@@ -149,16 +149,16 @@ function maakContextDomeinen() {
     const opzoeking = voor(sessie);
     const r = menscontext.saneer(ruw, opzoeking);
     const beelden = (r.verwijzingenUitslag || []).filter((u) => u.stand === 'CANONIEK').map((u) => u.object);
-    const { relatie, reden } = relatieVan(vraag, beelden);
+    const { relatie, reden, object } = relatieVan(vraag, beelden);
     const regel = menscontext.handtekening(r, { relatie });
     /* `aangewezen`: de SERVER vond een object van deze mens EN de vraag gaat
        erover. Alleen dan mag een vrije vraag eerst naar de stuurlus; een nieuwe
        taak met een oude aanvraag open is geen vraag over die aanvraag. */
     const aangewezen = beelden.length > 0 && (relatie === 'over' || relatie === 'wijzig');
-    const onderwerp = beelden.length && relatie !== 'los' ? naamVan(beelden[0]) : null;
+    const onderwerp = object && relatie !== 'los' ? naamVan(object) : null;
     return { opzoeking, aangewezen, relatie, reden, onderwerp,
       verduidelijk: relatie === 'onduidelijk' && beelden.length
-        ? 'Bedoelt u ' + naamVan(beelden[0]) + ', of gaat het om iets nieuws? Zeg het gerust, dan ga ik verder.' : null,
+        ? 'Bedoelt u ' + naamVan(object || beelden[0]) + ', of gaat het om iets nieuws? Zeg het gerust, dan ga ik verder.' : null,
       scherm: regel ? { regel, uitleg: CONTEXT_REGELS } : null };
   }
 

@@ -80,7 +80,15 @@ function noemtSoort(q, soort) {
 function relatieVan(vraag, beelden) {
   const lijst = (beelden || []).filter((b) => b && b.soort);
   const q = String(vraag || '');
-  if (!lijst.length) return { relatie: 'los', reden: 'er is geen object aangewezen' };
+  if (!lijst.length) return { relatie: 'los', reden: 'er is geen object aangewezen', object: null };
+  /* Twee aangewezen objecten (het scherm en het concept in het gesprek): de vraag
+     gaat over het object waarvan hij de SOORT noemt ("deze aanvraag" tegenover
+     "deze reiswens"), en anders over het eerste -- het nieuwste. */
+  const object = lijst.find((b) => noemtSoort(q, b.soort)) || lijst[0];
+  return Object.assign(oordeel(q, lijst), { object });
+}
+
+function oordeel(q, lijst) {
   const woorden = inhoudswoorden(q);
   const vanObject = new Set();
   for (const b of lijst) for (const w of woordenVanBeeld(b)) vanObject.add(w);

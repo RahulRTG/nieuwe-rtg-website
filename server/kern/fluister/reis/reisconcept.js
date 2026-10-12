@@ -116,7 +116,7 @@ module.exports = function reisconcept({ van, alle, save, nu, catalogus }) {
      waarden van NU, door de server opgezocht, en alleen van de eigenaar. */
   const contextDomein = {
     soort: 'reiswens',
-    velden: ['bestemming', 'reizigers', 'dagen', 'budgetPerPersoon', 'versie', 'stand'],
+    velden: ['titel', 'bestemming', 'reizigers', 'dagen', 'budgetPerPersoon', 'versie', 'stand'],
     zoek(id) {
       const grens = tijd() - BEWAARTERMIJN_MS;
       for (const p of Object.values(alle() || {}))
@@ -126,7 +126,7 @@ module.exports = function reisconcept({ van, alle, save, nu, catalogus }) {
     },
     eigenaar: (c) => c.eigenaar,
     mag: () => true,
-    beeld: (c) => ({ bestemming: c.waarden.bestemming, reizigers: c.waarden.reizigers, dagen: c.waarden.dagen,
+    beeld: (c) => ({ titel: 'Nieuwe reis naar ' + c.waarden.bestemming, bestemming: c.waarden.bestemming, reizigers: c.waarden.reizigers, dagen: c.waarden.dagen,
       budgetPerPersoon: c.waarden.budgetPP, versie: c.versie, stand: 'concept' })
   };
   return { conceptNieuw, conceptAanpassen, conceptBeeld, contextDomein, BEWERKBAAR };

@@ -17,17 +17,20 @@
    verzameld en daarna in een keer gestuurd, op de versie die de server net
    teruggaf. Zo botst het scherm nooit met zichzelf.
 
-   DE EDGE WEET WAAR HET LID AAN WERKT. Na elke tekening publiceert de kaart haar
-   object ({ soort, id, label }) in RTGAdaptief.context, dus een volgende vraag
-   aan Rahul verwijst naar dit concept -- en de server zoekt de waarden zelf op.
-   Er gaan geen waarden mee in die verwijzing.
+   RAHUL WEET WAAR HET LID AAN WERKT, ZONDER DAT DE KAART DE SCHERMCONTEXT ZET.
+   In de schil zet alleen de brug een context (test/edgedekking-zelf.test.js 5):
+   een kaart in het gesprek is geen blad. De kaart houdt daarom alleen bij welk
+   concept het laatst is gemaakt of aangepast (`verwijzing()`), en de
+   contextbouwer van Rahul (rahul-tab/helpers.js) zet die verwijzing naast het
+   object van het scherm, de nieuwste eerst. De server zoekt de waarden zelf op;
+   er gaan geen waarden mee in die verwijzing.
 
    EN DE KAART DOET NIETS. Er is hier geen knop om in te dienen, te boeken of te
    betalen: dat is een eigen handeling met een eigen gewicht. Alles wordt als
    tekst gezet (textContent), nooit als opmaak.
 
    Levert window.RTGEdgeConceptwerk.maak(concept, document, opties) -> {
-   element, concept(), teken(c) }, en in node module.exports. */
+   element, concept(), teken(c) } en .verwijzing(), en in node module.exports. */
 (function (root, fabriek) {
   'use strict';
   var api = fabriek(root);
@@ -35,7 +38,8 @@
   else if (root) root.RTGEdgeConceptwerk = api;
 }(typeof window !== 'undefined' ? window : this, function (root) {
   'use strict';
-  var BRON = 'rahul.concept';
+  // het concept waar het lid het laatst aan werkte, in dit venster
+  var actief = null;
   var STIJL = '.rtg-conceptwerk{margin:14px 0 4px;border:1px solid rgba(192,165,68,.32);padding:16px;background:rgba(192,165,68,.04)}' +
     'section.rtg-conceptwerk header{background:none;padding:0;border:0;display:flex;justify-content:space-between;gap:12px;font:600 11px/1.4 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase}' +
     '.rtg-conceptwerk header em{font-style:normal;opacity:.8}.rtg-conceptwerk h3{margin:8px 0 12px;font:500 19px/1.3 "Bodoni Moda",serif}' +
@@ -104,9 +108,7 @@
     });
 
     function publiceer(c) {
-      var A = root && root.RTGAdaptief;
-      if (A && typeof A.context === 'function')
-        try { A.context({ bron: BRON, titel: c.titel, object: { soort: c.soort, id: c.id, label: c.titel } }); } catch (e) { /* de kaart werkt zonder Edge */ }
+      actief = { soort: String(c.soort), id: String(c.id), op: Date.now(), kaart: kaart };
     }
     /* `houd` is een veld met een weigering: daar blijft staan wat het lid typte,
        met de reden eronder, zodat hij ziet wat er niet werd aangenomen. */
@@ -175,5 +177,12 @@
     return { element: kaart, concept: function () { return huidig; }, teken: teken, stuur: stuur };
   }
 
-  return { maak: maak, BRON: BRON };
+  /* Alleen een kaart die nog in het document staat telt: een weggehaalde kaart
+     is geen werkstuk meer. Soort, id en het moment, nooit een waarde. */
+  function verwijzing() {
+    if (!actief || !actief.kaart || actief.kaart.isConnected === false) return null;
+    return { soort: actief.soort, id: actief.id, op: actief.op };
+  }
+
+  return { maak: maak, verwijzing: verwijzing };
 }));

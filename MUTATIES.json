@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T02:35:22.728Z",
-    "commit": "c73c91afc",
+    "op": "2026-10-12T03:18:13.687Z",
+    "commit": "6ab0a938c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10993,7 +10993,8 @@
         "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
         "sourceSha256": "4a0fd28071240fb56281805736980f6e94f8fad81a6c9666696f6b1388706790",
         "testSha256": "73494e3f99f5525a7335e2e8f4f2e7abaae1a510f1d5ae072853b76b90e5d460"
-      }
+      },
+      "scherp": "gezakt"
     },
     "partnerpersoneelscode-migratie.test.js": {
       "soort": "server",
@@ -13362,6 +13363,21 @@
       "module": "server/kern/rtmail-lijn.js",
       "operator": "===->!==#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "rtmail-leiding-bestuur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtmail-leiding-pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtmail-leiding.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "rtmail-leidingplek.test.js": {

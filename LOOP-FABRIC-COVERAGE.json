@@ -12,7 +12,7 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5505,
+    "routes": 5506,
     "mutationContracts": 5377,
     "screens": 327
   },
@@ -42,7 +42,7 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2756,
+    "kernelFiles": 2757,
     "kernelGroups": [
       {
         "group": "_root",
@@ -650,7 +650,7 @@
       },
       {
         "group": "sociaal",
-        "files": 15
+        "files": 16
       },
       {
         "group": "socialebeleid",
@@ -2668,7 +2668,9 @@
       "server/log-meting.js",
       "server/log.js",
       "server/media/bestand.js",
+      "server/media/montage.js",
       "server/media/s3.js",
+      "server/media/toegang.js",
       "server/meetpoort.js",
       "server/meting-capaciteit.js",
       "server/meting-tekst.js",
@@ -6667,6 +6669,7 @@
       "server/kern/sleutelwoorden-uitdaging.js",
       "server/kern/sleutelwoorden.js",
       "server/kern/sociaal.js",
+      "server/kern/sociaal/dmpost.js",
       "server/kern/sociaal/pin-clusterrem.js",
       "server/kern/sociaal/pin-deur-rem.js",
       "server/kern/sociaal/pin-deur.js",
@@ -7002,6 +7005,8 @@
       "server/lokaal-tls.js",
       "server/mail.js",
       "server/media.js",
+      "server/media/montage.js",
+      "server/media/toegang.js",
       "server/meetpoort.js",
       "server/meting-lus.js",
       "server/middleware/apipoort.js",
@@ -26898,7 +26903,7 @@
         "mutationRoutes": 1,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 22,
+        "kernelDependencyCount": 23,
         "screenCount": 14,
         "sourceFiles": [
           "server/opzet/stroomtoegang.js",
@@ -26922,6 +26927,7 @@
           "server/kern/sessies.js",
           "server/kern/sessiestroom-kijk.js",
           "server/kern/sessiestroom.js",
+          "server/kern/sociaal/dmpost.js",
           "server/kern/sociaal/pin-clusterrem.js",
           "server/kern/sociaal/pin-formaat.js",
           "server/kern/stroomticket.js",
@@ -27017,7 +27023,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2619,
+        "kernelDependencyCount": 2620,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -27051,7 +27057,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2595,
+        "kernelDependenciesOmitted": 2596,
         "screens": [
           "public/apps/app.html"
         ],
@@ -28012,6 +28018,7 @@
         "signals": [
           "feedback",
           "booking",
+          "version",
           "event",
           "ai"
         ]

@@ -1,4 +1,4 @@
-/* Kantoren, deel "rtmail-leiding": de kantoorkant van de bewaartermijn van
+/* RTMAIL, de kantoorkant van de bewaartermijn van
    sollicitatiepost (besluit 584A, kern/rtmail-leidingtermijn.js en
    kern/rtmail-leidinghold.js). Twee dingen die onomkeerbaar verwijderen raken
    of tegenhouden, en dus allebei achter de boardroom met een VERSE passkey
@@ -14,8 +14,11 @@
 'use strict';
 const { wie: envelopWie } = require('../../opzet/envelop');
 
-module.exports = (ctx) => {
-  const { app, boardroomAuth, zwaar, boardroomUser, kern } = ctx;
+/* Gemonteerd vanuit ../rtmail-bestuur.js, op dezelfde domeingrens (GRENZEN.json:
+   rtmail-bestuur mag boardroomAuth, boardroomWie en zwaarbewijs). */
+module.exports = (kern) => {
+  const { app, boardroomAuth, zwaarbewijs: zwaar } = kern;
+  const boardroomUser = (req) => zwaar.boardroomUser(req);
   const body = (req) => (req && req.body) || {};
   const antwoord = (res, r) => (r.error ? res.status(r.status || 400).json(Object.assign({ error: r.error }, r.omvang ? { omvang: r.omvang } : {})) : res.json(r));
   const vinger = (req, actie, wat) => zwaar.eis(boardroomUser(req), actie, zwaar.sessieSleutel(req), req, wat, { zonderTerugval: true });

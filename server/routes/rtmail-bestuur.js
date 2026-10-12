@@ -135,7 +135,8 @@ module.exports = (kern) => {
      (kern/rtmail-leidinghold.js). Alleen een manager van DEZE zaak; een collega
      of een gedelegeerde van een andere zaak krijgt de reden. Wie het doet komt
      uit de inlog. De kantoorkant (toets, beoordeling) staat in
-     ./rtmail-leidingkantoor.js. */
+     ./rtmail-bestuur/kantoor.js, op dezelfde domeingrens. */
+  require('./rtmail-bestuur/kantoor')(kern);
   const manager = (req, res, ik, b) => {
     if (!ik) { res.status(404).json({ error: 'Geen postvak voor deze inlog.' }); return false; }
     if (magKlokZien(req.actor) && !(b.postvak && !zelfdeBus(ik, String(b.postvak)))) return true;

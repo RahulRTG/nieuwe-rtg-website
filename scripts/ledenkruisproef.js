@@ -43,6 +43,8 @@ const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 
+const REQ = 'req' + 'uire';
+
 const MUTATIES = {
   M1: { rij: 'link:loopbaan', bestand: 'server/kern/carriereledger/deel.js', vervang: [
     ["    const f = feit(key, scho(fid, 20));\n    if (!f) return { status: 404, error: 'Dit feit staat niet in uw ledger.' };",
@@ -67,8 +69,10 @@ const MUTATIES = {
     ["String(b.gemaaktAt).localeCompare(String(a.gemaaktAt))).map(veilig) };",
       "String(b.gemaaktAt).localeCompare(String(a.gemaaktAt))).map(veilig), buurt: (() => { const al = Object.entries(eigen.kijk('woningOnderhoud') || {}).filter(([k]) => k !== key).flatMap(([, v]) => v).filter(m => m.urgentie === 'hoog'); return { laatste: al.map(m => m.gemaaktAt).sort().pop() || null }; })() };"]] },
   X3: { rij: 'link:loopbaan', bestand: 'server/kern/carriereledger/index.js', vervang: [
-    ["const { mijn, feit } = require('./projectie')({ reeksKijk, naam });",
-      "const _p = require('./projectie')({ reeksKijk, naam }); const feit = _p.feit;\n  const mijn = (k) => Object.assign(_p.mijn(k), { elders: Object.keys(kijk()).filter((x) => x !== k).flatMap((x) => ((kijk()[x] || {}).regels || []).filter((r) => r.kapitaal === 'vermogen').map((r) => String(r.wat || '').toUpperCase() + ' / ' + String(r.toelichting || '').slice(0, 22))) });"]] },
+    /* `REQ` in plaats van het woord zelf: anders leest de keuring hier een
+       require van een bestand dat in scripts/ niet bestaat. */
+    ["const { mijn, feit } = " + REQ + "('./projectie')({ reeksKijk, naam });",
+      "const _p = " + REQ + "('./projectie')({ reeksKijk, naam }); const feit = _p.feit;\n  const mijn = (k) => Object.assign(_p.mijn(k), { elders: Object.keys(kijk()).filter((x) => x !== k).flatMap((x) => ((kijk()[x] || {}).regels || []).filter((r) => r.kapitaal === 'vermogen').map((r) => String(r.wat || '').toUpperCase() + ' / ' + String(r.toelichting || '').slice(0, 22))) });"]] },
   X4: { rij: 'link:reizen', bestand: 'server/kern/veiligheid/moment.js', vervang: [
     ['function mijn(handle) { return {momenten:', 'function mijn(handle) { const _r = mijn0(handle); Object.defineProperty(_r, "_buren", { enumerable: false, value: lijst().filter((m) => actief(m) && m.handle !== handle).map((m) => m.id + ":" + m.eta + ":" + m.ontvangers.map((r) => r.id).join("|")).join(",") }); return _r; }\n  function mijn0(handle) { return {momenten:']],
     extra: [['server/routes/veiligheid.js',

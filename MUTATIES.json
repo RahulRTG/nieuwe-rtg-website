@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T16:05:09.371Z",
-    "commit": "c71bb687e",
+    "op": "2026-10-12T21:24:46.907Z",
+    "commit": "0101deb41",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6802,6 +6802,14 @@
       "module": "server/lib/idem-sleutelbepaling.js",
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "idem-sleutelnaam.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "idem-takken.test.js": {

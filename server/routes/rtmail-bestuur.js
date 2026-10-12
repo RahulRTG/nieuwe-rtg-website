@@ -12,6 +12,7 @@
    reden dat de poort logt en niet de route: een route die zelf mag kiezen of
    hij logt, vergeet dat een keer. */
 const { magKlokZien } = require('../kern/leverancier/logboekzicht');
+const { zelfdeBus } = require('../kern/rtmail-adres');
 module.exports = (kern) => {
   const { app, auth, supplierAuth, db, rtmail, rtmailRecht, rtmailBewaar, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
@@ -27,6 +28,12 @@ module.exports = (kern) => {
     const doel = (req) => String(body(req).postvak || '') || p.adres(req);
     const geen = (res) => res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
     const nee = (res, r) => res.status(403).json({ error: r.error || r.waarom });
+    /* De leidingsplek (kern/rtmail-leiding.js) alleen voor een manager van PRECIES
+       de zaak van dit postvak: magKlokZien kent de eigen zaak, dus via een
+       delegatie op een ander postvak telt hij niet. De sessie gaat mee in het
+       vernietigingsbewijs, uit de inlog en nooit uit de body. */
+    const leidingVan = (req, ik, d) => p.pad === '/api/supplier/rtmail' && magKlokZien(req.actor) && zelfdeBus(ik, d);
+    const sessieVan = (req) => (req.actor && (req.actor.staffId || req.actor.lidKey)) || null;
 
     app.post(p.pad + '/rechten', p.poort, (req, res) => {
       const ik = p.adres(req);
@@ -79,7 +86,7 @@ module.exports = (kern) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
       const b = body(req);
-      const r = rtmailBewaar.zetTermijn(ik, doel(req), b.dagen, b.reden);
+      const r = rtmailBewaar.zetTermijn(ik, doel(req), b.dagen, b.reden, { leiding: leidingVan(req, ik, doel(req)) });
       if (r.error) return nee(res, r);
       res.json(r);
     });
@@ -96,7 +103,8 @@ module.exports = (kern) => {
     app.post(p.pad + '/opruimen', p.poort, (req, res) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
-      const r = rtmailBewaar.ruimOp(ik, doel(req), body(req).reden);
+      const r = rtmailBewaar.ruimOp(ik, doel(req), body(req).reden,
+        { leiding: leidingVan(req, ik, doel(req)), sessie: sessieVan(req) });
       if (r.error) return res.status(400).json(r);
       res.json(r);
     });
@@ -107,7 +115,7 @@ module.exports = (kern) => {
       const d = doel(req);
       const g = rtmailRecht.mag(ik, d, 'metadata');
       if (!g.ok) return nee(res, g);
-      res.json({ ok: true, postvak: d, bewijs: rtmailBewaar.bewijs(d),
+      res.json({ ok: true, postvak: d, bewijs: rtmailBewaar.bewijs(d, { leiding: leidingVan(req, ik, d) }),
         let: 'Hier staat WAT er vernietigd is, niet wat erin stond. Dat laatste zou de vernietiging ongedaan maken.' });
     });
 
@@ -115,9 +123,8 @@ module.exports = (kern) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
       const b = body(req);
-      // de wervingspost van de leidingsplek alleen voor een manager van de zaak (kern/rtmail-leiding.js)
       const r = rtmailBewaar.exporteer(ik, doel(req), { reden: b.reden, metInhoud: b.metInhoud,
-        leiding: p.pad === '/api/supplier/rtmail' && magKlokZien(req.actor) });
+        leiding: leidingVan(req, ik, doel(req)) });
       if (r.error) return nee(res, r);
       res.json(r);
     });

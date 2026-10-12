@@ -37,7 +37,7 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      verdwijnt post uit de verzonden-map van de afzender zodra de ontvanger hem
      opbergt. En de draad (het gesprek), die daarop leunt. */
   const rtmailVak = require('../kern/rtmail-vak')({ db, save, rtmail });
-  const rtmailDraad = require('../kern/rtmail-draad')({ db, rtmail, vak: rtmailVak });
+  const rtmailDraad = require('../kern/rtmail-draad')({ db, save, rtmail, vak: rtmailVak });
   /* De schrijfkant (concepten, uitgesteld verzenden, handtekening, afwezigheid,
      aliassen) en de regels die BIJ DE BEZORGING draaien. De regels hangen aan de
      haak in kern/rtmail.js, zodat ze langs elke bezorging komen -- ook langs post

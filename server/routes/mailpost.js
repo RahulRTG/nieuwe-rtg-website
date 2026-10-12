@@ -117,7 +117,7 @@ module.exports = (kern) => {
     app.post(p.pad + '/bijlagen', p.poort, (req, res) => {
       const a = p.adres(req);
       if (!a) return res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
-      schoonLeiding(db.data.rtmail); // beperkte post nooit in het gedeelde postvak (kern/rtmail-leiding.js)
+      schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (kern/rtmail-leiding.js)
       const m = ((db.data.rtmail || {}).berichten || []).find(x => x.id === String(body(req).id || ''));
       if (!m) return res.status(404).json({ error: 'Dat bericht bestaat niet.' });
       const g = rtmailRecht.poort(a, m.naar, 'lezen');
@@ -130,7 +130,7 @@ module.exports = (kern) => {
       if (!a) return res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
       const b = mailBijlage.open(String(body(req).id || ''));
       if (b.error) return res.status(404).json(b);
-      schoonLeiding(db.data.rtmail);
+      schoonLeiding(db.data.rtmail, save);
       const m = ((db.data.rtmail || {}).berichten || []).find(x => x.id === b.bericht);
       if (!m) return res.status(404).json({ error: 'Het bericht van deze bijlage bestaat niet meer.' });
       const g = rtmailRecht.poort(a, m.naar, 'lezen');

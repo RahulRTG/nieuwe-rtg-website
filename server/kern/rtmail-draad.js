@@ -20,10 +20,10 @@
 const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
-module.exports = ({ db, rtmail, vak }) => {
+module.exports = ({ db, save, rtmail, vak }) => {
   const store = () => {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    schoonLeiding(db.data.rtmail, null); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
+    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
     return db.data.rtmail;
   };
   const draadVan = (m) => m.draad || m.id;

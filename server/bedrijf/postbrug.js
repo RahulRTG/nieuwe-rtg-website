@@ -42,7 +42,7 @@ module.exports = (sctx) => {
      is een uitbreiding van je eigen bereik en geen vervanging ervan. */
   function berichtVoor(sessie, id) {
     const data = sctx.db && sctx.db.data && sctx.db.data.rtmail;
-    schoonLeiding(data); // beperkte post nooit in het gedeelde postvak (kern/rtmail-leiding.js)
+    schoonLeiding(data, save); // beperkte post nooit in het gedeelde postvak (kern/rtmail-leiding.js)
     const alle = (data || {}).berichten || [];
     const m = alle.find(x => x.id === id);
     if (!m) return { error: 'Dat bericht bestaat niet.' };

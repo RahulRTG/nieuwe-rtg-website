@@ -31,6 +31,9 @@ const zonderLeiding = (a) => String(a || '').replace(/-leiding@/, '@');
 /* Het vangnet (schoonLeiding), op een plek: haal beperkte post uit `data.berichten` (in place,
    want andere lezers houden de lijst vast) en zet hem op `data.leiding`. */
 function schoonLeiding(data, bewaar) {
+  // Verplicht, ook zonder iets te verhuizen: in PostgreSQL-modus is een
+  // verhuizing zonder save() PG_SAVE_ONTBREEKT, een 500 op een LEESpad.
+  if (typeof bewaar !== 'function') throw new Error('schoonLeiding: bewaar (save) ontbreekt');
   if (!data || !Array.isArray(data.berichten) || !data.berichten.some(isBeperkt)) return 0;
   if (!Array.isArray(data.leiding)) data.leiding = [];
   const weg = [];
@@ -41,7 +44,7 @@ function schoonLeiding(data, bewaar) {
     weg.unshift(m);
   }
   data.leiding.unshift(...weg);
-  if (typeof bewaar === 'function') try { bewaar(); } catch (e) { /* de verhuizing staat; opslaan volgt bij de volgende schrijf */ }
+  bewaar();
   return weg.length;
 }
 

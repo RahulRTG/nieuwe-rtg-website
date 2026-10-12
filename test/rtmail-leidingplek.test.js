@@ -126,7 +126,7 @@ test('3. bewaartermijn, juridische bewaring en export gelden ook voor de leiding
 
 test('4. vangnet: beperkte post die NA de verhuizing in het gedeelde postvak komt, ziet een collega niet', () => {
   /* Een oude instantie bij een rolling deploy, of een andere schrijver, kan nog
-     beperkte post in `berichten` zetten. Elke lezer roept dezelfde schoon() aan
+     beperkte post in `berichten` zetten. Elke lezer roept dezelfde schoonLeiding() aan
      (kern/rtmail-leiding.js), zonder vlag. Hier rechtstreeks op de kern, want
      over HTTP is "een andere schrijver" niet na te bootsen. */
   const crypto = require('crypto');
@@ -134,7 +134,7 @@ test('4. vangnet: beperkte post die NA de verhuizing in het gedeelde postvak kom
   const save = () => {};
   const rtmail = require('../server/kern/rtmail')({ db, save, crypto });
   const vak = require('../server/kern/rtmail-vak')({ db, save, rtmail });
-  const draad = require('../server/kern/rtmail-draad')({ db, rtmail, vak });
+  const draad = require('../server/kern/rtmail-draad')({ db, save, rtmail, vak });
   rtmail.systeemStuur('kik', 'Gewone post', 'hallo', 'systeem');
   rtmail.postvak('kik');                                   // de opslag bestaat en is al eens geschoond
   const stray = (id, naar) => ({ id, van: 'rtg@rtmail', naar, soort: 'personeel', onderwerp: 'Nieuwe sollicitatie', tekst: 'x',
@@ -149,30 +149,4 @@ test('4. vangnet: beperkte post die NA de verhuizing in het gedeelde postvak kom
   assert.ok(op, 'hij staat op de leidingsplek');
   assert.equal(op.naar, 'kik@rtmail', 'en het achtervoegsel -leiding is eraf');
 });
-
-test('bron: elke lezer van het gedeelde postvak roept dezelfde schoon() aan', () => {
-  /* Een nieuwe lezer die db.data.rtmail.berichten rechtstreeks leest zonder het
-     vangnet, laat beperkte post weer door. Let op de naam: een bestand met een
-     eigen `schoon` (tekstopschoning) mag het vangnet niet overschaduwen, vandaar
-     schoonLeiding. */
-  const W = path.join(__dirname, '..', 'server');
-  const fout = [];
-  const loop = (map) => {
-    for (const n of fs.readdirSync(map)) {
-      const f = path.join(map, n);
-      if (fs.statSync(f).isDirectory()) loop(f);
-      else if (n.endsWith('.js')) {
-        const t = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-        if (!/data\.rtmail\b/.test(t) || !/berichten/.test(t)) continue;
-        const rel = path.relative(W, f);
-        if (rel === path.join('kern', 'rtmail.js') || rel === path.join('kern', 'rtmail-leiding.js')) continue;
-        /* kern/rtgone.js geeft de lijst alleen door; de lezer, kern/rtgone-projecten.js,
-           filtert met isBeperkt (en leest alleen post aan het eigen persoonlijke adres) */
-        if (rel === path.join('kern', 'rtgone.js')) continue;
-        if (!/schoonLeiding\(/.test(t)) fout.push(rel);
-      }
-    }
-  };
-  loop(W);
-  assert.deepEqual(fout, [], 'lezers zonder het vangnet van kern/rtmail-leiding.js');
-});
+// de bronscan per leesplek staat in test/rtmail-leiding-pg.test.js

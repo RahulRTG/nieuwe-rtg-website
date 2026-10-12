@@ -4477,6 +4477,24 @@
       "meter": "toetsenNietGemeten 134 -> 142",
       "reden": "Acht nieuwe toetsbestanden uit de laatste samenvoeging waar de mutatiemotor nog niet langs is geweest, met naam: conciergelusscherm.e2e.js en conciergeproef.test.js (#562), contrastfoto.e2e.js (#549), office-formaten-eenheid.test.js, office-formaten.e2e.js, office-formaten.test.js en office-uitgangspoort.test.js (#582) en opnieuwbeginnen.test.js (#580). Geen van de PRs had ze in MUTATIES.json staan.",
       "waarheen": "npm run mutatie over deze acht draaien en MUTATIES.json vastleggen"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1686,
+      "meter": "kernBreedte 1686 -> 1687",
+      "reden": "AUTHORITY.md B4, vierde tegenlezing PR #587. De oplosser voor een gedeelde Salon-post in een DM (kern/sociaal/dmpost.js) staat als EEN instantie op de gedeelde sociale context (sctx.dmPost, routes/social.js) en wordt door de ledenkant (routes/social/leden.js) en de gezinskant (routes/social/gezinnen/vrienden.js) gebruikt, in plaats van twee kopieen die elk hun eigen poort zouden kunnen krijgen. Een eerdere versie las hem zonder destructureren en hield de meter zo op 1686; dat verstopte de koppeling voor scripts/grenzen.js (die sctx. niet telt) en is teruggedraaid.",
+      "waarheen": "test/media-toegang.test.js (de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen; de gezinskant lost op met de sessie van het gezinslid)"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "AUTHORITY.md B4, tegenlezing PR #587. Een Salon-post in een DM reist als id en wordt bij het LEZEN opgelost met de sessie van de lezer (kern/sociaal/dmpost.js). Het domein social krijgt daarvoor alleen de leespoort van De Salon als kern.salonMagLezen (opzet/kernlaag4-comm.js) en niet heel kern.salon (upload, plaats, verwijder, S() met volgtLid/verborgen/bewaard, ai): een smalle naam in plaats van een brede verruiming van GRENZEN.json. Een eigen instantie van zichtbaarheid.js in het routebestand zou findSupplier en zijnVrienden naar social trekken.",
+      "waarheen": "GRENZEN.json (social draagt salonMagLezen) en test/media-toegang.test.js (de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen)"
     }
   ],
   "prestatie": {

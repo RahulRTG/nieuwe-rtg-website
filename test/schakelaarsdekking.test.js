@@ -119,7 +119,7 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      Wat allebei bewaken is hetzelfde: dat het er niet STILLETJES meer worden. */
   const onverklaard = zonder.filter(r => !redenVoor(r.pad)).map(r => r.pad);
 
-  assert.ok(onverklaard.length <= 10,
+  assert.ok(onverklaard.length <= 9,   // 10 -> 9: /media staat sinds AUTHORITY.md B4 in bestuursroutes.js
     onverklaard.length + ' routes hangen aan geen enkele functie EN staan in geen enkel register. ' +
     'Ze zijn dan niet schakelbaar en niemand heeft opgeschreven waarom: ' +
     onverklaard.sort().join(', ') + ' -- zet ze in server/kern/bestuursroutes.js met een reden, ' +
@@ -236,7 +236,14 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      bestaande reden van /api/privacy in kern/bestuursroutes.js ("AVG-rechten en
      niet uitschakelbaar"). Kwam in de samenvoeging van #542 boven op #521 en #523,
      die elk hun eigen stap al zetten. `onverklaard <= 10` beweegt niet mee. */
-  assert.ok(zonder.length <= 154,
+  /* 154 -> 155: DE ONDERTEKENDE MEDIALINK (#587) (AUTHORITY.md B4, 12 oktober 2026).
+     GET /media/t/:token levert privébeeld na de poort van een domeinroute. De
+     levering is geen functie: wie iets mag zien beslist server/media/toegang.js,
+     niet een knop. /media staat daarom met reden in kern/bestuursroutes.js (en
+     al eerder in kern/platformregister/bediening.js), en test/platformregister.test.js
+     en test/schakelkast-dekking.test.js waren groen voordat dit getal werd verzet.
+     `onverklaard` ging in dezelfde stap OMLAAG, van 10 naar 9. */
+  assert.ok(zonder.length <= 155,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

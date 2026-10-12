@@ -9538,6 +9538,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "media-toegang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "media-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"

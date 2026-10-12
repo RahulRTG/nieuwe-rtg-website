@@ -67,7 +67,7 @@ module.exports = [
     'een bundel die je uit kunt zetten haalt in een klap elke pagina onderuit; dit is levering, geen functie'],
   ['/stijlbundel.css', 'De stijlbundel', 'De gebundelde stijl die elke pagina van dit huis draagt.',
     'zelfde reden als de scriptbundel: zonder stijl is er geen huis om iets in te schakelen'],
-  ['/media', 'Medialevering', 'Het uitleveren van geuploade bestanden op naam.',
+  ['/media', 'Medialevering', 'Het uitleveren van geuploade bestanden: openbaar beeld op naam, al het andere via een kort geldige ondertekende link (/media/t/...).',
     'de levering zelf is geen functie; wat je met media MAG staat in de functies die ze maken en tonen'],
   /* WAARSCHIJNLIJK HOORT DEZE BIJ EEN FUNCTIE EN NIET HIER. /werken/:code is de
      publieke ingang van de wervingslink. De functie die daarbij hoort heet

@@ -68,15 +68,30 @@ function stuurBuffer(req, res, buf, mime, cacheControl) {
   res.end(buf);
 }
 
-function maakServeer(leesBuf) {
-  return async function serveer(req, res) {
-    const naam = path.basename(String(req.params.naam || ''));
-    if (!/^[0-9a-f]{32}\.(jpg|jpeg|png|webp|mp4|webm|mov)$/.test(naam)) return res.status(400).end();
+/* Twee ingangen, allebei fail-closed (server/media/toegang.js):
+   - serveer: /media/:naam, ALLEEN voor een bestand dat nu op een verklaarde
+     openbare plek staat. Elk ander bestand krijgt exact hetzelfde 404 als een
+     naam die niet bestaat -- de route verraadt niet wat er in de opslag ligt.
+   - serveerLink: /media/t/:token, een kort geldige ondertekende link die een
+     domeinroute na haar eigen toegangspoort heeft gezet. Privé, nooit gecachet. */
+function maakServeer(leesBuf, toegang) {
+  async function lever(req, res, naam, cache) {
     const buf = await leesBuf(naam);
     if (!buf) return res.status(404).end();
     const ext = path.extname(naam).slice(1).toLowerCase();
-    return stuurBuffer(req, res, buf, MIME[ext], 'public, max-age=31536000, immutable');
-  };
+    return stuurBuffer(req, res, buf, MIME[ext], cache);
+  }
+  async function serveer(req, res) {
+    const naam = path.basename(String(req.params.naam || ''));
+    if (!toegang || !toegang.NAAM.test(naam) || !toegang.openbaarKlasse(naam)) return res.status(404).end();
+    return lever(req, res, naam, toegang.CACHE_OPENBAAR);
+  }
+  async function serveerLink(req, res) {
+    const naam = toegang ? toegang.leesLink(req.params.token) : null;
+    if (!naam) return res.status(404).end();
+    return lever(req, res, naam, toegang.CACHE_PRIVE);
+  }
+  return { serveer, serveerLink };
 }
 
 module.exports = { MIME, soortVanBuffer, stuurBuffer, maakServeer };

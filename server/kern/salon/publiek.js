@@ -3,6 +3,12 @@
    moment, de publiekskeuze en een genormaliseerd Offer. */
 'use strict';
 
+/* Beeld gaat door media.toon: openbaar blijft /media/<naam>, al het andere wordt
+   een kort geldige ondertekende link. Deze projectie draait alleen NA de
+   leespoort van de Salon (zichtbaarheid.js), dus de link is de toegang die die
+   poort al gaf -- en niet meer. */
+const { toon } = require('../../media/toegang');
+
 module.exports = ({ S, vorm }) => function publiek(p, sess) {
   const s = S();
   const mij = sess && sess.key;
@@ -19,11 +25,11 @@ module.exports = ({ S, vorm }) => function publiek(p, sess) {
     } : (p.deal ? { titel: p.deal.titel || '', geldigTot: p.deal.geldigTot || null,
       capaciteit: null, actie: null } : null),
     media: Array.isArray(p.media) && p.media.length ? p.media.map(m => ({
-      src: m.src, alt: m.alt || '', type: m.type === 'video' ? 'video' : 'image',
+      src: toon(m.src), alt: m.alt || '', type: m.type === 'video' ? 'video' : 'image',
       mime: m.mime || (m.type === 'video' ? 'video/mp4' : null),
       ondertitels: m.type === 'video' && Array.isArray(m.ondertitels) ? m.ondertitels : [],
       ondertitelStatus: m.type === 'video' ? (m.ondertitelStatus || null) : null
-    })) : (p.photo ? [{ src: p.photo, alt: '', type: 'image', mime: null }] : []),
+    })) : (p.photo ? [{ src: toon(p.photo), alt: '', type: 'image', mime: null }] : []),
     onderwerpen: p.onderwerpen || [],
     likes: (p.baseLikes || 0) + Object.keys(p.likedBy || {}).length,
     liked: !!(p.likedBy && mij && p.likedBy[mij]),

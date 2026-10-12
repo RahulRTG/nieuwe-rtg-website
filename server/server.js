@@ -429,14 +429,14 @@ if (zaakdoos.actief) {
     if (zaakdoos.modusVan() !== 'cloud' || !zaakdoos.magProxy(req.path)) return next();
     zaakdoos.proxy(req, res).then(gelukt => { if (!gelukt) next(); }).catch(() => next());
   });
-  // de randcache: media die eerder over de lijn kwam, serveert de doos zelf
-  // zodra het doorgeefluik hem niet kan leveren (de lijn is weg)
+  // de randcache: media die eerder over de lijn kwam, serveert de doos zelf als de lijn weg is
   app.use((req, res, next) => {
     if (req.method !== 'GET' || !req.path.startsWith('/media/') || zaakdoos.modusVan() === 'cloud') return next();
     const hit = zaakdoos.kasLees(req.originalUrl);
     if (!hit) return next();
     res.set('Content-Type', hit.type);
     res.set('X-Content-Type-Options', 'nosniff');
+    res.set('Cache-Control', hit.cc);
     res.end(hit.buf);
   });
   console.log('[doos] zaakdoos-modus: doorgeefluik naar', process.env.RTG_DOOS_CLOUD);
@@ -1004,7 +1004,7 @@ const webplatform = require('./kern/webplatform')({ db, team: webmakerTeam });
 const webplatformTaal = require('./kern/webplatform-taal')({ vertaler: require('./translate') });
 // AI in de Website-maker: past een ontwerp aan op een opdracht; bewaart niets zelf
 const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
-app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
+require('./media/montage')({ app, media, data: () => db.data, accounts });   // /media: fail-closed, zie daar
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
 // schrijver migreert; idempotent, dus veilig bij elke start. Async (kan naar S3).

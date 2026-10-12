@@ -1,6 +1,7 @@
 /* Rahul-reislaag (kern/fluister/reis): Rahul regelt met EEN vraag een hele
    reis: verblijf, transfer, diner en een activiteit, als een voorstel met een
-   totaalprijs dat op een enkel "ja" in zijn geheel wordt geboekt en afgerekend,
+   totaalprijs dat op een enkel "ja" in zijn geheel wordt klaargezet (afrekenen
+   doet het lid zelf, zie ./reisplan.js),
    via exact dezelfde actie-functies als de app-knoppen. Ook hier: koopt hij
    kleding (apart leggen in uw maat bij de modezaak) en voorspelt hij wat er nog
    nodig is rond wat al geboekt staat. Alles met geld of voorraad blijft achter
@@ -73,7 +74,7 @@ module.exports = (ctx) => {
       save();
       return klaar('Mijn voorstel voor uw reis vanaf ' + plan.start + ' met ' + plan.personen + ' personen: ' +
         plan.delen.map(d => d.oms).join(' | ') + '. Samen ' + eur(totaal) + ' (de transfer volgt het tarief van de vervoerder). ' +
-        'Zeg "ja" en ik boek alles in een keer, inclusief uw dagschema; "nee" en het gaat niet door.', false, true);
+        'Zeg "ja" en ik zet alles in een keer klaar, inclusief uw dagschema; afrekenen doet u daarna zelf in de app. "Nee" en het gaat niet door.', false, true);
     }
     if (/\b(koop|bestel|zoek|regel)\b/i.test(q)) {
       // de catalogus zelf is het bewijs: vindt Rahul een echt kledingstuk in

@@ -57,7 +57,24 @@
     return '<div class="rtg-command-msg ' + (mens ? 'user' : '') + '"><b>' + (mens ? 'U' : 'RAHUL') + '</b>' + tekst(m.tekst) +
       (m.noot ? '<small class="rtg-command-noot">' + tekst(m.noot) + '</small>' : '') + '</div>';
   }
-  window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht };
+  /* HET CONCEPT ALS WERKSTUK (shared/edge/conceptwerk.js, EDGE.md par. 14.6):
+     een concept met bewerkbare velden komt onder het gesprek te staan, en een
+     wijziging gaat met de eigen sessie naar de server. Een nieuw concept
+     vervangt het vorige; er staat er een tegelijk. */
+  function werk(d, page, auth) {
+    var c = d && d.taak && d.taak.concept, W = window.RTGEdgeConceptwerk;
+    if (!c || !c.id || !c.bewerkbaar || !W || !page || !auth) return null;
+    var oud = page.querySelector('.rtg-conceptwerk');
+    if (oud) oud.remove();
+    var k = W.maak(c, document, { verstuur: function (body) {
+      return fetch('/api/fluister/concept', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + auth },
+        body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; }); });
+    } });
+    var form = page.querySelector('.rtg-command-form');
+    if (form && form.parentNode) form.parentNode.insertBefore(k.element, form);
+    return k;
+  }
+  window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht, werk: werk };
   /* Escape sluit het Rahul-paneel, zoals elke andere laag in deze schil
      (GRAMMATICA.md: ik kan bijna altijd terug). Het paneel ligt vast over het
      werkblad; zonder dit was de sluitknop de enige weg terug. Dezelfde knop,

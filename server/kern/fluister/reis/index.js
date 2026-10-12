@@ -21,8 +21,10 @@ module.exports = (ctx) => {
   const deelCtx = { ...ctx, zaken, open, caps, datumPlus };
   const { bouwReisplan, voerReisUit } = require('./reisplan')(deelCtx);
   const { bouwKleding, voerKledingUit, voorspel } = require('./kleding')(deelCtx);
-  const { reiswens, zinVan } = require('./reiswens');
+  const { leesReiswens, conceptVan, zinVan } = require('./reiswens');
   const { reisAanbod } = require('../../reisbureau');
+  // een reiswens wordt een werkstuk met id en versie in het eigen geheugen (./reisconcept.js)
+  const concepten = require('./reisconcept')({ van: ctx.van, alle: ctx.alleFluister, save, nu, catalogus: () => reisAanbod(db) });
 
   /* ---- de servicedag: voor een zaak of een personeelslid bouwt Rahul uit
      de echte dagstand (reserveringen, lopende orders, activiteiten) een
@@ -81,8 +83,11 @@ module.exports = (ctx) => {
        concept met wat bekend is en wat ontbreekt, zonder iets in te dienen
        (./reiswens.js). Na het reisplan, zodat "plan mijn weekend" blijft wat
        het was. */
-    const wens = reiswens(q, reisAanbod(db));
-    if (wens) return Object.assign(klaar(zinVan(wens)), { concept: wens });
+    const waarden = leesReiswens(q);
+    if (waarden) {
+      const concept = concepten.conceptNieuw(p, key, waarden);
+      return Object.assign(klaar(zinVan(conceptVan(waarden, reisAanbod(db)))), { concept });
+    }
     if (/\b(koop|bestel|zoek|regel)\b/i.test(q)) {
       // de catalogus zelf is het bewijs: vindt Rahul een echt kledingstuk in
       // de vraag, dan is dit een kledingwens (anders valt de vraag gewoon
@@ -103,5 +108,5 @@ module.exports = (ctx) => {
     return null;
   }
 
-  return { rahulExtra, voerReisUit, voerKledingUit };
+  return { rahulExtra, voerReisUit, voerKledingUit, concepten };
 };

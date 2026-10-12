@@ -36,7 +36,6 @@ function leesReiswens(q) {
      ("naar huis", "naar buiten"). */
   const b = /\bnaar\s+([A-Z][\w\u00C0-\u017F'-]+(?:\s+[A-Z][\w\u00C0-\u017F'-]+)?)/.exec(tekst);
   if (!b) return null;
-  const velden = [];
   const vrienden = new RegExp('\\bmet\\s+' + N + '\\s+(vrienden|vriendinnen|collega\'?s|familieleden)\\b', 'i').exec(tekst);
   const personen = new RegExp('\\b(?:met\\s+)?' + N + '\\s+(personen|reizigers|man|mensen)\\b', 'i').exec(tekst);
   const dagen = new RegExp('\\b' + N + '\\s+(dagen|dag|nachten|nacht)\\b', 'i').exec(tekst);
@@ -49,43 +48,58 @@ function leesReiswens(q) {
   if (/\b(taxi|rit|ritje|transfer|chauffeur|vervoer|tafel|reserveer|reservering|bestel)\b/i.test(tekst)) return null;
   if (!dagen && !budget && !/\b(reis|reizen|vakantie|trip|stedentrip|weekend|weekendje)\b/i.test(tekst)) return null;
 
-  velden.push({ naam: 'Bestemming', waarde: b[1] });
-  if (vrienden) {
-    const n = getal(vrienden[1]);
-    velden.push({ naam: 'Reizigers', waarde: String(n + 1), aanname: 'u en ' + vrienden[1] + ' ' + vrienden[2] });
-  } else if (personen) velden.push({ naam: 'Reizigers', waarde: String(getal(personen[1])) });
-  if (dagen) velden.push({ naam: 'Duur', waarde: getal(dagen[1]) + ' ' + (/nacht/i.test(dagen[2]) ? 'nachten' : 'dagen') });
-  if (budget) velden.push({ naam: 'Budget', waarde: 'maximaal \u20ac ' + Number(String(budget[1]).replace(/\./g, '')) + ' per persoon' });
-  const ontbreekt = [];
-  if (!/\b(\d{1,2}[-/ ]\d{1,2}|januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december|morgen|volgende week|weekend)\b/i.test(tekst))
-    ontbreekt.push('de reisdata');
-  if (!/\bvanuit\s+[A-Z]|\bvertrek(ken)?\s+(vanuit|uit|vanaf)\s+[A-Z]/.test(tekst)) ontbreekt.push('uw vertrekplaats');
-  if (!vrienden && !personen) ontbreekt.push('het aantal reizigers');
-  return { bestemming: b[1], velden, ontbreekt };
+  /* De waarden staan GESTRUCTUREERD; de regels die het lid leest worden eruit
+     afgeleid (conceptVan). Zo is een wijziging op het scherm een wijziging van
+     een waarde, en geen tweede model naast het eerste (./reisconcept.js). */
+  return {
+    bestemming: b[1],
+    reizigers: vrienden ? getal(vrienden[1]) + 1 : personen ? getal(personen[1]) : null,
+    aanname: vrienden ? 'u en ' + vrienden[1] + ' ' + vrienden[2] : null,
+    dagen: dagen ? getal(dagen[1]) : null,
+    nachten: !!(dagen && /nacht/i.test(dagen[2])),
+    budgetPP: budget ? Number(String(budget[1]).replace(/\./g, '')) : null,
+    datumGenoemd: /\b(\d{1,2}[-/ ]\d{1,2}|januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december|morgen|volgende week|weekend)\b/i.test(tekst),
+    vertrekGenoemd: /\bvanuit\s+[A-Z]|\bvertrek(ken)?\s+(vanuit|uit|vanaf)\s+[A-Z]/.test(tekst)
+  };
 }
 
-/* Het concept zoals het lid het krijgt, met de catalogus ernaast: staat de
+const geld = (n) => '€ ' + String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+/* Het concept zoals het lid het krijgt, uit de waarden en de catalogus: staat de
    bestemming erin, dan noemen we die reis; zo niet, dan zeggen we dat, want een
    aanvraag in de app hoort bij een reis uit de catalogus (kern/reisbureau.js). */
-function reiswens(q, catalogus) {
-  const w = leesReiswens(q);
-  if (!w) return null;
-  const naam = w.bestemming.toLowerCase();
+function conceptVan(w, catalogus) {
+  const velden = [{ naam: 'Bestemming', waarde: w.bestemming }];
+  if (w.reizigers) velden.push(Object.assign({ naam: 'Reizigers', waarde: String(w.reizigers) }, w.aanname ? { aanname: w.aanname } : {}));
+  if (w.dagen) velden.push({ naam: 'Duur', waarde: w.dagen + ' ' + (w.nachten ? 'nachten' : 'dagen') });
+  if (w.budgetPP) velden.push({ naam: 'Budget', waarde: 'maximaal ' + geld(w.budgetPP) + ' per persoon' });
+  // afgeleid, en zo gemarkeerd: het lid past de twee waarden aan, niet dit getal
+  if (w.budgetPP && w.reizigers) velden.push({ naam: 'Groepsbudget', waarde: 'maximaal ' + geld(w.budgetPP * w.reizigers), afgeleid: true });
+  const ontbreekt = [];
+  if (!w.datumGenoemd) ontbreekt.push('de reisdata');
+  if (!w.vertrekGenoemd) ontbreekt.push('uw vertrekplaats');
+  if (!w.reizigers) ontbreekt.push('het aantal reizigers');
+  const naam = String(w.bestemming).toLowerCase();
   const reis = (catalogus || []).find((t) => String(t.bestemming || '').toLowerCase() === naam ||
     String(t.titel || '').toLowerCase().split(/[\s,]+/).includes(naam));
   const volgende = reis
-    ? 'In onze catalogus staat \u2018' + reis.titel + '\u2019. Die kunt u in het reisbureau aanvragen; dan bevestigt een reisadviseur de datum.'
+    ? 'In onze catalogus staat ‘' + reis.titel + '’. Die kunt u in het reisbureau aanvragen; dan bevestigt een reisadviseur de datum.'
     : w.bestemming + ' staat niet in onze reiscatalogus, dus ik kan deze reis nog niet als aanvraag indienen.';
-  return { soort: 'reiswens', titel: 'Nieuwe reis naar ' + w.bestemming, velden: w.velden, ontbreekt: w.ontbreekt,
-    volgende, catalogusreis: reis ? reis.id : null };
+  return { soort: 'reiswens', titel: 'Nieuwe reis naar ' + w.bestemming, velden, ontbreekt, volgende,
+    catalogusreis: reis ? reis.id : null };
+}
+
+function reiswens(q, catalogus) {
+  const w = leesReiswens(q);
+  return w ? conceptVan(w, catalogus) : null;
 }
 
 function zinVan(c) {
-  const v = c.velden.filter((x) => x.naam !== 'Bestemming').map((x) => x.naam.toLowerCase() + ' ' + x.waarde +
+  const v = c.velden.filter((x) => x.naam !== 'Bestemming' && !x.afgeleid).map((x) => x.naam.toLowerCase() + ' ' + x.waarde +
     (x.aanname ? ' (' + x.aanname + ')' : ''));
   return c.titel + (v.length ? ': ' + v.join(', ') + '.' : '.') +
     (c.ontbreekt.length ? ' Wat ik nog nodig heb: ' + c.ontbreekt.join(' en ') + '.' : '') + ' ' + c.volgende +
     ' Er is niets ingediend of geboekt.';
 }
 
-module.exports = { leesReiswens, reiswens, zinVan };
+module.exports = { leesReiswens, reiswens, conceptVan, zinVan, geld };

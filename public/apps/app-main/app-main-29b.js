@@ -131,6 +131,14 @@
            wat Rahul begreep, voorstelt en wat er werkelijk gebeurde. */
         const taak = r.taak && window.RTGEdgeTaakbeeld ? window.RTGEdgeTaakbeeld.teken(r.taak, document) : null;
         if (taak && aiDraad) { taak.classList.add('os-bel', 'van-rahul'); aiDraad.appendChild(taak); aiDraad.scrollTop = aiDraad.scrollHeight; }
+        // een concept met bewerkbare velden wordt een werkstuk (shared/edge/conceptwerk.js, par. 14.6)
+        const c = r.taak && r.taak.concept, W = window.RTGEdgeConceptwerk;
+        if (W && c && c.bewerkbaar && aiDraad) {
+          const k = W.maak(c, document, { verstuur: (b) => API.call('/fluister/concept', b)
+            .then((x) => ({ status: 200, body: x }), (e) => ({ status: e.status || 0, body: e.data || {} })) });
+          k.element.classList.add('os-bel', 'van-rahul');
+          aiDraad.appendChild(k.element);
+        }
         if (r.gedaan) toast(T('fl.gedaan', 'Rahul heeft het geregeld.'));
         // een voorstel van Rahul krijgt hier dezelfde twee knoppen als in zijn app
         draadTips(r.voorstel

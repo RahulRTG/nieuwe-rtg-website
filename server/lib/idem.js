@@ -122,9 +122,14 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
       if (dicht) return dicht;
       return werk();
     }
+    /* `_keys` is de ring en `__proto__` het prototype: geen sleutel, en nooit
+       een plek om een antwoord neer te zetten (test/idem-sleutelnaam.test.js). */
+    if (sleutel === '_keys' || sleutel === '__proto__') {
+      return { status: 400, code: 'IDEMPOTENTIESLEUTEL_ONGELDIG', error: 'Deze idem-sleutel is niet bruikbaar.' };
+    }
     const s = store();
     const a = afdrukStore();
-    if (sleutel in s && sleutel !== '_keys') {
+    if (Object.hasOwn(s, sleutel)) {
       if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
         return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
       }

@@ -90,13 +90,13 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5436<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27488<!--/getal--> benoemde symbolen met een regelnummer,
+**<!--getal:symbolen.gelezen-->5436<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27471<!--/getal--> benoemde symbolen met een regelnummer,
 <!--getal:symbolen.kanten-->7752<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
-<!--getal:symbolen.nietGelezen-->315<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
-reden: alle <!--getal:symbolen.bundeldeel-->315<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
+<!--getal:symbolen.nietGelezen-->314<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
+reden: alle <!--getal:symbolen.bundeldeel-->314<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
 functie beginnen en pas samengevoegd een programma vormen. Echte parsefouten:
 <!--getal:symbolen.parsefout-->0<!--/getal--> — en elke andere waarde dan nul laat het script met een foutcode
 eindigen, want een parsefout búiten een bundeldeel is een bevinding en geen ruis.
@@ -158,8 +158,8 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
-per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->440<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->1004<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1215<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
+per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->439<!--/getal--> schermen,
+<!--getal:schermroutes.paden-->1004<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1214<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -207,7 +207,7 @@ Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->1004<!
 
 `scripts/aanroepgraaf.js` → `AANROEPGRAAF.json` (`npm run aanroepgraaf`) legt de
 laatste twee schakels: **wie roept wie aan**, en **welk symbool handelt deze
-route af**. <!--getal:graaf.kanten-->31535<!--/getal--> kanten, <!--getal:graaf.aanroepers-->12382<!--/getal--> symbolen waarvan bekend is wie ze
+route af**. <!--getal:graaf.kanten-->31534<!--/getal--> kanten, <!--getal:graaf.aanroepers-->12382<!--/getal--> symbolen waarvan bekend is wie ze
 aanroept, en <!--getal:graaf.routesMetSymbool-->3373<!--/getal--> routes met minstens één afgehandeld symbool.
 
 Daarmee loopt de keten van scherm tot functie, uit registers alleen:
@@ -227,7 +227,7 @@ uit een `require` komt, **én** het doelbestand dat symbool ook echt kent.
 
 #### Een kwart opgelost is hier geen tekort
 
-Van de <!--getal:graaf.aanroepen-->181083<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% naar een symbool te herleiden (18,1%
+Van de <!--getal:graaf.aanroepen-->181081<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% naar een symbool te herleiden (18,1%
 toen deze meter werd gebouwd; §0.7 bracht de rest). Dat getal zonder indeling
 nodigt uit tot de verkeerde reparatie — iemand gaat de resolver "verbeteren" tot
 hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
@@ -272,7 +272,7 @@ lessen die elders net zo gelden:
    of lokale verklaring zijn, vallen daarom uit de bindingen. Grof, en met
    opzet.
 
-Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->31535<!--/getal-->
+Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->31534<!--/getal-->
 kanten zijn tegen de symbooltabel van hun doelbestand gehouden.
 
 Sinds 20 september 2026 staat er een **vijfde** soort naast die vier, en die
@@ -468,7 +468,7 @@ geen uitvoer van de fabriek.
 
 | | vóór §0.7 | na |
 |---|---|---|
-| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->31535<!--/getal--> |
+| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->31534<!--/getal--> |
 | aanroepen herleid | 18,1% | <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% |
 | routes met een symbool | 2346 | <!--getal:graaf.routesMetSymbool-->3373<!--/getal--> |
 | post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->20794<!--/getal--> |
@@ -559,7 +559,7 @@ eerst door de bestaanscontrole en produceerden **303 "bevindingen"** — de mete
 beschuldigde de code van een ontbrekend symbool dat hij zelf niet had ingevuld.
 `doelOnbekend` staat weer op <!--getal:graaf.doelOnbekend-->0<!--/getal-->.
 
-Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->31535<!--/getal--> kanten,
+Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->31534<!--/getal--> kanten,
 <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% herleid, <!--getal:graaf.routesMetSymbool-->3373<!--/getal--> routes met een symbool.
 
 **Een huisregel die twee keer moest worden geleerd:** zet geen voorbeeld met een

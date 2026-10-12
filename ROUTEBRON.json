@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-12T16:09:26.292Z",
-  "commit": "b0b5f9b1c",
+  "op": "2026-10-12T16:21:24.187Z",
+  "commit": "5dfdcb791",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3258,6 +3258,7 @@
     "server/lib/idemsleutels-proefronde.js",
     "server/lib/idemsleutels-recent.js",
     "server/lib/idemsleutels-reisconcept.js",
+    "server/lib/idemsleutels-reisgezelschap.js",
     "server/lib/idemsleutels-reisherkomst.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-restbak.js",
@@ -14355,7 +14356,7 @@
   {
    "route": "POST /api/cluster/:actie",
    "bestand": "server/server.js",
-   "regel": 899,
+   "regel": 897,
    "samengesteld": false
   },
   {
@@ -25611,13 +25612,13 @@
   {
    "route": "POST /api/notifications",
    "bestand": "server/server.js",
-   "regel": 1046,
+   "regel": 1044,
    "samengesteld": false
   },
   {
    "route": "POST /api/notifications/read",
    "bestand": "server/server.js",
-   "regel": 1049,
+   "regel": 1047,
    "samengesteld": false
   },
   {
@@ -31377,7 +31378,7 @@
   {
    "route": "POST /api/push/subscribe",
    "bestand": "server/server.js",
-   "regel": 1238,
+   "regel": 1236,
    "samengesteld": false
   },
   {
@@ -31401,7 +31402,7 @@
   {
    "route": "GET /api/ready",
    "bestand": "server/server.js",
-   "regel": 869,
+   "regel": 867,
    "samengesteld": false
   },
   {
@@ -36315,19 +36316,19 @@
   {
    "route": "POST /api/supplier/aanwezig",
    "bestand": "server/server.js",
-   "regel": 1367,
+   "regel": 1365,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/aanwezig/leeg",
    "bestand": "server/server.js",
-   "regel": 1379,
+   "regel": 1377,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/aanwezig/pas",
    "bestand": "server/server.js",
-   "regel": 1368,
+   "regel": 1366,
    "samengesteld": false
   },
   {
@@ -42309,7 +42310,7 @@
   {
    "route": "POST /api/supplier/zegel/check",
    "bestand": "server/server.js",
-   "regel": 1353,
+   "regel": 1351,
    "samengesteld": false
   },
   {
@@ -42429,7 +42430,7 @@
   {
    "route": "POST /api/talen",
    "bestand": "server/server.js",
-   "regel": 1317,
+   "regel": 1315,
    "samengesteld": false
   },
   {
@@ -43347,7 +43348,7 @@
   {
    "route": "POST /api/translate",
    "bestand": "server/server.js",
-   "regel": 1276,
+   "regel": 1274,
    "samengesteld": false
   },
   {
@@ -43761,7 +43762,7 @@
   {
    "route": "POST /api/vertaal/ui",
    "bestand": "server/server.js",
-   "regel": 1402,
+   "regel": 1400,
    "samengesteld": false
   },
   {
@@ -44931,19 +44932,19 @@
   {
    "route": "POST /api/zegel/controleer",
    "bestand": "server/server.js",
-   "regel": 1346,
+   "regel": 1344,
    "samengesteld": false
   },
   {
    "route": "POST /api/zegel/maak",
    "bestand": "server/server.js",
-   "regel": 1334,
+   "regel": 1332,
    "samengesteld": false
   },
   {
    "route": "GET /api/zegel/sleutel",
    "bestand": "server/server.js",
-   "regel": 1328,
+   "regel": 1326,
    "samengesteld": false
   },
   {

@@ -17,6 +17,7 @@ const SLEUTELS = Object.assign({},
   require('./idemsleutels-vrijgave').SLEUTELS,
   require('./idemsleutels-horecateruggave').SLEUTELS,
   require('./idemsleutels-leidingtermijn').SLEUTELS,
+  require('./idemsleutels-reisgezelschap').SLEUTELS,
   // RTG Office in en uit: exporteer en importeer zijn met opzet een tweede handeling
   require('./idemsleutels-officeformaten').SLEUTELS,
   /* De TURN-uitgifte: elk antwoord is een vers geheim. Zie de kop daar. */

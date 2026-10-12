@@ -2535,9 +2535,9 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27488<!--/getal--> benoemde symbolen
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27471<!--/getal--> benoemde symbolen
 met een regelnummer en <!--getal:symbolen.kanten-->7752<!--/getal--> require-kanten heen en terug, met de eigen parser
-en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->315<!--/getal--> niet-gelezen bestanden staan er MET reden in
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->314<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
 aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
@@ -2556,7 +2556,7 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->31535<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+<!--getal:graaf.kanten-->31534<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
 (<!--getal:graaf.routesMetSymbool-->3373<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
@@ -2671,8 +2671,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4115<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2711<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->4130<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2714<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

@@ -16,8 +16,8 @@
       "id": "partner",
       "route": "/apps/leverancier.html",
       "file": "partner.png",
-      "sourceHash": "fe6e7469985d902b930a39f00cb9e41185c68b3e94aeeec641a3b41cd2ace066",
-      "imageHash": "5b1d84239a6b01b61b6f43d8334e63d5162eb329f02d578ac0864216bff5da6d"
+      "sourceHash": "5f2490cae3f44f1d209921d37eea6d02fc54257d00bad9ad7502543d3a94d615",
+      "imageHash": "b731c5aa31d81b93e6c843906b7077bb0900cc56fbc4fe4e83aff08f69421ba0"
     },
     {
       "id": "gebruiker",

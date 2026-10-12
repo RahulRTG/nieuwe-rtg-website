@@ -130,7 +130,9 @@ async function loop(w, stap) {
 
 /* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
-   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   is en geen leeg experiment. `merktekens` (vrije tekst die A schreef; een ander
+   speelt hem na met een eigen waarde) en `objecten` (ids van A's dingen; die
+   blijven staan, dat is de IDOR-proef) mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
    terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
    `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
@@ -139,7 +141,7 @@ async function zaai(w) {
   const lid = await nieuwLid(w, 'kpst');
   const bron = 'kruis' + Date.now().toString(36);
   await w.post(ZET, { soort: 'aanbiedingen', kanalen: ['email', 'sms'], bron }, lid.token);
-  return { lid, merktekens: ['scherm:' + bron], lezers: [{ pad: STAND }, { pad: GESCHIEDENIS }],
+  return { lid, merktekens: [bron], lezers: [{ pad: STAND }, { pad: GESCHIEDENIS }],
     handelingen: [{ pad: ZET, lijf: { soort: 'productnieuws', kanalen: ['push'], bron } }, { pad: ALLES_UIT, lijf: {} }] };
 }
 

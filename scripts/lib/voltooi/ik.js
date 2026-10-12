@@ -120,7 +120,9 @@ async function loop(w, stap) {
 
 /* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
-   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   is en geen leeg experiment. `merktekens` (vrije tekst die A schreef; een ander
+   speelt hem na met een eigen waarde) en `objecten` (ids van A's dingen; die
+   blijven staan, dat is de IDOR-proef) mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
    terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
    `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
@@ -146,7 +148,15 @@ async function zaai(w) {
   const ADRES = 'kring' + merk() + '@voorbeeld.nl';
   await w.post('/api/veiligheid/kring/toevoegen', { handle: maat.key }, A);
   await w.post('/api/veiligheid/kring/mail', { adres: ADRES }, A);
-  return { lid, merktekens: [VNW, AANHEF, EIGEN, ADRES],
+  /* Een open venster en een plek: zonder venster bewaart de server geen plek
+     (N19), en dan valt er niets van A's plek te lekken. A's eigen lezing toont
+     zijn coordinaten niet (alleen hoe oud de plek is), dus de plek is een
+     merkteken voor een lek en geen onderwerp. */
+  const LABEL = 'Naar huis kruisproef ' + merk();
+  const LAT = 52 + (Math.floor(Math.random() * 89999) + 10001) / 1e5;
+  await w.post('/api/veiligheid/wacht/start', { soort: 'thuis', minuten: 240, marge: 0, label: LABEL }, A);
+  await w.post('/api/veiligheid/plek', { lat: LAT, lon: 4.9, accu: 20 }, A);
+  return { lid, merktekens: [VNW, AANHEF, EIGEN, ADRES, LABEL, String(LAT)],
     lezers: [{ pad: IK }, { pad: TOEG }, { pad: '/api/veiligheid/kring' }, { pad: '/api/ik/vandaag', lijf: { lat: 52.37, lon: 4.9 } },
       { pad: '/api/rahul/stemming' }],
     handelingen: [{ pad: ZET, lijf: { voornaamwoord: 'hen/die ' + merk() + 'kr' } }, { pad: TOEG_ZET, lijf: { beweging: 'stil' } },

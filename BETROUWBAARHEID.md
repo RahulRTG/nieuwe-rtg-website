@@ -743,7 +743,10 @@ codenaam. Met de hand nagekeken was dat A's aanwezigheid in een gedeelde zaal va
 de Residence -- zo bedoeld. De eerste reparatie haalde de codenaam daarom
 huisbreed uit de merktekens, en dat was te ruim (zie hieronder, M3b). Nu is hij
 weer een merkteken, behalve op de routes in `CODENAAM_ZICHTBAAR`
-(`scripts/lib/ledenkruis.js`), elk met de reden waarom die ruimte gedeeld is.
+(`scripts/lib/ledenkruis.js`): een EXACTE lijst van de vier zaalroutes van de
+Residence (`betreed`, `stap`, `zeg`, `emote`), elk met de reden waarom die ruimte
+gedeeld is. Een voorvoegsel `/api/residentie/` was te ruim: de suite en de
+huistelefoon zijn geen gedeelde zaal.
 
 **Waar IDOR geen id vond.** `IDOR.json` (vers, 698 gescheiden, 0 doorbraak, 0 lek)
 noemt een route zonder object-id `onbereikbaar`, en zo'n route hield de rij op
@@ -772,8 +775,35 @@ lekken, en twee bleven BEWEZEN:
   zaait een eigen waarde in elk veld (titel, doel, eta), en de codenaam is weer
   een merkteken met de allowlist hierboven. Nagemeten: DEFECT.
 
-Beide staan als toets in `test/ledenkruis.test.js` (8 en 9). Twee vondsten in de
-meter zelf, eerder: een merkteken dat de ander zelf meestuurde (`bron` in
+Een tweede tegenlezing vond vier lekken die daarna NOG op BEWEZEN bleven, en
+die vielen in twee klassen:
+
+- **Klasse A -- "hij stuurde het zelf" maakte de meter blind.** Een merkteken dat
+  in het verzoek van de ander stond, telde niet. Maar de ander speelde A's
+  verzoek na, dus A's adres en A's eigen tekst stonden in ZIJN lijf.
+  **N1** (Wie ben ik): `kring/mail {weg}` gaf de kring van A terug aan een ander
+  lid, met A's adres -- groen. Reparatie: een TEKST-merkteken wordt bij het
+  naspelen door een ander vervangen door een eigen waarde (`vervangTekst()`), en
+  de uitzondering is weg. Een OBJECT-id blijft juist staan, want dat is de
+  IDOR-proef; alleen dat mag in het antwoord op een verzoek dat het zelf
+  meestuurde terugkomen (de handeling oordeelt dan via `object: true`).
+- **Klasse B -- vrije velden zonder merkteken.** **N2** (Wonen): `/api/home/onderhoud`
+  gaf `urgentInDeBuurt` mee, met plek, notitie en stand van iedereen. **N3**
+  (Mijn loopbaan): `/delen` zonder filter op uitgever gaf ieders deelcodes,
+  `voor` en verloop. **N4** (Reizen): `/api/veiligheid/moment` gaf `aankomend` mee,
+  met ontvangers, `tot` en plek van elk moment. Reparatie: de zaai vult elk vrij
+  veld met een eigen waarde (plek en notitie; toelichting en `voor`; de code en
+  naam van de ontvanger), en de ids van A's dingen (feit, deelcode, melding,
+  map, document, moment, sessies) tellen als OBJECT-merkteken.
+
+**De zes mutaties liggen vast** in `scripts/ledenkruisproef.js`
+(`npm run ledenkruisproef`): hij brengt elk lek weer aan in de bron, draait
+`bevoegdronde --alleen=<rij>` en eist DEFECT. Gedraaid op 12 oktober 2026: M1,
+M3b, N1, N2, N3 en N4 alle zes DEFECT. Die live-replay start per mutatie een
+server en een browser en zit daarom **niet in de gewone CI**; wat wel in CI zit
+zijn de oordelen per klasse (`test/ledenkruis.test.js`, toetsen 1, 1b, 8 en 9) en
+een toets (10) die vasthoudt dat alle zes mutaties nog in de proef staan en nog
+op de bron passen. Twee vondsten in de meter zelf, eerder: een merkteken dat de ander zelf meestuurde (`bron` in
 `/api/mijn/post/zet`) gaf een vals lek, en een stroom (event-stream) hing de hele
 ronde een kwartier op `res.text()`.
 
@@ -795,8 +825,13 @@ inhoud van een stroom (alleen zijn status telt); de inhoud van een WEIGERING (ee
 ziet de kruis niet); een handeling op een object van A die het scenario NIET als
 `object` markeert (de inbreuk hangt aan die verklaring); een gedeelde route in
 `CODENAAM_ZICHTBAAR` die meer laat zien dan de codenaam alleen (daar telt de
-codenaam niet, de andere merktekens wel); en een andere zaak of een ander kantoor
-dan het proefaccount uit de sleutelbos.
+codenaam niet, de andere merktekens wel); een vrij veld dat het scenario NIET
+zaait (de kruis kan alleen een waarde herkennen die hij zelf heeft neergezet);
+A's PLEK alleen als lek en niet als onderwerp -- Wie ben ik opent een venster en
+meldt een plek met unieke coordinaten, maar A's eigen lezing toont die
+coordinaten niet, dus de kruis bewijst dat geen ander ze krijgt en niet dat het
+scherm ze afschermt; en een andere zaak of een ander kantoor dan het
+proefaccount uit de sleutelbos.
 
 **De twee vondsten van ronde 2 zijn bij de oorzaak gerepareerd.** Mijn loopbaan:
 `server/kern/carriereledger/` riep `vastleggen()` aan zonder `await`, terwijl

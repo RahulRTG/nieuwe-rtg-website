@@ -507,6 +507,7 @@
     "liegronde:vast": "node scripts/liegronde.js --vastleggen",
     "bevoegdronde": "node scripts/bevoegdronde.js",
     "bevoegdronde:vast": "node scripts/bevoegdronde.js --vastleggen",
+    "ledenkruisproef": "node scripts/ledenkruisproef.js",
     "mandaatproef": "node scripts/mandaatproef.js",
     "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen",
     "positieproef": "node scripts/positieproef.js",

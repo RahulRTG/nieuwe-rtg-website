@@ -147,7 +147,9 @@ async function loop(w, stap) {
 
 /* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
-   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   is en geen leeg experiment. `merktekens` (vrije tekst die A schreef; een ander
+   speelt hem na met een eigen waarde) en `objecten` (ids van A's dingen; die
+   blijven staan, dat is de IDOR-proef) mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
    terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
    `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
@@ -155,11 +157,12 @@ async function loop(w, stap) {
 async function zaai(w) {
   const lid = await nieuwLid(w, 'klpb');
   const WAT = 'Diploma kruisproef ' + merk();
-  const f = await w.post(ZET, { kapitaal: 'vermogen', wat: WAT, op: '2020-06-30' }, lid.token);
+  const TOELICHTING = 'Toelichting kruisproef ' + merk(), VOOR = 'Sponsor kruisproef ' + merk();
+  const f = await w.post(ZET, { kapitaal: 'vermogen', wat: WAT, op: '2020-06-30', toelichting: TOELICHTING }, lid.token);
   const feitId = f.data && f.data.regel && f.data.regel.id;
-  await w.post(DEEL, { id: feitId, dagen: 7, voor: 'een sponsor' }, lid.token);
+  await w.post(DEEL, { id: feitId, dagen: 7, voor: VOOR }, lid.token);
   const deel = (((await w.post(DELEN, {}, lid.token)).data || {}).delen || [])[0];
-  return { lid, merktekens: [WAT], lezers: [{ pad: MIJN }, { pad: DELEN }],
+  return { lid, merktekens: [WAT, TOELICHTING, VOOR], objecten: [feitId, deel && deel.id], lezers: [{ pad: MIJN }, { pad: DELEN }],
     handelingen: [{ pad: DEEL, object: true, lijf: { id: feitId, dagen: 3, voor: 'een tweede' } },
       { pad: STOP, object: true, lijf: { id: deel && deel.id } },
       { pad: ZET, lijf: { kapitaal: 'netwerk', wat: 'Club kruisproef ' + merk(), op: '2022-11-12' } },

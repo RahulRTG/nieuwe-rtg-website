@@ -171,7 +171,9 @@ async function loop(w, stap) {
 
 /* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
-   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   is en geen leeg experiment. `merktekens` (vrije tekst die A schreef; een ander
+   speelt hem na met een eigen waarde) en `objecten` (ids van A's dingen; die
+   blijven staan, dat is de IDOR-proef) mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
    terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
    `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
@@ -183,9 +185,11 @@ async function zaai(w) {
      route die de lopende reizen van ANDEREN teruggaf groen staan zodra die de
      titel wegliet (de tegenlezer, mutatie M3b). */
   const TITEL = 'Diner kruisproef ' + merk(), DOEL = 'Bestemming kruisproef ' + merk(), ETA = 'eta-' + merk();
-  const m = await w.post(MAAK, Object.assign(formulier(TITEL), { doel: DOEL, eta: ETA }), lid.token);
+  const CODE = 'KR' + merk().toUpperCase(), NAAM = 'Ontvanger kruisproef ' + merk();
+  const m = await w.post(MAAK, Object.assign(formulier(TITEL), { doel: DOEL, eta: ETA,
+    ontvangers: [{ soort: 'bedrijf', id: CODE, naam: NAAM, niveau: 'voortgang' }] }), lid.token);
   const id = m.data && m.data.moment && m.data.moment.id;
-  return { lid, merktekens: [TITEL, DOEL, ETA], lezers: [{ pad: MIJN }],
+  return { lid, merktekens: [TITEL, DOEL, ETA, CODE, NAAM], objecten: [id], lezers: [{ pad: MIJN }],
     handelingen: [{ pad: STATUS, object: true, lijf: { id, status: 'onderweg', eta: '19:45' } }, { pad: PAUZE, object: true, lijf: { id, aan: true } },
       { pad: STOP, object: true, lijf: { id } }, { pad: MAAK, lijf: formulier('Trein kruisproef ' + merk()) }] };
 }

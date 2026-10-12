@@ -21,7 +21,10 @@
      8. Een handeling op een object van A die bij een ander slaagt, is een
         inbreuk (de tegenlezer, mutatie M1).
      9. De codenaam is een merkteken, behalve op de verklaarde gedeelde routes
-        (de tegenlezer, mutatie M3b). */
+        (de tegenlezer, mutatie M3b); de lijst is exact.
+    10. De live-replay van alle zes mutaties (M1, M3b, N1-N4) staat in
+        scripts/ledenkruisproef.js en past nog op de bron. Klasse A (1) en B
+        (1b) zijn de oordelen van de tweede tegenlezing. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -32,15 +35,31 @@ const M = ['Kraan kruisproef abc'];
 const alleGeweigerd = () => Object.fromEntries(K.ANDEREN.map((w) => [w, 'geweigerd']));
 const paar = (soort, pad, a, anderen) => ({ soort, pad, a, anderen: Object.assign(alleGeweigerd(), anderen || {}) });
 
-test('1. een merkteken van A bij een ander is een lek, tenzij hij het zelf meestuurde', () => {
+test('1. KLASSE A: een tekst van A bij een ander is altijd een lek, want de ander stuurt hem nooit mee', () => {
   assert.equal(K.andersOordeel({ status: 200, tekst: '{"titel":"Kraan kruisproef abc"}' }, M, { wie: 'ander lid' }), 'lek');
-  assert.equal(K.andersOordeel({ status: 200, tekst: '{"titel":"Kraan kruisproef abc"}' }, M,
-    { wie: 'ander lid', verzoek: '/api/x {"titel":"Kraan kruisproef abc"}' }), 'eigen',
-  'wie een woord zelf stuurt en het terugkrijgt, ziet zijn eigen woord');
-  assert.equal(K.andersOordeel({ status: 200, tekst: '{"via":"scherm:kruisx"}' }, ['scherm:kruisx'],
-    { wie: 'ander lid', verzoek: '{"bron":"kruisx"}' }), 'eigen', 'de herkomst die het lid zelf meegaf is zijn eigen woord');
+  /* De oude uitzondering ("hij stuurde het zelf") maakte de meter blind voor N1:
+     een kring/mail die A's kring teruggaf, met A's adres in het lijf. Nu speelt
+     de ander na met een EIGEN waarde, en telt A's tekst in zijn antwoord altijd. */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"kring":{"mails":["kring1@x.nl"]}}' }, ['kring1@x.nl'],
+    { wie: 'ander lid', verzoek: '/api/veiligheid/kring/mail {"adres":"kring1@x.nl","weg":true}' }), 'lek',
+  'N1: een tekst van A in het antwoord is een lek, ook als hij in het verzoek stond');
+  const lijf = K.vervangTekst('{"adres":"kring1@x.nl","id":"wo-1"}', ['kring1@x.nl', { waarde: 'wo-1', soort: 'object' }], 'ander lid');
+  assert.equal(lijf.includes('kring1@x.nl'), false, 'de ander stuurt nooit A\'s tekst mee');
+  assert.equal(lijf.includes('"wo-1"'), true, 'een object van A blijft staan: dat is de IDOR-proef');
   assert.equal(K.andersOordeel({ status: 403, tekst: 'Kraan kruisproef abc' }, M, { wie: 'zaak' }), 'geweigerd',
-    'een weigering is geen lek, ook als de tekst toevallig klopt');
+    'een weigering wordt niet op merktekens gelezen (een bekende blinde vlek, BETROUWBAARHEID.md par. 4j)');
+});
+
+test('1b. KLASSE B: een object-id van A is een merkteken, behalve waar de ander het zelf meestuurde', () => {
+  const obj = [{ waarde: 'cdab12', soort: 'object' }];
+  /* N3: /delen gaf ieders deelcodes, met hun id. */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"delen":[{"id":"cdab12"}]}' }, obj,
+    { wie: 'ander lid', pad: '/api/carriere/ledger/delen', verzoek: '/api/carriere/ledger/delen {}' }), 'lek');
+  /* Een 404 die het id terugnoemt is een weigering; een "eigen" antwoord dat het
+     id echoot op een verzoek dat het meestuurde, is geen lek -- slaagt de
+     handeling, dan oordeelt `object: true` (inbreuk). */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"id":"cdab12","ok":false}' }, obj,
+    { wie: 'ander lid', verzoek: '{"id":"cdab12"}' }), 'eigen');
 });
 
 test('2. een handeling zonder sessie is open, een andere sessie die iets eigens krijgt niet', () => {
@@ -139,7 +158,26 @@ test('9. M3b: de codenaam lekt buiten de verklaarde gedeelde routes', () => {
   /* In een gedeelde zaal is de codenaam met opzet zichtbaar. */
   assert.equal(K.andersOordeel({ status: 200, tekst: '{"aanwezig":["Zilveren Valk EE41"]}' }, [cn],
     { wie: 'ander lid', pad: '/api/residentie/betreed' }), 'eigen');
+  /* De lijst is EXACT en geen voorvoegsel: een tweede route onder dezelfde map
+     (de suite, de huistelefoon) is geen gedeelde zaal. */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"suite":"Zilveren Valk EE41"}' }, [cn],
+    { wie: 'ander lid', pad: '/api/residentie/suite' }), 'lek');
   for (const [route, reden] of Object.entries(K.CODENAAM_ZICHTBAAR)) {
-    assert.ok(route.startsWith('/api/') && reden.length > 30, route + ' draagt geen reden waarom de codenaam daar zichtbaar mag zijn');
+    assert.ok(/^\/api\/[a-z/]+[a-z]$/.test(route), route + ' is geen exacte route');
+    assert.ok(reden.length > 30, route + ' draagt geen reden waarom de codenaam daar zichtbaar mag zijn');
+  }
+});
+
+test('10. de live-replay ligt vast: elke mutatie van beide tegenlezingen staat in de ledenkruisproef', () => {
+  /* De zware helft (server + browser per mutatie) staat niet in CI maar in
+     scripts/ledenkruisproef.js; deze toets houdt vast dat geen van de zes er
+     stil uit verdwijnt en dat elk nog op de bron past. */
+  const { MUTATIES } = require('../scripts/ledenkruisproef');
+  const fs = require('fs');
+  const path = require('path');
+  assert.deepEqual(Object.keys(MUTATIES).sort(), ['M1', 'M3b', 'N1', 'N2', 'N3', 'N4']);
+  for (const [naam, m] of Object.entries(MUTATIES)) {
+    const bron = fs.readFileSync(path.join(__dirname, '..', m.bestand), 'utf8');
+    for (const [oud] of m.vervang) assert.ok(bron.includes(oud), naam + ': het te muteren stuk staat niet meer in ' + m.bestand);
   }
 });

@@ -122,7 +122,9 @@ async function loop(w, stap) {
 
 /* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
-   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   is en geen leeg experiment. `merktekens` (vrije tekst die A schreef; een ander
+   speelt hem na met een eigen waarde) en `objecten` (ids van A's dingen; die
+   blijven staan, dat is de IDOR-proef) mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
    terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
    `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
@@ -130,7 +132,8 @@ async function loop(w, stap) {
 async function zaai(w) {
   const lid = await nieuwLid(w, 'kwon');
   const TITEL = 'Kraan kruisproef ' + merk();
-  await w.post(MELD, { titel: TITEL, plek: 'keuken', urgentie: 'hoog' }, lid.token);
+  const PLEK = 'Keuken kruisproef ' + merk(), NOTITIE = 'Druppelt kruisproef ' + merk();
+  await w.post(MELD, { titel: TITEL, plek: PLEK, notitie: NOTITIE, urgentie: 'hoog' }, lid.token);
   const m = met(await w.post(LIJST, {}, lid.token), TITEL)[0];
   /* Het woningdossier van hetzelfde scherm (public/apps/wonen.js): een map en een
      document. Een ander die A's map hernoemt of een nieuwe versie over A's
@@ -142,7 +145,7 @@ async function zaai(w) {
   const mapId = map.data && map.data.id;
   const stuk = await w.post('/api/bestanden/upload', { naam: STUK, map: mapId, dataUrl: tekst('label A') }, lid.token);
   const stukId = stuk.data && stuk.data.id;
-  return { lid, merktekens: [TITEL, DOSSIER, STUK], lezers: [{ pad: LIJST }, { pad: '/api/bestanden/mijn' }],
+  return { lid, merktekens: [TITEL, PLEK, NOTITIE, DOSSIER, STUK], objecten: [m && m.id, mapId, stukId], lezers: [{ pad: LIJST }, { pad: '/api/bestanden/mijn' }],
     handelingen: [{ pad: ANNULEER, object: true, lijf: { id: m && m.id } }, { pad: MELD, lijf: { titel: 'CV kruisproef ' + merk(), plek: 'zolder', urgentie: 'normaal' } },
       { pad: '/api/bestanden/map', object: true, lijf: { id: mapId, naam: DOSSIER + ' (bijgewerkt)' } },
       { pad: '/api/bestanden/upload', object: true, lijf: { id: stukId, dataUrl: tekst('label A, tweede versie') } }] };

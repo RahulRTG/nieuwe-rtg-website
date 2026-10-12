@@ -50,19 +50,29 @@ const GRENS = 'het scherm bij het laden plus de zaai en handelingen van zijn sce
 
 const ok = (s) => s >= 200 && s < 300;
 
-/* Wat een ander bij EEN verzoek kreeg. */
-/* `verzoek` is wat de ander zelf meestuurde (adres en lijf). Een merkteken dat
-   daarin al staat, kan hij niet van A hebben gekregen: wie "bron: x" stuurt en
-   "via: scherm:x" terugkrijgt, ziet zijn eigen woord. Zonder die uitzondering
-   meldde de eerste ronde een lek op /api/mijn/post/zet dat er niet was. */
+/* Wat een ander bij EEN verzoek kreeg.
+
+   TWEE SOORTEN MERKTEKEN, en het verschil is de hele les van de tweede
+   tegenlezing. Een TEKST (een titel, een notitie, een adres dat A schreef) wordt
+   bij het naspelen door een ander VERVANGEN door een eigen waarde
+   (vervangTekst() hieronder): de ander stuurt dus nooit A's woord mee, en elk
+   spoor van A's tekst in zijn antwoord is een lek. Eerder gold de uitzondering
+   "hij stuurde het zelf", en die maakte de meter blind voor precies de waarden
+   die het scenario in A's lijf zette -- een kring/mail die de kring van een ander
+   teruggaf, bleef groen omdat het adres in het verzoek stond. Een OBJECT (het id
+   van A's feit, melding, moment, map, sessie) blijft juist staan, want dat IS de
+   IDOR-proef; komt het terug in het antwoord op een verzoek dat het zelf
+   meestuurde, dan is dat geen lek (de handeling zelf wordt dan als `inbreuk`
+   beoordeeld als hij slaagde). */
 function andersOordeel({ status, tekst }, merktekens, { handeling = false, object = false, wie = '', verzoek = '', pad = '' } = {}) {
   if (status === 429 || status === 0) return 'onbeslist';
   if (!ok(status)) return 'geweigerd';
   const raak = merktekens.find((m) => {
     const waarde = typeof m === 'string' ? m : m && m.waarde;
     if (!waarde) return false;
-    if (m.zichtbaarOp && m.zichtbaarOp.some((v) => pad === v || pad.startsWith(v))) return false;
-    return !String(verzoek).includes(waarde.replace(/^scherm:/, '')) && String(tekst || '').includes(waarde);
+    if (m.zichtbaarOp && m.zichtbaarOp.includes(pad)) return false;
+    if (m.soort === 'object' && String(verzoek).includes(waarde)) return false;
+    return String(tekst || '').includes(waarde);
   });
   if (raak) return 'lek';
   if (handeling && wie === 'anoniem') return 'open';
@@ -81,8 +91,24 @@ function andersOordeel({ status, tekst }, merktekens, { handeling = false, objec
    route. Een verklaring en geen afleiding -- wie hier een route toevoegt, zegt
    waarom die ruimte gedeeld is. */
 const CODENAAM_ZICHTBAAR = {
-  '/api/residentie/': 'de Residence is een gedeelde zaal: wie binnenloopt ziet wie er is, op codenaam (server/routes/member/residentie.js)'
+  '/api/residentie/betreed': 'binnenlopen in een zaal van de Residence: wie binnenkomt ziet wie er al is, op codenaam (server/routes/member/residentie.js)',
+  '/api/residentie/stap': 'een stap in een gedeelde zaal: het antwoord is de zaal met wie erin staat, op codenaam',
+  '/api/residentie/zeg': 'iets zeggen in een gedeelde zaal: wie er is hoort het, met de codenaam van wie het zei',
+  '/api/residentie/emote': 'een emote in een gedeelde zaal: zichtbaar voor wie er is, op codenaam'
 };
+
+/* Een tekst-merkteken van A vervangen door een eigen waarde van de ander, in het
+   adres en het lijf van een verzoek dat een ander naspeelt. Objecten blijven. */
+function vervangTekst(s, merktekens, wie) {
+  let uit = String(s == null ? '' : s);
+  merktekens.forEach((m, i) => {
+    const waarde = typeof m === 'string' ? m : m && m.waarde;
+    const soort = typeof m === 'string' ? 'tekst' : (m.soort || 'tekst');
+    if (!waarde || soort !== 'tekst') return;
+    uit = uit.split(waarde).join('ander' + i + '-' + String(wie).replace(/\W/g, '') + '-x');
+  });
+  return uit;
+}
 
 /* Tijdstempels wegstrepen: een stand die alleen een "laatst gezien" anders heeft,
    is niet aangetast. Getallen blijven staan -- een teller die verschuift is wel
@@ -187,11 +213,13 @@ async function identiteit(w, token) {
   const u = (s.data && s.data.state && s.data.state.user) || {};
   /* De codenaam is een merkteken, behalve op de routes in CODENAAM_ZICHTBAAR. */
   const codenaam = u.codename ? [{ waarde: String(u.codename), zichtbaarOp: Object.keys(CODENAAM_ZICHTBAAR) }] : [];
-  return [u.number, u.email, u.phone, sidVan(token)].filter((x) => x && String(x).length >= 6).map(String).concat(codenaam);
+  const sid = sidVan(token);
+  return [u.number, u.email, u.phone].filter((x) => x && String(x).length >= 6).map(String).concat(codenaam,
+    sid ? [{ waarde: sid, soort: 'object' }] : []);
 }
 
-/* Een rij meten. `zaai` (optioneel, uit een scenario) geeft { lid, merktekens,
-   lezers, handelingen }; zonder zaai is A `standaardLid`. `anderen` zijn de
+/* Een rij meten. `zaai` (optioneel, uit een scenario) geeft { lid, merktekens
+   (vrije tekst van A), objecten (ids van A's dingen), lezers, handelingen }; zonder zaai is A `standaardLid`. `anderen` zijn de
    sessies van de sleutelbos ({ wie: token|null }). */
 async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, eigenRoutes, zaai, standaardLid }) {
   const w = wereldOver(base);
@@ -199,7 +227,8 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
   if (zaai) {
     const z = await zaai(w);
     A = z.lid.token;
-    merktekens = (z.merktekens || []).concat(await identiteit(w, A));
+    merktekens = (z.merktekens || []).concat((z.objecten || []).filter(Boolean).map((o) => ({ waarde: String(o), soort: 'object' })),
+      await identiteit(w, A));
     lezers = z.lezers || []; handelingen = z.handelingen || [];
   } else {
     A = standaardLid.token; merktekens = standaardLid.merktekens;
@@ -263,10 +292,12 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
     for (const p of paren) {
       if (p.h) {
         const koppen = p.h.kop ? await p.h.kop() : {};
-        p.anderen[wie] = andersOordeel(await roep(base, { methode: 'POST', url: p.h.pad, lijf: JSON.stringify(p.h.lijf || {}), koppen }, anderen[wie]),
-          merktekens, { handeling: true, object: !!p.h.object, wie, pad: p.pad, verzoek: p.h.pad + ' ' + JSON.stringify(p.h.lijf || {}) });
+        const lijf = vervangTekst(JSON.stringify(p.h.lijf || {}), merktekens, wie);
+        p.anderen[wie] = andersOordeel(await roep(base, { methode: 'POST', url: p.h.pad, lijf, koppen }, anderen[wie]),
+          merktekens, { handeling: true, object: !!p.h.object, wie, pad: p.pad, verzoek: p.h.pad + ' ' + lijf });
       } else {
-        p.anderen[wie] = andersOordeel(await roep(base, p.v, anderen[wie]), merktekens, { wie, pad: p.pad, verzoek: p.v.url + ' ' + p.v.lijf });
+        const v = Object.assign({}, p.v, { url: vervangTekst(p.v.url, merktekens, wie), lijf: vervangTekst(p.v.lijf, merktekens, wie) });
+        p.anderen[wie] = andersOordeel(await roep(base, v, anderen[wie]), merktekens, { wie, pad: p.pad, verzoek: v.url + ' ' + v.lijf });
       }
     }
     const na = await leesStand();
@@ -287,4 +318,4 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
   return Object.assign(kruisOordeel({ paren, onderwerp, aangetast }), { kruisparen: paren.map((p) => ({ pad: p.pad, soort: p.soort, a: p.a, anderen: p.anderen })) });
 }
 
-module.exports = { ANDEREN, GRENS, CODENAAM_ZICHTBAAR, andersOordeel, kruisOordeel, vlak, meetRij, wereldOver, identiteit, sidVan };
+module.exports = { ANDEREN, GRENS, CODENAAM_ZICHTBAAR, vervangTekst, andersOordeel, kruisOordeel, vlak, meetRij, wereldOver, identiteit, sidVan };

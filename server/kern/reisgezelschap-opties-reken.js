@@ -28,13 +28,13 @@ const bandOmhoog = c => Math.ceil(c / BAND) * BAND;
 function pastBij(optie, opgave) {
   const redenen = [];
   if (opgave.plafond != null && bandOmhoog(optie.prijsPP) > bandOmlaag(opgave.plafond)) {
-    redenen.push('De prijs per persoon ligt boven jouw plafond.');
+    redenen.push('De prijs per persoon ligt boven uw plafond.');
   }
   if (opgave.data && opgave.data.length && !opgave.data.some(d => d.van <= optie.van && optie.tot <= d.tot)) {
-    redenen.push('De data vallen buiten de periodes die jij opgaf.');
+    redenen.push('De data vallen buiten de periodes die u opgaf.');
   }
   const botst = (optie.kenmerken || []).filter(k => (opgave.nietGraag || []).includes(k));
-  if (botst.length) redenen.push('Deze optie heeft iets wat jij liever niet hebt: ' + botst.join(', ') + '.');
+  if (botst.length) redenen.push('Deze optie heeft iets wat u liever niet heeft: ' + botst.join(', ') + '.');
   return { past: redenen.length === 0, redenen };
 }
 

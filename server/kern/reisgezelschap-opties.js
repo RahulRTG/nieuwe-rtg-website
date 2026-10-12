@@ -49,6 +49,7 @@
 
 const { BAND, MAX_OPTIES, MAX_TOETSEN, DAG_MS, MIN_DEELNEMERS, GRENS, NIET_GEZEGD, pastBij, gedeeldVenster, keurOptie } =
   require('./reisgezelschap-opties-reken');
+const { projectie } = require('./reisgezelschap-werkruimte');
 
 module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave }) => {
   const nuMs = () => klok.datum().getTime();
@@ -60,7 +61,7 @@ module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave
     if (!k[eigenaar][reisId]) { if (!maak) return null; k[eigenaar][reisId] = { opties: [], toetsen: [] }; }
     return k[eigenaar][reisId];
   };
-  const NIET = { status: 404, error: 'Je reist niet mee met deze reis.' };
+  const NIET = { status: 404, error: 'U reist niet mee met deze reis.' };
   const recent = (v) => (v ? v.toetsen.filter(t => nuMs() - t < DAG_MS) : []);
 
   /* Een optie zetten of wijzigen. Alleen de reiziger zelf; hij is degene die
@@ -80,7 +81,7 @@ module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave
       : v.opties.find(o => inhoud(o) === inhoud(k.optie));
     if (gelijk) return { status: 200, ok: true, optie: gelijk, getoetst: false };
     if (!bestaand && v.opties.length >= MAX_OPTIES) {
-      return { status: 409, error: 'Er staan al ' + MAX_OPTIES + ' opties klaar. Haal er een weg voor je een nieuwe toevoegt.' };
+      return { status: 409, error: 'Er staan al ' + MAX_OPTIES + ' opties klaar. Haal er een weg voor u een nieuwe toevoegt.' };
     }
     const gebruikt = recent(v);
     if (gebruikt.length >= MAX_TOETSEN) {
@@ -122,13 +123,15 @@ module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave
       voorIedereen: vast ? rijen.every(r => pastBij(o, r.opgave).past) : null,
       voorJou: mijn ? pastBij(o, mijn) : null
     }));
-    return { status: 200, ok: true, stand: 'voorlopig',
+    /* Per lezer een projectie (./reisgezelschap-werkruimte.js): de server kiest
+       blokken, gegevens en handelingen bij de rol, het scherm tekent alleen. */
+    return projectie(d.eigenaar === key ? 'eigenaar' : 'reisgenoot', {
       deelnemers: rijen.length, ingevuld: rijen.filter(r => r.opgave).length,
-      vastTeStellen: vast, waaromNiet,
+      vastTeStellen: vast, waaromNiet, mijn,
       venster: vast ? gedeeldVenster(rijen.map(r => r.opgave)) : null,
-      opties,
+      opties, berekendOp: new Date(nuMs()).toISOString(),
       toetsingen: { afgelopenEtmaal: recent(v).length, max: MAX_TOETSEN },
-      nietGezegd: NIET_GEZEGD, grens: GRENS };
+      nietGezegd: NIET_GEZEGD, grens: GRENS });
   }
 
   return { zetOptie, wisOptie, groepsbeeld };

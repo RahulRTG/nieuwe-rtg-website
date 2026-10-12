@@ -57,7 +57,7 @@ const beeld = async (wie) => {
   assert.equal(r.status, 200, wie.naam + ': ' + JSON.stringify(r.body));
   return r.body;
 };
-const zonderJou = (b) => JSON.stringify(Object.assign({}, b, { opties: b.opties.map(o => Object.assign({}, o, { voorJou: undefined })) }));
+const gedeeld = (b) => JSON.stringify(Object.assign({}, b.groep, { voortgang: undefined }));
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -94,10 +94,10 @@ test('2. zolang niet iedereen iets opgaf, is er geen groepsuitkomst -- wel een e
   opties.zee = z.body.optie.id;
   await api('/api/reis/gezelschap/opgave/zet', { reis: REIS, opgave: { plafond: 150000 } }, A.token);
   const b = await beeld(A);
-  assert.equal(b.vastTeStellen, false);
-  assert.match(b.waaromNiet, /Nog niet iedereen/);
-  assert.equal(b.opties[0].voorIedereen, null, 'een groepsuitkomst zonder alle opgaven is een gok');
-  assert.equal(b.opties[0].voorJou.past, true, 'Anna ziet wel haar eigen uitkomst');
+  assert.equal(b.groep.vastTeStellen, false);
+  assert.match(b.groep.waaromNiet, /Nog niet iedereen/);
+  assert.equal(b.groep.opties[0].voorIedereen, null, 'een groepsuitkomst zonder alle opgaven is een gok');
+  assert.equal(b.jij.opties[opties.zee].past, true, 'Anna ziet wel haar eigen uitkomst');
   assert.equal(b.stand, 'voorlopig');
 });
 
@@ -118,27 +118,30 @@ test('3. vijf opgaven, drie opties: het beeld is voor iedereen gelijk op voorJou
 
   const per = {};
   for (const wie of [A, B, C, D, G]) per[wie.naam] = await beeld(wie);
-  const o = (b, id) => b.opties.find(x => x.id === id);
+  const o = (b, id) => b.groep.opties.find(x => x.id === id);
 
-  assert.equal(per.Anna.vastTeStellen, true);
+  assert.equal(per.Anna.groep.vastTeStellen, true);
   assert.equal(o(per.Anna, opties.zee).voorIedereen, true, 'de villa past iedereen');
   assert.equal(o(per.Anna, opties.duur).voorIedereen, false, 'het hotel past niet iedereen');
   assert.equal(o(per.Anna, opties.feest).voorIedereen, false, 'de feestweek past niet iedereen');
 
-  // DE DRAGENDE BEWERING: buiten voorJou is het beeld voor iedereen gelijk
-  const ijk = zonderJou(per.Anna);
-  for (const naam of Object.keys(per)) assert.equal(zonderJou(per[naam]), ijk, naam + ' kreeg een ander groepsbeeld');
+  // DE DRAGENDE BEWERING: het gedeelde deel is voor iedereen gelijk, en de vingerafdruk ook
+  const ijk = gedeeld(per.Anna);
+  for (const naam of Object.keys(per)) {
+    assert.equal(gedeeld(per[naam]), ijk, naam + ' kreeg een ander groepsbeeld');
+    assert.equal(per[naam].kenmerk, per.Anna.kenmerk, naam + ' kreeg een andere vingerafdruk');
+  }
 
   // Bram hoort zijn eigen redenen, en alleen hij
-  assert.deepEqual(o(per.Bram, opties.duur).voorJou.redenen, ['De prijs per persoon ligt boven jouw plafond.']);
-  assert.match(o(per.Bram, opties.feest).voorJou.redenen[0], /liever niet hebt: nachtleven/);
+  assert.deepEqual(per.Bram.jij.opties[opties.duur].redenen, ['De prijs per persoon ligt boven uw plafond.']);
+  assert.match(per.Bram.jij.opties[opties.feest].redenen[0], /liever niet heeft: nachtleven/);
   for (const naam of ['Anna', 'Cees', 'Dirk', 'Gijs']) {
     const t = JSON.stringify(per[naam]);
-    assert.ok(!/plafond\.|liever niet hebt/.test(t), naam + ' ziet de reden van een ander');
+    assert.ok(!/plafond\.|liever niet heeft/.test(t), naam + ' ziet de reden van een ander');
     assert.ok(!t.includes('120000'), naam + ' ziet het plafond van Bram');
     for (const x of [A, B, C, D, G]) assert.ok(!t.includes(x.codenaam), naam + ' ziet een codenaam in het groepsbeeld');
   }
-  assert.deepEqual(per.Anna.venster, [{ van: dag(58), tot: dag(65) }], 'de dagen waarop iedereen die data opgaf kan');
+  assert.deepEqual(per.Anna.groep.venster, [{ van: dag(58), tot: dag(65) }], 'de dagen waarop iedereen die data opgaf kan');
 });
 
 test('4. de reiziger kan de grens van de groep niet ongelimiteerd uithoren', async () => {
@@ -156,7 +159,7 @@ test('4. de reiziger kan de grens van de groep niet ongelimiteerd uithoren', asy
     const r = await api('/api/reis/gezelschap/opties/zet', { reis: REIS, id: opties.duur,
       optie: { titel: 'Boutiquehotel', prijsPP: prijs, van: dag(60), tot: dag(64) } }, A.token);
     assert.equal(r.status, 200, 'proef ' + prijs);
-    uitkomst.push((await beeld(A)).opties.find(x => x.id === opties.duur).voorIedereen);
+    uitkomst.push((await beeld(A)).groep.opties.find(x => x.id === opties.duur).voorIedereen);
   }
   // in stappen van EUR 50: 1225 en 1210 tellen allebei als 1250, dus het verschil is niet te zien
   assert.deepEqual(uitkomst, [false, false, false], 'onder de EUR 50 leert de proef niets');
@@ -167,15 +170,15 @@ test('4. de reiziger kan de grens van de groep niet ongelimiteerd uithoren', asy
   assert.ok(geweigerd.body.weerVanaf, 'en hij zegt wanneer het weer kan');
   // en Bram ziet dat er geprobeerd is
   const b = await beeld(B);
-  assert.deepEqual(b.toetsingen, { afgelopenEtmaal: 6, max: R.MAX_TOETSEN });
-  assert.match(b.grens, /niet zien van wie/, 'de rest van het lek staat er hardop bij');
+  assert.deepEqual(b.groep.toetsingen, { afgelopenEtmaal: 6, max: R.MAX_TOETSEN });
+  assert.match(b.groep.grens, /niet zien van wie/, 'de rest van het lek staat er hardop bij');
 });
 
 test('5. wie vertrekt, telt niet meer mee', async () => {
   assert.equal((await api('/api/reis/gezelschap/weg', { id: B.uitnodiging }, B.token)).status, 200);
   const b = await beeld(A);
-  assert.equal(b.deelnemers, 4);
-  assert.equal(b.opties.find(x => x.id === opties.feest).voorIedereen, true, 'zonder Bram past de feestweek wel');
+  assert.equal(b.groep.voortgang.deelnemers, 4);
+  assert.equal(b.groep.opties.find(x => x.id === opties.feest).voorIedereen, true, 'zonder Bram past de feestweek wel');
 });
 
 test('6. de rekenregels zelf: grove stappen, data binnen een periode, en de drempel', () => {
@@ -195,7 +198,7 @@ test('6. de rekenregels zelf: grove stappen, data binnen een periode, en de drem
       voorDeBerekening: () => [{ key: 'a', opgave: { plafond: 1 } }, { key: 'b', opgave: { plafond: 2 } }] } });
   m.zetOptie('a', 'r', { titel: 'x', prijsPP: 100, van: '2027-02-01', tot: '2027-02-02' });
   const b = m.groepsbeeld('a', 'r');
-  assert.equal(b.vastTeStellen, false);
-  assert.match(b.waaromNiet, /vanaf 3 deelnemers/);
-  assert.equal(b.opties[0].voorIedereen, null);
+  assert.equal(b.groep.vastTeStellen, false);
+  assert.match(b.groep.waaromNiet, /vanaf 3 deelnemers/);
+  assert.equal(b.groep.opties[0].voorIedereen, null);
 });

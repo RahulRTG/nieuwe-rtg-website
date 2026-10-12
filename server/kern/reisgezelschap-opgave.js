@@ -63,7 +63,7 @@ function keur(invoer) {
   if (i.plafond != null && i.plafond !== '') {
     const p = Number(i.plafond);
     if (!Number.isInteger(p) || p <= 0 || p > MAX_PLAFOND) {
-      return { fout: 'Geef je plafond op als een heel aantal centen per persoon, groter dan nul en hoogstens ' + MAX_PLAFOND + '.' };
+      return { fout: 'Geef uw plafond op als een heel aantal centen per persoon, groter dan nul en hoogstens ' + MAX_PLAFOND + '.' };
     }
     uit.plafond = p;
   }
@@ -93,8 +93,8 @@ function keur(invoer) {
   return { invoer: uit };
 }
 
-const WIE_ZIET = 'Alleen jij ziet wat je hier invult. Anderen in het gezelschap zien alleen hoeveel ' +
-  'deelnemers iets hebben ingevuld, niet wie en niet wat. De server van RTG verwerkt je invoer ' +
+const WIE_ZIET = 'Alleen u ziet wat u hier invult. Anderen in het gezelschap zien alleen hoeveel ' +
+  'deelnemers iets hebben ingevuld, niet wie en niet wat. De server van RTG verwerkt uw invoer ' +
   'om een groepsvoorstel te kunnen maken; dat is geen versleutelde berekening.';
 
 module.exports.maakGezelschapOpgave = ({ db, save, klok, crypto, leden, reisVan }) => {
@@ -115,7 +115,7 @@ module.exports.maakGezelschapOpgave = ({ db, save, klok, crypto, leden, reisVan 
       .filter(x => x.reis === reisId && x.eigenaar === eigenaar && x.stand === 'aanvaard' && x.rol === 'reisgenoot')
       .map(x => x.lid));
   }
-  const NIET = { status: 404, error: 'Je reist niet mee met deze reis.' };
+  const NIET = { status: 404, error: 'U reist niet mee met deze reis.' };
 
   function mijnOpgave(key, reisId) {
     const d = deelnameVan(key, reisId);

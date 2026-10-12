@@ -847,6 +847,20 @@
         "deel": "Documenten",
         "selectie": "Paspoort 2026"
       }
+    },
+    {
+      "id": "act-doel-ondernemen",
+      "input": "Ik wil mijn eigen bedrijf beginnen",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "wegen",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
     }
   ],
   "contextGeval": "Een machineleesbare HumanContext voor dit geval, in de vorm die server/kern/stuur/menscontext.js saneert: presentatie (app/deel/selectie/wereld), verwijzingen (soort + id, NOOIT een object) en interactie (soort/opties/gekozen). Ontbreekt hij, dan wordt het geval zonder context gedraaid. Let op: `interactie` is NIET p.wacht -- een client die zegt dat er iets openstaat, maakt daarmee geen uitvoerbaar voorstel."

@@ -75,4 +75,14 @@ const VRAGEN = Object.freeze([
     ] }
 ]);
 
-module.exports = { VRAGEN };
+/* Naar welke onderdelen een onderwerp wijst, en hoe het heet. Voor de
+   persoonlijke volgorde (kern/experience/volgorde.js), die zo geen tweede
+   indeling hoeft te maken: de indeling is deze lijst, en er is er een. */
+const opties = () => VRAGEN.flatMap(v => v.opties);
+const wijstVan = (onderwerp) => opties().filter(o => o.onderwerp === onderwerp).flatMap(o => o.wijst);
+function labelVan(onderwerp) {
+  const o = opties().find(x => x.onderwerp === onderwerp);
+  return o ? o.label.toLowerCase() : null;
+}
+
+module.exports = { VRAGEN, wijstVan, labelVan };

@@ -73,7 +73,7 @@
  },
  "telling": {
   "capabilities": 5148,
-  "bereikbaarPerRol": 179,
+  "bereikbaarPerRol": 180,
   "conflicten": 0,
   "metBesluit": 167,
   "metVermoedeTerugweg": 49,
@@ -10527,7 +10527,11 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
-   "bereik": "verboden"
+   "bereik": {
+    "member": "lezen",
+    "supplier": "verboden",
+    "staff": "verboden"
+   }
   },
   {
    "pad": "/api/kosten/grens",

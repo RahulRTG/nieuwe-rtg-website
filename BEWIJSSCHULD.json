@@ -5,7 +5,7 @@
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
@@ -43,7 +43,7 @@
   "rollback-gezakt": 1,
   "object-vooraf": 466,
   "proefruis": 1,
-  "gevolg-onbekend": 96,
+  "gevolg-onbekend": 97,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
   "idem-ongeclassificeerd": 152,
@@ -158,7 +158,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 96,
+   "aantal": 97,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -356,7 +356,7 @@
     "aantal": 323
    },
    {
-    "op": "2026-10-06",
+    "op": "2026-10-12",
     "aantal": 323
    },
    {
@@ -390,6 +390,10 @@
    {
     "op": "2026-10-11",
     "aantal": 96
+   },
+   {
+    "op": "2026-10-12",
+    "aantal": 97
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -473,12 +477,6 @@
    "aantal": 1,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
-  },
-  {
-   "id": "gevolg-onbekend",
-   "aantal": 96,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
   {
    "id": "droogloop-onbeoordeeld",

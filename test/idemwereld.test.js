@@ -100,7 +100,11 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      stonden op main op `ongemeten (404)` omdat er geen locatie in de wereld
      was; dat gat is hiermee dicht en `mutatiesZonderEnigeAs` daalde van 2789
      naar 2783. */
-  assert.equal(Object.keys(perRoute).length, 37, 'zevenendertig geldroutes krijgen een eigen lijf');
+  /* ACHTENDERTIG SINDS DE KNELPUNTMOTOR (11 oktober 2026). Geen geldroute maar een
+     leesroute die op de LEZEN-lijst van het stuur kwam: zonder doel weigert hij
+     met 400 en heette hij `ongemeten`, en dan zou kern/stuur/gevolg.js zeggen dat
+     niemand weet wat hij aanraakt. Er ging er geen af. */
+  assert.equal(Object.keys(perRoute).length, 38, 'achtendertig routes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }
@@ -239,6 +243,8 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
   assert.deepEqual(Object.keys(perRoute).sort(), [
     '/api/bank/rekening/open',
     '/api/boardroom/betalingen/proef',
+    /* Een constant doel en verder niets: hij overleeft een lege wereld. */
+    '/api/knelpunt',
     '/api/labfonds/locatie/maak',
     '/api/labfonds/stem',
     '/api/pay/oplaad',

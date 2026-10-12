@@ -110,6 +110,8 @@ module.exports = function maakProjecties({ kern, crypto, contexten, attention, m
   }
   const BOUWERS = { living, travel, work, foundation };
 
+  const ordenVoor = require('./volgorde').maakOrdening(kern);
+
   function projecteer({ key, world, contextId, economicPrincipalRef }) {
     const w = String(world || '').toLowerCase();
     const manifest = manifesten.haal(w);
@@ -126,7 +128,10 @@ module.exports = function maakProjecties({ kern, crypto, contexten, attention, m
     const objects = items.map(item => ({ ref: item.ref, title: item.titel || '', status: item.status || '',
       source: item.app || item.bron || '', deepLink: item.link || null }));
     const generatedAt = klok.datum().toISOString();
+    /* De hash gaat over de DOMEINVOLGORDE: de persoonlijke volgorde hieronder is
+       presentatie en geen andere werkelijkheid. */
     const inhoud = { world: w, context: context.id, view: b.view, objects };
+    const ordening = ordenVoor(key, objects);
     const attentions = attention.uit(key, w, context, items);
     return {
       projectionId: manifest.home.projection + ':' + context.id,
@@ -135,7 +140,9 @@ module.exports = function maakProjecties({ kern, crypto, contexten, attention, m
       freshness: { status: 'FRESH', maxAgeSeconds: MAX_AGE[w], generatedAt },
       completeness: { status: b.silent.length ? 'PARTIAL' : 'COMPLETE', missingSources: kopie(b.silent) },
       provenance: { builder: manifest.home.projection, sources: kopie(b.sources), ownsSourceData: false },
-      snapshotHash: hash(crypto, inhoud), view: kopie(b.view), objects, attention: attentions,
+      snapshotHash: hash(crypto, inhoud), view: kopie(b.view), objects: ordening.objects,
+      ordering: { personal: ordening.persoonlijk, explanation: ordening.uitleg },
+      attention: attentions,
       attentionSummary: {
         open: attentions.filter(a => !['ACKNOWLEDGED', 'RESOLVED', 'EXPIRED'].includes(a.lifecycle)).length,
         actionRequired: attentions.filter(a => a.severity === 'ACTION_REQUIRED' && a.lifecycle !== 'ACKNOWLEDGED').length

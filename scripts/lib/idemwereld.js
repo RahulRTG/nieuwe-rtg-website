@@ -941,6 +941,13 @@ function geldLijf(w) {
     '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
     '/api/pay/saldo': { invoiceId: w.factuurId },
 
+    /* DE KNELPUNTMOTOR (11 oktober 2026). Zonder doel weigert hij terecht met een
+       400 ("Waar wilt u naartoe?"), en dan heette hij hier `ongemeten` -- terwijl
+       hij juist op de LEZEN-lijst van het stuur komt en kern/stuur/gevolg.js dan
+       zou zeggen dat niemand weet wat hij aanraakt. Een kaal doel is genoeg: de
+       wegen worden dan uit de bronnen samengesteld (kern/knelpunt/wegen.js). */
+    '/api/knelpunt': { doel: 'een eigen bedrijf beginnen' },
+
     /* ---- twee ZWARE KANTOORROUTES, en waarom ze hier horen ----
 
        `npm run kantoormacht` heeft naast de as op PAD een as op EFFECT, en die

@@ -1597,6 +1597,75 @@ bevoegdheid, identiteit, kantoor, machtigingen, leeftijds- en paspoortgrenzen) e
 zakt zodra er één de neiginglaag noemt, of zodra een tweede routedomein de
 kernnaam `neiging` mag lezen. Beide helften zijn met een mutatie nagetrokken.
 
+## 7k. Rahul als ingang: een doel uitspreken (11 oktober 2026)
+
+De eigenaar besloot dat er **geen scherm** voor de knelpuntmotor komt. Rahul is
+de ingang: iemand zegt wat hij wil bereiken, en de bestaande systemen maken de
+mogelijkheden zichtbaar. *Geen nieuw scherm, geen nieuwe motor, geen nieuwe
+architectuur.*
+
+### Wat er veranderde
+
+- **`/api/knelpunt` staat op de LEZEN-lijst van het stuur**, alleen voor een lid
+  (`kern/stuur/beleid-lijsten.js`). Lezen en niet klein: de route bewaart niets.
+  Niet voor een zaak, medewerker of kantoor, en de gezinsdeur
+  `/api/rtf/knelpunt` staat er met opzet niet op, want een gezin heeft geen
+  stuursessie. Die toevoeging staat verklaard in `ERBIJ_GEKOMEN` van
+  `test/stuur-niveaus.test.js`, met datum en reden.
+- **Een regel voor het model** (`DOELREGEL` in `kern/stuur/lusregels.js`): bij een
+  uitgesproken doel roept het de motor aan met alleen het doel, en geeft het de
+  wegen weer zoals ze terugkomen: zonder volgorde, met wat ze niet regelen, en
+  zonder iets toe te voegen. Waar een bron ontbreekt, zegt het dat (par. 7j).
+- **De zin op de deterministische rail** (`kern/stuur/rail-corpus-doel.js`, met
+  zijn contractregel in `menstaal.json`, maximaal `tonen`). De vaste afsluitzin
+  zegt alleen wat er gebeurde, want deze rail leest het tool-antwoord niet: wegen
+  in woorden weergeven doet een taalmodel.
+- **De Edge-balk** vraagt met plafond `tonen`, en de motor valt daaronder. Er is
+  dus geen tweede ingang gebouwd: alle Rahul-ingangen (de balk, het tabblad, de
+  metgezel) gaan al naar `/api/fluister`.
+
+### Wat bewezen is, en wat niet
+
+`test/stuur-knelpunt.test.js` loopt tegen een echte server door de echte keten:
+de zin komt bij de motor met 200 en zonder voorstel, ook onder plafond `tonen`.
+De scherpste toets is die op **andere context**. Een sleutel, codenaam, profiel
+of schermcontext van een ander lid in het lijf levert byte voor byte hetzelfde
+antwoord op, en geen vondst draagt een gegeven over een mens. De eerste versie
+van die toets las de velden op de buitenkant van `/api/member/doe`, waar ze niet
+staan, en slaagde dus op `undefined === undefined`. Een vergelijking van twee
+keer niets is geen vergelijking.
+
+**Een openstaande post, met opzet.** `IDEMPROEF.json` heeft `/api/knelpunt` nooit aan
+het werk gekregen (kale oproep: 400), dus `gevolg-onbekend` ging van 96 naar 97. Een
+lokale volle ronde mat de route drie keer 200 zonder een collectie te raken, maar
+reproduceerde de rest van het register niet (130 in plaats van 95 onbekend). De
+eigenaar koos voor een vastgelegde schuld (`BEWIJSSCHULD.json`, NORM-notitie met
+vervaldatum) boven een register met metingen van twee rondes onder één stempel. Het
+lijf staat in `scripts/lib/idemwereld.js`, dus de eerstvolgende referentieronde sluit
+hem.
+
+De resolver versmalt bij deze doelzinnen niet: het werkveld blijft de volle
+lijst, en de dekking staat op 100%. Of een echt model met dat werkveld de juiste
+keuze maakt, is **niet gemeten**. Dat ligt buiten wat een proef zonder model kan
+bewijzen.
+
+### De persoonlijke volgorde
+
+`kern/experience/volgorde.js` zet onderdelen waar een lid zelf iets over **zei**
+of **koos** naar voren, met de reden in woorden op het object. `afgeleid` telt
+nooit mee. Er is geen score maar een stabiele tweedeling, er verdwijnt niets, en
+de `snapshotHash` blijft die van de domeinvolgorde. De koppeling loopt via de
+vragenlijst en `sprongindex.json`, zonder tweede indeling.
+
+**De eerlijke stand is dat dit vandaag zelden iets verschuift.** De neigingen
+wijzen naar ONDERDELEN (Table, Sport, Sociaal, Reizen) en de projecties tonen
+vooral domeinRECORDS die naar andere schermen linken (Geld, Office, Agenda). Van
+de twintig adressen waar een neiging heen wijst, komt er lexicaal **een** voor
+als link in de projectiebouwers: `/apps/vluchten.html`. Het mechanisme staat en
+is beproefd; dat het merkbaar wordt, vraagt een besluit over waar de
+persoonlijke volgorde moet werken (de bank met onderdelen, of de records die
+naar een onderdeel horen te linken) en geen extra bouwwerk.
+
 ## 8. De volgorde
 
 1. **Dit document** — welke uitspraak huisgrond heeft, welke wordt

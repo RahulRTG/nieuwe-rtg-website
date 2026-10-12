@@ -46,6 +46,13 @@ const CORPUS = Object.freeze([
     moet: ['/api/booking/request'] },
   { rol: 'member', soort: 'synoniem', zin: 'ik wil sparen voor een nieuwe fiets',
     moet: ['/api/bank/spaardoel'] },
+  /* Een uitgesproken DOEL draagt geen padwoord, en dat is precies waarom deze er
+     staan: de knelpuntmotor (besluit van 11 oktober 2026) hoort in het werkveld
+     te blijven, ook als de zin "knelpunt" nergens noemt. */
+  { rol: 'member', soort: 'synoniem', zin: 'ik wil mijn eigen bedrijf beginnen',
+    moet: ['/api/knelpunt'] },
+  { rol: 'member', soort: 'synoniem', zin: 'ik wil weer aan het werk',
+    moet: ['/api/knelpunt'] },
 
   // -- scheidbaar werkwoord: de delen staan los in de zin ----------------
   { rol: 'member', soort: 'scheidbaar', zin: 'maak 200 euro over naar mijn spaarrekening',

@@ -45,14 +45,15 @@
    ./rail-corpus-verwijzing.js dat een selectie zegt WELK object en nooit WAT -- die tweede kan pas bestaan sinds de gesaneerde context onder de
    vraag meereist (./menscontext.js) -- en ./rail-corpus-intrek.js de spiegel van
    bevestigen: "toch niet" mag een klaargezet voorstel wel laten vervallen, want
-   dat kan alleen vermogen inleveren. Ze worden hier samengevoegd en niet in
+   dat kan alleen vermogen inleveren -- en ./rail-corpus-doel.js een uitgesproken
+   doel dat de knelpuntmotor naar wegen vertaalt. Ze worden hier samengevoegd en niet in
    elkaar geschoven: een sleutel die in allebei staat, is een botsing en geen
    voorrangsregel, en test/menscontext.test.js laat de bouw daarop zakken. */
 const ZINNEN = Object.assign({}, require('./rail-corpus-zinnen'),
   require('./rail-corpus-context'), require('./rail-corpus-samenhang'),
   require('./rail-corpus-goudenplak'), require('./rail-corpus-geld'),
   require('./rail-corpus-bevestig'), require('./rail-corpus-verwijzing'),
-  require('./rail-corpus-intrek'));
+  require('./rail-corpus-intrek'), require('./rail-corpus-doel'));
 
 /* Normaliseren is met opzet het domste wat werkt. Elke regel die hier bij komt
    is begrip, en begrip hoort in de echte rail. */

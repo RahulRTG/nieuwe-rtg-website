@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "8c0820e83",
-  "seconden": 9.3,
+  "commit": "4bbf02bac",
+  "seconden": 9.5,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -2719,6 +2719,7 @@
     "server/kern/kletspraat/namen.js",
     "server/kern/klok.js",
     "server/kern/knelpunt/aanvoer-bronnen.js",
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/knelpunt/aanvoer-opleiding.js",
     "server/kern/knelpunt/aanvoer-opvang.js",
     "server/kern/knelpunt/aanvoer-werk.js",
@@ -7167,18 +7168,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5691,
-  "gelezen": 5377,
+  "bestandenGezien": 5692,
+  "gelezen": 5378,
   "nietGelezen": 314,
   "waarvanBundeldeel": 314,
   "waarvanParsefout": 0,
-  "symbolen": 27178,
-  "bestandenMetUitvoer": 4480,
-  "uitvoerMetNamen": 2026,
+  "symbolen": 27181,
+  "bestandenMetUitvoer": 4481,
+  "uitvoerMetNamen": 2027,
   "uitvoerOnvolledig": 5,
   "uitvoerZonderNamen": 2449,
   "zonderUitvoer": 897,
-  "requireKanten": 7616
+  "requireKanten": 7620
  },
  "nietGelezen": [
   {
@@ -81288,6 +81289,44 @@
    ]
   },
   {
+   "bestand": "server/kern/knelpunt/aanvoer-ondernemen.js",
+   "symbolen": [
+    {
+     "naam": "echtRegister",
+     "soort": "pijl",
+     "lijn": 53,
+     "geexporteerd": false
+    },
+    {
+     "naam": "echteHoofdstukken",
+     "soort": "pijl",
+     "lijn": 54,
+     "geexporteerd": false
+    },
+    {
+     "naam": "maakOndernemenbron",
+     "soort": "functie",
+     "lijn": 56,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "maakOndernemenbron"
+    ]
+   },
+   "requires": [
+    "server/kern/knelpunt/openingen.js",
+    "server/kern/onderneming/plan.js",
+    "server/kern/onderneming/rechtsvorm.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/routes/knelpunt.js"
+   ]
+  },
+  {
    "bestand": "server/kern/knelpunt/aanvoer-opleiding.js",
    "symbolen": [
     {
@@ -81487,6 +81526,7 @@
    ],
    "extern": [],
    "gebruiktDoor": [
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/knelpunt/aanvoer-opleiding.js",
     "server/kern/knelpunt/aanvoer-werk.js",
     "server/kern/knelpunt/wegen.js",
@@ -113322,6 +113362,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/onderneming/lagen.js"
    ]
   },
@@ -113487,6 +113528,7 @@
     "server/kern/concern/entiteit-beeld.js",
     "server/kern/concern/entiteit.js",
     "server/kern/concern/voorstel.js",
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/onderneming/beeld.js",
     "server/kern/onderneming/belasting.js",
     "server/kern/onderneming/bestuur-handelingen.js",
@@ -188795,7 +188837,7 @@
     {
      "naam": "beantwoord",
      "soort": "functie",
-     "lijn": 60,
+     "lijn": 64,
      "geexporteerd": "onbekend"
     }
    ],
@@ -188805,6 +188847,7 @@
    },
    "requires": [
     "server/kern/knelpunt/aanvoer-bronnen.js",
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/knelpunt/aanvoer-opleiding.js",
     "server/kern/knelpunt/aanvoer-opvang.js",
     "server/kern/knelpunt/aanvoer-werk.js",

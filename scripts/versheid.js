@@ -451,6 +451,7 @@ const REGISTERS = [
   ['LUSPROEF.json', 'npm run lusproef:vast', 'of de ontdeklus van Foundation Connect sluit, tot een ander die bevestigt dat het hem hielp'],
   ['VOLTOOIPROEF.json', 'npm run voltooiproef:vast', 'of een onderdeel met een scenario zijn bedoeling afmaakt, een herstart overleeft en na een crash en een afgebroken verzoek klopt (bewijs 3, 5 en 7)'],
   ['CONCIERGEPROEF.json', 'npm run conciergeproef:vast', 'of de concierge-lus sluit, van een wens in een zin tot een gesloten case met een uitkomst'],
+  ['ROMEPROEF.json', 'npm run romeproef:vast', 'of de Rome-keten sluit over LivingOS, WorkOS, TravelOS, het geld en de universele bodem van FoundationOS'],
   ['LIEGRONDE.json', 'npm run liegronde:vast', 'of een scherm een zekerheid verzint als de backend leeg antwoordt, per onderdeel uit MAPPEN'],
   ['BEVOEGD.json', 'npm run bevoegdronde:vast', 'of een ander lid, een andere rol of een ander gezin bij het werk van een onderdeel uit MAPPEN kan'],
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],

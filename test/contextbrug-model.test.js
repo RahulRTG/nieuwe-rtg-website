@@ -146,12 +146,16 @@ test('1. de eigen aanvraag gaat mee, met precies de velden van de positieve lijs
   assert.ok(opgezocht[2].includes('titel ' + JSON.stringify(A.reis.titel)), 'de titel staat afgebakend, ook met een komma erin');
   assert.match(opgezocht[2], new RegExp('prijsPerPersoon ' + A.reis.prijs + '(,|$)'), 'de prijs komt van de server');
   assert.match(v.systeem, /opgezocht door RTG/, 'het model krijgt uitgelegd dat dit een beschrijving is');
-  /* Het gespreksgeheugen bewaart de vraag, niet het scherm. */
+  /* Geen enkel geheugen bewaart het scherm. Sinds stap 2 (EDGE.md par. 14.4)
+     gaat een aangewezen object eerst naar de stuurlus en niet naar het
+     gesprek, dus deze toets kijkt niet naar EEN geheugen maar naar elk verzoek:
+     in geen ervan staat een eerdere beurt met het scherm erbij. */
   const v2 = await vraag(A, 'En hoe staat het ervoor?', ctxVoor(A.ref));
-  const vorige = (v2.verzoek.messages || []).filter((x) => x.role === 'user');
-  assert.ok(vorige.some((x) => x.content === 'Ik wil met zes vrienden vier dagen naar Rome, maximaal €800 per persoon.'),
-    'de vorige beurt staat in het geheugen als kale vraag');
-  assert.equal(vorige.filter((x) => /Actieve context/.test(x.content)).length, 1, 'alleen de huidige vraag draagt het scherm');
+  for (const verzoek of v2.nieuw) {
+    const mensen = (verzoek.messages || []).filter((x) => x.role === 'user' && typeof x.content === 'string');
+    assert.ok(mensen.slice(0, -1).every((x) => !/Actieve context/.test(x.content)),
+      'een eerdere beurt draagt het scherm niet mee');
+  }
 });
 
 test('2. een vervalste verwijzing levert geen enkel veld op', async () => {

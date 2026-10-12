@@ -132,8 +132,11 @@ function maakContextDomeinen() {
      zodat het gesprek en de stuurlus dezelfde regel zien. */
   function scherm(sessie, ruw) {
     const opzoeking = voor(sessie);
-    const regel = menscontext.handtekening(menscontext.saneer(ruw, opzoeking));
-    return { opzoeking, scherm: regel ? { regel, uitleg: CONTEXT_REGELS } : null };
+    const r = menscontext.saneer(ruw, opzoeking), regel = menscontext.handtekening(r);
+    /* `aangewezen`: de SERVER vond een object van deze mens -- niet wat de client
+       beweert. Alleen dan mag een vrije vraag eerst naar de stuurlus. */
+    const aangewezen = (r.verwijzingenUitslag || []).some((u) => u.stand === 'CANONIEK');
+    return { opzoeking, aangewezen, scherm: regel ? { regel, uitleg: CONTEXT_REGELS } : null };
   }
 
   return { meld, voor, scherm, soorten: () => [...domeinen.keys()] };

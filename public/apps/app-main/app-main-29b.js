@@ -127,6 +127,10 @@
                                                  : { q, plafond: 'tonen' });
       if (r && r.pakte && r.antwoord) {
         zet(r.antwoord);
+        /* Het taakbeeld van de server onder het antwoord (EDGE.md par. 14.4):
+           wat Rahul begreep, voorstelt en wat er werkelijk gebeurde. */
+        const taak = r.taak && window.RTGEdgeTaakbeeld ? window.RTGEdgeTaakbeeld.teken(r.taak, document) : null;
+        if (taak && aiDraad) { taak.classList.add('os-bel', 'van-rahul'); aiDraad.appendChild(taak); aiDraad.scrollTop = aiDraad.scrollHeight; }
         if (r.gedaan) toast(T('fl.gedaan', 'Rahul heeft het geregeld.'));
         // een voorstel van Rahul krijgt hier dezelfde twee knoppen als in zijn app
         draadTips(r.voorstel

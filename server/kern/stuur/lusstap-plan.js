@@ -66,6 +66,9 @@ module.exports = function planStap(t, { wereld, acties, spoor }) {
       verklaardVolledig: (gevolg && gevolg.verklaring || {}).volledig,
       zouAfwijzen: (gevolg && gevolg.verklaring || {}).zouAfwijzen });
   const uit = Object.assign({}, gewogen, { gevolg });
-  acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
+  /* Het gewogen plan reist mee, zodat de Edge het kan tonen (./taakbeeld.js).
+     Het is een OORDEEL en geen uitvoering: taakbeeld telt `pad: 'plan'` nooit
+     als gedaan. */
+  acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true, plan: uit });
   return uit;
 };

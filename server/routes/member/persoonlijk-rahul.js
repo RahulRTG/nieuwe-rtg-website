@@ -14,10 +14,14 @@
    tussenvoegt, verplaatst een grens. */
 const { maakLiveTwin } = require('../../ai-live-twin');
 const plafond = require('../../kern/stuur/plafond');
+const { taakBeeld } = require('../../kern/stuur/taakbeeld');
+// het volle plan zit al in `taak`; in `stuur` reist hij niet nog eens mee
+const zonderPlan = (a) => Object.fromEntries(Object.entries(a).filter(([k]) => k !== 'plan'));
 
 module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, stuurLus } = kern;
   const { fluisterZeg } = kern.fluister;
+  const lusVoorLid = require('./persoonlijk-rahul-stuur')({ stuurLus, bus, liveCodename });
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(kern.anthropic);
   const meting = require('../../kern/ai/routermeting');
   /* HEEFT DE GOEDKOPE LAAG HET GEDEKT -- en `r.pakte` alleen is daarvoor niet
@@ -49,7 +53,10 @@ module.exports = (kern) => {
     // het scherm, aan DEZE sessie gebonden (EDGE.md par. 14.4)
     const sch = kern.contextDomeinen.scherm(req.session, req.body.context);
     // sessie mee voor doen (reserveren, 24 uur plannen)
-    const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session, sch.scherm);
+    const zeg = (eerst) => fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session,
+      sch.scherm && Object.assign({ stuurEerst: eerst }, sch.scherm));
+    // een aangewezen object gaat eerst naar de stuurlus, als die er is
+    let r = await zeg(!!(stuurLus && sch.aangewezen));
     if (r.error) return res.status(r.status).json({ error: r.error });
     /* Rahul aan het stuur: pakten de eigen regels het gesprek NIET op
        (pakte=false), dan mag hij het met het AI-stuur alsnog echt DOEN;
@@ -66,30 +73,13 @@ module.exports = (kern) => {
        Een zin die vandaag niets doet, doet pas iets zodra er echt een voorstel
        openstaat en de rail de zin herkent. */
     if (stuurLus && (!r.pakte || r.stuurMagKijken)) {
-      const lus = await stuurLus(req, {
-        vraag: req.body.q,
-        wereld: 'member',
-        /* Ruw: kern/stuur/menscontext.js saneert, met de opzoeking hierboven. */
-        context: req.body.context, opzoeking: sch.opzoeking,
-        // streamende voortgang voor een zware taak: elke stap wordt live
-        // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
-        opStap: (v) => {
-          /* De enige publicerende plek in dit huis die de actor met zekerheid
-             weet: hier ligt de codenaam van het lid al op tafel. Nooit de echte
-             naam -- die woont in de identiteitskluis en hoort niet op een bus. */
-          try { bus && bus.publish('sse', { doel: 'tier', match: [req.session.tier],
-            event: 'rahul-voortgang', data: { stap: v.stap, totaal: v.totaal, bericht: v.bericht, klaar: !!v.klaar },
-            envelop: { actor: liveCodename(req.session), classificatie: 'persoonsgegeven' } }); } catch (e) {}
-        },
-        // Leden- en Foundationpaden wel; werkwerelden blijven buiten bereik.
-            filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w))
-          && (!grendel || grendel(p)),
-        systeem: require('../../kern/rahul').RAHUL_LEAD +
-          'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app. ' +
-          'Je regelt niet alleen reizen, bestellen, betalen en de Salon, maar ook de RTFoundation voor het gezin (bijvoorbeeld het babyboek, school, toetsen of het zakgeldpotje) als het lid daar recht op heeft.'
-      });
+      const lus = await lusVoorLid(req, { grendel, opzoeking: sch.opzoeking });
       if (lus && lus.tekst) {
         onthoudGesprek(req, lus.tekst);
+        /* Wat de Edge toont, uit serverbronnen (kern/stuur/taakbeeld.js); `gedaan`
+           komt alleen uit echte uitvoeringen, nooit uit een gewogen plan. */
+        const taak = taakBeeld({ vraag: req.body.q, scherm: sch.scherm && sch.scherm.regel, acties: lus.acties,
+          plafond: grendel && { trede: plafondTrede, mag: grendel } });
         const stand = aiStatus();
         /* HET STUURSPOOR REIST MEE ALS DE LUS HEM MEEGEEFT, en die geeft hem
            alleen op de deterministische rail (kern/stuur/lus.js). Zonder dat
@@ -98,7 +88,7 @@ module.exports = (kern) => {
            beslist er niets over: dat zou betekenen dat zij de railnaam moet
            kunnen opvragen, en daarmee verder reikt dan zij hoeft. */
         const antwoord = { pakte: true, plafond: plafondTrede, spoor: lus.spoor,
-          antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+          antwoord: lus.tekst, gedaan: taak.uitgevoerd.length > 0, taak, stuur: lus.acties.map(zonderPlan),
           goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
           goedkeuringWereld: 'member', staving: lus.staving,
           aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas,
@@ -114,6 +104,8 @@ module.exports = (kern) => {
         return res.json(antwoord);
       }
     }
+    if (r.stuurEerst) r = await zeg(false);   // de stuurlus zei niets: dan het gesprek
+    if (r.error) return res.status(r.status).json({ error: r.error });
     onthoudGesprek(req, r && r.antwoord);
     const stand = aiStatus();
     const antwoord = Object.assign(r, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,

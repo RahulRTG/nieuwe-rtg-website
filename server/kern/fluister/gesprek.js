@@ -10,6 +10,7 @@ module.exports = (ctx) => {
   // sparren: waaraan Rahul herkent dat je wil meedenken over een idee
   const SPAR = /\b(spar(ren)?|brainstorm|denk (even )?met me mee|wat vind je van (mijn |het )?idee|help me (na)?denken)\b/i;
   const intent = require('./intent')(ctx);
+  const modelAntwoord = require('./gesprek-model')(ctx);
   /* Het gesprek. Eerst de eigen commando's (onthouden, opvragen, vergeten);
      daarna Claude met het volledige persoonlijke beeld, of de eigen regels. */
   async function fluisterZeg(key, codenaam, qIn, sess, scherm) {
@@ -105,29 +106,21 @@ module.exports = (ctx) => {
     const seintjes = fluisterSeintjes(key);
     // EDGE.md 14.4, niet bewaard
     const sch = scherm && scherm.regel ? scherm : null;
-    if (anthropic) {
-      try {
-        const ctx = 'Lid: ' + codenaam + '. ' +
-          (p.weetjes.length ? 'Weetjes die het lid zelf deelde: ' + p.weetjes.map(w => w.tekst).join('; ') + '. ' : '') +
-          (topFocus(p, 3).length ? 'Gebruikt het meest: ' + topFocus(p, 3).join(', ') + '. ' : '') +
-          (stand.length ? 'Actuele stand: ' + stand.join('; ') + '. ' : '') +
-          (seintjes.length ? 'Actuele seintjes: ' + seintjes.map(x => x.tekst).join('; ') + '.' : '');
-        const response = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 300,
-          system: require('../rahul').rahulLeadVoor(key) + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. ' + (sparHouding ? sparHouding() + ' ' : '') + 'Context: ' + ctx + (sch ? ' ' + sch.uitleg : ''),
-          messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: sch ? q + '\n\nActieve context: ' + sch.regel : q }]
-        });
-        /* VIA HET MODEL, EN DAT MOET HIER GEZEGD WORDEN. Van buitenaf is
-           `pakte: true` niet te lezen als goedkoop of duur: deze functie
-           antwoordt met een model AAN met een modelantwoord en met een model UIT
-           met haar eigen regels, en in beide gevallen staat er pakte=true. De
-           schaduwmeting (kern/ai/routermeting.js) telde dat eerst als "de
-           goedkope laag dekte het", en dat is precies het getal dat zij niet
-           mag verzinnen. Alleen deze plek weet het; daarom staat de vlag hier
-           en wordt hij niet in de route geraden. */
-        return Object.assign(klaar(response.content[0].text), { viaModel: true });
-      } catch (e) { /* val terug op de eigen regels */ }
-    }
+    /* EEN AANGEWEZEN OBJECT GAAT EERST NAAR DE STUURLUS (besluit van de eigenaar,
+       12 oktober 2026; EDGE.md par. 14.4). Alleen als de server het object ZELF
+       vond en geen eigen regel of handeling de vraag pakte. Niets in het
+       geheugen: de route vraagt het gesprek opnieuw als de stuurlus niets zegt. */
+    if (sch && sch.stuurEerst && !sparModus) return { ok: true, pakte: false, stuurEerst: true };
+    const tekst = await modelAntwoord({ key, codenaam, q, p, stand, seintjes, sch });
+    /* VIA HET MODEL, EN DAT MOET HIER GEZEGD WORDEN. Van buitenaf is
+       `pakte: true` niet te lezen als goedkoop of duur: deze functie
+       antwoordt met een model AAN met een modelantwoord en met een model UIT
+       met haar eigen regels, en in beide gevallen staat er pakte=true. De
+       schaduwmeting (kern/ai/routermeting.js) telde dat eerst als "de
+       goedkope laag dekte het", en dat is precies het getal dat zij niet
+       mag verzinnen. Alleen deze plek weet het; daarom staat de vlag hier
+       en wordt hij niet in de route geraden. */
+    if (tekst !== null) return Object.assign(klaar(tekst), { viaModel: true });
     // de eigen regels: persoonlijk waar het kan, eerlijk waar het moet
     const groet = p.weetjes.length ? 'Ik denk aan uw ' + p.weetjes.length + ' weetje(s). ' : '';
     const fluistert = seintjes.length ? ' Mijn seintjes: ' + seintjes.map(x => x.tekst).join(' | ') + '.' : '';

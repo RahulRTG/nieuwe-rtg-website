@@ -42,9 +42,13 @@
      regel; wat wel klopt krijgt geen vinkje, want een gevonden getal bewijst
      niet dat het in de juiste betekenis is gebruikt. Geen staving: geen regel. */
   function noot(d) {
-    var n = d && d.staving && d.staving.nietGevonden;
-    if (!n || !n.length) return '';
-    return 'Niet teruggevonden in wat Rahul opzocht: ' + n.slice(0, 6).join(', ') + '. Lees dat als onbekend.';
+    var n = d && d.staving && d.staving.nietGevonden, uit = [];
+    if (n && n.length) uit.push('Niet teruggevonden in wat Rahul opzocht: ' + n.slice(0, 6).join(', ') + '. Lees dat als onbekend.');
+    /* Het taakbeeld van de server (shared/edge/taakbeeld.js, EDGE.md par. 14.4):
+       wat Rahul begreep, voorstelt en wat er werkelijk gebeurde. Als tekst. */
+    var T = window.RTGEdgeTaakbeeld;
+    if (d && d.taak && T && T.regels) T.regels(d.taak).forEach(function (r) { uit.push(r.tekst); });
+    return uit.join('\n');
   }
   /* Een bericht in het gesprek, met de noot eronder als die er is. Alles gaat
      door tekst(): wat uit een antwoord komt, is nooit opmaak. */

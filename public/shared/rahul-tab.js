@@ -6,6 +6,7 @@
   function laadStijl(src){var script=document.createElement('script');script.src=src;script.async=false;document.head.appendChild(script)}
   laadStijl('/shared/rahul-tab/style-base.js');
   laadStijl('/shared/rahul-tab/style-twin.js');
+  laadStijl('/shared/edge/taakbeeld.js');
   laadStijl('/shared/rahul-tab/helpers.js');
 
   /* Alleen echte app-bovenbalken zijn geldige gastheren voor deze globale tab. */

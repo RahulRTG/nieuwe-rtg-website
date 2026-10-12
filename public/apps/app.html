@@ -81,6 +81,7 @@ try {
 <script src="/shared/adaptief.js" defer></script>
 <script src="/shared/adaptief/grammatica.js" defer></script>
 <script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/edge/taakbeeld.js" defer></script>
 <script src="/shared/adaptief/vorm.js" defer></script>
 <script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/adaptief/lagen.js" defer></script>
@@ -1391,6 +1392,10 @@ try {
     border-bottom-right-radius:calc(var(--e) * 0.3);
   }
   .os-bel.denkt{opacity:0.6;font-style:italic;}
+  /* het taakbeeld (shared/edge/taakbeeld.js): tekst, geen kleurcodes -- de
+     stand staat er in woorden, zodat hij ook zonder kleur te lezen is */
+  .os-taak-regel.doel{font-weight:600;}
+  .os-taak-regel.grens{font-style:italic;}
   /* de suggesties van Rahul: tikken in plaats van typen */
   .os-aitips{
     flex-shrink:0;display:flex;gap:calc(var(--e) * 0.35);flex-wrap:wrap;

@@ -42,7 +42,7 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2755,
+    "kernelFiles": 2756,
     "kernelGroups": [
       {
         "group": "_root",
@@ -366,7 +366,7 @@
       },
       {
         "group": "knelpunt",
-        "files": 11
+        "files": 12
       },
       {
         "group": "kosten",
@@ -6276,6 +6276,7 @@
       "server/kern/kantoorwereld.js",
       "server/kern/kappen.js",
       "server/kern/kassa/herhaling.js",
+      "server/kern/knelpunt/aanvoer-ondernemen.js",
       "server/kern/knelpunt/aanvoer-werk.js",
       "server/kern/knelpunt/aanvoer.js",
       "server/kern/koppel.js",
@@ -9563,7 +9564,7 @@
         "mutationRoutes": 263,
         "declaredMutationSemantics": 107,
         "sourceFileCount": 26,
-        "kernelDependencyCount": 69,
+        "kernelDependencyCount": 77,
         "screenCount": 28,
         "sourceFiles": [
           "server/routes/baby.js",
@@ -9594,6 +9595,7 @@
           "server/kern/journaalverhuizing.js",
           "server/kern/journaalvorm.js",
           "server/kern/knelpunt/aanvoer-bronnen.js",
+          "server/kern/knelpunt/aanvoer-ondernemen.js",
           "server/kern/knelpunt/aanvoer-opleiding.js",
           "server/kern/knelpunt/aanvoer-opvang.js",
           "server/kern/knelpunt/aanvoer-werk.js",
@@ -9607,10 +9609,9 @@
           "server/kern/kosten/haak.js",
           "server/kern/kosten/soorten.js",
           "server/kern/leerstof-bibliotheek.js",
-          "server/kern/leerstof-dag.js",
-          "server/kern/leerstof-data/aardrijkskunde.js"
+          "server/kern/leerstof-dag.js"
         ],
-        "kernelDependenciesOmitted": 45,
+        "kernelDependenciesOmitted": 53,
         "screens": [
           "public/apps/connect.html",
           "public/apps/foundation/arena.html",
@@ -14754,7 +14755,7 @@
         "mutationRoutes": 2,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 11,
+        "kernelDependencyCount": 19,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/knelpunt.js"
@@ -14762,6 +14763,7 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/knelpunt/aanvoer-bronnen.js",
+          "server/kern/knelpunt/aanvoer-ondernemen.js",
           "server/kern/knelpunt/aanvoer-opleiding.js",
           "server/kern/knelpunt/aanvoer-opvang.js",
           "server/kern/knelpunt/aanvoer-werk.js",
@@ -14771,7 +14773,14 @@
           "server/kern/knelpunt/openingen.js",
           "server/kern/knelpunt/vondstenbundel.js",
           "server/kern/knelpunt/wegen.js",
-          "server/kern/knelpunt/woorden.js"
+          "server/kern/knelpunt/woorden.js",
+          "server/kern/onderneming/plan.js",
+          "server/kern/onderneming/rechtsvorm-angelsaksisch.js",
+          "server/kern/onderneming/rechtsvorm-europa.js",
+          "server/kern/onderneming/rechtsvorm-landen.js",
+          "server/kern/onderneming/rechtsvorm-nl.js",
+          "server/kern/onderneming/rechtsvorm-woorden.js",
+          "server/kern/onderneming/rechtsvorm.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [],
@@ -14779,6 +14788,8 @@
         "signals": [
           "decision",
           "booking",
+          "failure",
+          "version",
           "event",
           "ai"
         ]
@@ -15496,7 +15507,7 @@
         "mutationRoutes": 1024,
         "declaredMutationSemantics": 317,
         "sourceFileCount": 202,
-        "kernelDependencyCount": 2646,
+        "kernelDependencyCount": 2647,
         "screenCount": 41,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15543,7 +15554,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2622,
+        "kernelDependenciesOmitted": 2623,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -26337,7 +26348,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2617,
+        "kernelDependencyCount": 2618,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26371,7 +26382,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2593,
+        "kernelDependenciesOmitted": 2594,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -27003,7 +27014,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2618,
+        "kernelDependencyCount": 2619,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -27037,7 +27048,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2594,
+        "kernelDependenciesOmitted": 2595,
         "screens": [
           "public/apps/app.html"
         ],
@@ -27364,7 +27375,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2617,
+        "kernelDependencyCount": 2618,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27397,7 +27408,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2593,
+        "kernelDependenciesOmitted": 2594,
         "screens": [
           "public/apps/vertaler.html"
         ],

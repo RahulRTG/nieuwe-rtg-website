@@ -14,8 +14,8 @@
        de wijzigingen.
 
    MUTATIES, nagetrokken (12 oktober 2026): laat de tab conceptwerk.js niet laden
-   (de kaart verschijnt niet, zakt), en laat de kaart haar object niet publiceren
-   (het model krijgt het concept niet, zakt).
+   (de kaart verschijnt niet, zakt), en laat de contextbouwer het werkstuk niet
+   meesturen (het model krijgt het concept niet, zakt).
 
    Schrijft een schermafdruk naar RTG_DEMO_SCHERM als die is gezet. Draait alleen
    waar Playwright beschikbaar is; anders overgeslagen. */
@@ -107,11 +107,14 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
       'Rahul · Concept bijgewerkt. U plant een reis naar Rome voor 8 personen, 5 dagen, met een maximaal groepsbudget van € 6.400. Er is niets ingediend of geboekt.');
     assert.equal(model.verzoeken.length, voorModel, 'een wijziging op het scherm roept geen model aan');
 
-    // de Edge kent het concept als het object waaraan het lid werkt
-    const obj = await page.evaluate(() => window.RTGEdgeBlikveld.voorRahul().verwijzingen);
-    assert.equal(obj.length, 1);
+    /* Rahul kent het concept als het werkstuk van het lid: nieuwste eerst, naast de
+       aangewezen aanvraag op het scherm. De schermcontext zelf zet de kaart niet
+       (in de schil doet alleen de brug dat, test/edgedekking-zelf.test.js 5). */
+    const obj = await page.evaluate(() => window.RTGRahulTabHelpers.context().verwijzingen);
+    assert.equal(obj.length, 2);
     assert.equal(obj[0].soort, 'reiswens');
     assert.match(obj[0].id, /^RW-/);
+    assert.deepEqual(obj[1], { soort: 'reisaanvraag', id: ref });
 
     // een ongeldige waarde: geweigerd bij het veld, met de reden, en de versie blijft
     await kaart.locator('input[name="reizigers"]').fill('40');
@@ -128,9 +131,7 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
     await page.waitForFunction(() => /Genoteerd|Ik heb/.test(document.querySelector('.rtg-command-log').textContent) &&
       !/Context en grenzen controleren/.test(document.querySelector('.rtg-command-log').textContent), null, { timeout: 20000 });
     const alles = JSON.stringify(model.verzoeken.slice(voorModel));
-    assert.match(alles, /opgezocht door RTG: reiswens RW-[0-9A-F]+ \(bestemming \\"Rome\\", reizigers 8, dagen 5/);
-    assert.ok(!alles.includes('opgezocht door RTG: reisaanvraag'), 'niet meer de Ibiza-aanvraag');
-
+    assert.match(alles, /opgezocht door RTG: reiswens RW-[0-9A-F]+ \(titel \\"Nieuwe reis naar Rome\\", bestemming \\"Rome\\", reizigers 8, dagen 5/);
     assert.equal(JSON.stringify((await post(srv.base, '/api/reisbureau/mijn', {}, token)).body.aanvragen), ibizaVoor,
       'de Ibiza-aanvraag is byte voor byte gelijk');
     assert.deepEqual(fouten, [], 'geen fouten in de console');

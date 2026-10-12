@@ -18,7 +18,7 @@
       try {
         var b = B.voorRahul();
         return { app: document.title.replace(/^RTG\s*/i, '') || 'RTG', deel: b.deel || 'Actieve pagina',
-          selectie: '', wereld: b.wereld, verwijzingen: b.verwijzingen, op: b.op };
+          selectie: '', wereld: b.wereld, verwijzingen: metWerkstuk(b.verwijzingen || [], B), op: b.op };
       } catch (e) { /* val terug op de oude bron */ }
     }
     var actief = document.querySelector('[data-wk].actief,.rv-bank .actief,.lo-rail .actief,.pn-rail .actief,.po-rail .actief,nav .actief');
@@ -29,6 +29,18 @@
       deel: actief ? actief.textContent.trim() : 'Actieve pagina',
       selectie: keuze ? keuze.textContent.trim() : ''
     };
+  }
+  /* Het concept waar het lid in het gesprek aan werkt (shared/edge/conceptwerk.js)
+     staat naast het object van het scherm, de nieuwste eerst: wie na het concept
+     weer een aanvraag aanwijst, bedoelt die. Welke van de twee een vraag bedoelt,
+     beslist de server (kern/stuur/menscontext-relatie.js). */
+  function metWerkstuk(lijst, B) {
+    var W = window.RTGEdgeConceptwerk, w = W && W.verwijzing ? W.verwijzing() : null;
+    if (!w) return lijst;
+    var ref = { soort: w.soort, id: w.id }, sinds = 0;
+    try { sinds = Number(B.lees().velden.object.sinds) || 0; } catch (e) { sinds = 0; }
+    var rest = lijst.filter(function (v) { return !(v.soort === ref.soort && v.id === ref.id); });
+    return w.op >= sinds ? [ref].concat(rest) : rest.concat([ref]);
   }
   function suggesties(c) {
     var bron = c.app + c.deel;

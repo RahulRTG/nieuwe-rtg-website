@@ -15,6 +15,7 @@
      7  een andere rol (een zaak): komt er niet bij
      8  verouderde context: Rahul krijgt het concept niet
      9  Rahul krijgt de waarden van NU via het contextcontract
+     9b concept en aanvraag tegelijk: het soortwoord kiest, anders het nieuwste
      10 misleidende modeluitvoer: verandert het concept niet en heet niet "gedaan"
      11 "vergeet alles" neemt het concept mee
      12 reactietijd en modelaanroepen gemeten
@@ -26,6 +27,7 @@
      d. conceptAanpassen zoekt via contextDomein.zoek    -> 6 zakt
      e. het contextdomein niet gemeld in kernlaag6          -> 9 zakt
      f. "vergeet alles" laat de concepten staan             -> 11 zakt
+     g. relatieVan kiest altijd het eerste object           -> 9b zakt
 
    Draai los: node --test test/concept-live.test.js */
 'use strict';
@@ -222,9 +224,22 @@ test('9. Rahul krijgt de waarden van NU via het contextcontract', async () => {
     context: ctx([{ soort: 'reiswens', id: c.id }]) }, A.token);
   assert.equal(v.status, 200);
   const alles = JSON.stringify(model.verzoeken.slice(voor));
-  assert.match(alles, new RegExp('opgezocht door RTG: reiswens ' + c.id + ' \\(bestemming \\\\"Rome\\\\", reizigers 8, dagen 5'),
+  assert.match(alles, new RegExp('opgezocht door RTG: reiswens ' + c.id + ' \\(titel \\\\"Nieuwe reis naar Rome\\\\", bestemming \\\\"Rome\\\\", reizigers 8, dagen 5'),
     'het model krijgt de waarden na de wijziging, door de server opgezocht');
   assert.ok(!alles.includes('reizigers 7'), 'niet de waarden van voor de wijziging');
+});
+
+test('9b. concept en aanvraag tegelijk: de vraag kiest het object waarvan hij de soort noemt', async () => {
+  const c = await rome(A);
+  const beide = ctx([{ soort: 'reiswens', id: c.id }, { soort: 'reisaanvraag', id: A.ref }]);
+  const onderwerp = async (q, context) => (await api('/api/fluister', { q, plafond: 'tonen', context }, A.token)).body.taak.begrepen.onderwerp;
+  assert.equal(await onderwerp('Hoeveel dagen duurt deze reis?', beide), 'uw reiswens ‘Nieuwe reis naar Rome’',
+    'zonder eigen soortwoord: het eerste, het nieuwste werkstuk');
+  assert.match(await onderwerp('Hoe staat deze aanvraag ervoor?', beide), /^uw reisaanvraag ‘/, '"aanvraag" noemt de reisaanvraag');
+  const omgekeerd = ctx([{ soort: 'reisaanvraag', id: A.ref }, { soort: 'reiswens', id: c.id }]);
+  assert.match(await onderwerp('Hoeveel dagen duurt deze reis?', omgekeerd), /^uw reisaanvraag ‘/,
+    'wie daarna weer de aanvraag aanwijst, zet hem vooraan en bedoelt hem');
+  assert.equal(await onderwerp('Hoeveel kost deze reiswens per persoon?', omgekeerd), 'uw reiswens ‘Nieuwe reis naar Rome’');
 });
 
 test('10. misleidende modeluitvoer verandert het concept niet en heet niet "gedaan"', async () => {

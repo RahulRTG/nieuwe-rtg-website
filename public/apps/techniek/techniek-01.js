@@ -76,6 +76,23 @@
     }
     return el('div',{class:'zeker'}, badge, mid, knop);
   }
+  /* Het registratiebesluit (RTG_REGISTRATIE_DICHT) naast de zekeringen. Geen
+     knop: het woont in de serveromgeving en verandert alleen met een herstart,
+     dus deze pagina toont het en zegt waar het wel kan. */
+  function registratieRij(r){
+    if (!r) return null;
+    var badge = el('span',{class:'badge '+(r.dicht?'uit':'aan')}, r.dicht?'DICHT':'OPEN');
+    var paden = (r.paden||[]).map(function(p){ return p.weg+' ('+p.pad+')'; }).join(', ');
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, 'Registratiebesluit'), el('span',{class:'code'}, r.vlag)),
+      el('div',{class:'muted'}, r.dicht
+        ? 'Dicht bij besluit van de eigenaar. Geen nieuw account via: '+paden+'.'
+        : 'Open: het besluit staat niet aan. Het dekt: '+paden+'.'),
+      r.onbekendeWaarde ? el('div',{class:'muted'}, 'De waarde is geen 0 of 1 en telt daarom als dicht.') : null,
+      el('div',{class:'muted'}, 'Alleen te lezen hier: '+(r.hoe||''))
+    );
+    return el('div',{class:'zeker'}, badge, mid);
+  }
   function zetZekering(id, actie, reden){
     api('/api/techniek/zekering', { method:'POST', body:{ id:id, actie:actie, reden:reden } })
       .then(function(){ toast(actie==='reset'?'Zekering er weer in.':'Zekering eruit.'); laad(); })

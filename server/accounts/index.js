@@ -147,6 +147,8 @@ const api = {
      weigert daarop al voor ze iets keurt. */
   registratieDicht: () => registratie.dicht(),
   registratieUitleg: registratie.UITLEG,
+  registratieWeigering: (zekeringEruit) => registratie.weigering(zekeringEruit),
+  registratieStand: () => registratie.stand(),
   ...users,
   ...staff,
   /* De grendel op nieuwe accounts staat in de GEVEL en niet in ./users.js: alle

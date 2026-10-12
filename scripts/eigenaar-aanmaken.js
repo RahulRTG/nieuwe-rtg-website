@@ -75,6 +75,7 @@ const crypto = require('node:crypto');
 
 const eigenaar = require('../server/eigenaar');
 const duurzaamheid = require('../server/accounts/duurzaamheid');
+const registratie = require('../server/accounts/registratie');
 const testomgeving = require('../server/testomgeving');
 const { leeftijdVan, LID_MIN_LEEFTIJD, LID_MAX_LEEFTIJD } = require('../server/lib/leeftijd');
 const { schoon } = require('../server/kern/util');
@@ -201,6 +202,20 @@ function toonHulp() {
    doet dat niet. Het zegt wat er aan de hand is en wat wel kan: dit script draait
    BUITEN een verzoek, dus er is geen requesttransactie om aan deel te nemen, en
    het spiegelt zelf naar Postgres voordat het afsluit. */
+/* Wat er bij een geweigerde aanmaak te zeggen valt. Er stond hier altijd "draait
+   er een tweede schrijver?", en dat was bij de meeste weigeringen gewoon onwaar.
+   Alleen wat de fout zelf aanwijst, wordt genoemd. */
+function aanmaakUitleg(e) {
+  const code = e && e.code;
+  if (code === 'REGISTRATIE_DICHT') return [
+    'Registratie is gesloten door ' + registratie.VLAG + '. Dit script hoort daar buiten te',
+    'vallen; komt deze melding toch, dan liep de aanmaak via de accountgevel. Haal de',
+    'variabele tijdelijk weg voor de bootstrap en zet hem daarna terug.'];
+  if (code === duurzaamheid.BLOKKADECODE) return grendelUitleg();
+  return ['De kluis gaf geen herkende reden. Kijk of een andere server op dezelfde datamap',
+    'schrijft (rtg.db op slot), en draai `npm run eigenaar` zonder argumenten voor de stand.'];
+}
+
 function grendelUitleg() {
   return [
     'NODE_ENV=production en DATABASE_URL staan allebei: accountmutaties zijn dicht',
@@ -464,13 +479,25 @@ async function hoofd(argv = process.argv.slice(2)) {
     return stop(WACHTWOORD_ENV + ' is korter dan ' + MIN_WACHTWOORD + ' tekens.',
       ['Laat hem leeg, dan verzint dit script er een en toont hem een keer.']);
 
+  /* LANGS DE GEVEL, EN MET OPZET. createUser van de accountgevel (server/
+     accounts/index.js) weigert zolang RTG_REGISTRATIE_DICHT aan staat -- dat is
+     het besluit dat de OPENBARE registratie dicht houdt. De eigenaar is geen
+     openbare registratie: dit script draait offline, buiten elk verzoek, maakt
+     precies een account op precies het eigenaarsadres, en overschrijft niets.
+     Daarom roept het de ongegrendelde schrijver uit ./users.js rechtstreeks aan.
+     Geen route kan dat: test/registratie-dicht.test.js zakt zodra iets in
+     server/ buiten server/accounts/ die module zelf laadt, of een ander script
+     dan dit. Een vlag of geheim dat een verzoek kan meesturen kwam er bewust
+     niet voor in de plaats. */
+  if (registratie.dicht()) {
+    regel('registratie', 'DICHT (' + registratie.VLAG + ') -- geldt niet voor dit eigenaarsscript');
+  }
   let user;
   try {
-    user = await accounts.createUser({ email: adres, username: null, password: wachtwoord,
+    user = await require('../server/accounts/users').createUser({ email: adres, username: null, password: wachtwoord,
       tier: 'rtg', realName: naam, phone: telefoon });
   } catch (e) {
-    return stop('de kluis nam het account niet aan: ' + (e && e.message ? e.message : e),
-      ['Draait er een tweede schrijver op dezelfde datamap? Zet die even stil en probeer opnieuw.']);
+    return stop('de kluis nam het account niet aan: ' + (e && e.message ? e.message : e), aanmaakUitleg(e));
   }
 
   /* De startinhoud komt uit kern/lid.js en niet uit een kopie hier: memberTemplate

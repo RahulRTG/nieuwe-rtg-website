@@ -20,12 +20,25 @@ module.exports = (bctx) => {
   app.get('/api/techniek/status', techAuth, async (req, res) => {
     const checks = await techniek.draaiChecks(ctx());
     const t = staat();
-    const zeker = Object.keys(t.zekeringen).map(id => ({ id, ...t.zekeringen[id] }));
+    /* Naam, code, uitleg en dekking komen uit de STANDAARD en niet uit de
+       opgeslagen rij: die draagt de tekst van de dag dat hij werd aangemaakt,
+       en een gecorrigeerde uitleg (FUSE-REG dekt alleen /api/auth/register)
+       zou anders nooit op een bestaande installatie aankomen. */
+    const std = techniek.standaardZekeringen();
+    const zeker = Object.keys(t.zekeringen).map(id => {
+      const s = std[id] ? { naam: std[id].naam, code: std[id].code, uitleg: std[id].uitleg, dekt: std[id].dekt || null } : {};
+      return { id, ...t.zekeringen[id], ...s };
+    });
     const cat = functies.catalogus(t.functies);
     const verzoeken = t.functieVerzoeken || [];
     const uit = {
       eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
       checks, zekeringen: zeker,
+      /* Het registratiebesluit (RTG_REGISTRATIE_DICHT) naast de zekering, en
+         ALLEEN-LEZEN: het woont in de serveromgeving, dus deze pagina kan hem
+         niet zien veranderen en niet veranderen. Zonder dit stond er "AAN" bij
+         FUSE-REG terwijl niemand zich kon registreren. */
+      registratie: accounts.registratieStand ? accounts.registratieStand() : null,
       functies: cat,
       doelgroepen: functies.DOELGROEPEN,
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),

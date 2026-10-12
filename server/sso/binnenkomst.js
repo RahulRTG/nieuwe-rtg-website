@@ -45,6 +45,15 @@ function foutAntwoord(e) {
       bericht: 'Uw zakelijke toegang kon niet veilig worden bijgewerkt. Er is geen sessie geopend; probeer het over een moment opnieuw.'
     };
   }
+  /* De registratiegrendel (accounts/registratie.js) is geen mislukte inlog maar
+     een besluit: een NIEUW account via SSO ontstaat nu niet. Dat mag de mens
+     weten -- het verklapt niets over de inrichting van de koppeling, en een
+     kale 401 liet hem denken dat zijn organisatie iets fout deed. Bestaande
+     accounts komen hier niet: die worden gekoppeld zonder createUser. */
+  if (e && e.code === 'REGISTRATIE_DICHT') {
+    return { status: 503, retryAfter: null, code: e.code, hoe: e.hoe || null,
+      bericht: 'Er kan via uw organisatie op dit moment geen nieuw RTG-account worden aangemaakt: nieuwe registraties zijn gesloten. Bestaande accounts kunnen gewoon inloggen.' };
+  }
   return { status: 401, retryAfter: null, bericht: 'Inloggen via uw organisatie is niet gelukt.' };
 }
 

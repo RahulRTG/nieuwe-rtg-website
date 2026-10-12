@@ -93,6 +93,11 @@ function leesEnvBestand(pad) {
   for (const f of r.fouten) blokkeer(f);
   for (const w of r.waarschuwingen) waarschuw(w);
   if (!r.fouten.length) goed('Configuratie: geen blokkerende fouten.');
+  /* De registratiegrendel hardop, want hij verandert wat "live" betekent: met
+     RTG_REGISTRATIE_DICHT ontstaat er via geen enkele weg een nieuw account. Een
+     onbekende waarde staat al als waarschuwing hierboven (config.valideer). */
+  if (require('../server/config/registratie').dicht(env)) waarschuw('Registratie staat DICHT bij besluit van de eigenaar (RTG_REGISTRATIE_DICHT): registreren, de eerste SSO-aanmelding en SCIM maken geen nieuw account. owner-init (scripts/eigenaar-aanmaken.js) werkt wel; heropenen is een besluit en een herstart.');
+  else goed('Registratie: open (RTG_REGISTRATIE_DICHT leeg of 0).');
   /* Een losse Node-instantie mag voor een afgeschermde proef op SQLite en
      proceslokale tellers draaien. Dat is niet hetzelfde als een B2B2C-
      go-live: geld, intrekking, rate limits en realtime moeten instanceverlies

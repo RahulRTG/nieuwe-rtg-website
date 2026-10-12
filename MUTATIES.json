@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T16:05:09.371Z",
-    "commit": "c71bb687e",
+    "op": "2026-10-12T21:01:35.808Z",
+    "commit": "b3e5a0a4c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15518,6 +15518,14 @@
         "sourceSha256": "88bbeef6abc0bf20470797034acd3ef36db13d09dbf9e1ecf0b5545b0c501159",
         "testSha256": "31be36277e1f3c275d78fb8e4bf0babc3c7b855c3a2892e2afee6b85124f37b5"
       }
+    },
+    "sessiestroom-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/sessiestroom.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "sessiestroom-takken.test.js": {
       "soort": "puur",

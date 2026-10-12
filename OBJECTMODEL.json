@@ -3,13 +3,13 @@
   "vastgelegd": "2026-10-12",
   "gemeten": {
     "bestanden": 2793,
-    "vormen": 1600,
+    "vormen": 1599,
     "velden": 2289,
     "modules": 887,
     "domeinen": 310,
     "envelopDrempel": 19,
     "envelop": 29,
-    "veldenDomeineigen": 1606,
+    "veldenDomeineigen": 1607,
     "veldenGedeeldVanafVier": 234,
     "gelijkendeVormparen": 64
   },
@@ -58,18 +58,6 @@
       ]
     },
     {
-      "veld": "naar",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/ai",
-        "kern/bank",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/lidboard"
-      ]
-    },
-    {
       "veld": "code",
       "domeinen": 18,
       "waar": [
@@ -91,6 +79,18 @@
         "kern/gemeente",
         "kern/instant-reality",
         "kern/ledenbalie-inzage"
+      ]
+    },
+    {
+      "veld": "naar",
+      "domeinen": 17,
+      "waar": [
+        "bedrijf",
+        "kern/ai",
+        "kern/bank",
+        "kern/command",
+        "kern/leerhuis",
+        "kern/lidboard"
       ]
     },
     {
@@ -178,18 +178,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/connect",
-        "kern/kantoor",
-        "kern/mailwachtrij"
-      ]
-    },
-    {
       "veld": "actor",
       "domeinen": 14,
       "waar": [
@@ -271,6 +259,18 @@
         "kern/command",
         "kern/festival",
         "kern/leerhuis"
+      ]
+    },
+    {
+      "veld": "onderwerp",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/connect",
+        "kern/kantoor",
+        "kern/mailwachtrij"
       ]
     },
     {

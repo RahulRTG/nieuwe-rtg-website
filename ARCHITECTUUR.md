@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5454 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5458 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5454 |
-| servermodules (`server/**/*.js`) | 4271 |
-| routebestanden (`server/routes/**`) | 646 |
-| kernmodules (`server/kern/**`) | 2678 |
+| API-endpoints | 5458 |
+| servermodules (`server/**/*.js`) | 4274 |
+| routebestanden (`server/routes/**`) | 647 |
+| kernmodules (`server/kern/**`) | 2679 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 427 |
-| toetsbestanden (`test/*.test.js`) | 2137 |
+| toetsbestanden (`test/*.test.js`) | 2138 |
 | schermtoetsen (`test/*.e2e.js`) | 308 |
 
 ## 2. De weg van een verzoek
@@ -110,7 +110,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 255 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -132,7 +132,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3727 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3731 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -141,8 +141,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1687 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 254 |
-| daarvan door precies één domein | 1433 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 255 |
+| daarvan door precies één domein | 1432 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -154,7 +154,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(214) auth(130) supplierAuth(66) officeAuth(49) db(40) liveCodename(36) status(32)
+app(215) auth(131) supplierAuth(66) officeAuth(49) db(40) liveCodename(36) status(32)
 accounts(30) schoon(23) boardroomWie(20) codenaamVan(20) managerOnly(19) save(19)
 rtf(19) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)

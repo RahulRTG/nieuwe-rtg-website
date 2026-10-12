@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-12T05:24:56.081Z",
-  "commit": "d9fec89d7",
+  "op": "2026-10-12T11:13:39.038Z",
+  "commit": "cb4daa51",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -3344,7 +3344,7 @@
   },
   {
    "sleutel": "POST /api/reis/uitnodiging/open",
-   "bestand": "server/routes/reis.js:131",
+   "bestand": "server/routes/reis.js:132",
    "staat": "openbaar",
    "reden": "een klaargezette reis openen kan per definitie nog zonder account (met rem per ip)"
   },

@@ -18,13 +18,13 @@ const os = require('node:os');
 const path = require('node:path');
 const cp = require('node:child_process');
 
-const WORTEL = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-preload-')));
+const PROEFMAP = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-preload-')));
 const OUD_WORTEL = process.env.RTG_INVOER_WORTEL;
-process.env.RTG_INVOER_WORTEL = WORTEL;
+process.env.RTG_INVOER_WORTEL = PROEFMAP;
 require('../scripts/lib/invoerspoor-preload');
 if (OUD_WORTEL === undefined) delete process.env.RTG_INVOER_WORTEL; else process.env.RTG_INVOER_WORTEL = OUD_WORTEL;
 const spoor = global.__rtgInvoerspoor;
-const pad = (p) => path.join(WORTEL, p);
+const pad = (p) => path.join(PROEFMAP, p);
 
 test.before(() => {
   fs.mkdirSync(pad('d/sub'), { recursive: true });
@@ -35,10 +35,10 @@ test.before(() => {
   /* het opzetten zelf telt niet mee in de toetsen hieronder */
   spoor.lees.clear(); spoor.bestaat.clear(); spoor.mappen.clear(); spoor.schrijf.clear(); spoor.onwaarneembaar.clear();
 });
-test.after(() => { fs.rmSync(WORTEL, { recursive: true, force: true }); });
+test.after(() => { fs.rmSync(PROEFMAP, { recursive: true, force: true }); });
 
 test('het spoor kent zijn wortel uit RTG_INVOER_WORTEL en hangt aan global', () => {
-  assert.equal(spoor.wortel, WORTEL);
+  assert.equal(spoor.wortel, PROEFMAP);
   assert.equal(typeof spoor.blok, 'function');
 });
 
@@ -48,7 +48,7 @@ test('een pad als tekst, URL of Buffer wordt relatief genoteerd; descriptor, nul
   fs.lstatSync(Buffer.from(pad('d/sub')));
   fs.existsSync(null);
   fs.existsSync(os.tmpdir());
-  fs.existsSync(WORTEL);
+  fs.existsSync(PROEFMAP);
   const fd = fs.openSync(pad('a.txt'), 'r');
   try { assert.equal(fs.readFileSync(fd, 'utf8'), 'a'); } finally { fs.closeSync(fd); }
   assert.deepEqual([...spoor.bestaat].sort(), ['a.txt', 'd', 'd/sub']);
@@ -108,10 +108,10 @@ test('fs.promises: lezen, opsommen, bestaan en schrijven worden ook genoteerd', 
 
 test('git over de commit zelf is geen invoer; elk ander subproces is onwaarneembaar, met korte paden', () => {
   spoor.onwaarneembaar.clear();
-  cp.spawnSync('git', ['--no-pager', 'status'], { cwd: WORTEL, stdio: 'ignore' });
-  cp.spawnSync('git', ['rev-parse', 'HEAD'], { cwd: WORTEL, stdio: 'ignore' });
+  cp.spawnSync('git', ['--no-pager', 'status'], { cwd: PROEFMAP, stdio: 'ignore' });
+  cp.spawnSync('git', ['rev-parse', 'HEAD'], { cwd: PROEFMAP, stdio: 'ignore' });
   assert.deepEqual([...spoor.onwaarneembaar], [], 'status en rev-parse zijn het stempel');
-  cp.spawnSync('git', ['log', '-1'], { cwd: WORTEL, stdio: 'ignore' });
+  cp.spawnSync('git', ['log', '-1'], { cwd: PROEFMAP, stdio: 'ignore' });
   cp.execFileSync(process.execPath, [pad('kind.js'), 'een', 'twee', 'drie'], { stdio: 'ignore' });
   cp.spawnSync('true');
   cp.spawnSync('git', ['--version'], { stdio: 'ignore' });

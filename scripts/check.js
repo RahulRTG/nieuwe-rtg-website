@@ -1209,7 +1209,7 @@ console.log('\n18) de kantoordeur staat maar op een plek nagebouwd');
 {
   const MAG_ZELF = new Map([
     ['public/apps/personeel.js', 'de werk-app koppelt rollen aan het ene account; heeft code en tweede factor allebei'],
-    ['public/apps/personeel/personeel-05.js', 'de bron-slice van dezelfde werk-app']
+    ['public/apps/personeel/personeel-04a.js', 'de bron-slice van dezelfde werk-app; de code alleen buiten productie (B10)']
   ]);
   let eigen = 0, viaGesprek = 0;
   loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {

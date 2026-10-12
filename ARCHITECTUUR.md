@@ -119,7 +119,7 @@ zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
 | `supplier` | 640 | 137 | 6 | 345 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
-| `social` | 76 | 10 | 31 | 72 |
+| `social` | 76 | 10 | 31 | 73 |
 | `techniek` | 80 | 20 | 1 | 66 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
 | `wereld` | 15 | 3 | 0 | 0 |
@@ -140,9 +140,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1686 |
+| kern-namen die routes aanraken | 1687 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 254 |
-| daarvan door precies één domein | 1432 |
+| daarvan door precies één domein | 1433 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

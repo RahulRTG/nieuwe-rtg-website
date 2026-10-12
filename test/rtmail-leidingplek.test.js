@@ -166,6 +166,9 @@ test('bron: elke lezer van het gedeelde postvak roept dezelfde schoon() aan', ()
         if (!/data\.rtmail\b/.test(t) || !/berichten/.test(t)) continue;
         const rel = path.relative(W, f);
         if (rel === path.join('kern', 'rtmail.js') || rel === path.join('kern', 'rtmail-leiding.js')) continue;
+        /* kern/rtgone.js geeft de lijst alleen door; de lezer, kern/rtgone-projecten.js,
+           filtert met isBeperkt (en leest alleen post aan het eigen persoonlijke adres) */
+        if (rel === path.join('kern', 'rtgone.js')) continue;
         if (!/schoonLeiding\(/.test(t)) fout.push(rel);
       }
     }

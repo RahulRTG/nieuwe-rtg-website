@@ -1,7 +1,6 @@
 /* RTG One: het gezamenlijke werkgeheugen voor RTG en RTF. De module bewaart
    niet alleen WAT er gebeurt, maar ook waarom, wie iets beloofde, waar werk
    schuurt en hoe een automatisering veilig kan worden teruggedraaid. */
-const { schoonLeiding } = require('./rtmail-leiding');
 const { nu: klokNu, datum: klokDatum } = require('../lib/klok');
 const projectenMaak = require('./rtgone-projecten');
 
@@ -166,7 +165,7 @@ module.exports = ({ db, save, crypto }) => {
     log(actor, 'automatisering-teruggedraaid', a.id, a.huis); save(); return { ok: true, automatisering: a, belofte: doel };
   }
   const { projectVanMail, projectTaakZet, projectBewijs, projectOplever } = projectenMaak({
-    rtmailBerichten: () => { schoonLeiding(db.data.rtmail); return ((db.data.rtmail || {}).berichten) || []; }, // ./rtmail-leiding.js
+    rtmailBerichten: () => (((db.data.rtmail || {}).berichten) || []),
     save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen: BESLUITTYPEN, goedkeuringMaak
   });
   return { rtgone: { state, intentieMaak, belofteMaak, frictieMaak, overdrachtMaak, automatiseringVoorbereid, automatiseringVoer, automatiseringHerstel,

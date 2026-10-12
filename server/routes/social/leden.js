@@ -2,7 +2,7 @@
    codenaam, DM en (video)bellen. Snaps en 24-uurs verhalen staan in
    ./snaps.js. Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, dmPost } = sctx;
   const { app, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord, socialIntrek,
           socialConnecties, liveCodename, connectieTussen, verbActief, codenaamVan,
           sseToCustomer, isGeblokkeerd } = kern;
@@ -71,7 +71,8 @@ app.post('/api/member/dm', auth, async (req, res) => {
   const brug = kern.commDm;
   if (!brug) return res.status(503).json({ error: 'De communicatiekern is niet beschikbaar.' });
   brug.markeerGelezen(req.session.key, ander);
-  let uit = brug.berichten(req.session.key, ander, 80);
+  let uit = brug.berichten(req.session.key, ander, 80)
+    .map(m => m.post ? Object.assign({}, m, { post: dmPost().voorLezer(req.session, m.post) }) : m);
   const mijnTaal = (db.data.memberTaal || {})[req.session.key];
   if (mijnTaal) {
     const vertaler = require('../../translate');
@@ -111,11 +112,8 @@ app.post('/api/member/dm/send', auth, async (req, res) => {
   const text = String(req.body.text || '').slice(0, 500).trim();
   // de 9+-poort: de vriendenchat deelt de leeftijdsgrens met de rest van de socials
   if (text) { const keur9 = require('../../kern/veilig').keur(text); if (!keur9.ok) return res.status(400).json({ error: keur9.reden }); }
-  let postDeel = null;
-  if (req.body.postId != null) {
-    const p = db.data.posts.find(x => x.id === Number(req.body.postId));
-    if (p) postDeel = { id: p.id, author: p.author, place: p.place, text: String(p.text || '').slice(0, 120), photo: p.photo || null };
-  }
+  // een post reist als ID; de lezer lost hem op met zijn eigen sessie (kern/sociaal/dmpost.js)
+  const postDeel = dmPost().deel(req.session, req.body.postId);
   /* Een gedeeld mediastuk (uit de Media OS-tak) reist NET ALS een gedeelde
      post als bijlage mee -- maar sinds de DM's in de communicatiekern wonen,
      gaat hij daar doorheen en niet meer rechtstreeks in memberChats. Alleen
@@ -142,8 +140,12 @@ app.post('/api/member/dm/send', auth, async (req, res) => {
   const msg = brug.stuur(req.session.key, ander, { tekst: text, post: postDeel, stuk: stukDeel,
     lang: (db.data.memberTaal || {})[req.session.key] || null });
   const mijnNaam = liveCodename(req.session);
-  sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text, post: msg.post, stuk: msg.stuk, at: msg.at });
-  res.json({ ok: true, message: msg });
+  /* Het live-seintje draagt de post NIET, alleen zijn id: hier is geen sessie
+     van de ontvanger, en een nagemaakte (zonder pas) telde een gratis vriend als
+     vriend. De ontvanger haalt het gesprek op met zijn eigen sessie. */
+  sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text,
+    post: null, postId: msg.post ? msg.post.id : null, stuk: msg.stuk, at: msg.at });
+  res.json({ ok: true, message: Object.assign({}, msg, { post: dmPost().voorLezer(req.session, msg.post) }) });
 });
 
 // bel-signalering: pure doorgeefluik tussen twee verbonden leden

@@ -9,6 +9,7 @@
 
 const salonviraal = require('./salonviraal');
 const lidmaatschap = require('./lidmaatschap');
+const { toon } = require('../media/toegang');
 
 function maakLid(deps) {
   const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan,
@@ -17,6 +18,8 @@ function maakLid(deps) {
   // opgebouwd, dus server.js vult deps.zijnVrienden later in. Zonder die functie
   // (bijv. losse module-test) telt niemand als vriend.
   const zijnVriendenVan = (a, b) => { try { return typeof deps.zijnVrienden === 'function' ? !!deps.zijnVrienden(a, b) : false; } catch (e) { return false; } };
+  let _leespoort = null;
+  const salonLeespoort = () => _leespoort || (_leespoort = require('./salon/zichtbaarheid')({ db, findSupplier, zijnVrienden: zijnVriendenVan }));
   const { hasContact, addContact, canEngage, engageError, registerContact } =
     require('./lid/contact')({ db, PERSONAS });
   const { facturenVoor, reisVoor, eersteBijdrageFactuur } = require('./lid/facturen')({ i18n, deps });
@@ -78,12 +81,17 @@ function maakLid(deps) {
       return zijnVriendenVan(sess.key, p.authorKey);
     };
     const kijker = { volgt: volgtAuteur, bevriend: bevriendMet };
-    const posts = db.data.posts.filter(p => salonviraal.toonInSalon(p, kijker)).map(p => {
+    /* DEZELFDE LEESPOORT ALS DE SALON ZELF (kern/salon/zichtbaarheid.js). Hier
+       stond alleen toonInSalon(), en dat kent de publiekskeuze niet: een vriend
+       zag een post "alleen ik" van zijn vriend in /api/state, tekst en foto --
+       en sinds AUTHORITY.md B4 met een werkende beeldlink erbij. magLezen kijkt
+       ook naar weg, verborgen, archief en de eigen verborgen-lijst. */
+    const posts = db.data.posts.filter(p => salonLeespoort().magLezen(sess, p)).map(p => {
       const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
       const claim = p.deal && salonClaimcode ? salonClaimcode.vindVanLid(p, sess.key) : null;
       return {
         id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual, at: p.at || null,
-        photo: p.photo || null, partner: !!p.partner,
+        photo: toon(p.photo) || null, partner: !!p.partner,
         reden: salonviraal.reden(p, kijker),
         text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
         likes: p.baseLikes + Object.keys(p.likedBy).length,

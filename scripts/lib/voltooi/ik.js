@@ -122,7 +122,9 @@ async function loop(w, stap) {
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
    is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
-   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
+   `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
+   zaai): dan is een 2xx voor ieder ander een inbreuk. */
 async function zaai(w) {
   const lid = await nieuwLid(w, 'kikk');
   const A = lid.token;

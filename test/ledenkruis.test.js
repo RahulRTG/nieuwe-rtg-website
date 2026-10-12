@@ -17,7 +17,11 @@
         maakt de rij NIET_GETEST.
      6. De rem (429) is onbeslist en nooit geweigerd.
      7. De bevoegdronde laat de kruis het ROLPROEF-deel alleen vervangen voor
-        de schrijfroutes die hij werkelijk raakte. */
+        de schrijfroutes die hij werkelijk raakte.
+     8. Een handeling op een object van A die bij een ander slaagt, is een
+        inbreuk (de tegenlezer, mutatie M1).
+     9. De codenaam is een merkteken, behalve op de verklaarde gedeelde routes
+        (de tegenlezer, mutatie M3b). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -51,7 +55,10 @@ test('3. aangetast is een stand die anders terugkomt; een tijdstempel telt niet'
   assert.notEqual(K.vlak('{"n":1}'), K.vlak('{"n":2}'), 'een teller die verschuift is wel een verandering');
   const r = K.kruisOordeel({ paren: [paar('lezer', '/api/a', 200)], onderwerp: true, aangetast: ['/api/a'] });
   assert.equal(r.status, 'GEBLOKKEERD_DOOR_DEFECT');
-  assert.match(r.reden, /iemand anders veranderde zijn stand/);
+  assert.match(r.reden, /anders terug dan voor de pogingen van de anderen/);
+  const wie = K.kruisOordeel({ paren: [paar('lezer', '/api/a', 200)], onderwerp: true, aangetast: [{ pad: '/api/a', na: 'ander lid' }] });
+  assert.match(wie.reden, /\/api\/a \(anders na de pogingen van ander lid\)/,
+    'het label zegt NA wiens pogingen, en beweert geen oorzaak');
 });
 
 test('4. zonder onderwerp geen uitslag', () => {
@@ -103,4 +110,36 @@ test('7. de kruis vervangt het ROLPROEF-deel alleen voor de routes die hij raakt
   const idorWeg = Object.assign({}, reg, { vervallen: ['IDOR.json: verouderd'] });
   assert.equal(R.ledenOordeel(rij, idorWeg, { schermroutes: SR, lees, kruis: kruisOk(['/api/a/lijst', '/api/a/zet']) }).status, 'NIET_GETEST',
     'IDOR blijft verplicht: de kruis verwisselt de sessie, IDOR het object');
+});
+
+test('8. M1: een ander die op A\'s object een handeling laat slagen, is een inbreuk', () => {
+  /* De mutatie van de tegenlezer: deel() zocht in ALLE ledgers, dus een ander lid
+     maakte een deelcode op A's feit. Het antwoord liet niets van A zien (een code
+     en een datum), en de kruis bleef groen. */
+  const antwoord = { status: 200, tekst: '{"status":200,"code":"RTGCL.x","tot":"2026-10-14T00:00:00Z"}' };
+  assert.equal(K.andersOordeel(antwoord, M, { handeling: true, object: true, wie: 'ander lid' }), 'inbreuk');
+  assert.equal(K.andersOordeel(antwoord, M, { handeling: true, object: false, wie: 'ander lid' }), 'eigen',
+    'een handeling zonder object van A (een nieuwe melding) mag een ander voor zichzelf doen');
+  assert.equal(K.andersOordeel({ status: 404, tekst: '' }, M, { handeling: true, object: true, wie: 'ander lid' }), 'geweigerd');
+  const r = K.kruisOordeel({ paren: [paar('lezer', '/api/carriere/ledger/mijn', 200),
+    paar('handeling', '/api/carriere/ledger/deel', 200, { 'ander lid': 'inbreuk' })], onderwerp: true });
+  assert.equal(r.status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.match(r.reden, /^ander lid kreeg 2xx op \/api\/carriere\/ledger\/deel, een handeling op een object van lid A/);
+});
+
+test('9. M3b: de codenaam lekt buiten de verklaarde gedeelde routes', () => {
+  const cn = { waarde: 'Zilveren Valk EE41', zichtbaarOp: Object.keys(K.CODENAAM_ZICHTBAAR) };
+  /* De mutatie van de tegenlezer: /api/veiligheid/moment gaf een ander lid de
+     lopende reizen van anderen -- codenaam, doel en eta, maar niet de titel. */
+  const reizen = { status: 200, tekst: '{"momenten":[{"codenaam":"Zilveren Valk EE41","doel":"Bestemming kruisproef q1","eta":"eta-q2"}]}' };
+  assert.equal(K.andersOordeel(reizen, [cn], { wie: 'ander lid', pad: '/api/veiligheid/moment' }), 'lek', 'de codenaam alleen is genoeg');
+  assert.equal(K.andersOordeel(reizen, ['Bestemming kruisproef q1'], { wie: 'ander lid', pad: '/api/veiligheid/moment' }), 'lek',
+    'en de gezaaide bestemming ook, zonder codenaam');
+  assert.equal(K.andersOordeel(reizen, ['eta-q2'], { wie: 'ander lid', pad: '/api/veiligheid/moment' }), 'lek');
+  /* In een gedeelde zaal is de codenaam met opzet zichtbaar. */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"aanwezig":["Zilveren Valk EE41"]}' }, [cn],
+    { wie: 'ander lid', pad: '/api/residentie/betreed' }), 'eigen');
+  for (const [route, reden] of Object.entries(K.CODENAAM_ZICHTBAAR)) {
+    assert.ok(route.startsWith('/api/') && reden.length > 30, route + ' draagt geen reden waarom de codenaam daar zichtbaar mag zijn');
+  }
 });

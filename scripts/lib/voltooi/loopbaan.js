@@ -149,7 +149,9 @@ async function loop(w, stap) {
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
    is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
-   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
+   `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
+   zaai): dan is een 2xx voor ieder ander een inbreuk. */
 async function zaai(w) {
   const lid = await nieuwLid(w, 'klpb');
   const WAT = 'Diploma kruisproef ' + merk();
@@ -158,10 +160,10 @@ async function zaai(w) {
   await w.post(DEEL, { id: feitId, dagen: 7, voor: 'een sponsor' }, lid.token);
   const deel = (((await w.post(DELEN, {}, lid.token)).data || {}).delen || [])[0];
   return { lid, merktekens: [WAT], lezers: [{ pad: MIJN }, { pad: DELEN }],
-    handelingen: [{ pad: DEEL, lijf: { id: feitId, dagen: 3, voor: 'een tweede' } },
-      { pad: STOP, lijf: { id: deel && deel.id } },
+    handelingen: [{ pad: DEEL, object: true, lijf: { id: feitId, dagen: 3, voor: 'een tweede' } },
+      { pad: STOP, object: true, lijf: { id: deel && deel.id } },
       { pad: ZET, lijf: { kapitaal: 'netwerk', wat: 'Club kruisproef ' + merk(), op: '2022-11-12' } },
-      { pad: INTREK, lijf: { id: feitId, reden: 'kruisproef' } }] };
+      { pad: INTREK, object: true, lijf: { id: feitId, reden: 'kruisproef' } }] };
 }
 
 module.exports = {

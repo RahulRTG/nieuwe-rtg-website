@@ -165,7 +165,9 @@ async function loop(w, stap) {
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
    is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
-   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
+   `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
+   zaai): dan is een 2xx voor ieder ander een inbreuk. */
 async function zaai(w) {
   const lid = await nieuwLid(w, 'kses');
   const A = lid.token;
@@ -178,9 +180,9 @@ async function zaai(w) {
   const ander = sids.find((s) => s !== (l.data && l.data.huidige));
   const u2 = await w.post(UITDAGING, {}, A);
   return { lid, merktekens: sids, lezers: [{ pad: LIJST }],
-    handelingen: [{ pad: BIND, lijf: { jwk: sleutel.jwk, handtekening: await sleutel.teken(u2.data.nonce), naam: 'Kruistoestel' } },
+    handelingen: [{ pad: BIND, object: true, lijf: { jwk: sleutel.jwk, handtekening: await sleutel.teken(u2.data.nonce), naam: 'Kruistoestel' } },
       { pad: UITDAGING, lijf: {} },
-      { pad: SLUIT, lijf: { sid: ander }, kop: () => sleutel.bewijs('POST', SLUIT) }] };
+      { pad: SLUIT, object: true, lijf: { sid: ander }, kop: () => sleutel.bewijs('POST', SLUIT) }] };
 }
 
 module.exports = {

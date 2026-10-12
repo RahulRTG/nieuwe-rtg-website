@@ -259,3 +259,17 @@ test('18. een deelcode verloopt, en een jaar is het maximum', async () => {
   assert.ok(dagen <= 366, 'LINK.md: alles wat met een oude foto nog iets in gang kan zetten, hoort tijdelijk te zijn');
   assert.ok(dagen > 300);
 });
+
+test('19. een schrijfactie die de opslag niet bevestigt, laat niets achter', async () => {
+  /* De bundel faalt (zoals onder RTG_VERRAAD=schrijf-faalt): de regel gaat uit
+     het geheugen terug, en een lid dat nog geen ledger had, krijgt er ook geen
+     leeg ledger bij -- anders schrijft write-behind later een lege rij weg. */
+  const db = { data: {} };
+  const L = maakCarriereLedger({ db, save: () => {}, bijeen: async () => { throw new Error('opslag weigert'); },
+    inBundel: () => false, crypto, schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200),
+    codenaamVan: () => 'Zilveren Reiger' });
+  const r = await L.zet('ka', { kapitaal: 'vermogen', wat: 'Nederlands kampioen junior', op: GISTEREN });
+  assert.equal(r.status, 503);
+  assert.equal(Object.prototype.hasOwnProperty.call(db.data.carriereLedger || {}, 'ka'), false,
+    'een mislukte eerste regel laat geen leeg ledger achter');
+});

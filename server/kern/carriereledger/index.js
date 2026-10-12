@@ -86,6 +86,7 @@ function maakCarriereLedger(state) {
       const rs = reeks(key);
       const i = r ? rs.findIndex((x) => x && x.id === r.id) : -1;
       if (i >= 0) rs.splice(i, 1);
+      if (!rs.length) delete kaart()[key];   // geen leeg ledger achterlaten
       return mis;
     }
     return { status: 200, regel: r };

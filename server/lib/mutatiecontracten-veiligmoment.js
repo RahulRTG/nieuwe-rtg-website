@@ -8,7 +8,11 @@ const AFGETEKEND = { door: 'Claude (afbouw ronde 3), op grond van route, kern en
 const CONTRACTEN = {
   'POST /api/veiligheid/moment/maak': {
     mutatieId: 'veiligheid.moment.maak', herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
+    /* Niet `idempotent`: alleen een woordelijk gelijk verzoek binnen vijf
+       seconden valt samen. Daarbuiten is een tweede aanroep een tweede Live
+       Circle, en die zet het lid recht met /moment/stop -- dat is precies
+       `compenseerbaar` (kern/mutatie.js). */
+    semantiek: { klasse: 'compenseerbaar' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'PROTECTED',
     hoe: 'De idempoort (lib/idem-poort.js) speelt een woordelijk gelijk verzoek van dezelfde sessie binnen vijf seconden af in plaats van een tweede Live Circle te maken (zelfdeVerzoek in lib/idemsleutels-veiligmoment.js). Een ander woord, een andere duur of een andere ontvanger is een ander verzoek en maakt gewoon een tweede.',

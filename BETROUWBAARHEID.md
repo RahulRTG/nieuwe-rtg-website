@@ -723,7 +723,8 @@ waarnemingen maken een rij defect:
 |---|---|
 | **lek** | een ander krijgt 2xx en het antwoord draagt een merkteken van A (behalve een woord dat hij zelf meestuurde) |
 | **open** | een handeling van A slaagt zonder sessie |
-| **aangetast** | na alle pogingen leest A zijn eigen stand niet meer byte voor byte terug (tijdstempels uitgezonderd) |
+| **inbreuk** | een handeling op een OBJECT van A (het scenario markeert hem met `object: true`: een id van zijn feit, melding, sessie of map) geeft bij een ander 2xx -- ook als het antwoord niets van A laat zien |
+| **aangetast** | na de pogingen van een van de anderen leest A zijn eigen stand niet meer byte voor byte terug (tijdstempels uitgezonderd); de anderen proberen een voor een, en het label zegt na WIENS pogingen -- een volgorde, geen bewezen oorzaak |
 
 En het eigen lid moet het WEL kunnen: een paar telt alleen als A zelf 2xx kreeg,
 en de handelingen doet A pas NA de anderen, op hetzelfde levende object.
@@ -736,10 +737,13 @@ in zijn veiligheidskring -- en noemt dat het merkteken. Zonder scenario zijn de
 merktekens alleen A's nummer, e-mail, telefoon en sessie-id, en dan telt een rij
 alleen als een route van het scherm zelf er een droeg (in de vastgelegde ronde: 78 van de 97 ledenrijen met een eigen adres niet).
 
-**De codenaam is geen merkteken.** De eerste volle ronde meldde een lek in
-`/api/residentie/betreed`: een ander lid zag A's codenaam. Met de hand nagekeken
-was dat A's aanwezigheid in een gedeelde zaal van de Residence -- zo bedoeld, want
-de codenaam is het pseudoniem dat een ander lid mag zien.
+**De codenaam is een merkteken, met een verklaarde uitzondering.** De eerste
+volle ronde meldde een lek in `/api/residentie/betreed`: een ander lid zag A's
+codenaam. Met de hand nagekeken was dat A's aanwezigheid in een gedeelde zaal van
+de Residence -- zo bedoeld. De eerste reparatie haalde de codenaam daarom
+huisbreed uit de merktekens, en dat was te ruim (zie hieronder, M3b). Nu is hij
+weer een merkteken, behalve op de routes in `CODENAAM_ZICHTBAAR`
+(`scripts/lib/ledenkruis.js`), elk met de reden waarom die ruimte gedeeld is.
 
 **Waar IDOR geen id vond.** `IDOR.json` (vers, 698 gescheiden, 0 doorbraak, 0 lek)
 noemt een route zonder object-id `onbereikbaar`, en zo'n route hield de rij op
@@ -750,12 +754,28 @@ voor de schrijfroutes die de kruis werkelijk raakte met A binnen: een
 schrijfroute van het scherm die hij niet raakte, houdt de rij op NIET_GETEST,
 met naam.
 
-**Nagetrokken met mutaties** (in Wonen, elk teruggedraaid): annuleren over alle
-leden heen gaf DEFECT (lek), de lijst over alle leden gaf DEFECT (lek), annuleren
-over alle leden zonder echo in het antwoord gaf DEFECT (aangetast), en melden
-zonder `auth` gaf DEFECT (open). Twee vondsten in de meter zelf: een merkteken dat
-de ander zelf meestuurde (`bron` in `/api/mijn/post/zet`) gaf eerst een vals lek,
-en een stroom (event-stream) hing de hele ronde een kwartier op `res.text()`.
+**Nagetrokken met mutaties, en een tegenlezer vond er twee die bleven staan.**
+De eerste ronde mutaties zat alleen in Wonen (en een in Reizen): annuleren over
+alle leden heen (lek), de lijst over alle leden (lek), annuleren zonder echo
+(aangetast), melden zonder `auth` (open), en in Reizen `vind()` zonder handle
+(lek) -- alle vijf DEFECT. Een onafhankelijke tegenlezer probeerde daarna andere
+lekken, en twee bleven BEWEZEN:
+
+- **M1**: `deel()` in `kern/carriereledger/deel.js` zocht in alle ledgers, dus een
+  ander lid maakte een deelcode op A's feit en las het via `toon(code)`. Het
+  antwoord op `deel` draagt niets van A, dus er was geen lek te zien. Reparatie:
+  een handeling op een object van A is gemarkeerd (`object: true`), en een 2xx
+  daarop is een **inbreuk**. Nagemeten: DEFECT.
+- **M3b**: `/api/veiligheid/moment` gaf een ander lid de lopende reizen van
+  anderen (codenaam, doel, eta), zonder de titel -- en alleen de titel was een
+  merkteken, de codenaam was huisbreed uitgezonderd. Reparatie: het scenario
+  zaait een eigen waarde in elk veld (titel, doel, eta), en de codenaam is weer
+  een merkteken met de allowlist hierboven. Nagemeten: DEFECT.
+
+Beide staan als toets in `test/ledenkruis.test.js` (8 en 9). Twee vondsten in de
+meter zelf, eerder: een merkteken dat de ander zelf meestuurde (`bron` in
+`/api/mijn/post/zet`) gaf een vals lek, en een stroom (event-stream) hing de hele
+ronde een kwartier op `res.text()`.
 
 **Uitslag: 4 ledenschermen BEWEZEN** -- Wie ben ik, Mijn loopbaan, Reizen &
 Veilig en Wonen -- naast de 12 gezinsschermen. Post van RTG en Waar ben ik
@@ -767,11 +787,16 @@ vraagt een WebAuthn-authenticator in de proef, en een account wissen vraagt een
 ander lid per rij dat het mag verliezen. Dat is werk met een adres, geen gat in
 de regel.
 
-**Wat dit niet bewijst**: wat het scherm bij het laden en het scenario aanroept,
-en niets daarbuiten; een merkteken dat een ander op een andere manier zou kunnen
-afleiden zonder het woordelijk te krijgen; de inhoud van een stroom (alleen zijn
-status telt); en een andere zaak of een ander kantoor dan het proefaccount uit
-de sleutelbos.
+**Wat dit niet bewijst, en de bekende blinde vlekken**: wat het scherm bij het
+laden en het scenario aanroept, en niets daarbuiten; een merkteken dat een ander
+op een andere manier zou kunnen afleiden zonder het woordelijk te krijgen; de
+inhoud van een stroom (alleen zijn status telt); de inhoud van een WEIGERING (een
+4xx wordt niet op merktekens gelezen -- een foutmelding die A's gegevens noemt,
+ziet de kruis niet); een handeling op een object van A die het scenario NIET als
+`object` markeert (de inbreuk hangt aan die verklaring); een gedeelde route in
+`CODENAAM_ZICHTBAAR` die meer laat zien dan de codenaam alleen (daar telt de
+codenaam niet, de andere merktekens wel); en een andere zaak of een ander kantoor
+dan het proefaccount uit de sleutelbos.
 
 **De twee vondsten van ronde 2 zijn bij de oorzaak gerepareerd.** Mijn loopbaan:
 `server/kern/carriereledger/` riep `vastleggen()` aan zonder `await`, terwijl

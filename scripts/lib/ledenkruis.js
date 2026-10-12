@@ -45,7 +45,8 @@
 const ANDEREN = ['anoniem', 'ander lid', 'zaak', 'kantoor', 'gezin'];
 const GRENS = 'het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, ' +
   'een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; ' +
-  'van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen';
+  'van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op ' +
+  'merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR';
 
 const ok = (s) => s >= 200 && s < 300;
 
@@ -54,14 +55,34 @@ const ok = (s) => s >= 200 && s < 300;
    daarin al staat, kan hij niet van A hebben gekregen: wie "bron: x" stuurt en
    "via: scherm:x" terugkrijgt, ziet zijn eigen woord. Zonder die uitzondering
    meldde de eerste ronde een lek op /api/mijn/post/zet dat er niet was. */
-function andersOordeel({ status, tekst }, merktekens, { handeling = false, wie = '', verzoek = '' } = {}) {
+function andersOordeel({ status, tekst }, merktekens, { handeling = false, object = false, wie = '', verzoek = '', pad = '' } = {}) {
   if (status === 429 || status === 0) return 'onbeslist';
   if (!ok(status)) return 'geweigerd';
-  const raak = merktekens.find((m) => m && !String(verzoek).includes(m.replace(/^scherm:/, '')) && String(tekst || '').includes(m));
+  const raak = merktekens.find((m) => {
+    const waarde = typeof m === 'string' ? m : m && m.waarde;
+    if (!waarde) return false;
+    if (m.zichtbaarOp && m.zichtbaarOp.some((v) => pad === v || pad.startsWith(v))) return false;
+    return !String(verzoek).includes(waarde.replace(/^scherm:/, '')) && String(tekst || '').includes(waarde);
+  });
   if (raak) return 'lek';
   if (handeling && wie === 'anoniem') return 'open';
+  /* Een handeling op een OBJECT van A (een id van zijn feit, zijn melding, zijn
+     sessie) hoort voor ieder ander te mislukken. Een 2xx daarop is geen "eigen"
+     antwoord maar een inbreuk, ook als het antwoord niets van A laat zien: de
+     tegenlezer liet deel() in alle ledgers zoeken, een ander lid maakte een
+     deelcode op A's feit -- en de kruis bleef groen. */
+  if (handeling && object) return 'inbreuk';
   return 'eigen';
 }
+
+/* WAAR DE CODENAAM VAN A ZICHTBAAR MAG ZIJN voor een ander, met de reden. Buiten
+   deze routes is hij een merkteken zoals elk ander: de codenaam is het pseudoniem
+   dat een ander lid in een GEDEELDE ruimte mag zien, niet een vrijbrief voor elke
+   route. Een verklaring en geen afleiding -- wie hier een route toevoegt, zegt
+   waarom die ruimte gedeeld is. */
+const CODENAAM_ZICHTBAAR = {
+  '/api/residentie/': 'de Residence is een gedeelde zaal: wie binnenloopt ziet wie er is, op codenaam (server/routes/member/residentie.js)'
+};
 
 /* Tijdstempels wegstrepen: een stand die alleen een "laatst gezien" anders heeft,
    is niet aangetast. Getallen blijven staan -- een teller die verschuift is wel
@@ -83,11 +104,21 @@ function kruisOordeel({ paren, onderwerp, aangetast = [], fout = null }) {
     const wie = Object.entries(lek.anderen).find(([, u]) => u === 'lek')[0];
     return { status: 'GEBLOKKEERD_DOOR_DEFECT', gekruist, reden: wie + ' kreeg ' + lek.pad + ' met een merkteken van lid A erin' };
   }
+  const inbreuk = telt.find((p) => Object.values(p.anderen).includes('inbreuk'));
+  if (inbreuk) {
+    const wie = Object.entries(inbreuk.anderen).find(([, u]) => u === 'inbreuk')[0];
+    return { status: 'GEBLOKKEERD_DOOR_DEFECT', gekruist, reden: wie + ' kreeg 2xx op ' + inbreuk.pad + ', een handeling op een object van lid A' };
+  }
   const open = telt.find((p) => Object.values(p.anderen).includes('open'));
   if (open) return { status: 'GEBLOKKEERD_DOOR_DEFECT', gekruist, reden: 'de handeling ' + open.pad + ' van lid A slaagde zonder sessie' };
   if (aangetast.length) {
+    /* `aangetast`: [{ pad, na }] -- na wiens pogingen de stand van A anders
+       terugkwam. Dat is een tijdsvolgorde en geen bewijs van de oorzaak: het
+       label zegt daarom "anders na de pogingen van X", niet "X veranderde". */
+    const a = aangetast.map((x) => (typeof x === 'string' ? { pad: x, na: null } : x));
     return { status: 'GEBLOKKEERD_DOOR_DEFECT', gekruist,
-      reden: 'na de pogingen van de anderen las lid A ' + aangetast.join(', ') + ' anders terug: iemand anders veranderde zijn stand' };
+      reden: 'lid A las ' + a.map((x) => x.pad + (x.na ? ' (anders na de pogingen van ' + x.na + ')' : '')).join(', ') +
+        ' anders terug dan voor de pogingen van de anderen' };
   }
   if (!telt.length) return { status: 'NIET_GETEST', gekruist, reden: 'geen enkel verzoek waarin lid A zelf binnenkwam; er viel niets te kruisen' };
   /* Het eigen lid WEL: een lezer of handeling van het scenario die A zelf
@@ -107,7 +138,7 @@ function kruisOordeel({ paren, onderwerp, aangetast = [], fout = null }) {
   const handelingen = telt.filter((p) => p.soort === 'handeling').length;
   return { status: 'BEWEZEN', gekruist,
     reden: telt.length + ' verzoeken van lid A (' + handelingen + ' handelingen) nagespeeld door ' + ANDEREN.join(', ') +
-      ': geen lek, geen handeling zonder sessie, de stand van A onaangetast; ' + GRENS };
+      ': geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; ' + GRENS };
 }
 
 /* ---- de meting ---------------------------------------------------------- */
@@ -154,11 +185,9 @@ function sidVan(token) {
 async function identiteit(w, token) {
   const s = await w.post('/api/state', {}, token);
   const u = (s.data && s.data.state && s.data.state.user) || {};
-  /* GEEN codenaam. Die is in dit huis het pseudoniem dat een ander lid met opzet
-     mag zien (de Residence, De Salon); de eerste volle ronde meldde daarop een
-     "lek" in /api/residentie/betreed dat de aanwezigheid in een gedeelde zaal
-     was. Nummer, e-mail, telefoon en sessie-id zijn wel van A alleen. */
-  return [u.number, u.email, u.phone, sidVan(token)].filter((x) => x && String(x).length >= 6).map(String);
+  /* De codenaam is een merkteken, behalve op de routes in CODENAAM_ZICHTBAAR. */
+  const codenaam = u.codename ? [{ waarde: String(u.codename), zichtbaarOp: Object.keys(CODENAAM_ZICHTBAAR) }] : [];
+  return [u.number, u.email, u.phone, sidVan(token)].filter((x) => x && String(x).length >= 6).map(String).concat(codenaam);
 }
 
 /* Een rij meten. `zaai` (optioneel, uit een scenario) geeft { lid, merktekens,
@@ -175,6 +204,7 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
   } else {
     A = standaardLid.token; merktekens = standaardLid.merktekens;
   }
+  const waarden = merktekens.map((m) => (typeof m === 'string' ? m : m.waarde));
   const eigen = (p) => eigenRoutes.exact.has(p) || [...eigenRoutes.voor].some((v) => p.startsWith(v));
 
   /* 1. Het scherm openen als A en vastleggen wat het vraagt en krijgt. */
@@ -211,55 +241,50 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
     const r = await roep(base, { methode: 'POST', url: l.pad, lijf: JSON.stringify(l.lijf || {}) }, A);
     if (lezerStatus[i] === undefined) {
       lezerStatus[i] = r.status;
-      lezerOnderwerp[i] = ok(r.status) && eigen(l.pad) && merktekens.some((m) => r.tekst.includes(m));
+      lezerOnderwerp[i] = ok(r.status) && eigen(l.pad) && waarden.some((m) => r.tekst.includes(m));
     }
     return vlak(r.tekst);
   }));
   const voor = await leesStand();
 
-  /* 3. De anderen. Eerst de verzoeken van het laden, dan de handelingen die A
-     straks zelf doet -- op hetzelfde levende object. */
-  const paren = [];
-  for (const v of geladenLijst) {
-    const p = { pad: v.pad, soort: 'laden', a: v.a, anderen: {} };
-    for (const wie of ANDEREN) p.anderen[wie] = andersOordeel(await roep(base, v, anderen[wie]), merktekens, { wie, verzoek: v.url + ' ' + v.lijf });
-    paren.push(p);
-  }
-  /* De lezers van het scenario: dezelfde routes van het scherm, ook als het
-     scherm ze bij het laden niet aanriep. A's antwoord staat al in `voor`. */
-  for (const [i, l] of lezers.entries()) {
-    const v = { methode: 'POST', url: l.pad, lijf: JSON.stringify(l.lijf || {}) };
-    const p = { pad: l.pad, soort: 'lezer', a: lezerStatus[i], anderen: {} };
-    for (const wie of ANDEREN) p.anderen[wie] = andersOordeel(await roep(base, v, anderen[wie]), merktekens, { wie, verzoek: v.url + ' ' + v.lijf });
-    paren.push(p);
-  }
-  for (const h of handelingen) {
-    const p = { pad: h.pad, soort: 'handeling', a: 0, anderen: {} };
-    for (const wie of ANDEREN) {
-      const koppen = h.kop ? await h.kop() : {};
-      p.anderen[wie] = andersOordeel(await roep(base, { methode: 'POST', url: h.pad, lijf: JSON.stringify(h.lijf || {}), koppen }, anderen[wie]),
-        merktekens, { handeling: true, wie, verzoek: h.pad + ' ' + JSON.stringify(h.lijf || {}) });
+  /* 3. De anderen, EEN VOOR EEN: eerst alle verzoeken van het laden, de lezers
+     en de handelingen die A straks zelf doet (op hetzelfde levende object), en
+     daarna leest A zijn stand terug. Zo zegt een aangetaste stand na WIENS
+     pogingen hij anders was. */
+  const paren = [
+    ...geladenLijst.map((v) => ({ pad: v.pad, soort: 'laden', a: v.a, anderen: {}, v })),
+    ...lezers.map((l, i) => ({ pad: l.pad, soort: 'lezer', a: lezerStatus[i], anderen: {},
+      v: { methode: 'POST', url: l.pad, lijf: JSON.stringify(l.lijf || {}) } })),
+    ...handelingen.map((h) => ({ pad: h.pad, soort: 'handeling', a: 0, anderen: {}, h }))
+  ];
+  const aangetast = [];
+  let stand = voor;
+  for (const wie of ANDEREN) {
+    for (const p of paren) {
+      if (p.h) {
+        const koppen = p.h.kop ? await p.h.kop() : {};
+        p.anderen[wie] = andersOordeel(await roep(base, { methode: 'POST', url: p.h.pad, lijf: JSON.stringify(p.h.lijf || {}), koppen }, anderen[wie]),
+          merktekens, { handeling: true, object: !!p.h.object, wie, pad: p.pad, verzoek: p.h.pad + ' ' + JSON.stringify(p.h.lijf || {}) });
+      } else {
+        p.anderen[wie] = andersOordeel(await roep(base, p.v, anderen[wie]), merktekens, { wie, pad: p.pad, verzoek: p.v.url + ' ' + p.v.lijf });
+      }
     }
-    paren.push(p);
+    const na = await leesStand();
+    lezers.forEach((l, i) => { if (stand[i] !== na[i]) aangetast.push({ pad: l.pad, na: wie }); });
+    stand = na;
   }
 
   /* Onderwerp: droeg een eigen route van het scherm (geladen of gelezen) iets van A? */
   const onderwerp = lezerOnderwerp.some(Boolean) ||
-    geladenLijst.some((v) => ok(v.a) && eigen(v.pad) && merktekens.some((m) => String(v.tekst || '').includes(m)));
-
-  /* 4. Is A's stand nog die van daarvoor? */
-  const na = await leesStand();
-  const aangetast = lezers.filter((l, i) => voor[i] !== na[i]).map((l) => l.pad);
+    geladenLijst.some((v) => ok(v.a) && eigen(v.pad) && waarden.some((m) => String(v.tekst || '').includes(m)));
 
   /* 5. En nu A zelf, op hetzelfde object. */
-  for (const p of paren.filter((x) => x.soort === 'handeling')) {
-    const h = handelingen.find((x) => x.pad === p.pad && !x.gedaan);
-    h.gedaan = true;
-    const koppen = h.kop ? await h.kop() : {};
-    p.a = (await roep(base, { methode: 'POST', url: h.pad, lijf: JSON.stringify(h.lijf || {}), koppen }, A)).status;
+  for (const p of paren.filter((x) => x.h)) {
+    const koppen = p.h.kop ? await p.h.kop() : {};
+    p.a = (await roep(base, { methode: 'POST', url: p.h.pad, lijf: JSON.stringify(p.h.lijf || {}), koppen }, A)).status;
   }
 
   return Object.assign(kruisOordeel({ paren, onderwerp, aangetast }), { kruisparen: paren.map((p) => ({ pad: p.pad, soort: p.soort, a: p.a, anderen: p.anderen })) });
 }
 
-module.exports = { ANDEREN, GRENS, andersOordeel, kruisOordeel, vlak, meetRij, wereldOver, identiteit, sidVan };
+module.exports = { ANDEREN, GRENS, CODENAAM_ZICHTBAAR, andersOordeel, kruisOordeel, vlak, meetRij, wereldOver, identiteit, sidVan };

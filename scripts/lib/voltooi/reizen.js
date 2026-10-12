@@ -173,15 +173,21 @@ async function loop(w, stap) {
    Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
    is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
    staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
-   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf.
+   `object: true` zegt dat een handeling een object van A raakt (een id uit zijn
+   zaai): dan is een 2xx voor ieder ander een inbreuk. */
 async function zaai(w) {
   const lid = await nieuwLid(w, 'krvl');
-  const TITEL = 'Diner kruisproef ' + merk();
-  const m = await w.post(MAAK, formulier(TITEL), lid.token);
+  /* Elk veld dat een ander zou kunnen zien, draagt een eigen waarde: de titel,
+     de bestemming en de aankomsttijd. Alleen de titel als merkteken liet een
+     route die de lopende reizen van ANDEREN teruggaf groen staan zodra die de
+     titel wegliet (de tegenlezer, mutatie M3b). */
+  const TITEL = 'Diner kruisproef ' + merk(), DOEL = 'Bestemming kruisproef ' + merk(), ETA = 'eta-' + merk();
+  const m = await w.post(MAAK, Object.assign(formulier(TITEL), { doel: DOEL, eta: ETA }), lid.token);
   const id = m.data && m.data.moment && m.data.moment.id;
-  return { lid, merktekens: [TITEL], lezers: [{ pad: MIJN }],
-    handelingen: [{ pad: STATUS, lijf: { id, status: 'onderweg', eta: '19:45' } }, { pad: PAUZE, lijf: { id, aan: true } },
-      { pad: STOP, lijf: { id } }, { pad: MAAK, lijf: formulier('Trein kruisproef ' + merk()) }] };
+  return { lid, merktekens: [TITEL, DOEL, ETA], lezers: [{ pad: MIJN }],
+    handelingen: [{ pad: STATUS, object: true, lijf: { id, status: 'onderweg', eta: '19:45' } }, { pad: PAUZE, object: true, lijf: { id, aan: true } },
+      { pad: STOP, object: true, lijf: { id } }, { pad: MAAK, lijf: formulier('Trein kruisproef ' + merk()) }] };
 }
 
 module.exports = {

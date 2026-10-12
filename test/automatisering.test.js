@@ -58,16 +58,23 @@ test('zonder bruikbaar adres gebeurt er niets (geen crash)', () => {
   assert.equal(automatisering.welkomLid({}), null);
 });
 
-test('personeel-draaiboek: sollicitatie zet een seintje in het postvak van de zaak', () => {
+test('personeel-draaiboek: sollicitatie zet een seintje in de LEIDINGSBUS van de zaak', () => {
+  /* Werving is van de manager (tegenlezing PR #584): het seintje staat niet in
+     het gedeelde zaakpostvak maar in de leidingsbus ernaast
+     (kern/rtmail-adres.js leidingBus), en draagt de beperking. Alleen de inbox
+     van een manager leest die bus mee (routes/rtmail.js). */
   const { rtmail, automatisering } = maak();
   const m = automatisering.sollicitatieBinnen({ zaakCode: 'SAKURA', functie: 'gastvrouw', codename: 'orchidee' });
   assert.ok(m);
-  assert.equal(m.naar, 'sakura@rtmail');
+  assert.equal(m.naar, 'sakura-leiding@rtmail');
+  assert.equal(m.beperkt, 'werving');
   assert.equal(m.van, 'rtg@rtmail');
   assert.match(m.onderwerp, /sollicitatie/i);
   assert.match(m.tekst, /gastvrouw/);
   assert.match(m.tekst, /orchidee/); // codenaam mag, echte naam niet
-  assert.equal(rtmail.postvak('sakura').length, 1);
+  assert.equal(rtmail.postvak('sakura', { beperkt: true }).length, 0, 'niet in het gedeelde zaakpostvak');
+  assert.equal(rtmail.postvak('sakura-leiding').length, 0, 'zonder { beperkt: true } levert ook de leidingsbus niets');
+  assert.equal(rtmail.postvak('sakura-leiding', { beperkt: true }).length, 1);
 });
 
 test('personeel-draaiboek: zonder zaakcode gebeurt er niets', () => {

@@ -47,31 +47,8 @@ app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
   res.json({ ok: true, ...klokVan(req.supplier.code, staffId) });
 });
 
-/* Videobellen op de werkvloer (WebRTC). De server geeft alleen signalen door
-   (bel, aannemen, offer/answer/ice); het beeld en geluid lopen rechtstreeks
-   tussen de toestellen (peer-to-peer). 1-op-1 belt op staffId en alleen wie
-   is ingeklokt is bereikbaar; de teamcall is een groepsgesprek per zaak
-   (kamer "team"), waarin ieder toestel rechtstreeks met de anderen verbindt
-   (mesh) tot de kamergrens van 100 deelnemers. */
-app.post('/api/staff/call', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const kind = String(req.body.kind || '');
-  if (!['ring', 'accept', 'decline', 'offer', 'answer', 'ice', 'hangup', 'join', 'leave'].includes(kind))
-    return res.status(400).json({ error: 'Onbekend signaal.' });
-  const naar = req.body.staffId != null && req.body.staffId !== '' ? parseInt(req.body.staffId, 10) : null;
-  if (kind === 'ring') {
-    if (!naar || naar === req.actor.staffId) return res.status(400).json({ error: 'Kies een collega.' });
-    const lijst = db.data.klok[req.supplier.code] || [];
-    if (!lijst.find(e => e.staffId === naar && !e.out)) return res.status(409).json({ error: 'Deze collega is niet ingeklokt en dus niet bereikbaar.' });
-    logActivity(req.supplier.code, req.actor, 'belde een ingeklokte collega (video)');
-  }
-  sseToSupplier(req.supplier.code, 'rtc', {
-    kind, van: req.actor.staffId, vanNaam: req.actor.name, naar,
-    video: req.body.video !== false, payload: req.body.payload || null,
-    kamer: String(req.body.kamer || '') || null
-  });
-  res.json({ ok: true });
-});
+// videobellen (1-op-1 en de teamkamer): ./bellen.js
+require('./bellen')(actx);
 
 /* Collega tegen collega: een direct chatbericht, van toestel naar toestel.
    De lijst toont wie er ingeklokt en online is; het gesprek zelf blijft

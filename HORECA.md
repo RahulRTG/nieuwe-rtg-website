@@ -975,7 +975,12 @@ collega `afwezig: true` en niet de verlofsoort; loonruns, bevindingen,
 contracten en aangiftes zijn van de manager; de verzuimplanning toont van een
 collega alleen vandaag; de online-stip staat pas aan als BEIDE in het gesprek
 schreven, en een oproep of bericht zegt niet op hoeveel toestellen het aankwam
-(`test/personeelzicht-routes.test.js`). Hij telt
+(`test/personeelzicht-routes.test.js`). De vierde ronde sloot nog vier wegen: de
+online-stip in een gesprek tussen collega's volgt dezelfde wederkerigheid, de
+sollicitatiepost van RTMail staat verplicht in een LEIDINGSBUS naast het
+zaakpostvak die alleen de inbox van een manager meeleest, een videobelsignaal
+(met zijn IP-adressen) gaat alleen naar wie gebeld wordt en de teamkamer alleen
+naar wie erin zit, en een pauze seint alleen de manager en de medewerker zelf. Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

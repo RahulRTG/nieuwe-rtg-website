@@ -57,4 +57,13 @@ function meldingBeperking(n) {
   return Object.prototype.hasOwnProperty.call(BEPERKTE_TITELS, n.title) ? BEPERKTE_TITELS[n.title] : null;
 }
 
-module.exports = { KLOKSOORTEN, OUDE_KLOKTEKST, MELDINGBEPERKING, BEPERKTE_TITELS, meldingBeperking };
+/* BEPERKTE POST in een gedeeld zaakpostvak (kern/rtmail.js). Een systeembericht
+   van een soort hieronder krijgt de beperking VERPLICHT mee bij de bezorging,
+   en een postvak levert hem alleen aan wie er expliciet om vraagt (de
+   supplierroute: alleen een manager). Een bericht van voor het veld wordt
+   herkend aan soort + afzender. */
+const BEPERKTE_POSTSOORTEN = Object.freeze({ personeel: 'werving' });
+const postBeperking = (m, systeem) => (m && (m.beperkt ||
+  (m.van === systeem && Object.prototype.hasOwnProperty.call(BEPERKTE_POSTSOORTEN, m.soort) ? BEPERKTE_POSTSOORTEN[m.soort] : null))) || null;
+
+module.exports = { KLOKSOORTEN, OUDE_KLOKTEKST, MELDINGBEPERKING, BEPERKTE_TITELS, meldingBeperking, BEPERKTE_POSTSOORTEN, postBeperking };

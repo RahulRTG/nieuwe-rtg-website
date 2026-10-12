@@ -97,7 +97,8 @@ app.post('/api/staff/pauze', supplierAuth, (req, res) => {
   if (open) { open.uit = new Date().toISOString(); actie = 'uit'; }
   else { dienst.pauzes.push({ in: new Date().toISOString(), uit: null }); actie = 'in'; }
   save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
+  // een pauze verandert niemands aanwezigheid: het signaal alleen voor de managers en de medewerker zelf
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' }, { staffId: req.actor.staffId });
   const stand = werkbeleidPauzeStand(req.supplier.code, req.actor.staffId);
   res.json({ ok: true, actie, pauze: stand, budgetMinuten: WERKBELEID_PAUZE_MINUTEN });
 });

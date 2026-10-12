@@ -6,6 +6,8 @@
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
 const { nu: klokNu } = require('../lib/klok');
+const { magKlokZien } = require('../kern/leverancier/logboekzicht');
+const { leidingBus } = require('../kern/rtmail-adres');
 
 module.exports = (kern) => {
   const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, db } = kern;
@@ -17,9 +19,17 @@ module.exports = (kern) => {
   // het lid-adres: de codenaam van het account (privacy by design)
   const lidCodenaam = wie.lidCodenaam;
 
+  /* BEPERKTE POST (werving) staat in de leidingsbus naast het zaakpostvak
+     (kern/rtmail-adres.js) en alleen een MANAGER leest die hier mee; oude
+     beperkte post in het zaakpostvak zelf filtert rtmail.postvak weg zonder
+     { beperkt: true }. Een medewerker ziet hem dus nergens, ook niet als aantal. */
+  const leiding = (req) => magKlokZien(req.actor) ? leidingBus(adresVan(req)) : null;
+  const zicht = (req) => ({ beperkt: magKlokZien(req.actor) });
   app.post('/api/supplier/rtmail/inbox', supplierAuth, (req, res) => {
-    const adres = adresVan(req);
-    res.json({ adres, ongelezen: rtmail.ongelezen(adres), berichten: rtmail.postvak(adres) });
+    const adres = adresVan(req), l = leiding(req);
+    const berichten = rtmail.postvak(adres, zicht(req)).concat(l ? rtmail.postvak(l, zicht(req)) : [])
+      .sort((x, y) => String(y.at).localeCompare(String(x.at))).slice(0, 60);
+    res.json({ adres, ongelezen: rtmail.ongelezen(adres, zicht(req)) + (l ? rtmail.ongelezen(l, zicht(req)) : 0), berichten });
   });
 
   app.post('/api/supplier/rtmail/verzonden', supplierAuth, (req, res) => {
@@ -27,11 +37,14 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/rtmail/ongelezen', supplierAuth, (req, res) => {
-    res.json({ ongelezen: rtmail.ongelezen(adresVan(req)) });
+    const l = leiding(req);
+    res.json({ ongelezen: rtmail.ongelezen(adresVan(req), zicht(req)) + (l ? rtmail.ongelezen(l, zicht(req)) : 0) });
   });
 
   app.post('/api/supplier/rtmail/lees', supplierAuth, (req, res) => {
-    const r = rtmail.lees(adresVan(req), String((req.body && req.body.id) || ''));
+    const id = String((req.body && req.body.id) || ''), l = leiding(req);
+    let r = rtmail.lees(adresVan(req), id, zicht(req));
+    if (r.error && l) r = rtmail.lees(l, id, zicht(req));
     if (r.error) return res.status(404).json({ error: r.error });
     res.json({ ok: true, bericht: r });
   });
@@ -92,7 +105,7 @@ module.exports = (kern) => {
     const basis = vatSamen(berichten);
     res.json({ ok: true, samenvatting: basis, ai: false, bron: 'lokale-regels' });
   }
-  app.post('/api/supplier/rtmail/assist', supplierAuth, (req, res) => assist(rtmail.postvak(adresVan(req)), req.body, res));
+  app.post('/api/supplier/rtmail/assist', supplierAuth, (req, res) => assist(rtmail.postvak(adresVan(req), zicht(req)), req.body, res));
   app.post('/api/member/rtmail/assist', auth, (req, res) => {
     const codenaam = lidCodenaam(req);
     if (!codenaam) return res.json({ ok: true, samenvatting: 'Je postvak is nog leeg.' });

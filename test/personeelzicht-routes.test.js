@@ -227,3 +227,66 @@ test('scherm: een collega die vandaag "afwezig" is zonder datum, staat er vandaa
   assert.ok(verlofOp(stand, { id: 9, name: 'Zora' }, { date: vandaag() }), 'vandaag afwezig');
   assert.ok(!verlofOp(stand, { id: 9, name: 'Zora' }, { date: '2099-01-01' }), 'niet op een andere dag');
 });
+
+/* ---------------- vierde tegenlezing ---------------- */
+
+test('N2. de sollicitatie in de zaakpostbus (RTMail): alleen in de inbox van een manager', async () => {
+  // de sollicitatie van test H1 heeft automatisering.sollicitatieBinnen al laten bezorgen
+  const tekst = (b) => JSON.stringify(b);
+  const ma = await h('/api/supplier/rtmail/inbox', {}, tokM);
+  assert.ok(ma.body.berichten.some(m => m.onderwerp === 'Nieuwe sollicitatie'), 'de manager ziet de post');
+  for (const [pad, body] of [['/api/supplier/rtmail/inbox', {}], ['/api/supplier/rtmail/vak', {}], ['/api/supplier/rtmail/zoek', { vraag: 'sollicitatie' }],
+    ['/api/supplier/rtmail/gesprekken', {}], ['/api/supplier/rtmail/ongelezen', {}]]) {
+    const r = await h(pad, body, abel.tok);
+    assert.ok(!/Nieuwe sollicitatie/.test(tekst(r.body)), pad + ' toont een collega de sollicitatiepost');
+  }
+  const mo = (await h('/api/supplier/rtmail/ongelezen', {}, tokM)).body.ongelezen;
+  const ao = (await h('/api/supplier/rtmail/ongelezen', {}, abel.tok)).body.ongelezen;
+  assert.ok(mo > ao, 'ook het aantal ongelezen telt de sollicitatie alleen voor de manager: ' + mo + ' / ' + ao);
+  const id = ma.body.berichten.find(m => m.onderwerp === 'Nieuwe sollicitatie').id;
+  assert.equal((await h('/api/supplier/rtmail/lees', { id }, abel.tok)).status, 404, 'en openen kan hij hem niet');
+  assert.equal((await h('/api/supplier/rtmail/lees', { id }, tokM)).status, 200);
+});
+
+test('N1. de online-stip in comm: niet door een gesprek te openen of eenzijdig te schrijven', async () => {
+  const met = async (tok, id) => (await h('/api/supplier/comm/collega', { staffId: id }, tok)).body.gesprek;
+  await h('/api/supplier/comm/inbox', {}, zora.tok);                // Zora geeft een teken van leven
+  const g = await met(abel.tok, zora.id);
+  assert.equal(g.online, false, 'een gesprek openen dwingt de stip niet af');
+  const inboxOnline = async () => ((await h('/api/supplier/comm/inbox', {}, abel.tok)).body.gesprekken.find(x => x.id === g.id) || {}).online;
+  assert.equal(await inboxOnline(), false, 'ook niet in de inbox');
+  assert.equal((await h('/api/supplier/comm/stuur', { id: g.id, tekst: 'hoi' }, abel.tok)).status, 200);
+  await h('/api/supplier/comm/inbox', {}, zora.tok);
+  assert.equal(await inboxOnline(), false, 'een bericht van een kant ook niet');
+  assert.equal((await h('/api/supplier/comm/stuur', { id: g.id, tekst: 'hoi terug' }, zora.tok)).status, 200);
+  await h('/api/supplier/comm/inbox', {}, zora.tok);
+  assert.equal(await inboxOnline(), true, 'als beiden schreven wel');
+});
+
+test('M3. een videobelsignaal gaat alleen naar wie gebeld wordt, de teamkamer alleen naar wie erin zit', async () => {
+  assert.equal((await h('/api/staff/clock', {}, mira.tok)).status, 200, 'Mira is ingeklokt en dus bereikbaar');
+  const bel = async () => {
+    assert.equal((await h('/api/staff/call', { kind: 'ring', staffId: mira.id }, zora.tok)).status, 200);
+    assert.equal((await h('/api/staff/call', { kind: 'offer', staffId: mira.id, payload: { sdp: 'c=IN IP4 192.0.2.77' } }, zora.tok)).status, 200);
+  };
+  const sa = await luister(abel.tok, bel);
+  assert.doesNotMatch(sa, /event: rtc/, 'een derde collega krijgt niets');
+  assert.doesNotMatch(sa, /192\.0\.2\.77/);
+  assert.match(await luister(mira.tok, bel), /192\.0\.2\.77/, 'wie gebeld wordt wel');
+  assert.doesNotMatch(await luister(tokM, bel), /event: rtc/, 'ook een manager hoort een gesprek tussen twee anderen niet');
+  // de teamkamer
+  const kamer = async () => {
+    await h('/api/staff/call', { kind: 'join', kamer: 'team' }, zora.tok);
+    await h('/api/staff/call', { kind: 'join', kamer: 'team' }, mira.tok);
+  };
+  assert.doesNotMatch(await luister(abel.tok, kamer), /event: rtc/, 'wie niet in de kamer zit, krijgt niets');
+  await h('/api/staff/call', { kind: 'leave', kamer: 'team' }, mira.tok);
+  assert.match(await luister(zora.tok, () => h('/api/staff/call', { kind: 'join', kamer: 'team' }, mira.tok)), /"kind":"join"/, 'wie erin zit wel');
+});
+
+test('N3. een pauze stuurt het klok-signaal naar de manager en de medewerker zelf', async () => {
+  const doe = () => h('/api/staff/pauze', {}, mira.tok);
+  assert.doesNotMatch(await luister(abel.tok, doe), /"scope":"klok"/, 'een collega niet');
+  assert.match(await luister(tokM, doe), /"scope":"klok"/, 'de manager wel');
+  assert.match(await luister(mira.tok, doe), /"scope":"klok"/, 'Mira zelf ook');
+});

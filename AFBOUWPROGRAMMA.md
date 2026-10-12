@@ -133,7 +133,7 @@ geblokkeerd item zegt welke voorwaarde aantoonbaar vervuld moet zijn. Valt een
 item op dezelfde regel als een gelezen markering, dan wint het besluitbestand.
 
 **De stand bij lezing** (levende getallen uit `APPWERKT.json`, bijgehouden door
-`npm run getallen`): over <!--getal:toezeg.documenten-->166<!--/getal-->
+`npm run getallen`): over <!--getal:toezeg.documenten-->167<!--/getal-->
 documenten zijn er <!--getal:toezeg.toegezegd-->879<!--/getal--> onderdelen
 `toegezegd`, <!--getal:toezeg.afgewezen-->20<!--/getal-->
 `afgewezen-met-grens`, <!--getal:toezeg.besluit-->84<!--/getal-->

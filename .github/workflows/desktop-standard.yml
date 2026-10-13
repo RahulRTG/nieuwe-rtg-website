@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arm: [A, B, C]
+        arm: [a, b]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -76,9 +76,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps webkit
-      - name: Mechanismeproef arm ${{ matrix.arm }} (alleen op deze proeftak)
-        run: node proef-webkit.js
+      - name: Reisschermen ${{ matrix.arm }} tienmaal in WebKit (alleen op deze proeftak)
+        run: |
+          set +e
+          z=0
+          for i in $(seq 1 10); do
+            node --test --test-reporter=spec test/reis-${{ matrix.arm }}.e2e.js > uit.txt 2>&1; e=$?
+            echo "ronde $i exit $e"
+            [ $e -ne 0 ] && { z=$((z+1)); grep -E "✖|afgebroken|Error|internal" uit.txt | head -6; }
+          done
+          echo "=== UITSLAG ${{ matrix.arm }}: $z/10 gezakt"
+          exit 0
         env:
-          ARMEN: ${{ matrix.arm }}
-          RONDES: '25'
           RTG_TEST_MOTOR: webkit
+          RTG_EIS_INFRA: '1'

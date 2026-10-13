@@ -1,0 +1,252 @@
+/* ============================================================================
+   REIZEN, UITGAAN EN DE DIENST: ZESTIEN SCHERMEN, VIER SOORTEN.
+
+   Allemaal uit de lijst van TAKEN 4.9. Ze lijken op elkaar -- kaartjes, tijden,
+   plaatsen -- maar ze staan in vier verschillende verhoudingen tot de bezoeker,
+   en dat verschil is wat hier wordt vastgelegd.
+
+   1. VOOR DE REIZIGER (ov, vluchten, reisbureau, hotels, uitgaan, sport,
+      muziek, theater, zaal, residentie, navigatie). Open met een ledenpas, en
+      ze dragen allemaal een BELOFTE in hun kop: het reisbureau werkt "tegen de
+      nettoprijs zonder opslag", het theater "hercomprimeert niets". Zulke zinnen
+      zijn met een tekstopschoning weg, en dan belooft het scherm iets anders
+      dan het product doet.
+
+   2. ACHTER DE DIENST (ovroutes, ovdienst, luchthaven, sportclub). Dat zijn de
+      werkschermen van personeel. Een reiziger hoort daar een eerlijke
+      personeelsinlog te zien -- geen dienstrooster, geen namen van collega's.
+
+   3. HET PODIUM is de bijzondere: 18+, op codenaam, en het vraagt eerst een
+      RTG-geverifieerd paspoort. Leeftijdsverificatie is precies het soort poort
+      dat "later wel even" wordt aangezet en dan nooit meer. Hij ligt hier vast.
+
+   4. EN OVERAL DE MERKREGEL. Hotels en reisbureau zijn de plek waar een echt
+      merk het makkelijkst binnensluipt ("verblijf in het Hilton"), en CLAUDE.md
+      is er stellig over: nooit een echt hotel- of luchtvaartmerk als bevestigde
+      partner. Op een boekingsscherm leest een lid dat als een toezegging.
+
+   Draait alleen waar een browser is.
+   ========================================================================== */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { startServer, letOpFouten, afgebrokenIn, laadPlaywright, startBrowser, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
+
+const pw = laadPlaywright();
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-'));
+
+/* Per reizigersscherm de belofte die erop hoort te staan. Steeds iets dat het
+   scherm over ZICHZELF zegt en dat een lid erop afrekent. */
+const VOOR_DE_REIZIGER = [
+  { app: 'ov', eist: /inchecken|live gps|oplichtende code/i },
+  { app: 'vluchten', eist: /het bord|mijn reizen|security/i },
+  { app: 'reisbureau', eist: /samengestelde reizen/i },
+  { app: 'hotels', eist: /hotels|appartementen|villa/i },
+  { app: 'uitgaan', eist: /gastenlijst/i },
+  { app: 'sport', eist: /uitslagen|stand|tickets/i },
+  { app: 'muziek', eist: /ongecomprimeerd|samen luisteren/i },
+  { app: 'theater', eist: /origineel beeld|hercomprimeren niets/i },
+  { app: 'zaal', eist: /wat leden gemaakt hebben|klankwerk/i },
+  { app: 'residentie', eist: /lobby|suite|aanwezig/i },
+  { app: 'navigatie', eist: /route|kaart|halte/i }
+];
+
+const ACHTER_DE_DIENST = [
+  { app: 'ovroutes', eist: /personeels-?app|log eerst in/i },
+  { app: 'ovdienst', eist: /personeels-?app|log eerst in|geen dienst/i },
+  { app: 'luchthaven', eist: /operations|de operatie/i },
+  { app: 'sportclub', eist: /clubkantoor|clubkantine|kantine/i }
+];
+
+/* Echte merken die dit huis nooit als bevestigde partner opvoert (CLAUDE.md). */
+const MERKEN = /\b(Hilton|Marriott|Four Seasons|Ritz[- ]Carlton|Aman|Rosewood|Mandarin Oriental|Emirates|KLM|Lufthansa|Air France|British Airways|Qatar Airways|Singapore Airlines|Booking\.com|Airbnb|Expedia)\b/i;
+
+async function nieuwLid(base) {
+  const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+  const reg = await fetch(base + '/api/auth/register', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Reiziger', email: 'rz' + u + '@x.nl', phone: '06' + u.slice(0, 8),
+      password: 'geheim12345', geboortedatum: '1988-08-08', tier: 'rtg' }) }).then(r => r.json());
+  assert.ok(reg.token, 'het lid is aangemeld: ' + JSON.stringify(reg).slice(0, 160));
+  return reg.token;
+}
+
+/* EEN VERSE PAGINA PER SCHERM, EN DE VORIGE DICHT.
+
+   Hier stond: dezelfde pagina twee keer naar elk scherm (eerst om de opslag te
+   zetten, dan om met die opslag te laden) en daarna door naar het volgende.
+   Elke goto verliet dan een document dat nog verzoeken had lopen. Chromium
+   zwijgt daarover; WebKit breekt ze af en meldt elk als fout. De
+   mechanismeproef (run 38382403936, 275 schermwissels per arm) gaf voor dat
+   patroon 776 afgebroken verzoeken, en voor een verse pagina per scherm nul.
+   Een pagina die dichtgaat draait geen script meer, dus meldt ook niets.
+
+   De opslag wordt eenmaal per tabblad gezet, net als vroeger: een merk in
+   sessionStorage (per tabblad) zorgt dat een omleiding binnen het scherm het
+   token niet opnieuw neerzet als de app het zelf weghaalde. */
+async function opstelling(token) {
+  const browser = await startBrowser(pw);
+  const ctx = await browser.newContext({ serviceWorkers: 'block' });
+  await ctx.addInitScript(t => {
+    if (sessionStorage.getItem('rtg_toets_opslag')) return;
+    sessionStorage.setItem('rtg_toets_opslag', '1');
+    localStorage.setItem('rtg_cookieinfo_v1', '1');
+    localStorage.setItem('rtg_lang', 'nl');
+    if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
+    localStorage.removeItem('rtg_sup_token');
+    localStorage.removeItem('rtg_office_token');
+  }, token || null);
+  return { browser, ctx, page: null, fouten: [] };
+}
+
+async function toon(o, base, app) {
+  if (o.page) await o.page.close();
+  o.page = await o.ctx.newPage();
+  await volgVerzoeken(o.page);
+  letOpFouten(o.page, o.fouten);
+  await o.page.goto(base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' });
+  await wachtOpRust(o.page);
+  return o.page.evaluate(() => ({
+    pad: location.pathname, tekst: document.body.innerText.replace(/\s+/g, ' ')
+  }));
+}
+
+test('elf reizigersschermen tonen hun eigen belofte, en geen enkel echt merk',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const token = await nieuwLid(base);
+    const o = await opstelling(token);
+    browser = o.browser;
+
+    const stuk = [];
+    for (const s of VOOR_DE_REIZIGER) {
+      const r = await toon(o, base, s.app);
+      if (r.pad !== '/apps/' + s.app + '.html') { stuk.push(s.app + ': stuurt weg naar ' + r.pad); continue; }
+      if (r.tekst.trim().length < 80) { stuk.push(s.app + ': bijna leeg (' + r.tekst.trim().length + ' tekens)'); continue; }
+      if (!s.eist.test(r.tekst)) stuk.push(s.app + ': de eigen belofte staat er niet -- ' + r.tekst.slice(0, 140));
+      const merk = r.tekst.match(MERKEN);
+      if (merk) stuk.push(s.app + ': voert "' + merk[0] + '" op, en dit huis noemt geen echte merken als partner');
+    }
+    assert.deepEqual(stuk, [], 'de elf reizigersschermen staan er:\n  ' + stuk.join('\n  '));
+    assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
+    /* GEEN SCHERM IS VERLATEN TERWIJL HET NOG LAADDE. WebKit breekt de verzoeken
+       van een document dat je verlaat af en meldt dat als fout; de algemene zeef
+       slikt de ene vorm ('access control checks') in en telt hem, de andere
+       ('Load failed') niet. Een telling boven nul betekent dat de toets schermen
+       halverwege afbrak -- en dan zakte hij soms wel en soms niet. */
+    assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een scherm werd verlaten terwijl het nog laadde');
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});
+
+test('de vier dienstschermen zijn van het personeel, niet van de reiziger',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const token = await nieuwLid(base);
+    const o = await opstelling(token);
+    browser = o.browser;
+
+    const stuk = [];
+    for (const s of ACHTER_DE_DIENST) {
+      const r = await toon(o, base, s.app);
+      if (r.pad !== '/apps/' + s.app + '.html') { stuk.push(s.app + ': stuurt weg naar ' + r.pad); continue; }
+      if (!s.eist.test(r.tekst)) stuk.push(s.app + ': zegt niet waar dit scherm voor is -- ' + r.tekst.slice(0, 140));
+      if (r.tekst.trim().length < 60) stuk.push(s.app + ': bijna leeg');
+    }
+    assert.deepEqual(stuk, [], 'de vier dienstschermen melden zich als werkscherm:\n  ' + stuk.join('\n  '));
+    assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
+    assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een scherm werd verlaten terwijl het nog laadde');
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});
+
+test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste niet',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const token = await nieuwLid(base);
+    const o = await opstelling(token);
+    browser = o.browser;
+
+    const r = await toon(o, base, 'podium');
+    assert.equal(r.pad, '/apps/podium.html', 'het Podium blijft op zijn eigen adres');
+
+    /* DEZE TOETS IS BIJGEWERKT, EN DE VOLGORDE WAARIN DAT GEBEURDE DOET ERTOE.
+
+       Hij was geschreven toen het Podium EEN zaal achter EEN deur was: hij
+       opende /apps/podium.html en eiste meteen de paspoortpoort. Sinds de zones
+       (kern/podium/zones.js) is dat niet meer waar -- wie geen wereld kiest
+       krijgt de OPEN wereld, en die vraagt terecht geen paspoort. De toets
+       zakte daardoor op iets wat geen defect is.
+
+       De verleiding is dan om de toets aan te passen aan wat het scherm nu doet.
+       Dat is precies hoe je een grens kwijtraakt. Daarom is EERST nagetrokken of
+       de 18+-deur zelf nog dichtzit -- dat doet test/podiumzones.test.js, en een
+       mutatie die `geverifieerd` en `minLeeftijd` uit die zone haalt laat daar
+       vier toetsen zakken. De grens is dus bewezen; alleen dit scherm keek op de
+       verkeerde plek.
+
+       Wat hier nu staat is dezelfde eis als altijd, op de app zoals hij is: de
+       18+-wereld staat in de balk, hij is als DICHT gemarkeerd, en wie hem opent
+       krijgt de poort en geen inhoud. Een leeftijdsgrens die je met een klik
+       overslaat is nog steeds geen grens. */
+    const zones = await o.page.evaluate(() => [...document.querySelectorAll('#zoneBalk button')]
+      .map(b => ({ naam: b.textContent, dicht: b.classList.contains('dicht') })));
+    assert.ok(zones.length > 1, 'de werelden staan in de balk: ' + JSON.stringify(zones));
+    const acht = zones.find(z => /18\+/.test(z.naam));
+    assert.ok(acht, 'de 18+-wereld staat in de balk: ' + JSON.stringify(zones));
+    assert.equal(acht.dicht, true, 'en hij is voor een onverifieerd lid als dicht gemarkeerd');
+
+    // hem openen geeft de POORT met de reden, en niet de zaal
+    await o.page.evaluate(() => {
+      const b = [...document.querySelectorAll('#zoneBalk button')].find(x => /18\+/.test(x.textContent));
+      b.click();
+    });
+    /* WACHTEN OP WAT DE BEWERING HIERONDER MEET, en niet op iets ernaast. Hier
+       stond alleen "poortReden heeft tekst", en dat is eerder waar dan dat het
+       POORTSCHERM ook echt vooraan staat: de app vult de reden en wisselt daarna
+       pas van paneel. In een volle ronde viel de meting daar precies tussen --
+       `vZaal` was nog zichtbaar en `vPoort` nog niet -- en dan leest de uitslag
+       als "de 18+-deur staat open" terwijl er niets mis is met de deur. Zelfde
+       fout als wachten op de klok, alleen met een ander teken ernaast. */
+    await o.page.waitForFunction(() => {
+      const p = document.getElementById('poortReden');
+      const poort = document.getElementById('vPoort');
+      return p && p.textContent.trim().length > 0 && poort && poort.offsetParent !== null;
+    }, null, { timeout: 10000 });
+
+    const reden = await o.page.evaluate(() => document.getElementById('poortReden').textContent);
+    assert.match(reden, /geverifieerd|verifieer|paspoort/i,
+      'de poort noemt het geverifieerde paspoort: ' + reden);
+
+    /* En het achterste blijft achter de poort: geen kanalenlijst, geen chat,
+       geen aanmeldformulier van die wereld. */
+    const achter = await o.page.evaluate(() => {
+      const zicht = [...document.querySelectorAll('[id^="v"]')]
+        .filter(n => n.offsetParent !== null).map(n => n.id);
+      return { zicht, tekst: document.body.innerText.replace(/\s+/g, ' ') };
+    });
+    assert.ok(achter.zicht.includes('vPoort'),
+      'het poortscherm staat aan; zichtbaar zijn: ' + achter.zicht.join(', '));
+    assert.ok(!/NU LIVE|ALLE KANALEN/i.test(achter.tekst),
+      'er staat geen zaalinhoud achter de poort: ' + achter.tekst.slice(0, 200));
+
+    assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
+    assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een scherm werd verlaten terwijl het nog laadde');
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

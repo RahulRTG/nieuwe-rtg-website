@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:56:44.079Z",
-    "commit": "327ba7b02",
+    "op": "2026-10-13T13:18:24.510Z",
+    "commit": "c7822c4c3",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16550,6 +16550,10 @@
       "operator": "&&->||#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "storeschema-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "storingen-bezorging.test.js": {
       "soort": "puur",

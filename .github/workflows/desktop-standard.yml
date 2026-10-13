@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arm: [m, e]
+        arm: [f]
         bestand: [kd]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -84,7 +84,7 @@ jobs:
           for i in $(seq 1 15); do
             node --test --test-reporter=spec test/${{ matrix.bestand }}-${{ matrix.arm }}.e2e.js > uit.txt 2>&1; e=$?
             echo "ronde $i exit $e"
-            [ $e -ne 0 ] && { z=$((z+1)); grep -E -A4 "^\s+(AssertionError|Error|page\.|TimeoutError)|internal error|navigating to|niet gemeten|niet open|vraagt" uit.txt | head -14; }
+            [ $e -ne 0 ] && { z=$((z+1)); grep -E -A6 "^\s+(AssertionError|Error|page\.|TimeoutError)|internal error|niet gemeten|niet open|vraagt" uit.txt | head -20; echo "--- DIAG (laatste 120)"; grep DIAG uit.txt | tail -120; }
           done
           echo "=== UITSLAG ${{ matrix.bestand }} ${{ matrix.arm }}: $z/15 gezakt"
           exit 0

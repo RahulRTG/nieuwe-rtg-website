@@ -73,31 +73,44 @@ async function nieuwLid(base) {
   return reg.token;
 }
 
-async function toon(page, base, app, token) {
-  const pad = '/apps/' + app + '.html';
-  await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.evaluate(t => {
+/* EEN VERSE PAGINA PER SCHERM, EN DE VORIGE DICHT.
+
+   Hier stond: dezelfde pagina twee keer naar elk scherm (eerst om de opslag te
+   zetten, dan om met die opslag te laden) en daarna door naar het volgende.
+   Elke goto verliet dan een document dat nog verzoeken had lopen. Chromium
+   zwijgt daarover; WebKit breekt ze af en meldt elk als fout. De
+   mechanismeproef (run 38382403936, 275 schermwissels per arm) gaf voor dat
+   patroon 776 afgebroken verzoeken, en voor een verse pagina per scherm nul.
+   Een pagina die dichtgaat draait geen script meer, dus meldt ook niets.
+
+   De opslag wordt eenmaal per tabblad gezet, net als vroeger: een merk in
+   sessionStorage (per tabblad) zorgt dat een omleiding binnen het scherm het
+   token niet opnieuw neerzet als de app het zelf weghaalde. */
+async function opstelling(token) {
+  const browser = await startBrowser(pw);
+  const ctx = await browser.newContext({ serviceWorkers: 'block' });
+  await ctx.addInitScript(t => {
+    if (sessionStorage.getItem('rtg_toets_opslag')) return;
+    sessionStorage.setItem('rtg_toets_opslag', '1');
     localStorage.setItem('rtg_cookieinfo_v1', '1');
     localStorage.setItem('rtg_lang', 'nl');
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
     localStorage.removeItem('rtg_sup_token');
     localStorage.removeItem('rtg_office_token');
   }, token || null);
-  await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await wachtOpRust(page);
-  return page.evaluate(() => ({
-    pad: location.pathname, tekst: document.body.innerText.replace(/\s+/g, ' ')
-  }));
+  return { browser, ctx, page: null, fouten: [] };
 }
 
-async function opstelling(base) {
-  const browser = await startBrowser(pw);
-  const ctx = await browser.newContext({ serviceWorkers: 'block' });
-  const page = await ctx.newPage();
-  await volgVerzoeken(page);
-  const fouten = [];
-  letOpFouten(page, fouten);
-  return { browser, page, fouten };
+async function toon(o, base, app) {
+  if (o.page) await o.page.close();
+  o.page = await o.ctx.newPage();
+  await volgVerzoeken(o.page);
+  letOpFouten(o.page, o.fouten);
+  await o.page.goto(base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' });
+  await wachtOpRust(o.page);
+  return o.page.evaluate(() => ({
+    pad: location.pathname, tekst: document.body.innerText.replace(/\s+/g, ' ')
+  }));
 }
 
 test('elf reizigersschermen tonen hun eigen belofte, en geen enkel echt merk',
@@ -106,12 +119,12 @@ test('elf reizigersschermen tonen hun eigen belofte, en geen enkel echt merk',
   let browser;
   try {
     const token = await nieuwLid(base);
-    const o = await opstelling(base);
+    const o = await opstelling(token);
     browser = o.browser;
 
     const stuk = [];
     for (const s of VOOR_DE_REIZIGER) {
-      const r = await toon(o.page, base, s.app, token);
+      const r = await toon(o, base, s.app);
       if (r.pad !== '/apps/' + s.app + '.html') { stuk.push(s.app + ': stuurt weg naar ' + r.pad); continue; }
       if (r.tekst.trim().length < 80) { stuk.push(s.app + ': bijna leeg (' + r.tekst.trim().length + ' tekens)'); continue; }
       if (!s.eist.test(r.tekst)) stuk.push(s.app + ': de eigen belofte staat er niet -- ' + r.tekst.slice(0, 140));
@@ -138,12 +151,12 @@ test('de vier dienstschermen zijn van het personeel, niet van de reiziger',
   let browser;
   try {
     const token = await nieuwLid(base);
-    const o = await opstelling(base);
+    const o = await opstelling(token);
     browser = o.browser;
 
     const stuk = [];
     for (const s of ACHTER_DE_DIENST) {
-      const r = await toon(o.page, base, s.app, token);
+      const r = await toon(o, base, s.app);
       if (r.pad !== '/apps/' + s.app + '.html') { stuk.push(s.app + ': stuurt weg naar ' + r.pad); continue; }
       if (!s.eist.test(r.tekst)) stuk.push(s.app + ': zegt niet waar dit scherm voor is -- ' + r.tekst.slice(0, 140));
       if (r.tekst.trim().length < 60) stuk.push(s.app + ': bijna leeg');
@@ -163,10 +176,10 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
   let browser;
   try {
     const token = await nieuwLid(base);
-    const o = await opstelling(base);
+    const o = await opstelling(token);
     browser = o.browser;
 
-    const r = await toon(o.page, base, 'podium', token);
+    const r = await toon(o, base, 'podium');
     assert.equal(r.pad, '/apps/podium.html', 'het Podium blijft op zijn eigen adres');
 
     /* DEZE TOETS IS BIJGEWERKT, EN DE VOLGORDE WAARIN DAT GEBEURDE DOET ERTOE.

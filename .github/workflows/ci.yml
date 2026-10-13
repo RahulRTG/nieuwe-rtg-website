@@ -396,6 +396,15 @@ jobs:
     # veranderen. Lokaal volledig gemeten op 16 september: 9m23s in plaats van
     # 43–45 minuten. Dertig minuten houdt ruime runner-marge zonder een echte
     # hang weer anderhalf uur te laten kosten.
+    #
+    # EN HIJ KROOP TERUG. Op 13 oktober liep meterijk weer 23 tot 29,5 minuten
+    # (main 38379140671, #626, #627 afgekapt): elf proeven die na september
+    # waren bijgekomen riepen een kale norm.meet() aan en startten elk de hele
+    # keuring opnieuw, ook als ze alleen een register of een lezer vervingen.
+    # Lokaal gemeten: 2470 s, waarvan 15 proeven van ~94 s. Met het snapshot
+    # (meetMet in test/meterijk.test.js) 1329 s, alle 182 ijkingen nog raak, en
+    # weer precies zes proeven die de keuring opnieuw draaien. De grens blijft
+    # dertig minuten.
     timeout-minutes: ${{ matrix.ijking == 'meterijk' && 30 || 45 }}
     strategy:
       fail-fast: false

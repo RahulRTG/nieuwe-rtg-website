@@ -262,6 +262,8 @@ function graadVan(m) {
      stempel net zomin. Beide zijn `vermoed`: er is iets vastgesteld, maar niet
      op een manier die later nog iets bewijst. */
   if (!m.register || m.stempel !== true) return 'vermoed';
+  /* Lokaal maar niet volledig is niet "hier na te spelen": hooguit gemeten. */
+  if ((m.lokaalNiet || []).length) return 'gemeten';
   return (m.lokaal && (m.keten || []).length) ? 'bewezen' : 'gemeten';
 }
 
@@ -285,7 +287,7 @@ function graadSport(mechanismen) {
    kosten en risico en geen eigenschap van een bestand -- dat hoort in
    KEURING.md en niet in een register. */
 function standVan(mechanismen) {
-  const beide = mechanismen.filter(m => m.lokaal && m.keten.length);
+  const beide = mechanismen.filter(m => m.lokaal && m.keten.length && !(m.lokaalNiet || []).length);
   const metBewijs = beide.filter(m => m.register && m.stempel === true);
   if (!mechanismen.length) return { stand: 'jaren', waarom: 'geen enkel mechanisme draait hiervoor' };
   if (metBewijs.length) return { stand: 'staat',
@@ -293,6 +295,20 @@ function standVan(mechanismen) {
   if (!beide.length) return { stand: 'stap',
     waarom: 'draait maar aan een kant: ' + (mechanismen.some(m => m.lokaal) ? 'alleen lokaal' : 'alleen in de keten') };
   return { stand: 'stap', waarom: 'draait aan beide kanten, maar laat geen gestempeld register achter' };
+}
+
+/* LOKAAL, MAAR NIET VOLLEDIG. Een mechanisme dat lokaal een route heeft die
+   minder doet dan de keten, telt als lokaal bereikbaar -- en dan hoort erbij
+   te staan WAT lokaal ontbreekt, anders leest "beide" als "gelijkwaardig".
+   De lijst komt van het mechanisme zelf (afgeleid uit de werkstroom, niet hier
+   overgetypt). Zo'n mechanisme haalt nooit de graad `bewezen`: dat vraagt dat
+   de uitslag hier na te spelen is, en dat is hij maar voor een deel. */
+const DEELS_LOKAAL = {
+  'scripts/kwalificatie.js': () => require('./kwalificatie').lokaalGrens(WORTEL)
+};
+function lokaalNietVan(doel, lokaal) {
+  if (!lokaal || !DEELS_LOKAAL[doel]) return [];
+  return DEELS_LOKAAL[doel]();
 }
 
 function meet() {
@@ -322,8 +338,11 @@ function meet() {
       if (!sport.patronen.some(p => p.test(r.doel))) continue;
       gebruikt.add(r.doel);
       const bewijs = bewijsVan(r.doel);
-      mechanismen.push({ doel: r.doel, lokaal: !!r.lokaal, keten: [...r.keten].sort(),
-        aanleiding: [...r.aanleiding].sort(), register: bewijs.register, stempel: bewijs.stempel, grond: bewijs.grond });
+      const m = { doel: r.doel, lokaal: !!r.lokaal, keten: [...r.keten].sort(),
+        aanleiding: [...r.aanleiding].sort(), register: bewijs.register, stempel: bewijs.stempel, grond: bewijs.grond };
+      const niet = lokaalNietVan(r.doel, !!r.lokaal);
+      if (niet.length) m.lokaalNiet = niet;
+      mechanismen.push(m);
     }
     const { stand, waarom } = standVan(mechanismen);
     /* De graad staat NAAST de stand en vervangt hem niet: de stand zegt of dit
@@ -353,7 +372,8 @@ function meet() {
       'zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet ' +
       'of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en ' +
       'oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen ' +
-      'lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel ' +
+      'lokaal per definitie niet draaien. `deelsLokaal` telt de mechanismen die lokaal draaien maar ' +
+      'minder doen dan de keten; wat er lokaal ontbreekt staat per mechanisme in `lokaalNiet`. En er staat met opzet geen samengesteld eindoordeel ' +
       'onder deze tabel (KEURING.md par. 5).',
     telling: {
       mechanismen: gebruikt.size,
@@ -369,7 +389,11 @@ function meet() {
       // Eén doel kan meer sporten dienen. Bewaar ook alle ruwe vermeldingen.
       alleenKeten: new Set(sporten.flatMap(s => s.mechanismen.filter(m => !m.lokaal).map(m => m.doel))).size,
       vermeldingenAlleenKeten: sporten.reduce((n, s) => n + s.mechanismen.filter(m => !m.lokaal).length, 0),
-      zonderTrede: zonderTrede.length
+      zonderTrede: zonderTrede.length,
+      /* Telt als lokaal, maar mist lokaal een deel van de keten (`lokaalNiet`
+         bij het mechanisme). Geen norm: een zichtbaar getal, zodat de daling
+         van alleenKeten niet leest als volledige gelijkwaardigheid. */
+      deelsLokaal: new Set(sporten.flatMap(s => s.mechanismen.filter(m => (m.lokaalNiet || []).length).map(m => m.doel))).size
     } };
 }
 
@@ -420,7 +444,8 @@ if (require.main === module) {
     console.log('         ' + K.dim + s.waarom + K.uit);
     for (const m of s.mechanismen)
       console.log('         ' + (m.lokaal ? '  ' : K.geel + '! ' + K.uit) + m.doel.replace(/^scripts\//, '').padEnd(30) +
-        K.dim + (m.lokaal && m.keten.length ? 'beide' : m.keten.length ? 'ALLEEN DE KETEN' : 'alleen lokaal') +
+        K.dim + (m.lokaal && m.keten.length ? ((m.lokaalNiet || []).length ? 'beide, lokaal DEELS (' + m.lokaalNiet.length + ' stap(pen) alleen in de keten)' : 'beide')
+          : m.keten.length ? 'ALLEEN DE KETEN' : 'alleen lokaal') +
         (m.register ? '  -> ' + m.register + (m.stempel === true ? ' (gestempeld)' : m.stempel === false ? ' (zonder stempel)' : ' (STAAT HIER NIET)') : '  -> geen register') + K.uit);
     console.log('');
   }
@@ -431,7 +456,8 @@ if (require.main === module) {
   }
   const t = uitslag.telling;
   console.log('  ' + t.staat + ' staat, ' + t.stap + ' een stap weg, ' + t.jaren + ' bestaat niet; ' +
-    t.alleenKeten + ' mechanisme(n) draaien alleen in de keten, ' + t.zonderTrede + ' zonder sport.');
+    t.alleenKeten + ' mechanisme(n) draaien alleen in de keten, ' + t.deelsLokaal + ' lokaal maar niet volledig, ' +
+    t.zonderTrede + ' zonder sport.');
   console.log('  ' + K.dim + 'Er staat met opzet geen samengesteld oordeel onder deze tabel (KEURING.md par. 5).' + K.uit + '\n');
 
   if (argv.includes('--vastleggen')) {

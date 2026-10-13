@@ -130,3 +130,29 @@ test('de Slotsuite: de kwalificatie is een harde laag die --lokaal draait', () =
   assert.equal(laag.hard, true);
   assert.deepEqual(laag.stappen.map(s => s[1][1]), [['scripts/kwalificatie.js', '--lokaal']]);
 });
+
+/* DE GRENS STAAT IN HET REGISTER, NIET ALLEEN IN DEZE TOETS. Dat kwalificatie
+   lokaal draait, mag niet lezen als "lokaal gelijkwaardig": de bewijsladder
+   zet bij het mechanisme wat lokaal ontbreekt, telt het apart, en geeft het
+   nooit de graad `bewezen`. */
+test('de lokale grens van de kwalificatie: precies de na-controle en de publicatie, met reden', () => {
+  const grens = kwal.lokaalGrens(WORTEL);
+  assert.deepEqual(grens.map(g => g.opdracht.split(' ').slice(2, 4).join(' ')), ['--controle --fase=na', '--gepubliceerd --image="$RTG_CANDIDATE_IMAGE"']);
+  assert.ok(grens.every(g => g.waarom.length > 30), 'elke uitzondering draagt een reden');
+});
+
+test('de bewijsladder: kwalificatie telt als lokaal, staat als DEELS lokaal en haalt nooit `bewezen`', () => {
+  const ladder = require('../scripts/bewijsladder');
+  const uit = ladder.meet();
+  const m = uit.sporten.flatMap(s => s.mechanismen).find(x => x.doel === 'scripts/kwalificatie.js');
+  assert.equal(m.lokaal, true);
+  assert.equal(m.lokaalNiet.length, 2);
+  assert.equal(uit.telling.deelsLokaal, 1, 'zichtbaar geteld naast alleenKeten');
+  const t = uit.sporten.flatMap(s => s.mechanismen).find(x => x.doel === 'scripts/toetsroutes.js');
+  assert.equal(t.lokaal, true);
+  assert.equal(t.lokaalNiet, undefined, 'de routekaart doet lokaal wat de keten doet');
+  const vol = { lokaal: true, keten: ['x.yml'], register: 'X.json', stempel: true };
+  assert.equal(ladder.graadVan(vol), 'bewezen');
+  assert.equal(ladder.graadVan({ ...vol, lokaalNiet: [{ opdracht: 'x', waarom: 'y' }] }), 'gemeten');
+  assert.equal(ladder.standVan([{ ...vol, lokaalNiet: [{}] }]).stand, 'stap', 'deels lokaal draagt geen `staat`');
+});

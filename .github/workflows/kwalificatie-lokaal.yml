@@ -14,7 +14,6 @@ on:
       - scripts/lib/kwalificatie.js
       - scripts/release-bewijs.js
       - scripts/lib/werkstroom.js
-      - scripts/slotsuite.js
       - .github/workflows/release-image.yml
       - .github/workflows/kwalificatie-lokaal.yml
   workflow_dispatch:

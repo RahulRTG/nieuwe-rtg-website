@@ -220,6 +220,36 @@ function lokaalPlan(root, waarden) {
   throw new Error('Kwalificatie lokaal: release-image.yml heeft geen voor- en na-controle meer; het plan is niet af te leiden.');
 }
 
+/* WAT DE LOKALE ROUTE NIET DOET, afgeleid en niet opgeschreven: elke
+   kwalificatie-opdracht van release-image.yml die niet in lokaalPlan() staat.
+   scripts/bewijsladder.js zet deze lijst bij het mechanisme (`lokaalNiet`),
+   zodat "draait ook lokaal" nooit leest als "draait lokaal volledig". Komt er
+   in de keten een vijfde stand bij, dan staat hij hier vanzelf, met de reden
+   dat de lokale route hem niet kent. */
+const GRENS_REDEN = [
+  [/--controle --fase=na\b/, 'de na-controle hoort na de afbouw op de imagebytes (npm run afbouw:software); zonder die afbouw ertussen kan hij niet zakken'],
+  [/--gepubliceerd\b/, 'vraagt een registry: het image wordt gepusht en teruggehaald']
+];
+function lokaalGrens(root) {
+  const W = require('./lib/werkstroom');
+  const doc = W.ontleed(fs.readFileSync(path.join(root, '.github/workflows/release-image.yml'), 'utf8'));
+  const waarden = { GITHUB_SHA: 'x', RTG_CANDIDATE_IMAGE: 'x', RTG_CANDIDATE_BACKUP_IMAGE: 'x' };
+  const lokaalVorm = new Set(lokaalPlan(root, waarden).map(s => s.argv.slice(0, 3).join(' ')));
+  const uit = [];
+  for (const stap of ((doc.jobs || {}).image || {}).steps || []) {
+    if (!stap || typeof stap.run !== 'string') continue;
+    for (const { opdracht } of W.opdrachtenUit(stap.run)) {
+      if (!/^node scripts\/kwalificatie\.js\b/.test(opdracht)) continue;
+      const vorm = opdracht.split(/\s+/).slice(0, 3).join(' ');
+      if (lokaalVorm.has(vorm) && !/--fase=na\b/.test(opdracht)) continue;
+      const reden = GRENS_REDEN.find(([re]) => re.test(opdracht));
+      uit.push({ stap: stap.name || '', opdracht,
+        waarom: reden ? reden[1] : 'staat in de keten en niet in de lokale route (kwalificatie.js --lokaal)' });
+    }
+  }
+  return uit;
+}
+
 function git(args, opties = {}) {
   const r = cp.spawnSync('git', ['-C', opties.cwd || ROOT].concat(args), { encoding: 'utf8' });
   if (r.status !== 0) throw new Error('git ' + args[0] + ' stopte met ' + r.status + ': ' + String(r.stderr || '').trim().slice(0, 300));
@@ -282,7 +312,7 @@ function hoofd() {
   throw new Error('Gebruik --uit-image, --controle --fase=voor|na, --gepubliceerd of --lokaal.');
 }
 
-module.exports = { lokaalPlan, woorden, eisen };
+module.exports = { lokaalPlan, lokaalGrens, woorden, eisen };
 
 if (require.main === module) {
   try { hoofd(); } catch (e) { console.error('[kwalificatie] ' + e.message); process.exitCode = 1; }

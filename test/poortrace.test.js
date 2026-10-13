@@ -34,9 +34,11 @@ const path = require('path');
 // laat daar de hele testrun falen
 const FATAAL = /"bron":"(uncaughtException|unhandledRejection)"|"serverfout":true/;
 
-/* De poort zelf bezetten en vasthouden; los() geeft hem weer vrij. */
+/* De poort zelf bezetten en vasthouden; los() geeft hem weer vrij. De bezetter
+   hoeft niemand te bedienen -- hij moet de poort alleen bezet houden -- dus elke
+   verbinding die toch binnenkomt gaat meteen dicht (zie de toets hieronder). */
 async function bezetPoort() {
-  const bezetter = net.createServer();
+  const bezetter = net.createServer((sok) => sok.destroy());
   const poort = await new Promise((res, rej) => {
     bezetter.on('error', rej);
     bezetter.listen(0, '127.0.0.1', () => res(bezetter.address().port));

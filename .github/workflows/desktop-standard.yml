@@ -72,7 +72,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps webkit
-      - run: node --test --test-concurrency=1 test/kantoordeur.e2e.js test/rtg-edge-2.e2e.js test/rahulscherm.e2e.js test/paytegoed.e2e.js test/reisschermen.e2e.js test/experience-travel.e2e.js
+      - run: node scripts/browserinstall.js
+      - name: Belasting (alleen op deze proeftak, nooit naar main)
+        run: for i in $(seq 1 20); do echo "=== RONDE $i"; RTG_TEST_MOTOR=webkit node --test test/reisschermen.e2e.js > uit-r.txt 2>&1; echo "reisschermen exit $?"; grep -E "^ℹ (pass|fail)|internal error|Error:|evaluating|navigating to|paginafouten" uit-r.txt | head -12; RTG_TEST_WEBKIT=1 node --test test/mobile-content.e2e.js > uit-m.txt 2>&1; echo "mobile-content exit $?"; grep -E "^ℹ (pass|fail)|internal error|Error:|reload|navigating to" uit-m.txt | head -12; done
         env:
-          RTG_TEST_MOTOR: webkit
           RTG_EIS_INFRA: '1'

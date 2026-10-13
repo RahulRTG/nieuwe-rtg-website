@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:52:28.273Z",
-    "commit": "5f909ad93",
+    "op": "2026-10-13T01:56:44.079Z",
+    "commit": "327ba7b02",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16059,8 +16059,11 @@
     },
     "sprong-zonderbody.test.js": {
       "soort": "puur",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "staat": "gezakt",
+      "module": "public/shared/sprong.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "sprong.e2e.js": {
       "soort": "server",

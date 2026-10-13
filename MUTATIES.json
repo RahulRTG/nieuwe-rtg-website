@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:07:48.264Z",
-    "commit": "b7057e2f9",
-    "boomVuil": false,
+    "op": "2026-10-13T01:43:12.345Z",
+    "commit": "a1dc64a21",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v26.10.0"
@@ -16057,6 +16057,14 @@
       "gezakt": 1,
       "geprobeerd": 33
     },
+    "sprong-zonderbody.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/sprong.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "sprong.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -18758,9 +18766,12 @@
       "scherp": "overleefd"
     },
     "webkitstand.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/helper.js",
+      "operator": "!==->===#3",
+      "gezakt": 1,
+      "geprobeerd": 47
     },
     "webplatform.test.js": {
       "soort": "server",

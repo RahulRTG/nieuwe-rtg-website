@@ -138,7 +138,7 @@ jobs:
         run: node scripts/outputproof.js plan ../candidate "$CANDIDATE_SHA" ../output-input/routejournaal.log ../output-input
       - name: Bewaar invoer, inclusief een expliciete verzamelblokkade
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: output-input-${{ github.run_id }}-${{ github.run_attempt }}
           path: output-input/
@@ -188,7 +188,7 @@ jobs:
         run: node scripts/outputproof.js shard ../candidate "$CANDIDATE_SHA" ../output-input/PLAN.json "$SHARD_INDEX" ../output-shard
       - name: Bewaar echte TAP, gewijzigde antwoorden en storingen
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: output-shard-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
           path: output-shard/
@@ -232,7 +232,7 @@ jobs:
         run: node scripts/outputproof.js aggregate ../candidate "$CANDIDATE_SHA" ../output-input/PLAN.json ../output-shards ../output-proof
       - name: Bewaar volledig dossier; geen automatische registerwijziging of promotie
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: output-proof-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
@@ -288,7 +288,7 @@ jobs:
         run: node scripts/performance-debt.js evaluate
       - name: Bewaar bewijs, ook wanneer een doel niet is gehaald
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: performance-debt-${{ env.RTG_PERFORMANCE_COMMIT }}
           path: |
@@ -403,7 +403,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: De uitvoer bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: beproeving
           path: |
@@ -449,7 +449,7 @@ jobs:
         run: npm run tot-crash 2>&1 | tee tot-crash.log
       - name: De uitvoer bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: tot-crash
           path: tot-crash.log
@@ -486,7 +486,7 @@ jobs:
         run: npm run heapproef 2>&1 | tee heapproef.log
       - name: De uitvoer bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: heapproef
           path: |
@@ -583,7 +583,7 @@ jobs:
         run: npm run zekerheid
       - name: De sabotage-uitslag bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: sabotage
           path: SABOTAGE.json
@@ -618,7 +618,7 @@ jobs:
         run: npm run versheid
       - name: De registers van deze ronde bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: registers
           path: |
@@ -632,7 +632,7 @@ jobs:
           retention-days: 30
       - name: Het journaal bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: routejournaal
           path: routejournaal.log

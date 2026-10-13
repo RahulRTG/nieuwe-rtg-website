@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-13",
-  "commit": "4696e54f3",
-  "seconden": 8.9,
+  "commit": "c0ab3c848",
+  "seconden": 8,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -8749,7 +8749,7 @@
   {
    "bestand": "public/shared/sprong/sprong-03.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
-   "melding": "parsefout regel 200: onverwacht token bij \"}\""
+   "melding": "parsefout regel 205: onverwacht token bij \"}\""
   },
   {
    "bestand": "public/shared/sterren/sterren-01.js",
@@ -264549,7 +264549,7 @@
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 315,
+     "lijn": 320,
      "geexporteerd": "onbekend"
     }
    ],

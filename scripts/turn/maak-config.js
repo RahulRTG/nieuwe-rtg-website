@@ -57,8 +57,8 @@ function maakConfig(o) {
   if (net.isIP(publiek) !== 4 || !turn.openbareHost(publiek)) fout('--extern-ip moet een openbaar IPv4-adres zijn.');
   if (prive && net.isIP(prive) !== 4) fout('Het privé-adres achter --extern-ip/ moet IPv4 zijn.');
   const geheim = String(o.geheim || '').trim();
+  // sterkGeheim weigert ook elke witruimte, dus een regeleinde (een geinjecteerde configregel) komt er niet door
   if (!turn.sterkGeheim(geheim)) fout('Het TURN-geheim is te zwak of een plaatshouder (minstens 32 willekeurige tekens).');
-  if (/[\r\n]/.test(geheim)) fout('Het TURN-geheim mag geen regeleinde bevatten.');
   const min = Number(o['min-poort'] || 49160), max = Number(o['max-poort'] || 49999);
   if (!Number.isInteger(min) || !Number.isInteger(max) || min < 1024 || max > 65535 || max - min < 100 || max - min > 16000)
     fout('Het relaypoortbereik moet een beperkt bereik boven 1024 zijn (100-16000 poorten).');

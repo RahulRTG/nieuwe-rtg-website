@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T16:05:09.371Z",
-    "commit": "c71bb687e",
+    "op": "2026-10-12T23:37:30.008Z",
+    "commit": "6e332e22e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6804,6 +6804,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "idem-sleutelnaam.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "idem-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6865,6 +6873,14 @@
       "module": "scripts/lib/idemproef.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "idemring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idemring.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "idemschuld.test.js": {
@@ -15519,6 +15535,14 @@
         "testSha256": "31be36277e1f3c275d78fb8e4bf0babc3c7b855c3a2892e2afee6b85124f37b5"
       }
     },
+    "sessiestroom-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/sessiestroom.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "sessiestroom-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -18158,6 +18182,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "verzoekbetaal-herhaling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/rtg-keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "verzoekbetaal-race.test.js": {
       "soort": "puur",

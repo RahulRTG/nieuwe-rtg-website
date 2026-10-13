@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "c6fb7cd63",
+  "commit": "94c08252c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3189,6 +3189,7 @@
     "server/lib/idem-poort.js",
     "server/lib/idem-sleutelbepaling.js",
     "server/lib/idem.js",
+    "server/lib/idemring.js",
     "server/lib/idemsleutels-aankomst.js",
     "server/lib/idemsleutels-afleidrest.js",
     "server/lib/idemsleutels-basis.js",
@@ -5458,36 +5459,36 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4474,
+  "bestanden": 4475,
   "nietGelezen": 0,
-  "aanroepen": 181084,
-  "kanten": 31535,
-  "kantenLokaal": 20238,
+  "aanroepen": 181101,
+  "kanten": 31543,
+  "kantenLokaal": 20245,
   "kantenIngevoerd": 2843,
   "kantenLid": 2819,
   "kantenViaKern": 4899,
-  "kantenModuleAlsFunctie": 105,
+  "kantenModuleAlsFunctie": 106,
   "kantenLidOpInvoer": 325,
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135104,
-  "onopgelosteNamen": 13898,
+  "onopgelosteAanroepen": 135111,
+  "onopgelosteNamen": 13901,
   "onopgelostNaarSoort": {
-   "ingebouwd": 36274,
+   "ingebouwd": 36278,
    "externeModule": 1061,
    "kader": 12430,
-   "contextobject": 20794,
+   "contextobject": 20795,
    "uitgepaktObject": 1679,
-   "lokaleWaarde": 24187,
-   "methodeOpWaarde": 38212,
+   "lokaleWaarde": 24190,
+   "methodeOpWaarde": 38211,
    "overig": 467
   },
   "opgelostPct": 25.4,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 72,
-  "symbolenMetAanroeper": 12382,
+  "symbolenMetAanroeper": 12386,
   "routesMetSymbool": 3373,
   "routeSymboolKanten": 7091
  },
@@ -32825,7 +32826,7 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 35333
+   "aantal": 35332
   },
   {
    "naam": "String",
@@ -32833,7 +32834,7 @@
   },
   {
    "naam": "require",
-   "aantal": 8382
+   "aantal": 8383
   },
   {
    "naam": "app.post",
@@ -32845,7 +32846,7 @@
   },
   {
    "naam": "save",
-   "aantal": 3221
+   "aantal": 3222
   },
   {
    "naam": "CallExpression",
@@ -32861,11 +32862,11 @@
   },
   {
    "naam": "Object.assign",
-   "aantal": 2122
+   "aantal": 2123
   },
   {
    "naam": "Array.isArray",
-   "aantal": 2055
+   "aantal": 2054
   },
   {
    "naam": "Math.round",
@@ -32994,7 +32995,7 @@
     },
     {
      "naam": "require",
-     "aantal": 8382
+     "aantal": 8383
     },
     {
      "naam": "Number",
@@ -33002,11 +33003,11 @@
     },
     {
      "naam": "Object.assign",
-     "aantal": 2122
+     "aantal": 2123
     },
     {
      "naam": "Array.isArray",
-     "aantal": 2055
+     "aantal": 2054
     },
     {
      "naam": "Math.round",
@@ -33055,7 +33056,7 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 35320
+     "aantal": 35319
     },
     {
      "naam": "CallExpression",
@@ -33214,7 +33215,7 @@
    "namen": [
     {
      "naam": "save",
-     "aantal": 2836
+     "aantal": 2837
     },
     {
      "naam": "veilig",
@@ -34094,7 +34095,7 @@
      "aantal": 2,
      "waar": [
       "server/server.js:984",
-      "server/server.js:2362"
+      "server/server.js:2328"
      ]
     },
     {
@@ -34102,7 +34103,7 @@
      "aantal": 2,
      "waar": [
       "server/server.js:1281",
-      "server/server.js:2291"
+      "server/server.js:2257"
      ]
     },
     {
@@ -182690,7 +182691,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 54
+   "lijn": 56
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182698,7 +182699,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "ruim",
    "hoe": "lokaal",
-   "lijn": 76
+   "lijn": 78
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182706,7 +182707,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "sleutel",
    "hoe": "lokaal",
-   "lijn": 84
+   "lijn": 86
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182714,7 +182715,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "sleutel",
    "hoe": "lokaal",
-   "lijn": 93
+   "lijn": 95
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182722,7 +182723,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "ontzegel",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182730,7 +182731,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "aadVan",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182738,7 +182739,7 @@
    "naarBestand": "server/kern/sessies.js",
    "naar": "tokenHash",
    "hoe": "ingevoerd",
-   "lijn": 108
+   "lijn": 110
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182746,7 +182747,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "eigen",
    "hoe": "lokaal",
-   "lijn": 120
+   "lijn": 122
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182754,7 +182755,7 @@
    "naarBestand": "server/kern/sessies.js",
    "naar": "tokenHash",
    "hoe": "ingevoerd",
-   "lijn": 140
+   "lijn": 142
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182762,7 +182763,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "zegel",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 144
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182770,7 +182771,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "aadVan",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 144
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182778,7 +182779,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "geopend",
    "hoe": "lokaal",
-   "lijn": 158
+   "lijn": 161
   },
   {
    "vanBestand": "server/kern/settlement.js",
@@ -193106,7 +193107,7 @@
    "naarBestand": "server/kern/stroomticket.js",
    "naar": "zelfdeGroep",
    "hoe": "lokaal",
-   "lijn": 70
+   "lijn": 73
   },
   {
    "vanBestand": "server/kern/stroomticket.js",
@@ -193114,7 +193115,7 @@
    "naarBestand": "server/kern/stroomticket.js",
    "naar": "levend",
    "hoe": "lokaal",
-   "lijn": 103
+   "lijn": 111
   },
   {
    "vanBestand": "server/kern/studio/aiwerk.js",
@@ -212858,7 +212859,7 @@
    "naarBestand": "server/lib/idem.js",
    "naar": "store",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 130
   },
   {
    "vanBestand": "server/lib/idem.js",
@@ -212866,7 +212867,7 @@
    "naarBestand": "server/lib/idem.js",
    "naar": "afdrukStore",
    "hoe": "lokaal",
-   "lijn": 126
+   "lijn": 131
   },
   {
    "vanBestand": "server/lib/idem.js",
@@ -212874,7 +212875,7 @@
    "naarBestand": "server/lib/idem-handeling.js",
    "naar": null,
    "hoe": "lidOpInvoer",
-   "lijn": 152
+   "lijn": 157
   },
   {
    "vanBestand": "server/lib/idem.js",
@@ -212882,7 +212883,23 @@
    "naarBestand": "server/lib/idem.js",
    "naar": "doeWerkEnLegVast",
    "hoe": "lokaal",
-   "lijn": 173
+   "lijn": 178
+  },
+  {
+   "vanBestand": "server/lib/idemring.js",
+   "van": "(module)",
+   "naarBestand": "server/lib/idemring.js",
+   "naar": "bak",
+   "hoe": "lokaal",
+   "lijn": 31
+  },
+  {
+   "vanBestand": "server/lib/idemring.js",
+   "van": "(module)",
+   "naarBestand": "server/lib/idemring.js",
+   "naar": "weiger",
+   "hoe": "lokaal",
+   "lijn": 34
   },
   {
    "vanBestand": "server/lib/jws.js",
@@ -269922,39 +269939,79 @@
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "maakPrefix",
    "hoe": "lokaal",
-   "lijn": 19
+   "lijn": 23
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "maakInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 44
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "van": "maakInvite",
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "nieuweCode",
-   "hoe": "lokaal",
-   "lijn": 60
-  },
-  {
-   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "van": "maakInvite",
-   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "naar": "spec",
-   "hoe": "lokaal",
-   "lijn": 60
-  },
-  {
-   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "van": "maakInvite",
-   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "naar": "plekVan",
    "hoe": "lokaal",
    "lijn": 64
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "maakInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "spec",
+   "hoe": "lokaal",
+   "lijn": 64
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "maakInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "plekVan",
+   "hoe": "lokaal",
+   "lijn": 68
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "lijstInvites",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 78
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "trekInviteIn",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 81
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "trekInVoorStaff",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 99
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "roteerInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 110
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "van": "roteerInvite",
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "nieuweCode",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 129
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
@@ -269962,7 +270019,7 @@
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "spec",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 129
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
@@ -269970,7 +270027,7 @@
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "plekVan",
    "hoe": "lokaal",
-   "lijn": 130
+   "lijn": 134
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging.js",
@@ -283130,7 +283187,15 @@
    "naarBestand": "server/betaal.js",
    "naar": "koppelStore",
    "hoe": "lid",
-   "lijn": 1697
+   "lijn": 1693
+  },
+  {
+   "vanBestand": "server/server.js",
+   "van": "(module)",
+   "naarBestand": "server/lib/idemring.js",
+   "naar": null,
+   "hoe": "moduleAlsFunctie",
+   "lijn": 1693
   },
   {
    "vanBestand": "server/server.js",
@@ -283138,7 +283203,7 @@
    "naarBestand": "server/kern/directpay/index.js",
    "naar": "maakDirectpay",
    "hoe": "ingevoerd",
-   "lijn": 1719
+   "lijn": 1701
   },
   {
    "vanBestand": "server/server.js",
@@ -283146,7 +283211,7 @@
    "naarBestand": "server/betaal.js",
    "naar": "maakUitbetaling",
    "hoe": "lid",
-   "lijn": 1755
+   "lijn": 1737
   },
   {
    "vanBestand": "server/server.js",
@@ -283154,7 +283219,7 @@
    "naarBestand": "server/kern/fonds.js",
    "naar": "maakFonds",
    "hoe": "ingevoerd",
-   "lijn": 1776
+   "lijn": 1758
   },
   {
    "vanBestand": "server/server.js",
@@ -283162,7 +283227,7 @@
    "naarBestand": "server/muntbetaal.js",
    "naar": "koppelStore",
    "hoe": "lid",
-   "lijn": 1784
+   "lijn": 1764
   },
   {
    "vanBestand": "server/server.js",
@@ -283170,7 +283235,7 @@
    "naarBestand": "server/kern/munten.js",
    "naar": "maakMunten",
    "hoe": "ingevoerd",
-   "lijn": 1799
+   "lijn": 1765
   },
   {
    "vanBestand": "server/server.js",
@@ -283178,7 +283243,7 @@
    "naarBestand": "server/kern/settlement.js",
    "naar": "maakSettlement",
    "hoe": "ingevoerd",
-   "lijn": 1812
+   "lijn": 1778
   },
   {
    "vanBestand": "server/server.js",
@@ -283186,7 +283251,7 @@
    "naarBestand": "server/kern/paspoort.js",
    "naar": "maakPaspoort",
    "hoe": "ingevoerd",
-   "lijn": 1856
+   "lijn": 1822
   },
   {
    "vanBestand": "server/server.js",
@@ -283194,7 +283259,7 @@
    "naarBestand": "server/kern/events.js",
    "naar": "maakEvents",
    "hoe": "ingevoerd",
-   "lijn": 1899
+   "lijn": 1865
   },
   {
    "vanBestand": "server/server.js",
@@ -283202,7 +283267,7 @@
    "naarBestand": "server/kern/personeel.js",
    "naar": "maakPersoneel",
    "hoe": "ingevoerd",
-   "lijn": 1952
+   "lijn": 1918
   },
   {
    "vanBestand": "server/server.js",
@@ -283210,7 +283275,7 @@
    "naarBestand": "server/kern/fiscaal/index.js",
    "naar": "maakFiscaal",
    "hoe": "ingevoerd",
-   "lijn": 1991
+   "lijn": 1957
   },
   {
    "vanBestand": "server/server.js",
@@ -283218,7 +283283,7 @@
    "naarBestand": "server/kern/vervoer.js",
    "naar": "maakVervoer",
    "hoe": "ingevoerd",
-   "lijn": 2052
+   "lijn": 2018
   },
   {
    "vanBestand": "server/server.js",
@@ -283226,7 +283291,7 @@
    "naarBestand": "server/kern/ai.js",
    "naar": "maakAi",
    "hoe": "ingevoerd",
-   "lijn": 2137
+   "lijn": 2103
   },
   {
    "vanBestand": "server/server.js",
@@ -283234,7 +283299,7 @@
    "naarBestand": "server/lib/lidsleutel.js",
    "naar": "idVanKey",
    "hoe": "ingevoerd",
-   "lijn": 2139
+   "lijn": 2105
   },
   {
    "vanBestand": "server/server.js",
@@ -283242,7 +283307,7 @@
    "naarBestand": "server/server.js",
    "naar": "migreerLokaleToegang",
    "hoe": "lokaal",
-   "lijn": 2319
+   "lijn": 2285
   },
   {
    "vanBestand": "server/sms-sandbox.js",

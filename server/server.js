@@ -1688,27 +1688,9 @@ const {
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
-   maken: dezelfde idempotentiesleutel geeft ook NA een herstart hetzelfde
-   resultaat terug, zodat een netwerk-herhaling of dubbeltik nooit dubbel kan
-   afschrijven. Compact gehouden met een FIFO-cap; de sleutelvolgorde staat in
-   _keys (echte sleutels zijn geprefixt, dus botsen daar nooit mee). */
-if (!db.data.betaalIdem || typeof db.data.betaalIdem !== 'object') db.data.betaalIdem = { _keys: [] };
-if (!Array.isArray(db.data.betaalIdem._keys)) db.data.betaalIdem._keys = [];
-betaal.koppelStore({
-  get: (k) => (k === '_keys' ? undefined : db.data.betaalIdem[k]),
-  set: (k, v) => {
-    if (k === '_keys') return;
-    if (!(k in db.data.betaalIdem)) {
-      db.data.betaalIdem._keys.push(k);
-      if (db.data.betaalIdem._keys.length > 50000) {
-        for (const weg of db.data.betaalIdem._keys.splice(0, db.data.betaalIdem._keys.length - 50000))
-          delete db.data.betaalIdem[weg];
-      }
-    }
-    db.data.betaalIdem[k] = v;
-    try { save(); } catch (e) { /* het geheugen-resultaat blijft geldig */ }
-  }
-});
+   maken, als begrensde ring: ./lib/idemring.js. */
+const maakIdemRing = require('./lib/idemring');
+betaal.koppelStore(maakIdemRing({ data: () => db.data, naam: 'betaalIdem', save }));
 
 /* De directe-betaallaag (kern/directpay.js): elk betalend lid rekent alles met
    Face ID af via de AI en de Salon, en het geld gaat rechtstreeks van de klant
@@ -1778,24 +1760,8 @@ const fonds = maakFonds({ db, save, bijeen, inBundel, betaal, log, env: process.
 /* Munt-ontvangst (server/muntbetaal.js + kern/munten.js): RTG accepteert
    cryptomunten voor zijn eigen diensten en zet ze via een vergunninghoudende
    aanbieder meteen om naar euro's. Durende idempotentie zodat een herhaald
-   verzoek na een herstart hetzelfde adres teruggeeft. */
-if (!db.data.muntIdem || typeof db.data.muntIdem !== 'object') db.data.muntIdem = { _keys: [] };
-if (!Array.isArray(db.data.muntIdem._keys)) db.data.muntIdem._keys = [];
-muntbetaal.koppelStore({
-  get: (k) => (k === '_keys' ? undefined : db.data.muntIdem[k]),
-  set: (k, v) => {
-    if (k === '_keys') return;
-    if (!(k in db.data.muntIdem)) {
-      db.data.muntIdem._keys.push(k);
-      if (db.data.muntIdem._keys.length > 50000) {
-        for (const weg of db.data.muntIdem._keys.splice(0, db.data.muntIdem._keys.length - 50000))
-          delete db.data.muntIdem[weg];
-      }
-    }
-    db.data.muntIdem[k] = v;
-    try { save(); } catch (e) { /* het geheugen-resultaat blijft geldig */ }
-  }
-});
+   verzoek na een herstart hetzelfde adres teruggeeft (./lib/idemring.js). */
+muntbetaal.koppelStore(maakIdemRing({ data: () => db.data, naam: 'muntIdem', save }));
 const munten = maakMunten({ db, save, muntbetaal });
 
 /* Een bevestigde munt-ontvangst settelt de bijbehorende factuur langs de gewone

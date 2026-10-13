@@ -733,6 +733,25 @@ async function elevateTier(base, memberToken, pas, approverToken) {
    doet. Alles wat de APP zegt hoort door te komen. */
 const BROWSERRUIS = ['Transition was skipped',
   'Transition was aborted because of invalid state. ViewTransition opt-in disabled'];
+/* WEBKIT MELDT EEN VERZOEK DAT AFBREEKT OMDAT ZIJN DOCUMENT WORDT VERLATEN --
+   een pagina die dichtgaat of weg-navigeert -- als onafgevangen fout, met de
+   misleidende tekst "<adres> due to access control checks.". Voor een adres op
+   de EIGEN pagina-origin bestaat geen toegangscontrole die kan falen, dus dit
+   is altijd die afbreking; Chromium meldt hem niet. Alleen in WebKit-stand,
+   alleen voor de eigen origin en alleen in precies die vorm telt hij niet als
+   fout; hij wordt wel geteld (afgebrokenIn(bak)). Die telling staat NAAST de
+   bak en niet erop: een eigenschap op de array laat elke
+   assert.deepEqual(fouten, []) zakken op een lijst zonder een enkele fout. Elke andere melding, ook
+   "Load failed" (een echte netwerkfout), blijft een fout.
+   test/mobile-content.e2e.js houdt een strengere zeef voor zijn eigen venster. */
+function afbrekingsTekst(bericht, host) {
+  return !!host && String(bericht).includes(host + '/') && / due to access control checks\.$/.test(String(bericht));
+}
+function webkitAfbreking(bericht, origin) {
+  return testMotor() === 'webkit' && !!origin && afbrekingsTekst(bericht, origin.replace(/^https?:\/\//, ''));
+}
+const afgebrokenTelling = new WeakMap();
+function afgebrokenIn(bak) { return afgebrokenTelling.get(bak) || 0; }
 function letOpFouten(page, bak) {
   /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
      bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een
@@ -741,6 +760,9 @@ function letOpFouten(page, bak) {
   if (!page || typeof page.on !== 'function') return bak;
   page.on('pageerror', (e) => {
     const bericht = String((e && e.message) || e);
+    let origin = '';
+    try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
+    if (webkitAfbreking(bericht, origin)) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
     if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
   });
   return bak;
@@ -901,6 +923,14 @@ async function wachtOpVerandering(page, selector, oud, opties) {
    want hij hangt een teller om window.fetch. */
 async function volgVerzoeken(page) {
   await page.addInitScript(() => {
+    /* EEN KEER PER DOCUMENT, en geteld per aanroep. In WebKit liep de kale
+       teller onder nul (-7 tot -11 in de WebKit-job): draait dit script twee
+       keer in een document, dan zette de tweede keer hem op 0 terwijl de
+       finally's van de eerste nog aftrokken -- en een negatieve teller is
+       "bezig" voor altijd. Nu wikkelt hij fetch maar een keer, en elke aanroep
+       haalt alleen zijn eigen merk weg. */
+    if (window.__rtgVolgt) return;
+    window.__rtgVolgt = true;
     window.__rtgBezig = 0;
     /* De ADRESSEN erbij, en niet alleen de teller. Blijft een wacht hangen op
        "er loopt nog een verzoek", dan is de teller alleen een getal en moet je
@@ -910,12 +940,13 @@ async function volgVerzoeken(page) {
     const echt = window.fetch;
     window.fetch = function (...args) {
       const waar = String((args[0] && args[0].url) || args[0] || '');
-      window.__rtgBezig++;
-      window.__rtgInVlucht.push(waar);
+      const merk = { waar };
+      window.__rtgInVlucht.push(merk);
+      window.__rtgBezig = window.__rtgInVlucht.length;
       return echt.apply(this, args).finally(() => {
-        window.__rtgBezig--;
-        const i = window.__rtgInVlucht.indexOf(waar);
+        const i = window.__rtgInVlucht.indexOf(merk);
         if (i >= 0) window.__rtgInVlucht.splice(i, 1);
+        window.__rtgBezig = window.__rtgInVlucht.length;
       });
     };
   });
@@ -927,7 +958,7 @@ async function watHieldHemBezig(page) {
   try {
     return await page.evaluate(() => 'op ' + location.pathname + ' liepen er ' + (window.__rtgBezig || 0) +
       ' verzoeken' + (window.__rtgInVlucht && window.__rtgInVlucht.length
-        ? ' (' + window.__rtgInVlucht.slice(0, 4).join(', ') + ')' : '') + '.');
+        ? ' (' + window.__rtgInVlucht.slice(0, 4).map(m => m.waar || m).join(', ') + ')' : '') + '.');
   } catch (e) { return 'de stand was niet meer te lezen (' + (e && e.message) + ').'; }
 }
 
@@ -1238,6 +1269,10 @@ function laadPlaywright(opties) {
          met "Executable doesn't exist", en dat is rood dat niets over de code
          zegt. Deze controle komt uit scripts/lib/scherm.js en staat sinds de
          samenvoeging van 20 augustus 2026 hier, op de ene plek. */
+      /* In WebKit-stand (testMotor, hieronder) telt de WebKit van playwright,
+         niet een Chromium: de WebKit-job installeert alleen WebKit, en de
+         eigen driver hieronder kent geen WebKit. */
+      if (testMotor() === 'webkit') { if (mod && webkitPad(mod)) return mod; continue; }
       if (mod && mod.chromium && fs.existsSync(process.env.RTG_BROWSER_PATH || mod.chromium.executablePath())) {
         const endpoint = process.env.RTG_SHARED_BROWSER_ENDPOINT;
         if (!endpoint) return mod;
@@ -1249,6 +1284,7 @@ function laadPlaywright(opties) {
     } catch (e) { /* volgende */ }
   }
   if (opties && opties.eigenDriver === false) return null;
+  if (testMotor() === 'webkit') return null;   // geen WebKit gevonden: geenBrowser() zegt waarom
   try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
   return null;
 }
@@ -1324,8 +1360,44 @@ function browserOpties(pw, extra) {
 /* Via test/infra.js: zonder RTG_EIS_INFRA een etiket ([infra:browser]) dat de
    draaier telt, MET de schakelaar een zakker -- een omgeving die schermtoetsen
    belooft, laat ze niet stil overslaan. */
+/* DE MOTOR VAN EEN BROWSERTOETS. Standaard Chromium; met RTG_TEST_MOTOR=webkit
+   draait een toets die zijn browser via startBrowser() start in WebKit, de motor
+   van Safari en van elke browser op iOS. Waarom: de kantoordeur liep op de
+   iPhone van de eigenaar vast, en geen enkele toets draaide in WebKit
+   (CONSOLIDATIE.md, fase 2). De CI-job "Kernroutes in WebKit"
+   (.github/workflows/desktop-standard.yml) zet hem aan voor de kernroutes.
+
+   Wat WebKit hier NIET kan: Chromium-vlaggen (--no-sandbox, nepmedia) en de
+   CDP-sessies van een virtuele passkey. Een toets die die nodig heeft, start
+   zijn browser dus niet via startBrowser(); de echte passkey op een iPhone staat
+   op de handmatige checklist. Een onbekende motor is een fout, geen terugval. */
+const MOTOREN = new Set(['chromium', 'webkit']);
+function testMotor() {
+  const m = String(process.env.RTG_TEST_MOTOR || 'chromium').trim().toLowerCase();
+  if (!MOTOREN.has(m)) throw new Error('RTG_TEST_MOTOR kent alleen chromium en webkit, niet: ' + m);
+  return m;
+}
+function webkitPad(pw) {
+  try {
+    const p = pw && pw.webkit && typeof pw.webkit.executablePath === 'function' ? pw.webkit.executablePath() : null;
+    return p && fs.existsSync(p) ? p : false;
+  } catch (e) { return false; }
+}
+function startBrowser(pw, extra) {
+  if (testMotor() === 'webkit') {
+    const e = Object.assign({}, extra || {});
+    delete e.args;   // Chromium-vlaggen; WebKit kent ze niet
+    return pw.webkit.launch(e);
+  }
+  return pw.chromium.launch(browserOpties(pw, extra));
+}
+
 function geenBrowser(pw) {
   const { vereist } = require('./infra');
+  if (testMotor() === 'webkit') {
+    return webkitPad(pw) ? false
+      : vereist('browser', false, 'RTG_TEST_MOTOR=webkit, maar WebKit is niet geinstalleerd -- npx playwright install --with-deps webkit');
+  }
   if (!pw) return vereist('browser', false, 'playwright niet beschikbaar in deze omgeving');
   if (browserPad(pw) === false) {
     return vereist('browser', false, 'playwright is er, maar geen enkele chromium start hier -- zet ' +
@@ -1711,7 +1783,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

@@ -77,8 +77,7 @@ async function shot(page, name) {
    geteld (stand.afgebroken). Buiten dat venster blijven ze een fout, en dan zegt
    netwerkStand() welk adres het was. */
 const AFGEBROKEN = 'TypeError: Load failed';
-const afgebroken = (m, host) => m === AFGEBROKEN ||
-  (!!host && m.includes(host + '/') && / due to access control checks\.$/.test(m));
+const afgebroken = (m, host) => m === AFGEBROKEN || h.afbrekingsTekst(m, host);
 const bak = (errors, stand, host) => ({ push(m) {
   if (stand.weg && afgebroken(m, host)) stand.afgebroken++; else errors.push(m);
 } });

@@ -633,6 +633,12 @@ const EIGEN_MODULE = new Map([
      antwoord van een route in om, dus de liegpoort zou hem laten "overleven"
      terwijl hij alleen test/helper.js op de proef stelt. */
   ['poortreeks.test.js', ['test/helper.js']],
+  /* DE WEBKIT-STAND (13 oktober 2026). De toets legt testMotor(),
+     afbrekingsTekst(), webkitAfbreking() en letOpFouten() een eigen omgeving
+     en een nep-pagina voor; er gaat geen antwoord van een route in om, dus de
+     liegpoort liet hem "overleven" terwijl hij alleen test/helper.js op de
+     proef stelt. */
+  ['webkitstand.test.js', ['test/helper.js']],
   /* DE VERZOEKRACE (24 september 2026, BEWIJSLUS.md par. 6a). De toets bouwt RTG
      Pay via de opstelling van de Magnaat-geldpomp, en de motor koos die
      opstelling als module -- een mutatie daar zegt niets over het betalen van een

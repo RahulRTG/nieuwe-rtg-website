@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, letOpFouten, startBrowser, geenBrowser, edgeActies } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -96,7 +96,7 @@ test('tegoed op het scherm: klaarzetten geeft een code, verzilveren zet hem op h
     const krijger = await versLid(base);
     await api(base, '/api/pay/oplaad', { centen: 10000, idem: 'e2e-oplaad' }, gever.token);
 
-    browser = await pw.chromium.launch(browserOpties(pw));
+    browser = await startBrowser(pw);
     const paginaA = await openPay(browser, base, gever.token, fouten);
 
     /* Leeg is leeg: zolang er niets klaarstaat en niets is klaargezet, staan
@@ -169,7 +169,7 @@ test('tegoed op naam is EEN knop bij de ontvanger, zonder code overtikken',
     const krijger = await versLid(base);
     await api(base, '/api/pay/oplaad', { centen: 10000, idem: 'e2e2-oplaad' }, gever.token);
 
-    browser = await pw.chromium.launch(browserOpties(pw));
+    browser = await startBrowser(pw);
     const paginaA = await openPay(browser, base, gever.token, fouten);
     await openDeel(paginaA, /tegoed/i);
     await paginaA.fill('#gBedrag', '12,50');

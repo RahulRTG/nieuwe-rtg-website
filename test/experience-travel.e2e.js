@@ -9,7 +9,7 @@ test.after(async()=>{if(srv)await h.stop(srv.child);});
 for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt antwoordverlies en toont de bevestigde reis',async()=>{
  const token=(await api('/api/auth/register',{name:'Reisproef',email:'travel-browser-'+width+'-'+Date.now()+'@example.test',phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'})).token;
  const onboarding=await api('/api/onboarding/status',{},token);await api('/api/onboarding/teken',{naam:'Reisproef',akkoord:true,contractVersion:onboarding.contract.versie},token);
- const browser=await pw.chromium.launch(h.browserOpties(pw));
+ const browser=await h.startBrowser(pw);
  try{
   const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block',reducedMotion:'reduce'});
   await ctx.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');},token);

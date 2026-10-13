@@ -51,3 +51,28 @@ jobs:
             artifacts/world-palette/
             artifacts/experience/
           if-no-files-found: error
+  webkit-kernroutes:
+    # DE KERNROUTES IN WEBKIT, de motor van Safari en van elke browser op iOS.
+    # De kantoordeur liep op de iPhone van de eigenaar vast terwijl alle
+    # schermtoetsen in Chromium groen waren (CONSOLIDATIE.md, fase 2). Deze job
+    # draait de lanceerbare kern -- het kantoor, Edge, Rahul, Pay en reizen --
+    # in WebKit via startBrowser() in test/helper.js. RTG_EIS_INFRA maakt een
+    # ontbrekende browser een fout en geen stille overslag. Wat WebKit hier niet
+    # kan (een virtuele passkey) staat op de iPhone-checklist.
+    name: Kernroutes in WebKit (Safari-motor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps webkit
+      - run: node --test --test-concurrency=1 test/kantoordeur.e2e.js test/rtg-edge-2.e2e.js test/rahulscherm.e2e.js test/paytegoed.e2e.js test/reisschermen.e2e.js test/experience-travel.e2e.js
+        env:
+          RTG_TEST_MOTOR: webkit
+          RTG_EIS_INFRA: '1'

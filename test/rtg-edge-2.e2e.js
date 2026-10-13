@@ -12,7 +12,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  browserOpties, geenBrowser, laadPlaywright, startServer, stop
+  startBrowser, geenBrowser, laadPlaywright, startServer, stop
 } = require('./helper');
 
 const pw = laadPlaywright();
@@ -408,7 +408,7 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch(browserOpties(pw));
+    browser = await startBrowser(pw);
     const context = await browser.newContext();
     await context.addInitScript(() => {
       try {
@@ -560,7 +560,7 @@ test('Edge 2: een keuze van de mens overleeft een hashwissel in Work',
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch(browserOpties(pw));
+    browser = await startBrowser(pw);
 
     await t.test('Compact gekozen in de sessie, dan #people', async (st) => {
       const { context, page, omgeleid } = await openWerk(browser, base);

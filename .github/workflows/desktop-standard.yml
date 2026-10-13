@@ -65,8 +65,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arm: [a, b]
-        bestand: [reis, kd]
+        arm: [d]
+        bestand: [kd]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -81,12 +81,12 @@ jobs:
         run: |
           set +e
           z=0
-          for i in $(seq 1 10); do
+          for i in $(seq 1 4); do
             node --test --test-reporter=spec test/${{ matrix.bestand }}-${{ matrix.arm }}.e2e.js > uit.txt 2>&1; e=$?
             echo "ronde $i exit $e"
-            [ $e -ne 0 ] && { z=$((z+1)); grep -E "✖|afgebroken|Error|internal" uit.txt | head -6; }
+            grep -E "DIAG|✖|afgebroken|internal error|navigating to" uit.txt | head -150; [ $e -ne 0 ] && z=$((z+1))
           done
-          echo "=== UITSLAG ${{ matrix.bestand }} ${{ matrix.arm }}: $z/10 gezakt"
+          echo "=== UITSLAG ${{ matrix.bestand }} ${{ matrix.arm }}: $z/4 gezakt"
           exit 0
         env:
           RTG_TEST_MOTOR: webkit

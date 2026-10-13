@@ -1,0 +1,38 @@
+name: Kwalificatie lokaal (de Slotsuite-route werkt)
+# DE LOKALE ROUTE VAN DE RELEASEKWALIFICATIE, op een schone machine gedraaid.
+# scripts/kwalificatie.js --lokaal is wat de Slotsuite lokaal draait: dezelfde
+# bouw en voor-controle als release-image.yml, in een tijdelijke werkboom.
+# Een route die alleen op iemands laptop loopt, verrot ongemerkt; deze job
+# draait hem precies zoals een ontwikkelaar hem draait (geen extra vlaggen,
+# geen geheimen, geen registry) zodra er iets verandert waar hij van afhangt.
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - scripts/kwalificatie.js
+      - scripts/lib/kwalificatie.js
+      - scripts/release-bewijs.js
+      - scripts/lib/werkstroom.js
+      - scripts/slotsuite.js
+      - .github/workflows/release-image.yml
+      - .github/workflows/kwalificatie-lokaal.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: kwalificatie-lokaal-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  lokaal:
+    name: Kwalificatie --lokaal (bouw + voor-controle, zoals de Slotsuite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: '.nvmrc'
+      - run: node scripts/kwalificatie.js --lokaal

@@ -226,12 +226,21 @@ function git(args, opties = {}) {
   return String(r.stdout || '').trim();
 }
 
+/* De twee eisen, los van het uitvoeren zodat ze te toetsen zijn: `status` is
+   de uitvoer van `git status --porcelain`, `info` het resultaat van
+   `docker info`. Geeft de reden waarom het niet mag, of null. */
+function eisen(status, info) {
+  if (String(status || '').trim()) return 'De werkboom is niet schoon. Het image komt uit HEAD; commit eerst, anders ' +
+    'leest een niet-gecommitte wijziging als gekwalificeerd.';
+  if (!info || info.error || info.status !== 0) return 'Geen draaiende docker-daemon. Deze kwalificatie bouwt het releaseimage ' +
+    'en kan zonder niet; overslaan zou een kwalificatie als groen tellen die niet is gedaan.';
+  return null;
+}
+
 function lokaal() {
-  if (git(['status', '--porcelain'])) throw new Error('De werkboom is niet schoon. Het image komt uit HEAD; commit eerst, anders ' +
-    'leest een niet-gecommitte wijziging als gekwalificeerd.');
-  const info = cp.spawnSync('docker', ['info', '--format', '{{.ServerVersion}}'], { encoding: 'utf8' });
-  if (info.error || info.status !== 0) throw new Error('Geen draaiende docker-daemon. Deze kwalificatie bouwt het releaseimage ' +
-    'en kan zonder niet; overslaan zou een kwalificatie als groen tellen die niet is gedaan.');
+  const nee = eisen(git(['status', '--porcelain']),
+    cp.spawnSync('docker', ['info', '--format', '{{.ServerVersion}}'], { encoding: 'utf8' }));
+  if (nee) throw new Error(nee);
   const commit = git(['rev-parse', 'HEAD']);
   const merk = commit.slice(0, 12) + '-' + process.pid;
   const waarden = { GITHUB_SHA: commit, RTG_CANDIDATE_IMAGE: 'rtg-kwalificatie-lokaal:' + merk,
@@ -273,7 +282,7 @@ function hoofd() {
   throw new Error('Gebruik --uit-image, --controle --fase=voor|na, --gepubliceerd of --lokaal.');
 }
 
-module.exports = { lokaalPlan, woorden };
+module.exports = { lokaalPlan, woorden, eisen };
 
 if (require.main === module) {
   try { hoofd(); } catch (e) { console.error('[kwalificatie] ' + e.message); process.exitCode = 1; }

@@ -739,7 +739,9 @@ const BROWSERRUIS = ['Transition was skipped',
    de EIGEN pagina-origin bestaat geen toegangscontrole die kan falen, dus dit
    is altijd die afbreking; Chromium meldt hem niet. Alleen in WebKit-stand,
    alleen voor de eigen origin en alleen in precies die vorm telt hij niet als
-   fout; hij wordt wel geteld (bak.afgebroken). Elke andere melding, ook
+   fout; hij wordt wel geteld (afgebrokenIn(bak)). Die telling staat NAAST de
+   bak en niet erop: een eigenschap op de array laat elke
+   assert.deepEqual(fouten, []) zakken op een lijst zonder een enkele fout. Elke andere melding, ook
    "Load failed" (een echte netwerkfout), blijft een fout.
    test/mobile-content.e2e.js houdt een strengere zeef voor zijn eigen venster. */
 function afbrekingsTekst(bericht, host) {
@@ -748,6 +750,8 @@ function afbrekingsTekst(bericht, host) {
 function webkitAfbreking(bericht, origin) {
   return testMotor() === 'webkit' && !!origin && afbrekingsTekst(bericht, origin.replace(/^https?:\/\//, ''));
 }
+const afgebrokenTelling = new WeakMap();
+function afgebrokenIn(bak) { return afgebrokenTelling.get(bak) || 0; }
 function letOpFouten(page, bak) {
   /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
      bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een
@@ -758,7 +762,7 @@ function letOpFouten(page, bak) {
     const bericht = String((e && e.message) || e);
     let origin = '';
     try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
-    if (webkitAfbreking(bericht, origin)) { bak.afgebroken = (bak.afgebroken || 0) + 1; return; }
+    if (webkitAfbreking(bericht, origin)) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
     if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
   });
   return bak;
@@ -1779,7 +1783,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { startBrowser, testMotor, webkitAfbreking, afbrekingsTekst, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

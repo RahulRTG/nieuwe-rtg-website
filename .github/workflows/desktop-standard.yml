@@ -81,3 +81,4 @@ jobs:
         env:
           ARMEN: ${{ matrix.arm }}
           RONDES: '25'
+          RTG_TEST_MOTOR: webkit

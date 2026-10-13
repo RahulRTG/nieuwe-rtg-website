@@ -87,6 +87,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `LAT.md` is de technische lat
 - `ZERO.md` is het Zero-Debt-programma
 - `BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen
+- `CONSOLIDATIE.md` is het opruimbesluit van de eigenaar; lees het vóór elke PR
 - `AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is leidend
 
 ## Structuur en starten (kort)

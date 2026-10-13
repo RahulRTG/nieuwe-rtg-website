@@ -128,6 +128,19 @@ test('oude rijen: een lijst die geen lijst is wordt leeg, en een legacy-code wor
   assert.ok(!lijst.invites.some(i => i.id === 'sinv-gebruikt'));
 });
 
+test('een beschadigde rij (null, of zonder toegang) blijft staan maar breekt de zaak niet', async () => {
+  const s = opstelling({ bron: { ZAAK: [null, { id: 'kapot', naam: 'zonder code' }] } });
+  const g = await s.api.maakInvite(ZAAK, MANAGER, { naam: 'Ida', idem: 'k1' });
+  assert.equal(g.ok, true, JSON.stringify(g));
+  const lijst = await s.api.lijstInvites('ZAAK');
+  assert.deepEqual(lijst.invites.map(i => i.id), [g.id], 'alleen de hele rij in het overzicht');
+  assert.equal((await s.api.trekInviteIn('ZAAK', 'kapot', MANAGER)).status, 404, 'een rij zonder toegang is geen uitnodiging');
+  assert.equal((await s.api.roteerInvite('ZAAK', 'kapot', MANAGER)).status, 404);
+  assert.deepEqual(await s.api.trekInVoorStaff('ZAAK', { id: 1, member_id: 2 }, MANAGER), { ok: true, ingetrokken: 0 });
+  assert.equal(s.collecties.staffInvites.ZAAK[0], null, 'de beschadigde rijen blijven bewaard: niets verdwijnt stil');
+  assert.deepEqual(s.collecties.staffInvites.ZAAK[1], { id: 'kapot', naam: 'zonder code' });
+});
+
 test('een collectie die geen kaart is, wordt geweigerd', () => {
   for (const vorm of [null, [], 7]) {
     const s = opstelling({ vorm });

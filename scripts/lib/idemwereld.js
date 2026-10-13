@@ -759,8 +759,11 @@ function gemist(w, logboek) {
     if (w[e.sleutel]) continue;
     /* De LAATSTE oproep telt: een keten kan een route twee keer aanroepen (een
        poging en een herstelpoging), en dan is de laatste wat er echt gebeurde. */
+    /* Een `merk` logt zijn stappen als '<merk>: aansluiten' en '<merk>: rooster'
+       (zie stil()); die horen bij hetzelfde voorwerp, anders heet een gefaalde
+       aansluiting "nooit aangeroepen". */
     let laatste = null;
-    for (const r of logboek) if (r.pad === e.via) laatste = r;
+    for (const r of logboek) if (r.pad === e.via || String(r.pad).startsWith(e.via + ': ')) laatste = r;
     uit.push({ wat: e.wat, via: e.via,
       status: laatste ? laatste.status : null,
       melding: laatste ? laatste.error : 'deze route is nooit aangeroepen -- de keten brak eerder af' });

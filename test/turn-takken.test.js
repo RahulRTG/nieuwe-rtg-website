@@ -150,3 +150,11 @@ test('tijdelijk: verloop in de gebruikersnaam, en een HMAC-SHA1 als wachtwoord (
   assert.ok(standaard.verloopt > Math.floor(Date.now() / 1000) + cred.TTL_STANDAARD - 5);
   assert.ok(standaard.username.endsWith(':' + cred.actorLabel(STERK, 'anoniem')));
 });
+
+test('192.0.x.x: alleen 192.0.0.0/24 en TEST-NET-1 (192.0.2.0/24) zijn gereserveerd, de rest is openbaar', () => {
+  const { openbareHost } = adres;
+  for (const ip of ['192.0.0.1', '192.0.0.255', '192.0.2.1', '192.0.2.255'])
+    assert.equal(openbareHost(ip), false, ip + ' is gereserveerd');
+  for (const ip of ['192.0.1.1', '192.0.3.1', '192.0.255.1'])
+    assert.equal(openbareHost(ip), true, ip + ' is een gewoon adres');
+});

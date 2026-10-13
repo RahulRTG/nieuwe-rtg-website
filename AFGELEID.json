@@ -3,16 +3,16 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-12T23:33:12.804Z",
-  "commit": "9f5100f69",
+  "op": "2026-10-13T00:20:45.011Z",
+  "commit": "f64101a26",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v26.10.0"
  },
  "gemeten": {
-  "artefacten": 388,
-  "bron": 49,
+  "artefacten": 389,
+  "bron": 50,
   "afgeleid": 205,
   "fragmenten": 28,
   "momentopname": 1,
@@ -821,6 +821,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run connectlus:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONSOLIDATIE.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

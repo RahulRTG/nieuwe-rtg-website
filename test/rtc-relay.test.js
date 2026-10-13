@@ -146,6 +146,8 @@ test('maak-config weigert een zwak geheim, een privé realm/IP en een open poort
   assert.doesNotThrow(() => maakConfig(basis));
   assert.throws(() => maakConfig({ ...basis, geheim: 'a'.repeat(40) }));
   assert.throws(() => maakConfig({ ...basis, geheim: 'change-me-0123456789012345678901234567' }));
+  // een regeleinde in het geheim zou een tweede configregel kunnen injecteren; sterkGeheim weigert elke witruimte
+  assert.throws(() => maakConfig({ ...basis, geheim: GEHEIM.slice(0, 20) + '\nno-auth\n' + GEHEIM.slice(20) }), /te zwak/);
   assert.throws(() => maakConfig({ ...basis, 'extern-ip': '10.0.0.4' }));
   assert.throws(() => maakConfig({ ...basis, realm: 'turn.example.com' }));
   assert.throws(() => maakConfig({ ...basis, 'min-poort': '1024', 'max-poort': '65535' }));

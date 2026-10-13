@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T23:33:46.163Z",
-    "commit": "8f43e369a",
+    "op": "2026-10-12T23:37:30.008Z",
+    "commit": "6e332e22e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6804,6 +6804,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "idem-sleutelnaam.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "idem-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6865,6 +6873,14 @@
       "module": "scripts/lib/idemproef.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "idemring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idemring.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "idemschuld.test.js": {
@@ -18167,6 +18183,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "verzoekbetaal-herhaling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/rtg-keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "verzoekbetaal-race.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -18733,11 +18757,6 @@
       "gezakt": 5,
       "scherp": "overleefd"
     },
-    "webkitstand.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
-    },
     "webplatform.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -19208,14 +19227,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
-    },
-    "werkstart-onvolledig.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/werk/start.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "werkstatus.e2e.js": {
       "soort": "puur",

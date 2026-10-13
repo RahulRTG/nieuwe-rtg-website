@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2677 bestanden en 18540 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2678 bestanden en 18548 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,18 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2677 |
-| losse beweringen (`test(...)`) | 18540 |
+| toetsbestanden | 2678 |
+| losse beweringen (`test(...)`) | 18548 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2488 |
-| **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 1 met minder dan 8 pogingen) |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2490 |
+| **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 8 |
-
-Van die overlevers kregen er **1** minder dan 8 mutaties aangeboden. Dat is geen
-uitspraak over de toets maar over de motor: zijn module draagt bijna geen construct dat
-een operator kan omzetten. Ze staan er apart omdat ze anders als zwakke toets meelezen.
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -37,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2345 bestanden, 17975 beweringen.
+2346 bestanden, 17983 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -301,7 +297,7 @@ toets omvalt.
 | `bezorgcode.test.js` | 8 | gezakt op `!==->===#0` | De bezorgcode van een mode-bezorging (mode.bezorgcode, server/kern/modebezorg/bezorgcode.js): vier cijfers die het lid VOORLEEST. De korte code haalt de 128-bit lat niet, en dat is een besluit; wat hem veilig houdt... |
 | `bezorging.test.js` | 1 | gezakt op `liegpoort /api/` | DE BEZORGING -- van assortiment tot voordeur, met GPS. WAAROM DIT ER IS De bezorgketen raakt vier mensen achter elkaar: de manager richt de dienst in, een lid bestelt en betaalt, een bezorger neemt de rit aan, en de... |
 | `bezorgketen.test.js` | 4 | gezakt op `liegpoort /api/` | De bezorg-keten sluit: de inpakker vinkt alles af op de juiste tas en het juiste bonnummer, de bezorger vinkt af dat hij alles gepakt heeft, pas dan mag de rit vertrekken; de beste route kent voertuigkeuze en de... |
-| `bezorgproef-takken.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | De bezorgproef (scripts/bezorgproef.js) tegen een NAGEMAAKTE server: zegt het instrument eerlijk "stuk", "open" en "gebroken" als de keten het niet doet, en stopt hij met een duidelijke reden als de actoren of de... |
+| `bezorgproef-takken.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | De bezorgproef (scripts/bezorgproef.js) tegen een NAGEMAAKTE server: zegt het instrument eerlijk "stuk", "open" en "gebroken" als de keten het niet doet, en stopt hij met een duidelijke reden als de actoren of de... |
 | `bezorgproef.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | DE BEZORGPROEF (scripts/bezorgproef.js) -- de tweede horecaketen, gelopen. De tafelproef noemt bezorging zelf als eigen naad. |
 | `bezorgpunt.test.js` | 9 | gezakt op `liegpoort /api/` | EEN BEZORGPUNT VERDWIJNT BIJ LEVERING (NAVIGATIE.md N20). Tijdens een bezorging mag alles wat goede navigatie vraagt (N11): een coordinaat van het bezorgadres, de laatste positie van de koerier, een ETA. |
 | `bezorgvolgen.test.js` | 7 | gezakt op `liegpoort /api/` | HET VOLGSCHERM VAN DE KLANT -- waar is mijn bestelling, en hoe lang nog? WAAROM DIT ER IS Tussen "betaald" en "onderweg" zit de keuken, en dat is precies de tijd waarin iemand zich afvraagt of zijn bestelling wel is... |
@@ -857,6 +853,7 @@ toets omvalt.
 | `idem-poort-echt.test.js` | 4 | gezakt op `liegpoort /api/` | De idem-poort op een ECHTE server, langs een ECHTE route. test/idem-poort.test.js toetst de regel; dit toetst dat hij ook werkelijk in de keten hangt en dat er niets onder hem doorglipt. |
 | `idem-poort.test.js` | 23 | gezakt op `===->!==#0` | De idem-poort: hetzelfde verzoek twee keer sturen mag nooit twee keer werken. Deze toets draait op de middleware zelf, met een nagebootst verzoek/antwoord. |
 | `idem-sleutelbepaling.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `idem-sleutelnaam.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | EEN SLEUTEL IS EEN SLEUTEL, GEEN EIGENSCHAPSNAAM (server/lib/idem.js). De idem-laag bewaart antwoorden in een gewoon object, met de ring van sleutels onder `_keys` ernaast. |
 | `idem-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | DE IDEM-LAAG (server/lib/idem.js), TAK VOOR TAK. De bestaande toetsen meten de hoofdroute: dezelfde sleutel geeft hetzelfde antwoord, een andere afdruk een 409. |
 | `idembundel.test.js` | 8 | gezakt op `true->false#0` | MEEDOEN IN EEN BUNDEL DIE ER AL IS -- en de grendel eromheen. Hier komen twee reparaties samen die uit één meting volgen (`npm run factuurproef`, zie GELDLAT.md par. |
 | `idemcontract.test.js` | 14 | gezakt op `liegpoort /api/` | HET SEMANTISCHE IDENTITEITSCONTRACT, getoetst tegen de code die het beschrijft. server/lib/idem-contract.js verandert geen gedrag; het declareert wat twee handlers vandaag met de hand herontdekken. |
@@ -865,10 +862,11 @@ toets omvalt.
 | `idemmeting.test.js` | 7 | gezakt op `===->!==#0` | DE METING ALS CLASSIFICATIEGROND, EN DE POORT ERVOOR. WAAROM DEZE TOETS BESTAAT. |
 | `idempotentie.test.js` | 9 | gezakt op `===->!==#0` | DE IDEMPOTENTIELAAG, NAGETROKKEN. Een sleutel, een uitvoering: de herhaling krijgt hetzelfde antwoord en de handler draait niet nog een keer. |
 | `idemproef.test.js` | 36 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
+| `idemring.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE DUURZAME IDEM-RING van de betaal- en de munt-naad (server/lib/idemring.js). server.js koppelde twee keer dezelfde opslag aan server/betaal.js en server/muntbetaal.js: een object met de ring onder `_keys`, en `in`... |
 | `idemschuld.test.js` | 6 | gezakt op `&&->||#0` | DE IDEM-SCHULD MAG ALLEEN KRIMPEN. Er zijn 3650 schrijfroutes. |
 | `idemtoerekening.test.js` | 5 | gezakt op `return-weg#4` | DE TOEREKENING VAN DE IDEMPOTENTIEPROEF -- belandt VOORWERK in het vak van de gemeten handeling? WAT ER MISGING, en het stond als GERUSTHEID in de bron. |
 | `idemvoorziening.test.js` | 12 | gezakt op `-->+#0` | DE VOORZIENING -- een VERS onderwerp vlak voor de meting. Waarom deze laag bestaat staat in scripts/lib/idemwereld.js, en het is geen ontbrekende fixture: de idempotentieproef doet voor elke ledenroute eerst een... |
-| `idemwereld-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | DE IDEMWERELD, TAK VOOR TAK (scripts/lib/idemwereld.js). test/idemwereld.test.js bouwt de geldwereld en test/idemvoorziening.test.js de voorzieningen in de meetlus. |
+| `idemwereld-takken.test.js` | 16 | gezakt op `voorwaarde-omkeren#0` | DE IDEMWERELD, TAK VOOR TAK (scripts/lib/idemwereld.js). test/idemwereld.test.js bouwt de geldwereld en test/idemvoorziening.test.js de voorzieningen in de meetlus. |
 | `idemwereld-voorvoegsel.test.js` | 4 | gezakt op `&&->||#0` | DE VOORVOEGSELREGELS VAN DE IDEMWERELD -- volgorde en reikwijdte. Twee fouten die hier echt zijn gemaakt, allebei stil: 1. |
 | `idemwereld.test.js` | 14 | gezakt op `true->false#0` | DE WERELD VAN DE IDEMPOTENTIEPROEF (TAKEN.md 4.30), los van een server. scripts/lib/idemwereld.js zet voor de idemproef een echte wereld klaar -- rekening, saldo, pas, vaste betaling, twee klompjes -- zodat de... |
 | `identiteit-opvraag.test.js` | 8 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
@@ -1507,7 +1505,7 @@ toets omvalt.
 | `persistentiestand.test.js` | 3 | geen module gevonden | DE PERSISTENTIESTAND (server/db/persistentieStand) -- het enige getal waarmee een aanroeper kan vaststellen dat zijn schrijfactie de SCHIJF heeft gehaald. WAAROM DIT ER LOS STAAT, en waarom de geldroute hem nog NIET... |
 | `personeel-aanmelden-takken.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | POST /api/supplier/staff/join (server/routes/supplier/werving/ personeel-aanmelden.js), rechtstreeks aangeroepen met een nagemaakte app, kern en uitnodiging: elke stap van de volgorde (bedrijf en kassacode, dan... |
 | `personeelsuitnodiging-montage.test.js` | 2 | gezakt op `!==->===#0` | De personeelsuitnodiging (workos.personeelsuitnodiging) belooft een atomaire claim, en die bestaat alleen in een collectietransactie. Werving en supplier maakten elk een eigen instantie met alleen `kern`, en kern... |
-| `personeelsuitnodiging-takken.test.js` | 21 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `personeelsuitnodiging-takken.test.js` | 22 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `personeelsuitnodiging.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor workos.personeelsuitnodiging: twee onafhankelijke kerninstances delen dezelfde PostgreSQL en racen om dezelfde eenmalige personeelscode. Precies EEN lid krijgt een personeelsplek,... |
 | `personeelzicht-routes.test.js` | 13 | gezakt op `liegpoort /api/` | PERSONEELSZICHT, DE ROUTES DIE ER LANGS LIEPEN (derde tegenlezing PR #584). Dezelfde regel als test/personeelzicht.test.js -- een manager wat zijn functie vraagt, de medewerker zelf het zijne (op staffId), een... |
 | `personeelzicht.test.js` | 4 | gezakt op `liegpoort /api/` | PERSONEELSZICHT: de keukenlijn, ziekmeldingen, de online-stip en sollicitaties -- eigenaarsbesluiten A1, B1 en C1 (11 oktober 2026, PR #584). Een regel, een plek (server/kern/leverancier/personeelzicht.js, met de... |
@@ -2128,7 +2126,7 @@ toets omvalt.
 | `turn-inrichting.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | De inrichting van de TURN-host: de VPS-route (scripts/turn/vps.js + cloudinit.js), het DNS-record (scripts/turn/dns.js) en de Mac mini-route (scripts/mac/turn.sh). Geen netwerk: wat hier bewezen wordt is de VORM --... |
 | `turn-maak-config-takken.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | De coturn-generator (scripts/turn/maak-config.js), alle weigeringen en standaardwaarden: een IP als realm, een privé-adres achter NAT, een geheim met regeleinde, een relatief certificaatpad, de quota en poorten die... |
 | `turn-projectie-takken.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | DE TURN-PROJECTIE TAK VOOR TAK (server/config/turn.js). Wat dit bestand vasthoudt: hoe een TURN- en STUN-adres wordt ontleed (vorm, poort, host, transport, en wat publieke productie extra weigert), hoe een lijst... |
-| `turn-takken.test.js` | 14 | gezakt op `voorwaarde-omkeren#0` | DE TURN-KEURING TAK VOOR TAK (server/config/turn-adres.js en server/config/turn-credential.js). Wat dit bestand vasthoudt: welke hosts als openbaar gelden voor een relais (en welke privé, gereserveerd of een... |
+| `turn-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | DE TURN-KEURING TAK VOOR TAK (server/config/turn-adres.js en server/config/turn-credential.js). Wat dit bestand vasthoudt: welke hosts als openbaar gelden voor een relais (en welke privé, gereserveerd of een... |
 | `tweede-rem.test.js` | 8 | gezakt op `liegpoort /api/` | DE POGINGENREM OP DE TWEEDE INLOGSTAP -- regressie voor RTG-V1-RELEASE C3. DE FOUT: /api/auth/tweede controleerde de TOTP-code zonder enige rem. |
 | `tweedehandtekening.test.js` | 12 | gezakt op `liegpoort /api/` | EEN TWEEDE MENS ONDER TWEE BANKHANDELINGEN. `scripts/overleving.js` had één rij die met zoveel woorden `nee` zei: *een medewerker handelt te kwader trouw, in zijn eentje.* De grond was gemeten -- een medewerker op... |
 | `tweefactor.test.js` | 18 | gezakt op `===->!==#0` | DE TWEEDE FACTOR VOOR LEDEN. DE BEWERING DIE ERTOE DOET staat in toets 6: TOTP is GEEN passkey. |
@@ -2203,6 +2201,7 @@ toets omvalt.
 | `vervalstaten.test.js` | 9 | gezakt op `===->!==#0` | DE VERVALSTATEN VAN scripts/vertrouwen.js -- de staatmachine achter de bewijspoort. Dit bestand heette test/vertrouwen.test.js. |
 | `verzadiging.test.js` | 12 | gezakt op `&&->||#0` | De verzadigingspoort van scripts/tot-crash.js (scripts/lib/verzadiging.js). Deze poort bestaat omdat het crashharnas urenlang het verkeerde heeft gemeten: het verdubbelde het aantal werkers, de doorvoer stortte in... |
 | `verzoek-intrekken.test.js` | 4 | gezakt op `liegpoort /api/` | EEN BETAALVERZOEK INTREKKEN -- 2 endpoints, aan beide kanten van het huis. De dekkingsmeting wees /api/pay/verzoek/intrek (lid vraagt een vriend) en /api/supplier/betaalverzoek/intrek (zaak vraagt een klant) aan als... |
+| `verzoekbetaal-herhaling.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | EEN HERHALING VAN EEN GESLAAGDE BETALING IS GEEN WEIGERING (server/kern/pay/verzoeken.js). verzoekBetaal() keek of het verzoek nog `open` stond VOORDAT het de idem-laag vroeg of deze sleutel al eens was gelukt. |
 | `verzoekbetaal-race.test.js` | 2 | gezakt op `!==->===#0` | TWEE KEER TEGELIJK BETALEN IS EEN KEER BETALEN (BEWIJSLUS.md par. 6). |
 | `verzoekcontext-wikkel.test.js` | 10 | gezakt op `true->false#0` | DE WIKKEL VAN DE VERZOEKCONTEXT -- wat er in de opslag belandt, en wat niet. server/db/verzoekcontext.js geeft elk verzoek een eigen werkkopie: lezen gaat door een Proxy, schrijven landt in de kopie, en pas de... |
 | `verzoekframe.test.js` | 9 | gezakt op `===->!==#0` | HET VERZOEKFRAME (server/opzet/verzoekframe.js) -- Fase 2, besluit B2a, in de schaduw. Deze toetsen houden de levenscyclus vast: open (correlatie van de server, extern begrensd), identificeer EEN keer en alleen via... |
@@ -2271,7 +2270,6 @@ toets omvalt.
 | `webauthn-ceremonie.test.js` | 1 | gezakt op `liegpoort /api/` | DE HELE PASSKEY-CEREMONIE, OVER DE ECHTE ROUTES. test/webauthn.test.js toetst de randen: rommel eruit, geen enumeratie, poorten dicht, remmen aan. |
 | `webauthn-eigen.test.js` | 6 | gezakt op `!==->===#0` | Eigen WebAuthn-laag (server/webauthn.js), die @simplewebauthn/server verving. We spelen een volledige ceremonie na met een ECHTE EC P-256-sleutel uit node:crypto: bouwen zelf een authenticatorData + attestationObject... |
 | `webauthn.test.js` | 7 | gezakt op `liegpoort /api/` | Passkeys (WebAuthn): de servermechanieken. Dit bestand toetst de RANDEN -- opties-vorm, anti-enumeratie, poorten, remmen en beheer. |
-| `webkitstand.test.js` | 3 | overleefd | DE WEBKIT-STAND VAN DE BROWSERTOETSEN (test/helper.js, fase 2 van CONSOLIDATIE.md). testMotor() kent precies twee motoren en noemt een andere een fout; afbrekingsTekst() herkent alleen WebKits melding voor een... |
 | `webplatform.test.js` | 28 | gezakt op `liegpoort /api/` | RTG WEB PLATFORM -- de automatische bedrijfssite en de browser die bedrijven begrijpt. Het principe onder deze laag is "automatic first, customizable forever": een partner krijgt uit zijn zaakprofiel in een keer een... |
 | `webpush.test.js` | 5 | gezakt op `&&->||#0` | Test voor onze eigen web-push (server/webpush.js), die het pakket `web-push` verving. Twee harde ijkpunten: 1. |
 | `website-aanvraag-handoff.test.js` | 2 | geen module gevonden | De publieke website geeft een aanvraag browser-tot-browser door aan de app. Deze toets bewaakt de privacygrens en de enige ontvangende route: het fragment mag niet in serverlogs belanden en pas na inloggen mag... |
@@ -2322,7 +2320,6 @@ toets omvalt.
 | `werkruimte-kantoor.test.js` | 7 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `werkruimte-maak-idem.test.js` | 1 | gezakt op `liegpoort /api/` | EEN RETRY MET DEZELFDE SLEUTEL MAAKT GEEN TWEEDE WERKRUIMTE. /api/bedrijf/werkruimte/maak staat in lib/eenmalig-geheim-routes.js: het antwoord draagt een beheer-token dat alleen als hash blijft, dus geen generieke... |
 | `werksleutels.test.js` | 10 | gezakt op `liegpoort /api/` | De sleutels van een werkruimte (workos.workspace_access_tokens), control voor control: 128 bits en eenmaal tonen, hash-only, issuer/doel/scope/onderwerp, vervaltijd, het plafond op sessies (een sessie telt geen... |
-| `werkstart-onvolledig.test.js` | 2 | gezakt op `browser-export-weg#0` | HET STARTSCHERM VAN WERK MET EEN ONVOLLEDIG ANTWOORD (public/apps/werk/start.js). RTGWerk.api maakt van een antwoord dat geen JSON is een leeg lijf `{}`: een 502 met HTML, een verbroken verbinding, of -- in WebKit,... |
 | `werktafelgeheugen.test.js` | 7 | geen module gevonden | WAT DE WERKTAFEL ONTHOUDT, en waarom dat drie beloftes tegelijk is. WERELD.md beloofde tot 19 augustus 2026 dat inloggen, je laatste blad sluiten en op Home drukken alle drie op dezelfde lege werktafel uitkwamen. |
 | `werktoen.test.js` | 6 | gezakt op `liegpoort /api/` | DE TIJDMACHINE EN DE UITVALANALYSE: twee vragen die niet meer beweren dan ze meten. TOEN (bedrijf/toen.js) -- de organisatie op een datum. |
 | `werkvenster.test.js` | 4 | gezakt op `liegpoort /api/` | Het werkvenster: de werkgever bepaalt wanneer personeel op de werkpagina en de PDA mag. Getoetst op beide lagen: de kernlogica (vensters, middernacht, manager/vrijstelling, Rahuls advies) met een vaste klok, en de... |

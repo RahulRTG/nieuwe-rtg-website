@@ -34,7 +34,7 @@ function nepServer(scenario) {
       : { staff: [{ id: 1, role: 'manager', name: 'Mira' }, { id: 2, role: 'bediening', name: 'Bas' }] }];
     if (pad === '/api/login') return s.geenLid ? [403, { error: 'Log in met je account' }] : [200, { token: 'L-' + b.tier }];
     if (pad === '/api/supplier/staff/add') return [200, s.geenCollega ? {} : { staff: { id: 3 }, pin: '0000' }];
-    if (pad === '/api/bezorg/partners') return [200, { partners: [{ code: 'Z1', name: 'Zaak', bezorgen: true, producten: [{ id: 'p1' }] }] }];
+    if (pad === '/api/bezorg/partners') return [200, s.geenZaak ? { partners: [] } : { partners: [{ code: 'Z1', name: 'Zaak', bezorgen: true, producten: [{ id: 'p1' }] }] }];
     if (pad === '/api/bezorg/bestel') return s.geenBestelling ? [400, { error: 'gesloten' }] : [200, { order: { ref: 'R' + (++n), items: [{ id: 'p1' }] } }];
     if (pad === '/api/notifications') return [200, 'geen json'];
     if (s.stuk) return pad === '/api/bezorg/volg' ? [200, { order: { status: 'nieuw', geo: null, adres: 'Keizersgracht 1' }, positie: null }] : [500, { error: 'kapot' }];
@@ -85,6 +85,11 @@ test('de actoren: zonder zaakcode, met een mens, zonder pin of zonder lid stopt 
 
 test('geen bestelling: de proef stopt in plaats van storingen leeg te laten slagen', async () => {
   await assert.rejects(metScenario({ geenBestelling: true }), /de bestelling kwam er niet \(400\)/);
+});
+
+test('de zaak staat niet in de bezorglijst: de proef stopt met die reden, niet met een TypeError', async () => {
+  await assert.rejects(metScenario({ geenZaak: true }), /de zaak Z1 staat niet in de bezorglijst/);
+  assert.deepEqual(gestart, ['klaar']);
 });
 
 test('een server die overal 500 geeft: schakels stuk met het antwoord, storingen gebroken, sluit niet', async () => {

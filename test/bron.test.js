@@ -281,3 +281,15 @@ test('eindTag zoekt de vorm die een browser accepteert, en niet meer', () => {
      sluiter geteld. Een matcher die dat wel doet, sluit een blok te vroeg. */
   assert.equal(eindTag('<script>x</script foo>', 'script', 8), null);
 });
+
+/* EEN REGELCOMMENTAAR OP DE LAATSTE REGEL, ZONDER REGELEINDE. Dan is er geen
+   `\n` om tot te knippen, en moet de rest van het bestand weg -- of, met
+   regelsHeel, platgeslagen worden zonder dat de lengte verschuift. Deze tak
+   draaide alleen nog mee via de volledige normmeting in meterijk; sinds die het
+   keuringssnapshot deelt (#631) raakte geen toets hem meer. */
+test('een regelcommentaar zonder regeleinde: weg, of platgeslagen met dezelfde lengte', () => {
+  assert.equal(zonderCommentaar('a = 1; // staart'), 'a = 1; ');
+  const heel = zonderCommentaar('a = 1; // staart', { regelsHeel: true });
+  assert.equal(heel.length, 'a = 1; // staart'.length, 'regelsHeel houdt elke positie op zijn plaats');
+  assert.equal(heel.trimEnd(), 'a = 1;');
+});

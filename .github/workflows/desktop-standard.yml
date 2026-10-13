@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arm: [h]
+        arm: [m, i]
         bestand: [kd]
         kopie: [1, 2, 3]
     steps:

@@ -77,7 +77,7 @@ async function opstelling() {
   /* De service worker uit: anders haalt hij schermen vooruit op en meet deze
      toets een pagina uit de cache in plaats van een verse. */
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
-  const page = await ctx.newPage();
+  const o = { browser, ctx, page: null, fouten: [] };
   /* DE VERZOEKENTELLER, EN DIE ONTBRAK HIER -- dat is de hele oorzaak van een
      valse aanklacht die op een drukke CI-runner echt is gevallen.
 
@@ -101,10 +101,23 @@ async function opstelling() {
      vertraagd meldde deze toets alle negen kantoorschermen als lek, met
      letterlijk de tekst die de CI-runner liet zien. Met deze regel wacht hij
      het verzoek af en meldt hij niets. */
-  await volgVerzoeken(page);
-  const fouten = [];
-  letOpFouten(page, fouten);
-  return { browser, page, fouten };
+  await vers(o);
+  return o;
+}
+
+/* EEN VERSE PAGINA, EN DE VORIGE DICHT. Elk bezoek begon met een goto op
+   dezelfde pagina, en verliet daarmee het vorige kantoorscherm terwijl dat nog
+   verzoeken had lopen. WebKit breekt die af, en de eerstvolgende goto stierf
+   daar soms aan met "internal error" (5 van de 9 rode WebKit-runs). Een pagina
+   die dichtgaat draait geen script meer. De opslag (localStorage) hoort bij de
+   context en gaat dus mee naar de nieuwe pagina; de verzoekenteller en de
+   foutenbak worden per pagina opnieuw aangehangen. */
+async function vers(o) {
+  if (o.page) await o.page.close();
+  o.page = await o.ctx.newPage();
+  await volgVerzoeken(o.page);
+  letOpFouten(o.page, o.fouten);
+  return o.page;
 }
 
 /* GEEN SCHERM IS VERLATEN TERWIJL HET NOG LAADDE. WebKit breekt de verzoeken
@@ -139,8 +152,9 @@ function nietsAfgebroken(o) {
    Vandaar `geland`. De aanroeper hoort daarop te splitsen; hij mag hier niet
    stilzwijgend doorlezen. De navigatiefout zelf gaat mee terug in `waarom`,
    zodat de melding zegt wat er misging in plaats van wie het gedaan zou hebben. */
-async function bezoek(page, base, app) {
+async function bezoek(o, base, app) {
   const doel = '/apps/' + app + '.html';
+  let page = await vers(o);
   /* EERST NAAR EEN STIL DOCUMENT, dan de sleutel weghalen. Het vorige scherm kan
      nog aan het navigeren zijn (een location.replace of een meta-refresh), en
      een evaluate op een document dat net vertrekt zakt met "Execution context
@@ -160,6 +174,13 @@ async function bezoek(page, base, app) {
      is er iets anders aan de hand dan drukte, en dan hoort een mens te kijken. */
   for (let poging = 1; poging <= 2; poging += 1) {
     waarom = null; rustFout = null;
+    /* De tweede poging begint ook op een verse pagina, met de sleutel weer
+       weggehaald: anders verlaat hij het scherm van de eerste poging. */
+    if (poging > 1) {
+      page = await vers(o);
+      await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
+      await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
+    }
     try { await page.goto(base + doel, { waitUntil: 'domcontentloaded' }); }
     catch (e) { waarom = String((e && e.message) || e).split('\n')[0].slice(0, 120); }
     /* EN DE TIME-OUT VAN DE WACHT GAAT MEE TERUG, want hij werd hier ingeslikt.
@@ -217,7 +238,8 @@ function nietGemeten(r) {
 }
 
 // De sleutel van dit toestel zetten (of weghalen met null).
-async function alsLid(page, base, token) {
+async function alsLid(o, base, token) {
+  const page = await vers(o);
   /* Alleen een same-origin document is nodig om localStorage te zetten. Het
      volledige beginscherm start zelf navigatie en maakte de eerstvolgende goto
      onder zware CI-belasting soms ongedaan; /api/health heeft geen appcode. */
@@ -274,10 +296,10 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     browser = o.browser;
 
     // 1) met de kantoorsleutel: geen vraag, en het scherm staat er echt
-    await alsLid(o.page, base, eigenaar);
+    await alsLid(o, base, eigenaar);
     const dicht = [], mis1 = [];
     for (const s of SCHERMEN) {
-      const r = await bezoek(o.page, base, s.app);
+      const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis1.push(nietGemeten(r)); continue; }
       if (vraagtCode(r.deur)) { dicht.push(s.app + ': vraagt de kantoorcode aan de eigenaar'); continue; }
       if (!s.open.test(r.tekst)) dicht.push(s.app + ': niet open -- ' + r.tekst.slice(0, 140));
@@ -287,10 +309,10 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
 
     /* 2) zonder lid-token: de code, en niets anders. Zou een scherm hier
        opengaan, dan had de deur iets weggegeven aan wie geen sleutel heeft. */
-    await alsLid(o.page, base, null);
+    await alsLid(o, base, null);
     const lek = [], mis = [];
     for (const s of SCHERMEN) {
-      const r = await bezoek(o.page, base, s.app);
+      const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
@@ -298,10 +320,10 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     assert.deepEqual(lek, [], 'zonder sleutel hoort elk scherm de kantoorcode te vragen:\n  ' + lek.join('\n  '));
 
     // 3) een lid ZONDER kantoorsleutel: ook gewoon de code
-    await alsLid(o.page, base, lid);
+    await alsLid(o, base, lid);
     const lek2 = [], mis2 = [];
     for (const s of SCHERMEN) {
-      const r = await bezoek(o.page, base, s.app);
+      const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis2.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek2.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
@@ -331,8 +353,8 @@ test('staat er een algemene pin, dan vraagt de kantoordeur die (gemaskeerd)',
 
     const o = await opstelling();
     browser = o.browser;
-    await alsLid(o.page, base, eigenaar);
-    await bezoek(o.page, base, 'concierge');
+    await alsLid(o, base, eigenaar);
+    await bezoek(o, base, 'concierge');
     await o.page.waitForSelector('.kg-in', { timeout: 15000 });
     const vraag = await o.page.evaluate(() => ({
       tekst: document.querySelector('.kg-zegt').textContent.trim(),

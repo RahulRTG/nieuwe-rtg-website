@@ -76,8 +76,7 @@ async function opstelling() {
   const browser = await startBrowser(pw);
   /* De service worker uit: anders haalt hij schermen vooruit op en meet deze
      toets een pagina uit de cache in plaats van een verse. */
-  const ctx = await browser.newContext({ serviceWorkers: 'block' });
-  const o = { browser, ctx, page: null };
+  const o = { browser, ctx: null, page: null };
   /* DE VERZOEKENTELLER, EN DIE ONTBRAK HIER -- dat is de hele oorzaak van een
      valse aanklacht die op een drukke CI-runner echt is gevallen.
 
@@ -101,7 +100,6 @@ async function opstelling() {
      vertraagd meldde deze toets alle negen kantoorschermen als lek, met
      letterlijk de tekst die de CI-runner liet zien. Met deze regel wacht hij
      het verzoek af en meldt hij niets. */
-  await vers(o);
   return o;
 }
 
@@ -153,16 +151,11 @@ test('de tussenstand van de kantoordeur heet nog zoals bezoek() hem herkent', ()
 
 async function bezoek(o, base, app) {
   const doel = '/apps/' + app + '.html';
+  /* Een verse pagina in de context van deze fase. De kantoorsleutel van het
+     vorige scherm haalt het init-script van alsLid() weg, bij het eerste
+     document van het tabblad -- niet meer een evaluate op /api/health (zie
+     alsLid() voor waarom die omweg eruit is). */
   let page = await vers(o);
-  /* EERST NAAR EEN STIL DOCUMENT, dan de sleutel weghalen. Het vorige scherm kan
-     nog aan het navigeren zijn (een location.replace of een meta-refresh), en
-     een evaluate op een document dat net vertrekt zakt met "Execution context
-     was destroyed" -- gezien onder belasting, vijftien schermtoetsen tegelijk.
-     Dat is een mislukte meting en geen uitspraak over het scherm; /api/health
-     heeft geen appcode en vertrekt dus nooit uit zichzelf, precies zoals alsLid
-     hem gebruikt. */
-  await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
   let waarom = null, r = null, rustFout = null;
   /* TWEE POGINGEN, en de tweede is geen wegkijken. Een navigatie die afbreekt is
      hier geen uitspraak over het scherm maar over de sprong ernaartoe -- op een
@@ -173,13 +166,9 @@ async function bezoek(o, base, app) {
      is er iets anders aan de hand dan drukte, en dan hoort een mens te kijken. */
   for (let poging = 1; poging <= 2; poging += 1) {
     waarom = null; rustFout = null;
-    /* De tweede poging begint ook op een verse pagina, met de sleutel weer
-       weggehaald: anders verlaat hij het scherm van de eerste poging. */
-    if (poging > 1) {
-      page = await vers(o);
-      await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
-      await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
-    }
+    /* De tweede poging begint ook op een verse pagina (en dus met de sleutel
+       weer weggehaald): anders verlaat hij het scherm van de eerste poging. */
+    if (poging > 1) page = await vers(o);
     try { await page.goto(base + doel, { waitUntil: 'domcontentloaded' }); }
     catch (e) { waarom = String((e && e.message) || e).split('\n')[0].slice(0, 120); }
     /* EN DE TIME-OUT VAN DE WACHT GAAT MEE TERUG, want hij werd hier ingeslikt.
@@ -261,18 +250,34 @@ function nietGemeten(r) {
     '. Dit zegt niets over dat scherm; het zegt dat deze meting niet is gelukt.';
 }
 
-// De sleutel van dit toestel zetten (of weghalen met null).
+/* DE SLEUTEL VAN DIT TOESTEL ZETTEN (of weghalen met null), en wel in een VERSE
+   CONTEXT met een init-script, niet meer via een evaluate op /api/health.
+
+   Die omweg was de gemene deler van elke rode kantoordeur in WebKit: "internal
+   error" en een time-out van 30 s op juist die goto, en een eigenaar die op vier
+   schermen ineens de code kreeg omdat het lid-token voor de app-pagina's leeg
+   bleek, terwijl geen enkele app-code het had weggehaald (diagnose op de
+   proeftak, runs 38408533703 en 38414043696). /api/health is een JSON-antwoord
+   en geen gewoon document van deze origin; WebKit gaat daar niet betrouwbaar
+   mee om, ook niet met de opslag die je er schrijft.
+
+   Nu: per fase een eigen context (een toestel), en een init-script dat bij het
+   EERSTE document van elk tabblad de opslag zet en de kantoorsleutel van een
+   vorig scherm weghaalt. Een merk in sessionStorage (per tabblad) zorgt dat een
+   herlaadbeurt van het scherm zelf -- websitestudio.html na het openen -- de
+   zojuist gezette kantoorsleutel niet weer weghaalt. Zo deed reisschermen.e2e.js
+   het al (#630). */
 async function alsLid(o, base, token) {
-  const page = await vers(o);
-  /* Alleen een same-origin document is nodig om localStorage te zetten. Het
-     volledige beginscherm start zelf navigatie en maakte de eerstvolgende goto
-     onder zware CI-belasting soms ongedaan; /api/health heeft geen appcode. */
-  await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
-  await page.evaluate((t) => {
+  if (o.page) { await o.page.close(); o.page = null; }
+  if (o.ctx) await o.ctx.close();
+  o.ctx = await o.browser.newContext({ serviceWorkers: 'block' });
+  await o.ctx.addInitScript((t) => {
+    if (sessionStorage.getItem('rtg_toets_opslag')) return;
+    sessionStorage.setItem('rtg_toets_opslag', '1');
     localStorage.setItem('rtg_cookieinfo_v1', '1');
     localStorage.removeItem('rtg_office_token');
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
-  }, token);
+  }, token || null);
 }
 
 async function registreer(base, lijf) {

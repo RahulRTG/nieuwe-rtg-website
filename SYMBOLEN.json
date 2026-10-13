@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-13",
-  "commit": "6f9f1a3ca",
-  "seconden": 14.4,
+  "commit": "00b5abf30",
+  "seconden": 15.2,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -19134,25 +19134,25 @@
     {
      "naam": "loadSqlite",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 67,
      "geexporteerd": true
     },
     {
      "naam": "statements",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 84,
      "geexporteerd": false
     },
     {
      "naam": "startSqliteSync",
      "soort": "functie",
-     "lijn": 95,
+     "lijn": 109,
      "geexporteerd": true
     },
     {
      "naam": "afrondSqlite",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 121,
      "geexporteerd": true
     }
    ],

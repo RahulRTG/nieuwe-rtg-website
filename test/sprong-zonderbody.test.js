@@ -9,6 +9,9 @@
    van run 38331448632, test/rahulscherm.e2e.js). Chromium parst door en kwam
    er nooit.
 
+   De bron is public/shared/sprong/sprong-03.js; scripts/bundel.js voegt
+   de drie delen samen tot de geladen public/shared/sprong.js.
+
    Draai los: node --test test/sprong-zonderbody.test.js */
 'use strict';
 const test = require('node:test');

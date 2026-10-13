@@ -176,6 +176,20 @@ test('een server die omvalt of halve antwoorden geeft, levert een eerlijke lijst
   } finally { fs.rmSync(PROEFMAP, { recursive: true, force: true }); }
 });
 
+test('een aansluiting die faalt: `gemist` noemt de status en de melding van die stap', async () => {
+  const antwoorden = Object.assign({}, RIJK, {
+    '/api/office/instelling/aansluiten': (l) => (l.genre === 'luchthaven'
+      ? { __status: 403, data: { error: 'genre luchthaven staat dicht' } }
+      : { code: 'C-' + l.genre, pin: '0000' })
+  });
+  const { gemist } = await W.zetWereldKlaar({ post: nep(antwoorden),
+    tokens: { member: 'lid', office: 'kantoor', boardroom: 'baas' } });
+  const l = gemist.find(g => g.wat === 'een luchthaven');
+  assert.ok(l, JSON.stringify(gemist));
+  assert.equal(l.status, 403, 'niet "nooit aangeroepen": de aansluiting werd wel aangeroepen en faalde');
+  assert.equal(l.melding, 'genre luchthaven staat dicht');
+});
+
 test('zonder werkruimte, zonder boardroom en zonder postbus blijft de wereld klein', async () => {
   const { wereld: w, perVoorvoegsel } = await W.zetWereldKlaar({
     post: nep({ '/api/bedrijf/werkruimte/maak': { werkruimte: 'WR2' }, '/api/login': {} }),

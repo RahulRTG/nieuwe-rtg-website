@@ -74,7 +74,9 @@ async function actoren(P) {
 async function bestelling(P, wie) {
   const parts = await P('/api/bezorg/partners', {}, wie.M);
   const zaak = ((parts.data && parts.data.partners) || []).find((p) => p.code === wie.code);
-  if (!zaak) return { zaak: null };
+  /* Zonder de zaak in de lijst is er niets te bestellen: zelfde regel als
+     hieronder, de proef stopt met de reden (en niet met een TypeError). */
+  if (!zaak) throw new Error('de zaak ' + wie.code + ' staat niet in de bezorglijst (' + parts.status + ')');
   const b = await P('/api/bezorg/bestel', { supplierCode: wie.code, levering: 'bezorgen',
     adres: 'Keizersgracht 1', lat: 52.37, lng: 4.89, items: [{ id: zaak.producten[0].id, qty: 2 }] }, wie.M);
   const ref = b.data && b.data.order && b.data.order.ref;

@@ -312,13 +312,8 @@
     d.body.appendChild(greep);
   }
 
-  /* GEEN BODY, GEEN GREEP. Een omleidingspagina (zoals /apps/logboek.html)
-     roept location.replace() in de kop aan. WebKit stopt dan met parsen, en
-     deze deferred laag loopt alsnog -- op een document dat nooit een body
-     kreeg. Daar valt niets te springen: de pagina is al op weg naar elders.
-     (test/sprong-zonderbody.test.js; run 38331448632 zag het in WebKit.) */
   function start() {
-    if (!d.body || !lid() || verboden()) return;
+    if (!lid() || verboden()) return;
     stijl(); greepje();
     if (w.requestIdleCallback) w.requestIdleCallback(vooraf, { timeout: 1500 }); else setTimeout(vooraf, 300);
     d.addEventListener('keydown', function (e) {

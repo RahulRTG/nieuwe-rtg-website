@@ -74,6 +74,18 @@ jobs:
       - run: npx playwright install --with-deps webkit
       - run: node scripts/browserinstall.js
       - name: Belasting (alleen op deze proeftak, nooit naar main)
-        run: for i in $(seq 1 20); do echo "=== RONDE $i"; RTG_TEST_MOTOR=webkit node --test test/reisschermen.e2e.js > uit-r.txt 2>&1; echo "reisschermen exit $?"; grep -E "^ℹ (pass|fail)|internal error|Error:|evaluating|navigating to|paginafouten" uit-r.txt | head -12; RTG_TEST_WEBKIT=1 node --test test/mobile-content.e2e.js > uit-m.txt 2>&1; echo "mobile-content exit $?"; grep -E "^ℹ (pass|fail)|internal error|Error:|reload|navigating to" uit-m.txt | head -12; done
+        run: |
+          set +e
+          zr=0; zm=0
+          for i in $(seq 1 20); do
+            echo "=== RONDE $i"
+            RTG_TEST_MOTOR=webkit node --test --test-reporter=spec test/reisschermen.e2e.js > uit-r.txt 2>&1; er=$?
+            RTG_TEST_WEBKIT=1 node --test --test-reporter=spec test/mobile-content.e2e.js > uit-m.txt 2>&1; em=$?
+            echo "reisschermen exit $er, mobile-content exit $em"
+            [ $er -ne 0 ] && { zr=$((zr+1)); grep -E "✖|internal error|Error|evaluating|navigating to|paginafouten" uit-r.txt | head -15; }
+            [ $em -ne 0 ] && { zm=$((zm+1)); grep -E "✖|internal error|Error|reload|navigating to" uit-m.txt | head -15; }
+          done
+          echo "=== UITSLAG reisschermen $zr/20 gezakt, mobile-content $zm/20 gezakt"
+          exit 0
         env:
           RTG_EIS_INFRA: '1'

@@ -15,9 +15,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2681 |
 | losse beweringen (`test(...)`) | 18556 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2493 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2491 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 179 |
+| niet te meten (al rood, geen module gevonden, ...) | 181 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 8 |
 
@@ -714,8 +714,8 @@ toets omvalt.
 | `genredekking.test.js` | 4 | gezakt op `===->!==#0` | EEN GENRE MAG ALLEEN OPEN STAAN ALS ZIJN GEREEDSCHAP ER IS. WAAROM DIT BESTAAT Het register kende ooit 31 aanvraagbare genres. |
 | `genreplan.test.js` | 7 | gezakt op `liegpoort /api/` | Genrepols 2: het draaiboek van vandaag en de week vooruit voor de acht dunnere genres. Bewaakt dat /api/supplier/puls/plan een geprioriteerd, afvinkbaar draaiboek uit de eigen genre-motor haalt (met "dit eerst"-... |
 | `genrepuls.test.js` | 5 | gezakt op `liegpoort /api/` | De Genrepols: de kantoren-laag voor de acht dunnere genres (golf, fitclub, beauty, petcare, kinderopvang, weddings, marina, alpine). Bewaakt dat /api/supplier/puls de meters en signalen van vandaag uit de eigen... |
-| `genreregister.test.js` | 5 | gezakt op `&&->||#0` | HET GENRE-REGISTER: EEN PLEK, EN DAT MOET ZO BLIJVEN. WAAROM DIT BESTAAT De 73 genres stonden verspreid over tien initdata-delen en zes kernmodules, elk met een eigen `if (!db.data.supplierTypes.x) ... |
-| `genretoegang.test.js` | 5 | gezakt op `===->!==#0` | DE TOEGANGSSTAND VAN EEN GENRE: EEN WAARHEID, EN GEEN STILLE OMZETTING. WAAROM DIT BESTAAT Het register kende 73 genres. |
+| `genreregister.test.js` | 5 | geen bronmutatie mogelijk | HET GENRE-REGISTER: EEN PLEK, EN DAT MOET ZO BLIJVEN. WAAROM DIT BESTAAT De 73 genres stonden verspreid over tien initdata-delen en zes kernmodules, elk met een eigen `if (!db.data.supplierTypes.x) ... |
+| `genretoegang.test.js` | 5 | geen bronmutatie mogelijk | DE TOEGANGSSTAND VAN EEN GENRE: EEN WAARHEID, EN GEEN STILLE OMZETTING. WAAROM DIT BESTAAT Het register kende 73 genres. |
 | `genrezaken.test.js` | 8 | gezakt op `!==->===#0` | De genrezaken: een zaaksessie per bedrijfssoort. Deze toets meet GEDRAG en geen brontekst. |
 | `gerechtkennis.test.js` | 5 | gezakt op `liegpoort /api/` | Het gerechtenmenu op het keukenscherm: recept, bereidingswijze, allergenen met vervangers en een dranksuggestie per gerecht, plus de 86-melding (uitverkocht) die het bestellen per direct blokkeert. |
 | `gereedschap.test.js` | 2 | gezakt op `===->!==` | RTG Gereedschap: de rekenmotor (puur, geen eval) en de klok-kern (wekkers en timers op de server; de veegfunctie wordt hier direct aangeroepen, dus de test wacht nergens op). |

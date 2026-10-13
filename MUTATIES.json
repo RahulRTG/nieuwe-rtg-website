@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:56:44.079Z",
-    "commit": "327ba7b02",
+    "op": "2026-10-13T13:37:06.929Z",
+    "commit": "b42243063",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16549,6 +16549,14 @@
       "module": "server/opzet/stopspoeling.js",
       "operator": "&&->||#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "storeschema-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "storingen-bezorging.test.js": {

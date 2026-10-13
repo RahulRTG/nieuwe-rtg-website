@@ -482,7 +482,7 @@ beoordeling. Daarmee blijft grens 2 hierboven staan zoals hij staat.
 |---|---|---|---|
 | **1. Uitvoering** (intentie → identiteit → bevoegdheid → risico → uitvoering → bewijs → verificatie) | `kern/stuur/goedkeuring.js`, `kern/zwaarbewijs.js`, `opzet/kritiekspoor.js` (geen auditregel betekent 503), `kern/agentteken.js`, `kern/command/transactie-poorten.js`, `kern/frictie/` + `bodem.js` | 2714 muterende routes zonder motoras; `mandaat.js` heeft 0 aanroepers (par. 6); `herkomst.js` bijt niet; het intentiebewijs is niet cryptografisch (wet 8) | 2 |
 | **2. Aanval** (signaal → correlatie → hypothese → bewijs → begrenzing → onderzoek → herstel) | `server/beveiliging.js` + de noodremladder, `kern/schild.js`, `kern/wacht/`, `kern/incidentcontrole.js` (vijf standen, exact herstel, het journaal wordt verzegeld bij het omschakelen), `kern/beschermstand.js` | Correlatie over meerdere verzoeken bestaat niet. Samenvoegen gaat alleen per soort en bron binnen twee minuten, en `X-RTG-Correlation` volgt één verzoek | 3 |
-| **3. Evolutie** (incident → patroon → reproductie → voorstel → tegenproef → uitrol → meting → nieuwe uitgangspositie) | `scripts/tegenvoorbeeld.js`, `lib/divergentie.js`, `herhaalpakket.js`, `sabotage.js`, `aanval.js`, `overleving.js`, de uitrol-canary, `middleware/schorspoort.js` | Immuniteit is nog handwerk (`BEWIJSLUS.md` par. 6a); de criticus die andere invoer krijgt is een besluit en nog geen code (`AUTONOMIE.md`) | 4 |
+| **3. Evolutie** (incident → patroon → reproductie → voorstel → tegenproef → uitrol → meting → nieuwe uitgangspositie) | `scripts/tegenvoorbeeld.js`, `scripts/lib/divergentie.js`, `herhaalpakket.js`, `sabotage.js`, `aanval.js`, `overleving.js`, de uitrol-canary, `middleware/schorspoort.js` | Immuniteit is nog handwerk (`BEWIJSLUS.md` par. 6a); de criticus die andere invoer krijgt is een besluit en nog geen code (`AUTONOMIE.md`) | 4 |
 | **4. Integriteit van de verdediging** | `lib/auditwacht.js` (bij de start en elke 5 min), het Ed25519-anker buiten de database, `kern/auditboek/`, SEC-LOCK-001..004 (alle vier `raak`), de noodrem gaat alleen uit door de eigenaar met passkey | Zie par. 9: er is geen alarm voor een stille sensor, acht gecatalogiseerde gebeurtenissen hebben geen schrijver, en geen enkele uitrol meet buitensluiting | 1 |
 | *Afsluiting* | de vijf instrumenten uit 8a punt 3 | Er is geen proef die ze samen draait, en geen onafhankelijke uitvoerder | 5 |
 
@@ -615,7 +615,7 @@ aangeraakt, omdat er geen code verandert.**
 - De kop van `server/beveiliging.js` zegt dat de noodrem bij een brede aanval
   "de onderhoudsstand" laat springen. `beveiliging-noodrem.js` en `SECURITY.md`
   zeggen dat die zekering **nooit** automatisch springt, en die twee kloppen.
-- `opzet/schildwacht.js` verwijst naar `kern/veilig/wacht.js`. De Wacht woont
+- `opzet/schildwacht.js` zoekt De Wacht in een map veilig onder kern, die niet bestaat. De Wacht woont
   in `kern/wacht/`.
 
 **De volgorde van de PR's in fase 1.** Steeds één per PR, en de kleinste eerst:

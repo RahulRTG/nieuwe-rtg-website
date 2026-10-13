@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:56:44.079Z",
-    "commit": "327ba7b02",
+    "op": "2026-10-13T07:20:59.505Z",
+    "commit": "36d259b7a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16033,6 +16033,10 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "sport-stand-onvolledig.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "sport-voorzijde.test.js": {
       "soort": "puur",

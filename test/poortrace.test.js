@@ -34,14 +34,44 @@ const path = require('path');
 // laat daar de hele testrun falen
 const FATAAL = /"bron":"(uncaughtException|unhandledRejection)"|"serverfout":true/;
 
-test('een bezette poort: de server stopt met een foutcode en noemt het een startfout', async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-poort-'));
-  // 1) zelf de poort bezetten en vasthouden
+/* De poort zelf bezetten en vasthouden; los() geeft hem weer vrij. */
+async function bezetPoort() {
   const bezetter = net.createServer();
   const poort = await new Promise((res, rej) => {
     bezetter.on('error', rej);
     bezetter.listen(0, '127.0.0.1', () => res(bezetter.address().port));
   });
+  return { poort, los: () => new Promise(res => bezetter.close(res)) };
+}
+
+/* HET OPRUIMEN MAG NIET WACHTEN OP EEN ANDERE TOETS. In de CI hing deze toets
+   eens tien minuten (#631, scherf 4: 'test timed out after 600000ms'), terwijl
+   hij zelf hooguit twintig seconden op de server wacht. Wat er dan nog
+   onbegrensd wacht is close() van de bezetter, en die wacht op elke open
+   verbinding. vrijePoort() in test/helper.js geeft een poort vrij voordat de
+   kindserver hem bindt; in dat venster kan de bezetter hier precies die poort
+   krijgen, en dan verbindt de gezondheidsvraag van een parallelle toets met een
+   socket die nooit antwoordt en nooit sluit. Deze toets zet zo'n verbinding open
+   en eist dat los() toch binnen twee seconden klaar is. */
+test('de bezetter laat los, ook als een andere toets er nog mee verbonden is', async () => {
+  const b = await bezetPoort();
+  const klant = net.connect(b.poort, '127.0.0.1');
+  klant.on('error', () => {});
+  await new Promise(res => klant.on('connect', res));
+  try {
+    const uit = await Promise.race([
+      b.los().then(() => 'los'),
+      new Promise(res => setTimeout(() => res('hangt'), 2000))
+    ]);
+    assert.equal(uit, 'los', 'los() wacht op een verbinding van iemand anders; zo hing deze toets tien minuten');
+  } finally { klant.destroy(); }
+});
+
+test('een bezette poort: de server stopt met een foutcode en noemt het een startfout', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-poort-'));
+  // 1) zelf de poort bezetten en vasthouden
+  const bezet = await bezetPoort();
+  const poort = bezet.poort;
 
   try {
     // 2) de echte server erbovenop starten
@@ -78,7 +108,7 @@ test('een bezette poort: de server stopt met een foutcode en noemt het een start
     assert.deepEqual(valsAlarm, [],
       'een poortbotsing is een startfout en mag niet als uncaughtException in het log komen');
   } finally {
-    await new Promise(res => bezetter.close(res));
+    await bezet.los();
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

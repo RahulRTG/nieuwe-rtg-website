@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T13:18:24.510Z",
-    "commit": "c7822c4c3",
+    "op": "2026-10-13T13:37:06.929Z",
+    "commit": "b42243063",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16553,7 +16553,11 @@
     },
     "storeschema-wedloop.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "storingen-bezorging.test.js": {
       "soort": "puur",

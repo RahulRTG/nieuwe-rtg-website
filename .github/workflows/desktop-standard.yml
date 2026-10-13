@@ -85,7 +85,7 @@ jobs:
           for i in $(seq 1 15); do
             node --test --test-reporter=spec test/${{ matrix.bestand }}-${{ matrix.arm }}.e2e.js > uit.txt 2>&1; e=$?
             echo "ronde $i exit $e"
-            [ $e -ne 0 ] && { z=$((z+1)); grep -E -A6 "^\s+(AssertionError|Error|page\.|TimeoutError)|internal error|niet gemeten|niet open|vraagt" uit.txt | head -20; echo "--- DIAG (laatste 120)"; grep DIAG uit.txt | tail -120; }
+            [ $e -ne 0 ] && { z=$((z+1)); grep -E -A6 "^\s+(AssertionError|Error|page\.|TimeoutError)|internal error|niet gemeten|niet open|vraagt" uit.txt | head -20; echo "--- LIDWEG"; grep "DIAG LIDWEG" uit.txt | head -20; echo "--- DIAG (laatste 60)"; grep DIAG uit.txt | grep -v LIDWEG | tail -60; }
           done
           echo "=== UITSLAG ${{ matrix.bestand }} ${{ matrix.arm }}: $z/15 gezakt"
           exit 0

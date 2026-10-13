@@ -76,8 +76,7 @@ async function opstelling() {
   const browser = await startBrowser(pw);
   /* De service worker uit: anders haalt hij schermen vooruit op en meet deze
      toets een pagina uit de cache in plaats van een verse. */
-  const ctx = await browser.newContext({ serviceWorkers: 'block' });
-  const page = await ctx.newPage();
+  const o = { browser, ctx: null, page: null };
   /* DE VERZOEKENTELLER, EN DIE ONTBRAK HIER -- dat is de hele oorzaak van een
      valse aanklacht die op een drukke CI-runner echt is gevallen.
 
@@ -101,9 +100,23 @@ async function opstelling() {
      vertraagd meldde deze toets alle negen kantoorschermen als lek, met
      letterlijk de tekst die de CI-runner liet zien. Met deze regel wacht hij
      het verzoek af en meldt hij niets. */
-  await volgVerzoeken(page);
-  return { browser, page };
+  return o;
 }
+
+/* EEN VERSE PAGINA, EN DE VORIGE DICHT. Elk bezoek begon met een goto op
+   dezelfde pagina, en verliet daarmee het vorige kantoorscherm terwijl dat nog
+   verzoeken had lopen. WebKit breekt die af, en de eerstvolgende goto stierf
+   daar soms aan met "internal error" (5 van de 9 rode WebKit-runs). Een pagina
+   die dichtgaat draait geen script meer. De opslag (localStorage) hoort bij de
+   context en gaat dus mee naar de nieuwe pagina; de verzoekenteller wordt per
+   pagina opnieuw aangehangen. */
+async function vers(o) {
+  if (o.page) await o.page.close();
+  o.page = await o.ctx.newPage();
+  await volgVerzoeken(o.page);
+  return o.page;
+}
+
 
 /* Eén scherm bezoeken met een schone kantoorsleutel, en teruggeven wat er staat.
 
@@ -128,17 +141,21 @@ async function opstelling() {
    Vandaar `geland`. De aanroeper hoort daarop te splitsen; hij mag hier niet
    stilzwijgend doorlezen. De navigatiefout zelf gaat mee terug in `waarom`,
    zodat de melding zegt wat er misging in plaats van wie het gedaan zou hebben. */
-async function bezoek(page, base, app) {
+/* De wacht hieronder herkent de tussenstand aan zijn zin. Verandert die zin in
+   shared/kantoorgesprek.js, dan wacht bezoek() stil niet meer; deze regel laat
+   dat hardop zakken in plaats van ongemerkt. */
+test('de tussenstand van de kantoordeur heet nog zoals bezoek() hem herkent', () => {
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'kantoorgesprek.js'), 'utf8'),
+    /Een moment, ik kijk/, 'de zin van de tussenstand is veranderd; pas de wacht in bezoek() mee aan');
+});
+
+async function bezoek(o, base, app) {
   const doel = '/apps/' + app + '.html';
-  /* EERST NAAR EEN STIL DOCUMENT, dan de sleutel weghalen. Het vorige scherm kan
-     nog aan het navigeren zijn (een location.replace of een meta-refresh), en
-     een evaluate op een document dat net vertrekt zakt met "Execution context
-     was destroyed" -- gezien onder belasting, vijftien schermtoetsen tegelijk.
-     Dat is een mislukte meting en geen uitspraak over het scherm; /api/health
-     heeft geen appcode en vertrekt dus nooit uit zichzelf, precies zoals alsLid
-     hem gebruikt. */
-  await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
+  /* Een verse pagina in de context van deze fase. De kantoorsleutel van het
+     vorige scherm haalt het init-script van alsLid() weg, bij het eerste
+     document van het tabblad -- niet meer een evaluate op /api/health (zie
+     alsLid() voor waarom die omweg eruit is). */
+  let page = await vers(o);
   let waarom = null, r = null, rustFout = null;
   /* TWEE POGINGEN, en de tweede is geen wegkijken. Een navigatie die afbreekt is
      hier geen uitspraak over het scherm maar over de sprong ernaartoe -- op een
@@ -149,6 +166,9 @@ async function bezoek(page, base, app) {
      is er iets anders aan de hand dan drukte, en dan hoort een mens te kijken. */
   for (let poging = 1; poging <= 2; poging += 1) {
     waarom = null; rustFout = null;
+    /* De tweede poging begint ook op een verse pagina (en dus met de sleutel
+       weer weggehaald): anders verlaat hij het scherm van de eerste poging. */
+    if (poging > 1) page = await vers(o);
     try { await page.goto(base + doel, { waitUntil: 'domcontentloaded' }); }
     catch (e) { waarom = String((e && e.message) || e).split('\n')[0].slice(0, 120); }
     /* EN DE TIME-OUT VAN DE WACHT GAAT MEE TERUG, want hij werd hier ingeslikt.
@@ -171,6 +191,31 @@ async function bezoek(page, base, app) {
     await wachtOpRust(page).catch((e) => {
       rustFout = String((e && e.message) || e).split('\n')[0].slice(0, 160);
     });
+    /* EN DE DEUR KAN DAN NOG NIET KLAAR ZIJN, op een manier die de rust niet ziet.
+       Voor wie de kantoorsleutel draagt doet shared/kantoorgesprek.js: rollen
+       (fetch) -> /shared/kantoordeur.js laden (een SCRIPT, geen fetch, dus
+       buiten de verzoekenteller) -> binnen (fetch) -> klaar. Tijdens dat laden
+       staat er een doodstille tussenstand, "Een moment, ik kijk...", en de rust
+       was tevreden. Daarna herlaadt een scherm zichzelf na het openen
+       (websitestudio.html: location.reload()). De toets las dan de tussenstand
+       of een document dat net vertrok, en de volgende goto trof in WebKit een
+       pagina midden in een herlaadbeurt ("internal error", 5 van de 9 rode
+       WebKit-runs). Gezien in de diagnose van run 38397076253: de enige gezakte
+       ronde viel precies op die herlaadbeurt van websitestudio, 0,64 s na de
+       eerste lading.
+
+       Daarom: wachten tot de tussenstand weg is, en daarna nog eens op rust --
+       die laatste overleeft een nieuw document (het merk in wachtOpRust). Lukt
+       het niet, dan is het een mislukte meting en geen bevinding. */
+    if (!rustFout) {
+      await page.waitForFunction(() => {
+        const z = document.querySelector('.kg .kg-zegt');
+        return !z || !/Een moment, ik kijk/.test(z.textContent || '');
+      }, null, { timeout: 15000 })
+        .then(() => page.waitForLoadState('domcontentloaded'))
+        .then(() => wachtOpRust(page))
+        .catch((e) => { rustFout = 'de deur kwam niet tot een eindstand: ' + String((e && e.message) || e).split('\n')[0].slice(0, 120); });
+    }
     r = await page.evaluate(() => {
       const zegt = document.querySelector('.kg .kg-zegt');
       return {
@@ -205,17 +250,34 @@ function nietGemeten(r) {
     '. Dit zegt niets over dat scherm; het zegt dat deze meting niet is gelukt.';
 }
 
-// De sleutel van dit toestel zetten (of weghalen met null).
-async function alsLid(page, base, token) {
-  /* Alleen een same-origin document is nodig om localStorage te zetten. Het
-     volledige beginscherm start zelf navigatie en maakte de eerstvolgende goto
-     onder zware CI-belasting soms ongedaan; /api/health heeft geen appcode. */
-  await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
-  await page.evaluate((t) => {
+/* DE SLEUTEL VAN DIT TOESTEL ZETTEN (of weghalen met null), en wel in een VERSE
+   CONTEXT met een init-script, niet meer via een evaluate op /api/health.
+
+   Die omweg was de gemene deler van elke rode kantoordeur in WebKit: "internal
+   error" en een time-out van 30 s op juist die goto, en een eigenaar die op vier
+   schermen ineens de code kreeg omdat het lid-token voor de app-pagina's leeg
+   bleek, terwijl geen enkele app-code het had weggehaald (diagnose op de
+   proeftak, runs 38408533703 en 38414043696). /api/health is een JSON-antwoord
+   en geen gewoon document van deze origin; WebKit gaat daar niet betrouwbaar
+   mee om, ook niet met de opslag die je er schrijft.
+
+   Nu: per fase een eigen context (een toestel), en een init-script dat bij het
+   EERSTE document van elk tabblad de opslag zet en de kantoorsleutel van een
+   vorig scherm weghaalt. Een merk in sessionStorage (per tabblad) zorgt dat een
+   herlaadbeurt van het scherm zelf -- websitestudio.html na het openen -- de
+   zojuist gezette kantoorsleutel niet weer weghaalt. Zo deed reisschermen.e2e.js
+   het al (#630). */
+async function alsLid(o, base, token) {
+  if (o.page) { await o.page.close(); o.page = null; }
+  if (o.ctx) await o.ctx.close();
+  o.ctx = await o.browser.newContext({ serviceWorkers: 'block' });
+  await o.ctx.addInitScript((t) => {
+    if (sessionStorage.getItem('rtg_toets_opslag')) return;
+    sessionStorage.setItem('rtg_toets_opslag', '1');
     localStorage.setItem('rtg_cookieinfo_v1', '1');
     localStorage.removeItem('rtg_office_token');
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
-  }, token);
+  }, token || null);
 }
 
 async function registreer(base, lijf) {
@@ -263,10 +325,10 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     browser = o.browser;
 
     // 1) met de kantoorsleutel: geen vraag, en het scherm staat er echt
-    await alsLid(o.page, base, eigenaar);
+    await alsLid(o, base, eigenaar);
     const dicht = [], mis1 = [];
     for (const s of SCHERMEN) {
-      const r = await bezoek(o.page, base, s.app);
+      const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis1.push(nietGemeten(r)); continue; }
       if (vraagtCode(r.deur)) { dicht.push(s.app + ': vraagt de kantoorcode aan de eigenaar'); continue; }
       if (!s.open.test(r.tekst)) dicht.push(s.app + ': niet open -- ' + r.tekst.slice(0, 140));
@@ -276,10 +338,10 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
 
     /* 2) zonder lid-token: de code, en niets anders. Zou een scherm hier
        opengaan, dan had de deur iets weggegeven aan wie geen sleutel heeft. */
-    await alsLid(o.page, base, null);
+    await alsLid(o, base, null);
     const lek = [], mis = [];
     for (const s of SCHERMEN) {
-      const r = await bezoek(o.page, base, s.app);
+      const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
@@ -287,10 +349,10 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     assert.deepEqual(lek, [], 'zonder sleutel hoort elk scherm de kantoorcode te vragen:\n  ' + lek.join('\n  '));
 
     // 3) een lid ZONDER kantoorsleutel: ook gewoon de code
-    await alsLid(o.page, base, lid);
+    await alsLid(o, base, lid);
     const lek2 = [], mis2 = [];
     for (const s of SCHERMEN) {
-      const r = await bezoek(o.page, base, s.app);
+      const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis2.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek2.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
@@ -319,8 +381,8 @@ test('staat er een algemene pin, dan vraagt de kantoordeur die (gemaskeerd)',
 
     const o = await opstelling();
     browser = o.browser;
-    await alsLid(o.page, base, eigenaar);
-    await bezoek(o.page, base, 'concierge');
+    await alsLid(o, base, eigenaar);
+    await bezoek(o, base, 'concierge');
     await o.page.waitForSelector('.kg-in', { timeout: 15000 });
     const vraag = await o.page.evaluate(() => ({
       tekst: document.querySelector('.kg-zegt').textContent.trim(),

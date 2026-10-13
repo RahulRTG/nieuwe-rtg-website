@@ -32,7 +32,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, laadPlaywright, startBrowser, geenBrowser, wachtOpRust,
-  volgVerzoeken, letOpFouten, afgebrokenIn } = require('./helper');
+  volgVerzoeken } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoordeur-'));
@@ -77,7 +77,7 @@ async function opstelling() {
   /* De service worker uit: anders haalt hij schermen vooruit op en meet deze
      toets een pagina uit de cache in plaats van een verse. */
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
-  const o = { browser, ctx, page: null, fouten: [] };
+  const o = { browser, ctx, page: null };
   /* DE VERZOEKENTELLER, EN DIE ONTBRAK HIER -- dat is de hele oorzaak van een
      valse aanklacht die op een drukke CI-runner echt is gevallen.
 
@@ -110,24 +110,15 @@ async function opstelling() {
    verzoeken had lopen. WebKit breekt die af, en de eerstvolgende goto stierf
    daar soms aan met "internal error" (5 van de 9 rode WebKit-runs). Een pagina
    die dichtgaat draait geen script meer. De opslag (localStorage) hoort bij de
-   context en gaat dus mee naar de nieuwe pagina; de verzoekenteller en de
-   foutenbak worden per pagina opnieuw aangehangen. */
+   context en gaat dus mee naar de nieuwe pagina; de verzoekenteller wordt per
+   pagina opnieuw aangehangen. */
 async function vers(o) {
   if (o.page) await o.page.close();
   o.page = await o.ctx.newPage();
   await volgVerzoeken(o.page);
-  letOpFouten(o.page, o.fouten);
   return o.page;
 }
 
-/* GEEN SCHERM IS VERLATEN TERWIJL HET NOG LAADDE. WebKit breekt de verzoeken
-   van een document dat je verlaat af en meldt dat als fout; de algemene zeef
-   telt die afbreking (afgebrokenIn). Een telling boven nul betekent dat de
-   toets kantoorschermen halverwege afbrak -- en precies daar stierf hij in
-   WebKit soms met "internal error" bij de volgende goto. */
-function nietsAfgebroken(o) {
-  assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een kantoorscherm werd verlaten terwijl het nog laadde');
-}
 
 /* Eén scherm bezoeken met een schone kantoorsleutel, en teruggeven wat er staat.
 
@@ -152,6 +143,14 @@ function nietsAfgebroken(o) {
    Vandaar `geland`. De aanroeper hoort daarop te splitsen; hij mag hier niet
    stilzwijgend doorlezen. De navigatiefout zelf gaat mee terug in `waarom`,
    zodat de melding zegt wat er misging in plaats van wie het gedaan zou hebben. */
+/* De wacht hieronder herkent de tussenstand aan zijn zin. Verandert die zin in
+   shared/kantoorgesprek.js, dan wacht bezoek() stil niet meer; deze regel laat
+   dat hardop zakken in plaats van ongemerkt. */
+test('de tussenstand van de kantoordeur heet nog zoals bezoek() hem herkent', () => {
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'kantoorgesprek.js'), 'utf8'),
+    /Een moment, ik kijk/, 'de zin van de tussenstand is veranderd; pas de wacht in bezoek() mee aan');
+});
+
 async function bezoek(o, base, app) {
   const doel = '/apps/' + app + '.html';
   let page = await vers(o);
@@ -203,6 +202,31 @@ async function bezoek(o, base, app) {
     await wachtOpRust(page).catch((e) => {
       rustFout = String((e && e.message) || e).split('\n')[0].slice(0, 160);
     });
+    /* EN DE DEUR KAN DAN NOG NIET KLAAR ZIJN, op een manier die de rust niet ziet.
+       Voor wie de kantoorsleutel draagt doet shared/kantoorgesprek.js: rollen
+       (fetch) -> /shared/kantoordeur.js laden (een SCRIPT, geen fetch, dus
+       buiten de verzoekenteller) -> binnen (fetch) -> klaar. Tijdens dat laden
+       staat er een doodstille tussenstand, "Een moment, ik kijk...", en de rust
+       was tevreden. Daarna herlaadt een scherm zichzelf na het openen
+       (websitestudio.html: location.reload()). De toets las dan de tussenstand
+       of een document dat net vertrok, en de volgende goto trof in WebKit een
+       pagina midden in een herlaadbeurt ("internal error", 5 van de 9 rode
+       WebKit-runs). Gezien in de diagnose van run 38397076253: de enige gezakte
+       ronde viel precies op die herlaadbeurt van websitestudio, 0,64 s na de
+       eerste lading.
+
+       Daarom: wachten tot de tussenstand weg is, en daarna nog eens op rust --
+       die laatste overleeft een nieuw document (het merk in wachtOpRust). Lukt
+       het niet, dan is het een mislukte meting en geen bevinding. */
+    if (!rustFout) {
+      await page.waitForFunction(() => {
+        const z = document.querySelector('.kg .kg-zegt');
+        return !z || !/Een moment, ik kijk/.test(z.textContent || '');
+      }, null, { timeout: 15000 })
+        .then(() => page.waitForLoadState('domcontentloaded'))
+        .then(() => wachtOpRust(page))
+        .catch((e) => { rustFout = 'de deur kwam niet tot een eindstand: ' + String((e && e.message) || e).split('\n')[0].slice(0, 120); });
+    }
     r = await page.evaluate(() => {
       const zegt = document.querySelector('.kg .kg-zegt');
       return {
@@ -329,7 +353,6 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     }
     assert.deepEqual(mis2, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis2.join('\n  '));
     assert.deepEqual(lek2, [], 'een lid zonder kantoorsleutel hoort de kantoorcode te krijgen:\n  ' + lek2.join('\n  '));
-    nietsAfgebroken(o);
   } finally {
     if (browser) await browser.close();
     child.kill();

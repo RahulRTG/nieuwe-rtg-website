@@ -618,17 +618,93 @@ aangeraakt, omdat er geen code verandert.**
 - `opzet/schildwacht.js` zoekt De Wacht in een map veilig onder kern, die niet bestaat. De Wacht woont
   in `kern/wacht/`.
 
-**De volgorde van de PR's in fase 1.** Steeds één per PR, en de kleinste eerst:
-1. de drie registreerbare wetten (punt 4);
-2. stille sensoren (punt 1);
-3. het auditboek (punt 2);
-4. regel-id's en de telling per regel (punt 3).
+### 9a. De volgorde en het alarmkanaal (tweede eigenaarsbesluit, 13 oktober 2026)
+
+Fase 1 wordt geen verzameling reparaties. Het doel is **de eerste aantoonbaar
+gesloten beveiligingslus** van RTG. De inventaris bevestigt waarom dat nodig is:
+RTG heeft beveiligingsmechanismen, maar kan nog niet betrouwbaar vaststellen of
+de eigen bewaking volledig werkt.
+
+| Stap | Werk | Acceptatievoorwaarde |
+|---|---|---|
+| 0 | Deze PR reviewen en mergen | De documentatie klopt met de actuele code |
+| 1 | De drie registreerbare wetten (punt 4) | `npm run sabotage` bewijst dat elke handhaver echt tegenhoudt |
+| 2 | Stille sensoren en de bewaker zelf (punt 1) | Ook een uitgevallen bewaker wordt **van buitenaf** opgemerkt |
+| 3 | Het auditboek aansluiten (punt 2) | Alle acht gebeurtenissen hebben een schrijver met een toets |
+| 4 | Weigeringen per regel meten (punt 3) | Een uitrol ziet een onterechte blokkade, niet alleen een serverfout |
+| 5 | De integrale tegenproef | Bewaking, alarm, bewijs, begrenzing en herstel werken samen |
+
+Elke stap is een eigen PR, en de volgende begint pas na de merge van de vorige.
+
+**Een proces kan zijn eigen volledige uitval niet betrouwbaar opmerken.** Dat
+corrigeert punt 1 hierboven. Een stempel "laatst gewogen" helpt alleen zolang er
+nog iets is dat hem leest. Dus moet minstens één bewaker **buiten het
+serverproces** nagaan of de RTG-bewaking nog leeft.
+
+Het begin daarvan staat er al: `scripts/sonde.js` draait op een andere machine
+en eindigt met exitcode 1 als een reis mislukt. Maar hij kijkt niet naar de
+bewaking, en hij waarschuwt niemand zelf. Stap 2 geeft hem één reis die de
+leeftijd van de laatste alarmronde leest. Zijn uitval gaat via het kanaal
+hieronder, en niet via de app die hij bewaakt.
+
+**Drie escalatieniveaus.**
+
+| Niveau | Wat er gebeurt | Wat er al staat |
+|---|---|---|
+| 1 | Een regel in het beveiligingsjournaal en een sein op het kantoorbord | `alarm.js` → `alarm-uitgang.js` (journaal + office-SSE) |
+| 2 | Een externe melding naar een aangewezen beveiligingsverantwoordelijke | Alleen het transport: de webhook van `foutmelder.js`, op de overgang |
+| 3 | Een externe urgente melding, plus een **vooraf vastgestelde** automatische begrenzing van kritieke handelingen | De begrenzing: de standen van `kern/incidentcontrole.js` en de noodremladder |
+
+Bij niveau 3 blijft één grens staan: de begrenzing is een bestaande stand of
+trede, die vooraf is vastgelegd. **Nooit de volledige onderhoudsstand** (par. 7),
+en eerst in de schaduw (grens 7).
+
+**Een webhook is een transport en geen garantie dat iemand het alarm
+ontvangt.** Een kanaal telt pas als het volgende getoetst is:
+- de aflevering;
+- de ontvangstbevestiging door een mens;
+- herhaling als die bevestiging uitblijft;
+- escalatie naar niveau 3 als er geen reactie komt.
+
+Mail mag een aanvullend kanaal zijn, maar nooit de enige voorziening voor een
+kritiek incident.
+
+**Het alarmkanaal is een harde voorwaarde voor stap 2.** De detectie van stille
+sensoren gaat pas aan als niveau 2 aantoonbaar iemand bereikt. Een detector
+waarvan de melding nergens aankomt, is de stille sensor die hij moest vinden.
+Daarvoor zijn drie dingen nodig die geen code zijn:
+- wie de aangewezen verantwoordelijke is, en wie hem vervangt;
+- welke externe dienst niveau 2 en 3 aflevert, en met welke
+  verwerkersovereenkomst (`VERWERKERS.md`);
+- hoe lang een bevestiging mag uitblijven voordat er wordt geëscaleerd.
+
+Tot die drie er zijn, staat stap 2 **gebouwd en niet actief**. Dat is dezelfde
+vorm als de herkomstpoort.
+
+**De integrale tegenproef (stap 5) simuleert vijf storingen.**
+
+| Storing | Wat RTG moet aantonen |
+|---|---|
+| Een beveiligingssensor stopt | dat het alarm afgaat, en van buitenaf als de bewaker zelf stopt |
+| De auditregistratie faalt | dat een kritieke toestemming niet doorgaat (503) en dat een weigering een weigering blijft |
+| Een nieuwe regel blokkeert legitieme leden | dat de telling per regel het ziet voordat de regel van de schaduw naar handhaving gaat |
+| Een beheerder probeert de bewaking uit te zetten | dat dit een ceremonie vraagt (SEC-LOCK-001), in het auditboek komt en van buitenaf zichtbaar wordt |
+| Het externe alarmkanaal is onbereikbaar | dat dit zelf een alarm is op niveau 1 en bij de externe bewaker, en nooit stil groen |
+
+Per storing levert de proef vier antwoorden op:
+- wat RTG detecteert;
+- welke actie volgt;
+- waar het bewijs staat;
+- welke risico's er overblijven.
+
+De proef draait in de testwereld uit `AFBOUWPROGRAMMA.md` par. 3, met simulaties
+naast de echte rails en nooit in de productieweg. Hij wordt een ketenproef in
+de vorm van `scripts/tafelproef.js`, en niet een eigen raamwerk.
 
 **Resterende risico's, hardop.**
-- Het alarm heeft geen uitgang buiten het huis als `ERR_WEBHOOK_URL` leeg is.
-  Een stille-sensoralarm dat alleen op het kantoorbord verschijnt, ziet niemand
-  die niet kijkt. Dat is het kanaalbesluit uit `SLO.md` punt 4, en het blijft
-  een besluit.
+- Tot het alarmkanaal geregeld is, heeft een alarm geen uitgang buiten het huis
+  als `ERR_WEBHOOK_URL` leeg is. Dat is het kanaalbesluit uit `SLO.md` punt 4.
+  Hierboven is de vorm besloten; de drie invullingen staan nog open.
 - Een beheerder met databasetoegang wordt door het auditboek niet tegengehouden.
   Het anker ziet het achteraf (`AUDITBOEK.md`). Fase 1 verandert dat niet.
 - De externe pentest blijft `extern` (`AFBOUWPROGRAMMA.md` par. 7). Geen

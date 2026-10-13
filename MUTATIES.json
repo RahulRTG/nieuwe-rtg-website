@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-13T11:10:51.525Z",
-    "commit": "ff1a6ff74",
+    "op": "2026-10-13T11:23:45.088Z",
+    "commit": "31febb5dc",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v26.10.0"
   },
@@ -5642,13 +5642,19 @@
     },
     "genreregister.test.js": {
       "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "een census over de genre-definities (staat elk genre in het register, heeft elke sector genres); een leeggemaakt antwoord raakt een registervergelijking niet"
+      "staat": "gezakt",
+      "module": "server/seed/genres.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "genretoegang.test.js": {
       "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "beweert dat een gesloten genre wordt GEWEIGERD en nooit stil een ander genre wordt; een leeg antwoord is ook geen ander genre, dus de liegpoort bevestigt de bewering in plaats van hem te breken"
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/bedrijf.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "genrezaken.test.js": {
       "soort": "puur",

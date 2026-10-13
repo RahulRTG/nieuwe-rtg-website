@@ -8,7 +8,10 @@
      node scripts/kwalificatie.js --controle --fase=voor|na
         de werkboom moet byte voor byte de runtime-inhoud van dat image zijn;
      node scripts/kwalificatie.js --gepubliceerd --image=<registryverwijzing>
-        het gepubliceerde (en teruggehaalde) image heeft hetzelfde image-ID.
+        het gepubliceerde (en teruggehaalde) image heeft hetzelfde image-ID;
+     node scripts/kwalificatie.js --lokaal
+        dezelfde bouw en dezelfde voor-controle als de releaseketen, op deze
+        machine (zie lokaal() hieronder).
 
    Elke afwijking is exitcode 1. Er is geen vlag die een verschil toestaat. */
 'use strict';
@@ -20,7 +23,7 @@ const kw = require('./lib/kwalificatie');
 
 const ROOT = path.join(__dirname, '..');
 const ID = /^sha256:[a-f0-9]{64}$/;
-const VLAGGEN = new Set(['uit-image', 'controle', 'gepubliceerd', 'image', 'backup', 'fase']);
+const VLAGGEN = new Set(['uit-image', 'controle', 'gepubliceerd', 'image', 'backup', 'fase', 'lokaal']);
 
 function arg(naam) {
   const v = process.argv.find(a => a.startsWith('--' + naam + '='));
@@ -143,6 +146,122 @@ function gepubliceerd() {
   console.log('Kwalificatie: gepubliceerd image is het geteste image (' + id + ').');
 }
 
+/* ---------- DE KWALIFICATIE OP DEZE MACHINE ----------
+
+   WAAROM HIJ ALLEEN IN DE KETEN STOND. De drie standen hierboven hangen aan
+   een image dat .github/workflows/release-image.yml net heeft gebouwd, en ze
+   SCHRIJVEN in de werkboom: --uit-image vervangt public/dist en de
+   Rust-binaries door de bytes uit het image. scripts/ci-lokaal.js kan zo'n
+   stap hier niet draaien (de tags komen uit een eerdere stap), en dat is
+   terecht: in iemands eigen werkboom zou hij diens bouwsel overschrijven.
+
+   WAT --lokaal DOET. Precies de bouw en de voor-controle van de keten, maar in
+   een TIJDELIJKE werkboom op HEAD, zodat de werkboom van de ontwikkelaar
+   nergens wordt aangeraakt:
+     1. de twee `docker build`-opdrachten, GELEZEN uit release-image.yml (geen
+        kopie hier die achter kan lopen), met lokale tags in plaats van de
+        registrytags en de commit van HEAD in plaats van $GITHUB_SHA;
+     2. --uit-image en --controle --fase=voor, ook gelezen uit de werkstroom;
+     3. opruimen: de tijdelijke werkboom en de twee lokale images.
+
+   WAT HIJ NIET DOET, en dat staat er met opzet. Tussen voor en na draait de
+   keten `npm run afbouw:software` op de imagebytes; dat is een eigen
+   mechanisme met een eigen plek op de bewijsladder. Een na-controle zonder
+   die afbouw ertussen kan per constructie niet zakken, en een controle die
+   niet kan zakken is geen bewijs -- dus die draait hier niet. Publiceren
+   (--gepubliceerd) vraagt een registry en blijft van de keten.
+
+   EIS, geen terugval: een schone werkboom (het image komt uit HEAD; een
+   wijziging die niet gecommit is, zit er niet in en zou als gekwalificeerd
+   lezen) en een draaiende docker-daemon. Ontbreekt een van de twee, dan zakt
+   hij -- een overgeslagen kwalificatie telt nooit als groen. */
+const LOKAAL_WAARDEN = ['GITHUB_SHA', 'RTG_CANDIDATE_IMAGE', 'RTG_CANDIDATE_BACKUP_IMAGE'];
+
+function woorden(opdracht) {
+  const uit = [];
+  let huidig = '', aanhaling = null, heeft = false;
+  for (const c of String(opdracht)) {
+    if (aanhaling) { if (c === aanhaling) aanhaling = null; else huidig += c; continue; }
+    if (c === '"' || c === "'") { aanhaling = c; heeft = true; continue; }
+    if (/\s/.test(c)) { if (heeft || huidig) uit.push(huidig); huidig = ''; heeft = false; continue; }
+    if (/[;&|<>`\\]/.test(c)) throw new Error('Kwalificatie lokaal: de opdracht "' + opdracht + '" is geen enkelvoudige opdracht.');
+    huidig += c; heeft = true;
+  }
+  if (aanhaling) throw new Error('Kwalificatie lokaal: open aanhaling in "' + opdracht + '".');
+  if (heeft || huidig) uit.push(huidig);
+  return uit;
+}
+
+/* De stappen van de keten tot en met de voor-controle, uit de werkstroom zelf.
+   `waarden` vult de drie ketenvariabelen; elke andere $-verwijzing is een
+   waarde die hier niet bestaat, en dan is dit niet meer dezelfde handeling. */
+function lokaalPlan(root, waarden) {
+  const W = require('./lib/werkstroom');
+  const doc = W.ontleed(fs.readFileSync(path.join(root, '.github/workflows/release-image.yml'), 'utf8'));
+  const stappen = ((doc.jobs || {}).image || {}).steps || [];
+  const plan = [];
+  for (const stap of stappen) {
+    if (!stap || typeof stap.run !== 'string') continue;
+    for (const o of W.opdrachtenUit(stap.run)) {
+      const tekst = o.opdracht;
+      const isBouw = /^docker build\b/.test(tekst);
+      const isVoor = /^node scripts\/kwalificatie\.js --(?:uit-image|controle --fase=voor)\b/.test(tekst);
+      if (/^node scripts\/kwalificatie\.js --controle --fase=na\b/.test(tekst)) return plan;
+      if (!isBouw && !isVoor) continue;
+      const ingevuld = tekst.replace(/\$\{?([A-Z_]+)\}?/g, (m, naam) => {
+        if (!LOKAAL_WAARDEN.includes(naam) || !waarden[naam]) throw new Error('Kwalificatie lokaal: "' + tekst +
+          '" leunt op $' + naam + ', en die bestaat hier niet.');
+        return waarden[naam];
+      });
+      const argv = woorden(ingevuld);
+      plan.push({ stap: stap.name || '', argv });
+    }
+  }
+  throw new Error('Kwalificatie lokaal: release-image.yml heeft geen voor- en na-controle meer; het plan is niet af te leiden.');
+}
+
+function git(args, opties = {}) {
+  const r = cp.spawnSync('git', ['-C', opties.cwd || ROOT].concat(args), { encoding: 'utf8' });
+  if (r.status !== 0) throw new Error('git ' + args[0] + ' stopte met ' + r.status + ': ' + String(r.stderr || '').trim().slice(0, 300));
+  return String(r.stdout || '').trim();
+}
+
+function lokaal() {
+  if (git(['status', '--porcelain'])) throw new Error('De werkboom is niet schoon. Het image komt uit HEAD; commit eerst, anders ' +
+    'leest een niet-gecommitte wijziging als gekwalificeerd.');
+  const info = cp.spawnSync('docker', ['info', '--format', '{{.ServerVersion}}'], { encoding: 'utf8' });
+  if (info.error || info.status !== 0) throw new Error('Geen draaiende docker-daemon. Deze kwalificatie bouwt het releaseimage ' +
+    'en kan zonder niet; overslaan zou een kwalificatie als groen tellen die niet is gedaan.');
+  const commit = git(['rev-parse', 'HEAD']);
+  const merk = commit.slice(0, 12) + '-' + process.pid;
+  const waarden = { GITHUB_SHA: commit, RTG_CANDIDATE_IMAGE: 'rtg-kwalificatie-lokaal:' + merk,
+    RTG_CANDIDATE_BACKUP_IMAGE: 'rtg-kwalificatie-lokaal:backup-' + merk };
+  const plan = lokaalPlan(ROOT, waarden);
+  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'rtg-kwal-lokaal-'));
+  const boom = path.join(tmp, 'boom');
+  git(['worktree', 'add', '--detach', boom, commit]);
+  try {
+    for (const { stap, argv } of plan) {
+      console.log('\n[kwalificatie lokaal] ' + stap + '\n  ' + argv.join(' '));
+      const [cmd, ...rest] = argv[0] === 'node' ? [process.execPath].concat(argv.slice(1)) : argv;
+      const r = cp.spawnSync(cmd, rest, { cwd: boom, stdio: 'inherit' });
+      if (r.error) throw r.error;
+      if (r.status !== 0) throw new Error('"' + argv.join(' ') + '" stopte met ' + r.status + '.');
+    }
+    const rapport = path.join(tmp, 'rapport');
+    fs.mkdirSync(rapport);
+    for (const rel of [kw.REL.image, kw.REL.voor]) fs.copyFileSync(path.join(boom, rel), path.join(rapport, path.basename(rel)));
+    const voor = kw.leesJson(boom, kw.REL.voor);
+    console.log('\nKwalificatie lokaal: ' + voor.bestandAantal + ' runtimebestanden van ' + commit.slice(0, 12) +
+      ' zijn byte voor byte het image ' + voor.imageId + '.\n  Rapport: ' + rapport +
+      '\n  Niet hier: de afbouw tussen voor en na (npm run afbouw:software) en het publiceren (--gepubliceerd).');
+  } finally {
+    cp.spawnSync('git', ['-C', ROOT, 'worktree', 'remove', '--force', boom]);
+    cp.spawnSync('docker', ['image', 'rm', '-f', waarden.RTG_CANDIDATE_IMAGE, waarden.RTG_CANDIDATE_BACKUP_IMAGE]);
+    fs.rmSync(boom, { recursive: true, force: true });
+  }
+}
+
 function hoofd() {
   const onbekend = process.argv.slice(2).filter(a => a.startsWith('--'))
     .map(a => a.slice(2).split('=')[0]).filter(n => !VLAGGEN.has(n));
@@ -150,8 +269,11 @@ function hoofd() {
   if (process.argv.includes('--uit-image')) return uitImage();
   if (process.argv.includes('--controle')) return controle();
   if (process.argv.includes('--gepubliceerd')) return gepubliceerd();
-  throw new Error('Gebruik --uit-image, --controle --fase=voor|na of --gepubliceerd.');
+  if (process.argv.includes('--lokaal')) return lokaal();
+  throw new Error('Gebruik --uit-image, --controle --fase=voor|na, --gepubliceerd of --lokaal.');
 }
+
+module.exports = { lokaalPlan, woorden };
 
 if (require.main === module) {
   try { hoofd(); } catch (e) { console.error('[kwalificatie] ' + e.message); process.exitCode = 1; }

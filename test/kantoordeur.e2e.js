@@ -32,7 +32,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, laadPlaywright, startBrowser, geenBrowser, wachtOpRust,
-  volgVerzoeken } = require('./helper');
+  volgVerzoeken, letOpFouten, afgebrokenIn } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoordeur-'));
@@ -102,7 +102,18 @@ async function opstelling() {
      letterlijk de tekst die de CI-runner liet zien. Met deze regel wacht hij
      het verzoek af en meldt hij niets. */
   await volgVerzoeken(page);
-  return { browser, page };
+  const fouten = [];
+  letOpFouten(page, fouten);
+  return { browser, page, fouten };
+}
+
+/* GEEN SCHERM IS VERLATEN TERWIJL HET NOG LAADDE. WebKit breekt de verzoeken
+   van een document dat je verlaat af en meldt dat als fout; de algemene zeef
+   telt die afbreking (afgebrokenIn). Een telling boven nul betekent dat de
+   toets kantoorschermen halverwege afbrak -- en precies daar stierf hij in
+   WebKit soms met "internal error" bij de volgende goto. */
+function nietsAfgebroken(o) {
+  assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een kantoorscherm werd verlaten terwijl het nog laadde');
 }
 
 /* Eén scherm bezoeken met een schone kantoorsleutel, en teruggeven wat er staat.
@@ -296,6 +307,7 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     }
     assert.deepEqual(mis2, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis2.join('\n  '));
     assert.deepEqual(lek2, [], 'een lid zonder kantoorsleutel hoort de kantoorcode te krijgen:\n  ' + lek2.join('\n  '));
+    nietsAfgebroken(o);
   } finally {
     if (browser) await browser.close();
     child.kill();

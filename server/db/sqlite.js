@@ -42,13 +42,27 @@ function sqliteInit() {
   // deze grens in plaats van op zijn hoogste stand te blijven staan. Zonder dit
   // groeide store.db-wal tot een paar MB en werd elke start onnodig traag.
   kvdb.exec('PRAGMA journal_size_limit=' + Number(process.env.RTG_SQLITE_WAL_MAX || 8 * 1024 * 1024));
-  kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
-  const kolommen = kvdb.prepare('PRAGMA table_info(kv)').all();
-  if (!kolommen.some(k => k.name === 'deleted'))
-    kvdb.exec('ALTER TABLE kv ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0');
-  kvdb.exec('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
-  kvdb.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER)');
-  kvdb.exec("INSERT INTO meta(k,v) VALUES('ver',0) ON CONFLICT(k) DO NOTHING");
+  /* HET SCHEMA IN EEN SCHRIJFTRANSACTIE. De kolom `deleted` wordt toegevoegd
+     als PRAGMA table_info hem nog niet ziet -- kijken en dan doen. Twee servers
+     die tegelijk opkomen op een gedeelde database zagen allebei "nog niet", en
+     de tweede ALTER TABLE viel om met "duplicate column name: deleted"
+     (test/storeschema-wedloop.test.js, en zo zakte eigenaar-wedloop in CI).
+     BEGIN IMMEDIATE neemt meteen het schrijfslot; de tweede wacht (busy_timeout
+     hierboven) en ziet de kolom dan wel. Hetzelfde als server/migraties. */
+  kvdb.exec('BEGIN IMMEDIATE');
+  try {
+    kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
+    const kolommen = kvdb.prepare('PRAGMA table_info(kv)').all();
+    if (!kolommen.some(k => k.name === 'deleted'))
+      kvdb.exec('ALTER TABLE kv ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0');
+    kvdb.exec('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
+    kvdb.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER)');
+    kvdb.exec("INSERT INTO meta(k,v) VALUES('ver',0) ON CONFLICT(k) DO NOTHING");
+    kvdb.exec('COMMIT');
+  } catch (e) {
+    try { kvdb.exec('ROLLBACK'); } catch (e2) { /* de transactie was al weg */ }
+    throw e;
+  }
 }
 function loadSqlite() {
   sqliteInit();

@@ -16551,6 +16551,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "storeschema-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "storingen-bezorging.test.js": {
       "soort": "puur",
       "staat": "gezakt",

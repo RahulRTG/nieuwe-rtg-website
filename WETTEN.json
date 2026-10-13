@@ -1138,6 +1138,80 @@
       ]
     },
     {
+      "id": "beveiliging-ai-maakt-geen-menselijke-bevestiging",
+      "soort": "beveiliging",
+      "wet": "Geen AI produceert een menselijke bevestiging: een voorstel-handeling gaat alleen door met de interne goedkeuring die alleen de aparte bevestigingsroute kan meegeven, nooit met iets dat in het verzoek of de modeluitvoer staat (WEERBAARHEID.md wet 3).",
+      "bron": {
+        "bestand": "WEERBAARHEID.md",
+        "anker": "3 · Geen AI produceert een menselijke bevestiging"
+      },
+      "sabotage": {
+        "wat": "laat de stuurpoort een bevestiging uit de body van het verzoek accepteren, zodat een model zijn eigen akkoord kan meesturen",
+        "bestand": "server/kern/stuur/toets.js",
+        "zoek": "o.goedgekeurd !== INTERNE_GOEDKEURING)",
+        "zet": "o.goedgekeurd !== INTERNE_GOEDKEURING && !(body && body.bevestigd === true))",
+        "wachters": [
+          "test:test/stuur-aanval.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/stuur-aanval.test.js"
+      ],
+      "draagt": [
+        "server/kern/stuur/toets.js",
+        "server/kern/stuur/bevestiging.js"
+      ]
+    },
+    {
+      "id": "beveiliging-intrekking-wint",
+      "soort": "beveiliging",
+      "wet": "Intrekking wint van eerder verleend vertrouwen: een ingetrokken sessie wordt bij het eerstvolgende verzoek geweigerd, ook als het token zelf nog geldig is (WEERBAARHEID.md wet 7).",
+      "bron": {
+        "bestand": "WEERBAARHEID.md",
+        "anker": "7 · Intrekking wint van eerder verleend vertrouwen"
+      },
+      "sabotage": {
+        "wat": "laat de sessieopslag een ingetrokken sessie-id negeren, zodat een open sessie na intrekking blijft werken",
+        "bestand": "server/kern/sessies.js",
+        "zoek": "if (sess.sid && typeof sessieIngetrokken === 'function' && sessieIngetrokken(sess.sid)) {",
+        "zet": "if (false && sess.sid && typeof sessieIngetrokken === 'function' && sessieIngetrokken(sess.sid)) {",
+        "wachters": [
+          "test:test/kantoorintrekking.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/kantoorintrekking.test.js"
+      ],
+      "draagt": [
+        "server/kern/sessies.js",
+        "server/kern/intreksignaal.js"
+      ]
+    },
+    {
+      "id": "beveiliging-geen-kritieke-handeling-zonder-spoor",
+      "soort": "beveiliging",
+      "wet": "Een kritieke schrijfhandeling (geld, privacy, de geldrails van kantoor en zaak) gaat alleen door als haar regel eerst aantoonbaar is vastgelegd; lukt dat niet, dan 503 en geen mutatie.",
+      "bron": {
+        "bestand": "AUDITOPSLAG.md",
+        "anker": "de voorregel van het kritiekspoor staat daar duurzaam VOORDAT de handler draait; faalt die, dan 503 en geen mutatie"
+      },
+      "sabotage": {
+        "wat": "laat het kritiekspoor een mislukte vastlegging negeren, zodat de handeling toch doorgaat",
+        "bestand": "server/opzet/kritiekspoor.js",
+        "zoek": "if (uit) {",
+        "zet": "if (false) {",
+        "wachters": [
+          "test:test/kritiekspoor.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/kritiekspoor.test.js"
+      ],
+      "draagt": [
+        "server/opzet/kritiekspoor.js"
+      ]
+    },
+    {
       "id": "techniek-meter-kent-zijn-grens",
       "soort": "techniek",
       "wet": "Een meter die uitspraken doet over onbekend terrein wordt eerst geijkt tegen bekende waarheid; is er geen grondwaarheid, dan zegt hij dat expliciet en beperkt hij zijn conclusies tot wat hij heeft waargenomen.",

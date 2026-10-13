@@ -609,6 +609,24 @@ in deze ronde geen productiecode veranderd.
   die 1 van de 13 kanalen dekt, en schuift mee met wet 1.
 - **Daarna.** De wetten die stap 1 tot en met 3 opleveren, komen er ook in.
 - **Meting vóór.** 4 van de 12 wetten uit par. 3 staan in het register.
+- **Meting na stap 1 (13 oktober 2026).** 7 van de 12 staan erin, en alle
+  zeven zijn `raak`. De drie nieuwe wetten zijn:
+  - `beveiliging-ai-maakt-geen-menselijke-bevestiging` (wet 3);
+  - `beveiliging-intrekking-wint` (wet 7);
+  - `beveiliging-geen-kritieke-handeling-zonder-spoor`.
+
+  Het register telt nu 58 wetten.
+- **De eerste ronde vond een gat.** Wet 3 kwam eerst op `afgeslagen`. De
+  sabotage liet de stuurpoort een `bevestigd` uit de body accepteren, en geen
+  enkele toets werd rood, want de bestaande aanval zette die vlag náást de body.
+  `test/stuur-aanval.test.js` smokkelt hem nu ín de body, en daarna was de wet
+  `raak`.
+- **Wat `raak` niet bewijst.** De wet staat aan voor déze zet, niet voor elke
+  omweg (de grens in `SABOTAGE.json`).
+- **Wat nog openstaat.** Wet 7 is bewezen op de recordsessie
+  (`kern/sessies.js`). De staatloze lid-token
+  (`accounts/tokens.js`) en de Redis-kant (`pgaccounts-intrekking.js`) hebben
+  hun eigen toetsen, maar nog geen sabotage.
 
 **Bijvangst. Twee koppen spreken de code tegen; ze zijn in deze ronde niet
 aangeraakt, omdat er geen code verandert.**

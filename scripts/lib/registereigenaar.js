@@ -178,6 +178,8 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven ontwerpstandaard (de ene desktopindeling); scripts/desktop-audit.js meet de schermen ertegen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
+  'CONSOLIDATIE.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven besluit van de eigenaar (12 oktober 2026, het opruimen van RTG); er is geen generator die het schrijft.' },
   'AGENTS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven projectregels voor elke agent (Codex leest dit rechtstreeks, Claude Code via CLAUDE.md); de blokken komen woordelijk uit de oude CLAUDE.md en test/agentinstructies.test.js houdt vast dat er geen verdween, er is geen generator die het schrijft.' },
   'CLAUDE.md': { soort: 'BRON',

@@ -2803,3 +2803,12 @@ afgewezen-met-grens, vraagt-besluit, extern) staat als blok `toezegklassen` in
 `APPWERKT.json` (`npm run appwerkt:inventaris`), gelezen uit de markeringen in
 de documenten plus het kleine besluitbestand `TOEZEGKLASSEN.json`, waarvan elk
 citaat letterlijk in de bron moet staan.
+
+**`CONSOLIDATIE.md` is het opruimbesluit van de eigenaar** (12 oktober 2026) —
+lees het vóór elke PR. De lanceerbare kern is RTG Pass, TravelOS, WorkOS,
+betalen, Rahul en de Edge; de andere werelden blijven bestaan maar zijn dicht
+tot ze hun eigen productiepoort halen, en een vlag vervangt nooit een
+beveiligingsgrens. Eén integrator, geen nieuwe domeinen tot fase 4, CI genereert
+en controleert de registers, en vier harde voorwaarden: geen kunstmatige
+normverbetering, geen verborgen bewijsachterstand, geen automatische
+productie-uitrol, geen nieuwe technische schuld.

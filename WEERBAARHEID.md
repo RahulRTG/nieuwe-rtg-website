@@ -98,6 +98,12 @@ Ze staan niet in het register, dus `npm run sabotage` heeft ze nog nooit
 geprobeerd te breken. Een wet zonder plek in het register is een wet waarvan
 niemand meet of hij bijt.
 
+*Stand 13 oktober 2026, en de alinea hierboven blijft staan als de meting van
+toen:* de vier SEC-LOCK-wetten staan inmiddels wél in `WETTEN.json` (soort
+`beveiliging`, nu 55 wetten in totaal), en `SABOTAGE.json` van 11 oktober zegt
+voor alle vier `raak`. Van de acht wetten uit de tabel hieronder staat er nog
+geen enkele in het register. Zie par. 9.
+
 | Wet | Handhaver vandaag | Stand |
 |---|---|---|
 | 1 · Onvertrouwde informatie vergroot nooit capabilities | `kern/isolatie/herkomst.js` + `kern/stuur/lusstap.js` | **telt, bijt niet** (`RTG_HERKOMST_AFDWINGEN` ≠ 1) |
@@ -386,6 +392,323 @@ bevinding, en als ze een cachesleutel maken is het niets.
   werkte als DoS-versterker: zes gespoofte bronnen zetten het hele huis uit
   (`SECURITY.md`, de noodrem-ladder). Weerbaarheid mag geen zelf toegebrachte
   storing worden.
+
+## 8. De vier verdedigingslussen: één kader, geen nieuwe laag
+
+*Eigenaarsbesluit van 13 oktober 2026.* De bestaande beveiliging wordt niet
+alleen gerepareerd. Ze wordt **aantoonbaar weerbaar tegen autonome
+AI-aanvallen**, zonder tweede architectuur. Een aanvallende AI blijft variëren
+en opnieuw proberen. Een huis dat alleen detecteert, blokkeert en achteraf
+leert, loopt daarom altijd achter. Het antwoord is geen slimmere wachter. Het
+antwoord is dat elke bevoegdheid tijdelijk, controleerbaar en intrekbaar is, en
+dat het huis na een aanval **aantoonbaar** terugkeert naar een vertrouwde
+toestand, zonder blind te vertrouwen op de AI die het herstel uitvoerde.
+
+**Over de naam.** AEGIS is de naam van het **programma** en nooit van een
+module, tabel of route. `AEGIS` is in de code al de leverancierscode van het
+demobedrijf "Aegis Elite Security" (`server/kern/initdata/deel4-genres.js`,
+`server/kern/staffseed.js`, de leverancier- en personeelsapp en hun toetsen).
+Dezelfde regel als par. 2: een bezette naam wordt niet tweemaal gebruikt.
+
+**De grenzen van dit programma** zijn geen nieuwe grenzen. Ze staan al vast:
+
+- Er komt geen AEGIS-module, geen Sentinel en geen laag boven de bewijsmachine.
+  Wat erbij komt, sluit aan op een bestaand onderdeel (`BEWIJSLUS.md` par. 11,
+  grens 1).
+- Er komt geen nieuwe gezagsschaal en geen samengesteld risicocijfer op een
+  persoon (grens 1 hierboven, `BEWIJSLUS.md` grens 2).
+- Een model stelt voor en een deterministische regel stelt vast. Een
+  productiewijziging door generatieve AI is nooit de volgende stap
+  (`BEWIJSLUS.md` grens 3 en 4).
+- Een nieuwe handhaving loopt eerst in de schaduw (grens 7).
+- Er komt geen automatische productie-uitrol. Elke fase is een eigen PR met
+  groene CI, en de eigenaar beoordeelt en merget zelf (`CONSOLIDATIE.md`,
+  voorwaarde 3).
+
+### 8a. Drie verplichte uitgangspunten
+
+1. **De gecompromitteerde-AI-aanname.** Bij elke kritieke uitvoering gaat RTG
+   ervan uit dat Rahul, een externe AI-agent of de invoer gecompromitteerd kan
+   zijn. Een uitvoeringsbevoegdheid hangt daarom nooit alleen af van wat een
+   model verklaart. Dit is de lat van dit document (de zin bovenaan) toegepast
+   op de AI. De vorm staat al: wet 3 (`goedkeuring.js`, een `Symbol` dat niet
+   uit JSON te maken is) en SEC-LOCK-002 ("de AI kan de beveiliging niet
+   opheffen"). Wat ontbreekt, is dat het voor élke kritieke uitvoering geldt en
+   niet alleen voor de paden die de assistent kent. Dat is fase 2.
+2. **Beveiligingsdekking**, het *Security Coverage Proof*. RTG wordt niet
+   beoordeeld op het aantal beveiligingssystemen. RTG wordt beoordeeld op **de
+   schade die één gecompromitteerde identiteit, AI-agent of server nog kan
+   aanrichten**. Dat is dezelfde vraag als par. 4, nu per route in plaats van
+   per kroonjuweel. De 2714 muterende routes zonder motoras
+   (`MACHINEDEKKING.json`, `CONSOLIDATIE.md` voorwaarde 2) gaan dus níet
+   allemaal door één nieuwe pijp. Ze worden eerst ingedeeld naar werkelijk
+   effect en risico. Daarna wordt per kritieke route bewezen dat de bestaande
+   autorisatie-, bewijs- en uitvoeringsregels niet te omzeilen zijn. Die
+   dekking wordt een **as op een bestaand register** en niet een nieuwe
+   routelijst (par. 7). Het totaal blijft zichtbaar naast het kritieke deel en
+   verdwijnt nooit doordat de meetlat kleiner wordt (`CONSOLIDATIE.md`,
+   voorwaarde 2). `beveiligingsdekking` is als naam vrij: nul treffers.
+3. **De onafhankelijke herstelproef**, het *Independent Recovery Proof*. Een
+   herstel is pas geslaagd als een controle die het herstel níét uitvoerde,
+   alle vijf punten bevestigt:
+   - de oorspronkelijke aanval werkt niet meer;
+   - legitieme handelingen werken nog;
+   - de bewijsregistratie is intact;
+   - de beveiligingsregels zijn niet verzwakt;
+   - de productieversie is de goedgekeurde versie.
+
+   Elk van de vijf heeft al een instrument:
+   - het herhaalpakket en de fixtoets die eerst op de oude code moet falen
+     (`BEWIJSLUS.md` par. 6a);
+   - de ketenproeven;
+   - `lib/auditwacht.js` en het externe anker;
+   - `SABOTAGE.json` en de ratels van `OVERLEVING.json`;
+   - de ondertekende artefactketen (`scripts/artefactketen.js`).
+
+   De proef zelf is fase 5. Let op de naam: `herstelproef`
+   (`scripts/herstelproef.js`) is al bezet door de heen-en-terugproef op
+   gegevens, en `herstelbewijs` draagt al drie losse betekenissen.
+
+**Het besluit over correlatie.** Voorlopig komt er **regelgebaseerde
+ketencorrelatie zonder permanent gedragsprofiel per lid**. Dat is geen verbod op
+AI: een model mag onbekende aanvalsketens ontdekken en nieuwe regels voorstellen.
+Automatisch handhaven mogen alleen expliciet goedgekeurde, toetsbare regels. Een
+uitgebreidere gedragsanalyse vraagt eerst een eigen privacy- en juridische
+beoordeling. Daarmee blijft grens 2 hierboven staan zoals hij staat.
+
+### 8b. De lussen naast wat er al staat
+
+| Lus | Wat er staat | Het gemeten gat | Fase |
+|---|---|---|---|
+| **1. Uitvoering** (intentie → identiteit → bevoegdheid → risico → uitvoering → bewijs → verificatie) | `kern/stuur/goedkeuring.js`, `kern/zwaarbewijs.js`, `opzet/kritiekspoor.js` (geen auditregel betekent 503), `kern/agentteken.js`, `kern/command/transactie-poorten.js`, `kern/frictie/` + `bodem.js` | 2714 muterende routes zonder motoras; `mandaat.js` heeft 0 aanroepers (par. 6); `herkomst.js` bijt niet; het intentiebewijs is niet cryptografisch (wet 8) | 2 |
+| **2. Aanval** (signaal → correlatie → hypothese → bewijs → begrenzing → onderzoek → herstel) | `server/beveiliging.js` + de noodremladder, `kern/schild.js`, `kern/wacht/`, `kern/incidentcontrole.js` (vijf standen, exact herstel, het journaal wordt verzegeld bij het omschakelen), `kern/beschermstand.js` | Correlatie over meerdere verzoeken bestaat niet. Samenvoegen gaat alleen per soort en bron binnen twee minuten, en `X-RTG-Correlation` volgt één verzoek | 3 |
+| **3. Evolutie** (incident → patroon → reproductie → voorstel → tegenproef → uitrol → meting → nieuwe uitgangspositie) | `scripts/tegenvoorbeeld.js`, `scripts/lib/divergentie.js`, `herhaalpakket.js`, `sabotage.js`, `aanval.js`, `overleving.js`, de uitrol-canary, `middleware/schorspoort.js` | Immuniteit is nog handwerk (`BEWIJSLUS.md` par. 6a); de criticus die andere invoer krijgt is een besluit en nog geen code (`AUTONOMIE.md`) | 4 |
+| **4. Integriteit van de verdediging** | `lib/auditwacht.js` (bij de start en elke 5 min), het Ed25519-anker buiten de database, `kern/auditboek/`, SEC-LOCK-001..004 (alle vier `raak`), de noodrem gaat alleen uit door de eigenaar met passkey | Zie par. 9: er is geen alarm voor een stille sensor, acht gecatalogiseerde gebeurtenissen hebben geen schrijver, en geen enkele uitrol meet buitensluiting | 1 |
+| *Afsluiting* | de vijf instrumenten uit 8a punt 3 | Er is geen proef die ze samen draait, en geen onafhankelijke uitvoerder | 5 |
+
+### 8c. De volgorde
+
+| Fase | Werk | Wat RTG daarna heeft |
+|---|---|---|
+| 0 | Dit hoofdstuk | Eén kader zonder nieuwe laag |
+| 1 | Integriteit van de verdediging (par. 9) | Bewijs dat de verdediging zelf werkt |
+| 2 | Vertrouwde uitvoering: de routes zonder as indelen, het mandaat aansluiten waar nodig, het intentiebewijs ondertekenen, de herkomstpoort per wereld laten bijten | Een AI-agent vergroot zijn bevoegdheid niet via een onbewaakt uitvoeringspad |
+| 3 | Benoemde aanvalsketens (`aanvalsketen`, vrij) over meerdere verzoeken, op handelingsklasse en sessie, zonder profiel per lid | Detectie van samengestelde aanvallen zonder risicoscore op een persoon |
+| 4 | Sabotage en tegenvoorbeelden uitbreiden met autonome AI-aanvalsscenario's; een AI stelt reparaties voor, een mens tekent af | Een verdediging die aantoonbaar beter wordt na een vondst |
+| 5 | De onafhankelijke herstelproef (8a punt 3) | Een gesloten lus |
+
+De P-labels in par. 6 zijn **prioriteiten** en geen fasen. P0 "herkomst laten
+bijten" valt in fase 2, en P0 "de twaalf wetten" valt deels in fase 1 (par. 9,
+punt 4).
+
+**Elke fase levert hetzelfde op:**
+1. de huidige toestand, met gemeten bewijs;
+2. de exacte kwetsbaarheden en de betrokken bestanden;
+3. de kleinste wijziging binnen de bestaande architectuur;
+4. positieve, negatieve en vijandige toetsen;
+5. een meting vóór en na;
+6. de resterende risico's, hardop;
+7. een eigen PR met groene CI, klaar voor menselijke review.
+
+## 9. Fase 1: de inventaris (13 oktober 2026)
+
+Gemeten op `main` (`99f61f35`). Dit is de stand vóór de eerste wijziging. Er is
+in deze ronde geen productiecode veranderd.
+
+**1. Stille sensoren.**
+- **Stand.** `kern/command/alarm.js` draagt tien controles: zeven in het
+  bestand zelf en drie in `alarm-aanvullend.js`. **Geen van de tien vraagt of
+  een sensor nog leeft.** Ze lezen allemaal een uitslag. Drie stille paden zijn
+  bij naam gevonden:
+  - `kern/command/tikker.js` slikt elke fout uit `weeg()` ("nooit de lus
+    breken"), en er bestaat geen stempel "laatst gewogen". Het alarm draait
+    zelf op die tikker. **De wachter die de andere wachters bewaakt, kan dus
+    zonder spoor stoppen.** Dat is het zwaarste punt van deze fase.
+  - `opzet/schildwacht.js` geeft schildtreffers door via `beveiligVan()`. Is die
+    `null`, dan verdwijnt de melding. De aanroepen naar De Wacht staan in een
+    lege `catch`.
+  - `lib/auditwacht.js` meldt alleen via datzelfde alarm.
+- **Kleinste wijziging.**
+  - Een sensor stempelt zijn **ronde** en niet zijn vondst: een schild dat
+    niets vangt, leeft gewoon.
+  - `tikker.js` houdt de laatste geslaagde ronde en de laatste fout bij.
+  - Er komt één controle `sensor-stil` in `alarm.js` die die stempels leest.
+  - Omdat het alarm zichzelf niet kan bewaken, kijkt de bestaande buitensonde
+    ook naar de leeftijd van de laatste alarmronde, in de vorm van
+    `niets-van-buiten`.
+- **Toetsen.**
+  - Positief: alles leeft en er gaat geen alarm af.
+  - Negatief: een stilgezette tikker of een `beveiligVan` die `null` is, geeft
+    een alarm.
+  - Vijandig: een sabotagewet die de stempel weghaalt, moet rood worden.
+- **Meting vóór.** 0 van de 10 controles dekken de levendigheid van een sensor,
+  en er zijn 3 benoemde stille paden.
+
+**2. Het auditboek aansluiten.**
+- **Stand.** Van de acht security- en beheertypen buiten het boekbeheer zelf
+  wordt er **één** geschreven (`kritiek.toegestaan`, door `kritiekspoor.js`).
+  Zeven hebben geen schrijver: `kritiek.geweigerd`, `bezitsbewijs.geweigerd`,
+  `sessie.ingetrokken`, `inzage.kluis`, `beheer.rol.gewijzigd`,
+  `beheer.sleutel.gewisseld` en `beheer.config.gewijzigd`. Daarnaast heeft
+  `release.gate` geen schrijver.
+- **Aanhaakpunten die al vaststaan:**
+  - `opzet/kritiekspoor.js` voor de weigering;
+  - `opzet/diensten2.js` bij de weigering van het bezitsbewijs;
+  - `pgaccounts-intrekking.js` en `kern/sessies.js` voor de intrekking;
+  - `opzet/inzagespoor.js` voor de kluis.
+
+  De plekken voor rol, sleutel en configuratie zijn nog niet vastgesteld; dat
+  is het eerste werk van deze stap.
+- **Twee ontwerpkeuzes vooraf, en ze staan hier zodat ze niet stil worden
+  gemaakt:**
+  - Een weigering voert al niets uit. Een mislukte auditregel bij een
+    **weigering** mag daarom nooit in een toestemming omslaan, en ook niet in
+    een 503 die als storing leest. Die regel gaat naar het alarm.
+  - Het auditboek bestaat alleen in de PostgreSQL-modus. In de JSON- of
+    SQLite-modus schrijft een schrijver dus niets, en de meting moet dat zeggen
+    in plaats van het als gedekt te tellen.
+- **Toetsen.** Per type: de regel landt; een verboden vorm wordt geweigerd; en
+  een ingetrokken sessie zonder regel laat de toets zakken.
+- **Meting vóór.** 1 van de 8 (security en beheer); `release.gate` 0 van 1.
+
+**3. Buitensluiting meten.**
+- **Stand.** `kern/command/canary.js` rolt alleen terug op serverfouten (5xx).
+  `server/meting.js` heeft wel een `4xx`-emmer, maar die gooit 401, 403, 404,
+  409 en 422 op één hoop en weet niet **welke regel** weigerde.
+- **De meting zegt ook iets dat de opdracht niet zei.** Een
+  beveiligingsregel gaat vandaag niet via de canary naar buiten maar via een
+  omgevingsvlag (`RTG_HERKOMST_AFDWINGEN`). Het enige wat telt hoe vaak een
+  regel zou bijten, is `kern/stuur/schaduwtelling.js`, en die geldt alleen voor
+  de herkomstpoort.
+- **Kleinste wijziging, in twee stappen:**
+  1. Een weigering van een beveiligingspoort draagt een regel-id.
+  2. De schaduwtelling telt per regel-id, over de bestaande poorten.
+
+  Pas daarna kan een uitrol stoppen op "deze regel sluit legitieme leden
+  buiten". Eerst als meting, en alleen na een schaduwperiode als rem (grens 7).
+- **Toetsen.** Een legitiem lid op een pad dat een nieuwe regel zou weigeren,
+  verschijnt in de telling. Een regel zonder id laat de toets zakken.
+- **Meting vóór.** 0 beveiligingspoorten met een regel-id; schaduwtelling op 1
+  poort.
+
+**4. Beveiligingswetten in het register.**
+- **Stand.** `WETTEN.json` telt 55 wetten. De vier SEC-LOCK-wetten staan erin
+  en zijn alle vier `raak` (`SABOTAGE.json`, 11 oktober; over het hele register
+  51 raak, 1 blind, 3 mensenwerk). Van de acht wetten uit par. 3 staat er
+  **geen**.
+- **Wat nu kan.** Een wet met een sabotage is alleen eerlijk als zijn handhaver
+  bijt. Nu registreerbaar, want de handhaver bestaat en heeft een toets:
+  - wet 3, `goedkeuring.js` met `test/stuur-aanval.test.js`;
+  - wet 7, de intrekking, met `test/kantoorintrekking.test.js` en de
+    intrekkingstoetsen;
+  - de regel "geen kritieke toestemming zonder auditregel", met
+    `opzet/kritiekspoor.js` en `test/kritiekspoor.test.js`.
+- **Wat nog niet kan.** Wet 1, 2, 4, 5 (de kantoorkant) en 8 bijten niet.
+  Registreren met een sabotage zou een uitslag geven die niets meet. Die gaan
+  in het register in fase 2, op het moment dat ze bijten. Wet 6 heeft een vorm
+  die 1 van de 13 kanalen dekt, en schuift mee met wet 1.
+- **Daarna.** De wetten die stap 1 tot en met 3 opleveren, komen er ook in.
+- **Meting vóór.** 4 van de 12 wetten uit par. 3 staan in het register.
+
+**Bijvangst. Twee koppen spreken de code tegen; ze zijn in deze ronde niet
+aangeraakt, omdat er geen code verandert.**
+- De kop van `server/beveiliging.js` zegt dat de noodrem bij een brede aanval
+  "de onderhoudsstand" laat springen. `beveiliging-noodrem.js` en `SECURITY.md`
+  zeggen dat die zekering **nooit** automatisch springt, en die twee kloppen.
+- `opzet/schildwacht.js` zoekt De Wacht in een map veilig onder kern, die niet bestaat. De Wacht woont
+  in `kern/wacht/`.
+
+### 9a. De volgorde en het alarmkanaal (tweede eigenaarsbesluit, 13 oktober 2026)
+
+Fase 1 wordt geen verzameling reparaties. Het doel is **de eerste aantoonbaar
+gesloten beveiligingslus** van RTG. De inventaris bevestigt waarom dat nodig is:
+RTG heeft beveiligingsmechanismen, maar kan nog niet betrouwbaar vaststellen of
+de eigen bewaking volledig werkt.
+
+| Stap | Werk | Acceptatievoorwaarde |
+|---|---|---|
+| 0 | Deze PR reviewen en mergen | De documentatie klopt met de actuele code |
+| 1 | De drie registreerbare wetten (punt 4) | `npm run sabotage` bewijst dat elke handhaver echt tegenhoudt |
+| 2 | Stille sensoren en de bewaker zelf (punt 1) | Ook een uitgevallen bewaker wordt **van buitenaf** opgemerkt |
+| 3 | Het auditboek aansluiten (punt 2) | Alle acht gebeurtenissen hebben een schrijver met een toets |
+| 4 | Weigeringen per regel meten (punt 3) | Een uitrol ziet een onterechte blokkade, niet alleen een serverfout |
+| 5 | De integrale tegenproef | Bewaking, alarm, bewijs, begrenzing en herstel werken samen |
+
+Elke stap is een eigen PR, en de volgende begint pas na de merge van de vorige.
+
+**Een proces kan zijn eigen volledige uitval niet betrouwbaar opmerken.** Dat
+corrigeert punt 1 hierboven. Een stempel "laatst gewogen" helpt alleen zolang er
+nog iets is dat hem leest. Dus moet minstens één bewaker **buiten het
+serverproces** nagaan of de RTG-bewaking nog leeft.
+
+Het begin daarvan staat er al: `scripts/sonde.js` draait op een andere machine
+en eindigt met exitcode 1 als een reis mislukt. Maar hij kijkt niet naar de
+bewaking, en hij waarschuwt niemand zelf. Stap 2 geeft hem één reis die de
+leeftijd van de laatste alarmronde leest. Zijn uitval gaat via het kanaal
+hieronder, en niet via de app die hij bewaakt.
+
+**Drie escalatieniveaus.**
+
+| Niveau | Wat er gebeurt | Wat er al staat |
+|---|---|---|
+| 1 | Een regel in het beveiligingsjournaal en een sein op het kantoorbord | `alarm.js` → `alarm-uitgang.js` (journaal + office-SSE) |
+| 2 | Een externe melding naar een aangewezen beveiligingsverantwoordelijke | Alleen het transport: de webhook van `foutmelder.js`, op de overgang |
+| 3 | Een externe urgente melding, plus een **vooraf vastgestelde** automatische begrenzing van kritieke handelingen | De begrenzing: de standen van `kern/incidentcontrole.js` en de noodremladder |
+
+Bij niveau 3 blijft één grens staan: de begrenzing is een bestaande stand of
+trede, die vooraf is vastgelegd. **Nooit de volledige onderhoudsstand** (par. 7),
+en eerst in de schaduw (grens 7).
+
+**Een webhook is een transport en geen garantie dat iemand het alarm
+ontvangt.** Een kanaal telt pas als het volgende getoetst is:
+- de aflevering;
+- de ontvangstbevestiging door een mens;
+- herhaling als die bevestiging uitblijft;
+- escalatie naar niveau 3 als er geen reactie komt.
+
+Mail mag een aanvullend kanaal zijn, maar nooit de enige voorziening voor een
+kritiek incident.
+
+**Het alarmkanaal is een harde voorwaarde voor stap 2.** De detectie van stille
+sensoren gaat pas aan als niveau 2 aantoonbaar iemand bereikt. Een detector
+waarvan de melding nergens aankomt, is de stille sensor die hij moest vinden.
+Daarvoor zijn drie dingen nodig die geen code zijn:
+- wie de aangewezen verantwoordelijke is, en wie hem vervangt;
+- welke externe dienst niveau 2 en 3 aflevert, en met welke
+  verwerkersovereenkomst (`VERWERKERS.md`);
+- hoe lang een bevestiging mag uitblijven voordat er wordt geëscaleerd.
+
+Tot die drie er zijn, staat stap 2 **gebouwd en niet actief**. Dat is dezelfde
+vorm als de herkomstpoort.
+
+**De integrale tegenproef (stap 5) simuleert vijf storingen.**
+
+| Storing | Wat RTG moet aantonen |
+|---|---|
+| Een beveiligingssensor stopt | dat het alarm afgaat, en van buitenaf als de bewaker zelf stopt |
+| De auditregistratie faalt | dat een kritieke toestemming niet doorgaat (503) en dat een weigering een weigering blijft |
+| Een nieuwe regel blokkeert legitieme leden | dat de telling per regel het ziet voordat de regel van de schaduw naar handhaving gaat |
+| Een beheerder probeert de bewaking uit te zetten | dat dit een ceremonie vraagt (SEC-LOCK-001), in het auditboek komt en van buitenaf zichtbaar wordt |
+| Het externe alarmkanaal is onbereikbaar | dat dit zelf een alarm is op niveau 1 en bij de externe bewaker, en nooit stil groen |
+
+Per storing levert de proef vier antwoorden op:
+- wat RTG detecteert;
+- welke actie volgt;
+- waar het bewijs staat;
+- welke risico's er overblijven.
+
+De proef draait in de testwereld uit `AFBOUWPROGRAMMA.md` par. 3, met simulaties
+naast de echte rails en nooit in de productieweg. Hij wordt een ketenproef in
+de vorm van `scripts/tafelproef.js`, en niet een eigen raamwerk.
+
+**Resterende risico's, hardop.**
+- Tot het alarmkanaal geregeld is, heeft een alarm geen uitgang buiten het huis
+  als `ERR_WEBHOOK_URL` leeg is. Dat is het kanaalbesluit uit `SLO.md` punt 4.
+  Hierboven is de vorm besloten; de drie invullingen staan nog open.
+- Een beheerder met databasetoegang wordt door het auditboek niet tegengehouden.
+  Het anker ziet het achteraf (`AUDITBOEK.md`). Fase 1 verandert dat niet.
+- De externe pentest blijft `extern` (`AFBOUWPROGRAMMA.md` par. 7). Geen
+  interne proef vervangt hem.
 
 ---
 

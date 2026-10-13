@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T06:45:13.780Z",
-    "commit": "53530a2f9",
+    "op": "2026-10-13T06:52:15.678Z",
+    "commit": "da6ada258",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
@@ -1106,7 +1106,7 @@
       "mechanismen": [
         {
           "doel": "scripts/containerproef.js",
-          "lokaal": true,
+          "lokaal": false,
           "keten": [
             "ci.yml"
           ],
@@ -1524,8 +1524,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 22,
-    "vermeldingenAlleenKeten": 23,
+    "alleenKeten": 23,
+    "vermeldingenAlleenKeten": 24,
     "zonderTrede": 0,
     "deelsLokaal": 1
   }

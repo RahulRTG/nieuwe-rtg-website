@@ -2,13 +2,13 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-12",
-    "commit": "d494eac04"
+    "op": "2026-10-13",
+    "commit": "97bed7697"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-10-12",
-      "commit": "aaf6bc3a4",
+      "op": "2026-10-13",
+      "commit": "98874574a",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,

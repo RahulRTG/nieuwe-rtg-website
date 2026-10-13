@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stopNet, stopHard } = require('./helper');
 
 const SLEUTEL = 'a'.repeat(64);
 const u = Date.now().toString().slice(-8);
@@ -147,7 +147,11 @@ test('5. en de server leest zijn eigen versleutelde dossier gewoon terug', async
     assert.equal(h.status, 200);
     const tekst = JSON.stringify(h.body);
     assert.ok(tekst.includes(NAALD.gesprek), 'het gesprek hoort gewoon terug te komen');
-  } finally { stop(srv2.child); }
+  } finally {
+    /* Toets 6 beschrijft rtg.db direct hierna; stop() wacht niet op het einde
+       van het proces, stopHard wel. */
+    await stopHard(srv2.child);
+  }
 });
 
 test('6. een bestaand, nog PLAT dossier blijft leesbaar en migreert bij het opslaan', async () => {

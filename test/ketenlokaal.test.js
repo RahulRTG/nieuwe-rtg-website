@@ -156,3 +156,55 @@ test('de bewijsladder: kwalificatie telt als lokaal, staat als DEELS lokaal en h
   assert.equal(ladder.graadVan({ ...vol, lokaalNiet: [{ opdracht: 'x', waarom: 'y' }] }), 'gemeten');
   assert.equal(ladder.standVan([{ ...vol, lokaalNiet: [{}] }]).stand, 'stap', 'deels lokaal draagt geen `staat`');
 });
+
+/* HET PADFILTER VAN kwalificatie-lokaal.yml DEKT WAT DE ROUTE EN DE BOUW
+   BEPAALT. Een filter dat met de hand wordt bijgehouden, loopt achter; deze
+   toets rekent hem na uit de bronnen zelf. */
+function vereisten(start) {
+  const gezien = new Set();
+  const stapel = [...start];
+  while (stapel.length) {
+    const rel = stapel.pop();
+    if (gezien.has(rel)) continue;
+    gezien.add(rel);
+    const bron = fs.readFileSync(path.join(WORTEL, rel), 'utf8');
+    for (const m of bron.matchAll(/require\(\s*['"](\.{1,2}\/[^'"]+)['"]\s*\)/g)) {
+      let doel = path.posix.normalize(path.posix.join(path.posix.dirname(rel), m[1]));
+      if (!/\.(js|json)$/.test(doel)) doel = fs.existsSync(path.join(WORTEL, doel + '.js')) ? doel + '.js' : doel + '/index.js';
+      if (fs.existsSync(path.join(WORTEL, doel))) stapel.push(doel);
+    }
+  }
+  return gezien;
+}
+function filterpaden() {
+  const tekst = fs.readFileSync(path.join(WORTEL, '.github/workflows/kwalificatie-lokaal.yml'), 'utf8');
+  const blok = tekst.slice(tekst.indexOf('    paths:'), tekst.indexOf('  workflow_dispatch:'));
+  return [...blok.matchAll(/^\s+- (\S+)$/gm)].map(m => m[1]);
+}
+const gedekt = (rel, paden) => paden.some(p => p === rel ||
+  (p.endsWith('/**') && (rel === p.slice(0, -3) || rel.startsWith(p.slice(0, -2)))));
+
+test('het padfilter van kwalificatie-lokaal.yml vangt elke afhankelijkheid van de route en van de bouw', () => {
+  const paden = filterpaden();
+  const docker = fs.readFileSync(path.join(WORTEL, 'Dockerfile'), 'utf8');
+  /* De COPY-bronnen: losse bestanden en motor/src. Server, public, scripts,
+     deploy en *.json gaan als geheel byte voor byte mee en worden door de
+     voor-controle zelf vergeleken (zie de kop van de workflow). */
+  const geheel = new Set(['server', 'public', 'scripts', 'deploy', '*.json']);
+  const copy = [];
+  for (const regel of docker.split('\n')) {
+    const m = /^COPY\s+(?!--from)(.+)$/.exec(regel.trim());
+    if (!m) continue;
+    const delen = m[1].trim().split(/\s+/);
+    for (const bron of delen.slice(0, -1)) if (!geheel.has(bron)) copy.push(bron);
+  }
+  assert.ok(copy.includes('scripts/docker/backup.sh') && copy.includes('motor/src'), 'de COPY-regels zijn gelezen');
+  /* Wat de Dockerfile met `node scripts/...` of `npm run build` draait. */
+  const scripts = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8')).scripts;
+  const draait = [...docker.matchAll(/node (scripts\/[\w./-]+\.js)/g)].map(m => m[1]);
+  for (const m of docker.matchAll(/npm run ([\w:-]+)/g)) draait.push(/node (scripts\/[\w./-]+\.js)/.exec(scripts[m[1]])[1]);
+  const nodig = new Set([...copy, ...vereisten(['scripts/kwalificatie.js', ...draait]),
+    'Dockerfile', '.dockerignore', '.nvmrc', '.github/workflows/release-image.yml', '.github/workflows/kwalificatie-lokaal.yml']);
+  const mist = [...nodig].filter(rel => !gedekt(rel, paden)).sort();
+  assert.deepEqual(mist, [], 'deze afhankelijkheden laten de lokale route veranderen zonder dat de job draait');
+});

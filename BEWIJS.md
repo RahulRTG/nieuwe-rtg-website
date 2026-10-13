@@ -15,9 +15,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2682 |
 | losse beweringen (`test(...)`) | 18559 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2493 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2494 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 180 |
+| niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 8 |
 
@@ -1939,7 +1939,7 @@ toets omvalt.
 | `spelveiling.test.js` | 15 | gezakt op `===->!==#0` | MAGNAAT FASE B: VEILINGEN -- het eerste waar twee spelers om HETZELFDE vechten. Contracten waren het eerste stuk van fase B en ze deden hun werk, maar de meting was hard: ze kantelen geen duel. |
 | `spelverzekering.test.js` | 17 | gezakt op `===->!==#0` | MAGNAAT: VERZEKERINGEN -- risico als keuze in plaats van een vinkje. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |
 | `spoorvorm.test.js` | 11 | gezakt op `===->!==#0` | DE CONVERGENTIEMATRIX -- meet hij wat hij zegt te meten? Deze meter beoordeelt code op vier eigenschappen, en op de echte boom haalt precies één mechanisme ze alle vier. |
-| `sport-stand-onvolledig.test.js` | 3 | geen module gevonden | DE STAND VAN SPORT MET EEN ONVOLLEDIG ANTWOORD (public/apps/sport.html). api() maakt van een lijf dat geen JSON is een leeg object: een 502 met HTML, een verbroken verbinding, of -- in WebKit -- een verzoek dat... |
+| `sport-stand-onvolledig.test.js` | 3 | gezakt op `voorwaarde-omkeren#4` | DE STAND VAN SPORT MET EEN ONVOLLEDIG ANTWOORD (public/apps/sport.html). api() maakt van een lijf dat geen JSON is een leeg object: een 502 met HTML, een verbroken verbinding, of -- in WebKit -- een verzoek dat... |
 | `sport-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sportclub.test.js` | 10 | gezakt op `liegpoort /api/` | Het sportstadion en het clubsysteem: de club tekent zijn EIGEN plattegrond (vakken met capaciteit en prijs, horeca en wc's erop), leden reserveren tickets per vak (afrekenen aan de poort), de scan is eenmalig, de... |
 | `spraaktekst.test.js` | 10 | geen module gevonden | SPRAAK NAAR TEKST -- lokaal, of helemaal niet. Dit is de helft die ontbrak onder de meeleesbaan. |

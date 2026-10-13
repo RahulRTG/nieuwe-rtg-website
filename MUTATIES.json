@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:56:44.079Z",
-    "commit": "327ba7b02",
+    "op": "2026-10-13T06:39:27.984Z",
+    "commit": "f39c208ec",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1940,9 +1940,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/bewijsladder.js",
-      "operator": "!==->===#0",
-      "gezakt": 2,
-      "geprobeerd": 2
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "bewijsmapscherm.e2e.js": {
       "soort": "server",
@@ -7686,6 +7686,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "ketenlokaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/kwalificatie.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 3
     },
     "ketenproef.test.js": {
       "soort": "puur",

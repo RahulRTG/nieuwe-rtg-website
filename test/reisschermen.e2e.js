@@ -32,7 +32,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, startBrowser, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, letOpFouten, afgebrokenIn, laadPlaywright, startBrowser, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-'));
@@ -120,6 +120,12 @@ test('elf reizigersschermen tonen hun eigen belofte, en geen enkel echt merk',
     }
     assert.deepEqual(stuk, [], 'de elf reizigersschermen staan er:\n  ' + stuk.join('\n  '));
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
+    /* GEEN SCHERM IS VERLATEN TERWIJL HET NOG LAADDE. WebKit breekt de verzoeken
+       van een document dat je verlaat af en meldt dat als fout; de algemene zeef
+       slikt de ene vorm ('access control checks') in en telt hem, de andere
+       ('Load failed') niet. Een telling boven nul betekent dat de toets schermen
+       halverwege afbrak -- en dan zakte hij soms wel en soms niet. */
+    assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een scherm werd verlaten terwijl het nog laadde');
   } finally {
     if (browser) await browser.close();
     child.kill();
@@ -144,6 +150,7 @@ test('de vier dienstschermen zijn van het personeel, niet van de reiziger',
     }
     assert.deepEqual(stuk, [], 'de vier dienstschermen melden zich als werkscherm:\n  ' + stuk.join('\n  '));
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
+    assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een scherm werd verlaten terwijl het nog laadde');
   } finally {
     if (browser) await browser.close();
     child.kill();
@@ -223,6 +230,7 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
       'er staat geen zaalinhoud achter de poort: ' + achter.tekst.slice(0, 200));
 
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
+    assert.equal(afgebrokenIn(o.fouten), 0, 'afgebroken verzoeken: een scherm werd verlaten terwijl het nog laadde');
   } finally {
     if (browser) await browser.close();
     child.kill();

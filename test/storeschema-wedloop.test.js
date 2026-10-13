@@ -1,4 +1,3 @@
-'use strict';
 /* HET SCHEMA VAN store.db ONDER GELIJKTIJDIGE OPSTART.
 
    sqliteInit() keek met PRAGMA table_info of kv de kolom `deleted` al had, en
@@ -13,21 +12,24 @@
    tien keer. Op de oude vorm viel lokaal in 2 van de 10 rondes een proces om
    met precies die melding; de schemastap hoort in een schrijftransactie
    (BEGIN IMMEDIATE), zoals server/migraties/index.js het al doet. */
+'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('child_process');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 const MODULE = path.join(__dirname, '..', 'server', 'db', 'sqlite.js');
+/* Het kindproces krijgt de module als argument: dezelfde server/db/sqlite.js,
+   zonder dat het pad in de broncode als losse modulenaam staat. */
 const KIND = 'const t = Number(process.env.RTG_TOETS_START); while (Date.now() < t) {}\n' +
-  'try { require(' + JSON.stringify(MODULE) + ').loadSqlite(); process.exit(0); }\n' +
+  'try { require(process.argv[1]).loadSqlite(); process.exit(0); }\n' +
   'catch (e) { process.stderr.write(String(e && e.message)); process.exit(3); }';
 
 function ronde(aantal) {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-storeschema-'));
   const start = Date.now() + 1500;
   return Promise.all(Array.from({ length: aantal }, () => new Promise((klaar) => {
-    const p = spawn(process.execPath, ['-e', KIND], {
+    const p = spawn(process.execPath, ['-e', KIND, MODULE], {
       env: { ...process.env, NODE_ENV: 'test', RTG_DATA_DIR: map, RTG_TOETS_START: String(start) },
       stdio: ['ignore', 'ignore', 'pipe']
     });

@@ -1322,6 +1322,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "bearercode-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "bearercode-v2.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2186,6 +2194,14 @@
       "module": "scripts/bodemdruk.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "body-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/body.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "boeken.e2e.js": {
@@ -14486,6 +14502,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "rtgjson-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/rtgjson.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "rtgjson.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -16282,6 +16306,14 @@
       "operator": "+->-#0",
       "gezakt": 2,
       "geprobeerd": 14
+    },
+    "ssrf-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ssrf.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 10,
+      "geprobeerd": 1
     },
     "ssrf.test.js": {
       "soort": "puur",

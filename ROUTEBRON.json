@@ -4501,6 +4501,7 @@
     "server/betaal/connect",
     "server/betaal/uitbetaalgate.json",
     "server/config",
+    "server/data",
     "server/db",
     "server/db/tx",
     "server/foundation",

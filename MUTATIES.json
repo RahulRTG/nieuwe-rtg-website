@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:14:43.935Z",
-    "commit": "cd8f030b7",
+    "op": "2026-10-14T18:17:39.932Z",
+    "commit": "b2a7063be",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15051,6 +15051,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "saml-signedinfo-prefix.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/handtekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "samlacs.test.js": {
       "soort": "server",

@@ -6330,6 +6330,7 @@
       "server/kern/instant-reality.js",
       "server/kern/instelling.js",
       "server/kern/integriteitswacht.js",
+      "server/kern/intreksignaal.js",
       "server/kern/isolatie/effectregister.js",
       "server/kern/isolatie/handhaving.js",
       "server/kern/isolatie/huisceremonie.js",

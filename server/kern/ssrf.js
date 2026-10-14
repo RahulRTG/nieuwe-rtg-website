@@ -68,10 +68,8 @@ function privaatIpv4(o) {
   return false;
 }
 
-/* Het IPv4-adres achter een IPv4-mapped IPv6-adres (::ffff:a.b.c.d), in beide
-   vormen: zoals het wordt opgeschreven en zoals de URL-parser het omschrijft
-   (::ffff:a9fe:a9fe voor ::ffff:169.254.169.254). null als het geen gemapt
-   adres is of als de staart niet te lezen is. */
+/* Het IPv4-adres achter ::ffff:a.b.c.d, ook in de hexvorm die de URL-parser
+   ervan maakt (::ffff:a9fe:a9fe). null als het niet te lezen is. */
 function gemaptIpv4(h) {
   if (!h.startsWith('::ffff:')) return null;
   const staart = h.slice(7);
@@ -88,9 +86,7 @@ function onveiligIpLiteral(host) {
   const v4 = isIpv4(host);
   if (v4) return privaatIpv4(v4);
   const h = host.replace(/^\[|\]$/g, '').toLowerCase(); // [::1] -> ::1
-  /* Alles hieronder gaat over IPv6, en een hostnaam bevat nooit een dubbele
-     punt. Zonder deze grens las `fc`/`fd` hieronder ook fcbarcelona.com en
-     fdn.example als unique-local adres. */
+  // hieronder alleen IPv6; anders las `fc`/`fd` ook fcbarcelona.com als ULA
   if (!h.includes(':')) return false;
   if (h === '::1' || h === '::' || h === '::0') return true;       // loopback/onbepaald
   if (h.startsWith('fe80:')) return true;                          // link-local
@@ -136,8 +132,7 @@ function veiligeExternalUrl(url) {
   let u;
   try { u = new URL(String(url || '')); } catch (e) { return { ok: false, reden: 'geen geldige URL' }; }
   if (u.protocol !== 'https:' && u.protocol !== 'http:') return { ok: false, reden: 'alleen http(s)' };
-  /* De punt aan het eind weg: `localhost.` en `db.internal.` lossen op naar
-     hetzelfde doel als zonder punt, en de URL-parser laat hem staan. */
+  // `localhost.` is localhost: de punt aan het eind telt niet
   const host = u.hostname.toLowerCase().replace(/\.+$/, '');
   if (onveiligIpLiteral(host)) return { ok: false, reden: 'privé/gereserveerd/metadata-adres' };
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.internal') || host.endsWith('.local')) {
@@ -156,7 +151,7 @@ function metadataDoel(host) {
   const h = String(host || '').replace(/^\[|\]$/g, '').toLowerCase();
   const v4 = isIpv4(h);
   if (v4) return v4[0] === 169 && v4[1] === 254;   // 169.254.0.0/16 (IMDS + link-local)
-  const gemapt = gemaptIpv4(h);                    // ::ffff:169.254.169.254, ook als ::ffff:a9fe:a9fe
+  const gemapt = gemaptIpv4(h);                    // ook ::ffff:169.254.169.254
   if (gemapt) return gemapt[0] === 169 && gemapt[1] === 254;
   if (h.startsWith('fe80:')) return true;          // IPv6 link-local
   if (h === 'fd00:ec2::254') return true;          // AWS IPv6 IMDS

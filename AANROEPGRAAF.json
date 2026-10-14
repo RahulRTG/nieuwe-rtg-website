@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
-  "op": "2026-10-13",
-  "commit": "cfe0dd03b",
+  "op": "2026-10-14",
+  "commit": "cb30cec34",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5461,7 +5461,7 @@
  "gemeten": {
   "bestanden": 4475,
   "nietGelezen": 0,
-  "aanroepen": 181101,
+  "aanroepen": 181104,
   "kanten": 31543,
   "kantenLokaal": 20245,
   "kantenIngevoerd": 2843,
@@ -5472,7 +5472,7 @@
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135111,
+  "onopgelosteAanroepen": 135114,
   "onopgelosteNamen": 13901,
   "onopgelostNaarSoort": {
    "ingebouwd": 36278,
@@ -5480,7 +5480,7 @@
    "kader": 12430,
    "contextobject": 20795,
    "uitgepaktObject": 1679,
-   "lokaleWaarde": 24190,
+   "lokaleWaarde": 24193,
    "methodeOpWaarde": 38211,
    "overig": 467
   },
@@ -47051,7 +47051,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "sqliteInit",
    "hoe": "lokaal",
-   "lijn": 54
+   "lijn": 68
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47059,7 +47059,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "auditMotor",
    "hoe": "lokaal",
-   "lijn": 55
+   "lijn": 69
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47067,7 +47067,7 @@
    "naarBestand": "server/db/sqlite-poll.js",
    "naar": "snapshot",
    "hoe": "ingevoerd",
-   "lijn": 56
+   "lijn": 70
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47075,7 +47075,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "uitStore",
    "hoe": "lokaal",
-   "lijn": 64
+   "lijn": 78
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47083,7 +47083,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "sqliteInit",
    "hoe": "lokaal",
-   "lijn": 83
+   "lijn": 97
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47091,7 +47091,7 @@
    "naarBestand": "server/db/sqlite-poll.js",
    "naar": "externeCollecties",
    "hoe": "ingevoerd",
-   "lijn": 90
+   "lijn": 104
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47099,7 +47099,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "statements",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 104
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47107,7 +47107,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "auditMotor",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 104
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47115,7 +47115,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "sqliteInit",
    "hoe": "lokaal",
-   "lijn": 97
+   "lijn": 111
   },
   {
    "vanBestand": "server/db/starten.js",

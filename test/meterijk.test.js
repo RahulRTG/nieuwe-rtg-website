@@ -82,10 +82,19 @@ let KEURINGSSNAPSHOT = null;
    die proeven worden aangeraakt, levert geen bewijs en wel tien minuten. Hun
    EIGEN proeven meten vers, met meetVerseRatels() hieronder. */
 let LOSSERATELS = null;
-function meet() {
+function meet() { return meetMet({}); }
+/* HETZELFDE SNAPSHOT, MET EEN INGESPOTEN LEZER OF TELLING. Een proef die alleen
+   een lezer meegeeft (leesMutaties, meetTandeloos) of een JSON-register vervangt
+   dat meet() zelf leest, verandert de keuring en de losse ratels niet. Hier
+   stond tot 13 oktober 2026 in elf proeven een kale norm.meet(), en elk daarvan
+   startte de hele keuring opnieuw: vijftien proeven van ~94 s, 1411 van de 1947
+   seconden ijking (lokaal gemeten), en meterijk liep in CI met 23-29,5 minuten
+   tegen zijn grens van 30. Een proef die de BRONBOOM verandert, hoort
+   meetVolledig() te gebruiken; deze niet. */
+function meetMet(extra) {
   if (!KEURINGSSNAPSHOT) KEURINGSSNAPSHOT = norm.keuringRapport();
   if (!LOSSERATELS) LOSSERATELS = norm.losseRatels();
-  return norm.meet({ keuring: KEURINGSSNAPSHOT, losseRatels: LOSSERATELS });
+  return norm.meet({ keuring: KEURINGSSNAPSHOT, losseRatels: LOSSERATELS, ...extra });
 }
 const meetVolledig = () => norm.meet();
 function meetVerseRatels() {
@@ -715,7 +724,7 @@ const IJKINGEN = {
       const namen = fs.readdirSync(path.join(WORTEL, 'test'))
         .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
       for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
-      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      const na = meetMet({ leesMutaties: () => JSON.stringify(j) });
       return na.toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
     }
   },
@@ -728,7 +737,7 @@ const IJKINGEN = {
       const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
       if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
       delete j.toetsen[gemeten[0]];
-      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      const na = meetMet({ leesMutaties: () => JSON.stringify(j) });
       return na.toetsenNietGemeten - voor.toetsenNietGemeten;
     }
   },
@@ -741,7 +750,7 @@ const IJKINGEN = {
     proef: (voor) => {
       const echt = require('../scripts/tandeloos').meet({ stil: true });
       if (!echt.bekeken) throw new Error('tandeloos.js keek naar nul beweringen; dan wijst deze ijking niets aan');
-      const na = norm.meet({ meetTandeloos: () => ({ ...echt, meldingen: echt.meldingen + 1 }) });
+      const na = meetMet({ meetTandeloos: () => ({ ...echt, meldingen: echt.meldingen + 1 }) });
       return na.beweringenZonderVulcontrole - voor.beweringenZonderVulcontrole;
     }
   },
@@ -1647,14 +1656,14 @@ const IJKINGEN = {
   planDomeinenGemeten: {
     proef: (voor) => metVervangenJson('PLANVORM.json',
       (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
-      () => voor.planDomeinenGemeten - norm.meet().planDomeinenGemeten)
+      () => voor.planDomeinenGemeten - meet().planDomeinenGemeten)
   },
   /* DE TAND VAN 29 SEPTEMBER 2026: plaatsDomeinenGemeten, de zuster van de tand
      hierboven voor de plaatsvorm (NAVIGATIE.md par. 14.1). */
   plaatsDomeinenGemeten: {
     proef: (voor) => metVervangenJson('PLAATSVORM.json',
       (j) => { j.rondes.ruim.domeinen = (j.rondes.ruim.domeinen || []).slice(0, -3); return j; },
-      () => voor.plaatsDomeinenGemeten - norm.meet().plaatsDomeinenGemeten)
+      () => voor.plaatsDomeinenGemeten - meet().plaatsDomeinenGemeten)
   },
   /* DE TAND VAN 23 SEPTEMBER 2026: officeDomeinenGemeten, de zuster van de tand
      hierboven en om dezelfde reden: OFFICEVORM.json draagt een nul (0 velden in
@@ -1665,7 +1674,7 @@ const IJKINGEN = {
   officeDomeinenGemeten: {
     proef: (voor) => metVervangenJson('OFFICEVORM.json',
       (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
-      () => voor.officeDomeinenGemeten - norm.meet().officeDomeinenGemeten)
+      () => voor.officeDomeinenGemeten - meet().officeDomeinenGemeten)
   },
   /* DE DRIE TANDEN VAN 30 SEPTEMBER 2026, bij OVERGANGSVORM.json (VERDER.md
      par. 2). Op de uitkomst GEEN rust het besluit dat er in FoundationOS geen
@@ -1685,17 +1694,17 @@ const IJKINGEN = {
   overgangenGemeten: {
     proef: (voor) => metVervangenJson('OVERGANGSVORM.json',
       (j) => { j.overgangen = (j.overgangen || []).slice(0, -3); return j; },
-      () => voor.overgangenGemeten - norm.meet().overgangenGemeten)
+      () => voor.overgangenGemeten - meet().overgangenGemeten)
   },
   overgangCitaatRot: {
     proef: (voor) => metVervangenJson('OVERGANGSVORM.json',
       (j) => { j.citaten.rot = (j.citaten.rot || 0) + 2; j.wetten.rot = (j.wetten.rot || 0) + 1; return j; },
-      () => norm.meet().overgangCitaatRot - voor.overgangCitaatRot)
+      () => meet().overgangCitaatRot - voor.overgangCitaatRot)
   },
   overgangWoordenOnverklaard: {
     proef: (voor) => metVervangenJson('OVERGANGSVORM.json',
       (j) => { j.woorden.onverklaard = (j.woorden.onverklaard || 0) + 2; return j; },
-      () => norm.meet().overgangWoordenOnverklaard - voor.overgangWoordenOnverklaard)
+      () => meet().overgangWoordenOnverklaard - voor.overgangWoordenOnverklaard)
   },
   /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
      0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
@@ -2802,7 +2811,7 @@ test('een onbruikbaar MUTATIES.json laat de meter ZAKKEN en niet stil nul melden
     ['geen enkele meting', () => JSON.stringify({ toetsen: {} })],
     ['alleen niet-gemeten uitslagen', () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
   ]) {
-    assert.throws(() => norm.meet({ leesMutaties: lezer }), /MUTATIES\.json/,
+    assert.throws(() => meetMet({ leesMutaties: lezer }), /MUTATIES\.json/,
       'met "' + wat + '" hoort meet() te gooien in plaats van een getal te geven');
   }
 });
@@ -2811,7 +2820,7 @@ test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
   /* Zonder deze zou de toets hierboven ook groen blijven als meet() ALTIJD
      gooit, en dan bewijst hij dat een kapotte meter goed gebouwd is. */
   const echt = fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8');
-  const na = norm.meet({ leesMutaties: () => echt });
+  const na = meetMet({ leesMutaties: () => echt });
   assert.equal(typeof na.toetsenOngevoeligPct, 'number');
   assert.equal(na.toetsenNietGemeten, meet().toetsenNietGemeten,
     'dezelfde inhoud via de lezer hoort hetzelfde getal te geven als van schijf');

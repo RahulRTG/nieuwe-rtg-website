@@ -183,3 +183,18 @@ test('10. de laag van een map buiten kern/ wordt VERKLAARD en niet geraden', () 
   const res = V.analyse([r('server/school/dag.js', 'server/kern/leerstof/x.js')]);
   assert.equal(res.randen[0].omhoog, false);
 });
+
+/* EEN BOOM ZONDER RANDEN. Nul randen is een geldige meting en geen deling door
+   nul: onbekend 0 en een percentage van 0, niet NaN. Ook deze tak draaide alleen
+   nog mee via de volledige normmeting in meterijk, tot die het keuringssnapshot
+   ging delen (#631). */
+test('11. een boom zonder randen meet nul onbekend en nul procent, geen NaN', () => {
+  const fs = require('fs'), os = require('os'), path = require('path');
+  const leeg = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-verstr-'));
+  try {
+    const m = V.meet(leeg, []);
+    assert.equal(m.randen, 0);
+    assert.equal(m.onbekend, 0);
+    assert.equal(m.onbekendPct, 0);
+  } finally { fs.rmSync(leeg, { recursive: true, force: true }); }
+});

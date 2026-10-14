@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "b383fc167",
-  "seconden": 14.7,
+  "commit": "c492c588d",
+  "seconden": 11.4,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -2623,6 +2623,7 @@
     "server/kern/identiteit/sessielijst.js",
     "server/kern/identiteit/sessieregister.js",
     "server/kern/identiteit/sessievelden.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestellen.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/kern/identiteit/tweedestap-rem.js",
@@ -7234,18 +7235,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5755,
-  "gelezen": 5440,
+  "bestandenGezien": 5756,
+  "gelezen": 5441,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27515,
-  "bestandenMetUitvoer": 4539,
-  "uitvoerMetNamen": 2065,
+  "symbolen": 27518,
+  "bestandenMetUitvoer": 4540,
+  "uitvoerMetNamen": 2066,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7763
+  "requireKanten": 7764
  },
  "nietGelezen": [
   {
@@ -76767,96 +76768,133 @@
    ]
   },
   {
+   "bestand": "server/kern/identiteit/toestelgrens.js",
+   "symbolen": [
+    {
+     "naam": "vanLid",
+     "soort": "pijl",
+     "lijn": 19,
+     "geexporteerd": false
+    },
+    {
+     "naam": "ruimActief",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": true
+    },
+    {
+     "naam": "intrekkingenVol",
+     "soort": "pijl",
+     "lijn": 31,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "MAX_ACTIEF",
+     "MAX_INGETROKKEN",
+     "intrekkingenVol",
+     "ruimActief"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/identiteit/toestellen.js"
+   ]
+  },
+  {
    "bestand": "server/kern/identiteit/toestellen.js",
    "symbolen": [
     {
      "naam": "maakToestellen",
      "soort": "functie",
-     "lijn": 50,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "bak",
      "soort": "pijl",
-     "lijn": 53,
+     "lijn": 54,
      "geexporteerd": false
     },
     {
      "naam": "uitdagingen",
      "soort": "pijl",
-     "lijn": 54,
+     "lijn": 55,
      "geexporteerd": false
     },
     {
      "naam": "sleutelVan",
      "soort": "pijl",
-     "lijn": 56,
+     "lijn": 57,
      "geexporteerd": false
     },
     {
      "naam": "geldigeId",
      "soort": "pijl",
-     "lijn": 57,
+     "lijn": 58,
      "geexporteerd": false
     },
     {
      "naam": "schoneNaam",
      "soort": "pijl",
-     "lijn": 64,
+     "lijn": 63,
      "geexporteerd": false
     },
     {
      "naam": "uitdaging",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 69,
      "geexporteerd": false
     },
     {
      "naam": "pakUitdaging",
      "soort": "functie",
-     "lijn": 80,
+     "lijn": 79,
      "geexporteerd": false
     },
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 97,
+     "lijn": 96,
      "geexporteerd": false
     },
     {
      "naam": "noem",
      "soort": "functie",
-     "lijn": 142,
+     "lijn": 143,
      "geexporteerd": false
     },
     {
      "naam": "trekIn",
      "soort": "functie",
-     "lijn": 157,
+     "lijn": 158,
      "geexporteerd": false
     },
     {
      "naam": "naamVan",
      "soort": "functie",
-     "lijn": 168,
+     "lijn": 169,
      "geexporteerd": false
     },
     {
      "naam": "publiekeSleutelVan",
      "soort": "functie",
-     "lijn": 179,
+     "lijn": 180,
      "geexporteerd": false
     },
     {
      "naam": "lijst",
      "soort": "functie",
-     "lijn": 185,
+     "lijn": 186,
      "geexporteerd": false
     },
     {
      "naam": "ruim",
-     "soort": "functie",
-     "lijn": 192,
+     "soort": "pijl",
+     "lijn": 193,
      "geexporteerd": false
     }
    ],
@@ -76868,6 +76906,7 @@
    },
    "requires": [
     "server/kern/eigencollectie.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/lib/klok.js"
    ],

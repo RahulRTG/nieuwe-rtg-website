@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:14:43.935Z",
-    "commit": "cd8f030b7",
+    "op": "2026-10-14T14:16:42.040Z",
+    "commit": "ad4cad4e2",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3533,6 +3533,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "dekking-takidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/v8takken.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "dekking.test.js": {
       "soort": "puur",

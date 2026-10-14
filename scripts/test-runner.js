@@ -231,11 +231,19 @@ function draai(namen, parallel, metVloer, tijdgrens) {
       '--test-coverage-branches=' + dekkingVloer[1],
       '--test-coverage-functions=' + dekkingVloer[2]);
   }
+  /* DE TAKKEN OP HUN PLEK IN DE BRON. De lcov hieronder draagt per tak een
+     volgnummer dat per proces verschuift; over batches opgeteld telde dat
+     dezelfde takken dubbel. Daarom schrijft V8 zijn ruwe dekking ook naar een
+     eigen map, en legt deze batch daaruit een .takken.json naast zijn lcov
+     (scripts/lib/v8takken.js). scripts/dekkingsvloer.js telt de takken daaruit. */
+  let takkenPlan = null;
   if (dekkingMap) {
     fs.mkdirSync(dekkingMap, { recursive: true });
     const merk = deel ? 'deel-' + deel.nr
       : (selectie.length === 1 ? selectie[0].replace(/\.test\.js$/, '') : 'alles');
     const naam = merk + '-' + (++batch) + '.info';
+    takkenPlan = { ruw: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8ruw-')),
+      uit: path.join(dekkingMap, naam.replace(/\.info$/, '.takken.json')) };
     args.push('--experimental-test-coverage',
       '--test-reporter=' + (reporter || 'tap'), '--test-reporter-destination=stdout',
       '--test-reporter=lcov', '--test-reporter-destination=' + path.join(dekkingMap, naam));
@@ -255,8 +263,13 @@ function draai(namen, parallel, metVloer, tijdgrens) {
   const metDekking = !!(dekkingMap || (metVloer && dekkingVloer.length === 3));
   const r = spawnSync(process.execPath, args, {
     cwd: WORTEL, stdio: 'inherit', timeout: 90 * 60 * 1000,
-    env: { ...opslagPlan.env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
+    env: { ...opslagPlan.env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal',
+      ...(takkenPlan ? { NODE_V8_COVERAGE: takkenPlan.ruw } : {}) }
   });
+  if (takkenPlan) {
+    try { require('./lib/v8takken').bewaar(takkenPlan.ruw, takkenPlan.uit, WORTEL); }
+    finally { fs.rmSync(takkenPlan.ruw, { recursive: true, force: true }); }
+  }
   let tapTekst = '';
   try {
     tapTekst = fs.readFileSync(tapPad, 'utf8');

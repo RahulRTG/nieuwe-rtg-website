@@ -151,7 +151,14 @@ const DEKKING = ['TN:', 'SF:/rtg/server/z.js', 'DA:1,1', 'LF:1', 'LH:1',
 
 function draaiVloer(namen) {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scherven-'));
-  for (const n of namen) fs.writeFileSync(path.join(map, n), DEKKING + '\n');
+  /* Elk lcov-bestand krijgt zijn takkenbestand erbij: zonder dat telt de vloer
+     de takken niet (scripts/lib/v8takken.js) en zakt hij om een andere reden
+     dan de scherven waar deze toetsen over gaan. */
+  const takken = JSON.stringify({ versie: 1, bestanden: {}, onleesbaar: 0 });
+  for (const n of namen) {
+    fs.writeFileSync(path.join(map, n), DEKKING + '\n');
+    fs.writeFileSync(path.join(map, n.replace(/\.info$/, '.takken.json')), takken + '\n');
+  }
   const uit = spawnSync(process.execPath, [VLOER, '--map', map, '--scherven', '4'], { encoding: 'utf8' });
   fs.rmSync(map, { recursive: true, force: true });
   return { code: uit.status, tekst: (uit.stdout || '') + (uit.stderr || '') };

@@ -318,6 +318,11 @@ jobs:
           for bestand in dekking/*.info; do
             mv "$bestand" "${bestand%.info}-scherf-${{ matrix.scherf }}.info"
           done
+          # Het takkenbestand hoort bij zijn lcov en draagt dezelfde naam
+          # (scripts/lib/v8takken.js); de vloer weigert een lcov zonder.
+          for bestand in dekking/*.takken.json; do
+            mv "$bestand" "${bestand%.takken.json}-scherf-${{ matrix.scherf }}.takken.json"
+          done
           exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
@@ -337,7 +342,9 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: dekking-scherf-${{ matrix.scherf }}
-          path: dekking/*.info
+          path: |
+            dekking/*.info
+            dekking/*.takken.json
           if-no-files-found: error
       - name: Het routejournaal van deze scherf bewaren
         if: always()
@@ -420,6 +427,11 @@ jobs:
           for bestand in dekking/*.info; do
             mv "$bestand" "${bestand%.info}-ijking-${{ matrix.ijking }}.info"
           done
+          # Het takkenbestand hoort bij zijn lcov en draagt dezelfde naam
+          # (scripts/lib/v8takken.js); de vloer weigert een lcov zonder.
+          for bestand in dekking/*.takken.json; do
+            mv "$bestand" "${bestand%.takken.json}-ijking-${{ matrix.ijking }}.takken.json"
+          done
           # Niet elke ijking start een server. Een leeg journaal betekent dan
           # eerlijk "deze job raakte nul routes" en bewijst tegelijk dat haar
           # artefact niet stil uit de samenvoeging verdwijnt.
@@ -436,7 +448,9 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: dekking-ijking-${{ matrix.ijking }}
-          path: dekking/*.info
+          path: |
+            dekking/*.info
+            dekking/*.takken.json
           if-no-files-found: error
       - name: De duurmeting van deze ijking bewaren
         if: always()

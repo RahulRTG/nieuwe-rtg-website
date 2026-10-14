@@ -61,9 +61,13 @@ function wereld() {
    de ruwe V8-dekking, en die laatste compact bewaard naast het lcov-bestand. */
 function batch(w, uit, naam, toets) {
   const ruw = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8ruw-'));
+  /* Zonder NODE_TEST_CONTEXT: draait deze toets zelf onder `node --test`, dan
+     zou de geneste run zich als kind melden en geen eigen lcov schrijven. */
+  const env = { ...process.env, NODE_V8_COVERAGE: ruw };
+  delete env.NODE_TEST_CONTEXT;
   const r = spawnSync(process.execPath, ['--test', '--experimental-test-coverage',
     '--test-reporter=lcov', '--test-reporter-destination=' + path.join(uit, naam + '.info'),
-    path.join('test', toets)], { cwd: w, env: { ...process.env, NODE_V8_COVERAGE: ruw }, encoding: 'utf8' });
+    path.join('test', toets)], { cwd: w, env, encoding: 'utf8' });
   assert.equal(r.status, 0, 'de proefbatch zelf hoort te slagen: ' + r.stderr);
   require('../scripts/lib/v8takken').bewaar(ruw, path.join(uit, naam + '.takken.json'), w);
   fs.rmSync(ruw, { recursive: true, force: true });
@@ -76,24 +80,29 @@ function takkenVan(map) {
   return { gedekt: Number(m[1]), totaal: Number(m[2]), uit: r.stdout + r.stderr };
 }
 
-test('een tak die in twee batches voorkomt, telt een keer in de noemer', () => {
+test('een tak die in twee batches voorkomt, telt een keer -- en twee keer dezelfde batch verandert niets', () => {
   const w = wereld();
+  const mappen = [];
+  const map = () => { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8m-')); mappen.push(d); return d; };
   try {
-    const alleenA = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8a-'));
-    const samen = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8ab-'));
-    batch(w, alleenA, 'deel-1-1', 'a.test.js');
-    batch(w, samen, 'deel-1-1', 'a.test.js');
-    batch(w, samen, 'deel-2-1', 'b.test.js');
-    const a = takkenVan(alleenA);
-    const ab = takkenVan(samen);
-    /* B voegt geen enkele nieuwe plek in de bron toe: hij raakt alleen g, en g
-       zat al in A. De noemer mag dus niet groeien -- dat deed hij wel, omdat
-       B's volgnummers na het weggevallen f een plaats opschoven. */
-    assert.equal(ab.totaal, a.totaal, 'dezelfde bron, dezelfde takken:\nA: ' + a.uit + '\nA+B: ' + ab.uit);
-    /* En B voegt een gedekte arm toe: de nee-kant van g, die A niet nam. */
-    assert.ok(ab.gedekt > a.gedekt, 'de nee-kant van g uit batch B telt mee');
-    for (const d of [alleenA, samen]) fs.rmSync(d, { recursive: true, force: true });
-  } finally { fs.rmSync(w, { recursive: true, force: true }); }
+    const ab = map(), ba = map(), abb = map();
+    batch(w, ab, 'deel-1-1', 'a.test.js'); batch(w, ab, 'deel-2-1', 'b.test.js');
+    batch(w, ba, 'deel-1-1', 'b.test.js'); batch(w, ba, 'deel-2-1', 'a.test.js');
+    batch(w, abb, 'deel-1-1', 'a.test.js'); batch(w, abb, 'deel-2-1', 'b.test.js'); batch(w, abb, 'deel-3-1', 'b.test.js');
+    const t = takkenVan(ab);
+    /* DE WAARHEID VOOR DEZE BRON, met de hand nageteld: zes blokken -- de
+       module, f, de klein-kant van f, g, de ja-kant en de nee-kant van g. Na A
+       en B samen is alleen de klein-kant nooit uitgevoerd (f kreeg alleen 2).
+       De oude optelling gaf hier 4 van 7: g's twee kanten dubbel in de noemer,
+       en geen van beide gedekt. */
+    assert.deepEqual([t.gedekt, t.totaal], [5, 6], 'de vloer telt wat de bron heeft:\n' + t.uit);
+    const o = takkenVan(ba), d = takkenVan(abb);
+    assert.deepEqual([o.gedekt, o.totaal], [t.gedekt, t.totaal], 'de volgorde van de batches doet er niet toe');
+    assert.deepEqual([d.gedekt, d.totaal], [t.gedekt, t.totaal], 'een batch die nog eens draait, telt niets dubbel');
+  } finally {
+    fs.rmSync(w, { recursive: true, force: true });
+    for (const d of mappen) fs.rmSync(d, { recursive: true, force: true });
+  }
 });
 
 test('bij elk lcov-bestand hoort een takkenbestand, anders telt de vloer niet', () => {
@@ -128,7 +137,8 @@ test('het takkenbestand houdt alleen de eigen bron vast, en een onleesbaar ruw b
     const r = v8.bewaar(ruw, uit, wortel);
     const k = JSON.parse(fs.readFileSync(uit, 'utf8'));
     assert.deepEqual(Object.keys(k.bestanden), ['server/a.js'], 'node_modules, toetsen en node-intern vallen buiten de meting');
-    assert.deepEqual(k.bestanden['server/a.js'], { gedekt: ['0-90'], open: ['40-60'] });
+    assert.deepEqual(k.bestanden['server/a.js'], { takken: ['0-90', '40-60'], uitgevoerd: [[0, 40], [60, 90]] },
+      'beide blokken in de noemer, en uitgevoerd is wat niet in het nul-blok ligt');
     assert.equal(r.onleesbaar, 1, 'een afgebroken ruw bestand verdwijnt niet stil');
     assert.equal(k.onleesbaar, 1);
   } finally {
@@ -137,12 +147,22 @@ test('het takkenbestand houdt alleen de eigen bron vast, en een onleesbaar ruw b
   }
 });
 
-test('samenvoegen: gedekt in een batch is gedekt, en de volgorde doet er niet toe', () => {
+test('samenvoegen: een plek die in een batch is uitgevoerd, is uitgevoerd, en de volgorde doet er niet toe', () => {
   const v8 = require('../scripts/lib/v8takken');
-  const p = { bestanden: { 'server/a.js': { gedekt: ['0-90'], open: ['40-60', '60-80'] } }, onleesbaar: 0 };
-  const q = { bestanden: { 'server/a.js': { gedekt: ['0-90', '40-60'], open: [] }, 'server/b.js': { gedekt: [], open: ['0-5'] } }, onleesbaar: 0 };
+  /* p: na een run die de nee-kant (40-60) niet nam; q: na een run die de
+     ja-kant (20-40) niet nam. Samen zijn beide kanten uitgevoerd. */
+  const p = { bestanden: { 'server/a.js': { takken: ['0-90', '40-60'], uitgevoerd: [[0, 40], [60, 90]] } }, onleesbaar: 0 };
+  const q = { bestanden: { 'server/a.js': { takken: ['0-90', '20-40'], uitgevoerd: [[0, 20], [40, 90]] },
+    'server/b.js': { takken: ['0-5'], uitgevoerd: [] } }, onleesbaar: 1 };
   const een = v8.tel(v8.voegSamen([p, q]));
-  const twee = v8.tel(v8.voegSamen([q, p]));
-  assert.deepEqual(een, twee);
-  assert.deepEqual(een, { bestanden: 2, gedekt: 2, totaal: 4, pct: 50, onleesbaar: 0 });
+  assert.deepEqual(v8.tel(v8.voegSamen([q, p])), een);
+  assert.deepEqual(een, { bestanden: 2, gedekt: 3, totaal: 4, pct: 75, onleesbaar: 1 });
+});
+
+test('de V8-regel: de telling van een plek is die van het binnenste bereik dat haar omvat', () => {
+  const { uitgevoerd } = require('../scripts/lib/v8takken');
+  assert.deepEqual(uitgevoerd([{ startOffset: 0, endOffset: 100, count: 1 }, { startOffset: 10, endOffset: 50, count: 0 },
+    { startOffset: 20, endOffset: 30, count: 2 }]), [[0, 10], [20, 30], [50, 100]], 'een uitgevoerd blok binnen een niet-uitgevoerd blok telt');
+  assert.deepEqual(uitgevoerd([{ startOffset: 0, endOffset: 10, count: 0 }]), [], 'nul is nergens uitgevoerd');
+  assert.deepEqual(uitgevoerd([]), []);
 });

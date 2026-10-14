@@ -12,9 +12,9 @@
 
    VERSIE 2 staat in ./bearercode-v2.js en gaat aan zodra een aanroeper
    `geldigheid` meegeeft. Zonder dat veld is dit exact v1 (vastgelegd in
-   test/bearercode.test.js). Twee fabriekopties zijn nieuw: `normaal` (een
-   domein dat zijn codes anders normaliseert, zodat de hash in maak() meteen
-   klopt en niet achteraf wordt overschreven) en `sluit`/`spoor` voor v2. */
+   test/bearercode.test.js). Opties: `normaal` (een domein dat zijn codes
+   anders normaliseert), `sluit`/`spoor` voor v2, en `sleutelring` voor het
+   HMAC-zegel (./bearercode-zegel.js; weggelaten = de ring van het proces). */
 'use strict';
 
 const klok = require('../lib/klok');

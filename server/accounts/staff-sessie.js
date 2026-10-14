@@ -17,6 +17,13 @@ function accountBinding(accounts, lidOfId, uitgegevenOp = Date.now()) {
   return { lid: id, lidKey: 'user-' + id, lidInlogOp: Number(uitgegevenOp) };
 }
 
+/* Twee zaakcodes zijn alleen dezelfde als ze er allebei zijn: een plek
+   zonder code paste anders op een sessie of zaak zonder code ('' === ''). */
+const zelfdeZaak = (a, b) => {
+  const x = String(a || '').toUpperCase(), y = String(b || '').toUpperCase();
+  return !!x && x === y;
+};
+
 function controleer(accounts, sess) {
   if (!sess || sess.role !== 'supplier')
     return { ok: false, status: 401, error: 'Niet ingelogd als leverancier.' };
@@ -25,7 +32,7 @@ function controleer(accounts, sess) {
   let staff = null;
   if (sess.staffId != null) {
     staff = accounts.getStaffById(Number(sess.staffId));
-    if (!staff || String(staff.supplier_code || '').toUpperCase() !== String(sess.code || '').toUpperCase())
+    if (!staff || !zelfdeZaak(staff.supplier_code, sess.code))
       return { ok: false, status: 401, error: 'Deze personeelsplek is niet meer actief.' };
   }
 
@@ -61,7 +68,7 @@ function controleer(accounts, sess) {
    het weer, want uitzetten is geen wissen. */
 function plekWerkt(accounts, staffId, zaak) {
   const s = accounts.getStaffByIdAny(Number(staffId));
-  if (!s || Number(s.active) !== 1 || String(s.supplier_code || '').toUpperCase() !== String(zaak || '').toUpperCase()) return false;
+  if (!s || Number(s.active) !== 1 || !zelfdeZaak(s.supplier_code, zaak)) return false;
   if (s.member_id == null) return true;
   const lid = accounts.getUserById(Number(s.member_id));
   return !!lid && !(accounts.isActief && !accounts.isActief(lid));

@@ -43,7 +43,10 @@ module.exports = (ctx) => {
     if (!Array.isArray(db.data.techniek.beveiliging)) db.data.techniek.beveiliging = [];
     return db.data.techniek.beveiliging;
   }
-  const score = e => ERNST[e] == null ? 0 : ERNST[e];
+  /* Eigen sleutels alleen: 'constructor' of 'toString' komen anders via het
+     prototype binnen als ernst, en dan geeft score() een functie terug. */
+  const geldig = e => Object.prototype.hasOwnProperty.call(ERNST, e);
+  const score = e => geldig(e) ? ERNST[e] : 0;
   function zekeringen() {
     if (!db.data.techniek) db.data.techniek = {};
     if (!db.data.techniek.zekeringen) db.data.techniek.zekeringen = standaardZekeringen();
@@ -55,12 +58,13 @@ module.exports = (ctx) => {
     if (!db.data.techniek.autoReactie) db.data.techniek.autoReactie = { aan: true };
     return db.data.techniek.autoReactie;
   }
+  require('./kern/command/sensorstilte').koppelNoodrem(() => autoStaat().aan);
   function zetAuto(aan) { autoStaat().aan = !!aan; save(); return autoStaat().aan; }
 
   /* Meld een gebeurtenis. ernst: 'info' | 'waarschuwing' | 'kritiek'.
      meta.bron identificeert de bron (bijv. IP of bucket) voor het samenvoegen. */
   function meld(type, ernst, tekst, meta) {
-    ernst = ERNST[ernst] == null ? 'waarschuwing' : ernst;
+    ernst = geldig(ernst) ? ernst : 'waarschuwing';
     const arr = lijst();
     const nu = Date.now();
     const bron = (meta && meta.bron) || '';
@@ -76,9 +80,22 @@ module.exports = (ctx) => {
         tekst, meta: meta || {}, aantal: 1, afgehandeld: false, at: new Date(nu).toISOString(), atMs: nu });
       if (arr.length > MAX) arr.length = MAX;
     }
-    save();
-    if (ernst === 'kritiek') escaleer(sleutel, tekst);
-    if (type === 'brute-force') noodrem();
+    /* Een melding die niet kan worden bewaard, is een verloren melding en geen
+       stille: kern/command/sensorstilte.js telt hem, en pas een volgende
+       geslaagde bewaring bewijst dat het journaal terug is. */
+    /* En een opslag die faalt, houdt de eigenaar en de noodrem niet tegen:
+       geen van beide heeft de schijf nodig, en een volle schijf tijdens een
+       aanval is precies het moment waarop ze er moeten zijn (WEERBAARHEID.md
+       par. 9b: automatische inperking wacht niet). De fout gaat daarna alsnog
+       naar de aanroeper. */
+    const stilte = require('./kern/command/sensorstilte');
+    let bewaarFout = null;
+    try { save(); } catch (e) { stilte.verloren('beveiligingsjournaal'); bewaarFout = e; }
+    if (!bewaarFout) stilte.aangekomen('beveiligingsjournaal');
+    try {
+      if (ernst === 'kritiek') escaleer(sleutel, tekst);
+      if (type === 'brute-force') noodrem();
+    } finally { if (bewaarFout) throw bewaarFout; }   // eslint-disable-line no-unsafe-finally
     return arr[0];
   }
 

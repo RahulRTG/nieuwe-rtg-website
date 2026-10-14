@@ -568,6 +568,11 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // De weerbaarheidstoetsen van WEERBAARHEID.md stap 2 laden de helper alleen
+  // voor wachtOpWaarde; ze starten geen server en lezen niets van /api/.
+  ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],
+  ['journaalbestand-weerbaar.test.js', ['server/kern/journaalbestand.js']],
+  ['wacht-weerbaar.test.js', ['server/kern/wacht/index.js', 'server/kern/wacht/raadkamer.js', 'server/kern/wacht/flood.js']],
   // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.

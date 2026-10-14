@@ -188,6 +188,23 @@ test('www bepaalt de vaste kaders van app, header en Edge', () => {
     'een late algemene materiaalregel mag de fotografie van het open scherm niet overschrijven');
 });
 
+test('www en app delen hetzelfde cinematische merkcasco', () => {
+  const shell = fs.readFileSync(path.join(ROOT, 'public/site/platform-shell.js'), 'utf8');
+  const publicCss = fs.readFileSync(path.join(ROOT, 'public/site/platform-shell.css'), 'utf8');
+  const cinematicCss = fs.readFileSync(path.join(ROOT, 'public/shared/rtg-cinematic-system.css'), 'utf8');
+  assert.match(shell, /dataset\.rtgCinematic='true'/,
+    'de publieke voordeur moet dezelfde cinematische systeemlaag activeren als de app');
+  assert.match(shell, /Rahul Travel Group/);
+  assert.match(shell, /rtg-edge-mark-lockup/,
+    'www gebruikt de officiële lock-up uit hetzelfde Edge-casco');
+  assert.match(publicCss, /height:82px!important;min-height:82px!important/,
+    'de mobiele www-header volgt dezelfde vaste maat als de app');
+  assert.match(cinematicCss, /\[data-world-home\]\[data-rtg-world\]:not\(\[data-public-platform\]\)/,
+    'de app-home erft de publieke donkere cinematische kamer zonder publieke inhoud te kopiëren');
+  assert.match(cinematicCss, /\[data-world-home\]\[data-rtg-shell="mobile"\] \.rtg-edge-top\{[\s\S]*?background:rgba\(16,14,11,\.9\)!important/,
+    'een mobiele route mag de gedeelde donkere merkheader niet terugzetten naar ivoor');
+});
+
 test('alle vier werelden gebruiken bestaande lokale productiebeelden', () => {
   const css = lees('public/shared/rtg-cinematic-system.css');
   ['living', 'travel', 'work', 'foundation'].forEach((world) => {

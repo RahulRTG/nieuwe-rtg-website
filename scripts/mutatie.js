@@ -871,6 +871,10 @@ const EIGEN_MODULE = new Map([
   ['samlxsw.test.js', ['server/sso/saml/antwoord.js', 'server/sso/saml/handtekening.js']],
   ['samlc14n.test.js', ['server/sso/saml/c14n.js', 'server/sso/saml/xml.js']],
   ['samlpoort.test.js', ['server/sso/saml/index.js']],
+  /* saml-signedinfo-prefix -> handtekening.js: de PrefixList van SignedInfo.
+     Zonder deze regel koos de motor xml.js, waar de eerste mutant de parser
+     laat vastlopen ('te langzaam') en dus niets over deze toets zegt. */
+  ['saml-signedinfo-prefix.test.js', ['server/sso/saml/handtekening.js']],
   /* DE MERKKERN als enige bron. Zes mutaties, zes raak -- maar niet allemaal
      tegen dezelfde toets, en dat is met opzet. merkkern.test.js kent de
      WAARDEREGELS en de STRUCTUUR (de drie consumenten lezen de definitie en

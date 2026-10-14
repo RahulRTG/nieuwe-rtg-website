@@ -572,6 +572,9 @@ const EIGEN_MODULE = new Map([
   // voor wachtOpWaarde; ze starten geen server en lezen niets van /api/.
   ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],
   ['journaalbestand-weerbaar.test.js', ['server/kern/journaalbestand.js']],
+  // De dekkingsvang toetst het vangmechanisme van de toetsservers (stop() in
+  // dekkingsmodus), niet een API-antwoord: de liegpoort raakt hem dus niet.
+  ['dekkingsvang.test.js', ['test/lib/dekkingsvang.js', 'test/lib/dekkingsvang-kind.js']],
   ['wacht-weerbaar.test.js', ['server/kern/wacht/index.js', 'server/kern/wacht/raadkamer.js', 'server/kern/wacht/flood.js']],
   // De SCIM-weerbaarheidstoetsen laden accounts alleen als onderlaag (init op
   // een wegwerpmap); wat ze toetsen is de organisatiegrens, de uitdienst-outbox

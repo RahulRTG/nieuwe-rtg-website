@@ -156,7 +156,7 @@ module.exports = (kern) => {
   /* ---------- aanmaken (in dienst) ---------- */
   app.post(BASIS + '/Users', remmen, scimAuth, async (req, res) => {
     try {
-      const { user, bestond } = await scim.maak(accounts, req.scimOrg, req.body || {});
+      const { user, bestond } = await scim.maak(accounts, req.scimOrg, req.body || {}, gebruikersync);
       log.info('scim.gebruiker', { org: req.scimOrg, id: user.id, bestond });
       stuurScim(res, bestond ? 200 : 201, vorm.gebruiker(user, accounts.emailOf(user), BASIS));
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }

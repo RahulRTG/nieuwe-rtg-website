@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2717 bestanden en 18994 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2718 bestanden en 18999 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2717 |
-| losse beweringen (`test(...)`) | 18994 |
+| toetsbestanden | 2718 |
+| losse beweringen (`test(...)`) | 18999 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2529 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2530 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2385 bestanden, 18428 beweringen.
+2386 bestanden, 18433 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1820,6 +1820,7 @@ toets omvalt.
 | `samentekenen.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Werk OS: SAMEN TEKENEN (server/bedrijf/samentekenen.js). Besluit van de eigenaar (24 september 2026): het bedrijf kiest zelf hoe het bestuur uit de concerngraaf meetelt bij een uitgave -- versmallen, bestuur of... |
 | `samenvoeging-routes.test.js` | 6 | gezakt op `liegpoort /api/` | ELF ROUTES UIT DE SAMENVOEGING DIE GEEN TOETS OVER DE DRAAD HADDEN. De twaalf takken van 1 september 2026 brachten routes mee waarvan de handler wel getoetst was (rechtstreeks aangeroepen, zoals... |
 | `samenwerking.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor de samenwerkingslaag (kern/samenwerking.js): EGn knop om als creator een leverancier voor te stellen, en een oproep waarop creators reageren en de leverancier er een kiest. We loggen als manager... |
+| `saml-signedinfo-prefix.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | SIGNEDINFO KRIJGT ZIJN EIGEN PREFIXLIJST (server/sso/saml/handtekening.js). Bij exclusieve canonicalisatie (exc-c14n) bepaalt de InclusiveNamespaces PrefixList welke naamruimten in scope tóch in de bytes komen. |
 | `samlacs.test.js` | 6 | gezakt op `liegpoort /api/` | DE SAML-DEUR ALS DEUR: van de heenreis tot een echt sessietoken. test/samlxsw.test.js doet de aanvallen op de handtekening, los van een server. |
 | `samlc14n.test.js` | 5 | gezakt op `===->!==#0` | CANONICALISATIE, MET LIBXML2 ALS SCHEIDSRECHTER. Waarom deze toets apart staat van de aanvalstoets. |
 | `samlpoort.test.js` | 6 | gezakt op `true->false#0` | DE SAML-POORT: het verzoek, het eenmalige gebruik, en de inrichting. De aanvalstoets ernaast (test/samlxsw.test.js) gaat over de handtekening. |

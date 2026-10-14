@@ -3662,6 +3662,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "dekkingsgat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/dekkingsgat.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "delen.test.js": {
       "soort": "puur",
       "staat": "gezakt",

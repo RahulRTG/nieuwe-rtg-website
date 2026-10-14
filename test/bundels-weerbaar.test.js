@@ -30,10 +30,12 @@ const zlib = require('zlib');
 const { stijlbundel } = require('../server/middleware/stijlbundel');
 const { scriptbundel } = require('../server/middleware/scriptbundel');
 
-const WORTEL = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bundel-'));
-test.after(() => fs.rmSync(WORTEL, { recursive: true, force: true }));
+/* PROEFMAP en niet WORTEL: dit is een wegwerpmap, geen repositorywortel, en
+   test/bronmutanten.test.js leest WORTEL terecht als de echte bron. */
+const PROEFMAP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bundel-'));
+test.after(() => fs.rmSync(PROEFMAP, { recursive: true, force: true }));
 const schrijf = (p, inhoud, mtime) => {
-  const abs = path.join(WORTEL, p);
+  const abs = path.join(PROEFMAP, p);
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, inhoud);
   if (mtime) fs.utimesSync(abs, mtime, mtime);
@@ -41,10 +43,10 @@ const schrijf = (p, inhoud, mtime) => {
 schrijf('css/a.css', '@import "/css/b.css";\n@import url(https://vreemd.test/x.css);\n@import "/css/../geheim.css";\n@import "/css/weg.css";\n@import "/css/map.css";\n.a{}');
 schrijf('css/b.css', '@import "/css/a.css";\n.b{}');
 for (let i = 0; i < 7; i++) schrijf('css/d' + i + '.css', '@import "/css/d' + (i + 1) + '.css";\n.d' + i + '{}');
-fs.mkdirSync(path.join(WORTEL, 'css/map.css'));
+fs.mkdirSync(path.join(PROEFMAP, 'css/map.css'));
 schrijf('js/een.js', 'var een = 1;');
 schrijf('js/twee.js', 'var twee = 2;');
-fs.mkdirSync(path.join(WORTEL, 'js/map.js'));
+fs.mkdirSync(path.join(PROEFMAP, 'js/map.js'));
 
 const f = (...paden) => Buffer.from(paden.join('\n'), 'utf8').toString('base64url');
 function roep(mw, pad, q, headers = {}) {
@@ -56,7 +58,7 @@ function roep(mw, pad, q, headers = {}) {
 }
 
 test('1. alleen eigen bestanden; vreemd of buiten de wortel is 400', () => {
-  for (const [mw, pad, ext] of [[stijlbundel(WORTEL), '/stijlbundel.css', 'css'], [scriptbundel(WORTEL), '/scriptbundel.js', 'js']]) {
+  for (const [mw, pad, ext] of [[stijlbundel(PROEFMAP), '/stijlbundel.css', 'css'], [scriptbundel(PROEFMAP), '/scriptbundel.js', 'js']]) {
     for (const slecht of ['/' + ext + '/../geheim.' + ext, '//cdn.test/x.' + ext, '/a.txt', 'a.' + ext, '/a b.' + ext]) {
       const r = roep(mw, pad, f(slecht));
       assert.equal(r.statusCode, 400, slecht);
@@ -71,21 +73,21 @@ test('1. alleen eigen bestanden; vreemd of buiten de wortel is 400', () => {
 });
 
 test('2. @import: eigen pad ingesloten, kring een keer, diepte begrensd, vreemd blijft staan', () => {
-  const css = roep(stijlbundel(WORTEL), '/stijlbundel.css', f('/css/a.css')).lijf.toString();
+  const css = roep(stijlbundel(PROEFMAP), '/stijlbundel.css', f('/css/a.css')).lijf.toString();
   assert.match(css, /\/\* @import \/css\/b\.css \*\/\n.*\.b\{\}/s);
   assert.match(css, /@import \/css\/a\.css: al ingesloten/, 'de kring a -> b -> a eindigt');
   assert.match(css, /@import url\(https:\/\/vreemd\.test\/x\.css\);/, 'een vreemd blad wordt niet opgehaald');
   assert.match(css, /@import "\/css\/\.\.\/geheim\.css";/);
   assert.match(css, /@import "\/css\/weg\.css";/);
   assert.match(css, /@import "\/css\/map\.css";/);
-  const diep = roep(stijlbundel(WORTEL), '/stijlbundel.css', f('/css/d0.css')).lijf.toString();
+  const diep = roep(stijlbundel(PROEFMAP), '/stijlbundel.css', f('/css/d0.css')).lijf.toString();
   assert.match(diep, /\.d5\{\}/);
   assert.doesNotMatch(diep, /\.d6\{\}/, 'na vijf lagen houdt het insluiten op');
   assert.match(diep, /@import "\/css\/d6\.css";/);
 });
 
 test('3. een gewijzigd INGESLOTEN blad verandert de ETag; dezelfde ETag is 304', () => {
-  const mw = stijlbundel(WORTEL);
+  const mw = stijlbundel(PROEFMAP);
   const een = roep(mw, '/stijlbundel.css', f('/css/a.css'));
   const etag = een.kop.etag;
   assert.equal(roep(mw, '/stijlbundel.css', f('/css/a.css'), { 'if-none-match': etag }).statusCode, 304);
@@ -93,7 +95,7 @@ test('3. een gewijzigd INGESLOTEN blad verandert de ETag; dezelfde ETag is 304',
   const twee = roep(mw, '/stijlbundel.css', f('/css/a.css'));
   assert.notEqual(twee.kop.etag, etag);
   assert.match(twee.lijf.toString(), /color:red/, 'de cache serveert niet de oude versie');
-  const js = scriptbundel(WORTEL);
+  const js = scriptbundel(PROEFMAP);
   const s1 = roep(js, '/scriptbundel.js', f('/js/een.js', '/js/twee.js'));
   assert.equal(roep(js, '/scriptbundel.js', f('/js/een.js', '/js/twee.js'), { 'if-none-match': s1.kop.etag }).statusCode, 304);
   schrijf('js/twee.js', 'var twee = 22;', new Date(Date.parse('2026-02-01T00:00:00Z')));
@@ -101,7 +103,7 @@ test('3. een gewijzigd INGESLOTEN blad verandert de ETag; dezelfde ETag is 304',
 });
 
 test('4. br en gzip pakken terug uit naar exact de bundel', () => {
-  for (const [mw, pad, q] of [[stijlbundel(WORTEL), '/stijlbundel.css', f('/css/b.css')], [scriptbundel(WORTEL), '/scriptbundel.js', f('/js/een.js')]]) {
+  for (const [mw, pad, q] of [[stijlbundel(PROEFMAP), '/stijlbundel.css', f('/css/b.css')], [scriptbundel(PROEFMAP), '/scriptbundel.js', f('/js/een.js')]]) {
     const kaal = roep(mw, pad, q).lijf;
     const br = roep(mw, pad, q, { 'accept-encoding': 'gzip, br' });
     assert.equal(br.kop['content-encoding'], 'br');
@@ -112,5 +114,5 @@ test('4. br en gzip pakken terug uit naar exact de bundel', () => {
     assert.notEqual(br.kop.etag, gz.kop.etag, 'elke codering een eigen ETag');
     assert.match(roep(mw, pad, q, { 'accept-encoding': 'br' }).kop.etag, /-b"$/, 'tweede keer uit de cache');
   }
-  assert.match(roep(scriptbundel(WORTEL), '/scriptbundel.js', f('/js/een.js')).lijf.toString(), /try \{\nvar een = 1;\n\} catch/);
+  assert.match(roep(scriptbundel(PROEFMAP), '/scriptbundel.js', f('/js/een.js')).lijf.toString(), /try \{\nvar een = 1;\n\} catch/);
 });

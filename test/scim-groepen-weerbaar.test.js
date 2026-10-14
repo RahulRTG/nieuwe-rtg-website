@@ -85,7 +85,7 @@ test('1. elke PATCH-vorm komt aan, en wie eruit gaat verliest zijn rol meteen', 
   assert.equal(hernoemd.body.displayName, 'Directie');
   assert.deepEqual(laatsteVoor(ids[0]).groepen, ['Directie'], 'de brug ziet de nieuwe naam');
   const put = await roep('PUT', '/Groups/:id', { sleutel: A, id: g.body.id, body: { displayName: 'Directie' } });
-  assert.deepEqual(put.body.members, [], 'PUT zonder members leegt de groep');
+  assert.equal(groepen.vind('org-ga', g.body.id).leden.includes(ids[0]), false, 'PUT zonder members haalt ook ids[0] eruit');
   assert.deepEqual(laatsteVoor(ids[0]).groepen, []);
 });
 

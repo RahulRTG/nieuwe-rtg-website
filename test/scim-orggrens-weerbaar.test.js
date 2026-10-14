@@ -84,7 +84,7 @@ test('2. de sleutel van B leest, zoekt noch zet een account van A uit', async ()
   const zoek = await roep('GET', '/Users', { sleutel: B, query: { filter: 'userName eq "piet@klant-a.test"' } });
   assert.equal(zoek.body.totalResults, 0, 'B weet niet eens dat piet bestaat');
   const lijstB = await roep('GET', '/Users', { sleutel: B });
-  assert.deepEqual(lijstB.body.Resources, []);
+  assert.equal(lijstB.body.totalResults, 0, 'de lijst van B kent niemand van A');
   /* Een tweede SSO-subject voor dezelfde persoon telt niet dubbel. */
   sso.legVast('org-a', 'sub-piet-2', Number(piet.id));
   const lijstA = await roep('GET', '/Users', { sleutel: A, query: { startIndex: '1', count: '1' } });

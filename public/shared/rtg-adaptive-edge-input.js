@@ -1,8 +1,6 @@
 (function (w) {
   'use strict';
-  function haptic(win) {
-    try { if (win.navigator && win.navigator.vibrate) win.navigator.vibrate(8); } catch (e) {}
-  }
+  function haptic(win){try{if(win.navigator&&win.navigator.vibrate)win.navigator.vibrate(8);}catch(e){}}
   function prepare(rt, action) {
     ['.rtg-edge-menu', '.rtg-edge-ai', '.rtg-edge-state', '.rtg-edge-2-context-button'].forEach(function (selector) {
       var button = rt.edge.root.querySelector(selector + '[aria-expanded="true"]');
@@ -43,9 +41,7 @@
       if (controls && button.getAttribute('aria-controls') !== controls) button.setAttribute('aria-controls', controls);
     });
   }
-  /* De drempels staan in de grammatica (EDGE.md par. 11); zonder tabel zijn de
-     gebaren op de balk uit en blijven tik, Cmd+K en Alt+pijl werken. */
-  function drempels(rt) { var g = rt.win.RTGGrammatica; return g && g.DREMPELS || null; }
+  function drempels(r){var g=r.win.RTGGrammatica;return g&&g.DREMPELS||null;}
   function busy(rt) {
     if (rt.host.dataset.rtgSurface) return true;
     var owner = rt.win.RTGEdge2;
@@ -54,14 +50,25 @@
     return !!(rt.customPanel || rt.host.contains(active) || active &&
       (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)));
   }
+  function pinned(r){var d=r.doc.body&&r.doc.body.dataset||{};return r.manual||d.rtgEdge2Auto==='false'||d.rtgEdge2Rendered==='true'&&!d.rtgEdge2Auto;}
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, lastX = 0, lastY = 0, timer = null, held = false, blockClickUntil = 0;
-    var scrollTimer = null, positions = new WeakMap(), listeners = [];
-    function listen(target, type, callback, options) {
-      target.addEventListener(type, callback, options); listeners.push([target, type, callback, options]);
+    var scrollTimer = null, quietTimer = null, positions = new WeakMap(), listeners = [];
+    function listen(target,type,callback,options){target.addEventListener(type,callback,options);listeners.push([target,type,callback,options]);}
+    var D=null;
+    function quiet(){rt.win.clearTimeout(quietTimer);
+      if(pinned(rt)||rt.model.state==='deck'||rt.model.state==='expanded')return;
+      quietTimer=rt.win.setTimeout(function(){if(pinned(rt))return;if(busy(rt))return quiet();
+        if(rt.model.state==='dock')handlers.state('peek','quiet');},3600);
     }
-    var D = null;
+    function wake(){rt.win.clearTimeout(quietTimer);
+      if(rt.model.state==='peek')handlers.state('dock','wake');
+    }
+    rt.quiet=quiet;
+    listen(rt.bar,'pointerenter',wake);
+    listen(rt.bar,'focusin',wake);
     listen(rt.bar, 'pointerdown', function (event) {
+      wake();
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       D = drempels(rt);
       if (!D) return;
@@ -91,8 +98,6 @@
       if (Math.max(Math.abs(dx), Math.abs(dy)) > D.veeg) blockClickUntil = Date.now() + 400;
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg) handlers.deck(dx < 0 ? 1 : -1);
       else if (-dy >= D.omhoog) {
-        /* Een host met een eigen paneel (de landing, de sitepagina's) krijgt
-           eerst de vraag; de kernlijst is alleen voor wie er geen heeft. */
         var depth = rt.win.RTGDiepte, adapt = rt.win.RTGAdaptief;
         if (depth && adapt && adapt.voorNu().length) {
           handlers.state('dock');
@@ -114,9 +119,7 @@
         event.preventDefault(); handlers.deck(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === 'Escape') handlers.escape();
     });
-    // Only fresh user gestures fold the bar; programmatic scrolling must not.
-    // Gesture ownership stays with Edge 2, including nested app scrollers.
-    var e2 = rt.win.RTGEdge2, gebaar = null;
+    var e2=rt.win.RTGEdge2,gebaar=null;
     if (e2 && e2.gestureBind && e2.gestureFresh) { gebaar = { events: [] }; e2.gestureBind(gebaar, rt.win); }
     positions.set(rt.doc, rt.win.scrollY || 0);
     listen(rt.doc, 'focusin', function (event) {
@@ -126,6 +129,7 @@
         handlers.state('dock');
       }
     });
+    listen(rt.doc,'focusout',quiet);
     listen(rt.doc, 'scroll', function (event) {
       var target = event.target;
       if (target !== rt.doc && (!(target instanceof rt.win.Element) || rt.edge.root.contains(target))) return;
@@ -138,10 +142,9 @@
         if (!rt.manual && rt.model.state === 'peek') handlers.state('dock', 'auto');
       }, 900);
     }, { passive: true, capture: true });
-    // Capture nested app scrollers as well as document scroll; a panel being
-    // used never folds itself away. Destroy/start must not retain old listeners.
+    quiet();
     return function () {
-      rt.win.clearTimeout(timer); rt.win.clearTimeout(scrollTimer);
+      rt.win.clearTimeout(timer);rt.win.clearTimeout(scrollTimer);rt.win.clearTimeout(quietTimer);delete rt.quiet;
       listeners.concat(gebaar ? gebaar.events : []).forEach(function (item) {
         item[0].removeEventListener(item[1], item[2], item[3]);
       });
@@ -162,7 +165,6 @@
     if (rt.host.contains(node)) return false;
     closePanel(rt); setState('expanded'); rt.sheet.dataset.rtgCustomPanel = 'true';
     rt.customPanel = { node: node, parent: node.parentNode, next: node.nextSibling, focus: rt.doc.activeElement, onClose: options && options.onClose };
-    /* Het hostpaneel vervangt de lijst. */
     rt.sheetList.textContent = ''; rt.sheetList.hidden = true; if (rt.controls) rt.controls.hidden = true;
     rt.sheetTitle.textContent = String(options && options.title || 'RTG');
     rt.sheetCopy.textContent = String(options && options.copy || '');
@@ -173,5 +175,5 @@
     if (focus) focus.focus({ preventScroll: true });
     return true;
   }
-  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, busy: busy, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
+  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, busy: busy, pinned: pinned, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
 }(window));

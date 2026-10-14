@@ -3,7 +3,7 @@
   if(w.RTGAdaptiveEdge)return;
   var K=w.RTGAdaptiveEdgeCore,Input=w.RTGAdaptiveEdgeInput,Services=w.RTGAdaptiveEdgeServices,rt=null;
   function icon(name) {
-    var paths = w.RTGEdgeIcons || {};
+    var paths=w.RTGEdgeIcons||{};
     return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (paths[name] || paths.spark || '') + '</svg>';
   }
   function button(spec, slot) {
@@ -68,39 +68,41 @@
     renderSheet();
   }
   function setState(state, source) {
-    if (!rt) return false;
-    if (source === 'auto' && (rt.manual || Input.busy(rt))) return false;
-    if (state !== 'expanded') closePanel();
-    rt.model.state = K.normState(state); rt.host.dataset.rtgAdaptiveState = rt.model.state;
-    rt.host.dataset.rtgAdaptiveMotion = source === 'auto' && rt.model.state === 'peek' ? 'reading' : 'available';
+    if(!rt)return false;
+    var v=K.view(state,source,d.body.dataset.rtgEdge2State),h=rt.host;
+    if(v.automatic&&(rt.manual||Input.busy(rt)))return false;
+    if(state!=='expanded')closePanel();
+    rt.model.state=v.state;h.dataset.rtgAdaptiveState=v.state;
+    h.dataset.rtgAdaptiveMotion=v.motion;h.dataset.rtgAdaptivePresence=v.presence;
     d.body.dataset.rtgAdaptiveState = rt.model.state; rt.sheet.hidden = rt.model.state !== 'expanded';
     rt.sheet.setAttribute('aria-hidden', String(rt.model.state !== 'expanded'));
-    if (rt.sheet.hidden) Input.closeContext(rt);
-    if (rt.model.state === 'expanded') renderSheet();
-    if (source !== 'auto') rt.manual = rt.model.state === 'deck' || rt.model.state === 'expanded';
+    if(rt.sheet.hidden)Input.closeContext(rt);
+    if(rt.model.state==='expanded')renderSheet();
+    if(!v.automatic)rt.manual=rt.model.state==='deck'||rt.model.state==='expanded';
+    if(rt.quiet)rt.quiet();
     return true;
   }
   function setDeck(deck) {
-    if (!rt) return false;
-    closePanel(); Services.clear(rt);
+    if(!rt)return false;
+    closePanel();Services.clear(rt);
     rt.model.deck = K.normDeck(deck); renderDeck(); setState('deck'); Input.haptic(w); return true;
   }
-  function closePanel() { Input.closePanel(rt); }
-  function openPanel(node, options) { return Input.openPanel(rt, node, options, setState); }
+  function closePanel(){Input.closePanel(rt);}
+  function openPanel(node,options){return Input.openPanel(rt,node,options,setState);}
   function setPresence(input) {
-    if (!rt) return false;
+    if(!rt)return false;
     rt.model.presence = input && input.label ? { label: String(input.label).slice(0, 100), action: input.action || null } : null;
     rt.presenceButton.hidden = !rt.model.presence;
     rt.presenceText.textContent = rt.model.presence ? rt.model.presence.label : ''; return true;
   }
   function setIdentity(input) {
-    if (!rt) return false;
+    if(!rt)return false;
     var person = String(input && input.person || 'U').slice(0, 40), acting = String(input && input.actingFor || '').slice(0, 50);
     rt.model.identity = acting ? person + ' → ' + acting : null;
     rt.identity.textContent = rt.model.identity || ''; rt.identity.hidden = !rt.model.identity; return true;
   }
   function continueWith(input) {
-    if (!rt) return false;
+    if(!rt)return false;
     rt.model.continuation = input && input.title ? { title: String(input.title).slice(0, 100), copy: String(input.copy || '').slice(0, 180) } : null;
     if (input && input.presence) setPresence({ label: input.presence, action: input.action });
     renderSheet(); return true;

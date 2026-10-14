@@ -132,12 +132,46 @@ function main() {
       '  Zonder dat bestand zijn de takken niet te tellen, en een som zonder die batch is een andere meting.\n');
     process.exit(1);
   }
-  const takken = v8takken.tel(v8takken.voegSamen(paden.map((p) =>
-    JSON.parse(fs.readFileSync(p.replace(/\.(?:info|lcov)$/, '.takken.json'), 'utf8')))));
+  let samen;
+  try {
+    samen = v8takken.voegSamen(paden.map((p) =>
+      JSON.parse(fs.readFileSync(p.replace(/\.(?:info|lcov)$/, '.takken.json'), 'utf8'))));
+  } catch (e) {
+    console.error('\n\x1b[31m  De takkenbestanden zijn niet op te tellen: ' + e.message + '.\x1b[0m\n' +
+      '  Zonder optelbare takken is er geen takkenmeting, en dus geen oordeel.\n');
+    process.exit(1);
+  }
+  const takken = v8takken.tel(samen);
+  /* De sleutel B:<begin> rust op een aanname die binnen een proces te
+     controleren is (scripts/lib/v8takken.js). Faalt die ergens, dan kan een
+     sleutel twee takken betekenen: niet rekenen. */
+  if (takken.botsingen) {
+    console.error('\n\x1b[31m  ' + takken.botsingen + ' blok(ken) begonnen binnen een proces op dezelfde plek als een ' +
+      'ander blok of een functie.\x1b[0m\n  Dan is het begin geen identiteit meer, en een telling erop geen meting.\n');
+    process.exit(1);
+  }
   totaal.takken = { gedekt: takken.gedekt, totaal: takken.totaal, pct: takken.pct };
   if (takken.onleesbaar) {
     console.log('  \x1b[33m' + takken.onleesbaar + ' ruw(e) dekkingsbestand(en) waren niet te lezen; ' +
       'wat daarin stond ontbreekt in de takken.\x1b[0m');
+  }
+
+  /* DE INVENTARIS PER BESTAND (--per-bestand <pad>): per bronbestand gedekte,
+     ongedekte en alle takken, op dezelfde optelling als de vloer hieronder en
+     achter dezelfde fail-closed poorten hierboven. Hij wordt geschreven vóór het
+     oordeel, zodat ook een gezakte vloer laat zien WAAR de takken ontbreken. */
+  const perPad = ARG.includes('--per-bestand') ? ARG[ARG.indexOf('--per-bestand') + 1] : null;
+  if (ARG.includes('--per-bestand') && (!perPad || perPad.startsWith('--'))) {
+    console.error('\x1b[31m  --per-bestand verwacht een uitvoerpad.\x1b[0m');
+    process.exit(2);
+  }
+  if (perPad) {
+    fs.writeFileSync(perPad, JSON.stringify({
+      sleutel: 'F:<begin>-<eind> per functie, B:<begin> per blok (scripts/lib/v8takken.js)',
+      totaal: { gedekt: takken.gedekt, ongedekt: takken.totaal - takken.gedekt, totaal: takken.totaal, pct: takken.pct },
+      bestanden: v8takken.perBestand(samen)
+    }, null, 2) + '\n');
+    console.log('  takken per bestand geschreven naar ' + toon(path.resolve(perPad)));
   }
 
   console.log('  ' + totaal.bestanden + ' bestand(en) in de opgetelde meting\n');

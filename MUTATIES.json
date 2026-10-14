@@ -3534,6 +3534,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "dekking-takidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/v8takken.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "dekking.test.js": {
       "soort": "puur",
       "staat": "gezakt",

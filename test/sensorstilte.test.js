@@ -127,6 +127,26 @@ test('6. een melding zonder journaal is verloren, en dat is stil', () => {
   assert.match(stilte.bevinding(), /melding:schild: 1 meldingen gingen verloren/);
 });
 
+test('6b. herstel is een nieuwe geslaagde melding, niet een gewist alarm', () => {
+  stilte._wis();
+  const klok = metKlok(3e12);
+  try {
+    allesLevend();
+    stilte.aangekomen('schild');                  // aangekomen zonder eerder verlies: niets te melden
+    assert.equal(stilte.bevinding(), null);
+    klok.zet(1000); stilte.verloren('schild');
+    assert.equal(standVan('melding:schild').stand, 'stil');
+    klok.zet(2000); stilte.verloren('schild');    // nog een verlies: nog steeds stil
+    assert.equal(standVan('melding:schild').stand, 'stil');
+    klok.zet(3000); stilte.aangekomen('schild');  // pas een nieuwe aankomst bewijst de terugkeer
+    const r = standVan('melding:schild');
+    assert.equal(r.stand, 'levend');
+    assert.match(r.reden, /2 meldingen gingen verloren; daarna kwam er weer een aan/, 'het spoor blijft staan');
+    klok.zet(4000); stilte.verloren('schild');    // en een nieuw verlies maakt hem weer stil
+    assert.equal(standVan('melding:schild').stand, 'stil');
+  } finally { klok.terug(); }
+});
+
 test('7. in de schaduw meldt het alarm niets; actief wel', () => {
   stilte._wis();                              // niets gestart: alles stil
   const { voegAanvullendeAlarmcontrolesToe } = require('../server/kern/command/alarm-aanvullend');

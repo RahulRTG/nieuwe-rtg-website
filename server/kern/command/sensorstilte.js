@@ -79,8 +79,21 @@ function fout(naam, e) {
 
 /* Een melding die nergens aankwam, bv. omdat het beveiligingsjournaal nog niet
    (of niet meer) aan het schild hangt (opzet/schildwacht.js). */
+function meldingStaat(bron) {
+  let v = staat.verloren.get(bron);
+  if (!v) { v = { verloren: 0, laatstVerloren: 0, laatstAangekomen: 0 }; staat.verloren.set(bron, v); }
+  return v;
+}
 function verloren(bron) {
-  staat.verloren.set(bron, (staat.verloren.get(bron) || 0) + 1);
+  const v = meldingStaat(bron);
+  v.verloren += 1; v.laatstVerloren = nu();
+}
+/* HERSTEL IS EEN NIEUWE GESLAAGDE MELDING, geen gewist alarm. Pas als er na
+   de laatste verloren melding weer een aankomt, is de bron terug; de teller
+   blijft staan als spoor (WEERBAARHEID.md par. 9e, controleerbare terugkeer). */
+function aangekomen(bron) {
+  const v = staat.verloren.get(bron);
+  if (v) v.laatstAangekomen = nu();
 }
 
 /* Het schild ziet ELK verzoek dat binnenkomt (kern/schild.js telt vóór de
@@ -136,8 +149,10 @@ function oordeel({ schuif = false } = {}) {
   }
   const sch = schildOordeel(schuif);
   if (sch) rijen.push({ naam: 'schild', wat: 'het schild ziet het binnenkomende verkeer', stand: sch.stil ? 'stil' : 'levend', reden: sch.reden });
-  for (const [bron, n] of staat.verloren) {
-    rijen.push({ naam: 'melding:' + bron, wat: 'meldingen van ' + bron + ' komen aan', stand: 'stil', reden: n + ' meldingen gingen verloren' });
+  for (const [bron, v] of staat.verloren) {
+    const terug = v.laatstAangekomen >= v.laatstVerloren;
+    rijen.push({ naam: 'melding:' + bron, wat: 'meldingen van ' + bron + ' komen aan', stand: terug ? 'levend' : 'stil',
+      reden: v.verloren + ' meldingen gingen verloren' + (terug ? '; daarna kwam er weer een aan' : '') });
   }
   return rijen;
 }
@@ -173,5 +188,5 @@ function gestart(naam, periodeMs) {
 /* Alleen voor toetsen. */
 function _wis() { staat.sensoren.clear(); staat.verloren.clear(); staat.schild = null; }
 
-module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL, aangemeld, gestart, ronde, fout, verloren, koppelSchild,
+module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL, aangemeld, gestart, ronde, fout, verloren, aangekomen, koppelSchild,
   oordeel, bevinding, stand, alarmActief, _wis };

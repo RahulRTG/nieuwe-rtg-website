@@ -874,6 +874,30 @@ iemand buiten het proces ook dat het alarm zelf stilvalt.
 - De sonde waarschuwt nog niemand zelf: hij geeft een exitcode, en wat daarmee
   gebeurt hangt aan de meldingsdienst uit par. 9b.
 
+### 9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)
+
+Stap 2 levert **detectie**: RTG kan vaststellen dat een sensor stilvalt. Twee
+andere dingen zijn nog niet operationeel bewezen, en ze worden niet met
+detectie verward:
+- **alarmering**: de verantwoordelijke buiten het platform bereiken;
+- **bescherming**: volgens vooraf vastgestelde regels veilig reageren.
+
+**Besluit:** stap 2 mag na groene CI en review worden gemerged, met de
+detectie in de schaduw. Stap 2 heet pas technisch voltooid als ook De Wacht en
+het beveiligingsjournaal gedekt zijn. Daarna volgen:
+1. de meldingsdienst met een reservekanaal;
+2. de tegenproef op alarmstormen;
+3. een onafhankelijke storingstest.
+
+**Vier garanties, en waar ze nu staan:**
+
+| Garantie | Stand na stap 2 |
+|---|---|
+| **Onafhankelijke waarneming.** Valt de hele server uit, dan ziet de externe sonde dat. | **In code, niet in bedrijf.** Een dode server laat de bestaande reizen van `sonde.js` zakken (`/api/health`), en de bewakingscontrole wordt "geen antwoord", dus niet gelukt. Dat geldt pas als de sonde echt op een andere machine draait, en dat is nog niet geregeld (par. 9b, eis 1). |
+| **Geen vals veiligheidsgevoel.** Een werkende meetroute bewijst niet dat de beveiliging werkt. | **Zo gebouwd, en hier hardop.** `bewaking` zegt alleen dat een sensor nog **rondes draait**, niet dat hij goed oordeelt. Dat een handhaver ook echt tegenhoudt, bewijzen de sabotagewetten (`SABOTAGE.json`), en ook die alleen voor de geprobeerde overtreding. Een groene `bewaking` is dus nooit "de beveiliging werkt". |
+| **Bestand tegen alarmstormen.** Herhaalde storingssignalen geven geen onbeperkte meldingen of zware acties. | **Deels.** Een stille sensor zet nooit een stand, en `alarm.js` meldt alleen bij een overgang. De tegenproef met wisselende bronnen en flikkerende alarmen (par. 9c) is nog niet gedaan. |
+| **Controleerbare terugkeer.** Herstel blijkt uit nieuwe geslaagde metingen, niet uit een gewist alarm. | **Gebouwd.** Een tikker of de auditwacht wordt pas weer `levend` na een nieuwe geslaagde ronde. Het schild herstelt pas na een weging waarin het weer verkeer zag. Een bron met verloren meldingen herstelt pas als er daarna weer een melding **aankomt**; de teller blijft als spoor staan (`test/sensorstilte.test.js` 6b). Een alarm stilzetten verandert niets aan de stand. |
+
 **De integrale tegenproef (stap 5) simuleert vijf storingen.**
 
 | Storing | Wat RTG moet aantonen |

@@ -37,7 +37,7 @@ module.exports = function schildWacht({ app, log, beveiligVan }) {
      (WEERBAARHEID.md par. 9 punt 1). */
   const stilte = require('../kern/command/sensorstilte');
   const schild = require('../kern/schild').maakSchild({
-    meld: (type, ernst, tekst, meta) => { const b = beveiligVan(); if (b) b.meld(type, ernst, tekst, meta); else stilte.verloren('schild'); },
+    meld: (type, ernst, tekst, meta) => { const b = beveiligVan(); if (b) { b.meld(type, ernst, tekst, meta); stilte.aangekomen('schild'); } else stilte.verloren('schild'); },
     logboek: log,
     quarantaine: (ip) => !!(wacht && wacht.inQuarantaine(ip))
   });

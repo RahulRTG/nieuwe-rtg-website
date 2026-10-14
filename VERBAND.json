@@ -1,10 +1,10 @@
 {
   "stempel": {
-    "op": "2026-10-14T03:35:43.101Z",
-    "commit": "715b6e43",
+    "op": "2026-10-14T11:13:17.762Z",
+    "commit": "01e43fac",
     "boomVuil": false,
     "instrument": "scripts/verband.js",
-    "node": "v22.22.0"
+    "node": "v26.11.1"
   },
   "uitleg": "De ijking van de verbandlaag: kan een onafhankelijke waarnemer de wet->wachter-randen terugvinden die WETTEN.json verklaart? Het veld `handhaver` is hier de REFERENTIE en wordt door geen enkele sensor gelezen -- anders ijkt de machine zichzelf en is de uitslag altijd honderd procent.",
   "graad": "vermoed",
@@ -26,7 +26,7 @@
     "causaal": {
       "recall": 8,
       "van": 67,
-      "voorstellen": 27,
+      "voorstellen": 28,
       "bron": "gemeten"
     },
     "document": {
@@ -50,7 +50,7 @@
     "wettekst": {
       "recall": 58,
       "van": 67,
-      "voorstellen": 448,
+      "voorstellen": 451,
       "bron": "gemeten"
     }
   },

@@ -1,7 +1,7 @@
 /* RTG Living Mall.
    De Mall is een projectie van bestaande bronnen. Daarom draagt de vorm één
    centrale selectie en geen los raster van concurrerende winkelkaarten. */
-html{background:#0b0807}
+html{background:#ede8df}
 html body.rtg-mall-living{
   --mall-bg:#0b0807;
   --mall-panel:#120d0a;
@@ -13,18 +13,18 @@ html body.rtg-mall-living{
   --mall-line:rgba(235,204,148,.22);
   --mall-wine:#7f1634;
   --mall-green:#8eb993;
-  background:
-    radial-gradient(80rem 45rem at 78% -8%,rgba(137,79,42,.17),transparent 62%),
-    linear-gradient(180deg,#0d0907,var(--mall-bg) 44%,#080605)!important;
+  background:#ede8df!important;
   color:var(--mall-ink);
 }
 html body.rtg-stijl.rtg-shop-flow.rtg-shop-discover.rtg-mall-living[data-rtg-world="living"][data-rtg-skin="heritage"]{
-  background:#0b0807!important;
+  background:#ede8df!important;
   color:var(--mall-ink)!important;
 }
 body.rtg-mall-living .wd-shell,
-body.rtg-mall-living #rtgWorldContent,
-body.rtg-mall-living #main{background:transparent!important;color:var(--mall-ink)!important}
+body.rtg-mall-living #rtgWorldContent{background:transparent!important;color:var(--mall-ink)!important}
+body.rtg-mall-living #main{background:
+  radial-gradient(80rem 45rem at 78% -8%,rgba(137,79,42,.17),transparent 62%),
+  linear-gradient(180deg,#0d0907,var(--mall-bg) 44%,#080605)!important;color:var(--mall-ink)!important}
 body.rtg-mall-living .mall-live,
 body.rtg-mall-living .mall-stage__story,
 body.rtg-mall-living .mall-capabilities,

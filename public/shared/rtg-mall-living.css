@@ -59,6 +59,12 @@ body.rtg-mall-living.mall-complete-open #main>#vast{animation:mall-reveal .38s c
 .mall-live__continuity span,.mall-live__continuity b{display:block}
 .mall-live__continuity span{color:var(--mall-dim);font-size:11px}
 .mall-live__continuity b{margin-top:7px;color:var(--mall-ink);font:500 13px/1.5 Inter,sans-serif}
+html body.rtg-mall-living #main .mall-live__intro{min-height:min(720px,calc(100svh - 110px));align-content:end;padding:clamp(34px,6vw,70px)!important;background:
+  linear-gradient(90deg,rgba(7,5,4,.82),rgba(7,5,4,.24) 64%,rgba(7,5,4,.08)),
+  linear-gradient(0deg,rgba(7,5,4,.92),transparent 58%),
+  #110d0a url('/images/mall/cinematic-arcade-v1.jpg') center 46%/cover no-repeat!important}
+html body.rtg-mall-living #main .mall-live__intro .mall-live__continuity{border-left-color:rgba(255,248,236,.28);text-shadow:0 2px 18px #000}
+html body.rtg-mall-living #main .mall-live__intro :is(h1,p,b,span){text-shadow:0 2px 24px rgba(0,0,0,.72)}
 
 .mall-departments{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--mall-line)}
 .mall-departments::-webkit-scrollbar{display:none}
@@ -67,29 +73,17 @@ body.rtg-mall-living.mall-complete-open #main>#vast{animation:mall-reveal .38s c
 .mall-departments button:focus-visible{outline:2px solid var(--mall-metal);outline-offset:-3px}
 
 .mall-stage{min-height:600px;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(330px,.8fr);border-bottom:1px solid var(--mall-line)}
-.mall-stage__visual{position:relative;min-height:600px;overflow:hidden;border-right:1px solid var(--mall-line);isolation:isolate;background:
-  radial-gradient(circle at 50% 48%,rgba(235,204,148,.18),transparent 17%),
-  radial-gradient(circle at 50% 70%,rgba(127,22,52,.17),transparent 36%),
-  linear-gradient(145deg,#17100c,#0b0807 58%,#1e130d)}
-.mall-stage__visual::before{content:"";position:absolute;inset:0;z-index:-3;background-image:var(--mall-stage-image,none);background-position:center;background-size:cover;opacity:.4;filter:saturate(.8) contrast(1.08);transition:opacity .45s,transform .7s;transform:scale(1.03)}
-.mall-stage__visual::after{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(9,6,5,.6),transparent 45%,rgba(9,6,5,.3)),linear-gradient(0deg,#0b0807 0,transparent 45%)}
-.mall-stage__object{position:absolute;left:50%;top:48%;width:250px;height:155px;transform:translate(-50%,-50%);display:grid;place-items:center;border:1px solid rgba(235,204,148,.38);border-radius:var(--rtg-radius-system);background:linear-gradient(155deg,#f4e7cd 0%,#cbbda5 46%,#8d7b62 100%);box-shadow:inset 0 2px 6px #fff7,0 42px 70px #000b,0 0 70px rgba(235,204,148,.16);transition:width .45s,height .45s,border-radius .45s,transform .55s cubic-bezier(.2,.8,.2,1)}
-.mall-stage__object::before{content:"";position:absolute;inset:14px;border:1px solid rgba(71,52,35,.18);border-radius:var(--rtg-radius-system)}
-.mall-stage__object span{color:#32271e;font:500 35px/1 "Bodoni Moda",serif;letter-spacing:-.04em}
-.mall-stage__visual[data-kind="software"] .mall-stage__object{width:285px;height:360px;border-radius:var(--rtg-radius-editorial);background:linear-gradient(145deg,rgba(31,24,20,.96),rgba(5,5,5,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 35px 75px #000c}
-.mall-stage__visual[data-kind="software"] .mall-stage__object span{color:var(--mall-metal);font-size:46px}
-.mall-stage__visual[data-kind="experience"] .mall-stage__object,
-.mall-stage__visual[data-kind="travel"] .mall-stage__object,
-.mall-stage__visual[data-kind="reis"] .mall-stage__object,
-.mall-stage__visual[data-kind="verblijf"] .mall-stage__object{width:330px;height:210px;border-radius:var(--rtg-radius-editorial);background:linear-gradient(135deg,rgba(127,22,52,.92),rgba(27,18,14,.96))}
-.mall-stage__visual[data-kind="dienst"] .mall-stage__object,
-.mall-stage__visual[data-kind="services"] .mall-stage__object{width:250px;height:250px;border-radius:50%;background:linear-gradient(145deg,#261a13,#0a0807)}
-.mall-stage__caption{position:absolute;left:26px;bottom:24px;margin:0;color:var(--mall-copy);font:500 10px/1.4 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase}
-.mall-stage__worlds{position:absolute;inset:0;pointer-events:none}
-.mall-stage__worlds i{position:absolute;width:11px;height:11px;border:1px solid var(--mall-metal);border-radius:50%;box-shadow:0 0 24px rgba(235,204,148,.4)}
-.mall-stage__worlds i::after{content:"";position:absolute;top:5px;width:88px;height:1px;background:linear-gradient(90deg,var(--mall-line),transparent)}
-.mall-stage__worlds i:nth-child(1){left:15%;top:22%}.mall-stage__worlds i:nth-child(2){right:15%;top:21%}.mall-stage__worlds i:nth-child(3){left:18%;bottom:24%}.mall-stage__worlds i:nth-child(4){right:16%;bottom:21%}
-.mall-stage__worlds i:nth-child(2)::after,.mall-stage__worlds i:nth-child(4)::after{right:0;transform:rotate(180deg)}
+.mall-stage__visual{--mall-stage-image:url('/images/mall/cinematic-arcade-v1.jpg');position:relative;min-height:600px;overflow:hidden;border-right:1px solid var(--mall-line);isolation:isolate;background:#120d0a}
+.mall-stage__visual::before{content:"";position:absolute;inset:-2%;z-index:-3;background-image:var(--mall-stage-image);background-position:center;background-size:cover;opacity:.94;filter:saturate(.82) contrast(1.07) brightness(.86);transition:opacity .45s,transform 1.1s cubic-bezier(.2,.8,.2,1);transform:scale(1.025)}
+.mall-stage__visual::after{content:"";position:absolute;inset:0;z-index:-2;background:
+  linear-gradient(90deg,rgba(8,6,5,.42),transparent 42%,rgba(8,6,5,.12)),
+  linear-gradient(0deg,rgba(8,6,5,.86),transparent 38%,rgba(8,6,5,.1) 75%,rgba(8,6,5,.24)),
+  radial-gradient(circle at 72% 18%,transparent 0,rgba(8,6,5,.18) 76%)}
+.mall-stage__visual[data-kind="software"],.mall-stage__visual[data-kind="dienst"],.mall-stage__visual[data-kind="services"]{--mall-stage-image:url('/images/mall/cinematic-software-v1.jpg')}
+.mall-stage__visual[data-kind="experience"],.mall-stage__visual[data-kind="travel"],.mall-stage__visual[data-kind="reis"],.mall-stage__visual[data-kind="verblijf"],.mall-stage__visual[data-kind="boeking"],.mall-stage__visual[data-kind="ticket"]{--mall-stage-image:url('/images/mall/cinematic-experience-v1.jpg')}
+.mall-stage__visual[data-kind="hardware"],.mall-stage__visual[data-kind="product"],.mall-stage__visual[data-kind="wonen"]{--mall-stage-image:url('/images/mall/cinematic-hardware-v1.jpg')}
+.mall-stage__object,.mall-stage__worlds{display:none}
+.mall-stage__caption{position:absolute;left:26px;bottom:24px;margin:0;padding:9px 12px;border:1px solid rgba(255,248,236,.2);border-radius:var(--rtg-radius-capsule);background:rgba(10,8,7,.34);color:#fff8ec;font:600 9px/1.4 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 12px 35px rgba(0,0,0,.28);backdrop-filter:blur(16px)}
 
 .mall-stage__story{display:flex;flex-direction:column;justify-content:center;padding:clamp(30px,4.5vw,64px);background:linear-gradient(155deg,rgba(255,255,255,.025),transparent 52%)}
 .mall-stage__meta{display:flex;justify-content:space-between;gap:20px;color:var(--mall-metal);font:600 9px/1.3 Inter,sans-serif;letter-spacing:.15em;text-transform:uppercase}
@@ -123,8 +117,10 @@ body.rtg-mall-living.mall-complete-open #main>#vast{animation:mall-reveal .38s c
 .mall-selection__rail::-webkit-scrollbar,.mall-partners__rail::-webkit-scrollbar{display:none}
 .mall-product{position:relative;flex:0 0 min(330px,31vw);min-height:430px;scroll-snap-align:start;display:flex;flex-direction:column;border:1px solid var(--mall-line);border-radius:var(--rtg-radius-editorial);background:var(--mall-panel);color:var(--mall-ink);text-align:left;overflow:hidden;cursor:pointer}
 .mall-product[aria-current="true"]{border-color:rgba(235,204,148,.7)}
-.mall-product__image{height:225px;background-color:#17100d;background-image:linear-gradient(0deg,rgba(11,8,7,.74),transparent 65%),var(--mall-product-image);background-size:cover;background-position:center;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.mall-product__image{position:relative;height:240px;background-color:#17100d;background-image:linear-gradient(0deg,rgba(11,8,7,.82),transparent 62%),var(--mall-product-image);background-size:cover;background-position:center;filter:saturate(.82) contrast(1.045) brightness(.9);transition:transform .75s cubic-bezier(.2,.8,.2,1),filter .75s}
+.mall-product__image::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,226,180,.08),transparent 30%,rgba(8,6,5,.18));box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);pointer-events:none}
 .mall-product:hover .mall-product__image{transform:scale(1.025)}
+.mall-product:hover .mall-product__image{filter:saturate(.9) contrast(1.04) brightness(.96)}
 .mall-product__body{display:flex;flex:1;flex-direction:column;padding:20px}
 .mall-product__state{display:flex;justify-content:space-between;gap:12px;color:var(--mall-metal);font-size:9px;letter-spacing:.12em;text-transform:uppercase}
 .mall-product__state span:last-child{color:var(--mall-dim);text-align:right}
@@ -184,16 +180,31 @@ body.rtg-mall-living.mall-complete-open #main>#vast{animation:mall-reveal .38s c
 .mall-visual-46{--mall-product-image:url('/images/editorial/public-night.webp');--mall-stage-image:url('/images/editorial/public-night.webp')}
 .mall-visual-47{--mall-product-image:url('/images/editorial/widget-table.webp');--mall-stage-image:url('/images/editorial/widget-table.webp')}
 .mall-visual-48{--mall-product-image:url('/images/editorial/work-project.webp');--mall-stage-image:url('/images/editorial/work-project.webp')}
-.mall-visual-49{--mall-product-image:linear-gradient(145deg,#5a1b2d,#120d0a 64%);--mall-stage-image:radial-gradient(circle at 32% 28%,#9f415d,#1a100d 55%)}
-.mall-visual-50{--mall-product-image:linear-gradient(145deg,#1a3940,#0a1112 64%);--mall-stage-image:radial-gradient(circle at 70% 26%,#2c7884,#0b0d0d 58%)}
-.mall-visual-51{--mall-product-image:linear-gradient(145deg,#4c3b20,#100d08 64%);--mall-stage-image:radial-gradient(circle at 38% 34%,#a07d3d,#120d08 60%)}
-.mall-visual-52{--mall-product-image:linear-gradient(145deg,#33234e,#0d0912 64%);--mall-stage-image:radial-gradient(circle at 65% 30%,#6d4f96,#0d0910 58%)}
-.mall-visual-53{--mall-product-image:linear-gradient(145deg,#214630,#09110d 64%);--mall-stage-image:radial-gradient(circle at 42% 28%,#4d8b65,#09100c 60%)}
-.mall-visual-54{--mall-product-image:linear-gradient(145deg,#69382c,#120b08 64%);--mall-stage-image:radial-gradient(circle at 68% 34%,#b46f52,#130c09 58%)}
-.mall-visual-55{--mall-product-image:linear-gradient(145deg,#273b58,#090d13 64%);--mall-stage-image:radial-gradient(circle at 35% 26%,#527aa8,#091019 58%)}
-.mall-visual-56{--mall-product-image:linear-gradient(145deg,#51402d,#110d09 64%);--mall-stage-image:radial-gradient(circle at 62% 30%,#b28b58,#120e09 58%)}
-.mall-visual-57{--mall-product-image:linear-gradient(145deg,#462330,#10090c 64%);--mall-stage-image:radial-gradient(circle at 36% 31%,#9a4f69,#11090d 58%)}
-.mall-visual-58{--mall-product-image:linear-gradient(145deg,#263b38,#090f0e 64%);--mall-stage-image:radial-gradient(circle at 66% 28%,#52847c,#090f0e 58%)}
+.mall-visual-49{--mall-product-image:url('/images/world-homes/living-coast.webp')}
+.mall-visual-50{--mall-product-image:url('/images/travelos/private-aviation.jpg')}
+.mall-visual-51{--mall-product-image:url('/images/travelos/hotel-executive.jpg')}
+.mall-visual-52{--mall-product-image:url('/images/daily/pulse.webp')}
+.mall-visual-53{--mall-product-image:url('/images/worlds/heritage/foundation-meedoen-atelier-v1.jpg')}
+.mall-visual-54{--mall-product-image:url('/images/travelos/residence-lobby.jpg')}
+.mall-visual-55{--mall-product-image:url('/images/world-homes/work-sfeer.jpg')}
+.mall-visual-56{--mall-product-image:url('/images/first-steps/galerij.webp')}
+.mall-visual-57{--mall-product-image:url('/images/travelos/night-road.jpg')}
+.mall-visual-58{--mall-product-image:url('/images/music/rtg-sound-hero-v1.jpg')}
+
+.mall-gate{position:relative;min-height:calc(100svh - 76px);overflow:hidden;isolation:isolate;background:#0b0807;color:#fff8ec}
+.mall-gate__image{position:absolute;inset:-2%;z-index:-3;background:url('/images/mall/cinematic-arcade-v1.jpg') center 46%/cover no-repeat;filter:saturate(.8) contrast(1.08) brightness(.78);transform:scale(1.03);animation:mall-gate-drift 16s ease-out both}
+.mall-gate__veil{position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(7,5,4,.84),rgba(7,5,4,.26) 60%,rgba(7,5,4,.08)),linear-gradient(0deg,rgba(7,5,4,.94),transparent 58%,rgba(7,5,4,.16))}
+.mall-gate__copy{min-height:inherit;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;width:min(680px,100%);padding:clamp(48px,9vw,110px)}
+.mall-gate__copy h1{margin:4px 0 18px;color:#fff8ec;font:400 clamp(58px,8vw,106px)/.86 "Bodoni Moda",Didot,Georgia,serif;letter-spacing:-.045em}
+.mall-gate__copy h1 em{color:var(--mall-metal);font-style:normal}
+.mall-gate__copy>p:not(.mall-live__eyebrow){max-width:560px;margin:0;color:#e0d5c8;font:400 clamp(15px,1.5vw,19px)/1.65 Inter,sans-serif}
+.mall-gate__action{display:flex;justify-content:space-between;align-items:center;gap:30px;min-width:min(330px,100%);margin-top:28px;padding:17px 20px;border:1px solid rgba(235,204,148,.62);background:rgba(12,9,7,.28);color:#fff8ec;font:600 12px/1 Inter,sans-serif;text-decoration:none;box-shadow:0 20px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px)}
+.mall-gate__action span{color:var(--mall-metal);font-size:20px}
+.mall-gate__copy small{max-width:440px;margin-top:18px;color:rgba(255,248,236,.62);font:400 10px/1.5 Inter,sans-serif}
+body.mall-guest #main{max-width:none!important;min-height:0!important;height:auto!important;padding:0!important}
+body.mall-guest .mall-edge__rahul{border:1px solid rgba(235,204,148,.3)!important;background:rgba(235,204,148,.08)!important;color:var(--mall-metal)!important}
+
+@keyframes mall-gate-drift{from{transform:scale(1.08) translate3d(-.5%,0,0)}to{transform:scale(1.03) translate3d(0,0,0)}}
 .mall-empty{width:100%;margin:0;padding:34px;border:1px solid var(--mall-line);color:var(--mall-copy);font:400 15px/1.6 Inter,sans-serif}
 
 .mall-partner{flex:0 0 min(250px,25vw);min-height:150px;scroll-snap-align:start;padding:22px;border:1px solid var(--mall-line);border-radius:var(--rtg-radius-editorial);background:linear-gradient(145deg,var(--mall-panel-soft),#0e0a08);color:var(--mall-ink);text-decoration:none}
@@ -226,13 +237,14 @@ body.rtg-mall-living.mall-complete-open #main>#vast{animation:mall-reveal .38s c
   body.rtg-mall-living main{padding:0 0 9rem!important}
   body.rtg-mall-living>header{padding-inline:18px}
   .mall-live{padding:32px 0 24px;overflow:hidden}
-  .mall-live__intro{padding:0 20px 25px}.mall-live__intro h1{font-size:clamp(48px,15vw,68px)}.mall-live__intro>div>p:last-child{font-size:14px}.mall-live__continuity{display:none}
+  html body.rtg-mall-living #main .mall-live__intro{min-height:min(680px,calc(100svh - 84px));padding:40px 20px 30px!important;background-position:center,center,53% center!important}.mall-live__intro h1{font-size:clamp(48px,15vw,68px)}.mall-live__intro>div>p:last-child{font-size:14px}.mall-live__continuity{display:none}
   .mall-departments{padding-left:12px}.mall-departments button{min-height:54px;padding:0 13px}
-  .mall-stage{min-height:0}.mall-stage__visual{min-height:410px}.mall-stage__object{width:210px;height:130px}.mall-stage__visual[data-kind="software"] .mall-stage__object{width:220px;height:290px}.mall-stage__story{padding:28px 20px 34px}.mall-stage__story h2{font-size:45px}.mall-stage__actions{grid-template-columns:1fr 1fr}.mall-stage__actions .mall-action--primary{grid-column:1/-1}.mall-stage__meta{font-size:8px}
+  .mall-stage{min-height:0}.mall-stage__visual{min-height:430px}.mall-stage__visual::before{background-position:center 42%}.mall-stage__caption{left:18px;bottom:18px;max-width:calc(100% - 36px)}.mall-stage__story{padding:28px 20px 34px}.mall-stage__story h2{font-size:45px}.mall-stage__actions{grid-template-columns:1fr 1fr}.mall-stage__actions .mall-action--primary{grid-column:1/-1}.mall-stage__meta{font-size:8px}
   .mall-capabilities{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.mall-capabilities>div{flex:0 0 74%;min-height:118px;border-right:1px solid var(--mall-line)!important;border-bottom:0!important;scroll-snap-align:start}
   .mall-selection,.mall-partners,.mall-reviews{padding:42px 20px}.mall-selection>header,.mall-partners>header,.mall-reviews>header{align-items:start}.mall-selection h2,.mall-partners h2,.mall-reviews h2{font-size:38px}.mall-selection>header>span,.mall-partners>header>span{max-width:80px;text-align:right}
   .mall-selection__rail,.mall-partners__rail{margin-right:-20px;padding-right:20px}.mall-product{flex-basis:82vw;min-height:405px}.mall-product__image{height:215px}.mall-partner{flex-basis:72vw}
   .mall-reviews>div{grid-template-columns:1fr}.mall-compare{padding:24px 18px}.mall-compare>div{grid-template-columns:1fr}.mall-complete-trigger{margin-top:32px}.mall-live__source{padding-inline:20px}
+  .mall-gate{min-height:calc(100svh - 64px)}.mall-gate__image{background-position:52% center}.mall-gate__veil{background:linear-gradient(0deg,rgba(7,5,4,.96) 3%,rgba(7,5,4,.48) 52%,rgba(7,5,4,.12) 84%),linear-gradient(90deg,rgba(7,5,4,.35),transparent)}.mall-gate__copy{padding:42px 24px max(118px,calc(92px + env(safe-area-inset-bottom)))}.mall-gate__copy h1{font-size:clamp(54px,16vw,72px)}.mall-gate__copy>p:not(.mall-live__eyebrow){font-size:14px}.mall-gate__action{width:100%}
 }
-@media(prefers-reduced-motion:reduce){.mall-product__image,.mall-stage__object,.mall-stage__visual::before{transition:none}.mall-product:hover .mall-product__image{transform:none}}
+@media(prefers-reduced-motion:reduce){.mall-product__image,.mall-stage__visual::before{transition:none}.mall-product:hover .mall-product__image{transform:none}.mall-gate__image{animation:none}}
 @media(forced-colors:active){.mall-stage__object,.mall-product,.mall-partner,.mall-action{border:1px solid CanvasText;background:Canvas;color:CanvasText}}

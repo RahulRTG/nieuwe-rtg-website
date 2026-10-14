@@ -431,9 +431,20 @@ const api = (pad, body, herkans) => fetch(pad, {
 const AS = { zoek: '', pagina: 1, mijn: false, laatste: {} };
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
-    '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
+  document.body.classList.add('mall-guest');
+  $('#main').innerHTML = '<section class="mall-gate" aria-labelledby="mallGateTitle">'+
+    '<div class="mall-gate__image" aria-hidden="true"></div>'+
+    '<div class="mall-gate__veil" aria-hidden="true"></div>'+
+    '<div class="mall-gate__copy"><p class="mall-live__eyebrow">RTG Mall · LivingOS</p>'+
+    '<h1 id="mallGateTitle">Een wereld die<br><em>op u wacht.</em></h1>'+
+    '<p>Software, huizen, reizen en bijzondere ervaringen komen na het inloggen samen in één persoonlijke Mall.</p>'+
+    '<a class="mall-gate__action" href="/apps/app.html">Open uw RTG-wereld <span aria-hidden="true">→</span></a>'+
+    '<small>Uw selectie en rechten blijven verbonden aan uw eigen RTG-account.</small></div></section>';
+  $('#mallEdgeControls').innerHTML = '<a href="/apps/rtg.html"><span>Home</span></a>'+
+    '<a href="/apps/app.html#werelden"><span>Werelden</span></a>'+
+    '<a class="mall-edge__rahul" href="/apps/app.html"><span>Rahul</span></a>'+
+    '<a href="/apps/app.html"><span>Account</span></a>'+
+    '<a href="/apps/app.html#menu"><span>Menu</span></a>';
 } else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadAppstore(); laadReisbieb(); laadRtfbieb(); }
 
 /* ---------- De vindlaag: locatie en intentie eerst ----------

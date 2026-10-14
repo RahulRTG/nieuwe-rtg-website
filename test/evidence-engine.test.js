@@ -170,6 +170,20 @@ test('de planner noemt de volledige fallback en de risicobaan expliciet', () => 
   assert.equal(planner.risicobaan('cosmetic'), 'light');
 });
 
+test('een gewijzigde bewijsmachine geeft altijd de volledige route, ook als er bewijs zou passen', () => {
+  /* Main na de merge van #614: test/helper.js gewijzigd en toch incrementeel,
+     met 1307 + 332 toetsen in twee jobs die tegen hun timeout liepen. */
+  const boek = { bewijzen: { x: {} } };
+  assert.deepEqual(planner.modusbesluit({ volledig: true }, { REUSED: 900, REPROVE: 1307, UNKNOWN: 0 }, boek, true),
+    { mode: 'full', code: 'bewijsmachine-gewijzigd', reden: 'de code die bewijs selecteert of uitvoert is zelf gewijzigd' });
+  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: 0, REPROVE: 4, UNKNOWN: 0 }, boek, true).code,
+    'bewijsmachine-gewijzigd');
+  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: 900, REPROVE: 3, UNKNOWN: 0 }, boek, false).mode,
+    'incremental', 'zonder gewijzigde machine blijft hergebruik gewoon toegestaan');
+  assert.equal(planner.modusbesluit({ volledig: false }, { REUSED: 900, REPROVE: 3, UNKNOWN: 0 }, boek, true).code,
+    'impact-onvolledig', 'een onbegrensde impact blijft de eerste reden');
+});
+
 test('de Evidence Control Plane bindt elke hergebruikte toets aan een negatieve claim', () => {
   const plan = { formaat: 'rtg-evidence-plan-v2', basis: 'basis',
     snapshot: { rootHash: 'snap' }, gewijzigd: ['server/a.js'], mode: 'incremental',

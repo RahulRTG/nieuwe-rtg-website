@@ -743,16 +743,25 @@ const BROWSERRUIS = ['Transition was skipped',
    bak en niet erop: een eigenschap op de array laat elke
    assert.deepEqual(fouten, []) zakken op een lijst zonder een enkele fout. Elke andere melding, ook
    "Load failed" (een echte netwerkfout), blijft een fout.
-   test/mobile-content.e2e.js houdt een strengere zeef voor zijn eigen venster. */
+   test/mobile-content.e2e.js houdt een strengere zeef voor zijn eigen venster
+   en geeft daarom { eigenZeef: true } mee: dan komt elke melding ongefilterd bij
+   zijn bak. De zeef volgt de motor van de PAGINA (motorVan), want met een knop
+   draaien Chromium en WebKit in dezelfde stand (testMotoren). */
 function afbrekingsTekst(bericht, host) {
   return !!host && String(bericht).includes(host + '/') && / due to access control checks\.$/.test(String(bericht));
 }
-function webkitAfbreking(bericht, origin) {
-  return testMotor() === 'webkit' && !!origin && afbrekingsTekst(bericht, origin.replace(/^https?:\/\//, ''));
+function webkitAfbreking(bericht, origin, motor) {
+  return (motor || testMotor()) === 'webkit' && !!origin && afbrekingsTekst(bericht, origin.replace(/^https?:\/\//, ''));
+}
+/* De motor van een Playwright-pagina zelf. Sinds een knop beide motoren in een
+   stand draait (testMotoren), zegt de knop niet meer welke motor een pagina
+   heeft; zonder dat antwoord (een eigen driver) geldt de knop. */
+function motorVan(page) {
+  try { return page.context().browser().browserType().name(); } catch (e) { return null; }
 }
 const afgebrokenTelling = new WeakMap();
 function afgebrokenIn(bak) { return afgebrokenTelling.get(bak) || 0; }
-function letOpFouten(page, bak) {
+function letOpFouten(page, bak, opties) {
   /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
      bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een
      plek. Zonder dit zou de omzetting naar dit hulpje die toetsen laten vallen
@@ -762,7 +771,7 @@ function letOpFouten(page, bak) {
     const bericht = String((e && e.message) || e);
     let origin = '';
     try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
-    if (webkitAfbreking(bericht, origin)) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
+    if (!(opties && opties.eigenZeef) && webkitAfbreking(bericht, origin, motorVan(page))) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
     if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
   });
   return bak;
@@ -1373,9 +1382,22 @@ function browserOpties(pw, extra) {
    op de handmatige checklist. Een onbekende motor is een fout, geen terugval. */
 const MOTOREN = new Set(['chromium', 'webkit']);
 function testMotor() {
+  /* De oude tweede knop (RTG_TEST_WEBKIT=1, fase 2.3 opgeheven) is een fout en
+     geen stille no-op: wie hem nog zet, verwacht WebKit en kreeg anders zonder
+     melding alleen Chromium. */
+  if (process.env.RTG_TEST_WEBKIT !== undefined) {
+    throw new Error('RTG_TEST_WEBKIT bestaat niet meer; zet RTG_TEST_MOTOR=webkit (een knop voor alle browsertoetsen).');
+  }
   const m = String(process.env.RTG_TEST_MOTOR || 'chromium').trim().toLowerCase();
   if (!MOTOREN.has(m)) throw new Error('RTG_TEST_MOTOR kent alleen chromium en webkit, niet: ' + m);
   return m;
+}
+/* DE MOTOREN VOOR EEN TOETS DIE ZELF OVER DE MOTOREN LOOPT (mobile-content,
+   pass-startup, world-palette): Chromium is de referentie en draait altijd;
+   WebKit komt erbij als hij de motor onder toets is. Dezelfde knop als
+   testMotor(), zodat RTG_TEST_MOTOR=webkit overal hetzelfde betekent. */
+function testMotoren() {
+  return testMotor() === 'webkit' ? ['chromium', 'webkit'] : ['chromium'];
 }
 function webkitPad(pw) {
   try {
@@ -1783,7 +1805,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { startBrowser, testMotor, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, testMotoren, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

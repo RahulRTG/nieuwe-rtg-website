@@ -1,0 +1,73 @@
+name: Kwalificatie lokaal (de Slotsuite-route werkt)
+# DE LOKALE ROUTE VAN DE RELEASEKWALIFICATIE, op een schone machine gedraaid.
+# scripts/kwalificatie.js --lokaal is wat de Slotsuite lokaal draait: dezelfde
+# bouw en voor-controle als release-image.yml, in een tijdelijke werkboom.
+# Een route die alleen op iemands laptop loopt, verrot ongemerkt; deze job
+# draait hem precies zoals een ontwikkelaar hem draait (geen extra vlaggen,
+# geen geheimen, geen registry) zodra er iets verandert waar hij van afhangt.
+on:
+  pull_request:
+    # WAT DE ROUTE EN DE BOUW BEPAALT, en niet meer. test/ketenlokaal.test.js
+    # rekent deze lijst na: elk los bestand dat de Dockerfile kopieert, de
+    # require-keten van scripts/kwalificatie.js en van scripts/build.js (de
+    # `npm run build` IN het image, zonder devDependencies), de lockfiles en de
+    # Rust-bron. Mist er een, dan zakt die toets. Wat NIET in de lijst staat:
+    # server/, public/ en scripts/ als geheel en de *.json in de wortel -- die
+    # gaan byte voor byte het image in, de voor-controle vergelijkt precies
+    # die bytes, en hun bouwbaarheid toetst de gewone bouwjob op elke PR.
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - .nvmrc
+      - package.json
+      - package-lock.json
+      - motor/Cargo.toml
+      - motor/Cargo.lock
+      - motor/src/**
+      - scripts/docker/**
+      - index.html
+      - docker-compose.yml
+      - docker-compose.live.yml
+      - .env.example
+      - VERWERKINGSREGISTER.md
+      - DATALEK.md
+      - scripts/kwalificatie.js
+      - scripts/release-bewijs.js
+      - scripts/build.js
+      - scripts/bundel.js
+      - scripts/afbouw-slot.js
+      - scripts/websitewaarheid.js
+      - scripts/workspace-worlds.js
+      - scripts/world-widgets.js
+      - scripts/ast/**
+      - scripts/lib/**
+      - public/shared/rtg-world-identity.js
+      - server/kern/appcatalogus-data.js
+      - server/kern/appcatalogus-rijen/**
+      - server/kern/appgids.js
+      - server/kern/appgids-data/**
+      - server/kern/pasladder.js
+      - server/kern/rtfappcatalogus-data.js
+      - server/kern/wereldroutes.js
+      - server/kern/wereldroutes/**
+      - .github/workflows/release-image.yml
+      - .github/workflows/kwalificatie-lokaal.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: kwalificatie-lokaal-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  lokaal:
+    name: Kwalificatie --lokaal (bouw + voor-controle, zoals de Slotsuite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: '.nvmrc'
+      - run: node scripts/kwalificatie.js --lokaal

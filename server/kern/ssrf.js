@@ -68,17 +68,32 @@ function privaatIpv4(o) {
   return false;
 }
 
+/* Het IPv4-adres achter ::ffff:a.b.c.d, ook in de hexvorm die de URL-parser
+   ervan maakt (::ffff:a9fe:a9fe). null als het niet te lezen is. */
+function gemaptIpv4(h) {
+  if (!h.startsWith('::ffff:')) return null;
+  const staart = h.slice(7);
+  const v = isIpv4(staart);
+  if (v) return v;
+  const m = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(staart);
+  if (!m) return null;
+  const hoog = parseInt(m[1], 16), laag = parseInt(m[2], 16);
+  return [hoog >> 8, hoog & 255, laag >> 8, laag & 255];
+}
+
 // Een IP-literal (v4 of v6) die we voor uitgaand verkeer nooit vertrouwen.
 function onveiligIpLiteral(host) {
   const v4 = isIpv4(host);
   if (v4) return privaatIpv4(v4);
   const h = host.replace(/^\[|\]$/g, '').toLowerCase(); // [::1] -> ::1
+  // hieronder alleen IPv6; anders las `fc`/`fd` ook fcbarcelona.com als ULA
+  if (!h.includes(':')) return false;
   if (h === '::1' || h === '::' || h === '::0') return true;       // loopback/onbepaald
   if (h.startsWith('fe80:')) return true;                          // link-local
   if (h.startsWith('fc') || h.startsWith('fd')) return true;       // unique-local fc00::/7
   if (h.startsWith('fec0:')) return true;                          // site-local (verouderd)
   if (h.startsWith('::ffff:')) {                                   // IPv4-mapped
-    const v = isIpv4(h.slice(7));
+    const v = gemaptIpv4(h);
     if (v) return privaatIpv4(v);
     return true;
   }
@@ -117,7 +132,8 @@ function veiligeExternalUrl(url) {
   let u;
   try { u = new URL(String(url || '')); } catch (e) { return { ok: false, reden: 'geen geldige URL' }; }
   if (u.protocol !== 'https:' && u.protocol !== 'http:') return { ok: false, reden: 'alleen http(s)' };
-  const host = u.hostname.toLowerCase();
+  // `localhost.` is localhost: de punt aan het eind telt niet
+  const host = u.hostname.toLowerCase().replace(/\.+$/, '');
   if (onveiligIpLiteral(host)) return { ok: false, reden: 'privé/gereserveerd/metadata-adres' };
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.internal') || host.endsWith('.local')) {
     return { ok: false, reden: 'interne hostnaam' };
@@ -135,6 +151,8 @@ function metadataDoel(host) {
   const h = String(host || '').replace(/^\[|\]$/g, '').toLowerCase();
   const v4 = isIpv4(h);
   if (v4) return v4[0] === 169 && v4[1] === 254;   // 169.254.0.0/16 (IMDS + link-local)
+  const gemapt = gemaptIpv4(h);                    // ook ::ffff:169.254.169.254
+  if (gemapt) return gemapt[0] === 169 && gemapt[1] === 254;
   if (h.startsWith('fe80:')) return true;          // IPv6 link-local
   if (h === 'fd00:ec2::254') return true;          // AWS IPv6 IMDS
   return false;

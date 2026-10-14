@@ -33,7 +33,12 @@
 
    Draai:  node scripts/toetsroutes.js --lees <journaal> [--lees ...]
              [--ronde <.toetsduur> ...] [--vorige TOETSROUTES.json]
-             [--commit <sha>] [--schrijf]
+             [--commit <sha>] [--schrijf | --naar <pad>]
+
+   --naar schrijft hetzelfde register naar een ander pad. De Slotsuite gebruikt
+   dat: zij draait deze stap lokaal na de volle testronde, en schrijft de kaart
+   buiten de repository -- precies zoals CI hem als artefact klaarzet in plaats
+   van hem zelf te committen.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -160,13 +165,14 @@ function versheid(register, opties) {
 }
 
 function main() {
-  const o = { journalen: [], duur: [], vorige: null, commit: null };
+  const o = { journalen: [], duur: [], vorige: null, commit: null, naar: null };
   for (let i = 2; i < process.argv.length; i++) {
     const a = process.argv[i];
     if (a === '--lees') o.journalen.push(path.resolve(process.argv[++i]));
     else if (a === '--ronde') o.duur.push(path.resolve(process.argv[++i]));
     else if (a === '--vorige') o.vorige = path.resolve(process.argv[++i]);
     else if (a === '--commit') o.commit = String(process.argv[++i]).slice(0, 9);
+    else if (a === '--naar') o.naar = path.resolve(process.argv[++i]);
   }
   if (!o.journalen.some((p) => fs.existsSync(p))) {
     console.error('\n  Geen enkel journaal gevonden; zonder bron is er geen ronde. Draai de suite met RTG_ROUTELOG gezet.\n');
@@ -179,7 +185,14 @@ function main() {
   console.log('  draaide zonder route' + String(g.draaideZonderRoute).padStart(5) + '   (eigenschap, geen nul)');
   console.log('  ongemeten           ' + g.ongemeten + '   (meetgat; volle ring)');
   console.log('  relaties            ' + g.relaties + ', waarvan in elke ronde waarin de toets draaide: ' + g.relatiesInElkeRonde);
-  if (process.argv.includes('--schrijf')) {
+  /* Twee schrijfregels en niet een met een berekend pad: scripts/bewijsladder.js
+     leest aan `writeFileSync(REGISTER, ...)` af welk register deze meter
+     schrijft, en een variabel doel zou dat verband voor de meter onzichtbaar
+     maken. */
+  if (o.naar) {
+    fs.writeFileSync(o.naar, JSON.stringify(uit, null, 1) + '\n');
+    console.log('  geschreven: ' + o.naar + ' (buiten de repository; een mens commit TOETSROUTES.json)\n');
+  } else if (process.argv.includes('--schrijf')) {
     fs.writeFileSync(REGISTER, JSON.stringify(uit, null, 1) + '\n');
     console.log('  geschreven: TOETSROUTES.json (een mens commit hem)\n');
   }

@@ -43,9 +43,18 @@ function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd) {
     return { mode: 'full', code: 'alle-bewijzen-onbekend',
       reden: 'geen enkel bewijs heeft begrensde invoer' };
   }
+  /* DE BEWIJSMACHINE ZELF GEWIJZIGD: dan altijd volledig, ook als er bewijs
+     "past". Dat bewijs is gemaakt door de oude machine (een andere
+     test/helper.js, test-runner.js, ci.yml...), en hergebruik ervan bewijst
+     niets over de nieuwe. Deze regel stond eerst binnen `!telling.REUSED` en
+     gold dus alleen als er toch al niets te hergebruiken viel. Gevolg op
+     13 oktober 2026: na de merge van #614 (test/helper.js) koos main de
+     incrementele route met 1307 unit- en 332 browsertoetsen in elk EEN job,
+     beide liepen tegen hun timeout, main kreeg geen nieuwe vertrouwde basis
+     en elke PR daarna moest dezelfde berg opnieuw bewijzen. */
+  if (bewijsMachineGewijzigd) return { mode: 'full', code: 'bewijsmachine-gewijzigd',
+    reden: 'de code die bewijs selecteert of uitvoert is zelf gewijzigd' };
   if (!telling.REUSED) {
-    if (bewijsMachineGewijzigd) return { mode: 'full', code: 'bewijsmachine-gewijzigd',
-      reden: 'de code die bewijs selecteert of uitvoert is zelf gewijzigd' };
     if (boek && boek.ongeldig) return { mode: 'full', code: 'bewijsboek-ongeldig', reden: boek.ongeldig };
     if (!boek || !boek.bewijzen || Object.keys(boek.bewijzen).length === 0) {
       return { mode: 'full', code: 'geen-vertrouwd-bewijsboek',

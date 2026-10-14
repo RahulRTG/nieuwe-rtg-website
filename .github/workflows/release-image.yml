@@ -107,7 +107,7 @@ jobs:
         run: node scripts/kwalificatie.js --controle --fase=na
       - name: Softwarebewijs bewaren, ook bij een mislukte ronde
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: software-proof-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           # Expliciete bewijsbestanden, nooit een hele .release-map met secrets.
@@ -241,7 +241,7 @@ jobs:
             --backup-repo="${RTG_CANDIDATE_BACKUP_IMAGE%:*}" --backup-digest="$backup_digest"
           node scripts/artefactketen.js controleer
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: herkomst
           path: |

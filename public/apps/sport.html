@@ -178,7 +178,7 @@ async function laadBord(){
   CLUBNAAM = (d.clubs[0]||{}).naam || CLUBNAAM;
   BORD = d.wedstrijden||[];
   const komend=d.wedstrijden.filter(w=>!w.uitslag).reverse(), gespeeld=d.wedstrijden.filter(w=>w.uitslag);
-  let stand=null; try{stand=await api('/stand',{club:CLUB});}catch(e){}
+  let stand=null; try{const s=await api('/stand',{club:CLUB}); stand=heeftTabel(s)?s:null;}catch(e){}
   const wedstrijd=(w,komendNu)=>'<article class="sport-match'+(komendNu?' sport-fixture':'')+'">'+
     '<span class="sport-team"><span class="sport-crest">'+esc((w.thuis?w.club:w.tegen).slice(0,3).toUpperCase())+'</span>'+esc(w.thuis?w.club:w.tegen)+'</span>'+
     '<span class="sport-score"><b>'+(w.uitslag?esc(w.uitslag):'VS')+'</b><small>'+(w.uitslag?'Afgelopen':esc(w.datum)+' · '+esc(w.tijd))+'</small></span>'+
@@ -192,13 +192,18 @@ async function laadBord(){
   verbindOpen();
 }
 
+/* Een stand zonder tabel is geen stand: een afgebroken verzoek (WebKit bij
+   weg-navigeren) of een 502 geeft hier een leeg lijf. Op het bord valt de
+   stand dan weg, op het standscherm komt de melding -- nooit een TypeError
+   (test/sport-stand-onvolledig.test.js, de WebKit-job van run 38359884995). */
+const heeftTabel=d=>!!d&&Array.isArray(d.tabel);
 function tekenStand(d,max){
   const rijen=max?d.tabel.slice(0,max):d.tabel;
   return '<div class="sport-table"><table><tr><th>#</th><th>Club</th><th>G</th><th>W</th><th>GL</th><th>V</th><th>+/-</th><th>P</th></tr>'+rijen.map((r,i)=>
     '<tr'+(r.team===d.team?' class="eigen"':'')+'><td>'+(i+1)+'</td><td>'+esc(r.team)+'</td><td>'+r.g+'</td><td>'+r.w+'</td><td>'+r.gl+'</td><td>'+r.v+'</td><td>'+(r.dv-r.dt)+'</td><td><b>'+r.p+'</b></td></tr>').join('')+'</table></div>';
 }
 async function laadStand(){
-  let d; try{ d=await api('/stand',{club:CLUB}); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('/stand',{club:CLUB}); if(!heeftTabel(d)) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   $('#inhoud').innerHTML='<div class="sport-section"><h3>'+esc(d.competitie||'De stand')+'</h3></div>'+tekenStand(d)+
     '<div class="item"><div class="meta">Rechtstreeks berekend uit de uitslagen die de club invoert.</div></div>';
 }

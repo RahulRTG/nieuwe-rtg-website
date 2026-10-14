@@ -91,6 +91,7 @@ function afloopZonderHartslag(rauw) {
 function opruimer(t) {
   const tekil = [];
   const pidBestanden = [];
+  const mappen = [];
   t.after(() => {
     /* OOK WAT DE TOETS NOOIT HEEFT GELEZEN. Zakt een bewering vóór de regel die
        kind.pid uitleest, dan staat dat kleinkind in geen enkele lijst -- en dan
@@ -102,8 +103,17 @@ function opruimer(t) {
       try { tekil.push(Number(fs.readFileSync(b, 'utf8'))); } catch (e) { /* nooit geschreven */ }
     }
     for (const pid of tekil) { try { process.kill(pid, 'SIGKILL'); } catch (e) { /* al weg */ } }
+    /* EERST DOOD, DAN PAS DE MAP WEG. SIGKILL is een verzoek aan de kernel en
+       geen afgerond feit; zolang de ronde nog leeft, schrijft haar hartslag
+       (hier elke 100 ms) in de wegwerpmap. De map stond eerst onderaan de toets
+       zelf weg te gaan, VOOR deze opruimer de processen doodde -- en in CI gaf
+       dat ENOTEMPTY (#631, toetsscherf 4, 14 oktober 2026). Met de hartslag op
+       1 ms zakte de oude volgorde 2 van de 10 keer. */
+    for (const pid of tekil) wachtOp(() => { try { process.kill(pid, 0); return false; } catch (e) { return true; } });
+    for (const m of mappen) fs.rmSync(m, { recursive: true, force: true });
   });
   return {
+    map: (m) => { mappen.push(m); return m; },
     pidBestand: (b) => { pidBestanden.push(b); return b; },
     volg: (pid) => { if (pid) tekil.push(Number(pid)); return pid; },
     start: (argv, env) => {
@@ -246,7 +256,7 @@ test('DE KETEN: van claim tot herstel, met echte processen', (t) => {
   const g3 = A.magStarten('proefronde');
   assert.equal(g3.mag, true, 'na een expliciete afsluiting en een schone kring hoort de poort te openen: ' + g3.reden);
 
-  fs.rmSync(w.map, { recursive: true, force: true });
+  op.map(w.map);   // weg na de processen: zie opruimer()
 });
 
 test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
@@ -281,5 +291,5 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   assert.equal(A.lees().taak, 'proefronde', 'de afloop hoort nog van de EERSTE ronde te zijn');
   assert.equal(A.lees().stand, 'RUNNING', 'en de eerste ronde hoort gewoon door te draaien');
 
-  fs.rmSync(w.map, { recursive: true, force: true });   // de processen ruimt t.after() op
+  op.map(w.map);   // weg na de processen: zie opruimer()
 });

@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
-  "op": "2026-10-13",
-  "commit": "cfe0dd03b",
+  "op": "2026-10-14",
+  "commit": "72344772a",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -822,6 +822,7 @@
     "server/kern/command/runbookcatalogus.js",
     "server/kern/command/runbooks-historie.js",
     "server/kern/command/runbooks.js",
+    "server/kern/command/sensorstilte.js",
     "server/kern/command/simulatie.js",
     "server/kern/command/slo-rekenen.js",
     "server/kern/command/slo.js",
@@ -5459,36 +5460,36 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4475,
+  "bestanden": 4476,
   "nietGelezen": 0,
-  "aanroepen": 181101,
-  "kanten": 31543,
-  "kantenLokaal": 20245,
+  "aanroepen": 181179,
+  "kanten": 31569,
+  "kantenLokaal": 20263,
   "kantenIngevoerd": 2843,
-  "kantenLid": 2819,
+  "kantenLid": 2827,
   "kantenViaKern": 4899,
   "kantenModuleAlsFunctie": 106,
   "kantenLidOpInvoer": 325,
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135111,
-  "onopgelosteNamen": 13901,
+  "onopgelosteAanroepen": 135164,
+  "onopgelosteNamen": 13907,
   "onopgelostNaarSoort": {
-   "ingebouwd": 36278,
+   "ingebouwd": 36296,
    "externeModule": 1061,
    "kader": 12430,
    "contextobject": 20795,
    "uitgepaktObject": 1679,
-   "lokaleWaarde": 24190,
-   "methodeOpWaarde": 38211,
+   "lokaleWaarde": 24207,
+   "methodeOpWaarde": 38229,
    "overig": 467
   },
   "opgelostPct": 25.4,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 72,
-  "symbolenMetAanroeper": 12386,
+  "symbolenMetAanroeper": 12401,
   "routesMetSymbool": 3373,
   "routeSymboolKanten": 7091
  },
@@ -32826,15 +32827,15 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 35332
+   "aantal": 35350
   },
   {
    "naam": "String",
-   "aantal": 9307
+   "aantal": 9309
   },
   {
    "naam": "require",
-   "aantal": 8383
+   "aantal": 8389
   },
   {
    "naam": "app.post",
@@ -32858,11 +32859,11 @@
   },
   {
    "naam": "Number",
-   "aantal": 2436
+   "aantal": 2438
   },
   {
    "naam": "Object.assign",
-   "aantal": 2123
+   "aantal": 2124
   },
   {
    "naam": "Array.isArray",
@@ -32870,7 +32871,7 @@
   },
   {
    "naam": "Math.round",
-   "aantal": 1603
+   "aantal": 1606
   },
   {
    "naam": "Math.max",
@@ -32902,7 +32903,7 @@
   },
   {
    "naam": "Date.now",
-   "aantal": 656
+   "aantal": 657
   },
   {
    "naam": "crypto.randomBytes",
@@ -32918,7 +32919,7 @@
   },
   {
    "naam": "Object.entries",
-   "aantal": 477
+   "aantal": 478
   },
   {
    "naam": "JSON.stringify",
@@ -32991,19 +32992,19 @@
    "namen": [
     {
      "naam": "String",
-     "aantal": 9307
+     "aantal": 9309
     },
     {
      "naam": "require",
-     "aantal": 8383
+     "aantal": 8389
     },
     {
      "naam": "Number",
-     "aantal": 2436
+     "aantal": 2438
     },
     {
      "naam": "Object.assign",
-     "aantal": 2123
+     "aantal": 2124
     },
     {
      "naam": "Array.isArray",
@@ -33011,7 +33012,7 @@
     },
     {
      "naam": "Math.round",
-     "aantal": 1603
+     "aantal": 1606
     },
     {
      "naam": "Math.max",
@@ -33039,7 +33040,7 @@
     },
     {
      "naam": "Date.now",
-     "aantal": 656
+     "aantal": 657
     },
     {
      "naam": "Date.parse",
@@ -33047,7 +33048,7 @@
     },
     {
      "naam": "Object.entries",
-     "aantal": 477
+     "aantal": 478
     }
    ]
   },
@@ -33056,7 +33057,7 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 35319
+     "aantal": 35337
     },
     {
      "naam": "CallExpression",
@@ -33109,7 +33110,7 @@
     },
     {
      "naam": "rijen.filter",
-     "aantal": 175
+     "aantal": 176
     },
     {
      "naam": "fouten.push",
@@ -47051,7 +47052,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "sqliteInit",
    "hoe": "lokaal",
-   "lijn": 54
+   "lijn": 68
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47059,7 +47060,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "auditMotor",
    "hoe": "lokaal",
-   "lijn": 55
+   "lijn": 69
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47067,7 +47068,7 @@
    "naarBestand": "server/db/sqlite-poll.js",
    "naar": "snapshot",
    "hoe": "ingevoerd",
-   "lijn": 56
+   "lijn": 70
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47075,7 +47076,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "uitStore",
    "hoe": "lokaal",
-   "lijn": 64
+   "lijn": 78
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47083,7 +47084,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "sqliteInit",
    "hoe": "lokaal",
-   "lijn": 83
+   "lijn": 97
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47091,7 +47092,7 @@
    "naarBestand": "server/db/sqlite-poll.js",
    "naar": "externeCollecties",
    "hoe": "ingevoerd",
-   "lijn": 90
+   "lijn": 104
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47099,7 +47100,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "statements",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 104
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47107,7 +47108,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "auditMotor",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 104
   },
   {
    "vanBestand": "server/db/sqlite.js",
@@ -47115,7 +47116,7 @@
    "naarBestand": "server/db/sqlite.js",
    "naar": "sqliteInit",
    "hoe": "lokaal",
-   "lijn": 97
+   "lijn": 111
   },
   {
    "vanBestand": "server/db/starten.js",
@@ -76038,6 +76039,22 @@
    "lijn": 154
   },
   {
+   "vanBestand": "server/kern/command/alarm-aanvullend.js",
+   "van": "voegAanvullendeAlarmcontrolesToe",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "bevinding",
+   "hoe": "lid",
+   "lijn": 30
+  },
+  {
+   "vanBestand": "server/kern/command/alarm-aanvullend.js",
+   "van": "voegAanvullendeAlarmcontrolesToe",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "alarmActief",
+   "hoe": "lid",
+   "lijn": 31
+  },
+  {
    "vanBestand": "server/kern/command/alarm-uitgang.js",
    "van": "melderNu",
    "naarBestand": "server/server.js",
@@ -78710,6 +78727,126 @@
    "lijn": 171
   },
   {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "aangemeld",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "sensor",
+   "hoe": "lokaal",
+   "lijn": 60
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "ronde",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "sensor",
+   "hoe": "lokaal",
+   "lijn": 68
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "ronde",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 69
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "fout",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "sensor",
+   "hoe": "lokaal",
+   "lijn": 75
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "fout",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 77
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "verloren",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "meldingStaat",
+   "hoe": "lokaal",
+   "lijn": 88
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "verloren",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "aangekomen",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 96
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "oordeel",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 131
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "oordeel",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "schildOordeel",
+   "hoe": "lokaal",
+   "lijn": 150
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "bevinding",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "oordeel",
+   "hoe": "lokaal",
+   "lijn": 169
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "stand",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "oordeel",
+   "hoe": "lokaal",
+   "lijn": 174
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "stand",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "alarmActief",
+   "hoe": "lokaal",
+   "lijn": 175
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "gestart",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "aangemeld",
+   "hoe": "lokaal",
+   "lijn": 183
+  },
+  {
+   "vanBestand": "server/kern/command/sensorstilte.js",
+   "van": "gestart",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 184
+  },
+  {
    "vanBestand": "server/kern/command/simulatie.js",
    "van": "grondslag",
    "naarBestand": "server/kern/command/simulatie.js",
@@ -79051,7 +79188,7 @@
    "naarBestand": "server/kern/command/tikkerstand.js",
    "naar": "tikkersUit",
    "hoe": "ingevoerd",
-   "lijn": 47
+   "lijn": 53
   },
   {
    "vanBestand": "server/kern/command/toegang.js",
@@ -189119,11 +189256,19 @@
   },
   {
    "vanBestand": "server/kern/ssrf.js",
+   "van": "gemaptIpv4",
+   "naarBestand": "server/kern/ssrf.js",
+   "naar": "isIpv4",
+   "hoe": "lokaal",
+   "lijn": 76
+  },
+  {
+   "vanBestand": "server/kern/ssrf.js",
    "van": "onveiligIpLiteral",
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 73
+   "lijn": 86
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189131,7 +189276,15 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "privaatIpv4",
    "hoe": "lokaal",
-   "lijn": 74
+   "lijn": 87
+  },
+  {
+   "vanBestand": "server/kern/ssrf.js",
+   "van": "onveiligIpLiteral",
+   "naarBestand": "server/kern/ssrf.js",
+   "naar": "gemaptIpv4",
+   "hoe": "lokaal",
+   "lijn": 96
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189139,7 +189292,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 105
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189147,7 +189300,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpLiteral",
    "hoe": "lokaal",
-   "lijn": 110
+   "lijn": 125
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189155,7 +189308,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "onveiligIpLiteral",
    "hoe": "lokaal",
-   "lijn": 121
+   "lijn": 137
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189163,7 +189316,15 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 136
+   "lijn": 152
+  },
+  {
+   "vanBestand": "server/kern/ssrf.js",
+   "van": "metadataDoel",
+   "naarBestand": "server/kern/ssrf.js",
+   "naar": "gemaptIpv4",
+   "hoe": "lokaal",
+   "lijn": 154
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189171,7 +189332,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "veiligeExternalUrl",
    "hoe": "lokaal",
-   "lijn": 150
+   "lijn": 168
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189179,7 +189340,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "metadataDoel",
    "hoe": "lokaal",
-   "lijn": 154
+   "lijn": 172
   },
   {
    "vanBestand": "server/kern/stad/advies.js",
@@ -212007,11 +212168,35 @@
   },
   {
    "vanBestand": "server/lib/auditwacht.js",
+   "van": "start",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "gestart",
+   "hoe": "lid",
+   "lijn": 125
+  },
+  {
+   "vanBestand": "server/lib/auditwacht.js",
    "van": "ronde",
    "naarBestand": "server/lib/auditwacht.js",
    "naar": "controleer",
    "hoe": "lokaal",
-   "lijn": 122
+   "lijn": 127
+  },
+  {
+   "vanBestand": "server/lib/auditwacht.js",
+   "van": "ronde",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "ronde",
+   "hoe": "lid",
+   "lijn": 127
+  },
+  {
+   "vanBestand": "server/lib/auditwacht.js",
+   "van": "ronde",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "fout",
+   "hoe": "lid",
+   "lijn": 128
   },
   {
    "vanBestand": "server/lib/browser-page.js",
@@ -219860,6 +220045,30 @@
    "naar": "salonProfielCompleet",
    "hoe": "lokaal",
    "lijn": 30
+  },
+  {
+   "vanBestand": "server/opzet/schildwacht.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "aangekomen",
+   "hoe": "lid",
+   "lijn": 40
+  },
+  {
+   "vanBestand": "server/opzet/schildwacht.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "verloren",
+   "hoe": "lid",
+   "lijn": 40
+  },
+  {
+   "vanBestand": "server/opzet/schildwacht.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/command/sensorstilte.js",
+   "naar": "koppelSchild",
+   "hoe": "lid",
+   "lijn": 44
   },
   {
    "vanBestand": "server/opzet/standbypoort-antwoord.js",
@@ -247115,7 +247324,7 @@
    "naarBestand": "server/meting.js",
    "naar": "samenvatting",
    "hoe": "lid",
-   "lijn": 45
+   "lijn": 48
   },
   {
    "vanBestand": "server/routes/metingen.js",

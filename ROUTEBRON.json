@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-13T01:57:56.642Z",
-  "commit": "17b67ca38",
+  "op": "2026-10-14T08:41:03.184Z",
+  "commit": "6ed85893b",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -824,6 +824,7 @@
     "server/kern/command/runbookcatalogus.js",
     "server/kern/command/runbooks-historie.js",
     "server/kern/command/runbooks.js",
+    "server/kern/command/sensorstilte.js",
     "server/kern/command/simulatie.js",
     "server/kern/command/slo-rekenen.js",
     "server/kern/command/slo.js",
@@ -4501,7 +4502,6 @@
     "server/betaal/connect",
     "server/betaal/uitbetaalgate.json",
     "server/config",
-    "server/data",
     "server/db",
     "server/db/tx",
     "server/foundation",

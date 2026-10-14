@@ -42,7 +42,7 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2788,
+    "kernelFiles": 2789,
     "kernelGroups": [
       {
         "group": "_root",
@@ -186,7 +186,7 @@
       },
       {
         "group": "command",
-        "files": 69
+        "files": 70
       },
       {
         "group": "commerce",
@@ -1214,6 +1214,7 @@
       "server/kern/command/register.js",
       "server/kern/command/runbookcatalogus.js",
       "server/kern/command/runbooks.js",
+      "server/kern/command/sensorstilte.js",
       "server/kern/command/slo.js",
       "server/kern/command/sonde.js",
       "server/kern/command/stadstart.js",
@@ -4678,6 +4679,7 @@
       "server/kern/command/puls.js",
       "server/kern/command/runbookcatalogus.js",
       "server/kern/command/runbooks.js",
+      "server/kern/command/sensorstilte.js",
       "server/kern/command/simulatie.js",
       "server/kern/command/toegang.js",
       "server/kern/command/transactie.js",
@@ -7903,7 +7905,7 @@
         "mutationRoutes": 471,
         "declaredMutationSemantics": 171,
         "sourceFileCount": 42,
-        "kernelDependencyCount": 142,
+        "kernelDependencyCount": 143,
         "screenCount": 26,
         "sourceFiles": [
           "server/routes/borden.js",
@@ -7950,7 +7952,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 118,
+        "kernelDependenciesOmitted": 119,
         "screens": [
           "public/apps/app.html",
           "public/apps/attenties.html",
@@ -9335,7 +9337,7 @@
         "mutationRoutes": 29,
         "declaredMutationSemantics": 14,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 19,
+        "kernelDependencyCount": 20,
         "screenCount": 4,
         "sourceFiles": [
           "server/routes/member/salon-claims.js",
@@ -9347,6 +9349,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -9673,7 +9676,7 @@
         "mutationRoutes": 263,
         "declaredMutationSemantics": 107,
         "sourceFileCount": 26,
-        "kernelDependencyCount": 77,
+        "kernelDependencyCount": 78,
         "screenCount": 28,
         "sourceFiles": [
           "server/routes/baby.js",
@@ -9698,6 +9701,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -9717,10 +9721,9 @@
           "server/kern/knelpunt/woorden.js",
           "server/kern/kosten/haak.js",
           "server/kern/kosten/soorten.js",
-          "server/kern/leerstof-bibliotheek.js",
-          "server/kern/leerstof-dag.js"
+          "server/kern/leerstof-bibliotheek.js"
         ],
-        "kernelDependenciesOmitted": 53,
+        "kernelDependenciesOmitted": 54,
         "screens": [
           "public/apps/connect.html",
           "public/apps/foundation/arena.html",
@@ -10646,7 +10649,7 @@
         "mutationRoutes": 6,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 14,
+        "kernelDependencyCount": 15,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/onderweg.js",
@@ -10657,6 +10660,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -12179,7 +12183,7 @@
         "mutationRoutes": 19,
         "declaredMutationSemantics": 11,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 13,
+        "kernelDependencyCount": 14,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/kantoorpakket-formaten.js",
@@ -12191,6 +12195,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -13880,7 +13885,7 @@
         "mutationRoutes": 6,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 14,
+        "kernelDependencyCount": 15,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/metingen.js",
@@ -13891,6 +13896,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
@@ -15489,7 +15495,7 @@
         "mutationRoutes": 3,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 38,
+        "kernelDependencyCount": 39,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/leerhuis.js"
@@ -15497,6 +15503,7 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/betrouwbaarheid.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/journaalverhuizing.js",
@@ -15518,10 +15525,9 @@
           "server/kern/leerhuis/hulp.js",
           "server/kern/leerhuis/index.js",
           "server/kern/leerhuis/lees.js",
-          "server/kern/leerhuis/namen.js",
-          "server/kern/leerhuis/oordeel.js"
+          "server/kern/leerhuis/namen.js"
         ],
-        "kernelDependenciesOmitted": 14,
+        "kernelDependenciesOmitted": 15,
         "screens": [
           "public/apps/leerhuis-werk.html",
           "public/apps/leerhuis.html"
@@ -15624,7 +15630,7 @@
         "mutationRoutes": 1026,
         "declaredMutationSemantics": 319,
         "sourceFileCount": 203,
-        "kernelDependencyCount": 2678,
+        "kernelDependencyCount": 2679,
         "screenCount": 41,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15671,7 +15677,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2654,
+        "kernelDependenciesOmitted": 2655,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -16617,7 +16623,7 @@
         "mutationRoutes": 667,
         "declaredMutationSemantics": 392,
         "sourceFileCount": 114,
-        "kernelDependencyCount": 151,
+        "kernelDependencyCount": 152,
         "screenCount": 21,
         "sourceFiles": [
           "server/routes/atelierweb.js",
@@ -16664,7 +16670,7 @@
           "server/kern/appstore/vierogen.js",
           "server/kern/bank/eigendom.js"
         ],
-        "kernelDependenciesOmitted": 127,
+        "kernelDependenciesOmitted": 128,
         "screens": [
           "public/apps/backoffice.html",
           "public/apps/boardroom.html",
@@ -16877,7 +16883,7 @@
         "mutationRoutes": 342,
         "declaredMutationSemantics": 141,
         "sourceFileCount": 84,
-        "kernelDependencyCount": 98,
+        "kernelDependencyCount": 99,
         "screenCount": 26,
         "sourceFiles": [
           "server/foundation.js",
@@ -16915,16 +16921,16 @@
           "server/kern/bewijsvlak/context.js",
           "server/kern/bewijsvlak/retry.js",
           "server/kern/bijles.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
           "server/kern/geld/eenheid.js",
           "server/kern/intreksignaal.js",
-          "server/kern/journaalverhuizing.js",
-          "server/kern/journaalvorm.js"
+          "server/kern/journaalverhuizing.js"
         ],
-        "kernelDependenciesOmitted": 74,
+        "kernelDependenciesOmitted": 75,
         "screens": [
           "public/apps/app.html",
           "public/apps/foundation/babyboek.html",
@@ -17023,7 +17029,7 @@
         "mutationRoutes": 216,
         "declaredMutationSemantics": 91,
         "sourceFileCount": 57,
-        "kernelDependencyCount": 84,
+        "kernelDependencyCount": 85,
         "screenCount": 0,
         "sourceFiles": [
           "server/school/aandacht.js",
@@ -17054,6 +17060,7 @@
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/retry.js",
           "server/kern/bijles.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/geld/eenheid.js",
@@ -17067,10 +17074,9 @@
           "server/kern/kosten/soorten.js",
           "server/kern/leerstof-bibliotheek.js",
           "server/kern/leerstof-dag.js",
-          "server/kern/leerstof-data/aardrijkskunde.js",
-          "server/kern/leerstof-data/geschiedenis.js"
+          "server/kern/leerstof-data/aardrijkskunde.js"
         ],
-        "kernelDependenciesOmitted": 60,
+        "kernelDependenciesOmitted": 61,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -17409,7 +17415,7 @@
         "mutationRoutes": 32,
         "declaredMutationSemantics": 23,
         "sourceFileCount": 8,
-        "kernelDependencyCount": 39,
+        "kernelDependencyCount": 40,
         "screenCount": 2,
         "sourceFiles": [
           "server/opzet/connectwebhook.js",
@@ -17431,6 +17437,7 @@
           "server/kern/bewijsvlak/context.js",
           "server/kern/bewijsvlak/retry.js",
           "server/kern/bezorgvolg.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/economie/principal.js",
@@ -17445,10 +17452,9 @@
           "server/kern/muziek-instrumenten.js",
           "server/kern/muziek-stijlen.js",
           "server/kern/servicekosten.js",
-          "server/kern/ssrf.js",
-          "server/kern/util.js"
+          "server/kern/ssrf.js"
         ],
-        "kernelDependenciesOmitted": 15,
+        "kernelDependenciesOmitted": 16,
         "screens": [
           "public/apps/geld.html",
           "public/apps/isolatie.html"
@@ -17931,7 +17937,7 @@
         "mutationRoutes": 56,
         "declaredMutationSemantics": 14,
         "sourceFileCount": 19,
-        "kernelDependencyCount": 23,
+        "kernelDependencyCount": 24,
         "screenCount": 4,
         "sourceFiles": [
           "server/routes/balans.js",
@@ -17953,6 +17959,7 @@
         ],
         "sourceFilesOmitted": 3,
         "kernelDependencies": [
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/frictie/bodem.js",
@@ -19943,7 +19950,7 @@
         "mutationRoutes": 11,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 11,
+        "kernelDependencyCount": 12,
         "screenCount": 4,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -19954,6 +19961,7 @@
           "server/kern/agenda-idempotentie.js",
           "server/kern/agenda-opslag.js",
           "server/kern/agenda.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/journaalverhuizing.js",
@@ -20785,7 +20793,7 @@
         "mutationRoutes": 26,
         "declaredMutationSemantics": 12,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 13,
+        "kernelDependencyCount": 14,
         "screenCount": 4,
         "sourceFiles": [
           "server/routes/muziek-samen.js",
@@ -20796,6 +20804,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -21107,7 +21116,7 @@
         "mutationRoutes": 6,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 23,
+        "kernelDependencyCount": 24,
         "screenCount": 9,
         "sourceFiles": [
           "server/routes/member/persoonlijk-concept.js",
@@ -21120,6 +21129,7 @@
           "server/kern/ai/router.js",
           "server/kern/ai/routermeting.js",
           "server/kern/ai/routertellers.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/frictie/bodem.js",
@@ -21349,7 +21359,7 @@
         "mutationRoutes": 84,
         "declaredMutationSemantics": 30,
         "sourceFileCount": 6,
-        "kernelDependencyCount": 13,
+        "kernelDependencyCount": 14,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/kantoorpakket-formaten.js",
@@ -21364,6 +21374,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -21772,7 +21783,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 15,
+        "kernelDependencyCount": 16,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/doos-kloon.js",
@@ -21783,6 +21794,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
@@ -22411,7 +22423,7 @@
         "mutationRoutes": 101,
         "declaredMutationSemantics": 17,
         "sourceFileCount": 4,
-        "kernelDependencyCount": 12,
+        "kernelDependencyCount": 13,
         "screenCount": 3,
         "sourceFiles": [
           "server/routes/livinglab/bewoner.js",
@@ -22421,6 +22433,7 @@
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/journaalverhuizing.js",
@@ -26489,7 +26502,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2649,
+        "kernelDependencyCount": 2650,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26523,7 +26536,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2625,
+        "kernelDependenciesOmitted": 2626,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -26925,7 +26938,7 @@
         "mutationRoutes": 14,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
-        "kernelDependencyCount": 131,
+        "kernelDependencyCount": 132,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/ik-workspace-rechten.js",
@@ -26960,7 +26973,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 107,
+        "kernelDependenciesOmitted": 108,
         "screens": [
           "public/apps/geld.html",
           "public/apps/ik.html"
@@ -27157,7 +27170,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2651,
+        "kernelDependencyCount": 2652,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -27191,7 +27204,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2627,
+        "kernelDependenciesOmitted": 2628,
         "screens": [
           "public/apps/app.html"
         ],
@@ -27293,7 +27306,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 14,
+        "kernelDependencyCount": 15,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/assistent.js",
@@ -27306,6 +27319,7 @@
           "server/kern/ai/router.js",
           "server/kern/ai/routermeting.js",
           "server/kern/ai/routertellers.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/journaalverhuizing.js",
@@ -27518,7 +27532,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2649,
+        "kernelDependencyCount": 2650,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27551,7 +27565,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2625,
+        "kernelDependenciesOmitted": 2626,
         "screens": [
           "public/apps/vertaler.html"
         ],
@@ -27626,7 +27640,7 @@
         "mutationRoutes": 3,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 23,
+        "kernelDependencyCount": 24,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/persoonlijk.js"
@@ -27637,6 +27651,7 @@
           "server/kern/ai/router.js",
           "server/kern/ai/routermeting.js",
           "server/kern/ai/routertellers.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/frictie/bodem.js",
@@ -27925,7 +27940,7 @@
         "mutationRoutes": 6,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 4,
-        "kernelDependencyCount": 23,
+        "kernelDependencyCount": 24,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/bieb.js",
@@ -27942,6 +27957,7 @@
           "server/kern/ai/routertellers.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -28576,7 +28592,7 @@
         "mutationRoutes": 3,
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 15,
+        "kernelDependencyCount": 16,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/kopen/tickets.js",
@@ -28587,6 +28603,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -29038,7 +29055,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 43,
+        "kernelDependencyCount": 44,
         "screenCount": 0,
         "sourceFiles": [
           "server/opzet/webhooks.js",
@@ -29057,6 +29074,7 @@
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
           "server/kern/bewijsvlak/retry.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
@@ -29068,10 +29086,9 @@
           "server/kern/kosten/soorten.js",
           "server/kern/muziek-instrumenten.js",
           "server/kern/muziek-stijlen.js",
-          "server/kern/sessies.js",
-          "server/kern/sessiestroom-kijk.js"
+          "server/kern/sessies.js"
         ],
-        "kernelDependenciesOmitted": 19,
+        "kernelDependenciesOmitted": 20,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -29523,7 +29540,7 @@
         "mutationRoutes": 2,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 32,
+        "kernelDependencyCount": 33,
         "screenCount": 3,
         "sourceFiles": [
           "server/routes/balans.js",
@@ -29534,6 +29551,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/commercie/allocatie.js",
           "server/kern/commercie/allocatie/regels.js",
           "server/kern/commercie/besluit.js",
@@ -29553,10 +29571,9 @@
           "server/kern/commercie/voorstel/weging.js",
           "server/kern/commercie/zaakabonnement.js",
           "server/kern/doorgeefjournaal.js",
-          "server/kern/eigencollectie.js",
-          "server/kern/envelop.js"
+          "server/kern/eigencollectie.js"
         ],
-        "kernelDependenciesOmitted": 8,
+        "kernelDependenciesOmitted": 9,
         "screens": [
           "public/apps/geld.html",
           "public/apps/juridisch/partnervoorwaarden.html",
@@ -29660,7 +29677,7 @@
         "mutationRoutes": 3,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 32,
+        "kernelDependencyCount": 33,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/kantoren/geld.js"
@@ -29670,6 +29687,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/commercie/allocatie.js",
           "server/kern/commercie/allocatie/regels.js",
           "server/kern/commercie/besluit.js",
@@ -29689,10 +29707,9 @@
           "server/kern/commercie/voorstel/weging.js",
           "server/kern/commercie/zaakabonnement.js",
           "server/kern/doorgeefjournaal.js",
-          "server/kern/eigencollectie.js",
-          "server/kern/envelop.js"
+          "server/kern/eigencollectie.js"
         ],
-        "kernelDependenciesOmitted": 8,
+        "kernelDependenciesOmitted": 9,
         "screens": [
           "public/apps/juridisch/partnervoorwaarden.html"
         ],
@@ -29995,7 +30012,7 @@
         "mutationRoutes": 8,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 14,
+        "kernelDependencyCount": 15,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/kantoren/stad.js",
@@ -30006,6 +30023,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
@@ -30459,7 +30477,7 @@
         "mutationRoutes": 2,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 23,
+        "kernelDependencyCount": 24,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/persoonlijk.js"
@@ -30470,6 +30488,7 @@
           "server/kern/ai/router.js",
           "server/kern/ai/routermeting.js",
           "server/kern/ai/routertellers.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/frictie/bodem.js",
@@ -31301,7 +31320,7 @@
         "mutationRoutes": 17,
         "declaredMutationSemantics": 11,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 13,
+        "kernelDependencyCount": 14,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/labfonds.js"
@@ -31311,6 +31330,7 @@
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/command/sensorstilte.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",

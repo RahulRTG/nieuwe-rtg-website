@@ -573,6 +573,10 @@ const EIGEN_MODULE = new Map([
   ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],
   ['journaalbestand-weerbaar.test.js', ['server/kern/journaalbestand.js']],
   ['wacht-weerbaar.test.js', ['server/kern/wacht/index.js', 'server/kern/wacht/raadkamer.js', 'server/kern/wacht/flood.js']],
+  // De handtekeningtoets laadt de XML-lezer eerst (om zelf te ondertekenen);
+  // een mutatie in diens leeslus hangt de toets op ('te langzaam'). Wat hij
+  // toetst is de controle zelf.
+  ['saml-handtekening-weerbaar.test.js', ['server/sso/saml/handtekening.js']],
   // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.

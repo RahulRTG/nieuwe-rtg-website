@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-10-14T03:35:42.439Z",
-    "commit": "3c3f77ad",
+    "op": "2026-10-14T11:13:16.652Z",
+    "commit": "551decaf",
     "boomVuil": false,
     "instrument": "scripts/doctrine.js",
-    "node": "v22.22.0"
+    "node": "v26.11.1"
   },
   "uitleg": "Harde uitspraken in de doctrine-documenten, en of het wettenregister ze kent. Een kandidaat is GEEN wet: wat een wet is, is een besluit van een mens en dat woont in WETTEN.json. Dit register wijst alleen aan waar een mens naar moet kijken.",
   "graad": "vermoed",
   "grens": "LEXICAAL EN STRUCTUREEL, in twee assen die nooit worden opgeteld. De ijking hieronder zegt wat deze extractor terugvindt van de wetten die dit huis AL kent (de recall); over de PRECISIE is niets gemeten -- van de kandidaten is niet vastgesteld welk deel werkelijk een harde uitspraak is. Het aantal is dus een werkvoorraad voor een mens en geen oordeel, en zeker geen percentage dat naar 100 moet: meerdere zinnen uit meerdere documenten beschrijven vaak een onderliggende wet, en daarvoor staan de groepen.",
   "telling": {
     "documenten": 175,
-    "zinnen": 46386,
-    "kandidatenSterk": 9110,
-    "kandidatenStructuur": 7309,
+    "zinnen": 46400,
+    "kandidatenSterk": 9112,
+    "kandidatenStructuur": 7311,
     "kandidatenWoord": 1801,
     "kandidatenZwak": 3970,
-    "gedekt": 279,
-    "onbepaald": 8831,
+    "gedekt": 278,
+    "onbepaald": 8834,
     "inGrenssectie": 1320,
     "wettenInRegister": 59,
     "documentenMetKandidaat": 172,
@@ -44,7 +44,7 @@
   },
   "overgeslagen": {
     "codeblokregels": 4176,
-    "tabelregels": 12524,
+    "tabelregels": 12534,
     "citaatregels": 1367,
     "geenUitspraak": 35,
     "waarom": "code, tabellen en citaten dragen geen eigen uitspraak; ze worden geteld en niet stil weggelaten"
@@ -866,8 +866,8 @@
       "inGrenssectie": 3
     },
     "WEERBAARHEID.md": {
-      "kandidaten": 93,
-      "gedekt": 8,
+      "kandidaten": 95,
+      "gedekt": 7,
       "inGrenssectie": 18
     },
     "WERELD.md": {
@@ -21688,7 +21688,7 @@
       "doc": "BEWIJS.md",
       "paragraaf": null,
       "kop": "Schermtoetsen (`npm run e2e`, met een browser)",
-      "regel": 2390,
+      "regel": 2391,
       "zin": "Schermtoetsen (`npm run e2e`, met een browser)",
       "as": "structuur",
       "signaal": "kop",
@@ -21701,7 +21701,7 @@
       "doc": "BEWIJS.md",
       "paragraaf": null,
       "kop": "Hoe je dit bestand bijwerkt",
-      "regel": 2729,
+      "regel": 2730,
       "zin": "Hoe je dit bestand bijwerkt",
       "as": "structuur",
       "signaal": "kop",
@@ -127430,7 +127430,7 @@
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
       "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
-      "regel": 855,
+      "regel": 858,
       "zin": "Meting vóór en na:",
       "as": "structuur",
       "signaal": "vet",
@@ -127442,15 +127442,41 @@
     {
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
-      "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
-      "regel": 877,
+      "kop": "9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
+      "regel": 881,
+      "zin": "e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
+      "as": "structuur",
+      "signaal": "kop",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "onbepaald",
+      "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
+      "regel": 896,
+      "zin": "Vier garanties, en waar ze nu staan:",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "onbepaald",
+      "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
+      "regel": 905,
       "zin": "De integrale tegenproef (stap 5) simuleert vijf storingen.",
       "as": "structuur",
       "signaal": "vet",
       "grond": "structuur",
       "inGrenssectie": false,
-      "stand": "gedekt",
-      "wet": "beveiliging-stille-sensor-is-zichtbaar"
+      "stand": "onbepaald",
+      "wet": null
     },
     {
       "doc": "WERELD.md",

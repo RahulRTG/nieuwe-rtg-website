@@ -27,7 +27,7 @@
    ontbrekende hartslag is geen bewijs van een aanval; het kan ook een storing
    zijn (WEERBAARHEID.md par. 9c). De uitkomst is een alarm, en zolang het
    alarmkanaal niet geregeld is staat zelfs dat alarm in de schaduw: hij wordt
-   berekend en getoond, maar niet gemeld (`actief()` hieronder, par. 9a). En
+   berekend en getoond, maar niet gemeld (`alarmActief()` hieronder, par. 9a). En
    hij kan zijn EIGEN uitval niet zien: als het alarm stopt, ziet alleen de
    externe sonde dat (scripts/sonde.js, `bewaking`). */
 'use strict';
@@ -97,14 +97,14 @@ function schildOordeel(schuif) {
   const k = staat.schild;
   if (!k) return null;
   if (!schuif) return k.laatste || { stil: false, reden: 'nog niet gewogen' };
-  let s, m;
-  try { s = Number(k.schildVerzoeken()); m = Number(k.metingVerzoeken()); }
+  let s, gemeten;
+  try { s = Number(k.schildVerzoeken()); gemeten = Number(k.metingVerzoeken()); }
   catch (e) { k.laatste = { stil: true, reden: 'de tellers van schild of meting konden niet worden gelezen: ' + e.message }; return k.laatste; }
   const vorig = k.vorig;
-  k.vorig = { s, m };
+  k.vorig = { s, gemeten };
   if (!vorig) k.laatste = { stil: false, reden: 'eerste meting, nog geen verschil' };
   else {
-    const ds = s - vorig.s, dm = m - vorig.m;
+    const ds = s - vorig.s, dm = gemeten - vorig.gemeten;
     k.laatste = dm >= SCHILD_DREMPEL && ds === 0
       ? { stil: true, reden: dm + ' verzoeken in de meting sinds de vorige weging, en het schild zag er geen enkele' }
       : { stil: false, reden: 'schild +' + ds + ', meting +' + dm };
@@ -145,7 +145,7 @@ function oordeel({ schuif = false } = {}) {
 /* ACTIEF OF SCHADUW. Tot het alarmkanaal geregeld is (WEERBAARHEID.md par. 9a
    en 9b) wordt de bevinding berekend en getoond, maar niet als alarm gemeld.
    Wie hem aanzet, zet hem aan voor dit proces; er is geen route die hem zet. */
-function actief(env) {
+function alarmActief(env) {
   return String((env || process.env).RTG_SENSORSTILTE_ACTIEF || '') === '1';
 }
 
@@ -157,7 +157,7 @@ function bevinding() {
 
 function stand() {
   const rijen = oordeel();
-  return { actief: actief(), stil: rijen.filter(r => r.stand === 'stil').map(r => r.naam), sensoren: rijen,
+  return { actief: alarmActief(), stil: rijen.filter(r => r.stand === 'stil').map(r => r.naam), sensoren: rijen,
     let: 'een sensor stempelt zijn ronde en niet zijn vondst; "uit" is bewust niet gestart en telt niet als levend. ' +
       'Zijn eigen uitval ziet dit proces niet: dat doet de externe sonde.' };
 }
@@ -174,4 +174,4 @@ function gestart(naam, periodeMs) {
 function _wis() { staat.sensoren.clear(); staat.verloren.clear(); staat.schild = null; }
 
 module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL, aangemeld, gestart, ronde, fout, verloren, koppelSchild,
-  oordeel, bevinding, stand, actief, _wis };
+  oordeel, bevinding, stand, alarmActief, _wis };

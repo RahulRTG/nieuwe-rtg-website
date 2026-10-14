@@ -28,7 +28,7 @@ function voegAanvullendeAlarmcontrolesToe(probeer, invoer) {
   probeer('sensor-stil', 'Een beveiligingssensor is stil', 'hoog', () => {
     const stilte = require('./sensorstilte');
     const b = stilte.bevinding();   // ook in de schaduw gewogen, zodat het bord hem toont
-    return stilte.actief() ? b : null;
+    return stilte.alarmActief() ? b : null;
   });
 }
 

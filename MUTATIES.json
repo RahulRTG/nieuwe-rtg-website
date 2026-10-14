@@ -15455,6 +15455,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "scim-terugdraai.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/user-sync.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 6
+    },
     "scim-user-outbox.test.js": {
       "soort": "puur",
       "staat": "gezakt",

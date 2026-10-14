@@ -17646,6 +17646,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "toestelintrekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/toestellen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "toestellen-weerbaar.test.js": {
       "soort": "puur",
       "staat": "gezakt",

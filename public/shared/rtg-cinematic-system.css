@@ -634,40 +634,6 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-item .rtg-adaptive-lips{
 body[data-rtg-cinematic="true"] .rtg-adaptive-item[data-rtg-adaptive-action="ai"],
 body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!important}
 
-/* WWW is de visuele referentie van het huis. Een wereld-home in de app blijft
-   functioneel rijker, maar staat voortaan in dezelfde donkere, fotografische
-   kamer. Dit is één tokenbrug op de bestaande wereld-home en geen tweede
-   thema, routekop of inhoudsmodel. Diepere operationele schermen behouden hun
-   eigen leesvlak tot hun route afzonderlijk door de productiepoort gaat. */
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-world-home][data-rtg-world]:not([data-public-platform]){
-  --rtg-world-bg:#100e0b!important;--rtg-world-ground:#100e0b!important;
-  --rtg-world-card:#15130f!important;--rtg-world-card-strong:#211a13!important;
-  --rtg-world-ink:#f6efe3!important;--rtg-world-muted:#d8cfc2!important;
-  --rtg-world-line:rgba(216,187,135,.3)!important;--rtg-world-metal:#e2c389!important;
-  --wh-bg:#100e0b!important;--wh-ink:#f6efe3!important;--wh-soft:#d8cfc2!important;
-  --wh-gold:#e2c389!important;--wd-surface:#15130f!important;--wd-line:rgba(216,187,135,.3)!important;
-  background-color:#100e0b!important;
-  background-image:linear-gradient(rgba(226,195,137,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(226,195,137,.025) 1px,transparent 1px)!important;
-  background-size:48px 48px!important;
-}
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-top{
-  color:#f6efe3!important;background:rgba(16,14,11,.9)!important;
-  border-bottom-color:rgba(216,187,135,.3)!important;
-  backdrop-filter:blur(22px) saturate(1.25)!important;
-  -webkit-backdrop-filter:blur(22px) saturate(1.25)!important;
-}
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-top{
-  --edge-copy:#f6efe3;--edge-dim:#d8cfc2;
-}
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile),
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-crumbs,
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-worldbar,
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-state{color:#d8cfc2!important}
-body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rtg-edge-worldbar a[aria-current="page"]{
-  color:#f6efe3!important;background:rgba(226,195,137,.08)!important;
-}
-
 @media(min-width:1000px){
   body[data-rtg-cinematic="true"][data-rtg-layout="standard"],
   body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{
@@ -751,13 +717,11 @@ body[data-rtg-cinematic="true"][data-world-home]:not([data-public-platform]) .rt
   }
   body[data-rtg-cinematic="true"][data-world-home][data-rtg-shell="mobile"] .rtg-edge-top{
     min-height:82px!important;height:82px!important;padding:0 20px!important;
-    color:#f6efe3!important;background:rgba(16,14,11,.9)!important;
-    border-bottom:1px solid rgba(216,187,135,.3)!important;
-    box-shadow:none!important;backdrop-filter:blur(24px) saturate(.9)!important;
-    -webkit-backdrop-filter:blur(24px) saturate(.9)!important;
+    color:#171411!important;background:#f4f0e9!important;
+    border-bottom:1px solid rgba(33,29,22,.14)!important;
+    box-shadow:none!important;backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
   }
-  body[data-rtg-cinematic="true"][data-world-home][data-rtg-shell="mobile"] .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile),
-  body[data-rtg-cinematic="true"][data-world-home][data-rtg-shell="mobile"] .rtg-edge-top :is(.rtg-edge-crumbs,.rtg-edge-worldbar,.rtg-edge-state){color:#d8cfc2!important}
   body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-shell="mobile"]
     .rtg-edge-mark .wd-world-label{display:none!important}
   body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-world-home][data-rtg-shell="mobile"]

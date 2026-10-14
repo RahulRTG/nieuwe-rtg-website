@@ -199,10 +199,10 @@ test('www en app delen hetzelfde cinematische merkcasco', () => {
     'www gebruikt de officiële lock-up uit hetzelfde Edge-casco');
   assert.match(publicCss, /height:82px!important;min-height:82px!important/,
     'de mobiele www-header volgt dezelfde vaste maat als de app');
-  assert.match(cinematicCss, /\[data-world-home\]\[data-rtg-world\]:not\(\[data-public-platform\]\)/,
-    'de app-home erft de publieke donkere cinematische kamer zonder publieke inhoud te kopiëren');
-  assert.match(cinematicCss, /\[data-world-home\]\[data-rtg-shell="mobile"\] \.rtg-edge-top\{[\s\S]*?background:rgba\(16,14,11,\.9\)!important/,
-    'een mobiele route mag de gedeelde donkere merkheader niet terugzetten naar ivoor');
+  assert.match(cinematicCss, /\[data-world-home\]\[data-rtg-shell="mobile"\] \.rtg-edge-top\{[\s\S]*?background:#f4f0e9!important/,
+    'de app houdt dezelfde rustige ivoren merkheader rondom fotografische inhoud');
+  assert.doesNotMatch(cinematicCss, /\[data-world-home\]\[data-rtg-world\]:not\(\[data-public-platform\]\)[\s\S]{0,900}background-color:#100e0b!important/,
+    'de app-home mag niet als een tweede volledig donker thema over de inhoud worden gelegd');
 });
 
 test('alle vier werelden gebruiken bestaande lokale productiebeelden', () => {

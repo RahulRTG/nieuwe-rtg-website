@@ -30,12 +30,12 @@ jobs:
         with:
           persist-credentials: false
       - name: CodeQL initialiseren
-        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           languages: javascript-typescript
           config-file: ./.github/codeql/codeql-config.yml
       - name: Analyse uitvoeren
-        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           category: "/language:javascript-typescript"
           output: codeql-results
@@ -43,7 +43,7 @@ jobs:
         run: node scripts/codeql-verdict.js --dir=codeql-results --out=.release/codeql-verdict.json
       - name: Commitgebonden CodeQL-verdict bewaren
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: codeql-verdict
           path: .release/codeql-verdict.json

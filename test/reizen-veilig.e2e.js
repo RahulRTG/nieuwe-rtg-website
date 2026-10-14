@@ -70,6 +70,14 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
     const adviesVragen = [];
     page.on('request', r => { if (r.url().includes('/api/reisbureau/advies')) adviesVragen.push(r.url()); });
     await page.goto(base + SCHERM, { waitUntil: 'domcontentloaded' });
+    /* DE EINDSTAND VAN HET SCHERM, NIET EEN TUSSENSTAND. De Edge-laag
+       (shared/rtg-adaptive-edge-loader.js) komt asynchroon op, en zodra hij er
+       is verbergt shared/rtg-adaptive-edge.css de eigen balk .rv-bank: de Edge
+       neemt de bediening over. Wie eerder klikt, klikt op een tussenstand -- en
+       of hij die haalt hangt af van de runner. Op de CI viel dat eens verkeerd
+       uit (#631, schermtoetsen deel 3: '.rv-bank [data-open=reisblad]' "not
+       visible" na 15 s). Dus eerst wachten tot de Edge er staat. */
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"]', { timeout: 20000 });
 
     /* 1. HET MOMENT KOMT UIT MOVE: de titel van het echte onderdeel. */
     const moment = page.locator('.rv-pane[data-id=overzicht] [data-volgende] .rv-lijn').first();
@@ -90,7 +98,9 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
       'Navigatie krijgt exact de plek van Move mee: ' + navSrc);
 
     /* 2. HET AANBOD KOMT UIT DE CATALOGUS. */
-    await page.locator('.rv-bank [data-open=reisblad]').click({ timeout: 15000 });
+    /* Langs de Edge, zoals een lid het in de eindstand ziet: Acties, dan Reizen. */
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+    await page.locator('.rtg-adaptive-controls button', { hasText: 'Reizen' }).first().click({ timeout: 15000 });
     const kaarten = page.locator('.rv-pane[data-id=reisblad] [data-reisaanbod] .rv-reiskaart');
     await kaarten.first().waitFor({ timeout: 15000 });
     assert.equal(await kaarten.count(), Math.min(3, catalogus.length), 'een kaart per reis uit de catalogus (hoogstens drie)');

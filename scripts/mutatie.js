@@ -589,6 +589,9 @@ const EIGEN_MODULE = new Map([
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['team-room-voorzijde.test.js', ['public/apps/personeel.html']],
   ['winkel-voorzijde.test.js', ['public/apps/mall.html']],
+  /* De stand van Sport: de toets voert de stukken van het inline-script van
+     sport.html uit (heeftTabel, tekenStand, laadStand); de module is de pagina. */
+  ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],
   ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
   ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
   ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],
@@ -977,6 +980,9 @@ const EIGEN_MODULE = new Map([
   ['actorvormen.test.js', ['scripts/actorvormen.js']],
   ['envelopvelden.test.js', ['scripts/envelopvelden.js']],
   ['loghygiene.test.js', ['server/log.js']],
+  /* storeschema-wedloop.test.js start kindprocessen die server/db/sqlite.js
+     laden; de module staat daarom niet als require in de toets zelf. */
+  ['storeschema-wedloop.test.js', ['server/db/sqlite.js']],
   ['genreregister.test.js', ['server/seed/genres.js']],
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
   /* VIER TOETSEN DIE OP server/db/index.js MIKTEN, en dat is 23,9 kB met de hele

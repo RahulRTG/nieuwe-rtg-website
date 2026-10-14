@@ -29,7 +29,14 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
   const ok = await api('/api/pay/kascode', { maxCenten: 1000, idem: 'eerst' }, reg.body.token);
   assert.equal(ok.status, 200, 'controle zonder storing: ' + JSON.stringify(ok.body));
 
+  /* DE INJECTOR IS EEN TWEEDE SCHRIJVER, DUS HIJ WACHT ZOALS ELKE ANDERE.
+     De server schrijft ook nog NA zijn antwoord (opzet/naafloop.js); een
+     verbinding zonder busy_timeout krijgt dan meteen SQLITE_BUSY. Zo zakte
+     deze toets op main (run 38379140671: 'database is locked' op de CREATE
+     TRIGGER) zonder dat er aan de atomiciteit iets mis was. Dezelfde
+     instellingen als elke serververbinding, uit dezelfde plek. */
   const conn = new DatabaseSync(path.join(map, 'store.db'));
+  require('../server/lib/sqlite-gelijktijdigheid')(conn);
   try {
     const kas = () => { const r = conn.prepare("SELECT val, ver FROM kv WHERE key='payKasToegang'").get(); return r ? r.ver + ':' + r.val : null; };
     const rijen = () => conn.prepare("SELECT COUNT(*) n FROM audit_rij WHERE naam='handelingLog'").get().n;

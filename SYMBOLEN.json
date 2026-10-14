@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "21688013",
-  "seconden": 11.7,
+  "commit": "b383fc167",
+  "seconden": 14.7,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7239,7 +7239,7 @@
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27514,
+  "symbolen": 27515,
   "bestandenMetUitvoer": 4539,
   "uitvoerMetNamen": 2065,
   "uitvoerOnvolledig": 7,
@@ -19149,25 +19149,25 @@
     {
      "naam": "loadSqlite",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 67,
      "geexporteerd": true
     },
     {
      "naam": "statements",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 84,
      "geexporteerd": false
     },
     {
      "naam": "startSqliteSync",
      "soort": "functie",
-     "lijn": 95,
+     "lijn": 109,
      "geexporteerd": true
     },
     {
      "naam": "afrondSqlite",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 121,
      "geexporteerd": true
     }
    ],
@@ -147886,39 +147886,45 @@
      "geexporteerd": false
     },
     {
+     "naam": "gemaptIpv4",
+     "soort": "functie",
+     "lijn": 73,
+     "geexporteerd": false
+    },
+    {
      "naam": "onveiligIpLiteral",
      "soort": "functie",
-     "lijn": 72,
+     "lijn": 85,
      "geexporteerd": true
     },
     {
      "naam": "isIpLiteral",
      "soort": "functie",
-     "lijn": 89,
+     "lijn": 104,
      "geexporteerd": false
     },
     {
      "naam": "pushEndpointOk",
      "soort": "functie",
-     "lijn": 105,
+     "lijn": 120,
      "geexporteerd": true
     },
     {
      "naam": "veiligeExternalUrl",
      "soort": "functie",
-     "lijn": 116,
+     "lijn": 131,
      "geexporteerd": true
     },
     {
      "naam": "metadataDoel",
      "soort": "functie",
-     "lijn": 134,
+     "lijn": 150,
      "geexporteerd": true
     },
     {
      "naam": "veiligeWebhookUrl",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 166,
      "geexporteerd": true
     }
    ],

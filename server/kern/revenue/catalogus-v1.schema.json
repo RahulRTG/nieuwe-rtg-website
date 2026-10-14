@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rahultravelgroup.com/revenue/catalogus-v1.schema.json",
+  "title": "RTG Revenue Catalog Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "catalogId",
+    "catalogVersion",
+    "contractDigest",
+    "mode",
+    "products"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "catalogId": { "const": "rtg.revenue.catalog" },
+    "catalogVersion": { "const": "1.0.0" },
+    "contractDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "mode": { "const": "READ_ONLY" },
+    "products": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/product" }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "file", "symbol"],
+      "properties": {
+        "role": { "enum": ["CAPABILITY", "OFFER", "PRICING"] },
+        "file": { "type": "string", "minLength": 1 },
+        "symbol": { "type": "string", "minLength": 1 }
+      }
+    },
+    "price": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formulaId", "state", "currency", "amountCenten", "taxTreatment", "reason"],
+      "properties": {
+        "formulaId": { "const": "rtg.ai.bundle-price@1" },
+        "state": { "enum": ["AVAILABLE", "UNAVAILABLE"] },
+        "currency": { "const": "EUR" },
+        "amountCenten": { "type": ["integer", "null"], "minimum": 0 },
+        "taxTreatment": { "const": "UNSPECIFIED" },
+        "reason": { "type": ["string", "null"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "state": { "const": "AVAILABLE" } } },
+          "then": {
+            "properties": {
+              "amountCenten": { "type": "integer", "minimum": 0 },
+              "reason": { "const": null }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "state": { "const": "UNAVAILABLE" } } },
+          "then": {
+            "properties": {
+              "amountCenten": { "const": null },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ]
+    },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "productId",
+        "productVersion",
+        "offerId",
+        "offerVersion",
+        "capabilityId",
+        "featureId",
+        "name",
+        "description",
+        "kind",
+        "unit",
+        "salesForms",
+        "price",
+        "availability",
+        "effects",
+        "sources",
+        "riskRefs"
+      ],
+      "properties": {
+        "productId": { "const": "rtg.product.ai.extra-s" },
+        "productVersion": { "const": 1 },
+        "offerId": { "const": "rtg.offer.ai.extra-s.a-la-carte" },
+        "offerVersion": { "const": 1 },
+        "capabilityId": { "const": "service.gld-aitegoed" },
+        "featureId": { "const": "gld-aitegoed" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "kind": { "const": "CAPACITY_ADD_ON" },
+        "kind": { "const": "CAPACITY_ADD_ON" },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "quantity"],
+          "properties": {
+            "id": { "const": "rtg-ai-credit" },
+            "quantity": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "salesForms": {
+          "type": "array",
+          "items": { "enum": ["A_LA_CARTE", "BUNDLE_ELIGIBLE"] },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "price": { "$ref": "#/$defs/price" },
+        "availability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["catalogVisible", "purchasable", "reason"],
+          "properties": {
+            "catalogVisible": { "const": true },
+            "purchasable": { "const": false },
+            "reason": { "type": "string", "minLength": 1 }
+          }
+        },
+        "effects": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["paymentInitiated", "creditGranted", "subscriptionActivated", "entitlementGranted"],
+          "properties": {
+            "paymentInitiated": { "const": false },
+            "creditGranted": { "const": false },
+            "subscriptionActivated": { "const": false },
+            "entitlementGranted": { "const": false }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/source" }
+        },
+        "riskRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

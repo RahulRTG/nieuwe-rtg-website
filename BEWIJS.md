@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2717 bestanden en 18994 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2718 bestanden en 18996 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2717 |
-| losse beweringen (`test(...)`) | 18994 |
+| toetsbestanden | 2718 |
+| losse beweringen (`test(...)`) | 18996 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2529 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2530 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2385 bestanden, 18428 beweringen.
+2386 bestanden, 18430 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1867,6 +1867,7 @@ toets omvalt.
 | `schrijfproef.test.js` | 7 | gezakt op `===->!==#0` | DE SCHRIJFPROEF (scripts/schrijfproef.js) -- de indeling, niet de ronde. Deze toets draait GEEN meting: dat kost een server per route en hoort in `npm run schrijfproef`. |
 | `scim-deprovisioning-failclosed.test.js` | 6 | gezakt op `!==->===#0` | SCIM UIT DIENST -- een 2xx is een bevestiging dat OOK Werk OS dicht is. Deze toets injecteert de storing op de naad zelf. |
 | `scim-sleutelverval.test.js` | 4 | gezakt op `liegpoort /api/` | De SCIM-sleutel vervalt (CODECREDENTIALS.json, identity.scim_bearer_sleutel; server/scim/sleutels.js, migratie 11). Een sleutel met de volledige provisioning- en uitdienstmacht over een tenant geldt standaard 90... |
+| `scim-terugdraai.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | EEN MISLUKTE SCIM-UITDIENST LAAT GEEN HALVE TRANSACTIE ACHTER (server/scim/user-sync.js, zetActief). De uitdienst schrijft accountstand en herstelopdracht in een BEGIN IMMEDIATE op S.db. |
 | `scim-user-outbox.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
 | `scimgroepen.test.js` | 6 | gezakt op `===->!==#0` | SCIM /Groups -- een groepswijziging bij de klant werkt METEEN door. Waarom deze laag er is: de identiteitsbrug las de claim `groups` uit het ID-token, en dat gebeurt alleen bij een inlog. |

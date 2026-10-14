@@ -1940,9 +1940,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/bewijsladder.js",
-      "operator": "!==->===#0",
-      "gezakt": 2,
-      "geprobeerd": 2
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "bewijsmapscherm.e2e.js": {
       "soort": "server",
@@ -7686,6 +7686,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "ketenlokaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/kwalificatie.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 3
     },
     "ketenproef.test.js": {
       "soort": "puur",
@@ -16040,6 +16048,14 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "sport-stand-onvolledig.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/sport.html",
+      "operator": "voorwaarde-omkeren#4",
+      "gezakt": 2,
+      "geprobeerd": 34
     },
     "sport-voorzijde.test.js": {
       "soort": "puur",

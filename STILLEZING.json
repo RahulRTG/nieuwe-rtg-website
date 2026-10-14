@@ -21,7 +21,7 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 632,
+   "bewijslezingen": 633,
    "metVanger": 106,
    "smeltSamen": 61,
    "zegtHet": 15,
@@ -148,7 +148,7 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 393,
+    "regel": 417,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"

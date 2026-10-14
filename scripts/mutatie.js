@@ -584,6 +584,9 @@ const EIGEN_MODULE = new Map([
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['team-room-voorzijde.test.js', ['public/apps/personeel.html']],
   ['winkel-voorzijde.test.js', ['public/apps/mall.html']],
+  /* De stand van Sport: de toets voert de stukken van het inline-script van
+     sport.html uit (heeftTabel, tekenStand, laadStand); de module is de pagina. */
+  ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],
   ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
   ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
   ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],

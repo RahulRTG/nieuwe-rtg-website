@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2681 bestanden en 18556 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2685 bestanden en 18629 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2681 |
-| losse beweringen (`test(...)`) | 18556 |
+| toetsbestanden | 2685 |
+| losse beweringen (`test(...)`) | 18629 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2493 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2497 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2349 bestanden, 17991 beweringen.
+2353 bestanden, 18064 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -203,6 +203,7 @@ toets omvalt.
 | `bankhart.test.js` | 8 | gezakt op `liegpoort /api/` | Het financiele hart: de Regelwacht (belastingen en regels automatisch bij, streng gevalideerd, in place op de gedeelde landtabel), het verenigde hart-afschrift (RTG Bank + RTG Pay + de derde-partij-kaartnaad met een... |
 | `banknood-idem.test.js` | 4 | gezakt op `!==->===#0` | DEZELFDE MISLUKTE CLEARING TWEE KEER MELDEN MAG DE BANK NIET IN NOOD ZETTEN. `bankClearingMislukt()` is een teller, en bij NOOD_DREMPEL trekt hij automatisch de noodstop: de clearing valt dan terug op de kaart-rails. |
 | `bankpositie.test.js` | 5 | gezakt op `liegpoort /api/` | HET BANKSALDO VAN RTG -- server/kern/bankpositie.js (besluit C4), tegen een echte server, want dit zijn twee nieuwe routes. VIJF BEWERINGEN, en ze kunnen alle vijf zakken: 1. |
+| `bearercode-takken.test.js` | 21 | gezakt op `voorwaarde-omkeren#0` | TAKKEN VAN kern/bearercode.js DIE GEEN TOETS RAAKTE. test/bearercode.test.js legt v1 vast, test/bearercode-v2.test.js en test/bearercode-vernieuw.test.js de v2-werkwoorden. |
 | `bearercode-v2.test.js` | 11 | gezakt op `===->!==#0` | BEARERCODE VERSIE 2 -- het Access/Grant-contract (kern/bearercode-v2.js). De v1-karakterisering staat in test/bearercode.test.js en mag niet bewegen. |
 | `bearercode-vernieuw.test.js` | 4 | gezakt op `===->!==#0` | TWEE WERKWOORDEN VOOR EEN NIEUWE CODE (kern/bearercode-keten.js). roteer zelfde termijn: de houder krijgt een verse code, het einde komt nooit later, het gebruik telt door; vernieuw een mens geeft een nieuwe termijn... |
 | `bearercode.test.js` | 13 | gezakt op `false->true#0` | KARAKTERISERING VAN kern/bearercode.js (v1) -- vóór er iets aan verandert. Fase 1 van het Authority-plan bouwt een v2 van deze laag (geldigheid, sessiegebruik, afgeleide codes, rotatie). |
@@ -314,6 +315,7 @@ toets omvalt.
 | `boardroom-poort.test.js` | 7 | gezakt op `liegpoort /api/` | De boardroom-poort: de boardroom is de kamer van de eigenaar (Rahul Imran Ismail). De anonieme kantoorcode heeft geen identiteit en komt er nooit in; de eigenaar komt binnen met zijn eigen account (direct, of als... |
 | `boardroom.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Boardroom: de complete schakelkast. Elke functie heeft een stoplicht-status (aan/uit/storing), de eigenaar schakelt direct, kan een storing melden, alles resetten en de AI om een voorstel vragen. |
 | `bodemdruk.test.js` | 5 | gezakt op `===->!==#0` | GEEN COMMERCIELE DRUK BINNEN DE BODEM -- de meter van eis 5 (SAMENLEVING.md par. 6). |
+| `body-takken.test.js` | 29 | gezakt op `voorwaarde-omkeren#0` | De takken van server/web/body.js die geen enkele toets raakte. test/web.test.js toetst web.json en web.raw van buitenaf, via een echte http-server: één geldig lichaam, één te groot, één kapot, één Zaakdoos- buffer. |
 | `boeken.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Boeken: de huisbibliotheek, de leesvoortgang die met je account meereist (en alleen die plek -- geen leesstatistieken), en de dichte poort zonder token. |
 | `boekhoud.test.js` | 4 | gezakt op `liegpoort /api/` | De branchegerichte AI-boekhouder: genre-profielen, datagedreven adviezen en de leverancier-endpoints (vragen, adviezen, antwoord). Draai: npm test |
 | `boerderij.test.js` | 8 | gezakt op `liegpoort /api/` | End-to-end tests voor het boerderij-genre (kern/boerderij.js): het slimme bedrijfssysteem voor boeren. Type kiezen, percelen + gewassen (zaaien -> groeien -> oogsten), dieren (voeren, opbrengst), takenbord, de... |
@@ -1753,6 +1755,7 @@ toets omvalt.
 | `rtgid-credential.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor RTG-iD. Twee onafhankelijke processen delen alleen de autoritatieve collectie: uitgifte, rotatie en intrekking moeten daardoor serialiseren, terwijl geen van beide kale credentials ooit in... |
 | `rtgid-credential.test.js` | 7 | gezakt op `liegpoort /api/` | Productiecontract van de RTG-iD-koppelcredential: 128-bit, hash-only, eenmalige uitgifte, duurzame retrybinding en server-side rotate/revoke. |
 | `rtgid.test.js` | 27 | gezakt op `liegpoort /api/` | RTG iD: de DigiD-vervanger op de eigen identiteitskluis. Bewaakt de koppelflow (code, bevestigen, weigeren, eenmalig token), de selectieve gegevensdeling (18plus zonder geboortedatum, alleen wat gevraagd is), het... |
+| `rtgjson-takken.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | WAAROM DEZE TOETSEN ER ZIJN. De dekkingsmeting over de hele suite liet in server/lib/rtgjson.js een reeks takken zien die geen enkele toets raakte: de diepte-grens via opties (en de val terug op de standaard), elke... |
 | `rtgjson.test.js` | 6 | gezakt op `liegpoort /api/` | De eigen JSON-motor (server/lib/rtgjson): in huis gecodeerd in plaats van de ingebouwde JSON, en op de grenzen ingebouwd (HTTP-body in, res.json uit, db-snapshots). Bewijs in drie lagen: (1) spec-randgevallen en een... |
 | `rtgone-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtgone.test.js` | 8 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1961,6 +1964,7 @@ toets omvalt.
 | `sso-werksync-failclosed.test.js` | 6 | gezakt op `===->!==#0` | SSO EN WERK OS -- authenticatie is pas zakelijke toegang na groepssync. De provider kan de persoon correct hebben aangemeld terwijl de tenantbrug faalt. |
 | `sso.test.js` | 28 | gezakt op `return-weg#0` | SSO: de laag waarmee een zakelijke klant met zijn eigen identiteitsprovider inlogt. Dit is auth, dus de tests gaan vooral over wat er NIET mag. |
 | `ssogeheim-ouderdom.test.js` | 2 | gezakt op `+->-#0` | B27 (deur identity.sso_client_secret): de uitrollijst van scripts/ssogeheim-ouderdom.js. Een seed met een OUD slot (gezet 120 dagen voor de uitrol, eigen verval ver weg), een VERS slot en een GEMIGREERD slot (geen... |
+| `ssrf-takken.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | Taktoetsen voor de SSRF-afweer (server/kern/ssrf.js). Deze toetsen bestaan omdat de dekkingsmeting over de HELE suite liet zien dat een reeks takken van ssrf.js door geen enkele toets werd geraakt: het octet boven... |
 | `ssrf.test.js` | 10 | gezakt op `true->false#0` | Tests voor de SSRF-afweer (server/kern/ssrf.js). Het scherpst getoetste geval is het web-push-endpoint: dat komt van de client en de server POST daar later naartoe. |
 | `staatlog.test.js` | 13 | gezakt op `true->false#0` | DE STAATMETER: heeft een verzoek de opslag veranderd? (TAKEN.md 4.30) De idempotentieproef keek alleen naar het ANTWOORD, en liep daarop vast: een route die bij elke oproep hetzelfde teruggeeft, verraadt van buitenaf... |
 | `staatproef.test.js` | 33 | gezakt op `>=->>#0` | HET OORDEEL VAN DE STAATPROEF, los van een server. De ronde start een echte server en muteert per route twee keer; daar komt niemand met een mutatie bij. |

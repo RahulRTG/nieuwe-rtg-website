@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "b383fc167",
-  "seconden": 14.7,
+  "commit": "96db5c94",
+  "seconden": 10.2,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3683,6 +3683,9 @@
     "server/kern/retail/assortiment.js",
     "server/kern/retail/klant.js",
     "server/kern/retail/vloer.js",
+    "server/kern/revenue/catalogus-v1-validatie.js",
+    "server/kern/revenue/catalogus-v1.js",
+    "server/kern/revenue/index.js",
     "server/kern/rijksbieb-data.js",
     "server/kern/rijksbieb.js",
     "server/kern/routedekking.js",
@@ -5889,6 +5892,8 @@
     "server/kern/redactie.js",
     "server/kern/reisbieb.js",
     "server/kern/residentie.js",
+    "server/kern/revenue/catalogus-v1.schema.json.js",
+    "server/kern/revenue/catalogus-v1.schema.json/index.js",
     "server/kern/rtfos.js",
     "server/kern/rugdekking.js",
     "server/kern/salon.js",
@@ -6893,6 +6898,9 @@
      "pad": "server/kern/retail"
     },
     {
+     "pad": "server/kern/revenue"
+    },
+    {
      "pad": "server/kern/rtc"
     },
     {
@@ -7229,23 +7237,23 @@
    "omgevingGekopieerd": false,
    "omgeving": [],
    "onwaarneembaar": [],
-   "nodeHoofdversie": 26
+   "nodeHoofdversie": 22
   }
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5755,
-  "gelezen": 5440,
+  "bestandenGezien": 5758,
+  "gelezen": 5443,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27515,
-  "bestandenMetUitvoer": 4539,
-  "uitvoerMetNamen": 2065,
+  "symbolen": 27523,
+  "bestandenMetUitvoer": 4542,
+  "uitvoerMetNamen": 2068,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7763
+  "requireKanten": 7769
  },
  "nietGelezen": [
   {
@@ -23577,6 +23585,7 @@
     "server/functies/voorstel/index.js",
     "server/kern/command/lagen.js",
     "server/kern/command/vermogens.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/kern/workspace-platform.js"
    ]
   },
@@ -51889,6 +51898,7 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/geldregie.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/routes/member/aitegoed.js"
    ]
   },
@@ -53314,7 +53324,8 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/commercie/tegoed.js",
-    "server/kern/commercie/tegoed/plafond.js"
+    "server/kern/commercie/tegoed/plafond.js",
+    "server/kern/revenue/catalogus-v1.js"
    ]
   },
   {
@@ -90414,19 +90425,19 @@
     {
      "naam": "regelsVanItems",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "maakFactuurVoorLid",
      "soort": "functie",
-     "lijn": 56,
+     "lijn": 58,
      "geexporteerd": true
     },
     {
      "naam": "melden",
      "soort": "functie",
-     "lijn": 57,
+     "lijn": 59,
      "geexporteerd": false
     }
    ],
@@ -90447,7 +90458,8 @@
     "server/kern/lidacties/rekening.js",
     "server/routes/supplier/kassa/afrekenen.js",
     "server/routes/supplier/kassa/innen.js",
-    "server/routes/supplier/kassa/verkoop.js"
+    "server/routes/supplier/kassa/verkoop.js",
+    "server/routes/supplier/retail.js"
    ]
   },
   {
@@ -130165,6 +130177,121 @@
    "gebruiktDoor": [
     "server/server.js"
    ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1-validatie.js",
+   "symbolen": [
+    {
+     "naam": "maakRevenueCatalogusValidator",
+     "soort": "functie",
+     "lijn": 6,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "pijl",
+     "lijn": 14,
+     "geexporteerd": false
+    },
+    {
+     "naam": "isObject",
+     "soort": "pijl",
+     "lijn": 15,
+     "geexporteerd": false
+    },
+    {
+     "naam": "veldenExact",
+     "soort": "pijl",
+     "lijn": 16,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "maakRevenueCatalogusValidator"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/revenue/catalogus-v1.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1.js",
+   "symbolen": [
+    {
+     "naam": "canoniek",
+     "soort": "functie",
+     "lijn": 35,
+     "geexporteerd": true
+    },
+    {
+     "naam": "diepVast",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": false
+    },
+    {
+     "naam": "prijsProjectie",
+     "soort": "functie",
+     "lijn": 50,
+     "geexporteerd": false
+    },
+    {
+     "naam": "projecteerAiExtraS",
+     "soort": "functie",
+     "lijn": 64,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CAPABILITY_ID",
+     "CATALOG_ID",
+     "CATALOG_VERSION",
+     "CONTRACT_DIGEST",
+     "FEATURE_ID",
+     "FORMULA_ID",
+     "OFFER_ID",
+     "PRODUCT_ID",
+     "SOURCE_REFS",
+     "canoniek",
+     "projecteerAiExtraS",
+     "schema",
+     "valideer"
+    ]
+   },
+   "requires": [
+    "server/functies/register/index.js",
+    "server/kern/commercie/bundelprijs.js",
+    "server/kern/commercie/tegoed/inhoud.js",
+    "server/kern/revenue/catalogus-v1-validatie.js"
+   ],
+   "extern": [
+    "./catalogus-v1.schema.json",
+    "crypto"
+   ],
+   "gebruiktDoor": [
+    "server/kern/revenue/index.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/index.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "catalogusV1"
+    ]
+   },
+   "requires": [
+    "server/kern/revenue/catalogus-v1.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
   },
   {
    "bestand": "server/kern/rijksbieb-data.js",
@@ -201705,7 +201832,7 @@
     {
      "naam": "eisRetail",
      "soort": "functie",
-     "lijn": 13,
+     "lijn": 15,
      "geexporteerd": "onbekend"
     }
    ],
@@ -201713,7 +201840,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/kern/lidacties/factuur.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/routes/supplier-deel2.js"

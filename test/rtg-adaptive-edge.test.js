@@ -176,6 +176,33 @@ test('www bepaalt de vaste kaders van app, header en Edge', () => {
   assert.match(heritage, /--rtg-edge-desktop-width:660px/);
   assert.match(css, /width:calc\(100% - \(var\(--rtg-frame-mobile\) \* 2\)\)!important/);
   assert.match(css, /width:calc\(100vw - \(var\(--rtg-edge-mobile-inset\) \* 2\)\)!important/);
+  assert.match(css, /data-rtg-adaptive-state="expanded"\] \.rtg-adaptive-sheet/,
+    'het functionele Edge-scherm heeft één gedeelde filmische uitvoering');
+  assert.match(css, /var\(--rtg-cinema-photo\)!important/,
+    'het Edge-scherm gebruikt dezelfde wereldfotografie als de appkamer');
+  assert.match(css, /content:"LIVINGOS"/);
+  assert.match(css, /content:"TRAVELOS"/);
+  assert.match(css, /content:"WORKOS"/);
+  assert.match(css, /content:"FOUNDATIONOS"/);
+  assert.doesNotMatch(css, /:is\(\.rtg-adaptive-bar,\.rtg-adaptive-sheet,\.rtg-adaptive-surface\)\{/,
+    'een late algemene materiaalregel mag de fotografie van het open scherm niet overschrijven');
+});
+
+test('www en app delen hetzelfde cinematische merkcasco', () => {
+  const shell = fs.readFileSync(path.join(ROOT, 'public/site/platform-shell.js'), 'utf8');
+  const publicCss = fs.readFileSync(path.join(ROOT, 'public/site/platform-shell.css'), 'utf8');
+  const cinematicCss = fs.readFileSync(path.join(ROOT, 'public/shared/rtg-cinematic-system.css'), 'utf8');
+  assert.match(shell, /dataset\.rtgCinematic='true'/,
+    'de publieke voordeur moet dezelfde cinematische systeemlaag activeren als de app');
+  assert.match(shell, /Rahul Travel Group/);
+  assert.match(shell, /rtg-edge-mark-lockup/,
+    'www gebruikt de officiële lock-up uit hetzelfde Edge-casco');
+  assert.match(publicCss, /height:82px!important;min-height:82px!important/,
+    'de mobiele www-header volgt dezelfde vaste maat als de app');
+  assert.match(cinematicCss, /\[data-world-home\]\[data-rtg-shell="mobile"\] \.rtg-edge-top\{[\s\S]*?background:#f4f0e9!important/,
+    'de app houdt dezelfde rustige ivoren merkheader rondom fotografische inhoud');
+  assert.doesNotMatch(cinematicCss, /\[data-world-home\]\[data-rtg-world\]:not\(\[data-public-platform\]\)[\s\S]{0,900}background-color:#100e0b!important/,
+    'de app-home mag niet als een tweede volledig donker thema over de inhoud worden gelegd');
 });
 
 test('alle vier werelden gebruiken bestaande lokale productiebeelden', () => {

@@ -5,7 +5,11 @@ body[data-public-platform]:has(.pp-shell)>.experience-header,body[data-public-pl
 body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif}
 .pp-shell [hidden],.pp-detail [hidden]{display:none!important}
 .pp-header{position:fixed!important;inset:0 0 auto!important;display:flex!important;align-items:center;gap:1rem;padding:0 40px!important;min-height:4rem;background:linear-gradient(105deg,#21180f,#100e0b)!important;border-bottom:1px solid var(--wd-line);z-index:10}
-.pp-brand{font:400 2.5rem/1 "Bodoni Moda",serif!important;letter-spacing:-.05em;color:var(--wh-gold)!important;text-decoration:none}
+.pp-brand{color:#fffaf2!important;text-decoration:none}
+.pp-brand .rtg-edge-mark-short{display:none!important}
+.pp-brand .rtg-edge-mark-lockup{display:flex!important;align-items:center!important}
+.pp-brand .rtg-edge-mark-lockup strong{display:block;padding:9px 14px 10px;background:#7f1634;color:#fffaf2;border:1px solid rgba(255,255,255,.15);font:600 20px/1 "Bodoni Moda",Didot,Georgia,serif;letter-spacing:-.025em;white-space:nowrap}
+.pp-brand .rtg-edge-mark-lockup small{display:none!important}
 .pp-context{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border:0;color:var(--wh-ink);background:transparent;font-size:1rem;min-height:44px;cursor:pointer}
 .pp-context .wd-icon{width:.8rem;transform:rotate(90deg)}
 .pp-tagline{margin-inline:auto;font-size:.7rem;letter-spacing:.14em;color:var(--wh-gold);text-align:center}
@@ -242,11 +246,11 @@ body[data-public-platform] .pp-story[aria-pressed="true"]{color:var(--wh-gold)}
 body[data-public-platform] .pp-shell :is(.wp-tabs,.wp-edit-images),body[data-public-platform]>.wp-atmosphere{display:none!important}
 body[data-public-platform] .pp-shell :is(h1,h2,h3),body[data-public-platform] .pp-detail-content :is(h1,h2,h3){font-family:"Bodoni Moda",Didot,Georgia,serif!important;font-weight:400;letter-spacing:-.03em}
 @media(max-width:999px){
- body[data-public-platform][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{padding-top:64px!important}
+ body[data-public-platform][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{padding-top:82px!important}
  body[data-public-platform][data-rtg-desktop] :is(.pp-shell,.pp-detail-shell){width:calc(100% - 32px)!important;max-width:680px;margin:12px auto 24px!important;padding-bottom:calc(var(--rtg-adaptive-inset,96px) + 12px);gap:16px}
  body[data-public-platform] :is(.pp-shell,.pp-detail-shell)>.wd-greeting{display:none!important}
- body[data-public-platform] .pp-header{height:64px;min-height:64px;padding:8px 16px!important;gap:10px;flex-wrap:nowrap}
- body[data-public-platform] .pp-brand{font-size:34px!important}
+ body[data-public-platform] .pp-header{height:82px!important;min-height:82px!important;padding:0 20px!important;gap:14px;flex-wrap:nowrap}
+ body[data-public-platform] .pp-brand .rtg-edge-mark-lockup strong{padding:8px 11px 9px;font-size:18px}
  body[data-public-platform] .pp-context{font-size:13px;min-width:0;white-space:nowrap;margin-inline-end:auto}
  body[data-public-platform] .pp-shell>.wd-favorites{display:none!important}
  body[data-public-platform] .pp-shell .pp-feature{min-height:clamp(360px,58svh,500px);border-radius:var(--rtg-radius-editorial)}

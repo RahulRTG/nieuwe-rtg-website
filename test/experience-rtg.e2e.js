@@ -27,6 +27,10 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method())&&!['/api/talen','/api/vertaal/ui'].includes(new URL(r.url()).pathname))mutations.push(r.url());});
    await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
    await page.waitForFunction(()=>document.documentElement.dataset.websiteTruth==='actueel');
+   if(process.env.RTG_PUBLIC_SCREENSHOTS){
+    fs.mkdirSync(process.env.RTG_PUBLIC_SCREENSHOTS,{recursive:true});
+    await page.screenshot({path:path.join(process.env.RTG_PUBLIC_SCREENSHOTS,'www-'+width+'.png'),fullPage:false});
+   }
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
    assert.match(await page.locator('#platform-story-title').innerText(),/Technologie die mensen dichter bij elkaar brengt/i);
    assert.equal(await page.locator('.pp-story[data-public-story]').count(),4);

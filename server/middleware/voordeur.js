@@ -1,8 +1,10 @@
 /* De voordeur en de scriptbeveiliging van de pagina's.
 
-   De voordeur: / is de openbare RTG-landing; alleen op het APP-domein
-   (landing.isAppHost) opent / meteen de app. De oude bureau-URL's komen op
-   elke host zonder omleiding op /apps/app.html uit.
+   De voordeur: / is op www en app exact dezelfde openbare, cinematografische
+   RTG-landing. De werkelijke account- en app-poort staat op /apps/app.html.
+   Daardoor heeft RTG één merkentree en blijven toegang en product daarachter
+   een afzonderlijke, controleerbare stap. De oude bureau-URL's komen op elke
+   host zonder omleiding op /apps/app.html uit.
 
    De scriptbeveiliging: op de app-pagina's staat geen 'unsafe-inline' voor
    scripts, maar krijgt elk antwoord een eigen nonce. We lezen het bestand,
@@ -46,15 +48,11 @@ function herschrijf(req, naar) {
    (/apps/index.html, met tegels in iframe-vensters), en twee beginschermen is
    er een te veel. De oude paden blijven bestaan omdat er van buiten naar
    gelinkt kan zijn; ze brengen je thuis. / blijft geregistreerd zodat de
-   routekaart de voordeur kent: op het app-domein wordt hij intern herschreven
-   (de browser houdt de korte link, CSP en toegang zijn die van de app), op
-   elke andere host levert de nonce-laag de canonieke landing. */
+   routekaart de gedeelde voordeur kent; de nonce-laag levert daar op iedere
+   host dezelfde canonieke repositorylanding. */
 function bureaublad(app) {
   const naarHome = (req, res, next) => { herschrijf(req, '/apps/app.html'); next(); };
-  app.get('/', (req, res, next) => {
-    if (landing.isAppHost(req)) herschrijf(req, '/apps/app.html');
-    next();
-  });
+  app.get('/', (req, res, next) => next());
   app.get('/apps/bureau.html', naarHome);
   app.get('/apps/index.html', naarHome);
   /* ZONDER SCHUINE STREEP GEREGISTREERD, en dat is geen smaak.

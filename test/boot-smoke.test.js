@@ -77,7 +77,7 @@ function boot(port, dataDir) {
   return { kind, uitInfo };
 }
 
-test('de server boot met de publieke landing op root, de app op app.* en de OS-poort onder /apps', async () => {
+test('de server boot met één landing op www en app, en de OS-poort onder /apps', async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boot-'));
   let kind, uitInfo, r, actievePoort;
   try {
@@ -108,13 +108,22 @@ test('de server boot met de publieke landing op root, de app op app.* en de OS-p
     assert.equal(apps.status, 200, '/apps gaf status ' + apps.status + ' i.p.v. 200');
     assert.ok(/id="gate"/.test(apps.body) && /os-lock|os-grid/.test(apps.body),
       '/apps serveert niet de OS-poort (klokscherm)');
-    // 4) alleen op het app-domein opent / meteen de app
-    //    (een echt domein komt achter de TLS-proxy binnen, vandaar de proto-kop)
+    // 4) www en app hebben exact dezelfde cinematografische voordeur; de
+    //    werkelijke accountpoort blijft expliciet op /apps/app.html staan
     const appRoot = await haal(actievePoort, '/', { host: 'app.rahultravelgroup.com', 'x-forwarded-proto': 'https' });
     assert.equal(appRoot.status, 200, 'app-root gaf status ' + appRoot.status);
-    assert.ok(/id="gate"/.test(appRoot.body) && /app-main/.test(appRoot.body) &&
-      !/data-page="rtg-landing"/.test(appRoot.body),
-    'de root van het app-domein serveert niet de RTG Account-voordeur');
+    assert.ok(/data-page="rtg-landing"/.test(appRoot.body) &&
+      /Vier werelden[\s\S]*[ÉE]én samenhangend geheel/.test(appRoot.body) &&
+      /LivingOS/.test(appRoot.body) && /FoundationOS/.test(appRoot.body),
+    'de root van het app-domein gebruikt niet dezelfde RTG-voordeur als www');
+    assert.equal(appRoot.body, r.body,
+      'www en app leveren op / niet byte-voor-byte dezelfde cinematografische bron');
+    assert.match(appRoot.body, /href="\/apps\/app\.html/,
+      'de gedeelde voordeur heeft geen expliciete route naar de echte accountpoort');
+    const account = await haal(actievePoort, '/apps/app.html', { host: 'app.rahultravelgroup.com', 'x-forwarded-proto': 'https' });
+    assert.equal(account.status, 200, 'accountpoort gaf status ' + account.status);
+    assert.ok(/id="gate"/.test(account.body) && /app-main/.test(account.body),
+      '/apps/app.html serveert niet de echte RTG Account-voordeur');
     // 5) geen fatale uitzondering onderweg
     assert.equal(uitInfo.fataal, false, 'server logde een fatale fout:\n' + uitInfo.log.slice(-1500));
   } finally {

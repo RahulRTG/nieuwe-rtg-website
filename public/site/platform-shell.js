@@ -7,7 +7,11 @@
   function collapse(){return controller.collapse();}
   function menu(){return controller.menu();}
   function refresh(){return controller.refresh();}
-  var header=node('header',null,'rtg-edge-top pp-header'), brand=node('a',null,'rtg-edge-mark pp-brand');brand.textContent='RTG';brand.href='#platform-home';brand.addEventListener('click',function(e){e.preventDefault();collapse();w.scrollTo({top:0,behavior:'instant'});});
+  var header=node('header',null,'rtg-edge-top pp-header'), brand=node('a',null,'rtg-edge-mark pp-brand');
+  var brandShort=node('span',null,'rtg-edge-mark-short');brandShort.textContent='RTG';brandShort.translate=false;brandShort.setAttribute('aria-hidden','true');
+  var brandLockup=node('span',null,'rtg-edge-mark-lockup'),brandName=node('strong'),brandClaim=node('small');
+  brandName.textContent='Rahul Travel Group';brandName.translate=false;brandClaim.textContent='Experience the elite class';brandLockup.setAttribute('aria-hidden','true');brandLockup.append(brandName,brandClaim);brand.append(brandShort,brandLockup);
+  brand.setAttribute('aria-label','Rahul Travel Group, naar het begin');brand.href='#platform-home';brand.addEventListener('click',function(e){e.preventDefault();collapse();w.scrollTo({top:0,behavior:'instant'});});
   var context=button(company?'company':'app',function(){menu();},'pp-context');context.append(icon('next'));
   var searchButton=button(null,function(){collapse();search.focus();search.scrollIntoView({block:'center'});},'pp-icon-button');searchButton.append(icon('search'));searchButton.setAttribute('aria-label',copy('search'));searchButton.dataset.i18nAria='public.search';
   var language=button(null,function(){w.RTGi18n&&w.RTGi18n.openModal();},'pp-icon-button pp-language');language.setAttribute('aria-label',copy('language'));language.dataset.i18nAria='public.language';
@@ -56,7 +60,7 @@
   root.append(greeting,languageNotice,people,home,favorites,focus,library);
   var footer=node('footer',null,'pp-footer');footer.append(node('p','freeFull'),node('span','footer'));
   source.before(header,root,footer,menuPanel,worldPanel);source.classList.add('pp-source');source.setAttribute('aria-hidden','true');
-  d.body.classList.add('rtg-stijl');d.body.dataset.rtgSkin='heritage';d.body.dataset.rtgLayout='standard';d.body.dataset.publicPlatform=kind;d.body.dataset.worldHome='living';d.body.dataset.rtgDesktop='living';
+  d.body.classList.add('rtg-stijl');d.body.dataset.rtgSkin='heritage';d.body.dataset.rtgLayout='standard';d.body.dataset.rtgCinematic='true';d.body.dataset.publicPlatform=kind;d.body.dataset.worldHome='living';d.body.dataset.rtgDesktop='living';
   var skip=d.querySelector('.skip-link');if(skip)skip.href='#platform-home';
   controller=w.RTGPublicController({o:o,data:data,company:company,root:root,detail:detail,focus:focus,focusTitle:focusTitle,home:home,favorites:favorites,library:library,title:title,body:body,picture:picture,stories:stories,stepper:stepper,overline:overline,summary:summary,signalWorld:front.world,signalCount:front.count,language:language,search:search,filter:filter,catalog:catalog,empty:empty,gridButton:gridButton,listButton:listButton,menuPanel:menuPanel,worldPanel:worldPanel});
   var widgets=(company?w.RTGCompanyWidgets:w.RTGPublicWidgets)({o:o,data:data,company:company,favorites:favorites,refresh:refresh});

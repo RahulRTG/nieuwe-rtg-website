@@ -609,6 +609,24 @@ in deze ronde geen productiecode veranderd.
   die 1 van de 13 kanalen dekt, en schuift mee met wet 1.
 - **Daarna.** De wetten die stap 1 tot en met 3 opleveren, komen er ook in.
 - **Meting vóór.** 4 van de 12 wetten uit par. 3 staan in het register.
+- **Meting na stap 1 (13 oktober 2026).** 7 van de 12 staan erin, en alle
+  zeven zijn `raak`. De drie nieuwe wetten zijn:
+  - `beveiliging-ai-maakt-geen-menselijke-bevestiging` (wet 3);
+  - `beveiliging-intrekking-wint` (wet 7);
+  - `beveiliging-geen-kritieke-handeling-zonder-spoor`.
+
+  Het register telt nu 58 wetten.
+- **De eerste ronde vond een gat.** Wet 3 kwam eerst op `afgeslagen`. De
+  sabotage liet de stuurpoort een `bevestigd` uit de body accepteren, en geen
+  enkele toets werd rood, want de bestaande aanval zette die vlag náást de body.
+  `test/stuur-aanval.test.js` smokkelt hem nu ín de body, en daarna was de wet
+  `raak`.
+- **Wat `raak` niet bewijst.** De wet staat aan voor déze zet, niet voor elke
+  omweg (de grens in `SABOTAGE.json`).
+- **Wat nog openstaat.** Wet 7 is bewezen op de recordsessie
+  (`kern/sessies.js`). De staatloze lid-token
+  (`accounts/tokens.js`) en de Redis-kant (`pgaccounts-intrekking.js`) hebben
+  hun eigen toetsen, maar nog geen sabotage.
 
 **Bijvangst. Twee koppen spreken de code tegen; ze zijn in deze ronde niet
 aangeraakt, omdat er geen code verandert.**
@@ -680,6 +698,80 @@ Daarvoor zijn drie dingen nodig die geen code zijn:
 
 Tot die drie er zijn, staat stap 2 **gebouwd en niet actief**. Dat is dezelfde
 vorm als de herkomstpoort.
+
+### 9b. Het alarmkanaal (derde eigenaarsbesluit, 13 oktober 2026)
+
+| Onderdeel | Besluit | Wat er nog open is |
+|---|---|---|
+| Ontvangers | Een vaste beveiligingsverantwoordelijke en een **onafhankelijke** vervanger | De vervanger: een tweede mens die aantoonbaar beschikbaar en bevoegd is |
+| Meldingsdienst | Een EU-gehoste piketdienst met ontvangstbevestiging, herhaling en escalatie | De leverancier (zie hieronder) |
+| Escalatie | Hangt af van de ernst: **5 minuten** bij kritiek, **15 minuten** bij hoog, **60 minuten** bij niet-kritiek | De koppeling aan de bestaande ernstschaal (zie hieronder) |
+
+**De primaire verantwoordelijke is tot V1 de eigenaar, en geen AI-agent.** Een
+agent kan die rol niet dragen, om drie redenen:
+- de gecompromitteerde-AI-aanname uit par. 8a geldt ook voor de agent die
+  meekijkt;
+- een agent draait niet doorlopend en kan een oproep om drie uur 's nachts niet
+  bevestigen;
+- een bevestiging door een AI is precies wat wet 3 uitsluit.
+
+Een agent mag een incident wel voorbereiden en uitzoeken. Bevestigen en
+beoordelen doet een mens.
+
+Zolang er geen tweede mens is, staat het risico op één persoon hardop. **Er
+wordt pas op menselijke opvolging vertrouwd als de vervanger er is.**
+
+**Nog geen leverancier.** Eerst worden vijf punten beoordeeld:
+- de gegevenslocatie;
+- de beschikbaarheid;
+- de kosten;
+- de verwerkersovereenkomst (`VERWERKERS.md`);
+- de onafhankelijkheid van RTG's eigen infrastructuur.
+
+**De ernst krijgt geen tweede schaal.** Er bestaan er al twee:
+- `alarm.js`: hoog, midden, laag;
+- `beveiliging.js`: info, waarschuwing, kritiek.
+
+De drie escalatietijden worden op die bestaande waarden gelegd, in stap 2, met
+code en een toets. Er komt geen derde lijst bij (par. 2).
+
+**Vier aanvullende eisen.**
+
+1. **Geen afhankelijkheid van RTG zelf.** De externe bewaker en de
+   meldingsdienst werken door als de hele RTG-applicatie of de primaire
+   infrastructuur plat ligt. Dat betekent:
+   - een andere hostingpartij, en geen gedeelde DNS of gedeeld netwerk;
+   - sleutels en ontvangers die niet in RTG staan.
+
+   `scripts/sonde.js` draait daarom niet in de RTG-omgeving.
+2. **Automatische begrenzing wacht niet op een mens.** Bij een aantoonbaar
+   kritieke compromittering voert `kern/incidentcontrole.js` meteen de vooraf
+   vastgestelde beschermingsstand uit. De vijf minuten gaan over het oproepen
+   van een mens, niet over het stoppen van de aanval. Drie grenzen blijven
+   staan:
+   - "aantoonbaar" is een deterministische regel en nooit het oordeel van een
+     model (`BEWIJSLUS.md` grens 3);
+   - het gaat alleen om een bestaande stand of trede, nooit om de volledige
+     onderhoudsstand (par. 7);
+   - de regel loopt eerst in de schaduw (grens 7).
+
+   Welke stand bij welk signaal hoort, legt de eigenaar vast vóór stap 2
+   actief wordt.
+3. **Een alarm is pas afgehandeld na bevestiging én beoordeling.** Een
+   ontvangstbevestiging zegt alleen dat iemand de melding zag. Het incident
+   blijft open tot de verantwoordelijke de situatie heeft beoordeeld, en die
+   beoordeling komt in het spoor. Stilzetten (`alarm.js`, met een maximum)
+   is geen afhandeling.
+4. **Uitval van de meldingsdienst is zelf een incident.** De externe bewaker
+   heeft een onafhankelijk reservekanaal. Hij toont periodiek met een
+   proefmelding aan dat beide kanalen werken, met een ontvangstbevestiging. Een
+   kanaal dat zijn laatste proef niet haalde, telt als uitgevallen, nooit als
+   stil groen. Dit is storing 5 van de integrale tegenproef.
+
+**De lat voor fase 1 blijft de tegenproef en niet groene CI.** Na fase 1 moet RTG
+niet alleen incidenten registreren, maar ook zien dat een deel van zijn eigen
+bewaking stilvalt. Dat is pas bewezen als de vijf storingen hieronder echt
+zijn gesimuleerd.
 
 **De integrale tegenproef (stap 5) simuleert vijf storingen.**
 

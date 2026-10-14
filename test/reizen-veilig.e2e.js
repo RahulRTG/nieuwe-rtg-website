@@ -98,7 +98,9 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
       'Navigatie krijgt exact de plek van Move mee: ' + navSrc);
 
     /* 2. HET AANBOD KOMT UIT DE CATALOGUS. */
-    await page.locator('.rv-bank [data-open=reisblad]').click({ timeout: 15000 });
+    /* Langs de Edge, zoals een lid het in de eindstand ziet: Acties, dan Reizen. */
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+    await page.locator('.rtg-adaptive-controls button', { hasText: 'Reizen' }).first().click({ timeout: 15000 });
     const kaarten = page.locator('.rv-pane[data-id=reisblad] [data-reisaanbod] .rv-reiskaart');
     await kaarten.first().waitFor({ timeout: 15000 });
     assert.equal(await kaarten.count(), Math.min(3, catalogus.length), 'een kaart per reis uit de catalogus (hoogstens drie)');

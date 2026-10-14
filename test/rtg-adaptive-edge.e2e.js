@@ -1,6 +1,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, pasAppAdres } = require('./helper');
 const pw = laadPlaywright();
 
@@ -174,6 +176,12 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
             'het Edge-scherm mist een van zijn vijf vaste ingangen');
           assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(), true,
             'de mond opent niet het scherm van dezelfde Edge');
+          if (process.env.RTG_EDGE_SCREENSHOTS) {
+            fs.mkdirSync(process.env.RTG_EDGE_SCREENSHOTS, { recursive: true });
+            await page.waitForTimeout(350); // bewijs de ruststand, niet een half frame van de ontvouwing
+            await page.screenshot({ path: path.join(process.env.RTG_EDGE_SCREENSHOTS,
+              'edge-' + wereld + '-' + maat.width + '.png') });
+          }
           await page.locator('.rtg-adaptive-modes [data-rtg-adaptive-mode="connect"]').click();
           assert.equal(await page.locator('.rtg-adaptive-service').getByRole('button', { name: /Open berichten/ }).count(), 1,
             'Connect heeft geen werkende weg naar de echte berichten-app');

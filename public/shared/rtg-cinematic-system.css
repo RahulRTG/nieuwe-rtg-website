@@ -116,6 +116,63 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-lips path:last-child{
   stroke:var(--edge-bar-bg);stroke-width:5;stroke-linecap:round;
 }
 
+/* HET EDGE-SCHERM IS EEN KLEIN RTG-VENSTER, GEEN DONKER FORMULIER.
+   De foto komt uit precies dezelfde wereldbron als de kamer erachter. De Edge
+   maakt dus geen tweede productmodel en verzint geen dashboard: kop, context,
+   acties, Connect, Media en Account blijven de bestaande, echte bediening.
+   Alleen het materiaal krijgt de filmische diepte van de publieke website. */
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet{
+  isolation:isolate;
+  height:min(620px,calc(100dvh - var(--rtg-adaptive-inset) - var(--rtg-safe-top) - 34px));
+  min-height:min(500px,calc(100dvh - var(--rtg-adaptive-inset) - var(--rtg-safe-top) - 34px));
+  display:flex;flex-direction:column;
+  background-color:#0d0c0a!important;
+  background-image:
+    linear-gradient(180deg,rgba(8,7,6,.78) 0,rgba(8,7,6,.88) 24%,rgba(8,7,6,.67) 52%,rgba(8,7,6,.94) 83%,#0d0c0a 100%),
+    var(--rtg-cinema-photo)!important;
+  background-position:center,var(--rtg-cinema-position)!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  box-shadow:inset 0 1px 0 rgba(255,250,240,.12),0 26px 72px rgba(0,0,0,.34)!important;
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet::before{
+  content:"RTG";display:block;flex:0 0 auto;margin:0 0 15px;
+  color:var(--edge-bar-accent);font:600 9px/1.2 Inter,system-ui,sans-serif;
+  letter-spacing:.19em;text-transform:uppercase;
+}
+body[data-rtg-cinematic="true"][data-rtg-world="living"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet::before{content:"LIVINGOS"}
+body[data-rtg-cinematic="true"][data-rtg-world="travel"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet::before{content:"TRAVELOS"}
+body[data-rtg-cinematic="true"][data-rtg-world="work"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet::before{content:"WORKOS"}
+body[data-rtg-cinematic="true"][data-rtg-world="foundation"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet::before{content:"FOUNDATIONOS"}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet-head{
+  flex:0 0 auto;padding-bottom:16px;border-bottom:1px solid rgba(255,250,240,.12);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet-head h2{
+  color:#fffaf0!important;text-shadow:0 2px 22px rgba(0,0,0,.3);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet-head p{
+  color:rgba(255,250,240,.72)!important;
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-modes{
+  flex:0 0 auto;margin-top:0;padding-top:10px;background:rgba(8,7,6,.36);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] :is(.rtg-adaptive-sheet-list,.rtg-adaptive-service){
+  margin-top:auto;padding-top:18px;
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-guard{
+  margin-top:16px;border-color:rgba(255,250,240,.13);background:rgba(8,7,6,.52);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] :is(.rtg-adaptive-sheet-action,.rtg-adaptive-service-action){
+  border-color:rgba(255,250,240,.15)!important;background:rgba(8,7,6,.58)!important;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] :is(.rtg-adaptive-sheet-action,.rtg-adaptive-service-action):is(:hover,:focus-visible){
+  border-color:color-mix(in srgb,var(--edge-bar-accent) 64%,transparent)!important;
+  background:rgba(19,16,12,.76)!important;
+}
+
 /* De vaste bovenrand is optisch lichter dan de inhoud, maar blijft een exact
    onderdeel van het bestaande Edge-casco. */
 body[data-rtg-cinematic="true"] .rtg-edge-top{
@@ -196,6 +253,10 @@ body[data-rtg-cinematic="true"] .rtg-edge-top::after{opacity:.52}
   }
   body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"] .rtg-adaptive-item{
     display:flex!important;grid-column:auto!important;min-height:44px!important
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .rtg-adaptive-sheet{
+    height:min(620px,calc(100dvh - var(--rtg-adaptive-inset) - var(--rtg-safe-top) - 24px));
+    min-height:min(480px,calc(100dvh - var(--rtg-adaptive-inset) - var(--rtg-safe-top) - 24px));
   }
 }
 
@@ -561,7 +622,7 @@ body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"] .rtg-adaptive-ed
   --edge-bar-dim:#b8afa2!important;--edge-bar-line:rgba(226,195,137,.24)!important;
   --edge-bar-accent:#e2c389!important;--edge-bar-accent-soft:rgba(226,195,137,.08)!important;
 }
-body[data-rtg-cinematic="true"] :is(.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface){
+body[data-rtg-cinematic="true"] :is(.rtg-adaptive-bar,.rtg-adaptive-surface){
   border:1px solid rgba(226,195,137,.24)!important;
   background:linear-gradient(180deg,rgba(25,23,19,.96),rgba(13,13,11,.97))!important;
   box-shadow:0 16px 38px rgba(31,24,16,.18)!important;

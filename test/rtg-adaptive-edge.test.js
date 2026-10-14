@@ -176,6 +176,16 @@ test('www bepaalt de vaste kaders van app, header en Edge', () => {
   assert.match(heritage, /--rtg-edge-desktop-width:660px/);
   assert.match(css, /width:calc\(100% - \(var\(--rtg-frame-mobile\) \* 2\)\)!important/);
   assert.match(css, /width:calc\(100vw - \(var\(--rtg-edge-mobile-inset\) \* 2\)\)!important/);
+  assert.match(css, /data-rtg-adaptive-state="expanded"\] \.rtg-adaptive-sheet/,
+    'het functionele Edge-scherm heeft één gedeelde filmische uitvoering');
+  assert.match(css, /var\(--rtg-cinema-photo\)!important/,
+    'het Edge-scherm gebruikt dezelfde wereldfotografie als de appkamer');
+  assert.match(css, /content:"LIVINGOS"/);
+  assert.match(css, /content:"TRAVELOS"/);
+  assert.match(css, /content:"WORKOS"/);
+  assert.match(css, /content:"FOUNDATIONOS"/);
+  assert.doesNotMatch(css, /:is\(\.rtg-adaptive-bar,\.rtg-adaptive-sheet,\.rtg-adaptive-surface\)\{/,
+    'een late algemene materiaalregel mag de fotografie van het open scherm niet overschrijven');
 });
 
 test('alle vier werelden gebruiken bestaande lokale productiebeelden', () => {

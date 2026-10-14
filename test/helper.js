@@ -1727,7 +1727,14 @@ async function edgeActies(page) {
   if (!await page.locator('.rtg-adaptive-sheet').isVisible()) {
     const mounted = page.locator('.rtg-adaptive-surface [data-rtg-adaptive-action="ai"]');
     if (await mounted.isVisible()) await mounted.click();
-    else await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+    else {
+      const bar = page.locator('.rtg-adaptive-bar');
+      const context = bar.locator('[data-rtg-adaptive-action="context"]');
+      // Quiet Presence houdt alleen de centrale 44px-bediening zichtbaar. Een
+      // echte aanwijzer wekt eerst het oppervlak en kiest daarna de context.
+      if (!await context.isVisible()) await bar.hover();
+      await context.click();
+    }
   }
   await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { state: 'visible' });
   await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });

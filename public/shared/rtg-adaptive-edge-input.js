@@ -57,12 +57,13 @@
     function listen(target,type,callback,options){target.addEventListener(type,callback,options);listeners.push([target,type,callback,options]);}
     var D=null;
     function quiet(){rt.win.clearTimeout(quietTimer);
+      if(!rt.model)return;
       if(pinned(rt)||rt.model.state==='deck'||rt.model.state==='expanded')return;
       quietTimer=rt.win.setTimeout(function(){if(pinned(rt))return;if(busy(rt))return quiet();
         if(rt.model.state==='dock')handlers.state('peek','quiet');},3600);
     }
     function wake(){rt.win.clearTimeout(quietTimer);
-      if(rt.model.state==='peek')handlers.state('dock','wake');
+      if(rt.model&&rt.model.state==='peek')handlers.state('dock','wake');
     }
     rt.quiet=quiet;
     listen(rt.bar,'pointerenter',wake);

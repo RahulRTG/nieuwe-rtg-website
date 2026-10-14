@@ -371,7 +371,7 @@
       },
       "bewijs": {
         "toon": "beheerLijst",
-        "prijs": "metPrijs",
+        "prijs": "mallPrijs",
         "beschikbaarheid": "agenda",
         "reserveer": "bronReserveringen",
         "bevestig": "bronBoekingen",

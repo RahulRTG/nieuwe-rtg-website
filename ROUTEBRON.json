@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-14T03:43:31.076Z",
-  "commit": "e5715853c",
+  "op": "2026-10-14T03:59:35.995Z",
+  "commit": "d8bf37ce1",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,

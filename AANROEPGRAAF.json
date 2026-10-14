@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
-  "op": "2026-10-13",
-  "commit": "cfe0dd03b",
+  "op": "2026-10-14",
+  "commit": "487816465",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5461,9 +5461,9 @@
  "gemeten": {
   "bestanden": 4475,
   "nietGelezen": 0,
-  "aanroepen": 181101,
-  "kanten": 31543,
-  "kantenLokaal": 20245,
+  "aanroepen": 181109,
+  "kanten": 31546,
+  "kantenLokaal": 20248,
   "kantenIngevoerd": 2843,
   "kantenLid": 2819,
   "kantenViaKern": 4899,
@@ -5472,23 +5472,23 @@
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135111,
+  "onopgelosteAanroepen": 135117,
   "onopgelosteNamen": 13901,
   "onopgelostNaarSoort": {
-   "ingebouwd": 36278,
+   "ingebouwd": 36280,
    "externeModule": 1061,
    "kader": 12430,
    "contextobject": 20795,
    "uitgepaktObject": 1679,
-   "lokaleWaarde": 24190,
-   "methodeOpWaarde": 38211,
+   "lokaleWaarde": 24192,
+   "methodeOpWaarde": 38213,
    "overig": 467
   },
   "opgelostPct": 25.4,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 72,
-  "symbolenMetAanroeper": 12386,
+  "symbolenMetAanroeper": 12387,
   "routesMetSymbool": 3373,
   "routeSymboolKanten": 7091
  },
@@ -32826,7 +32826,7 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 35332
+   "aantal": 35334
   },
   {
    "naam": "String",
@@ -33056,7 +33056,7 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 35319
+     "aantal": 35321
     },
     {
      "naam": "CallExpression",
@@ -189119,11 +189119,19 @@
   },
   {
    "vanBestand": "server/kern/ssrf.js",
+   "van": "gemaptIpv4",
+   "naarBestand": "server/kern/ssrf.js",
+   "naar": "isIpv4",
+   "hoe": "lokaal",
+   "lijn": 78
+  },
+  {
+   "vanBestand": "server/kern/ssrf.js",
    "van": "onveiligIpLiteral",
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 73
+   "lijn": 88
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189131,7 +189139,15 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "privaatIpv4",
    "hoe": "lokaal",
-   "lijn": 74
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/kern/ssrf.js",
+   "van": "onveiligIpLiteral",
+   "naarBestand": "server/kern/ssrf.js",
+   "naar": "gemaptIpv4",
+   "hoe": "lokaal",
+   "lijn": 100
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189139,7 +189155,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189147,7 +189163,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpLiteral",
    "hoe": "lokaal",
-   "lijn": 110
+   "lijn": 129
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189155,7 +189171,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "onveiligIpLiteral",
    "hoe": "lokaal",
-   "lijn": 121
+   "lijn": 142
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189163,7 +189179,15 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 136
+   "lijn": 157
+  },
+  {
+   "vanBestand": "server/kern/ssrf.js",
+   "van": "metadataDoel",
+   "naarBestand": "server/kern/ssrf.js",
+   "naar": "gemaptIpv4",
+   "hoe": "lokaal",
+   "lijn": 159
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189171,7 +189195,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "veiligeExternalUrl",
    "hoe": "lokaal",
-   "lijn": 150
+   "lijn": 173
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189179,7 +189203,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "metadataDoel",
    "hoe": "lokaal",
-   "lijn": 154
+   "lijn": 177
   },
   {
    "vanBestand": "server/kern/stad/advies.js",

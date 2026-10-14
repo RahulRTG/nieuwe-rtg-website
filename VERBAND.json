@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T09:51:42.469Z",
-    "commit": "b26de4207",
+    "op": "2026-10-13T17:57:47.636Z",
+    "commit": "2ee1fde4",
     "boomVuil": false,
     "instrument": "scripts/verband.js",
     "node": "v22.22.0"
@@ -10,47 +10,47 @@
   "graad": "vermoed",
   "grens": "De RECALL is gemeten, de PRECISIE niet: van de voorstellen per sensor is niet vastgesteld welk deel een echte handhaver aanwijst. De vijf sensoren worden NOOIT tot een cijfer gemiddeld -- `anker` haalt 8 van de 57 met 12 voorstellen en `wettekst` 52 met 411, dus een gemiddelde verbergt precies het verschil waar een lezer op moet wegen. Een rand draagt daarom WELKE sensoren hem zagen en geen betrouwbaarheidspercentage.",
   "telling": {
-    "wetten": 55,
-    "randenWachter": 63,
-    "randenImplementatie": 44,
-    "gevonden": 61,
+    "wetten": 58,
+    "randenWachter": 66,
+    "randenImplementatie": 49,
+    "gevonden": 64,
     "gemist": 2
   },
   "tweeRelaties": {
     "uitleg": "Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt (relatie BEWAAKT_DOOR), en de IMPLEMENTATIE die de regel draagt (relatie DRAAGT). Deze meter ijkt alleen de eerste. Elke rand draagt daarom een `relatie` die zegt WAT hij is, naast een `bronrelatie` die zegt wat er in WETTEN.json stond.",
     "interpretatie": "ONBEPAALD IN DE BRON: WETTEN.json kent een veldnaam voor twee relaties. De splitsing hier is een LEZING van deze meter en geen besluit -- WETTEN.json is niet aangeraakt. Wie die twee daar uit elkaar trekt, doet dat als besluit en niet als berekening.",
-    "wachter": 63,
-    "implementatie": 44
+    "wachter": 66,
+    "implementatie": 49
   },
   "sensoren": {
     "causaal": {
       "recall": 8,
-      "van": 63,
-      "voorstellen": 24,
+      "van": 66,
+      "voorstellen": 27,
       "bron": "gemeten"
     },
     "document": {
-      "recall": 35,
-      "van": 63,
-      "voorstellen": 376,
+      "recall": 36,
+      "van": 66,
+      "voorstellen": 402,
       "bron": "gemeten"
     },
     "anker": {
       "recall": 8,
-      "van": 63,
+      "van": 66,
       "voorstellen": 12,
       "bron": "gemeten"
     },
     "doelbestand": {
       "recall": 36,
-      "van": 63,
-      "voorstellen": 123,
+      "van": 66,
+      "voorstellen": 125,
       "bron": "gemeten"
     },
     "wettekst": {
-      "recall": 54,
-      "van": 63,
-      "voorstellen": 426,
+      "recall": 57,
+      "van": 66,
+      "voorstellen": 443,
       "bron": "gemeten"
     }
   },
@@ -628,6 +628,34 @@
       "bronrelatie": "bewaaktDoor"
     },
     {
+      "wet": "beveiliging-ai-maakt-geen-menselijke-bevestiging",
+      "wachter": "test/stuur-aanval.test.js",
+      "gezienDoor": [
+        "document",
+        "wettekst"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "beveiliging-intrekking-wint",
+      "wachter": "test/kantoorintrekking.test.js",
+      "gezienDoor": [
+        "wettekst"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "beveiliging-geen-kritieke-handeling-zonder-spoor",
+      "wachter": "test/kritiekspoor.test.js",
+      "gezienDoor": [
+        "wettekst"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
       "wet": "techniek-meter-kent-zijn-grens",
       "wachter": "test/meterwet.test.js",
       "gezienDoor": [
@@ -923,6 +951,36 @@
     {
       "wet": "beveiliging-onbekende-stand-is-niet-normaal",
       "bestand": "server/kern/incidentcontrole-stand.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "beveiliging-ai-maakt-geen-menselijke-bevestiging",
+      "bestand": "server/kern/stuur/toets.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "beveiliging-ai-maakt-geen-menselijke-bevestiging",
+      "bestand": "server/kern/stuur/bevestiging.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "beveiliging-intrekking-wint",
+      "bestand": "server/kern/sessies.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "beveiliging-intrekking-wint",
+      "bestand": "server/kern/intreksignaal.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "beveiliging-geen-kritieke-handeling-zonder-spoor",
+      "bestand": "server/opzet/kritiekspoor.js",
       "relatie": "DRAAGT",
       "bronrelatie": "draagt"
     },

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:41:55.526Z",
-    "commit": "39f10eb9d",
+    "op": "2026-10-13T16:59:05.734Z",
+    "commit": "f71cf0bb",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/sabotage.js",
     "node": "v22.22.0"
   },
@@ -387,6 +387,27 @@
       "reden": "4. mutatie: een weggehaalde meting maakt de keuring strenger, niet lichter",
       "wachter": "test:test/keuringreden.test.js",
       "duurMs": 2073
+    },
+    "beveiliging-ai-maakt-geen-menselijke-bevestiging": {
+      "stand": "raak",
+      "afdruk": "016cbca4cc3b15b6",
+      "reden": "bevestigd",
+      "wachter": "test:test/stuur-aanval.test.js",
+      "duurMs": 287
+    },
+    "beveiliging-intrekking-wint": {
+      "stand": "raak",
+      "afdruk": "2dc7adbd198d1364",
+      "reden": "1. ontkoppelen sluit elke open kantoorsessie en de stroom",
+      "wachter": "test:test/kantoorintrekking.test.js",
+      "duurMs": 6374
+    },
+    "beveiliging-geen-kritieke-handeling-zonder-spoor": {
+      "stand": "raak",
+      "afdruk": "ed2fa3f23d22f83c",
+      "reden": "2. onder een liegende opslag gaat een kritieke handeling NIET door",
+      "wachter": "test:test/kritiekspoor.test.js",
+      "duurMs": 9463
     }
   }
 }

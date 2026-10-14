@@ -37,7 +37,8 @@
 const VERWACHT = {
   alarm: { wat: 'het alarm weegt zijn controles', periodeMs: 60000 },
   canary: { wat: 'de uitrol-canary weegt lopende uitrollen', periodeMs: 30000 },
-  auditwacht: { wat: 'de auditwacht controleert de journalen', periodeMs: 5 * 60000 }
+  auditwacht: { wat: 'de auditwacht controleert de journalen', periodeMs: 5 * 60000 },
+  wacht: { wat: 'De Wacht meet het verkeer voor bord en lastafworp', periodeMs: 10000 }
 };
 const VENSTERS = 3;
 
@@ -45,7 +46,7 @@ const VENSTERS = 3;
    geen enkele zag. Onder de drempel is het te weinig om iets te zeggen. */
 const SCHILD_DREMPEL = 20;
 
-const staat = { sensoren: new Map(), verloren: new Map(), schild: null };
+const staat = { sensoren: new Map(), verloren: new Map(), schild: null, noodrem: null };
 
 const nu = () => Date.now();
 
@@ -106,6 +107,11 @@ function koppelSchild({ schildVerzoeken, metingVerzoeken }) {
 /* Alleen de weging van het alarm schuift het vergelijkpunt op (`schuif`).
    Een lezing van het bord of de meetroute krijgt het laatste oordeel terug:
    twee lezers die elk een stukje verschil opeten, zien samen nooit de drempel. */
+/* De automatische noodrem (server/beveiliging-noodrem.js). Uitzetten mag, met
+   de eigenaar en een passkey -- maar dan staat hij hier als "uit", en nooit als
+   een levende verdediging. */
+function koppelNoodrem(staatAan) { staat.noodrem = staatAan; }
+
 function schildOordeel(schuif) {
   const k = staat.schild;
   if (!k) return null;
@@ -149,6 +155,12 @@ function oordeel({ schuif = false } = {}) {
   }
   const sch = schildOordeel(schuif);
   if (sch) rijen.push({ naam: 'schild', wat: 'het schild ziet het binnenkomende verkeer', stand: sch.stil ? 'stil' : 'levend', reden: sch.reden });
+  if (staat.noodrem) {
+    let aan; try { aan = !!staat.noodrem(); } catch (e) { aan = null; }
+    rijen.push({ naam: 'noodrem', wat: 'de automatische noodrem bij brute force staat paraat',
+      stand: aan === null ? 'stil' : aan ? 'levend' : 'uit',
+      reden: aan === null ? 'de stand van de noodrem kon niet worden gelezen' : aan ? 'staat aan' : 'uitgezet door de eigenaar' });
+  }
   for (const [bron, v] of staat.verloren) {
     const terug = v.laatstAangekomen >= v.laatstVerloren;
     rijen.push({ naam: 'melding:' + bron, wat: 'meldingen van ' + bron + ' komen aan', stand: terug ? 'levend' : 'stil',
@@ -186,7 +198,7 @@ function gestart(naam, periodeMs) {
 }
 
 /* Alleen voor toetsen. */
-function _wis() { staat.sensoren.clear(); staat.verloren.clear(); staat.schild = null; }
+function _wis() { staat.sensoren.clear(); staat.verloren.clear(); staat.schild = null; staat.noodrem = null; }
 
-module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL, aangemeld, gestart, ronde, fout, verloren, aangekomen, koppelSchild,
+module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL, aangemeld, gestart, ronde, fout, verloren, aangekomen, koppelSchild, koppelNoodrem,
   oordeel, bevinding, stand, alarmActief, _wis };

@@ -55,6 +55,7 @@ module.exports = (ctx) => {
     if (!db.data.techniek.autoReactie) db.data.techniek.autoReactie = { aan: true };
     return db.data.techniek.autoReactie;
   }
+  require('./kern/command/sensorstilte').koppelNoodrem(() => autoStaat().aan);
   function zetAuto(aan) { autoStaat().aan = !!aan; save(); return autoStaat().aan; }
 
   /* Meld een gebeurtenis. ernst: 'info' | 'waarschuwing' | 'kritiek'.
@@ -76,7 +77,12 @@ module.exports = (ctx) => {
         tekst, meta: meta || {}, aantal: 1, afgehandeld: false, at: new Date(nu).toISOString(), atMs: nu });
       if (arr.length > MAX) arr.length = MAX;
     }
-    save();
+    /* Een melding die niet kan worden bewaard, is een verloren melding en geen
+       stille: kern/command/sensorstilte.js telt hem, en pas een volgende
+       geslaagde bewaring bewijst dat het journaal terug is. */
+    const stilte = require('./kern/command/sensorstilte');
+    try { save(); } catch (e) { stilte.verloren('beveiligingsjournaal'); throw e; }
+    stilte.aangekomen('beveiligingsjournaal');
     if (ernst === 'kritiek') escaleer(sleutel, tekst);
     if (type === 'brute-force') noodrem();
     return arr[0];

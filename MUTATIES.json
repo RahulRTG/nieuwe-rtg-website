@@ -4362,9 +4362,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/evidence-dag.js",
-      "operator": "getal+1#4",
+      "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
-      "geprobeerd": 5
+      "geprobeerd": 1
     },
     "excursie.test.js": {
       "soort": "server",

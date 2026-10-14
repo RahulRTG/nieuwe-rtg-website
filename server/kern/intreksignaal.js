@@ -78,11 +78,15 @@ function meld(soort, waarde, verloopt) {
   return true;
 }
 
+/* Het vervalmoment staat bij een sessietoken op plek 1 en bij een actietoken
+   (`id.doel.exp.nonce`) op plek 2. Op het aantal delen gokken las bij een oud
+   sessietoken (`id.exp.uitgegeven`) de UITGIFTE -- een tijd in het verleden,
+   zodat de intrekking meteen verliep. ../accounts/tokenvorm.js kent de vorm. */
 function tokenVervalt(token) {
   try {
     const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
-    const delen = body.split('.');
-    return Number(delen.length > 3 ? delen[1] : delen[2]) || 0;
+    const sessie = require('../accounts/tokenvorm').sessieDelen(body);
+    return Number(sessie ? sessie[1] : body.split('.')[2]) || 0;
   } catch (e) { return 0; }
 }
 function meldToken(token, verloopt) {
@@ -170,7 +174,7 @@ async function wachtDuurzaam() {
 }
 
 function koppelBus(nieuweBus) {
-  if (bus === nieuweBus) return true;
+  if (nieuweBus && bus === nieuweBus) return true;   // geen bus is geen geslaagde koppeling
   if (bus) throw new Error('intreksignaal: een tweede realtimebus zou twee waarheden maken');
   if (!nieuweBus || typeof nieuweBus.publish !== 'function' ||
       typeof nieuweBus.subscribe !== 'function') return false;

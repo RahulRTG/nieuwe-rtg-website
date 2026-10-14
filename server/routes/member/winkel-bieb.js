@@ -44,7 +44,7 @@ module.exports = (kern) => {
     const installedApps = appbieb.mijnApps(req.session.key);
     const ownProducts = mall.eigenCatalogus().producten;
     const supplierGroups = mall.overzicht().gids || [];
-    res.json(levendeEtalage.projecteer({
+    res.json(levendeEtalage.projecteerLivingMall({
       aanbod: zoek.items,
       apps,
       installedApps,

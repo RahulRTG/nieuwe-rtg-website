@@ -17,7 +17,7 @@ function api(base, route, body, token) {
 }
 
 test('de projectie houdt bron, uitvoeringsactie en commerciële grens intact', () => {
-  const data = projectie.projecteer({
+  const data = projectie.projecteerLivingMall({
     apps: [{ id: 'a', naam: 'Agenda', uitleg: 'Plan uw dag.', wereld: 'rtg', categorieLabel: 'Werk', ledenprijsCenten: 0, url: '/apps/agenda.html' }],
     installedApps: [],
     ownProducts: [{ slug: 'dock', naam: 'RTG Dock', beschrijving: 'Een vaste plek.', eenmalig: 500, perMaand: 0, eenheid: 'per stuk', discipline: 'Work' }],

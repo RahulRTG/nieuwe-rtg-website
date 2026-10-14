@@ -34,7 +34,7 @@ function afdelingVoorAanbod(a) {
   return 'products';
 }
 
-function geld(prijs) {
+function mallPrijs(prijs) {
   if (!prijs || !Number.isFinite(Number(prijs.bedrag))) return null;
   return {
     amount: Number(prijs.bedrag),
@@ -105,7 +105,7 @@ function aanbodRij(a) {
     worlds: wereldVoorAanbod(a),
     state: a.beschikbaar && a.beschikbaar.uit ? 'UNAVAILABLE' : 'AVAILABLE',
     stateLabel: a.beschikbaar ? a.beschikbaar.tekst : 'Bekijk beschikbaarheid',
-    price: geld(a.prijs),
+    price: mallPrijs(a.prijs),
     rating: a.waardering || null,
     action: { type: 'NAVIGATE', label: a.cta, href: a.pagina },
     source: { kind: a.bron, id: a.id },
@@ -116,7 +116,7 @@ function aanbodRij(a) {
   };
 }
 
-function tel(items, key) {
+function telMallAfdelingen(items, key) {
   return items.reduce((out, item) => {
     const waarde = item[key];
     out[waarde] = (out[waarde] || 0) + 1;
@@ -124,7 +124,7 @@ function tel(items, key) {
   }, {});
 }
 
-function projecteer({ aanbod, apps, installedApps, ownProducts, partial, supplierGroups }) {
+function projecteerLivingMall({ aanbod, apps, installedApps, ownProducts, partial, supplierGroups }) {
   const actief = new Set((installedApps || []).map(app => app.id));
   const software = (apps || []).slice(0, MAX_PER_BRON).map(app => softwareRij(app, actief.has(app.id)));
   const hardware = (ownProducts || []).slice(0, MAX_PER_BRON).map(hardwareRij);
@@ -136,7 +136,7 @@ function projecteer({ aanbod, apps, installedApps, ownProducts, partial, supplie
     version: VERSIE,
     generatedAt: new Date().toISOString(),
     items,
-    departments: tel(items, 'department'),
+    departments: telMallAfdelingen(items, 'department'),
     supplierGroups: (supplierGroups || []).map(group => ({
       id: group.type,
       label: group.label,
@@ -159,4 +159,4 @@ function projecteer({ aanbod, apps, installedApps, ownProducts, partial, supplie
   };
 }
 
-module.exports = { VERSIE, MAX_PER_BRON, projecteer, softwareRij, hardwareRij, aanbodRij };
+module.exports = { VERSIE, MAX_PER_BRON, projecteerLivingMall, softwareRij, hardwareRij, aanbodRij };

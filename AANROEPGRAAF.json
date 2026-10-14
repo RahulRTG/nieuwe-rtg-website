@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "487816465",
+  "commit": "bd81eaf4f",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -189123,7 +189123,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 78
+   "lijn": 76
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189131,7 +189131,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 88
+   "lijn": 86
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189139,7 +189139,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "privaatIpv4",
    "hoe": "lokaal",
-   "lijn": 89
+   "lijn": 87
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189147,7 +189147,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "gemaptIpv4",
    "hoe": "lokaal",
-   "lijn": 100
+   "lijn": 96
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189155,7 +189155,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 109
+   "lijn": 105
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189163,7 +189163,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpLiteral",
    "hoe": "lokaal",
-   "lijn": 129
+   "lijn": 125
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189171,7 +189171,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "onveiligIpLiteral",
    "hoe": "lokaal",
-   "lijn": 142
+   "lijn": 137
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189179,7 +189179,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "isIpv4",
    "hoe": "lokaal",
-   "lijn": 157
+   "lijn": 152
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189187,7 +189187,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "gemaptIpv4",
    "hoe": "lokaal",
-   "lijn": 159
+   "lijn": 154
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189195,7 +189195,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "veiligeExternalUrl",
    "hoe": "lokaal",
-   "lijn": 173
+   "lijn": 168
   },
   {
    "vanBestand": "server/kern/ssrf.js",
@@ -189203,7 +189203,7 @@
    "naarBestand": "server/kern/ssrf.js",
    "naar": "metadataDoel",
    "hoe": "lokaal",
-   "lijn": 177
+   "lijn": 172
   },
   {
    "vanBestand": "server/kern/stad/advies.js",

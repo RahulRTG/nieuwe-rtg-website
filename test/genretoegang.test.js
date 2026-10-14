@@ -34,7 +34,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopHard } = require('./helper');
 
 const register = require('../server/seed/genres');
 const bedrijfMod = require('../server/kern/aanmeldingen/bedrijf');
@@ -173,7 +173,10 @@ test('de toegangsstand haalt de database, ook een database die hem nog niet had'
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-genretoegang-'));
   try {
     const eerste = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
-    await stop(eerste);
+    /* stop() geeft alleen SIGKILL en wacht niet; de database hieronder wordt
+       dan beschreven terwijl het proces mogelijk nog een slot vasthoudt.
+       stopHard wacht op `exit`. */
+    await stopHard(eerste.child);
 
     /* Een bestaande database nabootsen: standen eruit, en op twee genres de
        oude `besloten`-vlag terugzetten die door de status is vervangen. */

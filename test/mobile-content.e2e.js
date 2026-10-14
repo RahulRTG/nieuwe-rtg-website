@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
-const engines = ['chromium', ...(process.env.RTG_TEST_WEBKIT === '1' ? ['webkit'] : [])];
+const engines = h.testMotoren();
 let srv, token, session;
 async function post(route, body, auth) {
   const r = await fetch(srv.base + route, {method:'POST', headers:{'content-type':'application/json',
@@ -110,7 +110,7 @@ for (const engine of engines) {
     const browser = await pw[engine].launch(engine === 'chromium' ? h.browserOpties(pw) : {});
     try {
       const ctx = await context(browser,width), page = await ctx.newPage(), errors = [];
-      h.letOpFouten(page,errors);
+      h.letOpFouten(page,errors,{eigenZeef:true});
       for (const [route,heading,stage] of [
         ['werk','.wk-briefing h1','.wk-stage'], ['horeca','.hq-stage h2','.hq-stage'],
         ['partner-network','.pn-network h2','.pn-grid']
@@ -148,7 +148,7 @@ for (const engine of engines) {
     try {
       const ctx = await context(browser,390), errors = [], stand = {weg:false, afgebroken:0};
       let page = await ctx.newPage();
-      const volg = (p) => { h.letOpFouten(p, bak(errors, stand, new URL(srv.base).host)); netwerk(p); };
+      const volg = (p) => { h.letOpFouten(p, bak(errors, stand, new URL(srv.base).host), {eigenZeef:true}); netwerk(p); };
       volg(page);
       let held = 0;
       const vertraag = async r => {held++;await new Promise(resolve => setTimeout(resolve,1200));await r.continue();};

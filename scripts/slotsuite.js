@@ -28,13 +28,15 @@
      5  TOEGANKELIJK de a11y-scan over alle schermen.
      6  BEPROEVING   de storm: mega volume, geld op de cent, morele grenzen,
                      herstart, elke route in elke rol, geheugenlek-vloer.
-     7  KEURING      het logica-oordeel over het geheel.
-     8  RAPPORT      RAPPORT-SLOTSUITE.md: uitslag, wat is opgelost sinds de
+     7  KWALIFICATIE het releaseimage bouwen en bewijzen dat zijn runtimebytes
+                     die van HEAD zijn (scripts/kwalificatie.js --lokaal).
+     8  KEURING      het logica-oordeel over het geheel.
+     9  RAPPORT      RAPPORT-SLOTSUITE.md: uitslag, wat is opgelost sinds de
                      vorige ronde, wat is nieuw, en de backlog op volgorde.
 
    DRAAIEN:
      node scripts/slotsuite.js            de hele suite (duurt lang; dat hoort)
-     node scripts/slotsuite.js --snel     zonder de Beproeving (laag 5)
+     node scripts/slotsuite.js --snel     zonder de keten, de Beproeving en de kwalificatie
      node scripts/slotsuite.js --alleen=poorten,keuring
    Exitcode 0 = alles staat. 1 = er is iets gezakt of STUK. 2 = zij zelf viel om. */
 'use strict';
@@ -55,6 +57,16 @@ const duur = ms => (ms < 1000 ? ms + ' ms' : ms < 60000 ? (ms / 1000).toFixed(1)
 
 /* ---------- de lagen ---------- */
 const NODE = process.execPath;
+/* DE DUURMETING VAN DEZE RONDE, en alleen van deze. De testdraaier VOEGT toe
+   aan zijn duurregister (test/toetsnaam.js, O_APPEND) en het standaardpad
+   .toetsduur overleeft dus elke eerdere ronde, ook een halve. De
+   toets-routekaart leest uit dat register WIE er draaide; met de regels van
+   gisteren erbij zou een toets die vandaag niet draaide als "draaide, raakte
+   niets" tellen. In CI begint elke scherf met een leeg register; hier krijgt
+   elke Slotsuite-ronde een eigen, nieuw pad. Het routejournaal hoeft dat niet:
+   de draaier gooit het zelf leeg voor hij begint (scripts/test-runner.js). */
+const RONDE_DUUR = path.join(require('os').tmpdir(), 'rtg-slotsuite-' + process.pid + '-' + Date.now() + '.toetsduur');
+const RONDE_KAART = RONDE_DUUR.replace(/\.toetsduur$/, '-toetsroutes.json');
 const LAGEN = [
   { id: 'bouw', naam: 'DE BOUW', hard: true, bouw: true },
   { id: 'poorten', naam: 'DE POORTEN', hard: true, stappen: [
@@ -72,7 +84,14 @@ const LAGEN = [
     /* De gedeelde runner begrenst serverconcurrentie en draait de twee
        bronmuterende ijkingen apart. Anders kan de Slotsuite precies door haar
        eigen meetproeven nondeterministisch rood worden. */
-    ['test/*.test.js', [NODE, ['scripts/test-runner.js', '--reporter=dot']]]
+    ['test/*.test.js', [NODE, ['scripts/test-runner.js', '--reporter=dot'], { RTG_TOETSDUUR: RONDE_DUUR }]],
+    /* DE TOETS-ROUTEKAART, met de invoer van de ronde hierboven: dezelfde stap
+       als in ci.yml (scripts/toetsroutes.js op het journaal, de duurmeting en
+       het vorige register). CI zet de kaart als artefact klaar; hier gaat hij
+       naar een pad buiten de repository. Een ronde zonder journaal laat deze
+       stap zakken (exitcode 2), net als in de keten. */
+    ['toets-routekaart', [NODE, ['scripts/toetsroutes.js', '--lees', '.routejournaal', '--ronde', RONDE_DUUR,
+      '--vorige', 'TOETSROUTES.json', '--naar', RONDE_KAART]]]
   ] },
   /* DE KETEN. Wat GitHub straks over deze wijziging zegt, hoort hier al gezegd
      te zijn -- en dat waren vierentwintig poorten die in geen enkele lokale
@@ -99,6 +118,14 @@ const LAGEN = [
   ] },
   { id: 'beproeving', naam: 'DE BEPROEVING', hard: true, overslaanBijSnel: true, stappen: [
     ['de storm', [NODE, ['scripts/beproeving.js']]]
+  ] },
+  /* DE RELEASEKWALIFICATIE: de bouw en de voor-controle van
+     .github/workflows/release-image.yml, in een tijdelijke werkboom op HEAD
+     (scripts/kwalificatie.js --lokaal). Hard, want een release die niet kan
+     bewijzen dat de geteste bytes de geleverde zijn, is geen release; zonder
+     docker-daemon of met een vuile werkboom zakt hij, en hij slaat niets over. */
+  { id: 'kwalificatie', naam: 'DE RELEASEKWALIFICATIE (image = geteste bytes)', hard: true, overslaanBijSnel: true, stappen: [
+    ['image en werkboom', [NODE, ['scripts/kwalificatie.js', '--lokaal']]]
   ] },
   { id: 'keuring', naam: 'DE KEURING', hard: false, intern: true }
 ];

@@ -78,7 +78,7 @@ test('4. een tikker die elke ronde omvalt, telt zijn fouten en is stil', async (
   let t;
   try {
     t = maakTikker(() => { throw new Error('de laag eronder viel om'); }, 5, 'alarm')();
-    await new Promise(r => setTimeout(r, 40));
+    await require('./helper').wachtOpWaarde(() => (standVan('alarm') || {}).fouten >= 2, { wat: 'twee getelde fouten' });
     const s = standVan('alarm');
     assert.ok(s.fouten > 0, 'de fouten worden geteld in plaats van geslikt');
     assert.match(s.laatsteFout.reden, /viel om/);

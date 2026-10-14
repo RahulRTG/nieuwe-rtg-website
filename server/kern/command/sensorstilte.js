@@ -120,7 +120,8 @@ function bevinding() {
 
 function stand() {
   const rijen = oordeel();
-  return { actief: alarmActief(), stil: rijen.filter(r => r.stand === 'stil').map(r => r.naam), sensoren: rijen,
+  return { actief: alarmActief(), stil: rijen.filter(r => r.stand === 'stil').map(r => r.naam),
+    uit: rijen.filter(r => r.stand === 'uit').map(r => r.naam), sensoren: rijen,
     let: 'een sensor stempelt zijn ronde en niet zijn vondst; "uit" is bewust niet gestart en telt niet als levend. ' +
       'Zijn eigen uitval ziet dit proces niet: dat doet de externe sonde.' };
 }

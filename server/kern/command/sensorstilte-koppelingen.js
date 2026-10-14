@@ -20,18 +20,22 @@ function meldingStaat(bron) {
   if (!v) { v = { verloren: 0, laatstVerloren: 0, laatstAangekomen: 0 }; koppeling.verloren.set(bron, v); }
   return v;
 }
+/* De volgorde is een VOLGNUMMER en geen klok. Met Date.now() vielen een
+   aankomst en een verlies in dezelfde milliseconde gelijk, en `>=` las dat als
+   herstel: precies het verlies verdween. Een teller kan niet gelijk vallen. */
+let volgnummer = 0;
 /* Een melding die nergens aankwam, bv. omdat het beveiligingsjournaal nog niet
    (of niet meer) aan het schild hangt (opzet/schildwacht.js). */
 function verloren(bron) {
   const v = meldingStaat(bron);
-  v.verloren += 1; v.laatstVerloren = Date.now();
+  v.verloren += 1; v.laatstVerloren = ++volgnummer;
 }
 /* HERSTEL IS EEN NIEUWE GESLAAGDE MELDING, geen gewist alarm. Pas als er na
    de laatste verloren melding weer een aankomt, is de bron terug; de teller
    blijft staan als spoor (WEERBAARHEID.md par. 9e, controleerbare terugkeer). */
 function aangekomen(bron) {
   const v = koppeling.verloren.get(bron);
-  if (v) v.laatstAangekomen = Date.now();
+  if (v) v.laatstAangekomen = ++volgnummer;
 }
 
 /* Het schild ziet ELK verzoek dat binnenkomt (kern/schild.js telt vóór de
@@ -79,7 +83,7 @@ function rijen(schuif) {
       reden: aan === null ? 'de stand van de noodrem kon niet worden gelezen' : aan ? 'staat aan' : 'uitgezet door de eigenaar' });
   }
   for (const [bron, v] of koppeling.verloren) {
-    const terug = v.laatstAangekomen >= v.laatstVerloren;
+    const terug = v.laatstAangekomen > v.laatstVerloren;
     uit.push({ naam: 'melding:' + bron, wat: 'meldingen van ' + bron + ' komen aan', stand: terug ? 'levend' : 'stil',
       reden: v.verloren + ' meldingen gingen verloren' + (terug ? '; daarna kwam er weer een aan' : '') });
   }

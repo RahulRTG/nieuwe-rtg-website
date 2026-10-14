@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:14:43.935Z",
-    "commit": "cd8f030b7",
+    "op": "2026-10-14T16:58:20.796Z",
+    "commit": "f67c4a6db",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3540,6 +3540,14 @@
       "module": "scripts/dekking.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "dekkingsgat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/dekkingsgat.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "delen.test.js": {

@@ -119,7 +119,14 @@ function start({ db, omgeving } = {}) {
   if (staat.timer) return { gestart: false, reden: 'loopt al' };
   const minuten = Math.max(1, Number(env.RTG_AUDITWACHT_MINUTEN || 5) || 5);
   staat.minuten = minuten;
-  const ronde = () => { try { controleer(db); } catch (e) { console.error('[auditwacht] ronde mislukt:', e && e.message); } };
+  /* De ronde stempelt zich bij ../kern/command/sensorstilte.js: een auditwacht
+     die stopt, hoort niet te klinken als een spoor dat heel is. */
+  const stilte = require('../kern/command/sensorstilte');
+  stilte.gestart('auditwacht', minuten * 60 * 1000);
+  const ronde = () => {
+    try { controleer(db); stilte.ronde('auditwacht'); }
+    catch (e) { stilte.fout('auditwacht', e); console.error('[auditwacht] ronde mislukt:', e && e.message); }
+  };
   const eerste = setImmediate(ronde);
   if (eerste && eerste.unref) eerste.unref();
   staat.timer = setInterval(ronde, minuten * 60 * 1000);

@@ -220,7 +220,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
 
   /* De tikker. Zonder deze zou "automatische terugroldrempel" betekenen: pas
      als er iemand kijkt. unref, zodat hij een proces nooit openhoudt. */
-  const tikker = maakTikker(weeg, STANDAARD.tikMs);   // zie ./tikker.js
+  const tikker = maakTikker(weeg, STANDAARD.tikMs, 'canary');   // zie ./tikker.js
 
   return { start, breder, terug, af, weeg, stand, lopende, tikker, STANDAARD };
 }

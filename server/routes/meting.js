@@ -42,6 +42,9 @@ module.exports = (kern) => {
      poort, zodat er niet per ongeluk een tweede, lossere deur ontstaat. */
   app.get('/api/metrics/kort', rem({ windowMs: 60000, limit: 120 }), (req, res) => {
     if (!magMeten(req)) return res.status(404).json({ error: 'Onbekend eindpunt.' });
-    res.json(meting.samenvatting());
+    /* `bewaking` is wat scripts/sonde.js van BUITENAF leest: draaien de
+       sensoren nog, het alarm zelf incluis. Achter dezelfde poort, want "de
+       bewaking ligt nu stil" is precies wat een aanvaller wil weten. */
+    res.json(Object.assign({}, meting.samenvatting(), { bewaking: require('../kern/command/sensorstilte').stand() }));
   });
 };

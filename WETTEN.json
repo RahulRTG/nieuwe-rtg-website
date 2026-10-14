@@ -1212,6 +1212,31 @@
       ]
     },
     {
+      "id": "beveiliging-stille-sensor-is-zichtbaar",
+      "soort": "beveiliging",
+      "wet": "Een beveiligingssensor die stilvalt, staat als stil in de bewaking: een ronde die omvalt wordt geteld en niet geslikt, en een verwachte sensor die nooit startte valt niet uit de lijst (WEERBAARHEID.md par. 9d).",
+      "bron": {
+        "bestand": "WEERBAARHEID.md",
+        "anker": "Een stille sensor staat in de bewaking; hij verdwijnt niet uit de lijst."
+      },
+      "sabotage": {
+        "wat": "laat de tikker een mislukte ronde weer stil slikken, zodat een wachter die elke ronde omvalt niet als stil te zien is",
+        "bestand": "server/kern/command/tikker.js",
+        "zoek": "catch (e) { if (stilte) stilte.fout(naam, e); /* nooit de lus breken */ }",
+        "zet": "catch (e) { /* nooit de lus breken */ }",
+        "wachters": [
+          "test:test/sensorstilte.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/sensorstilte.test.js"
+      ],
+      "draagt": [
+        "server/kern/command/sensorstilte.js",
+        "server/kern/command/tikker.js"
+      ]
+    },
+    {
       "id": "techniek-meter-kent-zijn-grens",
       "soort": "techniek",
       "wet": "Een meter die uitspraken doet over onbekend terrein wordt eerst geijkt tegen bekende waarheid; is er geen grondwaarheid, dan zegt hij dat expliciet en beperkt hij zijn conclusies tot wat hij heeft waargenomen.",

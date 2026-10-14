@@ -773,6 +773,107 @@ niet alleen incidenten registreren, maar ook zien dat een deel van zijn eigen
 bewaking stilvalt. Dat is pas bewezen als de vijf storingen hieronder echt
 zijn gesimuleerd.
 
+### 9c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)
+
+| Onderdeel | Besluit |
+|---|---|
+| Vervanger | Verplicht vóór menselijke escalatie wordt geactiveerd. Tot dan is het een expliciet open risico. |
+| Meldingsdienst | Een onafhankelijke, EU-gehoste piketdienst met ontvangstbevestiging, escalatie en een apart reservekanaal. De leverancier moet nog worden gekozen. |
+| Automatische beschermstand | Alleen vooraf goedgekeurde, bestaande standen van `kern/incidentcontrole.js`, gekoppeld aan concrete, deterministische signalen. |
+
+**De beslisregel, gelegd op de bestaande standen** (`normaal`, `waakzaam`,
+`beperkt`, `beschermd`, `isolatie`) en op de bestaande ernstschalen:
+
+| Ernst | Wat er gebeurt |
+|---|---|
+| laag / info | Registreren en controleren; de stand blijft gelijk. |
+| midden / waarschuwing | Een menselijke melding plus `waakzaam`. Strenger alleen waar een bestaande regel dat al voorschrijft. |
+| hoog / kritiek | Direct de kleinste passende bestaande stand, meestal `beperkt`, maar alleen bij een benoemd, deterministisch signaal. Tegelijk gaat er een extern alarm uit, zonder te wachten op een mens. |
+
+**Een ontbrekende hartslag is geen bewijs van een aanval.** Het kan ook een
+storing zijn. Een stille sensor leidt daarom altijd tot een extern alarm, maar
+nooit op zichzelf tot een zwaardere stand. Daarvoor is een tweede,
+onafhankelijk signaal nodig.
+
+**De lijst signalen die een stand mogen zetten, legt de eigenaar vast.** Per
+signaal is er een toets. Een agent stelt de lijst voor; de eigenaar keurt hem
+goed.
+
+**De beveiliging mag geen aanvalsmiddel worden.** Voordat stap 2 actief wordt,
+moet de tegenproef aantonen dat kunstmatig opgewekte alarmen RTG niet
+ontregelen. Wat er al staat, en wat de tegenproef nog moet bewijzen:
+
+| Er staat al | Nog te bewijzen |
+|---|---|
+| `server/beveiliging.js` voegt dezelfde soort uit dezelfde bron binnen 2 minuten samen en escaleert hooguit eens per 5 minuten per soort | of een aanvaller met **wisselende** bronnen die rem omzeilt en de externe pieper laat overlopen |
+| De noodremladder heeft tijdslimieten en zet nooit automatisch de volledige onderhoudsstand | dat geen opgewekt signaal een zwaardere stand dan de vooraf vastgestelde kan afdwingen |
+| `alarm.js` meldt alleen bij een overgang, niet bij elke ronde | dat een alarm dat snel aan en uit flikkert de piketdienst niet overspoelt |
+| Een stand verlagen vraagt een ceremonie (SEC-LOCK-001) | dat herhaalde escalaties niet stapelen tot isolatie |
+
+**De volgorde:**
+1. stap 2 bouwen;
+2. onafhankelijk testen, met de tegenproef op alarmstormen;
+3. de vervanger en de meldingsdienst regelen;
+4. gecontroleerd activeren.
+
+Mergen doet de eigenaar.
+
+### 9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)
+
+**Een stille sensor staat in de bewaking; hij verdwijnt niet uit de lijst.**
+`server/kern/command/sensorstilte.js` houdt per sensor bij of hij nog een ronde
+draait. Het kijkt niet naar wat de sensor vindt, alleen naar of hij nog kijkt.
+Er zijn drie standen:
+- `levend`;
+- `stil`;
+- `uit`: bewust niet gestart, bijvoorbeeld in een meetserver. Dat is een
+  uitspraak en telt niet als levend.
+
+Een verwachte sensor die nooit is gestart, telt als **stil**: een weggehaalde
+wachter verdwijnt niet uit de lijst.
+
+| Sensor | Hoe zijn ronde wordt gezien |
+|---|---|
+| het alarm, de canary | `kern/command/tikker.js` stempelt elke geslaagde ronde en telt een fout in plaats van hem te slikken |
+| de auditwacht | `lib/auditwacht.js` stempelt elke controle |
+| het schild | `opzet/schildwacht.js` legt de verzoekteller van het schild naast die van de meting. Telt de meting 20 of meer verzoeken en het schild geen enkel, dan hangt het schild niet meer in de keten. |
+| meldingen van het schild | Een melding zonder beveiligingsjournaal telt als verloren, in plaats van zonder spoor te verdwijnen |
+
+**Het alarm** heeft één controle erbij, `sensor-stil` (ernst hoog), in
+`kern/command/alarm-aanvullend.js`. Die controle wordt **in de schaduw** gewogen:
+- Hij wordt berekend en is te zien in `/api/metrics/kort` onder `bewaking`,
+  achter de bestaande meetpoort.
+- Hij wordt pas als alarm gemeld met `RTG_SENSORSTILTE_ACTIEF=1`, en dat gebeurt
+  pas na de stappen in par. 9c.
+- Een stille sensor zet nooit een stand.
+
+**De externe bewaker.** `scripts/sonde.js` leest die `bewaking` vanaf een andere
+machine, met het meettoken. Een stille sensor, een onleesbaar antwoord of geen
+antwoord is **niet gelukt**, en dan eindigt de sonde met exitcode 1. Zo ziet
+iemand buiten het proces ook dat het alarm zelf stilvalt.
+
+**Meting vóór en na:**
+
+| | vóór | na |
+|---|---|---|
+| alarmcontroles die kijken of een sensor nog leeft | 0 van 10 | 1 van 11, in de schaduw |
+| benoemde stille paden die nu gezien worden | — | 3 van 3: tikkerfouten, een verloren schildmelding, een schild buiten de keten |
+| controle van buitenaf of de bewaking leeft | geen | `sonde.js` |
+
+**Toetsen:** `test/sensorstilte.test.js`, met negen gevallen:
+- positief: alles levend;
+- negatief: stil, nooit gestart, een tikker die omvalt, verloren meldingen;
+- vijandig: een schild buiten de keten, terwijl het bord vaak leest.
+
+**Resterende risico's:**
+- De uitrolregie stempelt nog niet. `kern/command/uitrolregie.js` is groter dan
+  de omvangsgrens, en die grens gaat voor; het opsplitsen is een eigen stap.
+- De Wacht (`kern/wacht/`) en het beveiligingsjournaal hebben nog geen eigen
+  ronde om te stempelen.
+- Het schildoordeel kan pas na twee wegingen van het alarm iets zeggen.
+- De sonde waarschuwt nog niemand zelf: hij geeft een exitcode, en wat daarmee
+  gebeurt hangt aan de meldingsdienst uit par. 9b.
+
 **De integrale tegenproef (stap 5) simuleert vijf storingen.**
 
 | Storing | Wat RTG moet aantonen |

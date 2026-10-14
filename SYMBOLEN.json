@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "759474ddf",
-  "seconden": 8,
+  "commit": "620767cea",
+  "seconden": 8.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7251,7 +7251,7 @@
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27542,
+  "symbolen": 27548,
   "bestandenMetUitvoer": 4546,
   "uitvoerMetNamen": 2072,
   "uitvoerOnvolledig": 7,
@@ -33894,26 +33894,64 @@
     {
      "naam": "v2spoor",
      "soort": "pijl",
-     "lijn": 27,
+     "lijn": 43,
+     "geexporteerd": false
+    },
+    {
+     "naam": "toonbaar",
+     "soort": "pijl",
+     "lijn": 48,
      "geexporteerd": false
     },
     {
      "naam": "records",
      "soort": "functie",
-     "lijn": 30,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "herzegel",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 62,
+     "geexporteerd": true
+    },
+    {
+     "naam": "dicht",
+     "soort": "pijl",
+     "lijn": 68,
+     "geexporteerd": false
+    },
+    {
+     "naam": "regel",
+     "soort": "functie",
+     "lijn": 97,
+     "geexporteerd": false
+    },
+    {
+     "naam": "lijst",
+     "soort": "pijl",
+     "lijn": 104,
+     "geexporteerd": false
+    },
+    {
+     "naam": "metLijst",
+     "soort": "functie",
+     "lijn": 108,
+     "geexporteerd": true
+    },
+    {
+     "naam": "controleer",
+     "soort": "functie",
+     "lijn": 116,
      "geexporteerd": true
     }
    ],
    "uitvoer": {
     "vorm": "object",
     "namen": [
+     "controleer",
      "herzegel",
+     "metLijst",
      "records"
     ]
    },

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:14:43.935Z",
-    "commit": "cd8f030b7",
+    "op": "2026-10-14T18:06:46.982Z",
+    "commit": "156e09d56",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15423,6 +15423,14 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "scim-post-uitdienst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "scim-sleutelverval.test.js": {
       "soort": "server",

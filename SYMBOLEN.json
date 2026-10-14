@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "b383fc167",
-  "seconden": 14.7,
+  "commit": "5960cccb4",
+  "seconden": 20.2,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -207429,25 +207429,25 @@
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 88,
      "geexporteerd": true
     },
     {
      "naam": "zetActief",
      "soort": "functie",
-     "lijn": 126,
+     "lijn": 135,
      "geexporteerd": true
     },
     {
      "naam": "lees",
      "soort": "functie",
-     "lijn": 133,
+     "lijn": 142,
      "geexporteerd": true
     },
     {
      "naam": "uitPatch",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 157,
      "geexporteerd": true
     }
    ],

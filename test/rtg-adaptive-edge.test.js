@@ -175,6 +175,7 @@ test('invoerlaag behandelt geneste scroll en verwijdert alle luisteraars bij tea
 test('Quiet Presence gebruikt signalen, respecteert pin en bewaart een raakvlak van 44px', () => {
   assert.match(INPUT, /handlers\.state\('peek',\s*'quiet'\)/);
   assert.match(INPUT, /listen\(rt\.bar,'pointerenter',wake\)/);
+  assert.match(INPUT, /listen\(rt\.bar,'pointerleave',quiet\)/);
   assert.match(INPUT, /listen\(rt\.bar,'focusin',wake\)/);
   assert.match(INPUT, /rtgEdge2Auto==='false'/);
   assert.match(INPUT, /d\.rtgEdge2Rendered==='true'/);

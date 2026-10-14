@@ -33,6 +33,8 @@ test('Edge Quiet Presence blijft bedienbaar, focusveilig en vastzetbaar',
 
     assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'dock');
     assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'active');
+    await bar.hover();
+    await page.mouse.move(10, 10);
     await page.clock.runFor(3600);
     assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'peek');
     assert.equal(await host.getAttribute('data-rtg-adaptive-motion'), 'quiet');

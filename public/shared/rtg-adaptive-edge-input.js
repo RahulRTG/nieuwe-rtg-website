@@ -42,14 +42,9 @@
     });
   }
   function drempels(r){var g=r.win.RTGGrammatica;return g&&g.DREMPELS||null;}
-  function busy(rt) {
-    if (rt.host.dataset.rtgSurface) return true;
-    var owner = rt.win.RTGEdge2;
-    if (owner && owner.isBusy) return owner.isBusy(rt.doc, false);
-    var active = rt.doc.activeElement;
-    return !!(rt.customPanel || rt.host.contains(active) || active &&
-      (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)));
-  }
+  function busy(r){if(r.host.dataset.rtgSurface)return true;var o=r.win.RTGEdge2;
+    if(o&&o.isBusy)return o.isBusy(r.doc,false);var a=r.doc.activeElement;
+    return!!(r.customPanel||r.host.contains(a)||a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)));}
   function pinned(r){var d=r.doc.body&&r.doc.body.dataset||{};return r.manual||d.rtgEdge2Auto==='false'||d.rtgEdge2Rendered==='true'&&!d.rtgEdge2Auto;}
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, lastX = 0, lastY = 0, timer = null, held = false, blockClickUntil = 0;
@@ -67,6 +62,7 @@
     }
     rt.quiet=quiet;
     listen(rt.bar,'pointerenter',wake);
+    listen(rt.bar,'pointerleave',quiet);
     listen(rt.bar,'focusin',wake);
     listen(rt.bar, 'pointerdown', function (event) {
       wake();

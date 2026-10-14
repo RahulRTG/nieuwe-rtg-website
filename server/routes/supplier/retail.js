@@ -6,6 +6,8 @@ module.exports = (kern) => {
     retailState, RETAIL_MATEN, RETAIL_SEIZOENEN, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
     voorraadZoek, klantProfiel, zetKlantMaten, voegKlantnotitie, legApart, paskamerBreng, stuurStyling,
     retailVerkoop, retailVerkoopTerug, retailAnnuleer, retailBon, ANNULEERGRONDEN } = kern;
+  // dezelfde factuurroutine als de kassa; zie kern/lidacties/factuur.js
+  const factuurVoorLid = require('../../kern/lidacties/factuur').maakFactuurVoorLid(facturatie);
 
 /* ================= RETAIL / MODE (kern/retail.js) =================
    Merk-backoffice (manager) + winkelvloer (elke medewerker). De PDA logt in als
@@ -107,13 +109,13 @@ app.post('/api/supplier/retail/verkoop', supplierAuth, async (req, res) => {
   }
   logActivity(req.supplier.code, req.actor, 'verkocht ' + r.sale.items.reduce((n, i) => n + i.qty, 0) + ' stuk(s) · € ' + r.sale.total);
 
-  // automatische factuur voor beide partijen (koper gekoppeld via codenaam)
-  facturatie.boekMetCodenaam({
-    soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
+  // automatische factuur voor beide partijen (koper gekoppeld via codenaam); een
+  // factuur die niet lukt gaat naar het techniekbord (kern/lidacties/factuur.js)
+  factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+    codenaam: req.body.codenaam || r.sale.betaler || (r.sale.klant && r.sale.klant.codenaam),
     koper: { naam: req.body.codenaam || r.sale.betaler || 'Klant' },
     regels: (r.sale.items || []).map(i => ({ omschrijving: i.naam || i.name || 'Artikel', aantal: i.qty, stuk: i.price || i.prijs })),
-    methode: r.sale.method || 'contant', ref: r.sale.id
-  }, req.body.codenaam || r.sale.betaler || (r.sale.klant && r.sale.klant.codenaam)).catch(() => {});
+    methode: r.sale.method || 'contant', ref: r.sale.id });
   res.json(r);
 });
 

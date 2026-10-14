@@ -97,14 +97,14 @@ function schildOordeel(schuif) {
   const k = staat.schild;
   if (!k) return null;
   if (!schuif) return k.laatste || { stil: false, reden: 'nog niet gewogen' };
-  let s, gemeten;
-  try { s = Number(k.schildVerzoeken()); gemeten = Number(k.metingVerzoeken()); }
+  let schildTelling, metingTelling;
+  try { schildTelling = Number(k.schildVerzoeken()); metingTelling = Number(k.metingVerzoeken()); }
   catch (e) { k.laatste = { stil: true, reden: 'de tellers van schild of meting konden niet worden gelezen: ' + e.message }; return k.laatste; }
   const vorig = k.vorig;
-  k.vorig = { s, gemeten };
+  k.vorig = { s: schildTelling, metingTelling };
   if (!vorig) k.laatste = { stil: false, reden: 'eerste meting, nog geen verschil' };
   else {
-    const ds = s - vorig.s, dm = gemeten - vorig.gemeten;
+    const ds = schildTelling - vorig.s, dm = metingTelling - vorig.metingTelling;
     k.laatste = dm >= SCHILD_DREMPEL && ds === 0
       ? { stil: true, reden: dm + ' verzoeken in de meting sinds de vorige weging, en het schild zag er geen enkele' }
       : { stil: false, reden: 'schild +' + ds + ', meting +' + dm };

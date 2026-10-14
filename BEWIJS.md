@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2717 bestanden en 18994 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2732 bestanden en 19058 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2717 |
-| losse beweringen (`test(...)`) | 18994 |
+| toetsbestanden | 2732 |
+| losse beweringen (`test(...)`) | 19058 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2529 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2544 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2385 bestanden, 18428 beweringen.
+2400 bestanden, 18492 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -346,6 +346,7 @@ toets omvalt.
 | `bugjacht.test.js` | 29 | gezakt op `liegpoort /api/` | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
 | `bundeldelen.test.js` | 6 | gezakt op `return-weg#0` | De bundels en hun losse delen mogen niet uit elkaar lopen. DIT KOMT UIT EEN ECHTE FOUT, en uit de duurste soort: eentje die niets liet zakken. |
 | `bundelprijs.test.js` | 9 | gezakt op `===->!==#0` | DE PRIJS VAN EEN AI-BUNDEL: gerekend, niet gekozen. De bundels stonden in kern/commercie/tegoed.js met capaciteit en een naam en NADRUKKELIJK zonder prijs -- de verkoopprijs hoort gerekend te worden, en de inkoopkant... |
+| `bundels-weerbaar.test.js` | 4 | gezakt op `!==->===#0` | DE STIJL- EN SCRIPTBUNDEL -- alleen eigen bestanden, en een wijziging verandert de stempel. server/middleware/stijlbundel.js en scriptbundel.js voegen bestanden uit de webroot samen tot een antwoord, op een lijst... |
 | `bureau.test.js` | 39 | gezakt op `liegpoort /api/` | Integratietests voor Het Privekantoor: de ENE app van de Lifestyle Pass. Wat hier bewezen wordt, en waarom juist dit: de poort een RTG-pas komt er niet in, op geen enkele route de projectie de Life Graph LEEST de... |
 | `busabonnee.test.js` | 2 | gezakt op `&&->||#0` | EEN BUS-ABONNEE DRAAIT NIET IN HET VERZOEK VAN DE PUBLICEERDER (Fase 2, PR 6, invariant I12). `emit` is synchroon, dus in proces draaide een abonnee (SSE, sessies, intreksignaal, deurrem) tot nu toe in de handeling,... |
 | `ca.test.js` | 4 | gezakt op `===->!==` | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
@@ -409,6 +410,7 @@ toets omvalt.
 | `commerce.test.js` | 10 | gezakt op `&&->||#0` | DE COMMERCE-METING -- en of hij werkelijk iets onderscheidt. scripts/commerce.js beantwoordt de vraag uit COMMERCE.md par. |
 | `commercie.test.js` | 14 | gezakt op `return-weg#0` | DE COMMERCIELE KERN: twee invarianten die over geld gaan. Allebei komen ze uit een gat dat de doorlichting van 20 augustus 2026 vond, en allebei zijn ze van de soort "het scherm klopte en het geld niet". |
 | `commercieel.test.js` | 16 | gezakt op `!==->===#0` | COMMERCIELE COMMUNICATIE -- toestemming, en niet een voorkeur. DE BEWERING DIE ERTOE DOET staat in toets 1: alles staat standaard UIT. |
+| `compressie-weerbaar.test.js` | 4 | gezakt op `===->!==#0` | DE COMPRESSIELAAG -- nooit een oude minify, nooit buiten de webroot, nooit een lege belofte. server/middleware/compressie.js comprimeert statische bestanden (een keer, in een cache) en grote JSON-antwoorden. |
 | `concept-live.test.js` | 13 | gezakt op `liegpoort /api/` | LIVE SAMENWERKING OP EEN ECHTE SERVER -- een reisconcept dat het lid op het scherm aanpast, terwijl Rahul en de Edge naar dezelfde waarden kijken (EDGE.md par. 14.6). |
 | `concern-uitnodiging-credential.test.js` | 10 | gezakt op `liegpoort /api/` | De code van een concernuitnodiging als credential (workos.concern_uitnodiging), control voor control: 128 bit en eenmaal tonen, hash-only opslag, issuer/doel/ scope, vervaltijd, max_gebruik 1, intrekken en roteren... |
 | `concern-vestiging.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Concern: VESTIGINGEN, tegen een echte server (routes/concern/vestiging.js). De vestigingsroutes gingen naar een eigen deelmodule toen de samenvoeging van twee takken routes/concern.js over de 10 kB duwde. |
@@ -666,6 +668,7 @@ toets omvalt.
 | `foutmelder.test.js` | 5 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
 | `frictiebodem.test.js` | 14 | gezakt op `===->!==#0` | DE BODEM ONDER DE FRICTIE. WAT HIER BEPROEFD WORDT, EN WAAROM HET ZWAAR WEEGT. |
 | `frictieschaduw.test.js` | 6 | gezakt op `===->!==#0` | DE FRICTIESCHADUW -- meelopen zonder te bijten. kern/stuur/beleid.js beantwoordt "mag de AI dit pad" uit een statische lijst plus de bodem. |
+| `functiebeleid-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | HET FUNCTIEBELEID -- een vreemde hoort niets, een gast telt mee, twijfel over het land telt niet. server/middleware/functiebeleid.js geeft per verzoek het oordeel van de zesde as (mag RTG dit: vergunning, ook per... |
 | `functielijst.test.js` | 6 | al rood | DE AFDRUK VAN FUNCTIES.md LAAT NIETS VALLEN. WAAROM DIT ER IS, EN WAT HET KOSTTE. |
 | `functieplaats.test.js` | 4 | gezakt op `liegpoort /api/` | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
 | `functies.test.js` | 17 | geen bruikbare mutatie | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard en de catalogus. Zuiver, geen server nodig. |
@@ -817,6 +820,7 @@ toets omvalt.
 | `hersteltransactie.test.js` | 9 | gezakt op `!==->===#0` | HERSTEL ALS TRANSACTIE: negen beweringen over de twee stappen die een herstelknop normaal gesproken NIET heeft. 1. |
 | `herstelzondertelefoon.test.js` | 4 | gezakt op `liegpoort /api/` | HERSTELLEN MOET KUNNEN, OOK ZONDER TELEFOONNUMMER. WAT ER MISGING. |
 | `homekit.test.js` | 6 | gezakt op `liegpoort /api/` | De RTG Home Kit: alle elektronica op een plek, scenes met AI-hulp, en de vaste veiligheidsregel dat sloten nooit via een scene of de AI gaan. |
+| `hoofdzekering-weerbaar.test.js` | 3 | gezakt op `false->true#0` | DE HOOFDZEKERING -- in onderhoud komt alleen de eigenaar erbij, ook via een stroomticket. server/middleware/remmen.js (hoofdzekering) zet bij een gesprongen onder- houdszekering elke API op 503, behalve... |
 | `horeca-bar.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Horeca: DE BAR -- welke drankgolf moet nu gemaakt worden? Een bar is geen keuken met andere gerechten. |
 | `horeca-bezorg-club.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 3: de eigen bezorgdienst en de club. Wat hier bewezen wordt: - een adres buiten de zone krijgt een REDEN, geen kale weigering; - de capaciteitsrem telt in keukenminuten en noemt het eerstvolgende... |
 | `horeca-cadans.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Horeca: de cadans -- terugrekenen vanaf het serveermoment. Wat hier bewezen wordt, en waarom juist dat: 1. |
@@ -873,6 +877,7 @@ toets omvalt.
 | `idemidentiteit-velden.test.js` | 9 | gezakt op `!==->===#0` | WAT EEN ROUTE MET `velden` BELOOFT, EN WAT DE AFDRUK ERVAN MAAKT. ----------------------------------------------------------------- Deze toets verandert niets aan het gedrag. |
 | `idemidentiteit.test.js` | 4 | gezakt op `===->!==#0` | WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK -- de meter, en zijn eigen ijking. IDEMIDENTITEIT.json beantwoordt de vraag die na #269/#270 overbleef: waar zit nog een identiteit die te smal is? |
 | `idemmeting.test.js` | 7 | gezakt op `===->!==#0` | DE METING ALS CLASSIFICATIEGROND, EN DE POORT ERVOOR. WAAROM DEZE TOETS BESTAAT. |
+| `idempotentie-weerbaar.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | IDEMPOTENTIE -- een herhaald antwoord gaat alleen terug naar wie het eerste kreeg. server/middleware/idempotentie.js bewaart het eerste geslaagde antwoord op een POST met idem-sleutel en geeft het bij een herhaling... |
 | `idempotentie.test.js` | 9 | gezakt op `===->!==#0` | DE IDEMPOTENTIELAAG, NAGETROKKEN. Een sleutel, een uitvoering: de herhaling krijgt hetzelfde antwoord en de handler draait niet nog een keer. |
 | `idemproef.test.js` | 36 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
 | `idemring.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE DUURZAME IDEM-RING van de betaal- en de munt-naad (server/lib/idemring.js). server.js koppelde twee keer dezelfde opslag aan server/betaal.js en server/muntbetaal.js: een object met de ring onder `_keys`, en `in`... |
@@ -919,6 +924,8 @@ toets omvalt.
 | `inzagebewaring.test.js` | 4 | gezakt op `===->!==#0` | BESLUIT 6: DE BEWARING VOLGT DE BELOFTE, EN NIET ANDERSOM. Het inzagejournaal was begrensd op 5000 REGELS. |
 | `inzagekaart.test.js` | 11 | gezakt op `liegpoort /api/` | De inzagekaart (kern/inzagekaart.js): wie heeft er in mijn gegevens gekeken. Deze kaart bestaat omdat het antwoord op die vraag over drie sporen verspreid lag. |
 | `inzagelog.test.js` | 12 | gezakt op `===->!==` | Het inzagejournaal: wie keek er in wiens identiteitskluis. De twee regels die dit journaal bruikbaar EN veilig maken staan hier als test, want ze zijn allebei makkelijk stuk te maken zonder dat je het merkt: 1. |
+| `isolatie-ceremonie-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | ISOLATIE -- naar beneden alleen langs een voltooide ceremonie. server/kern/isolatie (index, zetten, ontsluiting, ceremonie-eisen) bewaakt dat een stand op een organisatie, identiteit, sessie of apparaat alleen omhoog... |
+| `isolatie-huispoort-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE HUISPOORT EN HET STAPBEWIJS -- een ceremonie dekt precies EEN overgang. server/kern/isolatie/huisceremonie.js is de poort die de incidentcontrole meekrijgt om het platform te ontsluiten; stapbewijs.js bindt een... |
 | `isolatie-lid.test.js` | 11 | gezakt op `liegpoort /api/` | DE ISOLATIEMODUS VAN EEN LID -- end-to-end, tegen een draaiende server. WAT DEZE TOETS BEWIJST, en de tweede is verreweg de belangrijkste: 1. |
 | `isolatie-passkey.test.js` | 8 | gezakt op `liegpoort /api/` | DE PASSKEY ONDER DE ONTSLUITCEREMONIE -- end-to-end, tegen een draaiende server, met echte P-256-crypto (test/webauthn-authenticator.js). WAT DEZE TOETS BEWIJST, en de derde is de belangrijkste: de stap `passkey`... |
 | `isolatie-productiepad.test.js` | 1 | gezakt op `liegpoort /api/` | De echte serverketen met de persoonlijke poort in afdwingstand: gewone ledenmutaties, de techniekdeur en /api/stream. |
@@ -926,6 +933,7 @@ toets omvalt.
 | `isolatie-techniek.test.js` | 7 | gezakt op `liegpoort /api/` | DE ISOLATIECOCKPIT VAN HET KANTOOR, over de echte HTTP-weg. WAAROM DEZE TOETS ER IS. |
 | `isolatie.test.js` | 9 | gezakt op `&&->||#0` | DE ISOLATIELAAG -- zes dragers, een join, en verlagen als protocol. WAT DEZE TOETS BEWIJST, en de derde en de vijfde zijn de belangrijkste: 1. |
 | `isolatiedragers.test.js` | 7 | gezakt op `===->!==#0` | DE DRAGERS BIJ EEN LOPEND VERZOEK -- welke laag heeft echt een sleutel. HET GAT DAT DIT SLUIT, en het was er een van het soort dat groen kijkt. |
+| `isolatiepoort-weerbaar.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE ISOLATIEPOORT BIJ ONZEKERHEID -- twijfel sluit, en een handhaver valt niet stil terug. server/middleware/isolatiepoort-stand.js houdt bij of de poort gemonteerd is en bijt; -drager.js weegt een mutatie tegen de... |
 | `isolatiepoort.test.js` | 13 | gezakt op `===->!==#0` | DE BEVEILIGINGS-AS IN DE HTTP-KETEN -- telt hij, en houdt hij niets tegen? HET GAT DAT DIT SLUIT. |
 | `isolatieregisters.test.js` | 4 | geen module gevonden | DE TWEE ISOLATIEREGISTERS DRAGEN EEN TAND -- en dat was de reden dat `metingenZonderRatel` van 33 naar 35 ging. scripts/lib/metingen.js zegt het scherp: een meetbestand dat aan geen enkele ratel hangt, groeit... |
 | `jeugdbestuur.e2e.test.js` | 11 | gezakt op `liegpoort /api/` | HET JEUGDBESTUUR OVER HTTP -- kan een talent van zestien iemand naast zich zetten zonder dat hij iets tekent wat hij niet leest? Dit is CARRIERE.md par. |
@@ -1045,6 +1053,7 @@ toets omvalt.
 | `leerstofbreed.test.js` | 3 | gezakt op `+->-#0` | RTG School, de brede leerlijn: van twee vakken naar een echt curriculum. Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer en Engels. |
 | `leerstofvo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 3: het voortgezet en vervolgonderwijs op de leerstof-motor. Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert en... |
 | `leespad-schrijft-niet.test.js` | 5 | gezakt op `getal+1#5` | EEN LEESPAD SCHRIJFT NIET. /api/supplier/backoffice is een dashboard: het kijkt naar de dag, de week en de openstaande signalen en verandert niets. |
+| `leesset-weerbaar.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | DE LEESSET ONDER ISOLATIE -- zonder meting geen lezer, en een mislukte oproep bewijst niets. server/kern/isolatie/leesset.js beslist welk pad onder de stand `isolatie` nog mag: alleen een uitgang, een uitzondering... |
 | `leeszonderscheppen.test.js` | 52 | gezakt op `===->!==#0` | LEZEN ZONDER SCHEPPEN -- de tegenproef van een hele klasse. scripts/lib/eigencollectie.js kent twee deuren naar de eigen opslag van een domein: bak() maakt de collectie aan als hij er nog niet is, kijk() geeft een... |
 | `legacy-codeportaal-productiepoort.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leren-leden.test.js` | 11 | gezakt op `liegpoort /api/` | DE LEERLAAG VANAF DE LEDEN-APP -- 28 endpoints, en een uitnodiging als spil. Deze achtentwintig wees de waargenomen dekkingsmeting aan als nooit aangeroepen. |
@@ -1589,6 +1598,7 @@ toets omvalt.
 | `productie.test.js` | 24 | gezakt op `===->!==#0` | Tests voor de productie-hardening: config-validatie, duurzame opslag, betaal-naad (idempotentie + webhook-verificatie) en de logger. NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js, omdat die... |
 | `productiekeur-takken.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | DE PRODUCTIEKEURING TAK VOOR TAK (server/config/productie.js). Wat dit bestand vasthoudt, per regel van het productiedeel: de versleutelingssleutel (ontbrekend of te kort), de twee kluissleutels (ontbrekend of te... |
 | `productiekeuring-regels.test.js` | 18 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `productiepoorten-weerbaar.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE PRODUCTIEPOORTEN -- een gesloten deur is onder elke spelling dicht. Vier grendels in server/middleware/ houden in productie routes dicht tot hun eigen bewijs rond is: de simulatiebrug, het legacy-codeportaal, een... |
 | `productieseed.test.js` | 3 | gezakt op `return-weg#0` | DE PRODUCTIESEED HOUDT ZIJN EIGEN BELOFTE. server/seed/index.js droeg de sleutel `trip` TWEE KEER in hetzelfde objectliteraal: `trip: null` met een uitleg erboven, en drie regels lager `trip: { dest: '', dates: '',... |
 | `proefsleutels.test.js` | 13 | gezakt op `!==->===#0` | DE SLEUTELBOS VAN DE PROEVEN -- scripts/lib/proefsleutels.js Deze toets bestaat om een fout te vangen die hier echt is gemaakt en die NIEMAND zag, omdat hij groen kleurde: de bewakerskaart kreeg vier eigenrollen... |
 | `proeftoestel.test.js` | 8 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1828,6 +1838,7 @@ toets omvalt.
 | `saveduurzaam.test.js` | 13 | gezakt op `expliciete bronmutatie` | saveDuurzaam() -- de zware primitive, en de poort die hem schaars houdt. WAT HIER OP HET SPEL STAAT, en het is niet de techniek. |
 | `scanner.test.js` | 4 | gezakt op `>=->>#0` | RTG Scanner (public/shared/scanner.js): de camera-bediening. De camera zelf (getUserMedia, BarcodeDetector) bestaat niet in Node, dus we toetsen de pure, camera-onafhankelijke kern: de grijswaarde-omzetting die elk... |
 | `scannerpdf.test.js` | 3 | gezakt op `<=-><#0` | RTG Scanner: de eigen PDF-bouwer (public/apps/scanner/pdfje.js) is puur en draait ook in Node -- dus toetsen we hem zonder browser: een geldige PDF-structuur, een beeld per pagina, en een kloppende xref-verwijzing. |
+| `scanpoort-weerbaar.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE SCANPOORT EN DE EXTERNE API-POORT -- bij twijfel niet verwerken. server/middleware/malwarescan.js keurt elke schrijfbody (via de upload- quarantaine of de scanner) en draagt de uploadnoodrem; server/middleware/... |
 | `schaduw.test.js` | 9 | gezakt op `===->!==#0` | SCHADUWHANDHAVING -- een nieuwe regel loopt eerst mee zonder te blokkeren. WAAROM DIT ER IS. |
 | `schaduwtelling.test.js` | 6 | gezakt op `liegpoort /api/` | DE SCHADUWTELLING VAN DE HERKOMSTPOORT (server/kern/stuur/schaduwtelling.js). CONTROLPLANE.md: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. |
 | `schakelaar-zwijgt.test.js` | 6 | gezakt op `liegpoort /api/` | WAT EEN BELLER TE HOREN KRIJGT ALS IETS DICHT STAAT -- en waarom de twee assen daarin uiteindelijk WEL gelijk zijn, na een omweg van een dag. HOE DIT BEGON. |
@@ -1866,7 +1877,10 @@ toets omvalt.
 | `schrijfanalyse.test.js` | 10 | gezakt op `===->!==#0` | DE SCHRIJFANALYSE -- en vooral: waar hij NIET 'nee' mag zeggen. Deze analyse is een VETO en geen certificaat (zie de kop van scripts/schrijfanalyse.js). |
 | `schrijfproef.test.js` | 7 | gezakt op `===->!==#0` | DE SCHRIJFPROEF (scripts/schrijfproef.js) -- de indeling, niet de ronde. Deze toets draait GEEN meting: dat kost een server per route en hoort in `npm run schrijfproef`. |
 | `scim-deprovisioning-failclosed.test.js` | 6 | gezakt op `!==->===#0` | SCIM UIT DIENST -- een 2xx is een bevestiging dat OOK Werk OS dicht is. Deze toets injecteert de storing op de naad zelf. |
+| `scim-groepen-weerbaar.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | SCIM /Groups -- wie uit een groep gaat, verliest zijn rol in HETZELFDE verzoek. server/scim/groepen.js bewaart naam + leden; server/routes/scim-groepen.js laat elke ledenwijziging door de tenantbrug meebewegen. |
+| `scim-orggrens-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | SCIM-ORGANISATIEGRENS -- een sleutel ziet alleen zijn eigen organisatie. De SCIM-deur (server/routes/scim.js + server/scim/index.js) is de enige plek waar een BUITENSTAANDS systeem accounts aanmaakt en uitzet, met... |
 | `scim-sleutelverval.test.js` | 4 | gezakt op `liegpoort /api/` | De SCIM-sleutel vervalt (CODECREDENTIALS.json, identity.scim_bearer_sleutel; server/scim/sleutels.js, migratie 11). Een sleutel met de volledige provisioning- en uitdienstmacht over een tenant geldt standaard 90... |
+| `scim-uitdienst-weerbaar.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | SCIM UIT DIENST -- de intrekking blijft staan tot Werk OS haar heeft bevestigd. server/scim/user-sync.js zet het RTG-account en een herstelopdracht in EEN SQLite-transactie dicht en probeert daarna de Werk OS-cascade. |
 | `scim-user-outbox.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
 | `scimgroepen.test.js` | 6 | gezakt op `===->!==#0` | SCIM /Groups -- een groepswijziging bij de klant werkt METEEN door. Waarom deze laag er is: de identiteitsbrug las de claim `groups` uit het ID-token, en dat gebeurt alleen bij een inlog. |
@@ -2255,6 +2269,7 @@ toets omvalt.
 | `vonk-daglot.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `vonk-experience.test.js` | 7 | gezakt op `===->!==#0` | RONDE 5: de Vonk-productervaring mag de bewezen Connection-contracten alleen presenteren. Deze toetsen bewaken de eindige dag, disclosure-reden, states, scopeslot en de mobiele/a11y-basics van het echte scherm. |
 | `vonk.test.js` | 26 | gezakt op `liegpoort /api/` | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
+| `voordeur-nonce-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE NONCE-LAAG VAN DE VOORDEUR -- elk script een verse nonce, niets van buiten de webroot. server/middleware/voordeur.js (cspNonce) serveert elke .html zelf: hij zet een verse nonce op ieder <script> en <style>, legt... |
 | `voornemen.test.js` | 15 | gezakt op `&&->||#0` | HET VOORNEMEN -- van "boek vijf hotels in Parijs onder 180 euro" naar een gecontroleerd plan, met de blokkade VOOR de uitvoering. DE FOUT DIE DIT VOORKOMT. |
 | `voorspel.test.js` | 13 | gezakt op `liegpoort /api/` | De voorspeller: RTG leert het ritme van leden en zaken uit het Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het nog niet kan). Draai los: node --test test/voorspel.test.js |
 | `voorspelplaats.test.js` | 6 | gezakt op `===->!==#0` | DE VOORSPELLER LEERT PLAATS -- of preciezer: hij LEERT er niets van, en dat is het ontwerp (PLAATS.md fase 3). De voorspeller leerde uitsluitend uit het grootboek: hij weet WANNEER en WAT, nooit WAAR. |

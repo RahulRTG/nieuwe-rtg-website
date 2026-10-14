@@ -12,9 +12,10 @@
      afgeleid     'geen' | 'perAanroep' | 'sluit': hoe toegang sluit die uit de
                   code is ONTSTAAN. trekIn() roept de sluitfunctie aan en geeft
                   de uitslag terug; een onbekende uitslag wordt nooit nul.
-     contracthash over de beveiligingsvelden. Wie na de uitgifte het einde, de
-                  scope of de hash overschrijft, krijgt `gemanipuleerd` en geen
-                  werkende code.
+     contracthash een HMAC-zegel met sleutelversie (contractkid) over de
+                  beveiligingsvelden (./bearercode-zegel.js). Wie na de uitgifte
+                  het einde, de scope of de hash overschrijft, krijgt
+                  `gemanipuleerd`; zonder sleutel `sleutel-ontbreekt`.
      roteer       nieuwe code, oude ingetrokken, einde NOOIT later.
      vernieuw     een mens geeft een nieuwe termijn uit; doel en uitgever blijven.
      leidAf       een kindtoegang die alleen kan versmallen.
@@ -23,25 +24,15 @@
 
 const AFGELEID = new Set(['geen', 'perAanroep', 'sluit']);
 const STAPOP = new Set(['geen', 'uitgifte', 'gebruik', 'beide']);
-const VELDEN = ['issuer', 'doel', 'scope', 'onderwerp', 'issued_at', 'expires_at', 'max_gebruik',
-  'gebruiksvorm', 'code_hash', 'bron_toegang', 'stapOp', 'afgeleid'];
 const { keten } = require('./bearercode-keten');
-
-/* Een vaste volgorde van sleutels, zodat dezelfde inhoud dezelfde hash geeft. */
-function stabiel(v) {
-  if (Array.isArray(v)) return '[' + v.map(stabiel).join(',') + ']';
-  if (v && typeof v === 'object') return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + stabiel(v[k])).join(',') + '}';
-  return JSON.stringify(v === undefined ? null : v);
-}
+const { maakContractzegel, VELDEN } = require('./bearercode-zegel');
 
 const fout = (code, tekst) => Object.assign(new Error('bearercode v2: ' + tekst), { code });
 
-module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) => {
-  const contracthash = t => {
-    const deel = {};
-    for (const k of VELDEN) deel[k] = t[k] === undefined ? null : t[k];
-    return crypto.createHash('sha256').update('rtg-bearer-v2|' + ns + '|' + stabiel(deel)).digest('hex');
-  };
+module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor, sleutelring }) => {
+  const zegel = maakContractzegel({ crypto, ns, sleutelring });
+  /* Herzegelen onder de kid die het record al draagt (anders de nieuwste). */
+  const contracthash = t => zegel.zegel(t, t.contractkid).contracthash;
   const meld = (soort, t) => { if (spoor) spoor({ soort, namespace: ns, doel: t.doel, at: nu() }); };
 
   function einde(geldigheid, uitgifte) {
@@ -85,14 +76,15 @@ module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) 
       rotatie: 1, contractversie: 2, afgeleid, stapOp, bron_toegang, geschiedenis: []
     });
     if (!t.issuer || !t.doel || !t.scope.length) throw fout('onvolledig', 'issuer, doel en scope zijn verplicht');
-    t.contracthash = contracthash(t);
+    Object.assign(t, zegel.zegel(t));
     meld('uitgegeven', t);
     return { code: kaleCode, toegang: t };
   }
 
   /* De v2-controles die VOOR de v1-weigervolgorde gaan. null = door naar v1. */
   function voorReden(t, verwacht) {
-    if (t.contracthash !== contracthash(t)) return 'gemanipuleerd';
+    const z = zegel.toets(t);
+    if (z) return z;
     if (!verwacht.doel || ![].concat(verwacht.scope || []).length) return 'controle-onvolledig';
     return null;
   }
@@ -151,7 +143,7 @@ module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) 
       geldigheid: v.geldigheid, gebruik, afgeleid: v.afgeleid || ouder.afgeleid, stapOp: ouder.stapOp, bron_toegang: ouder.code_hash });
     if (Date.parse(kind.toegang.expires_at) > Date.parse(ouder.expires_at)) {
       kind.toegang.expires_at = ouder.expires_at;
-      kind.toegang.contracthash = contracthash(kind.toegang);
+      Object.assign(kind.toegang, zegel.zegel(kind.toegang));
     }
     return kind;
   }

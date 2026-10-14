@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "e22b3f9b",
-  "seconden": 9.5,
+  "commit": "5ee36c98a",
+  "seconden": 14.4,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7238,7 +7238,7 @@
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27507,
+  "symbolen": 27508,
   "bestandenMetUitvoer": 4538,
   "uitvoerMetNamen": 2064,
   "uitvoerOnvolledig": 7,
@@ -147821,39 +147821,45 @@
      "geexporteerd": false
     },
     {
+     "naam": "gemaptIpv4",
+     "soort": "functie",
+     "lijn": 73,
+     "geexporteerd": false
+    },
+    {
      "naam": "onveiligIpLiteral",
      "soort": "functie",
-     "lijn": 72,
+     "lijn": 85,
      "geexporteerd": true
     },
     {
      "naam": "isIpLiteral",
      "soort": "functie",
-     "lijn": 89,
+     "lijn": 104,
      "geexporteerd": false
     },
     {
      "naam": "pushEndpointOk",
      "soort": "functie",
-     "lijn": 105,
+     "lijn": 120,
      "geexporteerd": true
     },
     {
      "naam": "veiligeExternalUrl",
      "soort": "functie",
-     "lijn": 116,
+     "lijn": 131,
      "geexporteerd": true
     },
     {
      "naam": "metadataDoel",
      "soort": "functie",
-     "lijn": 134,
+     "lijn": 150,
      "geexporteerd": true
     },
     {
      "naam": "veiligeWebhookUrl",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 166,
      "geexporteerd": true
     }
    ],

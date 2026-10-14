@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:14:43.935Z",
-    "commit": "cd8f030b7",
+    "op": "2026-10-14T17:29:11.895Z",
+    "commit": "c87218973",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15430,6 +15430,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "scim-terugdraai.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/user-sync.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 6
     },
     "scim-user-outbox.test.js": {
       "soort": "puur",

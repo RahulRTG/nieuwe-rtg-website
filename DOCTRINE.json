@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:05:42.574Z",
-    "commit": "cd31eb8f",
+    "op": "2026-10-14T12:15:07.518Z",
+    "commit": "07d9a4c99",
     "boomVuil": false,
     "instrument": "scripts/doctrine.js",
     "node": "v26.11.1"
@@ -11,7 +11,7 @@
   "grens": "LEXICAAL EN STRUCTUREEL, in twee assen die nooit worden opgeteld. De ijking hieronder zegt wat deze extractor terugvindt van de wetten die dit huis AL kent (de recall); over de PRECISIE is niets gemeten -- van de kandidaten is niet vastgesteld welk deel werkelijk een harde uitspraak is. Het aantal is dus een werkvoorraad voor een mens en geen oordeel, en zeker geen percentage dat naar 100 moet: meerdere zinnen uit meerdere documenten beschrijven vaak een onderliggende wet, en daarvoor staan de groepen.",
   "telling": {
     "documenten": 175,
-    "zinnen": 46398,
+    "zinnen": 46400,
     "kandidatenSterk": 9112,
     "kandidatenStructuur": 7311,
     "kandidatenWoord": 1801,
@@ -44,7 +44,7 @@
   },
   "overgeslagen": {
     "codeblokregels": 4176,
-    "tabelregels": 12539,
+    "tabelregels": 12542,
     "citaatregels": 1367,
     "geenUitspraak": 35,
     "waarom": "code, tabellen en citaten dragen geen eigen uitspraak; ze worden geteld en niet stil weggelaten"
@@ -127430,7 +127430,7 @@
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
       "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
-      "regel": 855,
+      "regel": 858,
       "zin": "Meting vóór en na:",
       "as": "structuur",
       "signaal": "vet",
@@ -127443,7 +127443,7 @@
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
       "kop": "9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
-      "regel": 877,
+      "regel": 881,
       "zin": "e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
       "as": "structuur",
       "signaal": "kop",
@@ -127456,7 +127456,7 @@
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
       "kop": "9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
-      "regel": 892,
+      "regel": 896,
       "zin": "Vier garanties, en waar ze nu staan:",
       "as": "structuur",
       "signaal": "vet",
@@ -127469,7 +127469,7 @@
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
       "kop": "9e. Detectie, alarmering en bescherming zijn drie dingen (vijfde eigenaarsbesluit, 14 oktober 2026)",
-      "regel": 901,
+      "regel": 905,
       "zin": "De integrale tegenproef (stap 5) simuleert vijf storingen.",
       "as": "structuur",
       "signaal": "vet",

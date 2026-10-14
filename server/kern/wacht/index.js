@@ -122,8 +122,23 @@ module.exports = (ctx) => {
     };
   }
 
+  /* DE LUS VAN DE WACHT. Stond als losse setInterval in opzet/diensten2.js,
+     met een lege catch: een meting die elke ronde omviel liet geen spoor na.
+     Nu stempelt elke ronde zich bij ../command/sensorstilte.js en telt een
+     fout in plaats van hem te slikken (WEERBAARHEID.md par. 9d). */
+  function start(ms) {
+    const stilte = require('../command/sensorstilte');
+    const periode = ms || 10000;
+    stilte.gestart('wacht', periode);
+    const t = setInterval(() => {
+      try { meet(); stilte.ronde('wacht'); } catch (e) { stilte.fout('wacht', e); }
+    }, periode);
+    if (t.unref) t.unref();
+    return t;
+  }
+
   return {
-    meet, meters, grafiek, opruimen, bord,
+    meet, start, meters, grafiek, opruimen, bord,
     isoleer: kamer.isoleer, vrij: kamer.vrij,
     inQuarantaine: kamer.inQuarantaine, quarantaineLijst: kamer.quarantaineLijst,
     voorstel: kamer.voorstel, beslis: kamer.beslis, analyseer: kamer.analyseer,

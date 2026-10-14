@@ -78,11 +78,13 @@ function meld(soort, waarde, verloopt) {
   return true;
 }
 
+/* Verval: sessietoken plek 1, actietoken (`id.doel.exp.nonce`) plek 2. Gokken
+   op het aantal delen las bij `id.exp.uitgegeven` de uitgifte: fail-open. */
 function tokenVervalt(token) {
   try {
-    const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
-    const delen = body.split('.');
-    return Number(delen.length > 3 ? delen[1] : delen[2]) || 0;
+    const d = Buffer.from(String(token).split('.')[0], 'base64url').toString().split('.');
+    const sessie = /^\d+$/.test(d[0]) && /^\d+$/.test(d[1] || '');
+    return Number(sessie ? d[1] : d[2]) || 0;
   } catch (e) { return 0; }
 }
 function meldToken(token, verloopt) {
@@ -170,7 +172,7 @@ async function wachtDuurzaam() {
 }
 
 function koppelBus(nieuweBus) {
-  if (bus === nieuweBus) return true;
+  if (nieuweBus && bus === nieuweBus) return true;   // geen bus is geen geslaagde koppeling
   if (bus) throw new Error('intreksignaal: een tweede realtimebus zou twee waarheden maken');
   if (!nieuweBus || typeof nieuweBus.publish !== 'function' ||
       typeof nieuweBus.subscribe !== 'function') return false;

@@ -41,6 +41,10 @@
 const klok = require('../../lib/klok');
 
 const { GRADEN, METHODEN, VELDEN, VERBODEN } = require('./sessievelden');
+/* Alleen eigen sleutels. Een methode of veldnaam als 'constructor' of
+   'toString' vond via het prototype een functie, en een claim met graad
+   undefined omzeilde in sessieregister.vul de controle op verzwakking. */
+const eigen = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
 const isSleutel = (v) => typeof v === 'string' && /^[A-Za-z0-9_:-]{1,64}$/.test(v);
 const isTekst   = (v) => typeof v === 'string' && v.length > 0 && v.length <= 64;
 const isGetal   = (v) => Number.isFinite(v);
@@ -50,7 +54,7 @@ const CONTROLE  = { sleutel: isSleutel, tekst: isTekst, getal: isGetal };
 function herkomstOk(h) {
   if (!h || typeof h !== 'object') return false;
   if (!isTekst(h.bron)) return false;
-  if (!METHODEN[h.methode]) return false;
+  if (!eigen(METHODEN, h.methode)) return false;
   if (!Number.isFinite(new Date(h.vastgesteldOp || 0).getTime()) || !h.vastgesteldOp) return false;
   if (!isTekst(h.regelversie)) return false;
   if (h.bevestigdOp != null && !Number.isFinite(new Date(h.bevestigdOp).getTime())) return false;
@@ -64,7 +68,7 @@ function herkomstOk(h) {
    `onbekend`: wij hebben het wel degelijk ooit gemeten, we weten alleen niet of
    het nu nog zo is. Dat verschil is precies wat een scherm hoort te tonen. */
 function graadVan(claim, nu = klok.nu()) {
-  return graadMet(claim, VELDEN[claim && claim.veld], nu);
+  return graadMet(claim, eigen(VELDEN, claim && claim.veld) ? VELDEN[claim.veld] : undefined, nu);
 }
 
 /* DEZELFDE REGEL, met de velddefinitie als argument.
@@ -101,8 +105,8 @@ function bouw(ruw) {
     return { context, geweigerd: [{ veld: '(geheel)', reden: 'geen object' }] };
   }
   for (const [naam, waarde] of Object.entries(ruw)) {
-    if (VERBODEN[naam]) { geweigerd.push({ veld: naam, reden: VERBODEN[naam], verboden: true }); continue; }
-    const veld = VELDEN[naam];
+    if (eigen(VERBODEN, naam)) { geweigerd.push({ veld: naam, reden: VERBODEN[naam], verboden: true }); continue; }
+    const veld = eigen(VELDEN, naam) ? VELDEN[naam] : undefined;
     if (!veld) { geweigerd.push({ veld: naam, reden: 'onbekend veld; de lijst in kern/identiteit/sessiecontext.js is gesloten' }); continue; }
     if (!waarde || typeof waarde !== 'object') { geweigerd.push({ veld: naam, reden: 'geen object' }); continue; }
     if (!herkomstOk(waarde.herkomst)) {

@@ -838,6 +838,9 @@ wachter verdwijnt niet uit de lijst.
 | de auditwacht | `lib/auditwacht.js` stempelt elke controle |
 | het schild | `opzet/schildwacht.js` legt de verzoekteller van het schild naast die van de meting. Telt de meting 20 of meer verzoeken en het schild geen enkel, dan hangt het schild niet meer in de keten. |
 | meldingen van het schild | Een melding zonder beveiligingsjournaal telt als verloren, in plaats van zonder spoor te verdwijnen |
+| De Wacht *(14 oktober, stap 2b)* | `kern/wacht/index.js` draait zijn eigen lus (`start()`), stempelt elke ronde en telt een fout. Eerst was dat een losse `setInterval` met een lege `catch` in `opzet/diensten2.js`. |
+| het beveiligingsjournaal *(stap 2b)* | `server/beveiliging.js`: een melding die niet kan worden bewaard, telt als verloren en de fout gaat door naar de aanroeper. Pas een volgende geslaagde bewaring bewijst de terugkeer. |
+| de automatische noodrem *(stap 2b)* | Staat de noodrem uit, dan staat hij in de bewaking als **uit**, nooit als levende verdediging. Uitzetten blijft voorbehouden aan de eigenaar met een passkey; wie het deed, legt stap 3 (het auditboek) vast. |
 
 **Het alarm** heeft één controle erbij, `sensor-stil` (ernst hoog), in
 `kern/command/alarm-aanvullend.js`. Die controle wordt **in de schaduw** gewogen:
@@ -868,8 +871,9 @@ iemand buiten het proces ook dat het alarm zelf stilvalt.
 **Resterende risico's:**
 - De uitrolregie stempelt nog niet. `kern/command/uitrolregie.js` is groter dan
   de omvangsgrens, en die grens gaat voor; het opsplitsen is een eigen stap.
-- De Wacht (`kern/wacht/`) en het beveiligingsjournaal hebben nog geen eigen
-  ronde om te stempelen.
+- De Wacht en het beveiligingsjournaal stonden hier eerst als open punt. Ze zijn
+  gedekt in stap 2b (14 oktober). Daarmee is stap 2 technisch voltooid in de
+  zin van par. 9e, met de uitrolregie als bekende uitzondering.
 - Het schildoordeel kan pas na twee wegingen van het alarm iets zeggen.
 - De sonde waarschuwt nog niemand zelf: hij geeft een exitcode, en wat daarmee
   gebeurt hangt aan de meldingsdienst uit par. 9b.

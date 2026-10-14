@@ -189,3 +189,45 @@ test('8. de meetroute toont de bewaking, achter dezelfde poort', async () => {
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
+
+test('9. De Wacht stempelt zijn eigen lus, en een omvallende meting wordt geteld', async () => {
+  stilte._wis();
+  const { wachtOpWaarde } = require('./helper');
+  let teller = () => 0;   // De Wacht kopieert zijn lezers; de toets wisselt wat erachter zit
+  const lees = { verzoeken: () => teller(), bans: () => 0, actieveIps: () => 0, verdachteBronnen: () => [], geheugenMB: () => 0 };
+  const wacht = require('../server/kern/wacht')({ db: { data: {} }, save: () => {}, beveilig: null, lees });
+  const t = wacht.start(5);
+  try {
+    await wachtOpWaarde(() => (standVan('wacht') || {}).stand === 'levend' && /rondes/.test(standVan('wacht').reden),
+      { wat: 'een geslaagde ronde van De Wacht' });
+    teller = () => { throw new Error('teller weg'); };
+    await wachtOpWaarde(() => (standVan('wacht') || {}).fouten > 0, { wat: 'een getelde fout van De Wacht' });
+    assert.match(standVan('wacht').laatsteFout.reden, /teller weg/);
+  } finally { clearInterval(t); }
+});
+
+test('10. het beveiligingsjournaal: een mislukte bewaring is verloren, een volgende geslaagde herstelt', () => {
+  stilte._wis();
+  allesLevend();
+  let faalt = true;
+  const db = { data: {} };
+  const bev = require('../server/beveiliging')({ db, save: () => { if (faalt) throw new Error('schijf vol'); }, notifyOwner: null });
+  assert.throws(() => bev.meld('proef', 'info', 'een melding', { bron: 'toets' }), /schijf vol/, 'de fout blijft zichtbaar voor de aanroeper');
+  assert.equal(standVan('melding:beveiligingsjournaal').stand, 'stil');
+  faalt = false;
+  bev.meld('proef', 'info', 'nog een melding', { bron: 'toets2' });
+  assert.equal(standVan('melding:beveiligingsjournaal').stand, 'levend', 'pas een geslaagde bewaring bewijst de terugkeer');
+});
+
+test('11. een uitgezette noodrem staat als "uit", nooit als levende verdediging', () => {
+  stilte._wis();
+  allesLevend();
+  const db = { data: {} };
+  const bev = require('../server/beveiliging')({ db, save: () => {}, notifyOwner: null });
+  assert.equal(standVan('noodrem').stand, 'levend');
+  bev.zetAuto(false);
+  assert.equal(standVan('noodrem').stand, 'uit');
+  assert.equal(stilte.bevinding(), null, 'uit is een uitspraak, geen stilte -- het auditboek legt vast wie het deed');
+  bev.zetAuto(true);
+  assert.equal(standVan('noodrem').stand, 'levend');
+});

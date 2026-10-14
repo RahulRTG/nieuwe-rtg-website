@@ -38,10 +38,7 @@ beveilig.zetIsoleer((bron, reden) => wacht.isoleer(bron, reden));
 const atelierweb = require('../kern/atelierweb')({ db, save, crypto, schoon });
 // de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
 const naamlaag = require('../kern/naamlaag')({ db, save, schoon });
-{
-  const t = setInterval(() => { try { wacht.meet(); } catch (e) {} }, 10000);
-  if (t.unref) t.unref();
-}
+wacht.start(10000);   // de lus stempelt zich (kern/wacht/index.js)
 
 /* De Ontsmetter (kern/antivirus.js): de platform-malware-scanner. Elk bestand
    dat RTG binnenkomt wordt gescand (handtekeningen + heuristiek + entropie);

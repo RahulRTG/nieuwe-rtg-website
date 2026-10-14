@@ -139,6 +139,22 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "accounts-herstel-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "accounts-kanaal-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "accounts-os.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3102,6 +3118,14 @@
       "module": "server/kern/commercie/vergoeding.js",
       "operator": "return-weg#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "commercieel-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/commercieel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "commercieel.test.js": {
@@ -8329,6 +8353,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "kyc-opslag-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/identiteitsmap.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "kycspoor.test.js": {
       "soort": "server",
@@ -15244,12 +15276,36 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "saml-antwoord-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/antwoord.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "saml-handtekening-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/handtekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "saml-signedinfo-prefix.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/sso/saml/handtekening.js",
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "saml-xml-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/xml.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "samlacs.test.js": {
@@ -16685,6 +16741,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "sso-binnenkomst-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/eigenaar.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 15
+    },
     "sso-clientgeheim-b22.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -16713,6 +16777,38 @@
       "operator": "return-weg#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "sso-haal-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/haal.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "sso-jwt-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/jwt.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "sso-koppeling-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "sso-oidc-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "sso-werksync-failclosed.test.js": {
       "soort": "puur",
@@ -16884,6 +16980,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "staff-plek-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "staff-sessie-weerbaar.test.js": {
       "soort": "puur",
@@ -18145,6 +18249,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "tweefactor-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/tweefactor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "tweefactor.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -19309,6 +19421,14 @@
       "gezakt": 2,
       "geprobeerd": 2
     },
+    "webauthn-cbor-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webauthn/cbor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "webauthn-ceremonie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -19322,6 +19442,14 @@
       "module": "server/webauthn/index.js",
       "operator": "!==->===#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "webauthn-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webauthn/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 10,
       "geprobeerd": 1
     },
     "webauthn.test.js": {

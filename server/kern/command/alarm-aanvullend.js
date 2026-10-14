@@ -22,6 +22,14 @@ function voegAanvullendeAlarmcontrolesToe(probeer, invoer) {
     return verouderd.length ? verouderd.map(x => x.capability).join(', ') +
       ' heeft geen verse meting' : null;
   });
+  /* De stille sensor (./sensorstilte.js). In de schaduw tot het alarmkanaal
+     geregeld is (WEERBAARHEID.md par. 9a): dan berekend en getoond, niet
+     gemeld. Een stille sensor is een alarm, nooit vanzelf een zwaardere stand. */
+  probeer('sensor-stil', 'Een beveiligingssensor is stil', 'hoog', () => {
+    const stilte = require('./sensorstilte');
+    const b = stilte.bevinding();   // ook in de schaduw gewogen, zodat het bord hem toont
+    return stilte.alarmActief() ? b : null;
+  });
 }
 
 module.exports = { voegAanvullendeAlarmcontrolesToe };

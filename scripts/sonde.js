@@ -89,6 +89,31 @@ function certMonster(basisUrl) {
   });
 }
 
+/* DE BEWAKING VAN BUITENAF (WEERBAARHEID.md par. 9a stap 2). Een proces kan
+   zijn eigen uitval niet zien: als het alarm stopt, meldt niemand binnen het
+   huis dat. Deze sonde draait op een andere machine en leest achter de
+   meetpoort of de sensoren nog stempelen, het alarm zelf incluis. Alleen met
+   een token (of --bewaking vanaf een intern adres): zonder poort is er niets
+   te lezen, en dan staat dat er in plaats van een groen vinkje. Stil, niet te
+   lezen of geen antwoord is allemaal NIET gelukt -- onbekend is geen groen. */
+async function bewakingMonster(basisUrl) {
+  if (!TOKEN && !args.includes('--bewaking')) return null;
+  const begin = Date.now();
+  const m = { at: new Date().toISOString(), reis: 'bewaking', status: 0, ms: 0, gelukt: false, traag: false, reden: null };
+  try {
+    const r = await fetch(basisUrl + '/api/metrics/kort', { headers: Object.assign({ 'x-rtg-sonde': '1' },
+      TOKEN ? { authorization: 'Bearer ' + TOKEN } : {}) });
+    m.status = r.status;
+    const d = await r.json().catch(() => null);
+    const b = d && d.bewaking;
+    if (!r.ok || !b || !Array.isArray(b.stil)) m.reden = 'de bewaking is niet te lezen (status ' + r.status + ')';
+    else if (b.stil.length) m.reden = 'stil: ' + b.stil.join(', ');
+    else m.gelukt = true;
+  } catch (e) { m.reden = 'geen antwoord: ' + String((e && e.message) || e).slice(0, 120); }
+  m.ms = Date.now() - begin;
+  return m;
+}
+
 (async () => {
   if (!REIZEN.length) {
     console.error('SLO.json draagt geen reizen. Zonder reizen is er niets te lopen.');
@@ -118,6 +143,14 @@ function certMonster(basisUrl) {
     monsters.push(cert);
     console.log((cert.gelukt ? '\u2713' : '\u2717') + ' ' + 'tls-geldigheid'.padEnd(30) + '   -' +
       '      - ms  ' + (cert.reden || ('certificaat nog ' + cert.dagen + ' dagen geldig')));
+  }
+
+  const bewaking = await bewakingMonster(BASIS);
+  if (bewaking) {
+    monsters.push(bewaking);
+    console.log((bewaking.gelukt ? '\u2713' : '\u2717') + ' ' + 'bewaking'.padEnd(30) +
+      String(bewaking.status).padStart(4) + '  ' + String(bewaking.ms).padStart(5) + ' ms' +
+      (bewaking.reden ? '  ' + bewaking.reden : '  alle sensoren stempelen'));
   }
 
   if (JSON_UIT) fs.writeFileSync(JSON_UIT, JSON.stringify({ basis: BASIS, monsters }, null, 2) + '\n');

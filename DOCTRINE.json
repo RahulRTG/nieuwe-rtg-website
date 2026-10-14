@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T17:57:30.410Z",
-    "commit": "43795cf3",
+    "op": "2026-10-14T03:35:42.439Z",
+    "commit": "3c3f77ad",
     "boomVuil": false,
     "instrument": "scripts/doctrine.js",
     "node": "v22.22.0"
@@ -11,23 +11,23 @@
   "grens": "LEXICAAL EN STRUCTUREEL, in twee assen die nooit worden opgeteld. De ijking hieronder zegt wat deze extractor terugvindt van de wetten die dit huis AL kent (de recall); over de PRECISIE is niets gemeten -- van de kandidaten is niet vastgesteld welk deel werkelijk een harde uitspraak is. Het aantal is dus een werkvoorraad voor een mens en geen oordeel, en zeker geen percentage dat naar 100 moet: meerdere zinnen uit meerdere documenten beschrijven vaak een onderliggende wet, en daarvoor staan de groepen.",
   "telling": {
     "documenten": 175,
-    "zinnen": 46345,
-    "kandidatenSterk": 9102,
-    "kandidatenStructuur": 7301,
+    "zinnen": 46386,
+    "kandidatenSterk": 9110,
+    "kandidatenStructuur": 7309,
     "kandidatenWoord": 1801,
-    "kandidatenZwak": 3964,
-    "gedekt": 275,
-    "onbepaald": 8827,
+    "kandidatenZwak": 3970,
+    "gedekt": 279,
+    "onbepaald": 8831,
     "inGrenssectie": 1320,
-    "wettenInRegister": 58,
+    "wettenInRegister": 59,
     "documentenMetKandidaat": 172,
     "groepen": 636,
     "groepenOverMeerdereDocumenten": 393
   },
   "ijking": {
     "uitleg": "De recall van deze extractor, gemeten tegen WETTEN.json als grondwaarheid: elke wet daar wijst een plek aan waar een mens heeft vastgesteld dat er een harde uitspraak staat. Vindt de extractor daar niets, dan is hij blind voor een BEKENDE wet -- en dan zegt zijn getal over de onbekende uitspraken evenmin iets.",
-    "wettenBekend": 58,
-    "gevonden": 56,
+    "wettenBekend": 59,
+    "gevonden": 57,
     "gemist": [
       {
         "id": "merk-geen-emoji",
@@ -44,7 +44,7 @@
   },
   "overgeslagen": {
     "codeblokregels": 4176,
-    "tabelregels": 12497,
+    "tabelregels": 12524,
     "citaatregels": 1367,
     "geenUitspraak": 35,
     "waarom": "code, tabellen en citaten dragen geen eigen uitspraak; ze worden geteld en niet stil weggelaten"
@@ -866,8 +866,8 @@
       "inGrenssectie": 3
     },
     "WEERBAARHEID.md": {
-      "kandidaten": 85,
-      "gedekt": 4,
+      "kandidaten": 93,
+      "gedekt": 8,
       "inGrenssectie": 18
     },
     "WERELD.md": {
@@ -127338,15 +127338,119 @@
     {
       "doc": "WEERBAARHEID.md",
       "paragraaf": null,
-      "kop": "9b. Het alarmkanaal (derde eigenaarsbesluit, 13 oktober 2026)",
+      "kop": "9c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)",
       "regel": 776,
-      "zin": "De integrale tegenproef (stap 5) simuleert vijf storingen.",
+      "zin": "c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)",
+      "as": "structuur",
+      "signaal": "kop",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "onbepaald",
+      "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)",
+      "regel": 784,
+      "zin": "De beslisregel, gelegd op de bestaande standen",
       "as": "structuur",
       "signaal": "vet",
       "grond": "structuur",
       "inGrenssectie": false,
       "stand": "onbepaald",
       "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)",
+      "regel": 793,
+      "zin": "Een ontbrekende hartslag is geen bewijs van een aanval.",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "onbepaald",
+      "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)",
+      "regel": 798,
+      "zin": "De lijst signalen die een stand mogen zetten, legt de eigenaar vast.",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "onbepaald",
+      "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9c. Beschermstanden en alarmstormen (vierde eigenaarsbesluit, 13 oktober 2026)",
+      "regel": 802,
+      "zin": "De beveiliging mag geen aanvalsmiddel worden.",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "onbepaald",
+      "wet": null
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
+      "regel": 821,
+      "zin": "d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
+      "as": "structuur",
+      "signaal": "kop",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "gedekt",
+      "wet": "beveiliging-stille-sensor-is-zichtbaar"
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
+      "regel": 823,
+      "zin": "Een stille sensor staat in de bewaking; hij verdwijnt niet uit de lijst.",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "gedekt",
+      "wet": "beveiliging-stille-sensor-is-zichtbaar"
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
+      "regel": 855,
+      "zin": "Meting vóór en na:",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "gedekt",
+      "wet": "beveiliging-stille-sensor-is-zichtbaar"
+    },
+    {
+      "doc": "WEERBAARHEID.md",
+      "paragraaf": null,
+      "kop": "9d. Stap 2 gebouwd: de stille sensor (14 oktober 2026)",
+      "regel": 877,
+      "zin": "De integrale tegenproef (stap 5) simuleert vijf storingen.",
+      "as": "structuur",
+      "signaal": "vet",
+      "grond": "structuur",
+      "inGrenssectie": false,
+      "stand": "gedekt",
+      "wet": "beveiliging-stille-sensor-is-zichtbaar"
     },
     {
       "doc": "WERELD.md",

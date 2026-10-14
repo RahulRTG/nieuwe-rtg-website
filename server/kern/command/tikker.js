@@ -39,13 +39,23 @@
 
 const { tikkersUit } = require('./tikkerstand');
 
-function maakTikker(weeg, ms) {
+/* EN EEN TIKKER MET EEN NAAM STEMPELT ZIJN RONDE (./sensorstilte.js,
+   WEERBAARHEID.md par. 9 punt 1). De lus breekt nog steeds nooit, maar een
+   fout wordt nu geteld in plaats van geslikt: een wachter die elke ronde
+   omvalt, hoort niet te klinken als een wachter die niets ziet. Zonder naam
+   gedraagt hij zich zoals voorheen. */
+function maakTikker(weeg, ms, naam) {
+  const stilte = naam ? require('./sensorstilte') : null;
   return function tikker() {
     /* Alleen de LUS gaat uit; een weeg() die een route zelf aanroept blijft
        gewoon schrijven. NULL en niet een nep-timer: wie een tikker start hoort
        te kunnen zien dat er geen loopt. */
-    if (tikkersUit()) return null;
-    const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, ms);
+    if (tikkersUit()) { if (stilte) stilte.aangemeld(naam, { uit: true }); return null; }
+    if (stilte) stilte.gestart(naam, ms);
+    const t = setInterval(() => {
+      try { weeg(); if (stilte) stilte.ronde(naam); }
+      catch (e) { if (stilte) stilte.fout(naam, e); /* nooit de lus breken */ }
+    }, ms);
     if (t.unref) t.unref();
     return t;
   };

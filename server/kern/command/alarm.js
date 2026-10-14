@@ -187,7 +187,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     };
   }
 
-  const tikker = maakTikker(weeg, 60000);   // zie ./tikker.js
+  const tikker = maakTikker(weeg, 60000, 'alarm');   // zie ./tikker.js
 
   return { weeg, stand, stilzetten, controles, tikker, buitenStand };
 }

@@ -30,11 +30,19 @@
 module.exports = function schildWacht({ app, log, beveiligVan }) {
   let wacht = null;
 
+  /* Een melding zonder beveiligingsjournaal verdween hier eerst zonder spoor.
+     Nu telt ../kern/command/sensorstilte.js hem als verloren, en het schild
+     zelf wordt naast de meting gelegd: verkeer dat de meting wel telt en het
+     schild niet ziet, is een schild dat niet meer in de keten hangt
+     (WEERBAARHEID.md par. 9 punt 1). */
+  const stilte = require('../kern/command/sensorstilte');
   const schild = require('../kern/schild').maakSchild({
-    meld: (type, ernst, tekst, meta) => { const b = beveiligVan(); if (b) b.meld(type, ernst, tekst, meta); },
+    meld: (type, ernst, tekst, meta) => { const b = beveiligVan(); if (b) { b.meld(type, ernst, tekst, meta); stilte.aangekomen('schild'); } else stilte.verloren('schild'); },
     logboek: log,
     quarantaine: (ip) => !!(wacht && wacht.inQuarantaine(ip))
   });
+  stilte.koppelSchild({ schildVerzoeken: schild.signalen.verzoeken,
+    metingVerzoeken: () => require('../meting').samenvatting().verzoeken });
   app.use(schild.middleware);
 
   app.use((req, res, next) => {

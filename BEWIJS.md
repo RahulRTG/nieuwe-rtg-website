@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2717 bestanden en 18994 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2718 bestanden en 18998 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2717 |
-| losse beweringen (`test(...)`) | 18994 |
+| toetsbestanden | 2718 |
+| losse beweringen (`test(...)`) | 18998 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2529 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2530 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2385 bestanden, 18428 beweringen.
+2386 bestanden, 18432 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2133,6 +2133,7 @@ toets omvalt.
 | `toestel-vector.test.js` | 5 | gezakt op `true->false#0` | Wat vóór en na het vectormodel zeker moet zijn (public/shared/toestel/vector.js, TOESTEL.md par. 12). |
 | `toestelbinding-race.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | TWEE GELIJKTIJDIGE EERSTE BINDINGEN -- en geen toestel zonder sessiebinding. /api/mijn/toestel/bind (server/routes/member/toestellen.js) controleerde eerst of de sessie al gebonden was, wachtte dan op de... |
 | `toestelbinding.test.js` | 12 | gezakt op `===->!==#0` | MIJN RTG blok 3 -- toestelbinding. DE BEWERING DIE ERTOE DOET staat in toets 1: alleen bezit van een sleutel die het toestel niet kan verlaten verdient `bewezen`. |
+| `toestelintrekking.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | EEN INGETROKKEN TOESTEL BLIJFT INGETROKKEN (kern/identiteit/toestelgrens.js, eigenaarsbesluit van 14 oktober 2026 bij WEERBAARHEID.md). Het register houdt per lid hoogstens 25 actieve bindingen bij. |
 | `toestellen-weerbaar.test.js` | 9 | gezakt op `voorwaarde-omkeren#0` | HET TOESTELREGISTER ACHTER HET BEZITSBEWIJS (server/kern/identiteit/toestellen.js). Wat deze module beschermt: het enige dat in deze laag `bewezen` mag heten, is bezit van een sleutel die het toestel niet kan verlaten. |
 | `toestellen.test.js` | 6 | gezakt op `liegpoort /api/` | Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Het zwaartepunt van deze toets is niet dat het werkt, maar dat de sleutel SMAL is. |
 | `toetsduur-opruim.test.js` | 6 | gezakt op `!==->===#0` | WANNEER MAG EEN GEWICHT ZONDER MODUS WEG? `onbekend` is de bak voor metingen van voor de modi: echt gemeten, maar niemand weet meer onder welke omstandigheden. |

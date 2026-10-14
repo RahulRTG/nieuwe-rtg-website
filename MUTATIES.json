@@ -2500,6 +2500,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "bundels-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/stijlbundel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
     "bureau.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3103,6 +3111,14 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "compressie-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/compressie.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "concept-live.e2e.js": {
       "soort": "server",
@@ -5285,6 +5301,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "functiebeleid-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/functiebeleid.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "functielijst.test.js": {
       "soort": "puur",
       "staat": "al rood",
@@ -6581,6 +6605,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "hoofdzekering-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/remmen.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "horeca-bar.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7043,6 +7075,14 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "idempotentie-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/idempotentie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "idempotentie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7434,12 +7474,28 @@
       "operator": "liegpoort /api/",
       "scherp": "overleefd"
     },
+    "isolatie-ceremonie-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "isolatie-cockpit.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "isolatie-huispoort-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "isolatie-lid.test.js": {
       "soort": "server",
@@ -7490,6 +7546,14 @@
       "staat": "gezakt",
       "module": "server/kern/isolatie/sessiedragers.js",
       "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "isolatiepoort-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/isolatiepoort-stand.js",
+      "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
       "geprobeerd": 1
     },
@@ -8528,6 +8592,14 @@
       "operator": "getal+1#5",
       "gezakt": 2,
       "geprobeerd": 15
+    },
+    "leesset-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/leesset.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "leeszonderscheppen.test.js": {
       "soort": "puur",
@@ -13092,6 +13164,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "productiepoorten-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/simulatiebrug-productiepoort.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "productieseed.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15255,6 +15335,14 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "scanpoort-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/malwarescan.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "schaduw.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15544,6 +15632,22 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "scim-groepen-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/groepen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "scim-orggrens-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "scim-post-uitdienst.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15566,6 +15670,14 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 2,
       "geprobeerd": 6
+    },
+    "scim-uitdienst-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/user-sync.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "scim-user-outbox.test.js": {
       "soort": "puur",
@@ -18780,6 +18892,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "voordeur-nonce-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/voordeur.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "voornemen.test.js": {
       "soort": "puur",

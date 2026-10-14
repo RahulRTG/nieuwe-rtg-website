@@ -573,6 +573,12 @@ const EIGEN_MODULE = new Map([
   ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],
   ['journaalbestand-weerbaar.test.js', ['server/kern/journaalbestand.js']],
   ['wacht-weerbaar.test.js', ['server/kern/wacht/index.js', 'server/kern/wacht/raadkamer.js', 'server/kern/wacht/flood.js']],
+  // De SCIM-weerbaarheidstoetsen laden accounts alleen als onderlaag (init op
+  // een wegwerpmap); wat ze toetsen is de organisatiegrens, de uitdienst-outbox
+  // en de groepen. Een zakker op accounts/index.js zou "alleen op de opzet" zijn.
+  ['scim-orggrens-weerbaar.test.js', ['server/scim/index.js', 'server/scim/filter.js', 'server/scim/sleutels.js']],
+  ['scim-uitdienst-weerbaar.test.js', ['server/scim/user-sync.js']],
+  ['scim-groepen-weerbaar.test.js', ['server/scim/groepen.js', 'server/routes/scim-groepen.js']],
   // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.

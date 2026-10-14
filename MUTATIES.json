@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T18:17:55.448Z",
-    "commit": "a2b68031c",
+    "op": "2026-10-14T20:27:26.753Z",
+    "commit": "c6032bb7f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3543,9 +3543,14 @@
       "geprobeerd": 1
     },
     "dekkingsvang.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 3,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "test/lib/dekkingsvang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "delen.test.js": {
       "soort": "puur",

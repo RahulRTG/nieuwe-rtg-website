@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T11:09:17.848Z",
-    "commit": "969c5cf3",
+    "op": "2026-10-14T11:11:25.873Z",
+    "commit": "98a02e54",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1164,9 +1164,12 @@
       "geprobeerd": 1
     },
     "auditwacht-weerbaar.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/auditwacht.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "auditwacht.test.js": {
       "soort": "puur",
@@ -7398,9 +7401,12 @@
       "scherp": "gezakt"
     },
     "journaalbestand-weerbaar.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/journaalbestand.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
     },
     "journaalbestand.test.js": {
       "soort": "puur",
@@ -18869,9 +18875,12 @@
       "geprobeerd": 1
     },
     "wacht-weerbaar.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/wacht/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "wacht.test.js": {
       "soort": "puur",

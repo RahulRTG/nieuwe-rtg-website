@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-14T12:14:43.935Z",
-    "commit": "cd8f030b7",
+    "op": "2026-10-14T12:26:57.873Z",
+    "commit": "56474c5a0",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1345,6 +1345,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "bearercode-hmac.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 3
     },
     "bearercode-takken.test.js": {
       "soort": "puur",

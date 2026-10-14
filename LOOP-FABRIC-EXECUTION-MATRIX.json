@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2666,
+        "kernelModules": 2667,
         "mutationContracts": 61,
         "routes": 64,
         "screens": 20,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2693,
+        "kernelModules": 2694,
         "mutationContracts": 2077,
         "routes": 2099,
         "screens": 98,

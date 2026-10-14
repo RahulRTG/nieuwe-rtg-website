@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "644f3676a",
-  "seconden": 12.2,
+  "commit": "027a91272",
+  "seconden": 8.6,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1824,7 +1824,10 @@
     "server/kern/bankregie/stand.js",
     "server/kern/bankregie/vergunning.js",
     "server/kern/bearercode-keten.js",
+    "server/kern/bearercode-migratie.js",
+    "server/kern/bearercode-sleutelring.js",
     "server/kern/bearercode-v2.js",
+    "server/kern/bearercode-zegel.js",
     "server/kern/bearercode.js",
     "server/kern/bedrijfscontrole.js",
     "server/kern/bedrijfsmaat/beoordeel.js",
@@ -2623,6 +2626,7 @@
     "server/kern/identiteit/sessielijst.js",
     "server/kern/identiteit/sessieregister.js",
     "server/kern/identiteit/sessievelden.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestellen.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/kern/identiteit/tweedestap-rem.js",
@@ -3683,6 +3687,9 @@
     "server/kern/retail/assortiment.js",
     "server/kern/retail/klant.js",
     "server/kern/retail/vloer.js",
+    "server/kern/revenue/catalogus-v1-validatie.js",
+    "server/kern/revenue/catalogus-v1.js",
+    "server/kern/revenue/index.js",
     "server/kern/rijksbieb-data.js",
     "server/kern/rijksbieb.js",
     "server/kern/routedekking.js",
@@ -5889,6 +5896,8 @@
     "server/kern/redactie.js",
     "server/kern/reisbieb.js",
     "server/kern/residentie.js",
+    "server/kern/revenue/catalogus-v1.schema.json.js",
+    "server/kern/revenue/catalogus-v1.schema.json/index.js",
     "server/kern/rtfos.js",
     "server/kern/rugdekking.js",
     "server/kern/salon.js",
@@ -6893,6 +6902,9 @@
      "pad": "server/kern/retail"
     },
     {
+     "pad": "server/kern/revenue"
+    },
+    {
      "pad": "server/kern/rtc"
     },
     {
@@ -7234,18 +7246,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5755,
-  "gelezen": 5440,
+  "bestandenGezien": 5762,
+  "gelezen": 5447,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27515,
-  "bestandenMetUitvoer": 4539,
-  "uitvoerMetNamen": 2065,
+  "symbolen": 27542,
+  "bestandenMetUitvoer": 4546,
+  "uitvoerMetNamen": 2072,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7763
+  "requireKanten": 7773
  },
  "nietGelezen": [
   {
@@ -23577,6 +23589,7 @@
     "server/functies/voorstel/index.js",
     "server/kern/command/lagen.js",
     "server/kern/command/vermogens.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/kern/workspace-platform.js"
    ]
   },
@@ -33876,78 +33889,156 @@
    ]
   },
   {
-   "bestand": "server/kern/bearercode-v2.js",
+   "bestand": "server/kern/bearercode-migratie.js",
    "symbolen": [
     {
-     "naam": "stabiel",
-     "soort": "functie",
-     "lijn": 31,
+     "naam": "v2spoor",
+     "soort": "pijl",
+     "lijn": 27,
      "geexporteerd": false
     },
     {
+     "naam": "records",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": true
+    },
+    {
+     "naam": "herzegel",
+     "soort": "functie",
+     "lijn": 36,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "herzegel",
+     "records"
+    ]
+   },
+   "requires": [
+    "server/kern/bearercode-zegel.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "server/kern/bearercode-sleutelring.js",
+   "symbolen": [
+    {
+     "naam": "uitGeheim",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": true
+    },
+    {
+     "naam": "afleid",
+     "soort": "pijl",
+     "lijn": 47,
+     "geexporteerd": false
+    },
+    {
+     "naam": "leesRing",
+     "soort": "functie",
+     "lijn": 53,
+     "geexporteerd": true
+    },
+    {
+     "naam": "ring",
+     "soort": "functie",
+     "lijn": 78,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "ENV",
+     "KID",
+     "leesRing",
+     "ring",
+     "uitGeheim"
+    ]
+   },
+   "requires": [
+    "server/lib/sleutelbestand.js"
+   ],
+   "extern": [
+    "node:crypto",
+    "node:path"
+   ],
+   "gebruiktDoor": [
+    "server/kern/bearercode-zegel.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/bearercode-v2.js",
+   "symbolen": [
+    {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 37,
+     "lijn": 30,
      "geexporteerd": false
     },
     {
      "naam": "contracthash",
      "soort": "pijl",
-     "lijn": 40,
+     "lijn": 35,
      "geexporteerd": false
     },
     {
      "naam": "meld",
      "soort": "pijl",
-     "lijn": 45,
+     "lijn": 36,
      "geexporteerd": false
     },
     {
      "naam": "einde",
      "soort": "functie",
-     "lijn": 47,
+     "lijn": 38,
      "geexporteerd": false
     },
     {
      "naam": "gebruiksvorm",
      "soort": "functie",
-     "lijn": 62,
+     "lijn": 53,
      "geexporteerd": false
     },
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 69,
+     "lijn": 60,
      "geexporteerd": false
     },
     {
      "naam": "voorReden",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 85,
      "geexporteerd": false
     },
     {
      "naam": "naReden",
      "soort": "functie",
-     "lijn": 101,
+     "lijn": 93,
      "geexporteerd": false
     },
     {
      "naam": "trekIn",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 100,
      "geexporteerd": false
     },
     {
      "naam": "roteer",
      "soort": "functie",
-     "lijn": 122,
+     "lijn": 114,
      "geexporteerd": false
     },
     {
      "naam": "leidAf",
      "soort": "functie",
-     "lijn": 139,
+     "lijn": 131,
      "geexporteerd": false
     }
    ],
@@ -33959,11 +34050,94 @@
     ]
    },
    "requires": [
-    "server/kern/bearercode-keten.js"
+    "server/kern/bearercode-keten.js",
+    "server/kern/bearercode-zegel.js"
    ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/bearercode.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/bearercode-zegel.js",
+   "symbolen": [
+    {
+     "naam": "stabiel",
+     "soort": "functie",
+     "lijn": 33,
+     "geexporteerd": true
+    },
+    {
+     "naam": "deel",
+     "soort": "pijl",
+     "lijn": 38,
+     "geexporteerd": false
+    },
+    {
+     "naam": "kaleHash",
+     "soort": "pijl",
+     "lijn": 42,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "pijl",
+     "lijn": 45,
+     "geexporteerd": false
+    },
+    {
+     "naam": "maakContractzegel",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": true
+    },
+    {
+     "naam": "nsSleutel",
+     "soort": "pijl",
+     "lijn": 52,
+     "geexporteerd": false
+    },
+    {
+     "naam": "ring",
+     "soort": "pijl",
+     "lijn": 58,
+     "geexporteerd": false
+    },
+    {
+     "naam": "mac",
+     "soort": "pijl",
+     "lijn": 59,
+     "geexporteerd": false
+    },
+    {
+     "naam": "zegel",
+     "soort": "functie",
+     "lijn": 63,
+     "geexporteerd": false
+    },
+    {
+     "naam": "toets",
+     "soort": "functie",
+     "lijn": 72,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "VELDEN",
+     "kaleHash",
+     "maakContractzegel",
+     "stabiel"
+    ]
+   },
+   "requires": [
+    "server/kern/bearercode-sleutelring.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/bearercode-migratie.js",
+    "server/kern/bearercode-v2.js"
    ]
   },
   {
@@ -51889,6 +52063,7 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/geldregie.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/routes/member/aitegoed.js"
    ]
   },
@@ -53314,7 +53489,8 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/commercie/tegoed.js",
-    "server/kern/commercie/tegoed/plafond.js"
+    "server/kern/commercie/tegoed/plafond.js",
+    "server/kern/revenue/catalogus-v1.js"
    ]
   },
   {
@@ -76767,96 +76943,133 @@
    ]
   },
   {
+   "bestand": "server/kern/identiteit/toestelgrens.js",
+   "symbolen": [
+    {
+     "naam": "vanLid",
+     "soort": "pijl",
+     "lijn": 19,
+     "geexporteerd": false
+    },
+    {
+     "naam": "ruimActief",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": true
+    },
+    {
+     "naam": "intrekkingenVol",
+     "soort": "pijl",
+     "lijn": 31,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "MAX_ACTIEF",
+     "MAX_INGETROKKEN",
+     "intrekkingenVol",
+     "ruimActief"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/identiteit/toestellen.js"
+   ]
+  },
+  {
    "bestand": "server/kern/identiteit/toestellen.js",
    "symbolen": [
     {
      "naam": "maakToestellen",
      "soort": "functie",
-     "lijn": 50,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "bak",
      "soort": "pijl",
-     "lijn": 53,
+     "lijn": 54,
      "geexporteerd": false
     },
     {
      "naam": "uitdagingen",
      "soort": "pijl",
-     "lijn": 54,
+     "lijn": 55,
      "geexporteerd": false
     },
     {
      "naam": "sleutelVan",
      "soort": "pijl",
-     "lijn": 56,
+     "lijn": 57,
      "geexporteerd": false
     },
     {
      "naam": "geldigeId",
      "soort": "pijl",
-     "lijn": 57,
+     "lijn": 58,
      "geexporteerd": false
     },
     {
      "naam": "schoneNaam",
      "soort": "pijl",
-     "lijn": 64,
+     "lijn": 63,
      "geexporteerd": false
     },
     {
      "naam": "uitdaging",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 69,
      "geexporteerd": false
     },
     {
      "naam": "pakUitdaging",
      "soort": "functie",
-     "lijn": 80,
+     "lijn": 79,
      "geexporteerd": false
     },
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 97,
+     "lijn": 96,
      "geexporteerd": false
     },
     {
      "naam": "noem",
      "soort": "functie",
-     "lijn": 142,
+     "lijn": 143,
      "geexporteerd": false
     },
     {
      "naam": "trekIn",
      "soort": "functie",
-     "lijn": 157,
+     "lijn": 158,
      "geexporteerd": false
     },
     {
      "naam": "naamVan",
      "soort": "functie",
-     "lijn": 168,
+     "lijn": 169,
      "geexporteerd": false
     },
     {
      "naam": "publiekeSleutelVan",
      "soort": "functie",
-     "lijn": 179,
+     "lijn": 180,
      "geexporteerd": false
     },
     {
      "naam": "lijst",
      "soort": "functie",
-     "lijn": 185,
+     "lijn": 186,
      "geexporteerd": false
     },
     {
      "naam": "ruim",
-     "soort": "functie",
-     "lijn": 192,
+     "soort": "pijl",
+     "lijn": 193,
      "geexporteerd": false
     }
    ],
@@ -76868,6 +77081,7 @@
    },
    "requires": [
     "server/kern/eigencollectie.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/lib/klok.js"
    ],
@@ -130167,6 +130381,121 @@
    ]
   },
   {
+   "bestand": "server/kern/revenue/catalogus-v1-validatie.js",
+   "symbolen": [
+    {
+     "naam": "maakRevenueCatalogusValidator",
+     "soort": "functie",
+     "lijn": 6,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "pijl",
+     "lijn": 14,
+     "geexporteerd": false
+    },
+    {
+     "naam": "isObject",
+     "soort": "pijl",
+     "lijn": 15,
+     "geexporteerd": false
+    },
+    {
+     "naam": "veldenExact",
+     "soort": "pijl",
+     "lijn": 16,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "maakRevenueCatalogusValidator"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/revenue/catalogus-v1.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1.js",
+   "symbolen": [
+    {
+     "naam": "canoniek",
+     "soort": "functie",
+     "lijn": 35,
+     "geexporteerd": true
+    },
+    {
+     "naam": "diepVast",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": false
+    },
+    {
+     "naam": "prijsProjectie",
+     "soort": "functie",
+     "lijn": 50,
+     "geexporteerd": false
+    },
+    {
+     "naam": "projecteerAiExtraS",
+     "soort": "functie",
+     "lijn": 64,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CAPABILITY_ID",
+     "CATALOG_ID",
+     "CATALOG_VERSION",
+     "CONTRACT_DIGEST",
+     "FEATURE_ID",
+     "FORMULA_ID",
+     "OFFER_ID",
+     "PRODUCT_ID",
+     "SOURCE_REFS",
+     "canoniek",
+     "projecteerAiExtraS",
+     "schema",
+     "valideer"
+    ]
+   },
+   "requires": [
+    "server/functies/register/index.js",
+    "server/kern/commercie/bundelprijs.js",
+    "server/kern/commercie/tegoed/inhoud.js",
+    "server/kern/revenue/catalogus-v1-validatie.js"
+   ],
+   "extern": [
+    "./catalogus-v1.schema.json",
+    "crypto"
+   ],
+   "gebruiktDoor": [
+    "server/kern/revenue/index.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/index.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "catalogusV1"
+    ]
+   },
+   "requires": [
+    "server/kern/revenue/catalogus-v1.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
    "bestand": "server/kern/rijksbieb-data.js",
    "symbolen": [],
    "uitvoer": {
@@ -177050,6 +177379,7 @@
     "server/accounts/index.js",
     "server/db/geheugen-kluis.js",
     "server/foundation/basis.js",
+    "server/kern/bearercode-sleutelring.js",
     "server/kern/dyncode.js",
     "server/kern/modebezorg/bezorgcode.js",
     "server/kern/rechterhand/index.js",
@@ -207429,25 +207759,25 @@
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 88,
      "geexporteerd": true
     },
     {
      "naam": "zetActief",
      "soort": "functie",
-     "lijn": 126,
+     "lijn": 135,
      "geexporteerd": true
     },
     {
      "naam": "lees",
      "soort": "functie",
-     "lijn": 133,
+     "lijn": 142,
      "geexporteerd": true
     },
     {
      "naam": "uitPatch",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 157,
      "geexporteerd": true
     }
    ],
@@ -207612,7 +207942,7 @@
     {
      "naam": "ronde",
      "soort": "functie",
-     "lijn": 153,
+     "lijn": 155,
      "geexporteerd": false
     }
    ],

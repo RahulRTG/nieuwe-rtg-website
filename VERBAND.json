@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-14T14:16:56.876Z",
-    "commit": "dd491328a",
-    "boomVuil": false,
+    "op": "2026-10-14T22:41:32.279Z",
+    "commit": "027a91272",
+    "boomVuil": true,
     "instrument": "scripts/verband.js",
     "node": "v26.11.1"
   },

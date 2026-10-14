@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "baf996f7d",
-  "seconden": 13,
+  "commit": "e86f1d927",
+  "seconden": 13.4,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -147689,43 +147689,43 @@
     {
      "naam": "gemaptIpv4",
      "soort": "functie",
-     "lijn": 75,
+     "lijn": 73,
      "geexporteerd": false
     },
     {
      "naam": "onveiligIpLiteral",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 85,
      "geexporteerd": true
     },
     {
      "naam": "isIpLiteral",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 104,
      "geexporteerd": false
     },
     {
      "naam": "pushEndpointOk",
      "soort": "functie",
-     "lijn": 124,
+     "lijn": 120,
      "geexporteerd": true
     },
     {
      "naam": "veiligeExternalUrl",
      "soort": "functie",
-     "lijn": 135,
+     "lijn": 131,
      "geexporteerd": true
     },
     {
      "naam": "metadataDoel",
      "soort": "functie",
-     "lijn": 155,
+     "lijn": 150,
      "geexporteerd": true
     },
     {
      "naam": "veiligeWebhookUrl",
      "soort": "functie",
-     "lijn": 171,
+     "lijn": 166,
      "geexporteerd": true
     }
    ],

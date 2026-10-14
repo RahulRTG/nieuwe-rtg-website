@@ -562,6 +562,14 @@
       "operator": "true->false",
       "gezakt": 1
     },
+    "alarm-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/alarm.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "alarm.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -733,6 +741,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "apipoort-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/apipoort.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "apipoort.test.js": {
       "soort": "puur",
@@ -2549,6 +2565,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "canary-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/canary.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "canary.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2924,6 +2948,14 @@
       "gezakt": 5,
       "geprobeerd": 3
     },
+    "commandbeleid-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/beleid.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "commandjournaal-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2946,6 +2978,38 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "commandoperator-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/operator.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "commandtoegang-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/toegang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "commandtransactie-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/transactie-poorten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "commandzaken-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/zaken.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "commerce-kern.test.js": {
       "soort": "puur",
@@ -7269,6 +7333,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "intreksignaal-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/intreksignaal.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "intreksignaal-weerbaar.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7329,6 +7401,14 @@
       "module": "server/inzagelog.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "inzagejournaal-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/inzagelog.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
       "geprobeerd": 1
     },
     "inzagekaart.test.js": {
@@ -13746,6 +13826,14 @@
       "gezakt": 2,
       "scherp": "overleefd"
     },
+    "rem-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/rem.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "rem.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15567,6 +15655,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "sensorstilte-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/sensorstilte.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "sensorstilte.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -16545,6 +16641,14 @@
       "operator": "true->false#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "staatlog-weerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/staatlog.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "staatlog.test.js": {
       "soort": "puur",

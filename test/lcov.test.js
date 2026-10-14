@@ -154,7 +154,7 @@ function draaiVloer(namen) {
   /* Elk lcov-bestand krijgt zijn takkenbestand erbij: zonder dat telt de vloer
      de takken niet (scripts/lib/v8takken.js) en zakt hij om een andere reden
      dan de scherven waar deze toetsen over gaan. */
-  const takken = JSON.stringify({ versie: 1, bestanden: {}, onleesbaar: 0 });
+  const takken = JSON.stringify({ versie: 2, bestanden: {}, onleesbaar: 0 });
   for (const n of namen) {
     fs.writeFileSync(path.join(map, n), DEKKING + '\n');
     fs.writeFileSync(path.join(map, n.replace(/\.info$/, '.takken.json')), takken + '\n');

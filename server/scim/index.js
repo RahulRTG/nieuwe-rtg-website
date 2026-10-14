@@ -79,8 +79,13 @@ function zoekOpEmail(accounts, org, email) {
    Bestaat het adres al binnen deze organisatie, dan is dat GEEN fout maar de
    normale gang van zaken bij een eerste synchronisatie: we geven het bestaande
    account terug met de vlag `bestond`. De routelaag maakt daar een 409 van als
-   SCIM dat eist, maar de aanroeper heeft de gegevens dan al. */
-async function maak(accounts, org, gegevens) {
+   SCIM dat eist, maar de aanroeper heeft de gegevens dan al.
+
+   Een bestaand account met active:false is een uitdienst en gaat door DEZELFDE
+   gebruikersync (./user-sync.js) als PATCH/PUT/DELETE: herstelopdracht, blokkade
+   van het lid-token en de Werk OS-cascade. Zonder die sync weigeren we liever
+   dan dat we alleen het RTG-account dichtzetten. */
+async function maak(accounts, org, gegevens, gebruikersync) {
   const k = koppelingen.vind(org);
   if (!k) throw Object.assign(new Error('Onbekende organisatie.'), { status: 404 });
 
@@ -97,7 +102,11 @@ async function maak(accounts, org, gegevens) {
     // binnen de eigen domeinen mag de organisatie dit account beheren
     if (!binnenOrg(accounts, org, bestaand))
       throw Object.assign(new Error('Dit account bestaat al en hoort niet bij deze organisatie.'), { status: 409, scimType: 'uniqueness' });
-    if (gegevens.active === false) accounts.zetActief(bestaand.id, false);
+    if (gegevens.active === false) {
+      if (!gebruikersync || typeof gebruikersync.zetActief !== 'function')
+        throw Object.assign(new Error('SCIM-uitdienst kan niet zonder gebruikersync.'), { status: 500 });
+      gebruikersync.zetActief(org, bestaand.id, false);
+    }
     return { user: accounts.getUserById(bestaand.id), bestond: true };
   }
 

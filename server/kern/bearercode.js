@@ -12,9 +12,9 @@
 
    VERSIE 2 staat in ./bearercode-v2.js en gaat aan zodra een aanroeper
    `geldigheid` meegeeft. Zonder dat veld is dit exact v1 (vastgelegd in
-   test/bearercode.test.js). Twee fabriekopties zijn nieuw: `normaal` (een
-   domein dat zijn codes anders normaliseert, zodat de hash in maak() meteen
-   klopt en niet achteraf wordt overschreven) en `sluit`/`spoor` voor v2. */
+   test/bearercode.test.js). Opties: `normaal` (een domein dat zijn codes
+   anders normaliseert), `sluit`/`spoor` voor v2, en `sleutelring` voor het
+   HMAC-zegel (./bearercode-zegel.js; weggelaten = de ring van het proces). */
 'use strict';
 
 const klok = require('../lib/klok');
@@ -41,7 +41,7 @@ function vindOpHash(crypto, rijen, gezocht, veld = 'code_hash') {
   return gevonden;
 }
 
-module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), normaal: eigenNormaal, sluit, spoor }) => {
+module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), normaal: eigenNormaal, sluit, spoor, sleutelring }) => {
   if (!crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.createHash !== 'function' ||
       typeof crypto.timingSafeEqual !== 'function') throw new Error('bearercode vereist node:crypto');
   const ns = String(namespace || '').trim();
@@ -66,7 +66,7 @@ module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), no
     const geheim = crypto.randomBytes(16).toString('hex').toUpperCase(); // 128 bits
     return p ? p + '.' + geheim : geheim;
   };
-  const v2 = maakV2({ crypto, ns, nu, hash, codeNieuw: p => codeNieuw(p), plafondMs: MAX_GELDIG_MS, sluit, spoor });
+  const v2 = maakV2({ crypto, ns, nu, hash, codeNieuw: p => codeNieuw(p), plafondMs: MAX_GELDIG_MS, sluit, spoor, sleutelring });
   const maak = (opdracht) => {
     if (opdracht && opdracht.geldigheid !== undefined) return v2.maak(opdracht);
     return maakV1(opdracht || {});
@@ -105,7 +105,7 @@ module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), no
     /* Een record met een spoor van v2 gaat altijd door v2. Op contractversie
        alleen kiezen liet wie hem weghaalde terugvallen op de v1-toetsen, en zo
        de contracthash ontlopen met een opgerekte termijn. */
-    const v2spoor = toegang.contractversie !== undefined || toegang.contracthash !== undefined || toegang.gebruiksvorm !== undefined;
+    const v2spoor = ['contractversie', 'contracthash', 'contractkid', 'gebruiksvorm'].some(k => toegang[k] !== undefined);
     if (!v2spoor) return redenV1(toegang, verwacht);
     return v2.voorReden(toegang, verwacht) || v2.naReden(toegang, verwacht, redenV1(toegang, verwacht));
   };

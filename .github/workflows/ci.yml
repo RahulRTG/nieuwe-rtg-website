@@ -997,6 +997,14 @@ jobs:
         # som over drie van de vier is geen lagere dekking maar een andere
         # meting, en die hoort niet te bepalen of een tak doorkomt.
         run: node scripts/dekkingsvloer.js --scherven 4
+      - name: Het dekkingsgat naast de vloer (rapport, geen poort)
+        # Welke productiebestanden NIET in de meting staan en hoe groot ze
+        # ongeveer zijn (scripts/dekkingsgat.js). Besluit eigenaar: eerst
+        # meten, dan beslissen -- de vloer zelf blijft ongewijzigd, en dit
+        # rapport kan een ronde nooit rood maken.
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: node scripts/dekkingsgat.js dekking-scherven
 
       # Elke toetsscherf en ijking schrijft zijn eigen routejournaal. Voeg ze
       # samen voordat de aparte dekkingsjob ze naast het schermjournaal legt.

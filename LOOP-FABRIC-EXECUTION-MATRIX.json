@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2667,
+        "kernelModules": 2670,
         "mutationContracts": 61,
         "routes": 64,
         "screens": 20,
@@ -140,7 +140,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 133,
+        "kernelModules": 135,
         "mutationContracts": 290,
         "routes": 290,
         "screens": 8,
@@ -639,7 +639,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 38,
-        "kernelModules": 142,
+        "kernelModules": 144,
         "mutationContracts": 1142,
         "routes": 1172,
         "screens": 89,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2694,
+        "kernelModules": 2697,
         "mutationContracts": 2077,
         "routes": 2099,
         "screens": 98,

@@ -15,11 +15,15 @@
       wint van NODE_ENV.
    3. De travel- en geldpoort sluiten alleen POST, en elk antwoord is no-store
       met de vaste code.
+   4. Een Foundation-route die volwassenen en minderjarigen deelt, blijft in
+      productie dicht -- ook met een groen vrijgavedossier, zonder req.path en
+      met een afsluitende slash.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
    - legacy-codeportaal: `pad = pad.toLowerCase();` weg -> toets 1 zakt.
    - travel-bearer: de POST-controle omgekeerd (`=== 'POST'`) -> toets 3 zakt.
    - money-credential: `if (!productie(env)) return next();` -> `if (false)` -> toets 2 zakt.
+   - foundation: de regel `if (isGemengdeRoute(...)) return stuurDicht(res);` weg -> toets 4 zakt.
 
    Draai los: node --test test/productiepoorten-weerbaar.test.js */
 'use strict';
@@ -29,6 +33,7 @@ const simulatie = require('../server/middleware/simulatiebrug-productiepoort');
 const legacy = require('../server/middleware/legacy-codeportaal-productiepoort');
 const travel = require('../server/middleware/travel-bearer-productiepoort');
 const geld = require('../server/middleware/money-credential-productiepoort');
+const foundation = require('../server/middleware/foundation-productiepoort');
 
 function roep(mw, req) {
   const res = { code: 200, body: null, kop: {}, door: false,
@@ -97,4 +102,30 @@ test('3. travel en geld sluiten alleen POST, met de vaste code', () => {
     assert.equal(roep(g, { path: '/api/proef/kascode%zz' }).door, true);
     assert.equal(geld.featureVoor({ method: 'post' }), null);
   } finally { travel.PER_ROUTE.delete('/api/proef/pas'); geld.EXACT.delete('/api/proef/kascode'); }
+});
+
+test('4. een gedeelde Foundation-route blijft in productie dicht', () => {
+  const f = foundation({ productie: true, env: {} });
+  for (const req of [{ path: '/api/foundation/registratie/aanvragen' }, { url: '/api/rtfos/activiteit/inschrijven/?x=1' }]) {
+    const r = roep(f, req);
+    assert.ok(dicht(r), JSON.stringify(req));
+    assert.deepEqual(r.body, foundation.ANTWOORD);
+  }
+  assert.equal(foundation.isBeschermdeRoute('POST', '/api/rtfos/activiteit/inschrijven'), true, 'gemengd is ook beschermd');
+  assert.equal(foundation.isGemengdeRoute(undefined, '/api/rtfos/activiteit/inschrijven'), false, 'zonder methode geen POST');
+  assert.equal(foundation.normaliseerPad(''), '/');
+  assert.equal(roep(foundation({ productie: false }), { path: '/api/foundation/registratie/aanvragen' }).door, true);
+
+  /* Ook een GROEN vrijgavedossier maakt van clientinvoer geen geverifieerde
+     leeftijd: de gedeelde routes blijven dicht, de rest gaat open. */
+  const vrijgave = require('../server/config/foundation-vrijgave');
+  const echt = vrijgave.beoordeel;
+  vrijgave.beoordeel = () => ({ vrijgegeven: true, reden: 'proef' });
+  try {
+    const groen = foundation({ productie: true, env: {} });
+    assert.ok(dicht(roep(groen, { path: '/api/foundation/registratie/aanvragen/' })));
+    assert.equal(roep(groen, { path: '/api/foundation/agenda/week' }).door, true, 'vrijgegeven: beschermd gaat open');
+    assert.ok(dicht(roep(groen, { path: '/api/foundation/school/les' })), 'een onvolwassen credentialroute blijft dicht');
+  } finally { vrijgave.beoordeel = echt; }
+  assert.ok(dicht(roep(foundation({ productie: true, env: {} }), { path: '/api/foundation/agenda/week' })), 'niet vrijgegeven: dicht');
 });

@@ -15076,6 +15076,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "saml-signedinfo-prefix.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/handtekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "samlacs.test.js": {
       "soort": "server",
       "staat": "gezakt",

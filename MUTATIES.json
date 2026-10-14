@@ -8110,8 +8110,8 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/lcov.js",
-      "operator": "===->!==#0",
-      "gezakt": 7,
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "leden-gids-pg.test.js": {
@@ -17744,6 +17744,14 @@
       "staat": "gezakt",
       "module": "server/db/collectie-bewerken.js",
       "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "v8takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/v8takken.js",
+      "operator": "voorwaarde-omkeren#0",
       "gezakt": 2,
       "geprobeerd": 1
     },

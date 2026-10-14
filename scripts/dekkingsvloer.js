@@ -20,6 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ontleed, voegSamen: voegTekstenSamen, tel: telKaart, lees } = require('./lib/lcov');
+const v8takken = require('./lib/v8takken');
 
 const WORTEL = path.join(__dirname, '..');
 const ARG = process.argv.slice(2);
@@ -117,6 +118,27 @@ function main() {
 
   const totaal = telKaart(voegTekstenSamen(lees(paden)));
   const eis = eisen();
+
+  /* DE TAKKEN KOMEN UIT DE TAKKENBESTANDEN, NIET UIT DE LCOV. De BRDA-sleutel
+     van de lcov is een volgnummer per proces; over batches opgeteld telde hij
+     dezelfde takken dubbel (scripts/lib/v8takken.js, test/v8takken.test.js).
+     Elke batch legt naast zijn lcov een .takken.json met de blokken op hun plek
+     in de bron. Ontbreekt er een, dan is er geen takkenmeting en dus geen
+     oordeel: fail-closed, net als bij een ontbrekende scherf. */
+  const zonder = paden.filter((p) => !fs.existsSync(p.replace(/\.(?:info|lcov)$/, '.takken.json')));
+  if (zonder.length) {
+    console.error('\n\x1b[31m  Bij ' + zonder.length + ' lcov-bestand(en) ontbreekt het takkenbestand: ' +
+      zonder.map((p) => path.basename(p)).join(', ') + '.\x1b[0m\n' +
+      '  Zonder dat bestand zijn de takken niet te tellen, en een som zonder die batch is een andere meting.\n');
+    process.exit(1);
+  }
+  const takken = v8takken.tel(v8takken.voegSamen(paden.map((p) =>
+    JSON.parse(fs.readFileSync(p.replace(/\.(?:info|lcov)$/, '.takken.json'), 'utf8')))));
+  totaal.takken = { gedekt: takken.gedekt, totaal: takken.totaal, pct: takken.pct };
+  if (takken.onleesbaar) {
+    console.log('  \x1b[33m' + takken.onleesbaar + ' ruw(e) dekkingsbestand(en) waren niet te lezen; ' +
+      'wat daarin stond ontbreekt in de takken.\x1b[0m');
+  }
 
   console.log('  ' + totaal.bestanden + ' bestand(en) in de opgetelde meting\n');
   const rij = [

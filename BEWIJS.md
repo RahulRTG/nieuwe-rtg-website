@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2718 bestanden en 19004 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2719 bestanden en 19008 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2718 |
-| losse beweringen (`test(...)`) | 19004 |
+| toetsbestanden | 2719 |
+| losse beweringen (`test(...)`) | 19008 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2530 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 8 |
+| niets van beide | 9 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2386 bestanden, 18438 beweringen.
+2387 bestanden, 18442 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1208,6 +1208,7 @@ toets omvalt.
 | `mall-extern.test.js` | 13 | gezakt op `liegpoort /api/` | De twee gaten die met naam openstonden na de Supplier OS-koppeling: 1. DE KLOK. |
 | `mall-kaart.test.js` | 13 | gezakt op `liegpoort /api/` | De kaartlaag, het landfilter en de gedeelde waardering van de RTG Mall. Drie dingen die makkelijk mooi lijken en stiekem liegen, en waar deze toetsen daarom op mikken: 1. |
 | `mall-lijsten.test.js` | 12 | gezakt op `liegpoort /api/` | Bewaren, een reis bouwen, en de vraagkant van de Mall. Twee dingen die als aparte functies waren bedacht en er een zijn (een verlanglijst en "voeg toe aan mijn reis"), plus de aanvraagmarkt: wat niemand aanbiedt, kun... |
+| `mall-living.test.js` | 4 | -- | De Living Mall is één leesprojectie over echte RTG-bronnen. Deze toetsen bewijzen dat zij geen tweede productcatalogus of uitvoeringspad wordt. |
 | `mall-supplieros.test.js` | 9 | gezakt op `liegpoort /api/` | De Supplier OS-koppeling: wat de ondernemer in zijn eigen systeem verandert, verandert in de Mall mee. Geen tweede administratie, en geen stand die de Mall zelf verzint. |
 | `mall-vestigingen.test.js` | 11 | gezakt op `liegpoort /api/` | Filialen en de zakelijke ingang van de RTG Mall. Waar deze toetsen op mikken: 1. |
 | `mall-vindlaag.test.js` | 17 | gezakt op `liegpoort /api/` | De vindlaag van de RTG Mall: het universele aanbod-object, het locatiemodel met servicegebied, en de zoek-/ontdeklaag daarboven. De Mall is hiermee niet langer een winkel met spullen maar de commerciele voorkant van... |

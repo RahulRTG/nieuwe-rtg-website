@@ -42,6 +42,7 @@
 
   d.addEventListener('DOMContentLoaded', function () {
     if (!d.body.classList.contains('rtg-shop-flow')) return;
-    if (d.body.classList.contains('rtg-shop-my')) mijnMall(); else nav('ontdekken');
+    if (d.body.classList.contains('rtg-shop-my')) mijnMall();
+    else if (!d.body.classList.contains('rtg-mall-living')) nav('ontdekken');
   });
 })(window, document);

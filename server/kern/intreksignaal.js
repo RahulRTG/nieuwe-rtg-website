@@ -78,15 +78,13 @@ function meld(soort, waarde, verloopt) {
   return true;
 }
 
-/* Het vervalmoment staat bij een sessietoken op plek 1 en bij een actietoken
-   (`id.doel.exp.nonce`) op plek 2. Op het aantal delen gokken las bij een oud
-   sessietoken (`id.exp.uitgegeven`) de UITGIFTE -- een tijd in het verleden,
-   zodat de intrekking meteen verliep. ../accounts/tokenvorm.js kent de vorm. */
+/* Verval: sessietoken plek 1, actietoken (`id.doel.exp.nonce`) plek 2. Gokken
+   op het aantal delen las bij `id.exp.uitgegeven` de uitgifte: fail-open. */
 function tokenVervalt(token) {
   try {
-    const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
-    const sessie = require('../accounts/tokenvorm').sessieDelen(body);
-    return Number(sessie ? sessie[1] : body.split('.')[2]) || 0;
+    const d = Buffer.from(String(token).split('.')[0], 'base64url').toString().split('.');
+    const sessie = /^\d+$/.test(d[0]) && /^\d+$/.test(d[1] || '');
+    return Number(sessie ? d[1] : d[2]) || 0;
   } catch (e) { return 0; }
 }
 function meldToken(token, verloopt) {

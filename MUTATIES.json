@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-13T01:56:44.079Z",
-    "commit": "327ba7b02",
+    "op": "2026-10-14T03:24:25.168Z",
+    "commit": "24ccbc71e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16264,8 +16264,8 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/ssrf.js",
-      "operator": "true->false#0",
-      "gezakt": 3,
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 11,
       "geprobeerd": 1
     },
     "staatlog.test.js": {

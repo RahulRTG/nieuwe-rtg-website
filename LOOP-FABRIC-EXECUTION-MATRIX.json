@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2666,
+        "kernelModules": 2667,
         "mutationContracts": 61,
         "routes": 64,
         "screens": 20,
@@ -140,7 +140,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 132,
+        "kernelModules": 133,
         "mutationContracts": 290,
         "routes": 290,
         "screens": 8,
@@ -202,7 +202,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 13,
-        "kernelModules": 163,
+        "kernelModules": 164,
         "mutationContracts": 1077,
         "routes": 1098,
         "screens": 30,
@@ -317,7 +317,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 8,
-        "kernelModules": 26,
+        "kernelModules": 27,
         "mutationContracts": 93,
         "routes": 95,
         "screens": 8,
@@ -389,7 +389,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 41,
+        "kernelModules": 42,
         "mutationContracts": 136,
         "routes": 140,
         "screens": 21,
@@ -475,7 +475,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 32,
-        "kernelModules": 60,
+        "kernelModules": 61,
         "mutationContracts": 530,
         "routes": 534,
         "screens": 45,
@@ -539,7 +539,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 11,
-        "kernelModules": 52,
+        "kernelModules": 53,
         "mutationContracts": 159,
         "routes": 159,
         "screens": 12,
@@ -639,7 +639,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 38,
-        "kernelModules": 141,
+        "kernelModules": 142,
         "mutationContracts": 1142,
         "routes": 1172,
         "screens": 89,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2693,
+        "kernelModules": 2694,
         "mutationContracts": 2077,
         "routes": 2099,
         "screens": 98,

@@ -37,15 +37,17 @@
 const VERWACHT = {
   alarm: { wat: 'het alarm weegt zijn controles', periodeMs: 60000 },
   canary: { wat: 'de uitrol-canary weegt lopende uitrollen', periodeMs: 30000 },
-  auditwacht: { wat: 'de auditwacht controleert de journalen', periodeMs: 5 * 60000 }
+  auditwacht: { wat: 'de auditwacht controleert de journalen', periodeMs: 5 * 60000 },
+  wacht: { wat: 'De Wacht meet het verkeer voor bord en lastafworp', periodeMs: 10000 }
 };
 const VENSTERS = 3;
 
-/* Verkeer zonder schild: zoveel verzoeken in de meting terwijl het schild er
-   geen enkele zag. Onder de drempel is het te weinig om iets te zeggen. */
-const SCHILD_DREMPEL = 20;
+/* De koppelingen met lagen BUITEN de tikkers -- het schild naast de meting, de
+   noodrem, en meldingen die verloren gaan -- staan in ./sensorstilte-koppelingen.js.
+   Hier staan de tikkers en hun rondes. */
+const koppelingen = require('./sensorstilte-koppelingen');
 
-const staat = { sensoren: new Map(), verloren: new Map(), schild: null };
+const staat = { sensoren: new Map() };
 
 const nu = () => Date.now();
 
@@ -77,54 +79,6 @@ function fout(naam, e) {
   s.laatsteFout = { op: new Date(nu()).toISOString(), reden: String((e && e.message) || e || 'onbekend').slice(0, 160) };
 }
 
-/* Een melding die nergens aankwam, bv. omdat het beveiligingsjournaal nog niet
-   (of niet meer) aan het schild hangt (opzet/schildwacht.js). */
-function meldingStaat(bron) {
-  let v = staat.verloren.get(bron);
-  if (!v) { v = { verloren: 0, laatstVerloren: 0, laatstAangekomen: 0 }; staat.verloren.set(bron, v); }
-  return v;
-}
-function verloren(bron) {
-  const v = meldingStaat(bron);
-  v.verloren += 1; v.laatstVerloren = nu();
-}
-/* HERSTEL IS EEN NIEUWE GESLAAGDE MELDING, geen gewist alarm. Pas als er na
-   de laatste verloren melding weer een aankomt, is de bron terug; de teller
-   blijft staan als spoor (WEERBAARHEID.md par. 9e, controleerbare terugkeer). */
-function aangekomen(bron) {
-  const v = staat.verloren.get(bron);
-  if (v) v.laatstAangekomen = nu();
-}
-
-/* Het schild ziet ELK verzoek dat binnenkomt (kern/schild.js telt vóór de
-   uitzondering voor localhost). Twee tellers: wat het schild zag en wat de
-   meting telde. */
-function koppelSchild({ schildVerzoeken, metingVerzoeken }) {
-  staat.schild = { schildVerzoeken, metingVerzoeken, vorig: null };
-}
-
-/* Alleen de weging van het alarm schuift het vergelijkpunt op (`schuif`).
-   Een lezing van het bord of de meetroute krijgt het laatste oordeel terug:
-   twee lezers die elk een stukje verschil opeten, zien samen nooit de drempel. */
-function schildOordeel(schuif) {
-  const k = staat.schild;
-  if (!k) return null;
-  if (!schuif) return k.laatste || { stil: false, reden: 'nog niet gewogen' };
-  let schildTelling, metingTelling;
-  try { schildTelling = Number(k.schildVerzoeken()); metingTelling = Number(k.metingVerzoeken()); }
-  catch (e) { k.laatste = { stil: true, reden: 'de tellers van schild of meting konden niet worden gelezen: ' + e.message }; return k.laatste; }
-  const vorig = k.vorig;
-  k.vorig = { s: schildTelling, metingTelling };
-  if (!vorig) k.laatste = { stil: false, reden: 'eerste meting, nog geen verschil' };
-  else {
-    const ds = schildTelling - vorig.s, dm = metingTelling - vorig.metingTelling;
-    k.laatste = dm >= SCHILD_DREMPEL && ds === 0
-      ? { stil: true, reden: dm + ' verzoeken in de meting sinds de vorige weging, en het schild zag er geen enkele' }
-      : { stil: false, reden: 'schild +' + ds + ', meting +' + dm };
-  }
-  return k.laatste;
-}
-
 /* Het oordeel per sensor. Leest alleen; met `schuif` schuift hij ook het
    vergelijkpunt van het schild op (alleen de weging van het alarm doet dat). */
 function oordeel({ schuif = false } = {}) {
@@ -147,13 +101,7 @@ function oordeel({ schuif = false } = {}) {
     rijen.push({ naam, wat: v.wat, stand, reden, laatst: s && s.laatst ? new Date(s.laatst).toISOString() : null,
       fouten: s ? s.fouten : 0, laatsteFout: s ? s.laatsteFout : null });
   }
-  const sch = schildOordeel(schuif);
-  if (sch) rijen.push({ naam: 'schild', wat: 'het schild ziet het binnenkomende verkeer', stand: sch.stil ? 'stil' : 'levend', reden: sch.reden });
-  for (const [bron, v] of staat.verloren) {
-    const terug = v.laatstAangekomen >= v.laatstVerloren;
-    rijen.push({ naam: 'melding:' + bron, wat: 'meldingen van ' + bron + ' komen aan', stand: terug ? 'levend' : 'stil',
-      reden: v.verloren + ' meldingen gingen verloren' + (terug ? '; daarna kwam er weer een aan' : '') });
-  }
+  rijen.push(...koppelingen.rijen(schuif));
   return rijen;
 }
 
@@ -172,7 +120,8 @@ function bevinding() {
 
 function stand() {
   const rijen = oordeel();
-  return { actief: alarmActief(), stil: rijen.filter(r => r.stand === 'stil').map(r => r.naam), sensoren: rijen,
+  return { actief: alarmActief(), stil: rijen.filter(r => r.stand === 'stil').map(r => r.naam),
+    uit: rijen.filter(r => r.stand === 'uit').map(r => r.naam), sensoren: rijen,
     let: 'een sensor stempelt zijn ronde en niet zijn vondst; "uit" is bewust niet gestart en telt niet als levend. ' +
       'Zijn eigen uitval ziet dit proces niet: dat doet de externe sonde.' };
 }
@@ -186,7 +135,8 @@ function gestart(naam, periodeMs) {
 }
 
 /* Alleen voor toetsen. */
-function _wis() { staat.sensoren.clear(); staat.verloren.clear(); staat.schild = null; }
+function _wis() { staat.sensoren.clear(); koppelingen.wis(); }
 
-module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL, aangemeld, gestart, ronde, fout, verloren, aangekomen, koppelSchild,
-  oordeel, bevinding, stand, alarmActief, _wis };
+module.exports = { VERWACHT, VENSTERS, SCHILD_DREMPEL: koppelingen.SCHILD_DREMPEL, aangemeld, gestart, ronde, fout,
+  verloren: koppelingen.verloren, aangekomen: koppelingen.aangekomen, koppelSchild: koppelingen.koppelSchild,
+  koppelNoodrem: koppelingen.koppelNoodrem, oordeel, bevinding, stand, alarmActief, _wis };

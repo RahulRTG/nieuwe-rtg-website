@@ -35,6 +35,12 @@ const NAAR = (args.find(a => a.startsWith('--naar=')) || '').slice(7) || BASIS;
    een duiding op kan doen (welke laag is stuk, helpt terugrollen). De tekst
    hierboven blijft de uitvoer voor mensen; dit is de uitvoer voor de triage. */
 const JSON_UIT = (args.find(a => a.startsWith('--json=')) || '').slice(7);
+/* Elk verzoek krijgt een einde. Een server die de verbinding aanneemt en nooit
+   antwoordt, liet deze sonde eeuwig wachten -- en dan valt precies de wachter
+   stil die er is om stilte van buitenaf te zien. Geen antwoord binnen de tijd
+   is een mislukte reis, met die reden erbij. */
+const WACHT_MS = Number((args.find(a => a.startsWith('--wacht=')) || '').slice(8)) || 10000;
+const metEinde = (opties) => Object.assign({ signal: AbortSignal.timeout(WACHT_MS) }, opties);
 
 const norm = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'SLO.json'), 'utf8'));
 const REIZEN = Array.isArray(norm.reizen) ? norm.reizen : [];
@@ -48,7 +54,7 @@ async function loop(reis) {
   }
   let status = 0, reden = null;
   try {
-    const r = await fetch(BASIS + reis.pad, opties);
+    const r = await fetch(BASIS + reis.pad, metEinde(opties));
     status = r.status;
     await r.arrayBuffer();
   } catch (e) {
@@ -101,13 +107,17 @@ async function bewakingMonster(basisUrl) {
   const begin = Date.now();
   const m = { at: new Date().toISOString(), reis: 'bewaking', status: 0, ms: 0, gelukt: false, traag: false, reden: null };
   try {
-    const r = await fetch(basisUrl + '/api/metrics/kort', { headers: Object.assign({ 'x-rtg-sonde': '1' },
-      TOKEN ? { authorization: 'Bearer ' + TOKEN } : {}) });
+    const r = await fetch(basisUrl + '/api/metrics/kort', metEinde({ headers: Object.assign({ 'x-rtg-sonde': '1' },
+      TOKEN ? { authorization: 'Bearer ' + TOKEN } : {}) }));
     m.status = r.status;
     const d = await r.json().catch(() => null);
     const b = d && d.bewaking;
     if (!r.ok || !b || !Array.isArray(b.stil)) m.reden = 'de bewaking is niet te lezen (status ' + r.status + ')';
     else if (b.stil.length) m.reden = 'stil: ' + b.stil.join(', ');
+    /* "Uit" is bewust niet gestart, en dat is een uitspraak en geen stilte --
+       maar het is ook geen bewaking. Een sonde die daar groen op geeft, laat
+       iemand die de tikkers uitzet een groen vinkje van buitenaf oogsten. */
+    else if (Array.isArray(b.uit) && b.uit.length) m.reden = 'bewust uit, dus niet bewaakt: ' + b.uit.join(', ');
     else m.gelukt = true;
   } catch (e) { m.reden = 'geen antwoord: ' + String((e && e.message) || e).slice(0, 120); }
   m.ms = Date.now() - begin;
@@ -160,12 +170,12 @@ async function bewakingMonster(basisUrl) {
 
   if (MELDEN) {
     try {
-      const r = await fetch(NAAR + '/api/sonde/melding', {
+      const r = await fetch(NAAR + '/api/sonde/melding', metEinde({
         method: 'POST',
         headers: Object.assign({ 'content-type': 'application/json' },
           TOKEN ? { authorization: 'Bearer ' + TOKEN } : {}),
         body: JSON.stringify({ monsters })
-      });
+      }));
       const d = await r.json().catch(() => ({}));
       /* Een 404 hier is de poort en niet een verdwaald pad: server/meetpoort.js
          antwoordt met 404 in plaats van 403 om niet te bevestigen dat het

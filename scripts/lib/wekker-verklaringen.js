@@ -72,6 +72,10 @@ module.exports = [
      de verstrengelingsmeter. */
   { bestand: 'server/opzet/start.js', reden: 'bedrading: hangt de diensten op, en is zelf geen functie' },
   { bestand: 'server/opzet/diensten2.js', reden: 'bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen' },
+  /* De meetlus van De Wacht stond in opzet/diensten2.js (de regel hierboven) en
+     verhuisde op 14 oktober 2026 naar de Wacht zelf, zodat hij zijn ronden kan
+     stempelen (WEERBAARHEID.md par. 9d). Dezelfde klok, geen nieuwe. */
+  { bestand: 'server/kern/wacht/index.js', reden: 'beveiliging: De Wacht meet het verkeer voor het bord en de lastafworp; een bewaker die je met een functieschakelaar kunt uitzetten, bewaakt niets -- zijn stilte meldt kern/command/sensorstilte.js' },
   { bestand: 'server/opzet/kernlaag1.js', reden: 'bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen' },
   { bestand: 'server/opzet/kernlaag3c.js', reden: 'bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen' },
   { bestand: 'server/opzet/kernlaag4b.js', reden: 'bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen' },

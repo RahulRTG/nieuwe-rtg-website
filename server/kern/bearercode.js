@@ -102,7 +102,11 @@ module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), no
   };
   const reden = (toegang, verwacht = {}) => {
     if (!toegang) return 'onbekend';
-    if (toegang.contractversie !== 2) return redenV1(toegang, verwacht);
+    /* Een record met een spoor van v2 gaat altijd door v2. Op contractversie
+       alleen kiezen liet wie hem weghaalde terugvallen op de v1-toetsen, en zo
+       de contracthash ontlopen met een opgerekte termijn. */
+    const v2spoor = toegang.contractversie !== undefined || toegang.contracthash !== undefined || toegang.gebruiksvorm !== undefined;
+    if (!v2spoor) return redenV1(toegang, verwacht);
     return v2.voorReden(toegang, verwacht) || v2.naReden(toegang, verwacht, redenV1(toegang, verwacht));
   };
   const redenV1 = (toegang, verwacht) => {

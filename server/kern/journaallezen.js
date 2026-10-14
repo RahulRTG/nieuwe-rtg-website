@@ -48,7 +48,7 @@ function lees(max) {
    antwoord wordt kort vastgehouden: dit voedt een scherm, geen beslissing. */
 let telWaarde = null, telTijd = 0;
 function aantal() {
-  if (telWaarde !== null && klok() - telTijd < 10000) return telWaarde + stapel.length;
+  if (telWaarde !== null && klok() - telTijd < 10000) return telWaarde + stapel().length;
   let n = 0;
   for (const naam of [huidig].concat(oudeBestanden())) {
     try {

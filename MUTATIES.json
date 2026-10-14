@@ -15448,6 +15448,14 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "scim-post-uitdienst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "scim-sleutelverval.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -1346,6 +1346,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "bearercode-hmac.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 3
+    },
     "bearercode-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",

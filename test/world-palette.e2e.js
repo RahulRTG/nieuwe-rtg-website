@@ -12,7 +12,7 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path');
 const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
-const engines = ['chromium', ...(process.env.RTG_TEST_WEBKIT === '1' ? ['webkit'] : [])];
+const engines = h.testMotoren();
 // [grond, vlak, inkt, signatuur]: de grond is www-ivoor met een zweem van de wereld.
 const inkt = 'rgb(17, 17, 14)';
 const colors = {

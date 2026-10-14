@@ -18809,7 +18809,7 @@
       "staat": "gezakt",
       "module": "test/helper.js",
       "operator": "!==->===#3",
-      "gezakt": 1,
+      "gezakt": 3,
       "geprobeerd": 47
     },
     "webplatform.test.js": {

@@ -45,7 +45,7 @@ async function reachable(page, selector) {
     return r.height >= 40 && hit && e.contains(hit);
   }, selector);
 }
-for (const engine of ['chromium',...(process.env.RTG_TEST_WEBKIT === '1' ? ['webkit'] : [])]) {
+for (const engine of h.testMotoren()) {
   test(engine+': ontbrekende Pass-module toont herstel en opnieuw proberen opent de echte inhoud', {skip}, async () => {
     const browser = await pw[engine].launch(engine === 'chromium' ? h.browserOpties(pw) : {});
     try {

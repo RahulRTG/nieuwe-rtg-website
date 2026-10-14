@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-14",
-  "commit": "e22b3f9b",
-  "seconden": 9.5,
+  "commit": "b56b41de",
+  "seconden": 9.2,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -2101,6 +2101,7 @@
     "server/kern/command/runbookcatalogus.js",
     "server/kern/command/runbooks-historie.js",
     "server/kern/command/runbooks.js",
+    "server/kern/command/sensorstilte-koppelingen.js",
     "server/kern/command/sensorstilte.js",
     "server/kern/command/simulatie.js",
     "server/kern/command/slo-rekenen.js",
@@ -7233,18 +7234,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5754,
-  "gelezen": 5439,
+  "bestandenGezien": 5755,
+  "gelezen": 5440,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27507,
-  "bestandenMetUitvoer": 4538,
-  "uitvoerMetNamen": 2064,
+  "symbolen": 27511,
+  "bestandenMetUitvoer": 4539,
+  "uitvoerMetNamen": 2065,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7760
+  "requireKanten": 7763
  },
  "nietGelezen": [
   {
@@ -15348,43 +15349,43 @@
     {
      "naam": "zetAuto",
      "soort": "functie",
-     "lijn": 58,
+     "lijn": 59,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meld",
      "soort": "functie",
-     "lijn": 62,
+     "lijn": 63,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "escaleer",
      "soort": "functie",
-     "lijn": 93,
+     "lijn": 99,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "samenvatting",
      "soort": "functie",
-     "lijn": 103,
+     "lijn": 109,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openKritiek",
      "soort": "functie",
-     "lijn": 117,
+     "lijn": 123,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openTotaal",
      "soort": "functie",
-     "lijn": 118,
+     "lijn": 124,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "handelAf",
      "soort": "functie",
-     "lijn": 121,
+     "lijn": 127,
      "geexporteerd": "onbekend"
     }
    ],
@@ -15394,6 +15395,7 @@
    },
    "requires": [
     "server/beveiliging-noodrem.js",
+    "server/kern/command/sensorstilte.js",
     "server/techniek.js"
    ],
    "extern": [
@@ -49140,102 +49142,142 @@
    ]
   },
   {
-   "bestand": "server/kern/command/sensorstilte.js",
+   "bestand": "server/kern/command/sensorstilte-koppelingen.js",
    "symbolen": [
-    {
-     "naam": "nu",
-     "soort": "pijl",
-     "lijn": 50,
-     "geexporteerd": false
-    },
-    {
-     "naam": "sensor",
-     "soort": "functie",
-     "lijn": 52,
-     "geexporteerd": false
-    },
-    {
-     "naam": "aangemeld",
-     "soort": "functie",
-     "lijn": 59,
-     "geexporteerd": true
-    },
-    {
-     "naam": "ronde",
-     "soort": "functie",
-     "lijn": 67,
-     "geexporteerd": true
-    },
-    {
-     "naam": "fout",
-     "soort": "functie",
-     "lijn": 74,
-     "geexporteerd": true
-    },
     {
      "naam": "meldingStaat",
      "soort": "functie",
-     "lijn": 82,
+     "lijn": 18,
      "geexporteerd": false
     },
     {
      "naam": "verloren",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 25,
      "geexporteerd": true
     },
     {
      "naam": "aangekomen",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 32,
      "geexporteerd": true
     },
     {
      "naam": "koppelSchild",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 40,
+     "geexporteerd": true
+    },
+    {
+     "naam": "koppelNoodrem",
+     "soort": "functie",
+     "lijn": 46,
      "geexporteerd": true
     },
     {
      "naam": "schildOordeel",
      "soort": "functie",
-     "lijn": 109,
+     "lijn": 51,
      "geexporteerd": false
+    },
+    {
+     "naam": "rijen",
+     "soort": "functie",
+     "lijn": 71,
+     "geexporteerd": true
+    },
+    {
+     "naam": "wis",
+     "soort": "functie",
+     "lijn": 90,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "SCHILD_DREMPEL",
+     "aangekomen",
+     "koppelNoodrem",
+     "koppelSchild",
+     "rijen",
+     "verloren",
+     "wis"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/command/sensorstilte.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/command/sensorstilte.js",
+   "symbolen": [
+    {
+     "naam": "nu",
+     "soort": "pijl",
+     "lijn": 52,
+     "geexporteerd": false
+    },
+    {
+     "naam": "sensor",
+     "soort": "functie",
+     "lijn": 54,
+     "geexporteerd": false
+    },
+    {
+     "naam": "aangemeld",
+     "soort": "functie",
+     "lijn": 61,
+     "geexporteerd": true
+    },
+    {
+     "naam": "ronde",
+     "soort": "functie",
+     "lijn": 69,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "functie",
+     "lijn": 76,
+     "geexporteerd": true
     },
     {
      "naam": "oordeel",
      "soort": "functie",
-     "lijn": 130,
+     "lijn": 84,
      "geexporteerd": true
     },
     {
      "naam": "alarmActief",
      "soort": "functie",
-     "lijn": 163,
+     "lijn": 111,
      "geexporteerd": true
     },
     {
      "naam": "bevinding",
      "soort": "functie",
-     "lijn": 168,
+     "lijn": 116,
      "geexporteerd": true
     },
     {
      "naam": "stand",
      "soort": "functie",
-     "lijn": 173,
+     "lijn": 121,
      "geexporteerd": true
     },
     {
      "naam": "gestart",
      "soort": "functie",
-     "lijn": 182,
+     "lijn": 130,
      "geexporteerd": true
     },
     {
      "naam": "_wis",
      "soort": "functie",
-     "lijn": 189,
+     "lijn": 137,
      "geexporteerd": true
     }
    ],
@@ -49252,6 +49294,7 @@
      "bevinding",
      "fout",
      "gestart",
+     "koppelNoodrem",
      "koppelSchild",
      "oordeel",
      "ronde",
@@ -49259,11 +49302,15 @@
      "verloren"
     ]
    },
-   "requires": [],
+   "requires": [
+    "server/kern/command/sensorstilte-koppelingen.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
+    "server/beveiliging.js",
     "server/kern/command/alarm-aanvullend.js",
     "server/kern/command/tikker.js",
+    "server/kern/wacht/index.js",
     "server/lib/auditwacht.js",
     "server/opzet/schildwacht.js",
     "server/routes/meting.js"
@@ -163280,6 +163327,12 @@
      "soort": "functie",
      "lijn": 110,
      "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "start",
+     "soort": "functie",
+     "lijn": 129,
+     "geexporteerd": "onbekend"
     }
    ],
    "uitvoer": {
@@ -163287,6 +163340,7 @@
     "namen": null
    },
    "requires": [
+    "server/kern/command/sensorstilte.js",
     "server/kern/wacht/afweer.js",
     "server/kern/wacht/flood.js",
     "server/kern/wacht/raadkamer.js",
@@ -182093,25 +182147,25 @@
     {
      "naam": "resolveSession",
      "soort": "functie",
-     "lijn": 178,
+     "lijn": 175,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "metContext",
      "soort": "functie",
-     "lijn": 194,
+     "lijn": 191,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "auth",
      "soort": "functie",
-     "lijn": 225,
+     "lijn": 222,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verder",
      "soort": "functie",
-     "lijn": 306,
+     "lijn": 303,
      "geexporteerd": "onbekend"
     }
    ],

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-14T15:19:01.446Z",
-    "commit": "2fb5bbbaa",
+    "op": "2026-10-14T22:29:49.226Z",
+    "commit": "443eed01f",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.11.1"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -14478,6 +14478,21 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "rtg-edge-quiet-presence.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-input.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-10-14/ik-wil-deze-adge-slimmer-effici/output/edge-quiet-mutation-443eed01f/rtg-edge-quiet-presence.e2e.js.evidence.json",
+        "sha256": "2df4926bddc48462b34f22a4c063b6aecb5e3987f5934fc634c0be82bb24849a",
+        "commit": "443eed01f6864c5492fea6dee32dc99f2382dae3",
+        "sourceSha256": "4dbfe86345a40f7c6b23bd406a27063ab876858e9c8884a63161e3ad6f321eaf",
+        "testSha256": "1704a77e93ea8635977db34b8354b2157a5f19b1b2dd20d1b10e3fdc9e40de09"
+      }
     },
     "rtg-edge-uitrol.test.js": {
       "soort": "puur",

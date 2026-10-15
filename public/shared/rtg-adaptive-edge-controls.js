@@ -99,7 +99,7 @@
       if (el.hasAttribute('aria-selected')) b.setAttribute('aria-pressed', el.getAttribute('aria-selected'));
       b.addEventListener('click', function () {
         if (!available(el, source.root) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
-        close(); el.click();
+        el.click(); close();
       });
       container.appendChild(b);
     });

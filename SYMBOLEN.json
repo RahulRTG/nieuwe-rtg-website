@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-15",
-  "commit": "e865327c",
-  "seconden": 10.4,
+  "commit": "3e98d00f3",
+  "seconden": 4.1,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7247,13 +7247,13 @@
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27523,
+  "symbolen": 27528,
   "bestandenMetUitvoer": 4542,
   "uitvoerMetNamen": 2068,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7769
+  "requireKanten": 7768
  },
  "nietGelezen": [
   {
@@ -90425,19 +90425,19 @@
     {
      "naam": "regelsVanItems",
      "soort": "functie",
-     "lijn": 51,
+     "lijn": 49,
      "geexporteerd": true
     },
     {
      "naam": "maakFactuurVoorLid",
      "soort": "functie",
-     "lijn": 58,
+     "lijn": 56,
      "geexporteerd": true
     },
     {
      "naam": "melden",
      "soort": "functie",
-     "lijn": 59,
+     "lijn": 57,
      "geexporteerd": false
     }
    ],
@@ -90458,8 +90458,7 @@
     "server/kern/lidacties/rekening.js",
     "server/routes/supplier/kassa/afrekenen.js",
     "server/routes/supplier/kassa/innen.js",
-    "server/routes/supplier/kassa/verkoop.js",
-    "server/routes/supplier/retail.js"
+    "server/routes/supplier/kassa/verkoop.js"
    ]
   },
   {
@@ -201832,7 +201831,7 @@
     {
      "naam": "eisRetail",
      "soort": "functie",
-     "lijn": 15,
+     "lijn": 13,
      "geexporteerd": "onbekend"
     }
    ],
@@ -201840,9 +201839,7 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [
-    "server/kern/lidacties/factuur.js"
-   ],
+   "requires": [],
    "extern": [],
    "gebruiktDoor": [
     "server/routes/supplier-deel2.js"
@@ -260462,33 +260459,45 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "detail",
+     "naam": "presence",
      "soort": "functie",
      "lijn": 35,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "normDeck",
+     "naam": "view",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 39,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "nextDeck",
-     "soort": "functie",
-     "lijn": 37,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "model",
+     "naam": "detail",
      "soort": "functie",
      "lijn": 45,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "normDeck",
+     "soort": "functie",
+     "lijn": 46,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "nextDeck",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "model",
+     "soort": "functie",
+     "lijn": 55,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "momentopname",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 59,
      "geexporteerd": "onbekend"
     }
    ],
@@ -260512,41 +260521,59 @@
     {
      "naam": "prepare",
      "soort": "functie",
-     "lijn": 6,
+     "lijn": 4,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closeContext",
      "soort": "functie",
-     "lijn": 16,
+     "lijn": 14,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "reflect",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 23,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "drempels",
      "soort": "functie",
-     "lijn": 48,
+     "lijn": 44,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "busy",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 45,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "pinned",
+     "soort": "functie",
+     "lijn": 48,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 57,
+     "lijn": 49,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "listen",
+     "soort": "functie",
+     "lijn": 52,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "quiet",
+     "soort": "functie",
+     "lijn": 54,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "wake",
      "soort": "functie",
      "lijn": 60,
      "geexporteerd": "onbekend"
@@ -260554,7 +260581,7 @@
     {
      "naam": "stop",
      "soort": "functie",
-     "lijn": 86,
+     "lijn": 90,
      "geexporteerd": "onbekend"
     },
     {
@@ -260791,61 +260818,61 @@
     {
      "naam": "setDeck",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 85,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closePanel",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 90,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openPanel",
      "soort": "functie",
-     "lijn": 89,
+     "lijn": 91,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setPresence",
      "soort": "functie",
-     "lijn": 90,
+     "lijn": 92,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setIdentity",
      "soort": "functie",
-     "lijn": 96,
+     "lijn": 98,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "continueWith",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 104,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "build",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 110,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "find",
      "soort": "functie",
-     "lijn": 113,
+     "lijn": 115,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 130,
+     "lijn": 132,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "destroy",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 150,
      "geexporteerd": "onbekend"
     }
    ],

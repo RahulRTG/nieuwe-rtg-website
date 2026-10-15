@@ -32,6 +32,16 @@
     return list.indexOf(value) >= 0 ? value : fallback;
   }
   function normState(value, fallback) { return norm(STATES, value, fallback || 'dock'); }
+  function presence(state, edgeState) {
+    if (edgeState === 'focus') return 'immersive';
+    return { peek: 'idle', dock: 'active', deck: 'contextual', expanded: 'expanded' }[normState(state)];
+  }
+  function view(state, source, edgeState) {
+    state = normState(state);
+    return { state: state, automatic: source === 'auto' || source === 'quiet',
+      motion: source === 'auto' && state === 'peek' ? 'reading' : source === 'quiet' && state === 'peek' ? 'quiet' : 'available',
+      presence: presence(state, edgeState) };
+  }
   function detail(action) { return DETAILS[action] || 'RTG'; }
   function normDeck(value, fallback) { return norm(DECKS, value, fallback || 'home'); }
   function nextDeck(value, delta) {
@@ -58,6 +68,6 @@
      grammatica en het gewicht lopen; de Edge-kern kent alleen zijn toestand en
      zijn decks. register, setProjection en voer bestaan met opzet niet, en
      test/edgeregister-leeg.test.js zakt zodra ze terugkomen. */
-  return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, detail: detail,
+  return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, presence: presence, view: view, detail: detail,
     normDeck: normDeck, nextDeck: nextDeck, model: model, momentopname: momentopname });
 }));

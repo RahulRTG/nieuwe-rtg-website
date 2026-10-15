@@ -1727,10 +1727,29 @@ async function edgeActies(page) {
   if (!await page.locator('.rtg-adaptive-sheet').isVisible()) {
     const mounted = page.locator('.rtg-adaptive-surface [data-rtg-adaptive-action="ai"]');
     if (await mounted.isVisible()) await mounted.click();
-    else await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+    else {
+      const bar = page.locator('.rtg-adaptive-bar');
+      const context = bar.locator('[data-rtg-adaptive-action="context"]');
+      // Quiet Presence houdt alleen de centrale 44px-bediening zichtbaar. De
+      // altijd bereikbare Rahul-knop krijgt eerst toetsenbordfocus; focusin
+      // activeert het bestaande oppervlak en houdt de rusttimer tegen totdat
+      // de contextknop zelf focus heeft. Alleen hover gebruiken is hier een
+      // wedloop: de muis kan tijdens het verbreden kort buiten de balk vallen.
+      if (!await context.isVisible()) {
+        await bar.locator('[data-rtg-adaptive-action="ai"]').focus();
+        await context.waitFor({ state: 'visible' });
+      }
+      await context.focus();
+      await context.click();
+    }
   }
   await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { state: 'visible' });
-  await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });
+  await page.waitForSelector('.rtg-adaptive-controls', { state: 'visible' });
+  // De bronbediening kan na het openen nog eenmaal via de bestaande
+  // MutationObserver worden ververst. Wacht twee browserframes: het eerste
+  // voert die render uit, het tweede bewijst dat de zichtbare kopie stabiel is.
+  // Zo raakt een onmiddellijke Playwright-klik niet een zojuist vervangen knop.
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
 async function edgeBediening(page, naam) {

@@ -2,9 +2,9 @@
  "soort": "index",
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
-  "op": "2026-10-14",
-  "commit": "b383fc167",
-  "seconden": 14.7,
+  "op": "2026-10-15",
+  "commit": "3e98d00f3",
+  "seconden": 4.1,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3683,6 +3683,9 @@
     "server/kern/retail/assortiment.js",
     "server/kern/retail/klant.js",
     "server/kern/retail/vloer.js",
+    "server/kern/revenue/catalogus-v1-validatie.js",
+    "server/kern/revenue/catalogus-v1.js",
+    "server/kern/revenue/index.js",
     "server/kern/rijksbieb-data.js",
     "server/kern/rijksbieb.js",
     "server/kern/routedekking.js",
@@ -5889,6 +5892,8 @@
     "server/kern/redactie.js",
     "server/kern/reisbieb.js",
     "server/kern/residentie.js",
+    "server/kern/revenue/catalogus-v1.schema.json.js",
+    "server/kern/revenue/catalogus-v1.schema.json/index.js",
     "server/kern/rtfos.js",
     "server/kern/rugdekking.js",
     "server/kern/salon.js",
@@ -6893,6 +6898,9 @@
      "pad": "server/kern/retail"
     },
     {
+     "pad": "server/kern/revenue"
+    },
+    {
      "pad": "server/kern/rtc"
     },
     {
@@ -7234,18 +7242,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5755,
-  "gelezen": 5440,
+  "bestandenGezien": 5758,
+  "gelezen": 5443,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27515,
-  "bestandenMetUitvoer": 4539,
-  "uitvoerMetNamen": 2065,
+  "symbolen": 27528,
+  "bestandenMetUitvoer": 4542,
+  "uitvoerMetNamen": 2068,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7763
+  "requireKanten": 7768
  },
  "nietGelezen": [
   {
@@ -23577,6 +23585,7 @@
     "server/functies/voorstel/index.js",
     "server/kern/command/lagen.js",
     "server/kern/command/vermogens.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/kern/workspace-platform.js"
    ]
   },
@@ -51889,6 +51898,7 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/geldregie.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/routes/member/aitegoed.js"
    ]
   },
@@ -53314,7 +53324,8 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/commercie/tegoed.js",
-    "server/kern/commercie/tegoed/plafond.js"
+    "server/kern/commercie/tegoed/plafond.js",
+    "server/kern/revenue/catalogus-v1.js"
    ]
   },
   {
@@ -130165,6 +130176,121 @@
    "gebruiktDoor": [
     "server/server.js"
    ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1-validatie.js",
+   "symbolen": [
+    {
+     "naam": "maakRevenueCatalogusValidator",
+     "soort": "functie",
+     "lijn": 6,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "pijl",
+     "lijn": 14,
+     "geexporteerd": false
+    },
+    {
+     "naam": "isObject",
+     "soort": "pijl",
+     "lijn": 15,
+     "geexporteerd": false
+    },
+    {
+     "naam": "veldenExact",
+     "soort": "pijl",
+     "lijn": 16,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "maakRevenueCatalogusValidator"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/revenue/catalogus-v1.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1.js",
+   "symbolen": [
+    {
+     "naam": "canoniek",
+     "soort": "functie",
+     "lijn": 35,
+     "geexporteerd": true
+    },
+    {
+     "naam": "diepVast",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": false
+    },
+    {
+     "naam": "prijsProjectie",
+     "soort": "functie",
+     "lijn": 50,
+     "geexporteerd": false
+    },
+    {
+     "naam": "projecteerAiExtraS",
+     "soort": "functie",
+     "lijn": 64,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CAPABILITY_ID",
+     "CATALOG_ID",
+     "CATALOG_VERSION",
+     "CONTRACT_DIGEST",
+     "FEATURE_ID",
+     "FORMULA_ID",
+     "OFFER_ID",
+     "PRODUCT_ID",
+     "SOURCE_REFS",
+     "canoniek",
+     "projecteerAiExtraS",
+     "schema",
+     "valideer"
+    ]
+   },
+   "requires": [
+    "server/functies/register/index.js",
+    "server/kern/commercie/bundelprijs.js",
+    "server/kern/commercie/tegoed/inhoud.js",
+    "server/kern/revenue/catalogus-v1-validatie.js"
+   ],
+   "extern": [
+    "./catalogus-v1.schema.json",
+    "crypto"
+   ],
+   "gebruiktDoor": [
+    "server/kern/revenue/index.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/index.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "catalogusV1"
+    ]
+   },
+   "requires": [
+    "server/kern/revenue/catalogus-v1.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
   },
   {
    "bestand": "server/kern/rijksbieb-data.js",
@@ -260333,33 +260459,45 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "detail",
+     "naam": "presence",
      "soort": "functie",
      "lijn": 35,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "normDeck",
+     "naam": "view",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 39,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "nextDeck",
-     "soort": "functie",
-     "lijn": 37,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "model",
+     "naam": "detail",
      "soort": "functie",
      "lijn": 45,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "normDeck",
+     "soort": "functie",
+     "lijn": 46,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "nextDeck",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "model",
+     "soort": "functie",
+     "lijn": 55,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "momentopname",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 59,
      "geexporteerd": "onbekend"
     }
    ],
@@ -260383,41 +260521,59 @@
     {
      "naam": "prepare",
      "soort": "functie",
-     "lijn": 6,
+     "lijn": 4,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closeContext",
      "soort": "functie",
-     "lijn": 16,
+     "lijn": 14,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "reflect",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 23,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "drempels",
      "soort": "functie",
-     "lijn": 48,
+     "lijn": 44,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "busy",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 45,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "pinned",
+     "soort": "functie",
+     "lijn": 48,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 57,
+     "lijn": 49,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "listen",
+     "soort": "functie",
+     "lijn": 52,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "quiet",
+     "soort": "functie",
+     "lijn": 54,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "wake",
      "soort": "functie",
      "lijn": 60,
      "geexporteerd": "onbekend"
@@ -260425,7 +260581,7 @@
     {
      "naam": "stop",
      "soort": "functie",
-     "lijn": 86,
+     "lijn": 90,
      "geexporteerd": "onbekend"
     },
     {
@@ -260662,61 +260818,61 @@
     {
      "naam": "setDeck",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 85,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closePanel",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 90,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openPanel",
      "soort": "functie",
-     "lijn": 89,
+     "lijn": 91,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setPresence",
      "soort": "functie",
-     "lijn": 90,
+     "lijn": 92,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setIdentity",
      "soort": "functie",
-     "lijn": 96,
+     "lijn": 98,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "continueWith",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 104,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "build",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 110,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "find",
      "soort": "functie",
-     "lijn": 113,
+     "lijn": 115,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 130,
+     "lijn": 132,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "destroy",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 150,
      "geexporteerd": "onbekend"
     }
    ],

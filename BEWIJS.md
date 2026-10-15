@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2718 bestanden en 19004 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2719 bestanden en 19006 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2718 |
-| losse beweringen (`test(...)`) | 19004 |
+| toetsbestanden | 2719 |
+| losse beweringen (`test(...)`) | 19006 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2530 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2531 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2386 bestanden, 18438 beweringen.
+2386 bestanden, 18439 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1746,7 +1746,7 @@ toets omvalt.
 | `rtfwelzijn.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 1): het gevoelsdagboek. Opt-in (de server bewaart alleen wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten), een woord per dag (vandaag herzien mag, gisteren blijft staan), en... |
 | `rtfwelzijn2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 2): de nieuwe coach-soorten voor de welzijnsapps. Zonder AI-sleutel geeft elke soort zijn EIGEN warme demotekst (de knop werkt dus altijd), een onbekende soort valt veilig terug, en de... |
 | `rtg-a11y.test.js` | 8 | gezakt op `&&->||#0` | DE TOEGANKELIJKHEIDSADAPTER -- leest hij de keuring werkelijk goed uit? scripts/rtg-a11y.js voegt geen regels toe: hij richt de bestaande machinerie (scripts/a11ykeuring.js en scripts/raakvlakkeuring.js) op een... |
-| `rtg-adaptive-edge.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-adaptive-edge.test.js` | 16 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-continue-key.test.js` | 10 | gezakt op `===->!==#0` | De Continue Key mag rijk bewegen, maar blijft exact de bestaande primaire Edge-knop. Deze toets bewaakt identiteit, veilige ankers, toetsenbord, langdruk, geometrie, a11y, opslag en motion-koppeling. |
 | `rtg-edge-2-pilots.test.js` | 15 | gezakt op `===->!==#0` | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
 | `rtg-edge-2.test.js` | 14 | gezakt op `===->!==#0` | Edge 2.0 bestuurt het bestaande casco. Deze toets borgt dat er geen tweede balkenstelsel, netwerklaag of onbegrensde contextselectie ontstaat. |
@@ -2426,7 +2426,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-332 bestanden, 566 beweringen.
+333 bestanden, 567 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2675,6 +2675,7 @@ toets omvalt.
 | `rtg-adaptive-edge.e2e.js` | 5 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-dev.e2e.js` | 1 | gezakt op `===->!==#0` | RTG DEV IN EEN ECHTE BROWSER -- want dit is de bewering die alleen daar valt na te rekenen. Alles wat `rtg dev` belooft, hangt aan drie dingen die je met curl niet ziet: 1. |
 | `rtg-edge-2.e2e.js` | 2 | gezakt op `voorwaarde-omkeren#0` | DE ENE RAND ROND DE ACHT EERSTE VANDAAG-SCHERMEN. Deze proef telt niet alleen dat Edge bestaat. |
+| `rtg-edge-quiet-presence.e2e.js` | 1 | gezakt op `expliciete bronmutatie` | Quiet Presence gebruikt de bestaande Edge-staten en bewijst in een echte mobiele browser dat rust, activatie, context, pinning, focus en routeherstel elkaar niet verstoren. |
 | `rtg-id-family.e2e.js` | 3 | gezakt op `liegpoort /api/` | RTG access in a real browser: one shared Edge, four concise registration steps, explicit agreement and existing password/WebAuthn/2FA recovery routes. All identities and credentials belong to isolated local test... |
 | `rtgboek.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets op het boek van RTG in de kamer Financiën (kantoren.html, public/apps/kantoren-rtgboek.js, besluit C8). Vier beweringen, en alle vier kunnen ze zakken: 1. |
 | `rtgzetel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

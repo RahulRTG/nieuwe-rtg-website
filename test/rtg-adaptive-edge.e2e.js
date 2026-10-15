@@ -252,10 +252,13 @@ test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit 
 
     // A retained proxy must recheck its original control at the moment of use.
     await page.evaluate(() => {
-      window.__edgeExecutions = 0;
+      window.__edgeExecutions = 0; window.__edgeSourceState = '';
       const root = document.createElement('nav'); root.className = 'wos-dock'; root.id = 'edgeProbe';
       const button = document.createElement('button'); button.id = 'edgeProbeAction'; button.textContent = 'Proefhandeling';
-      button.onclick = () => window.__edgeExecutions++;
+      button.onclick = () => {
+        window.__edgeExecutions++;
+        window.__edgeSourceState = document.body.dataset.rtgAdaptiveState;
+      };
       root.appendChild(button); document.body.appendChild(root);
     });
     await require('./helper').edgeActies(page);
@@ -267,6 +270,10 @@ test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit 
     await page.evaluate(() => { document.getElementById('edgeProbeAction').disabled = false; });
     await source.click();
     assert.equal(await page.evaluate(() => window.__edgeExecutions), 1, 'the real click reaches its existing handler once');
+    assert.equal(await page.evaluate(() => window.__edgeSourceState), 'expanded',
+      'the real source action runs before the Edge closes its presentation');
+    assert.equal(await page.locator('body').getAttribute('data-rtg-adaptive-state'), 'dock',
+      'the projected source action still closes the Edge after execution');
     await require('./helper').edgeActies(page);
     await source.evaluate(proxy => { document.getElementById('edgeProbe').remove(); proxy.click(); });
     assert.equal(await page.evaluate(() => window.__edgeExecutions), 1, 'removed owner cannot execute through a retained proxy');

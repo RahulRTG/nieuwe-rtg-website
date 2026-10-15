@@ -2,9 +2,9 @@
  "soort": "index",
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
-  "op": "2026-10-14",
-  "commit": "443eed01f",
-  "seconden": 4.1,
+  "op": "2026-10-15",
+  "commit": "723303e99",
+  "seconden": 4.7,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,

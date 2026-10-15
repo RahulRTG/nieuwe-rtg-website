@@ -14486,6 +14486,21 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "rtg-edge-quiet-presence.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-input.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-10-14/ik-wil-deze-adge-slimmer-effici/output/edge-quiet-mutation-443eed01f/rtg-edge-quiet-presence.e2e.js.evidence.json",
+        "sha256": "2df4926bddc48462b34f22a4c063b6aecb5e3987f5934fc634c0be82bb24849a",
+        "commit": "443eed01f6864c5492fea6dee32dc99f2382dae3",
+        "sourceSha256": "4dbfe86345a40f7c6b23bd406a27063ab876858e9c8884a63161e3ad6f321eaf",
+        "testSha256": "1704a77e93ea8635977db34b8354b2157a5f19b1b2dd20d1b10e3fdc9e40de09"
+      }
+    },
     "rtg-edge-uitrol.test.js": {
       "soort": "puur",
       "staat": "gezakt",

@@ -1737,7 +1737,12 @@ async function edgeActies(page) {
     }
   }
   await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { state: 'visible' });
-  await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });
+  await page.waitForSelector('.rtg-adaptive-controls', { state: 'visible' });
+  // De bronbediening kan na het openen nog eenmaal via de bestaande
+  // MutationObserver worden ververst. Wacht twee browserframes: het eerste
+  // voert die render uit, het tweede bewijst dat de zichtbare kopie stabiel is.
+  // Zo raakt een onmiddellijke Playwright-klik niet een zojuist vervangen knop.
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
 async function edgeBediening(page, naam) {

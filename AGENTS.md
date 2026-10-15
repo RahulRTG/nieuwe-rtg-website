@@ -72,6 +72,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `GRAMMATICA.md` is de RTG Mobile Interaction Grammar
 - `EDGE.md` is RTG Edge 3.0
 - `WERKRUIMTE.md` is het desktopparadigma
+- `TRAVELOS-SPATIAL-VERTICAL-SLICE.md` is het TravelOS Spatial-plan
 - `ONDERHOUD.md` is de onderhoudslaag
 - `BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT
 - `TIKKEN.md` zegt hoe diep het huis is

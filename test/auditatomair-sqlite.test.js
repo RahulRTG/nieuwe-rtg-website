@@ -39,7 +39,15 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
   require('../server/lib/sqlite-gelijktijdigheid')(conn);
   try {
     const kas = () => { const r = conn.prepare("SELECT val, ver FROM kv WHERE key='payKasToegang'").get(); return r ? r.ver + ':' + r.val : null; };
-    const rijen = () => conn.prepare("SELECT COUNT(*) n FROM audit_rij WHERE naam='handelingLog'").get().n;
+    /* Alleen het spoor van DEZE geldhandeling vergelijken. Registratie schrijft
+       zijn gewone eindregel na het HTTP-antwoord (lib/handelingsspoor.js). Die
+       onafhankelijke regel kan terecht tussen de twee tellingen landen en
+       maakte een globale COUNT(*) afhankelijk van runnerbelasting. De
+       atomiciteitsclaim gaat over /api/pay/kascode: daarvan mag na de
+       geweigerde transactie geen halve regel bijkomen. */
+    const rijen = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
+      .map(({ waarde }) => JSON.parse(waarde))
+      .filter(regel => regel.pad === '/api/pay/kascode').length;
     const kasVoor = kas(), rijenVoor = rijen();
     assert.ok(kasVoor, 'de eerste kascode staat in store.db');
     conn.exec("CREATE TRIGGER weiger_audit BEFORE INSERT ON audit_rij WHEN NEW.naam = 'handelingLog' " +

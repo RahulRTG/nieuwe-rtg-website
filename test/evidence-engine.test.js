@@ -184,6 +184,38 @@ test('een gewijzigde bewijsmachine geeft altijd de volledige route, ook als er b
     'impact-onvolledig', 'een onbegrensde impact blijft de eerste reden');
 });
 
+test('een te brede incrementele selectie gebruikt de bestaande volledige scherven', () => {
+  const boek = { bewijzen: { x: {} } };
+  const capaciteit = {
+    past: false,
+    unit: { past: false, geschatMs: 41 * 60 * 1000, budgetMs: 40 * 60 * 1000 },
+    e2e: { past: true, geschatMs: 4 * 60 * 1000, budgetMs: 20 * 60 * 1000 }
+  };
+  assert.deepEqual(planner.modusbesluit({ volledig: true },
+    { REUSED: 900, REPROVE: 300, UNKNOWN: 0 }, boek, false, capaciteit), {
+    mode: 'full', code: 'incrementieel-te-breed',
+    reden: 'de selectie past niet betrouwbaar in de onverdeelde runners (unit 41m/40m); gebruik de bestaande volledige scherven'
+  });
+  assert.equal(planner.modusbesluit({ volledig: true },
+    { REUSED: 900, REPROVE: 3, UNKNOWN: 0 }, boek, false,
+    { ...capaciteit, past: true, unit: { ...capaciteit.unit, past: true } }).mode, 'incremental');
+});
+
+test('de capaciteitsmeting telt alleen opnieuw te bewijzen unit- en browserbestanden', () => {
+  const capaciteit = planner.werkbelasting([
+    { toets: 'test/grondwacht.test.js', status: 'REPROVE' },
+    { toets: 'test/experience-travel.e2e.js', status: 'UNKNOWN' },
+    { toets: 'test/pg.test.js', status: 'REPROVE' },
+    { toets: 'test/evidence-engine.test.js', status: 'REUSED' }
+  ], { unit: 1, e2e: 1 });
+  assert.equal(capaciteit.unit.bestanden, 1);
+  assert.equal(capaciteit.e2e.bestanden, 1);
+  assert.ok(capaciteit.unit.geschatMs > 1);
+  assert.ok(capaciteit.e2e.geschatMs > 0,
+    'zonder bekende duur blijft een browserbestand minstens een positieve, fail-closed prijs houden');
+  assert.equal(capaciteit.past, false);
+});
+
 test('de Evidence Control Plane bindt elke hergebruikte toets aan een negatieve claim', () => {
   const plan = { formaat: 'rtg-evidence-plan-v2', basis: 'basis',
     snapshot: { rootHash: 'snap' }, gewijzigd: ['server/a.js'], mode: 'incremental',

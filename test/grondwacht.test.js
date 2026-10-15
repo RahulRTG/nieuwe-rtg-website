@@ -20,6 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { spawnSync } = require('node:child_process');
 
 const grondwacht = require('../scripts/grondwacht.js');
 const triage = require('../scripts/triage.js');
@@ -225,6 +226,48 @@ test('triage: een verlopen certificaat is TLS en geen appstoring', () => {
   const u = triage.duid([{ pad: '/', fout: 'CERT_HAS_EXPIRED', status: 0 }]);
   assert.equal(u.laag, 'tls');
   assert.equal(u.terugrollen, false);
+});
+
+test('triage: een rood streng TLS-bewijs blijft bruikbaar als de gewone sonde ontbreekt', () => {
+  const reizen = triage.voegBewijzenSamen(null, {
+    geslaagd: false,
+    foutcode: 'RTG_TLS_ANTWOORD',
+    fout: 'readiness-antwoord overschrijdt de bewijsgrens'
+  });
+  const u = triage.duid(reizen);
+  assert.equal(u.laag, 'rand', 'TLS kwam al rond; een te groot HTTP-antwoord is geen certificaatfout');
+  assert.equal(u.terugrollen, false);
+  assert.equal(u.totaal, 1, 'het rode TLS-bewijs is zelf een gemeten reis');
+});
+
+test('triage: de publieke vrijgaveproef duidt certificaat- en routefouten afzonderlijk', () => {
+  assert.equal(triage.laagVanTlsBewijs({ foutcode: 'RTG_TLS_HOSTNAME' }), 'tls');
+  assert.equal(triage.laagVanTlsBewijs({ foutcode: 'RTG_TLS_READY' }), 'deels');
+  assert.equal(triage.laagVanTlsBewijs({ foutcode: 'RTG_TLS_APP_URL' }), 'onbekend');
+});
+
+test('triage-CLI schrijft bewijs als alleen de rode vrijgaveproef leesbaar is', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-triage-zonder-sonde-'));
+  try {
+    const tls = path.join(tmp, 'tls.json');
+    fs.writeFileSync(tls, JSON.stringify({
+      geslaagd: false,
+      foutcode: 'RTG_TLS_ANTWOORD',
+      fout: 'readiness-antwoord overschrijdt de bewijsgrens'
+    }));
+    const resultaat = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'triage.js'),
+      '--uit=' + path.join(tmp, 'ontbrekende-sonde.json'), '--tls=' + tls], {
+      cwd: tmp,
+      encoding: 'utf8'
+    });
+    assert.equal(resultaat.status, 1, resultaat.stdout + resultaat.stderr);
+    const bewijs = JSON.parse(fs.readFileSync(path.join(tmp, 'TRIAGE.json'), 'utf8'));
+    assert.equal(bewijs.laag, 'rand');
+    assert.match(bewijs.bewijsfout, /sonde-uitvoer onleesbaar/);
+    assert.equal(bewijs.terugrollen, false);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 /* DE MUTATIE die het duurste onderscheid maakt: alles bereikbaar maar alles

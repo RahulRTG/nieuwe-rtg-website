@@ -172,6 +172,11 @@ test('deploy, containerhealth en publieke probe bevatten geen TLS-bypass meer', 
   assert.match(overlay, /publieke-tls-proef\.js.*--env-file=\/run\/secrets\/rtg_env.*--readiness-only/);
   assert.match(monitor, /--eis-release-commit[\s\S]*RTG_RELEASE_COMMIT:.*RTG_LIVE_COMMIT/,
     'de onafhankelijke monitor moet zijn TLS-bewijs aan de uitgerolde commit binden');
+  assert.match(monitor,
+    /set \+e[\s\S]*publieke-tls-proef\.js[\s\S]*TLS_STATUS=\$\?[\s\S]*sonde\.js[\s\S]*SONDE_STATUS=\$\?[\s\S]*set -e/,
+    'een rode strenge vrijgaveproef mag de gewone gebruikerssonde niet overslaan');
+  assert.match(monitor, /triage\.js --uit=sonde\.json --tls=tls-bewijs\.json/,
+    'triage moet beide onafhankelijke bewijzen ontvangen');
 });
 
 test('de CLI bewaart ook een rode, niet als succes te verwarren proef', () => {

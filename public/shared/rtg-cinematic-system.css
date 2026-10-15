@@ -561,11 +561,23 @@ body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"] .rtg-adaptive-ed
   --edge-bar-dim:#b8afa2!important;--edge-bar-line:rgba(226,195,137,.24)!important;
   --edge-bar-accent:#e2c389!important;--edge-bar-accent-soft:rgba(226,195,137,.08)!important;
 }
+body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"] .rtg-adaptive-edge[data-rtg-adaptive-presence="idle"]{
+  width:88px!important;max-width:88px!important;height:48px!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"] .rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-bar{
+  height:48px!important;padding:2px!important;border-color:rgba(226,195,137,.30)!important;
+  background:linear-gradient(145deg,rgba(255,248,229,.10),transparent 55%),rgba(17,16,14,.72)!important;
+  box-shadow:inset 0 1px 0 rgba(255,249,230,.17),0 8px 24px rgba(0,0,0,.16)!important;
+  backdrop-filter:blur(18px) saturate(1.08);-webkit-backdrop-filter:blur(18px) saturate(1.08);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-item:nth-child(3){min-width:44px!important;min-height:44px!important}
+@media(prefers-contrast:more){body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-bar{background:#11100e!important;border-color:#f7f1e8!important}}
 body[data-rtg-cinematic="true"] :is(.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface){
   border:1px solid rgba(226,195,137,.24)!important;
   background:linear-gradient(180deg,rgba(25,23,19,.96),rgba(13,13,11,.97))!important;
   box-shadow:0 16px 38px rgba(31,24,16,.18)!important;
 }
+@media(forced-colors:active){body[data-rtg-cinematic="true"] :is(.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface){background:Canvas!important;color:CanvasText!important;border-color:CanvasText!important;box-shadow:none!important}}
 body[data-rtg-cinematic="true"] .rtg-adaptive-item .rtg-adaptive-lips{
   align-self:center!important;transform:translateY(0)!important;
   filter:drop-shadow(0 0 6px rgba(226,195,137,.18))!important;

@@ -95,6 +95,8 @@ const EIGENAAR = {
   'TOEZEGKLASSEN.json': { handmatig: true, lezer: 'scripts/lib/toezegklassen.js',
     waarom: 'Handgeschreven besluitbestand van de inventaris (AFBOUWPROGRAMMA.md): afgewezen en extern zijn een oordeel en geen markering. scripts/lib/toezegklassen.js leest het en schrijft het niet; test/toezegklassen.test.js houdt elk citaat tegen zijn document.' },
   'ONTWERPSTANDAARD-METING.md': { soort: 'BRON', waarom: 'Handgeschreven meetverslag van website tegenover app (#585), op een genoemde commit; verandert geen code.' },
+  'TRAVELOS-SPATIAL-VERTICAL-SLICE.md': { soort: 'BRON',
+    waarom: 'Handgeschreven implementatiepassport voor de eerste TravelOS Spatial-proef; het beschrijft een voorstel en bestaand bronbewijs, geen generator schrijft dit document.' },
   'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
   'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },
   'GEMEENSCHAP.md': { soort: 'BRON', waarom: 'Handgeschreven richtingsdocument van FoundationOS als Human & Social Infrastructure.' },

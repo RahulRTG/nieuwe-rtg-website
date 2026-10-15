@@ -302,3 +302,46 @@ test('warme browserfabriek ruimt contexten op zonder het gedeelde proces te slui
   await apart.close();
   assert.equal(geisoleerd, 1, 'procesvlaggen krijgen een eigen browserproces');
 });
+
+test('een incrementele selectie zwaarder dan een scherf gaat naar de volledige route', () => {
+  /* Main na de merge van #649 (run 38718725654): 1174 bewijzen hergebruikt en
+     toch 1212 unit- en 333 van de 333 schermbestanden op elk EEN runner; beide
+     jobs liepen tegen hun timeout. Gemeten op het echte TOETSDUUR.json. */
+  const alle = planner.toetsbestanden();
+  const unit = alle.filter((t) => t.endsWith('.test.js'));
+  const e2e = alle.filter((t) => t.endsWith('.e2e.js'));
+  const zoals649 = alle.map((toets, i) => ({ toets,
+    status: toets.endsWith('.e2e.js') || i % 2 === 0 ? 'REPROVE' : 'REUSED' }));
+  const cap = planner.capaciteit(zoals649);
+  assert.equal(cap.e2e.bestanden, e2e.length);
+  assert.ok(cap.e2e.gekozenMs > cap.e2e.scherfMs, 'alle schermbestanden zijn meer dan een kwart');
+  const boek = { bewijzen: { x: {} } };
+  const besluit = planner.modusbesluit({ volledig: true }, { REUSED: 1174, REPROVE: 1429, UNKNOWN: 116 },
+    boek, false, cap);
+  assert.equal(besluit.mode, 'full');
+  assert.equal(besluit.code, 'incrementeel-boven-scherf');
+  assert.match(besluit.reden, /e2e 333\/333|e2e \d+\/\d+/);
+
+  /* Een kleine wijziging blijft incrementeel: dat is waar hergebruik voor is. */
+  const klein = alle.map((toets) => ({ toets,
+    status: toets === unit[0] || toets === e2e[0] ? 'REPROVE' : 'REUSED' }));
+  const kleinCap = planner.capaciteit(klein);
+  assert.equal(kleinCap.unit.bestanden, 1);
+  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: alle.length - 2, REPROVE: 2, UNKNOWN: 0 },
+    boek, false, kleinCap).mode, 'incremental');
+
+  /* De grens is EEN scherf: net erboven is volledig, erop is incrementeel. */
+  const op = { unit: { bestanden: 1, van: 4, gekozenMs: 100, scherfMs: 100 },
+    e2e: { bestanden: 0, van: 4, gekozenMs: 0, scherfMs: 100 } };
+  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: 3, REPROVE: 1, UNKNOWN: 0 }, boek, false, op).mode,
+    'incremental');
+  op.unit.gekozenMs = 101;
+  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: 3, REPROVE: 1, UNKNOWN: 0 }, boek, false, op).code,
+    'incrementeel-boven-scherf');
+});
+
+test('het aantal scherven in de planner is het aantal in ci.yml', () => {
+  const ci = require('fs').readFileSync(require('path').join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  assert.match(ci, new RegExp('Toetsscherf \\$\\{\\{ matrix\\.scherf \\}\\} van ' + planner.SCHERVEN.unit + '\\b'));
+  assert.match(ci, new RegExp('Schermtoetsen deel \\$\\{\\{ matrix\\.deel \\}\\} van ' + planner.SCHERVEN.e2e + '\\b'));
+});

@@ -20,6 +20,8 @@ const semdiff = require('./lib/semdiff');
 const risico = require('./lib/risico');
 const bb = require('./lib/bewijsboek');
 const keuringreden = require('./lib/keuringreden');
+const delen = require('./lib/delen');
+const { prijzen } = require('./lib/duurprijs');
 
 const WORTEL = path.join(__dirname, '..');
 const MAPPEN = snapshotModule.STANDAARDMAPPEN;
@@ -36,7 +38,48 @@ function risicobaan(klasse) {
   return 'light';
 }
 
-function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd) {
+/* HOEVEEL WERK DRAAGT EEN INCREMENTELE RUNNER?
+
+   De incrementele route zet alle unit-bewijzen op EEN runner en alle
+   schermbewijzen op EEN runner. De volledige route verdeelt ze over vier
+   scherven (ci.yml: `Toetsscherf x van 4`, `Schermtoetsen deel x van 4`).
+   Hergebruik is dus alleen winst zolang de selectie niet zwaarder is dan een
+   scherf; daarboven is een runner langzamer dan vier, en zijn timeout is daar
+   niet op gemaakt.
+
+   Gemeten op main na de merge van #649 (run 38718725654): 1174 bewijzen
+   hergebruikt, en toch 1212 unit- en 333 van de 333 schermbestanden op elk een
+   runner. Beide jobs werden afgekapt (50 en 30 minuten), main kreeg geen groene
+   basis en elke volgende PR erft dezelfde berg. Dat is het patroon van #614 op
+   13 oktober met een andere aanleiding; de regel hieronder vangt het ongeacht
+   de aanleiding.
+
+   Het gewicht komt uit TOETSDUUR.json via dezelfde weging als de verdeler
+   (./lib/delen.js en ./lib/duurprijs.js): een ongemeten bestand telt als duur.
+   Teller en noemer gebruiken dezelfde kaart, dus de modus van de meting valt
+   tegen elkaar weg. Dit kiest alleen de route; het verruimt geen timeout en
+   slaat geen bewijs over. */
+const SCHERVEN = { unit: 4, e2e: 4 };
+
+function capaciteit(toetsen) {
+  const uit = {};
+  for (const [soort, staart] of [['unit', '.test.js'], ['e2e', '.e2e.js']]) {
+    const alle = toetsen.filter((t) => t.toets.endsWith(staart));
+    const namen = alle.map((t) => path.basename(t.toets));
+    const w = delen.wegingVoor(namen);
+    const { prijsVoor } = prijzen(w.gewicht, { andere: w.andere });
+    const kost = (naam) => w.gewicht.get(naam) || prijsVoor(naam);
+    const totaal = namen.reduce((a, n) => a + kost(n), 0);
+    const gekozen = alle.filter((t) => t.status !== 'REUSED')
+      .reduce((a, t) => a + kost(path.basename(t.toets)), 0);
+    uit[soort] = { bestanden: alle.filter((t) => t.status !== 'REUSED').length, van: alle.length,
+      gekozenMs: Math.round(gekozen), scherfMs: Math.round(totaal / SCHERVEN[soort]),
+      vertrouwen: w.vertrouwen };
+  }
+  return uit;
+}
+
+function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, cap) {
   if (!impact.volledig) return { mode: 'full', code: 'impact-onvolledig',
     reden: 'de impactgraaf kan niet alle gewijzigde paden begrenzen' };
   if (telling.UNKNOWN === telling.REUSED + telling.REPROVE + telling.UNKNOWN && telling.UNKNOWN > 0) {
@@ -63,6 +106,11 @@ function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd) {
     return { mode: 'full', code: 'geen-geldig-hergebruik',
       reden: 'geen bewijsrecord past nog bij deze invoer en omgeving' };
   }
+  const te = cap ? ['unit', 'e2e'].filter((k) => cap[k] && cap[k].gekozenMs > cap[k].scherfMs) : [];
+  if (te.length) return { mode: 'full', code: 'incrementeel-boven-scherf',
+    reden: te.map((k) => k + ' ' + cap[k].bestanden + '/' + cap[k].van + ' bestanden, ' +
+      Math.round(cap[k].gekozenMs / 1000) + 's tegen ' + Math.round(cap[k].scherfMs / 1000) +
+      's per scherf').join('; ') + ': een runner is dan trager dan de vier scherven' };
   return { mode: 'incremental', code: 'bewijs-hergebruikt',
     reden: telling.REUSED + ' bewijzen blijven inhoudelijk geldig' };
 }
@@ -123,7 +171,7 @@ function plan(opties) {
      bewijzen opnieuw af. */
   const besluit = o.forceFull ? { mode: 'full', code: 'volledige-ijking-afgedwongen',
     reden: 'deze ronde kalibreert het selectieve bewijs tegen de volledige werkelijkheid' }
-    : modusbesluit(impact, telling, boek, bewijsMachineGewijzigd);
+    : modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, o.capaciteit || capaciteit(toetsen));
   const baan = risicobaan(oordeel.klasse);
   /* Welke regels er afgingen, uitgeschreven (ARCHITECTOPDRACHT.md fase 6).
      Dit besluit niets; het maakt het besluit hierboven navolgbaar. */
@@ -251,4 +299,4 @@ if (require.main === module) {
 }
 
 module.exports = { plan, vastleggen, serialiseer, schrijfUitvoer, toetsbestanden,
-  risicobaan, modusbesluit, MAPPEN };
+  risicobaan, modusbesluit, capaciteit, SCHERVEN, MAPPEN };

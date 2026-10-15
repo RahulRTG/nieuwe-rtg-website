@@ -2,9 +2,9 @@
  "soort": "index",
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
-  "op": "2026-10-14",
-  "commit": "b383fc167",
-  "seconden": 14.7,
+  "op": "2026-10-15",
+  "commit": "573614339",
+  "seconden": 4.4,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -538,6 +538,8 @@
     "public/apps/magnaat-voorzijde.js",
     "public/apps/mall-aanvraag-acties.js",
     "public/apps/mall-aanvraag-edge.js",
+    "public/apps/mall-experience-view.js",
+    "public/apps/mall-experience.js",
     "public/apps/media/blad.js",
     "public/apps/media/lijst.js",
     "public/apps/media/samen.js",
@@ -3136,6 +3138,7 @@
     "server/kern/mall/extern.js",
     "server/kern/mall/index.js",
     "server/kern/mall/kaart.js",
+    "server/kern/mall/levende-etalage.js",
     "server/kern/mall/lijsten.js",
     "server/kern/mall/lijstregel.js",
     "server/kern/mall/lijsttonen.js",
@@ -3683,6 +3686,9 @@
     "server/kern/retail/assortiment.js",
     "server/kern/retail/klant.js",
     "server/kern/retail/vloer.js",
+    "server/kern/revenue/catalogus-v1-validatie.js",
+    "server/kern/revenue/catalogus-v1.js",
+    "server/kern/revenue/index.js",
     "server/kern/rijksbieb-data.js",
     "server/kern/rijksbieb.js",
     "server/kern/routedekking.js",
@@ -4502,6 +4508,7 @@
     "server/lib/idemsleutels-lidabonnement.js",
     "server/lib/idemsleutels-loop-fabric.js",
     "server/lib/idemsleutels-magnaatleven.js",
+    "server/lib/idemsleutels-mall-living.js",
     "server/lib/idemsleutels-media.js",
     "server/lib/idemsleutels-move.js",
     "server/lib/idemsleutels-neiging.js",
@@ -4648,6 +4655,7 @@
     "server/lib/mutatiecontracten-machinesleutels.js",
     "server/lib/mutatiecontracten-magnaatleven.js",
     "server/lib/mutatiecontracten-mall-aanvraag.js",
+    "server/lib/mutatiecontracten-mall-living.js",
     "server/lib/mutatiecontracten-move.js",
     "server/lib/mutatiecontracten-muziekfeed.js",
     "server/lib/mutatiecontracten-naargast.js",
@@ -5889,6 +5897,8 @@
     "server/kern/redactie.js",
     "server/kern/reisbieb.js",
     "server/kern/residentie.js",
+    "server/kern/revenue/catalogus-v1.schema.json.js",
+    "server/kern/revenue/catalogus-v1.schema.json/index.js",
     "server/kern/rtfos.js",
     "server/kern/rugdekking.js",
     "server/kern/salon.js",
@@ -6141,6 +6151,9 @@
     },
     {
      "pad": "public/images/first-steps"
+    },
+    {
+     "pad": "public/images/mall"
     },
     {
      "pad": "public/images/music"
@@ -6893,6 +6906,9 @@
      "pad": "server/kern/retail"
     },
     {
+     "pad": "server/kern/revenue"
+    },
+    {
      "pad": "server/kern/rtc"
     },
     {
@@ -7234,18 +7250,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5755,
-  "gelezen": 5440,
+  "bestandenGezien": 5763,
+  "gelezen": 5448,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27515,
-  "bestandenMetUitvoer": 4539,
-  "uitvoerMetNamen": 2065,
+  "symbolen": 27562,
+  "bestandenMetUitvoer": 4545,
+  "uitvoerMetNamen": 2071,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2467,
-  "zonderUitvoer": 901,
-  "requireKanten": 7763
+  "zonderUitvoer": 903,
+  "requireKanten": 7771
  },
  "nietGelezen": [
   {
@@ -23577,6 +23593,7 @@
     "server/functies/voorstel/index.js",
     "server/kern/command/lagen.js",
     "server/kern/command/vermogens.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/kern/workspace-platform.js"
    ]
   },
@@ -51889,6 +51906,7 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/geldregie.js",
+    "server/kern/revenue/catalogus-v1.js",
     "server/routes/member/aitegoed.js"
    ]
   },
@@ -53314,7 +53332,8 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/commercie/tegoed.js",
-    "server/kern/commercie/tegoed/plafond.js"
+    "server/kern/commercie/tegoed/plafond.js",
+    "server/kern/revenue/catalogus-v1.js"
    ]
   },
   {
@@ -102668,6 +102687,81 @@
    ]
   },
   {
+   "bestand": "server/kern/mall/levende-etalage.js",
+   "symbolen": [
+    {
+     "naam": "wereldVoorAanbod",
+     "soort": "functie",
+     "lijn": 13,
+     "geexporteerd": false
+    },
+    {
+     "naam": "wereldVoorApp",
+     "soort": "functie",
+     "lijn": 21,
+     "geexporteerd": false
+    },
+    {
+     "naam": "afdelingVoorAanbod",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": false
+    },
+    {
+     "naam": "mallPrijs",
+     "soort": "functie",
+     "lijn": 37,
+     "geexporteerd": false
+    },
+    {
+     "naam": "softwareRij",
+     "soort": "functie",
+     "lijn": 48,
+     "geexporteerd": true
+    },
+    {
+     "naam": "hardwareRij",
+     "soort": "functie",
+     "lijn": 71,
+     "geexporteerd": true
+    },
+    {
+     "naam": "aanbodRij",
+     "soort": "functie",
+     "lijn": 92,
+     "geexporteerd": true
+    },
+    {
+     "naam": "telMallAfdelingen",
+     "soort": "functie",
+     "lijn": 119,
+     "geexporteerd": false
+    },
+    {
+     "naam": "projecteerLivingMall",
+     "soort": "functie",
+     "lijn": 127,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "MAX_PER_BRON",
+     "VERSIE",
+     "aanbodRij",
+     "hardwareRij",
+     "projecteerLivingMall",
+     "softwareRij"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/routes/member/winkel-bieb.js"
+   ]
+  },
+  {
    "bestand": "server/kern/mall/lijsten.js",
    "symbolen": [
     {
@@ -130165,6 +130259,121 @@
    "gebruiktDoor": [
     "server/server.js"
    ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1-validatie.js",
+   "symbolen": [
+    {
+     "naam": "maakRevenueCatalogusValidator",
+     "soort": "functie",
+     "lijn": 6,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "pijl",
+     "lijn": 14,
+     "geexporteerd": false
+    },
+    {
+     "naam": "isObject",
+     "soort": "pijl",
+     "lijn": 15,
+     "geexporteerd": false
+    },
+    {
+     "naam": "veldenExact",
+     "soort": "pijl",
+     "lijn": 16,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "maakRevenueCatalogusValidator"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/revenue/catalogus-v1.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/catalogus-v1.js",
+   "symbolen": [
+    {
+     "naam": "canoniek",
+     "soort": "functie",
+     "lijn": 35,
+     "geexporteerd": true
+    },
+    {
+     "naam": "diepVast",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": false
+    },
+    {
+     "naam": "prijsProjectie",
+     "soort": "functie",
+     "lijn": 50,
+     "geexporteerd": false
+    },
+    {
+     "naam": "projecteerAiExtraS",
+     "soort": "functie",
+     "lijn": 64,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CAPABILITY_ID",
+     "CATALOG_ID",
+     "CATALOG_VERSION",
+     "CONTRACT_DIGEST",
+     "FEATURE_ID",
+     "FORMULA_ID",
+     "OFFER_ID",
+     "PRODUCT_ID",
+     "SOURCE_REFS",
+     "canoniek",
+     "projecteerAiExtraS",
+     "schema",
+     "valideer"
+    ]
+   },
+   "requires": [
+    "server/functies/register/index.js",
+    "server/kern/commercie/bundelprijs.js",
+    "server/kern/commercie/tegoed/inhoud.js",
+    "server/kern/revenue/catalogus-v1-validatie.js"
+   ],
+   "extern": [
+    "./catalogus-v1.schema.json",
+    "crypto"
+   ],
+   "gebruiktDoor": [
+    "server/kern/revenue/index.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/revenue/index.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "catalogusV1"
+    ]
+   },
+   "requires": [
+    "server/kern/revenue/catalogus-v1.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
   },
   {
    "bestand": "server/kern/rijksbieb-data.js",
@@ -171936,6 +172145,21 @@
    ]
   },
   {
+   "bestand": "server/lib/idemsleutels-mall-living.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "SLEUTELS"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/idemsleutels-recent.js"
+   ]
+  },
+  {
    "bestand": "server/lib/idemsleutels-media.js",
    "symbolen": [],
    "uitvoer": {
@@ -172443,6 +172667,7 @@
     "server/lib/idemsleutels-leerhuis.js",
     "server/lib/idemsleutels-leidingtermijn.js",
     "server/lib/idemsleutels-loop-fabric.js",
+    "server/lib/idemsleutels-mall-living.js",
     "server/lib/idemsleutels-officeformaten.js",
     "server/lib/idemsleutels-reisconcept.js",
     "server/lib/idemsleutels-reisgezelschap.js",
@@ -175350,6 +175575,21 @@
    ]
   },
   {
+   "bestand": "server/lib/mutatiecontracten-mall-living.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CONTRACTEN"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/mutatiecontracten.js"
+   ]
+  },
+  {
    "bestand": "server/lib/mutatiecontracten-move.js",
    "symbolen": [
     {
@@ -176800,6 +177040,7 @@
     "server/lib/mutatiecontracten-lidabonnement.js",
     "server/lib/mutatiecontracten-machinesleutels.js",
     "server/lib/mutatiecontracten-magnaatleven.js",
+    "server/lib/mutatiecontracten-mall-living.js",
     "server/lib/mutatiecontracten-move.js",
     "server/lib/mutatiecontracten-muziekfeed.js",
     "server/lib/mutatiecontracten-naargast.js",
@@ -194676,13 +194917,13 @@
     {
      "naam": "geenGast",
      "soort": "pijl",
-     "lijn": 12,
+     "lijn": 13,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfSleutel",
      "soort": "pijl",
-     "lijn": 100,
+     "lijn": 127,
      "geexporteerd": "onbekend"
     }
    ],
@@ -194690,7 +194931,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/kern/mall/levende-etalage.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/routes/member/winkel.js"
@@ -235206,6 +235449,204 @@
      "naam": "selecteer",
      "soort": "functie",
      "lijn": 6,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "public/apps/mall-experience-view.js",
+   "symbolen": [
+    {
+     "naam": "locale",
+     "soort": "functie",
+     "lijn": 7,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "text",
+     "soort": "functie",
+     "lijn": 11,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "html",
+     "soort": "functie",
+     "lijn": 12,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "money",
+     "soort": "functie",
+     "lijn": 17,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "department",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "create",
+     "soort": "functie",
+     "lijn": 23,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "find",
+     "soort": "functie",
+     "lijn": 25,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "visualClass",
+     "soort": "functie",
+     "lijn": 26,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "productCard",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "renderRail",
+     "soort": "functie",
+     "lijn": 38,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "sourceLabel",
+     "soort": "functie",
+     "lijn": 53,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "select",
+     "soort": "functie",
+     "lijn": 57,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "renderCompare",
+     "soort": "functie",
+     "lijn": 76,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "openCompare",
+     "soort": "functie",
+     "lijn": 86,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "closeCompare",
+     "soort": "functie",
+     "lijn": 90,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "loadReviews",
+     "soort": "functie",
+     "lijn": 95,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "renderPartners",
+     "soort": "functie",
+     "lijn": 110,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "updateDots",
+     "soort": "functie",
+     "lijn": 120,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "public/apps/mall-experience.js",
+   "symbolen": [
+    {
+     "naam": "token",
+     "soort": "functie",
+     "lijn": 21,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "locale",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "post",
+     "soort": "functie",
+     "lijn": 26,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "announce",
+     "soort": "functie",
+     "lijn": 33,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "primary",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "saveCurrent",
+     "soort": "functie",
+     "lijn": 63,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "addCompare",
+     "soort": "functie",
+     "lijn": 70,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "setDepartment",
+     "soort": "functie",
+     "lijn": 77,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "openComplete",
+     "soort": "functie",
+     "lijn": 82,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "mountEdge",
+     "soort": "functie",
+     "lijn": 87,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "bind",
+     "soort": "functie",
+     "lijn": 95,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "start",
+     "soort": "functie",
+     "lijn": 111,
      "geexporteerd": "onbekend"
     }
    ],

@@ -42,7 +42,7 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2790,
+    "kernelFiles": 2794,
     "kernelGroups": [
       {
         "group": "_root",
@@ -474,7 +474,7 @@
       },
       {
         "group": "mall",
-        "files": 32
+        "files": 33
       },
       {
         "group": "markt",
@@ -627,6 +627,10 @@
       {
         "group": "retail",
         "files": 4
+      },
+      {
+        "group": "revenue",
+        "files": 3
       },
       {
         "group": "rtc",
@@ -2120,6 +2124,7 @@
       "server/kern/retail/assortiment.js",
       "server/kern/retail/klant.js",
       "server/kern/retail/vloer.js",
+      "server/kern/revenue/catalogus-v1-validatie.js",
       "server/kern/rijksbieb.js",
       "server/kern/rtc/ijs.js",
       "server/kern/rtc/poort.js",
@@ -5435,6 +5440,8 @@
       "server/kern/rendezvous.js",
       "server/kern/residentie/rahul.js",
       "server/kern/residentie/spel.js",
+      "server/kern/revenue/catalogus-v1-validatie.js",
+      "server/kern/revenue/catalogus-v1.js",
       "server/kern/rtfkantoor-advies.js",
       "server/kern/rtfkantoor.js",
       "server/kern/rtfos/beleid.js",
@@ -7907,7 +7914,7 @@
         "mutationRoutes": 471,
         "declaredMutationSemantics": 171,
         "sourceFileCount": 42,
-        "kernelDependencyCount": 144,
+        "kernelDependencyCount": 145,
         "screenCount": 26,
         "sourceFiles": [
           "server/routes/borden.js",
@@ -7954,7 +7961,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 120,
+        "kernelDependenciesOmitted": 121,
         "screens": [
           "public/apps/app.html",
           "public/apps/attenties.html",
@@ -10542,14 +10549,15 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 1,
+        "kernelDependencyCount": 2,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
-          "server/kern/agentteken.js"
+          "server/kern/agentteken.js",
+          "server/kern/mall/levende-etalage.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
@@ -10560,6 +10568,7 @@
           "decision",
           "booking",
           "transaction",
+          "version",
           "event",
           "ai"
         ]
@@ -17851,7 +17860,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 1,
+        "kernelDependencyCount": 2,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -17859,7 +17868,8 @@
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
-          "server/kern/agentteken.js"
+          "server/kern/agentteken.js",
+          "server/kern/mall/levende-etalage.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [],
@@ -17869,6 +17879,7 @@
           "booking",
           "transaction",
           "failure",
+          "version",
           "event",
           "ai"
         ]
@@ -19757,14 +19768,15 @@
         "mutationRoutes": 9,
         "declaredMutationSemantics": 7,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 1,
+        "kernelDependencyCount": 2,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/winkel.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
-          "server/kern/agentteken.js"
+          "server/kern/agentteken.js",
+          "server/kern/mall/levende-etalage.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
@@ -19776,6 +19788,7 @@
           "decision",
           "booking",
           "transaction",
+          "version",
           "event",
           "ai"
         ]
@@ -22952,14 +22965,16 @@
         "mutationRoutes": 46,
         "declaredMutationSemantics": 25,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 0,
+        "kernelDependencyCount": 1,
         "screenCount": 4,
         "sourceFiles": [
           "server/routes/member/mall-vindlaag.js",
           "server/routes/member/winkel-bieb.js"
         ],
         "sourceFilesOmitted": 0,
-        "kernelDependencies": [],
+        "kernelDependencies": [
+          "server/kern/mall/levende-etalage.js"
+        ],
         "kernelDependenciesOmitted": 0,
         "screens": [
           "public/apps/leverancier-aanvragen.html",
@@ -22970,6 +22985,8 @@
         "screensOmitted": 0,
         "signals": [
           "booking",
+          "transaction",
+          "version",
           "ai"
         ]
       },
@@ -26949,7 +26966,7 @@
         "mutationRoutes": 14,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
-        "kernelDependencyCount": 133,
+        "kernelDependencyCount": 134,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/ik-workspace-rechten.js",
@@ -26984,7 +27001,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 109,
+        "kernelDependenciesOmitted": 110,
         "screens": [
           "public/apps/geld.html",
           "public/apps/ik.html"
@@ -27181,7 +27198,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2653,
+        "kernelDependencyCount": 2654,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -27215,7 +27232,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2629,
+        "kernelDependenciesOmitted": 2630,
         "screens": [
           "public/apps/app.html"
         ],
@@ -28273,7 +28290,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 8,
+        "kernelDependencyCount": 9,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/boeken.js",
@@ -28289,6 +28306,7 @@
           "server/kern/fiscaal/wereld.js",
           "server/kern/internationalehandel.js",
           "server/kern/kvkvoorcontrole.js",
+          "server/kern/mall/levende-etalage.js",
           "server/kern/pasladder.js"
         ],
         "kernelDependenciesOmitted": 0,
@@ -28737,7 +28755,7 @@
         "mutationRoutes": 8,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
-        "kernelDependencyCount": 2,
+        "kernelDependencyCount": 3,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/handel/uitjes.js",
@@ -28748,7 +28766,8 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/agentteken.js",
-          "server/kern/lidacties/ritreferentie.js"
+          "server/kern/lidacties/ritreferentie.js",
+          "server/kern/mall/levende-etalage.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
@@ -28761,6 +28780,7 @@
           "feedback",
           "booking",
           "transaction",
+          "version",
           "event",
           "ai"
         ]
@@ -28971,13 +28991,15 @@
         "mutationRoutes": 2,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 0,
+        "kernelDependencyCount": 1,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/winkel-bieb.js"
         ],
         "sourceFilesOmitted": 0,
-        "kernelDependencies": [],
+        "kernelDependencies": [
+          "server/kern/mall/levende-etalage.js"
+        ],
         "kernelDependenciesOmitted": 0,
         "screens": [
           "public/apps/foodcourt.html",
@@ -28986,6 +29008,8 @@
         "screensOmitted": 0,
         "signals": [
           "booking",
+          "transaction",
+          "version",
           "ai"
         ]
       },

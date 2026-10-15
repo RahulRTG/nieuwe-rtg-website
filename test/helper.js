@@ -1730,9 +1730,16 @@ async function edgeActies(page) {
     else {
       const bar = page.locator('.rtg-adaptive-bar');
       const context = bar.locator('[data-rtg-adaptive-action="context"]');
-      // Quiet Presence houdt alleen de centrale 44px-bediening zichtbaar. Een
-      // echte aanwijzer wekt eerst het oppervlak en kiest daarna de context.
-      if (!await context.isVisible()) await bar.hover();
+      // Quiet Presence houdt alleen de centrale 44px-bediening zichtbaar. De
+      // altijd bereikbare Rahul-knop krijgt eerst toetsenbordfocus; focusin
+      // activeert het bestaande oppervlak en houdt de rusttimer tegen totdat
+      // de contextknop zelf focus heeft. Alleen hover gebruiken is hier een
+      // wedloop: de muis kan tijdens het verbreden kort buiten de balk vallen.
+      if (!await context.isVisible()) {
+        await bar.locator('[data-rtg-adaptive-action="ai"]').focus();
+        await context.waitFor({ state: 'visible' });
+      }
+      await context.focus();
       await context.click();
     }
   }

@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-14",
-    "commit": "85f7e3bc6"
+    "op": "2026-10-15",
+    "commit": "017122360"
   },
   "bronnen": {
     "schermroutes": {
@@ -3535,10 +3535,11 @@
         "/api/commerce"
       ],
       "zonderServer": false,
-      "inkomend": 5,
+      "inkomend": 6,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
+        "public/apps/mall.html",
         "public/apps/rtg.html",
         "public/apps/winkel-voorzijde.js",
         "public/shared/overdracht.js",
@@ -9549,7 +9550,7 @@
       "bestand": "public/apps/mall.html",
       "url": "/apps/mall.html",
       "titel": "RTG Mall",
-      "h1": "Vinden wat bij u past. Zonder eindeloos zoeken.",
+      "h1": "Niet alleen kopen. Uw wereld uitbreiden.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [

@@ -79,3 +79,8 @@ test('de schermkeuring erkent de ene native canvas-toolbar als de V4-kop', () =>
   assert.match(audit, /body\.dataset\.rtgV4Kind === 'canvas'/);
   assert.match(runtime, /body\.dataset\.rtgV4Kind !== 'canvas' \|\| !canvasToolbar/);
 });
+
+test('de schermkeuring verwacht voor V4 dezelfde ivoren grond in native productschillen', () => {
+  const audit = read('scripts/desktop-audit.js');
+  assert.match(audit, /region\.selector === '\.rtg-adaptive-bar' \? 'rgba\(10,10,9,\.9\)' : v4Canvas/);
+});

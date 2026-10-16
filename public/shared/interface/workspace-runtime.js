@@ -16,9 +16,7 @@
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });
     var contextEngine = w.RTGWorkspaceContext();
     var navigation = w.RTGWorkspaceNavigation({ open: o.open });
-    /* Zonder eigen antwoordfunctie vraagt de runtime de SERVER welke permissies
-       gelden (kern/workspace-rechten.js). Tot dat antwoord er is, is alles dicht;
-       daarna tekent de aanroeper opnieuw via `onRechten`. */
+    /* Zonder eigen antwoordfunctie vraagt de runtime de server om rechten. */
     var rechten = null, serverRecht = function (p) { return !!rechten && rechten[p] === true; };
     var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission || serverRecht, tenantPolicy: o.tenantPolicy });
     if (!o.permission && identity.authenticated()) Promise.resolve().then(function () {
@@ -66,7 +64,7 @@
     }
     function contextVoor(mid, status) {
       var vak = state.module(mid), ctx = { id: mid, manifest: defs[mid].manifest, services: o.services || {},
-        context: contextEngine.get,
+        context: contextEngine.get, session: Object.freeze ? Object.freeze({ unchanged: identity.sameSession }) : { unchanged: identity.sameSession },
         state: { get: vak.get, set: vak.set, snapshot: function () { return state.view(mid); } }, request: aanvraag,
         open: function (url, title) { return navigation.open(url, title, mid); },
         permission: function (p) { return policy.allowed(p, mid); },

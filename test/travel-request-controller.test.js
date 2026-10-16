@@ -120,3 +120,20 @@ test('een gewijzigde sessie blokkeert review of submit vóór ieder bronverzoek'
   assert.equal((await controller.submit(INVOER)).reason, 'session');
   assert.equal(calls, 0);
 });
+
+test('een sessiewissel tijdens de broncontrole blokkeert de mutatie', async () => {
+  let geldig = true, sends = 0;
+  const { controller, gebeurtenissen } = gereed(async route => {
+    if (route.endsWith('/mijn')) { geldig = false; return { aanvragen: [
+      { ref: 'verborgen-andere-sessie', tripId: REIS.id, status: 'aangevraagd' }
+    ] }; }
+    sends++; return {};
+  }, () => geldig);
+  const result = await controller.submit(INVOER);
+  assert.equal(result.type, 'ignored');
+  assert.equal(result.reason, 'session');
+  assert.equal(result.application, undefined, 'brondata uit de oude sessie bleef afgeschermd');
+  assert.equal(sends, 0, 'de nieuwe sessie ontving geen mutatie uit de oude werkruimte');
+  assert.equal(controller.state().phase, 'review');
+  assert.ok(gebeurtenissen.some(x => x[0] === 'session-changed'));
+});

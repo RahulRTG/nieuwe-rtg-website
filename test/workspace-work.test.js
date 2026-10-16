@@ -82,6 +82,47 @@ test('een accountwissel tijdens de WerkOS-bootstrap lekt niets en start geen wer
   assert.deepEqual(c.published, []);
 });
 
+test('een expliciete Regiekeuze wordt met de afgeschermde WorkOS-sessie read-only gebonden', async () => {
+  const calls = [], secret = 'tijdelijke-werkos-sessie';
+  const c = context(async (url, body) => {
+    calls.push({ url, body });
+    if (url === '/api/bedrijf/mijn') return { werkruimtes: [{ werkruimte: 'W123', naam: 'Atlas BV', lidToken: secret }] };
+    if (url === '/api/bedrijf/start') return { werkruimte: { code: 'W123', naam: 'Atlas BV' }, blokken: { waarschuwingen: [] } };
+    return { ok: true, regiebeeld: { readOnly: true, source: { domain: 'service', id: 'SUP-1' },
+      context: { status: 'bekend', readOnly: true, grantsAuthority: false,
+        context: { workspace: { id: 'W123' }, tenant: { id: 'ORG-A' }, legalEntity: null } } } };
+  });
+  const instance = definition().def.create(c.ctx);
+  assert.equal(await instance.actions['work.connect'].run({}), true);
+  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { domain: 'service', id: 'SUP-1' } }), true);
+  assert.equal(JSON.stringify(calls[2]), JSON.stringify({ url: '/api/bedrijf/zaakregie',
+    body: { werkruimte: 'W123', domain: 'service', id: 'SUP-1', lidToken: secret } }));
+  const event = c.published.at(-1);
+  assert.equal(event.type, 'work.coordination.bound');
+  assert.equal(event.payload.workspace.id, 'W123');
+  assert.equal(event.payload.tenant.id, 'ORG-A');
+  assert.equal(event.payload.readOnly, true);
+  assert.equal(event.payload.grantsAuthority, false);
+  assert.doesNotMatch(JSON.stringify(c.published), new RegExp(secret));
+  assert.doesNotMatch(JSON.stringify(c.published), /lidToken|authorization|sessie/i);
+});
+
+test('een afwijkende of ingetrokken zaakprojectie komt fail-closed terug in Regie', async () => {
+  const c = context(async (url) => {
+    if (url === '/api/bedrijf/mijn') return { werkruimtes: [{ werkruimte: 'W123', naam: 'Atlas BV', lidToken: 'verborgen' }] };
+    if (url === '/api/bedrijf/start') return { werkruimte: { code: 'W123' }, blokken: { waarschuwingen: [] } };
+    return { ok: true, regiebeeld: { readOnly: true, source: { domain: 'service', id: 'SUP-ANDER' },
+      context: { status: 'bekend', readOnly: true, grantsAuthority: false,
+        context: { workspace: { id: 'W999' }, tenant: { id: 'ORG-B' } } } } };
+  });
+  const instance = definition().def.create(c.ctx); await instance.actions['work.connect'].run({});
+  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { domain: 'service', id: 'SUP-1' } }), false);
+  const event = c.published.at(-1);
+  assert.equal(JSON.stringify(event), JSON.stringify({ type: 'work.coordination.unavailable', payload: { schemaVersion: 1,
+    case: { domain: 'service', id: 'SUP-1' }, reason: 'projection-mismatch' } }));
+  assert.doesNotMatch(JSON.stringify(event), /W999|ORG-B|SUP-ANDER|verborgen/);
+});
+
 test('WorkOS-bestanden laden in runtimevolgorde, zijn offline beschikbaar en gebruiken Heritage-geometrie', () => {
   const html = read('public/apps/app.html'), sw = read('public/sw.js'), css = read('public/shared/interface/workspace-components.css');
   const view = html.indexOf('/modules/work-view.js'), edge = html.indexOf('/modules/work-edge.js');

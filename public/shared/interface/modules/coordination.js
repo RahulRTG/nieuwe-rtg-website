@@ -10,18 +10,24 @@
     permissions: ['coordination.read'], actions: ['coordination.open-source', 'coordination.ask-human', 'coordination.refresh'],
     assistant: { actions: [{ id: 'coordination.open-source', kind: 'open' },
       { id: 'coordination.refresh', kind: 'search' }, { id: 'coordination.ask-human', kind: 'propose' }] },
-    events: { publishes: ['coordination.loaded', 'coordination.selected'], subscribes: [] },
+    events: { publishes: ['coordination.loaded', 'coordination.selected'],
+      subscribes: ['work.coordination.bound', 'work.coordination.unavailable'] },
     state: { persistence: 'none', schema: 'coordination.state.v1' },
     performance: { peekBudgetKb: 22, panelBudgetKb: 75 }
   }, function (ctx) {
     var root, state = 'panel', active = false, loading = false, loaded = false;
     var items = [], selectedId = '', error = null;
+    var binding = { phase: 'idle' };
     var stop = typeof AbortController === 'function' ? new AbortController() : null;
     function selected() {
       return items.find(function (x) { return x.source && x.source.id === selectedId; }) || items[0] || null;
     }
     function payload() {
       var item = selected(); return { id: item && item.source && item.source.id || '', kind: item && item.kind || '' };
+    }
+    function selectionPayload() {
+      var item = selected(), source = item && item.source || {};
+      return { id: source.id || '', domain: source.domain || '' };
     }
     var edge = w.RTGCoordinationEdge({ selected: selected, payload: payload,
       run: function (id, data) { return ctx.actions.run(id, data); } });
@@ -37,7 +43,8 @@
     }
     function draw() {
       if (!root) return;
-      w.RTGCoordinationView(root, { items: items, selectedId: selectedId, state: state, loading: loading, error: error });
+      w.RTGCoordinationView(root, { items: items, selectedId: selectedId, state: state,
+        loading: loading, error: error, binding: binding });
       edge.sync(active, state);
     }
     function serviceViews() {
@@ -57,7 +64,7 @@
     }
     function load(force) {
       if (loading || (loaded && !force)) return Promise.resolve(items);
-      loading = true; error = null; draw(); ctx.setStatus('laden', 'busy');
+      loading = true; error = null; binding = { phase: 'idle' }; draw(); ctx.setStatus('laden', 'busy');
       return Promise.all([serviceViews(), bureauViews()]).then(function (lists) {
         if (!root) return [];
         items = order(lists[0].concat(lists[1])); loaded = true;
@@ -95,11 +102,25 @@
         if (!b || !root.contains(b)) return false;
         var action = b.dataset.rtgCoordinationAction, id = b.dataset.rtgCoordinationId;
         if (action === 'select') {
-          selectedId = id; ctx.events.publish('coordination.selected', payload()); draw(); return true;
+          selectedId = id; binding = { phase: 'checking', case: selectionPayload() };
+          ctx.events.publish('coordination.selected', selectionPayload()); draw(); return true;
         }
         var map = { open: 'coordination.open-source', human: 'coordination.ask-human', refresh: 'coordination.refresh' };
         if (map[action]) ctx.actions.run(map[action], payload()).catch(function (e) { error = e; draw(); });
         return !!map[action];
+      },
+      onEvent: function (event) {
+        var p = event && event.payload || {}, c = p.case || {}, chosen = selectionPayload();
+        if (!chosen.id || c.id !== chosen.id || c.domain !== chosen.domain) return false;
+        if (event.event === 'work.coordination.bound' && p.readOnly === true && p.grantsAuthority === false &&
+            p.workspace && p.workspace.id && p.tenant && p.tenant.id) {
+          binding = { phase: 'bound', workspace: { id: String(p.workspace.id) },
+            tenant: { id: String(p.tenant.id) }, legalEntity: p.legalEntity && p.legalEntity.id
+              ? { id: String(p.legalEntity.id) } : null, readOnly: true, grantsAuthority: false };
+        } else if (event.event === 'work.coordination.unavailable') {
+          binding = { phase: 'unavailable', reason: String(p.reason || 'context-unavailable') };
+        } else return false;
+        draw(); return true;
       },
       destroy: function () { edge.clear(); if (stop) stop.abort(); root = null; items = []; }
     };

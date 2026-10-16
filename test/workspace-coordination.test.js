@@ -22,11 +22,14 @@ test('Universele Regie is een Living Module boven op bestaande brondomeinen', ()
   assert.deepEqual(Array.from(manifest.assistant.actions, x => [x.id, x.kind]),
     [['coordination.open-source', 'open'], ['coordination.refresh', 'search'], ['coordination.ask-human', 'propose']]);
   assert.equal(manifest.state.persistence, 'none', 'zaakdata krijgt geen tweede workspace-opslag');
+  assert.deepEqual(Array.from(manifest.events.subscribes),
+    ['work.coordination.bound', 'work.coordination.unavailable']);
   const source = read('public/shared/interface/modules/coordination.js');
   assert.doesNotMatch(source, /\bfetch\s*\(|localStorage|sessionStorage/);
   assert.match(source, /ctx\.request\('\/api\/service\/zaak'/);
   assert.match(source, /ctx\.request\('\/api\/member\/bureau\/zaken'/);
   assert.match(source, /ctx\.request\('\/api\/service\/mens'/);
+  assert.doesNotMatch(source, /lidToken|localStorage|sessionStorage/);
 });
 
 test('de Adaptieve Edge krijgt alleen gedeclareerde acties van de geselecteerde bronzaak', async () => {
@@ -51,6 +54,43 @@ test('de Adaptieve Edge krijgt alleen gedeclareerde acties van de geselecteerde 
   edge.sync(false, 'panel'); assert.equal(cleared.at(-1), 'workspace.coordination');
 });
 
+test('Regie vraagt alleen na een expliciete zaakselectie om een getypeerde WorkOS-binding', async () => {
+  const models = [], published = [];
+  const document = { createElement() { return { className: '', appendChild() {}, contains() { return true; } }; } };
+  const window = { RTGCoordinationView(root, model) { models.push(model); },
+    RTGCoordinationEdge() { return { sync() {}, clear() {} }; } };
+  const sandbox = { window, document, console, AbortController, Promise, Object, Array, String, Number, Error, TypeError };
+  vm.createContext(sandbox); vm.runInContext(read('public/shared/interface/module-sdk.js'), sandbox);
+  vm.runInContext(read('public/shared/interface/modules/coordination.js'), sandbox);
+  const def = window.RTGModuleSDK.catalog().find(x => x.manifest.id === 'coordination');
+  const ctx = { request(url) {
+    if (url === '/api/service/mijn') return Promise.resolve({ zaken: [{ id: 'SUP-1', stand: 'nieuw' }] });
+    if (url === '/api/service/zaak') return Promise.resolve({ zaak: { regiebeeld: { readOnly: true,
+      ownsSourceData: false, kind: 'service', title: 'Transfer', source: { domain: 'service', id: 'SUP-1' },
+      phase: { id: 'request', terminal: false }, responsibilities: [], relations: [], actions: [], attention: {} } } });
+    return Promise.resolve({ regiebeelden: [] });
+  }, setStatus() {}, events: { publish(type, payload) { published.push({ type, payload }); } },
+  actions: { run() { return Promise.resolve(); } }, open() { return true; } };
+  const instance = def.create(ctx); instance.mount({ appendChild() {} }); instance.render('panel', { active: true });
+  await new Promise(resolve => setImmediate(resolve));
+  const button = { dataset: { rtgCoordinationAction: 'select', rtgCoordinationId: 'SUP-1' },
+    closest() { return this; } };
+  assert.equal(instance.handle(button), true);
+  assert.equal(JSON.stringify(published.at(-1)), JSON.stringify({ type: 'coordination.selected',
+    payload: { id: 'SUP-1', domain: 'service' } }));
+  assert.equal(models.at(-1).binding.phase, 'checking');
+
+  assert.equal(instance.onEvent({ event: 'work.coordination.bound', payload: { case: { domain: 'service', id: 'SUP-1' },
+    workspace: { id: 'W123' }, tenant: { id: 'ORG-A' }, readOnly: true, grantsAuthority: false } }), true);
+  assert.equal(models.at(-1).binding.phase, 'bound');
+  assert.equal(models.at(-1).binding.workspace.id, 'W123');
+  assert.equal(instance.onEvent({ event: 'work.coordination.unavailable', payload: {
+    case: { domain: 'service', id: 'SUP-1' }, reason: 'session-changed' } }), true);
+  assert.equal(models.at(-1).binding.phase, 'unavailable');
+  assert.equal(models.at(-1).binding.reason, 'session-changed');
+  assert.doesNotMatch(JSON.stringify(models), /lidToken|authorization|sessie/i);
+});
+
 test('de modulebestanden staan in runtimevolgorde en gebruiken de gedeelde Heritage-laag', () => {
   const html = read('public/apps/app.html'), css = read('public/shared/interface/workspace-components.css');
   const view = html.indexOf('/modules/coordination-view.js');
@@ -59,5 +99,6 @@ test('de modulebestanden staan in runtimevolgorde en gebruiken de gedeelde Herit
   assert.ok(view > 0 && edge > view && module > edge);
   assert.match(css, /\.rtg-module-coordination/);
   assert.match(css, /min-height: 44px/);
+  assert.match(read('public/shared/interface/modules/coordination-view.js'), /Deze zaak kan niet veilig/);
   assert.doesNotMatch(css, /border-radius:\s*[1-9]/, 'de nieuwe module introduceert geen afwijkende geometrie');
 });

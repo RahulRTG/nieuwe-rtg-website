@@ -6,5 +6,6 @@ module.exports = {
   catalogusV1: require('./catalogus-v1'),
   entitlementProjectieV1: require('./entitlement-projectie-v1'),
   entitlementOverzichtV1: require('./entitlement-overzicht-v1'),
-  entitlementEligibilityV1: require('./entitlement-eligibility-v1')
+  entitlementEligibilityV1: require('./entitlement-eligibility-v1'),
+  commercialBindingV1: require('./commercial-binding-v1')
 };

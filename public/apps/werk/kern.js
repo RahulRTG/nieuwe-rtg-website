@@ -56,8 +56,13 @@
     api: function (pad, body) {
       var lijf = Object.assign({}, body || {}, sessie || {});
       var headers = { 'Content-Type': 'application/json' };
+      /* De meeste bestaande handelingen dragen een pad binnen /api/bedrijf.
+         Een volledige interne API-route mag hier ook doorheen: daarmee kan een
+         veiligheidskritieke handeling (zoals taak aanmaken) haar echte route
+         letterlijk declareren en kan SCHERMROUTES die koppeling bewijzen. */
+      var doel = String(pad || '').indexOf('/api/') === 0 ? String(pad) : '/api/bedrijf' + String(pad || '');
       try { var bearer = localStorage.getItem('rtg_member_token'); if (bearer) headers.Authorization = 'Bearer ' + bearer; } catch (_) {}
-      return fetch('/api/bedrijf' + pad, { method: 'POST',
+      return fetch(doel, { method: 'POST',
         headers: headers, body: JSON.stringify(lijf) })
         .then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (b) {

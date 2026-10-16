@@ -153,10 +153,10 @@ bewezen wordt beschreven.
 | werkstroom | actuele bouwstand | afhankelijkheid | kwalificatiestand |
 |---|---|---|---|
 | A — Experience | Edge Quiet Presence is geïntegreerd op `main`; overige schermmigratie loopt | Heritage en bestaande schermcontracten | `EINDKWALIFICATIE_NODIG` |
-| B — Spatial | TravelOS ondersteunt Flow ↔ Spatial, native aanvraag, veilige hervatting, accountisolatie, Edge-contextacties, antwoordverliesherstel en menselijke bevestigingsstatus. WorkOS is als tiende Living Module aangesloten: pas na expliciete activatie leest hij de bestaande `/api/bedrijf`-bronnen, bewaart hij geen lidtoken en kan hij veilig naar dezelfde werkruimte in de volledige Flow overdragen | TravelOS- en WorkOS-bronroutes, Workspace Runtime, bestaande account- en lidmaatschapssessies | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
-| C — Universal Concierge | Zaakregiebeeld en RTG Regie projecteren bestaande Concierge Case/Lus en Servicezaak. De bestaande Bedrijfspoort bindt nu een eigen zaak read-only aan exact dezelfde RTG-account, actieve WorkOS-werkruimte, tenant en eventuele concernentiteit; vreemde zaken, tenants en ingetrokken lidmaatschappen sluiten zonder bronlek | bestaande concierge-, service-, WorkOS-, tenant-, organisatie- en bevoegdheidsbronnen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
-| D — Revenue | naast de catalogus- en betaalbewijsgrenzen bestaan nu een read-only entitlementprojectie, accountoverzicht en eligibility-contract voor B2C, B2B en B2B2C. Alleen een exact gebonden, geboekte, niet teruggedraaide en transactiespecifiek gereconcilieerde betaling kan `ELIGIBLE` worden; de huidige ruwe betaalbronnen missen nog de vereiste product-, account-, tenant- en reconciliatiereferenties, dus publieke aankoop en toekenning blijven dicht | financiële veiligheid, exacte adaptercontracten, Payment Truth, RTG Pay en expliciete eigenaarspoorten | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
-| E — Rahul | accountgebonden tabgeschiedenis en goedkeuringscontext sluiten fail-closed. Rahul leest van Workspace uitsluitend id, presentatiemodus en de door dezelfde actuele Edge-context bevestigde module; modules kunnen alleen expliciet veilige `read`, `search`, `open` en `propose`-acties declareren, zonder payload, route of uitvoeringsrecht | bestaande Rahul-, Fluister-, Stuur-, modulemanifest-, sessie- en Trusted Execution-grenzen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| B — Spatial | TravelOS ondersteunt Flow ↔ Spatial, native aanvraag, veilige hervatting, accountisolatie, Edge-contextacties, antwoordverliesherstel en menselijke bevestigingsstatus. WorkOS is als tiende Living Module aangesloten en heeft nu dezelfde echte maakroute als Flow, met actor-gebonden idempotentie. De voltooiingsproef sluit voor aanmaken, rollen, taken, nette herstart, tweede sessie, dubbeltik, afgebroken antwoord en `SIGKILL` zonder tokenopslag, verlies of verdubbeling | TravelOS- en WorkOS-bronroutes, Workspace Runtime, bestaande account- en lidmaatschapssessies | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| C — Universal Concierge | Zaakregiebeeld en RTG Regie projecteren bestaande Concierge Case/Lus en Servicezaak. Alleen een expliciet geselecteerde bronzaak wordt via de afgeschermde WorkOS-sessie read-only aan exact hetzelfde account, dezelfde werkruimte en tenant gebonden. De gedeelde werkruimtestaat ontvangt uitsluitend gesaneerde referenties; vreemde zaken, tenants, sessies en ingetrokken lidmaatschappen sluiten zonder bronlek | bestaande concierge-, service-, WorkOS-, tenant-, organisatie- en bevoegdheidsbronnen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| D — Revenue | naast de catalogus- en betaalbewijsgrenzen bestaan nu een read-only entitlementprojectie, accountoverzicht, eligibility-contract en immutable commercieel bindingscontract voor B2C, B2B en B2B2C. De binding koppelt product/offer/version, account/tenant, bedrag/valuta, Payment Truth, ledger en provenance exact; bestaande ongebonden records blijven dicht. Publieke aankoop en toekenning blijven geblokkeerd totdat deze binding duurzaam in de bestaande betaalbronnen wordt opgeslagen en transactiespecifieke reconciliation bestaat | financiële veiligheid, exacte adaptercontracten, Payment Truth, RTG Pay en expliciete eigenaarspoorten | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
+| E — Rahul | accountgebonden tabgeschiedenis en goedkeuringscontext sluiten fail-closed. Rahul leest van Workspace uitsluitend id, presentatiemodus en de door dezelfde actuele Edge-context bevestigde module. De nieuwe read-only functiegids gebruikt direct het canonieke wereldregister, opent alleen exacte zichtbare functies via de bestaande app-/Command-route en toont keuzes bij ambiguïteit. Ontbrekende sessie, actuele context of expliciet zichtbaarheidsfilter sluit de gids; er is geen tweede catalogus, router, uitvoerder of opslag | bestaande Rahul-, Fluister-, Stuur-, modulemanifest-, sessie- en Trusted Execution-grenzen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | F — Platform | het canonieke wereldregister ontsluit 116 UX-functies; tien Living Modules volgen hetzelfde runtimecontract. WorkOS, RTG Regie en de Rahul-projectie gebruiken dezelfde offline shell en bestaande Command-/wereldnavigatie, zonder tweede app-catalogus | de zes productstromen, bestaande routekaart, service workers en registergeneratoren | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | Q — eindkwalificatie | start nadat de overeengekomen scope in de kandidaat is geïntegreerd | A t/m F | `GEBLOKKEERD` door nog lopende bouw |
 
@@ -183,6 +183,15 @@ niet-uitvoerbare acties. Een tweede tenant, vreemde zaak, losgemaakte
 tenantbinding, onbekende concernentiteit of ingetrokken lidmaatschap levert geen
 gedeeltelijke context op.
 
+WorkOS gebruikt voor taakaanmaak nu één routecontract in Flow en Spatial. Een
+optionele herhaalsleutel wordt uitsluitend als actor-gebonden hash bewaard; de
+algemene idempotentiepoort onderscheidt ook de bestaande WorkOS-bodybearers per
+werkruimte en medewerker. Daardoor kan een collega achter hetzelfde IP nooit
+het bewaarde antwoord van een ander ontvangen. Zonder sleutel blijft het oude
+gedrag ongewijzigd. De lokale voltooiingsproef heeft de echte opslag door een
+nette herstart en een harde procescrash heen gelezen en vond iedere taak exact
+eenmaal. Dit is gericht ontwikkelbewijs en nog geen platformbrede kwalificatie.
+
 De mapping van D heeft aangetoond dat `server/kern/revenue/catalogus-v1.js` al
 de gesloten catalogusbron is en dat RTG Pay, Payment Truth en Economic Runtime
 de financiële waarheid dragen. De bestaande AI-creditroute mag nog niet als
@@ -200,12 +209,29 @@ reconciliationbinding en iedere refund, reversal of onzekere uitkomst. Deze
 grens houdt alleen de afhankelijke commerciële keten tegen; de onafhankelijke
 bouwstromen gaan door.
 
+Het commerciële bindingscontract maakt het ontbrekende stuk nu expliciet en
+machineleesbaar zonder zelf geld of rechten te muteren. Het contract is
+immutable, versieerbaar en scoped op account of tenant. De bestaande ruwe
+Payment Truth- en RTG Pay-records worden bewust niet opgewaardeerd: zolang zij
+de binding niet duurzaam dragen en dezelfde transactiespecifieke
+reconciliation niet bevestigen, blijft `eligibilityReady` onwaar. De keuze waar
+deze binding duurzaam gaat wonen en welke bestaande bron de reconciliation
+autoritatief levert, blijft een eigenaarspoort vóór de afhankelijke koopketen.
+
 De mapping van E gebruikt geen tweede agent of intent-uitvoerder. De Workspace
 Runtime projecteert alleen een door de actieve module expliciet vrijgegeven
 assistentmanifest. Rahul krijgt daarvan uitsluitend actie-id en soort. Hij
 krijgt geen payload, endpoint, formulierinhoud, werkruimtelayout, concept,
 toegangstoken of mutatiefunctie. De bestaande Action Broker, serverautorisatie,
 bevestiging en Trusted Execution blijven de enige uitvoeringstrechter.
+
+Voor vinden en openen gebruikt Rahul dezelfde gegenereerde wereldcatalogus als
+de gewone app. De gids is alleen een read-only resolver: hij kan geen vrije URL,
+payload of capability uitvoeren en bewaart niets. Exacte zichtbare treffers
+gaan via de bestaande `openItem`/`openMap`-route; ambiguïteit wordt als keuze
+teruggegeven. Sessiemismatch, verouderde accountcontext of het ontbreken van de
+zichtbaarheidsfunctie sluit de resolver. Zo worden de bestaande functies beter
+bedienbaar zonder een tweede intentrouter of bevoegdheidsbron te bouwen.
 
 ## 6. De inventaris: vier klassen
 

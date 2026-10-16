@@ -250,6 +250,19 @@ test('de sleutel van iemand anders geeft NOOIT jouw antwoord', async () => {
   assert.ok(!b.res.verzonden.herhaald);
 });
 
+test('WorkOS-bearers in het lijf blijven per werkruimte en medewerker gescheiden', () => {
+  const wie = maakIdemPoort._wieVan;
+  const req = (body) => nepReq({ pad: '/api/bedrijf/taak/maak', body, auth: '' });
+  const a = wie(req({ werkruimte: 'WA', lidToken: 'WL.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }));
+  const zelfde = wie(req({ werkruimte: 'WA', lidToken: 'WL.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }));
+  const collega = wie(req({ werkruimte: 'WA', lidToken: 'WL.BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB' }));
+  const andereRuimte = wie(req({ werkruimte: 'WB', lidToken: 'WL.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }));
+  assert.equal(a, zelfde, 'dezelfde WorkOS-actor houdt een stabiele, ondoorzichtige scope');
+  assert.notEqual(a, collega, 'een collega achter hetzelfde IP deelt geen idempotentiekas');
+  assert.notEqual(a, andereRuimte, 'dezelfde bearer kan niet over werkruimtes botsen');
+  assert.doesNotMatch(a, /WL\.|AAAA/, 'de actorafleiding bewaart nooit het ruwe token');
+});
+
 test('dezelfde sleutel op een ANDER pad is een ander verzoek', async () => {
   const poort = maakIdemPoort();
   let keer = 0;

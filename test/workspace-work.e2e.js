@@ -48,6 +48,14 @@ test('WorkOS Spatial activeert expliciet en sluit een gewisseld account direct u
       const token = await member(server.base, 'Ada Werk');
       const other = await member(server.base, 'Andere gebruiker');
       const linked = await linkWorkspace(server.base, token);
+      const tech = await api(server.base, '/api/techniek/inloggen',
+        { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' });
+      await api(server.base, '/api/techniek/tenant',
+        { org: 'O-SPATIAL-REGIE', naam: 'Spatial Regie' }, tech.token);
+      await api(server.base, '/api/techniek/tenant/bind',
+        { org: 'O-SPATIAL-REGIE', soort: 'werkruimte', code: linked.code }, tech.token);
+      await api(server.base, '/api/service/open',
+        { onderwerp: 'reis', titel: 'Transfer voor Regie controleren' }, token);
       const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, serviceWorkers: 'block' });
       await context.addInitScript((value) => {
         localStorage.setItem('rtg_member_token', value); localStorage.setItem('rtg_lang', 'nl');
@@ -55,9 +63,10 @@ test('WorkOS Spatial activeert expliciet en sluit een gewisseld account direct u
       }, token);
       const page = await context.newPage(); page.setDefaultTimeout(25000);
       const errors = []; h.letOpFouten(page, errors);
-      let mine = 0, starts = 0;
+      let mine = 0, starts = 0, bindings = 0;
       await page.route('**/api/bedrijf/mijn', async route => { mine++; await route.continue(); });
       await page.route('**/api/bedrijf/start', async route => { starts++; await route.continue(); });
+      await page.route('**/api/bedrijf/zaakregie', async route => { bindings++; await route.continue(); });
 
       await page.goto(server.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
       const work = page.locator('[data-rtg-module="work"]');
@@ -69,10 +78,17 @@ test('WorkOS Spatial activeert expliciet en sluit een gewisseld account direct u
       await work.getByText('Atlas Werkbedrijf', { exact: true }).waitFor();
       assert.equal(mine, 1); assert.equal(starts, 1);
       assert.match(await work.innerText(), /Ada Werk/);
+      const regie = page.locator('[data-rtg-module="coordination"]');
+      await regie.getByText('Transfer voor Regie controleren', { exact: true }).click();
+      await regie.getByText(/Werkruimte bevestigd/).waitFor();
+      assert.equal(bindings, 1, 'de expliciete zaakselectie gebruikte niet exact eenmaal de read-only WorkOS-projectie');
+      assert.match(await regie.innerText(), new RegExp(linked.code));
       const exposure = await page.evaluate(() => ({ html: document.documentElement.innerHTML,
-        storage: Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]) }));
+        storage: Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]),
+        edge: window.RTGAdaptief && window.RTGAdaptief.context && window.RTGAdaptief.context() }));
       assert.equal(exposure.html.includes(linked.oldToken), false, 'oude WorkOS-sessie staat niet in DOM');
       assert.equal(JSON.stringify(exposure.storage).includes(linked.oldToken), false, 'oude WorkOS-sessie staat niet in opslag');
+      assert.equal(JSON.stringify(exposure.edge).includes(linked.oldToken), false, 'oude WorkOS-sessie staat niet in de Edge');
 
       await page.evaluate(value => localStorage.setItem('rtg_member_token', value), other);
       await work.locator('[data-rtg-work-action="refresh"]').click();

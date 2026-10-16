@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e5446469';
+var RTG_BOUW = 'f5dc1e88';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -5216,7 +5216,7 @@ var RTG_BOUW = 'e5446469';
       }
     }
     for (const { item, uit } of alleItems()) {
-      if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
+      if (q && !(itemNaam(item) + ' ' + item + ' ' + (uit || '')).toLowerCase().includes(q)) continue;
       zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
     }
     /* HANDELINGEN DIE IN EEN ANDERE APP WONEN. Dezelfde lijst die de sprong op
@@ -5267,7 +5267,6 @@ var RTG_BOUW = 'e5446469';
      enkele meting mee (zie de opmerking bij zoekRij hierboven). */
   if (zoekLijst) setTimeout(zoek, 800);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
-
 
   /* Afgesplitst van app-main-27.js, dat over de 10 KB ging. De snede loopt
      langs de grens tussen ZOEKEN (Spotlight: wat staat er op dit OS) en
@@ -5571,11 +5570,50 @@ var RTG_BOUW = 'e5446469';
      zoek, home) onderscheppen we in de capture-fase, vóór de chat-handlers;
      al het andere gaat gewoon door naar Rahul-chat, die met zijn
      acties-registry op de server bestelt, boekt, betaalt en annuleert. */
-  function alleDoelen() {
-    const uit = [];
-    for (const { item } of alleItems()) uit.push({ naam: itemNaam(item), doe: () => openItem(item) });
-    MAPPEN.forEach(mp => uit.push({ naam: mapNaam(mp), doe: () => openMap(mp) }));
-    return uit;
+  function gidsToegang(id, soort) {
+    if (soort === 'world') return id === 'world:core' || MAPPEN.some(mp => mp.wereld && 'world:' +
+      String(mp.naam || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === id);
+    return itemZichtbaar(id);
+  }
+  function gidsContext() {
+    let bewaard = '';
+    try { bewaard = localStorage.getItem('rtg_member_token') || ''; } catch (e) {}
+    return { authenticated: !!(user && user.account && API.token), sameSession: !!API.token && bewaard === API.token,
+      contextCurrent: !!(app && app.classList.contains('active')) };
+  }
+  function gidsOpen(match) {
+    if (!match) return false;
+    if (match.kind === 'item') { sluitScrims(); openItem(match.id); return true; }
+    const wereld = match.id === 'world:core' ? MAPPEN.find(mp => mp.sleutel === 'map-instellingen')
+      : MAPPEN.find(mp => mp.naam === match.name);
+    if (!wereld) return false;
+    sluitScrims(); openMap(wereld); return true;
+  }
+  function gidsKeuzes(query) {
+    openZoek(); zoekInput.value = query; zoek();
+  }
+  function gidsCommando(soort, query) {
+    const D = window.RTGWorkspaceDirectory;
+    if (!D) return { handled: false, message: '' };
+    const opties = { catalog: window.RTGWorkspaceWorldCatalog, guard: gidsContext(), allow: gidsToegang };
+    const uit = soort === 'search' ? D.search(query, opties) : D.resolve(query, opties);
+    if (uit.status === 'closed') return { handled: true, message: 'De functiegids is in deze sessie niet beschikbaar.' };
+    if (soort === 'search') {
+      gidsKeuzes(uit.query || query);
+      return { handled: true, message: uit.status === 'ready' ? 'Ik toon de passende RTG-onderdelen.' : 'Ik vond geen passend RTG-onderdeel.' };
+    }
+    if (uit.status === 'match' && gidsOpen(uit.match)) {
+      bannerToon('✦', 'Rahul', uit.match.name + ' staat voor u open.');
+      return { handled: true, message: uit.match.name + ' staat voor u open.' };
+    }
+    if (uit.status === 'choices') {
+      gidsKeuzes(uit.query);
+      const namen = uit.matches.slice(0, 3).map(x => x.name).join(', ');
+      bannerToon('✦', 'Rahul', 'Kies het bedoelde onderdeel' + (namen ? ': ' + namen + '.' : '.'));
+      return { handled: true, message: 'Ik vond meerdere mogelijkheden. Kies het bedoelde onderdeel.' };
+    }
+    bannerToon('✦', 'Rahul', 'Ik vond geen RTG-onderdeel met die naam.');
+    return { handled: true, message: 'Ik vond geen RTG-onderdeel met die naam.' };
   }
   function osCommando(ruw) {
     const schoon = (ruw || '').trim().replace(/[?.!]+$/, '');
@@ -5605,7 +5643,7 @@ var RTG_BOUW = 'e5446469';
       }
     }
     let m = q.match(/^zoek(?:en)?(?:\s+naar)?\s+(.+)$/);
-    if (m) { openZoek(); zoekInput.value = m[1]; zoek(); return true; }
+    if (m) return gidsCommando('search', m[1]).handled;
     m = q.match(/^thema\s+(bordeaux|parelmoer|standaard|klassiek)$/);
     if (m && window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
       RTGOSThema.zet(m[1] === 'klassiek' ? 'standaard' : m[1]);
@@ -5620,12 +5658,19 @@ var RTG_BOUW = 'e5446469';
     m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);
     if (m) {
       const naam = m[1].replace(/^(?:de|het|een)\s+/, '');
-      const doelen = alleDoelen();
-      const doel = doelen.find(d => d.naam.toLowerCase() === naam) || doelen.find(d => d.naam.toLowerCase().includes(naam));
-      if (doel) { sluitScrims(); doel.doe(); bannerToon('✦', 'Rahul', doel.naam + ' staat voor u open.'); return true; }
+      return gidsCommando('open', naam).handled;
     }
     return false;
   }
+  /* Command gebruikt exact dezelfde lokale, accountgebonden gidsroute. Dit is
+     geen uitvoerder: alleen zoeken en een bestaande RTG-bestemming openen. */
+  window.RTGAppDirectoryCommand = function (tekst) {
+    const schoon = String(tekst || '').trim().replace(/[?.!]+$/, '');
+    let m = schoon.match(/^zoek(?:en)?(?:\s+naar)?\s+(.+)$/i);
+    if (m) return gidsCommando('search', m[1]);
+    m = schoon.match(/^(?:open|start|ga naar|breng(?: me)? naar|toon|laat zien|terug naar)\s+(.+)$/i);
+    return m ? gidsCommando('open', m[1].replace(/^(?:de|het|een)\s+/i, '')) : { handled: false, message: '' };
+  };
   document.addEventListener('click', e => {
     if (!e.target || !e.target.closest || !e.target.closest('#askBtn')) return;
     const inp = $('#askInput');

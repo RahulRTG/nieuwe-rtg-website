@@ -12,7 +12,7 @@ const APP = path.join(ROOT, 'public', 'apps', 'app.html');
 function controleer(wortel = ROOT) {
   const fouten = [], appPad = path.join(wortel, 'public', 'apps', 'app.html');
   const html = fs.readFileSync(appPad, 'utf8');
-  const vereist = ['module-sdk.js', 'workspace-world-catalog.js', 'workspace-continuity.js', 'workspace-composer.js', 'workspace-registries.js',
+  const vereist = ['module-sdk.js', 'workspace-world-catalog.js', 'workspace-directory.js', 'workspace-continuity.js', 'workspace-composer.js', 'workspace-registries.js',
     'workspace-session.js', 'workspace-intents.js', 'workspace-policy.js', 'workspace-assistant-manifest.js', 'workspace-context.js', 'workspace-navigation.js',
     'workspace-state.js', 'workspace-orchestrator.js', 'workspace-blueprints.js',
     'workspace-broker.js', 'workspace-module-host.js', 'workspace-runtime.js', 'workspace-legacy.js',

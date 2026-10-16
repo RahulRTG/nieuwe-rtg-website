@@ -29,13 +29,27 @@ const { afdrukVan } = require('./idem-kast');
 const MAX_SLEUTEL = 200;        // langer is geen sleutel maar een payload
 
 /* Wie stuurt dit? De poort hoeft niet te weten WIE het is, alleen dat twee
-   verschillende mensen nooit dezelfde opslagsleutel delen. Een hash over het
-   ruwe token is daarvoor genoeg en houdt het token uit het geheugen. */
+   verschillende mensen nooit dezelfde opslagsleutel delen. Een hash over de
+   autorisatieheader, cookie of erkende WorkOS-bodybearer is daarvoor genoeg
+   en houdt het token uit het geheugen. */
 function wieVan(req) {
   const auth = (typeof req.get === 'function' && req.get('authorization')) || '';
   if (auth) return crypto.createHash('sha256').update(auth).digest('hex').slice(0, 32);
   const cookie = (typeof req.get === 'function' && req.get('cookie')) || '';
   if (cookie) return crypto.createHash('sha256').update(cookie).digest('hex').slice(0, 32);
+  /* WorkOS gebruikt buiten productie zijn bestaande werkruimtebearers in het
+     JSON-lijf. Als die hier niet meetellen, delen alle medewerkers achter
+     hetzelfde IP een idempotentiekas en kan een gelijke sleutel het antwoord
+     van een collega opleveren. Alleen de bedrijfsruimte krijgt deze vorm; in
+     productie wint de autoritatieve Authorization-header hierboven. */
+  const pad = String(req.path || req.url || '');
+  const body = req.body && typeof req.body === 'object' ? req.body : {};
+  if (pad.startsWith('/api/bedrijf/')) {
+    const token = typeof body.lidToken === 'string' && body.lidToken ? body.lidToken
+      : (typeof body.beheerToken === 'string' && body.beheerToken ? body.beheerToken : '');
+    if (token) return crypto.createHash('sha256')
+      .update('workos|' + String(body.werkruimte || '') + '|' + token).digest('hex').slice(0, 32);
+  }
   return 'anon:' + (req.ip || '');
 }
 

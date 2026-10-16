@@ -45,6 +45,23 @@
     if (attention.recovery) block.appendChild(el('p', 'rtg-coordination-attention', 'Deze zaak vraagt herstel of menselijke aandacht.'));
     root.appendChild(block);
   }
+  function workosBinding(root, binding) {
+    var b = binding || {};
+    if (b.phase === 'checking') {
+      root.appendChild(el('p', 'rtg-ss-quiet', 'WorkOS controleert deze zaak binnen uw gekozen werkruimte.')); return;
+    }
+    if (b.phase === 'bound') {
+      root.appendChild(el('p', 'rtg-ss-quiet', 'Werkruimte bevestigd · ' + b.workspace.id + ' · ' + b.tenant.id)); return;
+    }
+    if (b.phase === 'unavailable') {
+      var text = b.reason === 'workspace-not-selected'
+        ? 'Kies en verbind eerst een WorkOS-werkruimte voor deze zaak.'
+        : b.reason === 'session-changed'
+          ? 'Uw account is gewijzigd. Verbind WorkOS opnieuw.'
+          : 'Deze zaak kan niet veilig aan de gekozen werkruimte worden gekoppeld.';
+      root.appendChild(el('p', 'rtg-coordination-attention', text));
+    }
+  }
   w.RTGCoordinationView = function (root, model) {
     var m = model || {}, items = Array.isArray(m.items) ? m.items : [];
     root.textContent = '';
@@ -64,6 +81,6 @@
     items.slice(0, m.state === 'peek' ? 2 : 8).forEach(function (item) {
       list.appendChild(card(item, item === selected, m.state));
     });
-    root.appendChild(list); if (m.state !== 'peek') detail(root, selected);
+    root.appendChild(list); if (m.state !== 'peek') { workosBinding(root, m.binding); detail(root, selected); }
   };
 })(window, document);

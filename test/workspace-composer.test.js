@@ -1,3 +1,7 @@
+/* WERKRUIMTECOMPOSITIE: de gekozen hoofdtaak blijft gelijk in runtime en
+   opgeslagen indeling; een actuele tenantweigering verandert geen van beide.
+   De echte blueprintvalidator en composer draaien in een VM met opslag- en
+   DOM-doubles. Dit bewijst geen browserlayout of serverautorisatie. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

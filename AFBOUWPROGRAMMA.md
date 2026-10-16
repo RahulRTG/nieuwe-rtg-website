@@ -153,10 +153,10 @@ bewezen wordt beschreven.
 | werkstroom | actuele bouwstand | afhankelijkheid | kwalificatiestand |
 |---|---|---|---|
 | A — Experience | Edge Quiet Presence is geïntegreerd op `main`; overige schermmigratie loopt | Heritage en bestaande schermcontracten | `EINDKWALIFICATIE_NODIG` |
-| B — Spatial | TravelOS ondersteunt Flow ↔ Spatial, native aanvraag, veilige hervatting, accountisolatie, Edge-contextacties, antwoordverliesherstel en menselijke bevestigingsstatus. WorkOS is als tiende Living Module aangesloten en heeft nu dezelfde echte maakroute als Flow, met actor-gebonden idempotentie. De voltooiingsproef sluit voor aanmaken, rollen, taken, nette herstart, tweede sessie, dubbeltik, afgebroken antwoord en `SIGKILL` zonder tokenopslag, verlies of verdubbeling | TravelOS- en WorkOS-bronroutes, Workspace Runtime, bestaande account- en lidmaatschapssessies | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
-| C — Universal Concierge | Zaakregiebeeld en RTG Regie projecteren bestaande Concierge Case/Lus en Servicezaak. Alleen een expliciet geselecteerde bronzaak wordt via de afgeschermde WorkOS-sessie read-only aan exact hetzelfde account, dezelfde werkruimte en tenant gebonden. De gedeelde werkruimtestaat ontvangt uitsluitend gesaneerde referenties; vreemde zaken, tenants, sessies en ingetrokken lidmaatschappen sluiten zonder bronlek | bestaande concierge-, service-, WorkOS-, tenant-, organisatie- en bevoegdheidsbronnen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
-| D — Revenue | naast de catalogus- en betaalbewijsgrenzen bestaan nu een read-only entitlementprojectie, accountoverzicht, eligibility-contract en immutable commercieel bindingscontract voor B2C, B2B en B2B2C. De binding koppelt product/offer/version, account/tenant, bedrag/valuta, Payment Truth, ledger en provenance exact; bestaande ongebonden records blijven dicht. Publieke aankoop en toekenning blijven geblokkeerd totdat deze binding duurzaam in de bestaande betaalbronnen wordt opgeslagen en transactiespecifieke reconciliation bestaat | financiële veiligheid, exacte adaptercontracten, Payment Truth, RTG Pay en expliciete eigenaarspoorten | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
-| E — Rahul | accountgebonden tabgeschiedenis en goedkeuringscontext sluiten fail-closed. Rahul leest van Workspace uitsluitend id, presentatiemodus en de door dezelfde actuele Edge-context bevestigde module. De nieuwe read-only functiegids gebruikt direct het canonieke wereldregister, opent alleen exacte zichtbare functies via de bestaande app-/Command-route en toont keuzes bij ambiguïteit. Ontbrekende sessie, actuele context of expliciet zichtbaarheidsfilter sluit de gids; er is geen tweede catalogus, router, uitvoerder of opslag | bestaande Rahul-, Fluister-, Stuur-, modulemanifest-, sessie- en Trusted Execution-grenzen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| B — Spatial | TravelOS ondersteunt Flow ↔ Spatial, native aanvraag, veilige hervatting, accountisolatie, Edge-contextacties, antwoordverliesherstel en menselijke bevestigingsstatus. WorkOS is als tiende Living Module aangesloten en heeft nu dezelfde echte maakroute als Flow, met actor-gebonden idempotentie. De voltooiingsproef sluit voor aanmaken, rollen, taken, nette herstart, tweede sessie, dubbeltik, afgebroken antwoord en `SIGKILL` zonder tokenopslag, verlies of verdubbeling. Persoonlijk, Uitvoerder, Coördinator, Manager en Enterprise gebruiken nu vijf gedeelde indelingen boven op dezelfde Living Modules en Blueprint-validator; zij geven zelf geen rechten en zijn alleen zichtbaar wanneer serverrechten, tenantbeleid en devicegrenzen de volledige indeling toelaten | TravelOS- en WorkOS-bronroutes, Workspace Runtime, bestaande account- en lidmaatschapssessies | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| C — Universal Concierge | Zaakregiebeeld en RTG Regie projecteren bestaande Concierge Case/Lus en Servicezaak. Alleen een expliciet geselecteerde canonieke bronzaak wordt via een versieerbare, getypeerde selectie-envelop read-only aan dezelfde WorkOS-account-, werkruimte- en tenantcontext gebonden. Alleen `bureau/concierge-case` en `service/service-case` zijn toegestaan; schema-, type-, id-, versie-, account-, tenant- of sessieafwijkingen sluiten zonder bronlek. `source.version` is een waargenomen versiesignaal en nooit een autorisatiebewijs | bestaande concierge-, service-, WorkOS-, tenant-, organisatie- en bevoegdheidsbronnen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| D — Revenue | naast de catalogus- en betaalbewijsgrenzen bestaan nu een read-only entitlementprojectie, accountoverzicht, eligibility-contract, immutable commercieel bindingscontract en Subscription Source Audit V1. De audit vergelijkt de bestaande ladder, live prijslijst, capability-profielen, runtime-herkenning en aanmeldingsdefinities zonder ze samen te voegen of rechten te verlenen. Hij maakt de huidige Business Lite-brondrift zichtbaar en houdt contractbodems strikt gescheiden van maandprijzen. Publieke aankoop en toekenning blijven geblokkeerd totdat de commerciële binding duurzaam in bestaande betaalbronnen wordt opgeslagen, transactiespecifieke reconciliation bestaat en de brondrift via een expliciet productbesluit is opgelost | financiële veiligheid, exacte adaptercontracten, Payment Truth, RTG Pay, bestaande pasbronnen en expliciete eigenaarspoorten | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
+| E — Rahul | accountgebonden tabgeschiedenis en goedkeuringscontext sluiten fail-closed. Rahul leest van Workspace uitsluitend id, presentatiemodus en de door dezelfde actuele Edge-context bevestigde module. De read-only functiegids gebruikt direct het canonieke wereldregister en opent alleen exacte zichtbare functies via de bestaande app-/Command-route. Zichtbare startsuggesties worden, wanneer een geldig assistentmanifest bestaat, uitsluitend afgeleid uit de veilige soorten `read`, `search`, `open` en `propose`; zij gebruiken vaste vraagteksten en nemen geen actie-id, route, payload of mutatie over. Ontbrekende sessie, actuele context of expliciet zichtbaarheidsfilter sluit de gids; er is geen tweede catalogus, router, uitvoerder of opslag | bestaande Rahul-, Fluister-, Stuur-, modulemanifest-, sessie- en Trusted Execution-grenzen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | F — Platform | het canonieke wereldregister ontsluit 116 UX-functies; tien Living Modules volgen hetzelfde runtimecontract. WorkOS, RTG Regie en de Rahul-projectie gebruiken dezelfde offline shell en bestaande Command-/wereldnavigatie, zonder tweede app-catalogus | de zes productstromen, bestaande routekaart, service workers en registergeneratoren | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | Q — eindkwalificatie | start nadat de overeengekomen scope in de kandidaat is geïntegreerd | A t/m F | `GEBLOKKEERD` door nog lopende bouw |
 
@@ -173,6 +173,13 @@ werkruimtestaat. De Edge ontvangt uitsluitend vooraf gedeclareerde acties;
 expliciete bevestiging. Gericht zijn het modulecontract, Edge-selectie,
 bronisolatie en de bestaande Service- en Privékantoorketens lokaal groen. De
 platformbrede scherm- en herstelkwalificatie blijft voor Q gereserveerd.
+
+De selectie tussen RTG Regie en WorkOS draagt nu de volledige canonieke
+bronidentiteit (`domain:type:id`) en het op het leesmoment waargenomen
+bronversienummer. WorkOS accepteert alleen het versieerbare schema en de twee
+bestaande bronparen. Daarna herhaalt de Bedrijfspoort alle bestaande account-,
+lidmaatschaps-, tenant- en eigendomscontroles. Een bronversie die inmiddels is
+veranderd geeft een herstelbare onbeschikbaarheid; hij verleent nooit toegang.
 
 De nieuwe Bedrijfspoort voegt geen zaak of bevoegdheid toe. Hij bevestigt bij
 iedere lezing opnieuw vier reeds bestaande waarheden: het actuele RTG-account,
@@ -191,6 +198,57 @@ het bewaarde antwoord van een ander ontvangen. Zonder sleutel blijft het oude
 gedrag ongewijzigd. De lokale voltooiingsproef heeft de echte opslag door een
 nette herstart en een harde procescrash heen gelezen en vond iedere taak exact
 eenmaal. Dit is gericht ontwikkelbewijs en nog geen platformbrede kwalificatie.
+
+De vijf Spatial-indelingen zijn declaratieve presentaties van de al
+geregistreerde Living Modules. Zij maken geen doelgroep-apps, rollen,
+entitlements of tweede werkruimtestaat. De bestaande Blueprint-validator
+controleert bij tonen en toepassen opnieuw modulemanifest, serverpermissies,
+tenantbeleid, surfaces en devicegeschiktheid. Alleen daarna gaat het plan naar
+de bestaande Orchestrator. Toepassen vraagt een expliciete knop in de bestaande
+werkruimte-editor; Rahul krijgt de mutator niet. De gerichte contract- en
+rechtenproeven en de bestaande echte app/browserproef blijven groen. De brede
+mobiele, visuele en herstelmatrix blijft voor Q gereserveerd.
+
+De TravelOS-deur naar de volledige app blijft in iedere Spatial-presentatie
+bereikbaar en gebruikt de reeds gedeclareerde `travel.open`-actie. De brede
+browserproef vond tijdens deze bouwronde één oudere verwachting die de deur na
+heropenen van het paneel vereiste. Die integratie is hersteld en de betreffende
+echte browserscenario- en contractproef zijn opnieuw lokaal groen; de volledige
+appmenu-matrix wordt tijdens Q opnieuw integraal uitgevoerd.
+
+De bestaande Workspace Continuity bindt de lokale compositie nu aan een
+SHA-256-afdruk van de actieve ledensessie. Het token blijft buiten de
+werkruimteopslag; bij een nieuwe sessie herstelt dezelfde bestaande accountweg
+de indeling. Oude lokale composities zonder aantoonbare eigenaar worden niet
+overgenomen. Uitgestelde schrijfacties, late lees-/schrijfantwoorden,
+accountwisselingen en afgebroken hosts kunnen geen oude indeling onder een
+andere sessie toepassen. Een nieuwere lokale keuze wint van een ouder antwoord.
+De zes gerichte regressieproeven zijn tegen de oorspronkelijke implementatie
+rood bevonden en na reparatie groen; de bestaande accountwegen en echte
+mobiele/desktopproef slagen. De volledige meertoestel- en offlinekwalificatie
+blijft onderdeel van Q.
+
+De gekozen hoofdtaak blijft bij toepassing van een blueprint gelijk in runtime
+en opgeslagen compositie. Toetsenbordfocus blijft bij de gekozen template na
+hertekenen; dit is via Enter in een echte browser beproefd. De Revenue-audit
+weigert ook foutstatussen van de prijsbron, een niet-nulprijs voor Community en
+onbekende capabilities. Deze bevindingen zijn met falende tegenproeven en
+hersteltoetsen vastgelegd, zonder kwaliteitsdrempels te verlagen.
+
+Ontwikkelcontrole van deze integratiestap: 153 gerichte contract-, unit- en
+integratietests slagen. Daarnaast slagen de echte WorkOS-browserproef voor
+accountwisseling en het gerichte Second Screen-scenario met toetsenbordkeuze
+van een indeling. Het bestaande taalbewijspakket is op de nieuwe app-build
+opnieuw uitgevoerd: 27 tests slagen; de expliciete beperkingen voor vertalingen
+en fysieke apparaten blijven staan. De distributiebuild verwerkt 803
+JavaScript-bestanden (7.875.355 naar 5.475.362 bytes); dat is een buildmeting,
+geen bewijs voor Core Web Vitals of prestaties op echte toestellen. Het
+runtimecontract bevestigt tien Living Modules, 116 UX-functies en 228
+servercapabilities. De volledige statische huiscontrole, cachevingerafdrukken
+en broncontrole van de taalrapporten slagen na reguliere regeneratie van de
+afgeleide bestanden. Bestaande platformbevindingen en de afzonderlijke
+APPWERKT-documentvingerafdruk zijn hiermee niet opnieuw gekwalificeerd.
+Dit lokale bewijs is geen CI-uitslag of releasegoedkeuring.
 
 De mapping van D heeft aangetoond dat `server/kern/revenue/catalogus-v1.js` al
 de gesloten catalogusbron is en dat RTG Pay, Payment Truth en Economic Runtime
@@ -218,6 +276,17 @@ reconciliation niet bevestigen, blijft `eligibilityReady` onwaar. De keuze waar
 deze binding duurzaam gaat wonen en welke bestaande bron de reconciliation
 autoritatief levert, blijft een eigenaarspoort vóór de afhankelijke koopketen.
 
+De Subscription Source Audit V1 is een bewijslaag en geen nieuwe commerciële
+bron. Hij leest de vijf officiële laddertreden en accepteert de actuele
+geldregie- en aanmeldingsbronnen alleen via expliciete read-only injectie.
+Ontbrekende of falende bronnen krijgen `UNKNOWN_SOURCE`; een aanwezige bron die
+een trede mist of een contractbodem als maandprijs presenteert krijgt
+`SOURCE_MISMATCH`. De huidige audit toont dat Business Lite wel in ladder,
+prijslijst, aanmeldingsstroom en capability-profiel staat, maar ontbreekt in de
+centrale runtimeherkenning van passen. Dat wordt niet stil gerepareerd, omdat
+die wijziging toegangsgedrag kan veranderen en dus eerst een expliciet
+product-/autorisatiebesluit vraagt.
+
 De mapping van E gebruikt geen tweede agent of intent-uitvoerder. De Workspace
 Runtime projecteert alleen een door de actieve module expliciet vrijgegeven
 assistentmanifest. Rahul krijgt daarvan uitsluitend actie-id en soort. Hij
@@ -232,6 +301,14 @@ gaan via de bestaande `openItem`/`openMap`-route; ambiguïteit wordt als keuze
 teruggegeven. Sessiemismatch, verouderde accountcontext of het ontbreken van de
 zichtbaarheidsfunctie sluit de resolver. Zo worden de bestaande functies beter
 bedienbaar zonder een tweede intentrouter of bevoegdheidsbron te bouwen.
+
+Op schermen met een geldig capabilitymanifest komen de eerste
+gesprekssuggesties nu eveneens uit die bestaande bron. Alleen de
+niet-uitvoerende soorten lezen, zoeken, openen en voorstellen worden vertaald
+naar maximaal drie vaste vragen. Vrije actie-id's, routes, payloads en
+moduleteksten worden niet in een zichtbare prompt gespiegeld. De suggestie
+blijft een gewone Rahul-vraag en loopt bij een eventuele vervolghandeling door
+Stuur, serverautorisatie, bevestiging en Trusted Execution.
 
 ## 6. De inventaris: vier klassen
 

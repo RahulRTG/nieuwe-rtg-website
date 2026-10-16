@@ -1,3 +1,8 @@
+/* WERKRUIMTEHERSTEL: lokale compositie hoort bij de oorspronkelijke sessie.
+   Een accountwissel, logout of destroy sluit late antwoorden en uitgestelde
+   opslag; een nieuwere gebruikerskeuze overleeft een ouder antwoord. De echte
+   clientmodule draait met bestuurbare netwerk- en timerdoubles. Geen bewijs
+   voor meertoestelconflicten, fysieke browsers of serverautorisatie. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -1,3 +1,8 @@
+/* ABONNEMENTSBRONNEN: de read-only audit meldt ontbrekende en strijdige
+   ladder-, prijs-, capability-, runtime- en aanmeldingsgegevens expliciet.
+   Contractbodems zijn geen maandprijzen; onzekere bronnen leveren geen gezond
+   oordeel op. De proef gebruikt bestaande kernels en gerichte bronvarianten;
+   zij bewijst geen betaling, entitlementtoekenning of productieconfiguratie. */
 'use strict';
 
 const test = require('node:test');

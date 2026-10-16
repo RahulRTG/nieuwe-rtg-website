@@ -116,9 +116,8 @@
     var canvasToolbar = body.dataset.rtgV4Kind === 'canvas' &&
       doc.querySelector('body > header:not(.rtg-v4-header),.wd-page > header:not(.rtg-v4-header)');
     if (canvasToolbar) canvasToolbar.dataset.rtgV4CanvasToolbar = 'true';
-    /* Canvas-apps hebben al één functionele gereedschapskop. Een tweede
-       globale kop zou ruimte kosten en de echte bediening dubbel omlijsten. */
-    if (!embedded && !header && body.dataset.rtgV4Kind !== 'canvas') header = buildHeader(doc, body, name);
+    /* Een canvas houdt zijn eigen functionele toolbar. */
+    if (!embedded && !header && (body.dataset.rtgV4Kind !== 'canvas' || !canvasToolbar)) header = buildHeader(doc, body, name);
     if (header) {
       /* Edge 2 kan een routekop al vóór deze laag naar zijn contextlade hebben
          verplaatst. De V4-kop zelf hoort daar nooit in: hij is de ene schil. */

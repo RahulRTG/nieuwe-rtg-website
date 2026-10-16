@@ -109,8 +109,11 @@ async function main() {
             const body = document.body;
             if (body.dataset.rtgShell === 'mobile') return true;
             if (body.dataset.rtgEditorialV4 === 'true') {
+              const chrome = body.dataset.rtgV4Kind === 'canvas'
+                ? document.querySelector('[data-rtg-v4-canvas-toolbar="true"],.rtg-v4-header')
+                : document.querySelector('.rtg-v4-header');
               return getComputedStyle(body).getPropertyValue('--rtg-editorial-version').trim() === '20261016' &&
-                !!document.querySelector('.rtg-v4-header') && !!document.querySelector('.rtg-adaptive-bar');
+                !!chrome && !!document.querySelector('.rtg-adaptive-bar');
             }
             const cinematic = body.dataset.rtgCinematic === 'true';
             const edgeHidden = /^(compact|focus)$/.test(body.getAttribute('data-rtg-edge-2-state') || '');
@@ -156,8 +159,9 @@ async function main() {
               mobileDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wd-shell>.wd-people,.wd-shell>.wd-favorites,.wd-shell>.wd-library,.wd-home>.wp-scene,.wp-domain'),
               nativeContent:visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])'),
               publicDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wp-edit-images'),
-              publicHeader:rect('.pp-header'), v4Header:rect('body>.rtg-v4-header'),
-              visibleLegacyHeaders:[...document.querySelectorAll('body>header:not(.rtg-v4-header),.wd-page>header:not(.rtg-v4-header),.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom')].filter(shown).length,
+              publicHeader:rect('.pp-header'), v4Header:rect('body>.rtg-v4-header,[data-rtg-v4-canvas-toolbar="true"]'),
+              canvasToolbar:visible('[data-rtg-v4-canvas-toolbar="true"]'),
+              visibleLegacyHeaders:[...document.querySelectorAll('body>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]),.wd-page>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]),.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom')].filter(shown).length,
               accessRect:rect('[data-rtg-access]'),
               background:css.backgroundColor, editorialVersion:css.getPropertyValue('--rtg-editorial-version').trim(), headingFont:heading&&getComputedStyle(heading).fontFamily, edgeState:b.getAttribute('data-rtg-edge-2-state'), padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
               edges:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length,
@@ -182,7 +186,9 @@ async function main() {
           if (!s.access && s.v4Kind !== 'canvas' && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
           if (s.editorialV4 && !s.access) {
             const expectedHeader = mobile ? 58 : 72;
-            if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y) > 2) row.failures.push('nonstandard-v4-header');
+            if (s.v4Kind === 'canvas') {
+              if (!s.v4Header || s.v4Header.h < 44) row.failures.push('nonstandard-v4-canvas-toolbar');
+            } else if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y) > 2) row.failures.push('nonstandard-v4-header');
             if (s.visibleLegacyHeaders) row.failures.push('visible-legacy-header');
           }
           if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');

@@ -70,3 +70,12 @@ test('de ene schil sluit oude koppen, uitrekkende randen en Edge-overlap af', ()
   assert.match(css, /:has\(#onbGate:not\(\[hidden\]\)\)>\.rtg-v4-header/);
   assert.match(css, /#shell:has\(>#app\.active\)/);
 });
+
+test('de schermkeuring erkent de ene native canvas-toolbar als de V4-kop', () => {
+  const audit = read('scripts/desktop-audit.js');
+  const runtime = read('public/shared/rtg-editorial-v4.js');
+  assert.match(audit, /data-rtg-v4-canvas-toolbar/);
+  assert.match(audit, /nonstandard-v4-canvas-toolbar/);
+  assert.match(audit, /body\.dataset\.rtgV4Kind === 'canvas'/);
+  assert.match(runtime, /body\.dataset\.rtgV4Kind !== 'canvas' \|\| !canvasToolbar/);
+});

@@ -88,19 +88,24 @@ test('een expliciete Regiekeuze wordt met de afgeschermde WorkOS-sessie read-onl
     calls.push({ url, body });
     if (url === '/api/bedrijf/mijn') return { werkruimtes: [{ werkruimte: 'W123', naam: 'Atlas BV', lidToken: secret }] };
     if (url === '/api/bedrijf/start') return { werkruimte: { code: 'W123', naam: 'Atlas BV' }, blokken: { waarschuwingen: [] } };
-    return { ok: true, regiebeeld: { readOnly: true, source: { domain: 'service', id: 'SUP-1' },
+    return { ok: true, regiebeeld: { schemaVersion: 1, id: 'service:service-case:SUP-1',
+      readOnly: true, ownsSourceData: false,
+      source: { domain: 'service', type: 'service-case', id: 'SUP-1', version: 'v1' },
       context: { status: 'bekend', readOnly: true, grantsAuthority: false,
         context: { workspace: { id: 'W123' }, tenant: { id: 'ORG-A' }, legalEntity: null } } } };
   });
   const instance = definition().def.create(c.ctx);
   assert.equal(await instance.actions['work.connect'].run({}), true);
-  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { domain: 'service', id: 'SUP-1' } }), true);
+  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { schemaVersion: 1,
+    case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' } } }), true);
   assert.equal(JSON.stringify(calls[2]), JSON.stringify({ url: '/api/bedrijf/zaakregie',
     body: { werkruimte: 'W123', domain: 'service', id: 'SUP-1', lidToken: secret } }));
   const event = c.published.at(-1);
   assert.equal(event.type, 'work.coordination.bound');
   assert.equal(event.payload.workspace.id, 'W123');
   assert.equal(event.payload.tenant.id, 'ORG-A');
+  assert.equal(event.payload.case.type, 'service-case');
+  assert.equal(event.payload.case.observedVersion, 'v1');
   assert.equal(event.payload.readOnly, true);
   assert.equal(event.payload.grantsAuthority, false);
   assert.doesNotMatch(JSON.stringify(c.published), new RegExp(secret));
@@ -111,16 +116,43 @@ test('een afwijkende of ingetrokken zaakprojectie komt fail-closed terug in Regi
   const c = context(async (url) => {
     if (url === '/api/bedrijf/mijn') return { werkruimtes: [{ werkruimte: 'W123', naam: 'Atlas BV', lidToken: 'verborgen' }] };
     if (url === '/api/bedrijf/start') return { werkruimte: { code: 'W123' }, blokken: { waarschuwingen: [] } };
-    return { ok: true, regiebeeld: { readOnly: true, source: { domain: 'service', id: 'SUP-ANDER' },
+    return { ok: true, regiebeeld: { schemaVersion: 1, id: 'service:service-case:SUP-ANDER',
+      readOnly: true, ownsSourceData: false,
+      source: { domain: 'service', type: 'service-case', id: 'SUP-ANDER', version: 'v2' },
       context: { status: 'bekend', readOnly: true, grantsAuthority: false,
         context: { workspace: { id: 'W999' }, tenant: { id: 'ORG-B' } } } } };
   });
   const instance = definition().def.create(c.ctx); await instance.actions['work.connect'].run({});
-  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { domain: 'service', id: 'SUP-1' } }), false);
+  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { schemaVersion: 1,
+    case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' } } }), false);
   const event = c.published.at(-1);
   assert.equal(JSON.stringify(event), JSON.stringify({ type: 'work.coordination.unavailable', payload: { schemaVersion: 1,
-    case: { domain: 'service', id: 'SUP-1' }, reason: 'projection-mismatch' } }));
+    case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' },
+    reason: 'projection-mismatch' } }));
   assert.doesNotMatch(JSON.stringify(event), /W999|ORG-B|SUP-ANDER|verborgen/);
+});
+
+test('WorkOS weigert onbekende zaaktypen en een verouderde bronprojectie', async () => {
+  let bindings = 0;
+  const c = context(async (url) => {
+    if (url === '/api/bedrijf/mijn') return { werkruimtes: [{ werkruimte: 'W123', naam: 'Atlas BV', lidToken: 'verborgen' }] };
+    if (url === '/api/bedrijf/start') return { werkruimte: { code: 'W123' }, blokken: { waarschuwingen: [] } };
+    bindings++;
+    return { ok: true, regiebeeld: { schemaVersion: 1, id: 'service:service-case:SUP-1', readOnly: true,
+      ownsSourceData: false, source: { domain: 'service', type: 'service-case', id: 'SUP-1', version: 'v2' },
+      context: { status: 'bekend', readOnly: true, grantsAuthority: false,
+        context: { workspace: { id: 'W123' }, tenant: { id: 'ORG-A' } } } } };
+  });
+  const instance = definition().def.create(c.ctx); await instance.actions['work.connect'].run({});
+  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { schemaVersion: 1,
+    case: { domain: 'service', type: 'supplier-case', id: 'SUP-1', observedVersion: 'v1' } } }), false);
+  assert.equal(bindings, 0, 'een onbekend type bereikt de zaakregieroute niet');
+  assert.equal(await instance.onEvent({ event: 'coordination.selected', payload: { schemaVersion: 1,
+    case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' } } }), false);
+  assert.equal(bindings, 1);
+  assert.equal(c.published.at(-1).type, 'work.coordination.unavailable');
+  assert.equal(c.published.at(-1).payload.reason, 'projection-mismatch');
+  assert.doesNotMatch(JSON.stringify(c.published.at(-1)), /v2|W123|ORG-A|verborgen/);
 });
 
 test('WorkOS-bestanden laden in runtimevolgorde, zijn offline beschikbaar en gebruiken Heritage-geometrie', () => {

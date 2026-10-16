@@ -19,7 +19,7 @@
   function card(item, selected, state) {
     var source = item.source || {}, phase = item.phase || {};
     var node = button('', 'select', 'rtg-coordination-case');
-    node.dataset.rtgCoordinationId = source.id || '';
+    node.dataset.rtgCoordinationId = item.id || '';
     node.setAttribute('aria-pressed', selected ? 'true' : 'false');
     var top = el('span', 'rtg-coordination-case-top');
     top.appendChild(el('span', 'rtg-coordination-kind', item.kind === 'service' ? 'Service' : 'Concierge'));
@@ -76,7 +76,7 @@
       root.appendChild(el('p', 'rtg-ss-quiet', 'Er zijn geen lopende service- of conciergezaken.'));
       root.appendChild(button('Verversen', 'refresh')); return;
     }
-    var selected = items.find(function (x) { return x.source && x.source.id === m.selectedId; }) || items[0];
+    var selected = items.find(function (x) { return x.id === m.selectedId; }) || items[0];
     var list = el('div', 'rtg-coordination-list');
     items.slice(0, m.state === 'peek' ? 2 : 8).forEach(function (item) {
       list.appendChild(card(item, item === selected, m.state));

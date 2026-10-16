@@ -65,30 +65,62 @@ test('Regie vraagt alleen na een expliciete zaakselectie om een getypeerde WorkO
   const def = window.RTGModuleSDK.catalog().find(x => x.manifest.id === 'coordination');
   const ctx = { request(url) {
     if (url === '/api/service/mijn') return Promise.resolve({ zaken: [{ id: 'SUP-1', stand: 'nieuw' }] });
-    if (url === '/api/service/zaak') return Promise.resolve({ zaak: { regiebeeld: { readOnly: true,
-      ownsSourceData: false, kind: 'service', title: 'Transfer', source: { domain: 'service', id: 'SUP-1' },
+    if (url === '/api/service/zaak') return Promise.resolve({ zaak: { regiebeeld: { schemaVersion: 1,
+      id: 'service:service-case:SUP-1', readOnly: true, ownsSourceData: false, kind: 'service', title: 'Transfer',
+      source: { domain: 'service', type: 'service-case', id: 'SUP-1', version: 'v1' },
       phase: { id: 'request', terminal: false }, responsibilities: [], relations: [], actions: [], attention: {} } } });
     return Promise.resolve({ regiebeelden: [] });
   }, setStatus() {}, events: { publish(type, payload) { published.push({ type, payload }); } },
   actions: { run() { return Promise.resolve(); } }, open() { return true; } };
   const instance = def.create(ctx); instance.mount({ appendChild() {} }); instance.render('panel', { active: true });
   await new Promise(resolve => setImmediate(resolve));
-  const button = { dataset: { rtgCoordinationAction: 'select', rtgCoordinationId: 'SUP-1' },
+  const button = { dataset: { rtgCoordinationAction: 'select', rtgCoordinationId: 'service:service-case:SUP-1' },
     closest() { return this; } };
   assert.equal(instance.handle(button), true);
   assert.equal(JSON.stringify(published.at(-1)), JSON.stringify({ type: 'coordination.selected',
-    payload: { id: 'SUP-1', domain: 'service' } }));
+    payload: { schemaVersion: 1, case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' } } }));
   assert.equal(models.at(-1).binding.phase, 'checking');
 
-  assert.equal(instance.onEvent({ event: 'work.coordination.bound', payload: { case: { domain: 'service', id: 'SUP-1' },
+  assert.equal(instance.onEvent({ event: 'work.coordination.bound', payload: { schemaVersion: 1,
+    case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' },
     workspace: { id: 'W123' }, tenant: { id: 'ORG-A' }, readOnly: true, grantsAuthority: false } }), true);
   assert.equal(models.at(-1).binding.phase, 'bound');
   assert.equal(models.at(-1).binding.workspace.id, 'W123');
-  assert.equal(instance.onEvent({ event: 'work.coordination.unavailable', payload: {
-    case: { domain: 'service', id: 'SUP-1' }, reason: 'session-changed' } }), true);
+  assert.equal(instance.onEvent({ event: 'work.coordination.unavailable', payload: { schemaVersion: 1,
+    case: { domain: 'service', type: 'service-case', id: 'SUP-1', observedVersion: 'v1' },
+    reason: 'session-changed' } }), true);
   assert.equal(models.at(-1).binding.phase, 'unavailable');
   assert.equal(models.at(-1).binding.reason, 'session-changed');
   assert.doesNotMatch(JSON.stringify(models), /lidToken|authorization|sessie/i);
+});
+
+test('Regie onderscheidt gelijke bron-id’s met de canonieke getypeerde regiesleutel', async () => {
+  const published = [], models = [];
+  const document = { createElement() { return { className: '', appendChild() {}, contains() { return true; } }; } };
+  const window = { RTGCoordinationView(root, model) { models.push(model); },
+    RTGCoordinationEdge() { return { sync() {}, clear() {} }; } };
+  const sandbox = { window, document, console, AbortController, Promise, Object, Array, String, Number, Error, TypeError };
+  vm.createContext(sandbox); vm.runInContext(read('public/shared/interface/module-sdk.js'), sandbox);
+  vm.runInContext(read('public/shared/interface/modules/coordination.js'), sandbox);
+  const service = { schemaVersion: 1, id: 'service:service-case:DEEL-1', readOnly: true, ownsSourceData: false,
+    kind: 'service', title: 'Service', source: { domain: 'service', type: 'service-case', id: 'DEEL-1', version: 's1' },
+    phase: { id: 'request', terminal: false }, responsibilities: [], relations: [], actions: [], attention: {} };
+  const bureau = { schemaVersion: 1, id: 'bureau:concierge-case:DEEL-1', readOnly: true, ownsSourceData: false,
+    kind: 'concierge', title: 'Concierge', source: { domain: 'bureau', type: 'concierge-case', id: 'DEEL-1', version: 'b1' },
+    phase: { id: 'plan', terminal: false }, responsibilities: [], relations: [], actions: [], attention: {} };
+  const ctx = { request(url) {
+    if (url === '/api/service/mijn') return Promise.resolve({ zaken: [{ id: 'DEEL-1', stand: 'nieuw' }] });
+    if (url === '/api/service/zaak') return Promise.resolve({ zaak: { regiebeeld: service } });
+    return Promise.resolve({ regiebeelden: [bureau] });
+  }, setStatus() {}, events: { publish(type, payload) { published.push({ type, payload }); } },
+  actions: { run() { return Promise.resolve(); } }, open() { return true; } };
+  const def = window.RTGModuleSDK.catalog().find(x => x.manifest.id === 'coordination'), instance = def.create(ctx);
+  instance.mount({ appendChild() {} }); instance.render('panel', { active: true }); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(models.at(-1).items.length, 2);
+  const button = { dataset: { rtgCoordinationAction: 'select', rtgCoordinationId: bureau.id }, closest() { return this; } };
+  assert.equal(instance.handle(button), true);
+  assert.equal(JSON.stringify(published.at(-1).payload), JSON.stringify({ schemaVersion: 1,
+    case: { domain: 'bureau', type: 'concierge-case', id: 'DEEL-1', observedVersion: 'b1' } }));
 });
 
 test('de modulebestanden staan in runtimevolgorde en gebruiken de gedeelde Heritage-laag', () => {

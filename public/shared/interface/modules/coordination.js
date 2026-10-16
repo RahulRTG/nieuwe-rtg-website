@@ -4,7 +4,7 @@
   'use strict';
   var SDK = w.RTGModuleSDK; if (!SDK || !w.RTGCoordinationView || !w.RTGCoordinationEdge) return;
   SDK.add(SDK.define({
-    id: 'coordination', name: 'RTG Regie', version: '1.0.0', maturity: 'L3', priority: 55,
+    id: 'coordination', name: 'RTG Regie', version: '1.1.0', maturity: 'L3', priority: 55,
     runtime: { minVersion: '0.1.0' }, source: 'native', states: SDK.states,
     capabilities: ['coordination.read', 'coordination.handoff'], services: ['service', 'member'],
     permissions: ['coordination.read'], actions: ['coordination.open-source', 'coordination.ask-human', 'coordination.refresh'],
@@ -20,19 +20,23 @@
     var binding = { phase: 'idle' };
     var stop = typeof AbortController === 'function' ? new AbortController() : null;
     function selected() {
-      return items.find(function (x) { return x.source && x.source.id === selectedId; }) || items[0] || null;
+      return items.find(function (x) { return x.id === selectedId; }) || items[0] || null;
     }
     function payload() {
       var item = selected(); return { id: item && item.source && item.source.id || '', kind: item && item.kind || '' };
     }
     function selectionPayload() {
       var item = selected(), source = item && item.source || {};
-      return { id: source.id || '', domain: source.domain || '' };
+      return { schemaVersion: 1, case: { domain: source.domain || '', type: source.type || '',
+        id: source.id || '', observedVersion: source.version || '' } };
     }
     var edge = w.RTGCoordinationEdge({ selected: selected, payload: payload,
       run: function (id, data) { return ctx.actions.run(id, data); } });
     function valid(view) {
-      return !!(view && view.readOnly === true && view.ownsSourceData === false && view.source && view.source.id && view.phase);
+      var source = view && view.source || {}, pair = source.domain + '/' + source.type;
+      return !!(view && view.schemaVersion === 1 && view.readOnly === true && view.ownsSourceData === false &&
+        view.id === source.domain + ':' + source.type + ':' + source.id && source.id && source.version &&
+        (pair === 'bureau/concierge-case' || pair === 'service/service-case') && view.phase);
     }
     function order(list) {
       return list.filter(valid).sort(function (a, b) {
@@ -68,8 +72,8 @@
       return Promise.all([serviceViews(), bureauViews()]).then(function (lists) {
         if (!root) return [];
         items = order(lists[0].concat(lists[1])); loaded = true;
-        if (!items.some(function (x) { return x.source && x.source.id === selectedId; }) && items.length)
-          selectedId = items[0].source.id;
+        if (!items.some(function (x) { return x.id === selectedId; }) && items.length)
+          selectedId = items[0].id;
         ctx.setStatus(items.length ? items.length + ' actief' : 'Alles rustig', items.length ? 'ok' : 'quiet');
         ctx.events.publish('coordination.loaded', { count: items.length,
           attention: items.filter(function (x) { return x.attention && (x.attention.decisionRequired || x.attention.recovery); }).length });
@@ -111,7 +115,9 @@
       },
       onEvent: function (event) {
         var p = event && event.payload || {}, c = p.case || {}, chosen = selectionPayload();
-        if (!chosen.id || c.id !== chosen.id || c.domain !== chosen.domain) return false;
+        var ref = chosen.case || {};
+        if (p.schemaVersion !== 1 || !ref.id || c.id !== ref.id || c.domain !== ref.domain ||
+            c.type !== ref.type || c.observedVersion !== ref.observedVersion) return false;
         if (event.event === 'work.coordination.bound' && p.readOnly === true && p.grantsAuthority === false &&
             p.workspace && p.workspace.id && p.tenant && p.tenant.id) {
           binding = { phase: 'bound', workspace: { id: String(p.workspace.id) },

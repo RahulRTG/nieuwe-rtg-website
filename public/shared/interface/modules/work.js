@@ -5,7 +5,7 @@
   'use strict';
   var SDK = w.RTGModuleSDK; if (!SDK || !w.RTGWorkView || !w.RTGWorkEdge) return;
   SDK.add(SDK.define({
-    id: 'work', name: 'WorkOS', version: '1.0.0', maturity: 'L3', priority: 52,
+    id: 'work', name: 'WorkOS', version: '1.1.0', maturity: 'L3', priority: 52,
     runtime: { minVersion: '0.1.0' }, source: 'native', states: SDK.states,
     capabilities: ['work.read'], services: ['bedrijf'], permissions: ['work.read'],
     actions: ['work.connect', 'work.select', 'work.refresh', 'work.open'],
@@ -41,23 +41,30 @@
       });
     }
     function caseSelection(value) {
-      var p = value || {}, domain = String(p.domain || ''), id = String(p.id || '').trim();
-      if ((domain !== 'bureau' && domain !== 'service') || !id || id.length > 160) return null;
-      return { domain: domain, id: id };
+      var envelope = value || {}, p = envelope.case || {}, domain = String(p.domain || ''),
+        type = String(p.type || ''), id = String(p.id || '').trim(), observedVersion = String(p.observedVersion || '').trim();
+      var pair = domain + '/' + type;
+      if (envelope.schemaVersion !== 1 || (pair !== 'bureau/concierge-case' && pair !== 'service/service-case') ||
+          !id || id.length > 160 || !observedVersion || observedVersion.length > 160) return null;
+      return { domain: domain, type: type, id: id, observedVersion: observedVersion };
     }
     function unavailable(p, reason) {
       ctx.events.publish('work.coordination.unavailable', { schemaVersion: 1,
-        case: { domain: p.domain, id: p.id }, reason: reason || 'context-unavailable' });
+        case: { domain: p.domain, type: p.type, id: p.id, observedVersion: p.observedVersion },
+        reason: reason || 'context-unavailable' });
       return false;
     }
     function safeBinding(value, p, row) {
       var view = value && value.regiebeeld, context = view && view.context, refs = context && context.context;
       var workspace = refs && refs.workspace, tenant = refs && refs.tenant, entity = refs && refs.legalEntity;
-      if (!value || value.ok !== true || !view || view.readOnly !== true || !view.source ||
-          view.source.domain !== p.domain || view.source.id !== p.id || !context ||
+      if (!value || value.ok !== true || !view || view.schemaVersion !== 1 || view.readOnly !== true ||
+          view.ownsSourceData !== false || !view.source ||
+          view.id !== p.domain + ':' + p.type + ':' + p.id || view.source.domain !== p.domain ||
+          view.source.type !== p.type || view.source.id !== p.id || view.source.version !== p.observedVersion || !context ||
           context.status !== 'bekend' || context.readOnly !== true || context.grantsAuthority !== false ||
           !workspace || workspace.id !== row.werkruimte || !tenant || !tenant.id) return null;
-      return { schemaVersion: 1, case: { domain: p.domain, id: p.id },
+      return { schemaVersion: 1,
+        case: { domain: p.domain, type: p.type, id: p.id, observedVersion: p.observedVersion },
         workspace: { id: String(workspace.id) }, tenant: { id: String(tenant.id) },
         legalEntity: entity && entity.id ? { id: String(entity.id) } : null,
         readOnly: true, grantsAuthority: false };

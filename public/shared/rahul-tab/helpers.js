@@ -58,6 +58,25 @@
     return w.op >= sinds ? [ref].concat(rest) : rest.concat([ref]);
   }
   function suggesties(c) {
+    /* De Workspace-projectie heeft de actuele sessie, module, rechten en Edge-
+       context al fail-closed gecontroleerd. Hier worden alleen de vier gesloten
+       assistentsoorten naar vaste vragen vertaald. Actie-id, route, payload en
+       vrije manifesttekst worden nooit onderdeel van de zichtbare prompt; een
+       chip blijft bovendien een gewone vraag aan de bestaande Stuur-keten. */
+    var assistent = c && c.assistent, mogelijkheden = assistent && assistent.mogelijkheden;
+    if (Array.isArray(mogelijkheden)) {
+      var actie = /^[a-z][a-z0-9]*(?:\.[a-z0-9-]+)+$/, aanwezig = Object.create(null);
+      mogelijkheden.slice(0, 8).forEach(function (x) {
+        var id = String(x && x.id || ''), soort = String(x && x.soort || '');
+        if (actie.test(id) && ['read', 'search', 'open', 'propose'].indexOf(soort) >= 0) aanwezig[soort] = true;
+      });
+      var vast = { read: 'Vat het actieve onderdeel samen', search: 'Zoek binnen het actieve onderdeel',
+        open: 'Laat zien wat ik hier kan openen', propose: 'Bereid een controleerbaar voorstel voor' };
+      var gegrond = ['read', 'search', 'open', 'propose'].filter(function (soort) { return aanwezig[soort]; })
+        .slice(0, 3).map(function (soort) { return vast[soort]; });
+      if (gegrond.length) return gegrond;
+      return ['Wat vraagt nu aandacht?', 'Open het juiste onderdeel', 'Bereid de volgende stap voor'];
+    }
     var bron = c.app + c.deel;
     if (/werk|employee|personeel/i.test(bron)) return ['Bundel mijn beslissingen', 'Bereid onboarding voor', 'Wat blokkeert het team?'];
     if (/reis|living|veilig/i.test(bron)) return ['Bescherm mijn reis', 'Simuleer een verstoring', 'Wat vraagt mijn akkoord?'];

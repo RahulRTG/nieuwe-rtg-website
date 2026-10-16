@@ -13,6 +13,16 @@ html body.rtg-mall-living{
   --mall-line:rgba(235,204,148,.22);
   --mall-wine:#7f1634;
   --mall-green:#8eb993;
+  /* De bestaande Mall-functies blijven onder de nieuwe etalage beschikbaar.
+     Geef ook die oudere componenten de Mall-grond, zodat zij niet terugvallen
+     op de lichte LivingOS-tokens zodra de volledige catalogus openstaat. */
+  --bg:var(--mall-bg);
+  --card:var(--mall-panel);
+  --card2:var(--mall-panel-soft);
+  --line:var(--mall-line);
+  --txt:var(--mall-ink);
+  --muted:var(--mall-copy);
+  --soft:#a99b8d;
   background:#ede8df!important;
   color:var(--mall-ink);
 }
@@ -20,7 +30,7 @@ html body.rtg-stijl.rtg-shop-flow.rtg-shop-discover.rtg-mall-living[data-rtg-wor
   background:#ede8df!important;
   color:var(--mall-ink)!important;
 }
-body.rtg-mall-living .wd-shell,
+body.rtg-mall-living .wd-shell{background-color:var(--mall-bg)!important;color:var(--mall-ink)!important}
 body.rtg-mall-living #rtgWorldContent{background:transparent!important;color:var(--mall-ink)!important}
 body.rtg-mall-living #main{background:
   radial-gradient(80rem 45rem at 78% -8%,rgba(137,79,42,.17),transparent 62%),
@@ -31,8 +41,10 @@ body.rtg-mall-living .mall-capabilities,
 body.rtg-mall-living .mall-selection,
 body.rtg-mall-living .mall-partners,
 body.rtg-mall-living .mall-reviews{background-color:var(--mall-bg)!important;color:var(--mall-ink)!important}
-body.rtg-mall-living[data-rtg-cinematic="true"] .rtg-edge-top{--edge-copy:#fff8ec;--edge-dim:#b7aa9d;background:rgba(11,8,7,.9)!important;border-bottom-color:var(--mall-line)!important;color:var(--mall-ink)!important}
-body.rtg-mall-living[data-rtg-cinematic="true"] .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:var(--mall-ink)!important}
+body.rtg-mall-living[data-rtg-cinematic="true"] .rtg-edge-top{--edge-copy:#2a2119;--edge-dim:#645d55;background:#f8f5ef!important;border-bottom-color:rgba(42,33,25,.14)!important;color:#2a2119!important}
+body.rtg-mall-living[data-rtg-cinematic="true"] .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:#2a2119!important}
+body.rtg-mall-living:not([data-rtg-cinematic="true"]) .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:#2a2119!important}
+body.rtg-mall-living .rtg-spring.wd-skip{background:#0b0807!important;color:#fff8ec!important}
 body.rtg-mall-living #main .mall-selection>header,
 body.rtg-mall-living #main .mall-partners>header,
 body.rtg-mall-living #main .mall-reviews>header{position:static!important;inset:auto!important;padding:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
@@ -47,6 +59,10 @@ body.rtg-mall-living:not(.mall-complete-open) #main>#trefWrap,
 body.rtg-mall-living:not(.mall-complete-open) #main>#vast{display:none!important}
 body.rtg-mall-living.mall-complete-open #main>.vind,
 body.rtg-mall-living.mall-complete-open #main>#vast{animation:mall-reveal .38s cubic-bezier(.2,.8,.2,1) both}
+body.rtg-mall-living #main>:is(.vind,#trefWrap,#vast){background-color:var(--mall-bg)!important;color:var(--mall-ink)!important}
+body.rtg-mall-living #main :is(#trefWrap,#vast) :is(h1,h2,h3,h4,.deel,.dp-sub,.as-udeel){color:var(--mall-ink)!important}
+body.rtg-mall-living #main :is(#trefWrap,#vast) :is(.n,.stad,.tag,.meta,.mat,.oms,.opties,.waar,.dicht,.vindnoot,.reisnoot,.as-uitleg,.as-inleiding){color:var(--mall-copy)!important}
+body.rtg-mall-living #main :is(#trefWrap,#vast) :is(.boutiek,.genre,.kaart,.tref,.vd){background-color:var(--mall-panel)!important;color:var(--mall-ink)!important;border-color:var(--mall-line)!important}
 
 .mall-live{min-height:100vh;padding:clamp(42px,6vw,82px) 0 40px}
 .mall-live[aria-busy="true"]{cursor:progress}
@@ -221,8 +237,10 @@ body.mall-guest .mall-edge__rahul{border:1px solid rgba(235,204,148,.3)!importan
 .mall-live__source{margin:18px auto 0;color:var(--mall-dim);font-size:10px;text-align:center}
 
 .mall-edge-controls{display:flex;min-width:0;gap:2px}.mall-edge-controls>button,.mall-edge-controls>a{flex:1;min-width:0;min-height:44px;display:grid;place-items:center;padding:5px 8px;border:0;border-radius:var(--rtg-radius-system);background:transparent;color:var(--edge-bar-copy,var(--mall-ink));font:500 10px/1.2 Inter,sans-serif;text-decoration:none;cursor:pointer}.mall-edge-controls>button:hover,.mall-edge-controls>a:hover{background:rgba(255,255,255,.05)}
-.mall-edge-controls.is-fallback{position:fixed;z-index:60;left:50%;bottom:max(12px,env(safe-area-inset-bottom));width:min(510px,calc(100% - 24px));transform:translateX(-50%);padding:6px;border:1px solid var(--mall-line);border-radius:var(--rtg-radius-capsule);background:rgba(13,10,8,.88);box-shadow:0 16px 50px #0008;backdrop-filter:blur(26px)}
-.mall-edge-controls.is-mounted{width:100%}
+.mall-edge-controls.is-fallback{position:fixed;z-index:60;left:50%;bottom:max(12px,env(safe-area-inset-bottom));width:min(510px,calc(100% - 24px));transform:translateX(-50%);padding:6px;border:1px solid var(--mall-line);border-radius:var(--rtg-radius-capsule);background:#0d0a08;box-shadow:0 16px 50px #0008;backdrop-filter:blur(26px)}
+.mall-edge-controls.is-mounted{width:100%;background-color:#0d0a08}
+.mall-edge-controls.is-mounted>button,.mall-edge-controls.is-mounted>a{border-radius:0;background-color:#0d0a08}
+body[data-rtg-edge-2-rendered="true"] .mall-edge-controls.is-fallback{display:none}
 
 @keyframes mall-reveal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @media(max-width:900px){

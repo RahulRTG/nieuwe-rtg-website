@@ -23,6 +23,17 @@ html body.rtg-mall-living{
   --txt:var(--mall-ink);
   --muted:var(--mall-copy);
   --soft:#a99b8d;
+  /* Het desktopwerkvlak leest deze openbare wereld- en shelltokens. Houd ze
+     binnen de Mall gelijk aan de donkere projectie; anders zet Heritage na de
+     eerste render donkere LivingOS-tekst op de donkere Mall-grond. */
+  --rtg-world-ink:var(--mall-ink)!important;
+  --rtg-world-muted:var(--mall-copy)!important;
+  --rtg-world-card:var(--mall-panel)!important;
+  --rtg-world-card-strong:var(--mall-panel-soft)!important;
+  --rtg-world-line:var(--mall-line)!important;
+  --wh-ink:var(--mall-ink)!important;
+  --wh-soft:var(--mall-copy)!important;
+  --wd-line:var(--mall-line)!important;
   background:#ede8df!important;
   color:var(--mall-ink);
 }
@@ -31,6 +42,8 @@ html body.rtg-stijl.rtg-shop-flow.rtg-shop-discover.rtg-mall-living[data-rtg-wor
   color:var(--mall-ink)!important;
 }
 body.rtg-mall-living .wd-shell{background-color:var(--mall-bg)!important;color:var(--mall-ink)!important}
+body.rtg-mall-living .wd-shell :is(h1,h2,h3,h4,h5,h6,strong,b,label,legend,button,a){color:var(--mall-ink)!important}
+body.rtg-mall-living .wd-shell :is(p,small,time,.wd-muted,.wd-search-label){color:var(--mall-copy)!important}
 body.rtg-mall-living #rtgWorldContent{background:transparent!important;color:var(--mall-ink)!important}
 body.rtg-mall-living #main{background:
   radial-gradient(80rem 45rem at 78% -8%,rgba(137,79,42,.17),transparent 62%),

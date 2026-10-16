@@ -217,9 +217,12 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/rtg-winkel-2026.css" rel="stylesheet">
-<link href="/shared/rtg-mall-living.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<!-- De Mall-projectie komt bewust als laatste. Heritage levert de algemene
+     LivingOS-basis; deze laag bepaalt daarna de donkere Mall-grond en mag dus
+     niet opnieuw door de lichte wereldtokens worden overschreven. -->
+<link href="/shared/rtg-mall-living.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living mall-complete-open" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">

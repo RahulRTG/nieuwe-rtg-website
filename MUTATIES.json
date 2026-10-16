@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-16T05:30:42.406Z",
-    "commit": "18a886c6f",
+    "op": "2026-10-16T08:41:40.436Z",
+    "commit": "e93b77dae",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.12.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -19778,6 +19778,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "workspace-travel-request.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/second-screen.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "workspace-voorkeur.test.js": {
       "soort": "server",

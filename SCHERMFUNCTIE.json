@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-14",
-    "commit": "85f7e3bc6"
+    "op": "2026-10-16",
+    "commit": "2c61aefb4"
   },
   "bronnen": {
     "schermroutes": {
@@ -11433,7 +11433,7 @@
         "/api/reisbureau"
       ],
       "zonderServer": false,
-      "inkomend": 21,
+      "inkomend": 22,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-42.js",
@@ -11445,9 +11445,9 @@
         "public/apps/sociaal.html",
         "public/shared/command/console.js",
         "public/shared/experience-intent.js",
+        "public/shared/interface/modules/travel.js",
         "public/shared/rtg-world-home.js",
-        "public/shared/travel-os-config.js",
-        "public/site/werelden/travelos.html"
+        "public/shared/travel-os-config.js"
       ]
     },
     {
@@ -11582,7 +11582,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 70,
+      "inkomend": 71,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2b.js",

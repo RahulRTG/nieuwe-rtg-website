@@ -95,9 +95,10 @@
       }
     }
     function klik(e) {
+      var moduleRoot = e.target.closest('[data-rtg-module]');
+      if (moduleRoot && bank.contains(moduleRoot) && runtime.dispatch(e.target)) { e.preventDefault(); bewaar(); return; }
       var t = e.target.closest('[data-ss-action],[data-ss-url],[data-ss-context-id],[data-rtg-legacy-open]');
       if (!t || !bank.contains(t)) return;
-      if (runtime.dispatch(t)) { e.preventDefault(); bewaar(); return; }
       var a = t.dataset.ssAction, id = t.dataset.ssModuleId || (t.closest('[data-ss-module]') && t.closest('[data-ss-module]').dataset.ssModule);
       if (a === 'close') zet('peek');
       else if (a === 'panel' || a === 'workspace' || a === 'focus') zet(a);

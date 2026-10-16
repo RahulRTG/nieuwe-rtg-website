@@ -3,15 +3,27 @@
 **Classificatie:** financieel en beveiligingsrisico
 
 **Blokkeert:** publieke verkoop van AI-bundels
-**Scope van Revenue Catalog Contract v1:** vastleggen, niet herstellen
+**Stand op de afgeschermde integratiewerkboom:** directe toekenning fail-closed;
+de publieke aankoopketen blijft geblokkeerd
 
 ## Bevinding
 
-`POST /api/member/ai/bundel` berekent de prijs server-side en roept daarna
-rechtstreeks `tegoed.koopBundel()` aan. `koopBundel()` verhoogt `bijgekocht`,
-schrijft de bundel in de tegoedrij en bewaart. In deze keten is geen bewezen
-payment authorization, settlement, payer, ledgerreferentie of idempotente
-billing-event-identiteit vereist.
+`POST /api/member/ai/bundel` berekende de prijs server-side en riep daarna
+rechtstreeks `tegoed.koopBundel()` aan. `koopBundel()` verhoogde `bijgekocht`
+zonder payment authorization, settlement, payer, ledgerreferentie of
+idempotente billing-event-identiteit.
+
+De directe grant is op de integratiewerkboom gesloten. `koopBundel()` kent pas
+capaciteit toe wanneer een door de server geinjecteerde verifier exact dezelfde
+betaler, productreferentie, prijs, valuta, settlementstand, evidence-id en
+ledgerreferentie bevestigt. De evidence-id kan maar aan één toekenning worden
+gebonden; herhalen levert dezelfde uitkomst en geen tweede tegoed. Zonder
+verifier of passend bewijs retourneert de kern `PAYMENT_EVIDENCE_REQUIRED` of
+`PAYMENT_EVIDENCE_INVALID` en blijft het tegoed onveranderd.
+
+Ook de bestaande voorkeur `AUTO_AANVULLEN` veroorzaakt zonder zo'n adapter geen
+creditgrant meer. De voorkeur mag worden bewaard, maar de uitvoering stopt met
+`betaalbewijs-vereist` tot de betaaladapter is aangesloten.
 
 Bronnen:
 
@@ -30,12 +42,17 @@ toegekend zonder ontvangen geld. Retries en gelijktijdige requests dragen geen
 stabiele billing-idempotency key en kunnen daardoor bovendien meer dan één
 tegoedeffect veroorzaken.
 
-## Grens van deze PR
+## Huidige grens
 
-De cataloguspilot blijft altijd `READ_ONLY` en `purchasable: false`. De projectie
+De cataloguspilot blijft `READ_ONLY` en `purchasable: false`. De projectie
 initieert geen betaling, kent geen tegoed toe, activeert geen abonnement en
-verleent geen entitlement. De bestaande route wordt in deze PR niet gewijzigd,
-zodat een kleine catalogus-PR geen ongevraagde betaalarchitectuur introduceert.
+verleent geen entitlement. De route is nog geen kooproute: er is bewust geen
+verifier aangesloten en dus kan zij geen capaciteit toekennen.
+
+Dit sluit het acute gratis-creditpad, maar nog niet de productketen. Er bestaat
+nog geen gekoppelde payment intent, providerbevestiging, entitlementprojectie,
+refund-tegeneffect of reconciliatie voor AI Extra S. Daarom blijft
+`REV-AI-CREDIT-001` de publieke verkoop blokkeren.
 
 ## Vereist vervolg vóór verkoop
 

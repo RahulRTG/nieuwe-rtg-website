@@ -1,15 +1,14 @@
-/* RTFoundation-lesapp, service worker: maakt de app installeerbaar en laat hem
-   offline openen. Pagina's en scripts zijn network-first (een update komt direct
-   door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
-   gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-38632fbc';
+/* Foundation-shell: network-first met een offline vangnet. */
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-0a546777';
 const SHELL = [
-  /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
   '/shared/interface/workspace-registries.js',
   '/shared/interface/workspace-session.js',
+  '/shared/experience-intent.js',
+  '/shared/interface/workspace-intents.js',
   '/shared/interface/workspace-policy.js',
+  '/shared/interface/workspace-assistant-manifest.js',
   '/shared/interface/workspace-context.js',
   '/shared/interface/workspace-navigation.js',
   '/shared/interface/workspace-state.js',

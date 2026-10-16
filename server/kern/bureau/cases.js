@@ -30,6 +30,7 @@
 
 const { STATUSSEN, EINDSTATUS, KANTOOR_STATUSSEN, SOORTEN, SPECIALIST, BESLOTEN_DOMEIN } =
   require('./cases-soorten');
+const zaakregiebeeld = require('../zaakregiebeeld');
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, liveCodename, notify, beoordeel, deelopdrachten } = ctx;
@@ -171,6 +172,9 @@ module.exports = (ctx) => {
     return {
       status: 200,
       zaken: alle,
+      /* De werkruimte krijgt een positief opgebouwde projectie naast de
+         bestaande dossiers. Zij bezit of muteert de bronzaken niet. */
+      regiebeelden: alle.map(zaakregiebeeld.bureau),
       open: alle.filter(openCase).length,
       beslissingen: alle.filter(c => c.beslissing.nodig).length,
       statussen: STATUSSEN, soorten: SOORTEN

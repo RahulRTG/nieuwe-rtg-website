@@ -13,7 +13,7 @@ function controleer(wortel = ROOT) {
   const fouten = [], appPad = path.join(wortel, 'public', 'apps', 'app.html');
   const html = fs.readFileSync(appPad, 'utf8');
   const vereist = ['module-sdk.js', 'workspace-world-catalog.js', 'workspace-continuity.js', 'workspace-composer.js', 'workspace-registries.js',
-    'workspace-session.js', 'workspace-policy.js', 'workspace-context.js', 'workspace-navigation.js',
+    'workspace-session.js', 'workspace-intents.js', 'workspace-policy.js', 'workspace-assistant-manifest.js', 'workspace-context.js', 'workspace-navigation.js',
     'workspace-state.js', 'workspace-orchestrator.js', 'workspace-blueprints.js',
     'workspace-broker.js', 'workspace-module-host.js', 'workspace-runtime.js', 'workspace-legacy.js',
     'second-screen-modules.js', 'workspace-experience.js', 'second-screen.js'];
@@ -64,7 +64,7 @@ function controleer(wortel = ROOT) {
     if (!m.state || !m.performance || !m.isolation || !/^L[0-4]$/.test(m.maturity))
       fouten.push(m.id + ' mist state-, performance-, isolatie- of volwassenheidscontract');
   }
-  for (const id of ['profile', 'context', 'messages', 'navigation', 'travel', 'safety'])
+  for (const id of ['profile', 'context', 'messages', 'navigation', 'travel', 'work', 'coordination', 'safety'])
     if (!ids.has(id)) fouten.push('kernmodule ontbreekt: ' + id);
   let worlds = [];
   if (wortel === ROOT) {

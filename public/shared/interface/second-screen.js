@@ -17,7 +17,10 @@
         if (w.matchMedia('(max-width:999px)').matches) zet('peek');
         return o.open(url, title);
       },
-      confirm: function (vraag) { return w.confirm(String(typeof vraag === 'function' ? vraag() : vraag)); },
+      confirm: function (vraag, payload) {
+        var tekst = typeof vraag === 'function' ? vraag(payload || {}) : vraag;
+        return tekst ? w.confirm(String(tekst)) : true;
+      },
       onRechten: function () { if (composer) composer.draw(state, editing); },
       onOrchestrate: function (layout, changes, event) {
         var kritiek = event && event.event === 'safety.incident.started' && event.payload && event.payload.severity === 'critical';

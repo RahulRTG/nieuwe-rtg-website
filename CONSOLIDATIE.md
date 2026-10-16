@@ -6,6 +6,17 @@ RTG wordt opgeruimd zonder de ambitie of de bestaande productwerelden op te geve
 
 **Eén integrator.** Pull requests gaan via één integrerende agent naar main, en elke PR begint vanaf een verse main. Tot de inventaris van de domeinen (fase 4) klaar is, worden er geen nieuwe domeinen geïmplementeerd; beveiligingsreparaties, onderzoek, ontwerp en documentatie mogen doorgaan zolang ze de integratie niet verstoren.
 
+**Uitvoeringsaanvulling van de eigenaar (16 oktober 2026).** Voor het RTG Full
+Build-programma mag de integrator afhankelijke wijzigingen op één afgeschermde
+integratietak stapelen en onafhankelijke werkstromen voortzetten zonder op elke
+platformbrede kwalificatie-uitkomst te wachten. De integratietak is geen
+stabiele hoofdlijn en geen productiebron. Iedere stap houdt zijn basis,
+afhankelijkheden, lokale toetsen en open kwalificatiepunten zichtbaar. Voor
+`main`, releasetags en productie blijven review, expliciet integratiebesluit en
+de bestaande uitrolpoorten gelden. Accountisolatie, autorisatie en financiële
+veiligheid mogen ook op de integratietak nooit als later op te lossen schuld
+worden doorgeschoven.
+
 **Gegenereerde registers.** CI genereert en controleert de registers; een PR hoeft ze niet mee te nemen. CI faalt wanneer een register niet overeenkomt met de broncode: mergeconflicten verminderen mag, een architectuurafwijking verbergen niet.
 
 **Vier harde voorwaarden**, ook voor elke reparatie:

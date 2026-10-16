@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-14",
+  "vastgelegd": "2026-10-16",
   "gemeten": {
-    "bestanden": 2905,
-    "vormen": 1613,
-    "velden": 2315,
-    "modules": 899,
-    "domeinen": 319,
+    "bestanden": 2923,
+    "vormen": 1615,
+    "velden": 2316,
+    "modules": 901,
+    "domeinen": 320,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1622,
+    "veldenDomeineigen": 1623,
     "veldenGedeeldVanafVier": 237,
     "gelijkendeVormparen": 65
   },
@@ -370,6 +370,30 @@
       ]
     },
     {
+      "veld": "version",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/bewijsvlak",
+        "kern/connection-communication-media",
+        "kern/connection-profile-media",
+        "kern/document-contracten",
+        "kern/experience"
+      ]
+    },
+    {
+      "veld": "kind",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/boerderij",
+        "kern/connection-communication",
+        "kern/connection-communication-actions",
+        "kern/connection-communication-media",
+        "kern/economie"
+      ]
+    },
+    {
       "veld": "niveau",
       "domeinen": 12,
       "waar": [
@@ -487,30 +511,6 @@
         "kern/concern",
         "kern/livinglab",
         "kern/machtiging"
-      ]
-    },
-    {
-      "veld": "version",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/bewijsvlak",
-        "kern/connection-communication-media",
-        "kern/connection-profile-media",
-        "kern/document-contracten",
-        "kern/experience"
-      ]
-    },
-    {
-      "veld": "kind",
-      "domeinen": 11,
-      "waar": [
-        "kern/boerderij",
-        "kern/connection-communication",
-        "kern/connection-communication-actions",
-        "kern/connection-communication-media",
-        "kern/economie",
-        "kern/experience"
       ]
     },
     {

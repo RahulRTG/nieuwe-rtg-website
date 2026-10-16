@@ -10,6 +10,7 @@ const CSS = lees('public/shared/interface/second-screen-personal.css');
 const MODULES = lees('public/shared/interface/second-screen-modules.js');
 const CONTEXT = lees('public/shared/interface/modules/context.js');
 const TRAVEL = lees('public/shared/interface/modules/travel.js');
+const TRAVELDOSSIER = lees('public/shared/interface/modules/travel-dossier-view.js');
 const EMPTY = lees('public/shared/interface/workspace-empty.js');
 const LEEG = lees('public/shared/leeg.js');
 const UI = lees('public/shared/rtg-ui.css');
@@ -84,7 +85,7 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
     'de invulhandeling moet de leesbare inkt van haar vlak erven');
   assert.match(EMPTY, /RTGLeeg\.vlak/);
   assert.match(MODULES, /\/apps\/comm\.html#nieuw/);
-  assert.match(TRAVEL, /\/apps\/reizen\.html#rahul/);
+  assert.match(TRAVELDOSSIER, /\/apps\/reizen\.html#rahul/);
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);

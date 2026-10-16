@@ -17,15 +17,15 @@
 
      STOP           er worden geen extra kosten gemaakt, punt
      VRAAG_MIJ      melding bij 80% en 100%, met een bundel binnen handbereik
-     AUTO_AANVULLEN een gekozen bundel erbij zodra het tegoed op is, met een
-                    maandmaximum
+     AUTO_AANVULLEN bewaart bundel en maandmaximum, maar voert pas uit wanneer
+                    een betaalbewijsadapter de aankoop bevestigt
      CONTRACT       enterprise: het overschot loopt op het contract
 
    AUTO_AANVULLEN is er voor bedrijven. Een restaurant hoort niet op
-   vrijdagavond te ontdekken dat de menukaartvertaling stilstaat. Maar het
-   maandmaximum is niet optioneel: automatisch bijkopen zonder bovengrens IS
-   ongemerkte variabele kosten, alleen met een vriendelijker naam. Zonder
-   maximum weigert deze module de stand.
+   vrijdagavond te ontdekken dat de menukaartvertaling stilstaat. Het
+   maandmaximum is verplicht, maar op zichzelf geen betaalbewijs. Tot de
+   betaaladapter is aangesloten bewaart deze module de voorkeur en weigert zij
+   het tegoedeffect.
 
    EEN KLANT KOOPT CAPACITEIT, GEEN MODEL. Extern bestaan er RTG AI-credits en
    bundels (S, M, L, XL); nergens staat welk model erachter draait. Zo kan een
@@ -59,8 +59,9 @@ const { magVerbruiken } = require('./tegoed/plafond');
 
 const caps = require('./capaciteiten');
 
-function maakTegoed({ db, save, nu }) {
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/tegoed', bezit: { aiTegoed: 'kaart' } });
+function maakTegoed({ db, save, nu, verifieerBetaalbewijs }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/tegoed',
+    bezit: { aiTegoed: 'kaart', aiTegoedBewijs: 'kaart' } });
   const tijd = nu || klok.nu;
   const alles = () => eigen.bak('aiTegoed');
   const maandVan = t => new Date(t).toISOString().slice(0, 7);
@@ -102,11 +103,6 @@ function maakTegoed({ db, save, nu }) {
     const oordeel = mag(houder, pas, c, opties);
     if (!oordeel.mag) return { ...oordeel, geboekt: 0 };
 
-    if (oordeel.reden === 'auto-aangevuld') {
-      const b = BUNDELS[r.autoBundel];
-      r.bijgekocht += b.credits;
-      r.bundels.unshift({ bundel: b.id, credits: b.credits, automatisch: true, at: tijd() });
-    }
     r.verbruikt += c;
     if (oordeel.waarschuwing && !r.gewaarschuwdOp) r.gewaarschuwdOp = tijd();
     save();
@@ -122,23 +118,13 @@ function maakTegoed({ db, save, nu }) {
      (kern/commercie/bundelprijs.js) en komt van de aanroeper, want alleen die
      kent de boardroom-instelling.
 
-     ZONDER PRIJS GEEN VERKOOP. Staat de inkoopkant niet ingesteld, dan is er
+     ZONDER PRIJS EN ZONDER BEWEZEN BETALING GEEN VERKOOP. Staat de inkoopkant niet ingesteld, dan is er
      geen prijs, en dan hoort er niets verkocht te worden -- credits weggeven
-     omdat een som ontbreekt, is de duurste manier om een gat te verbergen. */
-  function koopBundel(houder, pas, bundelId, prijs) {
-    const b = BUNDELS[String(bundelId || '')];
-    if (!b) return { status: 404, error: 'Deze bundel bestaat niet.' };
-    if (!b.credits) return { status: 400, error: b.naam + ' is een contractafspraak en wordt niet los gekocht.' };
-    const centen = prijs && Number.isFinite(prijs.centen) ? prijs.centen : null;
-    if (centen === null)
-      return { status: 409, error: (prijs && prijs.reden) ||
-        'Voor deze bundel is nog geen prijs vastgesteld; hij is daarom niet te koop.' };
-    const r = rijVan(houder, pas);
-    r.bijgekocht += b.credits;
-    r.bundels.unshift({ bundel: b.id, credits: b.credits, centen, automatisch: false, at: tijd() });
-    save();
-    return { status: 200, ok: true, bundel: b.naam, centen, rest: restVan(r) };
-  }
+     omdat een som ontbreekt, is de duurste manier om een gat te verbergen.
+     De verifier komt van de serverbedrading; een client kan zichzelf daarmee
+     geen settlement of ledgerbewijs geven. */
+  const koopBundel = require('./tegoed/betaalbewijs')({ BUNDELS, verifieerBetaalbewijs,
+    bewijsBak: () => eigen.bak('aiTegoedBewijs'), rijVan, restVan, tijd, save });
 
   /* Het beleid zetten. AUTO_AANVULLEN VRAAGT EEN MAANDMAXIMUM -- automatisch
      bijkopen zonder bovengrens is ongemerkte variabele kosten met een
@@ -159,7 +145,10 @@ function maakTegoed({ db, save, nu }) {
     }
     r.beleid = beleid;
     save();
-    return { status: 200, ok: true, beleid: r.beleid, bundel: r.autoBundel, maandMaxCenten: r.maandMaxCenten };
+    return { status: 200, ok: true, beleid: r.beleid, bundel: r.autoBundel, maandMaxCenten: r.maandMaxCenten,
+      actief: beleid !== BELEID.AUTO_AANVULLEN,
+      waarom: beleid === BELEID.AUTO_AANVULLEN
+        ? 'Automatisch aanvullen blijft uit tot een betaalbewijsadapter iedere aanvulling bevestigt.' : null };
   }
 
   /* De stand, in de vorm die een scherm hoort te tonen. Percentage vooraan,

@@ -12,26 +12,11 @@
   }
   function kop(tekst) { return el('h4', 'rtg-travel-request-title', tekst); }
   function terug(tekst, actie) { return button(tekst, actie, 'rtg-travel-request-secondary'); }
-  function leeg(o) { return w.RTGWorkspaceEmpty ? w.RTGWorkspaceEmpty(o) : el('p', 'rtg-ss-quiet', o.titel); }
-  function renderDossier(root, model) {
-    var m = model || {}, dossier = m.dossier;
-    if (m.suggestion) {
-      var card = el('div', 'rtg-module-suggestion'); card.appendChild(el('strong', '', 'Chauffeurdetails ontvangen'));
-      card.appendChild(el('p', 'rtg-ss-quiet', m.suggestion.preview || 'Details uit Berichten zijn klaar om aan deze reis toe te voegen.'));
-      card.appendChild(button('Toevoegen aan rit', 'attach-driver')); root.appendChild(card);
-    }
-    if (!dossier) root.appendChild(el('p', 'rtg-ss-quiet', m.dossierLoading ? 'Reisdossier laden…' : 'Open de werklaag om uw reisdossier te laden.'));
-    else if (!dossier.reis) root.appendChild(leeg({ ey: 'TravelOS', titel: 'Uw reisboek is nog leeg.',
-      wat: 'Vertel Rahul wat u voor ogen heeft; hij brengt de eerste keuzes bij elkaar.',
-      tekst: 'Plan een reis met Rahul', pad: '/apps/reizen.html#rahul' }));
-    else {
-      var r = dossier.reis, kaart = el('div', 'rtg-module-summary'); kaart.appendChild(el('strong', '', r.bestemming || 'Komende reis'));
-      if (r.datums) kaart.appendChild(el('span', '', r.datums));
-      if (m.state !== 'peek') kaart.appendChild(el('small', '', (Number(dossier.bevestigd) || 0) + ' bevestigd · ' +
-        (Array.isArray(dossier.open) ? dossier.open.length : 0) + ' vraagt aandacht'));
-      root.appendChild(kaart);
-    }
-    if (m.state === 'peek') { var open = button('Open Travel', 'open'); open.dataset.ssUrl = '/apps/reizen.html#reizen'; root.appendChild(open); }
+  function overdracht(vak, m) {
+    vak.appendChild(el('p', 'rtg-travel-handoff-note', m.remember ?
+      'Uw datum en aantal reizigers gaan mee naar het volledige reisbureau. Vrije wensen blijven alleen in dit actieve paneel.' :
+      'Wilt u datum en reizigers meenemen? Zet eerst Bewaar en hervat aan. Vrije wensen worden nooit in de werkruimteopslag gezet.'));
+    vak.appendChild(terug('Ga verder in het volledige reisbureau', 'open-flow'));
   }
   function catalogus(vak, m) {
     vak.appendChild(kop('Nieuwe reisaanvraag'));
@@ -73,13 +58,18 @@
     var notitie = el('textarea'); notitie.maxLength = 300; notitie.rows = 3; notitie.value = draft.note;
     notitie.placeholder = 'Bijzondere wensen voor uw reisadviseur'; notitie.dataset.rtgTravelInput = 'note'; notitie.disabled = m.busy;
     notitieLabel.appendChild(notitie); vak.appendChild(notitieLabel);
+    var onthoud = el('label', 'rtg-travel-remember');
+    var vink = el('input'); vink.type = 'checkbox'; vink.checked = m.remember === true; vink.disabled = m.rememberBusy === true;
+    vink.dataset.rtgTravelAction = 'remember';
+    onthoud.appendChild(vink); onthoud.appendChild(el('span', '', 'Bewaar datum en reizigers in dit tabblad om later te hervatten'));
+    vak.appendChild(onthoud);
     vak.appendChild(el('p', 'rtg-travel-total', 'Richtprijs: ' + geld((Number(reis.prijs) || 0) * draft.participants) +
       ' voor ' + draft.participants + ' reiziger' + (draft.participants === 1 ? '' : 's')));
     if (result && result.type === 'rejected') vak.appendChild(status((result.sent ? 'Aanvraag geweigerd. ' : 'Niet verstuurd. ') +
       ((result.error && result.error.message) || 'Controleer uw invoer.'), 'warning'));
     var acties = el('div', 'rtg-travel-request-actions'); acties.appendChild(terug('Andere reis', 'back-catalog'));
     var review = button('Controleer uw aanvraag', 'review'); review.disabled = m.busy; acties.appendChild(review); vak.appendChild(acties);
-    vak.appendChild(terug('Ga verder in het volledige reisbureau', 'open-flow'));
+    overdracht(vak, m);
   }
   function review(vak, m) {
     var aanvraag = w.RTGTravelRequestController.requestFor(m.trip, m.draft);
@@ -90,7 +80,7 @@
       m.result.application.ref + '). Uw invoer is niet opnieuw verstuurd.', 'warning'));
     var acties = el('div', 'rtg-travel-request-actions'); acties.appendChild(terug('Terug naar invoer', 'edit'));
     var submit = button(m.busy ? 'Bezig met versturen…' : 'Verstuur deze reisaanvraag', 'submit'); submit.disabled = m.busy;
-    acties.appendChild(submit); vak.appendChild(acties); vak.appendChild(terug('Ga verder in het volledige reisbureau', 'open-flow'));
+    acties.appendChild(submit); vak.appendChild(acties); overdracht(vak, m);
   }
   function onzeker(vak, m) {
     vak.appendChild(kop('Uitkomst nog onbekend'));
@@ -102,9 +92,15 @@
   }
   function ontvangen(vak, m) {
     var a = m.result && m.result.application || {};
-    vak.appendChild(kop('Aanvraag ontvangen'));
-    vak.appendChild(status((m.result && m.result.matched ? 'Uw aanvraag is bij de bron teruggevonden. ' : '') +
-      'Aangevraagd, nog niet bevestigd.' + (a.ref ? ' Referentie: ' + a.ref + '.' : ''), 'ok'));
+    var confirmed = a.status === 'bevestigd', rejected = a.status === 'afgewezen';
+    vak.appendChild(kop(confirmed ? 'Reis bevestigd' : rejected ? 'Aanvraag afgewezen' : 'Aanvraag ontvangen'));
+    var message = confirmed ? 'Uw reisaanvraag is door een reisadviseur bevestigd.' :
+      rejected ? 'De reisadviseur heeft deze aanvraag niet kunnen bevestigen.' : 'Aangevraagd, nog niet bevestigd.';
+    if (a.besluit && a.besluit.bericht) message += ' ' + a.besluit.bericht;
+    if (a.ref) message += ' Referentie: ' + a.ref + '.';
+    vak.appendChild(status((m.result && m.result.matched ? 'Uw aanvraag is bij de bron teruggevonden. ' : '') + message,
+      rejected ? 'warning' : 'ok'));
+    vak.appendChild(terug('Ververs status', 'status'));
     vak.appendChild(button('Bekijk uw reisoverzicht', 'open'));
   }
   function renderRequest(root, model, onInput) {
@@ -123,6 +119,6 @@
     var note = vak.querySelector('[data-rtg-travel-input="note"]'); if (note) note.addEventListener('input', function () { onInput('note', note.value); });
     return vak;
   }
-  var api = { renderDossier: renderDossier, renderRequest: renderRequest };
+  var api = { renderDossier: w.RTGTravelDossierView, renderRequest: renderRequest };
   w.RTGTravelView = Object.freeze ? Object.freeze(api) : api;
 })(window, document);

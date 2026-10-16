@@ -1,9 +1,8 @@
 # Het afbouwprogramma — wat RTG heeft toegezegd, afbouwen en bewijzen
 
-*Eigenaarsbesluit van 11 oktober 2026. Dit document legt het besluit vast, de
-grenzen die eruit volgen, de vier werkstromen die het uitvoeren, en de
-inventaris die zegt wat er binnen de scope valt. Het is LEIDEND voor de verdere
-ontwikkeling van RTG.*
+*Eigenaarsbesluit van 11 oktober 2026, met het uitvoeringsbesluit van 16 oktober
+2026. Dit document legt de scope, grenzen, bouwstromen en bewijsvoering vast. Het
+is LEIDEND voor de verdere ontwikkeling van RTG.*
 
 Let op de naam. `afbouw` is in dit huis al bezet door de releaseketen
 (`npm run afbouw:software`, `scripts/afbouwoordeel.js`: *is deze commit
@@ -23,6 +22,27 @@ en parallelle werkstromen waar dat technisch verantwoord is, en met een
 gecontroleerde uitvoering van A, B en C naast elkaar. Na het vastleggen begint
 de uitvoering. Dit is geen nieuwe audit- of documentatiefase; elke ronde levert
 een meetbare softwareverbetering op.
+
+### Uitvoeringsbesluit 16 oktober 2026 — Full Build → Final Qualification
+
+De uitvoering bouwt voortaan eerst alle bestaande en toegezegde onderdelen tot
+één afgeschermde releasekandidaat. Daarna volgt één gezamenlijke,
+platformbrede eindkwalificatie. Een open platformbrede CI-afwijking in een
+afzonderlijke ontwikkeltak houdt onafhankelijk bouwwerk niet stil, maar blijft
+zichtbaar en mag niet als groen bewijs of stabiele productiegrondslag worden
+gebruikt.
+
+Tijdens de bouw blijven typechecks, gerichte unit-, contract- en
+integratietoetsen en de relevante beveiligingsproeven verplicht. Account- en
+tenantisolatie, autorisatie, gegevensbehoud en financiële veiligheid moeten
+lokaal dicht zijn voordat ander werk op zo'n grens voortbouwt. De volledige
+scherm-, route-, prestatie-, toegankelijkheids-, herstel- en operationele
+kwalificatie wordt uitgevoerd op de geïntegreerde kandidaat.
+
+De integratietak is geen publieke release. Mergen naar `main`, een releasetag,
+een productie-image en een live-uitrol blijven afzonderlijke handelingen met de
+bestaande menselijke poorten. Een feature flag kan nieuw gedrag afschermen,
+maar vervangt nooit serverautorisatie of een andere beveiligingsgrens.
 
 ## 1. De drie grenzen, definitief
 
@@ -72,35 +92,120 @@ De vorm ligt al vast en verandert niet: een simulatie-adapter vervangt de rail,
 nooit de poort (`MAGNAATLAB.md`); elke adapter heeft een grendel die fail-closed
 is; geen vlag in de productieweg; en een simulatie mag nooit een handeling laten
 slagen die in het echt niet zou slagen. Daarmee gaan bewijs 3, 5 en 7
-(voltooibaar, persistent, herstelbaar) open. Werkstroom B voert het uit.
+(voltooibaar, persistent, herstelbaar) open. Werkstroom F voert het uit en Q
+kwalificeert de geïntegreerde uitkomst.
 
 In de inventaris staat dat als correctie in `TOEZEGKLASSEN.json`: de regel van
 par. 7 stap 4 is daar `toegezegd`, met dit besluit als reden. Andere open punten
 in `BETROUWBAARHEID.md` (bellen/video in een headless browser, de acht bewijzen
 per belofte) blijven wat ze waren.
 
-## 4. De vier werkstromen
+## 4. De zes bouwstromen en de kwalificatiestroom
 
 | werkstroom | wat | werkterrein |
 |---|---|---|
-| A — besluit en inventaris | dit document, en de klassering van de toezeggingen in het bestaande completion-register | `AFBOUWPROGRAMMA.md`, `TOEZEGKLASSEN.json`, `scripts/lib/toezegklassen.js`, het blok `toezegklassen` in `APPWERKT.json` |
-| B — testwereld | de ontbrekende testinfrastructuur uit `BETROUWBAARHEID.md` par. 4, zodat alle acht bewijzen meetbaar worden; eerst een kleine representatieve keten, dan breder; alleen geïsoleerde testdata en veilige simulaties voor externe effecten | adapters naast de echte rails, `scripts/` |
-| C — integratieproef | de Rome-keten als echte ketenproef over FoundationOS, WorkOS, TravelOS en LivingOS; elke open schakel met oorzaak, eigenaar en benodigde oplossing; schakels sluiten zodra de voorziening er is | een ketenproef in de vorm van `scripts/tafelproef.js` |
-| D — productafbouw | bestaande, onafhankelijke producten afmaken waarvoor geen nieuw architectuurbesluit en geen ontbrekende testvoorziening nodig is; voorrang voor werk dat bestaande gebruikersketens werkelijk sluit | per product |
+| A — Experience | Heritage, Edge 3.0, de bestaande schermen, cinematische samenhang, responsiviteit en toegankelijke interactie | bestaande Heritage- en Edge-bronnen en de schermen die ze gebruiken |
+| B — Spatial | Flow ↔ Spatial, TravelOS, WorkOS, panelen, sessiecontinuïteit, niet-opgeslagen werk, herstel en foutisolatie | bestaande Spatial Shell, Workspace Runtime, modulecontracten en domeinbronnen |
+| C — Universal Concierge | Coordination Envelope, Universal Service Case, organisaties, rollen, mandaten, delegatie en sectorprofielen | bestaande bevoegdheids-, organisatie-, concierge- en domeincontracten; geen tweede backend |
+| D — Revenue | catalogus, producten, entitlements, abonnementen, betaalbewijs, reconciliation en B2B/B2C/B2B2C | bestaande commerce-, prijzen-, Pass- en Pay-grenzen |
+| E — Rahul | Intent Router, Capability Manifest en gecontroleerde contextuele bediening | bestaande Rahul-, Stuur-, Trusted Execution- en capabilitybronnen; geen tweede agent |
+| F — Platform | bestaande apps en widgets, testwereld, infrastructuur, integraties, technische afbouw en registergeneratie | bestaande domeinen, adapters naast echte rails en `scripts/` |
+| Q — eindkwalificatie | één campagne over alle geïntegreerde apps, routes, schermen, Living Modules, servercapabilities, gebruikersketens, beveiliging, toegankelijkheid, prestaties, herstel en operatie | de afgeschermde releasekandidaat en bestaande releaseketen |
+
+De eerdere testwereld en integratieproef vervallen niet. Ze zijn ondergebracht in
+F en Q. De Rome-keten blijft een echte ketenproef over de werelden; de
+gecontroleerde testwereld blijft de manier om externe effecten veilig te
+bewijzen.
 
 ## 5. Coördinatie
 
 - Eén bestaande architectuur en één completion-register: `APPWERKT.json`. De
   inventaris staat daarin als blok, niet ernaast.
-- Geen conflicterende wijzigingen tussen agents: elke werkstroom blijft binnen
-  zijn werkterrein en hergenereert geen registers die niet van hem zijn.
+- Eén afgeschermde integratietak verzamelt afhankelijke bouwstappen. Een stap
+  noteert zijn basis en afhankelijkheden; een falende of onvolledige stap wordt
+  nooit ongemarkeerd als stabiele basis behandeld.
+- Onafhankelijke bouwstromen mogen doorwerken wanneer een andere stroom een
+  niet-relevante kwalificatieafwijking heeft. Afhankelijke wijzigingen blijven
+  in volgorde en krijgen gerichte lokale toetsing vóór de volgende laag erop
+  voortbouwt.
+- Geen conflicterende wijzigingen tussen werkstromen: iedere stroom blijft
+  binnen zijn werkterrein en hergenereert geen registers die niet van hem zijn.
 - Geen omzeiling van veiligheidsgrenzen, en geen automatische merges zonder de
   vereiste controles. Mergen blijft mensenwerk (`ONDERHOUD.md`).
-- Elke ronde rapporteert bewezen voortgang (een meting die bewoog), niet alleen
-  ontwikkelactiviteit, en registreert de resterende afhankelijkheden en
-  blokkades.
+- Iedere bouwronde rapporteert wat is gebouwd, geïntegreerd en lokaal getoetst,
+  wat nog eindkwalificatie vraagt en welke blokkades of afhankelijkheden er
+  zijn. Alleen de eindkwalificatie mag de stand `DEFINITIEF_GEDEKT` toekennen.
 - Een poort bewijst alleen zijn eigen bereik (`LAT.md` regel 17): zeg welke poort
   groen staat en wat niet bevestigd is.
+
+### 5.1 Eén afbouwadministratie
+
+`AFBOUWPROGRAMMA.md` bewaart het eigenaarsbesluit, de werkstroomstand en de
+afhankelijkheden. `APPWERKT.json` blijft het gegenereerde completion-register
+en de bron voor de acht bewijsstanden. Er komt geen tweede register.
+
+De ontwikkelrapportage gebruikt zes labels: `GEBOUWD`, `GEINTEGREERD`,
+`LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG`, `GEBLOKKEERD` en
+`DEFINITIEF_GEDEKT`. Deze labels vervangen de bewijsstanden in `APPWERKT.json`
+niet. Ze voorkomen juist dat lokaal geslaagd werk voortijdig als volledig
+bewezen wordt beschreven.
+
+| werkstroom | actuele bouwstand | afhankelijkheid | kwalificatiestand |
+|---|---|---|---|
+| A — Experience | Edge Quiet Presence is geïntegreerd op `main`; overige schermmigratie loopt | Heritage en bestaande schermcontracten | `EINDKWALIFICATIE_NODIG` |
+| B — Spatial | TravelOS ondersteunt Flow ↔ Spatial, native aanvraag, veilige hervatting, accountisolatie, Edge-contextacties, antwoordverliesherstel en menselijke bevestigingsstatus. WorkOS is als tiende Living Module aangesloten: pas na expliciete activatie leest hij de bestaande `/api/bedrijf`-bronnen, bewaart hij geen lidtoken en kan hij veilig naar dezelfde werkruimte in de volledige Flow overdragen | TravelOS- en WorkOS-bronroutes, Workspace Runtime, bestaande account- en lidmaatschapssessies | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| C — Universal Concierge | Zaakregiebeeld en RTG Regie projecteren bestaande Concierge Case/Lus en Servicezaak. De bestaande Bedrijfspoort bindt nu een eigen zaak read-only aan exact dezelfde RTG-account, actieve WorkOS-werkruimte, tenant en eventuele concernentiteit; vreemde zaken, tenants en ingetrokken lidmaatschappen sluiten zonder bronlek | bestaande concierge-, service-, WorkOS-, tenant-, organisatie- en bevoegdheidsbronnen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| D — Revenue | naast de catalogus- en betaalbewijsgrenzen bestaan nu een read-only entitlementprojectie, accountoverzicht en eligibility-contract voor B2C, B2B en B2B2C. Alleen een exact gebonden, geboekte, niet teruggedraaide en transactiespecifiek gereconcilieerde betaling kan `ELIGIBLE` worden; de huidige ruwe betaalbronnen missen nog de vereiste product-, account-, tenant- en reconciliatiereferenties, dus publieke aankoop en toekenning blijven dicht | financiële veiligheid, exacte adaptercontracten, Payment Truth, RTG Pay en expliciete eigenaarspoorten | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
+| E — Rahul | accountgebonden tabgeschiedenis en goedkeuringscontext sluiten fail-closed. Rahul leest van Workspace uitsluitend id, presentatiemodus en de door dezelfde actuele Edge-context bevestigde module; modules kunnen alleen expliciet veilige `read`, `search`, `open` en `propose`-acties declareren, zonder payload, route of uitvoeringsrecht | bestaande Rahul-, Fluister-, Stuur-, modulemanifest-, sessie- en Trusted Execution-grenzen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| F — Platform | het canonieke wereldregister ontsluit 116 UX-functies; tien Living Modules volgen hetzelfde runtimecontract. WorkOS, RTG Regie en de Rahul-projectie gebruiken dezelfde offline shell en bestaande Command-/wereldnavigatie, zonder tweede app-catalogus | de zes productstromen, bestaande routekaart, service workers en registergeneratoren | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| Q — eindkwalificatie | start nadat de overeengekomen scope in de kandidaat is geïntegreerd | A t/m F | `GEBLOKKEERD` door nog lopende bouw |
+
+De mapping van C heeft aangetoond dat een tweede generieke case-opslag of een
+nieuwe lifecycle de bestaande Concierge Case, Servicezaak en domeinobjecten zou
+dupliceren. Het eerste universele contract is daarom een afgeleide, read-only
+regieprojectie met getypeerde bronverwijzingen, fasen, verantwoordelijkheden,
+relaties en niet-uitvoerbare actieverklaringen. Het bezit zelf geen status of
+domeininhoud en iedere handeling blijft bij het brondomein opnieuw geautoriseerd.
+`RTG Regie` leest deze projecties via de bestaande Service- en
+Privékantoorpoorten. De module bewaart geen zaakdata in de
+werkruimtestaat. De Edge ontvangt uitsluitend vooraf gedeclareerde acties;
+`vraag een mens` loopt opnieuw door de bestaande serviceautorisatie en vraagt
+expliciete bevestiging. Gericht zijn het modulecontract, Edge-selectie,
+bronisolatie en de bestaande Service- en Privékantoorketens lokaal groen. De
+platformbrede scherm- en herstelkwalificatie blijft voor Q gereserveerd.
+
+De nieuwe Bedrijfspoort voegt geen zaak of bevoegdheid toe. Hij bevestigt bij
+iedere lezing opnieuw vier reeds bestaande waarheden: het actuele RTG-account,
+het actief aan dat account gekoppelde WorkOS-lidmaatschap, de tenant van de
+gekozen werkruimte en het eigendom van precies de gevraagde Bureau- of
+Servicezaak. De contextadapter projecteert daarna alleen bronreferenties en
+niet-uitvoerbare acties. Een tweede tenant, vreemde zaak, losgemaakte
+tenantbinding, onbekende concernentiteit of ingetrokken lidmaatschap levert geen
+gedeeltelijke context op.
+
+De mapping van D heeft aangetoond dat `server/kern/revenue/catalogus-v1.js` al
+de gesloten catalogusbron is en dat RTG Pay, Payment Truth en Economic Runtime
+de financiële waarheid dragen. De bestaande AI-creditroute mag nog niet als
+publiek aankoopbewijs gelden. De directe grant is inmiddels gesloten: zonder
+servermatig geverifieerde settlement-, ledger-, betaler-, product-, prijs- en
+valutakoppeling wordt niets toegekend, en een evidence-id werkt precies een
+keer. `REV-AI-CREDIT-001` blijft zichtbaar totdat de exacte adapter tussen
+catalogus, Payment Truth, grootboek en transactiereconciliatie end-to-end is
+aangesloten. De reeds gebouwde
+entitlementprojectie en het accountoverzicht verlenen niets: zij behouden per
+bron de nominale aanspraak, effectieve stand, ontzegreden, lifecycle en
+provenance. Het eligibility-contract weigert ontbrekende of afwijkende
+account-, tenant-, product-, offer-, bedrag-, valuta-, payment-, ledger- en
+reconciliationbinding en iedere refund, reversal of onzekere uitkomst. Deze
+grens houdt alleen de afhankelijke commerciële keten tegen; de onafhankelijke
+bouwstromen gaan door.
+
+De mapping van E gebruikt geen tweede agent of intent-uitvoerder. De Workspace
+Runtime projecteert alleen een door de actieve module expliciet vrijgegeven
+assistentmanifest. Rahul krijgt daarvan uitsluitend actie-id en soort. Hij
+krijgt geen payload, endpoint, formulierinhoud, werkruimtelayout, concept,
+toegangstoken of mutatiefunctie. De bestaande Action Broker, serverautorisatie,
+bevestiging en Trusted Execution blijven de enige uitvoeringstrechter.
 
 ## 6. De inventaris: vier klassen
 
@@ -133,12 +238,12 @@ geblokkeerd item zegt welke voorwaarde aantoonbaar vervuld moet zijn. Valt een
 item op dezelfde regel als een gelezen markering, dan wint het besluitbestand.
 
 **De stand bij lezing** (levende getallen uit `APPWERKT.json`, bijgehouden door
-`npm run getallen`): over <!--getal:toezeg.documenten-->167<!--/getal-->
-documenten zijn er <!--getal:toezeg.toegezegd-->879<!--/getal--> onderdelen
+`npm run getallen`): over <!--getal:toezeg.documenten-->176<!--/getal-->
+documenten zijn er <!--getal:toezeg.toegezegd-->897<!--/getal--> onderdelen
 `toegezegd`, <!--getal:toezeg.afgewezen-->20<!--/getal-->
-`afgewezen-met-grens`, <!--getal:toezeg.besluit-->84<!--/getal-->
+`afgewezen-met-grens`, <!--getal:toezeg.besluit-->88<!--/getal-->
 `vraagt-besluit` en <!--getal:toezeg.extern-->10<!--/getal--> `extern`.
-Daarnaast liggen er <!--getal:toezeg.proza-->210<!--/getal--> markeringen in
+Daarnaast liggen er <!--getal:toezeg.proza-->220<!--/getal--> markeringen in
 lopende tekst die bewust niet zijn gelezen.
 
 **Wat hij niet is.** Geen tweede belofteregister: `BELOFTE.json` zegt of de

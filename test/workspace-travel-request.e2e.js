@@ -72,6 +72,42 @@ test('TravelOS blijft licht, rondt één aanvraag af en stopt bij een sessiewiss
       assert.equal(catalogusVerzoeken, 0, 'Travel laadde de catalogus al in Peek');
       await mobiel.ctx.close();
 
+      // De bestaande RTGIntent-store bewaart uitsluitend de expliciet gekozen
+      // velden in dit tabblad. Vrije tekst blijft buiten opslag en dezelfde
+      // sessie kan datum en reizigers na herladen hervatten.
+      const hervat = await context(browser, srv.base, token, { width: 1440, height: 960 });
+      await hervat.page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+      var hervatTravel = hervat.page.locator('[data-rtg-module="travel"]');
+      await hervatTravel.locator('.rtg-travel-option').first().waitFor();
+      await hervatTravel.locator('.rtg-travel-option').first().click();
+      const hervatDatum = new Date(Date.now() + 42 * 86400000).toISOString().slice(0, 10);
+      const nietBewaren = 'Deze vrije wens hoort nooit in sessieopslag';
+      await hervatTravel.locator('[data-rtg-travel-input="date"]').fill(hervatDatum);
+      await hervatTravel.locator('[data-rtg-travel-action="plus"]').click();
+      await hervatTravel.locator('[data-rtg-travel-input="note"]').fill(nietBewaren);
+      await hervatTravel.locator('[data-rtg-travel-action="remember"]').check();
+      await hervat.page.waitForFunction((datum) => (sessionStorage.getItem('rtg.intent.v1') || '').includes(datum), hervatDatum);
+      const intentTekst = await hervat.page.evaluate(() => sessionStorage.getItem('rtg.intent.v1') || '');
+      assert.doesNotMatch(intentTekst, /Deze vrije wens/, 'vrije tekst kwam in RTGIntent terecht');
+      await hervatTravel.locator('[data-rtg-travel-input="note"]').fill('');
+      await hervat.page.reload({ waitUntil: 'domcontentloaded' });
+      hervatTravel = hervat.page.locator('[data-rtg-module="travel"]');
+      await hervatTravel.locator('.rtg-travel-option').first().waitFor();
+      await hervatTravel.locator('.rtg-travel-option').first().click();
+      assert.equal(await hervatTravel.locator('[data-rtg-travel-input="date"]').inputValue(), hervatDatum);
+      assert.equal(await hervatTravel.locator('.rtg-travel-step output').textContent(), '3');
+      await hervatTravel.locator('[data-rtg-travel-action="open-flow"]').click();
+      const flow = hervat.page.frameLocator('iframe[src*="/apps/reisbureau.html?reis="]');
+      await flow.locator('#rDatum').waitFor();
+      assert.equal(await flow.locator('#rDatum').inputValue(), hervatDatum,
+        'de volledige TravelOS-flow hervatte de bewaarde datum niet');
+      assert.equal(await flow.locator('#rAantal').textContent(), '3',
+        'de volledige TravelOS-flow hervatte het aantal reizigers niet');
+      assert.equal(await flow.locator('#rNotitie').inputValue(), '',
+        'vrije tekst werd onverwacht aan de volledige TravelOS-flow overgedragen');
+      await hervatTravel.locator('[data-rtg-travel-action="remember"]').uncheck();
+      await hervat.ctx.close();
+
       const desktop = await context(browser, srv.base, token, { width: 1440, height: 960 });
       const fouten = [];
       h.letOpFouten(desktop.page, fouten);
@@ -85,6 +121,10 @@ test('TravelOS blijft licht, rondt één aanvraag af en stopt bij een sessiewiss
       await travel.waitFor({ state: 'attached' });
       await travel.locator('.rtg-travel-option').first().waitFor();
       await travel.locator('.rtg-travel-option').first().click();
+      const editContext = await desktop.page.evaluate(() => window.RTGAdaptief && window.RTGAdaptief.context());
+      assert.equal(editContext.bron, 'workspace.travel');
+      assert.ok(editContext.acties.includes('travel.request.review'));
+      assert.ok(!editContext.acties.includes('travel.request.submit'));
 
       const datum = new Date(Date.now() + 35 * 86400000).toISOString().slice(0, 10);
       const wens = 'Rustige kamer, aankomst na 20:00 en Nederlands contact';
@@ -98,6 +138,9 @@ test('TravelOS blijft licht, rondt één aanvraag af en stopt bij een sessiewiss
       await travel.screenshot({ path: path.join(bewijsMap, 'travel-spatial-request.png') });
       await travel.locator('[data-rtg-travel-action="review"]').click();
       await travel.getByRole('heading', { name: 'Controleer uw aanvraag' }).waitFor();
+      const reviewContext = await desktop.page.evaluate(() => window.RTGAdaptief.context());
+      assert.ok(reviewContext.acties.includes('travel.request.submit'));
+      assert.ok(reviewContext.acties.includes('travel.request.edit'));
       assert.equal(mutaties, 0, 'Controleren verstuurde al een aanvraag');
       assert.match(await travel.innerText(), /Er wordt nu niets betaald of definitief geboekt/);
       assert.match(await travel.innerText(), /3 reizigers/);
@@ -146,6 +189,10 @@ test('TravelOS blijft licht, rondt één aanvraag af en stopt bij een sessiewiss
       const wisselTravel = wissel.page.locator('[data-rtg-module="travel"]');
       await wisselTravel.locator('.rtg-travel-option').first().waitFor();
       await wisselTravel.locator('.rtg-travel-option').first().click();
+      const wisselDatum = new Date(Date.now() + 49 * 86400000).toISOString().slice(0, 10);
+      await wisselTravel.locator('[data-rtg-travel-input="date"]').fill(wisselDatum);
+      await wisselTravel.locator('[data-rtg-travel-action="remember"]').check();
+      await wissel.page.waitForFunction((datum) => (sessionStorage.getItem('rtg.intent.v1') || '').includes(datum), wisselDatum);
       await wisselTravel.locator('[data-rtg-travel-action="review"]').click();
       wissel.page.once('dialog', (dialoog) => dialoog.accept());
       const bronAntwoord = wissel.page.waitForResponse((response) =>
@@ -159,6 +206,14 @@ test('TravelOS blijft licht, rondt één aanvraag af en stopt bij een sessiewiss
         return knop && !knop.disabled;
       });
       assert.equal(wisselMutaties, 0, 'sessiewissel tussen broncontrole en mutatie werd niet gestopt');
+      const anderAccountIntent = await wissel.page.evaluate(async (nieuwToken) => {
+        const store = await window.RTGIntent.forSession(window, nieuwToken, 'travel');
+        const rijen = store.list();
+        return { rijen, opslag: sessionStorage.getItem('rtg.intent.v1') || '' };
+      }, anderToken);
+      assert.deepEqual(anderAccountIntent.rijen, [], 'een ander account kon de bewaarde reisintentie lezen');
+      assert.doesNotMatch(anderAccountIntent.opslag, new RegExp(wisselDatum),
+        'de reisintentie van het vorige account bleef na de eigenaarscontrole beschikbaar');
       const wisselTekst = await wisselTravel.innerText();
       assert.match(wisselTekst, /Controleer uw aanvraag/);
       assert.doesNotMatch(wisselTekst, /staat al een aanvraag open/, 'oude accountdata werd na de wissel geprojecteerd');

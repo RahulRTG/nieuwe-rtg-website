@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2722 bestanden en 19021 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2740 bestanden en 19103 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2722 |
-| losse beweringen (`test(...)`) | 19021 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
+| toetsbestanden | 2740 |
+| losse beweringen (`test(...)`) | 19103 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 358 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2534 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
-| alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 8 |
+| alleen in de kop *genoemd*, nog niet gemeten | 6 |
+| niets van beide | 21 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2388 bestanden, 18453 beweringen.
+2402 bestanden, 18531 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -345,7 +345,7 @@ toets omvalt.
 | `budgetterugname.test.js` | 5 | gezakt op `===->!==#0` | EEN MISLUKT BUDGET MAG EEN LID NIET BUITENSLUITEN. Twee besluiten die elk apart kloppen: kern/pay/budget.js eerst de positie klaarzetten, dan boeken -- want andersom staat er even saldo op een rekening zonder klasse,... |
 | `bugjacht.test.js` | 29 | gezakt op `liegpoort /api/` | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
 | `bundeldelen.test.js` | 6 | gezakt op `return-weg#0` | De bundels en hun losse delen mogen niet uit elkaar lopen. DIT KOMT UIT EEN ECHTE FOUT, en uit de duurste soort: eentje die niets liet zakken. |
-| `bundelprijs.test.js` | 9 | gezakt op `===->!==#0` | DE PRIJS VAN EEN AI-BUNDEL: gerekend, niet gekozen. De bundels stonden in kern/commercie/tegoed.js met capaciteit en een naam en NADRUKKELIJK zonder prijs -- de verkoopprijs hoort gerekend te worden, en de inkoopkant... |
+| `bundelprijs.test.js` | 11 | gezakt op `===->!==#0` | DE PRIJS VAN EEN AI-BUNDEL: gerekend, niet gekozen. De bundels stonden in kern/commercie/tegoed.js met capaciteit en een naam en NADRUKKELIJK zonder prijs -- de verkoopprijs hoort gerekend te worden, en de inkoopkant... |
 | `bureau.test.js` | 39 | gezakt op `liegpoort /api/` | Integratietests voor Het Privekantoor: de ENE app van de Lifestyle Pass. Wat hier bewezen wordt, en waarom juist dit: de poort een RTG-pas komt er niet in, op geen enkele route de projectie de Life Graph LEEST de... |
 | `busabonnee.test.js` | 2 | gezakt op `&&->||#0` | EEN BUS-ABONNEE DRAAIT NIET IN HET VERZOEK VAN DE PUBLICEERDER (Fase 2, PR 6, invariant I12). `emit` is synchroon, dus in proces draaide een abonnee (SSE, sessies, intreksignaal, deurrem) tot nu toe in de handeling,... |
 | `ca.test.js` | 4 | gezakt op `===->!==` | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
@@ -1607,12 +1607,15 @@ toets omvalt.
 | `qr.test.js` | 6 | gezakt op `===->!==#0` | RTG QR-codec (public/shared/qr.js): eigen QR encode + decode. Getoetst met (1) een externe grondwaarheid -- de Reed-Solomon EC-codewoorden van het ISO- voorbeeld "01234567" -- en (2) een encode->decode round-trip... |
 | `qrscan.test.js` | 3 | gezakt op `>=->>#0` | RTG QR-scanner (public/shared/qrscan.js): de beeld-decoder. We renderen een met onze eigen codec gemaakte QR naar een pixelbeeld (met stille rand) en halen dat door decodeImage -- die de zoekpatronen vindt, de... |
 | `raakvlak.test.js` | 13 | gezakt op `true->false#0` | DE RAAKVLAKPOORT MOET DICHT KUNNEN, EN OP DE JUISTE MOMENTEN OPEN BLIJVEN. WCAG 2.5.8 vraagt 24 bij 24 CSS-pixels voor alles wat je aanwijst. |
+| `rahul-capability-manifest.test.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rahul-eerlijk.test.js` | 12 | gezakt op `+->-#1` | De eerlijkheidsdoctrine van Rahul: liever te hard dan een liegbeest. Deze bewaking houdt de doctrine in ALLE gespreks-prompts: het gedeelde karakter (RAHUL_LEAD), de leden-AI met het volledige verhaal, en de tool-lus... |
 | `rahul-hart.test.js` | 2 | geen bronmutatie mogelijk | Het hart van Rahul: de liefhebberijen (horloges, F1, jetset zonder tent, gangen met wijnarrangement, 70's en Frenna) en het datahuis-verhaal (RTG verwerkt alles zelf, met de kluis en de hashes) staan in het GEDEELDE... |
 | `rahul-mens.test.js` | 8 | gezakt op `return-weg#0` | Rahul als mens: geen AI-taal, een echte bui, en iedereen welkom. De meeste toetsen hier zijn zuivere functietoetsen (geen server nodig), want dit is grotendeels tekst- en rekenwerk. |
 | `rahul-omgang.test.js` | 7 | gezakt op `&&->||#1` | De omgangsvormen van Rahul, gezien vanaf kern/rahul.js (de plek waar de assistenten hem ophalen). Dit bestand toetste de OUDE opzet: bij een vrouw flirtte hij en speelde hij hard to get, bij een man was hij de beste... |
 | `rahul-regie.test.js` | 3 | gezakt op `liegpoort /api/` | Rahul regelt de regie: de AI-hulp van de boardroom begrijpt gewone taal over de app-regie (per pas), de leveranciers-regie (per genre) en de geld-regie (pasprijzen, ledenvoordeel, partnervergoeding). Mens beslist: de... |
 | `rahul-reis.test.js` | 6 | gezakt op `liegpoort /api/` | De Rahul-reislaag: Rahul regelt met een vraag een hele reis (verblijf, transfer, diner, activiteit) die op een enkel "ja" in zijn geheel wordt KLAARGEZET en niet afgerekend (besluit van 12 oktober 2026, zie de kop... |
+| `rahul-session.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rahul-workspace-context.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rahulzicht.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | RAHUL LEEST HET BLIKVELD -- via een positieve veldenlijst, en alleen die. shared/edge/rahulzicht.js maakt van het Edge Blikveld de schermcontext die de Rahul-helper naar /api/fluister stuurt. |
 | `railvergelijk.test.js` | 7 | gezakt op `===->!==#0` | TWEE INTERPRETATIERAILS VERGELIJKEN (scripts/railvergelijk.js, fase 12). Het oordeel per zin is een PURE functie, en dat is met opzet: de echte vergelijking hangt af van welke rails er toevallig draaien, en vandaag... |
 | `rampbeeld.test.js` | 7 | gezakt op `liegpoort /api/` | Het gezamenlijke rampbeeld: korpsen, zorg en defensie delen tijdens een calamiteit hun paraatheid, vrije bedden en eenheden in een overzicht, met een coordinatieniveau. Een korps ziet de eigen keten-partners, de... |
@@ -1688,6 +1691,9 @@ toets omvalt.
 | `retail-prijs.test.js` | 8 | gezakt op `&&->||#0` | DE PRIJS VAN EEN RETAILVERKOOP -- en de fout die eronder zat. DE ZWAARSTE TOETS IS 4. |
 | `retail.test.js` | 12 | gezakt op `liegpoort /api/` | End-to-end tests voor het retail-/mode-genre (kern/retail.js): collecties en artikelen met varianten, voorraad, clienteling (maten/verlanglijst/historie/ notities), apart leggen, paskamerverzoeken,... |
 | `revenue-catalog-contract-v1.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | REVENUE CATALOG CONTRACT V1. Deze toets bewaakt dat AI Extra S één leesbare commerciële identiteit krijgt zonder een tweede bron voor capability, aanbod of prijs te maken. |
+| `revenue-entitlement-eligibility-v1.test.js` | 9 | genoemd | De payment-entitlementbeslissing blijft intern en read-only. Deze toets toont zowel het toekomstige exacte contract als waarom de huidige ruwe bronnen er niet zonder een echte serveradapter aan voldoen. |
+| `revenue-entitlement-overzicht-v1.test.js` | 9 | genoemd | REVENUE ENTITLEMENT OVERZICHT V1. Het overzicht bundelt uitsluitend bestaande projectiebesluiten. |
+| `revenue-entitlement-projectie-v1.test.js` | 9 | genoemd | REVENUE ENTITLEMENT PROJECTIE V1. De projectie voegt geen zesde rechtenmodel toe. |
 | `rijksles.test.js` | 4 | gezakt op `liegpoort /api/` | De Rijks-Bibliotheek (10.000 werk-apps per overheidsafdeling) en de Lesmaker (AI-lesstof + de interactieve klas-PDA). |
 | `risico.test.js` | 13 | gezakt op `===->!==#0` | HET REGRESSIECORPUS VAN DE RISICOPROPAGATIE. WAAROM DIT BESTAND ZWAAR WEEGT. |
 | `ritmigratie.test.js` | 7 | gezakt op `!==->===#0` | DE MIGRATIEKAART VAN db.data.rides (scripts/ritmigratie.js). De eigenaar heeft besloten dat de OPDRACHT de waarheid is; de brug staat (kern/mobiliteit/appbrug.js) en de migratie van de lezers volgt. |
@@ -2338,6 +2344,7 @@ toets omvalt.
 | `wereldvermogens.test.js` | 14 | gezakt op `liegpoort /api/` | De vermogens van de Lifestyle- en Business Pass die eerst alleen een NAAM in rechten.js hadden: geavanceerd zoeken, netwerkanalyse en "wie bekeek mijn profiel". De belangrijkste bewering staat in het midden: ZOEKEN... |
 | `wereldwortels.test.js` | 8 | gezakt op `===->!==#0` | De kleine wortels: negen dingen die elk hun eigen domein openen. Geen ketens maar een oproep per stuk -- daarom een module en geen negen werelden. |
 | `werk-bij-inloggen.test.js` | 1 | gezakt op `liegpoort /api/` | Een account voor alles: je logt in op je RTG-account en je werk-app staat er meteen. Geen tweede inlog, geen pincode, geen rol kiezen. |
+| `werk-spatial-handoff.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `werkbeleid-dienst.test.js` | 6 | gezakt op `liegpoort /api/` | HET WERKBELEID GELDT TIJDENS JE DIENST, EN NIET IN JE PAUZE. Het werkgeversbeleid kan functies op de pas van een medewerker dichtzetten: geen Salon, geen AI, geen paspoort delen. |
 | `werkgebeurtenis.test.js` | 9 | gezakt op `===->!==#0` | DE GEBEURTENISLAAG VAN HET WERK OS -- een temporele laag, geen auditlogje. WAAROM DIT BESTAAT bedrijf/toen.js kon zeggen WAT er bestond op een datum en zei er eerlijk bij dat de TOESTAND van toen niet vast te stellen... |
 | `werkgeheugen.test.js` | 7 | gezakt op `liegpoort /api/` | HET GEHEUGEN VAN EEN BESLUIT: waarom hebben we dit gedaan, en wat raakte het. Zeven beweringen, en ze gaan allemaal over de vraag wat dit over drie jaar nog waard is: 1. |
@@ -2380,11 +2387,14 @@ toets omvalt.
 | `workruimte-credential-register.test.js` | 2 | gezakt op `===->!==#6` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `workspace-context.test.js` | 4 | gezakt op `!==->===#0` | DE WERKRUIMTECONTEXT IS EEN LEZER VAN HET BLIKVELD (Edge ronde 2, stap 23). shared/interface/workspace-context.js had een eigen `current`, een setter, een refresh, luisteraars en een eigen ontdubbeling, gevoed uit... |
 | `workspace-contract.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `workspace-coordination.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `workspace-platform.test.js` | 6 | gezakt op `!==->===#0` | De platformgrenzen onder de Dynamic Layer: versiecontract, Event Fabric, Action Broker, centrale state, orchestration en declaratieve blueprints. |
 | `workspace-rechten.test.js` | 4 | gezakt op `liegpoort /api/` | DE RECHTEN VAN DE WERKRUIMTE: de server beslist wat het Second Screen mag tonen, de browser presenteert (kern/workspace-rechten.js). Vier dingen worden hier vastgehouden, en elk is een manier waarop het scherm eerder... |
 | `workspace-server-platform.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `workspace-session-continuity.test.js` | 1 | gezakt op `browser-export-weg#0` | De Workspace Identity Runtime geeft modules alleen een continuiteitsvraag. Het credential zelf blijft binnen de bestaande hostgrens. |
+| `workspace-travel-budget.test.js` | 1 | -- | Het Travel-paneel declareert 40 KB als Peek-budget. Omdat deze bronbestanden samen met de modulehost worden geladen, bewaken we de echte bronomvang en verbieden we stil achtergrondpolling in de moduleset. |
 | `workspace-voorkeur.test.js` | 5 | gezakt op `liegpoort /api/` | De Adaptive Workspace bewaart compositie en niets anders. Dit toetst zowel de pure grens als de twee accountwegen die Continuity gebruikt. |
+| `workspace-work.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-widget-catalog.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `writehealth-lus.test.js` | 5 | gezakt op `===->!==#0` | DE SCHRIJFPOORT MAG ZIJN EIGEN GESLOTEN TOESTAND NIET ALS NIEUWE STORING LEZEN. Gemeten in de 100M-ronde van 9 september 2026: de poort sloot 89 keer, en 45 van die sluitingen droegen als reden "collectietransactie:... |
 | `zaaihash.test.js` | 5 | gezakt op `liegpoort /api/` | DE ZAAI-HASH, EN DE GRENS ERONDER. De demo-seed maakte bij elke serverstart 220 scrypt-hashes voor 4 verschillende wachtwoorden. |
@@ -2405,6 +2415,10 @@ toets omvalt.
 | `zaakdoos-sleutel.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor devices.zaakdoos_sleutel (besluit B12). Twee onafhankelijke kerninstances delen de autoritatieve `doosSleutels` in PostgreSQL. |
 | `zaakdoos.test.js` | 10 | gezakt op `liegpoort /api/` | De Zaakdoos end-to-end: een cloudserver en een doos-kastje ernaast. 1. |
 | `zaakinlog.test.js` | 6 | gezakt op `===->!==#0` | Inloggen bij een zaak: op een plek, met een teller die klopt. Deze module bestaat omdat er TWEE implementaties van dezelfde handeling stonden -- de genrewereld en de proefsleutels deden allebei rooster+login -- en de... |
+| `zaakregie-context-adapter.test.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `zaakregie-context.test.js` | 8 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `zaakregie-workos-route.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `zaakregiebeeld.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `zaaktools.test.js` | 2 | gezakt op `liegpoort /api/` | De gereedschappen die elke zaak krijgt: reageren op reviews (met melding aan de gast) en de lichte voorraad met drempelmeldingen. |
 | `zaaktransactie.test.js` | 5 | gezakt op `===->!==#0` | DE HERSTELTRANSACTIE AAN DE ZAAK-KANT. Tot vandaag draaide kern/zaakcommand zijn recepten rechtstreeks door runbooks.voer(). |
 | `zaakwig.test.js` | 3 | gezakt op `!==->===#0` | DE ZAAKWIG -- de pure kant, en waarom die er is. scripts/zaakwig.js draait EEN scenario met een echte server: een lid vindt een zaak, bestelt, betaalt, de zaak ziet hem, de kassa haalt hem op. |
@@ -2428,7 +2442,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-334 bestanden, 568 beweringen.
+338 bestanden, 572 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2754,7 +2768,11 @@ toets omvalt.
 | `werkuitgaven.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET WERK OS: DE MODULE UITGAVEN, IN EEN ECHTE BROWSER. De routes van een uitgave zijn beproefd in test/bedrijfuitgave.test.js. |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
 | `workspace-rechten.e2e.js` | 1 | gezakt op `liegpoort /api/` | Het Second Screen in een echte browser: het toont een module pas als de SERVER de permissie gaf (kern/workspace-rechten.js), en niets daarvoor. Drie rondes met hetzelfde lid. |
+| `workspace-travel-accessibility.e2e.js` | 1 | -- | Gerichte toegankelijkheidsproef voor de TravelOS Spatial-taak. Deze proef vervangt geen handmatige schermlezerkeuring. |
+| `workspace-travel-confirmation.e2e.js` | 1 | -- | De TravelOS Spatial-werkruimte volgt de bestaande menselijke reisbalie. Spatial bevestigt zelf niets: het leest na een expliciete verversing de actuele status uit dezelfde Reisbureau-bron als de gewone Flow. |
+| `workspace-travel-recovery.e2e.js` | 1 | genoemd | TravelOS Spatial bij antwoordverlies. De server mag de aanvraag al hebben verwerkt terwijl het antwoord onderweg verdwijnt. |
 | `workspace-travel-request.e2e.js` | 1 | gezakt op `browser-export-weg#0` | De eerste echte TravelOS-taak in de bestaande Spatial-werkruimte. Bewijst dat Peek niets zwaars laadt, dat invoer in hetzelfde paneel blijft, dat controleren geen mutatie uitvoert en dat alleen de bevestigde Broker-... |
+| `workspace-work.e2e.js` | 1 | -- | WorkOS Spatial in een echte browser. Het paneel opent bestaande WerkOS-data pas na een expliciete handeling en houdt de verse WerkOS-sessie buiten DOM, Workspace State en browseropslag. |
 | `world-dashboard.e2e.js` | 1 | geen bronmutatie mogelijk | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |
 | `world-desktop-identity.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-desktop-state.e2e.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

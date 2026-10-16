@@ -46,6 +46,8 @@
 
 .rtg-interface-second-screen .rtg-module-legacy { display: grid; gap: 12px; }
 .rtg-interface-second-screen .rtg-module-travel,
+.rtg-interface-second-screen .rtg-module-work,
+.rtg-interface-second-screen .rtg-module-coordination,
 .rtg-interface-second-screen .rtg-module-safety { display: grid; gap: 12px; }
 .rtg-interface-second-screen .rtg-module-summary { display: grid; gap: 3px; }
 .rtg-interface-second-screen .rtg-module-summary strong {
@@ -109,6 +111,16 @@
 }
 .rtg-interface-second-screen .rtg-travel-field input:focus-visible,
 .rtg-interface-second-screen .rtg-travel-field textarea:focus-visible { border-color: var(--rtg-ss-gold); outline: 2px solid transparent; }
+.rtg-interface-second-screen .rtg-travel-remember {
+  align-items: center; color: var(--rtg-ss-text); cursor: pointer; display: grid; font-size: .72rem; gap: 10px;
+  grid-template-columns: 44px 1fr; line-height: 1.45; min-height: 44px;
+}
+.rtg-interface-second-screen .rtg-travel-remember input {
+  accent-color: var(--rtg-ss-gold); height: 20px; justify-self: center; margin: 0; width: 20px;
+}
+.rtg-interface-second-screen .rtg-travel-handoff-note {
+  color: var(--rtg-ss-muted); font-size: .68rem; line-height: 1.45; margin: 0;
+}
 .rtg-interface-second-screen .rtg-travel-step {
   align-items: center; border: 1px solid var(--rtg-ss-line); display: grid; grid-template-columns: 44px 1fr 44px; min-height: 44px;
 }
@@ -123,6 +135,56 @@
 }
 .rtg-interface-second-screen .rtg-travel-request .rtg-module-primary { min-height: 44px; }
 .rtg-interface-second-screen .rtg-travel-request button:disabled { cursor: wait; opacity: .58; }
+.rtg-interface-second-screen .rtg-coordination-list { display: grid; gap: 7px; }
+.rtg-interface-second-screen .rtg-coordination-case {
+  background: color-mix(in srgb, var(--rtg-ss-card) 88%, black 12%); border: 1px solid var(--rtg-ss-line);
+  color: var(--rtg-ss-text); cursor: pointer; display: grid; gap: 5px; min-height: 60px; padding: 10px 11px; text-align: left;
+}
+.rtg-interface-second-screen .rtg-coordination-case:hover,
+.rtg-interface-second-screen .rtg-coordination-case:focus-visible,
+.rtg-interface-second-screen .rtg-coordination-case[aria-pressed="true"] { border-color: var(--rtg-ss-gold); }
+.rtg-interface-second-screen .rtg-coordination-case-top { align-items: center; display: flex; gap: 8px; justify-content: space-between; }
+.rtg-interface-second-screen .rtg-coordination-kind,
+.rtg-interface-second-screen .rtg-coordination-phase {
+  color: var(--rtg-ss-gold); font-size: 9px; font-weight: 720; letter-spacing: .1em; text-transform: uppercase;
+}
+.rtg-interface-second-screen .rtg-coordination-phase { color: var(--rtg-ss-muted); }
+.rtg-interface-second-screen .rtg-coordination-case strong { font: 500 1rem/1.18 "Bodoni Moda", Georgia, serif; }
+.rtg-interface-second-screen .rtg-coordination-case small { color: var(--rtg-ss-muted); line-height: 1.45; }
+.rtg-interface-second-screen .rtg-coordination-detail { border-top: 1px solid var(--rtg-ss-line); display: grid; gap: 9px; padding-top: 11px; }
+.rtg-interface-second-screen .rtg-coordination-actions { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+.rtg-interface-second-screen .rtg-coordination-action {
+  background: transparent; border: 1px solid var(--rtg-ss-line); color: var(--rtg-ss-text); cursor: pointer;
+  min-height: 44px; padding: 9px 11px; text-align: left;
+}
+.rtg-interface-second-screen .rtg-coordination-attention {
+  border-left: 2px solid #e6bd77; color: var(--rtg-ss-text); font-size: .74rem; line-height: 1.5; margin: 0; padding: 7px 10px;
+}
+.rtg-interface-second-screen .rtg-work-summary { display: grid; gap: 3px; }
+.rtg-interface-second-screen .rtg-work-summary strong { color: var(--rtg-ss-text); font: 500 1.08rem/1.16 "Bodoni Moda", Georgia, serif; }
+.rtg-interface-second-screen .rtg-work-summary span,
+.rtg-interface-second-screen .rtg-work-space small { color: var(--rtg-ss-muted); font-size: .72rem; line-height: 1.45; }
+.rtg-interface-second-screen .rtg-work-spaces,
+.rtg-interface-second-screen .rtg-work-metrics { display: grid; gap: 7px; }
+.rtg-interface-second-screen .rtg-work-space {
+  background: color-mix(in srgb, var(--rtg-ss-card) 88%, black 12%); border: 1px solid var(--rtg-ss-line);
+  color: var(--rtg-ss-text); cursor: pointer; display: grid; gap: 4px; min-height: 56px; padding: 10px 11px; text-align: left;
+}
+.rtg-interface-second-screen .rtg-work-space:hover,
+.rtg-interface-second-screen .rtg-work-space:focus-visible { border-color: var(--rtg-ss-gold); }
+.rtg-interface-second-screen .rtg-work-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rtg-interface-second-screen .rtg-work-metric { border: 1px solid var(--rtg-ss-line); display: grid; gap: 2px; padding: 9px 10px; }
+.rtg-interface-second-screen .rtg-work-metric small { color: var(--rtg-ss-muted); text-transform: capitalize; }
+.rtg-interface-second-screen .rtg-work-metric strong { color: var(--rtg-ss-gold); font-variant-numeric: tabular-nums; }
+.rtg-interface-second-screen .rtg-work-attention {
+  border-left: 2px solid #e6bd77; color: var(--rtg-ss-text); font-size: .74rem; line-height: 1.5; margin: 0; padding: 7px 10px;
+}
+.rtg-interface-second-screen .rtg-work-actions { display: grid; gap: 8px; grid-template-columns: 1.4fr 1fr; }
+.rtg-interface-second-screen .rtg-work-action,
+.rtg-interface-second-screen .rtg-work-actions > button:not(.rtg-module-primary) {
+  background: transparent; border: 1px solid var(--rtg-ss-line); color: var(--rtg-ss-text); cursor: pointer;
+  min-height: 44px; padding: 9px 11px; text-align: left;
+}
 .rtg-interface-second-screen .rtg-workspace-empty.rtg-leeg-vlak {
   min-height: 108px; margin: 0; padding: 15px 56px 15px 0; border-top-color: var(--rtg-ss-line);
   color: var(--rtg-ss-text); justify-content: center;
@@ -176,5 +238,7 @@
 
 @media (max-width: 520px) {
   .rtg-interface-second-screen .rtg-travel-fields,
-  .rtg-interface-second-screen .rtg-travel-request-actions { grid-template-columns: 1fr; }
+  .rtg-interface-second-screen .rtg-travel-request-actions,
+  .rtg-interface-second-screen .rtg-work-actions,
+  .rtg-interface-second-screen .rtg-coordination-actions { grid-template-columns: 1fr; }
 }

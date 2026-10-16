@@ -12,7 +12,7 @@ function slug(value) {
 }
 function niveau(item) {
   const map = {
-    'link:berichten': ['L4', 'messages'], 'tab:reizen': ['L4', 'travel'],
+    'link:berichten': ['L4', 'messages'], 'link:werkos': ['L3', 'work'], 'tab:reizen': ['L4', 'travel'],
     'link:reizen': ['L4', 'travel'], 'link:veilig': ['L4', 'safety'], 'link:ik': ['L3', 'profile']
   };
   return map[item] || ['L0', null];

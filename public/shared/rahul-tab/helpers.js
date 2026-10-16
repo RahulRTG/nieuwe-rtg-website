@@ -8,11 +8,25 @@
   }
   /* DE CONTEXT VOOR RAHUL. Met een Edge Blikveld komt hij daaruit (EDGE.md
      par. 14.4): schermtitel, wereld, leesmoment en een verwijzing naar het
-     aangewezen object, die de server zelf opzoekt. De tekst van een gekozen
+     aangewezen object, die de server zelf opzoekt. Rahulzicht voegt hooguit de
+     id, modus en door de Edge bevestigde actieve Workspace-module toe. De tekst van een gekozen
      optie wordt dan NIET meer uit de DOM geschraapt: dat kon alles zijn, ook
      een naam. Zonder blikveld blijft alles zoals het was. `app` blijft de
      documenttitel, want de tab toont die en de suggesties lezen hem. */
   function context() {
+    /* Rahulzicht is de positieve projectie. Hij leest het Blikveld plus, als
+       die bestaat, de bestaande Workspace Runtime. De oudere Blikveld-helper
+       blijft alleen een terugval voor schermen die Rahulzicht niet laden. */
+    var Z = window.RTGEdgeRahulzicht, z = Z && Z.lees ? Z.lees(window) : null;
+    if (z && z.context) {
+      var uit = { app: document.title.replace(/^RTG\s*/i, '') || 'RTG', deel: z.context.deel || 'Actieve pagina',
+        selectie: '', verwijzingen: metWerkstuk(z.context.verwijzingen || [], window.RTGEdgeBlikveld) };
+      if (z.context.wereld) uit.wereld = z.context.wereld;
+      if (z.context.werkruimte) uit.werkruimte = z.context.werkruimte;
+      if (z.context.assistent) uit.assistent = z.context.assistent;
+      if (z.context.op) uit.op = z.context.op;
+      return uit;
+    }
     var B = window.RTGEdgeBlikveld;
     if (B && typeof B.voorRahul === 'function') {
       try {
@@ -29,17 +43,6 @@
       deel: actief ? actief.textContent.trim() : 'Actieve pagina',
       selectie: keuze ? keuze.textContent.trim() : ''
     };
-    /* WAT HET BLIKVELD ZAG, GAAT VOOR WAT DE DOM VAN DIT DOCUMENT ZEGT -- en
-       alleen de velden die shared/edge/rahulzicht.js toelaat. In de schil is
-       dit document de schil zelf; het open blad, zijn wereld en zijn object
-       weet alleen het blikveld. Veld voor veld overgenomen, nooit gespreid
-       (AI-CONTEXT-01). Zonder blikveld blijft alles zoals het was. */
-    var Z = window.RTGEdgeRahulzicht, z = Z && Z.lees ? Z.lees(window) : null;
-    if (z && z.context) {
-      if (z.context.wereld) c.wereld = z.context.wereld;
-      if (z.context.deel) c.deel = z.context.deel;
-      if (z.context.verwijzingen) c.verwijzingen = z.context.verwijzingen;
-    }
     return c;
   }
   /* Het concept waar het lid in het gesprek aan werkt (shared/edge/conceptwerk.js)

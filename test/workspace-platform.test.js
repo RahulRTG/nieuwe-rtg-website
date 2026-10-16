@@ -52,6 +52,7 @@ test('Module Registry kent LivingOS, WorkOS en iedere canonieke functie zonder t
   assert.equal(worlds.find(x => x.name === 'LivingOS').items.length, tel('LivingOS'));
   assert.equal(worlds.find(x => x.name === 'WorkOS').items.length, tel('WorkOS'));
   assert.equal(functies.find(x => x.id === 'link:berichten').module, 'messages');
+  assert.equal(functies.find(x => x.id === 'link:werkos').module, 'work');
   assert.equal(functies.find(x => x.id === 'link:veilig').module, 'safety');
 });
 

@@ -58,6 +58,7 @@
    als de uitslag ervan uit dezelfde deur komt als de context zelf. */
 const { woordenVan, handtekening, MAX_WOORDEN } = require('./menscontext-uit');
 const { canoniekeVerwijzingen } = require('./menscontext-ref');
+const { saneerWerkruimte, saneerAssistent } = require('./menscontext-presentatie');
 
 const MAX_TEKST = 80;      /* een schermtitel, geen document */
 const MAX_ITEMS = 8;       /* meer opties dan dit is geen keuze meer */
@@ -70,7 +71,7 @@ const MAX_ITEMS = 8;       /* meer opties dan dit is geen keuze meer */
 const INTERACTIES = Object.freeze(['vergelijking', 'keuze', 'formulier', 'selectie', 'onbekend']);
 
 const CONTRACTSLEUTELS = Object.freeze(['presentatie', 'verwijzingen', 'interactie',
-  'app', 'deel', 'selectie', 'wereld', 'scherm', 'op']);
+  'app', 'deel', 'selectie', 'wereld', 'scherm', 'werkruimte', 'assistent', 'op']);
 
 /* `op` is het leesmoment van het blikveld; zie ./menscontext-vers.js. */
 const { verouderd, MAX_OUDERDOM_MS, MAX_VOORUIT_MS } = require('./menscontext-vers');
@@ -119,6 +120,19 @@ function saneer(ruw, opties) {
      Rahul-tab, wereld/scherm van de reis- en living-schermen. */
   const presentatie = { app: tekst(p.app), scherm: tekst(p.scherm || p.deel),
     wereld: naarWoord(p.wereld), selectie: tekst(p.selectie) };
+
+  const rw = ruw.werkruimte && typeof ruw.werkruimte === 'object' ? ruw.werkruimte :
+    (p.werkruimte && typeof p.werkruimte === 'object' ? p.werkruimte : null);
+  const werkruimte = saneerWerkruimte(rw, gewist);
+  if (werkruimte) presentatie.werkruimte = werkruimte;
+
+  const ra = ruw.assistent && typeof ruw.assistent === 'object' ? ruw.assistent :
+    (p.assistent && typeof p.assistent === 'object' ? p.assistent : null);
+  const assistent = saneerAssistent(ra, gewist);
+  if (assistent && werkruimte && werkruimte.module === assistent.module) presentatie.assistent = assistent;
+  else if (assistent) {
+    gewist.push({ sleutel: 'assistent', reden: 'actieve Workspace-module bevestigt dit assistentmanifest niet' });
+  }
 
   const verwijzingen = lijst(ruw.verwijzingen).map(verwijzing).filter(Boolean);
 

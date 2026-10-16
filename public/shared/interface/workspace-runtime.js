@@ -1,11 +1,10 @@
-/* RTG WORKSPACE RUNTIME v0.1. Dynamic Layer, Second Screen en Focus View zijn
-   surfaces van dit fundament; modules bezitten nooit de platformlaag. */
 (function (w, d) {
   'use strict';
   var SDK = w.RTGModuleSDK, nummer = 0;
-  if (!SDK || !w.RTGWorkspaceRegistries || !w.RTGIdentityRuntime || !w.RTGSessionRuntime || !w.RTGWorkspaceContext ||
+  if (!SDK || !w.RTGWorkspaceRegistries || !w.RTGIdentityRuntime || !w.RTGSessionRuntime || !w.RTGWorkspaceIntents || !w.RTGWorkspaceContext ||
       !w.RTGWorkspaceNavigation || !w.RTGWorkspaceState || !w.RTGWorkspacePolicy ||
-      !w.RTGWorkspaceOrchestrator || !w.RTGWorkspaceBroker || !w.RTGWorkspaceModuleHost || !w.RTGWorkspaceBlueprints) return;
+      !w.RTGWorkspaceOrchestrator || !w.RTGWorkspaceBroker || !w.RTGWorkspaceModuleHost || !w.RTGWorkspaceBlueprints ||
+      !w.RTGWorkspaceAssistantManifest) return;
   w.RTGWorkspaceRuntime = function (opties) {
     var o = opties || {}, id = 'rtg-workspace-' + (++nummer), defs = Object.create(null), mounted = Object.create(null);
     var surface = 'peek', actief = null, dood = false, registries = w.RTGWorkspaceRegistries();
@@ -16,7 +15,6 @@
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });
     var contextEngine = w.RTGWorkspaceContext();
     var navigation = w.RTGWorkspaceNavigation({ open: o.open });
-    /* Zonder eigen antwoordfunctie vraagt de runtime de server om rechten. */
     var rechten = null, serverRecht = function (p) { return !!rechten && rechten[p] === true; };
     var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission || serverRecht, tenantPolicy: o.tenantPolicy });
     if (!o.permission && identity.authenticated()) Promise.resolve().then(function () {
@@ -35,9 +33,13 @@
     var broker = w.RTGWorkspaceBroker({ definition: function (mid) { return defs[mid]; }, registries: registries,
       policy: policy, workspaceId: o.workspaceId, confirm: o.confirm, audit: function (entry) {
         if (typeof o.audit === 'function') return o.audit(entry);
-        aanvraag('/api/ik/workspace/audit/noteer', entry).catch(function () { /* domeinaudit blijft leidend */ });
+        aanvraag('/api/ik/workspace/audit/noteer', entry).catch(function () {});
       }, error: fout,
       observe: function (event) { orchestrator.handle(event); } });
+    var assistant = w.RTGWorkspaceAssistantManifest({ registries: registries, identity: identity, policy: policy,
+      active: function () { return actief; }, surface: function () { return surface; }, edge: function () {
+        return w.RTGEdgeBlikveld && typeof w.RTGEdgeBlikveld.lees === 'function' ? w.RTGEdgeBlikveld.lees() : null;
+      } });
     var blueprints = w.RTGWorkspaceBlueprints({ manifest: function (mid) { return defs[mid] && defs[mid].manifest; },
       permission: policy.allowed, moduleAllowed: o.moduleAllowed, deviceAllows: o.deviceAllows,
       apply: function (plan, reason) { orchestrator.apply(plan, reason); } });
@@ -62,9 +64,11 @@
         });
       });
     }
+    var intents = w.RTGWorkspaceIntents({ identity: identity });
     function contextVoor(mid, status) {
       var vak = state.module(mid), ctx = { id: mid, manifest: defs[mid].manifest, services: o.services || {},
         context: contextEngine.get, session: Object.freeze ? Object.freeze({ unchanged: identity.sameSession }) : { unchanged: identity.sameSession },
+        intents: intents,
         state: { get: vak.get, set: vak.set, snapshot: function () { return state.view(mid); } }, request: aanvraag,
         open: function (url, title) { return navigation.open(url, title, mid); },
         permission: function (p) { return policy.allowed(p, mid); },
@@ -104,9 +108,7 @@
     function dispatch(target) {
       var root = target && target.closest && target.closest('[data-rtg-module]'); if (!root) return false;
       var mid = root.dataset.rtgModule, item = mounted[mid]; if (!item) return false;
-      /* Handel eerst de intentie af terwijl target nog bij de module hoort.
-         render() mag de surface vervangen; deden we dat ervoor, dan verloor
-         iedere native module de aangeklikte knop nog voor handle() hem zag. */
+      /* Handel af voordat render() de surface en daarmee target vervangt. */
       var verwerkt = item.handle(target);
       if (verwerkt) { actief = mid; toepassen(orchestrator.layout()); }
       return verwerkt;
@@ -123,6 +125,7 @@
       manifests: function () { return Object.keys(defs).map(function (mid) { return defs[mid].manifest; }); },
       active: function () { return actief; }, state: function () { return surface; }, stateEngine: state,
       registries: registries, orchestrator: orchestrator, contextEngine: contextEngine, navigation: navigation, blueprints: blueprints,
+      assistantManifest: assistant.read,
       applyBlueprint: blueprints.apply,
       publish: function (type, data) { return broker.publish(type, data, 'workspace', true); },
       execute: function (actionId, data) { return broker.run(null, actionId, data); }, destroy: destroy };

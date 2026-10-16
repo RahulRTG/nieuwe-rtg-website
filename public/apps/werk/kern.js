@@ -16,6 +16,13 @@
   var sessie = null;
   try { sessie = JSON.parse(localStorage.getItem(SLEUTEL) || 'null'); } catch (e) {}
 
+  function gewenst() {
+    var code = '';
+    try { code = new URLSearchParams(location.search).get('werkruimte') || ''; } catch (e) {}
+    code = String(code).trim().toUpperCase();
+    return /^W[A-Z0-9]{2,20}$/.test(code) ? code : '';
+  }
+
   function esc(t) {
     return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -26,6 +33,8 @@
     esc: esc,
     euro: function (c) { return '€ ' + ((c || 0) / 100).toFixed(2); },
     sessie: function () { return sessie; },
+    gewensteWerkruimte: gewenst,
+    wisselNodig: function () { var code = gewenst(); return !!(code && (!sessie || sessie.werkruimte !== code)); },
     bewaar: function (s) {
       sessie = s;
       try { localStorage.setItem(SLEUTEL, JSON.stringify(s)); } catch (e) {}
@@ -78,14 +87,16 @@
     viaLid: function () {
       var lid = null;
       try { lid = localStorage.getItem('rtg_member_token'); } catch (e) {}
-      if (!lid || sessie) return Promise.resolve(false);
+      var keuze = gewenst();
+      if (!lid || (sessie && (!keuze || sessie.werkruimte === keuze))) return Promise.resolve(false);
       return fetch('/api/bedrijf/mijn', { method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid },
         body: '{}' })
         .then(function (r) { return r.json().catch(function () { return {}; }); })
         .then(function (d) {
-          var w = (d.werkruimtes || [])[0];
-          if (!w) return false;
+          var lijst = d.werkruimtes || [];
+          var w = keuze ? lijst.find(function (row) { return row.werkruimte === keuze; }) : lijst[0];
+          if (!w) { if (keuze) window.RTGWerk.wis(); return false; }
           window.RTGWerk.bewaar({ werkruimte: w.werkruimte, lidToken: w.lidToken });
           window.RTGWerk._welkom = w;
           return true;

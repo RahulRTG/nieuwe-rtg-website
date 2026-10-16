@@ -123,7 +123,10 @@ for (const engine of engines) {
         if (route === 'werk') {
           await h.edgeActies(page);
           await page.click('[data-wk="projecten"]');
-          await page.click('[data-rtg-adaptive-close]');
+          const close = await page.locator('[data-rtg-adaptive-close]').boundingBox();
+          assert.ok(close,'the visible Edge close control has geometry');
+          await page.mouse.click(close.x + close.width / 2,close.y + close.height / 2);
+          await page.waitForSelector('.rtg-adaptive-edge[data-rtg-adaptive-state="dock"]');
           await painted(page,'[data-doe="0"]');
           // .wd-home is display:contents on mobile; measure the real Work content stage.
           const fits = await page.locator('[data-doe="0"]').evaluate(el => {

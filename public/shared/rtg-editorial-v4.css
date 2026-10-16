@@ -14,9 +14,9 @@ body[data-rtg-editorial-v4="true"]{
   font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;color-scheme:light;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
-body[data-rtg-editorial-v4="true"][data-rtg-world="travel"]{--v4-accent:#791a35;--v4-photo:url('/images/editorial/travel-inspiration.webp')}
-body[data-rtg-editorial-v4="true"][data-rtg-world="work"]{--v4-accent:#173d37;--v4-photo:url('/images/editorial/company-technology.webp')}
-body[data-rtg-editorial-v4="true"][data-rtg-world="foundation"]{--v4-accent:#285849;--v4-photo:url('/images/editorial/foundation-care.webp')}
+body[data-rtg-editorial-v4="true"]:is([data-rtg-world="travel"],[data-rtg-palette="travel"]){--v4-accent:#791a35;--v4-photo:url('/images/editorial/travel-inspiration.webp')}
+body[data-rtg-editorial-v4="true"]:is([data-rtg-world="work"],[data-rtg-palette="work"]){--v4-accent:#173d37;--v4-photo:url('/images/editorial/company-technology.webp')}
+body[data-rtg-editorial-v4="true"]:is([data-rtg-world="foundation"],[data-rtg-palette="foundation"]){--v4-accent:#285849;--v4-photo:url('/images/editorial/foundation-care.webp')}
 body[data-rtg-editorial-v4="true"] *,body[data-rtg-editorial-v4="true"] *::before,body[data-rtg-editorial-v4="true"] *::after{box-sizing:border-box}
 body[data-rtg-editorial-v4="true"] :is(h1,h2,.rtg-display){font-family:"Bodoni Moda",Didot,Georgia,serif!important;font-weight:400!important;letter-spacing:-.035em;text-wrap:balance}
 body[data-rtg-editorial-v4="true"] h1{font-size:clamp(2.35rem,6vw,5.5rem)!important;line-height:.98!important;max-width:14ch}
@@ -100,7 +100,12 @@ body[data-rtg-v4-kind="canvas"]{padding:var(--v4-header) 0 var(--v4-edge-space)!
 body[data-rtg-v4-kind="canvas"] :is(main,[data-rtg-screen-root="immersive"],[data-rtg-native-canvas]){position:fixed!important;inset:var(--v4-header) 0 var(--v4-edge-space)!important;width:auto!important;height:auto!important;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden!important}
 
 /* De ene Edge: dun glas, subtiele wereldkleur en de lippen als anker. */
-body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{--edge-bar-bg:rgba(10,10,9,.9)!important;--edge-bar-copy:#fffaf2!important;--edge-bar-dim:#cfc6ba!important;--edge-bar-line:rgba(217,188,137,.55)!important;--edge-bar-accent:#e2c38e!important;--edge-bar-accent-soft:rgba(226,195,142,.1)!important;isolation:isolate}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{--edge-bar-bg:rgba(10,10,9,.9)!important;--edge-bar-copy:#fffaf2!important;--edge-bar-dim:#cfc6ba!important;--edge-bar-line:rgba(217,188,137,.55)!important;--edge-bar-accent:#e2c38e!important;--edge-bar-accent-soft:rgba(226,195,142,.1)!important;isolation:isolate;pointer-events:auto!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{position:fixed!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]{height:min(754px,calc(100dvh - var(--v4-header) - 24px))!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-bar{top:auto!important;bottom:10px!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-sheet:not(:has(.rtg-edge-cinema)){bottom:82px!important;max-height:calc(100% - 82px)!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet:not([hidden]){z-index:20;pointer-events:auto!important}
 /* De capsule blijft doorschijnend, maar krijgt een zachte optische onderlaag.
    Zo blijven fotografie en wereldkleur aanwezig zonder dat kaart- of rasterlijnen
    uit het scherm achter de ene Edge doorlopen. */
@@ -207,7 +212,11 @@ body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg
   --v4-muted:#746b61;--v4-line:rgba(52,42,32,.16);--v4-accent:#67101f;
   color-scheme:light!important;background:var(--v4-paper)!important;color:var(--v4-ink)!important;
 }
-body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wd-shell,.wd-page,main,[data-rtg-screen-root="content"]){background-color:var(--v4-paper)!important;color:var(--v4-ink)!important}
+body[data-rtg-editorial-v4="true"]:is([data-rtg-world="travel"],[data-rtg-palette="travel"]){--v4-accent:#791a35!important}
+body[data-rtg-editorial-v4="true"]:is([data-rtg-world="work"],[data-rtg-palette="work"]){--v4-accent:#173d37!important}
+body[data-rtg-editorial-v4="true"]:is([data-rtg-world="foundation"],[data-rtg-palette="foundation"]){--v4-accent:#285849!important}
+body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wd-shell,.wd-page,.wk-shell,.reisapp,main,[data-rtg-screen-root="content"]){background-color:var(--v4-paper)!important;color:var(--v4-ink)!important}
+body.reisapp[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]){background-color:var(--v4-paper)!important;color:var(--v4-ink)!important}
 body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(h1,h2,h3,p,small,label,legend,li,strong){color:inherit}
 
 body[data-rtg-editorial-v4="true"] .rtg-v4-header{height:var(--v4-header);border-bottom:1px solid rgba(52,42,32,.12);background:rgba(248,244,237,.94);color:#17130f}
@@ -517,6 +526,7 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
   padding:var(--v4-header) 0 var(--v4-edge-space)!important;
   background:var(--v4-paper)!important;color:var(--v4-ink)!important;
 }
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wk-shell,.reisapp){background:var(--v4-paper)!important;color:var(--v4-ink)!important}
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"]{
   padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;
 }

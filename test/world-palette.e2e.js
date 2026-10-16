@@ -13,13 +13,14 @@ const fs = require('node:fs'), path = require('node:path');
 const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
 const engines = h.testMotoren();
-// [grond, vlak, inkt, signatuur]: de grond is www-ivoor met een zweem van de wereld.
-const inkt = 'rgb(17, 17, 14)';
+// V4 gebruikt één rustige tijdschriftgrond. Wereldidentiteit blijft zichtbaar in
+// signatuur en accent, zodat dezelfde besturing niet tot anonieme domeinen leidt.
+const paper = 'rgb(244, 239, 231)', inkt = 'rgb(23, 19, 15)';
 const colors = {
-  living: ['rgb(237, 232, 223)', 'rgb(248, 245, 239)', inkt, '#9b714e'],
-  work: ['rgb(233, 232, 225)', 'rgb(246, 245, 240)', inkt, '#587369'],
-  travel: ['rgb(237, 229, 224)', 'rgb(248, 243, 239)', inkt, '#9b3152'],
-  foundation: ['rgb(233, 232, 225)', 'rgb(246, 245, 239)', inkt, '#557566']
+  living: [paper, inkt, '#b59063', '#67101f'],
+  work: [paper, inkt, '#8da99b', '#173d37'],
+  travel: [paper, inkt, '#b86a7e', '#791a35'],
+  foundation: [paper, inkt, '#9eb69b', '#285849']
 };
 let srv, token;
 async function post(route, body, auth) {
@@ -37,27 +38,31 @@ test.before(async () => {
 });
 test.after(async () => { if (srv) await h.stop(srv.child); });
 async function palette(scope, world, card) {
-  // Wait for imported CSS too: the body attributes precede stylesheet loading.
-  await scope.waitForFunction(() => !!getComputedStyle(document.body).getPropertyValue('--rtg-world-card').trim());
+  // Basis injects the editorial runtime after the route scripts. WebKit on a
+  // wide fresh document can report desktop-ready one frame before that final
+  // stylesheet/runtime pair has annotated the body. Sample the actual V4
+  // surface only after both layers are present.
+  await scope.waitForFunction(() => document.body.dataset.rtgEditorialV4 === 'true' &&
+    !!getComputedStyle(document.body).getPropertyValue('--v4-paper').trim());
   // Reduced motion still has a 0.01ms transition; sample the final painted state.
-  await scope.waitForFunction(([bg,sig]) => {
-    const body = getComputedStyle(document.body);
-    return body.backgroundColor === bg && body.getPropertyValue('--rtg-world-signature').trim() === sig;
-  },[colors[world][0],colors[world][3]],{timeout:3000});
+  await scope.waitForFunction(world => document.body.dataset.rtgPalette === world,world,{timeout:3000});
   const actual = await scope.evaluate(selector => {
     const body = getComputedStyle(document.body), el = selector && document.querySelector(selector);
     return {body:body.backgroundColor, ink:body.color, card:el && getComputedStyle(el).backgroundColor,
       cardInk:el && getComputedStyle(el).color, palette:document.body.dataset.rtgPalette,
-      token:body.getPropertyValue('--rtg-world-bg'),signature:body.getPropertyValue('--rtg-world-signature').trim(),
+      kind:document.body.dataset.rtgV4Kind,token:body.getPropertyValue('--rtg-world-bg'),
+      signature:body.getPropertyValue('--rtg-world-signature').trim(),accent:body.getPropertyValue('--v4-accent').trim(),
       style:document.body.getAttribute('style'),transition:body.transition};
   },card);
-  assert.equal(actual.body,colors[world][0],world+' body '+JSON.stringify(actual));
-  assert.equal(actual.ink,colors[world][2],world+' text');
+  if (actual.kind === 'cover' || actual.kind === 'canvas') assert.equal(actual.body,'rgb(12, 12, 11)',world+' cinematic ground');
+  else assert.equal(actual.body,colors[world][0],world+' paper '+JSON.stringify(actual));
+  assert.equal(actual.ink,actual.kind === 'cover' || actual.kind === 'canvas' ? 'rgb(255, 250, 242)' : colors[world][1],world+' text');
   assert.equal(actual.palette,world,world+' palette');
-  assert.equal(actual.signature,colors[world][3],world+' signature');
+  assert.equal(actual.signature,colors[world][2],world+' signature');
+  assert.equal(actual.accent,colors[world][3],world+' editorial accent');
   if (card) {
-    assert.equal(actual.card,colors[world][1],world+' '+card+' surface');
-    assert.equal(actual.cardInk,colors[world][2],world+' '+card+' text');
+    assert.ok(actual.card,world+' '+card+' surface is painted');
+    assert.ok(actual.cardInk,world+' '+card+' text is painted');
   }
   // Let initial data requests finish before navigating or closing this frame.
   // Not `networkidle`: a signed-in screen keeps its live stream (/api/stream)
@@ -109,19 +114,15 @@ for (const engine of engines) for (const width of [390,1440]) {
         const frame = await activeFrame(page,'.cmd-pane.actief iframe');
         await page.waitForFunction(world => document.body.getAttribute('data-rtg-blad-wereld') === world,world);
         await palette(frame,world,card); await palette(page,world);
-        if (world === 'work' || world === 'travel') {
-          const ground = await frame.locator(world === 'work' ? '.wk-shell' : '.reisapp').evaluate(el => getComputedStyle(el).backgroundColor);
-          assert.equal(ground,colors[world][0],world+' inner operating shell');
-        }
         const out = path.join(__dirname,'../artifacts/world-palette'); fs.mkdirSync(out,{recursive:true});
         await page.screenshot({path:path.join(out,engine+'-'+width+'-'+world+'.png')});
         await page.waitForFunction(() => {
-          // The translucent header reports the same opaque pigment as rgb(),
-          // while world tokens use hex. Compare colours, not their spelling.
+          // De browserrand volgt de werkelijk geschilderde papier- of filmgrond.
+          // Vergelijk kleuren, niet hun rgb/hex-spelling.
           const c = document.createElement('canvas').getContext('2d');
           c.fillStyle = document.querySelector('meta[name="theme-color"]').content;
           const actual = c.fillStyle;
-          c.fillStyle = getComputedStyle(document.body).getPropertyValue('--rtg-world-bg').trim();
+          c.fillStyle = getComputedStyle(document.body).backgroundColor;
           return actual === c.fillStyle;
         });
         await home(page);

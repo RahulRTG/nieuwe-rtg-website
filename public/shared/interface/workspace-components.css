@@ -202,6 +202,13 @@
   color: var(--rtg-ss-wine, var(--rtg-ss-gold));
 }
 .rtg-interface-second-screen .rtg-ss-editor-list { display: grid; gap: 6px; }
+.rtg-interface-second-screen .rtg-ss-templates { border-bottom: 1px solid var(--rtg-ss-line); display: grid; gap: 8px; padding-bottom: 12px; }
+.rtg-interface-second-screen .rtg-ss-templates[hidden] { display: none; }
+.rtg-interface-second-screen .rtg-ss-templates h4 { font-size: .82rem; letter-spacing: .08em; margin: 0; text-transform: uppercase; }
+.rtg-interface-second-screen .rtg-ss-template-list { display: grid; gap: 6px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rtg-interface-second-screen .rtg-ss-template-list button { display: grid; gap: 4px; min-height: 64px; text-align: left; }
+.rtg-interface-second-screen .rtg-ss-template-list strong { font-size: .8rem; }
+.rtg-interface-second-screen .rtg-ss-template-list span { color: var(--rtg-ss-muted); font-size: .68rem; line-height: 1.35; }
 .rtg-interface-second-screen .rtg-ss-density { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
 .rtg-interface-second-screen .rtg-ss-density button[aria-pressed="true"] { border-color: var(--rtg-ss-gold); color: var(--rtg-ss-gold); }
 
@@ -237,6 +244,7 @@
 }
 
 @media (max-width: 520px) {
+  .rtg-interface-second-screen .rtg-ss-template-list,
   .rtg-interface-second-screen .rtg-travel-fields,
   .rtg-interface-second-screen .rtg-travel-request-actions,
   .rtg-interface-second-screen .rtg-work-actions,

@@ -20,6 +20,9 @@ const HTML = lees('public/apps/app.html');
 const SW = lees('public/sw.js');
 const SMART = lees('public/shared/rtg-edge-smart-menu.js');
 const EDGE_COMMAND = lees('public/shared/rtg-edge-command.js');
+const SECOND_SCREEN = lees('public/shared/interface/second-screen.js');
+const COMPOSER = lees('public/shared/interface/workspace-composer.js');
+const BLUEPRINTS = lees('public/shared/interface/workspace-blueprints.js');
 
 test('Uw ruimte gebruikt de bestaande profiel-, inbox- en Rahul-bronnen', () => {
   assert.match(MODULES, /request\('\/api\/auth\/me'/);
@@ -77,6 +80,14 @@ test('de persoonlijke voorzijde heeft vier echte snelle deuren', () => {
   assert.match(CONTEXT, /Geen actie nodig\. Rahul houdt de rest in de gaten\./);
 });
 
+test('werkruimte-indelingen zijn expliciet, toegankelijk en blijven achter de bestaande rechtenpoort', () => {
+  for (const naam of ['Persoonlijk', 'Uitvoerder', 'Coördinator', 'Manager', 'Enterprise']) assert.ok(BLUEPRINTS.includes(naam), naam);
+  assert.match(COMPOSER, /Een indeling ordent alleen functies waarvoor u al toegang heeft\./);
+  assert.match(SECOND_SCREEN, /composer\.applyTemplate\(t\.dataset\.ssTemplateId\)/);
+  assert.match(BLUEPRINTS, /var r = validate\(templateInvoer\(spec\)\)/);
+  assert.doesNotMatch(BLUEPRINTS, /fetch\(|localStorage|sessionStorage/);
+});
+
 test('lege informatie is één familie en opent meteen de juiste invullaag', () => {
   assert.match(LEEG, /rtg-leeg-vlak--actie/);
   assert.match(LEEG, /data-rtg-leeg-doel/);
@@ -86,6 +97,9 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(EMPTY, /RTGLeeg\.vlak/);
   assert.match(MODULES, /\/apps\/comm\.html#nieuw/);
   assert.match(TRAVELDOSSIER, /\/apps\/reizen\.html#rahul/);
+  assert.match(TRAVELDOSSIER, /Open volledig TravelOS/);
+  assert.doesNotMatch(TRAVELDOSSIER, /m\.state === 'peek'[^\n]*Open (?:volledig )?Travel/,
+    'de volledige TravelOS-deur moet in iedere Spatial-surface bereikbaar blijven');
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);

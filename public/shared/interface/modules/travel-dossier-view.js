@@ -23,6 +23,9 @@
         (Array.isArray(dossier.open) ? dossier.open.length : 0) + ' vraagt aandacht'));
       root.appendChild(summary);
     }
-    if (m.state === 'peek') { var open = button('Open Travel', 'open'); open.dataset.ssUrl = '/apps/reizen.html#reizen'; root.appendChild(open); }
+    /* De deur naar volledig TravelOS blijft in elke surface bereikbaar. De
+       compacte aanvraag kan daardoor nooit de bestaande volledige workflow
+       opsluiten; dezelfde gedeclareerde travel.open-actie handelt de klik af. */
+    var open = button('Open volledig TravelOS', 'open'); open.dataset.ssUrl = '/apps/reizen.html#reizen'; root.appendChild(open);
   };
 })(window, document);

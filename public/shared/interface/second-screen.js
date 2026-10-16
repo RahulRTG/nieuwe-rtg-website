@@ -1,4 +1,3 @@
-/* Second Screen boven de Workspace Runtime. */
 (function (w, d) {
   'use strict';
   function el(tag, cls, tekst) { var n = d.createElement(tag); if (cls) n.className = cls; if (tekst != null) n.textContent = tekst; return n; }
@@ -66,7 +65,6 @@
     }
     merkUitvoer(); if (w.MutationObserver) { uitvoerKijk = new MutationObserver(merkUitvoer); uitvoerKijk.observe(root, { childList: true, subtree: true }); }
 
-    function bewaar() { composer.save(); }
     function teken() { composer.draw(state, editing); }
     function aria(s) {
       var werk = root.querySelector('.cmd-werk'), focus = s === 'focus';
@@ -99,15 +97,16 @@
     }
     function klik(e) {
       var moduleRoot = e.target.closest('[data-rtg-module]');
-      if (moduleRoot && bank.contains(moduleRoot) && runtime.dispatch(e.target)) { e.preventDefault(); bewaar(); return; }
+      if (moduleRoot && bank.contains(moduleRoot) && runtime.dispatch(e.target)) { e.preventDefault(); composer.save(); return; }
       var t = e.target.closest('[data-ss-action],[data-ss-url],[data-ss-context-id],[data-rtg-legacy-open]');
       if (!t || !bank.contains(t)) return;
       var a = t.dataset.ssAction, id = t.dataset.ssModuleId || (t.closest('[data-ss-module]') && t.closest('[data-ss-module]').dataset.ssModule);
       if (a === 'close') zet('peek');
       else if (a === 'panel' || a === 'workspace' || a === 'focus') zet(a);
-      else if (a === 'focus-module') { composer.setActive(id, false); zet('focus'); bewaar(); }
+      else if (a === 'focus-module') { composer.setActive(id, false); zet('focus'); composer.save(); }
       else if (a === 'edit') { editing = !editing; teken(); }
       else if (a === 'edit-done') { editing = false; teken(); }
+      else if (a === 'template') { composer.applyTemplate(t.dataset.ssTemplateId); }
       else if (a === 'ask') { if (o.vraag) o.vraag('Maak een gevalideerde RTG Workspace Blueprint voor mijn doel'); }
       else if (a === 'up') composer.move(id, -1); else if (a === 'down') composer.move(id, 1);
       else if (a === 'hide') composer.hide(id, true); else if (a === 'show') composer.hide(id, false);

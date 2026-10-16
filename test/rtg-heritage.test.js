@@ -118,9 +118,13 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
   assert.match(ADAPTERS, /prefers-reduced-motion:reduce/);
 });
 
-test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-editorial-v4.css',
-    'last import is shared and project-relative; no query that the CSS bundler would discard');
+test('Heritage blijft zelfstandig; basis laadt editorial v4 daarna als laatste laag', () => {
+  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-world-palette.css');
+  assert.doesNotMatch(TOKENS, /rtg-editorial-v4\.css/,
+    'een CSS-import kan nooit na de rest van Heritage winnen');
+  const basis = fs.readFileSync(path.join(ROOT,'public/shared/basis/basis-01.js'),'utf8');
+  assert.match(basis, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basis, /laadEditorialBlad\(\)/);
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="content"/);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="immersive"/);

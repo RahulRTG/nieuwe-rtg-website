@@ -3,6 +3,7 @@
    Edge. Domeininhoud en canvassen blijven eigenaar van hun werking. */
 
 body[data-rtg-editorial-v4="true"]{
+  --rtg-editorial-version:20261016;
   --v4-paper:#f3efe7;--v4-paper-strong:#fffdf8;--v4-ink:#17130f;
   --v4-muted:#6d655c;--v4-line:rgba(23,19,15,.17);--v4-accent:#7f1634;
   --v4-accent-strong:#9e1c40;--v4-metal:#b79a61;--v4-dark:#0c0c0b;
@@ -502,4 +503,18 @@ html body[data-rtg-editorial-v4="true"]> :is(#melding,.melding,.toast):empty{
 }
 html body[data-rtg-editorial-v4="true"]> :is(#melding,.melding,.toast){
   bottom:calc(var(--rtg-adaptive-inset,82px) + 10px)!important;
+}
+
+/* Cascadeslot. De oude bureaulaag adresseert body met vier attributen en won
+   daardoor zelfs wanneer V4 erna stond. Deze regel benoemt dezelfde bestaande
+   context en bindt de werkelijke viewport aan de nieuwe header en Edge. */
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"]{
+  padding:var(--v4-header) 0 var(--v4-edge-space)!important;
+  background:var(--v4-paper)!important;color:var(--v4-ink)!important;
+}
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"]{
+  padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;
+}
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]{
+  background:#0c0c0b!important;color:#fffaf2!important;
 }

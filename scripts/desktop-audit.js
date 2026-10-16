@@ -43,6 +43,8 @@ async function main() {
           row.http = response.status();
           await page.waitForLoadState('load', { timeout: 12000 });
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform],body[data-rtg-projectie]', { timeout: 12000 });
+          if (route.startsWith('/apps/')) await page.waitForFunction(() =>
+            document.body.dataset.rtgEditorialV4 === 'true' || document.body.hasAttribute('data-rtg-projectie'), null, { timeout:12000 });
           row.contentReadyMs = Date.now() - started;
           row.access = await page.evaluate(() => [...document.querySelectorAll('[data-rtg-access]')].some(e =>
             e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'));
@@ -102,6 +104,10 @@ async function main() {
           if (!row.access) await page.waitForFunction(() => {
             const body = document.body;
             if (body.dataset.rtgShell === 'mobile') return true;
+            if (body.dataset.rtgEditorialV4 === 'true') {
+              const expected = body.dataset.rtgV4Kind === 'cover' ? '0px' : (innerWidth < 700 ? '58px' : '72px');
+              return getComputedStyle(body).paddingTop === expected;
+            }
             const cinematic = body.dataset.rtgCinematic === 'true';
             const edgeHidden = /^(compact|focus)$/.test(body.getAttribute('data-rtg-edge-2-state') || '');
             /* In compact en focus geeft de schil de bovenrand terug, ook in de
@@ -138,13 +144,16 @@ async function main() {
             const visible = s => [...document.querySelectorAll(s)].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
             const heading = [...document.querySelectorAll('#platform-story-title,.wd-home h1,.wd-access h1,h1')]
               .find(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
+            const shown = e => !!(e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none');
             return { url: location.pathname, world:b.dataset.rtgWorld, palette:b.dataset.rtgPalette, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
+              editorialV4:b.dataset.rtgEditorialV4 === 'true', v4Kind:b.dataset.rtgV4Kind || '',
               cinematic:b.dataset.rtgCinematic === 'true', viewport:innerWidth,
               access:[...document.querySelectorAll('[data-rtg-access]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
               mobileDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wd-shell>.wd-people,.wd-shell>.wd-favorites,.wd-shell>.wd-library,.wd-home>.wp-scene,.wp-domain'),
               nativeContent:visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])'),
               publicDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wp-edit-images'),
-              publicHeader:rect('.pp-header'),
+              publicHeader:rect('.pp-header'), v4Header:rect('body>.rtg-v4-header'),
+              visibleLegacyHeaders:[...document.querySelectorAll('body>header:not(.rtg-v4-header),.wd-page>header:not(.rtg-v4-header),.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom')].filter(shown).length,
               accessRect:rect('[data-rtg-access]'),
               background:css.backgroundColor, editorialVersion:css.getPropertyValue('--rtg-editorial-version').trim(), headingFont:heading&&getComputedStyle(heading).fontFamily, edgeState:b.getAttribute('data-rtg-edge-2-state'), padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
               edges:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length,
@@ -162,10 +171,16 @@ async function main() {
           row.failures = [];
           if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          const expectedTop = s.access ? 0 : s.public ? (mobile ? 76 : 88) :
+          const v4Top = s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
+          const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (mobile ? 76 : 88) :
             s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (!s.access && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
+          if (s.editorialV4 && !s.access) {
+            const expectedHeader = mobile ? 58 : 72;
+            if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y+s.pageScroll) > 2) row.failures.push('nonstandard-v4-header');
+            if (s.visibleLegacyHeaders) row.failures.push('visible-legacy-header');
+          }
           if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');
           if (mobile && !s.public) {
             if (s.shellMode !== 'mobile' || s.desktop) row.failures.push('desktop-shell-on-mobile');
@@ -173,7 +188,7 @@ async function main() {
                the mobile lead. The old audit called that real product content
                "desktop decoration" and would force the app back to a blank
                list. Non-cinematic screens keep the original prohibition. */
-            if (s.mobileDecoration && !s.cinematic) row.failures.push('stacked-mobile-shell');
+            if (s.mobileDecoration && !s.cinematic && !s.editorialV4) row.failures.push('stacked-mobile-shell');
             if (!s.nativeContent) row.failures.push('missing-mobile-content');
           }
           if (mobile && s.public) {
@@ -186,7 +201,12 @@ async function main() {
              one frame and one Edge, never a hidden second navigation. */
           if (s.shells !== 1 || s.edges !== 1) row.failures.push('duplicate-or-missing-frame');
           if (s.overflow) row.failures.push('horizontal-overflow');
-          if (!s.content || !s.shell || (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100))) row.failures.push('missing-column');
+          if (!s.content || !s.shell) row.failures.push('missing-content-frame');
+          else if (s.editorialV4 && !s.access) {
+            if (!mobile && (s.shell.w < s.viewport-162 || Math.abs(s.shell.x-(s.viewport-s.shell.w)/2) > 2)) row.failures.push('nonstandard-v4-frame');
+            if ((s.left && s.left.w > 1) || (s.right && s.right.w > 1) || (s.library && s.library.w > 1)) row.failures.push('visible-legacy-column');
+            if (s.content.x < s.shell.x-1 || s.content.right > s.shell.right+1) row.failures.push('content-outside-v4-frame');
+          } else if (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100)) row.failures.push('missing-column');
           else if (!s.access && !mobile) {
             if (s.cinematic) {
               const fullBleed = Math.abs(s.shell.x) <= 2 && Math.abs(s.shell.w-s.viewport) <= 2;
@@ -197,19 +217,20 @@ async function main() {
             if (s.library && Math.max(s.content.bottom,s.right.bottom) > s.library.y+1) row.failures.push('library-overlap');
           }
           const palettes = {living:'rgb(16, 13, 10)',work:'rgb(16, 24, 23)',travel:'rgb(25, 13, 18)',foundation:'rgb(16, 35, 30)'};
-          if(s.editorialVersion !== '20261001')row.failures.push('editorial-system-not-loaded');
+          if(s.editorialVersion !== (s.editorialV4 ? '20261016' : '20261001'))row.failures.push('editorial-system-not-loaded');
           if(s.layout !== 'standard')row.failures.push('legacy-layout');
           /* De ivoren kamer draagt per wereld een zweem van haar signatuur (besluit
              van de eigenaar, public/shared/rtg-cinematic-system.css). Die tint volgt
              het PALET, met de wereld als terugval -- precies zoals de CSS kiest. */
           const cinematicCanvas = {living:'rgb(237, 232, 223)',work:'rgb(233, 232, 225)',travel:'rgb(237, 229, 224)',foundation:'rgb(233, 232, 225)'};
-          if (!s.access && s.background !== (s.public ? 'rgb(16, 14, 12)' : s.cinematic ? cinematicCanvas[s.palette || s.world] : palettes[s.world])) row.failures.push('nonstandard-world-palette');
+          const v4Canvas = /^(cover|canvas)$/.test(s.v4Kind) ? 'rgb(12, 12, 11)' : 'rgb(244, 239, 231)';
+          if (!s.access && s.background !== (s.editorialV4 ? v4Canvas : s.public ? 'rgb(16, 14, 12)' : s.cinematic ? cinematicCanvas[s.palette || s.world] : palettes[s.world])) row.failures.push('nonstandard-world-palette');
           const cards = {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'};
           if (!s.public && !s.access) for (const region of s.paletteRegions) {
             /* Product-native workspaces may remain dark islands; the shared
                app canvas, header and Edge are the cross-product contract. */
             if (s.cinematic && region.selector !== '.rtg-adaptive-bar') continue;
-            const expected = s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
+            const expected = s.editorialV4 && region.selector === '.rtg-adaptive-bar' ? 'rgba(10,10,9,.9)' : s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if ((region.selector === '.rtg-adaptive-bar' ? region.material : region.background) !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
           }
           }

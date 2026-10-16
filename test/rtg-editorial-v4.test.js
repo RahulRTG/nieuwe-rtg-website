@@ -22,12 +22,14 @@ test('editorial v4 classificeert de zeven schermfamilies deterministisch', () =>
   assert.equal(runtime.classify('/apps/privacy.html', formBody, registry), 'state');
 });
 
-test('heritage laadt uitsluitend editorial v4 als laatste presentatielaag', () => {
+test('basis laadt editorial v4 als een werkelijk laatste presentatielaag', () => {
   const heritage = read('public/shared/rtg-heritage.css');
-  assert.match(heritage, /@import url\('\.\/rtg-editorial-v4\.css'\);/);
-  assert.doesNotMatch(heritage, /@import url\('\.\/rtg-(?:editorial-system|cinematic-system)\.css'\);/);
-  const imports = [...heritage.matchAll(/@import url\('([^']+)'\);/g)];
-  assert.equal(imports.at(-1)[1], './rtg-editorial-v4.css');
+  const basis = read('public/shared/basis/basis-01.js');
+  assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
+  assert.match(heritage, /--rtg-editorial-version:20261001/);
+  assert.match(basis, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basis, /laadEditorialBlad\(\)/);
+  assert.match(read('public/shared/rtg-editorial-v4.css'), /--rtg-editorial-version:20261016/);
 });
 
 test('de werkelijke browserbundel laadt één nieuwe runtime en de service workers bewaren hem offline', () => {

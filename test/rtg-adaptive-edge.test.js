@@ -207,9 +207,12 @@ test('Quiet Presence gebruikt signalen, respecteert pin en bewaart een raakvlak 
 
 test('de definitieve editorial laag is centraal en vervangt de oude presentatielagen', () => {
   const heritage = lees('public/shared/rtg-heritage.css');
+  const basisBron = lees('public/shared/basis/basis-01.js');
   const basis = lees('public/shared/basis.js');
-  assert.match(heritage, /@import url\('\.\/rtg-editorial-v4\.css'\);/);
+  assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
   assert.doesNotMatch(heritage, /rtg-(?:cinematic|editorial)-system\.css/);
+  assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basisBron, /laadEditorialBlad\(\)/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
 });
 

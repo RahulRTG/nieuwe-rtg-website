@@ -1,5 +1,5 @@
 /* Network-first RTFoundation-lesapp met offline vangnet. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-b49e040d';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-5825d048';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',

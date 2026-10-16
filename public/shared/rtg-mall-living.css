@@ -16,13 +16,14 @@ html body.rtg-mall-living{
   /* De bestaande Mall-functies blijven onder de nieuwe etalage beschikbaar.
      Geef ook die oudere componenten de Mall-grond, zodat zij niet terugvallen
      op de lichte LivingOS-tokens zodra de volledige catalogus openstaat. */
-  --bg:var(--mall-bg);
-  --card:var(--mall-panel);
-  --card2:var(--mall-panel-soft);
-  --line:var(--mall-line);
-  --txt:var(--mall-ink);
-  --muted:var(--mall-copy);
-  --soft:#a99b8d;
+  --bg:var(--mall-bg)!important;
+  --card:var(--mall-panel)!important;
+  --card2:var(--mall-panel-soft)!important;
+  --line:var(--mall-line)!important;
+  --txt:var(--mall-ink)!important;
+  --ink:var(--mall-ink)!important;
+  --muted:var(--mall-copy)!important;
+  --soft:#a99b8d!important;
   /* Het desktopwerkvlak leest deze openbare wereld- en shelltokens. Houd ze
      binnen de Mall gelijk aan de donkere projectie; anders zet Heritage na de
      eerste render donkere LivingOS-tekst op de donkere Mall-grond. */
@@ -34,6 +35,7 @@ html body.rtg-mall-living{
   --wh-ink:var(--mall-ink)!important;
   --wh-soft:var(--mall-copy)!important;
   --wd-line:var(--mall-line)!important;
+  --wd-surface:var(--mall-panel-soft)!important;
   background:#ede8df!important;
   color:var(--mall-ink);
 }
@@ -42,8 +44,13 @@ html body.rtg-stijl.rtg-shop-flow.rtg-shop-discover.rtg-mall-living[data-rtg-wor
   color:var(--mall-ink)!important;
 }
 body.rtg-mall-living .wd-shell{background-color:var(--mall-bg)!important;color:var(--mall-ink)!important}
-body.rtg-mall-living .wd-shell :is(h1,h2,h3,h4,h5,h6,strong,b,label,legend,button,a){color:var(--mall-ink)!important}
-body.rtg-mall-living .wd-shell :is(p,small,time,.wd-muted,.wd-search-label){color:var(--mall-copy)!important}
+/* Alleen de desktopchrome krijgt hier een geforceerd donker Mall-palet. Het
+   centrale #rtgWorldContent bevat de eigen Mall-knoppen; een globale
+   button-regel zou de donkere tekst van de champagne hoofdactie overschrijven. */
+html body.rtg-mall-living[data-rtg-desktop] .wd-shell>.wd-greeting h1{color:var(--mall-ink)!important}
+html body.rtg-mall-living[data-rtg-desktop] .wd-shell>:is(.wd-people,.wd-favorites,.wd-library,.wd-greeting,.wp-tabs,.wd-focus) :is(h1,h2,h3,h4,h5,h6,strong,b,label,legend,button,a,span){color:var(--mall-ink)!important}
+html body.rtg-mall-living[data-rtg-desktop] .wd-shell>:is(.wd-people,.wd-favorites,.wd-library,.wd-greeting,.wp-tabs,.wd-focus) :is(p,small,time,.wd-muted,.wd-search-label){color:var(--mall-copy)!important}
+html body.rtg-mall-living[data-rtg-desktop] .wd-shell .wd-widget{background:var(--mall-panel-soft)!important;border-color:var(--mall-line)!important}
 body.rtg-mall-living #rtgWorldContent{background:transparent!important;color:var(--mall-ink)!important}
 body.rtg-mall-living #main{background:
   radial-gradient(80rem 45rem at 78% -8%,rgba(137,79,42,.17),transparent 62%),
@@ -57,6 +64,7 @@ body.rtg-mall-living .mall-reviews{background-color:var(--mall-bg)!important;col
 body.rtg-mall-living[data-rtg-cinematic="true"] .rtg-edge-top{--edge-copy:#2a2119;--edge-dim:#645d55;background:#f8f5ef!important;border-bottom-color:rgba(42,33,25,.14)!important;color:#2a2119!important}
 body.rtg-mall-living[data-rtg-cinematic="true"] .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:#2a2119!important}
 body.rtg-mall-living:not([data-rtg-cinematic="true"]) .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:#2a2119!important}
+body.rtg-mall-living .rtg-edge-bottom>:is(a,button)>small{color:var(--mall-copy)!important;opacity:1!important}
 body.rtg-mall-living .rtg-spring.wd-skip{background:#0b0807!important;color:#fff8ec!important}
 body.rtg-mall-living #main .mall-selection>header,
 body.rtg-mall-living #main .mall-partners>header,

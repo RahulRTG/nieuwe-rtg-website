@@ -2,9 +2,9 @@
  "soort": "index",
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
-  "op": "2026-10-15",
-  "commit": "3e98d00f3",
-  "seconden": 4.1,
+  "op": "2026-10-16",
+  "commit": "6187b6fcf",
+  "seconden": 4.6,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1226,6 +1226,7 @@
     "public/shared/toestelsleutel.js",
     "public/shared/travel-os-config.js",
     "public/shared/travel-os.js",
+    "public/shared/travel-request-controller.js",
     "public/shared/typ.js",
     "public/shared/uitleg.js",
     "public/shared/uitstap.js",
@@ -7242,16 +7243,16 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5758,
-  "gelezen": 5443,
+  "bestandenGezien": 5759,
+  "gelezen": 5444,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27528,
-  "bestandenMetUitvoer": 4542,
+  "symbolen": 27542,
+  "bestandenMetUitvoer": 4543,
   "uitvoerMetNamen": 2068,
   "uitvoerOnvolledig": 7,
-  "uitvoerZonderNamen": 2467,
+  "uitvoerZonderNamen": 2468,
   "zonderUitvoer": 901,
   "requireKanten": 7768
  },
@@ -240967,75 +240968,87 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "say",
+     "naam": "state",
      "soort": "functie",
      "lijn": 9,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "fields",
+     "naam": "say",
      "soort": "functie",
      "lijn": 10,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "sameSession",
+     "naam": "fields",
      "soort": "functie",
      "lijn": 11,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "input",
+     "soort": "functie",
+     "lijn": 12,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "sameSession",
+     "soort": "functie",
+     "lijn": 13,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "lock",
      "soort": "functie",
-     "lijn": 18,
+     "lijn": 20,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "total",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 28,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "apply",
      "soort": "functie",
-     "lijn": 29,
+     "lijn": 32,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "remember",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 37,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "changed",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 49,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "finishIntent",
      "soort": "functie",
-     "lijn": 50,
+     "lijn": 54,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "result",
      "soort": "functie",
-     "lijn": 56,
+     "lijn": 60,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "check",
      "soort": "functie",
-     "lijn": 63,
+     "lijn": 67,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "book",
      "soort": "functie",
-     "lijn": 78,
+     "lijn": 77,
      "geexporteerd": "onbekend"
     }
    ],
@@ -266336,6 +266349,90 @@
     }
    ],
    "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "public/shared/travel-request-controller.js",
+   "symbolen": [
+    {
+     "naam": "schoonNotitie",
+     "soort": "functie",
+     "lijn": 15,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "aanvraagVoor",
+     "soort": "functie",
+     "lijn": 19,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "nieuweMatches",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "maak",
+     "soort": "functie",
+     "lijn": 41,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "stand",
+     "soort": "functie",
+     "lijn": 48,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "meld",
+     "soort": "functie",
+     "lijn": 59,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "geldig",
+     "soort": "functie",
+     "lijn": 60,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "open",
+     "soort": "functie",
+     "lijn": 62,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "edit",
+     "soort": "functie",
+     "lijn": 76,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "review",
+     "soort": "functie",
+     "lijn": 83,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "submit",
+     "soort": "functie",
+     "lijn": 92,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "check",
+     "soort": "functie",
+     "lijn": 131,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "anders",
+    "namen": null
+   },
    "requires": [],
    "extern": [],
    "gebruiktDoor": []

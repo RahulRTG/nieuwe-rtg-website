@@ -217,10 +217,11 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/rtg-winkel-2026.css" rel="stylesheet">
+<link href="/shared/rtg-mall-living.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-shop-flow rtg-shop-discover" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -236,6 +237,85 @@
   <a class="terug" href="/apps/app.html">← App</a>
 </header>
 <main id="main">
+  <section class="mall-live" id="mallLiving" aria-labelledby="mallLiveTitle" aria-busy="true">
+    <header class="mall-live__intro">
+      <div>
+        <p class="mall-live__eyebrow">RTG Mall · één platform, al uw werelden</p>
+        <h1 id="mallLiveTitle">Niet alleen kopen.<br><em>Uw wereld uitbreiden.</em></h1>
+        <p>Software, producten en ervaringen worden één met RTG. Ontdek wat past, zie waar het vandaan komt en gebruik het direct waar het hoort.</p>
+      </div>
+      <div class="mall-live__continuity" aria-label="Continuïteit">
+        <span>Deze selectie reist met u mee</span>
+        <b>Desktop · telefoon · toekomstige apparaten</b>
+      </div>
+    </header>
+
+    <nav class="mall-departments" id="mallDepartments" aria-label="Afdelingen">
+      <button type="button" data-department="all" aria-pressed="true">Voor u</button>
+      <button type="button" data-department="software">Software</button>
+      <button type="button" data-department="experience">Experience</button>
+      <button type="button" data-department="hardware">Hardware</button>
+      <button type="button" data-department="home">Huis &amp; leven</button>
+      <button type="button" data-department="services">Diensten</button>
+    </nav>
+
+    <div class="mall-stage" id="mallStage">
+      <div class="mall-stage__visual" id="mallStageVisual" data-kind="hardware">
+        <div class="mall-stage__worlds" aria-hidden="true">
+          <i data-world="living"></i><i data-world="travel"></i><i data-world="work"></i><i data-world="foundation"></i>
+        </div>
+        <div class="mall-stage__object" aria-hidden="true"><span>RTG</span></div>
+        <p class="mall-stage__caption">Samengesteld uit echte RTG-mogelijkheden</p>
+      </div>
+      <article class="mall-stage__story" aria-live="polite">
+        <div class="mall-stage__meta">
+          <span id="mallStageCategory">RTG Mall</span>
+          <span id="mallStageState">Wordt geladen</span>
+        </div>
+        <h2 id="mallStageTitle">Uw Mall komt samen.</h2>
+        <p id="mallStageDescription">RTG verbindt aanbod, software en leveranciers met de wereld waarin u het gebruikt.</p>
+        <div class="mall-stage__provider" id="mallStageProvider">RTG · bron wordt gecontroleerd</div>
+        <div class="mall-stage__worldlinks" id="mallStageWorlds" aria-label="Wereldverbindingen"></div>
+        <div class="mall-stage__price" id="mallStagePrice"></div>
+        <div class="mall-stage__actions">
+          <button type="button" class="mall-action mall-action--primary" id="mallPrimary">Bekijk</button>
+          <button type="button" class="mall-action" id="mallCompare">Vergelijk</button>
+          <button type="button" class="mall-action" id="mallSave">Bewaar</button>
+        </div>
+      </article>
+    </div>
+
+    <div class="mall-capabilities" aria-label="Wat de Living Mall kan">
+      <div><span>01</span><b>Direct in uw wereld</b><small>Software opent waar zij thuishoort.</small></div>
+      <div><span>02</span><b>Herkomst zichtbaar</b><small>RTG, partner of particulier blijft herkenbaar.</small></div>
+      <div><span>03</span><b>Echt gebruik, echte reviews</b><small>Beoordelen volgt op een afgeronde handeling.</small></div>
+      <div><span>04</span><b>Meegroeiend systeem</b><small>Nieuwe partners en capabilities verschijnen uit hun bron.</small></div>
+    </div>
+
+    <section class="mall-selection" aria-labelledby="mallSelectionTitle">
+      <header><div><p>Uw levende etalage</p><h2 id="mallSelectionTitle">Samengesteld voor u.</h2></div><span id="mallSelectionCount">Laden…</span></header>
+      <div class="mall-selection__rail" id="mallSelectionRail" tabindex="0" aria-label="Producten en ervaringen"></div>
+      <div class="mall-selection__dots" id="mallSelectionDots" aria-hidden="true"></div>
+    </section>
+
+    <section class="mall-partners" aria-labelledby="mallPartnersTitle">
+      <header><div><p>Automatisch verbonden</p><h2 id="mallPartnersTitle">Huizen binnen RTG.</h2></div><span id="mallPartnerCount">Wordt geladen</span></header>
+      <div class="mall-partners__rail" id="mallPartnersRail"></div>
+    </section>
+
+    <section class="mall-reviews" id="mallReviews" aria-labelledby="mallReviewsTitle" hidden>
+      <header><div><p>Na bewezen gebruik</p><h2 id="mallReviewsTitle">Ervaringen van leden.</h2></div><span id="mallReviewScore"></span></header>
+      <div id="mallReviewList"></div>
+    </section>
+
+    <section class="mall-compare" id="mallComparePanel" role="dialog" aria-modal="true" aria-labelledby="mallCompareTitle" hidden>
+      <header><div><p>Naast elkaar</p><h2 id="mallCompareTitle">Vergelijk wat werkelijk verschilt.</h2></div><button type="button" id="mallCompareClose" aria-label="Vergelijking sluiten">×</button></header>
+      <div id="mallCompareItems"></div>
+    </section>
+
+    <button type="button" class="mall-complete-trigger" id="mallCompleteTrigger" aria-expanded="false">Open de volledige Mall</button>
+    <p class="mall-live__source" id="mallSourceState">De etalage wordt rechtstreeks opgebouwd uit RTG-bronnen.</p>
+  </section>
   <section class="shop-hero" aria-labelledby="shopKop">
     <div class="shop-hero-copy">
       <p class="shop-ey">Alleen voor leden</p>
@@ -312,6 +392,12 @@
 </section>
 
 <div class="melding" id="melding" role="status"></div>
+<div class="mall-edge-controls is-fallback" id="mallEdgeControls" aria-label="Mall-bediening">
+  <button type="button" data-mall-edge="discover"><span>Ontdek</span></button>
+  <button type="button" data-mall-edge="compare"><span>Vergelijk</span></button>
+  <button type="button" data-mall-edge="save"><span>Bewaar</span></button>
+  <a href="/apps/commerce.html#mand-sec" data-mall-edge="cart"><span>Mand</span></a>
+</div>
 <script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -345,9 +431,20 @@ const api = (pad, body, herkans) => fetch(pad, {
 const AS = { zoek: '', pagina: 1, mijn: false, laatste: {} };
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
-    '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
+  document.body.classList.add('mall-guest');
+  $('#main').innerHTML = '<section class="mall-gate" aria-labelledby="mallGateTitle">'+
+    '<div class="mall-gate__image" aria-hidden="true"></div>'+
+    '<div class="mall-gate__veil" aria-hidden="true"></div>'+
+    '<div class="mall-gate__copy"><p class="mall-live__eyebrow">RTG Mall · LivingOS</p>'+
+    '<h1 id="mallGateTitle">Een wereld die<br><em>op u wacht.</em></h1>'+
+    '<p>Software, huizen, reizen en bijzondere ervaringen komen na het inloggen samen in één persoonlijke Mall.</p>'+
+    '<a class="mall-gate__action" href="/apps/app.html">Open uw RTG-wereld <span aria-hidden="true">→</span></a>'+
+    '<small>Uw selectie en rechten blijven verbonden aan uw eigen RTG-account.</small></div></section>';
+  $('#mallEdgeControls').innerHTML = '<a href="/apps/rtg.html"><span>Home</span></a>'+
+    '<a href="/apps/app.html#werelden"><span>Werelden</span></a>'+
+    '<a class="mall-edge__rahul" href="/apps/app.html"><span>Rahul</span></a>'+
+    '<a href="/apps/app.html"><span>Account</span></a>'+
+    '<a href="/apps/app.html#menu"><span>Menu</span></a>';
 } else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadAppstore(); laadReisbieb(); laadRtfbieb(); }
 
 /* ---------- De vindlaag: locatie en intentie eerst ----------
@@ -1645,5 +1742,7 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/apps/winkel-voorzijde.js"></script>
+<script src="/apps/mall-experience-view.js"></script>
+<script src="/apps/mall-experience.js"></script>
 </body>
 </html>

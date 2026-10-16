@@ -153,8 +153,8 @@ test('3. een herzegelde regel wordt op de VOLGENDE regel betrapt; een volledig h
 test('3b. een zegel die niet meer bij zijn eigen regel past (bv. afgekapt) is een gewijzigde regel', () => {
   const { j, vak } = opzet();
   const [, b] = vul(j, 3);
-  vak.commandJournaal[1].zegel = vak.commandJournaal[1].zegel.slice(0, 31) + '0';
-  if (vak.commandJournaal[1].zegel === b.zegel) vak.commandJournaal[1].zegel = b.zegel.slice(0, 31) + '1';
+  const oorspronkelijk = b.zegel;
+  vak.commandJournaal[1].zegel = oorspronkelijk.slice(0, 31) + (oorspronkelijk.endsWith('0') ? '1' : '0');
   assert.equal(j.controleer().bij, b.id);
   assert.equal(j.controleer().waarom, 'de regel is gewijzigd na het noteren');
 });

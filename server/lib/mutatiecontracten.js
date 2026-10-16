@@ -145,6 +145,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-vrijgave').CONTRACTEN,
   require('./mutatiecontracten-naargast').CONTRACTEN,
   require('./mutatiecontracten-leidingtermijn').CONTRACTEN,
+  /* De levende Mall-etaleerder leest en verbindt bestaande bronnen. Hij maakt
+     zelf geen product, recht, bestelling of betaling. */
+  require('./mutatiecontracten-mall-living').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026 (zie de kop van de eerste). */
   require('./mutatiecontracten-afleidrest').CONTRACTEN,

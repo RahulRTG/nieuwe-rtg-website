@@ -7,6 +7,7 @@
     var slot = d.createElement('div'), mouth = rt.bar.querySelector('[data-rtg-adaptive-action="ai"]').cloneNode(true);
     slot.className = 'rtg-adaptive-surface'; slot.hidden = true;
     mouth.removeAttribute('data-rtg-adaptive-slot'); mouth.setAttribute('aria-label', 'Bediening openen');
+    mouth.setAttribute('data-rtg-safe-exit', 'controls');
     mouth.onclick = function () { w.RTGAdaptiveEdge.setState('expanded'); };
     slot.appendChild(mouth); rt.host.appendChild(slot);
     var borrowed = null, frame = 0;

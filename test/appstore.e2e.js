@@ -121,6 +121,17 @@ async function klikRaakbaar(page, selector) {
   await page.mouse.click(punt.x, punt.y);
 }
 
+/* De filmische Mall opent met een gerichte selectie. De omvangrijke bestaande
+   catalogus blijft volledig beschikbaar, maar pas nadat de gebruiker daar
+   expliciet om vraagt; deze App Store-proeven bedienen daarom dezelfde deur. */
+async function openVolledigeMall(page) {
+  if (await page.locator('#mallCompleteTrigger').getAttribute('aria-expanded') !== 'true') {
+    await klikRaakbaar(page, '#mallCompleteTrigger');
+  }
+  await page.waitForFunction(() => document.body.classList.contains('mall-complete-open') &&
+    document.getElementById('mallCompleteTrigger').getAttribute('aria-expanded') === 'true', null, { timeout: 10000 });
+}
+
 /* Een echte proef-app: hij vraagt zijn stand op bij de brug, schrijft er een
    nieuwe en probeert daarna iets waar hij geen machtiging voor heeft. Alle drie
    de uitkomsten zet hij in de DOM, zodat de toets ze kan lezen. */
@@ -269,6 +280,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: vereist('b
     const fouten = letOpFouten(page, []);
     await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
     await page.goto(base + '/apps/mall.html');
+    await openVolledigeMall(page);
     await page.waitForSelector('#asGrid .boutiek', { timeout: 20000 });
     assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');
     assert.equal(await page.locator('#asGrid input[data-m]').count(), 2,
@@ -521,6 +533,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
     const fouten = letOpFouten(page, []);
     await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
     await page.goto(base + '/apps/mall.html');
+    await openVolledigeMall(page);
     await page.waitForSelector('#asGrid .asKoop', { timeout: 20000 });
     assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');
     assert.match(await page.textContent('#asGrid .boutiek'), /9,99/, 'de prijs staat op de kaart, voordat je iets doet');

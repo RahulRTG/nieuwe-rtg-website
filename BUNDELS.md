@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 490 delen, 0 zonder onderwerp.**
+**61 bundels, 490 delen, 2 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9908 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9908 regels in de delen, waarvan 2 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -40,8 +40,8 @@ omlaag.
 | `app-main-09a1.js` | jouw RTG PIN: stand, veiligheidsjournaal en vaste QR |
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
-| `app-main-10.js` | de directe berichten: versturen en aan het gesprek toevoegen |
-| `app-main-11.js` | het videogesprek: aanbod, antwoord en de verbinding |
+| `app-main-10.js` | -- |
+| `app-main-11.js` | -- |
 | `app-main-12.js` | de meldingenlijst en het ongelezen-merk |
 | `app-main-12a.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |
 | `app-main-12b.js` | De tickets van het lid: het aanbod en wat hij al heeft |
@@ -568,7 +568,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 916 regels in de delen
+`public/shared/basis/` -- 10 delen, 917 regels in de delen
 
 | deel | onderwerp |
 |---|---|

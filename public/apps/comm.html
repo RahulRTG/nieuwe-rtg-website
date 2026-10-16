@@ -375,6 +375,7 @@
     laadGesprek().then(function () {
       var veld = $('#veld');
       if (g.concept) veld.value = g.concept;
+      if (window.RTGAdaptiveEdgeVisual) RTGAdaptiveEdgeVisual.present({ kind: 'chat' });
       veld.focus();
     });
   }
@@ -721,6 +722,20 @@
   $('#terug').addEventListener('click', function () {
     document.body.setAttribute('data-pane', 'lijst');
     staat.open = null;
+    if (window.RTGAdaptiveEdgeVisual) RTGAdaptiveEdgeVisual.close();
+  });
+
+  /* De compacte chatvorm is bediening van exact dit bestaande formulier. De
+     Edge krijgt geen tweede verzendroute en kent geen gespreksopslag. */
+  window.addEventListener('rtg-edge-visual-action', function (event) {
+    var x = event.detail || {};
+    if (x.kind !== 'chat' || x.action !== 'send' || !staat.open) return;
+    veld.value = x.values && x.values.message || '';
+    veld.dispatchEvent(new Event('input', { bubbles: true }));
+    $('#invoerrij').requestSubmit();
+  });
+  window.addEventListener('rtg-adaptive-ready', function () {
+    if (window.RTGAdaptiveEdge && !staat.open) RTGAdaptiveEdge.setDeck('connect');
   });
 
   /* --------------------------------------------------------- live bij */

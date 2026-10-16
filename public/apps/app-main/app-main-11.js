@@ -1,4 +1,3 @@
-/* het videogesprek: aanbod, antwoord en de verbinding */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();
@@ -26,15 +25,20 @@
     }
   }
 
+  window.addEventListener('rtg-edge-visual-action',function(event){
+    const x=event.detail||{};
+    if(x.kind==='incoming-call'){if(x.action==='accept')neemOp();if(x.action==='decline')$('#ciNee').click();return;}
+    if(x.kind!=='active-call'||!call)return;
+    if(x.action==='decline')eindeGesprek(true);else if(x.action==='microphone')$('#csMute').click();
+    else if(x.action==='speaker')$('#csRemote').muted=!$('#csRemote').muted;
+  });
+
   function opSociaal(d){
     if (d.kind === 'request'){ toast('' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
     else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
-        /* Een gedeelde post zit niet in het seintje (alleen postId): de server
-           lost hem op met DEZE sessie bij het ophalen van het gesprek, dat we
-           toch al doen om hem als gelezen te markeren. */
-        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null); // gelezen
+        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null);
         if (d.postId == null) dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
         else gesprek.then(r => {
           const lijst = (r && r.messages) || [];

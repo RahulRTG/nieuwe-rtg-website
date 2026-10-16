@@ -7,14 +7,7 @@
     return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (paths[name] || paths.spark || '') + '</svg>';
   }
   function button(spec, slot) {
-    var b = d.createElement('button');
-    b.type='button'; b.className='rtg-adaptive-item';
-    b.dataset.rtgAdaptiveSlot=slot; b.dataset.rtgAdaptiveAction=spec[0];
-    b.setAttribute('aria-label',spec[1]);
-    b.innerHTML=(spec[0]==='ai'?Services.lips():icon(spec[3]))+'<span class="rtg-adaptive-item-copy"><small>'+
-      Services.escape(spec[0]==='ai'?'Vraag of regel iets':spec[2]||spec[1])+'</small><b>'+Services.escape(K.detail(spec[0]))+'</b></span>';
-    b.onclick=function(){execute(spec[0]);};
-    return b;
+    return w.RTGAdaptiveEdgeVisual.button(d,spec,slot,icon,Services,K.detail,execute);
   }
   function legacy(selector) {
     var node = rt.edge.root.querySelector(selector);
@@ -40,6 +33,10 @@
       return Services.open(rt, 'rahul', rt.serviceApi);
     }
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
+    var destination=w.RTGAdaptiveEdgeVisual&&w.RTGAdaptiveEdgeVisual.destination(action);
+    if(destination){w.location.href=destination;return true;}
+    if(action==='contact')return Services.open(rt,'connect',rt.serviceApi);
+    if(action.indexOf('object')===0){setDeck('actions');setState('expanded');return true;}
     if (action === 'connect' || action === 'media' || action === 'account') return Services.open(rt, action, rt.serviceApi);
     return false;
   }

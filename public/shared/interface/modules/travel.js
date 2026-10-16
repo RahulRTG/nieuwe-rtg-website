@@ -6,7 +6,7 @@
   'use strict';
   var SDK = w.RTGModuleSDK; if (!SDK) return;
   SDK.add(SDK.define({
-    id: 'travel', name: 'Travel', version: '3.3.0', maturity: 'L4', runtime: { minVersion: '0.1.0' }, priority: 50,
+    id: 'travel', name: 'Travel', version: '3.3.1', maturity: 'L4', runtime: { minVersion: '0.1.0' }, priority: 50,
     states: SDK.states, surfaces: { peek: true, panel: true, workspace: true, focus: true },
     capabilities: ['location.read', 'calendar.read', 'payments.request', 'notifications'],
     permissions: ['travel.read', 'travel.manage'], services: ['member', 'dom-reisbureau', 'mobiliteit', 'bk-reiswijzer'],
@@ -22,7 +22,7 @@
     var stop = typeof AbortController === 'function' ? new AbortController() : null;
     var controller = w.RTGTravelRequestController && w.RTGTravelRequestController.create({
       api: function (pad, body) { return ctx.request(pad, body, { signal: stop && stop.signal }); },
-      sameSession: function () { var s = ctx.state.snapshot().session || {}; return s.authenticated === true; },
+      sameSession: ctx.session && ctx.session.unchanged || function () { return false; },
       onChange: function (s, reden) {
         requestState = s;
         if (reden === 'submitting') ctx.setStatus('versturen', 'busy');

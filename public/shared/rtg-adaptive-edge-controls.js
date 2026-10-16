@@ -1,7 +1,6 @@
 
 (function (w, d) {
   'use strict';
-  // Edge vervangt lokale balken; hun echte bediening blijft hier bereikbaar.
   var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
@@ -9,7 +8,7 @@
     var view = el.ownerDocument.defaultView || w;
     for (var p = el; p; p = p.parentElement) {
       if (p.hidden || p.inert || p.getAttribute('aria-hidden') === 'true') return false;
-      if (p !== root && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && view.getComputedStyle(p).display === 'none') return false;
+      if (p !== root && !root.hasAttribute('data-rtg-edge-controls') && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && view.getComputedStyle(p).display === 'none') return false;
       if (p === el && p !== root && !el.matches('.cmd-balkblad,.cmd-balksluit') && view.getComputedStyle(p).display === 'none') return false;
     }
     return el.isConnected;
@@ -130,10 +129,8 @@
     }
   }
   function start(rt) {
-    // Marketing may omit claim.js.
     if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
     rt.renderControls = function () { render(rt); };
-    // Close presentation; preserve the original domain handler.
     function primaryClick(event) {
       var button = event.target.closest && event.target.closest('[data-rtg-edge-primary]');
       if (button && !button.disabled && button.getAttribute('aria-disabled') !== 'true') close();
@@ -146,7 +143,6 @@
     }
     var observer = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
-      // Claim late bars idempotently.
       if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
       var commandBar = d.querySelector('#rtgCommand .cmd-balk');
       if (commandBar && commandBar.classList.contains('vraagt')) {

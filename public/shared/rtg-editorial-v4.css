@@ -102,6 +102,8 @@ body[data-rtg-v4-kind="canvas"] :is(main,[data-rtg-screen-root="immersive"],[dat
 /* De ene Edge: dun glas, subtiele wereldkleur en de lippen als anker. */
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{--edge-bar-bg:rgba(10,10,9,.9)!important;--edge-bar-copy:#fffaf2!important;--edge-bar-dim:#cfc6ba!important;--edge-bar-line:rgba(217,188,137,.55)!important;--edge-bar-accent:#e2c38e!important;--edge-bar-accent-soft:rgba(226,195,142,.1)!important;isolation:isolate;pointer-events:auto!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{position:fixed!important}
+body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge){z-index:9200!important}
+body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]){pointer-events:auto!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]{height:min(754px,calc(100dvh - var(--v4-header) - 24px))!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-bar{top:auto!important;bottom:10px!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-sheet:not(:has(.rtg-edge-cinema)){bottom:82px!important;max-height:calc(100% - 82px)!important}

@@ -110,13 +110,13 @@
       '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><button type="button" class="rtg-adaptive-sheet-mouth" data-rtg-sheet-action="ai" aria-label="Praat met Rahul">' + Services.lips() + '</button><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Uw volgende handeling</span><b>Controle bij uitvoering</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
       '<nav class="rtg-adaptive-bar" aria-label="Home, Context, Acties, Connect en Rahul"></nav>';
     function find(selector) { return host.querySelector(selector); }
-    d.body.appendChild(host);rt.host=host;rt.bar=find('.rtg-adaptive-bar');
+    rt.edge.root.appendChild(host);rt.host=host;rt.bar=find('.rtg-adaptive-bar');
     rt.sheet = find('.rtg-adaptive-sheet'); rt.sheetTitle = find('h2');
     rt.sheetCopy = find('.rtg-adaptive-sheet-head p'); rt.sheetList = find('.rtg-adaptive-sheet-list');
     rt.identity = find('.rtg-adaptive-identity');
     rt.presenceButton = find('.rtg-adaptive-presence'); rt.presenceText = rt.presenceButton.querySelector('span');
     var c=find('[data-rtg-adaptive-close]');c.onclick=function(){setState('dock');};
-    host.onclick=function(e){var b=c.getBoundingClientRect();if(e.target===host&&e.clientX>=b.left&&e.clientX<=b.right&&e.clientY>=b.top&&e.clientY<=b.bottom)setState('dock');};
+    rt.edge.root.onclick=function(e){var b=c.getBoundingClientRect(),x=e.clientX,y=e.clientY;if(x>=b.left&&x<=b.right&&y>=b.top&&y<=b.bottom)setState('dock');};
     [['[data-rtg-sheet-action]', 'ai'], ['.rtg-adaptive-presence', 'presence']].forEach(function (item) {
       find(item[0]).onclick = function () { execute(item[1]); };
     });

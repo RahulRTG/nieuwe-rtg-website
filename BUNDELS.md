@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9910 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9909 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -42,7 +42,7 @@ omlaag.
 | `app-main-09b.js` | de directe berichten openen |
 | `app-main-10.js` | DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING |
 | `app-main-11.js` | DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE |
-| `app-main-12.js` | de meldingenlijst en het ongelezen-merk |
+| `app-main-12.js` | DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK |
 | `app-main-12a.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |
 | `app-main-12b.js` | De tickets van het lid: het aanbod en wat hij al heeft |
 | `app-main-13.js` | het ticketkanaal: partners, activiteiten en hun tijden |

@@ -2305,7 +2305,7 @@ var RTG_BOUW = '7008ca01';
     if (h < 24) return h + T('t.hour',' uur') + ago;
     return Math.round(h / 24) + T('t.days',' dag(en)') + ago;
   }
-
+/* DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK. */
   function renderBell(){
     const R = window.RTGRealtime;
     if (!R) return;
@@ -2320,7 +2320,6 @@ var RTG_BOUW = '7008ca01';
     const ccTel = $('#osCcBelTel');
     if (ccTel){ ccTel.hidden = n <= 0; ccTel.textContent = n > 0 ? (n > 9 ? '9+' : n) : ''; }
     const list = $('#notifList');
-/* de meldingenlijst en het ongelezen-merk */
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +

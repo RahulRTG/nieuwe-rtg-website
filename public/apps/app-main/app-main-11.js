@@ -180,18 +180,3 @@
     if (h < 24) return h + T('t.hour',' uur') + ago;
     return Math.round(h / 24) + T('t.days',' dag(en)') + ago;
   }
-
-  function renderBell(){
-    const R = window.RTGRealtime;
-    if (!R) return;
-    const n = R.unread();
-    const badge = $('#bellBadge');
-    badge.style.display = n > 0 ? 'flex' : 'none';
-    badge.textContent = n > 9 ? '9+' : n;
-    /* De bel zelf staat verborgen (de statusbalk is leeg); zijn teller staat op
-       de tegel in het bedieningspaneel. Hier bijgewerkt en niet daar, want dit
-       is de plek die weet hoeveel er ligt -- twee tellers die elkaar naschrijven
-       is precies hoe ze uit elkaar gaan lopen. */
-    const ccTel = $('#osCcBelTel');
-    if (ccTel){ ccTel.hidden = n <= 0; ccTel.textContent = n > 0 ? (n > 9 ? '9+' : n) : ''; }
-    const list = $('#notifList');

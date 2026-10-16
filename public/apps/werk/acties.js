@@ -26,8 +26,7 @@
   function $(id) { return document.getElementById(id); }
 
   function herhaalsleutel() {
-    if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
-    return 'werkos-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    return window.RTGId('werkos');
   }
 
   // [naam, pad, velden] -- een veld is [sleutel, label, soort, breedte]

@@ -264,6 +264,19 @@ body.mall-guest .mall-edge__rahul{border:1px solid rgba(235,204,148,.3)!importan
 body[data-rtg-edge-2-rendered="true"] .mall-edge-controls.is-fallback{display:none}
 
 @keyframes mall-reveal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+/* De Mall kan ook in een smaller desktopwerkvlak wonen. Schaal op het
+   inhoudsvlak, zodat zij daar dezelfde leesbare compositie houdt als mobiel. */
+body.rtg-mall-living #main{container-type:inline-size}
+@container(max-width:900px){
+  .mall-live{padding-top:24px}
+  .mall-live__intro{grid-template-columns:1fr;gap:28px}
+  .mall-live__intro h1{font-size:clamp(44px,8cqi,68px);line-height:1.02}
+  .mall-live__continuity{display:none}
+  .mall-stage{grid-template-columns:1fr}
+  .mall-stage__visual{min-height:430px;border-right:0}
+  .mall-gate__copy{width:100%;padding:clamp(24px,6cqi,48px);padding-bottom:100px}
+  .mall-gate__copy h1{max-width:600px;font-size:clamp(48px,9cqi,74px);line-height:1.02}
+}
 @media(max-width:900px){
   body.rtg-mall-living main{padding-inline:16px!important}
   .mall-live__intro{grid-template-columns:1fr;gap:28px}.mall-live__continuity{max-width:500px}

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2721 bestanden en 19022 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2721 bestanden en 19023 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2721 |
-| losse beweringen (`test(...)`) | 19022 |
+| losse beweringen (`test(...)`) | 19023 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2533 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2388 bestanden, 18455 beweringen.
+2388 bestanden, 18456 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -275,7 +275,7 @@ toets omvalt.
 | `betaalwaarheid.test.js` | 14 | gezakt op `!==->===#0` | De provider-onafhankelijke betaalwaarheid. Deze toetsen bewaken vooral de twee gevaarlijke grenzen: een tussenstatus is nooit betaald, en een bedrag dat afwijkt wordt nooit stil vrijgegeven. |
 | `betaalwebhook-fouten.test.js` | 10 | gezakt op `true->false#0` | Failure-injection op de echte kaart-webhookbedrading. Geen provider wordt benaderd: de providers zijn deterministische doubles, maar de routes, de betaalwaarheid en de betaalopdrachtenrij zijn de productiemodules. |
 | `betrouwbaarheid.test.js` | 8 | gezakt op `true->false#0` | Het betrouwbaarheidsniveau (kern/betrouwbaarheid.js): hoe zeker weet RTG dat dit deze mens is. Deze module verzint niets -- hij geeft een naam aan wat de identiteitslaag al wist -- dus wat hier vastligt is de... |
-| `beveiliging-weerbaar.test.js` | 12 | gezakt op `voorwaarde-omkeren#0` | HET BEVEILIGINGSJOURNAAL EN DE NOODREM, WEERBAAR (server/beveiliging.js en server/beveiliging-noodrem.js). Het journaal neemt de hoog-signaal-gebeurtenissen aan ("we worden aangevallen"), voegt herhalingen samen,... |
+| `beveiliging-weerbaar.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | HET BEVEILIGINGSJOURNAAL EN DE NOODREM, WEERBAAR (server/beveiliging.js en server/beveiliging-noodrem.js). Het journaal neemt de hoog-signaal-gebeurtenissen aan ("we worden aangevallen"), voegt herhalingen samen,... |
 | `beveiliging.test.js` | 18 | gezakt op `===->!==` | Tests voor de beveiligingsmeldingen (server/beveiliging.js): melden, samenvoegen, samenvatting, afhandelen en escalatie naar de eigenaar. Zuiver, met een nagemaakte db. |
 | `beveiligingsteam-weerbaar.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | HET COMMANDOCENTRUM VAN EEN BEVEILIGINGSTEAM, WEERBAAR (server/kern/beveiliging.js met rooster/planning.js, rooster/aanvragen.js en pda/index.js + pda/patrouille.js). Dit is de POS van de beveiligingsteams die met... |
 | `beveiligingsteam.test.js` | 13 | gezakt op `liegpoort /api/` | Het beveiligings-commandocentrum voor topbeveiligingsteams: de manager plant het rooster (of laat de AI het overnemen), bewaakt het budget, beheert posten en handelt inzetaanvragen af; de bewaker gebruikt de PDA (op... |

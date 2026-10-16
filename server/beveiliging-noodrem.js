@@ -104,10 +104,11 @@ module.exports = ({ lijst, zekeringen, autoStaat, save, meld, isoleer }) => {
   function spring(id, aantalBronnen, totMs) {
     const z = zekeringen()[id];
     if (!z || z.aan === false) return; // al gesprongen: niets te doen
+    const sindsGesprongen = klok.nu();
     z.aan = false;
     z.reden = 'automatische noodrem: brute force vanaf ' + aantalBronnen + ' bronnen';
-    z.sindsGesprongen = klok.nu();
-    z.tot = klok.nu() + (totMs || NOODREM_LOGIN_MS);   // tijdgebonden: dooft vanzelf
+    z.sindsGesprongen = sindsGesprongen;
+    z.tot = sindsGesprongen + (totMs || NOODREM_LOGIN_MS); // tijdgebonden: dooft vanzelf
     save();
     meld('auto-reactie', 'kritiek',
       'Automatische noodrem: de zekering "' + z.naam + '" is eruit gehaald (brute force vanaf ' +

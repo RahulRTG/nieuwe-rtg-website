@@ -113,6 +113,5 @@
     if (copy && spec.duration != null) copy.textContent=String(spec.duration);
     return true;
   }
-  w.addEventListener('rtg-edge-visual',function(event){present(event.detail);});
   w.RTGAdaptiveEdgeVisual=Object.freeze({markup:markup,button:edgeButton,destination:destination,present:present,update:update,close:close,photo:photo});
 }(window,document));

@@ -113,7 +113,12 @@
     var name = title(doc);
     body.dataset.rtgV4Title = name.slice(0, 120);
     var header = doc.querySelector('.rtg-v4-header');
-    if (!embedded && !header) header = buildHeader(doc, body, name);
+    var canvasToolbar = body.dataset.rtgV4Kind === 'canvas' &&
+      doc.querySelector('body > header:not(.rtg-v4-header),.wd-page > header:not(.rtg-v4-header)');
+    if (canvasToolbar) canvasToolbar.dataset.rtgV4CanvasToolbar = 'true';
+    /* Canvas-apps hebben al één functionele gereedschapskop. Een tweede
+       globale kop zou ruimte kosten en de echte bediening dubbel omlijsten. */
+    if (!embedded && !header && body.dataset.rtgV4Kind !== 'canvas') header = buildHeader(doc, body, name);
     if (header) {
       /* Edge 2 kan een routekop al vóór deze laag naar zijn contextlade hebben
          verplaatst. De V4-kop zelf hoort daar nooit in: hij is de ene schil. */
@@ -143,10 +148,19 @@
     function start() {
       annotate(doc, win);
       var queued = false;
-      if (win.ResizeObserver) new win.ResizeObserver(function () {
-        var body = doc.body; if (!body) return;
-        body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
-      }).observe(doc.documentElement);
+      /* Viewportclassificatie volgt het venster zelf. Een ResizeObserver op
+         documentElement die daarna een attribuut op body schrijft, vormt in
+         WebKit een terugkoppellus bij een iframe-overgang en produceert een
+         echte pageerror. Resize heeft hier precies de benodigde semantiek. */
+      var resizeQueued = false;
+      win.addEventListener('resize', function () {
+        if (resizeQueued) return;
+        resizeQueued = true; win.requestAnimationFrame(function () {
+          resizeQueued = false;
+          var body = doc.body; if (!body) return;
+          body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
+        });
+      }, { passive:true });
       if (win.MutationObserver) new win.MutationObserver(function (records) {
         if (queued || !records.some(function (record) { return record.addedNodes && record.addedNodes.length; })) return;
         queued = true; win.requestAnimationFrame(function () { queued = false; annotate(doc, win); });

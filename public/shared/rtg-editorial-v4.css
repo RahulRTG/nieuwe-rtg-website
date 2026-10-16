@@ -35,6 +35,10 @@ body[data-rtg-editorial-v4="true"].rtg-edge-host>header.rtg-v4-header{display:gr
 .rtg-v4-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px}.rtg-v4-icon,.rtg-v4-header-actions>:is(a,button){display:grid;place-items:center;min-width:44px!important;width:auto;min-height:44px!important;margin:0!important;padding:8px!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--v4-ink)!important;box-shadow:none!important;text-decoration:none!important}.rtg-v4-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
 body[data-rtg-editorial-v4="true"] .rtg-edge-top,body[data-rtg-editorial-v4="true"] header[data-rtg-v4-legacy-header="true"],body[data-rtg-editorial-v4="true"] [data-rtg-edge-2-contextual="native-header"][data-rtg-v4-legacy-header="true"]{display:none!important}
 html body[data-rtg-editorial-v4="true"]>header:not(.rtg-v4-header),html body[data-rtg-editorial-v4="true"] .wd-page>header:not(.rtg-v4-header),html body[data-rtg-editorial-v4="true"] .rtg-edge-2-context-slot>header[data-rtg-edge-2-contextual="native-header"]{display:none!important}
+/* Een canvas heeft een eigen gereedschapsbalk. Die is taakbediening en geen
+   tweede merkheader; zonder deze uitzondering verdwijnt onder meer de hele
+   Website-studio. */
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"] header[data-rtg-v4-canvas-toolbar="true"]{display:flex!important;position:sticky!important;inset:auto!important;top:0!important}
 /* De toegangspoort bezit al een complete veilige kop met merk en taalkeuze.
    De globale kop wijkt hier zodat er geen dubbele header of aanraakblokkade is. */
 html body[data-rtg-editorial-v4="true"]:has(#gate[data-rtg-access]:not([style*="display: none"]))>.rtg-v4-header,
@@ -517,8 +521,9 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
   padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;
 }
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]{
-  background:#0c0c0b!important;color:#fffaf2!important;
+  padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;
 }
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]:has(header[data-rtg-v4-canvas-toolbar="true"]) :is(main,[data-rtg-screen-root="immersive"]){position:relative!important;inset:auto!important;width:100%!important;height:auto!important;min-height:calc(100dvh - var(--v4-edge-space))!important;overflow:auto!important}
 html body.rtg-mall-living[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="collection"]{
   background:#f4efe7!important;color:#17130f!important;color-scheme:light!important;
 }

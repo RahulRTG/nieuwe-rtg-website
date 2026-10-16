@@ -630,7 +630,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 372 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 377 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -831,7 +831,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 810 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 816 regels in de delen
 
 | deel | onderwerp |
 |---|---|

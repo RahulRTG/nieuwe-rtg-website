@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2720 bestanden en 19015 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2720 bestanden en 19018 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2720 |
-| losse beweringen (`test(...)`) | 19015 |
+| losse beweringen (`test(...)`) | 19018 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2532 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2387 bestanden, 18448 beweringen.
+2387 bestanden, 18451 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1208,7 +1208,6 @@ toets omvalt.
 | `mall-extern.test.js` | 13 | gezakt op `liegpoort /api/` | De twee gaten die met naam openstonden na de Supplier OS-koppeling: 1. DE KLOK. |
 | `mall-kaart.test.js` | 13 | gezakt op `liegpoort /api/` | De kaartlaag, het landfilter en de gedeelde waardering van de RTG Mall. Drie dingen die makkelijk mooi lijken en stiekem liegen, en waar deze toetsen daarom op mikken: 1. |
 | `mall-lijsten.test.js` | 12 | gezakt op `liegpoort /api/` | Bewaren, een reis bouwen, en de vraagkant van de Mall. Twee dingen die als aparte functies waren bedacht en er een zijn (een verlanglijst en "voeg toe aan mijn reis"), plus de aanvraagmarkt: wat niemand aanbiedt, kun... |
-| `mall-living.test.js` | 4 | gezakt op `liegpoort /api/` | De Living Mall is één leesprojectie over echte RTG-bronnen. Deze toetsen bewijzen dat zij geen tweede productcatalogus of uitvoeringspad wordt. |
 | `mall-supplieros.test.js` | 9 | gezakt op `liegpoort /api/` | De Supplier OS-koppeling: wat de ondernemer in zijn eigen systeem verandert, verandert in de Mall mee. Geen tweede administratie, en geen stand die de Mall zelf verzint. |
 | `mall-vestigingen.test.js` | 11 | gezakt op `liegpoort /api/` | Filialen en de zakelijke ingang van de RTG Mall. Waar deze toetsen op mikken: 1. |
 | `mall-vindlaag.test.js` | 17 | gezakt op `liegpoort /api/` | De vindlaag van de RTG Mall: het universele aanbod-object, het locatiemodel met servicegebied, en de zoek-/ontdeklaag daarboven. De Mall is hiermee niet langer een winkel met spullen maar de commerciele voorkant van... |
@@ -2147,6 +2146,7 @@ toets omvalt.
 | `trainingsschema.test.js` | 10 | gezakt op `liegpoort /api/` | Het trainingsschema (kern/trainingsschema.js). dezelfde reden: RTG schrijft geen trainingsschema voor. |
 | `transfer.test.js` | 5 | gezakt op `liegpoort /api/` | De eigen transferdienst van een activiteitenzaak: alleen met een geldig ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de... |
 | `travel-bearer-productiepoort.test.js` | 8 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `travel-request-controller.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | De Travel-aanvraagkern deelt alleen toestand en bronregels. Flow en Spatial mogen hun eigen presentatie houden zonder antwoordverlies anders uit te leggen. |
 | `treasury.test.js` | 8 | gezakt op `liegpoort /api/` | DE TREASURY VAN EEN ZAAK -- geld dat binnenkomt is niet hetzelfde als geld dat van u is. WAAROM DEZE TOETS ER IS De klassieke manier waarop een horecazaak omvalt, is niet dat er te weinig binnenkwam maar dat er te... |
 | `tredeproef.test.js` | 8 | gezakt op `===->!==#0` | DE TREDEPROEF -- en of hij werkelijk iets onderscheidt. scripts/tredeproef.js beantwoordt de vraag waar de hele livegangsstrategie op rust: kan trede 0 zelfstandig bestaan? |
 | `trio-afzetten.test.js` | 14 | gezakt op `>=->>#0` | HET TRIO KENT NOOIT TWEE SCHRIJVERS -- regressie voor RTG-V1-RELEASE C6 (gevonden door de onafhankelijke herkeuring). DE FOUT: server/trio-wacht.js nam de oude leider zijn rol "best effort" af en promoveerde de... |

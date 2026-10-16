@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-14T23:18:11.297Z",
-    "commit": "5d8e79402",
+    "op": "2026-10-16T05:30:42.406Z",
+    "commit": "18a886c6f",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -9807,13 +9807,6 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
-    "mall-living.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 4,
-      "scherp": "gezakt"
-    },
     "mall-supplieros.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -17760,6 +17753,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "sinds de migratie van #403 is PER_ROUTE leeg: de poort houdt niets tegen, dus een mutatie in de methode- of NODE_ENV-grendel verandert niets waarneembaars (isProductie omgedraaid: 8/8 groen, terecht); wat er wel te zien is, is bewaakt: een route terug aan de grendel (/api/arrival/request) laat toets 1, 2, 6 en 8 zakken"
+    },
+    "travel-request-controller.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/travel-request-controller.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "treasury.test.js": {
       "soort": "server",

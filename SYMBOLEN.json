@@ -2,9 +2,9 @@
  "soort": "index",
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
-  "op": "2026-10-15",
-  "commit": "734f066a0",
-  "seconden": 4.9,
+  "op": "2026-10-16",
+  "commit": "6187b6fcf",
+  "seconden": 4.6,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -538,8 +538,6 @@
     "public/apps/magnaat-voorzijde.js",
     "public/apps/mall-aanvraag-acties.js",
     "public/apps/mall-aanvraag-edge.js",
-    "public/apps/mall-experience-view.js",
-    "public/apps/mall-experience.js",
     "public/apps/media/blad.js",
     "public/apps/media/lijst.js",
     "public/apps/media/samen.js",
@@ -1228,6 +1226,7 @@
     "public/shared/toestelsleutel.js",
     "public/shared/travel-os-config.js",
     "public/shared/travel-os.js",
+    "public/shared/travel-request-controller.js",
     "public/shared/typ.js",
     "public/shared/uitleg.js",
     "public/shared/uitstap.js",
@@ -3138,7 +3137,6 @@
     "server/kern/mall/extern.js",
     "server/kern/mall/index.js",
     "server/kern/mall/kaart.js",
-    "server/kern/mall/levende-etalage.js",
     "server/kern/mall/lijsten.js",
     "server/kern/mall/lijstregel.js",
     "server/kern/mall/lijsttonen.js",
@@ -4508,7 +4506,6 @@
     "server/lib/idemsleutels-lidabonnement.js",
     "server/lib/idemsleutels-loop-fabric.js",
     "server/lib/idemsleutels-magnaatleven.js",
-    "server/lib/idemsleutels-mall-living.js",
     "server/lib/idemsleutels-media.js",
     "server/lib/idemsleutels-move.js",
     "server/lib/idemsleutels-neiging.js",
@@ -4655,7 +4652,6 @@
     "server/lib/mutatiecontracten-machinesleutels.js",
     "server/lib/mutatiecontracten-magnaatleven.js",
     "server/lib/mutatiecontracten-mall-aanvraag.js",
-    "server/lib/mutatiecontracten-mall-living.js",
     "server/lib/mutatiecontracten-move.js",
     "server/lib/mutatiecontracten-muziekfeed.js",
     "server/lib/mutatiecontracten-naargast.js",
@@ -6153,9 +6149,6 @@
      "pad": "public/images/first-steps"
     },
     {
-     "pad": "public/images/mall"
-    },
-    {
      "pad": "public/images/music"
     },
     {
@@ -7250,18 +7243,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5763,
-  "gelezen": 5448,
+  "bestandenGezien": 5759,
+  "gelezen": 5444,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27567,
-  "bestandenMetUitvoer": 4545,
-  "uitvoerMetNamen": 2071,
+  "symbolen": 27542,
+  "bestandenMetUitvoer": 4543,
+  "uitvoerMetNamen": 2068,
   "uitvoerOnvolledig": 7,
-  "uitvoerZonderNamen": 2467,
-  "zonderUitvoer": 903,
-  "requireKanten": 7771
+  "uitvoerZonderNamen": 2468,
+  "zonderUitvoer": 901,
+  "requireKanten": 7768
  },
  "nietGelezen": [
   {
@@ -102687,81 +102680,6 @@
    ]
   },
   {
-   "bestand": "server/kern/mall/levende-etalage.js",
-   "symbolen": [
-    {
-     "naam": "wereldVoorAanbod",
-     "soort": "functie",
-     "lijn": 13,
-     "geexporteerd": false
-    },
-    {
-     "naam": "wereldVoorApp",
-     "soort": "functie",
-     "lijn": 21,
-     "geexporteerd": false
-    },
-    {
-     "naam": "afdelingVoorAanbod",
-     "soort": "functie",
-     "lijn": 30,
-     "geexporteerd": false
-    },
-    {
-     "naam": "mallPrijs",
-     "soort": "functie",
-     "lijn": 37,
-     "geexporteerd": false
-    },
-    {
-     "naam": "softwareRij",
-     "soort": "functie",
-     "lijn": 48,
-     "geexporteerd": true
-    },
-    {
-     "naam": "hardwareRij",
-     "soort": "functie",
-     "lijn": 71,
-     "geexporteerd": true
-    },
-    {
-     "naam": "aanbodRij",
-     "soort": "functie",
-     "lijn": 92,
-     "geexporteerd": true
-    },
-    {
-     "naam": "telMallAfdelingen",
-     "soort": "functie",
-     "lijn": 119,
-     "geexporteerd": false
-    },
-    {
-     "naam": "projecteerLivingMall",
-     "soort": "functie",
-     "lijn": 127,
-     "geexporteerd": true
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "MAX_PER_BRON",
-     "VERSIE",
-     "aanbodRij",
-     "hardwareRij",
-     "projecteerLivingMall",
-     "softwareRij"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/routes/member/winkel-bieb.js"
-   ]
-  },
-  {
    "bestand": "server/kern/mall/lijsten.js",
    "symbolen": [
     {
@@ -172145,21 +172063,6 @@
    ]
   },
   {
-   "bestand": "server/lib/idemsleutels-mall-living.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "SLEUTELS"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/lib/idemsleutels-recent.js"
-   ]
-  },
-  {
    "bestand": "server/lib/idemsleutels-media.js",
    "symbolen": [],
    "uitvoer": {
@@ -172667,7 +172570,6 @@
     "server/lib/idemsleutels-leerhuis.js",
     "server/lib/idemsleutels-leidingtermijn.js",
     "server/lib/idemsleutels-loop-fabric.js",
-    "server/lib/idemsleutels-mall-living.js",
     "server/lib/idemsleutels-officeformaten.js",
     "server/lib/idemsleutels-reisconcept.js",
     "server/lib/idemsleutels-reisgezelschap.js",
@@ -175575,21 +175477,6 @@
    ]
   },
   {
-   "bestand": "server/lib/mutatiecontracten-mall-living.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "CONTRACTEN"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/lib/mutatiecontracten.js"
-   ]
-  },
-  {
    "bestand": "server/lib/mutatiecontracten-move.js",
    "symbolen": [
     {
@@ -177040,7 +176927,6 @@
     "server/lib/mutatiecontracten-lidabonnement.js",
     "server/lib/mutatiecontracten-machinesleutels.js",
     "server/lib/mutatiecontracten-magnaatleven.js",
-    "server/lib/mutatiecontracten-mall-living.js",
     "server/lib/mutatiecontracten-move.js",
     "server/lib/mutatiecontracten-muziekfeed.js",
     "server/lib/mutatiecontracten-naargast.js",
@@ -194917,13 +194803,13 @@
     {
      "naam": "geenGast",
      "soort": "pijl",
-     "lijn": 13,
+     "lijn": 12,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfSleutel",
      "soort": "pijl",
-     "lijn": 127,
+     "lijn": 100,
      "geexporteerd": "onbekend"
     }
    ],
@@ -194931,9 +194817,7 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [
-    "server/kern/mall/levende-etalage.js"
-   ],
+   "requires": [],
    "extern": [],
    "gebruiktDoor": [
     "server/routes/member/winkel.js"
@@ -235458,204 +235342,6 @@
    "gebruiktDoor": []
   },
   {
-   "bestand": "public/apps/mall-experience-view.js",
-   "symbolen": [
-    {
-     "naam": "locale",
-     "soort": "functie",
-     "lijn": 7,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "text",
-     "soort": "functie",
-     "lijn": 11,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "html",
-     "soort": "functie",
-     "lijn": 12,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "money",
-     "soort": "functie",
-     "lijn": 17,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "department",
-     "soort": "functie",
-     "lijn": 22,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "create",
-     "soort": "functie",
-     "lijn": 23,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "find",
-     "soort": "functie",
-     "lijn": 25,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "visualClass",
-     "soort": "functie",
-     "lijn": 26,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "productCard",
-     "soort": "functie",
-     "lijn": 30,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "renderRail",
-     "soort": "functie",
-     "lijn": 38,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "sourceLabel",
-     "soort": "functie",
-     "lijn": 53,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "select",
-     "soort": "functie",
-     "lijn": 57,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "renderCompare",
-     "soort": "functie",
-     "lijn": 76,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "openCompare",
-     "soort": "functie",
-     "lijn": 86,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "closeCompare",
-     "soort": "functie",
-     "lijn": 90,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "loadReviews",
-     "soort": "functie",
-     "lijn": 95,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "renderPartners",
-     "soort": "functie",
-     "lijn": 110,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "updateDots",
-     "soort": "functie",
-     "lijn": 120,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": null,
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": []
-  },
-  {
-   "bestand": "public/apps/mall-experience.js",
-   "symbolen": [
-    {
-     "naam": "token",
-     "soort": "functie",
-     "lijn": 21,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "locale",
-     "soort": "functie",
-     "lijn": 22,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "post",
-     "soort": "functie",
-     "lijn": 26,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "announce",
-     "soort": "functie",
-     "lijn": 33,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "primary",
-     "soort": "functie",
-     "lijn": 44,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "saveCurrent",
-     "soort": "functie",
-     "lijn": 63,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "addCompare",
-     "soort": "functie",
-     "lijn": 70,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "setDepartment",
-     "soort": "functie",
-     "lijn": 77,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "openComplete",
-     "soort": "functie",
-     "lijn": 82,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "mountEdge",
-     "soort": "functie",
-     "lijn": 87,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "bind",
-     "soort": "functie",
-     "lijn": 95,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "start",
-     "soort": "functie",
-     "lijn": 111,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": null,
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": []
-  },
-  {
    "bestand": "public/apps/media/blad.js",
    "symbolen": [
     {
@@ -241282,75 +240968,87 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "say",
+     "naam": "state",
      "soort": "functie",
      "lijn": 9,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "fields",
+     "naam": "say",
      "soort": "functie",
      "lijn": 10,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "sameSession",
+     "naam": "fields",
      "soort": "functie",
      "lijn": 11,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "input",
+     "soort": "functie",
+     "lijn": 12,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "sameSession",
+     "soort": "functie",
+     "lijn": 13,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "lock",
      "soort": "functie",
-     "lijn": 18,
+     "lijn": 20,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "total",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 28,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "apply",
      "soort": "functie",
-     "lijn": 29,
+     "lijn": 32,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "remember",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 37,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "changed",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 49,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "finishIntent",
      "soort": "functie",
-     "lijn": 50,
+     "lijn": 54,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "result",
      "soort": "functie",
-     "lijn": 56,
+     "lijn": 60,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "check",
      "soort": "functie",
-     "lijn": 63,
+     "lijn": 67,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "book",
      "soort": "functie",
-     "lijn": 78,
+     "lijn": 77,
      "geexporteerd": "onbekend"
     }
    ],
@@ -266651,6 +266349,90 @@
     }
    ],
    "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "public/shared/travel-request-controller.js",
+   "symbolen": [
+    {
+     "naam": "schoonNotitie",
+     "soort": "functie",
+     "lijn": 15,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "aanvraagVoor",
+     "soort": "functie",
+     "lijn": 19,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "nieuweMatches",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "maak",
+     "soort": "functie",
+     "lijn": 41,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "stand",
+     "soort": "functie",
+     "lijn": 48,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "meld",
+     "soort": "functie",
+     "lijn": 59,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "geldig",
+     "soort": "functie",
+     "lijn": 60,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "open",
+     "soort": "functie",
+     "lijn": 62,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "edit",
+     "soort": "functie",
+     "lijn": 76,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "review",
+     "soort": "functie",
+     "lijn": 83,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "submit",
+     "soort": "functie",
+     "lijn": 92,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "check",
+     "soort": "functie",
+     "lijn": 131,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "anders",
+    "namen": null
+   },
    "requires": [],
    "extern": [],
    "gebruiktDoor": []

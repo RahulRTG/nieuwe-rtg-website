@@ -1941,6 +1941,7 @@ var RTG_BOUW = '7008ca01';
   async function stuurDm(){
     const text = $('#dmInput').value.trim();
     if (!text || !dmWith) return;
+/* DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING. */
     $('#dmInput').value = '';
     try {
       const d = await API.call('/member/dm/send', { toKey: dmWith, text });
@@ -2122,6 +2123,7 @@ var RTG_BOUW = '7008ca01';
       return;
     }
     if (!call || d.from !== call.withKey) return;
+/* DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE. */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();

@@ -52,9 +52,10 @@
   function glyph(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(GLYPHS[name]||'')+'</svg>'; }
   function markup(action, fallback) {
     var app=APP_VISUAL[action];
-    if (app) return '<span class="rtg-edge-app-icon rtg-edge-app-icon--'+app[0]+'"'+(app[1]?' style="--rtg-edge-app-image:url(&quot;'+esc(app[1])+'&quot;)"':'')+'>'+fallback+'</span>';
-    if (action==='object') return '<span class="rtg-edge-object-thumb" style="--rtg-edge-object:url(&quot;'+esc(photo())+'&quot;)"></span>';
-    if (action==='contact') return '<span class="rtg-edge-contact-thumb" style="--rtg-edge-object:url(&quot;/images/editorial/discover-living.webp&quot;)"></span>';
+    if (app) return '<span class="rtg-edge-app-icon rtg-edge-app-icon--'+app[0]+'">'+
+      (app[1]?'<img src="'+esc(app[1])+'" alt="">':'')+fallback+'</span>';
+    if (action==='object') return '<span class="rtg-edge-object-thumb"><img src="'+esc(photo())+'" alt=""></span>';
+    if (action==='contact') return '<span class="rtg-edge-contact-thumb"><img src="/images/editorial/discover-living.webp" alt=""></span>';
     return '';
   }
   function destination(action) { return ROUTES[action] || ''; }

@@ -1,3 +1,4 @@
+/* DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING. */
     $('#dmInput').value = '';
     try {
       const d = await API.call('/member/dm/send', { toKey: dmWith, text });

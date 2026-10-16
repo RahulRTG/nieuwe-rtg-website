@@ -1,3 +1,4 @@
+/* DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE. */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();

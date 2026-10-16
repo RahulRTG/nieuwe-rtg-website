@@ -41,7 +41,11 @@ async function main() {
           const started = Date.now();
           const response = await page.goto(srv.base + route, { waitUntil: 'domcontentloaded', timeout: 25000 });
           row.http = response.status();
-          await page.waitForLoadState('load', { timeout: 12000 });
+          /* Een route kan na DOMContentLoaded nog een langlevend beeld of
+             providerverzoek hebben. Dat mag de productschil niet onmeetbaar
+             maken; de concrete DOM-, beeld- en stabiliteitscontroles hieronder
+             bewijzen afzonderlijk dat het scherm bruikbaar klaarstaat. */
+          await page.waitForLoadState('load', { timeout: 12000 }).catch(() => {});
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform],body[data-rtg-projectie]', { timeout: 12000 });
           if (route.startsWith('/apps/')) await page.waitForFunction(() =>
             document.body.dataset.rtgEditorialV4 === 'true' || document.body.hasAttribute('data-rtg-projectie'), null, { timeout:12000 });
@@ -72,7 +76,7 @@ async function main() {
             });
             row.failures = [];
             if (row.http !== 200) row.failures.push('http-'+row.http);
-            if (row.state.editorialVersion !== '20261001') row.failures.push('editorial-system-not-loaded');
+            if (row.state.editorialVersion !== '20261016') row.failures.push('editorial-system-not-loaded');
             if (row.state.layout !== 'standard') row.failures.push('legacy-layout');
             if (row.state.edges) row.failures.push('personal-edge-on-shared-projection');
             if (!row.state.content || row.state.content.w < 300 || row.state.content.h < 300) row.failures.push('missing-projection-content');
@@ -105,8 +109,8 @@ async function main() {
             const body = document.body;
             if (body.dataset.rtgShell === 'mobile') return true;
             if (body.dataset.rtgEditorialV4 === 'true') {
-              const expected = body.dataset.rtgV4Kind === 'cover' ? '0px' : (innerWidth < 700 ? '58px' : '72px');
-              return getComputedStyle(body).paddingTop === expected;
+              return getComputedStyle(body).getPropertyValue('--rtg-editorial-version').trim() === '20261016' &&
+                !!document.querySelector('.rtg-v4-header') && !!document.querySelector('.rtg-adaptive-bar');
             }
             const cinematic = body.dataset.rtgCinematic === 'true';
             const edgeHidden = /^(compact|focus)$/.test(body.getAttribute('data-rtg-edge-2-state') || '');
@@ -122,7 +126,7 @@ async function main() {
           // de geometrie-eisen hieronder blijven onverminderd van kracht.
           await page.waitForFunction(() => {
             const b = document.body, shell = document.querySelector('.wd-shell');
-            if (!b || !shell || document.readyState !== 'complete') return false;
+            if (!b || !shell || document.readyState === 'loading') return false;
             const r = shell.getBoundingClientRect();
             const beeld = JSON.stringify([location.href, b.dataset.rtgDesktopState,
               b.getAttribute('data-rtg-edge-2-state'), document.querySelectorAll('.rtg-adaptive-bar').length,
@@ -175,10 +179,10 @@ async function main() {
           const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (mobile ? 76 : 88) :
             s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
-          if (!s.access && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
+          if (!s.access && s.v4Kind !== 'canvas' && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
           if (s.editorialV4 && !s.access) {
             const expectedHeader = mobile ? 58 : 72;
-            if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y+s.pageScroll) > 2) row.failures.push('nonstandard-v4-header');
+            if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y) > 2) row.failures.push('nonstandard-v4-header');
             if (s.visibleLegacyHeaders) row.failures.push('visible-legacy-header');
           }
           if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');

@@ -69,6 +69,60 @@
 }
 .rtg-interface-second-screen .rtg-module-primary:hover,
 .rtg-interface-second-screen .rtg-ss-compose:hover { filter: brightness(1.12); }
+.rtg-interface-second-screen .rtg-travel-request {
+  border-top: 1px solid var(--rtg-ss-line); display: grid; gap: 12px; margin-top: 2px; padding-top: 14px;
+}
+.rtg-interface-second-screen .rtg-travel-request-title {
+  color: var(--rtg-ss-text); font: 500 1.18rem/1.12 "Bodoni Moda", Georgia, serif; margin: 0;
+}
+.rtg-interface-second-screen .rtg-travel-request-meta,
+.rtg-interface-second-screen .rtg-travel-total,
+.rtg-interface-second-screen .rtg-travel-request-status {
+  color: var(--rtg-ss-muted); font-size: .76rem; line-height: 1.5; margin: 0;
+}
+.rtg-interface-second-screen .rtg-travel-total { color: var(--rtg-ss-gold); font-variant-numeric: tabular-nums; }
+.rtg-interface-second-screen .rtg-travel-request-status.is-warning {
+  border-left: 2px solid #e6bd77; color: var(--rtg-ss-text); padding: 7px 10px;
+}
+.rtg-interface-second-screen .rtg-travel-request-status.is-ok {
+  border-left: 2px solid #75d39c; color: var(--rtg-ss-text); padding: 7px 10px;
+}
+.rtg-interface-second-screen .rtg-travel-catalog { display: grid; gap: 7px; }
+.rtg-interface-second-screen .rtg-travel-option {
+  align-items: start; background: color-mix(in srgb, var(--rtg-ss-card) 86%, black 14%); border: 1px solid var(--rtg-ss-line);
+  color: var(--rtg-ss-text); cursor: pointer; display: grid; gap: 3px; min-height: 56px; padding: 10px 11px; text-align: left;
+}
+.rtg-interface-second-screen .rtg-travel-option:hover,
+.rtg-interface-second-screen .rtg-travel-option:focus-visible { border-color: var(--rtg-ss-gold); }
+.rtg-interface-second-screen .rtg-travel-option-meta {
+  color: var(--rtg-ss-gold); font-size: 9px; font-weight: 720; letter-spacing: .11em; text-transform: uppercase;
+}
+.rtg-interface-second-screen .rtg-travel-option strong { font: 500 1rem/1.15 "Bodoni Moda", Georgia, serif; }
+.rtg-interface-second-screen .rtg-travel-option small { color: var(--rtg-ss-muted); font-size: .7rem; }
+.rtg-interface-second-screen .rtg-travel-fields { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) minmax(118px, .7fr); }
+.rtg-interface-second-screen .rtg-travel-field { color: var(--rtg-ss-muted); display: grid; font-size: .7rem; gap: 6px; }
+.rtg-interface-second-screen .rtg-travel-field > span { font-weight: 650; }
+.rtg-interface-second-screen .rtg-travel-field input,
+.rtg-interface-second-screen .rtg-travel-field textarea {
+  background: color-mix(in srgb, var(--rtg-ss-card) 76%, black 24%); border: 1px solid var(--rtg-ss-line); border-radius: 0;
+  color: var(--rtg-ss-text); font: inherit; min-height: 44px; padding: 9px 10px; resize: vertical; width: 100%;
+}
+.rtg-interface-second-screen .rtg-travel-field input:focus-visible,
+.rtg-interface-second-screen .rtg-travel-field textarea:focus-visible { border-color: var(--rtg-ss-gold); outline: 2px solid transparent; }
+.rtg-interface-second-screen .rtg-travel-step {
+  align-items: center; border: 1px solid var(--rtg-ss-line); display: grid; grid-template-columns: 44px 1fr 44px; min-height: 44px;
+}
+.rtg-interface-second-screen .rtg-travel-step output { color: var(--rtg-ss-text); text-align: center; }
+.rtg-interface-second-screen .rtg-travel-step button {
+  border: 0; color: var(--rtg-ss-text); font-size: 1.1rem; min-height: 44px; min-width: 44px; padding: 0;
+}
+.rtg-interface-second-screen .rtg-travel-request-actions { display: grid; gap: 8px; grid-template-columns: 1fr 1.5fr; }
+.rtg-interface-second-screen .rtg-travel-request-secondary {
+  background: transparent; border: 1px solid var(--rtg-ss-line); color: var(--rtg-ss-text); cursor: pointer;
+  min-height: 44px; padding: 9px 11px; text-align: left;
+}
+.rtg-interface-second-screen .rtg-travel-request .rtg-module-primary { min-height: 44px; }
+.rtg-interface-second-screen .rtg-travel-request button:disabled { cursor: wait; opacity: .58; }
 .rtg-interface-second-screen .rtg-workspace-empty.rtg-leeg-vlak {
   min-height: 108px; margin: 0; padding: 15px 56px 15px 0; border-top-color: var(--rtg-ss-line);
   color: var(--rtg-ss-text); justify-content: center;
@@ -118,4 +172,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rtg-interface-second-screen .rtg-ss-module { transition: none; }
+}
+
+@media (max-width: 520px) {
+  .rtg-interface-second-screen .rtg-travel-fields,
+  .rtg-interface-second-screen .rtg-travel-request-actions { grid-template-columns: 1fr; }
 }

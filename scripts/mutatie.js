@@ -907,6 +907,7 @@ const EIGEN_MODULE = new Map([
   ['experience-travel.test.js', ['server/kern/reisbureau.js']],
   ['travel-request-controller.test.js', ['public/shared/travel-request-controller.js']],
   ['experience-travel.e2e.js', ['public/apps/reisbureau-experience.js', 'public/shared/travel-request-controller.js']],
+  ['workspace-travel-request.e2e.js', ['public/shared/interface/second-screen.js', 'public/shared/interface/modules/travel.js', 'public/shared/interface/modules/travel-view.js']],
   ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],
   /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
      gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de

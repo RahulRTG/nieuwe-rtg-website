@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-10-11T23:43:47.409Z",
-    "commit": "7d72d8fcb",
+    "op": "2026-10-17T11:20:38.909Z",
+    "commit": "e3565b7a7",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/vindbaar.js",
-    "node": "v26.10.0"
+    "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 101,
-  "woorden": 1261,
-  "gevonden": 794,
-  "dekking": 0.6297,
+  "woorden": 1273,
+  "gevonden": 791,
+  "dekking": 0.6214,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -69,6 +69,45 @@
         "teamkamer",
         "oefen",
         "solo"
+      ]
+    },
+    {
+      "naam": "Mall",
+      "url": "/apps/mall.html",
+      "woorden": 56,
+      "gevonden": 25,
+      "mist": [
+        "komt",
+        "samengesteld",
+        "huizen",
+        "binnen",
+        "ervaringen",
+        "werkelijk",
+        "verschilt",
+        "gevonden",
+        "complete",
+        "bibliotheek",
+        "aantal",
+        "window",
+        "rtgglyf",
+        "svghtml",
+        "icon",
+        "klasse",
+        "glyf",
+        "label",
+        "dienstenplein",
+        "tussen",
+        "leveranciers",
+        "lezen",
+        "kast",
+        "akkoord",
+        "vaste",
+        "afspraak",
+        "boeken",
+        "offerte",
+        "aanvragen",
+        "bestellen",
+        "plaatsen"
       ]
     },
     {
@@ -193,30 +232,6 @@
         "controle",
         "starten",
         "kijken"
-      ]
-    },
-    {
-      "naam": "Mall",
-      "url": "/apps/mall.html",
-      "woorden": 44,
-      "gevonden": 28,
-      "mist": [
-        "gevonden",
-        "complete",
-        "bibliotheek",
-        "aantal",
-        "window",
-        "rtgglyf",
-        "svghtml",
-        "icon",
-        "klasse",
-        "glyf",
-        "label",
-        "dienstenplein",
-        "tussen",
-        "leveranciers",
-        "bestellen",
-        "plaatsen"
       ]
     },
     {

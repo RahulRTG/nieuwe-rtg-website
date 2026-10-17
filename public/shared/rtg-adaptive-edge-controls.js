@@ -151,8 +151,12 @@
           w.RTGAdaptiveEdge.setDeck('rahul'); w.RTGAdaptiveEdge.setState('expanded');
         }
       } else rt.questionOwner = null;
-      if (records.some(function (r) { return !rt.host.contains(r.target) &&
-        (r.target.closest && r.target.closest(ROOTS)); })) refresh();
+      if (records.some(function (r) {
+        if (rt.host.contains(r.target) || !r.target.closest) return false;
+        return r.type === 'attributes' && r.attributeName === 'class'
+          ? r.target.matches && r.target.matches(ROOTS)
+          : !!r.target.closest(ROOTS);
+      })) refresh();
     });
     observer.observe(d.body, { subtree: true, childList: true, attributes: true,
       attributeFilter: ['disabled', 'hidden', 'class', 'aria-disabled', 'aria-current', 'aria-pressed', 'aria-expanded'] });

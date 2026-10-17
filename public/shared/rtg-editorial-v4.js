@@ -62,9 +62,6 @@
     lead.setAttribute('aria-hidden', 'true');
     lead.style.setProperty('--v4-lead-image', 'url("' + photoFor(route, world) + '")');
     var caption = make(doc, 'figcaption', '', worldName(world) + ' · RTG EDITION');
-    /* In taak-, collectie- en statusschermen is fotografie de redactionele
-       afsluiting, zoals in het vaste RTG-referentieblad. Covers houden het
-       beeld juist als volledige opening. */
     lead.appendChild(caption); main.appendChild(lead);
   }
 
@@ -85,13 +82,15 @@
     var account = make(doc, 'a', 'rtg-v4-icon'); account.href = '/apps/mijn-gegevens.html'; account.setAttribute('aria-label', 'Account'); account.innerHTML = icon('account');
     actions.append(search, account); header.append(home, context, actions);
 
-    if (old && body.dataset.rtgV4Kind !== 'canvas') {
+    var contentHeader = old && old.matches('.ritkop,[data-rtg-v4-content-header]');
+    if (old && !contentHeader && body.dataset.rtgV4Kind !== 'canvas') {
       old.dataset.rtgV4LegacyHeader = 'true';
       Array.from(old.querySelectorAll(':scope > .terug,:scope > [data-rtg-edge-bar]')).forEach(function (node) {
         if (!node.closest('dialog,[role="dialog"]')) actions.insertBefore(node, search);
       });
     }
-    body.insertBefore(header, body.firstChild);
+    var skip = body.querySelector(':scope > a[href^="#"]');
+    body.insertBefore(header, skip && skip.nextSibling ? skip.nextSibling : (skip ? null : body.firstChild));
     return header;
   }
 
@@ -116,24 +115,18 @@
     var canvasToolbar = body.dataset.rtgV4Kind === 'canvas' &&
       doc.querySelector('body > header:not(.rtg-v4-header),.wd-page > header:not(.rtg-v4-header)');
     if (canvasToolbar) canvasToolbar.dataset.rtgV4CanvasToolbar = 'true';
-    /* Een canvas houdt zijn eigen functionele toolbar. */
     if (!embedded && !header && (body.dataset.rtgV4Kind !== 'canvas' || !canvasToolbar)) header = buildHeader(doc, body, name);
     if (header) {
-      /* Edge 2 kan een routekop al vóór deze laag naar zijn contextlade hebben
-         verplaatst. De V4-kop zelf hoort daar nooit in: hij is de ene schil. */
       if (header.parentNode !== body) body.insertBefore(header, body.firstChild);
       header.removeAttribute('data-rtg-edge-2-contextual');
       Array.from(doc.querySelectorAll('[data-rtg-edge-2-contextual="native-header"]')).forEach(function (legacy) {
         if (legacy !== header) legacy.dataset.rtgV4LegacyHeader = 'true';
       });
       if (body.dataset.rtgV4Kind !== 'canvas') Array.from(doc.querySelectorAll('.wd-page > header:not(.rtg-v4-header), body > header:not(.rtg-v4-header)')).forEach(function (legacy) {
-        legacy.dataset.rtgV4LegacyHeader = 'true';
+        if (!legacy.matches('.ritkop,[data-rtg-v4-content-header]')) legacy.dataset.rtgV4LegacyHeader = 'true';
       });
       var worldNode = header.querySelector('.rtg-v4-world'), titleNode = header.querySelector('.rtg-v4-title');
       var worldText = worldName(world);
-      /* textContent vervangen maakt ook bij gelijke tekst nieuwe DOM-nodes.
-         In combinatie met de observer werd dat een zelfvoedende mutatielus en
-         zag de bestaande wereldstart nooit zijn vereiste rustige venster. */
       if (worldNode && worldNode.textContent !== worldText) worldNode.textContent = worldText;
       if (titleNode && titleNode.textContent !== name) titleNode.textContent = name;
     }
@@ -147,10 +140,6 @@
     function start() {
       annotate(doc, win);
       var queued = false;
-      /* Viewportclassificatie volgt het venster zelf. Een ResizeObserver op
-         documentElement die daarna een attribuut op body schrijft, vormt in
-         WebKit een terugkoppellus bij een iframe-overgang en produceert een
-         echte pageerror. Resize heeft hier precies de benodigde semantiek. */
       var resizeQueued = false;
       win.addEventListener('resize', function () {
         if (resizeQueued) return;

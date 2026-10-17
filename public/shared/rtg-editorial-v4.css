@@ -28,13 +28,13 @@ body[data-rtg-editorial-v4="true"] :is(button,a,input,select,textarea,summary):f
 
 /* Eén globale kop. Route-eigen taakbediening verhuist door de runtime naar de
    actieruimte; de oude merkbalk blijft niet als tweede schil staan. */
-.rtg-v4-header{position:fixed;z-index:9100;inset:0 0 auto;height:var(--v4-header);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:20px;padding:0 var(--v4-frame);border-bottom:1px solid var(--v4-line);background:color-mix(in srgb,var(--v4-paper) 88%,transparent);backdrop-filter:blur(24px) saturate(1.05);-webkit-backdrop-filter:blur(24px) saturate(1.05)}
+.rtg-v4-header{position:fixed;z-index:9100;inset:0 0 auto;height:var(--v4-header);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:20px;padding:0 var(--v4-frame);border-bottom:1px solid var(--v4-line);background:color-mix(in srgb,var(--v4-paper) 88%,transparent);backdrop-filter:blur(24px) saturate(1.05);-webkit-backdrop-filter:blur(24px) saturate(1.05);pointer-events:none}
 body[data-rtg-editorial-v4="true"].rtg-edge-host>header.rtg-v4-header{display:grid!important;position:fixed!important;inset:0 0 auto!important;top:0!important;right:0!important;bottom:auto!important;left:0!important;transform:none!important;margin:0!important}
-.rtg-v4-brand{color:var(--v4-ink)!important;text-decoration:none!important;font:400 clamp(1.8rem,3vw,2.5rem)/1 "Bodoni Moda",serif!important;letter-spacing:-.045em}
+.rtg-v4-brand{color:var(--v4-ink)!important;text-decoration:none!important;font:400 clamp(1.8rem,3vw,2.5rem)/1 "Bodoni Moda",serif!important;letter-spacing:-.045em;pointer-events:auto}
 .rtg-v4-context{display:flex;align-items:baseline;gap:12px;min-width:0}.rtg-v4-world{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--v4-accent);white-space:nowrap}.rtg-v4-title{font-size:.9rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rtg-v4-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px}.rtg-v4-icon,.rtg-v4-header-actions>:is(a,button){display:grid;place-items:center;min-width:44px!important;width:auto;min-height:44px!important;margin:0!important;padding:8px!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--v4-ink)!important;box-shadow:none!important;text-decoration:none!important}.rtg-v4-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.rtg-v4-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;pointer-events:auto}.rtg-v4-icon,.rtg-v4-header-actions>:is(a,button){display:grid;place-items:center;min-width:44px!important;width:auto;min-height:44px!important;margin:0!important;padding:8px!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--v4-ink)!important;box-shadow:none!important;text-decoration:none!important}.rtg-v4-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
 body[data-rtg-editorial-v4="true"] .rtg-edge-top,body[data-rtg-editorial-v4="true"] header[data-rtg-v4-legacy-header="true"],body[data-rtg-editorial-v4="true"] [data-rtg-edge-2-contextual="native-header"][data-rtg-v4-legacy-header="true"]{display:none!important}
-html body[data-rtg-editorial-v4="true"]>header:not(.rtg-v4-header),html body[data-rtg-editorial-v4="true"] .wd-page>header:not(.rtg-v4-header),html body[data-rtg-editorial-v4="true"] .rtg-edge-2-context-slot>header[data-rtg-edge-2-contextual="native-header"]{display:none!important}
+html body[data-rtg-editorial-v4="true"]>header[data-rtg-v4-legacy-header="true"],html body[data-rtg-editorial-v4="true"] .wd-page>header[data-rtg-v4-legacy-header="true"],html body[data-rtg-editorial-v4="true"] .rtg-edge-2-context-slot>header[data-rtg-edge-2-contextual="native-header"][data-rtg-v4-legacy-header="true"]{display:none!important}
 /* Een canvas heeft een eigen gereedschapsbalk. Die is taakbediening en geen
    tweede merkheader; zonder deze uitzondering verdwijnt onder meer de hele
    Website-studio. */
@@ -47,9 +47,11 @@ body[data-rtg-v4-kind="conversation"] .rtm-kop,body[data-rtg-v4-kind="conversati
 
 /* Eén inhoudsvlak; desktopaccessoires mogen de app niet meer in een smalle
    middenkolom drukken. */
-body[data-rtg-editorial-v4="true"] .wd-shell{display:block!important;width:min(calc(100% - 2 * var(--v4-frame)),var(--v4-wide))!important;max-width:var(--v4-wide)!important;margin:0 auto!important;padding:clamp(24px,4vw,64px) 0!important}
-body[data-rtg-editorial-v4="true"] :is(.wd-home,main.wd-home,.wd-page,[data-rtg-screen-root="content"]){display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important;grid-column:auto!important;grid-row:auto!important}
-body[data-rtg-editorial-v4="true"] :is(.wd-greeting,.wd-people,.wd-favorites,.wd-library,.wp-tabs,.wp-domain,.wp-atmosphere){display:none!important}
+/* Zelfstandige routes krijgen één brede redactionele kolom. Wereldhomes houden
+   hun bestaande driekolomsraster: die rails bevatten echte functies en vormen
+   samen met het middenvlak één responsieve werkruimte. */
+body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell{width:min(calc(100% - 2 * var(--v4-frame)),var(--v4-wide))!important;max-width:var(--v4-wide)!important;margin:0 auto!important;padding:clamp(24px,4vw,64px) 0!important}
+body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-page,[data-rtg-screen-root="content"]){width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important}
 body[data-rtg-editorial-v4="true"] :is(main,[data-rtg-screen-root="content"],.wrap,.shell,.schil):not([data-rtg-native-canvas]){max-width:var(--v4-wide);margin-inline:auto}
 body[data-rtg-editorial-v4="true"] main:not(.wd-home){padding:clamp(24px,4vw,64px) var(--v4-frame)!important}
 /* De leveranciersapp gebruikt een flexkolom waarvan de werkruimte `flex:1` is.
@@ -105,6 +107,7 @@ body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{position:fixed!important}
 body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge){z-index:9200!important}
 body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]){pointer-events:none!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]{height:min(754px,calc(100dvh - var(--v4-header) - 24px))!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]{pointer-events:none!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-bar{top:auto!important;bottom:10px!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-sheet:not(:has(.rtg-edge-cinema)){bottom:82px!important;max-height:calc(100% - 82px)!important;border-radius:var(--rtg-radius-system)!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet:not([hidden]){z-index:20;pointer-events:auto!important}
@@ -177,6 +180,12 @@ body[data-rtg-v4-embedded="true"]{--v4-header:0px;--v4-edge-space:0px;padding:0!
 body[data-rtg-v4-embedded="true"]>.rtg-v4-header,body[data-rtg-v4-embedded="true"]>.rtg-adaptive-edge{display:none!important}
 
 @media(max-width:699px){
+  /* De wereldscene is op telefoon de ene fotografische kop. De oudere
+     dashboardregel verbergt hem standaard; V4 brengt hem doelbewust terug
+     zonder daarnaast nog een tweede routehero te tonen. */
+  html body[data-rtg-editorial-v4="true"][data-rtg-shell="mobile"] .wd-home>.wp-scene{display:grid!important}
+  html body[data-rtg-editorial-v4="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>:is(img,h1,.wh-eyebrow,.wh-hero-label,.ey,.wh-caption,.wh-foundation-label,.wh-free,.buurtey){display:none!important}
+  html body[data-rtg-editorial-v4="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>.wh-photo-copy>h1{display:none!important}
   body[data-rtg-editorial-v4="true"]{--v4-header:64px;--v4-frame:16px;--v4-edge-space:88px}
   .rtg-v4-header{gap:10px}.rtg-v4-context{display:block}.rtg-v4-world{display:block;font-size:.55rem}.rtg-v4-title{display:block;font-size:.78rem}.rtg-v4-icon{display:none!important}.rtg-v4-header-actions>:is(a,button){min-width:42px!important}
   body[data-rtg-editorial-v4="true"] .wd-shell{width:100%!important;margin:0!important;padding:0!important}
@@ -205,7 +214,7 @@ body[data-rtg-v4-embedded="true"]>.rtg-v4-header,body[data-rtg-v4-embedded="true
   body[data-rtg-editorial-v4="true"]{--v4-frame:clamp(40px,5vw,80px);--v4-edge-space:112px}
   body[data-rtg-v4-kind="collection"] :is(.grid,.raster,.catalogus,.wd-catalog){grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
-@media(prefers-reduced-motion:reduce){body[data-rtg-editorial-v4="true"] *,body[data-rtg-editorial-v4="true"] *::before,body[data-rtg-editorial-v4="true"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){body[data-rtg-editorial-v4="true"] *,body[data-rtg-editorial-v4="true"] *::before,body[data-rtg-editorial-v4="true"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}body[data-rtg-editorial-v4="true"] :is(.rtg-adaptive-edge,.rtg-adaptive-bar,.rtg-adaptive-item,.rtg-adaptive-sheet){transition:none!important}}
 @media(forced-colors:active){.rtg-v4-header,body[data-rtg-editorial-v4="true"] :is(.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface){background:Canvas!important;color:CanvasText!important;border-color:CanvasText!important;backdrop-filter:none!important}}
 
 /* REFERENCE LOCK ---------------------------------------------------------
@@ -343,9 +352,9 @@ html body.rtg-stijl.rtg-edge-host[data-world-home="living"][data-rtg-editorial-v
   html body.rtg-stijl.rtg-edge-host[data-world-home="living"][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"] .dagkolom>.dagtitel>b{max-width:none!important;font-size:clamp(23px,6.8vw,27px)!important;line-height:1.03!important}
   html body.rtg-stijl.rtg-edge-host[data-world-home="living"][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"] .dagkolom>.dagtitel>a{font-size:9px!important;white-space:nowrap}
 
-  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge:not([data-rtg-adaptive-state="expanded"]){width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px)!important;height:58px!important}
-  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge:not([data-rtg-adaptive-state="expanded"])::before{inset:-10px -12px -13px!important;opacity:.72}
-  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge:not([data-rtg-adaptive-state="expanded"])>.rtg-adaptive-bar{inset-inline:0!important;bottom:max(10px,env(safe-area-inset-bottom))!important;height:58px!important;min-height:58px!important;padding:4px 6px 7px!important;border-color:rgba(217,188,137,.34)!important;border-radius:var(--rtg-radius-capsule)!important;background:linear-gradient(180deg,rgba(24,23,21,.82),rgba(8,8,7,.92))!important;box-shadow:0 14px 38px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08)!important}
+  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge:is([data-rtg-adaptive-state="dock"],[data-rtg-adaptive-state="deck"]){width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px)!important;height:58px!important}
+  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge:is([data-rtg-adaptive-state="dock"],[data-rtg-adaptive-state="deck"])::before{inset:-10px -12px -13px!important;opacity:.72}
+  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge:is([data-rtg-adaptive-state="dock"],[data-rtg-adaptive-state="deck"])>.rtg-adaptive-bar{inset-inline:0!important;bottom:max(10px,env(safe-area-inset-bottom))!important;height:58px!important;min-height:58px!important;padding:4px 6px 7px!important;border-color:rgba(217,188,137,.34)!important;border-radius:var(--rtg-radius-capsule)!important;background:linear-gradient(180deg,rgba(24,23,21,.82),rgba(8,8,7,.92))!important;box-shadow:0 14px 38px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08)!important}
   body[data-rtg-editorial-v4="true"] .rtg-adaptive-item{min-height:42px!important;padding:4px!important;gap:2px!important}
   body[data-rtg-editorial-v4="true"] .rtg-adaptive-item>svg{width:18px!important;height:18px!important;stroke-width:1.25!important}
   body[data-rtg-editorial-v4="true"] .rtg-adaptive-item .rtg-adaptive-lips{width:36px!important;height:23px!important}
@@ -353,6 +362,11 @@ html body.rtg-stijl.rtg-edge-host[data-world-home="living"][data-rtg-editorial-v
   body[data-rtg-editorial-v4="true"] .rtg-adaptive-deck-dots{bottom:3px!important;gap:4px!important}
   body[data-rtg-editorial-v4="true"] .rtg-adaptive-deck-dots i{width:2px!important;height:2px!important;opacity:.2!important}
   body[data-rtg-editorial-v4="true"] .rtg-adaptive-deck-dots i[data-active]{width:8px!important;border-radius:0!important;opacity:.72!important}
+  /* Tijdens lezen krimpt dezelfde Edge merkbaar, terwijl alle vijf doelen
+     minimaal 44px bereikbaar blijven. */
+  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"]{width:min(260px,calc(100vw - 40px))!important;height:52px!important}
+  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"]>.rtg-adaptive-bar{grid-template-columns:repeat(5,minmax(44px,1fr))!important;height:52px!important;min-height:52px!important;padding:4px!important}
+  body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"] .rtg-adaptive-item{display:flex!important;grid-column:auto!important;min-width:44px!important;min-height:44px!important}
 }
 
 /* UNIVERSAL EDITORIAL FINISH -------------------------------------------
@@ -377,7 +391,7 @@ html body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead>a{
 
 /* Uitvoer en routegereedschap blijven via de bestaande Edge beschikbaar.
    Hun oude losse werkbalk nam vooral in post en bestanden een lege rij in. */
-html body[data-rtg-editorial-v4="true"][data-rtg-adaptive-ready="true"] :is(.wd-output,.rtg-duimbalk){
+html body[data-rtg-editorial-v4="true"][data-rtg-adaptive-ready="true"] .wd-output{
   display:none!important;
 }
 
@@ -532,6 +546,34 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
   padding:var(--v4-header) 0 var(--v4-edge-space)!important;
   background:var(--v4-paper)!important;color:var(--v4-ink)!important;
 }
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]){
+  --rtg-world-bg:var(--v4-paper)!important;--rtg-world-ground:var(--v4-paper)!important;
+  --rtg-world-card:var(--v4-paper-strong)!important;--rtg-world-card-strong:#e8e1d7!important;
+  --rtg-world-ink:var(--v4-ink)!important;
+  --rtg-world-line:var(--v4-line)!important;--rtg-world-action:var(--v4-accent)!important;
+  --rtg-world-action-ink:#fffaf2!important;--rtg-world-schema:light!important;
+}
+/* Metaalinkt is een accent op donkere fotografie, geen leestekstkleur op
+   papier. Binnen lichte routes krijgt elk interactief tekstaccent daarom de
+   diepe wereldkleur. Dit omvat ook de vastzetknoppen van desktopwidgets. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a:not(.skip):not(.wd-skip):not(.skip-link),
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wd-widget-pin,.wd-filters button){color:var(--v4-accent)!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .stil{color:#554d45!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wd-muted,.wd-app-controls summary,.wd-search-label>span,.ingang:not(.actief)>span){color:#554d45!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .grens{color:#554d45!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .grens strong{color:#2f2923!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .code{color:var(--v4-accent)!important}
+/* Bestellen heeft een eigen donkere voortgangskop. De titel blijft daarin
+   licht tot die voortgang volledig door de Edge wordt overgenomen. */
+html body[data-rtg-editorial-v4="true"] .rtg-appshell .pagehead :is(h1,.ey,.topstatus){color:#fffaf2!important}
+html body[data-rtg-v4-kind="cover"]>header.rtg-v4-header .rtg-v4-world{color:#f0d19a!important}
+/* Travel gebruikt de kaart als fotografische grond voor de hoofdtitel. Het
+   oude bestemmingsbijschrift stond in exact dezelfde beeldcel en leverde
+   daardoor bij korte én vergrote tekst een tweede tekstlaag op. */
+html body[data-rtg-editorial-v4="true"][data-world-home="travel"] .kaartraster>.dagkop .dagkop-inhoud{display:none!important}
+html body[data-rtg-editorial-v4="true"][data-world-home="travel"] .statusicoon.goed{color:#77c69a!important}
+html body[data-rtg-editorial-v4="true"][data-world-home="foundation"] .buurtsec{color:#d9c8ad!important}
+html body[data-rtg-editorial-v4="true"][data-world-home="foundation"] .buurtstad[aria-pressed="true"] b{color:#f7f1e5!important}
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wk-shell,.reisapp){background:var(--v4-paper)!important;color:var(--v4-ink)!important}
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"]{
   padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;

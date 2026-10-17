@@ -6,7 +6,7 @@
   var active = null;
   var ROUTES = Object.freeze({
     'app:travel':'/apps/reizen.html', 'app:media':'/apps/media.html',
-    'app:photos':'/apps/galerij.html', 'app:settings':'/apps/instellingen.html'
+    'app:photos':'/apps/galerij.html', 'app:settings':'/apps/mijn-gegevens.html'
   });
   var APP_VISUAL = Object.freeze({
     'app:travel':['travel','/images/editorial/travel-inspiration.webp'],

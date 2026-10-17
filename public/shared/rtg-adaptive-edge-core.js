@@ -26,7 +26,7 @@
     actions: [['back', 'Terug', 'Terug', 'back'], ['primary', 'Hoofdactie', 'Doen', 'target'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['context', 'Meer acties', 'Meer', 'list'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
-    connect: [['contact', 'Actief contact', 'Contact', 'people'], ['connect', 'Connect openen', 'Connect', 'people'],
+    connect: [['contact', 'Actief contact', 'Contact', 'people'], ['context', 'Acties van dit gesprek', 'Acties', 'list'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['presence', 'Actuele activiteit', 'Actueel', 'replay'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
     rahul: [['back', 'Terug', 'Terug', 'back'], ['context', 'Geef Rahul context', 'Context', 'branch'],

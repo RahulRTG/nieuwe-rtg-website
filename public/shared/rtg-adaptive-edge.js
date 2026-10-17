@@ -15,11 +15,11 @@
     return false;
   }
   function execute(action){
-    if (rt.edge.onEdgeAction && rt.edge.onEdgeAction(action) === true) return true;
     if (action === 'context' || action === 'primary') {
       setDeck(action === 'ai' ? 'rahul' : 'actions');
       Input.prepare(rt, action); setState('expanded'); return true;
     }
+    if (rt.edge.onEdgeAction && rt.edge.onEdgeAction(action) === true) return true;
     setState('dock');
     if (action === 'home') { if (w.dispatchEvent(new w.CustomEvent('rtg-edge-home', { cancelable: true }))) w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }

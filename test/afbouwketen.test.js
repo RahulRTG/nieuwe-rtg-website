@@ -233,6 +233,10 @@ test('DE KETEN: van claim tot herstel, met echte processen', (t) => {
   const geraakt = A.ruimOp();
   assert.ok(geraakt.includes(kind), 'ruimOp() hoort te melden wat hij raakte');
   assert.ok(wachtOp(() => !A.procesLeeft(kind)), 'en het kind hoort werkelijk weg te zijn');
+  assert.deepEqual(A.lees().kring, [],
+    'de opruimer hoort zelf de volledige actieve kring leeg te bevestigen, niet alleen het bekende kind van de toets');
+  assert.ok(A.lees().opgeruimd.vastgelegd.some(k => k.pid === kind),
+    'de proceskring blijft in het afbouwbewijs bewaard nadat zij niet meer actief is');
 
   // --- maar de poort blijft dicht: de werkstatus is nog niet terminaal ---
   const g2 = A.magStarten('proefronde');

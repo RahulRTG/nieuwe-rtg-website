@@ -90,13 +90,13 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5449<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27581<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->7771<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5454<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27628<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->7772<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
-<!--getal:symbolen.nietGelezen-->315<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
-reden: alle <!--getal:symbolen.bundeldeel-->315<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
+<!--getal:symbolen.nietGelezen-->314<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
+reden: alle <!--getal:symbolen.bundeldeel-->314<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
 functie beginnen en pas samengevoegd een programma vormen. Echte parsefouten:
 <!--getal:symbolen.parsefout-->0<!--/getal--> — en elke andere waarde dan nul laat het script met een foutcode
 eindigen, want een parsefout búiten een bundeldeel is een bevinding en geen ruis.
@@ -116,7 +116,7 @@ Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geld
 `module.exports` kent **drie** standen, niet twee. Een bestand dat
 `module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
 namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
-onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2468<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2470<!--/getal--> bestanden hier. Het register draagt daarom de vórm
 (`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
 `onbekend` in plaats van op een vals `nee`.
 

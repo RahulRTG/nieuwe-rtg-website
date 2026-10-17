@@ -248,7 +248,8 @@ async function main() {
                workspaces keep their world material; the Edge stays glass. */
             const expected = s.editorialV4 && region.selector === '.rtg-adaptive-bar'
               ? 'rgba(10,10,9,.9)'
-              : s.editorialV4 && s.v4Kind !== 'cover' && s.v4Kind !== 'canvas' ? v4Canvas
+              : s.editorialV4 && region.selector === '.wk-shell' ? v4Canvas
+                : s.editorialV4 && s.v4Kind !== 'cover' && s.v4Kind !== 'canvas' ? v4Canvas
                 : s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if ((region.selector === '.rtg-adaptive-bar' ? region.material : region.background) !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
           }

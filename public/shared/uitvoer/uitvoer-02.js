@@ -20,12 +20,19 @@
     '.rtguitvoer-rij{display:flex;gap:.5rem;flex-wrap:wrap;}' +
     '.rtguitvoer-rij button{flex:1 1 6rem;}';
 
-  var knop = null, laag = null, melding = null, tik = 0, pogingen = 0;
+  var knop = null, laag = null, melding = null, tik = 0, pogingen = 0, terugFocus = null;
   var gastKnop = null, gastLaag = null, gekozenKnop = null, gekozenLaag = null;
 
   function sluit() {
     laag.hidden = true;
-    if (knop && knop.isConnected) knop.focus();   // terug naar de tik
+    var doel = terugFocus && !terugFocus.closest('.rtg-adaptive-sheet') && terugFocus.getClientRects().length ? terugFocus :
+      knop && knop.getClientRects().length ? knop :
+      document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="context"],.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+    terugFocus = null;
+    if (doel && doel.isConnected) {
+      doel.focus({ preventScroll: true });
+      requestAnimationFrame(function () { if (doel.isConnected && document.activeElement !== doel) doel.focus({ preventScroll: true }); });
+    }
   }
 
   function paneel() {
@@ -47,12 +54,10 @@
       var uit = neemMee(b.getAttribute('data-vorm'));
       melding.textContent = uit.ok ? uit.aantal + ' regels meegenomen als ' + b.textContent + '.' : uit.reden;
     });
-    /* aria-modal="true" is een belofte die ook in code hoort (LAT regel 6):
-       Tab loopt er niet uit, Esc sluit. Dat de sneltoetsen van het scherm
-       ERONDER stilvallen regelt sneltoets.js. */
+    /* Het modale venster bezit Tab en Escape; sneltoets.js pauzeert de laag eronder. */
     document.addEventListener('keydown', function (e) {
       if (laag.hidden || e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.key === 'Escape') { sluit(); e.preventDefault(); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); sluit(); return; }
       if (e.key !== 'Tab') return;
       var k = laag.querySelectorAll('button');
       var i = [].indexOf.call(k, document.activeElement);
@@ -62,6 +67,7 @@
   }
 
   function toon() {
+    terugFocus = document.activeElement;
     herzie(); paneel();
     var d = verzamel();
     melding.textContent = d ? d.rijen.length + ' regels, ' + d.kolommen.length +

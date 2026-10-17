@@ -44,6 +44,13 @@ een productie-image en een live-uitrol blijven afzonderlijke handelingen met de
 bestaande menselijke poorten. Een feature flag kan nieuw gedrag afschermen,
 maar vervangt nooit serverautorisatie of een andere beveiligingsgrens.
 
+De professionalisering van alle bestaande apps wordt uitgevoerd volgens
+`docs/rtg-premium-afbouwplan.md`. Die bijlage voegt geen tweede register toe:
+dit document blijft de scopebron en `APPWERKT.json` blijft de bewijsbron. De
+bijlage bepaalt het taakcontract, de appfamilies, de volgorde en de acceptatie
+voor diepte, breedte, inhoud en vormgeving. De bijlage verandert de vier
+werkstromen hieronder niet.
+
 ## 1. De drie grenzen, definitief
 
 Dit zijn harde architectuur- en productgrenzen. Ze gaan voor elke functie: waar

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-17T17:34:05.264Z",
-    "commit": "33f23b06a",
+    "op": "2026-10-17T22:01:32.308Z",
+    "commit": "72bde5559",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
   },
@@ -1950,7 +1950,7 @@
           "rol": "leest",
           "etiket": "capability-register:l",
           "wat": "handelingen via het blikveld",
-          "citaat": "if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();"
+          "citaat": "if(w.RTGEdgeBlikveld)return w.RTGEdgeBlikveld.acties();"
         },
         {
           "rol": "beslist",

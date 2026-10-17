@@ -15,9 +15,12 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
   await ctx.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');},token);
   const page=await ctx.newPage(),errors=[];page.setDefaultTimeout(15000);h.letOpFouten(page,errors);
   await page.goto(srv.base+'/apps/reizen.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+  const edgeMenu=page.locator('.rtg-adaptive-bar:visible [data-rtg-adaptive-action="menu"]:visible');
+  await page.waitForFunction(()=>document.body.dataset.rtgAdaptiveReady==='true');
+  await edgeMenu.waitFor({state:'visible',timeout:h.geduld(15000)});
   let app;
   if(width<1000){
-   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+   await edgeMenu.click({timeout:h.geduld(15000)});
    await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
    await page.locator('[data-edge-smart-search]').click();
    await page.locator('.rtg-edge-find input:visible').fill('reisbureau');
@@ -30,7 +33,7 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
    /* Desktop gebruikt dezelfde zichtbare Edge-route als telefoon. De oude
       bibliotheek blijft alleen als functionele bron bestaan en mag niet weer
       een tweede navigatiepaneel in de definitieve schil worden. */
-   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+   await edgeMenu.click({timeout:h.geduld(15000)});
    await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
    await page.locator('[data-edge-smart-search]').click();
    await page.locator('.rtg-edge-find input:visible').fill('reisbureau');

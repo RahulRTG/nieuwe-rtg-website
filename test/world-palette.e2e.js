@@ -46,6 +46,15 @@ async function palette(scope, world, card) {
     !!getComputedStyle(document.body).getPropertyValue('--v4-paper').trim());
   // Reduced motion still has a 0.01ms transition; sample the final painted state.
   await scope.waitForFunction(world => document.body.dataset.rtgPalette === world,world,{timeout:3000});
+  /* De V4-markering wordt door JavaScript gezet; het laatste stylesheet kan op
+     een volle WebKit-runner nog net daarna uit de netwerklaag komen. Wacht op
+     het werkelijk geschilderde eindvlak in plaats van de tussenliggende oude
+     wereldkleur te bemonsteren. Dit houdt dezelfde kleureis aan. */
+  await scope.waitForFunction(({paper,cinematic}) => {
+    const body = document.body, kind = body.dataset.rtgV4Kind;
+    const expected = kind === 'cover' || kind === 'canvas' ? cinematic : paper;
+    return getComputedStyle(body).backgroundColor === expected;
+  }, {paper,cinematic:'rgb(12, 12, 11)'}, {timeout:10000});
   const actual = await scope.evaluate(selector => {
     const body = getComputedStyle(document.body), el = selector && document.querySelector(selector);
     return {body:body.backgroundColor, ink:body.color, card:el && getComputedStyle(el).backgroundColor,

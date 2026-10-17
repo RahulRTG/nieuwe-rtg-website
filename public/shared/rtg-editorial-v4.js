@@ -1,7 +1,3 @@
-/* RTG EDITORIAL INTERFACE V4 ---------------------------------------------
-   Eén responsieve presentatielaag voor telefoon, tablet en desktop.
-   De runtime classificeert bestaande schermen, maar verplaatst geen
-   domeinlogica en verleent geen rechten. */
 (function (g, factory) {
   'use strict';
   var model = typeof module === 'object' && module.exports ? require('./rtg-editorial-v4-model') : g.RTGEditorialV4Model;
@@ -20,8 +16,12 @@
   }
 
   function title(doc) {
+    /* De routekop wint van de tijdelijke desktopbegroeting. */
+    var native = doc.querySelector('.wd-page>header:not(.rtg-v4-header) h1,body>header:not(.rtg-v4-header) h1');
     var h1 = Array.from(doc.querySelectorAll('main h1,[data-rtg-screen-root] h1,body>header h1,h1'))
-      .find(function (node) { return visible(node, doc.defaultView) && node.textContent.trim(); });
+      .find(function (node) { return !node.closest('.wd-greeting,.rtg-v4-header,.rtg-v4-section-masthead') &&
+        visible(node, doc.defaultView) && node.textContent.trim(); });
+    h1 = native || h1;
     if (h1) return h1.textContent.trim();
     return String(doc.title || 'RTG').replace(/^RTG\s*[·|\u2014:-]?\s*/i, '').trim() || 'RTG';
   }
@@ -35,10 +35,9 @@
   function ensureSectionMasthead(doc, body, route, name) {
     if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
+    if (main && main.querySelector(':scope > #dailyIntro')) return;
     if (!main || main.querySelector(':scope > .rtg-v4-section-masthead')) return;
     var bar = make(doc, 'div', 'rtg-v4-section-masthead');
-    /* De oude kop verdwijnt visueel om de dubbele header op te lossen. De
-       vervangende redactiekop blijft daarom ook de echte documentkop. */
     bar.appendChild(make(doc, 'h1', '', screenLabel(route, name)));
     var more = make(doc, 'a', '', '•••'); more.href = '/apps/app.html#menu'; more.setAttribute('aria-label', 'Meer in RTG');
     bar.appendChild(more); main.insertBefore(bar, main.firstChild);
@@ -92,6 +91,14 @@
       });
     }
     var skip = body.querySelector(':scope > a[href^="#"]');
+    if (!skip) {
+      var target = body.querySelector('main,[role="main"],.wd-page>main,.wrap,body>div');
+      if (target) {
+        if (!target.id) target.id = 'rtg-inhoud';
+        skip = make(doc, 'a', 'skip', 'Naar inhoud'); skip.href = '#' + target.id;
+        body.insertBefore(skip, body.firstChild);
+      }
+    }
     body.insertBefore(header, skip && skip.nextSibling ? skip.nextSibling : (skip ? null : body.firstChild));
     return header;
   }
@@ -111,13 +118,15 @@
     body.dataset.rtgV4Kind = classify(route, body, registry);
     body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
     if (embedded) body.dataset.rtgV4Embedded = 'true'; else delete body.dataset.rtgV4Embedded;
-    var name = title(doc);
+    var name = body.dataset.rtgV4Title || title(doc);
     body.dataset.rtgV4Title = name.slice(0, 120);
     var header = doc.querySelector('.rtg-v4-header');
     var canvasToolbar = body.dataset.rtgV4Kind === 'canvas' &&
       doc.querySelector('body > header:not(.rtg-v4-header),.wd-page > header:not(.rtg-v4-header)');
     if (canvasToolbar) canvasToolbar.dataset.rtgV4CanvasToolbar = 'true';
     if (!embedded && !header && (body.dataset.rtgV4Kind !== 'canvas' || !canvasToolbar)) header = buildHeader(doc, body, name);
+    var jump = body.querySelector('a[href^="#"]'), main = doc.querySelector('main,[role="main"],#main');
+    if (jump && main) { if (!main.id) main.id = 'rtg-inhoud'; jump.href = '#' + main.id; if (body.firstChild !== jump) body.insertBefore(jump, body.firstChild); }
     if (header) {
       if (header.parentNode !== body) body.insertBefore(header, body.firstChild);
       header.removeAttribute('data-rtg-edge-2-contextual');

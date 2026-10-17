@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-16T20:25:23.942Z",
-    "commit": "d63d80f5d",
-    "boomVuil": false,
-    "boomAnders": 2,
+    "op": "2026-10-17T17:06:09.584Z",
+    "commit": "70cf0eb2d",
+    "boomVuil": true,
+    "boomAnders": 3,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
   },
@@ -1956,7 +1956,7 @@
           "rol": "beslist",
           "etiket": "capability-register:b",
           "wat": "welke paginaknop geoogst wordt",
-          "citaat": "if (label(el) && available(el, root) && (!tab || !tabs.has(tab))"
+          "citaat": "if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab))"
         },
         {
           "rol": "rendert",

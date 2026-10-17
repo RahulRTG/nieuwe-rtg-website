@@ -375,7 +375,9 @@
     laadGesprek().then(function () {
       var veld = $('#veld');
       if (g.concept) veld.value = g.concept;
-      if (window.RTGAdaptiveEdgeVisual) RTGAdaptiveEdgeVisual.present({ kind: 'chat' });
+      /* De echte composer is al aan de ene Edge uitgeleend door
+         rtg-communication-surface. Een tweede visuele chat kopieerde hem,
+         verborg de veilige uitgang en kon de domeinactie niet uitvoeren. */
       veld.focus();
     });
   }

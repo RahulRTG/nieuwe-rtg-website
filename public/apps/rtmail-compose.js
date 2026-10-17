@@ -17,8 +17,9 @@
   function tell(s){status.textContent=s;}
   function mount(){
     if(form.hidden||release)return;
-    if(w.RTGAdaptiveEdgeVisual){w.RTGAdaptiveEdgeVisual.present({kind:'mail',to:fields.elements.naar.value,subject:fields.elements.onderwerp.value});release=function(){w.RTGAdaptiveEdgeVisual.close();};}
-    else if(w.RTGAdaptiveEdge)release=w.RTGAdaptiveEdge.mountSurface(controls,{kind:'mail'});
+    /* Leen de echte knoppen uit. Zo blijven bewaren, teruggaan en de
+       bevestigde verzending dezelfde listeners en dezelfde backend houden. */
+    if(w.RTGAdaptiveEdge)release=w.RTGAdaptiveEdge.mountSurface(controls,{kind:'mail'});
   }
   function values(){return {id:current&&current.id,naar:fields.elements.naar.value,onderwerp:fields.elements.onderwerp.value,tekst:fields.elements.tekst.value};}
   function save(){
@@ -71,11 +72,6 @@
       var notice=d.createElement('p');notice.className='rtm-send-result';notice.setAttribute('role','status');notice.textContent='Uw bericht is verstuurd.';home.querySelector('.rtm-binnen').prepend(notice);
     }catch(err){tell('Verzending is niet bevestigd. Uw concept blijft open. '+err.message);}
     finally{sending=false;Array.from(fields.elements).forEach(function(n){n.disabled=false;});controls.querySelectorAll('button').forEach(function(n){n.disabled=false;});}
-  });
-  w.addEventListener('rtg-edge-visual-action',function(e){
-    var x=e.detail||{};if(x.kind!=='mail'||x.action!=='send'||form.hidden)return;
-    var v=x.values||{};fields.elements.naar.value=v.to||fields.elements.naar.value;fields.elements.onderwerp.value=v.subject||fields.elements.onderwerp.value;
-    fields.dispatchEvent(new Event('input',{bubbles:true}));fields.requestSubmit();
   });
   [['Nieuw bericht',function(){open();}],['Concepten',list]].forEach(function(x){var b=d.createElement('button');b.type='button';b.textContent=x[0];b.onclick=x[1];home.querySelector('.rtm-nav').appendChild(b);});
   w.addEventListener('rtg-adaptive-ready',mount);

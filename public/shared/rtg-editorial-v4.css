@@ -561,9 +561,14 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]){
   --rtg-world-bg:var(--v4-paper)!important;--rtg-world-ground:var(--v4-paper)!important;
   --rtg-world-card:var(--v4-paper-strong)!important;--rtg-world-card-strong:#e8e1d7!important;
-  --rtg-world-ink:var(--v4-ink)!important;
+  --rtg-world-ink:var(--v4-ink)!important;--rtg-world-muted:#665d54!important;
   --rtg-world-line:var(--v4-line)!important;--rtg-world-action:var(--v4-accent)!important;
   --rtg-world-action-ink:#fffaf2!important;--rtg-world-schema:light!important;
+}
+/* Een fout in de bureaucatalogus blijft een volledig systeemvlak. Het kader
+   mag dan niet inspringen alsof de ontbrekende inhoud alsnog een artikel is. */
+html body[data-rtg-editorial-v4="true"][data-rtg-desktop-state="error"] .wd-shell{
+  width:100%!important;max-width:none!important;margin-inline:0!important;
 }
 /* Metaalinkt is een accent op donkere fotografie, geen leestekstkleur op
    papier. Binnen lichte routes krijgt elk interactief tekstaccent daarom de
@@ -575,6 +580,7 @@ html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([dat
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .grens{color:#554d45!important}
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .grens strong{color:#2f2923!important}
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .code{color:var(--v4-accent)!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .graad.bewezen{color:var(--v4-accent)!important}
 /* Bestellen heeft een eigen donkere voortgangskop. De titel blijft daarin
    licht tot die voortgang volledig door de Edge wordt overgenomen. */
 html body[data-rtg-editorial-v4="true"] .rtg-appshell .pagehead :is(h1,.ey,.topstatus){color:#fffaf2!important}

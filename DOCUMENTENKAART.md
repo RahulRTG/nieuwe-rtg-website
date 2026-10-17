@@ -1917,6 +1917,14 @@ stapel opnieuw opstart. Het doel is geen toestemming voor een grote verhuizing:
 de volgende trede is een wereld als Living Module op één route (TravelOS), met
 acceptatiecriteria en een terugval.
 
+**`TRAVELOS-SPATIAL-VERTICAL-SLICE.md` is het implementatiepassport voor die
+volgende trede** — één echte catalogusreisaanvraag in de bestaande Travel Living
+Module, boven op dezelfde TravelOS-routes, Workspace Runtime, serverrechten,
+Edge en Rahul-contextbrug als vandaag. Het document legt bronwaarheid, handoff,
+onzekere antwoordstatus, privacy, performance, acceptatiebewijs en vier kleine
+PR-stappen vast. Het bouwt geen vierde host en geeft nog geen toestemming voor
+de productimplementatie.
+
 **`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die
 zonder commit verschuift (runtime, browser, live-site, wet) en de herstellus
 die van elk rood licht een fix-issue met diagnose maakt. De twee vaste grenzen
@@ -2535,8 +2543,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27528<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7768<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27581<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7771<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->315<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in

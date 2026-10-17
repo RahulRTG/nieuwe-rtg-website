@@ -87,6 +87,12 @@ function schrijfSamenvatting(plan, resultaat) {
     '| Opnieuw bewijzen | ' + plan.telling.REPROVE + ' |',
     '| Onbekend | ' + plan.telling.UNKNOWN + ' |',
     '| Geselecteerd | ' + resultaat.unit.length + ' unit · ' + resultaat.e2e.length + ' browser |',
+    ...(plan.capaciteit ? [
+      '| Geprojecteerde unitduur | ' + Math.ceil(plan.capaciteit.unit.geschatMs / 60000) + ' min / ' +
+        Math.floor(plan.capaciteit.unit.budgetMs / 60000) + ' min budget |',
+      '| Geprojecteerde browserduur | ' + Math.ceil(plan.capaciteit.e2e.geschatMs / 60000) + ' min / ' +
+        Math.floor(plan.capaciteit.e2e.budgetMs / 60000) + ' min budget |'
+    ] : []),
     ''
   ];
   /* De afgegane regels (ARCHITECTOPDRACHT.md fase 6): welke wet, wat er

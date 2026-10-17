@@ -1,10 +1,10 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-10-12T14:12:19.882Z",
-    "commit": "eff44942b",
-    "routesToen": 5529,
-    "samengesteld": "de meting van #542 (5510 routes, zelf samengesteld: lokaal npm test + e2e-journaal + gerichte toetsen, met 5 routes uit de volledige meting ace454e2 die coturn vragen) plus een journaal van de tien nieuwe toetsen van #602-#607 (mob-ontvangst, reisgezelschap-instemming/-opgave/-opties/-werkruimte, workspace-rechten), die de 14 nieuwe routes van die reeks raken. De eerstvolgende volledige CI-meting vervangt dit."
+    "op": "2026-10-15T07:26:35.599Z",
+    "commit": "573614339",
+    "routesToen": 5530,
+    "samengesteld": "Bestaande 5529-routebaseline gecombineerd met het werkelijke routejournaal van test/mall-living.test.js op commit 573614339 voor POST /api/mall/living; de volledige CI valideert dezelfde kandidaat opnieuw."
   },
   "aangeraakt": [
     "GET /",
@@ -1639,6 +1639,7 @@
     "POST /api/mall/lijst/weg",
     "POST /api/mall/lijst/zet",
     "POST /api/mall/lijsten",
+    "POST /api/mall/living",
     "POST /api/mall/plekken",
     "POST /api/mall/reis",
     "POST /api/mall/reis/catalogus",

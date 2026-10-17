@@ -4,10 +4,12 @@
   'use strict';
   w.RTGTravelExperience = function (options) {
     var q = function (id) { return d.getElementById(id); };
-    var trip, store, active, busy = false, uncertain = false, received = false, before = [], submitted;
+    var trip, store, active, controller;
     var ready = false, touched = false;
+    function state() { return controller ? controller.state() : { busy:false, uncertain:false, received:false }; }
     function say(text) { q('rStatus').textContent = text; }
     function fields() { return {date:q('rDatum').value,participants:Number(q('rAantal').textContent)}; }
+    function input() { return Object.assign(fields(), { note:q('rNotitie').value }); }
     function sameSession() {
       try { if (w.localStorage.getItem('rtg_member_token') === options.token) return true; } catch(e) {}
       if (store) try { store.clear(); } catch(e) {}
@@ -16,11 +18,12 @@
       return false;
     }
     function lock() {
-      ['rDatum','rMin','rPlus','rNotitie','travelRemember','travelForget'].forEach(function (id) { q(id).disabled = busy || uncertain || received; });
-      q('rBoek').disabled = busy || uncertain || received;
-      q('rReview').disabled = busy || uncertain || received;
-      q('rCheck').disabled = busy;
-      q('bladTerug').disabled = busy;
+      var s = state(), dicht = s.busy || s.uncertain || s.received;
+      ['rDatum','rMin','rPlus','rNotitie','travelRemember','travelForget'].forEach(function (id) { q(id).disabled = dicht; });
+      q('rBoek').disabled = dicht;
+      q('rReview').disabled = dicht;
+      q('rCheck').disabled = s.busy;
+      q('bladTerug').disabled = s.busy;
     }
     function total() {
       var n = fields().participants;
@@ -44,6 +47,7 @@
       } catch(e) { q('travelContext').textContent = 'Bewaren lukt niet. Uw invoer staat nog in het formulier.'; }
     }
     function changed() {
+      controller.edit();
       touched = true; q('rBoek').hidden = true; q('rReview').hidden = false; q('rSummary').textContent = '';
       total(); remember();
     }
@@ -54,54 +58,52 @@
       q('travelContext').textContent = 'De aanvraag is ontvangen. Tijdelijke reiscontext is gewist.';
     }
     function result(a, matched) {
-      uncertain = false; received = true; q('rCheck').hidden = true;
+      q('rCheck').hidden = true;
       var description = a.status === 'aangevraagd' ? 'Aangevraagd, nog niet bevestigd.' : 'Actuele status: ' + a.status + '.';
       say((matched ? 'Uw aanvraag is teruggevonden. ' : 'Uw aanvraag is ontvangen. ') + description + ' Referentie: ' + a.ref);
       if (a.besluit && a.besluit.bericht) q('rStatus').textContent += ' ' + a.besluit.bericht;
       q('rTrips').hidden = false; finishIntent(); options.refresh(); lock();
     }
     async function check() {
-      if (busy || !submitted || !sameSession()) return;
-      busy = true; lock(); say('We controleren uw aanvragen bij het reisbureau.');
-      try {
-        var list = (await options.api('/api/reisbureau/mijn')).aanvragen;
-        if (!Array.isArray(list)) throw new Error('Ongeldig antwoord');
-        var found = list.filter(function (a) {
-          return before.indexOf(a.ref)<0 && a.tripId===submitted.tripId && a.personen===submitted.personen &&
-            (a.vertrek||'')===(submitted.vertrek||'') && (a.notitie||'')===submitted.notitie;
-        });
-        if (found.length===1) result(found[0],true);
-        else say('De uitkomst is nog onbekend. Er is geen unieke nieuwe aanvraag teruggevonden. Controleer straks opnieuw of bekijk Mijn aanvragen; we versturen niets opnieuw.');
-      } catch(e) { say('De uitkomst is nog onbekend. Controleren lukt nu niet. Uw invoer blijft staan; probeer de controle opnieuw.'); }
-      finally { busy = false; lock(); }
+      var s = state();
+      if (s.busy || !s.uncertain) return;
+      say('We controleren uw aanvragen bij het reisbureau.');
+      var uitkomst = await controller.check();
+      if (uitkomst.type === 'received') result(uitkomst.application,true);
+      else if (uitkomst.type === 'unmatched') say('De uitkomst is nog onbekend. Er is geen unieke nieuwe aanvraag teruggevonden. Controleer straks opnieuw of bekijk Mijn aanvragen; we versturen niets opnieuw.');
+      else if (uitkomst.type === 'check-failed') say('De uitkomst is nog onbekend. Controleren lukt nu niet. Uw invoer blijft staan; probeer de controle opnieuw.');
+      lock();
     }
     async function book() {
-      if (busy || uncertain || received || q('rBoek').hidden || !trip || !sameSession()) return;
-      busy = true; lock(); var sent = false;
-      submitted = {tripId:trip.id,personen:fields().participants,vertrek:fields().date || undefined,
-        notitie:q('rNotitie').value.replace(/[<>]/g,'').trim().slice(0,300)};
-      try {
-        // De bestaande refs onderscheiden een nieuwe ontvangst van een oudere reis.
-        var list = (await options.api('/api/reisbureau/mijn')).aanvragen;
-        if (!Array.isArray(list)) throw new Error('Uw aanvragen konden niet worden gecontroleerd.');
-        before = list.map(function (a) { return a.ref; });
-        var existing = list.find(function (a) { return a.tripId===submitted.tripId && a.status==='aangevraagd'; });
-        if (existing) { say('Voor deze reis staat al een aanvraag open ('+existing.ref+'). Bekijk Mijn aanvragen. Uw nieuwe invoer is niet verstuurd.'); options.refresh(); return; }
-        say('Uw aanvraag wordt verstuurd. Het reisbureau moet deze nog beoordelen.');
-        sent = true;
-        var response = await options.api('/api/reisbureau/boek',submitted);
-        if (!response.aanvraag || !response.aanvraag.ref) throw new Error('Geen ontvangstbewijs');
-        result(response.aanvraag,false);
-      } catch(e) {
-        if (sent && (!e.status || e.status>=500 || e.status===409)) {
-          uncertain = true; q('rCheck').hidden = false;
-          say('De uitkomst is onbekend. Controleer eerst of uw aanvraag is ontvangen. We versturen niets opnieuw.');
-        } else say((sent?'Aanvraag geweigerd. ':'Niet verstuurd. ') + e.message + ' Uw invoer blijft staan.');
-      } finally { busy = false; lock(); }
+      var s = state();
+      if (s.busy || s.uncertain || s.received || q('rBoek').hidden || !trip) return;
+      var uitkomst = await controller.submit(input());
+      if (uitkomst.type === 'existing') {
+        say('Voor deze reis staat al een aanvraag open ('+uitkomst.application.ref+'). Bekijk Mijn aanvragen. Uw nieuwe invoer is niet verstuurd.');
+        options.refresh();
+      } else if (uitkomst.type === 'received') result(uitkomst.application,false);
+      else if (uitkomst.type === 'uncertain') {
+        q('rCheck').hidden = false;
+        say('De uitkomst is onbekend. Controleer eerst of uw aanvraag is ontvangen. We versturen niets opnieuw.');
+      } else if (uitkomst.type === 'rejected') {
+        say((uitkomst.sent?'Aanvraag geweigerd. ':'Niet verstuurd. ') + uitkomst.error.message + ' Uw invoer blijft staan.');
+      }
+      lock();
     }
+    controller = w.RTGTravelRequestController.create({
+      api: options.api,
+      sameSession: sameSession,
+      onChange: function (s, reason) {
+        if (reason === 'submitting') say('Uw aanvraag wordt verstuurd. Het reisbureau moet deze nog beoordelen.');
+        lock();
+      }
+    });
     q('rReview').addEventListener('click',function () {
-      if (!trip || busy || uncertain || received || !sameSession() || !q('rDatum').reportValidity()) return;
-      q('rSummary').textContent = trip.titel + ' · ' + (fields().date || 'Datum in overleg') + ' · ' + fields().participants +
+      var s = state();
+      if (!trip || s.busy || s.uncertain || s.received || !sameSession() || !q('rDatum').reportValidity()) return;
+      var uitkomst = controller.review(input());
+      if (!uitkomst.ok) return;
+      q('rSummary').textContent = uitkomst.trip.titel + ' · ' + (uitkomst.request.vertrek || 'Datum in overleg') + ' · ' + uitkomst.request.personen +
         ' reizigers. Het RTG-reisbureau ontvangt deze aanvraag en uw eventuele wensen. Er wordt nu niets betaald of definitief geboekt.';
       q('rBoek').hidden = false; q('rReview').hidden = true; q('rBoek').focus();
     });
@@ -125,10 +127,13 @@
       .finally(function () { ready = true; lock(); });
     w.addEventListener('storage',function (e) { if (e.key==='rtg_member_token') sameSession(); });
     return {open:function (value) {
-      if (busy) return false;
-      if (uncertain && trip && trip.id!==value.id) { say('Controleer eerst de uitkomst van uw vorige aanvraag.'); return false; }
-      if (!uncertain) {
-        received = false; q('rStatus').textContent = ''; q('rSummary').textContent = '';
+      var geopend = controller.open(value);
+      if (!geopend.ok) {
+        if (geopend.reason === 'uncertain') say('Controleer eerst de uitkomst van uw vorige aanvraag.');
+        return false;
+      }
+      if (!state().uncertain) {
+        q('rStatus').textContent = ''; q('rSummary').textContent = '';
         q('rTrips').hidden = true; q('rCheck').hidden = true; q('rBoek').hidden = true; q('rReview').hidden = false;
       }
       trip = value; q('rDatum').min = new Date().toISOString().slice(0,10); total(); lock();

@@ -228,10 +228,19 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
         await page.keyboard.press('Escape');
         await selecteerAlles(fr);
         await require('./helper').edgeActies(page);
-        await page.waitForFunction(() => {
-          const b = document.querySelector('.rtg-adaptive-controls .cmd-actie');
-          return b && /vet/i.test(b.getAttribute('aria-label') || '');
-        }, null, { timeout: 10000 });
+        try {
+          await page.waitForFunction(() => {
+            const b = document.querySelector('.rtg-adaptive-controls .cmd-actie');
+            return b && /vet/i.test(b.getAttribute('aria-label') || '');
+          }, null, { timeout: 10000 });
+        } catch (error) {
+          const boven = await page.evaluate(() => ({ context: window.RTGAdaptief && RTGAdaptief.context(),
+            labels: [...document.querySelectorAll('.rtg-adaptive-controls .cmd-actie')].map((b) => b.getAttribute('aria-label')) }));
+          const blad = await fr.locator('body').evaluate(() => ({ context: window.RTGAdaptief && RTGAdaptief.context(),
+            selectie: String(document.getSelection()), collapsed: document.getSelection().isCollapsed,
+            bereik: document.getSelection().rangeCount }));
+          throw new Error(error.message + '\nboven=' + JSON.stringify(boven) + '\nblad=' + JSON.stringify(blad), { cause: error });
+        }
 
         const bijSelectie = await page.locator('.rtg-adaptive-controls .cmd-actie')
           .evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));

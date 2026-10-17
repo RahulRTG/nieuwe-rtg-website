@@ -51,7 +51,7 @@ body[data-rtg-v4-kind="conversation"] .rtm-kop,body[data-rtg-v4-kind="conversati
    hun bestaande driekolomsraster: die rails bevatten echte functies en vormen
    samen met het middenvlak één responsieve werkruimte. */
 body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell{display:block!important;width:min(calc(100% - 2 * var(--v4-frame)),var(--v4-wide))!important;max-width:var(--v4-wide)!important;margin:0 auto!important;padding:clamp(24px,4vw,64px) 0!important}
-body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-page,[data-rtg-screen-root="content"]){display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important}
+body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-page,[data-rtg-screen-root="content"]):not(#gate):not(#onbGate){display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important}
 body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-greeting,.wd-people,.wd-favorites,.wd-library,.wp-tabs,.wp-domain,.wp-atmosphere){display:none!important}
 body[data-rtg-editorial-v4="true"] :is(main,[data-rtg-screen-root="content"],.wrap,.shell,.schil):not([data-rtg-native-canvas]){max-width:var(--v4-wide);margin-inline:auto}
 body[data-rtg-editorial-v4="true"] main:not(.wd-home){padding:clamp(24px,4vw,64px) var(--v4-frame)!important}
@@ -64,7 +64,7 @@ body[data-rtg-editorial-v4="true"] #shell>#app.active{height:100%!important;min-
 .rtg-v4-photo-lead::after{content:"";position:absolute;inset:0;border:1px solid color-mix(in srgb,var(--v4-metal) 42%,transparent);pointer-events:none}
 .rtg-v4-photo-lead figcaption{position:absolute;right:clamp(18px,3vw,42px);bottom:clamp(18px,3vw,36px);left:clamp(18px,3vw,42px);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:inherit}
 .rtg-v4-section-masthead{display:flex;align-items:center;justify-content:space-between;min-height:64px;margin:0 0 clamp(18px,3vw,34px);border-bottom:1px solid var(--v4-line)}
-.rtg-v4-section-masthead strong{font:400 clamp(1.5rem,3vw,2.2rem)/1 "Bodoni Moda",Didot,Georgia,serif!important;letter-spacing:-.025em}
+.rtg-v4-section-masthead h1{max-width:none!important;margin:0!important;font:400 clamp(1.5rem,3vw,2.2rem)/1 "Bodoni Moda",Didot,Georgia,serif!important;letter-spacing:-.025em}
 .rtg-v4-section-masthead a{display:grid;place-items:center;width:44px;height:44px;color:var(--v4-ink)!important;font:600 .8rem/1 Inter,sans-serif;text-decoration:none;letter-spacing:.1em}
 .rtg-v4-world-title{position:absolute;z-index:5;top:clamp(24px,5vw,62px);left:var(--v4-frame);max-width:calc(100% - 2 * var(--v4-frame));font:400 clamp(2.7rem,7vw,6.8rem)/.88 "Bodoni Moda",Didot,Georgia,serif;letter-spacing:-.05em;color:#f1d6a4;text-shadow:0 3px 28px rgba(0,0,0,.48);pointer-events:none}
 
@@ -179,6 +179,10 @@ body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-cinema :is(butt
    papier-, type- en controltaal. */
 body[data-rtg-v4-embedded="true"]{--v4-header:0px;--v4-edge-space:0px;padding:0!important}
 body[data-rtg-v4-embedded="true"]>.rtg-v4-header,body[data-rtg-v4-embedded="true"]>.rtg-adaptive-edge{display:none!important}
+/* Command draagt zelf de ene Edge. De lokale standenbalk blijft alleen als
+   handlerbron in het frame aanwezig. */
+html.rtg-command-blad body[data-rtg-editorial-v4="true"] #standen,
+body[data-rtg-v4-embedded="true"] #standen{display:none!important}
 
 @media(max-width:699px){
   /* De wereldscene is op telefoon de ene fotografische kop. De oudere
@@ -381,6 +385,11 @@ html body[data-rtg-editorial-v4="true"]>header.rtg-v4-header{
   height:var(--v4-header)!important;min-height:var(--v4-header)!important;max-height:var(--v4-header)!important;
   padding:0 var(--v4-frame)!important;overflow:hidden!important;
 }
+/* Een Saloon-artikel heeft tijdens lezen zijn eigen taakheader met Terug en
+   Bewaren. De globale kop wijkt dan volledig: één actieve kop, geen laag die
+   het terugraakvlak onderschept. */
+html body.saloon-leest[data-rtg-editorial-v4="true"]{padding-top:0!important}
+html body.saloon-leest[data-rtg-editorial-v4="true"]>header.rtg-v4-header{display:none!important}
 html body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead{
   width:100%!important;max-width:none!important;min-height:60px!important;
   margin:0 0 clamp(18px,2.4vw,30px)!important;padding:0 2px!important;

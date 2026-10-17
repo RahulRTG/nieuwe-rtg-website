@@ -27,7 +27,7 @@
     if (action === 'menu') return legacy('.rtg-edge-menu');
     if (action === 'status') return legacy('.rtg-edge-state');
     if (action === 'ai') {
-      if (d.querySelector('#rtgCommand .cmd-vraagvorm,#rvRahul')) {
+      if (Services.hasQuestionSurface()) {
         setDeck('rahul'); Input.prepare(rt, 'ai'); setState('expanded'); return true;
       }
       return Services.open(rt, 'rahul', rt.serviceApi);

@@ -37,7 +37,9 @@
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
     if (!main || main.querySelector(':scope > .rtg-v4-section-masthead')) return;
     var bar = make(doc, 'div', 'rtg-v4-section-masthead');
-    bar.appendChild(make(doc, 'strong', '', screenLabel(route, name)));
+    /* De oude kop verdwijnt visueel om de dubbele header op te lossen. De
+       vervangende redactiekop blijft daarom ook de echte documentkop. */
+    bar.appendChild(make(doc, 'h1', '', screenLabel(route, name)));
     var more = make(doc, 'a', '', '•••'); more.href = '/apps/app.html#menu'; more.setAttribute('aria-label', 'Meer in RTG');
     bar.appendChild(more); main.insertBefore(bar, main.firstChild);
   }

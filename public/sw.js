@@ -1,5 +1,5 @@
 /* Network-first app-schil met een cache-id uit de inhoud van SHELL. */
-const CACHE = 'rtg-app-63eca98b';
+const CACHE = 'rtg-app-5e267eb8';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',

@@ -25,11 +25,15 @@
   var K = window.RTGWerk;
   function $(id) { return document.getElementById(id); }
 
+  function herhaalsleutel() {
+    return window.RTGId('werkos');
+  }
+
   // [naam, pad, velden] -- een veld is [sleutel, label, soort, breedte]
   var HANDELINGEN = {
     projecten: [
       ['Nieuw project', '/project/maak', [['naam', 'Naam', 'tekst'], ['werkvorm', 'Werkvorm', 'keuze:algemeen,software,stadsuitrol,horeca-implementatie,school-implementatie,juridisch,campagne,expansie'], ['budget', 'Budget', 'getal', '7rem'], ['uurtarief', 'Uurtarief', 'getal', '7rem']]],
-      ['Nieuwe taak', '/taak/maak', [['titel', 'Wat moet er gebeuren', 'tekst'], ['wie', 'Voor wie', 'tekst', '9rem'], ['deadline', 'Deadline', 'tekst', '8rem'], ['prioriteit', 'Prioriteit', 'keuze:normaal,laag,hoog,kritiek', '8rem']]],
+      ['Nieuwe taak', '/api/bedrijf/taak/maak', [['titel', 'Wat moet er gebeuren', 'tekst'], ['wie', 'Voor wie', 'tekst', '9rem'], ['deadline', 'Deadline', 'tekst', '8rem'], ['prioriteit', 'Prioriteit', 'keuze:normaal,laag,hoog,kritiek', '8rem']]],
       ['Taak verplaatsen', '/taak/kolom', [['taakId', 'Taak-id', 'tekst', '9rem'], ['kolom', 'Naar kolom', 'keuze:te doen,bezig,review,klaar', '9rem']]],
       ['Uren schrijven', '/taak/uren', [['taakId', 'Taak-id', 'tekst', '9rem'], ['uren', 'Uren', 'getal', '6rem']]]
     ],
@@ -117,13 +121,16 @@
       var naam = 'h' + i;
       return '<div class="kaart"><div class="kop">' + K.esc(h[0]) + '</div><div class="rij">' +
         h[2].map(function (v) { return veld(naam, v); }).join('') +
-        K.knop(h[0], { doe: i }, i === 0) + '</div></div>';
+        K.knop(h[0], { doe: i, idem: herhaalsleutel() }, i === 0) + '</div></div>';
     }).join('');
     K.bind(el, 'doe', function (b) {
       var h = lijst[Number(b.dataset.doe)];
-      K.api(h[1], lees('h' + b.dataset.doe, h[2])).then(function (r) {
+      var body = lees('h' + b.dataset.doe, h[2]);
+      if (h[1] === '/api/bedrijf/taak/maak') body.idem = b.dataset.idem;
+      K.api(h[1], body).then(function (r) {
         /* De zin van de server, voluit. Die zinnen zijn het halve product. */
         if (r.body.error) return K.meld(r.body.error);
+        if (h[1] === '/api/bedrijf/taak/maak' && !r.body.herhaald) b.dataset.idem = herhaalsleutel();
         K.meld(r.body.let || (h[0] + ': gelukt.'));
         window.RTGWerkModules.laad();
       });

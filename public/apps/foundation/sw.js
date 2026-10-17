@@ -1,11 +1,14 @@
-/* Network-first RTFoundation-lesapp met offline vangnet. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-1d73bd86';
+/* Foundation-shell: network-first met een offline vangnet. */
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-3c471cd5';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
   '/shared/interface/workspace-registries.js',
   '/shared/interface/workspace-session.js',
+  '/shared/experience-intent.js',
+  '/shared/interface/workspace-intents.js',
   '/shared/interface/workspace-policy.js',
+  '/shared/interface/workspace-assistant-manifest.js',
   '/shared/interface/workspace-context.js',
   '/shared/interface/workspace-navigation.js',
   '/shared/interface/workspace-state.js',

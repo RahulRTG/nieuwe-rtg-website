@@ -96,6 +96,14 @@
   }
 
   function bestemming(tekst){var q=String(tekst||'').trim(),laag=q.toLowerCase(),links=null,rechts=null,m,t;
+    /* De 116 functies lopen via de accountgebonden gids van app-main. Zo zoekt
+       Command niet langer met zijn vier-productenheuristiek zodra de mens
+       expliciet vraagt iets te zoeken of openen. Ambigu en onbekend blijven
+       lokaal: geen model of vrije URL mag dan alsnog raden. */
+    if(/^(?:zoek(?:en)?(?:\s+naar)?|open|start|ga naar|breng(?: me)? naar|toon|laat zien|terug naar)\b/.test(laag)&&
+       typeof w.RTGAppDirectoryCommand==='function'){
+      var gids=w.RTGAppDirectoryCommand(q);
+      if(gids&&gids.handled)return gids.message||'De RTG-functiegids is geopend.'}
     if((m=laag.match(/(.+?)\s+links(?:\s+en|,)?\s+(.+?)\s+rechts/))){links=appUit(m[1]);rechts=appUit(m[2]);
       if(links&&rechts){if(!mag())return null;t=bouwTafel();t.wis();open(links[1],links[0]);t.openNaast(rechts,'rechts');t.select(1);
         return 'Ik heb '+links[0]+' links en '+rechts[0]+' rechts voor u geopend.'}}

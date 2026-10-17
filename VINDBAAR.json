@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-17T12:05:32.060Z",
-    "commit": "94d405d8c",
+    "op": "2026-10-16T12:05:44.136Z",
+    "commit": "ef8b2f28c",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
   },
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 101,
-  "woorden": 1273,
-  "gevonden": 791,
-  "dekking": 0.6214,
+  "woorden": 1261,
+  "gevonden": 794,
+  "dekking": 0.6297,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -69,45 +69,6 @@
         "teamkamer",
         "oefen",
         "solo"
-      ]
-    },
-    {
-      "naam": "Mall",
-      "url": "/apps/mall.html",
-      "woorden": 56,
-      "gevonden": 25,
-      "mist": [
-        "komt",
-        "samengesteld",
-        "huizen",
-        "binnen",
-        "ervaringen",
-        "werkelijk",
-        "verschilt",
-        "gevonden",
-        "complete",
-        "bibliotheek",
-        "aantal",
-        "window",
-        "rtgglyf",
-        "svghtml",
-        "icon",
-        "klasse",
-        "glyf",
-        "label",
-        "dienstenplein",
-        "tussen",
-        "leveranciers",
-        "lezen",
-        "kast",
-        "akkoord",
-        "vaste",
-        "afspraak",
-        "boeken",
-        "offerte",
-        "aanvragen",
-        "bestellen",
-        "plaatsen"
       ]
     },
     {
@@ -232,6 +193,30 @@
         "controle",
         "starten",
         "kijken"
+      ]
+    },
+    {
+      "naam": "Mall",
+      "url": "/apps/mall.html",
+      "woorden": 44,
+      "gevonden": 28,
+      "mist": [
+        "gevonden",
+        "complete",
+        "bibliotheek",
+        "aantal",
+        "window",
+        "rtgglyf",
+        "svghtml",
+        "icon",
+        "klasse",
+        "glyf",
+        "label",
+        "dienstenplein",
+        "tussen",
+        "leveranciers",
+        "bestellen",
+        "plaatsen"
       ]
     },
     {

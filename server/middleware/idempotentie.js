@@ -80,6 +80,7 @@ const crypto = require('crypto');
 const { bewaarBijEind } = require('../lib/eindstatus');
 const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
 const { EIGEN, doetHetZelf } = require('./idempotentie-eigen');
+const { wieVan } = require('../lib/idem-sleutelbepaling');
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 const MAX = 50000;
@@ -119,7 +120,10 @@ module.exports = () => {
       : (typeof b.idem === 'string' ? b.idem : null));
     if (!sleutel) return next();
 
-    const wie = (req.get('authorization') || '') + '|' + String(req.ip || '');
+    /* Dezelfde actorafleiding als de algemene idem-poort. Dit is vooral van
+       belang voor de bestaande WorkOS-lidsessies die buiten productie in het
+       lijf reizen; twee collega's achter hetzelfde IP delen nooit een kas. */
+    const wie = wieVan(req);
     const id = crypto.createHash('sha256')
       .update(req.method + ' ' + req.path + '|' + wie + '|' + sleutel).digest('hex');
 

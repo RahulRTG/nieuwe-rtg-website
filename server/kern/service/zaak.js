@@ -35,6 +35,7 @@ const klok = require('../../lib/klok');
 const { SOORTEN, DOELGROEPEN, KANALEN, STANDEN, geldig } = require('./klassen');
 const prioriteit = require('./prioriteit');
 const router = require('./router');
+const zaakregiebeeld = require('../zaakregiebeeld');
 
 const MAX = 20000;
 
@@ -128,7 +129,8 @@ module.exports = function maakZaken({ db, save, crypto }) {
     const klokken = require('./klok').klokken(z);
     const basis = Object.assign(kort(z), {
       tijdlijn: z.tijdlijn.map(r => Object.assign({}, r)),
-      klokken
+      klokken,
+      regiebeeld: zaakregiebeeld.service(z)
     });
     if (voorMelder) return { ok: true, zaak: basis };
     return { ok: true, zaak: Object.assign(basis, {

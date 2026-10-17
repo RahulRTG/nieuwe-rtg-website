@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-16T19:29:40.604Z",
-    "commit": "9c7fda32e",
+    "op": "2026-10-16T09:13:54.518Z",
+    "commit": "9846b73ce",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -9807,13 +9807,6 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
-    "mall-living.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 4,
-      "scherp": "gezakt"
-    },
     "mall-supplieros.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14508,14 +14501,6 @@
       "operator": "getal+1#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "rtg-editorial-v4.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/rtg-editorial-v4.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 6
     },
     "rtg-heritage-first-paint.test.js": {
       "soort": "puur",
@@ -19793,6 +19778,22 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "workspace-session-continuity.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/workspace-session.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "workspace-travel-request.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/workspace-runtime.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "workspace-voorkeur.test.js": {
       "soort": "server",

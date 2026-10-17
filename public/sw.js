@@ -1,11 +1,20 @@
-/* Network-first app-schil met een cache-id uit de inhoud van SHELL. */
-const CACHE = 'rtg-app-3317110c';
+/* RTG app-schil: network-first, met een offline vangnet. */
+/* DE CACHENAAM IS DE VINGERAFDRUK VAN DE SCHIL, en dat is hij nu ook echt:
+   sha256 over de bestanden hieronder, eerste acht tekens. Draai
+   `npm run swcache` na een wijziging aan de schil; keuringsregel controleert
+   of hij nog klopt.
+
+   Een inhoudsafdruk voorkomt dat een geinstalleerde app een oude schil houdt. */
+const CACHE = 'rtg-app-f13cbf0f';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
   '/shared/interface/workspace-registries.js',
   '/shared/interface/workspace-session.js',
+  '/shared/experience-intent.js',
+  '/shared/interface/workspace-intents.js',
   '/shared/interface/workspace-policy.js',
+  '/shared/interface/workspace-assistant-manifest.js',
   '/shared/interface/workspace-context.js',
   '/shared/interface/workspace-navigation.js',
   '/shared/interface/workspace-state.js',
@@ -71,8 +80,9 @@ const SHELL = [
      kale Home worden omgebogen, maar moeten bij de eerste start wel openen. */
   '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
-  '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
-  '/shared/interface/modules/context.js', '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
+  '/shared/interface/second-screen.css', '/shared/interface/workspace-components.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
+  '/shared/interface/modules/context.js', '/shared/interface/modules/work-view.js', '/shared/interface/modules/work-edge.js', '/shared/interface/modules/work.js',
+  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
 
   '/shared/i18n.js',
   '/shared/taalschil/zh.json', '/shared/taalschil/hi.json', '/shared/taalschil/es.json',

@@ -4,7 +4,7 @@
     { "id": "ijk-1", "taakklasse": "toets-toevoegen", "onderwerp": "server/kern/pay/boeking.js", "verwacht": "voldoende", "ontbreekt": [] },
     { "id": "ijk-2", "taakklasse": "code-wijzigen", "onderwerp": "server/kern/pay/poort.js", "verwacht": "voldoende", "ontbreekt": [] },
     { "id": "ijk-3", "taakklasse": "code-wijzigen", "onderwerp": "server/routes/supplier/horeca/rekening.js", "verwacht": "onvoldoende", "ontbreekt": ["toetsen"] },
-    { "id": "ijk-4", "taakklasse": "geldregel-wijzigen", "onderwerp": "server/kern/pay/boeking.js", "verwacht": "onvoldoende", "ontbreekt": ["toetsenWaargenomen"] },
-    { "id": "ijk-5", "taakklasse": "geldregel-wijzigen", "onderwerp": "POST /api/supplier/tafelticket/afrekenen", "verwacht": "onvoldoende", "ontbreekt": ["wettenGenoemd", "toetsenWaargenomen"] }
+    { "id": "ijk-4", "taakklasse": "geldregel-wijzigen", "onderwerp": "server/kern/pay/boeking.js", "verwacht": "onvoldoende", "ontbreekt": ["toetsenWaargenomen", "vers"] },
+    { "id": "ijk-5", "taakklasse": "geldregel-wijzigen", "onderwerp": "POST /api/supplier/tafelticket/afrekenen", "verwacht": "onvoldoende", "ontbreekt": ["wettenGenoemd", "toetsenWaargenomen", "vers"] }
   ]
 }

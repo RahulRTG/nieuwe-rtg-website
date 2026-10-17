@@ -89,7 +89,17 @@ async function main() {
     const screens = [];
     for (const scherm of PLATFORM) {
       await page.goto(server.basis + scherm.route, { waitUntil: 'domcontentloaded', timeout: 45000 });
-      await page.waitForSelector(wachten[scherm.id], { state: 'visible', timeout: 25000 });
+      try { await page.waitForSelector(wachten[scherm.id], { state: 'visible', timeout: 25000 }); }
+      catch (fout) {
+        const diagnose = await page.locator(wachten[scherm.id].split(':')[0]).evaluate((node) => {
+          const stijl = getComputedStyle(node), vak = node.getBoundingClientRect();
+          const ouders=[]; for(let ouder=node.parentElement;ouder;ouder=ouder.parentElement){const s=getComputedStyle(ouder),r=ouder.getBoundingClientRect();ouders.push({tag:ouder.tagName,id:ouder.id,cls:ouder.className,display:s.display,breedte:r.width,hoogte:r.height});}
+          return { display:stijl.display, visibility:stijl.visibility, opacity:stijl.opacity,
+            breedte:vak.width, hoogte:vak.height, bodyClass:document.body.className,
+            bodyData:Object.assign({}, document.body.dataset),ouders:ouders };
+        }).catch(() => null);
+        throw new Error(fout.message + '\nDiagnose: ' + JSON.stringify(diagnose));
+      }
       await page.waitForTimeout(2200);
       if (scherm.id === 'gebruiker') {
         await page.keyboard.press('Escape').catch(() => {});

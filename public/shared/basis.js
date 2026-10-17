@@ -38,11 +38,22 @@
      heritage-blad komt bewust LAAT in <head>, na de stijl van het scherm. */
   if (document.body) document.body.setAttribute('data-rtg-skin', 'heritage');
 
+  function laadEditorialBlad() {
+    if (document.getElementById('rtgEditorialV4Css') ||
+        document.querySelector('link[href^="/shared/rtg-editorial-v4.css"]')) return;
+    var blad = document.createElement('link');
+    blad.id = 'rtgEditorialV4Css';
+    blad.rel = 'stylesheet';
+    blad.href = '/shared/rtg-editorial-v4.css';
+    (document.head || document.documentElement).appendChild(blad);
+  }
+
   function laadHeritageBlad() {
     var bestaand = document.getElementById('rtgHeritageCss') ||
       document.querySelector('link[href^="/shared/rtg-heritage.css"]');
     if (bestaand) {
       if (!bestaand.id) bestaand.id = 'rtgHeritageCss';
+      laadEditorialBlad();
       return;
     }
     var blad = document.createElement('link');
@@ -50,6 +61,10 @@
     blad.rel = 'stylesheet';
     blad.href = '/shared/rtg-heritage.css';
     (document.head || document.documentElement).appendChild(blad);
+    /* Een @import staat volgens CSS altijd vóór de regels van zijn eigenaar.
+       V4 moet juist ná alle Heritage-regels komen om werkelijk de ene schil
+       te zijn; daarom is dit bewust een volgend stylesheet in de DOM. */
+    laadEditorialBlad();
   }
 
   function pasWereldIdentiteitToe() {
@@ -225,7 +240,8 @@
   [['rtg-route-memory-core', 'RTGRouteMemoryCore'], ['rtg-route-memory', 'RTGRouteMemory'], ['rtg-heritage-transition', 'RTGHeritageTransition'], ['rtg-action-dock', 'RTGActionDock'], ['rtg-edge-preferences', 'RTGEdgePreferences'],
     ['rtg-heritage-registry', 'RTGHeritageRegistry'],
     ['rtg-heritage-components', 'RTGHeritageComponents'],
-    ['rtg-cinematic-system', 'RTGCinematicSystem']].forEach(function (bron) {
+    ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
+    ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
     if (window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
     var script = document.createElement('script');
     script.src = '/shared/' + bron[0] + '.js'; script.async = false;

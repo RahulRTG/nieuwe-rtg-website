@@ -196,7 +196,7 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
               maak('pointerdown', sx, sy); maak('pointermove', sx + x, sy + y); maak('pointerup', sx + x, sy + y);
             }, [dx, dy]);
             await veeg(-120, 0);
-            await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveDeck === 'context');
+            await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveDeck === 'apps');
             await veeg(0, -90);
             await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'expanded');
             assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(), true);

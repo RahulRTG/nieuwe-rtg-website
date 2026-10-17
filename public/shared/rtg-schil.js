@@ -773,7 +773,13 @@
     w.addEventListener('rtg-edge-layout', schik);
     /* Edge can change its inset after loading; the actual work surface owns
        the dimensions, independently of a browser resize event. */
-    if (w.ResizeObserver) new w.ResizeObserver(schik).observe(schil.vak);
+    if (w.ResizeObserver) {
+      var schikFrame = 0;
+      new w.ResizeObserver(function () {
+        if (schikFrame) return;
+        schikFrame = w.requestAnimationFrame(function () { schikFrame = 0; schik(); });
+      }).observe(schil.vak);
+    }
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {

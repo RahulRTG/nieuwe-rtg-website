@@ -162,7 +162,7 @@ const KAART = [
     ['schrijft', 'identiteit:s', 'identiteit in het eigen model', 'rt.model.identity = acting ?'],
     ['schrijft', 'voortzetting:s', 'voortzetting in het eigen model', 'rt.model.continuation = input && input.title ?'],
     ['schrijft', 'zichtbaarheidsstand:s', 'balkstand op body', 'd.body.dataset.rtgAdaptiveState = rt.model.state;'],
-    ['beslist', 'zichtbaarheidsstand:b', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
+    ['beslist', 'zichtbaarheidsstand:b', 'Edge 2 compact behoudt de volledige dock', "else if (state === 'compact') setState('dock', 'auto');"],
     ['schrijft', 'onderbalk:s', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"]]],
   ['rtg-adaptive-edge-services.js', 'adaptieve-balk', '', [
     ['rendert', '-', 'de vijf Edge-schermen zonder domeinbevoegdheid over te nemen', "var MODES = ['rahul', 'connect', 'media', 'account'];"],
@@ -171,7 +171,7 @@ const KAART = [
     ['beslist', 'zichtbaarheidsstand:b', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
   ['rtg-adaptive-edge-controls.js', 'adaptieve-balk', 'capability-register:bl hoofdactie:s vluchtige-context:l', [
     ['leest', 'capability-register:l', 'handelingen via het blikveld', 'if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();'],
-    ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if (label(el) && available(el, root) && (!tab || !tabs.has(tab))'],
+    ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab))'],
     ['rendert', 'hoofdactie:s', 'verhuist de hoofdactie in het blad', 'rt.primarySlot = primary; rt.sheet.appendChild(primary);'],
     ['rendert', 'vluchtige-context:l', 'bladtitel uit RTGAdaptief', 'if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;']]],
   ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:bl capability-register:l', [

@@ -245,7 +245,16 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
 
     /* Venster open: de toetsen eronder zijn nu van het venster. Een cijfer
        mag niet meer van deel wisselen, en Tab mag het venster niet uit. */
-    await page.click('.rtguitvoer-knop');
+    /* De losse bronknop is onder de uniforme shell bewust onzichtbaar; Edge
+       projecteert dezelfde echte capability. Open hem langs het pad dat een
+       mobiele gebruiker werkelijk bedient. */
+    await page.waitForFunction(() => document.body.dataset.rtgAdaptiveReady === 'true');
+    assert.equal(await page.locator('.rtguitvoer-knop').isHidden(), true,
+      'de oude losse uitvoerknop vormt geen tweede bediening naast Edge');
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+    const meenemen = page.locator('.rtg-adaptive-controls .rtg-adaptive-sheet-action', { hasText: 'Meenemen' });
+    await meenemen.waitFor({ state: 'visible' });
+    await meenemen.click();
     await page.keyboard.press('1');
     await page.keyboard.press('n');
     const eronder = await page.evaluate(() => {
@@ -264,12 +273,14 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
     assert.deepEqual(ronde, ['JSON', 'Sluiten', 'CSV', 'JSON'], 'Tab draait rond in het venster, kreeg: ' + ronde.join(' '));
 
     await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.querySelector('.rtguitvoer-laag').hidden &&
+      !!document.activeElement.closest('.rtg-adaptive-bar'));
     const naEsc = await page.evaluate(() => ({
       dicht: document.querySelector('.rtguitvoer-laag').hidden,
-      focus: (document.activeElement.className || '').indexOf('rtguitvoer-knop') >= 0
+      focus: !!document.activeElement.closest('.rtg-adaptive-bar')
     }));
     assert.equal(naEsc.dicht, true, 'Esc sluit het venster');
-    assert.equal(naEsc.focus, true, 'en de focus gaat terug naar de knop waar de tik vandaan kwam');
+    assert.equal(naEsc.focus, true, 'en de focus gaat terug naar de zichtbare Edge waar de actie vandaan kwam');
 
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
   } finally {

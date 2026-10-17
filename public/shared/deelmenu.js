@@ -74,6 +74,12 @@
   function eigenLaag(el) {
     return el.classList && (el.classList.contains('rtgdeel-balk') ||
       el.classList.contains('rtgdeel-vast') || el.classList.contains('rtg-greep') ||
+      /* De redactionele V4-laag zet een masthead en een fotografische afsluiting
+         direct in <main>. Het zijn omlijsting, geen inhoudsdelen. Als zij als
+         gewone kinderen meetellen, daalt gastheren() niet meer af naar de ene
+         zichtbare app (zoals #vPay) en verdwijnen alle deelacties uit Edge. */
+      el.classList.contains('rtg-v4-section-masthead') ||
+      el.classList.contains('rtg-v4-photo-lead') ||
       el.classList.contains('ios-groot') ||
       el.classList.contains('ios-boven') || el.classList.contains('ios-onder'));
   }
@@ -107,7 +113,6 @@
     for (var L = 0; L < lagen.length; L++) if (bouw(lagen[L])) return true;
     return false;
   }
-
   /* Het menu van DEZE ronde: de balk op het scherm plus de API die
      window.RTGDeel uitdeelt. Op een plek, want de wacht moet kunnen zien of de
      balk die er staat van ons is, en herscan() moet de vorige ronde kunnen

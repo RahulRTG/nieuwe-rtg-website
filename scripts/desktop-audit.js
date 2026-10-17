@@ -240,12 +240,13 @@ async function main() {
             /* Product-native workspaces may remain dark islands; the shared
                app canvas, header and Edge are the cross-product contract. */
             if (s.cinematic && region.selector !== '.rtg-adaptive-bar') continue;
-            /* V4 deliberately turns native product shells into the same ivory
-               page as the surrounding editorial frame. The Edge remains the
-               single dark glass control surface. */
-            const expected = s.editorialV4
-              ? (region.selector === '.rtg-adaptive-bar' ? 'rgba(10,10,9,.9)' : v4Canvas)
-              : s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
+            /* V4 deliberately turns the WorkOS command shell into the same
+               ivory page as its editorial frame. The other native product
+               workspaces keep their world material; the Edge stays glass. */
+            const expected = s.editorialV4 && region.selector === '.rtg-adaptive-bar'
+              ? 'rgba(10,10,9,.9)'
+              : s.editorialV4 && region.selector === '.wk-shell' ? v4Canvas
+                : s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if ((region.selector === '.rtg-adaptive-bar' ? region.material : region.background) !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
           }
           }

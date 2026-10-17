@@ -3,7 +3,7 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-17",
-    "commit": "e8542b775"
+    "commit": "37eca2d5c"
   },
   "bronnen": {
     "schermroutes": {
@@ -9973,7 +9973,7 @@
         "/api/privacy"
       ],
       "zonderServer": false,
-      "inkomend": 12,
+      "inkomend": 13,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -9981,13 +9981,13 @@
         "public/apps/muziek.html",
         "public/shared/interface/second-screen-modules.js",
         "public/shared/rtg-adaptive-edge-services.js",
+        "public/shared/rtg-adaptive-edge-visual.js",
         "public/shared/rtg-edge-preferences.js",
         "public/shared/rtg-edge-smart-menu.js",
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
         "public/shared/rtg-editorial-v4.js",
         "server/kern/appgids-data/deel12b.js",
-        "server/kern/opnieuwbeginnen.js",
-        "server/kern/wereldroutes/instellingen.js"
+        "server/kern/opnieuwbeginnen.js"
       ]
     },
     {

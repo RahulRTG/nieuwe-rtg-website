@@ -152,7 +152,7 @@ test('4. in de schil: een context via de brug heet blad en blad:rail, en telt ne
   for (const v of VELDEN) assert.equal(zelf(v, l.velden[v].herkomst), false, v + ' telt in de schil niet als zelf (' + l.velden[v].herkomst + ')');
 });
 
-test('5. in de schil zet alleen de brug een context (lexicaal)', () => {
+test('5. in de schil zetten alleen de brug en expliciete Edge-modulecontracten context (lexicaal)', () => {
   const html = lees('public/apps/app.html');
   const tags = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1].split('?')[0]);
   assert.ok(tags.includes('/shared/adaptief/brug.js'), 'app.html laadt de brug');
@@ -173,7 +173,17 @@ test('5. in de schil zet alleen de brug een context (lexicaal)', () => {
     const bron = zonderCommentaar(lees(path.join('public', p)));
     return /RTGAdaptief/.test(bron) && /\.context\(\s*[^)\s]/.test(bron);
   });
-  assert.deepEqual(publicisten, ['/shared/adaptief/brug.js']);
+  /* De Workspace Runtime gebruikt drie kleine adapters als expliciete
+     modulecontracten. Zij publiceren uitsluitend de context van het
+     gefocuste paneel en blijven daarom zichtbaar in deze gesloten lijst.
+     Een willekeurig gedeeld script dat RTGAdaptief.context(...) gaat zetten,
+     laat deze poort nog steeds onmiddellijk zakken. */
+  assert.deepEqual(publicisten, [
+    '/shared/adaptief/brug.js',
+    '/shared/interface/modules/coordination-edge.js',
+    '/shared/interface/modules/travel-edge.js',
+    '/shared/interface/modules/work-edge.js'
+  ]);
 });
 
 /* Een ruwe lezing zoals leesInPagina hem uit de browser haalt: per veld of er

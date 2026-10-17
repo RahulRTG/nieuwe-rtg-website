@@ -71,6 +71,19 @@
     return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"></path></svg>';
   }
 
+  function syncHeaderActions(doc, header) {
+    if (!header) return;
+    var actions = header.querySelector('.rtg-v4-header-actions');
+    var search = actions && actions.querySelector('.rtg-v4-icon');
+    if (!actions) return;
+    /* Het markerattribuut staat op het bedienbare element zelf. Daardoor
+       overleeft het een eerdere presentatieadapter die een vormwikkel
+       ontleedt. Elke annotatieronde herstelt de ene eigenaar: de V4-kop. */
+    Array.from(doc.querySelectorAll('[data-rtg-v4-header-action]')).forEach(function (node) {
+      if (!node.closest('dialog,[role="dialog"]') && node.parentNode !== actions) actions.insertBefore(node, search || null);
+    });
+  }
+
   function buildHeader(doc, body, name) {
     var old = body.querySelector('[data-rtg-edge-2-contextual="native-header"], :scope > header:not(.rtg-v4-header), :scope > .wd-page > header:not(.rtg-v4-header)');
     var header = make(doc, 'header', 'rtg-v4-header');
@@ -100,6 +113,7 @@
       }
     }
     body.insertBefore(header, skip && skip.nextSibling ? skip.nextSibling : (skip ? null : body.firstChild));
+    syncHeaderActions(doc, header);
     return header;
   }
 
@@ -128,6 +142,7 @@
     var jump = body.querySelector('a[href^="#"]'), main = doc.querySelector('main,[role="main"],#main');
     if (jump && main) { if (!main.id) main.id = 'rtg-inhoud'; jump.href = '#' + main.id; if (body.firstChild !== jump) body.insertBefore(jump, body.firstChild); }
     if (header) {
+      syncHeaderActions(doc, header);
       if (header.parentNode !== body) body.insertBefore(header, body.firstChild);
       header.removeAttribute('data-rtg-edge-2-contextual');
       Array.from(doc.querySelectorAll('[data-rtg-edge-2-contextual="native-header"]')).forEach(function (legacy) {

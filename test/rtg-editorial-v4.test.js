@@ -63,7 +63,8 @@ test('de nieuwe laag definieert header, Edge en alle apparaatbreekpunten', () =>
 
 test('de ene schil sluit oude koppen, uitrekkende randen en Edge-overlap af', () => {
   const css = read('public/shared/rtg-editorial-v4.css');
-  assert.match(css, /min-height:58px!important;max-height:58px!important/);
+  assert.match(css, /--v4-header:58px!important/);
+  assert.match(css, /min-height:var\(--v4-header\)!important;max-height:var\(--v4-header\)!important/);
   assert.match(css, /data-rtg-editorial-v4="true"\] \.topnav\{display:none!important\}/);
   assert.match(css, />\.rtg-v4-section-masthead\+h1/);
   assert.match(css, /data-rtg-editorial-v4="true"\] #rtg-uitstap/);
@@ -73,6 +74,22 @@ test('de ene schil sluit oude koppen, uitrekkende randen en Edge-overlap af', ()
   assert.match(css, /:has\(#gate\[data-rtg-access\]/);
   assert.match(css, /:has\(#onbGate:not\(\[hidden\]\)\)>\.rtg-v4-header/);
   assert.match(css, /#shell:has\(>#app\.active\)/);
+});
+
+test('expliciet verklaarde routeacties verhuizen naar de V4-kop voordat de legacykop sluit', () => {
+  const runtime = read('public/shared/rtg-editorial-v4.js');
+  const css = read('public/shared/rtg-editorial-v4.css');
+  const command = read('public/apps/command.html');
+  const ios = read('public/shared/ios.js');
+  assert.match(runtime, /querySelectorAll\('\[data-rtg-v4-header-action\]'\)/);
+  assert.match(runtime, /syncHeaderActions\(doc, header\)/);
+  assert.match(runtime, /actions\.insertBefore\(node, search \|\| null\)/);
+  assert.match(css, /\.rtg-v4-header-actions>\[data-rtg-v4-header-action\]/);
+  assert.match(css, /:has\(\.rtg-v4-header-actions>\[data-rtg-v4-header-action\]\)\{--v4-header:120px\}/,
+    'een routeactie blijft op telefoon bereikbaar in een tweede koprij');
+  assert.match(command, /id="q" type="search" data-rtg-v4-header-action/);
+  assert.match(ios, /body > header:not\(\.rtg-v4-header\)/,
+    'de oudere iOS-laag laat de universele V4-kop intact');
 });
 
 test('de schermkeuring erkent de ene native canvas-toolbar als de V4-kop', () => {

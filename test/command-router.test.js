@@ -44,3 +44,10 @@ test('Rahul routeert op appnaam en niet op de positie in de catalogus', () => {
 test('een onbekende opdracht opent niet stil een willekeurige app', () => {
   assert.equal(router().herken('bereken een onbekende kwantumroute'), null);
 });
+
+test('de vier productnamen blijven directe Rahul-bestemmingen vóór de functiegids', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '../public/shared/command.js'), 'utf8');
+  assert.match(bron, /var direct=.*\(laag\)\?appUit\(laag\):null/);
+  assert.match(bron, /if\(!direct&&[\s\S]*RTGAppDirectoryCommand/);
+  assert.match(bron, /var a=direct\|\|appUit\(laag\)/);
+});

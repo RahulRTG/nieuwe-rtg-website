@@ -1,10 +1,17 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const { WORLD_CONTRACT } = require('../server/kern/experience/contract');
 const manifesten = require('../server/kern/experience/manifesten');
 const { maakExperience } = require('../server/kern/experience');
+
+test('de browser bewaart alleen een herstelpunt uit een volledige Experience-context', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '../public/shared/experience-kernel.js'), 'utf8');
+  assert.match(bron, /if \(!state\.bootstrap \|\| !state\.bootstrap\.currentContext\) return;/);
+});
 
 function huis(opties) {
   opties = opties || {};

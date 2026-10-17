@@ -10,6 +10,7 @@
 
 const R = require('./lus-regels');
 const { intake } = require('./lus-intake');
+const zaakregiebeeld = require('../zaakregiebeeld');
 
 module.exports = (ctx) => {
   const { save, schoon, stap, caseOpen, caseLijst, vind } = ctx;
@@ -74,6 +75,7 @@ module.exports = (ctx) => {
     const a = c.voorstel ? c.mogelijkheden.find(x => x.id === c.voorstel.aanbod) : null;
     return { status: 200, id: c.id, titel: c.titel, status: c.status, eigenaar: c.eigenaar,
       bericht: R.gastBericht(c), verrassing: c.verrassing,
+      regiebeeld: zaakregiebeeld.bureau(c),
       voorstel: a ? { wat: a.wat, van: a.van, bedragCenten: a.bedragCenten, reden: c.voorstel.reden,
         stand: R.aanbodStand(a, nuMs()), geldigTot: a.geldigTot } : null,
       tijdlijn: R.tijdlijn(c).map(r => ({ wat: r.wat, van: r.van, tot: r.tot })) };

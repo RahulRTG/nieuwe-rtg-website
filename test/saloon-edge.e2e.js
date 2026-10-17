@@ -82,7 +82,8 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
       await lezer.getByText('Dit is de volledige tekst uit de redactie.', { exact: true }).waitFor();
       assert.equal(await page.locator('dialog[open]').count(), 0, 'de lezer sluit Edge niet op in een modal');
       await meet();
-      assert.equal(await page.locator('.rtg-edge-top').isVisible(), true);
+      assert.equal(await page.locator('.rtg-edge-top').isVisible(), false, 'de oude bovenrand blijft weg');
+      assert.equal(await page.locator('.rtg-v4-header').isVisible(), false, 'de artikeltakenkop vervangt de globale kop tijdens lezen');
       assert.equal(await lezer.locator('img').getAttribute('src'), '/images/editorial/living-nearby.webp');
       if (width === 390) await foto('saloon-verhaal-gebouwd');
       await lezer.locator('[data-terug]').click(); await lezer.waitFor({ state: 'hidden' });
@@ -110,11 +111,12 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
       material: getComputedStyle(n).getPropertyValue('--edge-bar-bg').trim(),
       glass: getComputedStyle(n).backdropFilter
     }));
-    // Een Edge-materiaal voor elke wereld sinds de www-pariteit (#534).
-    assert.equal(menu.material, '#11100e', 'het menu draagt het ene www-materiaal van de Edge');
+    // Het ene transparante Edge-materiaal blijft over elke wereld gelijk.
+    assert.equal(menu.material, 'rgba(10,10,9,.9)', 'het menu draagt het ene transparante materiaal van de Edge');
     assert.notEqual(menu.glass, 'none', 'dezelfde transparante Edge blijft de bedieningslaag');
     assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1, 'het werkvlak groeit uit de ene bereikbare Edge-balk');
-    assert.equal(await page.locator('.rtg-edge-top').isVisible(), true, 'de gedeelde bovenrand blijft bereikbaar');
+    assert.equal(await page.locator('.rtg-edge-top').isVisible(), false, 'de oude bovenrand blijft weg');
+    assert.equal(await page.locator('.rtg-v4-header').isVisible(), true, 'de ene V4-kop blijft bereikbaar');
     await foto('saloon-menu-gebouwd'); await page.keyboard.press('Escape');
     await page.locator('[data-dichtbij]').click();
     assert.equal(await page.locator('#saloonKeuzes').getAttribute('open'), '');

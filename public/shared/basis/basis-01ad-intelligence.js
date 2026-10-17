@@ -3,7 +3,8 @@
   [['rtg-route-memory-core', 'RTGRouteMemoryCore'], ['rtg-route-memory', 'RTGRouteMemory'], ['rtg-heritage-transition', 'RTGHeritageTransition'], ['rtg-action-dock', 'RTGActionDock'], ['rtg-edge-preferences', 'RTGEdgePreferences'],
     ['rtg-heritage-registry', 'RTGHeritageRegistry'],
     ['rtg-heritage-components', 'RTGHeritageComponents'],
-    ['rtg-cinematic-system', 'RTGCinematicSystem']].forEach(function (bron) {
+    ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
+    ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
     if (window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
     var script = document.createElement('script');
     script.src = '/shared/' + bron[0] + '.js'; script.async = false;

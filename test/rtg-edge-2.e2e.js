@@ -304,6 +304,55 @@ async function controleerContextlade(page, label, route) {
     document.querySelector('.rtg-edge-2-context').hidden);
 }
 
+async function controleerV4Route(page, route, scherm) {
+  const label = route.naam + ' · ' + scherm.naam;
+  await page.waitForFunction(() => {
+    const header = document.querySelector('body>.rtg-v4-header');
+    const bar = document.querySelector('.rtg-adaptive-bar');
+    const klaar = getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim() === '20261016' &&
+      header && header.getClientRects().length && getComputedStyle(header).display !== 'none' &&
+      bar && bar.getClientRects().length && getComputedStyle(bar).display !== 'none';
+    if (!klaar) { window.__rtgV4EdgeStabiel = 0; return false; }
+    if (!window.__rtgV4EdgeStabiel) { window.__rtgV4EdgeStabiel = performance.now(); return false; }
+    return performance.now() - window.__rtgV4EdgeStabiel >= 300;
+  }, null, { timeout:15000 });
+  const staat = await page.evaluate(() => {
+    const zichtbaar = el => !!(el && el.getClientRects().length &&
+      getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden');
+    const header = document.querySelector('body>.rtg-v4-header');
+    const bar = document.querySelector('.rtg-adaptive-bar');
+    return {
+      wereld:document.body.dataset.rtgWorld,
+      versie:getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim(),
+      headers:[...document.querySelectorAll('body>header:not(.rtg-v4-header),.wd-page>header:not(.rtg-v4-header),.rtg-edge-top')].filter(zichtbaar).length,
+      header:zichtbaar(header), headerHoogte:header && header.getBoundingClientRect().height,
+      bars:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(zichtbaar).length,
+      materiaal:bar && getComputedStyle(bar).getPropertyValue('--edge-bar-bg').trim(),
+      oudeTop:zichtbaar(document.querySelector('.rtg-edge-top')),
+      oudeZijde:zichtbaar(document.querySelector('.rtg-edge-side')),
+      shell:document.querySelectorAll('.wd-shell').length
+    };
+  });
+  assert.equal(staat.versie, '20261016', label + ': niet de definitieve editorial schil');
+  assert.equal(staat.wereld, route.wereld, label + ': verkeerde wereldcontext');
+  assert.equal(staat.header, true, label + ': uniforme header ontbreekt');
+  assert.ok(Math.abs(staat.headerHoogte - (scherm.naam === 'mobiel' ? 58 : 72)) <= 2,
+    label + ': header heeft de verkeerde maat');
+  assert.equal(staat.headers, 0, label + ': een oude of dubbele header is zichtbaar');
+  assert.equal(staat.bars, 1, label + ': er hoort precies één zichtbare Edge te zijn');
+  assert.equal(staat.shell, 1, label + ': er hoort precies één appschil te zijn');
+  assert.equal(staat.oudeTop, false, label + ': de oude bovenrand is zichtbaar');
+  assert.equal(staat.oudeZijde, false, label + ': de oude zijrand is zichtbaar');
+  assert.equal(staat.materiaal, 'rgba(10,10,9,.9)', label + ': de Edge gebruikt niet het vaste materiaal');
+
+  await page.click('[data-rtg-adaptive-action="context"]');
+  await page.waitForFunction(() => document.body.dataset.rtgAdaptiveState === 'expanded' &&
+    !document.querySelector('.rtg-adaptive-sheet').hidden);
+  await page.click('[data-rtg-adaptive-close]');
+  await page.waitForFunction(() => document.body.dataset.rtgAdaptiveState !== 'expanded' &&
+    document.querySelector('.rtg-adaptive-sheet').hidden);
+}
+
 async function controleerRoute(page, route, scherm) {
   await page.setViewportSize(scherm.maat);
   await page.goto(route.basis + route.pad, { waitUntil: 'domcontentloaded' });
@@ -313,6 +362,11 @@ async function controleerRoute(page, route, scherm) {
   await wachtOpEdge2(page, verwachtPad);
   const naOpstart = new URL(await page.url());
   if (naOpstart.pathname !== verwachtPad) return { omgeleid: naOpstart.pathname };
+
+  if (await page.locator('body').getAttribute('data-rtg-editorial-v4') === 'true') {
+    await controleerV4Route(page, route, scherm);
+    return { omgeleid:null };
+  }
 
   const label = route.naam + ' · ' + scherm.naam;
   // Desktopwereldhomes gebruiken de horizontale Edge met mensen/widgets ernaast.
@@ -436,9 +490,11 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto(base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
         await wachtOpEdge2(page);
-        // LivingOS gebruikt hier dezelfde brede wereldcompositie als WorkOS:
-        // de desktop-zijrand wijkt voor de vaste mensen/inhoud/apps-kolommen.
-        await zetStand(page, 'overview', { top: true, side: false, bottom: true, reveal: false });
+        // V4 houdt de oude boven- en zijrand permanent verborgen. Een oudere
+        // schil gebruikt hier nog de expliciete overview-stand.
+        if (await page.locator('body').getAttribute('data-rtg-editorial-v4') !== 'true') {
+          await zetStand(page, 'overview', { top: true, side: false, bottom: true, reveal: false });
+        }
         await page.evaluate(() => {
           const frame = document.createElement('iframe');
           frame.id = 'rtg-edge-2-proefframe';
@@ -569,8 +625,8 @@ test('Edge 2: een keuze van de mens overleeft een hashwissel in Work',
         const begin = await werkStand(page);
         assert.equal(begin.stand, 'overview', 'zonder keuze begint Work in overview');
         assert.equal(begin.opslag, null, 'de proef begint zonder bewaarde keuze');
-        await page.click('.rtg-edge-state');
-        await page.click('[data-edge-2-mode="compact"]');
+        const gekozen = await page.evaluate(() => window.RTGEdge2.setState('compact'));
+        assert.equal(gekozen, true, 'de menselijke Compact-keuze werd geweigerd');
         await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'compact');
         assert.equal((await werkStand(page)).opslag, 'compact', 'de keuze is als keuze bewaard');
 

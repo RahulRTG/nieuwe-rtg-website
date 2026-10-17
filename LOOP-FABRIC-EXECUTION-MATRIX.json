@@ -140,9 +140,9 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 133,
-        "mutationContracts": 290,
-        "routes": 290,
+        "kernelModules": 134,
+        "mutationContracts": 291,
+        "routes": 291,
         "screens": 8,
         "dataSchema": "eerst flowmanifest; geen runtime-opslag",
         "newSharedPrimitive": "geen nieuwe runtimeprimitive; build-time flowdecompositie",

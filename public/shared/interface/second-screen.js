@@ -1,4 +1,3 @@
-/* Second Screen boven de Workspace Runtime. */
 (function (w, d) {
   'use strict';
   function el(tag, cls, tekst) { var n = d.createElement(tag); if (cls) n.className = cls; if (tekst != null) n.textContent = tekst; return n; }
@@ -17,7 +16,10 @@
         if (w.matchMedia('(max-width:999px)').matches) zet('peek');
         return o.open(url, title);
       },
-      confirm: function (vraag) { return w.confirm(String(typeof vraag === 'function' ? vraag() : vraag)); },
+      confirm: function (vraag, payload) {
+        var tekst = typeof vraag === 'function' ? vraag(payload || {}) : vraag;
+        return tekst ? w.confirm(String(tekst)) : true;
+      },
       onRechten: function () { if (composer) composer.draw(state, editing); },
       onOrchestrate: function (layout, changes, event) {
         var kritiek = event && event.event === 'safety.incident.started' && event.payload && event.payload.severity === 'critical';
@@ -63,7 +65,6 @@
     }
     merkUitvoer(); if (w.MutationObserver) { uitvoerKijk = new MutationObserver(merkUitvoer); uitvoerKijk.observe(root, { childList: true, subtree: true }); }
 
-    function bewaar() { composer.save(); }
     function teken() { composer.draw(state, editing); }
     function aria(s) {
       var werk = root.querySelector('.cmd-werk'), focus = s === 'focus';
@@ -95,15 +96,17 @@
       }
     }
     function klik(e) {
+      var moduleRoot = e.target.closest('[data-rtg-module]');
+      if (moduleRoot && bank.contains(moduleRoot) && runtime.dispatch(e.target)) { e.preventDefault(); composer.save(); return; }
       var t = e.target.closest('[data-ss-action],[data-ss-url],[data-ss-context-id],[data-rtg-legacy-open]');
       if (!t || !bank.contains(t)) return;
-      if (runtime.dispatch(t)) { e.preventDefault(); bewaar(); return; }
       var a = t.dataset.ssAction, id = t.dataset.ssModuleId || (t.closest('[data-ss-module]') && t.closest('[data-ss-module]').dataset.ssModule);
       if (a === 'close') zet('peek');
       else if (a === 'panel' || a === 'workspace' || a === 'focus') zet(a);
-      else if (a === 'focus-module') { composer.setActive(id, false); zet('focus'); bewaar(); }
+      else if (a === 'focus-module') { composer.setActive(id, false); zet('focus'); composer.save(); }
       else if (a === 'edit') { editing = !editing; teken(); }
       else if (a === 'edit-done') { editing = false; teken(); }
+      else if (a === 'template') { composer.applyTemplate(t.dataset.ssTemplateId); }
       else if (a === 'ask') { if (o.vraag) o.vraag('Maak een gevalideerde RTG Workspace Blueprint voor mijn doel'); }
       else if (a === 'up') composer.move(id, -1); else if (a === 'down') composer.move(id, 1);
       else if (a === 'hide') composer.hide(id, true); else if (a === 'show') composer.hide(id, false);

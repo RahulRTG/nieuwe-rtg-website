@@ -114,7 +114,7 @@
     }).then(function () { tekenDialog(); }).catch(function (e) { knop.disabled = false; knop.textContent = e.message; });
   }
   function bewaarResume() {
-    if (!state.bootstrap) return;
+    if (!state.bootstrap || !state.bootstrap.currentContext) return;
     api('resume', { world: state.bootstrap.currentWorld, contextId: state.bootstrap.currentContext.id,
       surface: location.pathname + location.search }).catch(function () {});
   }

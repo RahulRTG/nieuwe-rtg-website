@@ -1,7 +1,11 @@
 # TravelOS Spatial Vertical Slice Passport
 
-Status: implementatievoorstel na repositoryverificatie. Dit document wijzigt geen
-productgedrag en is geen toestemming om de slice te bouwen.
+Status: gebouwd en lokaal geïntegreerd op de afgeschermde Full Build-
+integratietak. De gedeelde controller staat op `main`; native aanvraag,
+continuïteit, Edge-koppeling, Flow-terugval, antwoordherstel en het lezen van de
+bestaande menselijke bevestigingsstatus zijn op de kandidaat samengebracht.
+Platformbrede eindkwalificatie blijft nodig. Dit document verleent geen
+toestemming voor merge naar `main` of publieke uitrol.
 
 ## 1. Besluit in één zin
 
@@ -51,7 +55,7 @@ onderscheid blijft in tekst, gedrag en servercontract gehandhaafd.
 | Rahul-reisconcept | Geïmplementeerd | `server/kern/fluister/reis/reisconcept.js` | Bewerkbaar 24-uursconcept; geen aanvraag, boeking of betaling |
 | Contextbrug | Geïmplementeerd | `server/kern/stuur/menscontext.js`, `menscontext-ref.js`, `menscontext-opzoek.js` | Alleen type/id uit de client; object en toegestane velden komen van de server |
 | Edge-blikveld | Geïmplementeerd | `public/shared/edge/blikveld.js#voorRahul` | Context delen zonder tekst uit de interface als waarheid te behandelen |
-| Native Travel-module | Gedeeltelijk geïntegreerd | `public/shared/interface/modules/travel.js` | L4, echte dossierdata en chauffeuractie; aanvraagflow ontbreekt |
+| Native Travel-module | Lokaal geïntegreerd | `public/shared/interface/modules/travel.js` | L4, echte dossierdata, chauffeuractie, aanvraagflow, bronherstel en statusverversing |
 | Workspace Runtime | Geïmplementeerd | `public/shared/interface/workspace-runtime.js` | Bestaande host voor peek, panel, workspace en focus |
 | Modulehost en foutgrens | Geïmplementeerd | `workspace-module-host.js` | Runtime bezit chrome, lifecycle en foutisolatie |
 | Action Broker | Geïmplementeerd | `workspace-broker.js` | Declaratie, schema, policy, bevestiging, deduplicatie en audit |
@@ -123,6 +127,7 @@ Voorgestelde acties:
 | `travel.request.review` | Lokale samenvatting maken | `travel.manage` | Geen; heeft geen extern gevolg |
 | `travel.request.submit` | Bestaande aanvraagroute aanroepen | `travel.manage` | Expliciet in de UI én via Broker-contract |
 | `travel.request.check` | Na onzeker antwoord actuele bron lezen | `travel.manage` | Geen; read-only |
+| `travel.request.status` | Menselijke beoordeling opnieuw aan dezelfde bron lezen | `travel.read` | Geen; read-only |
 | `travel.request.open-flow` | Dezelfde reis in bestaande Flow openen | `travel.read` | Geen |
 | `travel.open` | Bestaand reisoverzicht openen | Bestaand contract | Bestaand gedrag |
 
@@ -185,7 +190,7 @@ acties die bij haar huidige toestand horen:
 - bewerken: controleren en Flow openen;
 - review: terug en expliciet versturen;
 - onzeker: status controleren;
-- ontvangen: reisoverzicht openen.
+- ontvangen: status verversen en reisoverzicht openen.
 
 Universele terug/vooruitnavigatie blijft van de bestaande navigatiebron. Een
 actief invoerveld, focus of open paneel houdt de Quiet Presence-bescherming.
@@ -270,9 +275,9 @@ expliciete actie, relevante gebeurtenis of bestaande herlaadcyclus.
 | Gedeelde controller | Unit-tests voor review, duidelijke fout, antwoordverlies, bronmatch en sessiewissel |
 | Servercontract | Bestaande `test/experience-travel.test.js` blijft groen |
 | Flow-regressie | Bestaande `test/experience-travel.e2e.js` blijft groen |
-| Native module | Browsertest in `app.html`: catalogus → review → aanvraag → ontvangst |
+| Native module | Browsertest in `app.html`: catalogus → review → aanvraag → ontvangst → menselijke bevestiging |
 | Handoff | Flow → module en module → Flow met toegestane velden, zonder vrije tekst in URL/opslag |
-| Herstel | Refresh, verlopen sessie, antwoordverlies en opnieuw controleren |
+| Herstel | Refresh, verlopen sessie, antwoordverlies en opnieuw controleren zonder tweede mutatie |
 | Dubbele aanvraag | Bestaande open aanvraag blokkeert een tweede verzending |
 | Rechten | `travel.manage=false` verbergt of blokkeert mutatie en server weigert rechtstreeks verzoek |
 | Foutisolatie | Geforceerde modulefout laat andere Workspace-modules bruikbaar |
@@ -307,14 +312,25 @@ duplicatierisico voordat de module een tweede presentatie krijgt.
 - bescherm niet-opgeslagen wijzigingen;
 - valideer routewisseling, refresh en sessieverloop.
 
-### PR D — productbewijs
+### Bouwstap D — productbewijs
 
 - voeg de native end-to-endreis, toegankelijkheidsproeven en prestatiemeting toe;
 - leg voor/na-resultaten vast;
 - kwalificeer de slice tegen dit passport.
 
-Iedere PR blijft afzonderlijk terugrolbaar. De volgende begint pas wanneer de
-vorige broncontracten en relevante CI groen zijn.
+De integratiekandidaat bevat inmiddels afzonderlijke browserproeven voor de
+native aanvraag, Flow-handoff en accountwisseling, antwoordverlies zonder
+tweede mutatie, de bestaande menselijke bevestigingsstatus en de kritieke
+toetsenbord-, focus-, touch-, tekstvergrotings- en reduced-motiongrenzen. De
+platformbrede schermlezerkeuring en prestatiemeting op representatieve echte
+apparaten blijven onderdeel van eindkwalificatiestroom Q.
+
+Iedere bouwstap blijft afzonderlijk herkenbaar en terugrolbaar. Een volgende
+afhankelijke stap begint pas nadat de relevante lokale contract-,
+autorisatie-, gegevensbehoud- en regressietoetsen van zijn basis slagen.
+Platformbrede CI-afwijkingen blijven geregistreerd en worden in de gezamenlijke
+eindkwalificatie opgelost; zij blokkeren uitsluitend werk dat werkelijk van de
+afwijkende grens afhankelijk is.
 
 ## 15. Beslisgrenzen
 

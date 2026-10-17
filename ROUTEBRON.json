@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-14T08:41:03.184Z",
-  "commit": "6ed85893b",
+  "op": "2026-10-16T12:04:18.324Z",
+  "commit": "7ecba8058",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -134,6 +134,7 @@
     "server/bedrijf/waarom.js",
     "server/bedrijf/werkruimte.js",
     "server/bedrijf/wieis.js",
+    "server/bedrijf/zaakregie.js",
     "server/betaal-connect.js",
     "server/betaal-regie.js",
     "server/betaal-sandbox.js",
@@ -824,6 +825,7 @@
     "server/kern/command/runbookcatalogus.js",
     "server/kern/command/runbooks-historie.js",
     "server/kern/command/runbooks.js",
+    "server/kern/command/sensorstilte-koppelingen.js",
     "server/kern/command/sensorstilte.js",
     "server/kern/command/simulatie.js",
     "server/kern/command/slo-rekenen.js",
@@ -897,6 +899,7 @@
     "server/kern/commercie/subsidie.js",
     "server/kern/commercie/tegenfeit.js",
     "server/kern/commercie/tegoed.js",
+    "server/kern/commercie/tegoed/betaalbewijs.js",
     "server/kern/commercie/tegoed/inhoud.js",
     "server/kern/commercie/tegoed/plafond.js",
     "server/kern/commercie/veiligheidskern.js",
@@ -2405,6 +2408,19 @@
     "server/kern/retail/assortiment.js",
     "server/kern/retail/klant.js",
     "server/kern/retail/vloer.js",
+    "server/kern/revenue/catalogus-v1-validatie.js",
+    "server/kern/revenue/catalogus-v1.js",
+    "server/kern/revenue/commercial-binding-v1.js",
+    "server/kern/revenue/entitlement-eligibility-v1.js",
+    "server/kern/revenue/entitlement-eligibility-v1/contract.js",
+    "server/kern/revenue/entitlement-overzicht-v1.js",
+    "server/kern/revenue/entitlement-projectie-v1.js",
+    "server/kern/revenue/entitlement-projectie-v1/capability.js",
+    "server/kern/revenue/entitlement-projectie-v1/gedeeld.js",
+    "server/kern/revenue/entitlement-projectie-v1/gedelegeerd.js",
+    "server/kern/revenue/entitlement-projectie-v1/tenant.js",
+    "server/kern/revenue/entitlement-projectie-v1/workos.js",
+    "server/kern/revenue/index.js",
     "server/kern/rijksbieb-data.js",
     "server/kern/rijksbieb.js",
     "server/kern/routedekking.js",
@@ -2826,6 +2842,7 @@
     "server/kern/stuur/mandaat.js",
     "server/kern/stuur/mandaatpoort.js",
     "server/kern/stuur/menscontext-opzoek.js",
+    "server/kern/stuur/menscontext-presentatie.js",
     "server/kern/stuur/menscontext-ref.js",
     "server/kern/stuur/menscontext-relatie.js",
     "server/kern/stuur/menscontext-uit.js",
@@ -3133,6 +3150,12 @@
     "server/kern/zaakdoos/sleutels-uitgever.js",
     "server/kern/zaakdoos/sleutels.js",
     "server/kern/zaakdoos/synchronisatie.js",
+    "server/kern/zaakregie-context.js",
+    "server/kern/zaakregie-context/adapter.js",
+    "server/kern/zaakregie-context/basis.js",
+    "server/kern/zaakregie-context/hoedanigheid.js",
+    "server/kern/zaakregie-context/organisatie.js",
+    "server/kern/zaakregiebeeld.js",
     "server/kern/zegelfeiten.js",
     "server/kern/zelfzorg/beschermen.js",
     "server/kern/zelfzorg/index.js",
@@ -3438,6 +3461,7 @@
     "server/lib/mutatiecontracten-wonen.js",
     "server/lib/mutatiecontracten-zaakdoos.js",
     "server/lib/mutatiecontracten-zaakkant.js",
+    "server/lib/mutatiecontracten-zaakregie.js",
     "server/lib/mutatiecontracten-zwaar.js",
     "server/lib/mutatiecontracten.js",
     "server/lib/padvorm.js",
@@ -4502,6 +4526,7 @@
     "server/betaal/connect",
     "server/betaal/uitbetaalgate.json",
     "server/config",
+    "server/data",
     "server/db",
     "server/db/tx",
     "server/foundation",
@@ -4690,6 +4715,11 @@
     "server/kern/reservering",
     "server/kern/residentie",
     "server/kern/retail",
+    "server/kern/revenue",
+    "server/kern/revenue/AI-CREDIT-PAYMENT-RISK.md",
+    "server/kern/revenue/catalogus-v1.schema.json",
+    "server/kern/revenue/entitlement-eligibility-v1",
+    "server/kern/revenue/entitlement-projectie-v1",
     "server/kern/rtc",
     "server/kern/rtfos",
     "server/kern/rugdekking",
@@ -4732,6 +4762,7 @@
     "server/kern/werkcommand",
     "server/kern/zaakcommand",
     "server/kern/zaakdoos",
+    "server/kern/zaakregie-context",
     "server/kern/zelfzorg",
     "server/kern/zorgketen",
     "server/lib",
@@ -5379,6 +5410,15 @@
      "pad": "server/kern/retail"
     },
     {
+     "pad": "server/kern/revenue"
+    },
+    {
+     "pad": "server/kern/revenue/entitlement-eligibility-v1"
+    },
+    {
+     "pad": "server/kern/revenue/entitlement-projectie-v1"
+    },
+    {
      "pad": "server/kern/rtc"
     },
     {
@@ -5500,6 +5540,9 @@
     },
     {
      "pad": "server/kern/zaakdoos"
+    },
+    {
+     "pad": "server/kern/zaakregie-context"
     },
     {
      "pad": "server/kern/zelfzorg"
@@ -5718,7 +5761,7 @@
     "git log -1 --format=%cI",
     "node scripts/routekaart.js --json"
    ],
-   "nodeHoofdversie": 26
+   "nodeHoofdversie": 24
   }
  },
  "vergelekenMet": {
@@ -5732,9 +5775,9 @@
  },
  "grens": "Een verschil is pas een TEGENSPRAAK als beide betrokken bestanden stilstaan sinds het stempel van het andere register. Verschilt de leeftijd, dan vergelijk je twee momenten -- dat wordt hier apart geteld en nooit als tegenspraak gepresenteerd.",
  "gemeten": {
-  "routerRoutes": 5529,
+  "routerRoutes": 5530,
   "routerRoutesZonderBestand": 4,
-  "routerRoutesMetBestand": 5525,
+  "routerRoutesMetBestand": 5526,
   "bronRoutesMetBestand": 4441,
   "beideKennen": 4121,
   "gelijk": 4079,
@@ -5742,7 +5785,7 @@
   "waarvanVerouderd": 42,
   "waarvanTegenspraak": 0,
   "waarvanNietVastTeStellen": 0,
-  "alleenRouter": 1404,
+  "alleenRouter": 1405,
   "alleenBron": 320,
   "toetsbaarPct": 74.6
  },
@@ -6732,6 +6775,7 @@
   "POST /api/bedrijf/werkruimte/entiteit",
   "POST /api/bedrijf/werkruimte/maak",
   "POST /api/bedrijf/werkruimte/tekenwijze",
+  "POST /api/bedrijf/zaakregie",
   "POST /api/bedrijf/zoek",
   "POST /api/beraad/heropen",
   "POST /api/beraad/hulp",
@@ -13415,31 +13459,31 @@
   {
    "route": "POST /api/bedrijf/taak/kolom",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 76,
+   "regel": 101,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taak/maak",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 30,
+   "regel": 43,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taak/uren",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 102,
+   "regel": 127,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taak/wacht-op",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 55,
+   "regel": 80,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taken",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 117,
+   "regel": 142,
    "samengesteld": false
   },
   {
@@ -13578,6 +13622,12 @@
    "route": "POST /api/bedrijf/werkruimte/tekenwijze",
    "bestand": "server/bedrijf/samentekenen.js",
    "regel": 79,
+   "samengesteld": false
+  },
+  {
+   "route": "POST /api/bedrijf/zaakregie",
+   "bestand": "server/bedrijf/zaakregie.js",
+   "regel": 46,
    "samengesteld": false
   },
   {

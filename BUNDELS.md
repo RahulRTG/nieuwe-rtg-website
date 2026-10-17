@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9908 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9954 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -40,9 +40,9 @@ omlaag.
 | `app-main-09a1.js` | jouw RTG PIN: stand, veiligheidsjournaal en vaste QR |
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
-| `app-main-10.js` | de directe berichten: versturen en aan het gesprek toevoegen |
-| `app-main-11.js` | het videogesprek: aanbod, antwoord en de verbinding |
-| `app-main-12.js` | de meldingenlijst en het ongelezen-merk |
+| `app-main-10.js` | DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING |
+| `app-main-11.js` | DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE |
+| `app-main-12.js` | DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK |
 | `app-main-12a.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |
 | `app-main-12b.js` | De tickets van het lid: het aanbod en wat hij al heeft |
 | `app-main-13.js` | het ticketkanaal: partners, activiteiten en hun tijden |
@@ -568,7 +568,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 916 regels in de delen
+`public/shared/basis/` -- 10 delen, 932 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -630,7 +630,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 372 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 377 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -831,7 +831,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 810 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 816 regels in de delen
 
 | deel | onderwerp |
 |---|---|

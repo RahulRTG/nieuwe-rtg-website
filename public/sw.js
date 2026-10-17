@@ -4,21 +4,17 @@
    `npm run swcache` na een wijziging aan de schil; keuringsregel controleert
    of hij nog klopt.
 
-   WAAROM DIT ERTOE DOET. Een geinstalleerde app ruimt oude caches alleen op
-   bij `activate`, en dan alleen die met een ANDERE naam. Blijft de naam
-   staan terwijl de schil verandert, dan houdt een toestel zijn oude schil --
-   en dat is precies wat er kan gebeuren zijn bij het toestel dat de app
-   installeerde in de periode dat de `cache: 'no-cache'` hieronder was
-   gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
-   niet vergeten worden. */
-const CACHE = 'rtg-app-a43aec7e';
+   Een inhoudsafdruk voorkomt dat een geinstalleerde app een oude schil houdt. */
+const CACHE = 'rtg-app-51a983c4';
 const SHELL = [
-  /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
   '/shared/interface/workspace-registries.js',
   '/shared/interface/workspace-session.js',
+  '/shared/experience-intent.js',
+  '/shared/interface/workspace-intents.js',
   '/shared/interface/workspace-policy.js',
+  '/shared/interface/workspace-assistant-manifest.js',
   '/shared/interface/workspace-context.js',
   '/shared/interface/workspace-navigation.js',
   '/shared/interface/workspace-state.js',
@@ -61,7 +57,7 @@ const SHELL = [
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
   '/shared/rtg-warm-details.css', '/shared/rtg-personal-images.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
-  '/shared/rtg-cinematic-system.css', '/shared/rtg-cinematic-system.js',
+  '/shared/rtg-editorial-v4.css', '/shared/rtg-editorial-v4-model.js', '/shared/rtg-editorial-v4.js',
   '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
   '/shared/rtg-continue-key.css', '/shared/rtg-continue-key-core.js',
@@ -71,7 +67,7 @@ const SHELL = [
   '/shared/rtg-edge-2-loader.js', '/shared/rtg-edge-2-context.js', '/shared/rtg-edge-command.js',
   '/shared/rtg-edge-2.js', '/shared/rtg-edge-2.css',
   '/shared/experience-handoff.js', '/shared/rtg-adaptive-edge-loader.js', '/shared/rtg-adaptive-edge-core.js', '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/apps/muziek-edge.js', '/shared/rtg-edge-pages.js', '/shared/rtg-communication-surface.css', '/shared/rtg-communication-surface.js', '/shared/adaptief/grammatica.js',
-  '/shared/rtg-adaptive-edge-services.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js', '/shared/rtg-adaptive-edge.css',
+  '/shared/rtg-adaptive-edge-services.js', '/shared/rtg-adaptive-edge-visual.js', '/shared/rtg-adaptive-edge-cinema.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js', '/shared/rtg-adaptive-edge.css',
   '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js',
   '/images/worlds/heritage/living-heritage-v2.jpg',
   '/images/worlds/heritage/travel-heritage-v2.jpg',
@@ -84,8 +80,9 @@ const SHELL = [
      kale Home worden omgebogen, maar moeten bij de eerste start wel openen. */
   '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
-  '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
-  '/shared/interface/modules/context.js', '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
+  '/shared/interface/second-screen.css', '/shared/interface/workspace-components.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
+  '/shared/interface/modules/context.js', '/shared/interface/modules/work-view.js', '/shared/interface/modules/work-edge.js', '/shared/interface/modules/work.js',
+  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
 
   '/shared/i18n.js',
   '/shared/taalschil/zh.json', '/shared/taalschil/hi.json', '/shared/taalschil/es.json',

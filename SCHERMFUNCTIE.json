@@ -3,7 +3,7 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-17",
-    "commit": "37eca2d5c"
+    "commit": "e59276116"
   },
   "bronnen": {
     "schermroutes": {
@@ -9754,7 +9754,7 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 18,
+      "inkomend": 17,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -9766,9 +9766,9 @@
         "public/shared/clipdeler.js",
         "public/shared/clipdeler/clipdeler-01.js",
         "public/shared/rosapps.js",
-        "public/shared/rtg-adaptive-edge-cinema.js",
         "public/shared/rtg-adaptive-edge-services.js",
-        "public/shared/rtg-adaptive-edge-visual.js"
+        "public/shared/rtg-adaptive-edge-visual.js",
+        "public/shared/split.js"
       ]
     },
     {

@@ -161,7 +161,11 @@ async function main() {
               publicDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wp-edit-images'),
               publicHeader:rect('.pp-header'), v4Header:rect('body>.rtg-v4-header,[data-rtg-v4-canvas-toolbar="true"]'),
               canvasToolbar:visible('[data-rtg-v4-canvas-toolbar="true"]'),
-              visibleLegacyHeaders:[...document.querySelectorAll('body>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]),.wd-page>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]),.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom')].filter(shown).length,
+              /* A ritkop is the Travel arrival hero: it carries the page's
+                 editorial content and is deliberately kept by the V4 shell.
+                 Counting it as a second shell header made the audit reject the
+                 one-screen composition it is meant to protect. */
+              visibleLegacyHeaders:[...document.querySelectorAll('body>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]):not(.ritkop):not([data-rtg-v4-content-header]),.wd-page>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]):not(.ritkop):not([data-rtg-v4-content-header]),.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom')].filter(shown).length,
               accessRect:rect('[data-rtg-access]'),
               background:css.backgroundColor, editorialVersion:css.getPropertyValue('--rtg-editorial-version').trim(), headingFont:heading&&getComputedStyle(heading).fontFamily, edgeState:b.getAttribute('data-rtg-edge-2-state'), padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
               edges:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length,

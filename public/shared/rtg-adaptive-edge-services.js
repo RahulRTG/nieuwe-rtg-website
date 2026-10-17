@@ -17,7 +17,11 @@
     button.addEventListener('click', action); return button;
   }
   function hasQuestionSurface() {
-    if (d.querySelector('#rtgCommand .cmd-pane.actief .cmd-vraagvorm')) return true;
+    /* De oorspronkelijke vraagbalk is na de overdracht aan Edge bewust niet
+       zichtbaar. Zijn formulier blijft wel de uitvoerende bron. Zichtbaarheid
+       als voorwaarde maakte de enige zichtbare Rahul-ingang daarom tot een
+       informatiemenu zonder invoerveld. */
+    if (d.querySelector('#rtgCommand .cmd-vraagvorm')) return true;
     var node = d.getElementById('rvRahul');
     if (!node || node.hidden) return false;
     var style = w.getComputedStyle(node), box = node.getBoundingClientRect();

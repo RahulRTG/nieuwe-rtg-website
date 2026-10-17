@@ -51,12 +51,10 @@
     var scrollTimer = null, quietTimer = null, positions = new WeakMap(), listeners = [];
     function listen(target,type,callback,options){target.addEventListener(type,callback,options);listeners.push([target,type,callback,options]);}
     var D=null;
-    function quiet(){rt.win.clearTimeout(quietTimer);
-      if(!rt.model)return;
-      if(pinned(rt)||rt.model.state==='deck'||rt.model.state==='expanded')return;
-      quietTimer=rt.win.setTimeout(function(){if(pinned(rt))return;if(busy(rt))return quiet();
-        if(rt.model.state==='dock')handlers.state('peek','quiet');},3600);
-    }
+    /* De volledige vijfdelige Edge is de standaard. Stilte is geen intentie om
+       bediening te verbergen: alleen een werkelijk scroll- of veeggebaar mag
+       tijdelijk de compacte leesstand kiezen. */
+    function quiet(){rt.win.clearTimeout(quietTimer);}
     function wake(){rt.win.clearTimeout(quietTimer);
       if(rt.model&&rt.model.state==='peek')handlers.state('dock','wake');
     }

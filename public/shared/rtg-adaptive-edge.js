@@ -15,11 +15,11 @@
     return false;
   }
   function execute(action){
+    if (rt.edge.onEdgeAction && rt.edge.onEdgeAction(action) === true) return true;
     if (action === 'context' || action === 'primary') {
       setDeck(action === 'ai' ? 'rahul' : 'actions');
       Input.prepare(rt, action); setState('expanded'); return true;
     }
-    if (rt.edge.onEdgeAction && rt.edge.onEdgeAction(action) === true) return true;
     setState('dock');
     if (action === 'home') { if (w.dispatchEvent(new w.CustomEvent('rtg-edge-home', { cancelable: true }))) w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }
@@ -48,10 +48,6 @@
     rt.sheetCopy.textContent = continuation && continuation.copy || 'Wat wilt u doen?';
     rt.sheetList.textContent = '';
     if (rt.renderControls) rt.renderControls();
-    if (!(rt.controls && rt.controls.children.length) && !rt.primarySlot) {
-      var empty = d.createElement('p'); empty.className = 'rtg-adaptive-empty';
-      empty.textContent = 'Voor deze context zijn geen veilige acties beschikbaar.'; rt.sheetList.appendChild(empty);
-    }
     Services.modes(rt);
   }
   function renderDeck() {
@@ -139,7 +135,7 @@
       var state = d.body.dataset.rtgEdge2State;
       if (d.body.dataset.rtgEdgeVensterOpen === 'true') return;
       if (state === 'focus') setState('dock', 'auto');
-      else if (state === 'compact') setState('peek', 'auto');
+      else if (state === 'compact') setState('dock', 'auto');
       else if (state === 'overview' && rt.model.state === 'peek') setState('dock', 'auto');
     });
     if (rt.observer) rt.observer.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-edge-2-state', 'data-rtg-edge-venster-open'] });

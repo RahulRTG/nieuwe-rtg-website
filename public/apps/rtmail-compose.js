@@ -15,7 +15,12 @@
   var fields=form.querySelector('form'), controls=form.querySelector('.rtm-compose-controls'), status=form.querySelector('[role="status"]');
   var drafts=d.createElement('section');drafts.className='rtm-draft-list';drafts.hidden=true;drafts.setAttribute('aria-label','Uw concepten');home.querySelector('.rtm-binnen').appendChild(drafts);
   function tell(s){status.textContent=s;}
-  function mount(){if(!form.hidden&&!release&&w.RTGAdaptiveEdge)release=w.RTGAdaptiveEdge.mountSurface(controls,{kind:'mail'});}
+  function mount(){
+    if(form.hidden||release)return;
+    /* Leen de echte knoppen uit. Zo blijven bewaren, teruggaan en de
+       bevestigde verzending dezelfde listeners en dezelfde backend houden. */
+    if(w.RTGAdaptiveEdge)release=w.RTGAdaptiveEdge.mountSurface(controls,{kind:'mail'});
+  }
   function values(){return {id:current&&current.id,naar:fields.elements.naar.value,onderwerp:fields.elements.onderwerp.value,tekst:fields.elements.tekst.value};}
   function save(){
     clearTimeout(timer);var rev=revision, data=values();

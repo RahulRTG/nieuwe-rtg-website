@@ -9,18 +9,20 @@ const lees = naam => fs.readFileSync(path.join(ROOT, naam), 'utf8');
 const kern = require('../public/shared/rtg-adaptive-edge-core.js');
 const VIEW = lees('public/shared/rtg-adaptive-edge.js');
 const SERVICES = lees('public/shared/rtg-adaptive-edge-services.js');
+const VISUAL = lees('public/shared/rtg-adaptive-edge-visual.js');
+const CINEMA = lees('public/shared/rtg-adaptive-edge-cinema.js');
 const INPUT = lees('public/shared/rtg-adaptive-edge-input.js');
 const CSS = lees('public/shared/rtg-adaptive-edge.css');
 const LOADER = lees('public/shared/rtg-edge-2-loader.js');
 const ADAPTIVE_LOADER = lees('public/shared/rtg-adaptive-edge-loader.js');
 const SIGNALS = lees('public/shared/rtg-adaptive-edge-signals.js');
-const CINEMA = lees('public/shared/rtg-cinematic-system.css');
+const EDITORIAL = lees('public/shared/rtg-editorial-v4.css');
 const SW = lees('public/sw.js');
 
-test('Adaptive Edge heeft vier toestanden en vijf vaste decks', () => {
+test('Adaptive Edge heeft vier toestanden en zeven swipebare decks', () => {
   assert.deepEqual(kern.STATES, ['peek', 'dock', 'deck', 'expanded']);
-  assert.deepEqual(kern.DECKS, ['home', 'context', 'actions', 'connect', 'rahul']);
-  assert.equal(kern.nextDeck('home', 1), 'context');
+  assert.deepEqual(kern.DECKS, ['home', 'apps', 'object', 'context', 'actions', 'connect', 'rahul']);
+  assert.equal(kern.nextDeck('home', 1), 'apps');
   assert.equal(kern.nextDeck('home', -1), 'rahul');
   assert.equal(kern.nextDeck('rahul', 1), 'home');
   assert.equal(kern.normState('onbekend'), 'dock');
@@ -86,8 +88,8 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /\.hv-balk:not\(\.hv-weg\)/);
   assert.doesNotMatch(CSS, /grid-template-columns:minmax\(108px,1fr\)/,
     'desktop krijgt geen tweede Edge-geometrie');
-  assert.match(VIEW, /rtg-adaptive-item-copy/);
-  assert.match(VIEW, /Vraag of regel iets/);
+  assert.match(VISUAL, /rtg-adaptive-item-copy/);
+  assert.match(VISUAL, /Vraag of regel iets/);
 });
 
 test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
@@ -114,6 +116,7 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
     '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/shared/rtg-adaptive-edge-services.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
+    '/shared/rtg-adaptive-edge-visual.js', '/shared/rtg-adaptive-edge-cinema.js',
     '/shared/adaptief/grammatica.js', '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
@@ -136,9 +139,23 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
 });
 
 test('alle Adaptive Edge-browsermodules blijven onder de productlimiet', () => {
-  for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-controls.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge-services.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
+  for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-controls.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge-services.js', 'rtg-adaptive-edge-visual.js', 'rtg-adaptive-edge-cinema.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
     assert.ok(fs.statSync(path.join(ROOT, 'public/shared', naam)).size < 10 * 1024, naam + ' is te groot');
   }
+});
+
+test('beeld, apps, objecten en communicatie zijn toestanden van dezelfde Edge', () => {
+  assert.match(VISUAL, /app:travel/);
+  assert.match(VISUAL, /rtg-edge-object-thumb/);
+  assert.match(VISUAL, /incoming|call/);
+  assert.match(VISUAL, /kind==='mail'/);
+  assert.match(VISUAL, /kind==='chat'/);
+  assert.match(VISUAL, /rtg-edge-visual-action/);
+  assert.match(VIEW, /RTGAdaptiveEdgeVisual\.button/);
+  assert.match(EDITORIAL, /\.rtg-edge-live__avatar/);
+  assert.match(EDITORIAL, /\.rtg-edge-app-icon--photos/);
+  assert.match(CINEMA, /rtg-edge-cinema__story/);
+  assert.match(CINEMA, /travel-inspiration\.webp/);
 });
 
 
@@ -184,49 +201,56 @@ test('Quiet Presence gebruikt signalen, respecteert pin en bewaart een raakvlak 
   assert.match(CSS, /prefers-contrast:more\)\{\.rtg-adaptive-edge\[data-rtg-adaptive-presence="idle"\]/);
   assert.match(CSS, /@media\(prefers-reduced-motion:reduce\)\{\.rtg-adaptive-edge,\.rtg-adaptive-bar\{transition:none!important\}\}/);
   assert.match(CSS, /env\(safe-area-inset-bottom,0px\)/);
-  assert.match(CINEMA, /data-rtg-adaptive-presence="idle"\]\{[\s\S]*?width:88px!important;max-width:88px!important;height:48px!important/);
-  assert.match(CINEMA, /@media\(forced-colors:active\)\{body\[data-rtg-cinematic="true"\] :is\(\.rtg-adaptive-bar,[\s\S]*?background:Canvas!important/);
+  assert.match(EDITORIAL, /\.rtg-adaptive-bar\{[\s\S]*?height:64px!important/);
+  assert.match(EDITORIAL, /@media\(forced-colors:active\)\{\.rtg-v4-header,[\s\S]*?background:Canvas!important/);
 });
 
-test('de filmische laag is centraal en volgt na de wereldgrammatica', () => {
+test('de definitieve editorial laag is centraal en vervangt de oude presentatielagen', () => {
   const heritage = lees('public/shared/rtg-heritage.css');
+  const basisBron = lees('public/shared/basis/basis-01.js');
   const basis = lees('public/shared/basis.js');
-  assert.match(heritage, /@import url\('\.\/rtg-cinematic-system\.css(?:\?[^']+)?'\);/);
-  assert.match(basis, /\['rtg-heritage-components', 'RTGHeritageComponents'\],[\s\S]*\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
+  assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
+  assert.doesNotMatch(heritage, /rtg-(?:cinematic|editorial)-system\.css/);
+  assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basisBron, /laadEditorialBlad\(\)/);
+  assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
 });
 
-test('www bepaalt de vaste kaders van app, header en Edge', () => {
+test('www bepaalt de vaste kaders van app, header en Edge in editorial v4', () => {
   const heritage = lees('public/shared/rtg-heritage.css');
-  const css = lees('public/shared/rtg-cinematic-system.css');
+  const css = lees('public/shared/rtg-editorial-v4.css');
   assert.match(heritage, /--rtg-frame-mobile:16px/);
   assert.match(heritage, /--rtg-header-mobile:64px/);
   assert.match(heritage, /--rtg-edge-mobile-height:64px/);
   assert.match(heritage, /--rtg-edge-desktop-width:660px/);
-  assert.match(css, /width:calc\(100% - \(var\(--rtg-frame-mobile\) \* 2\)\)!important/);
-  assert.match(css, /width:calc\(100vw - \(var\(--rtg-edge-mobile-inset\) \* 2\)\)!important/);
+  assert.match(css, /\.wd-shell\{[^}]*width:min\(calc\(100% - 2 \* var\(--v4-frame\)\),var\(--v4-wide\)\)!important/);
+  assert.match(css, /\.rtg-adaptive-bar\{[^}]*inset-inline:clamp\(12px,3vw,24px\)!important;[^}]*max-width:620px!important/);
+  assert.match(css, /--edge-bar-bg:rgba\(10,10,9,\.9\)!important/);
+  assert.match(css, /border:1px solid rgba\(217,188,137,\.55\)!important/);
 });
 
-test('alle vier werelden gebruiken bestaande lokale productiebeelden', () => {
-  const css = lees('public/shared/rtg-cinematic-system.css');
-  ['living', 'travel', 'work', 'foundation'].forEach((world) => {
-    const relative = `public/images/worlds/heritage/${world}-heritage-v2.jpg`;
+test('alle vier werelden gebruiken bestaande lokale editorial productiebeelden', () => {
+  const css = lees('public/shared/rtg-editorial-v4.css');
+  const images = ['living-home.webp', 'travel-inspiration.webp', 'company-technology.webp', 'foundation-care.webp'];
+  for (const image of images) {
+    const relative = `public/images/editorial/${image}`;
     assert.equal(fs.existsSync(path.join(ROOT, relative)), true, `${relative} ontbreekt`);
-    assert.match(css, new RegExp(`${world}-heritage-v2\\.jpg`));
-  });
+    assert.match(css, new RegExp(image.replace('.', '\\.') ));
+  }
 });
 
-test('de filmische laag benoemt bestaande schermen en tekent geen tweede Edge', () => {
-  const source = lees('public/shared/rtg-cinematic-system.js');
-  assert.match(source, /data-rtg-cinematic-root/);
-  assert.match(source, /data-rtg-cinematic-lead/);
-  assert.doesNotMatch(source, /createElement|appendChild|insertAdjacentHTML|innerHTML\s*=/);
-  assert.match(source, /SKIP = '\.rtg-edge-chrome/);
+test('de editorial runtime classificeert bestaande schermen en tekent geen tweede Edge', () => {
+  const source = lees('public/shared/rtg-editorial-v4.js');
+  assert.match(source, /body\.dataset\.rtgEditorialV4 = 'true'/);
+  assert.match(source, /body\.dataset\.rtgV4Kind = classify/);
+  assert.doesNotMatch(source, /createElement\(['"](?:nav|aside)['"]\)/);
+  assert.doesNotMatch(source, /rtg-adaptive-edge[^\n]*createElement/);
 });
 
-test('native canvassen blijven uitgesloten van fotografische inhoudsregie', () => {
-  const source = lees('public/shared/rtg-cinematic-system.js');
-  const css = lees('public/shared/rtg-cinematic-system.css');
-  assert.match(source, /canvas \|\| declared === 'canvas'/);
-  assert.match(source, /kind === 'immersive'/);
-  assert.match(css, /data-rtg-cinematic-kind="immersive"/);
+test('native canvassen krijgen alleen een vaste veilige viewport', () => {
+  const source = lees('public/shared/rtg-editorial-v4-model.js');
+  const css = lees('public/shared/rtg-editorial-v4.css');
+  assert.match(source, /canvas \|\| declared === 'canvas' \|\| declared === 'immersive'/);
+  assert.match(css, /data-rtg-v4-kind="canvas"/);
+  assert.match(css, /\[data-rtg-native-canvas\]/);
 });

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '7008ca01';
+var RTG_BOUW = '9470a914';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1941,7 +1941,7 @@ var RTG_BOUW = '7008ca01';
   async function stuurDm(){
     const text = $('#dmInput').value.trim();
     if (!text || !dmWith) return;
-/* de directe berichten: versturen en aan het gesprek toevoegen */
+/* DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING. */
     $('#dmInput').value = '';
     try {
       const d = await API.call('/member/dm/send', { toKey: dmWith, text });
@@ -1950,7 +1950,6 @@ var RTG_BOUW = '7008ca01';
   }
   $('#dmSend').addEventListener('click', stuurDm);
   $('#dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuurDm(); });
-  // RTG-eigen emoji-kiezer bij de DM-invoer
   (function(){ const inp = $('#dmInput'); if (inp && inp.parentNode && window.RTGEmoji && !inp.parentNode.querySelector('.rtg-emo-knop')) { inp.parentNode.insertBefore(RTGEmoji.knop(inp), inp); } })();
   const dmDicht = () => { $('#dm-sheet').classList.remove('open'); $('#dm-scrim').classList.remove('open'); dmWith = null; };
   $('#dmClose').addEventListener('click', dmDicht);
@@ -1959,7 +1958,6 @@ var RTG_BOUW = '7008ca01';
   $('#ride-scrim').addEventListener('click', () => { $('#ride-sheet').classList.remove('open'); $('#ride-scrim').classList.remove('open'); });
   $('#dm-scrim').addEventListener('click', dmDicht);
 
-  /* ---- post delen ---- */
   let deelPost = null;
   function openShare(postId){
     if (!socialOK){ toast(T('sal.eerstlid','Alleen voor leden.')); return; }
@@ -1980,14 +1978,10 @@ var RTG_BOUW = '7008ca01';
   $('#shareClose').addEventListener('click', () => { $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open'); });
   $('#share-scrim').addEventListener('click', () => { $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open'); });
 
-  /* ---- bellen en videobellen (WebRTC) ---- */
-  let call = null;        // { pc, stream, withKey, naam, video, richting, pendingIce, timer, t0 }
-  let inkomend = null;    // { from, codename, video }
-  let csMee = null;       // de tekstbaan van het gesprek (shared/meelezen.js)
+  let call = null;
+  let inkomend = null;
+  let csMee = null;
 
-  /* MEELEZEN. Zonder tekstbaan kan wie doof is niet meedoen aan een gesprek in
-     dit huis (TOEGANKELIJK.md). Getypt EN, waar een lokaal model draait,
-     herkend uit de eigen stem -- zie /shared/meelezen.js en /shared/meeluister.js. */
   function csBaan(){
     if (csMee || !window.RTGMeelezen) return csMee;
     csMee = window.RTGMeelezen.maak({
@@ -2003,15 +1997,16 @@ var RTG_BOUW = '7008ca01';
   function belUI(open){
     $('#callScreen').classList.toggle('open', !!open);
     if (open) csBaan();
-    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; if (csMee) csMee.leeg(); }
+    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; if (csMee) csMee.leeg(); if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.close(); }
   }
   function belTimer(){
     if (!call) return;
     const s = Math.round((Date.now() - call.t0) / 1000);
-    $('#csTijd').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    const tijd = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    $('#csTijd').textContent = tijd;
+    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.update({duration:tijd});
   }
   let iceConfig = null;
-  // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
   async function haalIce(){ try { iceConfig = (await API.call('/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
@@ -2027,11 +2022,10 @@ var RTG_BOUW = '7008ca01';
       else if (pc.connectionState === 'closed') eindeGesprek(false);
     };
     call.pc = pc;
-    window.__rtgCall = () => call; // voor tests
+    window.__rtgCall = () => call;
     return pc;
   }
   async function pakMedia(video){
-    // shared/media.js noemt de oorzaak en plaatst de volle uitleg zelf
     try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
     catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
@@ -2043,6 +2037,7 @@ var RTG_BOUW = '7008ca01';
     $('#csCam').style.display = video ? '' : 'none';
     $('#csTijd').textContent = T('sal.belt','gaat over…');
     belUI(true);
+    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'active-call',name:naam,duration:T('sal.belt','gaat over…')});
   }
   async function beginGesprek(video){
     if (!dmWith) return;
@@ -2086,6 +2081,7 @@ var RTG_BOUW = '7008ca01';
     $('#callIncoming').classList.remove('open');
     if (inkomend) API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
     inkomend = null;
+    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.close();
   });
 
   function eindeGesprek(zeggen){
@@ -2123,10 +2119,11 @@ var RTG_BOUW = '7008ca01';
       $('#ciNaam').textContent = d.codename;
       $('#ciSoort').textContent = d.video ? T('sal.videogesprek','Videogesprek') : T('sal.spraakoproep','Spraakoproep');
       $('#callIncoming').classList.add('open');
+      if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'incoming-call',name:d.codename});
       return;
     }
     if (!call || d.from !== call.withKey) return;
-/* het videogesprek: aanbod, antwoord en de verbinding */
+/* DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE. */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();
@@ -2154,15 +2151,20 @@ var RTG_BOUW = '7008ca01';
     }
   }
 
+  window.addEventListener('rtg-edge-visual-action',function(event){
+    const x=event.detail||{};
+    if(x.kind==='incoming-call'){if(x.action==='accept')neemOp();if(x.action==='decline')$('#ciNee').click();return;}
+    if(x.kind!=='active-call'||!call)return;
+    if(x.action==='decline')eindeGesprek(true);else if(x.action==='microphone')$('#csMute').click();
+    else if(x.action==='speaker')$('#csRemote').muted=!$('#csRemote').muted;
+  });
+
   function opSociaal(d){
     if (d.kind === 'request'){ toast('' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
     else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
-        /* Een gedeelde post zit niet in het seintje (alleen postId): de server
-           lost hem op met DEZE sessie bij het ophalen van het gesprek, dat we
-           toch al doen om hem als gelezen te markeren. */
-        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null); // gelezen
+        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null);
         if (d.postId == null) dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
         else gesprek.then(r => {
           const lijst = (r && r.messages) || [];
@@ -2303,7 +2305,7 @@ var RTG_BOUW = '7008ca01';
     if (h < 24) return h + T('t.hour',' uur') + ago;
     return Math.round(h / 24) + T('t.days',' dag(en)') + ago;
   }
-
+/* DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK. */
   function renderBell(){
     const R = window.RTGRealtime;
     if (!R) return;
@@ -2318,7 +2320,6 @@ var RTG_BOUW = '7008ca01';
     const ccTel = $('#osCcBelTel');
     if (ccTel){ ccTel.hidden = n <= 0; ccTel.textContent = n > 0 ? (n > 9 ? '9+' : n) : ''; }
     const list = $('#notifList');
-/* de meldingenlijst en het ongelezen-merk */
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +

@@ -68,17 +68,11 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
       if (await lokaal.isVisible()) return page.locator('#wkRahulExpand').click();
       const mouth = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
       if (await mouth.isVisible()) {
-        await mouth.click();
-        const open = page.getByRole('button', { name: 'Open beveiligd gesprek' });
-        await open.waitFor({ state: 'visible' });
-        return open.click();
+        return require('./helper').edgeRahul(page);
       }
       // De open sheet vervangt de balk. Haar zichtbare mond gebruikt dezelfde
       // uitvoering en moet de oude laag opruimen zonder een tweede navigator.
-      await page.locator('.rtg-adaptive-sheet [data-rtg-sheet-action="ai"]').click();
-      const open = page.getByRole('button', { name: 'Open beveiligd gesprek' });
-      await open.waitFor({ state: 'visible' });
-      await open.click();
+      await require('./helper').edgeRahul(page);
     };
 
     const vraag = async (token, tekst) => {
@@ -131,7 +125,10 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
           return x && (x.hidden || !x.classList.contains('page'));
         });
 
-        await page.click('.rtg-edge-state');
+        /* De bronknop is in V4 bewust onzichtbaar; de Adaptive Edge projecteert
+           hem als status-capability. Open hier de bronhandler rechtstreeks om
+           uitsluitend de wederzijdse laagsluiting te toetsen. */
+        await page.locator('.rtg-edge-state').evaluate((button) => button.click());
         await page.waitForSelector('.rtg-edge-status-panel[aria-hidden="false"]');
         await openRahul();
         await page.waitForSelector('.wk-rahul.page:not([hidden])');
@@ -160,13 +157,15 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
           ['.rtg-edge-state', '.rtg-edge-status-panel[aria-hidden="false"]'],
           ['.rtg-adaptive-bar [data-rtg-adaptive-action="context"]', '.rtg-adaptive-sheet:not([hidden])']
         ]) {
-          await page.click(knop);
+          if (knop === '.rtg-edge-state') await page.locator(knop).evaluate((button) => button.click());
+          else await page.click(knop);
           await page.waitForSelector(openLaag);
           assert.equal(await page.locator('.wk-rahul.page:not([hidden])').count(), 0,
             knop + ' sluit eerst de Werk-Rahul');
           assert.equal(await page.locator('.rtg-edge-ai[aria-expanded="true"]').count(), 0,
             knop + ' laat Rahul niet als open aangekondigd staan');
           if (await page.locator('.rtg-adaptive-sheet').isVisible()) await page.click('[data-rtg-adaptive-close]');
+          else if (knop === '.rtg-edge-state') await page.locator(knop).evaluate((button) => button.click());
           else await page.click(knop);
           assert.equal(await page.locator(openLaag).isVisible(), false, 'de zichtbare sluitbediening sluit de actieve laag');
           await openRahul();

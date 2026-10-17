@@ -16,6 +16,22 @@
     button.innerHTML = '<span>' + esc(label) + '</span><b aria-hidden="true">→</b>';
     button.addEventListener('click', action); return button;
   }
+  function hasQuestionSurface() {
+    if (d.querySelector('#rtgCommand .cmd-pane.actief .cmd-vraagvorm')) return true;
+    var node = d.getElementById('rvRahul');
+    if (!node || node.hidden) return false;
+    var style = w.getComputedStyle(node), box = node.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+  }
+  function secureConversation(close) {
+    var button = serviceButton('Open beveiligd gesprek', function () {
+      close();
+      if (w.RTGMetgezel && typeof w.RTGMetgezel.rahul === 'function') return w.RTGMetgezel.rahul();
+      var source = d.querySelector('.rtg-rahul-tab');
+      if (source) source.click();
+    });
+    button.classList.add('rtg-adaptive-sheet-action', 'rtg-adaptive-secure-conversation'); return button;
+  }
   function navigate(rt, api, path) {
     if (!path) return false;
     api.setState('dock'); rt.win.location.href = path; return true;
@@ -113,5 +129,5 @@
     modes(rt);
   }
   w.RTGAdaptiveEdgeServices = Object.freeze({ mount: mount, open: open, render: render, clear: clear,
-    modes: modes, escape: esc, lips: lips });
+    modes: modes, escape: esc, lips: lips, hasQuestionSurface: hasQuestionSurface, secureConversation: secureConversation });
 }(window, document));

@@ -27,14 +27,17 @@ test('a family profile never borrows an existing member identity for desktop wid
     page.on('request', r => { if (/\/api\/(comm\/inbox|auth\/me|ik\/(workspace|beelden)|bestanden\/|notities\/mijn|agenda\/bereik)/.test(r.url())) memberRequests.push(r.url()); });
     await page.goto(srv.base + '/apps/foundation/index.html');
     await page.waitForSelector('body[data-rtg-desktop]');
-    await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="ready"]');
+    // V4 houdt de voormalige bureaubladaccessoires bewust uit de zichtbare
+    // magazineschil. Hun brondata blijft wel actief en moet dezelfde
+    // tenant-/profielisolatie behouden.
+    await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="ready"]', { state: 'attached' });
     assert.match(await page.locator('.wd-greeting').innerText(), /Milan/);
     assert.equal(await page.locator('.wd-library [data-widget="geld"]').count(), 0);
     assert.deepEqual(memberRequests, []);
     // Logging out the family clears the old surfaces, even while the member token remains.
     await page.evaluate(() => { window.__oldDesktop = true; window.Sessie.uitloggen(); });
     await page.waitForFunction(() => !window.__oldDesktop && !!document.body.dataset.rtgDesktop);
-    await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="guest"]');
+    await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="guest"]', { state: 'attached' });
     assert.doesNotMatch(await page.locator('.wd-greeting').innerText(), /Milan|Ouder account/);
     assert.deepEqual(memberRequests, []); assert.deepEqual(errors, []);
   } finally { if (browser) await browser.close(); await stop(srv.child); }

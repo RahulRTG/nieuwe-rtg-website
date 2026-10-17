@@ -60,6 +60,10 @@
           add('script', '/shared/rtg-adaptive-edge-surface.js', 'RTGAdaptiveEdgeSurface', function () {
           add('script', '/shared/rtg-adaptive-edge-services.js', 'RTGAdaptiveEdgeServices', function (diensten) {
           if (!diensten) return;
+          add('script', '/shared/rtg-adaptive-edge-visual.js', 'RTGAdaptiveEdgeVisual', function (beeld) {
+          if (!beeld) return;
+          add('script', '/shared/rtg-adaptive-edge-cinema.js', 'RTGAdaptiveEdgeCinema', function (cinema) {
+          if (!cinema) return;
           add('script', '/shared/rtg-adaptive-edge.js', 'RTGAdaptiveEdge', function (klaar) {
             if (!klaar) return;
             w.RTGAdaptiveEdge.start(d, w);
@@ -67,6 +71,8 @@
             add('script', '/shared/rtg-adaptive-edge-signals.js', 'RTGAdaptiveEdgeSignals', function (brug) {
               if (brug) w.RTGAdaptiveEdgeSignals.start(d, w);
             });
+          });
+          });
           });
           });
           });

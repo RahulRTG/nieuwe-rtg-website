@@ -1,28 +1,26 @@
-
-(function (w, d) {
+(function(w,d){
   'use strict';
-  // Edge vervangt lokale balken; hun echte bediening blijft hier bereikbaar.
-  var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
+  var ROOTS='.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
-  function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
-  function available(el, root) {
-    var view = el.ownerDocument.defaultView || w;
-    for (var p = el; p; p = p.parentElement) {
-      if (p.hidden || p.inert || p.getAttribute('aria-hidden') === 'true') return false;
-      if (p !== root && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && view.getComputedStyle(p).display === 'none') return false;
-      if (p === el && p !== root && !el.matches('.cmd-balkblad,.cmd-balksluit') && view.getComputedStyle(p).display === 'none') return false;
+  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||'').replace(/\s+/g,' ').trim();}
+  function avail(el,root){
+    var view=el.ownerDocument.defaultView||w;
+    for(var p=el;p;p=p.parentElement){
+      if(p.hidden||p.inert||p.getAttribute('aria-hidden')==='true')return false;
+      if(p!==root&&!root.hasAttribute('data-rtg-edge-controls')&&!root.contains(p)&&!p.matches('.rtg-edge-bottom,.rtg-edge-appslot,[data-rtg-v4-legacy-header="true"]')&&view.getComputedStyle(p).display==='none')return false;
+      if(p===el&&p!==root&&!el.matches('.cmd-balkblad,.cmd-balksluit')&&view.getComputedStyle(p).display==='none')return false;
     }
     return el.isConnected;
   }
-  function sourceButtons(doc, embedded, items) {
-    var out = [], tabs = new Set(), actions = new Set((items || []).map(function (item) { return item.id; }));
+  function sourceButtons(doc,embedded,items){
+    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id;}));
     (doc || d).querySelectorAll(ROOTS + (embedded ? ',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]' : '')).forEach(function (root) {
       var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
       controls.forEach(function (el) {
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
         var action = el.getAttribute('data-rtg-action-key');
-        if (label(el) && available(el, root) && (!tab || !tabs.has(tab)) && (!action || !actions.has(action)) && !out.some(function (x) { return x.el === el; })) {
+        if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab)) && (!action || !actions.has(action)) && !out.some(function (x) { return x.el === el; })) {
           out.push({ el: el, root: root }); if (tab) tabs.add(tab); if (action) actions.add(action);
         }
       });
@@ -88,7 +86,7 @@
     sources.forEach(function (source) {
       var el = source.el, b = d.createElement('button'); b.type = 'button';
       var action = el.getAttribute('data-rtg-action-key');
-      b.className = 'rtg-adaptive-sheet-action'; b.textContent = label(el);
+      b.className = 'rtg-adaptive-sheet-action'; b.textContent = lbl(el);
       if (action) b.dataset.rtgActionKey = action;
       if (el.id) b.dataset.rtgAdaptiveSource = el.id;
       if (el.hasAttribute('data-tab')) b.dataset.rtgAdaptiveTab = el.getAttribute('data-tab');
@@ -98,7 +96,7 @@
       });
       if (el.hasAttribute('aria-selected')) b.setAttribute('aria-pressed', el.getAttribute('aria-selected'));
       b.addEventListener('click', function () {
-        if (!available(el, source.root) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+        if (!avail(el, source.root) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
         el.click(); close();
       });
       container.appendChild(b);
@@ -127,13 +125,12 @@
         var reply = d.querySelector('#rtgCommand .cmd-praat');
         if (reply && reply.children.length) reply.hidden = false;
       });
+      container.appendChild(w.RTGAdaptiveEdgeServices.secureConversation(close));
     }
   }
   function start(rt) {
-    // Marketing may omit claim.js.
     if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
     rt.renderControls = function () { render(rt); };
-    // Close presentation; preserve the original domain handler.
     function primaryClick(event) {
       var button = event.target.closest && event.target.closest('[data-rtg-edge-primary]');
       if (button && !button.disabled && button.getAttribute('aria-disabled') !== 'true') close();
@@ -146,7 +143,6 @@
     }
     var observer = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
-      // Claim late bars idempotently.
       if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
       var commandBar = d.querySelector('#rtgCommand .cmd-balk');
       if (commandBar && commandBar.classList.contains('vraagt')) {
@@ -155,8 +151,12 @@
           w.RTGAdaptiveEdge.setDeck('rahul'); w.RTGAdaptiveEdge.setState('expanded');
         }
       } else rt.questionOwner = null;
-      if (records.some(function (r) { return !rt.host.contains(r.target) &&
-        (r.target.closest && r.target.closest(ROOTS)); })) refresh();
+      if (records.some(function (r) {
+        if (rt.host.contains(r.target) || !r.target.closest) return false;
+        return r.type === 'attributes' && r.attributeName === 'class'
+          ? r.target.matches && r.target.matches(ROOTS)
+          : !!r.target.closest(ROOTS);
+      })) refresh();
     });
     observer.observe(d.body, { subtree: true, childList: true, attributes: true,
       attributeFilter: ['disabled', 'hidden', 'class', 'aria-disabled', 'aria-current', 'aria-pressed', 'aria-expanded'] });

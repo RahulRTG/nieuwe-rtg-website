@@ -1864,7 +1864,7 @@ NORM.json en geen achteruitgang. Daarnaast vond ronde 0
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
 nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
-<!--getal:edgekaart.levendeKanalen-->17<!--/getal--> levende kanalen. Het **Edge
+<!--getal:edgekaart.levendeKanalen-->18<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
@@ -2543,9 +2543,9 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27581<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7771<!--/getal--> require-kanten heen en terug, met de eigen parser
-en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->315<!--/getal--> niet-gelezen bestanden staan er MET reden in
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27628<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7772<!--/getal--> require-kanten heen en terug, met de eigen parser
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->314<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
 aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route

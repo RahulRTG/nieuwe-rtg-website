@@ -17,6 +17,11 @@
       doc.querySelector('link[href^="/shared/rtg-heritage.css"]'));
   }
 
+  function editorialLink(doc) {
+    return doc && (doc.getElementById('rtgEditorialV4Css') ||
+      doc.querySelector('link[href^="/shared/rtg-editorial-v4.css"]'));
+  }
+
   function laatsteStijl(head) {
     if (!head || !head.querySelectorAll) return null;
     var stijlen = head.querySelectorAll('style,link[rel~="stylesheet"]');
@@ -24,10 +29,15 @@
   }
 
   function herstel(doc) {
-    var head = doc && doc.head, heritage = heritageLink(doc);
+    var head = doc && doc.head, heritage = heritageLink(doc), editorial = editorialLink(doc);
     if (!head || !heritage || heritage.parentNode !== head) return false;
-    if (laatsteStijl(head) === heritage) return false;
+    var stijlen = head.querySelectorAll('style,link[rel~="stylesheet"]');
+    var klaar = editorial && editorial.parentNode === head ?
+      stijlen.length > 1 && stijlen[stijlen.length-2] === heritage && stijlen[stijlen.length-1] === editorial :
+      laatsteStijl(head) === heritage;
+    if (klaar) return false;
     head.appendChild(heritage);
+    if (editorial && editorial.parentNode === head) head.appendChild(editorial);
     return true;
   }
 

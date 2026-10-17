@@ -24,6 +24,13 @@ gecontroleerde uitvoering van A, B en C naast elkaar. Na het vastleggen begint
 de uitvoering. Dit is geen nieuwe audit- of documentatiefase; elke ronde levert
 een meetbare softwareverbetering op.
 
+De professionalisering van alle bestaande apps wordt uitgevoerd volgens
+`docs/rtg-premium-afbouwplan.md`. Die bijlage voegt geen tweede register toe:
+dit document blijft de scopebron en `APPWERKT.json` blijft de bewijsbron. De
+bijlage bepaalt het taakcontract, de appfamilies, de volgorde en de acceptatie
+voor diepte, breedte, inhoud en vormgeving. De bijlage verandert de vier
+werkstromen hieronder niet.
+
 ## 1. De drie grenzen, definitief
 
 Dit zijn harde architectuur- en productgrenzen. Ze gaan voor elke functie: waar

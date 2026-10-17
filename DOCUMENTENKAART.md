@@ -2812,6 +2812,17 @@ afgewezen-met-grens, vraagt-besluit, extern) staat als blok `toezegklassen` in
 de documenten plus het kleine besluitbestand `TOEZEGKLASSEN.json`, waarvan elk
 citaat letterlijk in de bron moet staan.
 
+**`docs/rtg-premium-afbouwplan.md` is de uitvoeringsbijlage voor alle apps**:
+de broninventaris wordt niet als kwaliteitsclaim gelezen, iedere canonieke
+capability krijgt één contract voor diepte, breedte, inhoud, vormgeving,
+bediening en continuïteit, en de 17 catalogusfamilies plus beheer-, partner-,
+enterprise- en specialistische schermen worden in fasen afgebouwd. Eerst komen
+drie referentie-ervaringen (wereldstart, compact taakscherm en TravelOS in Flow
+en Spatial), daarna de lanceerbare kern, alle families, de ketens tussen apps en
+één gezamenlijke eindkwalificatie. `AFBOUWPROGRAMMA.md` blijft de scopebron en
+`APPWERKT.json` de bewijsbron; de bijlage is geen tweede register en geeft geen
+livegoedkeuring.
+
 **`CONSOLIDATIE.md` is het opruimbesluit van de eigenaar** (12 oktober 2026) —
 lees het vóór elke PR. De lanceerbare kern is RTG Pass, TravelOS, WorkOS,
 betalen, Rahul en de Edge; de andere werelden blijven bestaan maar zijn dicht

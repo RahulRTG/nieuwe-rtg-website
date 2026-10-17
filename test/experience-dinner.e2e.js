@@ -23,8 +23,10 @@ for(const width of [390,1440])test(width+'px: context, verloren antwoord, bronco
   await page.goto(srv.base+'/apps/app.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
   /* Telefoon en desktop gebruiken dezelfde zichtbare Edge-catalogus. De
      verborgen oude desktopbibliotheek is geen tweede ingang in de V4-schil. */
+  const edgeBar=page.locator('.rtg-adaptive-bar:visible');
   const edgeMenu=page.locator('.rtg-adaptive-bar:visible [data-rtg-adaptive-action="menu"]:visible');
   await page.waitForFunction(()=>document.body.dataset.rtgAdaptiveReady==='true');
+  await edgeBar.hover();
   await edgeMenu.click({timeout:h.geduld(15000)});
   await page.locator('button[data-edge-face="all"]').click();
   await page.locator('[data-edge-smart-search]').click();

@@ -19,7 +19,7 @@ const SERVICE_FASE = Object.freeze({
 const EINDE = new Set(['close', 'cancel']);
 const tekst = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 
-function versie(zaak) {
+function zaakVersie(zaak) {
   const regels = Array.isArray(zaak.tijdlijn) ? zaak.tijdlijn : [];
   const laatst = regels[regels.length - 1] || {};
   return tekst(laatst.at || laatst.op || zaak.at || 'onbekend', 80);
@@ -53,7 +53,7 @@ function beeld({ source, kind, title, sourceState, phase, responsibilities, rela
 }
 
 function bureau(zaak) {
-  const v = versie(zaak), phase = BUREAU_FASE[zaak.status] || 'triage';
+  const v = zaakVersie(zaak), phase = BUREAU_FASE[zaak.status] || 'triage';
   const responsibilities = [verantwoordelijkheid('requester', 'Opdrachtgever', 'self')];
   if (zaak.eigenaar || (zaak.team || []).length) responsibilities.push(verantwoordelijkheid('coordinator',
     zaak.eigenaar && zaak.eigenaar.rol || 'Lead Rechterhand', 'bureau'));
@@ -77,7 +77,7 @@ function bureau(zaak) {
 }
 
 function service(zaak) {
-  const v = versie(zaak), phase = SERVICE_FASE[zaak.stand] || 'triage';
+  const v = zaakVersie(zaak), phase = SERVICE_FASE[zaak.stand] || 'triage';
   const responsibilities = [verantwoordelijkheid('requester', 'Melder', 'self'),
     verantwoordelijkheid('coordinator', zaak.team || 'RTG Service', zaak.team || 'service')];
   if (zaak.eigenaar) responsibilities.push(verantwoordelijkheid('provider', 'Zaakeigenaar', 'assigned'));

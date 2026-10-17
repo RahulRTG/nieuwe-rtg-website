@@ -1,5 +1,7 @@
 'use strict';
 
+const diepVast = require('../immutable');
+
 const PROJECTIE_ID = 'rtg.revenue.entitlement-decision';
 const PROJECTIE_VERSION = '1.0.0';
 
@@ -54,12 +56,6 @@ const BRONNEN = Object.freeze({
 
 const TENANT_ACTIES = Object.freeze(['workspace.create', 'api.request']);
 
-function diepVast(waarde) {
-  if (!waarde || typeof waarde !== 'object' || Object.isFrozen(waarde)) return waarde;
-  for (const deel of Object.values(waarde)) diepVast(deel);
-  return Object.freeze(waarde);
-}
-
 function tekst(waarde) { return String(waarde == null ? '' : waarde).trim(); }
 function status(ja) { return ja ? STAND.ALLOWED : STAND.DENIED; }
 
@@ -93,7 +89,7 @@ function basis(context, bron, binding, beslissing) {
   });
 }
 
-function gesloten(vraag, code, reason) {
+function geslotenProjectie(vraag, code, reason) {
   const kind = vraag && SOORT[vraag.kind] ? vraag.kind : null;
   return basis({
     kind,
@@ -125,7 +121,7 @@ function vraagContext(vraag) {
     targetRef: target, capability };
 }
 
-function bindingKlopt(binding, context) {
+function bindingProjectieKlopt(binding, context) {
   return !!(binding && binding.verified === true &&
     tekst(binding.actorAccountRef) === context.actorAccountRef &&
     tekst(binding.subjectAccountRef) === context.subjectAccountRef &&
@@ -154,6 +150,7 @@ function accountLevensloop(binding, eigen) {
 
 module.exports = {
   PROJECTIE_ID, PROJECTIE_VERSION, SOORT, STAND, BRONNEN, TENANT_ACTIES,
-  tekst, status, levensloop, basis, gesloten, vraagContext, bindingKlopt,
+  tekst, status, levensloop, basis, gesloten: geslotenProjectie, vraagContext,
+  bindingKlopt: bindingProjectieKlopt,
   accountWeigering, accountLevensloop
 };

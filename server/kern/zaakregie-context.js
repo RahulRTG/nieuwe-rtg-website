@@ -22,7 +22,7 @@ function maakZaakregieContext(bronnen) {
   const organisatie = maakOrganisatie(bronnen);
   const hoedanigheid = maakHoedanigheid(bronnen);
 
-  function projecteer(invoer) {
+  function projecteerZaakcontext(invoer) {
     const i = invoer || {};
     const accountRef = B.tekst(i.accountRef, 160);
     const workspaceRef = B.tekst(i.workspaceRef, 160);
@@ -48,7 +48,7 @@ function maakZaakregieContext(bronnen) {
       readOnly: true, grantsAuthority: false, refreshBeforeAction: true });
   }
 
-  return Object.freeze({ projecteer });
+  return Object.freeze({ projecteer: projecteerZaakcontext });
 }
 
 module.exports = Object.freeze({ maakZaakregieContext, STATUS: B.STATUS });

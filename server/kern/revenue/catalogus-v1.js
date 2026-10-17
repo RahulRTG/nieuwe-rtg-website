@@ -17,6 +17,7 @@ const { OP_ID } = require('../../functies/register');
 const { BUNDELS } = require('../commercie/tegoed/inhoud');
 const bundelprijs = require('../commercie/bundelprijs');
 const { maakRevenueCatalogusValidator } = require('./catalogus-v1-validatie');
+const diepVast = require('./immutable');
 
 const CATALOG_ID = 'rtg.revenue.catalog';
 const CATALOG_VERSION = '1.0.0';
@@ -40,12 +41,6 @@ function canoniek(waarde) {
 }
 
 const CONTRACT_DIGEST = 'sha256:' + crypto.createHash('sha256').update(canoniek(schema)).digest('hex');
-
-function diepVast(waarde) {
-  if (!waarde || typeof waarde !== 'object' || Object.isFrozen(waarde)) return waarde;
-  for (const kind of Object.values(waarde)) diepVast(kind);
-  return Object.freeze(waarde);
-}
 
 function prijsProjectie(instellingen) {
   const p = bundelprijs.prijsVan('ai-s', instellingen || {});

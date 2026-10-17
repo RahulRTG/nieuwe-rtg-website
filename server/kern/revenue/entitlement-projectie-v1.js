@@ -25,7 +25,7 @@ const {
 function maakEntitlementProjectieV1({ bindingVoor, commercieRechten, datum } = {}) {
   const dag = datum || (() => new Date().toISOString().slice(0, 10));
 
-  function projecteer(vraag) {
+  function projecteerEntitlement(vraag) {
     const context = vraagContext(vraag);
     if (!context) return gesloten(vraag, 'UNKNOWN_CONTEXT',
       'De entitlementcontext is onbekend, onvolledig of niet aan dezelfde account gebonden.');
@@ -76,7 +76,7 @@ function maakEntitlementProjectieV1({ bindingVoor, commercieRechten, datum } = {
     return basis(context, bron, binding, uit.value);
   }
 
-  return Object.freeze({ projecteer });
+  return Object.freeze({ projecteer: projecteerEntitlement });
 }
 
 module.exports = {

@@ -594,6 +594,11 @@ const EIGEN_MODULE = new Map([
   ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],
   ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
   ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
+  /* De composerproef voert de twee echte browsermodules in een VM uit. De
+     statische modulezoeker ziet readFileSync(path.join(..., name)) niet, dus
+     zonder deze binding heet een uitgevoerde toets ten onrechte onmeetbaar. */
+  ['workspace-composer.test.js', ['public/shared/interface/workspace-blueprints.js',
+    'public/shared/interface/workspace-composer.js']],
   ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],
   ['toestel.e2e.js', ['public/shared/toestel/opslag.js', 'public/shared/toestel/rekenaar.js']],
   ['laatstedrie.e2e.js', ['public/shared/media.js']],

@@ -8,17 +8,12 @@
 
 const catalogusV1 = require('./catalogus-v1');
 const contract = require('./entitlement-eligibility-v1/contract');
+const diepVast = require('./immutable');
 
 const PROJECTIE_ID = 'rtg.revenue.payment-entitlement-eligibility';
 const PROJECTIE_VERSION = '1.0.0';
 
 function tekst(v) { return String(v == null ? '' : v).trim(); }
-function diepVast(v) {
-  if (!v || typeof v !== 'object' || Object.isFrozen(v)) return v;
-  for (const deel of Object.values(v)) diepVast(deel);
-  return Object.freeze(v);
-}
-
 function basis(context, beslissing) {
   return diepVast({ schemaVersion: 1, projectionId: PROJECTIE_ID,
     projectionVersion: PROJECTIE_VERSION, mode: 'READ_ONLY', context, decision: beslissing,
@@ -34,7 +29,7 @@ function dicht(code, reason, extra) {
   });
 }
 
-function contextVan(vraag) {
+function eligibilityContextVan(vraag) {
   const v = vraag || {}, actor = tekst(v.actorAccountRef), subject = tekst(v.subjectAccountRef);
   const scopeKind = tekst(v.scopeKind), targetRef = tekst(v.targetRef), productId = tekst(v.productId);
   if (!actor || actor !== subject || !['ACCOUNT', 'TENANT'].includes(scopeKind) || !targetRef ||
@@ -42,7 +37,7 @@ function contextVan(vraag) {
   return { actorAccountRef: actor, subjectAccountRef: subject, scopeKind, targetRef, productId };
 }
 
-function bindingKlopt(binding, context) {
+function paymentBindingKlopt(binding, context) {
   return !!(binding && binding.verified === true && tekst(binding.actorAccountRef) === context.actorAccountRef &&
     tekst(binding.subjectAccountRef) === context.subjectAccountRef &&
     tekst(binding.scopeKind) === context.scopeKind && tekst(binding.targetRef) === context.targetRef &&
@@ -70,7 +65,7 @@ function maakEntitlementEligibilityV1({ bindingVoor, bewijsVoor, catalogusVoor }
   const leesCatalogus = catalogusVoor || (vraag => catalogusV1.projecteerAiExtraS(vraag.pricingSettings));
 
   function beslis(vraag) {
-    const context = contextVan(vraag);
+    const context = eligibilityContextVan(vraag);
     if (!context) return dicht('UNKNOWN_CONTEXT',
       'De account-, tenant- of productcontext is onbekend of niet aan dezelfde actor gebonden.');
     if (typeof bindingVoor !== 'function') return dicht('ACCOUNT_BINDING_UNAVAILABLE',
@@ -79,7 +74,7 @@ function maakEntitlementEligibilityV1({ bindingVoor, bewijsVoor, catalogusVoor }
     try { binding = bindingVoor({ ...context }); } catch (_) {
       return dicht('ACCOUNT_BINDING_UNAVAILABLE', 'De bestaande binding kon niet veilig worden gelezen.');
     }
-    if (!bindingKlopt(binding, context)) return dicht('ACCOUNT_CONTEXT_NOT_VERIFIED',
+    if (!paymentBindingKlopt(binding, context)) return dicht('ACCOUNT_CONTEXT_NOT_VERIFIED',
       'De bestaande accountbron bevestigt deze account- en tenantcontext niet.');
     if (!binding.accountState.active) return productBeslissing(context, null, 'ACCOUNT_INACTIVE',
       'De bestaande accountbron meldt dat deze account niet actief is.');

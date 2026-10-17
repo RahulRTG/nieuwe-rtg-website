@@ -12,18 +12,13 @@
 'use strict';
 
 const { STAND } = require('./entitlement-projectie-v1');
+const diepVast = require('./immutable');
 
 const OVERZICHT_ID = 'rtg.revenue.entitlement-overview';
 const OVERZICHT_VERSION = '1.0.0';
 const MAX_VRAGEN = 64;
 
 function tekst(waarde) { return String(waarde == null ? '' : waarde).trim(); }
-
-function diepVast(waarde) {
-  if (!waarde || typeof waarde !== 'object' || Object.isFrozen(waarde)) return waarde;
-  for (const deel of Object.values(waarde)) diepVast(deel);
-  return Object.freeze(waarde);
-}
 
 function contractBasis() {
   return {
@@ -34,7 +29,7 @@ function contractBasis() {
   };
 }
 
-function gesloten(code, reason) {
+function geslotenOverzicht(code, reason) {
   return diepVast({
     ...contractBasis(),
     account: null,
@@ -45,7 +40,7 @@ function gesloten(code, reason) {
   });
 }
 
-function contextVan(vraag) {
+function overzichtContextVan(vraag) {
   const v = vraag || {};
   const actorAccountRef = tekst(v.actorAccountRef);
   const subjectAccountRef = tekst(v.subjectAccountRef);
@@ -53,7 +48,7 @@ function contextVan(vraag) {
   return { actorAccountRef, subjectAccountRef };
 }
 
-function bindingKlopt(binding, context) {
+function overzichtBindingKlopt(binding, context) {
   return !!(binding && binding.verified === true &&
     tekst(binding.actorAccountRef) === context.actorAccountRef &&
     tekst(binding.subjectAccountRef) === context.subjectAccountRef &&
@@ -104,21 +99,21 @@ function telling(entitlements) {
 
 function maakEntitlementOverzichtV1({ entitlementProjectie, bindingVoorAccount } = {}) {
   function voorAccount(vraag) {
-    const context = contextVan(vraag);
-    if (!context) return gesloten('UNKNOWN_ACCOUNT_CONTEXT',
+    const context = overzichtContextVan(vraag);
+    if (!context) return geslotenOverzicht('UNKNOWN_ACCOUNT_CONTEXT',
       'Het entitlementoverzicht vraagt één geverifieerde account voor actor en onderwerp.');
     if (!entitlementProjectie || typeof entitlementProjectie.projecteer !== 'function')
-      return gesloten('ENTITLEMENT_SOURCE_UNAVAILABLE',
+      return geslotenOverzicht('ENTITLEMENT_SOURCE_UNAVAILABLE',
         'De bestaande entitlementprojectie is niet aangesloten; het overzicht blijft gesloten.');
-    if (typeof bindingVoorAccount !== 'function') return gesloten('ACCOUNT_BINDING_UNAVAILABLE',
+    if (typeof bindingVoorAccount !== 'function') return geslotenOverzicht('ACCOUNT_BINDING_UNAVAILABLE',
       'De bestaande accountbinding is niet aangesloten; het overzicht blijft gesloten.');
 
     let binding;
     try { binding = bindingVoorAccount({ ...context }); } catch (_) {
-      return gesloten('ACCOUNT_BINDING_UNAVAILABLE',
+      return geslotenOverzicht('ACCOUNT_BINDING_UNAVAILABLE',
         'De bestaande accountbinding kon niet veilig worden gelezen; het overzicht blijft gesloten.');
     }
-    if (!bindingKlopt(binding, context)) return gesloten('ACCOUNT_CONTEXT_NOT_VERIFIED',
+    if (!overzichtBindingKlopt(binding, context)) return geslotenOverzicht('ACCOUNT_CONTEXT_NOT_VERIFIED',
       'De bestaande accountbron bevestigt deze context niet.');
 
     const vragen = Array.isArray(vraag && vraag.entitlements)
@@ -127,9 +122,9 @@ function maakEntitlementOverzichtV1({ entitlementProjectie, bindingVoorAccount }
     for (const item of vragen) {
       let besluit;
       try { besluit = entitlementProjectie.projecteer(vraagVoorAccount(item, context)); }
-      catch (_) { return gesloten('ENTITLEMENT_SOURCE_UNAVAILABLE',
+      catch (_) { return geslotenOverzicht('ENTITLEMENT_SOURCE_UNAVAILABLE',
         'Een bestaande entitlementbron kon niet veilig worden gelezen; het overzicht blijft gesloten.'); }
-      if (!besluitKlopt(besluit, context)) return gesloten('INVALID_ENTITLEMENT_DECISION',
+      if (!besluitKlopt(besluit, context)) return geslotenOverzicht('INVALID_ENTITLEMENT_DECISION',
         'Een bestaande entitlementbron gaf geen volledig accountgebonden besluit.');
       entitlements.push(besluit);
     }

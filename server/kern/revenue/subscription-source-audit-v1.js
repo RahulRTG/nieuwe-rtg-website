@@ -13,6 +13,7 @@
 const ladder = require('../pasladder');
 const capaciteiten = require('../commercie/capaciteiten');
 const runtimePassen = require('../passen');
+const diepVast = require('./immutable');
 
 const AUDIT_ID = 'rtg.revenue.subscription-source-audit';
 const AUDIT_VERSION = '1.0.0';
@@ -36,12 +37,7 @@ function vlak(o) {
   return p === Object.prototype || p === null;
 }
 function tekst(v) { return typeof v === 'string' ? v.trim() : ''; }
-function diepVast(v) {
-  if (!v || typeof v !== 'object' || Object.isFrozen(v)) return v;
-  for (const deel of Object.values(v)) diepVast(deel);
-  return Object.freeze(v);
-}
-function statusVan(statussen) {
+function auditStatusVan(statussen) {
   if (statussen.includes(STATUS.SOURCE_MISMATCH)) return STATUS.SOURCE_MISMATCH;
   if (statussen.includes(STATUS.UNKNOWN_SOURCE)) return STATUS.UNKNOWN_SOURCE;
   return STATUS.HEALTHY;
@@ -131,7 +127,7 @@ function maakSubscriptionSourceAuditV1({ geldPasprijzen, applicationPasses,
       runtime: runtimeProjectie(t, recognizedPasses),
       application: applicationProjectie(t, applicationPasses, gratisId) };
     tier.findings = bevindingenVan(tier);
-    tier.status = statusVan([tier.pricing.sourceStatus, tier.capability.sourceStatus,
+    tier.status = auditStatusVan([tier.pricing.sourceStatus, tier.capability.sourceStatus,
       tier.runtime.sourceStatus, tier.application.sourceStatus]);
     return tier;
   });
@@ -140,7 +136,7 @@ function maakSubscriptionSourceAuditV1({ geldPasprijzen, applicationPasses,
     sourceMismatch: tiers.filter(t => t.status === STATUS.SOURCE_MISMATCH).length,
     unknownSource: tiers.filter(t => t.status === STATUS.UNKNOWN_SOURCE).length };
   return diepVast({ schemaVersion: 1, auditId: AUDIT_ID, auditVersion: AUDIT_VERSION,
-    status: statusVan(tiers.map(t => t.status)), sources: { ...BRONNEN }, summary, tiers,
+    status: auditStatusVan(tiers.map(t => t.status)), sources: { ...BRONNEN }, summary, tiers,
     provenance: Object.entries(BRONNEN).map(([source, sourceRef]) => ({ source, sourceRef })) });
 }
 

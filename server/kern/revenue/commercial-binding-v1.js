@@ -13,6 +13,7 @@ const CONTRACT_ID = 'rtg.revenue.commercial-binding';
 const CONTRACT_VERSION = '1.0.0';
 const PAYMENT_FIELD = 'context.commercialBindingV1';
 const LEDGER_FIELD = 'commercialBindingV1';
+const diepVast = require('./immutable');
 
 const HOOFDVELDEN = Object.freeze([
   'schemaVersion', 'contractId', 'contractVersion', 'scope', 'product',
@@ -39,12 +40,6 @@ function provenanceKlopt(lijst) {
   return Array.isArray(lijst) && lijst.length > 0 && lijst.every(p => vlak(p) &&
     Object.keys(p).length === 3 && tekst(p.file) && tekst(p.symbol) && tekst(p.sourceRef));
 }
-function diepVast(v) {
-  if (!v || typeof v !== 'object' || Object.isFrozen(v)) return v;
-  for (const deel of Object.values(v)) diepVast(deel);
-  return Object.freeze(v);
-}
-
 function inspecteer(invoer) {
   const v = invoer || {}, missingFields = [], invalidFields = [], extraFields = [];
   if (!vlak(v)) return { ok: false, code: 'COMMERCIAL_BINDING_INVALID',

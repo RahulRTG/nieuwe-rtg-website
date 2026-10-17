@@ -38,7 +38,7 @@ const SOORTEN = Object.freeze({
  * @property {GebondenReferentie=} legalEntity
  */
 
-function gesloten(status, reason) {
+function geslotenContext(status, reason) {
   return B.diepBevries({ schemaVersion: 1, status,
     states: { organization: status, legalEntity: B.STATUS.NIET_BEOORDEELD,
       capacity: B.STATUS.NIET_BEOORDEELD },
@@ -62,23 +62,23 @@ function zaakPast(ref, source) {
 
 function leesBinding(bindingVanBron, view) {
   if (typeof bindingVanBron !== 'function')
-    return { error: gesloten(B.STATUS.ONBEKEND, 'binding-resolver-ontbreekt') };
+    return { error: geslotenContext(B.STATUS.ONBEKEND, 'binding-resolver-ontbreekt') };
   let binding;
   try {
     binding = bindingVanBron(B.diepBevries({ kind: view.kind, source: view.source }));
   } catch (e) {
-    return { error: gesloten(B.STATUS.ONBEKEND, 'binding-bron-onbeschikbaar') };
+    return { error: geslotenContext(B.STATUS.ONBEKEND, 'binding-bron-onbeschikbaar') };
   }
   if (binding && typeof binding.then === 'function')
-    return { error: gesloten(B.STATUS.ONBEKEND, 'asynchrone-binding-niet-ondersteund') };
+    return { error: geslotenContext(B.STATUS.ONBEKEND, 'asynchrone-binding-niet-ondersteund') };
   if (!binding || binding.schemaVersion !== 1
     || !referentie(binding.account, SOORTEN.account)
     || !referentie(binding.workspace, SOORTEN.workspace)
     || (binding.legalEntity && !referentie(binding.legalEntity, SOORTEN.entiteit))) {
-    return { error: gesloten(B.STATUS.ONBEKEND, 'binding-onvolledig') };
+    return { error: geslotenContext(B.STATUS.ONBEKEND, 'binding-onvolledig') };
   }
   if (!zaakPast(binding.case, view.source))
-    return { error: gesloten(B.STATUS.CONFLICT, 'case-binding-wijkt-af') };
+    return { error: geslotenContext(B.STATUS.CONFLICT, 'case-binding-wijkt-af') };
   return { binding };
 }
 
@@ -87,7 +87,7 @@ function maakZaakregieContextAdapter(opties) {
   const context = maakZaakregieContext(o.bronnen);
   const beelden = o.beeld || standaardBeeld;
 
-  function verbind(view) {
+  function verbindZaakbeeld(view) {
     const gelezen = leesBinding(o.bindingVanBron, view);
     const projectie = gelezen.error || context.projecteer({
       accountRef: gelezen.binding.account.id,
@@ -99,8 +99,8 @@ function maakZaakregieContextAdapter(opties) {
   }
 
   return Object.freeze({
-    bureau: zaak => verbind(beelden.bureau(zaak)),
-    service: zaak => verbind(beelden.service(zaak))
+    bureau: zaak => verbindZaakbeeld(beelden.bureau(zaak)),
+    service: zaak => verbindZaakbeeld(beelden.service(zaak))
   });
 }
 

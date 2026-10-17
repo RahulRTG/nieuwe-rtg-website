@@ -100,14 +100,18 @@ body[data-rtg-v4-kind="canvas"]{padding:var(--v4-header) 0 var(--v4-edge-space)!
 body[data-rtg-v4-kind="canvas"] :is(main,[data-rtg-screen-root="immersive"],[data-rtg-native-canvas]){position:fixed!important;inset:var(--v4-header) 0 var(--v4-edge-space)!important;width:auto!important;height:auto!important;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden!important}
 
 /* De ene Edge: dun glas, subtiele wereldkleur en de lippen als anker. */
-body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{--edge-bar-bg:rgba(10,10,9,.9)!important;--edge-bar-copy:#fffaf2!important;--edge-bar-dim:#cfc6ba!important;--edge-bar-line:rgba(217,188,137,.55)!important;--edge-bar-accent:#e2c38e!important;--edge-bar-accent-soft:rgba(226,195,142,.1)!important;isolation:isolate;pointer-events:auto!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{--edge-bar-bg:rgba(10,10,9,.9)!important;--edge-bar-copy:#fffaf2!important;--edge-bar-dim:#cfc6ba!important;--edge-bar-line:rgba(217,188,137,.55)!important;--edge-bar-accent:#e2c38e!important;--edge-bar-accent-soft:rgba(226,195,142,.1)!important;pointer-events:auto!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{position:fixed!important}
 body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge){z-index:9200!important}
-body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]){pointer-events:auto!important}
+body[data-rtg-editorial-v4="true"]>.rtg-edge-chrome:has(>.rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]){pointer-events:none!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]{height:min(754px,calc(100dvh - var(--v4-header) - 24px))!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-bar{top:auto!important;bottom:10px!important}
-body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-sheet:not(:has(.rtg-edge-cinema)){bottom:82px!important;max-height:calc(100% - 82px)!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-sheet:not(:has(.rtg-edge-cinema)){bottom:82px!important;max-height:calc(100% - 82px)!important;border-radius:var(--rtg-radius-system)!important}
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet:not([hidden]){z-index:20;pointer-events:auto!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet>.rtg-edge-index[aria-hidden="false"],
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-faces,
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-face:not([hidden]),
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-global-original{pointer-events:auto!important}
 /* De capsule blijft doorschijnend, maar krijgt een zachte optische onderlaag.
    Zo blijven fotografie en wereldkleur aanwezig zonder dat kaart- of rasterlijnen
    uit het scherm achter de ene Edge doorlopen. */

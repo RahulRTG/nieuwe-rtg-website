@@ -162,7 +162,7 @@ const KAART = [
     ['schrijft', 'identiteit:s', 'identiteit in het eigen model', 'rt.model.identity = acting ?'],
     ['schrijft', 'voortzetting:s', 'voortzetting in het eigen model', 'rt.model.continuation = input && input.title ?'],
     ['schrijft', 'zichtbaarheidsstand:s', 'balkstand op body', 'd.body.dataset.rtgAdaptiveState = rt.model.state;'],
-    ['beslist', 'zichtbaarheidsstand:b', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
+    ['beslist', 'zichtbaarheidsstand:b', 'Edge 2 compact behoudt de volledige dock', "else if (state === 'compact') setState('dock', 'auto');"],
     ['schrijft', 'onderbalk:s', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"]]],
   ['rtg-adaptive-edge-services.js', 'adaptieve-balk', '', [
     ['rendert', '-', 'de vijf Edge-schermen zonder domeinbevoegdheid over te nemen', "var MODES = ['rahul', 'connect', 'media', 'account'];"],

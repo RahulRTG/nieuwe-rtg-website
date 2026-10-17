@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-17T17:34:05.264Z",
-    "commit": "33f23b06a",
-    "boomVuil": false,
+    "op": "2026-10-17T22:33:46.971Z",
+    "commit": "1cc5c9240",
+    "boomVuil": true,
     "boomAnders": 2,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
@@ -2219,8 +2219,8 @@
         {
           "rol": "beslist",
           "etiket": "zichtbaarheidsstand:b",
-          "wat": "Edge 2 compact wordt peek",
-          "citaat": "else if (state === 'compact') setState('peek', 'auto');"
+          "wat": "Edge 2 compact behoudt de volledige dock",
+          "citaat": "else if (state === 'compact') setState('dock', 'auto');"
         },
         {
           "rol": "schrijft",

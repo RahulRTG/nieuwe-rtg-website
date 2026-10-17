@@ -159,13 +159,13 @@ bewezen wordt beschreven.
 
 | werkstroom | actuele bouwstand | afhankelijkheid | kwalificatiestand |
 |---|---|---|---|
-| A — Experience | Edge Quiet Presence is geïntegreerd op `main`; overige schermmigratie loopt | Heritage en bestaande schermcontracten | `EINDKWALIFICATIE_NODIG` |
+| A — Experience | Edge Quiet Presence staat op `main`. De afgeschermde kandidaat voegt daarop één rand-tot-rand Editorial V4-schil toe voor alle 316 schermen, met dezelfde Heritage-bronnen, compacte Edge, expliciete filmische ingang binnen Rahul, leesbare compacte labels en echte uitschakeling van overgangen bij reduced motion. De universele Rahul-knop blijft Rahul openen; de filmische laag kaapt hem niet. Domeinschermen met nog beperkte cinematografische inhoud blijven zichtbaar als eindkwalificatiepunt | Heritage, Edge 2/Adaptive Edge, bestaande schermcontracten en de centrale Command-werktafel | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | B — Spatial | TravelOS ondersteunt Flow ↔ Spatial, native aanvraag, veilige hervatting, accountisolatie, Edge-contextacties, antwoordverliesherstel en menselijke bevestigingsstatus. WorkOS is als tiende Living Module aangesloten en heeft nu dezelfde echte maakroute als Flow, met actor-gebonden idempotentie. De voltooiingsproef sluit voor aanmaken, rollen, taken, nette herstart, tweede sessie, dubbeltik, afgebroken antwoord en `SIGKILL` zonder tokenopslag, verlies of verdubbeling. Persoonlijk, Uitvoerder, Coördinator, Manager en Enterprise gebruiken nu vijf gedeelde indelingen boven op dezelfde Living Modules en Blueprint-validator; zij geven zelf geen rechten en zijn alleen zichtbaar wanneer serverrechten, tenantbeleid en devicegrenzen de volledige indeling toelaten | TravelOS- en WorkOS-bronroutes, Workspace Runtime, bestaande account- en lidmaatschapssessies | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | C — Universal Concierge | Zaakregiebeeld en RTG Regie projecteren bestaande Concierge Case/Lus en Servicezaak. Alleen een expliciet geselecteerde canonieke bronzaak wordt via een versieerbare, getypeerde selectie-envelop read-only aan dezelfde WorkOS-account-, werkruimte- en tenantcontext gebonden. Alleen `bureau/concierge-case` en `service/service-case` zijn toegestaan; schema-, type-, id-, versie-, account-, tenant- of sessieafwijkingen sluiten zonder bronlek. `source.version` is een waargenomen versiesignaal en nooit een autorisatiebewijs | bestaande concierge-, service-, WorkOS-, tenant-, organisatie- en bevoegdheidsbronnen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
 | D — Revenue | naast de catalogus- en betaalbewijsgrenzen bestaan nu een read-only entitlementprojectie, accountoverzicht, eligibility-contract, immutable commercieel bindingscontract en Subscription Source Audit V1. De audit vergelijkt de bestaande ladder, live prijslijst, capability-profielen, runtime-herkenning en aanmeldingsdefinities zonder ze samen te voegen of rechten te verlenen. Hij maakt de huidige Business Lite-brondrift zichtbaar en houdt contractbodems strikt gescheiden van maandprijzen. Publieke aankoop en toekenning blijven geblokkeerd totdat de commerciële binding duurzaam in bestaande betaalbronnen wordt opgeslagen, transactiespecifieke reconciliation bestaat en de brondrift via een expliciet productbesluit is opgelost | financiële veiligheid, exacte adaptercontracten, Payment Truth, RTG Pay, bestaande pasbronnen en expliciete eigenaarspoorten | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
 | E — Rahul | accountgebonden tabgeschiedenis en goedkeuringscontext sluiten fail-closed. Rahul leest van Workspace uitsluitend id, presentatiemodus en de door dezelfde actuele Edge-context bevestigde module. De read-only functiegids gebruikt direct het canonieke wereldregister en opent alleen exacte zichtbare functies via de bestaande app-/Command-route. Zichtbare startsuggesties worden, wanneer een geldig assistentmanifest bestaat, uitsluitend afgeleid uit de veilige soorten `read`, `search`, `open` en `propose`; zij gebruiken vaste vraagteksten en nemen geen actie-id, route, payload of mutatie over. Ontbrekende sessie, actuele context of expliciet zichtbaarheidsfilter sluit de gids; er is geen tweede catalogus, router, uitvoerder of opslag | bestaande Rahul-, Fluister-, Stuur-, modulemanifest-, sessie- en Trusted Execution-grenzen | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
-| F — Platform | het canonieke wereldregister ontsluit 116 UX-functies; tien Living Modules volgen hetzelfde runtimecontract. WorkOS, RTG Regie en de Rahul-projectie gebruiken dezelfde offline shell en bestaande Command-/wereldnavigatie, zonder tweede app-catalogus | de zes productstromen, bestaande routekaart, service workers en registergeneratoren | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
-| Q — eindkwalificatie | start nadat de overeengekomen scope in de kandidaat is geïntegreerd | A t/m F | `GEBLOKKEERD` door nog lopende bouw |
+| F — Platform | het canonieke wereldregister ontsluit 116 UX-functies; tien Living Modules volgen hetzelfde runtimecontract. WorkOS, RTG Regie en de Rahul-projectie gebruiken dezelfde offline shell en bestaande Command-/wereldnavigatie, zonder tweede app-catalogus. De actuele statische controle bereikt alle 316 schermen en classificeert 4.922 routes; distributie, serviceworkers, websitewaarheid, taalbewijs en representatieve schermbeelden zijn vanuit dezelfde kandidaat opnieuw gegenereerd | de zes productstromen, bestaande routekaart, service workers en registergeneratoren | `GEBOUWD`, `GEINTEGREERD`, `LOKAAL_GETEST`, `EINDKWALIFICATIE_NODIG` |
+| Q — eindkwalificatie | de kandidaat is samengesteld en de gerichte ontwikkelproeven zijn groen. De platformbrede campagne, echte-toestelmetingen, externe poorten en de geblokkeerde commerciële besluiten zijn nog niet afgerond | A t/m F en de expliciete eigenaar-/externe poorten uit paragraaf 7 | `GEBLOKKEERD`, `EINDKWALIFICATIE_NODIG` |
 
 De mapping van C heeft aangetoond dat een tweede generieke case-opslag of een
 nieuwe lifecycle de bestaande Concierge Case, Servicezaak en domeinobjecten zou
@@ -242,20 +242,27 @@ weigert ook foutstatussen van de prijsbron, een niet-nulprijs voor Community en
 onbekende capabilities. Deze bevindingen zijn met falende tegenproeven en
 hersteltoetsen vastgelegd, zonder kwaliteitsdrempels te verlagen.
 
-Ontwikkelcontrole van deze integratiestap: 153 gerichte contract-, unit- en
-integratietests slagen. Daarnaast slagen de echte WorkOS-browserproef voor
-accountwisseling en het gerichte Second Screen-scenario met toetsenbordkeuze
-van een indeling. Het bestaande taalbewijspakket is op de nieuwe app-build
-opnieuw uitgevoerd: 27 tests slagen; de expliciete beperkingen voor vertalingen
-en fysieke apparaten blijven staan. De distributiebuild verwerkt 803
-JavaScript-bestanden (7.875.355 naar 5.475.362 bytes); dat is een buildmeting,
-geen bewijs voor Core Web Vitals of prestaties op echte toestellen. Het
-runtimecontract bevestigt tien Living Modules, 116 UX-functies en 228
-servercapabilities. De volledige statische huiscontrole, cachevingerafdrukken
-en broncontrole van de taalrapporten slagen na reguliere regeneratie van de
-afgeleide bestanden. Bestaande platformbevindingen en de afzonderlijke
-APPWERKT-documentvingerafdruk zijn hiermee niet opnieuw gekwalificeerd.
-Dit lokale bewijs is geen CI-uitslag of releasegoedkeuring.
+Ontwikkelcontrole van de samengestelde kandidaat: 259 gerichte contract-, unit-
+en integratietests slagen. De brede gerichte browsercampagne telt 41 van 41
+geslaagde tests en dekt de appcatalogus, Edge-toestanden, Quiet Presence,
+communicatie, balkconsolidatie, TravelOS-toegankelijkheid, aanvraag, bevestiging
+en herstel. De aanvullende Edge- en
+Experience-proeven slagen volledig. Daarbij zijn drie integratiefouten gevonden
+en hersteld: de filmische laag onderschepte de Rahul-knop, een directe
+productopdracht werd door de functiegids overschreven en een onvolledige
+Experience-bootstrap kon bij `pagehide` een fout veroorzaken. Het bestaande
+taalbewijspakket is op de nieuwe app-build opnieuw uitgevoerd: 27 tests slagen
+en alle 114 taalvermeldingen worden geraakt; dit bewijst nadrukkelijk geen
+volledig gelokaliseerde productie-inhoud voor 114 talen. De distributiebuild
+verwerkt 809 JavaScript-bestanden met circa dertig procent reductie; dat is een
+buildmeting, geen bewijs voor Core Web Vitals of prestaties op echte toestellen.
+Het runtimecontract bevestigt tien Living Modules, 116 UX-functies en 228
+servercapabilities. De volledige statische huiscontrole, cachevingerafdrukken,
+316 schermroutes en broncontrole van de taalrapporten slagen na reguliere
+regeneratie van de afgeleide bestanden. Een niet-blokkerende View Transition-
+waarschuwing op het geldscherm, bestaande platformbevindingen en de afzonderlijke
+APPWERKT-documentvingerafdruk blijven open en zichtbaar. Dit lokale bewijs is
+geen CI-uitslag, echte-toestelkwalificatie of releasegoedkeuring.
 
 De mapping van D heeft aangetoond dat `server/kern/revenue/catalogus-v1.js` al
 de gesloten catalogusbron is en dat RTG Pay, Payment Truth en Economic Runtime

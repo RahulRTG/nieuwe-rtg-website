@@ -2,39 +2,38 @@
   'use strict';
   var ROOTS='.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
-  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||'').replace(/\s+/g,' ').trim();}
+  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||'').replace(/\s+/g,' ').trim()}
   function avail(el,root){
     var view=el.ownerDocument.defaultView||w;
     for(var p=el;p;p=p.parentElement){
-      if(p.hidden||p.inert||p.getAttribute('aria-hidden')==='true')return false;
-      if(p!==root&&!root.hasAttribute('data-rtg-edge-controls')&&!root.contains(p)&&!p.matches('.rtg-edge-bottom,.rtg-edge-appslot,[data-rtg-v4-legacy-header="true"]')&&view.getComputedStyle(p).display==='none')return false;
-      if(p===el&&p!==root&&!el.matches('.cmd-balkblad,.cmd-balksluit')&&view.getComputedStyle(p).display==='none')return false;
+      if(p.hidden||p.inert||p.getAttribute('aria-hidden')==='true')return false
+      if(p!==root&&!root.hasAttribute('data-rtg-edge-controls')&&!root.contains(p)&&!p.matches('.rtg-edge-bottom,.rtg-edge-appslot,[data-rtg-v4-legacy-header="true"]')&&view.getComputedStyle(p).display==='none')return false
+      if(p===el&&p!==root&&!el.matches('.cmd-balkblad,.cmd-balksluit')&&view.getComputedStyle(p).display==='none')return false
     }
-    return el.isConnected;
+    return el.isConnected
   }
   function sourceButtons(doc,embedded,items){
-    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id;}));
-    (doc || d).querySelectorAll(ROOTS + (embedded ? ',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]' : '')).forEach(function (root) {
-      var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
-      controls.forEach(function (el) {
+    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id}));
+    (doc||d).querySelectorAll(ROOTS+(embedded?',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]':'')).forEach(function(root){
+      var controls=root.matches('button')?[root]:root.querySelectorAll('button,a[href]');
+      controls.forEach(function(el){
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
         var action = el.getAttribute('data-rtg-action-key');
         if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab)) && (!action || !actions.has(action)) && !out.some(function (x) { return x.el === el; })) {
-          out.push({ el: el, root: root }); if (tab) tabs.add(tab); if (action) actions.add(action);
+          out.push({el:el,root:root});if(tab)tabs.add(tab);if(action)actions.add(action);
         }
       });
     });
     return out;
   }
-  function close() { w.RTGAdaptiveEdge.setState('dock'); }
-  function currentItems() {
-    if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();
-    var A = w.RTGAdaptief, items = A && A.voorNu ? A.voorNu() : [];
-    var command = d.getElementById('rtgCommand');
-    return items.length || A && A.context().acties.length ? items : command && command.rtgEdgeItems ? command.rtgEdgeItems() : [];
+  function close(){w.RTGAdaptiveEdge.setState('dock')}
+  function currentItems(){
+    if(w.RTGEdgeBlikveld)return w.RTGEdgeBlikveld.acties();
+    var A=w.RTGAdaptief,items=A&&A.voorNu?A.voorNu():[],command=d.getElementById('rtgCommand');
+    return items.length||A&&A.context().acties.length?items:command&&command.rtgEdgeItems?command.rtgEdgeItems():[]
   }
-  function render(rt) {
+  function render(rt){
     w.RTGAdaptiveEdgeInput.reflect(rt);
     var container = rt.controls;
     if (!container) {
@@ -127,8 +126,9 @@
       });
       container.appendChild(w.RTGAdaptiveEdgeServices.secureConversation(close));
     }
+    if(w.RTGAdaptiveEdgeCinema)w.RTGAdaptiveEdgeCinema.render(container,rt.model);
   }
-  function start(rt) {
+  function start(rt){
     if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
     rt.renderControls = function () { render(rt); };
     function primaryClick(event) {

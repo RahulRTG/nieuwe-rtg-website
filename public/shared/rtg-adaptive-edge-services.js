@@ -17,7 +17,8 @@
     button.addEventListener('click', action); return button;
   }
   function hasQuestionSurface() {
-    if (d.querySelector('#rtgCommand .cmd-pane.actief .cmd-vraagvorm')) return true;
+    var command=d.getElementById('rtgCommand');
+    if(command&&command.dataset.stand==='open'&&command.querySelector('.cmd-vraagvorm'))return true;
     var node = d.getElementById('rvRahul');
     if (!node || node.hidden) return false;
     var style = w.getComputedStyle(node), box = node.getBoundingClientRect();

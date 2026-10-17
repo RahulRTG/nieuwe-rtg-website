@@ -55,6 +55,10 @@ test('de nieuwe laag definieert header, Edge en alle apparaatbreekpunten', () =>
   assert.match(css, /@media\(min-width:1180px\)/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
   assert.match(css, /@media\(forced-colors:active\)/);
+  assert.match(css, /\.rtg-adaptive-item-copy small\{[^}]*font-weight:600!important/,
+    'de compacte Edge-labels blijven op lichte en donkere beelden leesbaar');
+  assert.match(css, /prefers-reduced-motion:reduce\)[^{]*\{[\s\S]*transition-duration:0s!important/,
+    'reduced motion schakelt overgangen werkelijk uit');
 });
 
 test('de ene schil sluit oude koppen, uitrekkende randen en Edge-overlap af', () => {

@@ -28,6 +28,8 @@
     index=startIndex();draw();w.RTGAdaptiveEdge.setDeck('home');opened=!!w.RTGAdaptiveEdge.openPanel(node,{title:'RTG Edge',copy:'',onClose:function(){opened=false;}});return opened;
   }
   function assistant(copy){close();w.RTGAdaptiveEdge.continueWith({title:'Rahul',copy:copy});w.RTGAdaptiveEdge.openView('rahul');}
+  function control(){var b=d.createElement('button');b.type='button';b.className='rtg-adaptive-sheet-action rtg-adaptive-cinema-action';b.textContent='Open filmisch RTG-overzicht';b.addEventListener('click',open);return b;}
+  function render(container,model){if(model.deck==='rahul')container.append(control());}
   function act(event){
     var b=event.target.closest('[data-cinema]');if(!b)return;var a=b.dataset.cinema;
     if(a==='close'){close();return;}
@@ -38,9 +40,5 @@
     else if(a==='media')w.location.href='/apps/media.html';
     else if(a==='journey')w.location.href='/apps/reizen.html';
   }
-  d.addEventListener('click',function(event){
-    var b=event.target.closest&&event.target.closest('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
-    if(!b)return;event.preventDefault();event.stopImmediatePropagation();open();
-  },true);
-  w.RTGAdaptiveEdgeCinema=Object.freeze({open:open,close:close,worlds:WORLDS});
+  w.RTGAdaptiveEdgeCinema=Object.freeze({open:open,close:close,render:render,worlds:WORLDS});
 }(window,document));

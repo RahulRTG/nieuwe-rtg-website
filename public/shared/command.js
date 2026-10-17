@@ -100,14 +100,15 @@
        Command niet langer met zijn vier-productenheuristiek zodra de mens
        expliciet vraagt iets te zoeken of openen. Ambigu en onbekend blijven
        lokaal: geen model of vrije URL mag dan alsnog raden. */
-    if(/^(?:zoek(?:en)?(?:\s+naar)?|open|start|ga naar|breng(?: me)? naar|toon|laat zien|terug naar)\b/.test(laag)&&
+    var direct=/^(?:open|start|ga naar|breng(?: me)? naar|toon|laat zien|terug naar)\s+(?:life|work|foundation|instellingen)$/.test(laag)?appUit(laag):null;
+    if(!direct&&/^(?:zoek(?:en)?(?:\s+naar)?|open|start|ga naar|breng(?: me)? naar|toon|laat zien|terug naar)\b/.test(laag)&&
        typeof w.RTGAppDirectoryCommand==='function'){
       var gids=w.RTGAppDirectoryCommand(q);
       if(gids&&gids.handled)return gids.message||'De RTG-functiegids is geopend.'}
     if((m=laag.match(/(.+?)\s+links(?:\s+en|,)?\s+(.+?)\s+rechts/))){links=appUit(m[1]);rechts=appUit(m[2]);
       if(links&&rechts){if(!mag())return null;t=bouwTafel();t.wis();open(links[1],links[0]);t.openNaast(rechts,'rechts');t.select(1);
         return 'Ik heb '+links[0]+' links en '+rechts[0]+' rechts voor u geopend.'}}
-    var a=appUit(laag);if(!a)return null;
+    var a=direct||appUit(laag);if(!a)return null;
     if(/ernaast|naast elkaar|rechts/.test(laag)){if(!mag())return null;bouwTafel().openNaast(a,'rechts');return 'Natuurlijk. '+a[0]+' staat ernaast.'}
     if(/links/.test(laag)){if(!mag())return null;bouwTafel().openNaast(a,'links');return a[0]+' staat links voor u klaar.'}
     if(/open|breng|ga naar|toon|laat zien|terug naar/.test(laag)){open(a[1],a[0]);return 'Natuurlijk. Ik breng u naar '+a[0]+'.'}

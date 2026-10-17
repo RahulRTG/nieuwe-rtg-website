@@ -10,6 +10,7 @@ const kern = require('../public/shared/rtg-adaptive-edge-core.js');
 const VIEW = lees('public/shared/rtg-adaptive-edge.js');
 const SERVICES = lees('public/shared/rtg-adaptive-edge-services.js');
 const VISUAL = lees('public/shared/rtg-adaptive-edge-visual.js');
+const CONTROLS = lees('public/shared/rtg-adaptive-edge-controls.js');
 const CINEMA = lees('public/shared/rtg-adaptive-edge-cinema.js');
 const INPUT = lees('public/shared/rtg-adaptive-edge-input.js');
 const CSS = lees('public/shared/rtg-adaptive-edge.css');
@@ -156,6 +157,12 @@ test('beeld, apps, objecten en communicatie zijn toestanden van dezelfde Edge', 
   assert.match(EDITORIAL, /\.rtg-edge-app-icon--photos/);
   assert.match(CINEMA, /rtg-edge-cinema__story/);
   assert.match(CINEMA, /travel-inspiration\.webp/);
+  assert.match(CONTROLS, /RTGAdaptiveEdgeCinema\.render\(container,rt\.model\)/);
+  assert.match(CINEMA, /Open filmisch RTG-overzicht/);
+  assert.doesNotMatch(CINEMA, /rtg-adaptive-bar/,
+    'de filmische laag kaapt de universele Rahul-knop niet');
+  assert.match(SERVICES, /command\.dataset\.stand==='open'&&command\.querySelector\('\.cmd-vraagvorm'\)/,
+    'de bestaande Command-werktafel blijft een directe Rahul-invoer');
 });
 
 

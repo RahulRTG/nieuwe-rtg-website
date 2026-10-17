@@ -158,8 +158,8 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
-per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->440<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->1004<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1215<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
+per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->447<!--/getal--> schermen,
+<!--getal:schermroutes.paden-->1009<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1227<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -197,11 +197,11 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->5529<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->5530<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
-Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->1004<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->5529<!--/getal--> echte routes gehouden.
+Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->1009<!--/getal--> exacte paden zijn tegen
+<!--getal:routebron.routerRoutes-->5530<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 

@@ -508,6 +508,16 @@ html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="collection"] .rtg-v4-s
      inhoud. Deze late, bewust specifieke regel wint ook wanneer de oude
      desktoplaag na V4 wordt geladen. */
   html body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell>.wd-page{display:contents!important}
+  /* De oude mobiele bureaulaag zette iedere werkruimte opnieuw op inset:0.
+     Daardoor liep een iframe achter de vaste Edge door en ving de Edge de
+     onderste formulierknoppen af. De ene schil reserveert hier expliciet haar
+     kop- en Edgegebied; de inhoud blijft daarbinnen zelfstandig scrollen. */
+  html body.rtg-edge-workspace[data-rtg-editorial-v4="true"] #rtgWorldContent.wd-page>.rtg-werkruimte{
+    position:fixed!important;
+    inset:var(--v4-header) 0 var(--v4-edge-space) 0!important;
+    width:auto!important;height:auto!important;min-height:0!important;
+    overflow:hidden!important;
+  }
 }
 
 @media(min-width:700px){

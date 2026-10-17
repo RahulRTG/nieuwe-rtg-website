@@ -50,8 +50,9 @@ body[data-rtg-v4-kind="conversation"] .rtm-kop,body[data-rtg-v4-kind="conversati
 /* Zelfstandige routes krijgen één brede redactionele kolom. Wereldhomes houden
    hun bestaande driekolomsraster: die rails bevatten echte functies en vormen
    samen met het middenvlak één responsieve werkruimte. */
-body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell{width:min(calc(100% - 2 * var(--v4-frame)),var(--v4-wide))!important;max-width:var(--v4-wide)!important;margin:0 auto!important;padding:clamp(24px,4vw,64px) 0!important}
-body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-page,[data-rtg-screen-root="content"]){width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important}
+body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell{display:block!important;width:min(calc(100% - 2 * var(--v4-frame)),var(--v4-wide))!important;max-width:var(--v4-wide)!important;margin:0 auto!important;padding:clamp(24px,4vw,64px) 0!important}
+body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-page,[data-rtg-screen-root="content"]){display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important}
+body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-greeting,.wd-people,.wd-favorites,.wd-library,.wp-tabs,.wp-domain,.wp-atmosphere){display:none!important}
 body[data-rtg-editorial-v4="true"] :is(main,[data-rtg-screen-root="content"],.wrap,.shell,.schil):not([data-rtg-native-canvas]){max-width:var(--v4-wide);margin-inline:auto}
 body[data-rtg-editorial-v4="true"] main:not(.wd-home){padding:clamp(24px,4vw,64px) var(--v4-frame)!important}
 /* De leveranciersapp gebruikt een flexkolom waarvan de werkruimte `flex:1` is.
@@ -189,6 +190,8 @@ body[data-rtg-v4-embedded="true"]>.rtg-v4-header,body[data-rtg-v4-embedded="true
   body[data-rtg-editorial-v4="true"]{--v4-header:64px;--v4-frame:16px;--v4-edge-space:88px}
   .rtg-v4-header{gap:10px}.rtg-v4-context{display:block}.rtg-v4-world{display:block;font-size:.55rem}.rtg-v4-title{display:block;font-size:.78rem}.rtg-v4-icon{display:none!important}.rtg-v4-header-actions>:is(a,button){min-width:42px!important}
   body[data-rtg-editorial-v4="true"] .wd-shell{width:100%!important;margin:0!important;padding:0!important}
+  html body[data-rtg-editorial-v4="true"][data-rtg-shell="mobile"] .wd-shell{width:100%!important;max-width:none!important;margin:0!important}
+  body[data-rtg-editorial-v4="true"][data-world-home] .wd-shell{display:flex!important;flex-direction:column!important}
   body[data-rtg-editorial-v4="true"] :is(.wd-shell,.wd-page){width:100%!important;max-width:none!important;margin-inline:0!important;padding-inline:0!important}
   body[data-rtg-editorial-v4="true"] :is(main,#main){width:100%!important;max-width:none!important;margin-inline:0!important}
   body[data-rtg-editorial-v4="true"] :is(.wd-home,main.wd-home){padding-inline:0!important}

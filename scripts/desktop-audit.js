@@ -152,7 +152,7 @@ async function main() {
             const heading = [...document.querySelectorAll('#platform-story-title,.wd-home h1,.wd-access h1,h1')]
               .find(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
             const shown = e => !!(e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none');
-            return { url: location.pathname, world:b.dataset.rtgWorld, palette:b.dataset.rtgPalette, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
+            return { url: location.pathname, world:b.dataset.rtgWorld, worldHome:b.dataset.worldHome || '', palette:b.dataset.rtgPalette, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
               editorialV4:b.dataset.rtgEditorialV4 === 'true', v4Kind:b.dataset.rtgV4Kind || '',
               cinematic:b.dataset.rtgCinematic === 'true', viewport:innerWidth,
               access:[...document.querySelectorAll('[data-rtg-access]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
@@ -179,7 +179,7 @@ async function main() {
           row.failures = [];
           if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          const v4Top = s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
+          const v4Top = s.worldHome && !mobile ? 24 : s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
           const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (mobile ? 76 : 88) :
             s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
@@ -214,7 +214,10 @@ async function main() {
           if (!s.content || !s.shell) row.failures.push('missing-content-frame');
           else if (s.editorialV4 && !s.access) {
             if (!mobile && (s.shell.w < s.viewport-162 || Math.abs(s.shell.x-(s.viewport-s.shell.w)/2) > 2)) row.failures.push('nonstandard-v4-frame');
-            if ((s.left && s.left.w > 1) || (s.right && s.right.w > 1) || (s.library && s.library.w > 1)) row.failures.push('visible-legacy-column');
+            /* Wereldhomes gebruiken de drie rails als echte, bestuurbare
+               werkruimte. Op alle zelfstandige routes zijn dezelfde oude
+               kolommen verboden en worden ze door Editorial V4 verborgen. */
+            if (!s.worldHome && ((s.left && s.left.w > 1) || (s.right && s.right.w > 1) || (s.library && s.library.w > 1))) row.failures.push('visible-legacy-column');
             if (s.content.x < s.shell.x-1 || s.content.right > s.shell.right+1) row.failures.push('content-outside-v4-frame');
           } else if (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100)) row.failures.push('missing-column');
           else if (!s.access && !mobile) {
@@ -245,7 +248,7 @@ async function main() {
                workspaces keep their world material; the Edge stays glass. */
             const expected = s.editorialV4 && region.selector === '.rtg-adaptive-bar'
               ? 'rgba(10,10,9,.9)'
-              : s.editorialV4 && region.selector === '.wk-shell' ? v4Canvas
+              : s.editorialV4 && s.v4Kind !== 'cover' && s.v4Kind !== 'canvas' ? v4Canvas
                 : s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if ((region.selector === '.rtg-adaptive-bar' ? region.material : region.background) !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
           }

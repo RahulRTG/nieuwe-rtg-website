@@ -93,7 +93,9 @@ function kernVoor(db, orders) {
       voorstelLijst: () => db.data.ontmoetVoorstellen, save, lijsten: ontmoetLijsten, nu }),
     flitsVergeet: require(path.join(S, 'flits')).maakFlits({ db, save, crypto }).flitsVergeet,
     plaats: { plaatsVergeet: require(path.join(S, 'plaats', 'opslag'))({ db, save, crypto }).vergeet },
-    gemeente: { vergeetMelder: require(path.join(S, 'gemeente', 'meldingen'))({ db, save, nu }).vergeetMelder },
+    /* met de deur van het domein, zoals kern/gemeente/index.js hem meegeeft */
+    gemeente: { vergeetMelder: require(path.join(S, 'gemeente', 'meldingen'))({ db, save, nu,
+      opslag: require(path.join(S, 'gemeente', 'opslag'))({ db }) }).vergeetMelder },
     weefsel: { weefselVergeetMelder: require(path.join(S, 'stadsweefsel', 'zaakbeeld'))({ save, nu }, H).vergeetMelder },
     ordersVanKlant: key => orders.filter(o => o.customerKey === key),
     mbVergeet: mode.mbVergeet

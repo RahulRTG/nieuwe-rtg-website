@@ -9,10 +9,7 @@ const { zelfdeMeldingKortGeleden } = require('../dubbelemelding');
 module.exports = (ctx) => {
   const { save, anthropic, nu, id, ref, schoon, seed, deGemeente, publiekeMelding,
     notify, notifySupplier, sseToSupplier, weefsel, CATS, PLOEG, MELD_STATUS } = ctx;
-  /* De deur komt uit ./index.js mee; wie deze module los bouwt (de vergeet-
-     toetsen doen dat met alleen db, save en nu), krijgt dezelfde deur uit
-     ./opslag.js en niet een tweede manier om db.data aan te raken. */
-  const G = ctx.opslag || require('./opslag')({ db: ctx.db });
+  const G = ctx.opslag; // ./opslag.js
 
   function meld(sess, codenaam, data) {
     seed();

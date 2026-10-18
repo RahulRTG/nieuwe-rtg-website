@@ -28,26 +28,29 @@ const CONTRACTEN = {
     watErMoetKomen: null,
     bewijs: { gemeten: 'PROTECTED: gemeten in de idempotentieronde van 12 september 2026. De route was niet geblokkeerd door een ontbrekende wereld maar door een onderwerp dat op was voordat de meting begon -- de pasladder-ijkoproep doet echt werk. Een voorziening (scripts/lib/idemwereld.js) maakt het onderwerp nu vers, na die ijkoproep en voor de eerste gemeten oproep.', op: '2026-09-12' }
   },
-  /* POST /api/pay/verzoek/betaal STAAT HIER BEWUST NIET, en dat is de enige van
-     de zestien die op `onbekend` blijft.
-
-     Er stond hier eerst `sleutelVereist`, afgeleid uit het feit dat de route
-     `idem` doorgeeft aan pay.verzoekBetaal. Dat werd overschreven door een
-     BESTAAND besluit in ./mutatiecontracten-hindernis.js, en dat besluit is
-     zorgvuldiger dan de mijne was: "Met sleutel gaf zij 409, en dat is een
-     TOESTANDSCONTROLE en geen idempotentie -- de kop van ./idem-poort.js
-     waarschuwt daar met zoveel woorden voor. Wie hier de wereld klaarzet, meet
-     dus of de geldlaag de herhaling vangt of dat alleen de schuld op is."
-
-     Dat is precies het onderscheid dat een verklaring uit een meting NIET kan
-     maken: een 409 bij de tweede aanroep bewijst dat er niets tweemaal gebeurde,
-     maar niet WAAROM. Kwam dat door de sleutel of doordat het verzoek al
-     afgehandeld was? Tot iemand die wereld opzet, is het eerlijke antwoord
-     onbekend -- en een verklaring die dat verschil wegpoetst maakt het register
-     minder waard in plaats van completer.
-
-     De teller staat daarom op 41 van 42 en niet op 42 van 42. Dat laatste getal
-     had ik kunnen halen door een besluit van iemand anders te overschrijven. */
+  /* POST /api/pay/verzoek/betaal STOND HIER BEWUST NIET, tot 18 oktober 2026:
+     de kale ronde mat met sleutel een 409 en dat is een TOESTANDSCONTROLE, geen
+     idempotentie; ./mutatiecontracten-hindernis.js sloot af met "blijft liggen
+     tot iemand haar leest". Gelezen: kern/pay/verzoeken.js wikkelt verzoekBetaal
+     in metIdem(..., { geld }) uit lib/idem.js -- ZONDER sleutel 400
+     IDEMPOTENTIESLEUTEL_VERPLICHT voordat er iets gebeurt, MET sleutel het
+     eerdere antwoord op dezelfde afdruk (codenaam, verzoek-id, centen). Dat is
+     per constructie `sleutelVereist`, dezelfde grond als /bank/pas/betaal, en
+     geen uitspraak over de 409. De STAND blijft BLOCKED: PROTECTED vraagt een
+     meting met en zonder sleutel (./mutatiecontracten-geldgrens.js) en de ronde
+     zonder sleutel is hier nooit gedraaid. */
+  'POST /api/pay/verzoek/betaal': {
+    mutatieId: 'pay.verzoek.betaal', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('sleutelVereist'),
+    stand: 'BLOCKED_BY_TEST_FIXTURE',
+    afgetekend: { door: 'Claude (Fable 5.1), op grond van de gelezen handler (kern/pay/verzoeken.js, lib/idem.js metIdem met ' +
+      'opties.geld); de stand blijft BLOCKED omdat de ronde zonder sleutel niet is gedraaid; niet door een mens nagelezen', op: '2026-10-18' },
+    waarom: 'metIdem met { geld }: zonder sleutel weigert lib/idem.js met 400, met dezelfde sleutel en afdruk komt het ' +
+      'eerdere antwoord terug. De 409 "al afgehandeld" erna is een toestandscontrole en telt hier niet als grond.',
+    bewijs: { gemeten: 'kale ronde 30 augustus: de EERSTE oproep gaf al 409. Idemproef 29 september: met sleutel ' +
+      '"beschermd", zonder sleutel niets gemeten -- genoeg voor de semantiek (die staat in de code), niet voor PROTECTED.', op: '2026-09-29' },
+    watErMoetKomen: 'een openstaand betaalverzoek van een ANDER lid aan het proeflid, zodat de eerste oproep werk doet ' +
+      'en de ronde zonder sleutel de 400 van lib/idem.js meet in plaats van de 409 van de toestand.'
+  },
 
   'POST /api/supplier/pos/checkout': {
     mutatieId: 'kassa.checkout', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('sleutelVereist'), stand: 'PROTECTED', afgetekend: AFGETEKEND,

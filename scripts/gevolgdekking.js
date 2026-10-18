@@ -176,7 +176,7 @@ if (vastleggen) {
 
 if (controle) {
   let oud = null;
-  try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')); } catch (e) { oud = null; }
+  try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; oud = null; }
   if (!oud) { console.error('  Geen GEVOLGDEKKING.json om tegen te vergelijken; leg eerst vast.'); process.exit(2); }
   const fout = [];
   if (tellers.onbekendeEffectpaden > oud.tellers.onbekendeEffectpaden)

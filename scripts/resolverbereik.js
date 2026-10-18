@@ -72,7 +72,7 @@ const VORMEN = {
 
 function routesUitRegister() {
   let reg;
-  try { reg = require('../IDEMPROEF.json'); } catch (e) { return null; }
+  try { reg = require('../IDEMPROEF.json'); } catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; return null; }
   return [...new Set((reg.perRoute || [])
     .filter(r => r && r.methode === 'POST' && typeof r.pad === 'string').map(r => r.pad))].sort();
 }

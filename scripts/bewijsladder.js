@@ -414,7 +414,7 @@ if (require.main === module) {
 
   if (argv.includes('--controle')) {
     let oud = null;
-    try { oud = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) {}
+    try { oud = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
     if (!oud) { console.error('Geen BEWIJSLADDER.json om tegen te vergelijken -- draai `npm run bewijsladder:vast`.'); process.exitCode = 1; return; }
     const gegroeid = uitslag.zonderTrede.filter(z => !(oud.zonderTrede || []).some(o => o.doel === z.doel));
     if (gegroeid.length) {

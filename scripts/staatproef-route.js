@@ -154,7 +154,7 @@ if (require.main !== module) { module.exports = {}; return; }
     const oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
     oudOp = (oud.stempel && oud.stempel.op) || oudOp;
     oudeRijen = oud.perRoute || [];
-  } catch (e) {}
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   const eerder = new Map(oudeRijen.map(rij => [rij.methode + ' ' + rij.pad, { ...rij, op: rij.op || oudOp }]));
   /* De rij: eerst wat geen rij heeft, dan wat GESCHORST staat (een gezakte
      cel sluit alleen door hermeting, PROOF.md par. 2), dan de oudste meting. */

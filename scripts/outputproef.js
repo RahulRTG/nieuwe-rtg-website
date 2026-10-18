@@ -78,7 +78,7 @@ function koppeling(pad) {
 function gevoeligheid() {
   let t;
   try { t = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8')).toetsen; }
-  catch (e) { return null; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
   const gevoelig = new Set(), blind = new Set();
   for (const [naam, v] of Object.entries(t || {})) {
     if (v.soort !== 'server') continue;
@@ -261,7 +261,7 @@ function eerderGemeten() {
   try {
     const j = JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
     return j.gericht || {};
-  } catch (e) { return {}; }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return {}; }
 }
 
 /* Het geheugen van het register: `gericht` (elke route waarover al gelogen is)
@@ -274,7 +274,7 @@ function eerderGemeten() {
    schrijfpad hoort daarom door metGeheugen() te gaan. */
 function metGeheugen(uit, versGericht) {
   let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) {}
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   return Object.assign(uit, {
     gericht: versGericht || oud.gericht || {},
     basislijn: oud.basislijn || {},

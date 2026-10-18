@@ -205,7 +205,7 @@ if (require.main !== module) return;
 
   /* Stapelen: vers wint, de rest blijft. */
   let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) {}
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
      liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
      wacht zijn die niets wacht. */

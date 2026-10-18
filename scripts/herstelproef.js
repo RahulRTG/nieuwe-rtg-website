@@ -400,7 +400,7 @@ async function main() {
   const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTEL.json'), 'utf8'));
   const idemproef = (() => {
     try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
-    catch (e) { return null; }
+    catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
   })();
   let paren = parenUit(register, rollenUit(idemproef));
   /* Zet een deelronde haar eigen naam, zodat het REGISTER weet dat hij niet

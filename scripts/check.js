@@ -4821,10 +4821,12 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
      het niet zeker weten. */
   {
     const REG = path.join(ROOT, 'BEDRADING.json');
-    let oud = null;
-    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { oud = null; }
+    let oud = null, onleesbaar = null;
+    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); }
+    catch (e) { if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message); }
     if (!oud) {
-      fout('BEDRADING.json ontbreekt of is onleesbaar -- draai node scripts/check.js met een verse meting');
+      fout('BEDRADING.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'ontbreekt') +
+        ' -- draai node scripts/check.js met een verse meting');
     } else {
       if (r.kanten.onbekend.length > oud.gemeten.onbekend) {
         fout('de bedradingsonzekerheid groeit: ' + oud.gemeten.onbekend + ' -> ' +
@@ -5757,10 +5759,11 @@ console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is e
   if (!fs.existsSync(P)) {
     fout('EERSTEMINUUT.json ontbreekt -- draai: npm run eersteminuut');
   } else {
-    let r = null;
-    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { r = null; }
+    let r = null, onleesbaar = null;
+    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { onleesbaar = String(e && e.message); }
     if (!r || !r.telling) {
-      fout('EERSTEMINUUT.json is onleesbaar of draagt geen telling -- draai: npm run eersteminuut');
+      fout('EERSTEMINUUT.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'draagt geen telling') +
+        ' -- draai: npm run eersteminuut');
     } else {
       const gezakt = (r.toetsen || []).filter((t) => t.uitslag === 'gezakt');
       const wacht = r.wachten || {};

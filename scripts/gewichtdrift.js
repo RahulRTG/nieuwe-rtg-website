@@ -166,7 +166,7 @@ function meet(paden) {
   const { perModus } = lees(paden);
 
   let register = null;
-  try { register = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { /* geen register */ }
+  try { register = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* geen register */ }
   const modi = register && (register.modi ||
     (register.duur ? { onbekend: { duur: register.duur, stempel: register.stempel } } : {}));
 

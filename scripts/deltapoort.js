@@ -178,7 +178,7 @@ function uitzonderingen() {
   try {
     const n = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8'));
     return Array.isArray(n.uitzonderingen) ? n.uitzonderingen : [];
-  } catch (e) { return []; }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return []; }
 }
 function isUitgezonderd(lijst, regel, pad, wat) {
   return lijst.some(u => u && u.regel === regel && u.pad === pad &&

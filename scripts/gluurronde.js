@@ -806,7 +806,7 @@ async function main() {
     + vanB.length + ' stukken die B kon aanleggen)' + K.reset + '\n');
 
   let norm = null;
-  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) {}
+  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   if (norm && norm.meters && !BASIS_EXTERN) {
     if (VASTLEGGEN) {
       const p = norm.meters[METER], v = norm.meters[METER_N], b = norm.meters[METER_O];

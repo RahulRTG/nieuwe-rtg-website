@@ -144,7 +144,7 @@ function meet() {
     process.exit(1);
   }
   try { mutRuw = require(path.join(WORTEL, 'MUTATIES.json')).toetsen; }
-  catch (e) { mutRuw = null; }
+  catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; mutRuw = null; }
 
   /* De causale sensor leunt op MUTATIES.json. Ontbreekt dat register, dan staat
      die sensor op `geenBron` en niet op nul -- een sensor die niet kon kijken is

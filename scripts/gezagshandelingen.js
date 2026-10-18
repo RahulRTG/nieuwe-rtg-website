@@ -311,7 +311,7 @@ function stand(nu) {
 }
 
 function leesVastgelegd() {
-  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; }
+  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 function main() {

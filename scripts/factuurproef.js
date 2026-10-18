@@ -553,7 +553,7 @@ function terugweg(uit) {
     const rijen = (h && h.per) || [];
     kandidaten = (Array.isArray(rijen) ? rijen : Object.values(rijen))
       .filter(r => r && String(r.route || r.heen || '').includes('/api/pay/saldo')).length;
-  } catch (e) { kandidaten = null; }
+  } catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; kandidaten = null; }
   try {
     primitive = /huisUit/.test(fs.readFileSync(path.join(W.WORTEL, 'server/kern/pay/huis.js'), 'utf8'));
   } catch (e) { primitive = null; }
@@ -572,7 +572,7 @@ function terugweg(uit) {
   try {
     const b = require('../HERSTELBESLUIT.json');
     besluit = (b.routes && (b.routes['POST ' + ROUTE_PAD] || b.routes[ROUTE_PAD])) || null;
-  } catch (e) { besluit = null; }
+  } catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; besluit = null; }
   /* DE VERKLARING BLIJFT DE VERKLARING, DE METING BLIJFT DE METING.
 
      Deze stap stond tot 13 september hard op BLOCKED met de regel "ook een

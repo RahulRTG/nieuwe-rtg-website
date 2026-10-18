@@ -293,7 +293,7 @@ async function main() {
 
   /* ---------- de ratel ---------- */
   let norm = null;
-  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) {}
+  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   if (norm && norm.meters && !BASIS_EXTERN) {
     const uitslag = { gaten: gaten.length, gemeten: ledenEndpoints.length };
     if (VASTLEGGEN) {

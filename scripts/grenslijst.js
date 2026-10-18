@@ -78,7 +78,7 @@ if (require.main === module) {
      niet bij de volgende meting. Dat is het verschil tussen een vertrekpunt en
      een generator die je werk opeet. */
   let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')).domeinen || {}; } catch (e) {}
+  try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')).domeinen || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   const samen = {};
   let bijGehouden = 0;
   for (const d of new Set([].concat(Object.keys(lijst), Object.keys(oud))).values()) {

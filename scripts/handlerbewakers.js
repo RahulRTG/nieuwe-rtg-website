@@ -63,7 +63,7 @@ let zonderToegang = new Set();
 try {
   const c = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT.json'), 'utf8'));
   zonderToegang = new Set((c.rijen || []).filter(r => !r.toegang.waargenomen).map(r => r.route));
-} catch (e) {}
+} catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 
 /* DE POORTVORM. Drie schrijfwijzen van hetzelfde: een aanroep met (req, res)
    waarvan de uitkomst meteen tot een return leidt. Alles wat daar niet op lijkt,

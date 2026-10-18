@@ -12,8 +12,8 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5525,
-    "mutationContracts": 5397,
+    "routes": 5526,
+    "mutationContracts": 5398,
     "screens": 327
   },
   "classifications": [
@@ -42,11 +42,11 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2794,
+    "kernelFiles": 2820,
     "kernelGroups": [
       {
         "group": "_root",
-        "files": 601
+        "files": 603
       },
       {
         "group": "aanmeldingen",
@@ -166,7 +166,7 @@
       },
       {
         "group": "bureau",
-        "files": 25
+        "files": 26
       },
       {
         "group": "care",
@@ -194,7 +194,7 @@
       },
       {
         "group": "commercie",
-        "files": 46
+        "files": 47
       },
       {
         "group": "concern",
@@ -630,7 +630,7 @@
       },
       {
         "group": "revenue",
-        "files": 3
+        "files": 15
       },
       {
         "group": "rtc",
@@ -690,7 +690,7 @@
       },
       {
         "group": "stuur",
-        "files": 69
+        "files": 71
       },
       {
         "group": "tenant",
@@ -775,6 +775,10 @@
       {
         "group": "zaakdoos",
         "files": 11
+      },
+      {
+        "group": "zaakregie-context",
+        "files": 4
       },
       {
         "group": "zelfzorg",
@@ -869,6 +873,7 @@
       "server/bedrijf/waarom.js",
       "server/bedrijf/werkruimte.js",
       "server/bedrijf/wieis.js",
+      "server/bedrijf/zaakregie.js",
       "server/betaal-regie.js",
       "server/betaal.js",
       "server/betaal/connect/afrekening.js",
@@ -1260,6 +1265,7 @@
       "server/kern/commercie/subsidie.js",
       "server/kern/commercie/tegenfeit.js",
       "server/kern/commercie/tegoed.js",
+      "server/kern/commercie/tegoed/betaalbewijs.js",
       "server/kern/commercie/veiligheidskern.js",
       "server/kern/commercie/verrekening.js",
       "server/kern/commercie/voornemen.js",
@@ -2125,6 +2131,16 @@
       "server/kern/retail/klant.js",
       "server/kern/retail/vloer.js",
       "server/kern/revenue/catalogus-v1-validatie.js",
+      "server/kern/revenue/entitlement-eligibility-v1.js",
+      "server/kern/revenue/entitlement-eligibility-v1/contract.js",
+      "server/kern/revenue/entitlement-overzicht-v1.js",
+      "server/kern/revenue/entitlement-projectie-v1.js",
+      "server/kern/revenue/entitlement-projectie-v1/capability.js",
+      "server/kern/revenue/entitlement-projectie-v1/gedeeld.js",
+      "server/kern/revenue/entitlement-projectie-v1/gedelegeerd.js",
+      "server/kern/revenue/entitlement-projectie-v1/tenant.js",
+      "server/kern/revenue/entitlement-projectie-v1/workos.js",
+      "server/kern/revenue/subscription-source-audit-v1.js",
       "server/kern/rijksbieb.js",
       "server/kern/rtc/ijs.js",
       "server/kern/rtc/poort.js",
@@ -2587,6 +2603,12 @@
       "server/kern/zaakdoos/sleutels-uitgever.js",
       "server/kern/zaakdoos/sleutels.js",
       "server/kern/zaakdoos/synchronisatie.js",
+      "server/kern/zaakregie-context.js",
+      "server/kern/zaakregie-context/adapter.js",
+      "server/kern/zaakregie-context/basis.js",
+      "server/kern/zaakregie-context/hoedanigheid.js",
+      "server/kern/zaakregie-context/organisatie.js",
+      "server/kern/zaakregiebeeld.js",
       "server/kern/zelfzorg/beschermen.js",
       "server/kern/zelfzorg/index.js",
       "server/kern/zelfzorg/opruimen.js",
@@ -3931,6 +3953,9 @@
       "server/kern/reiswereld-bronnen-rtg.js",
       "server/kern/rendezvous-concierge.js",
       "server/kern/reservering/providerbewijs.js",
+      "server/kern/revenue/entitlement-eligibility-v1.js",
+      "server/kern/revenue/entitlement-overzicht-v1.js",
+      "server/kern/revenue/entitlement-projectie-v1/gedeeld.js",
       "server/kern/rtc/poort.js",
       "server/kern/rtc/turnclient.js",
       "server/kern/rtfos/basis.js",
@@ -4102,6 +4127,7 @@
       "server/kern/zaakdoos/koppen.js",
       "server/kern/zaakdoos/proxy.js",
       "server/kern/zaakdoos/sleutels.js",
+      "server/kern/zaakregiebeeld.js",
       "server/kern/zorgpolis.js",
       "server/kern/zwaarbewijs.js",
       "server/lib/ankerdienst.js",
@@ -4838,6 +4864,7 @@
       "server/kern/zaakdoos/index.js",
       "server/kern/zaakdoos/journaal.js",
       "server/kern/zaakdoos/synchronisatie.js",
+      "server/kern/zaakregiebeeld.js",
       "server/kern/zelfzorg/repareren.js",
       "server/kern/zorgketen/index.js",
       "server/lib/document-operatiepad.js",
@@ -5141,6 +5168,7 @@
       "server/kern/commercie/ronde.js",
       "server/kern/commercie/tegenfeit.js",
       "server/kern/commercie/tegoed.js",
+      "server/kern/commercie/tegoed/betaalbewijs.js",
       "server/kern/commercie/tegoed/inhoud.js",
       "server/kern/commercie/tegoed/plafond.js",
       "server/kern/commercie/veiligheidskern.js",
@@ -5596,6 +5624,7 @@
       "server/kern/werkvenster.js",
       "server/kern/zaakdoos/journaal.js",
       "server/kern/zaakdoos/kloon.js",
+      "server/kern/zaakregiebeeld.js",
       "server/kern/zelfzorg/index.js",
       "server/kern/zorgniveau.js",
       "server/lib/ca.js",
@@ -5898,6 +5927,7 @@
       "server/bedrijf/service.js",
       "server/bedrijf/taak.js",
       "server/bedrijf/werkruimte.js",
+      "server/bedrijf/zaakregie.js",
       "server/betaal.js",
       "server/betaal/connect/afrekening.js",
       "server/betaal/connect/index.js",
@@ -6666,6 +6696,7 @@
       "server/kern/rendezvous-tafels.js",
       "server/kern/rendezvous.js",
       "server/kern/retail.js",
+      "server/kern/revenue/entitlement-overzicht-v1.js",
       "server/kern/routedekking.js",
       "server/kern/rtc/ijs.js",
       "server/kern/rtc/poort.js",
@@ -7917,7 +7948,7 @@
         "mutationRoutes": 471,
         "declaredMutationSemantics": 171,
         "sourceFileCount": 42,
-        "kernelDependencyCount": 145,
+        "kernelDependencyCount": 146,
         "screenCount": 26,
         "sourceFiles": [
           "server/routes/borden.js",
@@ -7964,7 +7995,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 121,
+        "kernelDependenciesOmitted": 122,
         "screens": [
           "public/apps/app.html",
           "public/apps/attenties.html",
@@ -15648,7 +15679,7 @@
         "mutationRoutes": 1026,
         "declaredMutationSemantics": 319,
         "sourceFileCount": 203,
-        "kernelDependencyCount": 2683,
+        "kernelDependencyCount": 2698,
         "screenCount": 41,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15695,7 +15726,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2659,
+        "kernelDependenciesOmitted": 2674,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -16641,7 +16672,7 @@
         "mutationRoutes": 667,
         "declaredMutationSemantics": 392,
         "sourceFileCount": 114,
-        "kernelDependencyCount": 153,
+        "kernelDependencyCount": 154,
         "screenCount": 21,
         "sourceFiles": [
           "server/routes/atelierweb.js",
@@ -16688,7 +16719,7 @@
           "server/kern/appstore/vierogen.js",
           "server/kern/bank/eigendom.js"
         ],
-        "kernelDependenciesOmitted": 129,
+        "kernelDependenciesOmitted": 130,
         "screens": [
           "public/apps/backoffice.html",
           "public/apps/boardroom.html",
@@ -17280,11 +17311,11 @@
         "/api/werk-leverancier"
       ],
       "behaviourEvidence": {
-        "routeCount": 136,
-        "mutationRoutes": 136,
-        "declaredMutationSemantics": 68,
-        "sourceFileCount": 47,
-        "kernelDependencyCount": 90,
+        "routeCount": 137,
+        "mutationRoutes": 137,
+        "declaredMutationSemantics": 69,
+        "sourceFileCount": 48,
+        "kernelDependencyCount": 104,
         "screenCount": 1,
         "sourceFiles": [
           "server/bedrijf/aansluiting.js",
@@ -17304,7 +17335,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "sourceFilesOmitted": 31,
+        "sourceFilesOmitted": 32,
         "kernelDependencies": [
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
@@ -17331,7 +17362,7 @@
           "server/bedrijf/inzicht.js",
           "server/bedrijf/it.js"
         ],
-        "kernelDependenciesOmitted": 66,
+        "kernelDependenciesOmitted": 80,
         "screens": [
           "public/apps/werk.html"
         ],
@@ -26537,7 +26568,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2654,
+        "kernelDependencyCount": 2669,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26571,7 +26602,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2630,
+        "kernelDependenciesOmitted": 2645,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -26973,7 +27004,7 @@
         "mutationRoutes": 14,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
-        "kernelDependencyCount": 134,
+        "kernelDependencyCount": 135,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/ik-workspace-rechten.js",
@@ -27008,7 +27039,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 110,
+        "kernelDependenciesOmitted": 111,
         "screens": [
           "public/apps/geld.html",
           "public/apps/ik.html"
@@ -27206,7 +27237,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2654,
+        "kernelDependencyCount": 2672,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -27240,7 +27271,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2630,
+        "kernelDependenciesOmitted": 2648,
         "screens": [
           "public/apps/app.html"
         ],
@@ -27569,7 +27600,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2654,
+        "kernelDependencyCount": 2669,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27602,7 +27633,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2630,
+        "kernelDependenciesOmitted": 2645,
         "screens": [
           "public/apps/vertaler.html"
         ],
@@ -29585,7 +29616,7 @@
         "mutationRoutes": 2,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 34,
+        "kernelDependencyCount": 35,
         "screenCount": 3,
         "sourceFiles": [
           "server/routes/balans.js",
@@ -29610,15 +29641,15 @@
           "server/kern/commercie/risicouitzondering.js",
           "server/kern/commercie/tegenfeit.js",
           "server/kern/commercie/tegoed.js",
+          "server/kern/commercie/tegoed/betaalbewijs.js",
           "server/kern/commercie/tegoed/inhoud.js",
           "server/kern/commercie/tegoed/plafond.js",
           "server/kern/commercie/vergoeding.js",
           "server/kern/commercie/voorstel.js",
           "server/kern/commercie/voorstel/weging.js",
-          "server/kern/commercie/zaakabonnement.js",
-          "server/kern/doorgeefjournaal.js"
+          "server/kern/commercie/zaakabonnement.js"
         ],
-        "kernelDependenciesOmitted": 10,
+        "kernelDependenciesOmitted": 11,
         "screens": [
           "public/apps/geld.html",
           "public/apps/juridisch/partnervoorwaarden.html",
@@ -29722,7 +29753,7 @@
         "mutationRoutes": 3,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 34,
+        "kernelDependencyCount": 35,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/kantoren/geld.js"
@@ -29746,15 +29777,15 @@
           "server/kern/commercie/risicouitzondering.js",
           "server/kern/commercie/tegenfeit.js",
           "server/kern/commercie/tegoed.js",
+          "server/kern/commercie/tegoed/betaalbewijs.js",
           "server/kern/commercie/tegoed/inhoud.js",
           "server/kern/commercie/tegoed/plafond.js",
           "server/kern/commercie/vergoeding.js",
           "server/kern/commercie/voorstel.js",
           "server/kern/commercie/voorstel/weging.js",
-          "server/kern/commercie/zaakabonnement.js",
-          "server/kern/doorgeefjournaal.js"
+          "server/kern/commercie/zaakabonnement.js"
         ],
-        "kernelDependenciesOmitted": 10,
+        "kernelDependenciesOmitted": 11,
         "screens": [
           "public/apps/juridisch/partnervoorwaarden.html"
         ],
@@ -29961,7 +29992,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 6,
+        "kernelDependencyCount": 7,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/aitegoed.js"
@@ -29971,6 +30002,7 @@
           "server/kern/commercie/bundelprijs.js",
           "server/kern/commercie/capaciteiten.js",
           "server/kern/commercie/tegoed.js",
+          "server/kern/commercie/tegoed/betaalbewijs.js",
           "server/kern/commercie/tegoed/inhoud.js",
           "server/kern/commercie/tegoed/plafond.js",
           "server/kern/eigencollectie.js"

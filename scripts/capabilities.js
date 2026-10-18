@@ -370,6 +370,11 @@ function analyse(lijstenIn, opties) {
   for (const l of lijsten) for (const id of l.leden) alleLeden.add(id);
 
   return {
+    /* Wat deze meting NIET aantoont, als veld (scripts/meetleer.js leest het). */
+    grens: 'De zeef op de naam (VERMOGENSWOORD) is door een mens gekozen: hij mist een woordenlijst die ' +
+      'anders heet en vangt er een die toevallig zo heet. Weinig overlap tussen lijsten zegt dat het woord ' +
+      'hier geen EEN ding noemt, niet welk contract het wel zou moeten zijn; gemeten op de leden, niet op ' +
+      'het gedrag.',
     woordenlijsten: lijsten.length,
     leden: alleLeden.size,
     ledenInEen: alleLeden.size - gedeeld.length,

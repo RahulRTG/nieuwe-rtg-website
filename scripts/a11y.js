@@ -133,41 +133,21 @@ const { herkomst: browserHerkomst } = require('./lib/scherm');
    gaat nu via page.evaluate (dat loopt buiten de CSP om) in plaats van via
    addScriptTag. En hij heeft een wegwerpdatamap nodig, want de scan maakt een
    echt proeflid aan. Zelfde opzet als de proef-familie in scripts/. */
-function startEchteServer() {
-  const net = require('net');
-  const { spawn } = require('child_process');
-  const os = require('os');
-  return new Promise((klaar, mis) => {
-    const s = net.createServer();
-    s.unref(); s.on('error', mis);
-    s.listen(0, '127.0.0.1', () => {
-      const poort = s.address().port;
-      s.close(async () => {
-        const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-a11y-'));
-        const kind = spawn(process.execPath, [path.join(ROOT, 'server', 'server.js')], {
-          cwd: ROOT, stdio: 'ignore',
-          /* RTG_DEMO: de demozaken (en dus de zaak-inlog van de derde ronde)
-             worden alleen in demostand gezaaid -- test/helper.js doet hetzelfde.
-             Zonder die vlag kent deze wegwerpserver geen enkele leverancier en
-             valt de zaakronde om op "Deze leverancierscode kennen we niet". Het
-             is bovendien de betere stand om a11y in te meten: de schermen hebben
-             er echte inhoud in plaats van lege lijsten. */
-          env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-            STUN_UIT: '1', NODE_ENV: 'test', RTG_DEMO: '', RTG_MAGNAAT_TEST: '1' }
-        });
-        const basis = 'http://127.0.0.1:' + poort;
-        const stop = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
-        for (let i = 0; i < 300; i++) {
-          /* WACHTEN OP /api/ready EN NIET OP /api/health: health is op zodra de
-             poort luistert, maar de opslagpoortwachter geeft daarna nog 503 op
-             ELKE API tot de opslag echt geladen is. */
-          try { if ((await fetch(basis + '/api/ready')).ok) return klaar({ basis, stop }); } catch (e) { /* nog niet op */ }
-          await new Promise(r => setTimeout(r, 200));
-        }
-        stop(); mis(new Error('de server kwam niet op'));
-      });
-    });
-  });
+async function startEchteServer() {
+  /* De wegwerpserver uit de ene plek waar hij woont (scripts/lib/wegwerpserver.js;
+     BEWIJSSCHULD.json, post wegwerpserver-kopieen). Wachten op /api/ready en niet
+     op /api/health: health is op zodra de poort luistert, maar de
+     opslagpoortwachter geeft daarna nog 503 op ELKE API tot de opslag echt geladen
+     is.
+
+     RTG_DEMO: de demozaken (en dus de zaak-inlog van de derde ronde) worden alleen
+     in demostand gezaaid -- test/helper.js doet hetzelfde. Zonder die vlag kent deze
+     wegwerpserver geen enkele leverancier en valt de zaakronde om op "Deze
+     leverancierscode kennen we niet". Het is bovendien de betere stand om a11y in te
+     meten: de schermen hebben er echte inhoud in plaats van lege lijsten. */
+  const s = await require('./lib/wegwerpserver').start({ naam: 'a11y', gereed: 'ready', wachtMs: 60000,
+    env: { NODE_ENV: 'test', RTG_DEMO: '', RTG_MAGNAAT_TEST: '1' } });
+  return { basis: s.basis, stop: s.klaar };
 }
 
 (async () => {

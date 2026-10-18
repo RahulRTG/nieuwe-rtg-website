@@ -95,7 +95,9 @@ function heeftResultaat(j) {
 function keurRegister(naam) {
   let j;
   try { j = JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8')); }
-  catch (e) { return null; }
+  /* Een register dat er staat maar niet parseert is geen register dat er niet is:
+     stil overslaan haalde het uit de noemer EN uit `blind`. Alleen afwezig is afwezig. */
+  catch (e) { if (!e || e.code !== 'ENOENT') throw new Error(naam + ' is onleesbaar (' + (e && e.message) + '); de meetleer telt geen register weg'); return null; }
   if (!j || typeof j !== 'object' || Array.isArray(j)) return null;
 
   const proza = prozaVan(j);

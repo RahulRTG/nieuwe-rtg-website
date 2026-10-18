@@ -1,24 +1,24 @@
 {
  "stempel": {
-  "op": "2026-10-12T14:01:16.290Z",
-  "commit": "6d5abcb5c",
+  "op": "2026-10-18T10:48:27.242Z",
+  "commit": "2c24c722",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 1,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 358,
+  "meetwerk": 355,
   "instrument": 466,
   "grens": 687
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 824,
+  "staat": 821,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 824,
+  "achterstand": 821,
   "randVanDeMethode": 687,
   "auth-onbeslist": 1,
   "capability-in-handler": 560,
@@ -47,7 +47,7 @@
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
   "idem-ongeclassificeerd": 152,
-  "wegwerpserver-kopieen": 3
+  "wegwerpserver-kopieen": 0
  },
  "posten": [
   {
@@ -190,7 +190,7 @@
    "id": "wegwerpserver-kopieen",
    "soort": "meetwerk",
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
-   "aantal": 3,
+   "aantal": 0,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
    "sluit": "GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
   }
@@ -198,191 +198,187 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-10-06",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-11",
     "aantal": 1
    },
    {
     "op": "2026-10-12",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-10-06",
-    "aantal": 560
-   },
-   {
     "op": "2026-10-11",
     "aantal": 560
    },
    {
     "op": "2026-10-12",
+    "aantal": 560
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 560
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-10-06",
-    "aantal": 52
-   },
-   {
     "op": "2026-10-11",
     "aantal": 52
    },
    {
     "op": "2026-10-12",
+    "aantal": 52
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-10-06",
-    "aantal": 21
-   },
-   {
     "op": "2026-10-11",
     "aantal": 21
    },
    {
     "op": "2026-10-12",
+    "aantal": 21
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 21
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-10-06",
-    "aantal": 102
-   },
-   {
     "op": "2026-10-11",
     "aantal": 102
    },
    {
     "op": "2026-10-12",
+    "aantal": 102
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-10-06",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-11",
     "aantal": 0
    },
    {
     "op": "2026-10-12",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 0
    }
   ],
   "output-blind": [
    {
-    "op": "2026-10-06",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-11",
     "aantal": 0
    },
    {
     "op": "2026-10-12",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-10-06",
-    "aantal": 4
-   },
-   {
     "op": "2026-10-11",
     "aantal": 4
    },
    {
     "op": "2026-10-12",
+    "aantal": 4
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-10-06",
-    "aantal": null
-   },
-   {
     "op": "2026-10-11",
     "aantal": null
    },
    {
     "op": "2026-10-12",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-18",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-10-06",
-    "aantal": null
-   },
-   {
     "op": "2026-10-11",
     "aantal": null
    },
    {
     "op": "2026-10-12",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-18",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-10-06",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-11",
     "aantal": 1
    },
    {
     "op": "2026-10-12",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 1
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-10-05",
-    "aantal": 323
-   },
-   {
     "op": "2026-10-11",
     "aantal": 466
    },
    {
     "op": "2026-10-12",
+    "aantal": 466
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 466
    }
   ],
   "proefruis": [
    {
-    "op": "2026-10-06",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-11",
     "aantal": 1
    },
    {
     "op": "2026-10-12",
     "aantal": 1
+   },
+   {
+    "op": "2026-10-18",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
-   {
-    "op": "2026-10-06",
-    "aantal": 96
-   },
    {
     "op": "2026-10-11",
     "aantal": 96
@@ -390,62 +386,66 @@
    {
     "op": "2026-10-12",
     "aantal": 97
+   },
+   {
+    "op": "2026-10-18",
+    "aantal": 97
    }
   ],
   "droogloop-onbeoordeeld": [
-   {
-    "op": "2026-10-06",
-    "aantal": 2
-   },
    {
     "op": "2026-10-11",
     "aantal": 2
    },
    {
     "op": "2026-10-12",
+    "aantal": 2
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-10-06",
-    "aantal": 49
-   },
-   {
     "op": "2026-10-11",
     "aantal": 49
    },
    {
     "op": "2026-10-12",
+    "aantal": 49
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-10-06",
-    "aantal": 152
-   },
-   {
     "op": "2026-10-11",
     "aantal": 152
    },
    {
     "op": "2026-10-12",
+    "aantal": 152
+   },
+   {
+    "op": "2026-10-18",
     "aantal": 152
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-10-06",
-    "aantal": 3
-   },
-   {
     "op": "2026-10-11",
     "aantal": 3
    },
    {
     "op": "2026-10-12",
     "aantal": 3
+   },
+   {
+    "op": "2026-10-18",
+    "aantal": 0
    }
   ]
  },
@@ -467,6 +467,12 @@
    "aantal": 1,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
+  },
+  {
+   "id": "object-vooraf",
+   "aantal": 466,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
   },
   {
    "id": "proefruis",
@@ -491,12 +497,6 @@
    "aantal": 152,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route beslissen en vastleggen in de canonieke server/lib/mutatiecontracten (gevalideerd met dezelfde contractkeuring), of het oudere IDEMBESLUIT.json. Een fixtureblokkade, tebeslissen of onbekende semantiek blijft open. Dit telt uitsluitend het bestaan van een geldig besluit; runtimebewijs blijft afzonderlijk in IDEMPROEF.json en de bewijsmatrix staan."
-  },
-  {
-   "id": "wegwerpserver-kopieen",
-   "aantal": 3,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
   }
  ],
  "groei": [

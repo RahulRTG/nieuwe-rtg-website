@@ -126,7 +126,7 @@ function gevraagdeModus() {
 function duren() {
   if (onthouden) return onthouden;
   let reg = null;
-  try { reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { reg = null; }
+  try { reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; reg = null; }
 
   /* Een register van voor de modi (versie 1) draagt zijn duur in de top. Die
      metingen zijn ECHT, maar van welke modus weet niemand meer -- dus tellen ze

@@ -75,7 +75,7 @@ const prefix = p => p.split('/').slice(0, -1).join('/');
 function routes() {
   let reg;
   try { reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
-  catch (e) { return null; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
   return [...new Set((reg.perRoute || [])
     .filter(r => r && r.methode === 'POST' && typeof r.pad === 'string').map(r => r.pad))].sort();
 }
@@ -94,7 +94,7 @@ function bouw() {
   try {
     for (const u of (JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), 'utf8')).per || []))
       beproefd[u.heen] = u;
-  } catch (e) { /* geen proef gedraaid: dan blijft alles vermoed, en dat is de eerlijke stand */ }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* geen proef gedraaid: dan blijft alles vermoed, en dat is de eerlijke stand */ }
   let vermoed = 0, dubbelzinnig = 0;
   const bestaat = new Set(alle);
   const domeinVan = new Map(DOMEINPAREN.filter(([h, t]) => bestaat.has(h) && bestaat.has(t)).map(([h, t, g]) => [h, { t, g }]));

@@ -47,7 +47,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { start } = require('./lib/wegwerpserver');
 
 const WORTEL = path.join(__dirname, '..');
@@ -173,7 +173,7 @@ if (require.main !== module) { module.exports = { GEVALLEN }; return; }
       'die van een echt scherm.',
     rijen
   };
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('pakte'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
 
   if (!stil) {
     for (const k of Object.keys(perKlasse)) {

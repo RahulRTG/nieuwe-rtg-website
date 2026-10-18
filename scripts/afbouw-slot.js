@@ -55,7 +55,7 @@ function eigenaarLeeft(huidig) {
 
 function leesEigenaar() {
   try { return JSON.parse(fs.readFileSync(EIGENAAR, 'utf8')); }
-  catch (e) { return null; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 function pak(taak) {

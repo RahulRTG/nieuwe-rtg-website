@@ -125,6 +125,7 @@ async function meet(opties) {
   const reg = {
     stempel: huisStempel(),
     uitleg: 'Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om.',
+    grens: 'Gemeten in de gecontroleerde testwereld (wegwerpdata, postvanger, sms-sandbox), niet op productie: een onderdeel dat hier voltooibaar, persistent en herstelbaar is, kan dat buiten die wereld nog niet zijn. Een geslaagd scenario geldt voor DAT scenario en die invoer, niet voor elke variant van het onderdeel.',
     hoe: 'npm run voltooiproef:vast',
     testwereld: {
       mail: 'postvanger (server/post-vanger.js): alleen met RTG_POSTVANGER=1, nooit in productie, nooit naast SMTP_URL of MAIL_DIRECT',

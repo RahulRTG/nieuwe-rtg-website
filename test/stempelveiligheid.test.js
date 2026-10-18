@@ -33,29 +33,50 @@ test('1. de vijf klassen sluiten elkaar uit en dekken alle schrijvers', () => {
   }
 });
 
-test('2. DE ZELFIJKING: het bekende geval wordt gevonden', () => {
+/* HET BEKENDE GEVAL IS GEREPAREERD (18 oktober 2026): scripts/rolronde.js en
+   scripts/gluurronde.js roepen eisSchoneBoom() aan voor ze hun register
+   schrijven, en vallen daarmee terecht uit de risicoklasse. Toets 2 en 3 stonden
+   op die twee als ECHTE getuigen; een gerepareerd script kan niet meer getuigen.
+   Dus nu twee lagen: (a) is de reparatie echt -- staat de AANROEP er, en niet
+   alleen het woord -- en (b) een VERZONNEN getuige in precies de vorm van het
+   incident, die door dezelfde indeling (klasseer) moet lopen als elk script. Zo
+   blijft bewezen dat de meter het incident vindt, ook nu het niet meer bestaat. */
+const STEMPEL_REQ = 'const { stempel } = require(' + String.fromCharCode(39) + './lib/stempel' + String.fromCharCode(39) + ');\n';
+const INCIDENT = STEMPEL_REQ + 'fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({ stempel: stempel() }));\n';
+
+test('2. DE ZELFIJKING: het bekende geval wordt gevonden, of is aantoonbaar gerepareerd', () => {
   /* Het incident van 15 september: npm run ci:lokaal op een vuile boom schreef
-     ROLRONDE.json met boomVuil: true, en git add -A veegde hem mee. */
-  assert.equal(u.ijking.gevondenInKlasse, true,
-    'scripts/rolronde.js staat niet meer in KAN_COMMITBEWIJS_ONGELDIG_MAKEN. Dat is OF een echte ' +
-    'reparatie aan dat script OF een meter die blind is geworden -- kijk welke van de twee ' +
-    'voordat je dit getal als vooruitgang leest.');
-  assert.equal(u.ijking.gevondenInDoorsnede, true,
-    'rolronde.js zit in de klasse maar niet in de doorsnede. Precies dat was de eerste versie van ' +
-    'deze meter: hij miste het geval waarvoor hij was gebouwd, omdat ci-lokaal.js zijn poorten uit ' +
-    '.github/workflows haalt en niet uit package.json.');
+     ROLRONDE.json met boomVuil: true, en een brede add veegde hem mee. */
+  const fs = require('fs');
+  const path = require('path');
+  const { zonderCommentaar, zonderTekst } = require('../scripts/lib/bron');
+  const rol = zonderTekst(zonderCommentaar(fs.readFileSync(path.join(__dirname, '..', 'scripts', 'rolronde.js'), 'utf8')));
+  assert.ok(u.ijking.gevondenInKlasse || /\beisSchoneBoom\s*\(/.test(rol),
+    'scripts/rolronde.js staat niet meer in KAN_COMMITBEWIJS_ONGELDIG_MAKEN en roept eisSchoneBoom() ' +
+    'ook niet aan. Dan is de meter blind geworden, niet het script gerepareerd.');
+
+  const getuige = sv.klasseer('verzonnen-rolronde.js', INCIDENT, ['werkstroom:ci.yml']);
+  assert.equal(getuige.klasse, 'KAN_COMMITBEWIJS_ONGELDIG_MAKEN',
+    'de vorm van het incident (stempelt, schrijft ongevraagd, geen grendel) valt niet in de risicoklasse');
+  assert.deepEqual(getuige.viaPoort, ['werkstroom:ci.yml'],
+    'de getuige loopt mee in een werkstroom en staat toch niet in de doorsnede. Precies dat was de ' +
+    'eerste versie van deze meter: hij miste het geval waarvoor hij was gebouwd.');
+
+  const gerepareerd = sv.klasseer('verzonnen-rolronde.js',
+    INCIDENT.replace('fs.writeFileSync', 'if (eisSchoneBoom(1).ok) fs.writeFileSync'), ['werkstroom:ci.yml']);
+  assert.equal(gerepareerd.klasse, 'SCHONE_BOOM_VEREIST', 'de reparatie wordt niet herkend');
 });
 
 test('3. de doorsnede meet iets ANDERS dan de klasse', () => {
-  /* scripts/ci-lokaal.js noemt zelf drie schrijvers. Twee zijn vanuit een poort
-     bereikbaar, de ladder niet -- en juist dat verschil laat zien dat de
-     doorsnede geen tweede naam voor de klasse is. */
+  /* De ladder is vanuit geen enkele poort bereikbaar en hoort dus nooit in de
+     doorsnede; dezelfde verzonnen getuige zonder poort ook niet. */
   const d = u.ijking.drieUitCiLokaal;
-  assert.equal(d['rolronde.js'].inDoorsnede, true);
-  assert.equal(d['gluurronde.js'].inDoorsnede, true);
   assert.equal(d['bewijsladder.js'].inDoorsnede, false,
     'de ladder staat in de doorsnede terwijl hij nergens vanuit een poort bereikbaar is; dan is ' +
     'de doorsnede hetzelfde geworden als de klasse en meet hij niets extras');
+  const zonderPoort = sv.klasseer('verzonnen.js', INCIDENT, ['iets:vast']);
+  assert.equal(zonderPoort.klasse, 'KAN_COMMITBEWIJS_ONGELDIG_MAKEN');
+  assert.deepEqual(zonderPoort.viaPoort, [], 'een npm-script dat geen poort is, telt als poort');
   assert.ok(u.inEenPoort.length < (u.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN || 0),
     'de doorsnede is even groot als de klasse; dan is de poortvraag geen onderscheid');
 });
@@ -140,4 +161,17 @@ test('6. de drie blinde vlekken, elk met een VERZONNEN getuige', () => {
   assert.equal(sv.opVerzoek(vlagElders).achterVlag, 0,
     'een vlag die boven een ANDERE functie staat, dekt deze schrijfregel; dan is de vlagvraag ' +
     '"staat het woord ergens in het bestand" en dat is geen grendel');
+
+  /* f. DE ARGUMENTENLIJST HEET OOK `args` (activering.js, verstrengeling.js). */
+  const metArgs = 'else if (args.includes(' + q + '--vastleggen' + q + ')) {\n  fs.writeFileSync(DOEL, x);\n}';
+  assert.equal(sv.opVerzoek(metArgs).achterVlag, 1, 'args.includes(--vastleggen) wordt niet als vlag gezien');
+
+  /* g. DE VLAG ALS CONSTANTE IN HOOFDLETTERS (idorproef.js, ondernemerbewijs.js). */
+  assert.equal(sv.opVerzoek('if (VASTLEGGEN) {\n  fs.writeFileSync(DOEL, x);\n}').achterVlag, 1,
+    'if (VASTLEGGEN) wordt niet als vlag gezien');
+  assert.equal(sv.opVerzoek('if (VAST) { fs.writeFileSync(DOEL, x); }').achterVlag, 1);
+  /* en een ANDER woord in hoofdletters is geen vlag: zonder deze regel slaagt 6g
+     ook bij een meter die elke voorwaarde als vlag leest. */
+  assert.equal(sv.opVerzoek('if (KLAAR) {\n  fs.writeFileSync(DOEL, x);\n}').achterVlag, 0,
+    'een willekeurige voorwaarde telt als vlag');
 });

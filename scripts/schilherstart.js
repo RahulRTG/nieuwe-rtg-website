@@ -101,7 +101,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL_STANDAARD = path.join(WORTEL, 'SCHILHERSTART.json');
@@ -546,5 +546,5 @@ const mediaan = (r) => {
   if (telling.fouten || telling.nietTotRust) console.log('Let op: ' + telling.fouten + ' fouten, ' +
     telling.nietTotRust + ' keer niet tot rust gekomen.');
   if (telling.fouten) process.exitCode = 1;
-  if (!DROOG) fs.writeFileSync(DOEL, JSON.stringify(register, null, 2) + '\n');
+  if (!DROOG && magSchrijven(eisSchoneBoom('schilherstart'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(register, null, 2) + '\n');
 })().catch((e) => { console.error(e); process.exit(2); });

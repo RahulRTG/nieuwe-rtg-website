@@ -38,7 +38,7 @@ const fs = require('fs');
 const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const oppervlak = require('./tekstoppervlak');
 const { DOELTALEN, BRON, padVan } = require('../server/taalschil');
 const { keur } = require('../server/kern/taalkeuring');
@@ -164,6 +164,10 @@ function offlineTalen(bestaat) {
 }
 
 async function bouw(vertaalBatch) {
+  /* De grendel VOOR de eerste schrijfregel: de vertaalbestanden onder public/
+     zijn zelf code, dus na het wegschrijven is de boom vuil door deze bouw. Wat
+     telt is of hij schoon was toen hij begon. */
+  const poort = eisSchoneBoom('taalschil');
   const { teksten, gemist } = schilTeksten();
   const uit = [];
   for (const code of DOELTALEN) {
@@ -176,7 +180,7 @@ async function bouw(vertaalBatch) {
       afgewezen: bestand.afgewezenDoorKeuring, bytes: fs.statSync(doel).size });
   }
   const register = registerVoor(teksten.length, gemist, uit);
-  fs.writeFileSync(path.join(WORTEL, 'TAALSCHIL.json'), JSON.stringify(register, null, 1) + '\n');
+  if (magSchrijven(poort, 'TAALSCHIL.json')) fs.writeFileSync(path.join(WORTEL, 'TAALSCHIL.json'), JSON.stringify(register, null, 1) + '\n');
   return { schilTeksten: teksten.length, gemist, talen: uit };
 }
 

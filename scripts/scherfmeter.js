@@ -175,7 +175,7 @@ function meetKlasse(k, vorige, opties) {
 
 function meet() {
   let vorige = null;
-  try { vorige = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { vorige = null; }
+  try { vorige = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; vorige = null; }
   const klassen = {};
   for (const k of KLASSEN) klassen[k.id] = meetKlasse(k, vorige);
   return { klassen, vorige };

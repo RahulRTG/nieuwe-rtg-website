@@ -104,7 +104,7 @@ for (const v of gevonden.values()) telling[v.schrijft]++;
    DE KRUISING MET DE METING -- waar het veto werkelijk iets doet.
    ------------------------------------------------------------------------- */
 let proef = { perRoute: [] };
-try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) {}
+try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 
 const stilMaarSchrijvend = [];
 for (const r of proef.perRoute || []) {

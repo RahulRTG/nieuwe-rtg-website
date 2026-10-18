@@ -53,7 +53,7 @@ function lees(naam) {
    ongecommitte code is NIET te herhalen, en een register dat daarover zwijgt
    leest als een reproduceerbare meting. De norm telt zulke registers apart
    (`registersUitVuileBoom`) -- en dat werkt alleen als het veld er staat. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 /* DE BOUWER IS EEN PURE FUNCTIE, en dat is geen netheid maar een eis van dit
    huis. Zolang dit bestand zijn werk deed bij het laden, kon test/gelddekking.test.js
@@ -362,7 +362,7 @@ const register = bouw({
 const { klachten, ratel, rijen } = register;
 const N = register.gemeten.geldroutes;
 
-fs.writeFileSync(path.join(WORTEL, 'GELDDEKKING.json'), JSON.stringify(register, null, 2) + '\n');
+if (magSchrijven(eisSchoneBoom('gelddekking'), 'GELDDEKKING.json')) fs.writeFileSync(path.join(WORTEL, 'GELDDEKKING.json'), JSON.stringify(register, null, 2) + '\n');
 
 /* ---------------------------------------------------------------- scherm */
 const g = n => String(n).padStart(4);

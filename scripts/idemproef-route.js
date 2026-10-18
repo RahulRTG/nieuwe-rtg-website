@@ -547,7 +547,7 @@ function wachtOpSchoneBoom() {
   };
 
   let register = {};
-  try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
+  try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   const besluiten = register.routes || {};
 
   /* DE WERELDEN, EN WAAROM ZE HIER STAAN.

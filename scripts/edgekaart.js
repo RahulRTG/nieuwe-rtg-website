@@ -41,7 +41,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { zonderCommentaar, stukken } = require('./lib/bron');
 const { bundels } = require('./bundel');
 
@@ -777,7 +777,7 @@ function main() {
     console.log(regel + ' -- EDGEKAART.json is bij.');
     return;
   }
-  fs.writeFileSync(UIT, JSON.stringify(Object.assign({ stempel: stempel() }, r), null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('edgekaart'), UIT)) fs.writeFileSync(UIT, JSON.stringify(Object.assign({ stempel: stempel() }, r), null, 2) + '\n');
   console.log(regel);
   if (stil) return;
   for (const d of r.dubbeleEigenaars) console.log('  dubbel ' + d.naam + ': ' + d.schrijvers.length + ' schrijvers, ' + d.beslissers.length + ' beslissers');

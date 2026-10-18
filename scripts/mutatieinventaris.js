@@ -108,7 +108,7 @@ const aanroepbaar = schrijfBuitenSchakel.filter(r => !r.pad.includes(':'));
    5. EVIDENCE INVENTORY -- waarover werkelijk iets is vastgesteld.
    ------------------------------------------------------------------------- */
 let proef = null;
-try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) {}
+try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 const gemetenRijen = (proef && proef.perRoute) || [];
 const gemeten = new Map(gemetenRijen.map(r => [sleutel(r), r]));
 const metUitspraak = gemetenRijen.filter(r => r.idempotentie !== 'ongemeten');

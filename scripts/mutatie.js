@@ -792,6 +792,9 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
      muteert hij scripts/momentproef.js en zakt de toets erop. */
   ['momentproef.test.js', ['scripts/momentproef.js']],
+  /* Zelfde vorm voor de CIVILIS-keten voorraad-ontvangst: de toets leest het
+     instrument via fs, dus hier staat welke bron hij bewaakt. */
+  ['voorraadproef.test.js', ['scripts/voorraadproef.js']],
   /* DE BUDGETTERUGNAME toetst de GRENS van registratieTerug (alleen terugnemen
      wat aantoonbaar leeg is) en de poort van MAX_PER_LID -- maar requiret
      kern/waarde als geheel, dus de motor mikte op index.js: de compositiewortel,

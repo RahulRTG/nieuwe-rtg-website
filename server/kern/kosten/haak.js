@@ -100,6 +100,7 @@ function wieNu() { const s = context.getStore(); return (s && s.drager) || HUIS;
 /* De late binding. Eén meter, en de tweede aanroep vervangt de eerste in plaats
    van erbij te komen: twee meters zouden elk verbruik dubbel tellen. */
 let sink = null;
+let handelingModule = null; // lui geladen en daarna onthouden: zie de toelichting in opzet/handeling.js
 function zetMeter(fn) { sink = typeof fn === 'function' ? fn : null; }
 function meterStaat() { return !!sink; }
 
@@ -114,7 +115,7 @@ function meld(soortId, aantal, opties) {
      verzoek in gang zette, is zijn kost -- maar het wordt geteld in plaats van
      stil geboekt. Lui geladen: de kop van dit bestand belooft dat ai.js het
      zonder kern kan laden. */
-  try { const h = require('../../opzet/handeling'); if (h.afgelopen()) h.naAfloopMeld('kosten', soortId); } catch (e) {}
+  try { const h = handelingModule || (handelingModule = require('../../opzet/handeling')); if (h.afgelopen()) h.naAfloopMeld('kosten', soortId); } catch (e) {}
   try { return !!sink({ drager: o.drager || wieNu(), soort: soortId, aantal,
     pas: o.pas || (s && s.pas) || null, bron: o.bron || null }); }
   catch (e) { return false; }

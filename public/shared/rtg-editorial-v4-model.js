@@ -32,6 +32,17 @@
     if (TASK.test(route) || declared === 'agenda' || declared === 'task') return 'task';
     return 'detail';
   }
+  function ownsPresentation(kind, body) {
+    /* Heritage blijft de universele kwaliteitsvloer. Editorial V4 neemt een
+       scherm pas over wanneer het van zichzelf redactioneel is (cover of
+       collectie), of wanneer een gemigreerde route dat expliciet verklaart.
+       Zo blijft bestaande taakbediening eigenaar van operationele schermen
+       totdat die bediening bewust naar de gedeelde schil is overgedragen. */
+    var declared = body && body.getAttribute && body.getAttribute('data-rtg-editorial-v4');
+    if (declared === 'off') return false;
+    if (declared !== 'force' && body && body.hasAttribute && body.hasAttribute('data-rtg-editorial-room')) return false;
+    return declared === 'force' || kind === 'cover' || kind === 'collection';
+  }
   function photoFor(route, world) {
     var pool = PHOTOS[world] || PHOTOS.living, score = 0;
     for (var i = 0; i < route.length; i += 1) score = ((score * 31) + route.charCodeAt(i)) >>> 0;
@@ -44,5 +55,6 @@
     var key = route.split('/').pop().replace(/\.html$/, '');
     return ({agenda:'Agenda',berichten:'Berichten',rtmail:'RTmail',documenten:'Documenten',bestanden:'Documenten',mall:'Mall',reizen:'Reizen',reisboek:'Reisboek',passkeys:'Passkeys',navigatie:'Navigatie'})[key] || fallback;
   }
-  return Object.freeze({ pathOf:pathOf, classify:classify, photoFor:photoFor, worldName:worldName, screenLabel:screenLabel });
+  return Object.freeze({ pathOf:pathOf, classify:classify, ownsPresentation:ownsPresentation,
+    photoFor:photoFor, worldName:worldName, screenLabel:screenLabel });
 }));

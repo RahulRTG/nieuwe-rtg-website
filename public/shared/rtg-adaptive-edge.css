@@ -68,9 +68,17 @@ body[data-rtg-adaptive-ready="true"] #rtgCommand .cmd-praat{bottom:0}
 .rtg-adaptive-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
 .rtg-adaptive-controls .rtg-adaptive-sheet-action{min-width:48px;min-height:48px;white-space:normal;line-height:1.4}
 .rtg-adaptive-controls .rtg-adaptive-sheet-action{overflow-wrap:anywhere;max-width:100%;min-width:0}
-.rtg-adaptive-sheet>.rtg-edge-2-context{position:static!important;inset:auto!important;width:auto!important;max-width:none!important;max-height:none!important;margin-top:12px;padding:0;border:0;box-shadow:none}
+.rtg-adaptive-sheet>.rtg-edge-2-context{position:static!important;inset:auto!important;width:auto!important;max-width:none!important;max-height:none!important;margin-top:12px;padding:0;border:0;box-shadow:none;pointer-events:none}
 .rtg-adaptive-sheet>.rtg-edge-2-context>.rtg-edge-2-context-head{display:none}
-.rtg-adaptive-sheet .rtg-edge-2-context-slot{gap:8px!important;padding:0!important;background:transparent!important}
+.rtg-adaptive-sheet .rtg-edge-export{pointer-events:none}
+.rtg-adaptive-sheet .rtg-edge-export :is(button,a,input,select,textarea){pointer-events:auto}
+.rtg-adaptive-sheet .rtg-edge-2-context-slot{gap:8px!important;padding:0!important;background:transparent!important;pointer-events:none}
+.rtg-adaptive-sheet .rtg-edge-2-context-slot :is(button,a,input,select,textarea,summary){pointer-events:auto}
+body:has(.rtg-continue-key-picker:not([hidden])) .rtg-adaptive-sheet .rtg-edge-2-context,
+body:has(.rtg-continue-key-picker:not([hidden])) .rtg-adaptive-sheet .rtg-edge-2-context *{pointer-events:none!important}
+body:has(.rtg-continue-key-picker:not([hidden])) .rtg-adaptive-sheet{pointer-events:none}
+body:has(.rtg-continue-key-picker:not([hidden])) .rtg-continue-key-picker,
+body:has(.rtg-continue-key-picker:not([hidden])) .rtg-continue-key-picker *{pointer-events:auto!important}
 .rtg-adaptive-sheet .rtg-edge-2-context-slot>[data-rtg-edge-2-contextual]{position:relative!important}
 .rtg-adaptive-sheet .rtg-edge-2-context-slot :is(.wereldtabs,.wereldapps,.hoofdtabs,.rtgdeel-balk,.ws-balk){position:static!important;inset:auto!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important;height:auto!important;min-height:0!important;padding:0!important;overflow:visible!important;border:0!important;background:transparent!important;box-shadow:none!important}
 .rtg-adaptive-sheet .rtg-edge-2-context-slot :is(.wereldtabs,.wereldapps,.hoofdtabs,.rtgdeel-balk,.ws-balk)>:is(a,button){position:relative!important;min-width:0!important;min-height:52px!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;padding:10px 12px!important;border:1px solid var(--edge-bar-line)!important;background:rgba(255,255,255,.045)!important;color:var(--edge-bar-copy)!important;text-align:left!important}
@@ -183,7 +191,7 @@ body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet[data-rtg-custom-panel="
 .rtg-adaptive-sheet .rtg-edge-find input{font:400 16px/1.4 Inter,sans-serif!important;background:transparent!important;color:var(--edge-bar-copy)!important;border:0!important}
 .rtg-adaptive-sheet .rtg-edge-sheet-head{padding:0}
 @media(max-width:999px){
- body[data-rtg-adaptive-ready="true"]{--rtg-adaptive-height:60px;--rtg-adaptive-gap:max(10px,calc(env(safe-area-inset-bottom,0px) + 4px))}
+ body[data-rtg-adaptive-ready="true"]{--rtg-adaptive-height:64px;--rtg-adaptive-gap:max(10px,calc(env(safe-area-inset-bottom,0px) + 4px))}
  .rtg-adaptive-edge{left:calc(50% + (var(--rtg-safe-left) - var(--rtg-safe-right))/2);width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px)}
  .rtg-adaptive-item-copy{display:flex;gap:0}
  .rtg-adaptive-item small{font-size:10px;font-weight:500;line-height:12px;color:var(--edge-bar-dim)}

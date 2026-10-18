@@ -22,6 +22,21 @@ test('editorial v4 classificeert de zeven schermfamilies deterministisch', () =>
   assert.equal(runtime.classify('/apps/privacy.html', formBody, registry), 'state');
 });
 
+test('editorial v4 neemt alleen redactionele schermen of expliciete migraties over', () => {
+  const plain = { getAttribute(){ return null; } };
+  const forced = { getAttribute(name){ return name === 'data-rtg-editorial-v4' ? 'force' : null; } };
+  const disabled = { getAttribute(name){ return name === 'data-rtg-editorial-v4' ? 'off' : null; } };
+  const editorialRoom = { getAttribute(){ return null; }, hasAttribute(name){ return name === 'data-rtg-editorial-room'; } };
+  assert.equal(runtime.ownsPresentation('cover', plain), true);
+  assert.equal(runtime.ownsPresentation('collection', plain), true);
+  assert.equal(runtime.ownsPresentation('cover', disabled), false);
+  assert.equal(runtime.ownsPresentation('collection', editorialRoom), false);
+  for (const kind of ['task', 'detail', 'conversation', 'state', 'canvas']) {
+    assert.equal(runtime.ownsPresentation(kind, plain), false, kind + ' houdt zijn geteste taakpresentatie');
+    assert.equal(runtime.ownsPresentation(kind, forced), true, kind + ' kan bewust migreren');
+  }
+});
+
 test('basis laadt editorial v4 als een werkelijk laatste presentatielaag', () => {
   const heritage = read('public/shared/rtg-heritage.css');
   const basis = read('public/shared/basis/basis-01.js');
@@ -81,13 +96,16 @@ test('expliciet verklaarde routeacties verhuizen naar de V4-kop voordat de legac
   const css = read('public/shared/rtg-editorial-v4.css');
   const command = read('public/apps/command.html');
   const ios = read('public/shared/ios.js');
-  assert.match(runtime, /querySelectorAll\('\[data-rtg-v4-header-action\]'\)/);
+  assert.match(runtime, /querySelectorAll\('\[data-rtg-v4-header-action\],header/);
   assert.match(runtime, /syncHeaderActions\(doc, header\)/);
   assert.match(runtime, /actions\.insertBefore\(node, search \|\| null\)/);
   assert.match(css, /\.rtg-v4-header-actions>\[data-rtg-v4-header-action\]/);
   assert.match(css, /:has\(\.rtg-v4-header-actions>\[data-rtg-v4-header-action\]\)\{--v4-header:120px\}/,
     'een routeactie blijft op telefoon bereikbaar in een tweede koprij');
   assert.match(command, /id="q" type="search" data-rtg-v4-header-action/);
+  assert.match(command, /data-rtg-editorial-v4="force"/);
+  assert.match(runtime, /rtg-v4-edge-state/,
+    'de bestaande Edge-status blijft vanuit de universele kop bereikbaar');
   assert.match(ios, /body > header:not\(\.rtg-v4-header\)/,
     'de oudere iOS-laag laat de universele V4-kop intact');
 });

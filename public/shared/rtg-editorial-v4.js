@@ -6,7 +6,7 @@
   if (g && g.document) { g.RTGEditorialV4 = api; api.boot(g.document, g); }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (model) {
   'use strict';
-  var pathOf = model.pathOf, classify = model.classify, photoFor = model.photoFor;
+  var pathOf = model.pathOf, classify = model.classify, ownsPresentation = model.ownsPresentation, photoFor = model.photoFor;
   var worldName = model.worldName, screenLabel = model.screenLabel;
 
   function visible(el, win) {
@@ -79,9 +79,26 @@
     /* Het markerattribuut staat op het bedienbare element zelf. Daardoor
        overleeft het een eerdere presentatieadapter die een vormwikkel
        ontleedt. Elke annotatieronde herstelt de ene eigenaar: de V4-kop. */
-    Array.from(doc.querySelectorAll('[data-rtg-v4-header-action]')).forEach(function (node) {
+    Array.from(doc.querySelectorAll('[data-rtg-v4-header-action],header[data-rtg-v4-legacy-header="true"] .rtguitvoer-knop')).forEach(function (node) {
       if (!node.closest('dialog,[role="dialog"]') && node.parentNode !== actions) actions.insertBefore(node, search || null);
     });
+    /* De statusknop hoort functioneel bij de bestaande Edge-root. Een kleine
+       proxy in de universele kop houdt dat contract intact: de echte knop en
+       het bestaande statuspaneel blijven eigenaar van gedrag en toestand. */
+    var source = doc.querySelector('.rtg-edge-chrome .rtg-edge-state');
+    var proxy = actions.querySelector('.rtg-v4-edge-state');
+    if (source && !proxy) {
+      proxy = make(doc, 'button', 'rtg-edge-state rtg-v4-edge-state');
+      proxy.type = 'button'; proxy.innerHTML = source.innerHTML;
+      proxy.setAttribute('aria-label', source.getAttribute('aria-label') || 'Beveiliging en systeemstatus');
+      if (source.getAttribute('aria-controls')) proxy.setAttribute('aria-controls', source.getAttribute('aria-controls'));
+      proxy.setAttribute('aria-expanded', source.getAttribute('aria-expanded') || 'false');
+      proxy.addEventListener('click', function () {
+        source.click();
+        proxy.setAttribute('aria-expanded', source.getAttribute('aria-expanded') || 'false');
+      });
+      actions.insertBefore(proxy, search || null);
+    }
   }
 
   function buildHeader(doc, body, name) {
@@ -128,8 +145,10 @@
     var embedded = false;
     try { embedded = win.self !== win.top || new URLSearchParams(win.location.search).get('embed') === '1'; }
     catch (e) { embedded = false; }
+    var kind = classify(route, body, registry);
+    if (ownsPresentation && !ownsPresentation(kind, body)) return false;
     body.dataset.rtgEditorialV4 = 'true';
-    body.dataset.rtgV4Kind = classify(route, body, registry);
+    body.dataset.rtgV4Kind = kind;
     body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
     if (embedded) body.dataset.rtgV4Embedded = 'true'; else delete body.dataset.rtgV4Embedded;
     var name = body.dataset.rtgV4Title || title(doc);
@@ -183,5 +202,6 @@
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start, { once:true }); else start();
   }
 
-  return Object.freeze({ classify:classify, pathOf:pathOf, annotate:annotate, boot:boot });
+  return Object.freeze({ classify:classify, ownsPresentation:ownsPresentation,
+    pathOf:pathOf, annotate:annotate, boot:boot });
 }));

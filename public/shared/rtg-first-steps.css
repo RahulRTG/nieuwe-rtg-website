@@ -67,6 +67,7 @@ body.rtg-first-page .first-guest-controls{display:none}
   .rtg-first-steps.first-galerij .first-copy{grid-column:2;grid-row:1/3}
 }
 @media(max-width:359px){.rtg-first-steps .first-copy{padding-inline:20px}.rtg-first-steps .first-hero{padding-inline:20px}.rtg-first-steps .first-action{font-size:19px;padding-inline:14px}.rtg-first-steps .first-interests{gap:8px}}
+@media(max-width:799px){body.rtg-first-page .wd-page{display:contents!important}}
 @media(prefers-reduced-motion:reduce){.rtg-first-steps *{scroll-behavior:auto!important;transition:none!important}}
 /* Retire the old heading after its functional controls have moved to Edge. */
 body.rtg-first-page[data-rtg-adaptive-ready="true"]>header,

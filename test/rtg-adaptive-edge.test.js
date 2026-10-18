@@ -69,6 +69,12 @@ test('de uitvoerder van de Edge kent geen window.confirm meer (vorm; het gedrag 
   assert.doesNotMatch(VIEW, /confirm\(/);
 });
 
+test('een expliciete hostactie wint van het generieke contextblad', () => {
+  const host = VIEW.indexOf("if (rt.edge.onEdgeAction && rt.edge.onEdgeAction(action) === true) return true;");
+  const generic = VIEW.indexOf("if (action === 'context' || action === 'primary')");
+  assert.ok(host >= 0 && host < generic, 'de gedeelde Edge hoort eerst de actie van zijn host uit te voeren');
+});
+
 test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /data-rtg-adaptive-ready="true"\] \.rtg-edge-bottom\{display:none!important\}/);
   assert.match(CSS, /width:min\(720px,calc\(100% - var\(--edge-side\) - var\(--rtg-safe-left\) - var\(--rtg-safe-right\) - 28px\)\)/);
@@ -249,7 +255,8 @@ test('alle vier werelden gebruiken bestaande lokale editorial productiebeelden',
 test('de editorial runtime classificeert bestaande schermen en tekent geen tweede Edge', () => {
   const source = lees('public/shared/rtg-editorial-v4.js');
   assert.match(source, /body\.dataset\.rtgEditorialV4 = 'true'/);
-  assert.match(source, /body\.dataset\.rtgV4Kind = classify/);
+  assert.match(source, /var kind = classify/);
+  assert.match(source, /body\.dataset\.rtgV4Kind = kind/);
   assert.doesNotMatch(source, /createElement\(['"](?:nav|aside)['"]\)/);
   assert.doesNotMatch(source, /rtg-adaptive-edge[^\n]*createElement/);
 });

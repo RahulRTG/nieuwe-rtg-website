@@ -207,6 +207,7 @@ test('typen voor het formulier, en een co-host die de hoofdhost zelf aanwijst', 
 
   const zet = await api('cohost', { id: huisId, wie: gastNaam }, host.token);
   assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
+  assert.equal(zet.body.coHosts.length, 1, 'er staat een co-host');
   assert.deepEqual(zet.body.coHosts, [gastNaam]);
   assert.equal((await api('prijsadvies', { id: huisId }, gastLid.token)).status, 200, 'de co-host mag meebeheren');
   const beheerd = await fetch(base + '/api/thuis/huizen', { method: 'POST', headers: { 'Content-Type': 'application/json',

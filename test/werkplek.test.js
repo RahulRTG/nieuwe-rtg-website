@@ -200,6 +200,7 @@ test('9. het RTF-kantoor draagt huisstijl-glyfen, geen emoji', () => {
 test('10. de stichting heeft dezelfde ontwerptak als RTG', async () => {
   const r = await post('/api/werkplek/bureaus', { bedrijf: 'rtf' }, eigenaar);
   assert.equal(r.status, 200);
+  assert.equal(r.body.bureaus.length, 6, 'zes bureaus');
   const namen = r.body.bureaus.map(b => b.bureau).sort();
   assert.deepEqual(namen, ['architect', 'atelier', 'hardware', 'ideeen', 'redactie', 'studio'],
     'alle zes de bureaus staan er bij de stichting');

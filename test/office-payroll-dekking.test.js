@@ -209,6 +209,7 @@ test('een klacht vraagt een zetel, en verdwijnt uit het dossier zodra hij is opg
     { klachtId: spoor.klachtId, status: 'in behandeling' }, eigenaar);
   assert.equal(bezig.status, 200, uitleg(bezig));
   assert.equal(bezig.body.klacht.status, 'in behandeling');
+  assert.equal(bezig.body.klacht.log.length, 2, 'het spoor heeft twee regels');
   assert.deepEqual(bezig.body.klacht.log.map(l => l.status), ['open', 'in behandeling'],
     'de stand verandert, het spoor groeit mee: ' + uitleg(bezig));
   assert.ok(bezig.body.klacht.log.every(l => l.door),

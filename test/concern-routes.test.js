@@ -185,6 +185,7 @@ test('uit dienst: eerst het beeld, dan beeindigen, en alleen bij de eigen entite
   assert.equal(doe.status, 200, JSON.stringify(doe.body).slice(0, 160));
   assert.equal(doe.body.beeindigd, 1);
   const na = await api('/api/concern/mensen', { entiteit: a1, op: dag(2) }, A);
+  assert.ok(na.body.mensen.some(m => m.persoon === 'lid_jan'), 'wie niet uit dienst ging, werkt er nog');
   assert.ok(!na.body.mensen.some(m => m.persoon === 'lid_eva'), 'na de einddatum werkt zij hier niet meer');
 });
 
@@ -194,6 +195,7 @@ test('impact telt alleen eigen entiteiten; een momentopname zet de eigen structu
   assert.equal(imp.body.raakt.entiteiten, 1, 'de entiteit van een ander telt niet mee');
   assert.deepEqual(imp.body.perEntiteit.map(x => x.entiteit), [a1]);
 
+  assert.equal((await api('/api/concern/vestiging/nieuw', { entiteit: a1, naam: 'Blijvend' }, A)).status, 200);
   const opn = await api('/api/concern/opname/maak', { waarom: 'voor de verbouwing' }, A);
   assert.equal(opn.status, 200);
   const opnames = await api('/api/concern/opnames', {}, A);
@@ -206,6 +208,7 @@ test('impact telt alleen eigen entiteiten; een momentopname zet de eigen structu
   const h = await api('/api/concern/opname/herstel', { opname: opn.body.opname.id }, A);
   assert.equal(h.status, 200, JSON.stringify(h.body).slice(0, 160));
   const vest = await api('/api/concern/vestigingen', { entiteit: a1 }, A);
+  assert.ok(vest.body.vestigingen.some(x => x.naam === 'Blijvend'), 'wat er bij de opname stond, staat er weer');
   assert.ok(!vest.body.vestigingen.some(x => x.naam === 'Tijdelijk'), 'de vestiging van na de opname is terug weg');
   assert.ok((await api('/api/concern/entiteit', { entiteit: b1 }, B)).status === 200, 'de entiteit van een ander bleef staan');
 });

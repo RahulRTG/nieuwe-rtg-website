@@ -119,6 +119,8 @@ test('4. de pas-controle en de stopzetting: sober antwoord, en de pas verdwijnt 
   assert.deepEqual(Object.keys(c.body).sort(), ['actief', 'codenaam', 'pakket'], 'niet meer dan drie velden');
   assert.equal(c.body.actief, true);
   assert.equal((await zp('/pas', { pas: 'ZP-FFFF' }, segur)).status, 404);
+  const wVoor = await wallet('', {}, lidTok);
+  assert.ok(wVoor.body.items.some(x => x.code === v.pas), 'voor het stoppen staat de zorgpas in de wallet');
   // stopzetten: de pas gaat uit de wallet, declareren kan niet meer, nog eens stoppen ook niet
   assert.equal((await zp('/api/supplier/zorgpolis/stop', { id: v.id }, segur)).status, 200);
   assert.equal((await zp('/pas', { pas: v.pas }, segur)).body.actief, false);
@@ -205,4 +207,5 @@ test('7. de poorten: gasten en anoniemen niet, en zonder polis-cap geen zorgtak'
   const b = await lid();
   const wb = await wallet('', {}, b.token);
   assert.equal(wb.body.items.length, 0, 'een vers lid begint met een lege wallet');
+  assert.ok((await wallet('', {}, lidTok)).body.items.length >= 1, 'terwijl de wallet van het ingeschreven lid gevuld is');
 });

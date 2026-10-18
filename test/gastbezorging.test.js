@@ -211,6 +211,14 @@ test('buiten de zone wordt er geen rekening geopend en geen slot bezet', async (
   const na = (await post('/api/supplier/horeca/bezorg/sloten', {}, ZAAK)).body.sloten
     .reduce((t, s) => t + s.gebruiktMinuten, 0);
   assert.equal(na, voor, 'een geweigerde bestelling mag geen keukenminuten vasthouden');
+  /* De gevulde kant eerst: een lid BINNEN de zone ziet zijn bestelling wel in
+     /mijn staan. Zonder die helft zegt de nul hieronder niets. */
+  const lid4 = await maakLid('Dichtbij', true);
+  const duur = kaart.filter(k => !k.alcohol).sort((a, b) => b.centen - a.centen)[0];
+  const binnen = await post('/api/gast/bezorg/bestel', { zaak: 'KIKUNOI', postcode: '1012CD',
+    adres: 'Kalverstraat 4', items: [{ itemId: duur.id, aantal: 2 }] }, lid4);
+  assert.equal(binnen.status, 200, JSON.stringify(binnen.body).slice(0, 160));
+  assert.equal((await post('/api/gast/bezorg/mijn', {}, lid4)).body.bestellingen.length, 1, 'binnen de zone staat de bestelling in /mijn');
   const mijn = await post('/api/gast/bezorg/mijn', {}, lid3);
   assert.equal(mijn.body.bestellingen.length, 0, 'en er hoort geen lege rekening te blijven staan');
 });

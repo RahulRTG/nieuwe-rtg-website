@@ -15752,7 +15752,7 @@
         "mutationRoutes": 1026,
         "declaredMutationSemantics": 319,
         "sourceFileCount": 204,
-        "kernelDependencyCount": 2731,
+        "kernelDependencyCount": 2732,
         "screenCount": 41,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15799,7 +15799,7 @@
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js"
         ],
-        "kernelDependenciesOmitted": 2707,
+        "kernelDependenciesOmitted": 2708,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -17390,7 +17390,7 @@
         "mutationRoutes": 137,
         "declaredMutationSemantics": 69,
         "sourceFileCount": 47,
-        "kernelDependencyCount": 92,
+        "kernelDependencyCount": 93,
         "screenCount": 1,
         "sourceFiles": [
           "server/bedrijf/aansluiting.js",
@@ -17437,7 +17437,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 68,
+        "kernelDependenciesOmitted": 69,
         "screens": [
           "public/apps/werk.html"
         ],
@@ -26646,7 +26646,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2701,
+        "kernelDependencyCount": 2702,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26680,7 +26680,7 @@
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js"
         ],
-        "kernelDependenciesOmitted": 2677,
+        "kernelDependenciesOmitted": 2678,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -27315,7 +27315,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2704,
+        "kernelDependencyCount": 2705,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -27349,7 +27349,7 @@
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js"
         ],
-        "kernelDependenciesOmitted": 2680,
+        "kernelDependenciesOmitted": 2681,
         "screens": [
           "public/apps/app.html"
         ],
@@ -27678,7 +27678,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2701,
+        "kernelDependencyCount": 2702,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27711,7 +27711,7 @@
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js"
         ],
-        "kernelDependenciesOmitted": 2677,
+        "kernelDependenciesOmitted": 2678,
         "screens": [
           "public/apps/vertaler.html"
         ],

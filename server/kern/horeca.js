@@ -119,26 +119,9 @@ module.exports = (kern) => {
     return som(voor) === som(na);
   }
 
-  /* Happy hour: een tijdvak met een percentage op bepaalde groepen. Bewust
-     berekend op het moment van BESTELLEN en niet bij het afrekenen -- anders
-     verandert de prijs van een biertje nadat de gast hem heeft besteld, en dat
-     is precies het soort verrassing waar mensen boos van worden. */
-  function happyKorting(code, groep, wanneer) {
-    const h = H(code);
-    const lijst = Array.isArray(h.instel.happy) ? h.instel.happy : [];
-    const t = wanneer ? new Date(wanneer) : new Date();
-    const dag = t.getDay(); // 0 = zondag
-    const klok = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
-    for (const hh of lijst) {
-      if (Array.isArray(hh.dagen) && hh.dagen.length && !hh.dagen.includes(dag)) continue;
-      if (hh.van && klok < hh.van) continue;
-      if (hh.tot && klok > hh.tot) continue;
-      if (Array.isArray(hh.groepen) && hh.groepen.length && groep && !hh.groepen.includes(groep)) continue;
-      if (Array.isArray(hh.groepen) && hh.groepen.length && !groep) continue;
-      return { naam: hh.naam || 'Happy hour', procent: Math.max(0, Math.min(90, Number(hh.procent) || 0)) };
-    }
-    return null;
-  }
+  /* Happy hour (de prijs op het moment van bestellen) staat in ./horeca/happy.js. */
+  const { happyKorting: happyOp } = require('./horeca/happy');
+  const happyKorting = (code, groep, wanneer) => happyOp(Hlees(code), groep, wanneer);
 
   /* De bonnen (cadeaubon, tegoed, polsband) wonen NIET in deze doos maar in
      hun eigen collectie `horecaBonnen`, met een 128-bit code als hash en een

@@ -124,10 +124,14 @@ module.exports = ({ db, save, crypto, anthropic, livinglab, bijeen, inBundel }) 
      van een bijdrage na en loopt die vanzelf uit de pas met dit domein
      (LAT.md regel 4). Kopieen, geen verwijzingen: meekijken is geen
      meeschrijven. */
+  /* Lezen zonder scheppen: de geldgraaf (/api/geld/cockpit) vraagt dit bij elke
+     blik, en F() zou dan een fonds met drie startlocaties aanleggen voor een lid
+     dat alleen keek. De idemproef zag `labFonds` zo bewegen op een leesroute. */
   function mijnBijdragen(lidKey) {
-    const f = F();
-    return f.bijdragen.filter(b => b.lidKey === lidKey).map(b => ({
-      id: b.id, locId: b.locId, locNaam: (f.locaties[b.locId] || {}).naam || b.locId,
+    const f = eigen.kijk('labFonds');
+    const locaties = (f.locaties && typeof f.locaties === 'object') ? f.locaties : {};
+    return (Array.isArray(f.bijdragen) ? f.bijdragen : []).filter(b => b.lidKey === lidKey).map(b => ({
+      id: b.id, locId: b.locId, locNaam: (locaties[b.locId] || {}).naam || b.locId,
       centen: b.centen, at: b.at
     }));
   }

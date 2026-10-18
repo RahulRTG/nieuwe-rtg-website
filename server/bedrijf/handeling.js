@@ -82,28 +82,8 @@ module.exports = (sctx) => {
     return null;
   }
 
-  /* De uitvoering per handeling, in de bak waar dat soort al woonde. Een tabel;
-     een onbekende handeling wordt ERBOVEN geweigerd (scripts/laatspoor.js). */
-  const UITVOERINGEN = {
-    'taak.maak': (g, plan) => {
-      const T = (g.w.taken = g.w.taken || {});
-      const t = { id: rid(5), titel: plan.velden.titel, projectId: null, ouderId: null,
-        omschrijving: null, deadline: null, prioriteit: 'normaal', kolom: 'te doen',
-        wachtOp: [], uren: 0, sprint: null, at: nu(), door: plan.door };
-      sctx.zetWie(g.w, t, 'wie', plan.door);
-      T[t.id] = t;
-      return { ok: true, resultaat: t, verwijzing: { soort: 'taak', id: t.id, titel: t.titel } };
-    },
-    'ticket.maak': (g, plan) => {
-      const S = (g.w.tickets = g.w.tickets || {});
-      const t = { id: rid(5), titel: plan.velden.titel, klantId: null, prioriteit: 'normaal',
-        status: 'open', reacties: [], at: nu(), door: plan.door };
-      S[t.id] = t;
-      return { ok: true, resultaat: t, verwijzing: { soort: 'ticket', id: t.id, titel: t.titel } };
-    }
-  };
-  const voerUit = (g, plan) => UITVOERINGEN[plan.handeling] ? UITVOERINGEN[plan.handeling](g, plan)
-    : { ok: false, status: 409, reden: 'Deze handeling heeft geen uitvoering.', verwijzing: null };
+  /* De uitvoering per handeling staat in ./handeling-uitvoering.js, naast de lijst. */
+  const voerUit = require('./handeling-uitvoering')({ rid, nu, zetWie: (...a) => sctx.zetWie(...a) });
 
   /* ---------- 1. het plan ---------- */
   app.post('/api/bedrijf/handeling/plan', (req, res) => {

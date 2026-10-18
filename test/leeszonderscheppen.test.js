@@ -1230,3 +1230,29 @@ test('punten: het saldo opvragen legt geen rekening aan', () => {
   assert.equal(p.verdienPunten('lid-1', 50, 'proef'), 5);
   assert.equal(p.puntenVan('lid-1').saldo, 5);
 });
+
+/* ------------------------------------------------------------- ai-tegoed */
+test('ai-tegoed: de stand opvragen legt geen rij aan; verbruik wel', () => {
+  const { maakTegoed } = require('../server/kern/commercie/tegoed');
+  const db = { data: {}, writable: true };
+  let saves = 0;
+  const t = maakTegoed({ db, save: () => { saves++; } });
+  const st = t.stand('lid-1', 'rtg');
+  assert.equal(st.contractueel, false);
+  assert.equal(st.verbruikt, 0, 'de stand rekent met een vluchtige verse rij');
+  geenMeubilair(db, 'aiTegoed', 'de stand opvragen');
+  assert.equal(saves, 0, 'en er is niets weggeschreven');
+  /* TEGENPROEF: het schrijfpad blijft heel -- verbruik maakt de rij en de stand leest hem daarna. */
+  t.verbruik('lid-1', 'rtg', 3);
+  assert.ok(heeft(db, 'aiTegoed'), 'verbruik legt de rij aan');
+  assert.equal(t.stand('lid-1', 'rtg').verbruikt, 3, 'en de stand toont het echte verbruik');
+});
+
+/* ------------------------------------------------------ labfonds (lezer) */
+test('labfonds: mijn bijdragen lezen legt geen fonds aan', () => {
+  const maakLabfonds = require('../server/kern/labfonds');
+  const db = { data: {}, writable: true };
+  const k = maakLabfonds({ db, save: () => {}, crypto: require('node:crypto') });
+  assert.deepEqual(k.labfonds.mijnBijdragen('lid-1'), []);
+  geenMeubilair(db, 'labFonds', 'mijn bijdragen lezen');
+});

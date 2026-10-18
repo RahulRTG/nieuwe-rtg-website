@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2796 bestanden en 19381 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2796 bestanden en 19386 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2796 |
-| losse beweringen (`test(...)`) | 19381 |
+| losse beweringen (`test(...)`) | 19386 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2607 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 179 |
+| niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 9 |
+| niets van beide | 8 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2463 bestanden, 18814 beweringen.
+2463 bestanden, 18819 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -338,7 +338,7 @@ toets omvalt.
 | `borden.test.js` | 4 | gezakt op `liegpoort /api/` | Borden: het gedeelde werkbord. De zaak maakt borden met lijsten en kaarten, kiest per bord de collega's (leeg = hele team), en alleen bord-leden zien een besloten bord. |
 | `bouw.test.js` | 4 | gezakt op `liegpoort /api/` | Het bouw-genre (timmerman, loodgieter, elektricien op de vakwerk-motor) en het Dienstenplein in de RTG Mall: elke dienstverlener biedt er zijn aanbod aan, elk leverancier-genre heeft een plek in de gids, en boeken... |
 | `bron-release-bewijs.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `bron.test.js` | 17 | gezakt op `===->!==#0` | DE COMMENTAAR-VERWIJDERAAR IS DE INVOER VAN DERTIEN KEURINGEN. scripts/lib/bron.js haalt commentaar uit broncode, en check.js leunt er op elf plekken op: zero dependencies (regel 14), de glyfnamen (22), het... |
+| `bron.test.js` | 16 | gezakt op `===->!==#0` | DE COMMENTAAR-VERWIJDERAAR IS DE INVOER VAN DERTIEN KEURINGEN. scripts/lib/bron.js haalt commentaar uit broncode, en check.js leunt er op elf plekken op: zero dependencies (regel 14), de glyfnamen (22), het... |
 | `bronblind.test.js` | 11 | gezakt op `===->!==#0` | DE KRUISPROEF OP DE COMMENTAAR-VERWIJDERAAR. scripts/lib/bronblind.js kruist scripts/lib/bron.js met een tweede mening: voor JavaScript de lexer van de AST-scanner, voor een pagina de eis dat markup helemaal niet... |
 | `bronmutanten.test.js` | 10 | gezakt op `true->false#0` | WIE ER AAN DE ECHTE BRON ZIT, DRAAIT ALLEEN. WAAROM DIT BESTAAT. |
 | `browser-id-contract.test.js` | 6 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -891,8 +891,8 @@ toets omvalt.
 | `idem-poort.test.js` | 23 | gezakt op `===->!==#0` | De idem-poort: hetzelfde verzoek twee keer sturen mag nooit twee keer werken. Deze toets draait op de middleware zelf, met een nagebootst verzoek/antwoord. |
 | `idem-sleutelbepaling.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `idem-sleutelnaam.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | EEN SLEUTEL IS EEN SLEUTEL, GEEN EIGENSCHAPSNAAM (server/lib/idem.js). De idem-laag bewaart antwoorden in een gewoon object, met de ring van sleutels onder `_keys` ernaast. |
-| `idem-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | DE IDEM-LAAG (server/lib/idem.js), TAK VOOR TAK. De bestaande toetsen meten de hoofdroute: dezelfde sleutel geeft hetzelfde antwoord, een andere afdruk een 409. |
-| `idem-vlucht.test.js` | 3 | -- | De vluchten van de idem-poort (server/lib/idem-vlucht.js): een tweede verzoek met dezelfde sleutel ziet de lopende vlucht, wacht op precies de uitkomst van de eerste, en een afronder werkt maar een keer. |
+| `idem-takken.test.js` | 18 | gezakt op `voorwaarde-omkeren#0` | DE IDEM-LAAG (server/lib/idem.js), TAK VOOR TAK. De bestaande toetsen meten de hoofdroute: dezelfde sleutel geeft hetzelfde antwoord, een andere afdruk een 409. |
+| `idem-vlucht.test.js` | 3 | geen bruikbare mutatie | De vluchten van de idem-poort (server/lib/idem-vlucht.js): een tweede verzoek met dezelfde sleutel ziet de lopende vlucht, wacht op precies de uitkomst van de eerste, en een afronder werkt maar een keer. |
 | `idembundel.test.js` | 8 | gezakt op `true->false#0` | MEEDOEN IN EEN BUNDEL DIE ER AL IS -- en de grendel eromheen. Hier komen twee reparaties samen die uit één meting volgen (`npm run factuurproef`, zie GELDLAT.md par. |
 | `idemcontract.test.js` | 15 | gezakt op `liegpoort /api/` | HET SEMANTISCHE IDENTITEITSCONTRACT, getoetst tegen de code die het beschrijft. server/lib/idem-contract.js verandert geen gedrag; het declareert wat twee handlers vandaag met de hand herontdekken. |
 | `idemidentiteit-velden.test.js` | 9 | gezakt op `!==->===#0` | WAT EEN ROUTE MET `velden` BELOOFT, EN WAT DE AFDRUK ERVAN MAAKT. ----------------------------------------------------------------- Deze toets verandert niets aan het gedrag. |
@@ -1083,7 +1083,7 @@ toets omvalt.
 | `leerstofvo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 3: het voortgezet en vervolgonderwijs op de leerstof-motor. Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert en... |
 | `leespad-schrijft-niet.test.js` | 5 | gezakt op `getal+1#5` | EEN LEESPAD SCHRIJFT NIET. /api/supplier/backoffice is een dashboard: het kijkt naar de dag, de week en de openstaande signalen en verandert niets. |
 | `leesset-weerbaar.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | DE LEESSET ONDER ISOLATIE -- zonder meting geen lezer, en een mislukte oproep bewijst niets. server/kern/isolatie/leesset.js beslist welk pad onder de stand `isolatie` nog mag: alleen een uitgang, een uitzondering... |
-| `leeszonderscheppen.test.js` | 54 | gezakt op `===->!==#0` | LEZEN ZONDER SCHEPPEN -- de tegenproef van een hele klasse. scripts/lib/eigencollectie.js kent twee deuren naar de eigen opslag van een domein: bak() maakt de collectie aan als hij er nog niet is, kijk() geeft een... |
+| `leeszonderscheppen.test.js` | 56 | gezakt op `===->!==#0` | LEZEN ZONDER SCHEPPEN -- de tegenproef van een hele klasse. scripts/lib/eigencollectie.js kent twee deuren naar de eigen opslag van een domein: bak() maakt de collectie aan als hij er nog niet is, kijk() geeft een... |
 | `legacy-codeportaal-productiepoort.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leren-leden.test.js` | 12 | gezakt op `liegpoort /api/` | DE LEERLAAG VANAF DE LEDEN-APP -- 28 endpoints, en een uitnodiging als spil. Deze achtentwintig wees de waargenomen dekkingsmeting aan als nooit aangeroepen. |
 | `leren.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de leerlaag: overhoorlijsten (zelf en via de AI-demo), het overhoorduel via de vriendenlaag (zonder automatische vriendschap), samen-projecten met taken/notities/AI-plan, en schrijven met... |
@@ -1918,7 +1918,7 @@ toets omvalt.
 | `schorspoort-spelling.test.js` | 5 | gezakt op `liegpoort /api/` | DE SCHORSPOORT KENT ELKE SPELLING DIE DE ROUTER KENT (N26 van de V1-audit). De schorspoort (server/middleware/schorspoort.js) weigert een SCHRIJVENDE aanroep op een route die in VERTROUWEN.json `geschorst` heet. |
 | `schorspoort.test.js` | 7 | gezakt op `&&->||#0` | DE SCHORSPOORT, NAGETROKKEN. Een route waarvan het register zegt "geschorst" trekt zich terug voor schrijven, en voor niets anders: lezen blijft open, andere routes blijven open, en de poort kan alleen dichthouden --... |
 | `schrijfanalyse.test.js` | 10 | gezakt op `===->!==#0` | DE SCHRIJFANALYSE -- en vooral: waar hij NIET 'nee' mag zeggen. Deze analyse is een VETO en geen certificaat (zie de kop van scripts/schrijfanalyse.js). |
-| `schrijfproef.test.js` | 7 | gezakt op `===->!==#0` | DE SCHRIJFPROEF (scripts/schrijfproef.js) -- de indeling, niet de ronde. Deze toets draait GEEN meting: dat kost een server per route en hoort in `npm run schrijfproef`. |
+| `schrijfproef.test.js` | 8 | gezakt op `===->!==#0` | DE SCHRIJFPROEF (scripts/schrijfproef.js) -- de indeling, niet de ronde. Deze toets draait GEEN meting: dat kost een server per route en hoort in `npm run schrijfproef`. |
 | `scim-deprovisioning-failclosed.test.js` | 6 | gezakt op `!==->===#0` | SCIM UIT DIENST -- een 2xx is een bevestiging dat OOK Werk OS dicht is. Deze toets injecteert de storing op de naad zelf. |
 | `scim-groepen-weerbaar.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | SCIM /Groups -- wie uit een groep gaat, verliest zijn rol in HETZELFDE verzoek. server/scim/groepen.js bewaart naam + leden; server/routes/scim-groepen.js laat elke ledenwijziging door de tenantbrug meebewegen. |
 | `scim-orggrens-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | SCIM-ORGANISATIEGRENS -- een sleutel ziet alleen zijn eigen organisatie. De SCIM-deur (server/routes/scim.js + server/scim/index.js) is de enige plek waar een BUITENSTAANDS systeem accounts aanmaakt en uitzet, met... |

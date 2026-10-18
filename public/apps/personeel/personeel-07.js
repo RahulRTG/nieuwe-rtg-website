@@ -21,8 +21,8 @@
       if (!p || !p.ingeklokt) return '';
       const rest = p.restMinuten;
       const op = rest <= 0;
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.5rem;padding-top:0.6rem;border-top:1px solid var(--line);">'+
-        '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.p.rest','Pauze')+' <b style="color:'+(op?'var(--soft)':'var(--txt)')+';">'+rest+'/'+p.budget+' min</b>'+
+      return '<div class="s-13zxh2p">'+
+        '<span class="s-7igkjy">'+T('pd.p.rest','Pauze')+' <b class="' + (op ? 's-1pv2lmv' : 's-1btm41d') + '">'+rest+'/'+p.budget+' min</b>'+
         (p.pauze && !p.binnenBudget ? ' · '+T('pd.p.over','uw pauze loopt door, het beleid geldt weer') : '')+'</span>'+
         '<button class="abtn'+(p.pauze?'':' ghost')+'" id="pauzeBtn">'+
         (p.pauze ? T('pd.p.uit','Pauze klaar') : T('pd.p.in','Pauze'))+'</button></div>';
@@ -45,7 +45,7 @@
     if (wisselOpties.length){
       $('#todayWrap').insertAdjacentHTML('beforeend',
         '<div class="card"><div class="k">'+T('pd.ws.h','Andere afdeling')+'</div>'+
-        '<div style="margin-top:0.5rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
+        '<div class="s-jjtw56">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
         wisselOpties.map(o => '<div class="task"><span class="ic">'+RTGGlyf.tekst(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
           '<button class="abtn" data-wissel="'+esc(o.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
       document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
@@ -68,7 +68,7 @@
     if (andere.length){
       $('#todayWrap').insertAdjacentHTML('beforeend',
         '<div class="card"><div class="k">'+T('pd.mw.h','Mijn werkplekken')+'</div>'+
-        '<div style="margin-top:0.5rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
+        '<div class="s-jjtw56">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
         andere.map(p => '<div class="task"><span class="ic">'+RTGGlyf.tekst(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
           '<button class="abtn" data-mijn="'+esc(p.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
       document.querySelectorAll('[data-mijn]').forEach(b => b.addEventListener('click', async () => {
@@ -101,19 +101,19 @@
       if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
       if (t.kind==='mission') act = t.status==='nieuw'
         ? '<button class="abtn" data-hm="'+t.id+'" data-hmst="bezig">Start</button>'
-        : '<span style="display:flex;gap:.35rem;"><button class="abtn ghost" data-hm="'+t.id+'" data-hmst="hulp">Hulp</button><button class="abtn" data-hm="'+t.id+'" data-hmst="klaar">Klaar</button></span>';
+        : '<span class="s-1wdrie0"><button class="abtn ghost" data-hm="'+t.id+'" data-hmst="hulp">Hulp</button><button class="abtn" data-hm="'+t.id+'" data-hmst="klaar">Klaar</button></span>';
       return '<div class="task"><span class="ic">'+RTGGlyf.tekst(t.icon)+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
-    }).join('') : '<div style="font-size:0.84rem;color:var(--rtg-leesgroen,var(--green));padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
+    }).join('') : '<div class="s-v0381e">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
     const tw = $('#takenWrap');
     // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
     const kamers = (state && state.rooms || []).map(r => r.name);
     const kamerSel = id => '<select class="hin h-flex1" id="'+id+'"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
     tw.innerHTML += '<div class="card"><div class="k">'+T('hk.klus.meld','Meld klus')+'</div>'+
-      '<div class="row"><input class="hin" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'" style="flex:2;">'+kamerSel('klusKamer')+'</div>'+
+      '<div class="row"><input class="hin s-1dzu8dt" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'">'+kamerSel('klusKamer')+'</div>'+
       '<button class="abtn" id="klusMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.klus.meld','Meld klus')+'</button></div>';
     const lf = (state && state.lostfound || []).slice(0, 6);
     tw.innerHTML += '<div class="card"><div class="k">'+T('hk.lf','Gevonden voorwerp')+'</div>'+
-      '<div class="row"><input class="hin" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'" style="flex:2;">'+kamerSel('lfKamer')+'</div>'+
+      '<div class="row"><input class="hin s-1dzu8dt" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'">'+kamerSel('lfKamer')+'</div>'+
       '<div class="row"><input class="hin" id="lfPlek" placeholder="'+T('hk.lf.plek','Bewaarplek')+'"></div>'+
       '<button class="abtn" id="lfMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.lf.meld','Registreer')+'</button>'+
       (lf.length ? '<div class="k h-mt80">'+T('hk.lf.recent','Laatst geregistreerd')+'</div>'+

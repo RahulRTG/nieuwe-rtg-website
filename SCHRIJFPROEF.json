@@ -11,21 +11,23 @@
     "VALS_SUCCES": "de aanroeper kreeg een 2xx terwijl de opslag aantoonbaar onveranderd bleef",
     "WEIGERT": "de route gaf een fout toen de opslag niet kon bevestigen -- de aanroeper hoort de waarheid",
     "SCHREEF_TOCH": "de opslag veranderde alsnog; deze route raakt het verraadpunt niet op dit pad",
+    "GEEN_SCHRIJFACTIE": "ook ZONDER verraad veranderde de opslag niet: op dit lijf bewaart de route niets, dus er is geen schrijfactie om te verliezen -- een lezer op de geldkaart, geen leugen over een schrijfactie",
     "ONBEREIKT": "de proef kreeg de route niet aan het werk (geen lijf, geen wereld, of de deur bleef dicht)"
   },
   "stempel": {
-    "op": "2026-09-13T21:08:01.691Z",
-    "commit": "73fbb6a59",
+    "op": "2026-10-18T12:34:59.662Z",
+    "commit": "ca8ba1fea",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/schrijfproef.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "telling": {
-    "ONBEREIKT": 14,
-    "VALS_SUCCES": 28,
-    "WEIGERT": 1,
-    "SCHREEF_TOCH": 2
+    "ONBEREIKT": 13,
+    "WEIGERT": 23,
+    "GEEN_SCHRIJFACTIE": 6,
+    "VALS_SUCCES": 2,
+    "SCHREEF_TOCH": 1
   },
   "routes": 45,
   "per": [
@@ -39,10 +41,15 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -51,11 +58,17 @@
       "collecties": [
         "bankPassen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankPassen",
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -64,11 +77,17 @@
       "collecties": [
         "bankPassen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankPassen",
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -77,11 +96,17 @@
       "collecties": [
         "bankPassen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankPassen",
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -90,11 +115,17 @@
       "collecties": [
         "bankPassen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankPassen",
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -103,11 +134,17 @@
       "collecties": [
         "bankRekeningen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankRekeningen",
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -118,10 +155,15 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 402, dus zijn antwoord eronder (402) zegt niets over een verloren schrijfactie",
-      "status": 402,
-      "basisStatus": 402,
-      "opslagBewoog": false
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
+      "basisStatus": 400,
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -132,10 +174,15 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -144,11 +191,18 @@
       "collecties": [
         "bankRekeningen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankRekeningen",
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -159,10 +213,16 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -172,10 +232,16 @@
         "bankTerugkerend"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -188,7 +254,9 @@
       "reden": "deze route gaf ZONDER verraad al 401, dus zijn antwoord eronder (401) zegt niets over een verloren schrijfactie",
       "status": 401,
       "basisStatus": 401,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -197,11 +265,16 @@
       "collecties": [
         "geldbeleid"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:geldbeleid",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -210,11 +283,13 @@
       "collecties": [
         "labFonds"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "GEEN_SCHRIJFACTIE",
+      "reden": "ook zonder verraad veranderde de opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -223,11 +298,13 @@
       "collecties": [
         "geldbeleid"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "GEEN_SCHRIJFACTIE",
+      "reden": "ook zonder verraad veranderde de opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -240,7 +317,12 @@
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:gemeenteAanslagen",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -249,11 +331,13 @@
       "collecties": [
         "economie"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "GEEN_SCHRIJFACTIE",
+      "reden": "ook zonder verraad veranderde de opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -262,11 +346,16 @@
       "collecties": [
         "labFonds"
       ],
-      "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
-      "basisStatus": 400,
-      "opslagBewoog": false
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
+      "basisStatus": 200,
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:labFonds",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -275,11 +364,13 @@
       "collecties": [
         "aiTegoed"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "GEEN_SCHRIJFACTIE",
+      "reden": "ook zonder verraad veranderde de opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -288,11 +379,16 @@
       "collecties": [
         "bankregie"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankregie",
+        "store.db:kantoorAudit"
+      ]
     },
     {
       "methode": "POST",
@@ -301,11 +397,16 @@
       "collecties": [
         "bankregie"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankregie",
+        "store.db:kantoorAudit"
+      ]
     },
     {
       "methode": "POST",
@@ -314,11 +415,15 @@
       "collecties": [
         "bankregie"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankregie"
+      ]
     },
     {
       "methode": "POST",
@@ -327,11 +432,16 @@
       "collecties": [
         "bankregie"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bankregie",
+        "store.db:kantoorAudit"
+      ]
     },
     {
       "methode": "POST",
@@ -340,11 +450,13 @@
       "collecties": [
         "aiTegoed"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "GEEN_SCHRIJFACTIE",
+      "reden": "ook zonder verraad veranderde de opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -353,11 +465,17 @@
       "collecties": [
         "payCodes"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:payKasToegang",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -368,10 +486,17 @@
         "paySaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:onboarding",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -388,7 +513,29 @@
       "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
       "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": true
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "grootboek.db:tx_ledger",
+        "store.db:betaalIdem",
+        "store.db:betaalWaarheid",
+        "store.db:betaalWaarheidMeldingen",
+        "store.db:bezitsbewijzen",
+        "store.db:economischeRuntime",
+        "store.db:economische_boekingen",
+        "store.db:fondsAfdrachten",
+        "store.db:onboarding",
+        "store.db:payBoekingen",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:paySaldi",
+        "store.db:schaduwregels",
+        "store.db:socialeAfdrachten",
+        "store.db:trustEvidence",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -399,10 +546,17 @@
         "paySaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:onboarding",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -414,10 +568,16 @@
         "payTegoed"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:onboarding",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -428,10 +588,16 @@
         "paySaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:onboarding",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -440,11 +606,18 @@
       "collecties": [
         "payTikCodes"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:payTikToegang",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -453,11 +626,17 @@
       "collecties": [
         "payVerzoeken"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:payVerzoeken",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -469,10 +648,17 @@
         "payVerzoeken"
       ],
       "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
+      "status": 503,
       "basisStatus": 400,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:onboarding",
+        "store.db:schaduwregels",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -481,11 +667,17 @@
       "collecties": [
         "payVerzoeken"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:payVerzoeken",
+        "store.db:schaduwregels"
+      ]
     },
     {
       "methode": "POST",
@@ -494,11 +686,13 @@
       "collecties": [
         "punten"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "GEEN_SCHRIJFACTIE",
+      "reden": "ook zonder verraad veranderde de opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -507,11 +701,18 @@
       "collecties": [
         "betaalVerzoeken"
       ],
-      "stand": "SCHREEF_TOCH",
-      "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": true
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "grootboek.db:tx_ledger",
+        "store.db:betaalVerzoeken",
+        "store.db:directOntvangsten",
+        "store.db:supplierActivity"
+      ]
     },
     {
       "methode": "POST",
@@ -520,11 +721,18 @@
       "collecties": [
         "facturen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:facturen",
+        "store.db:factuurTeller",
+        "store.db:notifications",
+        "store.db:rtmail"
+      ]
     },
     {
       "methode": "POST",
@@ -533,11 +741,13 @@
       "collecties": [
         "facturen"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
-      "basisStatus": 200,
-      "opslagBewoog": false
+      "stand": "ONBEREIKT",
+      "reden": "deze route gaf ZONDER verraad al 404, dus zijn antwoord eronder (404) zegt niets over een verloren schrijfactie",
+      "status": 404,
+      "basisStatus": 404,
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -546,11 +756,16 @@
       "collecties": [
         "giftcards"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "stand": "SCHREEF_TOCH",
+      "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
       "status": 200,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": true,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:giftcards",
+        "store.db:supplierActivity"
+      ]
     },
     {
       "methode": "POST",
@@ -563,7 +778,9 @@
       "reden": "deze route gaf ZONDER verraad al 503, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
       "status": 503,
       "basisStatus": 503,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": false,
+      "basisBewogen": []
     },
     {
       "methode": "POST",
@@ -577,11 +794,15 @@
         "posSales",
         "waardeOormerken"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:waardeOormerken"
+      ]
     },
     {
       "methode": "POST",
@@ -590,11 +811,16 @@
       "collecties": [
         "payTreasury"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:payTreasury",
+        "store.db:wacht"
+      ]
     },
     {
       "methode": "POST",
@@ -604,11 +830,20 @@
         "payBoekingen",
         "paySaldi"
       ],
-      "stand": "SCHREEF_TOCH",
-      "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": true
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "grootboek.db:tx_ledger",
+        "store.db:betaalIdem",
+        "store.db:betaalOpdrachten",
+        "store.db:capGezondheid",
+        "store.db:payBoekingen",
+        "store.db:paySaldi"
+      ]
     },
     {
       "methode": "POST",
@@ -618,11 +853,16 @@
         "facturen",
         "posSales"
       ],
-      "stand": "VALS_SUCCES",
-      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
-      "status": 200,
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
       "basisStatus": 200,
-      "opslagBewoog": false
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:posSales",
+        "store.db:supplierActivity"
+      ]
     },
     {
       "methode": "POST",
@@ -631,11 +871,17 @@
       "collecties": [
         "wallet"
       ],
-      "stand": "ONBEREIKT",
-      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
-      "status": 400,
-      "basisStatus": 400,
-      "opslagBewoog": false
+      "stand": "WEIGERT",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
+      "basisStatus": 200,
+      "opslagBewoog": false,
+      "basisBewoog": true,
+      "basisBewogen": [
+        "store.db:bezitsbewijzen",
+        "store.db:schaduwregels",
+        "store.db:wallet"
+      ]
     }
   ]
 }

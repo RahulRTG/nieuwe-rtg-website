@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T12:26:54.509Z",
-    "commit": "cd1558dbe",
+    "op": "2026-10-18T13:59:30.375Z",
+    "commit": "78ed42b59",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7107,6 +7107,14 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "idem-vlucht.test.js": {
+      "soort": "puur",
+      "staat": "geen bruikbare mutatie",
+      "modules": [
+        "server/lib/idem-vlucht.js"
+      ],
+      "posities": 1
     },
     "idembundel.test.js": {
       "soort": "puur",

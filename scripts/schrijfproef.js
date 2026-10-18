@@ -45,6 +45,11 @@ const path = require('node:path');
 const W = require('./lib/wegwerpserver.js');
 const { haalSleutels } = require('./lib/proefsleutels.js');
 const { stempel, eisSchoneBoom } = require('./lib/stempel.js');
+/* Het opslagbeeld PER COLLECTIE voor de basismeting, uit dezelfde lezer als de
+   droogloop en de herstelproef (geen tweede lezer van de opslag). De
+   huishouding (apiSpoor, handelingLog) beweegt bij ELKE oproep en zou elke
+   lezer als schrijver laten lezen. */
+const { opslagBeeld, verschil, isSpoor } = require('./droogloop.js');
 
 const WORTEL = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
@@ -65,6 +70,7 @@ const STANDEN = Object.freeze({
   VALS_SUCCES: 'de aanroeper kreeg een 2xx terwijl de opslag aantoonbaar onveranderd bleef',
   WEIGERT: 'de route gaf een fout toen de opslag niet kon bevestigen -- de aanroeper hoort de waarheid',
   SCHREEF_TOCH: 'de opslag veranderde alsnog; deze route raakt het verraadpunt niet op dit pad',
+  GEEN_SCHRIJFACTIE: 'ook ZONDER verraad veranderde de opslag niet: op dit lijf bewaart de route niets, dus er is geen schrijfactie om te verliezen -- een lezer op de geldkaart, geen leugen over een schrijfactie',
   ONBEREIKT: 'de proef kreeg de route niet aan het werk (geen lijf, geen wereld, of de deur bleef dicht)'
 });
 
@@ -96,7 +102,7 @@ function beeld(map) {
    aan het werk) en pas daarna een stand -- dezelfde volgorde als in de
    crashproef, en om dezelfde reden: een conclusie uit een enkel negatief
    signaal is hoe je de proef de schuld van de route laat dragen. */
-function weeg({ status, opslagBewoog, basisStatus }) {
+function weeg({ status, opslagBewoog, basisStatus, basisBewoog }) {
   /* DE BASISMETING EERST, en zonder haar is `WEIGERT` een leugen. De eerste
      versie las elke 5xx als "de route weigert omdat de opslag niet kon
      bevestigen". /api/supplier/oog/overzicht gaf daarmee WEIGERT terwijl hij
@@ -109,10 +115,26 @@ function weeg({ status, opslagBewoog, basisStatus }) {
     return { stand: 'ONBEREIKT', reden: 'deze route gaf ZONDER verraad al ' + basisStatus +
       ', dus zijn antwoord eronder (' + status + ') zegt niets over een verloren schrijfactie' };
   if (status === 0) return { stand: 'ONBEREIKT', reden: 'de verbinding brak; er is geen antwoord om te wegen' };
-  if (status >= 200 && status < 300) return opslagBewoog
-    ? { stand: 'SCHREEF_TOCH', reden: 'de opslag veranderde ondanks het verraad -- deze route raakt ' +
-        'het injectiepunt niet op dit pad, dus hier is niets bewezen' }
-    : { stand: 'VALS_SUCCES', reden: 'de aanroeper kreeg ' + status + ' terwijl er niets is bewaard' };
+  if (status >= 200 && status < 300) {
+    if (opslagBewoog) return { stand: 'SCHREEF_TOCH', reden: 'de opslag veranderde ondanks het verraad -- deze route raakt ' +
+        'het injectiepunt niet op dit pad, dus hier is niets bewezen' };
+    /* EEN LEZER IS GEEN LEUGENAAR (18 oktober 2026). Zeven van de 28 VALS_SUCCES
+       waren routes die ook zonder verraad niets bewaren: /api/geld/grens en
+       /api/punten waren al tot lezers gemaakt, /api/geld/cockpit en
+       /api/member/ai/tegoed lazen alleen. Ze staan op de geldkaart omdat de
+       idemproef ze ooit een collectie zag aanleggen, en deze proef kon een
+       onveranderde opslag onder verraad niet onderscheiden van een onveranderde
+       opslag zonder. Daarom telt de basismeting nu ook haar opslagbeeld: bewoog
+       er ook ZONDER verraad niets, dan was er geen schrijfactie om te
+       verliezen. Alleen een gemeten `false` telt; is het beeld van de basis
+       onbekend, dan blijft het VALS_SUCCES -- de voorzichtige kant. Een route
+       die wel schrijft en dat onder verraad verliest, bewoog in de basis en
+       blijft VALS_SUCCES; deze stand maakt die niet kleiner. */
+    if (basisBewoog === false) return { stand: 'GEEN_SCHRIJFACTIE', reden: 'ook zonder verraad veranderde de ' +
+      'opslag niet: op dit lijf bewaart deze route niets, dus een 2xx eronder verzwijgt geen verloren schrijfactie. ' +
+      'Hij hoort niet op de geldkaart (IDEMPROEF.json opnieuw meten)' };
+    return { stand: 'VALS_SUCCES', reden: 'de aanroeper kreeg ' + status + ' terwijl er niets is bewaard' };
+  }
   if (status >= 500) return { stand: 'WEIGERT', reden: 'de route werkte zonder verraad (' + basisStatus +
     ') en gaf eronder ' + status + ': de opslag kon niet bevestigen en dat is aan de aanroeper ' +
     'verteld in plaats van verzwegen' };
@@ -177,9 +199,16 @@ async function meetRoute(route) {
        al aan het werk, en zijn stand hangt er niet van af. */
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, env: OMGEVING });
+    /* Ook van de basis het opslagbeeld, voor GEEN_SCHRIJFACTIE (zie weeg). De
+       schrijver is write-behind, dus even wachten tot hij stil ligt: anders
+       leest een trage save als "bewoog niet". */
+    const voorBasis = opslagBeeld(map);
     const basis = await p(route.pad, lijf, tok);
-    const u = weeg({ status: r.status, opslagBewoog, basisStatus: basis.status });
-    return { ...u, status: r.status, basisStatus: basis.status, opslagBewoog };
+    await new Promise(res => setTimeout(res, 1500));
+    const basisBewogen = (verschil(voorBasis, opslagBeeld(map)) || []).filter(n => !isSpoor(n));
+    const basisBewoog = basisBewogen.length > 0;
+    const u = weeg({ status: r.status, opslagBewoog, basisStatus: basis.status, basisBewoog });
+    return { ...u, status: r.status, basisStatus: basis.status, opslagBewoog, basisBewoog, basisBewogen };
   } catch (e) {
     return { stand: 'ONBEREIKT', reden: 'de ronde brak af: ' + String(e.message).slice(0, 120),
       status: null, opslagBewoog: null };

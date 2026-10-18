@@ -748,8 +748,6 @@ html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="state"] :is(.blok,.kaa
    van in het accent, dat voor papier is gekozen. Een gevulde knop houdt zijn
    accentvlak met witte tekst. */
 html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"] :is(.knop,.btn,a.button,.rtg-dashboard-hero-cta,.daily-action):not(.vol):not(.primary):not(.primair):not(.hoofd):not([type="submit"]){border-color:rgba(255,250,242,.55)!important;color:#fffaf2!important}
-/* Een lichte kaart op de Foundation-cover houdt donkere leestekst. */
-html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] :is(.wh-paper-card,.onthaal-kies) .buurtsec{color:#554d45!important}
 /* Een link die zelf een gevulde knop is, staat op het accentvlak: zijn tekst
    is wit, niet nogmaals het accent. */
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a:is(.knop.vol,.kknop.vol,.btn.primary,.primary,.primair,.hoofd):not(.skip):not(.wd-skip):not(.skip-link){color:#fff!important}
@@ -975,3 +973,15 @@ html body[data-rtg-editorial-v4="true"]:has(#heroName) .guard-mark{color:var(--v
 html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.hero-main,.hero-side) .eyebrow{color:#e2c389!important}
 html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #readinessRing>div,
 html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #readinessRing>div *{color:var(--v4-ink)!important}
+/* De gesprekkenlijst van Berichten en Comm is een donker vlak (comm-heritage);
+   zijn lege staat leest daar licht, met het lichte goud. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #gesprekken .rtg-leeg-vlak{color:#fffaf2!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #gesprekken .rtg-leeg-vlak .rtg-leeg-ey{color:#e2c389!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #gesprekken .rtg-leeg-vlak :is(b,p){color:#fffaf2!important}
+/* "Kies je stad" staat op het papieren keuzevlak van een wereldbegin
+   (rtg-editorial-system.css: [data-world-home] .onthaal-kies krijgt --wh-paper).
+   Alleen daar leest hij donker, en dat vlak is alleen vanaf de bureaubreedte
+   papier; smaller en op een donkere dashboardkaart blijft hij licht. */
+@media (min-width:1000px){
+  html body[data-rtg-editorial-v4="true"][data-world-home] :is(.wh-paper-card,.onthaal-kies) .buurtsec{color:#554d45!important}
+}

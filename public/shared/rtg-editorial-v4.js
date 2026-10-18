@@ -189,6 +189,11 @@
       if (worldNode && worldNode.textContent !== worldText) worldNode.textContent = worldText;
       if (titleNode && titleNode.textContent !== name) titleNode.textContent = name;
     }
+    /* De springlink blijft de eerste tabstop (WCAG 2.4.1). Hij wordt door twee
+       lagen geplaatst (deze kop en world-desktop-surface), en wie het laatst
+       draait, mag de kop niet vóór de springlink laten staan. */
+    var skipLink = body.querySelector(':scope > :is(.wd-skip,.skip,.rtg-spring)');
+    if (header && header.parentNode === body && skipLink && (header.compareDocumentPosition(skipLink) & 4)) body.insertBefore(skipLink, header);
     ensureWorldTitle(doc, body, world);
     ensureSectionMasthead(doc, body, route, name);
     ensurePhotoLead(doc, body, route, world);

@@ -509,9 +509,9 @@ async function verversTegoed(){
         klaar(r); ververs(); verversTegoed();
       } catch (e) { meld(e.message); b.disabled = false; }
     }));
-    doe('[data-terug]', 'pay/tegoed/terug', {}, r => meld(euro(r.centen) + ' eur is terug op je saldo.'));
-    doe('[data-intrek]', 'pay/tegoed/terug', { intrekken: true }, r => meld('Ingetrokken: ' + euro(r.centen) + ' eur is terug op je saldo.'));
-    doe('[data-roteer]', 'pay/tegoed/roteer', {}, r => {
+    doe('[data-terug]', '/api/pay/tegoed/terug', {}, r => meld(euro(r.centen) + ' eur is terug op je saldo.'));
+    doe('[data-intrek]', '/api/pay/tegoed/terug', { intrekken: true }, r => meld('Ingetrokken: ' + euro(r.centen) + ' eur is terug op je saldo.'));
+    doe('[data-roteer]', '/api/pay/tegoed/roteer', {}, r => {
       $('#gNieuw').hidden = false;
       $('#gCode').textContent = r.tegoed.code;
       meld('Nieuwe code. De oude werkt niet meer.');

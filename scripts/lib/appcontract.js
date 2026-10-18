@@ -109,6 +109,19 @@ const CONTRACT = {
   'link:ik': Object.assign({
     belofte: 'een lid zegt hoe hij genoemd wil worden, welke toon Rahul aanslaat en hoe elk scherm zich gedraagt, binnen de grens van zijn leeftijd'
   }, voltooi('ik', 'het scenario loopt /api/ik, /api/ik/zet en /api/ik/toegankelijk/zet, de routes die /apps/ik.html zelf aanroept')),
+  /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
+  'link:veilig': Object.assign({
+    belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'
+  }, voltooi('veilig', 'het scenario loopt /api/veiligheid, /kring/toevoegen, /aanpassen, /verwijderen, /mail, /plek, /alarm en /alarm/afsluiten, de routes die /apps/veilig.html zelf aanroept, met een tweede lid dat het alarm ontvangt')),
+  'link:foodcourt': Object.assign({
+    belofte: 'een lid ziet de restaurants en hun vrije tijden, vraagt een tafel aan, en de zaak beslist -- het lid ziet de bevestiging'
+  }, voltooi('foodcourt', 'het scenario loopt /api/foodcourt, /api/foodcourt/tijden, /api/reserveer en /api/reserveringen/mijn, de routes die /apps/foodcourt.html zelf aanroept, met de zaak die bevestigt')),
+  'link:uitgaan': Object.assign({
+    belofte: 'een lid zet zich met zijn gezelschap op de gastenlijst van een avond, de zaak ziet hem op codenaam, en afmelden geeft de plek vrij'
+  }, voltooi('uitgaan', 'het scenario loopt /api/uitgaan, /api/uitgaan/mijn, /api/event/rsvp en /api/event/rsvp/annuleer, de routes die /apps/uitgaan.html zelf aanroept, met de zaak die de gastenlijst leest')),
+  'link:mijnmall': Object.assign({
+    belofte: 'een lid vraagt wat niemand aanbiedt, alleen zaken met het juiste vak zien het, het lid kiest een reactie en vindt het antwoord terug -- zonder boeking of betaling'
+  }, voltooi('mijnmall', 'het scenario loopt /api/mall/aanvraag, /aanvragen/mijn, /aanvraag/kies en /wijzig, de routes die /apps/mijnmall.html zelf aanroept, met twee zaken aan de andere kant')),
   /* De apps van de Lifestyle Pass (18 oktober 2026). Elk scenario loopt met een
      lid dat zijn pas kreeg langs het menselijke besluit van het kantoor; het
      scenario van Reisboek loopt dat besluit zelf als schakels. */

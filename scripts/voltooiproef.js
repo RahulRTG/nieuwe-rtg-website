@@ -68,6 +68,7 @@ const SCENARIOS = {
   'cellier.js': require('./lib/voltooi/cellier'),
   'cercle.js': require('./lib/voltooi/cercle'),
   'entourage.js': require('./lib/voltooi/entourage'),
+  'foodcourt.js': require('./lib/voltooi/foodcourt'),
   'garderobe.js': require('./lib/voltooi/garderobe'),
   'hangar.js': require('./lib/voltooi/hangar'),
   'ik.js': require('./lib/voltooi/ik'),
@@ -75,12 +76,15 @@ const SCENARIOS = {
   'maison.js': require('./lib/voltooi/maison'),
   'mecenaat.js': require('./lib/voltooi/mecenaat'),
   'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
+  'mijnmall.js': require('./lib/voltooi/mijnmall'),
   'neigingen.js': require('./lib/voltooi/neigingen'),
   'post.js': require('./lib/voltooi/post'),
   'reisboek.js': require('./lib/voltooi/reisboek'),
   'relaties.js': require('./lib/voltooi/relaties'),
   'sessies.js': require('./lib/voltooi/sessies'),
   'table.js': require('./lib/voltooi/table'),
+  'uitgaan.js': require('./lib/voltooi/uitgaan'),
+  'veilig.js': require('./lib/voltooi/veilig'),
   'verificatie.js': require('./lib/voltooi/verificatie')
 };
 

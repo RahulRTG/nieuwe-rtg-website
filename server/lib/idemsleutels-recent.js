@@ -27,6 +27,8 @@ const SLEUTELS = Object.assign({},
   /* De Living Mall is een POST-projectie zonder mutatie. */
   require('./idemsleutels-mall-living').SLEUTELS,
   /* De apps van de Lifestyle Pass: gevonden door de voltooiproef van Reisboek. */
-  require('./idemsleutels-rechterhand').SLEUTELS);
+  require('./idemsleutels-rechterhand').SLEUTELS,
+  /* RTG Veilig: een dubbeltik op de alarmknop gaf de kring twee alarmen. */
+  require('./idemsleutels-veilig').SLEUTELS);
 
 module.exports = { SLEUTELS };

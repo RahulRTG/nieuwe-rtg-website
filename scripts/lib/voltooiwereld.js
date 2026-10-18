@@ -281,4 +281,23 @@ async function gebondenToestel(w, tok) {
   return { bewijs };
 }
 
-module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, KANTOORWERELD };
+/* TWEE LEDEN DIE ELKAAR KENNEN, langs de Salon: A zoekt B op codenaam, stuurt
+   een verzoek, B accepteert (routes/social/leden.js). Veel beloftes rusten op
+   een bestaande connectie (de veiligheidskring, berichten, samen betalen); de
+   proef maakt die connectie zoals leden dat doen, en legt hem niet neer. Geeft
+   per lid de sessiesleutel (`key`, waarop de vriendenlaag draait) en de
+   codenaam terug. */
+async function verbind(w, A, B) {
+  const ca = (await w.post('/api/member/connections', {}, A.token)).data || {};
+  const cb = (await w.post('/api/member/connections', {}, B.token)).data || {};
+  const f = await w.post('/api/member/find', { q: cb.codename }, A.token);
+  const doel = ((f.data && f.data.results) || []).find((x) => x.codename === cb.codename);
+  if (!doel) throw new Error('A vindt B niet op codenaam (' + f.status + ')');
+  const c = await w.post('/api/member/connect', { key: doel.key }, A.token);
+  if (c.status !== 200) throw new Error('het verzoek van A aan B lukte niet (' + c.status + ')');
+  const r = await w.post('/api/member/connect/respond', { key: ca.me, action: 'accept' }, B.token);
+  if (r.status !== 200 || (r.data && r.data.status) !== 'verbonden') throw new Error('B kon A niet accepteren (' + r.status + ')');
+  return { a: { key: ca.me, codenaam: ca.codename }, b: { key: cb.me, codenaam: cb.codename } };
+}
+
+module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, verbind, KANTOORWERELD };

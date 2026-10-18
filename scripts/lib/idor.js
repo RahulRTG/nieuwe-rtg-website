@@ -35,6 +35,17 @@ function oordeelIdor(status, lijf) {
       reden: 'B kreeg ' + s + ' op een object uit A\'s antwoord; NAKIJKEN of dat object echt van A is ' +
         'of publiek (een 2xx op een gedeeld object is geen lek)' };
   }
+  /* EEN DEUR DIE EEN TOESTEL VRAAGT, IS GEEN SCHEIDING (18 oktober 2026). Een
+     zwaar pad (kern/identiteit/bezitsbewijs.js) weigert elk verzoek zonder
+     een toestel dat zijn sleutel aantoont, met `bezitsbewijs: 'vereist'` in het
+     antwoord -- ook als het object WEL van B was. Die 401/403 als "gescheiden"
+     tellen is een geldige uitslag op het verkeerde experiment (BEWIJSMACHINE.md
+     par. 6a): negen zware routes stonden zo als bewijs in IDOR.json zonder dat
+     de eigenaarschapsvraag ooit was gesteld. */
+  if ((s === 401 || s === 403) && /"bezitsbewijs"\s*:\s*"vereist"/.test(String(lijf || ''))) {
+    return { staat: 'onbereikbaar',
+      reden: 'B kreeg ' + s + ' aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld' };
+  }
   if (s === 401 || s === 403 || s === 404) {
     const verraadt = VERRAADT.test(String(lijf || ''));
     return { staat: 'gescheiden',

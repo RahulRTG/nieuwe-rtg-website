@@ -84,7 +84,14 @@ function maakCarriereLedger(state) {
      Dat is geen beperking maar de waarheid: op het moment van schrijven heeft
      niemand anders er iets van gezien. Een hogere herkomst komt er alleen bij
      doordat een ANDER hem toevoegt. */
-  function zet(key, data) {
+  /* DE BEVESTIGING WACHT OP DE OPSLAG (18 oktober 2026). Deze functies riepen
+     vastleggen() aan zonder erop te wachten: het lid kreeg 200 voordat de
+     duurzame commit was gedaan, en een 503 van de opslag viel stil weg. De
+     voltooiproef vond het met een stroomstoring direct na de bevestiging: een
+     ingetrokken feit stond er daarna weer als geldig, en een gestopte deelcode
+     liet een vreemde weer kijken (scripts/lib/voltooi/loopbaan.js). Precies wat
+     server/lib/duurzaam.js moest voorkomen. Nu async, en `mis` gaat terug. */
+  async function zet(key, data) {
     const d = data || {};
     const voorstel = { kapitaal: scho(d.kapitaal, 20), herkomst: 'zelf',
       wat: scho(d.wat, 300), op: scho(d.op, 10) };
@@ -100,7 +107,8 @@ function maakCarriereLedger(state) {
     }
     const r = schrijfRegel(key, Object.assign({ soort: 'feit' }, voorstel,
       { toelichting: scho(d.toelichting, 600) || null }));
-    vastleggen();
+    const mis = await vastleggen();
+    if (mis) return mis;
     return { status: 200, regel: r };
   }
 
@@ -108,7 +116,7 @@ function maakCarriereLedger(state) {
      `door` moet een naam of een zaak zijn: een bevestiging die op niemand terug
      te voeren is, is geen bevestiging (KANTOORMACHT.md -- een spoor dat eindigt
      bij een gedeelde code is een alibi). */
-  function bevestig(key, fid, { herkomst, door, wat, zaak } = {}) {
+  async function bevestig(key, fid, { herkomst, door, wat, zaak } = {}) {
     if (!R.HERKOMSTNAMEN.includes(herkomst) || herkomst === 'zelf') {
       return { status: 400, error: 'Een bevestiging is `gezien` of `bevestigd`; `zelf` zet de eigenaar.' };
     }
@@ -127,7 +135,8 @@ function maakCarriereLedger(state) {
     }
     const r = schrijfRegel(key, { soort: 'bevestiging', feit: f, herkomst, door: wie, wat: tekst,
       zaak: scho(zaak, 40) || undefined });
-    vastleggen();
+    const mis = await vastleggen();
+    if (mis) return mis;
     return { status: 200, regel: r };
   }
 
@@ -141,7 +150,7 @@ function maakCarriereLedger(state) {
      voorwerp is precies de vorm die SEMANTIEK.json duur maakt. De ROUTE blijft
      wel /intrek heten -- dat is de taal van buiten, en daar is het onderwerp uit
      het pad al duidelijk. */
-  function trekRegelIn(key, rid, { door, reden, van } = {}) {
+  async function trekRegelIn(key, rid, { door, reden, van } = {}) {
     const rs = reeks(key);
     const doel = rs.find(r => r.id === scho(rid, 20));
     if (!doel || doel.soort === 'intrekking') return { status: 404, error: 'Deze regel staat niet in dit ledger.' };
@@ -153,7 +162,8 @@ function maakCarriereLedger(state) {
     const w = scho(reden, 300);
     if (!w) return { status: 400, error: 'Schrijf erbij waarom. Een intrekking zonder reden laat de lezer raden wat er niet klopte.' };
     const r = schrijfRegel(key, { soort: 'intrekking', doel: doel.id, door: scho(door, 120) || 'het lid', reden: w });
-    vastleggen();
+    const mis = await vastleggen();
+    if (mis) return mis;
     return { status: 200, regel: r };
   }
 

@@ -54,7 +54,7 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
     'Er staat met opzet geen cijfer, niveau of vergelijking bij. Die bestaan hier niet.'
   ];
 
-  function deel(key, fid, { dagen, voor } = {}) {
+  async function deel(key, fid, { dagen, voor } = {}) {
     const f = feit(key, scho(fid, 20));
     if (!f) return { status: 404, error: 'Dit feit staat niet in uw ledger.' };
     const d = Math.max(1, Math.min(Math.round(Number(dagen) || STANDAARD_DAGEN), MAX_DAGEN));
@@ -63,12 +63,15 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
       geldigMs: d * DAG, maxGebruik: 10000 });
     bak().push(Object.assign({ id: 'cd' + crypto.randomBytes(4).toString('hex'),
       voor: scho(voor, 120) || null }, toegang));
-    vastleggen();
+    /* Wachten op de opslag (zie de kop van zet() in ./index.js): een code die
+       het lid krijgt en die na een stroomstoring niet bestaat, is een leugen. */
+    const mis = await vastleggen();
+    if (mis) return mis;
     /* De kale code gaat precies EEN keer de deur uit. */
     return { status: 200, code, tot: toegang.expires_at, feit: f.id, voor: scho(voor, 120) || null };
   }
 
-  function toon(code) {
+  async function toon(code) {
     const rij = bc.vind(kijk(), scho(code, 120));
     const waarom = bc.reden(rij, { doel: 'carriere-regel', scope: ['carriere.regel.tonen'], negeerGebruik: true });
     if (waarom) {
@@ -78,7 +81,7 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
     if (!f) return { status: 404, error: 'Deze code doet niets meer.', waarom: 'feit-weg' };
     /* Het tellen gebeurt op de SCHRIJFbak, niet op de rij uit kijk(). */
     const schrijf = bc.vind(bak(), scho(code, 120));
-    if (schrijf) { bc.gebruik(schrijf); vastleggen(); }
+    if (schrijf) { bc.gebruik(schrijf); const mis = await vastleggen(); if (mis) return mis; }
     return { status: 200, mens: naam(rij.onderwerp.key),
       feit: { wat: f.wat, op: f.op, ingetrokken: f.ingetrokken,
         bevestigingen: f.bevestigingen.filter(b => !b.ingetrokken) },
@@ -91,12 +94,13 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
       gestopt: !!r.ingetrokken_at }));
   }
 
-  function stop(key, did) {
+  async function stop(key, did) {
     const rij = bak().find(r => r.id === scho(did, 20) && r.issuer === key);
     if (!rij) return { status: 404, error: 'Deze deelcode kennen wij niet.' };
     if (rij.ingetrokken_at) return { status: 409, error: 'Deze deelcode is al gestopt.' };
     bc.intrekken(rij, key, 'gestopt door het lid');
-    vastleggen();
+    const misStop = await vastleggen();
+    if (misStop) return misStop;
     return { status: 200, gestopt: rij.ingetrokken_at,
       let: 'Wie hem eerder heeft geopend, heeft de regel gelezen. Dat halen wij niet terug.' };
   }

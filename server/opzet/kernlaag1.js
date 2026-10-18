@@ -85,20 +85,8 @@ Object.assign(kern, require('../kern/spellen')({
    van het lid). */
 const { meldAan, meldLid } = require('./meldaan')({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToUser });
 
-/* DE CODENAAM DIE HET LID INTYPT, ALLEEN ONDER ZIJN EIGEN CONNECTIES. De kring
-   en de Live Circle vragen op het scherm om een codenaam ("Codenaam of
-   sleutel", "Codenaam of bedrijfscode"), maar de kern kende alleen de
-   sessiesleutel -- dus een verbonden vriend die je bij naam intypte, heette
-   "niet verbonden" (gevonden door de voltooiproef, 18 oktober 2026). Het
-   opzoeken gebeurt in de eigen connecties en nergens anders: een codenaam van
-   een vreemde wordt zo nooit een sleutel, en deze weg is geen ledengids. Lui,
-   want de vriendenlaag komt pas na deze laag in de kern. */
-const vriendOpCodenaam = (handle, tekst) => {
-  const t = String(tekst || '').trim().toLowerCase();
-  if (!t || typeof kern.socialConnecties !== 'function') return null;
-  const c = ((kern.socialConnecties(handle) || {}).connections || []).find(x => String(x.codename || '').toLowerCase() === t);
-  return c ? c.key : null;
-};
+// een getypte codenaam, alleen onder de eigen connecties (zie het bestand)
+const vriendOpCodenaam = require('../kern/veiligheid/vriendopcodenaam')(() => kern.socialConnecties);
 Object.assign(kern, require('../kern/veiligheid')({
   db, save, crypto, schoon, mail,
   kluis: require('../accounts/kluis'),

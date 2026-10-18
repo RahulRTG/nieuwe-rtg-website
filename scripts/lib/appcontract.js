@@ -134,6 +134,36 @@ const CONTRACT = {
   'link:commerce': Object.assign({
     belofte: 'een lid legt koopbare dingen in een mand, ziet per verkoper een afrekening met btw en wat bevestigen blokkeert, en geeft zijn keuze als briefje door aan de deur die wel bevestigt'
   }, voltooi('commerce', 'het scenario loopt /api/commerce/aanbod, /mand, /mand/zet, /mand/leeg en /overdracht/maak, de routes die /apps/commerce.html zelf aanroept, met een ander lid dat het briefje niet mag lezen')),
+  /* De tweede ronde van 18 oktober 2026: werelden met een tweede lid (Pulse,
+     RTMail, de wereldlaag), het eigen dossier (gegevens, bescherming,
+     loopbaan) en de Mall, School en Kwesties. */
+  'link:mall': Object.assign({
+    belofte: 'een lid vindt aanbod in de Mall, zet het in een eigen lijst, bewaart het met een hartje in een vaste lijst, en zet een app uit de bibliotheek in zijn kast'
+  }, voltooi('mall', 'het scenario loopt /api/mall/zoek, de lijstroutes, /bewaar en /bewaard en /api/mall/apps/*, de routes die /apps/mall.html zelf aanroept')),
+  'link:pulse': Object.assign({
+    belofte: 'een lid schrijft een kort bericht, een ander lid vindt het, waardeert het, reageert en bewaart het; wie het schreef haalt het weg en dan is het voor iedereen weg'
+  }, voltooi('pulse', 'het scenario loopt /api/member/pulse/* en /api/member/wauw/stemming, de routes die /apps/pulse.html zelf aanroept, met een tweede lid')),
+  'link:rtmail': Object.assign({
+    belofte: 'een lid verstuurt binnen RTG een bericht naar een ander lid, dat het ongelezen in zijn postvak op codenaam ziet en leest; andermans post is niet te lezen'
+  }, voltooi('rtmail', 'het scenario loopt /api/member/rtmail/adres, /inbox, /lees en de conceptroutes, de routes die /apps/rtmail.html zelf aanroept, met een tweede lid')),
+  'link:gegevens': Object.assign({
+    belofte: 'een lid ziet wat RTG van hem heeft, neemt het mee onder zijn codenaam, ziet wie in zijn dossier was, en wijzigt zijn wachtwoord zo dat het oude nergens meer opent'
+  }, voltooi('gegevens', 'het scenario loopt /api/mijn/gegevens, /api/privacy/export, /inzage en /api/auth/password, de routes die /apps/mijn-gegevens.html zelf aanroept')),
+  'link:loopbaan': Object.assign({
+    belofte: 'een lid schrijft feiten in een ledger dat niets wist, trekt er een terug met reden, en deelt een feit met een code die hij weer stopzet'
+  }, voltooi('loopbaan', 'het scenario loopt /api/carriere/ledger/* en /api/carriere/regel/toon, de routes die /apps/loopbaan.html zelf aanroept, met een vreemde zonder sessie')),
+  'link:bescherming': Object.assign({
+    belofte: 'een lid zet zijn eigen beveiliging zonder drempel strenger en krijgt hem alleen via een ceremonie met reden en stappen weer omlaag'
+  }, voltooi('bescherming', 'het scenario loopt /api/isolatie/mijn, /zet en de ontsluitceremonie, de routes die /apps/mijn-isolatie.html zelf aanroept')),
+  'link:school': Object.assign({
+    belofte: 'een lid oefent een examen zoals bij een echt examen en krijgt aan het eind een terugblik en een oefenindicatie die geen echt cijfer is'
+  }, voltooi('school', 'het scenario loopt /api/leerstof/examen, /examen-antwoord en /api/onderwijs/advies, de routes die /apps/rtgschool.html zelf aanroept')),
+  'link:kwesties': Object.assign({
+    belofte: 'een mens brengt in wat er speelt, ziet de kwestie op zijn naam, opent de uitkomst en trekt hem in -- een ander kan er niets mee'
+  }, voltooi('kwesties', 'het scenario loopt /api/member/democratie/kwestie/*, de routes die /apps/foundation/kwesties.html zelf aanroept, als lid en met een tweede lid')),
+  'link:wereldlaag': Object.assign({
+    belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
+  }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),
   'link:vandaag': Object.assign({
     belofte: 'een lid houdt zijn dag bij: een gewoonte afvinken en weer uitzetten, een meting met herkomst, een dagcheck-in, en een noodkaart die alleen hij zelf toont'
   }, voltooi('vandaag', 'het scenario loopt /api/life, /api/gewoonten (maak, tik, reeks, stop), /api/metingen (zet, weg), /api/gemoed (zet, weg) en /api/noodkaart (zet, weg), de routes die /apps/life.html zelf aanroept')),

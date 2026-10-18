@@ -31,6 +31,8 @@ const SLEUTELS = Object.assign({},
   /* RTG Veilig: een dubbeltik op de alarmknop gaf de kring twee alarmen. */
   require('./idemsleutels-veilig').SLEUTELS,
   /* De kluis: een dubbeltik op "document toevoegen" gaf twee documenten. */
-  require('./idemsleutels-bestanden').SLEUTELS);
+  require('./idemsleutels-bestanden').SLEUTELS,
+  /* Pulse, De Salon en RTMail: een dubbeltik gaf de ander alles twee keer. */
+  require('./idemsleutels-tweedelid').SLEUTELS);
 
 module.exports = { SLEUTELS };

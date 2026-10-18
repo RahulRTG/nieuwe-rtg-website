@@ -98,6 +98,32 @@ function sla(naam) {
   return true;
 }
 
+/* HET DOEL VAN EEN DOOD NA DE COMMIT -- en waarom zonder doel de verkeerde
+   commit werd geraakt (18 oktober 2026).
+
+   `sterf-na-commit` sloeg toe op de EERSTE bevestigde duurzame commit van het
+   proces. Op een kritieke geldroute is dat niet de geldcommit maar de regel die
+   server/opzet/kritiekspoor.js VOOR de handeling vastlegt (`stand: 'toegestaan'`).
+   De crashproef stierf daar, vond na de herstart geen spoor van de route, en
+   noemde dat "de commit overleefde de herstart niet" -- op 30 geldroutes,
+   terwijl de geldcommit nooit was bereikt. Een geldige uitslag van het
+   verkeerde experiment (BEWIJSMACHINE.md par. 6a).
+
+   `RTG_VERRAAD_DOEL=paySaldi,payBoekingen` richt de dood: hij slaat alleen toe
+   op een commit die een van die collecties WERKELIJK schreef. Zonder doel
+   blijft alles zoals het was. Weet de opslag niet wat hij schreef (alleen
+   sqlite zegt het), dan telt de commit als raak: liever de oude, grovere
+   meting dan een verraad dat stil nooit toeslaat. Het doel zet niets aan --
+   zonder RTG_VERRAAD doet het niets, en RTG_VERRAAD weigert in productie. */
+function leesDoel(ruw) {
+  return new Set(String(ruw == null ? '' : ruw).split(',').map(s => s.trim()).filter(Boolean));
+}
+const DOEL = leesDoel(process.env.RTG_VERRAAD_DOEL);
+function raaktDoel(geschreven, doel = DOEL) {
+  if (!doel.size || !Array.isArray(geschreven)) return true;
+  return geschreven.some(k => doel.has(k));
+}
+
 const actief = (naam) => INSTELLING.aan.has(naam);
 const ietsAan = () => INSTELLING.aan.size > 0;
 const telling = () => Object.fromEntries(geslagen);
@@ -125,4 +151,5 @@ const CONTROL = {
       onherhaalbareRondes: 'gemeten.onherhaalbareRondes' } }
 };
 
-module.exports = { CATALOGUS, lees, maakTeller, sla, actief, ietsAan, telling, ingebouwd, CONTROL };
+module.exports = { CATALOGUS, lees, maakTeller, sla, actief, ietsAan, telling, ingebouwd, CONTROL,
+  leesDoel, raaktDoel };

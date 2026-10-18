@@ -8,6 +8,7 @@
   if (w.RTGModuleSDK) return;
   var VERSION = '0.1.0', STATES = ['peek', 'panel', 'workspace', 'focus'];
   var LEVELS = ['L0', 'L1', 'L2', 'L3', 'L4'], PERSIST = ['none', 'session', 'workspace', 'user'];
+  var ASSISTANT = ['read', 'search', 'open', 'propose'];
   var ID = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/, EVENT = /^[a-z][a-z0-9]*(?:\.[a-z0-9-]+)+$/;
   var SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$/;
   var catalogus = [];
@@ -43,6 +44,27 @@
     if (!Object.keys(uit).some(function (s) { return uit[s]; })) throw new TypeError('Een module moet minstens een surface leveren.');
     return uit;
   }
+  function assistent(invoer, acties) {
+    if (invoer == null) return Object.freeze ? Object.freeze({ actions: Object.freeze([]) }) : { actions: [] };
+    if (!invoer || typeof invoer !== 'object' || Array.isArray(invoer))
+      throw new TypeError('Assistant-contract moet een object zijn.');
+    if (Object.keys(invoer).some(function (k) { return k !== 'actions'; }))
+      throw new TypeError('Assistant-contract bevat een onbekend veld.');
+    if (!Array.isArray(invoer.actions)) throw new TypeError('Assistant-actions moeten een lijst zijn.');
+    var gezien = Object.create(null), uit = [];
+    invoer.actions.forEach(function (rij) {
+      if (!rij || typeof rij !== 'object' || Array.isArray(rij) ||
+          Object.keys(rij).some(function (k) { return k !== 'id' && k !== 'kind'; }))
+        throw new TypeError('Assistant-action bevat een onbekend veld.');
+      var id = String(rij.id || ''), kind = String(rij.kind || '');
+      if (!EVENT.test(id) || acties.indexOf(id) < 0) throw new TypeError('Assistant-action is niet gedeclareerd: ' + id);
+      if (ASSISTANT.indexOf(kind) < 0) throw new TypeError('Onveilig assistant-actiontype: ' + kind);
+      if (gezien[id]) throw new TypeError('Dubbele assistant-action: ' + id);
+      gezien[id] = true; uit.push(Object.freeze ? Object.freeze({ id: id, kind: kind }) : { id: id, kind: kind });
+    });
+    var veilig = { actions: Object.freeze ? Object.freeze(uit) : uit };
+    return Object.freeze ? Object.freeze(veilig) : veilig;
+  }
   function manifest(invoer) {
     var m = invoer || {}, id = String(m.id || '').trim();
     if (!ID.test(id)) throw new TypeError('Ongeldig module-id: ' + id);
@@ -52,6 +74,7 @@
     if (!states.length || states.some(function (s) { return STATES.indexOf(s) < 0; }))
       throw new TypeError('Module ' + id + ' heeft een onbekende state.');
     var gebeurtenissen = m.events || {}, state = m.state || {}, perf = m.performance || {};
+    var acties = uniek(m.actions, 'actie', EVENT);
     var runtime = m.runtime || {}, level = String(m.maturity || m.level || (m.source === 'legacy' ? 'L0' : 'L3')).toUpperCase();
     if (LEVELS.indexOf(level) < 0) throw new TypeError('Module ' + id + ' heeft een onbekend migratieniveau.');
     var persistence = String(state.persistence || 'none');
@@ -65,7 +88,7 @@
       capabilities: uniek(m.capabilities, 'capability', ID),
       services: uniek(m.services, 'server-service', ID),
       permissions: uniek(m.permissions, 'permission', ID),
-      actions: uniek(m.actions, 'actie', EVENT), invokes: uniek(m.invokes, 'aanroep', EVENT),
+      actions: acties, invokes: uniek(m.invokes, 'aanroep', EVENT), assistant: assistent(m.assistant, acties),
       events: {
         publishes: uniek(gebeurtenissen.publishes, 'publicatie', EVENT),
         subscribes: uniek(gebeurtenissen.subscribes, 'abonnement', EVENT)
@@ -108,6 +131,7 @@
     return definitie;
   }
   var api = { version: VERSION, states: STATES.slice(), maturityLevels: LEVELS.slice(), persistence: PERSIST.slice(),
+    assistantKinds: ASSISTANT.slice(),
     define: define, validate: manifest, add: add, catalog: function () { return catalogus.slice(); }, compatible: compatibel,
     isId: function (id) { return ID.test(String(id || '')); }, isEvent: function (id) { return EVENT.test(String(id || '')); } };
   w.RTGModuleSDK = api;

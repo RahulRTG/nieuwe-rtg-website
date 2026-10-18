@@ -36,6 +36,7 @@
       if (!borrowed) return;
       var b = borrowed; borrowed = null;
       move(b.node, b.parent, b.next && b.next.parentNode === b.parent ? b.next : null);
+      mouth.hidden = false;
       slot.hidden = true; delete rt.host.dataset.rtgSurface; delete d.body.dataset.rtgEdgeSurface;
       schedule();
     }
@@ -43,6 +44,7 @@
       if (!node || node.ownerDocument !== d || !node.parentNode || rt.host.contains(node)) return null;
       release();
       borrowed = { node:node, parent:node.parentNode, next:node.nextSibling };
+      mouth.hidden = !!(options && options.mouth === false);
       move(node, slot, null); slot.hidden = false;
       rt.host.dataset.rtgSurface = String(options && options.kind || 'controls');
       d.body.dataset.rtgEdgeSurface = rt.host.dataset.rtgSurface;

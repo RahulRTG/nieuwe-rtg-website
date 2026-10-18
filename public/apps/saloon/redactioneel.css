@@ -49,7 +49,9 @@ body.rtg-saloon-experience .saloon-herkomst summary::before{content:'⌄';color:
 body.rtg-saloon-experience .saloon-herkomst[open] summary::before{content:'⌃'}
 body.rtg-saloon-experience #livingNearby{margin-top:28px;border-color:var(--saloon-lijn)}
 body.saloon-leest main>*:not(#saloonArtikel){display:none!important}
-body.rtg-saloon-experience #saloonArtikel{max-width:760px;margin:0 auto}
+body.saloon-leest[data-rtg-editorial-v4="true"]{padding-top:0!important}
+body.saloon-leest[data-rtg-editorial-v4="true"]>header.rtg-v4-header{display:none!important}
+body.rtg-saloon-experience #saloonArtikel{position:relative;z-index:9200;max-width:760px;margin:0 auto}
 body.rtg-saloon-experience .saloon-lezerkop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 14px}
 body.rtg-saloon-experience #saloonArtikel button{min-height:44px;padding:8px 0;background:transparent;color:var(--saloon-goud);border:0;border-bottom:1px solid var(--saloon-lijn);font:400 14px/1.5 Inter,sans-serif;cursor:pointer}
 body.rtg-saloon-experience .saloon-leesinhoud figure{margin:0 0 18px}

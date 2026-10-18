@@ -314,7 +314,30 @@ function magControleren() {
 }
 
 /* Bekende wezen beeindigen. Alleen processen die ALS ZELFDE PROCES herkend
-   worden -- een hergebruikt PID raakt hier nooit iets. */
+   worden -- een hergebruikt PID raakt hier nooit iets.
+
+   SIGKILL VERSTUREN IS NIET HETZELFDE ALS EEN SCHONE KRING. De oude versie
+   keerde direct na process.kill() terug en liet de aanroeper zelf op EEN bekend
+   kind wachten. Een vastgelegde kring kan meer leden bevatten. Op een drukke
+   CI-runner bleef daardoor soms nog een tweede lid in de overgang naar zombie
+   terwijl herstel() en magStarten() al achter elkaar werden aangeroepen.
+
+   Nog subtieler: een dood PID kan meteen opnieuw worden uitgegeven. Wanneer de
+   opgeslagen starttijd met de nieuwe instantie botst (de klok heeft een
+   eindige resolutie), lijkt het oude kind weer levend. Daarom wacht ruimOp()
+   zelf op IEDER geraakt proces en sluit het daarna uit de actieve kring. De
+   oorspronkelijke kring blijft als auditbewijs in `opgeruimd.vastgelegd` staan;
+   `kring` betekent voortaan precies wat de poort ermee bedoelt: wat nog leeft. */
+const SLAAPVELD = new Int32Array(new SharedArrayBuffer(4));
+function wachtOpAfbouw(processen, ms = 5000) {
+  const eind = Date.now() + ms;
+  let over = processen.filter(zelfdeProces);
+  while (over.length && Date.now() < eind) {
+    Atomics.wait(SLAAPVELD, 0, 0, Math.min(25, eind - Date.now()));
+    over = processen.filter(zelfdeProces);
+  }
+  return over;
+}
 function ruimOp() {
   const a = lees();
   const wezen = wezenVan(a);
@@ -322,7 +345,20 @@ function ruimOp() {
   for (const w of wezen) {
     try { process.kill(w.pid, 'SIGKILL'); geraakt.push(w.pid); } catch (e) { /* al weg */ }
   }
-  if (a) schrijf(Object.assign({}, a, { opgeruimd: { op: new Date().toISOString(), geraakt } }));
+  const over = wachtOpAfbouw(wezen);
+  if (a) schrijf(Object.assign({}, a, {
+    /* Geen oude procesidentiteiten opnieuw beoordelen nadat hun dood hier is
+       vastgesteld. Wat niet binnen de grens weg is, blijft fail-closed in de
+       actieve kring staan en blokkeert herstel()/de volgende ronde. */
+    kring: over,
+    opgeruimd: {
+      op: new Date().toISOString(),
+      geraakt,
+      vastgelegd: Array.isArray(a.kring) ? a.kring : [],
+      bevestigdDood: wezen.filter(w => !over.some(o => o.pid === w.pid && o.start === w.start)),
+      over
+    }
+  }));
   return geraakt;
 }
 

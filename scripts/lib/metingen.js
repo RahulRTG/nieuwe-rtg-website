@@ -515,6 +515,7 @@ const REGISTER = {
      register bij naam en vergelijkt de verse meting ertegen. */
   'TEKSTOPPERVLAK.json': { eigenRatel: 'scripts/check.js' },
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
+  'VOORRAADPROEF.json': { eigenRatel: 'test/voorraadproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'ADAMPROEF.json': { eigenRatel: 'test/adamproef.test.js' },
   'ROMEPROEF.json': { eigenRatel: 'test/romeproef.test.js' },

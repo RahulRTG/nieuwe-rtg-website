@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "c74c2845",
+  "commit": "29b8b395c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1254,21 +1254,35 @@
     "public/shared/inlogkleur.js",
     "public/shared/interface/module-sdk.js",
     "public/shared/interface/modules/context.js",
+    "public/shared/interface/modules/coordination-edge.js",
+    "public/shared/interface/modules/coordination-view.js",
+    "public/shared/interface/modules/coordination.js",
     "public/shared/interface/modules/safety.js",
+    "public/shared/interface/modules/travel-actions.js",
+    "public/shared/interface/modules/travel-continuity.js",
+    "public/shared/interface/modules/travel-dossier-view.js",
+    "public/shared/interface/modules/travel-edge.js",
+    "public/shared/interface/modules/travel-view.js",
     "public/shared/interface/modules/travel.js",
+    "public/shared/interface/modules/work-edge.js",
+    "public/shared/interface/modules/work-view.js",
+    "public/shared/interface/modules/work.js",
     "public/shared/interface/personal-image-editor.js",
     "public/shared/interface/personal-images.js",
     "public/shared/interface/public-presentation.js",
     "public/shared/interface/second-screen-modules.js",
     "public/shared/interface/second-screen-personal.js",
     "public/shared/interface/second-screen.js",
+    "public/shared/interface/workspace-assistant-manifest.js",
     "public/shared/interface/workspace-blueprints.js",
     "public/shared/interface/workspace-broker.js",
     "public/shared/interface/workspace-composer.js",
     "public/shared/interface/workspace-context.js",
     "public/shared/interface/workspace-continuity.js",
+    "public/shared/interface/workspace-directory.js",
     "public/shared/interface/workspace-empty.js",
     "public/shared/interface/workspace-experience.js",
+    "public/shared/interface/workspace-intents.js",
     "public/shared/interface/workspace-legacy.js",
     "public/shared/interface/workspace-module-host.js",
     "public/shared/interface/workspace-navigation.js",
@@ -1358,10 +1372,12 @@
     "public/shared/qrteken.js",
     "public/shared/rahul-mond.js",
     "public/shared/rahul-tab.js",
+    "public/shared/rahul-tab/approval.js",
     "public/shared/rahul-tab/dialog.js",
     "public/shared/rahul-tab/helpers.js",
     "public/shared/rahul-tab/inkt.js",
     "public/shared/rahul-tab/kompas.js",
+    "public/shared/rahul-tab/session.js",
     "public/shared/rahul-tab/style-base.js",
     "public/shared/rahul-tab/style-twin.js",
     "public/shared/rahul-tab/workspace.js",
@@ -1379,6 +1395,7 @@
     "public/shared/rosapps.js",
     "public/shared/rosthema.js",
     "public/shared/rtg-action-dock.js",
+    "public/shared/rtg-adaptive-edge-cinema.js",
     "public/shared/rtg-adaptive-edge-claim.js",
     "public/shared/rtg-adaptive-edge-controls.js",
     "public/shared/rtg-adaptive-edge-core.js",
@@ -1387,6 +1404,7 @@
     "public/shared/rtg-adaptive-edge-services.js",
     "public/shared/rtg-adaptive-edge-signals.js",
     "public/shared/rtg-adaptive-edge-surface.js",
+    "public/shared/rtg-adaptive-edge-visual.js",
     "public/shared/rtg-adaptive-edge.js",
     "public/shared/rtg-cinematic-system.js",
     "public/shared/rtg-communication-surface.js",
@@ -1409,6 +1427,10 @@
     "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
     "public/shared/rtg-edge-system.js",
     "public/shared/rtg-edge-worlds.js",
+    "public/shared/rtg-editorial-v4-header.js",
+    "public/shared/rtg-editorial-v4-model.js",
+    "public/shared/rtg-editorial-v4/rtg-editorial-v4-01.js",
+    "public/shared/rtg-editorial-v4/rtg-editorial-v4-02.js",
     "public/shared/rtg-first-steps.js",
     "public/shared/rtg-heritage-components.js",
     "public/shared/rtg-heritage-motion.js",
@@ -1904,6 +1926,9 @@
      "pad": "public/shared/rtg-edge-smart-menu"
     },
     {
+     "pad": "public/shared/rtg-editorial-v4"
+    },
+    {
      "pad": "public/shared/rtg-schil"
     },
     {
@@ -1968,20 +1993,25 @@
   "bekendePaden": 5508
  },
  "gemeten": {
-  "schermenMetPad": 442,
+  "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1034,
-  "verwijzingen": 1252,
+  "exactePaden": 1028,
+  "verwijzingen": 1250,
   "voorvoegsels": 142,
   "basisPaden": 2,
-  "doodPad": 0,
-  "doodPadVerwijzingen": 0
+  "doodPad": 1,
+  "doodPadVerwijzingen": 1
  },
  "basisPadLijst": [
   "/api/foundation",
   "/api/rtf/social"
  ],
- "doodPad": [],
+ "doodPad": [
+  {
+   "pad": "/api/bedrijf/zaakregie",
+   "scherm": "public/shared/interface/modules/work.js"
+  }
+ ],
  "nietGelezen": [],
  "perPad": [
   {
@@ -2117,17 +2147,6 @@
    "aantal": 5
   },
   {
-   "pad": "/api/member/connections",
-   "schermen": [
-    "public/apps/comm.html",
-    "public/apps/geld/wbwb.js",
-    "public/apps/media/lijst.js",
-    "public/apps/pay.html",
-    "public/apps/spelen.html"
-   ],
-   "aantal": 5
-  },
-  {
    "pad": "/api/account/start",
    "schermen": [
     "public/apps/decision-room.js",
@@ -2155,6 +2174,16 @@
     "public/apps/memo/app.js",
     "public/apps/reizen-samen-delen.js",
     "public/shared/interface/personal-images.js"
+   ],
+   "aantal": 4
+  },
+  {
+   "pad": "/api/member/connections",
+   "schermen": [
+    "public/apps/comm.html",
+    "public/apps/geld/wbwb.js",
+    "public/apps/media/lijst.js",
+    "public/apps/spelen.html"
    ],
    "aantal": 4
   },
@@ -2280,15 +2309,6 @@
    "aantal": 3
   },
   {
-   "pad": "/api/pay/overzicht",
-   "schermen": [
-    "public/apps/isolatie.js",
-    "public/apps/pay.html",
-    "public/shared/interface/world-widget-data.js"
-   ],
-   "aantal": 3
-  },
-  {
    "pad": "/api/salon/plaats",
    "schermen": [
     "public/apps/isolatie.js",
@@ -2312,6 +2332,24 @@
     "public/apps/memo/app.js",
     "public/apps/scanner/app.js",
     "public/apps/wonen.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/reisbureau",
+   "schermen": [
+    "public/apps/reisbureau.html",
+    "public/apps/reizen-veilig-reis.js",
+    "public/shared/interface/modules/travel.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/reisbureau/mijn",
+   "schermen": [
+    "public/apps/reisbureau.html",
+    "public/shared/interface/modules/travel-actions.js",
+    "public/shared/travel-request-controller.js"
    ],
    "aantal": 3
   },
@@ -2694,10 +2732,10 @@
    "aantal": 2
   },
   {
-   "pad": "/api/pay/stuur",
+   "pad": "/api/pay/overzicht",
    "schermen": [
     "public/apps/isolatie.js",
-    "public/apps/pay.html"
+    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 2
   },
@@ -2746,6 +2784,14 @@
    "schermen": [
     "public/apps/living-os-data.js",
     "public/shared/interface/world-widget-data.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/member/bureau/zaken",
+   "schermen": [
+    "public/apps/living-os-data.js",
+    "public/shared/interface/modules/coordination.js"
    ],
    "aantal": 2
   },
@@ -2886,22 +2932,6 @@
    "aantal": 2
   },
   {
-   "pad": "/api/reisbureau",
-   "schermen": [
-    "public/apps/reisbureau.html",
-    "public/apps/reizen-veilig-reis.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/reisbureau/mijn",
-   "schermen": [
-    "public/apps/reisbureau.html",
-    "public/shared/travel-request-controller.js"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/mob/vraag",
    "schermen": [
     "public/apps/reizen-performance-boeken.js",
@@ -3014,6 +3044,22 @@
    "aantal": 2
   },
   {
+   "pad": "/api/bedrijf/mijn",
+   "schermen": [
+    "public/apps/werk/kern.js",
+    "public/shared/interface/modules/work.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/bedrijf/start",
+   "schermen": [
+    "public/apps/werk/start.js",
+    "public/shared/interface/modules/work.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/bestanden/map",
    "schermen": [
     "public/apps/wonen.js",
@@ -3026,6 +3072,22 @@
    "schermen": [
     "public/shared/basis/basis-02.js",
     "public/shared/deur.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/service/mens",
+   "schermen": [
+    "public/shared/basis/basis-02b.js",
+    "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/service/mijn",
+   "schermen": [
+    "public/shared/basis/basis-02b.js",
+    "public/shared/interface/modules/coordination.js"
    ],
    "aantal": 2
   },
@@ -5612,6 +5674,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/pay/stuur",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/techniek/isolatie",
    "schermen": [
     "public/apps/isolatie.js"
@@ -6061,13 +6130,6 @@
   },
   {
    "pad": "/api/member/bureau/zaak/beslis",
-   "schermen": [
-    "public/apps/living-os-data.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/bureau/zaken",
    "schermen": [
     "public/apps/living-os-data.js"
    ],
@@ -7341,84 +7403,7 @@
    "aantal": 1
   },
   {
-   "pad": "/api/link/cap/maak",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/login",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/oplaad",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/tegoed",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/tegoed/koop",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/tegoed/verzilver",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/tik",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/tikcode",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/tiks",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/verzoek",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/verzoek/betaal",
-   "schermen": [
-    "public/apps/pay.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay/verzoek/intrek",
    "schermen": [
     "public/apps/pay.html"
    ],
@@ -8846,9 +8831,9 @@
    "aantal": 1
   },
   {
-   "pad": "/api/bedrijf/mijn",
+   "pad": "/api/bedrijf/taak/maak",
    "schermen": [
-    "public/apps/werk/kern.js"
+    "public/apps/werk/acties.js"
    ],
    "aantal": 1
   },
@@ -8856,6 +8841,13 @@
    "pad": "/api/tenant/bootstrap",
    "schermen": [
     "public/apps/werk/merk.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bedrijf/taken",
+   "schermen": [
+    "public/apps/werk/modules.js"
    ],
    "aantal": 1
   },
@@ -8972,20 +8964,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/service/mens",
-   "schermen": [
-    "public/shared/basis/basis-02b.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/service/mijn",
-   "schermen": [
-    "public/shared/basis/basis-02b.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/service/open",
    "schermen": [
     "public/shared/basis/basis-02b.js"
@@ -9056,9 +9034,23 @@
    "aantal": 1
   },
   {
+   "pad": "/api/service/zaak",
+   "schermen": [
+    "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/huis/dossier",
    "schermen": [
     "public/shared/interface/modules/travel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bedrijf/zaakregie",
+   "schermen": [
+    "public/shared/interface/modules/work.js"
    ],
    "aantal": 1
   },
@@ -11968,23 +11960,11 @@
   {
    "bestand": "public/apps/pay.html",
    "exact": [
-    "/api/link/cap/maak",
-    "/api/login",
-    "/api/member/connections",
-    "/api/pay/oplaad",
-    "/api/pay/overzicht",
-    "/api/pay/stuur",
-    "/api/pay/tegoed",
-    "/api/pay/tegoed/koop",
-    "/api/pay/tegoed/verzilver",
-    "/api/pay/tik",
-    "/api/pay/tikcode",
-    "/api/pay/tiks",
-    "/api/pay/verzoek",
-    "/api/pay/verzoek/betaal",
-    "/api/pay/verzoek/intrek"
+    "/api/login"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/"
+   ]
   },
   {
    "bestand": "public/apps/payroll.html",
@@ -12977,6 +12957,13 @@
    ]
   },
   {
+   "bestand": "public/apps/werk/acties.js",
+   "exact": [
+    "/api/bedrijf/taak/maak"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/werk/bijstand.js",
    "exact": [],
    "voorvoegsels": [
@@ -12989,6 +12976,7 @@
     "/api/bedrijf/mijn"
    ],
    "voorvoegsels": [
+    "/api/",
     "/api/bedrijf"
    ]
   },
@@ -12996,6 +12984,13 @@
    "bestand": "public/apps/werk/merk.js",
    "exact": [
     "/api/tenant/bootstrap"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/werk/modules.js",
+   "exact": [
+    "/api/bedrijf/taken"
    ],
    "voorvoegsels": []
   },
@@ -13012,6 +13007,13 @@
    "voorvoegsels": [
     "/api/werk-leverancier/"
    ]
+  },
+  {
+   "bestand": "public/apps/werk/start.js",
+   "exact": [
+    "/api/bedrijf/start"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/werk/status.js",
@@ -13245,6 +13247,16 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/interface/modules/coordination.js",
+   "exact": [
+    "/api/member/bureau/zaken",
+    "/api/service/mens",
+    "/api/service/mijn",
+    "/api/service/zaak"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/shared/interface/modules/safety.js",
    "exact": [
     "/api/veiligheid",
@@ -13253,9 +13265,26 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/interface/modules/travel-actions.js",
+   "exact": [
+    "/api/reisbureau/mijn"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/shared/interface/modules/travel.js",
    "exact": [
-    "/api/member/huis/dossier"
+    "/api/member/huis/dossier",
+    "/api/reisbureau"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/shared/interface/modules/work.js",
+   "exact": [
+    "/api/bedrijf/mijn",
+    "/api/bedrijf/start",
+    "/api/bedrijf/zaakregie"
    ],
    "voorvoegsels": []
   },
@@ -13489,6 +13518,13 @@
    ]
   },
   {
+   "bestand": "public/shared/rahul-tab/approval.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/"
+   ]
+  },
+  {
    "bestand": "public/shared/rahul-tab/helpers.js",
    "exact": [
     "/api/fluister/concept"
@@ -13501,9 +13537,7 @@
     "/api/fluister",
     "/api/supplier/ai"
    ],
-   "voorvoegsels": [
-    "/api/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/realtime.js",

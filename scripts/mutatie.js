@@ -607,6 +607,11 @@ const EIGEN_MODULE = new Map([
   ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],
   ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
   ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
+  /* De composerproef voert de twee echte browsermodules in een VM uit. De
+     statische modulezoeker ziet readFileSync(path.join(..., name)) niet, dus
+     zonder deze binding heet een uitgevoerde toets ten onrechte onmeetbaar. */
+  ['workspace-composer.test.js', ['public/shared/interface/workspace-blueprints.js',
+    'public/shared/interface/workspace-composer.js']],
   ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],
   ['toestel.e2e.js', ['public/shared/toestel/opslag.js', 'public/shared/toestel/rekenaar.js']],
   ['laatstedrie.e2e.js', ['public/shared/media.js']],
@@ -787,6 +792,9 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
      muteert hij scripts/momentproef.js en zakt de toets erop. */
   ['momentproef.test.js', ['scripts/momentproef.js']],
+  /* Zelfde vorm voor de CIVILIS-keten voorraad-ontvangst: de toets leest het
+     instrument via fs, dus hier staat welke bron hij bewaakt. */
+  ['voorraadproef.test.js', ['scripts/voorraadproef.js']],
   /* DE BUDGETTERUGNAME toetst de GRENS van registratieTerug (alleen terugnemen
      wat aantoonbaar leeg is) en de poort van MAX_PER_LID -- maar requiret
      kern/waarde als geheel, dus de motor mikte op index.js: de compositiewortel,
@@ -812,6 +820,7 @@ const EIGEN_MODULE = new Map([
      bewering zakken. De expliciete koppeling voorkomt dat een echte VM-toets
      als "geen module gevonden" buiten de mutatiemeting blijft. */
   ['workspace-platform.test.js', ['public/shared/interface/module-sdk.js']],
+  ['workspace-session-continuity.test.js', ['public/shared/interface/workspace-session.js']],
   /* De werkruimtecontext (Edge ronde 2, stap 23) is browsercode die de toets in
      een VM uitvoert, dus zonder require. Met de hand nagetrokken: de herkomst
      overschrijven, een cache terugzetten, terugvallen op RTGAdaptief en bij een
@@ -924,6 +933,8 @@ const EIGEN_MODULE = new Map([
   ['experience-travel.test.js', ['server/kern/reisbureau.js']],
   ['travel-request-controller.test.js', ['public/shared/travel-request-controller.js']],
   ['experience-travel.e2e.js', ['public/apps/reisbureau-experience.js', 'public/shared/travel-request-controller.js']],
+  ['workspace-travel-request.e2e.js', ['public/shared/interface/workspace-runtime.js', 'public/shared/interface/second-screen.js',
+    'public/shared/interface/modules/travel.js', 'public/shared/interface/modules/travel-view.js']],
   ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],
   /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
      gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de

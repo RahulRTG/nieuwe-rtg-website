@@ -122,6 +122,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-move').CONTRACTEN,
   require('./mutatiecontracten-network').CONTRACTEN,
   require('./mutatiecontracten-praktijk').CONTRACTEN,
+  require('./mutatiecontracten-zaakregie').CONTRACTEN,
   /* De kaartkeuze van een lid. Eigen bestand omdat de grond de BOUW is (de
      keuze is een verzameling) en niet een kale meetronde. */
   require('./mutatiecontracten-kaarten').CONTRACTEN,

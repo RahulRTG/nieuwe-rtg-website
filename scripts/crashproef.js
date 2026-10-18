@@ -57,6 +57,7 @@
    Draaien:  npm run crashproef
              npm run crashproef -- --pad=/api/pay/saldo
              npm run crashproef -- --routes=5 --json
+             npm run crashproef -- --paden=/api/pay/saldo,/api/bank/sepa --grens=na-commit-voor-antwoord
    ========================================================================== */
 'use strict';
 
@@ -81,6 +82,15 @@ const argv = process.argv.slice(2);
 const jsonUit = argv.includes('--json');
 const vastleggen = argv.includes('--vastleggen');
 const alleenPad = (argv.find(a => a.startsWith('--pad=')) || '').slice(6) || null;
+/* EEN KLEINE DEELVERZAMELING, om een bevinding na te lopen zonder de volle ronde
+   van drie kwartier: `--paden=/api/pay/saldo,/api/bank/sepa` kiest routes en
+   `--grens=na-commit-voor-antwoord` een grens. Ze kiezen alleen WAT er gemeten
+   wordt -- de weging, de ruisronde en de beweringen blijven exact dezelfde. Een
+   uitslag van een deelverzameling hoort nooit in CRASHPROEF.json: daarom weigert
+   --vastleggen samen met een van deze vlaggen. */
+const alleenPaden = ((argv.find(a => a.startsWith('--paden=')) || '').slice(8) || '')
+  .split(',').map(x => x.trim()).filter(Boolean);
+const alleenGrens = (argv.find(a => a.startsWith('--grens=')) || '').slice(8) || null;
 const maxRoutes = Number((argv.find(a => a.startsWith('--routes=')) || '').slice(9)) || 0;
 
 /* ============================================================================
@@ -638,9 +648,22 @@ async function ronde(route, grens, ruis) {
        zelf duurzaam, dus met de modus vanaf het begin scherp sterft de server
        tijdens het inloggen en meet de ronde de opstelling in plaats van de
        geldroute. */
+    /* DE DOOD NA DE COMMIT KRIJGT EEN DOEL: de collecties van DEZE route.
+
+       Zonder doel stierf de server op de eerste bevestigde duurzame commit van
+       het verzoek. Op een kritiek pad (/api/pay/, /api/bank/, /api/wallet/,
+       /api/office/bank/, /api/supplier/pay/) is dat de regel die
+       server/opzet/kritiekspoor.js VOOR de handeling vastlegt -- niet de
+       geldcommit. De ronde van 18 oktober 2026 gaf daardoor 30 keer FAILED
+       ("de commit overleefde de herstart niet") over een commit die nooit had
+       plaatsgevonden. Het doel richt de dood op de commit die een collectie van
+       deze route schrijft; de weging hieronder verandert er niet door. Schrijft
+       de route nooit duurzaam naar zijn eigen collecties, dan sterft hij niet en
+       zegt de rij dat (GEEN_DUURZAME_WEG) -- wat dan ook klopt. */
+    const doel = grens.modus === 'sterf-na-commit' ? { RTG_VERRAAD_DOEL: route.collecties.join(',') } : {};
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, magSterven: true, wachtMs: 30000,
-      env: { ...SERVEROMGEVING, RTG_VERRAAD: grens.modus, RTG_VERRAAD_SEED: '20260913' } });
+      env: { ...SERVEROMGEVING, RTG_VERRAAD: grens.modus, RTG_VERRAAD_SEED: '20260913', ...doel } });
     if (srv.dood) return { stand: 'BLOCKED', voorziening,
       reden: 'de server stierf al tijdens het opstarten onder ' + grens.modus };
 
@@ -751,14 +774,29 @@ function geldroutes() {
   const g = JSON.parse(fs.readFileSync(path.join(WORTEL, 'GELDDEKKING.json'), 'utf8'));
   let r = (g.rijen || []).filter(x => (x.collecties || []).length);
   if (alleenPad) r = r.filter(x => x.pad === alleenPad);
+  if (alleenPaden.length) r = r.filter(x => alleenPaden.includes(x.pad));
   if (maxRoutes) r = r.slice(0, maxRoutes);
   return r;
 }
 
+/* Welke grenzen deze ronde draait. Een onbekende naam is een fout en geen lege
+   ronde: een typefout zou anders "geen bevindingen" opleveren. */
+function gekozenGrenzen() {
+  if (!alleenGrens) return GRENZEN;
+  const g = GRENZEN.filter(x => x.grens === alleenGrens);
+  if (!g.length) throw new Error('--grens kent ' + alleenGrens + ' niet; bekend zijn: ' +
+    GRENZEN.map(x => x.grens).join(', '));
+  return g;
+}
+
 async function meet() {
+  if (vastleggen && (alleenPad || alleenPaden.length || maxRoutes || alleenGrens))
+    throw new Error('--vastleggen hoort bij de volle ronde; een deelverzameling in CRASHPROEF.json ' +
+      'leest als de hele uitslag');
   const routes = geldroutes();
+  const grenzen = gekozenGrenzen();
   if (!jsonUit) console.log('\n\x1b[1mDE CRASHPROEF OVER DE GELDROUTES\x1b[0m \x1b[2m(' +
-    routes.length + ' route(s) x ' + GRENZEN.length + ' grens)\x1b[0m\n');
+    routes.length + ' route(s) x ' + grenzen.length + ' grens)\x1b[0m\n');
 
   const ongebouwd = GRENZEN.filter(g => !verraad.CATALOGUS.some(v => v.naam === g.modus && v.waar));
   if (ongebouwd.length) throw new Error('geen injectiepunt voor: ' +
@@ -770,7 +808,7 @@ async function meet() {
 
   const per = [];
   for (const route of routes) {
-    for (const g of GRENZEN) {
+    for (const g of grenzen) {
       const uit = await ronde(route, g, ruis);
       per.push({ methode: route.methode, pad: route.pad, rol: route.rol, grens: g.grens,
         modus: g.modus, belofte: g.belofte, collecties: route.collecties,
@@ -782,7 +820,7 @@ async function meet() {
 
   const telling = {};
   for (const r of per) telling[r.stand] = (telling[r.stand] || 0) + 1;
-  return { per, telling, ruis, routes: routes.length, grenzen: GRENZEN.length };
+  return { per, telling, ruis, routes: routes.length, grenzen: grenzen.length };
 }
 
 /* Het register. De stempel komt uit ./lib/stempel.js -- dezelfde als elk ander

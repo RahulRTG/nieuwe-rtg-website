@@ -67,3 +67,44 @@ test('2. onder een liegende opslag geven uitchecken en factureren geen 2xx', asy
   const geen = await api(srv.base, 'supplier/pos/checkout', { room: 'Bestaat-niet', method: 'contant', idem: 'zgd-uit-3' }, tok);
   assert.equal(geen.status, 404);
 });
+
+/* 3. HET BERICHT KOMT NA DE COMMIT, en niet erin (18 oktober 2026).
+
+   boekVast() zette boek() in de duurzame bundel, en boek() meldt de koper en
+   mailt beide kanten voordat hij terugkeert -- dus VOOR de commit. De crashproef
+   stierf op het meldmoment en vond geen factuur: het bericht ging aan de commit
+   vooraf. Faalt die commit, dan heeft de koper een melding en een mail over een
+   factuur die niet bestaat. Zonder opslag of server: de motor met een bundel
+   die we zelf laten slagen of falen, en een logboek van de volgorde. */
+function factuurMotor(commitSlaagt) {
+  const log = [];
+  const save = () => {};
+  save.sleutels = () => {};
+  const bijeen = async (fn) => {
+    await fn();
+    log.push('commit');
+    if (!commitSlaagt) throw new Error('de opslag bevestigde niet');
+  };
+  const f = require('../server/kern/facturatie').maakFacturatie({ db: { data: {} }, save, crypto: require('crypto'),
+    findSupplier: () => null, keyVanCodenaam: async () => ({ key: 'user-proef', codename: 'Proef Koper' }),
+    notify: () => log.push('melding'), sseToCustomer: () => log.push('sse'), sseToSupplier: () => log.push('sse'),
+    automatisering: { factuurGeboekt: () => log.push('mail') }, bijeen, inBundel: () => false });
+  return { f, log };
+}
+const handFactuur = { soort: 'dienst', verkoperCode: 'proefzaak', verkoperNaam: 'Proefzaak',
+  koper: { naam: 'Proef Koper' }, regels: [{ omschrijving: 'Consult', aantal: 1, stuk: 80 }], methode: 'factuur' };
+
+test('3. boekVast meldt de koper pas NA de bevestigde commit', async () => {
+  const { f, log } = factuurMotor(true);
+  const r = await f.boekVast(JSON.parse(JSON.stringify(handFactuur)), 'Proef Koper');
+  assert.equal(r.ok, true, JSON.stringify(r).slice(0, 200));
+  assert.equal(log[0], 'commit', 'niets mag de deur uit voor de commit: ' + log.join(','));
+  assert.ok(log.includes('melding') && log.includes('mail'), 'na de commit hoort de koper het wel: ' + log.join(','));
+});
+
+test('4. faalt de commit, dan krijgt niemand een melding of mail over een factuur die niet bestaat', async () => {
+  const { f, log } = factuurMotor(false);
+  const r = await f.boekVast(JSON.parse(JSON.stringify(handFactuur)), 'Proef Koper');
+  assert.equal(r.status, 503, JSON.stringify(r).slice(0, 200));
+  assert.deepEqual(log, ['commit'], 'geen sein na een mislukte commit: ' + log.join(','));
+});

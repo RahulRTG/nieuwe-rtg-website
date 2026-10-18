@@ -263,7 +263,7 @@
     var houd = 1, som = breed[0] || 0;
     while (houd < breed.length && som + breed[houd] <= max) { som += breed[houd]; houd++; }
     while (binnen.children.length > houd) binnen.removeChild(binnen.lastChild);
-    var vol = Math.ceil(Math.min(Math.max(houd * KNOP, som), max));
+    var vol = Math.min(Math.floor(max), Math.ceil(Math.max(houd * KNOP, som)) + 1);
     binnen.style.width = '';
     px(lade, '--gb-vol', vol + 'px');
     lade.vol = vol;
@@ -332,7 +332,6 @@
     toost = t;
     setTimeout(function () { if (t.parentNode) t.remove(); if (toost === t) toost = null; }, 7000);
   }
-
 /* Vervolg van gebaar-02: HET SLEPEN ZELF. Apart bestand omdat het een eigen
    onderwerp is (en omdat de maat van check.js regel 13 dat afdwong): hierboven
    staat WAT er onder een regel ligt en wat er gebeurt als je erop tikt, hier

@@ -1,4 +1,4 @@
-/* de directe berichten: versturen en aan het gesprek toevoegen */
+/* DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING. */
     $('#dmInput').value = '';
     try {
       const d = await API.call('/member/dm/send', { toKey: dmWith, text });
@@ -7,7 +7,6 @@
   }
   $('#dmSend').addEventListener('click', stuurDm);
   $('#dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuurDm(); });
-  // RTG-eigen emoji-kiezer bij de DM-invoer
   (function(){ const inp = $('#dmInput'); if (inp && inp.parentNode && window.RTGEmoji && !inp.parentNode.querySelector('.rtg-emo-knop')) { inp.parentNode.insertBefore(RTGEmoji.knop(inp), inp); } })();
   const dmDicht = () => { $('#dm-sheet').classList.remove('open'); $('#dm-scrim').classList.remove('open'); dmWith = null; };
   $('#dmClose').addEventListener('click', dmDicht);
@@ -16,7 +15,6 @@
   $('#ride-scrim').addEventListener('click', () => { $('#ride-sheet').classList.remove('open'); $('#ride-scrim').classList.remove('open'); });
   $('#dm-scrim').addEventListener('click', dmDicht);
 
-  /* ---- post delen ---- */
   let deelPost = null;
   function openShare(postId){
     if (!socialOK){ toast(T('sal.eerstlid','Alleen voor leden.')); return; }
@@ -37,14 +35,10 @@
   $('#shareClose').addEventListener('click', () => { $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open'); });
   $('#share-scrim').addEventListener('click', () => { $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open'); });
 
-  /* ---- bellen en videobellen (WebRTC) ---- */
-  let call = null;        // { pc, stream, withKey, naam, video, richting, pendingIce, timer, t0 }
-  let inkomend = null;    // { from, codename, video }
-  let csMee = null;       // de tekstbaan van het gesprek (shared/meelezen.js)
+  let call = null;
+  let inkomend = null;
+  let csMee = null;
 
-  /* MEELEZEN. Zonder tekstbaan kan wie doof is niet meedoen aan een gesprek in
-     dit huis (TOEGANKELIJK.md). Getypt EN, waar een lokaal model draait,
-     herkend uit de eigen stem -- zie /shared/meelezen.js en /shared/meeluister.js. */
   function csBaan(){
     if (csMee || !window.RTGMeelezen) return csMee;
     csMee = window.RTGMeelezen.maak({
@@ -60,15 +54,16 @@
   function belUI(open){
     $('#callScreen').classList.toggle('open', !!open);
     if (open) csBaan();
-    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; if (csMee) csMee.leeg(); }
+    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; if (csMee) csMee.leeg(); if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.close(); }
   }
   function belTimer(){
     if (!call) return;
     const s = Math.round((Date.now() - call.t0) / 1000);
-    $('#csTijd').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    const tijd = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    $('#csTijd').textContent = tijd;
+    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.update({duration:tijd});
   }
   let iceConfig = null;
-  // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
   async function haalIce(){ try { iceConfig = (await API.call('/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
@@ -84,11 +79,10 @@
       else if (pc.connectionState === 'closed') eindeGesprek(false);
     };
     call.pc = pc;
-    window.__rtgCall = () => call; // voor tests
+    window.__rtgCall = () => call;
     return pc;
   }
   async function pakMedia(video){
-    // shared/media.js noemt de oorzaak en plaatst de volle uitleg zelf
     try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
     catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
@@ -100,6 +94,7 @@
     $('#csCam').style.display = video ? '' : 'none';
     $('#csTijd').textContent = T('sal.belt','gaat over…');
     belUI(true);
+    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'active-call',name:naam,duration:T('sal.belt','gaat over…')});
   }
   async function beginGesprek(video){
     if (!dmWith) return;
@@ -143,6 +138,7 @@
     $('#callIncoming').classList.remove('open');
     if (inkomend) API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
     inkomend = null;
+    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.close();
   });
 
   function eindeGesprek(zeggen){
@@ -180,6 +176,7 @@
       $('#ciNaam').textContent = d.codename;
       $('#ciSoort').textContent = d.video ? T('sal.videogesprek','Videogesprek') : T('sal.spraakoproep','Spraakoproep');
       $('#callIncoming').classList.add('open');
+      if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'incoming-call',name:d.codename});
       return;
     }
     if (!call || d.from !== call.withKey) return;

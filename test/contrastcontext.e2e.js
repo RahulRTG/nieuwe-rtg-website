@@ -71,7 +71,7 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
     /* Injecteer de historische verkeerde tekstinkt expliciet. De huidige Living-
        kleuren hebben goed contrast en mogen geen defectfixture zijn. Zo blijft
        de negatieve proef onafhankelijk van een toekomstige paletverbetering. */
-    await page.evaluate(() => {
+    const livingMuted = await page.evaluate(() => {
       document.body.setAttribute('data-rtg-skin', 'heritage');
       document.body.setAttribute('data-rtg-world', 'living');
       const kaart = document.createElement('div');
@@ -86,6 +86,7 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
       regel.textContent = 'Een regel om aan te meten';
       kaart.appendChild(regel);
       document.body.appendChild(kaart);
+      return getComputedStyle(regel).getPropertyValue('--rtg-world-muted').trim();
     });
     const uit = await page.evaluate(KEUR);
 
@@ -105,7 +106,9 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
     /* En de token die de melding noemt is de ECHTE waarde van deze wereld, niet
        een naam die toevallig meeloopt: zonder deze rij zou `muted=` ook groen
        blijven met een lege of doorgegeven waarde. */
-    assert.match(waar, /muted=\s*#cbbdab/i, 'de gemelde tokenwaarde is niet die van LivingOS');
+    assert.ok(livingMuted, 'LivingOS levert geen muted-token om te controleren');
+    assert.ok(waar.toLowerCase().includes('muted=' + livingMuted.toLowerCase()),
+      'de gemelde tokenwaarde is niet die van LivingOS: ' + livingMuted);
   } finally {
     if (browser) await browser.close().catch(() => {});
     await stop(srv);

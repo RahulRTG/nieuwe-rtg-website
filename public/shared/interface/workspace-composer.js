@@ -5,6 +5,12 @@
   w.RTGWorkspaceComposer = function (opties) {
     var o = opties || {}, runtime = o.runtime, state = 'peek', editing = false;
     var continuity, layout, syncBegonnen = false;
+    var templateSection = document.createElement('section'); templateSection.className = 'rtg-ss-templates'; templateSection.hidden = true;
+    var templateTitle = document.createElement('h4'); templateTitle.textContent = 'Kies een indeling'; templateSection.appendChild(templateTitle);
+    var templateHelp = document.createElement('p'); templateHelp.className = 'rtg-ss-quiet';
+    templateHelp.textContent = 'Een indeling ordent alleen functies waarvoor u al toegang heeft.'; templateSection.appendChild(templateHelp);
+    var templateList = document.createElement('div'); templateList.className = 'rtg-ss-template-list'; templateSection.appendChild(templateList);
+    o.editor.insertBefore(templateSection, o.editorList);
     continuity = w.RTGWorkspaceContinuity({ onChange: function (x) {
       if (!x) return; layout = x; draw(state, editing); if (o.onChange) o.onChange(x);
     } });
@@ -30,8 +36,9 @@
       return voor.concat(rest);
     }
     function draw(nextState, isEditing) {
+      var focusedTemplate = document.activeElement && document.activeElement.dataset.ssTemplateId;
       state = nextState || state; editing = isEditing === true;
-      o.list.textContent = ''; o.editorList.textContent = '';
+      o.list.textContent = ''; o.editorList.textContent = ''; templateList.textContent = '';
       layout.hidden = layout.hidden.filter(function (id) { return !vast(id); });
       layout.order = runtime.mount(o.list, vastVooraan(layout.order));
       var manifests = runtime.manifests();
@@ -51,6 +58,18 @@
         o.editorList.appendChild(b);
       });
       o.bank.toggleAttribute('data-ss-editing', editing); o.editor.hidden = !editing;
+      if (runtime.blueprints && typeof runtime.blueprints.templates === 'function') {
+        var templates = runtime.blueprints.templates().filter(function (x) { return x.available; });
+        templates.forEach(function (x) {
+          var b = document.createElement('button'); b.type = 'button'; b.dataset.ssAction = 'template';
+          b.dataset.ssTemplateId = x.id; b.setAttribute('aria-label', 'Gebruik indeling ' + x.label);
+          var strong = document.createElement('strong'); strong.textContent = x.label; b.appendChild(strong);
+          var span = document.createElement('span'); span.textContent = x.description; b.appendChild(span);
+          templateList.appendChild(b);
+          if (editing && focusedTemplate === x.id) b.focus();
+        });
+        templateSection.hidden = templates.length === 0;
+      }
       o.root.dataset.rtgDensity = layout.density; runtime.setState(state, layout.active);
       o.density.querySelectorAll('button').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.ssAction === 'density-' + layout.density ? 'true' : 'false');
@@ -70,8 +89,8 @@
       var a = runtime.active(); if (a && layout.hidden.indexOf(a) < 0) return a;
       return layout.order.find(function (id) { return layout.hidden.indexOf(id) < 0; }) || null;
     }
-    function blueprint(input) {
-      var r = runtime.applyBlueprint(input); if (!r || !r.ok) return r;
+    function verwerkt(r) {
+      if (!r || !r.ok) return r;
       var rijen = r.blueprint.layout, gekozen = rijen.map(function (x) { return x.module; });
       runtime.ids().forEach(function (id) { if (gekozen.indexOf(id) < 0) gekozen.push(id); });
       layout.order = gekozen; layout.hidden = rijen.filter(function (x) { return x.state === 'hidden'; }).map(function (x) { return x.module; });
@@ -79,13 +98,20 @@
       var focus = rijen.find(function (x) { return x.state === 'focus'; });
       var eerste = rijen.find(function (x) { return x.state !== 'hidden'; });
       layout.active = focus ? focus.module : eerste ? eerste.module : null;
-      save(); draw(state, editing); return r;
+      runtime.setActive(layout.active); save(); draw(state, editing); return r;
+    }
+    function blueprint(input) { return verwerkt(runtime.applyBlueprint(input)); }
+    function template(id) {
+      if (!runtime.blueprints || typeof runtime.blueprints.applyTemplate !== 'function')
+        return { ok: false, errors: ['werkruimtetemplates niet beschikbaar'] };
+      return verwerkt(runtime.blueprints.applyTemplate(id));
     }
     return {
       draw: draw, save: save, move: move, hide: hide,
       setDensity: function (x) { layout.density = x === 'compact' ? 'compact' : 'comfortable'; save(); draw(state, editing); },
       setActive: function (id, bewaren) { layout.active = id || null; if (id) runtime.setActive(id); if (bewaren) save(); return layout.active; },
-      active: function () { return layout.active || runtime.active(); }, activeOrFirst: activeOrFirst, applyBlueprint: blueprint,
+      active: function () { return layout.active || runtime.active(); }, activeOrFirst: activeOrFirst,
+      applyBlueprint: blueprint, applyTemplate: template,
       sync: function () { if (syncBegonnen) return Promise.resolve(layout); syncBegonnen = true; return continuity.sync(runtime.ids()); },
       destroy: function () { continuity.destroy(); }
     };

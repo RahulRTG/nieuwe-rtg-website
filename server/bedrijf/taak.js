@@ -23,12 +23,21 @@
    alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
    een defect. Zie de kop van ./gebeurtenis-lezen.js. */
 const { werkVeld } = require('./gebeurtenis');
+const maakHerhaal = require('./taak-idem');
 
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, rid, dag, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
+  const { app, save, schoon, nu, rid, dag, crypto, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
+
+  const herhaal = maakHerhaal(crypto);
 
   app.post('/api/bedrijf/taak/maak', (req, res) => {
     const g = werkPoort(req, res, 'project'); if (!g) return;
+    const idem = herhaal.afdruk(g, req);
+    if (idem.fout) return res.status(400).json({ error: idem.fout });
+    const eerderId = herhaal.eerder(g, idem.afdruk);
+    const eerder = eerderId && eigenVeld(T(g.w), eerderId);
+    if (eerder) return res.json({ ok: true, taak: eerder, herhaald: true,
+      let: 'Deze taak was al ontvangen; er is geen tweede taak gemaakt.' });
     const titel = schoon(req.body.titel, 120);
     if (!titel) return res.status(400).json({ error: 'Wat moet er gebeuren?' });
     const projectId = String(req.body.projectId || '');
@@ -46,6 +55,7 @@ module.exports = (sctx) => {
        en niet via een naamvergelijking die van een naamgenoot kan zijn. */
     const wie = sctx.zetWie(g.w, t, 'wie', schoon(req.body.wie, 60));
     T(g.w)[t.id] = t;
+    herhaal.boek(g, idem.afdruk, t.id);
     save();
     res.json({ ok: true, taak: t, wieLet: wie.reden });
   });

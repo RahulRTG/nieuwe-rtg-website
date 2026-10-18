@@ -5,9 +5,11 @@
   w.RTGIdentityRuntime = function (opties) {
     var o = opties || {}, key = o.tokenKey || 'rtg_member_token';
     function token() { try { return w.localStorage.getItem(key) || ''; } catch (e) { return ''; } }
+    var gestartMet = token();
     function actor() { var a = typeof o.actor === 'function' ? o.actor() : o.actor;
       return a || { id: token() ? 'current-member' : 'anonymous', type: token() ? 'member' : 'anonymous' }; }
     return { authenticated: function () { return !!token(); }, actor: actor,
+      sameSession: function () { return !!gestartMet && token() === gestartMet; },
       headers: function () { var t = token(); return t ? { Authorization: 'Bearer ' + t } : {}; } };
   };
   w.RTGSessionRuntime = function (opties) {

@@ -1286,6 +1286,19 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'workspace');
     assert.equal(await page.locator('#rtgCommand .cmd-bank').isVisible(), true,
       'op bureau hoort de vaste Workspace beschikbaar te blijven');
+    await page.locator('#rtgCommand [data-ss-action="edit"]').click();
+    const template = page.getByRole('button', { name: 'Gebruik indeling Persoonlijk', exact: true });
+    await template.waitFor({ state: 'visible' });
+    await template.focus();
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => {
+      const saved = JSON.parse(localStorage.getItem('rtg.interface.workspace.v2') || 'null')?.workspace;
+      return saved && saved.order.slice(0, 4).join(',') === 'navigation,profile,context,messages';
+    });
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.ssTemplateId), 'personal',
+      'toepassen van een indeling mag de toetsenbordfocus niet verliezen bij hertekenen');
+    await page.locator('#rtgCommand [data-ss-action="edit-done"]').click();
+
     await page.setViewportSize({ width: 393, height: 852 });
     await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'peek');
     await page.evaluate(() => document.getElementById('rtgCommand').__rtgSecondScreen.destroy());

@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, pasAppAdres } = require('./helper');
+const edgeCore = require('../public/shared/rtg-adaptive-edge-core.js');
 const pw = laadPlaywright();
 
 const SCHERMEN = [
@@ -195,8 +196,10 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
               const sx = r.left + r.width / 2, sy = r.top + r.height / 2;
               maak('pointerdown', sx, sy); maak('pointermove', sx + x, sy + y); maak('pointerup', sx + x, sy + y);
             }, [dx, dy]);
+            const huidigDeck = await page.locator('.rtg-adaptive-edge').getAttribute('data-rtg-adaptive-deck');
+            const volgendDeck = edgeCore.nextDeck(huidigDeck, 1);
             await veeg(-120, 0);
-            await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveDeck === 'context');
+            await page.waitForFunction(verwacht => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveDeck === verwacht, volgendDeck);
             await veeg(0, -90);
             await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'expanded');
             assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(), true);

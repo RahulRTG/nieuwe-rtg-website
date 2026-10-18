@@ -49,6 +49,11 @@ test('een aanbod dat verloopt voordat het lid akkoord geeft, wordt niet vastgeze
   assert.equal(c.onderdelen.length, 0);
   assert.ok(c.tijdlijn.some(x => /verlopen/.test(x.notitie)));
   assert.equal(lus.lusKies('k', c.id, { aanbod: a.id }).status, 409, 'en het kantoor kiest hem ook niet meer');
+  const beeld = lus.lusLid('k', c.id).regiebeeld;
+  assert.equal(beeld.source.id, c.id);
+  assert.equal(beeld.readOnly, true);
+  assert.equal(beeld.actions.every(x => x.executable === false), true,
+    'het universele beeld mag de bronautorisatie niet vervangen');
 }));
 
 test('binnen het mandaat zet het kantoor vast; een tweede keuze tijdens een open voorstel kan niet', () => metKlok(() => {

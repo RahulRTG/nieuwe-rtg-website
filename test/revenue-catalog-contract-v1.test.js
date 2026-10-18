@@ -131,10 +131,13 @@ test('8. het machineleesbare schema draagt dezelfde vaste contractidentiteiten',
   loop(s, '$');
 });
 
-test('9. het bekende risico reist mee zonder de bestaande kooproute te wijzigen', () => {
+test('9. het bekende risico reist mee en de bestaande kooproute kan niet zonder betaalbewijs toekennen', () => {
   const product = C.projecteerAiExtraS({}).products[0];
   assert.deepEqual(product.riskRefs, ['REV-AI-CREDIT-001']);
   const route = fs.readFileSync(path.join(__dirname, '../server/routes/member/aitegoed.js'), 'utf8');
   assert.match(route, /tegoed\.koopBundel/);
+  const kern = fs.readFileSync(require.resolve('../server/kern/commercie/tegoed/betaalbewijs'), 'utf8');
+  assert.match(kern, /PAYMENT_EVIDENCE_REQUIRED/);
+  assert.match(kern, /verifieerBetaalbewijs/);
   assert.doesNotMatch(fs.readFileSync(require.resolve('../server/kern/revenue/catalogus-v1'), 'utf8'), /\.koopBundel\s*\(/);
 });

@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-18T15:50:29.032Z",
-  "commit": "77f3685da",
+  "op": "2026-10-18T20:24:03.838Z",
+  "commit": "56a75809d",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 390,
-  "bron": 54,
-  "afgeleid": 205,
+  "artefacten": 392,
+  "bron": 55,
+  "afgeleid": 206,
   "fragmenten": 28,
   "momentopname": 1,
   "onbeslist": 102,
   "afgeleidZonderEigenaar": 0,
-  "metEigenaar": 234,
-  "afgeleidEigenaarHard": 205,
+  "metEigenaar": 235,
+  "afgeleidEigenaarHard": 206,
   "afgeleidGrendelt": 69,
-  "metStempel": 130,
+  "metStempel": 131,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -631,6 +631,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/carrierevorm.js --vastleggen",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CIVILIS.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -4811,6 +4823,20 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run voltooiproef:vast",
    "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VOORRAADPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/voorraadproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/voorraadproef.js"
+   ],
+   "stempelInstrument": "scripts/voorraadproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run voorraadproef:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

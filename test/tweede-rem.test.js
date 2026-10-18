@@ -175,11 +175,22 @@ test('4. uitzetten deelt de rem: tien foute codes op /uit, en ook de juiste zet 
 async function lidMetFactor(base, post, email) {
   const reg = await post('/api/auth/register', { name: 'Rem N4', email, password: 'geheim12', geboortedatum: '1990-01-01' });
   const begin = await post('/api/mijn/tweefactor/begin', { huidig: 'geheim12' }, reg.token);
-  await post('/api/mijn/tweefactor/bevestig', { code: totpCode(begin.geheim, Date.now(), 30) }, reg.token);
+  const bevestigd = totpCode(begin.geheim, Date.now(), 30);
+  await post('/api/mijn/tweefactor/bevestig', { code: bevestigd }, reg.token);
   const geldig = new Set([-30000, 0, 30000].map(d => totpCode(begin.geheim, Date.now() + d, 30)));
   let fout = '000000';
   for (let i = 0; geldig.has(fout); i++) fout = String(100000 + i);
-  return { geheim: begin.geheim, fout };
+  return { geheim: begin.geheim, fout, bevestigd };
+}
+/* Een geldige code die nog niet gebruikt is. Een code is eenmalig
+   (kern/totp.js); valt er een vensterwissel tussen twee stappen, dan kan een
+   vaste verschuiving precies op een al gebruikte code uitkomen. */
+function verseCode(geheim, gebruikt, volgorde) {
+  for (const d of volgorde) {
+    const code = totpCode(geheim, Date.now() + d, 30);
+    if (!gebruikt.includes(code)) return code;
+  }
+  throw new Error('geen ongebruikte geldige code in het venster');
 }
 async function vanaf(base, ip, pad, body) {
   const r = await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
@@ -255,12 +266,13 @@ test('8. nieuwe herstelcodes delen de rem: tien foute codes op /codes, en ook de
     return { status: r.status, body: await r.json().catch(() => ({})) };
   };
   try {
-    const { geheim, fout } = await lidMetFactor(base, post, email);
+    const { geheim, fout, bevestigd } = await lidMetFactor(base, post, email);
     const login = await post('/api/auth/login', { login: email, password: 'geheim12', pasApp: 'rtg' });
-    const sessie = await post('/api/auth/tweede', { bewijs: login.bewijs, code: totpCode(geheim, Date.now() - 30000, 30) });
+    const inlogcode = verseCode(geheim, [bevestigd], [-30000, 0, 30000]);
+    const sessie = await post('/api/auth/tweede', { bewijs: login.bewijs, code: inlogcode });
     assert.ok(sessie.token, 'het lid logt in met de tweede factor');
     for (let i = 1; i <= 10; i++) assert.equal((await codes(sessie.token, fout)).status, 403, 'poging ' + i);
-    const juist = await codes(sessie.token, totpCode(geheim, Date.now() + 30000, 30));
+    const juist = await codes(sessie.token, verseCode(geheim, [bevestigd, inlogcode], [30000, 0, -30000]));
     assert.equal(juist.status, 429, 'na tien foute codes zit /codes op slot, ook voor de juiste code (kreeg ' + juist.status + ')');
     assert.equal(juist.body.codes, undefined, 'en er komen geen nieuwe herstelcodes uit');
   } finally {

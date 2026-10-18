@@ -100,16 +100,40 @@ test('7. elke bundel uit het tegoed heeft een prijsregel', () => {
    duurste manier om een gat te verbergen -- en het is precies wat `koopBundel`
    deed toen bundels nog geen prijs hadden. */
 test('8. een bundel zonder vastgestelde prijs is niet te koop', () => {
-  const t = tegoed.maakTegoed({ db: { data: {} }, save: () => {}, nu: () => 1 });
+  const bewijs = (ref, verwacht) => ({ ok: true, status: 'SETTLED', evidenceId: ref,
+    ledgerRef: 'ledger:' + ref, ...verwacht });
+  const t = tegoed.maakTegoed({ db: { data: {} }, save: () => {}, nu: () => 1,
+    verifieerBetaalbewijs: bewijs });
   const zonder = t.koopBundel('Zaak', 'business-lite', 'ai-m', bp.prijsVan('ai-m', {}));
   assert.equal(zonder.status, 409, 'geen prijs, geen verkoop');
   assert.match(zonder.error, /inkoopkosten staan niet ingesteld/);
   assert.equal(t.stand('Zaak', 'business-lite').bijgekocht, 0, 'en er zijn geen credits weggegeven');
 
-  const met = t.koopBundel('Zaak', 'business-lite', 'ai-m', bp.prijsVan('ai-m', INSTEL));
+  const met = t.koopBundel('Zaak', 'business-lite', 'ai-m', bp.prijsVan('ai-m', INSTEL), 'bewijs-1');
   assert.equal(met.status, 200);
   assert.equal(met.centen, 1400, 'de gerekende prijs, en die staat op de aankoop');
   assert.equal(t.stand('Zaak', 'business-lite').bijgekocht, 20000);
+  const opnieuw = t.koopBundel('Zaak', 'business-lite', 'ai-m', bp.prijsVan('ai-m', INSTEL), 'bewijs-1');
+  assert.equal(opnieuw.replay, true);
+  assert.equal(t.stand('Zaak', 'business-lite').bijgekocht, 20000,
+    'een herhaald betaalbewijs mag niet nogmaals credits toekennen');
+});
+
+test('8b. een prijs zonder betaalbewijs kent nooit capaciteit toe', () => {
+  const t = tegoed.maakTegoed({ db: { data: {} }, save: () => {}, nu: () => 1 });
+  const r = t.koopBundel('Zaak', 'business-lite', 'ai-m', bp.prijsVan('ai-m', INSTEL));
+  assert.equal(r.code, 'PAYMENT_EVIDENCE_REQUIRED');
+  assert.equal(t.stand('Zaak', 'business-lite').bijgekocht, 0);
+});
+
+test('8c. een betaalbewijs voor een andere prijs of betaler wordt geweigerd', () => {
+  const t = tegoed.maakTegoed({ db: { data: {} }, save: () => {}, nu: () => 1,
+    verifieerBetaalbewijs: () => ({ ok: true, status: 'SETTLED', evidenceId: 'evidence-wrong',
+      ledgerRef: 'ledger:wrong', payerRef: 'Andere zaak', productRef: 'ai-bundle:ai-m',
+      amountCenten: 1, currency: 'EUR' }) });
+  const r = t.koopBundel('Zaak', 'business-lite', 'ai-m', bp.prijsVan('ai-m', INSTEL), 'bewijs-verkeerd');
+  assert.equal(r.code, 'PAYMENT_EVIDENCE_INVALID');
+  assert.equal(t.stand('Zaak', 'business-lite').bijgekocht, 0);
 });
 
 /* Het maandmaximum van automatisch aanvullen telde tegen NUL, zolang er geen

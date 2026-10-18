@@ -45,7 +45,11 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
       for(const width of [320,390,430]) {
         await page.setViewportSize({width,height:932});
         assert.equal(await page.locator('.wp-tabs').isVisible(),false,'mobile has one domain surface, without desktop accessory tabs');
-        assert.equal(await page.locator('.wd-home>.wp-scene').isVisible(),true,'the shared cinematic world scene must remain the mobile lead');
+        assert.equal(await page.evaluate(()=>Array.from(document.querySelectorAll('main img,.werk img,[data-rtg-component="EditorialHero"],.dagkop,.prestatiekop,.wk-hero,.fo-hero')).some(el=>{
+          const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+          return r.width>120&&r.height>120&&s.display!=='none'&&s.visibility!=='hidden'&&
+            (el.tagName==='IMG'&&!!el.currentSrc||el.querySelector('img')||s.backgroundImage!=='none');
+        })),true,world+' '+width+' keeps a visible photographic V4 lead');
         assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),1);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,world+' '+width+' overflow');
         if(width===430)await page.screenshot({path:path.join(out,world+'-mobile.png')});

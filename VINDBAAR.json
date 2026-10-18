@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T14:24:13.914Z",
-    "commit": "6550a20c2",
+    "op": "2026-10-18T21:08:41.544Z",
+    "commit": "5efcbac27",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 101,
-  "woorden": 1272,
-  "gevonden": 790,
-  "dekking": 0.6211,
+  "woorden": 1277,
+  "gevonden": 795,
+  "dekking": 0.6226,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -74,8 +74,8 @@
     {
       "naam": "Mall",
       "url": "/apps/mall.html",
-      "woorden": 54,
-      "gevonden": 23,
+      "woorden": 56,
+      "gevonden": 25,
       "mist": [
         "komt",
         "samengesteld",
@@ -98,7 +98,6 @@
         "dienstenplein",
         "tussen",
         "leveranciers",
-        "reisgidsen",
         "lezen",
         "kast",
         "akkoord",
@@ -107,7 +106,8 @@
         "boeken",
         "offerte",
         "aanvragen",
-        "bestellen"
+        "bestellen",
+        "plaatsen"
       ]
     },
     {
@@ -798,8 +798,8 @@
     {
       "naam": "Muziek",
       "url": "/apps/muziek.html",
-      "woorden": 9,
-      "gevonden": 6,
+      "woorden": 10,
+      "gevonden": 7,
       "mist": [
         "geluid",
         "makers",
@@ -842,8 +842,8 @@
     {
       "naam": "Ontdekken",
       "url": "/apps/connect.html",
-      "woorden": 10,
-      "gevonden": 7,
+      "woorden": 11,
+      "gevonden": 8,
       "mist": [
         "hebt",
         "gedaan",
@@ -960,8 +960,8 @@
     {
       "naam": "Pulse",
       "url": "/apps/pulse.html",
-      "woorden": 5,
-      "gevonden": 4,
+      "woorden": 6,
+      "gevonden": 5,
       "mist": [
         "savedheading"
       ]

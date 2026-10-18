@@ -37,7 +37,9 @@ module.exports = (ctx) => {
       if (typeof p.voorraad === 'number' && p.voorraad < som)
         return { status: 409, error: 'Van ' + p.naam + ' ligt er nog ' + p.voorraad + ' ' + (p.eenheid || 'stuks') + '; pas de hoeveelheid aan.' };
       nodig.set(p.id, som);
-      regels.push({ productId: p.id, naam: p.naam, eenheid: p.eenheid, aantal, prijs });
+      // keukenArtikel: het artikel van de koper (uit het inkoopadvies), alleen in diens eigen keuken.
+      const ka = r.keukenArtikel ? schoon(r.keukenArtikel, 40) : '';
+      regels.push(Object.assign({ productId: p.id, naam: p.naam, eenheid: p.eenheid, aantal, prijs }, ka ? { keukenArtikel: ka } : {}));
       subtotaal += prijs * aantal;
     }
     if (!regels.length) return { status: 400, error: 'Kies minstens een product.' };
@@ -83,10 +85,23 @@ module.exports = (ctx) => {
     else if (actie === 'verder') { const volgende = GH_KETEN[o.status]; if (!volgende) return { status: 409, error: 'Geen volgende stap.' }; o.status = volgende; }
     else return { status: 400, error: 'Onbekende actie.' };
     o.stappen.push({ status: o.status, at: nu(), door: (actor && actor.name) || null });
+    /* Geleverd bij een zaak: de keukenvoorraad vult zich aan en de bestelling
+       houdt bij wat er is ingeboekt. Een fout houdt de levering niet tegen
+       (de dozen staan er al), maar wordt niet meer stil ingeslikt. */
+    if (o.status === 'geleverd' && o.klant.soort !== 'lid' && bijGeleverd) {
+      const niet = reden => o.regels.map(x => ({ naam: x.naam, reden }));
+      try {
+        const r = bijGeleverd(o);
+        o.ontvangst = r ? { geboekt: r.geboekt, nietGeboekt: r.nietGeboekt, at: nu() }
+          : { geboekt: 0, nietGeboekt: niet('deze zaak heeft geen keukenvoorraad'), at: nu() };
+      } catch (e) {
+        o.ontvangst = { geboekt: 0, nietGeboekt: niet('inboeken mislukt'), fout: true, at: nu() };
+      }
+    }
     save();
-    // geleverd bij een zaak: de keukenvoorraad van de klant vult zichzelf aan
-    if (o.status === 'geleverd' && o.klant.soort !== 'lid' && bijGeleverd) { try { bijGeleverd(o); } catch (e) {} }
-    notifKlant(o, o.status === 'geweigerd' ? 'Bestelling geweigerd' : 'Bestelling: ' + o.status);
+    const mist = o.ontvangst && o.ontvangst.nietGeboekt.length;
+    notifKlant(o, o.status === 'geweigerd' ? 'Bestelling geweigerd'
+      : 'Bestelling: ' + o.status + (mist ? ' -- ' + mist + ' regel(s) niet in de keukenvoorraad ingeboekt' : ''));
     sseToSupplier(groothandelCode, 'sync', { scope: 'groothandel' });
     sseToOffice('sync', { scope: 'groothandel' });
     return { status: 200, ok: true, status2: o.status };
@@ -111,7 +126,7 @@ module.exports = (ctx) => {
       ref: o.ref, groothandelCode: o.groothandelCode, groothandelNaam: o.groothandelNaam,
       klant: kant === 'groothandel' ? o.klant : { soort: o.klant.soort, naam: o.klant.naam },
       regels: o.regels, subtotaal: o.subtotaal, bezorgen: o.bezorgen, soort: o.soort, bron: o.bron,
-      status: o.status, at: o.at, stappen: o.stappen
+      status: o.status, at: o.at, stappen: o.stappen, ontvangst: o.ontvangst || null
     };
   }
   function mijnBestellingen(koper) {

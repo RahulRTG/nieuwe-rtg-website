@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 490 delen, 0 zonder onderwerp.**
+**62 bundels, 492 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -727,7 +727,7 @@ omlaag.
 
 ## `shared/ios.js`
 
-`public/shared/ios/` -- 5 delen, 784 regels in de delen
+`public/shared/ios/` -- 5 delen, 789 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -829,6 +829,15 @@ omlaag.
 | `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
 | `rtg-edge-smart-menu-01.js` | Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen |
 
+## `shared/rtg-editorial-v4.js`
+
+`public/shared/rtg-editorial-v4/` -- 2 delen, 208 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `rtg-editorial-v4-01.js` | Editorial V4 presentatiehelpers: titel, beeld, sectiekop en gedeelde kopacties |
+| `rtg-editorial-v4-02.js` | Editorial V4 annotatie en levenscyclus: eigenaarschap, viewport en herstel |
+
 ## `shared/rtg-schil.js`
 
 `public/shared/rtg-schil/` -- 8 delen, 816 regels in de delen
@@ -887,7 +896,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 291 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 297 regels in de delen
 
 | deel | onderwerp |
 |---|---|

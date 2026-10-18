@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-18T12:57:22.508Z",
-  "commit": "c8df2a322"
+  "op": "2026-10-18T13:18:48.475Z",
+  "commit": "8272e0c12"
  },
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
@@ -165,7 +165,7 @@
    "route": "POST /api/doos/rapport",
    "volgensRouter": "server/routes/doos-rapport.js",
    "volgensBron": "server/routes/doos.js",
-   "routerRegel": 13,
+   "routerRegel": 14,
    "samengesteldPad": false,
    "gewijzigdNaStempel": {
     "server/routes/doos-rapport.js": true,
@@ -10217,13 +10217,13 @@
   {
    "route": "GET /api/doos/rapport",
    "bestand": "server/routes/doos-rapport.js",
-   "regel": 41,
+   "regel": 40,
    "samengesteld": false
   },
   {
    "route": "POST /api/doos/rapport",
    "bestand": "server/routes/doos-rapport.js",
-   "regel": 13,
+   "regel": 14,
    "samengesteld": false
   },
   {

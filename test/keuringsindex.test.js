@@ -115,10 +115,20 @@ test('3. EN OP DE ECHTE ROUTEKAART TEGEN DE ECHTE TOETSEN, route voor route', ()
   assert.deepEqual(oneens, [], 'de index en de lus zijn het oneens over echte routes');
 
   /* En het antwoord is niet overal hetzelfde -- anders zou "ze zijn het eens"
-     ook waar zijn als beide altijd false gaven. */
+     ook waar zijn als beide altijd false gaven, of allebei altijd true.
+
+     De "altijd true"-kant las hier eerst `gedektAantal < routes.length`: er
+     hoort een echte route ongedekt te zijn. Dat hield op waar te zijn op het
+     moment dat het huis zijn doel haalde -- op 18 oktober 2026 noemde de
+     toetstekst alle 5493 /api-routes (de laatste 119 alleen als '/member/...'
+     zonder voorvoegsel). Dus staat die kant nu op een route die NIET bestaat,
+     in een vorm die de echte routes wel hebben: die mogen beide niet gedekt
+     noemen. */
   const gedektAantal = routes.filter(snel).length;
-  assert.ok(gedektAantal > 0 && gedektAantal < routes.length,
-    'er hoort een echte verdeling te zijn (' + gedektAantal + ' van ' + routes.length + ')');
+  assert.ok(gedektAantal > 0, 'er hoort iets gedekt te zijn (' + gedektAantal + ' van ' + routes.length + ')');
+  const verzonnen = '/api/member/keuringsindex-bestaat-niet-' + process.pid;
+  assert.equal(snel(verzonnen), false, 'de index noemt een verzonnen route niet gedekt');
+  assert.equal(traagGedekt(testTekst, verzonnen), false, 'de lus ook niet');
 });
 
 test('4. de kap is een grens en geen stilte', () => {

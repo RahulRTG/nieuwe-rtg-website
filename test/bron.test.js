@@ -100,6 +100,27 @@ test('en een openend commentaarteken in zo n template eet de code erna niet op',
   assert.doesNotMatch(uit, /echt commentaar/, 'en het echte commentaar gaat gewoon weg');
 });
 
+test('een backtick of quote in een regex-literal opent geen string, en het commentaar erna gaat weg', () => {
+  /* De vorm van server/kern/magnaat-capabilities-routes.js: een regex met
+     `(['"\`])` erin. Las de walker die backtick als template, dan liep de
+     "string" door tot de volgende backtick en bleef het commentaarblok ertussen
+     als code staan -- met een routevoorbeeld erin dat test/routesbron.test.js
+     daarna als tweede bron van GET /api/scim/v2/Users zag. */
+  const bron = "const RE = /\\(\\s*(['\"`])([^'\"`]+)\\2/g;\n/* app.get(BASIS + '/Users') */\nconst blijft = 1;\nconst x = `t`;";
+  const uit = zonderCommentaar(bron);
+  assert.doesNotMatch(uit, /BASIS/, 'het commentaarblok na de regex is commentaar');
+  assert.match(uit, /\(\['"`\]\)/, 'de regex zelf blijft staan');
+  assert.match(uit, /const blijft = 1;/);
+  assert.match(uit, /const x = `t`;/);
+  const plat = zonderCommentaar(bron, { regelsHeel: true });
+  assert.equal(plat.length, bron.length);
+  assert.doesNotMatch(plat, /BASIS/);
+  /* En een deling blijft een deling: `a / b` opent geen regex die de rest van
+     de regel inslikt, en het commentaar erachter gaat gewoon weg. */
+  const deling = 'const q = a / b; const r = c / d; /* weg */ EINDE';
+  assert.equal(zonderCommentaar(deling), 'const q = a / b; const r = c / d;   EINDE');
+});
+
 test('DE TEGENPROEF: een apostrof in proza kost nog steeds hoogstens die ene regel', () => {
   /* De grens per regel voor ' en " mag hier niet mee zijn opgerekt: dan zou een
      losse apostrof in HTML-proza de rest van het BESTAND als string lezen. */

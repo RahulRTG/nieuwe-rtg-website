@@ -15,6 +15,15 @@ async function probe(browser,base,width,screenshot){
   try{
     const response=await page.goto(base+'/apps/personeel.html',{waitUntil:'domcontentloaded'});assert.equal(response.status(),200);
     await page.waitForSelector('#liUser');await page.waitForSelector('#teamAccessLanguage');
+    /* De Edge komt via een keten van ruim twintig losse scripts achter elkaar
+       (shared/rtg-adaptive-edge-loader.js), en het scherm is al bruikbaar
+       voordat die klaar is. Zonder erop te wachten is dit een wedloop: op een
+       drukke runner stond de balk er na 5 tot 9 s nog niet, telde de meting
+       hieronder 0 balken, en schoof de late Edge op 1440 de schil 224 px omlaag
+       nadat de taalknop al in beeld was gescrold (inside: false). Dus wachten
+       we VOOR de eerste handeling, zodat alles in de eindindeling gebeurt.
+       Komt hij nooit, dan zakt deze wacht -- de eis blijft dus staan. */
+    await page.waitForSelector('.rtg-adaptive-bar',{state:'attached',timeout:30000});
     assert.equal(await page.locator('#gateKlok,.rp-mond').count(),0);
     assert.equal(await page.locator('#teamAccessTitle').innerText(),'Welkom bij uw team.');
     assert.equal(await page.locator('#gate').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(57, 9, 25)');

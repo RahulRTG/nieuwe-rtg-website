@@ -6,6 +6,8 @@
 'use strict';
 
 const { maakZaakregieContextAdapter } = require('../kern/zaakregie-context/adapter');
+/* "Uitgezet" heeft één betekenis, en die woont in accounts/sessiegrens.js. */
+const { uitgezet } = require('../accounts/sessiegrens');
 
 const tekst = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
 
@@ -46,7 +48,7 @@ module.exports = function hangZaakregie(sctx) {
   app.post('/api/bedrijf/zaakregie', authEenmaal, (req, res) => {
     const sessie = req.session;
     const account = tekst(sessie && sessie.key, 160);
-    if (!sessie || !sessie.account || sessie.account.actief === 0 || !/^user-\d+$/.test(account))
+    if (!sessie || !sessie.account || uitgezet(sessie.account) || !/^user-\d+$/.test(account))
       return fout(res, 401, 'ZAAKREGIE_ACCOUNT_REQUIRED', 'Een actueel RTG-account is vereist.');
 
     const lid = lidVan(req, res);

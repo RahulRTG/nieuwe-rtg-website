@@ -475,6 +475,153 @@ fn gemounte_endpoints(root: &Path, bronnen: &BTreeMap<PathBuf, Vec<u8>>, uniek: 
     }
 }
 
+/* SAMENGESTELDE ADRESSEN -- zie samengesteldeEndpoints() in magnaat-capabilities-routes.js.
+`<voorvoegsel> + '/rest'` als eerste argument: het voorvoegsel is de eerste
+`const <naam> = '/api/...'` in hetzelfde bestand (een kale naam), of elke
+`<eigenschap>: '/api/...'` in hetzelfde bestand (een naam met een punt erin).
+Lexicaal, zonder code uit te voeren; dezelfde twee vormen als de JS-tweeling. */
+
+/* `<' of "><eis>...<zelfde quote>` vanaf p; stopt op elk aanhalingsteken, ook
+een backtick, precies zoals de tekenklasse [^'"`] in de JS-tweeling. */
+fn quote_pad(bron: &[u8], p: usize, eis: &[u8]) -> Option<(usize, usize, usize)> {
+    let quote = match bron.get(p) {
+        Some(b @ (b'\'' | b'"')) => *b,
+        _ => return None,
+    };
+    let begin = p + 1;
+    if !bron[begin.min(bron.len())..].starts_with(eis) {
+        return None;
+    }
+    let mut q = begin;
+    while q < bron.len() && !matches!(bron[q], b'\'' | b'"' | b'`') {
+        q += 1;
+    }
+    if bron.get(q) != Some(&quote) {
+        return None;
+    }
+    Some((begin, q, q + 1))
+}
+
+/* `<ontvanger><methode>\s*(\s*<naam(.naam)*>\s*+\s*<quote>/<rest><quote>` vanaf i:
+methode, de uitdrukking voor de +, de rest en de positie na de sluitende quote. */
+fn samengestelde_aanroep<'a>(
+    bron: &'a [u8],
+    i: usize,
+    ontvangers: &[&[u8]],
+) -> Option<(&'static str, &'a [u8], &'a [u8], usize)> {
+    let ontvanger = ontvangers.iter().find(|x| bron[i..].starts_with(x))?;
+    if i > 0 && woord(bron[i - 1]) {
+        return None;
+    }
+    let mut p = i + ontvanger.len();
+    let (methode_bytes, methode) = METHODEN.iter().find(|(m, _)| bron[p..].starts_with(m))?;
+    p = sla_wit_over(bron, p + methode_bytes.len());
+    if bron.get(p) != Some(&b'(') {
+        return None;
+    }
+    p = sla_wit_over(bron, p + 1);
+    let begin = p;
+    let mut eind = ident_vanaf(bron, p)?;
+    while bron.get(eind) == Some(&b'.') {
+        eind = ident_vanaf(bron, eind + 1)?;
+    }
+    p = sla_wit_over(bron, eind);
+    if bron.get(p) != Some(&b'+') {
+        return None;
+    }
+    p = sla_wit_over(bron, p + 1);
+    let (rb, re, na) = quote_pad(bron, p, b"/")?;
+    Some((methode, &bron[begin..eind], &bron[rb..re], na))
+}
+
+/* De eerste `const <naam> = '/api/...'` in het bestand, met een woordgrens voor const. */
+fn const_voorvoegsel(bron: &[u8], naam: &[u8]) -> Option<String> {
+    let mut i = 0usize;
+    while i < bron.len() {
+        if bron[i..].starts_with(b"const") && (i == 0 || !ident_deel(bron[i - 1])) {
+            let p = i + 5;
+            let q = sla_wit_over(bron, p);
+            if q > p {
+                if let Some(eind) = ident_vanaf(bron, q) {
+                    if &bron[q..eind] == naam {
+                        let r = sla_wit_over(bron, eind);
+                        if bron.get(r) == Some(&b'=') {
+                            let s = sla_wit_over(bron, r + 1);
+                            if let Some((b, e, _)) = quote_pad(bron, s, b"/api/") {
+                                return Some(String::from_utf8_lossy(&bron[b..e]).into_owned());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        i += 1;
+    }
+    None
+}
+
+/* Elke `<eigenschap>: '/api/...'` in het bestand, ontdubbeld en gesorteerd. */
+fn eigenschap_voorvoegsels(bron: &[u8], eigenschap: &[u8]) -> Vec<String> {
+    let mut uit: Vec<String> = Vec::new();
+    let mut i = 0usize;
+    while i < bron.len() {
+        if bron[i..].starts_with(eigenschap) && (i == 0 || !ident_deel(bron[i - 1])) {
+            let p = sla_wit_over(bron, i + eigenschap.len());
+            if bron.get(p) == Some(&b':') {
+                let s = sla_wit_over(bron, p + 1);
+                if let Some((b, e, _)) = quote_pad(bron, s, b"/api/") {
+                    let v = String::from_utf8_lossy(&bron[b..e]).into_owned();
+                    if !uit.contains(&v) {
+                        uit.push(v);
+                    }
+                }
+            }
+        }
+        i += 1;
+    }
+    uit.sort();
+    uit
+}
+
+fn samengestelde_endpoints(root: &Path, bronnen: &BTreeMap<PathBuf, Vec<u8>>, uniek: &mut BTreeMap<String, Json>) {
+    let mut volgorde: Vec<&PathBuf> = bronnen.keys().collect();
+    volgorde.sort_by_key(|p| p.to_string_lossy().into_owned());
+    let ontvangers: [&[u8]; 2] = [b"app.", b"router."];
+    for bestand in volgorde {
+        let bron = &bronnen[bestand];
+        let rel = relatief(root, bestand);
+        let mut i = 0usize;
+        while i < bron.len() {
+            let Some((methode, uitdrukking, rest, einde)) = samengestelde_aanroep(bron, i, &ontvangers) else {
+                i += 1;
+                continue;
+            };
+            i = einde;
+            if wordt_aangevuld(bron, einde) {
+                continue;
+            }
+            let voorvoegsels = match uitdrukking.iter().rposition(|c| *c == b'.') {
+                None => const_voorvoegsel(bron, uitdrukking).into_iter().collect::<Vec<String>>(),
+                Some(punt) => eigenschap_voorvoegsels(bron, &uitdrukking[punt + 1..]),
+            };
+            for voorvoegsel in voorvoegsels {
+                let kaal = voorvoegsel.trim_end_matches('/').to_string();
+                let samen = format!("{}{}", kaal, String::from_utf8_lossy(rest));
+                let mut route = samen.trim_end_matches('/').to_string();
+                if route.is_empty() {
+                    route = kaal.clone();
+                }
+                let sleutel = format!("{} {}", methode, route);
+                if uniek.contains_key(&sleutel) {
+                    continue;
+                }
+                let p = punt(sleutel.clone(), methode, route, &rel, toegang(bron, einde));
+                uniek.insert(sleutel, p);
+            }
+        }
+    }
+}
+
 fn scan_endpoints(root: &Path) -> Result<Vec<Json>, String> {
     let mut paden = Vec::new();
     bestanden(&root.join("server"), ".js", &mut paden)?;
@@ -487,6 +634,7 @@ fn scan_endpoints(root: &Path) -> Result<Vec<Json>, String> {
         bronnen.insert(pad, bron);
     }
     gemounte_endpoints(root, &bronnen, &mut uniek);
+    samengestelde_endpoints(root, &bronnen, &mut uniek);
     Ok(uniek.into_values().collect())
 }
 

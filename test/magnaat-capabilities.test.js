@@ -134,9 +134,21 @@ test('de bronscanner volgt app.use-mounts door de requires en noemt geen half ad
     schrijf('server/stichting/gezin.js', "module.exports = ({ router }) => {\n  router.post('/gezin/maak', auth, h);\n  router.post('/gezin/' + naam, h);\n};\n");
     schrijf('server/los.js', "router.post('/los', h);\n");
     schrijf('server/spel.js', "for (const naam of n) app.post('/api/spel/' + naam, auth, h);\napp.get('/api/spel/stand', h);\n");
+    /* De twee samengestelde vormen: een const als voorvoegsel, en een
+       eigenschap uit een lijst als voorvoegsel. Plus de tegenhangers: een
+       voorvoegsel dat geen /api/ is, en een samenstelling die verder wordt
+       aangevuld -- geen van beide is een route. */
+    schrijf('server/scim.js', "const ANDER = '/scim';\nconst BASIS = '/api/scim/v2';\napp.get(BASIS + '/Users', remmen, scimAuth, h);\napp.delete(BASIS + '/Users/:id', remmen, scimAuth, h);\napp.get(ANDER + '/los', h);\napp.post(BASIS + '/Users/' + id, h);\n");
+    schrijf('server/post.js', "for (const p of [{ pad: '/api/member/post', poort: auth }, { pad: '/api/supplier/post', poort: supplierAuth }]) {\n  app.post(p.pad + '/stuur', p.poort, h);\n}\n");
 
     const js = bronnen.scan(boom, { RTG_CAPABILITY_RUST_MODE: 'uit' });
     const sleutels = js.endpoints.map(e => e.sleutel);
+    for (const s of ['GET /api/scim/v2/Users', 'DELETE /api/scim/v2/Users/:id', 'POST /api/member/post/stuur', 'POST /api/supplier/post/stuur']) {
+      assert.ok(sleutels.includes(s), 'een samengesteld adres (voorvoegsel + rest) wordt gelezen: ' + s + ' -- ' + sleutels.join(', '));
+    }
+    assert.equal(js.endpoints.find(e => e.sleutel === 'POST /api/supplier/post/stuur').bestand, 'server/post.js');
+    assert.equal(sleutels.some(s => s.includes('/scim/los')), false, 'een voorvoegsel buiten /api/ levert geen route');
+    assert.equal(sleutels.some(s => s.startsWith('POST /api/scim/v2/Users')), false, 'een samenstelling die verder wordt aangevuld is geen route');
     const gezin = js.endpoints.find(e => e.sleutel === 'POST /api/stichting/gezin/maak');
     assert.ok(gezin, 'een relatieve route op de gemounte router krijgt het voorvoegsel van de mount: ' + sleutels.join(', '));
     assert.equal(gezin.bestand, 'server/stichting/gezin.js');
@@ -269,6 +281,15 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
      - de SCIM-router (15).
    Elk daarvan vraagt een stukje evaluatie in plaats van lezen; dat is een volgende stap,
    en in beide motoren. */
+/* EN VAN 237 NAAR 152 GEMIST OP 18 OKTOBER 2026, later die dag en weer in beide motoren:
+   de scanner leest nu een SAMENGESTELD adres `<voorvoegsel> + '/rest'` zolang het
+   voorvoegsel in hetzelfde bestand staat -- als `const BASIS = '/api/scim/v2'` (de
+   SCIM-router, 9) of als eigenschap in een lijst, `{ pad: '/api/member/rtmail' }` naast
+   `p.pad + '/stuur'` (de rtmail-lussen, 76). Nul spoken erbij; de wegwerpboomtoets
+   hierboven bewijst de twee vormen en hun twee tegenhangers. Wat overblijft (152) is
+   van de andere drie vormen: de spellenlus over Object.entries (86), de
+   voorvoegselfabriek maak() (48), prefix als parameter (12), en zes SCIM-groepsroutes
+   die buiten scim.js worden gebouwd. */
 /* DE TWEE GETALLEN STAAN SINDS 6 OKTOBER 2026 IN NORM.json (meters
    `bronscannerGemist` en `bronscannerSpook`) en niet meer als constante hier.
    De geschiedenis hierboven blijft staan, want die is de reden van het getal.

@@ -109,6 +109,65 @@ function gemounteEndpoints(root, bronnen, uniek) {
   }
 }
 
+/* SAMENGESTELDE ADRESSEN. Een route waarvan het pad in de bron als
+   `<voorvoegsel> + '/rest'` staat, schrijft zijn volle adres nergens op -- net
+   als een gemounte router, alleen staat het voorvoegsel hier in hetzelfde
+   bestand. Twee vormen worden gelezen, allebei zonder iets uit te voeren:
+
+     const BASIS = '/api/scim/v2';   app.get(BASIS + '/Users', ...)
+         het voorvoegsel is de EERSTE `const <naam> = '/api/...'` in het bestand;
+
+     for (const p of [{ pad: '/api/member/rtmail', ... }, { pad: '/api/supplier/rtmail', ... }])
+       app.post(p.pad + '/stuur', ...)
+         het voorvoegsel is ELKE `<eigenschap>: '/api/...'` in het bestand, en de
+         route bestaat dus zo vaak als er zo'n eigenschap staat.
+
+   Wat niet wordt gelezen, en met opzet: een voorvoegsel dat als PARAMETER
+   binnenkomt (prefix + '/papieren' in server/routes/papieren-deur.js), een
+   fabriek die het voorvoegsel in een sluiting vasthoudt (maak('/api/supplier/golf')
+   in server/routes/clubs.js) en een lus over de sleutels van een object
+   ('/api/rtf/spel/' + naam). Daar staat het voorvoegsel in een ander bestand of
+   pas tijdens het draaien vast, en lezen wordt dan raden. De router blijft de
+   toets (bronscannerSpook), en de Rust-tweeling leest exact dezelfde twee vormen. */
+const SAMENGESTELD_RE = /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\+\s*(['"])(\/[^'"`]*)\3/g;
+
+function ontsnap(naam) { return naam.replace(/\$/g, '\\$'); }
+
+function voorvoegsels(bron, uitdrukking) {
+  const punt = uitdrukking.lastIndexOf('.');
+  if (punt < 0) {
+    const m = new RegExp('(?<![\\w$])const\\s+' + ontsnap(uitdrukking) + '\\s*=\\s*([\'"])(\\/api\\/[^\'"`]*)\\1').exec(bron);
+    return m ? [m[2]] : [];
+  }
+  const re = new RegExp('(?<![\\w$])' + ontsnap(uitdrukking.slice(punt + 1)) + '\\s*:\\s*([\'"])(\\/api\\/[^\'"`]*)\\1', 'g');
+  const uit = new Set();
+  let m;
+  while ((m = re.exec(bron))) uit.add(m[2]);
+  return [...uit].sort();
+}
+
+function samengesteldeEndpoints(root, bronnen, uniek) {
+  for (const bestand of [...bronnen.keys()].sort()) {
+    const bron = bronnen.get(bestand);
+    SAMENGESTELD_RE.lastIndex = 0;
+    let m;
+    while ((m = SAMENGESTELD_RE.exec(bron))) {
+      if (wordtAangevuld(bron, SAMENGESTELD_RE.lastIndex)) continue;
+      for (const voorvoegsel of voorvoegsels(bron, m[2])) {
+        const kaal = voorvoegsel.replace(/\/+$/, '');
+        const route = (kaal + m[4]).replace(/\/+$/, '') || kaal;
+        const sleutel = m[1].toUpperCase() + ' ' + route;
+        if (uniek.has(sleutel)) continue;
+        uniek.set(sleutel, {
+          sleutel, methode: m[1].toUpperCase(), route,
+          bestand: path.relative(root, bestand).split(path.sep).join('/'),
+          toegang: toegangVan(bron, SAMENGESTELD_RE.lastIndex)
+        });
+      }
+    }
+  }
+}
+
 function scanEndpoints(root, bronnen) {
   const uniek = new Map();
   for (const [bestand, bron] of bronnen) {
@@ -125,6 +184,7 @@ function scanEndpoints(root, bronnen) {
     }
   }
   gemounteEndpoints(root, bronnen, uniek);
+  samengesteldeEndpoints(root, bronnen, uniek);
   return [...uniek.values()].sort((a, b) => a.sleutel.localeCompare(b.sleutel));
 }
 

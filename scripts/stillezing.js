@@ -80,14 +80,12 @@
         via een `const` in hetzelfde bestand te herleiden is -- dezelfde
         ondergrens als scripts/lib/registereigenaar.js, en met opzet dezelfde,
         zodat de twee getallen naast elkaar te leggen zijn.
-     2. Het BEREIK kijkt maximaal 200 tekens vooruit vanaf de leesaanroep. Staat
-        de registernaam verderop, dan telt hij niet mee. Met `regelsHeel` worden
-        commentaarblokken spaties in plaats van weggehaald, dus een lang
-        commentaar tussen de aanroep en de naam duwt die naam uit het venster --
-        het bereik daalde daardoor van 88 naar 75 (server) en 470 naar 439
-        (scripts) toen die stand aanging. Dat is geen verslechtering maar een
-        andere ondergrens: de eerste telling liet tekst uit een commentaarblok
-        aan elkaar plakken. Twee metingen, en ze horen niet vergeleken te worden.
+     2. Het BEREIK kijkt alleen in de ARGUMENTLIJST van de leesaanroep (sinds
+        het eigenaarsbesluit van 18 oktober 2026; zie telBewijslezingen()). Een
+        pad dat eerst in een `let` of een functie-argument wordt opgebouwd en pas
+        daarna wordt gelezen, telt dus niet mee -- een ondergrens, en de goede
+        kant op. Daarvoor keek de meter 200 tekens vooruit, en dat telde elke
+        `require('path')` met een registernaam twee regels lager mee.
      3. Een lezer die zijn eigen `lees()` heeft en die elders wordt aangeroepen,
         telt EEN keer (bij de lezer) en niet bij elke aanroeper. Dat onderschat
         het BEREIK van een enkele smoring en nooit het aantal plekken.
@@ -264,6 +262,50 @@ const LEEST = /\b(?:readFileSync|readFile|require)\s*\(/;
    literals zouden uit elkaar lopen; deze wordt uit de eerste AFGELEID. */
 const LEEST_G = new RegExp(LEEST.source, 'g');
 
+/* DE ARGUMENTLIJST VAN EEN AANROEP, vanaf het haakje dat LEEST vond tot het
+   haakje dat het sluit. Strings en template-literals worden overgeslagen, zodat
+   een haakje IN een pad de telling niet breekt. Geen sluitend haakje: null, en
+   dan telt er niets -- in een bron die parseert kan dat niet voorkomen. */
+function argumentlijst(code, open) {
+  let d = 0;
+  for (let j = open; j < code.length; j++) {
+    const c = code[j];
+    if (c === "'" || c === '"' || c === '`') {
+      for (j++; j < code.length && code[j] !== c; j++) if (code[j] === '\\') j++;
+      continue;
+    }
+    if (c === '(') d++;
+    else if (c === ')') { d--; if (d === 0) return code.slice(open, j + 1); }
+  }
+  return null;
+}
+
+/* HET BEREIK: hoeveel bewijslezingen dit stuk code doet.
+
+   EEN LEZING TELT ALLEEN ALS HET REGISTER IN DE ARGUMENTEN STAAT -- letterlijk
+   (`require('../IDEMPROEF.json')`, `readFileSync(path.join(WORTEL, 'NORM.json'))`)
+   of via een `const` in hetzelfde bestand die als argument wordt doorgegeven
+   (`readFileSync(UITSLAG, 'utf8')` met `const UITSLAG = path.join(WORTEL, 'X.json')`).
+
+   Hier stond een venster van 200 TEKENS na de aanroep, en dat was een besluit
+   van de eigenaar waard (18 oktober 2026). Het venster telde elke `require('path')`,
+   `require('fs')` en `require('./lib/stempel')` mee waar een registernaam vlak
+   onder stond -- in de kop van vrijwel elk meetscript, want daar staat
+   `const DOEL = path.join(WORTEL, 'X.json')` twee regels lager. Zo telde de meter
+   720 bewijslezingen waarvan het grootste deel geen bestand las, en een import
+   die langer werd (de stempelgrendels, 50e9e9d5) liet het getal dalen zonder dat
+   er een lezing verdween. Een bereik dat beweegt door de lengte van een
+   importregel is geen bereik. test/stillezing.test.js toets 7 houdt beide
+   kanten vast. */
+function telBewijslezingen(code, constanten, registers) {
+  let n = 0;
+  for (const m of code.matchAll(LEEST_G)) {
+    const args = argumentlijst(code, m.index + m[0].length - 1);
+    if (args && bewijsdoelen(args, constanten, registers).length) n++;
+  }
+  return n;
+}
+
 function meet() {
   const registers = wortelregisters();
   const wereldVan = (p) => path.relative(WORTEL, p).startsWith('scripts') ? 'scripts' : 'server';
@@ -289,10 +331,7 @@ function meet() {
       const wereld = wereldVan(pad);
 
       /* HET BEREIK: elke lezing van een bewijsbestand, met of zonder vanger. */
-      for (const m of code.matchAll(LEEST_G)) {
-        const staart = code.slice(m.index, m.index + 200);
-        if (bewijsdoelen(staart, constanten, registers).length) bereik[wereld]++;
-      }
+      bereik[wereld] += telBewijslezingen(code, constanten, registers);
 
       for (const m of code.matchAll(/\bcatch\s*(?:\([^)]*\))?\s*\{/g)) {
         const opener = code.indexOf('{', m.index);
@@ -390,4 +429,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { meet, deelIn, ijk, IJKVOORBEELDEN };
+module.exports = { meet, deelIn, ijk, IJKVOORBEELDEN, telBewijslezingen, constantenVan };

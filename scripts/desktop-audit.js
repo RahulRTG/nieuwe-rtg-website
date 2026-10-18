@@ -160,6 +160,7 @@ async function main() {
               nativeContent:visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])'),
               publicDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wp-edit-images'),
               publicHeader:rect('.pp-header'), v4Header:rect('body>.rtg-v4-header,[data-rtg-v4-canvas-toolbar="true"]'),
+              v4HeaderActionRow:!!document.querySelector('.rtg-v4-header-actions>[data-rtg-v4-header-action]'),
               canvasToolbar:visible('[data-rtg-v4-canvas-toolbar="true"]'),
               /* A ritkop is the Travel arrival hero: it carries the page's
                  editorial content and is deliberately kept by the V4 shell.
@@ -189,7 +190,12 @@ async function main() {
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (!s.access && s.v4Kind !== 'canvas' && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
           if (s.editorialV4 && !s.access) {
-            const expectedHeader = mobile ? 58 : 72;
+            /* De ene V4-kop heeft op de telefoon twee vastgelegde hoogtes: 58px,
+               of 120px wanneer een route een gedeclareerde kopactie draagt
+               (data-rtg-v4-header-action, bv. de zoekbalk van Command). Die
+               tweede rij houdt de actie bereikbaar; rtg-editorial-v4.css en
+               test/rtg-editorial-v4.test.js leggen hem vast. */
+            const expectedHeader = mobile ? (s.v4HeaderActionRow ? 120 : 58) : 72;
             if (s.v4Kind === 'canvas') {
               if (!s.v4Header || s.v4Header.h < 44) row.failures.push('nonstandard-v4-canvas-toolbar');
             } else if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y) > 2) row.failures.push('nonstandard-v4-header');

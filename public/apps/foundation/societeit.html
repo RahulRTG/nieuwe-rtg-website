@@ -97,6 +97,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14ck55u:not(#_#_#_){text-decoration:none}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -128,7 +138,7 @@
     <span><b>Het Rangschikduel</b><span>Zet vier dingen in de enige juiste volgorde</span></span>
     <span class="duelbadge">2-4 spelers</span>
   </button>
-  <a class="kaart-s" href="/apps/spelen.html" style="text-decoration:none">
+  <a class="kaart-s s-14ck55u" href="/apps/spelen.html">
     <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="3" fill="#C9A34A"/><rect x="26" y="26" width="14" height="14" rx="3" fill="#C9A34A" opacity=".5"/><rect x="26" y="8" width="14" height="14" rx="3" fill="#A9744A" opacity=".6"/><rect x="8" y="26" width="14" height="14" rx="3" fill="#A9744A"/></svg>
     <span><b>De speeltafel</b><span>Schaken, dammen, Rummi, Magnaat en meer</span></span>
   </a>

@@ -51,6 +51,27 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="werk-premium.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10pwjnz:not(#_#_#_){background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:0;width:min(100%,40rem);height:78vh;display:flex;flex-direction:column}
+.s-187ie3n:not(#_#_#_){width:auto}
+.s-19ycvvt:not(#_#_#_){flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.6rem .85rem;color:var(--txt)}
+.s-1axxmr9:not(#_#_#_){background:none;border:none;color:var(--zacht);font-size:1.3rem}
+.s-1bn3jy2:not(#_#_#_){flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem}
+.s-1ehk20b:not(#_#_#_){color:inherit;text-decoration:underline}
+.s-1pe4ve0:not(#_#_#_){display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--lijn)}
+.s-1yo4ual:not(#_#_#_){color:var(--zacht);text-align:center;margin:auto;font-size:.85rem}
+.s-89ia83:not(#_#_#_){color:inherit;text-decoration:underline;font-weight:700}
+.s-9uf5ke:not(#_#_#_){align-self:flex-end;max-width:82%;padding:.45rem .75rem;border-radius:0;background:var(--goud);color:#1a1710;white-space:pre-wrap}
+.s-fvtyng:not(#_#_#_){display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--lijn)}
+.s-ge1vrv:not(#_#_#_){align-self:flex-start;max-width:82%;padding:.45rem .75rem;border-radius:0;background:var(--paneel2);border:1px solid var(--lijn);white-space:pre-wrap}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -205,8 +226,8 @@ function cvKlaar(cv){ return !!(cv && cv.name && cv.contact && (cv.experience.le
 function toonCvStatus(){
   const cv = bouwCv();
   const el = $('#cvStatus');
-  if (cvKlaar(cv)){ el.className = 'cvstatus ok'; el.innerHTML = 'Je cv is klaar (' + esc(cv.name) + '). <a href="cv.html" style="color:inherit;text-decoration:underline;">Aanpassen</a>'; }
-  else { el.className = 'cvstatus mis'; el.innerHTML = 'Maak eerst je cv af om te kunnen solliciteren. <a href="cv.html" style="color:inherit;text-decoration:underline;font-weight:700;">Naar de cv-maker →</a>'; }
+  if (cvKlaar(cv)){ el.className = 'cvstatus ok'; el.innerHTML = 'Je cv is klaar (' + esc(cv.name) + '). <a href="cv.html" class="s-1ehk20b">Aanpassen</a>'; }
+  else { el.className = 'cvstatus mis'; el.innerHTML = 'Maak eerst je cv af om te kunnen solliciteren. <a href="cv.html" class="s-89ia83">Naar de cv-maker →</a>'; }
 }
 
 let vacatures = [];
@@ -338,17 +359,17 @@ let chatId = null, chatTimer = null;
 function chatMsgHtml(m){
   const mij = m.van === 'sollicitant';
   const inner = mij ? esc(m.tekst) : '<span class="xlate">'+esc(m.tekst)+'</span>';
-  return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:82%;padding:.45rem .75rem;border-radius:0;'+(mij?'background:var(--goud);color:#1a1710;':'background:var(--paneel2);border:1px solid var(--lijn);')+'white-space:pre-wrap;">'+inner+'</div>';
+  return '<div class="' + (mij ? 's-9uf5ke' : 's-ge1vrv') + '">'+inner+'</div>';
 }
 function vertaalChat(root){ if(!root||!window.Vertaal) return; root.querySelectorAll('.xlate:not([data-vt])').forEach(el=>{ el.setAttribute('data-vt','1'); Vertaal.vul(el, el.textContent, 'nl'); }); }
 function ensureChatEl(){
   let ov = document.getElementById('rtfchat'); if (ov) return ov;
   ov = document.createElement('div'); ov.id='rtfchat';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;';
-  ov.innerHTML='<div style="background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:0;width:min(100%,40rem);height:78vh;display:flex;flex-direction:column;">'+
-    '<div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--lijn);"><b class="h-flex1" id="rcWie"></b><button id="rcX" style="background:none;border:none;color:var(--zacht);font-size:1.3rem;">✕</button></div>'+
-    '<div id="rcMsgs" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
-    '<div style="display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--lijn);"><input id="rcIn" placeholder="Bericht (bijv. Kan ik donderdag om 15u langskomen?)" style="flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.6rem .85rem;color:var(--txt);"><button class="knop" id="rcSend" style="width:auto;">Stuur</button></div>'+
+  ov.innerHTML='<div class="s-10pwjnz">'+
+    '<div class="s-fvtyng"><b class="h-flex1" id="rcWie"></b><button id="rcX" class="s-1axxmr9">✕</button></div>'+
+    '<div id="rcMsgs" class="s-1bn3jy2"></div>'+
+    '<div class="s-1pe4ve0"><input id="rcIn" placeholder="Bericht (bijv. Kan ik donderdag om 15u langskomen?)" class="s-19ycvvt"><button class="knop s-187ie3n" id="rcSend">Stuur</button></div>'+
     '</div>';
   document.body.appendChild(ov);
   ov.querySelector('#rcX').addEventListener('click', sluitChat);
@@ -361,7 +382,7 @@ async function laadChat(){
   if (!chatId) return;
   try { const d = await rtfApi2('/apply/chat', { id: chatId });
     const box = document.getElementById('rcMsgs'); if(!box) return;
-    box.innerHTML = (d.chat.berichten||[]).map(chatMsgHtml).join('') || '<div style="color:var(--zacht);text-align:center;margin:auto;font-size:.85rem;">Nog geen berichten. Stel een moment voor om langs te komen.</div>';
+    box.innerHTML = (d.chat.berichten||[]).map(chatMsgHtml).join('') || '<div class="s-1yo4ual">Nog geen berichten. Stel een moment voor om langs te komen.</div>';
     vertaalChat(box); box.scrollTop = box.scrollHeight;
   } catch(e){}
 }

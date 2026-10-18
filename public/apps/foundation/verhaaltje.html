@@ -34,6 +34,19 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-17r2fi3:not(#_#_#_){background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.9rem 1rem;margin-bottom:1rem;color:var(--zacht);font-size:.88rem;line-height:1.55}
+.s-1a8ide0:not(#_#_#_){color:var(--txt);font-weight:600}
+.s-1papx63:not(#_#_#_){font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem}
+.s-1ylvh1w:not(#_#_#_){margin-top:0.75rem;justify-content:center}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -50,19 +63,19 @@
   <div class="kaart blok" id="leesblok" hidden>
     <div class="plaat" id="plaat"></div>
     <div class="tekst" id="tekst" aria-live="polite"></div>
-    <div class="doen" id="napraat" hidden style="background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.9rem 1rem;margin-bottom:1rem;color:var(--zacht);font-size:.88rem;line-height:1.55;"></div>
+    <div class="doen s-17r2fi3" id="napraat" hidden></div>
     <div class="onderrij">
       <button class="knop grijs klein" id="terug" type="button">Vorige</button>
       <div class="paginaatje" id="paginaatje"></div>
       <button class="knop klein" id="verder" type="button">Volgende</button>
     </div>
-    <div class="onderrij" style="margin-top:0.75rem;justify-content:center;">
+    <div class="onderrij s-1ylvh1w">
       <button class="knop grijs klein" id="andersverhaal" type="button">Ander verhaal</button>
     </div>
   </div>
 
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Voor de voorlezer</h2>
+    <h2 class="s-1papx63">Voor de voorlezer</h2>
     <p class="ouder">Lees rustig en laat stiltes vallen; een kleuter heeft tijd nodig om het plaatje te bekijken. Stel bij elke bladzijde een vraag: wat zie jij hier? wat zou er nu gebeuren? Op de laatste bladzijde staat een napraatvraag: het boekje gaat dicht, het gesprek gaat open. Alle verhaaltjes zijn voor deze app geschreven, lopen goed af en bevatten niets engs. Er is geen geluid en geen automatische pagina-omslag: het kind bepaalt het tempo.</p>
   </div>
 </div>
@@ -211,7 +224,7 @@ function toon() {
   // op de laatste bladzijde: een vraag om samen na te praten -- het boekje dicht, het gesprek open
   $('#napraat').hidden = !(laatste && huidig.vraag);
   if (laatste && huidig.vraag) {
-    $('#napraat').innerHTML = '<b style="color:var(--txt);font-weight:600;">Om samen na te praten: </b><span></span>';
+    $('#napraat').innerHTML = '<b class="s-1a8ide0">Om samen na te praten: </b><span></span>';
     $('#napraat').querySelector('span').textContent = huidig.vraag;
   }
   $('#paginaatje').textContent = 'bladzijde ' + (bladzij + 1) + ' van ' + huidig.bladzijden.length;

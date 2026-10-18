@@ -37,6 +37,20 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15e9keb:not(#_#_#_){justify-content:space-between}
+.s-1v3dw5a:not(#_#_#_){max-width:9rem}
+.s-hdve00:not(#_#_#_){font-size:1.02rem}
+.s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
+.s-kpqwcd:not(#_#_#_){margin:0.25rem 0}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -104,18 +118,18 @@ async function laad(){
 }
 function kaart(c){
   const stat = D.statussen.map(s => '<option value="' + s + '"' + (c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
-  return '<div class="kaart" style="margin-bottom:0.75rem;" data-club="' + c.id + '">' +
-    '<div class="rij" style="justify-content:space-between;"><h2 style="font-size:1.02rem;">' + esc(c.naam) + ' <span class="pil' + (c.status === 'actief' ? ' actief' : '') + '">' + esc(c.status) + '</span></h2>' +
+  return '<div class="kaart s-j0vkha" data-club="' + c.id + '">' +
+    '<div class="rij s-15e9keb"><h2 class="s-hdve00">' + esc(c.naam) + ' <span class="pil' + (c.status === 'actief' ? ' actief' : '') + '">' + esc(c.status) + '</span></h2>' +
     '<span class="code">' + esc(c.code) + '</span></div>' +
     '<div class="leeg">' + esc(c.sport) + (c.contact ? ' · contact: ' + esc(c.contact) : '') + '</div>' +
-    '<div class="rij" style="margin:0.25rem 0;"><select class="veld" data-status style="max-width:9rem;">' + stat + '</select>' +
+    '<div class="rij s-kpqwcd"><select class="veld s-1v3dw5a" data-status>' + stat + '</select>' +
     '<input class="veld" data-team value="' + esc((c.team || []).join(', ')) + '" placeholder="RTF-team (namen, met komma)"></div>' +
     '<div class="sec">Programma\'s</div>' +
     (c.programmas.length ? c.programmas.map(p => '<label class="item' + (p.af ? ' af' : '') + '"><input type="checkbox" data-prog="' + p.id + '"' + (p.af ? ' checked' : '') + '><span>' + esc(p.naam) + (p.doel ? ' · ' + esc(p.doel) : '') + '</span></label>').join('') : '<div class="leeg">Nog geen programma\'s.</div>') +
-    '<div class="rij" style="margin:0.25rem 0;"><input class="veld" data-pnaam placeholder="Nieuw programma (bijv. ' + esc(D.ideeen[0]) + ')" list="ideeen"><button class="knop stil" data-pmaak>+</button></div>' +
+    '<div class="rij s-kpqwcd"><input class="veld" data-pnaam placeholder="Nieuw programma (bijv. ' + esc(D.ideeen[0]) + ')" list="ideeen"><button class="knop stil" data-pmaak>+</button></div>' +
     '<div class="sec">Afspraken</div>' +
     (c.afspraken.length ? c.afspraken.map(a => '<label class="item' + (a.af ? ' af' : '') + '"><input type="checkbox" data-afs="' + a.id + '"' + (a.af ? ' checked' : '') + '><span>' + esc(a.tekst) + '</span></label>').join('') : '<div class="leeg">Nog geen afspraken.</div>') +
-    '<div class="rij" style="margin:0.25rem 0;"><input class="veld" data-anaam placeholder="Nieuwe afspraak"><button class="knop stil" data-amaak>+</button></div>' +
+    '<div class="rij s-kpqwcd"><input class="veld" data-anaam placeholder="Nieuwe afspraak"><button class="knop stil" data-amaak>+</button></div>' +
     '<div class="sec">Samenwerkingslog (club + RTF schrijven samen)</div>' +
     ((c.log || []).slice(0, 6).map(m => '<div class="log ' + esc(m.wie) + '"><b>' + esc(m.naam) + '</b>: ' + esc(m.tekst) + '</div>').join('') || '<div class="leeg">Nog stil hier.</div>') +
     '<div class="rij h-mt35"><input class="veld" data-bericht placeholder="Bericht aan de club"><button class="knop stil" data-stuur>Stuur</button></div>' +

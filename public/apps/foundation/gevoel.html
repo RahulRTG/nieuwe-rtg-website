@@ -46,6 +46,23 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1papx63:not(#_#_#_){font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem}
+.s-1vjsczt:not(#_#_#_){display:flex;gap:.35rem;flex-wrap:wrap}
+.s-1wscljg:not(#_#_#_){color:var(--zacht);line-height:1.55;margin-bottom:0.75rem}
+.s-356yzj:not(#_#_#_){color:var(--zacht);font-size:.85rem;line-height:1.5;margin-bottom:0.5rem}
+.s-4nau5o:not(#_#_#_){padding:.3rem 0 0}
+.s-jwzplr:not(#_#_#_){color:var(--zacht);font-size:.8rem;margin-left:0.5rem}
+.s-ogvy17:not(#_#_#_){font-size:.62rem}
+.s-u8vhas:not(#_#_#_){margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.9rem;line-height:1.5}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -61,7 +78,7 @@
     <div class="antwoord" id="antwoord" aria-live="polite"></div>
     <div class="h-mt70" id="bewaarRij" hidden>
       <button class="knop klein" id="bewaarKnop" type="button">Bewaar in mijn dagboekje</button>
-      <span style="color:var(--zacht);font-size:.8rem;margin-left:0.5rem;">alleen jij kunt erin kijken</span>
+      <span class="s-jwzplr">alleen jij kunt erin kijken</span>
       <!-- art. 9: een gevoel bewaren vraagt eerst een aparte toestemming (DPIA-GEZIN.md) -->
       <p id="toestemRij" class="h-mt70" hidden>
         <span id="toestemTekst"></span>
@@ -72,12 +89,12 @@
 
   <!-- het dagboekje: alleen wat het kind ZELF bewaarde, alleen voor het kind zelf -->
   <div class="kaart blok" id="dagboekBlok" hidden>
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Mijn dagboekje</h2>
-    <p style="color:var(--zacht);font-size:.85rem;line-height:1.5;margin-bottom:0.5rem;">Alleen jij ziet dit. Niet papa, niet mama, niemand.</p>
-    <div id="dagboekStrook" style="display:flex;gap:.35rem;flex-wrap:wrap;"></div>
+    <h2 class="s-1papx63">Mijn dagboekje</h2>
+    <p class="s-356yzj">Alleen jij ziet dit. Niet papa, niet mama, niemand.</p>
+    <div id="dagboekStrook" class="s-1vjsczt"></div>
     <!-- vanaf 16 is de toestemming van jezelf, en dus ook het intrekken -->
     <button class="knop klein grijs h-mt70" id="toestemIntrek" type="button" hidden>Toestemming intrekken en mijn dagboekje wissen</button>
-    <div id="hulpRegel" hidden style="margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;">
+    <div id="hulpRegel" hidden class="s-u8vhas">
       Je had een paar zware dagen achter elkaar. Dat hoef je niet alleen te dragen:
       <a href="steun.html" class="i-1ta0zs">praat met iemand</a> of kijk in de
       <a href="hulpwijzer.html" class="i-1ta0zs">hulpwijzer</a>.</div>
@@ -85,8 +102,8 @@
 
   <div class="deel">Ademen</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Rustig ademen</h2>
-    <p style="color:var(--zacht);line-height:1.55;margin-bottom:0.75rem;">Wordt de bol groot, dan adem je in. Wordt hij klein, dan adem je uit. Doe gewoon mee met de bol.</p>
+    <h2 class="s-1papx63">Rustig ademen</h2>
+    <p class="s-1wscljg">Wordt de bol groot, dan adem je in. Wordt hij klein, dan adem je uit. Doe gewoon mee met de bol.</p>
     <div class="adem">
       <div class="bol" id="bol">klaar?</div>
       <button class="knop" id="ademknop" type="button">Begin met ademen</button>
@@ -95,18 +112,18 @@
 
   <div class="deel">Praten</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Even praten?</h2>
+    <h2 class="s-1papx63">Even praten?</h2>
     <div class="chat" id="chat"><div class="b ai">Hoi. Alles wat je voelt mag er zijn. Wil je vertellen hoe het met je is?</div></div>
     <div class="rijveld">
       <textarea class="veld" id="vraag" rows="1" placeholder="Typ maar gewoon wat er in je zit..." maxlength="1000"></textarea>
       <button class="knop klein" id="stuur">Stuur</button>
     </div>
-    <div class="mini" style="padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
+    <div class="mini s-4nau5o">Wat je hier typt wordt niet bewaard.</div>
   </div>
 
   <div class="deel">Voor ouders</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Voor de grote mee-voeler</h2>
+    <h2 class="s-1papx63">Voor de grote mee-voeler</h2>
     <p class="ouder">Deze app stuurt niets door en legt uit zichzelf niets vast: wat het kind aantikt blijft op dit scherm. Alleen als het kind zelf op "bewaar in mijn dagboekje" tikt, wordt dat ene gevoel bewaard -- en dat dagboekje kan uitsluitend het kind zelf inzien, u niet. Dat is met opzet: een kind dat weet dat niemand meeleest, durft eerlijk te zijn. Benoem wat u ziet ("je kijkt boos") en wacht daarna even; kinderen hebben eerst erkenning nodig en pas daarna een oplossing. Blijft een kind langere tijd bang of verdrietig, dan is dit spel geen vervanging voor een gesprek met de huisarts of de school.</p>
   </div>
 </div>
@@ -245,7 +262,7 @@ async function laadDagboek() {
   $('#dagboekStrook').innerHTML = d.stemmingen.map(x => {
     const g = naam[x.gevoel];
     return '<span class="kop" style="width:3.6rem;min-width:3.6rem;padding:.3rem;cursor:default;" title="' + x.dag + '">' +
-      (g ? g.svg : '') + '<b style="font-size:.62rem;">' + x.dag.slice(8) + '-' + x.dag.slice(5, 7) + '</b></span>';
+      (g ? g.svg : '') + '<b class="s-ogvy17">' + x.dag.slice(8) + '-' + x.dag.slice(5, 7) + '</b></span>';
   }).join('');
   // hulp dichtbij: waren 3 van de laatste 5 bewaarde dagen zwaar, wijs dan warm de weg
   const laatste = d.stemmingen.slice(-5);

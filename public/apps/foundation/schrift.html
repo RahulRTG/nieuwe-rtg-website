@@ -70,13 +70,30 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12izg7a:not(#_#_#_){color:var(--rtg-leesgoud,var(--goud))}
+.s-160h9bn:not(#_#_#_){width:100%;border-radius:0;background:#12110F}
+.s-6dl9d4:not(#_#_#_){background:#3f6fb0}
+.s-6u92nb:not(#_#_#_){background:#5FA56A}
+.s-dbz74b:not(#_#_#_){font-weight:600;font-size:.9rem}
+.s-kpqwcd:not(#_#_#_){margin:0.25rem 0}
+.s-l3zm56:not(#_#_#_){background:#111}
+.s-rv65bw:not(#_#_#_){background:#b4574e}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <div class="kop">
   <div class="brand"><span class="merkvlak">Rahul Travel <b>Foundation</b></span></div>
-  <div><div id="mVak" style="font-weight:600;font-size:.9rem;">Les</div><div class="mini" id="mNaam"></div></div>
+  <div><div id="mVak" class="s-dbz74b">Les</div><div class="mini" id="mNaam"></div></div>
   <div class="status"><span class="dot" id="liveDot"></span><span id="liveTxt">verbinden…</span> · <span id="bewaard">opgeslagen</span></div>
 </div>
 
@@ -91,13 +108,13 @@
     <div class="schrijftools" id="tekentools" style="display:none;">
       <button class="tbtn aan" data-tool="pen">✏</button>
       <button class="tbtn" data-tool="gum">◻</button>
-      <span class="kleur aan" data-kleur="#111111" style="background:#111"></span>
-      <span class="kleur" data-kleur="#3f6fb0" style="background:#3f6fb0"></span>
-      <span class="kleur" data-kleur="#b4574e" style="background:#b4574e"></span>
-      <span class="kleur" data-kleur="#5FA56A" style="background:#5FA56A"></span>
+      <span class="kleur aan s-l3zm56" data-kleur="#111111"></span>
+      <span class="kleur s-6dl9d4" data-kleur="#3f6fb0"></span>
+      <span class="kleur s-rv65bw" data-kleur="#b4574e"></span>
+      <span class="kleur s-6u92nb" data-kleur="#5FA56A"></span>
       <button class="tbtn" id="tUndo">↶</button>
     </div>
-    <input class="titelinp" id="pgTitel" placeholder="Titel van deze bladzijde" style="margin:0.25rem 0;">
+    <input class="titelinp s-kpqwcd" id="pgTitel" placeholder="Titel van deze bladzijde">
     <div class="paginabox" id="paginabox"></div>
   </div>
 
@@ -180,7 +197,7 @@ function huidigePagina(){
   if(!p){ box.innerHTML='<div class="mini">Nog geen bladzijde. Maak er een met T (typen) of ✎ (tekenen).</div>'; $('#pgTitel').value=''; return; }
   $('#pgTitel').value = p.titel||'';
   if(p.type==='tekst'){ box.innerHTML='<textarea class="schrijf" id="schrijf" placeholder="Schrijf hier…"></textarea>'; const ta=$('#schrijf'); ta.value=p.inhoud||''; ta.addEventListener('input', ()=>{ p.inhoud=ta.value; markDirty(); }); }
-  else if(p.type==='foto'){ box.innerHTML='<img alt="Foto in je schrift" src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" style="width:100%;border-radius:0;background:#12110F;">'; }
+  else if(p.type==='foto'){ box.innerHTML='<img alt="Foto in je schrift" src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" class="s-160h9bn">'; }
   else { box.innerHTML='<div class="tekencanvasbox"><canvas id="schrijfcanvas"></canvas></div>'; $('#tekentools').style.display='flex';
     setTimeout(()=>{ tekenbord=new TekenBord($('#schrijfcanvas'), { background:'#12110F', kleur:'#111111', onStroke:()=>markDirty() }); tekenbord.kleur='#111111'; tekenbord.dikte=5; tekenbord.setStrokes(p.strokes||[]); },20); }
 }
@@ -206,7 +223,7 @@ function toonOpgaven(){
   }));
 }
 
-function toonAgenda(list){ $('#agLijst').innerHTML = (list&&list.length) ? list.map(a=> '<div class="kaart item">'+(a.datum?'<div class="mini" style="color:var(--rtg-leesgoud,var(--goud))">'+esc(a.datum)+'</div>':'')+'<div>'+esc(a.tekst)+'</div></div>').join('') : '<div class="mini">Nog niets in de agenda.</div>'; }
+function toonAgenda(list){ $('#agLijst').innerHTML = (list&&list.length) ? list.map(a=> '<div class="kaart item">'+(a.datum?'<div class="mini s-12izg7a">'+esc(a.datum)+'</div>':'')+'<div>'+esc(a.tekst)+'</div></div>').join('') : '<div class="mini">Nog niets in de agenda.</div>'; }
 
 const BUDDYNM={vrouw:'Rahul',man:'Rahul',nonbinair:'Rahul'};
 function buddyKeuze(){ try{ return localStorage.getItem('rtf_buddy')||'vrouw'; }catch(e){ return 'vrouw'; } }

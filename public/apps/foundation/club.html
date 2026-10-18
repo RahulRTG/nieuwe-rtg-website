@@ -32,6 +32,18 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15e9keb:not(#_#_#_){justify-content:space-between}
+.s-1s5f6sj:not(#_#_#_){margin-bottom:.5rem}
+.s-1v3dw5a:not(#_#_#_){max-width:9rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -43,7 +55,7 @@
 <main id="main">
   <div class="kaart" id="inlog">
     <div class="sec">Aanmelden met uw clubcode</div>
-    <p class="leeg" style="margin-bottom:.5rem;">De RTFoundation werkt met grote clubs in elke stad aan de jeugd en de buurt. Hier ziet u alleen het dossier van uw eigen club: de programma's, de afspraken en het gedeelde logboek met het RTF-team.</p>
+    <p class="leeg s-1s5f6sj">De RTFoundation werkt met grote clubs in elke stad aan de jeugd en de buurt. Hier ziet u alleen het dossier van uw eigen club: de programma's, de afspraken en het gedeelde logboek met het RTF-team.</p>
     <div class="rij rtg-duimeind">
       <input class="veld" id="code" placeholder="CLUB-XXXXXX" maxlength="14" autocomplete="off">
       <button class="knop" id="open" data-hoofdactie>Open</button>
@@ -52,7 +64,7 @@
   </div>
   <div id="portaal" hidden>
     <div class="kaart">
-      <div class="rij" style="justify-content:space-between;"><h2 id="pNaam" style="font-size:1.1rem;"></h2><span class="pil" id="pStatus"></span></div>
+      <div class="rij s-15e9keb"><h2 id="pNaam" style="font-size:1.1rem;"></h2><span class="pil" id="pStatus"></span></div>
       <div class="leeg" id="pMeta"></div>
       <div class="sec h-mt40">Uw vaste RTF-team</div>
       <div id="pTeam" class="leeg"></div>
@@ -63,7 +75,7 @@
       <div class="sec">Samenwerkingslog</div>
       <div id="pLog"></div>
       <div class="rij h-mt50">
-        <input class="veld" id="bNaam" placeholder="Uw naam" maxlength="60" style="max-width:9rem;">
+        <input class="veld s-1v3dw5a" id="bNaam" placeholder="Uw naam" maxlength="60">
         <input class="veld" id="bTekst" placeholder="Bericht aan het RTF-team" maxlength="300">
         <button class="knop" id="bStuur">Stuur</button>
       </div>

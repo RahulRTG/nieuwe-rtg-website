@@ -274,7 +274,10 @@ test('verbergen is prive, bewaren is prive, en drie melders halen een post uit d
 
 test('onderwerpen worden geteld uit wat er echt gedeeld is', async () => {
   const a = await lid();
-  for (let i = 0; i < 3; i++) await raw('/salon/plaats', { tekst: 'Aan tafel bij de haven #tafelen' }, a.token);
+  /* Drie VERSCHILLENDE posts met hetzelfde onderwerp. Drie keer woordelijk
+     hetzelfde binnen een paar milliseconden is sinds 18 oktober 2026 een
+     dubbeltik (server/lib/idemsleutels-tweedelid.js) en geen drie posts. */
+  for (let i = 0; i < 3; i++) await raw('/salon/plaats', { tekst: 'Aan tafel bij de haven, avond ' + (i + 1) + ' #tafelen' }, a.token);
   const o = await json(await raw('/salon/onderwerpen', { limiet: 30 }, a.token));
   const rij = o.onderwerpen.find(x => x.naam === 'tafelen');
   assert.ok(rij && rij.aantal >= 3, 'het getal komt uit de posts zelf, niet uit de AI');

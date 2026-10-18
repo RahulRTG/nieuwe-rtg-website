@@ -44,6 +44,19 @@ function maakVervolg({ db, save, onderwijs }) {
   function examenAntwoord(key, d) {
     const s = bak('examenSessies')['lid:' + key];
     if (!s) return { status: 400, error: 'Begin eerst een examentraining.' };
+    /* WELKE VRAAG WORDT ER BEANTWOORD. Zonder `nr` gold elk antwoord voor de
+       vraag die toevallig aan de beurt was, dus een tweede tik op een trage
+       verbinding beantwoordde stil de VOLGENDE vraag met hetzelfde antwoord --
+       de voltooiproef vond het (scripts/lib/voltooi/school.js). Een idem-
+       verklaring op de inhoud kan dit niet oplossen: hetzelfde antwoord op twee
+       opeenvolgende vragen is gewoon toegestaan. Stuurt het scherm het nummer
+       mee, dan telt een antwoord op een vraag die al voorbij is niet, en hoort
+       de leerling waar hij is. Zonder nummer blijft het oude gedrag. */
+    if (d && d.nr != null && Number(d.nr) !== s.ix + 1) {
+      const nu = s.vragen[s.ix];
+      return { status: 409, error: 'Vraag ' + Number(d.nr) + ' is al beantwoord; je bent bij vraag ' + (s.ix + 1) + '.',
+        nr: s.ix + 1, totaal: s.vragen.length, vraag: nu.v, opties: nu.opties };
+    }
     const vraag = s.vragen[s.ix];
     vraag.antwoord = String(d && d.antwoord || '').slice(0, 120);
     s.ix += 1;

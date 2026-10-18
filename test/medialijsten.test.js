@@ -53,7 +53,10 @@ test.before(async () => {
   kanaalId = (await api('/api/theater/kanaal/aanmeld', { naam: 'Atelier', genre: 'ambacht', bio: 'Hout.' }, maker)).body.kanaal.id;
   await api('/api/office/theater/beslis', { id: kanaalId, besluit: 'goedgekeurd' }, office);
   videoId = (await api('/api/theater/video/maak', { titel: 'De werkbank', omschrijving: 'Hout.', duurS: 74 }, maker)).body.id;
-  const up = await fetch(base + '/api/theater/upload/' + videoId, {
+  /* De deur heet voluit /api/theater/upload/:id: zo staat hij in de routekaart,
+     en zo telt de routedekking hem; een opgebouwd pad ziet die niet. */
+  const UPLOAD = '/api/theater/upload/:id';
+  const up = await fetch(base + UPLOAD.replace(':id', videoId), {
     method: 'POST', headers: { 'Content-Type': 'video/webm', Authorization: 'Bearer ' + maker }, body: WEBM });
   assert.equal(up.status, 200, 'de video staat er');
 });

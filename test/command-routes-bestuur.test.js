@@ -35,7 +35,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cmdbestuur-'));
 const CODE = 'KANTOOR-CMDBESTUUR-1';
 let srv, base, office;
 
-const api = (pad, body, token) => fetch(base + '/api/command/' + pad, {
+const api = (pad, body, token) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/command/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -58,31 +58,31 @@ test.before(async () => {
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('1. het beginscherm komt in een keer: start, puls, werk en zoek antwoorden', async () => {
-  const s = await moet('start', {}, 'het beginscherm');
+  const s = await moet('/api/command/start', {}, 'het beginscherm');
   assert.ok(s && typeof s === 'object', 'start geeft een beeld terug');
-  const p = await moet('puls', {}, 'de puls');
+  const p = await moet('/api/command/puls', {}, 'de puls');
   assert.ok(p && typeof p === 'object', 'de puls geeft een beeld terug');
-  const w = await moet('werk', { dagen: 30 }, 'het werkbord');
+  const w = await moet('/api/command/werk', { dagen: 30 }, 'het werkbord');
   assert.ok(w.bord && typeof w.bord.automatiseringsgraad === 'number', 'het bord telt handwerk');
 
   /* Het bereik hoort ALTIJD mee, ook bij nul treffers: anders is "niets
      gevonden" niet te onderscheiden van "er is niet gezocht". */
-  const leeg = await moet('zoek', { q: 'zzzzgeenenkeletreffer' }, 'zoeken zonder treffer');
+  const leeg = await moet('/api/command/zoek', { q: 'zzzzgeenenkeletreffer' }, 'zoeken zonder treffer');
   assert.equal(leeg.totaal, 0, 'geen treffers op onzin');
   assert.ok(Array.isArray(leeg.bereik) && leeg.bereik.length > 0, 'het bereik staat er ook bij nul treffers bij');
 });
 
 test('2. een vier-ogen-regel verandert NIET van een enkel verzoek', async () => {
-  const stand = await moet('beleid', {}, 'het beleidsregister');
+  const stand = await moet('/api/command/beleid', {}, 'het beleidsregister');
   const regel = (stand.regels || []).find(r => r.vierOgen);
   assert.ok(regel, 'er is een regel met vier ogen');
 
-  const uit = await moet('beleid/zet', { id: regel.id, waarde: regel.waarde, reden: 'de routetoets' },
+  const uit = await moet('/api/command/beleid/zet', { id: regel.id, waarde: regel.waarde, reden: 'de routetoets' },
     'een vier-ogen-regel zetten');
   assert.equal(uit.vierOgen, true, 'het antwoord zegt dat er een tweede paar ogen nodig is');
   assert.equal(uit.voorstel.status, 'wacht', 'er ligt een voorstel en geen wijziging');
 
-  const na = await moet('beleid', {}, 'het register opnieuw');
+  const na = await moet('/api/command/beleid', {}, 'het register opnieuw');
   const nu = na.regels.find(r => r.id === regel.id);
   assert.equal(nu.versie, regel.versie, 'de regel staat nog op dezelfde versie');
   assert.ok(na.open >= 1, 'het voorstel telt mee als openstaand');
@@ -92,71 +92,71 @@ test('3. wie voorstelt, keurt niet: dezelfde actor krijgt nee', async () => {
   /* De gedeelde kantoorcode geeft iedereen dezelfde actornaam. Dat is met opzet
      zo (zie routes/command/index.js) en het maakt deze toets scherp: hij kan
      niet per ongeluk slagen doordat er twee namen in het spel zijn. */
-  const stand = await moet('beleid', {}, 'het register');
+  const stand = await moet('/api/command/beleid', {}, 'het register');
   const voorstel = (stand.voorstellen || []).find(v => v.status === 'wacht');
   assert.ok(voorstel, 'er staat een voorstel open');
-  const r = await api('beleid/keur', { voorstel: voorstel.id, akkoord: true, reden: 'zelf' });
+  const r = await api('/api/command/beleid/keur', { voorstel: voorstel.id, akkoord: true, reden: 'zelf' });
   assert.notEqual(r.status, 200, 'de indiener mag zijn eigen voorstel niet goedkeuren');
   assert.match(String(r.body.error || ''), /ogen|zelf|ander/i, 'en zegt waarom: ' + r.body.error);
 });
 
 test('4. geschiedenis en terugzetten zeggen de waarheid over wat er ligt', async () => {
-  const stand = await moet('beleid', {}, 'het register');
+  const stand = await moet('/api/command/beleid', {}, 'het register');
   const regel = stand.regels[0];
-  const g = await moet('beleid/geschiedenis', { id: regel.id }, 'de geschiedenis');
+  const g = await moet('/api/command/beleid/geschiedenis', { id: regel.id }, 'de geschiedenis');
   assert.equal(g.id, regel.id);
   assert.ok(Array.isArray(g.versies) && g.versies.length >= 1, 'er staat minstens de startwaarde in');
 
   /* Terugzetten terwijl er niets is om naar terug te gaan, hoort een nette
      weigering te zijn en geen stille nul. */
-  const t = await api('beleid/terug', { id: regel.id, reden: 'de routetoets' });
+  const t = await api('/api/command/beleid/terug', { id: regel.id, reden: 'de routetoets' });
   assert.equal(t.status, 409, 'terug zonder eerdere versie is een conflict');
   assert.match(String(t.body.error || ''), /eerdere versie/i, t.body.error);
 
-  const onbekend = await api('beleid/geschiedenis', { id: 'bestaat.niet' });
+  const onbekend = await api('/api/command/beleid/geschiedenis', { id: 'bestaat.niet' });
   assert.equal(onbekend.status, 404, 'een onbekende regel is 404 en geen leeg antwoord');
 });
 
 test('5. de simulaties raken niets aan', async () => {
-  const voor = (await moet('beleid', {}, 'het register')).regels[0];
-  const proef = await moet('simulatie/beleid', { id: voor.id, waarde: Number(voor.waarde) + 5 },
+  const voor = (await moet('/api/command/beleid', {}, 'het register')).regels[0];
+  const proef = await moet('/api/command/simulatie/beleid', { id: voor.id, waarde: Number(voor.waarde) + 5 },
     'de beleidsproef');
   assert.equal(proef.regel, voor.id);
   assert.ok('gevolg' in proef, 'de proef zegt wat de waarde met de routering doet');
 
-  const watals = await moet('simulatie/watals', { groei: 10 }, 'de groeiproef');
+  const watals = await moet('/api/command/simulatie/watals', { groei: 10 }, 'de groeiproef');
   assert.ok(Array.isArray(watals.regels) && watals.aannames.length > 0,
     'de tweeling noemt zijn eigen aannames');
 
-  const na = (await moet('beleid', {}, 'het register')).regels.find(r => r.id === voor.id);
+  const na = (await moet('/api/command/beleid', {}, 'het register')).regels.find(r => r.id === voor.id);
   assert.equal(na.waarde, voor.waarde, 'de echte regel is niet meebewogen met de proef');
 });
 
 test('6. het journaal is een keten, en herbeleven laat zien wat we net deden', async () => {
-  const j = await moet('journaal', { n: 20 }, 'het journaal');
+  const j = await moet('/api/command/journaal', { n: 20 }, 'het journaal');
   assert.ok(j.aantal > 0, 'er staat iets in');
   assert.equal(j.keten.heel, true, 'de ketencontrole gaat op: ' + JSON.stringify(j.keten));
 
-  const h = await moet('journaal/herbeleef', { van: '2000-01-01', tot: '2099-01-01' }, 'de herbeleving');
+  const h = await moet('/api/command/journaal/herbeleef', { van: '2000-01-01', tot: '2099-01-01' }, 'de herbeleving');
   assert.ok(h.stappen > 0 && Array.isArray(h.lijn), 'de reconstructie heeft stappen');
   assert.ok(h.lijn.some(x => /beleid/.test(x.actie)),
     'het beleidsvoorstel van toets 2 staat in de lijn');
 });
 
 test('7. een object opvragen: onbekende soort is 404, een bestaande zaak opent', async () => {
-  const onzin = await api('object', { type: 'ditbestaatniet', id: 'x' });
+  const onzin = await api('/api/command/object', { type: 'ditbestaatniet', id: 'x' });
   assert.equal(onzin.status, 404, 'een onbekende soort is een nette 404');
 
-  const gevonden = await moet('zoek', { q: 'KIKUNOI' }, 'zoeken op een zaak uit de seed');
+  const gevonden = await moet('/api/command/zoek', { q: 'KIKUNOI' }, 'zoeken op een zaak uit de seed');
   const groep = (gevonden.groepen || []).find(g => (g.rijen || []).length);
   assert.ok(groep, 'de zoekbalk vindt de seed-zaak');
   const treffer = groep.rijen[0];
-  const dossier = await moet('object', { type: groep.type, id: treffer.id }, 'het dossier');
+  const dossier = await moet('/api/command/object', { type: groep.type, id: treffer.id }, 'het dossier');
   assert.ok(dossier && typeof dossier === 'object', 'het dossier komt terug');
 });
 
 test('8. de rechtengraaf: geven, breken en intrekken zijn alle drie zichtbaar', async () => {
-  const graaf = await moet('rechten', {}, 'de rechtengraaf');
+  const graaf = await moet('/api/command/rechten', {}, 'de rechtengraaf');
   assert.ok(graaf.soorten.length > 0 && graaf.actief.length === 0,
     'de rusttoestand is: geen enkel zwaar recht open');
   const soort = graaf.soorten[0].id;
@@ -164,10 +164,10 @@ test('8. de rechtengraaf: geven, breken en intrekken zijn alle drie zichtbaar', 
   /* Een zwaar recht is persoonlijk: de gedeelde kantoorcode geeft er geen en
      opent de nooddeur niet (KANTOOR.md: een spoor dat eindigt bij een gedeelde
      code is een alibi). Wat volgt doet de eigenaar op zijn eigen account. */
-  const gedeeldGeef = await api('recht/geef', { recht: soort, aan: 'een collega', minuten: 15,
+  const gedeeldGeef = await api('/api/command/recht/geef', { recht: soort, aan: 'een collega', minuten: 15,
     reden: 'de gedeelde code probeert het' });
   assert.equal(gedeeldGeef.status, 403, 'de gedeelde code gaf een zwaar recht weg');
-  const gedeeldNood = await api('recht/nood', { recht: soort,
+  const gedeeldNood = await api('/api/command/recht/nood', { recht: soort,
     reden: 'De gedeelde code probeert het glas te breken, en dat mag niet.' });
   assert.equal(gedeeldNood.status, 403, 'de gedeelde code opende de nooddeur');
   const eig = await (await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -175,28 +175,28 @@ test('8. de rechtengraaf: geven, breken en intrekken zijn alle drie zichtbaar', 
   const naam = eig.token;
   assert.ok(naam, 'de eigenaar logt in op zijn eigen account');
 
-  const gegeven = await moet('recht/geef', { recht: soort, aan: 'een collega', minuten: 15,
+  const gegeven = await moet('/api/command/recht/geef', { recht: soort, aan: 'een collega', minuten: 15,
     reden: 'de routetoets geeft het tijdelijk weg' }, 'een recht tijdelijk geven', naam);
   const gid = gegeven.id || (gegeven.recht && gegeven.recht.id);
   assert.ok(gid, 'het gegeven recht heeft een id: ' + JSON.stringify(gegeven).slice(0, 200));
-  const metRecht = await moet('rechten', {}, 'de graaf met een open recht');
+  const metRecht = await moet('/api/command/rechten', {}, 'de graaf met een open recht');
   assert.ok(metRecht.actief.some(a => a.id === gid), 'het staat in de graaf, van wie en waarom');
-  await moet('recht/introk', { id: gid, reden: 'de routetoets ruimt het meteen op' }, 'intrekken', naam);
+  await moet('/api/command/recht/introk', { id: gid, reden: 'de routetoets ruimt het meteen op' }, 'intrekken', naam);
 
-  const kaal = await api('recht/nood', { recht: soort, reden: 'kort' }, naam);
+  const kaal = await api('/api/command/recht/nood', { recht: soort, reden: 'kort' }, naam);
   assert.notEqual(kaal.status, 200, 'de nooddeur eist een volledige reden');
 
-  const nood = await moet('recht/nood', { recht: soort,
+  const nood = await moet('/api/command/recht/nood', { recht: soort,
     reden: 'De routetoets breekt het glas om te bewijzen dat dit in het journaal komt.' },
   'het glas breken', naam);
   const id = nood.id || (nood.recht && nood.recht.id) || nood.toekenning;
   assert.ok(id, 'de nooddeur geeft een id terug: ' + JSON.stringify(nood).slice(0, 200));
 
-  const open = await moet('rechten', {}, 'de graaf na de nooddeur');
+  const open = await moet('/api/command/rechten', {}, 'de graaf na de nooddeur');
   assert.ok(open.nood >= 1, 'de graaf telt de nooddeur apart');
 
-  await moet('recht/introk', { id, reden: 'de routetoets ruimt op' }, 'intrekken', naam);
-  const dicht = await moet('rechten', {}, 'de graaf na intrekken');
+  await moet('/api/command/recht/introk', { id, reden: 'de routetoets ruimt op' }, 'intrekken', naam);
+  const dicht = await moet('/api/command/rechten', {}, 'de graaf na intrekken');
   assert.equal(dicht.actief.filter(a => a.id === id).length, 0, 'het ingetrokken recht is weg');
 });
 
@@ -206,25 +206,25 @@ test('8. de rechtengraaf: geven, breken en intrekken zijn alle drie zichtbaar', 
    via kern/stuur/mandaat.js. Deze toets houdt vast dat de deur dicht blijft. */
 test('9. het command-mandaat bestaat niet meer', async () => {
   const tot = new Date(Date.now() + 3600 * 1000).toISOString();
-  const r = await api('mandaat', { van: 'a', aan: 'b', terrein: 'command', tot, reden: 'de routetoets' });
+  const r = await api('/api/command/mandaat', { van: 'a', aan: 'b', terrein: 'command', tot, reden: 'de routetoets' });
   assert.equal(r.status, 404, 'de opgeheven mandaatroute antwoordt weer');
-  const graaf = await moet('rechten', {}, 'de graaf');
+  const graaf = await moet('/api/command/rechten', {}, 'de graaf');
   assert.equal(graaf.mandaten, undefined, 'de graaf draagt weer mandaten');
 });
 
 test('10. het agent-toezicht: stoppen, grenzen zetten en hervatten', async () => {
   const naam = 'toetsagent';
-  const gestopt = await moet('agent/stop', { naam, reden: 'de routetoets stopt hem' }, 'stoppen');
+  const gestopt = await moet('/api/command/agent/stop', { naam, reden: 'de routetoets stopt hem' }, 'stoppen');
   assert.equal(gestopt.gestopt, true, 'de agent staat stil');
 
-  const grens = await moet('agent/rechten', { naam, mag: ['rit-vast-hervatten'],
+  const grens = await moet('/api/command/agent/rechten', { naam, mag: ['rit-vast-hervatten'],
     reden: 'de routetoets bakent af' }, 'grenzen zetten');
   assert.deepEqual(grens.mag, ['rit-vast-hervatten'], 'de bevoegdheid staat er precies zo');
 
-  const lijst = await moet('agents', {}, 'de agentlijst');
+  const lijst = await moet('/api/command/agents', {}, 'de agentlijst');
   assert.ok(lijst.agents.some(a => a.naam === naam), 'de agent staat in de lijst');
 
-  const hervat = await moet('agent/hervat', { naam, reden: 'de routetoets zet hem weer aan' }, 'hervatten');
+  const hervat = await moet('/api/command/agent/hervat', { naam, reden: 'de routetoets zet hem weer aan' }, 'hervatten');
   assert.equal(hervat.gestopt, false, 'de agent loopt weer');
 });
 
@@ -248,7 +248,7 @@ test('11. het API-spoor: eigen keten, begrensde lijst met een eerlijke teller, e
   /* Peilen tot de schrijfhandelingen van de toetsen hierboven genoteerd zijn:
      het spoor wordt op res.finish geschreven, dus NA het antwoord. */
   const spoor = await wachtOpWaarde(async () => {
-    const s = await moet('apispoor', { n: 200 }, 'het API-spoor');
+    const s = await moet('/api/command/apispoor', { n: 200 }, 'het API-spoor');
     return (Array.isArray(s.regels) && s.regels.some(r => r.actie === 'POST /api/command/beleid/zet')) ? s : false;
   }, { wat: 'de schrijfhandelingen van deze toetsen in het API-spoor' });
 
@@ -274,17 +274,17 @@ test('11. het API-spoor: eigen keten, begrensde lijst met een eerlijke teller, e
   /* De begrenzing knipt de LIJST af en niet de TELLER. Zonder dat onderscheid
      ziet een scherm een venster voor het geheel aan. */
   assert.ok(spoor.aantal > 1, 'er zijn meer handelingen dan één');
-  const een = await moet('apispoor', { n: 1 }, 'het spoor met n=1');
+  const een = await moet('/api/command/apispoor', { n: 1 }, 'het spoor met n=1');
   assert.equal(een.regels.length, 1, 'n begrenst de lijst');
   assert.ok(een.aantal >= spoor.aantal, 'maar de teller telt onafhankelijk door: ' + een.aantal);
   assert.ok(een.venster > 1, 'en het venster is groter dan de opgevraagde lijst');
 
   /* De filters van de route zelf. */
-  const gefilterd = await moet('apispoor', { n: 200, actie: '/api/command/beleid/' }, 'het spoor op actie');
+  const gefilterd = await moet('/api/command/apispoor', { n: 200, actie: '/api/command/beleid/' }, 'het spoor op actie');
   assert.ok(gefilterd.regels.length >= 1, 'de filter vindt de beleidshandelingen');
   assert.ok(gefilterd.regels.every(r => r.actie.includes('/api/command/beleid/')),
     'en laat er niets anders in');
-  const opActor = await moet('apispoor', { n: 200, actor: 'bestaat-niet' }, 'het spoor op een onbekende actor');
+  const opActor = await moet('/api/command/apispoor', { n: 200, actor: 'bestaat-niet' }, 'het spoor op een onbekende actor');
   assert.equal(opActor.regels.length, 0, 'een onbekende actor levert een lege lijst');
   assert.ok(opActor.aantal > 0, 'en de teller staat er ook dan bij: leeg is een uitslag, geen stilte');
 
@@ -297,14 +297,14 @@ test('11. het API-spoor: eigen keten, begrensde lijst met een eerlijke teller, e
      Inmiddels zijn er vijf lezingen geweest, dus een spoor dat zichzelf wel
      bijhoudt verraadt zich nu. Wie in het spoor kijkt hoort in het
      inzagejournaal, niet in het spoor zelf. */
-  const naLezen = await moet('apispoor', { n: 300 }, 'het spoor na vijf lezingen');
+  const naLezen = await moet('/api/command/apispoor', { n: 300 }, 'het spoor na vijf lezingen');
   assert.equal(naLezen.regels.filter(r => r.actie === 'POST /api/command/apispoor').length, 0,
     'de leesroute meet zichzelf niet: wie in het spoor kijkt hoort in het inzagejournaal');
 
   /* TWEE KETENS, NIET EEN. Het besluitjournaal en het API-spoor delen dezelfde
      module maar niet hetzelfde vak; als dat ooit één lijst wordt, is de
      boardroom-tijdlijn binnen een dag vol met ruis. */
-  const besluiten = await moet('journaal', { n: 200 }, 'het besluitjournaal');
+  const besluiten = await moet('/api/command/journaal', { n: 200 }, 'het besluitjournaal');
   assert.ok(besluiten.regels.every(r => r.niveau !== 'api'),
     'er staat geen enkele API-handeling in het besluitjournaal');
   const ids = new Set(besluiten.regels.map(r => r.id));

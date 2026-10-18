@@ -36,12 +36,12 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lagen-'));
 const CODE = 'KANTOOR-LAGEN-1';
 let srv, base, office;
 
-const api = (pad, body, tok) => fetch(base + '/api/' + pad, {
+const api = (pad, body, tok) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-const zonder = (pad) => fetch(base + '/api/' + pad, {
+const zonder = (pad) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
 }).then(r => r.status);
 
@@ -86,7 +86,7 @@ test('de tijdlijn beantwoordt "wat is er vlak daarvoor veranderd", zonder oorzaa
   /* De bedradingsvraag plus de ene zin die dit scherm eerlijk houdt. Een
      tijdlijn zonder die zin wordt binnen een week gelezen als een
      oorzakenlijst, en dat is op de server te bewaken en niet in de opmaak. */
-  const r = await api('command/tijdlijn/rondom', { moment: new Date().toISOString(), minuten: 60 });
+  const r = await api('/api/command/tijdlijn/rondom', { moment: new Date().toISOString(), minuten: 60 });
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
   assert.ok(Array.isArray(r.body.regels), 'er komt geen lijn terug');
   assert.equal(r.body.bronnen.length, 3, 'de tijdlijn noemt niet welke bronnen hij leest');
@@ -94,57 +94,57 @@ test('de tijdlijn beantwoordt "wat is er vlak daarvoor veranderd", zonder oorzaa
   assert.match(r.body.let, /VOLGORDE en geen oorzaak|niets veranderd/,
     'het antwoord draagt geen zin over wat het wel en niet betekent');
 
-  const stuk = await api('command/tijdlijn/rondom', { moment: 'geen tijd' });
+  const stuk = await api('/api/command/tijdlijn/rondom', { moment: 'geen tijd' });
   assert.equal(stuk.status, 400, 'een onzinnig moment gaf gewoon een lijst terug');
 });
 
 test('de zandbak draait een recept en de productie blijft ongemoeid', async () => {
-  const maak = await api('command/zandbak/maak', { naam: 'proefbak', waarvoor: 'de routetoets' });
+  const maak = await api('/api/command/zandbak/maak', { naam: 'proefbak', waarvoor: 'de routetoets' });
   assert.equal(maak.status, 200);
   assert.ok(maak.body.zandbak.objecten >= 0);
 
-  const zoek = await api('command/zandbak/zoek', { naam: 'proefbak', q: 'HOSHI' });
+  const zoek = await api('/api/command/zandbak/zoek', { naam: 'proefbak', q: 'HOSHI' });
   assert.equal(zoek.status, 200);
   assert.equal(zoek.body.zandbak, 'proefbak', 'elk antwoord draagt de naam van de zandbak');
 
-  const kw = await api('command/zandbak/kwaliteit', { naam: 'proefbak' });
+  const kw = await api('/api/command/zandbak/kwaliteit', { naam: 'proefbak' });
   assert.equal(kw.status, 200);
   assert.ok(kw.body.tel, 'de kwaliteitsmeting draait op de zandbak');
 
-  assert.equal((await api('command/zandbak/zoek', { naam: 'bestaatniet' })).status, 404);
-  assert.equal((await api('command/zandbak/weg', { naam: 'proefbak' })).status, 200);
+  assert.equal((await api('/api/command/zandbak/zoek', { naam: 'bestaatniet' })).status, 404);
+  assert.equal((await api('/api/command/zandbak/weg', { naam: 'proefbak' })).status, 200);
 });
 
 test('de overname loopt van inlezen tot terugdraaien', async () => {
-  const lees = await api('command/overname/lees', { naam: 'Routetoets', soort: 'zaak',
+  const lees = await api('/api/command/overname/lees', { naam: 'Routetoets', soort: 'zaak',
     rijen: [{ ID: 'RT-1', Naam: 'Zaak een' }, { ID: 'RT-2', Naam: 'Zaak twee' }] });
   assert.equal(lees.status, 200);
   const id = lees.body.partij.id;
   assert.ok(lees.body.voorstel.hunVelden.length >= 2, 'het voorstel meet hun kolommen');
 
-  assert.equal((await api('command/overname/afbeelden', { id, afbeelding: { code: 'ID', name: 'Naam' } })).status, 200);
-  const droog = await api('command/overname/droogloop', { id });
+  assert.equal((await api('/api/command/overname/afbeelden', { id, afbeelding: { code: 'ID', name: 'Naam' } })).status, 200);
+  const droog = await api('/api/command/overname/droogloop', { id });
   assert.equal(droog.body.rapport.erin, 2);
 
   /* Zonder het juiste zegel gaat er niets in, en dat is de hele opzet. */
-  assert.equal((await api('command/overname/voer', { id, zegel: 'fout' })).status, 409);
-  const voer = await api('command/overname/voer', { id, zegel: droog.body.rapport.zegel, reden: 'routetoets' });
+  assert.equal((await api('/api/command/overname/voer', { id, zegel: 'fout' })).status, 409);
+  const voer = await api('/api/command/overname/voer', { id, zegel: droog.body.rapport.zegel, reden: 'routetoets' });
   assert.equal(voer.body.erin, 2);
 
-  const terug = await api('command/overname/terug', { id });
+  const terug = await api('/api/command/overname/terug', { id });
   assert.equal(terug.body.weg, 2, 'en precies die twee gaan er weer uit');
 });
 
 test('de API-poort geeft een geheim dat nergens terugkomt', async () => {
-  assert.equal((await api('command/apipoort/sleutel', { naam: 'x', scopes: [{ pad: '/api/extern/x' }] })).status, 403,
+  assert.equal((await api('/api/command/apipoort/sleutel', { naam: 'x', scopes: [{ pad: '/api/extern/x' }] })).status, 403,
     'buiten de toelating komt er geen sleutel');
-  assert.equal((await api('command/apipoort/toelaten', { pad: '/api/extern/proef' })).status, 200);
+  assert.equal((await api('/api/command/apipoort/toelaten', { pad: '/api/extern/proef' })).status, 200);
 
-  const s = await api('command/apipoort/sleutel', { naam: 'Routetoets',   // op naam (naamAuth)
+  const s = await api('/api/command/apipoort/sleutel', { naam: 'Routetoets',   // op naam (naamAuth)
     scopes: [{ pad: '/api/extern/proef', methoden: ['GET'] }], quotaPerUur: 5 }, await kantoorAlsPersoon(base, CODE));
   assert.match(s.body.geheim, /^RTG-/);
 
-  const stand = await api('command/apipoort');
+  const stand = await api('/api/command/apipoort');
   assert.ok(!JSON.stringify(stand.body).includes(s.body.geheim.split('.')[1]),
     'het geheim staat niet in de stand');
 
@@ -156,23 +156,23 @@ test('de API-poort geeft een geheim dat nergens terugkomt', async () => {
   assert.notEqual(open.status, 401, 'met sleutel wel (daarachter staat niets, dus geen 200)');
   assert.equal(open.headers.get('x-rtg-quota-rest'), '4', 'en het resterende quotum komt mee');
 
-  assert.equal((await api('command/apipoort/intrekken', { id: s.body.sleutel.id, reden: 'klaar' })).status, 200);
+  assert.equal((await api('/api/command/apipoort/intrekken', { id: s.body.sleutel.id, reden: 'klaar' })).status, 200);
   const na = await fetch(base + '/api/extern/proef', { headers: { authorization: 'Bearer ' + s.body.geheim } });
   assert.equal(na.status, 401, 'een ingetrokken sleutel komt er niet meer in');
 });
 
 test('een land en een stad zijn aan elkaar geknoopt', async () => {
-  assert.equal((await api('command/stad/start', { naam: 'Proefstad', land: 'NL' })).status, 409,
+  assert.equal((await api('/api/command/stad/start', { naam: 'Proefstad', land: 'NL' })).status, 409,
     'zonder actief landpakket gaat er geen stad open');
-  assert.equal((await api('command/land/activeer', { land: 'NL' })).status, 200);
+  assert.equal((await api('/api/command/land/activeer', { land: 'NL' })).status, 200);
 
-  const stad = await api('command/stad/start', { naam: 'Proefstad', land: 'NL' });
+  const stad = await api('/api/command/stad/start', { naam: 'Proefstad', land: 'NL' });
   assert.equal(stad.status, 200);
   assert.deepEqual(stad.body.open, ['stadsweefsel'], 'en de weefselstap blijft openstaan');
   assert.ok(stad.body.mensenwerk.length >= 3);
 
-  assert.equal((await api('command/stad/stop', { naam: 'Proefstad' })).status, 200);
-  assert.equal((await api('command/land/terug', { land: 'NL' })).status, 200);
+  assert.equal((await api('/api/command/stad/stop', { naam: 'Proefstad' })).status, 200);
+  assert.equal((await api('/api/command/land/terug', { land: 'NL' })).status, 200);
 });
 
 /* ELKE INGANG ECHT AANRAKEN, en niet alleen de hoofdingang per laag.
@@ -186,44 +186,44 @@ test('een land en een stad zijn aan elkaar geknoopt', async () => {
 test('ook de tweede knop van elke laag wordt echt aangeroepen', async () => {
   /* De canary: verbreden, terugdraaien en afronden. Ze werken op een functie
      uit de schakelkast, dus we zetten er een op canary en halen hem weer weg. */
-  assert.equal((await api('command/canary/start', { id: 'command-zien', deel: 0.1 })).status, 200);
-  assert.equal((await api('command/canary/breder', { id: 'command-zien', deel: 0.5 })).status, 200);
-  assert.equal((await api('command/canary/terug', { id: 'command-zien', reden: 'routetoets' })).status, 200);
-  assert.equal((await api('command/canary/af', { id: 'command-zien' })).status, 200);
-  assert.equal((await api('command/canary/af', { id: 'command-zien' })).status, 404, 'twee keer afronden kan niet');
+  assert.equal((await api('/api/command/canary/start', { id: 'command-zien', deel: 0.1 })).status, 200);
+  assert.equal((await api('/api/command/canary/breder', { id: 'command-zien', deel: 0.5 })).status, 200);
+  assert.equal((await api('/api/command/canary/terug', { id: 'command-zien', reden: 'routetoets' })).status, 200);
+  assert.equal((await api('/api/command/canary/af', { id: 'command-zien' })).status, 200);
+  assert.equal((await api('/api/command/canary/af', { id: 'command-zien' })).status, 404, 'twee keer afronden kan niet');
 
   /* De kennisgraaf en de herkomst: van een echt object uit de startdata. */
-  const wandel = await api('command/graaf/wandel', { type: 'zaak', id: 'HOSHI', diepte: 2 });
+  const wandel = await api('/api/command/graaf/wandel', { type: 'zaak', id: 'HOSHI', diepte: 2 });
   assert.equal(wandel.status, 200);
   assert.equal(wandel.body.start.id, 'HOSHI');
-  const spoor = await api('command/herkomst/spoor', { type: 'zaak', id: 'HOSHI' });
+  const spoor = await api('/api/command/herkomst/spoor', { type: 'zaak', id: 'HOSHI' });
   assert.equal(spoor.status, 200);
   assert.ok(Array.isArray(spoor.body.wordtGenoemdDoor));
 
   /* Master data: het gouden record en het terugdraaien van een samenvoeging.
      Zonder dubbelen in de startdata is er geen groep, en dan hoort gouden() een
      eerlijke 404 te geven in plaats van iets te verzinnen. */
-  const groepen = (await api('command/mdm')).body.bedrijven;
-  const goud = await api('command/mdm/gouden', { sleutel: groepen.length ? groepen[0].sleutel : 'bestaat-niet' });
+  const groepen = (await api('/api/command/mdm')).body.bedrijven;
+  const goud = await api('/api/command/mdm/gouden', { sleutel: groepen.length ? groepen[0].sleutel : 'bestaat-niet' });
   assert.equal(goud.status, groepen.length ? 200 : 404);
-  assert.equal((await api('command/mdm/terug', { verliezers: [] })).status, 400,
+  assert.equal((await api('/api/command/mdm/terug', { verliezers: [] })).status, 400,
     'terugdraaien zonder samenvoeging is een fout en geen stille nul');
 
   /* En een pad weer uit de toelating halen. */
-  assert.equal((await api('command/apipoort/toelaten', { pad: '/api/extern/tijdelijk' })).status, 200);
-  assert.equal((await api('command/apipoort/toelating-weg', { pad: '/api/extern/tijdelijk' })).status, 200);
-  assert.equal((await api('command/apipoort/toelating-weg', { pad: '/api/extern/tijdelijk' })).status, 404);
+  assert.equal((await api('/api/command/apipoort/toelaten', { pad: '/api/extern/tijdelijk' })).status, 200);
+  assert.equal((await api('/api/command/apipoort/toelating-weg', { pad: '/api/extern/tijdelijk' })).status, 200);
+  assert.equal((await api('/api/command/apipoort/toelating-weg', { pad: '/api/extern/tijdelijk' })).status, 404);
 });
 
 test('het alarm meldt de stille sonde en is stil te zetten', async () => {
-  const st = await api('command/alarm');
+  const st = await api('/api/command/alarm');
   const a = st.body.alarmen.find(x => x.id === 'niets-van-buiten');
   assert.ok(a && a.actief, 'op een verse installatie is er niets van buitenaf gemeten');
 
-  const stil = await api('command/alarm/stil', { id: 'niets-van-buiten', uren: 4, reden: 'routetoets' });
+  const stil = await api('/api/command/alarm/stil', { id: 'niets-van-buiten', uren: 4, reden: 'routetoets' });
   assert.equal(stil.status, 200);
   assert.ok(Date.parse(stil.body.tot) > Date.now());
-  assert.equal((await api('command/alarm/stil', { id: 'bestaatniet' })).status, 404);
+  assert.equal((await api('/api/command/alarm/stil', { id: 'bestaatniet' })).status, 404);
 });
 
 /* De waargenomen routeproef vond deze ingangen als de laatste blinde rand:

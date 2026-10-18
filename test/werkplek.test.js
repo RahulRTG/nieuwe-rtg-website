@@ -137,27 +137,27 @@ test('6b. bezetting en werkvoorraad blijven bij hun eigen afdelingskantoor', asy
 test('7. elk huis heeft een eigen kantoordrive met alle drie de soorten', async () => {
   // de eigenaar heeft nog steeds beide sleutels na test 6 (die trok alleen de
   // sleutel van de medewerker in)
-  const drive = (pad, body) => post('/api/werkplek/kantoorpakket' + pad, body, eigenaar);
-  const leeg = await drive('/mijn', { bedrijf: 'rtf' });
+  const drive = (pad, body) => post((pad.startsWith('/api/') ? pad : '/api/werkplek/kantoorpakket' + pad), body, eigenaar);
+  const leeg = await drive('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtf' });
   assert.equal(leeg.status, 200);
   assert.equal(leeg.body.docs.length, 0, 'de RTF-drive begint leeg');
   assert.ok(leeg.body.sjablonen.length > 0, 'er staan sjablonen klaar');
 
   for (const soort of ['tekst', 'blad', 'presentatie']) {
-    const r = await drive('/maak', { bedrijf: 'rtf', soort, titel: 'Stichting ' + soort });
+    const r = await drive('/api/werkplek/kantoorpakket/maak', { bedrijf: 'rtf', soort, titel: 'Stichting ' + soort });
     assert.equal(r.status, 200, soort + ' kan aangemaakt worden');
     assert.equal(r.body.soort, soort);
   }
-  const vol = await drive('/mijn', { bedrijf: 'rtf' });
+  const vol = await drive('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtf' });
   assert.equal(vol.body.docs.length, 3, 'alle drie de soorten staan in de RTF-drive');
 
   // de twee drives zijn gescheiden
-  assert.equal((await drive('/mijn', { bedrijf: 'rtg' })).body.docs.length, 0, 'RTG ziet de RTF-documenten niet');
+  assert.equal((await drive('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtg' })).body.docs.length, 0, 'RTG ziet de RTF-documenten niet');
 
   // en de deur geldt ook hier: zonder sleutel geen documenten
   assert.equal((await post('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtf' }, medewerker)).status, 403);
   assert.equal((await post('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtf' })).status, 403);
-  assert.equal((await drive('/mijn', { bedrijf: 'bestaatniet' })).status, 404);
+  assert.equal((await drive('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'bestaatniet' })).status, 404);
 });
 
 test('8. Rahul denkt ook in het RTF-kantoor mee, per kamer en over het huis', () => {
@@ -211,70 +211,70 @@ test('10. de stichting heeft dezelfde ontwerptak als RTG', async () => {
 });
 
 test('11. de ontwerpen van de stichting staan niet tussen die van RTG', async () => {
-  const bu = (pad, body) => post('/api/werkplek/bureau' + pad, body, eigenaar);
-  const voor = (await bu('/atelier', { bedrijf: 'rtg' })).body.ontwerpen.length;
+  const bu = (pad, body) => post((pad.startsWith('/api/') ? pad : '/api/werkplek/bureau' + pad), body, eigenaar);
+  const voor = (await bu('/api/werkplek/bureau/atelier', { bedrijf: 'rtg' })).body.ontwerpen.length;
 
-  const maak = await bu('/atelier/maak', { bedrijf: 'rtf', naam: 'Stille Toga',
+  const maak = await bu('/api/werkplek/bureau/atelier/maak', { bedrijf: 'rtf', naam: 'Stille Toga',
     categorie: 'jurken', brief: 'Een ingetogen toga voor de vrijwilligers van de stichting.' });
   assert.equal(maak.status, 200, 'de stichting kan in haar eigen atelier ontwerpen');
   const oid = maak.body.ontwerp.id;
 
-  const rtf = (await bu('/atelier', { bedrijf: 'rtf' })).body;
-  const rtg = (await bu('/atelier', { bedrijf: 'rtg' })).body;
+  const rtf = (await bu('/api/werkplek/bureau/atelier', { bedrijf: 'rtf' })).body;
+  const rtg = (await bu('/api/werkplek/bureau/atelier', { bedrijf: 'rtg' })).body;
   assert.ok(rtf.ontwerpen.some(o => o.id === oid), 'het ontwerp staat in het atelier van de stichting');
   assert.ok(!rtg.ontwerpen.some(o => o.id === oid), 'en niet in dat van RTG');
   assert.equal(rtg.ontwerpen.length, voor, 'het atelier van RTG is niets veranderd');
 
   // het technische blad hoort er ook bij (werkt zonder API-sleutel, uit de bank)
-  const tp = await bu('/atelier/techpack', { bedrijf: 'rtf', id: oid });
+  const tp = await bu('/api/werkplek/bureau/atelier/techpack', { bedrijf: 'rtf', id: oid });
   assert.equal(tp.status, 200, 'het tech pack rolt eruit');
 
   // de andere drie bureaus doen hetzelfde in hun eigen taal
   for (const [bureau, blad] of [['studio', 'specsheet'], ['hardware', 'stuklijst'], ['architect', 'bouwstaat']]) {
-    const m = await bu('/' + bureau + '/maak', { bedrijf: 'rtf', naam: 'Stichting ' + bureau,
+    const m = await bu('/api/werkplek/bureau/' + bureau + '/maak', { bedrijf: 'rtf', naam: 'Stichting ' + bureau,
       brief: 'Een eerste verkenning voor de stichting.' });
     assert.equal(m.status, 200, bureau + ' ontwerpt voor de stichting');
-    const b = await bu('/' + bureau + '/' + blad, { bedrijf: 'rtf', id: m.body.ontwerp.id });
+    const b = await bu('/api/werkplek/bureau/' + bureau + '/' + blad, { bedrijf: 'rtf', id: m.body.ontwerp.id });
     assert.equal(b.status, 200, bureau + ' levert een ' + blad);
   }
 
   // de redactie van de stichting schrijft haar eigen krant
-  const art = await bu('/redactie/artikel/maak', { bedrijf: 'rtf', kop: 'De stichting opent haar clubhuis',
+  const art = await bu('/api/werkplek/bureau/redactie/artikel/maak', { bedrijf: 'rtf', kop: 'De stichting opent haar clubhuis',
     rubriek: 'nieuws', intro: 'Het eerste clubhuis gaat open.', tekst: 'Vrijwilligers openen het eerste clubhuis.' });
   assert.equal(art.status, 200);
-  const rtfPers = (await bu('/redactie', { bedrijf: 'rtf' })).body;
-  const rtgPers = (await bu('/redactie', { bedrijf: 'rtg' })).body;
+  const rtfPers = (await bu('/api/werkplek/bureau/redactie', { bedrijf: 'rtf' })).body;
+  const rtgPers = (await bu('/api/werkplek/bureau/redactie', { bedrijf: 'rtg' })).body;
   assert.ok(rtfPers.artikelen.some(a => a.kop === 'De stichting opent haar clubhuis'));
   assert.ok(!rtgPers.artikelen.some(a => a.kop === 'De stichting opent haar clubhuis'),
     'de krant van RTG blijft die van RTG');
 });
 
 test('12. de ideeenkamer van de stichting werkt haar eigen bureaus bij', async () => {
-  const bu = (pad, body) => post('/api/werkplek/bureau' + pad, body, eigenaar);
-  const idee = await bu('/ideeen/maak', { bedrijf: 'rtf', titel: 'Een clubhuis dat meegroeit',
+  const bu = (pad, body) => post((pad.startsWith('/api/') ? pad : '/api/werkplek/bureau' + pad), body, eigenaar);
+  const idee = await bu('/api/werkplek/bureau/ideeen/maak', { bedrijf: 'rtf', titel: 'Een clubhuis dat meegroeit',
     brief: 'Een gebouw dat met de club mee kan groeien.', bureaus: ['architect'] });
   assert.equal(idee.status, 200);
-  const spin = await bu('/ideeen/spinoff', { bedrijf: 'rtf', id: idee.body.idee.id, bureau: 'architect' });
+  const spin = await bu('/api/werkplek/bureau/ideeen/spinoff', { bedrijf: 'rtf', id: idee.body.idee.id, bureau: 'architect' });
   assert.equal(spin.status, 200, 'het idee gaat als concept naar het eigen architectenbureau');
 
-  const rtfArch = (await bu('/architect', { bedrijf: 'rtf' })).body;
-  const rtgArch = (await bu('/architect', { bedrijf: 'rtg' })).body;
+  const rtfArch = (await bu('/api/werkplek/bureau/architect', { bedrijf: 'rtf' })).body;
+  const rtgArch = (await bu('/api/werkplek/bureau/architect', { bedrijf: 'rtg' })).body;
   assert.ok(rtfArch.ontwerpen.some(o => o.naam === 'Een clubhuis dat meegroeit'));
   assert.ok(!rtgArch.ontwerpen.some(o => o.naam === 'Een clubhuis dat meegroeit'),
     'de spin-off blijft binnen de stichting');
 
   // de ideeen zelf zijn ook gescheiden
-  const rtgIdee = (await bu('/ideeen', { bedrijf: 'rtg' })).body;
+  const rtgIdee = (await bu('/api/werkplek/bureau/ideeen', { bedrijf: 'rtg' })).body;
   assert.ok(!rtgIdee.ideeen.some(i => i.titel === 'Een clubhuis dat meegroeit'));
 
   // en de deur geldt ook voor de bureaus
   assert.equal((await post('/api/werkplek/bureau/atelier', { bedrijf: 'rtf' }, medewerker)).status, 403);
   assert.equal((await post('/api/werkplek/bureau/atelier', { bedrijf: 'rtf' })).status, 403);
-  assert.equal((await bu('/atelier', { bedrijf: 'bestaatniet' })).status, 404);
+  assert.equal((await bu('/api/werkplek/bureau/atelier', { bedrijf: 'bestaatniet' })).status, 404);
 });
 
 test('13. elk huis verkoopt van zijn eigen plank', async () => {
-  const bu = (pad, body) => post('/api/werkplek/bureau' + pad, body, eigenaar);
+  const bu = (pad, body) => post((pad.startsWith('/api/') ? pad : '/api/werkplek/bureau' + pad), body, eigenaar);
   const plank = code => post('/api/werkplek/plank', { bedrijf: code }, eigenaar);
 
   const leeg = await plank('rtf');
@@ -284,14 +284,14 @@ test('13. elk huis verkoopt van zijn eigen plank', async () => {
   const rtgVoor = (await plank('rtg')).body.producten.length;
 
   // een apparaat van de stichting op haar eigen plank zetten
-  const m = await bu('/hardware/maak', { bedrijf: 'rtf', naam: 'Clubhuis-paneel',
+  const m = await bu('/api/werkplek/bureau/hardware/maak', { bedrijf: 'rtf', naam: 'Clubhuis-paneel',
     brief: 'Een eenvoudig paneel voor bij de deur van een clubhuis.' });
   assert.equal(m.status, 200);
   const oid = m.body.ontwerp.id;
-  assert.equal((await bu('/hardware/plank', { bedrijf: 'rtf', id: oid })).status, 400,
+  assert.equal((await bu('/api/werkplek/bureau/hardware/plank', { bedrijf: 'rtf', id: oid })).status, 400,
     'zonder prijs gaat er niets in de verkoop');
 
-  const op = await bu('/hardware/plank', { bedrijf: 'rtf', id: oid, prijs: { eenmalig: 240, eenheid: 'per stuk' } });
+  const op = await bu('/api/werkplek/bureau/hardware/plank', { bedrijf: 'rtf', id: oid, prijs: { eenmalig: 240, eenheid: 'per stuk' } });
   assert.equal(op.status, 200);
   const na = await plank('rtf');
   assert.equal(na.body.producten.length, 1, 'het staat op de plank van de stichting');
@@ -300,7 +300,7 @@ test('13. elk huis verkoopt van zijn eigen plank', async () => {
     'en niet in de winkel van RTG');
 
   // eraf halen kan ook
-  assert.equal((await bu('/hardware/plank-af', { bedrijf: 'rtf', id: oid })).status, 200);
+  assert.equal((await bu('/api/werkplek/bureau/hardware/plank-af', { bedrijf: 'rtf', id: oid })).status, 200);
   assert.equal((await plank('rtf')).body.producten.length, 0, 'de plank is weer leeg');
 
   // en de deur geldt ook hier

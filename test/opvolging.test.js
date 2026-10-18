@@ -22,7 +22,7 @@ const { escalatieVan } = require('../server/school/opvolging');
 
 let srv, base, sch, leraar, klas, gezin, kind, kindToken;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-opvolg-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
@@ -32,22 +32,22 @@ const kindje = (pad, body) => fnd(pad, Object.assign({ code: gezin.code, token: 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'De Ark', plaats: 'Delft' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Ark', plaats: 'Delft' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Mentor Vera', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Mentor Vera', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     personeelId: leraar.personeelId, akkoord: true });
-  klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: '2B', trap: 'vo', fase: 'havo' })).body;
-  gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Ark', naam: 'Ouder Ark', pin: '4321' })).body;
-  kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Nour', rol: 'kind', groep: 'kind' })).body;
-  kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
-  await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
-  await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
+  gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Ark', naam: 'Ouder Ark', pin: '4321' })).body;
+  kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Nour', rol: 'kind', groep: 'kind' })).body;
+  kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
+  await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -103,40 +103,40 @@ test('de keten loopt van gevraagd naar afgerond, en de volgende stap staat erbij
 
 /* ---------- en door de machine heen ---------- */
 test('na de knop zijn er hooguit twee keuzes, allebei vrijblijvend', async () => {
-  const m = await kindje('/school/hulplijn', { tekst: 'ik wil iemand spreken', acuut: false });
+  const m = await kindje('/api/foundation/school/hulplijn', { tekst: 'ik wil iemand spreken', acuut: false });
   assert.equal(m.status, 200);
   const id = m.body.melding.id;
 
-  const w = await kindje('/school/hulplijn/wens', { id, wanneer: 'deze-week', vanWie: 'mentor' });
+  const w = await kindje('/api/foundation/school/hulplijn/wens', { id, wanneer: 'deze-week', vanWie: 'mentor' });
   assert.equal(w.status, 200);
   assert.deepEqual(w.body.wens, { wanneer: 'deze-week', vanWie: 'mentor' });
   assert.match(w.body.uitleg, /hoeft verder niets in te vullen/i);
 
   // onzin valt terug op "maakt niet uit" in plaats van een foutmelding: een kind
   // dat om hulp vraagt hoort geen formulierfout te krijgen
-  const raar = await kindje('/school/hulplijn/wens', { id, wanneer: 'volgend-jaar', vanWie: 'de-koning' });
+  const raar = await kindje('/api/foundation/school/hulplijn/wens', { id, wanneer: 'volgend-jaar', vanWie: 'de-koning' });
   assert.equal(raar.status, 200);
   assert.deepEqual(raar.body.wens, { wanneer: 'maakt-niet-uit', vanWie: 'maakt-niet-uit' });
 });
 
 test('afronden kan niet zonder dat iemand keek, en niet zonder naam', async () => {
-  const id = (await kindje('/school/hulplijn', { tekst: 'even praten' })).body.melding.id;
+  const id = (await kindje('/api/foundation/school/hulplijn', { tekst: 'even praten' })).body.melding.id;
 
-  assert.equal((await kl('/school/hulplijn/afronden', { id, door: 'Mentor Vera' })).status, 409);
-  assert.equal((await kl('/school/hulplijn/afspraak', { id, wanneer: 'morgen', metWie: 'Vera' })).status, 409);
+  assert.equal((await kl('/api/foundation/school/hulplijn/afronden', { id, door: 'Mentor Vera' })).status, 409);
+  assert.equal((await kl('/api/foundation/school/hulplijn/afspraak', { id, wanneer: 'morgen', metWie: 'Vera' })).status, 409);
 
-  const toe = await kl('/school/hulplijn/toewijzen', { id, mentor: 'Mentor Vera' });
+  const toe = await kl('/api/foundation/school/hulplijn/toewijzen', { id, mentor: 'Mentor Vera' });
   assert.equal(toe.status, 200);
   assert.equal(toe.body.toegewezen.naam, 'Mentor Vera');
-  assert.equal((await kl('/school/hulplijn/bewaking')).body.meldingen.find(x => x.id === id).fase, 'toegewezen');
-  await kl('/school/hulplijn/oppakken', { id, notitie: 'gebeld' });
+  assert.equal((await kl('/api/foundation/school/hulplijn/bewaking')).body.meldingen.find(x => x.id === id).fase, 'toegewezen');
+  await kl('/api/foundation/school/hulplijn/oppakken', { id, notitie: 'gebeld' });
 
-  assert.equal((await kl('/school/hulplijn/afronden', { id })).status, 400, 'afronden zonder naam');
-  const af = await kl('/school/hulplijn/afronden', { id, door: 'Mentor Vera', notitie: 'gesprek geweest' });
+  assert.equal((await kl('/api/foundation/school/hulplijn/afronden', { id })).status, 400, 'afronden zonder naam');
+  const af = await kl('/api/foundation/school/hulplijn/afronden', { id, door: 'Mentor Vera', notitie: 'gesprek geweest' });
   assert.equal(af.status, 200);
   assert.match(af.body.uitleg, /wist niets/i, 'afronden hoort niets weg te gooien');
 
-  const b = (await kl('/school/hulplijn/bewaking')).body;
+  const b = (await kl('/api/foundation/school/hulplijn/bewaking')).body;
   const rij = b.meldingen.find(x => x.id === id);
   assert.equal(rij.fase, 'afgerond');
   assert.equal(rij.escaleert, false);
@@ -165,12 +165,12 @@ test('een escalatie draagt geen naam, geen tekst en geen sleutel', () => {
 });
 
 test('de escalatie bij de directie vertelt dat er iets ligt, niet wat', async () => {
-  const id = (await kindje('/school/hulplijn', { tekst: 'ik word gepest en durf het thuis niet te zeggen',
+  const id = (await kindje('/api/foundation/school/hulplijn', { tekst: 'ik word gepest en durf het thuis niet te zeggen',
     acuut: true, vertrouwelijk: true })).body.melding.id;
-  await kindje('/school/hulplijn/wens', { id, wanneer: 'vandaag' });
+  await kindje('/api/foundation/school/hulplijn/wens', { id, wanneer: 'vandaag' });
 
   // in de KLAS ziet de mentor hem gewoon: dat is de vertrouwenspersoon-route
-  const b = (await kl('/school/hulplijn/bewaking')).body;
+  const b = (await kl('/api/foundation/school/hulplijn/bewaking')).body;
   const rij = b.meldingen.find(x => x.id === id);
   assert.ok(rij, 'de mentor ziet zijn eigen melding');
   assert.equal(rij.fase, 'gevraagd');
@@ -179,7 +179,7 @@ test('de escalatie bij de directie vertelt dat er iets ligt, niet wat', async ()
   assert.match(rij.volgende, /mentor toe/i);
 
   // en de directie krijgt een lijst die nergens naar een kind wijst
-  const d = await fnd('/school/directie/bewaking', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken });
+  const d = await fnd('/api/foundation/school/directie/bewaking', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken });
   assert.equal(d.status, 200);
   assert.doesNotMatch(JSON.stringify(d.body), /gepest|Nour/i);
   assert.match(d.body.uitleg, /niet wat of van wie/i);

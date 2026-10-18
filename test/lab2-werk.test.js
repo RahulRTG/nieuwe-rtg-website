@@ -45,12 +45,12 @@ let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lab2-werk-'));
 
 // met kantoorsessie
-const api = (pad, body) => fetch(base + '/api/lab2/' + pad, {
+const api = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/lab2/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 // zonder enige inlog: precies wat een voorbijganger stuurt
-const pub = (pad, body) => fetch(base + '/api/lab2/' + pad, {
+const pub = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/lab2/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -121,10 +121,10 @@ test('het bestuur van een lab: het budget klopt met zichzelf en een partner staa
   BUUR = (await moet('lab/maak', { stad: 'Lab2Buurstad', naam: 'Living Lab Lab2Buurstad' }, 'tweede lab')).lab.id;
   await moet('lab/tekenaar', { id: LAB, naam: 'Dr. Vermeer', rol: 'professional' }, 'tekenaar');
 
-  const geenLab = await api('lab/budget', { id: 'bestaatniet', toegekend: 1000 });
+  const geenLab = await api('/api/lab2/lab/budget', { id: 'bestaatniet', toegekend: 1000 });
   assert.equal(geenLab.status, 404, 'een budget hangt aan een bestaand lab');
 
-  const scheef = await api('lab/budget', { id: LAB, toegekend: 1000, besteed: 5000 });
+  const scheef = await api('/api/lab2/lab/budget', { id: LAB, toegekend: 1000, besteed: 5000 });
   assert.equal(scheef.status, 400, 'er kan niet meer besteed staan dan toegekend');
   assert.match(scheef.body.error, /besteed/i, 'en de melding zegt waarom');
 
@@ -135,15 +135,15 @@ test('het bestuur van een lab: het budget klopt met zichzelf en een partner staa
     { toegekend: 40000, besteed: 12500, bron: 'Gemeente Lab2Werkstad' },
     'het register draagt het budget zoals het is vastgelegd');
 
-  const geenPartnerLab = await api('lab/partner', { id: 'bestaatniet', naam: 'Hogeschool Lab2' });
+  const geenPartnerLab = await api('/api/lab2/lab/partner', { id: 'bestaatniet', naam: 'Hogeschool Lab2' });
   assert.equal(geenPartnerLab.status, 404, 'een partner hangt aan een bestaand lab');
-  const naamloos = await api('lab/partner', { id: LAB, naam: 'X' });
+  const naamloos = await api('/api/lab2/lab/partner', { id: LAB, naam: 'X' });
   assert.equal(naamloos.status, 400, 'een letter is geen partnernaam');
   assert.match(naamloos.body.error, /partner/i);
 
   await moet('lab/partner', { id: LAB, naam: 'Hogeschool Lab2', soort: 'kennisinstelling',
     contract: 'Samenwerkingsovereenkomst 2026-2029' }, 'partner toevoegen');
-  const dubbel = await api('lab/partner', { id: LAB, naam: 'Hogeschool Lab2' });
+  const dubbel = await api('/api/lab2/lab/partner', { id: LAB, naam: 'Hogeschool Lab2' });
   assert.equal(dubbel.status, 409, 'dezelfde partner komt er niet twee keer in');
 
   const met = (await moet('labs', {}, 'labs opnieuw')).labs.find(l => l.id === LAB);
@@ -171,7 +171,7 @@ test('het kantooroverzicht draagt het dossier, het publieke overzicht van hetzel
     vraagstuk: 'Worden de bankjes langs het pad achter de school genoeg gebruikt, en door wie?',
     doel: 'Weten of er meer of juist andere zitplekken nodig zijn' }, 'studie aanmaken')).studie.id;
 
-  const weg = await api('overzicht', { id: 'bestaatniet' });
+  const weg = await api('/api/lab2/overzicht', { id: 'bestaatniet' });
   assert.equal(weg.status, 404, 'een lab dat niet bestaat geeft geen leeg overzicht maar een 404');
 
   const k = await moet('overzicht', { id: LAB }, 'kantooroverzicht');
@@ -206,11 +206,11 @@ test('het kantooroverzicht draagt het dossier, het publieke overzicht van hetzel
    bodem gaat dan omhoog EN de eerder gezette vaststelling gaat weer open --
    anders draagt de studie een handtekening die over een andere vraag ging. */
 test('een bijgesteld vraagstuk tilt de risicoklasse mee, en zet de vaststelling weer open', async () => {
-  const geenStudie = await api('studie/vraagstuk', { id: 'bestaatniet',
+  const geenStudie = await api('/api/lab2/studie/vraagstuk', { id: 'bestaatniet',
     vraagstuk: 'Wordt het pad achter de school ook in de winter gebruikt?' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
 
-  const dun = await api('studie/vraagstuk', { id: OPEN, vraagstuk: 'te kort' });
+  const dun = await api('/api/lab2/studie/vraagstuk', { id: OPEN, vraagstuk: 'te kort' });
   assert.equal(dun.status, 400, 'een half zinnetje is geen vraagstuk');
 
   const scherper = 'Worden de bankjes langs het pad achter de school genoeg gebruikt, op welke dagdelen, en door wie?';
@@ -250,7 +250,7 @@ test('een bijgesteld vraagstuk tilt de risicoklasse mee, en zet de vaststelling 
    moet ook echt opengaan. Een watNu die altijd hetzelfde zegt, zou de eerste
    helft van deze toets ook halen. */
 test('"wat nu" en de stappoort lezen dezelfde lijst gebreken', async () => {
-  const geenStudie = await api('studie/watnu', { id: 'bestaatniet' });
+  const geenStudie = await api('/api/lab2/studie/watnu', { id: 'bestaatniet' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
 
   await moet('plan/hypothese', { id: OPEN,
@@ -259,7 +259,7 @@ test('"wat nu" en de stappoort lezen dezelfde lijst gebreken', async () => {
   await moet('studie/stap', { id: OPEN, stap: 'hypothese' }, 'naar hypothese');
   await moet('studie/stap', { id: OPEN, stap: 'plan' }, 'naar plan');
 
-  const vast = await api('studie/vraagstuk', { id: OPEN,
+  const vast = await api('/api/lab2/studie/vraagstuk', { id: OPEN,
     vraagstuk: 'Toch maar iets heel anders onderzoeken langs ditzelfde pad achter de school.' });
   assert.equal(vast.status, 409, 'het vraagstuk staat vast zodra de hypothese er is');
   assert.match(vast.body.error, /vast/i, 'en de melding wijst naar de reflectie');
@@ -271,7 +271,7 @@ test('"wat nu" en de stappoort lezen dezelfde lijst gebreken', async () => {
   assert.equal(w1.klaar, false, 'en die stap kan nog niet');
   assert.equal(w1.gebreken.length, 2, 'er ontbreken een plan en een vastgestelde risicoklasse');
 
-  const poort = await api('studie/stap', { id: OPEN, stap: 'deelnemers' });
+  const poort = await api('/api/lab2/studie/stap', { id: OPEN, stap: 'deelnemers' });
   assert.equal(poort.status, 409, 'de stap gaat dan ook niet open');
   assert.deepEqual(poort.body.gebreken, w1.gebreken,
     'het scherm en de poort lezen EEN lijst, niet twee die uiteen kunnen lopen');
@@ -300,11 +300,11 @@ test('een rol op een onderzoek is geen tekenbevoegdheid in het lab', async () =>
   assert.match(A.alias, /^BW-/, 'een alias en geen naam');
   assert.notEqual(A.alias, B.alias, 'twee deelnemers, twee pseudoniemen');
 
-  const geenStudie = await api('mens/rol', { id: 'bestaatniet', alias: A.alias, rol: 'onderzoeker' });
+  const geenStudie = await api('/api/lab2/mens/rol', { id: 'bestaatniet', alias: A.alias, rol: 'onderzoeker' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const geenMens = await api('mens/rol', { id: OPEN, alias: 'BW-BESTAATNIET', rol: 'onderzoeker' });
+  const geenMens = await api('/api/lab2/mens/rol', { id: OPEN, alias: 'BW-BESTAATNIET', rol: 'onderzoeker' });
   assert.equal(geenMens.status, 404, 'een deelnemer die niet op dit onderzoek staat');
-  const geenRol = await api('mens/rol', { id: OPEN, alias: A.alias, rol: 'opperhoofd' });
+  const geenRol = await api('/api/lab2/mens/rol', { id: OPEN, alias: A.alias, rol: 'opperhoofd' });
   assert.equal(geenRol.status, 400, 'een rol die het kader niet kent');
   assert.match(geenRol.body.error, /rol/i);
 
@@ -314,7 +314,7 @@ test('een rol op een onderzoek is geen tekenbevoegdheid in het lab', async () =>
   assert.equal(dossier.studie.deelnemers.find(d => d.alias === A.alias).rol, 'toezichthouder',
     'de rol staat echt in het dossier en niet alleen in het antwoord');
 
-  const tekenen = await api('ethiek/stilleggen', { id: OPEN, door: A.alias,
+  const tekenen = await api('/api/lab2/ethiek/stilleggen', { id: OPEN, door: A.alias,
     reden: 'Ik vind als toezichthouder van dit onderzoek dat we moeten stoppen.' });
   assert.equal(tekenen.status, 403, 'de rol op de studie levert geen tekenbevoegdheid in het lab op');
   assert.match(tekenen.body.error, /toezichthouder/i, 'en de melding wijst naar het labregister');
@@ -336,17 +336,17 @@ test('een reflectie via de labpas draagt de alias van de pas, en de punten uit h
   await moetPub('mijn/observatie', { pas: A.pas, methode: 'observatie',
     wat: 'Woensdagmiddag zaten er vier mensen op het bankje bij de bocht; zaterdag niemand.' }, 'observatie via de labpas');
 
-  const onbekend = await pub('mijn/reflectie', { pas: 'LABPAS-BESTAATNIET', soort: 'misging',
+  const onbekend = await pub('/api/lab2/mijn/reflectie', { pas: 'LABPAS-BESTAATNIET', soort: 'misging',
     tekst: 'Wij hebben alleen op woensdag geteld en dat vertekent het beeld.' });
   assert.equal(onbekend.status, 404, 'een pas die niemand heeft, geeft niets');
 
-  const geenSoort = await pub('mijn/reflectie', { pas: A.pas, soort: 'balen',
+  const geenSoort = await pub('/api/lab2/mijn/reflectie', { pas: A.pas, soort: 'balen',
     tekst: 'Wij hebben alleen op woensdag geteld en dat vertekent het beeld.' });
   assert.equal(geenSoort.status, 400, 'de reflectie is geen vrij tekstveld: er hoort een soort bij');
   assert.match(geenSoort.body.error, /tegenviel|misging|onverwacht|herzien/,
     'en de melding noemt de vier soorten die er zijn');
 
-  const kort = await pub('mijn/reflectie', { pas: A.pas, soort: 'misging', tekst: 'oeps' });
+  const kort = await pub('/api/lab2/mijn/reflectie', { pas: A.pas, soort: 'misging', tekst: 'oeps' });
   assert.equal(kort.status, 400, '"oeps" is geen vastgelegde fout');
 
   const kader = await moet('kader', {}, 'kader voor de puntentabel');
@@ -384,11 +384,11 @@ test('een reflectie via de labpas draagt de alias van de pas, en de punten uit h
    agenda verdwijnen -- een taak die "af" heet en toch blijft staan, is precies
    hoe zo'n lijst zijn geloofwaardigheid verliest. */
 test('de agenda toont alleen taken die nog open staan en een echte datum dragen', async () => {
-  const geenStudie = await api('werk/taak', { id: 'bestaatniet', tekst: 'De telling uitwerken' });
+  const geenStudie = await api('/api/lab2/werk/taak', { id: 'bestaatniet', tekst: 'De telling uitwerken' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const leeg = await api('werk/taak', { id: OPEN, tekst: 'x' });
+  const leeg = await api('/api/lab2/werk/taak', { id: OPEN, tekst: 'x' });
   assert.equal(leeg.status, 400, 'wat moet er gebeuren?');
-  const vreemd = await api('werk/taak', { id: OPEN, tekst: 'De telling uitwerken', voor: 'BW-BESTAATNIET' });
+  const vreemd = await api('/api/lab2/werk/taak', { id: OPEN, tekst: 'De telling uitwerken', voor: 'BW-BESTAATNIET' });
   assert.equal(vreemd.status, 400, 'een taak gaat niet naar iemand die niet op dit onderzoek staat');
   assert.match(vreemd.body.error, /deelnemer/i);
 
@@ -402,7 +402,7 @@ test('de agenda toont alleen taken die nog open staan en een echte datum dragen'
   assert.equal(oud.voor, A.alias, 'een taak draagt de alias en geen naam');
   assert.equal(oud.af, false, 'een verse taak staat open');
 
-  const geenLab = await api('werk/agenda', { id: 'bestaatniet' });
+  const geenLab = await api('/api/lab2/werk/agenda', { id: 'bestaatniet' });
   assert.equal(geenLab.status, 404, 'een agenda hangt aan een bestaand lab');
 
   const a1 = await moet('werk/agenda', { id: LAB }, 'agenda');
@@ -414,11 +414,11 @@ test('de agenda toont alleen taken die nog open staan en een echte datum dragen'
   assert.equal(a1.taken[1].verlopen, false);
   assert.equal(a1.verlopen, 1, 'en het aantal verlopen taken staat er als eigen getal bij');
 
-  const geenTaakStudie = await api('werk/taak-zet', { id: 'bestaatniet', taakId: oud.id, af: true });
+  const geenTaakStudie = await api('/api/lab2/werk/taak-zet', { id: 'bestaatniet', taakId: oud.id, af: true });
   assert.equal(geenTaakStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const geenTaak = await api('werk/taak-zet', { id: OPEN, taakId: 'bestaatniet', af: true });
+  const geenTaak = await api('/api/lab2/werk/taak-zet', { id: OPEN, taakId: 'bestaatniet', af: true });
   assert.equal(geenTaak.status, 404, 'een taak die niet bestaat');
-  const vreemdeVoor = await api('werk/taak-zet', { id: OPEN, taakId: komt.id, voor: 'BW-BESTAATNIET' });
+  const vreemdeVoor = await api('/api/lab2/werk/taak-zet', { id: OPEN, taakId: komt.id, voor: 'BW-BESTAATNIET' });
   assert.equal(vreemdeVoor.status, 400, 'toewijzen aan iemand van buiten het team kan ook achteraf niet');
 
   await moet('werk/taak-zet', { id: OPEN, taakId: komt.id, voor: A.alias }, 'taak toewijzen');
@@ -452,9 +452,9 @@ test('de agenda toont alleen taken die nog open staan en een echte datum dragen'
    besluit draagt een naam en een waarom, want een besluitenlog zonder reden
    verklaart achteraf niets. */
 test('een document krijgt een versie in plaats van een tweede rij, en het logboek houdt het meetmoment vast', async () => {
-  const geenStudie = await api('werk/document', { id: 'bestaatniet', naam: 'Meetprotocol paden' });
+  const geenStudie = await api('/api/lab2/werk/document', { id: 'bestaatniet', naam: 'Meetprotocol paden' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const naamloos = await api('werk/document', { id: OPEN, naam: 'Ja' });
+  const naamloos = await api('/api/lab2/werk/document', { id: OPEN, naam: 'Ja' });
   assert.equal(naamloos.status, 400, 'hoe heet dit document?');
 
   const v1 = await moet('werk/document', { id: OPEN, naam: 'Meetprotocol paden',
@@ -478,9 +478,9 @@ test('een document krijgt een versie in plaats van een tweede rij, en het logboe
   assert.equal(rijen[0].versie, 2);
   assert.equal(rijen[0].versies.length, 2, 'met allebei de versies in de historie');
 
-  const geenLogStudie = await api('werk/log', { id: 'bestaatniet', tekst: 'Proefbankje geplaatst' });
+  const geenLogStudie = await api('/api/lab2/werk/log', { id: 'bestaatniet', tekst: 'Proefbankje geplaatst' });
   assert.equal(geenLogStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const leegLog = await api('werk/log', { id: OPEN, tekst: 'x' });
+  const leegLog = await api('/api/lab2/werk/log', { id: OPEN, tekst: 'x' });
   assert.equal(leegLog.status, 400, 'wat is er gebeurd?');
 
   const l = await moet('werk/log', { id: OPEN,
@@ -495,9 +495,9 @@ test('een document krijgt een versie in plaats van een tweede rij, en het logboe
   assert.equal(regel.meetmoment, 2, 'met het meetmoment, want daar zit het verschil met een notitieblok');
   assert.deepEqual(regel.apparatuur, ['Teller T-1'], 'en met waarmee er is gemeten');
 
-  const geenBesluitStudie = await api('werk/besluit', { id: 'bestaatniet', tekst: 'Meetmoment 3 valt af' });
+  const geenBesluitStudie = await api('/api/lab2/werk/besluit', { id: 'bestaatniet', tekst: 'Meetmoment 3 valt af' });
   assert.equal(geenBesluitStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const leegBesluit = await api('werk/besluit', { id: OPEN, tekst: 'ja' });
+  const leegBesluit = await api('/api/lab2/werk/besluit', { id: OPEN, tekst: 'ja' });
   assert.equal(leegBesluit.status, 400, 'wat is er besloten?');
 
   const bs = await moet('werk/besluit', { id: OPEN, tekst: 'Meetmoment 3 valt af', door: 'Dr. Vermeer',
@@ -528,7 +528,7 @@ test('een vraag uit de buurt wordt aan een onderzoek van hetzelfde lab gekoppeld
     vraag: 'Kan de bushalte in de buurstad een luifel krijgen?' }, 'thema in het andere lab')).thema.id;
   await moetPub('bewoner/stem', { id: T2, alias: 'BW-STEMMER' }, 'stemmen');
 
-  const geenLab = await api('themas', { id: 'bestaatniet' });
+  const geenLab = await api('/api/lab2/themas', { id: 'bestaatniet' });
   assert.equal(geenLab.status, 404, 'themas van een lab dat niet bestaat');
 
   const t = await moet('themas', { id: LAB }, 'themalijst van het kantoor');
@@ -538,17 +538,17 @@ test('een vraag uit de buurt wordt aan een onderzoek van hetzelfde lab gekoppeld
   assert.equal(t.themas[1].stemmen, 0);
   assert.ok(t.themas.every(x => x.studieId === null), 'nog geen van beide hangt aan een onderzoek');
 
-  const geenThema = await api('thema/koppel', { themaId: 'bestaatniet', studieId: OPEN });
+  const geenThema = await api('/api/lab2/thema/koppel', { themaId: 'bestaatniet', studieId: OPEN });
   assert.equal(geenThema.status, 404, 'een thema dat niet bestaat');
-  const geenStudie = await api('thema/koppel', { themaId: T2, studieId: 'bestaatniet' });
+  const geenStudie = await api('/api/lab2/thema/koppel', { themaId: T2, studieId: 'bestaatniet' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const anderLab = await api('thema/koppel', { themaId: T3, studieId: OPEN });
+  const anderLab = await api('/api/lab2/thema/koppel', { themaId: T3, studieId: OPEN });
   assert.equal(anderLab.status, 400, 'een vraag uit de ene stad hoort niet op een onderzoek in de andere');
   assert.match(anderLab.body.error, /lab/i);
 
   const k = await moet('thema/koppel', { themaId: T2, studieId: OPEN }, 'koppelen');
   assert.equal(k.thema.studieId, OPEN);
-  const weer = await api('thema/koppel', { themaId: T2, studieId: OPEN });
+  const weer = await api('/api/lab2/thema/koppel', { themaId: T2, studieId: OPEN });
   assert.equal(weer.status, 409, 'een thema hangt aan hoogstens een onderzoek');
 
   const na = await moet('themas', { id: LAB }, 'themalijst opnieuw');
@@ -574,7 +574,7 @@ test('een vraag uit de buurt wordt aan een onderzoek van hetzelfde lab gekoppeld
    Om er te komen loopt het onderzoek de rest van de cyclus af. Dat is geen
    opsmuk: een uitgang MAG alleen ontstaan uit een conclusie, bij het besluit. */
 test('de pijplijn volgt de status van een uitgang in plaats van rijen te tellen', async () => {
-  const geenLab = await api('uit/pijplijn', { id: 'bestaatniet' });
+  const geenLab = await api('/api/lab2/uit/pijplijn', { id: 'bestaatniet' });
   assert.equal(geenLab.status, 404, 'een pijplijn hangt aan een bestaand lab');
 
   const p0 = await moet('uit/pijplijn', { id: LAB }, 'lege pijplijn');
@@ -627,11 +627,11 @@ test('de pijplijn volgt de status van een uitgang in plaats van rijen te tellen'
    Het aantal studies wordt daarom vlak ervoor en vlak erna geteld: "er is een
    studie bijgekomen" is iets anders dan "het antwoord noemde een studie". */
 test('een vervolgonderzoek ontstaat echt, en allebei de dossiers houden de keten vast', async () => {
-  const geenStudie = await api('uit/vervolg', { id: 'bestaatniet', titel: 'Tweede pad',
+  const geenStudie = await api('/api/lab2/uit/vervolg', { id: 'bestaatniet', titel: 'Tweede pad',
     vraagstuk: 'Gebruiken bewoners het pad langs de sportvelden anders dan het pad achter de school?' });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
 
-  const dun = await api('uit/vervolg', { id: OPEN, titel: 'Tweede pad', vraagstuk: 'te kort' });
+  const dun = await api('/api/lab2/uit/vervolg', { id: OPEN, titel: 'Tweede pad', vraagstuk: 'te kort' });
   assert.equal(dun.status, 400, 'een vervolg begint met een echt vraagstuk, niet met een verwijzing');
   assert.match(dun.body.error, /vraagstuk/i);
 
@@ -672,9 +672,9 @@ test('wie zich terugtrekt neemt zijn eigen observaties mee, en die van een ander
   assert.ok(voor.studie.observaties.some(o => o.door === B.alias), 'de tweede deelnemer heeft iets waargenomen');
   assert.ok(voor.studie.observaties.some(o => o.door === A.alias), 'de eerste ook');
 
-  const geenStudie = await api('mens/weg', { id: 'bestaatniet', alias: B.alias });
+  const geenStudie = await api('/api/lab2/mens/weg', { id: 'bestaatniet', alias: B.alias });
   assert.equal(geenStudie.status, 404, 'een onderzoek dat niet bestaat');
-  const geenMens = await api('mens/weg', { id: OPEN, alias: 'BW-BESTAATNIET' });
+  const geenMens = await api('/api/lab2/mens/weg', { id: OPEN, alias: 'BW-BESTAATNIET' });
   assert.equal(geenMens.status, 404, 'een deelnemer die niet op dit onderzoek staat');
 
   const w = await moet('mens/weg', { id: OPEN, alias: B.alias }, 'terugtrekken');
@@ -689,7 +689,7 @@ test('wie zich terugtrekt neemt zijn eigen observaties mee, en die van een ander
   assert.ok(na.studie.logboek.some(x => /trok zich terug/.test(x.tekst)),
     'er blijft een spoor dat er iets weg is, zonder de inhoud ervan');
 
-  const pas = await pub('mijn', { pas: B.pas });
+  const pas = await pub('/api/lab2/mijn', { pas: B.pas });
   assert.equal(pas.status, 404, 'en het lab kent zijn labpas daarna niet meer');
 });
 
@@ -706,7 +706,7 @@ test('de opbrengst zet de studies op volgorde van wat ze hebben teruggegeven', a
   await moet('studie/besluit', { id: OPEN, soort: 'gestopt', door: 'Dr. Vermeer',
     reden: 'Het bewijs bleef bij een aanname; wij herhalen het langs een tweede pad.' }, 'bewust gestopt');
 
-  const geenLab = await api('opbrengst', { id: 'bestaatniet' });
+  const geenLab = await api('/api/lab2/opbrengst', { id: 'bestaatniet' });
   assert.equal(geenLab.status, 404, 'een opbrengst hangt aan een bestaand lab');
 
   const o = await moet('opbrengst', { id: LAB }, 'opbrengst');

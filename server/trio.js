@@ -123,8 +123,14 @@ poort.on('error', e => {
   wacht.startServer(2);
   if (werkers) werkers.startAlle();
   /* Na elke hartslag de stand delen. deel() stuurt alleen als er iets veranderd
-     is, dus in rust gaat er niets over de lijn. */
-  setInterval(async () => { await wacht.hartslag(); if (werkers) werkers.deel(); }, CHECK_MS);
+     is, dus in rust gaat er niets over de lijn. Loopt de vorige ronde nog (drie
+     controles van 1500 ms passen niet in twee seconden), dan slaat deze tik ALLES
+     over: hartslag() zou zelf ook overslaan, maar deel() stuurde daarna de stand
+     van een ronde die nog halverwege een rolbesluit zat naar de voordeuren. */
+  setInterval(async () => {
+    if (wacht.bezig()) return;
+    await wacht.hartslag(); if (werkers) werkers.deel();
+  }, CHECK_MS);
   setTimeout(() => {
     console.log('');
     /* De stand hardop, en niet de standaardstand als er een andere draait: een

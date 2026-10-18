@@ -7,8 +7,7 @@
    op een plek. */
 'use strict';
 
-module.exports = (kern, doosSleutelOk, noteerRapport) => {
-  const { app, zaakdoos } = kern;
+module.exports = ({ app, zaakdoos, doosSleutelOk, noteerRapport }) => {
   /* Het nachtwerk van de doos-vloot: elke doos die meedoet, stuurt om vier uur
      in de nacht een dagrapport over de lijn: pings, gemiddelde rondreistijd,
      uitval en naspeelwerk. Compact en zonder zaakdata, achter de sleutel. */

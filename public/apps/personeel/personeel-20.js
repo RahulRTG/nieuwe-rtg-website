@@ -7,7 +7,7 @@
     if (dr.length) html += '<div class="card"><div class="k">'+T('pd.boer.dieren','Dieren voeren')+'</div>'+
       dr.map(d => { const gevoerd = d.laatsteVoer && d.laatsteVoer.slice(0,10)===vandaag;
         return '<div class="task"><span class="ic">'+(d.soort==='melkkoe'?'':d.soort==='legkip'?'':d.soort==='varken'?'':d.soort==='geit'?'':'')+'</span><div class="t"><b>'+esc(d.soortLabel)+' × '+d.aantal+'</b><span>'+(d.stal?esc(d.stal)+' · ':'')+d.voerKgPerDag+' kg '+T('pd.boer.voer','voer')+(gevoerd?' · ✓ '+T('pd.boer.gevoerd','gevoerd'):'')+'</span></div>'+
-        (gevoerd?'<span style="color:#7EE0A3;font-size:1.1rem;">✓</span>':'<button class="abtn" data-bvoer="'+d.id+'">'+T('pd.boer.voeren','Voeren')+'</button>')+'</div>'; }).join('')+'</div>';
+        (gevoerd?'<span class="s-eic6x1">✓</span>':'<button class="abtn" data-bvoer="'+d.id+'">'+T('pd.boer.voeren','Voeren')+'</button>')+'</div>'; }).join('')+'</div>';
     wrap.innerHTML = html;
     wrap.querySelectorAll('[data-btaak]').forEach(b => b.addEventListener('click', async () => { try { boerPdaToe(await API.call('/supplier/boerderij/taak/klaar', { id: b.dataset.btaak })); toast(T('pd.boer.klaarok','Taak afgerond.')); } catch(e){ toast(e.message); } }));
     wrap.querySelectorAll('[data-boogst]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/oogst', { id: b.dataset.boogst }); toast(T('pd.boer.oogstok','Geoogst: ')+r.opbrengst+' '+r.eenheid); boerPdaToe(r); } catch(e){ toast(e.message); } }));
@@ -33,18 +33,18 @@
     const totVerkocht = slots.reduce((n, x) => n + x.verkocht, 0);
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.e.check','Entree-check')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+
+      '<div class="s-15ean2a">'+
       '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
       '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
       '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
       // de kassa aan de deur: kaartje verkopen, contant of met RTG Pay, VIP kan
       (slots.length ? '<div class="card"><div class="k">'+T('pd.e.verkoop','Deurverkoop')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
-      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
+      '<div class="s-1738il7">'+
+      '<select id="pdVkSlot" class="s-153s3qq">'+
         slots.map((x,i) => '<option value="'+i+'">'+x.tijd+' \u00B7 '+esc(x.naam)+' ('+(x.capaciteit-x.verkocht)+' '+T('pd.e.vrij','vrij')+')</option>').join('')+'</select>'+
-      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
-      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
+      '<input id="pdVkPers" type="number" min="1" max="20" value="1" class="s-7m28pf" aria-label="personen">'+
+      '<select id="pdVkSoort" class="s-v7peyc"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
+      '<div class="s-ksn81s">'+
       '<button class="abtn h-flex1" data-pdvk="contant">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
       '<button class="abtn h-flex1" data-pdvk="rtgpay">RTG Pay</button></div>'+
       '<div id="pdVkUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);">'+(pdVkLaatst||'')+'</div></div>' : '')+
@@ -52,16 +52,16 @@
       (slots.length ? slots.map(x =>
         '<div class="task"><span class="ic">'+(x.binnen>=x.verkocht&&x.verkocht?'\u2705':'\uD83C\uDF9F\uFE0F')+'</span><div class="t"><b>'+x.tijd+' \u00B7 '+esc(x.naam)+'</b>'+
         '<span>'+x.binnen+'/'+x.verkocht+' '+T('pd.e.binnen2','binnen')+' \u00B7 '+T('pd.e.verkocht','verkocht')+' '+x.verkocht+'/'+x.capaciteit+'</span></div></div>'
-      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.e.leeg','Vandaag geen tijdsloten.')+'</div>')+'</div>';
+      ).join('') : '<div class="s-1sydj7f">'+T('pd.e.leeg','Vandaag geen tijdsloten.')+'</div>')+'</div>';
     const c = document.getElementById('pdCheck');
     if (c) c.addEventListener('click', async () => {
       const uit = document.getElementById('pdCheckUit');
       try {
         const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
-        uit.innerHTML = '<b style="color:var(--rtg-leesgroen,var(--green));">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
-          (r.ticket.zorg?'<div style="margin-top:0.3rem;color:#E2B93B;">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
+        uit.innerHTML = '<b class="s-11zyxj0">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
+          (r.ticket.zorg?'<div class="s-slkh9p">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
         $('#pdCode').value = '';
         laadEntree();
-      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
+      } catch(e){ uit.innerHTML = '<b class="s-14oqrbo">\u26D4 '+esc(e.message)+'</b>'; }
     });
     // de deurverkoop: het kaartje is meteen betaald en de code kan naar binnen

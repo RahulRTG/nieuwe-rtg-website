@@ -244,65 +244,27 @@ function contractNieuw(reg, opSchijf) {
    een gedeclareerde kopie zou een tweede bron en een dubbele knop in het blad
    zijn. Bij de eerste meting (23 september 2026) stonden er 51 schermen onder;
    Bestanden is de eerste portie, en Comm spreekt zelf sinds het sociaal-spoor
-   (stap 16). */
+   (stap 16). Op 18 oktober 2026 gingen de laatste 47 eraf: elk zegt zijn bron
+   in zijn eigen HTML en public/apps/schermcontext.js publiceert hem.
+
+   contextSchuld(reg, lijst) neemt de lijst als tweede argument, zodat de toets
+   de regel ook met een lege lijst in beide richtingen kan nagaan. */
 const CONTEXT_SCHULD = Object.freeze([
-  '/apps/avond.html',
-  '/apps/belastingkantoor.html',
-  '/apps/browser.html',
-  '/apps/clips.html',
-  '/apps/concern.html',
-  '/apps/defensie.html',
-  '/apps/foundation/club.html',
-  '/apps/foundation/index.html',
-  '/apps/foundation/klas.html',
-  '/apps/foundation/os-deelnemer.html',
-  '/apps/foundation/os-donateur.html',
-  '/apps/foundation/os-portaal.html',
-  '/apps/foundation/os-vrijwilliger.html',
-  '/apps/foundation/partner.html',
-  '/apps/foundation/reis.html',
-  '/apps/foundation/rust.html',
-  '/apps/galerij.html',
-  '/apps/gemeenteloket.html',
-  '/apps/gemeentepda.html',
-  '/apps/genootschap.html',
-  '/apps/home.html',
-  '/apps/klankwerk.html',
-  '/apps/labpas.html',
-  '/apps/lesmaker.html',
-  '/apps/luchthaven.html',
-  '/apps/mall.html',
-  '/apps/marechaussee.html',
-  '/apps/media.html',
-  '/apps/mijnmall.html',
-  '/apps/muziek.html',
-  '/apps/onderneming.html',
-  '/apps/ov.html',
-  '/apps/overheidspda.html',
-  '/apps/partner-worden.html',
-  '/apps/passkeys.html',
-  '/apps/podium.html',
-  '/apps/rechtbank.html',
-  '/apps/rijksloket.html',
-  '/apps/rtgid.html',
-  '/apps/rtgschool.html',
-  '/apps/scanner.html',
-  '/apps/sitemaker.html',
-  '/apps/sportclub.html',
-  '/apps/techniek.html',
-  '/apps/theater.html',
-  '/apps/thuis.html',
-  '/apps/websitestudio.html'
+  /* Leeg sinds 18 oktober 2026: de laatste 47 schermen publiceren hun context
+     zelf via public/apps/schermcontext.js (data-rtg-context-bron op <body>).
+     Wie hier weer een scherm opzet, verhoogt edgeContextSchuld in NORM.json en
+     dat is een achteruitgang die een notitie van de eigenaar vraagt. */
 ]);
-function contextSchuld(reg) {
-  const uit = [], schuld = new Set(CONTEXT_SCHULD);
+function contextSchuld(reg, lijst) {
+  const L = lijst || CONTEXT_SCHULD;
+  const uit = [], schuld = new Set(L);
   for (const [pad, s] of Object.entries(reg.schermen || {})) {
     if (s.status !== 'gemeten' || (s.herkomst || {}).hoofdactie !== 'scherm:data-hoofdactie') continue;
     const eigen = zelf('context', (s.herkomst || {}).context);
     if (!eigen && !schuld.has(pad)) uit.push(pad + ': heeft een eigen hoofdactie maar publiceert zijn context niet zelf (RTGAdaptief.context) en staat niet op CONTEXT_SCHULD');
     if (eigen && schuld.has(pad)) uit.push(pad + ': publiceert zijn context zelf; haal hem van CONTEXT_SCHULD');
   }
-  for (const pad of CONTEXT_SCHULD) {
+  for (const pad of L) {
     const s = (reg.schermen || {})[pad];
     if (!s || s.status !== 'gemeten' || (s.herkomst || {}).hoofdactie !== 'scherm:data-hoofdactie') {
       uit.push(pad + ': staat op CONTEXT_SCHULD maar valt niet (meer) onder de regel; haal hem eraf');

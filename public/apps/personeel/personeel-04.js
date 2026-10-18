@@ -38,13 +38,13 @@
     try { localStorage.setItem('rtg_pda_bedrijf', c); } catch(e){}
     teamAccessView('team','pd.access.team','Kies uw naam.', 'pd.access.teamhelp','Kies uw eigen account om veilig verder te gaan met uw pincode.');
     $('#gateStep').innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.25rem;">'+
-        '<div style="font-size:0.9rem;"><b>'+BEDRIJVEN[c].icon+' '+esc(BEDRIJVEN[c].name)+'</b><div style="font-size:0.68rem;color:var(--soft);">'+teamText('pd.vast','Deze PDA staat op dit bedrijf')+'</div></div>'+
-        '<button class="gback" id="gbSwitch" style="margin:0;">'+teamText('pd.switch','Ander bedrijf')+'</button>'+
+      '<div class="s-1cyqjye">'+
+        '<div class="s-papaze"><b>'+BEDRIJVEN[c].icon+' '+esc(BEDRIJVEN[c].name)+'</b><div class="s-1pkrthn">'+teamText('pd.vast','Deze PDA staat op dit bedrijf')+'</div></div>'+
+        '<button class="gback s-40wpk4" id="gbSwitch">'+teamText('pd.switch','Ander bedrijf')+'</button>'+
       '</div><div class="glist">' + (roster.staff||[]).map(m =>
       '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'':'')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':teamText('pd.staff','Medewerker'))+'</span></span></button>'
     ).join('') + '</div>'+
-      '<div style="margin-top:0.75rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+teamText('pd.nieuw','Nieuw? Vraag uw werkgever om een kassacode en meld u eenmalig aan in de leverancier-app.')+'</div>';
+      '<div class="s-191f2bw">'+teamText('pd.nieuw','Nieuw? Vraag uw werkgever om een kassacode en meld u eenmalig aan in de leverancier-app.')+'</div>';
     $('#gbSwitch').addEventListener('click', () => {
       try { localStorage.removeItem('rtg_pda_bedrijf'); } catch(e){}
       stepSector();
@@ -54,7 +54,7 @@
   function stepPin(secId, c, staffId, nm){
     teamAccessView('pin','pd.access.pin','Welkom terug.', 'pd.access.pinhelp','Vul uw persoonlijke pincode in om uw werkplek te openen.');
     $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+teamText('pd.back','Terug')+'</button>'+
-      '<div style="margin-top:0.5rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
+      '<div class="s-w1gyni"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
       '<div class="pinrow"><input id="pinInp" aria-label="'+T('pd.access.pinlabel','Uw viercijferige pincode')+'" data-i18n-aria="pd.access.pinlabel" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+teamText('pd.login','Inloggen')+'</button></div>'+
       (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Magnaat Test: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
@@ -124,5 +124,5 @@
       '<div class="k h-mt70">'+teamText('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
       '<input class="hin h-mt40" id="kaTotp" data-i18n-aria="pd.ka.totp" aria-label="TOTP-code (alleen als die is ingesteld)" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"></div>'+
       '<div id="kaDeurVak"></div>'+
-      '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
+      '<div id="kaFout" class="s-q87hn8"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);

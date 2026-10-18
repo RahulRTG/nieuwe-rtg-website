@@ -13,7 +13,7 @@
     }
     const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('pd.noloc','locatie onbekend');
     el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('pd.needs','heeft direct assistentie nodig'))+'</span>'+
-      '<span style="margin-top:0.5rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
+      '<span class="s-w1gbnz">'+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
   }
 
@@ -67,19 +67,19 @@
       return '<div class="card"><div class="k">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
         (eigen.length ? eigen.map(a =>
           '<div class="task"><span class="ic">'+(a.soort==='medisch'?'':'')+'</span><div class="t">'+
-            '<b style="font-variant-numeric:tabular-nums;">'+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</b>'+
+            '<b class="s-167v99s">'+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</b>'+
             '<span>'+T('pd.zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min · '+eur(a.prijs)+'</span>'+
-            (a.zorg ? '<span style="display:block;color:#E2B93B;">'+esc(pkZorg(a.zorg))+'</span>' : '')+
-            (a.intake ? '<span style="display:block;color:#E2B93B;">'+esc(a.intake)+'</span>' : '')+
+            (a.zorg ? '<span class="s-12agxa1">'+esc(pkZorg(a.zorg))+'</span>' : '')+
+            (a.intake ? '<span class="s-12agxa1">'+esc(a.intake)+'</span>' : '')+
           '</div>'+
           (a.status === 'afgerond' ? '<span class="pill g">'+T('pd.zb.klaar','Afgerond')+'</span>'
             : '<button class="abtn" data-zbklaar="'+esc(a.ref)+'">'+T('pd.zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
-        : '<div style="margin-top:0.5rem;color:var(--soft);font-size:0.8rem;">'+T('pd.zb.leeg','Geen afspraken op deze dag.')+'</div>')+
+        : '<div class="s-121iqeb">'+T('pd.zb.leeg','Geen afspraken op deze dag.')+'</div>')+
       '</div>';
     }).join('');
     wrap.innerHTML = '<div class="card"><div class="k">'+esc(zbData.aanbieder || '')+'</div>'+
-      '<div class="row" style="flex-wrap:wrap;margin-top:0.5rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
+      '<div class="row s-171yguq">'+dagen.join('')+'</div></div>' + perBehandelaar;
     wrap.querySelectorAll('[data-zbdag]').forEach(b => b.addEventListener('click', () => { zbDatum = b.dataset.zbdag; laadZorgbalie(); }));
     wrap.querySelectorAll('[data-zbklaar]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/care/afronden', { ref: b.dataset.zbklaar }); toast(T('pd.zb.klaar','Afgerond') + ' '); laadZorgbalie(); }
@@ -119,8 +119,8 @@
           '<span>'+(m.plek ? esc(m.plek)+' · ' : '')+esc(m.status)+'</span></div>'+
           '<button class="abtn ghost" data-mkst="ter-plaatse" data-mkm="'+m.id+'">'+T('pd.mk.tp','Ter plaatse')+'</button>'+
           '<button class="abtn" data-mkst="afgerond" data-mkm="'+m.id+'">'+T('pd.mk.af','Rond af')+'</button></div>').join('')
-        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.rustig','Geen open meldingen; rustig op het bord.')+'</div>')+
-        '<div style="margin-top:0.5rem;font-size:0.75rem;color:var(--soft);">'+(mkHulp.eenheden || []).map(e => e.naam+' ('+e.status+')').join(' · ')+'</div></div>';
+        : '<div class="s-7a7ief">'+T('pd.mk.rustig','Geen open meldingen; rustig op het bord.')+'</div>')+
+        '<div class="s-1h98ifv">'+(mkHulp.eenheden || []).map(e => e.naam+' ('+e.status+')').join(' · ')+'</div></div>';
     }
     if (mkZorg && mkZorg.receptie){
       html += '<div class="card"><div class="k">'+T('pd.mk.receptie','Medische receptie')+'</div>'+
@@ -128,7 +128,7 @@
           '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(p.aanduiding)+'</b><span>'+esc(p.status)+(p.kamer ? ' ('+esc(p.kamer)+')' : '')+'</span></div>'+
           (p.status === 'wacht' ? '<button class="abtn" data-mkroep="'+p.id+'">'+T('pd.mk.roep','Roep op')+'</button>' : '')+
           '<button class="abtn ghost" data-mkpk="'+p.id+'">'+T('pd.mk.klaar','Klaar')+'</button></div>').join('')
-        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.wkleeg','De wachtkamer is leeg.')+'</div>')+'</div>';
+        : '<div class="s-7a7ief">'+T('pd.mk.wkleeg','De wachtkamer is leeg.')+'</div>')+'</div>';
     }
     if (mkZorg && mkZorg.seh){
       html += '<div class="card"><div class="k">'+T('pd.mk.seh','Eerste hulp')+' · '+mkZorg.seh.length+' '+T('pd.mk.inrij','in de rij')+'</div>'+

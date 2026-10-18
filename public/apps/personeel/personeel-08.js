@@ -55,19 +55,19 @@
     // de receptie kijkt mee: vuile kamers met een aankomst vandaag gaan voor
     pkLaadReceptie();
     if (pkReceptie && (pkReceptie.hkEerst || []).length)
-      html += '<div class="card" style="border-left:4px solid #E5484D;"><div class="k">'+T('hk.eerst','Eerst deze')+'</div>'+
-        '<div style="margin-top:0.25rem;font-size:0.85rem;"><b>'+pkReceptie.hkEerst.map(esc).join(', ')+'</b> · '+T('hk.eerst.s','daar komt vandaag alweer een gast aan.')+'</div></div>';
+      html += '<div class="card s-b0bupo"><div class="k">'+T('hk.eerst','Eerst deze')+'</div>'+
+        '<div class="s-g0r3ku"><b>'+pkReceptie.hkEerst.map(esc).join(', ')+'</b> · '+T('hk.eerst.s','daar komt vandaag alweer een gast aan.')+'</div></div>';
     // de AI kijkt vooruit: gasten onderweg (GPS) bepalen de prioriteit
     const onderweg = (state.guests || []).filter(g => g.heading && !g.arrived && Number.isFinite(g.etaMin));
     const vuil = rooms.filter(r => hkVan(r) === 'vuil').length;
     if (onderweg.length && vuil)
-      html += '<div class="card" style="border-left:4px solid var(--amber);"><div class="k">'+T('hk.prio','Prioriteit')+'</div>'+
-        '<div style="margin-top:0.25rem;font-size:0.86rem;">'+onderweg.length+' '+T('hk.gast','gast(en) onderweg, eerste over ~')+Math.min.apply(null, onderweg.map(g=>g.etaMin))+' min · '+vuil+' '+T('hk.vuilcnt','kamer(s) vuil')+'. '+T('hk.gast2','Zorg dat er een schone kamer klaarstaat.')+'</div></div>';
+      html += '<div class="card s-1vstuvm"><div class="k">'+T('hk.prio','Prioriteit')+'</div>'+
+        '<div class="s-g0rqkd">'+onderweg.length+' '+T('hk.gast','gast(en) onderweg, eerste over ~')+Math.min.apply(null, onderweg.map(g=>g.etaMin))+' min · '+vuil+' '+T('hk.vuilcnt','kamer(s) vuil')+'. '+T('hk.gast2','Zorg dat er een schone kamer klaarstaat.')+'</div></div>';
     // de teller van de vloer
     const n = s2 => rooms.filter(r => hkVan(r) === s2).length;
-    html += '<div class="card stat"><div><b style="color:#FF8589;">'+n('vuil')+'</b><span>'+T('hk.vuil','Vuil')+'</span></div>'+
-      '<div><b style="color:#E2B93B;">'+n('bezig')+'</b><span>'+T('hk.bezig','Bezig')+'</span></div>'+
-      '<div><b style="color:#7BC79B;">'+n('schoon')+'</b><span>'+T('hk.schoon','Schoon')+'</span></div>'+
+    html += '<div class="card stat"><div><b class="s-15g9sga">'+n('vuil')+'</b><span>'+T('hk.vuil','Vuil')+'</span></div>'+
+      '<div><b class="s-14oeqwv">'+n('bezig')+'</b><span>'+T('hk.bezig','Bezig')+'</span></div>'+
+      '<div><b class="s-yalcj8">'+n('schoon')+'</b><span>'+T('hk.schoon','Schoon')+'</span></div>'+
       '<div><b>'+rooms.filter(r=>r.vroegVrij).length+'</b><span>'+T('hk.vrij','Vrijgegeven')+'</span></div></div>';
     html += rooms.map(r => {
       const s2 = hkVan(r);
@@ -83,10 +83,10 @@
         ? '<button class="abtn ghost" data-vrij="'+r.id+'" data-op="uit">'+T('hk.vrijaf','Vrijgave intrekken')+'</button>'
         : '<button class="abtn" data-vrij="'+r.id+'" data-op="aan">'+T('hk.geefvrij','Geef vrij voor vroege check-in')+'</button>';
       return '<div class="card kamer '+s2+'">'+
-        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(r.name)+'</b>'+chip+'</div>'+
-        (r.hk && r.hk.at ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.25rem;">'+timeAgo(r.hk.at)+(r.hk.by?' · '+esc(r.hk.by):'')+(r.hk.note?' · '+esc(r.hk.note):'')+'</div>' : '')+
-        (r.vroegVrij ? '<div style="font-size:0.74rem;color:#7BC79B;margin-top:0.25rem;">'+T('hk.vrijchip','vrij voor vroege check-in')+'</div>' : '')+
-        '<div class="row" style="flex-wrap:wrap;">'+acts+
+        '<div class="s-wdsbtk"><b class="s-2uj31e">'+esc(r.name)+'</b>'+chip+'</div>'+
+        (r.hk && r.hk.at ? '<div class="s-uzra94">'+timeAgo(r.hk.at)+(r.hk.by?' · '+esc(r.hk.by):'')+(r.hk.note?' · '+esc(r.hk.note):'')+'</div>' : '')+
+        (r.vroegVrij ? '<div class="s-lukdsj">'+T('hk.vrijchip','vrij voor vroege check-in')+'</div>' : '')+
+        '<div class="row s-q9vs12">'+acts+
           (s2 !== 'vuil' && s2 !== 'defect' ? '<button class="abtn ghost" data-khk="'+r.id+'" data-st="vuil">'+T('hk.checkout','Check-out (vuil)')+'</button>' : '')+
           (s2 !== 'defect' ? '<button class="abtn warn" data-defect="'+r.id+'">'+T('hk.defectmeld','Defect')+'</button>' : '')+
           '<button class="abtn ghost" data-mb="'+r.id+'">'+T('hk.minibar','Minibar')+'</button></div>'+

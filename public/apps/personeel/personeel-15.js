@@ -61,8 +61,8 @@
       return '<div class="task"><div class="t">'+
         '<b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.etaMin?' · '+o.etaMin+' min':'')+'</b>'+
         '<span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+(m!=null?' · '+(m<1000?m+' m':(m/1000).toFixed(1)+' km'):'')+'</span>'+
-        '<span style="color:var(--soft);">'+keten+'</span>'+
-        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
+        '<span class="s-1pv2lmv">'+keten+'</span>'+
+        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" class="s-19wudhq">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
     };
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.bz.gps','Live GPS')+'</div>'+
@@ -71,12 +71,12 @@
       '<button class="abtn" id="pdGps">'+(gpsWatch!=null?T('pd.bz.stop','Stop'):T('pd.bz.start','Start'))+'</button></div></div>'+
       '<div class="card"><div class="k">'+T('pd.bz.inpak','Inpakken: afvinken per tas en bonnummer')+'</div>'+
       (inpakLijst.length ? inpakLijst.map(o =>
-        '<div class="task" style="flex-direction:column;align-items:stretch;gap:0.25rem;" data-inpak="'+o.ref+'">'+
+        '<div class="task s-3metpj" data-inpak="'+o.ref+'">'+
         '<b>'+esc(o.customerCodename)+' · '+T('pd.bz.bonnr','bon')+' '+o.ref+'</b>'+
-        o.items.map(i=>'<label style="display:block;font-size:0.82rem;cursor:pointer;"><input type="checkbox" class="ipItem" value="'+esc(i.id)+'" style="accent-color:var(--gold);margin-right:0.25rem;">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
-        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
-        '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:0;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
-        '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:0;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        o.items.map(i=>'<label class="s-1sdkgj"><input type="checkbox" class="ipItem s-1lojj1l" value="'+esc(i.id)+'">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
+        '<div class="s-1fa4ugf">'+
+        '<input class="ipTas s-1s9bfan" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'">'+
+        '<input class="ipBon s-w4zssu" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'">'+
         '<button class="abtn ipKlaar">'+T('pd.bz.ingepakt','Alles zit erin')+'</button></div></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geeninpak','Niets om in te pakken; nieuwe bestellingen verschijnen hier.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.mijn','Mijn rit')+' ('+mijn.length+')</div>'+
@@ -88,11 +88,11 @@
         (tePakken.length ? '<button class="abtn h-mt50" id="pdPakcheck">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
         (teVertrekken.length ? '<button class="abtn h-mt50" id="pdVertrek">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
         (rt && rt.stops ? '<div style="margin-top:0.55rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
-          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
+          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" class="s-19wudhq">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.vrij','Klaar om mee te nemen')+' ('+vrij.length+')</div>'+
       (vrij.length ? vrij.map(o =>
-        '<label class="task" style="cursor:pointer;"><input type="checkbox" class="pdbzkies" value="'+o.ref+'" style="margin-right:0.5rem;accent-color:var(--gold);">'+
+        '<label class="task s-3vd53t"><input type="checkbox" class="pdbzkies s-xvplk9" value="'+o.ref+'">'+
         '<div class="t"><b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.inpak?' · ✓ '+T('pd.bz.tasje','tas')+' '+esc(o.inpak.tas):'')+'</b><span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+'</span></div></label>'
       ).join('') + '<button class="abtn h-mt60" id="pdNeem">'+T('pd.bz.neem','Neem geselecteerde ritten (op uw naam)')+'</button>'
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenvrij','Niets klaar om mee te nemen. Nieuwe leveringen verschijnen hier live.')+'</div>')+'</div>'+

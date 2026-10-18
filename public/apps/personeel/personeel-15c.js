@@ -27,8 +27,8 @@
     /* Dezelfde bouwstenen als de rest van de PDA: .card met een .k-kopje,
        .mbrow voor een regel met een knop rechts, .abtn voor de knop zelf.
        Eigen klassen zouden hier als kale blokjes uitkomen. */
-    const meta = s => '<div style="font-size:0.72rem;color:var(--soft);line-height:1.45;">' + s + '</div>';
-    const leeg = s => '<div style="font-size:0.78rem;color:var(--soft);padding:0.5rem 0;">' + s + '</div>';
+    const meta = s => '<div class="s-k46qn5">' + s + '</div>';
+    const leeg = s => '<div class="s-g2g217">' + s + '</div>';
     let h = '';
 
     h += '<div class="card"><div class="k">' + T('pd.wv.open','Van het andere scherm') + ' (' + open.length + ')</div>' +
@@ -73,11 +73,11 @@
   function tekenvlakOpen(id, titel){
     wvPdaTekent = id; wvPdaPaden = [];
     $('#wvVak').innerHTML = '<div class="h-mt60"><b>' + esc(titel) + '</b>' +
-      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:0;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
+      '<canvas id="wvCanvas" width="600" height="200" class="s-1enndc5"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
       '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
-      '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;line-height:1.45;">' +
+      '<div class="s-5e1d4l">' +
       T('pd.wv.tekenuit','Uw naam komt automatisch bij de handtekening te staan; het bureau ziet hem meteen.') + '</div></div>';
     const cv = $('#wvCanvas'), ctx = cv.getContext('2d');
     ctx.strokeStyle = '#e8e4dc'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
@@ -119,9 +119,9 @@
     document.querySelectorAll('[data-wvcode]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/werkvloer/koppel/code', { id: b.dataset.wvcode });
-        $('#wvVak').innerHTML = '<div style="margin-top:0.5rem;text-align:center;">' +
-          '<div style="font-size:0.8rem;color:var(--muted);">' + esc(d.tonen) + '</div>' +
-          '<div id="wvQr" style="display:flex;justify-content:center;margin:0.5rem 0;"></div>' +
+        $('#wvVak').innerHTML = '<div class="s-1i7reuu">' +
+          '<div class="s-9yedti">' + esc(d.tonen) + '</div>' +
+          '<div id="wvQr" class="s-1653dtt"></div>' +
           '<b>' + eur(d.bedrag) + '</b></div>';
         /* De RTG-code als beeld: dezelfde tekenaar als de kassa gebruikt.
            Staat die niet klaar, dan tonen we de code als tekst -- de klant
@@ -140,9 +140,9 @@
         const d = await API.call('/werkvloer/bedieningskaart', { id: b.dataset.wvt });
         $('#wvTafelVak').innerHTML = '<div class="h-mt60"><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(d.tafel) + '</b>' +
           d.stoelen.map(s => '<div class="mbrow"><div>' + esc(s.naam) +
-            '<div style="font-size:0.72rem;line-height:1.45;color:' + (s.let_op ? 'var(--gold)' : 'var(--soft)') + ';">' +
+            '<div class="' + (s.let_op ? 's-ytigw3' : 's-z03vy1') + '">' +
             esc(s.regel) + '</div></div></div>').join('') +
-          '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;line-height:1.45;">' +
+          '<div class="s-5e1d4l">' +
           T('pd.wv.tafeluit','Vul aan tafel aan wat de gast vertelt; de keuken ziet het meteen opgeteld.') + '</div></div>';
       } catch(e){ toast(e.message); }
     }));

@@ -251,7 +251,7 @@ test('bron: waar een kloktijd ontstaat of een werksessie wordt gemunt, draagt el
     'stelde het werkvenster bij': 'een instelling van de manager, geen moment waarop iemand binnenkwam'
   };
   const WORTEL = path.join(__dirname, '..');
-  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=\s*lijst\.slice|bak\('mobDiensten'\)\.push/;
+  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=[^=]|bak\('mobDiensten'\)\.push/;
   const MUNT = (t) => /rememberSession\(/.test(t) && /role: 'supplier'/.test(t);
   const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
   const alle = [];

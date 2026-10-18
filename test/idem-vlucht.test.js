@@ -27,9 +27,15 @@ test('2. de afronder werkt een keer: een latere close overschrijft de uitkomst n
   rond(null);
   assert.deepEqual(await belofte, { status: 200, lijf: 'eerste' });
   /* en een nieuwe vlucht onder dezelfde sleutel is weer een eigen vlucht */
-  const rond2 = v.open('b', null);
+  const rond2 = v.open('b', 'tweede');
   assert.notEqual(v.bezig('b').belofte, belofte);
+  /* Een late afronder van de EERSTE vlucht (een close die na het antwoord komt)
+     mag de tweede niet uit de lijst halen: dan liep een gelijktijdige dubbeltik
+     weer naast het werk in plaats van erop te wachten. */
+  rond(null);
+  assert.equal(v.bezig('b') && v.bezig('b').afdruk, 'tweede');
   rond2(null);
+  assert.equal(v.bezig('b'), undefined);
 });
 
 test('3. vluchten onder verschillende sleutels lopen los van elkaar', async () => {

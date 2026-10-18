@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T13:59:30.375Z",
-    "commit": "78ed42b59",
+    "op": "2026-10-18T14:15:53.750Z",
+    "commit": "5e756c4f6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7110,11 +7110,8 @@
     },
     "idem-vlucht.test.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
-      "modules": [
-        "server/lib/idem-vlucht.js"
-      ],
-      "posities": 1
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "Map plus belofte plus eenmaal-grens, geen operator van de motor (0 pogingen); handmutatie zonder eenmaal-grens laat toets 2 zakken, zonder inVlucht.delete toets 1 en 3"
     },
     "idembundel.test.js": {
       "soort": "puur",

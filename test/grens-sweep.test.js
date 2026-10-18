@@ -73,6 +73,11 @@ async function nieuwLid(naam, mailLokaal, n) {
    van de sweep over een verbinding die al dicht was: "other side closed" op twee
    routes die zelf niets fout deden. */
 let ongedekt = null;
+/* De hele /api-kaart en de dekkingsvraag zelf, naast de lijst. Daarmee bewaken
+   toets 1 en 5 dat de sweep niet stil leegloopt, zonder te eisen dat er veel
+   ONGETEST blijft (zie toets 1). */
+let alleApi = null;
+let isGedekt = null;
 test.before(async () => {
   ongedekt = ongedekteRoutes();
   /* RTG_ROUTELOG uit voor DEZE server, ook als de suite met het routejournaal
@@ -142,10 +147,13 @@ function ongedekteRoutes() {
   };
   const gezien = new Set();
   const uit = [];
+  alleApi = [];
+  isGedekt = gedekt;
   for (const r of routekaart()) {
     const pad = r.pad || r.path;
     if (!pad || !pad.startsWith('/api/') || gezien.has(pad)) continue;
     gezien.add(pad);
+    alleApi.push(pad);
     if (gedekt(pad)) continue;
     /* Deze twee zetten de server bewust stil of gooien alles weg -- daar heeft
        een sweep niets te zoeken, en de eigen tests dekken ze. */
@@ -184,7 +192,18 @@ test('1. geen enkel endpoint valt om (geen 500) op een ingelogd verzoek', async 
      onderscheid al -- de storingswachter telt zo'n 503 bewust niet mee. Zonder
      de functienaam blijft een 503 gewoon een omgevallen endpoint. */
   const r = await eenmaligSweepen();
-  assert.ok(r.length > 200, 'de sweep heeft daadwerkelijk een grote lijst gelopen (' + r.length + ')');
+  /* DAT DE SWEEP NIET STIL LEEGLOOPT, en niet dat er veel ongetest blijft.
+     Hier stond `r.length > 200`. Dat was waar toen de sweep over 1016
+     ongeteste endpoints begon (c635b4471), maar het getal daalt met elke route
+     die een eigen toets krijgt -- en dat is precies het doel van dit huis. Op
+     18 oktober 2026 stond hij op 119, en zakte deze toets omdat er te VEEL was
+     getoetst. De twee manieren waarop de sweep wel stil leeg kan lopen, staan
+     hieronder los: de routekaart wordt niet gelezen, of de dekkingsvraag zegt
+     overal ja. En de sweep loopt de lijst helemaal, niet een deel ervan. */
+  assert.ok(alleApi.length > 1000, 'de routekaart is echt gelezen (' + alleApi.length + ' /api-routes)');
+  assert.equal(isGedekt('/api/grens-sweep-bestaat-niet/' + Date.now()), false,
+    'de dekkingsvraag zegt niet overal ja, dus een ongetoetste route komt wel op de lijst');
+  assert.equal(r.length, ongedekt.length, 'de sweep heeft de hele lijst gelopen (' + r.length + ')');
   const bewustDicht = x => x.status === 503 && /"functie"\s*:/.test(x.tekst || '');
   const omgevallen = r.filter(x => (x.status >= 500 || x.status === 0) && !bewustDicht(x))
     .map(x => x.pad + ' -> ' + x.status + ' ' + x.tekst.slice(0, 120));
@@ -225,10 +244,19 @@ test('5. de sweep raakt echt de domeinen waar de gaten zaten', async () => {
   /* Zonder deze controle zou de sweep stilletjes leeg kunnen lopen (bijvoorbeeld
      omdat de routekaart niet meer gelezen wordt) en zouden de tests hierboven
      groen staan zonder iets te hebben gedaan. */
+  /* Per domein: de kaart KENT het domein (anders is er niets om te sweepen en
+     ook niets om te dekken), en elke route ervan die nog geen eigen toets heeft,
+     is in de sweep geraakt. Hier stond ">= 20 in de sweep" per domein; dat
+     daalt met elke nieuwe toets en stond op 18 oktober 2026 voor foundation op
+     0 en voor member op 19 -- het zakte omdat de gaten dicht gingen. */
   const r = await eenmaligSweepen();
-  const per = {};
-  for (const x of r) { const d = x.pad.split('/')[2]; per[d] = (per[d] || 0) + 1; }
-  for (const domein of ['member', 'foundation', 'supplier', 'rtf', 'office'])
-    assert.ok((per[domein] || 0) >= 20,
-      'te weinig endpoints van "' + domein + '" in de sweep (' + (per[domein] || 0) + ')');
+  const domeinVan = (pad) => pad.split('/')[2];
+  const geraakt = new Set(r.map(x => x.pad));
+  for (const domein of ['member', 'foundation', 'supplier', 'rtf', 'office']) {
+    const inKaart = alleApi.filter(p => domeinVan(p) === domein);
+    assert.ok(inKaart.length >= 20,
+      'de routekaart kent te weinig endpoints van "' + domein + '" (' + inKaart.length + ')');
+    const gemist = ongedekt.filter(x => domeinVan(x.pad) === domein && !geraakt.has(x.pad)).map(x => x.pad);
+    assert.deepEqual(gemist, [], 'deze ongetoetste endpoints van "' + domein + '" zijn niet in de sweep geraakt');
+  }
 });

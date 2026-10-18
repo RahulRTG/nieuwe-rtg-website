@@ -1349,6 +1349,15 @@ const GEEN_BRONMUTATIE = new Map([
      toets 1 zakken, en de oorspronkelijke kapotte auditproef (dubbele
      declaratie van `stempel`) laat toets 2 zakken. Beide daarna teruggezet. */
   ['meetronde.test.js', 'regex plus ||, geen operator van de motor (0 pogingen); handmutatie || -> && laat toets 1 zakken, en de kapotte auditproef laat toets 2 zakken'],
+  /* De vluchten van de idem-poort (server/lib/idem-vlucht.js) bestaan uit een
+     Map, een belofte en een eenmaal-grens; geen operator van de motor past (0
+     pogingen, 18 oktober 2026). Met de hand gemeten en daarna teruggezet: de
+     eenmaal-grens `if (afgerond) return;` weg laat toets 2 zakken (een late
+     afronder wiste de nieuwe vlucht onder dezelfde sleutel), en
+     `inVlucht.delete(id)` weg laat toets 1 en 3 zakken. Eigenaarsbesluit van
+     18 oktober 2026: een uitzondering met reden, geen code herschreven voor de
+     meter. */
+  ['idem-vlucht.test.js', 'Map plus belofte plus eenmaal-grens, geen operator van de motor (0 pogingen); handmutatie zonder eenmaal-grens laat toets 2 zakken, zonder inVlucht.delete toets 1 en 3'],
   /* Deze broncontracten lezen HTML/tekst via fs. TALEN is alleen hun noemer;
      diens migratieversie muteren raakt de tekstbewering niet. Op 20-09-2026
      afzonderlijk gemeten: AI in de paginatitel respectievelijk een ontbrekende

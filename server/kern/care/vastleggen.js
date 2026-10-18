@@ -18,10 +18,11 @@
    en zijn naam erbij. Precies zoals bij een ingetrokken toestel. */
 
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, vandaag, lijsten, aanbiederVan, notify,
+  const { save, crypto, nu, vandaag, lijsten, aanbiederVan, notify,
     aanbiedersVanSupplier, metingVanBehandelaar } = ctx;
 
-  const bak = () => { if (!Array.isArray(db.data.careVastlegging)) db.data.careVastlegging = []; return db.data.careVastlegging; };
+  const C = ctx.opslag || require('./opslag')(ctx); // ./opslag.js, gebouwd in ../care.js
+  const bak = () => C.bak('careVastlegging');
 
   const vastleggingActief = (key, aanbiederId) =>
     bak().find(v => v.key === key && v.aanbiederId === aanbiederId && v.status === 'actief');
@@ -61,7 +62,7 @@ module.exports = (ctx) => {
     lijsten();
     const ids = aanbiedersVanSupplier(supplierCode).map(a => a.id);
     if (!ids.length) return { status: 409, error: 'Dit account is geen zorgaanbieder.' };
-    const bk = db.data.careBoekingen.find(x => x.ref === String(body.ref || '') && ids.includes(x.aanbiederId));
+    const bk = C.bak('careBoekingen').find(x => x.ref === String(body.ref || '') && ids.includes(x.aanbiederId));
     if (!bk) return { status: 404, error: 'Afspraak niet gevonden.' };
 
     const toestemming = vastleggingActief(bk.key, bk.aanbiederId);

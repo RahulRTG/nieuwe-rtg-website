@@ -174,12 +174,14 @@ async function maakWereld(naam, eigenEnv) {
 
 /* Een vers lid langs de echte registratie, met een eigen account (de
    sessiepagina en de postpagina eisen dat; een demo-persona heeft er geen). */
-async function nieuwLid(w, merk) {
+/* `tier`: standaard een RTG Pass; 'guest' is het gratis account (SAMENLEVING.md
+   par. 11.4), waarvoor sommige deuren pas na een paspoortcontrole opengaan. */
+async function nieuwLid(w, merk, tier) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const email = (merk || 'vp') + u + '@voorbeeld.nl';
   const wachtwoord = 'geheim12345';
   const r = await w.post('/api/auth/register', { name: 'Voltooilid', email, phone: '06' + u.slice(0, 8),
-    password: wachtwoord, geboortedatum: '1985-05-05', tier: 'rtg' });
+    password: wachtwoord, geboortedatum: '1985-05-05', tier: tier || 'rtg' });
   if (r.status !== 200 || !r.data || !r.data.token) throw new Error('registratie lukte niet (' + r.status + ')');
   return { token: r.data.token, email, wachtwoord };
 }
@@ -232,4 +234,51 @@ async function lifestyleLid(w, merk) {
   return lid;
 }
 
-module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, KANTOORWERELD };
+/* Een lid wiens identiteit RTG heeft gezien (niveau A3), langs de enige weg:
+   het lid stuurt een beeld in, een medewerker op naam keurt goed en neemt de
+   geboortedatum van het document over (routes/office/verificaties.js). Het
+   beeld is een pixel; de schakels van die keuring zelf staan in het scenario
+   van Identiteit aantonen (./voltooi/verificatie.js). Gooit met de stap erbij
+   als het niet lukt. */
+const PIXEL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+async function geverifieerdLid(w, merk, tier) {
+  const lid = await nieuwLid(w, merk, tier);
+  const u = await w.post('/api/verify/upload', { image: PIXEL }, lid.token);
+  if (u.status !== 200) throw new Error('het identiteitsbewijs insturen lukte niet (' + u.status + ')');
+  const K = await eigenaarSessie(w);
+  const rij = ((await w.post('/api/office/verifications', {}, K)).data || {}).pending || [];
+  const mijn = rij.find((x) => x.email === lid.email);
+  if (!mijn) throw new Error('het lid staat niet in de verificatiewachtrij van het kantoor');
+  const b = await w.post('/api/office/verify', { userId: mijn.userId || mijn.id, decision: 'approve', geboortedatum: '1985-05-05' }, K);
+  if (b.status !== 200) throw new Error('het kantoor kon de identiteit niet goedkeuren (' + b.status + ')');
+  lid.token = await inloggen(w, lid);
+  lid.userId = mijn.userId || mijn.id;
+  return lid;
+}
+
+/* EEN GEBONDEN TOESTEL. Zware handelingen (een machtiging geven, een toestel op
+   afstand sluiten) vragen een bezitsbewijs: het toestel tekent elk verzoek met
+   een niet-exporteerbare P-256-sleutel, zoals de browser dat doet
+   (kern/identiteit/bezitsbewijs.js). Dit bindt zo'n sleutel aan de sessie langs
+   de routes van "Waar ben ik aanwezig" en geeft `bewijs(methode, pad)` terug:
+   de kopregel voor een getekend verzoek. Hetzelfde recept als in
+   ./voltooi/sessies.js, waar het binden zelf als schakel wordt gemeten. */
+async function gebondenToestel(w, tok) {
+  const { webcrypto, randomBytes } = require('crypto');
+  const kp = await webcrypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
+  const jwk = await webcrypto.subtle.exportKey('jwk', kp.publicKey);
+  const teken = async (t) => Buffer.from(await webcrypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' },
+    kp.privateKey, Buffer.from(t, 'utf8'))).toString('base64url');
+  const u = await w.post('/api/mijn/toestel/uitdaging', {}, tok);
+  if (!u.data || !u.data.nonce) throw new Error('geen uitdaging voor het toestel (' + u.status + ')');
+  const b = await w.post('/api/mijn/toestel/bind', { jwk, handtekening: await teken(u.data.nonce), naam: 'Voltooitoestel' }, tok);
+  if (b.status !== 200) throw new Error('het toestel binden lukte niet (' + b.status + ')');
+  const bewijs = async (methode, pad) => {
+    const kop = Buffer.from(JSON.stringify({ methode, pad, tijd: Date.now(),
+      jti: 'v' + randomBytes(12).toString('base64url').replace(/[^A-Za-z0-9_-]/g, 'x') })).toString('base64url');
+    return { 'rtg-bezitsbewijs': kop + '.' + await teken(kop) };
+  };
+  return { bewijs };
+}
+
+module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, KANTOORWERELD };

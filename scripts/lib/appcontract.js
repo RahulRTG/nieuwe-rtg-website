@@ -95,6 +95,20 @@ const CONTRACT = {
   'link:post': Object.assign({
     belofte: 'een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar'
   }, voltooi('post', 'het scenario loopt /api/mijn/post, /zet, /alles-uit en /geschiedenis, de routes die /apps/mijn-post.html zelf aanroept')),
+  /* Instellingen: wie ik ben, wat RTG van mij denkt te weten, wie bij mij mag,
+     en mijn identiteit (18 oktober 2026). */
+  'link:verificatie': Object.assign({
+    belofte: 'een lid stuurt zijn identiteitsbewijs en een selfie in, een medewerker op naam beslist, het lid ziet de uitkomst en krijgt bericht, en een afwijzing wist het bewijs'
+  }, voltooi('verificatie', 'het scenario loopt /api/verify/upload, /selfie en /status, de routes die /apps/verificatie.html zelf aanroept, met het besluit langs /api/office/verify')),
+  'link:neigingen': Object.assign({
+    belofte: 'een lid vertelt RTG wat hij graag doet, ziet op een geheugenkaart wat RTG van hem denkt te weten, en haalt het weg of verbiedt het gebruik'
+  }, voltooi('neigingen', 'het scenario loopt /api/neiging/intake, /antwoord, /geheugen, /vergeet, /niet-voor, /overslaan en /opnieuw, de routes die /apps/mijn-neigingen.html zelf aanroept')),
+  'link:relaties': Object.assign({
+    belofte: 'een lid ziet per partij wie wat van hem mag, bekijkt vooraf wat sluiten doet, en zet het bij de bron stop -- en de andere partij merkt het'
+  }, voltooi('relaties', 'het scenario loopt /api/toestemming, /relaties, /relatie/gevolgen, /relatie/sluit en /intrek, de routes die /apps/mijn-relaties.html zelf aanroept, met een tweede lid dat de machtiging ontvangt')),
+  'link:ik': Object.assign({
+    belofte: 'een lid zegt hoe hij genoemd wil worden, welke toon Rahul aanslaat en hoe elk scherm zich gedraagt, binnen de grens van zijn leeftijd'
+  }, voltooi('ik', 'het scenario loopt /api/ik, /api/ik/zet en /api/ik/toegankelijk/zet, de routes die /apps/ik.html zelf aanroept')),
   /* De apps van de Lifestyle Pass (18 oktober 2026). Elk scenario loopt met een
      lid dat zijn pas kreeg langs het menselijke besluit van het kantoor; het
      scenario van Reisboek loopt dat besluit zelf als schakels. */

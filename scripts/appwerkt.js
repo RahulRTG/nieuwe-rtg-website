@@ -460,7 +460,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
      beoordelen of een foutmelding bruikbaar was. */
   r.bewijzen.menselijk = stuk.length || eersteBezoek.crash.length
     ? { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'een kale JS-fout of 500 bereikt de gebruiker: ' + (eersteBezoek.crash[0] || stuk[0]), bewijs: null }
-    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7', bewijs: null };
+    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7, en die levert de voltooiproef (VOLTOOIPROEF.json) voor een onderdeel met een scenario', bewijs: null };
 
   vulOngemeten(r);
   return r;

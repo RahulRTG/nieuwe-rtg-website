@@ -51,13 +51,27 @@ async function maakWereld(naam, eigenEnv) {
   let srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
   const herstarts = { netjes: 0, crash: 0 };
 
+  /* ELK ANTWOORD DAT HET LID KREEG, voor bewijs 8 (menselijk). De scenario's
+     schrijven hun eigen schakels voor voltooibaar, persistent en herstelbaar;
+     wat de gebruiker intussen te zien kreeg -- ook tijdens de dubbeltik, het
+     afgebroken verzoek en na de crash -- leidt scripts/voltooiproef.js hieruit
+     af. Alleen de soort en de melding, nooit de inhoud van het antwoord. */
+  const antwoorden = [];
+  function noteer(pad, status, data) {
+    const weigering = status >= 400 && status < 500;
+    const melding = data && typeof data.error === 'string' ? data.error : null;
+    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null });
+  }
+
   /* `koppen`: extra kopregels, zoals het bezitsbewijs van een gebonden toestel. */
   async function post(pad, lijf, tok, koppen) {
     const h = Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, koppen || {});
     let r;
     try { r = await fetch(srv.basis + pad, { method: 'POST', headers: h, body: JSON.stringify(lijf || {}) }); }
-    catch (e) { return { status: 0, data: null, fout: String(e && e.message || e) }; }
-    return { status: r.status, data: await r.json().catch(() => null) };
+    catch (e) { noteer(pad, 0, null); return { status: 0, data: null, fout: String(e && e.message || e) }; }
+    const data = await r.json().catch(() => null);
+    noteer(pad, r.status, data);
+    return { status: r.status, data };
   }
 
   /* Een verzoek dat de client halverwege opgeeft. Het lijf is verstuurd; het
@@ -168,6 +182,7 @@ async function maakWereld(naam, eigenEnv) {
   process.on('exit', klaar);
 
   return { post, dubbel, afgebroken, herstart, crash, opslag, collectie, vindInOpslag, klaar, datamap, herstarts,
+    antwoorden: () => antwoorden.slice(),
     berichten: () => postvanger.berichten(datamap),
     get basis() { return srv.basis; } };
 }

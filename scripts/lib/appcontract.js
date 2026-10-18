@@ -73,8 +73,17 @@ const BRONSOORTEN = {
      uitkomst daarna in een nieuwe sessie EN in de opslag buiten de server om
      (persistent), en laat het proces sterven direct na een bevestiging, herhaalt
      en breekt verzoeken af (herstelbaar). Hij leest geen scherm en kruist geen
-     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet. */
-  voltooiproef: ['voltooibaar', 'persistent', 'herstelbaar']
+     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet.
+     MENSELIJK (18 oktober 2026) levert hij als vierde, en alleen de helft die
+     scripts/appwerkt.js niet kon: dat scherm ziet of een kale fout de
+     gebruiker bereikt bij de bediening, en zei zelf dat de bruikbaarheid van
+     een melding "de storingen uit bewijs 7" vraagt. De voltooiproef leidt het
+     af uit alle antwoorden onder die storingen (geen kale 5xx, geen leeg
+     antwoord, elke weigering met een melding in woorden); een scenario kan het
+     niet zelf schrijven, en zonder uitgelokte weigering is het niet beproefd.
+     Een kale fout die APPWERKT zelf op het scherm zag, blijft staan: de
+     bewijsbron vervangt een GEBLOKKEERD_DOOR_DEFECT van het scherm nooit. */
+  voltooiproef: ['voltooibaar', 'persistent', 'herstelbaar', 'menselijk']
 };
 
 /* Een onderdeel met een scenario in scripts/lib/voltooi/ krijgt zijn drie
@@ -83,7 +92,7 @@ const BRONSOORTEN = {
    gedeelde instrument noemt de routes van geen enkel scherm. */
 function voltooi(scenario, waarom) {
   const bron = { soort: 'voltooiproef', register: 'VOLTOOIPROEF.json', instrument: 'scripts/lib/voltooi/' + scenario + '.js', waarom };
-  return { voltooibaar: bron, persistent: bron, herstelbaar: bron };
+  return { voltooibaar: bron, persistent: bron, herstelbaar: bron, menselijk: bron };
 }
 
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
@@ -125,6 +134,9 @@ const CONTRACT = {
   'link:commerce': Object.assign({
     belofte: 'een lid legt koopbare dingen in een mand, ziet per verkoper een afrekening met btw en wat bevestigen blokkeert, en geeft zijn keuze als briefje door aan de deur die wel bevestigt'
   }, voltooi('commerce', 'het scenario loopt /api/commerce/aanbod, /mand, /mand/zet, /mand/leeg en /overdracht/maak, de routes die /apps/commerce.html zelf aanroept, met een ander lid dat het briefje niet mag lezen')),
+  'link:vandaag': Object.assign({
+    belofte: 'een lid houdt zijn dag bij: een gewoonte afvinken en weer uitzetten, een meting met herkomst, een dagcheck-in, en een noodkaart die alleen hij zelf toont'
+  }, voltooi('vandaag', 'het scenario loopt /api/life, /api/gewoonten (maak, tik, reeks, stop), /api/metingen (zet, weg), /api/gemoed (zet, weg) en /api/noodkaart (zet, weg), de routes die /apps/life.html zelf aanroept')),
   'link:wonen': Object.assign({
     belofte: 'een lid meldt wat er thuis stuk is zonder dat RTG een vakman veinst, en houdt zijn woningdocumenten bij in een eigen dossier in de kluis'
   }, voltooi('wonen', 'het scenario loopt /api/home/onderhoud, /meld, /annuleer, /api/bestanden/map, /upload en /mijn, de routes die /apps/wonen.html zelf aanroept')),

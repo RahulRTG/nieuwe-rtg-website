@@ -363,7 +363,7 @@ test('bearercode v2: contracthash op de bon, een verlengd einde opent niets, v1 
 
   const koop2 = await w.tegoed.tegoedKoop({ codenaam: 'Koper', centen: 1000, idem: 'v2b' });
   const v1 = w.data.payTegoedBon[koop2.tegoed.id].toegang;
-  for (const veld of ['contractversie', 'contracthash', 'afgeleid', 'gebruiksvorm', 'stapOp', 'bron_toegang', 'geschiedenis']) delete v1[veld];
+  for (const veld of ['contractversie', 'contracthash', 'contractkid', 'afgeleid', 'gebruiksvorm', 'stapOp', 'bron_toegang', 'geschiedenis']) delete v1[veld];
   const rot = await w.tegoed.tegoedRoteer({ codenaam: 'Koper', tegoedId: koop2.tegoed.id, idem: 'v2r' });
   assert.equal(rot.ok, true, JSON.stringify(rot));
   const nieuw = w.data.payTegoedBon[koop2.tegoed.id].toegang;

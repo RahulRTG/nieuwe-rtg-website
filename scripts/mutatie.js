@@ -572,7 +572,20 @@ const EIGEN_MODULE = new Map([
   // voor wachtOpWaarde; ze starten geen server en lezen niets van /api/.
   ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],
   ['journaalbestand-weerbaar.test.js', ['server/kern/journaalbestand.js']],
+  // De dekkingsvang toetst het vangmechanisme van de toetsservers (stop() in
+  // dekkingsmodus), niet een API-antwoord: de liegpoort raakt hem dus niet.
+  ['dekkingsvang.test.js', ['test/lib/dekkingsvang.js', 'test/lib/dekkingsvang-kind.js']],
   ['wacht-weerbaar.test.js', ['server/kern/wacht/index.js', 'server/kern/wacht/raadkamer.js', 'server/kern/wacht/flood.js']],
+  // De SCIM-weerbaarheidstoetsen laden accounts alleen als onderlaag (init op
+  // een wegwerpmap); wat ze toetsen is de organisatiegrens, de uitdienst-outbox
+  // en de groepen. Een zakker op accounts/index.js zou "alleen op de opzet" zijn.
+  ['scim-orggrens-weerbaar.test.js', ['server/scim/index.js', 'server/scim/filter.js', 'server/scim/sleutels.js']],
+  ['scim-uitdienst-weerbaar.test.js', ['server/scim/user-sync.js']],
+  ['scim-groepen-weerbaar.test.js', ['server/scim/groepen.js', 'server/routes/scim-groepen.js']],
+  // De handtekeningtoets laadt de XML-lezer eerst (om zelf te ondertekenen);
+  // een mutatie in diens leeslus hangt de toets op ('te langzaam'). Wat hij
+  // toetst is de controle zelf.
+  ['saml-handtekening-weerbaar.test.js', ['server/sso/saml/handtekening.js']],
   // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.
@@ -871,6 +884,10 @@ const EIGEN_MODULE = new Map([
   ['samlxsw.test.js', ['server/sso/saml/antwoord.js', 'server/sso/saml/handtekening.js']],
   ['samlc14n.test.js', ['server/sso/saml/c14n.js', 'server/sso/saml/xml.js']],
   ['samlpoort.test.js', ['server/sso/saml/index.js']],
+  /* saml-signedinfo-prefix -> handtekening.js: de PrefixList van SignedInfo.
+     Zonder deze regel koos de motor xml.js, waar de eerste mutant de parser
+     laat vastlopen ('te langzaam') en dus niets over deze toets zegt. */
+  ['saml-signedinfo-prefix.test.js', ['server/sso/saml/handtekening.js']],
   /* DE MERKKERN als enige bron. Zes mutaties, zes raak -- maar niet allemaal
      tegen dezelfde toets, en dat is met opzet. merkkern.test.js kent de
      WAARDEREGELS en de STRUCTUUR (de drie consumenten lezen de definitie en

@@ -26,8 +26,15 @@ const vorm = require('./audit-vorm');
    rewrite werkt op een echte kopie, en na de commit wist naCommit() het
    voorlopige beeld. Wanneer er geen snapshot naast het basisbeeld staat (een
    append na een rewrite in dezelfde bundel, of een rij die niet als JSON kan),
-   loopt de oude volledige kopie zoals voorheen. */
-module.exports = ({ cache, projectie }) => {
+   loopt de oude volledige kopie zoals voorheen.
+
+   WAAROM DE BUNDEL HIER WOONT EN NIET IN audit-sqlite.js: de rijopslag kent
+   alleen gecommitte rijen (open, leesBinnen, pasToe). Het voorlopige beeld
+   binnen een doos -- auditOps, auditViews, auditBeelden, de snelle toevoeging
+   en de volledige kopie als terugval -- is een eigen begrip dat pas na de
+   commit (naCommit) met de opslag samenkomt. stage() staat daarom hier, naast
+   zijn snelle pad. */
+module.exports = ({ cache, projectie, view, publiceerResultaat }) => {
   function nrOpIndex(beeld, i) {
     for (const deel of beeld.delen) if (i < deel.einde) return deel.pagina.nummers[deel.begin + (i - deel.vanaf)];
     return null;
@@ -57,5 +64,35 @@ module.exports = ({ cache, projectie }) => {
     const waarde = vorm.pak(op.naam, projectie.lijst(beeldNieuw, spec.omgekeerd), totaalBasis + 1, vorm.extra(op.naam, basis));
     return { waarde, resultaat, beeld: beeldNieuw };
   }
-  return stageAppend;
+  function stage(doos, op) {
+    if (!doos.auditOps) { doos.auditOps = []; doos.auditViews = new Map(); doos.auditBeelden = new Map(); }
+    if (!doos.auditBeelden) doos.auditBeelden = new Map();
+    const basis = doos.auditViews.get(op.naam) || view(op.naam);
+    const licht = op.type === 'append' ? stageAppend(doos, op, basis) : null;
+    if (licht) {
+      publiceerResultaat(op.resultaat, licht.resultaat);
+      doos.auditOps.push(op); doos.auditViews.set(op.naam, vorm.alleenLezen(licht.waarde));
+      doos.auditBeelden.set(op.naam, licht.beeld);
+      return op.resultaat;
+    }
+    const waarde = op.type === 'append'
+      ? vorm.pak(op.naam, [...vorm.rijen(op.naam, basis)], vorm.totaal(op.naam, basis), vorm.extra(op.naam, basis))
+      : vorm.kopie(basis);
+    let resultaat;
+    if (op.type === 'append') {
+      const lijst = vorm.rijen(op.naam, waarde), spec = vorm.eis(op.naam);
+      const volgorde = spec.omgekeerd ? lijst : [...lijst].reverse();
+      const top = volgorde.find(r => !op.kopTest || op.kopTest(r));
+      resultaat = op.maak(top || null, vorm.totaal(op.naam, waarde));
+      if (spec.omgekeerd) { lijst.unshift(resultaat); lijst.splice(spec.max); }
+      else { lijst.push(resultaat); if (lijst.length > spec.max) lijst.splice(0, lijst.length - spec.max); waarde.commandJournaalTotaal = vorm.totaal(op.naam, basis) + 1; }
+    } else resultaat = op.werk(waarde);
+    if (resultaat && typeof resultaat.then === 'function') throw new Error('Auditbewerker moet synchroon zijn.');
+    publiceerResultaat(op.resultaat, resultaat);
+    doos.auditOps.push(op); doos.auditViews.set(op.naam, vorm.alleenLezen(waarde));
+    // een volledige kopie heeft geen snapshot naast zich: een volgende append in deze bundel kopieert ook
+    doos.auditBeelden.delete(op.naam);
+    return op.resultaat;
+  }
+  return stage;
 };

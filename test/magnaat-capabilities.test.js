@@ -112,6 +112,48 @@ test('de native broncodescan is byte-voor-byte gelijk en doorloopt schaduw en ca
   assert.equal(canary.motor.canaryGekozen, true);
 });
 
+/* De bronscanner volgt een mount en leest een half adres niet als heel adres.
+   Op een wegwerpboom, zodat de bewering over de VORM gaat en niet over wat er
+   vandaag toevallig in server/ staat; en door beide motoren, want de Rust-
+   tweeling moet dezelfde afleiding doen of de pariteit valt om. Mutatie (RAAK):
+   haal gemounteEndpoints() uit scanEndpoints -> de foundation-routes ontbreken;
+   haal wordtAangevuld() weg -> `POST /api/spel/` verschijnt. */
+test('de bronscanner volgt app.use-mounts door de requires en noemt geen half adres', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const boom = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bronscan-'));
+  const schrijf = (rel, tekst) => {
+    fs.mkdirSync(path.dirname(path.join(boom, rel)), { recursive: true });
+    fs.writeFileSync(path.join(boom, rel), tekst);
+  };
+  try {
+    schrijf('public/apps/a.html', '<title>A</title>');
+    schrijf('server/opzet/mount.js', "const rtf = require('../stichting');\napp.use('/api/stichting', rtf.router);\n");
+    schrijf('server/stichting.js', "const ctx = require('./stichting/basis')();\nrequire('./stichting/gezin')(ctx);\nrouter.get('/health', h);\n");
+    schrijf('server/stichting/basis.js', 'module.exports = () => ({ router });\n');
+    schrijf('server/stichting/gezin.js', "module.exports = ({ router }) => {\n  router.post('/gezin/maak', auth, h);\n  router.post('/gezin/' + naam, h);\n};\n");
+    schrijf('server/los.js', "router.post('/los', h);\n");
+    schrijf('server/spel.js', "for (const naam of n) app.post('/api/spel/' + naam, auth, h);\napp.get('/api/spel/stand', h);\n");
+
+    const js = bronnen.scan(boom, { RTG_CAPABILITY_RUST_MODE: 'uit' });
+    const sleutels = js.endpoints.map(e => e.sleutel);
+    const gezin = js.endpoints.find(e => e.sleutel === 'POST /api/stichting/gezin/maak');
+    assert.ok(gezin, 'een relatieve route op de gemounte router krijgt het voorvoegsel van de mount: ' + sleutels.join(', '));
+    assert.equal(gezin.bestand, 'server/stichting/gezin.js');
+    assert.equal(gezin.toegang, 'member');
+    assert.ok(sleutels.includes('GET /api/stichting/health'), 'ook in de gemounte module zelf');
+    assert.ok(sleutels.includes('GET /api/spel/stand'), 'een volledig adres blijft gezien');
+    assert.equal(sleutels.includes('POST /api/spel/'), false, 'een string die met + wordt aangevuld is geen route');
+    assert.equal(sleutels.some(s => s.includes('/los')), false, 'een router die nergens gemount is krijgt geen verzonnen voorvoegsel');
+    assert.equal(sleutels.some(s => s.startsWith('POST /api/stichting/gezin/') && s !== 'POST /api/stichting/gezin/maak'), false);
+
+    const schaduw = bronnen.scan(boom, { RTG_CAPABILITY_RUST_MODE: 'schaduw', RTG_CAPABILITY_RUST_BIN: nativeBin });
+    assert.equal(schaduw.motor.pariteit, true, 'de Rust-tweeling doet dezelfde afleiding');
+  } finally {
+    fs.rmSync(boom, { recursive: true, force: true });
+  }
+});
+
 test('capability-noodstop en een kapotte binary vallen aantoonbaar terug naar JavaScript', () => {
   const nood = bronnen.scan(root, {
     RTG_RUST_ALLES_UIT: '1', RTG_CAPABILITY_RUST_MODE: 'motor',
@@ -208,6 +250,25 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    in server/school/bellen.js, als router.post('/school/belkanaal/ticket') op dezelfde
    /api/foundation-router -- weer de bekende vorm. Vastgesteld door de lijst gemiste routes op
    bd424df3d (593) naast die op deze tak (594) te leggen: dit is het enige verschil. */
+/* EN VAN 596 NAAR 237 GEMIST EN VAN 4 NAAR 0 SPOOK OP 18 OKTOBER 2026 -- op opdracht
+   van de eigenaar ("repareer het lezen, niet de telling") en in BEIDE motoren, zodat
+   de pariteit met de Rust-tweeling blijft staan; daarmee is het besluit hierboven
+   genomen. De scanner volgt nu een `app.use('/api/x', naam.router)` naar de module
+   die `naam` via require bindt en door alles wat die relatief laadt (de hele
+   foundation-familie, 359 routes), en leest een string die met `+` wordt aangevuld
+   niet meer als heel adres (de vier spoken: drie lussen en twee kopcommentaren).
+   De wegwerpboomtoets hieronder bewijst beide kanten. Wat er nog mist is GEEN
+   mount maar een adres dat pas bij het draaien ontstaat, in vijf vormen:
+     - een lus over een object: '/api/member/spel/' + naam en '/api/rtf/spel/' + naam
+       over Object.entries(ACTIES) in server/routes/spellen.js (86);
+     - een lus over een lijst met paden: p.pad + '/x' in server/routes/rtmail-*.js (76);
+     - een voorvoegselfabriek: maak('/api/supplier/golf', ...)('/tee', ...) in
+       server/routes/clubs.js en zusters (supplier, 48);
+     - een voorvoegsel als parameter: prefix + '/papieren' in server/routes/papieren-deur.js,
+       aangeroepen met prefix '/api/office' en '/api/techniek' (12);
+     - de SCIM-router (15).
+   Elk daarvan vraagt een stukje evaluatie in plaats van lezen; dat is een volgende stap,
+   en in beide motoren. */
 /* DE TWEE GETALLEN STAAN SINDS 6 OKTOBER 2026 IN NORM.json (meters
    `bronscannerGemist` en `bronscannerSpook`) en niet meer als constante hier.
    De geschiedenis hierboven blijft staan, want die is de reden van het getal.

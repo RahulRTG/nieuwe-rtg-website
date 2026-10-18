@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-18T12:53:13.271Z",
-    "commit": "ede0ab038",
+    "op": "2026-10-18T12:57:24.699Z",
+    "commit": "c8df2a322",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/verstrengeling.js",
     "node": "v22.22.0"
   },
@@ -13,13 +13,13 @@
   "randenGemeten": "require",
   "randenNietGemeten": "bus/envelop, cron, AI-gereedschap, webhook -- die staan niet in de require-graaf en zijn hier onzichtbaar",
   "primitiefVanaf": 3,
-  "knopen": 1106,
-  "randen": 2444,
-  "randenBinnenKnoop": 4254,
+  "knopen": 1107,
+  "randen": 2445,
+  "randenBinnenKnoop": 4255,
   "randenBuitenBereik": 20,
   "perSoort": {
     "GEDEELDE_PRIMITIEF": 724,
-    "EIGEN_DATA": 389,
+    "EIGEN_DATA": 390,
     "DOMEINRELATIE": 100,
     "LAAGRAND": 554,
     "BELEID": 18,
@@ -1395,7 +1395,7 @@
         "domein:bank",
         "domein:bearercode"
       ],
-      "pct": 61
+      "pct": 62
     },
     {
       "id": "motor:testomgeving",
@@ -7792,6 +7792,40 @@
     {
       "id": "domein:werkvormen",
       "direct": 2,
+      "geraakt": 417,
+      "geraakteDomeinen": 283,
+      "welke": [
+        "domein:aanmeldgesprek",
+        "domein:aanmeldgesprek-aanmeld",
+        "domein:aanmeldingen",
+        "domein:aanmeldkanaal",
+        "domein:aanwezigheid",
+        "domein:activiteitendicht",
+        "domein:adresopzoek",
+        "domein:afdelingen",
+        "domein:afhaalcode",
+        "domein:afhaalcode-toegang",
+        "domein:agenda",
+        "domein:agenda-ics",
+        "domein:agenda-pro",
+        "domein:agenda-samenstelling",
+        "domein:agent",
+        "domein:ai",
+        "domein:appstore",
+        "domein:arrivalpas",
+        "domein:assets",
+        "domein:atelier",
+        "domein:atelierweb",
+        "domein:auditboek",
+        "domein:automatisering",
+        "domein:bank",
+        "domein:bearercode"
+      ],
+      "pct": 62
+    },
+    {
+      "id": "motor:effectbon-ring",
+      "direct": 1,
       "geraakt": 417,
       "geraakteDomeinen": 283,
       "welke": [
@@ -36484,6 +36518,16 @@
       "grond": "domein:stuur wordt door 11 knopen gebruikt (drempel 3)",
       "gewicht": 1,
       "omhoog": true,
+      "lek": false,
+      "wederkerig": false
+    },
+    {
+      "van": "motor:effectbon",
+      "naar": "motor:effectbon-ring",
+      "soort": "EIGEN_DATA",
+      "grond": "zelfde familie effectbon-*: een bestandsgrens (keuringsregel 13), geen domeingrens",
+      "gewicht": 1,
+      "omhoog": false,
       "lek": false,
       "wederkerig": false
     },

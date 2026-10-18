@@ -86,18 +86,21 @@
 .s-11qe8p2:not(#_#_#_){margin:0.25rem 0 0.5rem}
 .s-12itpbj:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold))}
 .s-1cv76ip:not(#_#_#_){flex:1;min-width:10rem}
+.s-1ppn6yv:not(#_#_#_){display:flex;gap:.5rem;justify-content:center;align-items:center;padding:.6rem 0}
 .s-1u1m5s1:not(#_#_#_){margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:0;padding:.35rem .7rem}
 .s-9cvirx:not(#_#_#_){width:100%;min-height:3rem;resize:vertical}
 .s-jv81uh:not(#_#_#_){max-width:15rem}
 .s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
 .s-k43idi:not(#_#_#_){width:11rem}
+.s-kysaxf:not(#_#_#_){display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:0.5rem}
+.s-w5zadg:not(#_#_#_){display:flex;align-items:flex-end;gap:.8rem}
 .s-xrzp1e:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body data-rtg-context-bron="rijksloket" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header style="display:flex;align-items:flex-end;gap:.8rem;">
+<header class="s-w5zadg">
   <div><div class="ey">Rijksambtenaar</div><h1>RTG Rijks-loket</h1></div>
   <a href="/apps/belastingkantoor.html" class="s-1u1m5s1">Belastingkantoor →</a>
   <a href="/apps/rechtbank.html" class="i-bl0kmx">Rechtbank →</a>
@@ -242,12 +245,12 @@ async function laadBieb(){
   if (!RB.klaar){
     $('#p-bieb').innerHTML =
       '<p class="meta s-11qe8p2">'+d.totaal.toLocaleString('nl-NL')+' werk-apps · 10.000 per afdeling · voor rijksambtenaren inbegrepen</p>'+
-      '<div class="rij" style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
+      '<div class="rij s-kysaxf">'+
         '<select class="veld s-jv81uh" id="rbAfd" aria-label="Afdeling"><option value="">Alle afdelingen</option>'+
           d.afdelingen.map(a => '<option value="'+esc(a.id)+'">'+RTGGlyf.tekst(a.icon)+' '+esc(a.label)+' ('+a.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
         '<input class="veld s-1cv76ip" id="rbZoek" maxlength="60" placeholder="Zoek een taak (bijv. dossierscan)" aria-label="Zoeken">'+
         '<button class="tab" id="rbMijn" type="button">Mijn werk-apps</button>'+
-      '</div><div id="rbGrid"></div><div id="rbBlader" style="display:flex;gap:.5rem;justify-content:center;align-items:center;padding:.6rem 0;"></div>';
+      '</div><div id="rbGrid"></div><div id="rbBlader" class="s-1ppn6yv"></div>';
     $('#rbAfd').addEventListener('change', () => { RB.afdeling = $('#rbAfd').value; RB.pagina = 1; RB.mijn = false; tekenBieb(); });
     let zt; $('#rbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RB.zoek = $('#rbZoek').value; RB.pagina = 1; RB.mijn = false; tekenBieb(); }, 300); });
     $('#rbMijn').addEventListener('click', () => { RB.mijn = !RB.mijn; RB.pagina = 1; tekenBieb(); });

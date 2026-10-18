@@ -12,9 +12,9 @@
     $('#orders').innerHTML = tl.items.length ? tl.items.map(x => {
       const pc = (x.status==='nieuw'||x.status==='aangevraagd')?'nieuw':KLAAR_R[x.status]?'klaar':'bereiding';
       const icoon = x.soort==='order'?'hotel':x.soort==='jet'?'✈':'auto';
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span class="s-rv1n8c">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
         '<div class="sub">'+icoon+' '+escHtml(x.sub||'')+' · '+timeAgo(x.at)+(x.when?' · '+escHtml(x.when):'')+' · '+(x.teruggestort?T('bo.refunded','teruggestort'):x.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
-        '<div style="text-align:right;"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
+        '<div class="s-dkemdj"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
     const pager = $('#tlPager');
     pager.style.display = tl.pages > 1 ? 'flex' : 'none';

@@ -5,7 +5,7 @@
     try { inc = (await call('/office/incidenten', { alleen: 'open' })).incidenten || []; } catch(e){ return; }
     el.innerHTML = inc.length ? inc.map(i =>
       '<div class="vrow" data-id="'+i.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(i.codenaam||'\u2013')+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(i.supplierName)+' · '+escHtml(i.gevraagdNiveau)+'</span></div>' +
+        '<div class="vi"><div class="nm">'+escHtml(i.codenaam||'\u2013')+' <span class="s-1caek87">· '+escHtml(i.supplierName)+' · '+escHtml(i.gevraagdNiveau)+'</span></div>' +
           '<div class="sub">'+escHtml(i.reden)+'</div></div>' +
         '<button class="vbtn ok" data-vrij>'+T('bo.release','Vrijgeven')+'</button>' +
         '<button class="vbtn no" data-afw>'+T('bo.declineinc','Afwijzen')+'</button>' +
@@ -29,7 +29,7 @@
     const kop = '<div class="vrow"><div class="vi"><div class="nm">'+d.compleet+' / '+d.totaal+' '+T('bo.saloncompleet','profielen compleet')+'</div>'+
       '<div class="sub">'+(d.achter.length ? d.achter.length+' '+T('bo.salonachter','partner(s) nog niet zichtbaar voor leden') : T('bo.salonok','alle partners zijn zichtbaar'))+'</div></div></div>';
     const rows = (d.partners || []).map(p =>
-      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✓':'⚠')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
+      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✓':'⚠')+' '+escHtml(p.name)+' <span class="s-1caek87">· '+escHtml(p.type)+'</span></div>'+
       '<div class="sub">'+(p.bio?'✓':'✗')+' bio · '+(p.foto?'✓':'✗')+' foto · '+p.items+' '+T('bo.salonitems','items')+' · '+p.volgers+' '+T('bo.salonvolgers','volgers')+'</div></div></div>').join('');
     el.innerHTML = kop + rows;
   }
@@ -47,15 +47,15 @@
       const status = dt.status === 'noodgeval' ? ''+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? ''+T('bo.ontactief','loopt') : ''+T('bo.onttekenen','wacht op tekenen');
       let sosBlok = '';
       if (nood) sosBlok = dt.sos.map(s =>
-        '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:0;padding:0.5rem 0.7rem;">'+
-        '<b style="color:#ff8a8a;">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
-        '<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        '<div class="s-1d6sgl7">'+
+        '<b class="s-1l3c0pq">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
+        '<div class="s-15zpg3n">'+
         '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">'+T('bo.ontlive','Live meekijken')+'</button>'+
-        '<a class="vbtn" href="tel:112" style="text-decoration:none;background:#c62828;color:#fff;">'+T('bo.ont112','Bel 112')+'</a>'+
+        '<a class="vbtn s-16ipkp2" href="tel:112">'+T('bo.ont112','Bel 112')+'</a>'+
         '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+
         '</div></div>').join('');
-      return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:0;':'')+'"><div class="vi" style="width:100%;">'+
-        '<div class="nm">'+RTGGlyf.tekst(dt.icon)+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
+      return '<div class="vrow ' + (nood ? 's-1o5v06e' : '') + '"><div class="vi s-186m9vs">'+
+        '<div class="nm">'+RTGGlyf.tekst(dt.icon)+' '+escHtml(dt.activiteitLabel)+' <span class="s-1caek87">· '+namen+'</span></div>'+
         '<div class="sub">'+status+' · '+pos+'</div>'+ sosBlok +'</div></div>';
     }).join('');
     el.querySelectorAll('[data-sosaf]').forEach(b => b.addEventListener('click', async () => {

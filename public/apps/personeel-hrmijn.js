@@ -67,7 +67,7 @@
       return '<div class="s-w1gbnz"><b>' + esc(s.periode) + '</b> · netto € ' + s.regel.netto.toFixed(2).replace('.', ',') +
         ' <span style="' + subStijl + '">' + s.regel.uren + ' u · bruto € ' + s.regel.bruto.toFixed(2).replace('.', ',') + ' · ' + esc(s.status) + '</span></div>';
     }).join('') || '<div style="' + subStijl + 'margin-top:0.3rem;">Nog geen loonstrook; die verschijnt hier na de eerste loonrun.</div>';
-    h += '<button id="pdLoonOpen" style="display:block;width:100%;text-align:left;margin-top:0.55rem;padding:0.5rem 0.7rem;border-radius:0;border:1px solid var(--line,rgba(255,255,255,0.1));background:none;color:inherit;font:inherit;font-size:0.78rem;cursor:pointer;">' +
+    h += '<button id="pdLoonOpen" class="s-14otqsj">' +
       (kans.open ? '✓ Ik sta open voor werk -- tik om dit uit te zetten' : '○ Zet "open voor werk" aan: passende bedrijven vinden jou') + '</button>';
     if (kans.open) {
       h += (kans.kansen || []).slice(0, 4).map(function (k) {

@@ -103,6 +103,7 @@
 .s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
 .s-ohjkjq:not(#_#_#_){font-size:.78rem}
 .s-rqfp3t:not(#_#_#_){color:var(--muted);font-size:.84rem;line-height:1.55;border-left:2px solid var(--goud,#C9A24B);padding:.2rem 0 .2rem .8rem;margin:.7rem 0 0}
+.s-tafq05:not(#_#_#_){margin:1.25rem 0 0.5rem}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
@@ -447,7 +448,7 @@ bind('#tsGo', 'click', async () => {
 async function laadToeslagen(){
   let d; try { d = await api('/api/overheid/toeslagen/mijn'); } catch(e){ return; }
   const l = d.toeslagen || [];
-  $('#tsMijn').innerHTML = l.length ? '<h3 style="margin:1.25rem 0 0.5rem;">Mijn toeslagen</h3>'+l.map(t =>
+  $('#tsMijn').innerHTML = l.length ? '<h3 class="s-tafq05">Mijn toeslagen</h3>'+l.map(t =>
     '<div class="item"><h4>'+esc(t.soortLabel)+'</h4><div class="meta">€ '+esc(t.maandbedrag)+' per maand</div>'+
     '<span class="status '+(t.status==='toegekend'?'op':t.status==='afgewezen'?'af':'')+'">'+esc(t.status)+'</span></div>').join('') : '';
 }
@@ -514,7 +515,7 @@ async function laadUitkeringen(){
   const l = d.uitkeringen || [];
   UITVOER.sociaal = { naam: 'uitkeringen', kolommen: ['soort','status'],
     rijen: l.map(u => [u.soortLabel || '', u.status || '']) };
-  $('#szMijn').innerHTML = l.length ? '<h3 style="margin:1.25rem 0 0.5rem;">Mijn aanvragen</h3>'+l.map(u =>
+  $('#szMijn').innerHTML = l.length ? '<h3 class="s-tafq05">Mijn aanvragen</h3>'+l.map(u =>
     '<div class="item"><h4>'+esc(u.soortLabel)+'</h4><span class="status '+(u.status==='toegekend'?'op':u.status==='afgewezen'?'af':'')+'">'+esc(u.status)+'</span></div>').join('') : '';
 }
 bind('#bzGo', 'click', async () => {
@@ -526,7 +527,7 @@ bind('#bzGo', 'click', async () => {
 async function laadBezwaren(){
   let d; try { d = await api('/api/overheid/bezwaren/mijn'); } catch(e){ return; }
   const l = d.bezwaren || [];
-  $('#bzMijn').innerHTML = l.length ? '<h3 style="margin:1.25rem 0 0.5rem;">Mijn bezwaren</h3>'+l.map(b =>
+  $('#bzMijn').innerHTML = l.length ? '<h3 class="s-tafq05">Mijn bezwaren</h3>'+l.map(b =>
     '<div class="item"><h4>'+esc(b.tegen)+'</h4><span class="status '+(b.status==='gegrond'?'op':b.status==='ongegrond'?'af':'')+'">'+esc(b.status)+'</span></div>').join('') : '';
 }
 
@@ -542,7 +543,7 @@ async function laadSubsidies(){
   const l = d.subsidies || [];
   UITVOER.prov = { naam: 'subsidies', kolommen: ['regeling','project','gevraagd','toegekend','status'],
     rijen: l.map(x => [x.regelingLabel || '', x.project || '', x.gevraagd, x.toegekend || '', x.status || '']) };
-  $('#sbMijn').innerHTML = l.length ? '<h3 style="margin:1.25rem 0 0.5rem;">Mijn aanvragen</h3>'+l.map(s =>
+  $('#sbMijn').innerHTML = l.length ? '<h3 class="s-tafq05">Mijn aanvragen</h3>'+l.map(s =>
     '<div class="item"><h4>'+esc(s.regelingLabel)+'</h4><div class="meta">'+esc(s.project)+' · gevraagd € '+esc(s.gevraagd)+(s.toegekend?' · toegekend € '+esc(s.toegekend):'')+'</div>'+
     '<span class="status '+(s.status==='toegekend'?'op':s.status==='afgewezen'?'af':'')+'">'+esc(s.status)+'</span></div>').join('') : '';
 }
@@ -570,7 +571,7 @@ bind('#wmGo', 'click', async () => {
 async function laadWaterMeldingen(){
   let d; try { d = await api('/api/overheid/water/meldingen/mijn'); } catch(e){ return; }
   const l = d.meldingen || [];
-  $('#wmMijn').innerHTML = l.length ? '<h3 style="margin:1.25rem 0 0.5rem;">Mijn meldingen</h3>'+l.map(m =>
+  $('#wmMijn').innerHTML = l.length ? '<h3 class="s-tafq05">Mijn meldingen</h3>'+l.map(m =>
     '<div class="item"><h4>'+esc(m.soortLabel)+'</h4><div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+'</div>'+
     '<span class="status '+(m.status==='opgelost'?'op':m.status==='afgewezen'?'af':'')+'">'+esc(m.status)+'</span>'+
     ((m.updates&&m.updates.length)?'<div class="meta h-mt30">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+'</div>').join('') : '';

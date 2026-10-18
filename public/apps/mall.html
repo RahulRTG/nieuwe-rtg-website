@@ -235,16 +235,19 @@
 .s-16mvxxl:not(#_#_#_){margin:0.5rem 0 0 1.25rem}
 .s-16woflw:not(#_#_#_){margin-bottom:.5rem;resize:vertical}
 .s-186m9vs:not(#_#_#_){width:100%}
+.s-18ou2wi:not(#_#_#_){font-size:.72rem;color:var(--soft);display:block}
 .s-19ic06h:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));font-size:.8rem}
 .s-1cv76ip:not(#_#_#_){flex:1;min-width:10rem}
 .s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
 .s-1dzu8ds:not(#_#_#_){flex:1}
 .s-1elbo4a:not(#_#_#_){color:var(--soft);font-size:.78rem}
+.s-1hdhb7q:not(#_#_#_){font-size:.76rem;color:var(--muted);line-height:1.5;display:block}
 .s-1ik90f3:not(#_#_#_){font-family:'Bodoni Moda',serif;font-size:1.3rem}
 .s-1pv2lmv:not(#_#_#_){color:var(--soft)}
 .s-1wi44k7:not(#_#_#_){font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:0.5rem}
 .s-1wxyff2:not(#_#_#_){margin-top:.5rem;gap:.4rem;align-items:center}
 .s-3xagld:not(#_#_#_){color:var(--soft);font-size:.8rem}
+.s-5avner:not(#_#_#_){display:block;margin:0.25rem 0}
 .s-h7lf83:not(#_#_#_){justify-content:center}
 .s-hlytrm:not(#_#_#_){grid-template-columns:1fr;max-width:460px}
 .s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
@@ -709,9 +712,9 @@ function rtfKaart(a, geinstalleerd){
   const open = a.url ? '<a class="knop stil s-14ck55u" href="'+esc(a.url)+'">Openen</a>' : '';
   return '<div class="boutiek s-101m0pp">'+
     '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel||a.categorie||'')+'</span>'+
-    '<b style="display:block;margin:0.25rem 0;">'+esc(a.naam)+'</b>'+
-    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
-    (a.doelgroepLabel?'<span style="font-size:.72rem;color:var(--soft);display:block;">voor '+esc(a.doelgroepLabel)+'</span>':'')+
+    '<b class="s-5avner">'+esc(a.naam)+'</b>'+
+    (a.uitleg?'<span class="s-1hdhb7q">'+esc(a.uitleg)+'</span>':'')+
+    (a.doelgroepLabel?'<span class="s-18ou2wi">voor '+esc(a.doelgroepLabel)+'</span>':'')+
     '<div class="rij s-1wxyff2">'+
       '<b class="s-19ic06h">Gratis</b>'+
       '<span class="s-1dzu8ds"></span>'+ open +
@@ -792,8 +795,8 @@ function appKaart(a, geinstalleerd){
     : (a.plankLabel ? '<span class="s-v8jwf2">'+esc(a.plankLabel)+'</span>' : '');
   return '<div class="boutiek s-101m0pp">'+
     '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel)+'</span>'+
-    '<b style="display:block;margin:0.25rem 0;">'+esc(a.naam)+'</b>'+
-    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    '<b class="s-5avner">'+esc(a.naam)+'</b>'+
+    (a.uitleg?'<span class="s-1hdhb7q">'+esc(a.uitleg)+'</span>':'')+
     '<div class="rij s-1wxyff2">'+
       '<b class="s-19ic06h">Inbegrepen</b>'+
       '<span class="s-1dzu8ds"></span>'+ open +
@@ -1255,8 +1258,8 @@ async function laadReisbieb(){
 function reisKaart(a, geinstalleerd){
   return '<div class="boutiek s-101m0pp">'+
     '<span class="stad">'+esc(a.bestemming)+' · '+esc(a.regio)+'</span>'+
-    '<b style="display:block;margin:0.25rem 0;">'+esc(a.naam)+'</b>'+
-    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    '<b class="s-5avner">'+esc(a.naam)+'</b>'+
+    (a.uitleg?'<span class="s-1hdhb7q">'+esc(a.uitleg)+'</span>':'')+
     '<div class="rij s-1wxyff2">'+
       '<b class="s-19ic06h">Inbegrepen</b>'+
       '<span class="s-1dzu8ds"></span>'+

@@ -138,14 +138,19 @@
    stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
    wint van elke gewone regel in de bladen, verliest net als het attribuut van
    !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10kryme:not(#_#_#_){display:flex;gap:.4rem}
+.s-10ksllx:not(#_#_#_){display:flex;gap:.5rem}
 .s-11qe8p2:not(#_#_#_){margin:0.25rem 0 0.5rem}
 .s-186m9vs:not(#_#_#_){width:100%}
 .s-18e8s1e:not(#_#_#_){font-size:.78rem;margin-top:0.5rem}
+.s-1b4loep:not(#_#_#_){width:100%;height:120px;display:block}
 .s-1dcamif:not(#_#_#_){font-size:.75rem;margin-bottom:0.25rem}
 .s-1dxigij:not(#_#_#_){font-size:.76rem;margin-bottom:0.75rem}
 .s-1f8bdb1:not(#_#_#_){width:6rem;margin-bottom:0}
 .s-1gbowd5:not(#_#_#_){padding:.6rem .8rem}
 .s-1lip1to:not(#_#_#_){white-space:pre-wrap;font-size:.72rem;max-height:22rem;overflow:auto}
+.s-1oadtmp:not(#_#_#_){display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap;align-items:center}
+.s-1tm6avw:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap}
 .s-1v0qglo:not(#_#_#_){min-height:3rem;resize:vertical;margin-top:0.5rem}
 .s-1xkemiw:not(#_#_#_){padding:.7rem}
 .s-2fpzs8:not(#_#_#_){font-size:.8rem;margin-bottom:0.75rem}
@@ -155,14 +160,18 @@
 .s-98k82s:not(#_#_#_){margin:0 0 0.25rem;font-weight:600}
 .s-9g83p7:not(#_#_#_){font-size:.8rem;margin-top:0.25rem}
 .s-faelie:not(#_#_#_){font-size:.74rem;margin-top:0.25rem}
+.s-j0h75i:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
 .s-j4q4w6:not(#_#_#_){min-height:3.4rem;resize:vertical;margin-top:0.5rem}
 .s-ndyzcf:not(#_#_#_){margin:0 0 0.5rem}
 .s-ohh0lm:not(#_#_#_){font-size:.74rem}
 .s-sv8jh7:not(#_#_#_){padding:.7rem;margin-bottom:0.75rem}
+.s-tk7yx:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem}
 .s-u7etlx:not(#_#_#_){flex:1;margin-bottom:0;min-width:11rem}
 .s-u7gqki:not(#_#_#_){flex:1;margin-bottom:0;min-width:14rem}
+.s-ulacx:not(#_#_#_){display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap}
 .s-vebk1y:not(#_#_#_){font-size:.76rem;margin-bottom:0.5rem}
+.s-vplm6p:not(#_#_#_){display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:0.5rem}
 .s-xjcbw8:not(#_#_#_){font-size:.72rem;margin-top:0.5rem}
 .s-xmivqi:not(#_#_#_){margin-bottom:1.25rem}
 </style>
@@ -188,7 +197,7 @@
         <h1><span class="merkvlak">RTG Techniek</span></h1>
         <div class="sub" id="wieSub"></div>
       </div>
-      <div style="display:flex;gap:.5rem;">
+      <div class="s-10ksllx">
         <button class="knop grijs klein" id="bVernieuw">Vernieuwen</button>
         <button class="knop grijs klein" id="bUit">Uitloggen</button>
       </div>
@@ -235,7 +244,7 @@
       <div id="beveiligBlok" hidden>
         <div class="i-1mh3zp sec">
           <span>Beveiliging &amp; inbraakdetectie</span>
-          <span style="display:flex;gap:.4rem;">
+          <span class="s-10kryme">
             <button class="knop grijs klein" id="bBevAuto" hidden>Noodrem</button>
             <button class="knop grijs klein" id="bBevAf" hidden>Alles gezien</button>
           </span>
@@ -263,7 +272,7 @@
         <div class="sec">Archiefkast (live-venster)</div>
         <div class="kaart">
           <div class="i-ohzj7x muted" id="archiefInfo"></div>
-          <div style="display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap;align-items:center;">
+          <div class="s-1oadtmp">
             <label class="i-ejeuqd muted">Afgeronde tickets ouder dan</label>
             <input class="veld s-1f8bdb1" id="archiefDagen" type="number" inputmode="numeric" min="1" max="3650">
             <span class="i-ejeuqd muted">dagen archiveren</span>
@@ -282,12 +291,12 @@
             <div class="i-ejeuqd muted" id="papWaarom"></div>
             <div class="muted s-faelie" id="papVoorbeeld"></div>
             <textarea class="veld s-1v0qglo" id="papAntwoord" placeholder="Uw antwoord, in uw eigen woorden&hellip;" aria-label="Antwoord op de vraag van Rahul"></textarea>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+            <div class="s-j0h75i">
               <button class="knop" id="bPapOk">Vastleggen</button>
               <button class="knop grijs klein" id="bPapParkeer">Weet ik nu niet</button>
             </div>
           </div>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem;">
+          <div class="s-tk7yx">
             <button class="knop grijs klein" id="bPapReg">Register lezen</button>
             <button class="knop grijs klein" id="bPapLek">Datalek-draaiboek lezen</button>
           </div>
@@ -316,7 +325,7 @@
             De eigenaar is de enige die zekeringen omzet, functies uitschakelt en anderen
             toegang geeft. Overdragen kan alleen naar een adres waar al een RTG-account
             bij hoort, anders zou deze pagina voor iedereen dichtzitten.</p>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <div class="s-1tm6avw">
             <input class="veld s-u7gqki" id="eigEmail" type="email" autocomplete="off"
               aria-label="E-mailadres van de nieuwe eigenaar"
               placeholder="E-mailadres van de nieuwe eigenaar">
@@ -333,7 +342,7 @@
         <div class="sec">Toegang beheren</div>
         <div class="kaart">
           <div id="toegangLijst"></div>
-          <div style="display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap;">
+          <div class="s-ulacx">
             <input class="i-u7fglg veld" id="grantEmail" placeholder="E-mail van een RTG-account">
             <button class="knop klein" id="bGrant">Toegang geven</button>
           </div>
@@ -397,7 +406,7 @@
            Dat verschil kostte vannacht uren: een sms die stil op de grond viel is
            in een grafiek onzichtbaar, in een regel niet. -->
       <div class="kaart s-sv8jh7" id="journaalKaart">
-        <div style="display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:0.5rem;">
+        <div class="s-vplm6p">
           <div class="sec s-40wpk4">Doorgeefjournaal</div>
           <span class="muted s-ohh0lm" id="journaalTel"></span>
           <span class="h-flex1"></span>
@@ -416,7 +425,7 @@
       <div class="kaart s-1gbowd5" id="wachtRand"></div>
       <div class="kaart s-1xkemiw">
         <div class="i-t2n41w muted">Laatste ~30 minuten · verzoeken (wit), alarmen (bordeaux), quarantaine (goud)</div>
-        <canvas id="wachtGrafiek" height="120" style="width:100%;height:120px;display:block;"></canvas>
+        <canvas id="wachtGrafiek" height="120" class="s-1b4loep"></canvas>
       </div>
 
       <div class="blok-kop h-mt100">

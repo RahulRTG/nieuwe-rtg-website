@@ -93,6 +93,9 @@
    wint van elke gewone regel in de bladen, verliest net als het attribuut van
    !important, en een el.style-schrijfactie wint er nog steeds van. */
 .s-1pxdjkg:not(#_#_#_){text-align:left;margin:0.5rem 0 0}
+.s-1s5h3r4:not(#_#_#_){margin-bottom:.8rem}
+.s-a402oz:not(#_#_#_){text-align:left;margin:0 0 .8rem}
+.s-e1a37p:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));cursor:pointer}
 .s-f4sti3:not(#_#_#_){color:var(--muted);margin-top:0.5rem;font-size:.9rem}
 .s-gidsbo:not(#_#_#_){font-size:1rem}
 </style>
@@ -187,7 +190,7 @@ async function wmLaad(){
   MAP='werkmail'; LIJST=[]; $('#tel').hidden=true;   // het adressenscherm is geen postvak
   let d; try{ d=await apiW('overzicht'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   $('#main').innerHTML = schakelBalk()+
-    '<div class="kaart" style="margin-bottom:.8rem;"><h2>'+esc(d.domein)+'</h2>'+
+    '<div class="kaart s-1s5h3r4"><h2>'+esc(d.domein)+'</h2>'+
     '<div class="meta">'+esc(d.uitleg)+' Externe afzenders blijven onbetrouwbaar tot SPF, DKIM en DMARC slagen.</div></div>'+
     d.adressen.map((a,i)=>'<button class="rij'+(a.ongelezen?' ongelezen':'')+'"'+(a.toegang?' data-wa="'+esc(a.adres)+'"':'')+((a.actief&&a.toegang)?'':' style="opacity:.55"')+'>'+
       '<span class="ic">'+esc(a.adres.slice(0,2).toUpperCase())+'</span>'+
@@ -222,7 +225,7 @@ async function wmInbox(adres){
   const lijst=d.berichten||[];
   LIJST=lijst;
   $('#main').innerHTML='<button class="terug" id="terug">← alle adressen</button>'+
-    '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
+    '<div class="noot s-a402oz">Postvak van '+esc(adres)+' · <span id="wmSchrijf" class="s-e1a37p">nieuw bericht vanaf dit adres</span></div>'+
     (lijst.length?lijst.map((m,i)=>'<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+esc((m.van||'@').slice(0,4).toUpperCase())+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
     :'<div class="leeg">Dit postvak is nog leeg.</div>');
   $('#terug').addEventListener('click', wmLaad);

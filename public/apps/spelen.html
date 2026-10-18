@@ -156,12 +156,14 @@
 .s-16vazqf:not(#_#_#_){text-align:center;margin:0.5rem 0 0.25rem;color:var(--zacht);font-size:.8rem}
 .s-1q4jpro:not(#_#_#_){width:100%;height:100%}
 .s-1ta0zs6:not(#_#_#_){color:var(--goud2)}
+.s-30r9rt:not(#_#_#_){color:var(--zacht)}
 .s-3vd53t:not(#_#_#_){cursor:pointer}
 .s-prlthd:not(#_#_#_){font-size:1.1rem}
 .s-prn3gf:not(#_#_#_){font-size:1.3rem}
 .s-q9vs12:not(#_#_#_){flex-wrap:wrap}
 .s-sf8r03:not(#_#_#_){max-width:16rem;margin:0.5rem auto 0}
 .s-u28ben:not(#_#_#_){cursor:default;border-style:solid}
+.s-xenyl8:not(#_#_#_){color:#5FA56A}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
@@ -1499,7 +1501,7 @@ function tekenMagnaatEco(){
         '<b class="' + ((r.resultaat || 0) >= 0 ? 'ecplus' : 'ecmin') + '">' + ecGeld(r.resultaat || 0) + '</b></div>'
       : '<div class="rij"><div class="nm">' + esc(r.naam) + '<small>' + r.bezetting + '% bezet · omzet ' + ecGeld(r.omzet) +
         (r.gemist ? ' · ' + r.gemist + ' misgelopen' : '') + '</small></div>' +
-        '<b style="color:' + (r.resultaat >= 0 ? '#5FA56A' : '#C23A5E') + ';">' + ecGeld(r.resultaat) + '</b></div>').join('') +
+        '<b class="' + (r.resultaat >= 0 ? 's-xenyl8' : 's-13q23ax') + '">' + ecGeld(r.resultaat) + '</b></div>').join('') +
     (sinds.projecten && sinds.projecten.length
       ? sinds.projecten.map(pr => '<div class="leeg">De RTFoundation opende: ' + esc(pr.naam) + '. ' + esc(pr.tekst) + '</div>').join('') : '');
 
@@ -1715,7 +1717,7 @@ function tekenWaarheid(){
   const mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
   $('#whInfo').textContent = 'Eerste op '+st.doel+' punten wint. '+p.spelers.map((s,i)=>esc(s)+': '+st.punten[i]).join(' · ');
   $('#whKaart').innerHTML = st.kaart
-    ? '<small style="color:var(--zacht);">'+(st.wat==='doen'?'OPDRACHT':'VRAAG')+' voor '+esc(p.spelers[p.beurt])+'</small><br>'+esc(st.kaart)
+    ? '<small class="s-30r9rt">'+(st.wat==='doen'?'OPDRACHT':'VRAAG')+' voor '+esc(p.spelers[p.beurt])+'</small><br>'+esc(st.kaart)
     : (mijnBeurt ? 'Jij bent aan de beurt. Doen of waarheid?' : esc(p.spelers[p.beurt])+' kiest: doen of waarheid…');
   const acties = $('#whActies'); acties.innerHTML='';
   if (!mijnBeurt) return;
@@ -1730,7 +1732,7 @@ function tekenWaarheid(){
 function tekenProost(){
   const p = huidig, st = p.staat;
   const mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
-  $('#prKaart').innerHTML = '<small style="color:var(--zacht);">kaart '+st.teller+' van '+st.totaal+'</small><br>'+esc(st.kaart||'');
+  $('#prKaart').innerHTML = '<small class="s-30r9rt">kaart '+st.teller+' van '+st.totaal+'</small><br>'+esc(st.kaart||'');
   const acties = $('#prActies'); acties.innerHTML='';
   if (mijnBeurt){
     const b=document.createElement('button'); b.className='knop'; b.textContent='Volgende kaart';

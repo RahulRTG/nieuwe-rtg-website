@@ -8,9 +8,9 @@
     var esc = ctx.esc, eur = ctx.eur, T = ctx.T;
     var k = d.kpi || {};
     var rij = function (l, r) {
-      return '<tr><td style="padding:0.3rem 0.6rem 0.3rem 0;color:#4D4A45;">' + l + '</td><td class="s-c40mid">' + r + '</td></tr>';
+      return '<tr><td class="s-fuwtu8">' + l + '</td><td class="s-c40mid">' + r + '</td></tr>';
     };
-    var sec = function (t) { return '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">' + t + '</h2>'; };
+    var sec = function (t) { return '<h2 class="s-bwc5d4">' + t + '</h2>'; };
     var h = '<!doctype html><html><head><meta charset="utf-8"><title>' + esc(d.naam || 'Gebouwrapport') + '</title></head>' +
       '<body style="font-family:Georgia,serif;color:#0C0C0B;max-width:46em;margin:2.5em auto;line-height:1.6;">' +
       '<div id="pwrap" style="text-align:right;"><button id="pbtn" type="button" style="padding:0.5rem 1rem;font-family:inherit;">Print / PDF</button></div>' +

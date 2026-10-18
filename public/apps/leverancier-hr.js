@@ -31,7 +31,7 @@
       '<div class="tkc-who">' + T('hr2.inwerk.s', 'Elke nieuwe collega een vaste route: dag 1, week 1, maand 1. De medewerker vinkt mee vanuit de eigen app.') + '</div>';
     for (const t of open){
       const n = t.stappen.filter(s => s.klaar).length;
-      h += '<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">' +
+      h += '<div class="s-q8bqou">' +
         '<div class="st-row s-15ai77r"><b>' + esc(t.name) + '</b><span class="sub">' + n + '/' + t.stappen.length + '</span></div>';
       for (const fase of ['dag1', 'week1', 'maand1']){
         const st2 = t.stappen.filter(s => s.fase === fase);
@@ -39,12 +39,12 @@
         h += '<div class="sub" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.58rem;margin-top:0.5rem;">' + T(FASEN[fase][0], FASEN[fase][1]) + '</div>' +
           st2.map(s => '<button class="obtn' + (s.klaar ? '' : ' ghost') + '" data-hrvink="' + t.id + '" data-stap="' + s.id + '" style="display:block;width:100%;text-align:left;margin-top:0.25rem;font-size:0.76rem;">' + (s.klaar ? '✓ ' : '○ ') + esc(s.tekst) + '</button>').join('');
       }
-      h += '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="st-in h-flex1" data-hrstapin="' + t.id + '" placeholder="' + T('hr2.stap', 'Eigen stap toevoegen') + '">' +
+      h += '<div class="s-1stuony"><input class="st-in h-flex1" data-hrstapin="' + t.id + '" placeholder="' + T('hr2.stap', 'Eigen stap toevoegen') + '">' +
         '<button class="obtn" data-hrstap="' + t.id + '">+</button></div></div>';
     }
     const zonder = (ctx.staff || []).filter(s => !open.some(t => t.staffId === s.id));
     if (zonder.length){
-      h += '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><select class="st-in h-flex1" id="hrStartWie">' +
+      h += '<div class="s-1stuony"><select class="st-in h-flex1" id="hrStartWie">' +
         zonder.map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('') + '</select>' +
         '<button class="obtn primary" id="hrStart">' + T('hr2.start', 'Start traject') + '</button></div>';
     }
@@ -77,7 +77,7 @@
         '<button class="obtn warn" data-hrcweg="' + x.id + '">✕</button></div>').join('');
     h += '<div class="st-form h-mt50">' + staffKeus('hrCwie') +
       '<input class="st-in" id="hrCsoort" placeholder="' + T('hr2.soort', 'Soort, bijv. EHBO of BHV') + '">' +
-      '<div style="display:flex;gap:0.4rem;"><input class="st-in h-flex1" id="hrCtot" type="date" title="' + T('hr2.verloopt', 'verloopt') + '"></div>' +
+      '<div class="s-1x93582"><input class="st-in h-flex1" id="hrCtot" type="date" title="' + T('hr2.verloopt', 'verloopt') + '"></div>' +
       '<button class="obtn primary s-9lnaus" id="hrCnieuw">' + T('hr2.toevoegen', 'Voeg toe') + '</button></div></div>';
     return h;
   }

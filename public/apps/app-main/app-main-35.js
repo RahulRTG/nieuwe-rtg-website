@@ -117,8 +117,8 @@
     let head = '';
     // rating + favoriet-hart + tafel reserveren (de ervaring-laag)
     head += '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0 0.6rem;">' +
-      (s.rating ? '<span style="font-size:0.8rem;"><b>' + s.rating.score + '</b> <span style="color:var(--soft);font-size:0.7rem;">(' + s.rating.aantal + ')</span></span>' : '<span style="font-size:0.72rem;color:var(--soft);">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
-      '<button id="msFav" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.8rem;font-size:0.85rem;" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '' + T('fav.bewaard','Bewaard') : '' + T('fav.bewaar','Bewaar')) + '</button></div>';
+      (s.rating ? '<span class="s-paonzv"><b>' + s.rating.score + '</b> <span class="s-1feg4kw">(' + s.rating.aantal + ')</span></span>' : '<span class="s-9uxsi">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
+      '<button id="msFav" class="s-1taai30" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '' + T('fav.bewaard','Bewaard') : '' + T('fav.bewaar','Bewaar')) + '</button></div>';
     if ((s.tableNames || []).length && s.reservationsOpen !== false){
       const morgen = new Date(Date.now() + 86400000).toISOString().slice(0,10);
       head += '<div class="ms-cat">' + T('erv.reserveer.h','Tafel reserveren') + '</div>' +

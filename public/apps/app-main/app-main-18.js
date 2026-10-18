@@ -30,11 +30,11 @@
     el.innerHTML = open.map(c =>
       '<div class="card" style="border-color:'+(c.getekendDoorMij?'rgba(91,185,140,0.4)':'rgba(208,172,87,0.5)')+';">'+
       '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:'+(c.getekendDoorMij?'var(--green)':'var(--gold)')+';">\uD83D\uDCDD '+esc(c.supplierName)+' \u00B7 '+T('con.'+c.soort, c.soort)+'</div>'+
-      '<div style="margin-top:0.25rem;font-size:0.92rem;"><b>'+esc(c.titel)+'</b></div>'+
-      (c.velden && c.velden.length ? '<div style="margin-top:0.25rem;font-size:0.76rem;color:var(--muted);">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
-      '<details class="h-mt40"><summary style="cursor:pointer;font-size:0.74rem;color:var(--gold);">'+T('con.lees','Lees de voorwaarden')+'</summary><div style="font-size:0.8rem;color:var(--muted);white-space:pre-wrap;margin-top:0.25rem;">'+escT(c.tekst)+'</div></details>'+
+      '<div class="s-g18z7m"><b>'+esc(c.titel)+'</b></div>'+
+      (c.velden && c.velden.length ? '<div class="s-doqu8l">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
+      '<details class="h-mt40"><summary class="s-1qj41co">'+T('con.lees','Lees de voorwaarden')+'</summary><div class="s-1530dfj">'+escT(c.tekst)+'</div></details>'+
       (c.getekendDoorMij
-        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--green);">\u2705 '+(c.status==='getekend'?T('con.klaar','Getekend door beide partijen.'):T('con.wacht','U tekende; de zaak tekent nog.'))+'</div>'
+        ? '<div class="s-j3l0p6">\u2705 '+(c.status==='getekend'?T('con.klaar','Getekend door beide partijen.'):T('con.wacht','U tekende; de zaak tekent nog.'))+'</div>'
         : '<div style="margin-top:0.5rem;display:flex;gap:0.5rem;"><button class="bz-groot h-flex1" data-conteken="'+c.ref+'">'+T('con.teken','Ondertekenen')+'</button><button class="bz-btn" data-conweiger="'+c.ref+'">'+T('con.weiger','Weiger')+'</button></div>')+
       '</div>').join('');
     document.querySelectorAll('[data-conteken]').forEach(b => b.addEventListener('click', async () => {
@@ -68,14 +68,14 @@
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.25rem 0 0.25rem;font-size:1rem;">' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.5rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
+    let h = '<h3 class="s-1k5gg2w">' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.5rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
     for (const d2 of deals){
-      h += '<div style="border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?''+T('vk.koop','Koop'):''+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
-        '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString(lang()):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
-        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
+      h += '<div class="s-14nhwbq"><div class="s-j918ji">' + (d2.soort==='koop'?''+T('vk.koop','Koop'):''+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
+        '<div class="s-js2oc2">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString(lang()):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
+        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken s-s5i11x" data-ref="' + d2.ref + '">' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
     }
-    h += autos.slice(0,20).map(a => '<div style="border:1px solid var(--line);border-radius:0;padding:0.85rem;margin-bottom:0.7rem;" data-av="' + a.id + '">' +
-      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString(lang()) + '</span></div>' +
+    h += autos.slice(0,20).map(a => '<div class="s-4of7a1" data-av="' + a.id + '">' +
+      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b class="s-2uh62t">' + (a.vip?'':'') + escT(a.naam) + '</b><span class="s-12h62uq">€ ' + a.prijs.toLocaleString(lang()) + '</span></div>' +
       '<div class="sub">' + a.km.toLocaleString(lang()) + ' km · ' + escT(a.brandstof) + ' · ' + escT(a.transmissie) + (a.vermogenPk?' · ' + a.vermogenPk + ' pk':'') + (a.garantieMnd?' · ' + a.garantieMnd + ' mnd garantie':'') + '</div>' +
       (a.opties && a.opties.length ? '<div class="sub h-mt20">' + a.opties.slice(0,4).map(escT).join(' · ') + '</div>' : '') +
       '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;">' +

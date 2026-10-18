@@ -1,7 +1,7 @@
 /* het contactenblok op het beginscherm, met de lege staat */
     if (!conns.length && !reqs.length){
-      html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
-        '<div class="meta" style="margin:0.25rem 0 0.75rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
+      html += '<div class="big s-hdve00">Nog geen contacten</div>'+
+        '<div class="meta s-x8hihn">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
         '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">'+
         '<button class="go" data-goto="salon">Iemand toevoegen →</button>'+
         '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek in De Salon iemand die bij me past en help me die toe te voegen als connectie">Laat Rahul iemand voorstellen</button>'+
@@ -11,14 +11,14 @@
       // het potloodje zet of wist hem, en hij werkt overal in dit account door
       html += conns.map(c => { const nm = c.eigenNaam || c.codename; return (
         '<div class="hc-rij" style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
-        '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+initCN(nm)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
-        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="'+escT(c.codename)+'">'+escT(nm)+(c.eigenNaam?' <span class="meta" style="font-weight:400;">· '+escT(c.codename)+'</span>':'')+'</b>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;color:var(--muted);" data-hernoem="'+escT(c.codename)+'" title="Eigen naam geven">✎</button>'+
-        '<button class="go" style="padding:.2rem .5rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">Bericht</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'); }
-      ).join('') + '<button class="go" style="margin-top:0.75rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
+        '<span class="sc-av s-1bs2pmo" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+initCN(nm)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
+        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="'+escT(c.codename)+'">'+escT(nm)+(c.eigenNaam?' <span class="meta s-12h61dc">· '+escT(c.codename)+'</span>':'')+'</b>'+
+        '<button class="go s-1qxd7lr" data-hernoem="'+escT(c.codename)+'" title="Eigen naam geven">✎</button>'+
+        '<button class="go s-1tbmukg" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">Bericht</button>'+
+        '<button class="go s-mvq09e" data-snap="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
+        '<button class="go s-mvq09e" data-bel="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
+        '<button class="go s-mvq09e" data-vid="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'); }
+      ).join('') + '<button class="go s-1nggdyi" data-goto="salon">+ Iemand toevoegen</button>';
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-dm]').forEach(b => b.addEventListener('click', () => openDm(b.dataset.dm, b.dataset.cn)));

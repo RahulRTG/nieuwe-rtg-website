@@ -1113,8 +1113,10 @@ jobs:
       # weg en draai de stap een keer met de hand:
       # `node scripts/nieuweroutes.js --tegen origin/main`. Komt hij door, dan
       # hoort hij hier gewoon weer te staan.
-      # - name: Nieuwe routes komen met een toets
-      #   run: node scripts/nieuweroutes.js --tegen origin/main
+      # Weer aan sinds 18 oktober 2026 (Project NUL, ZERO.md par. 7): op de
+      # V1-integratiebranch vergelijkt hij 5508 routes met main in seconden.
+      - name: Nieuwe routes komen met een toets
+        run: node scripts/nieuweroutes.js --tegen origin/main
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)
@@ -1731,7 +1733,13 @@ jobs:
     name: Vertrouwd bewijsboek publiceren
     runs-on: ubuntu-latest
     needs: [preflight, test-volledig, dekking, norm, security, adversarial, container, a11y-oordeel]
-    if: (github.event_name == 'schedule' || ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main')) && needs.preflight.outputs.mode == 'full'
+    # Sinds 18 oktober 2026 ook een handmatige full-run op een andere BRANCH
+    # (de V1-integratiebranch, CONSOLIDATIE.md): het releasebewijs eist een
+    # bewijsboek op exact de commit van de releaseref. Een PR-run blijft
+    # uitgesloten, en scripts/evidence-base.js zoekt een main-basis nog steeds
+    # uitsluitend op main, dus zo'n branchboek wordt nooit een vrijbrief voor
+    # een andere tak.
+    if: (github.event_name == 'schedule' || ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.ref_type == 'branch')) && needs.preflight.outputs.mode == 'full'
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

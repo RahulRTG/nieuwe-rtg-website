@@ -49,17 +49,19 @@
 'use strict';
 const http = require('http');
 const crypto = require('crypto');
+const { bindToestel, KOP } = require('./lib/proeftoestel');
+const { zwaarPad } = require('../server/kern/identiteit/bezitsbewijs');
 
 /* ---------- de deur ---------- */
 
 const agent = new http.Agent({ keepAlive: true, maxSockets: 128 });
 
 function maakDeur({ host, port, timeoutMs }) {
-  return function vraag(method, pad, token, body) {
+  return function vraag(method, pad, token, body, koppen) {
     const t0 = Date.now();
     return new Promise(resolve => {
       const data = method === 'GET' ? null : JSON.stringify(body === undefined ? {} : body);
-      const headers = { 'Content-Type': 'application/json' };
+      const headers = Object.assign({ 'Content-Type': 'application/json' }, koppen || {});
       if (token) headers.Authorization = 'Bearer ' + token;
       if (data) headers['Content-Length'] = Buffer.byteLength(data);
       let klaar = false;
@@ -218,7 +220,33 @@ async function bouwPodium(vraag) {
     wb.eis('paspoortstand', GEVERIFIEERD.includes(st.data.status),
       'het paspoort van ' + naam + ' staat na de upload op "' + st.data.status + '" in plaats van "pending"');
   }
+  /* DE TWEE BEURZEN BINDEN EEN TOESTEL. Sinds A-P1-04 (6 oktober 2026) staat het
+     bezitsbewijs standaard op `verplicht`: /api/pay/* vraagt een sessie met een
+     toestelsleutel en bij elk verzoek een handtekening. Zonder die stap gaf het
+     geldverhaal al in RUST een 403 ("bevestig dit toestel") en telde het als
+     gefaald -- terwijl de portemonnee in orde was en alleen de client achterliep.
+     De poort blijft zoals in productie; de beurzen doen wat de browser doet
+     (scripts/lib/proeftoestel.js). De andere twee leden komen op geen zwaar pad. */
+  const post = (pad, lijf, token, koppen) => vraag('POST', pad, token, lijf, koppen);
+  for (const naam of ['beursA', 'beursB']) {
+    const t = await bindToestel({ post, token: ploeg[naam].token, naam: 'Toestel ' + naam });
+    wb.eis('toestel binden', !!t.klaar, 'het toestel van ' + naam + ' is niet gebonden: ' + t.reden);
+    ploeg[naam].teken = t.klaar.teken;
+  }
   return { supToken: sup, supCode: code, vervoerCode: vervoer ? vervoer.code : null, prijs: 22, ploeg };
+}
+
+/* De deur met de toestellen van het podium ervoor: op een zwaar pad krijgt een
+   verzoek van een gebonden lid de kop `RTG-Bezitsbewijs` mee, overal anders
+   gaat het ongemoeid door. Welke paden zwaar zijn beslist de server. */
+function metTekening(vraag, podium) {
+  const gebonden = Object.values((podium && podium.ploeg) || {}).filter(l => l && typeof l.teken === 'function');
+  if (!gebonden.length) return vraag;
+  return async (method, pad, token, body, koppen) => {
+    const lid = zwaarPad(pad) ? gebonden.find(l => l.token === token) : null;
+    if (!lid) return vraag(method, pad, token, body, koppen);
+    return vraag(method, pad, token, body, Object.assign({}, koppen || {}, { [KOP]: await lid.teken(method, pad) }));
+  };
 }
 
 /* ---------- de verhalen ---------- */
@@ -432,7 +460,7 @@ function versRapport() {
    een ander verhaal. De gelijktijdigheid komt van de storm ernaast -- die
    hoeven we hier niet na te bootsen. */
 async function draaiRonde(vraag, podium, rapport) {
-  const wb = werkbank(vraag);
+  const wb = werkbank(metTekening(vraag, podium));
   /* De kaart terugzetten voor we beginnen. Draait dit harnas naast een storm,
      dan fuzzt die storm ook /api/supplier/menu met een geldig partner-token en
      kan hij het gerecht onder de bestelverhalen vandaan trekken. Een verhaal

@@ -187,7 +187,15 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
     ['/api/verify/upload', { image: 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).toString('base64') }],
     ['/api/giftcard/buy', { supplierCode: zaak.code, bedrag: 25 }],
     ['/api/splits', { ref: 'x', metKeys: [] }],
-    ['/api/review', { soort: 'order', ref: 'x', score: 5 }]
+    ['/api/review', { soort: 'order', ref: 'x', score: 5 }],
+    /* EN DE PLEKKEN, want die stonden nergens in deze wandeling en daardoor ook
+       niet in de bezem: een opgeslagen plek, een flitsmelding op een punt, en
+       een melding openbare ruimte (die ook als waarneming in het stadsweefsel
+       landt). Alle drie hangen aan haar sleutel of codenaam, en de vergeetroute
+       kende ze niet (server/kern/vergeten/positie.js). */
+    ['/api/mob/favoriet', { naam: 'Bij Wilma', plek: { zaak: zaak.code } }],
+    ['/api/flits/meld', { soort: 'file', lat: 52.0907, lng: 5.1214, land: 'NL' }],
+    ['/api/gemeente/meld', { categorie: 'afval', tekst: 'Volle container bij Wilma', lat: 52.0907, lng: 5.1214 }]
   ];
   const geland = [];
   for (const [pad, lijf] of sporen) {

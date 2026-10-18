@@ -966,3 +966,12 @@ html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([dat
 /* foundation/premium.css schildert .hero en .enterprise-hero altijd donker
    (!important). De tekst daarin leest dus licht, met het lichte goud. */
 html body[data-rtg-editorial-v4="true"][data-rtg-world="foundation"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.hero,.enterprise-hero){color:#fffaf2!important;--rtf-gold-soft:#e2c389!important;--rtg-world-metal:#e2c389!important}
+/* De deur van de Mall (.mall-gate) is een donker vlak; zijn actie leest licht. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .mall-gate a:not(.skip):not(.wd-skip):not(.skip-link){color:#fffaf2!important}
+/* De Partnerstudio van Magnaat houdt zijn donkere hero; de tekst daarin leest
+   licht. Het AIR GAP-merk staat op papier en leest daar in inkt. */
+html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.hero-main,.hero-side){color:#fffaf2!important;--rtg-leesgoud:#e2c389!important}
+html body[data-rtg-editorial-v4="true"]:has(#heroName) .guard-mark{color:var(--v4-ink)!important;border-color:currentColor!important}
+html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.hero-main,.hero-side) .eyebrow{color:#e2c389!important}
+html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #readinessRing>div,
+html body[data-rtg-editorial-v4="true"]:has(#heroName):not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) #readinessRing>div *{color:var(--v4-ink)!important}

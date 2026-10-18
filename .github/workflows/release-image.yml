@@ -49,11 +49,11 @@ jobs:
       # dat later door BUILD aan beide image-digests wordt gebonden.
       - name: Exacte voorafgaande workflowbewijzen binden
         env:
+          # RTG_RELEASE_BRON: de ref waarop deze run draait (main of de
+          # V1-integratiebranch, CONSOLIDATIE.md); een tag valt terug op main.
+          RTG_RELEASE_BRON: ${{ github.ref_type == 'branch' && github.ref_name || 'main' }}
           GITHUB_TOKEN: ${{ github.token }}
           RTG_RELEASE_EXPECTED_COMMIT: ${{ github.sha }}
-          # De bron is de ref waarop deze run draait: main, of de integratiebranch
-          # van de V1-afbouw (CONSOLIDATIE.md). Een tag valt terug op main.
-          RTG_RELEASE_BRON: ${{ github.ref_type == 'branch' && github.ref_name || 'main' }}
         run: node scripts/release-workflow-bewijs.js
       - name: Ondertekeningsrollen vóór bouw bewijzen
         env:

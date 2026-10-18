@@ -159,7 +159,8 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
     eigen.bak('clipsMeldingen').push({ id: id(), clipId: c.id, titel: c.titel, maker: codenaamVan(c.key),
       van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
-    eigen.zetBak('clipsMeldingen', eigen.bak('clipsMeldingen').slice(-200));
+    /* Geen kap hier: die draait in het onderhoud (kern/kappen.js, houd 200).
+       Een kap in het verzoek houdt een weigering van de begroting in stand. */
     save(); sseToOffice('sync', { scope: 'clips' });
     return { status: 200, ok: true };
   }

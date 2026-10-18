@@ -72,6 +72,8 @@ test('3. bevestigen telt de bezetting; de betaalde omzet en de boek-cijfers klop
   const boek = await api('/api/booking/request', { supplierCode: 'FUEGO', serviceId: 's3', date: VANDAAG, time: '11:00' }, lid);
   const ref = boek.body.boeking.ref;
   await api('/api/booking/pay', { ref }, lid);
+  const voor = await api('/api/supplier/vak/bord', {}, tok.FUEGO);
+  assert.ok(voor.body.teBevestigen.some(x => x.ref === ref), 'betaald en nog niet bevestigd: in de wachtlijst');
   // de chef bevestigt
   const bev = await api('/api/supplier/booking/status', { ref, status: 'bevestigd' }, tok.FUEGO);
   assert.equal(bev.status, 200);
@@ -114,6 +116,9 @@ test('6. een gesloten dag levert geen tijdvakken op', async () => {
   const slots = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: 'w1', date: '2027-01-05' }, lid);
   assert.equal(slots.status, 200);
   assert.equal(slots.body.tijden.length, 0, 'op een gesloten dag zijn er geen vrije tijden');
+  // en de tegenproef: op de open maandag ervoor zijn er wel tijden, anders zegt de nul hierboven niets
+  const maandag = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: 'w1', date: '2027-01-04' }, lid);
+  assert.ok(maandag.body.tijden.length >= 1, 'op een open dag zijn er wel vrije tijden');
 });
 
 test('7. de grens: een niet-dienstverlenend genre krijgt geen vakwerk-bord', async () => {

@@ -90,7 +90,7 @@ const post = (pad, body, tok) => fetch(BASE + pad, {
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const os_ = (pad, body, tok) => post('/api/rtfos/' + pad, body, tok || LAND);
+const os_ = (pad, body, tok) => post((pad.startsWith('/api/') ? pad : '/api/rtfos/' + pad), body, tok || LAND);
 
 const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 const kort = b => JSON.stringify(b).slice(0, 200);
@@ -104,7 +104,7 @@ async function kantoorLid(naam, mail, telefoon) {
   await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   const start = await post('/api/account/start', { rol: 'kantoor' }, reg.body.token);
   assert.ok(start.body.token, 'kantoorsessie mislukte: ' + kort(start.body));
-  const ik = await os_('ik', {}, start.body.token);
+  const ik = await os_('/api/rtfos/ik', {}, start.body.token);
   return { office: start.body.token, key: ik.body.key };
 }
 
@@ -117,26 +117,26 @@ test.before(async () => {
   /* TWEE STEDEN, en dat is geen decor: de helft van de beweringen hieronder
      gaat erover dat een lijst van de ENE stad de andere niet laat zien. Met een
      stad zou dat vanzelf waar zijn. */
-  STAD_A = (await os_('stad/maak', { naam: 'Almelo' })).body.stad.id;
-  STAD_B = (await os_('stad/maak', { naam: 'Assen' })).body.stad.id;
+  STAD_A = (await os_('/api/rtfos/stad/maak', { naam: 'Almelo' })).body.stad.id;
+  STAD_B = (await os_('/api/rtfos/stad/maak', { naam: 'Assen' })).body.stad.id;
   for (const id of [STAD_A, STAD_B]) {
-    await os_('stad/status', { id, status: 'actief' });
+    await os_('/api/rtfos/stad/status', { id, status: 'actief' });
     for (const vlag of ['donations', 'subsidy_management', 'warehouse_management',
       'events', 'youth_programs', 'volunteer_management', 'clothing_distribution']) {
-      await os_('stad/module', { id, vlag, aan: true });
+      await os_('/api/rtfos/stad/module', { id, vlag, aan: true });
     }
   }
 
   const a = await kantoorLid('Bestuur Almelo', 'bestuur.almelo@rtfosbestuur.test', '0612345681');
   BESTUUR_A = a.office;
-  await os_('zetel', { stad: STAD_A, key: a.key, naam: 'Bestuur Almelo', rol: 'stadsbestuur' });
+  await os_('/api/rtfos/zetel', { stad: STAD_A, key: a.key, naam: 'Bestuur Almelo', rol: 'stadsbestuur' });
 
-  const p = await os_('project/maak', { stad: STAD_A, naam: 'Kledingbank Almelo', soort: 'kleding',
+  const p = await os_('/api/rtfos/project/maak', { stad: STAD_A, naam: 'Kledingbank Almelo', soort: 'kleding',
     budget: 900, doelgroep: 'gezinnen' });
   assert.equal(p.status, 200, 'het proefproject kwam er niet: ' + kort(p.body));
   PROJECT_A = p.body.project.id;
-  for (const st of ['aanvraag', 'beoordeling']) await os_('project/status', { id: PROJECT_A, status: st }, BESTUUR_A);
-  for (const st of ['goedgekeurd', 'actief']) await os_('project/status', { id: PROJECT_A, status: st });
+  for (const st of ['aanvraag', 'beoordeling']) await os_('/api/rtfos/project/status', { id: PROJECT_A, status: st }, BESTUUR_A);
+  for (const st of ['goedgekeurd', 'actief']) await os_('/api/rtfos/project/status', { id: PROJECT_A, status: st });
 });
 
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -158,35 +158,35 @@ test('het subsidieregister opent alleen voor wie erbij mag, en telt wat er open 
 
   // een stad die niet bestaat is een 404 en geen lege lijst: een leeg antwoord
   // op een typefout leest als "er zijn geen subsidies".
-  const nergens = await os_('subsidies', { stad: 'bestaat-niet' });
+  const nergens = await os_('/api/rtfos/subsidies', { stad: 'bestaat-niet' });
   assert.equal(nergens.status, 404, kort(nergens.body));
   assert.match(nergens.body.error, /stadsafdeling bestaat niet/);
 
   // en de stad van een ander blijft dicht, met de naam van die stad erbij
-  const vreemd = await os_('subsidies', { stad: STAD_B }, BESTUUR_A);
+  const vreemd = await os_('/api/rtfos/subsidies', { stad: STAD_B }, BESTUUR_A);
   assert.equal(vreemd.status, 403, 'Almelo las het subsidieregister van Assen');
   assert.match(vreemd.body.error, /Assen/);
 
   // een gemiste kans (deadline in het verleden, nog op "kans")
-  const gemist = await os_('subsidie/maak', { stad: STAD_A, naam: 'Fonds Sluitpost', soort: 'fonds',
+  const gemist = await os_('/api/rtfos/subsidie/maak', { stad: STAD_A, naam: 'Fonds Sluitpost', soort: 'fonds',
     verstrekker: 'Fonds Sluitpost', bedrag: 700, deadline: '2020-03-01' });
   assert.equal(gemist.status, 200, kort(gemist.body));
 
   // en een toegekende subsidie met een openstaand rapportagemoment
-  const lopend = await os_('subsidie/maak', { stad: STAD_A, naam: 'Kledingbank Almelo 2026',
+  const lopend = await os_('/api/rtfos/subsidie/maak', { stad: STAD_A, naam: 'Kledingbank Almelo 2026',
     soort: 'gemeente', verstrekker: 'Gemeente Almelo', bedrag: 3000, projectId: PROJECT_A, risico: 'hoog' });
   const id = lopend.body.subsidie.id;
-  for (const st of ['in_voorbereiding', 'aangevraagd']) await os_('subsidie/status', { id, status: st });
-  const toe = await os_('subsidie/status', { id, status: 'toegekend', bedrag: 3000 });
+  for (const st of ['in_voorbereiding', 'aangevraagd']) await os_('/api/rtfos/subsidie/status', { id, status: st });
+  const toe = await os_('/api/rtfos/subsidie/status', { id, status: 'toegekend', bedrag: 3000 });
   assert.equal(toe.status, 200, kort(toe.body));
-  const moment = await os_('subsidie/moment', { id, wat: 'tussenrapportage', datum: '2027-02-01' });
+  const moment = await os_('/api/rtfos/subsidie/moment', { id, wat: 'tussenrapportage', datum: '2027-02-01' });
   assert.equal(moment.status, 200, kort(moment.body));
 
   // een subsidie in de ANDERE stad, die hier dus niet mag opduiken
-  await os_('subsidie/maak', { stad: STAD_B, naam: 'Fonds Assen', soort: 'fonds',
+  await os_('/api/rtfos/subsidie/maak', { stad: STAD_B, naam: 'Fonds Assen', soort: 'fonds',
     verstrekker: 'Fonds Drenthe', bedrag: 5000 });
 
-  const lijst = await os_('subsidies', { stad: STAD_A });
+  const lijst = await os_('/api/rtfos/subsidies', { stad: STAD_A });
   assert.equal(lijst.status, 200, kort(lijst.body));
   assert.equal(lijst.body.subsidies.length, 2, 'de lijst van Almelo telt niet twee subsidies');
   assert.equal(lijst.body.subsidies.every(s => s.stad === STAD_A), true,
@@ -203,8 +203,8 @@ test('het subsidieregister opent alleen voor wie erbij mag, en telt wat er open 
      tweede lezing zou "openMomenten: 1" ook kloppen bij een teller die vast
      staat op het aantal momenten. */
   const momentId = moment.body.subsidie.momenten[0].id;
-  await os_('subsidie/moment', { id, momentId, af: true });
-  const na = await os_('subsidies', { stad: STAD_A });
+  await os_('/api/rtfos/subsidie/moment', { id, momentId, af: true });
+  const na = await os_('/api/rtfos/subsidies', { stad: STAD_A });
   assert.equal(na.body.totalen.openMomenten, 0, 'een afgerond rapportagemoment stond nog open in de lijst');
   assert.equal(na.body.subsidies.find(s => s.id === id).openMomenten, 0,
     'de subsidie zelf telt zijn afgeronde moment nog als open');
@@ -219,16 +219,16 @@ test('het subsidieregister opent alleen voor wie erbij mag, en telt wat er open 
    elke lezing gerekend uit de houdbaarheidsdatum en het restant.
    ------------------------------------------------------------------------- */
 test('de voorraadlijst rekent restant en houdbaarheid bij elke lezing opnieuw', async () => {
-  const oud = await os_('voorraad/binnen', { stad: STAD_A, soort: 'voedsel', wat: 'blikken soep',
+  const oud = await os_('/api/rtfos/voorraad/binnen', { stad: STAD_A, soort: 'voedsel', wat: 'blikken soep',
     aantal: 30, houdbaarTot: '2020-05-01', gever: 'Supermarkt Almelo', locatie: 'magazijn' });
   assert.equal(oud.status, 200, kort(oud.body));
-  const bijna = await os_('voorraad/binnen', { stad: STAD_A, soort: 'voedsel', wat: 'melkpakken',
+  const bijna = await os_('/api/rtfos/voorraad/binnen', { stad: STAD_A, soort: 'voedsel', wat: 'melkpakken',
     aantal: 10, houdbaarTot: overDagen(3), locatie: 'koeling' });
-  const kleding = await os_('voorraad/binnen', { stad: STAD_A, soort: 'kleding', wat: 'winterjassen',
+  const kleding = await os_('/api/rtfos/voorraad/binnen', { stad: STAD_A, soort: 'kleding', wat: 'winterjassen',
     aantal: 20, waarde: 400, locatie: 'magazijn' });
   assert.equal(kleding.status, 200, kort(kleding.body));
 
-  const eerst = await os_('voorraad', { stad: STAD_A });
+  const eerst = await os_('/api/rtfos/voorraad', { stad: STAD_A });
   assert.equal(eerst.status, 200, kort(eerst.body));
   assert.equal(eerst.body.totalen.batches, 3);
   assert.equal(eerst.body.totalen.opVoorraad, 60, 'de optelling over de partijen klopt niet');
@@ -243,12 +243,12 @@ test('de voorraadlijst rekent restant en houdbaarheid bij elke lezing opnieuw', 
     'de weekgrens van bijnaOver klopt niet');
 
   // vier jassen de deur uit, en de soep van 2020 afgeschreven
-  const uit = await os_('voorraad/uit', { id: kleding.body.batch.id, aantal: 4, projectId: PROJECT_A });
+  const uit = await os_('/api/rtfos/voorraad/uit', { id: kleding.body.batch.id, aantal: 4, projectId: PROJECT_A });
   assert.equal(uit.status, 200, kort(uit.body));
-  const af = await os_('voorraad/afschrijven', { id: oud.body.batch.id, aantal: 30, reden: 'over de datum' });
+  const af = await os_('/api/rtfos/voorraad/afschrijven', { id: oud.body.batch.id, aantal: 30, reden: 'over de datum' });
   assert.equal(af.status, 200, kort(af.body));
 
-  const na = await os_('voorraad', { stad: STAD_A });
+  const na = await os_('/api/rtfos/voorraad', { stad: STAD_A });
   assert.equal(na.body.totalen.opVoorraad, 26, 'uitgifte en afschrijving gaan niet van de voorraad af');
   assert.equal(na.body.totalen.uitgegeven, 4);
   assert.equal(na.body.totalen.afgeschreven, 30);
@@ -262,7 +262,7 @@ test('de voorraadlijst rekent restant en houdbaarheid bij elke lezing opnieuw', 
   assert.equal(na.body.batches.find(b => b.id === kleding.body.batch.id).restant, 16);
 
   // en ook hier: de stad van een ander gaat niet open
-  const vreemd = await os_('voorraad', { stad: STAD_B }, BESTUUR_A);
+  const vreemd = await os_('/api/rtfos/voorraad', { stad: STAD_B }, BESTUUR_A);
   assert.equal(vreemd.status, 403, 'Almelo keek in het magazijn van Assen');
   assert.match(vreemd.body.error, /Assen/);
 });
@@ -278,17 +278,17 @@ test('de voorraadlijst rekent restant en houdbaarheid bij elke lezing opnieuw', 
    ------------------------------------------------------------------------- */
 test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er gebeurt', async () => {
   const jaar = overDagen(365);
-  const v = await os_('vrijwilliger/maak', { stad: STAD_A, naam: 'Begeleider Werkplaats' });
-  await os_('vrijwilliger/zet', { id: v.body.vrijwilliger.id, status: 'actief', gedragscode: true, vogGeldigTot: jaar });
+  const v = await os_('/api/rtfos/vrijwilliger/maak', { stad: STAD_A, naam: 'Begeleider Werkplaats' });
+  await os_('/api/rtfos/vrijwilliger/zet', { id: v.body.vrijwilliger.id, status: 'actief', gedragscode: true, vogGeldigTot: jaar });
 
-  const w = await os_('activiteit/maak', { stad: STAD_A, naam: 'Fietswerkplaats', soort: 'workshop',
+  const w = await os_('/api/rtfos/activiteit/maak', { stad: STAD_A, naam: 'Fietswerkplaats', soort: 'workshop',
     capaciteit: 1, wanneer: '2026-10-03', locatie: 'buurthuis' });
   assert.equal(w.status, 200, kort(w.body));
   const id = w.body.activiteit.id;
-  const maaltijd = await os_('activiteit/maak', { stad: STAD_A, naam: 'Buurtmaaltijd', soort: 'buurtmaaltijd',
+  const maaltijd = await os_('/api/rtfos/activiteit/maak', { stad: STAD_A, naam: 'Buurtmaaltijd', soort: 'buurtmaaltijd',
     capaciteit: 40, wanneer: '2026-10-10' });
 
-  const gepland = await os_('activiteiten', { stad: STAD_A });
+  const gepland = await os_('/api/rtfos/activiteiten', { stad: STAD_A });
   assert.equal(gepland.status, 200, kort(gepland.body));
   assert.equal(gepland.body.activiteiten.length, 2);
   const rij = gepland.body.activiteiten.find(a => a.id === id);
@@ -301,16 +301,16 @@ test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er
   assert.equal(gepland.body.jeugdsoorten.includes('workshop'), true);
   assert.equal(gepland.body.jeugdsoorten.includes('buurtmaaltijd'), false);
 
-  await os_('activiteit/begeleiders', { id, ids: [v.body.vrijwilliger.id] });
-  await os_('activiteit/zet', { id, veiligheidsplan: 'twee begeleiders, gereedschap achter slot' });
-  const open = await os_('activiteit/open', { id });
+  await os_('/api/rtfos/activiteit/begeleiders', { id, ids: [v.body.vrijwilliger.id] });
+  await os_('/api/rtfos/activiteit/zet', { id, veiligheidsplan: 'twee begeleiders, gereedschap achter slot' });
+  const open = await os_('/api/rtfos/activiteit/open', { id });
   assert.equal(open.status, 200, kort(open.body));
 
-  const een = await os_('activiteit/inschrijven', { id, codenaam: 'HV-FIETS1' });
-  const twee = await os_('activiteit/inschrijven', { id, codenaam: 'HV-FIETS2' });
+  const een = await os_('/api/rtfos/activiteit/inschrijven', { id, codenaam: 'HV-FIETS1' });
+  const twee = await os_('/api/rtfos/activiteit/inschrijven', { id, codenaam: 'HV-FIETS2' });
   assert.equal(twee.body.inschrijving.status, 'wachtlijst', 'de tweede kwam er bij een capaciteit van een gewoon bij');
 
-  const vol = await os_('activiteiten', { stad: STAD_A });
+  const vol = await os_('/api/rtfos/activiteiten', { stad: STAD_A });
   const rijVol = vol.body.activiteiten.find(a => a.id === id);
   assert.equal(rijVol.status, 'vol', 'de lijst laat een volle activiteit als open zien');
   assert.equal(rijVol.ingeschreven, 1, 'de lijst telt de wachtlijst mee als ingeschreven');
@@ -319,9 +319,9 @@ test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er
   assert.equal(rijVol.begeleiders, 1);
 
   // en na het inchecken telt dezelfde lijst een aanwezige, en staat de activiteit bezig
-  const binnen = await os_('activiteit/incheck', { id, checkinCode: een.body.inschrijving.checkinCode });
+  const binnen = await os_('/api/rtfos/activiteit/incheck', { id, checkinCode: een.body.inschrijving.checkinCode });
   assert.equal(binnen.status, 200, kort(binnen.body));
-  const bezig = await os_('activiteiten', { stad: STAD_A });
+  const bezig = await os_('/api/rtfos/activiteiten', { stad: STAD_A });
   const rijBezig = bezig.body.activiteiten.find(a => a.id === id);
   assert.equal(rijBezig.aanwezig, 1, 'de ingecheckte deelnemer komt niet terug in de lijst');
   assert.equal(rijBezig.ingeschreven, 1,
@@ -330,7 +330,7 @@ test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er
 
   // de lijst is van de stad, niet van het land -- en de weigering noemt de stad
   // waarop hij slaat, zodat een 403 om een heel andere reden hier niet meetelt
-  const vreemd = await os_('activiteiten', { stad: STAD_B }, BESTUUR_A);
+  const vreemd = await os_('/api/rtfos/activiteiten', { stad: STAD_B }, BESTUUR_A);
   assert.equal(vreemd.status, 403, 'Almelo las de agenda van Assen');
   assert.match(vreemd.body.error, /Assen/);
 });
@@ -345,17 +345,17 @@ test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er
    een stadsbestuurder leest de landelijke notulen niet.
    ------------------------------------------------------------------------- */
 test('een vergadering opvragen geeft het gerekende quorum, en niet aan het verkeerde orgaan', async () => {
-  const v = await os_('vergadering/maak', { soort: 'landelijk', datum: '2026-09-14', plaats: 'Utrecht',
+  const v = await os_('/api/rtfos/vergadering/maak', { soort: 'landelijk', datum: '2026-09-14', plaats: 'Utrecht',
     omvang: 5, agenda: ['jaarplan'] });
   assert.equal(v.status, 200, kort(v.body));
   const id = v.body.vergadering.id;
-  await os_('vergadering/agenda', { id, punt: 'kledingbank Almelo' });
-  await os_('vergadering/presentie', { id, aanwezig: ['rahul', 'nadia', 'joost'], afwezig: ['tim', 'els'] });
-  const besluit = await os_('vergadering/besluit', { id, onderwerp: 'kledingbank Almelo',
+  await os_('/api/rtfos/vergadering/agenda', { id, punt: 'kledingbank Almelo' });
+  await os_('/api/rtfos/vergadering/presentie', { id, aanwezig: ['rahul', 'nadia', 'joost'], afwezig: ['tim', 'els'] });
+  const besluit = await os_('/api/rtfos/vergadering/besluit', { id, onderwerp: 'kledingbank Almelo',
     tekst: 'het project krijgt drieduizend euro', voor: ['rahul', 'nadia'], tegen: ['joost'] });
   assert.equal(besluit.status, 200, kort(besluit.body));
 
-  const een = await os_('vergadering', { id });
+  const een = await os_('/api/rtfos/vergadering', { id });
   assert.equal(een.status, 200, kort(een.body));
   assert.equal(een.body.vergadering.id, id);
   assert.equal(een.body.vergadering.omvang, 5);
@@ -370,22 +370,22 @@ test('een vergadering opvragen geeft het gerekende quorum, en niet aan het verke
   assert.equal(een.body.vergadering.vastgesteld, null, 'een verse vergadering stond al als vastgesteld');
 
   // een vergadering die niet bestaat is een 404, geen leeg stuk
-  const weg = await os_('vergadering', { id: 'bestaatniet' });
+  const weg = await os_('/api/rtfos/vergadering', { id: 'bestaatniet' });
   assert.equal(weg.status, 404, kort(weg.body));
   assert.match(weg.body.error, /vergadering bestaat niet/);
 
   // de landelijke notulen zijn niet van de stad
-  const stad = await os_('vergadering', { id }, BESTUUR_A);
+  const stad = await os_('/api/rtfos/vergadering', { id }, BESTUUR_A);
   assert.equal(stad.status, 403, 'een stadsbestuurder las de landelijke notulen');
   assert.match(stad.body.error, /landelijke bestuur/);
 
   /* EN NU HET GEVAL DAT WEL MOET LUKKEN, want een 403 die altijd komt zegt
      alleen dat de sessie stuk is. Dezelfde sessie, dezelfde route, een
      vergadering van het eigen orgaan. */
-  const eigen = await os_('vergadering/maak', { soort: 'stad', stad: STAD_A, datum: '2026-09-21',
+  const eigen = await os_('/api/rtfos/vergadering/maak', { soort: 'stad', stad: STAD_A, datum: '2026-09-21',
     plaats: 'buurthuis', omvang: 3 }, BESTUUR_A);
   assert.equal(eigen.status, 200, kort(eigen.body));
-  const eigenLezen = await os_('vergadering', { id: eigen.body.vergadering.id }, BESTUUR_A);
+  const eigenLezen = await os_('/api/rtfos/vergadering', { id: eigen.body.vergadering.id }, BESTUUR_A);
   assert.equal(eigenLezen.status, 200, 'de stad kon haar eigen notulen niet opvragen');
   assert.equal(eigenLezen.body.vergadering.stad, STAD_A);
 
@@ -393,7 +393,7 @@ test('een vergadering opvragen geeft het gerekende quorum, en niet aan het verke
      de poort staat per orgaan open, niet per stad dicht. Een kale 200 zou hier
      te weinig zeggen (een lege of verkeerde vergadering is ook 200), dus het
      stuk dat terugkomt moet ook echt dat van Almelo zijn. */
-  const landLeest = await os_('vergadering', { id: eigen.body.vergadering.id });
+  const landLeest = await os_('/api/rtfos/vergadering', { id: eigen.body.vergadering.id });
   assert.equal(landLeest.status, 200, 'het landelijke bestuur kwam niet bij de notulen van een stad');
   assert.equal(landLeest.body.vergadering.id, eigen.body.vergadering.id);
   assert.equal(landLeest.body.vergadering.stad, STAD_A,
@@ -419,18 +419,18 @@ test('een vergadering opvragen geeft het gerekende quorum, en niet aan het verke
    pas zichtbaar met twee steden, waarvan er een tekent.
    ------------------------------------------------------------------------- */
 test('de beleidslijst zegt per lezer wat er nog open staat, en negeert wat nog niet geldt', async () => {
-  const privacy = await os_('beleid/maak', { titel: 'Beeldmateriaal van kinderen', soort: 'privacy',
+  const privacy = await os_('/api/rtfos/beleid/maak', { titel: 'Beeldmateriaal van kinderen', soort: 'privacy',
     tekst: 'Geen herkenbare foto van een minderjarige zonder schriftelijke toestemming van beide ouders.' });
   assert.equal(privacy.status, 200, kort(privacy.body));
-  const inkoop = await os_('beleid/maak', { titel: 'Inkoop boven duizend euro', soort: 'inkoop',
+  const inkoop = await os_('/api/rtfos/beleid/maak', { titel: 'Inkoop boven duizend euro', soort: 'inkoop',
     tekst: 'Boven duizend euro zijn er twee offertes nodig, en de keuze wordt schriftelijk onderbouwd.' });
   assert.equal(inkoop.status, 200, kort(inkoop.body));
-  const later = await os_('beleid/maak', { titel: 'Reiskostenregeling 2027', soort: 'financieel',
+  const later = await os_('/api/rtfos/beleid/maak', { titel: 'Reiskostenregeling 2027', soort: 'financieel',
     tekst: 'Reiskosten worden vergoed op basis van het laagste openbaarvervoertarief, achteraf en met bewijs.',
     ingangsdatum: overDagen(90) });
   assert.equal(later.status, 200, kort(later.body));
 
-  const land = await os_('beleid', {});
+  const land = await os_('/api/rtfos/beleid', {});
   assert.equal(land.status, 200, kort(land.body));
   assert.equal(land.body.aantal, 3);
   assert.equal(land.body.openVoorMij, 2,
@@ -440,28 +440,28 @@ test('de beleidslijst zegt per lezer wat er nog open staat, en negeert wat nog n
   assert.deepEqual(rijLater.open, [], 'een regel die nog niet geldt zette de steden al in gebreke');
 
   // filteren op soort levert echt een deelverzameling op
-  const alleenPrivacy = await os_('beleid', { soort: 'privacy' });
+  const alleenPrivacy = await os_('/api/rtfos/beleid', { soort: 'privacy' });
   assert.equal(alleenPrivacy.body.aantal, 1, 'het filter op soort levert niet een regel op');
   assert.equal(alleenPrivacy.body.regels[0].id, privacy.body.regel.id);
 
   // voor Almelo staan dezelfde twee open -- nog
-  const voor = await os_('beleid', {}, BESTUUR_A);
+  const voor = await os_('/api/rtfos/beleid', {}, BESTUUR_A);
   assert.equal(voor.body.openVoorMij, 2, 'Almelo begint niet met twee openstaande regels');
 
-  const teVroeg = await os_('beleid/bevestig', { id: later.body.regel.id, stad: STAD_A }, BESTUUR_A);
+  const teVroeg = await os_('/api/rtfos/beleid/bevestig', { id: later.body.regel.id, stad: STAD_A }, BESTUUR_A);
   assert.equal(teVroeg.status, 400, 'een regel kon worden bevestigd voordat hij inging');
   assert.match(teVroeg.body.error, /gaat pas in op/);
 
-  const getekend = await os_('beleid/bevestig', { id: privacy.body.regel.id, stad: STAD_A }, BESTUUR_A);
+  const getekend = await os_('/api/rtfos/beleid/bevestig', { id: privacy.body.regel.id, stad: STAD_A }, BESTUUR_A);
   assert.equal(getekend.status, 200, kort(getekend.body));
 
   /* DE TWEE LEZINGEN NAAST ELKAAR. Voor Almelo staat er nog een open, voor het
      landelijke bestuur nog steeds twee -- want Assen heeft niets getekend. Zou
      `openVoorMij` gewoon "alle open regels" tellen, dan waren die twee getallen
      gelijk gebleven en zou niemand het merken. */
-  const na = await os_('beleid', {}, BESTUUR_A);
+  const na = await os_('/api/rtfos/beleid', {}, BESTUUR_A);
   assert.equal(na.body.openVoorMij, 1, 'de bevestiging van Almelo veranderde niets aan het eigen getal');
-  const landNa = await os_('beleid', {});
+  const landNa = await os_('/api/rtfos/beleid', {});
   assert.equal(landNa.body.openVoorMij, 2,
     'de handtekening van Almelo haalde de regel ook voor Assen van de lijst');
   const rijPrivacy = landNa.body.regels.find(r => r.id === privacy.body.regel.id);
@@ -480,26 +480,26 @@ test('de beleidslijst zegt per lezer wat er nog open staat, en negeert wat nog n
    giften ziet.
    ------------------------------------------------------------------------- */
 test('de herkomstlijst toont wat stilstaat, per drempel en per stad', async () => {
-  const groot = await os_('bron/maak', { stad: STAD_A, soort: 'donatie', gever: 'Erfenis mevrouw De Wit',
+  const groot = await os_('/api/rtfos/bron/maak', { stad: STAD_A, soort: 'donatie', gever: 'Erfenis mevrouw De Wit',
     bedrag: 25000 });
   assert.equal(groot.status, 200, kort(groot.body));
-  const contant = await os_('bron/maak', { stad: STAD_A, soort: 'donatie', gever: 'Collecte kerk',
+  const contant = await os_('/api/rtfos/bron/maak', { stad: STAD_A, soort: 'donatie', gever: 'Collecte kerk',
     bedrag: 600, kenmerk: 'contant' });
   /* HET TEGENVOORBEELD BIJ ALLEBEI DE DREMPELS, want zonder die twee zou "hij
      staat in de lijst" ook waar zijn bij een controle die altijd afgaat. */
-  const zeshonderdGiraal = await os_('bron/maak', { stad: STAD_A, soort: 'donatie', gever: 'Buurtvereniging',
+  const zeshonderdGiraal = await os_('/api/rtfos/bron/maak', { stad: STAD_A, soort: 'donatie', gever: 'Buurtvereniging',
     bedrag: 600 });
   assert.equal(zeshonderdGiraal.body.melding, undefined,
     'een gewone gift van 600 euro werd als grote gift gemarkeerd');
-  const subsidie = await os_('bron/maak', { stad: STAD_A, soort: 'subsidie', gever: 'Gemeente Almelo',
+  const subsidie = await os_('/api/rtfos/bron/maak', { stad: STAD_A, soort: 'subsidie', gever: 'Gemeente Almelo',
     bedrag: 40000 });
   assert.equal(subsidie.body.melding, undefined, 'een gemeentesubsidie kwam in de witwascontrole terecht');
   // en een grote gift in de andere stad, voor de scheiding verderop
-  const assen = await os_('bron/maak', { stad: STAD_B, soort: 'donatie', gever: 'Anonieme gever Assen',
+  const assen = await os_('/api/rtfos/bron/maak', { stad: STAD_B, soort: 'donatie', gever: 'Anonieme gever Assen',
     bedrag: 12000 });
   assert.equal(assen.status, 200, kort(assen.body));
 
-  const lijst = await os_('herkomst', {});
+  const lijst = await os_('/api/rtfos/herkomst', {});
   assert.equal(lijst.status, 200, kort(lijst.body));
   assert.equal(lijst.body.aantal, 3, 'de lijst bevat niet precies de drie giften die boven een drempel uitkomen');
   assert.equal(lijst.body.open, 3, 'niet alle drie de controles staan open');
@@ -513,9 +513,9 @@ test('de herkomstlijst toont wat stilstaat, per drempel en per stad', async () =
   assert.match(rijContant.reden, /contante gift boven 500/, 'de contante drempel wordt niet als reden genoemd');
 
   // filteren op stad, en de stad die zelf kijkt ziet alleen zichzelf
-  const alleenA = await os_('herkomst', { stad: STAD_A });
+  const alleenA = await os_('/api/rtfos/herkomst', { stad: STAD_A });
   assert.equal(alleenA.body.aantal, 2, 'het filter op stad levert niet de twee giften van Almelo op');
-  const doorAlmelo = await os_('herkomst', {}, BESTUUR_A);
+  const doorAlmelo = await os_('/api/rtfos/herkomst', {}, BESTUUR_A);
   assert.equal(doorAlmelo.body.aantal, 2, 'Almelo zag de grote gift van Assen in haar eigen lijst staan');
   assert.equal(doorAlmelo.body.controles.every(c => c.stad === STAD_A), true,
     'er stond een gift van een andere stad in de lijst van Almelo');
@@ -523,15 +523,15 @@ test('de herkomstlijst toont wat stilstaat, per drempel en per stad', async () =
   /* EEN OORDEEL, EN DEZELFDE LIJST OPNIEUW. De beoordeelde gift verdwijnt uit
      het open-filter maar niet uit de lijst: wat gecontroleerd is, blijft
      zichtbaar met zijn uitkomst. */
-  const oordeel = await os_('herkomst/beoordeel', { bronId: groot.body.bron.id, uitkomst: 'akkoord',
+  const oordeel = await os_('/api/rtfos/herkomst/beoordeel', { bronId: groot.body.bron.id, uitkomst: 'akkoord',
     herkomstGeld: 'nalatenschap, afwikkeling via notaris Van Dijk in maart 2026' });
   assert.equal(oordeel.status, 200, kort(oordeel.body));
 
-  const na = await os_('herkomst', {});
+  const na = await os_('/api/rtfos/herkomst', {});
   assert.equal(na.body.aantal, 3, 'de afgeronde controle verdween uit de lijst');
   assert.equal(na.body.open, 2, 'de afgeronde controle telde nog mee als open');
   assert.equal(na.body.controles.find(c => c.bronId === groot.body.bron.id).status, 'afgerond');
-  const openBak = await os_('herkomst', { open: true });
+  const openBak = await os_('/api/rtfos/herkomst', { open: true });
   assert.equal(openBak.body.aantal, 2, 'het open-filter laat de afgeronde controle nog staan');
   assert.equal(openBak.body.controles.some(c => c.bronId === groot.body.bron.id), false,
     'de beoordeelde gift stond nog in het werkbakje');

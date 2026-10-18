@@ -73,9 +73,11 @@ test('1. de zekering-knop kent geen __proto__', async () => {
    vastleggen is het gedrag eromheen: zonder sleutel bestaat de route niet, en
    met een foute sleutel ook niet (zelfde 404, geen apart "verkeerde sleutel"). */
 test('2. de clusterknoppen bestaan niet zonder de juiste sleutel', async () => {
-  const zonder = await fetch(base + '/api/cluster/promote', { method: 'POST' });
+  // de deur heet in de routekaart /api/cluster/:actie; promote is een van de acties
+  const CLUSTER = '/api/cluster/:actie';
+  const zonder = await fetch(base + CLUSTER.replace(':actie', 'promote'), { method: 'POST' });
   assert.equal(zonder.status, 404, 'zonder sleutel: onbekend');
-  const fout = await fetch(base + '/api/cluster/promote', { method: 'POST', headers: { 'x-rtg-cluster': 'gokje' } });
+  const fout = await fetch(base + CLUSTER.replace(':actie', 'promote'), { method: 'POST', headers: { 'x-rtg-cluster': 'gokje' } });
   assert.equal(fout.status, 404, 'met een foute sleutel: precies hetzelfde antwoord');
   const body = await fout.json().catch(() => ({}));
   assert.doesNotMatch(String(body.error || ''), /sleutel|cluster/i,

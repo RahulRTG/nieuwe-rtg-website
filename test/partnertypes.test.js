@@ -44,7 +44,8 @@ test('met een Business Pass komt de volle kaart: types, landen en handelseisen',
   const d = await post('/api/partner/types', {}, tok);
   assert.equal(d.status, 200);
   assert.ok((d.body.types || []).length >= 5, 'de bedrijfstypen staan erin');
-  assert.ok((d.body.landen || []).length > 100, 'de landenlijst komt uit de catalogus, niet uit een lijstje');
+  assert.ok(Array.isArray(d.body.landen), 'er komt een landenlijst mee');
+  assert.ok(d.body.landen.length > 100, 'de landenlijst komt uit de catalogus, niet uit een lijstje');
   assert.ok(d.body.landen.every(l => typeof l.code === 'string' && l.code.length >= 2), 'elk land draagt een code');
   assert.ok(d.body.handelEisen, 'de handelseisen (goederen, douane) reizen mee');
   const restaurant = d.body.types.find(t => t.code === 'restaurant');

@@ -225,6 +225,7 @@ test('afhalen geeft een uitspreekbare code, en de zaak ziet dezelfde rekening', 
   assert.equal(uit.status, 200, JSON.stringify(uit.body).slice(0, 200));
   assert.match(uit.body.afhaal.code, /^[A-HJ-NP-Z]\d{2}$/,
     'de afhaalcode is een letter en twee cijfers, zonder I en O');
+  assert.ok(uit.body.rekening.regels.length > 0, 'de bestelde regel staat op de rekening');
   assert.ok(!uit.body.rekening.regels.some(r => /Bezorging/.test(r.naam)),
     'afhalen kent geen bezorgkosten');
 

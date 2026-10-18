@@ -24,7 +24,7 @@ const { steunVoor, maximum, schoonBeleid, isTaalvak } = require('../server/kern/
 
 let srv, base, sch, leraar, klas;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taal-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
@@ -33,16 +33,16 @@ const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'De Toren', plaats: 'Almere' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Toren', plaats: 'Almere' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Ilias', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Ilias', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     personeelId: leraar.personeelId, akkoord: true });
-  klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: '8A', trap: 'po', fase: 'po-g8' })).body;
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -73,7 +73,7 @@ test('bij een taalvak kan de steun nooit op volledig, wat een school ook instelt
 });
 
 test('een teruggezette keuze wordt gemeld en niet stil bijgesteld', async () => {
-  const r = await fnd('/school/taalbeleid/zet', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  const r = await fnd('/api/foundation/school/taalbeleid/zet', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     beleid: { nederlands: 'volledig', rekenen: 'geen' } });
   assert.equal(r.status, 200);
   assert.equal(r.body.beleid.nederlands, 'instructie');
@@ -81,7 +81,7 @@ test('een teruggezette keuze wordt gemeld en niet stil bijgesteld', async () => 
   assert.deepEqual(r.body.teruggezet, ['nederlands'], 'stil bijstellen laat een school denken dat het aanstaat');
   assert.match(r.body.uitleg, /taal zelf/i);
 
-  const lijst = (await kl('/school/taalbeleid')).body;
+  const lijst = (await kl('/api/foundation/school/taalbeleid')).body;
   const nl = lijst.vakken.find(v => v.vak === 'nederlands');
   assert.equal(nl.steun, 'instructie');
   assert.equal(nl.maximum, 'instructie');
@@ -109,7 +109,7 @@ test('de vier dingen die er nooit uit mogen vallen, worden gevangen', () => {
 
 /* ---------- de poort naar het gezin ---------- */
 test('een vertaald bericht gaat niet weg zonder mens, en draagt een bon', async () => {
-  const c = await kl('/school/bericht/controleer', { tekst: 'Uw kind moet morgen om 8 uur aanwezig zijn.', taal: 'en' });
+  const c = await kl('/api/foundation/school/bericht/controleer', { tekst: 'Uw kind moet morgen om 8 uur aanwezig zijn.', taal: 'en' });
   assert.equal(c.status, 200, JSON.stringify(c.body).slice(0, 160));
   assert.ok(c.body.vertaling && c.body.terug, 'de terugvertaling hoort erbij');
   assert.ok(Array.isArray(c.body.verschillen));
@@ -120,20 +120,20 @@ test('een vertaald bericht gaat niet weg zonder mens, en draagt een bon', async 
   assert.deepEqual(c.body.bon.gebruikt, ['de tekst van dit bericht']);
 
   // zonder naam gaat er niets weg
-  assert.equal((await kl('/school/bericht/verstuur', { bevestigd: true, tekst: 'x', vertaling: 'y' })).status, 400);
+  assert.equal((await kl('/api/foundation/school/bericht/verstuur', { bevestigd: true, tekst: 'x', vertaling: 'y' })).status, 400);
   // en zonder bevestiging ook niet
-  const zonder = await kl('/school/bericht/verstuur', { door: 'Meester Ilias', tekst: 'x', vertaling: 'y' });
+  const zonder = await kl('/api/foundation/school/bericht/verstuur', { door: 'Meester Ilias', tekst: 'x', vertaling: 'y' });
   assert.equal(zonder.status, 400);
   assert.match(zonder.body.error, /terugvertaling/i);
 
   // bij een verschoven betekenis is bevestigen niet genoeg
   const verschoven = [{ soort: 'verplichting', ernst: 'hoog', wat: 'afgezwakt' }];
-  const stop = await kl('/school/bericht/verstuur', { bevestigd: true, door: 'Meester Ilias',
+  const stop = await kl('/api/foundation/school/bericht/verstuur', { bevestigd: true, door: 'Meester Ilias',
     tekst: 'Uw kind moet morgen aanwezig zijn.', vertaling: 'Your child should be there.', taal: 'en', verschillen: verschoven });
   assert.equal(stop.status, 409);
   assert.match(stop.body.error, /apart/i);
 
-  const weg = await kl('/school/bericht/verstuur', { bevestigd: true, verschillenGezien: true, door: 'Meester Ilias',
+  const weg = await kl('/api/foundation/school/bericht/verstuur', { bevestigd: true, verschillenGezien: true, door: 'Meester Ilias',
     tekst: 'Uw kind moet morgen aanwezig zijn.', vertaling: 'Your child must be present tomorrow.',
     taal: 'en', verschillen: verschoven, model: 'woordenboek' });
   assert.equal(weg.status, 200);

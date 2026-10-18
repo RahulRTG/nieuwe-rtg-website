@@ -274,3 +274,39 @@ test('12. de schermen staan in de app-gids en de catalogus', () => {
   assert.ok(mijn, 'Mijn Mall staat in de App-Bibliotheek');
   assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', mijn.url)), 'en de pagina bestaat');
 });
+
+/* 9. /api/mall/lijst/zet en /api/mall/lijst/regel-weg: een lijst hernoemen, een
+   reis een andere periode geven, en een losse regel er weer uithalen. Een
+   ongeldige datum wordt geen datum; een regel die er niet staat is een 404; en
+   een ander account raakt de lijst niet aan.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/mall/lijsten.js `isDatum(data.tot) ?
+   data.tot : null` vervangen door `data.tot`; de toets zakte op "een ongeldige
+   datum wordt geen datum". */
+test('9. een lijst bijwerken en een regel eruit halen, alleen door het lid zelf', async () => {
+  const reis = await api('/api/mall/lijst/nieuw', { naam: 'Najaar', soort: 'reis', plek: 'Ibiza',
+    van: '2026-10-01', tot: '2026-10-05' }, lid);
+  assert.equal(reis.status, 200);
+  const id = reis.body.lijst.id;
+
+  const zet = await api('/api/mall/lijst/zet', { id, naam: 'Najaar op Ibiza', van: '2026-10-02', tot: 'volgende week' }, lid);
+  assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
+  assert.equal(zet.body.lijst.naam, 'Najaar op Ibiza');
+  assert.equal(zet.body.lijst.van, '2026-10-02');
+  assert.equal(zet.body.lijst.tot, null, 'een ongeldige datum wordt geen datum');
+  assert.equal((await api('/api/mall/lijst/zet', { id, naam: 'Overgenomen' }, gast)).status, 404, 'een ander account hernoemt niets');
+  assert.equal((await api('/api/mall/lijst', { id }, lid)).body.lijst.naam, 'Najaar op Ibiza', 'en de naam bleef staan');
+
+  const items = (await zoek({})).items;
+  assert.ok(items.length >= 2, 'er is aanbod genoeg');
+  await api('/api/mall/lijst/voegtoe', { id, aanbodId: items[0].id }, lid);
+  await api('/api/mall/lijst/voegtoe', { id, aanbodId: items[1].id }, lid);
+  assert.equal((await api('/api/mall/lijst/regel-weg', { id, aanbodId: items[0].id }, gast)).status, 404);
+  assert.equal((await api('/api/mall/lijst/regel-weg', { id, aanbodId: 'staat-er-niet' }, lid)).status, 404);
+  assert.equal((await api('/api/mall/lijst/regel-weg', { id, aanbodId: items[0].id }, null)).status, 401);
+  const weg = await api('/api/mall/lijst/regel-weg', { id, aanbodId: items[0].id }, lid);
+  assert.equal(weg.status, 200);
+  assert.equal(weg.body.aantal, 1);
+  const na = (await api('/api/mall/lijst', { id }, lid)).body.lijst.regels;
+  assert.equal(na.length, 1);
+  assert.equal(na[0].aanbodId, items[1].id, 'precies de genoemde regel is weg, de andere blijft');
+});

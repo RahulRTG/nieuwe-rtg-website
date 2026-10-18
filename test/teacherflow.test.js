@@ -23,7 +23,7 @@ const { verslagVan, VELDEN } = require('../server/school/les');
 
 let srv, base, sch, leraar, klas, gezin, kind, kindToken;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-teacher-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
@@ -33,28 +33,28 @@ const vandaag = () => new Date().toISOString().slice(0, 10);
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'De Wissel', plaats: 'Ede' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Wissel', plaats: 'Ede' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf Wilma', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf Wilma', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     personeelId: leraar.personeelId, akkoord: true });
-  klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: '6A', trap: 'po', fase: 'po-g6' })).body;
 
-  gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Wissel', naam: 'Ouder Wissel', pin: '4321' })).body;
-  kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Fien', rol: 'kind', groep: 'kind' })).body;
-  kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
-  await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
-  await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
+  gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Wissel', naam: 'Ouder Wissel', pin: '4321' })).body;
+  kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Fien', rol: 'kind', groep: 'kind' })).body;
+  kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
+  await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('de aandachtslijst staat in drie bakken, met een regel per soort', async () => {
-  const r = await kl('/school/aandacht');
+  const r = await kl('/api/foundation/school/aandacht');
   assert.equal(r.status, 200);
   for (const bak of ['nu', 'vandaag', 'kanWachten']) assert.ok(Array.isArray(r.body[bak]), 'bak ' + bak + ' ontbreekt');
 
@@ -65,24 +65,24 @@ test('de aandachtslijst staat in drie bakken, met een regel per soort', async ()
   assert.ok(presentie.waarheen, 'en waar het hoort');
 
   // zodra de presentie er staat, is die regel weg -- de lijst is geen inbox die volloopt
-  await fnd('/school/aanwezigheid/zet', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  await fnd('/api/foundation/school/aanwezigheid/zet', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     klasCode: klas.code, uur: 1, regels: [{ leerling: 'x', stand: 'aanwezig' }] })
     .then(async () => {
-      const kla = (await kl('/school/klas')).body;
-      await fnd('/school/aanwezigheid/zet', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+      const kla = (await kl('/api/foundation/school/klas')).body;
+      await fnd('/api/foundation/school/aanwezigheid/zet', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
         klasCode: klas.code, uur: 1, regels: [{ leerling: kla.leerlingen[0].sleutel, stand: 'aanwezig' }] });
     });
-  const na = (await kl('/school/aandacht')).body;
+  const na = (await kl('/api/foundation/school/aandacht')).body;
   assert.equal(na.nu.filter(x => /presentie/i.test(x.wat)).length, 0, 'de regel blijft staan nadat hij is gedaan');
 });
 
 test('de aandachtslijst draagt geen inhoud over een kind', async () => {
   // een kind gebruikt de hulplijn met een tekst die nergens mag opduiken
-  const melding = await fnd('/school/hulplijn', { code: gezin.code, token: kindToken, klasCode: klas.code,
+  const melding = await fnd('/api/foundation/school/hulplijn', { code: gezin.code, token: kindToken, klasCode: klas.code,
     tekst: 'ik word gepest door iemand uit groep acht', acuut: true });
   assert.equal(melding.status, 200);
 
-  const r = (await kl('/school/aandacht')).body;
+  const r = (await kl('/api/foundation/school/aandacht')).body;
   const rij = r.nu.find(x => /hulplijn/i.test(x.wat));
   assert.ok(rij, 'een acute melding hoort in de bak "nu"');
   assert.equal(rij.aantal, 1);
@@ -95,8 +95,8 @@ test('de aandachtslijst draagt geen inhoud over een kind', async () => {
 });
 
 test('de aandachtslijst bewaart niets: geen geschiedenis van hoe snel iemand hem leegwerkt', async () => {
-  const een = (await kl('/school/aandacht')).body;
-  const twee = (await kl('/school/aandacht')).body;
+  const een = (await kl('/api/foundation/school/aandacht')).body;
+  const twee = (await kl('/api/foundation/school/aandacht')).body;
   assert.deepEqual(een.nu, twee.nu, 'de lijst wordt uitgerekend en niet bewaard');
   const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'school', 'aandacht.js'), 'utf8');
   assert.doesNotMatch(bron, /\bsave\(/, 'de aandachtslijst kan opeens opslaan');
@@ -104,9 +104,9 @@ test('de aandachtslijst bewaart niets: geen geschiedenis van hoe snel iemand hem
 });
 
 test('een les rondt zichzelf niet af, en het verslag gaat over de les', async () => {
-  await kl('/school/huiswerk/maak', { titel: 'Breuken', doel: 'rekenen.g6.breuken-vergelijken', deadline: vandaag() });
+  await kl('/api/foundation/school/huiswerk/maak', { titel: 'Breuken', doel: 'rekenen.g6.breuken-vergelijken', deadline: vandaag() });
 
-  const concept = (await kl('/school/les/concept')).body;
+  const concept = (await kl('/api/foundation/school/les/concept')).body;
   assert.equal(concept.presentie.gezet, true, 'de presentie van vandaag staat in het concept');
   assert.ok(concept.presentie.telling.aanwezig >= 1);
   assert.ok(concept.doelen.length >= 1, 'wat vandaag aan de orde was, staat erin');
@@ -114,18 +114,18 @@ test('een les rondt zichzelf niet af, en het verslag gaat over de les', async ()
   assert.equal(concept.alAfgerond, false);
 
   // zonder bevestiging gebeurt er niets
-  const zonder = await kl('/school/les/rond-af', { doelen: concept.doelen, door: 'Juf Wilma' });
+  const zonder = await kl('/api/foundation/school/les/rond-af', { doelen: concept.doelen, door: 'Juf Wilma' });
   assert.equal(zonder.status, 400);
   assert.match(zonder.body.error, /mens die bevestigt/i);
   // en zonder naam ook niet
-  assert.equal((await kl('/school/les/rond-af', { bevestigd: true, doelen: concept.doelen })).status, 400);
+  assert.equal((await kl('/api/foundation/school/les/rond-af', { bevestigd: true, doelen: concept.doelen })).status, 400);
 
-  const af = await kl('/school/les/rond-af', { bevestigd: true, door: 'Juf Wilma', doelen: concept.doelen,
+  const af = await kl('/api/foundation/school/les/rond-af', { bevestigd: true, door: 'Juf Wilma', doelen: concept.doelen,
     telling: concept.presentie.telling, werkte: 'de strook op het bord werkte beter dan de uitleg in het boek',
     liepVast: 'gelijknamig maken bleef hangen' });
   assert.equal(af.status, 200);
 
-  const geheugen = (await kl('/school/les/geheugen', { doel: concept.doelen[0] })).body;
+  const geheugen = (await kl('/api/foundation/school/les/geheugen', { doel: concept.doelen[0] })).body;
   assert.doesNotMatch(JSON.stringify(geheugen), /Fien|sleutel|profielId/i);
 });
 
@@ -150,7 +150,7 @@ test('een lesverslag draagt alleen de telling, nooit een leerling', () => {
 });
 
 test('wat een les opschrijft, komt terug bij hetzelfde leerdoel', async () => {
-  const g = (await kl('/school/les/geheugen', { doel: 'rekenen.g6.breuken-vergelijken' })).body;
+  const g = (await kl('/api/foundation/school/les/geheugen', { doel: 'rekenen.g6.breuken-vergelijken' })).body;
   assert.equal(g.eerder.length, 1);
   assert.match(g.eerder[0].werkte, /strook op het bord/);
   assert.match(g.eerder[0].liepVast, /gelijknamig/);
@@ -158,7 +158,7 @@ test('wat een les opschrijft, komt terug bij hetzelfde leerdoel', async () => {
   assert.ok(g.eerder[0].datum);
 
   // bij een leerdoel waarover niets is opgeschreven, staat dat er eerlijk
-  const leeg = (await kl('/school/les/geheugen', { doel: 'taal.g6.cht-ch' })).body;
+  const leeg = (await kl('/api/foundation/school/les/geheugen', { doel: 'taal.g6.cht-ch' })).body;
   assert.equal(leeg.eerder.length, 0);
   assert.match(leeg.uitleg, /nog niets opgeschreven/i);
 });

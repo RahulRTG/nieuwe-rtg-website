@@ -176,6 +176,12 @@ module.exports = (kern, hulp) => {
   app.post('/api/concern/kwalificatie/zet', auth, (req, res) => {
     const e = mijn(req);
     if (!e) return stuur(res, nietGevonden);
+    /* Alleen op iemand die hier werkt -- dezelfde zeef als de leesroute
+       hieronder. Zonder deze regel zette een eigen entiteit een kwalificatie
+       (de werkelijke toegang) op een willekeurige persoon (test/concern-routes.test.js). */
+    const persoon = String((req.body || {}).persoon || '');
+    const werkt = employmentVanPersoon(persoon, true).some(x => x.entiteit === e.id);
+    if (!werkt) return stuur(res, { status: 404, error: 'Deze persoon werkt hier niet.' });
     stuur(res, kwalificatieZet(req.body || {}));
   });
 

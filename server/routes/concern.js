@@ -131,7 +131,13 @@ module.exports = (kern) => {
     const e = mijn(req);
     if (!e) return stuur(res, nietGevonden);
     const b = req.body || {};
-    stuur(res, tijdBeeindig(String(b.feit || ''), b.tot, Object.assign({}, b, { wie: req.session.key })));
+    /* HET FEIT MOET BIJ DEZE ENTITEIT HOREN. mijn() bewijst alleen dat de
+       entiteit van de aanvrager is; het feit-id komt uit het lichaam. Zonder
+       deze regel beeindigde een eigen entiteit plus andermans feit-id diens
+       bestuurder (test/concern-routes.test.js). Dezelfde 404 als "bestaat niet". */
+    const feitId = String(b.feit || '');
+    if (!entiteitGeschiedenis(e).some(f => f.id === feitId)) return stuur(res, { status: 404, error: 'Dit gegeven bestaat niet.' });
+    stuur(res, tijdBeeindig(feitId, b.tot, Object.assign({}, b, { wie: req.session.key })));
   });
 
   /* DE TIJDMACHINE ZELF: geef een datum en je krijgt de entiteit zoals zij er

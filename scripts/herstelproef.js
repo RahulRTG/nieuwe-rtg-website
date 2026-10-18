@@ -143,6 +143,8 @@ const proeftoestel = require('./lib/proeftoestel');
 const TOESTEL = new Map();
 const ALS = new Map();
 let OPROEP = 0;
+/* Wanneer de proef voor het laatst iets vroeg; zie `uitlijnen`. */
+let LAATSTE_OPROEP = 0;
 async function roep(basis, pad, token, lijf) {
   try {
     /* ELKE OPROEP VAN DEZE PROEF IS EEN BEWUSTE, APARTE OPDRACHT, en zegt dat
@@ -158,6 +160,7 @@ async function roep(basis, pad, token, lijf) {
       if (t) koppen[proeftoestel.KOP] = await t.teken('POST', pad);
     }
     koppen.Authorization = 'Bearer ' + token;
+    LAATSTE_OPROEP = Date.now();
     const r = await fetch(basis + pad, {
       method: 'POST',
       headers: koppen,
@@ -170,7 +173,24 @@ async function roep(basis, pad, token, lijf) {
 /* Alleen de collecties die er werkelijk toe doen: de huishouding (apiSpoor,
    handelingLog) verandert bij ELKE oproep en zou elk paar op "niet hersteld"
    zetten. Dat is dezelfde scheiding als in de droogloop, uit hetzelfde bestand. */
-const domein = (lijst) => (lijst || []).filter(n => !isSpoor(n));
+/* EN HET BEZITSBEWIJS HOORT DAARBIJ -- besluit van de eigenaar, 18 oktober
+   2026. `bezitsbewijzen` (kern/identiteit/bezitsbewijs.js) is de
+   herhaalkast van de ondertekende verzoeken: elk zwaar verzoek zet er zijn
+   eigen jti in, en die verloopt pas na drie minuten. Daarmee zegt hij DAT er
+   een ondertekend verzoek binnenkwam, net als apiSpoor en audit_rij zeggen dat
+   er een verzoek was -- en niets over het domein. Zonder deze regel kon geen
+   enkel paar op een zwaar pad ooit `exact` halen, ook niet als de bank zijn
+   pas letterlijk terugzette: /api/bank/pas/uitgeven en /api/wallet/voeg
+   zakten op precies deze ene collectie, en de proef had haar in de ronde
+   ervoor gemeten (bankPassen en wallet stonden exact terug).
+
+   Dit staat HIER en niet in SPOREN van scripts/droogloop.js: de droogloop
+   vraagt "is er iets gebeurd", en een ondertekend verzoek is daar wel degelijk
+   iets. Het besluit gaat alleen over de vraag van deze proef: staat het domein
+   er weer zoals het stond? */
+const HUISHOUDING_HERSTEL = ['bezitsbewijzen'];
+const domein = (lijst) => (lijst || []).filter(n => !isSpoor(n) &&
+  !HUISHOUDING_HERSTEL.includes(String(n).split(':').pop()));
 
 /* WACHTEN TOT DE OPSLAG STIL LIGT, in plaats van een vast aantal milliseconden.
    Dat is geen nettigheid maar een reparatie: /api/agenda/toevoegen kwam als
@@ -211,10 +231,112 @@ async function stilBeeld(datamap, voorBeeld, maxMs) {
    alles mee: het is van de wereld en niet van een paar. Een paar dat er zelf
    iets over zegt, wint. */
 let WERELDSLEUTELS = {};
+/* Per paar een server: zijn opstartregels herhalen zich honderd keer en zeggen dan niets meer. */
+const STIL = true;
 const lijfVoor = (pad, extra) => {
   const e = Object.assign({}, WERELDSLEUTELS, extra || {});
   return Object.assign(plausibelLijf(pad), e, wereld.lijfVoor(pad, e));
 };
+
+/* ============================================================================
+   HET MEETVENSTER BUITEN DE KLOKKEN VAN DE SERVER (besluit van de eigenaar,
+   18 oktober 2026: elk paar een eigen server, en de overspraak eruit).
+
+   Twee dingen schreven in de meting van een paar zonder dat het paar ze deed,
+   en ze kostten per ronde een tot vijf `exact`-paren -- steeds andere:
+
+     de uitgestelde tellingen  de kostenmeter (kern/kosten/meter.js) en de
+                   beleidsmotor (kern/beleidsmotor/slapend.js) zetten hun
+                   telling vijf seconden NA het verzoek weg. Zo landde de
+                   telling van de voorbereiding midden in de meting:
+                   /api/agenda/toevoegen zakte op `kosten...verzoek: 66 => 83`.
+     de wacht      kern/wacht/index.js zet elke tien seconden een punt in zijn
+                   grafiek, in het GEHEUGEN; het komt pas in de opslag bij de
+                   eerstvolgende schrijfronde van wie dan ook. Viel een tik voor
+                   de heenweg, dan schreef de heenweg hem mee en heette `wacht`
+                   "geraakt en niet terug".
+
+   Een eigen server per paar haalt de overspraak TUSSEN paren weg, maar niet
+   deze twee: de voorbereiding van hetzelfde paar en de klok van zijn eigen
+   server blijven. Daarom lijnt de proef de nulstand uit:
+
+     1. wachten tot een spoelperiode na de laatste oproep verstreken is -- dan
+        is elke uitgestelde telling weggeschreven;
+     2. de fase van de wacht uit de opslag lezen (de tijd van zijn laatste
+        tik). Valt de volgende tik binnen het meetvenster, dan eerst voorbij
+        die tik;
+     3. een VOLLE schrijfronde uitlokken -- de wereldschakelaar van de
+        leden-bank nog eens op "aan" zetten, die schrijft altijd alles weg wat
+        er in het geheugen klaarstaat. Een leesoproep doet dat NIET (gemeten:
+        het overzicht van Care schrijft alleen de eerste keer), en precies
+        daarom stond `wacht` er bij de eerste versie van deze stap nog in,
+        met drie tikken tegelijk. Daarna is de nulstand alles wat de server
+        op dat moment weet, en de volgende tik ligt ver genoeg weg.
+
+   Wat dit NIET doet: een collectie buiten het oordeel zetten. Wat de heenweg
+   aanraakt moet nog steeds letterlijk terug; alleen staat er nu niets meer in
+   het venster dat van de klok is en niet van het paar. Duurt een paar langer
+   dan het venster (VENSTER_MS), dan kan een tik er alsnog in vallen -- dan
+   staat `wacht` als reden in de uitslag, en is dat de klok.
+   ========================================================================== */
+const SPOEL_MS = 5000;     // kern/kosten/meter.js en kern/beleidsmotor/slapend.js
+const TIK_MS = 10000;      // kern/wacht/index.js via opzet/diensten2.js
+const VENSTER_MS = 4000;   // zoveel tijd moet er tussen de nulstand en de volgende tik liggen
+const slaap = (ms) => new Promise(r => setTimeout(r, Math.max(0, ms)));
+
+async function uitgespoeld(datamap) {
+  await slaap(LAATSTE_OPROEP + SPOEL_MS + 250 - Date.now());
+  /* De spoeling schrijft zelf asynchroon: tot het beeld 200 ms stil ligt. */
+  const eind = Date.now() + 2000;
+  let vorig = JSON.stringify(opslagBeeld(datamap)), sinds = Date.now();
+  while (Date.now() < eind) {
+    await slaap(50);
+    const nu = JSON.stringify(opslagBeeld(datamap));
+    if (nu !== vorig) { vorig = nu; sinds = Date.now(); continue; }
+    if (Date.now() - sinds >= 200) return;
+  }
+}
+
+/* De tijd van de laatste tik die IN DE OPSLAG staat, of null. */
+function laatsteTik(datamap) {
+  const { DatabaseSync } = require('node:sqlite');
+  let db;
+  try {
+    db = new DatabaseSync(path.join(datamap, 'store.db'), { readOnly: true });
+    const r = db.prepare("SELECT val FROM kv WHERE key = 'wacht'").get();
+    const g = r && JSON.parse(r.val).grafiek;
+    return Array.isArray(g) && g.length ? Number(g[g.length - 1].t) || null : null;
+  } catch (e) { return null; } finally { try { db && db.close(); } catch (e) {} }
+}
+
+function maakUitlijner({ datamap, gestart, schrijf }) {
+  const tikVoorbij = (p, nu) => nu - p >= TIK_MS - 50;
+  return async function uitlijnen() {
+    for (let poging = 0; poging < 6; poging++) {
+      await uitgespoeld(datamap);
+      const p = laatsteTik(datamap);
+      if (p === null) {
+        /* Nog geen tik in de opslag: de eerste valt binnen tien seconden na de
+           start. Wachten tot hij er geweest is, en hem dan laten meeschrijven. */
+        await slaap(gestart + TIK_MS + 200 - Date.now());
+        await schrijf();
+        continue;
+      }
+      /* Valt de volgende tik te dicht bij, dan eerst voorbij die tik. */
+      const nu = Date.now();
+      const volgende = p + TIK_MS * (Math.floor((nu - p) / TIK_MS) + 1);
+      if (volgende - nu < VENSTER_MS + 500) await slaap(volgende + 150 - Date.now());
+      /* De volle schrijfronde: neemt de hangende tik mee, en alles wat er
+         verder nog in het geheugen klaarstond. Zijn eigen uitgestelde telling
+         valt vijf seconden later, en dus na de meting. */
+      await schrijf();
+      await slaap(250);
+      const p2 = laatsteTik(datamap), nu2 = Date.now();
+      if (p2 !== null && !tikVoorbij(p2, nu2) && p2 + TIK_MS - nu2 >= VENSTER_MS) return true;
+    }
+    return false;
+  };
+}
 
 async function beproefPaar(srv, token, paar) {
   /* EEN PAAR DAT EEN ANDERE WERELD VRAAGT, en dat is een besluit en geen
@@ -356,12 +478,18 @@ async function beproefPaar(srv, token, paar) {
      /api/office/atelierweb/bewaar), met per variant een andere set. Dat is
      geen regressie in die routes maar een eigenschap van deze proef. `exact`
      is hier dus een BROZE graad; `wereldOntbreekt` daarentegen wordt beslist
-     voordat er een server draait en kan nooit schuiven. */
+     voordat er een server draait en kan nooit schuiven.
+
+     (Bijgewerkt 18 oktober 2026: dit TWEE is opgelost zoals hierboven al als
+     uitweg stond -- een verse server per paar, zie main() -- en de klokken
+     binnen een server haalt `uitlijnen` uit het venster.) */
   /* NOG EEN KEER, want de opwarmronde heeft het onderwerp opgebruikt: bij een
      verwijder -> maak-paar staat er na de opwarming weer niets. De nulstand
      hoort de wereld te zijn waarin de heenweg IETS kan doen. */
   await voorbereid();
 
+  /* Eerst de klokken van de server uit het meetvenster; zie `uitlijnen`. */
+  if (srv.uitlijnen) await srv.uitlijnen();
   const s0i = inhoudsBeeld(srv.datamap), s0v = opslagBeeld(srv.datamap);
   const heen = await roep(srv.basis, paar.heen, token, heenLijf());
   await stilBeeld(srv.datamap, s0v);
@@ -451,6 +579,7 @@ async function main() {
   async function ronde(lijst) {
     const srv = await start({ naam: 'herstelproef', gereed: 'ready',
       env: { NODE_ENV: 'test', RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+    const gestart = Date.now();
     const uitslagen = [];
     try {
       /* DRIE SESSIES, EN EEN ONTBREKENDE IS EEN FOUT. Een rol die niet inlogt en
@@ -480,7 +609,7 @@ async function main() {
       const pa = await proeftoestel.maakProeflid({ post: kaal, naam: 'Proeflid Tegenrekening', basis: srv.basis });
       for (const p of [pl, pa]) if (p.klaar) TOESTEL.set(p.klaar.token, p.klaar);
       if (pl.klaar) ALS.set(sessies.member.token, pl.klaar.token);
-      console.log('  proefleden met een gebonden toestel: ' + [pl, pa].map(p => p.klaar
+      if (!STIL || !(pl.klaar && pa.klaar)) console.log('  proefleden met een gebonden toestel: ' + [pl, pa].map(p => p.klaar
         ? 'klaar' + (p.klaar.gekeurd ? '' : ' (NIET gekeurd: ' + p.klaar.keurReden + ')') : 'NIET -- ' + p.reden).join(', '));
 
       const voorWereld = opslagBeeld(srv.datamap);
@@ -495,7 +624,13 @@ async function main() {
          die op dat moment werd weggeschreven. */
       await stilBeeld(srv.datamap, voorWereld);
       WERELDSLEUTELS = klaar.sleutels || {};
-      if (klaar.gedaan.length) console.log('  wereld klaargezet: ' + klaar.gedaan.join(', ') + '\n');
+      if (klaar.gedaan.length && !STIL) console.log('  wereld klaargezet: ' + klaar.gedaan.join(', ') + '\n');
+      /* De schrijfronde van de uitlijner is dezelfde schakelaar als in de
+         wereld (scripts/lib/herstelwereld.js): de leden-bank op "aan". Hij
+         staat al aan, dus er verandert niets aan de bank; wat hij wel doet is
+         een regel in het kantoorspoor en een VOLLE save, en die is het doel. */
+      srv.uitlijnen = maakUitlijner({ datamap: srv.datamap, gestart,
+        schrijf: () => roep(srv.basis, '/api/office/bank/leden', sessies.office.token, { aan: true }) });
 
       for (const paar of lijst) {
         const u = await beproefPaar(srv, sessies[paar.rol].token, paar);
@@ -507,39 +642,39 @@ async function main() {
     return uitslagen;
   }
 
-  const uitslagen = await ronde(paren);
+  /* ELK PAAR ZIJN EIGEN VERSE SERVER (besluit van de eigenaar, 18 oktober
+     2026). Hier draaiden alle paren tegen EEN gedeelde server, met daarna een
+     tweede ronde per paar voor wat niet lukte. De kop van beproefPaar zegt wat
+     dat kostte: `exact` was een BROZE graad, want een paar dat ergens schreef
+     verschoof de voorgeschiedenis van elk later paar, en per variant van de
+     proef zakte een andere set van drie, vier paren. Een verse server per paar
+     maakt de voorgeschiedenis voor elk paar dezelfde: de zaaiset plus de
+     wereld. Wat overblijft aan klokken binnen een server, haalt `uitlijnen`
+     uit het venster.
 
-  /* EEN TWEEDE RONDE OP EEN VERSE SERVER, voor wat niet lukte. Dit is geen
-     tweede kans maar een MEETPUNT: /api/staff/mob/cdt/aanmelden kwam als
-     `compensatie` door wanneer hij alleen draaide, en als 503 "deze functie is
-     voor dit genre uitgeschakeld" in de volle ronde. Een eerder paar had de
-     wereld veranderd waarin een later paar moest draaien.
+     Daarmee vervalt de tweede ronde: zij WAS al "op een eigen server", en een
+     paar dat daar niet lukt, nog eens op een eigen server draaien is geen
+     meetpunt meer maar een herkansing -- en wie herkanst tot het lukt, meet
+     het geluk. `ordeAfhankelijk` en `buitenTweedeRonde` blijven in de uitslag
+     staan, en staan nu per constructie op nul.
 
-     Zulke volgorde-afhankelijkheid stil laten staan zou betekenen dat de uitslag
-     afhangt van de volgorde van routenamen. Wat in ronde twee wel lukt, draagt
-     daarom `ordeAfhankelijk: true` -- de uitslag telt, en erbij staat dat een
-     ander paar hem in de weg zat. */
-  /* ELK PAAR OP ZIJN EIGEN SERVER, en dat is de tweede reparatie van hetzelfde
-     probleem. De eerste tweede-ronde zette de overgebleven paren samen op een
-     verse server, en toen bleef /api/staff/mob/cdt/aanmelden 503 -- want in die
-     kleine ronde stonden dezelfde stoorzenders. Isolatie is pas isolatie bij
-     een paar per server. Begrensd op MAX_TWEEDE, want dit kost een start per
-     paar; loopt de rest daarboven, dan staat dat in de uitslag. */
-  const MAX_TWEEDE = 24;
-  const rest = uitslagen.filter(u => u.uitslag === 'nietBeproefd');
-  const opnieuwGedaan = rest.slice(0, MAX_TWEEDE);
-  if (opnieuwGedaan.length) {
-    console.log('\n  ' + opnieuwGedaan.length + ' paar/paren opnieuw, elk op zijn EIGEN verse server\n');
-    for (const u of opnieuwGedaan) {
-      const [n] = await ronde([{ heen: u.heen, terug: u.terug, rol: u.rol }]);
-      if (!n || n.uitslag === 'nietBeproefd') continue;
-      const i = uitslagen.findIndex(x => x.heen === n.heen);
-      if (i >= 0) uitslagen[i] = Object.assign({}, n, { ordeAfhankelijk: true,
-        reden: n.reden + '. In de volle ronde lukte dit niet, alleen op een eigen server: een ander ' +
-          'paar had de wereld veranderd waarin dit paar moest draaien' });
+     Een paar dat een andere wereld vraagt krijgt geen server: die uitslag
+     wordt beslist voordat er iets draait. */
+  const uitslagen = [];
+  const begin = Date.now();
+  for (const paar of paren) {
+    if (wereld.onbereikbaar(paar.heen)) {
+      const u = await beproefPaar(null, null, paar);
+      uitslagen.push(u);
+      console.log('  ' + u.uitslag.padEnd(14) + paar.rol.padEnd(9) + paar.heen);
+      continue;
     }
+    const [u] = await ronde([paar]);
+    uitslagen.push(u);
   }
-  const buitenTweedeRonde = Math.max(0, rest.length - MAX_TWEEDE);
+  console.log('\n  looptijd ' + Math.round((Date.now() - begin) / 1000) + ' s');
+  const buitenTweedeRonde = 0;
+
 
   const tel = (n) => uitslagen.filter(u => u.uitslag === n).length;
 
@@ -558,10 +693,12 @@ async function main() {
       'een paar wordt in het gunstigste geval beproefd: meteen erna, door dezelfde gebruiker, met een ' +
         'vers gemaakt ding. Een bevestiging hier zegt niets over een terugweg een week later',
       'exact en compensatie zijn niet hetzelfde, en worden nooit samengeteld: een creditnota wist geen factuur',
-      'de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep',
-      'de volle ronde is NIET onafhankelijk: een paar kan de wereld veranderen waarin een later paar ' +
-        'draait. Wat in de volle ronde niet lukte, is daarom nog een keer alleen op een eigen server ' +
-        'gedraaid; lukt het dan wel, dan staat `ordeAfhankelijk` erbij en geldt die uitslag',
+      'de huishouding (apiSpoor, handelingLog, audit_rij) blijft buiten het oordeel; die verandert bij elke ' +
+        'oproep. Op besluit van de eigenaar (18 oktober 2026) hoort de herhaalkast van het bezitsbewijs ' +
+        '(bezitsbewijzen) daar voor deze proef bij: hij zegt DAT er een ondertekend verzoek was, niets over het domein',
+      'elk paar draait op zijn eigen verse server, en de nulstand wordt pas genomen als de uitgestelde ' +
+        'tellingen van de voorbereiding zijn weggeschreven en de volgende tik van de wacht buiten het ' +
+        'meetvenster valt. Een paar dat langer duurt dan dat venster, kan alsnog een tik meekrijgen',
       'de opwarmronde kan een EENMALIG gevolg opslokken: kost de eerste aanmaak iets (een kostenregel, ' +
         'een eerste inrichting), dan gebeurt dat in de opwarmronde en ziet de meting het niet. `exact` ' +
         'betekent hier dus: exact bij een tweede en volgende uitvoering. Zonder die ronde was `exact` ' +

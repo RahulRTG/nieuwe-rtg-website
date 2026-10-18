@@ -21,14 +21,15 @@
    herinnering eerder? Dat is het enige dat een gemiste ochtend echt oplost. */
 
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, vandaag, lijsten, aanbiederVan, notify } = ctx;
+  const { save, crypto, nu, vandaag, lijsten, aanbiederVan, notify } = ctx;
   /* aanbiedersVanSupplier komt uit de ledenlaag, en die wordt NA deze module
      gebouwd (zie kern/care.js: de wachtlijst moet er eerder zijn omdat
      careAnnuleer hem aanroept). Dus op aanroepmoment uit de context pakken en
      niet bij het opbouwen -- anders bevriest hier undefined. */
   const aanbiedersVanSupplier = (code) => ctx.aanbiedersVanSupplier(code);
 
-  const bak = () => { if (!Array.isArray(db.data.careWachtlijst)) db.data.careWachtlijst = []; return db.data.careWachtlijst; };
+  const C = ctx.opslag || require('./opslag')(ctx); // ./opslag.js, gebouwd in ../care.js
+  const bak = () => C.bak('careWachtlijst');
   const opLijst = (key, aanbiederId) =>
     bak().find(w => w.key === key && w.aanbiederId === aanbiederId && w.status === 'actief');
 
@@ -76,7 +77,7 @@ module.exports = (ctx) => {
     lijsten();
     const ids = aanbiedersVanSupplier(supplierCode).map(a => a.id);
     if (!ids.length) return { status: 409, error: 'Dit account is geen zorgaanbieder.' };
-    const bk = db.data.careBoekingen.find(x => x.ref === String(body.ref || '') && ids.includes(x.aanbiederId));
+    const bk = C.bak('careBoekingen').find(x => x.ref === String(body.ref || '') && ids.includes(x.aanbiederId));
     if (!bk) return { status: 404, error: 'Afspraak niet gevonden.' };
     if (bk.datum > vandaag()) return { status: 400, error: 'Die afspraak moet nog komen.' };
     if (bk.status === 'nietVerschenen') return { status: 409, error: 'Die staat al genoteerd.' };
@@ -99,7 +100,7 @@ module.exports = (ctx) => {
     lijsten();
     const ids = aanbiedersVanSupplier(supplierCode).map(a => a.id);
     if (!ids.length) return { status: 409, error: 'Dit account is geen zorgaanbieder.' };
-    const eigen = db.data.careBoekingen.filter(x => ids.includes(x.aanbiederId) && x.status === 'nietVerschenen');
+    const eigen = C.bak('careBoekingen').filter(x => ids.includes(x.aanbiederId) && x.status === 'nietVerschenen');
     return { ok: true, aantal: eigen.length,
       gemist: eigen.slice(0, 30).map(x => ({ ref: x.ref, datum: x.datum, tijd: x.tijd,
         codenaam: x.codenaam, behandelingNaam: x.behandelingNaam })),

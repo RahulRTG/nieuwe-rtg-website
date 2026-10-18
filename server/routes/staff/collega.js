@@ -4,12 +4,13 @@
 module.exports = (actx) => {
   const { DEMO, accounts, app, checkCred, commCollega, crypto, db, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan } = actx;
   const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = actx.fluister;
+  const dienst = require('../../kern/dienst-opslag')({ db }); // de prikklok van de zaak
 /* Het urenoverzicht voor de zaak: wie is er nu binnen, wie werkte wanneer en
    hoelang (vandaag en deze week). Elke medewerker klokt via de PDA; het
    management ziet hier het complete beeld. */
 app.post('/api/staff/klok/overzicht', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
-  const lijst = db.data.klok[req.supplier.code] || [];
+  const lijst = dienst.klok(req.supplier.code);
   const rows = accounts.listStaff(req.supplier.code).map(accounts.publicStaff).map(m => {
     const mijn = lijst.filter(e => e.staffId === m.id);
     const laatste = mijn[0] || null;
@@ -41,7 +42,7 @@ app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
      lege lijst ergens boven de keuring: een geweigerde correctie laat niets
      achter (scripts/laatspoor.js). */
   const rij = { id: crypto.randomBytes(4).toString('hex'), staffId, name: wie.name, in: inAt.toISOString(), out: uitAt.toISOString(), correctie: req.actor.name };
-  db.data.klok[req.supplier.code] = [rij].concat(db.data.klok[req.supplier.code] || []).slice(0, 4000);
+  dienst.zetKlok(req.supplier.code, [rij].concat(dienst.klok(req.supplier.code)).slice(0, 4000));
   save();
   logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name, 'klok-correctie');
   // een correctie verandert niemands aanwezigheid: het signaal alleen voor de managers en wie het betreft
@@ -78,7 +79,7 @@ const dmCollega = (req, res) => {
 
 app.post('/api/staff/dm/lijst', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const klok = db.data.klok[req.supplier.code] || [];
+  const klok = dienst.klok(req.supplier.code);
   const online = new Set(sseClients.filter(c => c.sup === req.supplier.code && c.staffId != null).map(c => c.staffId));
   const collegas = accounts.listStaff(req.supplier.code).map(accounts.publicStaff)
     .filter(m => m.id !== req.actor.staffId)

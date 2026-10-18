@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T13:24:29.012Z",
-  "commit": "6ea7bc71e",
+  "op": "2026-10-18T16:46:16.981Z",
+  "commit": "cf7bffea2",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -3299,13 +3299,13 @@
   },
   {
    "sleutel": "POST /api/mail/binnen",
-   "bestand": "server/routes/mailpost.js:57",
+   "bestand": "server/routes/mailpost.js:58",
    "staat": "openbaar",
    "reden": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
   },
   {
    "sleutel": "POST /api/mail/ses",
-   "bestand": "server/routes/mailpost.js:81",
+   "bestand": "server/routes/mailpost.js:82",
    "staat": "openbaar",
    "reden": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
   },
@@ -4014,13 +4014,13 @@
   },
   {
    "sleutel": "POST /api/rtf/talent/interesse",
-   "bestand": "server/routes/member/werk/talent.js:10",
+   "bestand": "server/routes/member/werk/talent.js:11",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/talent/mijn",
-   "bestand": "server/routes/member/werk/talent.js:47",
+   "bestand": "server/routes/member/werk/talent.js:48",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },

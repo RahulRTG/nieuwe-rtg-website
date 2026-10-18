@@ -37,10 +37,8 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
     return VERTROUWDE_BRONNEN.includes(b) ? b : 'extern';
   }
 
-  function ruw() {
-    if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    return db.data.rtmail;
-  }
+  const opslag = require('./rtmail-opslag')({ db, save }); // de enige deur naar db.data
+  const ruw = opslag.ruw;
   function store() { leiding.migreer(); return ruw(); }
 
   // De geverifieerde serverroute zet `bron`; de client bepaalt dit vertrouwen niet.
@@ -136,7 +134,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   /* Alleen voor een legitieme naverwerking binnen dezelfde bezorgketen, zoals
      het toevoegen van de uitkomst van de bijlagescanner. `bewaar` staat daar
      aan, zodat inhoud en nieuw zegel atomisch in dezelfde opslagronde landen. */
-  const leiding = require('./rtmail-leiding')({ ruw, heeft: () => !!db.data.rtmail, save, crypto, klokDatum, normAdres, zelfdeBus,
+  const leiding = require('./rtmail-leiding')({ ruw, heeft: opslag.heeft, save, crypto, klokDatum, normAdres, zelfdeBus,
     zegel: veiligheid.zegel, scanLinks, pub: (m) => pub(m), kap, MAX });
   try { leiding.migreer(); } catch (e) { /* later */ }
 

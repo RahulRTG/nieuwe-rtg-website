@@ -5,10 +5,12 @@
 const { maakInplanbaar } = require('../../payroll/inplanbaar');
 module.exports = (ctx) => {
   const inplanbaar = maakInplanbaar(ctx.afwezigOp);
-  const { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
+  const { save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost } = ctx;
+  // de deur van dit domein (../opslag.js); los gebouwd (een toets) uit dezelfde bron
+  const opslag = ctx.opslag || require('../opslag')({ db: ctx.db });
   /* ---- budget: geplande uren x tarief tegen het contractbudget ---- */
   function budget(s, opts) {
     opts = opts || {};
@@ -137,7 +139,7 @@ module.exports = (ctx) => {
     const dienst = { id: id('d'), supplierCode: s.code, datum, shiftId: sh.id, postId: p.id,
       guardId: gid, guardNaam: guardNaam(s, gid), status: 'gepland', door, at: nu() };
     diensten().unshift(dienst);
-    db.data.bevDiensten = diensten().slice(0, 100000);
+    opslag.zet('bevDiensten', diensten().slice(0, 100000));
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}),

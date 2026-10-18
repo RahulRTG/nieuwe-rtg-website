@@ -20,14 +20,17 @@ module.exports = ({ db, save, crypto }) => {
   const rid = () => crypto.randomBytes(4).toString('hex');
   const TEKENS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const codeMaak = () => 'RAAD-' + Array.from(crypto.randomBytes(6)).map(b => TEKENS[b % TEKENS.length]).join('');
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/stadsraad', bezit: { stadsraad: 'kaart' } });
   const S = () => {
-    if (!db.data.stadsraad) db.data.stadsraad = { partners: [], besluiten: [] };
-    return db.data.stadsraad;
+    const s = eigen.bak('stadsraad');
+    if (!Array.isArray(s.partners)) s.partners = [];
+    if (!Array.isArray(s.besluiten)) s.besluiten = [];
+    return s;
   };
   /* Lezen zonder scheppen -- dezelfde deur als S(), maar afwezig blijft afwezig.
      De vluchtige lege waarde gaat nooit naar buiten: elke lezer hieronder haalt
      er met find() een ELEMENT uit of maakt met slice/filter/map een kopie. */
-  const R = () => db.data.stadsraad || { partners: [], besluiten: [] };
+  const R = () => { const r = eigen.kijk('stadsraad'); return Array.isArray(r.partners) ? r : { partners: [], besluiten: [] }; };
   const vindCode = code => R().partners.find(p => p.code === String(code || '').trim().toUpperCase() && p.actief);
   const pubPartner = p => ({ id: p.id, stad: p.stad, naam: p.naam, soort: p.soort, actief: p.actief, at: p.at });
 

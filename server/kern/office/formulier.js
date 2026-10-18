@@ -15,13 +15,10 @@
 
 const { MAX_INZENDINGEN } = require('./basis');
 
-module.exports = ({ db, save }, basis) => {
+module.exports = ({ save }, basis) => {
   const { nu, docMet, naamVan, magSchrijven, magLezen } = basis;
-
-  function bak() {
-    if (!db.data.officeAntwoorden || typeof db.data.officeAntwoorden !== 'object') db.data.officeAntwoorden = {};
-    return db.data.officeAntwoorden;
-  }
+  // de inzendingen zijn van kern/office/basis (eigencollectie); hier alleen de vorm van het werk
+  const bak = () => basis.eigen.bak('officeAntwoorden');
   function pak(did) {
     const d = docMet(did);
     if (!d) return { fout: { status: 404, error: 'Formulier niet gevonden.' } };

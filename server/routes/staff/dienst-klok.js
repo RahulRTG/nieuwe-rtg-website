@@ -11,6 +11,7 @@
 module.exports = (actx) => {
   const { app, crypto, db, klokVan, logActivity, save, supplierAuth, sseToSupplier,
     werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, plaats, codenaamVan } = actx;
+  const prikklok = require('../../kern/dienst-opslag')({ db }); // lezen maakt geen la aan
 
 /* AANWEZIGHEID BIJ DE PRIKKLOK -- zonder volgen (PLAATS.md fase 2).
 
@@ -50,13 +51,13 @@ function plekBijKlok(req) {
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
+  const lijst = prikklok.klok(req.supplier.code);
   const open = lijst.find(e => e.staffId === req.actor.staffId && !e.out);
   const plek = plekBijKlok(req);
   let actie;
   if (open) { open.out = new Date().toISOString(); if (plek) open.plekUit = plek; actie = 'uit'; }
   else { lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId: req.actor.staffId, name: req.actor.name, in: new Date().toISOString(), out: null, plekIn: plek }); actie = 'in'; }
-  db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
+  prikklok.zetKlok(req.supplier.code, lijst.slice(0, 4000));
   save();
   logActivity(req.supplier.code, req.actor, 'klokte ' + actie, 'klok-' + actie);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
@@ -88,8 +89,7 @@ app.post('/api/staff/pauze', supplierAuth, (req, res) => {
      een leeg klokboek achter bij een zaak waar nog nooit iemand klokte -- en dan
      zeggen de statuscode en de opslag twee verschillende dingen over hetzelfde
      verzoek. De Array.isArray hieronder ving het ontbreken al op. */
-  const lijst = db.data.klok[req.supplier.code];
-  const dienst = Array.isArray(lijst) ? lijst.find(e => e.staffId === req.actor.staffId && e.in && !e.out) : null;
+  const dienst = prikklok.klok(req.supplier.code).find(e => e.staffId === req.actor.staffId && e.in && !e.out) || null;
   if (!dienst) return res.status(409).json({ error: 'Je staat niet ingeklokt; een pauze hoort bij een dienst.' });
   dienst.pauzes = dienst.pauzes || [];
   const open = dienst.pauzes.find(p => p && p.in && !p.uit);

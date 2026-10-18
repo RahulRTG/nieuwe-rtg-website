@@ -41,9 +41,9 @@ const { datum: klokDatum } = require('../../lib/klok');
 const ORG = /^[A-Z0-9][A-Z0-9-]{1,30}$/;
 
 module.exports = ({ db, save, schoon, findSupplier, contract }) => {
+  const opslag = require('./opslag')({ db }); // de deur naar werkruimtes en tenants
   function pot() {
-    if (!db.data.tenants || typeof db.data.tenants !== 'object') db.data.tenants = {};
-    return db.data.tenants;
+    return opslag.tenants();
   }
   const nu = () => klokDatum().toISOString();
   const norm = (c) => String(c || '').trim().toUpperCase();
@@ -132,7 +132,7 @@ module.exports = ({ db, save, schoon, findSupplier, contract }) => {
     if (aan) {
       if (soort === 'zaak') {
         if (!findSupplier || !findSupplier(c)) return { error: 'Deze zaak kennen we niet.', status: 404 };
-      } else if (!eigen(db.data.werkruimtes || {}, c)) {
+      } else if (!eigen(opslag.werkruimtesKijk(), c)) {
         return { error: 'Die werkruimte kennen we niet.', status: 404 };
       }
       const ander = Object.values(pot()).find(x => x.org !== t.org && x[veld].includes(c));

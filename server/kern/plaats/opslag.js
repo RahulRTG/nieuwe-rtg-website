@@ -25,6 +25,13 @@ module.exports = ({ db, save, crypto }) => {
   const vensters = () => bak('plaatsVensters');
   const waarnemingen = () => bak('plaatsWaarnemingen');
   const logboek = () => bak('plaatsLog');
+  /* Een lijst VERVANGEN (filteren, kappen). Hier en nergens anders: ./venster.js
+     en ./waarnemen.js deden het eerst zelf in db.data. */
+  const zet = (naam, lijst) => {
+    if (!Array.isArray(lijst)) throw new Error('kern/plaats/opslag: "' + naam + '" hoort een lijst te zijn');
+    db.data[naam] = lijst;
+    return lijst;
+  };
 
   const open = (v) => v && new Date(v.sluit).getTime() > Date.now();
 
@@ -72,6 +79,6 @@ module.exports = ({ db, save, crypto }) => {
     return { weg: voor - (vensters().length + waarnemingen().length + logboek().length) };
   }
 
-  return { nu, id, bak, vensters, waarnemingen, logboek, open, ruim, schrijfLog, vergeet,
+  return { nu, id, bak, zet, vensters, waarnemingen, logboek, open, ruim, schrijfLog, vergeet,
     WAARNEEM_MAX, LOG_MAX };
 };

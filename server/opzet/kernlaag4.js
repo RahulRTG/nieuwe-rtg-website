@@ -48,13 +48,11 @@ const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zi
 kern.wereldFeed = require('../kern/wereld/feed')({ db, codenaamVan: kern.codenaamVan,
   zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magLezen,
   pulseLezen: key => ((kern.pulseFeed(key, 'volgend') || {}).feed || []) }).feed;
+const wereldOpslag = require('../kern/wereld/opslag')({ db });
 kern.wereldFeed.saloon = require('../kern/wereld/saloon')({ kern, sociaal: kern.wereldFeed,
   voorkeurOpslag: {
-    haal: key => (((db.data.wereld || {}).saloon || {})[key]),
-    schrijf: (key, keuze) => {
-      const w = db.data.wereld = db.data.wereld || {};
-      w.saloon = w.saloon || {}; w.saloon[key] = keuze; save();
-    }
+    haal: key => (wereldOpslag.peil('saloon') || {})[key],
+    schrijf: (key, keuze) => { wereldOpslag.tak('saloon')[key] = keuze; save(); }
   }
 });
 // De Salon bewaart zijn eigen posts en publicatierechten.

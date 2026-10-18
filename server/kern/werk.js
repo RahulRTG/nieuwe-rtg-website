@@ -37,13 +37,15 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     if (a.key) return { kind: 'rtg', key: a.key, naam: a.name };
     return null; // anoniem: geen in-app chat
   }
+  const werving = require('./werk-opslag')({ db });
   function ensureApplyChat(supplierCode, a) {
-    if (db.data.applyChats[a.id]) return db.data.applyChats[a.id];
+    const bestaat = werving.chat(a.id);
+    if (bestaat) return bestaat;
     const applicant = chatApplicant(a);
     if (!applicant) return null;
     const s = findSupplier(supplierCode);
     const chat = { id: a.id, supplierCode, func: a.func, bedrijf: s ? s.name : supplierCode, applicant, berichten: [], at: new Date().toISOString() };
-    db.data.applyChats[a.id] = chat;
+    werving.zetChat(a.id, chat);
     return chat;
   }
   /* DE BERICHTEN KOMEN SINDS DE VERHUIZING UIT DE COMMUNICATIEKERN
@@ -109,7 +111,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
      RTF-app filtert op de leeftijdsgroep van het profiel (vanaf 16 jaar). */
   function openVacatures(minLeeftijd, land) {
     const uit = [];
-    for (const [code, list] of Object.entries(db.data.vacatures || {})) {
+    for (const [code, list] of Object.entries(werving.alleVacatures())) {
       const s = findSupplier(code);
       if (!s) continue;
       const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
@@ -140,10 +142,8 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     return uit;
   }
 
-  /* Wat de werkgever van een sollicitatie te zien krijgt. Wie via de RTFoundation
-     solliciteert, verschijnt bij het bedrijf precies als een gewoon RTG-lid; de
-     herkomst (viaRTF), de sessiesleutel en de gezinsverwijzing blijven intern. */
-  /* EEN POSITIEVE LIJST EN GEEN WEGLAATLIJST. Hier stond `{ viaRTF, key, rtf,
+  /* Wat de werkgever ziet: een RTF-sollicitant precies als een gewoon RTG-lid.
+     EEN POSITIEVE LIJST EN GEEN WEGLAATLIJST. Hier stond `{ viaRTF, key, rtf,
      ...rest }`, en dat lekte via wat er ONTBRAK: een ledenrij hield `codename` en
      `vacatureId`, een RTF-rij had ze allebei niet, dus een werkgever las de
      Foundation-herkomst af aan twee lege velden (ARBEID.md par. 4 punt 1). Bij

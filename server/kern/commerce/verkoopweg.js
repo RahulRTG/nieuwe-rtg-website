@@ -51,10 +51,8 @@ module.exports = ({ db, save, nu, etalage, publiekSlot }) => {
   const slot = publiekSlot || require('./publiekslot')();
   const tekst = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 80);
 
-  function pot() {
-    if (!db.data.verkoopwegen || typeof db.data.verkoopwegen !== 'object') db.data.verkoopwegen = {};
-    return db.data.verkoopwegen;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commerce/verkoopweg', bezit: { verkoopwegen: 'kaart' } });
+  const pot = () => eigen.bak('verkoopwegen');
   const vanZaak = (code) => {
     const c = tekst(code, 40);
     const p = pot();

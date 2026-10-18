@@ -3,9 +3,10 @@
    publiekVerzoek komt via de context binnen nadat kern/paspoort.js de
    toezichtlaag heeft gemount. */
 module.exports = (ctx) => {
-  const { db, save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
+  const { save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
     leesUploadDataUrl, leeftijdVan, gidsHaal, NIVEAUS, VIEW_TTL_MS, KIND_GRENS,
     lijsten, accountVanKey, memberState, leeftijdVanAccount, log, bevestigingVan, inhoudVoor, codenaamUitGids, id, schoon, nu } = ctx;
+  const opslag = ctx.opslag; // ./opslag.js, gebouwd in ../paspoort.js
   const { publiekVerzoek, publiekIncident } = ctx;
   function mijnStatus(key) {
     const u = accountVanKey(key);
@@ -52,8 +53,8 @@ module.exports = (ctx) => {
       reden: schoon(opts && opts.reden, 200), door: (actor && actor.name) || 'Team',
       incident: false, at: nu(), beslistAt: null, vervalt: null
     };
-    db.data.paspoortVerzoeken.unshift(verzoek);
-    db.data.paspoortVerzoeken = db.data.paspoortVerzoeken.slice(0, 50000);
+    opslag.bak('paspoortVerzoeken').unshift(verzoek);
+    opslag.zet('paspoortVerzoeken', opslag.bak('paspoortVerzoeken').slice(0, 50000));
     log({ soort: 'aanvraag', verzoekId: verzoek.id, niveau: nv, supplierCode: supplier.code, key, codenaam, door: verzoek.door });
     save();
     notify(key, {
@@ -68,7 +69,7 @@ module.exports = (ctx) => {
   /* ---- het lid keurt goed of weigert ---- */
   function beslis(key, verzoekId, akkoord) {
     lijsten();
-    const v = db.data.paspoortVerzoeken.find(x => x.id === verzoekId && x.key === key);
+    const v = opslag.bak('paspoortVerzoeken').find(x => x.id === verzoekId && x.key === key);
     if (!v) return { status: 404, error: 'Verzoek niet gevonden.' };
     if (v.status !== 'aangevraagd') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
     v.beslistAt = nu();
@@ -90,7 +91,7 @@ module.exports = (ctx) => {
   // het lid trekt een eerder gegeven goedkeuring weer in
   function trekIn(key, verzoekId) {
     lijsten();
-    const v = db.data.paspoortVerzoeken.find(x => x.id === verzoekId && x.key === key);
+    const v = opslag.bak('paspoortVerzoeken').find(x => x.id === verzoekId && x.key === key);
     if (!v) return { status: 404, error: 'Verzoek niet gevonden.' };
     if (v.status !== 'goedgekeurd') return { status: 409, error: 'Alleen een lopende goedkeuring kan worden ingetrokken.' };
     v.status = 'ingetrokken'; v.vervalt = null;
@@ -103,7 +104,7 @@ module.exports = (ctx) => {
   /* ---- de partner bekijkt een goedgekeurde (of vrijgegeven) inzage ---- */
   function bekijk(supplier, verzoekId, actor) {
     lijsten();
-    const v = db.data.paspoortVerzoeken.find(x => x.id === verzoekId && x.supplierCode === supplier.code);
+    const v = opslag.bak('paspoortVerzoeken').find(x => x.id === verzoekId && x.supplierCode === supplier.code);
     if (!v) return { status: 404, error: 'Verzoek niet gevonden.' };
     if (v.status !== 'goedgekeurd') return { status: 403, error: 'Dit verzoek is niet (meer) goedgekeurd.' };
     if (v.vervalt && new Date(v.vervalt).getTime() < Date.now()) {

@@ -29,10 +29,12 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const { TYPES, schoonBlok, schoonVolgorde } = require('./webmaker-schoon')({ scho, crypto, types: ATELIER_TYPES });
 
   const FOTO_MAX = 40;        // hoeveel eigen foto's het Atelier in zijn beeldbank houdt
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/atelierweb', bezit: { atelierSites: 'kaart' } });
   function store() {
-    if (!db.data.atelierSites || !Array.isArray(db.data.atelierSites.lijst)) db.data.atelierSites = { lijst: [] };
-    if (!Array.isArray(db.data.atelierSites.fotos)) db.data.atelierSites.fotos = [];
-    return db.data.atelierSites;
+    if (!Array.isArray(eigen.bak('atelierSites').lijst)) eigen.zetBak('atelierSites', { lijst: [] });
+    const s = eigen.bak('atelierSites');
+    if (!Array.isArray(s.fotos)) s.fotos = [];
+    return s;
   }
   // De gedeelde beeldbank van het Atelier: alleen veilige /media-verwijzingen (het
   // scannen en opslaan gebeurt in de route, hier bewaren we alleen de url).

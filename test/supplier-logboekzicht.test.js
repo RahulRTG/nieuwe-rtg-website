@@ -251,7 +251,9 @@ test('bron: waar een kloktijd ontstaat of een werksessie wordt gemunt, draagt el
     'stelde het werkvenster bij': 'een instelling van de manager, geen moment waarop iemand binnenkwam'
   };
   const WORTEL = path.join(__dirname, '..');
-  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=[^=]|bak\('mobDiensten'\)\.push/;
+  /* zetKlok( is de schrijvende deur van de prikklok sinds kern/dienst-opslag.js;
+     een schrijver die daarlangs gaat is net zo goed een klokschrijver. */
+  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=[^=]|\bzetKlok\(|bak\('mobDiensten'\)\.push/;
   const MUNT = (t) => /rememberSession\(/.test(t) && /role: 'supplier'/.test(t);
   const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
   const alle = [];

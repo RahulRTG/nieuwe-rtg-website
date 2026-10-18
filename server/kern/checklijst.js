@@ -19,7 +19,8 @@
    namen van leden hier: dit is personeelswerk. */
 module.exports = ({ db, save, crypto, schoon }) => {
   const nu = () => new Date().toISOString();
-  const bak = () => { if (!db.data.checklijsten || typeof db.data.checklijsten !== 'object') db.data.checklijsten = {}; return db.data.checklijsten; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/checklijst', bezit: { checklijsten: 'kaart' } });
+  const bak = () => eigen.bak('checklijsten');
   const vanZaak = code => { const b = bak(); if (!Array.isArray(b[code])) b[code] = []; return b[code]; };
   /* Lezen zonder scheppen: vind() en mijn() draaien op elke kijk- en
      weiger-weg, en die horen geen lege collectie achter te laten. De
@@ -27,8 +28,8 @@ module.exports = ({ db, save, crypto, schoon }) => {
      liet `checklijsten` ontstaan -- geweigerd en toch veranderd (de gezakte
      ROLLBACK-cel). Zelfde snit als Hlees in kern/horeca.js. */
   const vanZaakLees = code => {
-    const b = db.data.checklijsten;
-    return (b && typeof b === 'object' && Array.isArray(b[code])) ? b[code] : [];
+    const b = eigen.kijk('checklijsten');
+    return Array.isArray(b[code]) ? b[code] : [];
   };
 
   const namen = ruw => [...new Set((Array.isArray(ruw) ? ruw : []).map(n => schoon(n, 40)).filter(Boolean))].slice(0, 40);

@@ -39,12 +39,13 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   const nu = () => new Date().toISOString();
   const paar = (a, b) => [a, b].sort().join('|');
 
-  function lijsten() {
-    if (!db.data.ontmoetVoorkeur) db.data.ontmoetVoorkeur = {};   // key -> { aan, at }
-    if (!db.data.ontmoetPosities) db.data.ontmoetPosities = {};   // key -> { lat, lng, at }
-    if (!Array.isArray(db.data.ontmoetVoorstellen)) db.data.ontmoetVoorstellen = [];
-    if (!Array.isArray(db.data.ontmoetDates)) db.data.ontmoetDates = [];
-  }
+  /* De vier collecties van Ontmoeten, met hun vorm, op een plek (kern/eigencollectie.js).
+     De deelbestanden krijgen deze deur via ctx.opslag en geen db.data. */
+  const O = require('./eigencollectie')({ db, domein: 'kern/ontmoeting', bezit: {
+    ontmoetVoorkeur: 'kaart',      // key -> { aan, at }
+    ontmoetPosities: 'kaart',      // key -> { lat, lng, at }
+    ontmoetVoorstellen: 'lijst', ontmoetDates: 'lijst' } });
+  function lijsten() { for (const n of Object.keys(O.bezit)) O.bak(n); }
 
   /* ---- wie mag meedoen: 18+ met actief RTG-geverifieerd paspoort ---- */
   function accountVanKey(key) {
@@ -70,17 +71,17 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   }
 
   /* ---- de aan/uit-knop (elk lid zelf) ---- */
-  function staatAan(key) { lijsten(); const v = db.data.ontmoetVoorkeur[key]; return !!(v && v.aan); }
+  function staatAan(key) { lijsten(); const v = O.bak('ontmoetVoorkeur')[key]; return !!(v && v.aan); }
   function zet(key, aan) {
     lijsten();
     if (aan) {
       const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
-      db.data.ontmoetVoorkeur[key] = { aan: true, at: nu() };
+      O.bak('ontmoetVoorkeur')[key] = { aan: true, at: nu() };
     } else {
-      db.data.ontmoetVoorkeur[key] = { aan: false, at: nu() };
-      delete db.data.ontmoetPosities[key];
+      O.bak('ontmoetVoorkeur')[key] = { aan: false, at: nu() };
+      delete O.bak('ontmoetPosities')[key];
       // openstaande voorstellen van/aan dit lid vervallen
-      for (const v of db.data.ontmoetVoorstellen) if (v.status === 'open' && (v.a === key || v.b === key)) v.status = 'afgewezen';
+      for (const v of O.bak('ontmoetVoorstellen')) if (v.status === 'open' && (v.a === key || v.b === key)) v.status = 'afgewezen';
     }
     save();
     return { status: 200, ok: true, aan: !!aan };
@@ -96,7 +97,7 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
      staan. Een positie die niet meer vers is, hoort bij geen lopende radar meer
      en wordt gewist -- hier, bij het ophalen van de stand en door de bewaarveger. */
   function vergeetOudePosities() {
-    const P = db.data.ontmoetPosities || {};
+    const P = O.kijk('ontmoetPosities');
     let weg = 0;
     for (const k of Object.keys(P)) {
       const at = Date.parse((P[k] || {}).at || '') || 0;
@@ -109,13 +110,13 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     vergeetOudePosities();
     if (!staatAan(key)) return { status: 409, error: 'Zet Ontmoetingen eerst aan.' };
     const m = mag(key); if (!m.ok) { zet(key, false); return { status: 403, error: m.reden }; }
-    if (Number.isFinite(lat) && Number.isFinite(lng)) db.data.ontmoetPosities[key] = { lat, lng, at: nu() };
+    if (Number.isFinite(lat) && Number.isFinite(lng)) O.bak('ontmoetPosities')[key] = { lat, lng, at: nu() };
     const nieuwe = radar(key);
     save();
     return { status: 200, ok: true, nieuwe };
   }
   function versePositie(key) {
-    const p = db.data.ontmoetPosities[key];
+    const p = O.bak('ontmoetPosities')[key];
     if (!p || !Number.isFinite(p.lat)) return null;
     if (Date.now() - new Date(p.at).getTime() > POS_TTL_MS) return null;
     return p;
@@ -124,7 +125,7 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   /* De radarlaag en de datelaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten; beide komen de context
      in omdat ze elkaars functies per verzoek gebruiken. */
-  const ctx = { db, save, crypto, accounts, leeftijdVan, notify, sseToCustomer, sseToOffice,
+  const ctx = { db, opslag: O, save, crypto, accounts, leeftijdVan, notify, sseToCustomer, sseToOffice,
     connectieTussen, verbActief, zijnVrienden, codenaamVan, haversine,
     RADIUS_M, POS_TTL_MS, VOORSTEL_TTL_MS, MIN_LEEFTIJD, ACTIVITEITEN, ACT_IDS,
     lijsten, accountVanKey, memberState, geslachtVan, mag, staatAan, zet, pos, versePositie, vergeetOudePosities, id, nu, paar };
@@ -143,8 +144,8 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     ontmoetVergeetOudePosities: vergeetOudePosities,
     ontmoetVergeetSosPosities: deelDate.vergeetSosPosities,
     // de afspraken en voorstellen van een lid dat vergeten wil worden (AVG art. 17)
-    ontmoetVergeetLid: require('./ontmoeting/vergeten')({ dateLijst: () => db.data.ontmoetDates,
-      voorstelLijst: () => db.data.ontmoetVoorstellen, save, lijsten, nu }).ontmoetVergeetLid
+    ontmoetVergeetLid: require('./ontmoeting/vergeten')({ dateLijst: () => O.bak('ontmoetDates'),
+      voorstelLijst: () => O.bak('ontmoetVoorstellen'), save, lijsten, nu }).ontmoetVergeetLid
   };
 }
 

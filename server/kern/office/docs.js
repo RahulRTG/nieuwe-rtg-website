@@ -5,7 +5,7 @@
 const { poort } = require('./uitgangspoort');
 const { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, SJABLONEN } = require('./basis');
 
-module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
+module.exports = ({ save, schoon, sseToCustomer }, basis) => {
   const { id, nu, lijsten, docMet, grootteVan, naamVan, magSchrijven, magLezen,
     faseVan, schrijfAudit, spoorVan, schoonInhoud } = basis;
 
@@ -176,7 +176,7 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
     if (d.key !== key) return { status: 403, error: 'Alleen de eigenaar kan verwijderen.' };
     delete lijsten()[d.id];
     // een formulier neemt zijn inzendingen mee het graf in
-    if (db.data.officeAntwoorden) delete db.data.officeAntwoorden[d.id];
+    delete basis.eigen.kijk('officeAntwoorden')[d.id];
     save();
     return { status: 200, ok: true };
   }

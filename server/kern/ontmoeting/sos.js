@@ -12,7 +12,8 @@
    Afgesplitst uit date.js toen die de 10 KB passeerde. */
 const sosPositie = require('../sospositie');
 module.exports = (sctx) => {
-  const { db, nu, save, id, lijsten, dateVoor, codenaamVan, notify, sseToCustomer, sseToOffice } = sctx;
+  const { nu, save, id, lijsten, dateVoor, codenaamVan, notify, sseToCustomer, sseToOffice } = sctx;
+  const O = sctx.opslag; // kern/eigencollectie.js, gebouwd in ../ontmoeting.js
 
   function sos(key, dateId, bericht, lat, lng) {
     lijsten();
@@ -37,7 +38,7 @@ module.exports = (sctx) => {
   // RTG-kantoor handelt een SOS af
   function sosAf(dateId, sosId, door) {
     lijsten();
-    const d = db.data.ontmoetDates.find(x => x.id === dateId);
+    const d = O.bak('ontmoetDates').find(x => x.id === dateId);
     if (!d) return { status: 404, error: 'Afspraak niet gevonden.' };
     const s = d.sos.find(x => x.id === sosId);
     if (!s) return { status: 404, error: 'SOS niet gevonden.' };
@@ -95,7 +96,7 @@ module.exports = (sctx) => {
   const DICHT = { afgerond: 1, geannuleerd: 1 };
   function vergeetSosPosities(t) {
     let n = 0;
-    for (const d of db.data.ontmoetDates || []) {
+    for (const d of O.kijk('ontmoetDates')) {
       if (!Array.isArray(d.sos)) continue;
       n += sosPositie.veeg(d.sos, { velden: ['lat', 'lng'], dicht: s => s.ok && s.ok.at, nu: t });
       if (DICHT[d.status] && !d.sos.some(x => !x.ok) && d.posities && Object.keys(d.posities).length) { d.posities = {}; n++; }

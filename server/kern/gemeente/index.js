@@ -50,20 +50,18 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
   const ref = p => 'RTG-' + p + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 
+  const G = require('./opslag')({ db }); // de enige deur van dit domein naar db.data
   function seed() {
-    if (!Array.isArray(db.data.suppliers)) return;
+    const zaken = G.vreemd.zaken();
+    if (!zaken) return;
     require('../../seed/genres').zetGenre(db, 'gemeente');
-    if (!Array.isArray(db.data.gemeenteMeldingen)) db.data.gemeenteMeldingen = [];
-    if (!Array.isArray(db.data.gemeenteAfspraken)) db.data.gemeenteAfspraken = [];
-    if (!Array.isArray(db.data.gemeenteVergunningen)) db.data.gemeenteVergunningen = [];
-    if (!Array.isArray(db.data.gemeenteAanslagen)) db.data.gemeenteAanslagen = [];
-    if (!Array.isArray(db.data.gemeenteBekend)) db.data.gemeenteBekend = [];
-    if (db.data._gemeenteSeed) return;
-    db.data._gemeenteSeed = true;
+    for (const naam of Object.keys(G.REGISTER)) G.pak(naam);
+    if (G.gezaaid()) return;
+    G.markeerGezaaid();
     // verzonnen instelling: alleen in demostand aanmaken (kern/demostand.js)
     if (!demoAan()) return;
-    if (!db.data.suppliers.find(s => s.code === 'GEMEENTE')) {
-      db.data.suppliers.push({
+    if (!zaken.find(s => s.code === 'GEMEENTE')) {
+      G.vreemd.voegZaakToe({
         code: 'GEMEENTE', name: 'Gemeente Eivissa', type: 'gemeente', city: 'Ibiza',
         // geseed: opruimbaar op een database die ooit mét demo begon (kern/demostand.js)
         geseed: true,
@@ -74,7 +72,7 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
         }
       });
     }
-    db.data.gemeenteBekend.unshift(
+    G.pak('gemeenteBekend').unshift(
       { id: id(), gemeente: 'GEMEENTE', titel: 'Herinrichting Vara de Rey', tekst: 'De gemeente start met de herinrichting van de boulevard; werkzaamheden tot het najaar.', soort: 'algemeen', at: nu() },
       { id: id(), gemeente: 'GEMEENTE', titel: 'Tijdelijke verkeersmaatregel Marina', tekst: 'Rondom de jachthaven geldt tijdens het weekend een inrijverbod voor gemotoriseerd verkeer.', soort: 'verkeer', at: nu() }
     );
@@ -82,7 +80,7 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
   }
 
   function isGemeente(s) { return !!s && s.type === 'gemeente'; }
-  function deGemeente() { seed(); return (db.data.suppliers || []).find(s => s.type === 'gemeente') || null; }
+  function deGemeente() { seed(); return (G.vreemd.zaken() || []).find(s => s.type === 'gemeente') || null; }
   function magBehandelen(s) { return isGemeente(s); }
   // gedeelde mapper (gebruikt door meldingen én grofvuil)
   function publiekeMelding(m) {
@@ -96,7 +94,7 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
   }
 
   const ctx = {
-    db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier, weefsel,
+    db, opslag: G, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier, weefsel,
     nu, vandaag, isDatum, id, ref, schoon, seed, isGemeente, deGemeente, publiekeMelding,
     CATS, PLOEG, MELD_STATUS, BURGERZAKEN, VERGUNNINGEN, VERG_STATUS, FRACTIES, BALIE_SLOTS
   };

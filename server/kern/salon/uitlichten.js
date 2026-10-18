@@ -51,10 +51,8 @@ module.exports = ({ db, save, schoon, nieuwMoment, aanwezigZorg, codenaamVan }) 
   const posts = () => (Array.isArray(db.data.posts) ? db.data.posts : []);
   const vind = (id) => posts().find(p => p && String(p.id) === String(id)) || null;
 
-  function R() {
-    if (!Array.isArray(db.data.salonUitlicht)) db.data.salonUitlicht = [];
-    return db.data.salonUitlicht;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/salon/uitlichten', bezit: { salonUitlicht: 'lijst' } });
+  const R = () => eigen.bak('salonUitlicht');
 
   /* VERVAL IS BEREKEND EN GEEN TWEEDE WAARHEID. Een looptijd die om is, maakt de
      uitlichting niet ongedaan in de data -- hij telt alleen niet meer mee. Zo kan

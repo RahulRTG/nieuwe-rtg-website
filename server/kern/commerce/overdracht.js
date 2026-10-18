@@ -47,10 +47,8 @@ module.exports = ({ db, save, nu }) => {
   const sleutelVan = (s) => String(s == null ? '' : s).slice(0, 120);
   const tekst = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 80);
 
-  function pot() {
-    if (!db.data.commerceOverdrachten || typeof db.data.commerceOverdrachten !== 'object') db.data.commerceOverdrachten = {};
-    return db.data.commerceOverdrachten;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commerce/overdracht', bezit: { commerceOverdrachten: 'kaart' } });
+  const pot = () => eigen.bak('commerceOverdrachten');
 
   /* Opruimen gebeurt op het moment dat er toch al naar de tabel wordt gekeken --
      zelfde patroon als ./mand.js en ./retour.js, en om dezelfde reden: een eigen

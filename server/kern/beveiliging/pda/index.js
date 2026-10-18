@@ -10,10 +10,12 @@
 const { coord } = require('../../util');
 const sosPositie = require('../../sospositie');
 module.exports = (ctx) => {
-  const { db, save, findSupplier, notifySupplier, sseToSupplier, sseToOffice, logActivity,
+  const { save, findSupplier, notifySupplier, sseToSupplier, sseToOffice, logActivity,
     BEV_ERNST, id, nu, vandaag, schoon, isBeveiliging, defaults, functieAan,
     diensten, incidenten, rondes, guards, guardNaam, postVan, functieLijst, dienstPubliek,
     budget, rooster, aanvraagLijst } = ctx;
+  // de deur van dit domein (../opslag.js); los gebouwd (een toets) uit dezelfde bron
+  const opslag = ctx.opslag || require('../opslag')({ db: ctx.db });
   // rondePubliek blijft intern (het commandocentrum gebruikt het); de rest van
   // de patrouille-laag gaat wel naar buiten, net als in de oorspronkelijke pda.js
   const { rondePubliek, ...patrouille } = require('./patrouille')(ctx);
@@ -39,7 +41,7 @@ module.exports = (ctx) => {
       sos: false, status: 'open', at: nu()
     };
     incidenten().unshift(x);
-    db.data.bevIncidenten = incidenten().slice(0, 50000);
+    opslag.zet('bevIncidenten', incidenten().slice(0, 50000));
     save();
     notifySupplier(s.code, { icon: x.ernst === 'kritiek' || x.ernst === 'hoog' ? 'megafoon' : 'logboek', title: 'Incident · ' + x.ernst, body: x.guardNaam + ' @ ' + x.postNaam + ': ' + tekst.slice(0, 80) });
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
@@ -72,7 +74,7 @@ module.exports = (ctx) => {
       sos: true, status: 'open', at: nu()
     };
     incidenten().unshift(x);
-    db.data.bevIncidenten = incidenten().slice(0, 50000);
+    opslag.zet('bevIncidenten', incidenten().slice(0, 50000));
     save();
     notifySupplier(s.code, { icon: 'help', title: 'SOS · ' + naam, body: 'Noodknop ingedrukt. Bekijk de live locatie en stuur bijstand.' });
     logActivity(s.code, { name: naam }, 'drukte de SOS-noodknop in');

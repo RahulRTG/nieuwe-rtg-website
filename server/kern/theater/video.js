@@ -9,9 +9,10 @@ const { schoonCues } = require('../ondertitels');
 module.exports = (ctx) => {
   // nieuwWerk: de haak van de Media OS (laat gebonden en optioneel)
   const nieuwWerk = ctx.nieuwWerk;
-  const { db, save, fs, path, mediaDir, schoon, nu, id, lijsten, kanaalVan, kanaalMet, videoMet,
+  const { save, fs, path, mediaDir, schoon, nu, id, lijsten, kanaalVan, kanaalMet, videoMet,
     kanaalBytes, mbVan, sseToCustomer, thuisAanwezigheid, thuisOnline,
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB } = ctx;
+  const T = ctx.opslag; // ./opslag.js
 
   /* Een intern kanaal van een zaak waar dit lid de LEIDING heeft. Geen leiding,
      of een kanaal van een andere zaak: dan bestaat het hier niet. */
@@ -42,7 +43,7 @@ module.exports = (ctx) => {
       // wij noteren alleen de (door de maker gemelde) omvang voor de kijker
       klaar: thuis, mbGeschat: thuis ? Math.min(Math.max(Math.round(Number(data.mbGeschat) || 0), 0), 100000) : 0,
       bytes: 0, ext: null, at: nu() };
-    db.data.theaterVideos.push(v); save();
+    T.bak('theaterVideos').push(v); save();
     return { status: 200, ok: true, id: v.id, maxMb: MAX_VIDEO_MB, bewaring: v.bewaring };
   }
   // de bytes zelf: exact bewaren wat binnenkomt; alleen echt beeldmateriaal
@@ -71,8 +72,8 @@ module.exports = (ctx) => {
   function videoWeg(vid) {
     const v = videoMet(vid); if (!v) return;
     try { if (v.ext) fs.unlinkSync(path.join(mediaDir, v.id + '.' + v.ext)); } catch (e) {}
-    db.data.theaterVideos = db.data.theaterVideos.filter(x => x.id !== vid);
-    delete db.data.theaterReacties[vid];
+    T.zet('theaterVideos', T.bak('theaterVideos').filter(x => x.id !== vid));
+    delete T.bak('theaterReacties')[vid];
     save();
   }
   function verwijder(key, vid, kantoor) {

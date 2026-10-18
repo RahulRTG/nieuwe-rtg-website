@@ -52,11 +52,8 @@ const NOTITIE_MAX = 400;
 const MAX_PER_LIJST = 500;
 
 module.exports = ({ db, codenaamVan }) => {
-  function L() {
-    if (!db.data.wereld || typeof db.data.wereld !== 'object') db.data.wereld = {};
-    if (!db.data.wereld.lijsten || typeof db.data.wereld.lijsten !== 'object') db.data.wereld.lijsten = {};
-    return db.data.wereld.lijsten;
-  }
+  const opslag = require('./opslag')({ db });
+  const L = () => opslag.tak('lijsten');
   const sleutel = (key, soort) => key + '::' + soort;
   const nu = () => new Date().toISOString();
 

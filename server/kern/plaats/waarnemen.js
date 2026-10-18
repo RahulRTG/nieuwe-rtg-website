@@ -15,7 +15,7 @@
    staat daar, de lijsten in ./opslag.js. */
 'use strict';
 
-module.exports = ({ db, save, opslag, kentHek }) => {
+module.exports = ({ save, opslag, kentHek }) => {
   const { nu, id, vensters, waarnemingen, logboek, open, ruim, schrijfLog, WAARNEEM_MAX } = opslag;
 
   /* DE WAARNEMING. Het toestel heeft zelf gerekend; wij horen de uitkomst.
@@ -64,7 +64,7 @@ module.exports = ({ db, save, opslag, kentHek }) => {
     const mijn = waarnemingen().filter(x => x.codenaam === codenaam);
     if (mijn.length > WAARNEEM_MAX) {
       const weg = new Set(mijn.slice(WAARNEEM_MAX).map(x => x.id));
-      db.data.plaatsWaarnemingen = waarnemingen().filter(x => !weg.has(x.id));
+      opslag.zet('plaatsWaarnemingen', waarnemingen().filter(x => !weg.has(x.id)));
     }
     schrijfLog(codenaam, 'waargenomen', { doel, hek, richting: wat });
     save();

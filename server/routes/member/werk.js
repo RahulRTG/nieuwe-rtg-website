@@ -2,11 +2,11 @@
    vacatures en het solliciteren (voor gewone RTG-leden en voor RTF-gezinsleden),
    plus de sollicitatie-chat met de werkgever aan beide kanten. Alleen de routes;
    de helpers komen via het kern-object binnen. Gemount vanuit routes/member.js. */
-const { eigenVeld } = require('../../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, talen, chatStuur, applyChatVertaald, meldWerkgever, LANDEN,
           openVacatures, findSupplier, cvReady, leeftijdVan, geborenVan, notifySupplier, sseToSupplier,
           sseToOffice, PERSONAS, automatisering, commWerk } = kern;
+  const werving = require('../../kern/werk-opslag')({ db }); // de deur naar cv, sollicitatie en chat
   app.post('/api/member/apply/chats', auth, (req, res) => {
     // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
     /* Sinds de verhuizing uit de communicatiekern (kern/comm/werk.js), in
@@ -18,13 +18,13 @@ module.exports = (kern) => {
   });
 
   app.post('/api/member/apply/chat', auth, (req, res) => {
-    const chat = eigenVeld(db.data.applyChats, req.body.id);
+    const chat = werving.chat(req.body.id);
     if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
     applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
   });
 
   app.post('/api/member/apply/chat/send', auth, (req, res) => {
-    const chat = eigenVeld(db.data.applyChats, req.body.id);
+    const chat = werving.chat(req.body.id);
     if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
     const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text, talen.taalVan(req.body.lang));
     if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
@@ -34,7 +34,7 @@ module.exports = (kern) => {
 
 
   app.post('/api/cv/get', auth, (req, res) => {
-    const cv = db.data.cvs[req.session.key] || null;
+    const cv = werving.cv(req.session.key) || null;
     res.json({ cv, ready: cvReady(cv) });
   });
 
@@ -52,7 +52,7 @@ module.exports = (kern) => {
       updatedAt: new Date().toISOString()
     };
     if (!cv.name || !cv.contact) return res.status(400).json({ error: 'Vul minimaal uw naam en contactgegevens in.' });
-    db.data.cvs[req.session.key] = cv;
+    werving.zetCv(req.session.key, cv);
     save();
     res.json({ ok: true, cv, ready: cvReady(cv) });
   });
@@ -73,12 +73,12 @@ module.exports = (kern) => {
     // solliciteren mag ook zonder pas: het cv is de sleutel, niet de Pass
     const s = findSupplier(req.body.supplierCode);
     if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-    const cv = db.data.cvs[req.session.key];
+    const cv = werving.cv(req.session.key);
     if (!cvReady(cv)) return res.status(409).json({ error: 'Maak eerst uw cv af in de cv-builder; daarmee solliciteert u bij elke RTG-partner in een tik.', needCv: true });
-    const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+    const list = werving.sollicitatiesVan(s.code); // pas vastgezet als er werkelijk iets bij komt
     let func, vacatureId = null;
     if (req.body.vacatureId) {
-      const vac = (db.data.vacatures[s.code] || []).find(v => v.id === req.body.vacatureId && v.open);
+      const vac = werving.vacaturesVan(s.code).find(v => v.id === req.body.vacatureId && v.open);
       if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
       const lft = leeftijdVan(geborenVan(req.session));
       if (lft != null && lft < vac.minLeeftijd)
@@ -100,7 +100,7 @@ module.exports = (kern) => {
       status: 'nieuw', at: new Date().toISOString()
     };
     list.unshift(entry);
-    db.data.applications[s.code] = list.slice(0, 100);
+    werving.zetSollicitaties(s.code, list.slice(0, 100));
     save();
     notifySupplier(s.code, { icon: 'werk', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.', beperkt: 'werving' });
     // personeel-draaiboek: een seintje in het RTMAIL-postvak van de zaak (op codenaam)

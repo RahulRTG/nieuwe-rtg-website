@@ -29,13 +29,14 @@ module.exports = (kern) => {
      nergens op, want lezen uit een verse lege bak gaat gewoon goed. Vandaar
      `kijk`, dezelfde naam als in het sjabloon. */
   const LEEG = () => ({ contracten: [], leads: [], energie: [] });
+  const eigen = require('../../kern/eigencollectie')({ db, domein: 'routes/supplier/gebouwplus', bezit: { gebouwPlus: 'kaart' } });
   function kijk(code) {
-    return (db.data.gebouwPlus && db.data.gebouwPlus[code]) || LEEG();
+    return eigen.kijk('gebouwPlus')[code] || LEEG();
   }
   function bakSchrijf(code) {
-    if (!db.data.gebouwPlus) db.data.gebouwPlus = {};
-    if (!db.data.gebouwPlus[code]) db.data.gebouwPlus[code] = LEEG();
-    return db.data.gebouwPlus[code];
+    const p = eigen.bak('gebouwPlus');
+    if (!p[code]) p[code] = LEEG();
+    return p[code];
   }
   const cap = l => { if (l.length > MAX) l.length = MAX; };
   const vandaag = () => new Date().toISOString().slice(0, 10);

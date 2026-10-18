@@ -2,8 +2,9 @@
    vanzelf), het aanbod, boeken, betalen, annuleren en mijn behandelingen.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/care.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, notify, zorgVoor, zorgMee,
+  const { save, crypto, schoon, notify, zorgVoor, zorgMee,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief } = ctx;
+  const C = ctx.opslag || require('./opslag')(ctx); // ./opslag.js, gebouwd in ../care.js
   function careIntakeDeel(key, aanbiederIdIn, medischIn) {
     lijsten();
     const a = aanbiederVan(aanbiederIdIn);
@@ -14,7 +15,7 @@ module.exports = (ctx) => {
     let i = intakeActief(key, a.id);
     if (!i) {
       i = { id: crypto.randomBytes(4).toString('hex'), key, aanbiederId: a.id, aanbiederNaam: a.naam, status: 'actief', at: nu() };
-      db.data.careIntake.push(i);
+      C.bak('careIntake').push(i);
     }
     i.medisch = medisch;
     i.vervaltOp = new Date(Date.now() + INTAKE_DAGEN * 86400000).toISOString().slice(0, 10);
@@ -24,7 +25,7 @@ module.exports = (ctx) => {
   }
   function careIntakeStop(key, idIn) {
     lijsten();
-    const i = db.data.careIntake.find(x => x.id === String(idIn || '') && x.key === key && x.status === 'actief');
+    const i = C.bak('careIntake').find(x => x.id === String(idIn || '') && x.key === key && x.status === 'actief');
     if (!i) return { status: 404, error: 'Deze deling is er niet (meer).' };
     i.status = 'gestopt';
     i.gestoptOp = nu();
@@ -38,7 +39,7 @@ module.exports = (ctx) => {
     lijsten();
     return {
       ok: true,
-      aanbieders: db.data.careAanbieders.map(a => ({
+      aanbieders: C.bak('careAanbieders').map(a => ({
         id: a.id, naam: a.naam, soort: a.soort, icon: a.icon, waar: a.waar, beschrijving: a.beschrijving,
         behandelaars: (a.behandelaars || []).map(b => ({ id: b.id, naam: b.naam, functie: b.functie })),
         behandelingen: (a.behandelingen || []).map(b => ({
@@ -47,7 +48,7 @@ module.exports = (ctx) => {
         })),
         intakeActief: !!intakeActief(key, a.id)
       })),
-      intakes: db.data.careIntake.filter(i => i.key === key && i.status === 'actief' && i.vervaltOp >= vandaag())
+      intakes: C.bak('careIntake').filter(i => i.key === key && i.status === 'actief' && i.vervaltOp >= vandaag())
         .map(i => ({ id: i.id, aanbiederNaam: i.aanbiederNaam, vervaltOp: i.vervaltOp }))
     };
   }
@@ -66,7 +67,7 @@ module.exports = (ctx) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < vandaag()) return { status: 400, error: 'Kies een dag vanaf vandaag.' };
     if (!(b.tijden || []).includes(tijd)) return { status: 400, error: 'Kies een tijdslot van deze behandeling.' };
     // de behandelaar kan maar een gezelschap per slot hebben
-    const bezet = db.data.careBoekingen.find(x => x.aanbiederId === a.id && x.behandelaarId === b.behandelaarId &&
+    const bezet = C.bak('careBoekingen').find(x => x.aanbiederId === a.id && x.behandelaarId === b.behandelaarId &&
       x.datum === datum && x.tijd === tijd && !['geannuleerd'].includes(x.status));
     if (bezet) return { status: 409, error: 'Dat tijdslot is al bezet. Kies een ander moment.' };
     const boeking = {
@@ -84,15 +85,15 @@ module.exports = (ctx) => {
       intake: (intakeActief(sess.key, a.id) || {}).medisch || null,
       status: 'wacht-op-betaling', paid: false, at: nu()
     };
-    db.data.careBoekingen.unshift(boeking);
-    db.data.careBoekingen = db.data.careBoekingen.slice(0, 200000);
+    C.bak('careBoekingen').unshift(boeking);
+    C.zetBak('careBoekingen', C.bak('careBoekingen').slice(0, 200000));
     save();
     return { ok: true, boeking };
   }
 
   function careBetaal(sess, refIn, verdien) {
     lijsten();
-    const bk = db.data.careBoekingen.find(x => x.ref === String(refIn || '') && x.key === sess.key);
+    const bk = C.bak('careBoekingen').find(x => x.ref === String(refIn || '') && x.key === sess.key);
     if (!bk) return { status: 404, error: 'Boeking niet gevonden.' };
     if (bk.paid) return { status: 409, error: 'Al betaald.' };
     if (Date.now() - Date.parse(bk.at) > 30 * 60000) return { status: 410, error: 'Deze boeking is verlopen. Boek opnieuw.' };
@@ -107,7 +108,7 @@ module.exports = (ctx) => {
 
   function careAnnuleer(key, refIn) {
     lijsten();
-    const bk = db.data.careBoekingen.find(x => x.ref === String(refIn || '') && x.key === key);
+    const bk = C.bak('careBoekingen').find(x => x.ref === String(refIn || '') && x.key === key);
     if (!bk) return { status: 404, error: 'Boeking niet gevonden.' };
     if (bk.status === 'geannuleerd') return { status: 409, error: 'Al geannuleerd.' };
     bk.status = 'geannuleerd';
@@ -128,7 +129,7 @@ module.exports = (ctx) => {
     lijsten();
     return {
       ok: true,
-      boekingen: db.data.careBoekingen.filter(x => x.key === key && x.status !== 'geannuleerd').slice(0, 30)
+      boekingen: C.bak('careBoekingen').filter(x => x.key === key && x.status !== 'geannuleerd').slice(0, 30)
         .map(x => ({ ref: x.ref, aanbiederNaam: x.aanbiederNaam, behandelingNaam: x.behandelingNaam,
           behandelaarNaam: x.behandelaarNaam, datum: x.datum, tijd: x.tijd, prijs: x.prijs, paid: x.paid, status: x.status }))
     };
@@ -141,7 +142,7 @@ module.exports = (ctx) => {
      en, alleen voor een kliniek met een gedeelde intake, de medische notitie).
      Zo staat een notenallergie of bloedverdunner vóór de behandeling op het
      scherm. Afronden zet de afspraak op 'afgerond'. */
-  const aanbiedersVanSupplier = code => (db.data.careAanbieders || [])
+  const aanbiedersVanSupplier = code => C.kijk('careAanbieders')
     .filter(a => String(a.supplierCode || '').toUpperCase() === String(code || '').toUpperCase());
 
   return { careIntakeDeel, careIntakeStop, careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, aanbiedersVanSupplier };

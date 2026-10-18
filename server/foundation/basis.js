@@ -73,11 +73,7 @@ module.exports = function maakBasis() {
      beproeven is zonder server. */
   router.use(require('./kostenpoort')({ db }));
 
-  function F() {
-    if (!db.data.foundation) db.data.foundation = { lessen: {} };
-    if (!db.data.foundation.lessen) db.data.foundation.lessen = {};
-    return db.data.foundation;
-  }
+  const F = require('./opslag')({ db }).wortel; // de deur naar db.data.foundation
 
   /* ---------- helpers ---------- */
   /* DE TIJD VAN DE HELE FOUNDATION-LAAG LOOPT HIERDOORHEEN, en sinds 2 september

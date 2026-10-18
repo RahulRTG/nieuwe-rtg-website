@@ -42,10 +42,8 @@ module.exports = (ctx) => {
     require('./toernooi-schema')({ save, potjeDirect, schud, codenaamVan, SOORTEN });
   const MAX = 2000;             // harde bovengrens op schijf, los van de termijn
 
-  function T() {
-    if (!Array.isArray(db.data.spelToernooien)) db.data.spelToernooien = [];
-    return db.data.spelToernooien;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/spellen/toernooi', bezit: { spelToernooien: 'lijst' } });
+  const T = () => eigen.bak('spelToernooien');
   const vind = (id) => T().find(t => t.id === id) || null;
 
   function toernooiNieuw(mij, { soort, naam, maat, spelers, vorm }) {
@@ -181,7 +179,7 @@ module.exports = (ctx) => {
       }));
       if (t.spelers.some(k => k)) over.push(t);        // niemand meer over: helemaal weg
     }
-    db.data.spelToernooien = over;
+    eigen.zetBak('spelToernooien', over);
     save();
   }
 

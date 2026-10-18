@@ -17,7 +17,6 @@
    twee postvakken eindeloos tegen elkaar te laten praten: nooit op een
    automatisch bericht, nooit op post van het team aan zichzelf, en maar EEN
    bevestiging per gesprek. */
-const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 // wat NIET als antwoord telt voor de klok: door de machine geschreven post
@@ -27,11 +26,8 @@ const NORM_MINUTEN = { urgent: 30, hoog: 120, normaal: 480, laag: 1440 };
 
 module.exports = ({ db, save, rtmail, team }) => {
   const kap = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').trim().slice(0, n);
-  const store = () => {
-    if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
-    return db.data.rtmail;
-  };
+  const opslag = require('./rtmail-opslag')({ db, save });
+  const store = opslag.postvak; // beperkte post nooit in het gedeelde postvak (./rtmail-opslag.js)
 
   /* Wie er al geantwoord heeft: elk bericht in dezelfde draad dat van het
      teamadres komt. Afgeleid uit de post zelf, niet uit een tweede lijst. */
@@ -78,7 +74,7 @@ module.exports = ({ db, save, rtmail, team }) => {
      aan zichzelf -- dat zijn de drie manieren waarop dit een lus zou worden. */
   function naBezorging(m) {
     if (!m || !m.naar) return;
-    const t = (db.data.rtmailTeams && db.data.rtmailTeams.teams || [])
+    const t = opslag.teams()
       .find(x => adresLaag.zelfdeBus(x.adres, m.naar));
     if (!t || !t.bevestiging) return;
     if (AUTOMATISCH.includes(m.soort) || m.bron === 'systeem') return;

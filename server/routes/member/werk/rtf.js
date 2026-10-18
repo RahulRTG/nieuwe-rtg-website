@@ -2,16 +2,16 @@
    en solliciteren voor RTF-gezinsleden (op code + token, met rate-limit en
    dedup). Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/werk.js. */
-const { eigenVeld } = require('../../../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 const { datum: klokDatum } = require('../../../lib/klok');
 module.exports = (wctx) => {
   const { app, auth, db, save, crypto, talen, trChat, chatStuur, applyChatVertaald, meldWerkgever,
     rtf, LANDEN, openVacatures, tooManyTries, noteFailedTry, findSupplier, cvReady,
     leeftijdVan, geborenVan, notifySupplier, sseToSupplier, sseToOffice, PERSONAS } = wctx;
+  const werving = require('../../../kern/werk-opslag')({ db });
   app.post('/api/rtf/apply/chat', (req, res) => {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
     if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-    const chat = eigenVeld(db.data.applyChats, req.body.id);
+    const chat = werving.chat(req.body.id);
     if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
       return res.status(404).json({ error: 'Chat niet gevonden.' });
     applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
@@ -20,7 +20,7 @@ module.exports = (wctx) => {
   app.post('/api/rtf/apply/chat/send', (req, res) => {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
     if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-    const chat = eigenVeld(db.data.applyChats, req.body.id);
+    const chat = werving.chat(req.body.id);
     if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
       return res.status(404).json({ error: 'Chat niet gevonden.' });
     const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text, talen.taalVan(req.body.lang));
@@ -70,7 +70,7 @@ module.exports = (wctx) => {
     const lft = rtf.groepLeeftijd(sess.p.groep);
     const s = findSupplier(b.supplierCode);
     if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
-    const vac = (db.data.vacatures[s.code] || []).find(v => v.id === b.vacatureId && v.open);
+    const vac = werving.vacaturesVan(s.code).find(v => v.id === b.vacatureId && v.open);
     if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
     /* De server kent de leeftijdsGROEP, niet het exacte jaartal; groepLeeftijd
        geeft de ondergrens ervan. Een vacature met een hogere eis dan die
@@ -106,12 +106,12 @@ module.exports = (wctx) => {
       },
       status: 'nieuw', at: new Date().toISOString()
     };
-    const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+    const list = werving.sollicitatiesVan(s.code);
     list.unshift(entry);
-    db.data.applications[s.code] = list.slice(0, 100);
+    werving.zetSollicitaties(s.code, list.slice(0, 100));
     // verwijzing bij het gezin, voor "Mijn sollicitaties" met live status
     rtf.bewaarSollicitatie(b.code, sess.p.id, { appId: entry.id, supplierCode: s.code, vacatureId: vac.id, func: vac.func, bedrijf: s.name, land: landCode, landNaam: LANDEN[landCode].naam });
-    const deckMatch = (Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : []).find(x =>
+    const deckMatch = werving.talent().find(x =>
       x.vacatureId === vac.id && x.rtf && x.rtf.code === String(b.code).toUpperCase() && x.rtf.profielId === sess.p.id);
     if (deckMatch) { deckMatch.status = 'traject'; deckMatch.applicationId = entry.id; deckMatch.beslistAt = klokDatum().toISOString(); }
     save();

@@ -22,10 +22,11 @@ const TOTAAL = APPS.length;
 const WERKPLAATS_CAT = { id: 'werkplaats', label: 'Uit de Werkplaats', icon: 'ster' };
 
 function maakAppbieb({ db, save }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/appbieb', bezit: { appInstallaties: 'kaart' } });
   const rij = (key) => {
-    if (!db.data.appInstallaties) db.data.appInstallaties = {};
-    if (!Array.isArray(db.data.appInstallaties[key])) db.data.appInstallaties[key] = [];
-    return db.data.appInstallaties[key];
+    const a = eigen.bak('appInstallaties');
+    if (!Array.isArray(a[key])) a[key] = [];
+    return a[key];
   };
 
   // ---- de bewerkbare overlay: apps/materiaal uit de RTG Werkplaats ----

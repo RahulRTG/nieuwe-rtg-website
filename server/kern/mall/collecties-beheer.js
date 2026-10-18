@@ -13,7 +13,7 @@
    RTG-collectie is. */
 
 module.exports = (ctx, hulp) => {
-  const { db, save, crypto } = ctx;
+  const { save, crypto } = ctx;
   const { bak, toon, SOORTEN, MAX_REGELS, MAX_PER_ZAAK, isDatum, schoonTekst } = hulp;
 
   /* Een collectie samenstellen. `door` is 'rtg' (het kantoor) of een zaakcode;
@@ -57,7 +57,7 @@ module.exports = (ctx, hulp) => {
       doorNaam
     });
     if (!bestaand) lijst.unshift(c);
-    db.data.mallCollecties = lijst.slice(0, 2000);
+    hulp.zet(lijst.slice(0, 2000));
     save();
     return { ok: true, collectie: toon(c.id).collectie };
   }

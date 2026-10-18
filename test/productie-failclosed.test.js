@@ -43,7 +43,7 @@ const VEILIG = {
   RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
   REDIS_URL: 'r', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
   MAIL_PROVIDER_DKIM: '1', OPENAI_API_KEY: 'test-ai-key',
-  STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
+  STRIPE_SECRET_KEY: 'sk_live_k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
   RTG_MOTOR_GELD: 'motor', RTG_MOTOR_GELD_URL: 'http://motor:3100',
   RTG_MOTOR_TOKEN: 'test-motor-token-met-voldoende-lengte',
   RTG_MOTOR_STATE_KEY_FILE: '/run/secrets/rtg-motor-state-key',

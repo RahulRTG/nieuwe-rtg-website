@@ -33,8 +33,7 @@ function maakVluchten() {
     };
   }
 
-  const vluchten = { bezig: (id) => inVlucht.get(id), open, omvang: () => inVlucht.size };
-  return vluchten;
+  return { bezig: (id) => inVlucht.get(id), open, omvang: () => inVlucht.size };
 }
 
 module.exports = { maakVluchten };

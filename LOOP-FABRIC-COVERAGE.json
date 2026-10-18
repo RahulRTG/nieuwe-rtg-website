@@ -12,7 +12,7 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5518,
+    "routes": 5527,
     "mutationContracts": 5398,
     "screens": 327
   },
@@ -12427,13 +12427,15 @@
         "routeCount": 98,
         "mutationRoutes": 97,
         "declaredMutationSemantics": 43,
-        "sourceFileCount": 11,
+        "sourceFileCount": 13,
         "kernelDependencyCount": 1,
         "screenCount": 3,
         "sourceFiles": [
           "server/routes/concern.js",
           "server/routes/concern/duiding.js",
+          "server/routes/concern/feiten.js",
           "server/routes/concern/mensen.js",
+          "server/routes/concern/rechten.js",
           "server/routes/concern/rekening.js",
           "server/routes/concern/verandering.js",
           "server/routes/concern/vestiging.js",
@@ -15748,7 +15750,7 @@
         "/api/partner"
       ],
       "behaviourEvidence": {
-        "routeCount": 1020,
+        "routeCount": 1027,
         "mutationRoutes": 1026,
         "declaredMutationSemantics": 319,
         "sourceFileCount": 204,
@@ -17386,11 +17388,11 @@
         "/api/werk-leverancier"
       ],
       "behaviourEvidence": {
-        "routeCount": 136,
+        "routeCount": 137,
         "mutationRoutes": 137,
         "declaredMutationSemantics": 69,
-        "sourceFileCount": 47,
-        "kernelDependencyCount": 93,
+        "sourceFileCount": 48,
+        "kernelDependencyCount": 107,
         "screenCount": 1,
         "sourceFiles": [
           "server/bedrijf/aansluiting.js",
@@ -17410,7 +17412,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "sourceFilesOmitted": 31,
+        "sourceFilesOmitted": 32,
         "kernelDependencies": [
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
@@ -17437,7 +17439,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 69,
+        "kernelDependenciesOmitted": 83,
         "screens": [
           "public/apps/werk.html"
         ],
@@ -26454,7 +26456,7 @@
         "/api/scim"
       ],
       "behaviourEvidence": {
-        "routeCount": 21,
+        "routeCount": 22,
         "mutationRoutes": 11,
         "declaredMutationSemantics": 9,
         "sourceFileCount": 4,

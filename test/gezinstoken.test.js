@@ -93,7 +93,7 @@ test('4b. B19: een sessie van voor het besluit (dertig dagen op schijf) houdt na
   // Zoals B17 hem schreef: een v1-rij (zonder contract) met dertig dagen. Een v2-rij
   // achteraf verlengen is geen oude sessie maar manipulatie, en die weigert v2 al.
   const s = g.profielen.b.sessies[0];
-  for (const k of ['gebruiksvorm', 'contractversie', 'afgeleid', 'stapOp', 'bron_toegang', 'geschiedenis', 'contracthash']) delete s[k];
+  for (const k of ['gebruiksvorm', 'contractversie', 'afgeleid', 'stapOp', 'bron_toegang', 'geschiedenis', 'contracthash', 'contractkid']) delete s[k];
   s.max_gebruik = 0;
   s.expires_at = new Date(T0 + 30 * 86400000).toISOString();
   schuif(6 * 86400000);

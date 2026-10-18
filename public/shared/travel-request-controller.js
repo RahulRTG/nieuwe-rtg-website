@@ -100,6 +100,11 @@
         var antwoord = await opties.api('/api/reisbureau/mijn');
         var lijst = antwoord && antwoord.aanvragen;
         if (!Array.isArray(lijst)) throw new Error('Uw aanvragen konden niet worden gecontroleerd.');
+        if (!geldig()) {
+          fase = 'review';
+          meld('session-changed');
+          return { ok: false, type: 'ignored', reason: 'session' };
+        }
         eerder = lijst.map(function (a) { return a.ref; });
         var bestaand = lijst.find(function (a) { return a.tripId === verstuurd.tripId && a.status === 'aangevraagd'; });
         if (bestaand) {

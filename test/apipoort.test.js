@@ -22,6 +22,8 @@
      -> "een scope buiten de toelating levert geen sleutel op" ZAKT (RAAK)
    - de quotateller in het geheugen zetten in plaats van in de opslag
      -> "het quotum overleeft een herstart" ZAKT (RAAK)
+   - in maak() de foutmelding terug naar `buiten.map(x => x.pad)`
+     -> "een scope zonder pad (null, leeg object) is een 403 en geen 500" ZAKT (RAAK)
    - de uitfaseringsdatum negeren
      -> "een uitgefaseerd pad weigert, en kondigde dat aan" ZAKT (RAAK)
 
@@ -68,6 +70,20 @@ test('een scope buiten de toelating levert geen sleutel op', () => {
   assert.equal(r.status, 403);
   assert.match(r.error, /buiten de toelating/);
   assert.equal(poort.stand().sleutels.length, 0, 'er is ook geen half-ingeperkte sleutel gemaakt');
+});
+
+test('een scope zonder pad (null, leeg object) is een 403 en geen 500', () => {
+  /* Zo'n scope komt rechtstreeks uit req.body.scopes. Het filter weigerde hem
+     al, maar de foutmelding las x.pad van null en gooide: een 500 in plaats
+     van een uitleg. De weigering moet dezelfde blijven, en zeggen wat er mis is. */
+  const { poort } = maak();
+  poort.laatToe('/api/extern/aanbod', {}, 'ik');
+  for (const slecht of [null, {}, 'tekst']) {
+    const r = poort.maak('Koppeling', [{ pad: '/api/extern/aanbod' }, slecht], { door: 'ik' });
+    assert.equal(r.status, 403, JSON.stringify(slecht));
+    assert.match(r.error, /buiten de toelating: \(scope zonder pad\)/);
+  }
+  assert.equal(poort.stand().sleutels.length, 0);
 });
 
 test('het geheim gaat één keer mee terug en staat nergens', () => {

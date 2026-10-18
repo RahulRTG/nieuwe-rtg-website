@@ -3,7 +3,28 @@
 (function (w) {
   'use strict';
   var STATES = ['hidden', 'peek', 'panel', 'workspace', 'focus'];
+  /* Dit zijn uitsluitend presentaties van bestaande Living Modules. Een
+     template is geen rol, entitlement of autorisatiebewijs. Dezelfde
+     blueprintvalidator hieronder beslist opnieuw met de actuele serverrechten,
+     tenantregels en devicegrenzen of een template beschikbaar is. */
+  var TEMPLATES = [
+    { id: 'personal', label: 'Persoonlijk', description: 'Profiel, context en berichten dichtbij.', layout: [
+      ['navigation', 'panel'], ['profile', 'panel'], ['context', 'panel'], ['messages', 'panel'] ] },
+    { id: 'provider', label: 'Uitvoerder', description: 'Eigen werk, zaakcontext en communicatie.', layout: [
+      ['navigation', 'panel'], ['work', 'workspace'], ['coordination', 'panel'], ['messages', 'panel'], ['context', 'panel'] ] },
+    { id: 'coordinator', label: 'Coördinator', description: 'Zaken, werkruimtes en overdrachten samen.', layout: [
+      ['navigation', 'panel'], ['coordination', 'workspace'], ['work', 'workspace'], ['messages', 'panel'], ['context', 'panel'] ] },
+    { id: 'manager', label: 'Manager', description: 'Overzicht, uitvoering, contacten en besluiten.', layout: [
+      ['navigation', 'panel'], ['dashboard', 'workspace'], ['coordination', 'workspace'], ['work', 'panel'], ['messages', 'panel'], ['contacts', 'panel'] ] },
+    { id: 'enterprise', label: 'Enterprise', description: 'Ketenoverzicht met werk, reizen en communicatie.', layout: [
+      ['navigation', 'panel'], ['dashboard', 'workspace'], ['coordination', 'workspace'], ['work', 'workspace'],
+      ['travel', 'panel'], ['messages', 'panel'], ['contacts', 'panel'] ] }
+  ];
   function tekst(v, max) { return String(v || '').trim().slice(0, max); }
+  function templateInvoer(spec) {
+    return { workspace: spec.label, source: 'rtg-template:' + spec.id,
+      layout: spec.layout.map(function (x) { return { module: x[0], state: x[1] }; }) };
+  }
   w.RTGWorkspaceBlueprints = function (opties) {
     var o = opties || {};
     function validate(input) {
@@ -40,6 +61,17 @@
       var plan = {}; r.blueprint.layout.forEach(function (x) { plan[x.module] = x.state; });
       if (typeof o.apply === 'function') o.apply(plan, 'workspace-blueprint'); return r;
     }
-    return { validate: validate, apply: apply };
+    function templates() {
+      return TEMPLATES.map(function (spec) {
+        var r = validate(templateInvoer(spec));
+        return { id: spec.id, label: spec.label, description: spec.description, available: r.ok };
+      });
+    }
+    function applyTemplate(id) {
+      var key = tekst(id, 32), spec = TEMPLATES.find(function (x) { return x.id === key; });
+      if (!spec) return { ok: false, errors: ['onbekende werkruimtetemplate'], blueprint: null };
+      return apply(templateInvoer(spec));
+    }
+    return { validate: validate, apply: apply, templates: templates, applyTemplate: applyTemplate };
   };
 })(window);

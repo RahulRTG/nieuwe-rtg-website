@@ -115,7 +115,12 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await klant.waitForURL('**/apps/mijnmall.html#aanvragen');
     await eigen.getByRole('button', { name: 'Opnieuw openen', exact: true }).click();
     await eigen.getByRole('button', { name: 'Aanvraag intrekken', exact: true }).click();
-    await eigen.getByText('Ingetrokken', { exact: false }).waitFor();
+    /* Het STATUSLABEL, niet elke tekst met "ingetrokken": de reactie draagt al
+       "Reactie vervallen of ingetrokken." voordat er op intrekken is gedrukt.
+       Met exact:false slaagde deze wacht dan vóór de klik zonder iets te
+       bewijzen, of zag hij na het hertekenen twee elementen en zakte hij in
+       strict mode (CI-run 38731770721, deel 3 van 4). */
+    await eigen.locator('.rij .meta').filter({ hasText: /^Ingetrokken\b/ }).waitFor();
     assert.equal(await eigen.getByRole('button', { name: 'Kiezen', exact: true }).count(), 0);
     assert.deepEqual(fouten, []);
     assert.deepEqual(leesfouten, [], 'de schermlus heeft geen verborgen API-fouten');

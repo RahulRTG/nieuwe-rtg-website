@@ -25,6 +25,8 @@ const SLEUTELS = Object.assign({},
   /* Vier routes uit de samenvoeging van #542. Zie de kop daar. */
   require('./idemsleutels-samenvoeging').SLEUTELS,
   /* De Living Mall is een POST-projectie zonder mutatie. */
-  require('./idemsleutels-mall-living').SLEUTELS);
+  require('./idemsleutels-mall-living').SLEUTELS,
+  /* WorkOS-zaakregie projecteert een bestaande eigen zaak en schrijft niet. */
+  require('./idemsleutels-zaakregie').SLEUTELS);
 
 module.exports = { SLEUTELS };

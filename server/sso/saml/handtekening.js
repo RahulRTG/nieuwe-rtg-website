@@ -144,7 +144,12 @@ function controleer(wortel, certificaat) {
   if (!gelijk(gerekend, gemeld))
     throw new Error('de inhoud komt niet overeen met de digest in de handtekening: dit stuk is na het ondertekenen veranderd');
 
-  const siBytes = canoniek(si, alg(X.kind(si, DS, 'CanonicalizationMethod')) || INCLUSIEF, prefixLijst, null);
+  /* SignedInfo volgt de PrefixList van zijn EIGEN CanonicalizationMethod, niet
+     die van het reference-transform (XML-DSig 4.4.3, exc-c14n 3). */
+  const cm = X.kind(si, DS, 'CanonicalizationMethod');
+  const incSi = cm && X.kind(cm, EC, 'InclusiveNamespaces');
+  const siPrefix = incSi ? String(X.attr(incSi, 'PrefixList') || '').split(/\s+/).filter(Boolean) : [];
+  const siBytes = canoniek(si, alg(cm) || INCLUSIEF, siPrefix, null);
   const sv = X.kind(sig, DS, 'SignatureValue');
   if (!sv) throw new Error('handtekening zonder SignatureValue');
   const waarde = Buffer.from(String(X.tekstVan(sv)).replace(/\s+/g, ''), 'base64');

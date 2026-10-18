@@ -76,9 +76,9 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
     await page.waitForFunction(() => !!window.RTGEdgeBlikveld && !!window.RTGRahulTabHelpers, null, { timeout: 20000 });
     await rij.locator('h3').click();
 
-    const tab = page.locator('.rtg-rahul-tab').first();
+    const tab = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
     await tab.waitFor({ timeout: 20000 });
-    await tab.click();
+    await require('./helper').edgeRahul(page);
     const veld = page.locator('.rtg-rahul-page input[aria-label="Vraag Rahul"]');
     await veld.waitFor({ state: 'visible', timeout: 10000 });
     /* Eerst de Rome-vraag met de Ibiza-aanvraag aangewezen: een nieuw

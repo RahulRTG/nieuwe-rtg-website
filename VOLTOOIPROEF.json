@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-11T16:12:52.197Z",
-    "commit": "a650db65",
+    "op": "2026-10-16T12:17:18.711Z",
+    "commit": "08f616992",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/voltooiproef.js",
-    "node": "v22.22.0"
+    "node": "v24.18.0"
   },
   "uitleg": "Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om.",
   "hoe": "npm run voltooiproef:vast",
@@ -42,28 +42,28 @@
             "wat": "een nieuw lid begint met alles uit: afwezigheid is geen toestemming",
             "stand": "gesloten",
             "ziet": "4 soorten, 0 aan, 4 die nooit uit kunnen",
-            "ms": 13
+            "ms": 5
           },
           {
             "nr": 2,
             "wat": "het lid geeft toestemming voor aanbiedingen per e-mail en sms, met herkomst",
             "stand": "gesloten",
             "ziet": "aan=true, kanalen email+sms, via scherm:voltooiproef",
-            "ms": 15
+            "ms": 7
           },
           {
             "nr": 3,
             "wat": "het lid beperkt het tot e-mail; de geschiedenis zegt gegeven en daarna gewijzigd",
             "stand": "gesloten",
             "ziet": "geschiedenis: gewijzigd, gegeven",
-            "ms": 11
+            "ms": 6
           },
           {
             "nr": 4,
             "wat": "afmelden in een handeling: alles uit, en de intrekking staat erbij",
             "stand": "gesloten",
             "ziet": "2 uitgezet, 0 nog aan, 2 intrekkingen in de geschiedenis",
-            "ms": 23
+            "ms": 11
           }
         ],
         "storingen": [],
@@ -81,21 +81,21 @@
             "nr": 1,
             "wat": "na een nette herstart staat de gegeven toestemming er nog, met hetzelfde tijdstip en dezelfde herkomst",
             "stand": "gesloten",
-            "ziet": "voor: 2026-10-11T16:12:57.055Z via scherm:voltooiproef; na: 2026-10-11T16:12:57.055Z via scherm:voltooiproef",
-            "ms": 19
+            "ziet": "voor: 2026-10-16T12:17:22.138Z via scherm:voltooiproef; na: 2026-10-16T12:17:22.138Z via scherm:voltooiproef",
+            "ms": 7
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie (een andere browser) leest exact dezelfde geschiedenis",
             "stand": "gesloten",
             "ziet": "geschiedenis byte voor byte gelijk (6 regels)",
-            "ms": 120
+            "ms": 80
           },
           {
             "nr": 3,
             "wat": "de toestemming staat in de opslag zelf (store.db, gelezen buiten de server om)",
             "stand": "gesloten",
-            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-11T16:12:57.055Z",
+            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-16T12:17:22.138Z",
             "ms": 2
           }
         ],
@@ -115,28 +115,28 @@
             "wat": "dubbelklik: dezelfde keuze twee keer is een gebeurtenis, niet twee",
             "stand": "gesloten",
             "ziet": "geschiedenis 6 -> 7",
-            "ms": 20
+            "ms": 11
           },
           {
             "nr": 2,
             "wat": "een afgebroken verzoek en daarna opnieuw: de juiste stand, een regel in de geschiedenis",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 200, geschiedenis 7 -> 8",
-            "ms": 327
+            "ms": 319
           },
           {
             "nr": 3,
             "wat": "een crash direct na het afmelden: wat ingetrokken heette, blijft ingetrokken",
             "stand": "gesloten",
             "ziet": "afmelden 200 (3 uit), na SIGKILL en herstart 0 aan, laatste regel ingetrokken",
-            "ms": 4623
+            "ms": 2309
           },
           {
             "nr": 4,
             "wat": "een crash direct na het geven: wat gegeven heette, staat er nog",
             "stand": "gesloten",
             "ziet": "geven 200, na SIGKILL: aan=true via push",
-            "ms": 4605
+            "ms": 2299
           }
         ],
         "storingen": [],
@@ -173,36 +173,36 @@
             "nr": 1,
             "wat": "een tweede toestel logt in, en het lid ziet het in zijn lijst",
             "stand": "gesloten",
-            "ziet": "2 sessies, huidige x5OTkDrN15mC",
-            "ms": 174
+            "ziet": "2 sessies, huidige 4gj1jdQqsF0W",
+            "ms": 75
           },
           {
             "nr": 2,
             "wat": "het lid bevestigt zijn toestel met een sleutel (uitdaging, handtekening)",
             "stand": "gesloten",
             "ziet": "binden 200, sleutelbinding bewezen",
-            "ms": 39
+            "ms": 11
           },
           {
             "nr": 3,
             "wat": "het lid sluit het andere toestel op afstand, met een bezitsbewijs",
             "stand": "gesloten",
             "ziet": "status 200, ingetrokken_tokens 0 -> 1",
-            "ms": 22
+            "ms": 10
           },
           {
             "nr": 4,
             "wat": "het gesloten toestel merkt het: zijn token wordt geweigerd",
             "stand": "gesloten",
             "ziet": "het andere toestel krijgt 401",
-            "ms": 6
+            "ms": 4
           },
           {
             "nr": 5,
             "wat": "het lid ziet het andere toestel niet meer, en werkt zelf gewoon door",
             "stand": "gesloten",
-            "ziet": "lijst: x5OTkDrN15mC",
-            "ms": 5
+            "ziet": "lijst: 4gj1jdQqsF0W",
+            "ms": 4
           }
         ],
         "storingen": [],
@@ -221,28 +221,28 @@
             "wat": "na een nette herstart blijft het gesloten toestel buiten",
             "stand": "gesloten",
             "ziet": "het andere toestel krijgt 401 na de herstart",
-            "ms": 14
+            "ms": 4
           },
           {
             "nr": 2,
             "wat": "na de herstart werkt de sessie van het lid nog, en de lijst is dezelfde",
             "stand": "gesloten",
-            "ziet": "lijst: x5OTkDrN15mC",
-            "ms": 20
+            "ziet": "lijst: 4gj1jdQqsF0W",
+            "ms": 7
           },
           {
             "nr": 3,
             "wat": "een nieuwe sessie (een andere browser) ziet hetzelfde",
             "stand": "gesloten",
             "ziet": "lijst in de nieuwe sessie: 2 sessies, de gesloten er niet bij",
-            "ms": 155
+            "ms": 73
           },
           {
             "nr": 4,
             "wat": "de intrekking staat in de opslag zelf (rtg.db, gelezen buiten de server om)",
             "stand": "gesloten",
             "ziet": "ingetrokken_tokens 1 voor de herstart, 1 erna",
-            "ms": 1
+            "ms": 0
           }
         ],
         "storingen": [],
@@ -261,28 +261,28 @@
             "wat": "dubbelklik: dezelfde sessie nog eens sluiten geeft een nette weigering en verandert niets",
             "stand": "gesloten",
             "ziet": "tweede keer 404 (Die sessie kennen wij niet.), andere toestel 401, lid 200",
-            "ms": 28
+            "ms": 14
           },
           {
             "nr": 2,
             "wat": "een netwerkherhaling met hetzelfde bewijs doet niets twee keer",
             "stand": "gesloten",
             "ziet": "eerste 200, herhaling 401 (Dit bezitsbewijs is al gebruikt.), toestel 401",
-            "ms": 143
+            "ms": 76
           },
           {
             "nr": 3,
             "wat": "een afgebroken sluitverzoek laat geen halve stand na, en opnieuw proberen maakt het af",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 404, toestel 401",
-            "ms": 459
+            "ms": 380
           },
           {
             "nr": 4,
             "wat": "een crash direct na de bevestiging: wat gesloten heette, blijft gesloten",
             "stand": "gesloten",
             "ziet": "sluiten 200, na SIGKILL en herstart: toestel 401, lid 200",
-            "ms": 4763
+            "ms": 2388
           }
         ],
         "storingen": [],
@@ -294,11 +294,134 @@
         },
         "sluit": true
       }
+    },
+    "link:werkos": {
+      "scenario": "scripts/lib/voltooi/werkos.js",
+      "ingang": "/apps/werk.html",
+      "persona": "werkruimtelid",
+      "belofte": "een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug",
+      "grens": "De proef loopt de bestaande WorkOS-routes en opslag, niet de browserpresentatie. Hij meet één projecttaak en niet alle bedrijfsmodules; PostgreSQL-, Redis- en multi-instance-uitval blijven buiten deze lokale testwereld.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 1
+      },
+      "afgebroken": null,
+      "post": {
+        "gevangen": 0,
+        "naarBuiten": 0,
+        "onderwerpen": []
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een organisatie opent een werkruimte en krijgt het beheer-token precies een keer",
+            "stand": "gesloten",
+            "ziet": "status 200, werkruimte WF29A3",
+            "ms": 5
+          },
+          {
+            "nr": 2,
+            "wat": "een medewerker meldt zich aan, wordt door beheer toegelaten en krijgt projectrecht",
+            "stand": "gesloten",
+            "ziet": "aanmelden 200, toelaten 200, rol 200",
+            "ms": 9
+          },
+          {
+            "nr": 3,
+            "wat": "de medewerker opent zijn rolgebonden startscherm",
+            "stand": "gesloten",
+            "ziet": "status 200, rol projectleider",
+            "ms": 4
+          },
+          {
+            "nr": 4,
+            "wat": "de medewerker maakt een taak en ziet haar terug in dezelfde werkruimte",
+            "stand": "gesloten",
+            "ziet": "maken 200, lijst bevat 1",
+            "ms": 6
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart blijft het lid-token bij exact dezelfde werkruimte horen",
+            "stand": "gesloten",
+            "ziet": "status 200, werkruimte WF29A3",
+            "ms": 6
+          },
+          {
+            "nr": 2,
+            "wat": "na de herstart staat de taak nog precies een keer in de API",
+            "stand": "gesloten",
+            "ziet": "status 200, aantal 1",
+            "ms": 3
+          },
+          {
+            "nr": 3,
+            "wat": "een read-only lezer vindt dezelfde taak in de werkruimteopslag",
+            "stand": "gesloten",
+            "ziet": "opslag bevat 1 taak en geen rauw lid-token",
+            "ms": 1
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een dubbele tik met dezelfde herhaalsleutel maakt geen tweede taak",
+            "stand": "gesloten",
+            "ziet": "eerste 200, herhaling 200, aantal 1",
+            "ms": 7
+          },
+          {
+            "nr": 2,
+            "wat": "een afgebroken verzoek kan met dezelfde sleutel veilig worden hervat",
+            "stand": "gesloten",
+            "ziet": "afgebroken status 200, opnieuw 200, aantal 1",
+            "ms": 310
+          },
+          {
+            "nr": 3,
+            "wat": "een crash direct na taakbevestiging verliest of verdubbelt de taak niet",
+            "stand": "gesloten",
+            "ziet": "bevestigd 200, na SIGKILL herhaald=true, aantal 1",
+            "ms": 2306
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      }
     }
   },
   "telling": {
-    "apps": 2,
-    "bewijzenGesloten": 6,
+    "apps": 3,
+    "bewijzenGesloten": 9,
     "bewijzenOpen": 0
   },
   "sluit": true

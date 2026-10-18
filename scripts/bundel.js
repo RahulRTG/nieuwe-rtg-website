@@ -24,6 +24,10 @@ const PUB = path.join(__dirname, '..', 'public');
 // gesorteerd samengevoegd (vandaar de NN- prefix), en rauw aaneengeplakt zodat
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
+  // Editorial V4: de presentatiehelpers en de annotatie-/levenscycluslaag
+  // delen bewust een gesloten scope. De browser houdt een bestand; de bron
+  // blijft per verantwoordelijkheid onder de modulegrens.
+  'shared/rtg-editorial-v4.js': 'shared/rtg-editorial-v4',
   'shared/rtg-edge-smart-menu.js': 'shared/rtg-edge-smart-menu',
   'apps/boardroom.js': 'apps/boardroom',
   'apps/foundation/samen.js': 'apps/foundation/samen',

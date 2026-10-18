@@ -65,7 +65,8 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    stil niet mee te tellen. */
 const SCENARIOS = {
   'post.js': require('./lib/voltooi/post'),
-  'sessies.js': require('./lib/voltooi/sessies')
+  'sessies.js': require('./lib/voltooi/sessies'),
+  'werkos.js': require('./lib/voltooi/werkos')
 };
 
 function scenarios(alleen) {

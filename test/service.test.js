@@ -52,6 +52,10 @@ test('een zaak draagt een verwijzing en nooit de gegevens erachter', async () =>
       'de zaak draagt meer dan soort en code: ' + JSON.stringify(b));
     assert.equal(b.code, 'PAY-829192');
     assert.ok(!JSON.stringify(r.body).includes('NL00BANK'), 'het IBAN reisde mee in de zaak');
+    const dossier = await o.p('/api/service/zaak', { id: r.body.zaak.id }, o.lid);
+    assert.equal(dossier.body.zaak.regiebeeld.source.id, r.body.zaak.id);
+    assert.equal(dossier.body.zaak.regiebeeld.ownsSourceData, false);
+    assert.ok(!JSON.stringify(dossier.body.zaak.regiebeeld).includes('servicelid@x.nl'));
   } finally { await stop(o.srv); }
 });
 

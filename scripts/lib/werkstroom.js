@@ -205,14 +205,17 @@ const INRICHTING = [
   /^node\s+(?:-e|--eval)\b/,
 ];
 
-/* TWEE EIGEN SCRIPTS DIE GEEN POORT ZIJN, en ze staan hier met hun reden.
+/* DRIE EIGEN SCRIPTS DIE GEEN POORT ZIJN, en ze staan hier met hun reden.
    browserinstall.js INSTALLEERT (het is onze `npm ci` voor Chromium) en
    gezakte-toetsen.js RAPPORTEERT (het leest het log van een gezakte stap terug
    en velt zelf geen oordeel). Ze een poort noemen zou de lokale ronde twee
-   stappen geven die niets kunnen bewijzen. Er staat verder niets in deze lijst,
-   en dat hoort zo te blijven: elke naam hier is een poort die niemand meer
-   ziet. */
-const GEEN_POORT = ['scripts/browserinstall.js', 'scripts/gezakte-toetsen.js'];
+   stappen geven die niets kunnen bewijzen. dekkingsgat.js RAPPORTEERT ook: hij
+   zet naast de dekkingsvloer welke productiebestanden de meting niet ziet, en
+   eindigt altijd met 0 (besluit eigenaar 14 oktober 2026: eerst meten, dan
+   beslissen; de vloer zelf blijft de poort). Er staat verder niets in deze
+   lijst, en dat hoort zo te blijven: elke naam hier is een poort die niemand
+   meer ziet. */
+const GEEN_POORT = ['scripts/browserinstall.js', 'scripts/gezakte-toetsen.js', 'scripts/dekkingsgat.js'];
 
 /* Uit een `run:`-blok de losse opdrachten halen. Regels met een backslash
    lopen door, en een regel valt uiteen in de stukken die de shell los

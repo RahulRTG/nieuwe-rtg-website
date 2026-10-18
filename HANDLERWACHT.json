@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-14T08:43:50.925Z",
-  "commit": "e601f8f23",
+  "op": "2026-10-16T12:12:27.788Z",
+  "commit": "d00a21e69",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v26.10.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -941,31 +941,31 @@
   },
   {
    "sleutel": "POST /api/bedrijf/taak/kolom",
-   "bestand": "server/bedrijf/taak.js:76",
+   "bestand": "server/bedrijf/taak.js:101",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/maak",
-   "bestand": "server/bedrijf/taak.js:30",
+   "bestand": "server/bedrijf/taak.js:43",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/uren",
-   "bestand": "server/bedrijf/taak.js:102",
+   "bestand": "server/bedrijf/taak.js:127",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/wacht-op",
-   "bestand": "server/bedrijf/taak.js:55",
+   "bestand": "server/bedrijf/taak.js:80",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taken",
-   "bestand": "server/bedrijf/taak.js:117",
+   "bestand": "server/bedrijf/taak.js:142",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },

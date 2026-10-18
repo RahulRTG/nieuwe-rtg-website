@@ -221,7 +221,7 @@
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
+<body class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="auto" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -393,10 +393,11 @@
 
 <div class="melding" id="melding" role="status"></div>
 <div class="mall-edge-controls is-fallback" id="mallEdgeControls" aria-label="Mall-bediening">
-  <button type="button" data-mall-edge="discover"><span>Ontdek</span></button>
-  <button type="button" data-mall-edge="compare"><span>Vergelijk</span></button>
-  <button type="button" data-mall-edge="save"><span>Bewaar</span></button>
-  <a href="/apps/commerce.html#mand-sec" data-mall-edge="cart"><span>Mand</span></a>
+  <a href="/apps/rtg.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7v9h-6v-6h-4v6H4Z"/></svg><span>Home</span></a>
+  <a href="/apps/app.html#werelden"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/></svg><span>Werelden</span></a>
+  <a class="mall-edge__lips" href="/apps/app.html" aria-label="Praat met Rahul"><svg viewBox="0 0 100 58" aria-hidden="true"><path d="M3 31C20 26 32 6 50 17C68 6 80 26 97 31C80 52 68 57 50 47C32 57 20 52 3 31Z"/><path d="M13 31C29 34 40 29 50 29C60 29 71 34 87 31"/></svg></a>
+  <a href="#mallCapabilities"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="8" cy="6" r="1"/><circle cx="16" cy="12" r="1"/><circle cx="10" cy="18" r="1"/></svg><span>Acties</span></a>
+  <a href="/apps/app.html#menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg><span>Menu</span></a>
 </div>
 <script src="/shared/uitvoer.js"></script>
 <script>
@@ -440,11 +441,6 @@ if (!TOKEN) {
     '<p>Software, huizen, reizen en bijzondere ervaringen komen na het inloggen samen in één persoonlijke Mall.</p>'+
     '<a class="mall-gate__action" href="/apps/app.html">Open uw RTG-wereld <span aria-hidden="true">→</span></a>'+
     '<small>Uw selectie en rechten blijven verbonden aan uw eigen RTG-account.</small></div></section>';
-  $('#mallEdgeControls').innerHTML = '<a href="/apps/rtg.html"><span>Home</span></a>'+
-    '<a href="/apps/app.html#werelden"><span>Werelden</span></a>'+
-    '<a class="mall-edge__rahul" href="/apps/app.html"><span>Rahul</span></a>'+
-    '<a href="/apps/app.html"><span>Account</span></a>'+
-    '<a href="/apps/app.html#menu"><span>Menu</span></a>';
 } else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadAppstore(); laadReisbieb(); laadRtfbieb(); }
 
 /* ---------- De vindlaag: locatie en intentie eerst ----------

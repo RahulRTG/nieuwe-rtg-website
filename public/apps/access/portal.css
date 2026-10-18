@@ -186,7 +186,9 @@ body:has(#onbGate:not([hidden])) .rtg-adaptive-edge{display:block!important;poin
   font-size:14px;font-weight:600;line-height:1.4;box-shadow:none;
   transition:transform .24s var(--access-ease),background .24s,color .24s;
 }
-#gate[data-rtg-access] .access-primary:hover,#onbGate #onbGo:hover{transform:translateY(-2px);background:var(--access-burgundy-bright)}
+/* Geen verschuiving bij hover: een knop die onder de muis wegschuift, verliest
+   zijn hover en springt terug, en blijft zo trillen. */
+#gate[data-rtg-access] .access-primary:hover,#onbGate #onbGo:hover{background:var(--access-burgundy-bright)}
 #gate[data-rtg-access] .access-primary:active,#onbGate #onbGo:active{transform:translateY(0)}
 #gate[data-rtg-access] .access-primary svg{width:23px;height:25px;fill:none;stroke:currentColor;flex:none}
 #gate[data-rtg-access] .access-hint{margin:10px 0 26px;color:var(--access-muted);font-size:11px;line-height:1.6;text-align:center}

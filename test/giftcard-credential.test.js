@@ -199,7 +199,7 @@ test('9. bearercode v2: contracthash op een echt record, v1 wordt v2 bij rotatie
   const w2 = wereld();
   const k2 = await w2.koop();
   const v1 = w2.db.data.giftcards[0].toegang;
-  for (const veld of ['contractversie', 'contracthash', 'afgeleid', 'gebruiksvorm', 'stapOp', 'bron_toegang', 'geschiedenis']) delete v1[veld];
+  for (const veld of ['contractversie', 'contracthash', 'contractkid', 'afgeleid', 'gebruiksvorm', 'stapOp', 'bron_toegang', 'geschiedenis']) delete v1[veld];
   assert.equal((await w2.inwissel(k2.code, 5)).kaart.saldo, 95, 'een v1-kaart werkt onder de v1-regels');
   const vind = g => g.id === k2.kaart.id;
   const rot = await w2.kern.roteer({ vind, door: 'lid:K', idem: 'v1-naar-v2' });

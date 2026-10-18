@@ -53,11 +53,12 @@ const STANDAARD_MINUTEN = 20;
 module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/service-machtiging', bezit: { serviceMachtigingen: 'lijst' } });
   const M = () => eigen.bak('serviceMachtigingen');
+  const lees = () => eigen.kijk('serviceMachtigingen');
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const inhoud = (s) => String(s || '').replace(/[^\p{L}\p{N}]/gu, '').length;
 
-  const vind = (id) => M().find(m => m.id === String(id || '')) || null;
+  const vind = (id) => lees().find(m => m.id === String(id || '')) || null;
 
   /* DE DOORSNEDE. Gevraagd ∩ wat het team nodig heeft. Wat wegvalt komt in het
      antwoord te staan: een machtiging die stilletjes minder blijkt te zijn dan
@@ -163,7 +164,7 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
 
   const lijst = (f) => {
     const o = f || {};
-    let a = M();
+    let a = lees();
     if (o.zaak) a = a.filter(m => m.zaak === String(o.zaak).toUpperCase());
     if (o.mens) a = a.filter(m => m.mens === String(o.mens));
     if (o.alleenGeldig) a = a.filter(m => stand(m) === 'geldig');
@@ -173,7 +174,8 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
   /* Wat RTG op dit moment permanent bij een lid mag: niets. Zelfde getal en
      dezelfde reden als in kern/command/bijstand.js -- het is aflezbaar en het
      kan niet nul blijven zonder dat iemand deze laag verbouwt. */
-  const tel = () => ({ geldig: M().filter(m => stand(m) === 'geldig').length, totaal: M().length, permanenteToegang: 0 });
+  const tel = () => ({ geldig: lees().filter(m => stand(m) === 'geldig').length,
+    totaal: lees().length, permanenteToegang: 0 });
 
   return { verleen, tekenBij, magNu, trekIn, lijst, tel, stand, vind, ZWAAR, isAi, AI_VOOR };
 };

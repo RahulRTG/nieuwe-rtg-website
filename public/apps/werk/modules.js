@@ -39,7 +39,7 @@
           (v.overBudget ? ' · ' + K.euro(v.overBudget) + ' over budget' : ''));
       }), 'Nog geen projecten.');
     });
-    K.api('/taken', {}).then(function (r) {
+    K.api('/api/bedrijf/taken', {}).then(function (r) {
       if (r.body.error) return;
       K.lijst($('mExtra'), (r.body.taken || []).slice(0, 25).map(function (t) {
         return K.rij((t.geblokkeerd ? '<span class="tag laat">wacht</span> ' : '') + esc(t.titel) +

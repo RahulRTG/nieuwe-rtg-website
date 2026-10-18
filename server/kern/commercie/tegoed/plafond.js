@@ -16,9 +16,9 @@
    REGEL 6 VAN DE EIGENAAR: geen abonnement mag ooit ongemerkt variabele kosten
    veroorzaken. Wat er boven het plafond gebeurt is dus de KEUZE van de klant --
    stoppen, vragen, automatisch aanvullen of op contract -- en automatisch
-   aanvullen vraagt een maandmaximum. Dat maximum telt de bundelprijs mee: hij
-   stond hier op nul zolang de inkoopkant niet bestond, en een maximum waar niets
-   tegenaan telt is geen maximum. */
+   aanvullen vraagt een maandmaximum. Dat maximum telt de bundelprijs mee. Een
+   maximum is alleen nog geen betaalbewijs: tot de serveradapter de aankoop
+   bevestigt blijft de uitvoering dicht. */
 'use strict';
 
 const caps = require('../capaciteiten');
@@ -61,8 +61,9 @@ const c = Math.max(0, Math.round(Number(kosten) || 1));
       return { mag: false, reden: 'maandmaximum', tekort: c - beschikbaar,
         uitleg: 'Het maandmaximum voor automatisch bijkopen is bereikt. Koop handmatig bij of verhoog het maximum.',
         bundels: bundelsUit };
-    return { mag: true, reden: 'auto-aangevuld', bundel: r.autoBundel, tekort: c - beschikbaar,
-      uitleg: 'Het tegoed is aangevuld met ' + BUNDELS[r.autoBundel].naam + '.' };
+    return { mag: false, reden: 'betaalbewijs-vereist', bundel: r.autoBundel, tekort: c - beschikbaar,
+      uitleg: 'Automatisch aanvullen blijft uit totdat RTG de betaling servermatig heeft bevestigd.',
+      bundels: bundelsUit };
   }
   if (r.beleid === BELEID.CONTRACT)
     return { mag: true, reden: 'contract-overschot',

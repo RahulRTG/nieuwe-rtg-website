@@ -98,7 +98,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
     if (!gevraagd.length) return { error: 'Een sleutel zonder scope mag niets en heeft geen zin.', status: 400 };
     const buiten = gevraagd.filter(sc => !binnenToelating(String(sc && sc.pad || '')));
     if (buiten.length) {
-      return { error: 'Deze scopes vallen buiten de toelating: ' + buiten.map(x => x.pad).join(', ') +
+      return { error: 'Deze scopes vallen buiten de toelating: ' + buiten.map(x => (x && x.pad) || '(scope zonder pad)').join(', ') +
         '. Zet het pad eerst in de toelating; stil inperken zou een koppeling opleveren die pas in ' +
         'productie merkt dat hij er niet bij mag.', status: 403 };
     }

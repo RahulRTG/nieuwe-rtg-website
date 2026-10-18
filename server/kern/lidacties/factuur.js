@@ -20,8 +20,10 @@
      ./rekening.js          het lid rekent aan het eind zijn hele rekening af
      ./ritten.js            het lid betaalt zijn rit of vlucht
      ../lidacties.js        het lid betaalt zijn boeking (een dienst)
-     routes/.../verkoop.js  de zaak int de bon aan de balie op de ophaalcode
+     routes/.../innen.js    de zaak int de bon aan de balie op de ophaalcode
      routes/.../afrekenen.js  de zaak rekent een heel tafelticket af
+     routes/.../verkoop.js  de losse kassaverkoop (contant, pin, RTG Pay)
+     routes/supplier/retail.js  de verkoop op de winkelvloer
 
    Een factuur wordt geboekt op het moment dat er ECHT is betaald -- niet bij
    het plaatsen, niet bij het bevestigen -- en precies EEN keer: elke aanroeper
@@ -58,12 +60,14 @@ function maakFactuurVoorLid(facturatie) {
     try { log.uitzondering(new Error('factuur voor lid mislukt: ' + bericht), { bron: 'factuurVoorLid', ref }); }
     catch (e) { /* de melder zelf mag een betaling nooit omver trekken */ }
   }
-  return function factuurVoorLid({ supplierCode, supplierNaam, codenaam, regels, methode, ref, soort }) {
+  /* `koper` is er voor de balie: een kasklant zonder codenaam krijgt een naam
+     op de bon ('Kasklant', de kamer), en die komt dan van de aanroeper. */
+  return function factuurVoorLid({ supplierCode, supplierNaam, codenaam, koper, regels, methode, ref, soort }) {
     if (!facturatie || !supplierCode) return;
     try {
       const p = facturatie.boekMetCodenaam({
         soort: soort || 'verkoop', verkoperCode: supplierCode, verkoperNaam: supplierNaam,
-        koper: { codenaam }, regels, methode: methode || 'rtg', ref
+        koper: koper || { codenaam }, regels, methode: methode || 'rtg', ref
       }, codenaam);
       if (p && typeof p.then === 'function')
         p.then(r => { if (r && r.error) melden(ref, r.error); },

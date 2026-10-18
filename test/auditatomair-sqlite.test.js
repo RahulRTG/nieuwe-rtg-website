@@ -45,17 +45,31 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
        maakte een globale COUNT(*) afhankelijk van runnerbelasting. De
        atomiciteitsclaim gaat over /api/pay/kascode: daarvan mag na de
        geweigerde transactie geen halve regel bijkomen. */
-    const rijen = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
+    const regels = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
       .map(({ waarde }) => JSON.parse(waarde))
-      .filter(regel => regel.pad === '/api/pay/kascode').length;
-    const kasVoor = kas(), rijenVoor = rijen();
+      .filter(regel => regel.pad === '/api/pay/kascode');
+    /* Een kritieke geslaagde handeling krijgt twee regels: de duurzaam
+       vastgelegde toestemming en, na het HTTP-antwoord, de resultaatregel.
+       `finish` mag net na `fetch()` lopen. Wacht daarom op BEIDE regels van de
+       controlehandeling voordat de storing wordt geinjecteerd; anders kan de
+       nog legitiem landende resultaatregel ten onrechte aan het mislukte
+       verzoek worden toegeschreven (alleen zichtbaar op een belaste runner). */
+    const eind = Date.now() + 5000;
+    while (Date.now() < eind) {
+      const klaar = regels();
+      if (klaar.some(x => x.stand === 'toegestaan') && klaar.some(x => x.status === 200)) break;
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    const kasVoor = kas(), rijenVoor = regels().length;
     assert.ok(kasVoor, 'de eerste kascode staat in store.db');
+    assert.ok(regels().some(x => x.stand === 'toegestaan') && regels().some(x => x.status === 200),
+      'de controlehandeling heeft haar toestemming en resultaat duurzaam vastgelegd');
     conn.exec("CREATE TRIGGER weiger_audit BEFORE INSERT ON audit_rij WHEN NEW.naam = 'handelingLog' " +
       "BEGIN SELECT RAISE(ABORT, 'audit-schrijfactie faalt (geinjecteerd)'); END");
     const r = await api('/api/pay/kascode', { maxCenten: 2000, idem: 'tweede' }, reg.body.token);
     assert.ok(r.status < 200 || r.status >= 300, 'geen 2xx als het spoor niet vaststaat: ' + r.status + ' ' + JSON.stringify(r.body));
     assert.equal(kas(), kasVoor, 'de kascode van het mislukte verzoek staat NIET in store.db');
-    assert.equal(rijen(), rijenVoor, 'en er is ook geen halve auditregel');
+    assert.equal(regels().length, rijenVoor, 'en er is ook geen halve auditregel');
     conn.exec('DROP TRIGGER weiger_audit');
   } finally { conn.close(); }
 });

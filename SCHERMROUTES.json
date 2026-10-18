@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-10-14",
-  "commit": "ebc588be5",
+  "op": "2026-10-16",
+  "commit": "ad4a27cce",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1251,21 +1251,35 @@
     "public/shared/inlogkleur.js",
     "public/shared/interface/module-sdk.js",
     "public/shared/interface/modules/context.js",
+    "public/shared/interface/modules/coordination-edge.js",
+    "public/shared/interface/modules/coordination-view.js",
+    "public/shared/interface/modules/coordination.js",
     "public/shared/interface/modules/safety.js",
+    "public/shared/interface/modules/travel-actions.js",
+    "public/shared/interface/modules/travel-continuity.js",
+    "public/shared/interface/modules/travel-dossier-view.js",
+    "public/shared/interface/modules/travel-edge.js",
+    "public/shared/interface/modules/travel-view.js",
     "public/shared/interface/modules/travel.js",
+    "public/shared/interface/modules/work-edge.js",
+    "public/shared/interface/modules/work-view.js",
+    "public/shared/interface/modules/work.js",
     "public/shared/interface/personal-image-editor.js",
     "public/shared/interface/personal-images.js",
     "public/shared/interface/public-presentation.js",
     "public/shared/interface/second-screen-modules.js",
     "public/shared/interface/second-screen-personal.js",
     "public/shared/interface/second-screen.js",
+    "public/shared/interface/workspace-assistant-manifest.js",
     "public/shared/interface/workspace-blueprints.js",
     "public/shared/interface/workspace-broker.js",
     "public/shared/interface/workspace-composer.js",
     "public/shared/interface/workspace-context.js",
     "public/shared/interface/workspace-continuity.js",
+    "public/shared/interface/workspace-directory.js",
     "public/shared/interface/workspace-empty.js",
     "public/shared/interface/workspace-experience.js",
+    "public/shared/interface/workspace-intents.js",
     "public/shared/interface/workspace-legacy.js",
     "public/shared/interface/workspace-module-host.js",
     "public/shared/interface/workspace-navigation.js",
@@ -1355,10 +1369,12 @@
     "public/shared/qrteken.js",
     "public/shared/rahul-mond.js",
     "public/shared/rahul-tab.js",
+    "public/shared/rahul-tab/approval.js",
     "public/shared/rahul-tab/dialog.js",
     "public/shared/rahul-tab/helpers.js",
     "public/shared/rahul-tab/inkt.js",
     "public/shared/rahul-tab/kompas.js",
+    "public/shared/rahul-tab/session.js",
     "public/shared/rahul-tab/style-base.js",
     "public/shared/rahul-tab/style-twin.js",
     "public/shared/rahul-tab/workspace.js",
@@ -1485,6 +1501,7 @@
     "public/shared/toestelsleutel.js",
     "public/shared/travel-os-config.js",
     "public/shared/travel-os.js",
+    "public/shared/travel-request-controller.js",
     "public/shared/typ.js",
     "public/shared/uitleg.js",
     "public/shared/uitstap.js",
@@ -1948,15 +1965,15 @@
    "omgevingGekopieerd": false,
    "omgeving": [],
    "onwaarneembaar": [],
-   "nodeHoofdversie": 26
+   "nodeHoofdversie": 24
   }
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-14T08:41:03.184Z",
-   "commit": "6ed85893b",
+   "op": "2026-10-16T12:04:18.324Z",
+   "commit": "7ecba8058",
    "invoer": {
     "meting": "invoerspoor",
     "versie": 1,
@@ -2087,6 +2104,7 @@
      "server/bedrijf/waarom.js",
      "server/bedrijf/werkruimte.js",
      "server/bedrijf/wieis.js",
+     "server/bedrijf/zaakregie.js",
      "server/betaal-connect.js",
      "server/betaal-regie.js",
      "server/betaal-sandbox.js",
@@ -2777,6 +2795,7 @@
      "server/kern/command/runbookcatalogus.js",
      "server/kern/command/runbooks-historie.js",
      "server/kern/command/runbooks.js",
+     "server/kern/command/sensorstilte-koppelingen.js",
      "server/kern/command/sensorstilte.js",
      "server/kern/command/simulatie.js",
      "server/kern/command/slo-rekenen.js",
@@ -2850,6 +2869,7 @@
      "server/kern/commercie/subsidie.js",
      "server/kern/commercie/tegenfeit.js",
      "server/kern/commercie/tegoed.js",
+     "server/kern/commercie/tegoed/betaalbewijs.js",
      "server/kern/commercie/tegoed/inhoud.js",
      "server/kern/commercie/tegoed/plafond.js",
      "server/kern/commercie/veiligheidskern.js",
@@ -4358,6 +4378,19 @@
      "server/kern/retail/assortiment.js",
      "server/kern/retail/klant.js",
      "server/kern/retail/vloer.js",
+     "server/kern/revenue/catalogus-v1-validatie.js",
+     "server/kern/revenue/catalogus-v1.js",
+     "server/kern/revenue/commercial-binding-v1.js",
+     "server/kern/revenue/entitlement-eligibility-v1.js",
+     "server/kern/revenue/entitlement-eligibility-v1/contract.js",
+     "server/kern/revenue/entitlement-overzicht-v1.js",
+     "server/kern/revenue/entitlement-projectie-v1.js",
+     "server/kern/revenue/entitlement-projectie-v1/capability.js",
+     "server/kern/revenue/entitlement-projectie-v1/gedeeld.js",
+     "server/kern/revenue/entitlement-projectie-v1/gedelegeerd.js",
+     "server/kern/revenue/entitlement-projectie-v1/tenant.js",
+     "server/kern/revenue/entitlement-projectie-v1/workos.js",
+     "server/kern/revenue/index.js",
      "server/kern/rijksbieb-data.js",
      "server/kern/rijksbieb.js",
      "server/kern/routedekking.js",
@@ -4779,6 +4812,7 @@
      "server/kern/stuur/mandaat.js",
      "server/kern/stuur/mandaatpoort.js",
      "server/kern/stuur/menscontext-opzoek.js",
+     "server/kern/stuur/menscontext-presentatie.js",
      "server/kern/stuur/menscontext-ref.js",
      "server/kern/stuur/menscontext-relatie.js",
      "server/kern/stuur/menscontext-uit.js",
@@ -5086,6 +5120,12 @@
      "server/kern/zaakdoos/sleutels-uitgever.js",
      "server/kern/zaakdoos/sleutels.js",
      "server/kern/zaakdoos/synchronisatie.js",
+     "server/kern/zaakregie-context.js",
+     "server/kern/zaakregie-context/adapter.js",
+     "server/kern/zaakregie-context/basis.js",
+     "server/kern/zaakregie-context/hoedanigheid.js",
+     "server/kern/zaakregie-context/organisatie.js",
+     "server/kern/zaakregiebeeld.js",
      "server/kern/zegelfeiten.js",
      "server/kern/zelfzorg/beschermen.js",
      "server/kern/zelfzorg/index.js",
@@ -5391,6 +5431,7 @@
      "server/lib/mutatiecontracten-wonen.js",
      "server/lib/mutatiecontracten-zaakdoos.js",
      "server/lib/mutatiecontracten-zaakkant.js",
+     "server/lib/mutatiecontracten-zaakregie.js",
      "server/lib/mutatiecontracten-zwaar.js",
      "server/lib/mutatiecontracten.js",
      "server/lib/padvorm.js",
@@ -6455,6 +6496,7 @@
      "server/betaal/connect",
      "server/betaal/uitbetaalgate.json",
      "server/config",
+     "server/data",
      "server/db",
      "server/db/tx",
      "server/foundation",
@@ -6643,6 +6685,11 @@
      "server/kern/reservering",
      "server/kern/residentie",
      "server/kern/retail",
+     "server/kern/revenue",
+     "server/kern/revenue/AI-CREDIT-PAYMENT-RISK.md",
+     "server/kern/revenue/catalogus-v1.schema.json",
+     "server/kern/revenue/entitlement-eligibility-v1",
+     "server/kern/revenue/entitlement-projectie-v1",
      "server/kern/rtc",
      "server/kern/rtfos",
      "server/kern/rugdekking",
@@ -6685,6 +6732,7 @@
      "server/kern/werkcommand",
      "server/kern/zaakcommand",
      "server/kern/zaakdoos",
+     "server/kern/zaakregie-context",
      "server/kern/zelfzorg",
      "server/kern/zorgketen",
      "server/lib",
@@ -7332,6 +7380,15 @@
       "pad": "server/kern/retail"
      },
      {
+      "pad": "server/kern/revenue"
+     },
+     {
+      "pad": "server/kern/revenue/entitlement-eligibility-v1"
+     },
+     {
+      "pad": "server/kern/revenue/entitlement-projectie-v1"
+     },
+     {
       "pad": "server/kern/rtc"
      },
      {
@@ -7453,6 +7510,9 @@
      },
      {
       "pad": "server/kern/zaakdoos"
+     },
+     {
+      "pad": "server/kern/zaakregie-context"
      },
      {
       "pad": "server/kern/zelfzorg"
@@ -7671,16 +7731,16 @@
      "git log -1 --format=%cI",
      "node scripts/routekaart.js --json"
     ],
-    "nodeHoofdversie": 26
+    "nodeHoofdversie": 24
    }
   },
-  "bekendePaden": 5507
+  "bekendePaden": 5508
  },
  "gemeten": {
-  "schermenMetPad": 440,
+  "schermenMetPad": 447,
   "nietGelezen": 0,
-  "exactePaden": 1004,
-  "verwijzingen": 1215,
+  "exactePaden": 1009,
+  "verwijzingen": 1227,
   "voorvoegsels": 145,
   "basisPaden": 2,
   "doodPad": 0,
@@ -8010,6 +8070,24 @@
     "public/apps/memo/app.js",
     "public/apps/scanner/app.js",
     "public/apps/wonen.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/reisbureau",
+   "schermen": [
+    "public/apps/reisbureau.html",
+    "public/apps/reizen-veilig-reis.js",
+    "public/shared/interface/modules/travel.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/reisbureau/mijn",
+   "schermen": [
+    "public/apps/reisbureau.html",
+    "public/shared/interface/modules/travel-actions.js",
+    "public/shared/travel-request-controller.js"
    ],
    "aantal": 3
   },
@@ -8448,6 +8526,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/member/bureau/zaken",
+   "schermen": [
+    "public/apps/living-os-data.js",
+    "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/reis/wereld",
    "schermen": [
     "public/apps/living-os-data.js",
@@ -8576,22 +8662,6 @@
    "aantal": 2
   },
   {
-   "pad": "/api/reisbureau/mijn",
-   "schermen": [
-    "public/apps/reisbureau-experience.js",
-    "public/apps/reisbureau.html"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/reisbureau",
-   "schermen": [
-    "public/apps/reisbureau.html",
-    "public/apps/reizen-veilig-reis.js"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/mob/vraag",
    "schermen": [
     "public/apps/reizen-performance-boeken.js",
@@ -8704,6 +8774,22 @@
    "aantal": 2
   },
   {
+   "pad": "/api/bedrijf/mijn",
+   "schermen": [
+    "public/apps/werk/kern.js",
+    "public/shared/interface/modules/work.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/bedrijf/start",
+   "schermen": [
+    "public/apps/werk/start.js",
+    "public/shared/interface/modules/work.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/bestanden/map",
    "schermen": [
     "public/apps/wonen.js",
@@ -8716,6 +8802,22 @@
    "schermen": [
     "public/shared/basis/basis-02.js",
     "public/shared/deur.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/service/mens",
+   "schermen": [
+    "public/shared/basis/basis-02b.js",
+    "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/service/mijn",
+   "schermen": [
+    "public/shared/basis/basis-02b.js",
+    "public/shared/interface/modules/coordination.js"
    ],
    "aantal": 2
   },
@@ -11657,13 +11759,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/bureau/zaken",
-   "schermen": [
-    "public/apps/living-os-data.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/instant-reality",
    "schermen": [
     "public/apps/living-os.js"
@@ -13036,13 +13131,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/reisbureau/boek",
-   "schermen": [
-    "public/apps/reisbureau-experience.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/reis/wijzer",
    "schermen": [
     "public/apps/reisbureau.html"
@@ -14331,9 +14419,9 @@
    "aantal": 1
   },
   {
-   "pad": "/api/bedrijf/mijn",
+   "pad": "/api/bedrijf/taak/maak",
    "schermen": [
-    "public/apps/werk/kern.js"
+    "public/apps/werk/acties.js"
    ],
    "aantal": 1
   },
@@ -14341,6 +14429,13 @@
    "pad": "/api/tenant/bootstrap",
    "schermen": [
     "public/apps/werk/merk.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bedrijf/taken",
+   "schermen": [
+    "public/apps/werk/modules.js"
    ],
    "aantal": 1
   },
@@ -14457,20 +14552,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/service/mens",
-   "schermen": [
-    "public/shared/basis/basis-02b.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/service/mijn",
-   "schermen": [
-    "public/shared/basis/basis-02b.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/service/open",
    "schermen": [
     "public/shared/basis/basis-02b.js"
@@ -14541,9 +14622,23 @@
    "aantal": 1
   },
   {
+   "pad": "/api/service/zaak",
+   "schermen": [
+    "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/huis/dossier",
    "schermen": [
     "public/shared/interface/modules/travel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bedrijf/zaakregie",
+   "schermen": [
+    "public/shared/interface/modules/work.js"
    ],
    "aantal": 1
   },
@@ -14852,6 +14947,13 @@
    "pad": "/api/webauthn/weg",
    "schermen": [
     "public/shared/toestelsleutel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reisbureau/boek",
+   "schermen": [
+    "public/shared/travel-request-controller.js"
    ],
    "aantal": 1
   },
@@ -17576,14 +17678,6 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/reisbureau-experience.js",
-   "exact": [
-    "/api/reisbureau/boek",
-    "/api/reisbureau/mijn"
-   ],
-   "voorvoegsels": []
-  },
-  {
    "bestand": "public/apps/reisbureau.html",
    "exact": [
     "/api/reis/wijzer",
@@ -18435,6 +18529,13 @@
    ]
   },
   {
+   "bestand": "public/apps/werk/acties.js",
+   "exact": [
+    "/api/bedrijf/taak/maak"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/werk/bijstand.js",
    "exact": [],
    "voorvoegsels": [
@@ -18447,6 +18548,7 @@
     "/api/bedrijf/mijn"
    ],
    "voorvoegsels": [
+    "/api/",
     "/api/bedrijf"
    ]
   },
@@ -18454,6 +18556,13 @@
    "bestand": "public/apps/werk/merk.js",
    "exact": [
     "/api/tenant/bootstrap"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/werk/modules.js",
+   "exact": [
+    "/api/bedrijf/taken"
    ],
    "voorvoegsels": []
   },
@@ -18470,6 +18579,13 @@
    "voorvoegsels": [
     "/api/werk-leverancier/"
    ]
+  },
+  {
+   "bestand": "public/apps/werk/start.js",
+   "exact": [
+    "/api/bedrijf/start"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/werk/status.js",
@@ -18703,6 +18819,16 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/interface/modules/coordination.js",
+   "exact": [
+    "/api/member/bureau/zaken",
+    "/api/service/mens",
+    "/api/service/mijn",
+    "/api/service/zaak"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/shared/interface/modules/safety.js",
    "exact": [
     "/api/veiligheid",
@@ -18711,9 +18837,26 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/interface/modules/travel-actions.js",
+   "exact": [
+    "/api/reisbureau/mijn"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/shared/interface/modules/travel.js",
    "exact": [
-    "/api/member/huis/dossier"
+    "/api/member/huis/dossier",
+    "/api/reisbureau"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/shared/interface/modules/work.js",
+   "exact": [
+    "/api/bedrijf/mijn",
+    "/api/bedrijf/start",
+    "/api/bedrijf/zaakregie"
    ],
    "voorvoegsels": []
   },
@@ -18947,6 +19090,13 @@
    ]
   },
   {
+   "bestand": "public/shared/rahul-tab/approval.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/"
+   ]
+  },
+  {
    "bestand": "public/shared/rahul-tab/helpers.js",
    "exact": [
     "/api/fluister/concept"
@@ -18959,9 +19109,7 @@
     "/api/fluister",
     "/api/supplier/ai"
    ],
-   "voorvoegsels": [
-    "/api/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/realtime.js",
@@ -19047,6 +19195,14 @@
     "/api/pay/",
     "/api/wallet/"
    ]
+  },
+  {
+   "bestand": "public/shared/travel-request-controller.js",
+   "exact": [
+    "/api/reisbureau/boek",
+    "/api/reisbureau/mijn"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/veiligheid.js",

@@ -334,3 +334,15 @@ test('warme browserfabriek ruimt contexten op zonder het gedeelde proces te slui
   await apart.close();
   assert.equal(geisoleerd, 1, 'procesvlaggen krijgen een eigen browserproces');
 });
+
+test('de tijdlijn noemt de modus van het besluit, niet een afgeleide uit UNKNOWN', () => {
+  /* Run 38718725654 meldde "116 onbekend → volledige ronde" terwijl het plan
+     incrementeel bleef en twee onverdeelde runners tegen hun timeout liepen. */
+  const plan = { snapshot: { bestanden: 1, duurMs: 1 }, telling: { REUSED: 1174, REPROVE: 1429, UNKNOWN: 116 },
+    mode: 'incremental', besluit: { code: 'bewijs-hergebruikt' } };
+  const regels = uitvoerder.tijdlijn(plan, { unit: ['a.test.js'], e2e: [] });
+  assert.ok(!regels.some((r) => /volledige ronde/.test(r)), regels.join('\n'));
+  assert.ok(regels.includes('modus incremental (bewijs-hergebruikt)'));
+  assert.ok(uitvoerder.tijdlijn({ ...plan, mode: 'full', besluit: { code: 'incrementieel-te-breed' } },
+    { unit: [], e2e: [] }).includes('modus full (incrementieel-te-breed)'));
+});

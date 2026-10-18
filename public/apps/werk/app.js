@@ -59,7 +59,7 @@
   /* Eerst kijken of er al een weg naar binnen is via het ledenaccount; pas
      als die er niet is, komt de inlogkaart in beeld. */
   K.poort();
-  if (K.sessie()) { toon('start'); } else {
+  if (K.sessie() && !K.wisselNodig()) { toon('start'); } else {
     K.viaLid().then(function (gelukt) {
       var w = K._welkom;
       if (gelukt && w) {

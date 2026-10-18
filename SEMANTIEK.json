@@ -1872,7 +1872,7 @@
         },
         {
           "bestanden": [
-            "server/kern/bearercode-v2.js"
+            "server/kern/bearercode-zegel.js"
           ],
           "leden": 11,
           "voorbeeld": [
@@ -3733,5 +3733,5 @@
       ]
     }
   ],
-  "bestanden": 4454
+  "bestanden": 4461
 }

@@ -143,7 +143,9 @@ module.exports = function maakGebruikerSync({ accounts, scim, cascade, log, klok
         throw e;
       }
     } catch (e) {
-      if (eigen && db.inTransaction) {
+      /* node:sqlite heet het isTransaction (inTransaction is better-sqlite3 en
+         was hier altijd undefined: de halve schrijving bleef dan open staan). */
+      if (eigen && db.isTransaction) {
         try { db.exec('ROLLBACK'); } catch (_) {}
       }
       throw e;

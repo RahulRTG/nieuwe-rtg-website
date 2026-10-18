@@ -45,7 +45,8 @@ const klok = require('../../lib/klok');
    overleven; alles daarboven is een venster waarin een onderschepte handtekening
    opnieuw bruikbaar is. */
 const UITDAGING_MS = 2 * 60 * 1000;
-const MAX_PER_LID = 25;
+const grens = require('./toestelgrens');
+const MAX_PER_LID = grens.MAX_ACTIEF;
 
 function maakToestellen({ db, save }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/identiteit',
@@ -55,8 +56,6 @@ function maakToestellen({ db, save }) {
 
   const sleutelVan = (lidKey, toestelId) => String(lidKey) + '|' + String(toestelId);
   const geldigeId = (v) => typeof v === 'string' && /^[a-f0-9]{32}$/.test(v);
-
-
 
   /* De naam is invoer van een mens en gaat naar een scherm. Stuurtekens eruit,
      lengte begrensd; het ontsnappen zelf doet de laag die toont. */
@@ -119,6 +118,8 @@ function maakToestellen({ db, save }) {
       return { error: 'Dit toestel heeft u eerder ingetrokken. Neem het bewust opnieuw op als u het weer wilt vertrouwen.',
         ingetrokken: true, toestelId };
     }
+    if (!bestaand && grens.intrekkingenVol(bak(), lidKey))
+      return { error: 'Er zijn te veel ingetrokken toestellen om er een bij te nemen. Neem contact op met RTG.', vol: true };
     /* De bindingId hoort bij dit BEWIJS en niet bij het toestel: hij zegt "deze
        handtekening, op dit moment". Zo kan een sessie later laten zien met welk
        bewijs zij gebonden werd, en niet alleen aan welk toestel. */
@@ -189,13 +190,7 @@ function maakToestellen({ db, save }) {
       .sort((a, b) => new Date(b.laatstBewezenOp) - new Date(a.laatstBewezenOp));
   }
 
-  function ruim(lidKey, behoud) {
-    const mijne = Object.entries(bak())
-      .filter(([k, r]) => r.lidKey === String(lidKey) && k !== behoud)
-      .sort((a, b) => new Date(a[1].laatstBewezenOp || 0) - new Date(b[1].laatstBewezenOp || 0));
-    const teveel = mijne.length + 1 - MAX_PER_LID;
-    for (let i = 0; i < teveel; i++) delete bak()[mijne[i][0]];
-  }
+  const ruim = (lidKey, behoud) => grens.ruimActief(bak(), lidKey, behoud);
 
   return { uitdaging, bind, noem, trekIn, naamVan, publiekeSleutelVan, lijst, idVan, UITDAGING_MS, MAX_PER_LID };
 }

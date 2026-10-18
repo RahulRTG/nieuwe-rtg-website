@@ -170,6 +170,8 @@ module.exports = [
   /* ---- DOMEINEN DIE ELKAAR ECHT NODIG HEBBEN ---- */
   { van: 'domein:bedrijf', naar: 'domein:werkcommand', soort: 'DOMEINRELATIE',
     reden: 'bedrijf/geheugen.js r.44 gebruikt maakWerkRegister: het zakelijke geheugen leest wat er te doen staat, en dat register woont in werkcommand' },
+  { van: 'domein:bedrijf', naar: 'domein:zaakregie-context', soort: 'DOMEINRELATIE',
+    reden: 'bedrijf/zaakregie.js projecteert een expliciet gekozen, reeds door WorkOS en het brondomein gebonden zaak via de read-only contextadapter; de adapter verleent geen recht en de bedrijfsroute herhaalt account-, lidmaatschaps-, tenant- en broneigendomcontrole' },
   { van: 'domein:foundation', naar: 'domein:school', soort: 'DOMEINRELATIE',
     reden: 'foundation/gasten/gezinsleven.js r.7 leest schoolPunten uit de schoolplanner: het gezinsleven van de RTFoundation gaat over kinderen die naar school gaan' },
   { van: 'domein:foundation', naar: 'domein:agenda-pro', soort: 'DOMEINRELATIE',

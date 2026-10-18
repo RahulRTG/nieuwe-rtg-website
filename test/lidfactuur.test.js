@@ -600,6 +600,36 @@ test('8. een factuur die NIET lukt komt op het techniekbord, en trekt de betalin
   log.foutenReset();
 });
 
+test('8b. de balie geeft zijn eigen koper mee, en geen route slikt een factuurfout stil in', async () => {
+  // de kasklant zonder codenaam houdt zijn naam op de bon
+  let gezien = null;
+  maakFactuurVoorLid({ boekMetCodenaam: async (data) => { gezien = data; return { ok: true }; } })
+    ({ supplierCode: 'X', supplierNaam: 'Zaak', codenaam: null, koper: { naam: 'Kasklant' },
+      regels: [{ omschrijving: 'Koffie', aantal: 1, stuk: 3 }], methode: 'contant', ref: 'REF-BALIE' });
+  assert.deepEqual(gezien.koper, { naam: 'Kasklant' }, 'de koper van de aanroeper gaat mee');
+  assert.equal(gezien.methode, 'contant');
+
+  /* De kassa en de winkelvloer boekten hun factuur met `.catch(() => {})`: een
+     bon die betaald is maar geen factuur kreeg, stond dan wel in de kassa en
+     niet in het factuurregister -- en dus niet in de btw-aangifte, zonder dat
+     iemand het zag. Dat is het gat dat toets 8 hierboven dicht; deze toets
+     houdt het dicht voor elke route die rechtstreeks de motor aanroept. */
+  const routes = path.join(__dirname, '..', 'server', 'routes');
+  const stil = [];
+  (function loop(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) loop(p);
+      else if (e.name.endsWith('.js')) {
+        const tekst = fs.readFileSync(p, 'utf8');
+        const re = /boekMetCodenaam\([\s\S]*?\)\s*\.catch\(\s*\(\s*\)\s*=>\s*\{\s*\}\s*\)/g;
+        if (re.test(tekst)) stil.push(path.relative(routes, p));
+      }
+    }
+  })(routes);
+  assert.deepEqual(stil, [], 'een factuurfout wordt gemeld via kern/lidacties/factuur.js, niet ingeslikt');
+});
+
 /* -------------------------------------------------------------------------
    9. DE CADEAUKAART (TAKEN.md 4.27)
 

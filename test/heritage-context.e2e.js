@@ -20,8 +20,10 @@ test('Heritage context returns through real navigation without writes', async t 
     }
     /* Op mobiel staat de statusknop niet in de bovenbalk (www-stijl, #534); de Edge
        bereikt hem met zijn actie 'status', en die doet precies deze klik op de knop
-       (legacy() in shared/rtg-adaptive-edge.js). */
-    async function openStatus() { await page.locator('.rtg-edge-state').evaluate(e => e.click()); }
+       (legacy() in shared/rtg-adaptive-edge.js). De V4-kop draagt een proxy met
+       dezelfde klasse (rtg-v4-edge-state) die deze bron aanklikt; de toets kiest
+       daarom expliciet de bron in de Edge-root. */
+    async function openStatus() { await page.locator('.rtg-edge-chrome .rtg-edge-state').evaluate(e => e.click()); }
     async function returnTo(path) {
       await page.evaluate(() => window.RTGRouteMemory.save());
       await visit('/apps/bestanden.html');

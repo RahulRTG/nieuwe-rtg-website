@@ -97,22 +97,24 @@ test('6. automatisch aanvullen vraagt een bundel EN een maandmaximum', () => {
   const goed = t.zetBeleid('Zaak', 'business-lite', { beleid: BELEID.AUTO_AANVULLEN, bundel: 'ai-m', maandMaxCenten: 5000 });
   assert.equal(goed.status, 200);
   assert.equal(goed.maandMaxCenten, 5000);
+  assert.equal(goed.actief, false, 'een voorkeur is nog geen bewezen aankoop');
 });
 
 /* Een restaurant hoort niet op vrijdagavond te ontdekken dat de
    menukaartvertaling stilstaat. */
-test('7. met automatisch aanvullen loopt het door, zichtbaar en geboekt', () => {
+test('7. automatisch aanvullen blijft dicht zonder servermatig betaalbewijs', () => {
   const t = verse();
   t.zetBeleid('Zaak', 'business-lite', { beleid: BELEID.AUTO_AANVULLEN, bundel: 'ai-m', maandMaxCenten: 5000 });
   t.verbruik('Zaak', 'business-lite', 20000);      // het inbegrepen tegoed op
   const r = t.verbruik('Zaak', 'business-lite', 100);
 
-  assert.equal(r.mag, true);
-  assert.equal(r.reden, 'auto-aangevuld');
+  assert.equal(r.mag, false);
+  assert.equal(r.reden, 'betaalbewijs-vereist');
   assert.equal(r.bundel, 'ai-m');
   const s = t.stand('Zaak', 'business-lite');
-  assert.equal(s.bijgekocht, BUNDELS['ai-m'].credits, 'de bundel staat er echt bij');
-  assert.ok(s.bundels.length, 'en de aanvulling is terug te vinden');
+  assert.equal(s.bijgekocht, 0, 'zonder betaalbewijs zijn geen credits toegekend');
+  assert.equal(t.rijVan('Zaak', 'business-lite').bundels.length, 0,
+    'zonder betaling is er ook geen aankoopregel');
 });
 
 test('8. een contractuele trede kent hier geen plafond', () => {

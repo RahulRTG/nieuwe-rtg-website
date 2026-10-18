@@ -572,7 +572,20 @@ const EIGEN_MODULE = new Map([
   // voor wachtOpWaarde; ze starten geen server en lezen niets van /api/.
   ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],
   ['journaalbestand-weerbaar.test.js', ['server/kern/journaalbestand.js']],
+  // De dekkingsvang toetst het vangmechanisme van de toetsservers (stop() in
+  // dekkingsmodus), niet een API-antwoord: de liegpoort raakt hem dus niet.
+  ['dekkingsvang.test.js', ['test/lib/dekkingsvang.js', 'test/lib/dekkingsvang-kind.js']],
   ['wacht-weerbaar.test.js', ['server/kern/wacht/index.js', 'server/kern/wacht/raadkamer.js', 'server/kern/wacht/flood.js']],
+  // De SCIM-weerbaarheidstoetsen laden accounts alleen als onderlaag (init op
+  // een wegwerpmap); wat ze toetsen is de organisatiegrens, de uitdienst-outbox
+  // en de groepen. Een zakker op accounts/index.js zou "alleen op de opzet" zijn.
+  ['scim-orggrens-weerbaar.test.js', ['server/scim/index.js', 'server/scim/filter.js', 'server/scim/sleutels.js']],
+  ['scim-uitdienst-weerbaar.test.js', ['server/scim/user-sync.js']],
+  ['scim-groepen-weerbaar.test.js', ['server/scim/groepen.js', 'server/routes/scim-groepen.js']],
+  // De handtekeningtoets laadt de XML-lezer eerst (om zelf te ondertekenen);
+  // een mutatie in diens leeslus hangt de toets op ('te langzaam'). Wat hij
+  // toetst is de controle zelf.
+  ['saml-handtekening-weerbaar.test.js', ['server/sso/saml/handtekening.js']],
   // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.
@@ -594,6 +607,11 @@ const EIGEN_MODULE = new Map([
   ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],
   ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
   ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
+  /* De composerproef voert de twee echte browsermodules in een VM uit. De
+     statische modulezoeker ziet readFileSync(path.join(..., name)) niet, dus
+     zonder deze binding heet een uitgevoerde toets ten onrechte onmeetbaar. */
+  ['workspace-composer.test.js', ['public/shared/interface/workspace-blueprints.js',
+    'public/shared/interface/workspace-composer.js']],
   ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],
   ['toestel.e2e.js', ['public/shared/toestel/opslag.js', 'public/shared/toestel/rekenaar.js']],
   ['laatstedrie.e2e.js', ['public/shared/media.js']],
@@ -799,6 +817,7 @@ const EIGEN_MODULE = new Map([
      bewering zakken. De expliciete koppeling voorkomt dat een echte VM-toets
      als "geen module gevonden" buiten de mutatiemeting blijft. */
   ['workspace-platform.test.js', ['public/shared/interface/module-sdk.js']],
+  ['workspace-session-continuity.test.js', ['public/shared/interface/workspace-session.js']],
   /* De werkruimtecontext (Edge ronde 2, stap 23) is browsercode die de toets in
      een VM uitvoert, dus zonder require. Met de hand nagetrokken: de herkomst
      overschrijven, een cache terugzetten, terugvallen op RTGAdaptief en bij een
@@ -871,6 +890,10 @@ const EIGEN_MODULE = new Map([
   ['samlxsw.test.js', ['server/sso/saml/antwoord.js', 'server/sso/saml/handtekening.js']],
   ['samlc14n.test.js', ['server/sso/saml/c14n.js', 'server/sso/saml/xml.js']],
   ['samlpoort.test.js', ['server/sso/saml/index.js']],
+  /* saml-signedinfo-prefix -> handtekening.js: de PrefixList van SignedInfo.
+     Zonder deze regel koos de motor xml.js, waar de eerste mutant de parser
+     laat vastlopen ('te langzaam') en dus niets over deze toets zegt. */
+  ['saml-signedinfo-prefix.test.js', ['server/sso/saml/handtekening.js']],
   /* DE MERKKERN als enige bron. Zes mutaties, zes raak -- maar niet allemaal
      tegen dezelfde toets, en dat is met opzet. merkkern.test.js kent de
      WAARDEREGELS en de STRUCTUUR (de drie consumenten lezen de definitie en
@@ -907,6 +930,8 @@ const EIGEN_MODULE = new Map([
   ['experience-travel.test.js', ['server/kern/reisbureau.js']],
   ['travel-request-controller.test.js', ['public/shared/travel-request-controller.js']],
   ['experience-travel.e2e.js', ['public/apps/reisbureau-experience.js', 'public/shared/travel-request-controller.js']],
+  ['workspace-travel-request.e2e.js', ['public/shared/interface/workspace-runtime.js', 'public/shared/interface/second-screen.js',
+    'public/shared/interface/modules/travel.js', 'public/shared/interface/modules/travel-view.js']],
   ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],
   /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
      gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de

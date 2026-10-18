@@ -42,11 +42,12 @@ test('Escape sluit het Rahul-paneel, net als de sluitknop', { skip: geenBrowser(
     const page = await ctx.newPage();
     const fouten = letOpFouten(page, []);
     await page.goto(base + '/apps/mijn-neigingen.html', { waitUntil: 'domcontentloaded' });
-    await wachtTot(page, () => !!window.RTGRahulTabHelpers && !!document.querySelector('.rtg-rahul-tab'),
-      null, { wat: 'de Rahul-tab uit de gedeelde schil' });
+    await wachtTot(page, () => !!window.RTGRahulTabHelpers &&
+      !!document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]'),
+      null, { wat: 'Rahul in de ene gedeelde Edge' });
 
     const open = () => page.evaluate(() => { const p = document.querySelector('.rtg-rahul-page'); return !!p && !p.hidden; });
-    await page.locator('.rtg-rahul-tab').click();
+    await require('./helper').edgeRahul(page);
     await wachtTot(page, () => { const p = document.querySelector('.rtg-rahul-page'); return !!p && !p.hidden; },
       null, { wat: 'het Rahul-paneel open' });
 
@@ -56,7 +57,7 @@ test('Escape sluit het Rahul-paneel, net als de sluitknop', { skip: geenBrowser(
     assert.equal(await open(), false, 'Escape sloot het paneel niet');
 
     // opnieuw open, en de sluitknop blijft ook werken
-    await page.locator('.rtg-rahul-tab').click();
+    await require('./helper').edgeRahul(page);
     await wachtTot(page, () => { const p = document.querySelector('.rtg-rahul-page'); return !!p && !p.hidden; },
       null, { wat: 'het Rahul-paneel opnieuw open' });
     await page.locator('.rtg-command-close').click();

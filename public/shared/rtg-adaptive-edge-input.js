@@ -45,18 +45,15 @@
   function busy(r){if(r.host.dataset.rtgSurface)return true;var o=r.win.RTGEdge2;
     if(o&&o.isBusy)return o.isBusy(r.doc,false);var a=r.doc.activeElement;
     return!!(r.customPanel||r.host.contains(a)||a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)));}
-  function pinned(r){var d=r.doc.body&&r.doc.body.dataset||{};return r.manual||d.rtgEdge2Auto==='false'||d.rtgEdge2Rendered==='true'&&!d.rtgEdge2Auto;}
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, lastX = 0, lastY = 0, timer = null, held = false, blockClickUntil = 0;
     var scrollTimer = null, quietTimer = null, positions = new WeakMap(), listeners = [];
     function listen(target,type,callback,options){target.addEventListener(type,callback,options);listeners.push([target,type,callback,options]);}
     var D=null;
-    function quiet(){rt.win.clearTimeout(quietTimer);
-      if(!rt.model)return;
-      if(pinned(rt)||rt.model.state==='deck'||rt.model.state==='expanded')return;
-      quietTimer=rt.win.setTimeout(function(){if(pinned(rt))return;if(busy(rt))return quiet();
-        if(rt.model.state==='dock')handlers.state('peek','quiet');},3600);
-    }
+    /* De volledige vijfdelige Edge is de standaard. Stilte is geen intentie om
+       bediening te verbergen: alleen een werkelijk scroll- of veeggebaar mag
+       tijdelijk de compacte leesstand kiezen. */
+    function quiet(){rt.win.clearTimeout(quietTimer);}
     function wake(){rt.win.clearTimeout(quietTimer);
       if(rt.model&&rt.model.state==='peek')handlers.state('dock','wake');
     }
@@ -172,5 +169,5 @@
     if (focus) focus.focus({ preventScroll: true });
     return true;
   }
-  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, busy: busy, pinned: pinned, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
+  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, busy: busy, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
 }(window));

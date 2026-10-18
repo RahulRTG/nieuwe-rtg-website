@@ -123,7 +123,7 @@
       }
     }
     for (const { item, uit } of alleItems()) {
-      if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
+      if (q && !(itemNaam(item) + ' ' + item + ' ' + (uit || '')).toLowerCase().includes(q)) continue;
       zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
     }
     /* HANDELINGEN DIE IN EEN ANDERE APP WONEN. Dezelfde lijst die de sprong op
@@ -174,4 +174,3 @@
      enkele meting mee (zie de opmerking bij zoekRij hierboven). */
   if (zoekLijst) setTimeout(zoek, 800);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
-

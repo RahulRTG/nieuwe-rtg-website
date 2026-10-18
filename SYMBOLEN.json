@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "f58cc62ec",
-  "seconden": 9.9,
+  "commit": "c152f6da8",
+  "seconden": 9.8,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7320,13 +7320,13 @@
   "nietGelezen": 316,
   "waarvanBundeldeel": 316,
   "waarvanParsefout": 0,
-  "symbolen": 27897,
+  "symbolen": 27898,
   "bestandenMetUitvoer": 4582,
   "uitvoerMetNamen": 2090,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2485,
   "zonderUitvoer": 918,
-  "requireKanten": 7831
+  "requireKanten": 7830
  },
  "nietGelezen": [
   {
@@ -9991,7 +9991,6 @@
     "server/accounts/actietokens.js",
     "server/accounts/tokens.js",
     "server/accounts/users.js",
-    "server/bedrijf/zaakregie.js",
     "server/sso/index.js"
    ]
   },
@@ -14477,31 +14476,37 @@
     {
      "naam": "tekst",
      "soort": "pijl",
-     "lijn": 12,
+     "lijn": 10,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "authEenmaal",
      "soort": "pijl",
-     "lijn": 16,
+     "lijn": 14,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "actief",
+     "soort": "pijl",
+     "lijn": 17,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "fout",
      "soort": "functie",
-     "lijn": 18,
+     "lijn": 19,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eigenZaak",
      "soort": "functie",
-     "lijn": 23,
+     "lijn": 24,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bronnen",
      "soort": "functie",
-     "lijn": 38,
+     "lijn": 39,
      "geexporteerd": "onbekend"
     }
    ],
@@ -14510,7 +14515,6 @@
     "namen": null
    },
    "requires": [
-    "server/accounts/sessiegrens.js",
     "server/kern/zaakregie-context/adapter.js"
    ],
    "extern": [],

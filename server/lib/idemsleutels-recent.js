@@ -33,6 +33,8 @@ const SLEUTELS = Object.assign({},
   /* De kluis: een dubbeltik op "document toevoegen" gaf twee documenten. */
   require('./idemsleutels-bestanden').SLEUTELS,
   /* Pulse, De Salon en RTMail: een dubbeltik gaf de ander alles twee keer. */
-  require('./idemsleutels-tweedelid').SLEUTELS);
+  require('./idemsleutels-tweedelid').SLEUTELS,
+  /* WorkOS-zaakregie projecteert een bestaande eigen zaak en schrijft niet. */
+  require('./idemsleutels-zaakregie').SLEUTELS);
 
 module.exports = { SLEUTELS };

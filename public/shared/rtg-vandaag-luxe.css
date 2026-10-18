@@ -207,7 +207,9 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompaslijs
   color:var(--rtg-v-ink)!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] #reisdossier{
-  margin:1rem 0 0!important;padding:clamp(1.2rem,2.5vw,2rem)!important
+  /* Alleen de verticale marge: de horizontale is van de V4-cover, die het
+     dossier randloos over de volle breedte legt. */
+  margin-block:1rem 0!important;padding:clamp(1.2rem,2.5vw,2rem)!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .lifelagen button{
   border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important;color:var(--rtg-v-muted)!important
@@ -617,6 +619,19 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .band{
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtstad[aria-pressed="true"]{
   box-shadow:inset 2px 0 var(--rtg-v-metal),var(--rtg-v-depth-content)
+}
+
+/* Deze drie waarden staan op donkere wereldgrond. De eerdere lokale kleuren
+   waren nog uit de lichte dashboardversie afkomstig en voldeden daar niet aan
+   de tekstcontrastgrens. */
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart .statusicoon.goed{
+  color:#77c69a!important
+}
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtsec{
+  color:#d9c8ad!important
+}
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtstad b{
+  color:#f7f1e5!important
 }
 
 @media(hover:hover) and (pointer:fine){

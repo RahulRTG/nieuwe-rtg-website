@@ -1,44 +1,6 @@
-/* WAT RAHUL VAN HET BLIKVELD ZIET -- en wat met opzet niet.
-
-   EDGE.md punt 36: "Rahul leest het blikveld nog niet, en alleen via een
-   positieve veldenlijst (AI-CONTEXT-01)." Tot hier bouwde de Rahul-helper zijn
-   schermcontext uit de DOM van het BOVENDOCUMENT (document.title, `nav
-   .actief`). In de schil van app.html is dat de schil zelf: welk blad er open
-   staat, in welke wereld en waarnaar het wijst, zag Rahul niet -- terwijl het
-   blikveld (./blikveld.js) dat allemaal al wist, met herkomst.
-
-   DIT BESTAND IS EEN PROJECTIE EN GEEN TWEEDE CONTEXTMODEL. Het leest
-   RTGEdgeBlikveld.lees() op het moment van vragen, onthoudt niets, schrijft
-   niets terug en geeft precies de vorm die server/kern/stuur/menscontext.js
-   al kent (`wereld`, `deel`, `verwijzingen` -- drie van zijn CONTRACTSLEUTELS).
-   Er komt dus geen vijfde contextvorm bij; wat de server niet kent, wordt hier
-   niet eens samengesteld.
-
-   DE RICHTING IS DE HELE REGEL (AI-CONTEXT-01). Het antwoord wordt veld voor
-   veld OPGEBOUWD uit MEE; er wordt nergens een blikveld of een veld gekopieerd
-   met een spread en daarna iets uit verwijderd. Een NIEUW veld in het blikveld
-   gaat daardoor niet vanzelf naar Rahul: het staat in geen van beide lijsten,
-   en test/rahulzicht.test.js zakt tot iemand besluit in welke het hoort.
-
-   WAT NIET MEEGAAT, MET DE REDEN (NIET_MEE). De identiteit niet (wie iemand is
-   gaat langs de kluis en nooit langs de Edge, besluit 2), de voortzetting niet
-   (de lijst open bladen is een spoor van waar iemand was -- besluit 1 en
-   KOSTEN.md: tellers, geen journaal), de handelingen en de hoofdactie niet (wat
-   Rahul mag klaarzetten bepaalt de SERVER met beleid.js en de resolver; een
-   lijst knoppen van de client zou een capability suggereren die context nooit
-   mag scheppen), en de rest omdat het contract er geen plek voor heeft.
-
-   VAN EEN OBJECT GAAN ALLEEN SOORT EN ID MEE. Het label en de velden staan
-   wel in het blikveld, maar menscontext.js gooit ze toch weg (`verwijzing()`:
-   "de server kijkt dat zelf op, of het bestaat niet"), en een documenttitel
-   naar een model sturen die de server niet eens leest, is een lek zonder nut.
-
-   ZONDER BLIKVELD ZIET RAHUL WAT HIJ VOORHEEN ZAG. Het blikveld laadt lui met
-   de adaptieve Edge (rtg-adaptive-edge-loader.js); wie vraagt voordat die er
-   is, krijgt de oude DOM-context van de helper. Dat is een terugval en geen
-   fout: hier wordt dan niets beweerd dat niet gezien is.
-
-   Levert window.RTGEdgeRahulzicht, en in node module.exports. */
+/* Positieve, vluchtige Rahul-projectie van Edge en Workspace. Zij kopieert
+   alleen opgesomde velden. Assistant-acties zijn declaratieve voorstellen uit
+   het bestaande modulecontract; deze laag voert ze nooit uit. */
 (function (root, fabriek) {
   'use strict';
   var api = fabriek();
@@ -52,7 +14,10 @@
      paginatitel weet de helper zelf ook, en hem hier als blikveld-waarheid
      doorgeven zou herkomst verzinnen. */
   var TITELBRON = ['scherm', 'blad', 'edge-casco'];
-  var GRENS = { deel: 70, soort: 24, id: 40 };
+  var GRENS = { deel: 70, soort: 24, id: 40, werkruimte: 40, module: 40 };
+  var MODI = ['peek', 'panel', 'workspace', 'focus'];
+  var ASSISTENTSOORTEN = ['read', 'search', 'open', 'propose'];
+  var ACTIE = /^[a-z][a-z0-9]*(?:\.[a-z0-9-]+)+$/;
 
   var MEE = Object.freeze({
     wereld: 'de wereld waarin het scherm of het open blad staat (living, travel, work, foundation)',
@@ -68,6 +33,17 @@
     trust: 'de Trust Rail toont een toestand aan een mens; het contract kent hem niet',
     bevoegdheid: 'de Edge verleent niets, en de server weet zelf wat iemand mag'
   });
+  /* De Runtime bezit meer: layout, panelen, state en uitvoerfuncties. Dit is de
+     volledige positieve lijst van wat Rahul daarvan mag zien. */
+  var WERKRUIMTE_MEE = Object.freeze({
+    id: 'de niet-gevoelige identificatie van de huidige werkruimte',
+    modus: 'de zichtbare presentatiemodus uit de bestaande Workspace-state',
+    module: 'de actieve module, alleen als RTGAdaptief dezelfde module als actuele context bevestigt'
+  });
+  var ASSISTENT_MEE = Object.freeze({
+    module: 'de actieve module uit dezelfde Workspace-projectie',
+    mogelijkheden: 'alleen expliciet assistant-safe actie-id en type; nooit invoer of uitvoering'
+  });
 
   function kort(x, n) {
     return String(x == null ? '' : x).replace(/[\x00-\x1f\x7f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
@@ -75,11 +51,55 @@
   function woord(x, n) {
     return String(x == null ? '' : x).toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, n);
   }
+  /* Een Workspace-sleutel wordt niet verbeterd. Tekst met spaties, opmaak of
+     instructies is geen id en valt geheel weg. */
+  function sleutel(x, n) {
+    var s = String(x == null ? '' : x);
+    return /^[a-z][a-z0-9-]*$/.test(s) ? s.slice(0, n) : '';
+  }
+
+  function werkruimteVan(w, blik) {
+    try {
+      var root = w && w.document && w.document.getElementById('rtgCommand');
+      var second = root && root.__rtgSecondScreen, runtime = second && second.runtime;
+      var engine = runtime && runtime.stateEngine;
+      if (!engine || typeof engine.get !== 'function') return null;
+      var state = engine.get('workspace');
+      if (!state || typeof state !== 'object') return null;
+      var uit = {}, id = sleutel(state.id, GRENS.werkruimte);
+      var modus = MODI.indexOf(state.surface) >= 0 ? state.surface : '';
+      var module = sleutel(state.active, GRENS.module);
+      var context = blik && blik.velden && blik.velden.context;
+      var bron = context && context.waarde && String(context.waarde.bron || '');
+      if (id) uit.id = id;
+      if (modus) uit.modus = modus;
+      /* State alleen is geen bewijs van actuele focus. De levende Edge-context
+         moet dezelfde module aanwijzen. */
+      if (module && bron === 'workspace.' + module) uit.module = module;
+      return Object.keys(uit).length ? uit : null;
+    } catch (e) { return null; }
+  }
+
+  function assistentVan(w, werkruimte) {
+    try {
+      var root = w && w.document && w.document.getElementById('rtgCommand');
+      var runtime = root && root.__rtgSecondScreen && root.__rtgSecondScreen.runtime;
+      if (!runtime || typeof runtime.assistantManifest !== 'function' || !werkruimte || !werkruimte.module) return null;
+      var manifest = runtime.assistantManifest(), module = sleutel(manifest && manifest.module, GRENS.module);
+      if (!manifest || manifest.status !== 'ready' || !module || module !== werkruimte.module) return null;
+      var mogelijkheden = [];
+      (Array.isArray(manifest.actions) ? manifest.actions : []).slice(0, 8).forEach(function (actie) {
+        var id = String(actie && actie.id || ''), soort = String(actie && actie.kind || '');
+        if (ACTIE.test(id) && ASSISTENTSOORTEN.indexOf(soort) >= 0) mogelijkheden.push({ id: id, soort: soort });
+      });
+      return mogelijkheden.length ? { module: module, mogelijkheden: mogelijkheden } : null;
+    } catch (e) { return null; }
+  }
 
   /* Van een blikveld (de uitslag van lees()) naar de context voor Rahul.
      Geeft null als er niets bruikbaars in staat -- dan houdt de aanroeper wat
      hij zelf al had, en zegt deze laag niet dat ze iets zag. */
-  function projecteer(blik) {
+  function projecteer(blik, werkruimte, assistent) {
     var v = blik && blik.velden;
     if (!v || typeof v !== 'object') return null;
     var context = {}, herkomst = {}, iets = false;
@@ -97,6 +117,28 @@
       context.verwijzingen = [{ soort: woord(ow.soort, GRENS.soort) || 'onbekend', id: kort(ow.id, GRENS.id) }];
       herkomst.verwijzingen = String(o.herkomst || ''); iets = true;
     }
+    if (werkruimte && typeof werkruimte === 'object') {
+      var ruimte = {}, wid = sleutel(werkruimte.id, GRENS.werkruimte);
+      var modus = MODI.indexOf(werkruimte.modus) >= 0 ? werkruimte.modus : '';
+      var module = sleutel(werkruimte.module, GRENS.module);
+      if (wid) ruimte.id = wid;
+      if (modus) ruimte.modus = modus;
+      if (module) ruimte.module = module;
+      if (Object.keys(ruimte).length) {
+        context.werkruimte = ruimte; herkomst.werkruimte = 'workspace-runtime'; iets = true;
+      }
+    }
+    if (assistent && typeof assistent === 'object') {
+      var amodule = sleutel(assistent.module, GRENS.module), mogelijkheden = [];
+      (Array.isArray(assistent.mogelijkheden) ? assistent.mogelijkheden : []).slice(0, 8).forEach(function (actie) {
+        var id = String(actie && actie.id || ''), soort = String(actie && actie.soort || '');
+        if (ACTIE.test(id) && ASSISTENTSOORTEN.indexOf(soort) >= 0) mogelijkheden.push({ id: id, soort: soort });
+      });
+      if (amodule && mogelijkheden.length && context.werkruimte && context.werkruimte.module === amodule) {
+        context.assistent = { module: amodule, mogelijkheden: mogelijkheden };
+        herkomst.assistent = 'workspace-assistant-manifest'; iets = true;
+      }
+    }
     return iets ? { context: context, herkomst: herkomst } : null;
   }
 
@@ -105,8 +147,14 @@
   function lees(w) {
     var B = w && w.RTGEdgeBlikveld;
     if (!B || typeof B.lees !== 'function') return null;
-    try { return projecteer(B.lees()); } catch (e) { return null; }
+    try {
+      var blik = B.lees(), werkruimte = werkruimteVan(w, blik);
+      var uit = projecteer(blik, werkruimte, assistentVan(w, werkruimte));
+      if (uit && Number.isFinite && Number.isFinite(blik.op)) uit.context.op = blik.op;
+      return uit;
+    } catch (e) { return null; }
   }
 
-  return Object.freeze({ projecteer: projecteer, lees: lees, MEE: MEE, NIET_MEE: NIET_MEE });
+  return Object.freeze({ projecteer: projecteer, lees: lees, MEE: MEE, NIET_MEE: NIET_MEE,
+    WERKRUIMTE_MEE: WERKRUIMTE_MEE, ASSISTENT_MEE: ASSISTENT_MEE });
 }));

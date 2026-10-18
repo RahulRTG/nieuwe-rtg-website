@@ -1160,6 +1160,12 @@
       "url": "/apps/mall.html"
     },
     {
+      "label": "Mijn reisgidsen",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
       "label": "Mijn RTF-apps",
       "app": "Mall",
       "wereld": "LivingOS",
@@ -1167,12 +1173,6 @@
     },
     {
       "label": "Nu open",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
-      "label": "Ontdek",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"

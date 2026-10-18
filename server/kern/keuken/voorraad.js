@@ -115,19 +115,33 @@ module.exports = (ctx) => {
   }
 
   /* De cirkel dicht: een geleverde groothandelsbestelling vult de voorraad
-     automatisch aan (matching op artikelnaam, hoofdletter-ongevoelig) en de
-     regelprijs wordt de nieuwe kostprijs. Aangeroepen vanuit de
-     groothandel-keten zodra een bestelling op "geleverd" komt. */
+     automatisch aan en de regelprijs wordt de nieuwe kostprijs. Aangeroepen
+     vanuit de groothandel-keten zodra een bestelling op "geleverd" komt.
+
+     EERST HET ARTIKEL DAT DE BESTELLING ONTHIELD, PAS DAN DE NAAM. Hier stond
+     alleen een koppeling op exacte naam, terwijl het inkoopadvies al op een
+     DEEL van de naam bestelt (routes/supplier/keuken.js): "Tomaten" in de
+     keuken werd "Trostomaten" bij de groothandel, en bij de levering vond de
+     keuken geen "Trostomaten" -- de bestelling heette geleverd en er kwam niets
+     binnen. De voorraadproef (scripts/voorraadproef.js, schakel 6) vond dat.
+     Een regel uit het advies draagt nu zijn `keukenArtikel`; de naam blijft
+     de weg voor een bestelling die met de hand is samengesteld.
+
+     EN WAT NIET LANDT WORDT GENOEMD. De uitslag zegt per regel of hij is
+     ingeboekt, zodat de orderketen het bij de bestelling kan zetten: een
+     levering die nergens landde, hoort niet te lijken op een die wel landde. */
   function leverBinnen(s, regels, bron) {
-    if (!s) return 0;
-    let geboekt = 0;
+    const uit = { geboekt: 0, regels: [], nietGeboekt: [] };
+    if (!s) return uit;
     for (const r of (Array.isArray(regels) ? regels : [])) {
-      const a = artikelen(s).find(x => x.naam.toLowerCase() === String(r.naam || '').toLowerCase());
-      if (!a || !(r.aantal > 0)) continue;
-      const uit = levering(s, a.id, r.aantal, r.prijs, bron || 'groothandel');
-      if (uit.ok) geboekt++;
+      const a = (r.keukenArtikel && artikelVan(s, String(r.keukenArtikel))) ||
+        artikelen(s).find(x => x.naam.toLowerCase() === String(r.naam || '').toLowerCase());
+      if (!a) { uit.nietGeboekt.push({ naam: r.naam, reden: 'staat niet op de keukenlijst' }); continue; }
+      const l = r.aantal > 0 ? levering(s, a.id, r.aantal, r.prijs, bron || 'groothandel') : { error: 'geen hoeveelheid' };
+      if (l.ok) { uit.geboekt++; uit.regels.push({ naam: r.naam, artikel: a.naam, aantal: r.aantal }); }
+      else uit.nietGeboekt.push({ naam: r.naam, reden: l.error || 'niet in te boeken' });
     }
-    return geboekt;
+    return uit;
   }
 
   /* Menu-engineering: verkoopvolume (kassabonnen + betaalde bestellingen)

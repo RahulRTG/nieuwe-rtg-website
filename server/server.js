@@ -1586,11 +1586,11 @@ const {
   ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel
 } = maakGroothandel({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic,
-  // geleverd bij een zaak: het keukenbrein boekt de regels als levering in
-  // (kern.keuken bestaat op aanroepmoment; de kern-bag wordt verderop gevuld)
+  // geleverd bij een zaak: het keukenbrein boekt in en zegt wat (kern.keuken
+  // bestaat bij aanroep; de kern-bag wordt verderop gevuld)
   bijGeleverd: (o) => {
     const zaak = findSupplier(o.klant.id);
-    if (zaak && kern.keuken) kern.keuken.leverBinnen(zaak, o.regels, 'groothandel ' + o.groothandelNaam);
+    return zaak && kern.keuken ? kern.keuken.leverBinnen(zaak, o.regels, 'groothandel ' + o.groothandelNaam) : null;
   }
 });
 

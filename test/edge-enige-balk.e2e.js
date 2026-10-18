@@ -219,17 +219,17 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       assert.equal(balk.veldZichtbaar, true, 'het adresveld zelf is niet meer te zien');
     });
 
-    /* DE GRENDEL. ios.js plakt `ios-nav` op de hero van rit.html; die is 430px
-       hoog en draagt een foto. Zonder deze proef zou een grovere claimregel
+    /* DE GRENDEL. De hero van rit.html is een inhoudelijke sectie van ruim
+       200px en geen systeembalk. Zonder deze proef zou een grovere claimregel
        onopgemerkt de inhoud van dat scherm weghalen. */
     await t.test('een hero die alleen de naam draagt, blijft staan', async () => {
       await page.goto(base + '/apps/rit.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
         document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('header.ritkop'), null,
+        !!document.querySelector('.ritkop'), null,
         { wat: 'de inhoudelijke hero van rit.html' });
       const hero = await page.evaluate(() => {
-        const el = document.querySelector('header.ritkop');
+        const el = document.querySelector('.ritkop');
         const s = getComputedStyle(el), r = el.getBoundingClientRect();
         return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), positie: s.position,
           hoogte: Math.round(r.height), zichtbaar: s.display !== 'none' && r.height > 0 };

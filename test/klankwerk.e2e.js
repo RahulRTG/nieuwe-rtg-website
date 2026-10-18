@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -124,7 +124,8 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     assert.equal(bpmNa, '90', 'en het is het tempo uit de vraag');
 
     // bewaren werkt en de server kent het stuk terug
-    await page.click('#bewaar');
+    await edgeActies(page);
+    await page.locator('[data-rtg-adaptive-source="bewaar"]').click();
     await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });
 

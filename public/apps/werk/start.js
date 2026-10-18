@@ -19,7 +19,7 @@
     /* Het merk van de klant laadt naast het startscherm en niet erin: een
        werkruimte die zonder tenant draait, hoort gewoon te werken. */
     if (window.RTGWerkMerk) window.RTGWerkMerk.laad();
-    K.api('/start', {}).then(function (r) {
+    K.api('/api/bedrijf/start', {}).then(function (r) {
       var d = r.body || {};
       if (d.error) return K.meld(d.error);
       /* Een lijf zonder `wie` of `werkruimte` is geen startscherm: geen JSON,

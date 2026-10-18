@@ -1764,6 +1764,28 @@ async function edgeBediening(page, naam) {
   await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
 }
 
+/* De lippen openen eerst het fotografische Edge-scherm. Rahul is daar één
+   van de vijf vloeiende standen en draagt daarna over aan het beveiligde
+   gesprek. Tests nemen dezelfde zichtbare route als een gebruiker. */
+async function edgeRahul(page) {
+  const mouth = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+  if (await mouth.isVisible()) await mouth.click();
+  else await page.locator('.rtg-adaptive-sheet [data-rtg-sheet-action="ai"]').click();
+  /* Op routes zonder eigen vraagvlak opent de mond eerst het fotografische
+     Edge-scherm. Rahul is daar een stand in de vaste modenavigatie, geen knop
+     in de foto zelf. De oude helper zocht een niet-bestaand data-cinema-attribuut
+     en wachtte daarna dertig seconden op een knop uit de volgende stand. */
+  const cinema = page.locator('.rtg-edge-cinema');
+  if (await cinema.isVisible()) {
+    const rahul = page.locator('.rtg-adaptive-modes [data-rtg-adaptive-mode="rahul"]');
+    await rahul.waitFor({ state: 'visible' });
+    await rahul.click();
+  }
+  const open = page.getByRole('button', { name: 'Open beveiligd gesprek' });
+  await open.waitFor({ state: 'visible' });
+  await open.click();
+}
+
 async function edgeWerkbladen(page) {
   if (await page.locator('.rtg-edge-faces').count())
     await page.locator('[data-edge-command-bank]:visible').click();
@@ -1831,7 +1853,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { startBrowser, testMotor, testMotoren, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, testMotoren, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeRahul, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

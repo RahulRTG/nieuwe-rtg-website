@@ -30,6 +30,8 @@ const heeftSleutel = (sess) => !!(sess && sess.key);
 const PERMISSIES = Object.freeze({
   'travel.read': { mag: heeftSleutel, grond: 'dezelfde deur als /api/member/huis/dossier: een ledensessie' },
   'travel.manage': { mag: heeftSleutel, grond: 'het eigen reisdossier van de sessie; de route leest geen sleutel uit het verzoek' },
+  'work.read': { mag: heeftSleutel, grond: 'dezelfde accountdeur als /api/bedrijf/mijn; WerkOS controleert daarna het actieve lidmaatschap opnieuw' },
+  'coordination.read': { mag: heeftSleutel, grond: 'dezelfde ledensessie als de bestaande service- en Privékantoorprojecties; hun routes controleren de bronzaak opnieuw' },
   'safety.read': { mag: heeftSleutel, grond: 'dezelfde deur als /api/veiligheid: een ledensessie met een sleutel' },
   'safety.respond': { mag: heeftSleutel, grond: 'dezelfde deur als /api/veiligheid/wacht/start: een ledensessie met een sleutel' }
 });

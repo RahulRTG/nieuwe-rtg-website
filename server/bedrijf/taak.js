@@ -25,10 +25,30 @@
 const { werkVeld } = require('./gebeurtenis');
 
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, rid, dag, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
+  const { app, save, schoon, nu, rid, dag, crypto, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
+
+  /* Een taak kan uit een mobiele dubbele tik of een herhaald netwerkverzoek
+     komen. De werkruimte bewaart daarom uitsluitend een afdruk van de
+     herhaalsleutel naast het taak-id. De sleutel zelf en het lid-token komen
+     niet in de opslag of in het antwoord. Zonder sleutel blijft het bestaande
+     contract werken; de actuele WorkOS-bediening stuurt hem altijd mee. */
+  function idemAfdruk(g, req) {
+    const idem = String((req.body || {}).idem || '');
+    if (!idem) return { afdruk: null };
+    if (!/^[\w-]{16,100}$/.test(idem)) return { fout: 'Een geldige herhaalsleutel is nodig.' };
+    return { afdruk: crypto.createHash('sha256')
+      .update('werkos|taak|' + (g.l.id || 'beheer') + '|' + idem).digest('hex') };
+  }
 
   app.post('/api/bedrijf/taak/maak', (req, res) => {
     const g = werkPoort(req, res, 'project'); if (!g) return;
+    const idem = idemAfdruk(g, req);
+    if (idem.fout) return res.status(400).json({ error: idem.fout });
+    const idemBoek = g.w.idempotentie && g.w.idempotentie.taken;
+    const eerderId = idem.afdruk && idemBoek && idemBoek[idem.afdruk];
+    const eerder = eerderId && eigenVeld(T(g.w), eerderId);
+    if (eerder) return res.json({ ok: true, taak: eerder, herhaald: true,
+      let: 'Deze taak was al ontvangen; er is geen tweede taak gemaakt.' });
     const titel = schoon(req.body.titel, 120);
     if (!titel) return res.status(400).json({ error: 'Wat moet er gebeuren?' });
     const projectId = String(req.body.projectId || '');
@@ -46,6 +66,11 @@ module.exports = (sctx) => {
        en niet via een naamvergelijking die van een naamgenoot kan zijn. */
     const wie = sctx.zetWie(g.w, t, 'wie', schoon(req.body.wie, 60));
     T(g.w)[t.id] = t;
+    if (idem.afdruk) {
+      g.w.idempotentie = g.w.idempotentie || {};
+      g.w.idempotentie.taken = g.w.idempotentie.taken || {};
+      g.w.idempotentie.taken[idem.afdruk] = t.id;
+    }
     save();
     res.json({ ok: true, taak: t, wieLet: wie.reden });
   });

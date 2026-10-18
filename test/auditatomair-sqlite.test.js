@@ -45,27 +45,31 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
        maakte een globale COUNT(*) afhankelijk van runnerbelasting. De
        atomiciteitsclaim gaat over /api/pay/kascode: daarvan mag na de
        geweigerde transactie geen halve regel bijkomen. */
-    const rijen = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
+    const regels = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
       .map(({ waarde }) => JSON.parse(waarde))
-      .filter(regel => regel.pad === '/api/pay/kascode').length;
-    /* EEN KASCODE LAAT TWEE REGELS NA: de regel `toegestaan` van de poort en de
-       eindregel met status 200. Onder last landde die tweede pas NA de eerste
-       telling, en dan las de toets een regel van het GESLAAGDE verzoek als
-       halve regel van het geweigerde (CI 18-10-2026: 2 !== 1, terwijl de
-       trigger elke nieuwe insert tegenhoudt). Dus eerst wachten tot het eerste
-       verzoek zijn eindregel heeft; de bewering eronder blijft dezelfde. */
-    const eindVanEerste = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
-      .map(({ waarde }) => JSON.parse(waarde)).some(regel => regel.pad === '/api/pay/kascode' && regel.status === 200);
-    for (let t = 0; t < 100 && !eindVanEerste(); t++) await new Promise(r => setTimeout(r, 50));
-    assert.ok(eindVanEerste(), 'het geslaagde eerste verzoek hoort zijn eindregel in het spoor te hebben');
-    const kasVoor = kas(), rijenVoor = rijen();
+      .filter(regel => regel.pad === '/api/pay/kascode');
+    /* Een kritieke geslaagde handeling krijgt twee regels: de duurzaam
+       vastgelegde toestemming en, na het HTTP-antwoord, de resultaatregel.
+       `finish` mag net na `fetch()` lopen. Wacht daarom op BEIDE regels van de
+       controlehandeling voordat de storing wordt geinjecteerd; anders kan de
+       nog legitiem landende resultaatregel ten onrechte aan het mislukte
+       verzoek worden toegeschreven (alleen zichtbaar op een belaste runner). */
+    const eind = Date.now() + 5000;
+    while (Date.now() < eind) {
+      const klaar = regels();
+      if (klaar.some(x => x.stand === 'toegestaan') && klaar.some(x => x.status === 200)) break;
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    const kasVoor = kas(), rijenVoor = regels().length;
     assert.ok(kasVoor, 'de eerste kascode staat in store.db');
+    assert.ok(regels().some(x => x.stand === 'toegestaan') && regels().some(x => x.status === 200),
+      'de controlehandeling heeft haar toestemming en resultaat duurzaam vastgelegd');
     conn.exec("CREATE TRIGGER weiger_audit BEFORE INSERT ON audit_rij WHEN NEW.naam = 'handelingLog' " +
       "BEGIN SELECT RAISE(ABORT, 'audit-schrijfactie faalt (geinjecteerd)'); END");
     const r = await api('/api/pay/kascode', { maxCenten: 2000, idem: 'tweede' }, reg.body.token);
     assert.ok(r.status < 200 || r.status >= 300, 'geen 2xx als het spoor niet vaststaat: ' + r.status + ' ' + JSON.stringify(r.body));
     assert.equal(kas(), kasVoor, 'de kascode van het mislukte verzoek staat NIET in store.db');
-    assert.equal(rijen(), rijenVoor, 'en er is ook geen halve auditregel');
+    assert.equal(regels().length, rijenVoor, 'en er is ook geen halve auditregel');
     conn.exec('DROP TRIGGER weiger_audit');
   } finally { conn.close(); }
 });

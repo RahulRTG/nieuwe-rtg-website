@@ -187,6 +187,12 @@ test('ruimOp doodt alleen wat er van de kring nog leeft, en schrijft dat op', as
     const geraakt = A.ruimOp();
     assert.deepEqual(geraakt, [kind.pid]);
     assert.deepEqual(A.lees().opgeruimd.geraakt, [kind.pid]);
+    assert.deepEqual(A.lees().kring, [], 'ruimOp keert pas terug met een aantoonbaar lege actieve kring');
+    assert.equal(A.lees().opgeruimd.vastgelegd[0].pid, kind.pid,
+      'de oorspronkelijke kring blijft als auditbewijs bewaard');
+    assert.equal(A.lees().opgeruimd.bevestigdDood[0].pid, kind.pid,
+      'de bevestigde afbouw is expliciet en voorkomt herbeoordeling van een hergebruikt PID');
+    assert.deepEqual(A.lees().opgeruimd.over, [], 'geen geraakt proces bleef na de afbouwgrens over');
     await new Promise(r => kind.once('exit', r));
     assert.equal(kind.signalCode, 'SIGKILL');
   } finally { try { kind.kill('SIGKILL'); } catch (e) {} }

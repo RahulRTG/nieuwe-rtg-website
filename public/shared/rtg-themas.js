@@ -74,7 +74,9 @@
   }
   function geschilderd(el) {
     if (!el) return null;
-    var kleur = getComputedStyle(el).backgroundColor;
+    var stijl = getComputedStyle(el);
+    if (stijl.display === 'none' || stijl.visibility === 'hidden') return null;
+    var kleur = stijl.backgroundColor;
     // De warme kop is transparant boven de wereldgrond, geen zwarte balk.
     if (/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(kleur) || /\/\s*0(?:\.0+)?\s*\)$/.test(kleur)) return null;
     var rgb = ontleed(kleur);
@@ -85,6 +87,12 @@
     /* 1. de Edge-balk vult de veilige zone; wat HIJ schildert is de bovenrand */
     var uit = geschilderd(d.querySelector('.rtg-edge-top'));
     if (uit) return uit;
+    /* De redactionele schil schildert een lichte papiergrond boven de oudere
+       wereldtokens. De browserrand volgt de zichtbare verf. */
+    if (d.body && d.body.getAttribute('data-rtg-editorial-v4') === 'true') {
+      uit = geschilderd(d.body);
+      if (uit) return uit;
+    }
     /* 2. anders de wereld-skin op de body, als token (die schildert de body) */
     if (d.body) {
       var wbg = String(getComputedStyle(d.body).getPropertyValue('--rtg-world-bg') || '').trim();
@@ -146,7 +154,7 @@
     var start = function () {
       if (!d.documentElement) return;
       kijker.observe(d.documentElement, { attributes: true, subtree: true,
-        attributeFilter: ['data-rtg-world', 'data-rtg-palette', 'data-rtg-skin', 'data-rtg-edge-ready',
+        attributeFilter: ['data-rtg-world', 'data-rtg-palette', 'data-rtg-skin', 'data-rtg-editorial-v4', 'data-rtg-edge-ready',
           'data-rtg-edge-2', 'data-rtg-edge-2-rendered', 'data-rtg-edge-2-state',
           'data-rtg-eigenvlak'] });
     };

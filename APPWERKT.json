@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-10-18T22:34:10.561Z",
-  "commit": "ee4e4e46e",
+  "op": "2026-10-18T22:51:55.242Z",
+  "commit": "c8722a754",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -20,15 +20,15 @@
  "sessiesOvergeslagen": [],
  "belasting": {
   "kernen": 4,
-  "perKernBijStart": 1.21,
-  "perKernBijEinde": 1.74
+  "perKernBijStart": 0.37,
+  "perKernBijEinde": 1.69
  },
  "gemeten": {
   "onderdelen": 114,
   "defecten": 0,
-  "knoppenGevonden": 927,
-  "knoppenAangetikt": 713,
-  "knoppenNietKlikbaar": 70,
+  "knoppenGevonden": 926,
+  "knoppenAangetikt": 712,
+  "knoppenNietKlikbaar": 72,
   "remGeraakt": 0,
   "weigeringenGetoond": 8,
   "taalWissels": [],
@@ -39,7 +39,7 @@
    "aside#mediaRechten.media-rechten": 5,
    "div.wd-shell": 5,
    "section.rsm-rsheet": 3,
-   "div#poort.poort.zien": 1
+   "div#poort.poort.zien": 2
   },
   "schermenGrotendeelsOngemeten": 6,
   "deurenZonderPersona": 2
@@ -58,25 +58,27 @@
    "NIET_GETEST": 21
   },
   "menselijk": {
-   "NIET_GETEST": 114
+   "NIET_GETEST": 81,
+   "BEWEZEN": 33
   },
   "voltooibaar": {
    "GEEN_FIXTURE": 75,
-   "NIET_GETEST": 39
+   "NIET_GETEST": 3,
+   "BEWEZEN": 36
   },
   "waarheidsgetrouw": {
    "NIET_GETEST": 114
   },
   "persistent": {
    "GEEN_FIXTURE": 78,
-   "NIET_GETEST": 36
+   "BEWEZEN": 36
   },
   "bevoegd": {
    "NIET_GETEST": 114
   },
   "herstelbaar": {
    "GEEN_FIXTURE": 78,
-   "NIET_GETEST": 36
+   "BEWEZEN": 36
   }
  },
  "samenstelling": {
@@ -252,9 +254,9 @@
     "functie": "link:kwesties",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/kwesties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -262,9 +264,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/kwesties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -272,14 +274,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/kwesties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/kwesties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -320,9 +322,9 @@
     "functie": "link:bescherming",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/bescherming.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -330,9 +332,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/bescherming.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -340,14 +342,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/bescherming.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/bescherming.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -356,9 +358,9 @@
     "functie": "link:verificatie",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/verificatie.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -366,9 +368,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/verificatie.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -376,14 +378,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/verificatie.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/verificatie.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -408,9 +410,9 @@
     "functie": "link:neigingen",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/neigingen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -418,9 +420,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/neigingen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -428,14 +430,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/neigingen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/neigingen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -460,9 +462,9 @@
     "functie": "link:post",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -470,9 +472,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -480,14 +482,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
       "status": "NIET_GETEST",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -496,9 +498,9 @@
     "functie": "link:sessies",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -506,9 +508,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -516,14 +518,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -532,9 +534,9 @@
     "functie": "link:gegevens",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/gegevens.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -542,9 +544,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/gegevens.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -552,14 +554,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/gegevens.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/gegevens.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -568,9 +570,9 @@
     "functie": "link:ik",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -578,9 +580,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -588,14 +590,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
       "status": "NIET_GETEST",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -604,9 +606,9 @@
     "functie": "link:relaties",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/relaties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -614,9 +616,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/relaties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -624,14 +626,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/relaties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/relaties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -640,9 +642,9 @@
     "functie": "link:wereldlaag",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wereldlaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -650,9 +652,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wereldlaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -660,14 +662,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wereldlaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wereldlaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -708,9 +710,9 @@
     "functie": "link:attenties",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/attenties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -718,9 +720,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/attenties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -728,14 +730,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/attenties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/attenties.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -872,9 +874,9 @@
     "functie": "link:cellier",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cellier.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -882,9 +884,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cellier.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -892,14 +894,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cellier.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cellier.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -908,9 +910,9 @@
     "functie": "link:cercle",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cercle.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -918,9 +920,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cercle.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -928,14 +930,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cercle.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/cercle.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -944,9 +946,9 @@
     "functie": "link:commerce",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/commerce.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -954,9 +956,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/commerce.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -964,14 +966,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/commerce.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/commerce.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -996,9 +998,9 @@
     "functie": "link:entourage",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/entourage.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1006,9 +1008,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/entourage.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1016,14 +1018,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/entourage.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/entourage.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1064,9 +1066,9 @@
     "functie": "link:foodcourt",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/foodcourt.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1074,9 +1076,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/foodcourt.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1084,14 +1086,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/foodcourt.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/foodcourt.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1116,9 +1118,9 @@
     "functie": "link:garderobe",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/garderobe.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1126,9 +1128,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/garderobe.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1136,14 +1138,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/garderobe.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/garderobe.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1232,9 +1234,9 @@
     "functie": "link:logboek",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/logboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1242,9 +1244,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/logboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1252,14 +1254,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/logboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/logboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1284,9 +1286,9 @@
     "functie": "link:maison",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/maison.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1294,9 +1296,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/maison.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1304,14 +1306,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/maison.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/maison.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1320,9 +1322,9 @@
     "functie": "link:mall",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1330,9 +1332,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1340,14 +1342,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1356,9 +1358,9 @@
     "functie": "link:mecenaat",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mecenaat.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1366,9 +1368,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mecenaat.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1376,14 +1378,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mecenaat.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mecenaat.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1392,9 +1394,9 @@
     "functie": "link:mijnmall",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mijnmall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1402,9 +1404,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mijnmall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1412,14 +1414,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mijnmall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/mijnmall.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1460,9 +1462,9 @@
     "functie": "link:nalatenschap",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/nalatenschap.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1470,9 +1472,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/nalatenschap.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1480,14 +1482,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/nalatenschap.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/nalatenschap.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1549,9 +1551,9 @@
     "functie": "link:pulse",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/pulse.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1559,9 +1561,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/pulse.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1569,14 +1571,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/pulse.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/pulse.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1649,9 +1651,9 @@
     "functie": "link:veilig",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/veilig.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1659,9 +1661,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/veilig.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1669,14 +1671,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/veilig.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/veilig.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1781,9 +1783,9 @@
     "functie": "link:table",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/table.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1791,9 +1793,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/table.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1801,14 +1803,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/table.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/table.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1833,9 +1835,9 @@
     "functie": "link:uitgaan",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/uitgaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1843,9 +1845,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/uitgaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1853,14 +1855,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/uitgaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/uitgaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1869,9 +1871,9 @@
     "functie": "link:vandaag",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/vandaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1879,9 +1881,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/vandaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1889,14 +1891,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/vandaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/vandaag.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -1953,9 +1955,9 @@
     "functie": "link:wonen",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -1963,9 +1965,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -1973,14 +1975,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2021,9 +2023,9 @@
     "functie": "link:hangar",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/hangar.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2031,9 +2033,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/hangar.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2041,14 +2043,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/hangar.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/hangar.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2105,9 +2107,9 @@
     "functie": "link:reisboek",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reisboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2115,9 +2117,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reisboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2125,14 +2127,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reisboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reisboek.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2157,9 +2159,9 @@
     "functie": "link:reizen",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2167,9 +2169,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2177,14 +2179,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2358,9 +2360,9 @@
     "functie": "link:loopbaan",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2368,9 +2370,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2378,14 +2380,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2490,9 +2492,9 @@
     "functie": "link:werkos",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/werkos.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2500,9 +2502,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/werkos.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2510,14 +2512,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/werkos.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
       "status": "NIET_GETEST",
       "bron": "scripts/lib/voltooi/werkos.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2526,9 +2528,9 @@
     "functie": "link:rtmail",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/rtmail.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2536,9 +2538,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/rtmail.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2546,14 +2548,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/rtmail.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/rtmail.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -2562,9 +2564,9 @@
     "functie": "link:school",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/school.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
@@ -2572,9 +2574,9 @@
       "commit": "37a80115c"
      },
      "persistent": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/school.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
@@ -2582,14 +2584,14 @@
       "commit": "bd56c161b"
      },
      "herstelbaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/school.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      },
      "menselijk": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/school.js",
-      "commit": "37a80115c"
+      "commit": "6cc69a705"
      }
     }
    },
@@ -13517,7 +13519,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 951 tekens zichtbaar"
+    "als gezin: 997 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -13630,7 +13632,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 944 tekens zichtbaar"
+    "als gezin: 928 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -14097,7 +14099,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "5 van 6 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt), 1 niet aan te tikken (1x intercepts pointer events)",
+     "reden": "5 van 6 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt), 2 niet aan te tikken (1x intercepts pointer events, 1x element is not visible)",
      "bewijs": null
     },
     "menselijk": {
@@ -14162,7 +14164,8 @@
    "geklikt": 5,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "Rahul\nKOMPAS: intercepts pointer events"
+    "Rahul\nKOMPAS: intercepts pointer events",
+    "ONTDEK: element is not visible"
    ],
    "waarnemingen": [
     "als gezin: 2183 tekens zichtbaar"
@@ -14280,7 +14283,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1285 tekens zichtbaar"
+    "als gezin: 1278 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14404,7 +14407,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1340 tekens zichtbaar"
+    "als gezin: 1332 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -14520,7 +14523,7 @@
     "Start een samen-kamer: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1126 tekens zichtbaar"
+    "als gezin: 1125 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14587,13 +14590,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:kwesties/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -14603,13 +14607,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:kwesties/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -14632,13 +14637,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:kwesties/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -14661,13 +14667,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:kwesties/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -14943,13 +14950,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:bescherming/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -14959,13 +14967,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:bescherming/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -14988,13 +14997,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:bescherming/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15017,13 +15027,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:bescherming/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15040,7 +15051,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1785 tekens zichtbaar"
+    "als lid: 1769 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15099,13 +15110,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:verificatie/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15115,13 +15127,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 7 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:verificatie/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15144,13 +15157,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:verificatie/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15173,13 +15187,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:verificatie/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15299,7 +15314,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1003 tekens zichtbaar"
+    "als lid: 958 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15349,13 +15364,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:neigingen/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15365,13 +15381,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:neigingen/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15394,13 +15411,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:neigingen/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15423,13 +15441,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:neigingen/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15444,7 +15463,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1681 tekens zichtbaar"
+    "als lid: 1665 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15549,7 +15568,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1090 tekens zichtbaar"
+    "als lid: 1060 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15600,12 +15619,13 @@
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "reden": "vers gemeten, maar niet beproefd: het scenario lokte geen enkele weigering uit, dus of een melding in woorden de gebruiker bereikt is hier niet gezien",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:post/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15615,13 +15635,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:post/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15644,13 +15665,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:post/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15673,13 +15695,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:post/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15748,13 +15771,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:sessies/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15764,13 +15788,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:sessies/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15793,13 +15818,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:sessies/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15822,13 +15848,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:sessies/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15899,13 +15926,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:gegevens/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15915,13 +15943,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:gegevens/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15944,13 +15973,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:gegevens/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -15973,13 +16003,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:gegevens/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16049,12 +16080,13 @@
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "reden": "vers gemeten, maar niet beproefd: het scenario lokte geen enkele weigering uit, dus of een melding in woorden de gebruiker bereikt is hier niet gezien",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:ik/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16064,13 +16096,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:ik/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16093,13 +16126,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:ik/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16122,13 +16156,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:ik/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16206,13 +16241,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:relaties/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16222,13 +16258,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:relaties/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16251,13 +16288,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:relaties/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16280,13 +16318,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:relaties/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16301,7 +16340,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1061 tekens zichtbaar"
+    "als lid: 739 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -16355,13 +16394,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wereldlaag/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16371,13 +16411,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wereldlaag/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16400,13 +16441,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wereldlaag/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16429,13 +16471,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wereldlaag/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16584,7 +16627,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 3063 tekens zichtbaar"
+    "als lid: 3079 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -16721,13 +16764,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:attenties/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16737,13 +16781,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:attenties/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16766,13 +16811,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:attenties/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -16795,13 +16841,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:attenties/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17531,7 +17578,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "10 van 12 eigen knoppen aangetikt zonder fout (plus 18 van de gedeelde schil, die hier niet telt)",
+     "reden": "10 van 10 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -17581,7 +17628,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 12,
+   "gevonden": 10,
    "geklikt": 10,
    "overgeslagen": [],
    "nietKlikbaar": [],
@@ -17594,7 +17641,7 @@
     "ingangCap": "media.camera",
     "landingCap": "media.camera"
    },
-   "schil": 18,
+   "schil": 17,
    "bedekt": [],
    "onderschept": [],
    "rem": 0,
@@ -17636,13 +17683,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cellier/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17652,13 +17700,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cellier/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17681,13 +17730,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cellier/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17710,13 +17760,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cellier/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17731,7 +17782,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1030 tekens zichtbaar"
+    "als lid: 1014 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -17785,13 +17836,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cercle/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17801,13 +17853,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cercle/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17830,13 +17883,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cercle/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17859,13 +17913,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:cercle/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17934,13 +17989,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:commerce/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17950,13 +18006,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:commerce/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -17979,13 +18036,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:commerce/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18008,13 +18066,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:commerce/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18029,7 +18088,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2931 tekens zichtbaar"
+    "als lid: 2976 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -18184,13 +18243,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:entourage/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18200,13 +18260,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:entourage/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18229,13 +18290,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:entourage/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18258,13 +18320,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:entourage/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18279,7 +18342,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1570 tekens zichtbaar"
+    "als lid: 1525 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -18537,13 +18600,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:foodcourt/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18553,13 +18617,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:foodcourt/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18582,13 +18647,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:foodcourt/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18611,13 +18677,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:foodcourt/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18790,13 +18857,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:garderobe/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18806,13 +18874,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:garderobe/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18835,13 +18904,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:garderobe/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18864,13 +18934,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:garderobe/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -18990,7 +19061,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1301 tekens zichtbaar"
+    "als lid: 1346 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -19471,13 +19542,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:logboek/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19487,13 +19559,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:logboek/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19516,13 +19589,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:logboek/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19545,13 +19619,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:logboek/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19723,13 +19798,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:maison/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19739,13 +19815,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:maison/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19768,13 +19845,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:maison/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19797,13 +19875,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:maison/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19818,7 +19897,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1136 tekens zichtbaar"
+    "als lid: 1120 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -19868,17 +19947,18 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "37 van 72 eigen knoppen aangetikt zonder fout (plus 18 van de gedeelde schil, die hier niet telt), 2 niet aan te tikken (1x pagina antwoordde niet binnen de limiet, 1x element is not stable), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "36 van 72 eigen knoppen aangetikt zonder fout (plus 18 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (2x pagina antwoordde niet binnen de limiet, 1x element is not stable), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mall/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19888,13 +19968,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mall/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19917,13 +19998,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mall/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19946,13 +20028,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mall/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -19963,13 +20046,14 @@
     }
    },
    "gevonden": 72,
-   "geklikt": 37,
+   "geklikt": 36,
    "overgeslagen": [
     "Bestellen"
    ],
    "nietKlikbaar": [
     "Menu: pagina antwoordde niet binnen de limiet",
-    "MEENEMEN: element is not stable"
+    "Vergelijk: element is not stable",
+    "SOCIAAL & CONTACT\nIN UW WERELD\nRTG Socia: pagina antwoordde niet binnen de limiet"
    ],
    "waarnemingen": [
     "als lid: 13070 tekens zichtbaar",
@@ -20027,13 +20111,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mecenaat/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20043,13 +20128,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mecenaat/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20072,13 +20158,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mecenaat/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20101,13 +20188,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mecenaat/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20176,13 +20264,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mijnmall/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20192,13 +20281,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mijnmall/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20221,13 +20311,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mijnmall/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20250,13 +20341,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:mijnmall/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20271,7 +20363,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 997 tekens zichtbaar"
+    "als lid: 952 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -20376,7 +20468,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 788 tekens zichtbaar"
+    "als lid: 797 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -20527,13 +20619,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:nalatenschap/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20543,13 +20636,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:nalatenschap/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20572,13 +20666,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:nalatenschap/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20601,13 +20696,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:nalatenschap/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -20727,7 +20823,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 715 tekens zichtbaar"
+    "als lid: 722 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -20964,7 +21060,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1680 tekens zichtbaar"
+    "als lid: 1642 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -21015,13 +21111,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:pulse/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21031,13 +21128,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:pulse/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21060,13 +21158,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:pulse/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21089,13 +21188,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:pulse/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21215,7 +21315,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1360 tekens zichtbaar"
+    "als lid: 1242 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -21409,7 +21509,7 @@
     "Sluiten: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2036 tekens zichtbaar"
+    "als lid: 2414 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -21583,13 +21683,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:veilig/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21599,13 +21700,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 7 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:veilig/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21628,13 +21730,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:veilig/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -21657,13 +21760,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:veilig/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22058,7 +22162,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1567 tekens zichtbaar"
+    "als lid: 1338 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -22260,7 +22364,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1159 tekens zichtbaar"
+    "als lid: 1117 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -22310,13 +22414,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:table/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22326,13 +22431,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:table/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22355,13 +22461,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:table/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22384,13 +22491,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:table/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22405,7 +22513,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1084 tekens zichtbaar"
+    "als lid: 1070 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -22565,13 +22673,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:uitgaan/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22581,13 +22690,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:uitgaan/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22610,13 +22720,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:uitgaan/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22639,13 +22750,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:uitgaan/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22714,13 +22826,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:vandaag/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22730,13 +22843,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:vandaag/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22759,13 +22873,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:vandaag/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22788,13 +22903,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:vandaag/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -22809,7 +22925,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1210 tekens zichtbaar"
+    "als lid: 1092 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -22914,7 +23030,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 875 tekens zichtbaar"
+    "als lid: 873 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -23102,7 +23218,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1329 tekens zichtbaar"
+    "als lid: 1322 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -23152,13 +23268,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wonen/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23168,13 +23285,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wonen/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23197,13 +23315,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wonen/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23226,13 +23345,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:wonen/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23247,7 +23367,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1053 tekens zichtbaar"
+    "als lid: 1046 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -23512,13 +23632,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:hangar/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23528,13 +23649,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:hangar/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23557,13 +23679,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:hangar/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23586,13 +23709,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:hangar/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23607,7 +23731,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1404 tekens zichtbaar"
+    "als lid: 1388 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -23657,7 +23781,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "22 van 29 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt), 1 niet aan te tikken (1x intercepts pointer events)",
+     "reden": "21 van 29 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt), 2 niet aan te tikken (2x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -23708,9 +23832,10 @@
     }
    },
    "gevonden": 29,
-   "geklikt": 22,
+   "geklikt": 21,
    "overgeslagen": [],
    "nietKlikbaar": [
+    "🏛: intercepts pointer events",
     "🚨: intercepts pointer events"
    ],
    "waarnemingen": [
@@ -23725,6 +23850,10 @@
    "schil": 17,
    "bedekt": [],
    "onderschept": [
+    {
+     "knop": "🏛",
+     "door": "div#poort.poort.zien"
+    },
     {
      "knop": "🚨",
      "door": "div#poort.poort.zien"
@@ -23921,7 +24050,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 776 tekens zichtbaar"
+    "als lid: 819 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -23976,13 +24105,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reisboek/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -23992,13 +24122,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 8 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reisboek/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24021,13 +24152,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reisboek/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24050,13 +24182,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reisboek/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24212,13 +24345,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reizen/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24228,13 +24362,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reizen/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24257,13 +24392,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reizen/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24286,13 +24422,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:reizen/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -24307,7 +24444,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2374 tekens zichtbaar"
+    "als lid: 2454 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -24416,7 +24553,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als kantoor: 3725 tekens zichtbaar"
+    "als kantoor: 3702 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -24467,7 +24604,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "3 van 7 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "reden": "3 van 8 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -24517,12 +24654,12 @@
      "bewijs": null
     }
    },
-   "gevonden": 7,
+   "gevonden": 8,
    "geklikt": 3,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1102 tekens zichtbaar",
+    "als lid: 1098 tekens zichtbaar",
     "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "personaAfwijking": null,
@@ -24715,7 +24852,7 @@
     "Zeg: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 650 tekens zichtbaar"
+    "als lid: 660 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -24829,7 +24966,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 937 tekens zichtbaar"
+    "als lid: 944 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -24875,7 +25012,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "6 van 9 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt), 1 niet aan te tikken (1x element is not stable)",
+     "reden": "7 van 9 eigen knoppen aangetikt zonder fout (plus 17 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -24926,11 +25063,9 @@
     }
    },
    "gevonden": 9,
-   "geklikt": 6,
+   "geklikt": 7,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "MEENEMEN: element is not stable"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1125 tekens zichtbaar"
    ],
@@ -25412,13 +25547,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:loopbaan/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -25428,13 +25564,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:loopbaan/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -25457,13 +25594,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:loopbaan/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -25486,13 +25624,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:loopbaan/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -25719,7 +25858,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 723 tekens zichtbaar"
+    "als lid: 730 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -25826,7 +25965,7 @@
    "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 2491 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:32867/apps/partner-network.html\" is i"
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:39861/apps/partner-network.html\" is i"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -26204,12 +26343,13 @@
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "reden": "vers gemeten, maar niet beproefd: het scenario lokte geen enkele weigering uit, dus of een melding in woorden de gebruiker bereikt is hier niet gezien",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:werkos/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26219,13 +26359,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:werkos/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26248,13 +26389,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:werkos/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26277,13 +26419,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:werkos/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26298,7 +26441,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 978 tekens zichtbaar"
+    "als lid: 1107 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -26352,13 +26495,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:rtmail/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26368,13 +26512,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:rtmail/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26397,13 +26542,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:rtmail/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26426,13 +26572,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:rtmail/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26503,13 +26650,14 @@
      "bewijs": null
     },
     "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:school/menselijk"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26519,13 +26667,14 @@
      }
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:school/voltooibaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26548,13 +26697,14 @@
      }
     },
     "persistent": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:school/persistent"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26577,13 +26727,14 @@
      }
     },
     "herstelbaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 37a80115c, sindsdien zijn 173 codebestand(en) gewijzigd (18 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 6cc69a705; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-18T18:17:26.901Z",
-      "commit": "37a80115c",
-      "instrument": "scripts/voltooiproef.js"
+      "op": "2026-10-18T22:34:27.744Z",
+      "commit": "6cc69a705",
+      "instrument": "scripts/voltooiproef.js",
+      "deel": "apps/link:school/herstelbaar"
      },
      "bron": {
       "soort": "voltooiproef",
@@ -26598,7 +26749,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 622 tekens zichtbaar"
+    "als lid: 1759 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",

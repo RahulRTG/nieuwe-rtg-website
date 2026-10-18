@@ -5,7 +5,7 @@
    of hij nog klopt.
 
    Een inhoudsafdruk voorkomt dat een geinstalleerde app een oude schil houdt. */
-const CACHE = 'rtg-app-a77fb04c';
+const CACHE = 'rtg-app-cc778bf6';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',

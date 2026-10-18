@@ -1,9 +1,9 @@
 {
-  "catalogi": 1225,
+  "catalogi": 1226,
   "verschillendeNamen": 750,
   "namenInMeerDomeinen": 132,
   "woordenMetMeerBetekenissen": 114,
-  "betekenissenTotaal": 427,
+  "betekenissenTotaal": 428,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -543,7 +543,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 280,
+  "dubbelingenZonderNaam": 263,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -2112,7 +2112,7 @@
         },
         {
           "bestanden": [
-            "server/kern/rtgone.js"
+            "server/kern/rtgone-bestuur.js"
           ],
           "leden": 9,
           "voorbeeld": [
@@ -3733,5 +3733,5 @@
       ]
     }
   ],
-  "bestanden": 4464
+  "bestanden": 4476
 }

@@ -150,7 +150,11 @@ function haak(app) {
           if (!res.headersSent)
             res.setHeader('X-RTG-Effectbon', bon.klassen.length ? bon.klassen.join(',') : 'geen-klasse');
           require('./kern/agentteken').meld(req, res); // A5: een agent zegt wie hij is
-        } catch (e) { /* een bon die niet kan, mag het antwoord niet breken */ }
+        } catch (e) {
+          /* een bon die niet kan, mag het antwoord niet breken -- maar stil is hij
+             ook niet (STILSPOOR.json): dan staat er een handeling zonder effectbon */
+          console.warn('[effectbon] de effectbon niet bewaard:', e && e.message);
+        }
         return echt.apply(this, args);
       };
       next();

@@ -170,10 +170,9 @@ async function flushBijAfsluiten() {
   /* EERST DE GELD-SLEUTELS. De gewone flush slaat de voorrang-sleutels over
      (die rijden hun eigen strook), dus zonder deze regel zou een afsluiting ze
      juist NIET wegschrijven -- precies de bug die deze strook moest oplossen.
-     En ze gaan vooraan omdat een afsluit-flush op mega-schaal door het
-     grace-venster kan worden afgekapt: wat als eerste weg is, is veilig. */
-  try { if (pg.flushVoorrang) await metOpslagSlot(() => pg.flushVoorrang(state.getRuweData())); } catch (e) {}
-  try { await metOpslagSlot(() => pg.flush(state.getRuweData(), true)); } catch (e) {} // force: ook de door pacing uitgestelde grote collecties
+     Vooraan: het grace-venster kan afkappen. Falen staat in het log. */
+  try { if (pg.flushVoorrang) await metOpslagSlot(() => pg.flushVoorrang(state.getRuweData())); } catch (e) { console.error('[pg] afsluit-voorrang:', e.message); }
+  try { await metOpslagSlot(() => pg.flush(state.getRuweData(), true)); } catch (e) { console.error('[pg] afsluit-flush:', e.message); } // force: ook wat door pacing wachtte
 }
 
 // Ping de database voor de gezondheidscheck; geeft de antwoordtijd in ms.

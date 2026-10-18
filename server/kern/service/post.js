@@ -80,7 +80,7 @@ module.exports = function maakServicePost({ zaken, loop, accounts, inzagelog }) 
           waarom: reden || 'Een bericht aan het servicepostvak, om de melder te kunnen terugvinden.',
           bron: 'service/post' });
       }
-    } catch (e) {}
+    } catch (e) { console.error('[servicepost] kluis-opzoeking ZONDER journaalregel:', e && e.message); }
     if (u.id == null) return { gevonden: false, waarom: 'Dit adres hoort bij geen RTG-account.' };
     return { gevonden: true, melder: 'user-' + u.id };
   }
@@ -123,7 +123,7 @@ module.exports = function maakServicePost({ zaken, loop, accounts, inzagelog }) 
         tekst: 'Binnengekomen per e-mail. De afzender is bevestigd met ' +
           ((controles && String(controles.dmarc).toLowerCase() === 'geslaagd') ? 'DMARC' : 'DKIM') +
           '; het adres is via de identiteitskluis teruggevoerd op deze codenaam.' });
-    } catch (e) {}
+    } catch (e) { console.warn('[servicepost] de tijdlijnnotitie niet vastgelegd:', e && e.message); }
     return Object.assign({}, r, { let: 'Deze melding staat nu ook in de app van het lid.' });
   }
 

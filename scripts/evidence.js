@@ -61,7 +61,10 @@ function tijdlijn(plan, resultaat) {
     'snapshot ' + plan.snapshot.bestanden + ' bestanden in ' + plan.snapshot.duurMs + 'ms',
     plan.telling.REUSED + ' bewijzen hergebruikt',
     plan.telling.REPROVE + ' bewijzen opnieuw nodig',
-    plan.telling.UNKNOWN + ' onbekend' + (plan.telling.UNKNOWN ? ' → volledige ronde' : ''),
+    plan.telling.UNKNOWN + ' onbekend',
+    /* Hier stond "→ volledige ronde" zodra er iets UNKNOWN was, ook als het plan
+       incrementeel bleef (run 38718725654). De modus komt uit het besluit. */
+    'modus ' + plan.mode + ((plan.besluit && plan.besluit.code) ? ' (' + plan.besluit.code + ')' : ''),
     resultaat.unit.length + ' unitbestanden · ' + resultaat.e2e.length + ' browserbestanden geselecteerd'
   ];
 }

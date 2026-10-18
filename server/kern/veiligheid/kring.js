@@ -25,6 +25,15 @@ module.exports = ({ opslag, save, schoon, sociaal }) => {
   }
 
   const leeg = () => ({ contacten: [], mails: [], at: null });
+  /* Het scherm vraagt om een codenaam OF een sleutel. Een codenaam wordt alleen
+     onder de eigen connecties opgezocht (opzet/kernlaag1.js vriendOpCodenaam);
+     wat daar niet staat, blijft wat het was en valt hieronder op "nog niet
+     verbonden" -- precies dezelfde grens als voorheen. */
+  function sleutelVan(handle, invoer) {
+    const t = String(invoer || '').trim();
+    if (!t || sociaal.zijnVrienden(handle, t)) return t;
+    return (sociaal.vriendOpCodenaam && sociaal.vriendOpCodenaam(handle, t)) || t;
+  }
 
   function kringVan(handle) {
     const k = lijsten();
@@ -49,7 +58,7 @@ module.exports = ({ opslag, save, schoon, sociaal }) => {
 
   function kringToevoegen(handle, doelHandle, opties) {
     const k = lijsten();
-    const doel = String(doelHandle || '').trim();
+    const doel = sleutelVan(handle, doelHandle);
     if (!doel) return { status: 400, error: 'Wie wil je toevoegen?' };
     if (doel === handle) return { status: 400, error: 'Jezelf toevoegen heeft geen zin.' };
     // De harde grens: alleen mensen met wie je echt verbonden bent. Zo kan
@@ -130,5 +139,5 @@ module.exports = ({ opslag, save, schoon, sociaal }) => {
     };
   }
 
-  return { kringVan, kringToon, kringToevoegen, kringAanpassen, kringVerwijderen, mailToevoegen, mailVerwijderen, ontvangers };
+  return { sleutelVan, kringVan, kringToon, kringToevoegen, kringAanpassen, kringVerwijderen, mailToevoegen, mailVerwijderen, ontvangers };
 };

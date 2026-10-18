@@ -15,9 +15,9 @@
    dezelfde handeling), NA de controle op een lege kring.
 
    Elke regel is op de handler nagelezen (kern/veiligheid/kring.js, alarm.js,
-   plek.js). De wacht, het codewoord, de rust en de Live Circle staan er niet:
-   die zijn niet gelezen, en het codewoord (dat STIL alarm slaat) verdient een
-   eigen besluit.
+   plek.js, moment.js). De wacht, het codewoord en de rust staan er niet: die
+   zijn niet gelezen, en het codewoord (dat STIL alarm slaat) verdient een eigen
+   besluit.
 
      leest           het beeld en de kring;
      nietIdempotent  elke route hieronder, met de reden: de kern beantwoordt een
@@ -42,6 +42,18 @@ const SLEUTELS = {
     waarom: 'weghalen wat er niet staat is voor de kern een lege handeling; ' + STAND },
   'POST /api/veiligheid/kring/mail': { nietIdempotent: true,
     waarom: 'een adres dat er al staat is een 409 van de kern; ' + STAND },
+  /* De Live Circle (kern/veiligheid/moment.js), gelezen op 18 oktober 2026: een
+     dubbeltik op "Moment starten" gaf de ontvanger twee Momenten. Ook die
+     ontdubbeling staat in de kern, om dezelfde reden als bij het alarm. */
+  'POST /api/veiligheid/moment': { leest: true },
+  'POST /api/veiligheid/moment/maak': { nietIdempotent: true,
+    waarom: 'kern/veiligheid/moment.js ontdubbelt zelf op een lopend, gelijk Moment van een paar tellen oud; de poort zou een Moment terugspelen dat intussen gestopt kan zijn' },
+  'POST /api/veiligheid/moment/status': { nietIdempotent: true,
+    waarom: 'zet de voortgang uit de body en weigert op een afgelopen Moment; ' + STAND },
+  'POST /api/veiligheid/moment/pauze': { nietIdempotent: true,
+    waarom: 'zet de pauze uit de body; ' + STAND },
+  'POST /api/veiligheid/moment/stop': { nietIdempotent: true,
+    waarom: 'een gestopt Moment nog eens stoppen verandert niets; ' + STAND },
   'POST /api/veiligheid/plek': { nietIdempotent: true,
     waarom: 'elke plekmelding is een nieuwe meting; of hij bewaard wordt hangt af van een wacht of alarm dat intussen kan zijn begonnen (test/kringronde.test.js toets 6)' }
 };

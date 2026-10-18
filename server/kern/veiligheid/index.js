@@ -40,7 +40,7 @@ module.exports = (state) => {
   const wacht = require('./wacht')({ opslag, save, crypto, schoon, alarm, plek, meldAan, sociaal });
   const codewoord = require('./codewoord')({ opslag, save, crypto, kluis, alarm, plek, sociaal });
   const rust = require('./rust')({ opslag, save, schoon });
-  const moment = require('./moment')({ opslag, save, crypto, schoon, sociaal, plek });
+  const moment = require('./moment')({ opslag, save, crypto, schoon, sociaal, plek, sleutelVan: kring.sleutelVan });
 
   /* Het volledige beeld voor een lid: wat loopt er, wie is mijn kring, hoe
      staat het codewoord, welke rust. Een aanroep, want de vier apps tonen

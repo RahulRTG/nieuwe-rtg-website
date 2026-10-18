@@ -80,6 +80,7 @@ const SCENARIOS = {
   'neigingen.js': require('./lib/voltooi/neigingen'),
   'post.js': require('./lib/voltooi/post'),
   'reisboek.js': require('./lib/voltooi/reisboek'),
+  'reizen.js': require('./lib/voltooi/reizen'),
   'relaties.js': require('./lib/voltooi/relaties'),
   'sessies.js': require('./lib/voltooi/sessies'),
   'table.js': require('./lib/voltooi/table'),

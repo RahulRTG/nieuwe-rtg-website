@@ -8,7 +8,9 @@
    dat de keten werkt". En eerlijk: RTG is geen alarmcentrale.
 
    TWEE ACTOREN, EN DE ONTVANGER IS HET PUNT. Lid A zet lid B (verbonden via de
-   Salon) en een e-mailadres in zijn kring. A slaat alarm; B ziet het bij zich,
+   Salon) bij CODENAAM in zijn kring -- zoals het scherm het vraagt; de eerste
+   versie van deze proef stuurde de interne sleutel en zag daardoor niet dat het
+   scherm nooit werkte (18 oktober 2026) -- en een e-mailadres. A slaat alarm; B ziet het bij zich,
    met de plek; de mail ligt in de postvanger. A zet de plek voor B uit; het
    volgende alarm komt zonder plek. A sluit af; B ziet dat het voorbij is.
    ========================================================================== */
@@ -33,23 +35,25 @@ async function loop(w, stap) {
   const B = await nieuwLid(w, 'vlb');
   const voorB = async (tok) => (((await w.post(BEELD, {}, tok || B.token)).data || {}).voorMij || []);
   const kring = async (tok) => (((await w.post(KRING, {}, tok || A.token)).data || {}).kring || {});
-  let handleB = null, eerste = null;
+  let handleB = null, codenaamB = null, eerste = null;
 
   await stap('voltooibaar', 'met een lege kring wordt zelfs een proefalarm geweigerd, met de reden', async () => {
     const r = await w.post(ALARM, { proef: true }, A.token);
     return { klopt: r.status === 400 && /kring is leeg/.test(r.data.error), ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'iemand met wie A niet verbonden is, kan niet in de kring', async () => {
+  /* Het scherm vraagt "Codenaam of sleutel" en stuurt wat het lid intypt als
+     `handle` (public/shared/veiligheid.js). De proef typt dus de CODENAAM. */
+  await stap('voltooibaar', 'iemand met wie A niet verbonden is, kan niet in de kring -- ook niet bij codenaam', async () => {
     const cb = (await w.post('/api/member/connections', {}, B.token)).data;
-    handleB = cb.me;
-    const r = await w.post(TOEVOEGEN, { handle: handleB }, A.token);
+    handleB = cb.me; codenaamB = cb.codename;
+    const r = await w.post(TOEVOEGEN, { handle: codenaamB }, A.token);
     return { klopt: r.status === 403 && /nog niet verbonden/.test(r.data.error), ziet: r.status + ' (' + (r.data && r.data.error || '').slice(0, 60) + '...)' };
   });
 
-  await stap('voltooibaar', 'na een verbinding in de Salon staan B (met plek) en een e-mailadres in de kring', async () => {
+  await stap('voltooibaar', 'na een verbinding in de Salon zet A B in zijn kring door de codenaam in te typen, met een e-mailadres erbij', async () => {
     await verbind(w, A, B);
-    const a = await w.post(TOEVOEGEN, { handle: handleB, locatie: true }, A.token);
+    const a = await w.post(TOEVOEGEN, { handle: codenaamB, locatie: true }, A.token);
     const m = await w.post(MAIL, { adres: ADRES }, A.token);
     const k = await kring();
     return { klopt: a.status === 200 && m.status === 200 && k.contacten.length === 1 && k.contacten[0].locatie === true && k.mails.includes(ADRES) && k.compleet,
@@ -103,7 +107,7 @@ async function loop(w, stap) {
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'dubbeltik op toevoegen: B staat er een keer in, de tweede is een nette weigering', async () => {
     await w.post(VERWIJDEREN, { handle: handleB }, A.token);
-    const [a, b] = await w.dubbel(TOEVOEGEN, { handle: handleB }, A.token);
+    const [a, b] = await w.dubbel(TOEVOEGEN, { handle: codenaamB }, A.token);
     const k = await kring();
     return { klopt: [a, b].some((x) => x.status === 200) && geen5xx(a) && geen5xx(b) && k.contacten.filter((c) => c.handle === handleB).length === 1,
       ziet: 'antwoorden ' + a.status + '/' + b.status + ', B ' + k.contacten.filter((c) => c.handle === handleB).length + 'x in de kring' };

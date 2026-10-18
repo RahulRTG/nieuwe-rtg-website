@@ -113,6 +113,9 @@ const CONTRACT = {
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'
   }, voltooi('veilig', 'het scenario loopt /api/veiligheid, /kring/toevoegen, /aanpassen, /verwijderen, /mail, /plek, /alarm en /alarm/afsluiten, de routes die /apps/veilig.html zelf aanroept, met een tweede lid dat het alarm ontvangt')),
+  'link:reizen': Object.assign({
+    belofte: 'een lid deelt een Moment rond een reis met wie hij kiest, op het niveau dat hij kiest, de ontvanger ziet de voortgang, en na een pauze of stop niets meer'
+  }, voltooi('reizen', 'het scenario loopt /api/veiligheid/moment, /maak, /status, /pauze en /stop, de routes die /apps/reizen-veilig.html zelf aanroept, met de codenaam die het formulier vraagt en een tweede lid als ontvanger')),
   'link:foodcourt': Object.assign({
     belofte: 'een lid ziet de restaurants en hun vrije tijden, vraagt een tafel aan, en de zaak beslist -- het lid ziet de bevestiging'
   }, voltooi('foodcourt', 'het scenario loopt /api/foodcourt, /api/foodcourt/tijden, /api/reserveer en /api/reserveringen/mijn, de routes die /apps/foodcourt.html zelf aanroept, met de zaak die bevestigt')),

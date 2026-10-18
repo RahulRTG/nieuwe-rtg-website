@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-17",
-    "commit": "329734a1f"
+    "op": "2026-10-18",
+    "commit": "a211db1c7"
   },
   "bronnen": {
     "schermroutes": {
@@ -2515,7 +2515,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 205,
+      "inkomend": 207,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -9990,7 +9990,7 @@
         "/api/privacy"
       ],
       "zonderServer": false,
-      "inkomend": 13,
+      "inkomend": 14,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -10003,8 +10003,8 @@
         "public/shared/rtg-edge-smart-menu.js",
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
         "public/shared/rtg-editorial-v4.js",
-        "server/kern/appgids-data/deel12b.js",
-        "server/kern/opnieuwbeginnen.js"
+        "public/shared/rtg-editorial-v4/rtg-editorial-v4-02.js",
+        "server/kern/appgids-data/deel12b.js"
       ]
     },
     {
@@ -13615,7 +13615,7 @@
         "/api/wereld"
       ],
       "zonderServer": false,
-      "inkomend": 12,
+      "inkomend": 13,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -13625,11 +13625,11 @@
         "public/shared/interface/world-presentation.js",
         "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-editorial-v4.js",
+        "public/shared/rtg-editorial-v4/rtg-editorial-v4-02.js",
         "public/sw.js",
         "server/kern/appgids-data/deel1.js",
         "server/kern/lidmaatschap.js",
-        "server/kern/wereld/context.js",
-        "server/kern/wereld/koppel.js"
+        "server/kern/wereld/context.js"
       ]
     },
     {

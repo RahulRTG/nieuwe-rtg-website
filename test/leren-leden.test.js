@@ -133,6 +133,19 @@ test('2. de lijst van A bestaat voor B niet -- ook niet om weg te gooien', async
   assert.equal((await leer('/api/member/leren/lijst-haal', { id }, A.token)).status, 404, 'en daarna is hij echt weg');
 });
 
+test('2b. een AI-lijst voor een lid: zonder sleutel het demosetje, en hij is van het lid zelf', async () => {
+  const d = await leer('/api/member/leren/lijst-ai', { onderwerp: 'hoofdsteden van Europa', groep: 'kind' }, A.token);
+  assert.equal(d.status, 200, JSON.stringify(d.body).slice(0, 160));
+  assert.ok(d.body.ok && d.body.id, 'er staat een lijst klaar');
+  const haal = await leer('/api/member/leren/lijst-haal', { id: d.body.id }, A.token);
+  assert.equal(haal.status, 200);
+  assert.ok(haal.body.lijst.paren.length >= 8, 'een volwaardige lijst');
+  assert.match(haal.body.lijst.naam, /Hoofdsteden/, 'het onderwerp is herkend');
+  assert.equal((await leer('/api/member/leren/lijst-haal', { id: d.body.id }, B.token)).status, 404, 'en B ziet hem niet');
+  assert.equal((await leer('/api/member/leren/lijst-ai', { onderwerp: 'x' })).status, 401, 'zonder inlog geen AI-lijst');
+  assert.equal((await leer('/api/member/leren/lijst-weg', { id: d.body.id }, A.token)).status, 200);
+});
+
 test('3. de dagstapel van de vergeetcurve is persoonlijk', async () => {
   const id = await nieuweLijst('Duitse naamvallen',
     [{ v: 'der', a: 'mannelijk' }, { v: 'die', a: 'vrouwelijk' }], A.token);

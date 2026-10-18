@@ -118,7 +118,12 @@ const NAGEKEKEN = {
   'POST /api/meet/maak': 'meet.meetMaak(req.session.key, ...) maakt een NIEUWE vergadering voor B; het id uit het lijf wijst niets aan',
   'POST /api/mijn/post/zet': 'commercieel.zet(req.session.key, soort, kanalen) zet B\'s EIGEN posttoestemming per soort; een soort is een categorie en geen object',
   'POST /api/opvang/vraag': 'de code is de openbare code van een opvang; de aanvraag komt op B\'s eigen codenaam (opvangwijzerVraag(sess, codenaam, ...))',
-  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B'
+  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B',
+  /* De ronde van 18 oktober 2026 (na de integratie van het toetsenspoor): drie
+     nieuwe kandidaten, met de hand nagelezen, alle drie B die iets van B doet. */
+  'POST /api/auth/aanmeldkanaal': 'leest alleen req.session.account (de eigen ledenstand) en het gekozen kanaal; een `id` in het lijf wordt nergens gelezen',
+  'POST /api/member/magnaat/stad/maak': 'stad.maak(req.session.key, b) leest uit het lijf alleen moeilijkheid en begin en maakt een NIEUWE stad met een verse code; een meegestuurde code wijst niets aan',
+  'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;

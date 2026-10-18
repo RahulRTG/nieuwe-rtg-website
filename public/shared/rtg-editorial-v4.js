@@ -193,7 +193,18 @@
        lagen geplaatst (deze kop en world-desktop-surface), en wie het laatst
        draait, mag de kop niet vóór de springlink laten staan. */
     var skipLink = body.querySelector(':scope > :is(.wd-skip,.skip,.rtg-spring)');
-    if (header && header.parentNode === body && skipLink && (header.compareDocumentPosition(skipLink) & 4)) body.insertBefore(skipLink, header);
+    if (header && header.parentNode === body && !skipLink) {
+      // Nog geen springlink (world-desktop-surface komt later): zet er zelf een;
+      // die laag neemt hem daarna over in plaats van een tweede te maken.
+      var inhoud = doc.querySelector('main,[role="main"],[data-rtg-screen-root],#rtgWorldContent');
+      if (inhoud) {
+        if (!inhoud.id) inhoud.id = 'rtg-inhoud';
+        if (!inhoud.hasAttribute('tabindex')) inhoud.setAttribute('tabindex', '-1');
+        skipLink = make(doc, 'a', 'skip', 'Naar de inhoud'); skipLink.href = '#' + inhoud.id;
+      }
+    }
+    if (header && header.parentNode === body && skipLink && skipLink.parentNode !== body) body.insertBefore(skipLink, header);
+    else if (header && header.parentNode === body && skipLink && (header.compareDocumentPosition(skipLink) & 4)) body.insertBefore(skipLink, header);
     ensureWorldTitle(doc, body, world);
     ensureSectionMasthead(doc, body, route, name);
     ensurePhotoLead(doc, body, route, world);

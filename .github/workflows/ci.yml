@@ -1113,8 +1113,10 @@ jobs:
       # weg en draai de stap een keer met de hand:
       # `node scripts/nieuweroutes.js --tegen origin/main`. Komt hij door, dan
       # hoort hij hier gewoon weer te staan.
-      # - name: Nieuwe routes komen met een toets
-      #   run: node scripts/nieuweroutes.js --tegen origin/main
+      # Weer aan sinds 18 oktober 2026 (Project NUL, ZERO.md par. 7): op de
+      # V1-integratiebranch vergelijkt hij 5508 routes met main in seconden.
+      - name: Nieuwe routes komen met een toets
+        run: node scripts/nieuweroutes.js --tegen origin/main
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-18T09:37:04.619Z",
-    "commit": "b7696160",
+    "op": "2026-10-18T09:55:42.960Z",
+    "commit": "90c40a5f",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/activering.js",
     "node": "v22.22.0"
   },
@@ -373,7 +373,7 @@
   "routeLagen": 10781,
   "routesZonderEigenaar": 0,
   "randenOnvindbaar": 0,
-  "knopenTotaal": 1102,
+  "knopenTotaal": 1104,
   "perDomein": [
     {
       "domein": "domein:util",
@@ -12533,6 +12533,34 @@
       ]
     },
     {
+      "domein": "domein:rtgone",
+      "functies": 1,
+      "welke": [
+        "rtgone"
+      ]
+    },
+    {
+      "domein": "domein:rtgone-bestuur",
+      "functies": 1,
+      "welke": [
+        "rtgone"
+      ]
+    },
+    {
+      "domein": "domein:rtgone-projecten",
+      "functies": 1,
+      "welke": [
+        "rtgone"
+      ]
+    },
+    {
+      "domein": "domein:rtgone-vandaag",
+      "functies": 1,
+      "welke": [
+        "rtgone"
+      ]
+    },
+    {
       "domein": "domein:drm",
       "functies": 1,
       "welke": [
@@ -12551,20 +12579,6 @@
       "functies": 1,
       "welke": [
         "supplier-finance"
-      ]
-    },
-    {
-      "domein": "domein:rtgone",
-      "functies": 1,
-      "welke": [
-        "rtgone"
-      ]
-    },
-    {
-      "domein": "domein:rtgone-projecten",
-      "functies": 1,
-      "welke": [
-        "rtgone"
       ]
     },
     {
@@ -16300,7 +16314,7 @@
         "geenGast"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 594,
+      "bestandenBereikt": 595,
       "knopen": 148,
       "perLaag": {
         "domein": 88,
@@ -16398,7 +16412,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:beraad -> domein:genootschap"
+      ]
     },
     {
       "id": "rtf-samen",
@@ -22605,7 +22621,7 @@
       "sleutelsOnbekend": [
         "doelpoort"
       ],
-      "bestandenBereikt": 406,
+      "bestandenBereikt": 407,
       "knopen": 69,
       "perLaag": {
         "domein": 34,
@@ -22686,7 +22702,7 @@
       "sleutelsOnbekend": [
         "doelpoort"
       ],
-      "bestandenBereikt": 406,
+      "bestandenBereikt": 407,
       "knopen": 69,
       "perLaag": {
         "domein": 34,
@@ -23463,7 +23479,7 @@
         "officeAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 397,
+      "bestandenBereikt": 398,
       "knopen": 66,
       "perLaag": {
         "domein": 32,
@@ -28172,6 +28188,65 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "rtgone",
+      "naam": "RTG One",
+      "categorie": "Eigen apps",
+      "standaard": true,
+      "routes": 16,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/rtgone.js"
+      ],
+      "leveranciers": [
+        "server/accounts/index.js",
+        "server/bedrijf/index.js",
+        "server/kern/kantoor/boardroom.js",
+        "server/kern/rtgone.js"
+      ],
+      "sleutelsUitBedrading": [
+        "officeAuth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 194,
+      "knopen": 38,
+      "perLaag": {
+        "domein": 23,
+        "motor": 14,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bearercode",
+        "domein:bearercode-keten",
+        "domein:bearercode-sleutelring",
+        "domein:bearercode-v2",
+        "domein:bearercode-zegel",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:geld",
+        "domein:intreksignaal",
+        "domein:kantoor",
+        "domein:leverancier",
+        "domein:loop-fabric",
+        "domein:rtgone",
+        "domein:rtgone-bestuur",
+        "domein:rtgone-projecten",
+        "domein:rtgone-vandaag",
+        "domein:rtmail-leiding",
+        "domein:rtmail-leidingdatum",
+        "domein:rtmail-leidinghold",
+        "domein:rtmail-leidingtermijn",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "verzorging",
       "naam": "Verzorging (kapper, barbier, nagels)",
       "categorie": "Eigen apps",
@@ -28733,63 +28808,6 @@
         "domein:rahul-fases",
         "domein:rahul-hart",
         "domein:rahul-omgang",
-        "domein:rtmail-leiding",
-        "domein:rtmail-leidingdatum",
-        "domein:rtmail-leidinghold",
-        "domein:rtmail-leidingtermijn",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "rtgone",
-      "naam": "RTG One",
-      "categorie": "Eigen apps",
-      "standaard": true,
-      "routes": 16,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/rtgone.js"
-      ],
-      "leveranciers": [
-        "server/accounts/index.js",
-        "server/bedrijf/index.js",
-        "server/kern/kantoor/boardroom.js",
-        "server/kern/rtgone.js"
-      ],
-      "sleutelsUitBedrading": [
-        "officeAuth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 192,
-      "knopen": 36,
-      "perLaag": {
-        "domein": 21,
-        "motor": 14,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bearercode",
-        "domein:bearercode-keten",
-        "domein:bearercode-sleutelring",
-        "domein:bearercode-v2",
-        "domein:bearercode-zegel",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:geld",
-        "domein:intreksignaal",
-        "domein:kantoor",
-        "domein:leverancier",
-        "domein:loop-fabric",
-        "domein:rtgone",
-        "domein:rtgone-projecten",
         "domein:rtmail-leiding",
         "domein:rtmail-leidingdatum",
         "domein:rtmail-leidinghold",

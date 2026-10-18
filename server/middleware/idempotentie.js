@@ -122,8 +122,10 @@ module.exports = () => {
 
     /* Dezelfde actorafleiding als de algemene idem-poort. Dit is vooral van
        belang voor de bestaande WorkOS-lidsessies die buiten productie in het
-       lijf reizen; twee collega's achter hetzelfde IP delen nooit een kas. */
-    const wie = wieVan(req);
+       lijf reizen; twee collega's achter hetzelfde IP delen nooit een kas. Het
+       IP blijft daarnaast meetellen: hetzelfde token vanaf een ander adres krijgt
+       geen bewaard antwoord terug (test/idempotentie-weerbaar.test.js). */
+    const wie = wieVan(req) + '|' + String(req.ip || '');
     const id = crypto.createHash('sha256')
       .update(req.method + ' ' + req.path + '|' + wie + '|' + sleutel).digest('hex');
 

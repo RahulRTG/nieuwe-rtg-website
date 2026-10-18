@@ -235,3 +235,45 @@ test('11. wat onlangs eindigde staat er, zonder wie het deed en zonder reden', a
     assert.equal(tekst.includes(woord), false, woord + ' hoort hier niet in te staan');
   }
 });
+
+/* 11. De LEDENKANT van delen, intrekken en verbreken: /api/leven/deel/zet,
+   /api/leven/deel/in en /api/leven/band/verbreek. De toetsen hierboven doen dat
+   vanaf de gezinskant; hier deelt het lid zelf iets terug, trekt het weer in, en
+   verbreekt de band. Een stuk zonder einddatum deelt niemand, en wie geen partij
+   is bij de band, verbreekt hem niet.
+   MUTATIE GEZIEN ZAKKEN: de 'trekIn'-actie in server/routes/levenband.js laten
+   wijzen naar bandVerbreek in plaats van deelIn; de toets zakte op "intrekken
+   laat de band staan". */
+test('11. het lid deelt zelf, trekt in en verbreekt -- over de ledendeur', async () => {
+  const v = await post('/api/leven/band/vraag', { codenaam: kindNaam, soort: 'mentor', vervalt: dag(120) }, lidTok);
+  assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 160));
+  const bandId = v.body.band.id;
+  assert.equal((await huis('/api/rtf/leven/band/bevestig', { bandId }, kindTok)).status, 200);
+
+  const t = Date.now();
+  const ander = (await post('/api/auth/register', { name: 'Buiten Staander', email: 'lbx' + t + '@e.test',
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' })).body.token;
+
+  assert.equal((await post('/api/leven/deel/zet', { bandId, stuk: 'afspraken' }, lidTok)).status, 400, 'geen einddatum, geen deling');
+  assert.equal((await post('/api/leven/deel/zet', { bandId, stuk: 'afspraken', vervalt: dag(10) }, ander)).status, 403,
+    'wie geen partij is, deelt niets via deze band');
+  const d = await post('/api/leven/deel/zet', { bandId, stuk: 'afspraken', vervalt: dag(10) }, lidTok);
+  assert.equal(d.status, 200, JSON.stringify(d.body).slice(0, 160));
+  let bijKind = (await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.find(b => b.id === bandId);
+  assert.deepEqual(bijKind.ikZie.map(s => s.stuk), ['afspraken'], 'het kind ziet wat het lid gaf');
+
+  assert.equal((await post('/api/leven/deel/in', { delingId: d.body.deling.id }, ander)).status, 403,
+    'een buitenstaander trekt andermans deling niet in');
+  const uit = await post('/api/leven/deel/in', { delingId: d.body.deling.id }, lidTok);
+  assert.equal(uit.status, 200);
+  bijKind = (await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.find(b => b.id === bandId);
+  assert.ok(bijKind, 'intrekken laat de band staan');
+  assert.deepEqual(bijKind.ikZie, [], 'maar het kind ziet niets meer');
+
+  assert.equal((await post('/api/leven/band/verbreek', { bandId }, ander)).status, 403, 'een buitenstaander verbreekt niets');
+  assert.equal((await post('/api/leven/band/verbreek', { bandId }, null)).status, 401);
+  const weg = await post('/api/leven/band/verbreek', { bandId }, lidTok);
+  assert.equal(weg.status, 200);
+  assert.ok(!(await post('/api/leven/kring', {}, lidTok)).body.banden.some(b => b.id === bandId), 'de band is weg bij het lid');
+  assert.ok(!(await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.some(b => b.id === bandId), 'en bij het kind');
+});

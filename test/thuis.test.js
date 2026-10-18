@@ -182,3 +182,37 @@ test('prijsadvies en poorten: gast (gratis app) mag kijken, niet boeken', async 
   assert.equal((await api('zoek', { plaats: 'ibiza' }, g.token)).status, 200, 'kijken mag iedereen');
   assert.equal((await api('boek', { id: huisId, van: dag(40), tot: dag(42), gasten: 1 }, g.token)).status, 403, 'boeken is voor leden');
 });
+
+/* /api/thuis/typen en /api/thuis/cohost: de keuzelijsten voor het huisformulier,
+   en een co-host die meebeheert. Alleen de HOOFDHOST zet of haalt co-hosts; een
+   co-host mag daarna beheren (hier: het prijsadvies lezen), en na het weghalen
+   niet meer.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/thuis/aanbod.js `h.host !== codenaam` in
+   coHostZet() op `false`; de toets zakte op "alleen de hoofdhost beheert de
+   co-hosts". */
+test('typen voor het formulier, en een co-host die de hoofdhost zelf aanwijst', async () => {
+  const t = await api('typen', {}, gastLid.token);
+  assert.equal(t.status, 200);
+  assert.ok(t.body.types.villa && t.body.types.appartement, 'de huistypen staan erin');
+  assert.ok(Array.isArray(t.body.voorzieningen) ? t.body.voorzieningen.length > 0 : Object.keys(t.body.voorzieningen).length > 0,
+    'en de voorzieningen');
+  assert.equal((await fetch(base + '/api/thuis/typen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status, 401);
+
+  const gastNaam = (await fetch(base + '/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + gastLid.token }, body: '{}' }).then(r => r.json())).state.user.codename;
+  assert.ok(gastNaam, 'de gast heeft een codenaam');
+  assert.equal((await api('prijsadvies', { id: huisId }, gastLid.token)).status, 404, 'zonder co-hostschap beheert de gast niets');
+  assert.equal((await api('cohost', { id: huisId, wie: gastNaam }, gastLid.token)).status, 403, 'alleen de hoofdhost beheert de co-hosts');
+  assert.equal((await api('cohost', { id: huisId, wie: '' }, host.token)).status, 400);
+
+  const zet = await api('cohost', { id: huisId, wie: gastNaam }, host.token);
+  assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
+  assert.deepEqual(zet.body.coHosts, [gastNaam]);
+  assert.equal((await api('prijsadvies', { id: huisId }, gastLid.token)).status, 200, 'de co-host mag meebeheren');
+  assert.equal((await api('cohost', { id: huisId, wie: gastNaam }, gastLid.token)).status, 403, 'maar zet zelf geen co-hosts');
+
+  const weg = await api('cohost', { id: huisId, wie: gastNaam, weg: true }, host.token);
+  assert.equal(weg.status, 200);
+  assert.equal(weg.body.coHosts.length, 0);
+  assert.equal((await api('prijsadvies', { id: huisId }, gastLid.token)).status, 404, 'na het weghalen beheert hij niets meer');
+});

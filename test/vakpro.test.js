@@ -119,7 +119,7 @@ test('5. intrekken: voor het akkoord wel, erna niet, en alleen de eigen aanvraag
   const pro = await api(base, '/api/supplier/vak/pro', {}, zaak.token);
   const bijZaak = (pro.body.offertes || []).find(o => o.id === id);
   assert.ok(!bijZaak || bijZaak.status === 'ingetrokken', 'de zaak ziet hem niet meer als open aanvraag');
-  assert.notEqual((await api(base, '/api/vak/offerte/akkoord', { id }, lid.token)).status, 200,
+  assert.equal((await api(base, '/api/vak/offerte/akkoord', { id }, lid.token)).status, 409,
     'op een ingetrokken offerte komt geen akkoord meer');
 
   // de offerte uit toets 1 is akkoord: die trekt het lid niet meer in

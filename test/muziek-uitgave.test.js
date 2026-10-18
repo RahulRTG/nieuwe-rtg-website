@@ -218,3 +218,42 @@ test('reacties staan op codenaam, en zonder inlog is de zaal dicht', async () =>
     assert.equal(uit.status, 401, pad);
   }
 });
+
+/* Drie deuren die geen toets aanriep: /api/muziek/uitgave/van ("is dit stuk al
+   uit?"), /api/muziek/samen/verlaat (een medemaker stapt zelf op) en
+   /api/muziek/uitgave/in (de eigenaar trekt een uitgave in).
+   MUTATIE GEZIEN ZAKKEN: in server/kern/muziek-uitgave.js de voorwaarde
+   `u.key !== sess.key` uit trekIn() gehaald; de toets zakte op "een ander trekt
+   deze uitgave niet in". */
+test('uitgave/van, samen/verlaat en uitgave/in: wie wat mag', async () => {
+  const al = await api('/api/muziek/uitgave/van', { id: trackId }, baas);
+  assert.equal(al.status, 200);
+  assert.equal(al.body.uitgave.id, uitgaveId, 'het eerste lied is uitgegeven');
+  const r3 = await api('/api/muziek/maak', { naam: 'Derde' }, baas);
+  const t3 = r3.body.track.id;
+  assert.equal((await api('/api/muziek/uitgave/van', { id: t3 }, baas)).body.uitgave, null, 'een vers stuk is nog niet uit');
+
+  // samen: de zanger komt erbij en stapt daarna zelf op
+  assert.equal((await api('/api/muziek/samen/nodig', { id: t3, codenaam: maatCode, rol: 'zang' }, baas)).status, 200);
+  assert.equal((await api('/api/muziek/open', { id: t3 }, maat)).status, 200, 'de zanger kan erbij');
+  assert.equal((await api('/api/muziek/samen/verlaat', { id: t3 }, baas)).status, 400, 'de eigenaar verlaat zijn eigen stuk niet');
+  assert.equal((await api('/api/muziek/samen/verlaat', { id: t3 }, null)).status, 401);
+  const weg = await api('/api/muziek/samen/verlaat', { id: t3 }, maat);
+  assert.equal(weg.status, 200);
+  assert.equal((await api('/api/muziek/open', { id: t3 }, maat)).status, 404, 'na het verlaten kan de zanger er niet meer bij');
+  assert.equal((await api('/api/muziek/samen/verlaat', { id: t3 }, maat)).status, 404, 'twee keer verlaten kan niet');
+
+  // uitgeven en weer intrekken
+  await api('/api/muziek/bewaar', { id: t3, klaar: true }, baas);
+  const u3 = await api('/api/muziek/uitgeven', { id: t3, onder: 'codenaam' }, baas);
+  assert.equal(u3.status, 200);
+  const uid = u3.body.uitgave.id;
+  assert.equal((await api('/api/muziek/uitgave/in', { id: uid }, maat)).status, 404, 'een ander trekt deze uitgave niet in');
+  assert.ok((await api('/api/muziek/zaal', {}, maat)).body.uitgaven.some(x => x.id === uid), 'hij staat nog in de zaal');
+  const inT = await api('/api/muziek/uitgave/in', { id: uid }, baas);
+  assert.equal(inT.status, 200);
+  const zaal = (await api('/api/muziek/zaal', {}, maat)).body.uitgaven;
+  assert.ok(zaal.length > 0, 'de zaal is niet leeg');
+  assert.ok(!zaal.some(x => x.id === uid), 'ingetrokken is weg uit de zaal');
+  assert.equal((await api('/api/muziek/uitgave/van', { id: t3 }, baas)).body.uitgave, null, 'en het stuk is niet meer uit');
+});

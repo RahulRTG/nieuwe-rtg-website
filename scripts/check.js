@@ -513,10 +513,12 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
     'server/accounts/users.js',
     'server/kern/fiscaal/index.js',
-    'server/kern/vergeten.js',
     'server/opzet/diensten2.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
+    /* server/kern/vergeten.js STOND HIER en is er weer af (18 oktober 2026): het
+       account met zijn identiteitsmap woont in kern/vergeten/account.js en de
+       positie per domein in kern/vergeten/positie.js. Van 12,2 naar 9,8 KB. */
     /* server/db/postgres-verzoeken.js STOND HIER en is er weer af: de naad die
        er met naam bij stond is gemaakt. De vertaling van een opslagfout naar een
        antwoord (foutAntwoord, namenVan, de logregel) woont nu in

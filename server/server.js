@@ -1609,7 +1609,7 @@ const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, 
 // Mode-bezorging (kern/modebezorg.js): bezorgcode, foto, ID bij dure stukken, retour.
 const {
   MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht,
-  mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn
+  mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn, mbVergeet
 } = maakModebezorg({
   db, save, crypto, bewerkCollectie, dataDir: DATA_DIR, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl
@@ -2167,7 +2167,7 @@ const kern = {
     ghBijbestelVoorstel },
   agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis,
   // de mode-bezorging (kern/modebezorg.js)
-  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
+  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn, mbVergeet,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   lidboard,

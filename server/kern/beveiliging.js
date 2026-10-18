@@ -65,11 +65,9 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
   }
   function functieAan(s, fid) { return defaults(s).functies[fid] !== false; }
 
-  // gedeelde tabellen
-  const diensten = () => { if (!Array.isArray(db.data.bevDiensten)) db.data.bevDiensten = []; return db.data.bevDiensten; };
-  const aanvragen = () => { if (!Array.isArray(db.data.bevAanvragen)) db.data.bevAanvragen = []; return db.data.bevAanvragen; };
-  const incidenten = () => { if (!Array.isArray(db.data.bevIncidenten)) db.data.bevIncidenten = []; return db.data.bevIncidenten; };
-  const rondes = () => { if (!Array.isArray(db.data.bevRondes)) db.data.bevRondes = []; return db.data.bevRondes; };
+  // gedeelde tabellen, achter de deur van dit domein (./beveiliging/opslag.js)
+  const opslag = require('./beveiliging/opslag')({ db });
+  const { diensten, aanvragen, incidenten, rondes } = opslag;
 
   function guards(s) { try { return accounts.listStaff(s.code).map(accounts.publicStaff); } catch (e) { return []; } }
   function guardNaam(s, gid) { const g = guards(s).find(x => x.id === gid); return g ? g.name : null; }
@@ -126,7 +124,7 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
      Blijft hij leeg, dan is het antwoord "niets te zeggen" en niet "afwezig". */
   const laat = { plaats: null, codenaamVanGuard: null };
 
-  const ctx = { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, laat, afwezigOp,
+  const ctx = { db, opslag, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, laat, afwezigOp,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost };

@@ -4,10 +4,12 @@
    opstarten vanuit kern/beveiliging/rooster.js. */
 const { maakInplanbaar, NIET_GELEZEN } = require('../../payroll/inplanbaar');
 module.exports = (ctx) => {
-  const { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
+  const { save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost } = ctx;
+  // de deur van dit domein (../opslag.js); los gebouwd (een toets) uit dezelfde bron
+  const opslag = ctx.opslag || require('../opslag')({ db: ctx.db });
   const { rooster, zetDienst, rustBotsing } = ctx;
   const inplanbaar = maakInplanbaar(ctx.afwezigOp);
   /* ---- de AI neemt het rooster over: vul de open plekken van een dag ----
@@ -83,7 +85,7 @@ module.exports = (ctx) => {
       tekst: schoon(data.tekst, 400), status: 'nieuw', at: nu(), stappen: [{ status: 'nieuw', at: nu() }]
     };
     aanvragen().unshift(a);
-    db.data.bevAanvragen = aanvragen().slice(0, 20000);
+    opslag.zet('bevAanvragen', aanvragen().slice(0, 20000));
     save();
     notifySupplier(s.code, { icon: 'schild', title: 'Nieuwe inzetaanvraag', body: a.klant + ' · ' + object + ' · ' + datum + ' · ' + a.aantal + ' bewaker(s)' });
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });

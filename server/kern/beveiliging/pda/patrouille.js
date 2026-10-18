@@ -4,12 +4,14 @@
    afgesplitst uit pda.js; rondePubliek reist mee zodat het commandocentrum
    (index.js) er ook op kan tonen. */
 module.exports = (ctx) => {
-  const { db, save, findSupplier, sseToSupplier, logActivity,
+  const { save, findSupplier, sseToSupplier, logActivity,
     id, nu, vandaag, schoon, isBeveiliging, functieAan,
     diensten, rondes, guardNaam, postVan, dienstPubliek,
     /* `laat` is de late-binding-sleuf uit kern/beveiliging.js: de plaatslaag
        bestaat nog niet als deze module wordt gebouwd. Leeg = niets te zeggen. */
     laat } = ctx;
+  // de deur van dit domein (../opslag.js); los gebouwd (een toets) uit dezelfde bron
+  const opslag = ctx.opslag || require('../opslag')({ db: ctx.db });
 
   /* De aanwezigheid van deze bewaker bij de post van zijn dienst. `plaats` mag
      ontbreken (een kaal testproces mount de laag niet) en dan is er niets te
@@ -94,7 +96,7 @@ module.exports = (ctx) => {
     const p = postVan(s, postId); if (!p) return { status: 404, error: 'Post niet gevonden.' };
     const r = { id: id('r'), supplierCode: s.code, postId: p.id, guardId: gid, guardNaam: guardNaam(s, gid), gestart: nu(), klaar: null, checkpoints: [] };
     rondes().unshift(r);
-    db.data.bevRondes = rondes().slice(0, 50000);
+    opslag.zet('bevRondes', rondes().slice(0, 50000));
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, ronde: rondePubliek(s, r) };

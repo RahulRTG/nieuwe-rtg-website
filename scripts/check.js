@@ -5092,6 +5092,8 @@ console.log('\n62) een gecontracteerd domein raakt db.data alleen door zijn eige
       waarom: 'vijf schrijvers over vier collecties; lijsten() was een afspraak, bak() is nu een poort' },
     { map: 'server/kern/podium', deur: '../eigencollectie.js',
       waarom: 'drie schrijvers over drie collecties; de lichte vorm volstaat, gebouwd in index.js en via ctx.opslag gedeeld' },
+    { map: 'server/kern/beveiliging', deur: 'opslag.js',
+      waarom: 'vijf schrijvers over vier lijsten; de deelbestanden vervingen een lijst buiten de accessor om' },
     { map: 'server/kern/command', deur: 'opslag.js',
       waarom: 'twaalf schrijvers; het eerste domein met vier soorten omgang (bezit, teller, gedeeld, vreemd)',
       ook: {

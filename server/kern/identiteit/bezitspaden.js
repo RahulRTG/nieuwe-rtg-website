@@ -48,8 +48,18 @@ const PADEN = [
 
      Dit dicht dat niet: een bezitsbewijs vraagt om het toestel, niet om de
      mens. De echte reparatie is her-authenticatie op die routes, en die staat
-     nog open. */
-  { pad: '/api/gegevens/', reden: 'zet het telefoonnummer, en dat is het herstelkanaal' },
+     nog open.
+
+     ALLEEN WAT SCHRIJFT. Hier stond het hele voorvoegsel `/api/gegevens/`, en
+     dat sloot ook /api/gegevens/nodig in -- een leesroute die alleen zegt wat
+     er voor een handeling nog ontbreekt (kern/gegevenspoort.js `ontbreekt`:
+     geen enkele schrijfactie). Een pas-sessie zonder account kan niet binden
+     en kreeg daar dus 403 op een vraag die niets verandert; de tredeproef zag
+     het als een gebrek in Trede 0. Besluit van de eigenaar van 18 oktober 2026:
+     de zware regel is zo breed als wat schrijft -- /start opent het gesprek
+     dat het nummer gaat zetten, /zeg zet het. */
+  { pad: '/api/gegevens/start', reden: 'opent het gesprek dat het telefoonnummer zet, en dat is het herstelkanaal' },
+  { pad: '/api/gegevens/zeg', reden: 'zet het telefoonnummer, en dat is het herstelkanaal' },
   { pad: '/api/onboarding/inricht', reden: 'zet het telefoonnummer, en dat is het herstelkanaal' }
 ];
 

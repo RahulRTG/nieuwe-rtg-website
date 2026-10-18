@@ -503,16 +503,8 @@ try {
 
 /* ---------- personas & sessies ---------- */
 
-/* Codenaam: elke klant krijgt een pseudoniem. Reserveringen, betalingen en
-   reisdata staan in onze systemen op de codenaam; de echte naam ligt in een
-   gescheiden kluis en wordt pas bij ticketing/check-in eenmalig gekoppeld.
-   Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam. */
-const PERSONAS = {
-  guest:     { name: 'Gast',         full: 'Gast',               since: null,             number: null,                codename: 'GAST' },
-  rtg:       { name: 'K. Kiss',    full: 'Katja Kiss',    since: 'Maart 2026',     number: 'RTG · 2026 · 8841', codename: 'Amberen Vos',      geboren: '1994-09-14' },
-  lifestyle: { name: 'F. Johanna', full: 'Fleur Johanna', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217', codename: 'Gouden Ibis',      geboren: '1957-02-20' },
-  business:  { name: 'R. Imran',   full: 'Rahul Imran',   since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster', geboren: '1992-11-30' }
-};
+// de demo-persona's per pas, met de codenaamregel erbij: zie ./kern/personas.js
+const PERSONAS = require('./kern/personas');
 
 /* ---------- leeftijd uit het paspoort ----------
    Elke pas wordt met paspoort aangevraagd, dus de leeftijd van een lid is
@@ -630,20 +622,8 @@ function noteFailedTry(bucket, bron, limiet, soort) {
 // de gedeelde rem voor elke deur die een tweede-factorcode toetst
 const tweedeStapRem = require('./kern/identiteit/tweedestap-rem').maakTweedeStapRem({ tooManyTries, noteFailedTry, loginFails });
 
-/* ---------- demo-account: één inlog (Rahul / Imran) voor elk kanaal ----------
-   Zo kunt u het klantportaal, de leverancier-app en het personeelskanaal met
-   dezelfde gebruikersnaam en wachtwoord uitproberen. De gebruikersnaam is
-   hoofdletterongevoelig, het wachtwoord niet. */
-const DEMO_USER = (process.env.DEMO_USER || 'rahul').trim().toLowerCase();
-const DEMO_PASS = process.env.DEMO_PASS || 'Imran';
-const DEMO_SUPPLIER = process.env.DEMO_SUPPLIER || 'KIKUNOI';
-function hasCred(body) { return !!body && (body.username != null || body.password != null); }
-// tijd-veilig vergeleken: een gewone !== lekt via de reactietijd hoeveel klopt
-function checkCred(username, password) {
-  const userOk = veiligGelijk(String(username || '').trim().toLowerCase(), DEMO_USER);
-  const passOk = veiligGelijk(String(password || ''), DEMO_PASS);
-  return userOk && passOk;
-}
+// de demo-inlog (Rahul / Imran) voor elk kanaal: zie ./kern/identiteit/demo-inlog.js
+const { DEMO_USER, DEMO_PASS, DEMO_SUPPLIER, hasCred, checkCred } = require('./kern/identiteit/demo-inlog');
 
 /* Inlogherkomst bezit de geketende vastlegging én de lezer van datzelfde spoor. */
 const { logInlog, securityLogKeten } =
@@ -1629,7 +1609,7 @@ const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, 
 // Mode-bezorging (kern/modebezorg.js): bezorgcode, foto, ID bij dure stukken, retour.
 const {
   MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht,
-  mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn
+  mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn, mbVergeet
 } = maakModebezorg({
   db, save, crypto, bewerkCollectie, dataDir: DATA_DIR, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl
@@ -2187,7 +2167,7 @@ const kern = {
     ghBijbestelVoorstel },
   agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis,
   // de mode-bezorging (kern/modebezorg.js)
-  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
+  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn, mbVergeet,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   lidboard,

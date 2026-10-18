@@ -178,7 +178,7 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
     for (const s of servers) if (s.child) try { s.child.kill('SIGTERM'); } catch (e) {}
   }
 
-  return { servers, actieve: () => activeIdx, startServer, apiCall, isGezond, kiesActieve, hartslag, wachtOpActieve, stop,
+  return { servers, actieve: () => activeIdx, startServer, apiCall, isGezond, kiesActieve, hartslag, bezig: () => klopt, wachtOpActieve, stop,
     gestopt: () => stopping, kleefDoel: (req, terugval) => spreiding.kleefDoel(req, terugval), spreiding };
 }
 

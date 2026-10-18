@@ -69,7 +69,17 @@ module.exports = ({ store, save, scho }) => {
   }
 
   // een site die weg is, laat geen geschiedenis achter
-  function wis(id) { const p = pot(); delete p[id]; }
+  /* WISSEN LEGT GEEN BAK AAN. Hier stond `const p = pot(); delete p[id];`, en
+     pot() maakt de bak als hij er niet is -- dus het verwijderen van een site
+     zonder versiegeschiedenis liet een lege `versies: {}` achter. Precies het omgekeerde
+     van wat webmaker.js bij verwijder() belooft ("een site die weg is, laat
+     niets achter"), en de herstelproef zag het: /api/site/bewaar ->
+     /api/site/verwijder stond daardoor op compensatie in plaats van exact. */
+  function wis(id) {
+    const p = store().versies;
+    if (!p || typeof p !== 'object' || !Object.prototype.hasOwnProperty.call(p, id)) return;
+    delete p[id];
+  }
 
   return { leg, lijst, herstel, wis, ontwerpVan, MAX };
 };

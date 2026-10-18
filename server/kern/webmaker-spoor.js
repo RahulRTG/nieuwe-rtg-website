@@ -29,7 +29,18 @@ module.exports = ({ store, save, scho }) => {
   }
 
   function lees(id) { return (pot()[id] || []).slice(); }
-  function wis(id) { const p = pot(); delete p[id]; save(); }
+  /* WISSEN LEGT GEEN BAK AAN. Hier stond `const p = pot(); delete p[id];`, en
+     pot() maakt de bak als hij er niet is -- dus het verwijderen van een site
+     zonder spoor liet een lege `spoor: {}` achter. Precies het omgekeerde
+     van wat webmaker.js bij verwijder() belooft ("een site die weg is, laat
+     niets achter"), en de herstelproef zag het: /api/site/bewaar ->
+     /api/site/verwijder stond daardoor op compensatie in plaats van exact. */
+  function wis(id) {
+    const p = store().spoor;
+    if (!p || typeof p !== 'object' || !Object.prototype.hasOwnProperty.call(p, id)) return;
+    delete p[id];
+    save();
+  }
 
   return { noteer, lees, wis, MAX };
 };

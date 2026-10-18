@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-18T14:24:23.849Z",
-    "commit": "07f154cdb",
+    "op": "2026-10-18T18:30:21.641Z",
+    "commit": "73850d212",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v22.22.0"
   },
@@ -13,8 +13,8 @@
     "vervallen": []
   },
   "telling": {
-    "NIET_GETEST": 98,
-    "BEWEZEN": 16
+    "NIET_GETEST": 99,
+    "BEWEZEN": 15
   },
   "regels": [
     {
@@ -43,8 +43,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 75,
-      "open": 2,
-      "reden": "2 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "open": 6,
+      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:balans",
@@ -53,8 +53,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:bank",
@@ -63,8 +63,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:berichten",
@@ -72,9 +72,9 @@
       "ingang": "/apps/comm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 8,
-      "open": 3,
-      "reden": "3 van de 8 routes niet gemeten, o.a. /api/sociaal/beleid/zet is in IDOR.json onbereikbaar; /api/stream staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json"
+      "routes": 22,
+      "open": 18,
+      "reden": "18 van de 22 routes niet gemeten, o.a. /api/comm/begin is in IDOR.json onbereikbaar; /api/comm/concept is in IDOR.json onbereikbaar; /api/comm/gesprek is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:bescherming",
@@ -139,8 +139,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 75,
-      "open": 2,
-      "reden": "2 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "open": 6,
+      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:clips",
@@ -223,8 +223,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 75,
-      "open": 2,
-      "reden": "2 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "open": 6,
+      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:flits",
@@ -254,7 +254,7 @@
       "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/4GEC5M/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/Q5BX5J/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -306,9 +306,9 @@
       "ingang": "/apps/mijn-gegevens.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 10,
-      "reden": "10 van de 12 routes niet gemeten, o.a. /api/auth/password is in IDOR.json onbereikbaar; /api/mijn/sessies/sluit is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
+      "routes": 14,
+      "open": 6,
+      "reden": "6 van de 14 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:geldcommand",
@@ -317,8 +317,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:geven",
@@ -354,9 +354,9 @@
       "ingang": "/apps/horeca.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 138,
-      "open": 136,
-      "reden": "136 van de 138 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca/arrival/promise staat niet in IDOR.json"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca*: de registers kennen geen route onder dit voorvoegsel"
     },
     {
       "functie": "link:huis",
@@ -435,8 +435,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:leven",
@@ -473,8 +473,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:loonstrook",
@@ -501,8 +501,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 90,
-      "open": 22,
-      "reden": "22 van de 90 routes niet gemeten, o.a. /api/member/magnaat/economie/analyse is in IDOR.json onbereikbaar; /api/member/magnaat/economie/schok is in IDOR.json onbereikbaar; /api/member/magnaat/economie/volgende-dag is in IDOR.json onbereikbaar"
+      "open": 20,
+      "reden": "20 van de 90 routes niet gemeten, o.a. /api/member/magnaat/economie/analyse is in IDOR.json onbereikbaar; /api/member/magnaat/economie/schok is in IDOR.json onbereikbaar; /api/member/magnaat/economie/volgende-dag is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:maison",
@@ -531,8 +531,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:mediaos",
@@ -579,8 +579,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:navigatie",
@@ -598,9 +598,9 @@
       "ingang": "/apps/mijn-neigingen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 17,
-      "open": 11,
-      "reden": "11 van de 17 routes niet gemeten, o.a. /api/auth/password is in IDOR.json onbereikbaar; /api/mijn/sessies/sluit is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
+      "routes": 19,
+      "open": 7,
+      "reden": "7 van de 19 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:nieuws",
@@ -636,9 +636,10 @@
       "app": "Overzicht",
       "ingang": "/apps/rtg.html",
       "persona": "lid",
-      "status": "BEWEZEN",
+      "status": "NIET_GETEST",
       "routes": 7,
-      "reden": "alle 7 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "open": 2,
+      "reden": "2 van de 7 routes niet gemeten, o.a. /api/sociaal/lijn is in IDOR.json onbereikbaar; /api/sociaal/wereld is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:ov",
@@ -656,9 +657,9 @@
       "ingang": "/apps/ovroutes.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/checkin staat niet in IDOR.json; /api/staff/ov/dienst staat niet in IDOR.json"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/*: de registers kennen geen route onder dit voorvoegsel"
     },
     {
       "functie": "link:partnernetwerk",
@@ -704,9 +705,9 @@
       "ingang": "/apps/mijn-post.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 14,
-      "open": 10,
-      "reden": "10 van de 14 routes niet gemeten, o.a. /api/auth/password is in IDOR.json onbereikbaar; /api/mijn/sessies/sluit is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
+      "routes": 16,
+      "open": 6,
+      "reden": "6 van de 16 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:projectroom",
@@ -762,9 +763,9 @@
       "ingang": "/apps/mijn-relaties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 16,
-      "open": 11,
-      "reden": "11 van de 16 routes niet gemeten, o.a. /api/auth/password is in IDOR.json onbereikbaar; /api/inzagekaart is in IDOR.json onbereikbaar; /api/mijn/sessies/sluit is in IDOR.json onbereikbaar"
+      "routes": 18,
+      "open": 7,
+      "reden": "7 van de 18 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/inzagekaart is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:rendezvous",
@@ -773,8 +774,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 38,
-      "open": 5,
-      "reden": "5 van de 38 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar"
+      "open": 9,
+      "reden": "9 van de 38 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:residentie",
@@ -929,8 +930,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:rtgone",
@@ -966,9 +967,9 @@
       "ingang": "/apps/mijn-sessies.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 15,
-      "open": 13,
-      "reden": "13 van de 15 routes niet gemeten, o.a. /api/auth/password is in IDOR.json onbereikbaar; /api/mijn/sessies/sluit is in IDOR.json onbereikbaar; /api/mijn/sessies/sluit-overige is in IDOR.json onbereikbaar"
+      "routes": 17,
+      "open": 8,
+      "reden": "8 van de 17 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/bind is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:sitemaker",
@@ -986,8 +987,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 13,
-      "open": 3,
-      "reden": "3 van de 13 routes niet gemeten, o.a. /api/sociaal/beleid/zet is in IDOR.json onbereikbaar; /api/stream staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json"
+      "open": 12,
+      "reden": "12 van de 13 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:spelavond",
@@ -1124,8 +1125,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 9,
-      "open": 5,
-      "reden": "5 van de 9 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar; /api/ondertiteling/stand is in IDOR.json onbereikbaar"
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar; /api/ondertiteling/stand is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:vooruitzicht",
@@ -1154,14 +1155,14 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/4GEC5M/mij",
+          "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "POST /api/rtf/social/connections",
+          "verzoek": "GET /api/foundation/gezin/Q5BX5J/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -1239,8 +1240,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:wbw",
@@ -1249,8 +1250,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 100,
-      "open": 68,
-      "reden": "68 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "open": 61,
+      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:wereldlaag",

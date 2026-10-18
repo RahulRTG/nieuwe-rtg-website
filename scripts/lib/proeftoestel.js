@@ -127,12 +127,22 @@ async function maakProeflid({ post, naam, basis }) {
    - elk token dat bij een gebonden toestel hoort, krijgt een vers bewijs.
 
    Een token dat niemand kent gaat ongemoeid door: de SERVER beslist of dat mag,
-   niet deze schil. */
+   niet deze schil.
+
+   `toestellen` mag ook een FUNCTIE zijn die de lijst per verzoek geeft. Dat is
+   voor een proef waarvan de leden onderweg een vers token krijgen -- de
+   IDOR-proef loopt langs /api/logout en /api/privacy/delete, en een nieuwe
+   sessie moet dan opnieuw binden. Een lijst die bij het aanmaken wordt
+   vastgezet, zou het verse token niet kennen en het zware pad stil ongetekend
+   laten vertrekken. */
 function metToestellen(post, { toestellen, voorLid } = {}) {
-  const bekend = (toestellen || []).filter(Boolean);
-  if (!bekend.length && !(voorLid && voorLid.lid)) return post;
+  const levend = typeof toestellen === 'function';
+  const lijst = () => ((levend ? toestellen() : toestellen) || []).filter(Boolean);
+  const bekendBijStart = levend ? null : lijst();
+  if (!levend && !bekendBijStart.length && !(voorLid && voorLid.lid)) return post;
   return async (pad, lijf, token, koppen) => {
     if (!zwaarPad(pad)) return post(pad, lijf, token, koppen);
+    const bekend = levend ? lijst() : bekendBijStart;
     let t = token;
     if (voorLid && voorLid.lid && token) {
       const van = voorLid.van();

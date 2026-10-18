@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2706,
+        "kernelModules": 2721,
         "mutationContracts": 61,
         "routes": 64,
         "screens": 20,
@@ -141,7 +141,7 @@
       "blastRadius": {
         "sourceOwners": 5,
         "kernelModules": 137,
-        "mutationContracts": 290,
+        "mutationContracts": 291,
         "routes": 290,
         "screens": 8,
         "dataSchema": "eerst flowmanifest; geen runtime-opslag",
@@ -202,7 +202,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 13,
-        "kernelModules": 168,
+        "kernelModules": 169,
         "mutationContracts": 1077,
         "routes": 1098,
         "screens": 30,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2734,
+        "kernelModules": 2749,
         "mutationContracts": 2077,
         "routes": 2091,
         "screens": 98,

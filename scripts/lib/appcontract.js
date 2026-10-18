@@ -118,6 +118,10 @@ const CONTRACT = {
   'link:ik': Object.assign({
     belofte: 'een lid zegt hoe hij genoemd wil worden, welke toon Rahul aanslaat en hoe elk scherm zich gedraagt, binnen de grens van zijn leeftijd'
   }, voltooi('ik', 'het scenario loopt /api/ik, /api/ik/zet en /api/ik/toegankelijk/zet, de routes die /apps/ik.html zelf aanroept')),
+  /* Geld van buiten het huis, over de simulatiebank (18 oktober 2026). */
+  'link:pay': Object.assign({
+    belofte: 'een geverifieerd lid laadt zijn wallet op en ziet het nieuwe saldo; weigert of hangt de bank, dan hoort het lid wat er werkelijk gebeurde en wordt er niets bijgeschreven -- ook na een herstart, een dubbele tik, een afgebroken verzoek en een crash'
+  }, voltooi('pay', 'het scenario loopt /api/pay/oplaad en /api/pay/overzicht, de routes die /apps/pay.html zelf aanroept, met een goedgekeurde identiteit, een gebonden toestel en de simulatiebank als rail')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'

@@ -831,7 +831,7 @@ omlaag.
 
 ## `shared/rtg-editorial-v4.js`
 
-`public/shared/rtg-editorial-v4/` -- 2 delen, 208 regels in de delen
+`public/shared/rtg-editorial-v4/` -- 2 delen, 223 regels in de delen
 
 | deel | onderwerp |
 |---|---|

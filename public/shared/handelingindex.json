@@ -2684,6 +2684,12 @@
       "url": "/apps/rtmail.html"
     },
     {
+      "label": "Archief",
+      "app": "RTMail",
+      "wereld": "WorkOS",
+      "url": "/apps/rtmail.html"
+    },
+    {
       "label": "Gesprek",
       "app": "RTMail",
       "wereld": "WorkOS",
@@ -2732,6 +2738,18 @@
       "url": "/apps/rtmail.html"
     },
     {
+      "label": "Postvak in",
+      "app": "RTMail",
+      "wereld": "WorkOS",
+      "url": "/apps/rtmail.html"
+    },
+    {
+      "label": "Prullenbak",
+      "app": "RTMail",
+      "wereld": "WorkOS",
+      "url": "/apps/rtmail.html"
+    },
+    {
       "label": "Sluimeren tot morgen",
       "app": "RTMail",
       "wereld": "WorkOS",
@@ -2775,6 +2793,12 @@
     },
     {
       "label": "Versturen",
+      "app": "RTMail",
+      "wereld": "WorkOS",
+      "url": "/apps/rtmail.html"
+    },
+    {
+      "label": "Verzonden",
       "app": "RTMail",
       "wereld": "WorkOS",
       "url": "/apps/rtmail.html"

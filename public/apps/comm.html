@@ -298,8 +298,14 @@
     .replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
   var token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
 
+  /* HET VOLLE PAD STAAT BIJ DE AANROEP, niet een stam met een staart erachter.
+     Met `'/api/comm' + pad` zag de routetelling (scripts/schermroutes.js) van dit
+     scherm alleen het voorvoegsel /api/comm, en dat is te breed om te tellen
+     (scripts/lib/bewijsbron.js `smalVoorvoegsel`): Berichten leek dan alleen
+     /api/member/connections aan te roepen, en geen proef over de berichtroutes
+     kon er ooit aan koppelen. Zo leest elke telling wat dit scherm werkelijk doet. */
   function api(pad, body) {
-    return fetch('/api/comm' + pad, { method: 'POST',
+    return fetch(pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(body || {}) })
       .then(function (r) { return r.json().catch(function () { return {}; })
@@ -362,7 +368,7 @@
   }
 
   function laadInbox() {
-    return api('/inbox', { lade: staat.lade }).then(function (d) {
+    return api('/api/comm/inbox', { lade: staat.lade }).then(function (d) {
       staat.laden = d.laden || [];
       staat.gesprekken = d.gesprekken || [];
       tekenLaden(); tekenInbox();
@@ -392,14 +398,14 @@
 
   function laadGesprek() {
     if (!staat.open) return Promise.resolve();
-    return api('/gesprek', { id: staat.open }).then(function (d) {
+    return api('/api/comm/gesprek', { id: staat.open }).then(function (d) {
       staat.gesprek = d.gesprek;
       tekenGesprek(); vulAppMenu();
       /* Een bron houdt zijn eigen leesstand bij (in zijn module, op het moment
          dat je hem opent). De kern een leesmelding sturen voor een gesprek dat
          hij niet kent zou alleen een foutmelding opleveren. */
       if (staat.gesprek.extern) return null;
-      return api('/lees', { id: staat.open });
+      return api('/api/comm/lees', { id: staat.open });
     }).then(function () { return laadInbox(); }).catch(function (e) {
       $('#bubbels').innerHTML = '<p class="leeg">' + esc(e.message) + '</p>';
     });
@@ -462,7 +468,7 @@
           b.textContent = r.teken + ' ' + r.aantal;
         }
         b.addEventListener('click', function () {
-          api('/reactie', { id: staat.open, berichtId: m.id, teken: r.teken }).then(laadGesprek);
+          api('/api/comm/reactie', { id: staat.open, berichtId: m.id, teken: r.teken }).then(laadGesprek);
         });
         rea.appendChild(b);
       });
@@ -474,19 +480,19 @@
          de rest van dit huis tekent zijn beeld al zelf. De kern bewaart het
          teken als tekst (hoogstens acht tekens), dus 'emo-duim' past. */
       act.appendChild(knopje('Reageer', function () {
-        api('/reactie', { id: staat.open, berichtId: m.id, teken: 'emo-duim' }).then(laadGesprek);
+        api('/api/comm/reactie', { id: staat.open, berichtId: m.id, teken: 'emo-duim' }).then(laadGesprek);
       }));
       act.appendChild(knopje('Antwoord', function () { zetAntwoord(m); }));
       if (m.vanMij) {
         act.appendChild(knopje('Wijzig', function () {
           var nieuw = window.prompt('Bericht wijzigen', m.tekst || '');
           if (nieuw == null) return;
-          api('/wijzig', { id: staat.open, berichtId: m.id, tekst: nieuw })
+          api('/api/comm/wijzig', { id: staat.open, berichtId: m.id, tekst: nieuw })
             .then(laadGesprek).catch(function (e) { alert(e.message); });
         }));
         act.appendChild(knopje('Trek in', function () {
           if (!window.confirm('Dit bericht intrekken? De ander ziet dat er iets stond.')) return;
-          api('/wis', { id: staat.open, berichtId: m.id }).then(laadGesprek);
+          api('/api/comm/wis', { id: staat.open, berichtId: m.id }).then(laadGesprek);
         }));
       }
       el.appendChild(act);
@@ -537,7 +543,7 @@
     if (!staat.open || (staat.gesprek && staat.gesprek.extern)) return;
     if (Date.now() - typTimer < 3000) return;
     typTimer = Date.now();
-    api('/typt', { id: staat.open }).catch(function () {});
+    api('/api/comm/typt', { id: staat.open }).catch(function () {});
   }
 
   /* Het concept reist mee tussen apparaten. We bewaren het pas als je even
@@ -547,7 +553,7 @@
     if (!staat.open || (staat.gesprek && staat.gesprek.extern)) return;
     clearTimeout(conceptTimer);
     conceptTimer = setTimeout(function () {
-      api('/concept', { id: staat.open, tekst: veld.value }).catch(function () {});
+      api('/api/comm/concept', { id: staat.open, tekst: veld.value }).catch(function () {});
     }, 1200);
   });
 
@@ -567,7 +573,7 @@
        nog EEN verstuurweg, en dat is precies wat "communicatie is
        infrastructuur" hoort te betekenen. Een tak laten staan die niets meer
        kan bereiken is een tak die niemand meer nakijkt. */
-    api('/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp })
+    api('/api/comm/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp })
       .then(function () {
         veld.value = ''; veld.style.height = 'auto';
         staat.antwoordOp = null; $('#antwoordop').hidden = true;
@@ -595,7 +601,7 @@
   $('#vidBtn').addEventListener('click', function () { bel(true); });
   $('#porBtn').addEventListener('click', function () {
     if (!staat.open) return;
-    api('/por', { id: staat.open })
+    api('/api/comm/por', { id: staat.open })
       .then(function () { $('#draadSub').textContent = 'por verstuurd'; })
       .catch(function (e) { alert(e.message); });
   });
@@ -639,7 +645,7 @@
   function zetVlag(v) {
     var g = staat.gesprek;
     if (!g) return;
-    api('/vlag', { id: staat.open, vlag: v, aan: !g[v] }).then(function () {
+    api('/api/comm/vlag', { id: staat.open, vlag: v, aan: !g[v] }).then(function () {
       if (v === 'weg') {
         staat.open = null; staat.gesprek = null;
         $('#draad').hidden = true;
@@ -659,7 +665,7 @@
       if (!staat.open) return;
       var taak = b.getAttribute('data-ai');
       b.disabled = true;
-      api('/ai', { id: staat.open, taak: taak, wens: taak === 'concept' ? veld.value : '' })
+      api('/api/comm/ai', { id: staat.open, taak: taak, wens: taak === 'concept' ? veld.value : '' })
         .then(function (d) {
           if (taak === 'concept') { veld.value = d.concept || ''; veld.focus(); return; }
           if (taak === 'samenvat') { blad('<h2>Samenvatting</h2><pre>' + esc(d.samenvatting) + '</pre>'); return; }
@@ -691,7 +697,7 @@
       }).join(''));
       $('#blad').querySelectorAll('[data-key]').forEach(function (b) {
         b.addEventListener('click', function () {
-          api('/begin', { met: b.getAttribute('data-key') }).then(function (d2) {
+          api('/api/comm/begin', { met: b.getAttribute('data-key') }).then(function (d2) {
             sluitBlad();
             return laadInbox().then(function () { open(d2.gesprek); });
           }).catch(function (e) { alert(e.message); });
@@ -707,7 +713,7 @@
     clearTimeout(zoekTimer);
     zoekTimer = setTimeout(function () {
       if (q.length < 2) return laadInbox();
-      api('/zoek', { vraag: q }).then(function (d) {
+      api('/api/comm/zoek', { vraag: q }).then(function (d) {
         var n = $('#gesprekken');
         n.textContent = '';
         if (!d.treffers.length) { n.innerHTML = '<p class="leeg">Niets gevonden voor &ldquo;' + esc(q) + '&rdquo;.</p>'; return; }
@@ -797,7 +803,7 @@
       .then(function (d) {
         var c = (d.connections || []).find(function (x) { return x.codename === met; });
         if (!c) throw new Error('Je bent nog niet verbonden met ' + met + '.');
-        return api('/begin', { met: c.key });
+        return api('/api/comm/begin', { met: c.key });
       })
       .then(function (d) {
         return laadInbox().then(function () {

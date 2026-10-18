@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "6532dc93c",
+  "commit": "8c0cbb02d",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1970,9 +1970,9 @@
  "gemeten": {
   "schermenMetPad": 442,
   "nietGelezen": 0,
-  "exactePaden": 1010,
-  "verwijzingen": 1224,
-  "voorvoegsels": 143,
+  "exactePaden": 1023,
+  "verwijzingen": 1238,
+  "voorvoegsels": 142,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -2106,6 +2106,17 @@
    "aantal": 6
   },
   {
+   "pad": "/api/comm/inbox",
+   "schermen": [
+    "public/apps/comm.html",
+    "public/apps/sociaal.html",
+    "public/shared/interface/second-screen-modules.js",
+    "public/shared/interface/world-desktop-people.js",
+    "public/shared/interface/world-widget-data.js"
+   ],
+   "aantal": 5
+  },
+  {
    "pad": "/api/account/start",
    "schermen": [
     "public/apps/decision-room.js",
@@ -2172,16 +2183,6 @@
     "public/apps/reisboek.js",
     "public/apps/reizen-samen.js",
     "public/apps/reizen.html",
-    "public/shared/interface/world-widget-data.js"
-   ],
-   "aantal": 4
-  },
-  {
-   "pad": "/api/comm/inbox",
-   "schermen": [
-    "public/apps/sociaal.html",
-    "public/shared/interface/second-screen-modules.js",
-    "public/shared/interface/world-desktop-people.js",
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
@@ -3798,6 +3799,97 @@
    "pad": "/api/supplier/mob/toewijzen",
    "schermen": [
     "public/apps/chauffeur.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/ai",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/begin",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/concept",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/gesprek",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/lees",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/por",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/reactie",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/stuur",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/typt",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/vlag",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/wijzig",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/wis",
+   "schermen": [
+    "public/apps/comm.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comm/zoek",
+   "schermen": [
+    "public/apps/comm.html"
    ],
    "aantal": 1
   },
@@ -9600,12 +9692,24 @@
   {
    "bestand": "public/apps/comm.html",
    "exact": [
+    "/api/comm/ai",
+    "/api/comm/begin",
+    "/api/comm/concept",
+    "/api/comm/gesprek",
+    "/api/comm/inbox",
+    "/api/comm/lees",
+    "/api/comm/por",
+    "/api/comm/reactie",
+    "/api/comm/stuur",
+    "/api/comm/typt",
+    "/api/comm/vlag",
+    "/api/comm/wijzig",
+    "/api/comm/wis",
+    "/api/comm/zoek",
     "/api/member/connections",
     "/api/stream"
    ],
-   "voorvoegsels": [
-    "/api/comm"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/command/command-01.js",

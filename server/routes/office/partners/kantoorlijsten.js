@@ -18,11 +18,8 @@ module.exports = (octx) => {
    Een school meldt zich aan via de RTFoundation-app en staat dan op 'wacht'.
    Pas als RTG hem hier goedkeurt (status 'actief') kan de school personeel
    toelaten en klassen maken. Dezelfde beoordeling als bij partner-aanvragen. */
-function scholen() {
-  const f = db.data.foundation || (db.data.foundation = {});
-  if (!f.scholen) f.scholen = {};
-  return f.scholen;
-}
+// de scholen onder db.data.foundation, door de deur van de RTFoundation
+const scholen = () => require('../../../foundation/opslag')({ db }).tak('scholen');
 app.post('/api/office/schools', officeAuth, (req, res) => {
   const lijst = Object.values(scholen()).map(s => ({
     code: s.code, naam: s.naam, plaats: s.plaats, status: s.status || 'actief', at: s.at,

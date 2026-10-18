@@ -212,7 +212,7 @@ const STROMEN = [
       'ingetrokken alarm verliest hem direct. De kopie in het bericht aan de kring (meldAan) valt hierbuiten.' },
 
   { naam: 'ontmoet-radar', wat: 'de laatste positie voor de radar van Salon-ontmoetingen',
-    bron: [S('kern/ontmoeting.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) db.data.ontmoetPosities[key] = { lat, lng, at: nu() };')],
+    bron: [S('kern/ontmoeting.js', "if (Number.isFinite(lat) && Number.isFinite(lng)) O.bak('ontmoetPosities')[key] = { lat, lng, at: nu() };")],
     collectie: 'ontmoetPosities', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
     termijn: { soort: 'venster', bewijs: S('kern/ontmoeting.js', 'if (Date.now() - at > POS_TTL_MS) { delete P[k]; weg++; }') },
     waarom: 'sinds N14 wordt een positie die niet meer vers is gewist -- bij elke nieuwe positie, bij elke stand en ' +

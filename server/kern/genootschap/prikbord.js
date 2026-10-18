@@ -10,6 +10,7 @@
    lid, en de uitslag is altijd zichtbaar voor de leden. Geen anonieme peilingen
    in een besloten groep -- wie iets vindt in een gezelschap, zegt het daar. */
 const { keur } = require('../veilig');
+const { volgendId } = require('../../lib/volgendid');
 
 module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) => {
   const TEKST_MAX = 800;
@@ -36,11 +37,6 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
     return Array.isArray(g.prikbord[id]) ? g.prikbord[id] : [];
   };
 
-  function nieuwId(lijst) {
-    let id = Date.now();
-    while (lijst.some(x => x.id === id)) id++;
-    return id;
-  }
 
   const poort = (sess, groepId) => {
     const gr = genootschap.groepMet(groepId);
@@ -62,7 +58,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
 
     const lijst = bord(groepId);
     const bericht = {
-      id: nieuwId(lijst), vanKey: sess.key, tekst, at: nu(),
+      id: volgendId(lijst), vanKey: sess.key, tekst, at: nu(),
       reacties: [],
       peiling: keuzes.length ? { keuzes, stemmen: {} } : null
     };
@@ -100,7 +96,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
     if (!t) return { error: 'Schrijf eerst iets.' };
     const k = keur(t); if (!k.ok) return { error: k.reden };
     if (!Array.isArray(b.reacties)) b.reacties = [];
-    b.reacties.push({ id: nieuwId(b.reacties), vanKey: sess.key, tekst: t, at: nu() });
+    b.reacties.push({ id: volgendId(b.reacties), vanKey: sess.key, tekst: t, at: nu() });
     if (b.reacties.length > 200) b.reacties = b.reacties.slice(-200);
     save();
     return { ok: true };

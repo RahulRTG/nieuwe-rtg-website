@@ -101,6 +101,8 @@ function maakMobiliteit(state) {
   // de CDT-laag: de registratie eerst, de uitvoer daarna (die leest de diensten)
   Object.assign(ctx, require('./cdt')(ctx));
   Object.assign(ctx, require('./cdt-export')(ctx));
+  // wat dit domein van een lid vergeet als het daarom vraagt (AVG art. 17)
+  Object.assign(ctx, require('./vergeten')(ctx));
 
   ctx.ensureRegister();
   ctx.ensureAssets();

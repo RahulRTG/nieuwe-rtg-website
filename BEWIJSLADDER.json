@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-14T08:44:25.081Z",
-    "commit": "b288f04dd",
+    "op": "2026-10-18T10:37:48.922Z",
+    "commit": "b1978df5",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "sporten": [
     {
@@ -103,7 +103,8 @@
           "aanleiding": [
             "pull_request",
             "push",
-            "schedule"
+            "schedule",
+            "workflow_dispatch"
           ],
           "register": null,
           "stempel": null,
@@ -166,6 +167,23 @@
           "lokaal": true,
           "keten": [],
           "aanleiding": [],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/nieuweroutes.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
           "register": null,
           "stempel": null,
           "grond": null,
@@ -488,7 +506,7 @@
         },
         {
           "doel": "scripts/pgtoetsen.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml"
           ],
@@ -1169,7 +1187,7 @@
       "mechanismen": [
         {
           "doel": "npm run afbouw:software",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "release-image.yml"
           ],
@@ -1515,7 +1533,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. `deelsLokaal` telt de mechanismen die lokaal draaien maar minder doen dan de keten; wat er lokaal ontbreekt staat per mechanisme in `lokaalNiet`. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 84,
+    "mechanismen": 85,
     "sporten": 12,
     "staat": 7,
     "stap": 5,
@@ -1524,8 +1542,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 23,
-    "vermeldingenAlleenKeten": 24,
+    "alleenKeten": 21,
+    "vermeldingenAlleenKeten": 22,
     "zonderTrede": 0,
     "deelsLokaal": 1
   }

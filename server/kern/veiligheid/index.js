@@ -41,6 +41,8 @@ module.exports = (state) => {
   const codewoord = require('./codewoord')({ opslag, save, crypto, kluis, alarm, plek, sociaal });
   const rust = require('./rust')({ opslag, save, schoon });
   const moment = require('./moment')({ opslag, save, crypto, schoon, sociaal, plek });
+  // wat dit domein van een lid vergeet als het daarom vraagt (AVG art. 17)
+  const { veiligVergeet } = require('./vergeten')({ opslag, save });
 
   /* Het volledige beeld voor een lid: wat loopt er, wie is mijn kring, hoe
      staat het codewoord, welke rust. Een aanroep, want de vier apps tonen
@@ -107,6 +109,6 @@ module.exports = (state) => {
     momentStop: moment.momentStop, momentVoorContact: moment.momentVoorContact,
     momentVoorBedrijf: moment.momentVoorBedrijf,
 
-    veiligBeeld, veiligCheckin, veiligSweep: wacht.sweep
+    veiligBeeld, veiligCheckin, veiligSweep: wacht.sweep, veiligVergeet
   };
 };

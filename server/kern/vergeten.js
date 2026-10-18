@@ -5,27 +5,22 @@
    met een reden mag blijven staan -- dat hoort als een leesbaar geheel bij
    elkaar, niet verspreid tussen het afhandelen van een verzoek.
 
-   De vier soorten:
+   De soorten, elk in een eigen deelbestand onder ./vergeten/:
 
-   1. WEG. Alles wat alleen over dit lid gaat: zijn voorkeuren, zijn spullen,
-      zijn geheugen, zijn eigen Salon-posts. Dat staat in ./vergeten/eigen.js --
-      als enige van de vier stond die soort hier nog los in de functie, en de
-      lijst met takken was daar het onderwerp geworden in plaats van de gang van
-      zaken.
-   2. DE PERSOON ERUIT, DE REST BLIJFT. Waar zijn spoor in het werk van een
-      ander zit: een reactie in andermans draad, een DM die de helft van
-      iemands gesprek is, de bel van een zaak, een cadeaukaart met geld erin.
-      Dat staat in ./vergeten/anoniem.js.
-   3. BLIJFT, MET GROND. De fiscale administratie en het inzagejournaal. Die
-      staan met termijn en al in server/bewaartermijnen.js; een uitzondering die
-      alleen in een test is afgevinkt, kan niemand navertellen.
-   4. DE BYTES BUITEN DE DATABASE, en die soort ontbrak. Foto's, snaps,
-      verhalen, site-beelden en kluisbestanden liggen als losse versleutelde
-      bestanden op schijf of in de objectopslag; in db.data staat alleen het
-      pad. Dit beleid haalde het pad weg en liet het bestand staan -- een wees
-      die wij nog gewoon kunnen openen, en bij RTG Bestanden gaat dat over
-      paspoortscans, contracten en medische brieven. Dat staat nu in
-      ./vergeten/bytes.js.
+   1. WEG (eigen.js). Alles wat alleen over dit lid gaat: zijn voorkeuren,
+      zijn spullen, zijn geheugen, zijn eigen Salon-posts.
+   2. DE PERSOON ERUIT, DE REST BLIJFT (anoniem.js). Waar zijn spoor in het
+      werk van een ander zit: een reactie in andermans draad, een DM die de
+      helft van iemands gesprek is, de bel van een zaak, een cadeaukaart.
+   3. BLIJFT, MET GROND. De fiscale administratie en het inzagejournaal, met
+      termijn en al in server/bewaartermijnen.js.
+   4. DE BYTES BUITEN DE DATABASE (bytes.js). Foto's, snaps, verhalen,
+      site-beelden en kluisbestanden liggen als losse versleutelde bestanden
+      op schijf; een weggehaald pad met een blijvend bestand is een wees die
+      wij nog kunnen openen.
+   5. DE POSITIE IN EEN DOMEIN MET EEN EIGEN DEUR (positie.js). Een rit, een
+      SOS, een bezorgpunt: het domein wist, deze route vraagt het.
+   En als laatste het account zelf, met de identiteitsmap (account.js).
 
    test/vergeten.test.js en test/vergeten-gezelschap.test.js vegen na afloop door
    de HELE database en rekenen af wat er nog van het lid in staat -- voor elke
@@ -36,15 +31,15 @@ module.exports = function maakVergeten(kern) {
   /* Het lidboard staat onder een eigen naam op de kern; alleen het wissen van
      het logboek is hier nodig. */
   const { lidBoardLogWis } = kern.lidboard || {};
-  /* De vierde soort, en die stond hier niet: WAT ALLEEN ALS VERWIJZING IN
-     db.data STAAT. De foto's, snaps, verhalen, site-beelden en kluisbestanden
-     liggen als losse versleutelde bestanden op schijf; hier stond alleen het
-     pad. Dat beleid staat in ./vergeten/bytes.js, met de uitleg erbij. Het
-     werkt met een Set die hieronder wordt gevuld en aan het eind geleegd --
-     verzamelen VOOR het weggooien, want daarna is de link weg. */
+  /* De bytes werken met een Set die hieronder wordt gevuld en aan het eind
+     geleegd -- verzamelen VOOR het weggooien, want daarna is de link weg. */
   const bytes = require('./vergeten/bytes')({ db, media, bestanden });
-  // de identiteitsmap (paspoortscans en selfies): zie ../identiteitsmap.js
-  const identiteitsmap = require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR);
+  // het account en de identiteitsmap (paspoortscans en selfies)
+  const account = require('./vergeten/account')({ kern, accounts, UPLOAD_DIR });
+  // de sporen naast het lid: sessiecontext, DemocratieOS en de open sessies
+  const sporen = require('./vergeten/sporen')({ kern, sessions, forgetSession });
+  // de positie van dit lid in de domeinen met een eigen deur
+  const positie = require('./vergeten/positie')(kern);
   const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet });
   const { wisGesprekkenVan: wisGesprekken, wisSollicitatiechats } = require('./vergeten/gesprekken');
   const eigen = require('./vergeten/eigen')({ db, lidBoardLogWis });
@@ -65,6 +60,9 @@ module.exports = function maakVergeten(kern) {
     if (!codenaam && typeof liveCodename === 'function') {
       try { codenaam = liveCodename(sessie) || null; } catch (e) { codenaam = null; }
     }
+    /* EERST DE POSITIES (./vergeten/positie.js): die vragen een domein om te
+       wissen, en ontbreekt er een, dan faalt dit vóór de rest van de wissing. */
+    positie.wisPosities(key, codenaam);
     const teWissen = new Set();
     /* DE EERSTE SOORT: alles wat alleen over dit lid gaat -- zijn voorkeuren,
        zijn spullen, zijn geheugen, zijn eigen Salon-posts. De lijst met takken
@@ -102,44 +100,10 @@ module.exports = function maakVergeten(kern) {
        waarheid. test/vergeten.test.js veegt na afloop door de hele database om
        te controleren dat er geen enkele tak meer overblijft. */
     if (typeof gidsWeg === 'function') gidsWeg(key);
-    /* Echt account: het account zelf weg, met de HELE identiteitsmap erbij.
-
-       Hier stond `deleteUser` gevolgd door het unlinken van het ENE bestand dat
-       de database nog onthield. Dat dekte de werkelijkheid niet:
-
-       - elke upload schreef een nieuw bestand met een tijdstempel, terwijl
-         id_doc telkens overschreven werd -- dus alle eerdere pogingen bleven
-         als wees staan (en de afwijzingsmail raadt letterlijk aan het opnieuw
-         te proberen met een duidelijkere foto, dus dat gebeurt);
-       - de SELFIE stond in member_state, en die rij verdwijnt mee met het
-         account -- dus na deleteUser was de naam niet meer te lezen en werd hij
-         nooit gewist. Niet die ene, geen enkele.
-
-       Het lid kreeg intussen "ok: true", en niets faalde. Precies de wees waar
-       de kop van dit bestand en ./vergeten/bytes.js over gaan; voor de
-       mediastore en de kluis is dat gat gedicht en voor de identiteitsmap
-       overgeslagen.
-
-       De map is nu zelf de administratie: alles wat <id>- heet gaat weg, wat de
-       database er ook nog van weet. Vóór deleteUser, want daarna is het id nog
-       wel bekend maar de rest niet meer -- en de volgorde kost niets: mislukt de
-       verwijdering van het account, dan is een gewiste scan geen verlies maar
-       precies wat het lid vroeg. */
-    /* Het gezin aan dit account (foundation/gezinseigenaar.js) en de
-       koppelingen als oppas of familie. Niet in een lege catch: blijft het
-       gezin staan, dan blijven er gegevens van kinderen achter zonder ouder. */
-    if (sessie.account && kern.rtf && typeof kern.rtf.vergeetAccount === 'function')
-      kern.rtf.vergeetAccount(sessie.account.id);
-    if (sessie.account) {
-      try { identiteitsmap.wisAllesVan(sessie.account.id); } catch (e) {}
-      accounts.deleteUser(sessie.account.id);
-    }
-    /* Het inzagejournaal blijft staan, bewust. Het bevat geen naam en geen
-       e-mailadres -- alleen een account-id dat na deze regel nergens meer op
-       slaat, plus wie er keek en waarom. Anders veegt iemand zijn eigen
-       sporen uit door zijn account te verwijderen (AVG art. 17 lid 3
-       laat bewaren toe waar dat voor een rechtsvordering of wettelijke plicht
-       nodig is). Wat overblijft is de-geidentificeerd. */
+    /* Het account zelf, met het gezin eraan en de HELE identiteitsmap erbij
+       (paspoortscans en selfies): ./vergeten/account.js, met het waarom van de
+       volgorde en van het inzagejournaal dat bewust blijft staan. */
+    account.wisAccount(sessie);
     /* EN HET API-SPOOR. Dat bewaart per schrijfhandeling WIE er handelde (de
        sleutel, nooit een naam); de bezem van test/vergeten.test.js rekent erop
        af als die blijft staan. De regels blijven, de actor wordt "gewist", de
@@ -150,23 +114,10 @@ module.exports = function maakVergeten(kern) {
     const reden = 'recht op vergetelheid (AVG art. 17)';
     const herzegeling = require('./vergeten-anker').voor(kern, key, sessie, reden);
     if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, reden);
-    /* EN HET SESSIEREGISTER VAN MIJN RTG. Dat is iets anders dan de sessies die
-       hieronder worden uitgelogd: forgetSession raakt de Map met tokens, dit
-       register houdt de CONTEXT per sessie (waar, met welk toestel, hoe zeker)
-       en overleeft het token met opzet. Zonder deze regel bleef de sleutel van
-       het lid daar staan -- de bezem van test/vergeten-gezelschap.test.js vond
-       hem terug als tak `sessiecontext (sleutel)`.
-
-       De functie woont in het register zelf en niet hier, om twee redenen: die
-       module BEZIT de collectie (kern/eigencollectie), en wissen moet kijken
-       naar wat er staat in plaats van naar wat vanLid() nog toont -- die filtert
-       op een TTL van dertig dagen, en juist de oudste rij is de rij die het
-       langst blijft liggen. */
-    if (kern.sessieregister && kern.sessieregister.wisLid) kern.sessieregister.wisLid(key);
-    /* DemocratieOS: de kwesties blijven, de weg van het inbrengersnummer naar de mens niet. */
-    if (kern.democratieVergeet) kern.democratieVergeet(key);
-    // alle sessies van dit lid uitloggen
-    for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
+    /* De sporen naast het lid: het sessieregister van Mijn RTG, de weg van een
+       inbrengersnummer naar de mens in DemocratieOS, en zijn open sessies
+       (./vergeten/sporen.js). */
+    sporen.wisSporen(key);
     /* EEN SUCCESANTWOORD BETEKENT HIER OOK: OP SCHIJF.
 
        De gewone save() is write-behind. Onder de volledige parallelle suite

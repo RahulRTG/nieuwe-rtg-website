@@ -30,6 +30,7 @@ const S = require('./standen');
 const { maakSchrijver } = require('./ronde');
 const { maakZicht } = require('./zicht');
 const { maakTerugkoppeling } = require('./terugkoppeling');
+const { volgendId } = require('../../lib/volgendid');
 
 module.exports = ({ db, save, codenaamVan, notify, genootschap, nu = Date.now }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/beraad/index', bezit: { beraad: 'kaart' } });
@@ -61,12 +62,6 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap, nu = Date.now })
     return q;
   }
 
-  function nieuwId(lijst) {
-    let id = nu();
-    while (lijst.some(x => x.id === id)) id++;
-    return id;
-  }
-
   const klaar = (sess, b, r) => (r && r.error ? r : Object.assign({ ok: true, beraad: zicht.beraad(b, sess.key) },
     r && r.herhaling ? { herhaling: true } : {}));
 
@@ -82,7 +77,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap, nu = Date.now })
     const quorum = quorumVan(gr, v.quorum);
     if (quorum == null) return { status: 400, error: 'Het quorum is een heel getal tussen 1 en het aantal leden (' + (gr.leden || []).length + ').' };
     const lijst = lijstSchrijf();
-    const b = schr.nieuw({ id: nieuwId(lijst), drager: { soort: 'genootschap', id: gr.id }, vraag,
+    const b = schr.nieuw({ id: volgendId(lijst, nu), drager: { soort: 'genootschap', id: gr.id }, vraag,
       door: sess.key, gevoelig: v.gevoelig === true, quorum });
     lijst.unshift(b);
     save();

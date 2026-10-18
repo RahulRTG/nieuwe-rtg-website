@@ -68,15 +68,11 @@ module.exports = (kern) => {
      later terugvalt naar de gratis pas, hoort daar niet in te blijven staan
      omdat er een oude waarde in de database stond. De poort hangt aan het doel
      en niet aan wat de aanvrager eerder mocht (LAT-regel 7). */
-  function W() {
-    if (!db.data.wereld || typeof db.data.wereld !== 'object') db.data.wereld = { modus: {} };
-    if (!db.data.wereld.modus || typeof db.data.wereld.modus !== 'object') db.data.wereld.modus = {};
-    return db.data.wereld;
-  }
+  const wereldOpslag = require('../kern/wereld/opslag')({ db });
   function mijnModus(req) {
     // Lezen mag een lege installatie niet muteren: PostgreSQL weigert terecht
     // een leesroute die stil een collectie aanmaakt zonder opslagcommit.
-    const gekozen = db.data.wereld?.modus?.[req.session.key];
+    const gekozen = wereldOpslag.peil('modus')?.[req.session.key];
     return rechten.modusOpen(req.session.tier, gekozen) ? gekozen : 'alles';
   }
 
@@ -116,7 +112,7 @@ module.exports = (kern) => {
     const modus = String(req.body.modus || '');
     if (!rechten.modusOpen(req.session.tier, modus))
       return res.status(403).json({ error: 'Deze wereld hoort bij een andere pas.' });
-    W().modus[req.session.key] = modus;
+    wereldOpslag.tak('modus')[req.session.key] = modus;
     save();
     const saloon = req.body.saloon ? feed.saloon.zetVoorkeuren(req.session.key, req.body.saloon) : null;
     res.json({ ok: true, modus, saloon });

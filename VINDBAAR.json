@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-10-11T23:43:47.409Z",
-    "commit": "7d72d8fcb",
+    "op": "2026-10-18T14:24:13.914Z",
+    "commit": "6550a20c2",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 101,
-  "woorden": 1261,
-  "gevonden": 794,
-  "dekking": 0.6297,
+  "woorden": 1272,
+  "gevonden": 790,
+  "dekking": 0.6211,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -69,6 +69,45 @@
         "teamkamer",
         "oefen",
         "solo"
+      ]
+    },
+    {
+      "naam": "Mall",
+      "url": "/apps/mall.html",
+      "woorden": 54,
+      "gevonden": 23,
+      "mist": [
+        "komt",
+        "samengesteld",
+        "huizen",
+        "binnen",
+        "ervaringen",
+        "werkelijk",
+        "verschilt",
+        "gevonden",
+        "complete",
+        "bibliotheek",
+        "aantal",
+        "window",
+        "rtgglyf",
+        "svghtml",
+        "icon",
+        "klasse",
+        "glyf",
+        "label",
+        "dienstenplein",
+        "tussen",
+        "leveranciers",
+        "reisgidsen",
+        "lezen",
+        "kast",
+        "akkoord",
+        "vaste",
+        "afspraak",
+        "boeken",
+        "offerte",
+        "aanvragen",
+        "bestellen"
       ]
     },
     {
@@ -193,30 +232,6 @@
         "controle",
         "starten",
         "kijken"
-      ]
-    },
-    {
-      "naam": "Mall",
-      "url": "/apps/mall.html",
-      "woorden": 44,
-      "gevonden": 28,
-      "mist": [
-        "gevonden",
-        "complete",
-        "bibliotheek",
-        "aantal",
-        "window",
-        "rtgglyf",
-        "svghtml",
-        "icon",
-        "klasse",
-        "glyf",
-        "label",
-        "dienstenplein",
-        "tussen",
-        "leveranciers",
-        "bestellen",
-        "plaatsen"
       ]
     },
     {
@@ -570,8 +585,8 @@
     {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 22,
-      "gevonden": 16,
+      "woorden": 26,
+      "gevonden": 20,
       "mist": [
         "daarna",
         "externe",
@@ -783,8 +798,8 @@
     {
       "naam": "Muziek",
       "url": "/apps/muziek.html",
-      "woorden": 10,
-      "gevonden": 7,
+      "woorden": 9,
+      "gevonden": 6,
       "mist": [
         "geluid",
         "makers",
@@ -827,8 +842,8 @@
     {
       "naam": "Ontdekken",
       "url": "/apps/connect.html",
-      "woorden": 11,
-      "gevonden": 8,
+      "woorden": 10,
+      "gevonden": 7,
       "mist": [
         "hebt",
         "gedaan",
@@ -945,8 +960,8 @@
     {
       "naam": "Pulse",
       "url": "/apps/pulse.html",
-      "woorden": 6,
-      "gevonden": 5,
+      "woorden": 5,
+      "gevonden": 4,
       "mist": [
         "savedheading"
       ]

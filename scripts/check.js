@@ -5096,6 +5096,8 @@ console.log('\n62) een gecontracteerd domein raakt db.data alleen door zijn eige
       waarom: 'vijf schrijvers over vier lijsten; de deelbestanden vervingen een lijst buiten de accessor om' },
     { map: 'server/kern/plaats', deur: 'opslag.js',
       waarom: 'de deur stond er al; venster.js en waarnemen.js vervingen een lijst er nog langs, nu via zet()' },
+    { map: 'server/kern/commerce', deur: '../eigencollectie.js',
+      waarom: 'vier modules met elk precies een eigen collectie; de lichte vorm volstaat en regel 63 bewaakt het eigenaarschap' },
     { map: 'server/kern/command', deur: 'opslag.js',
       waarom: 'twaalf schrijvers; het eerste domein met vier soorten omgang (bezit, teller, gedeeld, vreemd)',
       ook: {

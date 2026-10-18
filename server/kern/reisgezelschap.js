@@ -101,7 +101,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
     if (!rec) return { status: 404, error: 'Geen openstaande uitnodiging.' };
     if (rec.stand !== 'gevraagd') return { status: 409, error: 'Deze uitnodiging is al afgehandeld.' };
     if (!ja) {
-      db.data.reisGezelschap = leden().filter(x => x !== rec); save();
+      eigen.zetBak('reisGezelschap', leden().filter(x => x !== rec)); save();
       return { status: 200, ok: true, stand: 'geweigerd' };
     }
     rec.stand = 'aanvaard'; rec.aanvaardOp = nu(); save();
@@ -114,7 +114,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   async function verwijder(key, id) {
     const rec = leden().find(x => x.id === id && (x.eigenaar === key || x.lid === key));
     if (!rec) return { status: 404, error: 'Niet gevonden.' };
-    db.data.reisGezelschap = leden().filter(x => x !== rec);
+    eigen.zetBak('reisGezelschap', leden().filter(x => x !== rec));
     // zijn opgave gaat mee: anders telt hij stil mee in een groepsvoorstel
     opgaven.wisVoorLid(rec.lid, rec.eigenaar, rec.reis);
     save();

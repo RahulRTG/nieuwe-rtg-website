@@ -15,4 +15,34 @@ const metInbegrepen = (r, pas, contractCredits) => {
   return r;
 };
 
-module.exports = { verseRij, metInbegrepen };
+const maandVan = t => new Date(t).toISOString().slice(0, 7);
+
+/* De rij van een houder (een lid op codenaam, of een zaak op code). Rolt bij
+   een nieuwe maand vanzelf om: verbruik is per maand, en een tegoed dat blijft
+   staan zou "inbegrepen per maand" tot een leugen maken. rijVan legt hem vast;
+   rijKijk rekent met een kopie of een vluchtige verse rij en schept niets
+   (test/leeszonderscheppen.test.js). */
+function maakRijen({ eigen, save, tijd }) {
+  function rijVan(houder, pas, contractCredits) {
+    const a = eigen.bak('aiTegoed');
+    const sleutel = String(houder || '');
+    const maand = maandVan(tijd());
+    let r = a[sleutel];
+    if (!r || r.maand !== maand) {
+      r = a[sleutel] = verseRij(sleutel, pas, maand, r);
+      save();
+    }
+    return metInbegrepen(r, pas, contractCredits);
+  }
+  function rijKijk(houder, pas, contractCredits) {
+    const a = eigen.kijk('aiTegoed');
+    const sleutel = String(houder || '');
+    const maand = maandVan(tijd());
+    const oud = a[sleutel];
+    const r = (oud && oud.maand === maand) ? Object.assign({}, oud) : verseRij(sleutel, pas, maand, oud);
+    return metInbegrepen(r, pas, contractCredits);
+  }
+  return { rijVan, rijKijk };
+}
+
+module.exports = { verseRij, metInbegrepen, maakRijen };

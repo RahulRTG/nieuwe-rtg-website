@@ -63,32 +63,9 @@ function maakTegoed({ db, save, nu }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/tegoed', bezit: { aiTegoed: 'kaart' } });
   const tijd = nu || klok.nu;
   const alles = () => eigen.bak('aiTegoed');
-  const maandVan = t => new Date(t).toISOString().slice(0, 7);
 
-  /* De rij van een houder (een lid op codenaam, of een zaak op code). Rolt bij
-     een nieuwe maand vanzelf om: verbruik is per maand, en een tegoed dat
-     blijft staan zou "inbegrepen per maand" tot een leugen maken. */
-  const { verseRij, metInbegrepen } = require('./tegoed/rij');
-  function rijVan(houder, pas, contractCredits) {
-    const a = alles();
-    const sleutel = String(houder || '');
-    const maand = maandVan(tijd());
-    let r = a[sleutel];
-    if (!r || r.maand !== maand) {
-      r = a[sleutel] = verseRij(sleutel, pas, maand, r);
-      save();
-    }
-    return metInbegrepen(r, pas, contractCredits);
-  }
-  // kijken zonder te scheppen: een blik rekent met een kopie of een vluchtige rij (test/leeszonderscheppen.test.js)
-  function rijKijk(houder, pas, contractCredits) {
-    const a = eigen.kijk('aiTegoed');
-    const sleutel = String(houder || '');
-    const maand = maandVan(tijd());
-    const oud = a[sleutel];
-    const r = (oud && oud.maand === maand) ? Object.assign({}, oud) : verseRij(sleutel, pas, maand, oud);
-    return metInbegrepen(r, pas, contractCredits);
-  }
+  /* De rij van een houder, schrijvend (rijVan) en kijkend (rijKijk): ./tegoed/rij.js. */
+  const { rijVan, rijKijk } = require('./tegoed/rij').maakRijen({ eigen, save, tijd });
 
   /* DE VRAAG DIE VOORAF WORDT GESTELD, en het antwoord komt uit
      ./tegoed/plafond.js -- zie daar waarom dat een eigen bestand is. */

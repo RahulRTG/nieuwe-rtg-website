@@ -23,7 +23,7 @@
     var h = '';
     if ((d.signalen || []).length) {
       h += '<div class="kaart"><div class="kop">Signalen</div>' + d.signalen.map(function (s) {
-        return '<p class="stil" style="margin:0.25rem 0;">&#9670; ' + esc(s.tekst) + '</p>';
+        return '<p class="stil s-kpqwcd">&#9670; ' + esc(s.tekst) + '</p>';
       }).join('') + '</div>';
     }
     h += '<div class="kaart"><div class="kop">Rooster en werkdruk per klas</div>' +
@@ -35,10 +35,10 @@
       '<p class="stil h-mt50">Alles op klasniveau; wie wat doet is aan de leraar en het gezin.</p></div>';
     h += '<div class="kaart"><div class="kop">Schoolbrede mededeling</div>' +
       '<p class="stil">Een keer schrijven, elke klas (en dus elk gezin) ziet hem, met de directie als afzender.</p>' +
-      '<div class="rij"><input class="veld" id="dpTekst" maxlength="400" placeholder="Bijv. vrijdag studiedag: de school is dicht" aria-label="Mededeling" style="flex:3;">' +
+      '<div class="rij"><input class="veld s-1dzu8du" id="dpTekst" maxlength="400" placeholder="Bijv. vrijdag studiedag: de school is dicht" aria-label="Mededeling">' +
       '<button class="knop p" id="dpStuur" type="button">Plaats in alle klassen</button></div>' +
       ((d.mededelingen || []).map(function (m) {
-        return '<p class="stil" style="margin:0.25rem 0 0;">' + esc((m.at || '').slice(0, 10)) + ' · ' + esc(m.tekst) + '</p>';
+        return '<p class="stil s-ini1ot">' + esc((m.at || '').slice(0, 10)) + ' · ' + esc(m.tekst) + '</p>';
       }).join('')) + '</div>';
     h += '<div class="rij h-mt60"><button class="knop" id="dpRapport" type="button">Schoolrapport (print)</button></div>';
     /* De escalatie van No-Lost-Child. Zonder naam en zonder tekst: dat is
@@ -111,12 +111,12 @@
       (d.kpi.wacht ? ' · ' + d.kpi.wacht + ' wachten op een besluit' : '') + '</p>' +
       '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">Per klas</h2>' +
       (d.klassen || []).map(function (k) {
-        return '<div style="border-bottom:1px solid #DEDBD5;padding:0.25rem 0;"><b>' + esc(k.naam) + '</b> · ' +
+        return '<div class="s-t99ri"><b>' + esc(k.naam) + '</b> · ' +
           k.leerlingen + ' leerlingen · ' + k.roosterRegels + ' roosterregels · ' + k.huiswerkWeek + ' opdrachten deze week · ' +
           k.openAbsenties + ' open ziekmelding(en)</div>';
       }).join('') +
       ((d.signalen || []).length ? '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">Signalen</h2>' +
-        d.signalen.map(function (s) { return '<div style="padding:0.2rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') : '') +
+        d.signalen.map(function (s) { return '<div class="s-yhw1rz">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') : '') +
       '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">Alles op klasniveau: geen leerlingnamen, geen cijfers, geen ranglijsten. Zo hoort een schoolrapport voor de organisatie eruit te zien.</p>' +
       '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script></body></html>';
     var b = new Blob([h], { type: 'text/html;charset=utf-8' });

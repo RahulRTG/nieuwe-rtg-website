@@ -51,7 +51,7 @@
         '<button id="geCNieuw" style="' + GOUD + 'flex:1;">' + T('ge.c.leg', 'Leg vast') + '</button></div>';
       h += (p.contracten || []).map(function (c) {
         return '<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">' +
-          '<b style="flex:1;font-size:0.84rem;">' + esc(c.huurder) + '</b><span class="sub">' + esc(c.verdiepingen || '') + ' · ' + eur(c.maandhuur) + '/mnd · t/m ' + esc(c.eind) + ' · ' + esc(c.status) + '</span>' +
+          '<b class="s-1q6jol6">' + esc(c.huurder) + '</b><span class="sub">' + esc(c.verdiepingen || '') + ' · ' + eur(c.maandhuur) + '/mnd · t/m ' + esc(c.eind) + ' · ' + esc(c.status) + '</span>' +
           (c.status === 'actief' ? '<button data-geverleng="' + c.id + '" style="' + STIL + '">' + T('ge.c.verleng', 'Verleng') + '</button>' +
             '<button data-gebeeindig="' + c.id + '" style="' + STIL + '">' + T('ge.c.stop', 'Beeindig') + '</button>' : '') + '</div>';
       }).join('') || '<p class="sub">' + T('ge.c.geen', 'Nog geen contracten vastgelegd.') + '</p>';
@@ -62,7 +62,7 @@
         '<button id="geLNieuw" style="' + GOUD + 'flex:1;">' + T('ge.l.leg', 'Voeg toe') + '</button></div>';
       h += (p.leads || []).map(function (l) {
         return '<div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:0.35rem 0;">' +
-          '<b style="flex:1;font-size:0.84rem;">' + esc(l.naam) + '</b><span class="sub">' + esc(l.wens || '') + ' · sinds ' + esc(l.sinds) + '</span>' +
+          '<b class="s-1q6jol6">' + esc(l.naam) + '</b><span class="sub">' + esc(l.wens || '') + ' · sinds ' + esc(l.sinds) + '</span>' +
           p.fasen.map(function (f) {
             return '<button data-gefase="' + l.id + ':' + f + '" style="' + STIL + (l.fase === f ? 'border-color:var(--gold);color:var(--txt);' : '') + '">' + f + '</button>';
           }).join('') + '</div>';

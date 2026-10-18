@@ -91,6 +91,17 @@ header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-16gpxl2:not(#_#_#_){color:var(--muted);margin-top:0.5rem;line-height:1.6}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <header>
@@ -421,7 +432,7 @@ async function toonSite(adres,pad){
   }
 }
 
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 class="s-14jo6ez">Log in op de leden-app</h2><p class="s-16gpxl2">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
 else {
   const start=new URLSearchParams(location.search).get('adres');
   if(start){ const p=parseAdres(start); ga(p.adres.length>=2?{adres:p.adres,pad:p.pad}:'start'); } else ga('start');

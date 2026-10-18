@@ -132,6 +132,16 @@
 <link href="/apps/muziek-heritage-kop.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-b4px2c:not(#_#_#_){text-transform:uppercase}
+</style>
 </head>
 <body class="rtg-stijl rtg-music-experience" data-rtg-world="living" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-edge-2-context="none" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -199,7 +209,7 @@
       <span class="samen-uit">Start dezelfde muziek, op hetzelfde moment, waar iedereen ook is.</span></div>
     <div class="samen-start" id="samenStart">
       <button type="button" id="samenMaak">Start samen</button>
-      <form id="samenMeeForm"><input id="samenCode" maxlength="48" autocomplete="off" placeholder="Deelcode" aria-label="Samen-code" style="text-transform:uppercase;"><button type="submit">Doe mee</button></form>
+      <form id="samenMeeForm"><input id="samenCode" maxlength="48" autocomplete="off" placeholder="Deelcode" aria-label="Samen-code" class="s-b4px2c"><button type="submit">Doe mee</button></form>
     </div>
     <div class="samen-in" id="samenIn" hidden>
       <span id="samenStatus"></span>

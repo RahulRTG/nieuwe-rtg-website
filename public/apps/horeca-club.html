@@ -32,6 +32,18 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12sbaw3:not(#_#_#_){flex:0 1 7rem}
+.s-12sckv5:not(#_#_#_){flex:0 1 9rem}
+.s-1trhhui:not(#_#_#_){flex:0 1 11rem}
+</style>
 </head>
 <body class="rtg-stijl" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -77,7 +89,7 @@
   <div class="kaart">
     <div class="kop">De deur</div>
     <div class="rij">
-      <input class="veld" id="dCapaciteit" type="number" min="1" max="20000" value="300" aria-label="Capaciteit" style="flex:0 1 7rem;">
+      <input class="veld s-12sbaw3" id="dCapaciteit" type="number" min="1" max="20000" value="300" aria-label="Capaciteit">
       <input class="i-12sa0x veld" id="dPersonen" type="number" min="1" max="50" value="1" aria-label="Aantal personen">
       <label class="stil"><input type="checkbox" id="dLeeftijd" checked> Leeftijd gecontroleerd</label>
       <button class="knop p" id="dIn" type="button">Naar binnen</button>
@@ -91,8 +103,8 @@
   <div class="kaart">
     <div class="kop">Gastenlijst en promoters</div>
     <div class="rij">
-      <input class="veld" id="dDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
-      <input class="veld" id="dPromoter" maxlength="40" placeholder="Promoter" aria-label="Promoter" style="flex:0 1 9rem;">
+      <input class="veld s-1trhhui" id="dDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
+      <input class="veld s-12sckv5" id="dPromoter" maxlength="40" placeholder="Promoter" aria-label="Promoter">
       <input class="i-12sa0x veld" id="dGastPersonen" type="number" min="1" max="20" value="1" aria-label="Personen per naam">
       <input class="i-12sbxv veld" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting">
       <button class="knop" id="dGastToon" type="button">Toon</button>

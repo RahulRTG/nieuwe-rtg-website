@@ -104,6 +104,22 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-16gpxl2:not(#_#_#_){color:var(--muted);margin-top:0.5rem;line-height:1.6}
+.s-1eltjr2:not(#_#_#_){color:var(--soft);font-size:.85rem}
+.s-1tgxa33:not(#_#_#_){width:100%;max-width:1080px}
+.s-uavf10:not(#_#_#_){font-size:.8rem;color:var(--soft);margin-top:0.75rem}
+.s-xmivqi:not(#_#_#_){margin-bottom:1.25rem}
+.s-ykf4ln:not(#_#_#_){gap:.5rem;margin:0.25rem 0 0.75rem;align-items:center}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -147,8 +163,8 @@
 </div>
 <div class="lint" id="versienoot" hidden></div>
 <main id="hoofd">
-  <div style="width:100%;max-width:1080px;">
-    <div class="tip" id="tip" style="margin-bottom:1.25rem;"><b>Begin hier.</b> Bouw je bedrijfssite met blokken: klik in de tekst om te typen, kies een accentkleur en beeld. Klaar? Klik op <b>Ga online</b> - dan krijgt je site een RTG-adres (bijv. jouwzaak.rtg) en staat hij in de RTG-browser, voor alle leden te bezoeken.</div>
+  <div class="s-1tgxa33">
+    <div class="tip s-xmivqi" id="tip"><b>Begin hier.</b> Bouw je bedrijfssite met blokken: klik in de tekst om te typen, kies een accentkleur en beeld. Klaar? Klik op <b>Ga online</b> - dan krijgt je site een RTG-adres (bijv. jouwzaak.rtg) en staat hij in de RTG-browser, voor alle leden te bezoeken.</div>
     <div class="doek" id="doek" data-thema="donker"></div>
   </div>
 </main>
@@ -159,7 +175,7 @@
 </div></div>
 <div class="sheet" id="beeldSheet"><div class="box">
   <h2>Kies beeld</h2><div class="sub">Kies een eigen RTG-campagnebeeld of upload je eigen foto (na een virusscan).</div>
-  <div class="rij" style="gap:.5rem;margin:0.25rem 0 0.75rem;align-items:center;">
+  <div class="rij s-ykf4ln">
     <button class="knop prim" id="uploadKnop" type="button">Upload eigen foto</button>
     <input type="file" id="fotoIn" accept="image/*" hidden>
     <span class="sub" id="uploadStatus" style="margin:0;"></span>
@@ -189,7 +205,7 @@
     <button class="knop online" id="publiceerKnop">Zet online</button>
     <button class="knop" id="offlineKnop" hidden>Uit de lucht halen</button>
   </div>
-  <div id="onlineNoot" style="font-size:.8rem;color:var(--soft);margin-top:0.75rem;"></div>
+  <div id="onlineNoot" class="s-uavf10"></div>
 </div></div>
 
 <div class="melding" id="melding" role="status"></div>
@@ -521,7 +537,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 async function openen(){
   $('#versievak').hidden=true;   // het sheet doet twee dingen; toon alleen wat je vroeg
   try{ const d=await api('mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
-    if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
+    if(!(d.lijst||[]).length){ l.innerHTML='<div class="s-1eltjr2">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
     (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
     laadSjablonen();
@@ -548,7 +564,7 @@ $('#terugKnop').addEventListener('click',async()=>{
     const d=await api('versies',{id:DESIGN.id});
     const lijst=d.lijst||[];
     l.textContent='';
-    if(!lijst.length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen eerdere versies. Vanaf je volgende bewaring staat de vorige stand hier.</div>'; }
+    if(!lijst.length){ l.innerHTML='<div class="s-1eltjr2">Nog geen eerdere versies. Vanaf je volgende bewaring staat de vorige stand hier.</div>'; }
     lijst.forEach(v=>{
       const r=document.createElement('div');r.className='lijstrij';
       const wanneer=String(v.op||'').replace('T',' ').slice(0,16);
@@ -614,7 +630,7 @@ async function offline(){
   catch(e){ meld(e.message); }
 }
 
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De Website-maker hoort bij je RTG-lidmaatschap. Open de leden-app en log in; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; $('#lint').hidden=true; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 class="s-14jo6ez">Log in op de leden-app</h2><p class="s-16gpxl2">De Website-maker hoort bij je RTG-lidmaatschap. Open de leden-app en log in; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; $('#lint').hidden=true; }
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
   laadMijnFotos().then(bouwBeeldgrid);

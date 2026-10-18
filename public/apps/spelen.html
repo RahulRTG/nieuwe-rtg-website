@@ -146,6 +146,25 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-13q23ax:not(#_#_#_){color:#C23A5E}
+.s-16vazqf:not(#_#_#_){text-align:center;margin:0.5rem 0 0.25rem;color:var(--zacht);font-size:.8rem}
+.s-1q4jpro:not(#_#_#_){width:100%;height:100%}
+.s-1ta0zs6:not(#_#_#_){color:var(--goud2)}
+.s-3vd53t:not(#_#_#_){cursor:pointer}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+.s-prn3gf:not(#_#_#_){font-size:1.3rem}
+.s-q9vs12:not(#_#_#_){flex-wrap:wrap}
+.s-sf8r03:not(#_#_#_){max-width:16rem;margin:0.5rem auto 0}
+.s-u28ben:not(#_#_#_){cursor:default;border-style:solid}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -231,7 +250,7 @@
       <div class="leeg" id="nProost" hidden style="padding:.3rem 0 0;">Proost is 18+: iedereen in het potje heeft een geverifieerde volwassen leeftijd nodig. Drink met mate; water doet ook gewoon mee.</div>
       <div class="leeg" id="nSeconden" hidden style="padding:.3rem 0 0;">30 Seconden speel je 2 tegen 2 (vier spelers): jij en speler 3 tegen speler 2 en 4. Omschrijven doe je via een belletje of aan tafel.</div>
       <button class="i-15bgfu knop" id="nStart">Nodig uit en start</button>
-      <div style="text-align:center;margin:0.5rem 0 0.25rem;color:var(--zacht);font-size:.8rem;">of</div>
+      <div class="s-16vazqf">of</div>
       <button class="i-186m9v knop grijs" id="nRandom">Random tegenstander</button>
       <div class="leeg" id="nFout"></div>
     </div>
@@ -263,7 +282,7 @@
       <div class="sec h-mt0">De tafel <small id="rZak"></small></div>
       <div id="rTafel"></div>
       <div class="sec">Jouw rek <small>(tik stenen aan en leg ze)</small></div>
-      <div class="rset" id="rRek" style="cursor:default;border-style:solid;"></div>
+      <div class="rset s-u28ben" id="rRek"></div>
       <div class="knoprij">
         <button class="knop" id="rNieuw">Leg als nieuw setje</button>
         <button class="knop" id="rSpeel">Klaar met leggen</button>
@@ -364,7 +383,7 @@
   <section id="vTetris" hidden>
     <div class="kop2"><h1>Tetris</h1><a class="terug" data-terug>← terug</a></div>
     <canvas class="bord" id="ttBord" width="260" height="520" style="max-width:16rem;margin:0 auto;"></canvas>
-    <div class="knoprij" style="max-width:16rem;margin:0.5rem auto 0;">
+    <div class="knoprij s-sf8r03">
       <button class="knop grijs" id="ttL">◀</button><button class="knop grijs" id="ttR">⟳</button>
       <button class="knop grijs" id="ttRe">▶</button><button class="knop grijs" id="ttD">▼</button>
     </div>
@@ -394,7 +413,7 @@
   <section id="vVlek" hidden>
     <div class="kop2"><h1>Vingerroulette</h1><a class="terug" data-terug>← terug</a></div>
     <div class="leeg" style="padding:0 0 .4rem;">Met z'n tweeën tot zessen om een telefoon: iedereen houdt een vinger op het vlak. Na drie tellen dooft er een vlek; die vinger verliest. Wie verliest doet de afwas, kiest het volgende spel, of wat jullie ook afspreken.</div>
-    <div class="vlekzone" id="vzZone"><canvas id="vzBord" style="width:100%;height:100%;"></canvas></div>
+    <div class="vlekzone" id="vzZone"><canvas id="vzBord" class="s-1q4jpro"></canvas></div>
     <div class="leeg" id="vzInfo" style="text-align:center;">Leg minstens twee vingers op het vlak.</div>
   </section>
 
@@ -604,7 +623,7 @@ async function laadLobby(){
   document.querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('antwoord',{id:b.dataset.nee, akkoord:false}); laadLobby(); }catch(e){ meld(e.message); } }));
   const p = d.potjes||[];
   $('#potjes').innerHTML = p.length ? p.map(x =>
-    '<div class="rij" style="cursor:pointer;" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
+    '<div class="rij s-3vd53t" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
     '<div class="nm">'+esc(x.naam)+(x.soort==='woord'?(x.taal==='en'?' ':' '):'')+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>'+x.spelers.map(esc).join(' · ')+' · '+
     (x.status==='klaar' ? (x.winnaar?''+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+klokBij(x)+'</small></div><span>→</span></div>').join('')
     : '<div class="leeg">Nog geen potjes. Kies hierboven een spel.</div>';
@@ -1104,7 +1123,7 @@ async function schKlik(veld){
 /* ---------- Pesten ---------- */
 const P_SYM = { H:'♥', R:'♦', K:'♣', S:'♠' };
 let pBoer = null; // gekozen boer die op een kleur wacht
-function pKaartHtml(k){ return k ? pRangVan(k)+'<span style="font-size:1.3rem;">'+P_SYM[k[0]]+'</span>' : ''; }
+function pKaartHtml(k){ return k ? pRangVan(k)+'<span class="s-prn3gf">'+P_SYM[k[0]]+'</span>' : ''; }
 function pRangVan(k){ return k.slice(1); }
 function tekenPesten(){
   const p = huidig, st = p.staat;
@@ -1122,7 +1141,7 @@ function tekenPesten(){
   $('#pPak').textContent = st.pak>0 ? 'Pak '+st.pak+' kaarten' : 'Pak een kaart';
   $('#pKleur').hidden = !pBoer;
   if (pBoer) $('#pKleur').innerHTML = Object.entries(P_SYM).map(([kl,sym]) =>
-    '<button type="button" class="chip" data-kl="'+kl+'" style="font-size:1.1rem;">'+sym+'</button>').join(''),
+    '<button type="button" class="chip s-prlthd" data-kl="'+kl+'">'+sym+'</button>').join(''),
     $('#pKleur').querySelectorAll('[data-kl]').forEach(b => b.addEventListener('click', ()=> pSpeel(pBoer, b.dataset.kl)));
 }
 async function pSpeel(kaart, kleur){
@@ -1257,7 +1276,7 @@ async function laadRanglijst(spel, sel){
     lijst.hidden = false;
     if (kop && kop.classList.contains('sec')) kop.hidden = false;
     lijst.innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
-      '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
+      '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b class="s-1ta0zs6">'+r.punten+'</b></div>').join('')
       : '<div class="leeg">Nog geen scores. Wees de eerste!</div>';
   }catch(e){}
 }
@@ -1472,7 +1491,7 @@ function tekenMagnaatEco(){
   const sinds = st.sinds;
   $('#ecSinds').innerHTML = !sinds || !sinds.regels.length ? '' :
     '<div class="sec">Afgelopen maand</div>' + sinds.regels.map(r => r.id === 'rood'
-      ? '<div class="rij"><div class="nm">Rood staan<small>rente over je negatieve kas</small></div><b style="color:#C23A5E;">' + ecGeld(-r.rente) + '</b></div>'
+      ? '<div class="rij"><div class="nm">Rood staan<small>rente over je negatieve kas</small></div><b class="s-13q23ax">' + ecGeld(-r.rente) + '</b></div>'
       /* Wat geen zaak is (een lening, een schade, de Foundation-afdracht) heeft
          geen bezetting en geen omzet: alleen een naam en wat het kostte. */
       : typeof r.bezetting !== 'number'
@@ -1489,7 +1508,7 @@ function tekenMagnaatEco(){
      reden dat een lange partij niet stilstaat (GAMEHALL.md 12.3). */
   $('#ecMijn').innerHTML = !st.vestigingen.length ? '<div class="leeg">Je hebt nog geen zaak. Open er hieronder een.</div>' :
     '<div class="sec">Jouw zaken</div>' + st.vestigingen.map(v =>
-      '<div class="rij" style="flex-wrap:wrap;"><div class="nm">' + esc(v.naam) +
+      '<div class="rij s-q9vs12"><div class="nm">' + esc(v.naam) +
       '<small>' + esc(v.kavelNaam) + ' · ' + v.omvang + ' · ' + v.personeel + ' medewerkers · staat ' +
       Math.round(v.onderhoud) + ' · naam ' + Math.round(v.reputatie) + ' · waarde ' + ecGeld(v.waarde) + '</small></div>' +
       '<div class="keuzerij" style="width:100%;">' +
@@ -1790,7 +1809,7 @@ async function suDagLaad(){
     : (d.bord||[]).length
       ? '<div class="sec">Uit jouw kring</div>' + d.bord.map(r =>
           '<div class="rij"><div class="nm">'+r.plaats+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')
-          +'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
+          +'</div><b class="s-1ta0zs6">'+r.punten+'</b></div>').join('')
       : '';
   $('#suDag').innerHTML = '<div class="leeg">'+esc(kop)+'</div>'
     + (d.ranglijst === false ? '' : '<div class="leeg">'+esc(veld)+'</div>')

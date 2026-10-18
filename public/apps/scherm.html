@@ -65,6 +65,17 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-194qh3n:not(#_#_#_){font-size:1.3rem;color:var(--rtg-leesgoud,var(--gold))}
+.s-b8zzye:not(#_#_#_){color:var(--oranje)}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -172,7 +183,7 @@
     return '<div class="kaart '+kl+'"><div class="bon"><b>'+esc(o.pickup || o.ref || '')+'</b><span class="tijd">'+m+"'</span></div>"+
       '<ul>'+items.map(it => '<li><span class="q">'+it.qty+'×</span><span>'+esc(it.name)+'</span></li>').join('')+'</ul>'+
       (o.table ? '<div class="meta">Tafel '+esc(o.table)+'</div>' : '')+
-      (o.allergyNote ? '<div class="meta" style="color:var(--oranje);">'+esc(o.allergyNote)+'</div>' : '')+'</div>';
+      (o.allergyNote ? '<div class="meta s-b8zzye">'+esc(o.allergyNote)+'</div>' : '')+'</div>';
   }
   function menuStation(id){ const m = (state.menu||[]).find(x => x.id === id); return m && m.station === 'bar' ? 'bar' : 'keuken'; }
   function lopende(){ return (state.orders||[]).filter(o => o.paid && !['klaar','geserveerd','geweigerd','terugbetaald','bezorgd','opgehaald'].includes(o.status)); }
@@ -200,7 +211,7 @@
   function gasten(){
     const rij = state.reserveringen || [];
     if (!rij.length) return leeg('Geen komende reserveringen.');
-    return rij.map(r => '<div class="rij"><span class="tijd" style="font-size:1.3rem;color:var(--rtg-leesgoud,var(--gold));">'+esc(r.tijd)+'</span>'+
+    return rij.map(r => '<div class="rij"><span class="tijd s-194qh3n">'+esc(r.tijd)+'</span>'+
       '<span class="rek">'+esc(r.codenaam || r.codename || 'Gast')+' · '+ (r.personen||r.people||2) +' pers.'+(r.notitie?' · '+esc(r.notitie):'')+'</span>'+
       '<span class="pill'+(r.status==='bevestigd'?' g':'')+'">'+esc(r.status)+'</span></div>').join('');
   }

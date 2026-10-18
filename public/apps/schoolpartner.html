@@ -92,6 +92,25 @@ body.rtg-stijl .kpi b.schoolgeld-samenvatting{font-size:1.05rem;}
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12sbaw3:not(#_#_#_){flex:0 1 7rem}
+.s-12sckv5:not(#_#_#_){flex:0 1 9rem}
+.s-1dzu8du:not(#_#_#_){flex:3}
+.s-1s5ggrl:not(#_#_#_){margin-bottom:.7rem}
+.s-1tri4u1:not(#_#_#_){flex:0 1 12rem}
+.s-9vyt3z:not(#_#_#_){margin:0.5rem 0}
+.s-ini1ot:not(#_#_#_){margin:0.25rem 0 0}
+.s-kpqwcd:not(#_#_#_){margin:0.25rem 0}
+.s-t99ri:not(#_#_#_){border-bottom:1px solid #DEDBD5;padding:0.25rem 0}
+.s-yhw1rz:not(#_#_#_){padding:0.2rem 0}
+</style>
 </head>
 <body class="rtg-stijl school-shell" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="school-kader">
@@ -241,7 +260,7 @@ body.rtg-stijl .kpi b.schoolgeld-samenvatting{font-size:1.05rem;}
         <div class="kop">Toets uit de leerlijn</div>
         <p class="stil">Vink leerdoelen aan, kies de vorm, klaar. Elke leerling krijgt verse opgaven; de motor kijkt na en het cijfervoorstel blijft een advies.</p>
         <div class="rij h-my50">
-          <select class="veld" id="tSoort" aria-label="Toetsvorm" style="flex:0 1 12rem;">
+          <select class="veld s-1tri4u1" id="tSoort" aria-label="Toetsvorm">
             <option value="so">SO</option><option value="proefwerk">Proefwerk</option>
             <option value="examen">Examen</option><option value="mo">MO (mondeling)</option>
           </select>
@@ -398,8 +417,8 @@ body.rtg-stijl .kpi b.schoolgeld-samenvatting{font-size:1.05rem;}
         <div class="rij h-my50">
           <input class="veld h-kolom10" id="afspraakDatum" type="date" aria-label="Datum">
           <input class="veld h-kolom8" id="afspraakTijd" type="time" aria-label="Begintijd">
-          <input class="veld" id="afspraakMinuten" type="number" min="5" max="60" step="5" value="10" aria-label="Minuten per gesprek" style="flex:0 1 7rem;">
-          <input class="veld" id="afspraakAantal" type="number" min="1" max="20" value="8" aria-label="Aantal momenten" style="flex:0 1 7rem;">
+          <input class="veld s-12sbaw3" id="afspraakMinuten" type="number" min="5" max="60" step="5" value="10" aria-label="Minuten per gesprek">
+          <input class="veld s-12sbaw3" id="afspraakAantal" type="number" min="1" max="20" value="8" aria-label="Aantal momenten">
           <input class="veld" id="afspraakPlek" maxlength="60" placeholder="Lokaal" aria-label="Plek">
           <button class="knop p" id="afspraakZet" type="button">Zet klaar</button>
         </div>

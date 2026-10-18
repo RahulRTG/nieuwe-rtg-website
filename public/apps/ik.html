@@ -133,6 +133,16 @@
 <script src="/shared/veiligheid.js" defer></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1n7e5wa:not(#_#_#_){text-transform:capitalize}
+</style>
 </head>
 <body class="rtg-stijl rtg-settings-page" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-layout="standard">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -520,7 +530,7 @@
       if (d.gebed) {
         h += '<h2 class="h-mt120">Gebedstijden</h2><p class="stil">' + Veilig.esc(d.gebed.methode) + '</p>' +
           ['fajr', 'zonsopgang', 'dhuhr', 'asr', 'maghrib', 'isha'].filter(k => d.gebed[k]).map(k =>
-            '<div class="rij"><span class="cn" style="text-transform:capitalize;">' + k + '</span><strong>' + lokaal(d.gebed[k]) + '</strong></div>').join('');
+            '<div class="rij"><span class="cn s-1n7e5wa">' + k + '</span><strong>' + lokaal(d.gebed[k]) + '</strong></div>').join('');
         if (d.gebed.waarschuwing) h += '<p class="stil h-mt50">' + Veilig.esc(d.gebed.waarschuwing) + '</p>';
       }
       if (d.qibla) h += '<h2 class="h-mt120">Richting van Mekka</h2>' +

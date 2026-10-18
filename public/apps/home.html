@@ -55,23 +55,42 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12itpbj:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold))}
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+.s-cd9ewb:not(#_#_#_){margin:.3rem 0 .6rem}
+.s-hfkoqo:not(#_#_#_){font-size:1.35rem}
+.s-m3b83:not(#_#_#_){margin-bottom:0.5rem}
+.s-oil8rv:not(#_#_#_){font-size:.95rem}
+.s-rykahu:not(#_#_#_){padding:1rem 0}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <a class="terug" href="/apps/wonen.html" aria-label="Terug naar mijn thuis">← Mijn thuis</a>
-  <div><div class="ey">Uw huis, één bediening</div><h1 style="font-size:1.35rem;">RTG Home Kit</h1></div>
+  <div><div class="ey">Uw huis, één bediening</div><h1 class="s-hfkoqo">RTG Home Kit</h1></div>
 </header>
 <main id="main" role="main">
   <p class="stil">Alle elektronica op één plek: lampen, klimaat, gordijnen, audio en meer, per kamer. Maak met Rahul complete scènes ("filmavond") en start ze met één tik. Sloten bedient u altijd zelf, los van scènes; dat is een vaste veiligheidsregel.</p>
 
   <div class="deel">Scènes</div>
-  <div class="kop2"><h2>✶ Scènes</h2><span class="n">één tik, heel het huis</span><button class="knop stil2" id="allesUit" style="margin-left:auto;">Alles uit</button></div>
+  <div class="kop2"><h2>✶ Scènes</h2><span class="n">één tik, heel het huis</span><button class="knop stil2 s-7myv37" id="allesUit">Alles uit</button></div>
   <div class="scenes" id="scenes"><span class="stil">Laden…</span></div>
   <div class="maker">
-    <b style="font-size:.95rem;">Nieuwe scène met Rahul</b>
-    <p class="stil" style="margin:.3rem 0 .6rem;">Vertel het moment; Rahul stelt de standen voor. U bekijkt, bewaart en start zelf.</p>
+    <b class="s-oil8rv">Nieuwe scène met Rahul</b>
+    <p class="stil s-cd9ewb">Vertel het moment; Rahul stelt de standen voor. U bekijkt, bewaart en start zelf.</p>
     <div class="rij rtg-duimeind">
-      <input class="veld" id="wens" maxlength="200" placeholder="Bijv. filmavond, rustige ochtend, iedereen weg…" style="flex:1;min-width:12rem;">
+      <input class="veld s-1cv8ghr" id="wens" maxlength="200" placeholder="Bijv. filmavond, rustige ochtend, iedereen weg…">
       <button class="knop" id="maak" data-hoofdactie>✶ Stel voor</button>
     </div>
     <div class="voorstel" id="voorstel" hidden></div>
@@ -79,11 +98,11 @@
 
   <div class="deel">Merken</div>
   <div class="kop2"><h2>Merken</h2><span class="n">werkt met RTG Home Kit · elk merk kan aansluiten</span></div>
-  <p class="stil" style="margin-bottom:0.5rem;">Verbind een merk en zijn apparaten verschijnen meteen in uw kamers en scènes. Ontkoppelen haalt ze net zo netjes weer weg. Elk RTG-partnermerk kan zich via de open koppelstandaard aanmelden.</p>
+  <p class="stil s-m3b83">Verbind een merk en zijn apparaten verschijnen meteen in uw kamers en scènes. Ontkoppelen haalt ze net zo netjes weer weg. Elk RTG-partnermerk kan zich via de open koppelstandaard aanmelden.</p>
   <div class="scenes" id="merken"><span class="stil">Laden…</span></div>
 
   <div class="deel">Kamers</div>
-  <div id="kamers"><p class="stil" style="padding:1rem 0;">De woning laadt…</p></div>
+  <div id="kamers"><p class="stil s-rykahu">De woning laadt…</p></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
@@ -96,7 +115,7 @@ const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'
   .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; });
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
+  $('#main').innerHTML = '<div class="inlog"><h2 class="s-14jo6ez">Log eerst in</h2>'+
     '<p class="stil h-mt60">De Home Kit hoort bij je RTG-account. Open de app en log in.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
@@ -133,7 +152,7 @@ async function laad(){
 function tekenMerken(){
   $('#merken').innerHTML = MERKEN.length ? MERKEN.map(m =>
     '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+RTGGlyf.tekst(m.icon)+' '+esc(m.naam)+
-    (m.partner?' <small style="color:var(--rtg-leesgoud,var(--gold));">partner</small>':'')+'</b>'+
+    (m.partner?' <small class="s-12itpbj">partner</small>':'')+'</b>'+
     '<small>'+esc(m.soort)+' · '+m.aantal+' apparaten · '+esc(m.uitleg)+'</small>'+
     '<div class="rij h-mt30">'+
     (m.verbonden ? '<button class="knop stil2 mlos" data-id="'+esc(m.id)+'">Ontkoppel</button>'
@@ -221,7 +240,7 @@ $('#maak').addEventListener('click', async () => {
     VOORSTEL = r.voorstel;
     const alle = HUIS.kamers.flatMap(k => k.apparaten);
     $('#voorstel').hidden = false;
-    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(lokaal basisvoorstel; met AI-koppeling bouwt Rahul het persoonlijk)</small>':'')+
+    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small class="s-1pv2lmv">(lokaal basisvoorstel; met AI-koppeling bouwt Rahul het persoonlijk)</small>':'')+
       '<p class="stil h-mt20">'+esc(VOORSTEL.uitleg)+'</p>'+
       '<ul>'+Object.entries(VOORSTEL.standen).map(([id,s]) => { const a = alle.find(x => x.id === id); return '<li>'+esc(a?a.naam:id)+': '+esc(JSON.stringify(s).replace(/[{}"]/g,'').replace(/,/g,', ').replace(/aan:true/,'aan').replace(/aan:false/,'uit'))+'</li>'; }).join('')+'</ul>'+
       '<div class="rij h-mt60"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';

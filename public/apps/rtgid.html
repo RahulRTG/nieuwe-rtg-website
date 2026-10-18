@@ -56,6 +56,17 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1ifdfke:not(#_#_#_){flex:2;text-transform:uppercase}
+.s-9vyt3z:not(#_#_#_){margin:0.5rem 0}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -71,12 +82,12 @@
     <p class="stil">Staat er een koppelcode op het scherm van een dienst? Voer die hier in. U ziet eerst welke dienst het is en welke gegevens die vraagt; pas na uw bevestiging gebeurt er iets. Bevestigen doet u met uw passkey &mdash; gezicht, vinger of pincode op dit toestel. Zo bewijst u dat u het bent en niet alleen dat u deze telefoon vasthoudt.</p>
     <form id="codeForm" class="rij">
       <input id="codeIn" maxlength="40" autocomplete="one-time-code" spellcheck="false"
-        placeholder="Koppelcode (ID.…)" aria-label="Koppelcode" style="flex:2;text-transform:uppercase;">
+        placeholder="Koppelcode (ID.…)" aria-label="Koppelcode" class="s-1ifdfke">
       <button class="knop vol hoofd" type="submit" data-hoofdactie>Zoek op</button>
     </form>
     <div id="koppelKaart" style="display:none;margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">
       <b class="groot" id="kDienst"></b>
-      <div id="kAttr" style="margin:0.5rem 0;"></div>
+      <div id="kAttr" class="s-9vyt3z"></div>
       <select id="kNamens" style="display:none;" aria-label="Inloggen als"></select>
       <p class="i-9ex6ps stil" id="kNiveau"></p>
       <p class="i-9ex6ps stil" id="kNiveauWeg" hidden><a href="/apps/verificatie.html">Uw identiteit laten zien &rsaquo;</a></p>

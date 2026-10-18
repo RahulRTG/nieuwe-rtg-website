@@ -53,13 +53,13 @@
 
   // de bank staat nog niet aan: eerlijk zeggen, en wijzen op wat wel werkt
   B.offline = function () {
-    return '<div class="kaart" style="text-align:center;padding:1.6rem;"><strong>Binnenkort</strong>' +
+    return '<div class="kaart s-1opwjnf"><strong>Binnenkort</strong>' +
       '<p class="stil h-mt50">RTG Rekening opent hier zodra RTG hem live zet. ' +
       'Je RTG Pay-wallet werkt gewoon door.</p></div>';
   };
 
   B.akkoordVraag = function () {
-    return '<div class="kaart" style="text-align:center;padding:1.6rem;"><strong>Open je RTG Rekening</strong>' +
+    return '<div class="kaart s-1opwjnf"><strong>Open je RTG Rekening</strong>' +
       '<p class="stil h-mt50">Je eigen rekening binnen RTG: een echt IBAN, met tegoedrente van ' +
       w.Geld.esc(String(B.ov.spaarrentePct)) + '%, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. ' +
       'Alle premium functies zijn inbegrepen, gratis. Heb je de Business Pass, dan komt je zakelijke rekening er ' +
@@ -89,8 +89,8 @@
         '<button class="knop bk-mini" data-bkaf="' + Geld.esc(r.iban) + '">Afschrift</button>' +
         '<button class="knop bk-mini" data-bkcsv="' + Geld.esc(r.iban) + '" title="Download het afschrift als CSV-bestand">CSV</button>' +
       '</div>' +
-      '<div class="bk-blad stil" data-bkblad="' + Geld.esc(r.iban) + '" hidden ' +
-        'style="flex-basis:100%;line-height:1.7;font-size:.78rem;"></div></div>';
+      '<div class="bk-blad stil s-1xp41ko" data-bkblad="' + Geld.esc(r.iban) + '" hidden ' +
+        '></div></div>';
   };
 
   // een regel van het financiele hart: omschrijving, bronlabel, datum, bedrag
@@ -118,7 +118,7 @@
     return '<p class="stil">' + Geld.esc(i.maand) + ' · ' + i.posten + ' posten · totaal ' +
       Geld.euro(i.uitgavenCenten) + '</p>' +
       (top.length ? top.map(function (s) {
-        return '<div style="margin-top:0.5rem;font-size:.78rem;">' + Geld.esc(s.soort) + ' · ' + Geld.euro(s.centen) +
+        return '<div class="s-v8b87u">' + Geld.esc(s.soort) + ' · ' + Geld.euro(s.centen) +
           '<div class="bk-staaf"><i style="width:' + Math.max(4, Math.round(100 * s.centen / max)) + '%;"></i></div></div>';
       }).join('') : '<p class="leeg">Nog geen uitgaven deze maand.</p>');
   };

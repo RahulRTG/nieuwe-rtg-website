@@ -1870,6 +1870,25 @@ try {
 <script src="/shared/rtg-communication-surface.js" defer></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-17xbfa6:not(#_#_#_){background:linear-gradient(135deg,#2A2724,#0C0C0B)}
+.s-1ajy4dw:not(#_#_#_){padding:1rem 1.1rem}
+.s-77nxhn:not(#_#_#_){font-size:0.66rem;color:var(--soft);margin:0.25rem 0}
+.s-7vwgh8:not(#_#_#_){font-size:0.6rem;color:var(--soft);line-height:1.5}
+.s-dpl4qm:not(#_#_#_){background:linear-gradient(135deg,#9E1C40,#4A0C1E)}
+.s-ml86rw:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.7rem;font-size:0.8rem;color:var(--soft)}
+.s-noy0gp:not(#_#_#_){padding-top:0.35rem}
+.s-v125gn:not(#_#_#_){background:linear-gradient(135deg,#F3EBDA,#E4CF9E)}
+.s-yqyuqh:not(#_#_#_){min-height:70px}
+.s-yr04pj:not(#_#_#_){min-height:90px}
+</style>
 </head>
 <!-- data-ios-home: dit IS de homescreen. shared/ios.js laat de balk en de
      home-indicator hier met rust -- het springboard heeft zijn eigen pill
@@ -1976,13 +1995,13 @@ try {
       </div>
       <div class="notif-list" id="notifList"></div>
       <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
-        <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
+        <button id="logoutBtn" class="s-ml86rw" data-i18n="app.logout">Uitloggen</button>
         <div class="privrij">
           <button id="privExport" class="privknop" data-i18n="app.priv.export">Download mijn gegevens</button>
           <button id="privDelete" class="privknop wis" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
         </div>
         <div class="privrij"><button id="privKoppel" class="privknop" data-i18n="app.priv.koppel">Mijn koppelingen</button></div>
-        <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
+        <div class="s-7vwgh8" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
       </div>
     </div>
     <div class="notif-scrim" id="notifScrim"></div>
@@ -2243,9 +2262,9 @@ try {
         <div class="os-cc-rij" id="osCcThema">
           <span class="os-cc-label" data-i18n="os.cc.thema">Thema</span>
           <div class="os-cc-knoppen os-cc-thema">
-            <button data-thema="parelmoer"><span class="os-thema-stip" style="background:linear-gradient(135deg,#F3EBDA,#E4CF9E)"></span><span data-i18n="os.cc.champagne">Champagne</span></button>
-            <button data-thema="standaard"><span class="os-thema-stip" style="background:linear-gradient(135deg,#2A2724,#0C0C0B)"></span><span data-i18n="os.cc.donker">Donker</span></button>
-            <button data-thema="bordeaux"><span class="os-thema-stip" style="background:linear-gradient(135deg,#9E1C40,#4A0C1E)"></span><span data-i18n="os.cc.bordeaux">Bordeaux</span></button>
+            <button data-thema="parelmoer"><span class="os-thema-stip s-v125gn"></span><span data-i18n="os.cc.champagne">Champagne</span></button>
+            <button data-thema="standaard"><span class="os-thema-stip s-17xbfa6"></span><span data-i18n="os.cc.donker">Donker</span></button>
+            <button data-thema="bordeaux"><span class="os-thema-stip s-dpl4qm"></span><span data-i18n="os.cc.bordeaux">Bordeaux</span></button>
           </div>
         </div>
         <div class="os-cc-rij">
@@ -2334,10 +2353,10 @@ try {
       <div class="field h-mt60"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
       <div class="field"><label data-i18n="cv.contact">Telefoon of e-mail</label><input id="cvContact"></div>
       <div class="field"><label data-i18n="cv.headline">Gewenste functie</label><input id="cvHeadline" placeholder="Bijv. Bediening of Receptie" data-i18n-ph="cv.headline.ph"></div>
-      <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" style="min-height:90px;" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
+      <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" class="s-yr04pj" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
       <div class="field"><label data-i18n="cv.skills">Vaardigheden (komma's)</label><input id="cvSkills" placeholder="wijnkennis, kassa, gastvrijheid" data-i18n-ph="cv.skills.ph"></div>
       <div class="field"><label data-i18n="cv.lang">Talen (komma's)</label><input id="cvLang" placeholder="Nederlands, Engels"></div>
-      <div class="field"><label data-i18n="cv.about">Over jou (kort)</label><textarea id="cvAbout" style="min-height:70px;"></textarea></div>
+      <div class="field"><label data-i18n="cv.about">Over jou (kort)</label><textarea id="cvAbout" class="s-yqyuqh"></textarea></div>
     </div>
     <div class="ms-foot"><button class="ms-order" id="cvSave" data-i18n="cv.save">Bewaar mijn cv</button></div>
   </div>
@@ -2377,7 +2396,7 @@ try {
       <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="pc-depts" id="pcDepts"></div>
-    <div class="pc-depts" id="pcAttn" style="padding-top:0.35rem;">
+    <div class="pc-depts s-noy0gp" id="pcAttn">
       <button data-attn="hulp"><span data-i18n="app.attn.roep">Roep de bediening</span></button>
       <button data-attn="rekening"><span data-i18n="app.attn.rekening">De rekening</span></button>
       <button data-attn="bestellen"><span data-i18n="app.attn.bestellen">Ik wil bestellen</span></button>
@@ -2425,7 +2444,7 @@ try {
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">
-      <div style="font-size:0.66rem;color:var(--soft);margin:0.25rem 0;" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
+      <div class="s-77nxhn" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
       <button class="ms-order" id="rideGo" data-i18n="ride.go">Vraag de rit aan</button>
     </div>
   </div>
@@ -2457,7 +2476,7 @@ try {
       <div><b>Rahul &amp; Rahul</b><span>Een gesprek over jullie dag &middot; <span id="kletsNaam"></span></span></div>
       <button class="ms-close" id="kletsClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ms-body" id="kletsBody" style="padding:1rem 1.1rem;"></div>
+    <div class="ms-body s-1ajy4dw" id="kletsBody"></div>
   </div>
 
   <!-- salon-post delen met een connectie -->
@@ -2467,7 +2486,7 @@ try {
       <div><b data-i18n="sal.share.h">Deel met een connectie</b></div>
       <button class="ms-close" id="shareClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ms-body" id="shareList" style="padding:1rem 1.1rem;"></div>
+    <div class="ms-body s-1ajy4dw" id="shareList"></div>
   </div>
 
   <!-- inkomende oproep -->

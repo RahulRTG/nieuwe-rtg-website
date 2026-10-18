@@ -73,6 +73,37 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1doalxl:not(#_#_#_){font-size:.75rem;max-width:9.5rem}
+.s-1emfcyx:not(#_#_#_){font-size:.7rem;padding:.15rem .5rem}
+.s-1fagvrr:not(#_#_#_){max-width:9.5rem}
+.s-1q9bgge:not(#_#_#_){font-size:.72rem;padding:.2rem .55rem}
+.s-1v3cm68:not(#_#_#_){max-width:7rem}
+.s-1v3d95r:not(#_#_#_){max-width:8rem}
+.s-1v3dw5a:not(#_#_#_){max-width:9rem}
+.s-1vkfgzy:not(#_#_#_){font-family:monospace;font-size:1.15rem}
+.s-1y7zeks:not(#_#_#_){font-size:.75rem;max-width:10rem}
+.s-1y80oju:not(#_#_#_){font-size:.75rem;max-width:12rem}
+.s-2h33ho:not(#_#_#_){max-width:9rem;font-size:.75rem;padding:.2rem .4rem}
+.s-956tyo:not(#_#_#_){font-size:.75rem;max-width:9rem}
+.s-hdxayl:not(#_#_#_){font-size:1.05rem}
+.s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
+.s-jv4uwu:not(#_#_#_){max-width:10rem}
+.s-jv5hwd:not(#_#_#_){max-width:11rem}
+.s-jv64vw:not(#_#_#_){max-width:12rem}
+.s-jv6rvf:not(#_#_#_){max-width:13rem}
+.s-jv8ou0:not(#_#_#_){max-width:16rem}
+.s-l5bsco:not(#_#_#_){justify-content:space-between;align-items:start}
+.s-ohjkjq:not(#_#_#_){font-size:.78rem}
+.s-prmggw:not(#_#_#_){font-size:1.2rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -82,7 +113,7 @@
 </header>
 <main id="main">
   <div class="rij">
-    <select class="veld" id="labKies" style="max-width:16rem;" aria-label="Kies een Living Lab"></select>
+    <select class="veld s-jv8ou0" id="labKies" aria-label="Kies een Living Lab"></select>
     <button class="knop stil" id="labNieuw" type="button">+ Nieuw lab</button>
   </div>
 
@@ -100,7 +131,7 @@
   <div class="deel">Nieuw onderzoek</div>
   <div class="kaart">
     <div class="rij">
-      <select class="veld" id="nSoort" style="max-width:13rem;" aria-label="Projectsoort"></select>
+      <select class="veld s-jv6rvf" id="nSoort" aria-label="Projectsoort"></select>
       <input class="veld" id="nTitel" placeholder="Titel (bijv. Buurttuin en eenzaamheid)" maxlength="120">
     </div>
     <div class="rij h-mt40">

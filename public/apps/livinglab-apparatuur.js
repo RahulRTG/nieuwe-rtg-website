@@ -32,11 +32,11 @@
           'weet een experiment achteraf ook waarmee en met welke kalibratie het is uitgevoerd.</div>') +
         '<div class="rij h-mt50">' +
           '<input class="veld" data-anaam placeholder="Naam (bijv. Regensensor RS-4)" maxlength="100">' +
-          '<select class="veld" data-asoort aria-label="Soort" style="max-width:10rem;">' +
+          '<select class="veld s-jv4uwu" data-asoort aria-label="Soort">' +
             (r.soorten || []).map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join('') +
           '</select>' +
-          '<input class="veld" data-aplek placeholder="Plek" maxlength="100" style="max-width:9rem;">' +
-          '<input class="veld" data-ageldig type="number" min="0" placeholder="kalibratie geldig (mnd)" style="max-width:11rem;">' +
+          '<input class="veld s-1v3dw5a" data-aplek placeholder="Plek" maxlength="100">' +
+          '<input class="veld s-jv5hwd" data-ageldig type="number" min="0" placeholder="kalibratie geldig (mnd)">' +
           '<button class="knop" data-abij type="button">Registreer</button></div>' +
         '<div class="leeg">Laat de kalibratietermijn op 0 als ijken hier niet van toepassing is ' +
         '(een werkbank kalibreer je niet). Dat is iets anders dan "verlopen".</div>';
@@ -60,26 +60,26 @@
       (storing.length ? '<br><span class="pil let">storing: ' + esc(storing[0].wat) + '</span>' : '') +
 
       '<div class="rij h-mt30">' +
-        '<input class="veld" data-abwie placeholder="bevoegd maken: naam" style="font-size:.75rem;max-width:10rem;">' +
-        '<input class="veld" data-abtot type="date" style="font-size:.75rem;max-width:9.5rem;" aria-label="bevoegd tot">' +
-        '<button class="knop stil" data-abzet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Bevoegd</button>' +
+        '<input class="veld s-1y7zeks" data-abwie placeholder="bevoegd maken: naam">' +
+        '<input class="veld s-1doalxl" data-abtot type="date" aria-label="bevoegd tot">' +
+        '<button class="knop stil s-1emfcyx" data-abzet type="button">Bevoegd</button>' +
       '</div>' +
       '<div class="rij h-mt30">' +
-        '<input class="veld" data-akdoor placeholder="kalibratie door" style="font-size:.75rem;max-width:9rem;">' +
-        '<input class="veld" data-akstand placeholder="gemeten afwijking" style="font-size:.75rem;max-width:9rem;">' +
-        '<button class="knop stil" data-akzet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Gekalibreerd</button>' +
+        '<input class="veld s-956tyo" data-akdoor placeholder="kalibratie door">' +
+        '<input class="veld s-956tyo" data-akstand placeholder="gemeten afwijking">' +
+        '<button class="knop stil s-1emfcyx" data-akzet type="button">Gekalibreerd</button>' +
         (storing.length
-          ? '<button class="knop stil" data-aopzet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Storing opgelost</button>'
-          : '<input class="veld" data-astoring placeholder="storing melden" style="font-size:.75rem;max-width:10rem;">' +
-            '<button class="knop stil" data-aszet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Meld storing</button>') +
+          ? '<button class="knop stil s-1emfcyx" data-aopzet type="button">Storing opgelost</button>'
+          : '<input class="veld s-1y7zeks" data-astoring placeholder="storing melden">' +
+            '<button class="knop stil s-1emfcyx" data-aszet type="button">Meld storing</button>') +
       '</div>' +
       /* Uitgifte staat los van reserveren: een gereserveerde laptop die nog in
          de kast ligt is iets anders dan een laptop die iemand meenam. */
       '<div class="rij h-mt30">' +
         (x.uit
-          ? '<button class="knop stil" data-aterug type="button" style="font-size:.7rem;padding:.15rem .5rem;">Ingenomen</button>'
-          : '<input class="veld" data-auitaan placeholder="uitgeven aan" style="font-size:.75rem;max-width:9rem;">' +
-            '<button class="knop stil" data-auit type="button" style="font-size:.7rem;padding:.15rem .5rem;">Geef uit</button>') +
+          ? '<button class="knop stil s-1emfcyx" data-aterug type="button">Ingenomen</button>'
+          : '<input class="veld s-956tyo" data-auitaan placeholder="uitgeven aan">' +
+            '<button class="knop stil s-1emfcyx" data-auit type="button">Geef uit</button>') +
       '</div></div>';
   }
 

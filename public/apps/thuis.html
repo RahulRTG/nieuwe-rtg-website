@@ -89,6 +89,42 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10sogmv:not(#_#_#_){font-size:.78rem;color:var(--muted);margin-top:0.5rem}
+.s-12itpbj:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold))}
+.s-15q3hty:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6;max-width:62ch}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-186q83d:not(#_#_#_){width:5rem}
+.s-186ss1h:not(#_#_#_){width:9rem}
+.s-1kmj6k3:not(#_#_#_){width:4.5rem}
+.s-1lkmfch:not(#_#_#_){width:6.5rem}
+.s-1oe4h5s:not(#_#_#_){font-size:.76rem;color:var(--soft);margin-top:0.5rem}
+.s-1pq1x4a:not(#_#_#_){font-size:.84rem;color:var(--muted);line-height:1.6}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-3heyfw:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold)}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+.s-7sxdsj:not(#_#_#_){border-radius:0;height:150px}
+.s-8jjrhu:not(#_#_#_){border-top:1px solid var(--line)}
+.s-9vyt3z:not(#_#_#_){margin:0.5rem 0}
+.s-dkemdj:not(#_#_#_){text-align:right}
+.s-gidsbo:not(#_#_#_){font-size:1rem}
+.s-gwsvc9:not(#_#_#_){width:100%;margin-top:1.25rem}
+.s-k1k2gk:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem}
+.s-k445d1:not(#_#_#_){width:12rem}
+.s-k45fc3:not(#_#_#_){width:14rem}
+.s-l7mhk8:not(#_#_#_){font-size:.82rem;color:var(--muted);line-height:1.6}
+.s-pa7a64:not(#_#_#_){font-size:.76rem;color:var(--soft);margin-top:0.25rem}
+.s-popvjv:not(#_#_#_){color:var(--burgundy)}
+.s-prn3gf:not(#_#_#_){font-size:1.3rem}
+.s-wafi2m:not(#_#_#_){font-size:.78rem;color:var(--soft);margin-top:0.25rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -106,15 +142,15 @@
   <div><div class="ey">Thuisverhuur van lid aan lid</div><h1>RTG Thuis</h1></div>
 </header>
 <main>
-  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:62ch;">Logeren bij leden, wereldwijd. Alle premium functies inbegrepen -- 0% servicekosten, keyless check-in, superhosts, AI-prijsadvies -- en bij elke boeking krijg je automatisch alle reisregels van het land.</p>
+  <p class="s-15q3hty">Logeren bij leden, wereldwijd. Alle premium functies inbegrepen -- 0% servicekosten, keyless check-in, superhosts, AI-prijsadvies -- en bij elke boeking krijg je automatisch alle reisregels van het land.</p>
   <div class="tabs"><button id="tabZoek" class="aan">Zoeken</button><button id="tabReizen">Mijn reizen</button><button id="tabHost">Host</button></div>
 
   <section id="secZoek">
     <div class="rij h-mt100">
-      <span><span class="lbl">Waarheen</span><input class="veld" id="zPlaats" placeholder="Plaats, land of titel" style="width:12rem;"></span>
+      <span><span class="lbl">Waarheen</span><input class="veld s-k445d1" id="zPlaats" placeholder="Plaats, land of titel"></span>
       <span><label class="lbl" for="zVan">Aankomst</label><input class="veld" id="zVan" type="date"></span>
       <span><label class="lbl" for="zTot">Vertrek</label><input class="veld" id="zTot" type="date"></span>
-      <span><label class="lbl" for="zGasten">Gasten</label><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
+      <span><label class="lbl" for="zGasten">Gasten</label><input class="veld s-1kmj6k3" id="zGasten" type="number" min="1" max="20" value="2"></span>
       <label class="i-11uf7p"><input type="checkbox" id="zInstant"> Instant boeken</label>
       <button class="knop" id="zGo" data-hoofdactie>Zoek</button>
     </div>
@@ -137,11 +173,11 @@
     <div class="sec">Zet je huis op RTG Thuis</div>
     <div class="kaart">
       <div class="rij">
-        <span><span class="lbl">Titel</span><input class="veld" id="nTitel" placeholder="Bijv. Finca met zeezicht" style="width:14rem;"></span>
-        <span><span class="lbl">Plaats</span><input class="veld" id="nPlaats" placeholder="Bijv. Ibiza" style="width:9rem;"></span>
+        <span><span class="lbl">Titel</span><input class="veld s-k45fc3" id="nTitel" placeholder="Bijv. Finca met zeezicht"></span>
+        <span><span class="lbl">Plaats</span><input class="veld s-186ss1h" id="nPlaats" placeholder="Bijv. Ibiza"></span>
         <span><span class="lbl">Type</span><select class="veld" id="nType"></select></span>
-        <span><span class="lbl">Prijs/nacht (€)</span><input class="veld" id="nPrijs" type="number" min="1" value="120" style="width:6.5rem;"></span>
-        <span><span class="lbl">Max gasten</span><input class="veld" id="nGasten" type="number" min="1" max="20" value="4" style="width:5rem;"></span>
+        <span><span class="lbl">Prijs/nacht (€)</span><input class="veld s-1lkmfch" id="nPrijs" type="number" min="1" value="120"></span>
+        <span><span class="lbl">Max gasten</span><input class="veld s-186q83d" id="nGasten" type="number" min="1" max="20" value="4"></span>
       </div>
       <div class="rij h-mt70">
         <span><span class="lbl">Schoonmaak (€)</span><input class="i-186qv2 veld" id="nSchoon" type="number" min="0" value="0"></span>
@@ -151,7 +187,7 @@
         <label class="i-11uf7p"><input type="checkbox" id="nKeyless" checked> Keyless deurcode</label>
         <button class="knop" id="nZet">Zet live</button>
       </div>
-      <div style="font-size:.76rem;color:var(--soft);margin-top:0.5rem;">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Rekening. Host en gast kennen elkaar als codenaam.</div>
+      <div class="s-1oe4h5s">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Rekening. Host en gast kennen elkaar als codenaam.</div>
     </div>
   </section>
 </main>
@@ -159,8 +195,8 @@
 <section class="blad" id="blad" aria-label="Huis bekijken">
   <div class="blad-kop">
     <button class="terug" id="bladTerug">← Terug</button>
-    <div><div class="ey" id="bMeta"></div><h1 id="bTitel" style="font-size:1.3rem;"></h1></div>
-    <button class="terug" id="bWens" style="margin-left:auto;">♥</button>
+    <div><div class="ey" id="bMeta"></div><h1 id="bTitel" class="s-prn3gf"></h1></div>
+    <button class="terug s-7myv37" id="bWens">♥</button>
   </div>
   <div class="paneel" id="bInhoud"></div>
 </section>
@@ -247,37 +283,37 @@ async function openHuis(id){
     const p = HUIDIG.prijsopbouw;
     const w = HUIDIG.reiswijzer;
     $('#bInhoud').innerHTML =
-      '<div class="beeld v'+(HUIDIG.visual||0)+'" style="border-radius:0;height:150px;"></div>'+
-      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
+      '<div class="beeld v'+(HUIDIG.visual||0)+' s-7sxdsj"></div>'+
+      '<p class="s-k1k2gk">'+esc(HUIDIG.beschrijving||'')+'</p>'+
       '<div class="h-mt40">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
         '<span class="chip">'+HUIDIG.slaapkamers+' slaapkamers</span><span class="chip">'+HUIDIG.bedden+' bedden</span><span class="chip">'+HUIDIG.badkamers+' badkamers</span>'+
-        (HUIDIG.keyless?'<span class="chip" style="color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
-      '<div class="kaart"><h3 style="font-size:1rem;">Prijs</h3>'+
+        (HUIDIG.keyless?'<span class="chip s-3heyfw">keyless check-in</span>':'')+'</div>'+
+      '<div class="kaart"><h3 class="s-gidsbo">Prijs</h3>'+
         (p ? '<div class="r"><span class="k">'+p.nachten+' nachten × '+euro(p.perNacht)+'</span><span>'+euro(p.basis)+'</span></div>'+
           (p.korting ? '<div class="r"><span class="k">Korting ('+p.kortingPct+'%)</span><span>− '+euro(p.korting)+'</span></div>' : '')+
           (p.schoonmaak ? '<div class="r"><span class="k">Schoonmaak</span><span>'+euro(p.schoonmaak)+'</span></div>' : '')+
-          '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--rtg-leesgoud,var(--gold));">'+euro(0)+'</span></div>'+
+          '<div class="r"><span class="k">Servicekosten</span><span class="s-12itpbj">'+euro(0)+'</span></div>'+
           (p.zakelijk && p.btw ? '<div class="r"><span class="k">Logies-btw ('+p.btwPct+'%)</span><span>'+euro(p.btw)+'</span></div>' : '')+
-          '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+euro(p.totaal)+'</b></div>'+
+          '<div class="r s-8jjrhu"><span><b>Totaal</b></span><b class="s-12itpbj">'+euro(p.totaal)+'</b></div>'+
           (p.borg ? '<div class="r"><span class="k">Borg (apart, terug na verblijf)</span><span>'+euro(p.borg)+'</span></div>' : '')+
-          '<div style="font-size:.76rem;color:var(--soft);margin-top:0.25rem;">'+esc(p.serviceTekst)+
+          '<div class="s-pa7a64">'+esc(p.serviceTekst)+
             (p.langverblijf ? ' ' + esc(p.langverblijf.tekst) : '')+
             (p.zakelijk ? ' ' + esc(p.btwTekst || '') + (p.opFactuur ? ' Deze zaak kan op factuur werken; geef bij het boeken een kostenplaats mee.' : '') : '')+'</div>'
         : '<div class="leeg">Kies eerst datums in de zoekbalk voor de volledige prijsopbouw.</div>')+
-        '<div style="font-size:.78rem;color:var(--muted);margin-top:0.5rem;">'+esc(HUIDIG.annuleringTekst||'')+'</div></div>'+
-      (w ? '<div class="kaart"><h3 style="font-size:1rem;">Alle regels van '+esc(w.naam)+'</h3>'+
+        '<div class="s-10sogmv">'+esc(HUIDIG.annuleringTekst||'')+'</div></div>'+
+      (w ? '<div class="kaart"><h3 class="s-gidsbo">Alle regels van '+esc(w.naam)+'</h3>'+
         '<div class="r"><span class="k">Visum</span><span>'+esc(w.visum.tekst)+'</span></div>'+
         '<div class="r"><span class="k">Verkeer</span><span>'+esc(w.rijden)+' rijden · alarm '+esc(w.alarm)+'</span></div>'+
         '<div class="r"><span class="k">Kraanwater</span><span>'+esc(w.waterTekst)+'</span></div>'+
         '<div class="r"><span class="k">Fooi</span><span>'+esc(w.fooi)+'</span></div>'+
-        (w.letOp ? '<div class="r"><span class="k">Let op</span><span style="color:var(--burgundy);">'+esc(w.letOp)+'</span></div>' : '')+'</div>' : '')+
-      '<div class="kaart" id="bReviews"><h3 style="font-size:1rem;">Reviews</h3><div class="leeg">Laden…</div></div>'+
-      (HUIDIG.huisregels ? '<div class="kaart"><h3 style="font-size:1rem;">Huisregels</h3><p style="font-size:.84rem;color:var(--muted);line-height:1.6;">'+esc(HUIDIG.huisregels)+'</p></div>' : '')+
+        (w.letOp ? '<div class="r"><span class="k">Let op</span><span class="s-popvjv">'+esc(w.letOp)+'</span></div>' : '')+'</div>' : '')+
+      '<div class="kaart" id="bReviews"><h3 class="s-gidsbo">Reviews</h3><div class="leeg">Laden…</div></div>'+
+      (HUIDIG.huisregels ? '<div class="kaart"><h3 class="s-gidsbo">Huisregels</h3><p class="s-1pq1x4a">'+esc(HUIDIG.huisregels)+'</p></div>' : '')+
       ((HUIDIG.prijsopbouw && HUIDIG.prijsopbouw.opFactuur) ?
-        '<div class="kaart"><h3 style="font-size:1rem;">Zakelijk boeken</h3>'+
-        '<p style="font-size:.82rem;color:var(--muted);line-height:1.6;">Deze zaak verhuurt beroepsmatig en kan op factuur werken. Geef een kostenplaats mee, dan staat die op de boeking en op de factuur.</p>'+
-        '<input class="veld" id="bKost" placeholder="Kostenplaats of projectcode (optioneel)" maxlength="40" style="width:100%;"></div>' : '')+
-      '<button class="knop" id="bBoek" style="width:100%;margin-top:1.25rem;">'+(HUIDIG.instant?'Boek direct':'Vraag aan bij de host')+'</button>';
+        '<div class="kaart"><h3 class="s-gidsbo">Zakelijk boeken</h3>'+
+        '<p class="s-l7mhk8">Deze zaak verhuurt beroepsmatig en kan op factuur werken. Geef een kostenplaats mee, dan staat die op de boeking en op de factuur.</p>'+
+        '<input class="veld s-186m9vs" id="bKost" placeholder="Kostenplaats of projectcode (optioneel)" maxlength="40"></div>' : '')+
+      '<button class="knop s-gwsvc9" id="bBoek">'+(HUIDIG.instant?'Boek direct':'Vraag aan bij de host')+'</button>';
     $('#blad').classList.add('open');
     $('#bBoek').addEventListener('click', boek);
     laadReviews(HUIDIG.id);
@@ -287,7 +323,7 @@ async function laadReviews(id){
   try {
     const d = await api('reviews', { id });
     $('#bReviews').innerHTML = '<h3 style="font-size:1rem;">Reviews'+(d.rating.sterren?' · ★ '+d.rating.sterren+' ('+d.rating.aantal+')':'')+'</h3>'+
-      (d.reviews.length ? d.reviews.map(r=>'<div class="r"><span class="k">'+esc(r.door)+' · ★ '+r.sterren+'</span><span style="text-align:right;">'+esc(r.tekst||'')+'</span></div>').join('') : '<div class="leeg">Nog geen reviews.</div>');
+      (d.reviews.length ? d.reviews.map(r=>'<div class="r"><span class="k">'+esc(r.door)+' · ★ '+r.sterren+'</span><span class="s-dkemdj">'+esc(r.tekst||'')+'</span></div>').join('') : '<div class="leeg">Nog geen reviews.</div>');
   } catch(e){}
 }
 async function boek(){
@@ -314,8 +350,8 @@ async function laadReizen(){
     REIZEN = d.reizen;
     $('#rUit').innerHTML = d.reizen.length ? d.reizen.map(b =>
       '<div class="boeking"><div class="st">'+esc(b.status)+'</div><b>'+esc(b.titel)+'</b> · '+esc(b.plaats)+'<br>'+
-      '<span style="color:var(--soft);">'+esc(b.van)+' tot '+esc(b.tot)+' · '+b.gasten+' gasten · '+euro(b.prijsopbouw.totaal)+' · host '+esc(b.host)+'</span>'+
-      (b.deurcode ? '<div style="margin:0.5rem 0;">Deurcode: <span class="deur">'+esc(b.deurcode)+'</span></div>' : '')+
+      '<span class="s-1pv2lmv">'+esc(b.van)+' tot '+esc(b.tot)+' · '+b.gasten+' gasten · '+euro(b.prijsopbouw.totaal)+' · host '+esc(b.host)+'</span>'+
+      (b.deurcode ? '<div class="s-9vyt3z">Deurcode: <span class="deur">'+esc(b.deurcode)+'</span></div>' : '')+
       '<div class="rij h-mt40">'+
         (b.status==='bevestigd' ? '<button class="knop stil" data-doe="checkin" data-ref="'+esc(b.ref)+'">Check-in</button>' : '')+
         (b.status==='ingecheckt' ? '<button class="knop stil" data-doe="checkuit" data-ref="'+esc(b.ref)+'">Check-uit</button>' : '')+
@@ -377,7 +413,7 @@ async function laadHuizen(){
       '<button class="knop stil" data-advies="'+esc(h.id)+'">AI-prijsadvies</button>'+
       '<button class="knop stil" data-blok="'+esc(h.id)+'">Blokkeer datums</button>'+
       '<button class="knop stil" data-cohost="'+esc(h.id)+'">Co-host</button></div>'+
-      '<div style="font-size:.78rem;color:var(--soft);margin-top:0.25rem;" data-uit="'+esc(h.id)+'"></div></div>').join('') : '<div class="leeg">Nog geen huizen. Zet er hieronder een live.</div>';
+      '<div class="s-wafi2m" data-uit="'+esc(h.id)+'"></div></div>').join('') : '<div class="leeg">Nog geen huizen. Zet er hieronder een live.</div>';
     $('#hHuizen').querySelectorAll('[data-advies]').forEach(b => b.addEventListener('click', async () => {
       try { const d2 = await api('prijsadvies', { id: b.dataset.advies });
         document.querySelector('[data-uit="'+b.dataset.advies+'"]').textContent = 'Advies: ' + euro(d2.advies) + '/nacht (nu ' + euro(d2.huidig) + ', bezetting ' + d2.bezettingPct + '%). ' + d2.uitleg;

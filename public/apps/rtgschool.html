@@ -74,6 +74,17 @@ body.rtg-stijl .sec.school-leer-anders{margin:0;}
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1poh6kx:not(#_#_#_){color:var(--gold)}
+.s-prmggw:not(#_#_#_){font-size:1.2rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -173,9 +184,9 @@ const api = (pad, body) => fetch(pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="kaart"><h2 style="font-size:1.2rem;">Log eerst in</h2>'+
+  $('#main').innerHTML = '<div class="kaart"><h2 class="s-prmggw">Log eerst in</h2>'+
     '<p class="leeg">RTG School hoort bij je RTG-account: je leerpaspoort gaat een leven lang met je mee. Open de app en log in.</p>'+
-    '<p class="h-mt60"><a href="/apps/app.html" style="color:var(--gold);">Naar de app &rarr;</a></p></div>';
+    '<p class="h-mt60"><a href="/apps/app.html" class="s-1poh6kx">Naar de app &rarr;</a></p></div>';
 } else if (window.RTGSchool) { RTGSchool.start(); }
 else { window.addEventListener('load', () => window.RTGSchool && RTGSchool.start()); }
 </script>

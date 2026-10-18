@@ -1,3 +1,4 @@
+/* Editorial V4 presentatiehelpers: titel, beeld, sectiekop en gedeelde kopacties. */
 (function (g, factory) {
   'use strict';
   var model = typeof module === 'object' && module.exports ? require('./rtg-editorial-v4-model') : g.RTGEditorialV4Model;
@@ -100,4 +101,3 @@
       actions.insertBefore(proxy, search || null);
     }
   }
-

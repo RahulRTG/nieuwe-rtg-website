@@ -1,3 +1,4 @@
+/* Editorial V4 presentatiehelpers: titel, beeld, sectiekop en gedeelde kopacties. */
 (function (g, factory) {
   'use strict';
   var model = typeof module === 'object' && module.exports ? require('./rtg-editorial-v4-model') : g.RTGEditorialV4Model;
@@ -100,7 +101,7 @@
       actions.insertBefore(proxy, search || null);
     }
   }
-
+  /* Editorial V4 annotatie en levenscyclus: eigenaarschap, viewport en herstel. */
   function buildHeader(doc, body, name) {
     var old = body.querySelector('[data-rtg-edge-2-contextual="native-header"], :scope > header:not(.rtg-v4-header), :scope > .wd-page > header:not(.rtg-v4-header)');
     var header = make(doc, 'header', 'rtg-v4-header');

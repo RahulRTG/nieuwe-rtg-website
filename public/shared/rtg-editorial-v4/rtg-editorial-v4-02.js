@@ -1,3 +1,4 @@
+  /* Editorial V4 annotatie en levenscyclus: eigenaarschap, viewport en herstel. */
   function buildHeader(doc, body, name) {
     var old = body.querySelector('[data-rtg-edge-2-contextual="native-header"], :scope > header:not(.rtg-v4-header), :scope > .wd-page > header:not(.rtg-v4-header)');
     var header = make(doc, 'header', 'rtg-v4-header');

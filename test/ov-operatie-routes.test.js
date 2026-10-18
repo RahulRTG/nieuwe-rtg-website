@@ -10,7 +10,8 @@
      - /api/ov/operaties toont alleen de EIGEN operaties;
      - /api/ov/operatie/segment werkt pas na activeren met de eenmalige code,
        vraagt per segment een expliciet akkoord en betaalt niets;
-     - een ander Business-lid vindt andermans operatie niet.
+     - een ander Business-lid vindt andermans operatie niet;
+     - annuleren kan alleen de eigenaar, een keer, en daarna is de operatie dicht.
 
    MUTATIE GEZIEN ZAKKEN: in server/kern/ov/operatie.js de grendel
    `data.akkoord !== true` in segment() op `false`; de toets zakte op "zonder
@@ -100,4 +101,13 @@ test('concept, activeren en per segment akkoord: de keten over de route, en alle
 
   const terug = (await api('/api/ov/operaties', {}, zakelijk)).body.operaties.find(o => o.id === id);
   assert.equal(terug.segmenten.find(s => s.id === seg.id).status, 'aangevraagd', 'de aanvraag is bewaard');
+
+  // /api/ov/operatie/annuleer: alleen de eigenaar, en een keer
+  assert.equal((await api('/api/ov/operatie/annuleer', { id }, ander)).status, 404, 'een ander annuleert niets');
+  const weg = await api('/api/ov/operatie/annuleer', { id }, zakelijk);
+  assert.equal(weg.status, 200);
+  assert.equal(weg.body.operatie.status, 'geannuleerd');
+  assert.equal((await api('/api/ov/operatie/annuleer', { id }, zakelijk)).status, 409, 'twee keer annuleren kan niet');
+  assert.equal((await api('/api/ov/operatie/segment', { id, segmentId: seg.id, actie: 'annuleer' }, zakelijk)).status, 409,
+    'een geannuleerde operatie krijgt geen segmentacties meer');
 });

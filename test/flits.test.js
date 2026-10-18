@@ -137,7 +137,7 @@ test('7. navigatie toont de eigen motor en neemt alleen partnersignalen aan', as
 });
 
 /* 8. RTG Navigatie over de routes: /api/nav/kaart, /api/nav/bestemmingen,
-   /api/nav/poi en /api/nav/meld. test/navigatie.test.js toetst dezelfde kern in
+   /api/nav/route, /api/nav/poi en /api/nav/meld. test/navigatie.test.js toetst dezelfde kern in
    het proces; hier gaat het om de deur: leden wel, gasten niet, en een melding
    via de navigatie komt werkelijk in het Flits-netwerk terecht (en nooit als
    flitser -- die soort loopt niet via de meldweg van de navigatie).
@@ -165,6 +165,13 @@ test('8. navigatie over de routes: kaart, bestemmingen, POI en melden, alleen vo
   const poi = await api('/api/nav/poi', { lagen: ['laad'], ...IBIZA, land: 'ES' }, a);
   assert.equal(poi.status, 200);
   assert.ok(poi.body.lagen.laad.length > 0, 'de laadlaag is gevuld');
+
+  const route = await api('/api/nav/route', { van: { lat: 38.873, lng: 1.373 }, naar: { lat: 38.985, lng: 1.535 }, modus: 'auto' }, a);
+  assert.equal(route.status, 200, JSON.stringify(route.body).slice(0, 160));
+  assert.ok(route.body.route.length >= 2, 'een route met meerdere punten');
+  assert.equal(route.body.stappen[0].bocht, 'start');
+  assert.equal((await api('/api/nav/route', { van: { lat: 'x' }, naar: IBIZA }, a)).status, 400, 'een ongeldig vertrekpunt is een nette fout');
+  assert.equal((await api('/api/nav/route', { van: IBIZA, naar: IBIZA }, gast)).status, 403);
 
   const m = await api('/api/nav/meld', { soort: 'wegwerk', lat: IBIZA.lat + 0.02, lng: IBIZA.lng, land: 'ES' }, a);
   assert.equal(m.status, 200, JSON.stringify(m.body).slice(0, 160));

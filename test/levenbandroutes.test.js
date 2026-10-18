@@ -38,7 +38,7 @@ const dag = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-levenband-'));
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, ANTHROPIC_API_KEY: '' } });
   base = srv.base;
 
   const t = Date.now();
@@ -276,4 +276,24 @@ test('11. het lid deelt zelf, trekt in en verbreekt -- over de ledendeur', async
   assert.equal(weg.status, 200);
   assert.ok(!(await post('/api/leven/kring', {}, lidTok)).body.banden.some(b => b.id === bandId), 'de band is weg bij het lid');
   assert.ok(!(await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.some(b => b.id === bandId), 'en bij het kind');
+});
+
+/* 12. /api/leven/mentor zonder model: hij SPIEGELT wat er op de levenslijn
+   staat en verzint geen advies (LEVEN.md par. 2.2), en elk antwoord draagt de
+   bronregels waar het op rust. Gasten komen er niet in.
+   MUTATIE GEZIEN ZAKKEN: in server/routes/levenmentor.js `gegevens` uit het
+   antwoord zonder model weggelaten; de toets zakte op "het antwoord draagt zijn
+   bronnen". */
+test('12. de mentor zonder model spiegelt de lijn en noemt zijn bronnen', async () => {
+  const r = await post('/api/leven/mentor', { vraag: 'Wat moet ik dit jaar gaan doen?' }, lidTok);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+  assert.ok(Array.isArray(r.body.gegevens) && r.body.gegevens.length >= 2, 'het antwoord draagt zijn bronnen');
+  assert.ok(r.body.gegevens.every(g => typeof g === 'string' && g.length > 0));
+  assert.ok(r.body.gegevens.some(g => /^levenslijn: /.test(g)), 'de bron is de levenslijn');
+  assert.match(r.body.antwoord, /lijn/i, 'hij spiegelt wat er op de lijn staat');
+  assert.doesNotMatch(r.body.antwoord, /niets voor u|slaagkans|moet u gaan/i, 'en adviseert of oordeelt niet');
+
+  const gast = (await post('/api/login', { tier: 'guest' })).body.token;
+  assert.equal((await post('/api/leven/mentor', { vraag: 'x' }, gast)).status, 403);
+  assert.equal((await post('/api/leven/mentor', { vraag: 'x' })).status, 401);
 });

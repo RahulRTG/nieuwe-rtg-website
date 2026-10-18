@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T19:30:19.560Z",
-    "commit": "5e7d34066",
+    "op": "2026-10-18T19:31:36.283Z",
+    "commit": "0271f6d42",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -19159,7 +19159,11 @@
     },
     "voorraadproef.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "scripts/voorraadproef.js",
+      "operator": "route-doel-weg#6",
+      "gezakt": 1,
+      "geprobeerd": 51
     },
     "voorspel.test.js": {
       "soort": "server",

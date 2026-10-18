@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "5f5c306ac",
-  "seconden": 9.3,
+  "commit": "8520a0fcb",
+  "seconden": 9.5,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1430,6 +1430,7 @@
     "server/bedrijf/sleutels.js",
     "server/bedrijf/start.js",
     "server/bedrijf/storing.js",
+    "server/bedrijf/taak-idem.js",
     "server/bedrijf/taak.js",
     "server/bedrijf/tekengrens.js",
     "server/bedrijf/toen.js",
@@ -7369,18 +7370,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5870,
-  "gelezen": 5554,
+  "bestandenGezien": 5871,
+  "gelezen": 5555,
   "nietGelezen": 316,
   "waarvanBundeldeel": 316,
   "waarvanParsefout": 0,
-  "symbolen": 27991,
-  "bestandenMetUitvoer": 4635,
+  "symbolen": 27990,
+  "bestandenMetUitvoer": 4636,
   "uitvoerMetNamen": 2119,
   "uitvoerOnvolledig": 7,
-  "uitvoerZonderNamen": 2509,
+  "uitvoerZonderNamen": 2510,
   "zonderUitvoer": 919,
-  "requireKanten": 7957
+  "requireKanten": 7958
  },
  "nietGelezen": [
   {
@@ -14260,18 +14261,25 @@
    ]
   },
   {
+   "bestand": "server/bedrijf/taak-idem.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/bedrijf/taak.js"
+   ]
+  },
+  {
    "bestand": "server/bedrijf/taak.js",
    "symbolen": [
     {
-     "naam": "idemAfdruk",
-     "soort": "functie",
-     "lijn": 35,
-     "geexporteerd": "onbekend"
-    },
-    {
      "naam": "leidtNaar",
      "soort": "pijl",
-     "lijn": 87,
+     "lijn": 72,
      "geexporteerd": "onbekend"
     }
    ],
@@ -14280,7 +14288,8 @@
     "namen": null
    },
    "requires": [
-    "server/bedrijf/gebeurtenis.js"
+    "server/bedrijf/gebeurtenis.js",
+    "server/bedrijf/taak-idem.js"
    ],
    "extern": [],
    "gebruiktDoor": [

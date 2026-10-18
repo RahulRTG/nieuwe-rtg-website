@@ -28,6 +28,14 @@ module.exports = (ctx) => {
      data: { soort, verkoperCode, verkoperNaam, koper:{key,naam,codenaam,supplierCode},
              regels:[{omschrijving,aantal,stuk,btw}], totaal?, btw?, methode, ref } */
   function boek(data) {
+    const r = boekStil(data);
+    if (r.seinen) r.seinen();
+    return r.uit;
+  }
+  /* Boeken ZONDER de seinen erachter. De seinen (sse, de melding aan de koper,
+     het RTMAIL-draaiboek) horen NA de commit: boekVast hieronder roept ze pas
+     aan als de opslag de factuur heeft bevestigd. */
+  function boekStil(data) {
     const s = store();
     const verkoper = data.verkoperCode ? findSupplier(data.verkoperCode) : null;
     const btwStd = data.btw != null ? Number(data.btw) : standaardBtw(verkoper);
@@ -37,7 +45,7 @@ module.exports = (ctx) => {
        aanroeper zelf een `btw` mee, dan telt die: dan is het een bewuste keuze
        van de boekende laag en niet iets om te overrulen. */
     const v = verwerkRegels(regels, btwStd, data.btw != null ? null : verkoper);
-    if (!(v.totaal > 0)) return { error: 'Geen bedrag om te factureren.' };
+    if (!(v.totaal > 0)) return { uit: { error: 'Geen bedrag om te factureren.' } };
     const koper = data.koper || {};
     const f = {
       id: 'f' + crypto.randomBytes(5).toString('hex'),
@@ -76,6 +84,9 @@ module.exports = (ctx) => {
     s.facturen.unshift(f);
     s.facturen = s.facturen.slice(0, 100000);
     factuurSave();
+    return { uit: { ok: true, factuur: publiek(f) }, seinen: () => seinNaBoeking(f) };
+  }
+  function seinNaBoeking(f) {
     // beide partijen seinen: de verkoper en (indien lid) de koper
     if (f.verkoper.code && sseToSupplier) sseToSupplier(f.verkoper.code, 'sync', { scope: 'facturen' });
     if (f.koper.supplierCode && sseToSupplier) sseToSupplier(f.koper.supplierCode, 'sync', { scope: 'facturen' });
@@ -89,7 +100,6 @@ module.exports = (ctx) => {
       if (ctx.automatisering) ctx.automatisering.factuurGeboekt({ verkoperCode: f.verkoper.code, verkoperNaam: f.verkoper.naam,
         koperCodenaam: f.koper.codenaam, koperZaakCode: f.koper.supplierCode, nummer: f.nummer, totaal: f.totaal });
     } catch (e) {}
-    return { ok: true, factuur: publiek(f) };
   }
 
   // Async variant die een codenaam naar een lidsleutel oplost.
@@ -113,9 +123,19 @@ module.exports = (ctx) => {
      doorlopend nummer staat er, of bestaat niet. De automatische boekingen
      roepen boek() BINNEN hun eigen handeling aan, die over de commit beslist.
      Eerst de koper opzoeken (wacht op de kluis), dan synchroon in de bundel. */
+  /* DE SEINEN NA DE COMMIT, en niet erin. Hier stond `antwoord(() => boek(data))`,
+     en boek() meldt de koper en mailt beide kanten VOOR hij terugkeert -- dus
+     binnen de duurzame bundel, voor de commit. Faalde die commit (503), dan had
+     de koper al een melding en een mail over een factuur die niet bestaat. De
+     crashproef zag het als een dood op het meldmoment ZONDER factuur
+     (na-commit-voor-bericht, 18 oktober 2026): het bericht kwam voor de commit. */
   async function boekVast(data, codenaam) {
     await koperBij(data, codenaam);
-    return ctx.vastleggen ? ctx.vastleggen.antwoord(() => boek(data)) : boek(data);
+    if (!ctx.vastleggen) return boek(data);
+    let seinen = null;
+    const r = await ctx.vastleggen.antwoord(() => { const b = boekStil(data); seinen = b.seinen || null; return b.uit; });
+    if (r && r.ok && !r.error && seinen) seinen();
+    return r;
   }
   /* Een openstaande factuur afboeken. Alleen de VERKOPER mag dat, want alleen
      hij weet of het geld binnen is; een koper die zijn eigen factuur op betaald

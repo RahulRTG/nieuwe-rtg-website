@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-18T18:30:21.641Z",
-    "commit": "73850d212",
+    "op": "2026-10-18T18:54:37.309Z",
+    "commit": "bd56c161b",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v22.22.0"
   },
@@ -254,7 +254,7 @@
       "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/Q5BX5J/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/BGTUGN/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -354,9 +354,9 @@
       "ingang": "/apps/horeca.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca*: de registers kennen geen route onder dit voorvoegsel"
+      "routes": 138,
+      "open": 136,
+      "reden": "136 van de 138 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca/arrival/promise staat niet in IDOR.json"
     },
     {
       "functie": "link:huis",
@@ -657,9 +657,9 @@
       "ingang": "/apps/ovroutes.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/*: de registers kennen geen route onder dit voorvoegsel"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/checkin staat niet in IDOR.json; /api/staff/ov/dienst staat niet in IDOR.json"
     },
     {
       "functie": "link:partnernetwerk",
@@ -1155,14 +1155,14 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "POST /api/rtf/social/connections",
+          "verzoek": "GET /api/foundation/gezin/BGTUGN/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/Q5BX5J/mij",
+          "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -1173,13 +1173,6 @@
           "a": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1216,6 +1209,13 @@
           "b": 401,
           "anoniem": 401,
           "uitslag": "eigenaarWeg"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
         },
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",

@@ -89,7 +89,10 @@ test('one Edge responds to nested human scroll, keeps five reachable actions and
     await page.waitForSelector('.rtg-adaptive-edge[data-rtg-adaptive-state="dock"]');
     await bar.locator('[data-rtg-adaptive-action="context"]').click();
     assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(), true);
-    await page.locator('#scroll-fixture').hover(); await page.mouse.wheel(0, 180);
+    /* Een open Edge-paneel is het actieve oppervlak en onderschept terecht de
+       onderliggende pagina. Scroll daarom op het paneel zelf: het moet open
+       blijven en mag de invoer niet doorgeven aan de pagina erachter. */
+    await page.locator('.rtg-adaptive-sheet').hover(); await page.mouse.wheel(0, 180);
     assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'expanded');
     await page.keyboard.press('Escape');
     await page.evaluate(() => {

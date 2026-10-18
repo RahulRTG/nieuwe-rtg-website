@@ -89,9 +89,10 @@ test('mail draft survives reload and sends only after confirmation through the o
     await page.locator('.rtg-adaptive-surface [data-mail-save]').click();
     await page.getByRole('status').filter({hasText:'Uw concept is bewaard.'}).waitFor();
     assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
-    assert.equal(await page.locator('header.ios-nav:has(.rtm-diep-terug)').count(),1);
-    assert.equal(await page.locator('header.ios-nav:has(.rtm-diep-terug)').isVisible(),false,
-      'the original mail header does not form a second control strip behind the composer Edge');
+    assert.equal(await page.locator('.rtm-diep-terug').count(),1,
+      'the original route control is retained as a capability');
+    assert.equal(await page.locator('header.ios-nav:has(.rtm-diep-terug)').count(),0,
+      'the route control is adopted instead of retaining a second mail header');
     await shot(page,'mail-mobile');
     await page.reload();await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
     await mailAction(page,'Concepten');

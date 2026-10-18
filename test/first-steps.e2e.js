@@ -56,7 +56,8 @@ test('Four editorial first visits: responsive, language, shared Edge and real fi
       assert.equal(await page.locator('.rtg-reality-graph,.tos-module-hero,.rtg-suite-hero').count(), 0);
       const header = await page.locator('.rtg-first-steps').boundingBox();
       const surface = await page.locator('.wd-page').evaluate(el => ({display:getComputedStyle(el).display, y:el.getBoundingClientRect().y}));
-      assert.equal(surface.display,'contents','mobiel heeft geen tweede inhoudskader');
+      assert.equal(surface.display,'block','mobiel houdt één meetbaar, randloos inhoudskader');
+      assert.ok(surface.y >= 0, 'het gedeelde inhoudskader blijft in de zichtbare schil');
       const edge = await page.locator('.rtg-v4-header').boundingBox();
       assert.ok(header && edge && header.y >= edge.y + edge.height - 1 && header.y <= edge.y + edge.height + 100,
         app + ' begins directly below the single shared Edge header');

@@ -3,13 +3,20 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "411913ca4",
-  "seconden": 9.2,
+  "commit": "ed33f4dc",
+  "seconden": 10.6,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [],
+   "boomVuil": true,
+   "ongecommitteInvoer": [
+    "server/kern/lidacties/factuur.js",
+    "server/routes/supplier/kassa/verkoop.js",
+    "server/routes/supplier/retail.js",
+    "server/kern/lidacties/factuur.js",
+    "server/routes/supplier/kassa/verkoop.js",
+    "server/routes/supplier/retail.js"
+   ],
    "bestanden": [
     "public/apps/access/meaning.js",
     "public/apps/agenda/app.js",
@@ -7250,7 +7257,7 @@
    "omgevingGekopieerd": false,
    "omgeving": [],
    "onwaarneembaar": [],
-   "nodeHoofdversie": 26
+   "nodeHoofdversie": 22
   }
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
@@ -7266,7 +7273,7 @@
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2468,
   "zonderUitvoer": 903,
-  "requireKanten": 7776
+  "requireKanten": 7777
  },
  "nietGelezen": [
   {
@@ -90675,19 +90682,19 @@
     {
      "naam": "regelsVanItems",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "maakFactuurVoorLid",
      "soort": "functie",
-     "lijn": 56,
+     "lijn": 58,
      "geexporteerd": true
     },
     {
      "naam": "melden",
      "soort": "functie",
-     "lijn": 57,
+     "lijn": 59,
      "geexporteerd": false
     }
    ],
@@ -90708,7 +90715,8 @@
     "server/kern/lidacties/rekening.js",
     "server/routes/supplier/kassa/afrekenen.js",
     "server/routes/supplier/kassa/innen.js",
-    "server/routes/supplier/kassa/verkoop.js"
+    "server/routes/supplier/kassa/verkoop.js",
+    "server/routes/supplier/retail.js"
    ]
   },
   {
@@ -202191,7 +202199,7 @@
     {
      "naam": "eisRetail",
      "soort": "functie",
-     "lijn": 13,
+     "lijn": 15,
      "geexporteerd": "onbekend"
     }
    ],
@@ -202199,7 +202207,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/kern/lidacties/factuur.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/routes/supplier-deel2.js"

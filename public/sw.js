@@ -5,7 +5,7 @@
    of hij nog klopt.
 
    Een inhoudsafdruk voorkomt dat een geinstalleerde app een oude schil houdt. */
-const CACHE = 'rtg-app-cc778bf6';
+const CACHE = 'rtg-app-1cd732cd';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
@@ -39,7 +39,7 @@ const SHELL = [
   '/shared/rtg-world-desktop.css',
   '/shared/rtg-world-widgets.css',
   '/shared/rtg-desktop-components.css',
-  '/shared/rtg-world-palette.css', '/shared/rtg-editorial-system.css',
+  '/shared/rtg-world-palette.css', '/shared/rtg-editorial-system.css', '/shared/rtg-cinematic-system.css',
 '/apps/app.html', '/shared/id.js',
   '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
@@ -138,9 +138,8 @@ self.addEventListener('fetch', e => {
             if (hit) return hit;
             // Alleen een echte pagina-navigatie mag op het beginscherm
             // terugvallen. Elke andere mislukte GET (een script, een fetch
-            // vanuit een app) kreeg hier ook app.html terug: de app "viel
-            // terug naar het beginscherm" bij elke netwerkhapering, en een
-            // script-URL kreeg HTML als JavaScript.
+            // vanuit een app) kreeg hier ook app.html terug bij elke
+            // netwerkhapering, en een script-URL kreeg HTML als JavaScript.
             if (e.request.mode === 'navigate' && !url.search) return caches.match('/apps/app.html');
             return Response.error();
           });

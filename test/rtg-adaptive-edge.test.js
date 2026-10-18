@@ -220,12 +220,16 @@ test('de volledige Edge blijft standaard zichtbaar en bewaart een raakvlak van 4
   assert.match(EDITORIAL, /@media\(forced-colors:active\)\{\.rtg-v4-header,[\s\S]*?background:Canvas!important/);
 });
 
-test('de definitieve editorial laag is centraal en vervangt de oude presentatielagen', () => {
+test('de definitieve editorial laag is centraal; de oude lagen blijven alleen als grondbrug', () => {
   const heritage = lees('public/shared/rtg-heritage.css');
   const basisBron = lees('public/shared/basis/basis-01.js');
   const basis = lees('public/shared/basis.js');
   assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
-  assert.doesNotMatch(heritage, /rtg-(?:cinematic|editorial)-system\.css/);
+  /* Universele V4 legt papier onder elk scherm; de cinematische en
+     editoriale systeemlaag dragen daaronder nog de contrastbruggen van de
+     oudere schermen (a11y-poort op nul, 18 oktober 2026). */
+  assert.match(heritage, /@import url\('\.\/rtg-editorial-system\.css'\)/);
+  assert.match(heritage, /@import url\('\.\/rtg-cinematic-system\.css'\)/);
   assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
   assert.match(basisBron, /laadEditorialBlad\(\)/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);

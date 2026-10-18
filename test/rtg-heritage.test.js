@@ -119,7 +119,9 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage blijft zelfstandig; basis laadt editorial v4 daarna als laatste laag', () => {
-  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-world-palette.css');
+  // Na het wereldpalet volgen alleen de twee grondbruggen voor oudere schermen.
+  assert.deepEqual([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].slice(-3).map(m => m[1]),
+    ['./rtg-world-palette.css', './rtg-editorial-system.css', './rtg-cinematic-system.css']);
   assert.doesNotMatch(TOKENS, /rtg-editorial-v4\.css/,
     'een CSS-import kan nooit na de rest van Heritage winnen');
   const basis = fs.readFileSync(path.join(ROOT,'public/shared/basis/basis-01.js'),'utf8');

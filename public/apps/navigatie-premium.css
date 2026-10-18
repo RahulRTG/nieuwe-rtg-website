@@ -125,6 +125,13 @@ body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-e
      venster. Zonder die tweede grens schoof de sluitknop onder de V4-kop. */
   html body.travel-os-map[data-rtg-editorial-v4="true"] main[data-rtg-screen-root="immersive"]>:is(.paneel,.kaarten){max-height:min(calc(100dvh - var(--tos-top) - var(--tos-bottom) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px),calc(100% - var(--tos-bottom) - var(--v4-header,0px) - 24px))!important}
   .paneel{left:0;right:0;bottom:0;width:100%;padding:1rem 1rem calc(env(safe-area-inset-bottom,0px) + 1rem);border-left:0;border-right:0;border-bottom:0}
+  /* Geparkeerd is weg. Onder V4 rekent het paneel vanaf #rtgWorldContent, dat
+     boven de Edge eindigt; de parkeerstand van travel-os.css (102% plus de
+     optilling) liet daardoor nog een strook van het paneel in beeld staan. Een
+     geparkeerd paneel is dus ook onzichtbaar en niet focusbaar, pas na de
+     schuifbeweging, zodat het wegschuiven zichtbaar blijft. */
+  html body.travel-os-map[data-rtg-editorial-v4="true"] .paneel:not(.zien){visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s linear .32s}
+  html body.travel-os-map[data-rtg-editorial-v4="true"] .paneel.zien{visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
   .paneel .grip{display:block}.route-hero .samenv b{font-size:2.7rem}.profile-row button{font-size:.56rem}
   .intel-metrics{grid-template-columns:repeat(2,1fr)}
   .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 1rem)}

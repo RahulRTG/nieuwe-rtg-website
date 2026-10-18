@@ -46,6 +46,13 @@
     var profile = registry.profiles[path] || null, canvas = registry.canvas[path] || null;
     var root = d.querySelector('[data-rtg-screen-root="content"],[data-rtg-screen-root="immersive"]');
     if (!root) return false;
+    // Een V4-cover en een V4-canvas houden hun eigen donkere grond; de
+    // papierbrug hoort daar niet.
+    var v4 = w.RTGEditorialV4Model, v4kind = v4 && v4.classify(w.location.href, body, registry);
+    if (v4kind === 'cover' || v4kind === 'canvas') {
+      body.removeAttribute('data-rtg-cinematic');
+      return false;
+    }
 
     body.setAttribute('data-rtg-cinematic', 'true');
     body.setAttribute('data-rtg-cinematic-kind', screenKind(body, profile, canvas));

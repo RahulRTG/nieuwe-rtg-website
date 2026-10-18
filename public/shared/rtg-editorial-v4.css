@@ -494,7 +494,10 @@ html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="conversation"] :is(.rt
 html body[data-rtg-editorial-v4="true"] .rtgdeur{
   margin-inline:0!important;padding:clamp(24px,4vw,44px) 0!important;
   border:0!important;border-block:1px solid var(--v4-line)!important;border-radius:0!important;
-  background:transparent!important;color:var(--v4-ink)!important;box-shadow:none!important;
+  /* De papierlaag is echt een laag: het paneel staat ook op schermen die hun
+     eigen donkere grond houden (horeca, arena), en daar leest de V4-inkt alleen
+     op papier. Transparant liet donkere inkt op zwart achter. */
+  background:var(--v4-paper)!important;color:var(--v4-ink)!important;box-shadow:none!important;
 }
 html body[data-rtg-editorial-v4="true"] .rtgdeur :is(h1,h2,h3,p,li,a,b,small,span,div){color:inherit!important}
 html body[data-rtg-editorial-v4="true"] .rtgdeur :is(li,.rtgdeur-regel){border-color:var(--v4-line)!important}
@@ -637,7 +640,7 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]){
   --rtg-world-bg:var(--v4-paper)!important;--rtg-world-ground:var(--v4-paper)!important;
   --rtg-world-card:var(--v4-paper-strong)!important;--rtg-world-card-strong:#e8e1d7!important;
-  --rtg-world-ink:var(--v4-ink)!important;--rtg-world-muted:#665d54!important;
+  --rtg-world-ink:var(--v4-ink)!important;--rtg-world-muted:#554d45!important;
   --rtg-world-line:var(--v4-line)!important;--rtg-world-action:var(--v4-accent)!important;
   --rtg-world-action-ink:#fffaf2!important;--rtg-world-schema:light!important;
 }
@@ -679,3 +682,132 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
 html body.rtg-mall-living[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="collection"]{
   background:#f4efe7!important;color:#17130f!important;color-scheme:light!important;
 }
+
+/* LEESBAAR OP DE EIGEN GROND ---------------------------------------------
+   De universele V4-schil legt licht papier onder elk scherm. De wereldtokens
+   voor tekstgoud (de familietokens hieronder, die rtg-world-palette.css op het
+   wereldmetaal zet, en de eyebrow-regel van Heritage) wezen naar het lichte
+   wereldmetaal, dat voor een donkere grond
+   bedoeld is. Op papier wordt dat --gold-diep, het bestaande huistoken voor goud
+   in de schaduw (rtg-materiaal.css; 6,4 tot 8:1 op de V4-gronden). Het metaal
+   zelf blijft staan: de Edge is donker en leest het daar. */
+html body[data-rtg-skin="heritage"][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]){
+  --rtg-leesgoud:var(--gold-diep,#5E4F05)!important;--sport-gold:var(--gold-diep,#5E4F05)!important;
+  --wh-gold:var(--gold-diep,#5E4F05)!important;--gold:var(--gold-diep,#5E4F05)!important;
+  --goud:var(--gold-diep,#5E4F05)!important;--rtg-goud:var(--gold-diep,#5E4F05)!important;
+  --shop-gold:var(--gold-diep,#5E4F05)!important;--safe-gold:var(--gold-diep,#5E4F05)!important;
+  --night-gold:var(--gold-diep,#5E4F05)!important;--home-gold:var(--gold-diep,#5E4F05)!important;
+  --wo-gold:var(--gold-diep,#5E4F05)!important;--wk-gold:var(--gold-diep,#5E4F05)!important;
+  --tos-lees:var(--gold-diep,#5E4F05)!important;--studio-gold:var(--gold-diep,#5E4F05)!important;
+  --stay-gold:var(--gold-diep,#5E4F05)!important;--sound-gold:var(--gold-diep,#5E4F05)!important;
+  --saloon-goud:var(--gold-diep,#5E4F05)!important;--rv-goud:var(--gold-diep,#5E4F05)!important;
+  --rtg-ss-gold:var(--gold-diep,#5E4F05)!important;--rtf-gold-soft:var(--gold-diep,#5E4F05)!important;
+  --rit-gold:var(--gold-diep,#5E4F05)!important;--nav-gold:var(--gold-diep,#5E4F05)!important;
+  --media-gold:var(--gold-diep,#5E4F05)!important;--gx-gold:var(--gold-diep,#5E4F05)!important;
+  --flight-gold:var(--gold-diep,#5E4F05)!important;--deep-gold:var(--gold-diep,#5E4F05)!important;
+  --campus-gold:var(--gold-diep,#5E4F05)!important;--anchor-gold:var(--gold-diep,#5E4F05)!important;
+}
+/* Het premiumpalet (--rtg-p-*) is in deze schil nergens gedefinieerd; de
+   modules van horeca, WorkOS en TravelOS vielen daardoor terug op hun eigen
+   donkere fallbacks (bv. var(--rtg-p-vlak,rgba(12,14,14,.95))). Onder V4 krijgt
+   het dezelfde lichte waarden als de rest van de papierlaag. */
+html body[data-rtg-skin="heritage"][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]){
+  --rtg-p-vlak:var(--v4-paper-strong);--rtg-p-papier:var(--v4-paper-strong);--rtg-p-ivoor:var(--v4-paper);
+  --rtg-p-inkt:var(--v4-ink);--rtg-p-zacht:var(--v4-muted);--rtg-p-metaal:var(--gold-diep,#5E4F05);
+  --rtg-p-op-metaal:#fffaf2;--rtg-p-rood:var(--v4-accent);--rtg-p-groen:#2f7256;
+}
+html body[data-rtg-skin="heritage"][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :where(.ey,.eyebrow,.kicker,.micro,.rtg-merk,.rtg-label,legend){
+  color:var(--gold-diep,#5E4F05);
+}
+/* Een canvas houdt zijn donkere grond (#0c0c0b, hierboven); zijn tekst leest
+   dan licht, en niet de donkere V4-inkt die het anders erft. */
+html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]{
+  color:#fffaf2!important;
+}
+/* De cookiebalk is overal zwart; een link erin leest wit (CLAUDE.md: kleine
+   tekst op zwart is wit), ook waar V4 links het wereldaccent geeft. */
+html body[data-rtg-editorial-v4="true"] #rtg-cookie a{color:#fff!important}
+/* Donkere eilanden op papier. Een paar bestaande modules houden hun eigen
+   donkere materiaal (partnerkaarten, salonvakken, reisboeknavigatie, de
+   muziekkop, de hulpkop van de Foundation, de hoofdactie van de chauffeur).
+   Daar leest tekst licht, en een link erin ook: het V4-accent hoort op
+   papier, niet op hun donkere grond. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(a.mall-partner,.rtg-social-elite .sociaal-ruimtes,.sociaal-register .vak,.sociaal-poorten .poort,.sociaal-kringpaneel,.reisboek-nav,.muziek-hero,.fh-top,.fh-nav,.hoofdactie){color:#fffaf2!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a.mall-partner:not(.skip):not(.wd-skip):not(.skip-link),
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.rtg-social-elite .sociaal-ruimtes,.sociaal-register .vak,.sociaal-poorten .poort,.sociaal-kringpaneel,.reisboek-nav,.muziek-hero,.fh-top,.fh-nav,.hoofdactie) a:not(.skip):not(.wd-skip):not(.skip-link),
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a.hoofdactie:not(.skip):not(.wd-skip):not(.skip-link){color:#fffaf2!important}
+/* De noodnummers op de privacypagina staan op een eigen donkergroen vlak. */
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="state"] .nood,
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="state"] :is(.blok,.kaart,.wrap) .nood :is(p,li,b,strong,.nr){color:#fffaf2!important}
+/* Op een cover is de grond zwart: een omlijnde knop leest daar licht in plaats
+   van in het accent, dat voor papier is gekozen. Een gevulde knop houdt zijn
+   accentvlak met witte tekst. */
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"] :is(.knop,.btn,a.button,.rtg-dashboard-hero-cta,.daily-action):not(.vol):not(.primary):not(.primair):not(.hoofd):not([type="submit"]){border-color:rgba(255,250,242,.55)!important;color:#fffaf2!important}
+/* Een lichte kaart op de Foundation-cover houdt donkere leestekst. */
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] :is(.wh-paper-card,.onthaal-kies) .buurtsec{color:#554d45!important}
+/* Een link die zelf een gevulde knop is, staat op het accentvlak: zijn tekst
+   is wit, niet nogmaals het accent. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a:is(.knop.vol,.kknop.vol,.btn.primary,.primary,.primair,.hoofd):not(.skip):not(.wd-skip):not(.skip-link){color:#fff!important}
+/* Een gesloten Edge-index (aria-hidden) is nul breed, maar zijn gezichten
+   tekenden toch als smalle strook links over de inhoud. Gesloten is onzichtbaar. */
+html body[data-rtg-editorial-v4="true"] .rtg-edge-index[aria-hidden="true"]{visibility:hidden!important}
+/* De sectiekop draagt zijn eigen leesrichting: de "meer"-link volgt de kop en
+   niet het papieraccent, ook waar de hoofdgrond van een scherm donker is. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .rtg-v4-section-masthead>a:not(.skip):not(.wd-skip):not(.skip-link){color:inherit!important}
+/* Links in de donkere Edge-balk erven de Edge-tekst, niet het papieraccent. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom) a:not(.skip):not(.wd-skip):not(.skip-link){color:inherit!important}
+/* Salonvakken en -poorten zijn zelf links. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.sociaal-register,.sociaal-poorten) a:is(.vak,.poort):not(.skip):not(.wd-skip):not(.skip-link){color:#fffaf2!important}
+/* De winkelflow legt zijn kaarten op de wereldkaart (--rtg-world-card); een
+   link daarin leest in de wereldinkt die daarbij hoort, licht of donker. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]).rtg-shop-flow :is(.vind,.vd,.boutiek,.genre,.tref,.kaart,.leeg,.shop-order) a:not(.skip):not(.wd-skip):not(.skip-link),
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]).rtg-shop-flow a:is(.vind,.vd,.boutiek,.genre,.tref,.kaart,.leeg,.shop-order):not(.skip):not(.wd-skip):not(.skip-link){color:var(--rtg-world-ink)!important}
+/* Een canvas heeft een donkere kop: de wereldnaam leest daar in het lichte metaal. */
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]>header.rtg-v4-header .rtg-v4-world{color:#f0d19a!important}
+/* Op het donkere vlak van de camera lezen de standen licht. */
+html body[data-rtg-editorial-v4="true"]:has(.zoeker) :is(.boven,.onder) .standen>button{color:#cec4b7!important}
+html body[data-rtg-editorial-v4="true"]:has(.zoeker) :is(.boven,.onder) .standen>button.actief{color:#fffaf2!important}
+/* Het routeadvies van de navigatie ligt op het donkere canvas. */
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"] .route-insight :is(strong,b,h2,h3,p){color:#fffaf2!important}
+/* Bestellen heeft een donkere voortgangskop; zijn eyebrow leest in licht metaal. */
+html body[data-rtg-skin="heritage"][data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .hero :where(.ey){color:#fffaf2}
+/* Een losse springlink met eigen zwarte grond leest wit. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a.rtg-spring:not(.wd-skip):not(.skip):not(.skip-link){color:#fff!important}
+/* De cinematische laag geeft deze startknoppen lichte tekst omdat ze gevuld
+   zijn bedoeld; onder V4 krijgen ze dat accentvlak dan ook. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]) :is(#kaGo,#prBegin .knop.p,#idStart,#zegGo,#n-maak,#startTrialTop,#btn-zet,#verstuur,.verstuur,.kg-rij button,#rkToetsen .gelijk):is(.knop,.btn){border-color:var(--v4-accent)!important;background:var(--v4-accent)!important}
+/* In de donkere kop van een canvas is een omlijnde knop doorzichtig. */
+html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]>header :is(.knop,.btn):not(.vol):not(.primary){background:transparent!important}
+/* Raakvlak (WCAG 2.5.8): het merk, de kopiconen en de "meer"-link van de
+   sectiekop zijn links en houden overal minstens 44 bij 44 pixels, ook waar een
+   scherm hun regelhoogte of breedte inperkt. */
+html body[data-rtg-editorial-v4="true"]>header.rtg-v4-header .rtg-v4-brand{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px;min-height:44px}
+html body[data-rtg-editorial-v4="true"]>header.rtg-v4-header .rtg-v4-icon{min-width:44px!important;min-height:44px!important}
+html body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead>a{display:inline-grid!important;place-items:center;min-width:44px!important;min-height:44px!important}
+/* Op telefoon en tablet duwde de vaste minimumbreedte van een knop (148px) een
+   rij van twee knoppen buiten beeld (bieb, beroepen). Daar bepaalt de inhoud de
+   breedte; het raakvlak blijft 52px hoog. */
+@media (max-width:900px){
+  html body[data-rtg-editorial-v4="true"] :is(.knop,.btn,button[type="submit"],a.button,.primary,.primair,.hoofd,.rtg-dashboard-hero-cta,.daily-action){min-width:0;max-width:100%}
+}
+/* Nog drie eigen vlakken met een link erin: de snelkoppelingen van Foundation
+   Hulp liggen op de wereldkaart, het merk van de toegangsdeur en de
+   inlogkoppeling van de rit liggen op bordeaux. */
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .fh-snel a:not(.skip):not(.wd-skip):not(.skip-link){color:var(--rtg-world-ink)!important}
+html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.access-brand-head,.rit-leeg) a:not(.skip):not(.wd-skip):not(.skip-link){color:#fff!important}
+/* Een omlijnde knop in de eigen kop van een scherm (ios-nav) is doorzichtig;
+   die kop draagt de wereldkaart en de wereldinkt. */
+html body[data-rtg-editorial-v4="true"] :is(.wd-page,body)>header.ios-nav :is(.knop,.btn):not(.vol):not(.primary){background:transparent!important;color:var(--rtg-world-ink)!important}
+/* De sectiekop past binnen de telefoon: een lange titel breekt af en duwt de
+   "meer"-link niet buiten beeld. */
+html body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead{min-width:0;box-sizing:border-box}
+html body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead>:is(h1,strong){min-width:0;overflow-wrap:anywhere}
+html body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead>a{flex:none}
+/* Een main met display:contents (De Résidence) tekent geen eigen vlak; zijn
+   canvas en kop staan zelf vast. 'fixed' op zo'n main doet niets zichtbaars,
+   maar maakte er een vaste strook van nul hoog van, waardoor zijn hele inhoud
+   als schil telde en het scherm op een telefoon "leeg" leek. */
+html body[data-rtg-v4-kind="canvas"] main[style*="display:contents"]{position:static!important;inset:auto!important}
+/* Het 3x3-voorproefje van een map op het beginscherm staat op de lichte
+   kaarttoon; zijn monogrammen lezen daar in inkt in plaats van wit. */
+html body[data-rtg-editorial-v4="true"] .os-map-tegel .os-map-mini .os-monogram{color:var(--v4-ink)}

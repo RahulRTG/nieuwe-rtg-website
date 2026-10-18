@@ -6,14 +6,15 @@
 'use strict';
 
 const { maakZaakregieContextAdapter } = require('../kern/zaakregie-context/adapter');
-/* "Uitgezet" heeft één betekenis, en die woont in accounts/sessiegrens.js. */
-const { uitgezet } = require('../accounts/sessiegrens');
 
 const tekst = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
 
 module.exports = function hangZaakregie(sctx) {
   const { app, lidVan, kern } = sctx;
   const authEenmaal = (req, res, next) => req.session ? next() : kern.auth(req, res, next);
+  /* "Actief" heeft één betekenis en die leest de gevel van de identiteitskluis
+     (accounts.isActief). Zonder die gevel is er geen actueel account: dicht. */
+  const actief = u => !!(kern.accounts && typeof kern.accounts.isActief === 'function' && kern.accounts.isActief(u));
 
   function fout(res, status, code, error) {
     res.set('Cache-Control', 'no-store');
@@ -48,7 +49,7 @@ module.exports = function hangZaakregie(sctx) {
   app.post('/api/bedrijf/zaakregie', authEenmaal, (req, res) => {
     const sessie = req.session;
     const account = tekst(sessie && sessie.key, 160);
-    if (!sessie || !sessie.account || uitgezet(sessie.account) || !/^user-\d+$/.test(account))
+    if (!sessie || !actief(sessie.account) || !/^user-\d+$/.test(account))
       return fout(res, 401, 'ZAAKREGIE_ACCOUNT_REQUIRED', 'Een actueel RTG-account is vereist.');
 
     const lid = lidVan(req, res);

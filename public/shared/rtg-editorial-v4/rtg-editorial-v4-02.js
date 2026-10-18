@@ -44,8 +44,9 @@
     var embedded = false;
     try { embedded = win.self !== win.top || new URLSearchParams(win.location.search).get('embed') === '1'; }
     catch (e) { embedded = false; }
+    /* Eén universele bediening: elk scherm met een wereld krijgt de V4-kop en
+       de gedeelde Edge. Er is geen opt-out per route. */
     var kind = classify(route, body, registry);
-    if (ownsPresentation && !ownsPresentation(kind, body)) return false;
     body.dataset.rtgEditorialV4 = 'true';
     body.dataset.rtgV4Kind = kind;
     body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
@@ -113,6 +114,5 @@
     if (page && !body.hasAttribute('data-world-home')) page.style.setProperty('display', 'block', 'important');
   }
 
-  return Object.freeze({ classify:classify, ownsPresentation:ownsPresentation,
-    pathOf:pathOf, annotate:annotate, boot:boot });
+  return Object.freeze({ classify:classify, pathOf:pathOf, annotate:annotate, boot:boot });
 }));

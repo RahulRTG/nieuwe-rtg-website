@@ -22,19 +22,18 @@ test('editorial v4 classificeert de zeven schermfamilies deterministisch', () =>
   assert.equal(runtime.classify('/apps/privacy.html', formBody, registry), 'state');
 });
 
-test('editorial v4 neemt alleen redactionele schermen of expliciete migraties over', () => {
-  const plain = { getAttribute(){ return null; } };
-  const forced = { getAttribute(name){ return name === 'data-rtg-editorial-v4' ? 'force' : null; } };
-  const disabled = { getAttribute(name){ return name === 'data-rtg-editorial-v4' ? 'off' : null; } };
-  const editorialRoom = { getAttribute(){ return null; }, hasAttribute(name){ return name === 'data-rtg-editorial-room'; } };
-  assert.equal(runtime.ownsPresentation('cover', plain), true);
-  assert.equal(runtime.ownsPresentation('collection', plain), true);
-  assert.equal(runtime.ownsPresentation('cover', disabled), false);
-  assert.equal(runtime.ownsPresentation('collection', editorialRoom), false);
-  for (const kind of ['task', 'detail', 'conversation', 'state', 'canvas']) {
-    assert.equal(runtime.ownsPresentation(kind, plain), false, kind + ' houdt zijn geteste taakpresentatie');
-    assert.equal(runtime.ownsPresentation(kind, forced), true, kind + ' kan bewust migreren');
-  }
+test('editorial v4 is één universele bediening, zonder opt-out per scherm', () => {
+  /* Besluit van de eigenaar (18 oktober 2026): één standaard universele
+     bediening. Elk scherm met een wereld krijgt de V4-kop en de gedeelde Edge;
+     een route kan zich niet uitschrijven of alleen bij verklaring meedoen. */
+  assert.equal(runtime.ownsPresentation, undefined);
+  const source = read('public/shared/rtg-editorial-v4.js');
+  assert.doesNotMatch(source, /ownsPresentation|data-rtg-editorial-room/);
+  const pagina = (map) => fs.readdirSync(map, { withFileTypes: true }).flatMap(e =>
+    e.isDirectory() ? pagina(path.join(map, e.name)) : e.name.endsWith('.html') ? [path.join(map, e.name)] : []);
+  const uitzonderingen = pagina(path.join(ROOT, 'public'))
+    .filter(f => /data-rtg-editorial-v4="(?:off|force)"/.test(fs.readFileSync(f, 'utf8')));
+  assert.deepEqual(uitzonderingen, [], 'geen scherm schrijft zich uit of in');
 });
 
 test('basis laadt editorial v4 als een werkelijk laatste presentatielaag', () => {
@@ -105,7 +104,6 @@ test('expliciet verklaarde routeacties verhuizen naar de V4-kop voordat de legac
   assert.match(css, /:has\(\.rtg-v4-header-actions>\[data-rtg-v4-header-action\]\)\{--v4-header:120px\}/,
     'een routeactie blijft op telefoon bereikbaar in een tweede koprij');
   assert.match(command, /id="q" type="search" data-rtg-v4-header-action/);
-  assert.match(command, /data-rtg-editorial-v4="force"/);
   assert.match(runtime, /rtg-v4-edge-state/,
     'de bestaande Edge-status blijft vanuit de universele kop bereikbaar');
   assert.match(ios, /body > header:not\(\.rtg-v4-header\)/,

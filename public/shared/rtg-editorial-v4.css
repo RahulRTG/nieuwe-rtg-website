@@ -56,7 +56,6 @@ body[data-rtg-v4-kind="conversation"] .rtm-kop,body[data-rtg-v4-kind="conversati
    samen met het middenvlak één responsieve werkruimte. */
 body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell{display:block!important;width:min(calc(100% - 2 * var(--v4-frame)),var(--v4-wide))!important;max-width:var(--v4-wide)!important;margin:0 auto!important;padding:clamp(24px,4vw,64px) 0!important}
 body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-page,[data-rtg-screen-root="content"]):not(#gate):not(#onbGate){display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin-inline:auto!important;padding-inline:0!important}
-@media(max-width:799px){html body.rtg-first-page[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-page:not(#gate):not(#onbGate){display:contents!important}}
 body[data-rtg-editorial-v4="true"]:not([data-world-home]) :is(.wd-greeting,.wd-people,.wd-favorites,.wd-library,.wp-tabs,.wp-domain,.wp-atmosphere){display:none!important}
 body[data-rtg-editorial-v4="true"] :is(main,[data-rtg-screen-root="content"],.wrap,.shell,.schil):not([data-rtg-native-canvas]){max-width:var(--v4-wide);margin-inline:auto}
 body[data-rtg-editorial-v4="true"] main:not(.wd-home){padding:clamp(24px,4vw,64px) var(--v4-frame)!important}

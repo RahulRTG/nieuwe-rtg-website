@@ -8,7 +8,7 @@
   if (g && g.document) { g.RTGEditorialV4 = api; api.boot(g.document, g); }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (model, headerDom) {
   'use strict';
-  var pathOf = model.pathOf, classify = model.classify, ownsPresentation = model.ownsPresentation, photoFor = model.photoFor;
+  var pathOf = model.pathOf, classify = model.classify, photoFor = model.photoFor;
   var worldName = model.worldName, screenLabel = model.screenLabel;
   var adoptHeaderControls = headerDom.adopt;
 

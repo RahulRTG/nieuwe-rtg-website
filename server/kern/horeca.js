@@ -141,8 +141,23 @@ module.exports = (kern) => {
      kern als `horecaBonlaag` (opzet/kernlaag5f.js). Een getter en geen waarde:
      wie de bonnen niet raakt (de avondplanner, een unittoets), reikt er ook niet
      naar -- en de domeingrens telt alleen wat er werkelijk wordt gelezen. */
+  /* VERGETEN (AVG art. 17): de rekening blijft (administratie van de zaak), het
+     bezorgpunt van de gast niet; na sluiten ook het adres. Bewaren: de aanroeper. */
+  function vergeetBezorgpunten(handle) {
+    let n = 0;
+    for (const doos of Object.values(handle ? eigen.bak('horeca') : {})) {
+      for (const r of Object.values((doos && doos.rekeningen) || {})) {
+        if (!r || r.gastId !== handle || !r.bezorg) continue;
+        r.bezorg.lat = null; r.bezorg.lng = null;
+        if (r.status !== 'open') { r.bezorg.adres = null; r.bezorg.postcode = null; r.bezorg.opmerking = null; }
+        n++;
+      }
+    }
+    return { rekeningen: n };
+  }
+
   return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, teruggegeven, waarde,
-    totaal, openstaand, controleerSom, happyKorting,
+    totaal, openstaand, controleerSom, happyKorting, vergeetBezorgpunten,
     get bonlaag() { return kern.horecaBonlaag || null; },
     // De smalle terugbetaalweg van de horecateruggave (opzet/kernlaag5f.js), op dezelfde manier.
     get terugbetaling() { return kern.horecaTerugbetaling || null; } };

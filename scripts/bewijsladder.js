@@ -72,7 +72,10 @@ const LADDER = [
     patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /releaseketenwacht\.js$/, /ci-lokaal\.js$/,
       /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/,
       /* register tegen code, statisch en in seconden (ZERO.md golf A) */
-      /schermfunctie\.js$/] },
+      /schermfunctie\.js$/,
+      /* de instroompoort naast de deltapoort: een nieuwe route komt met een
+         toets (ZERO.md par. 7, weer aan sinds 18 oktober 2026) */
+      /nieuweroutes\.js$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
     patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /toetsroutes\.js$/, /verstrengeling\.js$/, /activering\.js$/,
       /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs

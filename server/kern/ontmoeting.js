@@ -141,7 +141,10 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     ontmoetSos: sos, ontmoetSosAf: sosAf, ontmoetSignaalKantoor: signaalNaarKantoor,
     ontmoetSignaalLid: signaalNaarLid, ontmoetMijnState: mijnState, ontmoetKantoorState: kantoorState,
     ontmoetVergeetOudePosities: vergeetOudePosities,
-    ontmoetVergeetSosPosities: deelDate.vergeetSosPosities
+    ontmoetVergeetSosPosities: deelDate.vergeetSosPosities,
+    // de afspraken en voorstellen van een lid dat vergeten wil worden (AVG art. 17)
+    ontmoetVergeetLid: require('./ontmoeting/vergeten')({ dateLijst: () => db.data.ontmoetDates,
+      voorstelLijst: () => db.data.ontmoetVoorstellen, save, lijsten, nu }).ontmoetVergeetLid
   };
 }
 

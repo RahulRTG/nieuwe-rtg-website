@@ -265,3 +265,51 @@ Niet "RTG technical debt = 0", maar:
 Daarna is de vraag bij nieuw werk niet meer "hoe houden we dit schoon", maar
 "komt deze verandering door de bestaande grondwet heen zonder aantoonbaar
 nieuwe schuld".
+
+---
+
+## 7. Project NUL (besluit van de eigenaar, 18 oktober 2026)
+
+De eigenaar maakte van dit programma de voorwaarde voor V1: **RTG ontwikkelt
+niet sneller dan het zijn eigen kwaliteit, veiligheid en continuïteit kan
+bewijzen.** V1 is pas voltooid als de ratels zijn afgebouwd, in deze zin:
+
+| Groep | Einddoel |
+|---|---|
+| Technische schuld | naar 0 waar de schuld daadwerkelijk verwijderbaar is |
+| Beveiliging en privacy | 0 onbehandelde kritieke risico's |
+| Functionele volledigheid | elk onderdeel in `APPWERKT.json` bewezen via de acht bewijzen of een ketenproef |
+| Kwaliteit en betrouwbaarheid | alle vereiste toetsen en bewijzen groen |
+
+**De juiste eindtoestand is nul onbehandelde blokkades en aantoonbare naleving
+van de vastgestelde normen, niet een dashboard waarop toevallig overal nul
+staat.** Een meter die omhoog hoort (bewezen cellen, testbestanden, geslaagde
+ketenproeven) gaat omhoog; een uitzondering mag bestaan, maar alleen gemotiveerd,
+met eigenaar en einde (par. 1, ZERO-UNOWNED-UNKNOWN). Elke ratel hangt aan een
+werkelijk kwaliteitsresultaat: 4511 inline-stijlen weghalen terwijl een scherm
+slechter wordt, is niets gewonnen; een endpointtoets die alleen controleert of er
+een antwoord komt, is geen dekking (LAT.md regel 9).
+
+**Volgorde van prioriteit** (niet per se van uitvoering; werkstromen lopen
+parallel zolang ze elkaars code niet raken): 1. veiligheid en geld (vals succes,
+stil weggevangen fouten, onbevoegde toegang, privacy, onherstelbare transacties);
+2. runtime en architectuur (Loop Fabric, modulegrenzen, dubbele code,
+databasetoegang); 3. functionele volledigheid (de 114 onderdelen door echte
+ketenproeven, met opslag en herstel); 4. frontend en gebruikskwaliteit;
+5. bewijs en release.
+
+**De blijvende grens na de afbouw** is grotendeels wat par. 1 al draagt; dit zijn
+de zes regels met de poort die ze afdwingt:
+
+| Regel | Poort |
+|---|---|
+| nieuwe schuld ontstaat niet ongemerkt | `deltapoort.js` in `ci.yml` |
+| een behaalde norm verslechtert niet stil | `norm.js` (de ratel) en `normverval.js` |
+| kritieke beveiligingsproblemen blokkeren de release | `npm audit` high/critical, CodeQL, `release-gate.js` |
+| nieuwe endpoints komen met een echte toets | `nieuweroutes.js --tegen origin/main`; sinds dit besluit weer AAN in `ci.yml` (hij stond uit omdat de routekaart op main hing; op de V1-integratiebranch loopt hij in seconden) |
+| nieuwe apps bewijzen hun volledige gebruikerstaak | `APPWERKT.json` (de acht bewijzen) en de ketenproeven |
+| nieuwe afhankelijkheden worden verantwoord | ratel `dependencies` = 0, de CI-stap "Nieuwe dependencies beoordelen" |
+
+Wat deze grens nog mist, staat in par. 1 en blijft open werk van het programma:
+`versheid.js` (ZERO-DRIFT) en een controlemodus van `stilspoor.js`
+(ZERO-SILENT-FAILURE) draaien nog niet in `ci.yml`.

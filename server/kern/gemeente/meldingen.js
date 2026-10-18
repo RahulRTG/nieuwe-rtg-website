@@ -147,5 +147,13 @@ module.exports = (ctx) => {
     } catch (e) { return { ok: true, ...val, bron: 'regel' }; }
   }
 
-  return { meld, mijnMeldingen, meldingenLijst, meldingZet, triage };
+  // VERGETEN (AVG art. 17): de knip van N21 hierboven, op verzoek en voor alles
+  function vergeetMelder(key, cn) {
+    let n = 0;
+    for (const m of db.data.gemeenteMeldingen || [])
+      if (m && ((key && m.melderKey === key) || (cn && m.melder === cn))) { delete m.melderKey; delete m.melder; m.melderLos = nu(); n++; }
+    return { los: n };
+  }
+
+  return { meld, mijnMeldingen, meldingenLijst, meldingZet, triage, vergeetMelder };
 };

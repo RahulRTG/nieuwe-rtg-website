@@ -155,7 +155,7 @@ module.exports = (ctx) => {
   /* Het bijhouden en tonen van een zaak staat in ./zaakbeeld.js: dit bestand
      is de ingang (waarneming binnen, duplicaat of niet), dat de behandeling. */
   const H = { zaken, zaak, open, schoon, CATS, STATUS, PRIOS };
-  const { publiek, voorMelder, oorzaakZoek, zaakZet, zaakKlaar, lijst, vanMelder } = require('./zaakbeeld')(ctx, H);
+  const { publiek, voorMelder, oorzaakZoek, zaakZet, zaakKlaar, lijst, vanMelder, vergeetMelder } = require('./zaakbeeld')(ctx, H);
 
   return {
     CATS, STATUS, PRIOS, MELDWEGEN, DUP_M, DUP_UUR, waarneming, zaak, zaakZet, zaakKlaar, lijst, vanMelder, publiek, voorMelder, oorzaakZoek, open,
@@ -171,7 +171,8 @@ module.exports = (ctx) => {
         return z ? { status: 200, zaak: publiek(z) } : { status: 404, error: 'Onbekende zaak.' };
       },
       weefselWaarneming: waarneming,
-      weefselZaakZet: zaakZet
+      weefselZaakZet: zaakZet,
+      weefselVergeetMelder: vergeetMelder
     }
   };
 };

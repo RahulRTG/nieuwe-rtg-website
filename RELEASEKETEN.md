@@ -45,6 +45,21 @@ Besluit van de eigenaar: er is **één releaseketen**, en dat is de artefactkete
 
 Het promotieboek beslist niets zonder de keten: een image dat de keten niet als gepromoveerd kent, of een archief dat naar een ander record wijst, is nee -- ook als het archief zelf klopt. De wacht (`npm run releaseketenwacht`) eist de volgorde kwalificatie → herkomstcontrole met image-ID → `artefactketen.js gebouwd`, en dat het promotieboek de keten leest voor dezelfde omgeving.
 
+## De bron van het workflowbewijs (18 oktober 2026)
+
+`scripts/release-workflow-bewijs.js` bindt vier voorafgaande workflows (volledige
+CI met bewijsboek, de ronde, de desktopstandaard, CodeQL) aan exact de
+releasecommit. Tot 18 oktober telde alleen een run op `main`. Besluit van de
+eigenaar bij de V1-afbouw op één integratiebranch (`CONSOLIDATIE.md`): **de bron
+is de ref waarop de release-imageworkflow zelf draait** (`RTG_RELEASE_BRON`,
+uit `github.ref_name`; een tag valt terug op `main`). De regel zelf verandert
+niet: dezelfde vier workflows, op exact die commit, groen, en een run op een
+andere ref telt niet. Daarvoor kreeg `codeql.yml` een `workflow_dispatch` en
+mag een handmatige full-run van `ci.yml` op een branch zijn bewijsboek
+publiceren; `scripts/evidence-base.js` zoekt een main-basis nog steeds alleen
+op `main`. Bewijs: `test/release-workflow-bewijs.test.js`,
+`test/ci-keten.test.js`.
+
 ## Wat NIET bewezen is (met reden)
 
 1. **Een echte CI-run.** De nieuwe stappen in `release-image.yml` zijn in deze omgeving niet uitgevoerd: er is geen Docker-daemon. De digest-test is bewezen tegen een nep-`docker`; dat het echt werkt met GHCR is niet bewezen. Eerste echte run is de proef.

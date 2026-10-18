@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T19:52:53.823Z",
-  "commit": "c92ea0b27",
+  "op": "2026-10-18T20:23:45.482Z",
+  "commit": "8f0a10ea7",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -941,31 +941,31 @@
   },
   {
    "sleutel": "POST /api/bedrijf/taak/kolom",
-   "bestand": "server/bedrijf/taak.js:101",
+   "bestand": "server/bedrijf/taak.js:86",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/maak",
-   "bestand": "server/bedrijf/taak.js:43",
+   "bestand": "server/bedrijf/taak.js:33",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/uren",
-   "bestand": "server/bedrijf/taak.js:127",
+   "bestand": "server/bedrijf/taak.js:112",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/wacht-op",
-   "bestand": "server/bedrijf/taak.js:80",
+   "bestand": "server/bedrijf/taak.js:65",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taken",
-   "bestand": "server/bedrijf/taak.js:142",
+   "bestand": "server/bedrijf/taak.js:127",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },

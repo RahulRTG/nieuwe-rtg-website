@@ -7,7 +7,7 @@
    DE LIJST IS GESLOTEN, en dat is de kern. Er is geen algemene "voer maar uit":
    elke regel is een werkwoord dat iemand met dat recht ook met de hand had
    mogen doen, met de rechtencontrole en de samenvatting ernaast. Wie er een
-   bijzet, schrijft ook de uitvoering in handeling.js -- er is met opzet geen
+   bijzet, schrijft ook de uitvoering in handeling-uitvoering.js -- er is met opzet geen
    generieke weg die elke nieuwe regel meteen uitvoerbaar maakt.
 
    DE ZEEF IS EEN REGEL EN GEEN MODEL. CLAUDE.md legt dat vast: controleerbare

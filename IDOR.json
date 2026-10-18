@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T14:23:29.863Z",
-  "commit": "07f154cdb",
+  "op": "2026-10-18T16:11:16.990Z",
+  "commit": "6f566dc95",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/idorproef.js",
@@ -11,14 +11,14 @@
  "grens": "een doorbraak is een VRAAG en geen vonnis: het object kan publiek zijn. En de proef ziet alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.",
  "gemeten": {
   "routes": 1998,
-  "gescheiden": 708,
+  "gescheiden": 715,
   "doorbraak": 0,
-  "nagekeken": 40,
-  "publiek": 426,
-  "onbereikbaar": 824,
+  "nagekeken": 43,
+  "publiek": 445,
+  "onbereikbaar": 795,
   "lek": 0,
-  "poolDomeinen": 115,
-  "poolVelden": 712,
+  "poolDomeinen": 119,
+  "poolVelden": 749,
   "werkplek": {
    "routes": 84,
    "gescheiden": 56,
@@ -30,8 +30,22 @@
     "velden": 59
    }
   },
-  "sessieHernieuwd": 1,
-  "subjectVervangen": 0
+  "sessieHernieuwd": 3,
+  "subjectVervangen": 2,
+  "toestel": {
+   "gebonden": 5,
+   "gekeurd": 4,
+   "mislukt": []
+  },
+  "zwarePaden": {
+   "routes": 80,
+   "gescheiden": 12,
+   "doorbraak": 0,
+   "nagekeken": 1,
+   "publiek": 16,
+   "onbereikbaar": 51,
+   "aanDeDeur": 0
+  }
  },
  "doorbraken": [],
  "perRoute": {
@@ -190,7 +204,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -203,7 +223,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -218,7 +244,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/bonnen": {
@@ -230,7 +262,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -245,7 +283,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/catalogus": {
@@ -257,7 +301,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -272,7 +322,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/context/klaarzet": {
@@ -285,7 +341,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/context/lees": {
@@ -299,7 +361,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/dossier": {
@@ -313,7 +381,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/installeer": {
@@ -327,7 +401,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/kanaal": {
@@ -339,14 +419,20 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/appstore/koop": {
-   "status": 403,
+   "status": 404,
    "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
+   "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
     "code",
@@ -354,7 +440,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/landen": {
@@ -366,7 +458,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -379,7 +477,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -394,148 +498,186 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 200,
+   "staat": "publiek",
    "velden": [
     "code",
     "land",
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
-   ]
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/appstore/persoon/aanvraag": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 400,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/cijfers": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/dossier": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/intrekken": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/inzenden": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/journaal": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/naslag": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 200,
+   "staat": "publiek",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
-   ]
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/appstore/persoon/omzet": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/persoon/proef": {
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
+   "status": 200,
+   "staat": "publiek",
    "velden": [
-    "code",
-    "land",
-    "landid",
     "id",
     "machtiging",
-    "machtigingid"
-   ]
+    "machtigingid",
+    "doel",
+    "doelid",
+    "code",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/appstore/tijdlijn": {
    "status": 200,
@@ -546,7 +688,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -561,7 +709,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/vernietig": {
@@ -575,7 +729,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/weg": {
@@ -589,7 +749,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ]
   },
   "POST /api/appstore/wis-opslag": {
@@ -601,7 +767,13 @@
     "landid",
     "id",
     "machtiging",
-    "machtigingid"
+    "machtigingid",
+    "doel",
+    "doelid",
+    "fout",
+    "foutid",
+    "noggeencode",
+    "noggeencodeid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -661,8 +833,9 @@
   },
   "POST /api/auth/password": {
    "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
    "velden": [
     "id"
    ]
@@ -17524,9 +17697,9 @@
    ]
   },
   "POST /api/member/connect": {
-   "status": 403,
+   "status": 404,
    "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
+   "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
     "id",
@@ -41987,9 +42160,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -42008,9 +42182,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/abonnement/opzegvoorbeeld": {
@@ -42028,9 +42203,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/gegevens": {
@@ -42046,9 +42222,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -42067,9 +42244,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/herstelkanaal/telefoon": {
@@ -42087,9 +42265,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/pas/gast": {
@@ -42106,9 +42285,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/post": {
@@ -42124,9 +42304,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -42179,16 +42360,18 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/mijn/sessies/sluit": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
    "velden": [
     "id",
     "rij",
@@ -42199,15 +42382,15 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/sessies/sluit-overige": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 200,
+   "staat": "publiek",
    "velden": [
     "id",
     "rij",
@@ -42218,12 +42401,34 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
-   ]
+    "sessieid",
+    "contextid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/mijn/toestel/bind": {
+   "status": 409,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "rij",
+    "rijid",
+    "doel",
+    "doelid",
+    "soort",
+    "soortid",
+    "kanal",
+    "kanalid",
+    "toestelid",
+    "sessie",
+    "sessieid",
+    "contextid"
+   ]
+  },
+  "POST /api/mijn/toestel/introk": {
    "status": 400,
    "staat": "onbereikbaar",
    "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
@@ -42237,28 +42442,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
-   ]
-  },
-  "POST /api/mijn/toestel/introk": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
-   "velden": [
-    "id",
-    "rij",
-    "rijid",
-    "doel",
-    "doelid",
-    "soort",
-    "soortid",
-    "kanal",
-    "kanalid",
-    "contextid",
-    "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/toestel/noem": {
@@ -42275,9 +42462,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/toestel/uitdaging": {
@@ -42293,9 +42481,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -42312,9 +42501,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -42333,9 +42523,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/tweefactor/bevestig": {
@@ -42352,9 +42543,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/tweefactor/codes": {
@@ -42372,9 +42564,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mijn/tweefactor/uit": {
@@ -42392,9 +42585,10 @@
     "soortid",
     "kanal",
     "kanalid",
-    "contextid",
+    "toestelid",
     "sessie",
-    "sessieid"
+    "sessieid",
+    "contextid"
    ]
   },
   "POST /api/mob/aanbod": {
@@ -43305,12 +43499,24 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/notifications": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "notification",
+    "notificationid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/notifications/read": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "notification",
+    "notificationid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/notities/bewaar": {
    "staat": "onbereikbaar",
@@ -43400,9 +43606,8 @@
    ]
   },
   "POST /api/onboarding/inricht": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 200,
+   "staat": "publiek",
    "velden": [
     "id",
     "ladder",
@@ -43413,12 +43618,12 @@
     "veldid",
     "laterveld",
     "laterveldid"
-   ]
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/onboarding/inrichten": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 200,
+   "staat": "publiek",
    "velden": [
     "id",
     "ladder",
@@ -43429,7 +43634,8 @@
     "veldid",
     "laterveld",
     "laterveldid"
-   ]
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/onboarding/meebouwen": {
    "status": 200,
@@ -45225,100 +45431,205 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/pay": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/graaf": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/kascode": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/kascode/intrek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/oplaad": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/overzicht": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/portefeuille": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/rekening": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/saldo": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/stuur": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/tegoed": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/tegoed/koop": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/tegoed/roteer": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/tegoed/terug": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/tegoed/verzilver": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/terug": {
+   "status": 409,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/terugstand": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/tik": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/tikcode": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/tikcode/intrek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/tiks": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/pay/verzoek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/verzoek/betaal": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pay/verzoek/intrek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/pin/check": {
    "staat": "onbereikbaar",
@@ -45581,40 +45892,64 @@
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/privacy/delete": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 200,
+   "staat": "nagekeken",
    "velden": [
     "id",
+    "invoice",
+    "invoiceid",
+    "notification",
+    "notificationid",
+    "categorie",
+    "categorieid",
     "onderdel",
     "onderdelid"
-   ]
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: DE PROEF ZELF. wisLid(req.session) wist het account van de AANROEPER; het id uit het lijf wordt niet gelezen. Dit is de route die lid A op plek 1147 van de rij liet verdwijnen -- geen doorbraak maar het recht om vergeten te worden, dat precies doet wat het belooft"
   },
   "POST /api/privacy/export": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 200,
+   "staat": "publiek",
    "velden": [
     "id",
+    "invoice",
+    "invoiceid",
+    "notification",
+    "notificationid",
+    "categorie",
+    "categorieid",
     "onderdel",
     "onderdelid"
-   ]
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/privacy/inzage": {
-   "status": 403,
-   "staat": "onbereikbaar",
-   "reden": "B kreeg 403 aan de toesteldeur (bezitsbewijs vereist): de eigenaarschapsvraag is niet gesteld",
+   "status": 200,
+   "staat": "publiek",
    "velden": [
     "id",
+    "invoice",
+    "invoiceid",
+    "notification",
+    "notificationid",
+    "categorie",
+    "categorieid",
     "onderdel",
     "onderdelid"
-   ]
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/privacy/opnieuw": {
    "status": 200,
    "staat": "publiek",
    "velden": [
     "id",
+    "invoice",
+    "invoiceid",
+    "notification",
+    "notificationid",
+    "categorie",
+    "categorieid",
     "onderdel",
     "onderdelid"
    ],
@@ -46993,15 +47328,14 @@
    ]
   },
   "POST /api/salon/reacties": {
-   "status": 404,
-   "staat": "gescheiden",
-   "reden": "B kreeg 404: het object is niet van B",
-   "lek": false,
+   "status": 200,
+   "staat": "nagekeken",
    "velden": [
     "id",
     "post",
     "postid"
-   ]
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: de reacties onder een post die B mag zien; wie de post mag zien, mag de reacties zien"
   },
   "POST /api/salon/reacties-van": {
    "status": 400,
@@ -47014,15 +47348,14 @@
    ]
   },
   "POST /api/salon/reageer": {
-   "status": 404,
-   "staat": "gescheiden",
-   "reden": "B kreeg 404: het object is niet van B",
-   "lek": false,
+   "status": 200,
+   "staat": "nagekeken",
    "velden": [
     "id",
     "post",
     "postid"
-   ]
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: reageren op een zichtbare post; de reactie staat op B's naam uit de sessie"
   },
   "POST /api/salon/verberg": {
    "status": 200,
@@ -47793,139 +48126,48 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/actielog": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/beleid": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/beleid/zet": {
-   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ]
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/command": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/graaf": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/lijn": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/object": {
-   "status": 404,
-   "staat": "gescheiden",
-   "reden": "B kreeg 404: het object is niet van B",
-   "lek": false,
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ]
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/object/pagina": {
-   "status": 404,
-   "staat": "gescheiden",
-   "reden": "B kreeg 404: het object is niet van B",
-   "lek": false,
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ]
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/rahul": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/voorstel/bevestig": {
-   "status": 404,
-   "staat": "gescheiden",
-   "reden": "B kreeg 404: het object is niet van B",
-   "lek": false,
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ]
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/sociaal/wereld": {
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "sleutel",
-    "komt",
-    "komtid",
-    "vak",
-    "vakid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
   },
   "POST /api/spar/lijst": {
    "status": 200,
@@ -49202,60 +49444,293 @@
    ]
   },
   "POST /api/vonk/bericht": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/betaal": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/blokkeer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/edge": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/halfweg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/kies": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/like": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/vonk/profiel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/vonk/profile-photo": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/profile-photo/order": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/vonk/profile-photo/publish": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/profile-photo/remove": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ]
   },
   "POST /api/vonk/selectie": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "as",
+    "asid",
+    "dag",
+    "dagid",
+    "del",
+    "delid",
+    "slot",
+    "slotid",
+    "eis",
+    "eisid",
+    "soort",
+    "soortid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/voorspel": {
    "staat": "onbereikbaar",
@@ -49270,24 +49745,51 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/wallet": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wallet/munt/koop": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "code"
+   ]
   },
   "POST /api/wallet/munt/wissel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "code"
+   ]
   },
   "POST /api/wallet/voeg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wallet/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "code"
+   ]
   },
   "POST /api/wbw/groep": {
    "staat": "onbereikbaar",

@@ -13,6 +13,11 @@
 @import url('./rtg-world-desktop.css');
 @import url('./rtg-desktop-components.css');
 @import url('./rtg-world-palette.css');
+/* Bestaande, breed gekwalificeerde schermen behouden hun redactionele en
+   filmische grondlaag. Editorial V4 wordt door basis.js daarna geladen en
+   neemt alleen expliciet gemigreerde routes over. */
+@import url('./rtg-editorial-system.css');
+@import url('./rtg-cinematic-system.css');
 
 /* RTG Heritage
    De vaste beeldtaal van het huis, over ieder echt appscherm heen.

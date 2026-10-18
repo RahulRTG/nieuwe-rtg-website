@@ -218,12 +218,13 @@ test('Quiet Presence gebruikt signalen, respecteert pin en bewaart een raakvlak 
   assert.match(EDITORIAL, /@media\(forced-colors:active\)\{\.rtg-v4-header,[\s\S]*?background:Canvas!important/);
 });
 
-test('de definitieve editorial laag is centraal en vervangt de oude presentatielagen', () => {
+test('de definitieve editorial laag migreert expliciet boven de bestaande presentatielaag', () => {
   const heritage = lees('public/shared/rtg-heritage.css');
   const basisBron = lees('public/shared/basis/basis-01.js');
   const basis = lees('public/shared/basis.js');
   assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
-  assert.doesNotMatch(heritage, /rtg-(?:cinematic|editorial)-system\.css/);
+  assert.match(heritage, /rtg-editorial-system\.css/);
+  assert.match(heritage, /rtg-cinematic-system\.css/);
   assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
   assert.match(basisBron, /laadEditorialBlad\(\)/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);

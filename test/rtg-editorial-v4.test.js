@@ -22,16 +22,16 @@ test('editorial v4 classificeert de zeven schermfamilies deterministisch', () =>
   assert.equal(runtime.classify('/apps/privacy.html', formBody, registry), 'state');
 });
 
-test('editorial v4 neemt alleen redactionele schermen of expliciete migraties over', () => {
+test('editorial v4 neemt uitsluitend expliciet gemigreerde schermen over', () => {
   const plain = { getAttribute(){ return null; } };
   const forced = { getAttribute(name){ return name === 'data-rtg-editorial-v4' ? 'force' : null; } };
   const disabled = { getAttribute(name){ return name === 'data-rtg-editorial-v4' ? 'off' : null; } };
   const editorialRoom = { getAttribute(){ return null; }, hasAttribute(name){ return name === 'data-rtg-editorial-room'; } };
-  assert.equal(runtime.ownsPresentation('cover', plain), true);
-  assert.equal(runtime.ownsPresentation('collection', plain), true);
+  assert.equal(runtime.ownsPresentation('cover', plain), false);
+  assert.equal(runtime.ownsPresentation('collection', plain), false);
   assert.equal(runtime.ownsPresentation('cover', disabled), false);
   assert.equal(runtime.ownsPresentation('collection', editorialRoom), false);
-  for (const kind of ['task', 'detail', 'conversation', 'state', 'canvas']) {
+  for (const kind of ['cover', 'collection', 'task', 'detail', 'conversation', 'state', 'canvas']) {
     assert.equal(runtime.ownsPresentation(kind, plain), false, kind + ' houdt zijn geteste taakpresentatie');
     assert.equal(runtime.ownsPresentation(kind, forced), true, kind + ' kan bewust migreren');
   }
@@ -41,6 +41,8 @@ test('basis laadt editorial v4 als een werkelijk laatste presentatielaag', () =>
   const heritage = read('public/shared/rtg-heritage.css');
   const basis = read('public/shared/basis/basis-01.js');
   assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
+  assert.match(heritage, /rtg-editorial-system\.css/);
+  assert.match(heritage, /rtg-cinematic-system\.css/);
   assert.match(heritage, /--rtg-editorial-version:20261001/);
   assert.match(basis, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
   assert.match(basis, /laadEditorialBlad\(\)/);
@@ -51,7 +53,7 @@ test('de werkelijke browserbundel laadt één nieuwe runtime en de service worke
   const basis = read('public/shared/basis.js');
   assert.match(basis, /\['rtg-editorial-v4-model', 'RTGEditorialV4Model'\]/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
-  assert.doesNotMatch(basis, /\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
+  assert.match(basis, /\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
   for (const file of ['public/sw.js','public/apps/foundation/sw.js']) {
     const source = read(file);
     assert.match(source, /rtg-editorial-v4\.css/);

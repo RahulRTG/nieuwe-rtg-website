@@ -57,10 +57,6 @@ const telContrast = (r) => r.contrast.reduce((n, v) => n + v.aantal, 0);
    een scherm waar altijd iets loopt mag deze toets niet laten zakken. */
 const stilNaLaden = async (p) => {
   await wachtOpNetstilte(p);
-  /* De universele presentatielaag komt via basis.js. Wacht op haar expliciete
-     gereedtoestand; anders kan een snelle cache-herlaad precies tussen de
-     oorspronkelijke en de uiteindelijke kleuren worden gemeten. */
-  await p.waitForSelector('body[data-rtg-editorial-v4="true"]');
   try {
     await wachtTot(p, () => !document.getAnimations ||
       document.getAnimations().every((a) => a.playState !== 'running'),

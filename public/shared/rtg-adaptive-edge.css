@@ -212,9 +212,9 @@ body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet[data-rtg-custom-panel="
    een rustige capsule, één contour en een echt scherm dat boven de capsule
    opent. De semantiek en uitvoering blijven van RTGAdaptief en de domeinen. */
 .rtg-adaptive-edge{
-  --edge-bar-bg:var(--rtg-world-card,#0d0c0a);
-  --edge-bar-copy:var(--rtg-world-ink,#fffaf0);
-  --edge-bar-dim:var(--rtg-world-muted,#b8afa1);
+  --edge-bar-bg:#11100e;
+  --edge-bar-copy:#f7f1e8;
+  --edge-bar-dim:#b8afa2;
   --edge-bar-line:color-mix(in srgb,var(--rtg-world-metal,#ebcc94) 22%,transparent);
   --edge-bar-accent:var(--rtg-world-metal,#ebcc94);
   --edge-bar-accent-soft:rgba(235,204,148,.09);

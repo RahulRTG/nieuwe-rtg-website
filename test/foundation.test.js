@@ -97,8 +97,11 @@ test('opgave klaarzetten, inleveren, en de docent leest het schrift mee', async 
   assert.equal((await api('/api/foundation/opgave', { code: L.code, token: L.sToken, tekst: 'stiekem' })).status, 403);
   // leerling levert in
   assert.equal((await api('/api/foundation/opgave/inleveren', { code: L.code, token: L.sToken, opgaveId: o.opgave.id, antwoord: '54' })).status, 200);
-  const opgaven = await json(await metSleutel('/opgaven/' + L.code, L.tToken));
+  // de deur heet in de routekaart /api/foundation/opgaven/:code; alleen de docent leest de inzendingen
+  const OPGAVEN = '/api/foundation/opgaven/:code';
+  const opgaven = await json(await metSleutel(OPGAVEN.replace(':code', L.code), L.tToken));
   assert.equal(Object.keys(opgaven.opgaven[0].inzendingen).length, 1);
+  assert.equal((await metSleutel(OPGAVEN.replace(':code', L.code), L.sToken)).status, 403, 'een leerling leest de inzendingen van de klas niet');
 
   // schrift opslaan en de docent leest mee
   await api('/api/foundation/schrift/opslaan', { code: L.code, token: L.sToken, pages: [{ type: 'tekst', titel: 'Som', inhoud: '6 x 9 = 54' }] });

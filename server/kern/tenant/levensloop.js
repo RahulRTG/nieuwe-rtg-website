@@ -54,10 +54,11 @@ const MAG = {
 };
 
 module.exports = ({ db, save, schoon, register, uitgang }) => {
+  const opslag = require('./opslag')({ db }); // de deur naar de werkruimtes
   const nu = () => klokDatum().toISOString();
 
   function ruimte(code) {
-    const w = db.data.werkruimtes || {};
+    const w = opslag.werkruimtesKijk();
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
   }
   function vak(t) {
@@ -173,7 +174,7 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
       if (!w) continue;
       const u = uitgang.exporteer(code);
       bewijs.werkruimtes.push({ code, catalogus: u.ok ? u.uitvoer.catalogus : [], checksum: u.ok ? u.uitvoer.checksum : null });
-      delete db.data.werkruimtes[code];
+      delete opslag.werkruimtesKijk()[code];
     }
     bewijs.checksum = uitgang.som(bewijs.werkruimtes);
     t.werkruimtes = [];

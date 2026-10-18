@@ -50,11 +50,12 @@ const REDEN_UIT = 'Identiteitsprovider: groepslidmaatschap vervallen.';
 const REDEN_SCIM = 'Identiteitsprovider: account gedeactiveerd (SCIM).';
 
 module.exports = ({ db, save, register }) => {
+  const opslag = require('./opslag')({ db }); // de deur naar werkruimtes en tenants
   const nu = () => klokDatum().toISOString();
   const dag = () => nu().slice(0, 10);
   const bestaatRol = (id) => ROLLEN.some(r => r.id === id);
 
-  function ruimtes() { return db.data.werkruimtes || {}; }
+  function ruimtes() { return opslag.werkruimtesKijk(); }
   function ruimte(code) {
     const w = ruimtes();
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
@@ -176,7 +177,7 @@ module.exports = ({ db, save, register }) => {
      leest dit; de brug is de enige die de koppeling rtgKey -> lid kent. */
   function werkruimtesVan(rtgKey) {
     const uit = [];
-    for (const t of Object.values(db.data.tenants || {})) {
+    for (const t of Object.values(opslag.tenantsKijk())) {
       for (const code of t.werkruimtes) {
         const w = ruimte(code);
         const l = w ? lidVanKey(w, rtgKey) : null;

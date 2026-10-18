@@ -34,6 +34,7 @@ body[data-rtg-editorial-v4="true"].rtg-edge-host>header.rtg-v4-header{display:gr
 .rtg-v4-brand{color:var(--v4-ink)!important;text-decoration:none!important;font:400 clamp(1.8rem,3vw,2.5rem)/1 "Bodoni Moda",serif!important;letter-spacing:-.045em;pointer-events:auto}
 .rtg-v4-context{display:flex;align-items:baseline;gap:12px;min-width:0}.rtg-v4-world{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--v4-accent);white-space:nowrap}.rtg-v4-title{font-size:.9rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rtg-v4-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;pointer-events:auto}.rtg-v4-icon,.rtg-v4-header-actions>:is(a,button){display:grid;place-items:center;min-width:44px!important;width:auto;min-height:44px!important;margin:0!important;padding:8px!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--v4-ink)!important;box-shadow:none!important;text-decoration:none!important}.rtg-v4-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.rtg-v4-route-actions{display:flex;align-items:center;gap:4px;max-width:min(68vw,900px);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}.rtg-v4-route-actions::-webkit-scrollbar{display:none}.rtg-v4-route-actions>:is(nav,form,.tabs,.standen,.zoekbalk){display:flex!important;align-items:center!important;gap:4px!important;position:static!important;inset:auto!important;width:auto!important;min-width:max-content!important;height:auto!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}.rtg-v4-route-actions :is(button,a,input,select){min-height:40px!important;margin:0!important}.rtg-v4-route-actions input{width:clamp(150px,20vw,320px)!important;min-height:40px!important;padding-block:8px!important}.rtg-v4-route-actions [aria-live]{white-space:nowrap}
 body[data-rtg-editorial-v4="true"] .rtg-edge-top,body[data-rtg-editorial-v4="true"] header[data-rtg-v4-legacy-header="true"],body[data-rtg-editorial-v4="true"] [data-rtg-edge-2-contextual="native-header"][data-rtg-v4-legacy-header="true"]{display:none!important}
 html body[data-rtg-editorial-v4="true"]>header[data-rtg-v4-legacy-header="true"],html body[data-rtg-editorial-v4="true"] .wd-page>header[data-rtg-v4-legacy-header="true"],html body[data-rtg-editorial-v4="true"] .rtg-edge-2-context-slot>header[data-rtg-edge-2-contextual="native-header"][data-rtg-v4-legacy-header="true"]{display:none!important}
 /* Een canvas heeft een eigen gereedschapsbalk. Die is taakbediening en geen
@@ -102,7 +103,11 @@ body[data-rtg-v4-kind="conversation"] :is(.berichten,.gesprek,.chat,.inbox){back
 body[data-rtg-v4-kind="state"] :is(main,[data-rtg-screen-root="content"]){display:grid!important;place-content:center;min-height:calc(100dvh - var(--v4-header) - var(--v4-edge-space));max-width:44rem!important;text-align:center}
 body[data-rtg-v4-kind="state"] :is(h1,h2,p){margin-inline:auto}
 body[data-rtg-v4-kind="canvas"]{padding:var(--v4-header) 0 var(--v4-edge-space)!important;background:#0c0c0b!important;color:#fff!important;color-scheme:dark}
-body[data-rtg-v4-kind="canvas"] :is(main,[data-rtg-screen-root="immersive"],[data-rtg-native-canvas]){position:fixed!important;inset:var(--v4-header) 0 var(--v4-edge-space)!important;width:auto!important;height:auto!important;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden!important}
+/* Alleen het dragende canvasvlak mag de viewport bezitten. Een afstammeling
+   met data-rtg-native-canvas kan net zo goed een editor, kaart of ander
+   interactief vlak zijn. Die hier ook fixed maken legde zo'n afstammeling over
+   zijn eigen werkbalk heen; hij bleef transparant maar ving iedere klik. */
+body[data-rtg-v4-kind="canvas"] :is(main[data-rtg-native-canvas],[data-rtg-screen-root="immersive"],body>[data-rtg-native-canvas]){position:fixed!important;inset:var(--v4-header) 0 var(--v4-edge-space)!important;width:auto!important;height:auto!important;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden!important}
 
 /* De ene Edge: dun glas, subtiele wereldkleur en de lippen als anker. */
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-edge{--edge-bar-bg:rgba(10,10,9,.9)!important;--edge-bar-copy:#fffaf2!important;--edge-bar-dim:#cfc6ba!important;--edge-bar-line:rgba(217,188,137,.55)!important;--edge-bar-accent:#e2c38e!important;--edge-bar-accent-soft:rgba(226,195,142,.1)!important;pointer-events:auto!important}
@@ -118,6 +123,9 @@ body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet>.rtg-edge-index[aria-hidd
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-faces,
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-face:not([hidden]),
 body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-global-original{pointer-events:auto!important}
+body[data-rtg-editorial-v4="true"] .rtg-adaptive-sheet .rtg-edge-export:empty{display:none!important;pointer-events:none!important}
+body[data-rtg-editorial-v4="true"]:has(.rtg-continue-key-picker:not([hidden])) .rtg-adaptive-edge,
+body[data-rtg-editorial-v4="true"]:has(.rtg-continue-key-picker:not([hidden])) .rtg-adaptive-edge *{pointer-events:none!important}
 /* De capsule blijft doorschijnend, maar krijgt een zachte optische onderlaag.
    Zo blijven fotografie en wereldkleur aanwezig zonder dat kaart- of rasterlijnen
    uit het scherm achter de ene Edge doorlopen. */
@@ -202,10 +210,18 @@ body[data-rtg-v4-embedded="true"] #standen{display:none!important}
   html body[data-rtg-editorial-v4="true"][data-rtg-shell="mobile"] .wd-shell{width:100%!important;max-width:none!important;margin:0!important}
   body[data-rtg-editorial-v4="true"][data-world-home] .wd-shell{display:flex!important;flex-direction:column!important}
   body[data-rtg-editorial-v4="true"] :is(.wd-shell,.wd-page){width:100%!important;max-width:none!important;margin-inline:0!important;padding-inline:0!important}
-  body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-page{display:contents!important}
+  /* display:contents wist de geometrie van .wd-page. De werkruimte gebruikt
+     dat kader als het contract voor haar surfaces en kreeg op mobiel daardoor
+     letterlijk een kader van 0 x 0. Een randloos blok geeft dezelfde visuele
+     volle breedte en houdt wel een meetbaar, aanraakbaar vlak. */
+  body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-page{display:block!important}
   body[data-rtg-editorial-v4="true"] :is(main,#main){width:100%!important;max-width:none!important;margin-inline:0!important}
   body[data-rtg-editorial-v4="true"] :is(.wd-home,main.wd-home){padding-inline:0!important}
   body[data-rtg-editorial-v4="true"] main:not(.wd-home){padding:24px var(--v4-frame)!important}
+  /* Command is zelf de werkvloer en bevat een geneste <main>. Algemene
+     artikelwitruimte daar toepassen verschoof elk iframe 22px ten opzichte van
+     het gedeelde kader en maakte de ene schil zichtbaar als twee lagen. */
+  body[data-rtg-editorial-v4="true"] #rtgCommand main.cmd-werk{padding:0!important}
   .rtg-v4-photo-lead{left:50%;width:100vw;min-height:clamp(290px,48dvh,430px);margin-top:-24px;transform:translateX(-50%);border-radius:0}
   body[data-rtg-editorial-v4="true"] :is(.knop,.btn,button[type="submit"],a.button,.primary,.primair,.hoofd,.rtg-dashboard-hero-cta,.daily-action){min-width:min(100%,156px);min-height:50px;padding:12px 18px!important}
   body[data-rtg-editorial-v4="true"] h1{max-width:11ch}
@@ -273,6 +289,7 @@ body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg
   body[data-rtg-editorial-v4="true"] .rtg-v4-header-actions{position:absolute;inset:0 8px;display:flex;justify-content:space-between;pointer-events:none}
   body[data-rtg-editorial-v4="true"] .rtg-v4-header-actions>.rtg-v4-icon{display:grid!important;min-width:44px!important;width:44px!important;color:inherit!important;pointer-events:auto}
   body[data-rtg-editorial-v4="true"] .rtg-v4-header-actions>.rtg-v4-icon svg{width:18px;height:18px}
+  body[data-rtg-editorial-v4="true"] .rtg-v4-route-actions{display:none!important}
   body[data-rtg-editorial-v4="true"] main:not(.wd-home){padding-top:22px!important}
   body[data-rtg-editorial-v4="true"] .rtg-v4-section-masthead{min-height:58px;margin:0;padding:0 2px}
   body[data-rtg-editorial-v4="true"] .rtg-v4-photo-lead{left:50%;width:100vw;min-height:190px;margin-top:42px;margin-bottom:-24px;transform:translateX(-50%)}
@@ -507,14 +524,20 @@ html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="collection"] .rtg-v4-s
   /* Een mobiel redactioneel scherm heeft geen tweede kaart om zijn volledige
      inhoud. Deze late, bewust specifieke regel wint ook wanneer de oude
      desktoplaag na V4 wordt geladen. */
-  html body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell>.wd-page{display:contents!important}
+  html body[data-rtg-editorial-v4="true"]:not([data-world-home]) .wd-shell>.wd-page{display:block!important}
   /* De oude mobiele bureaulaag zette iedere werkruimte opnieuw op inset:0.
      Daardoor liep een iframe achter de vaste Edge door en ving de Edge de
      onderste formulierknoppen af. De ene schil reserveert hier expliciet haar
      kop- en Edgegebied; de inhoud blijft daarbinnen zelfstandig scrollen. */
-  html body.rtg-edge-workspace[data-rtg-editorial-v4="true"] #rtgWorldContent.wd-page>.rtg-werkruimte{
+  html body[data-rtg-editorial-v4="true"] #rtgWorldContent.wd-page:is(:has(>.rtg-werkruimte),:has(>#rtgCommand)){
     position:fixed!important;
     inset:var(--v4-header) 0 var(--v4-edge-space) 0!important;
+    width:auto!important;height:auto!important;min-height:0!important;
+    contain:layout!important;isolation:isolate!important;
+  }
+  html body.rtg-edge-workspace[data-rtg-editorial-v4="true"] #rtgWorldContent.wd-page>.rtg-werkruimte{
+    position:absolute!important;
+    inset:0!important;
     width:auto!important;height:auto!important;min-height:0!important;
     overflow:hidden!important;
   }

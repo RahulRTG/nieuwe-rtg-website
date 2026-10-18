@@ -192,7 +192,8 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.goto(server.base + '/apps/rtg.html', {waitUntil:'domcontentloaded'}); await ready(page);
         await openEdgeMenu(page); await require('./helper').edgeCatalogus(page);
         assert.deepEqual(await page.locator('.rtg-action-dock-slots > div').evaluateAll(els=>els.map(e=>e.querySelector('a')?.getAttribute('href') || null)),links);
-        await page.keyboard.press('Escape'); await page.click('.rtg-edge-state');
+        await page.keyboard.press('Escape'); await page.evaluate(() => window.RTGAdaptiveEdge.setDeck('context'));
+        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="status"]');
         await page.click('.rtg-edge-density [data-density="compact"]');
         await page.reload({waitUntil:'domcontentloaded'}); await ready(page,true);
         await page.waitForFunction(()=>document.body.dataset.rtgDensity==='compact');

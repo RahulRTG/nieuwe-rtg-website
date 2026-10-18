@@ -120,7 +120,8 @@ body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-e
   .intelligence-dock{left:1rem;right:1rem;top:auto;bottom:1rem;width:auto;padding:1rem}
   .source-grid{grid-template-columns:repeat(3,1fr)}
   .lagen{right:.65rem;bottom:6.7rem;flex-direction:column;padding:.2rem}.lagen button{width:38px;height:38px;border-left:0;border-top:1px solid rgba(255,255,255,.08)}
-  .paneel{left:0;right:0;bottom:0;width:100%;max-height:78vh;padding:1rem 1rem calc(env(safe-area-inset-bottom,0px) + 1rem);border-left:0;border-right:0;border-bottom:0}
+  html body.travel-os-map[data-rtg-editorial-v4="true"] main[data-rtg-screen-root="immersive"]>:is(.paneel,.kaarten){max-height:calc(100dvh - var(--tos-top) - var(--tos-bottom) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px)!important}
+  .paneel{left:0;right:0;bottom:0;width:100%;padding:1rem 1rem calc(env(safe-area-inset-bottom,0px) + 1rem);border-left:0;border-right:0;border-bottom:0}
   .paneel .grip{display:block}.route-hero .samenv b{font-size:2.7rem}.profile-row button{font-size:.56rem}
   .intel-metrics{grid-template-columns:repeat(2,1fr)}
   .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 1rem)}

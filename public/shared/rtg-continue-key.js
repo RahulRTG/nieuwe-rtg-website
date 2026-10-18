@@ -1,6 +1,4 @@
-/* RTG Continue Key: verrijkt exact de bestaande Edge-hoofdactie. De knop,
-   onclick en bevoegdheid blijven van Edge/de app; deze laag voegt alleen
-   veilige interactie toe. */
+/* RTG Continue Key verrijkt de bestaande Edge-hoofdactie zonder haar uit te voeren. */
 (function (g, fabriek) {
   'use strict';
   var kern = typeof module === 'object' && module.exports ? require('./rtg-continue-key-core.js') : g && g.RTGContinueKeyCore;
@@ -77,7 +75,7 @@
       }
       if (ev.key === 'Escape' && !rt.picker.hidden) { ev.preventDefault(); sluitPicker(rt, true); }
     });
-    rt.picker.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { ev.preventDefault(); sluitPicker(rt, true); } });
+    rt.picker.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !rt.picker.hidden) { ev.preventDefault(); sluitPicker(rt, true); } });
     win.addEventListener('resize', function () { pasViewport(rt); planMeet(rt); }, { passive: true });
     win.addEventListener('rtg-hand', function () { if (!rt.heeftVoorkeur) pasAnker(rt, C.handAnchor(win), false); });
     if (win.visualViewport) {

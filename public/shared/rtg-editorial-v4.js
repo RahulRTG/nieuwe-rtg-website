@@ -62,6 +62,23 @@ function icon(kind) {
   if (kind === 'search') return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>';
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"></path></svg>';
 }
+function adoptHeaderControls(doc, header, legacy) {
+  if (!header || !legacy || legacy === header) return;
+  var actions = header.querySelector('.rtg-v4-header-actions');
+  if (!actions) return;
+  var bucket = actions.querySelector('.rtg-v4-route-actions');
+  var candidates = Array.from(legacy.children).filter(function (node) {
+    if (!node.matches) return false;
+    if (node.matches('nav,form,[role="tablist"],button,input,select,textarea,.zoekbalk,.tabs,.standen,.rtg-rahul-tab,[aria-live]')) return true;
+    return !node.matches('h1,h2,h3,.ey,.rek,.sp') && !!node.querySelector('button,input,select,textarea');
+  });
+  if (!candidates.length) return;
+  if (!bucket) {
+    bucket = make(doc, 'div', 'rtg-v4-route-actions');
+    actions.insertBefore(bucket, actions.firstChild);
+  }
+  candidates.forEach(function (node) { bucket.appendChild(node); });
+}
 function buildHeader(doc, body, name) {
   var old = body.querySelector('[data-rtg-edge-2-contextual="native-header"], :scope > header:not(.rtg-v4-header), :scope > .wd-page > header:not(.rtg-v4-header)');
   var header = make(doc, 'header', 'rtg-v4-header');
@@ -75,6 +92,7 @@ function buildHeader(doc, body, name) {
   actions.append(search, account); header.append(home, context, actions);
   var contentHeader = old && old.matches('.ritkop,[data-rtg-v4-content-header]');
   if (old && !contentHeader && body.dataset.rtgV4Kind !== 'canvas') {
+    adoptHeaderControls(doc, header, old);
     old.dataset.rtgV4LegacyHeader = 'true';
     Array.from(old.querySelectorAll(':scope > .terug,:scope > [data-rtg-edge-bar]')).forEach(function (node) {
       if (!node.closest('dialog,[role="dialog"]')) actions.insertBefore(node, search);
@@ -123,12 +141,12 @@ function annotate(doc, win) {
     Array.from(doc.querySelectorAll('[data-rtg-edge-2-contextual="native-header"]')).forEach(function (legacy) {
       if (legacy !== header) {
         if (legacy.matches('.ritkop,[data-rtg-v4-content-header]')) delete legacy.dataset.rtgV4LegacyHeader;
-        else legacy.dataset.rtgV4LegacyHeader = 'true';
+        else { adoptHeaderControls(doc, header, legacy); legacy.dataset.rtgV4LegacyHeader = 'true'; }
       }
     });
     if (body.dataset.rtgV4Kind !== 'canvas') Array.from(doc.querySelectorAll('.wd-page > header:not(.rtg-v4-header), body > header:not(.rtg-v4-header)')).forEach(function (legacy) {
       if (legacy.matches('.ritkop,[data-rtg-v4-content-header]')) delete legacy.dataset.rtgV4LegacyHeader;
-      else legacy.dataset.rtgV4LegacyHeader = 'true';
+      else { adoptHeaderControls(doc, header, legacy); legacy.dataset.rtgV4LegacyHeader = 'true'; }
     });
     var worldNode = header.querySelector('.rtg-v4-world'), titleNode = header.querySelector('.rtg-v4-title');
     var worldText = worldName(world);
@@ -162,6 +180,11 @@ function boot(doc, win) {
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start, { once:true }); else start();
 }
 function setSurface(doc, win, body) { var page = doc.querySelector('.wd-page');
-  if (page && !body.hasAttribute('data-world-home')) page.style.setProperty('display', win.innerWidth < 700 ? 'contents' : 'block', 'important'); }
+  /* `.wd-page` is the shared, measurable content frame. Turning it into
+     `display: contents` on phones erased that frame from the layout and made
+     both Edge and embedded worlds position themselves against different
+     ancestors. Keep one real shell on every viewport; the responsive grids
+     inside it still decide how many panes are visible. */
+  if (page && !body.hasAttribute('data-world-home')) page.style.setProperty('display', 'block', 'important'); }
 return Object.freeze({classify:classify,pathOf:pathOf,annotate:annotate,boot:boot});
 }));

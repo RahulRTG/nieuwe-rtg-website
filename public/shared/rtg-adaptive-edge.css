@@ -2,7 +2,11 @@
 body[data-rtg-adaptive-ready="true"]{--rtg-safe-left:env(safe-area-inset-left,0px);--rtg-safe-right:env(safe-area-inset-right,0px);--rtg-safe-top:env(safe-area-inset-top,0px);--rtg-adaptive-height:68px;--rtg-adaptive-gap:max(14px,calc(env(safe-area-inset-bottom,0px) + 4px));--rtg-adaptive-inset:calc(var(--rtg-adaptive-height) + var(--rtg-adaptive-gap) + 14px);--edge-bottom:var(--rtg-adaptive-inset);scroll-padding-bottom:calc(var(--rtg-adaptive-inset) + 16px)}
 html:has(body[data-rtg-adaptive-ready="true"]){scroll-padding-bottom:calc(var(--rtg-adaptive-inset,96px) + 16px)}
 body[data-rtg-adaptive-ready="true"] .rtg-edge-bottom{display:none!important}
+/* Adaptive Edge is de zichtbare schil en blijft in dock staan. Beide oude
+   44px-randsensoren zijn dan overbodig. Alleen de onderste verbergen liet de
+   transparante bovensensor nog boven sluit- en kaartknoppen liggen. */
 body[data-rtg-adaptive-ready="true"] .rtg-edge-2-edge-reveal--bottom{display:none!important}
+body[data-rtg-adaptive-ready="true"] .rtg-edge-2-edge-reveal--top{display:none!important;pointer-events:none!important}
 body[data-rtg-adaptive-ready="true"] :is(.rtgsprong-greep,.rtm-nav){display:none!important}
 body[data-rtg-adaptive-ready="true"] .rtg-edge-index,
 body[data-rtg-adaptive-ready="true"] .rtg-edge-ai-panel{bottom:calc(var(--rtg-adaptive-inset) + env(safe-area-inset-bottom,0px))}

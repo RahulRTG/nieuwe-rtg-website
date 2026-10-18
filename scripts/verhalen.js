@@ -49,18 +49,20 @@
 'use strict';
 const http = require('http');
 const crypto = require('crypto');
+const { bindToestel, metToestellen } = require('./lib/proeftoestel');
 
 /* ---------- de deur ---------- */
 
 const agent = new http.Agent({ keepAlive: true, maxSockets: 128 });
 
 function maakDeur({ host, port, timeoutMs }) {
-  return function vraag(method, pad, token, body) {
+  return function vraag(method, pad, token, body, extraKoppen) {
     const t0 = Date.now();
     return new Promise(resolve => {
       const data = method === 'GET' ? null : JSON.stringify(body === undefined ? {} : body);
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers.Authorization = 'Bearer ' + token;
+      Object.assign(headers, extraKoppen || {});
       if (data) headers['Content-Length'] = Buffer.byteLength(data);
       let klaar = false;
       const af = (status, tekst) => {
@@ -218,7 +220,24 @@ async function bouwPodium(vraag) {
     wb.eis('paspoortstand', GEVERIFIEERD.includes(st.data.status),
       'het paspoort van ' + naam + ' staat na de upload op "' + st.data.status + '" in plaats van "pending"');
   }
-  return { supToken: sup, supCode: code, vervoerCode: vervoer ? vervoer.code : null, prijs: 22, ploeg };
+  /* De twee beursleden gebruiken zware RTG Pay-paden. Bind hun sessie aan een
+     echte P-256-toestelsleutel en laat alleen die paden ondertekenen via het
+     gedeelde proefclientcontract. De serverpoort blijft daarmee exact gelijk
+     aan productie; het verhaal gedraagt zich voortaan als de browser. */
+  const post = (pad, body, token, koppen) => vraag('POST', pad, token, body, koppen);
+  const toestellen = [];
+  for (const naam of ['beursA', 'beursB']) {
+    const binding = await bindToestel({ post, token: ploeg[naam].token, naam: 'Verhaal ' + naam });
+    if (!binding.klaar) throw new Gefaald('toestel bevestigen', naam + ': ' + binding.reden);
+    ploeg[naam].toestel = binding.klaar;
+    toestellen.push(binding.klaar);
+  }
+  const getekendePost = metToestellen(post, { toestellen });
+  const getekendeVraag = (method, pad, token, body) => method === 'POST'
+    ? getekendePost(pad, body, token)
+    : vraag(method, pad, token, body);
+  return { supToken: sup, supCode: code, vervoerCode: vervoer ? vervoer.code : null,
+    prijs: 22, ploeg, vraag: getekendeVraag };
 }
 
 /* ---------- de verhalen ---------- */
@@ -432,7 +451,7 @@ function versRapport() {
    een ander verhaal. De gelijktijdigheid komt van de storm ernaast -- die
    hoeven we hier niet na te bootsen. */
 async function draaiRonde(vraag, podium, rapport) {
-  const wb = werkbank(vraag);
+  const wb = werkbank(podium.vraag || vraag);
   /* De kaart terugzetten voor we beginnen. Draait dit harnas naast een storm,
      dan fuzzt die storm ook /api/supplier/menu met een geldig partner-token en
      kan hij het gerecht onder de bestelverhalen vandaan trekken. Een verhaal

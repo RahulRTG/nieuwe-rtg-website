@@ -15,7 +15,7 @@
    .js) dezelfde projectie nodig heeft en er geen tweede versie van de prijs-
    en veldnamen mag ontstaan (LAT-regel 4): een reis die hier EUR 2200 kost en
    in de Mall EUR 22 is precies het soort verschil dat niemand ziet aankomen. */
-const maakReisOpslag = require('./reis-opslag');
+const maakReisOpslag = require('./reisbureau-opslag');
 function reisAanbod(db) {
   return maakReisOpslag({ db }).reizen().map(t => ({
     id: t.id, titel: t.title, bestemming: t.dest, dates: t.dates || null,
@@ -28,7 +28,7 @@ function reisAanbod(db) {
 
 function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan }) {
   const nu = () => new Date().toISOString();
-  const opslag = maakReisOpslag({ db }); // de deur naar aanbod en aanvragen (./reis-opslag.js)
+  const opslag = maakReisOpslag({ db }); // de deur naar aanbod en aanvragen (./reisbureau-opslag.js)
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
   /* De weg waarlangs een besluit BIJ HET LID komt. Laat gebonden, want de
@@ -138,7 +138,7 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
      aanvraag, het dossier en de visumtaak met het besluit hierboven, zodat er
      EEN plek blijft waar een aanvraag van stand verandert. */
   const nazorg = require('./reisbureau-nazorg')({
-    // de aanvragenrij gaat mee naar beneden; hij woont in ./reis-opslag.js
+    // de aanvragenrij gaat mee naar beneden; hij woont in ./reisbureau-opslag.js
     rij: opslag.aanvragen,
     save, nu, dossier, visum, meldLid,
     // laat gebonden: de betaallaag wordt na het reisbureau gemount (opzet/kernlaag2.js)

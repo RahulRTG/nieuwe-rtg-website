@@ -37,7 +37,7 @@ const REGISTER = {
 };
 
 module.exports = function maakReisOpslag({ db }) {
-  if (!db) throw new Error('kern/reis-opslag: zonder db is er niets om te bewaren');
+  if (!db) throw new Error('kern/reisbureau-opslag: zonder db is er niets om te bewaren');
 
   const lees = (naam) => (db.data && Array.isArray(db.data[naam]) ? db.data[naam] : []);
   const pak = (naam) => (Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []));

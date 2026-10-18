@@ -49,7 +49,7 @@ const SNIJ = { title: 80, dest: 60, dates: 60, desc: 600, regel: 120, visual: 40
 function maakReisaanbod({ db, save, crypto }) {
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
-  const opslag = require('./reis-opslag')({ db }); // de deur naar aanbod en aanvragen
+  const opslag = require('./reisbureau-opslag')({ db }); // de deur naar aanbod en aanvragen
   const rij = opslag.pakReizen;
   const aanvragen = opslag.aanvragen;
 

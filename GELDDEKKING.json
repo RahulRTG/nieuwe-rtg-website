@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-10-18T11:21:24.953Z",
-    "commit": "ba4420c10",
+    "op": "2026-10-18T13:06:53.490Z",
+    "commit": "0b7beb12b",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/gelddekking.js",
     "node": "v22.22.0"
   },
@@ -28,16 +28,15 @@
       "ongemeten": 4
     },
     "terugweg": {
-      "geen tegenhanger beproefd": 42,
-      "compensatie": 2,
-      "exact": 1
+      "geen tegenhanger beproefd": 34,
+      "compensatie": 11
     }
   },
   "ratel": {
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 0,
     "geldRoutesZonderIdemBewijs": 3,
-    "geldRoutesZonderTerugweg": 42,
+    "geldRoutesZonderTerugweg": 34,
     "geldRoutesHerstelOnbesloten": 44,
     "geldRoutesMeldOnbesloten": 45,
     "geldRoutesHerstelTegenspraak": 0
@@ -88,9 +87,9 @@
         "UNKNOWN"
       ],
       "telling": {
-        "PROVEN": 3,
+        "PROVEN": 11,
         "BLOCKED": 0,
-        "UNKNOWN": 42
+        "UNKNOWN": 34
       }
     },
     "correctiemodel": {
@@ -213,7 +212,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "exact",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -376,7 +375,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -616,7 +615,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -704,7 +703,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -745,7 +744,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -765,7 +764,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -907,7 +906,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -952,7 +951,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",
@@ -1034,7 +1033,7 @@
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
-      "terugweg": "geen tegenhanger beproefd",
+      "terugweg": "compensatie",
       "berichtAan": "UNKNOWN",
       "berichtGrond": null,
       "herstelKlasse": "UNKNOWN",

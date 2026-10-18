@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "18d2a8ca0",
-  "seconden": 20.6,
+  "commit": "f5be86f0e",
+  "seconden": 19.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -31448,25 +31448,25 @@
     {
      "naam": "verwijder",
      "soort": "functie",
-     "lijn": 86,
+     "lijn": 89,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetEtalage",
      "soort": "functie",
-     "lijn": 91,
+     "lijn": 100,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "etalage",
      "soort": "functie",
-     "lijn": 97,
+     "lijn": 106,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "etalageHaal",
      "soort": "functie",
-     "lijn": 101,
+     "lijn": 110,
      "geexporteerd": "onbekend"
     }
    ],

@@ -184,7 +184,10 @@ async function main() {
           row.failures = [];
           if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          const v4Top = s.worldHome && !mobile ? 24 : s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
+          /* Een wereldstart op desktop begint ONDER de vaste kop (72) met zijn
+             eigen marge (24). Hier stond 24: dat legde vast dat de inhoud onder
+             de kop doorliep, zodat het logo over "Uw mensen" lag (18 oktober 2026). */
+          const v4Top = s.worldHome && !mobile ? 96 : s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
           const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (mobile ? 76 : 88) :
             s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);

@@ -267,10 +267,10 @@ const GRENZEN = [
 const OFFICE = 'RTG-OFFICE-PROEF';
 const SERVEROMGEVING = { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: OFFICE };
 
-async function post(basis, pad, lijf, tok) {
+async function post(basis, pad, lijf, tok, koppen) {
   try {
     const r = await fetch(basis + pad, { method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+      headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(koppen || {}) },
       body: JSON.stringify(lijf || {}) });
     const tekst = await r.text();
     let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
@@ -284,12 +284,38 @@ async function post(basis, pad, lijf, tok) {
    dan strandt de oproep op "deed geen werk" in plaats van op de crash. */
 async function stelOp(datamap) {
   const srv = await W.start({ naam: 'crashproef', datamap, env: SERVEROMGEVING });
-  const p = (pad, lijf, tok) => post(srv.basis, pad, lijf, tok);
-  const bos = await haalSleutels({ post: p });
+  const kaal = (pad, lijf, tok, koppen) => post(srv.basis, pad, lijf, tok, koppen);
+  const bos = await haalSleutels({ post: kaal });
+  /* TWEE PROEFLEDEN MET EEN GEBONDEN TOESTEL -- ./lib/proeftoestel.js, dezelfde
+     weg als scripts/idemproef-route.js. De geldroutes zijn ZWARE paden: sinds
+     het bezitsbewijs standaard verplicht staat, weigert de poort daar de
+     demo-pas uit de sleutelbos met een 403. Dan bouwt idemwereld.js geen
+     rekening, geen saldo en geen tweede codenaam, en strandt een route als
+     /api/pay/stuur op 400 ("Kies aan wie je het stuurt") of /api/bank/sepa op
+     402 -- niet op de crashgrens die deze proef wil raken.
+
+     De poort blijft zoals hij in productie staat. Alleen de CLIENT wordt echt:
+     op een zwaar pad klopt de ledenrol aan als het eerste proeflid, met een
+     vers bewijs van zijn toestelsleutel in de kop; elk ander pad blijft zoals
+     het was. `teken` zet die schil om een post naar een WILLEKEURIGE basis,
+     want na elke herstart draait de server op een ander adres -- het toestel
+     en de sessie staan in de datamap en overleven die herstart. Lukt een
+     proeflid niet, dan bouwt de wereld zich als vanouds en zegt de rij
+     waarop hij strandde. */
+  const { maakProeflid, metToestellen } = require('./lib/proeftoestel');
+  const proeflid = await maakProeflid({ post: kaal, naam: 'Proeflid Crash', basis: srv.basis });
+  const proefander = await maakProeflid({ post: kaal, naam: 'Proeflid Ontvanger', basis: srv.basis });
+  const demoLid = () => [bos.tokens.member, bos.tokenVoor && bos.tokenVoor('member')].filter(Boolean);
+  const teken = (naarBasis) => metToestellen(
+    (pad, lijf, tok, koppen) => post(naarBasis, pad, lijf, tok, koppen),
+    { toestellen: [proefander.klaar], voorLid: { lid: proeflid.klaar, van: demoLid } });
+  const p = teken(srv.basis);
   const { zetWereldKlaar, voorzieningVoor } = require('./lib/idemwereld');
-  const w = await zetWereldKlaar({ post: p, tokens: bos.tokens, datamap });
+  const w = await zetWereldKlaar({ post: p, tokens: bos.tokens, datamap,
+    geldlid: proeflid.klaar && proeflid.klaar.token, tweedeLid: proefander.klaar && proefander.klaar.token });
   const { gedeeldLijf } = require('./lib/idemwereld');
-  return { srv, p, bos, wereld: w.wereld, lijven: w.perRoute || {},
+  return { srv, p, teken, bos, wereld: w.wereld, lijven: w.perRoute || {},
+    proefleden: { eerste: proeflid.klaar ? 'klaar' : proeflid.reden, tweede: proefander.klaar ? 'klaar' : proefander.reden },
     gedeeld: gedeeldLijf(w.wereld), voorzieningVoor };
 }
 
@@ -618,7 +644,7 @@ async function ronde(route, grens, ruis) {
     if (srv.dood) return { stand: 'BLOCKED', voorziening,
       reden: 'de server stierf al tijdens het opstarten onder ' + grens.modus };
 
-    const r = await post(srv.basis, route.pad, lijf, tok);
+    const r = await a.teken(srv.basis)(route.pad, lijf, tok);
     const gestorven = r.status === 0;
 
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
@@ -691,11 +717,11 @@ async function ronde(route, grens, ruis) {
        meting is wat `geenDubbel` weegt; de eerste is wat na de ATOMIC-grens
        bewijst dat de route niet stuk is achtergebleven. */
     const voorHerhaling = inhoudsBeeld(map);
-    const herhaal = await post(srv.basis, route.pad, lijf, tok);
+    const herhaal = await a.teken(srv.basis)(route.pad, lijf, tok);
     const naHerhaling = inhoudsBeeld(map);
     const herhaalDeed = schoon(verschil(voorHerhaling, naHerhaling)).filter(vanRoute(route));
 
-    const tweede = await post(srv.basis, route.pad, lijf, tok);
+    const tweede = await a.teken(srv.basis)(route.pad, lijf, tok);
     const naTweede = inhoudsBeeld(map);
     const bijgekomen = schoon(verschil(naHerhaling, naTweede)).filter(vanRoute(route));
 

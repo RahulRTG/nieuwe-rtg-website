@@ -67,18 +67,30 @@ module.exports = ({ horeca, schoon }) => {
   /* Aanmaken of bijwerken. Tafels die al in een andere wijk zaten, worden daar
      weggehaald -- en de aanroeper krijgt te horen welke, zodat het geen stille
      verhuizing is (regel 3). */
-  function zet(h, { wijkId, naam, tafels }) {
-    const wijken = doosWijken(h);
+  /* `open` is de doos-opener voor het geval `h` een LEESvorm is (Hlees in
+     kern/horeca.js: de echte doos als hij bestaat, anders een losse lege vorm).
+     Alle weigeringen hierboven lezen die vorm; pas als er werkelijk iets te
+     schrijven valt, wordt de doos geopend -- en in een zaak zonder doos
+     ontstaat hij dus pas met de eerste wijk erin, nooit door een geweigerd
+     verzoek (scripts/laatspoor.js). Zonder `open` schrijft hij in `h` zelf,
+     zoals vroeger. */
+  function zet(h, { wijkId, naam, tafels }, open) {
     const n = schoon(naam, 40).trim();
     if (!n) return { status: 400, error: 'Hoe heet deze wijk?' };
     const lijstTafels = (Array.isArray(tafels) ? tafels : []).slice(0, MAXTAFELS)
       .map(tafelNaam).filter(Boolean);
     const uniek = [...new Set(lijstTafels)];
 
-    let w = wijkId ? wijken.find((x) => x.id === String(wijkId)) : null;
+    const bestaand = (h && h.instel && Array.isArray(h.instel.wijken)) ? h.instel.wijken : [];
+    let w = wijkId ? bestaand.find((x) => x.id === String(wijkId)) : null;
     if (wijkId && !w) return { status: 404, error: 'Deze wijk kennen we niet.' };
+    if (!w && bestaand.length >= MAXWIJKEN) return { status: 409, error: 'Meer dan ' + MAXWIJKEN + ' wijken wordt onleesbaar.' };
+
+    // vanaf hier wordt er geschreven: nu pas de echte doos
+    const doos = typeof open === 'function' ? open() : h;
+    const wijken = doosWijken(doos);
+    if (w) w = wijken.find((x) => x.id === String(wijkId)) || w;
     if (!w) {
-      if (wijken.length >= MAXWIJKEN) return { status: 409, error: 'Meer dan ' + MAXWIJKEN + ' wijken wordt onleesbaar.' };
       w = { id: id(4), naam: n, tafels: [] };
       wijken.push(w);
     }

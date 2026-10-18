@@ -13,10 +13,10 @@
     return el.isConnected
   }
   function sourceButtons(doc,embed,items){
-    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id;}));
-    (doc || d).querySelectorAll(R + (embed ? ',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]' : '')).forEach(function (root) {
-      var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
-      controls.forEach(function (el) {
+    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id}));
+    (doc||d).querySelectorAll(R+(embed?',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]':'')).forEach(function(root){
+      var controls=root.matches('button')?[root]:root.querySelectorAll('button,a[href]');
+      controls.forEach(function(el){
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
         var action = el.getAttribute('data-rtg-action-key');

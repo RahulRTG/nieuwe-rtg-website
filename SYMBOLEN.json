@@ -3,7 +3,7 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "cf5162ba5",
+  "commit": "f58cc62ec",
   "seconden": 9.9,
   "invoer": {
    "meting": "invoerspoor",
@@ -7326,7 +7326,7 @@
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2485,
   "zonderUitvoer": 918,
-  "requireKanten": 7830
+  "requireKanten": 7831
  },
  "nietGelezen": [
   {
@@ -9991,6 +9991,7 @@
     "server/accounts/actietokens.js",
     "server/accounts/tokens.js",
     "server/accounts/users.js",
+    "server/bedrijf/zaakregie.js",
     "server/sso/index.js"
    ]
   },
@@ -14476,31 +14477,31 @@
     {
      "naam": "tekst",
      "soort": "pijl",
-     "lijn": 10,
+     "lijn": 12,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "authEenmaal",
      "soort": "pijl",
-     "lijn": 14,
+     "lijn": 16,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "fout",
      "soort": "functie",
-     "lijn": 16,
+     "lijn": 18,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eigenZaak",
      "soort": "functie",
-     "lijn": 21,
+     "lijn": 23,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bronnen",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     }
    ],
@@ -14509,6 +14510,7 @@
     "namen": null
    },
    "requires": [
+    "server/accounts/sessiegrens.js",
     "server/kern/zaakregie-context/adapter.js"
    ],
    "extern": [],

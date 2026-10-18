@@ -3,12 +3,12 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "2d9f256b6",
-  "seconden": 33.6,
+  "commit": "24ce3e30c",
+  "seconden": 39.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
+   "boomVuil": false,
    "ongecommitteInvoer": [],
    "bestanden": [
     "public/apps/access/meaning.js",
@@ -96590,25 +96590,25 @@
     {
      "naam": "ontsnap",
      "soort": "functie",
-     "lijn": 134,
+     "lijn": 137,
      "geexporteerd": false
     },
     {
      "naam": "voorvoegsels",
      "soort": "functie",
-     "lijn": 136,
+     "lijn": 139,
      "geexporteerd": false
     },
     {
      "naam": "samengesteldeEndpoints",
      "soort": "functie",
-     "lijn": 149,
+     "lijn": 152,
      "geexporteerd": false
     },
     {
      "naam": "scanEndpoints",
      "soort": "functie",
-     "lijn": 171,
+     "lijn": 174,
      "geexporteerd": true
     }
    ],
@@ -126959,21 +126959,27 @@
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "landenLaag",
+     "soort": "functie",
+     "lijn": 84,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "landVind",
      "soort": "functie",
-     "lijn": 74,
+     "lijn": 92,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "reiswijzer",
      "soort": "functie",
-     "lijn": 86,
+     "lijn": 104,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "reisLanden",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 120,
      "geexporteerd": "onbekend"
     }
    ],
@@ -150019,75 +150025,69 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "perId",
-     "soort": "pijl",
-     "lijn": 39,
-     "geexporteerd": "onbekend"
-    },
-    {
      "naam": "totGeometrie",
      "soort": "pijl",
-     "lijn": 44,
+     "lijn": 43,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gebied",
      "soort": "pijl",
-     "lijn": 54,
+     "lijn": 57,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kinderen",
      "soort": "pijl",
-     "lijn": 55,
+     "lijn": 62,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opNiveau",
      "soort": "pijl",
-     "lijn": 65,
+     "lijn": 72,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "namen",
      "soort": "pijl",
-     "lijn": 69,
+     "lijn": 76,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opNaam",
      "soort": "pijl",
-     "lijn": 70,
+     "lijn": 77,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "pad",
      "soort": "functie",
-     "lijn": 79,
+     "lijn": 86,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "binnen",
      "soort": "pijl",
-     "lijn": 85,
+     "lijn": 92,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "plaats",
      "soort": "functie",
-     "lijn": 91,
+     "lijn": 98,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "label",
      "soort": "functie",
-     "lijn": 111,
+     "lijn": 118,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "uitTekst",
      "soort": "functie",
-     "lijn": 122,
+     "lijn": 129,
      "geexporteerd": "onbekend"
     }
    ],

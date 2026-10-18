@@ -54,17 +54,15 @@ module.exports = ({ db, save, klok, beleid }) => {
   /* Opslag pas AANMAKEN als er echt iets bewaard wordt; kijken laat geen spoor
      achter. Dezelfde afspraak als kern/geldbeleid, en om dezelfde reden: een
      rij per mens die een keer keek is opslag die niemand heeft gevraagd. */
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/levensband', bezit: { levensbanden: 'kaart' } });
   function pak() {
-    if (!db.data.levensbanden || typeof db.data.levensbanden !== 'object') {
-      db.data.levensbanden = { banden: [], delingen: [] };
-    }
-    const d = db.data.levensbanden;
+    const d = eigen.bak('levensbanden');
     if (!Array.isArray(d.banden)) d.banden = [];
     if (!Array.isArray(d.delingen)) d.delingen = [];
     return d;
   }
   function kijk() {
-    const d = db.data.levensbanden;
+    const d = eigen.kijk('levensbanden');
     return {
       banden: Array.isArray(d && d.banden) ? d.banden : [],
       delingen: Array.isArray(d && d.delingen) ? d.delingen : []

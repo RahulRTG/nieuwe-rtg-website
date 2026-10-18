@@ -37,10 +37,9 @@ module.exports = ({ db, save }) => {
      Dat is dezelfde klasse als de leespaden uit de kijk()-sweep en het staat op
      de lijst voor de aparte tak; het is hier ongewijzigd overgenomen zodat deze
      verhuizing niets anders doet dan verhuizen. */
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/afdelingen/integratiekamer', bezit: { integratiekamer: 'kaart' } });
   function data() {
-    if (!db.data.integratiekamer || typeof db.data.integratiekamer !== 'object')
-      db.data.integratiekamer = { schakelaars: {}, verantwoordelijk: {}, tests: {}, storingen: {}, verzoeken: [], log: [] };
-    const s = db.data.integratiekamer;
+    const s = eigen.bak('integratiekamer');
     for (const k of ['schakelaars', 'verantwoordelijk', 'tests', 'storingen']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
     if (!Array.isArray(s.verzoeken)) s.verzoeken = [];
     if (!Array.isArray(s.log)) s.log = [];

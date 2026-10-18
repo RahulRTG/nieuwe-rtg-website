@@ -91,21 +91,20 @@ module.exports = ({ db, save, soorten }) => {
     knopUit: []
   });
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/socialebeleid', bezit: { socialebeleid: 'kaart' } });
   function kijk(key) {
-    const alles = db.data.socialebeleid;
+    const alles = eigen.kijk('socialebeleid');
     const k = String(key || '');
-    const r = alles && alles[k];
+    const r = alles[k];
     return r && typeof r === 'object' ? r : leegBeleid();
   }
 
   function pak(key) {
-    if (!db.data.socialebeleid || typeof db.data.socialebeleid !== 'object') db.data.socialebeleid = {};
+    const alles = eigen.bak('socialebeleid');
     const k = String(key || '');
     if (!k) return null;
-    if (!db.data.socialebeleid[k] || typeof db.data.socialebeleid[k] !== 'object') {
-      db.data.socialebeleid[k] = leegBeleid();
-    }
-    const r = db.data.socialebeleid[k];
+    if (!alles[k] || typeof alles[k] !== 'object') alles[k] = leegBeleid();
+    const r = alles[k];
     if (!Array.isArray(r.uit)) r.uit = [];
     if (!Number.isFinite(r.horizon)) r.horizon = HORIZON_STANDAARD;
     if (!Array.isArray(r.knopUit)) r.knopUit = [];

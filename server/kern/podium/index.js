@@ -38,11 +38,11 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyV
   const id = () => 'pk' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
 
-  function lijsten() {
-    if (!Array.isArray(db.data.podiumKanalen)) db.data.podiumKanalen = [];
-    if (!db.data.podiumChat) db.data.podiumChat = {};
-    if (!Array.isArray(db.data.podiumMeldingen)) db.data.podiumMeldingen = [];
-  }
+  /* De drie collecties van het Podium, met hun vorm, op een plek (kern/eigencollectie.js).
+     De deelbestanden krijgen deze deur via ctx.opslag en geen db.data. */
+  const P = require('../eigencollectie')({ db, domein: 'kern/podium',
+    bezit: { podiumKanalen: 'lijst', podiumChat: 'kaart', podiumMeldingen: 'lijst' } });
+  const lijsten = () => { for (const n of Object.keys(P.bezit)) P.bak(n); };
 
   /* ---- de poort ----
      `lat` is de harde controle die dit huis al had, nu als losse maat: is dit
@@ -78,8 +78,8 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyV
      poort.magKanaal te vragen: die kent ook het kaartje en de uitnodiging. */
   const mag = (key) => poort.magZone(key, zones.ERFENIS);
 
-  const kanaalMet = kid => { lijsten(); return db.data.podiumKanalen.find(k => k.id === kid) || null; };
-  const kanaalVan = key => { lijsten(); return db.data.podiumKanalen.find(k => k.key === key) || null; };
+  const kanaalMet = kid => { lijsten(); return P.bak('podiumKanalen').find(k => k.id === kid) || null; };
+  const kanaalVan = key => { lijsten(); return P.bak('podiumKanalen').find(k => k.key === key) || null; };
   function isAbonnee(k, key) { const tot = (k.abonnees || {})[key]; return !!tot && new Date(tot).getTime() > Date.now(); }
   function verseKijkers(k) {
     const grens = Date.now() - KIJKER_TTL_MS;
@@ -141,7 +141,7 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyV
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
+    db, opslag: P, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
     stuurRond, kijkBeeld, eigenBeeld, metIdem, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk, pay,
     zones, poort, keyVanCodenaam, zakenVan,
     koppel, herstelBoom, ouderKeyVan, kiesOuder,

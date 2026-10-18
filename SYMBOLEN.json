@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "b14e972e0",
-  "seconden": 7.9,
+  "commit": "a322b562a",
+  "seconden": 10.4,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7320,7 +7320,7 @@
   "nietGelezen": 316,
   "waarvanBundeldeel": 316,
   "waarvanParsefout": 0,
-  "symbolen": 27898,
+  "symbolen": 27897,
   "bestandenMetUitvoer": 4582,
   "uitvoerMetNamen": 2090,
   "uitvoerOnvolledig": 7,
@@ -263527,43 +263527,43 @@
     {
      "naam": "secureConversation",
      "soort": "functie",
-     "lijn": 30,
+     "lijn": 27,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "navigate",
      "soort": "functie",
-     "lijn": 39,
+     "lijn": 36,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "modes",
      "soort": "functie",
-     "lijn": 43,
+     "lijn": 40,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "render",
      "soort": "functie",
-     "lijn": 52,
+     "lijn": 49,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "clear",
      "soort": "functie",
-     "lijn": 103,
+     "lijn": 100,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "open",
      "soort": "functie",
-     "lijn": 114,
+     "lijn": 111,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mount",
      "soort": "functie",
-     "lijn": 120,
+     "lijn": 117,
      "geexporteerd": "onbekend"
     }
    ],
@@ -265139,27 +265139,21 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "ownsPresentation",
+     "naam": "photoFor",
      "soort": "functie",
      "lijn": 35,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "photoFor",
-     "soort": "functie",
-     "lijn": 46,
-     "geexporteerd": "onbekend"
-    },
-    {
      "naam": "worldName",
      "soort": "functie",
-     "lijn": 51,
+     "lijn": 40,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "screenLabel",
      "soort": "functie",
-     "lijn": 54,
+     "lijn": 43,
      "geexporteerd": "onbekend"
     }
    ],
@@ -265239,19 +265233,19 @@
     {
      "naam": "boot",
      "soort": "functie",
-     "lijn": 193,
+     "lijn": 194,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 194,
+     "lijn": 195,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setSurface",
      "soort": "functie",
-     "lijn": 216,
+     "lijn": 217,
      "geexporteerd": "onbekend"
     }
    ],

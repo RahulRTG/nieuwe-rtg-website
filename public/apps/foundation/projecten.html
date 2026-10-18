@@ -47,6 +47,21 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10ksllx:not(#_#_#_){display:flex;gap:.5rem}
+.s-12t26xb:not(#_#_#_){flex:0 1 auto}
+.s-1fpqyo3:not(#_#_#_){width:100%;margin-top:.4rem}
+.s-3vd53t:not(#_#_#_){cursor:pointer}
+.s-4nau5o:not(#_#_#_){padding:.3rem 0 0}
+.s-mfhf3b:not(#_#_#_){text-transform:none;letter-spacing:0}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -61,7 +76,7 @@
     <div class="kaart blok">
       <input class="veld" id="nTitel" placeholder="Waar gaan jullie aan werken? (bijv. Spreekbeurt over dolfijnen)" maxlength="80">
       <input class="veld h-mt40" id="nWat" placeholder="Vertel er iets bij (mag leeg)" maxlength="300">
-      <button class="knop" id="nMaak" style="width:100%;margin-top:.4rem;" data-hoofdactie>Start het project</button>
+      <button class="knop s-1fpqyo3" id="nMaak" data-hoofdactie>Start het project</button>
       <div class="fout" id="nFout"></div>
     </div>
     <div id="uitnodigingen"></div>
@@ -78,7 +93,7 @@
     <!-- de andere twee koppen zijn kaal en gelden zelf als deelmarkering;
          deze draagt een hint in een <small>, dus krijgt hij er een naast zich -->
     <div class="deel">Taken</div>
-    <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik  om een taak te pakken)</small></h2>
+    <h2 class="sec">Taken <small class="s-mfhf3b">(tik  om een taak te pakken)</small></h2>
     <div class="kaart blok">
       <div id="pTaken"></div>
       <div class="i-1stvws">
@@ -102,14 +117,14 @@
     <div class="kaart blok">
       <div class="keuzerij" id="uVrienden"><span class="leeg">Vrienden laden…</span></div>
       <input class="veld h-mt30" id="uCodenaam" placeholder="Of nodig uit op codenaam">
-      <div class="leeg" style="padding:.3rem 0 0;">Samen werken maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
+      <div class="leeg s-4nau5o">Samen werken maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <button class="i-15bgfu knop grijs" id="uStuur">Nodig uit</button>
       <div class="fout" id="uFout"></div>
     </div>
 
-    <div class="rtgdeel-vast" style="display:flex;gap:.5rem;">
+    <div class="rtgdeel-vast s-10ksllx">
       <button class="knop grijs h-flex1" id="pTerug">← terug</button>
-      <button class="knop rood" id="pWeg" style="flex:0 1 auto;" hidden>Project opruimen</button>
+      <button class="knop rood s-12t26xb" id="pWeg" hidden>Project opruimen</button>
     </div>
   </section>
 </div>
@@ -157,7 +172,7 @@ async function laadOverzicht(){
   $('#uitnodigingen').querySelectorAll('[data-ja]').forEach(b => b.addEventListener('click', async () => { await api('project-antwoord',{id:b.dataset.ja, akkoord:true}); openProject(b.dataset.ja); }));
   $('#uitnodigingen').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { await api('project-antwoord',{id:b.dataset.nee, akkoord:false}); laadOverzicht(); }));
   $('#projecten').innerHTML = d.projecten.length ? d.projecten.map(p =>
-    '<div class="kaart rij" style="cursor:pointer;" data-open="'+p.id+'"><div class="nm">'+esc(p.titel)+
+    '<div class="kaart rij s-3vd53t" data-open="'+p.id+'"><div class="nm">'+esc(p.titel)+
     '<small>'+p.leden.map(esc).join(', ')+' · '+p.af+' van '+p.taken+' taken af</small></div><span>→</span></div>').join('')
     : '<div class="leeg">Nog geen projecten. Start er hierboven een.</div>';
   $('#projecten').querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', () => openProject(r.dataset.open)));

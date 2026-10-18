@@ -144,7 +144,7 @@
     $('#ktKandidaat').innerHTML = (st.kandidaten || []).map(k => '<option value="' + k.code + '">' + esc(k.naam) + '</option>').join('');
     $('#ktLinks').textContent = (st.links || []).filter(l => l.status === 'akkoord').map(l => l.metNaam).join(' · ') || 'nog niet verbonden';
     $('#ktInkomend').innerHTML = (st.links || []).filter(l => l.inkomend).map(l =>
-      '<span class="stil" style="font-size:0.78rem;">' + esc(l.metNaam) + ' nodigt u uit</span>' +
+      '<span class="stil s-2tfhuo">' + esc(l.metNaam) + ' nodigt u uit</span>' +
       '<button class="knop klein" data-ktja="' + l.met + '" type="button">Akkoord</button>' +
       '<button class="knop klein" data-ktnee="' + l.met + '" type="button">Weiger</button>').join('');
     document.querySelectorAll('[data-ktja]').forEach(b => b.addEventListener('click', () => ktDoe('keten/beslis', { korps: b.dataset.ktja, akkoord: true })));

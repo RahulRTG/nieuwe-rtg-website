@@ -113,16 +113,16 @@
     catch(e){ kluisDicht($('#verify'), e); return; }
     $('#verify').innerHTML = pend.length ? pend.map(v =>
       '<div class="vrow" data-id="'+v.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.codename)+'</span></div>' +
+        '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span class="s-1caek87">· '+escHtml(v.codename)+'</span></div>' +
           '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
-        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
+        '<label class="s-1bc3spk"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
         /* De geboortedatum van het DOCUMENT. Voorgevuld met wat het lid zelf
            opgaf, zodat de keurder vergelijkt in plaats van overtypt; wijkt hij
            af, dan wint het document. Zonder dit veld rustte elke leeftijdsclaim
            in het huis op een zelf ingetypte datum. */
-        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;">'+T('bo.dob','Geb. op document')+
-          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" style="font:inherit;font-size:0.72rem;"></label>' +
+        '<label class="s-1bc3spk">'+T('bo.dob','Geb. op document')+
+          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" class="s-1sy5mu3"></label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
         /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de

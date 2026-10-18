@@ -28,15 +28,15 @@
       var p = PRIO[t2.prio] || PRIO[3];
       return '<div style="display:flex;align-items:center;gap:0.55rem;border:1px solid var(--line);border-radius:0;padding:0.45rem 0.6rem;margin-top:0.4rem;' + (t2.klaar ? 'opacity:0.45;' : '') + '">' +
         '<button data-dpklaar="' + esc(t2.id) + '" aria-label="' + T('dp.vink', 'Afvinken') + '" style="' + STIL + 'min-width:2rem;' + (t2.klaar ? 'color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);' : '') + '">' + (t2.klaar ? '✓' : '○') + '</button>' +
-        '<span style="font-size:0.8rem;line-height:1.45;flex:1;' + (t2.klaar ? 'text-decoration:line-through;' : '') + '">' + esc(t2.tekst) + '</span>' +
+        '<span class="' + (t2.klaar ? 's-1dusu8u' : 's-1ob4q4z') + '">' + esc(t2.tekst) + '</span>' +
         '<span class="sub" style="font-size:0.6rem;letter-spacing:0.1em;color:' + p[1] + ';">' + T('dp.p' + t2.prio, p[0]) + '</span></div>';
     }).join('');
     if (blik && blik.dagen) {
       h += '<div class="st-sec h-mt110">' + T('dp.week', 'De week vooruit') + '</div>';
-      h += '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:0.3rem;">' + blik.dagen.map(function (d2) {
+      h += '<div class="s-16lu7ul">' + blik.dagen.map(function (d2) {
         return '<div style="border:1px solid var(--line);border-radius:0;padding:0.4rem 0.2rem;text-align:center;' + (d2.n ? '' : 'opacity:0.45;') + '">' +
           '<span class="sub" style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;">' + esc(d2.dag) + '</span>' +
-          '<b style="display:block;font-size:0.95rem;">' + d2.n + '</b></div>';
+          '<b class="s-m9cuyn">' + d2.n + '</b></div>';
       }).join('') + '</div>';
       var druk = blik.dagen.filter(function (d2) { return d2.n; });
       if (druk.length) h += '<div class="sub" style="margin-top:0.5rem;line-height:1.5;">' + druk.map(function (d2) {
@@ -76,7 +76,7 @@
 
   function rapport(plan, blik, ctx) {
     var esc = ctx.esc, naam = (ctx.S && ctx.S.name) || 'De zaak';
-    var kop = function (s) { return '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">' + s + '</h2>'; };
+    var kop = function (s) { return '<h2 class="s-bwc5d4">' + s + '</h2>'; };
     var h = '<!doctype html><html><head><meta charset="utf-8"><title>' + esc(naam) + '</title></head>' +
       '<body style="font-family:Georgia,serif;color:#0C0C0B;max-width:46em;margin:2.5em auto;line-height:1.6;">' +
       '<div id="pwrap" style="text-align:right;"><button id="pbtn" type="button" style="padding:0.5rem 1rem;font-family:inherit;">Print / PDF</button></div>' +
@@ -87,11 +87,11 @@
       kop('De taken van vandaag') +
       plan.taken.map(function (t2) {
         return '<div class="s-1aably8">' + (t2.klaar ? '✓' : '○') + ' ' + esc(t2.tekst) +
-          (t2.prio === 1 ? ' <b style="color:#7F1634;">(nu)</b>' : '') + '</div>';
+          (t2.prio === 1 ? ' <b class="s-ych08x">(nu)</b>' : '') + '</div>';
       }).join('') +
       (blik && blik.dagen ? kop('De week vooruit') + blik.dagen.map(function (d2) {
         return '<div class="s-yhw1rz"><b class="s-1trvxqt">' + esc(d2.dag) + '</b> · ' +
-          (d2.n ? esc(d2.items.join(' · ')) : '<span style="color:#8A8680;">rustig</span>') + '</div>';
+          (d2.n ? esc(d2.items.join(' · ')) : '<span class="s-yqw4p7">rustig</span>') + '</div>';
       }).join('') : '') +
       '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">Opgesteld in de zaak-app van RTG; vinkjes zijn de stand van dit moment.</p>' +
       '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script></body></html>';

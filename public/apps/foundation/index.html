@@ -182,6 +182,22 @@
 <script src="/shared/rtg-world-home-copy.js"></script>
 <script src="/shared/rtg-world-home.js"></script>
 <link rel="stylesheet" href="/shared/rtg-world-widgets.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14t8193:not(#_#_#_){font-size:1.3rem;font-weight:700}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-1aoi2c1:not(#_#_#_){display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+.s-1ncmgab:not(#_#_#_){padding-top:.4rem}
+.s-1sq8mkq:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center}
+.s-9ip54:not(#_#_#_){flex:1;min-width:4.5rem;text-align:center}
+.s-xtmsp5:not(#_#_#_){color:var(--rood);font-size:.82rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -293,7 +309,7 @@
 <!-- 4. De volledige hub: ingelogd (rol-bewust) -->
 <section id="vHub" class="wrap" hidden>
   <button class="knop grijs rtf-rustig-terug" id="rtfRustigTerug" type="button">&larr; Rustig overzicht</button>
-  <div class="hero" style="padding-top:.4rem;">
+  <div class="hero s-1ncmgab">
     <div class="logo" id="hWelkom">Welkom terug</div>
     <div class="deck" id="hDeck"></div>
     <div id="hPass" class="passband" hidden></div>
@@ -685,7 +701,7 @@
     <label class="ronb-veld"><span>Typ je volledige naam om digitaal te ondertekenen</span>
       <input id="rtfOnbNaam" autocomplete="name"></label>
     <div id="rtfOnbFout" role="alert"></div>
-    <button class="knop" id="rtfOnbDoe" type="button" style="width:100%;">Onderteken en ga verder</button>
+    <button class="knop s-186m9vs" id="rtfOnbDoe" type="button">Onderteken en ga verder</button>
   </div>
 </div>
 
@@ -772,8 +788,8 @@ async function laadImpact(){
     const d = await fetch('/api/foundation/impact').then(r => r.json());
     if (!d || (!d.opgehaald && !d.scholen && !d.gezinnen)) return;
     const eur = n => '€ ' + Number(n || 0).toLocaleString('nl-NL', { maximumFractionDigits: 0 });
-    const tegel = (v, l) => '<div style="flex:1;min-width:4.5rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;">' + v + '</div><div style="font-size:.6rem;opacity:.7;letter-spacing:.06em;text-transform:uppercase;">' + l + '</div></div>';
-    box.innerHTML = '<div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;">' +
+    const tegel = (v, l) => '<div class="s-9ip54"><div class="s-14t8193">' + v + '</div><div style="font-size:.6rem;opacity:.7;letter-spacing:.06em;text-transform:uppercase;">' + l + '</div></div>';
+    box.innerHTML = '<div class="s-1aoi2c1">' +
       tegel(eur(d.opgehaald), 'samen opgehaald') +
       (d.scholen ? tegel(d.scholen, d.scholen === 1 ? 'school' : 'scholen') : '') +
       (d.gezinnen ? tegel(d.gezinnen, d.gezinnen === 1 ? 'gezin' : 'gezinnen') : '') +
@@ -813,11 +829,11 @@ async function start(){
         } else {
           $('#hWisBanner').innerHTML =
             '<b>'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens van het gezin verwijderen.</b> Geef je toestemming?'+
-            '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">'+
+            '<div class="s-1sq8mkq">'+
             (d.profiel.heeftPin?'<input id="wbPin" class="veld" style="max-width:9rem;padding:.5rem .7rem;" inputmode="numeric" maxlength="6" type="password" placeholder="Jouw pincode">':'')+
             '<button class="knop rood klein" id="wbJa">Ja, verwijderen</button>'+
             '<button class="knop grijs klein" id="wbNee">Nee, afwijzen</button>'+
-            '<span id="wbFout" style="color:var(--rood);font-size:.82rem;"></span></div>';
+            '<span id="wbFout" class="s-xtmsp5"></span></div>';
           $('#wbJa').onclick = async ()=>{
             try{ const r = await Sessie.api('/gezin/wissen/bevestig', { code:Sessie.huidig().code, token:Sessie.huidig().token, pin: ($('#wbPin')?$('#wbPin').value.trim():'') });
               if (r.verwijderd){ Sessie.uitloggen(); alert('De gegevens van jullie gezin zijn verwijderd.'); location.href='index.html'; }

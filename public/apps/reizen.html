@@ -40,12 +40,17 @@
    !important, en een el.style-schrijfactie wint er nog steeds van. */
 .s-13bdal:not(#_#_#_){margin-top:1rem}
 .s-148cz8o:not(#_#_#_){color:var(--rtg-acc)}
+.s-148pjyx:not(#_#_#_){color:var(--rtg-txt)}
+.s-14bgo8e:not(#_#_#_){flex:1 1 18rem;font-size:.8rem}
 .s-1dninqr:not(#_#_#_){gap:.6rem;flex-wrap:wrap}
 .s-1fkgm3n:not(#_#_#_){flex-direction:column;align-items:stretch;gap:.3rem}
+.s-1v8vhtg:not(#_#_#_){display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .s-1vlyext:not(#_#_#_){flex:1 1 8rem}
 .s-1vlz1xc:not(#_#_#_){flex:1 1 9rem}
 .s-2fdded:not(#_#_#_){margin-top:.4rem;line-height:1.7}
+.s-2q881v:not(#_#_#_){display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap}
 .s-7myv37:not(#_#_#_){margin-left:auto}
+.s-9p3yvo:not(#_#_#_){display:flex;align-items:center;gap:.6rem}
 .s-mvitr2:not(#_#_#_){margin-left:.6rem}
 .s-rl0xl1:not(#_#_#_){margin-top:.7rem;align-items:center}
 .s-xs3nn1:not(#_#_#_){margin-top:.7rem}
@@ -927,10 +932,9 @@
     for (const r of (d.reizen || [])) {
       if (!r.signalen.length) continue;
       blokken.push('<div class="rtg-rij s-1fkgm3n">' +
-        '<span class="rtg-naam" style="display:flex;align-items:center;gap:.6rem;">' + esc(r.bestemming) +
+        '<span class="rtg-naam s-9p3yvo">' + esc(r.bestemming) +
           '<button class="rtg-knop s-7myv37" type="button" data-los="' + esc(r.id) + '">Los het op</button></span>' +
-        r.signalen.map((s) => '<span class="rtg-sub" style="color:' +
-          (s.ernst === 'incident' ? 'var(--rtg-acc)' : 'var(--rtg-txt)') + ';">' +
+        r.signalen.map((s) => '<span class="rtg-sub ' + (s.ernst === 'incident' ? 's-148cz8o' : 's-148pjyx') + '">' +
           TEKEN[s.ernst] + ' ' + esc(s.tekst) + '</span>' +
           '<span class="rtg-sub">Bron: ' + esc(s.bron) + ' &middot; ' + esc(s.grond) + '</span>').join('') +
         '<span data-losuit="' + esc(r.id) + '"></span>' +
@@ -970,7 +974,7 @@
       }).then(async (r) => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; });
     } catch (e) { vak.innerHTML = '<span class="rtg-sub">' + esc(e.message) + '</span>'; knop.disabled = false; return; }
     vak.innerHTML = d.blokken.map((b) => b.voorstellen.map((v) => {
-      if (v.soort === 'taak') return '<span class="rtg-sub" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">' +
+      if (v.soort === 'taak') return '<span class="rtg-sub s-1v8vhtg">' +
         '<button class="rtg-knop" type="button" data-doe="' + esc(v.id) + '" data-reis="' + esc(knop.dataset.los) + '">' + esc(v.tekst) + '</button>' +
         '<span>' + esc(v.uitleg || '') + '</span></span>';
       if (v.soort === 'alternatief') return '<span class="rtg-sub">&rarr; <a href="' + esc(v.link) + '">' + esc(v.tekst) + '</a>' +
@@ -1010,8 +1014,8 @@
       const link = location.origin + d.link;
       vak.innerHTML = '<span>Stuur deze link naar uw reisgenoot. Hij ziet alleen waar en wanneer; ' +
         'de reis komt pas bij hem te staan nadat hij zich heeft gelegitimeerd.</span>' +
-        '<span style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap;">' +
-        '<input class="rtg-veld" readonly value="' + esc(link) + '" style="flex:1 1 18rem;font-size:.8rem;">' +
+        '<span class="s-2q881v">' +
+        '<input class="rtg-veld s-14bgo8e" readonly value="' + esc(link) + '">' +
         '<button class="rtg-knop" type="button" id="kopie-' + esc(reis.id) + '">Kopieer</button></span>';
       const kb = vak.querySelector('button');
       kb.addEventListener('click', async () => {
@@ -1139,7 +1143,7 @@
     const rij = d.onderdelen || [];
     $('#invTel').textContent = rij.length ? rij.length + (rij.length === 1 ? ' toegevoegd' : ' toegevoegd') : '';
     $('#invMijn').innerHTML = !rij.length ? '' :
-      '<h2 style="margin-top:1rem;">Door u toegevoegd</h2>' + rij.map((x) =>
+      '<h2 class="s-13bdal">Door u toegevoegd</h2>' + rij.map((x) =>
         '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(x.titel) +
           (x.bestemming ? ' &middot; ' + esc(x.bestemming) : '') + '</span>' +
           '<span class="rtg-sub">' + esc(x.van) + (x.tot ? ' t/m ' + esc(x.tot) : '') +

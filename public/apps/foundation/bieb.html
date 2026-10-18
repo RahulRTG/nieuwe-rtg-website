@@ -36,6 +36,23 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14ck55u:not(#_#_#_){text-decoration:none}
+.s-14k8ke1:not(#_#_#_){font-size:.84rem;color:var(--zacht);line-height:1.6;margin-top:0.5rem}
+.s-15vclsu:not(#_#_#_){line-height:1.5}
+.s-16mvxxl:not(#_#_#_){margin:0.5rem 0 0 1.25rem}
+.s-1hc5ae8:not(#_#_#_){margin-bottom:0}
+.s-1nqlc7d:not(#_#_#_){padding:.8rem .9rem;margin-bottom:0.75rem}
+.s-1p72wcu:not(#_#_#_){margin:.25rem 0 .5rem;font-size:.84rem}
+.s-oijbta:not(#_#_#_){font-size:.92rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -45,14 +62,14 @@
   <h1>App-Bibliotheek</h1>
   <p class="intro" id="biebIntro">Alle apps van de RTFoundation om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de stichting. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.</p>
 
-  <div class="kaart" style="padding:.8rem .9rem;margin-bottom:0.75rem;">
-    <b style="font-size:.92rem;">De bibliothecaris</b>
-    <p class="intro" style="margin:.25rem 0 .5rem;font-size:.84rem;">Vertel wat je wilt leren of zoekt; de bibliothecaris kijkt in de App-, School- en Beroepen-Bibliotheek en raadt echte apps aan.</p>
-    <div class="zoekrij rtg-duimeind" style="margin-bottom:0;">
+  <div class="kaart s-1nqlc7d">
+    <b class="s-oijbta">De bibliothecaris</b>
+    <p class="intro s-1p72wcu">Vertel wat je wilt leren of zoekt; de bibliothecaris kijkt in de App-, School- en Beroepen-Bibliotheek en raadt echte apps aan.</p>
+    <div class="zoekrij rtg-duimeind s-1hc5ae8">
       <input id="bibVraag" class="veld" maxlength="300" placeholder="Bijv. ik wil beter leren rekenen">
       <button class="knop" id="bibGo" type="button" data-hoofdactie>Vraag</button>
     </div>
-    <div id="bibUit" style="font-size:.84rem;color:var(--zacht);line-height:1.6;margin-top:0.5rem;" aria-live="polite"></div>
+    <div id="bibUit" class="s-14k8ke1" aria-live="polite"></div>
   </div>
 
   <div class="zoekrij">
@@ -81,7 +98,7 @@ document.getElementById('bibGo').addEventListener('click', async () => {
   try {
     const d = await api('/ai', { vraag: document.getElementById('bibVraag').value });
     uit.innerHTML = esc(d.antwoord) + (d.aanraders && d.aanraders.length
-      ? '<ul style="margin:0.5rem 0 0 1.25rem;">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="opacity:.7;">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>' : '');
+      ? '<ul class="s-16mvxxl">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="opacity:.7;">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>' : '');
   } catch(e){ uit.textContent = e.message; }
   knop.disabled = false;
 });
@@ -116,11 +133,11 @@ async function start(){
 }
 function kaart(a, vanMij){
   // een echte app: de tegel opent de bestaande pagina
-  const open = a.url ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>' : '';
+  const open = a.url ? '<a class="knop stil s-14ck55u" href="'+esc(a.url)+'">Openen</a>' : '';
   return '<div class="kaart app">'+
     '<span class="cat">'+esc(a.categorieLabel)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
-    (a.uitleg ? '<small style="line-height:1.5;">'+esc(a.uitleg)+'</small>' : '')+
+    (a.uitleg ? '<small class="s-15vclsu">'+esc(a.uitleg)+'</small>' : '')+
     '<small>voor '+esc(a.doelgroepLabel)+'</small>'+
     '<div class="rij"><span class="gratis">Gratis</span>'+ open +
     (vanMij ? '<button class="knop stil bweg" data-id="'+esc(a.id)+'">Opruimen</button>'

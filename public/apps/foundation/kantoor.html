@@ -49,6 +49,23 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-11qe8p2:not(#_#_#_){margin:0.25rem 0 0.5rem}
+.s-12babhf:not(#_#_#_){flex:0 0 8rem}
+.s-15e9keb:not(#_#_#_){justify-content:space-between}
+.s-1igs0oj:not(#_#_#_){font-size:.72rem;padding:.25rem .6rem}
+.s-1l8fum3:not(#_#_#_){margin-left:auto;font-size:.72rem;padding:.25rem .6rem}
+.s-1ns85dd:not(#_#_#_){border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.84rem}
+.s-1pdzuuw:not(#_#_#_){margin:0.5rem 0 0.25rem}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -91,8 +108,8 @@
        met het menu erbij. -->
   <div id="kamer" class="rtgdeel-vast" hidden>
     <div class="kaart">
-      <div class="rij" style="justify-content:space-between;"><h2 id="kNaam" style="font-size:1.1rem;"></h2><button class="knop stil" id="terug">← Alle kamers</button></div>
-      <div class="kpi" id="kMissie" style="margin:0.25rem 0 0.5rem;"></div>
+      <div class="rij s-15e9keb"><h2 id="kNaam" class="s-prlthd"></h2><button class="knop stil" id="terug">← Alle kamers</button></div>
+      <div class="kpi s-11qe8p2" id="kMissie"></div>
       <div class="rij" id="kKpis"></div>
     </div>
     <div class="kaart h-mt70"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
@@ -170,7 +187,7 @@ async function laad(){
     '<div class="stat"><b>' + o.lab.projecten + '</b><i>lab-projecten</i></div>' +
     '<div class="stat"><b>' + o.takenOpen + '</b><i>taken open</i></div>';
   $('#grid').innerHTML = k.kamers.map(x => '<div class="kaart kamer" data-id="' + x.id + '">' +
-    '<div class="rij" style="justify-content:space-between;"><h2>' + glyf(x.icoon) + esc(x.naam) + '</h2>' + (x.takenOpen ? '<span class="pil">' + x.takenOpen + ' taken</span>' : '') + '</div>' +
+    '<div class="rij s-15e9keb"><h2>' + glyf(x.icoon) + esc(x.naam) + '</h2>' + (x.takenOpen ? '<span class="pil">' + x.takenOpen + ' taken</span>' : '') + '</div>' +
     '<div class="mi">' + esc(x.missie) + '</div>' +
     (x.kpi ? '<div class="kpi">' + esc(x.kpi[0]) + ': <b>' + esc(x.kpi[1]) + '</b></div>' : '') + '</div>').join('');
   document.querySelectorAll('.kamer').forEach(el => el.addEventListener('click', () => open(el.dataset.id)));
@@ -207,18 +224,18 @@ $('#aVraag2').addEventListener('click', async () => {
    en de partner beslissen SAMEN over de lab-uitslagen (rtf/samen-werk). ---------- */
 async function raadLaad(){
   let d; try { d = await api('stadsraad'); } catch (e) { $('#raadIn').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
-  const partners = (d.partners || []).map(p => '<div class="taak' + (p.actief ? '' : ' af') + '"><span><b>' + esc(p.stad) + '</b> -- ' + esc(p.naam) + ' (' + esc(p.soort) + ')' + (p.actief ? ' · raadcode <b>' + esc(p.code) + '</b>' : ' · gestopt') + '</span>' + (p.actief ? '<button class="knop stil" data-stop="' + esc(p.id) + '" style="margin-left:auto;font-size:.72rem;padding:.25rem .6rem;">Stop</button>' : '') + '</div>').join('') || '<div class="leeg">Nog geen stadspartners. Elke stad krijgt er precies een.</div>';
-  const uitslagen = (d.uitslagen || []).map(u => '<div class="taak"><span><b>' + esc(u.titel) + '</b> · ' + esc(u.fase) + ' · ' + u.bevindingen.length + ' bevinding(en)</span><button class="knop stil" data-voorstel="' + esc(u.id) + '" style="margin-left:auto;font-size:.72rem;padding:.25rem .6rem;">Voorstel</button></div>').join('') || '<div class="leeg">Nog geen uitslagen op de raadstafel (rtf- en samen-onderzoek met bevindingen).</div>';
+  const partners = (d.partners || []).map(p => '<div class="taak' + (p.actief ? '' : ' af') + '"><span><b>' + esc(p.stad) + '</b> -- ' + esc(p.naam) + ' (' + esc(p.soort) + ')' + (p.actief ? ' · raadcode <b>' + esc(p.code) + '</b>' : ' · gestopt') + '</span>' + (p.actief ? '<button class="knop stil s-1l8fum3" data-stop="' + esc(p.id) + '">Stop</button>' : '') + '</div>').join('') || '<div class="leeg">Nog geen stadspartners. Elke stad krijgt er precies een.</div>';
+  const uitslagen = (d.uitslagen || []).map(u => '<div class="taak"><span><b>' + esc(u.titel) + '</b> · ' + esc(u.fase) + ' · ' + u.bevindingen.length + ' bevinding(en)</span><button class="knop stil s-1l8fum3" data-voorstel="' + esc(u.id) + '">Voorstel</button></div>').join('') || '<div class="leeg">Nog geen uitslagen op de raadstafel (rtf- en samen-onderzoek met bevindingen).</div>';
   const besluiten = (d.besluiten || []).map(b => {
     const stemmen = b.stemmen.map(s => (s.voor ? '✓ ' : '✕ ') + esc(s.wie) + ' (' + s.kant + ')').join(' · ') || 'nog geen stemmen';
     const knoppen = b.status === 'open'
-      ? '<div class="rij h-mt30"><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="1" style="font-size:.72rem;padding:.25rem .6rem;">Voor</button><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="0" style="font-size:.72rem;padding:.25rem .6rem;">Tegen</button><button class="knop stil" data-sluit="' + esc(b.id) + '" style="font-size:.72rem;padding:.25rem .6rem;">Sluit besluit</button></div>'
+      ? '<div class="rij h-mt30"><button class="knop stil s-1igs0oj" data-stem="' + esc(b.id) + '" data-voor="1">Voor</button><button class="knop stil s-1igs0oj" data-stem="' + esc(b.id) + '" data-voor="0">Tegen</button><button class="knop stil s-1igs0oj" data-sluit="' + esc(b.id) + '">Sluit besluit</button></div>'
       : '';
-    return '<div style="border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.84rem;"><b>' + esc(b.titel) + '</b> -- ' + esc(b.voorstel) + '<div class="kpi">door ' + esc(b.door) + ' · status: <b>' + esc(b.status) + '</b>' + (b.uitslag ? ' (' + esc(b.uitslag) + ')' : '') + '</div><div class="kpi">' + stemmen + '</div>' + knoppen + '</div>';
+    return '<div class="s-1ns85dd"><b>' + esc(b.titel) + '</b> -- ' + esc(b.voorstel) + '<div class="kpi">door ' + esc(b.door) + ' · status: <b>' + esc(b.status) + '</b>' + (b.uitslag ? ' (' + esc(b.uitslag) + ')' : '') + '</div><div class="kpi">' + stemmen + '</div>' + knoppen + '</div>';
   }).join('') || '<div class="leeg">Nog geen besluiten.</div>';
   $('#raadIn').innerHTML =
     '<div class="sec h-mt40">Stadspartners (een per stad)</div>' + partners +
-    '<div class="rij" style="margin:0.5rem 0 0.25rem;"><input class="veld" id="pStad" placeholder="Stad"><input class="veld" id="pNaam" placeholder="Naam van de foundation of club"><select class="veld" id="pSoort" style="flex:0 0 8rem;"><option value="foundation">foundation</option><option value="club">club</option><option value="instelling">instelling</option></select><button class="knop" id="pMaak">Partner toevoegen</button></div>' +
+    '<div class="rij s-1pdzuuw"><input class="veld" id="pStad" placeholder="Stad"><input class="veld" id="pNaam" placeholder="Naam van de foundation of club"><select class="veld s-12babhf" id="pSoort"><option value="foundation">foundation</option><option value="club">club</option><option value="instelling">instelling</option></select><button class="knop" id="pMaak">Partner toevoegen</button></div>' +
     '<div class="sec h-mt60">Lab-uitslagen op de raadstafel</div>' + uitslagen +
     '<div class="sec h-mt60">Besluiten</div>' + besluiten;
   $('#pMaak').addEventListener('click', async () => {

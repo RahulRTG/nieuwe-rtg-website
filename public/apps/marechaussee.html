@@ -69,12 +69,14 @@
    wint van elke gewone regel in de bladen, verliest net als het attribuut van
    !important, en een el.style-schrijfactie wint er nog steeds van. */
 .s-186m9vs:not(#_#_#_){width:100%}
+.s-1cv76ip:not(#_#_#_){flex:1;min-width:10rem}
 .s-1hv4dhs:not(#_#_#_){color:var(--soft);font-family:Inter}
 .s-4mhsan:not(#_#_#_){color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem}
 .s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
 .s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
 .s-qge8k0:not(#_#_#_){font-size:1.15rem;margin-bottom:0.5rem}
 .s-rrt1xk:not(#_#_#_){font-size:.95rem;margin:0.5rem 0 0.25rem}
+.s-vgbzx0:not(#_#_#_){background:var(--card2)}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
@@ -192,7 +194,7 @@ function koppelBasis(){
 /* ---- de grensbalie ---- */
 async function schermGrens(){
   $('#app').innerHTML = kopStuk('Grensbalie')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">De passagierslijst op codenaam; de echte naam blijft in de kluis. Per reiziger een menselijk besluit: akkoord, nader onderzoek, of daarna vrijgeven.</div>'+
+    '<div class="item s-vgbzx0"><div class="meta">De passagierslijst op codenaam; de echte naam blijft in de kluis. Per reiziger een menselijk besluit: akkoord, nader onderzoek, of daarna vrijgeven.</div>'+
     '<div class="rij"><select class="veld" id="gVlucht">'+(C.vluchten.length?C.vluchten.map(v=>'<option value="'+esc(v.nummer)+'">'+esc(v.nummer)+' · '+esc(v.tijd)+' · '+esc(v.status)+'</option>').join(''):'<option value="">Geen vertrekkers</option>')+'</select><button class="knop stil" id="gLaad">Toon de lijst</button></div></div>'+
     '<div id="gLijst"></div>'+aiBlok('Bijv. welke vlucht controleer ik als eerste?');
   koppelBasis();
@@ -220,7 +222,7 @@ async function laadGrens(){
 /* ---- de patrouille ---- */
 async function schermPatrouille(){
   $('#app').innerHTML = kopStuk('Patrouille')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">Loop de zones na; een bevinding leg je meteen vast. De stille zones staan bovenaan.</div></div>'+
+    '<div class="item s-vgbzx0"><div class="meta">Loop de zones na; een bevinding leg je meteen vast. De stille zones staan bovenaan.</div></div>'+
     '<div id="pLijst">'+C.zones.map(z =>
       '<div class="item"><h4>'+esc(z)+' <span class="status">'+(C.laatstePatrouille[z]?'laatst '+tijd(C.laatstePatrouille[z]):'nog niet gelopen')+'</span></h4>'+
       '<div class="rij"><input class="veld s-jwt5vg" data-bev="'+esc(z)+'" placeholder="Bevinding (leeg = alles rustig)" maxlength="200"><button class="knop stil" data-zone="'+esc(z)+'">Gelopen ✓</button></div></div>').join('')+'</div>'+
@@ -240,9 +242,9 @@ async function schermPatrouille(){
 /* ---- incidenten ---- */
 async function schermIncidenten(){
   $('#app').innerHTML = kopStuk('Incidenten')+
-    '<div class="item" style="background:var(--card2);"><h4>Incident melden</h4>'+
+    '<div class="item s-vgbzx0"><h4>Incident melden</h4>'+
     '<div class="rij"><select class="veld" id="iZone"></select><select class="veld" id="iSoort"></select></div>'+
-    '<div class="rij"><input class="veld" id="iTekst" style="flex:1;min-width:10rem;" placeholder="Wat speelt er?" maxlength="300"><button class="knop rood" id="iMeld">Meld</button></div>'+
+    '<div class="rij"><input class="veld s-1cv76ip" id="iTekst" placeholder="Wat speelt er?" maxlength="300"><button class="knop rood" id="iMeld">Meld</button></div>'+
     '<div class="meta">Bij direct gevaar: eerst 112 en de meldkamer, dan melden.</div></div>'+
     '<div id="iLijst"></div>'+aiBlok('Bijv. hoe pak ik achtergelaten bagage aan?');
   koppelBasis();

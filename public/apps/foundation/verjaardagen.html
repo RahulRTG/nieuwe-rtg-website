@@ -55,6 +55,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-oi067g:not(#_#_#_){font-size:.83rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -143,7 +153,7 @@ function kaartHtml(p){
   if (p.dagenTot<=60 && !p.vandaag) h += '<span class="telt">'+p.dagenTot+' dagen te gaan</span>';
   // wensen
   h += '<div class="sect"><h3>Wensenlijst'+(p.benIkDeJarige?' (van jou)':'')+'</h3>';
-  if (!p.wensen.length) h += '<div class="leeg" style="font-size:.83rem;">Nog geen wensen.</div>';
+  if (!p.wensen.length) h += '<div class="leeg s-oi067g">Nog geen wensen.</div>';
   else h += p.wensen.map(w=>{
     let r = '<div class="wens'+(w.geclaimd?' claimed':'')+'" data-wid="'+w.id+'"><span class="w">'+esc(w.tekst)+'</span>';
     if (!p.benIkDeJarige){

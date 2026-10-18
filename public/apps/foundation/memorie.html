@@ -36,6 +36,17 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12z6941:not(#_#_#_){margin:0 0 0.75rem;min-height:0}
+.s-1papx63:not(#_#_#_){font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -55,7 +66,7 @@
       <button type="button" data-s="1" class="aan">Alleen</button>
       <button type="button" data-s="2">Samen om de beurt</button>
     </div>
-    <div class="melding" id="beurt" style="margin:0 0 0.75rem;min-height:0;"></div>
+    <div class="melding s-12z6941" id="beurt"></div>
     <div class="bord" id="bord"></div>
     <div class="melding" id="melding" aria-live="polite"></div>
     <div class="onderrij"><button class="knop grijs" id="opnieuw" type="button">Nieuw spel</button></div>
@@ -63,7 +74,7 @@
   </div>
 
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Voor de grote mee-speler</h2>
+    <h2 class="s-1papx63">Voor de grote mee-speler</h2>
     <p class="ouder">Begin bij drie paren en ga pas omhoog als dat makkelijk gaat. Benoem hardop wat er op het kaartje staat ("een vis, en daar nog een vis") - zo oefent het kind woorden en geheugen tegelijk. Bij Samen om de beurt speel je met z'n tweeen op een scherm; er wordt bewust niet geteld wie de meeste paren vond, want samen het bord leeg spelen is het feest. Er wordt niets bijgehouden buiten dit ene spel; sluit je de app, dan is de stand weg.</p>
   </div>
 </div>

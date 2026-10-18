@@ -43,6 +43,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186m9vs:not(#_#_#_){width:100%}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -75,7 +85,7 @@
     <label class="lab" id="labWaarom">Vertel kort waarom</label>
     <textarea class="veld" id="fWaarom" maxlength="1500" placeholder="Wat maakt het nu zwaar, en wat zou een paar dagen weg betekenen? Een paar zinnen is genoeg."></textarea>
     <div class="fout" id="fout"></div>
-    <button class="knop" id="verstuur" style="width:100%;" data-hoofdactie>Versturen naar de foundation</button>
+    <button class="knop s-186m9vs" id="verstuur" data-hoofdactie>Versturen naar de foundation</button>
   </div>
 
   <div class="discreet">Discreet en veilig. Je gegevens gaan alleen naar de RTFoundation om contact met je op te nemen, nergens anders heen. Je hoeft je nergens voor te schamen: hulp vragen is sterk.</div>

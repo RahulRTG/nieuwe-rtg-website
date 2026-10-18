@@ -100,12 +100,14 @@
    !important, en een el.style-schrijfactie wint er nog steeds van. */
 .s-15g919n:not(#_#_#_){max-width:7rem;flex:1}
 .s-1p274fk:not(#_#_#_){border-color:var(--gold)}
+.s-1swp8vd:not(#_#_#_){display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem}
 .s-1v3d95r:not(#_#_#_){max-width:8rem}
 .s-1v3dw5a:not(#_#_#_){max-width:9rem}
 .s-1w7kwnq:not(#_#_#_){color:var(--muted)}
 .s-53krcx:not(#_#_#_){font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
 .s-iuiki6:not(#_#_#_){white-space:nowrap;color:var(--muted)}
 .s-ji67kl:not(#_#_#_){color:var(--leesgoud);font-size:.82rem}
+.s-tdav1m:not(#_#_#_){font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
@@ -404,7 +406,7 @@ async function laadTiks(){
     el.hidden = false;
     const wanneer = at => new Date(at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     el.innerHTML = r.tiks.map(t =>
-      '<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem;">'+
+      '<div class="s-1swp8vd">'+
         '<span>'+(t.richting === 'uit'
           ? 'Jij tikte <b class="h-leesgoud">'+esc(t.met)+'</b>'
           : '<b class="h-leesgoud">'+esc(t.met)+'</b> tikte jou')+
@@ -487,7 +489,7 @@ async function verversTegoed(){
   const g = $('#gGekocht');
   g.hidden = !open.length;
   if (open.length) {
-    g.innerHTML = '<div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem;">Klaargezet door jou</div>' +
+    g.innerHTML = '<div class="s-tdav1m">Klaargezet door jou</div>' +
       open.map(t =>
       '<div class="tikkie"><div class="wie"><b>'+esc(euro(t.centen))+' eur</b>'+
         '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+'</small></div>'+

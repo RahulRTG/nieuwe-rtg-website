@@ -3,7 +3,7 @@
     try {
       const g = await api('keten/gesprek', { kanaal: ktGekozen });
       $('#ktChat').innerHTML = (g.berichten || []).map(m =>
-        '<div class="b"><span class="stil" style="display:block;font-size:0.68rem;">' + esc(m.van) + ' · ' + esc(m.korpsNaam || m.korps) + '</span>' + esc(m.tekst) + '</div>').join('')
+        '<div class="b"><span class="stil s-m7re55">' + esc(m.van) + ' · ' + esc(m.korpsNaam || m.korps) + '</span>' + esc(m.tekst) + '</div>').join('')
         || '<p class="stil">Nog geen berichten' + (g.kijktMee ? ' (u kijkt mee als meldkamer)' : '') + '.</p>';
       $('#ktTekst').disabled = g.magSchrijven === false;
       $('#ktTekst').placeholder = g.magSchrijven === false ? 'U kijkt mee als meldkamer; alleen de leden schrijven.' : 'Bericht aan de keten of de groep';
@@ -31,7 +31,7 @@
     try {
       const d = await api('roster', { code });
       $('#ktGroepLeden').insertAdjacentHTML('beforeend', d.staff.map(m =>
-        '<label class="stil" style="font-size:0.75rem;display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" data-ktlid="' + code + ':' + m.id + ':' + esc(m.name) + '">' + esc(m.name) + ' (' + code + ')</label>').join(''));
+        '<label class="stil s-47s4fr"><input type="checkbox" data-ktlid="' + code + ':' + m.id + ':' + esc(m.name) + '">' + esc(m.name) + ' (' + code + ')</label>').join(''));
     } catch (e) { $('#ktUit').textContent = e.message; }
   });
   $('#ktGroepMaakKnop').addEventListener('click', async () => {

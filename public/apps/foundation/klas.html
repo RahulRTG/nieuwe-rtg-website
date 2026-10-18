@@ -36,6 +36,24 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12izg7a:not(#_#_#_){color:var(--rtg-leesgoud,var(--goud))}
+.s-16e2z3i:not(#_#_#_){font-size:1.25rem;text-align:center}
+.s-1m13bt8:not(#_#_#_){font-size:1.2rem;margin-top:0.5rem}
+.s-1m9a70q:not(#_#_#_){text-align:center}
+.s-1uq6r6e:not(#_#_#_){color:#E39AA2;margin-top:.6rem}
+.s-251prt:not(#_#_#_){text-transform:none;letter-spacing:normal;text-align:left;font-family:inherit}
+.s-3oo9fl:not(#_#_#_){text-align:center;margin-top:.4rem}
+.s-3oq6e6:not(#_#_#_){text-align:center;margin-top:.7rem}
+.s-hf0w5b:not(#_#_#_){font-size:1.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -47,9 +65,9 @@
     <h1>Jouw klas. Live en veilig.</h1>
     <p class="stil">Vul de klascode en je voornaam in. Dan kun je direct veilig meedoen.</p>
     <input class="veld" id="cCode" maxlength="6" autocomplete="off" placeholder="KLASCODE" aria-label="Klascode">
-    <input class="veld" id="cNaam" maxlength="24" autocomplete="off" placeholder="Je voornaam" aria-label="Je voornaam" style="text-transform:none;letter-spacing:normal;text-align:left;font-family:inherit;">
+    <input class="veld s-251prt" id="cNaam" maxlength="24" autocomplete="off" placeholder="Je voornaam" aria-label="Je voornaam">
     <button class="knop" id="cGo" data-hoofdactie>Start de les →</button>
-    <p class="stil" id="cFout" role="alert" style="color:#E39AA2;margin-top:.6rem;"></p>
+    <p class="stil s-1uq6r6e" id="cFout" role="alert"></p>
   </section>
 
   <!-- de les -->
@@ -91,25 +109,25 @@ function teken(){
   $('#sScore').textContent = LES.score;
   const inhoud = $('#kInhoud'), opties = $('#kOpties');
   if (LES.fase === 'lobby'){
-    inhoud.innerHTML = '<h1 style="font-size:1.25rem;">'+esc(LES.titel)+'</h1><p class="stil h-mt60">'+esc(LES.uitleg||'')+'</p>'+
+    inhoud.innerHTML = '<h1 class="s-hf0w5b">'+esc(LES.titel)+'</h1><p class="stil h-mt60">'+esc(LES.uitleg||'')+'</p>'+
       '<p class="stil h-mt80">De juf of meester start zo de eerste vraag. Lees de uitleg alvast rustig door.</p>';
     opties.innerHTML = ''; laatsteVraag = -2; return;
   }
   if (LES.fase === 'klaar'){
-    inhoud.innerHTML = '<div class="groot">✓</div><h1 style="font-size:1.25rem;text-align:center;">De les is klaar!</h1>'+
-      '<p class="stil" style="text-align:center;margin-top:.4rem;">Je had <b style="color:var(--rtg-leesgoud,var(--goud));">'+LES.score+'</b> vragen goed. Kijk vooral welke stap je nu beter begrijpt.</p>'+
-      '<p class="stil" style="text-align:center;margin-top:.7rem;">Er is bewust geen podium: leren is geen wedstrijd.</p>';
+    inhoud.innerHTML = '<div class="groot">✓</div><h1 class="s-16e2z3i">De les is klaar!</h1>'+
+      '<p class="stil s-3oo9fl">Je had <b class="s-12izg7a">'+LES.score+'</b> vragen goed. Kijk vooral welke stap je nu beter begrijpt.</p>'+
+      '<p class="stil s-3oq6e6">Er is bewust geen podium: leren is geen wedstrijd.</p>';
     opties.innerHTML = ''; return;
   }
   if (LES.fase === 'vraag' && LES.vraag){
     if (LES.vraagIx !== laatsteVraag){ gekozen = null; laatsteVraag = LES.vraagIx; }
     if (LES.beantwoord){
       inhoud.innerHTML = '<div class="groot '+(LES.goedFout?'goed':'fout')+'">'+(LES.goedFout?'✓ Goed!':'Helaas')+'</div>'+
-        '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
+        '<p class="stil s-1m9a70q">Wacht op de volgende vraag…</p>';
       opties.innerHTML = ''; return;
     }
     inhoud.innerHTML = '<span class="stil">Vraag '+(LES.vraagIx+1)+' van '+LES.totaalVragen+'</span>'+
-      '<h1 style="font-size:1.2rem;margin-top:0.5rem;">'+esc(LES.vraag.v)+'</h1>';
+      '<h1 class="s-1m13bt8">'+esc(LES.vraag.v)+'</h1>';
     opties.innerHTML = LES.vraag.opties.map((o,i) =>
       '<button class="optie" data-k="'+i+'"><span class="ltr">'+'ABCD'[i]+'</span>'+esc(o)+'</button>').join('');
     opties.querySelectorAll('.optie').forEach(b => b.addEventListener('click', async () => {
@@ -120,7 +138,7 @@ function teken(){
         const r = await api('/api/les/antwoord', { code: CODE, naam: NAAM, deelnemerToken: TOKEN, keuze: gekozen });
         $('#sScore').textContent = r.score;
         $('#kInhoud').innerHTML = '<div class="groot '+(r.goed?'goed':'fout')+'">'+(r.goed?'✓ Goed!':'Nog niet')+'</div>'+
-          '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
+          '<p class="stil s-1m9a70q">Wacht op de volgende vraag…</p>';
         opties.innerHTML = '';
       } catch(e){ gekozen = null; opties.querySelectorAll('.optie').forEach(x => x.disabled = false); }
     }));

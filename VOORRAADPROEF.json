@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-18T07:56:10.976Z",
-    "commit": "dc91a23a",
-    "boomVuil": true,
+    "op": "2026-10-18T19:30:25.549Z",
+    "commit": "1a0bc6862",
+    "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/voorraadproef.js",
     "node": "v22.22.0"
@@ -22,7 +22,7 @@
       "status": 200,
       "ziet": "advies 8 kg (stand 2, minimum 5)",
       "fout": null,
-      "ms": 4
+      "ms": 3
     },
     {
       "nr": 2,
@@ -34,7 +34,7 @@
       "status": 200,
       "ziet": "keuken: 1 laag, Tomaten erbij: true",
       "fout": null,
-      "ms": 6
+      "ms": 8
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "order GHED1864D9, inkomend: true, regel 8 x Trostomaten",
+      "ziet": "order GHAE779EAA, inkomend: true, regel 8 x Trostomaten",
       "fout": null,
       "ms": 12
     },
@@ -70,7 +70,7 @@
       "status": 200,
       "ziet": "de zaak leest \"onderweg\"",
       "fout": null,
-      "ms": 5
+      "ms": 7
     },
     {
       "nr": 6,
@@ -94,7 +94,7 @@
       "status": 200,
       "ziet": "nog laag: false",
       "fout": null,
-      "ms": 6
+      "ms": 5
     },
     {
       "nr": 8,
@@ -106,7 +106,7 @@
       "status": 200,
       "ziet": "Trostomaten 90 -> 82, afgerond: true, omzet 17.6",
       "fout": null,
-      "ms": 3
+      "ms": 5
     }
   ],
   "storingen": [
@@ -156,7 +156,7 @@
       "naam": "een geleverd product dat niet op de keukenlijst staat",
       "belofte": "de zaak leest per regel of hij in haar voorraad is ingeboekt; niets is stilzwijgend \"binnen\"",
       "stand": "gehouden",
-      "wat": "order \"geleverd\", ontvangst: {\"geboekt\":0,\"nietGeboekt\":[{\"naam\":\"Servetten (pak 500)\",\"reden\":\"staat niet op de keukenlijst\"}],\"at\":\"2026-10-18T07:56:17.621Z\"}"
+      "wat": "order \"geleverd\", ontvangst: {\"geboekt\":0,\"nietGeboekt\":[{\"naam\":\"Servetten (pak 500)\",\"reden\":\"staat niet op de keukenlijst\"}],\"at\":\"2026-10-18T19:30:31.683Z\"}"
     },
     {
       "naam": "een ledensessie probeert in te kopen bij de groothandel",
@@ -171,7 +171,7 @@
       "wat": "status 409: Deze groothandel levert niet aan dit type klant."
     }
   ],
-  "order": "GHED1864D9",
+  "order": "GHAE779EAA",
   "telling": {
     "schakels": 8,
     "gesloten": 8,

@@ -113,5 +113,10 @@ module.exports = (kern) => {
     res.json({ ok: true, doorgegeven: doorgegeven === true });
   });
   /* Het dagrapport (nachtwerk) van de vloot staat in ./doos-rapport.js. */
-  require('./doos-rapport')(kern, doosSleutelOk);
+  require('./doos-rapport')(kern, doosSleutelOk, (rij) => {
+    if (!Array.isArray(db.data.doosRapporten)) db.data.doosRapporten = [];
+    db.data.doosRapporten.unshift(rij);
+    db.data.doosRapporten = db.data.doosRapporten.slice(0, 1000);
+    save();
+  });
 };

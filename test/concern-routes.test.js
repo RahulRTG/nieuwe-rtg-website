@@ -235,7 +235,7 @@ test('overname en fusie: alleen tussen eigen entiteiten, en eerst tonen dan doen
     'na de fusie werkt hij bij de blijvende entiteit');
 });
 
-test('document/lees: kandidaten met vindplaats, en er wordt niets vastgelegd', async () => {
+test('document/lees en /bevestig: lezen legt niets vast, bevestigen alleen wat is aangevinkt', async () => {
   const voor = (await api('/api/concern/geschiedenis', { entiteit: a2 }, A)).body.geschiedenis.length;
   const r = await api('/api/concern/document/lees', { entiteit: a2, tekst: AKTE, bestand: 'uittreksel.pdf' }, A);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
@@ -247,4 +247,22 @@ test('document/lees: kandidaten met vindplaats, en er wordt niets vastgelegd', a
     'lezen legt niets vast');
   assert.equal((await api('/api/concern/document/lees', { entiteit: a2, tekst: 'te kort' }, A)).status, 400);
   assert.equal((await api('/api/concern/document/lees', { entiteit: a2, tekst: AKTE }, B)).status, 404);
+
+  // bevestigen: alleen wat is aangevinkt, alleen op het eigen voorstel
+  const vid = r.body.voorstel.id;
+  assert.ok(vid, 'het voorstel heeft een id');
+  assert.equal((await api('/api/concern/document/bevestig', { entiteit: b1, voorstel: vid, kandidaten: [reg.id] }, B)).status, 404,
+    'een ander bevestigt dit voorstel niet, ook niet via een eigen entiteit');
+  assert.equal((await api('/api/concern/document/bevestig', { entiteit: a2, voorstel: vid, kandidaten: [] }, A)).status, 400,
+    'niets aangevinkt is niets vastleggen');
+  const bev = await api('/api/concern/document/bevestig', { entiteit: a2, voorstel: vid, kandidaten: [reg.id] }, A);
+  assert.equal(bev.status, 200, JSON.stringify(bev.body).slice(0, 160));
+  const reeks = (await api('/api/concern/geschiedenis', { entiteit: a2, soort: 'registratie' }, A)).body.geschiedenis;
+  assert.equal(reeks.length, 1, 'precies het aangevinkte gegeven is nu een feit');
+  assert.equal(reeks[0].waarde, '87654321');
+  assert.equal((await api('/api/concern/geschiedenis', { entiteit: a2 }, A)).body.geschiedenis.length, voor + 1,
+    'en verder niets');
+
+  assert.equal((await api('/api/concern/discovery/neem', { onderneming: 'ond_bestaatniet' }, A)).status, 404,
+    'wat niet uw onderneming is, neemt u niet over');
 });

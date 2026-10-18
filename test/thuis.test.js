@@ -209,10 +209,16 @@ test('typen voor het formulier, en een co-host die de hoofdhost zelf aanwijst', 
   assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
   assert.deepEqual(zet.body.coHosts, [gastNaam]);
   assert.equal((await api('prijsadvies', { id: huisId }, gastLid.token)).status, 200, 'de co-host mag meebeheren');
+  const beheerd = await fetch(base + '/api/thuis/huizen', { method: 'POST', headers: { 'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + gastLid.token }, body: '{}' }).then(r => r.json());
+  assert.deepEqual(beheerd.huizen.map(h => h.id), [huisId], 'de co-host ziet precies het huis dat hij meebeheert');
   assert.equal((await api('cohost', { id: huisId, wie: gastNaam }, gastLid.token)).status, 403, 'maar zet zelf geen co-hosts');
 
   const weg = await api('cohost', { id: huisId, wie: gastNaam, weg: true }, host.token);
   assert.equal(weg.status, 200);
   assert.equal(weg.body.coHosts.length, 0);
   assert.equal((await api('prijsadvies', { id: huisId }, gastLid.token)).status, 404, 'na het weghalen beheert hij niets meer');
+  const hostHuizen = await fetch(base + '/api/thuis/huizen', { method: 'POST', headers: { 'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + host.token }, body: '{}' }).then(r => r.json());
+  assert.ok(hostHuizen.huizen.some(h => h.id === huisId) && hostHuizen.huizen.some(h => h.id === instantId), 'de host ziet zijn eigen huizen');
 });

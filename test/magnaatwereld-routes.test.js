@@ -137,6 +137,17 @@ test('kantoor kiezen en de controlekamer: de rol bepaalt wat je mag', async () =
 
   const taak = await api('/api/member/magnaat/controle/taak/maak', { puntId: groen.id, invoer: { titel: 'Bewijs dit punt' } }, speler);
   assert.equal(taak.status, 200, JSON.stringify(taak.body).slice(0, 160));
+  const taakId = taak.body.taak.id;
+  assert.equal((await api('/api/member/magnaat/controle/taak/zet', { taakId, status: 'klaar', bewijs: 'kort' }, speler)).status, 400,
+    'afronden vraagt testbewijs');
+  assert.equal((await api('/api/member/magnaat/controle/taak/zet', { taakId, status: 'verzonnen' }, speler)).status, 400);
+  const buiten = await lid();
+  const bk = await api('/api/member/magnaat/kantoor/kies', { kantoorId: 'intern' }, buiten);
+  assert.equal(bk.status, 200, JSON.stringify(bk.body).slice(0, 160));
+  assert.equal((await api('/api/member/magnaat/controle/taak/zet', { taakId, status: 'klaar', bewijs: 'Zelftest groen op de trainingskopie' }, buiten)).status, 403,
+    'een speler uit een ander kantoor rondt de taak niet af');
+  const af = await api('/api/member/magnaat/controle/taak/zet', { taakId, status: 'klaar', bewijs: 'Zelftest groen op de trainingskopie' }, speler);
+  assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 160));
   assert.equal((await api('/api/member/magnaat/controle/zelftest', { puntId: groen.id }, speler)).status, 423,
     'een uitgezet punt test je niet');
   assert.equal((await api('/api/member/magnaat/controle/zet', { puntId: groen.id, wijziging: { aan: true } }, speler)).status, 200);

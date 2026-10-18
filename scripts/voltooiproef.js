@@ -64,8 +64,20 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'attenties.js': require('./lib/voltooi/attenties'),
+  'cellier.js': require('./lib/voltooi/cellier'),
+  'cercle.js': require('./lib/voltooi/cercle'),
+  'entourage.js': require('./lib/voltooi/entourage'),
+  'garderobe.js': require('./lib/voltooi/garderobe'),
+  'hangar.js': require('./lib/voltooi/hangar'),
+  'logboek.js': require('./lib/voltooi/logboek'),
+  'maison.js': require('./lib/voltooi/maison'),
+  'mecenaat.js': require('./lib/voltooi/mecenaat'),
+  'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
   'post.js': require('./lib/voltooi/post'),
-  'sessies.js': require('./lib/voltooi/sessies')
+  'reisboek.js': require('./lib/voltooi/reisboek'),
+  'sessies.js': require('./lib/voltooi/sessies'),
+  'table.js': require('./lib/voltooi/table')
 };
 
 function scenarios(alleen) {
@@ -94,7 +106,10 @@ async function meetScenario(sc) {
       boek[bewijs].push({ nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 });
     }
   };
-  const w = await maakWereld(path.basename(sc.bestand, '.js'));
+  /* `omgeving`: een scenario dat een herleidbaar mens van het kantoor nodig
+     heeft, draait in de kantoorwereld (KANTOORWERELD in ./lib/voltooiwereld.js).
+     De postvanger-grendel geldt daar net zo. */
+  const w = await maakWereld(path.basename(sc.bestand, '.js'), sc.omgeving);
   let afgebroken = null;
   try { await sc.loop(w, stap); }
   catch (e) { afgebroken = String(e && e.message || e).slice(0, 300); }

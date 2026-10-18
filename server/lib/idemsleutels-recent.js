@@ -25,6 +25,8 @@ const SLEUTELS = Object.assign({},
   /* Vier routes uit de samenvoeging van #542. Zie de kop daar. */
   require('./idemsleutels-samenvoeging').SLEUTELS,
   /* De Living Mall is een POST-projectie zonder mutatie. */
-  require('./idemsleutels-mall-living').SLEUTELS);
+  require('./idemsleutels-mall-living').SLEUTELS,
+  /* De apps van de Lifestyle Pass: gevonden door de voltooiproef van Reisboek. */
+  require('./idemsleutels-rechterhand').SLEUTELS);
 
 module.exports = { SLEUTELS };

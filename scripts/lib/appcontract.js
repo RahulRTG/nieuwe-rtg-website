@@ -95,6 +95,45 @@ const CONTRACT = {
   'link:post': Object.assign({
     belofte: 'een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar'
   }, voltooi('post', 'het scenario loopt /api/mijn/post, /zet, /alles-uit en /geschiedenis, de routes die /apps/mijn-post.html zelf aanroept')),
+  /* De apps van de Lifestyle Pass (18 oktober 2026). Elk scenario loopt met een
+     lid dat zijn pas kreeg langs het menselijke besluit van het kantoor; het
+     scenario van Reisboek loopt dat besluit zelf als schakels. */
+  'link:reisboek': Object.assign({
+    belofte: 'een Lifestyle-lid -- na het menselijke besluit van het kantoor -- legt een reis vast met vluchten, verblijven, documenten en programma en ziet op tijd welk document verloopt'
+  }, voltooi('reisboek', 'het scenario loopt /api/member/rechterhand/reisboek, /reis/zet, /reis/item en /weg, de routes die /apps/reisboek.html zelf aanroept, met een lid dat zijn pas via /api/aanmelding/beslis kreeg')),
+  'link:cellier': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn wijnkelder bij: aantal, waarde en drinkvenster per fles, wat op dronk is, en inschenken telt af'
+  }, voltooi('cellier', 'het scenario loopt /api/member/rechterhand/cellier, /zet, /schenk en /weg, onder het voorvoegsel dat /apps/cellier.html aanroept')),
+  'link:table': Object.assign({
+    belofte: 'een Lifestyle-lid organiseert een prive-diner: gelegenheid, gastenlijst met dieet en tafelindeling, en het menu per gang'
+  }, voltooi('table', 'het scenario loopt /api/member/rechterhand/table en zijn gast- en menuroutes, onder het voorvoegsel dat /apps/table.html aanroept')),
+  'link:maison': Object.assign({
+    belofte: 'een Lifestyle-lid bestuurt zijn huishouden: staf, taken voor wie en wanneer, af te vinken, en een logboek'
+  }, voltooi('maison', 'het scenario loopt /api/member/rechterhand/maison en zijn staf-, taak- en logroutes, onder het voorvoegsel dat /apps/maison.html aanroept')),
+  'link:garderobe': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn garderobe bij: per stuk wat het is en waar het hangt, per categorie geteld, met zijn vaklui'
+  }, voltooi('garderobe', 'het scenario loopt /api/member/rechterhand/garderobe, /stuk en /vakman, onder het voorvoegsel dat /apps/garderobe.html aanroept')),
+  'link:mecenaat': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn filantropie bij: doel, bedrag, toegezegd of betaald, en het deel via de RTFoundation'
+  }, voltooi('mecenaat', 'het scenario loopt /api/member/rechterhand/mecenaat, /gift, /betaald en /gift/weg, de routes die /apps/geld.html zelf aanroept')),
+  'link:nalatenschap': Object.assign({
+    belofte: 'een Lifestyle-lid legt zijn nalatenschap vast -- documenten, vertrouwenspersonen, wensen -- met de gevoelige velden versleuteld op schijf'
+  }, voltooi('nalatenschap', 'het scenario loopt /api/member/rechterhand/nalatenschap en zijn doc-, contact- en wensroutes, de routes die /apps/geld.html zelf aanroept')),
+  'link:logboek': Object.assign({
+    belofte: 'een Lifestyle-lid houdt het onderhoud van kostbaar bezit bij, en het overzicht seint wat binnenkort weer moet'
+  }, voltooi('logboek', 'het scenario loopt /api/member/rechterhand/logboek, /object en /regel, de routes die /apps/geld.html zelf aanroept')),
+  'link:cercle': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn clubs bij, vraagt waar hij in een stad terecht kan, en zijn gastpassen lopen met een boekhouding terug'
+  }, voltooi('cercle', 'het scenario loopt /api/member/rechterhand/cercle, /club, /gast, /gast/terug en /waarheen, onder het voorvoegsel dat /apps/cercle.html aanroept')),
+  'link:hangar': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn toestellen en vluchten bij: laatst bekende positie, eerstvolgende vlucht en vlieguren'
+  }, voltooi('hangar', 'het scenario loopt /api/member/rechterhand/hangar, /toestel en /vlucht, onder het voorvoegsel dat /apps/hangar.html aanroept')),
+  'link:entourage': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn reisgezelschap bij: documenten met vervaldatum, en bij het samenstellen ziet hij wat ontbreekt'
+  }, voltooi('entourage', 'het scenario loopt /api/member/rechterhand/entourage, /persoon, /doc en /gezelschap, onder het voorvoegsel dat /apps/entourage.html aanroept')),
+  'link:attenties': Object.assign({
+    belofte: 'een Lifestyle-lid onderhoudt zijn relaties: wie binnen dertig dagen een attentie verdient, met de giftgeschiedenis'
+  }, voltooi('attenties', 'het scenario loopt /api/member/rechterhand/attenties, /relatie en /gift, onder het voorvoegsel dat /apps/attenties.html aanroept')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

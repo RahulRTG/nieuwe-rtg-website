@@ -76,6 +76,13 @@ async function maakWereld(naam, eigenEnv) {
     return uit;
   }
 
+  /* EEN DUBBELTIK: hetzelfde verzoek twee keer TEGELIJK, zoals een tweede tik
+     op een trage verbinding aankomt terwijl de eerste nog loopt. Achter elkaar
+     sturen is een andere (mildere) proef: dan is de eerste al klaar. */
+  async function dubbel(pad, lijf, tok, koppen) {
+    return Promise.all([post(pad, lijf, tok, koppen), post(pad, lijf, tok, koppen)]);
+  }
+
   async function opnieuw() {
     srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
   }
@@ -115,13 +122,52 @@ async function maakWereld(naam, eigenEnv) {
     return JSON.parse(require('../../server/kluis').ontsleutel(rij.val));
   }
 
+  /* WAAR STAAT DIT MERKTEKEN OP SCHIJF? Een scenario dat zijn uitkomst met een
+     uniek merkteken maakt (een reisnaam, een notitie), kan zonder de
+     opslagvorm van elk domein te kennen nagaan dat het ERGENS in de opslag
+     staat -- en, net zo belangrijk, dat het na een verwijdering NERGENS meer
+     staat. Gelezen uit de bestanden zelf, readOnly, met dezelfde kluis als de
+     server (zonder RTG_ENC_KEY is dat een doorgeefluik). Elke rij van elke
+     tabel in elk .db-bestand van de datamap; bij de kv-opslag de sleutel erbij,
+     zodat de uitslag zegt WELKE collectie het draagt. Een kluis- of
+     auditspoor telt mee als vindplaats: dat het daar staat is waar, en een
+     scenario dat "weg" bewijst, moet zelf zeggen welke vindplaats het bedoelt. */
+  function vindInOpslag(merk) {
+    const { DatabaseSync } = require('node:sqlite');
+    const kluis = require('../../server/kluis');
+    const uit = [];
+    for (const bestand of fs.readdirSync(datamap).filter((f) => f.endsWith('.db')).sort()) {
+      const db = new DatabaseSync(path.join(datamap, bestand), { readOnly: true });
+      try {
+        const tabellen = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+        for (const tabel of tabellen) {
+          for (const rij of db.prepare('SELECT * FROM "' + tabel.replace(/"/g, '') + '"').all()) {
+            if (bestand === 'store.db' && tabel === 'kv') {
+              if (rij.deleted) continue;
+              let val = rij.val;
+              try { val = kluis.ontsleutel(val); } catch (e) { /* onleesbaar is niet gevonden */ }
+              if (String(val).includes(merk)) uit.push({ bestand, tabel, sleutel: rij.key });
+              continue;
+            }
+            const tekst = Object.values(rij).map((v) => {
+              if (typeof v !== 'string') return String(v);
+              try { return kluis.ontsleutel(v); } catch (e) { return v; }
+            }).join('\u0000');
+            if (tekst.includes(merk)) uit.push({ bestand, tabel });
+          }
+        }
+      } finally { db.close(); }
+    }
+    return uit;
+  }
+
   function klaar() {
     try { srv.kind.kill('SIGKILL'); } catch (e) { /* al weg */ }
     try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) { /* al weg */ }
   }
   process.on('exit', klaar);
 
-  return { post, afgebroken, herstart, crash, opslag, collectie, klaar, datamap, herstarts,
+  return { post, dubbel, afgebroken, herstart, crash, opslag, collectie, vindInOpslag, klaar, datamap, herstarts,
     berichten: () => postvanger.berichten(datamap),
     get basis() { return srv.basis; } };
 }
@@ -144,4 +190,46 @@ async function inloggen(w, lid) {
   return r.data.token;
 }
 
-module.exports = { maakWereld, nieuwLid, inloggen };
+/* DE KANTOORWERELD: een wegwerpserver waarin een HERLEIDBAAR mens van RTG kan
+   beslissen. Een Lifestyle- of Business Pass ontstaat uitsluitend na menselijke
+   goedkeuring (kern/aanmeldingen/besluit.js), en de gedeelde kantoorcode is geen
+   mens -- die weigert het besluit terecht. De testomgeving (NODE_ENV=test met
+   RTG_DEMO=1, server/testomgeving.js) maakt bij de opstart het
+   eigenaarsaccount aan; met DIE inlog beslist de proef, precies zoals
+   scripts/toelatingsproef.js. Geen nieuwe deur en geen vlag in de poort: in
+   productie weigert de configuratie RTG_DEMO (server/config/productie-lokaal.js),
+   en de sleutel hieronder gaat alleen naar deze wegwerpserver. */
+const EIGENAAR = { email: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com',
+  wachtwoord: process.env.DEMO_PASS || 'Imran' };
+const KANTOORWERELD = { RTG_DEMO: '1', RTG_OWNER_BOOTSTRAP: 'proefsleutel-voltooiwereld-2026',
+  OFFICE_CODE: 'RTG-VOLTOOI-KANTOOR' };
+
+async function eigenaarSessie(w) {
+  const r = await w.post('/api/auth/login', { login: EIGENAAR.email, password: EIGENAAR.wachtwoord });
+  if (r.status !== 200 || !r.data || !r.data.token) {
+    throw new Error('geen eigenaarssessie (status ' + r.status + ') -- draait het scenario in de kantoorwereld (omgeving: KANTOORWERELD)?');
+  }
+  return r.data.token;
+}
+
+/* Een lid met een Lifestyle Pass, langs de ENIGE weg die die pas geeft: een
+   vers RTG-lid vraagt hem aan, en een herleidbaar mens van het kantoor
+   accepteert met een afgesproken contractbedrag. Daarna logt het lid opnieuw in
+   (de pas hoort bij de nieuwe sessie). Lukt een stap niet, dan gooit dit met de
+   stap erbij: een scenario dat op een Lifestyle-lid bouwt, mag niet stil met een
+   RTG-lid verder. */
+async function lifestyleLid(w, merk) {
+  const lid = await nieuwLid(w, merk);
+  const a = await w.post('/api/aanmelding/aanvraag', { pas: 'lifestyle', naam: 'Voltooilid ' + merk,
+    contact: lid.email, viaUitnodiging: true }, lid.token);
+  const id = a.data && a.data.aanmelding && a.data.aanmelding.id;
+  if (a.status !== 200 || !id) throw new Error('de Lifestyle-aanvraag lukte niet (' + a.status + ')');
+  const K = await eigenaarSessie(w);
+  const b = await w.post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, K);
+  if (b.status !== 200) throw new Error('het kantoor kon de Lifestyle Pass niet toekennen (' + b.status + ': ' + (b.data && b.data.error) + ')');
+  lid.token = await inloggen(w, lid);
+  lid.aanmelding = id;
+  return lid;
+}
+
+module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, KANTOORWERELD };

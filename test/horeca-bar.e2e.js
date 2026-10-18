@@ -26,7 +26,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  wachtTot, wachtOpTekst, wachtOpZichtbaar } = require('./helper');
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, edgeActies } = require('./helper');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-barscherm-'));
 
@@ -165,7 +165,8 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       if (lijnDicht) return route.abort('failed');
       return route.continue();
     });
-    await page.click('#bVerversNu');
+    await edgeActies(page);
+    await page.locator('[data-rtg-adaptive-source="bVerversNu"]').click();
     /* Ververs haalt het bord opnieuw op; de nieuwe ronde is binnen zodra BAR-C
        in de ronderlijst staat. De knop eronder komt in dezelfde hertekening mee,
        want teken() zet de hele lijst in een keer neer. */

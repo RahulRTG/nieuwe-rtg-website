@@ -87,7 +87,8 @@ test('de voorzijde gebruikt de standaard Edge en houdt de volledige bestaande Ma
   const front = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'winkel-voorzijde.js'), 'utf8');
   assert.match(html, /id="mallEdgeControls"/);
   assert.match(html, /id="mallCompleteTrigger"/);
-  assert.match(experience, /RTGAdaptiveEdge\.mountSurface/);
+  assert.doesNotMatch(experience, /RTGAdaptiveEdge\.mountSurface/);
+  assert.match(experience, /els\.edge\.hidden = true/);
   assert.match(experience, /\/api\/mall\/apps\/installeer/);
   assert.match(experience, /\/api\/mall\/bewaar/);
   const view = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'mall-experience-view.js'), 'utf8');

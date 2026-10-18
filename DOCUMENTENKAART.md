@@ -1864,7 +1864,7 @@ NORM.json en geen achteruitgang. Daarnaast vond ronde 0
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
 nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
-<!--getal:edgekaart.levendeKanalen-->17<!--/getal--> levende kanalen. Het **Edge
+<!--getal:edgekaart.levendeKanalen-->18<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
@@ -2812,6 +2812,27 @@ afgewezen-met-grens, vraagt-besluit, extern) staat als blok `toezegklassen` in
 de documenten plus het kleine besluitbestand `TOEZEGKLASSEN.json`, waarvan elk
 citaat letterlijk in de bron moet staan.
 
+Het uitvoeringsbesluit van 16 oktober 2026 kiest **Full Build → Final
+Qualification**: de toegezegde functionaliteit wordt eerst op een afgeschermde
+integratietak gebouwd en geïntegreerd, met gerichte lokale toetsen en harde
+veiligheidsgrenzen per stap. Daarna volgt één platformbrede eindkwalificatie.
+Een afwijking in een onafhankelijke stroom houdt ander bouwwerk niet stil, maar
+blijft zichtbaar en geldt nooit als groen bewijs. De zes bouwstromen zijn
+Experience, Spatial, Universal Concierge, Revenue, Rahul en Platform;
+`APPWERKT.json` blijft het enige completion-register en `AFBOUWPROGRAMMA.md`
+houdt het eigenaarsbesluit en de werkstroomstand bij.
+
+**`docs/rtg-premium-afbouwplan.md` is de uitvoeringsbijlage voor alle apps**:
+de broninventaris wordt niet als kwaliteitsclaim gelezen, iedere canonieke
+capability krijgt één contract voor diepte, breedte, inhoud, vormgeving,
+bediening en continuïteit, en de 17 catalogusfamilies plus beheer-, partner-,
+enterprise- en specialistische schermen worden in fasen afgebouwd. Eerst komen
+drie referentie-ervaringen (wereldstart, compact taakscherm en TravelOS in Flow
+en Spatial), daarna de lanceerbare kern, alle families, de ketens tussen apps en
+één gezamenlijke eindkwalificatie. `AFBOUWPROGRAMMA.md` blijft de scopebron en
+`APPWERKT.json` de bewijsbron; de bijlage is geen tweede register en geeft geen
+livegoedkeuring.
+
 **`CONSOLIDATIE.md` is het opruimbesluit van de eigenaar** (12 oktober 2026) —
 lees het vóór elke PR. De lanceerbare kern is RTG Pass, TravelOS, WorkOS,
 betalen, Rahul en de Edge; de andere werelden blijven bestaan maar zijn dicht
@@ -2820,3 +2841,7 @@ beveiligingsgrens. Eén integrator, geen nieuwe domeinen tot fase 4, CI genereer
 en controleert de registers, en vier harde voorwaarden: geen kunstmatige
 normverbetering, geen verborgen bewijsachterstand, geen automatische
 productie-uitrol, geen nieuwe technische schuld.
+De aanvulling van 16 oktober staat afhankelijke stappen op één afgeschermde
+integratietak toe. Dat verandert niets aan de menselijke poorten voor `main`,
+releases en productie, en niets aan de harde grens voor accountisolatie,
+autorisatie en financiële veiligheid.

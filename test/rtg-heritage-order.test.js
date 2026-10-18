@@ -11,9 +11,10 @@ const ROOT = path.join(__dirname, '..');
 
 function omgeving() {
   const heritage = { tagName: 'LINK', rel: 'stylesheet', id: 'rtgHeritageCss', parentNode: null };
+  const editorial = { tagName: 'LINK', rel: 'stylesheet', id: 'rtgEditorialV4Css', parentNode: null };
   const scherm = { tagName: 'LINK', rel: 'stylesheet', parentNode: null };
   const script = { tagName: 'SCRIPT', parentNode: null };
-  const kinderen = [heritage, script, scherm];
+  const kinderen = [heritage, editorial, script, scherm];
   const head = {
     querySelectorAll() { return kinderen.filter(e => e.tagName === 'STYLE' || e.rel === 'stylesheet'); },
     appendChild(e) {
@@ -24,26 +25,27 @@ function omgeving() {
   kinderen.forEach(e => { e.parentNode = head; });
   const doc = {
     head,
-    getElementById(id) { return id === 'rtgHeritageCss' ? heritage : null; },
+    getElementById(id) { return id === 'rtgHeritageCss' ? heritage : id === 'rtgEditorialV4Css' ? editorial : null; },
     querySelector() { return null; }
   };
-  return { doc, head, heritage, scherm, script, kinderen };
+  return { doc, head, heritage, editorial, scherm, script, kinderen };
 }
 
-test('de bestaande Heritage-link verhuist achter een later schermblad', () => {
+test('Heritage en editorial V4 verhuizen samen achter een later schermblad', () => {
   const o = omgeving();
   assert.equal(order.ensureLast(o.doc), true);
-  assert.strictEqual(o.kinderen.at(-1), o.heritage);
+  assert.strictEqual(o.kinderen.at(-2), o.heritage);
+  assert.strictEqual(o.kinderen.at(-1), o.editorial);
   assert.equal(o.kinderen.filter(e => e === o.heritage).length, 1);
+  assert.equal(o.kinderen.filter(e => e === o.editorial).length, 1);
   assert.equal(order.ensureLast(o.doc), false, 'een tweede controle verandert niets');
 });
 
 test('scripts na Heritage veranderen de CSS-cascade niet', () => {
   const o = omgeving();
   o.kinderen.splice(o.kinderen.indexOf(o.scherm), 1);
-  o.kinderen.splice(o.kinderen.indexOf(o.heritage), 1);
-  o.kinderen.unshift(o.heritage);
-  assert.strictEqual(order.lastStyle(o.head), o.heritage);
+  order.ensureLast(o.doc);
+  assert.strictEqual(order.lastStyle(o.head), o.editorial);
   assert.equal(order.ensureLast(o.doc), false);
 });
 

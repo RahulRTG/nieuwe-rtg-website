@@ -36,6 +36,10 @@ function woordenVan(c) {
     for (const o of c.interactie.opties) voeg(o);
   }
   if (c && c.presentatie) {
+    const ruimte = c.presentatie.werkruimte;
+    if (ruimte) { voeg(ruimte.module); voeg(ruimte.id); voeg(ruimte.modus); }
+    const assistent = c.presentatie.assistent;
+    if (assistent) for (const actie of assistent.mogelijkheden) { voeg(actie.soort); voeg(actie.id); }
     voeg(c.presentatie.selectie); voeg(c.presentatie.scherm);
     voeg(c.presentatie.app); voeg(c.presentatie.wereld);
   }
@@ -60,6 +64,11 @@ function handtekening(res, opties) {
   if (c.presentatie.app) d.push('scherm ' + c.presentatie.app);
   if (c.presentatie.scherm) d.push('deel ' + c.presentatie.scherm);
   if (c.presentatie.selectie) d.push('selectie ' + c.presentatie.selectie);
+  const ruimte = c.presentatie.werkruimte;
+  if (ruimte) d.push(['werkruimte', ruimte.id, ruimte.modus, ruimte.module].filter(Boolean).join(' '));
+  const assistent = c.presentatie.assistent;
+  if (assistent) d.push('assistentmogelijkheden zonder uitvoerbevoegdheid ' + assistent.mogelijkheden
+    .map((actie) => actie.soort + ' ' + actie.id).join(' | '));
   /* De opties staan er UITGESCHREVEN en niet geteld. Een interpretatielaag die
      "twee opties" leest, weet nog steeds niet welke de andere is -- en dan moet
      hij raden, precies wat deze laag moet voorkomen. */

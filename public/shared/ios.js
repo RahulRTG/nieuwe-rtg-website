@@ -743,8 +743,13 @@
      gebeurt, is een wedloop tussen twee uitgestelde laders. Kwam het kader
      eerst, dan vond `body > header` niets en kreeg rit.html zijn hero, en elk
      ander scherm zijn navigatiebalk, niet. Het schermvlak is dezelfde plek. */
-  var kop = d.querySelector('body > header') ||
-    d.querySelector('[data-rtg-screen-surface] > header');
+  /* Editorial V4 is de universele kop en blijft eigenaar van zijn eigen
+     acties. Als die kop al bestaat, mag deze oudere presentatielaag hem niet
+     opnieuw als iOS-kop ontleden; routebediening zou dan in de verborgen
+     .ios-nav-extra belanden. De oorspronkelijke routekop blijft beschikbaar
+     als expliciete bron voor de iOS-laag. */
+  var kop = d.querySelector('body > header:not(.rtg-v4-header)') ||
+    d.querySelector('[data-rtg-screen-surface] > header:not(.rtg-v4-header)');
   if (kop && !isThuis) {
     bouwBalk(kop);
     /* Pas inmeten als de balk er echt staat -- en na deze tik, want de

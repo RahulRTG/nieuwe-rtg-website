@@ -114,7 +114,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
       null, { timeout: 8000 });
     await page.click('#afDicht');
     await require('./helper').edgeActies(page);
-    await page.click('#icsBtn');
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Agenda exporteren', exact: true }).click();
     await page.waitForFunction(() => /rtg-agenda\.ics/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });
 

@@ -179,7 +179,8 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     /* ---- uitgeven, met de RTG-naam als AANVRAAG ---- */
     await page.check('#tKlaar');
     await naarDeel(page, 'uitgeven');
-    await page.click('#bewaar');
+    await require('./helper').edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Bewaren', exact: true }).click();
     await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#melding').textContent),
       null, { timeout: 20000 });
     await page.waitForSelector('#uitgaveVlak input', { timeout: 20000 });

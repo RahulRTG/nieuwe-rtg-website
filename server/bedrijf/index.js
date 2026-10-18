@@ -89,6 +89,10 @@ module.exports = (kern) => {
   require('./aansluiting')(sctx);
   require('./postbrug')(sctx);
   require('./mijn')(sctx);
+  /* Een eigen Bureau- of Servicezaak in de gekozen werkruimte bekijken. De
+     route hergebruikt accountpoort, WerkOS-deur en broneigendom; zij schrijft
+     geen context en verleent geen recht. */
+  require('./zaakregie')(sctx);
   // Herkomst uit een andere RTG-app (verwijzing bewaren, NOOIT oplossen) en
   // het eigen werk van een lid (geen parameter om naar een ander te vragen).
   Object.assign(sctx, require('./herkomst')(sctx));

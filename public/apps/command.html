@@ -153,7 +153,7 @@
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-editorial-v4="force">
 <!-- De kop volgt het contract van de iOS-laag (shared/ios.js): die bouwt elke
      `body > header` ter plekke om tot een navigatiebalk en pakt de <h1> als
      titel. Een eigen woordmerk-div werd daar stilzwijgend uit gegooid -- vandaar
@@ -163,7 +163,7 @@
 <header>
   <div class="ey">RTG &amp; RTF · één kantoor</div>
   <h1>RTG Command</h1>
-  <div class="zoekbalk"><input id="q" type="search" placeholder="Zoek alles: naam, code, kenteken, plaats, status…" aria-label="Zoek over alle domeinen"></div>
+  <div class="zoekbalk"><input id="q" type="search" data-rtg-v4-header-action placeholder="Zoek alles: naam, code, kenteken, plaats, status…" aria-label="Zoek over alle domeinen"></div>
   <span class="stand" id="stand" aria-live="polite"><i></i><span>laden…</span></span>
 </header>
 <div class="schil">

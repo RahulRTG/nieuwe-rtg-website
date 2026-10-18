@@ -15,9 +15,17 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
   await ctx.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');},token);
   const page=await ctx.newPage(),errors=[];page.setDefaultTimeout(15000);h.letOpFouten(page,errors);
   await page.goto(srv.base+'/apps/reizen.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+  const edgeBar=page.locator('.rtg-adaptive-bar:visible');
+  const edgeMenu=page.locator('.rtg-adaptive-bar:visible [data-rtg-adaptive-action="menu"]:visible');
+  await page.waitForFunction(()=>document.body.dataset.rtgAdaptiveReady==='true');
+  /* Op een zwaar belaste WebKit-run kan Quiet Presence al actief zijn tegen
+     de tijd dat de route klaar is. Aanwijzen wekt dezelfde Edge zoals een
+     echte pointer dat doet en voorkomt een klik op een intussen verborgen vak. */
+  await edgeBar.hover();
+  await edgeMenu.waitFor({state:'visible',timeout:h.geduld(15000)});
   let app;
   if(width<1000){
-   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+   await edgeMenu.click({timeout:h.geduld(15000)});
    await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
    await page.locator('[data-edge-smart-search]').click();
    await page.locator('.rtg-edge-find input:visible').fill('reisbureau');
@@ -27,10 +35,17 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
    await app.waitForSelector('body.rtg-edge-embed');
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1,'één Edge rondom de geopende reisapp');
   }else{
-   await page.locator('.wd-library .wd-app-controls summary').click();
-   await page.locator('.wd-library input[type="search"]').fill('reisbureau');
-   await page.locator('.wd-library [data-widget="reisbureau"] .wd-widget-open').click();
-   app=await (await page.waitForSelector('.wd-app-frame:not([hidden])')).contentFrame();
+   /* Desktop gebruikt dezelfde zichtbare Edge-route als telefoon. De oude
+      bibliotheek blijft alleen als functionele bron bestaan en mag niet weer
+      een tweede navigatiepaneel in de definitieve schil worden. */
+   await edgeMenu.click({timeout:h.geduld(15000)});
+   await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
+   await page.locator('[data-edge-smart-search]').click();
+   await page.locator('.rtg-edge-find input:visible').fill('reisbureau');
+   await page.locator('.rtg-edge-group a[href="/apps/reisbureau.html"]:visible').click();
+   await page.waitForURL('**/apps/werkruimte.html?gebied=reizen&open=reisbureau');
+   app=await (await page.waitForSelector('iframe[src*="/apps/reisbureau.html"]:visible')).contentFrame();
+   await app.waitForSelector('body.rtg-edge-embed');
   }
   await app.locator('.reis[data-id="ibiza-jetset"]').click();
   const date=new Date(Date.now()+30*86400000).toISOString().slice(0,10);

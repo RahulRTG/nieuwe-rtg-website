@@ -619,6 +619,19 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurts
   box-shadow:inset 2px 0 var(--rtg-v-metal),var(--rtg-v-depth-content)
 }
 
+/* Deze drie waarden staan op donkere wereldgrond. De eerdere lokale kleuren
+   waren nog uit de lichte dashboardversie afkomstig en voldeden daar niet aan
+   de tekstcontrastgrens. */
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart .statusicoon.goed{
+  color:#77c69a!important
+}
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtsec{
+  color:#d9c8ad!important
+}
+html body[data-rtg-editorial-v4="true"][data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtstad b{
+  color:#f7f1e5!important
+}
+
 @media(hover:hover) and (pointer:fine){
   body[data-rtg-world-dashboard-ready="true"] :where(
     .rtg-dashboard-hero-cta,.dagkaart[href],.laagfocus a,.grid>.kaart,

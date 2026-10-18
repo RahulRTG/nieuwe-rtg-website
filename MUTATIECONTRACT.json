@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-10-15T08:09:53.967Z",
-  "commit": "7a54aa570",
+  "op": "2026-10-17T20:02:38.054Z",
+  "commit": "ab4c08c25",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.12.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5397,
-  "geclassificeerd": 5372,
+  "totaal": 5398,
+  "geclassificeerd": 5373,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
-   "NOT_APPLICABLE": 1297,
+   "NOT_APPLICABLE": 1298,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 705,
    "INTENTIONALLY_NON_IDEMPOTENT": 206
   },
-  "vastgesteldDoorMens": 2260,
+  "vastgesteldDoorMens": 2261,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4437,
+   "AUTHENTICATED": 4438,
    "PUBLIC": 142,
    "OBJECT_SCOPED": 785,
    "(niet af te leiden -- vraagt een verklaring)": 17,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 250
+   "niet gemeten": 251
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -51,6 +51,12 @@
    "route": "POST /api/arrival/pass/roteer",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/bedrijf/zaakregie",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -7932,6 +7938,27 @@
     "hindernis": "Onbekende werkruimte of verkeerd beheer-token."
    },
    "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.zaakregie.lees",
+   "route": "POST /api/bedrijf/zaakregie",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "authEenmaal"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

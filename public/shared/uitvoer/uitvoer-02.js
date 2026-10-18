@@ -25,7 +25,13 @@
 
   function sluit() {
     laag.hidden = true;
-    if (knop && knop.isConnected) knop.focus();   // terug naar de tik
+    if (knop && knop.isConnected) {
+      knop.focus();   // terug naar de tik
+      var terug = knop;
+      (window.queueMicrotask || function (fn) { Promise.resolve().then(fn); })(function () {
+        if (terug && terug.isConnected) terug.focus();
+      });
+    }
   }
 
   function paneel() {

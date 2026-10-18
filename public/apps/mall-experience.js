@@ -86,10 +86,11 @@
   }
   function mountEdge() {
     if (!els.edge || els.edge.classList.contains('is-mounted')) return;
-    if (w.RTGAdaptiveEdge && w.RTGAdaptiveEdge.mountSurface) {
-      var release = w.RTGAdaptiveEdge.mountSurface(els.edge, { kind: 'mall' });
-      if (release) { els.edge.classList.remove('is-fallback'); els.edge.classList.add('is-mounted'); return; }
-    }
+    /* De Mall leende vroeger vijf eigen knoppen aan de onderste schil. Dat
+       maakte de universele Edge op deze route een tweede, bredere navigatie.
+       De bestaande echte Mall-knoppen worden al door de centrale actielade
+       gevonden; de zichtbare Edge blijft daarom overal hetzelfde object. */
+    if (w.RTGAdaptiveEdge) { els.edge.hidden = true; return; }
     els.edge.classList.add('is-fallback');
   }
   function bind() {

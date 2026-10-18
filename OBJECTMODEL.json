@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-14",
+  "vastgelegd": "2026-10-17",
   "gemeten": {
-    "bestanden": 2906,
-    "vormen": 1613,
-    "velden": 2315,
-    "modules": 899,
-    "domeinen": 319,
+    "bestanden": 2929,
+    "vormen": 1616,
+    "velden": 2319,
+    "modules": 902,
+    "domeinen": 321,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1622,
+    "veldenDomeineigen": 1625,
     "veldenGedeeldVanafVier": 237,
     "gelijkendeVormparen": 65
   },
@@ -262,6 +262,18 @@
       ]
     },
     {
+      "veld": "name",
+      "domeinen": 13,
+      "waar": [
+        "kern/agent",
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 13,
       "waar": [
@@ -310,18 +322,6 @@
       ]
     },
     {
-      "veld": "name",
-      "domeinen": 12,
-      "waar": [
-        "kern/agent",
-        "kern/experience",
-        "kern/gast",
-        "kern/kantoor",
-        "kern/leverancier",
-        "kern/lidacties"
-      ]
-    },
-    {
       "veld": "zaak",
       "domeinen": 12,
       "waar": [
@@ -367,6 +367,30 @@
         "kern/frictie",
         "kern/geldbeleid",
         "kern/kantoor"
+      ]
+    },
+    {
+      "veld": "version",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/bewijsvlak",
+        "kern/connection-communication-media",
+        "kern/connection-profile-media",
+        "kern/document-contracten",
+        "kern/experience"
+      ]
+    },
+    {
+      "veld": "kind",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/boerderij",
+        "kern/connection-communication",
+        "kern/connection-communication-actions",
+        "kern/connection-communication-media",
+        "kern/economie"
       ]
     },
     {
@@ -487,30 +511,6 @@
         "kern/concern",
         "kern/livinglab",
         "kern/machtiging"
-      ]
-    },
-    {
-      "veld": "version",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/bewijsvlak",
-        "kern/connection-communication-media",
-        "kern/connection-profile-media",
-        "kern/document-contracten",
-        "kern/experience"
-      ]
-    },
-    {
-      "veld": "kind",
-      "domeinen": 11,
-      "waar": [
-        "kern/boerderij",
-        "kern/connection-communication",
-        "kern/connection-communication-actions",
-        "kern/connection-communication-media",
-        "kern/economie",
-        "kern/experience"
       ]
     },
     {

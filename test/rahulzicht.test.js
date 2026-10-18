@@ -8,8 +8,9 @@
       NIET_MEE, nooit in allebei. Een nieuw blikveldveld gaat dus niet vanzelf
       naar een model -- deze toets zakt tot iemand kiest.
       Mutatie: haal `presence` uit NIET_MEE; toets 1 zakt.
-   2. POSITIEF: wat eruit komt zijn alleen `wereld`, `deel` en `verwijzingen`, en
-      een verwijzing is alleen soort en id. Een blikveld vol identiteit, open
+   2. POSITIEF: uit het Blikveld komen alleen `wereld`, `deel` en
+      `verwijzingen`, en een verwijzing is alleen soort en id. De optionele
+      Workspace-projectie heeft haar eigen gesloten lijst. Een blikveld vol identiteit, open
       bladen, labels en velden laat daar niets van achter.
       Mutatie: neem het object met een spread over; toets 2 zakt.
    3. HERKOMST: een titel gaat alleen mee als het scherm (of het blad, of het
@@ -143,7 +144,7 @@ test('6. de helper neemt de drie velden over, en zonder blikveld blijft de oude 
   assert.equal(met.wereld, 'travel');
   assert.equal(met.deel, 'Mijn reizen', 'de titel van het blad gaat voor de DOM van de schil');
   assert.deepEqual(JSON.parse(JSON.stringify(met.verwijzingen)), [{ soort: 'reis', id: 'r-42' }]);
-  assert.deepEqual(Object.keys(met).sort(), ['app', 'deel', 'selectie', 'verwijzingen', 'wereld']);
+  assert.deepEqual(Object.keys(met).sort(), ['app', 'deel', 'op', 'selectie', 'verwijzingen', 'wereld']);
 
   // een blikveld dat gooit, breekt de helper niet
   const kapot = helpersIn({ RTGEdgeRahulzicht: Z, RTGEdgeBlikveld: { lees: () => { throw new Error('x'); } } }).context();

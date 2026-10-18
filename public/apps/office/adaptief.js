@@ -11,7 +11,7 @@
    twee de echte is (LAT.md regel 4). Wat hier gebeurt is dat de knop op een
    andere plek wordt AANGEBODEN, niet dat hij wordt nagebouwd.
 
-   Gevolg dat je gratis krijgt: wie morgen een knop aan de werkbalk toevoegt,
+   Wie morgen een knop aan de werkbalk toevoegt,
    heeft hem op een telefoon meteen ook. Er is niets bij te werken.
 
    WAT ER OVER DE GRENS GAAT. Dit document draait in een werkblad-frame van RTG
@@ -64,16 +64,17 @@
      Bewaren bij elke wijziging, terugzetten vlak voor de handeling. Alleen
      bereiken BINNEN het vel: een cursor in het titelveld is geen documentbereik,
      en die terugzetten zou vet op de titel plakken. */
-  var bewaard = null;
+  var bewaard = null, hadSelectie = false;
   function velTekst() { return $('#tekst'); }
   d.addEventListener('selectionchange', function () {
     var vel = velTekst();
-    if (!vel || !zichtbaar(vel)) return;
+    if (!vel || !vel.isConnected) return;
     var s = d.getSelection();
     if (!s || !s.rangeCount) return;
     var r = s.getRangeAt(0);
     if (!vel.contains(r.commonAncestorContainer)) return;
     bewaard = r.cloneRange();
+    hadSelectie = !r.collapsed;
     meld();
   });
   function herstel() {
@@ -155,7 +156,8 @@
   }
   function erIsSelectie() {
     var s = d.getSelection(), vel = velTekst();
-    return !!(s && vel && s.rangeCount && !s.isCollapsed && vel.contains(s.getRangeAt(0).commonAncestorContainer));
+    if (s && vel && s.rangeCount && !s.isCollapsed && vel.contains(s.getRangeAt(0).commonAncestorContainer)) return true;
+    return !!(hadSelectie && bewaard && !bewaard.collapsed && vel);
   }
 
   /* De presentatie heeft geen werkbalk om uit te lezen: zijn bediening staat in

@@ -170,8 +170,8 @@ const KAART = [
   ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'zichtbaarheidsstand:b', [
     ['beslist', 'zichtbaarheidsstand:b', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
   ['rtg-adaptive-edge-controls.js', 'adaptieve-balk', 'capability-register:bl hoofdactie:s vluchtige-context:l', [
-    ['leest', 'capability-register:l', 'handelingen via het blikveld', 'if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();'],
-    ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if (label(el) && available(el, root) && (!tab || !tabs.has(tab))'],
+    ['leest', 'capability-register:l', 'handelingen via het blikveld', 'if(w.RTGEdgeBlikveld)return w.RTGEdgeBlikveld.acties();'],
+    ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab))'],
     ['rendert', 'hoofdactie:s', 'verhuist de hoofdactie in het blad', 'rt.primarySlot = primary; rt.sheet.appendChild(primary);'],
     ['rendert', 'vluchtige-context:l', 'bladtitel uit RTGAdaptief', 'if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;']]],
   ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:bl capability-register:l', [

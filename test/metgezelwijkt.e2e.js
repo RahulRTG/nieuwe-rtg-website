@@ -94,8 +94,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        Bewaak dat die opsplitsing niet alleen compileert, maar ook echt landt
        en beide veilige voorbereidingsknoppen blijft bedienen. */
     await page.waitForSelector('.rtg-one [data-one-decision]', { state: 'attached', timeout: 10000 });
-    await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
-    await page.getByRole('button', { name: 'Open beveiligd gesprek' }).click();
+    await require('./helper').edgeRahul(page);
     await page.waitForSelector('[data-build-plan]:visible');
 
     /* HIER STOND EEN VASTGEPINDE DECORTEKST, en dat is precies waarom deze

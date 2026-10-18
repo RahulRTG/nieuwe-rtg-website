@@ -6,7 +6,7 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);
-  var DECKS = Object.freeze(['home', 'context', 'actions', 'connect', 'rahul']);
+  var DECKS = Object.freeze(['home', 'apps', 'object', 'context', 'actions', 'connect', 'rahul']);
   var DETAILS = Object.freeze({ home: 'Eerste Minuut', worlds: 'Uw werelden', ai: 'Pagina, taak en mandaat',
     context: 'Veilig voorbereid', menu: 'Alle functies', back: 'Vorige ruimte', status: 'Vertrouwd en veilig',
     primary: 'Volgende stap', connect: 'Mensen en gesprekken', presence: 'Actuele voortgang' });
@@ -14,13 +14,19 @@
     home: [['home', 'Home', 'Home', 'home'], ['worlds', 'Werelden', 'Werelden', 'grid'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['context', 'Acties van dit scherm', 'Acties', 'list'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
+    apps: [['app:travel', 'TravelOS', 'Reizen', 'plane'], ['app:media', 'RTG Media', 'Media', 'play'],
+      ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['app:photos', 'Foto’s', 'Foto’s', 'camera'],
+      ['app:settings', 'Instellingen', 'Instellen', 'shield']],
+    object: [['object', 'Actief object', 'Object', 'camera'], ['object:save', 'Bewaren', 'Bewaar', 'bookmark'],
+      ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['object:share', 'Delen', 'Deel', 'branch'],
+      ['object:more', 'Meer objectacties', 'Meer', 'menu']],
     context: [['back', 'Terug', 'Terug', 'back'], ['context', 'Context van deze pagina', 'Context', 'doc'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['status', 'Veiligheid en status', 'Status', 'shield'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
     actions: [['back', 'Terug', 'Terug', 'back'], ['primary', 'Hoofdactie', 'Doen', 'target'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['context', 'Meer acties', 'Meer', 'list'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
-    connect: [['back', 'Terug', 'Terug', 'back'], ['connect', 'Connect openen', 'Connect', 'people'],
+    connect: [['contact', 'Actief contact', 'Contact', 'people'], ['context', 'Acties van dit gesprek', 'Acties', 'list'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['presence', 'Actuele activiteit', 'Actueel', 'replay'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
     rahul: [['back', 'Terug', 'Terug', 'back'], ['context', 'Geef Rahul context', 'Context', 'branch'],

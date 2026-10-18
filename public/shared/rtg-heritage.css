@@ -13,8 +13,6 @@
 @import url('./rtg-world-desktop.css');
 @import url('./rtg-desktop-components.css');
 @import url('./rtg-world-palette.css');
-@import url('./rtg-editorial-system.css');
-@import url('./rtg-cinematic-system.css');
 
 /* RTG Heritage
    De vaste beeldtaal van het huis, over ieder echt appscherm heen.
@@ -29,6 +27,7 @@
    niet als een vijfde visuele wereld. */
 
 body[data-rtg-skin="heritage"]{
+  --rtg-editorial-version:20261001;
   /* Vaste maatvoering voor alle routes. */
   --rtg-space-1:4px;--rtg-space-2:8px;--rtg-space-3:12px;
   --rtg-space-4:16px;--rtg-space-6:24px;--rtg-space-8:32px;

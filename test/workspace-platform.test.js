@@ -52,6 +52,7 @@ test('Module Registry kent LivingOS, WorkOS en iedere canonieke functie zonder t
   assert.equal(worlds.find(x => x.name === 'LivingOS').items.length, tel('LivingOS'));
   assert.equal(worlds.find(x => x.name === 'WorkOS').items.length, tel('WorkOS'));
   assert.equal(functies.find(x => x.id === 'link:berichten').module, 'messages');
+  assert.equal(functies.find(x => x.id === 'link:werkos').module, 'work');
   assert.equal(functies.find(x => x.id === 'link:veilig').module, 'safety');
 });
 
@@ -99,4 +100,31 @@ test('Orchestrator behandelt critical safety als policybesluit en blueprintvalid
   assert.equal(bp.validate({ workspace: 'Vrij', layout: [{ module: 'travel', state: 'focus' }] }).ok, false);
   assert.equal(bp.validate({ workspace: 'Fout', layout: [{ module: 'onbekend', state: 'panel' }] }).ok, false);
   assert.equal(toegepast.length, 1);
+});
+
+test('gedeelde werkruimtetemplates gebruiken dezelfde blueprintvalidator en verlenen geen rechten', () => {
+  const w = platform('workspace-blueprints.js'), toegepast = [];
+  const manifest = id => ({ id, permissions: id === 'work' ? ['work.read'] : id === 'coordination' ? ['coordination.read'] : [],
+    states: ['peek', 'panel', 'workspace', 'focus'], surfaces: { peek: true, panel: true, workspace: true, focus: true } });
+  const bekend = new Set(['navigation', 'profile', 'context', 'messages', 'work', 'coordination', 'dashboard', 'contacts', 'travel']);
+  const rechten = { 'work.read': true, 'coordination.read': false };
+  const bp = w.RTGWorkspaceBlueprints({ manifest: id => bekend.has(id) ? manifest(id) : null,
+    permission: p => rechten[p] === true, moduleAllowed: () => true, deviceAllows: () => true,
+    apply: (plan, reason) => toegepast.push({ plan, reason }) });
+  const lijst = bp.templates();
+  assert.equal(lijst.find(x => x.id === 'personal').available, true);
+  assert.equal(lijst.find(x => x.id === 'provider').available, false, 'een template omzeilt coordination.read niet');
+  assert.equal(bp.applyTemplate('provider').ok, false);
+  assert.equal(toegepast.length, 0, 'een geweigerde template verandert de workspace niet');
+  rechten['coordination.read'] = true;
+  const resultaat = bp.applyTemplate('provider');
+  assert.equal(resultaat.ok, true);
+  assert.equal(resultaat.blueprint.source, 'rtg-template:provider');
+  assert.equal(toegepast[0].plan.work, 'workspace');
+  assert.equal(toegepast[0].reason, 'workspace-blueprint');
+  assert.equal(bp.applyTemplate('verzonnen').ok, false);
+
+  const mobiel = w.RTGWorkspaceBlueprints({ manifest: id => bekend.has(id) ? manifest(id) : null,
+    permission: () => true, moduleAllowed: id => id !== 'contacts', deviceAllows: state => state !== 'workspace' });
+  assert.equal(mobiel.applyTemplate('manager').ok, false, 'tenant- en devicegrenzen blijven ook voor templates gelden');
 });

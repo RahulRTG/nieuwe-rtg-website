@@ -252,6 +252,13 @@ test('de grens bepaalt of een zaak doorloopt of op uw handtekening wacht', async
   const buiten = await json(await bu('zaak/open', { titel: 'Nieuwe wagen', domein: 'vervoer', bedragCenten: 30000000 }, tok));
   assert.equal(buiten.zaak.status, 'wacht op uw akkoord');
   assert.equal(buiten.zaak.beslissing.nodig, true);
+  const regie = await json(await bu('zaken', {}, tok));
+  const beeld = regie.regiebeelden.find(x => x.source.id === buiten.zaak.id);
+  assert.equal(beeld.phase.id, 'agreement');
+  assert.equal(beeld.attention.decisionRequired, true);
+  assert.equal(beeld.readOnly, true);
+  assert.equal(beeld.ownsSourceData, false);
+  assert.ok(!JSON.stringify(beeld).includes('30000000'), 'het regiebeeld draagt geen domeinbedrag');
 
   // een bijzonder verzoek gaat ALTIJD langs het lid, ook binnen de grens
   const bijz = await json(await bu('zaak/open', { titel: 'Iets onmogelijks', soort: 'bijzonder',

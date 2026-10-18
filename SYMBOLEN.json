@@ -1113,6 +1113,7 @@
     "public/shared/rosapps.js",
     "public/shared/rosthema.js",
     "public/shared/rtg-action-dock.js",
+    "public/shared/rtg-adaptive-edge-cinema.js",
     "public/shared/rtg-adaptive-edge-claim.js",
     "public/shared/rtg-adaptive-edge-controls.js",
     "public/shared/rtg-adaptive-edge-core.js",
@@ -1121,6 +1122,7 @@
     "public/shared/rtg-adaptive-edge-services.js",
     "public/shared/rtg-adaptive-edge-signals.js",
     "public/shared/rtg-adaptive-edge-surface.js",
+    "public/shared/rtg-adaptive-edge-visual.js",
     "public/shared/rtg-adaptive-edge.js",
     "public/shared/rtg-cinematic-system.js",
     "public/shared/rtg-communication-surface.js",
@@ -1144,6 +1146,8 @@
     "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
     "public/shared/rtg-edge-system.js",
     "public/shared/rtg-edge-worlds.js",
+    "public/shared/rtg-editorial-v4-model.js",
+    "public/shared/rtg-editorial-v4.js",
     "public/shared/rtg-first-steps.js",
     "public/shared/rtg-heritage-components.js",
     "public/shared/rtg-heritage-motion.js",
@@ -7250,18 +7254,18 @@
    "omgevingGekopieerd": false,
    "omgeving": [],
    "onwaarneembaar": [],
-   "nodeHoofdversie": 26
+   "nodeHoofdversie": 24
   }
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5764,
-  "gelezen": 5449,
-  "nietGelezen": 315,
-  "waarvanBundeldeel": 315,
+  "bestandenGezien": 5768,
+  "gelezen": 5454,
+  "nietGelezen": 314,
+  "waarvanBundeldeel": 314,
   "waarvanParsefout": 0,
-  "symbolen": 27581,
-  "bestandenMetUitvoer": 4546,
+  "symbolen": 27628,
+  "bestandenMetUitvoer": 4548,
   "uitvoerMetNamen": 2071,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2468,
@@ -7343,11 +7347,6 @@
    "bestand": "public/apps/app-main/app-main-11.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
    "melding": "parsefout regel 27: onverwacht token bij \"}\""
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-12.js",
-   "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
-   "melding": "parsefout regel 14: onverwacht token bij \"}\""
   },
   {
    "bestand": "public/apps/app-main/app-main-12b.js",
@@ -8452,7 +8451,7 @@
   {
    "bestand": "public/shared/basis/basis-01.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
-   "melding": "parsefout regel 172: verwacht '}' bij <eof>"
+   "melding": "parsefout regel 187: verwacht '}' bij <eof>"
   },
   {
    "bestand": "public/shared/basis/basis-02.js",
@@ -8507,7 +8506,7 @@
   {
    "bestand": "public/shared/deelmenu/deelmenu-01.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
-   "melding": "parsefout regel 111: verwacht '}' bij <eof>"
+   "melding": "parsefout regel 116: verwacht '}' bij <eof>"
   },
   {
    "bestand": "public/shared/deelmenu/deelmenu-03.js",
@@ -8747,7 +8746,7 @@
   {
    "bestand": "public/shared/rtg-schil/07-start.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
-   "melding": "parsefout regel 60: onverwacht token bij \"}\""
+   "melding": "parsefout regel 66: onverwacht token bij \"}\""
   },
   {
    "bestand": "public/shared/rtghorloge/rtghorloge-01.js",
@@ -213473,6 +213472,45 @@
    "gebruiktDoor": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-12.js",
+   "symbolen": [
+    {
+     "naam": "renderBell",
+     "soort": "functie",
+     "lijn": 2,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "openNotif",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "vulTab",
+     "soort": "functie",
+     "lijn": 91,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "pinHerstelUitAdres",
+     "soort": "functie",
+     "lijn": 112,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "openTab",
+     "soort": "functie",
+     "lijn": 114,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-12a.js",
    "symbolen": [
     {
@@ -214706,1981 +214744,1981 @@
     {
      "naam": "dmDicht",
      "soort": "pijl",
-     "lijn": 1955,
+     "lijn": 1954,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openShare",
      "soort": "functie",
-     "lijn": 1964,
+     "lijn": 1962,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "csBaan",
      "soort": "functie",
-     "lijn": 1991,
+     "lijn": 1985,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "belUI",
      "soort": "functie",
-     "lijn": 2003,
+     "lijn": 1997,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "belTimer",
      "soort": "functie",
-     "lijn": 2008,
+     "lijn": 2002,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "haalIce",
      "soort": "functie",
-     "lijn": 2015,
+     "lijn": 2010,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakPc",
      "soort": "functie",
-     "lijn": 2016,
+     "lijn": 2011,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "pakMedia",
      "soort": "functie",
-     "lijn": 2033,
+     "lijn": 2028,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toonGesprek",
      "soort": "functie",
-     "lijn": 2038,
+     "lijn": 2032,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "beginGesprek",
      "soort": "functie",
-     "lijn": 2047,
+     "lijn": 2042,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "neemOp",
      "soort": "functie",
-     "lijn": 2072,
+     "lijn": 2067,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eindeGesprek",
      "soort": "functie",
-     "lijn": 2091,
+     "lijn": 2087,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "flushIce",
      "soort": "functie",
-     "lijn": 2114,
+     "lijn": 2110,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opBelsignaal",
      "soort": "functie",
-     "lijn": 2118,
+     "lijn": 2114,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opSociaal",
      "soort": "functie",
-     "lijn": 2157,
+     "lijn": 2162,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kletsLaad",
      "soort": "functie",
-     "lijn": 2200,
+     "lijn": 2202,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kletsTekenLeeg",
      "soort": "functie",
-     "lijn": 2208,
+     "lijn": 2210,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kletsToon",
      "soort": "functie",
-     "lijn": 2237,
+     "lijn": 2239,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kletsStart",
      "soort": "functie",
-     "lijn": 2248,
+     "lijn": 2250,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kletsOpen",
      "soort": "functie",
-     "lijn": 2256,
+     "lijn": 2258,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kletsDicht",
      "soort": "pijl",
-     "lijn": 2263,
+     "lijn": 2265,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "syncScope",
      "soort": "functie",
-     "lijn": 2270,
+     "lijn": 2272,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "timeAgo",
      "soort": "functie",
-     "lijn": 2296,
+     "lijn": 2298,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderBell",
      "soort": "functie",
-     "lijn": 2307,
+     "lijn": 2309,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openNotif",
      "soort": "functie",
-     "lijn": 2336,
+     "lijn": 2337,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vulTab",
      "soort": "functie",
-     "lijn": 2397,
+     "lijn": 2398,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "pinHerstelUitAdres",
      "soort": "functie",
-     "lijn": 2418,
+     "lijn": 2419,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openTab",
      "soort": "functie",
-     "lijn": 2420,
+     "lijn": 2421,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldLeegScherm",
      "soort": "functie",
-     "lijn": 2488,
+     "lijn": 2489,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stap",
      "soort": "functie",
-     "lijn": 2507,
+     "lijn": 2508,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "naBeeld",
      "soort": "functie",
-     "lijn": 2532,
+     "lijn": 2533,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "volgende",
      "soort": "pijl",
-     "lijn": 2534,
+     "lijn": 2535,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAll",
      "soort": "functie",
-     "lijn": 2546,
+     "lijn": 2547,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadTickets",
      "soort": "functie",
-     "lijn": 2656,
+     "lijn": 2657,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderTkAanbod",
      "soort": "functie",
-     "lijn": 2703,
+     "lijn": 2704,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadCare",
      "soort": "functie",
-     "lijn": 2769,
+     "lijn": 2770,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderCareMijn",
      "soort": "functie",
-     "lijn": 2782,
+     "lijn": 2783,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderCareIntakes",
      "soort": "functie",
-     "lijn": 2804,
+     "lijn": 2805,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderCareAanbod",
      "soort": "functie",
-     "lijn": 2819,
+     "lijn": 2820,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVerzorging",
      "soort": "functie",
-     "lijn": 2899,
+     "lijn": 2900,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVerzorging",
      "soort": "functie",
-     "lijn": 2905,
+     "lijn": 2906,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderCarePakketten",
      "soort": "functie",
-     "lijn": 2976,
+     "lijn": 2977,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vhFotoKlein",
      "soort": "functie",
-     "lijn": 3040,
+     "lijn": 3041,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVerhuur",
      "soort": "functie",
-     "lijn": 3050,
+     "lijn": 3051,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "koppelVhActies",
      "soort": "functie",
-     "lijn": 3075,
+     "lijn": 3076,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stuur",
      "soort": "pijl",
-     "lijn": 3094,
+     "lijn": 3095,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVhAanbod",
      "soort": "functie",
-     "lijn": 3116,
+     "lijn": 3117,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadCharter",
      "soort": "functie",
-     "lijn": 3167,
+     "lijn": 3168,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "koppelChActies",
      "soort": "functie",
-     "lijn": 3192,
+     "lijn": 3193,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stuur",
      "soort": "pijl",
-     "lijn": 3211,
+     "lijn": 3212,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderChAanbod",
      "soort": "functie",
-     "lijn": 3233,
+     "lijn": 3234,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vgGeld",
      "soort": "pijl",
-     "lijn": 3291,
+     "lijn": 3292,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVastgoed",
      "soort": "functie",
-     "lijn": 3292,
+     "lijn": 3293,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadContracten",
      "soort": "functie",
-     "lijn": 3358,
+     "lijn": 3359,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBestellen",
      "soort": "functie",
-     "lijn": 3390,
+     "lijn": 3391,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadShowroom",
      "soort": "functie",
-     "lijn": 3398,
+     "lijn": 3399,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBoodschappen",
      "soort": "functie",
-     "lijn": 3443,
+     "lijn": 3444,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBzMijn",
      "soort": "functie",
-     "lijn": 3471,
+     "lijn": 3472,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opBezorg",
      "soort": "functie",
-     "lijn": 3487,
+     "lijn": 3488,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderBestellen",
      "soort": "functie",
-     "lijn": 3497,
+     "lijn": 3498,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bzTotaal",
      "soort": "functie",
-     "lijn": 3516,
+     "lijn": 3517,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderBzZaak",
      "soort": "functie",
-     "lijn": 3517,
+     "lijn": 3518,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderTerPlaatse",
      "soort": "functie",
-     "lijn": 3578,
+     "lijn": 3579,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "reviewUI",
      "soort": "functie",
-     "lijn": 3701,
+     "lijn": 3702,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "splitsUI",
      "soort": "functie",
-     "lijn": 3715,
+     "lijn": 3716,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAfspraken",
      "soort": "functie",
-     "lijn": 3736,
+     "lijn": 3737,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openBoekSheet",
      "soort": "functie",
-     "lijn": 3768,
+     "lijn": 3769,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadSlots",
      "soort": "functie",
-     "lijn": 3791,
+     "lijn": 3792,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraagRekening",
      "soort": "functie",
-     "lijn": 3846,
+     "lijn": 3847,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "$",
      "soort": "pijl",
-     "lijn": 3905,
+     "lijn": 3906,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "werkrolOk",
      "soort": "pijl",
-     "lijn": 4483,
+     "lijn": 4484,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraagPositie",
      "soort": "pijl",
-     "lijn": 4521,
+     "lijn": 4522,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadKantoorDeur",
      "soort": "pijl",
-     "lijn": 4542,
+     "lijn": 4543,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "metAlgPin",
      "soort": "functie",
-     "lijn": 4548,
+     "lijn": 4549,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "pijl",
-     "lijn": 4571,
+     "lijn": 4572,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openWerkKiezer",
      "soort": "functie",
-     "lijn": 4596,
+     "lijn": 4597,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mapNamen",
      "soort": "functie",
-     "lijn": 4686,
+     "lijn": 4687,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mapNaam",
      "soort": "functie",
-     "lijn": 4687,
+     "lijn": 4688,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetMapNaam",
      "soort": "functie",
-     "lijn": 4688,
+     "lijn": 4689,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gebruik",
      "soort": "functie",
-     "lijn": 4701,
+     "lijn": 4702,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "telGebruik",
      "soort": "functie",
-     "lijn": 4702,
+     "lijn": 4703,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "topGebruik",
      "soort": "functie",
-     "lijn": 4724,
+     "lijn": 4725,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sleutelVan",
      "soort": "pijl",
-     "lijn": 4734,
+     "lijn": 4735,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "RIJEN",
      "soort": "pijl",
-     "lijn": 4736,
+     "lijn": 4737,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bewaardeVolgorde",
      "soort": "functie",
-     "lijn": 4737,
+     "lijn": 4738,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bewaarVolgorde",
      "soort": "functie",
-     "lijn": 4738,
+     "lijn": 4739,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gesorteerd",
      "soort": "functie",
-     "lijn": 4739,
+     "lijn": 4740,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tabKnop",
      "soort": "pijl",
-     "lijn": 4750,
+     "lijn": 4751,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tabZichtbaar",
      "soort": "pijl",
-     "lijn": 4751,
+     "lijn": 4752,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tabNaam",
      "soort": "pijl",
-     "lijn": 4752,
+     "lijn": 4753,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "itemDef",
      "soort": "functie",
-     "lijn": 4754,
+     "lijn": 4755,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "monogram",
      "soort": "functie",
-     "lijn": 4759,
+     "lijn": 4760,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "glyfVoor",
      "soort": "functie",
-     "lijn": 4768,
+     "lijn": 4769,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tegelInhoud",
      "soort": "functie",
-     "lijn": 4772,
+     "lijn": 4773,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "itemNaam",
      "soort": "functie",
-     "lijn": 4780,
+     "lijn": 4781,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "itemZichtbaar",
      "soort": "functie",
-     "lijn": 4792,
+     "lijn": 4793,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gast",
      "soort": "pijl",
-     "lijn": 4803,
+     "lijn": 4804,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openItem",
      "soort": "functie",
-     "lijn": 4805,
+     "lijn": 4806,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openen",
      "soort": "pijl",
-     "lijn": 4816,
+     "lijn": 4817,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openOsApp",
      "soort": "functie",
-     "lijn": 4830,
+     "lijn": 4831,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aiMond",
      "soort": "functie",
-     "lijn": 4893,
+     "lijn": 4894,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mount",
      "soort": "functie",
-     "lijn": 4899,
+     "lijn": 4900,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakAppIcoon",
      "soort": "functie",
-     "lijn": 4910,
+     "lijn": 4911,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakMapIcoon",
      "soort": "functie",
-     "lijn": 4926,
+     "lijn": 4927,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "badgeVan",
      "soort": "pijl",
-     "lijn": 4970,
+     "lijn": 4971,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "afdruk",
      "soort": "pijl",
-     "lijn": 4976,
+     "lijn": 4977,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bouw",
      "soort": "functie",
-     "lijn": 4993,
+     "lijn": 4994,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openMap",
      "soort": "functie",
-     "lijn": 5050,
+     "lijn": 5051,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openHernoem",
      "soort": "functie",
-     "lijn": 5089,
+     "lijn": 5090,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluitScrims",
      "soort": "functie",
-     "lijn": 5104,
+     "lijn": 5105,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "alleItems",
      "soort": "functie",
-     "lijn": 5110,
+     "lijn": 5111,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "voeg",
      "soort": "pijl",
-     "lijn": 5112,
+     "lijn": 5113,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osActies",
      "soort": "functie",
-     "lijn": 5121,
+     "lijn": 5122,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraagRahul",
      "soort": "functie",
-     "lijn": 5140,
+     "lijn": 5141,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoekSectie",
      "soort": "functie",
-     "lijn": 5161,
+     "lijn": 5162,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoekRij",
      "soort": "functie",
-     "lijn": 5178,
+     "lijn": 5179,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoek",
      "soort": "functie",
-     "lijn": 5198,
+     "lijn": 5199,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openZoek",
      "soort": "functie",
-     "lijn": 5263,
+     "lijn": 5264,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ccSync",
      "soort": "functie",
-     "lijn": 5279,
+     "lijn": 5280,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetHelder",
      "soort": "functie",
-     "lijn": 5360,
+     "lijn": 5361,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetWiebel",
      "soort": "functie",
-     "lijn": 5376,
+     "lijn": 5377,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laat",
      "soort": "pijl",
-     "lijn": 5406,
+     "lijn": 5407,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "actieveTab",
      "soort": "functie",
-     "lijn": 5412,
+     "lijn": 5413,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sync",
      "soort": "functie",
-     "lijn": 5413,
+     "lijn": 5414,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bouwAlsAnders",
      "soort": "pijl",
-     "lijn": 5437,
+     "lijn": 5438,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "naarHome",
      "soort": "pijl",
-     "lijn": 5451,
+     "lijn": 5452,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "pillLos",
      "soort": "pijl",
-     "lijn": 5478,
+     "lijn": 5479,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verf",
      "soort": "pijl",
-     "lijn": 5513,
+     "lijn": 5514,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bannerToon",
      "soort": "functie",
-     "lijn": 5528,
+     "lijn": 5529,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bannerWeg",
      "soort": "functie",
-     "lijn": 5549,
+     "lijn": 5550,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "alleDoelen",
      "soort": "functie",
-     "lijn": 5574,
+     "lijn": 5575,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osCommando",
      "soort": "functie",
-     "lijn": 5580,
+     "lijn": 5581,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaal",
      "soort": "pijl",
-     "lijn": 5599,
+     "lijn": 5600,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "draadBel",
      "soort": "functie",
-     "lijn": 5694,
+     "lijn": 5695,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "draadTips",
      "soort": "functie",
-     "lijn": 5713,
+     "lijn": 5714,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osRahulOpent",
      "soort": "functie",
-     "lijn": 5730,
+     "lijn": 5731,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osRahulVraag",
      "soort": "functie",
-     "lijn": 5769,
+     "lijn": 5770,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zet",
      "soort": "pijl",
-     "lijn": 5777,
+     "lijn": 5778,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osRahulKijkt",
      "soort": "functie",
-     "lijn": 5836,
+     "lijn": 5837,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "wereldBij",
      "soort": "functie",
-     "lijn": 5882,
+     "lijn": 5883,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "systeemBij",
      "soort": "functie",
-     "lijn": 5914,
+     "lijn": 5915,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isAan",
      "soort": "functie",
-     "lijn": 5995,
+     "lijn": 5996,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBoardroom",
      "soort": "functie",
-     "lijn": 6000,
+     "lijn": 6001,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetWall",
      "soort": "functie",
-     "lijn": 6029,
+     "lijn": 6030,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toon",
      "soort": "functie",
-     "lijn": 6089,
+     "lijn": 6090,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openSound",
      "soort": "functie",
-     "lijn": 6098,
+     "lijn": 6099,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bedien",
      "soort": "functie",
-     "lijn": 6103,
+     "lijn": 6104,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tRide",
      "soort": "pijl",
-     "lijn": 6135,
+     "lijn": 6136,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderLive",
      "soort": "functie",
-     "lijn": 6137,
+     "lijn": 6138,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderLiveStart",
      "soort": "functie",
-     "lijn": 6145,
+     "lijn": 6146,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAssets",
      "soort": "functie",
-     "lijn": 6178,
+     "lijn": 6179,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "posVan",
      "soort": "pijl",
-     "lijn": 6186,
+     "lijn": 6187,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderFluister",
      "soort": "functie",
-     "lijn": 6283,
+     "lijn": 6284,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderZorg",
      "soort": "functie",
-     "lijn": 6361,
+     "lijn": 6362,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "huidigePositie",
      "soort": "functie",
-     "lijn": 6400,
+     "lijn": 6401,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "startLive",
      "soort": "functie",
-     "lijn": 6407,
+     "lijn": 6408,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "projectPoints",
      "soort": "functie",
-     "lijn": 6415,
+     "lijn": 6416,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderLivePanel",
      "soort": "functie",
-     "lijn": 6426,
+     "lijn": 6427,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stopLive",
      "soort": "functie",
-     "lijn": 6529,
+     "lijn": 6530,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "requestTaxi",
      "soort": "functie",
-     "lijn": 6535,
+     "lijn": 6536,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verstuurRit",
      "soort": "functie",
-     "lijn": 6545,
+     "lijn": 6546,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "shareMyLocation",
      "soort": "functie",
-     "lijn": 6573,
+     "lijn": 6574,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stopSim",
      "soort": "functie",
-     "lijn": 6582,
+     "lijn": 6583,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "simulateRide",
      "soort": "functie",
-     "lijn": 6583,
+     "lijn": 6584,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openMenu",
      "soort": "functie",
-     "lijn": 6604,
+     "lijn": 6605,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderMenuSheet",
      "soort": "functie",
-     "lijn": 6625,
+     "lijn": 6626,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "deur",
      "soort": "pijl",
-     "lijn": 6743,
+     "lijn": 6744,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "retailMenuBlock",
      "soort": "functie",
-     "lijn": 6811,
+     "lijn": 6812,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bindRetailMenu",
      "soort": "functie",
-     "lijn": 6857,
+     "lijn": 6858,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "placeOrder",
      "soort": "functie",
-     "lijn": 6900,
+     "lijn": 6901,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "payOrder",
      "soort": "functie",
-     "lijn": 6937,
+     "lijn": 6938,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadCv",
      "soort": "functie",
-     "lijn": 6963,
+     "lijn": 6964,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderCvCard",
      "soort": "functie",
-     "lijn": 6967,
+     "lijn": 6968,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openCvSheet",
      "soort": "functie",
-     "lijn": 6987,
+     "lijn": 6988,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closeCvSheet",
      "soort": "functie",
-     "lijn": 6999,
+     "lijn": 7000,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "memberApply",
      "soort": "functie",
-     "lijn": 7013,
+     "lijn": 7014,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadVacatures",
      "soort": "functie",
-     "lijn": 7029,
+     "lijn": 7030,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVacatures",
      "soort": "functie",
-     "lijn": 7039,
+     "lijn": 7040,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isApplied",
      "soort": "pijl",
-     "lijn": 7046,
+     "lijn": 7047,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "applyVac",
      "soort": "functie",
-     "lijn": 7075,
+     "lijn": 7076,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "apMsgHtml",
      "soort": "functie",
-     "lijn": 7092,
+     "lijn": 7093,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ensureApChatEl",
      "soort": "functie",
-     "lijn": 7098,
+     "lijn": 7099,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadApplyChat",
      "soort": "functie",
-     "lijn": 7114,
+     "lijn": 7115,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openApplyChat",
      "soort": "functie",
-     "lijn": 7122,
+     "lijn": 7123,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closeApplyChat",
      "soort": "functie",
-     "lijn": 7128,
+     "lijn": 7129,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sendApplyChat",
      "soort": "functie",
-     "lijn": 7129,
+     "lijn": 7130,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tDept",
      "soort": "pijl",
-     "lijn": 7137,
+     "lijn": 7138,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openPChat",
      "soort": "functie",
-     "lijn": 7138,
+     "lijn": 7139,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPChatDepts",
      "soort": "functie",
-     "lijn": 7150,
+     "lijn": 7151,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closePChat",
      "soort": "functie",
-     "lijn": 7162,
+     "lijn": 7163,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadPChat",
      "soort": "functie",
-     "lijn": 7167,
+     "lijn": 7168,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPChat",
      "soort": "functie",
-     "lijn": 7174,
+     "lijn": 7175,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sendPChat",
      "soort": "functie",
-     "lijn": 7190,
+     "lijn": 7191,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sparBlokHtml",
      "soort": "functie",
-     "lijn": 7216,
+     "lijn": 7217,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bindSparBlok",
      "soort": "functie",
-     "lijn": 7236,
+     "lijn": 7237,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "park",
      "soort": "pijl",
-     "lijn": 7251,
+     "lijn": 7252,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "showGlow",
      "soort": "functie",
-     "lijn": 7264,
+     "lijn": 7265,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVerifyBanner",
      "soort": "functie",
-     "lijn": 7283,
+     "lijn": 7284,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadPaspoortInbox",
      "soort": "functie",
-     "lijn": 7329,
+     "lijn": 7330,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPaspoortInbox",
      "soort": "functie",
-     "lijn": 7334,
+     "lijn": 7335,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderHome",
      "soort": "functie",
-     "lijn": 7362,
+     "lijn": 7363,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderHomeGuest",
      "soort": "functie",
-     "lijn": 7446,
+     "lijn": 7447,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadGuestHistory",
      "soort": "functie",
-     "lijn": 7477,
+     "lijn": 7478,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "esc",
      "soort": "functie",
-     "lijn": 7509,
+     "lijn": 7510,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderFoundation",
      "soort": "functie",
-     "lijn": 7510,
+     "lijn": 7511,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfBerichtHtml",
      "soort": "functie",
-     "lijn": 7536,
+     "lijn": 7537,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderGezin",
      "soort": "functie",
-     "lijn": 7541,
+     "lijn": 7542,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadGezinChat",
      "soort": "functie",
-     "lijn": 7560,
+     "lijn": 7561,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "grtMsgHtml",
      "soort": "functie",
-     "lijn": 7578,
+     "lijn": 7579,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "scrollGrt",
      "soort": "functie",
-     "lijn": 7579,
+     "lijn": 7580,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openGrtThread",
      "soort": "functie",
-     "lijn": 7580,
+     "lijn": 7581,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "grtStuur",
      "soort": "functie",
-     "lijn": 7590,
+     "lijn": 7591,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "onGrtChat",
      "soort": "functie",
-     "lijn": 7591,
+     "lijn": 7592,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "telHref",
      "soort": "pijl",
-     "lijn": 7592,
+     "lijn": 7593,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "geleden",
      "soort": "functie",
-     "lijn": 7593,
+     "lijn": 7594,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "datumKort",
      "soort": "functie",
-     "lijn": 7594,
+     "lijn": 7595,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadGezinInfo",
      "soort": "functie",
-     "lijn": 7595,
+     "lijn": 7596,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "infoRij",
      "soort": "functie",
-     "lijn": 7624,
+     "lijn": 7625,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfReply",
      "soort": "functie",
-     "lijn": 7625,
+     "lijn": 7626,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfKoppelStart",
      "soort": "functie",
-     "lijn": 7631,
+     "lijn": 7632,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "urlB64ToUint8",
      "soort": "functie",
-     "lijn": 7642,
+     "lijn": 7643,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ensurePush",
      "soort": "functie",
-     "lijn": 7647,
+     "lijn": 7648,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderTrip",
      "soort": "functie",
-     "lijn": 7666,
+     "lijn": 7667,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "uitleg",
      "soort": "pijl",
-     "lijn": 7671,
+     "lijn": 7672,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAgenda",
      "soort": "functie",
-     "lijn": 7696,
+     "lijn": 7697,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagNaam",
      "soort": "pijl",
-     "lijn": 7707,
+     "lijn": 7708,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "executePay",
      "soort": "functie",
-     "lijn": 7727,
+     "lijn": 7728,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "payWithFaceId",
      "soort": "functie",
-     "lijn": 7745,
+     "lijn": 7746,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "muntStop",
      "soort": "functie",
-     "lijn": 7781,
+     "lijn": 7782,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openMuntSheet",
      "soort": "functie",
-     "lijn": 7783,
+     "lijn": 7784,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "muntVraag",
      "soort": "functie",
-     "lijn": 7805,
+     "lijn": 7806,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "betaalPartner",
      "soort": "functie",
-     "lijn": 7850,
+     "lijn": 7851,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dpLees",
      "soort": "pijl",
-     "lijn": 7871,
+     "lijn": 7872,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "betaalVerzoekPay",
      "soort": "functie",
-     "lijn": 7896,
+     "lijn": 7897,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBetaalVerzoeken",
      "soort": "functie",
-     "lijn": 7904,
+     "lijn": 7905,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPay",
      "soort": "functie",
-     "lijn": 7909,
+     "lijn": 7910,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eurC",
      "soort": "pijl",
-     "lijn": 7918,
+     "lijn": 7919,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "specRow",
      "soort": "pijl",
-     "lijn": 7919,
+     "lijn": 7920,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bizSpec",
      "soort": "pijl",
-     "lijn": 7921,
+     "lijn": 7922,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isContrib",
      "soort": "pijl",
-     "lijn": 7940,
+     "lijn": 7941,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tegel",
      "soort": "pijl",
-     "lijn": 7946,
+     "lijn": 7947,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "jaarVan",
      "soort": "pijl",
-     "lijn": 7961,
+     "lijn": 7962,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "chip",
      "soort": "pijl",
-     "lijn": 7966,
+     "lijn": 7967,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPunten",
      "soort": "functie",
-     "lijn": 8046,
+     "lijn": 8047,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 8062,
+     "lijn": 8063,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderGiftcards",
      "soort": "functie",
-     "lijn": 8109,
+     "lijn": 8110,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderBoekhouder",
      "soort": "functie",
-     "lijn": 8150,
+     "lijn": 8151,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rij",
      "soort": "pijl",
-     "lijn": 8216,
+     "lijn": 8217,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aiOpener",
      "soort": "functie",
-     "lijn": 8240,
+     "lijn": 8241,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aiAnswer",
      "soort": "functie",
-     "lijn": 8278,
+     "lijn": 8279,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bubble",
      "soort": "functie",
-     "lijn": 8317,
+     "lijn": 8318,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "escHtml",
      "soort": "pijl",
-     "lijn": 8326,
+     "lijn": 8327,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "voorstelChips",
      "soort": "functie",
-     "lijn": 8329,
+     "lijn": 8330,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ask",
      "soort": "functie",
-     "lijn": 8347,
+     "lijn": 8348,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderChatMsgs",
      "soort": "functie",
-     "lijn": 8382,
+     "lijn": 8383,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderChat",
      "soort": "functie",
-     "lijn": 8402,
+     "lijn": 8403,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kiesPartnerEnBetaal",
      "soort": "functie",
-     "lijn": 8419,
+     "lijn": 8420,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "chatSend",
      "soort": "functie",
-     "lijn": 8438,
+     "lijn": 8439,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verwerkWebsiteAanvraag",
      "soort": "functie",
-     "lijn": 8450,
+     "lijn": 8451,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "standaardChips",
      "soort": "functie",
-     "lijn": 8476,
+     "lijn": 8477,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAI",
      "soort": "functie",
-     "lijn": 8483,
+     "lijn": 8484,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakOpen",
      "soort": "functie",
-     "lijn": 8504,
+     "lijn": 8505,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakDicht",
      "soort": "functie",
-     "lijn": 8505,
+     "lijn": 8506,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakStatusKnop",
      "soort": "pijl",
-     "lijn": 8514,
+     "lijn": 8515,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakProfielKaart",
      "soort": "functie",
-     "lijn": 8520,
+     "lijn": 8521,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakRender",
      "soort": "functie",
-     "lijn": 8541,
+     "lijn": 8542,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoek",
      "soort": "pijl",
-     "lijn": 8578,
+     "lijn": 8579,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laad",
      "soort": "pijl",
-     "lijn": 8603,
+     "lijn": 8604,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 8605,
+     "lijn": 8606,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opt",
      "soort": "pijl",
-     "lijn": 8638,
+     "lijn": 8639,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "veld",
      "soort": "pijl",
-     "lijn": 8673,
+     "lijn": 8674,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "agendaBadgeLid",
      "soort": "functie",
-     "lijn": 8715,
+     "lijn": 8716,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadAgendaLid",
      "soort": "functie",
-     "lijn": 8726,
+     "lijn": 8727,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "agendaToeLid",
      "soort": "functie",
-     "lijn": 8727,
+     "lijn": 8728,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAgendaLid",
      "soort": "functie",
-     "lijn": 8729,
+     "lijn": 8730,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagLbl",
      "soort": "pijl",
-     "lijn": 8733,
+     "lijn": 8734,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "pijl",
-     "lijn": 8745,
+     "lijn": 8746,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadFacturenLid",
      "soort": "functie",
-     "lijn": 8750,
+     "lijn": 8751,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderFacturenLid",
      "soort": "functie",
-     "lijn": 8751,
+     "lijn": 8752,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "pijl",
-     "lijn": 8765,
+     "lijn": 8766,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVooruit",
      "soort": "functie",
-     "lijn": 8796,
+     "lijn": 8797,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVooruit",
      "soort": "functie",
-     "lijn": 8800,
+     "lijn": 8801,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagLbl",
-     "soort": "pijl",
-     "lijn": 8811,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "regel",
      "soort": "pijl",
      "lijn": 8812,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "regel",
+     "soort": "pijl",
+     "lijn": 8813,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "laadPostDatums",
      "soort": "functie",
-     "lijn": 8852,
+     "lijn": 8853,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPostDatums",
      "soort": "functie",
-     "lijn": 8856,
+     "lijn": 8857,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagLbl",
      "soort": "pijl",
-     "lijn": 8871,
+     "lijn": 8872,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opnieuw",
      "soort": "pijl",
-     "lijn": 8893,
+     "lijn": 8894,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderKluisLid",
      "soort": "functie",
-     "lijn": 8909,
+     "lijn": 8910,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boOpen",
      "soort": "functie",
-     "lijn": 8935,
+     "lijn": 8936,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boDicht",
      "soort": "functie",
-     "lijn": 8936,
+     "lijn": 8937,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "naarTab",
      "soort": "pijl",
-     "lijn": 8940,
+     "lijn": 8941,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boRender",
      "soort": "functie",
-     "lijn": 8942,
+     "lijn": 8943,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
-     "soort": "pijl",
-     "lijn": 8945,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "rij",
      "soort": "pijl",
      "lijn": 8946,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "knopje",
+     "naam": "rij",
      "soort": "pijl",
      "lijn": 8947,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "knopje",
+     "soort": "pijl",
+     "lijn": 8948,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "knop",
      "soort": "pijl",
-     "lijn": 9004,
+     "lijn": 9005,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bind",
      "soort": "pijl",
-     "lijn": 9029,
+     "lijn": 9030,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zegelStijlEenmalig",
      "soort": "functie",
-     "lijn": 9054,
+     "lijn": 9055,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluitZegel",
      "soort": "functie",
-     "lijn": 9083,
+     "lijn": 9084,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openZegel",
      "soort": "functie",
-     "lijn": 9084,
+     "lijn": 9085,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakZegel",
      "soort": "functie",
-     "lijn": 9100,
+     "lijn": 9101,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "labelVoor",
      "soort": "pijl",
-     "lijn": 9119,
+     "lijn": 9120,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tik",
      "soort": "functie",
-     "lijn": 9132,
+     "lijn": 9133,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "scanRoute",
      "soort": "functie",
-     "lijn": 9193,
+     "lijn": 9194,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openEtalage",
      "soort": "functie",
-     "lijn": 9234,
+     "lijn": 9235,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eur2",
      "soort": "pijl",
-     "lijn": 9247,
+     "lijn": 9248,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderSalon",
      "soort": "functie",
-     "lijn": 9291,
+     "lijn": 9292,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toonSalonCode",
      "soort": "functie",
-     "lijn": 9298,
+     "lijn": 9299,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluit",
      "soort": "pijl",
-     "lijn": 9320,
+     "lijn": 9321,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "salonClaimBediening",
      "soort": "functie",
-     "lijn": 9329,
+     "lijn": 9330,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadOntmoet",
      "soort": "functie",
-     "lijn": 9539,
+     "lijn": 9540,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stopOntmoetTimer",
      "soort": "functie",
-     "lijn": 9547,
+     "lijn": 9548,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "beheerOntmoetTimer",
      "soort": "functie",
-     "lijn": 9549,
+     "lijn": 9550,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetPositie",
      "soort": "functie",
-     "lijn": 9555,
+     "lijn": 9556,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetTick",
      "soort": "functie",
-     "lijn": 9566,
+     "lijn": 9567,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetActBtns",
      "soort": "functie",
-     "lijn": 9578,
+     "lijn": 9579,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderOntmoet",
      "soort": "functie",
-     "lijn": 9584,
+     "lijn": 9585,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 9588,
+     "lijn": 9589,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bindOntmoet",
      "soort": "functie",
-     "lijn": 9658,
+     "lijn": 9659,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetKies",
      "soort": "functie",
-     "lijn": 9672,
+     "lijn": 9673,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetTeken",
      "soort": "functie",
-     "lijn": 9678,
+     "lijn": 9679,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetStop",
      "soort": "functie",
-     "lijn": 9684,
+     "lijn": 9685,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetSos",
      "soort": "functie",
-     "lijn": 9688,
+     "lijn": 9689,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetSosLive",
      "soort": "functie",
-     "lijn": 9699,
+     "lijn": 9700,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetSosStop",
      "soort": "functie",
-     "lijn": 9713,
+     "lijn": 9714,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opOntmoetSignaal",
      "soort": "functie",
-     "lijn": 9717,
+     "lijn": 9718,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVakbewijs",
      "soort": "functie",
-     "lijn": 9834,
+     "lijn": 9835,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stand",
      "soort": "pijl",
-     "lijn": 9856,
+     "lijn": 9857,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vakIndienen",
      "soort": "functie",
-     "lijn": 9891,
+     "lijn": 9892,
      "geexporteerd": "onbekend"
     }
    ],
@@ -235886,13 +235924,13 @@
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 95,
+     "lijn": 96,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 111,
+     "lijn": 112,
      "geexporteerd": "onbekend"
     }
    ],
@@ -244166,37 +244204,37 @@
     {
      "naam": "values",
      "soort": "functie",
-     "lijn": 19,
+     "lijn": 23,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "save",
      "soort": "functie",
-     "lijn": 20,
+     "lijn": 24,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "open",
      "soort": "functie",
-     "lijn": 30,
+     "lijn": 34,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "close",
      "soort": "functie",
-     "lijn": 37,
+     "lijn": 41,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "back",
      "soort": "functie",
-     "lijn": 41,
+     "lijn": 45,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "list",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 50,
      "geexporteerd": "onbekend"
     }
    ],
@@ -249957,135 +249995,141 @@
    "bestand": "public/shared/basis.js",
    "symbolen": [
     {
-     "naam": "laadHeritageBlad",
+     "naam": "laadEditorialBlad",
      "soort": "functie",
      "lijn": 41,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "laadHeritageBlad",
+     "soort": "functie",
+     "lijn": 51,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "pasWereldIdentiteitToe",
      "soort": "functie",
-     "lijn": 55,
+     "lijn": 70,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toost",
      "soort": "functie",
-     "lijn": 328,
+     "lijn": 344,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldingenHoorbaar",
      "soort": "functie",
-     "lijn": 395,
+     "lijn": 411,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "focusSpoor",
      "soort": "functie",
-     "lijn": 434,
+     "lijn": 450,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openModaal",
      "soort": "functie",
-     "lijn": 453,
+     "lijn": 469,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "modaalLos",
      "soort": "functie",
-     "lijn": 489,
+     "lijn": 505,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "modaalAfsluiten",
      "soort": "functie",
-     "lijn": 510,
+     "lijn": 526,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldingenIn",
      "soort": "functie",
-     "lijn": 544,
+     "lijn": 560,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetGrens",
      "soort": "functie",
-     "lijn": 576,
+     "lijn": 592,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "begrens",
      "soort": "functie",
-     "lijn": 581,
+     "lijn": 597,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "springNaarInhoud",
      "soort": "functie",
-     "lijn": 607,
+     "lijn": 623,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 658,
+     "lijn": 674,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluit",
      "soort": "functie",
-     "lijn": 696,
+     "lijn": 712,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openGids",
      "soort": "functie",
-     "lijn": 697,
+     "lijn": 713,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tok",
      "soort": "functie",
-     "lijn": 759,
+     "lijn": 775,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "svc",
      "soort": "functie",
-     "lijn": 760,
+     "lijn": 776,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "el",
      "soort": "functie",
-     "lijn": 766,
+     "lijn": 782,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "knop",
      "soort": "functie",
-     "lijn": 772,
+     "lijn": 788,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "hulplaag",
      "soort": "functie",
-     "lijn": 778,
+     "lijn": 794,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "teken",
      "soort": "functie",
-     "lijn": 792,
+     "lijn": 808,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldForm",
      "soort": "functie",
-     "lijn": 879,
+     "lijn": 895,
      "geexporteerd": "onbekend"
     }
    ],
@@ -251952,67 +251996,67 @@
     {
      "naam": "gastheren",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 93,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 103,
+     "lijn": 109,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bouw",
      "soort": "functie",
-     "lijn": 117,
+     "lijn": 122,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "losseKop",
      "soort": "functie",
-     "lijn": 129,
+     "lijn": 134,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kopVan",
      "soort": "functie",
-     "lijn": 135,
+     "lijn": 140,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "open",
      "soort": "functie",
-     "lijn": 228,
+     "lijn": 233,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "deelUit",
      "soort": "functie",
-     "lijn": 263,
+     "lijn": 268,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "herscan",
      "soort": "functie",
-     "lijn": 282,
+     "lijn": 287,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "wacht",
      "soort": "functie",
-     "lijn": 310,
+     "lijn": 315,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "volgHash",
      "soort": "functie",
-     "lijn": 364,
+     "lijn": 369,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "begin",
      "soort": "functie",
-     "lijn": 369,
+     "lijn": 374,
      "geexporteerd": "onbekend"
     }
    ],
@@ -260915,6 +260959,63 @@
    "gebruiktDoor": []
   },
   {
+   "bestand": "public/shared/rtg-adaptive-edge-cinema.js",
+   "symbolen": [
+    {
+     "naam": "esc",
+     "soort": "functie",
+     "lijn": 13,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "current",
+     "soort": "functie",
+     "lijn": 14,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "startIndex",
+     "soort": "functie",
+     "lijn": 15,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "draw",
+     "soort": "functie",
+     "lijn": 16,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "close",
+     "soort": "functie",
+     "lijn": 24,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "open",
+     "soort": "functie",
+     "lijn": 25,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "assistant",
+     "soort": "functie",
+     "lijn": 30,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "act",
+     "soort": "functie",
+     "lijn": 31,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
    "bestand": "public/shared/rtg-adaptive-edge-claim.js",
    "symbolen": [
     {
@@ -260953,61 +261054,61 @@
     {
      "naam": "label",
      "soort": "functie",
-     "lijn": 7,
+     "lijn": 6,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "available",
      "soort": "functie",
-     "lijn": 8,
+     "lijn": 7,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sourceButtons",
      "soort": "functie",
-     "lijn": 17,
+     "lijn": 16,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "close",
      "soort": "functie",
-     "lijn": 32,
+     "lijn": 31,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "currentItems",
      "soort": "functie",
-     "lijn": 33,
+     "lijn": 32,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "render",
      "soort": "functie",
-     "lijn": 39,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "refreshLater",
      "soort": "functie",
-     "lijn": 110,
+     "lijn": 109,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 132,
+     "lijn": 131,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "primaryClick",
      "soort": "functie",
-     "lijn": 137,
+     "lijn": 134,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "refresh",
      "soort": "functie",
-     "lijn": 143,
+     "lijn": 140,
      "geexporteerd": "onbekend"
     }
    ],
@@ -261022,55 +261123,55 @@
     {
      "naam": "norm",
      "soort": "functie",
-     "lijn": 30,
+     "lijn": 36,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "normState",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 40,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "presence",
      "soort": "functie",
-     "lijn": 35,
+     "lijn": 41,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "view",
      "soort": "functie",
-     "lijn": 39,
+     "lijn": 45,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "detail",
      "soort": "functie",
-     "lijn": 45,
+     "lijn": 51,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "normDeck",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 52,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "nextDeck",
      "soort": "functie",
-     "lijn": 47,
+     "lijn": 53,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "model",
      "soort": "functie",
-     "lijn": 55,
+     "lijn": 61,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "momentopname",
      "soort": "functie",
-     "lijn": 59,
+     "lijn": 65,
      "geexporteerd": "onbekend"
     }
    ],
@@ -261334,7 +261435,112 @@
     {
      "naam": "mount",
      "soort": "functie",
+     "lijn": 43,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "public/shared/rtg-adaptive-edge-visual.js",
+   "symbolen": [
+    {
+     "naam": "esc",
+     "soort": "functie",
+     "lijn": 28,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "visible",
+     "soort": "functie",
+     "lijn": 33,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "fallbackPhoto",
+     "soort": "functie",
+     "lijn": 38,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "photo",
+     "soort": "functie",
      "lijn": 42,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "glyph",
+     "soort": "functie",
+     "lijn": 52,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "markup",
+     "soort": "functie",
+     "lijn": 53,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "destination",
+     "soort": "functie",
+     "lijn": 61,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "edgeButton",
+     "soort": "functie",
+     "lijn": 62,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "emit",
+     "soort": "functie",
+     "lijn": 68,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "button",
+     "soort": "functie",
+     "lijn": 76,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "input",
+     "soort": "functie",
+     "lijn": 80,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "present",
+     "soort": "functie",
+     "lijn": 83,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "mouth",
+     "soort": "functie",
+     "lijn": 104,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "mark",
+     "soort": "functie",
+     "lijn": 108,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "close",
+     "soort": "functie",
+     "lijn": 109,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "update",
+     "soort": "functie",
+     "lijn": 110,
      "geexporteerd": "onbekend"
     }
    ],
@@ -261361,91 +261567,91 @@
     {
      "naam": "legacy",
      "soort": "functie",
-     "lijn": 19,
+     "lijn": 12,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "execute",
      "soort": "functie",
-     "lijn": 24,
+     "lijn": 17,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderSheet",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 43,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderDeck",
      "soort": "functie",
-     "lijn": 60,
+     "lijn": 57,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setState",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 67,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setDeck",
      "soort": "functie",
-     "lijn": 85,
+     "lijn": 82,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closePanel",
      "soort": "functie",
-     "lijn": 90,
+     "lijn": 87,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openPanel",
      "soort": "functie",
-     "lijn": 91,
+     "lijn": 88,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setPresence",
      "soort": "functie",
-     "lijn": 92,
+     "lijn": 89,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "setIdentity",
      "soort": "functie",
-     "lijn": 98,
+     "lijn": 95,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "continueWith",
      "soort": "functie",
-     "lijn": 104,
+     "lijn": 101,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "build",
      "soort": "functie",
-     "lijn": 110,
+     "lijn": 107,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "find",
      "soort": "functie",
-     "lijn": 115,
+     "lijn": 112,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 132,
+     "lijn": 130,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "destroy",
      "soort": "functie",
-     "lijn": 150,
+     "lijn": 148,
      "geexporteerd": "onbekend"
     }
    ],
@@ -262704,6 +262910,130 @@
    "gebruiktDoor": []
   },
   {
+   "bestand": "public/shared/rtg-editorial-v4-model.js",
+   "symbolen": [
+    {
+     "naam": "pathOf",
+     "soort": "functie",
+     "lijn": 20,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "classify",
+     "soort": "functie",
+     "lijn": 24,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "photoFor",
+     "soort": "functie",
+     "lijn": 35,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "worldName",
+     "soort": "functie",
+     "lijn": 40,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "screenLabel",
+     "soort": "functie",
+     "lijn": 43,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "anders",
+    "namen": null
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "public/shared/rtg-editorial-v4.js"
+   ]
+  },
+  {
+   "bestand": "public/shared/rtg-editorial-v4.js",
+   "symbolen": [
+    {
+     "naam": "visible",
+     "soort": "functie",
+     "lijn": 16,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "title",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "make",
+     "soort": "functie",
+     "lijn": 29,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "ensureSectionMasthead",
+     "soort": "functie",
+     "lijn": 35,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "ensureWorldTitle",
+     "soort": "functie",
+     "lijn": 45,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "ensurePhotoLead",
+     "soort": "functie",
+     "lijn": 54,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "icon",
+     "soort": "functie",
+     "lijn": 68,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "buildHeader",
+     "soort": "functie",
+     "lijn": 73,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "annotate",
+     "soort": "functie",
+     "lijn": 97,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "boot",
+     "soort": "functie",
+     "lijn": 139,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "start",
+     "soort": "functie",
+     "lijn": 140,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "anders",
+    "namen": null
+   },
+   "requires": [
+    "public/shared/rtg-editorial-v4-model.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
    "bestand": "public/shared/rtg-first-steps.js",
    "symbolen": [
     {
@@ -262875,33 +263205,39 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "laatsteStijl",
+     "naam": "editorialLink",
      "soort": "functie",
      "lijn": 20,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "laatsteStijl",
+     "soort": "functie",
+     "lijn": 25,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "herstel",
      "soort": "functie",
-     "lijn": 26,
+     "lijn": 31,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 44,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boot",
      "soort": "functie",
-     "lijn": 51,
+     "lijn": 61,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stop",
      "soort": "functie",
-     "lijn": 57,
+     "lijn": 67,
      "geexporteerd": "onbekend"
     }
    ],
@@ -263918,31 +264254,31 @@
     {
      "naam": "bovenrand",
      "soort": "functie",
-     "lijn": 84,
+     "lijn": 86,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "pas",
      "soort": "functie",
-     "lijn": 98,
+     "lijn": 106,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zet",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 115,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "hertel",
      "soort": "functie",
-     "lijn": 123,
+     "lijn": 131,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 146,
+     "lijn": 154,
      "geexporteerd": "onbekend"
     }
    ],

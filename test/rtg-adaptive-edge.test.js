@@ -14,6 +14,7 @@ const CSS = lees('public/shared/rtg-adaptive-edge.css');
 const LOADER = lees('public/shared/rtg-edge-2-loader.js');
 const ADAPTIVE_LOADER = lees('public/shared/rtg-adaptive-edge-loader.js');
 const SIGNALS = lees('public/shared/rtg-adaptive-edge-signals.js');
+const CINEMA = lees('public/shared/rtg-cinematic-system.css');
 const SW = lees('public/sw.js');
 
 test('Adaptive Edge heeft vier toestanden en vijf vaste decks', () => {
@@ -23,6 +24,17 @@ test('Adaptive Edge heeft vier toestanden en vijf vaste decks', () => {
   assert.equal(kern.nextDeck('home', -1), 'rahul');
   assert.equal(kern.nextDeck('rahul', 1), 'home');
   assert.equal(kern.normState('onbekend'), 'dock');
+  assert.equal(kern.presence('peek'), 'idle');
+  assert.equal(kern.presence('dock'), 'active');
+  assert.equal(kern.presence('deck'), 'contextual');
+  assert.equal(kern.presence('expanded'), 'expanded');
+  assert.equal(kern.presence('expanded', 'focus'), 'immersive');
+  assert.deepEqual(kern.view('peek', 'quiet'), {
+    state: 'peek', automatic: true, motion: 'quiet', presence: 'idle'
+  });
+  assert.deepEqual(kern.view('peek', 'auto'), {
+    state: 'peek', automatic: true, motion: 'reading', presence: 'idle'
+  });
 });
 
 /* HET BLAD HEEFT GEEN EIGEN LIJST MEER (EDGE.md par. 11, ronde 2 stap 17 en 18).
@@ -158,6 +170,22 @@ test('invoerlaag behandelt geneste scroll en verwijdert alle luisteraars bij tea
   cleanup();
   assert.equal(doc.events.size, 0);
   assert.equal(bar.events.size, 0);
+});
+
+test('Quiet Presence gebruikt signalen, respecteert pin en bewaart een raakvlak van 44px', () => {
+  assert.match(INPUT, /handlers\.state\('peek',\s*'quiet'\)/);
+  assert.match(INPUT, /listen\(rt\.bar,'pointerenter',wake\)/);
+  assert.match(INPUT, /listen\(rt\.bar,'pointerleave',quiet\)/);
+  assert.match(INPUT, /listen\(rt\.bar,'focusin',wake\)/);
+  assert.match(INPUT, /rtgEdge2Auto==='false'/);
+  assert.match(INPUT, /d\.rtgEdge2Rendered==='true'/);
+  assert.match(CSS, /data-rtg-adaptive-ready="true"\] \.rtg-adaptive-edge\[data-rtg-adaptive-presence="idle"\]\{width:88px;height:48px/);
+  assert.match(CSS, /data-rtg-adaptive-presence="idle"\][\s\S]+?\.rtg-adaptive-item:nth-child\(3\)\{min-width:44px;min-height:44px/);
+  assert.match(CSS, /prefers-contrast:more\)\{\.rtg-adaptive-edge\[data-rtg-adaptive-presence="idle"\]/);
+  assert.match(CSS, /@media\(prefers-reduced-motion:reduce\)\{\.rtg-adaptive-edge,\.rtg-adaptive-bar\{transition:none!important\}\}/);
+  assert.match(CSS, /env\(safe-area-inset-bottom,0px\)/);
+  assert.match(CINEMA, /data-rtg-adaptive-presence="idle"\]\{[\s\S]*?width:88px!important;max-width:88px!important;height:48px!important/);
+  assert.match(CINEMA, /@media\(forced-colors:active\)\{body\[data-rtg-cinematic="true"\] :is\(\.rtg-adaptive-bar,[\s\S]*?background:Canvas!important/);
 });
 
 test('de filmische laag is centraal en volgt na de wereldgrammatica', () => {

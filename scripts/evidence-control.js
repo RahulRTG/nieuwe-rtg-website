@@ -89,7 +89,8 @@ function bouwen(plan, opties) {
     uitvoering: {
       vereist: plan.toetsen.filter((t) => t.status !== 'REUSED').map((t) => t.toets),
       hergebruikt: uitsluitingen.map((u) => u.toets),
-      telling: plan.telling
+      telling: plan.telling,
+      capaciteit: plan.capaciteit || null
     },
     kalibratie: {
       vereist: !!plan.gedwongenVolledig,

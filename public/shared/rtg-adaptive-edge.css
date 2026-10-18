@@ -250,6 +250,18 @@ body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet[data-rtg-custom-panel="
 .rtg-adaptive-edge[data-rtg-adaptive-state="peek"] .rtg-adaptive-item:nth-child(3){min-height:42px}
 .rtg-adaptive-edge[data-rtg-adaptive-state="peek"] .rtg-adaptive-lips{width:66px;height:38px}
 .rtg-adaptive-edge[data-rtg-adaptive-state="peek"] .rtg-adaptive-bar::after{display:none}
+body[data-rtg-adaptive-ready="true"] .rtg-adaptive-edge[data-rtg-adaptive-presence="idle"]{width:88px;height:48px}
+.rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-bar{
+  min-height:48px;padding:2px;border-color:color-mix(in srgb,var(--edge-bar-accent) 30%,transparent);
+  background:linear-gradient(145deg,rgba(255,248,229,.10),transparent 55%),color-mix(in srgb,var(--edge-bar-bg) 70%,transparent);
+  box-shadow:inset 0 1px 0 rgba(255,249,230,.17),0 8px 24px rgba(0,0,0,.16);
+  backdrop-filter:blur(18px) saturate(1.08);-webkit-backdrop-filter:blur(18px) saturate(1.08);
+}
+.rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-item:nth-child(3){min-width:44px;min-height:44px}
+.rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-lips{width:58px;height:34px}
+body[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-auto="true"]) .rtg-adaptive-bar{border-color:color-mix(in srgb,var(--edge-bar-accent) 42%,transparent)}
+@supports not (backdrop-filter:blur(1px)){.rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-bar{background:var(--edge-bar-bg)}}
+@media(prefers-contrast:more){.rtg-adaptive-edge[data-rtg-adaptive-presence="idle"] .rtg-adaptive-bar{background:var(--edge-bar-bg);border-color:var(--edge-bar-copy)}}
 
 /* Het scherm hoort UIT de Edge te komen; het vervangt de bediening niet. */
 .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"]>.rtg-adaptive-bar{display:grid!important}

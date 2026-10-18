@@ -11,7 +11,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop, wachtOpWaarde } = require('./helper');
+const { startServer, stop } = require('./helper');
 
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-auditatomair-'));
 let srv;
@@ -39,16 +39,15 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
   require('../server/lib/sqlite-gelijktijdigheid')(conn);
   try {
     const kas = () => { const r = conn.prepare("SELECT val, ver FROM kv WHERE key='payKasToegang'").get(); return r ? r.ver + ':' + r.val : null; };
-    const rijen = () => conn.prepare("SELECT COUNT(*) n FROM audit_rij WHERE naam='handelingLog'").get().n;
-    /* EN DE NULMETING WACHT OP RUST. De server schrijft na zijn antwoord nog
-       (opzet/naafloop.js), ook in het handelingsspoor. Werd `rijenVoor` meteen
-       gelezen, dan landde de nagekomen regel van het EERSTE verzoek soms na de
-       telling en voor de trigger, en las de toets 3 tegen 2 -- een halve
-       auditregel die er niet was. Pas als de telling een poos stilstaat, is hij
-       de stand van voor de storing. */
-    let vorig = -1, gelijk = 0;
-    await wachtOpWaarde(() => { const n = rijen(); gelijk = n === vorig ? gelijk + 1 : 0; vorig = n; return gelijk >= 12; },
-      { ms: 10000, wat: 'een stilstaand handelingsspoor na het eerste verzoek' });
+    /* Alleen het spoor van DEZE geldhandeling vergelijken. Registratie schrijft
+       zijn gewone eindregel na het HTTP-antwoord (lib/handelingsspoor.js). Die
+       onafhankelijke regel kan terecht tussen de twee tellingen landen en
+       maakte een globale COUNT(*) afhankelijk van runnerbelasting. De
+       atomiciteitsclaim gaat over /api/pay/kascode: daarvan mag na de
+       geweigerde transactie geen halve regel bijkomen. */
+    const rijen = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
+      .map(({ waarde }) => JSON.parse(waarde))
+      .filter(regel => regel.pad === '/api/pay/kascode').length;
     const kasVoor = kas(), rijenVoor = rijen();
     assert.ok(kasVoor, 'de eerste kascode staat in store.db');
     conn.exec("CREATE TRIGGER weiger_audit BEFORE INSERT ON audit_rij WHEN NEW.naam = 'handelingLog' " +

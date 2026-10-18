@@ -254,12 +254,6 @@
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Bewaar",
-      "app": "Daten",
-      "wereld": "LivingOS",
-      "url": "/apps/vonk.html"
-    },
-    {
       "label": "Blokkeren en melden",
       "app": "Daten",
       "wereld": "LivingOS",
@@ -824,12 +818,6 @@
       "url": "/apps/podium.html"
     },
     {
-      "label": "Bewaar",
-      "app": "Live",
-      "wereld": "LivingOS",
-      "url": "/apps/podium.html"
-    },
-    {
       "label": "Ga live",
       "app": "Live",
       "wereld": "LivingOS",
@@ -1094,12 +1082,6 @@
       "url": "/apps/maison.html"
     },
     {
-      "label": "Akkoord",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
       "label": "Alles tonen",
       "app": "Mall",
       "wereld": "LivingOS",
@@ -1107,6 +1089,12 @@
     },
     {
       "label": "Ander land",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Bekijk",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1124,19 +1112,25 @@
       "url": "/apps/mall.html"
     },
     {
-      "label": "Boeken",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
       "label": "Cel vernietigen",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
     },
     {
-      "label": "In mijn kast",
+      "label": "Diensten",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Experience",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Hardware",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1154,12 +1148,6 @@
       "url": "/apps/mall.html"
     },
     {
-      "label": "Lezen",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
       "label": "Mijn apps",
       "app": "Mall",
       "wereld": "LivingOS",
@@ -1167,12 +1155,6 @@
     },
     {
       "label": "Mijn geschiedenis",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
-      "label": "Mijn reisgidsen",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1190,7 +1172,7 @@
       "url": "/apps/mall.html"
     },
     {
-      "label": "Offerte aanvragen",
+      "label": "Ontdek",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1214,13 +1196,13 @@
       "url": "/apps/mall.html"
     },
     {
-      "label": "Softwarepaspoort",
+      "label": "Software",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
     },
     {
-      "label": "Stop vaste afspraak",
+      "label": "Softwarepaspoort",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1232,19 +1214,25 @@
       "url": "/apps/mall.html"
     },
     {
+      "label": "Vergelijk",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
       "label": "Verwijder",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
     },
     {
-      "label": "Vraag advies",
+      "label": "Voor u",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
     },
     {
-      "label": "Vraag offerte aan",
+      "label": "Vraag advies",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -3114,12 +3102,6 @@
       "app": "Vandaag",
       "wereld": "LivingOS",
       "url": "/apps/life.html"
-    },
-    {
-      "label": "Bewaar",
-      "app": "Verblijven",
-      "wereld": "TravelOS",
-      "url": "/apps/residentie.html"
     },
     {
       "label": "Gids",

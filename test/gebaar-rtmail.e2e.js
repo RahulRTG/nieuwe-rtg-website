@@ -103,12 +103,12 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
     // Laat de oude, verborgen lijst eerst bestaan. Houd daarna de echte nieuwe
     // serverreactie vast: deze overgang mag geen bedienbare verouderde rij tonen.
     await page.waitForSelector('#main .rij[data-i]', { state: 'attached' });
-    let vrijgeven, aangevraagd;
+    let vrijgeven, aangevraagd, lijstAangevraagd = false;
     const wachtOpVrijgave = new Promise(r => { vrijgeven = r; });
     const nieuweLijst = new Promise(r => { aangevraagd = r; });
     await page.route('**/api/member/rtmail/vak', async route => {
       const response = await route.fetch();
-      aangevraagd();
+      lijstAangevraagd = true; aangevraagd();
       await wachtOpVrijgave;
       await route.fulfill({ response });
     });
@@ -117,6 +117,8 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
        door aria-hidden heen in het oude postvak probeert te grijpen. */
     await edgeActies(page);
     await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
+    await wachtTot(() => Promise.resolve(lijstAangevraagd), Boolean,
+      'Alle post hoort via de Edge de nieuwe serverlijst aan te vragen');
     await nieuweLijst;
     try {
       assert.equal(await page.locator('#main').getAttribute('aria-hidden'), 'true',

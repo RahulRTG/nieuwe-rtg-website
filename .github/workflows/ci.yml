@@ -741,9 +741,11 @@ jobs:
     # batches tot en met klok 6m57s, en meterijk was na 16m58s nog bezig toen
     # de job op dertig minuten werd afgekapt. Zelfstandig duurde meterijk die
     # dag 15m42s, 21m37s en 23m26s (runs 37507709887, 37450225350, 37507194793).
-    # Opgeteld is dat tot ruim 31 minuten, dus vijftig laat marge zonder dat een
-    # echte hang uren kost -- de testrunner geeft een ijking zelf veertig.
-    timeout-minutes: 50
+    # Opgeteld is dat tot ruim 31 minuten. Een geldige incrementele ronde kan
+    # daarnaast alle unitbestanden selecteren wanneer oud bewijs opnieuw aan een
+    # samengevoegde kandidaat moet worden gebonden. Vijfenzeventig minuten laat
+    # die volledige selectie uitlopen; de testrunner begrenst iedere ijking zelf.
+    timeout-minutes: 75
     services:
       postgres:
         image: postgres:16-alpine
@@ -815,7 +817,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: preflight
     if: needs.preflight.outputs.mode == 'incremental' && needs.preflight.outputs.e2e != '0'
-    timeout-minutes: 30
+    # Een bewijsherbinding kan ook in de incrementele weg alle schermbestanden
+    # selecteren. Run 38724386001 bleef uit een selectie van 333 toetsen groen
+    # uitvoeren toen de oude jobgrens hem na exact dertig minuten afbrak. De
+    # selectie blijft gelijk; alleen de runner krijgt genoeg tijd om haar af te maken.
+    timeout-minutes: 45
     services:
       postgres:
         image: postgres:16-alpine

@@ -127,7 +127,7 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 726,
+    "stilLezingBereik": 214,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 1,
@@ -4590,6 +4590,15 @@
       "meter": "kernBreedte 1696 -> 1697",
       "reden": "Eigenaarsbesluit 18 oktober 2026 (V1-afbouw, Project NUL): een bewuste koppeling. server/routes/supplier/horeca/wijk.js haalt Hopener uit de horecakern (server/kern/horeca.js) sinds de laatspoor-reparatie 607b8596: wijk/zet keurt de invoer eerst op Hlees en opent de doos pas bij een echte wijk, zodat er niets in de opslag komt voordat de invoer gekeurd is. Het is de horecakern en niet de globale kern; een toets bewaakt het pad. Nagetrokken door de knip-agent: tussen c2c0e05f (1696) en 05d50fc6 kwam precies deze ene naam erbij en viel er geen weg.",
       "waarheen": "test/horeca-wijk.test.js (wijk/zet keurt op Hlees en opent de doos pas bij een echte wijk) en LAATSPOOR.json (laatSpoorVerdacht 0)"
+    },
+    {
+      "datum": "2026-10-18",
+      "soort": "structureel",
+      "sleutel": "stilLezingBereik",
+      "van": 726,
+      "meter": "stilLezingBereik 726 -> 214",
+      "reden": "Eigenaarsbesluit van 18 oktober 2026: de lat gaat NIET naar 721, de meter wordt preciezer. Dit is het akkoord van de eigenaar voor deze verlaging van een omhoog-meter. scripts/stillezing.js telt een bewijslezing alleen nog als de registernaam in de ARGUMENTLIJST van de require(/readFileSync(-aanroep staat, letterlijk of via een const die als argument wordt doorgegeven, en niet meer binnen 200 tekens erna. Dat venster telde elke require('path'), require('fs') en require('./lib/stempel') mee waar twee regels lager een registernaam stond; daardoor daalde de meter van 726 naar 720 toen de stempelgrendels (50e9e9d5) een importregel langer maakten, zonder dat er een lezing verdween (zeven stdlib-requires vielen buiten het venster en een stempel-require kwam erin). Met de argumentlijst vallen 506 valse treffers weg (server 93 -> 35, scripts 627 -> 179; bij 720 gemeten). De schuldtellingen van de meter (smeltSamen 5 en 1, 115 vangers) bewegen niet.",
+      "waarheen": "test/stillezing.test.js toets 7 (een echte registerlezing telt nog: doorgegeven const, require('../X.json') en path.join(WORTEL, 'X.json'); een stdlib-require vlak boven een registernaam telt niet; met de oude 200-tekenregel zakt de toets) en STILLEZING.json (gemeten op 482de8c6, commit 319e425e)"
     }
   ],
   "prestatie": {

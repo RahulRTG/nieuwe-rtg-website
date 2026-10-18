@@ -3,8 +3,8 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-18T12:58:20.970Z",
-  "commit": "32e5ba8ad",
+  "op": "2026-10-18T15:50:29.032Z",
+  "commit": "77f3685da",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
@@ -12,16 +12,16 @@
  },
  "gemeten": {
   "artefacten": 390,
-  "bron": 51,
+  "bron": 54,
   "afgeleid": 205,
   "fragmenten": 28,
   "momentopname": 1,
-  "onbeslist": 105,
-  "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 233,
-  "afgeleidEigenaarHard": 204,
+  "onbeslist": 102,
+  "afgeleidZonderEigenaar": 0,
+  "metEigenaar": 234,
+  "afgeleidEigenaarHard": 205,
   "afgeleidGrendelt": 69,
-  "metStempel": 129,
+  "metStempel": 130,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -361,7 +361,7 @@
   },
   {
    "naam": "BELOFTE.json",
-   "soort": "ONBESLIST",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -659,7 +659,7 @@
   },
   {
    "naam": "CODECREDENTIALS.json",
-   "soort": "ONBESLIST",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -1218,8 +1218,8 @@
   {
    "naam": "ENVELOP.json",
    "soort": "AFGELEID",
-   "eigenaar": null,
-   "graad": "meerdere",
+   "eigenaar": "scripts/envelopvelden.js",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/actorvormen.js",
     "scripts/envelopvelden.js"
@@ -1227,8 +1227,8 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
-   "botsingVerklaard": false
+   "grendelt": false,
+   "botsingVerklaard": true
   },
   {
    "naam": "EU.md",
@@ -1825,11 +1825,11 @@
    "naam": "HERSTELPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/herstelproef.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/herstelproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/herstelproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run herstelproef",
    "grendelt": true,
@@ -4171,7 +4171,7 @@
   },
   {
    "naam": "SLO.json",
-   "soort": "ONBESLIST",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],

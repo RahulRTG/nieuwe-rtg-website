@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "8cf88e164",
-  "seconden": 60.4,
+  "commit": "24ce3e30c",
+  "seconden": 39.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4450,7 +4450,6 @@
     "server/kern/zorgniveau.js",
     "server/kern/zorgpolis.js",
     "server/kern/zwaarbewijs.js",
-    "server/kern/zz-ijk-tijdelijk.js",
     "server/kluis.js",
     "server/lib/acme.js",
     "server/lib/ankerdienst.js",
@@ -7277,14 +7276,14 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5790,
-  "gelezen": 5475,
+  "bestandenGezien": 5789,
+  "gelezen": 5474,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
   "symbolen": 27653,
-  "bestandenMetUitvoer": 4571,
-  "uitvoerMetNamen": 2086,
+  "bestandenMetUitvoer": 4570,
+  "uitvoerMetNamen": 2085,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2478,
   "zonderUitvoer": 904,
@@ -169674,19 +169673,6 @@
    "gebruiktDoor": [
     "server/opzet/kernlaag7-eigenaar.js"
    ]
-  },
-  {
-   "bestand": "server/kern/zz-ijk-tijdelijk.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "x"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": []
   },
   {
    "bestand": "server/kluis.js",

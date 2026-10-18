@@ -159,6 +159,10 @@
     if (embedded) body.dataset.rtgV4Embedded = 'true'; else delete body.dataset.rtgV4Embedded;
     var name = body.dataset.rtgV4Title || title(doc);
     body.dataset.rtgV4Title = name.slice(0, 120);
+    /* Een openbare gastdeur (travel-guest) laadt basis.js en het V4-blad niet
+       en houdt zijn eigen gastpalet. Hij draagt de V4-schermsoort, maar geen
+       persoonlijke kop, sectiekop of fotolead: die tekenden daar ongestyled. */
+    if (body.dataset.publicPlatform) return true;
     var header = doc.querySelector('.rtg-v4-header');
     var canvasToolbar = body.dataset.rtgV4Kind === 'canvas' &&
       doc.querySelector('body > header:not(.rtg-v4-header),.wd-page > header:not(.rtg-v4-header)');

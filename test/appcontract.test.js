@@ -170,9 +170,14 @@ test('8. stelSamen raakt alleen wat het contract noemt', () => {
   assert.equal(r.bewijzen.voltooibaar.status, 'GEEN_FIXTURE');
 });
 
-test('9. een voltooiproef levert precies drie bewijzen, en een ontbrekend deel is niet gemeten', () => {
-  assert.deepEqual(BRONSOORTEN.voltooiproef, ['voltooibaar', 'persistent', 'herstelbaar'],
+test('9. een voltooiproef levert drie geschreven bewijzen plus het afgeleide menselijk, en een ontbrekend deel is niet gemeten', () => {
+  /* Vier sinds 18 oktober 2026: menselijk wordt uit de antwoorden onder de
+     storingen AFGELEID (scripts/voltooiproef.js, kop) en nooit door een
+     scenario geschreven. Waarheidsgetrouw en bevoegd blijven buiten bereik:
+     de proef leest geen scherm en kruist geen rol. */
+  assert.deepEqual(BRONSOORTEN.voltooiproef, ['voltooibaar', 'persistent', 'herstelbaar', 'menselijk'],
     'een voltooiproef herstart en laat crashen, en leest geen scherm en kruist geen rol');
+  assert.ok(!BRONSOORTEN.voltooiproef.includes('waarheidsgetrouw') && !BRONSOORTEN.voltooiproef.includes('bevoegd'));
   const vals = { 'link:x': { belofte: 'een belofte die lang genoeg is om te tellen', bevoegd: { soort: 'voltooiproef', register: 'X.json', instrument: 'scripts/x.js' } } };
   assert.throws(() => B.bewijsVoor('link:x', 'bevoegd', '/apps/x.html', { contract: vals }), /mag geen bevoegd/);
   const reg = { stempel: STEMPEL, apps: { 'link:x': { persistent: { schakels: [{ nr: 1, stand: 'gesloten', wat: 'a' }], storingen: [], telling: {}, sluit: true } } } };

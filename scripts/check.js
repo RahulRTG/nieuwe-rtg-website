@@ -3527,6 +3527,11 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/mall/aanvragen.js', 'aanvraag, keuze en antwoord zijn werk van een lid en zaak: geen bevestiging vóór opslag; rollback bij fout'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
+    ['server/kern/labfonds.js', 'het Lab-fonds is een toezeggingen-grootboek: een toezegging, voorstel, stem of besluit dat "gelukt" heet en na een herstart weg is, is een grootboek dat liegt (SCHRIJFPROEF.json mat /api/labfonds/locatie/maak als VALS_SUCCES, 18 oktober 2026)'],
+    ['server/kern/facturatie.js', 'een factuur die een MENS maakt of afboekt is een fiscaal stuk met een doorlopend nummer: hij staat er of hij bestaat niet (SCHRIJFPROEF.json mat /api/supplier/facturen/maak als VALS_SUCCES, 18 oktober 2026); de automatische boekingen blijven binnen hun eigen handeling'],
+    ['server/kern/kassa/herhaling.js', 'de kassa: geld, bon en idem-sleutel landen als EEN bevestigde commit -- anders staan de lasten na een herstart weer open terwijl de gast al is afgeschreven (SCHRIJFPROEF.json mat /api/supplier/pos/checkout als VALS_SUCCES, 18 oktober 2026)'],
+    ['test/duurzaam-antwoord.test.js','de toets van vastleggen.antwoord(): een nagemaakte bundel, er wordt niets gecommit'],
+    ['server/kern/geldbeleid/index.js','het geldbeleid van een lid: een geldgrens WEIGERT in de waardepoort, dus een grens die "gezet" heet en na een herstart weg is laat juist de betaling door die het lid wilde tegenhouden (SCHRIJFPROEF.json mat /api/geld/beleid/weg als VALS_SUCCES, 18 oktober 2026)'],
     ['server/kern/vrijheid/huis.js', 'een besluit over iemands vrije tijd (verzoek, goedkeuring, verjaardag) heet pas gelukt als de opslag het bevestigt (VRIJHEID.md)'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],
     ['server/kern/democratie/index.js', 'NIEMAND KWIJT (POLITIEK.md, DO-02): een burger die een kwestie inbrengt en "ontvangen" leest terwijl de opslag hem nog niet heeft, is precies de mens die tussen twee systemen verdwijnt; hetzelfde geldt voor een eindstand, want de terugkoppeling hangt eraan'],
@@ -4824,10 +4829,12 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
      het niet zeker weten. */
   {
     const REG = path.join(ROOT, 'BEDRADING.json');
-    let oud = null;
-    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { oud = null; }
+    let oud = null, onleesbaar = null;
+    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); }
+    catch (e) { if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message); }
     if (!oud) {
-      fout('BEDRADING.json ontbreekt of is onleesbaar -- draai node scripts/check.js met een verse meting');
+      fout('BEDRADING.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'ontbreekt') +
+        ' -- draai node scripts/check.js met een verse meting');
     } else {
       if (r.kanten.onbekend.length > oud.gemeten.onbekend) {
         fout('de bedradingsonzekerheid groeit: ' + oud.gemeten.onbekend + ' -> ' +
@@ -5760,10 +5767,11 @@ console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is e
   if (!fs.existsSync(P)) {
     fout('EERSTEMINUUT.json ontbreekt -- draai: npm run eersteminuut');
   } else {
-    let r = null;
-    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { r = null; }
+    let r = null, onleesbaar = null;
+    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { onleesbaar = String(e && e.message); }
     if (!r || !r.telling) {
-      fout('EERSTEMINUUT.json is onleesbaar of draagt geen telling -- draai: npm run eersteminuut');
+      fout('EERSTEMINUUT.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'draagt geen telling') +
+        ' -- draai: npm run eersteminuut');
     } else {
       const gezakt = (r.toetsen || []).filter((t) => t.uitslag === 'gezakt');
       const wacht = r.wachten || {};

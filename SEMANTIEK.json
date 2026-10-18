@@ -1,9 +1,10 @@
 {
-  "catalogi": 1225,
-  "verschillendeNamen": 750,
+  "grens": "Telt alleen benoemde catalogi (een hoofdletterconstante met een gesloten verzameling ids) onder server/; een begrip dat anders wordt vastgelegd ziet hij niet. Een naam in twee domeinen met weinig gedeelde leden is een KANDIDAAT-botsing, geen bewezen misverstand: of het hetzelfde ding hoort te zijn, beslist een mens.",
+  "catalogi": 1227,
+  "verschillendeNamen": 751,
   "namenInMeerDomeinen": 132,
   "woordenMetMeerBetekenissen": 114,
-  "betekenissenTotaal": 427,
+  "betekenissenTotaal": 428,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -543,7 +544,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 280,
+  "dubbelingenZonderNaam": 263,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -2112,7 +2113,7 @@
         },
         {
           "bestanden": [
-            "server/kern/rtgone.js"
+            "server/kern/rtgone-bestuur.js"
           ],
           "leden": 9,
           "voorbeeld": [
@@ -3733,5 +3734,5 @@
       ]
     }
   ],
-  "bestanden": 4464
+  "bestanden": 4484
 }

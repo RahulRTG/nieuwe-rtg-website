@@ -73,7 +73,8 @@ function ronde(db, opties) {
       catch (e) {}
     }
   }
-  if (typeof o.save === 'function') { try { o.save(); } catch (e) {} }
+  // niet stil: een ronde die haar stand niet kon bewaren, meldt dat (STILSPOOR.json)
+  if (typeof o.save === 'function') { try { o.save(); } catch (e) { console.warn('[bewaarwacht] de rondestand niet bewaard:', e && e.message); } }
   return uit;
 }
 

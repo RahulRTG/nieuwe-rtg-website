@@ -98,14 +98,15 @@ const { naAntwoord } = require('./antwoord-einde');
    "welke sleutel geldt en van wie" is een andere vraag dan "wat doet de poort
    met een herhaling", en dit bestand stond met allebei erin boven de maat. */
 const { wieVan, sleutelVan, verklaardeSleutel } = require('./idem-sleutelbepaling');
+/* En wat er nog onderweg is (twee gelijktijdige dubbeltikken): idem-vlucht.js. */
+const { maakVluchten } = require('./idem-vlucht');
 
 /* De poort zelf. `nu` is injecteerbaar zodat de verlooptoets niet hoeft te
    wachten; standaard is het de huisklok en niet Date.now(). */
 function maakIdemPoort(opties) {
   const ttl = (opties && opties.ttl) || TTL_MS;
   const kast = maakKast(opties);
-
-  const inVlucht = new Map(); // opslagsleutel -> { afdruk, belofte, klaar }
+  const vluchten = maakVluchten();
 
   function opslagsleutel(req, sleutel) {
     return crypto.createHash('sha256')
@@ -113,11 +114,12 @@ function maakIdemPoort(opties) {
       .digest('hex');
   }
 
+  let documentOperatiepad = null; // lui geladen en daarna onthouden: zie de toelichting in opzet/handeling.js
   function middleware(req, res, next) {
     if (req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') return next();
     if (isEenmalig(req.method, req.path)) return next();
     // Domain-owned durable receipts must recheck current auth and ownership on every retry.
-    if (require('./document-operatiepad')(req.path)) return next();
+    if ((documentOperatiepad || (documentOperatiepad = require('./document-operatiepad')))(req.path)) return next();
     /* Twee bronnen, en de header wint. Stuurt een client een eigen sleutel, dan
        is dat een bewuste opdracht met een lang venster; de verklaring is de
        vangnet-vorm met het korte dubbeltikvenster. */
@@ -136,29 +138,27 @@ function maakIdemPoort(opties) {
       return res.status(eerder.status).json(herhaal(eerder.lijf));
     }
 
-    const bezig = inVlucht.get(id);
+    const bezig = vluchten.bezig(id);
     if (bezig) {
       if (afdruk && bezig.afdruk && bezig.afdruk !== afdruk)
         return res.status(409).json({ error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' });
-      /* Wachten op de eerste in plaats van er naast draaien. Zonder dit passen
-         twee gelijktijdige dubbeltikken allebei door het gat tussen de controle
-         en de vastlegging -- dezelfde fout die lib/idem.js met zijn inVlucht
-         oploste, en om dezelfde reden. */
+      // Wachten op de eerste in plaats van er naast draaien (idem-vlucht.js).
       return bezig.belofte.then(r => {
         if (!r) return next();
         res.status(r.status).json(herhaal(r.lijf));
       });
     }
 
-    let klaar;
-    const vlucht = { afdruk, belofte: new Promise(r => { klaar = r; }) };
-    inVlucht.set(id, vlucht);
-
+    const rond = vluchten.open(id, afdruk);
     const echteJson = res.json.bind(res);
-    let afgerond = false;
-    const rond = (r) => { if (afgerond) return; afgerond = true; inVlucht.delete(id); klaar(r); };
 
-    res.json = (lijf) => {
+    /* Deze poort hangt BINNEN jsonGzip (middleware/compressie.js), die boven
+       1 kB om deze wikkel heen stuurt: een groot antwoord werd voor een
+       browser nooit herhaald (voltooiproef 18-10-2026). Die roept idemZie. */
+    let gezien = false;
+    const zie = (lijf) => {
+      if (gezien) return;
+      gezien = true;
       const status = res.statusCode || 200;
       /* De kast beslist zelf of dit bewaard mag worden (alleen een geslaagd
          antwoord) en snoeit meteen daarna. Levert hij false, dan is er niets
@@ -168,6 +168,10 @@ function maakIdemPoort(opties) {
         else rond(null);
       };
       bewaarBijEind(res, bewaar);
+    };
+    res[Symbol.for('rtg.idemZie')] = zie;
+    res.json = (lijf) => {
+      zie(lijf);
       return echteJson(lijf);
     };
     /* Een verzoek dat nooit bij res.json komt (crash, stream, afgebroken

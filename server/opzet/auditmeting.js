@@ -34,7 +34,7 @@ module.exports = function auditmeting({ app, db }) {
       const patroon = req.routePatroon || null;
       if (!patroon) return;
       try { routelog.noteerAudit(req.method, patroon, sporen.gegroeid(voor, sporen.standVan(db.data)), res.statusCode); }
-      catch (e) { /* een meting mag nooit een verzoek raken */ }
+      catch (e) { /* een meting mag nooit een verzoek raken, maar een gat in de meting hoort gemeld */ console.warn('[auditmeting] de auditregel niet vastgelegd:', e && e.message); }
     });
     next();
   });

@@ -7,7 +7,7 @@ module.exports = (kern) => {
    werkt alleen als beide deuren dezelfde instantie gebruiken. Zie
    kern/kassa/herhaling.js. */
 const herhaling = require('../../kern/kassa/herhaling')({
-  db: kern.db, save: kern.save, bijeen: require('../../db').bijeen
+  db: kern.db, save: kern.save, bijeen: require('../../db').bijeen, inBundel: require('../../db').inBundel
 });
 
 /* De verkoop- en afrekenlaag draaien als submodules op de gedeelde kern. */

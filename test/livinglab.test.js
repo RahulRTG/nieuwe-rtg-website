@@ -17,12 +17,12 @@ const { startServer, stop } = require('./helper');
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livinglab-'));
 
-const api = (pad, body) => fetch(base + '/api/lab2/' + pad, {
+const api = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/lab2/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 // zonder inlog: de bewonersdeuren
-const pub = (pad, body) => fetch(base + '/api/lab2/' + pad, {
+const pub = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/lab2/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -48,10 +48,10 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
 let LAB, SOC, TECH;
 
 test('het lab is dicht zonder inlog, en het kader komt uit één tabel', async () => {
-  const dicht = await pub('kader');
+  const dicht = await pub('/api/lab2/kader');
   assert.equal(dicht.status, 401, 'zonder kantoorsessie blijft het lab dicht');
 
-  const k = await moet('kader', {}, 'het kader komt door');
+  const k = await moet('/api/lab2/kader', {}, 'het kader komt door');
   assert.equal(k.cyclus.length, 10, 'tien stappen in de cyclus');
   assert.equal(k.soorten.length, 12, 'twaalf projectsoorten, veel breder dan techniek');
   assert.equal(k.methoden.length, 12, 'twaalf methoden in de bibliotheek');
@@ -65,90 +65,90 @@ test('het lab is dicht zonder inlog, en het kader komt uit één tabel', async (
   /* Een EIGEN stad, want de startdata zet zelf al een lab in Haarlem neer en
      er is per stad precies één lab. Dat die regel hier bijt is geen hinder maar
      het bewijs dat de seed echte data is (test 'de startdata ...'). */
-  LAB = (await moet('lab/maak', { stad: 'Toetsstad', naam: 'Living Lab Toetsstad' }, 'lab aanmaken')).lab.id;
-  await moet('lab/tekenaar', { id: LAB, naam: 'Dr. Vermeer', rol: 'professional' }, 'tekenaar');
-  await moet('lab/tekenaar', { id: LAB, naam: 'Prof. Aziz', rol: 'reviewer', onafhankelijk: true }, 'onafhankelijke reviewer');
-  await moet('lab/tekenaar', { id: LAB, naam: 'M. de Wit', rol: 'toezichthouder' }, 'toezichthouder');
+  LAB = (await moet('/api/lab2/lab/maak', { stad: 'Toetsstad', naam: 'Living Lab Toetsstad' }, 'lab aanmaken')).lab.id;
+  await moet('/api/lab2/lab/tekenaar', { id: LAB, naam: 'Dr. Vermeer', rol: 'professional' }, 'tekenaar');
+  await moet('/api/lab2/lab/tekenaar', { id: LAB, naam: 'Prof. Aziz', rol: 'reviewer', onafhankelijk: true }, 'onafhankelijke reviewer');
+  await moet('/api/lab2/lab/tekenaar', { id: LAB, naam: 'M. de Wit', rol: 'toezichthouder' }, 'toezichthouder');
 
-  const geen = await api('lab/tekenaar', { id: LAB, naam: 'Sam Bewoner', rol: 'buurtonderzoeker' });
+  const geen = await api('/api/lab2/lab/tekenaar', { id: LAB, naam: 'Sam Bewoner', rol: 'buurtonderzoeker' });
   assert.equal(geen.status, 400, 'een buurtonderzoeker krijgt geen tekenbevoegdheid');
 });
 
 test('een lab kan de RTF-bewaarondergrens niet lokaal onderschrijden', async () => {
-  const laag = await api('lab/zet', { id: LAB, bewaarMaanden: 3 });
+  const laag = await api('/api/lab2/lab/zet', { id: LAB, bewaarMaanden: 3 });
   assert.equal(laag.status, 400, 'onder de ondergrens weigert hij');
   assert.match(laag.body.error, /ondergrens/i);
   // en hij past hem NIET stil aan: het lab houdt wat het had
-  const labs = await moet('labs', {}, 'labs lezen');
+  const labs = await moet('/api/lab2/labs', {}, 'labs lezen');
   assert.ok(labs.labs.find(l => l.id === LAB).bewaarMaanden >= labs.centraal.bewaarMin,
     'de bewaartermijn blijft op of boven de ondergrens');
-  await moet('lab/zet', { id: LAB, bewaarMaanden: 60 }, 'omhoog mag lokaal wel');
+  await moet('/api/lab2/lab/zet', { id: LAB, bewaarMaanden: 60 }, 'omhoog mag lokaal wel');
 });
 
 test('de cyclus slaat geen stap over en gaat nooit terug', async () => {
-  SOC = (await moet('studie/maak', { labId: LAB, titel: 'Buurttuin en eenzaamheid', soort: 'cohesie',
+  SOC = (await moet('/api/lab2/studie/maak', { labId: LAB, titel: 'Buurttuin en eenzaamheid', soort: 'cohesie',
     vraagstuk: 'Vermindert een gezamenlijke buurttuin de ervaren eenzaamheid in de Kerkstraat?',
     doel: 'Weten of samen tuinieren helpt' }, 'sociale studie')).studie.id;
 
-  const spring = await api('studie/stap', { id: SOC, stap: 'plan' });
+  const spring = await api('/api/lab2/studie/stap', { id: SOC, stap: 'plan' });
   assert.equal(spring.status, 400, 'van vraagstuk direct naar plan mag niet');
 
-  const wens = await api('plan/hypothese', { id: SOC, tekst: 'Een buurttuin vermindert eenzaamheid' });
+  const wens = await api('/api/lab2/plan/hypothese', { id: SOC, tekst: 'Een buurttuin vermindert eenzaamheid' });
   assert.equal(wens.status, 400, 'een hypothese zonder tegendeel is een wens');
   assert.match(wens.body.error, /tegendeel/i);
 
-  await moet('plan/hypothese', { id: SOC, tekst: 'Wekelijks samen tuinieren verlaagt de ervaren eenzaamheid.',
+  await moet('/api/lab2/plan/hypothese', { id: SOC, tekst: 'Wekelijks samen tuinieren verlaagt de ervaren eenzaamheid.',
     tegendeel: 'Als de eenzaamheidsscore na drie maanden gelijk of hoger is dan in de vergelijkingsstraat.' }, 'hypothese');
-  await moet('studie/stap', { id: SOC, stap: 'hypothese' }, 'naar hypothese');
-  await moet('studie/stap', { id: SOC, stap: 'plan' }, 'naar plan');
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'hypothese' }, 'naar hypothese');
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'plan' }, 'naar plan');
 
-  const terug = await api('studie/stap', { id: SOC, stap: 'hypothese' });
+  const terug = await api('/api/lab2/studie/stap', { id: SOC, stap: 'hypothese' });
   assert.equal(terug.status, 409, 'de cyclus gaat niet terug');
   assert.match(terug.body.error, /niet terug/i);
 });
 
 test('het plan rekent de steekproef na, en de methode bepaalt wat het kan dragen', async () => {
-  const advies = await moet('plan/advies', { methoden: ['enquete', 'interview'] }, 'advies');
+  const advies = await moet('/api/lab2/plan/advies', { methoden: ['enquete', 'interview'] }, 'advies');
   assert.equal(advies.minSteekproef, 30, 'een enquête vraagt minstens 30');
   assert.equal(advies.hoogstBewijs, 'indicatie', 'enquête + interview dragen hoogstens een indicatie');
 
-  const klein = await api('plan/zet', { id: SOC, methoden: ['enquete'], steekproef: 8, meetmomenten: 1,
+  const klein = await api('/api/lab2/plan/zet', { id: SOC, methoden: ['enquete'], steekproef: 8, meetmomenten: 1,
     doel: 'Eenzaamheid meten voor en na' });
   assert.equal(klein.status, 400, 'acht mensen is geen enquête');
   assert.match(klein.body.error, /kleinste steekproef/i);
 
-  await moet('plan/zet', { id: SOC, methoden: ['enquete', 'interview'], steekproef: 30, meetmomenten: 2,
+  await moet('/api/lab2/plan/zet', { id: SOC, methoden: ['enquete', 'interview'], steekproef: 30, meetmomenten: 2,
     doel: 'De eenzaamheidsscore voor en na drie maanden vergelijken' }, 'plan');
 });
 
 test('geen deelnemers zonder ethiek, en de poort noemt ALLE gebreken', async () => {
-  const dicht = await api('studie/stap', { id: SOC, stap: 'deelnemers' });
+  const dicht = await api('/api/lab2/studie/stap', { id: SOC, stap: 'deelnemers' });
   assert.equal(dicht.status, 409, 'zonder ethiek geen deelnemers');
   assert.ok(dicht.body.gebreken.length >= 4, 'de poort geeft alle gebreken, niet alleen de eerste: ' + JSON.stringify(dicht.body.gebreken));
 
   // en de poort staat OOK op de deelnemersroute zelf, niet alleen op de stap --
   // een poort met een omweg ernaast is geen poort
-  const omweg = await api('mens/bij', { id: SOC, rol: 'buurtonderzoeker' });
+  const omweg = await api('/api/lab2/mens/bij', { id: SOC, rol: 'buurtonderzoeker' });
   assert.equal(omweg.status, 409, 'de ethiekpoort geldt ook op de directe route');
 
-  await moet('ethiek/klasse', { id: SOC, klasse: 'midden', door: 'Dr. Vermeer' }, 'klasse vaststellen');
+  await moet('/api/lab2/ethiek/klasse', { id: SOC, klasse: 'midden', door: 'Dr. Vermeer' }, 'klasse vaststellen');
 
-  const vreemd = await api('ethiek/review', { id: SOC, door: 'Jan Onbekend', oordeel: 'akkoord' });
+  const vreemd = await api('/api/lab2/ethiek/review', { id: SOC, door: 'Jan Onbekend', oordeel: 'akkoord' });
   assert.equal(vreemd.status, 403, 'een naam die niet in het tekenaarsregister staat, tekent niet');
 
-  await moet('ethiek/review', { id: SOC, door: 'Dr. Vermeer', oordeel: 'akkoord' }, 'review');
-  await moet('ethiek/privacy', { id: SOC, velden: ['leeftijdsgroep', 'eenzaamheidsscore'],
+  await moet('/api/lab2/ethiek/review', { id: SOC, door: 'Dr. Vermeer', oordeel: 'akkoord' }, 'review');
+  await moet('/api/lab2/ethiek/privacy', { id: SOC, velden: ['leeftijdsgroep', 'eenzaamheidsscore'],
     grondslag: 'Toestemming van de deelnemer zelf', weggelaten: 'Geen naam, geen adres, geen inkomen',
     door: 'Dr. Vermeer' }, 'privacytoets');
-  await moet('ethiek/toestemming', { id: SOC, regime: 'schriftelijk',
+  await moet('/api/lab2/ethiek/toestemming', { id: SOC, regime: 'schriftelijk',
     tekst: 'U doet mee aan een onderzoek naar samen tuinieren. U kunt altijd stoppen.' }, 'toestemming');
-  await moet('ethiek/stopcriterium', { id: SOC,
+  await moet('/api/lab2/ethiek/stopcriterium', { id: SOC,
     tekst: 'Bij een deelnemer die aangeeft zich slechter te voelen door deelname stoppen we direct.' }, 'stopcriterium');
-  await moet('studie/stap', { id: SOC, stap: 'deelnemers' }, 'nu mag het wel');
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'deelnemers' }, 'nu mag het wel');
 });
 
 test('een privacytoets zonder "wat laten we weg" bestaat niet', async () => {
-  const zonder = await api('ethiek/privacy', { id: SOC, velden: ['alles'], grondslag: 'Omdat het handig is',
+  const zonder = await api('/api/lab2/ethiek/privacy', { id: SOC, velden: ['alles'], grondslag: 'Omdat het handig is',
     door: 'Dr. Vermeer' });
   assert.equal(zonder.status, 400, 'gegevensminimalisatie begint bij wat je weglaat');
   assert.match(zonder.body.error, /WEG/i);
@@ -156,24 +156,24 @@ test('een privacytoets zonder "wat laten we weg" bestaat niet', async () => {
 
 let PAS, ALIAS;
 test('een deelnemer krijgt een studie-eigen pseudoniem en een eigen labpas', async () => {
-  const d = await moet('mens/bij', { id: SOC, rol: 'buurtonderzoeker', toestemming: true }, 'deelnemer');
+  const d = await moet('/api/lab2/mens/bij', { id: SOC, rol: 'buurtonderzoeker', toestemming: true }, 'deelnemer');
   PAS = d.deelnemer.pas; ALIAS = d.deelnemer.alias;
   assert.match(ALIAS, /^BW-/, 'een alias en geen naam');
   assert.match(PAS, /^LABPAS-/, 'een eigen labpas');
 
-  const mijn = await pub('mijn', { pas: PAS });
+  const mijn = await pub('/api/lab2/mijn', { pas: PAS });
   assert.equal(mijn.status, 200, 'de bewoner opent zijn onderzoek zonder account');
   assert.equal(mijn.body.alias, ALIAS);
   assert.ok(mijn.body.watNu, 'hij ziet wat er nu moet gebeuren');
 
-  const fout = await pub('mijn', { pas: 'LABPAS-ZZZZZZZ' });
+  const fout = await pub('/api/lab2/mijn', { pas: 'LABPAS-ZZZZZZZ' });
   assert.equal(fout.status, 404, 'een onbekende pas geeft niets');
 });
 
 test('een observatie draagt de alias van de PAS, niet die uit het lijf', async () => {
   // de aanval: iemand die een alias kent (die staat in het teambeeld) stuurt een
   // observatie in op naam van een ander en strijkt diens punten op
-  const r = await pub('mijn/observatie', { pas: PAS, wat: 'Nulmeting: gemiddelde eenzaamheidsscore 6,4',
+  const r = await pub('/api/lab2/mijn/observatie', { pas: PAS, wat: 'Nulmeting: gemiddelde eenzaamheidsscore 6,4',
     methode: 'enquete', door: 'BW-IEMANDANDERS' });
   assert.equal(r.status, 200, 'de observatie komt binnen');
   assert.equal(r.body.observatie.door, ALIAS, 'de alias komt uit de pas en niet uit de body');
@@ -181,51 +181,51 @@ test('een observatie draagt de alias van de PAS, niet die uit het lijf', async (
 
 test('een experiment begint niet met een halve steekproef', async () => {
   // het plan gaat uit van dertig deelnemers; er staat er tot nu toe één
-  const tekort = await api('studie/stap', { id: SOC, stap: 'experiment' });
+  const tekort = await api('/api/lab2/studie/stap', { id: SOC, stap: 'experiment' });
   assert.equal(tekort.status, 409, 'met één van de dertig deelnemers begint het experiment niet');
   assert.match(tekort.body.error, /30 deelnemers/, 'en de melding noemt het verschil');
 
   for (let i = 1; i < 30; i++) {
-    const d = await api('mens/bij', { id: SOC, rol: i < 25 ? 'buurtonderzoeker' : 'onderzoeker', toestemming: true });
+    const d = await api('/api/lab2/mens/bij', { id: SOC, rol: i < 25 ? 'buurtonderzoeker' : 'onderzoeker', toestemming: true });
     assert.equal(d.status, 200, 'deelnemer ' + i + ' -- ' + (d.body.error || ''));
   }
 });
 
 test('de bewijsmotor: een verhaal wordt geen feit', async () => {
-  await moet('studie/stap', { id: SOC, stap: 'experiment' }, 'naar experiment');
-  await moet('studie/stap', { id: SOC, stap: 'observaties' }, 'naar observaties');
-  const o1 = (await moet('bewijs/observatie', { id: SOC, wat: 'Bewoner kent nu twee buren bij naam', methode: 'interview' }, 'observatie')).observatie;
-  const ds = (await moet('bewijs/dataset', { id: SOC, naam: 'Eenzaamheidsscores meetmoment 1 en 2', rijen: 60 }, 'dataset')).dataset;
-  await moet('studie/stap', { id: SOC, stap: 'reflectie' }, 'naar reflectie');
-  await moet('bewijs/reflectie', { id: SOC, soort: 'misging', tekst: 'Meetmoment 2 viel in de vakantie; acht deelnemers waren weg.' }, 'reflectie');
-  await moet('studie/stap', { id: SOC, stap: 'resultaten' }, 'naar resultaten');
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'experiment' }, 'naar experiment');
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'observaties' }, 'naar observaties');
+  const o1 = (await moet('/api/lab2/bewijs/observatie', { id: SOC, wat: 'Bewoner kent nu twee buren bij naam', methode: 'interview' }, 'observatie')).observatie;
+  const ds = (await moet('/api/lab2/bewijs/dataset', { id: SOC, naam: 'Eenzaamheidsscores meetmoment 1 en 2', rijen: 60 }, 'dataset')).dataset;
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'reflectie' }, 'naar reflectie');
+  await moet('/api/lab2/bewijs/reflectie', { id: SOC, soort: 'misging', tekst: 'Meetmoment 2 viel in de vakantie; acht deelnemers waren weg.' }, 'reflectie');
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'resultaten' }, 'naar resultaten');
 
-  const c = (await moet('bewijs/conclusie', { id: SOC, tekst: 'Samen tuinieren verlaagt de ervaren eenzaamheid in deze straat.' }, 'conclusie')).conclusie;
+  const c = (await moet('/api/lab2/bewijs/conclusie', { id: SOC, tekst: 'Samen tuinieren verlaagt de ervaren eenzaamheid in deze straat.' }, 'conclusie')).conclusie;
   assert.equal(c.graad, 'aanname', 'een conclusie begint als aanname');
 
-  const meteen = await api('bewijs/graad', { id: SOC, conclusieId: c.id, graad: 'bewezen', door: 'Dr. Vermeer' });
+  const meteen = await api('/api/lab2/bewijs/graad', { id: SOC, conclusieId: c.id, graad: 'bewezen', door: 'Dr. Vermeer' });
   assert.equal(meteen.status, 409, 'zonder dragers is niets bewezen');
 
   // een bron die niemand heeft nagetrokken draagt niets
-  const bron = (await moet('plan/bron', { id: SOC, titel: 'Onderzoek naar buurtgroen en eenzaamheid', herkomst: 'Universiteit X' }, 'bron')).bron;
-  const ongecheckt = await api('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'bron', ref: bron.id });
+  const bron = (await moet('/api/lab2/plan/bron', { id: SOC, titel: 'Onderzoek naar buurtgroen en eenzaamheid', herkomst: 'Universiteit X' }, 'bron')).bron;
+  const ongecheckt = await api('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'bron', ref: bron.id });
   assert.equal(ongecheckt.status, 409, 'een ongecontroleerde bron draagt geen conclusie');
-  await moet('plan/bron-natrek', { id: SOC, bronId: bron.id, door: 'Dr. Vermeer', nagetrokken: true }, 'bron natrekken');
+  await moet('/api/lab2/plan/bron-natrek', { id: SOC, bronId: bron.id, door: 'Dr. Vermeer', nagetrokken: true }, 'bron natrekken');
 
   // verwijzen naar bewijs dat niet bestaat is de stilste manier om het te verzinnen
-  const verzonnen = await api('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'dataset', ref: 'bestaatniet' });
+  const verzonnen = await api('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'dataset', ref: 'bestaatniet' });
   assert.equal(verzonnen.status, 404, 'een verwijzing naar iets dat er niet is, wordt nagetrokken');
 
-  await moet('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'observatie', ref: o1.id }, 'bewijs 1');
-  await moet('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'dataset', ref: ds.id }, 'bewijs 2');
-  await moet('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'bron', ref: bron.id }, 'bewijs 3');
+  await moet('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'observatie', ref: o1.id }, 'bewijs 1');
+  await moet('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'dataset', ref: ds.id }, 'bewijs 2');
+  await moet('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'bron', ref: bron.id }, 'bewijs 3');
 
   // MENSELIJK ONDERWERP: hier ligt de handtekeninggrens een trede lager
-  const zonderMens = await api('bewijs/graad', { id: SOC, conclusieId: c.id, graad: 'indicatie' });
+  const zonderMens = await api('/api/lab2/bewijs/graad', { id: SOC, conclusieId: c.id, graad: 'indicatie' });
   assert.equal(zonderMens.status, 409, 'bij een menselijk onderwerp vraagt een indicatie al een handtekening');
   assert.match(zonderMens.body.error, /handtekening/i);
 
-  const getekend = await moet('bewijs/graad', { id: SOC, conclusieId: c.id, graad: 'indicatie', door: 'Dr. Vermeer' }, 'indicatie met handtekening');
+  const getekend = await moet('/api/lab2/bewijs/graad', { id: SOC, conclusieId: c.id, graad: 'indicatie', door: 'Dr. Vermeer' }, 'indicatie met handtekening');
   assert.equal(getekend.conclusie.graad, 'indicatie');
 
   /* DE REGRESSIE. Bewijs TOEVOEGEN mag een conclusie nooit verlagen. In de
@@ -234,19 +234,19 @@ test('de bewijsmotor: een verhaal wordt geen feit', async () => {
      conclusie een trede zakte -- juist doordat er bewijs bij kwam. De mutatie
      (c.tekenaar = doel.mens ? tekenaar : null) laat deze toets zakken op
      "waarneming". */
-  const o2 = (await moet('bewijs/observatie', { id: SOC, wat: 'Tweede meetronde laat lagere scores zien', methode: 'enquete' }, 'observatie 2')).observatie;
-  const na = await moet('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'observatie', ref: o2.id }, 'extra bewijs');
+  const o2 = (await moet('/api/lab2/bewijs/observatie', { id: SOC, wat: 'Tweede meetronde laat lagere scores zien', methode: 'enquete' }, 'observatie 2')).observatie;
+  const na = await moet('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'observatie', ref: o2.id }, 'extra bewijs');
   assert.equal(na.conclusie.graad, 'indicatie', 'extra bewijs mag een conclusie nooit VERLAGEN');
 
   // en weghalen moet hem wél laten zakken, anders bewijst de vorige regel niets
-  await moet('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'dataset', ref: ds.id, weg: true }, 'dataset eraf');
-  const eraf = await moet('bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'bron', ref: bron.id, weg: true }, 'bron eraf');
+  await moet('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'dataset', ref: ds.id, weg: true }, 'dataset eraf');
+  const eraf = await moet('/api/lab2/bewijs/koppel', { id: SOC, conclusieId: c.id, soort: 'bron', ref: bron.id, weg: true }, 'bron eraf');
   assert.equal(eraf.conclusie.graad, 'waarneming', 'bewijs weghalen laat de conclusie wél zakken');
   assert.equal(eraf.conclusie.tekenaar, null, 'en de handtekening vervalt met de graad die hij droeg');
 });
 
 test('een gescheiden studie legt geen enkele koppeling vast en toont niets publiek', async () => {
-  const g = (await moet('studie/maak', { labId: LAB, titel: 'Schuldhulp en stress bij jongeren', soort: 'welzijn',
+  const g = (await moet('/api/lab2/studie/maak', { labId: LAB, titel: 'Schuldhulp en stress bij jongeren', soort: 'welzijn',
     vraagstuk: 'Helpt vroege schuldhulp bij kinderen in gezinnen met geldzorgen tegen stress?' }, 'gevoelige studie')).studie;
   // de bodem uit het onderwerp: kind + schuld tilt hem naar hoog
   assert.equal(g.klasse, 'hoog', 'kinderen en schulden tillen de risicoklasse omhoog');
@@ -254,62 +254,62 @@ test('een gescheiden studie legt geen enkele koppeling vast en toont niets publi
 
   // het publieke beeld verraadt de vraagstelling niet: juist die zegt wie de
   // deelnemers zijn
-  const open = await pub('bewoner/studie', { id: g.id });
+  const open = await pub('/api/lab2/bewoner/studie', { id: g.id });
   assert.equal(open.status, 200);
   assert.equal(open.body.studie.titel, 'Schuldhulp en stress bij jongeren', 'de titel mag');
   assert.equal(open.body.studie.vraagstuk, undefined, 'het vraagstuk niet: dat verraadt de deelnemers');
   assert.equal(open.body.magTeam, false, 'een voorbijganger zit niet op het team');
 
   // verlagen kan niet zomaar, en al helemaal niet zonder reden
-  const stiekem = await api('ethiek/klasse', { id: g.id, klasse: 'laag', door: 'Sam Bewoner' });
+  const stiekem = await api('/api/lab2/ethiek/klasse', { id: g.id, klasse: 'laag', door: 'Sam Bewoner' });
   assert.equal(stiekem.status, 403, 'alleen een tekenbevoegde verlaagt een risicoklasse');
-  const zonderReden = await api('ethiek/klasse', { id: g.id, klasse: 'laag', door: 'Dr. Vermeer' });
+  const zonderReden = await api('/api/lab2/ethiek/klasse', { id: g.id, klasse: 'laag', door: 'Dr. Vermeer' });
   assert.equal(zonderReden.status, 400, 'verlagen kan alleen met een reden');
 
   // twee handtekeningen, waarvan één onafhankelijk
-  await moet('ethiek/klasse', { id: g.id, klasse: 'hoog', door: 'Dr. Vermeer' }, 'klasse bevestigen');
-  await moet('ethiek/privacy', { id: g.id, velden: ['leeftijdsgroep', 'stressscore'], grondslag: 'Toestemming plus ouderlijke toestemming',
+  await moet('/api/lab2/ethiek/klasse', { id: g.id, klasse: 'hoog', door: 'Dr. Vermeer' }, 'klasse bevestigen');
+  await moet('/api/lab2/ethiek/privacy', { id: g.id, velden: ['leeftijdsgroep', 'stressscore'], grondslag: 'Toestemming plus ouderlijke toestemming',
     weggelaten: 'Geen naam, geen adres, geen schuldbedrag, geen schoolgegevens', door: 'Dr. Vermeer' }, 'privacytoets');
-  await moet('ethiek/toestemming', { id: g.id, regime: 'schriftelijk', ouderlijk: true,
+  await moet('/api/lab2/ethiek/toestemming', { id: g.id, regime: 'schriftelijk', ouderlijk: true,
     tekst: 'Uw kind doet mee aan een onderzoek naar stress. U en uw kind kunnen altijd stoppen.' }, 'toestemming');
-  await moet('ethiek/stopcriterium', { id: g.id, tekst: 'Bij tekenen van toenemende stress bij een deelnemer stoppen we direct.' }, 'stopcriterium');
-  await moet('ethiek/review', { id: g.id, door: 'Dr. Vermeer', oordeel: 'akkoord' }, 'eerste handtekening');
+  await moet('/api/lab2/ethiek/stopcriterium', { id: g.id, tekst: 'Bij tekenen van toenemende stress bij een deelnemer stoppen we direct.' }, 'stopcriterium');
+  await moet('/api/lab2/ethiek/review', { id: g.id, door: 'Dr. Vermeer', oordeel: 'akkoord' }, 'eerste handtekening');
 
-  await moet('plan/hypothese', { id: g.id, tekst: 'Vroege schuldhulp verlaagt de ervaren stress bij kinderen.',
+  await moet('/api/lab2/plan/hypothese', { id: g.id, tekst: 'Vroege schuldhulp verlaagt de ervaren stress bij kinderen.',
     tegendeel: 'Als de stressscore na een half jaar gelijk blijft aan die van de vergelijkingsgroep.' }, 'hypothese');
-  await moet('studie/stap', { id: g.id, stap: 'hypothese' }, 'naar hypothese');
-  await moet('studie/stap', { id: g.id, stap: 'plan' }, 'naar plan');
-  await moet('plan/zet', { id: g.id, methoden: ['interview'], steekproef: 10, meetmomenten: 1,
+  await moet('/api/lab2/studie/stap', { id: g.id, stap: 'hypothese' }, 'naar hypothese');
+  await moet('/api/lab2/studie/stap', { id: g.id, stap: 'plan' }, 'naar plan');
+  await moet('/api/lab2/plan/zet', { id: g.id, methoden: ['interview'], steekproef: 10, meetmomenten: 1,
     doel: 'De ervaren stress voor en na de hulp in kaart brengen' }, 'plan');
 
-  const eenHandtekening = await api('studie/stap', { id: g.id, stap: 'deelnemers' });
+  const eenHandtekening = await api('/api/lab2/studie/stap', { id: g.id, stap: 'deelnemers' });
   assert.equal(eenHandtekening.status, 409, 'klasse hoog vraagt twee akkoorden');
-  await moet('ethiek/review', { id: g.id, door: 'Prof. Aziz', oordeel: 'akkoord' }, 'onafhankelijke tweede handtekening');
-  await moet('studie/stap', { id: g.id, stap: 'deelnemers' }, 'met twee handtekeningen mag het');
+  await moet('/api/lab2/ethiek/review', { id: g.id, door: 'Prof. Aziz', oordeel: 'akkoord' }, 'onafhankelijke tweede handtekening');
+  await moet('/api/lab2/studie/stap', { id: g.id, stap: 'deelnemers' }, 'met twee handtekeningen mag het');
 
   // en nu de kern van de scheiding: een deelnemer MET een Foundation-sleutel
   // levert geen koppeling op die het dossier uit lekt. Dat de koppelTABEL leeg
   // blijft, wordt hieronder in de kern zelf nagerekend -- dat is de enige plek
   // waar je in de opslag kunt kijken zonder er een endpoint voor te openen, en
   // een endpoint dat de koppeltabel toont is precies wat hier niet moet bestaan.
-  const d = await moet('mens/bij', { id: g.id, rol: 'ervaringsdeskundige', toestemming: true,
+  const d = await moet('/api/lab2/mens/bij', { id: g.id, rol: 'ervaringsdeskundige', toestemming: true,
     sleutel: 'foundation-sleutel-van-deze-persoon' }, 'deelnemer met sleutel');
-  const dossier = await moet('studie', { id: g.id }, 'het volledige dossier als staf');
+  const dossier = await moet('/api/lab2/studie', { id: g.id }, 'het volledige dossier als staf');
   assert.ok(!JSON.stringify(dossier).includes('foundation-sleutel-van-deze-persoon'),
     'de sleutel staat nergens in het dossier, ook niet voor de staf');
 
   // een labpaspoort zou juist die koppeling maken, en wordt dus geweigerd --
   // met uitleg, niet stil genegeerd
-  const pasp = await pub('bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' });
+  const pasp = await pub('/api/lab2/bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' });
   assert.equal(pasp.status, 200);
-  const weiger = await api('mens/bij', { id: g.id, rol: 'buurtonderzoeker', toestemming: true, paspoort: pasp.body.paspoort.code });
+  const weiger = await api('/api/lab2/mens/bij', { id: g.id, rol: 'buurtonderzoeker', toestemming: true, paspoort: pasp.body.paspoort.code });
   assert.equal(weiger.status, 409, 'een paspoort koppelen kan niet bij een gescheiden studie');
   assert.match(weiger.body.error, /gescheiden/i);
 
   // terugtrekken werkt op de pas, dus ook zonder dat iemand weet wie het is
-  const weg = await pub('mijn/terugtrekken', { pas: d.deelnemer.pas });
+  const weg = await pub('/api/lab2/mijn/terugtrekken', { pas: d.deelnemer.pas });
   assert.equal(weg.status, 200, 'de deelnemer trekt zich terug met zijn eigen pas');
-  const na = await pub('mijn', { pas: d.deelnemer.pas });
+  const na = await pub('/api/lab2/mijn', { pas: d.deelnemer.pas });
   assert.equal(na.status, 404, 'daarna kent het lab de pas niet meer');
 });
 
@@ -477,7 +477,7 @@ test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten
 });
 
 test('het spel beloont kwaliteit en niet volume', async () => {
-  const k = await moet('kader', {}, 'kader');
+  const k = await moet('/api/lab2/kader', {}, 'kader');
   const p = k.spel.punten;
   assert.ok(p.herzien > p.stap && p.gestopt > p.stap, 'herzien en stoppen leveren het meest op');
   assert.equal(p.observatie, undefined, 'er bestaat geen punt per observatie');
@@ -485,65 +485,65 @@ test('het spel beloont kwaliteit en niet volume', async () => {
 });
 
 test('apparatuur: bevoegdheid verloopt en een ongekalibreerd apparaat meet niet', async () => {
-  const a = (await moet('app/maak', { labId: LAB, naam: 'Regensensor RS-4', soort: 'sensor', geldigMaanden: 6 }, 'apparaat')).apparaat;
+  const a = (await moet('/api/lab2/app/maak', { labId: LAB, naam: 'Regensensor RS-4', soort: 'sensor', geldigMaanden: 6 }, 'apparaat')).apparaat;
 
-  const onbevoegd = await api('app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-01', tot: '2026-09-03', door: 'Dr. Vermeer' });
+  const onbevoegd = await api('/api/lab2/app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-01', tot: '2026-09-03', door: 'Dr. Vermeer' });
   assert.equal(onbevoegd.status, 403, 'zonder bevoegdheid geen reservering');
 
-  const eeuwig = await api('app/bevoegd', { id: a.id, wie: 'Dr. Vermeer' });
+  const eeuwig = await api('/api/lab2/app/bevoegd', { id: a.id, wie: 'Dr. Vermeer' });
   assert.equal(eeuwig.status, 400, 'een bevoegdheid zonder einddatum kijkt niemand meer na');
 
-  await moet('app/bevoegd', { id: a.id, wie: 'Dr. Vermeer', tot: '2099-01-01' }, 'bevoegdheid');
-  const ongekalibreerd = await api('app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-01', tot: '2026-09-03', door: 'Dr. Vermeer' });
+  await moet('/api/lab2/app/bevoegd', { id: a.id, wie: 'Dr. Vermeer', tot: '2099-01-01' }, 'bevoegdheid');
+  const ongekalibreerd = await api('/api/lab2/app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-01', tot: '2026-09-03', door: 'Dr. Vermeer' });
   assert.equal(ongekalibreerd.status, 409, 'een nooit gekalibreerde sensor levert geen te verantwoorden metingen');
 
-  await moet('app/kalibratie', { id: a.id, door: 'Dr. Vermeer', op: '2026-08-01', stand: '0,2 mm afwijking' }, 'kalibratie');
-  const r = await moet('app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-01', tot: '2026-09-03', door: 'Dr. Vermeer' }, 'reservering');
+  await moet('/api/lab2/app/kalibratie', { id: a.id, door: 'Dr. Vermeer', op: '2026-08-01', stand: '0,2 mm afwijking' }, 'kalibratie');
+  const r = await moet('/api/lab2/app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-01', tot: '2026-09-03', door: 'Dr. Vermeer' }, 'reservering');
   assert.equal(r.reservering.kalibratie.op, '2026-08-01', 'de kalibratiestand gaat MEE in de reservering');
   assert.equal(r.reservering.kalibratie.stand, '0,2 mm afwijking', 'inclusief de gemeten afwijking van dat moment');
 
-  const dubbel = await api('app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-02', tot: '2026-09-04', door: 'Dr. Vermeer' });
+  const dubbel = await api('/api/lab2/app/reserveer', { id: a.id, studieId: SOC, van: '2026-09-02', tot: '2026-09-04', door: 'Dr. Vermeer' });
   assert.equal(dubbel.status, 409, 'twee reserveringen op dezelfde dagen kan niet');
 
   // een open storing haalt het apparaat uit de roulatie
-  await moet('app/onderhoud', { id: a.id, wat: 'Sensor geeft sprongen na regen', soort: 'storing' }, 'storing');
-  const kapot = await api('app/reserveer', { id: a.id, studieId: SOC, van: '2026-10-01', tot: '2026-10-02', door: 'Dr. Vermeer' });
+  await moet('/api/lab2/app/onderhoud', { id: a.id, wat: 'Sensor geeft sprongen na regen', soort: 'storing' }, 'storing');
+  const kapot = await api('/api/lab2/app/reserveer', { id: a.id, studieId: SOC, van: '2026-10-01', tot: '2026-10-02', door: 'Dr. Vermeer' });
   assert.equal(kapot.status, 409, 'een apparaat met een open storing is niet te reserveren');
 });
 
 test('van onderzoek naar verandering: de uitgang volgt het bewijs', async () => {
-  await moet('studie/stap', { id: SOC, stap: 'besluit' }, 'naar besluit');
-  const c = (await moet('studie', { id: SOC }, 'studie')).studie.conclusies[0];
+  await moet('/api/lab2/studie/stap', { id: SOC, stap: 'besluit' }, 'naar besluit');
+  const c = (await moet('/api/lab2/studie', { id: SOC }, 'studie')).studie.conclusies[0];
   assert.equal(c.graad, 'waarneming', 'de conclusie staat na het weghalen van bewijs op waarneming');
 
-  const teVroeg = await api('uit/maak', { id: SOC, uitgang: 'beleid', conclusieId: c.id, titel: 'Buurttuinen opnemen in het wijkplan' });
+  const teVroeg = await api('/api/lab2/uit/maak', { id: SOC, uitgang: 'beleid', conclusieId: c.id, titel: 'Buurttuinen opnemen in het wijkplan' });
   assert.equal(teVroeg.status, 409, 'een beleidsvoorstel vraagt minstens een indicatie');
   assert.match(teVroeg.body.error, /minstens/i);
 
   // nieuw onderzoek mag juist wél uit een zwakke conclusie komen -- daar is
   // onderzoek voor
-  const nieuw = (await moet('uit/maak', { id: SOC, uitgang: 'onderzoek', conclusieId: c.id,
+  const nieuw = (await moet('/api/lab2/uit/maak', { id: SOC, uitgang: 'onderzoek', conclusieId: c.id,
     titel: 'Herhaling met een vergelijkingsstraat' }, 'nieuw onderzoek als uitgang')).uitgang;
 
   // "uitgevoerd" is de enige status die iets over de wereld beweert, en die
   // vraagt dus een bewijs van uitvoering in plaats van een vinkje
-  const vinkje = await api('uit/status', { id: SOC, uitgangId: nieuw.id, status: 'uitgevoerd', door: 'Dr. Vermeer' });
+  const vinkje = await api('/api/lab2/uit/status', { id: SOC, uitgangId: nieuw.id, status: 'uitgevoerd', door: 'Dr. Vermeer' });
   assert.equal(vinkje.status, 400, '"uitgevoerd" zonder onderbouwing is een vinkje');
-  await moet('uit/status', { id: SOC, uitgangId: nieuw.id, status: 'ingediend', door: 'Dr. Vermeer' }, 'ingediend');
-  await moet('uit/status', { id: SOC, uitgangId: nieuw.id, status: 'uitgevoerd', door: 'Dr. Vermeer',
+  await moet('/api/lab2/uit/status', { id: SOC, uitgangId: nieuw.id, status: 'ingediend', door: 'Dr. Vermeer' }, 'ingediend');
+  await moet('/api/lab2/uit/status', { id: SOC, uitgangId: nieuw.id, status: 'uitgevoerd', door: 'Dr. Vermeer',
     notitie: 'Vervolgstudie gestart in de Lindelaan, met vergelijkingsstraat.' }, 'uitgevoerd met onderbouwing');
 
   // alleen een pilot gaat door naar het RTG Onderzoekslab; de rest loopt langs
   // zijn eigen weg, en er ontstaat dus geen tweede projectenlijst
-  const geenPilot = await api('uit/naar-lab', { id: SOC, uitgangId: nieuw.id, veld: 'dorp' });
+  const geenPilot = await api('/api/lab2/uit/naar-lab', { id: SOC, uitgangId: nieuw.id, veld: 'dorp' });
   assert.equal(geenPilot.status, 400, 'alleen een pilotvoorstel gaat door naar het Onderzoekslab');
 
-  await moet('studie/besluit', { id: SOC, soort: 'gestopt', door: 'Dr. Vermeer',
+  await moet('/api/lab2/studie/besluit', { id: SOC, soort: 'gestopt', door: 'Dr. Vermeer',
     reden: 'Het bewijs bleef bij een waarneming; we herhalen het met een vergelijkingsstraat.' }, 'bewust gestopt');
 });
 
 test('impact telt een gestopt onderzoek als opbrengst', async () => {
-  const i = await moet('impact', { id: LAB }, 'impact');
+  const i = await moet('/api/lab2/impact', { id: LAB }, 'impact');
   assert.ok(i.onderzoek.gestopt >= 1, 'er staat een gestopt onderzoek');
   assert.equal(typeof i.onderzoek.stoppercentage, 'number', 'het stoppercentage is een eigen getal');
   assert.ok(i.kennis.foutenVastgelegd >= 1, 'vastgelegde fouten tellen mee als kennis');
@@ -553,7 +553,7 @@ test('impact telt een gestopt onderzoek als opbrengst', async () => {
 });
 
 test('het auditspoor houdt de geweigerde en de getekende handelingen vast', async () => {
-  const a = await moet('lab/audit', { id: LAB, max: 500 }, 'auditspoor');
+  const a = await moet('/api/lab2/lab/audit', { id: LAB, max: 500 }, 'auditspoor');
   assert.ok(a.totaal > 10, 'er staat een spoor');
   const soorten = new Set(a.regels.map(r => r.wat));
   for (const w of ['studie.maak', 'ethiek.review', 'ethiek.privacy', 'bewijs.graad', 'cyclus.stap'])
@@ -562,11 +562,11 @@ test('het auditspoor houdt de geweigerde en de getekende handelingen vast', asyn
 });
 
 test('de coach werkt zonder AI-sleutel en tekent nooit iets af', async () => {
-  const r = await moet('coach', { id: SOC, vraag: 'Hoe zet ik een eerlijke nulmeting op?' }, 'coach');
+  const r = await moet('/api/lab2/coach', { id: SOC, vraag: 'Hoe zet ik een eerlijke nulmeting op?' }, 'coach');
   assert.ok(r.antwoord.length > 20, 'zonder sleutel geeft hij het advies dat bij deze stap hoort, geen foutmelding');
   assert.equal(r.demo, true, 'en hij zegt erbij dat het de demostand is');
 
-  const m = await moet('coach/methoden', { soort: 'welzijn', ambitie: 'bewezen' }, 'methodeadvies');
+  const m = await moet('/api/lab2/coach/methoden', { soort: 'welzijn', ambitie: 'bewezen' }, 'methodeadvies');
   assert.equal(m.menselijk, true, 'welzijn is een menselijk onderwerp');
   assert.ok(m.passend.every(x => ['abtest', 'veldexperiment'].includes(x.methode)),
     'alleen een vergelijkende opzet kan "bewezen" dragen');

@@ -43,7 +43,7 @@ module.exports = function maakIdemRing({ data, naam, max = 50000, save }) {
         if (s._keys.length > max) for (const weg of s._keys.splice(0, s._keys.length - max)) delete s[weg];
       }
       s[k] = v;
-      try { save(); } catch (e) { /* het geheugen-resultaat blijft geldig */ }
+      try { save(); } catch (e) { /* het geheugen-resultaat blijft geldig, tot een herstart */ console.warn('[idemring] de herhalingssleutel niet bewaard:', e && e.message); }
     }
   };
 };

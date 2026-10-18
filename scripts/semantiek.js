@@ -301,6 +301,11 @@ function analyse(catalogi, opties) {
   naamloos.sort((x, y) => y.overlap - x.overlap || y.leden - x.leden);
 
   return {
+    /* Wat deze meting NIET aantoont, als veld (scripts/meetleer.js leest het). */
+    grens: 'Telt alleen benoemde catalogi (een hoofdletterconstante met een gesloten verzameling ids) ' +
+      'onder server/; een begrip dat anders wordt vastgelegd ziet hij niet. Een naam in twee domeinen met ' +
+      'weinig gedeelde leden is een KANDIDAAT-botsing, geen bewezen misverstand: of het hetzelfde ding ' +
+      'hoort te zijn, beslist een mens.',
     catalogi: catalogi.length,
     verschillendeNamen: opNaam.size,
     namenInMeerDomeinen,

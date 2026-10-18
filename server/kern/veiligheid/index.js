@@ -40,7 +40,7 @@ module.exports = (state) => {
   const wacht = require('./wacht')({ opslag, save, crypto, schoon, alarm, plek, meldAan, sociaal });
   const codewoord = require('./codewoord')({ opslag, save, crypto, kluis, alarm, plek, sociaal });
   const rust = require('./rust')({ opslag, save, schoon });
-  const moment = require('./moment')({ opslag, save, crypto, schoon, sociaal, plek });
+  const moment = require('./moment')({ opslag, save, crypto, schoon, sociaal, plek, sleutelVan: kring.sleutelVan });
   // wat dit domein van een lid vergeet als het daarom vraagt (AVG art. 17)
   const { veiligVergeet } = require('./vergeten')({ opslag, save });
 

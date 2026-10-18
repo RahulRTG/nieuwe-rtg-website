@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:03:29.047Z",
-    "commit": "170a819a",
+    "op": "2026-10-18T11:27:30.902Z",
+    "commit": "d51189c9f",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/overgangsvorm.js",
@@ -1222,6 +1222,14 @@
         "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
       },
       {
+        "overgang": "werk",
+        "dimensie": "privacyklasse",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`codenaamVan` (#579, employment-wie.js) vertaalt een ledensleutel naar een codenaam: dat is de actor op codenaam, geen privacyregel van de aanname.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
         "overgang": "leren",
         "dimensie": "kennis",
         "verklaard": "afwezig",
@@ -1340,14 +1348,6 @@
         "woorden": "raak",
         "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. De bevestiging in RTG Service is die van een machtiging, niet van een melding.",
         "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
-      },
-      {
-        "overgang": "oplossen",
-        "dimensie": "terugweg",
-        "verklaard": "draagt",
-        "woorden": "mis",
-        "nagekeken": "Terugzetten is dezelfde zetStand, geen apart woord.",
-        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
       },
       {
         "overgang": "oplossen",

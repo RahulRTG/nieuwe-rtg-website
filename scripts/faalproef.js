@@ -492,7 +492,7 @@ function oordeel(schoon, met) {
   let BESLUITEN = {};
   try {
     BESLUITEN = (JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERREKENBAAR.json'), 'utf8')) || {}).routes || {};
-  } catch (e) { BESLUITEN = {}; }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; BESLUITEN = {}; }
   for (const r of perRoute) {
     const b = BESLUITEN[r.route];
     if (b) r.besluit = { klasse: b.klasse, grond: b.grond, besloten: b.besloten };

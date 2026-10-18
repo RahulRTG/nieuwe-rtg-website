@@ -22,7 +22,7 @@
 
 function maakStopspoeling({ save, flushBijAfsluiten, accounts }) {
   function spoelSynchroon() {
-    try { save(); } catch (e) {}
+    try { save(); } catch (e) { console.error('[stop] de laatste save niet weggeschreven:', e && e.message); }
     try { require('../kern/journaalbestand').spoelAlle(); } catch (e) {}
     try { require('../lib/vertaalkast').spoelAlle(); } catch (e) {}
   }
@@ -70,7 +70,7 @@ function bijCrash({ save, flushBijAfsluiten, accounts, inBundel, exit, graceMs }
   try { halverwege = typeof inBundel !== 'function' || inBundel() !== false; } catch (e) { halverwege = true; }
   let spoel = null;
   try { spoel = maakStopspoeling({ save, flushBijAfsluiten, accounts }); spoel.spoelSynchroon(); }
-  catch (e) { try { save(); } catch (x) {} }
+  catch (e) { try { save(); } catch (x) { console.error('[stop] ook de noodsave faalde:', x && x.message); } }
   const klaarNa = Date.now() + 200;
   let klaar = false;
   const einde = () => { if (!klaar) { klaar = true; stopMet(1); } };

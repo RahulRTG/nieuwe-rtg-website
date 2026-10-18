@@ -121,7 +121,7 @@ function meet() {
 }
 
 function lees() {
-  try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { return null; }
+  try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 function schrijf(nu) {

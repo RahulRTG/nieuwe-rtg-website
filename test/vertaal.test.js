@@ -13,7 +13,7 @@ let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vertaal-'));
 
 function api(pad, body, tok) {
-  return fetch(base + '/api/vertaal' + pad, { method: 'POST',
+  return fetch(base + (pad.startsWith('/api/') ? pad : '/api/vertaal' + pad), { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || token) },
     body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -35,27 +35,27 @@ test.after(() => {
 });
 
 test('1. de talenlijst staat klaar en de route is dicht zonder token', async () => {
-  const t = await api('/talen', {});
+  const t = await api('/api/vertaal/talen', {});
   assert.equal(t.status, 200);
   assert.ok(t.body.talen.length >= 10, 'een ruime lijst talen');
   assert.ok(t.body.talen.some(x => x[0] === 'nl') && t.body.talen.some(x => x[0] === 'ja'));
-  const dicht = await api('', { tekst: 'hallo', naar: 'en' }, 'nep');
+  const dicht = await api('/api/vertaal', { tekst: 'hallo', naar: 'en' }, 'nep');
   assert.equal(dicht.status, 401, 'zonder geldig token geen vertaling');
 });
 
 test('2. zonder AI-sleutel vertaalt het huiswoordenboek nl->en echt', async () => {
-  const r = await api('', { tekst: 'hallo', naar: 'en', van: 'nl' });
+  const r = await api('/api/vertaal', { tekst: 'hallo', naar: 'en', van: 'nl' });
   assert.equal(r.status, 200);
   assert.equal(r.body.tekst.toLowerCase(), 'hello', 'het huiswoordenboek vertaalt echt');
   assert.equal(r.body.vertaald, true);
 });
 
 test('3. eerlijk bij wat niet kan: lege tekst is een nette fout, een verre taal geen neptaal', async () => {
-  const leeg = await api('', { tekst: '   ', naar: 'en' });
+  const leeg = await api('/api/vertaal', { tekst: '   ', naar: 'en' });
   assert.equal(leeg.status, 400);
   // een taal buiten het huiswoordenboek: de motor mag terugvallen, maar moet
   // dat via vertaald:false eerlijk zeggen in plaats van onzin te verzinnen
-  const ver = await api('', { tekst: 'goedemorgen', naar: 'ja', van: 'nl' });
+  const ver = await api('/api/vertaal', { tekst: 'goedemorgen', naar: 'ja', van: 'nl' });
   assert.equal(ver.status, 200, 'nooit kapot');
   assert.ok(typeof ver.body.vertaald === 'boolean', 'de eerlijkheidsvlag reist mee');
 });

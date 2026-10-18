@@ -37,9 +37,11 @@ app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
   if (isNaN(inAt) || isNaN(uitAt) || uitAt <= inAt) return res.status(400).json({ error: 'Geef een geldige begin- en eindtijd.' });
   if (uitAt - inAt > 86400000) return res.status(400).json({ error: 'Een correctie beslaat hooguit een etmaal.' });
   if (inAt.getTime() > Date.now() || Date.now() - inAt.getTime() > 31 * 86400000) return res.status(400).json({ error: 'Een correctie kan alleen binnen de afgelopen 31 dagen.' });
-  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
-  lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId, name: wie.name, in: inAt.toISOString(), out: uitAt.toISOString(), correctie: req.actor.name });
-  db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
+  /* De la van deze zaak ontstaat pas HIER, met de correctie erin, en niet als
+     lege lijst ergens boven de keuring: een geweigerde correctie laat niets
+     achter (scripts/laatspoor.js). */
+  const rij = { id: crypto.randomBytes(4).toString('hex'), staffId, name: wie.name, in: inAt.toISOString(), out: uitAt.toISOString(), correctie: req.actor.name };
+  db.data.klok[req.supplier.code] = [rij].concat(db.data.klok[req.supplier.code] || []).slice(0, 4000);
   save();
   logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name, 'klok-correctie');
   // een correctie verandert niemands aanwezigheid: het signaal alleen voor de managers en wie het betreft

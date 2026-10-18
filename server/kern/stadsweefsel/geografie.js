@@ -36,7 +36,6 @@ module.exports = (ctx) => {
   const { bak, save, crypto } = ctx;
 
   const gebieden = () => bak().gebieden;
-  const perId = () => { const m = {}; for (const g of gebieden()) m[g.id] = g; return m; };
 
   // de meetkunde (punt-in-vlak, afstand tot een lijnstuk, omhullende) staat in
   // ./meetkunde.js: pure rekenkunde, los na te rekenen
@@ -51,7 +50,15 @@ module.exports = (ctx) => {
 
   // ---- opvragen ----
 
-  const gebied = (id) => perId()[String(id || '')] || null;
+  /* Een opzoeking op id bouwde eerst een kaart van ALLE gebieden (perId) en
+     gooide die weg; pad() doet per niveau zo'n opzoeking. Dezelfde regel als
+     die kaart (de laatste met dit id wint, ids als tekst vergeleken), nu als
+     lezing van achteren naar voren zonder iets te bouwen. */
+  const gebied = (id) => {
+    const k = String(id || ''), lijst = gebieden();
+    for (let i = lijst.length - 1; i >= 0; i--) if (String(lijst[i].id) === k) return lijst[i];
+    return null;
+  };
   const kinderen = (id) => gebieden().filter(g => g.ouder === String(id || ''));
 
   /* De STAD-AS staat in ./steden.js: welke stad hoort bij dit gebied, welke

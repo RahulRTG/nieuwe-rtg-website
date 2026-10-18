@@ -15,7 +15,7 @@
 const { magKlokZien } = require('../../../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca, klokVan } = kern;
-  const { H, Hlees } = horeca;
+  const { H, Hlees, Hopener } = horeca;
   const wijk = require('../../../kern/horeca/wijk')({ horeca, schoon });
   /* Het wijkbeeld (hoeveel open werk draagt elke wijk) komt uit de WERKLIJST en
      wordt hier niet nog eens geteld: dat is dezelfde som die de PDA toont, en
@@ -106,16 +106,20 @@ module.exports = (kern) => {
      bestaat hij niet, dan is er niets te vinden en eindigt de aanroep sowieso
      op een 404 -- nu zonder spoor.
 
-     `zet` hieronder houdt daarom bewust H(): hij is de enige van de vier die
-     ook op een zaak zonder doos kan SLAGEN, want hij maakt de eerste wijk. Met
-     een leesdoos zou die eerste wijk in een losse vorm landen en verdwijnen.
-     Zijn keuring woont in kern/horeca/wijk.js, in dezelfde aanroep die
-     schrijft, dus de route kan er niet tussen komen zonder die keuring over te
-     typen -- en twee plekken die dezelfde regel kennen lopen uiteen. */
+     `zet` is de enige van de vier die ook op een zaak zonder doos kan SLAGEN,
+     want hij maakt de eerste wijk. Hij hield daarom H(), en dat liet een
+     spoor na: een manager die de naam vergat kreeg 400 en de zaak had opeens
+     een lege horecadoos (scripts/laatspoor.js). Nu keurt hij op de LEESvorm en
+     krijgt hij de opener mee; de doos ontstaat pas op het moment dat er een
+     wijk in gaat. De keuring blijft in kern/horeca/wijk.js, in dezelfde
+     aanroep die schrijft, dus de route hoeft haar niet over te typen -- en
+     twee plekken die dezelfde regel kennen lopen uiteen. */
   app.post('/api/supplier/horeca/wijk/zet', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const h = H(req.supplier.code);
-    const uit = wijk.zet(h, { wijkId: req.body.wijkId, naam: req.body.naam, tafels: req.body.tafels });
+    /* Keuren op de leesvorm, schrijven in de echte doos: `zet` opent hem pas
+       als er iets te schrijven valt (kern/horeca/wijk.js). */
+    const uit = wijk.zet(Hlees(req.supplier.code), { wijkId: req.body.wijkId, naam: req.body.naam, tafels: req.body.tafels },
+      Hopener(req.supplier.code));
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     save();
     logActivity(req.supplier.code, req.actor, 'zette wijk "' + uit.wijk.naam + '" op ' + uit.wijk.tafels.length + ' tafel(s)');

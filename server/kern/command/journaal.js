@@ -32,6 +32,7 @@ const MAX = 5000;
    Dit is geen tweede journaal: het is dezelfde module, één keer per eigenaar.
    De waarheid "wat is er in zaak X gebeurd" staat daarmee op precies één
    plek -- wat LAT.md regel 4 vraagt. */
+let releaseidentiteit = null; // lui geladen en daarna onthouden: zie de toelichting in opzet/handeling.js
 function maakJournaal({ db, save, crypto, vak, opslag, auditOpslag }) {
   let werkVak = null;
   const bron = typeof vak === 'function' ? vak : (() => opslag.vak());
@@ -87,7 +88,7 @@ function maakJournaal({ db, save, crypto, vak, opslag, auditOpslag }) {
     /* Audit P2-7: het verzoek en de release staan IN de regel en dus onder de
        zegel. Alleen wat bekend is; nooit een verzonnen waarde. */
     if (regel.verzoek) kern.verzoek = String(regel.verzoek).slice(0, 40);
-    const release = require('../../lib/releaseidentiteit').release();
+    const release = (releaseidentiteit || (releaseidentiteit = require('../../lib/releaseidentiteit'))).release();
     if (release) kern.release = release;
     if (auditOpslag && !werkVak) return auditOpslag.append(top => {
       const waarde = { ...kern, vorig: top?.zegel || null }; waarde.zegel = hash(waarde); return waarde;

@@ -21,7 +21,7 @@ const SOORTEN = ['verkoop', 'dienst', 'huur'];
    vandaan haalt. Twee lijstjes die hetzelfde bedoelen lopen uiteen -- en dat
    deden ze ook. */
 
-function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering }) {
+function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering, bijeen, inBundel }) {
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
@@ -29,16 +29,20 @@ function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify
   /* De motor- en loketlaag draaien als submodules op een gedeelde context,
      een keer opgebouwd bij het opstarten; de motor gaat eerst de context
      in omdat het loket (o.a. de AI) boekMetCodenaam gebruikt. */
+  /* De duurzame bundel voor de facturen die een MENS maakt of afboekt; zie
+     boekVast() in ./facturatie/motor.js voor waarom alleen die ingangen. */
+  const vastleggen = typeof bijeen === 'function'
+    ? require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'facturatie' }) : null;
   const ctx = { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering,
-    SOORTEN, nu, scho, rond };
+    SOORTEN, nu, scho, rond, vastleggen };
   const deelMotor = require('./facturatie/motor')(ctx);
   Object.assign(ctx, deelMotor);
   const deelLoket = require('./facturatie/loket')(ctx);
   Object.assign(ctx, deelLoket);
-  const { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, factuurBetaald } = deelMotor;
+  const { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, boekVast, factuurBetaald, factuurBetaaldVast } = deelMotor;
   const { publiek, vind, voorSupplier, voorLid, classificeer, mag, pdf, bedragUit, aantalUit, codenaamUit, ai } = deelLoket;
 
-  return { SOORTEN, boek, boekMetCodenaam, factuurBetaald, voorSupplier, voorLid, classificeer, vind, mag, pdf, publiek, standaardBtw, ai };
+  return { SOORTEN, boek, boekMetCodenaam, boekVast, factuurBetaald, factuurBetaaldVast, voorSupplier, voorLid, classificeer, vind, mag, pdf, publiek, standaardBtw, ai };
 }
 
 module.exports = { maakFacturatie };

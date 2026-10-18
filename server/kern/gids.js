@@ -11,13 +11,14 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
   /* Wordt bijgehouden zodra een lid iets doet: echte accounts (ook de gratis
      laag) staan in de codenaam-gids; alleen een anonieme demo-gast zonder
      account niet. */
+  let aanwezigheid = null; // lui geladen en daarna onthouden: zie de toelichting in opzet/handeling.js
   function dirTouch(sess) {
     if (!sess) return;
     if (sess.tier === 'guest' && !sess.account) return;
     const cn = liveCodename(sess);
     /* De dag van het laatste bezoek (kern/aanwezigheid.js) op hetzelfde keelgat,
        zodat "aanwezig" en "in de gids" niet op twee deuren iets anders betekenen. */
-    require('./aanwezigheid').raak(cn);
+    (aanwezigheid || (aanwezigheid = require('./aanwezigheid'))).raak(cn);
     // Met Postgres gaat het lid naar de geindexeerde ledengids (member_dir) en
     // NIET naar db.data.memberDir: zo groeit de gids buiten het geheugen en
     // staan er bij miljoenen leden geen miljoenen rijen in het proces.

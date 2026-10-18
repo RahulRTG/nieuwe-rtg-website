@@ -37,7 +37,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { toegestanePaden } = require('../server/kern/stuur/beleid');
 const { resolveer } = require('../server/kern/stuur/resolver');
 const { SYNONIEMEN } = require('../server/kern/stuur/resolver-woorden');
@@ -72,7 +72,7 @@ const VORMEN = {
 
 function routesUitRegister() {
   let reg;
-  try { reg = require('../IDEMPROEF.json'); } catch (e) { return null; }
+  try { reg = require('../IDEMPROEF.json'); } catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; return null; }
   return [...new Set((reg.perRoute || [])
     .filter(r => r && r.methode === 'POST' && typeof r.pad === 'string').map(r => r.pad))].sort();
 }
@@ -129,8 +129,8 @@ function main() {
   Object.assign(r, { stempel: stempel(),
     uitleg: 'Per toegestaan pad een gegenereerde vraag in zeven vervormingen; gemeten of de resolver dat pad dan in zijn werkveld houdt.',
     grens: 'Zegt alleen of het pad in het werkveld BLIJFT (dekking), niet of het bovenaan staat; en de zinnen zijn gegenereerd, geen echte vragen van leden.' });
-  fs.writeFileSync(path.join(WORTEL, 'RESOLVERBEREIK.json'), JSON.stringify(r, null, 1) + '\n');
-  console.log('\nRESOLVERBEREIK.json geschreven. Laagste dekking: ' + r.laagste + '%');
+  if (magSchrijven(eisSchoneBoom('resolverbereik'), 'RESOLVERBEREIK.json')) fs.writeFileSync(path.join(WORTEL, 'RESOLVERBEREIK.json'), JSON.stringify(r, null, 1) + '\n');
+  console.log('\nRESOLVERBEREIK: laagste dekking ' + r.laagste + '%');
   if (r.laagste < 100) { console.error('NIET OK: de resolver verbergt een vermogen.'); process.exit(1); }
 }
 

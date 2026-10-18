@@ -56,7 +56,7 @@ const path = require('path');
 const { start } = require('./lib/wegwerpserver');
 const { alleRoutes, rolVan } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
@@ -205,7 +205,7 @@ if (require.main !== module) return;
 
   /* Stapelen: vers wint, de rest blijft. */
   let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) {}
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
      liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
      wacht zijn die niets wacht. */
@@ -227,7 +227,7 @@ if (require.main !== module) return;
     perRoute[k] = v;
   }
 
-  fs.writeFileSync(UITSLAG, JSON.stringify({
+  if (magSchrijven(eisSchoneBoom('inhoudskaart'), UITSLAG)) fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Het ware antwoordprofiel per blinde route (status, sleutels, dragende velden), vastgelegd ' +
       'van een eerlijke run op een wegwerpserver. test/inhoudswacht.test.js dwingt deze profielen af; ' +

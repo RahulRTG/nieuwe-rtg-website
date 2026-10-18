@@ -75,7 +75,7 @@ module.exports = (kern, gedeeld) => {
 
      EERST NOTEREN, DAN PAS TERUGGEVEN: een inzage die halverwege misgaat mag
      geen gegevens hebben opgeleverd zonder regel in het journaal. */
-  app.post('/api/office/vakbewijs/nummer', kluisAuth, (req, res) => {
+  app.post('/api/office/vakbewijs/nummer', kluisAuth, async (req, res) => {
     const b = req.body || {};
     const sleutel = String(b.sleutel || '');
     const wat = String(b.wat || '');
@@ -88,14 +88,19 @@ module.exports = (kern, gedeeld) => {
 
     const m = /^lid:(\d+)$/.exec(sleutel);
     const wie = wieKijkt(req);
-    try {
-      inzagelog.noteer({
-        door: wie,
-        over: { id: m ? Number(m[1]) : null, codenaam: codenaamBijSleutel(sleutel) },
-        waarom: reden.slice(0, 300),
-        bron: 'backoffice/vakbewijs:' + wat
-      });
-    } catch (e) { /* het journaal mag de inzage niet blokkeren, wel altijd geprobeerd */ }
+    /* EERST NOTEREN betekende hier niets: noteer() stond in een lege catch, dus
+       een journaal dat faalde leverde het nummer gewoon op -- en het antwoord
+       zei er nog bij dat de inzage in het journaal stond (STILSPOOR.json). Nu
+       duurzaam en weigerend, zoals elke andere kluisdeur (LAT.md regel 21). */
+    const spoor = await inzagelog.noteerVast({
+      door: wie,
+      over: { id: m ? Number(m[1]) : null, codenaam: codenaamBijSleutel(sleutel) },
+      waarom: reden.slice(0, 300),
+      bron: 'backoffice/vakbewijs:' + wat
+    });
+    if (!spoor || !spoor.ok) {
+      return res.status((spoor && spoor.status) || 503).json({ error: 'Er is niets ingezien: deze inzage kon niet aantoonbaar in het journaal worden vastgelegd. Probeer het zo opnieuw.' });
+    }
     if (m && kern.sendPushToUser) {
       try {
         kern.sendPushToUser(Number(m[1]), { title: 'Uw vakbewijs is ingezien',

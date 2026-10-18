@@ -41,7 +41,7 @@ module.exports = ({ pak, snoei, save, nu, periodeVan, MAX_AANTAL }) => {
     rij[s.id] = Math.round((oud + (v - oud) / n) * 1e9) / 1e9;   // lopend gemiddelde
     rij.laatst = nu();
     snoei();
-    try { save(); } catch (e) {}
+    try { save(); } catch (e) { console.warn('[kosten] de meterstand niet bewaard:', e && e.message); }
     return true;
   }
 

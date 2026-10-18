@@ -163,6 +163,26 @@ test('geldbedrag canonicaliseert, exact doet dat met opzet niet', () => {
   assert.equal(contract.CANONIEK.valuta(' eur '), 'EUR');
 });
 
+/* DE TWEE VERKLARINGEN VAN 18 OKTOBER 2026: bank.akkoord en
+   pay.partner.uitbetaal. Ze vervingen een hand-gebouwde afdruk, en die afdruk
+   STAAT in de database naast elke bestaande sleutel (lib/idem.js: a[sleutel] =
+   afdruk). Levert het contract ook maar een teken anders op, dan krijgt elke
+   herhaling van een oud verzoek 409 "al gebruikt voor een ander verzoek". */
+test('bank.akkoord en pay.partner.uitbetaal: byte voor byte de oude afdruk, en de handler gebruikt hem', () => {
+  assert.equal(contract.identiteitVan('bank.akkoord', { codenaam: 'Blauwe Fenix 8427' }), 'bankakkoord|Blauwe Fenix 8427');
+  assert.equal(contract.identiteitVan('pay.partner.uitbetaal', { supplierCode: 'KIKUNOI' }), 'uit|KIKUNOI');
+  assert.match(bron('server/kern/bank/ledenbank.js'), /identiteitVan\('bank\.akkoord', \{ codenaam: c \}\)/,
+    'ledenAkkoord() hoort zijn afdruk uit het contract te halen');
+  assert.match(bron('server/kern/pay/partner-uitbetaal.js'), /identiteitVan\('pay\.partner\.uitbetaal', \{ supplierCode \}\)/,
+    'partnerUitbetaal() hoort zijn afdruk uit het contract te halen');
+  /* Het bedrag hoort met opzet NIET in de identiteit van een uitbetaling: het
+     beschikbare saldo verschilt legitiem per poging. */
+  assert.equal(contract.identiteitVan('pay.partner.uitbetaal', { supplierCode: 'KIKUNOI', bedrag: 10 }),
+    contract.identiteitVan('pay.partner.uitbetaal', { supplierCode: 'KIKUNOI', bedrag: 99 }));
+  /* Geld dat het huis verlaat, wordt nooit vanzelf opnieuw afgeleverd. */
+  assert.equal(contract.CONTRACTEN['pay.partner.uitbetaal'].levering, 'MENS_ERBIJ');
+});
+
 test('geen contract is iets anders dan een lege identiteit', () => {
   assert.equal(contract.identiteitVan('bestaat.niet', { a: 1 }), null);
   /* En twee verschillende onverklaarde handelingen vallen dus niet samen: ze

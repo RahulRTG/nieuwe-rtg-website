@@ -340,7 +340,7 @@ function rolproefUitslag() {
     for (const r of (Array.isArray(j.nietTeKruisen) ? j.nietTeKruisen : []))
       kaart.nvt.set(r.methode + ' ' + r.pad, r);
     return kaart;
-  } catch (e) { return null; }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 /* De handelingproef per route: liet een geslaagde oproep een geketende regel na
@@ -354,7 +354,7 @@ function handelingproefUitslag() {
     const kaart = new Map();
     for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
     return kaart;
-  } catch (e) { return null; }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 /* De invoerproef en de idempotentieproef: allebei per METHODE+pad een regel.
@@ -427,7 +427,7 @@ function poortwachtUitslag() {
     const kaart = new Map();
     for (const p of j.perRoute) kaart.set(p.methode + ' ' + p.pad, p);
     return kaart;
-  } catch (e) { return null; }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -862,7 +862,7 @@ function bouw(invoer) {
    en zou daardoor "verbeterd" melden -- de vervelendste soort vals groen.
    ------------------------------------------------------------------------- */
 function vorige() {
-  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; }
+  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 /* Zonder de rijen: die maken het bestand tientallen megabytes en de git-diff

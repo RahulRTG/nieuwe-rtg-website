@@ -71,7 +71,7 @@ module.exports = ({ journaal, sein, foutmelder }) => {
       journaal.noteer({ actie: richting === 'aan' ? 'alarm aan' : 'alarm af', actor: 'automaat',
         niveau: NIVEAUS.auto, objectType: 'alarm', objectId: a.id,
         reden: a.naam + (richting === 'aan' ? ': ' + a.wat : ' is opgelost') + (stil ? ' (stilgezet)' : '') });
-    } catch (e) { /* een journaalstoring mag het alarm niet dempen */ }
+    } catch (e) { /* een journaalstoring mag het alarm niet dempen -- maar zwijgen doet hij ook niet */ console.warn('[alarm] de journaalregel van het alarm niet vastgelegd:', e && e.message); }
     if (stil) return;
     if (typeof sein === 'function') {
       try { sein('sync', { scope: 'alarm', id: a.id, richting, ernst: a.ernst, naam: a.naam }); } catch (e) {}

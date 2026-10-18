@@ -117,11 +117,13 @@ module.exports = (kern) => {
      uitval en naspeelwerk. Compact en zonder zaakdata, achter de sleutel. */
   app.post('/api/doos/rapport', (req, res) => {
     if (!doosSleutelOk(req, res, 'rapport')) return;
-    if (!Array.isArray(db.data.doosRapporten)) db.data.doosRapporten = [];
     const b = req.body || {};
     // met een eigen sleutel rapporteert een doos alleen over zichzelf en zijn zaak
     if (req.doosZaak && b.zaak != null && String(b.zaak).toUpperCase() !== req.doosZaak)
       return res.status(403).json({ error: 'Deze sleutel rapporteert alleen voor zijn eigen zaak.' });
+    /* De la pas NA de keuring neerzetten: een geweigerd rapport (403) liet hier
+       een lege doosRapporten achter (scripts/laatspoor.js). */
+    if (!Array.isArray(db.data.doosRapporten)) db.data.doosRapporten = [];
     db.data.doosRapporten.unshift({
       doos: req.doosBewezen || String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40), zaak: req.doosZaak || null,
       datum: /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum)) ? String(b.datum) : new Date().toISOString().slice(0, 10),

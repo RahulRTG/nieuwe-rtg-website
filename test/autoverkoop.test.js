@@ -88,3 +88,39 @@ test('5. de zaak voegt een auto toe aan de showroom', async () => {
   const o = await api(base, '/api/supplier/verkoop/overzicht', {}, dealer);
   assert.ok(o.body.showroom.some(a => /RS6/.test(a.naam)), 'de nieuwe auto staat in de showroom');
 });
+
+/* /api/verkoop/inruil: alleen laten taxeren, zonder te kopen. Er ontstaat een
+   koopdeal op de vraagprijs (geen bod), met de gegevens van de inruilauto en nog
+   zonder taxatiebedrag -- dat bedrag zet de zaak, niet het lid.
+   Zonder inruilgegevens geen aanvraag, en een auto die niet te koop staat, kent
+   hij niet.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/autoverkoop/deal.js de grendel
+   `!(inruil.merk || inruil.model)` op `false`; de toets zakte op "zonder merk of
+   model geen taxatie". */
+test('inruil: alleen laten taxeren levert een taxatie-deal op, zonder verzonnen bedrag', async () => {
+  const sr = await api(base, '/api/verkoop/showroom', {}, lid);
+  assert.ok(sr.body.autos.length > 0, 'er staat iets in de showroom');
+  const auto = sr.body.autos[sr.body.autos.length - 1];
+
+  const leeg = await api(base, '/api/verkoop/inruil', { supplierCode: auto.supplierCode, autoId: auto.id, inruil: {} }, lid);
+  assert.equal(leeg.status, 400, 'zonder merk of model geen taxatie');
+  const onbekend = await api(base, '/api/verkoop/inruil',
+    { supplierCode: auto.supplierCode, autoId: 'bestaat-niet', inruil: { merk: 'Fiat', model: 'Panda' } }, lid);
+  assert.equal(onbekend.status, 404);
+  assert.equal((await api(base, '/api/verkoop/inruil',
+    { supplierCode: auto.supplierCode, autoId: auto.id, inruil: { merk: 'Fiat' } }, null)).status, 401);
+
+  const r = await api(base, '/api/verkoop/inruil',
+    { supplierCode: auto.supplierCode, autoId: auto.id, inruil: { merk: 'Fiat', model: 'Panda', jaar: 2014, km: 98000 } }, lid);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+  const ref = r.body.deal.ref;
+  const mijn = await api(base, '/api/verkoop/mijn', {}, lid);
+  const d = mijn.body.deals.find(x => x.ref === ref);
+  assert.ok(d, 'de taxatie-aanvraag staat bij het lid');
+  assert.equal(d.soort, 'koop');
+  assert.equal(d.status, 'aangevraagd');
+  assert.equal(d.prijs, d.vraagprijs, 'geen bod: de vraagprijs staat');
+  assert.equal(d.inruil.merk, 'Fiat');
+  assert.equal(d.inruil.km, 98000);
+  assert.equal(d.inruil.taxatie, null, 'het lid zet geen taxatiebedrag; dat doet de zaak');
+});

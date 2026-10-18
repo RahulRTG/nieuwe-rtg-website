@@ -3,12 +3,12 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-15T19:37:10.834Z",
-  "commit": "ab1d21598",
+  "op": "2026-10-18T12:58:20.970Z",
+  "commit": "32e5ba8ad",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "gemeten": {
   "artefacten": 390,
@@ -20,7 +20,7 @@
   "afgeleidZonderEigenaar": 1,
   "metEigenaar": 233,
   "afgeleidEigenaarHard": 204,
-  "afgeleidGrendelt": 29,
+  "afgeleidGrendelt": 69,
   "metStempel": 129,
   "stempelAnders": 0
  },
@@ -218,7 +218,7 @@
    "stempelInstrument": "scripts/appwerkt.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run appwerkt",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -406,7 +406,7 @@
    "stempelInstrument": "scripts/beproeving.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run beproeving",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1120,7 +1120,7 @@
    "stempelInstrument": "scripts/droogloop.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run droogloop",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1134,7 +1134,7 @@
    "stempelInstrument": "scripts/duurzaamheidskosten.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/duurzaamheidskosten.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1172,7 +1172,7 @@
    "stempelInstrument": "scripts/edgedekking.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run edgedekking",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1186,7 +1186,7 @@
    "stempelInstrument": "scripts/edgekaart.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run edgekaart",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1200,7 +1200,7 @@
    "stempelInstrument": "scripts/eersteminuut.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run eersteminuut",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1317,7 +1317,7 @@
    "stempelInstrument": "scripts/factuurproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run factuurproef:vast",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1431,7 +1431,7 @@
    "stempelInstrument": "scripts/gelddekking.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run gelddekking",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1459,7 +1459,7 @@
    "stempelInstrument": "scripts/geldkaart.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run geldkaart",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1591,7 +1591,7 @@
    "stempelInstrument": "scripts/gluurronde.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/gluurronde.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1742,7 +1742,7 @@
    "stempelInstrument": "scripts/heapproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run heapproef",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1832,7 +1832,7 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run herstelproef",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1870,7 +1870,7 @@
    "stempelInstrument": "scripts/idemidentiteit.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run idemidentiteit",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -1926,7 +1926,7 @@
    "stempelInstrument": "scripts/inhoudskaart.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/inhoudskaart.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2068,7 +2068,7 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2110,7 +2110,7 @@
    "stempelInstrument": "scripts/ketenronde.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=ketenronde",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2216,7 +2216,7 @@
    "stempelInstrument": "scripts/laatspoor.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/laatspoor.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2228,7 +2228,7 @@
    "stempelInstrument": "scripts/beproeving.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run beproeving",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2538,7 +2538,7 @@
    "stempelInstrument": "scripts/lussen.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run lussen",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2774,7 +2774,7 @@
    "stempelInstrument": "scripts/mensmutatie.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run mensmutatie",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -2800,7 +2800,7 @@
    "stempelInstrument": "scripts/menstaalproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run menstaalproef",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3229,7 +3229,7 @@
    "stempelInstrument": "scripts/onderzoeksketen.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run onderzoeksketen",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3306,7 +3306,7 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=outputproef",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": true
   },
   {
@@ -3348,7 +3348,7 @@
    "stempelInstrument": "scripts/pakte.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/pakte.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3464,7 +3464,7 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=poortwacht",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3566,7 +3566,7 @@
    "stempelInstrument": "scripts/railvergelijk.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run railvergelijk",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3668,7 +3668,7 @@
    "stempelInstrument": "scripts/resolverbereik.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run resolverbereik",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3736,7 +3736,7 @@
    "stempelInstrument": "scripts/rolronde.js",
    "stempelAnders": false,
    "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/rolronde.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4088,7 +4088,7 @@
    "stempelInstrument": "scripts/schilherstart.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run schilherstart",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4258,7 +4258,7 @@
    "stempelInstrument": "scripts/staatproef-route.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=staatproef",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4352,7 +4352,7 @@
    "stempelInstrument": "scripts/test-runner.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm test",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4380,7 +4380,7 @@
    "stempelInstrument": "scripts/taalkwaliteit.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run taalkwaliteit",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4406,7 +4406,7 @@
    "stempelInstrument": "scripts/taalschil.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run taalschil",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4446,7 +4446,7 @@
    "stempelInstrument": "scripts/tekstoppervlak.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run tekstoppervlak",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4472,7 +4472,7 @@
    "stempelInstrument": "scripts/tikken.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run tikken",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4610,7 +4610,7 @@
    "stempelInstrument": "scripts/tredeproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/tredeproef.js --alle --vastleggen",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4718,7 +4718,7 @@
    "stempelInstrument": "scripts/verraadronde.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/verraadronde.js",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4796,7 +4796,7 @@
    "stempelInstrument": "scripts/vindbaar.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run vindbaar",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -4966,7 +4966,7 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run wereldstijl",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

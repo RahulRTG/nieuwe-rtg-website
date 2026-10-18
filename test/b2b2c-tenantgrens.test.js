@@ -359,6 +359,12 @@ test('externe persoonscode: code A plus bekende gift-id B opent niets van B', as
 });
 
 test('oude zakelijke sessie en lidToken verliezen direct hun ingetrokken recht en lidmaatschap', async () => {
+  /* Eerst de gevulde kant: zolang het lidmaatschap loopt, staat de werkruimte
+     in beide lijsten. Zonder deze helft zeggen de lege lijsten hieronder niets. */
+  const mijnVoor = await bedrijf('/mijn', {}, A.sessie);
+  assert.equal(mijnVoor.body.werkruimtes.length, 1, 'zolang het lid in dienst is, staat zijn werkruimte erin');
+  const bootstrapVoor = await post('/api/tenant/bootstrap/mijn', {}, A.sessie);
+  assert.equal(bootstrapVoor.body.werkruimtes.length, 1, 'ook in de bootstrap');
   const rolWeg = await bedrijf('/lid/rollen', {
     werkruimte: A.werkruimte,
     beheerToken: A.beheerToken,

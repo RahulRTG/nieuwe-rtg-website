@@ -7,7 +7,7 @@ const { startServer, stop } = require('./helper');
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-one-'));
-const api = (pad, body, auth = token) => fetch(base + '/api/rtgone/' + pad, {
+const api = (pad, body, auth = token) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/rtgone/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(auth ? { Authorization: 'Bearer ' + auth } : {}) }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -20,10 +20,10 @@ test.before(async () => {
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('RTG One is dicht zonder kantooridentiteit en houdt de twee huizen gescheiden', async () => {
-  assert.equal((await api('state', { huis: 'rtg' }, null)).status, 401);
-  assert.equal((await api('intentie', { huis: 'rtg', titel: 'Netto reizen', waarom: 'Leden betalen transparant' })).status, 200);
-  assert.equal((await api('intentie', { huis: 'rtf', titel: 'Kinderen eerst', waarom: 'Iedere keuze beschermt het kind' })).status, 200);
-  const rtg = await api('state', { huis: 'rtg' }), rtf = await api('state', { huis: 'rtf' });
+  assert.equal((await api('/api/rtgone/state', { huis: 'rtg' }, null)).status, 401);
+  assert.equal((await api('/api/rtgone/intentie', { huis: 'rtg', titel: 'Netto reizen', waarom: 'Leden betalen transparant' })).status, 200);
+  assert.equal((await api('/api/rtgone/intentie', { huis: 'rtf', titel: 'Kinderen eerst', waarom: 'Iedere keuze beschermt het kind' })).status, 200);
+  const rtg = await api('/api/rtgone/state', { huis: 'rtg' }), rtf = await api('/api/rtgone/state', { huis: 'rtf' });
   assert.equal(rtg.body.intenties.length, 1); assert.equal(rtf.body.intenties.length, 1);
   assert.equal(rtg.body.intenties[0].titel, 'Netto reizen'); assert.equal(rtf.body.intenties[0].titel, 'Kinderen eerst');
   assert.equal(rtg.body.vandaag.persoonlijk, false, 'een gedeelde kantoorcode wordt eerlijk als tijdelijke toegang gemarkeerd');
@@ -32,7 +32,7 @@ test('RTG One is dicht zonder kantooridentiteit en houdt de twee huizen gescheid
 test('Vandaag verzamelt echte open taken uit het gekozen RTF-huis', async () => {
   const m = await fetch(base + '/api/rtfkantoor/kamer/taak', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ id: 'sales', tekst: 'Controleer de nieuwe clubaanvraag' }) });
   assert.equal(m.status, 200);
-  const s = await api('state', { huis: 'rtf' });
+  const s = await api('/api/rtgone/state', { huis: 'rtf' });
   assert.ok(s.body.vandaag.items.some(x => x.titel === 'Controleer de nieuwe clubaanvraag' && x.soort === 'rtf'));
   assert.ok(s.body.vandaag.telling.taken >= 1);
 });
@@ -43,31 +43,31 @@ test('de twee Project Room-schrijfdeuren bestaan en blijven zonder kantooridenti
   });
   assert.equal((await zonderIdentiteit('/api/rtgone/project/bewijs')).status, 401);
   assert.equal((await zonderIdentiteit('/api/rtgone/project/oplever')).status, 401);
-  assert.equal((await api('project/bewijs', { projectId: 'onbekend' })).status, 404,
+  assert.equal((await api('/api/rtgone/project/bewijs', { projectId: 'onbekend' })).status, 404,
     'na de kantoorpoort bereikt bewijs de echte Project Room-deur');
-  assert.equal((await api('project/oplever', { projectId: 'onbekend' })).status, 404,
+  assert.equal((await api('/api/rtgone/project/oplever', { projectId: 'onbekend' })).status, 404,
     'na de kantoorpoort bereikt opleveren de echte Project Room-deur');
 });
 
 test('het frictiegrootboek rekent minuten en geld per jaar exact door', async () => {
-  const r = await api('frictie', { huis: 'rtg', naam: 'Handmatig facturen zoeken', minuten: 12, frequentie: 5, uurloon: 45 });
+  const r = await api('/api/rtgone/frictie', { huis: 'rtg', naam: 'Handmatig facturen zoeken', minuten: 12, frequentie: 5, uurloon: 45 });
   assert.equal(r.status, 200); assert.equal(r.body.frictie.jaarMinuten, 3120); assert.equal(r.body.frictie.jaarCenten, 234000);
-  const s = await api('state', { huis: 'rtg' }); assert.equal(s.body.stats.frictieUren, 52); assert.equal(s.body.stats.frictieEuro, 2340);
+  const s = await api('/api/rtgone/state', { huis: 'rtg' }); assert.equal(s.body.stats.frictieUren, 52); assert.equal(s.body.stats.frictieEuro, 2340);
 });
 
 test('een levende overdracht neemt open beloften van de medewerker mee', async () => {
-  const b = await api('belofte', { huis: 'rtf', belofte: 'Bel de club woensdag', eigenaar: 'Noor', aan: 'FC Havenstad', deadline: '2026-08-20' });
+  const b = await api('/api/rtgone/belofte', { huis: 'rtf', belofte: 'Bel de club woensdag', eigenaar: 'Noor', aan: 'FC Havenstad', deadline: '2026-08-20' });
   assert.equal(b.status, 200);
-  const o = await api('overdracht', { huis: 'rtf', eigenaar: 'Noor', naar: 'Sam', geldigTot: '2026-08-30', context: 'Noor is met verlof.' });
+  const o = await api('/api/rtgone/overdracht', { huis: 'rtf', eigenaar: 'Noor', naar: 'Sam', geldigTot: '2026-08-30', context: 'Noor is met verlof.' });
   assert.equal(o.status, 200); assert.equal(o.body.overdracht.beloften.length, 1); assert.equal(o.body.overdracht.beloften[0].id, b.body.belofte.id);
 });
 
 test('automatisering toont de wijziging vooraf, voert uit en draait terug', async () => {
-  const b = await api('belofte', { huis: 'rtg', belofte: 'Lever directierapport', eigenaar: 'Rahul' });
-  const v = await api('automatisering/voorbereid', { huis: 'rtg', belofteId: b.body.belofte.id });
+  const b = await api('/api/rtgone/belofte', { huis: 'rtg', belofte: 'Lever directierapport', eigenaar: 'Rahul' });
+  const v = await api('/api/rtgone/automatisering/voorbereid', { huis: 'rtg', belofteId: b.body.belofte.id });
   assert.equal(v.status, 200); assert.deepEqual(v.body.automatisering.voor, { status: 'open' }); assert.deepEqual(v.body.automatisering.na, { status: 'afgerond' });
-  const u = await api('automatisering/voer', { id: v.body.automatisering.id }); assert.equal(u.body.belofte.status, 'afgerond');
-  const h = await api('automatisering/herstel', { id: v.body.automatisering.id }); assert.equal(h.body.belofte.status, 'open'); assert.equal(h.body.automatisering.status, 'teruggedraaid');
+  const u = await api('/api/rtgone/automatisering/voer', { id: v.body.automatisering.id }); assert.equal(u.body.belofte.status, 'afgerond');
+  const h = await api('/api/rtgone/automatisering/herstel', { id: v.body.automatisering.id }); assert.equal(h.body.belofte.status, 'open'); assert.equal(h.body.automatisering.status, 'teruggedraaid');
 });
 
 test('Decision Room: expertise, persoonlijke identiteit en vier ogen zijn hard afgedwongen', () => {

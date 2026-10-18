@@ -36,7 +36,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const INDEX = path.join(WORTEL, 'public', 'shared', 'sprongindex.json');
@@ -388,7 +388,7 @@ if (require.main !== module) return;
     bron: 'public/shared/sprongindex.json (afgeleid van MAPPEN) + een browsermeting',
     werelden
   };
-  if (!alleen) fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
+  if (!alleen && magSchrijven(eisSchoneBoom('wereldstijl'), UIT)) fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
 
   for (const w of werelden) {
     const t = w.telling;

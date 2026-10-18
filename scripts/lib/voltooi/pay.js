@@ -26,7 +26,7 @@
    ========================================================================== */
 'use strict';
 const crypto = require('crypto');
-const { geverifieerdLid, gebondenToestel, KANTOORWERELD } = require('../voltooiwereld');
+const { geverifieerdLid, gebondenToestel, inloggen, KANTOORWERELD } = require('../voltooiwereld');
 const simulatiebank = require('../../../server/betaal/synthetisch');
 
 const OPLAAD = '/api/pay/oplaad';
@@ -50,7 +50,7 @@ const oplaadregels = (r) => ((r && r.data && r.data.geschiedenis) || []).filter(
 
 async function loop(w, stap) {
   const lid = await geverifieerdLid(w, 'pay');
-  let toestel = await gebondenToestel(w, lid.token);
+  const toestel = await gebondenToestel(w, lid.token);
   const post = async (pad, lijf) => w.post(pad, lijf, lid.token, await toestel.bewijs('POST', pad));
   const overzicht = () => post(OVERZICHT, {});
   let codenaam = null;
@@ -120,6 +120,14 @@ async function loop(w, stap) {
       stand('geweigerd').join() === 'GEWEIGERD' && stand('teruggeboekt').join() === 'GEWEIGERD' &&
       stand('open').join() === 'WACHT_OP_KLANT' && !JSON.stringify(waarheid).includes(lid.token),
       ziet: waarheid.length + ' betalingen: ' + waarheid.map((b) => b.providerStatus + '=' + b.status).join(', ') };
+  });
+
+  await stap('persistent', 'na de herstart logt het lid opnieuw in op een nieuw toestel en ziet hetzelfde saldo', async () => {
+    const tok = await inloggen(w, lid);
+    const ander = await gebondenToestel(w, tok);
+    const o = await w.post(OVERZICHT, {}, tok, await ander.bewijs('POST', OVERZICHT));
+    return { klopt: o.status === 200 && o.data.codenaam === codenaam && o.data.saldo === BEDRAG && oplaadregels(o).length === 1,
+      ziet: 'nieuwe sessie ' + o.status + ', saldo ' + (o.data && o.data.saldo) + ', ' + oplaadregels(o).length + ' oplaadregel' };
   });
 
   /* ---------------- herstelbaar ---------------- */

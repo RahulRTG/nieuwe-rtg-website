@@ -151,6 +151,16 @@ test('een leeg btw-veld is niet hetzelfde als nul procent', () => {
   assert.equal(echt.btwBedrag, 0);
 });
 
+/* De factuurmotor rekent het btw-deel sinds 18 oktober 2026 in zijn eigen deel
+   (server/kern/facturatie/btw.js). De motor MOET dat deel laden; de bron die
+   deze toetsen lezen is dan de motor plus dat deel, en niets daarbuiten. */
+function factuurmotorBron() {
+  const fs = require('fs');
+  const motor = fs.readFileSync('server/kern/facturatie/motor.js', 'utf8');
+  assert.ok(motor.includes("require('./btw')"), 'de factuurmotor hoort zijn btw-deel te laden');
+  return motor + '\n' + fs.readFileSync('server/kern/facturatie/btw.js', 'utf8');
+}
+
 test('de bouwer rekent met dezelfde som als de factuurmotor', () => {
   const regels = [{ omschrijving: 'A', aantal: 3, stuk: 33.33, btw: 21 },
     { omschrijving: 'B', aantal: 1, stuk: 19.99, btw: 9 }];
@@ -160,7 +170,7 @@ test('de bouwer rekent met dezelfde som als de factuurmotor', () => {
   assert.equal(viaBouwer.subtotaal, viaSom.subtotaal);
   assert.equal(viaBouwer.btwBedrag, viaSom.btwBedrag);
 
-  const motor = require('fs').readFileSync('server/kern/facturatie/motor.js', 'utf8');
+  const motor = factuurmotorBron();
   assert.ok(motor.includes("require('../regelsom')"),
     'en de factuurmotor rekent hem ook daar: een offerte die anders afrondt dan de factuur is onuitlegbaar');
 });
@@ -182,7 +192,7 @@ test('het btw-tarief komt uit dezelfde fiscale laag als dat van de facturatie', 
   // bron: geen eigen kopie meer, in geen van beide bestanden
   const fs = require('fs');
   for (const p of ['server/kern/onderneming/offertebouw.js', 'server/kern/facturatie/motor.js']) {
-    const bron = fs.readFileSync(p, 'utf8');
+    const bron = p.endsWith('motor.js') ? factuurmotorBron() : fs.readFileSync(p, 'utf8');
     assert.ok(bron.includes("require('../fiscaal/tarief')") || bron.includes("require('../../fiscaal/tarief')") || bron.includes("../fiscaal/tarief"),
       p + ' hoort de fiscale laag te lezen');
     assert.ok(!/LAAG_BTW_TYPES\s*=\s*\[/.test(bron),

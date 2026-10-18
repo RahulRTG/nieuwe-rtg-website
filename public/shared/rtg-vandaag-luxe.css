@@ -207,7 +207,9 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompaslijs
   color:var(--rtg-v-ink)!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] #reisdossier{
-  margin:1rem 0 0!important;padding:clamp(1.2rem,2.5vw,2rem)!important
+  /* Alleen de verticale marge: de horizontale is van de V4-cover, die het
+     dossier randloos over de volle breedte legt. */
+  margin-block:1rem 0!important;padding:clamp(1.2rem,2.5vw,2rem)!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .lifelagen button{
   border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important;color:var(--rtg-v-muted)!important

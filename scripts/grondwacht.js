@@ -100,11 +100,27 @@ function opvolger(kalender, huidig, nu) {
 
    Onenigheid is hier geen schoonheidsfoutje: de CI toetst dan een andere
    runtime dan de container draait, en dat is de klasse fout die pas in
-   productie zichtbaar wordt. */
+   productie zichtbaar wordt.
+
+   PIN EN BAND zijn twee soorten waarheid, en die mag deze meter niet op
+   een hoop gooien. .nvmrc, de Dockerfile en een `node-version` in een
+   workflow zeggen WELKE runtime draait: dat is een pin, en pinnen moeten
+   het eens zijn. `engines.node` zegt welke runtimes het huis VERDRAAGT
+   (">=22.13 <27", de engines-band uit test/journaalschrijf.test.js): dat is
+   een band, en de vraag daar is niet "is hij gelijk aan de pin" maar "valt
+   de pin erbinnen". De eerste versie las van ">=22.13 <27" alleen de 22 en
+   meldde dat als onenigheid met .nvmrc=26 -- een harde bevinding over iets
+   wat de CI en de container helemaal niet scheidt, en de wacht stond daarop
+   wekenlang rood (runs 6-9, issue #293). Een pin BUITEN de band is wel
+   hard: dan draait de CI of de container op een runtime die het huis zelf
+   onverdraagbaar noemt. Een band die we niet kunnen lezen valt terug op de
+   strenge lezing (alleen de major, als pin), nooit op "past wel". */
 function eenWaarheid(bronnen) {
   const bevindingen = [];
   const gevonden = bronnen.filter(b => b.major !== null);
   const ontbreekt = bronnen.filter(b => b.major === null);
+  const banden = gevonden.filter(b => b.band);
+  const pinnen = gevonden.filter(b => !b.band);
 
   for (const b of ontbreekt) {
     bevindingen.push({
@@ -116,18 +132,60 @@ function eenWaarheid(bronnen) {
     });
   }
 
-  const majors = [...new Set(gevonden.map(b => b.major))];
+  const majors = [...new Set(pinnen.map(b => b.major))];
   if (majors.length > 1) {
     bevindingen.push({
       code: 'VERSIES_ONEENS',
       ernst: 'hard',
-      wat: 'De Node-versie verschilt per plek: ' + gevonden.map(b => `${b.naam}=${b.major}`).join(', ') + '.',
+      wat: 'De Node-versie verschilt per plek: ' + pinnen.map(b => `${b.naam}=${b.major}`).join(', ') + '.',
       waarom: 'De CI toetst dan een andere runtime dan de container draait. Dat is geen verschil in smaak maar een gat in het bewijs: groen in de CI zegt niets over de versie die de klant raakt.',
       doen: 'Zet alle bronnen op dezelfde major.'
     });
   }
 
-  return { bevindingen, major: majors.length === 1 ? majors[0] : null, bronnen: gevonden };
+  for (const band of banden) {
+    const buiten = pinnen.filter(p => p.major < band.band.min || p.major > band.band.max);
+    if (!buiten.length) continue;
+    bevindingen.push({
+      code: 'VERSIE_BUITEN_BAND',
+      ernst: 'hard',
+      wat: `${buiten.map(p => `${p.naam}=${p.major}`).join(', ')} valt buiten ${band.naam} (${band.tekst}).`,
+      waarom: 'De CI of de container draait dan op een runtime die het huis zelf niet verdraagt. Groen daar zegt niets over de band die we beloven.',
+      doen: 'Zet de pin binnen de band, of verleg de band -- en dan bewust, want de band is een belofte aan wie het huis draait.'
+    });
+  }
+
+  /* Zonder pinnen is er geen draaiende waarheid; dan geldt de bodem van de
+     band, zoals voorheen. */
+  const major = majors.length === 1 ? majors[0]
+    : (majors.length === 0 && banden.length === 1 ? banden[0].major : null);
+  return { bevindingen, major, bronnen: gevonden };
+}
+
+/* De band uit een engines-range: ">=22.13 <27" wordt { min: 22, max: 26 }.
+   Alleen vormen die een enkel interval geven (>=, >, <, <=, ^, ~, = en een
+   kale versie, met spaties als EN). Een `||`, een `-`-range of iets
+   onleesbaars geeft null, en dan leest versiebronnen() de bron als pin: de
+   strenge kant, nooit "past wel". */
+function bandUit(tekst) {
+  if (typeof tekst !== 'string' || !tekst.trim() || tekst.includes('||')) return null;
+  let min = 0;
+  let max = Infinity;
+  for (const deel of tekst.trim().split(/\s+/)) {
+    const m = /^(>=|<=|>|<|\^|~|=)?v?(\d+)(?:\.(\d+|x|\*))?(?:\.(\d+|x|\*))?$/.exec(deel);
+    if (!m) return null;
+    const op = m[1] || '';
+    const maj = Number(m[2]);
+    const rest = [m[3], m[4]].filter(x => x !== undefined && x !== 'x' && x !== '*').map(Number);
+    const alleenMajor = rest.every(n => n === 0);
+    if (op === '>=') min = Math.max(min, maj);
+    else if (op === '>') min = Math.max(min, rest.length === 0 ? maj + 1 : maj);
+    else if (op === '<') max = Math.min(max, alleenMajor ? maj - 1 : maj);
+    else if (op === '<=') max = Math.min(max, maj);
+    else { min = Math.max(min, maj); max = Math.min(max, maj); }   // ^N, ~N, =N, N
+  }
+  if (min > max) return null;
+  return { min, max };
 }
 
 /* De versie uit een tekst peuteren. Bewust ruim: '22', 'v22', '22.11.0',
@@ -148,8 +206,10 @@ function versiebronnen(wortel) {
   const pkgTekst = lees('package.json');
   let engines = null;
   try { engines = pkgTekst ? (JSON.parse(pkgTekst).engines || {}).node : null; } catch { engines = null; }
+  const band = bandUit(engines);
   bronnen.push({
-    naam: 'package.json engines.node', major: majorUit(engines), verplicht: true,
+    naam: 'package.json engines.node', major: band ? band.min : majorUit(engines), verplicht: true,
+    ...(band ? { band, tekst: engines } : {}),
     hoe: 'Zet "engines": { "node": ">=22" } in package.json; npm waarschuwt dan zelf bij een verkeerde versie.'
   });
 
@@ -378,4 +438,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { eol, opvolger, eenWaarheid, majorUit, versiebronnen, vlaggenInGebruik, vlagbevindingen, vlagstand, ronde, toon };
+module.exports = { eol, opvolger, eenWaarheid, majorUit, bandUit, versiebronnen, vlaggenInGebruik, vlagbevindingen, vlagstand, ronde, toon };

@@ -91,3 +91,38 @@ test('4. herhaal-onderhoud: interval per dienst, alleen de eigenaar', async () =
   const pro = await api(base, '/api/supplier/vak/pro', {}, zaak.token);
   assert.ok(Array.isArray(pro.body.onderhoud), 'de onderhoudslijst bestaat (vers werk is nog niet aan de beurt)');
 });
+
+/* 5. /api/vak/offerte/intrek: het lid trekt een aanvraag in zolang hij nog geen
+   akkoord gaf; de zaak ziet hem dan als ingetrokken en kan er geen akkoord meer
+   op krijgen. Een akkoord-offerte trekt het lid niet meer in (dan is er een
+   boeking), en een ander lid raakt hem niet aan.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/vakwerk/pro.js de 409-grendel
+   `o.status === 'akkoord'` in offerteIntrek() op `false`; de toets zakte op "na
+   akkoord trekt het lid niet meer in". */
+test('5. intrekken: voor het akkoord wel, erna niet, en alleen de eigen aanvraag', async () => {
+  const vraag = await api(base, '/api/vak/offerte/vraag',
+    { supplierCode: 'CASTELL', omschrijving: 'Dakgoot reinigen en nakijken op lekkage' }, lid.token);
+  assert.equal(vraag.status, 200);
+  const id = vraag.body.offerte.id;
+  assert.equal((await api(base, '/api/supplier/vak/offerte/antwoord', { id, prijs: 120 }, zaak.token)).status, 200);
+
+  const u = Date.now().toString().slice(-8);
+  const ander = (await api(base, '/api/auth/register', { name: 'Buur', email: 'bu' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.equal((await api(base, '/api/vak/offerte/intrek', { id }, ander)).status, 404, 'andermans offerte bestaat hier niet');
+  assert.equal((await api(base, '/api/vak/offerte/intrek', { id }, null)).status, 401);
+
+  const weg = await api(base, '/api/vak/offerte/intrek', { id }, lid.token);
+  assert.equal(weg.status, 200, JSON.stringify(weg.body).slice(0, 160));
+  const mijn = await api(base, '/api/vak/offertes/mijn', {}, lid.token);
+  assert.equal(mijn.body.offertes.find(o => o.id === id).status, 'ingetrokken');
+  const pro = await api(base, '/api/supplier/vak/pro', {}, zaak.token);
+  const bijZaak = (pro.body.offertes || []).find(o => o.id === id);
+  assert.ok(!bijZaak || bijZaak.status === 'ingetrokken', 'de zaak ziet hem niet meer als open aanvraag');
+  assert.notEqual((await api(base, '/api/vak/offerte/akkoord', { id }, lid.token)).status, 200,
+    'op een ingetrokken offerte komt geen akkoord meer');
+
+  // de offerte uit toets 1 is akkoord: die trekt het lid niet meer in
+  assert.equal((await api(base, '/api/vak/offerte/intrek', { id: offerteId }, lid.token)).status, 409,
+    'na akkoord trekt het lid niet meer in');
+});

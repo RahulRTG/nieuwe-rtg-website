@@ -135,3 +135,41 @@ test('7. navigatie toont de eigen motor en neemt alleen partnersignalen aan', as
   assert.equal(lijst.status, 200);
   assert.ok(lijst.body.gebeurtenissen.some(e => e.id === gezet.body.gebeurtenis.id));
 });
+
+/* 8. RTG Navigatie over de routes: /api/nav/kaart, /api/nav/bestemmingen,
+   /api/nav/poi en /api/nav/meld. test/navigatie.test.js toetst dezelfde kern in
+   het proces; hier gaat het om de deur: leden wel, gasten niet, en een melding
+   via de navigatie komt werkelijk in het Flits-netwerk terecht (en nooit als
+   flitser -- die soort loopt niet via de meldweg van de navigatie).
+   MUTATIE GEZIEN ZAKKEN: in server/routes/navigatie.js de geenGast()-regel van
+   /api/nav/bestemmingen weggehaald; de toets zakte op "gasten zoeken geen
+   bestemmingen". */
+test('8. navigatie over de routes: kaart, bestemmingen, POI en melden, alleen voor leden', async () => {
+  const a = await lid('rtg'), b = await lid('rtg');
+  const gast = await lid('guest');
+  for (const pad of ['/api/nav/kaart', '/api/nav/bestemmingen', '/api/nav/poi', '/api/nav/meld']) {
+    assert.equal((await api(pad, { ...IBIZA, q: 'laad' }, gast)).status, 403, pad + ': gasten niet');
+    assert.equal((await api(pad, { ...IBIZA }, null)).status, 401, pad + ': zonder sessie niet');
+  }
+
+  const kaart = await api('/api/nav/kaart', { ...IBIZA }, a);
+  assert.equal(kaart.status, 200);
+  assert.ok(kaart.body.plekken.length > 0, 'de kaart draagt koppelpunten');
+  assert.ok(kaart.body.plekken.every(p => Number.isFinite(p.afstandM)), 'met een afstand tot hier');
+
+  const best = await api('/api/nav/bestemmingen', { q: 'laad', ...IBIZA }, a);
+  assert.equal(best.status, 200);
+  assert.ok(best.body.bestemmingen.length > 0, 'er zijn laadpunten');
+  assert.ok(best.body.bestemmingen.every(x => x.laag === 'laad'), 'alleen wat bij de zoekterm hoort');
+
+  const poi = await api('/api/nav/poi', { lagen: ['laad'], ...IBIZA, land: 'ES' }, a);
+  assert.equal(poi.status, 200);
+  assert.ok(poi.body.lagen.laad.length > 0, 'de laadlaag is gevuld');
+
+  const m = await api('/api/nav/meld', { soort: 'wegwerk', lat: IBIZA.lat + 0.02, lng: IBIZA.lng, land: 'ES' }, a);
+  assert.equal(m.status, 200, JSON.stringify(m.body).slice(0, 160));
+  const rond = await api('/api/flits/rond', { lat: IBIZA.lat + 0.02, lng: IBIZA.lng, land: 'ES' }, b);
+  const w = (rond.body.meldingen || []).find(x => x.soort === 'wegwerk');
+  assert.ok(w, 'de melding uit de navigatie staat in het Flits-netwerk');
+  assert.ok(w.door && !/Lid /.test(w.door), 'op codenaam');
+});

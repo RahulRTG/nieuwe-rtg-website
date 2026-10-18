@@ -189,3 +189,32 @@ test('5. een poll heeft een vraag en minstens twee opties', async () => {
   const st = await api('/api/supplier/salon/stats', {}, zaak);
   assert.ok(st.body.posts >= 2, 'de aanbieding en de poll staan allebei op het eigen profiel');
 });
+
+/* 6. /api/salon/poll/stem: een lid stemt EEN keer, op een optie die bestaat, en
+   de stand die het lid daarna ziet telt die stem precies een keer.
+   MUTATIE GEZIEN ZAKKEN: in server/routes/member/salon.js de 409-grendel
+   (`p.poll.opties.some(o => o.stemmen.includes(...))`) op `false`; de toets zakte
+   op "twee keer stemmen kan niet". */
+test('6. stemmen op een poll: een keer per lid, op een bestaande optie', async () => {
+  const p = await api('/api/supplier/salon/poll', { vraag: 'Welke avond wordt de tapasavond?', opties: ['Donderdag', 'Vrijdag'] }, zaak);
+  assert.equal(p.status, 200);
+  const id = p.body.postId;
+
+  assert.equal((await api('/api/salon/poll/stem', { postId: id, optie: 7 }, lid)).status, 400, 'een optie die niet bestaat');
+  assert.equal((await api('/api/salon/poll/stem', { postId: 12345, optie: 0 }, lid)).status, 404, 'een poll die niet bestaat');
+  assert.equal((await api('/api/salon/poll/stem', { postId: id, optie: 1 }, null)).status, 401);
+
+  const stem = await api('/api/salon/poll/stem', { postId: id, optie: 1 }, lid);
+  assert.equal(stem.status, 200, JSON.stringify(stem.body).slice(0, 160));
+  assert.equal((await api('/api/salon/poll/stem', { postId: id, optie: 0 }, lid)).status, 409, 'twee keer stemmen kan niet');
+  assert.equal((await api('/api/salon/poll/stem', { postId: id, optie: 1 }, lid2)).status, 200, 'een ander lid stemt wel');
+
+  const beeld = (await api('/api/state', {}, lid)).body.state;
+  const post = beeld.posts.find(x => x.id === id);
+  assert.ok(post && post.poll, 'het lid ziet de poll');
+  assert.equal(post.poll.totaal, 2, 'twee stemmen in totaal');
+  assert.equal(post.poll.opties[1].stemmen, 2);
+  assert.equal(post.poll.opties[0].stemmen, 0);
+  assert.equal(post.poll.opties[1].mijn, true, 'het lid ziet waar hij op stemde');
+  assert.equal(post.poll.gestemd, true);
+});

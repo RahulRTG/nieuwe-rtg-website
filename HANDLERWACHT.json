@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T10:20:11.760Z",
-  "commit": "be0eadff",
+  "op": "2026-10-18T12:12:02.375Z",
+  "commit": "2d9f256b6",
   "boomVuil": false,
   "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
@@ -527,13 +527,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/doe",
-   "bestand": "server/bedrijf/handeling.js:130",
+   "bestand": "server/bedrijf/handeling.js:153",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/plan",
-   "bestand": "server/bedrijf/handeling.js:86",
+   "bestand": "server/bedrijf/handeling.js:109",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },

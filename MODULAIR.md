@@ -300,8 +300,8 @@ eerste twee uitslagen is het hele punt.
 | `proza` | de betekenis staat er, maar in een vrije zin. Een zorgvuldige lezer wordt niet misleid; een dashboard wel, want dat leest geen proza |
 | `ontbreekt` | er staat niets |
 
-**De stand over <!--getal:meetleer.registers-->85<!--/getal--> registers.** Twee getallen die nooit worden
-opgeteld: <!--getal:meetleer.onleesbaar-->410<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
+**De stand over <!--getal:meetleer.registers-->202<!--/getal--> registers.** Twee getallen die nooit worden
+opgeteld: <!--getal:meetleer.onleesbaar-->880<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
 leeg — dat daalt ook als een zin een veld wordt), en <!--getal:meetleer.blind-->8<!--/getal-->
 registers zijn **blind**: die zeggen nergens wat ze niet aantonen, veld noch zin.
 Daar wordt zelfs een zorgvuldige lezer niet geremd, en dat is het gevaarlijke

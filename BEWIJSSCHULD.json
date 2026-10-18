@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-18T10:48:27.242Z",
-  "commit": "2c24c722",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-10-18T12:17:09.431Z",
+  "commit": "2d9f256b6",
+  "boomVuil": true,
+  "boomAnders": 19,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.0"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 355,
+  "meetwerk": 365,
   "instrument": 466,
-  "grens": 687
+  "grens": 726
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 821,
+  "staat": 831,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,13 +28,13 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 821,
-  "randVanDeMethode": 687,
+  "achterstand": 831,
+  "randVanDeMethode": 726,
   "auth-onbeslist": 1,
-  "capability-in-handler": 560,
-  "objectpoort": 52,
+  "capability-in-handler": 589,
+  "objectpoort": 54,
   "output-deuren": 21,
-  "lichaamssleutel": 102,
+  "lichaamssleutel": 112,
   "output-niet-toerekenbaar": 0,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
@@ -45,7 +45,7 @@
   "proefruis": 1,
   "gevolg-onbekend": 97,
   "droogloop-onbeoordeeld": 2,
-  "herstel-onbevestigd": 49,
+  "herstel-onbevestigd": 57,
   "idem-ongeclassificeerd": 152,
   "wegwerpserver-kopieen": 0
  },
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 560,
+   "aantal": 589,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -70,7 +70,7 @@
    "id": "objectpoort",
    "soort": "meetwerk",
    "wat": "routes die eigenaarschap toetsen van een object uit het lichaam, en die nog geen enkel instrument heeft beslist",
-   "aantal": 52,
+   "aantal": 54,
    "waarom": "huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een bedrijfscode in het lijf.",
    "sluit": "GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json). Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-poort, geijkt op de eigenaar zodat een weigering iets bewijst: 56 routes bewezen-gescheiden, 0 doorbraken, 26 onbereikbaar. Die 56 waren er eerst 20: de ijking ging over op twee gangen met de objectpool, zodat de eigenaar met een lijf vol ECHTE id's uit zijn eigen huis naar binnen gaat en lid B daarna met precies hetzelfde lijf. De 26 die overblijven vragen een keten die deze proef niet kan lopen (een goedgekeurd document, een toegewezen klus) en zijn hetzelfde werk als object-vooraf hieronder: geen ontbrekend instrument, maar werk per domein."
   },
@@ -86,7 +86,7 @@
    "id": "lichaamssleutel",
    "soort": "grens",
    "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
-   "aantal": 102,
+   "aantal": 112,
    "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
    "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
   },
@@ -174,7 +174,7 @@
    "id": "herstel-onbevestigd",
    "soort": "meetwerk",
    "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd",
-   "aantal": 49,
+   "aantal": 57,
    "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
    "sluit": "wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
@@ -221,7 +221,7 @@
    },
    {
     "op": "2026-10-18",
-    "aantal": 560
+    "aantal": 589
    }
   ],
   "objectpoort": [
@@ -235,7 +235,7 @@
    },
    {
     "op": "2026-10-18",
-    "aantal": 52
+    "aantal": 54
    }
   ],
   "output-deuren": [
@@ -263,7 +263,7 @@
    },
    {
     "op": "2026-10-18",
-    "aantal": 102
+    "aantal": 112
    }
   ],
   "output-niet-toerekenbaar": [
@@ -417,7 +417,7 @@
    },
    {
     "op": "2026-10-18",
-    "aantal": 49
+    "aantal": 57
    }
   ],
   "idem-ongeclassificeerd": [
@@ -457,12 +457,6 @@
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
   {
-   "id": "objectpoort",
-   "aantal": 52,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json). Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-poort, geijkt op de eigenaar zodat een weigering iets bewijst: 56 routes bewezen-gescheiden, 0 doorbraken, 26 onbereikbaar. Die 56 waren er eerst 20: de ijking ging over op twee gangen met de objectpool, zodat de eigenaar met een lijf vol ECHTE id's uit zijn eigen huis naar binnen gaat en lid B daarna met precies hetzelfde lijf. De 26 die overblijven vragen een keten die deze proef niet kan lopen (een goedgekeurd document, een toegewezen klus) en zijn hetzelfde werk als object-vooraf hieronder: geen ontbrekend instrument, maar werk per domein."
-  },
-  {
    "id": "rollback-gezakt",
    "aantal": 1,
    "meetdagen": 3,
@@ -485,12 +479,6 @@
    "aantal": 2,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: dezelfde weg als gevolg-onbekend: het pad in een proefronde krijgen. Deze post is daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf onbeoordeelde stappen er groen uitziet en niets bewijst."
-  },
-  {
-   "id": "herstel-onbevestigd",
-   "aantal": 49,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
   {
    "id": "idem-ongeclassificeerd",
@@ -631,6 +619,12 @@
    "van": 823,
    "naar": 824,
    "reden": "De post van #591 (680 -> 681) op de stand van de integratie (823): /api/knelpunt kwam op 11 oktober 2026 op de LEZEN-lijst van het stuur (Rahul als ingang naar de knelpuntmotor). IDEMPROEF.json kreeg hem nooit aan het werk (kale oproep: 400), dus gevolg.js noemt zijn effect onbekend (gevolg-onbekend 96 -> 97). Het lijf met een doel staat in scripts/lib/idemwereld.js; de eerstvolgende referentieronde van de idempotentieproef sluit deze post."
+  },
+  {
+   "op": "2026-10-18",
+   "van": 821,
+   "naar": 831,
+   "reden": "ROLPROEF.json en de herstelproef zijn op 18 oktober voor het eerst sinds weken vers gemeten: de rolproef loopt weer met een proeflid met gebonden toestel (objectpoort 52->54), en de herstelproef noemt nu de tegenhangers die het geldomein zelf benoemt (herstel-onbevestigd 49->57). Bestaande routes die in beeld kwamen, geen nieuwe schuld."
   }
  ]
 }

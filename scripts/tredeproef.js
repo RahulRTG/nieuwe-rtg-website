@@ -149,7 +149,15 @@ const RONDGANG = [
   { wat: 'mijn kletsgesprekken zien', route: 'POST /api/klets', functie: 'kern-berichten', vanaf: 'ontmoeten' },
   { wat: 'mijn sollicitaties zien', route: 'POST /api/member/apply/chats', functie: 'member-werk', vanaf: 'partners' },
   { wat: 'mijn bestellingen zien', route: 'POST /api/orders/mine', functie: 'bestellen', vanaf: 'bestellen' },
-  { wat: 'mijn saldo zien', route: 'POST /api/pay/overzicht', functie: 'dom-pay-wallet', vanaf: 'fundament' },
+  /* HET SALDO VRAAGT EEN EIGEN ACCOUNT MET EEN GEBONDEN TOESTEL. /api/pay/ is
+     een zwaar pad (kern/identiteit/bezitspaden.js) en sinds A-P1-04 staat het
+     bezitsbewijs standaard op `verplicht`: de pas-sessie van de korte inlog kan
+     niet binden en krijgt daar terecht 403. De poort blijft; deze ene stap loopt
+     daarom als een echte client -- registreren, toestel binden, tekenen
+     (scripts/lib/proeftoestel.js), zoals de idempotentieproef en De Beproeving.
+     Staat de functie op deze trede UIT, dan klopt de pas-sessie aan en hoort de
+     schakelkast 503 te geven, vóór welke poort dan ook. */
+  { wat: 'mijn saldo zien', route: 'POST /api/pay/overzicht', functie: 'dom-pay-wallet', vanaf: 'fundament', eigenAccount: true },
   { wat: 'mijn OV-kaart zien', route: 'POST /api/ov/kaart', functie: 'ov', vanaf: 'stad' },
 
   /* DE WIG UIT LAUNCH.md, in vier stappen die elkaar VOEDEN: een zaak vinden,
@@ -387,9 +395,41 @@ async function meet(tredeId) {
   let token = null;
   const rondgang = [];
   const staat = {};
+  /* Het proeflid met gebonden toestel, voor de stappen met `eigenAccount`. Pas
+     gemaakt als zo'n stap aan de beurt is EN zijn functie aan staat; op een
+     lagere trede klopt de pas-sessie aan en meet de stap de schakelkast. */
+  const { maakProeflid, KOP } = require('./lib/proeftoestel');
+  const { zwaarPad } = require(path.join(WORTEL, 'server', 'kern', 'identiteit', 'bezitsbewijs'));
+  const proefPost = async (p, lijf, tok, koppen) => {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 5000);
+    try {
+      const res = await fetch('http://127.0.0.1:' + poort + p, { method: 'POST', signal: ac.signal,
+        headers: { 'content-type': 'application/json', ...(tok ? { authorization: 'Bearer ' + tok } : {}), ...(koppen || {}) },
+        body: JSON.stringify(lijf || {}) });
+      let data = null; try { data = await res.json(); } catch (e) { data = null; }
+      return { status: res.status, data: data || {} };
+    } catch (e) { return { status: 0, data: {} }; }
+    finally { clearTimeout(t); }
+  };
+  let proeflid = null;
   for (const stap of RONDGANG) {
     const [methode, pad] = stap.route.split(' ');
     const aanInTredeVooraf = aan.has(stap.functie);
+    let stapToken = token;
+    const koppen = {};
+    if (stap.eigenAccount && aanInTredeVooraf) {
+      if (!proeflid) proeflid = await maakProeflid({ post: proefPost, naam: 'Tredeproef' });
+      if (!proeflid.klaar) {
+        /* Geen proeflid is geen vrijspraak: de stap zakt, met de reden erbij. */
+        rondgang.push({ ...stap, aanInTrede: aanInTredeVooraf, verwacht: '<400', status: null,
+          ...oordeelStap({ aanInTrede: aanInTredeVooraf, status: null, voedingMist: false }),
+          reden: 'het proeflid met gebonden toestel kwam niet klaar: ' + proeflid.reden });
+        continue;
+      }
+      stapToken = proeflid.klaar.token;
+      if (zwaarPad(pad)) koppen[KOP] = await proeflid.klaar.teken(methode, pad);
+    }
     /* EEN STAP DIE ZIJN VOEDING MIST. Zijn functie staat aan, maar de stap die
        hem zou voeden kon op deze trede niet draaien. Dat is geen zakker: de code
        is niet stuk, de LADDER is niet rond. Zo'n uitkomst hoort een eigen naam
@@ -417,7 +457,7 @@ async function meet(tredeId) {
       try {
         const res = await fetch('http://127.0.0.1:' + poort + pad, {
           method: methode, signal: ac.signal,
-          headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) },
+          headers: { 'content-type': 'application/json', ...(stapToken ? { authorization: 'Bearer ' + stapToken } : {}), ...koppen },
           body: JSON.stringify(dit)
         });
         status = res.status;
@@ -446,7 +486,7 @@ async function meet(tredeId) {
     const oordeel = oordeelStap({ aanInTrede, status, voedingMist: false, geldUit,
       code: data && data.code, klaar: stap.klaar ? stap.klaar(staat) : undefined });
     rondgang.push({ ...stap, aanInTrede, verwacht: geldUit ? '503g' : aanInTrede ? '<400' : '503',
-      status, ...oordeel, pogingen });
+      status, ...oordeel, pogingen, alsProeflid: stapToken !== token && stapToken !== null });
   }
 
   /* ---- DE INGANGEN BUITEN HTTP: antwoorden ze terwijl hun functie uit staat? ---- */
@@ -512,14 +552,14 @@ async function meet(tredeId) {
     rondgangOnvoltooidLijst: rondgang.filter(r => r.onvoltooid).map(r => r.wat + ' (' + r.route + ', ' + r.functie + '): ' + r.reden),
     rondgangLijst: rondgang.map(r => ({ wat: r.wat, route: r.route, functie: r.functie,
       aanInTrede: r.aanInTrede, verwacht: r.verwacht, status: r.status, geslaagd: r.geslaagd,
-      onvoltooid: !!r.onvoltooid, reden: r.reden || null, pogingen: r.pogingen || 0 })),
+      onvoltooid: !!r.onvoltooid, reden: r.reden || null, pogingen: r.pogingen || 0, alsProeflid: !!r.alsProeflid })),
     rondgangKreegSessie: !!token,
     ingangen,
     ingangLekken: ingangen.filter(i => i.lek).length,
     ingangStilTerwijlAan: ingangen.filter(i => i.stilTerwijlAan).length,
     ingangenUitleg: 'de SMTP- en IMAP-poort worden door deze proef met opzet opengezet (ze starten anders niet); een LEK is: hij antwoordt terwijl zijn functie op deze trede uit staat. De STUN-server staat hier niet in -- die praat UDP, en zijn functie kern-live gaat al op trede 0 open.',
     routesGeraakt: geraakt.size,
-    rondgangDektNiet: 'alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.',
+    rondgangDektNiet: 'alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht; alleen de saldostap loopt als een proeflid met gebonden toestel, omdat /api/pay/ een zwaar pad is), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.',
     watDitNietDoet: 'de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.'
   };
 }
@@ -567,7 +607,8 @@ function rapport(r) {
   for (const st of r.rondgangLijst)
     L.push(`    ${st.onvoltooid ? 'leeg' : st.geslaagd ? 'ok  ' : 'ZAKT'}  ${String(st.status === null ? '-' : st.status).padStart(3)} (${st.verwacht.padEnd(4)})  ` +
       `${st.aanInTrede ? 'aan ' : 'uit '} ${st.wat.padEnd(24)} ${st.route}  [${st.functie}]` +
-      `${st.pogingen > 1 ? '  (' + st.pogingen + ' pogingen)' : ''}`);
+      `${st.pogingen > 1 ? '  (' + st.pogingen + ' pogingen)' : ''}${st.alsProeflid ? '  (eigen account, gebonden toestel)' : ''}` +
+      `${!st.geslaagd && !st.onvoltooid && st.reden ? '  -- ' + st.reden : ''}`);
   L.push('    (dekt niet: ' + r.rondgangDektNiet.split('.')[0].toLowerCase() + ')');
   if (r.rondgangOnvoltooid) {
     L.push(`    ${r.rondgangOnvoltooid} stap(pen) konden NIET draaien -- hun functie staat aan, maar wat`);

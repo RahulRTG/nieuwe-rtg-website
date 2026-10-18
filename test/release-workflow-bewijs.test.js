@@ -63,7 +63,7 @@ test('verkeerde bron, ref, workflow, event, leeftijd en zelfbewijs sluiten fail-
   const eis = bewijs.VEREISTEN[0], goed = run(eis);
   const gevallen = [
     [{ ...goed, head_sha:'b'.repeat(40) }, /geen workflowrun/],
-    [{ ...goed, head_branch:'release' }, /geen workflowrun/],
+    [{ ...goed, head_branch:'release' }, /geen workflowrun .* op main/],
     [{ ...goed, path:null }, /geen workflowrun/],
     [{ ...goed, path:'.github/workflows/release-image.yml' }, /geen workflowrun/],
     [{ ...goed, event:'pull_request' }, /geen workflowrun/],
@@ -114,4 +114,45 @@ test('verzamel bouwt één gesanitiseerd dossier voor exact de checkoutcommit', 
     eventCommit:commit, huidigeRun:'999', nu:NU, request:fake }), /GITHUB_TOKEN/);
   await assert.rejects(() => bewijs.verzamel({ repository:'rtg/platform', token:'x', commit,
     eventCommit:'b'.repeat(40), huidigeRun:'999', nu:NU, request:fake }), /releasebron/);
+});
+
+test('de bron is de ref van de releaserun zelf: main standaard, anders exact die branch', () => {
+  const eis = bewijs.VEREISTEN[0];
+  const opMain = run(eis), opBranch = run(eis, { id:102, head_branch:'claude/v1-integratie' });
+  assert.equal(bewijs.bronNaam(undefined), 'main');
+  assert.equal(bewijs.bronNaam(''), 'main');
+  assert.equal(bewijs.kiesRun(eis, [opMain, opBranch], COMMIT, NU).id, 101);
+  assert.equal(bewijs.kiesRun(eis, [opMain, opBranch], COMMIT, NU, '999', 'claude/v1-integratie').id, 102);
+  assert.throws(() => bewijs.kiesRun(eis, [opMain], COMMIT, NU, '999', 'claude/v1-integratie'),
+    /geen workflowrun .* op claude\/v1-integratie/);
+  assert.throws(() => bewijs.kiesRun(eis, [opBranch], COMMIT, NU), /geen workflowrun .* op main/);
+  assert.equal(bewijs.runBewijs(eis, opBranch, artifacts(eis)).branch, 'claude/v1-integratie');
+  for (const slecht of ['../main', '/main', 'main/', 'a b', 'x'.repeat(201), 'tak\n']) {
+    assert.throws(() => bewijs.bronNaam(slecht), /geen geldige branchnaam/);
+  }
+});
+
+test('verzamel vraagt de API naar de bron en zet hem in het dossier', async () => {
+  const commit = bewijs.gitCommit();
+  const gezien = [];
+  const ids = new Map(bewijs.VEREISTEN.map((e, i) => [e.workflow, 400 + i]));
+  const fake = async url => {
+    gezien.push(url);
+    for (const eis of bewijs.VEREISTEN) {
+      const id = ids.get(eis.workflow);
+      if (url.includes('/actions/workflows/' + encodeURIComponent(eis.workflow) + '/runs')) {
+        return { workflow_runs:[run(eis, { id, head_sha:commit, head_branch:'claude/v1-integratie' })] };
+      }
+      if (url.includes('/actions/runs/' + id + '/artifacts')) return { artifacts:artifacts(eis) };
+    }
+    throw new Error('onverwachte API-vraag: ' + url);
+  };
+  const dossier = await bewijs.verzamel({ repository:'rtg/platform', token:'t', commit, eventCommit:commit,
+    huidigeRun:'999', nu:NU, request:fake, bron:'claude/v1-integratie' });
+  assert.equal(dossier.releaseRef, 'claude/v1-integratie');
+  assert.equal(dossier.bron, 'github-actions-api');
+  assert.ok(dossier.workflows.every(w => w.branch === 'claude/v1-integratie'));
+  assert.ok(gezien.filter(u => u.includes('/runs?')).every(u => u.includes('branch=claude%2Fv1-integratie&')));
+  await assert.rejects(() => bewijs.verzamel({ repository:'rtg/platform', token:'t', commit, eventCommit:commit,
+    huidigeRun:'999', nu:NU, request:fake }), /op main/);
 });

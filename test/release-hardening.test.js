@@ -192,6 +192,9 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
   assert.match(bron.slice(Math.max(0, vooraf - 350), vooraf + 100),
     /GITHUB_TOKEN:\s*\$\{\{ github\.token \}\}[\s\S]*RTG_RELEASE_EXPECTED_COMMIT:\s*\$\{\{ github\.sha \}\}/,
     'de workflowpoort is niet aan GitHub-authoriteit en exact de kandidaatcommit gebonden');
+  assert.match(bron.slice(Math.max(0, vooraf - 500), vooraf),
+    /RTG_RELEASE_BRON:\s*\$\{\{ github\.ref_type == 'branch' && github\.ref_name \|\| 'main' \}\}/,
+    'de bron van het workflowbewijs is de ref van de releaserun zelf, met main als terugval voor een tag');
   assert.ok(afbouw >= 0 && afbouw < kandidaat, 'de volledige software-afbouw staat niet vóór het kandidaatimage');
   assert.ok(bootstrap >= 0 && bootstrap < afbouw,
     'de drie signingrollen worden niet vóór de bouw gecontroleerd');

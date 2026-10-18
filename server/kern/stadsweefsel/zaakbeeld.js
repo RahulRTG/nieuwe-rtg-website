@@ -119,6 +119,16 @@ module.exports = (ctx, H) => {
     return rij;
   }
   const vanMelder = (codenaam) => codenaam ? zaken().filter(z => z.waarnemingen.some(w => w.melder === codenaam)) : [];
+  /* VERGETEN (AVG art. 17). De zaak is het probleem in de stad en blijft; de
+     plek is die van het probleem. Wat weg moet is de weg naar dit lid: zijn
+     codenaam bij elke waarneming, en daarmee is de plek niet meer de zijne. */
+  function vergeetMelder(codenaam) {
+    let n = 0;
+    for (const z of vanMelder(codenaam))
+      for (const w of z.waarnemingen) if (w.melder === codenaam) { w.melder = null; w.melderLos = nu(); n++; }
+    if (n) save();
+    return { los: n };
+  }
 
-  return { publiek, voorMelder, oorzaakZoek, zaakZet, zaakKlaar, lijst, vanMelder };
+  return { publiek, voorMelder, oorzaakZoek, zaakZet, zaakKlaar, lijst, vanMelder, vergeetMelder };
 };

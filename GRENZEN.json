@@ -1351,7 +1351,14 @@
       "zzpwacht",
       "partnerPersoneelscode",
       "zwaarbewijs",
-      "herstelSmsDicht"
+      "herstelSmsDicht",
+      "mobVergeetLid",
+      "veiligVergeet",
+      "ontmoetVergeetLid",
+      "flitsVergeet",
+      "plaats",
+      "weefsel",
+      "mbVergeet"
     ],
     "memo": [],
     "meting": [],

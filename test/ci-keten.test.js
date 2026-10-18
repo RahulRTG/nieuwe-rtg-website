@@ -124,7 +124,11 @@ test('handmatige full-run en beschermd eindoordeel zijn fail-closed bedraad', ()
     'de volledige schermsuite moet door dezelfde beschermde poort worden beoordeeld');
   const publiceren = blok('evidence-publish');
   assert.match(publiceren, /workflow_dispatch[\s\S]*github\.ref == 'refs\/heads\/main'[\s\S]*mode == 'full'/,
-    'alleen een handmatige full-run op main mag een vertrouwd bewijsboek publiceren');
+    'een handmatige full-run op main mag een vertrouwd bewijsboek publiceren');
+  assert.match(publiceren, /github\.event_name == 'workflow_dispatch' && github\.ref_type == 'branch'/,
+    'een handmatige full-run op een branch (de V1-integratiebranch) publiceert zijn eigen bewijsboek');
+  assert.doesNotMatch(publiceren.replace(/#.*/g, ''), /pull_request/,
+    'een PR-run schrijft nooit zijn eigen vrijbrief');
 });
 
 test('de ronde plant onafhankelijke refs en scopes zonder lopende metingen af te breken', () => {

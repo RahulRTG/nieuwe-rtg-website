@@ -14,27 +14,9 @@
    zodra hij dat niet doet.
 
    ------------------------------------------------------------------------
-   DE MENSREM, en waarom die geen instelling is
-
-   Twee treden gaan NOOIT vanzelf open, hoe groen elk cijfer ook staat:
-
-     ontmoeten   het kanaal waarop het ene lid het andere rechtstreeks bereikt
-     fundament   de betaalrail
-
-   Dat is niet mijn voorzichtigheid maar de wet van dit huis. GELD.md: "De grens
-   is hard: geld verlaat het huis nooit autonoom." LIFE.md: "Alles wat een
-   tweede persoon bereikt -- een uitnodiging, een bericht, een reservering op
-   andermans naam, een betaling -- blijft maximaal klaarzetten. Er is geen regel,
-   geen instelling en geen vertrouwensniveau waarmee dat automatisch wordt."
-
-   Een uitrolautomaat die die twee openzet omdat het foutpercentage laag is,
-   overtreedt die twee zinnen letterlijk. Daarom klimt de regie eronaartoe,
-   meet, en blijft dan staan met stand 'wacht-op-mens'. De trede staat dan
-   KLAAR; bevestigen doet de mens. Dat is hetzelfde werkwoord als in LIFE.md.
-
-   En let op de RICHTING: de mensrem geldt alleen omhoog. Terugzakken mag altijd
-   vanzelf. Een rem die ook het dichtdraaien tegenhoudt, is geen rem maar een
-   klem -- dan blijft een kapotte betaalrail openstaan tot iemand wakker wordt.
+   DE MENSREM en de weging die hem afdwingt staan sinds 18 oktober 2026 in
+   ./uitrolweging.js: twee treden (ontmoeten en fundament) gaan NOOIT vanzelf
+   open, en zakken mag altijd. Daar staat het waarom, bij de code die het doet.
 
    ------------------------------------------------------------------------
    DE DRIE KEUZES OVER HET METEN staan sinds 3 september 2026 bij de meting zelf,
@@ -58,6 +40,8 @@ const { maakTikker } = require('./tikker');
 /* De METING staat sinds 3 september 2026 apart (TAKEN.md 5.57): "hoeveel
    serverfouten sinds deze trede" is een andere vraag dan "mag hij klimmen". */
 const { maakUitrolmeting } = require('./uitrolmeting');
+// de automaat die klimt, zakt en voor de mensrem stilstaat (./uitrolweging.js)
+const { maakUitrolweging } = require('./uitrolweging');
 
 const klok = require('../../lib/klok');
 
@@ -75,6 +59,12 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu, vast
   const TREDEN = () => (functies && functies.FASES) || [];
   const { tel, oordeel } = maakUitrolmeting({ meting, nu: tijd, STANDAARD });
   const index = id => TREDEN().findIndex(t => t.id === id);
+
+  /* DE AUTOMAAT: zakken bij tegenwind, klimmen bij groen, en stilstaan voor de
+     mensrem. Een eigen bestand, want dat is een andere vraag dan de handelingen
+     hieronder: die zetten een trede, de weging BESLUIT of hij vanzelf mag. */
+  const weeg = maakUitrolweging({ staat: () => staat(), oordeel, index, TREDEN, zet: (...a) => zet(...a),
+    boek: (...a) => boek(...a), save: () => save() });
 
   function staat() {
     /* Door de deur van het domein (./opslag.js, gedeeld.uitrol) en niet
@@ -162,59 +152,6 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu, vast
     u2.stand = 'klimt';
     save();
     return stand();
-  }
-
-  /* De weging. Zakt bij tegenwind, klimt bij groen, en blijft staan voor een
-     trede met de mensrem. Raakt niets aan als de regie niet klimt -- behalve
-     zakken, want die richting mag altijd (zie de kop). */
-  function weeg() {
-    const u = staat();
-    if (!u.trede) return { gedaan: null };
-    const o = oordeel(u);
-    const i = index(u.trede);
-
-    if (o.zakbaar) {
-      const vorige = TREDEN()[i - 1];
-      if (!vorige) { // al op de smalste trede: niet verder te zakken
-        if (u.stand !== 'gestopt') {
-          u.stand = 'gestopt';
-          u.reden = 'de smalste trede haalt de drempel niet: ' + o.uitleg;
-          boek(u, u.trede, u.trede, 'automaat', 'automaat', u.reden);
-          save();
-        }
-        return { gedaan: 'gestopt-onderaan', oordeel: o };
-      }
-      const r = zet(vorige.id, 'automaat', 'automaat');
-      const u2 = staat();
-      u2.stand = 'gestopt';
-      u2.reden = 'automaat: teruggezakt na ' + o.uitleg;
-      boek(u2, u.trede, vorige.id, 'automaat', 'automaat', u2.reden);
-      save();
-      return { gedaan: 'gezakt', naar: vorige.id, oordeel: o, zet: r };
-    }
-
-    if (u.stand !== 'klimt') return { gedaan: null, oordeel: o };
-    if (!o.klimbaar) return { gedaan: null, oordeel: o };
-
-    const volgende = TREDEN()[i + 1];
-    if (!volgende) {
-      u.stand = 'stil';
-      u.reden = 'de trap is uit: alles staat open';
-      save();
-      return { gedaan: 'boven', oordeel: o };
-    }
-    if (volgende.mens) {
-      u.stand = 'wacht-op-mens';
-      u.reden = volgende.mensWaarom || 'deze trede vraagt een menselijke bevestiging';
-      boek(u, u.trede, volgende.id, 'automaat', 'automaat', 'klaargezet, wacht op een mens');
-      save();
-      return { gedaan: 'wacht-op-mens', volgende: volgende.id, oordeel: o };
-    }
-    const r = zet(volgende.id, 'automaat', 'automaat');
-    const u2 = staat();
-    u2.stand = 'klimt';
-    save();
-    return { gedaan: 'geklommen', naar: volgende.id, oordeel: o, zet: r };
   }
 
   function stand() {

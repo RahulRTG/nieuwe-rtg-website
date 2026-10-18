@@ -70,3 +70,22 @@ test('2. een GEBONDEN sessie zonder bewijs wordt standaard geweigerd; met geldig
   const hergebruik = await api('/api/privacy/inzage', {}, l.token, await l.teken('POST', '/api/privacy/export'));
   assert.equal(hergebruik.status, 401, 'een bewijs voor een ander pad dekt deze handeling niet');
 });
+
+/* DE GEGEVENSPOORT: ZO BREED ALS WAT SCHRIJFT (besluit van de eigenaar, 18
+   oktober 2026). /api/gegevens/nodig leest alleen wat er voor een handeling nog
+   ontbreekt (kern/gegevenspoort.js `ontbreekt`) en is voor een ongebonden sessie
+   gewoon bereikbaar; /start en /zeg zetten het telefoonnummer -- het
+   herstelkanaal -- en blijven zwaar. Zakt de tweede helft, dan is de lijst
+   verder versmald dan het besluit; zakt de eerste, dan is hij weer te breed. */
+test('3. /api/gegevens/nodig leest zonder bezitsbewijs; /start en /zeg blijven zwaar', async () => {
+  const l = await lidMetToestel();
+  const nodig = await api('/api/gegevens/nodig', { soort: 'boeking' }, l.token);
+  assert.equal(nodig.status, 200, 'lezen wat er ontbreekt vraagt geen toestel: ' + JSON.stringify(nodig.body).slice(0, 160));
+  assert.equal(nodig.body.ok, true);
+  assert.ok(Array.isArray(nodig.body.ontbreekt), 'de route geeft de lijst terug en niet een weigering');
+  for (const pad of ['/api/gegevens/start', '/api/gegevens/zeg']) {
+    const r = await api(pad, { soort: 'boeking' }, l.token);
+    assert.equal(r.status, 403, pad + ' hoort zwaar te blijven: ' + JSON.stringify(r.body).slice(0, 160));
+    assert.equal(r.body.bezitsbewijs, 'vereist', pad + ' weigert om het bezitsbewijs en niet om iets anders');
+  }
+});

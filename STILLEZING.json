@@ -3,8 +3,8 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-18T09:53:42.275Z",
-  "commit": "fff96f8e",
+  "op": "2026-10-18T10:37:51.475Z",
+  "commit": "b1978df5",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/stillezing.js",
@@ -21,12 +21,12 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 627,
+   "bewijslezingen": 633,
    "metVanger": 106,
-   "smeltSamen": 1,
+   "smeltSamen": 61,
    "zegtHet": 15,
-   "onderscheidt": 8,
-   "gooit": 61,
+   "onderscheidt": 6,
+   "gooit": 3,
    "anders": 21
   }
  },
@@ -112,7 +112,7 @@
     "leest": [
      "KERNHERKOMST.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/actorvormen.js",
@@ -120,7 +120,7 @@
     "leest": [
      "ENVELOP.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/afbouw-slot.js",
@@ -128,7 +128,7 @@
     "leest": [
      "eigenaar.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/afbouw-slot.js",
@@ -148,12 +148,12 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 417,
+    "regel": 420,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
@@ -161,7 +161,7 @@
     "leest": [
      "ROLPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
@@ -169,7 +169,7 @@
     "leest": [
      "HANDELINGPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
@@ -177,7 +177,7 @@
     "leest": [
      "POORTWACHT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
@@ -185,7 +185,7 @@
     "leest": [
      "BEWIJSMATRIX.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/bewijsschuld.js",
@@ -193,11 +193,11 @@
     "leest": [
      "BEWIJSSCHULD.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3145,
+    "regel": 3148,
     "leest": [
      "BELOFTE.json"
     ],
@@ -205,7 +205,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3464,
+    "regel": 3467,
     "leest": [
      "SLO.json"
     ],
@@ -213,7 +213,15 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4826,
+    "regel": 4828,
+    "leest": [
+     "MUTATIECONTRACT.json"
+    ],
+    "soort": "smeltSamen"
+   },
+   {
+    "bestand": "scripts/check.js",
+    "regel": 5317,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,15 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5316,
-    "leest": [
-     "MUTATIECONTRACT.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 5587,
+    "regel": 5588,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,11 +237,11 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5763,
+    "regel": 5764,
     "leest": [
      "EERSTEMINUUT.json"
     ],
-    "soort": "onderscheidt"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/check.js",
@@ -265,7 +265,7 @@
     "leest": [
      "CONTROLS.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/crashas.js",
@@ -289,7 +289,7 @@
     "leest": [
      "NORM.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/doctrine.js",
@@ -305,7 +305,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/doodspoor.js",
@@ -329,7 +329,7 @@
     "leest": [
      "ENVELOP.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/executionmap.js",
@@ -369,7 +369,7 @@
     "leest": [
      "HERREKENBAAR.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/factuurproef.js",
@@ -377,7 +377,7 @@
     "leest": [
      "HERSTEL.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/factuurproef.js",
@@ -385,7 +385,7 @@
     "leest": [
      "HERSTELBESLUIT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/gelding.js",
@@ -410,7 +410,7 @@
      "DEKKING.json",
      "GEVOLGDEKKING.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/gewichtdrift.js",
@@ -418,7 +418,7 @@
     "leest": [
      "TOETSDUUR.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/gezag.js",
@@ -426,7 +426,7 @@
     "leest": [
      "GEZAG.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/gezagshandelingen.js",
@@ -442,7 +442,7 @@
     "leest": [
      "GEZAGSHANDELINGEN.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/gluurronde.js",
@@ -450,7 +450,7 @@
     "leest": [
      "NORM.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/grenslijst.js",
@@ -458,7 +458,7 @@
     "leest": [
      "GRENZEN.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/handelingsklasse.js",
@@ -466,7 +466,7 @@
     "leest": [
      "HANDELINGSKLASSE.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/handlerbewakers.js",
@@ -474,7 +474,7 @@
     "leest": [
      "MUTATIECONTRACT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/herbouwproef.js",
@@ -490,7 +490,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/herstel.js",
@@ -498,7 +498,7 @@
     "leest": [
      "HERSTELPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/herstelproef.js",
@@ -506,7 +506,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/idemproef-route.js",
@@ -514,7 +514,7 @@
     "leest": [
      "IDEMBESLUIT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/inhoudskaart.js",
@@ -530,7 +530,7 @@
     "leest": [
      "INHOUDSKAART.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/kantoormacht.js",
@@ -546,7 +546,7 @@
     "leest": [
      "KLOK.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/klokwacht.js",
@@ -554,7 +554,7 @@
     "leest": [
      "KLOKWACHT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/krimpronde.js",
@@ -562,7 +562,7 @@
     "leest": [
      "KRIMP.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/ladder.js",
@@ -570,7 +570,7 @@
     "leest": [
      "NORM.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/lib/codearchitect.js",
@@ -595,7 +595,7 @@
     "leest": [
      "TOETSDUUR.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/lib/idemmeting.js",
@@ -611,7 +611,7 @@
     "leest": [
      "IDEMBESLUIT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/lib/wetboek.js",
@@ -619,7 +619,7 @@
     "leest": [
      "SABOTAGE.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/lib/zwaareffect.js",
@@ -652,7 +652,7 @@
      "KERNHERKOMST.json",
      "MUTATIECONTRACT.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/machinedekking.js",
@@ -660,7 +660,7 @@
     "leest": [
      "KERNHERKOMST.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/machinedekking.js",
@@ -668,7 +668,7 @@
     "leest": [
      "EXECUTION_MAP.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/machinedekking.js",
@@ -694,7 +694,7 @@
      "AFGELEID.json",
      "MUTATIECONTRACT-AFGELEID.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/mutatiecontract.js",
@@ -702,7 +702,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/mutatiecontract.js",
@@ -710,7 +710,7 @@
     "leest": [
      "SCHRIJFANALYSE.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/mutatieinventaris.js",
@@ -718,7 +718,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/mutatiepoort.js",
@@ -742,7 +742,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/outputband.js",
@@ -750,7 +750,7 @@
     "leest": [
      "OUTPUTPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/outputband.js",
@@ -774,7 +774,7 @@
     "leest": [
      "MUTATIES.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/outputproef.js",
@@ -790,7 +790,7 @@
     "leest": [
      "OUTPUTPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/outputproef.js",
@@ -798,7 +798,7 @@
     "leest": [
      "OUTPUTPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/overleving.js",
@@ -814,7 +814,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/resolverbereik.js",
@@ -822,7 +822,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/rolronde.js",
@@ -830,7 +830,7 @@
     "leest": [
      "NORM.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/rommeltaal.js",
@@ -838,7 +838,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/samenhang.js",
@@ -854,7 +854,7 @@
     "leest": [
      "SCHERFMETER.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/schermen.js",
@@ -878,7 +878,7 @@
     "leest": [
      "IDEMPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/staatproef-route.js",
@@ -886,7 +886,7 @@
     "leest": [
      "STAATPROEF.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/taalkwaliteit.js",
@@ -898,7 +898,7 @@
    },
    {
     "bestand": "scripts/test-runner.js",
-    "regel": 451,
+    "regel": 449,
     "leest": [
      "SUITE.json"
     ],
@@ -910,7 +910,7 @@
     "leest": [
      "TOETSDUUR.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/veranderbereik.js",
@@ -934,7 +934,7 @@
     "leest": [
      "MUTATIES.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/vervalproef.js",
@@ -950,7 +950,7 @@
     "leest": [
      "WACHTWIJZE.json"
     ],
-    "soort": "gooit"
+    "soort": "smeltSamen"
    },
    {
     "bestand": "scripts/wekkers.js",

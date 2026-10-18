@@ -152,8 +152,9 @@ const STROMEN = [
     bron: [S('kern/mobiliteit/plekken.js', 'Object.assign(f, { naam, lat: plek.lat, lng: plek.lng, bron: plek.bron });')],
     collectie: 'mobFavorieten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'noodzakelijk',
     termijn: { soort: 'lid', bewijs: S('kern/mobiliteit/plekken.js', 'if (body.weg) {') },
-    waarom: 'het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor -- maar de ' +
-      'vergeetroute kent mobFavorieten niet (daar staat favorieten, een andere collectie)' },
+    waarom: 'het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor. Tot 18 oktober ' +
+      'kende de vergeetroute mobFavorieten niet (daar stond favorieten, een andere collectie); nu wist ' +
+      'kern/mobiliteit/vergeten.js ze via server/kern/vergeten/positie.js' },
 
   { naam: 'ov-instap', wat: 'het instappunt van een OV-rit',
     bron: [S('kern/ov/index.js', 'in: { ...halteBij(lijn, voertuig), at }, uit: null, prijs: null };')],
@@ -307,7 +308,8 @@ const STROMEN = [
     collectie: 'flitsMeldingen', sleutel: 'codenaam', van: 'lid', klasse: 'noodzakelijk',
     termijn: { soort: 'module', bewijs: S('kern/flits.js', 'return Date.now() - basis < s.ttlMin * 60 * 1000 && (m.weg || 0) < WEG_STEMMEN;') },
     waarom: 'een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van ' +
-      'wie bevestigt reizen mee, en de vergeetroute kent de collectie niet' },
+      'wie bevestigt reizen mee. Sinds 18 oktober haalt de vergeetroute de eigen meldingen weg en de stem uit die ' +
+      'van anderen (flitsVergeet in kern/flits.js)' },
 
   { naam: 'plaats-passages', wat: 'elke overgang langs een hek tijdens een naderingsvenster, onder een codenaam',
     bron: [S('kern/plaats/waarnemen.js', "schrijfLog(codenaam, 'waargenomen', { doel, hek, richting: wat });")],
@@ -464,6 +466,15 @@ function termijnBronnen() {
     for (const m of b.matchAll(/delete\s+db\.data\.(\w+)(?:\.\w+)*\s*\[\s*key\s*\]/g)) vergeten.add(m[1]);
     /* een lijst die op de sleutel wordt gefilterd, of een collectie een laag dieper (db.data.vonk.profielen) */
     for (const m of b.matchAll(/db\.data\.(\w+)\s*=\s*db\.data\.\1\.filter\([^;]*\bkey\b/g)) vergeten.add(m[1]);
+    /* EEN COLLECTIE VAN EEN DOMEIN MET EEN EIGEN DEUR (./vergeten/positie.js).
+       Daar mag de vergeetroute niet zelf in db.data wissen (keuringsregels 53
+       en 63); hij vraagt het domein, en de tabel zegt welke collectie via welke
+       wisser meegaat. Een rij telt ALLEEN als die wisser in hetzelfde bestand
+       ook echt bestaat -- een naam in een lijst is nog geen wissing. Wat de
+       wisser doet, bewijst test/vergeten-positie.test.js op een echte doorloop. */
+    const tabel = /POSITIE_TAKKEN\s*=\s*Object\.freeze\(\[([\s\S]*?)\]\)/.exec(b);
+    if (tabel) for (const m of tabel[1].matchAll(/\[\s*'(\w+)'\s*,\s*'(\w+)'\s*\]/g))
+      if (new RegExp('\\b' + m[2] + '\\s*:\\s*\\(').test(b)) vergeten.add(m[1]);
   }
   return { beleid, veger, vergeten };
 }

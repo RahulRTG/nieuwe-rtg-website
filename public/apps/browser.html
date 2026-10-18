@@ -103,7 +103,7 @@ header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px
 .s-16gpxl2:not(#_#_#_){color:var(--muted);margin-top:0.5rem;line-height:1.6}
 </style>
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
+<body data-rtg-context-bron="browser" class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <header>
   <button class="nav" id="terugKnop" title="Terug" aria-label="Terug">‹</button>
   <button class="nav" id="vooruitKnop" title="Vooruit" aria-label="Vooruit">›</button>
@@ -446,5 +446,13 @@ else {
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

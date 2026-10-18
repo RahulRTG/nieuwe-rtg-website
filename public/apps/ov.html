@@ -160,7 +160,7 @@
 .s-5iufzb:not(#_#_#_){width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem}
 </style>
 </head>
-<body class="rtg-stijl travel-os" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="ov" class="rtg-stijl travel-os" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
   <h1>RTG Vervoer</h1>
@@ -1058,5 +1058,13 @@
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/travel-os-config.js" defer></script>
 <script src="/shared/travel-os.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

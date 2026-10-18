@@ -260,7 +260,7 @@
 .s-z2auej:not(#_#_#_){font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
 </style>
 </head>
-<body class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
+<body data-rtg-context-bron="mall" class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -1783,5 +1783,13 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
 <script src="/apps/winkel-voorzijde.js"></script>
 <script src="/apps/mall-experience-view.js"></script>
 <script src="/apps/mall-experience.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

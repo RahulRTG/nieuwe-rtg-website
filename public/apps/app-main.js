@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'c3d95694';
+var RTG_BOUW = '013d9339';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -352,6 +352,35 @@ var RTG_BOUW = 'c3d95694';
   // logica hierboven te dupliceren. Iedereen mag kiezen.
   window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
 
+  /* DE PAS AANNEMEN ZONDER HERLADEN. Een kale /apps/app.html (zonder ?pas=) is
+     de deur waar bijna elk scherm naar terugwijst. Tot hier herlaadde de
+     werktafel zich daar met location.replace(pasAdres(...)) zodra de sessie
+     haar pas prijsgaf: de hele stapel twee keer, en elk API-verzoek van het
+     opstarten dubbel (SCHILHERSTART.json, de eerste stap). De voorschotregel in
+     de kop van app.html vangt dat alleen op als de pas al eens is onthouden;
+     de eerste keer, en na een inlog, ging de herlading gewoon door.
+
+     Zonder ?pas= is er nog niets gekozen dat een herlading nodig maakt: de
+     pagina draagt dan de kale kop (titel 'RTG, log in', geen manifest) en
+     verder dezelfde bundel. Dus: zet het adres goed met replaceState en neem
+     de pas in DIT document aan -- vastePas, titel, manifest, icoon en het
+     pas-thema (app-main-02b.js), precies wat de pas-tak hierboven bij een
+     herlading had gezet. Staat er WEL een ?pas= die niet klopt, dan is dit de
+     app van een andere pas en blijft de omleiding via pasAdres zoals hij was.
+     test/werktafel-pas.e2e.js houdt vast dat het adres daarna op de pas van
+     de sessie staat en het geheugen klopt. */
+  function neemPasAan(doelPas){
+    vastePas = doelPas;
+    history.replaceState(history.state, '', pasAdres(doelPas));
+    document.title = { rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[doelPas];
+    let ml = document.getElementById('manifestLink');
+    if (!ml){ ml = document.createElement('link'); ml.id = 'manifestLink'; ml.rel = 'manifest'; document.head.appendChild(ml); }
+    ml.href = '/manifests/pas-' + doelPas + '.webmanifest';
+    const tl = document.getElementById('touchLink');
+    if (tl) tl.href = '/icons/pas-' + doelPas + '-192.png';
+    if (typeof pasThemaToepassen === 'function') pasThemaToepassen();
+  }
+
   /* ---------- de stem van de pas (tone of voice) ----------
      Dezelfde vriend als op de website, maar in de taal van de pas:
      RTG (65 euro per maand) praat als de jetset-vriend (je), Business
@@ -468,9 +497,15 @@ var RTG_BOUW = 'c3d95694';
           const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
           const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg', 'guest'] : [vastePas]) : [];
           if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
-            try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
-            location.replace(pasAdres(doelPas));
-            return true;
+            if (vastePas){
+              try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
+              location.replace(pasAdres(doelPas));
+              return true;
+            }
+            /* een kale poort: de pas aannemen zonder de werktafel te herladen
+               (neemPasAan, app-main-02b.js), en onthouden wat de server bevestigde */
+            neemPasAan(doelPas);
+            try { localStorage.setItem('rtg_werktafel_pas', doelPas); } catch (e2) {}
           }
         } catch (e) { throw e; }
       } else {
@@ -531,8 +566,9 @@ var RTG_BOUW = 'c3d95694';
       const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
       const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
       if (!magHier.includes(user.tier)){
-        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(pasAdres(doelPas)); return; }
-        API.token = null; return; // onbekende pas: poort tonen
+        if (!['rtg','lifestyle','business'].includes(doelPas)){ API.token = null; return; } // onbekende pas: poort tonen
+        if (vastePas){ location.replace(pasAdres(doelPas)); return; } // de app van een andere pas: daarheen
+        neemPasAan(doelPas); // een kale werktafel: de pas aannemen zonder herladen (app-main-02b.js)
       }
       /* De server heeft deze sessie op DEZE pas bevestigd. Onthoud dat, zodat
          de volgende kale /apps/app.html het adres al in de kop van de pagina

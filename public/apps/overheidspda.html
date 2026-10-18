@@ -78,7 +78,7 @@
 .s-qge8k0:not(#_#_#_){font-size:1.15rem;margin-bottom:0.5rem}
 </style>
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/personeel.html" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="overheidspda" class="rtg-stijl" data-workos-premium data-workos-home="/apps/personeel.html" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header><div class="ey">Rijksoverheid · personeel</div><h1 id="kop">Overheids-PDA</h1></header>
 <main id="main">
   <div class="login" id="login">
@@ -331,5 +331,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); L
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/workos-premium.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

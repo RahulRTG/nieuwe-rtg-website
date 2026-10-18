@@ -83,7 +83,7 @@
 .s-rrt1xk:not(#_#_#_){font-size:.95rem;margin:0.5rem 0 0.25rem}
 </style>
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="luchthaven" class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div><div class="ey">RTG Airport · operations</div><h1 id="kop">De Operatie</h1></div>
   <a href="/apps/marechaussee.html">KMar →</a>
@@ -451,5 +451,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); k
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/travel-os-config.js" defer></script>
 <script src="/shared/travel-os.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

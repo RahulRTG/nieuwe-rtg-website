@@ -7,6 +7,7 @@ const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
 const fs = require('node:fs');
+const dekkingsvang = require('./lib/dekkingsvang');
 
 /* DE BROWSER VOOR EEN SCHERMTOETS, en waarom dit hier staat en niet 32 keer.
 
@@ -363,7 +364,11 @@ async function startEens(opts) {
      die ook. */
   const eigenMap = (opts.env && ('RTG_DATA_DIR' in opts.env)) || process.env.RTG_DATA_DIR
     ? null : fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-toets-'));
-  const child = spawn(process.execPath, [script], {
+  /* In dekkingsmodus krijgt het kind de dekkingsvang mee, zodat stop() zijn
+     dekking kan laten wegschrijven voor de SIGKILL (test/lib/dekkingsvang.js).
+     Daarbuiten is vang null en verandert hier niets. */
+  const vang = dekkingsvang.plan({ ...process.env, ...(opts.env || {}) });
+  const child = spawn(process.execPath, vang ? [...vang.args, script] : [script], {
     /* RTG_TOETS: welke toets deze server start. De server schrijft dat mee in
        het schermjournaal, zodat scripts/schermen.js een VEEGTOETS (een die
        honderd schermen even aantikt) kan onderscheiden van een toets die de
@@ -401,10 +406,11 @@ async function startEens(opts) {
       RTG_BEZITSBEWIJS: process.env.RTG_BEZITSBEWIJS || 'aanbevolen',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
       ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),
-      ...(opts.env || {}), PORT: String(port)
+      ...(opts.env || {}), ...(vang ? vang.env : {}), PORT: String(port)
     },
     stdio: ['ignore', 'ignore', eigenStderr ? opts.stderr : 'pipe']
   });
+  dekkingsvang.onthoud(child, vang);
   if (!eigenStderr) luisterOpFouten(child);
   /* De eigen map gaat weg zodra het kind weg is -- ook bij SIGKILL, want 'exit'
      vuurt altijd. Alleen wat de helper zelf aanmaakte; een meegegeven map is
@@ -481,6 +487,7 @@ function stop(watDanOok) {
   const kind = typeof watDanOok.kill === 'function' ? watDanOok
     : (watDanOok.child && typeof watDanOok.child.kill === 'function' ? watDanOok.child : null);
   if (!kind) throw new TypeError('stop() kreeg iets zonder .kill: geef het kindproces mee (of het resultaat van startServer).');
+  dekkingsvang.vang(kind); // alleen in dekkingsmodus; anders meteen terug
   try { kind.kill('SIGKILL'); } catch (e) { /* al weg: prima */ }
 }
 

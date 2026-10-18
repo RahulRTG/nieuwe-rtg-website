@@ -1827,7 +1827,10 @@
     "server/kern/bankregie/stand.js",
     "server/kern/bankregie/vergunning.js",
     "server/kern/bearercode-keten.js",
+    "server/kern/bearercode-migratie.js",
+    "server/kern/bearercode-sleutelring.js",
     "server/kern/bearercode-v2.js",
+    "server/kern/bearercode-zegel.js",
     "server/kern/bearercode.js",
     "server/kern/bedrijfscontrole.js",
     "server/kern/bedrijfsmaat/beoordeel.js",
@@ -2626,6 +2629,7 @@
     "server/kern/identiteit/sessielijst.js",
     "server/kern/identiteit/sessieregister.js",
     "server/kern/identiteit/sessievelden.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestellen.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/kern/identiteit/tweedestap-rem.js",
@@ -33894,78 +33898,194 @@
    ]
   },
   {
-   "bestand": "server/kern/bearercode-v2.js",
+   "bestand": "server/kern/bearercode-migratie.js",
    "symbolen": [
     {
-     "naam": "stabiel",
-     "soort": "functie",
-     "lijn": 31,
+     "naam": "v2spoor",
+     "soort": "pijl",
+     "lijn": 43,
      "geexporteerd": false
     },
     {
+     "naam": "toonbaar",
+     "soort": "pijl",
+     "lijn": 48,
+     "geexporteerd": false
+    },
+    {
+     "naam": "records",
+     "soort": "functie",
+     "lijn": 51,
+     "geexporteerd": true
+    },
+    {
+     "naam": "herzegel",
+     "soort": "functie",
+     "lijn": 62,
+     "geexporteerd": true
+    },
+    {
+     "naam": "dicht",
+     "soort": "pijl",
+     "lijn": 68,
+     "geexporteerd": false
+    },
+    {
+     "naam": "regel",
+     "soort": "functie",
+     "lijn": 97,
+     "geexporteerd": false
+    },
+    {
+     "naam": "lijst",
+     "soort": "pijl",
+     "lijn": 104,
+     "geexporteerd": false
+    },
+    {
+     "naam": "metLijst",
+     "soort": "functie",
+     "lijn": 108,
+     "geexporteerd": true
+    },
+    {
+     "naam": "controleer",
+     "soort": "functie",
+     "lijn": 116,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "controleer",
+     "herzegel",
+     "metLijst",
+     "records"
+    ]
+   },
+   "requires": [
+    "server/kern/bearercode-zegel.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "server/kern/bearercode-sleutelring.js",
+   "symbolen": [
+    {
+     "naam": "uitGeheim",
+     "soort": "functie",
+     "lijn": 44,
+     "geexporteerd": true
+    },
+    {
+     "naam": "afleid",
+     "soort": "pijl",
+     "lijn": 47,
+     "geexporteerd": false
+    },
+    {
+     "naam": "leesRing",
+     "soort": "functie",
+     "lijn": 53,
+     "geexporteerd": true
+    },
+    {
+     "naam": "ring",
+     "soort": "functie",
+     "lijn": 78,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "ENV",
+     "KID",
+     "leesRing",
+     "ring",
+     "uitGeheim"
+    ]
+   },
+   "requires": [
+    "server/lib/sleutelbestand.js"
+   ],
+   "extern": [
+    "node:crypto",
+    "node:path"
+   ],
+   "gebruiktDoor": [
+    "server/kern/bearercode-zegel.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/bearercode-v2.js",
+   "symbolen": [
+    {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 37,
+     "lijn": 30,
      "geexporteerd": false
     },
     {
      "naam": "contracthash",
      "soort": "pijl",
-     "lijn": 40,
+     "lijn": 35,
      "geexporteerd": false
     },
     {
      "naam": "meld",
      "soort": "pijl",
-     "lijn": 45,
+     "lijn": 36,
      "geexporteerd": false
     },
     {
      "naam": "einde",
      "soort": "functie",
-     "lijn": 47,
+     "lijn": 38,
      "geexporteerd": false
     },
     {
      "naam": "gebruiksvorm",
      "soort": "functie",
-     "lijn": 62,
+     "lijn": 53,
      "geexporteerd": false
     },
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 69,
+     "lijn": 60,
      "geexporteerd": false
     },
     {
      "naam": "voorReden",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 85,
      "geexporteerd": false
     },
     {
      "naam": "naReden",
      "soort": "functie",
-     "lijn": 101,
+     "lijn": 93,
      "geexporteerd": false
     },
     {
      "naam": "trekIn",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 100,
      "geexporteerd": false
     },
     {
      "naam": "roteer",
      "soort": "functie",
-     "lijn": 122,
+     "lijn": 114,
      "geexporteerd": false
     },
     {
      "naam": "leidAf",
      "soort": "functie",
-     "lijn": 139,
+     "lijn": 131,
      "geexporteerd": false
     }
    ],
@@ -33977,11 +34097,94 @@
     ]
    },
    "requires": [
-    "server/kern/bearercode-keten.js"
+    "server/kern/bearercode-keten.js",
+    "server/kern/bearercode-zegel.js"
    ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/bearercode.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/bearercode-zegel.js",
+   "symbolen": [
+    {
+     "naam": "stabiel",
+     "soort": "functie",
+     "lijn": 33,
+     "geexporteerd": true
+    },
+    {
+     "naam": "deel",
+     "soort": "pijl",
+     "lijn": 38,
+     "geexporteerd": false
+    },
+    {
+     "naam": "kaleHash",
+     "soort": "pijl",
+     "lijn": 42,
+     "geexporteerd": true
+    },
+    {
+     "naam": "fout",
+     "soort": "pijl",
+     "lijn": 45,
+     "geexporteerd": false
+    },
+    {
+     "naam": "maakContractzegel",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": true
+    },
+    {
+     "naam": "nsSleutel",
+     "soort": "pijl",
+     "lijn": 52,
+     "geexporteerd": false
+    },
+    {
+     "naam": "ring",
+     "soort": "pijl",
+     "lijn": 58,
+     "geexporteerd": false
+    },
+    {
+     "naam": "mac",
+     "soort": "pijl",
+     "lijn": 59,
+     "geexporteerd": false
+    },
+    {
+     "naam": "zegel",
+     "soort": "functie",
+     "lijn": 63,
+     "geexporteerd": false
+    },
+    {
+     "naam": "toets",
+     "soort": "functie",
+     "lijn": 72,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "VELDEN",
+     "kaleHash",
+     "maakContractzegel",
+     "stabiel"
+    ]
+   },
+   "requires": [
+    "server/kern/bearercode-sleutelring.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/bearercode-migratie.js",
+    "server/kern/bearercode-v2.js"
    ]
   },
   {
@@ -76787,96 +76990,133 @@
    ]
   },
   {
+   "bestand": "server/kern/identiteit/toestelgrens.js",
+   "symbolen": [
+    {
+     "naam": "vanLid",
+     "soort": "pijl",
+     "lijn": 19,
+     "geexporteerd": false
+    },
+    {
+     "naam": "ruimActief",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": true
+    },
+    {
+     "naam": "intrekkingenVol",
+     "soort": "pijl",
+     "lijn": 31,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "MAX_ACTIEF",
+     "MAX_INGETROKKEN",
+     "intrekkingenVol",
+     "ruimActief"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/identiteit/toestellen.js"
+   ]
+  },
+  {
    "bestand": "server/kern/identiteit/toestellen.js",
    "symbolen": [
     {
      "naam": "maakToestellen",
      "soort": "functie",
-     "lijn": 50,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "bak",
      "soort": "pijl",
-     "lijn": 53,
+     "lijn": 54,
      "geexporteerd": false
     },
     {
      "naam": "uitdagingen",
      "soort": "pijl",
-     "lijn": 54,
+     "lijn": 55,
      "geexporteerd": false
     },
     {
      "naam": "sleutelVan",
      "soort": "pijl",
-     "lijn": 56,
+     "lijn": 57,
      "geexporteerd": false
     },
     {
      "naam": "geldigeId",
      "soort": "pijl",
-     "lijn": 57,
+     "lijn": 58,
      "geexporteerd": false
     },
     {
      "naam": "schoneNaam",
      "soort": "pijl",
-     "lijn": 64,
+     "lijn": 63,
      "geexporteerd": false
     },
     {
      "naam": "uitdaging",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 69,
      "geexporteerd": false
     },
     {
      "naam": "pakUitdaging",
      "soort": "functie",
-     "lijn": 80,
+     "lijn": 79,
      "geexporteerd": false
     },
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 97,
+     "lijn": 96,
      "geexporteerd": false
     },
     {
      "naam": "noem",
      "soort": "functie",
-     "lijn": 142,
+     "lijn": 143,
      "geexporteerd": false
     },
     {
      "naam": "trekIn",
      "soort": "functie",
-     "lijn": 157,
+     "lijn": 158,
      "geexporteerd": false
     },
     {
      "naam": "naamVan",
      "soort": "functie",
-     "lijn": 168,
+     "lijn": 169,
      "geexporteerd": false
     },
     {
      "naam": "publiekeSleutelVan",
      "soort": "functie",
-     "lijn": 179,
+     "lijn": 180,
      "geexporteerd": false
     },
     {
      "naam": "lijst",
      "soort": "functie",
-     "lijn": 185,
+     "lijn": 186,
      "geexporteerd": false
     },
     {
      "naam": "ruim",
-     "soort": "functie",
-     "lijn": 192,
+     "soort": "pijl",
+     "lijn": 193,
      "geexporteerd": false
     }
    ],
@@ -76888,6 +77128,7 @@
    },
    "requires": [
     "server/kern/eigencollectie.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/lib/klok.js"
    ],
@@ -177293,6 +177534,7 @@
     "server/accounts/index.js",
     "server/db/geheugen-kluis.js",
     "server/foundation/basis.js",
+    "server/kern/bearercode-sleutelring.js",
     "server/kern/dyncode.js",
     "server/kern/modebezorg/bezorgcode.js",
     "server/kern/rechterhand/index.js",
@@ -207676,25 +207918,25 @@
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 88,
      "geexporteerd": true
     },
     {
      "naam": "zetActief",
      "soort": "functie",
-     "lijn": 126,
+     "lijn": 135,
      "geexporteerd": true
     },
     {
      "naam": "lees",
      "soort": "functie",
-     "lijn": 133,
+     "lijn": 142,
      "geexporteerd": true
     },
     {
      "naam": "uitPatch",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 157,
      "geexporteerd": true
     }
    ],
@@ -207859,7 +208101,7 @@
     {
      "naam": "ronde",
      "soort": "functie",
-     "lijn": 153,
+     "lijn": 155,
      "geexporteerd": false
     }
    ],

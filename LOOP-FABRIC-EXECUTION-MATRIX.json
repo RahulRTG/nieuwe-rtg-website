@@ -140,7 +140,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 133,
+        "kernelModules": 135,
         "mutationContracts": 290,
         "routes": 290,
         "screens": 8,

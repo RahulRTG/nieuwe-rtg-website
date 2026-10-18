@@ -137,8 +137,9 @@ test('het takkenbestand houdt alleen de eigen bron vast, en een onleesbaar ruw b
     const r = v8.bewaar(ruw, uit, wortel);
     const k = JSON.parse(fs.readFileSync(uit, 'utf8'));
     assert.deepEqual(Object.keys(k.bestanden), ['server/a.js'], 'node_modules, toetsen en node-intern vallen buiten de meting');
-    assert.deepEqual(k.bestanden['server/a.js'], { takken: ['0-90', '40-60'], uitgevoerd: [[0, 40], [60, 90]] },
-      'beide blokken in de noemer, en uitgevoerd is wat niet in het nul-blok ligt');
+    assert.deepEqual(k.bestanden['server/a.js'], { functies: ['0-90'], gedekteFuncties: ['0-90'], blokken: [40],
+      uitgevoerd: [[0, 40], [60, 90]] },
+    'de functie op begin-eind, het blok op zijn begin, en uitgevoerd is wat niet in het nul-blok ligt');
     assert.equal(r.onleesbaar, 1, 'een afgebroken ruw bestand verdwijnt niet stil');
     assert.equal(k.onleesbaar, 1);
   } finally {
@@ -151,12 +152,13 @@ test('samenvoegen: een plek die in een batch is uitgevoerd, is uitgevoerd, en de
   const v8 = require('../scripts/lib/v8takken');
   /* p: na een run die de nee-kant (40-60) niet nam; q: na een run die de
      ja-kant (20-40) niet nam. Samen zijn beide kanten uitgevoerd. */
-  const p = { bestanden: { 'server/a.js': { takken: ['0-90', '40-60'], uitgevoerd: [[0, 40], [60, 90]] } }, onleesbaar: 0 };
-  const q = { bestanden: { 'server/a.js': { takken: ['0-90', '20-40'], uitgevoerd: [[0, 20], [40, 90]] },
-    'server/b.js': { takken: ['0-5'], uitgevoerd: [] } }, onleesbaar: 1 };
+  const a = (blok, uit) => ({ functies: ['0-90'], gedekteFuncties: ['0-90'], blokken: [blok], uitgevoerd: uit });
+  const p = { versie: 2, bestanden: { 'server/a.js': a(40, [[0, 40], [60, 90]]) }, onleesbaar: 0 };
+  const q = { versie: 2, bestanden: { 'server/a.js': a(20, [[0, 20], [40, 90]]),
+    'server/b.js': { functies: ['0-5'], gedekteFuncties: [], blokken: [], uitgevoerd: [] } }, onleesbaar: 1 };
   const een = v8.tel(v8.voegSamen([p, q]));
   assert.deepEqual(v8.tel(v8.voegSamen([q, p])), een);
-  assert.deepEqual(een, { bestanden: 2, gedekt: 3, totaal: 4, pct: 75, onleesbaar: 1 });
+  assert.deepEqual(een, { bestanden: 2, gedekt: 3, totaal: 4, pct: 75, onleesbaar: 1, botsingen: 0 });
 });
 
 test('de V8-regel: de telling van een plek is die van het binnenste bereik dat haar omvat', () => {

@@ -46,7 +46,7 @@
     "kernelGroups": [
       {
         "group": "_root",
-        "files": 598
+        "files": 601
       },
       {
         "group": "aanmeldingen",
@@ -338,7 +338,7 @@
       },
       {
         "group": "identiteit",
-        "files": 26
+        "files": 27
       },
       {
         "group": "initdata",
@@ -3489,6 +3489,8 @@
       "server/kern/bankregie/instellingen.js",
       "server/kern/bankregie/stand.js",
       "server/kern/bankregie/vergunning.js",
+      "server/kern/bearercode-migratie.js",
+      "server/kern/bearercode-sleutelring.js",
       "server/kern/bedrijfsmaat/besluiten-later.js",
       "server/kern/bedrijfsmaat/besluiten.js",
       "server/kern/bedrijfsmaat/definities-later.js",
@@ -6056,6 +6058,7 @@
       "server/kern/bank/walletbrug.js",
       "server/kern/bankregie/autorisatie.js",
       "server/kern/bearercode-keten.js",
+      "server/kern/bearercode-sleutelring.js",
       "server/kern/bearercode-v2.js",
       "server/kern/bearercode.js",
       "server/kern/bedrijfscontrole.js",
@@ -15645,7 +15648,7 @@
         "mutationRoutes": 1026,
         "declaredMutationSemantics": 319,
         "sourceFileCount": 203,
-        "kernelDependencyCount": 2680,
+        "kernelDependencyCount": 2683,
         "screenCount": 41,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15692,7 +15695,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2656,
+        "kernelDependenciesOmitted": 2659,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -16898,7 +16901,7 @@
         "mutationRoutes": 342,
         "declaredMutationSemantics": 141,
         "sourceFileCount": 84,
-        "kernelDependencyCount": 100,
+        "kernelDependencyCount": 102,
         "screenCount": 26,
         "sourceFiles": [
           "server/foundation.js",
@@ -16928,7 +16931,9 @@
           "server/kern/agentteken.js",
           "server/kern/ai/contextpakket.js",
           "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-sleutelring.js",
           "server/kern/bearercode-v2.js",
+          "server/kern/bearercode-zegel.js",
           "server/kern/bearercode.js",
           "server/kern/belasting.js",
           "server/kern/betekenis.js",
@@ -16941,11 +16946,9 @@
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
-          "server/kern/envelop.js",
-          "server/kern/geld/eenheid.js",
-          "server/kern/intreksignaal.js"
+          "server/kern/envelop.js"
         ],
-        "kernelDependenciesOmitted": 76,
+        "kernelDependenciesOmitted": 78,
         "screens": [
           "public/apps/app.html",
           "public/apps/foundation/babyboek.html",
@@ -17044,7 +17047,7 @@
         "mutationRoutes": 216,
         "declaredMutationSemantics": 91,
         "sourceFileCount": 57,
-        "kernelDependencyCount": 86,
+        "kernelDependencyCount": 88,
         "screenCount": 0,
         "sourceFiles": [
           "server/school/aandacht.js",
@@ -17068,7 +17071,9 @@
         "kernelDependencies": [
           "server/kern/ai/contextpakket.js",
           "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-sleutelring.js",
           "server/kern/bearercode-v2.js",
+          "server/kern/bearercode-zegel.js",
           "server/kern/bearercode.js",
           "server/kern/belasting.js",
           "server/kern/betekenis.js",
@@ -17087,11 +17092,9 @@
           "server/kern/koppelvlak-kaarten.js",
           "server/kern/koppelvlak.js",
           "server/kern/kosten/haak.js",
-          "server/kern/kosten/soorten.js",
-          "server/kern/leerstof-bibliotheek.js",
-          "server/kern/leerstof-dag.js"
+          "server/kern/kosten/soorten.js"
         ],
-        "kernelDependenciesOmitted": 62,
+        "kernelDependenciesOmitted": 64,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -17281,7 +17284,7 @@
         "mutationRoutes": 136,
         "declaredMutationSemantics": 68,
         "sourceFileCount": 47,
-        "kernelDependencyCount": 88,
+        "kernelDependencyCount": 90,
         "screenCount": 1,
         "sourceFiles": [
           "server/bedrijf/aansluiting.js",
@@ -17328,7 +17331,7 @@
           "server/bedrijf/inzicht.js",
           "server/bedrijf/it.js"
         ],
-        "kernelDependenciesOmitted": 64,
+        "kernelDependenciesOmitted": 66,
         "screens": [
           "public/apps/werk.html"
         ],
@@ -18106,7 +18109,7 @@
         "mutationRoutes": 2,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 3,
+        "kernelDependencyCount": 5,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/werving.js"
@@ -18114,7 +18117,9 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-sleutelring.js",
           "server/kern/bearercode-v2.js",
+          "server/kern/bearercode-zegel.js",
           "server/kern/bearercode.js"
         ],
         "kernelDependenciesOmitted": 0,
@@ -18791,7 +18796,7 @@
         "mutationRoutes": 14,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 20,
+        "kernelDependencyCount": 22,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/tenant.js",
@@ -18802,7 +18807,9 @@
           "server/bedrijf/rollen-register.js",
           "server/bedrijf/sleutels.js",
           "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-sleutelring.js",
           "server/kern/bearercode-v2.js",
+          "server/kern/bearercode-zegel.js",
           "server/kern/bearercode.js",
           "server/kern/intreksignaal.js",
           "server/kern/tenant/bewijs-sla.js",
@@ -26530,7 +26537,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2651,
+        "kernelDependencyCount": 2654,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26564,7 +26571,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2627,
+        "kernelDependenciesOmitted": 2630,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -27078,7 +27085,7 @@
         "mutationRoutes": 1,
         "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 23,
+        "kernelDependencyCount": 25,
         "screenCount": 14,
         "sourceFiles": [
           "server/opzet/stroomtoegang.js",
@@ -27087,7 +27094,9 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-sleutelring.js",
           "server/kern/bearercode-v2.js",
+          "server/kern/bearercode-zegel.js",
           "server/kern/bearercode.js",
           "server/kern/eigencollectie.js",
           "server/kern/intreksignaal.js",
@@ -27107,10 +27116,9 @@
           "server/kern/sociaal/pin-formaat.js",
           "server/kern/stroomticket.js",
           "server/kern/taalkeuring.js",
-          "server/kern/util.js",
-          "server/kern/veilig.js"
+          "server/kern/util.js"
         ],
-        "kernelDependenciesOmitted": 0,
+        "kernelDependenciesOmitted": 1,
         "screens": [
           "public/apps/comm.html",
           "public/apps/geld.html",
@@ -27561,7 +27569,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2651,
+        "kernelDependencyCount": 2654,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27594,7 +27602,7 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2627,
+        "kernelDependenciesOmitted": 2630,
         "screens": [
           "public/apps/vertaler.html"
         ],
@@ -29092,7 +29100,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 45,
+        "kernelDependencyCount": 47,
         "screenCount": 0,
         "sourceFiles": [
           "server/opzet/webhooks.js",
@@ -29103,7 +29111,9 @@
           "server/kern/agentteken.js",
           "server/kern/ai/contextpakket.js",
           "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-sleutelring.js",
           "server/kern/bearercode-v2.js",
+          "server/kern/bearercode-zegel.js",
           "server/kern/bearercode.js",
           "server/kern/betaalwaarheid/inkomend.js",
           "server/kern/bevoegdheid/lijst-afhankelijk.js",
@@ -29121,11 +29131,9 @@
           "server/kern/journaalverhuizing.js",
           "server/kern/journaalvorm.js",
           "server/kern/kosten/haak.js",
-          "server/kern/kosten/soorten.js",
-          "server/kern/muziek-instrumenten.js",
-          "server/kern/muziek-stijlen.js"
+          "server/kern/kosten/soorten.js"
         ],
-        "kernelDependenciesOmitted": 21,
+        "kernelDependenciesOmitted": 23,
         "screens": [],
         "screensOmitted": 0,
         "signals": [

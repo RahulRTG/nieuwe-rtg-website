@@ -312,6 +312,10 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+          # Het verval (scripts/normverval.js) zet NORM.json af tegen het
+          # aftakpunt van origin/main (scripts/lib/basis.js). Een ondiepe kloon
+          # heeft dat punt niet en de stap zakte elke week met "GEEN BASIS".
+          fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: '.nvmrc'

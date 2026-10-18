@@ -121,8 +121,9 @@ async function maakProeflid({ post, naam, basis }) {
      token van `voorLid.van()` (de demo-pas) aanklopt, klopt aan als het proeflid
      -- want een demo-pas kan per definitie niet binden, en de vraag die de proef
      stelt ("doet een herhaling iets") gaat over de route en niet over welk lid.
-     Op elk ander pad blijft het token zoals het was: de meting van de rest van
-     het huis verandert niet.
+     `van()` mag ook een LIJST tokens geven: De Beproeving heeft twee demo-passen
+     (RTG en Business) in de ledenrol. Op elk ander pad blijft het token zoals
+     het was: de meting van de rest van het huis verandert niet.
    - elk token dat bij een gebonden toestel hoort, krijgt een vers bewijs.
 
    Een token dat niemand kent gaat ongemoeid door: de SERVER beslist of dat mag,
@@ -133,7 +134,10 @@ function metToestellen(post, { toestellen, voorLid } = {}) {
   return async (pad, lijf, token, koppen) => {
     if (!zwaarPad(pad)) return post(pad, lijf, token, koppen);
     let t = token;
-    if (voorLid && voorLid.lid && token && token === voorLid.van()) t = voorLid.lid.token;
+    if (voorLid && voorLid.lid && token) {
+      const van = voorLid.van();
+      if (Array.isArray(van) ? van.includes(token) : token === van) t = voorLid.lid.token;
+    }
     const toestel = (voorLid && voorLid.lid && voorLid.lid.token === t) ? voorLid.lid : bekend.find(x => x.token === t);
     if (!toestel) return post(pad, lijf, t, koppen);
     const bewijs = await toestel.teken('POST', pad);

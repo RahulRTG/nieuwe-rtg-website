@@ -99,7 +99,7 @@
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="avond" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div><span class="ey">Rahul Travel Group</span><h1>Een avond</h1></div>
   <button class="terug" id="bTerug">Terug</button>
@@ -409,5 +409,13 @@
      test/appmenu.e2e.js, die elke pagina onder apps/ nakijkt; de keuring ziet
      dit niet, want dat is een toets en geen keuringsregel. -->
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

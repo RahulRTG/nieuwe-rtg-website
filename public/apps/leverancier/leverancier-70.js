@@ -1,9 +1,9 @@
 /* de kamerkalender */
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.plan','Kamerkalender')+' <span class="sub">('+p.dagen.length+' '+T('vr.dagen','dagen')+')</span></div>'+
-      '<div style="display:flex;gap:2px;margin:0.5rem 0 0.25rem;padding-left:96px;overflow:hidden;">'+p.dagen.map(d => '<span style="width:16px;flex-shrink:0;font-size:0.55rem;color:var(--soft);text-align:center;">'+dagLabel(d)+'</span>').join('')+'</div>'+
-      p.kamers.map(k => '<div style="display:flex;align-items:center;gap:0;margin-top:3px;">'+
-        '<span style="width:96px;flex-shrink:0;font-size:0.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px;">'+esc(k.name)+'</span>'+
-        '<span style="display:flex;gap:2px;overflow:hidden;">'+k.dagen.map(d =>
+      '<div class="s-1o5wmup">'+p.dagen.map(d => '<span class="s-gs5au2">'+dagLabel(d)+'</span>').join('')+'</div>'+
+      p.kamers.map(k => '<div class="s-1wh5dc0">'+
+        '<span class="s-1phutar">'+esc(k.name)+'</span>'+
+        '<span class="s-7cvann">'+k.dagen.map(d =>
           '<span title="'+d.datum+(d.codenaam?', '+esc(d.codenaam):'')+'" style="width:16px;height:16px;flex-shrink:0;border-radius:0;border:1px solid var(--line);background:'+
           (d.status==='ingecheckt'?'#7F1634':d.status==='bevestigd'?'#A98F1C':'transparent')+';"></span>').join('')+'</span>'+
       '</div>').join('')+
@@ -25,18 +25,18 @@
     const rij = p => {
       const i = afd.keten.indexOf(p.status);
       const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
-      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.5rem;font-size:0.82rem;flex-wrap:wrap;" data-dpost="'+p.id+'">'+
+      return '<div class="s-18ylv35" data-dpost="'+p.id+'">'+
         '<span>'+(p.waar?'<b>'+esc(p.waar)+'</b> · ':'')+esc(p.tekst)+' <span class="sub">'+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+
           ((p.via||[]).length?' · '+T('dorp.via','via')+' '+p.via.map(esc).join(', '):'')+'</span></span>'+
         (volgende
-          ? '<span style="display:flex;gap:0.4rem;align-items:center;flex-shrink:0;"><span class="pill bereiding">'+esc(p.status)+'</span><button class="obtn primary js-dverder">'+esc(volgende)+'</button><button class="obtn js-dstuur" title="'+T('dorp.stuur','Stuur door naar een andere afdeling')+'">↪</button></span>'
+          ? '<span class="s-b3jkew"><span class="pill bereiding">'+esc(p.status)+'</span><button class="obtn primary js-dverder">'+esc(volgende)+'</button><button class="obtn js-dstuur" title="'+T('dorp.stuur','Stuur door naar een andere afdeling')+'">↪</button></span>'
           : '<span class="pill klaar" style="flex-shrink:0;">'+esc(p.status)+'</span>')+
       '</div>';
     };
     // het specialistische gereedschap van deze afdeling (dagstaat, wachtrij...)
     let tools = null;
     try { tools = await API.call('/supplier/dorp/tools', { afdeling: dorpKant }); } catch(e){}
-    const kop = t => '<div style="margin-top:0.5rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+t+'</div>';
+    const kop = t => '<div class="s-ds4k2m">'+t+'</div>';
     // de gereedschapskist: generieke widgets (cijfers, lijst, knoppen, actie, meter)
     let toolsBlok = '';
     if (tools && Array.isArray(tools.tools)) toolsBlok = tools.tools.map(w => {
@@ -44,7 +44,7 @@
         w.items.map(i => '<span>'+esc(i.label)+' · <b>'+esc(String(i.waarde))+'</b></span>').join('')+'</div>';
       if (w.type === 'lijst') return kop(esc(w.titel))+((w.rijen||[]).length ? w.rijen.map(r =>
         '<div class="st-row"><span>'+(r.icoon?r.icoon+' ':'')+esc(r.tekst)+(r.sub?'<span class="sub" style="display:block;">'+esc(r.sub)+'</span>':'')+'</span>'+
-        (r.rechts?'<b style="color:'+(r.rood?'var(--burgundy)':'var(--gold)')+';white-space:nowrap;">'+esc(r.rechts)+'</b>':'')+'</div>').join('')
+        (r.rechts?'<b class="' + (r.rood ? 's-1fp8htv' : 's-qopcz1') + '">'+esc(r.rechts)+'</b>':'')+'</div>').join('')
         : '<div class="softline h-mt35">'+esc(w.leeg||'')+'</div>');
       if (w.type === 'knoppen') return kop(esc(w.titel))+'<div class="pos-chips h-mt35">'+
         w.knoppen.map(k => '<span><button class="obtn js-dsnel" data-snel="'+esc(k)+'" style="padding:0.15rem 0.55rem;">'+esc(k)+'</button></span>').join('')+'</div>';
@@ -54,7 +54,7 @@
         (w.stand?'<div class="softline h-mt25">'+T('gy.nu','Nu')+' '+esc(w.stand.stand)+' · '+esc(w.stand.door)+', '+timeAgo(w.stand.at)+'</div>':'');
       // de leeftijdscheck aan de deur: ja/nee op codenaam, zonder gegevens
       if (w.type === 'leeftijd') return kop(esc(w.titel))+
-        '<div class="tt-add" style="margin-top:0.25rem;flex-wrap:wrap;"><input id="dorpLftIn" placeholder="'+T('dorp.lft.ph','Codenaam van de gast')+'" style="flex:2;min-width:140px;">'+
+        '<div class="tt-add s-ixm1sc"><input id="dorpLftIn" placeholder="'+T('dorp.lft.ph','Codenaam van de gast')+'" class="s-7ug9o">'+
         '<button class="obtn js-dlft" data-min="18">18+?</button><button class="obtn js-dlft" data-min="21">21+?</button></div>'+
         '<div id="dorpLftUit" class="softline h-mt30">'+esc(w.hint||'')+'</div>';
       return '';
@@ -65,22 +65,22 @@
       if (!renderDorp.buurt){
         try { renderDorp.buurt = (await API.call('/supplier/dorp/buurt', {})).buurt || []; } catch(e){ renderDorp.buurt = []; }
       }
-      if (renderDorp.buurt.length) buurtBlok = '<div style="margin-top:0.75rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('dorp.buurt','In de buurt')+'</div>'+
+      if (renderDorp.buurt.length) buurtBlok = '<div class="s-5vz2p">'+T('dorp.buurt','In de buurt')+'</div>'+
         '<div class="pos-chips h-mt35">'+renderDorp.buurt.map(b =>
           '<span><button class="obtn js-dbuurt" data-naam="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'" style="padding:0.15rem 0.5rem;">'+RTGGlyf.tekst(b.icon)+' '+esc(b.naam)+' · '+b.km+' km</button></span>').join('')+'</div>'+
         '<div class="softline h-mt30">'+T('dorp.buurt.s','Een tik zet de naam alvast in de wens.')+'</div>';
     }
     el.innerHTML =
-      '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+d.afdelingen.map(a =>
+      '<div class="card s-1fa4ugf">'+d.afdelingen.map(a =>
         '<button class="obtn'+(a.key===dorpKant?' primary':'')+'" data-dkant="'+a.key+'">'+RTGGlyf.tekst(a.icon)+' '+esc(a.label)+(a.openAantal?' · '+a.openAantal:'')+'</button>').join('')+'</div>'+
       '<div class="card"><div class="tt-h">'+RTGGlyf.tekst(afd.icon)+' '+esc(afd.label)+' <span class="sub">('+afd.keten.join(' · ')+')</span></div>'+
         toolsBlok+
         (afd.open.length ? afd.open.map(rij).join('') : '<div class="softline h-mt50">'+T('dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
         buurtBlok+
-        (afd.klaar.length ? '<div style="margin-top:0.5rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('dorp.klaar','Net afgerond')+'</div>'+afd.klaar.map(rij).join('') : '')+
-        '<div class="tt-add" style="flex-wrap:wrap;margin-top:0.75rem;">'+
-          '<input id="dorpWaar" placeholder="'+esc(afd.waarHint)+'" style="flex:1;min-width:110px;">'+
-          '<input id="dorpTekst" placeholder="'+esc(afd.watHint)+'" style="flex:2;min-width:160px;">'+
+        (afd.klaar.length ? '<div class="s-ds4k2m">'+T('dorp.klaar','Net afgerond')+'</div>'+afd.klaar.map(rij).join('') : '')+
+        '<div class="tt-add s-1k4off3">'+
+          '<input id="dorpWaar" placeholder="'+esc(afd.waarHint)+'" class="s-1cv6gu6">'+
+          '<input id="dorpTekst" placeholder="'+esc(afd.watHint)+'" class="s-7vq8q">'+
           '<button id="dorpAdd">'+T('dorp.zet','Zet erbij')+'</button></div>'+
       '</div>';
     el.querySelectorAll('[data-dkant]').forEach(b => b.addEventListener('click', () => {

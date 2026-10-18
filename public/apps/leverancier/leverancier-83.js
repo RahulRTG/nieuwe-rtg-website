@@ -1,6 +1,6 @@
 /* de recepten en hun marges */
     if (rec.length) h += '<div class="card"><div class="tt-h">'+T('vr.recepten','Recepten en marge')+'</div>'+
-      rec.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;">'+
+      rec.map(r => '<div class="s-knqe4u">'+
         '<div class="st-row"><span><b>'+esc(r.naam)+'</b> <span class="sub">'+geld(r.prijs)+(r.regels.length?' · '+T('vr.kost','kost')+' '+geld(r.kostprijs)+' · '+T('vr.marge','marge')+' '+geld(r.marge)+(r.margePct!=null?' ('+r.margePct+'%)':''):'')+'</span></span>'+
         (mgr?'<button class="obtn ghost" data-vrec="'+r.id+'">'+(r.regels.length?T('vr.rbew','Recept'):T('vr.rzet','+ Recept'))+'</button>':'')+'</div>'+
         (r.regels.length?'<div class="sub">'+r.regels.map(x=>x.hoeveelheid+' '+esc(x.eenheid)+' '+esc(x.naam)).join(' · ')+'</div>':'')+
@@ -10,7 +10,7 @@
     if (ma && (ma.rijen||[]).some(r => r.verkocht > 0 || r.heeftRecept)){
       const KLASSE = { ster: ['', '#D8B940'], werkpaard: ['', '#69B98B'], puzzel: ['', '#7FA6D9'], hond: ['', '#FF8589'], onbekend: ['·', 'var(--soft)'] };
       h += '<div class="card"><div class="tt-h">'+T('vr.me','Menu-engineering')+' <span class="sub">('+ma.dagen+' '+T('vr.dagen','dagen')+')</span></div>'+
-        ma.rijen.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+        ma.rijen.map(r => '<div class="s-stqank">'+
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
           '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
@@ -52,8 +52,8 @@
       try {
         const p = await API.call('/supplier/keuken/menu-advies', {});
         uit.innerHTML = '<div class="sub h-mt50">'+esc(p.samenvatting)+'</div>'+
-          (p.acties||[]).map(x => '<div style="border-top:1px solid var(--line);padding:0.35rem 0;font-size:0.82rem;">'+
-            (x.impact?'<b style="color:var(--rtg-leesgoud,var(--gold));">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
+          (p.acties||[]).map(x => '<div class="s-wreczo">'+
+            (x.impact?'<b class="s-12itpbj">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
       } catch(e){ uit.innerHTML = ''; toast(e.message); }
     });
     el.querySelectorAll('[data-vtel]').forEach(b => b.addEventListener('click', () => {

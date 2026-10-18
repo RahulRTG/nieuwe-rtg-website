@@ -56,6 +56,18 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1knmidi:not(#_#_#_){font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.s-bro4np:not(#_#_#_){font-size:.75rem;color:var(--soft)}
+.s-sqqr9:not(#_#_#_){font-size:.98rem;color:var(--muted);line-height:1.6;margin-top:0.5rem;font-style:italic}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -108,9 +120,9 @@ async function lees(id){
   let d; try{ d=await api('/artikel',{id}); }catch(e){ OPEN=null; meld(e.message); return laad(); }
   const a=d.artikel;
   $('#main').innerHTML='<button class="knop stil" id="terug">← alle artikelen</button>'
-    +'<article class="lees h-mt80"><div class="rlbl" style="font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);">'+esc(a.rubriek)+'</div>'
-    +'<h2>'+esc(a.kop)+'</h2><div style="font-size:.75rem;color:var(--soft);">door '+esc(a.auteur)+' · '+tijd(a.at)+'</div>'
-    +(a.intro?'<div style="font-size:.98rem;color:var(--muted);line-height:1.6;margin-top:0.5rem;font-style:italic;">'+esc(a.intro)+'</div>':'')
+    +'<article class="lees h-mt80"><div class="rlbl s-1knmidi">'+esc(a.rubriek)+'</div>'
+    +'<h2>'+esc(a.kop)+'</h2><div class="s-bro4np">door '+esc(a.auteur)+' · '+tijd(a.at)+'</div>'
+    +(a.intro?'<div class="s-sqqr9">'+esc(a.intro)+'</div>':'')
     +'<div class="tekst">'+esc(a.tekst)+'</div>'
     +'<div class="ai"><div class="rij"><input id="aiV" placeholder="Vraag Rahul iets over dit stuk, of laat het samenvatten"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA"></div></div></article>';
   $('#terug').onclick=()=>{ OPEN=null; laad(); };

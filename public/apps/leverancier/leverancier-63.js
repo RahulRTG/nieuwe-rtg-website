@@ -1,7 +1,7 @@
 /* afrekenen, of op de kamer laten schrijven */
     const rooms = state.rooms || [];
     return '<div class="card"><div class="tt-h">'+T('pos.charge','Afrekening of kamerlast')+'</div>'+
-      '<div class="field"><label>'+T('pos.roomlbl','Kamer (optioneel)')+'</label><select id="posRoom" style="width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
+      '<div class="field"><label>'+T('pos.roomlbl','Kamer (optioneel)')+'</label><select id="posRoom" class="s-18pfzb1">'+
         '<option value="">'+T('pos.noroom','Geen kamer, losse verkoop')+'</option>'+
         rooms.map(r=>'<option value="'+r.name.replace(/"/g,'&quot;')+'">'+r.name+'</option>').join('')+'</select></div>'+
       '<div class="field"><label>'+T('pos.desc','Omschrijving')+'</label><input id="posDesc" placeholder="'+T('pos.deschotel','Bijv. minibar, spa, roomservice')+'"></div>'+
@@ -22,7 +22,7 @@
     return '<div class="card"><div class="tt-h">'+T('pos.openrooms','Open kamerrekeningen')+'</div>'+
       rooms.map(r =>
         '<div class="pos-sale"><div><b>'+r+'</b><span>'+open[r].count+' '+T('pos.posts','post(en)')+'</span></div>'+
-        '<div class="row-mid-gap"><span class="amt" style="font-family:\'Bodoni Moda\',serif;">'+eur(open[r].total)+'</span>'+
+        '<div class="row-mid-gap"><span class="amt s-14jo6ez">'+eur(open[r].total)+'</span>'+
         '<button class="obtn primary js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="rtgpay">'+T('pos.checkoutrtg','Check-out, RTG Pay')+'</button>'+
         '<button class="obtn js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="contant">'+T('pos.cash','Contant')+'</button></div></div>'
       ).join('')+'</div>';
@@ -132,7 +132,7 @@
       await refresh(); openTab('kassa');
       $('#posRedeemResult').innerHTML = box.innerHTML;
     } catch(e){
-      box.innerHTML = '<div class="enroute" style="margin-top:0.75rem;border-color:rgba(194,58,94,0.4);color:var(--burgundy);">'+e.message+'</div>';
+      box.innerHTML = '<div class="enroute s-1kyh0rc">'+e.message+'</div>';
       toast(e.message);
     }
   }

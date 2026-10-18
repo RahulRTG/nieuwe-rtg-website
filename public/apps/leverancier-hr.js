@@ -27,12 +27,12 @@
   function kaartInwerk(){
     const open = (data.inwerk || []).filter(t => !t.klaarOp);
     const klaar = (data.inwerk || []).filter(t => t.klaarOp);
-    let h = '<div class="tkc" style="grid-column:1/-1;"><h3>' + T('hr2.inwerk', 'Inwerktrajecten') + (open.length ? ' (' + open.length + ')' : '') + '</h3>' +
+    let h = '<div class="tkc s-1fuhja7"><h3>' + T('hr2.inwerk', 'Inwerktrajecten') + (open.length ? ' (' + open.length + ')' : '') + '</h3>' +
       '<div class="tkc-who">' + T('hr2.inwerk.s', 'Elke nieuwe collega een vaste route: dag 1, week 1, maand 1. De medewerker vinkt mee vanuit de eigen app.') + '</div>';
     for (const t of open){
       const n = t.stappen.filter(s => s.klaar).length;
       h += '<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">' +
-        '<div class="st-row" style="padding:0;"><b>' + esc(t.name) + '</b><span class="sub">' + n + '/' + t.stappen.length + '</span></div>';
+        '<div class="st-row s-15ai77r"><b>' + esc(t.name) + '</b><span class="sub">' + n + '/' + t.stappen.length + '</span></div>';
       for (const fase of ['dag1', 'week1', 'maand1']){
         const st2 = t.stappen.filter(s => s.fase === fase);
         if (!st2.length) continue;
@@ -57,12 +57,12 @@
     let h = '<div class="tkc"><h3>' + T('hr2.gesprek', 'Groeigesprekken') + '</h3>' +
       '<div class="tkc-who">' + T('hr2.gesprek.s', 'Vast ritme, geen scores: wat gaat goed, wat heeft aandacht, welke afspraken. Alleen management en de medewerker zelf zien dit.') + '</div>' +
       g.slice(-8).reverse().map(x => '<div class="st-row" style="cursor:pointer;" data-hropen="' + x.id + '"><span>' + esc(x.name) + '<span class="sub">' + esc(x.datum) + ' · ' + esc(x.onderwerp) + '</span></span><span class="sub">' + (openGesprek === x.id ? '−' : '+') + '</span></div>' +
-        (openGesprek === x.id ? '<div class="tkc-who" style="border-left:2px solid var(--gold);padding-left:0.7rem;">' + esc(x.verslag) + (x.afspraken ? '<br><b>' + T('hr2.afspraken', 'Afspraken') + ':</b> ' + esc(x.afspraken) : '') + '</div>' : '')).join('');
+        (openGesprek === x.id ? '<div class="tkc-who s-1t0enyw">' + esc(x.verslag) + (x.afspraken ? '<br><b>' + T('hr2.afspraken', 'Afspraken') + ':</b> ' + esc(x.afspraken) : '') + '</div>' : '')).join('');
     h += '<div class="st-form h-mt50">' + staffKeus('hrGwie') +
       '<input class="st-in" id="hrGond" placeholder="' + T('hr2.onderwerp', 'Onderwerp, bijv. eerste kwartaal') + '">' +
-      '<textarea class="st-in" id="hrGver" placeholder="' + T('hr2.verslag', 'Verslag: wat gaat goed, wat heeft aandacht') + '" style="min-height:56px;resize:vertical;"></textarea>' +
+      '<textarea class="st-in s-1pd764i" id="hrGver" placeholder="' + T('hr2.verslag', 'Verslag: wat gaat goed, wat heeft aandacht') + '"></textarea>' +
       '<input class="st-in" id="hrGafs" placeholder="' + T('hr2.afspraken', 'Afspraken') + '">' +
-      '<button class="obtn primary" id="hrGopslaan" style="align-self:flex-start;">' + T('hr2.vastleggen', 'Leg gesprek vast') + '</button></div></div>';
+      '<button class="obtn primary s-9lnaus" id="hrGopslaan">' + T('hr2.vastleggen', 'Leg gesprek vast') + '</button></div></div>';
     return h;
   }
 
@@ -78,7 +78,7 @@
     h += '<div class="st-form h-mt50">' + staffKeus('hrCwie') +
       '<input class="st-in" id="hrCsoort" placeholder="' + T('hr2.soort', 'Soort, bijv. EHBO of BHV') + '">' +
       '<div style="display:flex;gap:0.4rem;"><input class="st-in h-flex1" id="hrCtot" type="date" title="' + T('hr2.verloopt', 'verloopt') + '"></div>' +
-      '<button class="obtn primary" id="hrCnieuw" style="align-self:flex-start;">' + T('hr2.toevoegen', 'Voeg toe') + '</button></div></div>';
+      '<button class="obtn primary s-9lnaus" id="hrCnieuw">' + T('hr2.toevoegen', 'Voeg toe') + '</button></div></div>';
     return h;
   }
 
@@ -92,8 +92,8 @@
   function teken(){
     const w = document.getElementById('hrPlusWortel');
     if (!w) return;
-    if (!data){ w.innerHTML = '<div class="tkc" style="grid-column:1/-1;"><h3>HR</h3><div class="tkc-who">' + T('kt.laden', 'Laden...') + '</div></div>'; return; }
-    if (data.error){ w.innerHTML = '<div class="tkc" style="grid-column:1/-1;"><h3>HR</h3><div class="tkc-who">' + esc(data.error) + '</div></div>'; return; }
+    if (!data){ w.innerHTML = '<div class="tkc s-1fuhja7"><h3>HR</h3><div class="tkc-who">' + T('kt.laden', 'Laden...') + '</div></div>'; return; }
+    if (data.error){ w.innerHTML = '<div class="tkc s-1fuhja7"><h3>HR</h3><div class="tkc-who">' + esc(data.error) + '</div></div>'; return; }
     w.innerHTML = kaartInwerk() + kaartGesprekken() + kaartCertificaten() + kaartDienst();
   }
 

@@ -5,15 +5,15 @@
         (r.bezetting.vuil?'<span>'+r.bezetting.vuil+' '+T('rc.vuil','voor housekeeping')+'</span>':'')+
         (r.aanvragen.length?'<span>'+r.aanvragen.length+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+
       '</div>'+
-      ((r.hkEerst||[]).length?'<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--burgundy);border:1px solid rgba(194,58,94,0.35);border-radius:0;padding:0.45rem 0.6rem;">'+T('rc.hkeerst','Housekeeping eerst:')+' <b>'+r.hkEerst.map(esc).join(', ')+'</b> · '+T('rc.hkeerst2','daar komt vandaag alweer een gast aan.')+'</div>':'')+
-      (r.aanvragen.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.nieuw','Aanvragen')+'</div>'+r.aanvragen.map(v => rij(v,
+      ((r.hkEerst||[]).length?'<div class="s-94pgia">'+T('rc.hkeerst','Housekeeping eerst:')+' <b>'+r.hkEerst.map(esc).join(', ')+'</b> · '+T('rc.hkeerst2','daar komt vandaag alweer een gast aan.')+'</div>':'')+
+      (r.aanvragen.length?'<div class="s-x3n22l">'+T('rc.nieuw','Aanvragen')+'</div>'+r.aanvragen.map(v => rij(v,
         '<button class="obtn primary js-vbok">'+T('res.ok','Bevestig')+'</button><button class="obtn warn js-vbnee">'+T('sup.reject','Weiger')+'</button>')).join(''):'')+
-      (r.aankomsten.length?'<div style="margin-top:0.5rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.aankomst','Aankomsten')+'</div>'+r.aankomsten.map(v => rij(v,
+      (r.aankomsten.length?'<div class="s-ds4k2m">'+T('rc.aankomst','Aankomsten')+'</div>'+r.aankomsten.map(v => rij(v,
         '<button class="obtn primary js-vbin">'+T('rc.checkin','Check-in')+'</button><button class="obtn warn js-vbnoshow">'+T('res.noshow','No-show')+'</button>')).join(''):'')+
-      (r.inHuis.length?'<div style="margin-top:0.5rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.inhuis','In huis')+'</div>'+r.inHuis.map(v => rij(v,
+      (r.inHuis.length?'<div class="s-ds4k2m">'+T('rc.inhuis','In huis')+'</div>'+r.inHuis.map(v => rij(v,
         '<button class="obtn js-vbuit">'+T('rc.checkout','Check-out')+'</button>',
-        T('rc.tot','tot')+' '+v.vertrek+(v.vertrek<=r.datum?' · <b style="color:var(--rtg-leesgoud,var(--gold));">'+T('rc.vandaagweg','vertrekt vandaag')+'</b>':'')+(v.openLast?' · '+T('rc.open','rekening')+' <b>'+eur(v.openLast)+'</b>':''))).join(''):'')+
-      (r.komend.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.komend','Komende dagen')+'</div>'+r.komend.map(v => rij(v, '')).join(''):'')+
+        T('rc.tot','tot')+' '+v.vertrek+(v.vertrek<=r.datum?' · <b class="s-12itpbj">'+T('rc.vandaagweg','vertrekt vandaag')+'</b>':'')+(v.openLast?' · '+T('rc.open','rekening')+' <b>'+eur(v.openLast)+'</b>':''))).join(''):'')+
+      (r.komend.length?'<div class="s-x3n22l">'+T('rc.komend','Komende dagen')+'</div>'+r.komend.map(v => rij(v, '')).join(''):'')+
       (leeg?'<div class="softline h-mt50">'+T('rc.leeg','Nog geen verblijven. Zodra een gast boekt, staat het hier.')+'</div>':'')+
       '</div>';
     el.querySelectorAll('[data-vb]').forEach(elv => {
@@ -48,12 +48,12 @@
         '<button class="rr-del" data-rdel="'+r.id+'">✕</button>'+
         '<div class="hk-chips">'+['schoon','vuil','bezig','bezet','defect'].map(s =>
           '<button class="hk-chip hk-'+s+(hk===s?' on':'')+'" data-hk="'+r.id+'" data-hkst="'+s+'">'+tHk(s)+'</button>').join('')+'</div>'+
-        (hkDefectFor===r.id ? '<div class="tt-add" style="width:100%;"><input id="hkNote" placeholder="'+T('hk.noteph','Wat is er kapot?')+'"><button id="hkNoteOk">'+T('hk.report','Meld defect')+'</button></div>' : '')+
+        (hkDefectFor===r.id ? '<div class="tt-add s-186m9vs"><input id="hkNote" placeholder="'+T('hk.noteph','Wat is er kapot?')+'"><button id="hkNoteOk">'+T('hk.report','Meld defect')+'</button></div>' : '')+
       '</div>';
     }).join('') : '<div class="softline">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
     html += '<div class="tt-add h-wrap">'+
-      '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;min-width:120px;">'+
-      '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:70px;">'+
+      '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" class="s-7t6am">'+
+      '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" class="s-jwr67v">'+
       '<button id="rmAdd">'+T('team.add','Toevoegen')+'</button></div>';
     html += '<div class="note-soft">'+T('sup.roomnote','Uit = direct onzichtbaar voor gasten en de backoffice, zonder telefoontjes.')+'</div>';
     html += '</div>';

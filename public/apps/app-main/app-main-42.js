@@ -1,12 +1,12 @@
 /* de verzoeken van partners om een niveau: u beslist */
-    if (open.length) html += open.map(v => '<div class="vbanner" style="border-color:var(--gold,#c9a227);">' +
+    if (open.length) html += open.map(v => '<div class="vbanner s-18rb9yl">' +
       '<b>'+esc(v.supplierName)+' '+T('pi.vraagt','vraagt uw')+' '+T('pi.n.'+v.niveau, v.niveau)+'</b>' +
       '<span>'+(v.reden?esc(v.reden)+' · ':'')+T('pi.uitleg','U beslist. Bij goedkeuren ziet de partner dit 10 minuten; daarna vervalt het vanzelf.')+'</span>' +
       '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="vbtn" data-pigo="'+v.id+'">'+T('pi.goed','Goedkeuren')+'</button>' +
-      '<button class="vbtn" data-piweiger="'+v.id+'" style="background:none;border:1px solid var(--line);color:var(--txt);">'+T('pi.weiger','Weigeren')+'</button></div></div>').join('');
+      '<button class="vbtn s-ua8ht7" data-piweiger="'+v.id+'">'+T('pi.weiger','Weigeren')+'</button></div></div>').join('');
     if (lopend.length) html += lopend.map(v => '<div class="vbanner pending"><b>'+esc(v.supplierName)+' · '+T('pi.n.'+v.niveau, v.niveau)+' '+T('pi.gedeeld','gedeeld')+'</b>' +
       '<span>'+T('pi.lopend','De inzage loopt. U kunt hem intrekken.')+'</span>' +
-      '<button class="vbtn" data-pitrek="'+v.id+'" style="margin-top:0.5rem;background:none;border:1px solid var(--line);color:var(--txt);">'+T('pi.trek','Intrekken')+'</button></div>').join('');
+      '<button class="vbtn s-1df46c7" data-pitrek="'+v.id+'">'+T('pi.trek','Intrekken')+'</button></div>').join('');
     el.innerHTML = html;
     el.querySelectorAll('[data-pigo]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/paspoort/beslis', { id: b.dataset.pigo, akkoord: true }); toast(T('pi.goedok','Goedgekeurd.')); await laadPaspoortInbox(); } catch(e){ toast(e.message); }
@@ -112,8 +112,8 @@
       gastKaart.hidden = false;
       gastKaart.innerHTML =
         '<div class="label">'+T('app.guest.k','Gratis account')+'</div>'+
-        '<div class="big" style="font-size:1.35rem;">'+T('app.guest.title','Zonder pas')+'</div>'+
-        '<div class="meta" style="margin-top:0.75rem;line-height:1.55;">'+T('app.guest.body','Je kunt bij RTG-partners betalen via de app, de foto’s in De Salon bekijken en solliciteren op vacatures met je cv. Liken en reageren bij leden hoort bij een pas.')+'</div>';
+        '<div class="big s-hfkoqo">'+T('app.guest.title','Zonder pas')+'</div>'+
+        '<div class="meta s-15ikrh4">'+T('app.guest.body','Je kunt bij RTG-partners betalen via de app, de foto’s in De Salon bekijken en solliciteren op vacatures met je cv. Liken en reageren bij leden hoort bij een pas.')+'</div>';
     }
     const trip = $('#homeTrip'); if (trip) trip.style.display='none';
     // de gratis app is een bestel/betaal-app: toon de betaalgeschiedenis
@@ -122,8 +122,8 @@
     const salon = $('#homeSalon');
     if (salon){ salon.style.display='';
       salon.innerHTML = '<div class="label">'+T('app.thesalon','De Salon')+'</div>'+
-        '<div class="big" style="font-size:1.1rem;">'+T('app.guest.salon','Bekijk de foto’s')+'</div>'+
-        '<div class="meta" style="margin:0.25rem 0 0.75rem;">'+T('app.guest.salonsub','Ontdek wat leden en partners delen.')+'</div>'+
+        '<div class="big s-prlthd">'+T('app.guest.salon','Bekijk de foto’s')+'</div>'+
+        '<div class="meta s-x8hihn">'+T('app.guest.salonsub','Ontdek wat leden en partners delen.')+'</div>'+
         '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));

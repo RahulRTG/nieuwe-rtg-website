@@ -90,6 +90,27 @@
 <script src="/shared/rtg-first-steps.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12ziu9c:not(#_#_#_){min-width:7.5rem;color:var(--soft);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding-top:.15rem}
+.s-16j2h7l:not(#_#_#_){min-width:2.5rem;text-align:center;font-size:1.05rem}
+.s-1e3l51k:not(#_#_#_){color:var(--soft);font-size:.76rem;margin-top:0.5rem}
+.s-1grrhzp:not(#_#_#_){color:var(--rtg-leesgoud,#E7A8B8)}
+.s-1ik90f3:not(#_#_#_){font-family:'Bodoni Moda',serif;font-size:1.3rem}
+.s-1ke48o0:not(#_#_#_){color:var(--rtg-leesgoud,#E7A8B8);margin-bottom:.35rem}
+.s-1u9jfh1:not(#_#_#_){margin-top:0.75rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums}
+.s-gadqz5:not(#_#_#_){font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,#E7A8B8)}
+.s-jkn0mr:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6}
+.s-popvjv:not(#_#_#_){color:var(--burgundy)}
+.s-v7dap9:not(#_#_#_){font-size:.86rem;color:var(--muted);line-height:1.7}
+.s-wo6tnb:not(#_#_#_){width:auto;margin-left:.4rem;padding:.3rem .7rem;font-size:.78rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-editorial-room data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -112,18 +133,18 @@
 <section class="blad" id="blad" aria-label="Reis aanvragen">
   <div class="blad-kop">
     <button class="terug" id="bladTerug">← Reisbureau</button>
-    <div><div class="ey" id="bladMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,#E7A8B8);"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey s-gadqz5" id="bladMeta"></div><h1 id="bladNaam" class="s-1ik90f3"></h1></div>
   </div>
   <div class="paneel">
-    <p id="bladTag" style="color:var(--muted);font-size:.9rem;line-height:1.6;"></p>
+    <p id="bladTag" class="s-jkn0mr"></p>
     <div class="sec">Inbegrepen</div>
     <ul class="inbeg" id="bladInbeg"></ul>
     <div class="sec">Alle regels van je bestemming</div>
-    <div id="bladRegels" style="font-size:.86rem;color:var(--muted);line-height:1.7;">Laden…</div>
+    <div id="bladRegels" class="s-v7dap9">Laden…</div>
     <div class="sec">Jouw aanvraag</div>
     <div class="rij">
       <div><label class="lbl" for="rDatum">Voorkeursdatum</label><input class="veld" id="rDatum" type="date"></div>
-      <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin" aria-label="Minder reizigers">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus" aria-label="Meer reizigers">+</button></div></div>
+      <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin" aria-label="Minder reizigers">−</button><span id="rAantal" class="s-16j2h7l">2</span><button type="button" id="rPlus" aria-label="Meer reizigers">+</button></div></div>
     </div>
     <div class="h-mt80"><label class="lbl" for="rNotitie">Wensen (optioneel)</label><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
     <div class="reis-context">
@@ -131,7 +152,7 @@
       <p id="travelContext" role="status">Alleen na uw keuze, in dit tabblad, maximaal twee uur.</p>
       <button type="button" class="knop stil" id="travelForget">Nieuwe reiswens</button>
     </div>
-    <div id="rTotaal" style="margin-top:0.75rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;"></div>
+    <div id="rTotaal" class="s-1u9jfh1"></div>
     <button type="button" class="knop" id="rReview">Controleer uw aanvraag</button>
     <p id="rSummary"></p>
     <button type="button" class="knop" id="rBoek" hidden>Verstuur deze reisaanvraag</button>
@@ -362,7 +383,7 @@ $('#adviesGo').addEventListener('click', async () => {
   $('#adviesUit').textContent = 'Rahul denkt mee...';
   try {
     const d = await api('/api/reisbureau/advies', { wens });
-    if (d.reis){ $('#adviesUit').innerHTML = '<b style="color:var(--rtg-leesgoud,#E7A8B8);">'+esc(d.reis.titel)+'</b> · '+esc(d.reden)+' <button class="knop" id="adviesOpen" style="width:auto;margin-left:.4rem;padding:.3rem .7rem;font-size:.78rem;">Bekijk</button>';
+    if (d.reis){ $('#adviesUit').innerHTML = '<b class="s-1grrhzp">'+esc(d.reis.titel)+'</b> · '+esc(d.reden)+' <button class="knop s-wo6tnb" id="adviesOpen">Bekijk</button>';
       const ob = $('#adviesOpen'); if (ob) ob.addEventListener('click', () => openReis(d.reis.id)); }
     else $('#adviesUit').textContent = 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.';
   } catch(e){ $('#adviesUit').textContent = e.status === 404 ? 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.' : e.message; }
@@ -386,9 +407,9 @@ async function laadRegels(bestemming){
   el.textContent = 'Laden…';
   try {
     const w = await api('/api/reis/wijzer', { bestemming });
-    const rij = (k, v) => '<div style="display:flex;gap:.6rem;"><span style="min-width:7.5rem;color:var(--soft);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding-top:.15rem;">'+k+'</span><span>'+v+'</span></div>';
+    const rij = (k, v) => '<div style="display:flex;gap:.6rem;"><span class="s-12ziu9c">'+k+'</span><span>'+v+'</span></div>';
     el.innerHTML =
-      '<div style="color:var(--rtg-leesgoud,#E7A8B8);margin-bottom:.35rem;"><b>'+esc(w.naam)+'</b> · '+esc(w.regio)+'</div>' +
+      '<div class="s-1ke48o0"><b>'+esc(w.naam)+'</b> · '+esc(w.regio)+'</div>' +
       rij('Visum', esc(w.visum.tekst)) +
       rij('Paspoort', esc(w.paspoort)) +
       rij('Verkeer', 'Er wordt '+esc(w.rijden)+' gereden') +
@@ -397,8 +418,8 @@ async function laadRegels(bestemming){
       rij('Fooi', esc(w.fooi)) +
       rij('Alcohol', 'Vanaf '+w.alcoholLeeftijd+' jaar') +
       rij('Btw', w.btwStandaard+'% standaardtarief') +
-      (w.letOp ? rij('Let op', '<span style="color:var(--burgundy);">'+esc(w.letOp)+'</span>') : '') +
-      '<div style="color:var(--soft);font-size:.76rem;margin-top:0.5rem;">'+esc(w.basis)+'</div>';
+      (w.letOp ? rij('Let op', '<span class="s-popvjv">'+esc(w.letOp)+'</span>') : '') +
+      '<div class="s-1e3l51k">'+esc(w.basis)+'</div>';
   } catch(e){ el.textContent = e.message; }
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));

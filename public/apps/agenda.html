@@ -135,13 +135,24 @@
 <link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-7myv37:not(#_#_#_){margin-left:auto}
+.s-9vyt3z:not(#_#_#_){margin:0.5rem 0}
+</style>
 </head>
 <body class="rtg-stijl rtg-daily rtg-living-flow" data-kantoor-tool="agenda" data-rtg-world="living" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-daily="agenda" data-rtg-editorial-room="agenda" data-rtg-layout="standard">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey" data-i18n="dailyField.livingBrand">RTG · LivingOS</span><h1 data-i18n="dailyField.yourCalendar">Uw agenda</h1></span>
-  <span class="rij" style="margin-left:auto;">
+  <span class="rij s-7myv37">
     <button class="knop" id="icsBtn" aria-label="Agenda exporteren" data-i18n-aria="daily.exportAgenda" data-rtg-edge-bar type="button" title="Exporteer als .ics; opent in elke agenda ter wereld" data-i18n="dailyField.export" data-i18n-title="dailyField.exportHint">Exporteer</button>
   </span>
 </header>
@@ -188,7 +199,7 @@
     <h3 id="afKop" data-i18n="dailyField.appointment">Afspraak</h3>
     <div id="uitnodigingBlok" style="display:none;">
       <p class="stil" id="uitnodigingTekst"></p>
-      <div class="rij" style="margin:0.5rem 0;">
+      <div class="rij s-9vyt3z">
         <button class="knop vol" id="afJa" type="button" data-i18n="dailyField.attend">Ik kom</button>
         <button class="knop" id="afNee" type="button" data-i18n="dailyField.decline">Ik kom niet</button>
       </div>

@@ -104,12 +104,27 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15gr0ns:not(#_#_#_){font-size:1rem;padding:.8rem 2rem}
+.s-1l3ksya:not(#_#_#_){width:5.5rem}
+.s-1lkmfch:not(#_#_#_){width:6.5rem}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+.s-gidsbo:not(#_#_#_){font-size:1rem}
+.s-h7lf83:not(#_#_#_){justify-content:center}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Gereedschap</h1></span>
-  <nav class="rij" style="margin-left:auto;" aria-label="Gereedschappen">
+  <nav class="rij s-7myv37" aria-label="Gereedschappen">
     <button class="knop aan" data-tab="reken" type="button">Rekenmachine</button>
     <button class="knop" data-tab="wekker" type="button">Wekker &amp; timer</button>
     <button class="knop" data-tab="tijd" type="button">Stopwatch &amp; wereld</button>
@@ -129,7 +144,7 @@
       </div>
       <div class="vak"><b>Rekening delen</b>
         <div class="rij"><input class="i-1ujuoy veld" id="splitBedrag" inputmode="decimal" placeholder="Bedrag">
-          <input class="veld" id="splitPersonen" inputmode="numeric" placeholder="Personen" style="width:5.5rem;">
+          <input class="veld s-1l3ksya" id="splitPersonen" inputmode="numeric" placeholder="Personen">
           <select class="veld" id="splitFooi" aria-label="Fooi"><option value="0">0%</option><option value="5">5%</option><option value="10">10%</option></select></div>
         <div class="uitkomst" id="splitUit"></div>
       </div>
@@ -150,7 +165,7 @@
     <div class="h-mt70" id="wekkers" aria-live="polite"></div>
     <div class="kop">Timers</div>
     <div class="rij">
-      <input class="veld" id="tmMin" inputmode="numeric" placeholder="Minuten" style="width:6.5rem;">
+      <input class="veld s-1lkmfch" id="tmMin" inputmode="numeric" placeholder="Minuten">
       <input class="i-jwt5vg veld" id="tmLabel" maxlength="60" placeholder="Waarvoor?">
       <button class="knop vol" id="tmStart" type="button">Start</button>
     </div>
@@ -161,7 +176,7 @@
   <section class="paneel" id="tab-tijd" aria-label="Stopwatch en wereldklok">
     <div class="kop">Stopwatch</div>
     <div id="swTijd">0:00,0</div>
-    <div class="rij" style="justify-content:center;">
+    <div class="rij s-h7lf83">
       <button class="knop vol" id="swStart" type="button">Start</button>
       <button class="knop" id="swRonde" type="button">Ronde</button>
       <button class="knop" id="swReset" type="button">Terug naar nul</button>
@@ -178,8 +193,8 @@
 
 <div class="alarm" id="alarm" role="alertdialog" aria-label="Alarm">
   <h2 id="alarmKop">Wekker</h2>
-  <p id="alarmTekst" class="stil" style="font-size:1rem;"></p>
-  <button class="knop vol" id="alarmStil" type="button" style="font-size:1rem;padding:.8rem 2rem;">Ik ben er</button>
+  <p id="alarmTekst" class="stil s-gidsbo"></p>
+  <button class="knop vol s-15gr0ns" id="alarmStil" type="button">Ik ben er</button>
 </div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/rekenkern.js"></script>

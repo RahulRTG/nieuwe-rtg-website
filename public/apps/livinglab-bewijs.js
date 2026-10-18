@@ -34,13 +34,13 @@
           (b.nagetrokken
             ? '<span class="pil ok">nagetrokken door ' + esc(b.door || '?') + '</span>'
             : '<span class="pil let">nog niet nagetrokken</span> ' +
-              '<input class="veld" data-bndoor placeholder="Uw naam" style="max-width:9rem;font-size:.75rem;padding:.2rem .4rem;">' +
-              '<button class="knop stil" data-bnzet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Nagetrokken</button>') +
+              '<input class="veld s-2h33ho" data-bndoor placeholder="Uw naam">' +
+              '<button class="knop stil s-1emfcyx" data-bnzet type="button">Nagetrokken</button>') +
           '</div>';
       }).join('') : '<div class="leeg">Nog geen bronnen. Een bron die niemand heeft nagetrokken, draagt hier geen conclusie.</div>') +
       '<div class="rij h-mt35">' +
         '<input class="veld" data-brtitel placeholder="Bron: titel" maxlength="200">' +
-        '<input class="veld" data-brherkomst placeholder="Herkomst" maxlength="200" style="max-width:11rem;">' +
+        '<input class="veld s-jv5hwd" data-brherkomst placeholder="Herkomst" maxlength="200">' +
         '<button class="knop stil" data-brzet type="button">Voeg bron toe</button></div>' +
 
       '<div class="sec h-mt90">Datasets</div>' +
@@ -50,7 +50,7 @@
       }).join('') : '<div class="leeg">Nog geen datasets.</div>') +
       '<div class="rij h-mt35">' +
         '<input class="veld" data-dsnaam placeholder="Dataset: naam" maxlength="120">' +
-        '<input class="veld" data-dsrijen type="number" min="0" placeholder="rijen" style="max-width:7rem;">' +
+        '<input class="veld s-1v3cm68" data-dsrijen type="number" min="0" placeholder="rijen">' +
         '<button class="knop stil" data-dszet type="button">Voeg dataset toe</button></div></div>';
   }
 
@@ -84,22 +84,22 @@
             ? '<br>' + c.bewijs.map(function (w) { return esc(w.soort) + (w.notitie ? ' (' + esc(w.notitie) + ')' : ''); }).join(', ')
             : '') +
           '<div class="rij h-mt30">' +
-            '<select class="veld" data-bsoort aria-label="Bewijs kiezen" style="font-size:.78rem;">' +
+            '<select class="veld s-ohjkjq" data-bsoort aria-label="Bewijs kiezen">' +
               '<option value="">-- kies een drager uit dit dossier --</option>' + opties() +
               '<option value="interview:">interview (beschrijf hieronder)</option>' +
               '<option value="experiment:">experiment (beschrijf hieronder)</option>' +
               '<option value="statistiek:">statistiek (beschrijf hieronder)</option>' +
             '</select>' +
-            '<input class="veld" data-bvrij placeholder="omschrijving (bij de laatste drie)" style="font-size:.78rem;">' +
-            '<button class="knop stil" data-bkoppel type="button" style="font-size:.72rem;padding:.2rem .55rem;">Hang eronder</button></div>' +
+            '<input class="veld s-ohjkjq" data-bvrij placeholder="omschrijving (bij de laatste drie)">' +
+            '<button class="knop stil s-1q9bgge" data-bkoppel type="button">Hang eronder</button></div>' +
           '<div class="rij h-mt30">' +
-            '<select class="veld" data-ggraad aria-label="Bewijsgraad" style="font-size:.78rem;">' +
+            '<select class="veld s-ohjkjq" data-ggraad aria-label="Bewijsgraad">' +
               KADER.bewijs.map(function (b) {
                 return '<option value="' + esc(b.graad) + '">' + esc(b.naam) + '</option>';
               }).join('') + '</select>' +
-            (tek ? '<select class="veld" data-gdoor aria-label="Getekend door" style="font-size:.78rem;">' +
+            (tek ? '<select class="veld s-ohjkjq" data-gdoor aria-label="Getekend door">' +
               '<option value="">zonder handtekening</option>' + tek + '</select>' : '') +
-            '<button class="knop stil" data-gzet type="button" style="font-size:.72rem;padding:.2rem .55rem;">Zet de graad</button></div>' +
+            '<button class="knop stil s-1q9bgge" data-gzet type="button">Zet de graad</button></div>' +
           '</div>';
       }).join('') +
       '<div class="leeg">De graad is een uitkomst, geen keuze: hij kan nooit hoger dan wat het bewijs, de methode ' +

@@ -30,8 +30,18 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-ohiako:not(#_#_#_){font-size:.76rem}
+</style>
 </head>
-<body data-osbar="Partner worden" data-oswereld="werk" data-osterug="apps/index.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="partner-worden" data-osbar="Partner worden" data-oswereld="werk" data-osterug="apps/index.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
   <header class="bar"><div class="brand">RTG <i>Partners</i></div><a href="/apps/index.html">Terug naar RTG OS</a></header>
   <main>
     <div class="eyebrow">Een gecontroleerde bedrijfswerkplek</div>
@@ -87,7 +97,7 @@
           <div class="step"><div class="nr">4</div><div><b>Veilig online</b><span>Vul de Salon-pagina en rond de kassa- en werkintro af voordat de zaak zichtbaar wordt.</span></div></div>
           <div class="step"><div class="nr">5</div><div><b>Speelbaar in Magnaat</b><span>Bouw daarna in de Partnerstudio een digitale tweeling. RTG publiceert alleen een bewezen trainingsversie, zonder echt geld of klantdata.</span></div></div>
         </div>
-        <div class="status"><div class="eyebrow">Mijn aanvragen</div><div class="status-list" id="statusLijst"><p class="lead" style="font-size:.76rem">Log in met uw pas om statussen te zien.</p></div></div>
+        <div class="status"><div class="eyebrow">Mijn aanvragen</div><div class="status-list" id="statusLijst"><p class="lead s-ohiako">Log in met uw pas om statussen te zien.</p></div></div>
       </aside>
     </div>
   </main>
@@ -105,5 +115,13 @@
   <script src="/shared/metgezel.js" defer></script>
   <script src="/shared/basis.js" defer></script>
   <script src="/shared/cookie.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

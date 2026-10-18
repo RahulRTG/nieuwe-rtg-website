@@ -10,19 +10,19 @@
     try { mijn = (await API.call('/tickets/mijn')).tickets || []; } catch(e){}
     const mijnEl = $('#tkMijn');
     if (mijnEl) mijnEl.innerHTML = mijn.filter(t => !t.gebruikt || t.datum >= new Date().toISOString().slice(0, 10)).map(t =>
-      '<div class="card" style="border-color:rgba(208,172,87,0.35);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">\uD83C\uDF9F\uFE0F '+T('tk.ticket','Ticket')+' \u00B7 '+esc(t.supplierName)+'</div>'+
-      '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(t.naam)+'</b> \u00B7 '+t.datum+' '+t.tijd+' \u00B7 '+t.personen+'p</div>'+
+      '<div class="card s-j84k16">'+
+      '<div class="s-1f3kzms">\uD83C\uDF9F\uFE0F '+T('tk.ticket','Ticket')+' \u00B7 '+esc(t.supplierName)+'</div>'+
+      '<div class="s-10mclmr"><b>'+esc(t.naam)+'</b> \u00B7 '+t.datum+' '+t.tijd+' \u00B7 '+t.personen+'p</div>'+
       (t.gebruikt
-        ? '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--rtg-leesgroen,var(--green));">\u2705 '+T('tk.gebruikt','Binnen; ingecheckt door ')+esc(t.checkin.door)+'</div>'
+        ? '<div class="s-1syecv">\u2705 '+T('tk.gebruikt','Binnen; ingecheckt door ')+esc(t.checkin.door)+'</div>'
         // de code staat nergens bewaard: tonen maakt een nieuwe (en trekt de vorige in)
-        : '<div style="margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:0;padding:0.55rem;">'+
-          '<span id="tkCode-'+esc(t.ref)+'" style="font-size:0.9rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));font-weight:700;word-break:break-all;"></span>'+
+        : '<div class="s-t2hr14">'+
+          '<span id="tkCode-'+esc(t.ref)+'" class="s-kzdem1"></span>'+
           '<button class="bz-btn" data-tktoon="'+esc(t.ref)+'">'+T('tk.toon','Toon ticketcode')+'</button>'+
-          '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.2rem;">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
+          '<div class="s-1p5pee4">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
       // de eigen transferdienst van de zaak: aanvragen, of live zien wie er komt
       (t.transfer
-        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted);">\uD83D\uDE90 '+T('tk.tr','Transfer')+': <b style="color:var(--txt);">'+
+        ? '<div class="s-lzrpeq">\uD83D\uDE90 '+T('tk.tr','Transfer')+': <b class="s-1btm41d">'+
           ({ 'wacht-op-betaling': T('tk.tr.betalen','nog betalen'), 'aangevraagd': T('tk.tr.aangevraagd','aangevraagd'), 'geaccepteerd': T('tk.tr.geacc','bevestigd'), 'onderweg': T('tk.tr.onderweg','onderweg naar u') }[t.transfer.status] || t.transfer.status)+'</b>'+
           (t.transfer.chauffeur ? ' \u00B7 '+esc(t.transfer.chauffeur) : '')+(t.transfer.etaMin ? ' \u00B7 \u23F1 '+t.transfer.etaMin+' min' : '')+
           (t.transfer.prijs ? ' \u00B7 '+eur(t.transfer.prijs) : ' \u00B7 '+T('tk.tr.incl','inclusief'))+'</div>'
@@ -53,4 +53,4 @@
   function renderTkAanbod(){
     const el = $('#tkAanbod'); if (!el) return;
     if (!tkPartners.length){ el.innerHTML = ''; return; }
-    let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';
+    let html = '<div class="s-llzgco">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';

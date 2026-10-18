@@ -1,30 +1,30 @@
 /* het zorgaanbod: klinieken, behandelingen en het medische onderscheid */
     for (const a of aanb){
       const medisch = a.soort === 'kliniek' || (a.behandelingen || []).some(b => b.soort === 'medisch');
-      html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'')+'</span>'+
+      html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span class="s-prlthd">'+esc(a.icon||'')+'</span>'+
         '<div class="h-flex1"><b>'+esc(a.naam)+'</b> <span class="soft-sm">· '+esc(careSoort[a.soort]||a.soort)+(a.waar?' · '+esc(a.waar):'')+'</span>'+
         (a.beschrijving?'<div class="soft-sm h-mt15">'+esc(a.beschrijving)+'</div>':'')+
         ((a.behandelaars||[]).length?'<div class="soft-sm h-mt20">'+a.behandelaars.map(b => esc(b.naam)+(b.functie?' ('+esc(b.functie)+')':'')).join(' · ')+'</div>':'')+'</div></div>';
       // intake-deling voor klinieken/medische zorg: uitdrukkelijk en per aanbieder
       if (medisch){
         const actief = !!a.intakeActief;
-        html += '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div class="soft-sm" style="margin-bottom:0.25rem;">'+(actief
+        html += '<div class="s-e7t9zs">'+
+          '<div class="soft-sm s-iy4lih">'+(actief
             ? T('care.intakeaan','U deelt medische context met deze kliniek. U kunt dit bij Mijn afspraken stoppen.')
             : T('care.intakeuit','Wilt u dat de behandelaar iets weet (medicijnen, allergie, aandoening)? Deel het apart en alleen met deze kliniek.'))+'</div>'+
           (actief ? '' :
-            '<textarea data-care-intaketxt="'+esc(a.id)+'" rows="2" placeholder="'+T('care.intakeph','Bijv. ik gebruik bloedverdunners en ben allergisch voor penicilline')+'" style="width:100%;box-sizing:border-box;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:0;padding:0.5rem 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;resize:vertical;">'+esc(careIntakeTekst[a.id]||'')+'</textarea>'+
+            '<textarea data-care-intaketxt="'+esc(a.id)+'" rows="2" placeholder="'+T('care.intakeph','Bijv. ik gebruik bloedverdunners en ben allergisch voor penicilline')+'" class="s-xzkep3">'+esc(careIntakeTekst[a.id]||'')+'</textarea>'+
             '<button class="bz-btn h-mt40" data-care-intakedeel="'+esc(a.id)+'">'+T('care.intakedeel','Deel met deze kliniek')+'</button>')+
           '</div>';
       }
       for (const b of (a.behandelingen || [])){
         const open = careOpen === a.id + ':' + b.id;
         const behlr = (a.behandelaars || []).find(x => x.id === b.behandelaarId);
-        html += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div class="h-flex1"><div style="font-size:0.88rem;">'+esc(b.naam)+
+        html += '<div class="s-1yg9rkb">'+
+          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div class="h-flex1"><div class="s-2tzag1">'+esc(b.naam)+
             ' <span style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:'+(b.soort==='medisch'?'var(--gold)':'var(--green,#8bc3a8)')+';">'+(b.soort==='medisch'?T('care.med','medisch'):T('care.well','wellness'))+'</span></div>'+
             '<div class="soft-sm">'+b.duurMin+' '+T('care.min','min')+(behlr?' · '+esc(behlr.naam):'')+'</div></div>'+
-            '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.82rem;white-space:nowrap;">'+eur(b.prijs)+'</span></div>';
+            '<span class="s-1skp4oz">'+eur(b.prijs)+'</span></div>';
         if (open){
           const k = careKeuze;
           html += '<div class="h-mt50">'+

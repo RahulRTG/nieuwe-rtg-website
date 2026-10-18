@@ -85,8 +85,8 @@
   function teken(s, nu) {
     var el = blad(
       '<div style="padding:1rem;display:flex;flex-direction:column;gap:.7rem;">' +
-        '<div class="rij" style="justify-content:space-between;align-items:start;">' +
-          '<h2 style="font-size:1.2rem;">' + esc(s.titel) + '</h2>' +
+        '<div class="rij s-l5bsco">' +
+          '<h2 class="s-prmggw">' + esc(s.titel) + '</h2>' +
           '<button class="knop stil" data-dicht type="button">Sluiten</button></div>' +
         (s.vraagstuk ? '<div class="uitdaging"><div class="sec">De uitdaging</div>' +
           '<div class="vraag">' + esc(s.vraagstuk) + '</div></div>' : '') +

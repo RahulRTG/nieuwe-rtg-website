@@ -70,6 +70,16 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1dsdx8u:not(#_#_#_){background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.45rem 0.7rem;font:inherit}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header class="kop">
@@ -147,7 +157,7 @@
       <h2>Maandoverzicht</h2>
       <div class="kaart">
         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-          <input id="oMaand" type="month" style="background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.45rem 0.7rem;font:inherit;">
+          <input id="oMaand" type="month" class="s-1dsdx8u">
           <button class="knop" id="oHaal" type="button">Toon</button>
           <span class="rek"></span>
           <span class="badge" id="oTotaal">&mdash;</span>

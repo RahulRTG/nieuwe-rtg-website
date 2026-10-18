@@ -1,11 +1,11 @@
 /* de kengetallen van een beautysalon */
-    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+    let h = '<div class="s-1ah2knl">'+
       [[k.afsprakenVandaag, T('bs.k.af','afspraken vandaag')],[k.wachtenden, T('bs.k.wacht','in de wachtrij')],[k.inDeStoel, T('bs.k.stoel','in de stoel')],[eur(k.omzetVandaag), T('bs.k.omzet','omzet vandaag')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div class="s-1fk9glc"><b class="s-123kxff">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de agenda: behandeling op de juiste stoel, zonder dubbele bezetting
     h += '<div class="st-sec h-mt100">'+T('bs.agenda','De agenda')+'</div>'+
-      '<div style="border:1px solid var(--line);border-radius:0;padding:0.8rem;">'+
+      '<div class="s-owx58s">'+
       '<div class="row-gap"><select id="bsBeh" class="st-in h-flex2">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+' · '+b.duurMin+' min · '+eur(b.prijs)+'</option>').join('')+'</select>'+
       '<select id="bsStoel" class="st-in h-flex2">'+d.stoelen.map(s=>'<option value="'+s.id+'">'+esc(s.naam)+'</option>').join('')+'</select></div>'+
       '<div class="row-gap h-mt40"><input id="bsNaam" class="st-in h-flex2" placeholder="'+T('bs.naam','Op naam van')+'" maxlength="60"><input id="bsDatum" class="st-in h-flex1" type="date"><input id="bsTijd" class="st-in h-flex1" type="time">'+
@@ -17,8 +17,8 @@
     h += '<div class="st-sec h-mt100">'+T('bs.rij','Walk-in wachtrij')+'</div>'+
       '<div class="row-gap"><input id="bsWNaam" class="st-in h-flex2" placeholder="'+T('bs.rij.naam','Wie loopt er binnen')+'" maxlength="60"><select id="bsWBeh" class="st-in h-flex2">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+'</option>').join('')+'</select>'+
       '<button id="bsWalk" style="flex:1;'+vzGoud+'">'+T('bs.rij.in','In de rij')+'</button></div>';
-    h += (d.wachtrij||[]).map(w=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
-      '<span class="sub" style="flex:0 0 3rem;">nr '+w.nr+'</span><b style="flex:1;font-size:0.85rem;">'+esc(w.naam)+'</b><span class="sub">'+esc(w.behandeling)+' · '+esc(w.status)+'</span>'+
+    h += (d.wachtrij||[]).map(w=>'<div class="s-57bs1i">'+
+      '<span class="sub" style="flex:0 0 3rem;">nr '+w.nr+'</span><b class="s-1q6kbkp">'+esc(w.naam)+'</b><span class="sub">'+esc(w.behandeling)+' · '+esc(w.status)+'</span>'+
       (w.status==='wacht'?vzKnop('data-bswp', w.id, T('bs.rij.pak','In de stoel'), true):vzKnop('data-bswk', w.id, T('bs.klaar','Klaar'), true))+'</div>').join('') || '<p class="sub">'+T('bs.rij.leeg','Niemand in de rij; de deur staat open.')+'</p>';
     el.innerHTML = h;
 
@@ -40,27 +40,27 @@
     if (!has('petcare')){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/petcare'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
     const k = d.kpi;
-    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+    let h = '<div class="s-1ah2knl">'+
       [[k.gasten, T('pc.k.gast','gasten in het pension')],[k.hokkenVrij, T('pc.k.vrij','hokken vrij')],[k.rondesVandaag, T('pc.k.ronde','rondes gepland')],[k.trimOpen, T('pc.k.trim','trimafspraken')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div class="s-1fk9glc"><b class="s-123kxff">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // het pension: check-in met dieet, notities en check-uit
     h += '<div class="st-sec h-mt100">'+T('pc.pension','Het pension')+'</div>'+
-      '<div class="row-gap"><select id="pcDier" class="st-in" style="flex:0 0 6rem;"><option value="hond">hond</option><option value="kat">kat</option><option value="anders">anders</option></select>'+
+      '<div class="row-gap"><select id="pcDier" class="st-in s-12b91id"><option value="hond">hond</option><option value="kat">kat</option><option value="anders">anders</option></select>'+
       '<input id="pcNaam" class="st-in h-flex1" placeholder="'+T('pc.naam','Naam dier')+'" maxlength="40"><input id="pcBaas" class="st-in h-flex1" placeholder="'+T('pc.baas','Baasje')+'" maxlength="60">'+
       '<input id="pcDieet" class="st-in h-flex2" placeholder="'+T('pc.dieet','Dieet of bijzonderheden')+'" maxlength="120"><button id="pcIn" style="flex:1;'+vzGoud+'">'+T('pc.in','Check in')+'</button></div>';
-    h += (d.gasten||[]).map(g=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(g.naam)+' ('+esc(g.dier)+') · hok '+g.hok+'</b><span class="sub">'+esc(g.baasje)+(g.tot?' · tot '+esc(g.tot):'')+'</span>'+vzKnop('data-pcuit', g.id, T('pc.uit','Check uit'))+'</div>'+
+    h += (d.gasten||[]).map(g=>'<div class="s-q8bqou">'+
+      '<div class="s-tbd6xd"><b class="s-1q6kbkp">'+esc(g.naam)+' ('+esc(g.dier)+') · hok '+g.hok+'</b><span class="sub">'+esc(g.baasje)+(g.tot?' · tot '+esc(g.tot):'')+'</span>'+vzKnop('data-pcuit', g.id, T('pc.uit','Check uit'))+'</div>'+
       (g.dieet?'<div class="sub h-mt25">'+esc(g.dieet)+'</div>':'')+
       (g.notities&&g.notities.length?'<div class="sub h-mt25">'+esc(g.notities[0].tekst)+'</div>':'')+
-      '<div class="row-gap h-mt40"><input data-pcnt="'+g.id+'" class="st-in" placeholder="'+T('pc.notitie','Notitie voor het baasje')+'" maxlength="160" style="flex:3;">'+vzKnop('data-pcnb', g.id, T('pc.noteer','Noteer'), true)+'</div></div>').join('');
+      '<div class="row-gap h-mt40"><input data-pcnt="'+g.id+'" class="st-in s-1dzu8du" placeholder="'+T('pc.notitie','Notitie voor het baasje')+'" maxlength="160">'+vzKnop('data-pcnb', g.id, T('pc.noteer','Noteer'), true)+'</div></div>').join('');
 
     // de uitlaatrondes
     h += '<div class="st-sec h-mt100">'+T('pc.rondes','Uitlaatrondes')+'</div>'+
       '<div class="row-gap"><input id="pcRTijd" class="st-in h-flex1" type="time"><button id="pcRonde" style="flex:1;'+vzGoud+'">'+T('pc.ronde.maak','Nieuwe ronde')+'</button></div>';
-    h += (d.rondes||[]).map(r=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;flex-wrap:wrap;">'+
-      '<b style="flex:0 0 4rem;font-size:0.85rem;">'+esc(r.tijd)+'</b><span class="sub h-flex1">'+(r.honden.length?r.honden.map(esc).join(' · '):T('pc.ronde.leeg','nog geen honden'))+' · '+esc(r.status)+'</span>'+
-      (r.status==='gepland'?'<input data-pcrh="'+r.id+'" class="st-in" placeholder="'+T('pc.ronde.hond','Hond erbij')+'" maxlength="40" style="flex:0 0 8rem;">'+vzKnop('data-pcrb', r.id, T('pc.ronde.bij','Erbij'), true)+vzKnop('data-pcrk', r.id, T('pc.ronde.klaar','Gelopen')):'')+'</div>').join('');
+    h += (d.rondes||[]).map(r=>'<div class="s-1covwa3">'+
+      '<b class="s-t77uvk">'+esc(r.tijd)+'</b><span class="sub h-flex1">'+(r.honden.length?r.honden.map(esc).join(' · '):T('pc.ronde.leeg','nog geen honden'))+' · '+esc(r.status)+'</span>'+
+      (r.status==='gepland'?'<input data-pcrh="'+r.id+'" class="st-in s-12babhf" placeholder="'+T('pc.ronde.hond','Hond erbij')+'" maxlength="40">'+vzKnop('data-pcrb', r.id, T('pc.ronde.bij','Erbij'), true)+vzKnop('data-pcrk', r.id, T('pc.ronde.klaar','Gelopen')):'')+'</div>').join('');
 
     // de trimsalon
     h += '<div class="st-sec h-mt100">'+T('pc.trim','De trimsalon')+'</div>'+

@@ -25,8 +25,8 @@
   }
   function rSelStyle(){ return 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"'; }
   function retailSubnav(){
-    return '<div class="st-chips" style="display:flex;gap:0.4rem;overflow-x:auto;margin-bottom:0.9rem;-webkit-overflow-scrolling:touch;">'+
-      RSEC.map(s => { const on = retailSec===s[0]; return '<button data-rsec="'+s[0]+'" style="white-space:nowrap;border:1px solid '+(on?'var(--gold)':'var(--line)')+';background:var(--card2);color:'+(on?'var(--gold)':'var(--txt)')+';border-radius:0;padding:0.5rem 0.9rem;font-size:0.74rem;font-weight:'+(on?'600':'500')+';">'+s[1]+' '+T('rt.sec.'+s[0], s[2])+'</button>'; }).join('')+'</div>';
+    return '<div class="st-chips s-1jr4fe9">'+
+      RSEC.map(s => { const on = retailSec===s[0]; return '<button data-rsec="'+s[0]+'" class="' + (on ? 's-52gokr' : 's-1ksq6wm') + '">'+s[1]+' '+T('rt.sec.'+s[0], s[2])+'</button>'; }).join('')+'</div>';
   }
   function collNaam(cid){ const c = (retailData.collecties||[]).find(x => x.id===cid); return c ? (c.seizoen+' '+c.jaar+' · '+c.naam) : T('rt.los','Losse artikelen'); }
   function renderRetail(){
@@ -45,9 +45,9 @@
   }
   function retailOverzicht(canEdit){
     const st = retailData.stats || {};
-    const kpi = (v,l) => '<div style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.8rem;"><div style="font-size:1.25rem;font-weight:700;">'+v+'</div><div class="tt-h h-mt15">'+l+'</div></div>';
+    const kpi = (v,l) => '<div class="s-eogdoi"><div class="s-plkwk7">'+v+'</div><div class="tt-h h-mt15">'+l+'</div></div>';
     let html = '<div class="card"><div class="tt-h">'+T('rt.vandaag','Vandaag')+'</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.5rem;">'+
+      '<div class="s-yie925">'+
       kpi(geld(st.omzetVandaag||0), T('rt.omzet','omzet'))+kpi(st.bonnenVandaag||0, T('rt.bonnen','bonnen'))+kpi(st.klanten||0, T('rt.klanten','klanten'))+
       kpi(st.artikelen||0, T('rt.artikelen','artikelen'))+kpi(st.voorraadTotaal||0, T('rt.voorraad','stuks voorraad'))+kpi((retailData.paskamer||[]).length+(retailData.apart||[]).length, T('rt.vloer','op de vloer'))+
       '</div></div>';
@@ -59,14 +59,14 @@
     // sell-through per collectie (balkjes)
     const sthr = st.sellThrough || [];
     if (sthr.length) html += '<div class="card"><div class="tt-h">'+T('rt.sellthrough','Sell-through per collectie')+'</div>'+
-      '<div style="margin-top:0.5rem;display:grid;gap:0.6rem;">'+sthr.map(c =>
-        '<div><div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>'+esc(c.collectie)+'</span><span style="color:var(--rtg-leesgoud,var(--gold));">'+c.pct+'%</span></div>'+
-        '<div style="height:7px;background:var(--card2);border-radius:0;margin-top:0.3rem;overflow:hidden;"><div style="height:100%;width:'+c.pct+'%;background:var(--gold);"></div></div>'+
+      '<div class="s-1ydzaen">'+sthr.map(c =>
+        '<div><div class="s-99omnx"><span>'+esc(c.collectie)+'</span><span class="s-12itpbj">'+c.pct+'%</span></div>'+
+        '<div class="s-1cq8pe0"><div style="height:100%;width:'+c.pct+'%;background:var(--gold);"></div></div>'+
         '<div class="tt-h h-mt20">'+c.verkocht+' '+T('rt.verkocht','verkocht')+' · '+c.voorraad+' '+T('rt.opvoorraad','op voorraad')+'</div></div>').join('')+'</div></div>';
     // lage voorraad / bijbestellen
     const laag = st.laag || [];
     html += '<div class="card"><div class="tt-h">'+T('rt.bijbestel','Bijbestellen (lage voorraad)')+'</div>'+
-      (laag.length ? '<div class="h-mt50">'+laag.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr" style="color:'+(v.voorraad<=0?'var(--burgundy)':'var(--amber)')+';">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+esc(v.vsku)+'</div></div>').join('')+'</div>'
+      (laag.length ? '<div class="h-mt50">'+laag.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr ' + (v.voorraad<=0 ? 's-popvjv' : 's-1qeblr2') + '">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+esc(v.vsku)+'</div></div>').join('')+'</div>'
         : '<div class="empty">'+T('rt.voorraadok','Alle maten ruim op voorraad.')+'</div>')+'</div>';
     // open paskamerverzoeken (ook af te handelen vanuit de backoffice)
     const pk = retailData.paskamer || [];

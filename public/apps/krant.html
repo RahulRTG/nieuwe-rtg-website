@@ -65,6 +65,17 @@
 <script src="/apps/redactie/publicatie.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-19h0v7y:not(#_#_#_){border:0;padding:0}
+.s-1ujuoye:not(#_#_#_){flex:1;min-width:0}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -79,7 +90,7 @@
 </div>
 <header>
   <button class="nav" id="terug" title="Terug" aria-label="Terug">‹</button>
-  <div style="flex:1;min-width:0;"><div class="ey">RTG Krant</div><div class="titel" id="kop">Nieuws</div></div>
+  <div class="s-1ujuoye"><div class="ey">RTG Krant</div><div class="titel" id="kop">Nieuws</div></div>
 </header>
 <main id="hoofd"></main>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
@@ -152,7 +163,7 @@ async function toonKrant(){
   const lead=arts[0];
   const le=document.createElement('div'); le.className='lead'; le.addEventListener('click',()=>lees(lead.id));
   le.innerHTML=(lead.beeld?'<div class="beeld"><img src="'+esc(lead.beeld)+'" alt=""></div>':'<div></div>')+
-    '<div><div class="kaart" style="border:0;padding:0;"><div class="rub" style="color:'+esc(acc)+';">'+esc(lead.rubriek)+'</div></div><h2>'+esc(lead.titel)+'</h2><div class="chapo">'+esc(lead.chapo||'')+'</div><div class="meta">'+esc(lead.auteur||'Redactie')+' · '+(lead.gelezen||0)+' gelezen</div></div>';
+    '<div><div class="kaart s-19h0v7y"><div class="rub" style="color:'+esc(acc)+';">'+esc(lead.rubriek)+'</div></div><h2>'+esc(lead.titel)+'</h2><div class="chapo">'+esc(lead.chapo||'')+'</div><div class="meta">'+esc(lead.auteur||'Redactie')+' · '+(lead.gelezen||0)+' gelezen</div></div>';
   feed.appendChild(le);
   const grid=document.createElement('div'); grid.className='grid';
   arts.slice(1).forEach(a=>{ const k=document.createElement('div'); k.className='kaart'; k.addEventListener('click',()=>lees(a.id));

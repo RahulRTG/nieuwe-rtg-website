@@ -5,7 +5,7 @@
     h += '</div>';
     if (snaps.length){
       h += '<div style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:.5rem;">'+snaps.map(sn=>
-        '<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;"><span></span><b style="flex:1;color:var(--rtg-leesgoud,var(--gold));">'+escT(sn.van)+'</b><span style="color:var(--soft);">stuurde een snap</span><button class="js-opensnap go" data-id="'+escT(sn.id)+'" style="padding:.15rem .55rem;">Bekijk</button></div>'
+        '<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;"><span></span><b style="flex:1;color:var(--rtg-leesgoud,var(--gold));">'+escT(sn.van)+'</b><span class="s-1pv2lmv">stuurde een snap</span><button class="js-opensnap go s-npapob" data-id="'+escT(sn.id)+'">Bekijk</button></div>'
       ).join('')+'</div>';
     }
     box.innerHTML = h;
@@ -50,7 +50,7 @@
       const langs = r.via === 'pin' ? T('sal.viapin','via je pin')
                   : r.via === 'code' ? T('sal.viacode','via je live code')
                   : T('sal.wilverbinden','wil verbinden');
-      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span style="color:var(--soft);font-size:0.7rem;">' + langs + '</span>' +
+      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span class="s-1feg4kw">' + langs + '</span>' +
         '<button class="ja" data-scja="' + escT(r.key) + '">' + T('sal.accepteer','Accepteer') + '</button>' +
         '<button data-scnee="' + escT(r.key) + '">✕</button></div>';
     }
@@ -89,12 +89,12 @@
     try {
       const d = await API.call('/member/find', { q });
       $('#scRes').innerHTML = (d.results || []).map(r =>
-        '<div class="sc-hit"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' + initCN(r.codename) + '</span><b>' + escT(r.codename) + '</b>' +
+        '<div class="sc-hit"><span class="sc-av s-12mp3uh">' + initCN(r.codename) + '</span><b>' + escT(r.codename) + '</b>' +
         (r.status === 'geen' ? '<button data-scvz="' + escT(r.key) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>'
-         : r.status === 'verbonden' ? '<span style="color:var(--rtg-leesgroen,var(--green,#2E7D4F));font-size:0.72rem;">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
-         : r.status === 'aangevraagd' ? '<span style="color:var(--soft);font-size:0.72rem;">' + T('sal.gevraagd','aangevraagd') + '</span>'
-         : '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.72rem;">' + T('sal.wachtu','wacht op u') + '</span>') + '</div>'
-      ).join('') || '<div style="font-size:0.78rem;color:var(--soft);">' + T('sal.niksgevonden','Geen leden gevonden met deze codenaam.') + '</div>';
+         : r.status === 'verbonden' ? '<span class="s-10qur68">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
+         : r.status === 'aangevraagd' ? '<span class="s-uqa4wi">' + T('sal.gevraagd','aangevraagd') + '</span>'
+         : '<span class="s-3233cq">' + T('sal.wachtu','wacht op u') + '</span>') + '</div>'
+      ).join('') || '<div class="s-b4rdxo">' + T('sal.niksgevonden','Geen leden gevonden met deze codenaam.') + '</div>';
       $('#scRes').querySelectorAll('[data-scvz]').forEach(b => b.addEventListener('click', async () => {
         try { await API.call('/member/connect', { key: b.dataset.scvz }); toast(T('sal.verzonden','Verzoek verstuurd.')); zoekLeden(); } catch(e){ toast(e.message); }
       }));

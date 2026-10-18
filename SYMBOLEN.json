@@ -3,7 +3,7 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "1941a8358",
+  "commit": "f21f99a19",
   "seconden": 11,
   "invoer": {
    "meting": "invoerspoor",
@@ -7320,7 +7320,7 @@
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2492,
   "zonderUitvoer": 904,
-  "requireKanten": 7905
+  "requireKanten": 7904
  },
  "nietGelezen": [
   {
@@ -71389,49 +71389,49 @@
     {
      "naam": "meld",
      "soort": "functie",
-     "lijn": 17,
+     "lijn": 14,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mijnMeldingen",
      "soort": "functie",
-     "lijn": 63,
+     "lijn": 60,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldingenLijst",
      "soort": "functie",
-     "lijn": 68,
+     "lijn": 65,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldingZet",
      "soort": "functie",
-     "lijn": 77,
+     "lijn": 74,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "regelTriage",
      "soort": "functie",
-     "lijn": 123,
+     "lijn": 120,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kies",
      "soort": "pijl",
-     "lijn": 125,
+     "lijn": 122,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "triage",
      "soort": "functie",
-     "lijn": 135,
+     "lijn": 132,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vergeetMelder",
      "soort": "functie",
-     "lijn": 155,
+     "lijn": 152,
      "geexporteerd": "onbekend"
     }
    ],
@@ -71441,7 +71441,6 @@
    },
    "requires": [
     "server/kern/dubbelemelding.js",
-    "server/kern/gemeente/opslag.js",
     "server/kern/util.js"
    ],
    "extern": [],
@@ -71498,8 +71497,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/kern/gemeente/index.js",
-    "server/kern/gemeente/meldingen.js"
+    "server/kern/gemeente/index.js"
    ]
   },
   {

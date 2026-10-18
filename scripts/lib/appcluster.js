@@ -49,7 +49,7 @@ function normaliseer(reden) {
     .replace(/, # (?:niet aan te tikken \(…\)|overgeslagen omdat ze onomkeerbaar zijn|x geweigerd met een reden \(…\))/g, '')
     /* Een bedieningsreden noemt de knop die niet aan te tikken was; welke knop
        dat is verschilt per app, de SOORT (een laag die de tik onderschept) niet. */
-    .replace(/; niet aan te tikken: .*?(intercepts pointer events|element is not visible|element is outside of the viewport|element is not stable|element is not enabled|reden niet gemeld).*$/, '; niet aan te tikken: … $1')
+    .replace(/; niet aan te tikken: .*?(intercepts pointer events|element is not visible|element is outside of the viewport|element is not stable|element is not enabled|tik verstuurd maar niet afgerond binnen de limiet|pagina antwoordde niet binnen de limiet|reden niet gemeld).*$/, '; niet aan te tikken: … $1')
     .replace(/: [^:]{80,}$/, ': …')
     .replace(/\s+/g, ' ')
     .trim();

@@ -1,34 +1,19 @@
-(function(g, factory) {
+(function(g,factory){
 'use strict';
 var model=typeof module==='object'&&module.exports?require('./rtg-editorial-v4-model'):g.RTGEditorialV4Model;
-var api=factory(model);
+var headerDom=typeof module==='object'&&module.exports?require('./rtg-editorial-v4-header'):g.RTGEditorialV4Header;
+var api=factory(model,headerDom);
 if(typeof module==='object'&&module.exports)module.exports=api;
 if(g&&g.document){g.RTGEditorialV4=api;api.boot(g.document,g);}
-}(typeof globalThis !== 'undefined' ? globalThis : this, function (model) {
+}(typeof globalThis!=='undefined'?globalThis:this,function(model,headerDom){
 'use strict';
-var pathOf = model.pathOf, classify = model.classify, photoFor = model.photoFor;
-var worldName = model.worldName, screenLabel = model.screenLabel;
-function visible(el, win) {
-  if (!el) return false;
-  var style = win && win.getComputedStyle ? win.getComputedStyle(el) : null;
-  return !style || (style.display !== 'none' && style.visibility !== 'hidden');
-}
-function title(doc) {
-  var native = doc.querySelector('.wd-page>header:not(.rtg-v4-header) h1,body>header:not(.rtg-v4-header) h1');
-  var h1 = Array.from(doc.querySelectorAll('main h1,[data-rtg-screen-root] h1,body>header h1,h1'))
-    .find(function (node) { return !node.closest('.wd-greeting,.rtg-v4-header,.rtg-v4-section-masthead') &&
-      visible(node, doc.defaultView) && node.textContent.trim(); });
-  h1 = native || h1;
-  if (h1) return h1.textContent.trim();
-  return String(doc.title || 'RTG').replace(/^RTG\s*[·|\u2014:-]?\s*/i, '').trim() || 'RTG';
-}
-function make(doc, tag, className, text) {
-  var node = doc.createElement(tag); node.className = className || '';
-  if (text != null) node.textContent = text;
-  return node;
-}
-function ensureSectionMasthead(doc, body, route, name) {
-  if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
+var pathOf=model.pathOf,classify=model.classify,photoFor=model.photoFor;
+var worldName=model.worldName,screenLabel=model.screenLabel;
+function visible(el,win){if(!el)return false;var s=win&&win.getComputedStyle?win.getComputedStyle(el):null;return !s||(s.display!=='none'&&s.visibility!=='hidden');}
+function title(doc){var native=doc.querySelector('.wd-page>header:not(.rtg-v4-header) h1,body>header:not(.rtg-v4-header) h1');var h1=Array.from(doc.querySelectorAll('main h1,[data-rtg-screen-root] h1,body>header h1,h1')).find(function(node){return !node.closest('.wd-greeting,.rtg-v4-header,.rtg-v4-section-masthead')&&visible(node,doc.defaultView)&&node.textContent.trim();});h1=native||h1;if(h1)return h1.textContent.trim();return String(doc.title||'RTG').replace(/^RTG\s*[·|\u2014:-]?\s*/i,'').trim()||'RTG';}
+function make(doc,tag,className,text){var node=doc.createElement(tag);node.className=className||'';if(text!=null)node.textContent=text;return node;}
+function ensureSectionMasthead(doc,body,route,name){
+  if(body.dataset.rtgV4Kind==='cover'||body.dataset.rtgV4Kind==='canvas')return;
   var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
   if (main && main.querySelector(':scope > #dailyIntro')) return;
   if (!main || main.querySelector(':scope > .rtg-v4-section-masthead')) return;
@@ -37,49 +22,23 @@ function ensureSectionMasthead(doc, body, route, name) {
   var more = make(doc, 'a', '', '•••'); more.href = '/apps/app.html#menu'; more.setAttribute('aria-label', 'Meer in RTG');
   bar.appendChild(more); main.insertBefore(bar, main.firstChild);
 }
-function ensureWorldTitle(doc, body, world) {
-  if (body.dataset.rtgV4Kind !== 'cover') return;
-  var hero = doc.querySelector('.dagkop,.prestatiekop,.wk-hero,.fo-hero,[data-rtg-component="EditorialHero"],[data-rtg-cinematic-lead="true"],.hero,.voorzijde-hero');
-  if (!hero || hero.querySelector(':scope > .rtg-v4-world-title')) return;
-  var heading = make(doc, 'div', 'rtg-v4-world-title', worldName(world));
-  heading.setAttribute('aria-hidden', 'true');
-  hero.insertBefore(heading, hero.firstChild);
-}
-function ensurePhotoLead(doc, body, route, world) {
-  if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
-  var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
-  if (!main || main.querySelector(':scope > .rtg-v4-photo-lead')) return;
-  if (main.querySelector(':scope > :is(.mall-live,.mall-live__intro,.rtm-voorzijde,#dailyIntro,[data-rtg-cinematic-lead="true"],[data-rtg-component="EditorialHero"])')) return;
-  var firstImage = main.querySelector('img,picture,[style*="background-image"]');
-  if (firstImage && firstImage.getBoundingClientRect && firstImage.getBoundingClientRect().top < 520) return;
-  var lead = make(doc, 'figure', 'rtg-v4-photo-lead');
+function ensureWorldTitle(doc,body,world){if(body.dataset.rtgV4Kind!=='cover')return;var hero=doc.querySelector('.dagkop,.prestatiekop,.wk-hero,.fo-hero,[data-rtg-component="EditorialHero"],[data-rtg-cinematic-lead="true"],.hero,.voorzijde-hero');if(!hero||hero.querySelector(':scope > .rtg-v4-world-title'))return;var heading=make(doc,'div','rtg-v4-world-title',worldName(world));heading.setAttribute('aria-hidden','true');hero.insertBefore(heading,hero.firstChild);}
+function ensurePhotoLead(doc,body,route,world){
+  if(body.dataset.rtgV4Kind==='cover'||body.dataset.rtgV4Kind==='canvas')return;
+  var main=doc.querySelector('main,[data-rtg-screen-root="content"]');
+  if(!main||main.querySelector(':scope > .rtg-v4-photo-lead'))return;
+  if(main.querySelector(':scope > :is(.mall-live,.mall-live__intro,.rtm-voorzijde,#dailyIntro,[data-rtg-cinematic-lead="true"],[data-rtg-component="EditorialHero"])'))return;
+  var firstImage=main.querySelector('img,picture,[style*="background-image"]');
+  if(firstImage&&firstImage.getBoundingClientRect&&firstImage.getBoundingClientRect().top<520)return;
+  var lead=make(doc,'figure','rtg-v4-photo-lead');
   lead.setAttribute('aria-hidden', 'true');
   lead.style.setProperty('--v4-lead-image', 'url("' + photoFor(route, world) + '")');
-  var caption = make(doc, 'figcaption', '', worldName(world) + ' · RTG EDITION');
+  var caption=make(doc,'figcaption','',worldName(world)+' · RTG EDITION');
   lead.appendChild(caption); main.appendChild(lead);
 }
-function icon(kind) {
-  if (kind === 'search') return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>';
-  return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"></path></svg>';
-}
-function adoptHeaderControls(doc, header, legacy) {
-  if (!header || !legacy || legacy === header) return;
-  var actions = header.querySelector('.rtg-v4-header-actions');
-  if (!actions) return;
-  var bucket = actions.querySelector('.rtg-v4-route-actions');
-  var candidates = Array.from(legacy.children).filter(function (node) {
-    if (!node.matches) return false;
-    if (node.matches('nav,form,[role="tablist"],button,input,select,textarea,.zoekbalk,.tabs,.standen,.rtg-rahul-tab,[aria-live]')) return true;
-    return !node.matches('h1,h2,h3,.ey,.rek,.sp') && !!node.querySelector('button,input,select,textarea');
-  });
-  if (!candidates.length) return;
-  if (!bucket) {
-    bucket = make(doc, 'div', 'rtg-v4-route-actions');
-    actions.insertBefore(bucket, actions.firstChild);
-  }
-  candidates.forEach(function (node) { bucket.appendChild(node); });
-}
-function buildHeader(doc, body, name) {
+function icon(kind){if(kind==='search')return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>';return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"></path></svg>';}
+var adoptHeaderControls=headerDom.adopt;
+function buildHeader(doc,body,name){
   var old = body.querySelector('[data-rtg-edge-2-contextual="native-header"], :scope > header:not(.rtg-v4-header), :scope > .wd-page > header:not(.rtg-v4-header)');
   var header = make(doc, 'header', 'rtg-v4-header');
   header.setAttribute('aria-label', 'RTG hoofdnavigatie');
@@ -110,7 +69,7 @@ function buildHeader(doc, body, name) {
   body.insertBefore(header, skip && skip.nextSibling ? skip.nextSibling : (skip ? null : body.firstChild));
   return header;
 }
-function annotate(doc, win) {
+function annotate(doc,win){
   var body = doc && doc.body;
   if (!body) return false;
   var identity = win && win.RTGWorldIdentity;
@@ -158,7 +117,7 @@ function annotate(doc, win) {
   ensurePhotoLead(doc, body, route, world);
   return true;
 }
-function boot(doc, win) {
+function boot(doc,win){
   function start() {
     annotate(doc, win);
     var queued = false;
@@ -179,12 +138,6 @@ function boot(doc, win) {
   }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start, { once:true }); else start();
 }
-function setSurface(doc, win, body) { var page = doc.querySelector('.wd-page');
-  /* `.wd-page` is the shared, measurable content frame. Turning it into
-     `display: contents` on phones erased that frame from the layout and made
-     both Edge and embedded worlds position themselves against different
-     ancestors. Keep one real shell on every viewport; the responsive grids
-     inside it still decide how many panes are visible. */
-  if (page && !body.hasAttribute('data-world-home')) page.style.setProperty('display', 'block', 'important'); }
+function setSurface(doc,win,body){var page=doc.querySelector('.wd-page');if(page&&!body.hasAttribute('data-world-home'))page.style.setProperty('display','block','important');}
 return Object.freeze({classify:classify,pathOf:pathOf,annotate:annotate,boot:boot});
 }));

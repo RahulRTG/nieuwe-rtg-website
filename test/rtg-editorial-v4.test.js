@@ -35,12 +35,14 @@ test('basis laadt editorial v4 als een werkelijk laatste presentatielaag', () =>
 test('de werkelijke browserbundel laadt één nieuwe runtime en de service workers bewaren hem offline', () => {
   const basis = read('public/shared/basis.js');
   assert.match(basis, /\['rtg-editorial-v4-model', 'RTGEditorialV4Model'\]/);
+  assert.match(basis, /\['rtg-editorial-v4-header', 'RTGEditorialV4Header'\]/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
   assert.doesNotMatch(basis, /\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
   for (const file of ['public/sw.js','public/apps/foundation/sw.js']) {
     const source = read(file);
     assert.match(source, /rtg-editorial-v4\.css/);
     assert.match(source, /rtg-editorial-v4-model\.js/);
+    assert.match(source, /rtg-editorial-v4-header\.js/);
     assert.match(source, /rtg-editorial-v4\.js/);
   }
 });

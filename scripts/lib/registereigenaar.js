@@ -54,6 +54,23 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* Vier verklaringen van 18 oktober 2026, elk nagelopen in de bron en geen
+     daarvan uit detecteer() overgenomen. */
+  'ENVELOP.json': { schrijver: 'scripts/envelopvelden.js',
+    waarom: 'Twee meters delen dit register met opzet en zonder elkaar te overschrijven: scripts/envelopvelden.js ' +
+      'schrijft veldenZonderHuis en envelopVelden, scripts/actorvormen.js schrijft actorVormen (met ' +
+      'actorDuplicaten en actorSessies onder gemeten), en allebei lezen ze eerst het bestaande bestand en ' +
+      'zetten alleen hun eigen velden erin (stand(nu, oud)). Het register is het ene envelopregister dat ' +
+      'TAKEN.md 4.71 en 4.72 noemen; twee bestanden zouden de lezer (scripts/samenhang.js) twee waarheden geven.' },
+  'BELOFTE.json': { handmatig: true, lezer: 'scripts/belofte.js',
+    waarom: 'De toezeggingen zelf, met de hand bijgehouden ("Bewerk BELOFTE.json, niet dit bestand" staat boven ' +
+      'de afdruk BELOFTE.md); scripts/belofte.js kijkt per belofte na of de dekking bestaat en schrijft de afdruk.' },
+  'SLO.json': { handmatig: true, lezer: 'scripts/slo.js',
+    waarom: 'De servicedoelen als gegevens, met de hand vastgesteld; scripts/slo.js drukt ze af in SLO.md en ' +
+      'server/kern/command/slo.js leest ze als norm. Een generator zou hier een besluit genereren.' },
+  'CODECREDENTIALS.json': { handmatig: true, lezer: 'scripts/codecredentials.js',
+    waarom: 'De inventaris van alle code-deuren (schema 1, per deur status en classificatie), met de hand ' +
+      'bijgehouden na de productie-audit; scripts/codecredentials.js leest hem als releasepoort en schrijft nooit.' },
   /* LibraryOS en de RTG Loop Fabric (#502, 6 oktober 2026). Die tak bracht
      acht gegenereerde registers en tien handgeschreven documenten mee zonder
      te zeggen wie ze schrijft; bij de samenvoeging van alle open PR's stonden
@@ -520,10 +537,10 @@ function wortelregisters() {
    een keer uiteen. Wie er een verklaart, haalt hem hier weg en zet de reden in
    EIGENAAR. Het getal hoort te dalen doordat er verklaringen bijkomen.
 
-   Deze twee zijn NIET onderzocht: ik weet niet waarom er twee schrijvers zijn,
-   en een reden verzinnen is precies wat regel 13 verbiedt. */
-const ONVERKLAARDE_BOTSING = {
-  'ENVELOP.json': 'scripts/actorvormen.js en scripts/envelopvelden.js schrijven er allebei naar',
-};
+   Een reden verzinnen is precies wat regel 13 verbiedt; wie er een nagaat,
+   haalt hem hier weg. ENVELOP.json stond hier tot 18 oktober 2026 en is toen
+   nagelopen: twee meters schrijven elk hun eigen velden na het lezen van het
+   bestaande bestand -- zie EIGENAAR. */
+const ONVERKLAARDE_BOTSING = {};
 
 module.exports = { EIGENAAR, ONVERKLAARDE_BOTSING, detecteer, wortelregisters, WORTEL };

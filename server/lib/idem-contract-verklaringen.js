@@ -91,6 +91,58 @@ const CONTRACTEN = {
     },
     herhaling: 'ZELFDE_SLEUTEL_VEREIST',
     levering: 'HERPROBEREN_MAG'
+  },
+
+  /* server/kern/bank/ledenbank.js, ledenAkkoord(). De afdruk was met de hand
+     'bankakkoord|' + c, en IDEMIDENTITEIT.json noemde dat `voegtNietsToe`: de
+     enige naam erin is de codenaam, en die staat al in de sleutel. Dat is hier
+     geen gat maar de handeling zelf -- een akkoord is er EEN per lid, de sleutel
+     wordt uit de codenaam AFGELEID en niet door de client gekozen, en er bestaat
+     geen tweede parameter die een ander akkoord zou maken. Tot 18 oktober 2026
+     stond dat alleen als vorm in de code; nu staat het als uitspraak hier, zodat
+     een ander transport het kan lezen. De vorm levert byte voor byte de oude
+     afdruk op: die staat in de database naast elke bestaande sleutel. */
+  'bank.akkoord': {
+    identiteit: {
+      modus: 'DERIVED_IDENTITY',
+      velden: ['codenaam'],
+      canoniek: { codenaam: 'exact' },
+      standaarden: {},
+      vorm: { voorvoegsel: 'bankakkoord', scheiding: '|', waarde: 'ruw' },
+      buiten: {
+        tier: 'beslist alleen of er daarna een zakelijke rekening bij komt; dat is een eigen handeling met een eigen sleutel (open())'
+      }
+    },
+    /* store[c] = store[c] || nu(): een tweede akkoord verandert niets. */
+    herhaling: 'VEILIG',
+    levering: 'HERPROBEREN_MAG'
+  },
+
+  /* server/kern/pay/partner-uitbetaal.js, partnerUitbetaal(). Ook hier stond de
+     afdruk met de hand ('uit|' + supplierCode) en heette hij `voegtNietsToe`,
+     en ook hier is dat een uitgeschreven besluit en geen gat: een uitbetaling
+     heeft geen parameters buiten de partner zelf -- het gaat altijd om het
+     beschikbare saldo -- en het bedrag verschilt legitiem per moment, dus het
+     hoort er met opzet NIET in. De client kiest de sleutel. */
+  'pay.partner.uitbetaal': {
+    identiteit: {
+      modus: 'CLIENT_KEY_AUTHORITATIVE',
+      velden: ['supplierCode'],
+      canoniek: { supplierCode: 'exact' },
+      standaarden: {},
+      vorm: { voorvoegsel: 'uit', scheiding: '|', waarde: 'ruw' },
+      buiten: {
+        bedrag: 'het beschikbare saldo op het moment zelf; verschilt legitiem per poging',
+        idem: 'is de sleutel zelf'
+      }
+    },
+    herhaling: 'ZELFDE_SLEUTEL_VEREIST',
+    /* MENS_ERBIJ en niet HERPROBEREN_MAG, ook al ontdubbelt de handler een
+       herhaling met dezelfde sleutel: dit geld verlaat het huis, en dat gebeurt
+       nooit vanzelf (GELD.md, AFBOUWPROGRAMMA.md par. 1 grens 3). Een transport
+       dat hier zelf opnieuw aflevert, is een automaat die een uitbetaling
+       herhaalt. */
+    levering: 'MENS_ERBIJ'
   }
 };
 

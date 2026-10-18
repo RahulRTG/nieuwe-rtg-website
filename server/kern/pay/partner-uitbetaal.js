@@ -7,6 +7,7 @@
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 'use strict';
 
+const idemContract = require('../../lib/idem-contract');
 module.exports = (ctx) => {
   const { rekPartner, saldoVan, metIdem, boek, boekAsync, opdrachten, grootboek, MAX_CENTEN,
     economischeBoekingEenmaal, geldModus, vrijgavePoort } = ctx;
@@ -48,8 +49,10 @@ module.exports = (ctx) => {
       saldo: saldoVan(rek), beschikbaar: nuVrij };
     /* Een uitbetaling heeft geen parameters buiten de partner zelf (het gaat
        altijd om het saldo), dus de afdruk is de partner. Het bedrag bewust NIET
-       meenemen: dat verschilt legitiem per moment. */
-    return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {
+       meenemen: dat verschilt legitiem per moment. Dat besluit staat sinds 18
+       oktober 2026 als contract in lib/idem-contract-verklaringen.js. */
+    return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null,
+      idemContract.identiteitVan('pay.partner.uitbetaal', { supplierCode }), async () => {
       /* Het saldo PAS hier lezen, en begrensd op de boekingsgrens van het
          grootboek. Twee dingen gingen hier mis en ze versterkten elkaar.
 

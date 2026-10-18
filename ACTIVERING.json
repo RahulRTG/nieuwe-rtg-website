@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T09:55:42.960Z",
-    "commit": "90c40a5f",
+    "op": "2026-10-18T10:04:13.265Z",
+    "commit": "fff22b9b",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/activering.js",
@@ -14627,7 +14627,7 @@
         "kern",
         "lidboard"
       ],
-      "bestandenBereikt": 1170,
+      "bestandenBereikt": 1171,
       "knopen": 300,
       "perLaag": {
         "domein": 210,
@@ -15900,7 +15900,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 615,
+      "bestandenBereikt": 616,
       "knopen": 150,
       "perLaag": {
         "domein": 100,
@@ -16412,9 +16412,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:beraad -> domein:genootschap"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "rtf-samen",

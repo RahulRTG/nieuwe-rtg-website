@@ -243,3 +243,55 @@ test('duurzame SQLite-commit serialiseert één keer; backupcheckpoint flusht no
   assert.equal(uit.scans, 2, 'backupcheckpoint schrijft zijn eigen nog niet gecommitte RAM');
   assert.deepEqual(uit.opgeslagen, { n: 2 });
 });
+
+/* ---------- het DOEL van sterf-na-commit (18 oktober 2026) ----------
+
+   Zonder doel stierf het proces op de EERSTE bevestigde duurzame commit. Op een
+   kritieke geldroute is dat de spoorregel van server/opzet/kritiekspoor.js, die
+   VOOR de handeling wordt vastgelegd -- niet de geldcommit. De crashproef mat
+   daardoor op 30 geldroutes "de commit overleefde de herstart niet" over een
+   geldcommit die nooit had plaatsgevonden. RTG_VERRAAD_DOEL richt de dood op
+   een commit die een genoemde collectie WERKELIJK schreef. De eerste toets
+   zakt zonder die richting: dan sterft het proces al op de spoorcommit. */
+test('met een doel sterft het proces pas op de commit die DAT doel schrijft', () => {
+  const map = verseMap();
+  let uitvoer = '', gestorven = false;
+  try {
+    uitvoer = execFileSync(process.execPath, ['-e',
+      "const db=require('./server/db');(async()=>{await db.load();" +
+      "db.db.data.spoorregel={t:1};db.saveDuurzaam();console.log('SPOOR OVERLEEFD');" +
+      "db.db.data.geldproef={t:1};db.saveDuurzaam();" +
+      "console.log('DIT MAG NIET GEBEUREN')})()"],
+      { encoding: 'utf8', cwd: WORTEL, stdio: ['ignore', 'pipe', 'ignore'],
+        env: { ...process.env, RTG_DATA_DIR: map, RTG_STORE: 'sqlite',
+          RTG_VERRAAD: 'sterf-na-commit', RTG_VERRAAD_DOEL: 'geldproef' } });
+  } catch (e) { gestorven = true; uitvoer = String(e.stdout || ''); }
+  assert.match(uitvoer, /SPOOR OVERLEEFD/, 'een commit buiten het doel hoort het proces niet te doden');
+  assert.equal(gestorven, true, 'de commit van het doel hoort het proces wel te doden');
+  assert.doesNotMatch(uitvoer, /DIT MAG NIET GEBEUREN/);
+  const terug = JSON.parse(inProces({ RTG_DATA_DIR: map, RTG_STORE: 'sqlite' },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "console.log(JSON.stringify({spoor:!!db.db.data.spoorregel,geld:!!db.db.data.geldproef}))})()"));
+  assert.deepEqual(terug, { spoor: true, geld: true }, 'beide commits horen de dood te overleven');
+});
+
+test('de SQLite-commit zegt welke collecties hij schreef, en een ongewijzigde staat er niet bij', () => {
+  const uit = JSON.parse(inProces({ RTG_DATA_DIR: verseMap(), RTG_STORE: 'sqlite' },
+    "const db=require('./server/db'),sqlite=require('./server/db/sqlite');(async()=>{await db.load();" +
+    "db.db.data.blijft={t:1};db.db.data.wisselt={t:1};db.saveDuurzaam();" +
+    "db.db.data.wisselt.t=2;const r=sqlite.saveSqlite(false,undefined,[],true);" +
+    "const leeg=sqlite.saveSqlite(false,undefined,[],true);" +
+    "console.log(JSON.stringify({r:r.collecties,leeg:leeg.collecties}))})()"));
+  assert.ok(uit.r.includes('wisselt'));
+  assert.ok(!uit.r.includes('blijft'), 'een collectie die niet veranderde, is niet geschreven');
+  assert.deepEqual(uit.leeg, []);
+});
+
+test('het doel zonder lijst of zonder wetenschap raakt altijd: de oude meting blijft de terugval', () => {
+  const { leesDoel, raaktDoel } = require('../server/lib/verraad');
+  assert.equal(raaktDoel(['x'], leesDoel('')), true, 'zonder doel slaat hij toe zoals altijd');
+  assert.equal(raaktDoel(null, leesDoel('paySaldi')), true, 'een opslag die niet zegt wat hij schreef telt als raak');
+  assert.equal(raaktDoel(['handelingsspoor'], leesDoel('paySaldi, payBoekingen')), false);
+  assert.equal(raaktDoel(['handelingsspoor', 'payBoekingen'], leesDoel('paySaldi,payBoekingen')), true);
+  assert.equal(raaktDoel([], leesDoel('paySaldi')), false, 'een lege commit schreef niets van het doel');
+});

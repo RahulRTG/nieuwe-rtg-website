@@ -148,6 +148,12 @@ function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } 
      is precies de tweede waarheid die hier niet mag winnen. */
   const niet = schakels.filter((s) => s.stand !== 'gesloten');
   const gebroken = storingen.filter((s) => s.stand !== 'gehouden');
+  /* Een deel dat zelf zegt dat het niet beproefd is (de voltooiproef schrijft
+     dat bij menselijk zonder uitgelokte weigering) is niet gemeten en nooit
+     een defect: er is niets gezien dat stuk was. */
+  if (typeof reg.nietBeproefd === 'string' && reg.nietBeproefd) {
+    return { status: 'NIET_GETEST', reden: 'vers gemeten, maar niet beproefd: ' + reg.nietBeproefd, bewijs };
+  }
   if (!schakels.length) return { status: 'NIET_GETEST', reden: register + ' draagt geen schakels; er is niets om te laten tellen', bewijs };
   if (niet.length || gebroken.length || t.stuk || t.gebroken || reg.sluit === false) {
     const eerste = niet[0] ? 'schakel ' + niet[0].nr + ' staat ' + niet[0].stand + ' (' + (niet[0].wat || '') + ')'
@@ -223,7 +229,18 @@ function stelSamen(r, opties = {}) {
   const gedaan = [];
   for (const naam of BEWIJZEN) {
     const b = bewijsVoor(r.functie, naam, r.ingang, opties);
-    if (b) { r.bewijzen[naam] = b; gedaan.push(naam); }
+    if (!b) continue;
+    /* MENSELIJK HEEFT TWEE HELFTEN en de schermkant wint als die stuk is: zag
+       scripts/appwerkt.js bij de bediening een kale JS-fout of 500, dan is dat
+       een defect dat geen routeproef wegneemt. Alleen een rij waar het scherm
+       niets kaals zag, krijgt de uitslag van de storingen erbij. */
+    const eerder = r.bewijzen[naam];
+    if (naam === 'menselijk' && eerder && eerder.status === 'GEBLOKKEERD_DOOR_DEFECT') continue;
+    if (naam === 'menselijk' && b.status === 'BEWEZEN') {
+      b.reden = 'op het scherm geen kale fout gezien bij de bediening (scripts/appwerkt.js), en onder de storingen van de voltooiproef: ' + b.reden;
+    }
+    r.bewijzen[naam] = b;
+    gedaan.push(naam);
   }
   return gedaan;
 }

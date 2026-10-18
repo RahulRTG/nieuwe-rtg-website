@@ -2,13 +2,15 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-10-14",
-  "commit": "ebc588be5",
+  "op": "2026-10-18",
+  "commit": "c01876ab",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [],
+   "boomVuil": true,
+   "ongecommitteInvoer": [
+    "public/apps/verificatie.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -727,6 +729,8 @@
     "public/apps/maison.html",
     "public/apps/mall-aanvraag-acties.js",
     "public/apps/mall-aanvraag-edge.js",
+    "public/apps/mall-experience-view.js",
+    "public/apps/mall-experience.js",
     "public/apps/mall.html",
     "public/apps/marechaussee.html",
     "public/apps/mecenaat.html",
@@ -1485,6 +1489,7 @@
     "public/shared/toestelsleutel.js",
     "public/shared/travel-os-config.js",
     "public/shared/travel-os.js",
+    "public/shared/travel-request-controller.js",
     "public/shared/typ.js",
     "public/shared/uitleg.js",
     "public/shared/uitstap.js",
@@ -1765,6 +1770,9 @@
      "pad": "public/images/first-steps"
     },
     {
+     "pad": "public/images/mall"
+    },
+    {
      "pad": "public/images/music"
     },
     {
@@ -1948,7 +1956,7 @@
    "omgevingGekopieerd": false,
    "omgeving": [],
    "onwaarneembaar": [],
-   "nodeHoofdversie": 26
+   "nodeHoofdversie": 22
   }
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
@@ -7677,20 +7685,25 @@
   "bekendePaden": 5507
  },
  "gemeten": {
-  "schermenMetPad": 440,
+  "schermenMetPad": 442,
   "nietGelezen": 0,
-  "exactePaden": 1004,
-  "verwijzingen": 1215,
-  "voorvoegsels": 145,
+  "exactePaden": 1010,
+  "verwijzingen": 1222,
+  "voorvoegsels": 144,
   "basisPaden": 2,
-  "doodPad": 0,
-  "doodPadVerwijzingen": 0
+  "doodPad": 1,
+  "doodPadVerwijzingen": 1
  },
  "basisPadLijst": [
   "/api/foundation",
   "/api/rtf/social"
  ],
- "doodPad": [],
+ "doodPad": [
+  {
+   "pad": "/api/mall/living",
+   "scherm": "public/apps/mall-experience.js"
+  }
+ ],
  "nietGelezen": [],
  "perPad": [
   {
@@ -8464,6 +8477,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/mall/apps/installeer",
+   "schermen": [
+    "public/apps/mall-experience.js",
+    "public/apps/mall.html"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/mall/home",
    "schermen": [
     "public/apps/mall.html",
@@ -8576,18 +8597,18 @@
    "aantal": 2
   },
   {
-   "pad": "/api/reisbureau/mijn",
-   "schermen": [
-    "public/apps/reisbureau-experience.js",
-    "public/apps/reisbureau.html"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/reisbureau",
    "schermen": [
     "public/apps/reisbureau.html",
     "public/apps/reizen-veilig-reis.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/reisbureau/mijn",
+   "schermen": [
+    "public/apps/reisbureau.html",
+    "public/shared/travel-request-controller.js"
    ],
    "aantal": 2
   },
@@ -11867,6 +11888,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/reviews",
+   "schermen": [
+    "public/apps/mall-experience-view.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mall/bewaar",
+   "schermen": [
+    "public/apps/mall-experience.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mall/living",
+   "schermen": [
+    "public/apps/mall-experience.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/appstore/bon",
    "schermen": [
     "public/apps/mall.html"
@@ -11959,13 +12001,6 @@
   },
   {
    "pad": "/api/mall/apps/catalogus",
-   "schermen": [
-    "public/apps/mall.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/mall/apps/installeer",
    "schermen": [
     "public/apps/mall.html"
    ],
@@ -13032,13 +13067,6 @@
    "pad": "/api/member/rechterhand/reis/zet",
    "schermen": [
     "public/apps/reisboek-beheer.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/reisbureau/boek",
-   "schermen": [
-    "public/apps/reisbureau-experience.js"
    ],
    "aantal": 1
   },
@@ -14303,6 +14331,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/verify/selfie",
+   "schermen": [
+    "public/apps/verificatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/verify/status",
+   "schermen": [
+    "public/apps/verificatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/verify/upload",
+   "schermen": [
+    "public/apps/verificatie.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/voeding",
    "schermen": [
     "public/apps/voeding.html"
@@ -14852,6 +14901,13 @@
    "pad": "/api/webauthn/weg",
    "schermen": [
     "public/shared/toestelsleutel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reisbureau/boek",
+   "schermen": [
+    "public/shared/travel-request-controller.js"
    ],
    "aantal": 1
   },
@@ -16969,6 +17025,22 @@
    ]
   },
   {
+   "bestand": "public/apps/mall-experience-view.js",
+   "exact": [
+    "/api/reviews"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/mall-experience.js",
+   "exact": [
+    "/api/mall/apps/installeer",
+    "/api/mall/bewaar",
+    "/api/mall/living"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/mall.html",
    "exact": [
     "/api/appstore/bon",
@@ -17572,14 +17644,6 @@
     "/api/reis/los/doe",
     "/api/reis/reizen",
     "/api/reis/wacht"
-   ],
-   "voorvoegsels": []
-  },
-  {
-   "bestand": "public/apps/reisbureau-experience.js",
-   "exact": [
-    "/api/reisbureau/boek",
-    "/api/reisbureau/mijn"
    ],
    "voorvoegsels": []
   },
@@ -18369,10 +18433,12 @@
   },
   {
    "bestand": "public/apps/verificatie.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/verify"
-   ]
+   "exact": [
+    "/api/verify/selfie",
+    "/api/verify/status",
+    "/api/verify/upload"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/vertaler/app.js",
@@ -19047,6 +19113,14 @@
     "/api/pay/",
     "/api/wallet/"
    ]
+  },
+  {
+   "bestand": "public/shared/travel-request-controller.js",
+   "exact": [
+    "/api/reisbureau/boek",
+    "/api/reisbureau/mijn"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/veiligheid.js",

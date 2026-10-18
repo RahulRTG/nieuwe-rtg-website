@@ -28,6 +28,10 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = 'VOLTOOIPROEF.json';
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
+/* Het vierde, AFGELEIDE bewijs (18 oktober 2026): uit alle antwoorden die het
+   lid kreeg, ook onder de storingen. Een scenario schrijft het niet; zonder
+   uitgelokte weigering draagt het geen schakels en `nietBeproefd`. */
+const AFGELEID = 'menselijk';
 /* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
    onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
    waarom. */
@@ -64,7 +68,7 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
     assert.ok(sc.belofte && sc.grens && typeof sc.loop === 'function', sc.bestand + ' mist belofte, grens of loop');
     const c = CONTRACT[sc.functie];
     assert.ok(c, sc.functie + ' heeft een scenario maar geen contract: zijn bewijs telt dan stil niet mee');
-    for (const b of BEWIJZEN) {
+    for (const b of BEWIJZEN.concat(AFGELEID)) {
       assert.equal(c[b] && c[b].soort, 'voltooiproef', sc.functie + ': ' + b + ' komt niet uit de voltooiproef');
       assert.equal(c[b].instrument, sc.bestand);
       const raak = B.gedeeld(B.proefRoutes(sc.bestand), B.ingangRoutes(sc.ingang));
@@ -104,6 +108,22 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
   assert.equal(reg.telling.bewijzenGesloten, gesloten);
   assert.equal(reg.telling.bewijzenOpen, open);
   assert.equal(reg.sluit, open === 0);
+  /* Menselijk: of drie afgeleide schakels met dezelfde standen, of geen
+     schakels en een reden waarom het niet beproefd is -- nooit allebei, en
+     nooit gesloten zonder uitgelokte weigering. */
+  for (const [f, a] of Object.entries(reg.apps)) {
+    const m = a[AFGELEID];
+    assert.ok(m && Array.isArray(m.schakels), f + '/' + AFGELEID + ' ontbreekt');
+    if (m.nietBeproefd) {
+      assert.equal(m.schakels.length, 0, f + '/' + AFGELEID + ': niet beproefd en toch schakels');
+      assert.equal(m.sluit, false, f + '/' + AFGELEID + ': niet beproefd en toch gesloten');
+    } else {
+      assert.equal(m.schakels.length, 3, f + '/' + AFGELEID + ': drie afgeleide schakels');
+      assert.ok(m.weigeringen >= 1, f + '/' + AFGELEID + ': gesloten zonder een enkele weigering');
+      const g = m.schakels.filter((s) => s.stand === 'gesloten').length;
+      assert.equal(m.sluit, g === 3 && !a.afgebroken, f + '/' + AFGELEID + ': `sluit` zegt iets anders dan de rijen');
+    }
+  }
   /* Persistent en herstelbaar MOETEN echt herstarten en crashen; een register
      waarin dat niet gebeurde, draagt die bewijzen niet. */
   for (const [f, a] of Object.entries(reg.apps)) {
@@ -124,6 +144,10 @@ test('4. de lezer van APPWERKT leest het echte register, en het aantal gesloten 
       assert.equal(u.status, a[b].sluit ? 'BEWEZEN' : 'GEBLOKKEERD_DOOR_DEFECT', f + '/' + b + ' leest als ' + u.status + ': ' + u.reden);
       if (u.status === 'BEWEZEN') bewezen++;
     }
+    const m = bewijsVoor(f, AFGELEID, a.ingang, { versheid: VERS });
+    assert.ok(m, f + '/' + AFGELEID + ': de bewijsbron kent geen bron');
+    const verwacht = a[AFGELEID].nietBeproefd ? 'NIET_GETEST' : (a[AFGELEID].sluit ? 'BEWEZEN' : 'GEBLOKKEERD_DOOR_DEFECT');
+    assert.equal(m.status, verwacht, f + '/' + AFGELEID + ' leest als ' + m.status + ': ' + m.reden);
   }
   assert.ok(bewezen >= GESLOTEN_MINIMUM, 'de ratel: ' + bewezen + ' gesloten bewijzen, het minimum is ' + GESLOTEN_MINIMUM);
 });

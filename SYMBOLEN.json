@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "b123a22a5",
-  "seconden": 52.1,
+  "commit": "3f98b1942",
+  "seconden": 39.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4237,6 +4237,7 @@
     "server/kern/veiligheid/plek.js",
     "server/kern/veiligheid/rust.js",
     "server/kern/veiligheid/vergeten.js",
+    "server/kern/veiligheid/vriendopcodenaam.js",
     "server/kern/veiligheid/wacht.js",
     "server/kern/verblijf.js",
     "server/kern/verblijf/gast.js",
@@ -4590,6 +4591,7 @@
     "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-stage.js",
     "server/lib/idemsleutels-toestemming.js",
+    "server/lib/idemsleutels-tweedelid.js",
     "server/lib/idemsleutels-veilig.js",
     "server/lib/idemsleutels-verbond.js",
     "server/lib/idemsleutels-vracht.js",
@@ -7291,18 +7293,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5804,
-  "gelezen": 5489,
+  "bestandenGezien": 5806,
+  "gelezen": 5491,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27663,
-  "bestandenMetUitvoer": 4585,
-  "uitvoerMetNamen": 2091,
+  "symbolen": 27662,
+  "bestandenMetUitvoer": 4587,
+  "uitvoerMetNamen": 2092,
   "uitvoerOnvolledig": 7,
-  "uitvoerZonderNamen": 2487,
+  "uitvoerZonderNamen": 2488,
   "zonderUitvoer": 904,
-  "requireKanten": 7827
+  "requireKanten": 7829
  },
  "nietGelezen": [
   {
@@ -44828,19 +44830,19 @@
     {
      "naam": "toon",
      "soort": "functie",
-     "lijn": 71,
+     "lijn": 74,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mijnDelen",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 91,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stop",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 97,
      "geexporteerd": "onbekend"
     }
    ],
@@ -44917,19 +44919,19 @@
     {
      "naam": "zet",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 94,
      "geexporteerd": false
     },
     {
      "naam": "bevestig",
      "soort": "functie",
-     "lijn": 111,
+     "lijn": 119,
      "geexporteerd": false
     },
     {
      "naam": "trekRegelIn",
      "soort": "functie",
-     "lijn": 144,
+     "lijn": 153,
      "geexporteerd": false
     }
    ],
@@ -87759,7 +87761,7 @@
     {
      "naam": "advies",
      "soort": "functie",
-     "lijn": 71,
+     "lijn": 84,
      "geexporteerd": false
     }
    ],
@@ -158901,6 +158903,19 @@
    ]
   },
   {
+   "bestand": "server/kern/veiligheid/vriendopcodenaam.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/opzet/kernlaag1.js"
+   ]
+  },
+  {
    "bestand": "server/kern/veiligheid/wacht.js",
    "symbolen": [
     {
@@ -173719,6 +173734,7 @@
     "server/lib/idemsleutels-rtc.js",
     "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-toestemming.js",
+    "server/lib/idemsleutels-tweedelid.js",
     "server/lib/idemsleutels-veilig.js",
     "server/lib/idemsleutels-vrijgave.js"
    ],
@@ -173907,6 +173923,21 @@
   },
   {
    "bestand": "server/lib/idemsleutels-toestemming.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "SLEUTELS"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/idemsleutels-recent.js"
+   ]
+  },
+  {
+   "bestand": "server/lib/idemsleutels-tweedelid.js",
    "symbolen": [],
    "uitvoer": {
     "vorm": "object",
@@ -184055,14 +184086,7 @@
   },
   {
    "bestand": "server/opzet/kernlaag1.js",
-   "symbolen": [
-    {
-     "naam": "vriendOpCodenaam",
-     "soort": "pijl",
-     "lijn": 96,
-     "geexporteerd": "onbekend"
-    }
-   ],
+   "symbolen": [],
    "uitvoer": {
     "vorm": "functie",
     "namen": null
@@ -184081,6 +184105,7 @@
     "server/kern/spellen/magnaat/leerkring.js",
     "server/kern/tafelticket.js",
     "server/kern/veiligheid/index.js",
+    "server/kern/veiligheid/vriendopcodenaam.js",
     "server/kern/volwassen.js",
     "server/kern/welzijn.js",
     "server/opzet/meldaan.js"
@@ -244866,31 +244891,31 @@
     {
      "naam": "toonVraag",
      "soort": "functie",
-     "lijn": 9,
+     "lijn": 14,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 31,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "antwoord",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 42,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "advies",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 59,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bind",
      "soort": "functie",
-     "lijn": 67,
+     "lijn": 73,
      "geexporteerd": "onbekend"
     }
    ],

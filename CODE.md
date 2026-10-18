@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5443<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27528<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->7768<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5449<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27581<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->7771<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -116,7 +116,7 @@ Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geld
 `module.exports` kent **drie** standen, niet twee. Een bestand dat
 `module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
 namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
-onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2467<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2468<!--/getal--> bestanden hier. Het register draagt daarom de vórm
 (`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
 `onbekend` in plaats van op een vals `nee`.
 

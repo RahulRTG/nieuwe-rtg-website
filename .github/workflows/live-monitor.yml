@@ -47,8 +47,15 @@ jobs:
       - name: Meet DNS, TLS, rand en kritieke gebruikersreizen van buitenaf
         id: meet
         run: |
+          set +e
           node scripts/publieke-tls-proef.js "$RTG_LIVE_URL" --eis-release-commit --bewijs=tls-bewijs.json
+          TLS_STATUS=$?
           node scripts/sonde.js "$RTG_LIVE_URL" --json=sonde.json
+          SONDE_STATUS=$?
+          set -e
+          echo "tls_status=$TLS_STATUS" >> "$GITHUB_OUTPUT"
+          echo "sonde_status=$SONDE_STATUS" >> "$GITHUB_OUTPUT"
+          if [ "$TLS_STATUS" -ne 0 ] || [ "$SONDE_STATUS" -ne 0 ]; then exit 1; fi
         env:
           RTG_LIVE_URL: ${{ vars.RTG_LIVE_URL }}
           RTG_RELEASE_COMMIT: ${{ vars.RTG_LIVE_COMMIT }}
@@ -58,8 +65,9 @@ jobs:
       - name: Triage -- welke laag is stuk, en helpt terugrollen?
         if: failure() && steps.meet.outcome == 'failure'
         run: |
-          node scripts/triage.js --uit=sonde.json 2>&1 | tee triage.log || STATUS=$?
+          node scripts/triage.js --uit=sonde.json --tls=tls-bewijs.json 2>&1 | tee triage.log || STATUS=$?
           { echo '## Triage van de live-sonde'; echo '```'; cat triage.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo ''; echo "TLS-proef: ${{ steps.meet.outputs.tls_status || 'onbekend' }} · gebruikersreizen: ${{ steps.meet.outputs.sonde_status || 'onbekend' }}"; } >> "$GITHUB_STEP_SUMMARY"
           exit ${STATUS:-0}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()

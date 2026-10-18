@@ -208,6 +208,21 @@ test('7. een zekering die niet bestaat of al gesprongen is: geen crash, geen dub
   assert.equal(db2.data.techniek.beveiliging.filter(m => m.type === 'auto-reactie').length, 1);
 });
 
+test('7b. dooftijden blijven exact wanneer de klok tussen aanroepen verder tikt', () => {
+  const echt = Date.now;
+  let nu = 1e12;
+  Date.now = () => ++nu;
+  try {
+    const { bev, db } = opzet();
+    for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
+    for (const [id, duur] of [['registratie', 60 * 60000], ['inlogpauze', 10 * 60000]]) {
+      const z = zekering(db, id);
+      assert.equal(z.aan, false);
+      assert.equal(z.tot - z.sindsGesprongen, duur);
+    }
+  } finally { Date.now = echt; }
+});
+
 test('8. de noodrem-stand is van de eigenaar, wordt bewaard, en een bestaande techniek-tak blijft heel', () => {
   const db = { data: { techniek: { functies: { x: 1 } } } };
   const { bev, saves } = opzet({ db });

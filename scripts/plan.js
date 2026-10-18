@@ -22,9 +22,18 @@ const bb = require('./lib/bewijsboek');
 const keuringreden = require('./lib/keuringreden');
 const delen = require('./lib/delen');
 const { prijzen } = require('./lib/duurprijs');
+const { maakBatches, STANDAARD_MAX } = require('./lib/testbatches');
+const { isGeisoleerd } = require('./lib/geisoleerd');
+const { TOETSEN: PG_TOETSEN } = require('./lib/pg-toetslijst');
 
 const WORTEL = path.join(__dirname, '..');
 const MAPPEN = snapshotModule.STANDAARDMAPPEN;
+/* De incrementele runners hebben ieder ook installatie-, bouw- en
+   infrastructuurwerk. Van hun harde grenzen (50 en 30 minuten in ci.yml)
+   blijft daarom tien minuten buiten het toetsbudget. Een selectie die hier
+   niet in past gaat naar de BESTAANDE volledige scherven; er wordt geen bewijs
+   weggelaten en geen timeout opgerekt. */
+const INCREMENTEEL_BUDGET_MS = Object.freeze({ unit: 40 * 60 * 1000, e2e: 20 * 60 * 1000 });
 
 function toetsbestanden() {
   return fs.readdirSync(path.join(WORTEL, 'test'))
@@ -38,48 +47,7 @@ function risicobaan(klasse) {
   return 'light';
 }
 
-/* HOEVEEL WERK DRAAGT EEN INCREMENTELE RUNNER?
-
-   De incrementele route zet alle unit-bewijzen op EEN runner en alle
-   schermbewijzen op EEN runner. De volledige route verdeelt ze over vier
-   scherven (ci.yml: `Toetsscherf x van 4`, `Schermtoetsen deel x van 4`).
-   Hergebruik is dus alleen winst zolang de selectie niet zwaarder is dan een
-   scherf; daarboven is een runner langzamer dan vier, en zijn timeout is daar
-   niet op gemaakt.
-
-   Gemeten op main na de merge van #649 (run 38718725654): 1174 bewijzen
-   hergebruikt, en toch 1212 unit- en 333 van de 333 schermbestanden op elk een
-   runner. Beide jobs werden afgekapt (50 en 30 minuten), main kreeg geen groene
-   basis en elke volgende PR erft dezelfde berg. Dat is het patroon van #614 op
-   13 oktober met een andere aanleiding; de regel hieronder vangt het ongeacht
-   de aanleiding.
-
-   Het gewicht komt uit TOETSDUUR.json via dezelfde weging als de verdeler
-   (./lib/delen.js en ./lib/duurprijs.js): een ongemeten bestand telt als duur.
-   Teller en noemer gebruiken dezelfde kaart, dus de modus van de meting valt
-   tegen elkaar weg. Dit kiest alleen de route; het verruimt geen timeout en
-   slaat geen bewijs over. */
-const SCHERVEN = { unit: 4, e2e: 4 };
-
-function capaciteit(toetsen) {
-  const uit = {};
-  for (const [soort, staart] of [['unit', '.test.js'], ['e2e', '.e2e.js']]) {
-    const alle = toetsen.filter((t) => t.toets.endsWith(staart));
-    const namen = alle.map((t) => path.basename(t.toets));
-    const w = delen.wegingVoor(namen);
-    const { prijsVoor } = prijzen(w.gewicht, { andere: w.andere });
-    const kost = (naam) => w.gewicht.get(naam) || prijsVoor(naam);
-    const totaal = namen.reduce((a, n) => a + kost(n), 0);
-    const gekozen = alle.filter((t) => t.status !== 'REUSED')
-      .reduce((a, t) => a + kost(path.basename(t.toets)), 0);
-    uit[soort] = { bestanden: alle.filter((t) => t.status !== 'REUSED').length, van: alle.length,
-      gekozenMs: Math.round(gekozen), scherfMs: Math.round(totaal / SCHERVEN[soort]),
-      vertrouwen: w.vertrouwen };
-  }
-  return uit;
-}
-
-function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, cap) {
+function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, capaciteit) {
   if (!impact.volledig) return { mode: 'full', code: 'impact-onvolledig',
     reden: 'de impactgraaf kan niet alle gewijzigde paden begrenzen' };
   if (telling.UNKNOWN === telling.REUSED + telling.REPROVE + telling.UNKNOWN && telling.UNKNOWN > 0) {
@@ -97,6 +65,14 @@ function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, cap) {
      en elke PR daarna moest dezelfde berg opnieuw bewijzen. */
   if (bewijsMachineGewijzigd) return { mode: 'full', code: 'bewijsmachine-gewijzigd',
     reden: 'de code die bewijs selecteert of uitvoert is zelf gewijzigd' };
+  if (capaciteit && !capaciteit.past) {
+    const teBreed = ['unit', 'e2e'].filter((soort) => !capaciteit[soort].past)
+      .map((soort) => soort + ' ' + Math.ceil(capaciteit[soort].geschatMs / 60000) +
+        'm/' + Math.floor(capaciteit[soort].budgetMs / 60000) + 'm').join(', ');
+    return { mode: 'full', code: 'incrementieel-te-breed',
+      reden: 'de selectie past niet betrouwbaar in de onverdeelde runners (' + teBreed +
+        '); gebruik de bestaande volledige scherven' };
+  }
   if (!telling.REUSED) {
     if (boek && boek.ongeldig) return { mode: 'full', code: 'bewijsboek-ongeldig', reden: boek.ongeldig };
     if (!boek || !boek.bewijzen || Object.keys(boek.bewijzen).length === 0) {
@@ -106,13 +82,58 @@ function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, cap) {
     return { mode: 'full', code: 'geen-geldig-hergebruik',
       reden: 'geen bewijsrecord past nog bij deze invoer en omgeving' };
   }
-  const te = cap ? ['unit', 'e2e'].filter((k) => cap[k] && cap[k].gekozenMs > cap[k].scherfMs) : [];
-  if (te.length) return { mode: 'full', code: 'incrementeel-boven-scherf',
-    reden: te.map((k) => k + ' ' + cap[k].bestanden + '/' + cap[k].van + ' bestanden, ' +
-      Math.round(cap[k].gekozenMs / 1000) + 's tegen ' + Math.round(cap[k].scherfMs / 1000) +
-      's per scherf').join('; ') + ': een runner is dan trager dan de vier scherven' };
   return { mode: 'incremental', code: 'bewijs-hergebruikt',
     reden: telling.REUSED + ' bewijzen blijven inhoudelijk geldig' };
+}
+
+function belastingVan(namen, parallel, opties) {
+  const o = opties || {};
+  if (!namen.length) return { bestanden: 0, geschatMs: 0, gemeten: 0, ongemeten: 0 };
+  const kaart = delen.gewichtenVoor(namen);
+  const prijs = prijzen(kaart.gewicht, { andere: kaart.andere });
+  const kost = (naam) => kaart.gewicht.get(naam) || prijs.prijsVoor(naam);
+  const batches = o.batches
+    ? maakBatches(namen, { maxBestanden: STANDAARD_MAX, gewicht: kost })
+    : [namen];
+  let geschatMs = 0;
+  for (const batch of batches) {
+    const bakken = delen.indeling(batch, Math.max(1, parallel));
+    geschatMs += Math.max(0, ...bakken.map((bak) => bak.reduce((som, naam) => som + kost(naam), 0)));
+  }
+  return { bestanden: namen.length, geschatMs: Math.round(geschatMs),
+    gemeten: namen.filter((naam) => kaart.gewicht.has(naam)).length,
+    ongemeten: namen.filter((naam) => !kaart.gewicht.has(naam)).length };
+}
+
+/* De projectie gebruikt exact dezelfde gewichten, onbekend-prijs, batches en
+   isolatielijst als de uitvoerders. Dit is een capaciteitsbesluit en geen
+   bewijsbesluit: te groot betekent VOLLEDIG en dus dezelfde toetsen over de
+   bestaande scherven, nooit minder toetsen. */
+function werkbelasting(toetsen, budgetten) {
+  const budget = { ...INCREMENTEEL_BUDGET_MS, ...(budgetten || {}) };
+  const draaien = (toetsen || []).filter((t) => t.status !== 'REUSED')
+    .map((t) => path.basename(t.toets));
+  /* De incrementele unitrunner stelt de canonieke PostgreSQL-lijst uit aan de
+     verplichte PG-job in dezelfde keten (suite-pg.js). Alleen wat werkelijk in
+     deze onverdeelde runner komt, hoort dus tegen zijn 40-minutenbudget. */
+  const pg = new Set(PG_TOETSEN.map((naam) => path.basename(naam)));
+  const unit = draaien.filter((naam) => naam.endsWith('.test.js') && !pg.has(naam));
+  const gewoon = unit.filter((naam) => !isGeisoleerd(naam));
+  const geisoleerd = unit.filter(isGeisoleerd);
+  const unitGewoon = belastingVan(gewoon, 4, { batches: true });
+  const unitGeisoleerd = belastingVan(geisoleerd, 1);
+  const unitUit = {
+    bestanden: unit.length,
+    geschatMs: unitGewoon.geschatMs + unitGeisoleerd.geschatMs,
+    gemeten: unitGewoon.gemeten + unitGeisoleerd.gemeten,
+    ongemeten: unitGewoon.ongemeten + unitGeisoleerd.ongemeten,
+    budgetMs: budget.unit
+  };
+  const e2eNamen = draaien.filter((naam) => naam.endsWith('.e2e.js'));
+  const e2eUit = { ...belastingVan(e2eNamen, 1), budgetMs: budget.e2e };
+  unitUit.past = unitUit.geschatMs <= unitUit.budgetMs;
+  e2eUit.past = e2eUit.geschatMs <= e2eUit.budgetMs;
+  return { unit: unitUit, e2e: e2eUit, past: unitUit.past && e2eUit.past };
 }
 
 function plan(opties) {
@@ -169,9 +190,10 @@ function plan(opties) {
      zelf onvolledig is, zijn alle toetsen UNKNOWN en wordt dit vanzelf full.
      Zo dwingt één toets met een dynamische loader niet 1.926 onafhankelijke
      bewijzen opnieuw af. */
+  const capaciteit = werkbelasting(toetsen, o.budgetten);
   const besluit = o.forceFull ? { mode: 'full', code: 'volledige-ijking-afgedwongen',
     reden: 'deze ronde kalibreert het selectieve bewijs tegen de volledige werkelijkheid' }
-    : modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, o.capaciteit || capaciteit(toetsen));
+    : modusbesluit(impact, telling, boek, bewijsMachineGewijzigd, capaciteit);
   const baan = risicobaan(oordeel.klasse);
   /* Welke regels er afgingen, uitgeschreven (ARCHITECTOPDRACHT.md fase 6).
      Dit besluit niets; het maakt het besluit hierboven navolgbaar. */
@@ -182,7 +204,7 @@ function plan(opties) {
     wijziging, gewijzigd, ondergrens, impact, oordeel, bewijsMachineGewijzigd, omgeving: volledigOmgeving,
     boek: { versie: boek.versie || 1, ongeldig: boek.ongeldig || null,
       bewijzen: Object.keys(boek.bewijzen || {}).length },
-    telling, mode: besluit.mode, besluit, baan, gedwongenVolledig: !!o.forceFull, redenen, toetsen };
+    telling, capaciteit, mode: besluit.mode, besluit, baan, gedwongenVolledig: !!o.forceFull, redenen, toetsen };
 }
 
 function commit() {
@@ -238,7 +260,7 @@ function serialiseer(p) {
       ongemeten: p.omgeving.ongemeten }, boek: p.boek, mode: p.mode,
     besluit: p.besluit, baan: p.baan, gedwongenVolledig: p.gedwongenVolledig, redenen: p.redenen,
     impactClaims: [...p.impact.geraakt].map(([pad, staat]) => ({ pad, ...staat })),
-    telling: p.telling,
+    telling: p.telling, capaciteit: p.capaciteit,
     reused: p.toetsen.filter((t) => t.status === 'REUSED').map((t) => t.toets),
     reprove: p.toetsen.filter((t) => t.status === 'REPROVE').map((t) => t.toets),
     unknown: p.toetsen.filter((t) => t.status === 'UNKNOWN').map((t) => t.toets),
@@ -299,4 +321,4 @@ if (require.main === module) {
 }
 
 module.exports = { plan, vastleggen, serialiseer, schrijfUitvoer, toetsbestanden,
-  risicobaan, modusbesluit, capaciteit, SCHERVEN, MAPPEN };
+  risicobaan, modusbesluit, werkbelasting, belastingVan, INCREMENTEEL_BUDGET_MS, MAPPEN };

@@ -184,6 +184,38 @@ test('een gewijzigde bewijsmachine geeft altijd de volledige route, ook als er b
     'impact-onvolledig', 'een onbegrensde impact blijft de eerste reden');
 });
 
+test('een te brede incrementele selectie gebruikt de bestaande volledige scherven', () => {
+  const boek = { bewijzen: { x: {} } };
+  const capaciteit = {
+    past: false,
+    unit: { past: false, geschatMs: 41 * 60 * 1000, budgetMs: 40 * 60 * 1000 },
+    e2e: { past: true, geschatMs: 4 * 60 * 1000, budgetMs: 20 * 60 * 1000 }
+  };
+  assert.deepEqual(planner.modusbesluit({ volledig: true },
+    { REUSED: 900, REPROVE: 300, UNKNOWN: 0 }, boek, false, capaciteit), {
+    mode: 'full', code: 'incrementieel-te-breed',
+    reden: 'de selectie past niet betrouwbaar in de onverdeelde runners (unit 41m/40m); gebruik de bestaande volledige scherven'
+  });
+  assert.equal(planner.modusbesluit({ volledig: true },
+    { REUSED: 900, REPROVE: 3, UNKNOWN: 0 }, boek, false,
+    { ...capaciteit, past: true, unit: { ...capaciteit.unit, past: true } }).mode, 'incremental');
+});
+
+test('de capaciteitsmeting telt alleen opnieuw te bewijzen unit- en browserbestanden', () => {
+  const capaciteit = planner.werkbelasting([
+    { toets: 'test/grondwacht.test.js', status: 'REPROVE' },
+    { toets: 'test/experience-travel.e2e.js', status: 'UNKNOWN' },
+    { toets: 'test/pg.test.js', status: 'REPROVE' },
+    { toets: 'test/evidence-engine.test.js', status: 'REUSED' }
+  ], { unit: 1, e2e: 1 });
+  assert.equal(capaciteit.unit.bestanden, 1);
+  assert.equal(capaciteit.e2e.bestanden, 1);
+  assert.ok(capaciteit.unit.geschatMs > 1);
+  assert.ok(capaciteit.e2e.geschatMs > 0,
+    'zonder bekende duur blijft een browserbestand minstens een positieve, fail-closed prijs houden');
+  assert.equal(capaciteit.past, false);
+});
+
 test('de Evidence Control Plane bindt elke hergebruikte toets aan een negatieve claim', () => {
   const plan = { formaat: 'rtg-evidence-plan-v2', basis: 'basis',
     snapshot: { rootHash: 'snap' }, gewijzigd: ['server/a.js'], mode: 'incremental',
@@ -303,45 +335,14 @@ test('warme browserfabriek ruimt contexten op zonder het gedeelde proces te slui
   assert.equal(geisoleerd, 1, 'procesvlaggen krijgen een eigen browserproces');
 });
 
-test('een incrementele selectie zwaarder dan een scherf gaat naar de volledige route', () => {
-  /* Main na de merge van #649 (run 38718725654): 1174 bewijzen hergebruikt en
-     toch 1212 unit- en 333 van de 333 schermbestanden op elk EEN runner; beide
-     jobs liepen tegen hun timeout. Gemeten op het echte TOETSDUUR.json. */
-  const alle = planner.toetsbestanden();
-  const unit = alle.filter((t) => t.endsWith('.test.js'));
-  const e2e = alle.filter((t) => t.endsWith('.e2e.js'));
-  const zoals649 = alle.map((toets, i) => ({ toets,
-    status: toets.endsWith('.e2e.js') || i % 2 === 0 ? 'REPROVE' : 'REUSED' }));
-  const cap = planner.capaciteit(zoals649);
-  assert.equal(cap.e2e.bestanden, e2e.length);
-  assert.ok(cap.e2e.gekozenMs > cap.e2e.scherfMs, 'alle schermbestanden zijn meer dan een kwart');
-  const boek = { bewijzen: { x: {} } };
-  const besluit = planner.modusbesluit({ volledig: true }, { REUSED: 1174, REPROVE: 1429, UNKNOWN: 116 },
-    boek, false, cap);
-  assert.equal(besluit.mode, 'full');
-  assert.equal(besluit.code, 'incrementeel-boven-scherf');
-  assert.match(besluit.reden, /e2e 333\/333|e2e \d+\/\d+/);
-
-  /* Een kleine wijziging blijft incrementeel: dat is waar hergebruik voor is. */
-  const klein = alle.map((toets) => ({ toets,
-    status: toets === unit[0] || toets === e2e[0] ? 'REPROVE' : 'REUSED' }));
-  const kleinCap = planner.capaciteit(klein);
-  assert.equal(kleinCap.unit.bestanden, 1);
-  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: alle.length - 2, REPROVE: 2, UNKNOWN: 0 },
-    boek, false, kleinCap).mode, 'incremental');
-
-  /* De grens is EEN scherf: net erboven is volledig, erop is incrementeel. */
-  const op = { unit: { bestanden: 1, van: 4, gekozenMs: 100, scherfMs: 100 },
-    e2e: { bestanden: 0, van: 4, gekozenMs: 0, scherfMs: 100 } };
-  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: 3, REPROVE: 1, UNKNOWN: 0 }, boek, false, op).mode,
-    'incremental');
-  op.unit.gekozenMs = 101;
-  assert.equal(planner.modusbesluit({ volledig: true }, { REUSED: 3, REPROVE: 1, UNKNOWN: 0 }, boek, false, op).code,
-    'incrementeel-boven-scherf');
-});
-
-test('het aantal scherven in de planner is het aantal in ci.yml', () => {
-  const ci = require('fs').readFileSync(require('path').join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
-  assert.match(ci, new RegExp('Toetsscherf \\$\\{\\{ matrix\\.scherf \\}\\} van ' + planner.SCHERVEN.unit + '\\b'));
-  assert.match(ci, new RegExp('Schermtoetsen deel \\$\\{\\{ matrix\\.deel \\}\\} van ' + planner.SCHERVEN.e2e + '\\b'));
+test('de tijdlijn noemt de modus van het besluit, niet een afgeleide uit UNKNOWN', () => {
+  /* Run 38718725654 meldde "116 onbekend → volledige ronde" terwijl het plan
+     incrementeel bleef en twee onverdeelde runners tegen hun timeout liepen. */
+  const plan = { snapshot: { bestanden: 1, duurMs: 1 }, telling: { REUSED: 1174, REPROVE: 1429, UNKNOWN: 116 },
+    mode: 'incremental', besluit: { code: 'bewijs-hergebruikt' } };
+  const regels = uitvoerder.tijdlijn(plan, { unit: ['a.test.js'], e2e: [] });
+  assert.ok(!regels.some((r) => /volledige ronde/.test(r)), regels.join('\n'));
+  assert.ok(regels.includes('modus incremental (bewijs-hergebruikt)'));
+  assert.ok(uitvoerder.tijdlijn({ ...plan, mode: 'full', besluit: { code: 'incrementieel-te-breed' } },
+    { unit: [], e2e: [] }).includes('modus full (incrementieel-te-breed)'));
 });

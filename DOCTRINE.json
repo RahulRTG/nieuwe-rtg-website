@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-18T07:11:44.499Z",
-    "commit": "3af26155a",
-    "boomVuil": true,
+    "op": "2026-10-18T07:12:22.238Z",
+    "commit": "a04f20116",
+    "boomVuil": false,
     "instrument": "scripts/doctrine.js",
     "node": "v26.11.1"
   },
@@ -44,7 +44,7 @@
   },
   "overgeslagen": {
     "codeblokregels": 4214,
-    "tabelregels": 12677,
+    "tabelregels": 12680,
     "citaatregels": 1367,
     "geenUitspraak": 35,
     "waarom": "code, tabellen en citaten dragen geen eigen uitspraak; ze worden geteld en niet stil weggelaten"
@@ -21699,7 +21699,7 @@
       "doc": "BEWIJS.md",
       "paragraaf": null,
       "kop": "Schermtoetsen (`npm run e2e`, met een browser)",
-      "regel": 2480,
+      "regel": 2482,
       "zin": "Schermtoetsen (`npm run e2e`, met een browser)",
       "as": "structuur",
       "signaal": "kop",
@@ -21712,7 +21712,7 @@
       "doc": "BEWIJS.md",
       "paragraaf": null,
       "kop": "Hoe je dit bestand bijwerkt",
-      "regel": 2819,
+      "regel": 2822,
       "zin": "Hoe je dit bestand bijwerkt",
       "as": "structuur",
       "signaal": "kop",

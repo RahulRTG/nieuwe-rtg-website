@@ -1771,8 +1771,16 @@ async function edgeRahul(page) {
   const mouth = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
   if (await mouth.isVisible()) await mouth.click();
   else await page.locator('.rtg-adaptive-sheet [data-rtg-sheet-action="ai"]').click();
-  const cinema = page.locator('.rtg-edge-cinema [data-cinema="rahul"]');
-  if (await cinema.isVisible()) await cinema.click();
+  /* Op routes zonder eigen vraagvlak opent de mond eerst het fotografische
+     Edge-scherm. Rahul is daar een stand in de vaste modenavigatie, geen knop
+     in de foto zelf. De oude helper zocht een niet-bestaand data-cinema-attribuut
+     en wachtte daarna dertig seconden op een knop uit de volgende stand. */
+  const cinema = page.locator('.rtg-edge-cinema');
+  if (await cinema.isVisible()) {
+    const rahul = page.locator('.rtg-adaptive-modes [data-rtg-adaptive-mode="rahul"]');
+    await rahul.waitFor({ state: 'visible' });
+    await rahul.click();
+  }
   const open = page.getByRole('button', { name: 'Open beveiligd gesprek' });
   await open.waitFor({ state: 'visible' });
   await open.click();

@@ -13,6 +13,7 @@
 
     var contentHeader = old && old.matches('.ritkop,[data-rtg-v4-content-header]');
     if (old && !contentHeader && body.dataset.rtgV4Kind !== 'canvas') {
+      adoptHeaderControls(doc, header, old);
       old.dataset.rtgV4LegacyHeader = 'true';
       Array.from(old.querySelectorAll(':scope > .terug,:scope > [data-rtg-edge-bar]')).forEach(function (node) {
         if (!node.closest('dialog,[role="dialog"]')) actions.insertBefore(node, search);
@@ -48,6 +49,7 @@
     body.dataset.rtgEditorialV4 = 'true';
     body.dataset.rtgV4Kind = kind;
     body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
+    setSurface(doc, win, body);
     if (embedded) body.dataset.rtgV4Embedded = 'true'; else delete body.dataset.rtgV4Embedded;
     var name = body.dataset.rtgV4Title || title(doc);
     body.dataset.rtgV4Title = name.slice(0, 120);
@@ -59,15 +61,19 @@
     var jump = body.querySelector('a[href^="#"]'), main = doc.querySelector('main,[role="main"],#main');
     if (jump && main) { if (!main.id) main.id = 'rtg-inhoud'; jump.href = '#' + main.id; if (body.firstChild !== jump) body.insertBefore(jump, body.firstChild); }
     if (header) {
-      syncHeaderActions(doc, header);
       if (header.parentNode !== body) body.insertBefore(header, body.firstChild);
       header.removeAttribute('data-rtg-edge-2-contextual');
       Array.from(doc.querySelectorAll('[data-rtg-edge-2-contextual="native-header"]')).forEach(function (legacy) {
-        if (legacy !== header) legacy.dataset.rtgV4LegacyHeader = 'true';
+        if (legacy !== header) {
+          if (legacy.matches('.ritkop,[data-rtg-v4-content-header]')) delete legacy.dataset.rtgV4LegacyHeader;
+          else { adoptHeaderControls(doc, header, legacy); legacy.dataset.rtgV4LegacyHeader = 'true'; }
+        }
       });
       if (body.dataset.rtgV4Kind !== 'canvas') Array.from(doc.querySelectorAll('.wd-page > header:not(.rtg-v4-header), body > header:not(.rtg-v4-header)')).forEach(function (legacy) {
-        if (!legacy.matches('.ritkop,[data-rtg-v4-content-header]')) legacy.dataset.rtgV4LegacyHeader = 'true';
+        if (legacy.matches('.ritkop,[data-rtg-v4-content-header]')) delete legacy.dataset.rtgV4LegacyHeader;
+        else { adoptHeaderControls(doc, header, legacy); legacy.dataset.rtgV4LegacyHeader = 'true'; }
       });
+      syncHeaderActions(doc, header);
       var worldNode = header.querySelector('.rtg-v4-world'), titleNode = header.querySelector('.rtg-v4-title');
       var worldText = worldName(world);
       if (worldNode && worldNode.textContent !== worldText) worldNode.textContent = worldText;
@@ -90,6 +96,7 @@
           resizeQueued = false;
           var body = doc.body; if (!body) return;
           body.dataset.rtgV4Viewport = win.innerWidth < 700 ? 'phone' : (win.innerWidth < 1180 ? 'tablet' : 'desktop');
+          setSurface(doc, win, body);
         });
       }, { passive:true });
       if (win.MutationObserver) new win.MutationObserver(function (records) {
@@ -98,6 +105,12 @@
       }).observe(doc.body, { childList:true, subtree:true });
     }
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start, { once:true }); else start();
+  }
+
+  /* Het werkvlak blijft zichtbaar onder de V4-kop, behalve op het wereldbeginscherm. */
+  function setSurface(doc, win, body) {
+    var page = doc.querySelector('.wd-page');
+    if (page && !body.hasAttribute('data-world-home')) page.style.setProperty('display', 'block', 'important');
   }
 
   return Object.freeze({ classify:classify, ownsPresentation:ownsPresentation,

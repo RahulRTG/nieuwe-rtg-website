@@ -1,6 +1,6 @@
-/* Quiet Presence gebruikt de bestaande Edge-staten en bewijst in een echte
-   mobiele browser dat rust, activatie, context, pinning, focus en routeherstel
-   elkaar niet verstoren. */
+/* De persistente Edge gebruikt de bestaande staten en bewijst in een echte
+   mobiele browser dat rust, activatie, context, focus en routeherstel elkaar
+   niet verstoren. Alleen een bewust scroll- of veeggebaar mag hem verkleinen. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -12,7 +12,7 @@ async function gereed(page) {
     window.RTGAdaptiveEdge && window.RTGEdge2);
 }
 
-test('Edge Quiet Presence blijft bedienbaar, focusveilig en vastzetbaar',
+test('de volledige Edge blijft in rust bedienbaar, focusveilig en vastgezet',
   { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '' } });
   let browser;
@@ -36,16 +36,20 @@ test('Edge Quiet Presence blijft bedienbaar, focusveilig en vastzetbaar',
     await bar.hover();
     await page.mouse.move(10, 10);
     await page.clock.runFor(3600);
-    assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'peek');
-    assert.equal(await host.getAttribute('data-rtg-adaptive-motion'), 'quiet');
-    assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'idle');
+    assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'dock',
+      'stilte verbergt geen primaire navigatie');
+    assert.equal(await host.getAttribute('data-rtg-adaptive-motion'), 'available');
+    assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'active');
     const maat = await host.evaluate(node => {
       const r = node.getBoundingClientRect();
-      const target = node.querySelector('[data-rtg-adaptive-action="ai"]').getBoundingClientRect();
-      return { width: r.width, height: r.height, targetWidth: target.width, targetHeight: target.height };
+      const targets = [].map.call(node.querySelectorAll('.rtg-adaptive-bar > button'), button => {
+        const b = button.getBoundingClientRect(); return { width: b.width, height: b.height };
+      });
+      return { width: r.width, height: r.height, targets: targets };
     });
-    assert.ok(maat.width <= 88.5 && maat.height >= 47.5, JSON.stringify(maat));
-    assert.ok(maat.targetWidth >= 44 && maat.targetHeight >= 44, JSON.stringify(maat));
+    assert.ok(maat.width > 300 && maat.height >= 63.5, JSON.stringify(maat));
+    assert.equal(maat.targets.length, 5, 'de standaard-Edge houdt alle vijf functies zichtbaar');
+    maat.targets.forEach(target => assert.ok(target.width >= 44 && target.height >= 44, JSON.stringify(maat)));
 
     await bar.hover();
     assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'dock');
@@ -64,7 +68,7 @@ test('Edge Quiet Presence blijft bedienbaar, focusveilig en vastzetbaar',
     await page.evaluate(() => RTGAdaptiveEdge.setState('dock'));
     await page.mouse.move(10, 10);
     await page.clock.runFor(3600);
-    assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'idle');
+    assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'active');
     await bar.hover();
 
     await bar.locator('.rtg-adaptive-item[data-rtg-adaptive-action="ai"]').focus();
@@ -82,7 +86,7 @@ test('Edge Quiet Presence blijft bedienbaar, focusveilig en vastzetbaar',
 
     await page.evaluate(() => { document.body.dataset.rtgEdge2Auto = 'true'; RTGAdaptiveEdge.setState('dock'); });
     await page.clock.runFor(3600);
-    assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'idle');
+    assert.equal(await host.getAttribute('data-rtg-adaptive-presence'), 'active');
 
     await page.evaluate(() => {
       RTGAdaptiveEdge.setState('dock');

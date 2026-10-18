@@ -61,8 +61,10 @@ test('de hoofdactie wordt niet meer als snelkoppeling geregistreerd; de voortgan
   assert.doesNotMatch(VIEW, /K\.defaults\(/);
 });
 
-test('de lege melding staat nooit boven een gevulde lijst (vorm; het gedrag bewijst rtg-adaptive-edge.e2e.js)', () => {
-  assert.match(VIEW, /if \(!\(rt\.controls && rt\.controls\.children\.length\) && !rt\.primarySlot\)/);
+test('de Edge toont geen generieke foutmelding naast contextuele bediening', () => {
+  assert.doesNotMatch(VIEW, /Voor deze context zijn geen veilige acties beschikbaar/);
+  assert.match(VIEW, /if \(rt\.renderControls\) rt\.renderControls\(\)/);
+  assert.match(VIEW, /Services\.modes\(rt\)/);
 });
 
 test('de uitvoerder van de Edge kent geen window.confirm meer (vorm; het gedrag bewijst edgeblikveld.e2e.js)', () => {
@@ -202,13 +204,13 @@ test('invoerlaag behandelt geneste scroll en verwijdert alle luisteraars bij tea
   assert.equal(bar.events.size, 0);
 });
 
-test('Quiet Presence gebruikt signalen, respecteert pin en bewaart een raakvlak van 44px', () => {
-  assert.match(INPUT, /handlers\.state\('peek',\s*'quiet'\)/);
+test('de volledige Edge blijft standaard zichtbaar en bewaart een raakvlak van 44px', () => {
+  assert.doesNotMatch(INPUT, /handlers\.state\('peek',\s*'quiet'\)/);
+  assert.doesNotMatch(INPUT, /setTimeout\(function\(\)\{[^}]*handlers\.state\('peek'/);
   assert.match(INPUT, /listen\(rt\.bar,'pointerenter',wake\)/);
   assert.match(INPUT, /listen\(rt\.bar,'pointerleave',quiet\)/);
   assert.match(INPUT, /listen\(rt\.bar,'focusin',wake\)/);
-  assert.match(INPUT, /rtgEdge2Auto==='false'/);
-  assert.match(INPUT, /d\.rtgEdge2Rendered==='true'/);
+  assert.match(INPUT, /handlers\.state\(delta > 0 \? 'peek' : 'dock', 'auto'\)/);
   assert.match(CSS, /data-rtg-adaptive-ready="true"\] \.rtg-adaptive-edge\[data-rtg-adaptive-presence="idle"\]\{width:88px;height:48px/);
   assert.match(CSS, /data-rtg-adaptive-presence="idle"\][\s\S]+?\.rtg-adaptive-item:nth-child\(3\)\{min-width:44px;min-height:44px/);
   assert.match(CSS, /prefers-contrast:more\)\{\.rtg-adaptive-edge\[data-rtg-adaptive-presence="idle"\]/);

@@ -241,6 +241,7 @@
     ['rtg-heritage-registry', 'RTGHeritageRegistry'],
     ['rtg-heritage-components', 'RTGHeritageComponents'],
     ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
+    ['rtg-editorial-v4-header', 'RTGEditorialV4Header'],
     ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
     if (window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
     var script = document.createElement('script');

@@ -9771,7 +9771,7 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 18,
+      "inkomend": 17,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -9783,9 +9783,9 @@
         "public/shared/clipdeler.js",
         "public/shared/clipdeler/clipdeler-01.js",
         "public/shared/rosapps.js",
-        "public/shared/rtg-adaptive-edge-cinema.js",
         "public/shared/rtg-adaptive-edge-services.js",
-        "public/shared/rtg-adaptive-edge-visual.js"
+        "public/shared/rtg-adaptive-edge-visual.js",
+        "public/shared/split.js"
       ]
     },
     {

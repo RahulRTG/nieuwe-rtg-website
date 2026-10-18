@@ -1,6 +1,6 @@
 (function(w,d){
   'use strict';
-  var ROOTS='.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
+  var R='.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra,.rtg-v4-route-actions';
 
   function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||'').replace(/\s+/g,' ').trim()}
   function avail(el,root){
@@ -12,11 +12,11 @@
     }
     return el.isConnected
   }
-  function sourceButtons(doc,embedded,items){
-    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id}));
-    (doc||d).querySelectorAll(ROOTS+(embedded?',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]':'')).forEach(function(root){
-      var controls=root.matches('button')?[root]:root.querySelectorAll('button,a[href]');
-      controls.forEach(function(el){
+  function sourceButtons(doc,embed,items){
+    var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id;}));
+    (doc || d).querySelectorAll(R + (embed ? ',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]' : '')).forEach(function (root) {
+      var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
+      controls.forEach(function (el) {
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
         var action = el.getAttribute('data-rtg-action-key');
@@ -154,8 +154,8 @@
       if (records.some(function (r) {
         if (rt.host.contains(r.target) || !r.target.closest) return false;
         return r.type === 'attributes' && r.attributeName === 'class'
-          ? r.target.matches && r.target.matches(ROOTS)
-          : !!r.target.closest(ROOTS);
+          ? r.target.matches && r.target.matches(R)
+          : !!r.target.closest(R);
       })) refresh();
     });
     observer.observe(d.body, { subtree: true, childList: true, attributes: true,

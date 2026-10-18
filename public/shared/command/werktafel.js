@@ -1,4 +1,3 @@
-/* De werktafel: bank, bladen, scheiding en lade. De grendel staat in command.js. */
 (function(w,d){
   'use strict';
   w.RTGCommandWerktafel=function(o){
@@ -41,8 +40,9 @@
        sluiten komen op dezelfde plek uit. WAT er dan staat woont in
        ./beginscherm.js -- eigen onderwerp, eigen bestand. */
     function leeg(){var vak=root.querySelector('.cmd-panes');vak.textContent='';
-      w.RTGCommandBeginscherm(vak,{werelden:o.werelden,open:o.open,
-        praat:function(){if(praatLaag)praatLaag.open()}})}
+      if(typeof w.RTGCommandBeginscherm==='function')w.RTGCommandBeginscherm(vak,{werelden:o.werelden,open:o.open,
+        praat:function(){if(praatLaag)praatLaag.open()}});
+      else{var fout=d.createElement('p');fout.className='cmd-leegreden';fout.textContent='De werkruimte kon niet volledig worden geladen. Vernieuw dit scherm.';vak.appendChild(fout)}}
     /* Op telefoon is dit de enige schilbalk; Adaptief vult de handelingen. */
     function balk(){
       var rij=root.querySelector('.cmd-balkbladen'),kruis=root.querySelector('.cmd-balksluit');

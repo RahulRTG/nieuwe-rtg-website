@@ -88,7 +88,8 @@ function uitImage() {
   const container = docker(['create', id]);
   try {
     for (const [binnen, buiten] of [['/app/release-bewijs.json', 'release-bewijs.json'],
-      ['/app/rtg-motor', 'rtg-motor'], ['/app/rtg-sentinel', 'rtg-sentinel'], ['/app/public/dist', 'dist']])
+      ['/app/rtg-motor', 'rtg-motor'], ['/app/rtg-sentinel', 'rtg-sentinel'], ['/app/public/dist', 'dist'],
+      ['/app/public/sw.js', 'sw.js'], ['/app/public/apps/foundation/sw.js', 'foundation-sw.js']])
       docker(['cp', container + ':' + binnen, path.join(tmp, buiten)]);
   } finally { cp.spawnSync('docker', ['rm', '-f', container]); }
   const bewijsBytes = fs.readFileSync(path.join(tmp, 'release-bewijs.json'));
@@ -109,6 +110,11 @@ function uitImage() {
     fs.chmodSync(path.join(ROOT, 'motor/target/release', bin), 0o755);
   }
   vervang(path.join(ROOT, 'public/dist'), path.join(tmp, 'dist'));
+  /* De build stempelt beide workers met de hash van hun werkelijke shell.
+     Ook die gebouwde bytes moeten daarom uit hetzelfde image komen; alleen
+     dist terughalen liet de voor-controle na iedere shellwijziging zakken. */
+  vervang(path.join(ROOT, 'public/sw.js'), path.join(tmp, 'sw.js'));
+  vervang(path.join(ROOT, 'public/apps/foundation/sw.js'), path.join(tmp, 'foundation-sw.js'));
   fs.rmSync(tmp, { recursive: true, force: true });
   kw.schrijfJson(ROOT, kw.REL.image, { formaat: kw.FORMAAT + '-image', image: ref, imageId: id,
     commit, bewijsSha256: kw.sha256(bewijsBytes), inhoudSha256: bewijs.inhoudSha256,

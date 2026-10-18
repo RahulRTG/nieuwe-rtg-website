@@ -29,6 +29,8 @@ const path = require('path');
 const BASIS = Number(process.env.RTG_VLOOT_BASIS || 3010); // eerste groepspoort
 const POORT = Number(process.env.RTG_POORT || 3000);       // de gateway zelf
 const STANDAARD = 'leden:auth,member,social,zakelijk|partners:supplier,staff|kantoor:office,techniek|rtf:-';
+const GEDEELDE_DB = process.env.DATABASE_URL || process.env.PG_URL;
+const LOKALE_DATA = process.env.RTG_DATA_DIR || path.join(__dirname, 'data');
 
 // 'naam:domein1,domein2|naam2:...' -> [{ naam, domeinen, poort }]
 const GROEPEN = (process.env.RTG_VLOOT_GROEPEN || STANDAARD).split('|').map((deel, i) => {
@@ -42,7 +44,7 @@ const UP_VAN_DOMEIN = {
   supplier: 'RTG_UP_SUPPLIER', staff: 'RTG_UP_STAFF', office: 'RTG_UP_OFFICE', techniek: 'RTG_UP_TECHNIEK'
 };
 
-if (!process.env.DATABASE_URL) {
+if (!GEDEELDE_DB) {
   console.warn('[vloot] LET OP: geen DATABASE_URL. Elke groep heeft dan zijn eigen data-snapshot;');
   console.warn('[vloot] prima voor demo en test, maar zet voor productie PostgreSQL en de Redis-bus aan.');
 }
@@ -70,8 +72,14 @@ for (const g of GROEPEN) {
   const domeinen = g.domeinen === '-' ? '-' : g.domeinen; // '-' = alleen kern+foundation
   start('groep ' + g.naam, () => {
     console.log(`[vloot] groep ${g.naam} (${domeinen === '-' ? 'kern+foundation' : domeinen}) op poort ${g.poort}`);
+    // Zonder PostgreSQL mogen processen nooit dezelfde SQLite-bestanden openen.
+    // De vloot beloofde al afzonderlijke snapshots, maar gaf tot nu toe iedere
+    // groep dezelfde RTG_DATA_DIR. Gelijktijdige initialisatie kon daardoor één
+    // wereld permanent op 502 laten staan. PostgreSQL blijft juist gedeeld.
+    const dataDir = GEDEELDE_DB ? process.env.RTG_DATA_DIR
+      : path.join(LOKALE_DATA, 'vloot', g.naam.replace(/[^a-z0-9_-]/gi, '_'));
     return spawn(process.execPath, [path.join(__dirname, 'server.js')], {
-      env: { ...process.env, PORT: String(g.poort), RTG_DOMAINS: domeinen },
+      env: { ...process.env, PORT: String(g.poort), RTG_DOMAINS: domeinen, ...(dataDir ? { RTG_DATA_DIR: dataDir } : {}) },
       stdio: ['ignore', 'inherit', 'inherit']
     });
   });

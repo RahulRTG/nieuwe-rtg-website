@@ -128,3 +128,41 @@ test('8. een vaartuig toevoegen en de vloot bijwerken (manager)', async () => {
   assert.equal(r.status, 200);
   assert.ok(r.body.boten.some(v => v.naam === 'Brisa'), 'het nieuwe vaartuig staat in de vloot');
 });
+
+/* 9. /api/charter/foto: de GAST legt zelf de staat vast. Voor-foto's alleen voor
+   het uitvaren, na-foto's alleen tijdens de vaart; geen beeld is geen foto; en
+   een andere gast kan niets bij deze charter zetten.
+   MUTATIE GEZIEN ZAKKEN: in server/routes/member/voertuigen/charter.js de
+   fase-grendel `c.status !== 'aangevraagd'` op `false`; de toets zakte op
+   "na het uitvaren geen voor-foto meer". */
+test('9. de gast legt zelf de staat vast: voor-foto voor het uitvaren, na-foto tijdens de vaart', async () => {
+  const b = await boekBetaal({ supplierCode: 'AZUL', bootId: 'b3', van: D(30), tot: D(32), metSkipper: true });
+  assert.equal(b.status, 200);
+  const ref = b.body.charter.ref;
+
+  assert.equal((await api(base, '/api/charter/foto', { ref, fase: 'voor', foto: 'geen-beeld' }, lid)).status, 400);
+  assert.equal((await api(base, '/api/charter/foto', { ref, fase: 'na', foto: FOTO }, lid)).status, 409,
+    'een na-foto voor het uitvaren kan niet');
+  const voor = await api(base, '/api/charter/foto', { ref, fase: 'voor', foto: FOTO }, lid);
+  assert.equal(voor.status, 200, JSON.stringify(voor.body).slice(0, 160));
+  assert.equal(voor.body.aantal, 1);
+  let rij = (await api(base, '/api/charter/mijn', {}, lid)).body.charters.find(c => c.ref === ref);
+  assert.equal(rij.fotosVoor, 1, 'de gast ziet zijn voor-foto terug');
+
+  const u = Date.now().toString().slice(-8);
+  const ander = (await api(base, '/api/auth/register', { name: 'Ander Lid', email: 'ca' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.equal((await api(base, '/api/charter/foto', { ref, fase: 'voor', foto: FOTO }, ander)).status, 404,
+    'een andere gast vindt deze charter niet');
+  assert.equal((await api(base, '/api/charter/foto', { ref, fase: 'voor', foto: FOTO }, null)).status, 401);
+
+  const uit = await api(base, '/api/supplier/charter/status', { ref, status: 'lopend', urenStart: 10, brandstofStart: 8 }, mgr);
+  assert.equal(uit.status, 200);
+  assert.equal((await api(base, '/api/charter/foto', { ref, fase: 'voor', foto: FOTO }, lid)).status, 409,
+    'na het uitvaren geen voor-foto meer');
+  const na = await api(base, '/api/charter/foto', { ref, fase: 'na', foto: FOTO }, lid);
+  assert.equal(na.status, 200);
+  rij = (await api(base, '/api/charter/mijn', {}, lid)).body.charters.find(c => c.ref === ref);
+  assert.equal(rij.fotosNa, 1);
+  assert.equal(rij.fotosVoor, 1, 'de voor-foto bleef staan');
+});

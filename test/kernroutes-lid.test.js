@@ -155,6 +155,7 @@ test('ik/vandaag: zonder plek geen gebedstijden, met plek een qibla die bij die 
   assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
 
   const zonderPlek = await api('/api/ik/vandaag', {}, tok);
+  assert.equal(zonderPlek.body.tradities.length, 1, 'na het zetten staat er een traditie');
   assert.deepEqual(zonderPlek.body.tradities, ['islam']);
   assert.equal(zonderPlek.body.gebed, null, 'zonder plek geen tijden');
   assert.equal(zonderPlek.body.qibla, null);

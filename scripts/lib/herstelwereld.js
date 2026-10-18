@@ -85,6 +85,9 @@ async function zetWereldKlaar({ roep, tokens, aanmeld, tweede }) {
   return { gedaan, sleutels };
 }
 const vers = () => Math.random().toString(36).slice(2, 10);
+/* Een dag een eind vooruit, uit de klok; zie `straks` verderop. */
+const dagNa = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+let careDag = 0;
 
 /* ---- 2. HET LIJF: de velden die deze route eist -------------------------- */
 /* Per route, met de reden waarom dat veld er moet zijn -- overgenomen uit het
@@ -126,11 +129,36 @@ const LIJVEN = Object.freeze({
      409 "terugnemen kan pas na de vervaldatum" -- de route zegt zelf hoe. */
   '/api/pay/tegoed/terug': () => ({ intrekken: true, idem: 'herstelproef-' + vers() }),
   '/api/supplier/giftcard/sell': () => ({ bedrag: 25, idem: 'herstelproef-' + vers() }),
-  '/api/supplier/pay/treasury/apart': () => ({ naam: 'Proefoormerk', centen: 50, doel: 'btw' }),
+  /* Een VERSE naam per poging. Apart zetten onder een naam die al bestaat, TELT
+     BIJ dat oormerk op (kern/waarde/oormerk.js), en vrijgeven geeft het hele
+     oormerk vrij. Met een vaste naam stond het oormerk van de opwarmronde er
+     nog, zette de meetronde er 50 cent bij en gaf de terugweg het geheel vrij
+     -- inclusief het restant van de opwarming. Dan meet je het restant en niet
+     het paar; zelfde les als het verse adres bij publiceren. */
+  '/api/supplier/pay/treasury/apart': () => ({ naam: 'Proefoormerk ' + vers(), centen: 50, doel: 'btw' }),
   '/api/wallet/voeg': () => ({ soort: 'klantenkaart', titel: 'Proefkaart', code: 'PROEF-' + vers() }),
   /* De terugweg van een weggehaalde regel is een NIEUWE regel, dus zonder het
      id van de oude: met dat id gaf regelZet 404 "deze regel bestaat niet". */
   '/api/geld/beleid/zet': () => ({ soort: 'minimumbuffer', drempelCenten: 10000, niveau: 'kijken', id: undefined }),
+
+  /* EEN VERS TIJDSLOT PER POGING bij Care. De opzoeking vindt EEN behandeling
+     met haar vaste tijden, en die tijden hangen niet aan een dag: de agenda
+     van de behandelaar is per (dag, tijd) schaars (kern/care/leden.js). De
+     opwarmronde bezette dus het slot van de meetronde, en de heenweg kreeg 409
+     "Dat tijdslot is al bezet" -- van zijn eigen opwarming. Een andere DAG per
+     poging geeft elke boeking een vrij slot, zonder de bezetregel te raken:
+     dezelfde les als het verse adres bij publiceren hierboven. */
+  '/api/care/boek': () => ({ datum: dagNa(3 + (++careDag)) }),
+  /* DE BESCHERMZAAK KENT GEEN NAAM, en het plausibele lijf stuurt er een mee
+     (`naam`, `email`). De klasse weigert die velden hard
+     (kern/beschermzaak/klasse.js, WEIGERT) -- terecht, en dat blijft zo. Het
+     lijf hoort dus te sturen wat deze route vraagt: een aanleiding en een korte
+     feitelijke omschrijving; de codenaam maakt de zaak zelf. `undefined` valt
+     bij het versturen weg, zodat de velden echt ontbreken. */
+  '/api/rtfos/bescherming/open': { naam: undefined, email: undefined,
+    aanleiding: 'anders', wat: 'Proefzaak: een korte feitelijke omschrijving zonder namen.' },
+  '/api/rtfos/bescherming/sluit': { naam: undefined, email: undefined,
+    uitkomst: 'Proefzaak afgerond.', bewaarDagen: 30, bewaarWaarom: 'Proeftermijn van de herstelproef.' },
 
   '/api/member/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
   '/api/supplier/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
@@ -247,6 +275,14 @@ const ONBEREIKBAAR = Object.freeze({
   '/api/thuis/annuleer': 'een huis in de zaaiset',
   '/api/rtfos/meldcode/open': 'een stadsafdeling in de zaaiset',
   '/api/rtfos/meldcode/sluit': 'een stadsafdeling in de zaaiset',
+  /* Gemeten op 18 oktober 2026, met het lijf dat de beschermzaak WEL vraagt
+     (zie LIJVEN): de heenweg geeft dan 404 "Deze stadsafdeling bestaat niet".
+     Een beschermzaak hangt aan een stad, net als het meldcode-dossier hierboven,
+     en de zaaiset heeft er geen. Zelfde besluit als bij de meldcode: de proef
+     richt geen stad in om zichzelf iets te meten te geven. Het lijf blijft
+     staan, zodat dit paar meteen meetbaar is zodra de wereld een stad heeft. */
+  '/api/rtfos/bescherming/open': 'een stadsafdeling in de zaaiset; een beschermzaak hangt aan een stad',
+  '/api/rtfos/bescherming/sluit': 'een stadsafdeling in de zaaiset; een beschermzaak hangt aan een stad',
   '/api/office/afdelingshotel/boek': 'een afdeling in het afdelingshotel',
   '/api/office/afdelingshotel/annuleer': 'een afdeling in het afdelingshotel',
   '/api/vak/ritme/start': 'een zaak met vaste afspraken',

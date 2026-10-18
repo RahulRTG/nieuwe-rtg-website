@@ -116,7 +116,10 @@ function opslagBeeld(datamap) {
    verandering en het hoort in de uitslag, maar wie het op een hoop gooit met
    het gevolg van de handeling zelf, krijgt vijf stappen die allemaal "raakt
    van alles aan" heten. Twee lijsten dus, en de reden staat erbij. */
-const SPOREN = ['apiSpoor', 'handelingLog', 'rtgai'];
+/* `audit_rij` is de sqlite-tabel waarin diezelfde twee journalen (apiSpoor en
+   handelingLog) sinds server/db/audit-sqlite.js als rijen wonen; zonder hem hier
+   bewoog "de opslag" bij elke oproep en las elke lezer als schrijver. */
+const SPOREN = ['apiSpoor', 'handelingLog', 'rtgai', 'audit_rij'];
 const isSpoor = (naam) => SPOREN.includes(String(naam).split(':').pop());
 
 /* TWEE BEELDEN, TWEE VRAGEN. Hierboven telt `ver` -- het versienummer van een

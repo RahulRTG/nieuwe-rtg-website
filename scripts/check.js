@@ -3517,6 +3517,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
+    ['server/lib/idem-zondersleutel.js', 'de tak van lib/idem.js voor werk ZONDER sleutel in een laag die duurzaam verklaarde: dezelfde belofte als met sleutel (schrijfproef 18 oktober 2026: /api/bank/rekening/open en /api/bank/pas/uitgeven gaven 200 over een opslag die niets had)'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
     ['server/kern/pay/idemlaag.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed (de idem-laag van RTG Pay; stond op kern/pay/index.js tot die op 7 oktober 2026 is geknipt -- VERPLAATST, niet gegroeid)'],

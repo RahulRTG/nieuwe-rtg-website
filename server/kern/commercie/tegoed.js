@@ -68,24 +68,26 @@ function maakTegoed({ db, save, nu }) {
   /* De rij van een houder (een lid op codenaam, of een zaak op code). Rolt bij
      een nieuwe maand vanzelf om: verbruik is per maand, en een tegoed dat
      blijft staan zou "inbegrepen per maand" tot een leugen maken. */
+  const { verseRij, metInbegrepen } = require('./tegoed/rij');
   function rijVan(houder, pas, contractCredits) {
     const a = alles();
     const sleutel = String(houder || '');
     const maand = maandVan(tijd());
     let r = a[sleutel];
     if (!r || r.maand !== maand) {
-      r = a[sleutel] = { houder: sleutel, pas, maand, verbruikt: 0, bijgekocht: 0,
-        beleid: (r && r.beleid) || BELEID.VRAAG_MIJ,
-        autoBundel: (r && r.autoBundel) || null,
-        maandMaxCenten: (r && r.maandMaxCenten) || null,
-        autoDezeMaandCenten: 0,
-        gewaarschuwdOp: null, bundels: [] };
+      r = a[sleutel] = verseRij(sleutel, pas, maand, r);
       save();
     }
-    if (pas) r.pas = pas;
-    const basis = Number.isFinite(contractCredits) ? contractCredits : inbegrepenVoor(r.pas);
-    r.inbegrepen = Number.isFinite(basis) ? basis : null;
-    return r;
+    return metInbegrepen(r, pas, contractCredits);
+  }
+  // kijken zonder te scheppen: een blik rekent met een kopie of een vluchtige rij (test/leeszonderscheppen.test.js)
+  function rijKijk(houder, pas, contractCredits) {
+    const a = eigen.kijk('aiTegoed');
+    const sleutel = String(houder || '');
+    const maand = maandVan(tijd());
+    const oud = a[sleutel];
+    const r = (oud && oud.maand === maand) ? Object.assign({}, oud) : verseRij(sleutel, pas, maand, oud);
+    return metInbegrepen(r, pas, contractCredits);
   }
 
   /* DE VRAAG DIE VOORAF WORDT GESTELD, en het antwoord komt uit
@@ -165,7 +167,7 @@ function maakTegoed({ db, save, nu }) {
   /* De stand, in de vorm die een scherm hoort te tonen. Percentage vooraan,
      rauwe getallen erachter -- nooit tokens. */
   function stand(houder, pas, opties) {
-    const r = rijVan(houder, pas, (opties || {}).contractCredits);
+    const r = rijKijk(houder, pas, (opties || {}).contractCredits);
     if (r.inbegrepen === null)
       return { contractueel: true, tekst: 'AI-capaciteit volgens contract', beleid: r.beleid };
     const totaal = r.inbegrepen + r.bijgekocht;

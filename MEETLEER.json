@@ -1,10 +1,10 @@
 {
   "wat": "of elk register in de wortel de lezer machinaal belet er meer uit te concluderen dan het aantoont",
   "stempel": {
-    "op": "2026-10-18T10:48:26.826Z",
-    "commit": "2c24c722",
+    "op": "2026-10-18T12:10:03.885Z",
+    "commit": "a64eb0eef",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/meetleer.js",
     "node": "v22.22.0"
   },
@@ -14,8 +14,8 @@
   "blindeVlekken": "Alleen registers in de wortel met een HOOFDLETTERnaam. Registers elders (server/data, .github) worden niet gezien, en een register dat helemaal niet geschreven wordt al helemaal niet.",
   "registers": 202,
   "slots": 7,
-  "onleesbaar": 880,
-  "blind": 8,
+  "onleesbaar": 876,
+  "blind": 4,
   "losseClaims": 0,
   "perSlot": {
     "watMeetIk": {
@@ -44,9 +44,9 @@
       "ontbreekt": 201
     },
     "watBewijstDitNiet": {
-      "veld": 134,
+      "veld": 138,
       "proza": 60,
-      "ontbreekt": 8
+      "ontbreekt": 4
     },
     "blindeVlekken": {
       "veld": 9,
@@ -55,38 +55,6 @@
     }
   },
   "rijen": [
-    {
-      "register": "CODECREDENTIALS.json",
-      "slots": {
-        "watMeetIk": "ontbreekt",
-        "hoeGemeten": "ontbreekt",
-        "gemetenOp": "ontbreekt",
-        "resultaat": "veld",
-        "watBewijstDit": "ontbreekt",
-        "watBewijstDitNiet": "ontbreekt",
-        "blindeVlekken": "ontbreekt"
-      },
-      "losseClaim": false,
-      "velden": 1,
-      "proza": 0,
-      "ontbreekt": 6
-    },
-    {
-      "register": "CONNECTION_CONSTITUTION.json",
-      "slots": {
-        "watMeetIk": "ontbreekt",
-        "hoeGemeten": "ontbreekt",
-        "gemetenOp": "ontbreekt",
-        "resultaat": "veld",
-        "watBewijstDit": "ontbreekt",
-        "watBewijstDitNiet": "ontbreekt",
-        "blindeVlekken": "ontbreekt"
-      },
-      "losseClaim": false,
-      "velden": 1,
-      "proza": 0,
-      "ontbreekt": 6
-    },
     {
       "register": "GRENZEN.json",
       "slots": {
@@ -149,22 +117,6 @@
       "losseClaim": false,
       "velden": 0,
       "proza": 1,
-      "ontbreekt": 6
-    },
-    {
-      "register": "KENNISINDEX.json",
-      "slots": {
-        "watMeetIk": "ontbreekt",
-        "hoeGemeten": "ontbreekt",
-        "gemetenOp": "ontbreekt",
-        "resultaat": "veld",
-        "watBewijstDit": "ontbreekt",
-        "watBewijstDitNiet": "ontbreekt",
-        "blindeVlekken": "ontbreekt"
-      },
-      "losseClaim": false,
-      "velden": 1,
-      "proza": 0,
       "ontbreekt": 6
     },
     {
@@ -264,22 +216,6 @@
       "ontbreekt": 6
     },
     {
-      "register": "TRUST_EVIDENCE_PLANE.json",
-      "slots": {
-        "watMeetIk": "ontbreekt",
-        "hoeGemeten": "ontbreekt",
-        "gemetenOp": "ontbreekt",
-        "resultaat": "veld",
-        "watBewijstDit": "ontbreekt",
-        "watBewijstDitNiet": "ontbreekt",
-        "blindeVlekken": "ontbreekt"
-      },
-      "losseClaim": false,
-      "velden": 1,
-      "proza": 0,
-      "ontbreekt": 6
-    },
-    {
       "register": "AANVOERVORM.json",
       "slots": {
         "watMeetIk": "ontbreekt",
@@ -360,6 +296,38 @@
       "ontbreekt": 5
     },
     {
+      "register": "CODECREDENTIALS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "CONNECTION_CONSTITUTION.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
       "register": "EXECUTION_MAP.json",
       "slots": {
         "watMeetIk": "ontbreekt",
@@ -414,6 +382,22 @@
         "hoeGemeten": "ontbreekt",
         "gemetenOp": "veld",
         "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "KENNISINDEX.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
         "watBewijstDit": "ontbreekt",
         "watBewijstDitNiet": "veld",
         "blindeVlekken": "ontbreekt"
@@ -677,6 +661,22 @@
       "losseClaim": false,
       "velden": 1,
       "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "TRUST_EVIDENCE_PLANE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
       "ontbreekt": 5
     },
     {

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-18T12:12:02.375Z",
-  "commit": "2d9f256b6",
+  "op": "2026-10-18T13:24:29.012Z",
+  "commit": "6ea7bc71e",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -521,19 +521,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/bonnen",
-   "bestand": "server/bedrijf/handeling.js:194",
+   "bestand": "server/bedrijf/handeling.js:174",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/doe",
-   "bestand": "server/bedrijf/handeling.js:153",
+   "bestand": "server/bedrijf/handeling.js:133",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/plan",
-   "bestand": "server/bedrijf/handeling.js:109",
+   "bestand": "server/bedrijf/handeling.js:89",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -1168,7 +1168,7 @@
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:118",
+   "bestand": "server/routes/doos-rapport.js:14",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },

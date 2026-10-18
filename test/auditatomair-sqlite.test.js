@@ -48,6 +48,16 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
     const rijen = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
       .map(({ waarde }) => JSON.parse(waarde))
       .filter(regel => regel.pad === '/api/pay/kascode').length;
+    /* EEN KASCODE LAAT TWEE REGELS NA: de regel `toegestaan` van de poort en de
+       eindregel met status 200. Onder last landde die tweede pas NA de eerste
+       telling, en dan las de toets een regel van het GESLAAGDE verzoek als
+       halve regel van het geweigerde (CI 18-10-2026: 2 !== 1, terwijl de
+       trigger elke nieuwe insert tegenhoudt). Dus eerst wachten tot het eerste
+       verzoek zijn eindregel heeft; de bewering eronder blijft dezelfde. */
+    const eindVanEerste = () => conn.prepare("SELECT waarde FROM audit_rij WHERE naam='handelingLog'").all()
+      .map(({ waarde }) => JSON.parse(waarde)).some(regel => regel.pad === '/api/pay/kascode' && regel.status === 200);
+    for (let t = 0; t < 100 && !eindVanEerste(); t++) await new Promise(r => setTimeout(r, 50));
+    assert.ok(eindVanEerste(), 'het geslaagde eerste verzoek hoort zijn eindregel in het spoor te hebben');
     const kasVoor = kas(), rijenVoor = rijen();
     assert.ok(kasVoor, 'de eerste kascode staat in store.db');
     conn.exec("CREATE TRIGGER weiger_audit BEFORE INSERT ON audit_rij WHEN NEW.naam = 'handelingLog' " +

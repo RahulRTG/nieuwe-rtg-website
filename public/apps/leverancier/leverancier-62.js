@@ -14,17 +14,17 @@
         '<span>'+r.gasten.personen+' '+T('shift.gasten','gasten aan tafel')+'</span>'+
         '<span>'+r.gasten.reserveringen+' '+T('shift.res','reservering(en)')+'</span>'+
         (r.gasten.walkIns?'<span>'+r.gasten.walkIns+' walk-in(s)</span>':'')+
-        (r.gasten.noShows?'<span style="color:var(--burgundy);">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
+        (r.gasten.noShows?'<span class="s-popvjv">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
       '</div>':'')+
       (r.verblijf?'<div class="pos-chips h-mt40">'+
         '<span>'+r.verblijf.bezet+' / '+r.verblijf.totaal+' '+T('rc.bezet','bezet')+'</span>'+
         (r.verblijf.aankomsten?'<span>'+r.verblijf.aankomsten+' '+T('shift.aank','check-in(s)')+'</span>':'')+
         (r.verblijf.vertrekken?'<span>'+r.verblijf.vertrekken+' '+T('shift.vertr','check-out(s)')+'</span>':'')+
-        (r.verblijf.noShows?'<span style="color:var(--burgundy);">✗ '+r.verblijf.noShows+' no-show(s)</span>':'')+
+        (r.verblijf.noShows?'<span class="s-popvjv">✗ '+r.verblijf.noShows+' no-show(s)</span>':'')+
         (r.verblijf.adr?'<span>ADR '+eur(r.verblijf.adr)+'</span>':'')+
       '</div>':'')+
       ((r.toppers||[]).length?'<div class="st-row h-mt40"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
-      (r.derving?'<div class="st-row"><span>'+T('shift.derving','Derving (kostprijs)')+'</span><b style="color:var(--burgundy);">'+eur(r.derving)+'</b></div>':'')+
+      (r.derving?'<div class="st-row"><span>'+T('shift.derving','Derving (kostprijs)')+'</span><b class="s-popvjv">'+eur(r.derving)+'</b></div>':'')+
       ((r.team||[]).length?'<div class="st-row"><span>'+T('shift.team','Op de kassa')+'</span><span class="sub">'+r.team.map(t=>esc(t.naam)+' '+eur(t.omzet)).join(' · ')+'</span></div>':'')+
       '<div class="softline h-mt30">'+T('shift.s','Samen met het Z-rapport hierboven is dit de briefing voor morgen.')+'</div></div>';
   }
@@ -53,19 +53,19 @@
   // horeca: tik gerechten aan, bon loopt op, afrekenen met PIN of contant
   function kassaHoreca(){
     const m = state.menu || [];
-    if (!m.length) return '<div class="card"><div style="font-size:0.84rem;color:var(--muted);">'+T('pos.nomenu','Zet eerst gerechten op de menukaart; die worden hier uw kassaknoppen.')+'</div></div>';
+    if (!m.length) return '<div class="card"><div class="s-19t7uz0">'+T('pos.nomenu','Zet eerst gerechten op de menukaart; die worden hier uw kassaknoppen.')+'</div></div>';
     const total = bonTotal();
     const pct = luchtPct();
     const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+mNaam(x)+'</span><span>'+eur(x.price*bon[x.id])+(pct?' ·  '+eur(luchtPrijs(x.price)*bon[x.id]):'')+'</span></div>').join('');
     return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+
-      (pct?' <span style="font-size:0.64rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;">'+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
-      '<div class="pos-pay" style="margin:0.4rem 0 0.2rem;">'+
+      (pct?' <span class="s-xrorl4">'+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
+      '<div class="pos-pay s-p5wqo6">'+
         '<button class="obtn" id="posVertaal">'+(MENU_VERTAAL.naar?MENU_VERTAAL.naar.toUpperCase():T('pos.vertaal','Vertaal de kaart'))+'</button>'+
         (pct?'<button class="obtn" id="posPass">'+T('pos.pass','Boarding pass')+'</button>':'')+
       '</div>'+
       '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+mNaam(x)+'</b><span>'+eur(x.price)+(pct?' ·  '+eur(luchtPrijs(x.price)):'')+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
       (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+(pct?' ·  '+eur(luchtPrijs(total)):'')+'</span></div>'+
-        (pct?'<div style="font-size:0.68rem;color:var(--soft);margin-top:0.25rem;">'+T('pos.luchtsub','De gast betaalt de luchthavenprijs (); de bon draagt beide prijzen.')+'</div>':'')+'</div>':'')+
+        (pct?'<div class="s-1k33i11">'+T('pos.luchtsub','De gast betaalt de luchthavenprijs (); de bon draagt beide prijzen.')+'</div>':'')+'</div>':'')+
       '<div class="pos-pay">'+
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
@@ -73,7 +73,7 @@
         '<button class="obtn js-pay" data-method="cadeaukaart"'+(total?'':' disabled')+'>'+T('pos.gc','Cadeaukaart')+'</button>'+
       '</div>'+
       ((state.tables||[]).length ? '<div class="pos-pay h-mt40">'+
-        '<select id="posTafel" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;">'+
+        '<select id="posTafel" class="s-wybeoc">'+
           '<option value="">'+T('pos.tafelkies','Tafel...')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name.replace(/"/g,'&quot;')+'">'+t.name+'</option>').join('')+'</select>'+
         '<button class="obtn js-pay" data-method="tafel"'+(total?'':' disabled')+'>'+T('pos.optafel','Op de tafel')+'</button>'+
@@ -81,7 +81,7 @@
       '</div>'+
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
       '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat de afhaal-QR in zijn app zien. Scan hem; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven. Het bonnummer alleen opent niets.')+'</div>'+
+      '<div class="s-5874ud">'+T('pos.redeemsub','De gast laat de afhaal-QR in zijn app zien. Scan hem; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven. Het bonnummer alleen opent niets.')+'</div>'+
       '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Scan de afhaal-QR')+'" maxlength="80" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'"></button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
       '<div id="posRedeemResult"></div></div>';
   }

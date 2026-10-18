@@ -2,21 +2,21 @@
     const apCv = x => {
       if (!x.viaRTG || !x.cv) return '';
       const c = x.cv, parts = [];
-      if (c.headline) parts.push('<b style="color:var(--txt);">'+c.headline+'</b>');
+      if (c.headline) parts.push('<b class="s-1btm41d">'+c.headline+'</b>');
       if (c.experience && c.experience.length) parts.push(c.experience.slice(0,3).join(' · '));
       if (c.skills && c.skills.length) parts.push(T('ap.skills','Vaardigheden')+': '+c.skills.join(', '));
       if (c.languages) parts.push(T('ap.langs','Talen')+': '+c.languages);
       if (!parts.length) return '';
-      return '<div style="flex-basis:100%;font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:0.35rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.5rem 0.7rem;">'+parts.join('<br>')+'</div>';
+      return '<div class="s-y8bxk">'+parts.join('<br>')+'</div>';
     };
     html += apps.length ? apps.map(x =>
       '<div class="tk-row h-wrap"><div class="tk-t"><b>'+x.name+' · '+x.func+
-      (x.viaRTG?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</i>':'')+
+      (x.viaRTG?' <i class="s-1ytspbv">RTG</i>':'')+
       '</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
       (a.manager ? '<button class="obtn" data-apinvite="'+x.id+'">'+T('ap.invite','Uitnodigen')+'</button><button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
       apCv(x)+
       '</div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.5rem 0;">'+T('ap.none','Geen open sollicitaties. Kandidaten solliciteren via het startscherm van deze app, RTG-leden via de leden-app met hun cv.')+'</div>';
+    ).join('') : '<div class="s-1orklno">'+T('ap.none','Geen open sollicitaties. Kandidaten solliciteren via het startscherm van deze app, RTG-leden via de leden-app met hun cv.')+'</div>';
     html += decided.map(x => {
       const kanChat = x.status === 'uitgenodigd' || x.status === 'aangenomen';
       const stLabel = x.status === 'uitgenodigd' ? T('ap.st.invited','uitgenodigd') : x.status === 'aangenomen' ? T('ap.st.hired','aangenomen') : T('ap.st.rejected','afgewezen');
@@ -37,10 +37,10 @@
     html += '</div>';
 
     // interne chat
-    html += '<div class="card"><div class="tt-h" style="margin-bottom:0.5rem;">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
+    html += '<div class="card"><div class="tt-h s-m3b83">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
     html += team.length ? team.map(m =>
       '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+esc(m.text)+'<time>'+timeAgo(m.at)+'</time></div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.4rem 0;">'+T('team.nochat','Nog geen berichten. Stuur je team een bericht.')+'</div>';
+    ).join('') : '<div class="s-1oaiz9h">'+T('team.nochat','Nog geen berichten. Stuur je team een bericht.')+'</div>';
     html += '</div><div class="tt-compose"><input id="ttMsg" placeholder="'+T('team.msgph','Bericht aan het team')+'"><button id="ttSend">'+T('team.send','Stuur')+'</button></div></div>';
 
     $('#teamWrap').innerHTML = html;

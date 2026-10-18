@@ -9,15 +9,15 @@
           '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="na">'+T('ch.fotona','Na-foto')+' ('+c.fotosNa+')</button> '+
           '<button class="obtn primary" data-chst="'+c.ref+'" data-st="afgerond">'+T('ch.teruggeven','Teruggeven en afronden')+'</button>';
         return '<div class="mitem">'+
-          (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy);border-radius:0;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.8rem;"><b>SOS:</b> '+esc(c.sos[0].bericht)+
-            (Number.isFinite(c.sos[0].lat) ? ' · <a style="color:var(--rtg-leesgoud,var(--gold));" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('ch.kaart','kaart')+'</a>' : '')+
+          (c.sos && c.sos.length ? '<div class="s-bdrhbx"><b>SOS:</b> '+esc(c.sos[0].bericht)+
+            (Number.isFinite(c.sos[0].lat) ? ' · <a class="s-12itpbj" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('ch.kaart','kaart')+'</a>' : '')+
             ' <button class="obtn" data-chsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;font-size:0.7rem;">'+T('ch.sosok','Afgehandeld')+'</button></div>' : '')+
           '<div class="r1"><span class="nm">'+esc(c.codename)+' · '+esc(c.boot)+' ('+esc(c.type)+')</span><span class="pr">'+eur(c.prijs)+'</span></div>'+
           '<div class="ds">'+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('ch.gasten','gasten')+' · ':'')+(c.metSkipper?''+T('ch.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.bareboat','bareboat'))+' · '+T('ch.st.'+c.status, CHARTER_ST[c.status]||c.status)+
           ' ·  '+c.fotosVoor+'/'+c.fotosNa+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+
           (c.uitvaart ? ' · '+c.uitvaart.urenStart+' '+T('ch.uur','mu') : '')+
-          (c.locatie ? ' · <a style="color:var(--rtg-leesgoud,var(--gold));" target="_blank" rel="noopener" href="geo:'+c.locatie.lat+','+c.locatie.lng+'?q='+c.locatie.lat+','+c.locatie.lng+'">'+T('ch.live','live positie')+'</a>' : '')+'</div>'+
-          (c.teruggave ? '<div class="ds" style="color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
+          (c.locatie ? ' · <a class="s-12itpbj" target="_blank" rel="noopener" href="geo:'+c.locatie.lat+','+c.locatie.lng+'?q='+c.locatie.lat+','+c.locatie.lng+'">'+T('ch.live','live positie')+'</a>' : '')+'</div>'+
+          (c.teruggave ? '<div class="ds ' + (c.teruggave.meerkosten>0 ? 's-1poh6kx' : 's-1tbe7y6') + '">'+
             (c.teruggave.meerkosten>0 ? T('ch.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten)+' ('+c.teruggave.gevaren+' '+T('ch.uur','mu')+(c.teruggave.brandstofKosten>0?', '+T('ch.brandstof','brandstof')+' '+eur(c.teruggave.brandstofKosten):'')+')'
               : '✓ '+c.teruggave.gevaren+' '+T('ch.uur','mu')+', '+T('ch.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
           (knop ? '<div class="h-mt50">'+knop+'</div>' : '')+'</div>';
@@ -31,7 +31,7 @@
         '<div class="ds">'+esc(b.type||'')+' · '+(b.lengte||0)+'m ·  '+(b.gasten||0)+(b.hutten?' ·  '+b.hutten+' '+T('ch.hutten','hutten'):'')+' · '+esc(b.brandstof||'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+
         ' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+' · '+(b.skipperVerplicht?''+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs vereist'):T('ch.vrij','vrij te huren')))+
         (b.skipperPrijsPerDag?' (+'+eur(b.skipperPrijsPerDag)+'/'+T('ch.dag','dag')+')':'')+'</div></div>').join('')+
-      (canEdit ? '<details class="h-mt100"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('ch.f.nieuw','Vaartuig toevoegen')+'</summary><div class="h-mt80">'+
+      (canEdit ? '<details class="h-mt100"><summary class="s-8gssez">'+T('ch.f.nieuw','Vaartuig toevoegen')+'</summary><div class="h-mt80">'+
         '<div class="row-gap"><div class="field h-flex2"><label>'+T('ch.f.naam','Naam')+'</label><input id="chNaam" placeholder="Serenidad"></div>'+
         '<div class="field h-flex1"><label>'+T('ch.f.type','Type')+'</label><select id="chType" '+selCss+'>'+BOOT_TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></div></div>'+
         '<div class="row-gap">'+
@@ -46,8 +46,8 @@
         '<div class="field h-flex1"><label>'+T('ch.f.prijs','€/dag')+'</label><input id="chPrijs" type="number" inputmode="numeric"></div>'+
         '<div class="field h-flex1"><label>'+T('ch.f.borg','Borg €')+'</label><input id="chBorg" type="number" inputmode="numeric" value="2000"></div>'+
         '<div class="field h-flex1"><label>'+T('ch.f.skipperprijs','Schipper €/dag')+'</label><input id="chSkPrijs" type="number" inputmode="numeric" value="300"></div></div>'+
-        '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="chSkV" style="accent-color:var(--gold);"> '+T('ch.f.skipperv','Schipper verplicht')+'</label>'+
-        '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="chVb" checked style="accent-color:var(--gold);"> '+T('ch.f.vaarbewijs','Vaarbewijs vereist bij bareboat')+'</label>'+
+        '<label class="field s-hakdr6"><input type="checkbox" id="chSkV" class="s-mcabm6"> '+T('ch.f.skipperv','Schipper verplicht')+'</label>'+
+        '<label class="field s-hakdr6"><input type="checkbox" id="chVb" checked class="s-mcabm6"> '+T('ch.f.vaarbewijs','Vaarbewijs vereist bij bareboat')+'</label>'+
         '<button class="obtn primary" id="chAdd">'+T('ch.f.voeg','Toevoegen')+'</button></div></details>' : '')+'</div>'+
       '<input type="file" id="chFile" accept="image/*" capture="environment" style="display:none;">';
     el.innerHTML = html;

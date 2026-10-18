@@ -9,7 +9,7 @@
     if (ap.length) html += '<div class="card"><div class="tt-h">'+T('wv.apart','Apart gelegd')+' ('+ap.length+')</div>'+
       ap.map(r => '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</span></div><div class="ds">'+esc(r.codenaam||r.key)+' · '+T('wv.tot','tot')+' '+esc(r.tot)+'</div></div>').join('')+'</div>';
     html += '<div class="card"><div class="tt-h">'+T('wv.klant','Klant erbij pakken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+wvInput('wvKlantKey', T('wv.klantph','Codenaam of sleutel van het lid'))+'<button class="obtn primary" id="wvKlantBtn">'+T('wv.open','Open')+'</button></div>'+
+      '<div class="s-v4g2d9">'+wvInput('wvKlantKey', T('wv.klantph','Codenaam of sleutel van het lid'))+'<button class="obtn primary" id="wvKlantBtn">'+T('wv.open','Open')+'</button></div>'+
       '<div id="wvKlantUit">'+(wvKlant?wvKlantKaart(wvKlant):'')+'</div></div>';
     wrap.innerHTML = html;
     wvBind(wrap);
@@ -48,7 +48,7 @@
         uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
           '<div class="mitem"><div class="r1"><span class="nm">'+(v.voorraad>0?'':'')+' '+esc(v.artikel)+'</span><span class="pr">'+eur(v.price)+'</span></div>'+
           '<div class="ds">'+esc(v.kleur)+' · '+esc(v.maat)+' · '+T('wv.voorraad','voorraad')+' '+v.voorraad+'</div>'+
-          (v.voorraad>0?'<div style="display:flex;gap:0.35rem;margin-top:0.25rem;"><button class="obtn primary" data-wvadd="'+esc(v.vsku)+'" data-nm="'+esc(v.artikel)+'" data-kl="'+esc(v.kleur)+'" data-mt="'+esc(v.maat)+'" data-pr="'+v.price+'">+ '+T('wv.opbon','Op de bon')+'</button>'+
+          (v.voorraad>0?'<div class="s-vgvg3o"><button class="obtn primary" data-wvadd="'+esc(v.vsku)+'" data-nm="'+esc(v.artikel)+'" data-kl="'+esc(v.kleur)+'" data-mt="'+esc(v.maat)+'" data-pr="'+v.price+'">+ '+T('wv.opbon','Op de bon')+'</button>'+
           '<button class="obtn" data-wvapart="'+esc(v.vsku)+'">'+T('wv.legapart','Apart')+'</button></div>':'')+'</div>').join('')
           : '<div class="empty">'+T('wv.niets','Niets gevonden.')+'</div>';
         uit.querySelectorAll('[data-wvadd]').forEach(b => b.addEventListener('click', () => {
@@ -101,18 +101,18 @@
       const eigen = (zbLev.afspraken || []).filter(a => a.behandelaarId === b.id);
       return '<div class="card"><div class="tt-h">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
         (eigen.length ? eigen.map(a =>
-          '<div class="mitem"><div class="r1"><span class="nm" style="font-variant-numeric:tabular-nums;">'+(a.soort==='medisch'?'':'')+' '+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</span><span class="pr">'+eur(a.prijs)+'</span></div>'+
+          '<div class="mitem"><div class="r1"><span class="nm s-167v99s">'+(a.soort==='medisch'?'':'')+' '+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</span><span class="pr">'+eur(a.prijs)+'</span></div>'+
           '<div class="ds">'+T('zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min</div>'+
-          (a.zorg ? '<div class="ds" style="color:#E2B93B;">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
-          (a.intake ? '<div class="ds" style="color:#E2B93B;">'+esc(a.intake)+'</div>' : '')+
-          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--rtg-leesgroen,var(--green,#4C9A75));">'+T('zb.klaar','Afgerond')+'</div>'
+          (a.zorg ? '<div class="ds s-14oeqwv">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
+          (a.intake ? '<div class="ds s-14oeqwv">'+esc(a.intake)+'</div>' : '')+
+          (a.status === 'afgerond' ? '<div class="ds s-enbybs">'+T('zb.klaar','Afgerond')+'</div>'
             : '<button class="obtn primary h-mt35" data-zblevklaar="'+esc(a.ref)+'">'+T('zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
         : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+
       '</div>';
     }).join('');
     wrap.innerHTML = '<div class="card"><div class="tt-h">'+esc(zbLev.aanbieder || '')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
+      '<div class="s-1738il7">'+dagen.join('')+'</div></div>' + perBehandelaar;
     wrap.querySelectorAll('[data-zblevdag]').forEach(b => b.addEventListener('click', () => { zbLevDatum = b.dataset.zblevdag; laadZorgbalieLev(); }));
     wrap.querySelectorAll('[data-zblevklaar]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/care/afronden', { ref: b.dataset.zblevklaar }); toast(''+T('zb.klaar','Afgerond')); laadZorgbalieLev(); }

@@ -1,13 +1,13 @@
 /* de kengetallen van een jachthaven */
-    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+    let h = '<div class="s-1ah2knl">'+
       [[k.bezet+' van '+k.ligplaatsen, T('mr.k.bezet','ligplaatsen bezet')],[k.passanten, T('mr.k.pas','passanten')],[k.brandstofOpen, T('mr.k.brand','brandstof open')],[k.serviceOpen, T('mr.k.svc','service open')],[k.conciergeOpen, T('mr.k.con','concierge open')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div class="s-1fk9glc"><b class="s-123kxff">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // het havenoverzicht: elke steiger een regel
     h += '<div class="st-sec h-mt100">'+esc(d.naam)+' · '+T('mr.plaatsen','de ligplaatsen')+'</div>';
-    h += d.ligplaatsen.map(p=>'<div style="display:flex;gap:0.6rem;align-items:baseline;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+    h += d.ligplaatsen.map(p=>'<div class="s-15d06p3">'+
       '<span class="sub" style="flex:0 0 3.2rem;">'+p.id+'</span><span class="sub" style="flex:0 0 6.5rem;">tot '+p.lengteMax+' m · '+eur(p.dagprijs)+'/n</span>'+
-      (p.boot?'<b style="flex:1;font-size:0.85rem;">'+esc(p.boot.naam)+' ('+p.boot.lengte+' m)</b><span class="sub">'+esc(p.boot.eigenaar)+(p.vast?' · '+T('mr.vast','vaste ligger'):' · tot '+esc(p.boot.tot||''))+'</span>'+(p.vast?'':knop('data-mrweg', p.id, T('mr.vertrek','Vertrek')))
+      (p.boot?'<b class="s-1q6kbkp">'+esc(p.boot.naam)+' ('+p.boot.lengte+' m)</b><span class="sub">'+esc(p.boot.eigenaar)+(p.vast?' · '+T('mr.vast','vaste ligger'):' · tot '+esc(p.boot.tot||''))+'</span>'+(p.vast?'':knop('data-mrweg', p.id, T('mr.vertrek','Vertrek')))
         :'<span class="sub h-flex1">'+T('mr.vrij','vrij')+'</span>')+'</div>').join('');
 
     // een passant binnenmelden: de eerste passende plaats
@@ -25,20 +25,20 @@
     // service en de hellingbaan
     h += '<div class="st-sec h-mt100">'+T('mr.service','Service en de helling')+'</div>'+
       '<div class="row-gap"><input id="mrSBoot" class="st-in h-flex2" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60"><select id="mrSSoort" class="st-in h-flex1">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
-      '<input id="mrSWens" class="st-in" placeholder="'+T('mr.wens','Wat moet er gebeuren?')+'" maxlength="160" style="flex:3;"><button id="mrSVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
-    h += (d.service||[]).filter(s=>s.status!=='klaar').map(s=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
-      '<span class="sub" style="flex:0 0 7rem;">'+MR_SVC[s.soort]+'</span><b style="flex:1;font-size:0.82rem;">'+esc(s.boot)+' · '+esc(s.wens)+'</b><span class="sub">'+esc(s.status)+'</span>'+
+      '<input id="mrSWens" class="st-in s-1dzu8du" placeholder="'+T('mr.wens','Wat moet er gebeuren?')+'" maxlength="160"><button id="mrSVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
+    h += (d.service||[]).filter(s=>s.status!=='klaar').map(s=>'<div class="s-57bs1i">'+
+      '<span class="sub" style="flex:0 0 7rem;">'+MR_SVC[s.soort]+'</span><b class="s-1q6iem4">'+esc(s.boot)+' · '+esc(s.wens)+'</b><span class="sub">'+esc(s.status)+'</span>'+
       (s.status==='open'?knop('data-mrsb', s.id, T('mr.pak','Oppakken'), true):knop('data-mrsk', s.id, T('mr.klaar','Klaar'), true))+'</div>').join('') || '<p class="sub">'+T('mr.svc.geen','Geen open verzoeken op de werf.')+'</p>';
 
     // de marina-concierge: de jetset op het water
     h += '<div class="st-sec h-mt100">'+T('mr.concierge','De marina-concierge')+'</div>'+
       '<div class="row-gap"><select id="mrCSoort" class="st-in h-flex1">'+Object.keys(MR_CON).map(s=>'<option value="'+s+'">'+MR_CON[s]+'</option>').join('')+'</select>'+
-      '<input id="mrCVoor" class="st-in h-flex1" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
+      '<input id="mrCVoor" class="st-in h-flex1" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60"><input id="mrCWens" class="st-in s-1dzu8du" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160">'+
       '<button id="mrCVraag" style="flex:1;'+goud+'">'+T('mr.vraag','Vraag aan')+'</button></div>';
-    h += (d.concierge||[]).map(c=>'<div style="border:1px solid '+(c.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+MR_CON[c.soort]+' · '+esc(c.voorWie)+'</b><span class="sub">'+esc(c.status)+'</span></div>'+
+    h += (d.concierge||[]).map(c=>'<div class="' + (c.status==='afgerond' ? 's-q8bqou' : 's-dbavhu') + '">'+
+      '<div class="s-tbd6xd"><b class="s-1q6kbkp">'+MR_CON[c.soort]+' · '+esc(c.voorWie)+'</b><span class="sub">'+esc(c.status)+'</span></div>'+
       '<div class="sub">'+esc(c.wens)+' · '+esc(c.moment)+(c.notitie?' · '+esc(c.notitie):'')+'</div>'+
-      (c.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
+      (c.status!=='afgerond'?'<div class="s-1stuony">'+
         (c.status==='aangevraagd'?knop('data-mrcb', c.id, T('mr.bevestig','Bevestig'), true):'')+knop('data-mrca', c.id, T('mr.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
     h += '<p class="sub h-mt50">'+T('mr.regel','Een charter-transfer is een dienstverzoek aan RTG Charter; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;

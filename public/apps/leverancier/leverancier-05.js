@@ -92,7 +92,7 @@
     st.push(['kantoor','\uD83D\uDDDD',T('st.kantoor','Kantoor'),
       horeca ? T('st.kantoor.s','Alles aanpassen: HR, keuken, bar, bediening en events (alleen management)')
              : T('st.kantoor.s2','Alles aanpassen: HR, marketing en het aanbod (alleen management)')]);
-    $('#spList').innerHTML += '<div style="margin:0.75rem 0 0.5rem;font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);">'+T('st.h','Werkplekken')+'</div>' +
+    $('#spList').innerHTML += '<div class="s-1ttomk2">'+T('st.h','Werkplekken')+'</div>' +
       st.map(r => '<button class="sp-person" data-station="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>').join('');
     $('#spList').querySelectorAll('[data-station]').forEach(b => b.addEventListener('click', () => {
       pendingStation = b.dataset.station;
@@ -119,7 +119,7 @@
     $('#spList').innerHTML = (all.map(m =>
       '<button class="sp-person" data-sid="'+m.id+'" data-name="'+m.name.replace(/"/g,'&quot;')+'" data-role="'+m.role+'">'+
         '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+(m.func||T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker'))+'</span></span></button>'
-    ).join('') || '<div class="empty" style="padding:1.2rem 0;">'+T('sp.nostaff','Nog geen persoonlijke accounts. Log in als Beheer en voeg je team toe.')+'</div>') + backBtn();
+    ).join('') || '<div class="empty s-1rbiiu6">'+T('sp.nostaff','Nog geen persoonlijke accounts. Log in als Beheer en voeg je team toe.')+'</div>') + backBtn();
     $('#spList').querySelectorAll('.sp-person[data-sid]').forEach(b => b.addEventListener('click', () => openPin(b.dataset.sid, b.dataset.name, b.dataset.role)));
     bindBack(() => { pendingStation = null; renderRoles(); });
   }

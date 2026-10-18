@@ -26,7 +26,7 @@
     }
     const meta = chats.find(c => c.key === gchatKey);
     el.innerHTML = '<button class="sp-back" id="gcBack">← ' + T('gc.back','Alle gesprekken') + '</button>' +
-      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--rtg-leesgoud,var(--gold));">' + (meta ? meta.codename : '') + '</span>' + (meta && meta.dept ? ' · ' + meta.dept : '') +
+      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span class="s-12itpbj">' + (meta ? meta.codename : '') + '</span>' + (meta && meta.dept ? ' · ' + meta.dept : '') +
         ' <button class="gc-salon-btn" id="gcSalonBtn">' + T('gc.salon','Bekijk Salon') + '</button></div>' +
       '<div id="gcSalon"></div>' +
       '<div class="tt-chat" id="gcThread"></div>' +
@@ -69,7 +69,7 @@
     t.innerHTML = (msgs || []).map(m =>
       '<div class="tt-msg ' + (m.from === 'partner' ? 'me' : (m.from === 'systeem' ? 'sys' : 'other')) + '"><span class="who">' + (m.who || (m.from === 'systeem' ? 'RTG' : '')) + '</span>' +
       m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
-      (m.orig ? '<span style="display:block;margin-top:0.25rem;font-size:0.68rem;color:var(--soft);font-style:italic;">' + m.orig.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' : '') +
+      (m.orig ? '<span class="s-1wol4mf">' + m.orig.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' : '') +
       '<time>' + timeAgo(m.at) + '</time></div>'
     ).join('');
     t.scrollTop = t.scrollHeight;

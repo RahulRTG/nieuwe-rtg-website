@@ -17,11 +17,11 @@ const { startServer, stop } = require('./helper');
 let srv, base, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-stad-'));
 
-const api = (pad, body, token) => fetch(base + '/api/' + pad, {
+const api = (pad, body, token) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const oapi = (pad, body) => api('office/' + pad, { ...(body || {}), naam: 'Aïsha' }, office);
+const oapi = (pad, body) => api((pad.startsWith('/api/') ? pad : '/api/office/' + pad), { ...(body || {}), naam: 'Aïsha' }, office);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-STAD-1' } });
@@ -34,7 +34,7 @@ test.before(async () => {
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('het stadsbeeld: demovloot, acht domeinen, zones en de privacy-belofte', async () => {
-  const b = await oapi('stad');
+  const b = await oapi('/api/office/stad');
   assert.equal(b.status, 200);
   assert.equal(b.body.scenario, 'normaal', 'de stad start in de gewone stand');
   assert.ok(b.body.zones.length >= 6, 'de zones staan klaar');
@@ -46,21 +46,21 @@ test('het stadsbeeld: demovloot, acht domeinen, zones en de privacy-belofte', as
 });
 
 test('de scenario-knop verzet alle regimes in een keer, met auditspoor', async () => {
-  const r = await oapi('stad/scenario', { scenario: 'evenement' });
+  const r = await oapi('/api/office/stad/scenario', { scenario: 'evenement' });
   assert.equal(r.status, 200);
   assert.equal(r.body.scenario, 'evenement');
-  const b = (await oapi('stad')).body;
+  const b = (await oapi('/api/office/stad')).body;
   assert.equal(b.scenario, 'evenement');
   assert.equal(b.domeinen.find(d => d.id === 'verkeer').regime, 'streng', 'evenement zet het verkeersregime streng');
   assert.equal(b.domeinen.find(d => d.id === 'afval').regime, 'intensief', 'en het ophalen intensief');
-  assert.equal((await oapi('stad/scenario', { scenario: 'onzin' })).status, 400, 'een onbekend scenario is geweigerd');
-  const board = (await oapi('boardroom')).body;
+  assert.equal((await oapi('/api/office/stad/scenario', { scenario: 'onzin' })).status, 400, 'een onbekend scenario is geweigerd');
+  const board = (await oapi('/api/office/boardroom')).body;
   assert.ok((board.audit || []).some(a => /RTG Stad-scenario/.test(a.wat)), 'de schakeling staat in het auditlog');
-  await oapi('stad/scenario', { scenario: 'normaal' });
+  await oapi('/api/office/stad/scenario', { scenario: 'normaal' });
 });
 
 test('eigen hardware: een Stadsdoos aanmelden en insturen met de apparaat-sleutel', async () => {
-  const aan = await oapi('stad/node/aanmeld', { doosNaam: 'Stadsdoos Brug', zone: 'Centrum', sensoren: ['verkeer', 'geluid'] });
+  const aan = await oapi('/api/office/stad/node/aanmeld', { doosNaam: 'Stadsdoos Brug', zone: 'Centrum', sensoren: ['verkeer', 'geluid'] });
   assert.equal(aan.status, 200);
   assert.match(aan.body.serial, /^SD-[0-9A-F]{6}$/, 'een eigen serienummer');
   assert.ok(aan.body.sleutel && aan.body.sleutel.length >= 32, 'de apparaat-sleutel wordt een keer gegeven');
@@ -80,19 +80,19 @@ test('eigen hardware: een Stadsdoos aanmelden en insturen met de apparaat-sleute
   // de rem op de poort: direct nog een bericht is te snel (spam/kapotte doos)
   const spam = await api('stad/doos/meting', { serial, sleutel, metingen: [{ sens: 'verkeer', waarde: 300 }] });
   assert.equal(spam.status, 429, 'de poort remt een doos die te vaak instuurt');
-  const b = (await oapi('stad')).body;
+  const b = (await oapi('/api/office/stad')).body;
   const doos = b.nodes.find(n => n.serial === serial);
   assert.ok(doos && doos.online && !doos.demo, 'de echte doos staat online op het bord');
   // uit dienst nemen sluit de poort
-  await oapi('stad/node/stop', { serial });
+  await oapi('/api/office/stad/node/stop', { serial });
   assert.equal((await api('stad/doos/meting', { serial, sleutel, metingen: [{ sens: 'verkeer', waarde: 100 }] })).status, 401, 'uit dienst = poort dicht');
 });
 
 test('de veld-app: de werklijst schrijft zichzelf en klaarmelden dempt de klus', async () => {
   // een verse doos die nog nooit contact maakte staat offline -> een onderhoudsklus
-  const aan = await oapi('stad/node/aanmeld', { doosNaam: 'Stadsdoos Steiger', zone: 'Marina', sensoren: ['water'] });
+  const aan = await oapi('/api/office/stad/node/aanmeld', { doosNaam: 'Stadsdoos Steiger', zone: 'Marina', sensoren: ['water'] });
   const sleutelKlus = 'doos:' + aan.body.serial;
-  const w1 = await oapi('stad/werk');
+  const w1 = await oapi('/api/office/stad/werk');
   assert.equal(w1.status, 200);
   const klus = w1.body.klussen.find(k => k.sleutel === sleutelKlus);
   assert.ok(klus, 'de offline doos staat als klus op de werklijst');
@@ -102,10 +102,10 @@ test('de veld-app: de werklijst schrijft zichzelf en klaarmelden dempt de klus',
   // klaarmelden (met naam) haalt hem van de lijst en komt in het auditlog
   const klaar = await api('office/stad/werk/klaar', { sleutel: sleutelKlus, naam: 'Bram', notitie: 'voeding zat los' }, office);
   assert.equal(klaar.status, 200);
-  const w2 = (await oapi('stad/werk')).body;
+  const w2 = (await oapi('/api/office/stad/werk')).body;
   assert.ok(!w2.klussen.some(k => k.sleutel === sleutelKlus), 'klaargemeld = van de lijst (demper)');
   assert.ok(w2.klaargemeld.some(k => k.sleutel === sleutelKlus && k.wie === 'Bram' && k.notitie === 'voeding zat los'), 'de klaarmelding staat erbij, op naam');
-  const board = (await oapi('boardroom')).body;
+  const board = (await oapi('/api/office/boardroom')).body;
   /* De opgegeven naam staat bij de klus (hierboven) en in de TEKST van de
      auditregel, maar nooit als actor: die komt uit de sessie. Tot 23 september
      2026 eiste deze bewering het omgekeerde. */
@@ -114,8 +114,8 @@ test('de veld-app: de werklijst schrijft zichzelf en klaarmelden dempt de klus',
   assert.notEqual(regel.wie, 'Bram', 'een opgegeven naam is geen actor');
   assert.match(regel.wat, /gemeld als Bram/, 'maar staat wel als gegeven in de regel');
   // een klus die niet (meer) bestaat is netjes 404
-  assert.equal((await oapi('stad/werk/klaar', { sleutel: 'doos:SD-BESTAATNIET' })).status, 404);
-  await oapi('stad/node/stop', { serial: aan.body.serial });
+  assert.equal((await oapi('/api/office/stad/werk/klaar', { sleutel: 'doos:SD-BESTAATNIET' })).status, 404);
+  await oapi('/api/office/stad/node/stop', { serial: aan.body.serial });
 });
 
 test('Mijn Stad (bewoner): kijken mag, melden landt bij de veldploeg en komt klaar terug', async () => {
@@ -141,13 +141,13 @@ test('Mijn Stad (bewoner): kijken mag, melden landt bij de veldploeg en komt kla
   const mid = m.body.melding.id;
 
   // de melding staat DIRECT als klus op de werklijst van de veld-app
-  const werk = (await oapi('stad/werk')).body;
+  const werk = (await oapi('/api/office/stad/werk')).body;
   const klus = werk.klussen.find(k => k.sleutel === 'melding:' + mid);
   assert.ok(klus, 'de bewonersmelding is een klus voor buiten');
   assert.match(klus.omschrijving, /lantaarn stuk bij de brug/);
 
   // de veldploeg meldt hem klaar -> de bewoner ziet "opgelost"
-  await oapi('stad/werk/klaar', { sleutel: 'melding:' + mid });
+  await oapi('/api/office/stad/werk/klaar', { sleutel: 'melding:' + mid });
   const na = (await api('stad/bewoner', {}, l.token)).body;
   const mijn = na.mijnMeldingen.find(x => x.id === mid);
   assert.ok(mijn && mijn.status === 'klaar', 'de melder ziet zijn melding als opgelost');
@@ -155,15 +155,15 @@ test('Mijn Stad (bewoner): kijken mag, melden landt bij de veldploeg en komt kla
 
 test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en dataset', async () => {
   // een los regime naast de knop
-  assert.equal((await oapi('stad/regime', { domein: 'licht', regime: 'vol' })).body.regime, 'vol');
-  assert.equal((await oapi('stad')).body.domeinen.find(d => d.id === 'licht').regime, 'vol');
-  assert.equal((await oapi('stad/regime', { domein: 'licht', regime: 'onzin' })).status, 400);
+  assert.equal((await oapi('/api/office/stad/regime', { domein: 'licht', regime: 'vol' })).body.regime, 'vol');
+  assert.equal((await oapi('/api/office/stad')).body.domeinen.find(d => d.id === 'licht').regime, 'vol');
+  assert.equal((await oapi('/api/office/stad/regime', { domein: 'licht', regime: 'onzin' })).status, 400);
   // de AI adviseert (en beslist niet): altijd een samenvatting + tips
-  const adv = await oapi('stad/advies', { vraag: 'Hoe staat de stad ervoor?' });
+  const adv = await oapi('/api/office/stad/advies', { vraag: 'Hoe staat de stad ervoor?' });
   assert.equal(adv.status, 200);
   assert.ok(Array.isArray(adv.body.tips) && adv.body.tips.length >= 1 && adv.body.samenvatting.length > 0);
   // nood meldt de beveiligingslaag (zichtbaar op het technische bord)
-  await oapi('stad/scenario', { scenario: 'nood' });
+  await oapi('/api/office/stad/scenario', { scenario: 'nood' });
   const tech = await (await fetch(base + '/api/techniek/inloggen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', wachtwoord: 'Imran' }) })).json();
   assert.ok(tech.token, 'de eigenaar komt op het technische bord');
   const status = await (await fetch(base + '/api/techniek/status', { method: 'GET', headers: { Authorization: 'Bearer ' + tech.token } })).json();
@@ -175,16 +175,16 @@ test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en da
   const pay2 = status.checks.find(c => c.code === 'PAY-02');
   assert.ok(pay2 && pay2.status === 'ok', 'PAY-02: het wallet-grootboek sluit');
   // de stad hoort bij het gezamenlijke rampbeeld (operationeel, geen personen)
-  const rb = await oapi('rampbeeld');
+  const rb = await oapi('/api/office/rampbeeld');
   assert.equal(rb.status, 200);
   assert.ok(rb.body.stad && rb.body.stad.scenario && rb.body.stad.vloot, 'het rampbeeld toont de staat van de stad');
-  await oapi('stad/scenario', { scenario: 'normaal' });
+  await oapi('/api/office/stad/scenario', { scenario: 'normaal' });
   // en de coordinator adviseert het stad-nood-scenario zodra de keten opschaalt
-  await oapi('rampbeeld/schaal', { niveau: 'opgeschaald' });
-  const co = await oapi('rampbeeld/ai', {});
+  await oapi('/api/office/rampbeeld/schaal', { niveau: 'opgeschaald' });
+  const co = await oapi('/api/office/rampbeeld/ai', {});
   assert.ok((co.body.voorstellen || []).some(v => /zet de stad op "nood"/.test(v)), 'de coordinator wijst de boardroom op het stad-nood-scenario');
-  await oapi('rampbeeld/schaal', { niveau: 'normaal' });
+  await oapi('/api/office/rampbeeld/schaal', { niveau: 'normaal' });
   // de metingen zitten (zonder persoonsgegevens) in de eigen-AI-dataset
-  const ai = (await oapi('aidata')).body;
+  const ai = (await oapi('/api/office/aidata')).body;
   assert.ok(ai.bronnen.stad >= 1, 'de bron "stad" telt mee in de dataset');
 });

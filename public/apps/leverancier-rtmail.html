@@ -84,6 +84,18 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1pxdjkg:not(#_#_#_){text-align:left;margin:0.5rem 0 0}
+.s-f4sti3:not(#_#_#_){color:var(--muted);margin-top:0.5rem;font-size:.9rem}
+.s-gidsbo:not(#_#_#_){font-size:1rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -184,7 +196,7 @@ async function wmLaad(){
       '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">ingetrokken</span>')+(a.actief&&!a.toegang?' · adresbeheer, inhoud privé':'')+'</span></span>'+
       (!d.magBeheren||a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Intrekken':'Teruggeven')+'</span>')+
       '</button>').join('')+
-    (d.magBeheren?'<div class="kaart h-mt80"><h2 style="font-size:1rem;">Gedeeld functieadres</h2>'+
+    (d.magBeheren?'<div class="kaart h-mt80"><h2 class="s-gidsbo">Gedeeld functieadres</h2>'+
     '<label class="lab">Naam voor de apenstaart</label><input class="veld" id="wmLokaal" placeholder="bijv. balie of jamal">'+
     '<label class="lab">Functie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
     '<div class="fout" id="wmFout" hidden></div>'+
@@ -254,7 +266,7 @@ function wmOpstellen(van, voor){
   });
 }
 async function laad(){
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:0.5rem;font-size:.9rem;">Open de leverancier-app en log in met uw zaak; daarna staat het postvak hier.</p></div>'; return; }
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p class="s-f4sti3">Open de leverancier-app en log in met uw zaak; daarna staat het postvak hier.</p></div>'; return; }
   let d; try{ d=await api(MAP==='verzonden'?'verzonden':'inbox'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   LIJST=d.berichten||[]; if(d.adres) ADRES=d.adres;
   if(MAP==='inbox' && d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
@@ -309,7 +321,7 @@ function opstellen(voor){
     '<label class="lab">Onderwerp</label><input class="veld" id="vOnd" value="'+esc(voor.onderwerp||'')+'">'+
     '<label class="lab">Bericht</label><textarea class="veld" id="vTxt" placeholder="Uw bericht…">'+esc(voor.tekst||'')+'</textarea>'+
     '<div class="fout" id="vFout" hidden></div>'+
-    (voor.tekst?'<div class="noot" style="text-align:left;margin:0.5rem 0 0;">Voorstel van Rahul - lees het na en pas aan voordat u verstuurt.</div>':'')+
+    (voor.tekst?'<div class="noot s-1pxdjkg">Voorstel van Rahul - lees het na en pas aan voordat u verstuurt.</div>':'')+
     '<button class="knop" id="verstuur">Versturen</button></div>';
   $('#terug').addEventListener('click', laad);
   $('#verstuur').addEventListener('click', verstuur);

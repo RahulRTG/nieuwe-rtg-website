@@ -8,7 +8,7 @@
         '<div class="field"><label>'+T('menu.alg','Allergenen (komma\'s)')+'</label><input id="mnAlg" placeholder="vis, soja"></div>'+
         '<div class="row-gap"><div class="field h-flex2"><label>Ingrediënten</label><input id="mnIng" placeholder="tomaat"></div><div class="field h-flex1"><label>Bereiding (min)</label><input id="mnPrep" placeholder="12"></div></div>'+
         '<div class="field"><label>Dieetlabels</label><input id="mnDieet" placeholder="vegetarisch"></div><div class="field"><label>Keuzes</label><input id="mnOpt" placeholder="Cuisson*: medium, doorbakken +1; Extra: kaas"></div>'+
-        '<div class="field"><label>'+T('menu.station','Werkplek')+'</label><select id="mnStation" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
+        '<div class="field"><label>'+T('menu.station','Werkplek')+'</label><select id="mnStation" class="s-1r27qfv">'+
         '<option value="keuken"'+((S&&(S.type==='bar'||S.type==='club'))?'':' selected')+'>\uD83D\uDD25 '+T('menu.keuken','Keuken')+'</option>'+
         '<option value="bar"'+((S&&(S.type==='bar'||S.type==='club'))?' selected':'')+'>\uD83C\uDF78 Bar</option></select></div>'+
         '<button class="bigbtn" id="mnAdd">'+T('menu.addbtn','Zet op de kaart')+'</button></div>';

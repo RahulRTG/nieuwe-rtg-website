@@ -1,13 +1,13 @@
 {
  "uitleg": "Vermoede tegenhangers uit HERSTEL.json, werkelijk uitgevoerd: heen, kijken, terug, kijken. Alleen `exact` en `compensatie` zijn een uitspraak over het paar; de rest is een tekort van de proef.",
  "gemeten": {
-  "paren": 90,
-  "exact": 13,
-  "compensatie": 30,
-  "geenHerstel": 1,
-  "nietBeproefd": 0,
-  "wereldOntbreekt": 46,
-  "ordeAfhankelijk": 3,
+  "paren": 100,
+  "exact": 10,
+  "compensatie": 41,
+  "geenHerstel": 0,
+  "nietBeproefd": 7,
+  "wereldOntbreekt": 42,
+  "ordeAfhankelijk": 4,
   "buitenTweedeRonde": 0
  },
  "per": [
@@ -36,8 +36,7 @@
    "geraakt": [
     "store.db:agendas"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
-   "ordeAfhankelijk": true
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/annuleer",
@@ -68,24 +67,34 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:bankPassen"
+    "store.db:bankPassen",
+    "store.db:beleidsmotor",
+    "store.db:bezitsbewijzen",
+    "store.db:zetelGebruik"
    ],
    "nietTerug": [
-    "store.db:bankPassen"
+    "store.db:bankPassen",
+    "store.db:beleidsmotor",
+    "store.db:bezitsbewijzen",
+    "store.db:zetelGebruik"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/pas/uitgeven",
    "terug": "/api/bank/pas/sluit",
    "rol": "member",
-   "uitslag": "exact",
+   "uitslag": "compensatie",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:bankPassen"
+    "store.db:bankPassen",
+    "store.db:bezitsbewijzen"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+   "nietTerug": [
+    "store.db:bezitsbewijzen"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/terugkerend/stop",
@@ -95,12 +104,16 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:bankTerugkerend"
+    "store.db:bankTerugkerend",
+    "store.db:bezitsbewijzen",
+    "store.db:wacht"
    ],
    "nietTerug": [
-    "store.db:bankTerugkerend"
+    "store.db:bankTerugkerend",
+    "store.db:bezitsbewijzen",
+    "store.db:wacht"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/terugkerend/zet",
@@ -112,40 +125,58 @@
    "geraakt": [
     "store.db:bankIdem",
     "store.db:bankIdemAfdruk",
-    "store.db:bankTerugkerend"
+    "store.db:bankTerugkerend",
+    "store.db:bezitsbewijzen"
    ],
    "nietTerug": [
     "store.db:bankIdem",
     "store.db:bankIdemAfdruk",
-    "store.db:bankTerugkerend"
+    "store.db:bankTerugkerend",
+    "store.db:bezitsbewijzen"
    ],
-   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/care/annuleer",
    "terug": "/api/care/boek",
    "rol": "member",
-   "uitslag": "wereldOntbreekt",
-   "reden": "deze route vraagt een zorgaanbieder in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:careBoekingen"
+   ],
+   "nietTerug": [
+    "store.db:careBoekingen"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/care/boek",
    "terug": "/api/care/annuleer",
    "rol": "member",
-   "uitslag": "wereldOntbreekt",
-   "reden": "deze route vraagt een zorgaanbieder in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+   "uitslag": "nietBeproefd",
+   "heenStatus": 409,
+   "geraakt": [
+    "store.db:kosten"
+   ],
+   "reden": "de heenweg gaf status 409 (Dat tijdslot is al bezet. Kies een ander moment.): er is niets gebeurd om terug te draaien"
   },
   {
    "heen": "/api/clips/maak",
    "terug": "/api/clips/weg",
    "rol": "member",
-   "uitslag": "exact",
+   "uitslag": "compensatie",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:clips"
+    "store.db:clips",
+    "store.db:mediaWerkherkomst"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+   "nietTerug": [
+    "store.db:mediaWerkherkomst"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/clips/weg",
@@ -260,6 +291,21 @@
    "reden": "deze route vraagt een school en een gezin met een gezinscode. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
+   "heen": "/api/geld/beleid/weg",
+   "terug": "/api/geld/beleid/zet",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:geldbeleid"
+   ],
+   "nietTerug": [
+    "store.db:geldbeleid"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
    "heen": "/api/kantoorpakket/maak",
    "terug": "/api/kantoorpakket/weg",
    "rol": "member",
@@ -339,17 +385,12 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:ledenSites",
-    "store.db:meetKamers",
-    "store.db:veilig",
-    "store.db:wacht"
+    "store.db:meetKamers"
    ],
    "nietTerug": [
-    "store.db:ledenSites",
-    "store.db:veilig",
-    "store.db:wacht"
+    "store.db:meetKamers"
    ],
-   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/meet/verlaat",
@@ -364,22 +405,17 @@
    "nietTerug": [
     "store.db:meetKamers"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
+   "ordeAfhankelijk": true
   },
   {
    "heen": "/api/meet/weg",
    "terug": "/api/meet/maak",
    "rol": "member",
-   "uitslag": "compensatie",
-   "heenStatus": 200,
-   "terugStatus": 200,
-   "geraakt": [
-    "store.db:meetKamers"
-   ],
-   "nietTerug": [
-    "store.db:meetKamers"
-   ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404 (Die Meet-kamer bestaat niet.): er is niets gebeurd om terug te draaien"
   },
   {
    "heen": "/api/member/rtmail/regel/maak",
@@ -479,16 +515,10 @@
    "heen": "/api/office/atelierweb/verwijder",
    "terug": "/api/office/atelierweb/bewaar",
    "rol": "office",
-   "uitslag": "geen-herstel",
+   "uitslag": "nietBeproefd",
    "heenStatus": 200,
-   "terugStatus": 200,
-   "geraakt": [
-    "store.db:atelierSites"
-   ],
-   "nietTerug": [
-    "store.db:atelierSites"
-   ],
-   "reden": "de terugweg gaf 200 en veranderde niets; de naam belooft een omkering die de handeling niet uitvoert"
+   "geraakt": [],
+   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
   },
   {
    "heen": "/api/office/kantoorpakket/maak",
@@ -530,6 +560,90 @@
    "rol": "office",
    "uitslag": "wereldOntbreekt",
    "reden": "deze route vraagt een stadsweefsel met objecten aan beide kanten van de relatie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/pay/kascode",
+   "terug": "/api/pay/kascode/intrek",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bezitsbewijzen",
+    "store.db:payKasToegang"
+   ],
+   "nietTerug": [
+    "store.db:bezitsbewijzen",
+    "store.db:payKasToegang"
+   ],
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/pay/tegoed/koop",
+   "terug": "/api/pay/tegoed/terug",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "grootboek.db:tx_ledger",
+    "store.db:bezitsbewijzen",
+    "store.db:payBoekingen",
+    "store.db:payIdem",
+    "store.db:payIdemAfdruk",
+    "store.db:paySaldi",
+    "store.db:payTegoedBon"
+   ],
+   "nietTerug": [
+    "store.db:bezitsbewijzen",
+    "store.db:payBoekingen",
+    "store.db:payIdem",
+    "store.db:payIdemAfdruk",
+    "store.db:payTegoedBon"
+   ],
+   "reden": "de terugweg deed werk, maar 5 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/pay/tikcode",
+   "terug": "/api/pay/tikcode/intrek",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:beleidsmotor",
+    "store.db:bezitsbewijzen",
+    "store.db:kantoorMensdeur",
+    "store.db:payTikToegang"
+   ],
+   "nietTerug": [
+    "store.db:beleidsmotor",
+    "store.db:bezitsbewijzen",
+    "store.db:kantoorMensdeur",
+    "store.db:payTikToegang"
+   ],
+   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/pay/verzoek",
+   "terug": "/api/pay/verzoek/intrek",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bezitsbewijzen",
+    "store.db:payIdem",
+    "store.db:payIdemAfdruk",
+    "store.db:payVerzoeken"
+   ],
+   "nietTerug": [
+    "store.db:bezitsbewijzen",
+    "store.db:payIdem",
+    "store.db:payIdemAfdruk",
+    "store.db:payVerzoeken"
+   ],
+   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/reisbureau/annuleer",
@@ -595,6 +709,24 @@
    "reden": "deze route vraagt een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
+   "heen": "/api/rtfos/bescherming/open",
+   "terug": "/api/rtfos/bescherming/sluit",
+   "rol": "office",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400 (Het veld \"naam\" bestaat niet in een beschermzaak. Deze klasse draait op een codenaam. De naam staat in de kluis, en wie ): er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/rtfos/bescherming/sluit",
+   "terug": "/api/rtfos/bescherming/open",
+   "rol": "office",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400 (Het veld \"naam\" bestaat niet in een beschermzaak. Deze klasse draait op een codenaam. De naam staat in de kluis, en wie ): er is niets gebeurd om terug te draaien"
+  },
+  {
    "heen": "/api/rtfos/meldcode/open",
    "terug": "/api/rtfos/meldcode/sluit",
    "rol": "office",
@@ -612,28 +744,24 @@
    "heen": "/api/samen/maak",
    "terug": "/api/samen/weg",
    "rol": "member",
-   "uitslag": "exact",
-   "heenStatus": 200,
-   "terugStatus": 200,
+   "uitslag": "nietBeproefd",
+   "heenStatus": 409,
    "geraakt": [
-    "store.db:samenKamers"
+    "store.db:beleidsmotor"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+   "reden": "de heenweg gaf status 409 (Deze Samen-code is al eenmalig getoond. Vernieuw haar vanuit de kamer.): er is niets gebeurd om terug te draaien"
   },
   {
    "heen": "/api/samen/weg",
    "terug": "/api/samen/maak",
    "rol": "member",
-   "uitslag": "compensatie",
+   "uitslag": "nietBeproefd",
    "heenStatus": 200,
-   "terugStatus": 200,
+   "terugStatus": 409,
    "geraakt": [
     "store.db:samenKamers"
    ],
-   "nietTerug": [
-    "store.db:samenKamers"
-   ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg gaf status 409 (Deze Samen-code is al eenmalig getoond. Vernieuw haar vanuit de kamer.); waarschijnlijk wees het lijf niet het ding aan dat de heenweg maakte. Dat is een tekort van deze proef en geen oordeel over het paar"
   },
   {
    "heen": "/api/site/bewaar",
@@ -740,15 +868,13 @@
    "terugStatus": 200,
    "geraakt": [
     "store.db:supplierActivity",
-    "store.db:suppliers",
-    "store.db:zandbakken"
+    "store.db:suppliers"
    ],
    "nietTerug": [
     "store.db:supplierActivity",
-    "store.db:suppliers",
-    "store.db:zandbakken"
+    "store.db:suppliers"
    ],
-   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/activiteit/sluit",
@@ -759,8 +885,7 @@
    "terugStatus": 200,
    "geraakt": [
     "store.db:supplierActivity",
-    "store.db:suppliers",
-    "store.db:zandbakken"
+    "store.db:suppliers"
    ],
    "nietTerug": [
     "store.db:supplierActivity"
@@ -795,6 +920,27 @@
    "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
+   "heen": "/api/supplier/giftcard/sell",
+   "terug": "/api/supplier/giftcard/intrek",
+   "rol": "supplier",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:giftcards",
+    "store.db:kassaIdem",
+    "store.db:kassaIdemAfdruk",
+    "store.db:supplierActivity"
+   ],
+   "nietTerug": [
+    "store.db:giftcards",
+    "store.db:kassaIdem",
+    "store.db:kassaIdemAfdruk",
+    "store.db:supplierActivity"
+   ],
+   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
    "heen": "/api/supplier/kantoorpakket/maak",
    "terug": "/api/supplier/kantoorpakket/weg",
    "rol": "supplier",
@@ -814,14 +960,27 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:officeDocs",
-    "store.db:wacht"
+    "store.db:officeDocs"
    ],
    "nietTerug": [
-    "store.db:officeDocs",
-    "store.db:wacht"
+    "store.db:officeDocs"
    ],
-   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/supplier/pay/treasury/apart",
+   "terug": "/api/supplier/pay/treasury/vrij",
+   "rol": "supplier",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:waardeOormerken"
+   ],
+   "nietTerug": [
+    "store.db:waardeOormerken"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/redactie/artikel/bewaar",
@@ -954,15 +1113,48 @@
    "heen": "/api/verzorging/annuleer",
    "terug": "/api/verzorging/boek",
    "rol": "member",
-   "uitslag": "wereldOntbreekt",
-   "reden": "deze route vraagt een salon in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:beauty"
+   ],
+   "nietTerug": [
+    "store.db:beauty"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/verzorging/boek",
    "terug": "/api/verzorging/annuleer",
    "rol": "member",
-   "uitslag": "wereldOntbreekt",
-   "reden": "deze route vraagt een salon in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:beauty"
+   ],
+   "nietTerug": [
+    "store.db:beauty"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
+   "ordeAfhankelijk": true
+  },
+  {
+   "heen": "/api/wallet/voeg",
+   "terug": "/api/wallet/weg",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bezitsbewijzen",
+    "store.db:wallet"
+   ],
+   "nietTerug": [
+    "store.db:bezitsbewijzen"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/werkplek/kantoorpakket/maak",
@@ -986,5 +1178,13 @@
   "de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep",
   "de volle ronde is NIET onafhankelijk: een paar kan de wereld veranderen waarin een later paar draait. Wat in de volle ronde niet lukte, is daarom nog een keer alleen op een eigen server gedraaid; lukt het dan wel, dan staat `ordeAfhankelijk` erbij en geldt die uitslag",
   "de opwarmronde kan een EENMALIG gevolg opslokken: kost de eerste aanmaak iets (een kostenregel, een eerste inrichting), dan gebeurt dat in de opwarmronde en ziet de meting het niet. `exact` betekent hier dus: exact bij een tweede en volgende uitvoering. Zonder die ronde was `exact` onbereikbaar, dus dit is een gekozen ruil en geen vergissing -- /api/meet/maak stond in de eerste ronde op compensatie met `kosten` als reden, en staat er nu op exact"
- ]
+ ],
+ "stempel": {
+  "op": "2026-10-18T13:06:07.695Z",
+  "commit": "e3e359aa4",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/herstelproef.js",
+  "node": "v22.22.0"
+ }
 }

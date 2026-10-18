@@ -33,6 +33,19 @@
    handeling lukte maar de uitkomst niet klopt, `stuk` als het werk zelf al niet
    lukte. Dezelfde woorden als de ketenregisters, want dezelfde lezer leest ze.
 
+   BEWIJS 8 (MENSELIJK) WORDT AFGELEID, NIET GESCHREVEN (18 oktober 2026).
+   scripts/appwerkt.js ziet op het scherm of een kale fout de gebruiker bereikt
+   en zei bij elke rij: "of een foutMELDING bruikbaar is, vraagt de storingen
+   uit bewijs 7". Die storingen staan hier. Daarom leidt deze proef per
+   onderdeel uit ALLE antwoorden die het lid kreeg (ook tijdens de dubbeltik,
+   het afgebroken verzoek en na de crash) drie schakels af: geen kale 5xx of
+   weggevallen verbinding, geen antwoord zonder leesbaar lijf, en elke
+   weigering draagt een melding in woorden en geen stacktrace. Een scenario
+   dat geen enkele weigering uitlokte, heeft dat laatste niet laten zien: dan
+   draagt menselijk GEEN schakels en `nietBeproefd` met de reden, en APPWERKT
+   leest dat als NIET_GETEST en nooit als bewezen. Een scenario kan dit bewijs
+   niet zelf schrijven: `stap()` kent alleen de drie hierboven.
+
    WAT DEZE PROEF NIET IS, en dat staat per onderdeel onder `grens`:
      - geen browser: de routes van het scherm, niet het scherm (dat is bewijs 2);
      - geen Redis en geen PostgreSQL: herstelbaar is hier een proces dat sterft
@@ -54,6 +67,8 @@ const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'VOLTOOIPROEF.json');
 const MAP = path.join(__dirname, 'lib', 'voltooi');
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
+/* Afgeleid uit de antwoorden, niet door een scenario geschreven (zie de kop). */
+const AFGELEID = 'menselijk';
 
 /* DE SCENARIO'S STAAN HIER LETTERLIJK, en niet als een require over een
    mapinhoud. De versheid van VOLTOOIPROEF.json rekent alleen wijzigingen mee in
@@ -64,8 +79,32 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'attenties.js': require('./lib/voltooi/attenties'),
+  'cellier.js': require('./lib/voltooi/cellier'),
+  'cercle.js': require('./lib/voltooi/cercle'),
+  'commerce.js': require('./lib/voltooi/commerce'),
+  'entourage.js': require('./lib/voltooi/entourage'),
+  'foodcourt.js': require('./lib/voltooi/foodcourt'),
+  'garderobe.js': require('./lib/voltooi/garderobe'),
+  'hangar.js': require('./lib/voltooi/hangar'),
+  'ik.js': require('./lib/voltooi/ik'),
+  'logboek.js': require('./lib/voltooi/logboek'),
+  'maison.js': require('./lib/voltooi/maison'),
+  'mecenaat.js': require('./lib/voltooi/mecenaat'),
+  'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
+  'mijnmall.js': require('./lib/voltooi/mijnmall'),
+  'neigingen.js': require('./lib/voltooi/neigingen'),
   'post.js': require('./lib/voltooi/post'),
-  'sessies.js': require('./lib/voltooi/sessies')
+  'reisboek.js': require('./lib/voltooi/reisboek'),
+  'reizen.js': require('./lib/voltooi/reizen'),
+  'relaties.js': require('./lib/voltooi/relaties'),
+  'sessies.js': require('./lib/voltooi/sessies'),
+  'table.js': require('./lib/voltooi/table'),
+  'uitgaan.js': require('./lib/voltooi/uitgaan'),
+  'vandaag.js': require('./lib/voltooi/vandaag'),
+  'veilig.js': require('./lib/voltooi/veilig'),
+  'verificatie.js': require('./lib/voltooi/verificatie'),
+  'wonen.js': require('./lib/voltooi/wonen')
 };
 
 function scenarios(alleen) {
@@ -94,7 +133,10 @@ async function meetScenario(sc) {
       boek[bewijs].push({ nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 });
     }
   };
-  const w = await maakWereld(path.basename(sc.bestand, '.js'));
+  /* `omgeving`: een scenario dat een herleidbaar mens van het kantoor nodig
+     heeft, draait in de kantoorwereld (KANTOORWERELD in ./lib/voltooiwereld.js).
+     De postvanger-grendel geldt daar net zo. */
+  const w = await maakWereld(path.basename(sc.bestand, '.js'), sc.omgeving);
   let afgebroken = null;
   try { await sc.loop(w, stap); }
   catch (e) { afgebroken = String(e && e.message || e).slice(0, 300); }
@@ -107,6 +149,7 @@ async function meetScenario(sc) {
        dat het nergens heen ging, bewijst de grendel. */
     post: { gevangen: post.length, naarBuiten: 0,
       onderwerpen: post.map((b) => b.soort + ': ' + (b.onderwerp || '(geen onderwerp)')) } };
+  uit[AFGELEID] = menselijkUit(w.antwoorden(), afgebroken);
   for (const b of BEWIJZEN) {
     const schakels = boek[b];
     const t = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
@@ -120,11 +163,48 @@ async function meetScenario(sc) {
   return uit;
 }
 
+/* De grens tussen een melding in woorden en een kale fout, zoals een lid hem
+   ziet: een zin van ten minste acht tekens met letters erin, zonder stacktrace
+   en zonder de naam van een JavaScript-fout. Alleen de `error`-tekst telt: dat
+   is het veld dat elk scherm van dit huis aan de gebruiker toont. */
+const KAAL = /TypeError|ReferenceError|SyntaxError|RangeError|Cannot read propert|is not a function|is not defined|\n\s+at\s|^Error:/;
+function inWoorden(melding) {
+  return typeof melding === 'string' && melding.trim().length >= 8 && /[A-Za-z]/.test(melding) && !KAAL.test(melding);
+}
+
+function menselijkUit(antwoorden, afgebroken) {
+  const n = antwoorden.length;
+  const kaal = antwoorden.filter((a) => a.status === 0 || a.status >= 500);
+  const leeg = antwoorden.filter((a) => a.status > 0 && !a.lijf);
+  const weigeringen = antwoorden.filter((a) => a.status >= 400 && a.status < 500);
+  const zonder = weigeringen.filter((a) => !inWoorden(a.melding));
+  const samenvat = (lijst) => [...new Set(lijst.map((a) => a.status + ' ' + a.pad))].slice(0, 5).join(', ');
+  if (!n || !weigeringen.length) {
+    return { schakels: [], storingen: [], telling: { schakels: 0, gesloten: 0, open: 0, stuk: 0 }, sluit: false,
+      antwoorden: n, weigeringen: 0,
+      nietBeproefd: n ? 'het scenario lokte geen enkele weigering uit, dus of een melding in woorden de gebruiker bereikt is hier niet gezien'
+        : 'het scenario kreeg geen enkel antwoord' };
+  }
+  const schakels = [
+    { nr: 1, wat: 'geen kale 5xx en geen weggevallen verbinding in de ' + n + ' antwoorden, de dubbeltik, het afgebroken verzoek en de crash inbegrepen',
+      stand: kaal.length ? 'open' : 'gesloten', ziet: kaal.length ? kaal.length + ' kaal: ' + samenvat(kaal) : n + ' antwoorden, geen enkele kaal' },
+    { nr: 2, wat: 'geen antwoord zonder leesbaar lijf (de lege pagina van een route)',
+      stand: leeg.length ? 'open' : 'gesloten', ziet: leeg.length ? leeg.length + ' leeg: ' + samenvat(leeg) : 'elk antwoord droeg een lijf' },
+    { nr: 3, wat: 'elke weigering (' + weigeringen.length + ') draagt een melding in woorden en geen stacktrace of foutnaam',
+      stand: zonder.length ? 'open' : 'gesloten', ziet: zonder.length ? zonder.length + ' zonder melding: ' + samenvat(zonder)
+        : weigeringen.length + ' weigering(en), bijvoorbeeld "' + String(weigeringen[0].melding).slice(0, 90) + '"' }
+  ];
+  const t = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
+  for (const s of schakels) t[s.stand]++;
+  return { schakels, storingen: [], telling: t, antwoorden: n, weigeringen: weigeringen.length,
+    sluit: t.open === 0 && t.stuk === 0 && !afgebroken };
+}
+
 async function meet(opties) {
   const o = opties || {};
   const reg = {
     stempel: huisStempel(),
-    uitleg: 'Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om.',
+    uitleg: 'Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om. Bewijs 8 (menselijk) wordt per onderdeel AFGELEID uit alle antwoorden die het lid daarbij kreeg: geen kale 5xx, geen leeg antwoord, en elke weigering met een melding in woorden; zonder uitgelokte weigering is het niet beproefd.',
     grens: 'Gemeten in de gecontroleerde testwereld (wegwerpdata, postvanger, sms-sandbox), niet op productie: een onderdeel dat hier voltooibaar, persistent en herstelbaar is, kan dat buiten die wereld nog niet zijn. Een geslaagd scenario geldt voor DAT scenario en die invoer, niet voor elke variant van het onderdeel.',
     hoe: 'npm run voltooiproef:vast',
     testwereld: {
@@ -137,10 +217,15 @@ async function meet(opties) {
     apps: {}
   };
   for (const sc of scenarios(o.alleen)) reg.apps[sc.functie] = await meetScenario(sc);
-  const t = { apps: 0, bewijzenGesloten: 0, bewijzenOpen: 0 };
+  /* De telling en `sluit` gaan over de drie geschreven bewijzen. Menselijk
+     telt apart (`menselijkGesloten`, `menselijkNietBeproefd`): een scenario dat
+     geen weigering uitlokte is niet gezakt, het heeft dat stuk niet gemeten. */
+  const t = { apps: 0, bewijzenGesloten: 0, bewijzenOpen: 0, menselijkGesloten: 0, menselijkOpen: 0, menselijkNietBeproefd: 0 };
   for (const a of Object.values(reg.apps)) {
     t.apps++;
     for (const b of BEWIJZEN) (a[b].sluit ? t.bewijzenGesloten++ : t.bewijzenOpen++);
+    const m = a[AFGELEID];
+    if (m.nietBeproefd) t.menselijkNietBeproefd++; else if (m.sluit) t.menselijkGesloten++; else t.menselijkOpen++;
   }
   reg.telling = t;
   reg.sluit = t.apps > 0 && t.bewijzenOpen === 0;
@@ -155,12 +240,16 @@ function druk(reg) {
       for (const s of a[b].schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat +
         (s.ziet ? '\n         ziet: ' + s.ziet : '') + (s.fout ? '\n         FOUT: ' + s.fout : ''));
     }
+    const m = a[AFGELEID];
+    console.log('  ' + AFGELEID + ' (afgeleid): ' + (m.nietBeproefd ? 'NIET BEPROEFD -- ' + m.nietBeproefd : (m.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + m.telling.gesloten + '/' + m.telling.schakels + ')'));
+    for (const s of m.schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat + (s.ziet ? '\n         ziet: ' + s.ziet : ''));
     console.log('  post: ' + a.post.gevangen + ' gevangen, ' + a.post.naarBuiten + ' naar buiten');
   }
   console.log(reg.sluit ? '\nAlle bewijzen sluiten.' : '\nNIET ALLE BEWIJZEN SLUITEN (' + reg.telling.bewijzenOpen + ' open).');
+  console.log('menselijk (afgeleid): ' + reg.telling.menselijkGesloten + ' gesloten, ' + reg.telling.menselijkOpen + ' open, ' + reg.telling.menselijkNietBeproefd + ' niet beproefd.');
 }
 
-module.exports = { meet, scenarios, DOEL, BEWIJZEN };
+module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, menselijkUit, inWoorden };
 
 if (require.main === module) {
   const vast = process.argv.includes('--vastleggen');

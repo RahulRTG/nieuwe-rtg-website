@@ -36,13 +36,23 @@
   #melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <a href="/apps/backoffice.html">&lsaquo; Kantoor</a>
-  <div><div class="ey">RTG Web Platform</div><h1 style="font-size:1.1rem;">Merken &amp; vestigingen</h1></div>
+  <div><div class="ey">RTG Web Platform</div><h1 class="s-prlthd">Merken &amp; vestigingen</h1></div>
 </header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div id="melding" role="status"></div>

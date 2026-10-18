@@ -47,16 +47,16 @@
       document.body.appendChild(ov);
       ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     }
-    ov.innerHTML = '<div style="width:100%;max-width:460px;background:var(--bg);border-radius:0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
-      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;"><b style="font-size:1rem;">' + FID_MINI + T('dp.title','Betaal direct') + '</b>' +
-        '<button id="dpX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
-      '<div style="font-size:0.8rem;color:var(--soft);margin-bottom:0.75rem;">' + T('dp.naar','Aan') + ' <b style="color:var(--txt);">' + escT(name) + '</b>. ' + T('dp.direct','Het bedrag gaat rechtstreeks naar de partner.') + '</div>' +
-      (opts.omschrijving ? '<div style="font-size:0.82rem;margin-bottom:0.5rem;">' + escT(opts.omschrijving) + '</div>' : '') +
-      '<label style="font-size:0.72rem;color:var(--soft);">' + T('dp.bedrag','Bedrag (€)') + '</label>' +
+    ov.innerHTML = '<div class="s-1pfuym5">' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;"><b class="s-gidsbo">' + FID_MINI + T('dp.title','Betaal direct') + '</b>' +
+        '<button id="dpX" class="s-rwgmky">✕</button></div>' +
+      '<div class="s-1v8rjju">' + T('dp.naar','Aan') + ' <b class="s-1btm41d">' + escT(name) + '</b>. ' + T('dp.direct','Het bedrag gaat rechtstreeks naar de partner.') + '</div>' +
+      (opts.omschrijving ? '<div class="s-1uadirr">' + escT(opts.omschrijving) + '</div>' : '') +
+      '<label class="s-9uxsi">' + T('dp.bedrag','Bedrag (€)') + '</label>' +
       '<input id="dpBedrag" type="number" inputmode="decimal" min="0.50" step="0.50" ' + (opts.bedrag ? 'value="' + opts.bedrag + '"' : '') + ' style="width:100%;font-size:1.3rem;padding:0.6rem 0.8rem;margin:0.25rem 0 0.7rem;background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);">' +
       '<input id="dpNote" placeholder="' + T('dp.note','Waarvoor? (optioneel)') + '" ' + (opts.omschrijving ? 'value="' + escT(opts.omschrijving) + '"' : '') + ' style="width:100%;padding:0.55rem 0.8rem;margin-bottom:0.9rem;background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);">' +
-      '<button id="dpPay" class="mo-pay" style="width:100%;justify-content:center;padding:0.8rem;">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>' +
-      (muntOpties && muntOpties.aan ? '<button id="dpMunt" style="width:100%;margin-top:0.5rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.7rem;font-family:inherit;font-size:0.8rem;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '') +
+      '<button id="dpPay" class="mo-pay s-1jdfvby">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>' +
+      (muntOpties && muntOpties.aan ? '<button id="dpMunt" class="s-17jmyk4">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '') +
       '</div>';
     ov.querySelector('#dpX').addEventListener('click', () => ov.remove());
     const dpLees = () => {

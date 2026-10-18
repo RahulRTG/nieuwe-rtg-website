@@ -81,10 +81,10 @@
   }));
 
   const zakStatusKnop = (p) =>
-    p.status === 'verbonden' ? '<span class="zak-open" style="color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);">✓ ' + T('zak.verbonden','Verbonden') + '</span>'
+    p.status === 'verbonden' ? '<span class="zak-open s-3heyfw">✓ ' + T('zak.verbonden','Verbonden') + '</span>'
     : p.status === 'aangevraagd' ? '<span class="zak-chip">' + T('zak.wacht','Aangevraagd') + '</span>'
     : p.status === 'wacht-op-u' ? '<span class="zak-chip mijn">' + T('zak.wachtu','Accepteer in Contacten') + '</span>'
-    : '<button class="go js-zcon" data-key="' + escT(p.key) + '" style="padding:0.25rem 0.7rem;font-size:0.68rem;">+ ' + T('zak.verbind','Verbind') + '</button>';
+    : '<button class="go js-zcon s-xu75cl" data-key="' + escT(p.key) + '">+ ' + T('zak.verbind','Verbind') + '</button>';
 
   function zakProfielKaart(p){
     const skills = (p.vaardigheden || []).map(v =>
@@ -93,17 +93,17 @@
     return '<div class="zak-kaart">' +
       '<div style="display:flex;align-items:center;gap:0.6rem;">' +
         '<div class="grow-min"><b>' + escT(p.naam) + '</b>' +
-        (p.pas ? ' <span style="font-size:0.56rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.08rem 0.4rem;vertical-align:middle;">' + (TIER_LABEL[p.pas] || p.pas) + '</span>' : '') +
+        (p.pas ? ' <span class="s-1gwpioo">' + (TIER_LABEL[p.pas] || p.pas) + '</span>' : '') +
         (p.openVoorWerk ? ' <span class="zak-open">' + T('zak.open','open voor werk') + '</span>' : '') +
-        '<div style="font-size:0.74rem;color:var(--muted);">' + escT(p.kop) +
+        '<div class="s-1ax41pp">' + escT(p.kop) +
         (p.sector ? ' · ' + escT(p.sector) : '') + (p.plaats ? ' · ' + escT(p.plaats) : '') + '</div>' +
-        '<div style="font-size:0.62rem;color:var(--soft);">' + T('zak.codenaam','codenaam') + ' ' + escT(p.codenaam) +
+        '<div class="s-1epvdch">' + T('zak.codenaam','codenaam') + ' ' + escT(p.codenaam) +
         (p.gedeeld ? ' · ' + p.gedeeld + ' ' + T('zak.gedeeld','gedeelde connectie(s)') + (p.gedeeldNamen && p.gedeeldNamen.length ? ' (' + p.gedeeldNamen.map(escT).join(', ') + ')' : '') : '') + '</div></div>' +
         zakStatusKnop(p) + '</div>' +
-      (p.bio ? '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.5rem;line-height:1.5;">' + escT(p.bio) + '</div>' : '') +
-      ((p.ervaring || []).length ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.5rem;">' + p.ervaring.map(escT).join('<br>') + '</div>' : '') +
+      (p.bio ? '<div class="s-1i1ycbi">' + escT(p.bio) + '</div>' : '') +
+      ((p.ervaring || []).length ? '<div class="s-lmgu0k">' + p.ervaring.map(escT).join('<br>') + '</div>' : '') +
       (skills ? '<div class="h-mt35">' + skills +
-        (p.status === 'verbonden' ? '<div style="font-size:0.6rem;color:var(--soft);margin-top:0.25rem;">' + T('zak.tikskill','Tik een vaardigheid aan om hem aan te bevelen.') + '</div>' : '') + '</div>' : '') +
+        (p.status === 'verbonden' ? '<div class="s-1r077af">' + T('zak.tikskill','Tik een vaardigheid aan om hem aan te bevelen.') + '</div>' : '') + '</div>' : '') +
       '</div>';
   }
 

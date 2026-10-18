@@ -81,10 +81,10 @@
     try { cons = (await API.call('/member/connections')).connections || []; } catch(e){}
     if (!cons.length){ toast(T('erv.geenvrienden','Voeg eerst vrienden toe via de Salon om te kunnen splitsen.')); return; }
     const acts = el.querySelector('.acts');
-    acts.innerHTML = '<div style="width:100%;">' +
-      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.25rem;">' + T('erv.splitsmet','Splits gelijk met:') + '</div>' +
+    acts.innerHTML = '<div class="s-186m9vs">' +
+      '<div class="s-oqfvs0">' + T('erv.splitsmet','Splits gelijk met:') + '</div>' +
       cons.slice(0,8).map(c => '<label style="display:inline-flex;align-items:center;gap:0.3rem;margin:0 0.5rem 0.5rem 0;font-size:0.78rem;"><input type="checkbox" class="js-splid" value="' + c.key + '"> ' + c.codename + '</label>').join('') +
-      '<button class="mo-pay js-splgo" style="width:100%;margin-top:0.25rem;">' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
+      '<button class="mo-pay js-splgo s-28el48">' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
     acts.querySelector('.js-splgo').addEventListener('click', async () => {
       const metKeys = [...acts.querySelectorAll('.js-splid:checked')].map(x => x.value);
       if (!metKeys.length){ toast(T('erv.kiesvriend','Kies minstens een vriend.')); return; }
@@ -112,7 +112,7 @@
       const st = BST[b.status] || [b.status, 'var(--soft)'];
       return '<div class="myorder">' +
         '<div class="r1"><div><div class="nm">' + b.supplierName + '</div><div class="sub2">' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + '</div></div>' +
-        '<div style="text-align:right;"><div class="amt">' + eur(b.price) + '</div><span style="font-size:0.62rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:' + st[1] + ';">' + st[0] + '</span></div></div>' +
+        '<div class="s-dkemdj"><div class="amt">' + eur(b.price) + '</div><span style="font-size:0.62rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:' + st[1] + ';">' + st[0] + '</span></div></div>' +
         (!b.paid ? '<div class="acts"><button class="mo-pay js-bpay" data-bref="' + b.ref + '" data-bamt="' + b.price + '">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button></div>' : '') +
       '</div>';
     }).join('') : '';

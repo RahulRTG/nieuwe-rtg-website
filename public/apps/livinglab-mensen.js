@@ -35,13 +35,13 @@
             return '<div class="log" data-alias="' + esc(p.alias) + '"><b>' + esc(p.alias) + '</b> &middot; ' +
               esc(rolNaam(p.rol)) + ' &middot; toestemming: ' + esc(p.toestemming) +
               '<div class="rij h-mt25">' +
-                '<select class="veld" data-mrolzet aria-label="Rol wijzigen" style="font-size:.75rem;max-width:12rem;">' +
+                '<select class="veld s-1y80oju" data-mrolzet aria-label="Rol wijzigen">' +
                   KADER.rollen.map(function (r) {
                     return '<option value="' + esc(r.rol) + '"' + (r.rol === p.rol ? ' selected' : '') + '>' +
                       esc(r.naam) + '</option>';
                   }).join('') + '</select>' +
-                '<button class="knop stil" data-mrolknop type="button" style="font-size:.7rem;padding:.15rem .5rem;">Wijzig rol</button>' +
-                '<button class="knop stil" data-mweg type="button" style="font-size:.7rem;padding:.15rem .5rem;">terugtrekken</button>' +
+                '<button class="knop stil s-1emfcyx" data-mrolknop type="button">Wijzig rol</button>' +
+                '<button class="knop stil s-1emfcyx" data-mweg type="button">terugtrekken</button>' +
               '</div></div>';
           }).join('')
         : '<div class="leeg">Nog niemand. Een deelnemer krijgt een pseudoniem en een eigen labpas; met die pas opent hij zijn onderzoek op /apps/labpas.html.</div>') +
@@ -68,7 +68,7 @@
         .then(function (r) {
           q('[data-mnieuw]').innerHTML = '<div class="uitdaging h-mt60">' +
             '<div class="sec">Labpas voor ' + esc(r.deelnemer.alias) + '</div>' +
-            '<h2 style="font-family:monospace;font-size:1.15rem;">' + esc(r.deelnemer.pas) + '</h2>' +
+            '<h2 class="s-1vkfgzy">' + esc(r.deelnemer.pas) + '</h2>' +
             '<div class="leeg">Geef deze code aan de deelnemer. Hij komt maar één keer in beeld en is daarna ' +
             'niet meer op te vragen -- noteer hem nu.</div></div>';
           meld('Deelnemer toegevoegd als ' + r.deelnemer.alias + '.');

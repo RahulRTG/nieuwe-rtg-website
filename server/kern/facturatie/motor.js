@@ -3,7 +3,6 @@
    van de zaak), regels verwerken en het tweezijdige boeken (op code of
    codenaam). Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/facturatie.js. */
-const REGELSOM = require('../regelsom');
 
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
@@ -22,35 +21,8 @@ module.exports = (ctx) => {
     s.factuurTeller += 1;
     return 'RTG-' + new Date().getFullYear() + '-' + String(s.factuurTeller).padStart(6, '0');
   }
-  /* HET TARIEF KOMT UIT DE FISCALE LAAG, niet uit een lijstje hier.
-     Hier stond `LAAG_BTW_TYPES.includes(type) ? 9 : 21` -- twee vaste getallen
-     die nergens naar het LAND van de zaak keken, terwijl de maandboekhouding
-     van diezelfde zaak wel de landentabel gebruikte. Sal de Mar op Ibiza (land
-     ES) boekte 10% en factureerde 9%. Zie de kop van kern/fiscaal/tarief.js. */
-  const tarief = require('../fiscaal/tarief');
-  const capsVan = (s) => { try { return db.capsVan(s); } catch (e) { return []; } };
-  function standaardBtw(supplier) {
-    if (!supplier) return tarief.tariefVan(null, 'standaard');
-    return tarief.tariefVan(supplier, tarief.basisCat(supplier, capsVan(supplier)));
-  }
-  /* En PER REGEL, want een glas wijn in een restaurant is geen eten. Zonder
-     deze stap zou de bon alles op het lage tarief zetten terwijl de boekhouding
-     de bar apart telt -- dan lopen ze alsnog uiteen, alleen subtieler. */
-  function regelBtw(supplier, omschrijving, basis) {
-    return tarief.tariefVan(supplier, tarief.catVanItem(supplier, omschrijving, basis));
-  }
-
-  /* Reken de regels door. De som zelf staat in kern/regelsom.js, want de
-     offertebouwer rekent hem ook -- en een offerte die anders afrondt dan de
-     factuur die eruit voortkomt, is een verschil dat niemand kan uitleggen.
-     Reist er een verkoper mee, dan krijgt de som een opzoeker die het tarief
-     van elke regel uit de fiscale laag haalt (zie regelBtw hierboven); de
-     berekening zelf blijft op die ene plek. */
-  const verwerkRegels = (regels, btwStandaard, verkoper) => {
-    const basis = verkoper ? tarief.basisCat(verkoper, capsVan(verkoper)) : null;
-    const perRegel = basis ? (omschrijving) => regelBtw(verkoper, omschrijving, basis) : null;
-    return REGELSOM.verwerkRegels(regels, btwStandaard, scho, perRegel);
-  };
+  /* Het btw-tarief per factuur en per regel woont in ./btw.js (de fiscale laag). */
+  const { standaardBtw, verwerkRegels } = require('./btw')({ db, scho });
 
   /* De kern: boek EGn transactie -> EGn tweezijdige factuur.
      data: { soort, verkoperCode, verkoperNaam, koper:{key,naam,codenaam,supplierCode},
@@ -121,7 +93,7 @@ module.exports = (ctx) => {
   }
 
   // Async variant die een codenaam naar een lidsleutel oplost.
-  async function boekMetCodenaam(data, codenaam) {
+  async function koperBij(data, codenaam) {
     codenaam = scho(codenaam, 80);
     if (codenaam && keyVanCodenaam) {
       try {
@@ -130,7 +102,20 @@ module.exports = (ctx) => {
         data.koper = Object.assign({}, data.koper, key ? { key, codenaam: (t.codename || codenaam) } : { codenaam });
       } catch (e) { data.koper = Object.assign({}, data.koper, { codenaam }); }
     }
-    return boek(data);
+    return data;
+  }
+  async function boekMetCodenaam(data, codenaam) {
+    return boek(await koperBij(data, codenaam));
+  }
+  /* DE FACTUUR VAN EEN MENS, DUURZAAM (18 oktober 2026). Met de hand gemaakt
+     (/api/supplier/facturen/maak) heette hij "gemaakt" terwijl de opslag hem
+     nog niet had (SCHRIJFPROEF.json: VALS_SUCCES). Een fiscaal stuk met een
+     doorlopend nummer staat er, of bestaat niet. De automatische boekingen
+     roepen boek() BINNEN hun eigen handeling aan, die over de commit beslist.
+     Eerst de koper opzoeken (wacht op de kluis), dan synchroon in de bundel. */
+  async function boekVast(data, codenaam) {
+    await koperBij(data, codenaam);
+    return ctx.vastleggen ? ctx.vastleggen.antwoord(() => boek(data)) : boek(data);
   }
   /* Een openstaande factuur afboeken. Alleen de VERKOPER mag dat, want alleen
      hij weet of het geld binnen is; een koper die zijn eigen factuur op betaald
@@ -151,5 +136,10 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, betaald: naar };
   }
 
-  return { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, factuurBetaald };
+  // afboeken idem: de debiteurenlijst slaat een "betaalde" factuur over
+  const factuurBetaaldVast = (id, verkoperCode, betaald) => ctx.vastleggen
+    ? ctx.vastleggen.antwoord(() => factuurBetaald(id, verkoperCode, betaald))
+    : Promise.resolve(factuurBetaald(id, verkoperCode, betaald));
+
+  return { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, boekVast, factuurBetaald, factuurBetaaldVast };
 };

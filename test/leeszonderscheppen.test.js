@@ -1194,3 +1194,65 @@ test('eigenaarherstel: zonder ingerichte herstelweg blijft de la dicht', () => {
   assert.equal(h.ingericht(), true);
   assert.equal(h.stand().log.length > 0, true, 'en het logboek loopt');
 });
+
+/* ------------------------------------------------------------- geldbeleid */
+test('geldbeleid: grenzen, regels en potten lezen schept geen collectie', () => {
+  /* /api/geld/grens is een LEZER, en hij legde `geldbeleid` aan voor elk lid
+     dat keek. De idemproef zag die collectie bewegen en zette de route op de
+     geldkaart; de schrijfproef las de verloren lege bak daarna als een vals
+     succes (18 oktober 2026). */
+  const db = { data: {} };
+  const { geldbeleid: g } = require('../server/kern/geldbeleid')({ db, save: () => {} });
+  assert.deepEqual(g.grenzen('Lid Een'), []);
+  assert.deepEqual(g.regels('Lid Een'), []);
+  assert.deepEqual(g.potten('Lid Een'), []);
+  geenMeubilair(db, 'geldbeleid', 'grenzen, regels en potten van een lid zonder beleid');
+
+  /* TEGENPROEF: een grens zetten schrijft nog, en daarna leest hij hem terug. */
+  const z = g.grensZet('Lid Een', { periode: 'maand', centen: 50000 });
+  assert.equal(z.ok, true, z.error || '');
+  assert.equal(g.grenzen('Lid Een').length, 1);
+  assert.ok(db.data.geldbeleid, 'de collectie staat er nu wel');
+});
+
+/* ----------------------------------------------------------------- punten */
+test('punten: het saldo opvragen legt geen rekening aan', () => {
+  /* /api/punten is een LEZER; puntenVan() maakte een lege rekening voor elk lid
+     dat keek, en dat zag de idemproef als een schrijfactie op de geldkaart. */
+  const db = { data: { punten: {} } };
+  const p = require('../server/kern/ervaring/leden/punten')({ db, save: () => {}, nu: () => new Date().toISOString() });
+  const nul = p.puntenVan('lid-1');
+  assert.equal(nul.saldo, 0);
+  assert.equal(nul.tegoedCenten, 0);
+  assert.equal(Object.keys(db.data.punten).length, 0, 'opvragen legt geen rekening aan voor lid-1');
+
+  /* TEGENPROEF: verdienen schrijft nog, en het saldo leest daarna terug. */
+  assert.equal(p.verdienPunten('lid-1', 50, 'proef'), 5);
+  assert.equal(p.puntenVan('lid-1').saldo, 5);
+});
+
+/* ------------------------------------------------------------- ai-tegoed */
+test('ai-tegoed: de stand opvragen legt geen rij aan; verbruik wel', () => {
+  const { maakTegoed } = require('../server/kern/commercie/tegoed');
+  const db = { data: {}, writable: true };
+  let saves = 0;
+  const t = maakTegoed({ db, save: () => { saves++; } });
+  const st = t.stand('lid-1', 'rtg');
+  assert.equal(st.contractueel, false);
+  assert.equal(st.verbruikt, 0, 'de stand rekent met een vluchtige verse rij');
+  geenMeubilair(db, 'aiTegoed', 'de stand opvragen');
+  assert.equal(saves, 0, 'en er is niets weggeschreven');
+  /* TEGENPROEF: het schrijfpad blijft heel -- verbruik maakt de rij en de stand leest hem daarna. */
+  t.verbruik('lid-1', 'rtg', 3);
+  assert.ok(heeft(db, 'aiTegoed'), 'verbruik legt de rij aan');
+  assert.equal(t.stand('lid-1', 'rtg').verbruikt, 3, 'en de stand toont het echte verbruik');
+});
+
+/* ------------------------------------------------------ labfonds (lezer) */
+test('labfonds: mijn bijdragen lezen legt geen fonds aan', () => {
+  const maakLabfonds = require('../server/kern/labfonds');
+  const db = { data: {}, writable: true };
+  const k = maakLabfonds({ db, save: () => {}, crypto: require('node:crypto') });
+  assert.deepEqual(k.labfonds.mijnBijdragen('lid-1'), []);
+  geenMeubilair(db, 'labFonds', 'mijn bijdragen lezen');
+});

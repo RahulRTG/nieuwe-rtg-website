@@ -8,8 +8,8 @@
     const idAdd = $('#crIdAdd'); if (idAdd) idAdd.addEventListener('click', async () => { const tekst = $('#crIdTekst').value.trim(); if (!tekst) return; try { crToe(await API.call('/supplier/creator/idee', { tekst, voor: $('#crIdVoor').value })); } catch(e){ toast(e.message); } });
     const aiGo = $('#crAiGo'); if (aiGo){
       const doe = async () => { const opdracht = $('#crAiIn').value.trim(); if (!opdracht) return; const out = $('#crAiOut'); out.innerHTML = '<div class="ds">'+T('cr.aidenkt','Even denken...')+'</div>';
-        try { const r = await API.call('/supplier/creator/ai', { opdracht }); out.innerHTML = '<div class="mitem"'+(r.gedaan?' style="border-left:3px solid #7EE0A3;"':'')+'><div class="ds" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div></div>'; $('#crAiIn').value=''; if (r.overzicht){ cr = r.overzicht; } if (r.gedaan) renderCreator(); }
-        catch(e){ out.innerHTML = '<div class="ds" style="color:#E0736A;">'+esc(e.message)+'</div>'; } };
+        try { const r = await API.call('/supplier/creator/ai', { opdracht }); out.innerHTML = '<div class="mitem"'+(r.gedaan?' style="border-left:3px solid #7EE0A3;"':'')+'><div class="ds s-pcf0s6">'+esc(r.antwoord)+'</div></div>'; $('#crAiIn').value=''; if (r.overzicht){ cr = r.overzicht; } if (r.gedaan) renderCreator(); }
+        catch(e){ out.innerHTML = '<div class="ds s-14n40hq">'+esc(e.message)+'</div>'; } };
       aiGo.addEventListener('click', doe);
       const aiIn = $('#crAiIn'); if (aiIn) aiIn.addEventListener('keydown', e => { if (e.key==='Enter') doe(); });
     }
@@ -39,7 +39,7 @@
     html += '<div class="card"><div class="tt-h">'+T('sw.mijn','Mijn samenwerkingen')+'</div>'+
       (inl.length||uitl.length ? [].concat(inl,uitl).map(x => '<div class="mitem" style="border-left:3px solid '+(statusKl[x.status]||'var(--soft)')+';"><div class="r1"><span class="nm">'+kaartAnder(x.ander)+'</span><span class="pr" style="color:'+(statusKl[x.status]||'var(--soft)')+';">'+T('sw.st.'+x.status, x.status)+'</span></div>'+
         (x.bericht?'<div class="ds">'+esc(x.bericht)+(x.budget?' · € '+x.budget:'')+(x.soort?' · '+esc(x.soort):'')+'</div>':'')+
-        (x.richting==='in'&&x.status==='voorgesteld'&&canEdit ? '<div style="margin-top:0.5rem;display:flex;gap:0.4rem;"><button class="obtn primary" data-swja="'+x.id+'">'+T('sw.accept','Accepteren')+'</button><button class="obtn" data-swnee="'+x.id+'">'+T('sw.afwijs','Afwijzen')+'</button></div>' : '')+
+        (x.richting==='in'&&x.status==='voorgesteld'&&canEdit ? '<div class="s-fnxhcu"><button class="obtn primary" data-swja="'+x.id+'">'+T('sw.accept','Accepteren')+'</button><button class="obtn" data-swnee="'+x.id+'">'+T('sw.afwijs','Afwijzen')+'</button></div>' : '')+
         '</div>').join('')
         : '<div class="ds h-mt50">'+T('sw.geen','Nog geen samenwerkingen. Start er hieronder een.')+'</div>')+'</div>';
 

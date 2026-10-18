@@ -98,7 +98,7 @@
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="onderneming" class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 
 <header>
   <div>
@@ -895,5 +895,13 @@ if(kz)kz.addEventListener('change',async e=>{HUIDIG=e.target.value;await herlaad
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

@@ -31,7 +31,7 @@
       '<span class="campus-seal">RTG</span><div><p>Secure enterprise workspace</p><b>Rahul Group Campus</b></div></div>' +
       '<header><div><span class="campus-kicker">Beveiligde deur</span><h1>Deze campus is gesloten.</h1></div><p>' +
       esc(tekst) + ' Log in via de personeelsingang; daarna keert u terug naar deze kantoorwereld.</p></header>' +
-      '<p style="margin-top:1.4rem"><a class="knop" href="/apps/personeel.html?kantoor=1&amp;terug=%2Fapps%2Fwerkplek.html">Naar de personeelsingang</a></p></div></section>';
+      '<p class="s-1i0nzd3"><a class="knop" href="/apps/personeel.html?kantoor=1&amp;terug=%2Fapps%2Fwerkplek.html">Naar de personeelsingang</a></p></div></section>';
   }
 
   function toonKiezer() {

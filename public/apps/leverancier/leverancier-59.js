@@ -44,12 +44,12 @@
       if (vandaag) knoppen.push('<button class="obtn primary js-reser">'+T('res.er','Gast is er')+'</button>','<button class="obtn warn js-resno">'+T('res.noshow','No-show')+'</button>');
     }
     if (r.status === 'aangekomen') knoppen.push('<button class="obtn js-resweg">'+T('res.weg','Vertrokken')+'</button>');
-    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.5rem;font-size:0.82rem;flex-wrap:wrap;" data-res="'+r.id+'">'+
+    return '<div class="s-18ylv35" data-res="'+r.id+'">'+
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
         (r.tafel?' ·  '+esc(r.tafel):'')+(r.notitie?' ·  '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
-        (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
-      (knoppen.length ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
-        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+'</div>';
+        (r.zorg?'<span class="s-12agxa1">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
+      (knoppen.length ? '<span class="s-mif44q">'+knoppen.join('')+'</span>'
+        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+' s-11qsifn">'+resStatusTekst(r.status)+'</span>')+'</div>';
   }
   async function renderReserveringen(){
     const wrap = $('#resWrap');
@@ -64,9 +64,9 @@
         : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>').join('')+'</div>'+ '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>' : '';
     const rekeningen = plan.tafels.filter(t => t.rekening);
     const rekBlok = rekeningen.length
-      ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+
-          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(t.rekening.totaal)+'</b></span>'+
-          '<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+
+      ? rekeningen.map(t => '<div class="s-ejem2y" data-tafelrek="'+esc(t.name)+'">'+
+          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b class="s-12itpbj">'+eur(t.rekening.totaal)+'</b></span>'+
+          '<span class="s-1wrzvzr">'+
             '<button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button>'+
             '<button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button>'+
             '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+

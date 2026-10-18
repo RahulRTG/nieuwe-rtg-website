@@ -11,9 +11,9 @@
       '<div class="tkc h-volbreed">'+rows.map(r =>
         '<div class="st-row'+(r.it.done?'" style="opacity:0.5;':'"')+'">'+
         '<span>'+
-        '<span style="display:inline-block;min-width:5.4rem;margin-right:0.5rem;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:'+(r.due===today?'var(--burgundy)':'var(--soft)')+';">'+dueLabel(r.due, r.it.daysBefore)+'</span>'+
-        '<b style="color:var(--rtg-leesgoud,var(--gold));font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+r.it.time+'</b>'+
-        (station==='party'?'<span style="margin-right:0.4rem;">'+(RUN_ICON[r.it.station]||'')+'</span>':'')+
+        '<span class="' + (r.due===today ? 's-fqi76x' : 's-1fnlj3p') + '">'+dueLabel(r.due, r.it.daysBefore)+'</span>'+
+        '<b class="s-1nhm19k">'+r.it.time+'</b>'+
+        (station==='party'?'<span class="s-1wdyim9">'+(RUN_ICON[r.it.station]||'')+'</span>':'')+
         (r.it.done?'<s>'+r.it.text+'</s>':r.it.text)+
         '<span class="sub">'+r.e.name+' \u00b7 '+r.e.date+(r.it.done&&r.it.doneBy?' \u00b7 \u2713 '+r.it.doneBy:'')+'</span></span>'+
         '<button class="obtn'+(r.it.done?' primary':'')+'" data-rundone="'+r.e.id+'" data-item="'+r.it.id+'">'+(r.it.done?'\u2713':T('rs.doit','Gedaan'))+'</button></div>'
@@ -33,7 +33,7 @@
     if (!wvInfo) return '';
     const chips = [];
     (wvInfo.adviezen||[]).forEach(a => chips.push('<button class="obtn warn" data-st86adv="'+a.menuItemId+'">\u26d4 86: '+esc(a.gerecht)+' ('+esc(a.ingredient)+' '+T('st.isop','is op')+')</button>'));
-    (wvInfo.op||[]).forEach(a => chips.push('<span class="ad" style="color:#FF8589;font-weight:600;">'+esc(a.naam)+' '+T('st.op','OP')+'</span>'));
+    (wvInfo.op||[]).forEach(a => chips.push('<span class="ad s-vjo3oh">'+esc(a.naam)+' '+T('st.op','OP')+'</span>'));
     (wvInfo.laag||[]).forEach(a => chips.push('<span class="ad">'+esc(a.naam)+' '+T('st.laag','laag')+' ('+a.aantal+' '+esc(a.eenheid)+')</span>'));
     chips.push('<button class="obtn ghost" data-stderf>\u267b '+T('st.derf','Derving melden')+'</button>');
     return '<div class="allday"><span class="ad-h">\ud83d\udce6 '+T('st.voorraad','Voorraad')+'</span>'+chips.join('')+'</div>';

@@ -38,14 +38,17 @@ module.exports = (ctx) => {
        van het kantoor; dit journaal is van de betrokkene -- daar kan een lid
        later opvragen wie in ZIJN dossier heeft gekeken (AVG art. 15). Twee
        lezers, twee doelen, dus twee sporen. */
-    try {
-      inzagelog.noteer({
-        door: { naam: String(wie || kamer.naam) },
-        over: { id: u.id, codenaam: tref.codename },
-        waarom: 'Naam opgevraagd bij codenaam vanuit ' + kamer.naam,
-        bron: 'kantoren/' + kamerId
-      });
-    } catch (e) {}
+    /* En het journaal kan WEIGEREN (18 oktober 2026, LAT.md regel 21): hier
+       stond noteer() in een lege catch, en dan kwam de echte naam mee terwijl
+       het spoor ontbrak (STILSPOOR.json). Geen vaststaande regel, geen naam. */
+    const spoor = await inzagelog.noteerVast({
+      door: { naam: String(wie || kamer.naam) },
+      over: { id: u.id, codenaam: tref.codename },
+      waarom: 'Naam opgevraagd bij codenaam vanuit ' + kamer.naam,
+      bron: 'kantoren/' + kamerId
+    });
+    if (!spoor || !spoor.ok) return { status: (spoor && spoor.status) || 503,
+      error: 'Er is niets ingezien: deze opvraging kon niet aantoonbaar in het inzagejournaal worden vastgelegd. Probeer het zo opnieuw.' };
     return { ok: true, inzage: { codenaam: tref.codename, pas: tref.tier, naam: accounts.realNameOf(u), email: accounts.emailOf(u) } };
   }
 

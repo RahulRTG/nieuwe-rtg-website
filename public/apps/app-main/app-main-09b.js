@@ -11,7 +11,7 @@
     try {
       const d = await API.call('/member/dm', { withKey: dmWith });
       $('#dmBody').innerHTML = (d.messages || []).map(m => dmBubbel(m)).join('') ||
-        '<div style="font-size:0.78rem;color:var(--soft);text-align:center;margin:auto 0;">' + T('sal.dm.leeg','Nog geen berichten. Zeg hallo.') + '</div>';
+        '<div class="s-1spsht7">' + T('sal.dm.leeg','Nog geen berichten. Zeg hallo.') + '</div>';
       vertaalBubbels($('#dmBody'));
       $('#dmBody').scrollTop = 999999;
     } catch(e){ toast(e.message); }

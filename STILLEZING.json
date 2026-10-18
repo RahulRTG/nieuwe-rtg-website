@@ -3,8 +3,8 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-18T11:43:17.868Z",
-  "commit": "07364d4e7",
+  "op": "2026-10-18T12:59:37.268Z",
+  "commit": "6012c6ad1",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/stillezing.js",
@@ -12,7 +12,7 @@
  },
  "gemeten": {
   "server": {
-   "bewijslezingen": 93,
+   "bewijslezingen": 94,
    "metVanger": 9,
    "smeltSamen": 5,
    "zegtHet": 1,
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4829,
+    "regel": 4834,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5319,
+    "regel": 5324,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5590,
+    "regel": 5595,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5766,
+    "regel": 5771,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5779,
+    "regel": 5784,
     "leest": [
      "NORM.json"
     ],
@@ -486,7 +486,7 @@
    },
    {
     "bestand": "scripts/herstel.js",
-    "regel": 53,
+    "regel": 78,
     "leest": [
      "IDEMPROEF.json"
     ],
@@ -494,7 +494,7 @@
    },
    {
     "bestand": "scripts/herstel.js",
-    "regel": 72,
+    "regel": 97,
     "leest": [
      "HERSTELPROEF.json"
     ],
@@ -502,7 +502,7 @@
    },
    {
     "bestand": "scripts/herstelproef.js",
-    "regel": 403,
+    "regel": 424,
     "leest": [
      "IDEMPROEF.json"
     ],

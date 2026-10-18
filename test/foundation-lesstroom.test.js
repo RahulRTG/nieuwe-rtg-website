@@ -33,11 +33,11 @@ const post = async (pad, body, token) => {
   return { status: r.status, data, cache: r.headers.get('cache-control') };
 };
 const lees = async (pad, token) => {
-  const r = await fetch(BASE + '/api/foundation' + pad, { headers: token ? { Authorization: 'Bearer ' + token } : {} });
+  const r = await fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { headers: token ? { Authorization: 'Bearer ' + token } : {} });
   let data = null; try { data = await r.json(); } catch (e) {}
   return { status: r.status, data };
 };
-const ticket = async (lesId, token) => post('/les/stroomticket', { code: lesId }, token);
+const ticket = async (lesId, token) => post('/api/foundation/les/stroomticket', { code: lesId }, token);
 /* Open de stroom en lees het eerste stuk; geeft status en een sluiter terug. */
 async function stroom(lesId, query) {
   const ac = new AbortController();
@@ -47,8 +47,8 @@ async function stroom(lesId, query) {
   return { status: r.status, type: r.headers.get('content-type'), sluit: () => ac.abort(), r };
 }
 async function klas(vak) {
-  const d = (await post('/les/maak', { vak, naam: 'Juf' })).data;
-  const sam = (await post('/les/join', { lescode: d.lescode, naam: 'Sam' })).data;
+  const d = (await post('/api/foundation/les/maak', { vak, naam: 'Juf' })).data;
+  const sam = (await post('/api/foundation/les/join', { lescode: d.lescode, naam: 'Sam' })).data;
   return { d, sam };
 }
 
@@ -62,7 +62,7 @@ test('een sleutel in het adres wordt overal geweigerd, ook als hij klopt', async
     assert.equal(r.data.reden, 'sleutel-in-adres', pad + ' zegt waarom');
     assert.match(r.data.hoe, /Authorization/, pad + ' zegt hoe het wel moet');
     /* Ook de combinatie: een geldige kop plus een ?token= gaat niet door. */
-    assert.equal((await fetch(BASE + '/api/foundation' + pad + '?token=x',
+    assert.equal((await fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad) + '?token=x',
       { headers: { Authorization: 'Bearer ' + tok } })).status, 400, pad + ' ook naast een geldige kop');
   }
   const p = await fetch(BASE + '/api/foundation/bord/wis?token=' + d.token, { method: 'POST',
@@ -79,7 +79,7 @@ test('de kop en het lijf werken', async () => {
   assert.equal((await lees('/schrift/' + d.lesId, sam.token)).status, 200);
   assert.equal((await lees('/schrift/' + d.lesId + '/' + sam.studentId, d.token)).status, 200);
   assert.equal((await post('/api/foundation/opgave', { code: d.lesId, tekst: 'Som 1' }, d.token)).status, 200, 'POST met de kop');
-  assert.equal((await post('/agenda', { code: d.lesId, token: d.token, tekst: 'Toets' })).status, 200, 'POST met het lijf');
+  assert.equal((await post('/api/foundation/agenda', { code: d.lesId, token: d.token, tekst: 'Toets' })).status, 200, 'POST met het lijf');
   assert.equal((await lees('/les/' + d.lesId)).status, 403, 'zonder sleutel niets');
 });
 
@@ -124,12 +124,12 @@ test('het stroomticket: eenmalig, aan les en rol gebonden, met een eigen antwoor
 test('intrekken en sluiten: een al uitgegeven ticket opent daarna niets', async () => {
   const { d, sam } = await klas('Intrek');
   const voor = await ticket(d.lesId, sam.token);
-  assert.equal((await post('/les/leerling/intrekken', { code: d.lesId, studentId: sam.studentId }, d.token)).status, 200);
+  assert.equal((await post('/api/foundation/les/leerling/intrekken', { code: d.lesId, studentId: sam.studentId }, d.token)).status, 200);
   assert.equal((await stroom(d.lesId, 'ticket=' + encodeURIComponent(voor.data.ticket))).status, 403,
     'het ticket van voor de intrekking opent niets');
   assert.equal((await ticket(d.lesId, sam.token)).status, 403, 'en er komt geen nieuw');
   const leraar = await ticket(d.lesId, d.token);
-  assert.equal((await post('/les/sluit', { code: d.lesId }, d.token)).status, 200);
+  assert.equal((await post('/api/foundation/les/sluit', { code: d.lesId }, d.token)).status, 200);
   assert.equal((await stroom(d.lesId, 'ticket=' + encodeURIComponent(leraar.data.ticket))).status, 403,
     'een gesloten les opent ook met een vers leraarsticket niets');
 });

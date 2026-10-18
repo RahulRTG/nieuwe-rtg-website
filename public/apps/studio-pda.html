@@ -45,6 +45,17 @@
   .i-m3b83{margin-bottom:0.5rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -66,11 +77,11 @@
   <div class="kaart" id="briefKaart">
     <div class="sec">Snel briefen</div>
     <div class="i-m3b83 rij">
-      <select class="veld" id="pCat" style="flex:1;min-width:9rem;" aria-label="Discipline"></select>
+      <select class="veld s-jwtsuz" id="pCat" aria-label="Discipline"></select>
     </div>
     <input class="i-m3b83 veld" id="pNaam" placeholder="Naam van het concept" maxlength="100">
     <input class="i-m3b83 veld" id="pBrief" placeholder="Brief: sfeer, gebruik, aandrijving" maxlength="600">
-    <button class="knop prim" id="pMaak" style="width:100%;">Concept + AI</button>
+    <button class="knop prim s-186m9vs" id="pMaak">Concept + AI</button>
   </div>
   <div class="chips" id="pFilters"></div>
   <div id="pLijst"><div class="leeg">Laden...</div></div>

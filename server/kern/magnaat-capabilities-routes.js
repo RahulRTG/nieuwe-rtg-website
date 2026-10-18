@@ -131,7 +131,10 @@ function gemounteEndpoints(root, bronnen, uniek) {
    toets (bronscannerSpook), en de Rust-tweeling leest exact dezelfde twee vormen. */
 const SAMENGESTELD_RE = /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\+\s*(['"])(\/[^'"`]*)\3/g;
 
-function ontsnap(naam) { return naam.replace(/\$/g, '\\$'); }
+/* Volledige regex-ontsnapping, ook al is de invoer een JavaScript-naam (waar
+   alleen `$` bijzonder kan zijn): een halve ontsnapping is een val voor wie
+   deze functie later voor iets anders gebruikt (CodeQL js/incomplete-sanitization). */
+function ontsnap(naam) { return naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
 function voorvoegsels(bron, uitdrukking) {
   const punt = uitdrukking.lastIndexOf('.');

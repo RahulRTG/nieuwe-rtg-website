@@ -114,7 +114,7 @@ module.exports = ({ db, save, inzagelog, hulp, serviceEnvelop }) => {
     save();
     try {
       inzagelog.noteer({ door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/abo' });
-    } catch (e) {}
+    } catch (e) { console.warn('[ledenbalie] de journaalregel bij het pasvoorstel niet vastgelegd:', e && e.message); }
     return { ok: true, voorstel: v,
       let: menselijk
         ? 'Vastgelegd als voorstel. De ' + pas + '-pas wordt alleen toegekend na een menselijk besluit; de balie verleent niets.'

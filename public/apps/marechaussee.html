@@ -60,20 +60,36 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-1hv4dhs:not(#_#_#_){color:var(--soft);font-family:Inter}
+.s-4mhsan:not(#_#_#_){color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem}
+.s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
+.s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
+.s-qge8k0:not(#_#_#_){font-size:1.15rem;margin-bottom:0.5rem}
+.s-rrt1xk:not(#_#_#_){font-size:.95rem;margin:0.5rem 0 0.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="marechaussee" class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div><div class="ey">Koninklijke Marechaussee</div><h1 id="kop">Brigade RTG Airport</h1></div>
   <a href="/apps/luchthaven.html">Airport Ops →</a>
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">Het kantoor en de PDA van de brigade op het veld: de grensbalie, patrouilles en incidenten. Log in met je persoonlijke pincode.</p>
+    <p class="s-4mhsan">Het kantoor en de PDA van de brigade op het veld: de grensbalie, patrouilles en incidenten. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
+    <button class="knop prim s-186m9vs" id="loginGo" data-hoofdactie>Inloggen</button>
   </div>
   <div id="app" hidden></div>
 </main>
@@ -148,7 +164,7 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+C.patrouillesVandaag+'</b><span>Patrouilles</span></div>'+
     '</div>'+
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
-    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Jouw post</h3>'+
+    '<h3 class="s-rrt1xk">Jouw post</h3>'+
     '<div class="keuze">'+
       '<button data-rol="grens"><span class="ic"></span>Grensbalie<span class="sub">de passagierslijst per vlucht, besluit per reiziger</span></button>'+
       '<button data-rol="patrouille"><span class="ic"></span>Patrouille<span class="sub">rondes door de zones, met bevindingen</span></button>'+
@@ -160,8 +176,8 @@ async function kiesScherm(){
     if (b.dataset.rol === 'incidenten') schermIncidenten();
   }));
 }
-function kopStuk(titel){ return '<button class="terug" id="terug">← de brigade</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>'; }
-function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-wachtcommandant adviseert; beslissen doet u zelf. Bij direct gevaar: eerst 112.</div></div>'; }
+function kopStuk(titel){ return '<button class="terug" id="terug">← de brigade</button><h2 class="s-qge8k0">'+titel+'</h2>'; }
+function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld s-jwtsuz" id="aiV" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-wachtcommandant adviseert; beslissen doet u zelf. Bij direct gevaar: eerst 112.</div></div>'; }
 function koppelBasis(){
   $('#terug').addEventListener('click', kiesScherm);
   $('#aiK').addEventListener('click', async () => {
@@ -189,7 +205,7 @@ async function laadGrens(){
     const r = await api('/api/kmar/controle/lijst', { vlucht: nr });
     $('#gLijst').innerHTML = '<div class="item"><h4><span class="nr">'+esc(r.vlucht.nummer)+'</span> · '+esc(r.vlucht.bestemming)+' · '+esc(r.vlucht.tijd)+' <span class="status goud">'+esc(r.vlucht.status)+'</span></h4></div>'+
       (r.passagiers.length ? r.passagiers.map(p =>
-        '<div class="item"><h4>'+esc(p.codenaam)+' <small style="color:var(--soft);font-family:Inter;">stoel '+esc(p.stoel)+'</small> '+
+        '<div class="item"><h4>'+esc(p.codenaam)+' <small class="s-1hv4dhs">stoel '+esc(p.stoel)+'</small> '+
         (p.besluit==='wacht'?'<span class="status">wacht</span>':p.besluit==='akkoord'?'<span class="status ok">akkoord</span>':p.besluit==='vrijgegeven'?'<span class="status ok">vrijgegeven</span>':'<span class="status open">nader onderzoek</span>')+'</h4>'+
         (p.besluit==='wacht' ? '<div class="rij"><button class="knop" data-b="'+p.boekingId+'" data-w="akkoord">Akkoord ✓</button><button class="knop rood" data-b="'+p.boekingId+'" data-w="nader-onderzoek">Nader onderzoek</button></div>'
           : p.besluit==='nader-onderzoek' ? '<div class="rij"><button class="knop" data-b="'+p.boekingId+'" data-w="vrijgegeven">Vrijgeven ✓</button></div>' : '')+'</div>').join('')
@@ -207,7 +223,7 @@ async function schermPatrouille(){
     '<div class="item" style="background:var(--card2);"><div class="meta">Loop de zones na; een bevinding leg je meteen vast. De stille zones staan bovenaan.</div></div>'+
     '<div id="pLijst">'+C.zones.map(z =>
       '<div class="item"><h4>'+esc(z)+' <span class="status">'+(C.laatstePatrouille[z]?'laatst '+tijd(C.laatstePatrouille[z]):'nog niet gelopen')+'</span></h4>'+
-      '<div class="rij"><input class="veld" data-bev="'+esc(z)+'" style="flex:1;min-width:8rem;" placeholder="Bevinding (leeg = alles rustig)" maxlength="200"><button class="knop stil" data-zone="'+esc(z)+'">Gelopen ✓</button></div></div>').join('')+'</div>'+
+      '<div class="rij"><input class="veld s-jwt5vg" data-bev="'+esc(z)+'" placeholder="Bevinding (leeg = alles rustig)" maxlength="200"><button class="knop stil" data-zone="'+esc(z)+'">Gelopen ✓</button></div></div>').join('')+'</div>'+
     aiBlok('Bijv. welke zone verdient nu aandacht?');
   koppelBasis();
   $('#pLijst').querySelectorAll('[data-zone]').forEach(b => b.addEventListener('click', async () => {
@@ -268,5 +284,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); k
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

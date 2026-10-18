@@ -86,7 +86,7 @@
               return '<div class="log" data-klacht="' + esc(k.id) + '"><b>' + esc(k.tekst) + '</b><br>' +
                 'van ' + esc(k.van) + ' &middot; <span class="pil' + (k.status === 'open' ? ' let' : ' ok') + '">' +
                 esc(k.status) + '</span>' +
-                (k.status === 'open' ? ' <button class="knop stil" data-kkies type="button" style="font-size:.7rem;padding:.15rem .5rem;">afhandelen</button>' : '') +
+                (k.status === 'open' ? ' <button class="knop stil s-1emfcyx" data-kkies type="button">afhandelen</button>' : '') +
                 (k.antwoord ? '<br>antwoord: ' + esc(k.antwoord) : '') + '</div>';
             }).join('')
           : '<div class="leeg">De klachten zijn niet op te halen in dit beeld.</div>';

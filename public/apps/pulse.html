@@ -88,6 +88,19 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/rtg-daily.css" rel="stylesheet">
 <link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-13mw0os:not(#_#_#_){color:var(--muted);font-size:.8rem;margin-top:0.5rem}
+.s-1okci5r:not(#_#_#_){margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem}
+.s-1p274fk:not(#_#_#_){border-color:var(--gold)}
+.s-betnyq:not(#_#_#_){padding:1rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -168,10 +181,10 @@ async function laad(){
   heading(first?'empty':'ready');
   document.querySelectorAll('[data-s]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===SOORT)));
   FEED=d; PLANK=null;
-  let h='<div class="schrijf"'+(first?' hidden':'')+'><textarea id="nw" maxlength="280" aria-label="Wat wilt u delen?" data-i18n-aria="daily.postPrompt" data-i18n-ph="daily.postPrompt" placeholder="Wat wilt u delen?"></textarea><div class="voet"><button class="knop stil" id="stemKnop" title="Je stemming van vandaag" data-i18n-title="pulse.moodHint">'+L('mood','Stemming')+'</button><button class="knop stil" id="terugKnop">'+L('myWeek','Mijn week')+'</button><span class="teller" id="teller">280</span><button class="knop" id="plaats">'+L('publish','Plaatsen')+'</button></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
+  let h='<div class="schrijf"'+(first?' hidden':'')+'><textarea id="nw" maxlength="280" aria-label="Wat wilt u delen?" data-i18n-aria="daily.postPrompt" data-i18n-ph="daily.postPrompt" placeholder="Wat wilt u delen?"></textarea><div class="voet"><button class="knop stil" id="stemKnop" title="Je stemming van vandaag" data-i18n-title="pulse.moodHint">'+L('mood','Stemming')+'</button><button class="knop stil" id="terugKnop">'+L('myWeek','Mijn week')+'</button><span class="teller" id="teller">280</span><button class="knop" id="plaats">'+L('publish','Plaatsen')+'</button></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden class="s-1okci5r"></div></div>';
   if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
   // het Moment van de week: een enkel lichtpunt, geen ranglijst
-  if(SOORT==='ontdek'&&d.moment) h+='<div class="post" style="border-color:var(--gold);"><div class="kop"><button class="wie" data-user-content data-profiel="'+esc(d.moment.eigen?'':d.moment.van)+'">'+L('weekMoment','Moment van de week')+' · '+esc(d.moment.codenaam)+glans(d.moment)+'</button><span class="tijd" translate="no">'+d.moment.likes+'</span></div><div class="tekst" data-user-content>'+mooi(d.moment.tekst)+'</div></div>';
+  if(SOORT==='ontdek'&&d.moment) h+='<div class="post s-1p274fk"><div class="kop"><button class="wie" data-user-content data-profiel="'+esc(d.moment.eigen?'':d.moment.van)+'">'+L('weekMoment','Moment van de week')+' · '+esc(d.moment.codenaam)+glans(d.moment)+'</button><span class="tijd" translate="no">'+d.moment.likes+'</span></div><div class="tekst" data-user-content>'+mooi(d.moment.tekst)+'</div></div>';
   h+= d.feed.length ? d.feed.map(p=>{
     const acts='<div class="acts">'+
       '<button aria-label="Waarderen" data-i18n-aria="daily.appreciate" aria-pressed="'+p.mijnLike+'" class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'"><span aria-hidden="true">♡ </span>'+p.likes+'</button>'+
@@ -226,12 +239,12 @@ async function laad(){
   $('#plankKnop').onclick=async()=>{
     try{ const pl=await api('bewaard',{});
       rememberDraft(); loadVersion++; heading('ready'); PLANK=pl;
-      $('#pulseContent').innerHTML='<div class="post" style="padding:1rem;"><h2>'+L('savedHeading','Mijn plank')+'</h2>'+
+      $('#pulseContent').innerHTML='<div class="post s-betnyq"><h2>'+L('savedHeading','Mijn plank')+'</h2>'+
         (pl.mappen.length?'<div class="trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
         (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie" data-user-content>'+esc(x.codenaam)+'</span><span class="tijd" translate="no">'+esc(x.map)+'</span></div><div class="tekst" data-user-content>'+mooi(x.tekst)+'</div></div>').join('')
           :'<div class="leeg">'+L('emptySaved','U heeft nog geen berichten bewaard.')+'</div>')+
         '<div class="h-mt80"><button class="knop" id="plankTerug">'+L('backFeed','Terug naar de feed')+'</button></div>'+
-        '<p style="color:var(--muted);font-size:.8rem;margin-top:0.5rem;">'+L('privateSaved','Uw bewaarde berichten zijn prive. De schrijver krijgt geen melding.')+'</p></div>';
+        '<p class="s-13mw0os">'+L('privateSaved','Uw bewaarde berichten zijn prive. De schrijver krijgt geen melding.')+'</p></div>';
       $('#plankTerug').onclick=()=>laad();
     }catch(e){ meld(e.message); } };
   $('#profielKnop').onclick=()=>toonProfiel(null);

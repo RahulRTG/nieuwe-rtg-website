@@ -65,6 +65,16 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-9rdqfw:not(#_#_#_){padding:0.3rem 0.6rem;font-size:0.75rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -94,7 +104,7 @@
           <svg id="tekenvlak" viewBox="0 0 480 340" role="img" aria-label="Tekenkaart van de stad; elke tik plaatst de volgende halte"></svg>
         </div>
         <p class="stil h-mt50">Elke tik op de kaart plaatst de volgende halte.
-          Zonder aanraakscherm: <button class="knop" id="midBtn" type="button" style="padding:0.3rem 0.6rem;font-size:0.75rem;">halte in het midden</button></p>
+          Zonder aanraakscherm: <button class="knop s-9rdqfw" id="midBtn" type="button">halte in het midden</button></p>
         <div id="halteLijst"></div>
         <label for="fNaam">Naam van de lijn</label>
         <input id="fNaam" maxlength="40" placeholder="Bijv. Lijn 2 Haven">

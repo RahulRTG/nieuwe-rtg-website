@@ -11,12 +11,12 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pulse-'));
-const raw = (pad, body, token) => fetch(BASE + '/api' + pad, {
+const raw = (pad, body, token) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 });
 const json = r => r.json();
-const pu = (pad, body, token) => raw('/member/pulse/' + pad, body, token);
+const pu = (pad, body, token) => raw((pad.startsWith('/api/') ? pad : '/api/member/pulse/' + pad), body, token);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -44,44 +44,44 @@ test('de 9+-poort: keur weigert grof taalgebruik en telefoonnummers, en laat nor
 
 test('posten, volgen en de chronologische feed', async () => {
   const a = await lid(), b = await lid();
-  const p1 = await json(await pu('post', { tekst: 'Mijn eerste bericht op #pulse vanaf #ibiza' }, a));
+  const p1 = await json(await pu('/api/member/pulse/post', { tekst: 'Mijn eerste bericht op #pulse vanaf #ibiza' }, a));
   assert.ok(p1.ok && p1.post.id);
   assert.deepEqual(p1.post.tags.sort(), ['ibiza', 'pulse']);
   // grof taalgebruik komt er niet in
-  assert.equal((await pu('post', { tekst: 'wat een shit dag' }, b)).status, 400);
+  assert.equal((await pu('/api/member/pulse/post', { tekst: 'wat een shit dag' }, b)).status, 400);
   // B ziet het bericht via Ontdek, nog niet via Volgend
-  let f = await json(await pu('feed', { soort: 'ontdek' }, b));
+  let f = await json(await pu('/api/member/pulse/feed', { soort: 'ontdek' }, b));
   const vanA = f.feed.find(x => x.tags.includes('pulse'));
   assert.ok(vanA, 'het bericht staat in Ontdek');
-  assert.equal((await json(await pu('feed', { soort: 'volgend' }, b))).feed.length, 0);
+  assert.equal((await json(await pu('/api/member/pulse/feed', { soort: 'volgend' }, b))).feed.length, 0);
   // B volgt A -> nu wel in Volgend, en de trending telt de hashtags
-  assert.equal((await json(await pu('volg', { key: vanA.van }, b))).volgIk, true);
-  f = await json(await pu('feed', { soort: 'volgend' }, b));
+  assert.equal((await json(await pu('/api/member/pulse/volg', { key: vanA.van }, b))).volgIk, true);
+  f = await json(await pu('/api/member/pulse/feed', { soort: 'volgend' }, b));
   assert.ok(f.feed.some(x => x.id === vanA.id));
   assert.ok(f.trending.some(t => t.tag === 'pulse'));
 });
 
 test('reageren (met 9+-poort) en je eigen bericht weghalen', async () => {
   const a = await lid(), b = await lid();
-  const p = await json(await pu('post', { tekst: 'Wie gaat er mee zeilen?' }, a));
-  assert.equal((await pu('reactie', { id: p.post.id, tekst: 'Ik! Hoe laat?' }, b)).status, 200);
-  assert.equal((await pu('reactie', { id: p.post.id, tekst: 'kut weer vandaag' }, b)).status, 400);
-  const f = await json(await pu('feed', { soort: 'ontdek' }, a));
+  const p = await json(await pu('/api/member/pulse/post', { tekst: 'Wie gaat er mee zeilen?' }, a));
+  assert.equal((await pu('/api/member/pulse/reactie', { id: p.post.id, tekst: 'Ik! Hoe laat?' }, b)).status, 200);
+  assert.equal((await pu('/api/member/pulse/reactie', { id: p.post.id, tekst: 'kut weer vandaag' }, b)).status, 400);
+  const f = await json(await pu('/api/member/pulse/feed', { soort: 'ontdek' }, a));
   assert.equal(f.feed.find(x => x.id === p.post.id).reacties.length, 1);
   // alleen de eigenaar haalt zijn bericht weg
-  assert.equal((await pu('weg', { id: p.post.id }, b)).status, 404);
-  assert.equal((await pu('weg', { id: p.post.id }, a)).status, 200);
+  assert.equal((await pu('/api/member/pulse/weg', { id: p.post.id }, b)).status, 404);
+  assert.equal((await pu('/api/member/pulse/weg', { id: p.post.id }, a)).status, 200);
 });
 
 test('melden: drie unieke melders verbergen een bericht automatisch', async () => {
   const a = await lid();
-  const p = await json(await pu('post', { tekst: 'Een bericht dat gemeld gaat worden' }, a));
+  const p = await json(await pu('/api/member/pulse/post', { tekst: 'Een bericht dat gemeld gaat worden' }, a));
   for (let i = 0; i < 3; i++) {
     const m = await lid();
-    const r = await json(await pu('meld', { id: p.post.id, reden: 'test' }, m));
+    const r = await json(await pu('/api/member/pulse/meld', { id: p.post.id, reden: 'test' }, m));
     assert.equal(r.verborgen, i === 2, 'pas bij de derde melder verdwijnt het');
   }
-  const f = await json(await pu('feed', { soort: 'ontdek' }, a));
+  const f = await json(await pu('/api/member/pulse/feed', { soort: 'ontdek' }, a));
   assert.ok(!f.feed.some(x => x.id === p.post.id), 'het gemelde bericht is verborgen');
 });
 
@@ -105,57 +105,57 @@ test('de 9+-poort geldt ook in De Salon (reacties op een seed-post)', async () =
 
 test('bewerken mag, maar nooit stiekem: de vorige versie blijft en iedereen kan hem lezen', async () => {
   const a = await lid(), b = await lid();
-  const p = await json(await pu('post', { tekst: 'De vergadering is om drie uur.' }, a));
+  const p = await json(await pu('/api/member/pulse/post', { tekst: 'De vergadering is om drie uur.' }, a));
   assert.ok(p.ok, p.error);
   const id = p.post.id;
   assert.equal(p.post.bewerkt, null, 'een verse post is niet bewerkt');
 
-  const bew = await json(await pu('bewerk', { id, tekst: 'De vergadering is om vier uur.' }, a));
+  const bew = await json(await pu('/api/member/pulse/bewerk', { id, tekst: 'De vergadering is om vier uur.' }, a));
   assert.ok(bew.ok, bew.error);
   assert.ok(bew.post.bewerkt, 'er staat nu een bewerkt-stempel op');
   assert.equal(bew.post.versies, 1);
 
   // de geschiedenis staat open voor een ander lid, niet alleen voor de schrijver
-  const hist = await json(await pu('versies', { id }, b));
+  const hist = await json(await pu('/api/member/pulse/versies', { id }, b));
   assert.equal(hist.nu, 'De vergadering is om vier uur.');
   assert.equal(hist.versies.length, 1);
   assert.equal(hist.versies[0].tekst, 'De vergadering is om drie uur.',
     'wat er stond blijft leesbaar voor wie het bericht mag zien');
 
   // een ander bewerkt jouw bericht niet
-  const inbraak = await pu('bewerk', { id, tekst: 'Iets anders.' }, b);
+  const inbraak = await pu('/api/member/pulse/bewerk', { id, tekst: 'Iets anders.' }, b);
   assert.equal(inbraak.status, 403);
 
   // dezelfde tekst is geen bewerking, en leeg mag niet
-  assert.ok((await json(await pu('bewerk', { id, tekst: 'De vergadering is om vier uur.' }, a))).error);
-  assert.ok((await json(await pu('bewerk', { id, tekst: '   ' }, a))).error);
+  assert.ok((await json(await pu('/api/member/pulse/bewerk', { id, tekst: 'De vergadering is om vier uur.' }, a))).error);
+  assert.ok((await json(await pu('/api/member/pulse/bewerk', { id, tekst: '   ' }, a))).error);
 });
 
 test('bewaren met mappen is prive, en de schrijver merkt er niets van', async () => {
   const a = await lid(), b = await lid();
-  const p = await json(await pu('post', { tekst: 'Een tip over de haven van Ibiza.' }, a));
+  const p = await json(await pu('/api/member/pulse/post', { tekst: 'Een tip over de haven van Ibiza.' }, a));
   const id = p.post.id;
 
-  const bw = await json(await pu('bewaar', { id, map: 'Reizen' }, b));
+  const bw = await json(await pu('/api/member/pulse/bewaar', { id, map: 'Reizen' }, b));
   assert.equal(bw.bewaard, true);
   assert.equal(bw.map, 'Reizen');
 
-  const plank = await json(await pu('bewaard', {}, b));
+  const plank = await json(await pu('/api/member/pulse/bewaard', {}, b));
   assert.equal(plank.aantal, 1);
   assert.equal(plank.bewaard[0].id, id);
   assert.deepEqual(plank.mappen, [{ naam: 'Reizen', aantal: 1 }], 'de map telt mee');
 
   // filteren op map, en een lege map geeft niets
-  assert.equal((await json(await pu('bewaard', { map: 'Reizen' }, b))).bewaard.length, 1);
-  assert.equal((await json(await pu('bewaard', { map: 'Werk' }, b))).bewaard.length, 0);
+  assert.equal((await json(await pu('/api/member/pulse/bewaard', { map: 'Reizen' }, b))).bewaard.length, 1);
+  assert.equal((await json(await pu('/api/member/pulse/bewaard', { map: 'Werk' }, b))).bewaard.length, 0);
 
   // de plank van B is niet die van A, en A ziet nergens dat B iets bewaarde
-  assert.equal((await json(await pu('bewaard', {}, a))).aantal, 0);
-  const feed = await json(await pu('feed', { soort: 'ontdek' }, a));
+  assert.equal((await json(await pu('/api/member/pulse/bewaard', {}, a))).aantal, 0);
+  const feed = await json(await pu('/api/member/pulse/feed', { soort: 'ontdek' }, a));
   const mijn = feed.feed.find(x => x.id === id);
   assert.equal(mijn.bewaard, false, 'in de feed van de schrijver staat niets over andermans plank');
 
   // nog een keer drukken haalt hem er weer af
-  assert.equal((await json(await pu('bewaar', { id }, b))).bewaard, false);
-  assert.equal((await json(await pu('bewaard', {}, b))).aantal, 0);
+  assert.equal((await json(await pu('/api/member/pulse/bewaar', { id }, b))).bewaard, false);
+  assert.equal((await json(await pu('/api/member/pulse/bewaard', {}, b))).aantal, 0);
 });

@@ -146,6 +146,9 @@ test('7. de bode ziet de zittingsrol op de PDA en zet de zaal klaar; de zittings
   const rol = await api(base, '/api/overheid/pda/zittingen', {}, rijk);
   const zit = rol.body.zittingen.find(z => z.ref === mk.body.zaak.ref);
   assert.ok(zit && !zit.klaargezet, 'de zitting staat op de bode-lijst');
+  // eerst staat het bode-signaal er WEL, anders zegt "geen signaal meer" hieronder niets
+  const cVoor = await api(base, '/api/overheid/rb/cockpit', {}, rijk);
+  assert.ok(cVoor.body.signalen.some(s => s.soort === 'bode' && s.ref === mk.body.zaak.ref), 'zolang de zaal niet klaarstaat, ziet de griffie het bode-signaal');
   assert.equal((await api(base, '/api/overheid/pda/klaarzet', { ref: mk.body.zaak.ref }, rijk)).status, 200);
   assert.equal((await api(base, '/api/overheid/pda/klaarzet', { ref: mk.body.zaak.ref }, rijk)).status, 409, 'staat al klaar');
   // de griffie-cockpit ziet hetzelfde: geen bode-signaal meer voor deze zaal

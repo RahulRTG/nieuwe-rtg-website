@@ -19,7 +19,7 @@ const { week, DREMPEL } = require('../server/kern/belasting');
 
 let srv, base, sch, leraar, klas, klasB, gezin, kind, kindToken;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-belasting-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
@@ -29,26 +29,26 @@ const dagOver = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'De Spil', plaats: 'Venlo' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Spil', plaats: 'Venlo' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Rein', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Rein', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     personeelId: leraar.personeelId, akkoord: true });
-  klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: '3A', trap: 'vo', fase: 'havo' })).body;
-  klasB = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klasB = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: 'Wiskunde 3', trap: 'vo', fase: 'havo' })).body;
 
-  gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Spil', naam: 'Ouder Spil', pin: '4321' })).body;
-  kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Tycho', rol: 'kind', groep: 'kind' })).body;
-  kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Spil', naam: 'Ouder Spil', pin: '4321' })).body;
+  kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Tycho', rol: 'kind', groep: 'kind' })).body;
+  kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
   for (const k of [klas, klasB]) {
-    await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: k.code, profielId: kind.profiel.id });
-    await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: k.code, akkoord: true });
+    await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: k.code, profielId: kind.profiel.id });
+    await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: k.code, akkoord: true });
   }
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -87,13 +87,13 @@ test('de telling ziet geen titel en geen naam', () => {
 /* ---------- en door de machine heen ---------- */
 test('de donderdag van de leerling telt over klassen heen, zonder wat elders staat', async () => {
   const donderdag = dagOver(3);
-  await kl('/school/huiswerk/maak', { titel: 'Verslag natuurkunde', vak: 'natuurkunde', deadline: donderdag });
-  await kl('/school/toets/maak', { soort: 'so', naam: 'SO breuken', doelen: ['rekenen.g7.procenten'], datum: donderdag });
+  await kl('/api/foundation/school/huiswerk/maak', { titel: 'Verslag natuurkunde', vak: 'natuurkunde', deadline: donderdag });
+  await kl('/api/foundation/school/toets/maak', { soort: 'so', naam: 'SO breuken', doelen: ['rekenen.g7.procenten'], datum: donderdag });
   // en in de andere klas van hetzelfde kind zet een collega er nog iets op
-  await fnd('/school/huiswerk/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  await fnd('/api/foundation/school/huiswerk/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     klasCode: klasB.code, titel: 'Geheime opdracht van de collega', vak: 'wiskunde', deadline: donderdag });
 
-  const r = await kl('/school/belasting/klas');
+  const r = await kl('/api/foundation/school/belasting/klas');
   assert.equal(r.status, 200);
   const dag = r.body.dagen.find(x => x.datum === donderdag);
   assert.equal(dag.aantal, 3, 'de donderdag telt over klassen heen');
@@ -114,13 +114,13 @@ test('de donderdag van de leerling telt over klassen heen, zonder wat elders sta
 });
 
 test('de week van de docent is planning en houdt niets bij', async () => {
-  const een = await fnd('/school/belasting/mij', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken });
+  const een = await fnd('/api/foundation/school/belasting/mij', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken });
   assert.equal(een.status, 200);
   assert.equal(een.body.klassen, 2);
   assert.ok(een.body.dagen.length >= 7);
   assert.match(een.body.uitleg, /niet bijgehouden hoe snel/i);
 
-  const twee = await fnd('/school/belasting/mij', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken });
+  const twee = await fnd('/api/foundation/school/belasting/mij', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken });
   assert.deepEqual(een.body.dagen, twee.body.dagen, 'het beeld wordt uitgerekend en niet bewaard');
 
   /* De sterkste vorm van die belofte staat in de module zelf: hij schrijft

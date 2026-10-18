@@ -98,7 +98,7 @@ module.exports = ({ store }, h) => {
           }
         }
       }
-    } catch (e) { /* de veger valt nooit de zaak om */ }
+    } catch (e) { /* de veger valt nooit de zaak om, maar zwijgt er ook niet over */ console.warn('[agenda] de herinneringsronde niet bewaard:', e && e.message); }
   }
   function startHerinneringen() {
     if (timer) return;

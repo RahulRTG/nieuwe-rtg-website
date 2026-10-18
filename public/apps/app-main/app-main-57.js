@@ -37,29 +37,29 @@
         ? '<button class="js-volg" data-code="' + p.partnerCode + '" style="margin-left:auto;background:' + (p.volgIk ? 'var(--gold)' : 'none') + ';color:' + (p.volgIk ? '#000' : 'var(--gold)') + ';border:1px solid var(--gold);border-radius:0;padding:0.25rem 0.75rem;font-size:0.66rem;font-weight:600;font-family:inherit;flex-shrink:0;cursor:pointer;">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button>'
         : '';
       const deal = p.deal
-        ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">' + T('sal.deal','Exclusief voor leden') + (p.deal.geldigTot ? ' · t/m ' + p.deal.geldigTot : '') + '</div>' +
-          '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + p.deal.titel + '</div>' +
+        ? '<div class="s-1wywltl">' +
+          '<div class="s-1wdaki3">' + T('sal.deal','Exclusief voor leden') + (p.deal.geldigTot ? ' · t/m ' + p.deal.geldigTot : '') + '</div>' +
+          '<div class="s-bqgib1">' + p.deal.titel + '</div>' +
           salonClaimBediening(p.deal) +
-          '<div style="margin-top:0.35rem;font-size:0.62rem;color:var(--soft);">' + p.deal.claims + ' ' + T('sal.geclaimd','keer geclaimd') + '</div></div>'
+          '<div class="s-1sf9ess">' + p.deal.claims + ' ' + T('sal.geclaimd','keer geclaimd') + '</div></div>'
         : '';
       const poll = p.poll
-        ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">' + T('sal.poll','Poll') + ' · ' + p.poll.totaal + ' ' + T('sal.stemmen','stem(men)') + '</div>' +
+        ? '<div class="s-1eqe06d">' +
+          '<div class="s-1wdaki3">' + T('sal.poll','Poll') + ' · ' + p.poll.totaal + ' ' + T('sal.stemmen','stem(men)') + '</div>' +
           p.poll.opties.map((o, i) => {
             const pct = p.poll.totaal ? Math.round(o.stemmen / p.poll.totaal * 100) : 0;
             return p.poll.gestemd
-              ? '<div class="h-mt45"><div style="display:flex;justify-content:space-between;font-size:0.76rem;"><span>' + (o.mijn ? '✓ ' : '') + o.tekst + '</span><span style="color:var(--soft);">' + pct + '%</span></div>' +
-                '<div style="height:4px;border-radius:0;background:rgba(255,255,255,0.08);margin-top:0.25rem;overflow:hidden;"><i style="display:block;height:100%;width:' + pct + '%;background:' + (o.mijn ? 'var(--gold)' : 'var(--soft)') + ';border-radius:0;"></i></div></div>'
+              ? '<div class="h-mt45"><div style="display:flex;justify-content:space-between;font-size:0.76rem;"><span>' + (o.mijn ? '✓ ' : '') + o.tekst + '</span><span class="s-1pv2lmv">' + pct + '%</span></div>' +
+                '<div class="s-ndv50u"><i style="display:block;height:100%;width:' + pct + '%;background:' + (o.mijn ? 'var(--gold)' : 'var(--soft)') + ';border-radius:0;"></i></div></div>'
               : '<button class="js-stem" data-optie="' + i + '" style="display:block;width:100%;margin-top:0.45rem;background:none;border:1px solid var(--line);border-radius:0;padding:0.5rem 0.7rem;color:var(--txt);font-size:0.78rem;font-family:inherit;text-align:left;cursor:pointer;">' + o.tekst + '</button>';
           }).join('') + '</div>'
         : '';
       const folder = p.folder
-        ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">' + T('sal.folder','Folder') + '</div>' +
-          '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + escT(p.folder.titel) + '</div>' +
+        ? '<div class="s-1eqe06d">' +
+          '<div class="s-1wdaki3">' + T('sal.folder','Folder') + '</div>' +
+          '<div class="s-bqgib1">' + escT(p.folder.titel) + '</div>' +
           ((p.folder.fotos && p.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.5rem;">' + p.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:96px;border-radius:0;flex-shrink:0;">').join('') + '</div>' : '') +
-          ((p.folder.items && p.folder.items.length) ? '<div style="margin-top:0.5rem;display:grid;gap:0.2rem;">' + p.folder.items.slice(0, 12).map(it => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(it.naam) + (it.tekst ? ' <span style="color:var(--soft);">· ' + escT(it.tekst) + '</span>' : '') + '</span>' + (it.prijs != null ? '<span style="color:var(--rtg-leesgoud,var(--gold));white-space:nowrap;">' + eur(it.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '') +
+          ((p.folder.items && p.folder.items.length) ? '<div style="margin-top:0.5rem;display:grid;gap:0.2rem;">' + p.folder.items.slice(0, 12).map(it => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(it.naam) + (it.tekst ? ' <span class="s-1pv2lmv">· ' + escT(it.tekst) + '</span>' : '') + '</span>' + (it.prijs != null ? '<span class="s-1gzoq4v">' + eur(it.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '') +
           '</div>'
         : '';
       const etalageBtn = p.partnerCode

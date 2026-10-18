@@ -65,6 +65,18 @@
 <script src="/shared/plek.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15bgfuc:not(#_#_#_){width:100%;margin-top:0.5rem}
+.s-1kpzn91:not(#_#_#_){margin:0.5rem 0 0 1.25rem;padding:0}
+.s-oox2we:not(#_#_#_){font-size:.85rem;line-height:1.6}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -245,13 +257,13 @@
     html += '<div class="kaartje"><b>Wilt u er iets bij schrijven?</b>' +
       '<span class="m">Hoeft niet. Het is voor uzelf.</span>' +
       '<textarea id="gNotitie" rows="3" maxlength="1000" aria-label="Voor uzelf"' +
-      ' style="width:100%;margin-top:0.5rem;">' + esc((d.vandaagIngevuld || {}).notitie || '') + '</textarea>' +
+      ' class="s-15bgfuc">' + esc((d.vandaagIngevuld || {}).notitie || '') + '</textarea>' +
       '<div class="rij"><button class="knop mini" id="gBewaar">Bewaren</button>' +
       (d.vandaagIngevuld ? '<button class="knop mini" id="gWeg">Wissen</button>' : '') + '</div></div>';
 
     const esc2 = x => '<div class="kaartje"><b>' + esc(x.kop) + '</b><span class="m">' + esc(x.tekst) + '</span>' +
-      '<ul style="margin:0.5rem 0 0 1.25rem;padding:0;">' + (x.wegen || []).map(w =>
-        '<li style="font-size:.85rem;line-height:1.6;"><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') +
+      '<ul class="s-1kpzn91">' + (x.wegen || []).map(w =>
+        '<li class="s-oox2we"><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') +
       '</ul></div>';
 
     if (antwoord && antwoord.mag === false) {
@@ -474,7 +486,7 @@
         '</div>' +
         '<textarea id="nNodig" rows="2" maxlength="200" aria-label="Wat moet iemand meteen weten"' +
           ' placeholder="Wat moet iemand meteen weten? Houd het kort."' +
-          ' style="width:100%;margin-top:0.5rem;">' + esc(k.watNodig) + '</textarea>' +
+          ' class="s-15bgfuc">' + esc(k.watNodig) + '</textarea>' +
         '<label class="keus"><input type="checkbox" id="nZorg"' + (k.zorgErbij ? ' checked' : '') +
           '> Zet mijn allergenen en aandachtspunten uit mijn zorgprofiel erbij</label>' +
         '<label class="keus"><input type="checkbox" id="nMeds"' + (k.medicijnenErbij ? ' checked' : '') +

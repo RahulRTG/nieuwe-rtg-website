@@ -19,34 +19,34 @@
     if (!has('opvang')){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/opvang'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
     const k = d.kpi;
-    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+    let h = '<div class="s-1ah2knl">'+
       [[k.aanwezig, T('op.k.aan','kinderen aanwezig')],[k.plekkenVrij, T('op.k.vrij','plekken vrij')],[k.nannyOpen, T('op.k.nanny','nanny-aanvragen')],[k.verslagenVandaag, T('op.k.verslag','verslagjes vandaag')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div class="s-1fk9glc"><b class="s-123kxff">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de groepen: aanmelden en ophalen (alleen door de aangemelde ouder)
     h += '<div class="st-sec h-mt100">'+T('op.groepen','De groepen')+'</div>'+
       '<div class="row-gap"><select id="opGroep" class="st-in h-flex2">'+d.groepen.map(g=>'<option value="'+g.id+'">'+esc(g.naam)+' · '+g.aanwezig.length+' van '+g.capaciteit+'</option>').join('')+'</select>'+
       '<input id="opKind" class="st-in h-flex1" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30"><input id="opOuder" class="st-in h-flex1" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60">'+
       '<button id="opMeld" style="flex:1;'+vzGoud+'">'+T('op.meld','Meld aan')+'</button></div>';
-    h += d.groepen.map(g=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
-      '<b style="font-size:0.85rem;">'+esc(g.naam)+'</b>'+
-      (g.aanwezig.length?g.aanwezig.map(kd=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.3rem 0;">'+
-        '<span style="flex:1;font-size:0.82rem;">'+esc(kd.voornaam)+'</span>'+
-        '<input data-opoud="'+g.id+':'+kd.id+'" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" style="flex:0 0 9rem;">'+
+    h += d.groepen.map(g=>'<div class="s-q8bqou">'+
+      '<b class="s-2txdhg">'+esc(g.naam)+'</b>'+
+      (g.aanwezig.length?g.aanwezig.map(kd=>'<div class="s-1d7lcvd">'+
+        '<span class="s-1q6iem4">'+esc(kd.voornaam)+'</span>'+
+        '<input data-opoud="'+g.id+':'+kd.id+'" class="st-in s-12baygy" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60">'+
         vzKnop('data-ophaal', g.id+':'+kd.id, T('op.haal','Ophalen'), true)+'</div>').join(''):'<p class="sub h-mt30">'+T('op.leeg','Nog niemand aangemeld.')+'</p>')+'</div>').join('');
 
     // de nanny-service: aanvraag, en een mens bevestigt met een gescreende nanny
     h += '<div class="st-sec h-mt100">'+T('op.nanny','Nanny-service')+'</div>'+
       '<div class="row-gap"><input id="opGezin" class="st-in h-flex1" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60"><input id="opNDatum" class="st-in h-flex1" type="date"><input id="opNVan" class="st-in h-flex1" type="time"><input id="opNTot" class="st-in h-flex1" type="time">'+
       '<button id="opNVraag" style="flex:1;'+vzGoud+'">'+T('op.vraag','Vraag aan')+'</button></div>';
-    h += (d.nannyBoekingen||[]).map(a=>'<div style="border:1px solid '+(a.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(a.gezin)+' · '+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+'</b><span class="sub">'+esc(a.status)+(a.nanny?' · '+esc(a.nanny):'')+'</span></div>'+
+    h += (d.nannyBoekingen||[]).map(a=>'<div class="' + (a.status==='afgerond' ? 's-q8bqou' : 's-dbavhu') + '">'+
+      '<div class="s-tbd6xd"><b class="s-1q6kbkp">'+esc(a.gezin)+' · '+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+'</b><span class="sub">'+esc(a.status)+(a.nanny?' · '+esc(a.nanny):'')+'</span></div>'+
       (a.status==='aangevraagd'?'<div class="row-gap h-mt45"><select data-opnn="'+a.id+'" class="st-in h-flex2">'+d.nannies.map(n=>'<option value="'+n.id+'">'+esc(n.naam)+' (gescreend)</option>').join('')+'</select>'+vzKnop('data-opnb', a.id, T('op.bevestig','Bevestig'), true)+'</div>':
         a.status==='bevestigd'?'<div class="h-mt45">'+vzKnop('data-opna', a.id, T('op.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
 
     // dagverslagjes met alleen voornamen
     h += '<div class="st-sec h-mt100">'+T('op.verslag','Dagverslagjes')+'</div>'+
-      '<div class="row-gap"><input id="opVKind" class="st-in h-flex1" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
+      '<div class="row-gap"><input id="opVKind" class="st-in h-flex1" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30"><input id="opVTekst" class="st-in s-1dzu8du" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240">'+
       '<button id="opVMaak" style="flex:1;'+vzGoud+'">'+T('op.schrijf','Schrijf')+'</button></div>';
     h += (d.verslagen||[]).slice(0,6).map(v=>'<div class="sub" style="padding:0.3rem 0;"><b>'+esc(v.voornaam)+'</b> · '+esc(v.tekst)+'</div>').join('');
     h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';

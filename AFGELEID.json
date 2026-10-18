@@ -3,8 +3,8 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-18T12:10:01.410Z",
-  "commit": "a64eb0eef",
+  "op": "2026-10-18T12:58:20.970Z",
+  "commit": "32e5ba8ad",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
@@ -12,14 +12,14 @@
  },
  "gemeten": {
   "artefacten": 390,
-  "bron": 54,
+  "bron": 51,
   "afgeleid": 205,
   "fragmenten": 28,
   "momentopname": 1,
-  "onbeslist": 102,
-  "afgeleidZonderEigenaar": 0,
-  "metEigenaar": 234,
-  "afgeleidEigenaarHard": 205,
+  "onbeslist": 105,
+  "afgeleidZonderEigenaar": 1,
+  "metEigenaar": 233,
+  "afgeleidEigenaarHard": 204,
   "afgeleidGrendelt": 69,
   "metStempel": 129,
   "stempelAnders": 0
@@ -361,7 +361,7 @@
   },
   {
    "naam": "BELOFTE.json",
-   "soort": "BRON",
+   "soort": "ONBESLIST",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -659,7 +659,7 @@
   },
   {
    "naam": "CODECREDENTIALS.json",
-   "soort": "BRON",
+   "soort": "ONBESLIST",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -1218,8 +1218,8 @@
   {
    "naam": "ENVELOP.json",
    "soort": "AFGELEID",
-   "eigenaar": "scripts/envelopvelden.js",
-   "graad": "verklaard",
+   "eigenaar": null,
+   "graad": "meerdere",
    "schrijvers": [
     "scripts/actorvormen.js",
     "scripts/envelopvelden.js"
@@ -1227,8 +1227,8 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": false,
-   "botsingVerklaard": true
+   "grendelt": null,
+   "botsingVerklaard": false
   },
   {
    "naam": "EU.md",
@@ -4171,7 +4171,7 @@
   },
   {
    "naam": "SLO.json",
-   "soort": "BRON",
+   "soort": "ONBESLIST",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],

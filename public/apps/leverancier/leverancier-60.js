@@ -69,7 +69,7 @@
   const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
   function ridePill(st){ return st==='aangevraagd'?'nieuw':RIT_KLAAR(st)?'klaar':'bereiding'; }
   function ritRegel(r){
-    return (r.passengers?''+r.passengers+' ':'')+(r.luggage?''+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(r.quote)+'</b>':'');
+    return (r.passengers?''+r.passengers+' ':'')+(r.luggage?''+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b class="s-12itpbj">'+eur(r.quote)+'</b>':'');
   }
   function renderRides(){
     const list = (state.rides || []).filter(r => !RIT_KLAAR(r.status));
@@ -83,7 +83,7 @@
           '<div class="ref">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+' · '+timeAgo(r.at)+'</div></div>'+
           '<span class="pill '+ridePill(r.status)+'">'+tStatus(r.status)+'</span></div>'+
         '<div class="ref h-mt25">'+ritRegel(r)+
-          (r.driver?' ·  '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span style="color:var(--amber,#B8860B);">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
+          (r.driver?' ·  '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span class="s-1q1tsw1">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
         (r.note?'<div class="ref">'+r.note+'</div>':'')+
         (r.zorg?'<div class="allergy">'+T('sup.zorgp','Zorgprofiel gast:')+' '+esc(zorgTekst(r.zorg))+'</div>':'')+
         eta +

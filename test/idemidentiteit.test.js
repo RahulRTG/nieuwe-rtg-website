@@ -15,6 +15,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const M = require('../scripts/idemidentiteit');
 
@@ -58,12 +59,30 @@ test('3 - de tweede familie wordt meegenomen, en dat is de dragende bewering', (
   assert.deepEqual(verzoek.vergeleken, ['bedrag', 'naarCodename'],
     'en te laten zien dat het sinds #270 op bedrag EN ontvanger vergelijkt');
 
-  /* En de familie is niet leeg op een andere manier: er staan plekken in die
-     NIETS vergelijken. Dat is geen aanklacht (rij.js dient een klacht in in
-     plaats van een oud antwoord terug te geven) maar het is wel de lijst waar
-     de volgende migratie uit komt. */
-  assert.ok(r.handwerkGeenVergelijking >= 1,
-    'de meter hoort ook de plekken te vinden die niets vergelijken; vindt hij er nul, kijk of hij nog leest');
+  /* En de meter VINDT plekken die niets vergelijken. Hier stond dat er in de
+     LEVENDE code minstens een moest staan (rij.js), en dat maakte van de laatste
+     reparatie een rode toets: een ratel die omlaag moet, kon zijn nul niet halen.
+     Sinds 18 oktober 2026 vergelijkt rij.js wel (soort, bedrag, bron en
+     bestemming), dus de uitslag wordt nu op een VASTE invoer geijkt: een
+     opzoeking die het oude antwoord blind teruggeeft, en een die vergelijkt.
+     Dat bewijst hetzelfde -- de lezer kan beide vormen zien -- zonder dat er
+     een gebrek in het huis hoeft te blijven staan om hem te laten slagen. */
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-idemid-'));
+  const blind = path.join(map, 'blind.js');
+  const kijkt = path.join(map, 'kijkt.js');
+  fs.writeFileSync(blind, "function plaats(o) {\n  const al = vindOpIdem(o.sleutel);\n  if (al) return al;\n  return o;\n}\n");
+  fs.writeFileSync(kijkt, "function plaats(o) {\n  const al = vindOpIdem(o.sleutel);\n  if (al && al.centen !== o.centen) throw new Error('anders');\n  if (al) return al;\n  return o;\n}\n");
+  try {
+    const [b] = M.handwerk([blind]);
+    const [k] = M.handwerk([kijkt]);
+    assert.equal(b && b.uitspraak, 'geenVergelijking', 'een blinde herhaling hoort als geenVergelijking te tellen');
+    assert.equal(k && k.uitspraak, 'vergelijkt', 'en een die vergelijkt als vergelijkt');
+    assert.deepEqual(k.vergeleken, ['centen']);
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
+  const rij = r.handwerk.find(h => h.bestand === 'server/kern/betaalopdracht/rij.js');
+  assert.ok(rij, 'de betaalrij hoort in de tweede familie te staan');
+  assert.deepEqual(rij.vergeleken, ['bestemming', 'bron', 'centen', 'soort'],
+    'en te laten zien dat zij sinds 18 oktober 2026 de economische identiteit vergelijkt');
   assert.ok(r.handwerkPlekken >= 4, 'vier plekken waren er bij het schrijven; minder betekent dat de lezer iets mist');
 });
 

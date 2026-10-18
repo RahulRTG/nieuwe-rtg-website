@@ -147,7 +147,6 @@ const NAGEKEKEN = {
   'blauwdruk.privacyklasse': 'De abstractie is een veldselectie ({ naam, doel }), geen woord.',
   'melden.privacyklasse': 'De melder uit de sessie heet `melder`, en dat woord valt onder actor.',
   'fork.privacyklasse': 'Het bedrag dat NIET meereist is `budgetCenten: 0`, geen woord.',
-  'oplossen.terugweg': 'Terugzetten is dezelfde zetStand, geen apart woord.',
   'les.voorwaarden': 'De keuzelijst staat in een tekenreeks; de woordenas leest geen tekenreeksen.'
 };
 

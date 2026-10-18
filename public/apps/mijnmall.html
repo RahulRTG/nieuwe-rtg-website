@@ -80,7 +80,7 @@
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-shop-flow rtg-shop-my" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="mijnmall" class="rtg-stijl rtg-shop-flow rtg-shop-my" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -152,6 +152,10 @@
 <script src="/shared/adaptief/grammatica.js"></script>
 <script src="/shared/adaptief/vorm.js"></script>
 <script src="/shared/adaptief/register.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 <script src="/shared/adaptief/gewicht.js"></script>
 <script src="/shared/adaptief/balkknop.js"></script>
 <script src="/apps/mall-aanvraag-edge.js"></script>

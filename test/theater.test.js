@@ -109,6 +109,18 @@ test('4. abonneren, reageren op codenaam en melden bij kantoor', async () => {
   const re = await api('/api/theater/reactie', { id: videoId, tekst: 'Prachtig licht in dit atelier.' }, kijker);
   assert.equal(re.status, 200);
   assert.ok(!/Lid /.test(re.body.reactie.codenaam), 'de reactie draagt de codenaam, nooit de echte naam');
+  /* /api/theater/reacties: de maker leest terug wat er onder zijn video staat,
+     precies die reactie en op codenaam. MUTATIE GEZIEN ZAKKEN: in
+     server/kern/theater/zaal.js reacties() laten lezen onder een vaste sleutel
+     ('') in plaats van het video-id; deze bewering zakte. */
+  const lijst = await api('/api/theater/reacties', { id: videoId }, maker);
+  assert.equal(lijst.status, 200);
+  assert.equal(lijst.body.reacties.length, 1, 'de ene reactie staat eronder');
+  assert.equal(lijst.body.reacties[0].tekst, 'Prachtig licht in dit atelier.');
+  assert.equal(lijst.body.reacties[0].codenaam, re.body.reactie.codenaam);
+  assert.equal((await api('/api/theater/reacties', { id: 'bestaat-niet' }, maker)).body.reacties.length, 0,
+    'onder een andere video staat niets');
+  assert.equal((await api('/api/theater/reacties', { id: videoId }, null)).status, 401);
   const meld = await api('/api/theater/meld', { id: videoId, reden: 'Verkeerd label' }, kijker);
   assert.equal(meld.status, 200);
   const kantoor = await api('/api/office/theater', {}, office);

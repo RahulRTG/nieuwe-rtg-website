@@ -3,18 +3,18 @@
       ap.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
     // klant erbij pakken
     html += '<div class="card"><div class="k">'+T('pd.w.klant','Klant erbij pakken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
+      '<div class="s-v4g2d9">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
       '<div class="h-mt50" id="wKlantUit">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
     wrap.innerHTML = html;
     winkelBind(wrap);
   }
   function winkelKlantKaart(k){
     const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
-    return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;">'+
-      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--rtg-leesgoud,var(--gold));">'+eur(k.besteedTotaal)+'</span></div>'+
-      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
-      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
-      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+    return '<div class="s-muks8c">'+
+      '<div class="s-7l4opl"><b>'+esc(k.codenaam||k.key)+'</b><span class="s-12itpbj">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div class="s-1qn5v5s">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div class="s-6giw2j">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div class="s-1ef4oo5">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
       '</div>';
   }
   function winkelBind(wrap){
@@ -55,10 +55,10 @@
         const r = await API.call('/supplier/retail/zoek', { q: wrap.querySelector('#wZoek').value });
         uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
           '<div class="task"><span class="ic">'+(v.voorraad>0?'':'')+'</span><div class="t"><b>'+esc(v.artikel)+'</b><span>'+esc(v.kleur)+' · '+esc(v.maat)+' · '+eur(v.price)+' · '+T('pd.w.voorraad','voorraad')+' '+v.voorraad+'</span></div>'+
-          '<div style="display:flex;gap:0.3rem;">'+
+          '<div class="s-1x92i8j">'+
           (v.voorraad>0?'<button class="abtn" data-wadd="'+esc(v.vsku)+'" data-wnaam="'+esc(v.artikel)+'" data-wkleur="'+esc(v.kleur)+'" data-wmaat="'+esc(v.maat)+'" data-wprice="'+v.price+'">+</button>':'')+
           (v.voorraad>0?'<button class="abtn ghost" data-wapart="'+esc(v.vsku)+'">'+T('pd.w.legapart','Apart')+'</button>':'')+
-          '</div></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.w.niets','Niets gevonden.')+'</div>';
+          '</div></div>').join('') : '<div class="s-7a7ief">'+T('pd.w.niets','Niets gevonden.')+'</div>';
         // knoppen in de resultaten binden
         uit.querySelectorAll('[data-wadd]').forEach(b => b.addEventListener('click', () => {
           const bestaand = winkelCart.find(r => r.vsku === b.dataset.wadd);
@@ -110,11 +110,11 @@
     const br = o.briefing || { punten:[] };
     html += '<div class="card"><div class="k">'+T('pd.boer.vandaag','Vandaag op het land')+'</div>'+
       (br.punten.length ? br.punten.map(p => '<div class="task"><span class="ic">'+(p.soort==='oogst'?'':p.soort==='voer'?'':p.soort==='water'?'':p.soort==='gezondheid'?'':'')+'</span><div class="t"><b>'+esc(p.tekst)+'</b></div></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.rustig','Niets dringends. Fijne dag.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.boer.rustig','Niets dringends. Fijne dag.')+'</div>')+'</div>';
     // Taken van vandaag / open
     const open = (o.taken||[]).filter(t => !t.klaar);
     html += '<div class="card"><div class="k">'+T('pd.boer.taken','Taken')+' ('+open.length+')</div>'+
       (open.length ? open.map(t => '<div class="task"><span class="ic">'+((t.voor&&t.voor<vandaag)?'':'')+'</span><div class="t"><b>'+esc(t.wat)+'</b><span>'+(t.waar?''+esc(t.waar):'')+(t.voor?' · '+esc(t.voor):'')+'</span></div><button class="abtn" data-btaak="'+t.id+'">'+T('pd.boer.klaar','Klaar')+'</button></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.geentaak','Geen open taken.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.boer.geentaak','Geen open taken.')+'</div>')+'</div>';
     // Percelen: oogsten en water geven
     const perc = (o.percelen||[]).filter(p => p.gewasLabel && p.fase !== 'geoogst');

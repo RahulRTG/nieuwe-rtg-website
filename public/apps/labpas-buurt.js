@@ -29,7 +29,7 @@
         return '<div class="log" data-thema="' + esc(t.id) + '"><b>' + esc(t.vraag) + '</b><br>' +
           t.stemmen + ' stem' + (t.stemmen === 1 ? '' : 'men') +
           (t.studieId ? ' &middot; <span class="pil ok">wordt onderzocht</span>'
-            : ' &middot; <button class="knop stil" data-stem type="button" style="font-size:.72rem;padding:.2rem .55rem;">Ik ook</button>') +
+            : ' &middot; <button class="knop stil s-1q9bgge" data-stem type="button">Ik ook</button>') +
           '</div>';
       }).join('') || '<div class="leeg">Nog geen vragen. Dien de eerste in.</div>';
       Array.prototype.forEach.call(document.querySelectorAll('[data-stem]'), function (b) {

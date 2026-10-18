@@ -46,7 +46,7 @@
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="foundation.reis" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="topnav"><span class="brand">Rahul Travel <b>Foundation</b></span><a href="index.html">← Foundation</a></div>
 <div class="wrap" id="wrap" role="main">
   <div class="hero">
@@ -119,5 +119,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="premium.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

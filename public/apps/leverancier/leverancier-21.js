@@ -7,7 +7,7 @@
         '<button class="bigbtn h-mt20" id="kPrSend">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs; u ontvangt altijd het volledige bedrag, RTG rekent 0% commissie.')+'</div></div>';
       html += '<div class="tkc"><h3>'+T('sup.pricehist','Eerder doorgegeven')+'</h3>'+
-        (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(p.price)+'</b></div>').join('')
+        (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b class="s-12itpbj">'+eur(p.price)+'</b></div>').join('')
         : '<div class="tkc-who">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>')+'</div>';
     }
     if (kantoorSec === 'marketing'){
@@ -18,7 +18,7 @@
         (photos.length<6?'<label class="ph add">+<input type="file" id="kPhFile" accept="image/jpeg,image/png,image/webp" style="display:none;"></label>':'')+
         '</div><div class="tkc-who">'+T('sup.photonote','Gasten zien deze foto\'s in de RTG-app bij uw pagina, direct na plaatsen.')+'</div></div>';
       html += '<div class="tkc"><h3>'+T('sup.salonpub','Publiceer op De Salon')+'</h3>'+
-        '<div class="st-form"><textarea class="st-in" id="kSpText" placeholder="'+T('kt.salonph','Vertel RTG-leden over uw nieuwste aanbod, suite of avond...')+'" style="min-height:70px;resize:vertical;"></textarea>'+
+        '<div class="st-form"><textarea class="st-in s-1olxuka" id="kSpText" placeholder="'+T('kt.salonph','Vertel RTG-leden over uw nieuwste aanbod, suite of avond...')+'"></textarea>'+
         (photos.length?'<div class="ph-pick">'+photos.map((p,i)=>'<img src="'+p+'" data-kpick="'+i+'" alt="">').join('')+'</div>':'')+
         '<button class="bigbtn" id="kSpPost">'+T('sup.salonpost','Publiceer als RTG-partner')+'</button></div>'+
         '<div class="tkc-who">'+T('sup.salonnote','Uw bericht staat er direct, zonder wachttijd (de 7-dagen-regel geldt alleen voor leden). Alle leden zien het met uw bedrijfsnaam als partner; uw volgers krijgen een melding.')+'</div></div>';
@@ -30,15 +30,15 @@
         html += '<div class="tkc h-volbreed"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+mktData.error+'</div></div>';
       } else {
         const mk = mktData;
-        if (mktMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+mktMsg+'</div>'; }
+        if (mktMsg){ html += '<div class="tkc s-9ncju4">'+mktMsg+'</div>'; }
         html += '<div class="tkc h-volbreed"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3>'+
           '<div class="tkc-who">'+T('mk.salon.s','Vast onderdeel van uw RTG-partnerschap: leden volgen uw zaak en krijgen een melding bij elk bericht.')+'</div>'+
-          '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;">'+
+          '<div class="s-116fi4o">'+
           [[T('mk.volgers','Volgers'), mk.volgers], [T('mk.posts','Berichten'), mk.posts], ['Likes', mk.likes], [T('mk.reacties','Reacties'), mk.reacties]]
-          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;text-align:center;">'+
-            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--rtg-leesgoud,var(--gold));">'+x[1]+'</div>'+
-            '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
-          '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
+          .map(x => '<div class="s-1fnwq24">'+
+            '<div class="s-c8fkab">'+x[1]+'</div>'+
+            '<div class="s-1wpvz51">'+x[0]+'</div></div>').join('')+'</div>'+
+          '<div class="st-form"><textarea class="st-in s-1a76yta" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'">'+(mk.bio||'')+'</textarea>'+
           '<button class="obtn primary" id="mkBioSave" style="align-self:flex-start;">'+T('mk.biosave','Bio opslaan')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('mk.deal','Exclusieve aanbieding')+'</h3>'+
           '<div class="tkc-who">'+T('mk.deal.s','Alleen voor leden; zij claimen met een persoonlijke code die u aan de kassa verzilvert. Pure klantbinding.')+'</div>'+
@@ -48,7 +48,7 @@
           '<button class="bigbtn" id="mkDealGo">'+T('mk.dealgo','Zet op De Salon')+'</button></div>'+
           (mk.deals.length ? mk.deals.map(d2 =>
             '<div class="st-row"><span>'+d2.titel+'<span class="sub">'+(d2.geldigTot?'t/m '+d2.geldigTot+' · ':'')+d2.claims+' '+T('mk.claims','geclaimd')+' · '+d2.verzilverd+' '+T('mk.verzilverd','verzilverd')+'</span></span></div>').join('') : '')+
-          '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><input class="st-in h-flex1" id="mkCode" placeholder="RTG-D-XXXXXX">'+
+          '<div class="s-v4g2d9"><input class="st-in h-flex1" id="mkCode" placeholder="RTG-D-XXXXXX">'+
           '<button class="obtn" id="mkRedeem">'+T('mk.innen','Verzilver')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
           '<div class="tkc-who">'+T('mk.poll.s','Marketinginzicht: laat leden kiezen en zie live de uitslag.')+'</div>'+
@@ -56,11 +56,11 @@
           '<input class="st-in" id="mkP1" placeholder="'+T('mk.optie','Optie')+' 1"><input class="st-in" id="mkP2" placeholder="'+T('mk.optie','Optie')+' 2"><input class="st-in" id="mkP3" placeholder="'+T('mk.optie','Optie')+' 3 ('+T('mk.optioneel','optioneel')+')">'+
           '<button class="bigbtn" id="mkPollGo">'+T('mk.pollgo','Plaats de poll')+'</button></div>'+
           (mk.polls.length ? mk.polls.map(pl =>
-            '<div class="h-mt40"><div class="tkc-who" style="color:var(--txt);">'+pl.vraag+'</div>'+
-            pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
+            '<div class="h-mt40"><div class="tkc-who s-1btm41d">'+pl.vraag+'</div>'+
+            pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b class="s-12itpbj">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
       }
       // pr-plus (los script leverancier-pr.js): planner, nieuwsbrief, bereik
-      html += '<div id="prPlusWortel" style="display:contents;"></div>';
+      html += '<div id="prPlusWortel" class="s-q28qmq"></div>';
     }
     return html;
   }

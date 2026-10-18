@@ -61,6 +61,16 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-ndyzcf:not(#_#_#_){margin:0 0 0.5rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -98,7 +108,7 @@
     <div id="loopt" class="weg">
       <div class="kaart nuHero"><div class="nuLabel">Nu</div><h3 id="nuTitel">Rijd uw lijn</h3><p class="stil">Uw positie en bezetting lopen automatisch mee. Kijk alleen naar uitzonderingen.</p><div class="tellers h-mt80"><span><b id="tAanBoord">0</b><span>aan boord</span></span><span><b id="tVandaag">0</b><span>vandaag</span></span></div><p class="stil h-mt60" id="gpsStatus">GPS delen…</p></div>
       <h2>Hierna</h2>
-      <div class="kaart opdracht"><h2 style="margin:0 0 0.5rem;">Veilige automatische dienst</h2>
+      <div class="kaart opdracht"><h2 class="s-ndyzcf">Veilige automatische dienst</h2>
         <div class="veilig">GPS en bezetting worden bijgewerkt nadat u de dienst zelf start.</div>
         <div class="veilig">Geld, identiteit en uitzonderingen worden nooit automatisch beslist.</div>
         <div class="veilig">Stoppen blijft altijd direct beschikbaar.</div></div>

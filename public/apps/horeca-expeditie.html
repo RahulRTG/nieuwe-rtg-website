@@ -17,6 +17,17 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12sanwk:not(#_#_#_){flex:0 1 6rem}
+.s-12sbaw3:not(#_#_#_){flex:0 1 7rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -53,7 +64,7 @@
   <div class="kaart">
     <div class="kop">Drukterem</div>
     <div class="rij">
-      <input class="veld" id="eKokken" type="number" min="1" max="60" value="3" aria-label="Aantal koks" style="flex:0 1 6rem;">
+      <input class="veld s-12sanwk" id="eKokken" type="number" min="1" max="60" value="3" aria-label="Aantal koks">
       <button class="knop" id="eDruk" type="button">Herbereken</button>
     </div>
     <p class="stil h-mt40" id="eDrukUit"></p>
@@ -65,7 +76,7 @@
     <div class="kop">Bereidingstijd vastleggen</div>
     <div class="rij">
       <input class="veld" id="eGerecht" maxlength="80" placeholder="Gerecht" aria-label="Gerecht">
-      <input class="veld" id="eMinuten" type="number" min="1" max="180" placeholder="Minuten" aria-label="Minuten" style="flex:0 1 7rem;">
+      <input class="veld s-12sbaw3" id="eMinuten" type="number" min="1" max="180" placeholder="Minuten" aria-label="Minuten">
       <button class="knop p" id="eTijd" type="button">Vastleggen</button>
     </div>
     <p class="stil h-mt40">Zonder eigen tijd rekent het bord met een standaard per station. Wat hier staat, maakt het vertragingssignaal pas scherp.</p>

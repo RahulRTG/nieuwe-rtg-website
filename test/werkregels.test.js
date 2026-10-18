@@ -26,32 +26,32 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkregels-'));
-const api = (pad, body) => fetch(BASE + '/api/bedrijf' + pad, {
+const api = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/bedrijf' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 /* Alleen de sleutels die de poort leest -- zie de kop van werkregister.test.js
    voor waarom `id` en `naam` hier niet in horen. */
 async function lid(ruimte, beheer, naam, rollen) {
-  const a = (await api('/lid/aanmeld', { werkruimte: ruimte, naam })).body;
-  await api('/lid/besluit', { werkruimte: ruimte, beheerToken: beheer, lidId: a.lidId, akkoord: true });
-  await api('/lid/rollen', { werkruimte: ruimte, beheerToken: beheer, lidId: a.lidId, rollen });
+  const a = (await api('/api/bedrijf/lid/aanmeld', { werkruimte: ruimte, naam })).body;
+  await api('/api/bedrijf/lid/besluit', { werkruimte: ruimte, beheerToken: beheer, lidId: a.lidId, akkoord: true });
+  await api('/api/bedrijf/lid/rollen', { werkruimte: ruimte, beheerToken: beheer, lidId: a.lidId, rollen });
   return { werkruimte: ruimte, lidToken: a.lidToken };
 }
 const teken = (con, partij, naam, wie) =>
-  api('/contract/teken', Object.assign({ contractId: con, partij, naam }, wie));
+  api('/api/bedrijf/contract/teken', Object.assign({ contractId: con, partij, naam }, wie));
 
 let W, B, JU, FI, DI;
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const w = (await api('/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
+  const w = (await api('/api/bedrijf/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
   W = w.werkruimte; B = w.beheerToken;
   JU = await lid(W, B, 'Joris', ['jurist']);      // recht
   FI = await lid(W, B, 'Fien', ['financieel']);    // geld, cijfer, klant -- GEEN geld.goedkeuren
   DI = await lid(W, B, 'Dana', ['directie']);      // alles, inclusief geld.goedkeuren en recht
 
-  const r = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
+  const r = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
     boven: 50000, eist: ['recht', 'geld.goedkeuren'] });
   assert.equal(r.status, 200, 'de regel hoort te staan voordat de rest begint');
 });
@@ -62,29 +62,29 @@ test.after(() => {
 });
 
 test('1. een regel voor een soort die nergens wordt afgedwongen, bestaat niet', async () => {
-  const uit = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'project',
+  const uit = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'project',
     boven: 10000, eist: ['geld.goedkeuren'] });
   assert.equal(uit.status, 400, 'er is geen plek waar zo\'n regel iets tegenhoudt');
   assert.match(uit.body.let, /theater/i, 'en het antwoord zegt waarom');
 
-  const lijst = (await api('/regels', { werkruimte: W, beheerToken: B })).body;
+  const lijst = (await api('/api/bedrijf/regels', { werkruimte: W, beheerToken: B })).body;
   assert.equal(lijst.regels.length, 1, 'alleen de contractregel staat er');
   assert.match(lijst.regels[0].afgedwongen, /activeren van een contract/i, 'elke regel noemt WAAR hij bijt');
 });
 
 test('2. onder de drempel verandert er niets', async () => {
-  const c = (await api('/contract/zet', Object.assign({ titel: 'Kantoorplanten',
+  const c = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Kantoorplanten',
     wederpartij: 'Groenhof', soort: 'leverancier', waarde: 4000 }, JU))).body.contract;
   await teken(c.id, 'wij', 'Joris', JU);
   const na = await teken(c.id, 'wederpartij', 'Groenhof BV', JU);
   assert.equal(na.body.contract.status, 'actief', 'twee handtekeningen en klaar');
 
-  const k = (await api('/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
+  const k = (await api('/api/bedrijf/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
   assert.deepEqual(k.regels, [], 'dit contract valt onder geen enkele regel');
 });
 
 test('3. boven de drempel houdt de regel het tegen', async () => {
-  const c = (await api('/contract/zet', Object.assign({ titel: 'Vervoer Fjordlijn',
+  const c = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Vervoer Fjordlijn',
     wederpartij: 'Fjordlijn Transport', soort: 'leverancier', waarde: 120000 }, JU))).body.contract;
   await teken(c.id, 'wij', 'Joris', JU);
   const na = await teken(c.id, 'wederpartij', 'Fjordlijn BV', JU);
@@ -95,66 +95,66 @@ test('3. boven de drempel houdt de regel het tegen', async () => {
 });
 
 test('4. een mens keurt een keer goed, en het beheer-token keurt niet', async () => {
-  const c = (await api('/contract/zet', Object.assign({ titel: 'Wagenpark',
+  const c = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Wagenpark',
     wederpartij: 'Kaap Lease', soort: 'leverancier', waarde: 200000 }, JU))).body.contract;
   await teken(c.id, 'wij', 'Joris', JU);
   await teken(c.id, 'wederpartij', 'Kaap Lease BV', JU);
 
-  const beheer = await api('/keur', { werkruimte: W, beheerToken: B, soort: 'contract', id: c.id, recht: 'recht' });
+  const beheer = await api('/api/bedrijf/keur', { werkruimte: W, beheerToken: B, soort: 'contract', id: c.id, recht: 'recht' });
   assert.equal(beheer.status, 403, 'het beheer-token keurt niet goed');
 
-  const zonderRecht = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, FI));
+  const zonderRecht = await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, FI));
   assert.equal(zonderRecht.status, 403, 'Fien heeft "geld" maar niet "geld.goedkeuren"');
 
   /* Dana is directie en draagt BEIDE vereiste rechten. Zij mag er één afvinken
      en daarna niet de tweede: anders is "vier ogen" één paar. */
-  const eerste = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, DI));
+  const eerste = await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, DI));
   assert.equal(eerste.status, 200);
-  const tweede = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
+  const tweede = await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
   assert.equal(tweede.status, 409, 'dezelfde mens keurt niet twee keer goed');
   assert.match(tweede.body.error, /in zijn eentje/i);
 
-  const k = (await api('/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
+  const k = (await api('/api/bedrijf/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
   assert.equal(k.status, 'wacht op goedkeuring', 'en het contract wacht dus nog');
   assert.deepEqual(k.ontbreekt, ['geld.goedkeuren']);
 });
 
 test('5. met de vereiste goedkeuringen gaat hij wel actief', async () => {
-  const c = (await api('/contract/zet', Object.assign({ titel: 'Beveiliging',
+  const c = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Beveiliging',
     wederpartij: 'Nachtwacht', soort: 'leverancier', waarde: 90000 }, JU))).body.contract;
   await teken(c.id, 'wij', 'Joris', JU);
   await teken(c.id, 'wederpartij', 'Nachtwacht BV', JU);
 
-  await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
-  const laatste = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
+  await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
+  const laatste = await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
   assert.equal(laatste.body.status, 'actief', 'twee verschillende mensen, twee rechten, rond');
   assert.match(laatste.body.let, /staat op actief/i);
 });
 
 test('6. het bedrag ophogen is de uitweg, en die is dicht', async () => {
-  const c = (await api('/contract/zet', Object.assign({ titel: 'Schoonmaak',
+  const c = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Schoonmaak',
     wederpartij: 'Helder', soort: 'leverancier', waarde: 60000 }, JU))).body.contract;
   await teken(c.id, 'wij', 'Joris', JU);
   await teken(c.id, 'wederpartij', 'Helder BV', JU);
-  await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
-  const rond = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
+  await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
+  const rond = await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
   assert.equal(rond.body.status, 'actief');
 
-  const op = await api('/contract/zet', Object.assign({ contractId: c.id, titel: 'Schoonmaak',
+  const op = await api('/api/bedrijf/contract/zet', Object.assign({ contractId: c.id, titel: 'Schoonmaak',
     wederpartij: 'Helder', soort: 'leverancier', waarde: 5000000 }, JU));
   assert.equal(op.body.contract.status, 'wacht op goedkeuring', 'ophogen zet het contract terug');
   assert.match(op.body.let, /vervallen/i, 'en zegt dat de oude goedkeuringen zijn vervallen');
 
-  const k = (await api('/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
+  const k = (await api('/api/bedrijf/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
   assert.equal(k.goedkeuringen.length, 0, 'geen enkele goedkeuring telt nog mee');
   assert.equal(k.vervallen.length, 2, 'maar ze staan er wel, met de reden');
   assert.match(k.vervallen[0].reden, /omhoog/i);
 });
 
 test('7. goedkeuren kan alleen waar een regel erom vraagt', async () => {
-  const c = (await api('/contract/zet', Object.assign({ titel: 'Koffie',
+  const c = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Koffie',
     wederpartij: 'Bonenhuis', soort: 'leverancier', waarde: 900 }, JU))).body.contract;
-  const uit = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
+  const uit = await api('/api/bedrijf/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
   assert.equal(uit.status, 409, 'onder de drempel vraagt geen regel om een goedkeuring');
   assert.match(uit.body.let, /alleen de twee handtekeningen/i);
 });
@@ -163,41 +163,41 @@ test('7. goedkeuren kan alleen waar een regel erom vraagt', async () => {
    trucje voor contracten is: een besluit wordt niet vastgehouden maar
    GEWEIGERD, en dat verschil staat in het register zelf. */
 test('8. een besluitregel weigert het sluiten van de stemronde', async () => {
-  const r = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
+  const r = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
     besluitSoort: 'investering', eist: ['geld.goedkeuren'] });
   assert.equal(r.status, 200);
   assert.match(r.body.afgedwongen, /sluiten van de stemronde/i, 'en hij noemt hoe hij tegenhoudt');
 
-  const b = (await api('/besluit/maak', Object.assign({ titel: 'Tweede vestiging',
+  const b = (await api('/api/bedrijf/besluit/maak', Object.assign({ titel: 'Tweede vestiging',
     onderbouwing: 'De huidige hal zit vol.', soort: 'investering' }, JU))).body.besluit;
-  await api('/besluit/stemronde', Object.assign({ besluitId: b.id }, JU));
-  await api('/besluit/stem', Object.assign({ besluitId: b.id, stem: 'voor' }, JU));
+  await api('/api/bedrijf/besluit/stemronde', Object.assign({ besluitId: b.id }, JU));
+  await api('/api/bedrijf/besluit/stem', Object.assign({ besluitId: b.id, stem: 'voor' }, JU));
 
-  const dicht = await api('/besluit/sluit', Object.assign({ besluitId: b.id, evalueerOp: '2027-06-01' }, JU));
+  const dicht = await api('/api/bedrijf/besluit/sluit', Object.assign({ besluitId: b.id, evalueerOp: '2027-06-01' }, JU));
   assert.equal(dicht.status, 409, 'zonder de CFO gaat dit besluit niet dicht');
   assert.deepEqual(dicht.body.ontbreekt, ['geld.goedkeuren']);
 
   /* En een besluit van een ANDERE soort valt er niet onder: de voorwaarde van
      een besluitregel is de soort, niet het bestaan van een regel. */
-  const ander = (await api('/besluit/maak', Object.assign({ titel: 'Nieuw logo',
+  const ander = (await api('/api/bedrijf/besluit/maak', Object.assign({ titel: 'Nieuw logo',
     onderbouwing: 'Het oude is van 2012.', soort: 'product' }, JU))).body.besluit;
-  await api('/besluit/stemronde', Object.assign({ besluitId: ander.id }, JU));
-  await api('/besluit/stem', Object.assign({ besluitId: ander.id, stem: 'voor' }, JU));
-  const los = await api('/besluit/sluit', Object.assign({ besluitId: ander.id, evalueerOp: '2027-06-01' }, JU));
+  await api('/api/bedrijf/besluit/stemronde', Object.assign({ besluitId: ander.id }, JU));
+  await api('/api/bedrijf/besluit/stem', Object.assign({ besluitId: ander.id, stem: 'voor' }, JU));
+  const los = await api('/api/bedrijf/besluit/sluit', Object.assign({ besluitId: ander.id, evalueerOp: '2027-06-01' }, JU));
   assert.equal(los.body.besluit.status, 'aangenomen', 'een productbesluit gaat gewoon dicht');
 
   // Met de goedkeuring erbij gaat de eerste alsnog dicht.
-  await api('/keur', Object.assign({ soort: 'besluit', id: b.id, recht: 'geld.goedkeuren' }, DI));
-  const alsnog = await api('/besluit/sluit', Object.assign({ besluitId: b.id, evalueerOp: '2027-06-01' }, JU));
+  await api('/api/bedrijf/keur', Object.assign({ soort: 'besluit', id: b.id, recht: 'geld.goedkeuren' }, DI));
+  const alsnog = await api('/api/bedrijf/besluit/sluit', Object.assign({ besluitId: b.id, evalueerOp: '2027-06-01' }, JU));
   assert.equal(alsnog.body.besluit.status, 'aangenomen', 'met de CFO erbij wel');
 });
 
 test('9. een regel draagt alleen de voorwaarde die zijn soort kent', async () => {
-  const metBedrag = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
+  const metBedrag = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
     besluitSoort: 'prijs', boven: 1000, eist: ['geld.goedkeuren'] });
   assert.equal(metBedrag.status, 400, 'een besluitregel leest nergens een bedrag');
 
-  const metSoort = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
+  const metSoort = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
     besluitSoort: 'prijs', boven: 1000, eist: ['recht'] });
   assert.equal(metSoort.status, 400, 'en een contractregel drempelt niet op een besluitsoort');
 });
@@ -207,27 +207,27 @@ test('9. een regel draagt alleen de voorwaarde die zijn soort kent', async () =>
    als "niet ingevuld" leest als "past overal op", ligt een landregel stil over
    alle contracten heen. */
 test('10. een landregel geldt alleen voor contracten met DAT land', async () => {
-  const r = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
+  const r = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
     boven: 1000, land: 'BE', eist: ['geld.goedkeuren'] });
   assert.equal(r.status, 200);
   assert.match(r.body.let, /valt er niet onder/i, 'het antwoord waarschuwt voor het lege veld');
 
-  const be = (await api('/contract/zet', Object.assign({ titel: 'Belgisch vervoer',
+  const be = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Belgisch vervoer',
     wederpartij: 'Ardennen BV', soort: 'leverancier', waarde: 5000, land: 'BE' }, JU))).body.contract;
-  const nl = (await api('/contract/zet', Object.assign({ titel: 'Nederlands vervoer',
+  const nl = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Nederlands vervoer',
     wederpartij: 'Veluwe BV', soort: 'leverancier', waarde: 5000, land: 'NL' }, JU))).body.contract;
-  const leeg = (await api('/contract/zet', Object.assign({ titel: 'Vervoer zonder land',
+  const leeg = (await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Vervoer zonder land',
     wederpartij: 'Ergens BV', soort: 'leverancier', waarde: 5000 }, JU))).body.contract;
 
-  const kBe = (await api('/keuring', Object.assign({ soort: 'contract', id: be.id }, JU))).body;
+  const kBe = (await api('/api/bedrijf/keuring', Object.assign({ soort: 'contract', id: be.id }, JU))).body;
   assert.ok(kBe.eist.includes('geld.goedkeuren'), 'het Belgische contract valt onder de regel');
 
-  const kNl = (await api('/keuring', Object.assign({ soort: 'contract', id: nl.id }, JU))).body;
+  const kNl = (await api('/api/bedrijf/keuring', Object.assign({ soort: 'contract', id: nl.id }, JU))).body;
   assert.ok(!kNl.eist.includes('geld.goedkeuren'), 'het Nederlandse niet');
 
   /* En het contract ZONDER land valt er ook niet onder -- maar dat wordt
      GEMELD, want anders lijkt "geen regel" op "er is geen regel". */
-  const kLeeg = (await api('/keuring', Object.assign({ soort: 'contract', id: leeg.id }, JU))).body;
+  const kLeeg = (await api('/api/bedrijf/keuring', Object.assign({ soort: 'contract', id: leeg.id }, JU))).body;
   assert.ok(!kLeeg.eist.includes('geld.goedkeuren'), 'zonder land geldt de landregel niet');
   assert.ok(kLeeg.nietVanToepassing.some(x => x.land === 'BE'),
     'en dat staat er, met de reden erbij');
@@ -235,7 +235,7 @@ test('10. een landregel geldt alleen voor contracten met DAT land', async () => 
 });
 
 test('11. land en afdeling bestaan alleen als voorwaarde op een contract', async () => {
-  const uit = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
+  const uit = await api('/api/bedrijf/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
     besluitSoort: 'prijs', land: 'BE', eist: ['geld.goedkeuren'] });
   assert.equal(uit.status, 400, 'een besluitregel leest een land nergens');
   assert.match(uit.body.error, /leest ze nergens/i);

@@ -23,7 +23,10 @@
 
 module.exports = (kern) => {
   const { app, auth, officeAuth, labfonds, rtf } = kern;
-  const veilig = (res, werk) => { try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); } catch (e) { console.error('[labfonds]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
+  /* `werk` mag een belofte teruggeven: een SCHRIJVER loopt door de duurzame
+     bundel (vast() hieronder) en antwoordt pas als de opslag bevestigt. */
+  const veilig = async (res, werk) => { try { const r = await werk(); res.status(r && r.status ? r.status : 200).json(r); } catch (e) { console.error('[labfonds]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
+  const vast = (schrijver) => (...a) => labfonds.vast(() => schrijver(...a));
   const lid = (req) => (req.session && req.session.key) || null;
   /* DE CONTROLE ZEI "ACCOUNT" EN ACCEPTEERDE EEN GAST.
 
@@ -48,12 +51,12 @@ module.exports = (kern) => {
      aan geen van beide deuren. */
   const DOEN = {
     overzicht: (wie) => labfonds.fonds(wie),
-    locatie: (wie, nm, b) => labfonds.locatieMaak(b.naam, b.land),
-    doneer: (wie, nm, b) => labfonds.doneer(wie, nm, String(b.locId || ''), b.bedrag),
-    voorstel: (wie, nm, b) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek),
-    stem: (wie, nm, b) => labfonds.stem(wie, String(b.id || ''), String(b.keuze || '')),
+    locatie: vast((wie, nm, b) => labfonds.locatieMaak(b.naam, b.land)),
+    doneer: vast((wie, nm, b) => labfonds.doneer(wie, nm, String(b.locId || ''), b.bedrag)),
+    voorstel: vast((wie, nm, b) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek)),
+    stem: vast((wie, nm, b) => labfonds.stem(wie, String(b.id || ''), String(b.keuze || ''))),
     scheidsrechter: (wie, nm, b) => labfonds.scheidsrechter(String(b.id || '')),
-    beslis: (wie, nm, b) => labfonds.beslis(String(b.id || ''), wie),
+    beslis: vast((wie, nm, b) => labfonds.beslis(String(b.id || ''), wie)),
     financiering: (wie, nm, b) => {
       const r = labfonds.zoekOnderzoek(String(b.onderzoek || ''));
       if (!r.gevonden) return { status: 404, error: r.reden };

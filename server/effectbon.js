@@ -48,6 +48,8 @@ const staatlog = require('./staatlog');
 const effectmeter = require('./effectmeter');
 const { classificeerEffectcollecties } = require('./effectbon-classificatie');
 const { nameet } = require('./kern/stuur/gevolgcontract/nameting');
+/* de begrensde ring van de laatste bonnen, met opzet geen journaal: ./effectbon-ring.js */
+const { bewaar, bonnen, laatste, RING_MAX } = require('./effectbon-ring');
 
 /* DE VOORSPELLER WORDT ERIN GEHANGEN EN NIET OPGEHAALD. Deze laag mag kern LEZEN, maar
    zij hoort niet te weten dat er een geldketen bestaat -- en kern hoort niets naar de
@@ -68,21 +70,10 @@ let aan = String(process.env.RTG_EFFECTBON || '') !== '0';
 const BLIND_ONDIEP = Object.freeze(['wijziging-zonder-lengteverschil', 'objectcollecties']);
 const BLIND_ALTIJD = Object.freeze(effectmeter.NIET_GEMETEN.slice());
 
-/* De bonnen van de laatste verzoeken, begrensd. GEEN collectie in de database: een bon
-   die blijft staan is een journaal, en daarvoor is dit niet gebouwd. Wie hem wil bewaren,
-   neemt dat besluit apart en met een bewaartermijn. */
-const RING = [];
-const RING_MAX = 200;
-
-function bewaar(bon) {
-  RING.push(bon);
-  while (RING.length > RING_MAX) RING.shift();
-  return bon;
-}
-
 /* De bon van EEN verzoek. `teller` komt van de effectmeter en wordt meegegeven en niet
    opgevraagd: een antwoord dat uit een andere context wordt verstuurd zou anders de stand
    van een ander verzoek dragen. */
+let agentteken = null; // lui geladen en daarna onthouden: zie de toelichting in opzet/handeling.js
 function maak({ envelop, voor, na, teller }) {
   const e = envelop || {};
   const ctx = e.context || {};
@@ -149,23 +140,18 @@ function haak(app) {
              leeg -- `geen` zou een meting suggereren waar er geen was. */
           if (!res.headersSent)
             res.setHeader('X-RTG-Effectbon', bon.klassen.length ? bon.klassen.join(',') : 'geen-klasse');
-          require('./kern/agentteken').meld(req, res); // A5: een agent zegt wie hij is
-        } catch (e) { /* een bon die niet kan, mag het antwoord niet breken */ }
+          (agentteken || (agentteken = require('./kern/agentteken'))).meld(req, res); // A5: een agent zegt wie hij is
+        } catch (e) {
+          /* een bon die niet kan, mag het antwoord niet breken -- maar stil is hij
+             ook niet (STILSPOOR.json): dan staat er een handeling zonder effectbon */
+          console.warn('[effectbon] de effectbon niet bewaard:', e && e.message);
+        }
         return echt.apply(this, args);
       };
       next();
     });
   });
   return true;
-}
-
-function bonnen({ limit = 50 } = {}) {
-  const n = Math.min(RING_MAX, Math.max(1, Number(limit) || 50));
-  return RING.slice(-n);
-}
-function laatste(verzoek) {
-  for (let i = RING.length - 1; i >= 0; i--) if (RING[i].verzoek === verzoek) return RING[i];
-  return null;
 }
 
 module.exports = { haak, maak, bonnen, laatste, zetVoorspeller, BLIND_ONDIEP, BLIND_ALTIJD, RING_MAX,

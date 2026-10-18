@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T12:10:38.466Z",
-  "commit": "4738ba38c",
+  "op": "2026-10-18T13:07:03.547Z",
+  "commit": "4e480edea",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
@@ -629,8 +629,8 @@
   {
    "op": "2026-10-18",
    "van": 821,
-   "naar": 823,
-   "reden": "ROLPROEF.json is op 18 oktober 2026 opnieuw gemeten (07364d4e7) na de reparatie van de proefclient; de vorige meting was van 29 september. De nieuwe ronde deelt twee routes meer in als objectpoort (52 -> 54): routes die er al waren en nu in beeld komen, geen nieuwe code."
+   "naar": 831,
+   "reden": "ROLPROEF.json en de herstelproef zijn op 18 oktober voor het eerst sinds weken vers gemeten: de rolproef loopt weer met een proeflid met gebonden toestel (objectpoort 52->54), en de herstelproef noemt nu de tegenhangers die het geldomein zelf benoemt (herstel-onbevestigd 49->57). Bestaande routes die in beeld kwamen, geen nieuwe schuld."
   }
  ]
 }

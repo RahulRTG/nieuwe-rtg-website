@@ -204,6 +204,17 @@
 <link href="/apps/comm-heritage.css" rel="stylesheet">
 <link href="/shared/rtg-communication-surface.css" rel="stylesheet">
 <script src="/shared/rtg-communication-surface.js" defer></script>
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1ntrtu0:not(#_#_#_){width:1.9rem;height:1.9rem}
+.s-26tkt:not(#_#_#_){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:12rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -257,7 +268,7 @@
     <div class="invoer">
       <div class="antwoordop" id="antwoordop" hidden>
         <span>Antwoord op <b id="antwoordWie"></b>:</span>
-        <span id="antwoordTekst" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:12rem;"></span>
+        <span id="antwoordTekst" class="s-26tkt"></span>
         <button type="button" id="antwoordWeg" aria-label="Antwoord annuleren">&#10005;</button>
       </div>
       <form class="invoerrij" id="invoerrij" autocomplete="off">
@@ -675,7 +686,7 @@
       }
       blad('<h2>Nieuw gesprek</h2><p class="uit">Met wie?</p>' + cs.map(function (c) {
         return '<button class="contact" data-key="' + esc(c.key) + '">' +
-          '<span class="rond" style="width:1.9rem;height:1.9rem;">' + esc(initialen(c.codename)) + '</span>' +
+          '<span class="rond s-1ntrtu0">' + esc(initialen(c.codename)) + '</span>' +
           esc(c.codename) + '</button>';
       }).join(''));
       $('#blad').querySelectorAll('[data-key]').forEach(function (b) {

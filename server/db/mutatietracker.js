@@ -77,6 +77,14 @@ function bewaak(data) {
     const handler = {
       get(doel, sleutel, ontvanger) {
         const v = Reflect.get(doel, sleutel, ontvanger);
+        /* Een primitieve waarde (of een functie, Date, Map ...) wordt nooit
+           gewikkeld: diep() geeft haar ongewijzigd terug. De descriptor hieronder
+           is dan overbodig, en hij was niet gratis: Reflect.getOwnPropertyDescriptor
+           alloceert per lezing een object, en de meeste lezingen op een collectie
+           zijn van velden (codes, bedragen, data). Gemeten in De Beproeving van
+           18 oktober 2026: 195 MB aan descriptors per 40 s storm, 8,5% van alle
+           allocaties -- en elke megabyte is weer een scavenge-pauze op de lus. */
+        if (!volg(v)) return v;
         /* Proxy-invariant: een niet-schrijfbare, niet-configureerbare waarde
            moet letterlijk dezelfde waarde teruggeven. Trust-records zijn diep
            bevroren; zo'n kind opnieuw in een Proxy wikkelen laat onder andere

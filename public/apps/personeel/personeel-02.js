@@ -1,6 +1,6 @@
 /* de gebeurtenissen van vandaag: valet, jetset en bevestigingen */
         (j.status==='aangevraagd' ? '<button class="abtn" data-pgjb="'+j.id+'">'+T('pd.geb.bevestig','Bevestig')+'</button>' : '<button class="abtn" data-pgja="'+j.id+'">'+T('pd.geb.afgerond','Afgerond')+'</button>')+'</div>').join('')+
-      ((valet.length+jetset.length) ? '' : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.geb.geenjetset','Geen open verzoeken.')+'</div>')+'</div>';
+      ((valet.length+jetset.length) ? '' : '<div class="s-1sydj7f">'+T('pd.geb.geenjetset','Geen open verzoeken.')+'</div>')+'</div>';
     wrap.innerHTML = html;
     const doe = (sel, body) => wrap.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       const { pad, data } = body(b.dataset);
@@ -37,24 +37,24 @@
     // de steiger: bezetting in een oogopslag
     const vrij = (d.ligplaatsen||[]).filter(p => !p.boot);
     html += '<div class="card"><div class="k">'+T('pd.mr.steiger','De steiger')+' ('+d.kpi.bezet+' van '+d.kpi.ligplaatsen+')</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+(vrij.length ? T('pd.mr.vrij','Vrij:')+' '+vrij.map(p=>p.id+' (tot '+p.lengteMax+' m)').join(' · ') : T('pd.mr.vol','De haven ligt vol.'))+'</div></div>';
+      '<div class="s-1sydj7f">'+(vrij.length ? T('pd.mr.vrij','Vrij:')+' '+vrij.map(p=>p.id+' (tot '+p.lengteMax+' m)').join(' · ') : T('pd.mr.vol','De haven ligt vol.'))+'</div></div>';
     // de brandstofsteiger
     const tanken = (d.brandstof||[]).filter(b => b.status === 'gevraagd');
     html += '<div class="card"><div class="k">'+T('pd.mr.brand','Brandstof')+' ('+tanken.length+')</div>'+
       (tanken.length ? tanken.map(b => '<div class="task"><div class="t"><b>'+esc(b.boot)+'</b><span>'+esc(b.soort)+' · '+b.liters+' l</span></div><button class="abtn" data-pmbk="'+b.id+'">'+T('pd.mr.getankt','Getankt')+'</button></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.mr.geenbrand','Niemand aan de pomp.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.mr.geenbrand','Niemand aan de pomp.')+'</div>')+'</div>';
     // service en de helling
     const werk = (d.service||[]).filter(s => s.status !== 'klaar');
     html += '<div class="card"><div class="k">'+T('pd.mr.svc','Service en de helling')+' ('+werk.length+')</div>'+
       (werk.length ? werk.map(s => '<div class="task"><div class="t"><b>'+esc(s.boot)+'</b><span>'+SVC[s.soort]+' · '+esc(s.wens)+' · '+esc(s.status)+'</span></div>'+
         (s.status==='open' ? '<button class="abtn" data-pmsb="'+s.id+'">'+T('pd.mr.pak','Pak op')+'</button>' : '<button class="abtn" data-pmsk="'+s.id+'">'+T('pd.mr.klaar','Klaar')+'</button>')+'</div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.mr.geensvc','De werf ligt er netjes bij.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.mr.geensvc','De werf ligt er netjes bij.')+'</div>')+'</div>';
     // de marina-concierge
     const con = (d.concierge||[]).filter(c => c.status !== 'afgerond');
     html += '<div class="card"><div class="k">'+T('pd.mr.con','Marina-concierge')+' ('+con.length+')</div>'+
       (con.length ? con.map(c => '<div class="task"><div class="t"><b>'+CON[c.soort]+' · '+esc(c.voorWie)+'</b><span>'+esc(c.wens)+' · '+esc(c.moment)+' · '+esc(c.status)+'</span></div>'+
         (c.status==='aangevraagd' ? '<button class="abtn" data-pmcb="'+c.id+'">'+T('pd.mr.bevestig','Bevestig')+'</button>' : '<button class="abtn" data-pmca="'+c.id+'">'+T('pd.mr.afgerond','Afgerond')+'</button>')+'</div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.mr.geencon','Geen open verzoeken.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.mr.geencon','Geen open verzoeken.')+'</div>')+'</div>';
     wrap.innerHTML = html;
     const doe = (sel, body) => wrap.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       const { pad, data } = body(b.dataset);
@@ -87,14 +87,14 @@
     const open = (pdPol.aanvragen||[]).filter(a => a.status === 'aangevraagd');
     html += '<div class="card"><div class="k">'+T('pd.pol.advies','Adviesvragen')+' ('+open.length+')</div>'+
       (open.length ? open.map(a => '<div class="task"><div class="t"><b>'+esc(a.klant)+' · '+esc(a.product)+'</b><span>'+esc(a.situatie)+'</span></div></div>'+
-        '<div style="display:flex;gap:0.4rem;margin:0.3rem 0 0.6rem;"><input data-ppat="'+a.id+'" placeholder="'+T('pd.pol.schrijf','Het advies (van u, niet van het systeem)')+'" maxlength="240" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.78rem;padding:0.4rem 0.6rem;">'+
+        '<div class="s-59h8ju"><input data-ppat="'+a.id+'" placeholder="'+T('pd.pol.schrijf','Het advies (van u, niet van het systeem)')+'" maxlength="240" class="s-wx0hqg">'+
         '<button class="abtn" data-ppak="'+a.id+'">'+T('pd.pol.klaar','Advies klaar')+'</button></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.pol.geenadvies','Geen open adviesvragen.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.pol.geenadvies','Geen open adviesvragen.')+'</div>')+'</div>';
     // declaraties: goedkeuren met een tik, afwijzen alleen met een reden
     const decl = (pdPolZorg.declaraties||[]).filter(x => x.status === 'ingediend');
     html += '<div class="card"><div class="k">'+T('pd.pol.decl','Declaraties')+' ('+decl.length+')</div>'+
       (decl.length ? decl.map(x => '<div class="task"><div class="t"><b>'+esc(x.codenaam)+' · '+esc(x.omschrijving)+'</b><span>'+eur(x.bedrag)+'</span></div>'+
         '<button class="abtn" data-ppdg="'+x.id+'">'+T('pd.pol.goed','Keur goed')+'</button></div>'+
-        '<div style="display:flex;gap:0.4rem;margin:0.3rem 0 0.6rem;"><input data-ppdr="'+x.id+'" placeholder="'+T('pd.pol.reden','Reden bij afwijzen')+'" maxlength="160" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.78rem;padding:0.4rem 0.6rem;">'+
+        '<div class="s-59h8ju"><input data-ppdr="'+x.id+'" placeholder="'+T('pd.pol.reden','Reden bij afwijzen')+'" maxlength="160" class="s-wx0hqg">'+
         '<button class="abtn" data-ppda="'+x.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.pol.af','Wijs af')+'</button></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.pol.geendecl','Geen open declaraties.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.pol.geendecl','Geen open declaraties.')+'</div>')+'</div>';

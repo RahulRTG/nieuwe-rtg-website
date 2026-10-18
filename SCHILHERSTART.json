@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:43:33.022Z",
-    "commit": "1eb83968",
+    "op": "2026-10-18T11:46:51.561Z",
+    "commit": "85698044f",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/schilherstart.js",
@@ -98,46 +98,26 @@
         "document"
       ],
       "documentAdressen": [
-        "buiten /apps/app.html",
-        "buiten /apps/app.html?pas=rtg"
+        "buiten /apps/app.html"
       ],
-      "buiten": 2,
+      "buiten": 1,
       "blad": 0,
       "documentenSpreiding": [
-        2,
-        2
+        1,
+        1
       ],
       "schillen": 1,
-      "scripts": 174,
-      "jsKB": 2418,
-      "api": 56,
-      "dubbel": [
-        "buiten GET /api/doos/status",
-        "buiten GET /api/health",
-        "buiten GET /api/ready",
-        "buiten POST /api/account/rollen",
-        "buiten POST /api/agenda/bereik",
-        "buiten POST /api/auth/me",
-        "buiten POST /api/bank/overzicht",
-        "buiten POST /api/chat/history",
-        "buiten POST /api/comm/inbox",
-        "buiten POST /api/ik/beelden",
-        "buiten POST /api/ik/toegankelijk",
-        "buiten POST /api/ik/workspace",
-        "buiten POST /api/member/apps",
-        "buiten POST /api/member/boardroom",
-        "buiten POST /api/notities/mijn",
-        "buiten POST /api/plaats/dienst",
-        "buiten POST /api/state",
-        "buiten POST /api/talen"
-      ],
+      "scripts": 169,
+      "jsKB": 2398,
+      "api": 40,
+      "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 23752,
-        "edge": 11170
+        "load": 30869,
+        "edge": 8494
       },
-      "hoofddraadBlokkeertMs": 12758,
-      "heapMB": 7.2,
+      "hoofddraadBlokkeertMs": 22789,
+      "heapMB": 7,
       "nietTotRust": 3,
       "fouten": []
     },
@@ -158,17 +138,17 @@
         1
       ],
       "schillen": 1,
-      "scripts": 49,
-      "jsKB": 603,
-      "api": 9,
+      "scripts": 32,
+      "jsKB": 380,
+      "api": 0,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 4165,
+        "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2871,
-      "heapMB": 10.6,
+      "hoofddraadBlokkeertMs": 1305,
+      "heapMB": 7.8,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -179,27 +159,25 @@
       "hoe": [
         "link"
       ],
-      "documentAdressen": [
-        "blad /apps/life.html"
-      ],
+      "documentAdressen": [],
       "buiten": 0,
-      "blad": 1,
+      "blad": 0,
       "documentenSpreiding": [
-        1,
-        1
+        0,
+        0
       ],
       "schillen": 1,
-      "scripts": 31,
-      "jsKB": 580,
-      "api": 11,
+      "scripts": 0,
+      "jsKB": 0,
+      "api": 2,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2431,
+        "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2072,
-      "heapMB": 10,
+      "hoofddraadBlokkeertMs": 1714,
+      "heapMB": 9.1,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -215,20 +193,20 @@
       "blad": 0,
       "documentenSpreiding": [
         0,
-        0
+        1
       ],
       "schillen": 1,
       "scripts": 0,
       "jsKB": 0,
-      "api": 5,
+      "api": 6,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
         "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 1064,
-      "heapMB": 8.2,
+      "hoofddraadBlokkeertMs": 2227,
+      "heapMB": 10.2,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -249,17 +227,17 @@
         1
       ],
       "schillen": 1,
-      "scripts": 49,
-      "jsKB": 669,
+      "scripts": 51,
+      "jsKB": 685,
       "api": 9,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 3814,
+        "load": 5143,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 3271,
-      "heapMB": 8.9,
+      "hoofddraadBlokkeertMs": 4467,
+      "heapMB": 9.4,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -270,27 +248,25 @@
       "hoe": [
         "link"
       ],
-      "documentAdressen": [
-        "blad /apps/reisboek.html"
-      ],
+      "documentAdressen": [],
       "buiten": 0,
       "blad": 1,
       "documentenSpreiding": [
-        1,
+        0,
         1
       ],
       "schillen": 1,
-      "scripts": 35,
-      "jsKB": 601,
-      "api": 5,
+      "scripts": 12,
+      "jsKB": 298,
+      "api": 1,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2918,
+        "load": 4136,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2361,
-      "heapMB": 10.1,
+      "hoofddraadBlokkeertMs": 3480,
+      "heapMB": 9.5,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -318,8 +294,8 @@
         "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 992,
-      "heapMB": 8.7,
+      "hoofddraadBlokkeertMs": 1621,
+      "heapMB": 9.7,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -340,16 +316,16 @@
         1
       ],
       "schillen": 1,
-      "scripts": 64,
-      "jsKB": 838,
-      "api": 3,
+      "scripts": 44,
+      "jsKB": 558,
+      "api": 0,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2673,
+        "load": 3405,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2463,
+      "hoofddraadBlokkeertMs": 2391,
       "heapMB": 10.1,
       "nietTotRust": 0,
       "fouten": []
@@ -371,17 +347,17 @@
         1
       ],
       "schillen": 1,
-      "scripts": 47,
-      "jsKB": 654,
+      "scripts": 49,
+      "jsKB": 675,
       "api": 5,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2902,
+        "load": 4002,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2544,
-      "heapMB": 10.6,
+      "hoofddraadBlokkeertMs": 2810,
+      "heapMB": 10.5,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -403,16 +379,16 @@
       ],
       "schillen": 1,
       "scripts": 38,
-      "jsKB": 614,
+      "jsKB": 615,
       "api": 5,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 3098,
+        "load": 3610,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2934,
-      "heapMB": 10.8,
+      "hoofddraadBlokkeertMs": 3841,
+      "heapMB": 11,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -440,8 +416,8 @@
         "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 917,
-      "heapMB": 10.9,
+      "hoofddraadBlokkeertMs": 1614,
+      "heapMB": 11.2,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -462,19 +438,19 @@
         1
       ],
       "schillen": 1,
-      "scripts": 121,
-      "jsKB": 1196,
-      "api": 19,
+      "scripts": 125,
+      "jsKB": 1233,
+      "api": 20,
       "dubbel": [
         "buiten POST /api/reis/reizen"
       ],
       "dubbelSoms": [],
       "ms": {
-        "load": 9990,
-        "edge": 2548
+        "load": 13331,
+        "edge": 3662
       },
-      "hoofddraadBlokkeertMs": 6232,
-      "heapMB": 13.5,
+      "hoofddraadBlokkeertMs": 8373,
+      "heapMB": 12.2,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -496,37 +472,37 @@
         2
       ],
       "schillen": 1,
-      "scripts": 184,
-      "jsKB": 2696,
-      "api": 33,
+      "scripts": 179,
+      "jsKB": 2473,
+      "api": 28,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 13728,
-        "edge": 5644
+        "load": null,
+        "edge": 9119
       },
-      "hoofddraadBlokkeertMs": 10261,
-      "heapMB": 12.8,
+      "hoofddraadBlokkeertMs": 12295,
+      "heapMB": 16.1,
       "nietTotRust": 0,
       "fouten": []
     }
   ],
   "telling": {
     "stappen": 13,
-    "herstarts": 11,
-    "hostHerladen": 3,
-    "bladHerstarts": 8,
-    "zelfherladingen": 2,
+    "herstarts": 9,
+    "hostHerladen": 2,
+    "bladHerstarts": 7,
+    "zelfherladingen": 1,
     "stappenMetTweeSchillen": 0,
-    "dubbeleVerzoeken": 19,
+    "dubbeleVerzoeken": 1,
     "dubbeleVerzoekenSoms": 0,
-    "scripts": 792,
-    "scriptsNaEerste": 618,
-    "jsKB": 10869,
-    "jsKBNaEerste": 8451,
-    "api": 160,
-    "hoofddraadBlokkeertMs": 50740,
-    "heapMBEind": 12.8,
+    "scripts": 699,
+    "scriptsNaEerste": 530,
+    "jsKB": 9315,
+    "jsKBNaEerste": 6917,
+    "api": 116,
+    "hoofddraadBlokkeertMs": 68927,
+    "heapMBEind": 16.1,
     "nietTotRust": 3,
     "fouten": 0
   }

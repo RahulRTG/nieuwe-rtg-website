@@ -2,8 +2,8 @@
     const bizSpec = inv => {
       if (user.tier !== 'business') return '';
       const total = inv.netto + inv.bijdrage;
-      return '<div style="margin:0 0 0.9rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.8rem 1rem;font-size:0.7rem;color:var(--muted);line-height:1.8;">' +
-        '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:0.3rem;">' + T('inv.spec','Factuurspecificatie') + '</div>' +
+      return '<div class="s-mqnrrw">' +
+        '<div class="s-1ts2o85">' + T('inv.spec','Factuurspecificatie') + '</div>' +
         specRow(T('inv.number','Factuurnummer'), inv.id) +
         specRow(T('inv.holder','Op naam van'), user.codename + ' · Business Pass') +
         (inv.netto > 0 ? specRow(T('inv.net','Nettoprijs (inkoop)'), eurC(inv.netto)) : '') +
@@ -13,7 +13,7 @@
         (inv.netto > 0 ? specRow(T('inv.toms','Reisdeel: btw-margeregeling reisdiensten'), eurC(0)) : '') +
         specRow(T('inv.total','Totaal'), eurC(total), true) +
         specRow(T('inv.ledger','Afboekcode (grootboek)'), '<b style="color:var(--txt);">' + (inv.afboekcode || '4510') + '</b> · ' + (inv.afboeklabel || '')) +
-        '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.5rem;font-size:0.64rem;">RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · ' + RTG_IBAN + '</div>' +
+        '<div class="s-23ibup">RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · ' + RTG_IBAN + '</div>' +
       '</div>';
     };
     // Financiën in één oogopslag: openstaand, dit jaar betaald, en de eigen
@@ -25,7 +25,7 @@
     const rtfKomt = open.filter(i => isContrib(i.desc)).reduce((s,i) => s + Math.round(i.bijdrage / 1.21 * 0.3 * 100) / 100, 0);
     const btwSom = paidInv.reduce((s,i) => s + (i.btw || 0), 0);
     const tegel = (l, v, klas) => '<div style="flex:1;min-width:6.5rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;">' +
-      '<div style="font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">' + l + '</div>' +
+      '<div class="s-1mys5tf">' + l + '</div>' +
       '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.15rem;margin-top:0.15rem;' + (klas === 'g' ? 'color:var(--rtg-leesgoud,var(--gold));' : '') + '">' + v + '</div></div>';
     const finKaart = '<div style="margin-bottom:0.9rem;">' +
       '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin:0 0 0.5rem;">' + T('fin.title','Uw financiën') + '</div>' +
@@ -67,10 +67,10 @@
           '<span class="amount">' + eur(total) + '</span>' +
           (inv.status === 'open'
             ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>' +
-              (API.live && user.tier !== 'guest' ? '<button class="js-saldo" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◉ ' + T('fin.paysaldo','Uit RTG Pay-saldo') + '</button>' : '') +
-              (muntAan ? '<button class="js-munt" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '')
+              (API.live && user.tier !== 'guest' ? '<button class="js-saldo s-1l48cal" data-inv="' + inv.id + '" data-amt="' + total + '">◉ ' + T('fin.paysaldo','Uit RTG Pay-saldo') + '</button>' : '') +
+              (muntAan ? '<button class="js-munt s-1l48cal" data-inv="' + inv.id + '" data-amt="' + total + '">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '')
             : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
-          (API.live ? '<button class="js-dlinv" data-inv="' + inv.id + '" style="background:none;border:none;color:var(--soft);font-size:0.66rem;font-family:inherit;cursor:pointer;padding:0.15rem 0;">⤓ ' + T('fin.download','Download factuur') + '</button>' : '') +
+          (API.live ? '<button class="js-dlinv s-1h7u973" data-inv="' + inv.id + '">⤓ ' + T('fin.download','Download factuur') + '</button>' : '') +
         '</div>' +
       '</div>' + bizSpec(inv);
     }).join('');

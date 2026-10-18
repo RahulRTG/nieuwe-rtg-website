@@ -2,7 +2,7 @@
     const rows = DAG.map(d => {
       const slot = wv.dagen[d[0]] || {};
       return '<div class="st-row" data-wvdag="'+d[0]+'" style="gap:0.5rem;">'+
-        '<span style="min-width:2.2rem;text-transform:uppercase;font-size:0.68rem;">'+d[1]+'</span>'+
+        '<span class="s-1dsxntc">'+d[1]+'</span>'+
         '<input type="time" class="wv-van" value="'+(slot.van||'')+'" aria-label="'+T('wv.vanaf','Vanaf')+' '+d[1]+'" '+(slot.dicht?'disabled':'')+' style="background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;">'+
         '<input type="time" class="wv-tot" value="'+(slot.tot||'')+'" aria-label="'+T('wv.tot','Tot')+' '+d[1]+'" '+(slot.dicht?'disabled':'')+' style="background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;">'+
         '<button class="obtn'+(slot.dicht?' warn':'')+'" data-wvdicht="'+d[0]+'">'+(slot.dicht?T('wv.dicht','Dicht'):T('wv.open','Open'))+'</button></div>';
@@ -13,11 +13,11 @@
     // inlogmoment vergeleken en nooit opgeslagen.
     const plek = wv.plek || null;
     const veldStijl = 'background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;';
-    const plekBlok = '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
-      '<b style="font-size:0.78rem;">'+T('wv.plekh','Werkplek-zone')+'</b>'+
+    const plekBlok = '<div class="s-zcmmo8">'+
+      '<b class="s-2tfhuo">'+T('wv.plekh','Werkplek-zone')+'</b>'+
       '<div class="tkc-who">'+T('wv.pleks','Alleen op de werkplek inloggen: het toestel deelt bij het inloggen eenmalig zijn positie, de server vergelijkt die met deze zone en bewaart er niets van. Thuiswerk-toestemming per persoon heft de zone op.')+'</div>'+
       '<div class="st-row" style="gap:0.5rem;flex-wrap:wrap;">'+
-      '<span style="flex:1;min-width:8rem;">'+(plek ? (plek.lat.toFixed(3))+', '+(plek.lng.toFixed(3))+' · '+plek.radiusM+' m' : T('wv.plekleeg','Nog geen zone ingesteld'))+'</span>'+
+      '<span class="s-jwt5vg">'+(plek ? (plek.lat.toFixed(3))+', '+(plek.lng.toFixed(3))+' · '+plek.radiusM+' m' : T('wv.plekleeg','Nog geen zone ingesteld'))+'</span>'+
       '<input type="number" id="wvPlekStraal" min="50" max="50000" step="50" value="'+(plek?plek.radiusM:250)+'" aria-label="'+T('wv.straal','Straal in meters')+'" style="'+veldStijl+'width:5.5rem;">'+
       '<button class="obtn" id="wvPlekHier">'+T('wv.hier','Zet op mijn huidige locatie')+'</button>'+
       (plek ? '<button class="obtn'+(plek.aan?' primary':' warn')+'" id="wvPlekAan" data-val="'+(plek.aan?'0':'1')+'">'+(plek.aan?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button>'+
@@ -29,15 +29,15 @@
       const p = (wv.perStaff||{})[m.id] || {};
       const stand = p.stand || 'zaak';
       return '<div class="st-row" data-wvps="'+m.id+'" style="gap:0.4rem;flex-wrap:wrap;">'+
-        '<span style="flex:1;min-width:7rem;">'+esc(m.name)+'</span>'+
+        '<span class="s-jwsivx">'+esc(m.name)+'</span>'+
         '<select class="wvps-stand" aria-label="'+T('wv.stand','Beschikbaarheid')+' '+esc(m.name)+'" style="'+veldStijl+'">'+
         Object.keys(stnd).map(k => '<option value="'+k+'"'+(stand===k?' selected':'')+'>'+stnd[k]+'</option>').join('')+'</select>'+
         '<input type="time" class="wvps-van" value="'+(p.van||'')+'" aria-label="'+T('wv.vanaf','Vanaf')+' '+esc(m.name)+'"'+(stand==='eigen'?'':' hidden')+' style="'+veldStijl+'">'+
         '<input type="time" class="wvps-tot" value="'+(p.tot||'')+'" aria-label="'+T('wv.tot','Tot')+' '+esc(m.name)+'"'+(stand==='eigen'?'':' hidden')+' style="'+veldStijl+'">'+
         '<button class="obtn'+(p.thuiswerk?' primary':'')+'" data-wvthuis="'+(p.thuiswerk?'1':'0')+'">'+(p.thuiswerk?T('wv.thuisaan','Thuiswerk aan'):T('wv.thuisuit','Thuiswerk uit'))+'</button></div>';
     }).join('');
-    const psBlok = psRows ? '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
-      '<b style="font-size:0.78rem;">'+T('wv.persh','Per persoon')+'</b>'+
+    const psBlok = psRows ? '<div class="s-1h1elyr">'+
+      '<b class="s-2tfhuo">'+T('wv.persh','Per persoon')+'</b>'+
       '<div class="tkc-who">'+T('wv.perss','Wanneer de PDA en de werkpagina voor wie beschikbaar zijn: volgens het venster van de zaak, altijd, nooit, of eigen tijden. Thuiswerk aan = deze persoon kan ook buiten de werkplek-zone aan het werk.')+'</div>'+
       psRows+'</div>' : '';
     return '<div class="tkc"><h3>'+T('wv.h','Werkvenster')+'</h3>'+
@@ -45,7 +45,7 @@
       '<div class="st-row"><span>'+T('wv.aanh','Venster actief')+'<span class="sub">'+T('wv.aans','Uit = iedereen kan altijd inloggen')+'</span></span>'+
       '<button class="obtn'+(wv.aan?' primary':' warn')+'" id="wvAan" data-val="'+(wv.aan?'0':'1')+'">'+(wv.aan?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>'+
       rows+plekBlok+psBlok+
-      '<div style="margin-top:0.5rem;text-align:right;"><button class="obtn primary" id="wvSave">'+T('wv.bewaar','Venster bewaren')+'</button></div>'+
+      '<div class="s-kb6a1n"><button class="obtn primary" id="wvSave">'+T('wv.bewaar','Venster bewaren')+'</button></div>'+
       '<div class="tkc-who h-mt40">'+T('wv.leeg','Een dag zonder tijden is gewoon open; "Dicht" sluit de hele dag.')+'</div></div>';
   }
   function bindWerkvenster(el){

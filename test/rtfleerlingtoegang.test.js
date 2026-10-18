@@ -25,7 +25,7 @@ const leer = (sess, pad, body) => post('/leerling' + pad, Object.assign({ code: 
 
 test.before(async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-leerlingdeur-'));
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } }); base = srv.base;
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp, ANTHROPIC_API_KEY: '' } }); base = srv.base;
   gezin = (await post('/gezin/maak', { gezinsnaam: 'Toegang', naam: 'Beheerder', pin: '1234' })).body;
   kind = await profiel('Mila', '2018-06-01');
   tiener = await profiel('Sam', '2012-06-01');
@@ -161,4 +161,50 @@ test('live lessen lekken geen sleutels en klaswerk gebruikt geen ranglijst', () 
   assert.match(klas, /geen podium/i);
   assert.match(klas, /geen wedstrijd/i);
   assert.doesNotMatch(lesmaker, /stand:\s*publiekeStand/);
+});
+
+/* De vier leerlingdeuren die geen toets aanriep: /api/rtf/leerling/les,
+   /api/rtf/leerling/jaar-over, /api/rtf/leerling/examen-antwoord en
+   /api/rtf/leerling/bijles/vraag. Ook hier beslist de leeftijdspas: een kind
+   leest geen hbo-les, en zonder bevestigde leeftijd blijft alles dicht.
+   MUTATIE GEZIEN ZAKKEN: in server/routes/rtfleerling.js de les-route laten
+   antwoorden zonder doelMag()-poort; de toets zakte op "een kind leest geen
+   hbo-les". */
+test('les, leerjaar, examentraining en bijles over de leerlingdeur', async () => {
+  const les = await leer(kind, '/les', { doel: 'rekenen.g1.tellen-tot-10' });
+  assert.equal(les.status, 200, JSON.stringify(les.body).slice(0, 160));
+  assert.equal(les.body.doel.id, 'rekenen.g1.tellen-tot-10');
+  assert.ok(les.body.doel.naam, 'de les heeft een naam');
+  assert.equal((await leer(kind, '/les', { doel: 'onderzoek.hbo.bronnen' })).status, 403, 'een kind leest geen hbo-les');
+  assert.equal((await leer(zonder, '/les', { doel: 'rekenen.g1.tellen-tot-10' })).status, 403, 'zonder leeftijdspas dicht');
+
+  // leerjaar: alleen binnen een fase met jaren, en nooit voorbij het laatste
+  assert.equal((await leer(tiener, '/inschrijf', { fase: 'havo' })).status, 200);
+  const over = await leer(tiener, '/jaar-over', {});
+  assert.equal(over.status, 200, JSON.stringify(over.body).slice(0, 160));
+  assert.equal(over.body.jaar, 2, 'de tiener gaat naar leerjaar 2');
+  for (let j = 3; j <= 5; j++) assert.equal((await leer(tiener, '/jaar-over', {})).body.jaar, j);
+  assert.equal((await leer(tiener, '/jaar-over', {})).status, 400, 'na het laatste havo-jaar geen jaar meer erbij');
+
+  // examentraining: halverwege geen goed of fout, aan het eind de terugblik
+  assert.equal((await leer(tiener, '/examen-antwoord', { antwoord: '1' })).status, 400, 'eerst een training beginnen');
+  const ex = await leer(tiener, '/examen', { fase: 'havo' });
+  assert.equal(ex.status, 200, JSON.stringify(ex.body).slice(0, 160));
+  let r = ex;
+  for (let i = 1; i < ex.body.totaal; i++) {
+    r = await leer(tiener, '/examen-antwoord', { antwoord: '0' });
+    assert.equal(r.status, 200);
+    assert.equal(r.body.nr, i + 1, 'de volgende vraag');
+    assert.equal(r.body.goed, undefined, 'halverwege geen goed of fout');
+  }
+  const eind = await leer(tiener, '/examen-antwoord', { antwoord: '0' });
+  assert.equal(eind.status, 200, JSON.stringify(eind.body).slice(0, 160));
+  assert.equal(eind.body.terugblik.length, ex.body.totaal, 'elke vraag staat in de terugblik');
+
+  // bijles zonder model: een eerlijk demo-antwoord, en een lege vraag is geen vraag
+  assert.equal((await leer(tiener, '/bijles/vraag', { tekst: '' })).status, 400);
+  const bij = await leer(tiener, '/bijles/vraag', { tekst: 'Hoe werkt een breuk?' });
+  assert.equal(bij.status, 200, JSON.stringify(bij.body).slice(0, 160));
+  assert.ok(String(bij.body.text).length > 0, 'er komt een antwoord');
+  assert.match(String(bij.body.niveau), /havo|HAVO/i, 'op het niveau van de leerling');
 });

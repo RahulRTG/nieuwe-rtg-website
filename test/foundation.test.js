@@ -388,6 +388,14 @@ test('oppas met RTG-pas: koppelt zijn gastprofiel en krijgt de gezinsmeldingen i
   assert.ok(st.state.foundation, 'de RTG-app-state bevat foundation');
   assert.equal(st.state.foundation.gekoppeld.length, 1);
   assert.ok(st.state.foundation.meldingen.some(x => /op reis/.test(x.tekst) && x.gezin === 'Fam Steun'), 'de melding staat in de RTG-app');
+  /* /api/rtf/meldingen/gelezen: opa vinkt zijn meldingen af; ze blijven staan,
+     maar ongelezen is er daarna geen. MUTATIE GEZIEN ZAKKEN: in
+     server/routes/member/gezin.js `m.gelezen = true` weggehaald; deze bewering zakte. */
+  assert.ok(st.state.foundation.meldingen.some(x => !x.gelezen), 'er is een ongelezen melding');
+  assert.equal((await rtgCall('/rtf/meldingen/gelezen', {})).status, 200);
+  const gelezen = (await json(await rtgCall('/state', {}))).state.foundation.meldingen;
+  assert.ok(gelezen.length > 0, 'de meldingen blijven staan');
+  assert.ok(gelezen.every(x => x.gelezen === true), 'en zijn allemaal gelezen');
 
   // opa antwoordt het gezin vanuit de RTG-app; het komt in de gezinsberichten
   assert.equal((await rtgCall('/rtf/bericht', { code: g.code, tekst: 'Wat leuk, ik pas graag op!' })).status, 200);

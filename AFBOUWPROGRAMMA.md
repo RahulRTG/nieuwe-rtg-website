@@ -133,12 +133,12 @@ geblokkeerd item zegt welke voorwaarde aantoonbaar vervuld moet zijn. Valt een
 item op dezelfde regel als een gelezen markering, dan wint het besluitbestand.
 
 **De stand bij lezing** (levende getallen uit `APPWERKT.json`, bijgehouden door
-`npm run getallen`): over <!--getal:toezeg.documenten-->167<!--/getal-->
-documenten zijn er <!--getal:toezeg.toegezegd-->879<!--/getal--> onderdelen
+`npm run getallen`): over <!--getal:toezeg.documenten-->176<!--/getal-->
+documenten zijn er <!--getal:toezeg.toegezegd-->897<!--/getal--> onderdelen
 `toegezegd`, <!--getal:toezeg.afgewezen-->20<!--/getal-->
-`afgewezen-met-grens`, <!--getal:toezeg.besluit-->84<!--/getal-->
+`afgewezen-met-grens`, <!--getal:toezeg.besluit-->89<!--/getal-->
 `vraagt-besluit` en <!--getal:toezeg.extern-->10<!--/getal--> `extern`.
-Daarnaast liggen er <!--getal:toezeg.proza-->210<!--/getal--> markeringen in
+Daarnaast liggen er <!--getal:toezeg.proza-->220<!--/getal--> markeringen in
 lopende tekst die bewust niet zijn gelezen.
 
 **Wat hij niet is.** Geen tweede belofteregister: `BELOFTE.json` zegt of de
@@ -211,3 +211,37 @@ bij komt. Het programma is af wanneer:
   half) worden geteld en niet gelezen.
 - "toegezegd" komt uit het document. Of het onderdeel er werkelijk is, zeggen de
   acht bewijzen en `BELOFTE.json`, niet deze inventaris.
+
+## 10. Het integrale V1-concept (18 oktober 2026)
+
+De eigenaar legde op 18 oktober 2026 een integraal bedrijfs- en technologieconcept
+voor ("RTG · Het soevereine digitale bedrijf"). Het is een ontwerp, geen nieuw
+register: wat eruit vastligt staat hier, de werkwijze staat in `CONSOLIDATIE.md`
+(één integratiebranch, geen merges naar main tot V1), en wat het voor later
+noemt staat in `TOEZEGKLASSEN.json`. Er komt geen apart document naast dit
+programma.
+
+**Einddefinitie van V1.** RTG V1 is niet af wanneer alle code aanwezig is, maar
+wanneer een onafhankelijke beoordelaar aan de hand van reproduceerbaar bewijs kan
+vaststellen dat de afgesproken taken veilig, bevoegd, betrouwbaar, herstelbaar en
+operationeel beheersbaar zijn, en de onderneming de verantwoordelijkheid
+daadwerkelijk kan dragen. In de code betekent dat: `npm run productie:status`
+geeft `READY` (of, na besluit B2, het afzonderlijke `READY_ZONDER_RAIL`) op één
+ondertekende kandidaat, met een geslaagde staging-repetitie en rollbackproef.
+
+**Stopcriteria.** Geen go-live bij ontbrekende kritieke bewijzen, onbeheerde
+secrets, een ongeteste rollback, een onduidelijke geldstroom of een onrechtmatige
+gegevensverwerking.
+
+**Productgrens.** De 114 onderdelen in `APPWERKT.json` zijn de toetsbare baseline
+van V1. Er komen geen nieuwe domeinen bij tot de V1-gaten gesloten zijn.
+
+**Wat het concept voor na V1 noemt.** Het Zaakdoos-netwerk met nodeklassen en federatie (fase B), multi-regio (fase C) en het ecosysteem voor derden (fase D) zijn geen V1-werk.
+Ze staan als `vraagt-besluit` in `TOEZEGKLASSEN.json` en blijven dicht tot de
+eigenaar ze na een bewezen V1 openzet.
+
+**Open besluiten voor V1** (de bron per punt is `RELEASEKANDIDAAT.md` par. 1):
+V1 met of zonder geld (B2/B3), SMS of bewust uit (B5), de image-scanner (B6), het
+IBAN van de RTFoundation (B7), het e-mailadres van de eigenaar, de oude
+kaartcodes (cadeaukaart 24 bits, opwaardeerkaart 96 bits), PR #661, en de scope
+van de overlappende productwerk-PR's #672 tot en met #677.

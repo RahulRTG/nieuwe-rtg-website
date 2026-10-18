@@ -2018,25 +2018,25 @@
    "vraagt-besluit": "vraagt-besluit"
   },
   "bron": {
-   "documenten": 167,
+   "documenten": 176,
    "besluitbestand": "TOEZEGKLASSEN.json",
-   "vingerafdruk": "b38a53711b03828a"
+   "vingerafdruk": "0a73404df8564f11"
   },
   "telling": {
-   "toegezegd": 879,
+   "toegezegd": 897,
    "afgewezen-met-grens": 20,
-   "vraagt-besluit": 84,
+   "vraagt-besluit": 89,
    "extern": 10
   },
   "perStand": {
-   "staat": 528,
-   "een-stap-weg": 284,
-   "jaren-weg": 66,
-   "vraagt-besluit": 79
+   "staat": 536,
+   "een-stap-weg": 290,
+   "jaren-weg": 70,
+   "vraagt-besluit": 83
   },
   "nietGeteld": {
-   "prozaMarkeringen": 210,
-   "standOnbekend": 962,
+   "prozaMarkeringen": 220,
+   "standOnbekend": 1030,
    "uitleg": "prozaMarkeringen: een vetgedrukte stand in lopende tekst of een tabelrij zonder onderdeel; standOnbekend: een cel in een stand-kolom die geen van de vier standen is (bv. \"gedekt\", \"proven\", \"half\"). Beide worden niet geraden."
   },
   "perDocument": {
@@ -2046,10 +2046,22 @@
     "vraagt-besluit": 0,
     "extern": 0
    },
+   "AFBOUWPROGRAMMA.md": {
+    "toegezegd": 0,
+    "afgewezen-met-grens": 0,
+    "vraagt-besluit": 1,
+    "extern": 0
+   },
    "AFSPRAAK.md": {
     "toegezegd": 15,
     "afgewezen-met-grens": 0,
     "vraagt-besluit": 4,
+    "extern": 0
+   },
+   "AGENTS.md": {
+    "toegezegd": 0,
+    "afgewezen-met-grens": 1,
+    "vraagt-besluit": 0,
     "extern": 0
    },
    "ARBEID.md": {
@@ -2083,7 +2095,7 @@
     "extern": 0
    },
    "BETROUWBAARHEID.md": {
-    "toegezegd": 12,
+    "toegezegd": 11,
     "afgewezen-met-grens": 0,
     "vraagt-besluit": 1,
     "extern": 0
@@ -2096,12 +2108,6 @@
    },
    "CARRIERE.md": {
     "toegezegd": 15,
-    "afgewezen-met-grens": 1,
-    "vraagt-besluit": 0,
-    "extern": 0
-   },
-   "CLAUDE.md": {
-    "toegezegd": 0,
     "afgewezen-met-grens": 1,
     "vraagt-besluit": 0,
     "extern": 0
@@ -2149,9 +2155,9 @@
     "extern": 0
    },
    "EDGE.md": {
-    "toegezegd": 53,
+    "toegezegd": 61,
     "afgewezen-met-grens": 0,
-    "vraagt-besluit": 1,
+    "vraagt-besluit": 4,
     "extern": 0
    },
    "EIGENAAR.md": {
@@ -2170,6 +2176,12 @@
     "toegezegd": 1,
     "afgewezen-met-grens": 0,
     "vraagt-besluit": 0,
+    "extern": 0
+   },
+   "GEMEENSCHAP.md": {
+    "toegezegd": 7,
+    "afgewezen-met-grens": 0,
+    "vraagt-besluit": 1,
     "extern": 0
    },
    "GIFT.md": {
@@ -2317,7 +2329,7 @@
     "extern": 0
    },
    "SAMENLEVING.md": {
-    "toegezegd": 16,
+    "toegezegd": 17,
     "afgewezen-met-grens": 0,
     "vraagt-besluit": 0,
     "extern": 0
@@ -2381,10 +2393,25 @@
     "afgewezen-met-grens": 0,
     "vraagt-besluit": 0,
     "extern": 0
+   },
+   "WERKRUIMTE.md": {
+    "toegezegd": 3,
+    "afgewezen-met-grens": 0,
+    "vraagt-besluit": 0,
+    "extern": 0
    }
   },
   "geblokkeerd": {
    "vraagt-besluit": [
+    {
+     "document": "AFBOUWPROGRAMMA.md",
+     "regel": 239,
+     "onderdeel": "Zaakdoos-netwerk met nodeklassen, federatie, multi-regio en een ecosysteem voor derden",
+     "citaat": "**Wat het concept voor na V1 noemt.** Het Zaakdoos-netwerk met nodeklassen en federatie (fase B), multi-regio (fase C) en het ecosysteem voor derden (fase D) zijn geen V1-werk.",
+     "reden": "Het integrale V1-concept van 18 oktober 2026 zet deze onderdelen in de roadmap na V1 (fase B tot en met D); CONSOLIDATIE.md staat geen nieuwe domeinen toe tot de V1-gaten gesloten zijn.",
+     "voorwaarde": "V1 is gereed volgens de einddefinitie in AFBOUWPROGRAMMA.md par. 10, en de eigenaar besluit per fase dat die opengaat.",
+     "eigenaar": "eigenaar"
+    },
     {
      "document": "AFSPRAAK.md",
      "regel": 196,
@@ -2405,7 +2432,7 @@
     },
     {
      "document": "AFSPRAAK.md",
-     "regel": 308,
+     "regel": 323,
      "onderdeel": "Bewijs: de keten bestaat, het anker niet",
      "citaat": "## 9. Bewijs: de keten bestaat, het anker niet — **vraagt een besluit**",
      "reden": null,
@@ -2414,7 +2441,7 @@
     },
     {
      "document": "AFSPRAAK.md",
-     "regel": 457,
+     "regel": 472,
      "onderdeel": "16 het anker naar buiten",
      "citaat": "| 16 | het anker naar buiten | vraagt een besluit (par. 9) |",
      "reden": null,
@@ -2576,7 +2603,7 @@
     },
     {
      "document": "BETROUWBAARHEID.md",
-     "regel": 758,
+     "regel": 798,
      "onderdeel": "De acht bewijzen per belofte in plaats van per ingang",
      "citaat": "6. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per",
      "reden": "Welke ingangen samen een belofte vormen staat nergens in de code; dat verzinnen levert een lijst die stelliger is dan wat het huis weet.",
@@ -2665,6 +2692,33 @@
      "eigenaar": null
     },
     {
+     "document": "EDGE.md",
+     "regel": 1071,
+     "onderdeel": "Werkruimte die een view voorstelt uit de bloktaal",
+     "citaat": "| Werkruimte die een view voorstelt uit de bloktaal | **een besluit** | welke blokken Rahul mag openen en waar de renderer woont, zonder tweede componentenlijst |",
+     "reden": null,
+     "voorwaarde": null,
+     "eigenaar": null
+    },
+    {
+     "document": "EDGE.md",
+     "regel": 1076,
+     "onderdeel": "Vóór zijn",
+     "citaat": "| Vóór zijn | **een besluit** | `INTELLIGENTIE.md` par. 7 |",
+     "reden": null,
+     "voorwaarde": null,
+     "eigenaar": null
+    },
+    {
+     "document": "EDGE.md",
+     "regel": 1077,
+     "onderdeel": "Externe diensten (agenda) via OAuth of MCP",
+     "citaat": "| Externe diensten (agenda) via OAuth of MCP | **een besluit** | inkomende inhoud telt als besmet (`besmetting.js`); er is geen tokenkluis per lid |",
+     "reden": null,
+     "voorwaarde": null,
+     "eigenaar": null
+    },
+    {
      "document": "EIGENAAR.md",
      "regel": 44,
      "onderdeel": "Wachtwoordloze eigenaar",
@@ -2732,6 +2786,15 @@
      "regel": 433,
      "onderdeel": "33 Process Engine",
      "citaat": "| 33 | Process Engine | besluit | configureerbaar tot aan de bevestiging, niet erdoorheen |",
+     "reden": null,
+     "voorwaarde": null,
+     "eigenaar": null
+    },
+    {
+     "document": "GEMEENSCHAP.md",
+     "regel": 152,
+     "onderdeel": "6 Foundation Dialogue",
+     "citaat": "| 6 | Foundation Dialogue | **besluit** | prikbord + peiling, `livinglab/vraagbesluit.js` (besluit met reden uit een gesloten lijst), DemocratieOS (kwestie → eindstand), `bedrijf/besluit.js` (bezwaar verdwijnt nooit), Decision Room | een **beraad** voor een gemeenschap: standpunten ordenen, voorstel, besluit door de leden. Het besluit is de vraag of Beraad en DemocratieOS gescheiden blijven (aanbeveling: ja, zie par. 4 grens G6) |",
      "reden": null,
      "voorwaarde": null,
      "eigenaar": null
@@ -2999,7 +3062,7 @@
     },
     {
      "document": "RTG-V1-RELEASE-READINESS-AUDIT.md",
-     "regel": 1001,
+     "regel": 1496,
      "onderdeel": "F6 image-kwetsbaarheidsscan (B6)",
      "citaat": "| **F6** | **besluit** | image-kwetsbaarheidsscan (B6) | Geen scanner in CI; dossier eist `imageVulnerabilityScan`. | `RELEASEKANDIDAAT.md` B6. |",
      "reden": null,
@@ -3181,7 +3244,7 @@
     },
     {
      "document": "PRODUCTION.md",
-     "regel": 705,
+     "regel": 717,
      "onderdeel": "Externe security-audit en pentest",
      "citaat": "1. **Externe security-audit / pentest.** De basis is verstandig, maar niet door",
      "reden": "Door een derde geverifieerd is per definitie extern.",
@@ -3190,7 +3253,7 @@
     },
     {
      "document": "PRODUCTION.md",
-     "regel": 707,
+     "regel": 719,
      "onderdeel": "Echte betaalcertificering (PCI-scope)",
      "citaat": "2. **Echte betaalcertificering.** De naad staat klaar, maar PCI-scope,",
      "reden": "Certificering en een echte betaalprovider liggen buiten de code.",
@@ -3226,7 +3289,7 @@
     },
     {
      "document": "VRIJHEID.md",
-     "regel": 244,
+     "regel": 253,
      "onderdeel": "Juridische validatie van het RTG-tijdbeleid",
      "citaat": "3. De rest van het arbeidsvoorwaardenbesluit (par. 6), plus de juridische",
      "reden": "server/kern/vrijheid/rtgbeleid.js staat er nog zonder juridische toets.",
@@ -3236,6 +3299,15 @@
    ]
   },
   "afgewezen": [
+   {
+    "document": "AGENTS.md",
+    "regel": 161,
+    "onderdeel": "Competitieve progressie (ranglijsten, niveaus, toernooien) onder 18",
+    "citaat": "- **De progressielaag stopt bij 18+.**",
+    "reden": "progressieMag in server/kern/spellen/grens.js leest volwassen(); een leerdossier valt er niet onder (besluit 14 september 2026).",
+    "voorwaarde": null,
+    "eigenaar": null
+   },
    {
     "document": "ARBEID.md",
     "regel": 115,
@@ -3251,15 +3323,6 @@
     "onderdeel": "Career-objecttype",
     "citaat": "**Een `Career`-objecttype over deze vijftien domeinen is daarmee niet",
     "reden": "CARRIEREVORM.json: 0 velden in alle talentdomeinen; de carrierelus is een verklaring van werkwoorden, geen object.",
-    "voorwaarde": null,
-    "eigenaar": null
-   },
-   {
-    "document": "CLAUDE.md",
-    "regel": 2870,
-    "onderdeel": "Competitieve progressie (ranglijsten, niveaus, toernooien) onder 18",
-    "citaat": "- **De progressielaag stopt bij 18+.**",
-    "reden": "progressieMag in server/kern/spellen/grens.js leest volwassen(); een leerdossier valt er niet onder (besluit 14 september 2026).",
     "voorwaarde": null,
     "eigenaar": null
    },
@@ -3409,7 +3472,7 @@
    },
    {
     "document": "VERDER.md",
-    "regel": 447,
+    "regel": 478,
     "onderdeel": "Universeel Overgang-object",
     "citaat": "- een `Overgang`-object;",
     "reden": "OVERGANGSVORM.json: geen universele overgang; de mutatieproef liet een universele motor door waar de echte drager weigert.",
@@ -3655,6 +3718,18 @@
     "herkomst": "tabel"
    },
    {
+    "document": "AFBOUWPROGRAMMA.md",
+    "regel": 239,
+    "citaat": "**Wat het concept voor na V1 noemt.** Het Zaakdoos-netwerk met nodeklassen en federatie (fase B), multi-regio (fase C) en het ecosysteem voor derden (fase D) zijn geen V1-werk.",
+    "onderdeel": "Zaakdoos-netwerk met nodeklassen, federatie, multi-regio en een ecosysteem voor derden",
+    "stand": null,
+    "klasse": "vraagt-besluit",
+    "herkomst": "besluitbestand",
+    "reden": "Het integrale V1-concept van 18 oktober 2026 zet deze onderdelen in de roadmap na V1 (fase B tot en met D); CONSOLIDATIE.md staat geen nieuwe domeinen toe tot de V1-gaten gesloten zijn.",
+    "voorwaarde": "V1 is gereed volgens de einddefinitie in AFBOUWPROGRAMMA.md par. 10, en de eigenaar besluit per fase dat die opengaat.",
+    "eigenaar": "eigenaar"
+   },
+   {
     "document": "AFSPRAAK.md",
     "regel": 97,
     "citaat": "### 2.3 Wat het blad is — **jaren weg**, en met opzet klein",
@@ -3782,7 +3857,7 @@
    },
    {
     "document": "AFSPRAAK.md",
-    "regel": 291,
+    "regel": 306,
     "citaat": "## 8. De levenscyclus loopt zelf — **een stap weg**",
     "onderdeel": "De levenscyclus loopt zelf",
     "stand": "een-stap-weg",
@@ -3791,7 +3866,7 @@
    },
    {
     "document": "AFSPRAAK.md",
-    "regel": 308,
+    "regel": 323,
     "citaat": "## 9. Bewijs: de keten bestaat, het anker niet — **vraagt een besluit**",
     "onderdeel": "Bewijs: de keten bestaat, het anker niet",
     "stand": "vraagt-besluit",
@@ -3800,7 +3875,7 @@
    },
    {
     "document": "AFSPRAAK.md",
-    "regel": 336,
+    "regel": 351,
     "citaat": "## 10. Zekerheid hangt aan de handeling — **een stap weg**",
     "onderdeel": "Zekerheid hangt aan de handeling",
     "stand": "een-stap-weg",
@@ -3809,7 +3884,7 @@
    },
    {
     "document": "AFSPRAAK.md",
-    "regel": 356,
+    "regel": 371,
     "citaat": "## 11. Wat het lid ziet — **een stap weg**, met een naamconflict",
     "onderdeel": "Wat het lid ziet",
     "stand": "een-stap-weg",
@@ -3818,12 +3893,24 @@
    },
    {
     "document": "AFSPRAAK.md",
-    "regel": 457,
+    "regel": 472,
     "citaat": "| 16 | het anker naar buiten | vraagt een besluit (par. 9) |",
     "onderdeel": "16 het anker naar buiten",
     "stand": "vraagt-besluit",
     "klasse": "vraagt-besluit",
     "herkomst": "tabel"
+   },
+   {
+    "document": "AGENTS.md",
+    "regel": 161,
+    "citaat": "- **De progressielaag stopt bij 18+.**",
+    "onderdeel": "Competitieve progressie (ranglijsten, niveaus, toernooien) onder 18",
+    "stand": null,
+    "klasse": "afgewezen-met-grens",
+    "herkomst": "besluitbestand",
+    "reden": "progressieMag in server/kern/spellen/grens.js leest volwassen(); een leerdossier valt er niet onder (besluit 14 september 2026).",
+    "voorwaarde": null,
+    "eigenaar": null
    },
    {
     "document": "ARBEID.md",
@@ -5531,15 +5618,6 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 48,
-    "citaat": "| 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |",
-    "onderdeel": "3 voltooibaar",
-    "stand": "een-stap-weg",
-    "klasse": "toegezegd",
-    "herkomst": "tabel"
-   },
-   {
-    "document": "BETROUWBAARHEID.md",
     "regel": 49,
     "citaat": "| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |",
     "onderdeel": "4 waarheidsgetrouw",
@@ -5550,24 +5628,15 @@
    {
     "document": "BETROUWBAARHEID.md",
     "regel": 50,
-    "citaat": "| 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |",
+    "citaat": "| 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **staat voor twee onderdelen** (`VOLTOOIPROEF.json`, par. 4h): nette herstart, nieuwe sessie, en de opslag zelf |",
     "onderdeel": "5 persistent",
-    "stand": "een-stap-weg",
+    "stand": "staat",
     "klasse": "toegezegd",
     "herkomst": "tabel"
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 52,
-    "citaat": "| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **een stap weg** (`HERSTELPROEF.json`, `chaos.js`, `aanval.js` bestaan al) |",
-    "onderdeel": "7 herstelbaar",
-    "stand": "een-stap-weg",
-    "klasse": "toegezegd",
-    "herkomst": "tabel"
-   },
-   {
-    "document": "BETROUWBAARHEID.md",
-    "regel": 116,
+    "regel": 117,
     "citaat": "| betalen | vierde provider naast de demo-provider | **staat**: `server/betaal/synthetisch.js`, achter `RTG_SIMULATIEBANK=1`, nooit naast een echte provider, nooit in productie |",
     "onderdeel": "betalen",
     "stand": "staat",
@@ -5576,16 +5645,25 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 117,
-    "citaat": "| mail | sink-mailbox | **een stap weg**: `SMTP_URL=''` en `server/data/outbox/` bestaan al |",
+    "regel": 118,
+    "citaat": "| mail | sink-mailbox | **staat** (11 oktober 2026): de postvanger, `server/post-vanger.js`, achter `RTG_POSTVANGER=1`, nooit in productie, nooit naast `SMTP_URL` of `MAIL_DIRECT`; de proef leest hem met `scripts/lib/postvanger.js` en weigert te meten als er post naar buiten kan |",
     "onderdeel": "mail",
-    "stand": "een-stap-weg",
+    "stand": "staat",
     "klasse": "toegezegd",
     "herkomst": "tabel"
    },
    {
     "document": "BETROUWBAARHEID.md",
     "regel": 119,
+    "citaat": "| sms | test-adapter | **staat** (11 oktober 2026): `server/sms-sandbox.js` achter `SMS_SANDBOX=1`, nooit in productie, met de grendel in elke weigering; beide choke points (`sendSms` en `send('sms:...')`) lopen erdoor (`test/testwereld-adapters.test.js`) |",
+    "onderdeel": "sms",
+    "stand": "staat",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "BETROUWBAARHEID.md",
+    "regel": 120,
     "citaat": "| verwijderen | wegwerpdata | **staat**: elke proef draait al op een eigen `RTG_DATA_DIR` |",
     "onderdeel": "verwijderen",
     "stand": "staat",
@@ -5594,7 +5672,7 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 120,
+    "regel": 121,
     "citaat": "| boekingen | synthetische leveranciers | **staat**: de seed levert ze (`KIKUNOI`) |",
     "onderdeel": "boekingen",
     "stand": "staat",
@@ -5603,7 +5681,7 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 123,
+    "regel": 124,
     "citaat": "| AI | testmodel | **staat**: `LOCAL_AI_URL`, en zonder model is de handmatige werkmodus zelf de uitkomst die getoetst hoort te worden |",
     "onderdeel": "AI",
     "stand": "staat",
@@ -5612,7 +5690,7 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 124,
+    "regel": 125,
     "citaat": "| locatie | gesimuleerde GPS-trajecten | **staat**: Playwright `geolocation` + `permissions` |",
     "onderdeel": "locatie",
     "stand": "staat",
@@ -5621,8 +5699,8 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 754,
-    "citaat": "4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen. Dit is",
+    "regel": 792,
+    "citaat": "4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen.",
     "onderdeel": "De gecontroleerde testwereld (bewijs 3, 5 en 7)",
     "stand": null,
     "klasse": "toegezegd",
@@ -5633,7 +5711,7 @@
    },
    {
     "document": "BETROUWBAARHEID.md",
-    "regel": 758,
+    "regel": 798,
     "citaat": "6. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per",
     "onderdeel": "De acht bewijzen per belofte in plaats van per ingang",
     "stand": null,
@@ -5879,18 +5957,6 @@
     "stand": "jaren-weg",
     "klasse": "toegezegd",
     "herkomst": "tabel"
-   },
-   {
-    "document": "CLAUDE.md",
-    "regel": 2870,
-    "citaat": "- **De progressielaag stopt bij 18+.**",
-    "onderdeel": "Competitieve progressie (ranglijsten, niveaus, toernooien) onder 18",
-    "stand": null,
-    "klasse": "afgewezen-met-grens",
-    "herkomst": "besluitbestand",
-    "reden": "progressieMag in server/kern/spellen/grens.js leest volwassen(); een leerdossier valt er niet onder (besluit 14 september 2026).",
-    "voorwaarde": null,
-    "eigenaar": null
    },
    {
     "document": "CODE.md",
@@ -6933,7 +6999,7 @@
    {
     "document": "EDGE.md",
     "regel": 689,
-    "citaat": "| 36 | Rahul context button | stap weg | 5 | \"Wat kan hier\" en \"waarom niet\" bestaan deterministisch; Rahul leest het blikveld nog niet, en alleen via een positieve veldenlijst (AI-CONTEXT-01). |",
+    "citaat": "| 36 | Rahul context button | stap weg | 5 | \"Wat kan hier\" en \"waarom niet\" bestaan deterministisch. Rahul LEEST het blikveld sinds golf 3 (`edge/rahulzicht.js`): wereld, de titel die het scherm zelf zei en een verwijzing (soort en id), via een positieve veldenlijst (AI-CONTEXT-01) met elk ander veld in `NIET_MEE` met reden; de server saneert het tot PASS zonder weggegooide sleutel (`test/rahulzicht.e2e.js`). Een contextknop die er handelingen uit voorstelt, ontbreekt nog. |",
     "onderdeel": "36 Rahul context button",
     "stand": "een-stap-weg",
     "klasse": "toegezegd",
@@ -7097,6 +7163,105 @@
     "regel": 726,
     "citaat": "| 6 — adaptieve prestaties | vooruit laden en lokaal leren (besluit 3), gemeten in plaats van gevoeld | jaren weg tot de meting er is |",
     "onderdeel": "6 — adaptieve prestaties",
+    "stand": "jaren-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1068,
+    "citaat": "| Context Bridge: blikveld als verwijzing naar Rahul, opnieuw getoetst op de server | **een stap weg** | het contract (`menscontext.js`), de objectvorm (`objectverwijzing.js`) en de ketting (`menscontext-ref.js`) staan; de clientbron en een opzoeker per domein ontbreken |",
+    "onderdeel": "Context Bridge: blikveld als verwijzing naar Rahul, opnieuw getoetst op de server",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1069,
+    "citaat": "| Point & Ask: wijs een object aan en vraag ernaar | **een stap weg** | volgt uit de Context Bridge zodra een scherm zijn object publiceert via `RTGAdaptief.context()` |",
+    "onderdeel": "Point & Ask: wijs een object aan en vraag ernaar",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1070,
+    "citaat": "| Plan op de Edge met echte actiestaten | **een stap weg** | `plan.js` en `actiestaat.js` staan; ze zijn nog niet op elkaar aangesloten |",
+    "onderdeel": "Plan op de Edge met echte actiestaten",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1071,
+    "citaat": "| Werkruimte die een view voorstelt uit de bloktaal | **een besluit** | welke blokken Rahul mag openen en waar de renderer woont, zonder tweede componentenlijst |",
+    "onderdeel": "Werkruimte die een view voorstelt uit de bloktaal",
+    "stand": "vraagt-besluit",
+    "klasse": "vraagt-besluit",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1073,
+    "citaat": "| Intentie herkennen op het toestel | **een stap weg** | `tekst.vector` loopt in de cel (`TOESTEL.md` par. 12); de koppeling aan de resolver niet |",
+    "onderdeel": "Intentie herkennen op het toestel",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1074,
+    "citaat": "| Prompt caching met hoedanigheid in de sleutel | **een stap weg** | AI-CONTEXT-02 heeft vandaag geen handhaver, omdat er geen cache is |",
+    "onderdeel": "Prompt caching met hoedanigheid in de sleutel",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1075,
+    "citaat": "| Continuïteit over werelden via een correlatie | **jaren weg** voor hervatten, **staat** voor de keten | `kern/envelop.js` draagt correlatie en oorzaak; hervatten over werelden niet |",
+    "onderdeel": "Continuïteit over werelden via een correlatie",
+    "stand": "jaren-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1076,
+    "citaat": "| Vóór zijn | **een besluit** | `INTELLIGENTIE.md` par. 7 |",
+    "onderdeel": "Vóór zijn",
+    "stand": "vraagt-besluit",
+    "klasse": "vraagt-besluit",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1077,
+    "citaat": "| Externe diensten (agenda) via OAuth of MCP | **een besluit** | inkomende inhoud telt als besmet (`besmetting.js`); er is geen tokenkluis per lid |",
+    "onderdeel": "Externe diensten (agenda) via OAuth of MCP",
+    "stand": "vraagt-besluit",
+    "klasse": "vraagt-besluit",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1078,
+    "citaat": "| Externe agents die RTG bedienen | **jaren weg** | `VERTROUWEN.json` heeft vrijwel geen bewezen routes |",
+    "onderdeel": "Externe agents die RTG bedienen",
+    "stand": "jaren-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "EDGE.md",
+    "regel": 1079,
+    "citaat": "| Zelfstandige uitvoering van meerstapsdoelen | **jaren weg** | `INTELLIGENTIE.md` par. 6: 7 van de 118 schrijfparen dragen herstel, gevolg en herhaling |",
+    "onderdeel": "Zelfstandige uitvoering van meerstapsdoelen",
     "stand": "jaren-weg",
     "klasse": "toegezegd",
     "herkomst": "tabel"
@@ -7310,6 +7475,78 @@
     "stand": "staat",
     "klasse": "toegezegd",
     "herkomst": "kop"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 147,
+    "citaat": "| 1 | Communities voor iedereen | **een stap weg** | Genootschap (rollen, prikbord, peiling, bijeenkomst), comm-groepsgesprek, objectlaag-groep, rtfos-activiteiten met wachtlijst en VOG-slot | Genootschap staat alleen open voor `LEDEN` en kent geen **organisatie** als drager (buurt, vereniging). Het groepsgesprek hangt er niet aan. Documenten per groep bestaan niet |",
+    "onderdeel": "1 Communities voor iedereen",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 148,
+    "citaat": "| 2 | Mensen verbinden | **staat** (met correctie) | Sociaal + vriendenlaag met voogdgoedkeuring, Contact-PIN, RTG Link, Vonk, Rendez-vous, Ontmoeting, Salon, Pulse, Connect | niets bouwen. De correctie van par. 1.2: verbinden loopt via activiteiten en groepen en nooit via een personenlijst |",
+    "onderdeel": "2 Mensen verbinden",
+    "stand": "staat",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 151,
+    "citaat": "| 5 | Buurten | **een stap weg** | Buurtruil, os-publiek, rtfos-activiteiten, vrijwilligersportaal, gemeenteportaal (alleen aantallen, buurten onder vijf samengevoegd), Living Lab-thema's, stadsweefsel-inspraak | een **buurt als gemeenschap** (Genootschap met een gebied) en \"hulp vragen of aanbieden\" tussen bewoners. Let op `VERDER.md` par. 7: celveilig is niet queryveilig |",
+    "onderdeel": "5 Buurten",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 152,
+    "citaat": "| 6 | Foundation Dialogue | **besluit** | prikbord + peiling, `livinglab/vraagbesluit.js` (besluit met reden uit een gesloten lijst), DemocratieOS (kwestie → eindstand), `bedrijf/besluit.js` (bezwaar verdwijnt nooit), Decision Room | een **beraad** voor een gemeenschap: standpunten ordenen, voorstel, besluit door de leden. Het besluit is de vraag of Beraad en DemocratieOS gescheiden blijven (aanbeveling: ja, zie par. 4 grens G6) |",
+    "onderdeel": "6 Foundation Dialogue",
+    "stand": "vraagt-besluit",
+    "klasse": "vraagt-besluit",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 153,
+    "citaat": "| 7 | Communities onderling verbinden | **een stap weg** | `rtfos/partners.js` (vier afspraakvelden: geld, vrijwilligers, gegevens, aansprakelijkheid), `rtfclubs.js`, `rtfos/netwerk.js` (blauwdrukken tussen steden), stadsraad (beide kanten stemmen) | een **samenwerkingsverband** tussen twee gemeenschappen die geen RTF-partner zijn. De vorm van `partners.js` is precies goed en hoort hergebruikt te worden, niet gekopieerd |",
+    "onderdeel": "7 Communities onderling verbinden",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 155,
+    "citaat": "| 9 | Praktische en maatschappelijke ondersteuning | **staat** | knelpuntmotor (ook via `/api/rtf/knelpunt`), rtfos-casus met versleutelde naam, hulpwijzer, zorg, gemeenteloket, onvervreemdbare bodem, RTG Service (zaak met tijdlijn) | de hulpwijzer is statisch (geen API). Een buurtbewoner die hulp **aanbiedt** heeft nog geen weg |",
+    "onderdeel": "9 Praktische en maatschappelijke ondersteuning",
+    "stand": "staat",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 156,
+    "citaat": "| 10 | Mentorschap en kansen | **een stap weg** | knelpunt-aanvoer (werk, opleiding, opvang), Carrièreledger (een ander bevestigt), Métier (aanbeveling als tekst, één mens één stem), vacatures incl. `stage`, beroepenbieb | **mensen als mentor**. Er bestaat geen menselijke mentorkoppeling, alleen de AI-levensmentor. Dit is meteen de **derde bron** voor de aanvoerprojectie die `MAATSTAF.md` par. 7h vraagt |",
+    "onderdeel": "10 Mentorschap en kansen",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "GEMEENSCHAP.md",
+    "regel": 158,
+    "citaat": "| 12 | Integratie met alle Worlds | **staat** (mechanisme) | WorldNetwork-paneel in alle vier werelden, `MAPPEN`, functieregister met doelgroepen, Trusted Execution | per gemeenschapsfunctie bepalen in welke wereld hij verschijnt (par. 3.1) |",
+    "onderdeel": "12 Integratie met alle Worlds",
+    "stand": "staat",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
    },
    {
     "document": "GIFT.md",
@@ -10259,7 +10496,7 @@
    },
    {
     "document": "PRODUCTION.md",
-    "regel": 705,
+    "regel": 717,
     "citaat": "1. **Externe security-audit / pentest.** De basis is verstandig, maar niet door",
     "onderdeel": "Externe security-audit en pentest",
     "stand": null,
@@ -10271,7 +10508,7 @@
    },
    {
     "document": "PRODUCTION.md",
-    "regel": 707,
+    "regel": 719,
     "citaat": "2. **Echte betaalcertificering.** De naad staat klaar, maar PCI-scope,",
     "onderdeel": "Echte betaalcertificering (PCI-scope)",
     "stand": null,
@@ -10769,7 +11006,7 @@
    },
    {
     "document": "RTG-V1-RELEASE-READINESS-AUDIT.md",
-    "regel": 1001,
+    "regel": 1496,
     "citaat": "| **F6** | **besluit** | image-kwetsbaarheidsscan (B6) | Geen scanner in CI; dossier eist `imageVulnerabilityScan`. | `RELEASEKANDIDAAT.md` B6. |",
     "onderdeel": "F6 image-kwetsbaarheidsscan (B6)",
     "stand": "vraagt-besluit",
@@ -10877,7 +11114,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 118,
+    "regel": 143,
     "citaat": "| volledig digitaal | staat |",
     "onderdeel": "volledig digitaal",
     "stand": "staat",
@@ -10886,7 +11123,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 119,
+    "regel": 144,
     "citaat": "| meertalig | staat: `public/shared/i18n/` |",
     "onderdeel": "meertalig",
     "stand": "staat",
@@ -10895,7 +11132,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 120,
+    "regel": 145,
     "citaat": "| eenvoudige taal | **een stap weg**: er bestaat geen taalniveau naast de taalkeuze |",
     "onderdeel": "eenvoudige taal",
     "stand": "een-stap-weg",
@@ -10904,7 +11141,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 121,
+    "regel": 146,
     "citaat": "| begeleid | staat in delen: bijstand (`kern/command/bijstand.js`), de ledenbalie, een mens in Service |",
     "onderdeel": "begeleid",
     "stand": "staat",
@@ -10913,7 +11150,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 122,
+    "regel": 147,
     "citaat": "| via een gemachtigde | staat: `kern/vertegenwoordiging/`, maar achter A3 (par. 5) |",
     "onderdeel": "via een gemachtigde",
     "stand": "staat",
@@ -10922,7 +11159,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 123,
+    "regel": 148,
     "citaat": "| anoniem waar verantwoord | staat aan de HDI-voordeur, nergens anders |",
     "onderdeel": "anoniem waar verantwoord",
     "stand": "staat",
@@ -10931,7 +11168,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 221,
+    "regel": 246,
     "citaat": "| **Toegang** | niemand valt buiten het systeem omdat geld, taal, handicap, woning of digitale vaardigheid ontbreekt | Understand, Protect | staat in delen; eenvoudige taal en een fysieke ingang ontbreken (par. 3) |",
     "onderdeel": "Toegang",
     "stand": "staat",
@@ -10940,7 +11177,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 223,
+    "regel": 248,
     "citaat": "| **Bescherming** | de HDI-kant, waar gewone software niet genoeg is | Protect, Prove | staat (HDI.md par. 7, regels 1 t/m 7) |",
     "onderdeel": "Bescherming",
     "stand": "staat",
@@ -10949,7 +11186,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 490,
+    "regel": 515,
     "citaat": "| 1 | Dit document als grondwet | **staat** |",
     "onderdeel": "1 Dit document als grondwet",
     "stand": "staat",
@@ -10958,7 +11195,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 492,
+    "regel": 517,
     "citaat": "| 3 | De nulmeting van par. 11.2 | **staat** voor het gratis account; de verklaring wacht op aftekening |",
     "onderdeel": "3 De nulmeting van par. 11.2",
     "stand": "staat",
@@ -10967,7 +11204,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 493,
+    "regel": 518,
     "citaat": "| 4 | SAM-01 als ratel | **staat** (`test/onvervreemdbaar.test.js`) |",
     "onderdeel": "4 SAM-01 als ratel",
     "stand": "staat",
@@ -10976,7 +11213,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 494,
+    "regel": 519,
     "citaat": "| 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | **staat** (par. 11.3); de toegangsvraag bij `werving/verbind` wacht op een mens |",
     "onderdeel": "4b De doelgroepmeter een gratis-accountsessie geven naast de bezoeker",
     "stand": "staat",
@@ -10985,7 +11222,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 495,
+    "regel": 520,
     "citaat": "| 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **staat**: open na paspoortcontrole (`server/kern/onvervreemdbaar.js`) |",
     "onderdeel": "4c Gemeenteafspraak, aangifte en zorgintake voor een Community-lid",
     "stand": "staat",
@@ -10994,7 +11231,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 496,
+    "regel": 521,
     "citaat": "| 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | **staat** (par. 11.4): gemeten met `npm run gastsplitsing`, en de drie tegenspraken zijn op 29 september besloten en dicht; de 82 weigeringen \"voor leden\" zijn een formuleringsvraag |",
     "onderdeel": "5 guest splitsen in bezoeker en lid op de bodem",
     "stand": "staat",
@@ -11003,7 +11240,7 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 497,
+    "regel": 522,
     "citaat": "| 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | **staat** (par. 6): RTG Veilig in LivingOS, `rust` als eigen functie, eis 2 en 5 gehandhaafd; eis 1, 3 en 4 zonder handhaver, met de reden |",
     "onderdeel": "6 Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6",
     "stand": "staat",
@@ -11012,10 +11249,19 @@
    },
    {
     "document": "SAMENLEVING.md",
-    "regel": 498,
+    "regel": 523,
     "citaat": "| 7 | Eenvoudige taal als deelnamevorm | een stap weg |",
     "onderdeel": "7 Eenvoudige taal als deelnamevorm",
     "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "SAMENLEVING.md",
+    "regel": 527,
+    "citaat": "| 11 | Opnieuw beginnen als projectie over wat er staat | **staat** (11 okt 2026), de schuld uitgezonderd: geen module, met de reden |",
+    "onderdeel": "11 Opnieuw beginnen als projectie over wat er staat",
+    "stand": "staat",
     "klasse": "toegezegd",
     "herkomst": "tabel"
    },
@@ -12299,7 +12545,7 @@
    },
    {
     "document": "VERDER.md",
-    "regel": 447,
+    "regel": 478,
     "citaat": "- een `Overgang`-object;",
     "onderdeel": "Universeel Overgang-object",
     "stand": null,
@@ -12311,7 +12557,7 @@
    },
    {
     "document": "VRIJHEID.md",
-    "regel": 244,
+    "regel": 253,
     "citaat": "3. De rest van het arbeidsvoorwaardenbesluit (par. 6), plus de juridische",
     "onderdeel": "Juridische validatie van het RTG-tijdbeleid",
     "stand": null,
@@ -12431,7 +12677,7 @@
    },
    {
     "document": "WEERBAARHEID.md",
-    "regel": 105,
+    "regel": 111,
     "citaat": "| 3 · Geen AI produceert een menselijke bevestiging | `kern/stuur/goedkeuring.js` (`Symbol`), `test/stuur-aanval.test.js` met vijandig model | **staat, met toets** |",
     "onderdeel": "3 · Geen AI produceert een menselijke bevestiging",
     "stand": "staat",
@@ -12440,7 +12686,7 @@
    },
    {
     "document": "WEERBAARHEID.md",
-    "regel": 107,
+    "regel": 113,
     "citaat": "| 5 · Niemand verzwakt kritieke beveiliging alleen | `kern/isolatie/ceremonie-eisen.js` (SEC-LOCK-001) | staat voor de isolatiestand, **0 kantoorroutes** |",
     "onderdeel": "5 · Niemand verzwakt kritieke beveiliging alleen",
     "stand": "staat",
@@ -12449,7 +12695,7 @@
    },
    {
     "document": "WEERBAARHEID.md",
-    "regel": 108,
+    "regel": 114,
     "citaat": "| 6 · Onbekende herkomst valt naar minimale bevoegdheid | `herkomst.js` `klasseVan()`, SEC-LOCK-004, `handelingsklasse.js` | **staat als vorm**, dekking 1 van 13 kanalen |",
     "onderdeel": "6 · Onbekende herkomst valt naar minimale bevoegdheid",
     "stand": "staat",
@@ -12458,10 +12704,37 @@
    },
    {
     "document": "WEERBAARHEID.md",
-    "regel": 110,
+    "regel": 116,
     "citaat": "| 8 · Elke kritieke mutatie draagt cryptografisch bewijs van intentie | `goedkeuring.js` (pad + body, niet cryptografisch) | **een stap weg** |",
     "onderdeel": "8 · Elke kritieke mutatie draagt cryptografisch bewijs van intentie",
     "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "WERKRUIMTE.md",
+    "regel": 390,
+    "citaat": "| **0. De host herstart niet meer** | een kale `/apps/app.html` laadt een keer in plaats van twee (app.html, \"de pas van deze werktafel\"), en een teruggezet blad laadt op een telefoon pas als het in beeld komt (`shared/command/geheugen.js`, `hervat`) | **staat** (11 oktober 2026) |",
+    "onderdeel": "0. De host herstart niet meer",
+    "stand": "staat",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "WERKRUIMTE.md",
+    "regel": 391,
+    "citaat": "| **1. Een licht blad** | een scherm dat weet dat het in de werktafel staat (`rtg-in-frame`), laadt de schilcode niet die alleen de host draagt | een stap weg: eerst per laag vaststellen of hij in een blad iets doet |",
+    "onderdeel": "1. Een licht blad",
+    "stand": "een-stap-weg",
+    "klasse": "toegezegd",
+    "herkomst": "tabel"
+   },
+   {
+    "document": "WERKRUIMTE.md",
+    "regel": 393,
+    "citaat": "| **3. Een schil, alle werelden** | de iframe-weg wordt de terugval en niet de regel | jaren weg in de zin van PLATFORM.md: per wereld, nooit in een keer |",
+    "onderdeel": "3. Een schil, alle werelden",
+    "stand": "jaren-weg",
     "klasse": "toegezegd",
     "herkomst": "tabel"
    }

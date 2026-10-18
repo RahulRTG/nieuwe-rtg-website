@@ -2820,3 +2820,7 @@ beveiligingsgrens. Eén integrator, geen nieuwe domeinen tot fase 4, CI genereer
 en controleert de registers, en vier harde voorwaarden: geen kunstmatige
 normverbetering, geen verborgen bewijsachterstand, geen automatische
 productie-uitrol, geen nieuwe technische schuld.
+Sinds 18 oktober 2026 loopt de V1-afbouw op één integratiebranch
+(`claude/v1-integratie`) zonder merges naar main tot V1 gereed is; open PR's
+worden in die branch geïntegreerd, en de einddefinitie van V1 staat in
+`AFBOUWPROGRAMMA.md` par. 10.

@@ -3,20 +3,13 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-18",
-  "commit": "ed33f4dc",
-  "seconden": 10.6,
+  "commit": "36fd470d",
+  "seconden": 44.7,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
-   "ongecommitteInvoer": [
-    "server/kern/lidacties/factuur.js",
-    "server/routes/supplier/kassa/verkoop.js",
-    "server/routes/supplier/retail.js",
-    "server/kern/lidacties/factuur.js",
-    "server/routes/supplier/kassa/verkoop.js",
-    "server/routes/supplier/retail.js"
-   ],
+   "boomVuil": false,
+   "ongecommitteInvoer": [],
    "bestanden": [
     "public/apps/access/meaning.js",
     "public/apps/agenda/app.js",

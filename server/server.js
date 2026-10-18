@@ -1610,7 +1610,7 @@ const {
   // (kern.keuken bestaat op aanroepmoment; de kern-bag wordt verderop gevuld)
   bijGeleverd: (o) => {
     const zaak = findSupplier(o.klant.id);
-    if (zaak && kern.keuken) kern.keuken.leverBinnen(zaak, o.regels, 'groothandel ' + o.groothandelNaam);
+    return zaak && kern.keuken ? kern.keuken.leverBinnen(zaak, o.regels, 'groothandel ' + o.groothandelNaam) : null;
   }
 });
 

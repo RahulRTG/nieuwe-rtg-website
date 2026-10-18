@@ -1,0 +1,188 @@
+{
+  "stempel": {
+    "op": "2026-10-18T07:56:10.976Z",
+    "commit": "dc91a23a",
+    "boomVuil": true,
+    "boomAnders": 0,
+    "instrument": "scripts/voorraadproef.js",
+    "node": "v22.22.0"
+  },
+  "uitleg": "De eerste keten tussen twee zaken: een keukenartikel zakt onder zijn minimum, het inkoopadvies wordt een groothandelsbestelling, en de levering landt in de keukenvoorraad van de koper. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Zie CIVILIS.md par. 4.",
+  "grens": "Geen browser en geen geld: de groothandelsbestelling kent vandaag geen betaling en geen factuur (keten factuur-grootboek blijft open). Alleen de keukenvoorraad van de koper; retail-, oogst- en groothandelsvoorraad aan de koperskant hebben eigen naden. Een groothandel uit de seed, twee restaurants langs de echte toelatingsweg.",
+  "groothandel": "MERCABIZA",
+  "genre": "restaurant",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "zaak",
+      "naar": "zaak",
+      "wat": "een keukenartikel onder zijn minimum staat in het inkoopadvies",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "advies 8 kg (stand 2, minimum 5)",
+      "fout": null,
+      "ms": 4
+    },
+    {
+      "nr": 2,
+      "van": "ondernemer",
+      "naar": "ondernemer",
+      "wat": "het ondernemingsbeeld telt het artikel als laag",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "keuken: 1 laag, Tomaten erbij: true",
+      "fout": null,
+      "ms": 6
+    },
+    {
+      "nr": 3,
+      "van": "zaak",
+      "naar": "groothandel",
+      "wat": "het inkoopadvies wordt een bestelling, en de groothandel ziet hem als inkomend",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "order GHED1864D9, inkomend: true, regel 8 x Trostomaten",
+      "fout": null,
+      "ms": 12
+    },
+    {
+      "nr": 4,
+      "van": "groothandel",
+      "naar": "zaak",
+      "wat": "zet de bestelling op \"bevestigd\", en de zaak leest die stand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de zaak leest \"bevestigd\"",
+      "fout": null,
+      "ms": 7
+    },
+    {
+      "nr": 5,
+      "van": "groothandel",
+      "naar": "zaak",
+      "wat": "zet de bestelling op \"onderweg\", en de zaak leest die stand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de zaak leest \"onderweg\"",
+      "fout": null,
+      "ms": 5
+    },
+    {
+      "nr": 6,
+      "van": "groothandel",
+      "naar": "zaak",
+      "wat": "levert, en de keukenvoorraad van de zaak is aangevuld tegen de inkoopprijs",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "order \"geleverd\", Tomaten 10 (verwacht 10), kostprijs 2.2 (inkoop 2.2)",
+      "fout": null,
+      "ms": 11
+    },
+    {
+      "nr": 7,
+      "van": "ondernemer",
+      "naar": "ondernemer",
+      "wat": "het artikel staat niet meer als laag in het ondernemingsbeeld",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "nog laag: false",
+      "fout": null,
+      "ms": 6
+    },
+    {
+      "nr": 8,
+      "van": "groothandel",
+      "naar": "groothandel",
+      "wat": "zijn voorraad is afgeboekt en de levering telt in zijn omzet",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "Trostomaten 90 -> 82, afgerond: true, omzet 17.6",
+      "fout": null,
+      "ms": 3
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "meer bestellen dan de groothandel heeft liggen",
+      "belofte": "weigert met de stand erbij, en de voorraad van de groothandel blijft gelijk",
+      "stand": "gehouden",
+      "wat": "status 409, voorraad 82 -> 82"
+    },
+    {
+      "naam": "een nog niet bevestigde bestelling annuleren",
+      "belofte": "gaat door, en zet precies terug wat er was afgeboekt",
+      "stand": "gehouden",
+      "wat": "bestel 200, annuleer 200, voorraad 82 -> 82"
+    },
+    {
+      "naam": "een bevestigde bestelling annuleren",
+      "belofte": "weigert; na bevestiging is het de groothandel die beslist",
+      "stand": "gehouden",
+      "wat": "status 409: Alleen een nog niet bevestigde bestelling kan geannuleerd worden."
+    },
+    {
+      "naam": "de groothandel weigert een bestelling",
+      "belofte": "de voorraad gaat terug op de plank en de keuken van de koper verandert niet",
+      "stand": "gehouden",
+      "wat": "weiger 200, plank 81 -> 81, keuken 10 -> 10"
+    },
+    {
+      "naam": "een geleverde bestelling nog eens vooruitzetten",
+      "belofte": "weigert, en de keuken krijgt geen tweede levering",
+      "stand": "gehouden",
+      "wat": "status 409, keuken 10 -> 10"
+    },
+    {
+      "naam": "een andere zaak annuleert een bestelling die niet van haar is",
+      "belofte": "bestaat niet voor haar, en de bestelling blijft staan",
+      "stand": "gehouden",
+      "wat": "status 404, bestelling van A: aangevraagd"
+    },
+    {
+      "naam": "een andere zaak leest haar eigen inkooplijst",
+      "belofte": "daar staat de bestelling van een ander niet in",
+      "stand": "gehouden",
+      "wat": "zichtbaar voor B: false"
+    },
+    {
+      "naam": "een geleverd product dat niet op de keukenlijst staat",
+      "belofte": "de zaak leest per regel of hij in haar voorraad is ingeboekt; niets is stilzwijgend \"binnen\"",
+      "stand": "gehouden",
+      "wat": "order \"geleverd\", ontvangst: {\"geboekt\":0,\"nietGeboekt\":[{\"naam\":\"Servetten (pak 500)\",\"reden\":\"staat niet op de keukenlijst\"}],\"at\":\"2026-10-18T07:56:17.621Z\"}"
+    },
+    {
+      "naam": "een ledensessie probeert in te kopen bij de groothandel",
+      "belofte": "komt niet langs de zaakpoort",
+      "stand": "gehouden",
+      "wat": "status 401"
+    },
+    {
+      "naam": "een groothandel die niet meer aan zaken levert",
+      "belofte": "weigert de bestelling met een reden",
+      "stand": "gehouden",
+      "wat": "status 409: Deze groothandel levert niet aan dit type klant."
+    }
+  ],
+  "order": "GHED1864D9",
+  "telling": {
+    "schakels": 8,
+    "gesloten": 8,
+    "open": 0,
+    "openBekend": 0,
+    "stuk": 0,
+    "storingen": 10,
+    "gehouden": 10,
+    "gebroken": 0
+  },
+  "sluit": true,
+  "sluitMetBevinding": true,
+  "bevindingen": []
+}

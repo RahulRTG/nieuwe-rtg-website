@@ -158,6 +158,33 @@ test('een knop: het inkoopadvies wordt een groothandelsbestelling en geleverd vu
   assert.ok(na.logboek.some(x => x.soort === 'levering' && /mercabiza/i.test(x.wie || '')), 'de levering staat herleidbaar in het logboek');
 });
 
+/* De toets hierboven koos met opzet een artikel dat EXACT zo heet als het
+   product, en verborg daarmee het gat dat scripts/voorraadproef.js vond: het
+   advies bestelt op een deel van de naam, de ontvangst boekte alleen op de hele
+   naam. "Tomaten" werd "Trostomaten", de bestelling heette geleverd, en de
+   keuken kreeg niets -- zonder dat iemand het kon zien. */
+test('een levering landt op het artikel waarvoor besteld is, ook als de groothandel het anders noemt', async () => {
+  const tom = (await api('supplier/voorraad/zet', { naam: 'Tomaten', aantal: 1, min: 4, eenheid: 'kg', kostprijs: 2 })).body.item;
+  const r = await api('supplier/keuken/bestel-advies', { groothandelCode: 'MERCABIZA' });
+  assert.equal(r.status, 200);
+  const regel = r.body.order.regels.find(x => x.naam === 'Trostomaten');
+  assert.ok(regel, 'het advies koppelt Tomaten aan Trostomaten');
+  assert.equal(regel.keukenArtikel, tom.id, 'de regel onthoudt voor welk keukenartikel hij is besteld');
+  const roster = await api('supplier/roster', { code: 'MERCABIZA' });
+  const rosa = (roster.body.staff || []).find(x => x.role === 'manager');
+  const gh = await (await fetch(base + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'MERCABIZA', staffId: rosa.id, pin: '1234' })
+  })).json();
+  for (let i = 0; i < 3; i++) await api('supplier/groothandel/order/status', { ref: r.body.order.ref, actie: 'verder' }, gh.token);
+  const t = (await api('supplier/keuken')).body.artikelen.find(a => a.id === tom.id);
+  assert.equal(t.aantal, 1 + regel.aantal, 'de geleverde trostomaten staan in de keuken als tomaten');
+  assert.equal(t.kostprijs, regel.prijs, 'tegen de inkoopprijs');
+  const mijn = (await api('supplier/inkoop/mijn')).body.bestellingen.find(o => o.ref === r.body.order.ref);
+  assert.ok(mijn.ontvangst && mijn.ontvangst.geboekt >= 1, 'de bestelling zegt wat er is ingeboekt');
+  assert.ok(Array.isArray(mijn.ontvangst.nietGeboekt), 'en wat niet, als lijst en niet stilzwijgend');
+});
+
 test('de dagafsluiting: Z-rapport met btw-splitsing en de boekhoudexport als CSV', async () => {
   const r = await api('supplier/dagrapport', {});
   assert.equal(r.status, 200);

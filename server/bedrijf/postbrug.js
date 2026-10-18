@@ -25,7 +25,7 @@
    verwijzing, nooit een tweede administratie. */
 'use strict';
 
-const { schoonLeiding } = require('../kern/rtmail-leiding');
+const maakRtmailOpslag = require('../kern/rtmail-opslag');
 module.exports = (sctx) => {
   const { app, save, nu, werkPoort, eigenVeld, schoon, rid, kern } = sctx;
   const { auth, rtmail, rtmailTeam, rtmailVak } = kern;
@@ -41,8 +41,8 @@ module.exports = (sctx) => {
      dan de teams waar hij in zit -- in die volgorde, want een gedeeld postvak
      is een uitbreiding van je eigen bereik en geen vervanging ervan. */
   function berichtVoor(sessie, id) {
-    const data = sctx.db && sctx.db.data && sctx.db.data.rtmail;
-    schoonLeiding(data, save); // beperkte post nooit in het gedeelde postvak (kern/rtmail-leiding.js)
+    // peil(): het vangnet tegen beperkte post, en niets aanmaken (kern/rtmail-opslag.js)
+    const data = sctx.db ? maakRtmailOpslag({ db: sctx.db, save }).peil() : null;
     const alle = (data || {}).berichten || [];
     const m = alle.find(x => x.id === id);
     if (!m) return { error: 'Dat bericht bestaat niet.' };

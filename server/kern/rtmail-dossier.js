@@ -24,7 +24,6 @@
    4. ALLEEN TEAMLEDEN. Elke functie hier vraagt het team op via
       kern/rtmail-team.js en weigert wie er niet in zit. Het dossier is niet
       openbaarder dan het postvak waar het bij hoort. */
-const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 const STATUSSEN = ['nieuw', 'in behandeling', 'wacht op klant', 'afgehandeld'];
@@ -40,11 +39,8 @@ module.exports = ({ db, save, crypto, rtmail, team, sla }) => {
   const nu = () => new Date().toISOString();
   const kap = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').trim().slice(0, n);
 
-  const store = () => {
-    if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
-    return db.data.rtmail;
-  };
+  const opslag = require('./rtmail-opslag')({ db, save });
+  const store = opslag.postvak; // beperkte post nooit in het gedeelde postvak (./rtmail-opslag.js)
 
   /* Het team EN het bericht, of een fout met de reden. Deze functie is de
      poort: geen enkele andere functie hier praat met de opslag zonder eerst

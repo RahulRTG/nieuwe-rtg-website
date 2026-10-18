@@ -67,6 +67,7 @@ const SCENARIOS = {
   'attenties.js': require('./lib/voltooi/attenties'),
   'cellier.js': require('./lib/voltooi/cellier'),
   'cercle.js': require('./lib/voltooi/cercle'),
+  'commerce.js': require('./lib/voltooi/commerce'),
   'entourage.js': require('./lib/voltooi/entourage'),
   'foodcourt.js': require('./lib/voltooi/foodcourt'),
   'garderobe.js': require('./lib/voltooi/garderobe'),
@@ -86,7 +87,8 @@ const SCENARIOS = {
   'table.js': require('./lib/voltooi/table'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),
   'veilig.js': require('./lib/voltooi/veilig'),
-  'verificatie.js': require('./lib/voltooi/verificatie')
+  'verificatie.js': require('./lib/voltooi/verificatie'),
+  'wonen.js': require('./lib/voltooi/wonen')
 };
 
 function scenarios(alleen) {

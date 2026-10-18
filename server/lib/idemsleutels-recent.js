@@ -29,6 +29,8 @@ const SLEUTELS = Object.assign({},
   /* De apps van de Lifestyle Pass: gevonden door de voltooiproef van Reisboek. */
   require('./idemsleutels-rechterhand').SLEUTELS,
   /* RTG Veilig: een dubbeltik op de alarmknop gaf de kring twee alarmen. */
-  require('./idemsleutels-veilig').SLEUTELS);
+  require('./idemsleutels-veilig').SLEUTELS,
+  /* De kluis: een dubbeltik op "document toevoegen" gaf twee documenten. */
+  require('./idemsleutels-bestanden').SLEUTELS);
 
 module.exports = { SLEUTELS };

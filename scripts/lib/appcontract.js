@@ -122,6 +122,12 @@ const CONTRACT = {
   'link:uitgaan': Object.assign({
     belofte: 'een lid zet zich met zijn gezelschap op de gastenlijst van een avond, de zaak ziet hem op codenaam, en afmelden geeft de plek vrij'
   }, voltooi('uitgaan', 'het scenario loopt /api/uitgaan, /api/uitgaan/mijn, /api/event/rsvp en /api/event/rsvp/annuleer, de routes die /apps/uitgaan.html zelf aanroept, met de zaak die de gastenlijst leest')),
+  'link:commerce': Object.assign({
+    belofte: 'een lid legt koopbare dingen in een mand, ziet per verkoper een afrekening met btw en wat bevestigen blokkeert, en geeft zijn keuze als briefje door aan de deur die wel bevestigt'
+  }, voltooi('commerce', 'het scenario loopt /api/commerce/aanbod, /mand, /mand/zet, /mand/leeg en /overdracht/maak, de routes die /apps/commerce.html zelf aanroept, met een ander lid dat het briefje niet mag lezen')),
+  'link:wonen': Object.assign({
+    belofte: 'een lid meldt wat er thuis stuk is zonder dat RTG een vakman veinst, en houdt zijn woningdocumenten bij in een eigen dossier in de kluis'
+  }, voltooi('wonen', 'het scenario loopt /api/home/onderhoud, /meld, /annuleer, /api/bestanden/map, /upload en /mijn, de routes die /apps/wonen.html zelf aanroept')),
   'link:mijnmall': Object.assign({
     belofte: 'een lid vraagt wat niemand aanbiedt, alleen zaken met het juiste vak zien het, het lid kiest een reactie en vindt het antwoord terug -- zonder boeking of betaling'
   }, voltooi('mijnmall', 'het scenario loopt /api/mall/aanvraag, /aanvragen/mijn, /aanvraag/kies en /wijzig, de routes die /apps/mijnmall.html zelf aanroept, met twee zaken aan de andere kant')),

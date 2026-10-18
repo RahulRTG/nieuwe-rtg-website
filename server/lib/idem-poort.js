@@ -158,7 +158,13 @@ function maakIdemPoort(opties) {
     let afgerond = false;
     const rond = (r) => { if (afgerond) return; afgerond = true; inVlucht.delete(id); klaar(r); };
 
-    res.json = (lijf) => {
+    /* Deze poort hangt BINNEN jsonGzip (middleware/compressie.js), die boven
+       1 kB om deze wikkel heen stuurt: een groot antwoord werd voor een
+       browser nooit herhaald (voltooiproef 18-10-2026). Die roept idemZie. */
+    let gezien = false;
+    const zie = (lijf) => {
+      if (gezien) return;
+      gezien = true;
       const status = res.statusCode || 200;
       /* De kast beslist zelf of dit bewaard mag worden (alleen een geslaagd
          antwoord) en snoeit meteen daarna. Levert hij false, dan is er niets
@@ -168,6 +174,10 @@ function maakIdemPoort(opties) {
         else rond(null);
       };
       bewaarBijEind(res, bewaar);
+    };
+    res[Symbol.for('rtg.idemZie')] = zie;
+    res.json = (lijf) => {
+      zie(lijf);
       return echteJson(lijf);
     };
     /* Een verzoek dat nooit bij res.json komt (crash, stream, afgebroken

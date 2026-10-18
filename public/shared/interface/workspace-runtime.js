@@ -1,32 +1,26 @@
 (function (w, d) {
   'use strict';
   var SDK = w.RTGModuleSDK, nummer = 0, rechtenGedeeld = null;
-  if (!SDK || !w.RTGWorkspaceRegistries || !w.RTGIdentityRuntime || !w.RTGSessionRuntime || !w.RTGWorkspaceIntents || !w.RTGWorkspaceContext ||
-      !w.RTGWorkspaceNavigation || !w.RTGWorkspaceState || !w.RTGWorkspacePolicy ||
-      !w.RTGWorkspaceOrchestrator || !w.RTGWorkspaceBroker || !w.RTGWorkspaceModuleHost || !w.RTGWorkspaceBlueprints ||
-      !w.RTGWorkspaceAssistantManifest) return;
+  if (!SDK || ['IdentityRuntime', 'SessionRuntime', 'WorkspaceRegistries', 'WorkspaceIntents', 'WorkspaceContext',
+    'WorkspaceNavigation', 'WorkspaceState', 'WorkspacePolicy', 'WorkspaceOrchestrator', 'WorkspaceBroker',
+    'WorkspaceModuleHost', 'WorkspaceBlueprints', 'WorkspaceAssistantManifest'].some(function (n) { return !w['RTG' + n]; })) return;
   w.RTGWorkspaceRuntime = function (opties) {
     var o = opties || {}, id = 'rtg-workspace-' + (++nummer), defs = Object.create(null), mounted = Object.create(null);
     var surface = 'peek', actief = null, dood = false, registries = w.RTGWorkspaceRegistries();
     registries.registerWorldCatalog(w.RTGWorkspaceWorldCatalog || []);
-    function fout(waar, error) {
-      if (typeof o.error === 'function') o.error(waar, error);
-    }
+    function fout(waar, error) { if (typeof o.error === 'function') o.error(waar, error); }
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });
     var contextEngine = w.RTGWorkspaceContext();
     var navigation = w.RTGWorkspaceNavigation({ open: o.open });
-    /* Zonder eigen antwoordfunctie vraagt de runtime de SERVER (kern/workspace-rechten.js);
-       twee runtimes delen EEN vraag (SCHILHERSTART.json). */
     var rechten = null, serverRecht = function (p) { return !!rechten && rechten[p] === true; };
     var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission || serverRecht, tenantPolicy: o.tenantPolicy });
     if (!o.permission && identity.authenticated()) Promise.resolve().then(function () {
-      if (typeof o.request === 'function') return aanvraag('/api/ik/workspace/rechten', {});
-      return rechtenGedeeld || (rechtenGedeeld = aanvraag('/api/ik/workspace/rechten', {}).catch(function (e) { rechtenGedeeld = null; throw e; }));
+      var r = '/api/ik/workspace/rechten'; if (typeof o.request === 'function') return aanvraag(r, {});
+      return rechtenGedeeld || (rechtenGedeeld = aanvraag(r, {}).catch(function (e) { rechtenGedeeld = null; throw e; }));
     }).then(function (j) { rechten = j && j.bron === 'server' && j.rechten ? j.rechten : {}; if (!dood && o.onRechten) o.onRechten(); })
       .catch(function (e) { rechten = {}; fout('rechten', e); });
     var state = w.RTGWorkspaceState({ workspaceId: o.workspaceId, global: o.globalState, user: o.userState,
-      session: Object.assign(session.snapshot(), o.sessionState || {}),
-      workspace: o.workspaceState,
+      session: Object.assign(session.snapshot(), o.sessionState || {}), workspace: o.workspaceState,
       persist: o.persistModuleState, onChange: o.onStateChange });
     session.subscribe(function (s) { state.hostSet('session', s, 'connection-change'); });
     var orchestrator = w.RTGWorkspaceOrchestrator({ error: fout, apply: function (layout, changes, event) {
@@ -41,7 +35,7 @@
       observe: function (event) { orchestrator.handle(event); } });
     var assistant = w.RTGWorkspaceAssistantManifest({ registries: registries, identity: identity, policy: policy,
       active: function () { return actief; }, surface: function () { return surface; }, edge: function () {
-        return w.RTGEdgeBlikveld && typeof w.RTGEdgeBlikveld.lees === 'function' ? w.RTGEdgeBlikveld.lees() : null;
+        var b = w.RTGEdgeBlikveld; return b && typeof b.lees === 'function' ? b.lees() : null;
       } });
     var blueprints = w.RTGWorkspaceBlueprints({ manifest: function (mid) { return defs[mid] && defs[mid].manifest; },
       permission: policy.allowed, moduleAllowed: o.moduleAllowed, deviceAllows: o.deviceAllows,
@@ -70,8 +64,7 @@
     var intents = w.RTGWorkspaceIntents({ identity: identity });
     function contextVoor(mid, status) {
       var vak = state.module(mid), ctx = { id: mid, manifest: defs[mid].manifest, services: o.services || {},
-        context: contextEngine.get, session: Object.freeze ? Object.freeze({ unchanged: identity.sameSession }) : { unchanged: identity.sameSession },
-        intents: intents,
+        context: contextEngine.get, session: Object.freeze({ unchanged: identity.sameSession }), intents: intents,
         state: { get: vak.get, set: vak.set, snapshot: function () { return state.view(mid); } }, request: aanvraag,
         open: function (url, title) { return navigation.open(url, title, mid); },
         permission: function (p) { return policy.allowed(p, mid); },
@@ -79,7 +72,7 @@
         events: { publish: function (type, data) { return broker.publish(type, data, mid, false); },
           subscribe: function (type, fn) { return broker.subscribe(mid, type, fn, false); } },
         actions: { run: function (actionId, data) { return broker.run(mid, actionId, data); } } };
-      return Object.freeze ? Object.freeze(ctx) : ctx;
+      return Object.freeze(ctx);
     }
     function frame(def) {
       var item = w.RTGWorkspaceModuleHost({ runtimeId: id, definition: def, context: function (status) { return contextVoor(def.manifest.id, status); },
@@ -128,8 +121,7 @@
       manifests: function () { return Object.keys(defs).map(function (mid) { return defs[mid].manifest; }); },
       active: function () { return actief; }, state: function () { return surface; }, stateEngine: state,
       registries: registries, orchestrator: orchestrator, contextEngine: contextEngine, navigation: navigation, blueprints: blueprints,
-      assistantManifest: assistant.read,
-      applyBlueprint: blueprints.apply,
+      assistantManifest: assistant.read, applyBlueprint: blueprints.apply,
       publish: function (type, data) { return broker.publish(type, data, 'workspace', true); },
       execute: function (actionId, data) { return broker.run(null, actionId, data); }, destroy: destroy };
   };

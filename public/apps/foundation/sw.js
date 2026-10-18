@@ -1,5 +1,5 @@
 /* Foundation-shell: network-first met een offline vangnet. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-1e0bb1bc';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-029fb323';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
@@ -33,7 +33,7 @@ const SHELL = [
   '/shared/rtg-world-desktop.css',
   '/shared/rtg-world-widgets.css',
   '/shared/rtg-desktop-components.css',
-  '/shared/rtg-world-palette.css', '/shared/rtg-editorial-system.css', '/shared/rtg-cinematic-system.css',
+  '/shared/rtg-world-palette.css', '/shared/rtg-editorial-system.css',
 
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/samen-thuis.html', '/apps/foundation/samen-thuis.js', '/apps/foundation/samen-thuis-weergave.js',

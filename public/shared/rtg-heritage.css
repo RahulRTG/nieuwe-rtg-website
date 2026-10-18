@@ -13,12 +13,10 @@
 @import url('./rtg-world-desktop.css');
 @import url('./rtg-desktop-components.css');
 @import url('./rtg-world-palette.css');
-/* De redactionele en filmische grondlaag blijft geladen onder de universele
-   V4-schil: daarin staan de token- en contrastbruggen waarmee de bestaande
-   schermen op een lichte wereldgrond leesbaar zijn (rtg-cinematic-system.css
-   par. 2b-5). V4 laadt daarna via basis.js als laatste presentatielaag. */
+/* De redactionele grondlaag blijft geladen onder de universele V4-schil:
+   daarin staan de tokenbruggen waarmee de bestaande schermen op een lichte
+   wereldgrond leesbaar zijn. V4 laadt daarna via basis.js als laatste laag. */
 @import url('./rtg-editorial-system.css');
-@import url('./rtg-cinematic-system.css');
 
 /* RTG Heritage
    De vaste beeldtaal van het huis, over ieder echt appscherm heen.

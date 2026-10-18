@@ -225,11 +225,12 @@ test('de definitieve editorial laag is centraal; de oude lagen blijven alleen al
   const basisBron = lees('public/shared/basis/basis-01.js');
   const basis = lees('public/shared/basis.js');
   assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
-  /* Universele V4 legt papier onder elk scherm; de cinematische en
-     editoriale systeemlaag dragen daaronder nog de contrastbruggen van de
-     oudere schermen (a11y-poort op nul, 18 oktober 2026). */
+  /* Universele V4 legt papier onder elk scherm; de editoriale systeemlaag
+     draagt daaronder nog de tokenbruggen van de oudere schermen. De
+     cinematische laag blijft uit: die is een volledige layoutlaag (signatuur,
+     Command, werkruimte) en geen contrastbrug (18 oktober 2026). */
   assert.match(heritage, /@import url\('\.\/rtg-editorial-system\.css'\)/);
-  assert.match(heritage, /@import url\('\.\/rtg-cinematic-system\.css'\)/);
+  assert.doesNotMatch(heritage, /rtg-cinematic-system\.css/);
   assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
   assert.match(basisBron, /laadEditorialBlad\(\)/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);

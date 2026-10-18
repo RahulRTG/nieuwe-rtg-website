@@ -51,10 +51,7 @@ test('de werkelijke browserbundel laadt één nieuwe runtime en de service worke
   assert.match(basis, /\['rtg-editorial-v4-model', 'RTGEditorialV4Model'\]/);
   assert.match(basis, /\['rtg-editorial-v4-header', 'RTGEditorialV4Header'\]/);
   assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
-  // De cinematische grondbrug laadt NA het model: hij leest de schermsoort en
-  // blijft weg van covers en canvassen, die hun eigen donkere grond houden.
-  assert.match(basis, /\['rtg-editorial-v4-model', 'RTGEditorialV4Model'\],\s*\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
-  assert.match(read('public/shared/rtg-cinematic-system.js'), /v4kind === 'cover' \|\| v4kind === 'canvas'/);
+  assert.doesNotMatch(basis, /\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
   for (const file of ['public/sw.js','public/apps/foundation/sw.js']) {
     const source = read(file);
     assert.match(source, /rtg-editorial-v4\.css/);

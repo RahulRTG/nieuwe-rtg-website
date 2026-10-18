@@ -41,8 +41,8 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 // de zaak-kant: Bearer-token; de gezins-kant: code en token in de body
-const zk = (pad, body, token) => api('/api/supplier/markt/' + pad, body, token);
-const rtf = (pad, body) => api('/api/foundation/markt/' + pad, Object.assign({ code: gezin, token: gezinToken }, body));
+const zk = (pad, body, token) => api((pad.startsWith('/api/') ? pad : '/api/supplier/markt/' + pad), body, token);
+const rtf = (pad, body) => api((pad.startsWith('/api/') ? pad : '/api/foundation/markt/' + pad), Object.assign({ code: gezin, token: gezinToken }, body));
 
 async function manager(code) {
   const roster = await api('/api/supplier/roster', { code });
@@ -65,106 +65,106 @@ test.after(() => {
 });
 
 test('1. de zaak beheert alleen zijn eigen advertentie', async () => {
-  const mk = await zk('plaats', { akkoord: true, titel: 'Vitrinekast uit de winkel', beschrijving: 'Glazen vitrinekast, netjes, op te halen.', categorie: 'wonen', staat: 'gebruikt', prijs: 120, plaats: 'Ibiza' }, zaak);
+  const mk = await zk('/api/supplier/markt/plaats', { akkoord: true, titel: 'Vitrinekast uit de winkel', beschrijving: 'Glazen vitrinekast, netjes, op te halen.', categorie: 'wonen', staat: 'gebruikt', prijs: 120, plaats: 'Ibiza' }, zaak);
   assert.equal(mk.status, 200);
   adId = mk.body.ad.id;
   assert.equal(mk.body.ad.verkoper.badge, 'zaak');
 
-  const mijn = await zk('mijn', {}, zaak);
+  const mijn = await zk('/api/supplier/markt/mijn', {}, zaak);
   assert.ok(mijn.body.ads.some(a => a.id === adId), 'de advertentie staat in het eigen overzicht');
 
-  const res = await zk('status', { id: adId, status: 'gereserveerd' }, zaak);
+  const res = await zk('/api/supplier/markt/status', { id: adId, status: 'gereserveerd' }, zaak);
   assert.equal(res.body.ad.status, 'gereserveerd');
-  assert.equal((await zk('status', { id: adId, status: 'weggegooid' }, zaak)).status, 400, 'een onbekende status is geen status');
-  assert.equal((await zk('status', { id: 'bestaatniet', status: 'te-koop' }, zaak)).status, 404);
+  assert.equal((await zk('/api/supplier/markt/status', { id: adId, status: 'weggegooid' }, zaak)).status, 400, 'een onbekende status is geen status');
+  assert.equal((await zk('/api/supplier/markt/status', { id: 'bestaatniet', status: 'te-koop' }, zaak)).status, 404);
   // de andere zaak heeft een geldige inlog, maar niet op deze advertentie
-  assert.equal((await zk('status', { id: adId, status: 'verkocht' }, andereZaak)).status, 403, 'dit is de advertentie van een ander');
-  assert.equal((await zk('verwijder', { id: adId }, andereZaak)).status, 403);
-  await zk('status', { id: adId, status: 'te-koop' }, zaak);
+  assert.equal((await zk('/api/supplier/markt/status', { id: adId, status: 'verkocht' }, andereZaak)).status, 403, 'dit is de advertentie van een ander');
+  assert.equal((await zk('/api/supplier/markt/verwijder', { id: adId }, andereZaak)).status, 403);
+  await zk('/api/supplier/markt/status', { id: adId, status: 'te-koop' }, zaak);
 });
 
 test('2. een gezin reageert; de zaak leest het gesprek en antwoordt', async () => {
-  const r = await rtf('reageer', { id: adId, tekst: 'Hallo, is de vitrinekast er nog?' });
+  const r = await rtf('/api/foundation/markt/reageer', { id: adId, tekst: 'Hallo, is de vitrinekast er nog?' });
   assert.equal(r.status, 200);
   chatId = r.body.chat.id;
 
-  const pv = await zk('mijn', {}, zaak);
+  const pv = await zk('/api/supplier/markt/mijn', {}, zaak);
   assert.ok(pv.body.postvak.some(c => c.id === chatId && c.rol === 'verkoper'), 'het gesprek staat in het postvak van de zaak');
 
-  const open = await zk('chat', { chatId }, zaak);
+  const open = await zk('/api/supplier/markt/chat', { chatId }, zaak);
   assert.equal(open.status, 200);
   assert.equal(open.body.chat.berichten.length, 1);
-  assert.equal((await zk('chat', { chatId }, andereZaak)).status, 403, 'een derde zaak leest het gesprek niet mee');
-  assert.equal((await zk('chat', { chatId: 'bestaatniet' }, zaak)).status, 404);
+  assert.equal((await zk('/api/supplier/markt/chat', { chatId }, andereZaak)).status, 403, 'een derde zaak leest het gesprek niet mee');
+  assert.equal((await zk('/api/supplier/markt/chat', { chatId: 'bestaatniet' }, zaak)).status, 404);
 
-  const a = await zk('antwoord', { chatId, tekst: 'Ja hoor, hij staat klaar. Kom maar langs de winkel.' }, zaak);
+  const a = await zk('/api/supplier/markt/antwoord', { chatId, tekst: 'Ja hoor, hij staat klaar. Kom maar langs de winkel.' }, zaak);
   assert.equal(a.status, 200);
   assert.equal(a.body.chat.berichten.length, 2);
-  assert.equal((await zk('antwoord', { chatId, tekst: 'hoi' }, andereZaak)).status, 403, 'en schrijft er ook niet in');
+  assert.equal((await zk('/api/supplier/markt/antwoord', { chatId, tekst: 'hoi' }, andereZaak)).status, 403, 'en schrijft er ook niet in');
 });
 
 test('3. de prijs afspreken: geen bedrag betekent de vraagprijs', async () => {
   /* Een leeg bedrag is hier geen fout maar een keuze: dan geldt de vraagprijs
      van de advertentie (kern/markt/handel/deal.js). Pas als er ook geen
      vraagprijs is, valt er niets af te spreken en komt er een 400. */
-  const leeg = await zk('deal/voorstel', { chatId }, zaak);
+  const leeg = await zk('/api/supplier/markt/deal/voorstel', { chatId }, zaak);
   assert.equal(leeg.status, 200);
   assert.equal(leeg.body.chat.deal.bedrag, 120, 'zonder bedrag geldt de vraagprijs');
 
-  const d = await zk('deal/voorstel', { chatId, bedrag: 110 }, zaak);
+  const d = await zk('/api/supplier/markt/deal/voorstel', { chatId, bedrag: 110 }, zaak);
   assert.equal(d.status, 200);
   assert.equal(d.body.chat.deal.status, 'afgesproken');
   assert.equal(d.body.chat.deal.bedrag, 110);
-  assert.equal((await zk('deal/voorstel', { chatId, bedrag: 1 }, andereZaak)).status, 403);
+  assert.equal((await zk('/api/supplier/markt/deal/voorstel', { chatId, bedrag: 1 }, andereZaak)).status, 403);
 });
 
 test('4. samen zijn: pas als beide locaties vers en dichtbij zijn komt de factuur vrij', async () => {
-  assert.equal((await zk('deal/hier', { chatId, lat: 'ergens', lng: null }, zaak)).status, 400, 'zonder leesbare locatie gebeurt er niets');
+  assert.equal((await zk('/api/supplier/markt/deal/hier', { chatId, lat: 'ergens', lng: null }, zaak)).status, 400, 'zonder leesbare locatie gebeurt er niets');
 
-  const alleen = await zk('deal/hier', { chatId, lat: 38.9090, lng: 1.4330 }, zaak);
+  const alleen = await zk('/api/supplier/markt/deal/hier', { chatId, lat: 38.9090, lng: 1.4330 }, zaak);
   assert.equal(alleen.status, 200);
   assert.equal(alleen.body.samen, false, 'met alleen de verkoper ter plekke zijn ze niet samen');
 
-  const ver = await rtf('deal/hier', { chatId, lat: 39.5000, lng: 2.6500 });
+  const ver = await rtf('/api/foundation/markt/deal/hier', { chatId, lat: 39.5000, lng: 2.6500 });
   assert.equal(ver.body.samen, false, 'ruim honderd kilometer uit elkaar is niet samen');
 
-  const dichtbij = await rtf('deal/hier', { chatId, lat: 38.9091, lng: 1.4331 });
+  const dichtbij = await rtf('/api/foundation/markt/deal/hier', { chatId, lat: 38.9091, lng: 1.4331 });
   assert.equal(dichtbij.body.samen, true, 'een paar meter uit elkaar is samen');
   assert.ok(/^SAL-\d{4}-\d{6}$/.test(dichtbij.body.chat.deal.factuur.nummer), 'de factuur heeft een nummer');
   assert.equal(dichtbij.body.chat.deal.factuur.bedrag, 110);
 });
 
 test('5. alleen de koper betaalt: de verkopende zaak kan zijn eigen verkoop niet afstempelen', async () => {
-  const poging = await zk('deal/betaal', { chatId, methode: 'apple-pay' }, zaak);
+  const poging = await zk('/api/supplier/markt/deal/betaal', { chatId, methode: 'apple-pay' }, zaak);
   assert.equal(poging.status, 403, 'de verkoper betaalt niet');
   assert.match(poging.body.error, /koper/i);
-  assert.equal((await zk('deal/betaal', { chatId }, andereZaak)).status, 403, 'en een buitenstaander al helemaal niet');
+  assert.equal((await zk('/api/supplier/markt/deal/betaal', { chatId }, andereZaak)).status, 403, 'en een buitenstaander al helemaal niet');
 
   // de koper betaalt wel, en dan pas is de advertentie verkocht
-  const betaald = await rtf('deal/betaal', { chatId, methode: 'apple-pay' });
+  const betaald = await rtf('/api/foundation/markt/deal/betaal', { chatId, methode: 'apple-pay' });
   assert.equal(betaald.status, 200);
   assert.equal(betaald.body.chat.deal.betaald, true);
-  const mijn = await zk('mijn', {}, zaak);
+  const mijn = await zk('/api/supplier/markt/mijn', {}, zaak);
   assert.equal(mijn.body.ads.find(a => a.id === adId).status, 'verkocht', 'de advertentie staat op verkocht');
-  assert.equal((await rtf('deal/betaal', { chatId })).status, 409, 'twee keer betalen kan niet');
+  assert.equal((await rtf('/api/foundation/markt/deal/betaal', { chatId })).status, 409, 'twee keer betalen kan niet');
 });
 
 test('6. de AI-hulp van de zaak draait ook zonder sleutel', async () => {
-  const tekst = await zk('ai', { soort: 'beschrijving', titel: 'Etalagepop', staat: 'gebruikt' }, zaak);
+  const tekst = await zk('/api/supplier/markt/ai', { soort: 'beschrijving', titel: 'Etalagepop', staat: 'gebruikt' }, zaak);
   assert.equal(tekst.status, 200);
   assert.ok(tekst.body.tekst && tekst.body.tekst.length > 10, 'er komt een bruikbare omschrijving terug');
-  const prijs = await zk('ai', { soort: 'prijs', categorie: 'wonen', staat: 'zgan' }, zaak);
+  const prijs = await zk('/api/supplier/markt/ai', { soort: 'prijs', categorie: 'wonen', staat: 'zgan' }, zaak);
   assert.ok(prijs.body.prijs && prijs.body.prijs.midden > 0, 'en een prijsvoorstel');
 });
 
 test('7. opruimen: de eigenaar haalt zijn advertentie weg', async () => {
   // eerst vaststellen dat hij er nog staat: op een leeg overzicht slaagt
   // "hij is weg" ook als er nooit iets is weggehaald
-  assert.ok((await zk('mijn', {}, zaak)).body.ads.some(a => a.id === adId),
+  assert.ok((await zk('/api/supplier/markt/mijn', {}, zaak)).body.ads.some(a => a.id === adId),
     'de advertentie staat er nog voordat we hem weghalen');
 
-  assert.equal((await zk('verwijder', { id: adId }, zaak)).status, 200);
-  const mijn = await zk('mijn', {}, zaak);
+  assert.equal((await zk('/api/supplier/markt/verwijder', { id: adId }, zaak)).status, 200);
+  const mijn = await zk('/api/supplier/markt/mijn', {}, zaak);
   assert.ok(!mijn.body.ads.some(a => a.id === adId), 'de advertentie is uit het overzicht');
-  assert.equal((await zk('verwijder', { id: 'bestaatniet' }, zaak)).status, 404);
+  assert.equal((await zk('/api/supplier/markt/verwijder', { id: 'bestaatniet' }, zaak)).status, 404);
 });

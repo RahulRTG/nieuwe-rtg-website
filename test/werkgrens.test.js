@@ -25,7 +25,7 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkgrens-'));
-const api = (pad, body) => fetch(BASE + '/api/bedrijf' + pad, {
+const api = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/bedrijf' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -33,20 +33,20 @@ let W, B, SAM, PIA, TICKET, RTG_TOKEN;
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const w = (await api('/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
+  const w = (await api('/api/bedrijf/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
   W = w.werkruimte; B = w.beheerToken;
   const mk = async (naam, rollen) => {
-    const a = (await api('/lid/aanmeld', { werkruimte: W, naam })).body;
-    await api('/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
-    await api('/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen });
+    const a = (await api('/api/bedrijf/lid/aanmeld', { werkruimte: W, naam })).body;
+    await api('/api/bedrijf/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
+    await api('/api/bedrijf/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen });
     return { cred: { werkruimte: W, lidToken: a.lidToken }, lidId: a.lidId, naam };
   };
   SAM = await mk('Sam', ['service']);
   PIA = await mk('Pia', ['projectleider', 'service']);
 
-  TICKET = (await api('/ticket/maak', Object.assign({ onderwerp: 'Bus 28 rijdt niet',
+  TICKET = (await api('/api/bedrijf/ticket/maak', Object.assign({ onderwerp: 'Bus 28 rijdt niet',
     prioriteit: 'hoog', wie: 'Sam' }, SAM.cred))).body.ticket;
-  await api('/ticket/maak', Object.assign({ onderwerp: 'Kassa hapert', wie: 'Pia' }, SAM.cred));
+  await api('/api/bedrijf/ticket/maak', Object.assign({ onderwerp: 'Kassa hapert', wie: 'Pia' }, SAM.cred));
 });
 
 test.after(() => {
@@ -56,14 +56,14 @@ test.after(() => {
 
 test('1. alleen de bestaande verwijsvorm wordt geaccepteerd', async () => {
   for (const kaduuk of ['bus 28', 'https://rtg.nl/voertuig/28', 'rtg:/zaak/GLAS', 'rtg://ZAAK/GLAS']) {
-    const uit = await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id, ref: kaduuk }, SAM.cred));
+    const uit = await api('/api/bedrijf/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id, ref: kaduuk }, SAM.cred));
     assert.equal(uit.status, 400, 'geweigerd: ' + kaduuk);
     assert.match(uit.body.let, /geen tweede verwijsvorm/i);
   }
 });
 
 test('2. een geldige verwijzing wordt bewaard en NIET opgelost', async () => {
-  const uit = await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+  const uit = await api('/api/bedrijf/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
     ref: 'rtg://zaak/GLAS' }, SAM.cred));
   assert.equal(uit.status, 200);
   assert.equal(uit.body.herkomst.soort, 'zaak');
@@ -84,9 +84,9 @@ test('3. een soort die dit huis niet kent, wordt bewaard en niet gegokt', async 
      geen app om heen te gaan, en dat wordt gezegd in plaats van een pagina te
      gokken. (Deze toets stond eerst op `voertuig`; die soort heeft sinds
      public/apps/voertuig.html wél een bestemming, zie toets 3b.) */
-  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+  await api('/api/bedrijf/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
     ref: 'rtg://koffer/28' }, SAM.cred));
-  const uit = (await api('/herkomst', Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred))).body;
+  const uit = (await api('/api/bedrijf/herkomst', Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred))).body;
   assert.equal(uit.herkomst.soort, 'koffer', 'de verwijzing staat er gewoon');
   assert.equal(uit.herkomst.opent, null, 'maar er wordt geen pagina gegokt');
   assert.match(uit.herkomst.let, /geen app om heen te gaan/i, 'met de reden erbij');
@@ -97,9 +97,9 @@ test('3b. een defect voertuig heeft nu WEL een bestemming', async () => {
   /* Dit was het scenario waar deze hele draad om begon: "bus 28 is defect"
      gebeurt in RTG Mobility, het ticket hier. Sinds public/apps/voertuig.html
      bestaat, wijst die verwijzing ergens heen. */
-  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+  await api('/api/bedrijf/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
     ref: 'rtg://voertuig/bus28' }, SAM.cred));
-  const uit = (await api('/herkomst', Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred))).body;
+  const uit = (await api('/api/bedrijf/herkomst', Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred))).body;
   assert.equal(uit.herkomst.soort, 'voertuig');
   assert.ok(uit.herkomst.opent, 'er is een app om heen te gaan');
   assert.match(uit.herkomst.opent.app, /voertuig\.html\?voertuig=bus28/, 'met het id in het adres');
@@ -108,8 +108,8 @@ test('3b. een defect voertuig heeft nu WEL een bestemming', async () => {
 });
 
 test('4. er is geen parameter om naar het werk van een ander te vragen', async () => {
-  const sam = (await api('/mijnwerk', SAM.cred)).body;
-  const pia = (await api('/mijnwerk', PIA.cred)).body;
+  const sam = (await api('/api/bedrijf/mijnwerk', SAM.cred)).body;
+  const pia = (await api('/api/bedrijf/mijnwerk', PIA.cred)).body;
   assert.equal(sam.wie.naam, 'Sam');
   assert.equal(pia.wie.naam, 'Pia');
   assert.equal(sam.openstaand.aantallen.tickets, 1, 'ieder ziet zijn eigen ticket');
@@ -117,19 +117,19 @@ test('4. er is geen parameter om naar het werk van een ander te vragen', async (
   assert.ok(!JSON.stringify(sam.openstaand).includes('Kassa hapert'), 'Sam ziet het werk van Pia niet');
 
   /* En een meegestuurd lidId verandert er niets aan: de route leest het niet. */
-  const poging = (await api('/mijnwerk', Object.assign({ lidId: PIA.lidId }, SAM.cred))).body;
+  const poging = (await api('/api/bedrijf/mijnwerk', Object.assign({ lidId: PIA.lidId }, SAM.cred))).body;
   assert.equal(poging.wie.naam, 'Sam', 'het meegestuurde lidId wordt niet gelezen');
   assert.ok(!JSON.stringify(poging.openstaand).includes('Kassa hapert'));
 });
 
 test('5. het beheer-token komt er niet in', async () => {
-  const uit = await api('/mijnwerk', { werkruimte: W, beheerToken: B });
+  const uit = await api('/api/bedrijf/mijnwerk', { werkruimte: W, beheerToken: B });
   assert.equal(uit.status, 403, 'directie leest hier niet mee');
   assert.match(uit.body.let, /leuze/i, 'met de reden waarom dat geen detail is');
 });
 
 test('6. wat op naam staat, draagt de naamgrens mee', async () => {
-  const sam = (await api('/mijnwerk', SAM.cred)).body;
+  const sam = (await api('/api/bedrijf/mijnwerk', SAM.cred)).body;
   assert.equal(sam.naamgrens.opNaam, true);
   assert.match(sam.naamgrens.let, /niet op een sleutel/i,
     'de lijst gaat op naam, en dat wordt gezegd in plaats van verzwegen');
@@ -140,20 +140,20 @@ test('6. wat op naam staat, draagt de naamgrens mee', async () => {
    beweringen, en de derde is de reden dat het een helper werd en geen regel per
    module. */
 test('7. een onbedubbelzinnige naam levert een id op, en dat wordt gebruikt', async () => {
-  const t = (await api('/ticket/maak', Object.assign({ onderwerp: 'Pomp lekt',
+  const t = (await api('/api/bedrijf/ticket/maak', Object.assign({ onderwerp: 'Pomp lekt',
     wie: 'Pia' }, SAM.cred))).body;
   assert.equal(t.ticket.wie, 'Pia', 'de naam blijft gewoon staan');
   assert.equal(t.ticket.wieId, PIA.lidId, 'en het id staat ernaast');
   assert.equal(t.wieLet, null, 'geen voorbehoud: de naam was thuis te brengen');
 
-  const mijn = (await api('/mijnwerk', PIA.cred)).body;
+  const mijn = (await api('/api/bedrijf/mijnwerk', PIA.cred)).body;
   assert.ok(mijn.gevonden.opId >= 1, 'die rij wordt op id gevonden');
   assert.equal(mijn.gevonden.opNaam, 0, 'en niet op naam');
   assert.match(mijn.gevonden.let, /geen naamgok/i);
 });
 
 test('8. een naam die niet thuis te brengen is, blijft een naam -- met de reden', async () => {
-  const buiten = (await api('/ticket/maak', Object.assign({ onderwerp: 'Dak lekt',
+  const buiten = (await api('/api/bedrijf/ticket/maak', Object.assign({ onderwerp: 'Dak lekt',
     wie: 'Iemand van buiten' }, SAM.cred))).body;
   assert.equal(buiten.ticket.wie, 'Iemand van buiten', 'de toewijzing wordt niet geweigerd');
   assert.equal(buiten.ticket.wieId, null, 'er wordt geen id gegokt');
@@ -161,17 +161,17 @@ test('8. een naam die niet thuis te brengen is, blijft een naam -- met de reden'
 });
 
 test('9. bij twee naamgenoten wordt er GEEN id gekozen', async () => {
-  const a = (await api('/lid/aanmeld', { werkruimte: W, naam: 'Pia' })).body;
-  await api('/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
+  const a = (await api('/api/bedrijf/lid/aanmeld', { werkruimte: W, naam: 'Pia' })).body;
+  await api('/api/bedrijf/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
 
-  const t = (await api('/ticket/maak', Object.assign({ onderwerp: 'Derde melding',
+  const t = (await api('/api/bedrijf/ticket/maak', Object.assign({ onderwerp: 'Derde melding',
     wie: 'Pia' }, SAM.cred))).body;
   assert.equal(t.ticket.wieId, null, 'twee actieve Pia\'s: er wordt er geen gekozen');
   assert.match(t.wieLet, /2 actieve leden heten zo/i, 'met de telling erbij');
 
   /* En de rij die eerder WEL een id kreeg, blijft exact -- er wordt niets met
      terugwerkende kracht omgegooid. */
-  const mijn = (await api('/mijnwerk', PIA.cred)).body;
+  const mijn = (await api('/api/bedrijf/mijnwerk', PIA.cred)).body;
   assert.ok(mijn.gevonden.opId >= 1, 'de eerdere toewijzing blijft op id staan');
 });
 
@@ -182,7 +182,7 @@ test('9. bij twee naamgenoten wordt er GEEN id gekozen', async () => {
    Deze drie toetsen gebruiken een ECHTE RTG-sessie. Een eerdere versie deed dat
    niet en accepteerde 401 of 403; die kon dus niet zakken, en twee mutaties
    sloegen er dan ook op af (LAT-regel 9). Nu bijt hij. */
-const metSessie = (pad, body, token) => fetch(BASE + '/api/bedrijf' + pad, {
+const metSessie = (pad, body, token) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/bedrijf' + pad), {
   method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' },
     token ? { Authorization: 'Bearer ' + token } : {}),
@@ -196,10 +196,10 @@ test('10. met een RTG-sessie maar ZONDER koppeling wordt er niets gelezen', asyn
   assert.ok(inlog.token, 'de demo-inlog werkt');
   RTG_TOKEN = inlog.token;
 
-  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+  await api('/api/bedrijf/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
     ref: 'rtg://zaak/HOSHI' }, SAM.cred));
 
-  const uit = await metSessie('/herkomst/open',
+  const uit = await metSessie('/api/bedrijf/herkomst/open',
     Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), RTG_TOKEN);
   assert.equal(uit.status, 200, 'de sessie komt binnen');
   assert.equal(uit.body.opgelost, null, 'maar er is niets van de RTG-kant gelezen');
@@ -208,10 +208,10 @@ test('10. met een RTG-sessie maar ZONDER koppeling wordt er niets gelezen', asyn
 });
 
 test('11. na de eigen koppeling wordt hij WEL opgelost', async () => {
-  const kop = await metSessie('/lid/koppel', SAM.cred, RTG_TOKEN);
+  const kop = await metSessie('/api/bedrijf/lid/koppel', SAM.cred, RTG_TOKEN);
   assert.equal(kop.status, 200, 'Sam koppelt zijn eigen RTG-account');
 
-  const uit = await metSessie('/herkomst/open',
+  const uit = await metSessie('/api/bedrijf/herkomst/open',
     Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), RTG_TOKEN);
   assert.equal(uit.status, 200);
   assert.ok(uit.body.opgelost, 'nu komt er een titel mee');
@@ -234,7 +234,7 @@ test('12. een ANDERE RTG-sessie dan de gekoppelde lost niets op', async () => {
     body: JSON.stringify({ login: 'bram-werkgrens@x.nl', password: 'geheim123' }) }).then(r => r.json());
   assert.ok(ander.token, 'een tweede RTG-account is beschikbaar');
 
-  const uit = await metSessie('/herkomst/open',
+  const uit = await metSessie('/api/bedrijf/herkomst/open',
     Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), ander.token);
   assert.equal(uit.status, 200);
   assert.equal(uit.body.opgelost, null, 'met een vreemde sessie komt er niets mee');
@@ -247,9 +247,9 @@ test('12b. een voertuig wordt alleen opgelost bij een vervoerder waar u WERKT', 
      personeelsadministratie werkelijk werkt. Sam is nergens chauffeur, dus er is
      geen pad waarlangs deze bus gevonden wordt -- ook al is zijn RTG-account
      netjes gekoppeld en is de sessie de juiste. */
-  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+  await api('/api/bedrijf/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
     ref: 'rtg://voertuig/bus28' }, SAM.cred));
-  const uit = await metSessie('/herkomst/open',
+  const uit = await metSessie('/api/bedrijf/herkomst/open',
     Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), RTG_TOKEN);
   assert.equal(uit.status, 200);
   assert.equal(uit.body.opgelost, null, 'er komt geen naam of kenteken mee');
@@ -259,7 +259,7 @@ test('12b. een voertuig wordt alleen opgelost bij een vervoerder waar u WERKT', 
 });
 
 test('13. het beheer-token lost nooit op, ook niet met een geldige sessie', async () => {
-  const uit = await metSessie('/herkomst/open',
+  const uit = await metSessie('/api/bedrijf/herkomst/open',
     { werkruimte: W, beheerToken: B, soort: 'ticket', id: TICKET.id }, RTG_TOKEN);
   assert.equal(uit.status, 403, 'de werkgever opent deze deur niet');
   assert.match(uit.body.let, /opent de werkgever de deur/i,

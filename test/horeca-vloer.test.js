@@ -23,7 +23,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api((pad.startsWith('/api/') ? pad : '/api/supplier/horeca' + pad), body, tok);
 const vandaag = new Date().toISOString().slice(0, 10);
 
 test.before(async () => {
@@ -38,61 +38,61 @@ test.after(() => {
 });
 
 test('een temperatuur buiten de grens kan niet zonder actie worden weggeschreven', async () => {
-  const zonderGrens = await H('/haccp/punt', { naam: 'Koeling 1' });
+  const zonderGrens = await H('/api/supplier/horeca/haccp/punt', { naam: 'Koeling 1' });
   assert.equal(zonderGrens.status, 400, 'een meetpunt zonder grens is geen controle');
 
-  const punt = (await H('/haccp/punt', { id: 'koel1', naam: 'Koeling 1', min: 0, max: 7 })).body.punt;
-  assert.equal((await H('/haccp/meting', { puntId: punt.id, waarde: 4 })).body.meting.afwijking, false);
+  const punt = (await H('/api/supplier/horeca/haccp/punt', { id: 'koel1', naam: 'Koeling 1', min: 0, max: 7 })).body.punt;
+  assert.equal((await H('/api/supplier/horeca/haccp/meting', { puntId: punt.id, waarde: 4 })).body.meting.afwijking, false);
 
-  const heet = await H('/haccp/meting', { puntId: punt.id, waarde: 11 });
+  const heet = await H('/api/supplier/horeca/haccp/meting', { puntId: punt.id, waarde: 11 });
   assert.equal(heet.status, 400);
   assert.equal(heet.body.afwijking, true);
   assert.match(heet.body.error, /Noteer wat u hebt gedaan/);
 
-  const met = (await H('/haccp/meting', { puntId: punt.id, waarde: 11, actie: 'product weggegooid, monteur gebeld' })).body.meting;
+  const met = (await H('/api/supplier/horeca/haccp/meting', { puntId: punt.id, waarde: 11, actie: 'product weggegooid, monteur gebeld' })).body.meting;
   assert.equal(met.afwijking, true);
   assert.match(met.actie, /monteur/);
 
   // corrigeren mag, maar de oude waarde blijft staan
-  const zonderReden = await H('/haccp/meting/corrigeer', { metingId: met.id, waarde: 5 });
+  const zonderReden = await H('/api/supplier/horeca/haccp/meting/corrigeer', { metingId: met.id, waarde: 5 });
   assert.equal(zonderReden.status, 400);
-  const gecorrigeerd = (await H('/haccp/meting/corrigeer', { metingId: met.id, waarde: 5, reden: 'verkeerde thermometer' })).body.meting;
+  const gecorrigeerd = (await H('/api/supplier/horeca/haccp/meting/corrigeer', { metingId: met.id, waarde: 5, reden: 'verkeerde thermometer' })).body.meting;
   assert.equal(gecorrigeerd.waarde, 5);
   assert.equal(gecorrigeerd.afwijking, false);
   assert.equal(gecorrigeerd.correcties[0].was, 11, 'de oorspronkelijke waarde blijft staan');
 
-  const log = (await H('/haccp/logboek', {})).body;
+  const log = (await H('/api/supplier/horeca/haccp/logboek', {})).body;
   assert.equal(log.aantal, 2);
   assert.deepEqual(log.gemistVandaag, [], 'dit punt is vandaag gemeten');
 });
 
 test('batches: wat over de datum is staat bovenaan en gaat niet vanzelf weg', async () => {
-  await H('/haccp/batch', { naam: 'Kipfilet', tht: '2020-01-01', batch: 'L2019', leverancier: 'Versgroep' });
-  await H('/haccp/batch', { naam: 'Room', tht: '2099-01-01' });
-  const lijst = (await H('/haccp/batches', {})).body;
+  await H('/api/supplier/horeca/haccp/batch', { naam: 'Kipfilet', tht: '2020-01-01', batch: 'L2019', leverancier: 'Versgroep' });
+  await H('/api/supplier/horeca/haccp/batch', { naam: 'Room', tht: '2099-01-01' });
+  const lijst = (await H('/api/supplier/horeca/haccp/batches', {})).body;
   assert.equal(lijst.over, 1);
   assert.equal(lijst.batches[0].naam, 'Kipfilet', 'het oudste staat bovenaan');
   assert.ok(lijst.batches[0].dagenTeGaan < 0);
   assert.match(lijst.let, /niet automatisch afgeboekt/);
 
-  const zonderReden = await H('/haccp/batch/weg', { batchId: lijst.batches[0].id });
+  const zonderReden = await H('/api/supplier/horeca/haccp/batch/weg', { batchId: lijst.batches[0].id });
   assert.equal(zonderReden.status, 400);
-  const weg = (await H('/haccp/batch/weg', { batchId: lijst.batches[0].id, reden: 'over de datum, weggegooid' })).body;
+  const weg = (await H('/api/supplier/horeca/haccp/batch/weg', { batchId: lijst.batches[0].id, reden: 'over de datum, weggegooid' })).body;
   assert.equal(weg.batch.weg, true);
-  assert.equal((await H('/haccp/batches', {})).body.over, 0);
+  assert.equal((await H('/api/supplier/horeca/haccp/batches', {})).body.over, 0);
 });
 
 test('een controlelijst kan niet in een keer worden afgevinkt', async () => {
-  await H('/haccp/lijst', { naam: 'Opening', moment: 'opening', vragen: ['Koelingen gecontroleerd', 'Werkbladen schoon', 'Afwasmachine op temperatuur'] });
-  const half = await H('/haccp/afvinken', { naam: 'Opening', antwoorden: [{ akkoord: true }] });
+  await H('/api/supplier/horeca/haccp/lijst', { naam: 'Opening', moment: 'opening', vragen: ['Koelingen gecontroleerd', 'Werkbladen schoon', 'Afwasmachine op temperatuur'] });
+  const half = await H('/api/supplier/horeca/haccp/afvinken', { naam: 'Opening', antwoorden: [{ akkoord: true }] });
   assert.equal(half.status, 400);
   assert.match(half.body.error, /alle 3 punten/);
 
-  const zonderOpmerking = await H('/haccp/afvinken', { naam: 'Opening',
+  const zonderOpmerking = await H('/api/supplier/horeca/haccp/afvinken', { naam: 'Opening',
     antwoorden: [{ akkoord: true }, { akkoord: false }, { akkoord: true }] });
   assert.equal(zonderOpmerking.status, 400, 'niet-akkoord vraagt een opmerking');
 
-  const uit = (await H('/haccp/afvinken', { naam: 'Opening',
+  const uit = (await H('/api/supplier/horeca/haccp/afvinken', { naam: 'Opening',
     antwoorden: [{ akkoord: true }, { akkoord: false, opmerking: 'plint bij de spoelbak' }, { akkoord: true }] })).body;
   assert.equal(uit.controle.akkoord, false);
   assert.equal(uit.controle.rijen.length, 3);
@@ -101,15 +101,15 @@ test('een controlelijst kan niet in een keer worden afgevinkt', async () => {
 test('de fooienpot telt exact op tot de pot, ook als de deling niet uitkomt', async () => {
   // twee rekeningen met fooi, allebei vandaag gesloten
   for (const [tafel, prijs, fooi] of [['Tafel 1', 40, 5], ['Tafel 2', 60, 5.01]]) {
-    const r = (await H('/rekening/open', { kanaal: 'tafel', tafel })).body.rekening;
-    await H('/rekening/regel', { rekeningId: r.id, naam: 'Diner', prijs });
-    await H('/fooi', { rekeningId: r.id, bedrag: fooi });
-    await H('/betaal', { rekeningId: r.id, wijze: 'pin' });
+    const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel })).body.rekening;
+    await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Diner', prijs });
+    await H('/api/supplier/horeca/fooi', { rekeningId: r.id, bedrag: fooi });
+    await H('/api/supplier/horeca/betaal', { rekeningId: r.id, wijze: 'pin' });
   }
-  const zonder = await H('/fooienpot', { datum: vandaag });
+  const zonder = await H('/api/supplier/horeca/fooienpot', { datum: vandaag });
   assert.equal(zonder.status, 400, 'zonder deelnemers valt er niets te verdelen');
 
-  const uit = (await H('/fooienpot', { datum: vandaag, deelnemers: [
+  const uit = (await H('/api/supplier/horeca/fooienpot', { datum: vandaag, deelnemers: [
     { naam: 'Sam', uren: 8 }, { naam: 'Isa', uren: 5 }, { naam: 'Kees (afwas)', uren: 4 }
   ] })).body;
   assert.equal(uit.potCenten, 1001, 'de fooi van beide rekeningen zit in de pot');
@@ -120,10 +120,10 @@ test('de fooienpot telt exact op tot de pot, ook als de deling niet uitkomt', as
 });
 
 test('het loonpercentage rekent met de omzet zonder fooi', async () => {
-  const zonder = await H('/loonkosten', { datum: '2020-01-01' });
+  const zonder = await H('/api/supplier/horeca/loonkosten', { datum: '2020-01-01' });
   assert.equal(zonder.status, 404, 'zonder diensten geen percentage');
 
-  const uit = (await H('/loonkosten', { datum: vandaag, diensten: [
+  const uit = (await H('/api/supplier/horeca/loonkosten', { datum: vandaag, diensten: [
     { naam: 'Sam', uren: 8, uurloon: 16, afdeling: 'zaal' },
     { naam: 'Isa', uren: 5, uurloon: 18, afdeling: 'keuken' }
   ] })).body;
@@ -148,9 +148,9 @@ test('een betaalde rekening boekt de ingredienten af via het bestaande keukenbre
   assert.equal(recept.status, 200, 'het recept is gekoppeld');
   const voor = (await api('/api/supplier/keuken', {}, tok)).body.artikelen.find(a => a.id === artikel.id).aantal;
 
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'Tafel 9' })).body.rekening;
-  await H('/rekening/regel', { rekeningId: r.id, naam: 'Kip van het huis', prijs: 22, aantal: 3 });
-  await H('/betaal', { rekeningId: r.id, wijze: 'pin' });
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'Tafel 9' })).body.rekening;
+  await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Kip van het huis', prijs: 22, aantal: 3 });
+  await H('/api/supplier/horeca/betaal', { rekeningId: r.id, wijze: 'pin' });
 
   const na = (await api('/api/supplier/keuken', {}, tok)).body.artikelen.find(a => a.id === artikel.id).aantal;
   assert.equal(Math.round((voor - na) * 1000) / 1000, 6, 'drie porties van twee eenheden zijn afgeboekt');
@@ -161,11 +161,11 @@ test('een betaalde rekening boekt de ingredienten af via het bestaande keukenbre
 });
 
 test('het dagbeeld houdt fooi en oninbaar apart en noemt bij elk gemiddelde zijn noemer', async () => {
-  const weg = (await H('/rekening/open', { kanaal: 'terras', tafel: 'T5', gasten: 2 })).body.rekening;
-  await H('/rekening/regel', { rekeningId: weg.id, naam: 'Bier', prijs: 6, aantal: 2 });
-  await H('/oninbaar', { rekeningId: weg.id, reden: 'gasten weggelopen' });
+  const weg = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'terras', tafel: 'T5', gasten: 2 })).body.rekening;
+  await H('/api/supplier/horeca/rekening/regel', { rekeningId: weg.id, naam: 'Bier', prijs: 6, aantal: 2 });
+  await H('/api/supplier/horeca/oninbaar', { rekeningId: weg.id, reden: 'gasten weggelopen' });
 
-  const d = (await H('/dagbeeld', {})).body;
+  const d = (await H('/api/supplier/horeca/dagbeeld', {})).body;
   assert.ok(d.omzetCenten >= 10000);
   assert.equal(d.fooiCenten, 1001, 'fooi staat apart van de omzet');
   assert.equal(d.oninbaar.bonnen, 1);
@@ -175,40 +175,40 @@ test('het dagbeeld houdt fooi en oninbaar apart en noemt bij elk gemiddelde zijn
   assert.ok(d.perKanaal.some(k => k.kanaal === 'tafel'));
   assert.ok(d.perBetaalwijze.pin > 0);
 
-  const sig = (await H('/signalen', {})).body;
+  const sig = (await H('/api/supplier/horeca/signalen', {})).body;
   assert.ok(Array.isArray(sig.signalen));
   assert.match(sig.let, /geen advies bij dat wij niet kunnen onderbouwen/);
 });
 
 test('een gastprofiel bewaart voorkeuren, geen waarde-per-gast', async () => {
-  const g = (await H('/gast', { naam: 'M. Okafor', allergie: 'noten', voorkeur: 'stille tafel, geen muziek dichtbij', bezoek: true })).body.gast;
+  const g = (await H('/api/supplier/horeca/gast', { naam: 'M. Okafor', allergie: 'noten', voorkeur: 'stille tafel, geen muziek dichtbij', bezoek: true })).body.gast;
   assert.equal(g.allergie, 'noten');
   assert.equal(g.bezoeken, 1);
   const plat = JSON.stringify(g);
   assert.ok(plat.indexOf('waarde') < 0 && plat.indexOf('score') < 0, 'geen waarde- of scoreveld');
 
-  const min = await H('/gast', { naam: 'M. Okafor', punten: -50 });
+  const min = await H('/api/supplier/horeca/gast', { naam: 'M. Okafor', punten: -50 });
   assert.equal(min.status, 400, 'een gast kan niet onder nul punten');
-  const punten = (await H('/gast', { naam: 'M. Okafor', punten: 120, reden: 'diner' })).body.gast;
+  const punten = (await H('/api/supplier/horeca/gast', { naam: 'M. Okafor', punten: 120, reden: 'diner' })).body.gast;
   assert.equal(punten.punten, 120);
 
-  const lijst = (await H('/gasten', {})).body;
+  const lijst = (await H('/api/supplier/horeca/gasten', {})).body;
   assert.equal(lijst.metAllergie, 1);
 });
 
 test('de pottenlijst bewaart wat er is verdeeld, met de nieuwste bovenaan', async () => {
   const eerder = '2026-01-05';
-  const r = (await H('/rekening/open', { kanaal: 'bar', tafel: 'Bar 3' })).body.rekening;
-  await H('/rekening/regel', { rekeningId: r.id, naam: 'Cocktails', prijs: 30 });
-  await H('/fooi', { rekeningId: r.id, bedrag: 4 });
-  await H('/betaal', { rekeningId: r.id, wijze: 'contant' });
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'bar', tafel: 'Bar 3' })).body.rekening;
+  await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Cocktails', prijs: 30 });
+  await H('/api/supplier/horeca/fooi', { rekeningId: r.id, bedrag: 4 });
+  await H('/api/supplier/horeca/betaal', { rekeningId: r.id, wijze: 'contant' });
 
   // een pot van een oudere datum, uitsluitend uit contante fooi
-  const oud = (await H('/fooienpot', { datum: eerder, extra: 20,
+  const oud = (await H('/api/supplier/horeca/fooienpot', { datum: eerder, extra: 20,
     deelnemers: [{ naam: 'Joost', uren: 6 }] })).body;
   assert.equal(oud.potCenten, 2000, 'op die dag is er geen rekening gesloten; alleen de contante fooi telt');
 
-  const lijst = (await H('/fooienpot/lijst', {})).body;
+  const lijst = (await H('/api/supplier/horeca/fooienpot/lijst', {})).body;
   assert.ok(lijst.potten.length >= 2, 'beide potten staan erin');
   assert.equal(lijst.potten[0].datum >= lijst.potten[1].datum, true, 'de nieuwste staat bovenaan');
   assert.equal(lijst.totaal, lijst.potten.reduce((t, p) => t + p.potCenten, 0), 'het totaal telt de potten na');

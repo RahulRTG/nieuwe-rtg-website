@@ -71,6 +71,18 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186ri2f:not(#_#_#_){width:7rem}
+.s-1cv76ip:not(#_#_#_){flex:1;min-width:10rem}
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -129,7 +141,7 @@ async function laad(){
 }
 function schrijftafel(){
   const rub=D.rubrieken.map(r=>'<option>'+r+'</option>').join('');
-  let h='<div class="item"><h3>Nieuw stuk</h3><div class="rij"><input class="veld" id="nOnd" style="flex:1;min-width:12rem;" placeholder="Onderwerp of kop"><select class="veld" id="nRub">'+rub+'</select></div>'
+  let h='<div class="item"><h3>Nieuw stuk</h3><div class="rij"><input class="veld s-1cv8ghr" id="nOnd" placeholder="Onderwerp of kop"><select class="veld" id="nRub">'+rub+'</select></div>'
     +'<div class="rij"><button class="knop" id="nAi">Laat de AI-hoofdredacteur een concept schrijven</button><button class="knop stil" id="nLeeg">Leeg stuk</button></div><div class="uit" id="nUit" hidden></div></div>';
   h+= D.artikelen.length ? D.artikelen.map(a=>{
     const acties='<div class="rij">'
@@ -155,7 +167,7 @@ function schrijftafel(){
 }
 function drukkerij(){
   const gepub=D.artikelen.filter(a=>a.status==='gepubliceerd');
-  let h='<div class="item"><h3>Nieuwe editie</h3><div class="rij"><input class="veld" id="eT" style="flex:1;min-width:10rem;" placeholder="Titel van de editie"><select class="veld" id="eS"><option value="krant">krant</option><option value="magazine">magazine</option></select><input class="veld" id="eO" type="number" placeholder="oplage" value="1000" style="width:7rem;"></div>'
+  let h='<div class="item"><h3>Nieuwe editie</h3><div class="rij"><input class="veld s-1cv76ip" id="eT" placeholder="Titel van de editie"><select class="veld" id="eS"><option value="krant">krant</option><option value="magazine">magazine</option></select><input class="veld s-186ri2f" id="eO" type="number" placeholder="oplage" value="1000"></div>'
     +'<div class="meta h-mt40">Kies de gepubliceerde stukken:</div><div class="rij">'+(gepub.length?gepub.map(a=>'<label style="font-size:.8rem;color:var(--muted);display:flex;gap:.3rem;align-items:center;"><input type="checkbox" class="kies" value="'+a.id+'"> '+esc(a.kop)+'</label>').join(''):'<span class="leeg">Publiceer eerst een stuk op de schrijftafel.</span>')+'</div>'
     +'<div class="rij"><button class="knop" id="eMaak">Editie samenstellen</button></div></div>';
   h+= D.edities.length ? D.edities.map(e=>{

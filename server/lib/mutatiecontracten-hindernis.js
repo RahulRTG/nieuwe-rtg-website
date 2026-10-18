@@ -1,9 +1,10 @@
 /* ============================================================================
-   MUTATIECONTRACTEN -- ZESTIEN DIE DE PROEFOPSTELLING NOOIT AAN HET WERK KREEG.
+   MUTATIECONTRACTEN -- VIJFTIEN DIE DE PROEFOPSTELLING NOOIT AAN HET WERK KREEG.
+   (Zestien tot 18 oktober 2026; zie de aantekening bij /api/pay/verzoek/betaal.)
 
    Deel van ./mutatiecontracten.js.
 
-   Deze zestien maten allemaal hetzelfde: de EERSTE kale oproep deed al geen
+   Deze vijftien maten allemaal hetzelfde: de EERSTE kale oproep deed al geen
    werk. Een 409 omdat het ding er niet was, een 404 omdat het ding er niet was,
    een 429 omdat de rem aansloeg, een 401 omdat er geen sessie was, een 400 omdat
    de body niet klopte. Wat de tweede oproep dan doet is niet gemeten, want er is
@@ -85,12 +86,11 @@ const CONTRACTEN = Object.fromEntries([
     'de body voldeed niet aan wat roerTerug() vraagt',
     'een geldige body voor het roer, plus een roer dat daadwerkelijk verzet IS -- terugzetten wat nooit ' +
     'verzet is, is geen handeling'),
-  geblokkeerd('POST /api/pay/verzoek/betaal', 'pay.verzoek.betaal', { klasse: 'AUTHENTICATED' }, 409,
-    'er stond geen openstaand betaalverzoek ("er is geen schuld meer")',
-    'een openstaand betaalverzoek. LET OP: deze route bleef bewust buiten ' +
-    './mutatiecontracten-geldgrens.js. Met sleutel gaf zij 409, en dat is een TOESTANDSCONTROLE en geen ' +
-    'idempotentie -- de kop van ./idem-poort.js waarschuwt daar met zoveel woorden voor. Wie hier de ' +
-    'wereld klaarzet, meet dus of de geldlaag de herhaling vangt of dat alleen de schuld op is'),
+  /* POST /api/pay/verzoek/betaal stond hier tot 18 oktober 2026 en woont nu in
+     ./mutatiecontracten-geld-b.js: de handler is gelezen, de semantiek staat in
+     de code (metIdem met opties.geld), en de stand blijft daar BLOCKED met
+     dezelfde opdracht. Hier zou een semantiek anders dan `onbekend` de kop
+     van dit bestand tegenspreken. */
   geblokkeerd('POST /api/scim/v2/Users', 'scim.v2.users', { klasse: 'SERVICE_TO_SERVICE' }, 400,
     'de SCIM-body was ongeldig',
     'een geldige SCIM-gebruiker met een externalId; SCIM schrijft VAN buiten en is daarmee precies het ' +

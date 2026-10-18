@@ -32,7 +32,7 @@
             ? (legacyPinUi ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset testcode')+'</button>' : '')+
               '<button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
-        '<div class="tkc-who" style="margin-top:0.5rem;line-height:1.5;">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
+        '<div class="tkc-who s-1xl14qy">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
         '<button class="bigbtn h-mt20" id="ktInvite">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
@@ -42,7 +42,7 @@
       html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Personeelsuitnodigingen')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
         (invData
           ? (openInv.length ? openInv.map(i =>
-              '<div class="st-row"><span><span style="color:var(--rtg-leesgoud,var(--gold));">'+
+              '<div class="st-row"><span><span class="s-12itpbj">'+
               (i.status==='actief'?T('kt.codeonce','Code eenmalig uitgegeven'):
                 i.status==='verlopen'?T('kt.expired','Verlopen · code verborgen'):
                 i.status==='uitgever-niet-actief'?T('kt.uitgeverweg','Uitgever werkt hier niet meer · maak een nieuwe code'):

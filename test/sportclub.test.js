@@ -52,6 +52,15 @@ test('1. de club tekent zijn eigen stadion: vakken met prijs, en de horeca en wc
   assert.ok(zet.body.voorzieningen.some(v => v.naam === 'Bar Oost'), 'met de nieuwe bar');
   // en een leeg stadion kan niet
   assert.equal((await api(base, '/api/sport/plattegrond/zet', { vakken: [] }, club)).status, 400);
+  /* /api/member/sport/plattegrond: het lid ziet DEZELFDE kaart die de club net
+     tekende, om er een vak op te kiezen. MUTATIE GEZIEN ZAKKEN: de ledenroute in
+     server/routes/sportclub.js laten lezen van club 'XXRTG' in plaats van de
+     gevraagde; deze bewering zakte. */
+  const lidKaart = await api(base, '/api/member/sport/plattegrond', { club: 'FCRTG' }, lid);
+  assert.equal(lidKaart.status, 200);
+  assert.ok(lidKaart.body.vakken.some(v => v.naam === 'Tribune Oost'), 'het lid ziet het nieuwe vak');
+  assert.ok(lidKaart.body.voorzieningen.some(v => v.naam === 'Bar Oost'), 'en de nieuwe bar');
+  assert.equal((await api(base, '/api/member/sport/plattegrond', { club: 'FCRTG' }, null)).status, 401);
 });
 
 test('2. tickets: reserveren per vak, capaciteit bewaakt, en nooit voor een uitwedstrijd', async () => {
@@ -159,6 +168,9 @@ test('9. momenten voor de socials, en het ene sportbord voor alle leden', async 
   assert.equal(bord.status, 200);
   assert.ok(bord.body.wedstrijden.some(w => w.uitslag === '3 - 1'), 'de uitslagen staan op het bord');
   assert.ok(bord.body.momenten.some(x => /jeugdtoernooi/.test(x.tekst)), 'het moment staat in de Sport-app');
+  const mom = await api(base, '/api/member/sport/momenten', { club: 'FCRTG' }, lid);
+  assert.equal(mom.status, 200);
+  assert.ok(mom.body.momenten.some(x => /jeugdtoernooi/.test(x.tekst)), 'en in de momentenlijst van de club voor leden');
   const stand = await api(base, '/api/member/sport/stand', { club: 'FCRTG' }, lid);
   assert.ok(stand.body.tabel.length >= 6, 'en de stand is voor iedereen te zien');
 });

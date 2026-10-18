@@ -185,6 +185,27 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186q83d:not(#_#_#_){width:5rem}
+.s-186ri2f:not(#_#_#_){width:7rem}
+.s-186s51y:not(#_#_#_){width:8rem}
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+.s-1mzraj2:not(#_#_#_){width:9.5rem}
+.s-1q74462:not(#_#_#_){flex:1;font-size:0.95rem}
+.s-1shl20y:not(#_#_#_){font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.75rem;line-height:1.5}
+.s-1t9snq9:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer}
+.s-4z4nyz:not(#_#_#_){font-size:0.75rem;color:var(--soft);margin-top:0.5rem}
+.s-7aff7e:not(#_#_#_){width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:0;padding:1rem}
+.s-9uxsi:not(#_#_#_){font-size:0.72rem;color:var(--soft)}
+.s-xqfogx:not(#_#_#_){background:#c62828;color:#fff;border-radius:0;padding:0.4rem 0.9rem;font-weight:700;text-decoration:none}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -247,7 +268,7 @@
         <div class="rows" id="orders"></div>
         <div id="tlPager" style="display:none;align-items:center;justify-content:center;gap:0.9rem;padding:0.7rem;border-top:1px solid var(--line);">
           <button class="hbtn" id="tlPrev">‹</button>
-          <span style="font-size:0.72rem;color:var(--soft);" id="tlWaar"></span>
+          <span class="s-9uxsi" id="tlWaar"></span>
           <button class="hbtn" id="tlNext">›</button>
         </div>
       </div>
@@ -255,7 +276,7 @@
     <div class="cols h-mt150">
       <div class="panel">
         <h2 data-i18n="panel.aanmeldingen">Aanmeldingen per pas</h2>
-        <p style="font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.75rem;line-height:1.5;" data-i18n="bo.aanmuitleg">De AI verzorgt de hele aanmelding automatisch (berichten, onboarding, rondleiding, RTF, veiligheid en privacy). Alleen dit blijft aan jou: accepteren of afwijzen. Lifestyle en Business krijgen nooit automatisch toegang.</p>
+        <p class="s-1shl20y" data-i18n="bo.aanmuitleg">De AI verzorgt de hele aanmelding automatisch (berichten, onboarding, rondleiding, RTF, veiligheid en privacy). Alleen dit blijft aan jou: accepteren of afwijzen. Lifestyle en Business krijgen nooit automatisch toegang.</p>
         <div class="rows" id="aanmeldingen"></div>
       </div>
       <div class="panel">
@@ -279,12 +300,12 @@
         <div class="rows" id="rvTafels"></div>
         <div style="padding:0.7rem;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:0.5rem;">
           <input id="tfNaam" placeholder="Naam, bijv. Diner 04" class="h-rek9">
-          <input id="tfStad" placeholder="Stad" style="width:8rem;">
-          <input id="tfDatum" type="date" aria-label="Datum" style="width:9.5rem;">
-          <input id="tfTijd" type="time" aria-label="Tijd" style="width:7rem;">
+          <input id="tfStad" placeholder="Stad" class="s-186s51y">
+          <input id="tfDatum" type="date" aria-label="Datum" class="s-1mzraj2">
+          <input id="tfTijd" type="time" aria-label="Tijd" class="s-186ri2f">
           <input id="tfThema" placeholder="Thema, bijv. architectuur &middot; hospitality" class="h-rek9">
-          <input id="tfPlaatsen" type="number" min="2" max="12" value="8" aria-label="Aantal plaatsen" style="width:5rem;">
-          <input id="tfGasten" placeholder="Codenamen, met komma's" style="flex:1;min-width:12rem;">
+          <input id="tfPlaatsen" type="number" min="2" max="12" value="8" aria-label="Aantal plaatsen" class="s-186q83d">
+          <input id="tfGasten" placeholder="Codenamen, met komma's" class="s-1cv8ghr">
           <button class="hbtn" id="tfMaak" data-i18n="bo.tfmaak">Tafel samenstellen</button>
         </div>
       </div>
@@ -311,18 +332,18 @@
       <div class="rows" id="trustList"></div>
     </div>
     <div id="ontLiveScrim" class="scrim" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;align-items:center;justify-content:center;">
-      <div style="width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:0;padding:1rem;">
+      <div class="s-7aff7e">
         <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;">
-          <b style="flex:1;font-size:0.95rem;"><span id="ontLiveNaam">SOS</span></b>
-          <a id="ontBel112" href="tel:112" style="background:#c62828;color:#fff;border-radius:0;padding:0.4rem 0.9rem;font-weight:700;text-decoration:none;">Bel 112</a>
-          <button id="ontLiveClose" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer;">Sluiten</button>
+          <b class="s-1q74462"><span id="ontLiveNaam">SOS</span></b>
+          <a id="ontBel112" href="tel:112" class="s-xqfogx">Bel 112</a>
+          <button id="ontLiveClose" class="s-1t9snq9">Sluiten</button>
         </div>
         <video id="ontLiveVid" autoplay playsinline style="width:100%;border-radius:0;background:#000;"></video>
         <!-- De tekstbaan bij het SOS-beeld: wat het lid zegt, op zijn eigen
              toestel omgezet naar tekst. Hier stond dat wie doof is geen
              SOS-dienst kon draaien; dit is wat daaraan doet. -->
         <div id="ontLiveTekst" class="livetekst" role="log" aria-live="polite" aria-label="Wat het lid zegt, automatisch omgezet naar tekst" hidden></div>
-        <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
+        <div id="ontLiveStatus" class="s-4z4nyz">Verbinden met de camera van het lid…</div>
       </div>
     </div>
     <div class="cols h-mt150">

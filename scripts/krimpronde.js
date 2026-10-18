@@ -298,7 +298,7 @@ if (!uit.collecties.length) {
 
    Dus per gemeten grens een eigen sleutel, en de rest blijft staan. */
 const bestaand = (() => {
-  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; }
+  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 })();
 const rondes = (bestaand && bestaand.rondes && typeof bestaand.rondes === 'object')
   ? bestaand.rondes : {};

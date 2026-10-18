@@ -12,8 +12,9 @@
       const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
       const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
       if (!magHier.includes(user.tier)){
-        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(pasAdres(doelPas)); return; }
-        API.token = null; return; // onbekende pas: poort tonen
+        if (!['rtg','lifestyle','business'].includes(doelPas)){ API.token = null; return; } // onbekende pas: poort tonen
+        if (vastePas){ location.replace(pasAdres(doelPas)); return; } // de app van een andere pas: daarheen
+        neemPasAan(doelPas); // een kale werktafel: de pas aannemen zonder herladen (app-main-02b.js)
       }
       /* De server heeft deze sessie op DEZE pas bevestigd. Onthoud dat, zodat
          de volgende kale /apps/app.html het adres al in de kop van de pagina

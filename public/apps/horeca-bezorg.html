@@ -33,6 +33,18 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12sa0x1:not(#_#_#_){flex:0 1 5rem}
+.s-12sckv5:not(#_#_#_){flex:0 1 9rem}
+.s-1trguuz:not(#_#_#_){flex:0 1 10rem}
+</style>
 </head>
 <body class="rtg-stijl" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -51,7 +63,7 @@
     <div class="kop">Kan het hier bezorgd worden</div>
     <div class="rij">
       <input class="veld" id="bCheckPost" maxlength="7" placeholder="Postcode" aria-label="Postcode">
-      <input class="veld" id="bCheckBedrag" type="number" min="0" step="0.01" placeholder="Bestelbedrag" aria-label="Bestelbedrag" style="flex:0 1 9rem;">
+      <input class="veld s-12sckv5" id="bCheckBedrag" type="number" min="0" step="0.01" placeholder="Bestelbedrag" aria-label="Bestelbedrag">
       <button class="knop p" id="bCheck" type="button">Check</button>
     </div>
     <p class="stil h-mt40" id="bCheckUit"></p>
@@ -112,7 +124,7 @@
       <input class="veld" id="bStopAdres" maxlength="120" placeholder="Adres" aria-label="Adres">
       <input class="i-12sbxv veld" id="bStopLat" type="number" step="0.0001" placeholder="Breedte" aria-label="Breedtegraad">
       <input class="i-12sbxv veld" id="bStopLng" type="number" step="0.0001" placeholder="Lengte" aria-label="Lengtegraad">
-      <input class="veld" id="bStopMin" type="number" min="0" max="120" placeholder="Min" aria-label="Keukenminuten" style="flex:0 1 5rem;">
+      <input class="veld s-12sa0x1" id="bStopMin" type="number" min="0" max="120" placeholder="Min" aria-label="Keukenminuten">
       <button class="knop" id="bStopVoeg" type="button">Stop erbij</button>
       <button class="knop p" id="bRoute" type="button">Volgorde</button>
     </div>
@@ -132,7 +144,7 @@
     <div class="kop">Afleverbewijs</div>
     <div class="rij">
       <input class="veld" id="rBewijsRef" maxlength="40" placeholder="Ritnummer" aria-label="Ritnummer">
-      <select class="veld" id="rHoe" aria-label="Hoe is er afgeleverd" style="flex:0 1 10rem;">
+      <select class="veld s-1trguuz" id="rHoe" aria-label="Hoe is er afgeleverd">
         <option value="overhandigd">Overhandigd</option>
         <option value="op de stoep">Op de stoep</option>
         <option value="buren">Bij de buren</option>

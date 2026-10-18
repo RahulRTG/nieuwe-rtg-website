@@ -46,7 +46,7 @@
         rij('Wachtlijst', t.wachtlijst || 0) + rij('Uitgeschreven', t.uitgeschreven || 0) +
         '<div class="rij h-mt60">' +
         '<input class="veld" id="enNaam" maxlength="60" placeholder="Naam van de leerling" aria-label="Naam van de leerling">' +
-        '<select class="veld" id="enKlas" aria-label="Klas" style="flex:0 1 9rem;"><option value="">Zonder klas</option>' +
+        '<select class="veld s-12sckv5" id="enKlas" aria-label="Klas"><option value="">Zonder klas</option>' +
         (org.klassen || []).map(function (k) { return '<option value="' + esc(k.code) + '">' + esc(k.naam) + '</option>'; }).join('') +
         '</select><button class="knop p" id="enAanmeld" type="button">Meld aan</button></div>',
         'Een aanmelding is nog geen plaats. Plaatsen of op de wachtlijst zetten doet u hieronder, met de klas die hierboven staat gekozen.');
@@ -68,7 +68,7 @@
       ].map(function (x) { return '<div class="kpi"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>';
 
       h += kaart('Waarschuwingen', (dash.waarschuwingen || []).length
-        ? dash.waarschuwingen.map(function (w) { return '<p class="stil" style="margin:0.25rem 0;">◆ ' + esc(w.tekst) + '</p>'; }).join('')
+        ? dash.waarschuwingen.map(function (w) { return '<p class="stil s-kpqwcd">◆ ' + esc(w.tekst) + '</p>'; }).join('')
         : '<p class="stil">Geen waarschuwingen.</p>',
       'Elk signaal noemt zijn eigen rekensom. Tevredenheid staat hier niet: dat meten we nergens, dus verzinnen we het ook niet.');
 

@@ -144,7 +144,7 @@ function meet() {
 function main() {
   const nu = meet();
   let oud = null;
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { oud = null; }
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; oud = null; }
 
   console.log('\n=== DE VELDEN VAN DE ENVELOP ===\n');
 

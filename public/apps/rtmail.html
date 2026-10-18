@@ -113,6 +113,22 @@
 <link href="/shared/rtg-mail-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10u4ouo:not(#_#_#_){margin:0 0 0.5rem;text-align:left}
+.s-1fyu5g5:not(#_#_#_){color:var(--txt);font-size:.95rem}
+.s-1hc5ae8:not(#_#_#_){margin-bottom:0}
+.s-1in4znw:not(#_#_#_){color:var(--muted);margin-top:.6rem;font-size:.9rem}
+.s-1pzsxo3:not(#_#_#_){margin:0 0 0.75rem;text-align:left}
+.s-2q4tfg:not(#_#_#_){text-align:left}
+.s-30rd9g:not(#_#_#_){margin:0 0 .8rem}
+</style>
 </head>
 <body class="rtg-stijl rtg-work-flow rtm-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <section class="rtm-voorzijde" id="rtmVoorzijde" aria-label="RTMail rustig werkpostvak">
@@ -244,7 +260,7 @@ async function api(pad, body){
 }
 async function laadInbox(){
   const versie=++laadVersie;
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p class="s-1in4znw">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
   let d, adresInfo; try{
     [d,adresInfo]=await Promise.all([
       ZOEK ? api('zoek',{vraag:ZOEK}) : api('vak',{map:MAP}), api('adres',{})
@@ -271,7 +287,7 @@ async function laadInbox(){
   /* Publiek staat de echte naam op het visitekaartje; binnen RTG blijft de
      codenaam het postvak. De server geeft beide adressen en kiest het pasniveau. */
   const kaart = adresInfo && adresInfo.adres
-    ? '<div class="noot" style="margin:0 0 .8rem;"><b style="color:var(--txt);font-size:.95rem;">' +
+    ? '<div class="noot s-30rd9g"><b class="s-1fyu5g5">' +
       esc(adresInfo.publiekAdres||adresInfo.adres) + '</b><br>' +
       (adresInfo.publiekAdres ? 'Publiek internetadres · intern beschermd als '+esc(adresInfo.adres)+'.' : esc(adresInfo.uitleg||'Intern RTG-adres.'))+'</div>'
     : '';
@@ -289,7 +305,7 @@ async function laadInbox(){
   const balk = '<div id="mapbalkPlek"></div>'+
     '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
     '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+(window.RTGMailInstellingen?'<button class="knp" id="instKnp">Instellingen</button>':'')+'</div>'+
-    (ZOEK?'<div class="noot" style="margin:0 0 0.75rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
+    (ZOEK?'<div class="noot s-1pzsxo3">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
   $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
     LIJST.map((m,i)=>
@@ -320,8 +336,8 @@ async function teamsErbij(versie){
       '<button class="rij" data-team="'+esc(t.id)+'"><span class="ic">'+esc((t.naam||'?').slice(0,1).toUpperCase())+'</span>'+
       '<span class="b"><span class="nm">'+esc(t.naam)+'</span><span class="lt adr">'+esc(t.adres)+'</span></span>'+
       '<span class="tijd">'+t.aantalLeden+(t.aantalLeden===1?' persoon':' mensen')+'</span></button>').join('')
-      || '<div class="noot" style="margin:0 0 0.5rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
-    '<button class="ai-knop" id="tNieuw" style="margin-bottom:0;">Team oprichten</button>';
+      || '<div class="noot s-10u4ouo">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
+    '<button class="ai-knop s-1hc5ae8" id="tNieuw">Team oprichten</button>';
   $('#main').appendChild(wrap);
   wrap.querySelectorAll('[data-team]').forEach(b=>b.addEventListener('click',()=>openTeam(b.dataset.team)));
   $('#tNieuw').addEventListener('click',nieuwTeamForm);
@@ -500,7 +516,7 @@ async function toonDraad(m){
       return '<div class="draadje" id="b-'+esc(b.id)+'"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
         '<div class="meta">'+esc(b.van)+' · '+esc(langTijd(b.at))+'</div>'+
         '<div class="body">'+veiligBody(b.tekst, !!b.vertrouwd)+'</div></div>'; }).join('')+
-    (d.let?'<div class="noot" style="text-align:left;">'+esc(d.let)+'</div>':'')+
+    (d.let?'<div class="noot s-2q4tfg">'+esc(d.let)+'</div>':'')+
     '<div class="acties">'+
       '<button class="knp" data-hulp="samenvatting">Vat dit gesprek samen</button>'+
       '<button class="knp" data-hulp="acties">Wat wordt er van mij gevraagd?</button>'+
@@ -516,22 +532,22 @@ async function toonDraad(m){
    springen, is een tweede versie van de waarheid. */
 async function hulp(m, wat){
   const uit=$('#hulpUit'); if(!uit) return;
-  uit.innerHTML='<div class="noot" style="text-align:left;">Even kijken…</div>';
+  uit.innerHTML='<div class="noot s-2q4tfg">Even kijken…</div>';
   let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ uit.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
   const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'">'+tekst+'</button>';
   if(wat==='acties'){
     uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
       d.acties.map(a=>naar(a.bericht, esc(a.zin)+(a.datums.length?' <span class="etiket">'+esc(a.datums.join(', '))+'</span>':''))).join('')+
-      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+      '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   } else if(wat==='risico'){
     uit.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
       (d.redenen.length?'<ul class="hulplijst">'+d.redenen.map(r=>'<li'+(r.zwaar?' class="zwaar"':'')+'>'+esc(r.uitleg)+'</li>').join('')+'</ul>':'')+
-      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+      '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   } else {
     uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
       '<div class="meta">Aan zet: '+esc(d.aanZet)+'</div>'+
       d.punten.map(p=>naar(p.bericht, (p.vanMij?'<span class="etiket">u</span> ':'')+esc(p.zin))).join('')+
-      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+      '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   }
   uit.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
     const el=$('#b-'+b.dataset.spring);

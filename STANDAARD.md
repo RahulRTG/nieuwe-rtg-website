@@ -414,7 +414,7 @@ noemt, dragen er 638 geen toewijsbare uitslag over horizontale scheiding.
 **De vorm.** Niet herschrijven. Elke bewakersvorm roept een gedeelde
 `beslis(req, eis)` aan die de uitkomst met reden teruggeeft; de bewakers blijven
 staan, alleen hun oordeel loopt door een functie. De projectie die daaruit volgt
-loopt eerst in de schaduw (`kern/stuur/schaduw.js` is het model) voordat hij
+loopt eerst in de schaduw (`kern/commercie/schaduw.js` is het model) voordat hij
 afdwingt. Het doel is **100% toewijsbaar**, niet 100% gescheiden.
 
 ---

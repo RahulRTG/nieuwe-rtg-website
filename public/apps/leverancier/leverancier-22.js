@@ -21,7 +21,7 @@
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
         finMsg = d.kaart.code
-          ? ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')'
+          ? ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b class="s-12itpbj">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')'
           : T('fn.gceenmaal','Deze kaart is al verkocht; de code wordt maar een keer getoond.');
         finData = null;
         renderStation();   // hertekent het scherm, dus de knop komt vers terug
@@ -30,7 +30,7 @@
     const gR = el.querySelector('#gcRedeem'); if (gR) gR.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/redeem', { code: el.querySelector('#gcCode').value, bedrag: Number(el.querySelector('#gcInBedrag').value) });
-        finMsg = ''+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">€ '+d.saldo+'</b>';
+        finMsg = ''+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b class="s-12itpbj">€ '+d.saldo+'</b>';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -58,7 +58,7 @@
       box.innerHTML = '<div class="tkc-who h-mt60">' + T('fn.advbezig', 'Ik kijk naar uw cijfers…') + '</div>';
       try {
         const d = await API.call('/supplier/accountant/adviezen', {});
-        box.innerHTML = (d.intro ? '<div style="font-size:0.82rem;margin:0.6rem 0;line-height:1.6;">' + esc(d.intro) + '</div>' : '') +
-          (d.adviezen || []).map(a => '<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;"><b style="color:var(--rtg-leesgoud,var(--gold));font-size:0.8rem;">' + esc(a.titel) + '</b><div style="font-size:0.8rem;color:var(--soft);margin-top:0.2rem;line-height:1.5;">' + esc(a.tekst) + '</div></div>').join('');
+        box.innerHTML = (d.intro ? '<div class="s-x3in7y">' + esc(d.intro) + '</div>' : '') +
+          (d.adviezen || []).map(a => '<div class="s-q8bqou"><b class="s-1pyrn6v">' + esc(a.titel) + '</b><div class="s-6sv1bt">' + esc(a.tekst) + '</div></div>').join('');
       } catch(e){ box.innerHTML = '<div class="tkc-who">' + esc(e.message) + '</div>'; }
     });

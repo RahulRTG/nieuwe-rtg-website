@@ -47,6 +47,24 @@
 <link href="/shared/travel-os.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-157n44:not(#_#_#_){font-size:.75rem;color:var(--soft);margin-top:0.5rem;line-height:1.5}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-19h2qye:not(#_#_#_){font-size:.74rem;color:var(--soft)}
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+.s-1q7ok7o:not(#_#_#_){font-size:.65rem;color:var(--soft)}
+.s-4ldsda:not(#_#_#_){margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.83rem;line-height:1.55}
+.s-b9qud4:not(#_#_#_){font-size:.72rem;color:var(--soft);margin-top:0.25rem}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+.s-sq78s5:not(#_#_#_){color:var(--muted);font-size:.85rem;margin-top:.3rem;line-height:1.55}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -103,28 +121,28 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
 });
 function render(){
   $('#app').innerHTML =
-    '<div class="kaart"><h2 style="font-size:1.1rem;">' + esc(B.scenario.label) + '</h2>' +
-      '<p style="color:var(--muted);font-size:.85rem;margin-top:.3rem;line-height:1.55;">' + esc(B.scenario.uitleg) + '</p>' +
-      (B.alerts.length ? '<div style="margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
+    '<div class="kaart"><h2 class="s-prlthd">' + esc(B.scenario.label) + '</h2>' +
+      '<p class="s-sq78s5">' + esc(B.scenario.uitleg) + '</p>' +
+      (B.alerts.length ? '<div class="s-4ldsda">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
     '</div>' +
     '<div class="sec">Hoe de stad er nu bij staat</div>' +
     '<div class="grid">' + B.domeinen.map(d =>
       '<div class="dom"><div class="l">' + esc(d.label) + '</div>' +
       '<div class="w" style="color:' + (STAND[d.stand] || 'var(--txt)') + ';">' +
-        (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span style="font-size:.65rem;color:var(--soft);">' + esc(d.eenheid) + '</span>') + '</div>' +
-      '<div style="font-size:.72rem;color:var(--soft);margin-top:0.25rem;">' + esc(d.stand) +
+        (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span class="s-1q7ok7o">' + esc(d.eenheid) + '</span>') + '</div>' +
+      '<div class="s-b9qud4">' + esc(d.stand) +
         (d.ovOnderweg != null ? ' ·  ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +
     '<div class="sec">Iets kapot of vol gezien? Meld het</div>' +
     '<div class="kaart"><div class="rij">' +
       '<span><label for="mZone">Waar</label><select id="mZone">' + B.zones.map(z => '<option>' + esc(z) + '</option>').join('') + '</select></span>' +
       '<span><label for="mSoort">Wat</label><select id="mSoort">' + Object.entries(B.soorten).map(([k, v]) => '<option value="' + k + '">' + esc(v) + '</option>').join('') + '</select></span>' +
-      '<span style="flex:1;min-width:12rem;"><label for="mTekst">Korte omschrijving</label><input id="mTekst" maxlength="200" placeholder="bijv. lantaarn bij de brug doet het niet" style="width:100%;"></span>' +
+      '<span class="s-1cv8ghr"><label for="mTekst">Korte omschrijving</label><input id="mTekst" maxlength="200" placeholder="bijv. lantaarn bij de brug doet het niet" class="s-186m9vs"></span>' +
       '<button class="knop" id="mDoe">Meld</button></div>' +
-    '<p style="font-size:.75rem;color:var(--soft);margin-top:0.5rem;line-height:1.5;">' + esc(B.privacy) + '</p></div>' +
+    '<p class="s-157n44">' + esc(B.privacy) + '</p></div>' +
     '<div class="sec">Mijn meldingen</div>' +
     '<div class="kaart" id="mijnM">' + (B.mijnMeldingen.length ? B.mijnMeldingen.map(m =>
       '<div class="melding-rij">' + esc(m.tekst) +
-      '<br><span style="font-size:.74rem;color:var(--soft);">' + esc(m.zone) + ' · ' + tijd(m.at) + '</span> ' +
+      '<br><span class="s-19h2qye">' + esc(m.zone) + ' · ' + tijd(m.at) + '</span> ' +
       '<span class="pil" style="color:' + (m.status === 'klaar' ? 'var(--green)' : 'var(--gold)') + ';">' + (m.status === 'klaar' ? '✓ opgelost' : 'de veldploeg kijkt ernaar') + '</span></div>').join('')
       : '<div class="leeg">Nog geen meldingen. Zie je iets, dan hoort de stad het graag.</div>') + '</div>';
   $('#mDoe').addEventListener('click', async () => {

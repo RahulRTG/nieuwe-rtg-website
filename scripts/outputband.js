@@ -100,7 +100,7 @@ const WACHT = 'inhoudswacht.test.js';
 
 function leesRegister() {
   try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); }
-  catch (e) { return {}; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return {}; }
 }
 
 /* Het register herbouwen met de verse gerichte metingen en de gememoriseerde

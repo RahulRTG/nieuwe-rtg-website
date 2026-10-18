@@ -77,6 +77,16 @@ module.exports = (kern) => {
     try { stuur(res, werk(kern.codenaamVan(req.session.key), req.body || {})); }
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
+  /* Een SCHRIJVER antwoordt pas als de opslag hem bevestigt (zie vast() in
+     kern/geldbeleid/index.js): een regel, pot of geldgrens die het lid
+     "gezet" of "weg" leest, staat er ook na een herstart. De lezers blijven
+     op doe(): een lijst opvragen hoeft niet op de schijf te wachten. */
+  const doeVast = (werk) => async (req, res) => {
+    if (geenGast(req, res)) return;
+    const c = kern.codenaamVan(req.session.key), b = req.body || {};
+    try { stuur(res, await kern.geldbeleid.vast(() => werk(c, b))); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  };
 
   /* Het command center: exact het beeld dat kern/geldgraaf samenstelt, met
      alleen ok erbij. Hier wordt niets bijgerekend -- een tweede rekenlaag in
@@ -92,14 +102,14 @@ module.exports = (kern) => {
      lid, en het log mag het lid en Rahul nooit door elkaar halen. */
   app.post('/api/geld/beleid', auth, doe((c) => ({ status: 200, ok: true,
     regels: kern.geldbeleid.regels(c), potten: kern.geldbeleid.potten(c) })));
-  app.post('/api/geld/beleid/zet', auth, doe((c, b) => kern.geldbeleid.regelZet(c, b)));
-  app.post('/api/geld/pot/zet', auth, doe((c, b) => kern.geldbeleid.potZet(c, b)));
+  app.post('/api/geld/beleid/zet', auth, doeVast((c, b) => kern.geldbeleid.regelZet(c, b)));
+  app.post('/api/geld/pot/zet', auth, doeVast((c, b) => kern.geldbeleid.potZet(c, b)));
   // centen mag negatief zijn: dat geeft een oormerk vrij; de kern bewaakt de nulgrens
-  app.post('/api/geld/pot/reserveer', auth, doe((c, b) => kern.geldbeleid.potReserveer(c, String(b.id || ''), b.centen)));
+  app.post('/api/geld/pot/reserveer', auth, doeVast((c, b) => kern.geldbeleid.potReserveer(c, String(b.id || ''), b.centen)));
   /* opruimen hoort erbij: zonder deze route belooft de foutmelding bij
      veertig regels een handeling die niet bestaat (LAT.md regel 6) */
-  app.post('/api/geld/beleid/weg', auth, doe((c, b) => kern.geldbeleid.regelWeg(c, String(b.id || ''))));
-  app.post('/api/geld/pot/weg', auth, doe((c, b) => kern.geldbeleid.potWeg(c, String(b.id || ''))));
+  app.post('/api/geld/beleid/weg', auth, doeVast((c, b) => kern.geldbeleid.regelWeg(c, String(b.id || ''))));
+  app.post('/api/geld/pot/weg', auth, doeVast((c, b) => kern.geldbeleid.potWeg(c, String(b.id || ''))));
   app.post('/api/geld/actielog', auth, doe((c) => ({ status: 200, ok: true, log: kern.geldbeleid.log(c) })));
 
   /* DE EIGEN GELDGRENS. Apart van /beleid hierboven, en dat is geen ordening
@@ -109,8 +119,8 @@ module.exports = (kern) => {
      nou juist is waar hij voor kiest. Zie kern/geldbeleid/grens.js voor de
      bedenktijd, en waarom die opt-in is. */
   app.post('/api/geld/grens', auth, doe((c) => ({ status: 200, ok: true, grenzen: kern.geldbeleid.grenzen(c) })));
-  app.post('/api/geld/grens/zet', auth, doe((c, b) => kern.geldbeleid.grensZet(c, b)));
-  app.post('/api/geld/grens/weg', auth, doe((c, b) => kern.geldbeleid.grensWeg(c, String(b.id || ''))));
+  app.post('/api/geld/grens/zet', auth, doeVast((c, b) => kern.geldbeleid.grensZet(c, b)));
+  app.post('/api/geld/grens/weg', auth, doeVast((c, b) => kern.geldbeleid.grensWeg(c, String(b.id || ''))));
 
   /* De gegronde Rahul staat in een eigen bestand: antwoorden (AI plus het
      rekenende terugvalpad) is meer dan vertalen, en dat hoort niet tussen de

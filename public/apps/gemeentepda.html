@@ -62,18 +62,31 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1fpsvmo:not(#_#_#_){width:100%;margin-top:.7rem}
+.s-1iqzg4y:not(#_#_#_){border:none;color:var(--soft)}
+.s-jkn0mr:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6}
+.s-m756vp:not(#_#_#_){background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.2rem .55rem;cursor:pointer}
+</style>
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/personeel.html" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="gemeentepda" class="rtg-stijl" data-workos-premium data-workos-home="/apps/personeel.html" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div><div class="ey">Gemeente buitendienst</div><h1 id="titel">Gemeente-PDA</h1></div>
   <button class="ververser" id="ververs" hidden>Ververs</button>
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;">Meld je aan voor je dienst met je persoonlijke pincode.</p>
+    <p class="s-jkn0mr">Meld je aan voor je dienst met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden...</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="verstuur" id="loginGo" style="width:100%;margin-top:.7rem;" data-hoofdactie>Aanmelden</button>
+    <button class="verstuur s-1fpsvmo" id="loginGo" data-hoofdactie>Aanmelden</button>
   </div>
   <div id="app" hidden>
     <div class="chips" id="ploegen"></div>
@@ -84,7 +97,7 @@
 <div class="melding" id="melding" role="status"></div>
 <button class="rahulfab" id="rahulFab" type="button" style="display:none;">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
-  <div class="rahulkop"><b>Rahul · buitendienst</b><button type="button" id="rahulSluit" aria-label="Sluiten" style="background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.2rem .55rem;cursor:pointer;">✕</button></div>
+  <div class="rahulkop"><b>Rahul · buitendienst</b><button type="button" id="rahulSluit" aria-label="Sluiten" class="s-m756vp">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
   <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Vraag om een overzicht" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
@@ -196,7 +209,7 @@ async function laad(){
   const l = d.meldingen || [];
   MELDINGEN = l;
   $('#lijst').innerHTML = l.length ? l.map(m => {
-    const maps = (m.lat && m.lng) ? '<a class="loc" href="geo:'+m.lat+','+m.lng+'?q='+m.lat+','+m.lng+'" target="_blank" rel="noopener">Kaart openen</a>' : (m.locatie ? '<span class="loc" style="border:none;color:var(--soft);">'+esc(m.locatie)+'</span>' : '');
+    const maps = (m.lat && m.lng) ? '<a class="loc" href="geo:'+m.lat+','+m.lng+'?q='+m.lat+','+m.lng+'" target="_blank" rel="noopener">Kaart openen</a>' : (m.locatie ? '<span class="loc s-1iqzg4y">'+esc(m.locatie)+'</span>' : '');
     return '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+'</h4>'+
       '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder||'')+'</div>'+
       maps + '<div><span class="status">'+esc(m.status)+'</span></div>'+
@@ -223,5 +236,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); $
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/workos-premium.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

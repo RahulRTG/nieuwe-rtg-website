@@ -137,8 +137,21 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-1eltjr2:not(#_#_#_){color:var(--soft);font-size:.85rem}
+.s-axy1rr:not(#_#_#_){color:var(--muted);margin-top:.6rem;line-height:1.6}
+.s-x8hihn:not(#_#_#_){margin:0.25rem 0 0.75rem}
+</style>
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
+<body data-rtg-context-bron="websitestudio" class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <header>
   <a class="terug" href="/apps/kantoren.html">← Kantoren</a>
   <div><div class="ey">RTG Atelier</div><h1>Website-studio</h1></div>
@@ -181,7 +194,7 @@
 <!-- beeld-kiezer -->
 <div class="sheet" id="beeldSheet"><div class="box">
   <h2>Kies beeld</h2><div class="sub">Eigen foto's, "Uit De Salon" en het RTG-campagnebeeld (quiet luxury). Geen stockfoto's.</div>
-  <div style="margin:0.25rem 0 0.75rem;"><button type="button" id="uploadKnop" class="knop stil" style="font-size:.82rem;">Upload eigen foto</button><input type="file" id="fotoIn" accept="image/*" hidden><span id="uploadStatus" class="sub" style="margin-left:0.5rem;"></span></div>
+  <div class="s-x8hihn"><button type="button" id="uploadKnop" class="knop stil" style="font-size:.82rem;">Upload eigen foto</button><input type="file" id="fotoIn" accept="image/*" hidden><span id="uploadStatus" class="sub" style="margin-left:0.5rem;"></span></div>
   <div class="beeldgrid" id="beeldgrid"></div>
 </div></div>
 <!-- opgeslagen sjablonen -->
@@ -409,7 +422,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 });
 async function openen(){
   try{ const d=await api('lijst'); SJABLONEN=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
-    if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen opgeslagen sjablonen.</div>'; }
+    if(!(d.lijst||[]).length){ l.innerHTML='<div class="s-1eltjr2">Nog geen opgeslagen sjablonen.</div>'; }
     (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+it.blokken+' blok'+(it.blokken===1?'':'ken')+(it.etalage?' · in de etalage':'')+'</span>';
       /* in of uit de etalage: vrijgeven als startpunt voor ledensites */
       const eb=document.createElement('button');eb.textContent=it.etalage?'Uit etalage':'In etalage';
@@ -460,8 +473,8 @@ function exporteer(){
    kantoordeur (shared/kantoorgesprek.js) opent hem op deze pagina zelf: eerst
    met het RTG-account dat al is ingelogd, de kantoorcode als terugval. */
 if(!TOKEN){
-  $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">De Website-studio</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De studio hoort bij het RTG Atelier en draait op een kantoorsessie.</p><div id="kgDeur"></div></div>';
+  $('#hoofd').innerHTML='<div class="inlog"><h2 class="s-14jo6ez">De Website-studio</h2>'+
+    '<p class="s-axy1rr">De studio hoort bij het RTG Atelier en draait op een kantoorsessie.</p><div id="kgDeur"></div></div>';
   window.RTGKantoorGesprek.toon(document.getElementById('kgDeur'),token=>{
     TOKEN=token; try{ localStorage.setItem('rtg_office_token',TOKEN); }catch(e){}
     location.reload();
@@ -505,5 +518,13 @@ else {
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

@@ -1075,7 +1075,7 @@ const samenwerking = require('./kern/samenwerking').maakSamenwerking({ db, save,
 // De centrale facturatielaag (kern/facturatie.js): bij elke verkoop/dienst/verhuur
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
-const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering });
+const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, bijeen, inBundel, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering });
 // De handelsketen (kern/handelsketen.js): een weg waarlangs ELKE zaak met elke
 // andere zaak zaken doet -- aanvraag, offerte, gunning, planning, levering,
 // factuur, betaling. Vervangt op termijn de veertien losse aanvraagcollecties.

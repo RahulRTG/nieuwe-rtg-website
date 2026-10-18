@@ -12,6 +12,7 @@
    geen tweede kopie van. */
 'use strict';
 
+const idemContract = require('../../lib/idem-contract');
 module.exports = (ctx, { open, vanLid }) => {
   const { db, save, nu, rekeningen, bankregie, metIdem } = ctx;
   /* ---------- de leden-bank: alleen live als de boardroom hem aan heeft, en
@@ -50,7 +51,7 @@ module.exports = (ctx, { open, vanLid }) => {
        Twee commits, in de juiste volgorde -- eerst de instemming, dan de
        rekening; andersom krijgt een lid een rekening waar hij nooit ja tegen
        zei. */
-    const vast = await metIdem('bankakkoord:' + c, 'bankakkoord|' + c, () => {
+    const vast = await metIdem('bankakkoord:' + c, idemContract.identiteitVan('bank.akkoord', { codenaam: c }), () => {
       const store = akkoordStore();
       store[c] = store[c] || nu();
       save();

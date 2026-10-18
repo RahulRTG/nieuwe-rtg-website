@@ -89,13 +89,24 @@
 <link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-4t7hy3:not(#_#_#_){width:100%;margin-bottom:0.75rem}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+</style>
 </head>
 <body class="rtg-stijl rtg-daily" data-kantoor-tool="notities" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-daily="notities" data-rtg-editorial-room="notities" data-rtg-layout="standard">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey">RTG</span><h1 data-i18n="dailyField.notesTasks">Notities &amp; Taken</h1></span>
-  <span class="rij" style="margin-left:auto;">
+  <span class="rij s-7myv37">
     <button class="knop" id="toonArchief" data-rtg-edge-bar type="button" data-i18n="dailyField.archive">Archief</button>
     <button class="knop" id="nieuwLijst" data-rtg-edge-bar type="button" data-i18n="dailyField.newList">+ Lijst</button>
   </span>
@@ -108,8 +119,8 @@
 <main>
 <section id="dailyIntro" aria-label="Notities" data-i18n-aria="dailyField.notes"></section>
   <div class="daily-content">
-  <input class="veld" id="zoek" type="search" placeholder="Zoek in uw notities" data-i18n-ph="daily.noteSearch" aria-label="Zoeken"
-    style="width:100%;margin-bottom:0.75rem;" data-i18n-aria="dailyField.search">
+  <input class="veld s-4t7hy3" id="zoek" type="search" placeholder="Zoek in uw notities" data-i18n-ph="daily.noteSearch" aria-label="Zoeken"
+ data-i18n-aria="dailyField.search">
   <div id="bord" aria-live="polite"></div>
   <div id="gedeeldKop" class="kop" style="display:none;" data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
   <div id="gedeeldBord"></div>

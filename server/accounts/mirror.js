@@ -196,7 +196,9 @@ async function flushBijAfsluiten() {
   gestopt = true;
   if (herstelTimer) clearTimeout(herstelTimer);
   herstelTimer = null;
-  if (PGMODE && pg && pgKlaar) { try { await wachtrij.flush(); } catch (e) {} }
+  /* Bij het afsluiten mag een flush de rest niet tegenhouden, maar wat niet is
+     weggeschreven hoort in het log te staan (STILSPOOR.json). */
+  if (PGMODE && pg && pgKlaar) { try { await wachtrij.flush(); } catch (e) { console.error('[accounts] de laatste accountmutaties niet weggeschreven:', e && e.message); } }
   if (pg) { try { await pg.sluit(); } catch (e) {} }
   pgKlaar = false;
 }

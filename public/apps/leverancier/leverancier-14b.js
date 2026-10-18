@@ -9,11 +9,11 @@
                 : (d.status !== 'gestopt' ? '<button class="obtn ghost" data-synstop="'+d.id+'">'+T('sy.stop','Stop')+'</button>' : ''))+
               '</div>';
           }).join('')+
-          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">'+
-            '<input id="synNaam" placeholder="'+T('sy.naam','Naam van de deal')+'" style="flex:2;min-width:9rem;">'+
-            '<input id="synPartner" placeholder="'+T('sy.partner','Partnercode (bijv. SAKURA)')+'" style="flex:1;min-width:7rem;">'+
-            '<input id="synPrijs" inputmode="decimal" placeholder="'+T('sy.prijs','Totaal EUR')+'" style="width:6.5rem;">'+
-            '<input id="synMijn" inputmode="decimal" placeholder="'+T('sy.mijn','Mijn deel EUR')+'" style="width:6.5rem;">'+
+          '<div class="s-12ib2j6">'+
+            '<input id="synNaam" placeholder="'+T('sy.naam','Naam van de deal')+'" class="s-bgva62">'+
+            '<input id="synPartner" placeholder="'+T('sy.partner','Partnercode (bijv. SAKURA)')+'" class="s-jwsivx">'+
+            '<input id="synPrijs" inputmode="decimal" placeholder="'+T('sy.prijs','Totaal EUR')+'" class="s-1lkmfch">'+
+            '<input id="synMijn" inputmode="decimal" placeholder="'+T('sy.mijn','Mijn deel EUR')+'" class="s-1lkmfch">'+
             '<button class="obtn" id="synMaak">'+T('sy.maak','Stel voor')+'</button></div></div>';
         // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft
         // bewust geen knop, wel kiest u het moment (vooraf of achteraf)
@@ -41,15 +41,15 @@
         html += werkvensterBlokHtml(inst);
         const maxD = Math.max.apply(null, b.week.map(d => d.omzet).concat([1]));
         html += '<div class="tkc"><h3>'+T('bz.weekh','Omzet per dag')+'</h3>'+
-          '<div style="display:flex;align-items:flex-end;gap:0.45rem;height:120px;margin-top:0.5rem;">'+
+          '<div class="s-2wkit8">'+
           b.week.map((d, i) =>
-            '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0.2rem;height:100%;min-width:0;">'+
-            '<span style="font-size:0.54rem;color:var(--soft);white-space:nowrap;">'+(d.omzet?eur(d.omzet):'·')+'</span>'+
+            '<div class="s-22kawz">'+
+            '<span class="s-1nccjyo">'+(d.omzet?eur(d.omzet):'·')+'</span>'+
             '<i style="display:block;width:100%;max-width:32px;border-radius:0;min-height:2px;height:'+Math.max(2, Math.round(d.omzet/maxD*70))+'%;background:'+(i===6?'var(--burgundy)':'var(--gold)')+';"></i>'+
-            '<span style="font-size:0.52rem;color:var(--soft);text-transform:uppercase;">'+d.label+'</span></div>').join('')+'</div></div>';
+            '<span class="s-179p4gf">'+d.label+'</span></div>').join('')+'</div></div>';
         html += '<div class="tkc"><h3>'+T('bz.top','Toppers')+'</h3>'+
           (b.toppers.length ? b.toppers.map((t2, i) =>
-            '<div class="st-row"><span>'+(['','',''][i]||'')+' '+t2.naam+'<span class="sub">'+t2.aantal+'x '+T('bz.verkocht','verkocht')+'</span></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(t2.omzet)+'</b></div>').join('')
+            '<div class="st-row"><span>'+(['','',''][i]||'')+' '+t2.naam+'<span class="sub">'+t2.aantal+'x '+T('bz.verkocht','verkocht')+'</span></span><b class="s-12itpbj">'+eur(t2.omzet)+'</b></div>').join('')
             : '<div class="tkc-who">'+T('bz.geentop','Nog geen verkopen. Zodra er via de app of de kassa verkocht wordt, staan de toppers hier.')+'</div>')+'</div>';
       }
     }

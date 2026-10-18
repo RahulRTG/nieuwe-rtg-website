@@ -192,6 +192,7 @@ test('8. wachtlijst: vol event, plek vrij na afmelding, de eerste is aan de beur
   assert.equal(w.status, 200, JSON.stringify(w.body));
   assert.equal(w.body.positie, 1);
   assert.equal((await api(base, '/api/wachtlijst', { supplierCode: sup.code, eventId: ev.id }, lidB.token)).status, 409, 'niet dubbel op de lijst');
+  assert.equal((await api(base, '/api/wachtlijst/mijn', {}, lidB.token)).body.wachtlijst.length, 1, 'B staat op de wachtlijst');
   // A meldt zich af: de plek komt vrij en B is van de lijst (kreeg bericht)
   assert.equal((await api(base, '/api/event/rsvp/annuleer', { supplierCode: sup.code, eventId: ev.id }, lidA.token)).status, 200);
   const mijnW = await api(base, '/api/wachtlijst/mijn', {}, lidB.token);

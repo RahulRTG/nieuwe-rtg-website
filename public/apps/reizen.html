@@ -32,6 +32,27 @@
 <link rel="stylesheet" href="/shared/rtg-world-widgets.css">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-13bdal:not(#_#_#_){margin-top:1rem}
+.s-148cz8o:not(#_#_#_){color:var(--rtg-acc)}
+.s-1dninqr:not(#_#_#_){gap:.6rem;flex-wrap:wrap}
+.s-1fkgm3n:not(#_#_#_){flex-direction:column;align-items:stretch;gap:.3rem}
+.s-1vlyext:not(#_#_#_){flex:1 1 8rem}
+.s-1vlz1xc:not(#_#_#_){flex:1 1 9rem}
+.s-2fdded:not(#_#_#_){margin-top:.4rem;line-height:1.7}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+.s-mvitr2:not(#_#_#_){margin-left:.6rem}
+.s-rl0xl1:not(#_#_#_){margin-top:.7rem;align-items:center}
+.s-xs3nn1:not(#_#_#_){margin-top:.7rem}
+.s-xs4amk:not(#_#_#_){margin-top:.8rem}
+</style>
 </head>
 <body data-world-home="travel" class="rtg-stijl rtg-travel-experience" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true" data-rtg-layout="standard">
 <div class="rtg-world-start" role="status" aria-live="polite"><span class="rtg-world-start-brand" aria-hidden="true"><strong>Rahul Travel Group</strong><span>Experience the elite class</span></span><span class="rtg-world-start-status">TravelOS wordt klaargezet…</span></div>
@@ -467,7 +488,7 @@
     <label class="rtg-label" for="invTekst">De tekst van uw bevestiging, of de strook van een boardingpass</label>
     <textarea class="rtg-veld" id="invTekst" rows="3" maxlength="20000"
       placeholder="Plak hier de e-mail, de voucher of de M1-strook van uw instapkaart"></textarea>
-    <div class="rtg-acties" style="margin-top:.7rem;align-items:center;">
+    <div class="rtg-acties s-rl0xl1">
       <input type="file" id="invBestand" hidden accept=".txt,.pdf,image/*,text/plain,application/pdf">
       <button class="rtg-knop" id="invKies" type="button">Kies een bestand</button>
       <span class="rtg-sub" id="invBestandNaam"></span>
@@ -475,7 +496,7 @@
     </div>
     <div id="invUit" aria-live="polite"></div>
     <div id="invMijn"></div>
-    <p class="rtg-sub" style="margin-top:.7rem;">Eerder een reisgenoot uitgenodigd?
+    <p class="rtg-sub s-xs3nn1">Eerder een reisgenoot uitgenodigd?
       <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
   </div>
   </section>
@@ -732,7 +753,7 @@
        van deze reis -- geen bewijsstukken, geen kenmerk van uw kluis. */
     return '<div class="regkop"><h2>' + esc(r.bestemming) + ' &middot; ' + esc(vensterTekst(r.venster)) + '</h2>' +
       '<span class="tel">' + n + (n === 1 ? ' onderdeel' : ' onderdelen') + '</span>' +
-      '<button class="rtg-knop" type="button" data-nodig="' + esc(r.id) + '" style="margin-left:.6rem;">Nodig een reisgenoot uit</button>' +
+      '<button class="rtg-knop s-mvitr2" type="button" data-nodig="' + esc(r.id) + '">Nodig een reisgenoot uit</button>' +
       '</div>' +
       (n > 1 ? '<p class="stil">' + esc(r.grond) + '</p>' : '') +
       '<div class="stil" data-uitnodiging="' + esc(r.id) + '"></div>';
@@ -905,9 +926,9 @@
     const blokken = [];
     for (const r of (d.reizen || [])) {
       if (!r.signalen.length) continue;
-      blokken.push('<div class="rtg-rij" style="flex-direction:column;align-items:stretch;gap:.3rem;">' +
+      blokken.push('<div class="rtg-rij s-1fkgm3n">' +
         '<span class="rtg-naam" style="display:flex;align-items:center;gap:.6rem;">' + esc(r.bestemming) +
-          '<button class="rtg-knop" type="button" data-los="' + esc(r.id) + '" style="margin-left:auto;">Los het op</button></span>' +
+          '<button class="rtg-knop s-7myv37" type="button" data-los="' + esc(r.id) + '">Los het op</button></span>' +
         r.signalen.map((s) => '<span class="rtg-sub" style="color:' +
           (s.ernst === 'incident' ? 'var(--rtg-acc)' : 'var(--rtg-txt)') + ';">' +
           TEKEN[s.ernst] + ' ' + esc(s.tekst) + '</span>' +
@@ -925,8 +946,8 @@
       (b.stand === 'gemeten' ? '\u25CF' : b.stand === 'stil' ? '\u25CB' : '\u2014') + ' ' +
       esc(b.naam) + (b.stand === 'gemeten' ? '' : ': ' + esc(b.uitleg)) + '</span>').join('<br>');
     el.innerHTML = rust + blokken.join('') +
-      '<p class="stil" style="margin-top:.7rem;">' + esc(d.uitleg || '') + '</p>' +
-      '<div style="margin-top:.4rem;line-height:1.7;">' + bronnen + '</div>';
+      '<p class="stil s-xs3nn1">' + esc(d.uitleg || '') + '</p>' +
+      '<div class="s-2fdded">' + bronnen + '</div>';
     el.querySelectorAll('[data-los]').forEach((b) => b.addEventListener('click', () => losOp(b)));
   }
   laadWacht();
@@ -1053,19 +1074,19 @@
       const onzeker = f.zekerheid < DREMPEL;
       return '<div class="rtg-rij"><span class="rtg-tekst">' +
         '<span class="rtg-naam">' + esc(VELDNAAM[n] || n) + ': ' + esc(String(f.waarde)) +
-        (onzeker ? ' <span style="color:var(--rtg-acc);">&middot; na te kijken</span>' : '') + '</span>' +
+        (onzeker ? ' <span class="s-148cz8o">&middot; na te kijken</span>' : '') + '</span>' +
         '<span class="rtg-sub">' + esc(f.uitleg) + '</span></span></div>';
     }).join('') : '<p class="rtg-leeg">Wij konden er niets uit lezen. Het origineel is bewaard; vul de gegevens zelf in.</p>';
 
     const w = (n) => (velden[n] || {}).waarde || '';
     const soorten = ['vlucht', 'verblijf', 'vervoer', 'transfer', 'activiteit', 'tafel', 'evenement', 'spoor'];
     $('#invUit').innerHTML =
-      '<h2 style="margin-top:1rem;">Wat wij eruit lezen</h2>' +
+      '<h2 class="s-13bdal">Wat wij eruit lezen</h2>' +
       '<p class="rtg-uitleg">' + esc(d.opmerking || '') + '</p>' + gelezen +
-      '<h2 style="margin-top:1rem;">Nakijken en aanvullen</h2>' +
-      '<div class="rtg-rij" style="gap:.6rem;flex-wrap:wrap;">' +
+      '<h2 class="s-13bdal">Nakijken en aanvullen</h2>' +
+      '<div class="rtg-rij s-1dninqr">' +
         veldje('bTitel', 'Naam', w('titel') || w('vlucht') || w('kenmerk')) +
-        '<span style="flex:1 1 8rem;"><label class="rtg-label" for="bSoort">Soort</label>' +
+        '<span class="s-1vlyext"><label class="rtg-label" for="bSoort">Soort</label>' +
         '<select class="rtg-veld" id="bSoort">' + soorten.map((x) =>
           '<option value="' + x + '"' + (w('soort') === x ? ' selected' : '') + '>' + x + '</option>').join('') +
         '</select></span>' +
@@ -1073,14 +1094,14 @@
         veldje('bVan', 'Van (jjjj-mm-dd)', w('van_datum')) +
         veldje('bTot', 'Tot (leeg mag)', w('tot_datum')) +
       '</div>' +
-      '<div class="rtg-acties" style="margin-top:.8rem;">' +
+      '<div class="rtg-acties s-xs4amk">' +
         '<button class="rtg-knop vol" id="invVoegToe" type="button">Voeg toe aan mijn reizen</button>' +
         '<span class="rtg-sub">Pas hierna staat het bij uw reizen.</span>' +
       '</div>';
     $('#invVoegToe').addEventListener('click', voegToe);
   }
   function veldje(id, label, waarde) {
-    return '<span style="flex:1 1 9rem;"><label class="rtg-label" for="' + id + '">' + esc(label) + '</label>' +
+    return '<span class="s-1vlz1xc"><label class="rtg-label" for="' + id + '">' + esc(label) + '</label>' +
       '<input class="rtg-veld" id="' + id + '" value="' + esc(waarde || '') + '" maxlength="120"></span>';
   }
 

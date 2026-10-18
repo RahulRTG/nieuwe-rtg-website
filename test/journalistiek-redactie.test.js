@@ -40,7 +40,7 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 // de redactie-endpoints, met de prefix er los voor zodat de paden leesbaar blijven
-const red = (pad, body, token) => api('/api/supplier/redactie/' + pad, body, token);
+const red = (pad, body, token) => api((pad.startsWith('/api/') ? pad : '/api/supplier/redactie/' + pad), body, token);
 
 /* Inloggen op de zaak gaat op naam met een persoonlijke pincode; de
    demo-rooster geeft de bezetting per code (manager 1234, personeel 5678). */
@@ -64,17 +64,17 @@ test.after(() => {
 });
 
 test('1. de redactie staat klaar: huisstijl, rubrieken en lege tellers; zonder inlog niets', async () => {
-  const r = await red('staat', {}, bode);
+  const r = await red('/api/supplier/redactie/staat', {}, bode);
   assert.equal(r.status, 200);
   assert.equal(r.body.huisstijl.naam, 'De Ibiza Bode', 'de krant erft de naam van de zaak');
   assert.ok(r.body.rubrieken.includes('Voorpagina'), 'er staat een startset rubrieken klaar');
   assert.deepEqual(r.body.tellers, { concept: 0, live: 0, gelezen: 0 }, 'een verse redactie telt nul');
   assert.deepEqual(r.body.site.blokken, [], 'de krantsite is nog leeg');
-  assert.equal((await red('staat', {}, null)).status, 401, 'zonder zaak-inlog geen redactie');
+  assert.equal((await red('/api/supplier/redactie/staat', {}, null)).status, 401, 'zonder zaak-inlog geen redactie');
 });
 
 test('2. de huisstijl: wat geldig is wordt bewaard, de rest wordt GEWEIGERD', async () => {
-  const goed = await red('huisstijl', { naam: 'De Ibiza Bode', payoff: 'Onafhankelijk sinds 1998', accent: '#7F1634', thema: 'licht' }, bode);
+  const goed = await red('/api/supplier/redactie/huisstijl', { naam: 'De Ibiza Bode', payoff: 'Onafhankelijk sinds 1998', accent: '#7F1634', thema: 'licht' }, bode);
   assert.equal(goed.status, 200);
   assert.equal(goed.body.huisstijl.payoff, 'Onafhankelijk sinds 1998');
   assert.equal(goed.body.huisstijl.thema, 'licht');
@@ -85,32 +85,32 @@ test('2. de huisstijl: wat geldig is wordt bewaard, de rest wordt GEWEIGERD', as
      merkkern de enige bron is (kern/tenant/merkkern.js) strandt dezelfde
      invoer overal hetzelfde: met een melding. Voor wie de knop indrukt is dat
      het verschil tussen weten dat het niet mocht en denken dat het gelukt is. */
-  const fout = await red('huisstijl', { accent: 'bordeaux' }, bode);
+  const fout = await red('/api/supplier/redactie/huisstijl', { accent: 'bordeaux' }, bode);
   assert.equal(fout.status, 400);
   assert.match(fout.body.error, /hexcode/);
-  const themaFout = await red('huisstijl', { thema: 'neon' }, bode);
+  const themaFout = await red('/api/supplier/redactie/huisstijl', { thema: 'neon' }, bode);
   assert.equal(themaFout.status, 400);
   assert.match(themaFout.body.error, /licht of donker/);
 
   /* En er is niets half toegepast: de stand van na de geldige bewaring staat er nog. */
-  const na = await red('staat', {}, bode);
+  const na = await red('/api/supplier/redactie/staat', {}, bode);
   assert.equal(na.body.huisstijl.accent, '#7F1634');
   assert.equal(na.body.huisstijl.thema, 'licht');
 });
 
 test('3. rubrieken: een nieuwe komt vooraan, een lege naam wordt geweigerd', async () => {
-  const nieuw = await red('rubriek/bewaar', { naam: 'Haven' }, bode);
+  const nieuw = await red('/api/supplier/redactie/rubriek/bewaar', { naam: 'Haven' }, bode);
   assert.equal(nieuw.status, 200);
   assert.equal(nieuw.body.rubrieken[0], 'Haven', 'de nieuwste rubriek staat vooraan');
-  assert.equal((await red('rubriek/bewaar', { naam: '   ' }, bode)).status, 400, 'een lege naam is geen rubriek');
-  const nogmaals = await red('rubriek/bewaar', { naam: 'Haven' }, bode);
+  assert.equal((await red('/api/supplier/redactie/rubriek/bewaar', { naam: '   ' }, bode)).status, 400, 'een lege naam is geen rubriek');
+  const nogmaals = await red('/api/supplier/redactie/rubriek/bewaar', { naam: 'Haven' }, bode);
   assert.equal(nogmaals.body.rubrieken.filter(x => x === 'Haven').length, 1, 'dezelfde rubriek komt er niet dubbel in');
-  const weg = await red('rubriek/verwijder', { naam: 'Haven' }, bode);
+  const weg = await red('/api/supplier/redactie/rubriek/verwijder', { naam: 'Haven' }, bode);
   assert.ok(!weg.body.rubrieken.includes('Haven'), 'de rubriek is weg');
 });
 
 test('4. een stuk schrijven: het blijft concept, en een onbekende rubriek valt terug', async () => {
-  const mk = await red('artikel/bewaar', {
+  const mk = await red('/api/supplier/redactie/artikel/bewaar', {
     titel: 'Nieuwe steiger in de haven', chapo: 'De werkzaamheden beginnen maandag.',
     inhoud: 'De gemeente begint maandag aan de nieuwe steiger. Het werk duurt tot het najaar.',
     rubriek: 'Bestaat Niet'
@@ -122,21 +122,21 @@ test('4. een stuk schrijven: het blijft concept, en een onbekende rubriek valt t
   assert.ok(a.rubriek && a.rubriek !== 'Bestaat Niet', 'een onbekende rubriek valt terug op een bestaande');
 
   // hetzelfde id opnieuw bewaren wijzigt het stuk en maakt er geen tweede
-  const bij = await red('artikel/bewaar', { id: a.id, titel: 'Nieuwe steiger komt er', inhoud: a.inhoud }, bode);
+  const bij = await red('/api/supplier/redactie/artikel/bewaar', { id: a.id, titel: 'Nieuwe steiger komt er', inhoud: a.inhoud }, bode);
   assert.equal(bij.body.artikel.id, a.id, 'bewaren op id wijzigt hetzelfde stuk');
   assert.equal(bij.body.artikel.titel, 'Nieuwe steiger komt er');
 
-  const lijst = await red('artikelen', { status: 'concept' }, bode);
+  const lijst = await red('/api/supplier/redactie/artikelen', { status: 'concept' }, bode);
   assert.equal(lijst.body.lijst.filter(x => x.id === a.id).length, 1, 'het staat er precies een keer in');
-  assert.equal((await red('artikelen', { status: 'live' }, bode)).body.lijst.length, 0, 'er staat nog niets live');
+  assert.equal((await red('/api/supplier/redactie/artikelen', { status: 'live' }, bode)).body.lijst.length, 0, 'er staat nog niets live');
 
-  const vol = await red('artikel/haal', { id: a.id }, bode);
+  const vol = await red('/api/supplier/redactie/artikel/haal', { id: a.id }, bode);
   assert.equal(vol.body.artikel.inhoud, a.inhoud, 'de redactie ziet de volledige tekst');
-  assert.equal((await red('artikel/haal', { id: 'bestaatniet' }, bode)).status, 404);
+  assert.equal((await red('/api/supplier/redactie/artikel/haal', { id: 'bestaatniet' }, bode)).status, 404);
 });
 
 test('5. een concept blijft binnen de redactie: de krant toont het niet', async () => {
-  const mk = await red('artikel/bewaar', { titel: 'Nog niet af', inhoud: 'Een half stuk over een raadslid.' }, bode);
+  const mk = await red('/api/supplier/redactie/artikel/bewaar', { titel: 'Nog niet af', inhoud: 'Een half stuk over een raadslid.' }, bode);
   const id = mk.body.artikel.id;
   /* Eerst de andere kant: in de REDACTIE staat het stuk wel. Zonder die regel
      zou "het staat niet in de krant" ook slagen als het stuk nergens is
@@ -144,7 +144,7 @@ test('5. een concept blijft binnen de redactie: de krant toont het niet', async 
      dus de krant is sowieso leeg. De bewering die telt is het VERSCHIL tussen
      de twee lijsten, en dat verschil bewijst zich alleen als het stuk aan de
      ene kant aantoonbaar bestaat. */
-  assert.ok((await red('artikelen', {}, bode)).body.lijst.some(x => x.id === id),
+  assert.ok((await red('/api/supplier/redactie/artikelen', {}, bode)).body.lijst.some(x => x.id === id),
     'het concept staat wel in de redactie');
   const krant = await api('/api/krant/open', { code: 'BODE' });
   assert.equal(krant.status, 200);
@@ -152,31 +152,31 @@ test('5. een concept blijft binnen de redactie: de krant toont het niet', async 
   /* En ook niet als je het id al weet. Een lijst die iets verzwijgt terwijl
      de detailpagina het gewoon geeft, is geen grens maar een gordijn. */
   assert.equal((await api('/api/krant/artikel', { code: 'BODE', id })).status, 404, 'ook niet rechtstreeks op id');
-  await red('artikel/verwijder', { id }, bode);
+  await red('/api/supplier/redactie/artikel/verwijder', { id }, bode);
 });
 
 test('6. publiceren en terugtrekken: de krant volgt beide kanten op', async () => {
-  const mk = await red('artikel/bewaar', { titel: 'Zeilseizoen geopend', chapo: 'De eerste boten liggen klaar.', inhoud: 'De haven loopt vol.' }, bode);
+  const mk = await red('/api/supplier/redactie/artikel/bewaar', { titel: 'Zeilseizoen geopend', chapo: 'De eerste boten liggen klaar.', inhoud: 'De haven loopt vol.' }, bode);
   const id = mk.body.artikel.id;
-  const pub = await red('artikel/publiceer', { id }, bode);
+  const pub = await red('/api/supplier/redactie/artikel/publiceer', { id }, bode);
   assert.equal(pub.body.artikel.status, 'live');
 
   const krant = await api('/api/krant/open', { code: 'BODE' });
   assert.ok(krant.body.artikelen.some(x => x.id === id), 'het stuk staat in de krant');
   const lees = await api('/api/krant/artikel', { code: 'BODE', id });
   assert.equal(lees.body.artikel.titel, 'Zeilseizoen geopend');
-  assert.equal((await red('staat', {}, bode)).body.tellers.gelezen, 1, 'een lezer wordt geteld');
+  assert.equal((await red('/api/supplier/redactie/staat', {}, bode)).body.tellers.gelezen, 1, 'een lezer wordt geteld');
 
   // terugtrekken: wat de redactie in draait, hoort de lezer niet meer te zien
-  const terug = await red('artikel/concept', { id }, bode);
+  const terug = await red('/api/supplier/redactie/artikel/concept', { id }, bode);
   assert.equal(terug.body.artikel.status, 'concept');
   assert.ok(!(await api('/api/krant/open', { code: 'BODE' })).body.artikelen.some(x => x.id === id), 'het stuk is uit de krant');
   assert.equal((await api('/api/krant/artikel', { code: 'BODE', id })).status, 404, 'en ook niet meer op id te lezen');
-  assert.equal((await red('artikel/concept', { id: 'bestaatniet' }, bode)).status, 404);
+  assert.equal((await red('/api/supplier/redactie/artikel/concept', { id: 'bestaatniet' }, bode)).status, 404);
 });
 
 test('7. snel nieuws: in een handeling geschreven en gepubliceerd', async () => {
-  const snel = await red('snel', { titel: 'Stroomstoring in Vila', inhoud: 'Delen van Vila zaten een uur zonder stroom.' }, bode);
+  const snel = await red('/api/supplier/redactie/snel', { titel: 'Stroomstoring in Vila', inhoud: 'Delen van Vila zaten een uur zonder stroom.' }, bode);
   assert.equal(snel.status, 200);
   assert.equal(snel.body.artikel.status, 'live', 'snel nieuws staat meteen live');
   const krant = await api('/api/krant/open', { code: 'BODE' });
@@ -184,7 +184,7 @@ test('7. snel nieuws: in een handeling geschreven en gepubliceerd', async () => 
 });
 
 test('8. de redactie-assistent draait ook zonder sleutel', async () => {
-  const a = await red('assist', { titel: 'Stroomstoring in Vila', inhoud: 'Delen van Vila zaten een uur zonder stroom. De oorzaak was een defecte kabel.' }, bode);
+  const a = await red('/api/supplier/redactie/assist', { titel: 'Stroomstoring in Vila', inhoud: 'Delen van Vila zaten een uur zonder stroom. De oorzaak was een defecte kabel.' }, bode);
   assert.equal(a.status, 200);
   assert.equal(a.body.chapo, 'Delen van Vila zaten een uur zonder stroom.', 'de chapo is de eerste zin');
   assert.ok(a.body.koppen.length >= 1, 'er komen kopsuggesties terug');
@@ -192,7 +192,7 @@ test('8. de redactie-assistent draait ook zonder sleutel', async () => {
 });
 
 test('9. de krantsite: blokken worden geschoond en de volgorde opgeschoond', async () => {
-  const bw = await red('site/bewaar', {
+  const bw = await red('/api/supplier/redactie/site/bewaar', {
     design: {
       blokken: [
         { id: 'b1', type: 'kop', tekst: 'De Ibiza Bode' },
@@ -213,7 +213,7 @@ test('9. de krantsite: blokken worden geschoond en de volgorde opgeschoond', asy
 });
 
 test('10. een krant beginnen is een werkvorm, geen algemene knop', async () => {
-  const mk = await red('artikel/bewaar', { titel: 'Interne notitie', inhoud: 'Bronnen en telefoonnummers.' }, bode);
+  const mk = await red('/api/supplier/redactie/artikel/bewaar', { titel: 'Interne notitie', inhoud: 'Bronnen en telefoonnummers.' }, bode);
   const id = mk.body.artikel.id;
 
   /* TOT DEZE RONDE kon ELKE zaak met een leverancier-inlog een krant beginnen:
@@ -234,11 +234,11 @@ test('10. een krant beginnen is een werkvorm, geen algemene knop', async () => {
     assert.equal(r.status, 409, pad + ' hoort dicht te zijn voor een restaurant (kreeg ' + r.status + ')');
     assert.match(r.body.error || '', /redactie|journalistiek/i, pad + ' zegt ook waarom');
   }
-  assert.equal((await red('artikel/haal', { id }, bode)).status, 200, 'en bij de krant zelf staat het stuk er nog gewoon');
+  assert.equal((await red('/api/supplier/redactie/artikel/haal', { id }, bode)).status, 200, 'en bij de krant zelf staat het stuk er nog gewoon');
 
-  const weg = await red('artikel/verwijder', { id }, bode);
+  const weg = await red('/api/supplier/redactie/artikel/verwijder', { id }, bode);
   assert.equal(weg.status, 200);
-  assert.equal((await red('artikel/haal', { id }, bode)).status, 404, 'de eigenaar kan het wel weghalen');
+  assert.equal((await red('/api/supplier/redactie/artikel/haal', { id }, bode)).status, 404, 'de eigenaar kan het wel weghalen');
 });
 
 /* De scheiding TUSSEN TWEE KRANTEN is met die deur niet meer over HTTP te

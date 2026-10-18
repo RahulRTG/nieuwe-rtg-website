@@ -148,7 +148,10 @@ function boek(usd, opties, nu) {
   rij.aanroepen += 1;
   rij.pas = pas;
   if (vrij) rij.vrijCent = (rij.vrijCent || 0) + cent;
-  try { b.bewaar(); } catch (e) {}
+  /* Niet stil (LAT.md regel 5, STILSPOOR.json): een AI-uitgave die niet is
+     bewaard, telt na een herstart niet mee in het budget. De aanroep zelf is
+     al gedaan en betaald, dus weigeren helpt niemand -- melden wel. */
+  try { b.bewaar(); } catch (e) { console.warn('[ai-budget] de AI-uitgave niet bewaard:', e && e.message); }
   return rij;
 }
 

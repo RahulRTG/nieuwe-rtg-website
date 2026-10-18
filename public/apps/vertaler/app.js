@@ -165,7 +165,7 @@
   function lijstHtml(items) {
     return items.map(function (h) {
       return '<div class="zin" data-zin="' + esc(h.van) + '" role="button" tabindex="0"><span class="t">' +
-        esc(h.van) + '<br><span style="color:var(--soft);">' + esc(h.naar) + '</span></span></div>';
+        esc(h.van) + '<br><span class="s-1pv2lmv">' + esc(h.naar) + '</span></span></div>';
     }).join('');
   }
   function tekenLijsten() {

@@ -63,6 +63,11 @@ module.exports = (kern) => {
      toestand, en een weigering laat niets achter). Wie alleen wil KIJKEN
      krijgt hier de echte doos als hij bestaat, en anders een losse lege vorm
      die nergens aan vast zit. */
+  /* De OPENER: een belofte om de doos te maken, en niet de doos zelf. Een
+     schrijver die eerst wil keuren krijgt Hlees() om te kijken en deze functie
+     om pas te scheppen als hij echt schrijft (kern/horeca/wijk.js, zet). */
+  const Hopener = (code) => () => H(code);
+
   function Hlees(code) {
     const c = String(code || '');
     // bak() maakt hooguit de lege wortel aan; de doos van een zaak nooit
@@ -156,7 +161,7 @@ module.exports = (kern) => {
     return { rekeningen: n };
   }
 
-  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, teruggegeven, waarde,
+  return { KANALEN, REGELSTANDEN, H, Hlees, Hopener, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, teruggegeven, waarde,
     totaal, openstaand, controleerSom, happyKorting, vergeetBezorgpunten,
     get bonlaag() { return kern.horecaBonlaag || null; },
     // De smalle terugbetaalweg van de horecateruggave (opzet/kernlaag5f.js), op dezelfde manier.

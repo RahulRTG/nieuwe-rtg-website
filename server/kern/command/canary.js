@@ -67,7 +67,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
     if (!journaal) return;
     try {
       journaal.noteer(Object.assign({ actie, objectType: 'functie', objectId: id }, extra || {}));
-    } catch (e) { /* een journaalstoring mag een uitrol niet tegenhouden */ }
+    } catch (e) { console.warn('[canary] journaal (houdt geen uitrol tegen):', e.message); }
   }
 
   function start(id, deel, opties) {

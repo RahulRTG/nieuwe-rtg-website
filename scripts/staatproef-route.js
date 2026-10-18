@@ -32,7 +32,7 @@ const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
@@ -154,7 +154,7 @@ if (require.main !== module) { module.exports = {}; return; }
     const oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
     oudOp = (oud.stempel && oud.stempel.op) || oudOp;
     oudeRijen = oud.perRoute || [];
-  } catch (e) {}
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   const eerder = new Map(oudeRijen.map(rij => [rij.methode + ' ' + rij.pad, { ...rij, op: rij.op || oudOp }]));
   /* De rij: eerst wat geen rij heeft, dan wat GESCHORST staat (een gezakte
      cel sluit alleen door hermeting, PROOF.md par. 2), dan de oudste meting. */
@@ -362,7 +362,7 @@ if (require.main !== module) { module.exports = {}; return; }
     console.log('      ! ' + r.methode + ' ' + r.pad + ' -- ' + r.reden);
   }
 
-  fs.writeFileSync(UITSLAG, JSON.stringify({
+  if (magSchrijven(eisSchoneBoom('staatproef-route'), UITSLAG)) fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Per route drie vingerafdrukken rond twee gelijke oproepen. De eerste oproep IJKT: ' +
       'bewoog de toestand niet, dan is er over deze route niets te zeggen en staat alles op ongemeten. ' +

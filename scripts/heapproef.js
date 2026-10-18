@@ -48,7 +48,7 @@ const fs = require('fs'), os = require('os'), path = require('path'), http = req
 const { start: wegwerp } = require('./lib/wegwerpserver');
 const { haalSessies } = require('./lib/proefsessies');
 const { tempos, oordeel } = require('./lib/heapstat');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
@@ -235,7 +235,7 @@ async function main() {
     tempos: { verkeer: (per.verkeer || []).map(x => Number(x.toFixed(1))), stilte: (per.stilte || []).map(x => Number(x.toFixed(1))) },
     verkeer: { calls: telling.n, onverwachte5xx: telling.s5xx, paden: telling.paden },
     overgeslagenRollen: overgeslagen, oordeel: uit };
-  fs.writeFileSync(UIT, JSON.stringify(verslag, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('heapproef'), UIT)) fs.writeFileSync(UIT, JSON.stringify(verslag, null, 2) + '\n');
   console.log('  verslag: ' + path.relative(WORTEL, UIT) + '\n');
 
   /* DE IJKING KEERT DE VERWACHTING OM. Met een ingebouwd lek MOET de proef LEK

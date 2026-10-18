@@ -80,7 +80,7 @@ const belasting = require('./lib/belasting');
    schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
 const rolproef = require('./lib/rolproef');
 /* WANNEER en TEGEN WELKE CODE dit is gemeten; zie scripts/versheid.js. */
-const { exactStempel } = require('./lib/stempel');
+const { exactStempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -1345,6 +1345,10 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
      meting, maar hij hoort nooit meer te zeggen dat hij niets kán controleren. */
   const schrijf = (naam, inhoud) => {
     try {
+      /* "Altijd" betekent: ook rood, niet: ook op een vuile boom. Een meting op
+         ongecommitte code wijst naar een commit die haar invoer niet bevat
+         (STEMPELVEILIGHEID.json); dan blijft het vorige register staan. */
+      if (!magSchrijven(eisSchoneBoom('beproeving'), naam)) return false;
       fs.writeFileSync(path.join(__dirname, '..', naam), JSON.stringify(inhoud, null, 2) + '\n');
       return true;
     } catch (e) {

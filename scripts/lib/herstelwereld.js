@@ -32,7 +32,7 @@
 'use strict';
 
 /* ---- 1. DE WERELD: wat er eenmalig aan moet ------------------------------ */
-async function zetWereldKlaar({ roep, tokens, aanmeld }) {
+async function zetWereldKlaar({ roep, tokens, aanmeld, tweede }) {
   const gedaan = [];
   const sleutels = {};
   /* De leden-bank staat in een verse database niet live, en dat gaf vier
@@ -54,16 +54,37 @@ async function zetWereldKlaar({ roep, tokens, aanmeld }) {
      bestaat -- en een extern voorbeeld-IBAN is dat niet ("De tegenrekening
      bestaat niet"). Zelfde ingreep als scripts/lib/idemwereld.js, en om dezelfde
      reden: geld sturen vraagt iemand anders. */
-  if (aanmeld) {
-    const ander = await aanmeld('/api/login', { tier: 'lifestyle' });
+  /* `tweede` is een PROEFLID met een gebonden toestel (./proeftoestel.js): de
+     bank vraagt sinds A-P1-04 een eigen account, en een demo-pas kreeg hier een
+     403 op /api/bank/akkoord. Zonder `tweede` blijft het de oude weg. */
+  if (tweede || aanmeld) {
+    const ander = tweede || await aanmeld('/api/login', { tier: 'lifestyle' });
+    if (ander && ander.codenaam) sleutels.anderCodenaam = ander.codenaam;
     if (ander && ander.token) {
       const ak2 = await roep('/api/bank/akkoord', ander.token, {});
       const iban2 = ak2 && ak2.data && ak2.data.rekening && ak2.data.rekening.iban;
       if (iban2) { sleutels.naarIban = iban2; gedaan.push('een tweede lid met een rekening'); }
     }
   }
+  /* GELD OP DE PAS EN IN DE KASSA (18 oktober 2026), voor de geldparen uit de
+     domeinlijst van scripts/herstel.js. Een tegoed kopen vraagt saldo, en geld
+     apart zetten vraagt omzet bij de zaak -- die komt van een kascode van het
+     lid, ingeind aan de kassa, langs de gewone routes en hun eigen poorten. */
+  const op = await roep('/api/pay/oplaad', tokens.member, { centen: 20000, idem: 'herstelwereld-' + vers() });
+  if (op && op.status >= 200 && op.status < 300) gedaan.push('saldo op de pas van het lid');
+  if (tokens.supplier) {
+    const kas = await roep('/api/pay/kascode', tokens.member, { centen: 10000, idem: 'herstelwereld-' + vers() });
+    const code = kas && kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code));
+    if (code) {
+      const v = await roep('/api/supplier/pos/sale', tokens.supplier,
+        { total: 100, method: 'rtgpay', payCode: code, idem: 'herstelwereld-' + vers() });
+      if (v && v.status >= 200 && v.status < 300) gedaan.push('omzet bij de zaak');
+      /* De kascode is daarmee gebruikt; de kascode van het paar is een verse. */
+    }
+  }
   return { gedaan, sleutels };
 }
+const vers = () => Math.random().toString(36).slice(2, 10);
 
 /* ---- 2. HET LIJF: de velden die deze route eist -------------------------- */
 /* Per route, met de reden waarom dat veld er moet zijn -- overgenomen uit het
@@ -93,6 +114,23 @@ const LIJVEN = Object.freeze({
   '/api/bank/terugkerend/zet': (k) => ({ vanIban: k.iban, naarIban: k.naarIban,
     centen: 100, interval: 'maand', oms: 'proef',
     idem: 'herstelproef-' + Math.random().toString(36).slice(2, 10) }),
+
+  /* DE GELDPAREN uit DOMEINPAREN in scripts/herstel.js. Elk veld komt uit de
+     foutmelding van de route zelf (dezelfde waarden als scripts/lib/idemwereld.js),
+     en elke `idem` is vers per poging -- om dezelfde reden als hierboven. */
+  '/api/pay/kascode': () => ({ centen: 100, idem: 'herstelproef-' + vers() }),
+  '/api/pay/verzoek': (k) => ({ aan: [k.anderCodenaam], totaalCenten: 500, oms: 'proefklompje', idem: 'herstelproef-' + vers() }),
+  '/api/pay/tegoed/koop': (k) => ({ centen: 500, aan: k.anderCodenaam, oms: 'prooftegoed', idem: 'herstelproef-' + vers() }),
+  /* Een tegoed dat nog loopt, neemt de route alleen terug MET intrekken: de
+     code mag dan niet meer werken (kern/pay/tegoed.js). Zonder die vlag gaf zij
+     409 "terugnemen kan pas na de vervaldatum" -- de route zegt zelf hoe. */
+  '/api/pay/tegoed/terug': () => ({ intrekken: true, idem: 'herstelproef-' + vers() }),
+  '/api/supplier/giftcard/sell': () => ({ bedrag: 25, idem: 'herstelproef-' + vers() }),
+  '/api/supplier/pay/treasury/apart': () => ({ naam: 'Proefoormerk', centen: 50, doel: 'btw' }),
+  '/api/wallet/voeg': () => ({ soort: 'klantenkaart', titel: 'Proefkaart', code: 'PROEF-' + vers() }),
+  /* De terugweg van een weggehaalde regel is een NIEUWE regel, dus zonder het
+     id van de oude: met dat id gaf regelZet 404 "deze regel bestaat niet". */
+  '/api/geld/beleid/zet': () => ({ soort: 'minimumbuffer', drempelCenten: 10000, niveau: 'kijken', id: undefined }),
 
   '/api/member/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
   '/api/supplier/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },

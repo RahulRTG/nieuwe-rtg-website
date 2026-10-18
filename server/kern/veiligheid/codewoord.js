@@ -170,7 +170,7 @@ module.exports = ({ opslag, save, crypto, kluis, alarm, plek, sociaal }) => {
         try {
           const C = lijsten();
           if (C[handle]) { C[handle].mislukt = { t: nu(), reden: String(r.error).slice(0, 140) }; save(); }
-        } catch (e2) {}
+        } catch (e2) { console.error('[veiligheid] de mislukte melding van ' + handle + ' kon niet in de stand:', e2 && e2.message); }
         console.error('[veiligheid] codewoord van ' + handle + ' sloeg GEEN alarm: ' + r.error);
       }
       return true;

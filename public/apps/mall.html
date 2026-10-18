@@ -220,8 +220,47 @@
 <link href="/shared/rtg-mall-living.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-101m0pp:not(#_#_#_){cursor:default}
+.s-1059wtf:not(#_#_#_){margin-bottom:.6rem;resize:vertical}
+.s-12itpbj:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold))}
+.s-12ueut0:not(#_#_#_){margin-bottom:0.5rem;resize:vertical}
+.s-14ck55u:not(#_#_#_){text-decoration:none}
+.s-15bgfuc:not(#_#_#_){width:100%;margin-top:0.5rem}
+.s-16mvxxl:not(#_#_#_){margin:0.5rem 0 0 1.25rem}
+.s-16woflw:not(#_#_#_){margin-bottom:.5rem;resize:vertical}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-19ic06h:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));font-size:.8rem}
+.s-1cv76ip:not(#_#_#_){flex:1;min-width:10rem}
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+.s-1dzu8ds:not(#_#_#_){flex:1}
+.s-1elbo4a:not(#_#_#_){color:var(--soft);font-size:.78rem}
+.s-1ik90f3:not(#_#_#_){font-family:'Bodoni Moda',serif;font-size:1.3rem}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-1wi44k7:not(#_#_#_){font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:0.5rem}
+.s-1wxyff2:not(#_#_#_){margin-top:.5rem;gap:.4rem;align-items:center}
+.s-3xagld:not(#_#_#_){color:var(--soft);font-size:.8rem}
+.s-h7lf83:not(#_#_#_){justify-content:center}
+.s-hlytrm:not(#_#_#_){grid-template-columns:1fr;max-width:460px}
+.s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
+.s-jv6rvf:not(#_#_#_){max-width:13rem}
+.s-jv81uh:not(#_#_#_){max-width:15rem}
+.s-m33ux4:not(#_#_#_){color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0}
+.s-o73w9v:not(#_#_#_){max-width:38rem;margin:0 auto;padding:1.6rem 1.2rem 4rem;font-size:.95rem;line-height:1.8;color:var(--muted)}
+.s-oil8rv:not(#_#_#_){font-size:.95rem}
+.s-v8jwf2:not(#_#_#_){font-size:.74rem;color:var(--rtg-leesgoud,var(--gold))}
+.s-xmivqi:not(#_#_#_){margin-bottom:1.25rem}
+.s-z2auej:not(#_#_#_){font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
+</style>
 </head>
-<body class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
+<body data-rtg-context-bron="mall" class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="none" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -378,7 +417,7 @@
 <section class="blad" id="blad" aria-label="Boutique">
   <div class="blad-kop">
     <button class="terug" id="bladTerug">← Mall</button>
-    <div><div class="ey" id="bladStad" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey s-z2auej" id="bladStad"></div><h1 id="bladNaam" class="s-1ik90f3"></h1></div>
   </div>
   <div class="art" id="bladArt"></div>
 </section>
@@ -386,9 +425,9 @@
 <section class="blad" id="lezer" aria-label="Reisgids lezen">
   <div class="blad-kop">
     <button class="terug" id="lezerTerug">← Bibliotheek</button>
-    <div><div class="ey" id="lezerMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));"></div><h1 id="lezerTitel" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey s-z2auej" id="lezerMeta"></div><h1 id="lezerTitel" class="s-1ik90f3"></h1></div>
   </div>
-  <div id="lezerTekst" style="max-width:38rem;margin:0 auto;padding:1.6rem 1.2rem 4rem;font-size:.95rem;line-height:1.8;color:var(--muted);"></div>
+  <div id="lezerTekst" class="s-o73w9v"></div>
 </section>
 
 <div class="melding" id="melding" role="status"></div>
@@ -620,14 +659,14 @@ function tekenBiebKop(){
   $('#biebKop').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>De RTG Bibliotheek</h2>'+
     '<span class="n">drie afdelingen · bladeren voor iedereen · vraag de bibliothecaris</span></div>'+
-    '<div class="boutiek" style="cursor:default;">'+
+    '<div class="boutiek s-101m0pp">'+
       '<b>De bibliothecaris</b>'+
       '<span class="tag">Vertel wat u zoekt of wilt leren; de bibliothecaris zoekt dwars door de App-, Reis- en RTF-afdeling en raadt echte titels aan.</span>'+
       '<div class="rij knoprij">'+
-        '<input class="veld" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen" style="flex:1;min-width:12rem;">'+
+        '<input class="veld s-1cv8ghr" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen">'+
         '<button class="knop" id="bibGo">Vraag advies</button>'+
       '</div>'+
-      '<div id="bibUit" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:0.5rem;" aria-live="polite"></div>'+
+      '<div id="bibUit" class="s-1wi44k7" aria-live="polite"></div>'+
     '</div></div>';
   $('#bibGo').addEventListener('click', async () => {
     $('#bibGo').disabled = true;
@@ -635,7 +674,7 @@ function tekenBiebKop(){
     try {
       const d = await api('/api/bieb/ai', { vraag: $('#bibVraag').value });
       $('#bibUit').innerHTML = esc(d.antwoord) + (d.aanraders && d.aanraders.length
-        ? '<ul style="margin:0.5rem 0 0 1.25rem;">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="color:var(--soft);">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>'
+        ? '<ul class="s-16mvxxl">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span class="s-1pv2lmv">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>'
         : '');
     } catch(e){ $('#bibUit').textContent = e.message; }
     $('#bibGo').disabled = false;
@@ -653,13 +692,13 @@ async function laadRtfbieb(){
   $('#rtfbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>RTF-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' echte kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
-    '<div class="rij" style="margin-bottom:0.75rem;">'+
-      '<select id="rfCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
+    '<div class="rij s-j0vkha">'+
+      '<select id="rfCat" class="veld s-jv81uh" aria-label="Categorie"><option value="">Alle categorieën</option>'+
         d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('')+'</select>'+
-      '<input id="rfZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
+      '<input id="rfZoek" class="veld s-1cv76ip" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="rfMijn" type="button">Mijn RTF-apps</button>'+
     '</div>'+
-    '<div id="rfGrid"></div><div class="rij" id="rfBlader" style="justify-content:center;"></div></div>';
+    '<div id="rfGrid"></div><div class="rij s-h7lf83" id="rfBlader"></div></div>';
   $('#rfCat').addEventListener('change', () => { RF.categorie = $('#rfCat').value; RF.pagina = 1; RF.mijn = false; tekenRtf(); });
   let zt; $('#rfZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RF.zoek = $('#rfZoek').value; RF.pagina = 1; RF.mijn = false; tekenRtf(); }, 300); });
   $('#rfMijn').addEventListener('click', () => { RF.mijn = !RF.mijn; RF.pagina = 1; tekenRtf(); });
@@ -667,15 +706,15 @@ async function laadRtfbieb(){
 }
 function rtfKaart(a, geinstalleerd){
   // een echte foundation-app: elke tegel opent een bestaande, werkende pagina
-  const open = a.url ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>' : '';
-  return '<div class="boutiek" style="cursor:default;">'+
+  const open = a.url ? '<a class="knop stil s-14ck55u" href="'+esc(a.url)+'">Openen</a>' : '';
+  return '<div class="boutiek s-101m0pp">'+
     '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel||a.categorie||'')+'</span>'+
     '<b style="display:block;margin:0.25rem 0;">'+esc(a.naam)+'</b>'+
     (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
     (a.doelgroepLabel?'<span style="font-size:.72rem;color:var(--soft);display:block;">voor '+esc(a.doelgroepLabel)+'</span>':'')+
-    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;">Gratis</b>'+
-      '<span style="flex:1;"></span>'+ open +
+    '<div class="rij s-1wxyff2">'+
+      '<b class="s-19ic06h">Gratis</b>'+
+      '<span class="s-1dzu8ds"></span>'+ open +
       (geinstalleerd
         ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'">Verwijder</button>'
         : '<button class="knop rfin" data-id="'+esc(a.id)+'">Installeer</button>')+
@@ -734,13 +773,13 @@ async function laadAppbieb(){
   $('#appbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>App-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' echte apps · bladeren voor iedereen · alles inbegrepen bij de pas</span></div>'+
-    '<div class="rij" style="margin-bottom:0.75rem;">'+
-      '<select id="abCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
+    '<div class="rij s-j0vkha">'+
+      '<select id="abCat" class="veld s-jv81uh" aria-label="Categorie"><option value="">Alle categorieën</option>'+
         d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
-      '<input id="abZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
+      '<input id="abZoek" class="veld s-1cv76ip" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="abMijn" type="button">Mijn apps</button>'+
     '</div>'+
-    '<div id="abGrid"></div><div class="rij" id="abBlader" style="justify-content:center;"></div></div>';
+    '<div id="abGrid"></div><div class="rij s-h7lf83" id="abBlader"></div></div>';
   $('#abCat').addEventListener('change', () => { AB.categorie = $('#abCat').value; AB.pagina = 1; AB.mijn = false; tekenApps(); });
   let zt; $('#abZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AB.zoek = $('#abZoek').value; AB.pagina = 1; AB.mijn = false; tekenApps(); }, 300); });
   $('#abMijn').addEventListener('click', () => { AB.mijn = !AB.mijn; AB.pagina = 1; tekenApps(); });
@@ -749,15 +788,15 @@ async function laadAppbieb(){
 function appKaart(a, geinstalleerd){
   // een echte app: open de bestaande pagina, of zet hem op je startscherm
   const open = a.url
-    ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>'
-    : (a.plankLabel ? '<span style="font-size:.74rem;color:var(--rtg-leesgoud,var(--gold));">'+esc(a.plankLabel)+'</span>' : '');
-  return '<div class="boutiek" style="cursor:default;">'+
+    ? '<a class="knop stil s-14ck55u" href="'+esc(a.url)+'">Openen</a>'
+    : (a.plankLabel ? '<span class="s-v8jwf2">'+esc(a.plankLabel)+'</span>' : '');
+  return '<div class="boutiek s-101m0pp">'+
     '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel)+'</span>'+
     '<b style="display:block;margin:0.25rem 0;">'+esc(a.naam)+'</b>'+
     (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
-    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;">Inbegrepen</b>'+
-      '<span style="flex:1;"></span>'+ open +
+    '<div class="rij s-1wxyff2">'+
+      '<b class="s-19ic06h">Inbegrepen</b>'+
+      '<span class="s-1dzu8ds"></span>'+ open +
       (geinstalleerd
         ? '<button class="knop stil abweg" data-id="'+esc(a.id)+'">Van startscherm</button>'
         : '<button class="knop abin" data-id="'+esc(a.id)+'">Op startscherm</button>')+
@@ -1198,15 +1237,15 @@ async function laadReisbieb(){
   $('#reisbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>Reis-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' gidsen van eigen redactie · echt te lezen · voor iedereen open</span></div>'+
-    '<div class="rij" style="margin-bottom:0.75rem;">'+
-      '<select id="rbBestemming" class="veld" style="max-width:13rem;" aria-label="Bestemming"><option value="">Alle bestemmingen</option>'+
+    '<div class="rij s-j0vkha">'+
+      '<select id="rbBestemming" class="veld s-jv6rvf" aria-label="Bestemming"><option value="">Alle bestemmingen</option>'+
         d.bestemmingen.map(b => '<option value="'+esc(b)+'">'+esc(b)+'</option>').join('')+'</select>'+
-      '<select id="rbRegio" class="veld" style="max-width:13rem;" aria-label="Werelddeel"><option value="">Alle werelddelen</option>'+
+      '<select id="rbRegio" class="veld s-jv6rvf" aria-label="Werelddeel"><option value="">Alle werelddelen</option>'+
         d.regios.map(r => '<option value="'+esc(r.id)+'">'+esc(r.label)+' ('+r.aantal+')</option>').join('')+'</select>'+
-      '<input id="rbZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek een bestemming of een woord uit de gids" maxlength="60" aria-label="Zoeken">'+
+      '<input id="rbZoek" class="veld s-1cv76ip" placeholder="Zoek een bestemming of een woord uit de gids" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="rbMijn" type="button">Mijn reisgidsen</button>'+
     '</div>'+
-    '<div id="rbGrid"></div><div class="rij" id="rbBlader" style="justify-content:center;"></div></div>';
+    '<div id="rbGrid"></div><div class="rij s-h7lf83" id="rbBlader"></div></div>';
   $('#rbBestemming').addEventListener('change', () => { RB.bestemming = $('#rbBestemming').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
   $('#rbRegio').addEventListener('change', () => { RB.regio = $('#rbRegio').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
   let zt; $('#rbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RB.zoek = $('#rbZoek').value; RB.pagina = 1; RB.mijn = false; tekenReis(); }, 300); });
@@ -1214,13 +1253,13 @@ async function laadReisbieb(){
   tekenReis();
 }
 function reisKaart(a, geinstalleerd){
-  return '<div class="boutiek" style="cursor:default;">'+
+  return '<div class="boutiek s-101m0pp">'+
     '<span class="stad">'+esc(a.bestemming)+' · '+esc(a.regio)+'</span>'+
     '<b style="display:block;margin:0.25rem 0;">'+esc(a.naam)+'</b>'+
     (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
-    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;">Inbegrepen</b>'+
-      '<span style="flex:1;"></span>'+
+    '<div class="rij s-1wxyff2">'+
+      '<b class="s-19ic06h">Inbegrepen</b>'+
+      '<span class="s-1dzu8ds"></span>'+
       '<button class="knop stil rblees" data-id="'+esc(a.id)+'">Lezen</button>'+
       (geinstalleerd
         ? '<button class="knop stil rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'
@@ -1235,7 +1274,7 @@ async function leesGids(id){
     $('#lezerTitel').textContent = g.naam;
     $('#lezerMeta').textContent = g.bestemming + ' · ' + g.regio;
     $('#lezerTekst').innerHTML = String(g.tekst || '').split('\n').filter(Boolean)
-      .map(p => '<p style="margin-bottom:1.25rem;">'+esc(p)+'</p>').join('');
+      .map(p => '<p class="s-xmivqi">'+esc(p)+'</p>').join('');
     $('#lezer').classList.add('open');
     window.scrollTo(0, 0);
   } catch(e){ meld(e.message); }
@@ -1333,8 +1372,8 @@ function tekenThuis(t){
           '<span class="meta">'+euro(h.prijs)+' per nacht'+(h.maandprijs?' · '+euro(h.maandprijs)+' per maand':'')+
             ' · '+h.maxGasten+' gasten'+(h.btwPct?' · incl. '+h.btwPct+'% logies-btw':'')+(h.opFactuur?' · op factuur':'')+'</span>'+
         '</a>').join('')+'</div>').join('')+
-    '<p style="color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;">'+esc(t.opmerking)+
-    ' <a href="'+esc(t.pagina)+'" style="color:var(--rtg-leesgoud,var(--gold));">Naar RTG Thuis</a></p></div>';
+    '<p class="s-m33ux4">'+esc(t.opmerking)+
+    ' <a href="'+esc(t.pagina)+'" class="s-12itpbj">Naar RTG Thuis</a></p></div>';
 }
 
 /* ---------- Het Dienstenplein: de dienstverlenende zaken (zelfstandigen,
@@ -1356,7 +1395,7 @@ function tekenDiensten(genres){
           '<span class="stad">'+esc(z.stad||'RTG')+'</span>'+
           '<h3>'+esc(z.naam)+'</h3>'+
           (z.vak?'<span class="tag">'+esc(z.vak)+'</span>':(z.tagline?'<span class="tag">'+esc(z.tagline)+'</span>':''))+
-          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+(z.beoordeling?' · <span style="color:var(--rtg-leesgoud,var(--gold));">✶ '+z.beoordeling.score+'</span> ('+z.beoordeling.aantal+')':'')+'</span>'+
+          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+(z.beoordeling?' · <span class="s-12itpbj">✶ '+z.beoordeling.score+'</span> ('+z.beoordeling.aantal+')':'')+'</span>'+
         '</button>').join('')+'</div>';
     }).join('')+'</div>';
   w.querySelectorAll('.dpz').forEach(b => b.addEventListener('click', () => openDienstZaak(b.dataset.code)));
@@ -1373,10 +1412,10 @@ async function tekenOffertes(){
   const LBL = { aangevraagd:'wacht op antwoord', aangeboden:'aanbod ontvangen', akkoord:'akkoord · geboekt', afgewezen:'kon niet' };
   w.innerHTML = '<div class="dp-sub">Mijn offertes <span class="n">· '+off.length+'</span></div>'+
     '<div class="boutieks">'+off.slice(0,6).map(o =>
-      '<div class="boutiek" style="cursor:default;">'+
+      '<div class="boutiek s-101m0pp">'+
         '<span class="stad">'+esc(o.zaak)+' · '+esc(LBL[o.status]||o.status)+'</span>'+
         '<span class="tag">'+esc(o.omschrijving)+'</span>'+
-        (o.prijs!=null?'<span class="prijs" style="font-size:.95rem;">'+euro(o.prijs)+(o.toelichting?' <span style="color:var(--soft);font-size:.78rem;">· '+esc(o.toelichting)+'</span>':'')+'</span>':'')+
+        (o.prijs!=null?'<span class="prijs s-oil8rv">'+euro(o.prijs)+(o.toelichting?' <span class="s-1elbo4a">· '+esc(o.toelichting)+'</span>':'')+'</span>':'')+
         (o.status==='akkoord'&&o.boekingRef?'<span class="meta">boeking '+esc(o.boekingRef)+' · de zaak neemt contact op</span>':'')+
         (o.status==='aangeboden'
           ? '<div class="rij"><button class="knop offok" data-id="'+esc(o.id)+'">Akkoord</button><button class="knop stil offweg" data-id="'+esc(o.id)+'">Intrekken</button></div>'
@@ -1402,7 +1441,7 @@ async function tekenRitmes(){
   if (!rit.length){ w.innerHTML=''; return; }
   w.innerHTML = '<div class="dp-sub">Mijn vaste afspraken <span class="n">· '+rit.length+'</span></div>'+
     '<div class="boutieks">'+rit.map(r =>
-      '<div class="boutiek" style="cursor:default;">'+
+      '<div class="boutiek s-101m0pp">'+
         '<span class="stad">'+esc(r.zaak)+'</span>'+
         '<span class="tag">'+esc(r.dienst)+' · '+(r.intervalWeken===1?'elke week':'elke '+r.intervalWeken+' weken')+' om '+esc(r.tijd)+'</span>'+
         '<span class="meta">laatst gepland: '+esc(r.laatst)+'</span>'+
@@ -1422,7 +1461,7 @@ async function tekenReviews(){
   if (!open.length){ w.innerHTML=''; return; }
   w.innerHTML = '<div class="dp-sub">Hoe was het? <span class="n">· beoordeel je afgeronde klussen</span></div>'+
     '<div class="boutieks">'+open.map(o =>
-      '<div class="boutiek" style="cursor:default;">'+
+      '<div class="boutiek s-101m0pp">'+
         '<span class="stad">'+esc(o.zaak)+' · '+esc(o.datum)+'</span>'+
         '<span class="tag">'+esc(o.dienst)+'</span>'+
         '<div class="rij" data-ref="'+esc(o.ref)+'" data-code="'+esc(o.supplierCode)+'">'+
@@ -1449,7 +1488,7 @@ function openDienstZaak(code){
       '<span class="cat">'+(d.soort==='product'?'Product':'Dienst')+'</span>'+
       '<h3>'+esc(d.naam)+'</h3>'+
       (d.uitleg?'<span class="oms">'+esc(d.uitleg)+'</span>':'')+
-      '<span class="prijs">'+euro(d.prijs)+(d.duurMin?' <span style="color:var(--soft);font-size:.8rem;">· '+d.duurMin+' min</span>':'')+'</span>'+
+      '<span class="prijs">'+euro(d.prijs)+(d.duurMin?' <span class="s-3xagld">· '+d.duurMin+' min</span>':'')+'</span>'+
       '<div class="rij"><button class="knop dboek" data-id="'+esc(d.id)+'">Boeken</button></div>'+
     '</div>').join('') : '<div class="leeg">Deze zaak vult haar aanbod nog.</div>')+
     '<div class="kaart"><span class="cat">Vrije klus</span><h3>Staat het er niet tussen?</h3>'+
@@ -1463,12 +1502,12 @@ function vraagOfferte(code){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="ofTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">Offerte aanvragen</h1></div></div>'+
-    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+    '<div><div class="ey s-z2auej">'+esc(z.naam)+'</div><h1 class="s-1ik90f3">Offerte aanvragen</h1></div></div>'+
+    '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties" for="ofTekst">Omschrijf de klus</label>'+
-      '<textarea class="veld" id="ofTekst" rows="4" maxlength="300" placeholder="Bijv. schutting van 8 meter vervangen, hout mag je zelf voorstellen" style="margin-bottom:.5rem;resize:vertical;"></textarea>'+
+      '<textarea class="veld s-16woflw" id="ofTekst" rows="4" maxlength="300" placeholder="Bijv. schutting van 8 meter vervangen, hout mag je zelf voorstellen"></textarea>'+
       '<label class="opties" for="ofWens">Gewenste datum (optioneel)</label><input class="veld h-mb60" id="ofWens" type="date">'+
-      '<button class="knop" id="ofGa" style="width:100%;">Vraag offerte aan</button>'+
+      '<button class="knop s-186m9vs" id="ofGa">Vraag offerte aan</button>'+
       '<p class="opties h-mt50">Je vraagt aan op je codenaam; het antwoord met prijs verschijnt hier op het Dienstenplein onder Mijn offertes.</p>'+
     '</div></div>';
   document.body.appendChild(wrap);
@@ -1486,16 +1525,16 @@ function boekDienst(code, dienstId){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(d.naam)+'</h1></div></div>'+
-    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+    '<div><div class="ey s-z2auej">'+esc(z.naam)+'</div><h1 class="s-1ik90f3">'+esc(d.naam)+'</h1></div></div>'+
+    '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties" for="dbDatum">Datum</label><input class="veld h-mb50" id="dbDatum" type="date">'+
       '<label class="opties" for="dbTijd">Tijd</label><select class="veld h-mb50" id="dbTijd"><option value="">Kies eerst een datum</option></select>'+
       '<label class="opties" for="dbHerhaal">Herhalen</label><select class="veld h-mb50" id="dbHerhaal">'+
         '<option value="">Eenmalig</option><option value="1">Elke week</option><option value="2">Elke 2 weken</option><option value="4">Elke 4 weken</option></select>'+
-      '<textarea class="veld" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)" style="margin-bottom:0.5rem;resize:vertical;"></textarea>'+
+      '<textarea class="veld s-12ueut0" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)"></textarea>'+
       '<p class="movenoot" id="dbMove" hidden></p>'+
-      '<button class="knop" id="dbGa" style="width:100%;">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
-      '<button class="knop stil" id="dbWacht" style="width:100%;margin-top:0.5rem;" hidden>Vol? Zet mij op de wachtlijst voor deze dag</button>'+
+      '<button class="knop s-186m9vs" id="dbGa">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
+      '<button class="knop stil s-15bgfuc" id="dbWacht" hidden>Vol? Zet mij op de wachtlijst voor deze dag</button>'+
       '<p class="opties h-mt50">Je boekt op je codenaam; de zaak bevestigt je aanvraag in de app. Een vaste afspraak stop je wanneer je wilt.</p>'+
     '</div></div>';
   document.body.appendChild(wrap);
@@ -1609,7 +1648,7 @@ function tekenFarm(prod){
   $('#bladArt').innerHTML = prod.length ? prod.map(p =>
     '<div class="kaart">'+
       '<h3>'+esc(p.naam)+'</h3>'+
-      '<span class="prijs">'+euro(p.prijs)+' <span style="color:var(--soft);font-size:.8rem;">'+esc(p.eenheid)+'</span></span>'+
+      '<span class="prijs">'+euro(p.prijs)+' <span class="s-3xagld">'+esc(p.eenheid)+'</span></span>'+
       '<span class="opties">'+(p.voorraad>0?('nog '+p.voorraad+' beschikbaar'):'uitverkocht')+'</span>'+
       '<div class="rij"><button class="knop koopf" data-id="'+esc(p.id)+'" data-naam="'+esc(p.naam)+'" data-eenheid="'+esc(p.eenheid)+'">Bestellen</button></div>'+
     '</div>').join('') : '<div class="leeg">Deze boerderij heeft nu niets te koop.</div>';
@@ -1619,12 +1658,12 @@ function koopFarm(code, productId, naam){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="kfTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">Van het land</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
-    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+    '<div><div class="ey s-z2auej">Van het land</div><h1 class="s-1ik90f3">'+esc(naam)+'</h1></div></div>'+
+    '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties">Naam voor de levering</label><input class="veld h-mb50" id="kfNaam" maxlength="60">'+
       '<label class="opties">E-mail</label><input class="veld h-mb50" id="kfMail" type="email" maxlength="80">'+
       '<label class="opties">Aantal</label><input class="veld h-mb60" id="kfAantal" type="number" min="1" max="100" value="1">'+
-      '<button class="knop" id="kfBevestig" style="width:100%;">Bestelling plaatsen</button>'+
+      '<button class="knop s-186m9vs" id="kfBevestig">Bestelling plaatsen</button>'+
       '<p class="opties h-mt50">Vers van het erf; we nemen contact op voor de levering. Prijs in euro.</p>'+
     '</div></div>';
   document.body.appendChild(wrap);
@@ -1644,7 +1683,7 @@ function tekenEigen(prod){
       (p.discipline?'<span class="cat">'+esc(p.discipline)+'</span>':(p.eigen?'<span class="cat">RTG Hardwarelab</span>':''))+
       '<h3>'+esc(p.naam)+'</h3>'+
       (p.beschrijving?'<span class="oms">'+esc(p.beschrijving)+'</span>':'')+
-      '<span class="prijs">'+euro(p.eenmalig)+(p.perMaand?' <span style="color:var(--soft);font-size:.8rem;">+ '+euro(p.perMaand)+'/mnd</span>':'')+'</span>'+
+      '<span class="prijs">'+euro(p.eenmalig)+(p.perMaand?' <span class="s-3xagld">+ '+euro(p.perMaand)+'/mnd</span>':'')+'</span>'+
       '<span class="opties">'+esc(p.eenheid)+' · euro, ex btw</span>'+
       '<div class="rij"><button class="knop koop" data-slug="'+esc(p.slug)+'" data-naam="'+esc(p.naam)+'">Bestellen</button></div>'+
     '</div>').join('') : '<div class="leeg">Het eigen-merk vult zich nog.</div>';
@@ -1654,13 +1693,13 @@ function koopEigen(slug, naam){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="koopTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">Bestellen</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
-    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+    '<div><div class="ey s-z2auej">Bestellen</div><h1 class="s-1ik90f3">'+esc(naam)+'</h1></div></div>'+
+    '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties">Naam voor de levering</label><input class="veld h-mb50" id="koopNaam" maxlength="60">'+
       '<label class="opties">E-mail</label><input class="veld h-mb50" id="koopMail" type="email" maxlength="80">'+
       '<label class="opties">Aantal</label><input class="veld h-mb50" id="koopAantal" type="number" min="1" max="50" value="1">'+
-      '<textarea class="veld" id="koopNote" rows="2" maxlength="500" placeholder="Opmerking (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
-      '<button class="knop" id="koopBevestig" style="width:100%;">Bestelling plaatsen</button>'+
+      '<textarea class="veld s-1059wtf" id="koopNote" rows="2" maxlength="500" placeholder="Opmerking (optioneel)"></textarea>'+
+      '<button class="knop s-186m9vs" id="koopBevestig">Bestelling plaatsen</button>'+
       '<p class="opties h-mt50">We nemen contact op voor de levering. Facturatie in euro, ex btw.</p>'+
     '</div></div>';
   document.body.appendChild(wrap);
@@ -1684,7 +1723,7 @@ function tekenArt(arts){
       (a.omschrijving?'<span class="oms">'+esc(a.omschrijving)+'</span>':'')+
       '<span class="prijs">'+euro(prijs)+'</span>'+
       ((a.kleuren&&a.kleuren.length)||(a.maten&&a.maten.length)?'<span class="opties">'+esc((a.kleuren||[]).join(', '))+(a.maten&&a.maten.length?' · maten '+esc(a.maten.join('/')):'')+'</span>':'')+
-      (a.drop?'<span class="opties" style="color:var(--rtg-leesgoud,var(--gold));">Drop op '+esc(a.drop.datum)+' om '+esc(a.drop.tijd||'')+'</span>':'')+
+      (a.drop?'<span class="opties s-12itpbj">Drop op '+esc(a.drop.datum)+' om '+esc(a.drop.tijd||'')+'</span>':'')+
       '<div class="rij">'+
         '<button class="knop stil wl'+(a.opWishlist?' aan':'')+'" data-id="'+esc(a.id)+'">'+(a.opWishlist?'Op verlanglijst':'Verlanglijst')+'</button>'+
       '</div></div>';
@@ -1744,5 +1783,13 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
 <script src="/apps/winkel-voorzijde.js"></script>
 <script src="/apps/mall-experience-view.js"></script>
 <script src="/apps/mall-experience.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

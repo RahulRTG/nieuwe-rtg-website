@@ -81,19 +81,35 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-116q5n9:not(#_#_#_){width:100%;margin-top:0.5rem;resize:vertical}
+.s-132o9z0:not(#_#_#_){margin-left:0}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-1hv4dhs:not(#_#_#_){color:var(--soft);font-family:Inter}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-vgbzx0:not(#_#_#_){background:var(--card2)}
+.s-xrzp1e:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem}
+</style>
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="rechtbank" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div><div class="ey">De Rechtspraak · griffie en rechters</div><h1>De Rechtbank</h1></div>
   <a href="/apps/overheidspda.html">Overheids-PDA →</a>
-  <a href="/apps/rijksloket.html" style="margin-left:0;">Rijks-loket →</a>
+  <a href="/apps/rijksloket.html" class="s-132o9z0">Rijks-loket →</a>
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem;">Het meest complete rechtbanksysteem van het rijk. Log in als medewerker met je persoonlijke pincode. De uitspraak blijft altijd het besluit van de rechter.</p>
+    <p class="s-xrzp1e">Het meest complete rechtbanksysteem van het rijk. Log in als medewerker met je persoonlijke pincode. De uitspraak blijft altijd het besluit van de rechter.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
+    <button class="knop prim s-186m9vs" id="loginGo" data-hoofdactie>Inloggen</button>
   </div>
 
   <div id="app" hidden>
@@ -117,7 +133,7 @@
     </section>
 
     <section class="paneel" id="p-zaken">
-      <div class="item" style="background:var(--card2);">
+      <div class="item s-vgbzx0">
         <h4>Nieuwe zaak aanbrengen</h4>
         <div class="rij">
           <select class="veld" id="zType"></select>
@@ -128,7 +144,7 @@
           <input class="veld" id="zVerweerder" placeholder="Verweerder" maxlength="60">
           <button class="knop" id="zMaak">Aanbrengen</button>
         </div>
-        <textarea class="veld" id="zOms" rows="2" maxlength="800" placeholder="Korte omschrijving van het geschil" style="width:100%;margin-top:0.5rem;resize:vertical;"></textarea>
+        <textarea class="veld s-116q5n9" id="zOms" rows="2" maxlength="800" placeholder="Korte omschrijving van het geschil"></textarea>
       </div>
       <div class="i-eq0sgi rij">
         <select class="veld" id="zFilter"><option value="">Alle zaken</option><option value="aangebracht">Aangebracht</option><option value="gepland">Op de rol</option><option value="uitspraak">Uitspraak gedaan</option></select>
@@ -259,10 +275,10 @@ function zaakKaart(z){
     : z.status === 'gepland' ? '<span class="status goud">'+esc(z.zitting.datum)+' '+esc(z.zitting.tijd)+' · '+esc(z.zitting.zaal)+(z.zitting.klaargezet?' · klaargezet':'')+'</span>'
     : '<span class="status open">wacht op zitting · '+z.dagen+'d</span>';
   const bron = z.bron ? ' <span class="status">uit bezwaar '+esc(z.bron.ref)+'</span>' : '';
-  const acties = z.status === 'uitspraak' ? '<div class="vonnis">'+esc(z.uitspraak.motivatie)+' <span style="color:var(--soft);">(de rechter, '+esc(z.uitspraak.rechter)+')</span></div>'
+  const acties = z.status === 'uitspraak' ? '<div class="vonnis">'+esc(z.uitspraak.motivatie)+' <span class="s-1pv2lmv">(de rechter, '+esc(z.uitspraak.rechter)+')</span></div>'
     : '<div class="rij"><button class="knop stil" data-plan="'+z.ref+'">Zitting plannen</button>'+
       (z.status === 'gepland' ? '<button class="knop" data-von="'+z.ref+'">Uitspraak (de rechter beslist)</button>' : '')+'</div>';
-  return '<div class="item"><h4>'+esc(z.titel)+' <small style="color:var(--soft);font-family:Inter;">'+esc(z.ref)+'</small></h4>'+
+  return '<div class="item"><h4>'+esc(z.titel)+' <small class="s-1hv4dhs">'+esc(z.ref)+'</small></h4>'+
     '<div class="meta">'+esc(z.typeLabel)+' · '+esc(z.eiser)+' tegen '+esc(z.verweerder)+' · '+st+bron+'</div>'+
     (z.omschrijving ? '<div class="meta">'+esc(z.omschrijving)+'</div>' : '')+acties+'</div>';
 }
@@ -314,7 +330,7 @@ async function laadBeroepen(){
     const r = await api('/api/overheid/bezwaren', { status: 'ongegrond' });
     $('#p-beroep').innerHTML = '<div class="item" style="background:var(--card2);"><h4>Van bezwaar naar beroep</h4><div class="meta">Een ongegrond verklaard bezwaar kan als beroep de rechtbank in: de griffie brengt de zaak aan, de inwoner kan het ook zelf via MijnOverheid.</div></div>'+
       (r.bezwaren.length ? r.bezwaren.map(b =>
-        '<div class="item"><h4>'+esc(b.tegen)+' <small style="color:var(--soft);font-family:Inter;">'+esc(b.ref)+'</small></h4>'+
+        '<div class="item"><h4>'+esc(b.tegen)+' <small class="s-1hv4dhs">'+esc(b.ref)+'</small></h4>'+
         '<div class="meta">'+esc(b.aanvrager||'')+' · '+esc(b.reden||'')+'</div>'+
         '<div class="rij"><button class="knop stil" data-ber="'+b.ref+'">Als beroep aanbrengen</button></div></div>').join('')
       : '<div class="leeg">Geen ongegronde bezwaren die wachten.</div>');
@@ -345,5 +361,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

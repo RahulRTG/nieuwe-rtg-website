@@ -27,10 +27,10 @@ const { startServer } = require('./helper');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezin-'));
 let child, BASE;
 
-const api = (pad, body) => fetch(BASE + '/api/foundation' + pad, {
+const api = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 });
-const rtfApi = (pad, body) => fetch(BASE + '/api/rtf' + pad, {
+const rtfApi = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/rtf' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 });
 const json = async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) });
@@ -48,13 +48,13 @@ test.after(() => {
 /* Een gezin met een ouder en een kind. De ouder maakt het gezin en is
    daarmee beheerder; het kind krijgt een eigen profiel met een eigen token. */
 async function gezinMetKind(naam) {
-  const g = (await json(await api('/gezin/maak',
+  const g = (await json(await api('/api/foundation/gezin/maak',
     { gezinsnaam: 'Fam ' + naam, naam: 'Ouder ' + naam, pin: '1234' }))).body;
   assert.ok(g.code && g.token, 'het gezin bestaat: ' + JSON.stringify(g).slice(0, 160));
-  const kind = (await json(await api('/gezin/profiel/maak',
+  const kind = (await json(await api('/api/foundation/gezin/profiel/maak',
     { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }))).body;
   assert.ok(kind.profiel && kind.profiel.id, 'het kind heeft een profiel: ' + JSON.stringify(kind).slice(0, 160));
-  const kindToken = (await json(await api('/gezin/profiel/kies',
+  const kindToken = (await json(await api('/api/foundation/gezin/profiel/kies',
     { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).body.token;
   assert.ok(kindToken, 'en een eigen token');
   return { g, kindId: kind.profiel.id, kindToken };
@@ -65,18 +65,18 @@ test('de geldschool: een kind zet zijn eigen zakgeld niet', async () => {
 
   /* ---- 1. HET KIND MAG HET NIET. Dit is de bewering waar het om gaat: zonder
      die grens is zakgeld een veld dat je zelf invult. ---- */
-  const doorKind = await json(await api('/gezin/geldschool/weekgeld',
+  const doorKind = await json(await api('/api/foundation/gezin/geldschool/weekgeld',
     { code: o.g.code, token: o.kindToken, pid: o.kindId, centenPerWeek: 5000 }));
   assert.equal(doorKind.status, 403, 'een kind zet zijn eigen weekgeld niet: ' +
     JSON.stringify(doorKind.body).slice(0, 180));
   assert.match(String(doorKind.body.error), /ouder|beheerder/i, 'en het zegt wie dat wel mag');
 
   /* ---- 2. DE OUDER WEL, en binnen een grens. ---- */
-  const teHoog = await json(await api('/gezin/geldschool/weekgeld',
+  const teHoog = await json(await api('/api/foundation/gezin/geldschool/weekgeld',
     { code: o.g.code, token: o.g.token, pid: o.kindId, centenPerWeek: 999999 }));
   assert.equal(teHoog.status, 400, 'ook een ouder kan geen duizend euro per week zetten');
 
-  const gezet = await json(await api('/gezin/geldschool/weekgeld',
+  const gezet = await json(await api('/api/foundation/gezin/geldschool/weekgeld',
     { code: o.g.code, token: o.g.token, pid: o.kindId, centenPerWeek: 500 }));
   assert.equal(gezet.status, 200, 'vijf euro per week staat: ' + JSON.stringify(gezet.body).slice(0, 160));
   assert.equal(gezet.body.weekgeldCenten, 500, 'op het bedrag dat is opgegeven');
@@ -84,20 +84,20 @@ test('de geldschool: een kind zet zijn eigen zakgeld niet', async () => {
   /* ---- 3. STERREN VERZILVEREN KAN NIET UIT HET NIETS. Het kind heeft nog
      niets verdiend, dus er valt niets te verzilveren -- en dat is precies wat
      sparen betekenisvol houdt. ---- */
-  const uitNiets = await json(await api('/gezin/geldschool/verzilver',
+  const uitNiets = await json(await api('/api/foundation/gezin/geldschool/verzilver',
     { code: o.g.code, token: o.g.token, pid: o.kindId, sterren: 5, centen: 500 }));
   assert.equal(uitNiets.status, 400, 'sterren die niet verdiend zijn kun je niet verzilveren: ' +
     JSON.stringify(uitNiets.body).slice(0, 180));
   assert.match(String(uitNiets.body.error), /staa[tn] er nog/i, 'en het zegt hoeveel er wel openstaan');
 
-  const doorHetKind = await json(await api('/gezin/geldschool/verzilver',
+  const doorHetKind = await json(await api('/api/foundation/gezin/geldschool/verzilver',
     { code: o.g.code, token: o.kindToken, pid: o.kindId, sterren: 1, centen: 500 }));
   assert.equal(doorHetKind.status, 403, 'en het kind verzilvert sowieso niet zelf');
 });
 
 test('de vergeetcurve: goed schuift vooruit, fout komt vandaag terug -- zonder straf', async () => {
   const o = await gezinMetKind('Leren');
-  const leer = (actie, body) => rtfApi('/leren/' + actie,
+  const leer = (actie, body) => rtfApi('/api/rtf/leren/' + actie,
     Object.assign({ code: o.g.code, token: o.kindToken }, body || {}));
 
   const lijst = (await json(await leer('lijst-maak', {
@@ -149,13 +149,13 @@ test('de lijst is van het kind: een ander gezin komt er niet bij', async () => {
 
   /* Een lijst van een enkel paar is geen lijst -- overhoren met een vraag is
      geen overhoren. Die grens staat er, dus die toetsen we meteen mee. */
-  const teKlein = await json(await rtfApi('/leren/lijst-maak', {
+  const teKlein = await json(await rtfApi('/api/rtf/leren/lijst-maak', {
     code: a.g.code, token: a.kindToken, naam: 'Te klein', paren: [{ v: 'Madrid', a: 'Spanje' }]
   }));
   assert.notEqual(teKlein.status, 200, 'een lijst met een enkel paar wordt geweigerd: ' +
     JSON.stringify(teKlein.body).slice(0, 160));
 
-  const lijst = (await json(await rtfApi('/leren/lijst-maak', {
+  const lijst = (await json(await rtfApi('/api/rtf/leren/lijst-maak', {
     code: a.g.code, token: a.kindToken, naam: 'Topografie',
     paren: [{ v: 'Madrid', a: 'Spanje' }, { v: 'Lissabon', a: 'Portugal' }]
   }))).body;
@@ -164,18 +164,18 @@ test('de lijst is van het kind: een ander gezin komt er niet bij', async () => {
 
   /* Een kind uit een ander gezin mag er niet in -- niet lezen en niet
      beantwoorden. Zonder deze grens is een leerlijst een gedeeld prikbord. */
-  const lezen = await json(await rtfApi('/leren/lijst-haal',
+  const lezen = await json(await rtfApi('/api/rtf/leren/lijst-haal',
     { code: b.g.code, token: b.kindToken, id: lid }));
   assert.notEqual(lezen.status, 200, 'kind B kan de lijst niet openen: ' +
     lezen.status + ' ' + JSON.stringify(lezen.body).slice(0, 160));
 
-  const antwoorden = await json(await rtfApi('/leren/herhaal-antwoord',
+  const antwoorden = await json(await rtfApi('/api/rtf/leren/herhaal-antwoord',
     { code: b.g.code, token: b.kindToken, lijstId: lid, idx: 0, goed: true }));
   assert.notEqual(antwoorden.status, 200, 'en kan er ook niet in antwoorden: ' +
     antwoorden.status + ' ' + JSON.stringify(antwoorden.body).slice(0, 160));
 
   // en de eigenaar wel
-  const eigen = await json(await rtfApi('/leren/lijst-haal',
+  const eigen = await json(await rtfApi('/api/rtf/leren/lijst-haal',
     { code: a.g.code, token: a.kindToken, id: lid }));
   assert.equal(eigen.status, 200, 'de eigenaar komt er gewoon bij');
 });

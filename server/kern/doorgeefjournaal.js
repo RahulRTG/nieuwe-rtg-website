@@ -104,7 +104,7 @@ function maakDoorgeefjournaal({ db, save, nu, bestand }) {
   let spoelt = null;
   function plan() {
     if (spoelt) return;
-    spoelt = setTimeout(() => { spoelt = null; try { save(); } catch (e) {} }, 1000);
+    spoelt = setTimeout(() => { spoelt = null; try { save(); } catch (e) { console.warn('[doorgeefjournaal] de spoeling niet bewaard:', e && e.message); } }, 1000);
     if (spoelt.unref) spoelt.unref();
   }
 

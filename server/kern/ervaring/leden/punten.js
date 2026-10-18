@@ -79,8 +79,16 @@ module.exports = ({ db, save, nu, payVan, codenaamVan }) => {
     if (!Number.isFinite(p.tegoedCenten)) p.tegoedCenten = 0;
     return p;
   }
+  /* LEZEN ZONDER SCHEPPEN (18 oktober 2026). puntenVan() ging altijd via
+     puntenRek(), en die legt een lege rekening aan voor elk lid dat een keer
+     keek. Dan schreef /api/punten -- een lezer -- in de opslag: de idemproef zag
+     `punten` bewegen en zette de route op de geldkaart, en de schrijfproef las
+     de verloren lege rekening als een vals succes. Een lid zonder rekening heeft
+     nul punten; dat valt te zeggen zonder iets aan te leggen. Een BESTAANDE
+     rekening gaat wel via puntenRek(), want daar hoort de eenmalige omrekening
+     van `tegoed` naar `tegoedCenten` (toets 3 van test/punten.test.js). */
   function puntenVan(key) {
-    const p = puntenRek(key);
+    const p = (db.data.punten || {})[key] ? puntenRek(key) : { saldo: 0, tegoedCenten: 0, historie: [] };
     /* `tegoed` in euro's blijft in het antwoord staan: app-main.js rendert dat
        veld rechtstreeks. De opslag is centen, de rand is euro's. */
     return { saldo: p.saldo, tegoedCenten: p.tegoedCenten, tegoed: p.tegoedCenten / 100,

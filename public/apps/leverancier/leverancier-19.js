@@ -32,8 +32,8 @@
         (open.length ? open.map(r =>
           '<div class="st-row h-wrap"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+r.when+'</span></span>'+
           '<span class="acts h-wrap">'+
-            '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
-            '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
+            '<select class="st-in s-1rjkne0" data-ktch="'+r.ref+'">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
+            '<select class="st-in s-1rjkne0" data-ktvg="'+r.ref+'">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
             '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
             '<button class="obtn" data-ktslim="'+r.ref+'">'+T('kt.slim','Slim')+'</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.geenopen','Geen open aanvragen.')+'</div>')+'</div>';
@@ -41,8 +41,8 @@
         (geplandK.length ? geplandK.map(r =>
           '<div class="st-row h-wrap"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · <b>'+r.when+'</b></span></span>'+
           '<span class="acts h-wrap">'+
-            '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
-            '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
+            '<select class="st-in s-1rjkne0" data-ktch="'+r.ref+'">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
+            '<select class="st-in s-1rjkne0" data-ktvg="'+r.ref+'">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
             '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
             '<button class="obtn" data-ktslim="'+r.ref+'">'+T('kt.slim','Slim')+'</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.nietsgepland','Geen geplande ritten. Leden kunnen ritten dagen vooruit boeken.')+'</div>')+'</div>';
@@ -61,16 +61,16 @@
       } else {
         const h = histData;
         html += '<div class="tkc h-volbreed"><h3>'+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
-          '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
-          '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in h-flex1" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'">'+
+          '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b class="s-12itpbj">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
+          '<div class="s-1w18tsl"><input class="st-in h-flex1" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'">'+
           '<button class="obtn" id="ktHzGo">'+T('kt.zoek','Zoek')+'</button></div>'+
           (h.items.length ? h.items.map(r =>
             '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
-            '<b style="color:var(--rtg-leesgoud,var(--gold));">'+(r.quote?eur(r.quote):'')+'</b></div>'
+            '<b class="s-12itpbj">'+(r.quote?eur(r.quote):'')+'</b></div>'
           ).join('') : '<div class="tkc-who">'+(histQ ? T('kt.nietsgevonden','Niets gevonden voor deze zoekopdracht.') : T('kt.geenhistorie','Nog geen afgeronde ritten.'))+'</div>')+
-          (h.pages > 1 ? '<div style="display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-top:0.5rem;">'+
+          (h.pages > 1 ? '<div class="s-tdpubh">'+
             '<button class="obtn" data-khist="-1"'+(h.page<=1?' disabled':'')+'>‹</button>'+
-            '<span class="tkc-who" style="margin:0;">'+T('kt.pagina','Pagina')+' '+h.page+' / '+h.pages+'</span>'+
+            '<span class="tkc-who s-40wpk4">'+T('kt.pagina','Pagina')+' '+h.page+' / '+h.pages+'</span>'+
             '<button class="obtn" data-khist="1"'+(h.page>=h.pages?' disabled':'')+'>›</button></div>' : '')+
           (h.total ? '<div class="st-form"><button class="bigbtn" id="ktCsv">'+T('kt.csv','Exporteer alles als CSV')+' ('+h.total+')</button></div>' : '')+'</div>';
       }

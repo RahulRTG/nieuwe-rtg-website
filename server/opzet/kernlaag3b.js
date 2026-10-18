@@ -61,7 +61,7 @@ kern.rtf.setAgenda(kern.agenda);
    geldgraaf is daar de financiele evenknie van. VOOR de graaf gemount, want
    de graaf krijgt deze laag als argument mee -- een thunk zou die echte
    afhankelijkheid alleen maar verstoppen. */
-Object.assign(kern, require('../kern/geldbeleid').maakGeldbeleid({ db, save }));
+Object.assign(kern, require('../kern/geldbeleid').maakGeldbeleid({ db, save, bijeen: hulp.bijeen, inBundel: hulp.inBundel }));
 /* DE EIGEN GELDGRENS AANSLUITEN OP DE BETAALWEG. Zonder deze regel bestaat
    `grensVoor` wel en vraagt niemand hem, en dan is een grens die het lid stelt
    een instelling die nergens bijt -- precies de fout die het besluit

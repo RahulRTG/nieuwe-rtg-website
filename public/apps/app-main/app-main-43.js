@@ -15,8 +15,8 @@
     const retour = orders.filter(o => o.refunded);
     el.innerHTML = '<div class="label">'+T('app.guest.history','Mijn bestellingen en betalingen')+'</div>'+
       (orders.length
-        ? '<div class="big" style="font-size:1.05rem;">'+eur(som)+' <span style="font-size:0.7rem;color:var(--soft);font-weight:400;">'+T('app.guest.paid','betaald')+'</span></div>'+
-          '<div class="meta" style="margin:0.25rem 0 0.5rem;">'+betaald.length+' '+T('app.guest.paidorders','betaalde bestelling(en)')+(open.length?(' · '+open.length+' '+T('app.guest.open','open')):'')+(retour.length?(' · '+retour.length+' '+T('app.guest.refunded','teruggestort')):'')+'</div>'+
+        ? '<div class="big s-hdxayl">'+eur(som)+' <span class="s-vhujod">'+T('app.guest.paid','betaald')+'</span></div>'+
+          '<div class="meta s-11qe8p2">'+betaald.length+' '+T('app.guest.paidorders','betaalde bestelling(en)')+(open.length?(' · '+open.length+' '+T('app.guest.open','open')):'')+(retour.length?(' · '+retour.length+' '+T('app.guest.refunded','teruggestort')):'')+'</div>'+
           '<div style="display:flex;flex-direction:column;gap:.45rem;">'+orders.slice(0,6).map(o=>{
             const kleur = o.refunded ? 'var(--soft)' : o.paid ? 'var(--green,#4CAF7D)' : 'var(--gold)';
             const st = o.refunded ? T('app.guest.refunded','teruggestort')
@@ -24,7 +24,7 @@
             return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
               '<span>'+escT(o.supplierName)+' · '+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('app.items','item(s)')+' · '+timeAgo(o.at)+'</span>'+
               '<span style="flex-shrink:0;white-space:nowrap;">'+eur(o.total)+' · <span style="color:'+kleur+';">'+st+'</span>'+
-              (o.paid||o.refunded?'':' <button class="pa" data-guestpay="'+o.ref+'" style="padding:.12rem .5rem;font-size:0.66rem;margin-left:0.25rem;">'+T('app.guest.paynow','betaal')+'</button>')+'</span></div>';
+              (o.paid||o.refunded?'':' <button class="pa s-1ddhxfb" data-guestpay="'+o.ref+'">'+T('app.guest.paynow','betaal')+'</button>')+'</span></div>';
           }).join('')+'</div>'
         : '<div class="meta">'+T('app.guest.none','Je hebt nog niets besteld. Betaal bij een partner via Ter plaatse.')+'</div>');
     el.querySelectorAll('[data-guestpay]').forEach(b => b.addEventListener('click', async () => {
@@ -47,13 +47,13 @@
       homeEl.style.display='';
       if (!g.length){
         homeEl.innerHTML = '<div class="label">RTFoundation</div>'+
-          '<div class="big" style="font-size:1.05rem;line-height:1.4;">Ben je oppas, opa of oma?</div>'+
-          '<div class="meta" style="margin:0.25rem 0 0.75rem;">Volg een RTFoundation-gezin met je pas, dan krijg je hun meldingen hier op je telefoon, zonder een extra app.</div>'+
+          '<div class="big s-m03fy7">Ben je oppas, opa of oma?</div>'+
+          '<div class="meta s-x8hihn">Volg een RTFoundation-gezin met je pas, dan krijg je hun meldingen hier op je telefoon, zonder een extra app.</div>'+
           '<button class="go" id="rtfKoppelBtn">Koppel een gezin →</button>';
       } else {
-        homeEl.innerHTML = '<div class="label">Je gezinsruimte'+(ongelezen?' · <span style="color:var(--rtg-leesgoud,var(--gold))">'+ongelezen+' nieuw</span>':'')+'</div>'+
-          '<div class="big" style="font-size:1.05rem;">'+g.map(x=>esc(x.gezinNaam)).join(', ')+'</div>'+
-          '<div class="meta" style="margin:0.25rem 0 0.75rem;">'+(ongelezen? ongelezen+' nieuwe melding'+(ongelezen>1?'en':'') : 'Alles gelezen')+'</div>'+
+        homeEl.innerHTML = '<div class="label">Je gezinsruimte'+(ongelezen?' · <span class="s-12itpbj">'+ongelezen+' nieuw</span>':'')+'</div>'+
+          '<div class="big s-hdxayl">'+g.map(x=>esc(x.gezinNaam)).join(', ')+'</div>'+
+          '<div class="meta s-x8hihn">'+(ongelezen? ongelezen+' nieuwe melding'+(ongelezen>1?'en':'') : 'Alles gelezen')+'</div>'+
           '<button class="go" data-goto="gezin">Open je gezinsruimte →</button>';
       }
       const kb = $('#rtfKoppelBtn'); if (kb) kb.addEventListener('click', rtfKoppelStart);
@@ -63,16 +63,16 @@
   }
   function rtfBerichtHtml(x){
     return '<div style="padding:.55rem .7rem;border:1px solid var(--line);border-radius:0;margin:.4rem 0;'+(x.gelezen?'':'border-color:var(--burgundy,#C23A5E);')+(x.soort==='hulp'?'background:rgba(194,58,94,.08);':'')+'">'+
-      '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'':(x.soort==='reis'?'':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
-      '<div style="font-size:.92rem;line-height:1.4;margin-top:0.25rem;white-space:pre-wrap;">'+esc(x.tekst)+'</div></div>';
+      '<div class="s-g7amkl">'+(x.soort==='hulp'?'':(x.soort==='reis'?'':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
+      '<div class="s-1qms1gn">'+esc(x.tekst)+'</div></div>';
   }
   function renderGezin(){
     const fam = $('#gezinFamilies'), feed = $('#gezinFeed'); if (!fam || !feed) return;
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     $('#gezinSub').textContent = g.length ? 'De RTFoundation-gezinnen die je als oppas of familie volgt.' : 'Je volgt nog geen gezin.';
     fam.innerHTML = '<div class="label">Gevolgde gezinnen</div>'+
-      (g.length ? g.map(x=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><b class="h-flex1">'+esc(x.gezinNaam)+'</b><span class="meta">als '+esc(x.profielNaam)+'</span><button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-los="'+x.code+'|'+x.profielId+'">Ontkoppel</button></div>').join('') : '<div class="meta">Nog geen gezin gekoppeld.</div>')+
-      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go" id="rtfPushBtn" style="background:transparent;color:var(--muted);">Meldingen op mijn telefoon</button></div>';
+      (g.length ? g.map(x=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><b class="h-flex1">'+esc(x.gezinNaam)+'</b><span class="meta">als '+esc(x.profielNaam)+'</span><button class="go s-5dbscx" data-los="'+x.code+'|'+x.profielId+'">Ontkoppel</button></div>').join('') : '<div class="meta">Nog geen gezin gekoppeld.</div>')+
+      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go s-2k7uh7" id="rtfPushBtn">Meldingen op mijn telefoon</button></div>';
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');

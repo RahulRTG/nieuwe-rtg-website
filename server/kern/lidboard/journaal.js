@@ -77,7 +77,7 @@ function maakJournaal({ db, save }) {
       }))
     };
     const geschreven = ketenNoteerIn(s[sleutel], r, MAX);
-    if (save) { try { save(); } catch (e) { /* de schakeling zelf is al bewaard */ } }
+    if (save) { try { save(); } catch (e) { /* de schakeling zelf is al bewaard; de journaalregel niet */ console.warn('[lidboard] de journaalregel niet bewaard:', e && e.message); } }
     return geschreven;
   }
 
@@ -103,7 +103,9 @@ function maakJournaal({ db, save }) {
     const s = store();
     if (!s[sleutel]) return false;
     delete s[sleutel];
-    if (save) { try { save(); } catch (e) {} }
+    /* Een wissing op verzoek van de betrokkene die niet is bewaard, komt na een
+       herstart terug: dat hoort luid te zijn (STILSPOOR.json). */
+    if (save) { try { save(); } catch (e) { console.error('[lidboard] de wissing van het journaal niet weggeschreven:', e && e.message); } }
     return true;
   }
 

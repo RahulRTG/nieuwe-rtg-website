@@ -59,7 +59,7 @@ module.exports = function maakStuurToets({ stuurUit, VERBODEN, MAX_BODY, INTERNE
        Alles achter een vangnet: een schaduw die de aanroeper kan laten klappen
        is erger dan geen schaduw, en de levering gaat voor (kern/envelop.js). */
     try { schaduw().noteer(o.wereld, pad, weger().weeg(beleid.niveau, body)); }
-    catch (e) { /* een gemiste tel is geen geweigerde actie */ }
+    catch (e) { /* een gemiste tel is geen geweigerde actie, maar wel een gemiste tel */ console.warn('[stuur] de frictieschaduw niet vastgelegd:', e && e.message); }
 
     if (beleid.niveau === NIVEAUS.voorstel && o.goedgekeurd !== INTERNE_GOEDKEURING)
       return { status: 428, bevestigNodig: true, menselijkAkkoord: true, pad,

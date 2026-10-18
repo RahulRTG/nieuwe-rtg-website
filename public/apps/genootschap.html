@@ -74,8 +74,25 @@
 <script src="/shared/rtg-first-steps.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-133sbve:not(#_#_#_){margin-top:0.5rem;font-size:.88rem;line-height:1.55;color:var(--muted)}
+.s-1hpvyfa:not(#_#_#_){color:var(--soft);font-size:.78rem;margin-top:0.5rem}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-1tmuwdn:not(#_#_#_){font-size:.88rem;line-height:1.55}
+.s-1yntbw7:not(#_#_#_){margin-left:0.5rem}
+.s-dmclvy:not(#_#_#_){max-width:60%}
+.s-k2n4g:not(#_#_#_){margin-top:0.5rem;font-size:.82rem;line-height:1.5;color:var(--soft)}
+.s-ou3ccy:not(#_#_#_){font-size:.84rem;color:var(--muted);margin-top:0.5rem}
+</style>
 </head>
-<body class="rtg-stijl" data-rtg-editorial-room data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="genootschap" class="rtg-stijl" data-rtg-editorial-room data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a href="#main" class="skip">Naar de inhoud</a>
 <header>
   <div class="ey">Van RTG</div>
@@ -131,7 +148,7 @@
     if ((d.uitnodigingen||[]).length) {
       html += '<div class="kaart"><h2>Uitnodigingen</h2>'+
         d.uitnodigingen.map(function(g){ return groepRij(g, '<button class="mini" data-binnen="'+g.id+'">binnentreden</button>'); }).join('')+
-        '<p style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Een uitnodiging is nog geen lidmaatschap: je zegt zelf ja.</p></div>';
+        '<p class="s-1hpvyfa">Een uitnodiging is nog geen lidmaatschap: je zegt zelf ja.</p></div>';
     }
     html += (d.groepen||[]).length ? '<div class="kaart"><h2>Mijn genootschappen</h2>'+
       d.groepen.map(function(g){ return groepRij(g, '<button class="mini" data-open="'+g.id+'">openen</button>'); }).join('')+'</div>'
@@ -142,9 +159,9 @@
   function tekenGroep(d, agenda){
     var g = d.groep, b = d.berichten||[];
     var html = '<div class="kaart"><h2>'+esc(g.naam)+'</h2>'+
-      '<small style="color:var(--soft);">'+esc(SOORT[g.soort]||g.soort)+' · '+g.leden+' leden'+(g.mijnRol?' · jij bent '+esc(g.mijnRol):'')+'</small>'+
-      (g.over?'<p style="margin-top:0.5rem;font-size:.88rem;line-height:1.55;color:var(--muted);">'+esc(g.over)+'</p>':'')+
-      (g.regels?'<p style="margin-top:0.5rem;font-size:.82rem;line-height:1.5;color:var(--soft);"><b>Huisregels:</b> '+esc(g.regels)+'</p>':'')+
+      '<small class="s-1pv2lmv">'+esc(SOORT[g.soort]||g.soort)+' · '+g.leden+' leden'+(g.mijnRol?' · jij bent '+esc(g.mijnRol):'')+'</small>'+
+      (g.over?'<p class="s-133sbve">'+esc(g.over)+'</p>':'')+
+      (g.regels?'<p class="s-k2n4g"><b>Huisregels:</b> '+esc(g.regels)+'</p>':'')+
       '<div class="knoppen"><button class="knop stil" id="bterug" type="button">Terug</button>'+
       '<button class="knop stil" id="bleden" type="button">Leden</button>'+
       '<button class="knop stil" id="bmee" type="button">Neem mijn inbreng mee</button>'+
@@ -167,7 +184,7 @@
           '<div class="knoppen">'+['ja','misschien','nee'].map(function(w){
             return '<button class="knop'+(x.mijnAntwoord===w?'':' stil')+'" data-antw="'+x.id+'" data-w="'+w+'">'+w+'</button>';
           }).join('')+
-          (x.vanMij?'<button class="mini" data-afgelast="'+x.id+'" style="margin-left:0.5rem;">afgelasten</button>':'')+
+          (x.vanMij?'<button class="mini s-1yntbw7" data-afgelast="'+x.id+'">afgelasten</button>':'')+
           '</div></div></div>';
       }).join('') : '<div class="leeg">Nog niets gepland.</div>')+
       '<label for="bwat">Roep een bijeenkomst uit</label><input id="bwat" maxlength="90" placeholder="Waarvoor komen jullie samen?">'+
@@ -197,7 +214,7 @@
             return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+
               (r.vanMij||g.mijnRol==='beheerder'?' <button class="mini" data-reactie-weg="'+x.id+'" data-reactie-id="'+r.id+'">verwijder reactie</button>':'')+
               '</small>'; }).join('')+'</div>' : '')+
-          '<div class="knoppen"><input data-reactie="'+x.id+'" placeholder="Reageren" aria-label="Reageren op dit bericht" style="max-width:60%;">'+
+          '<div class="knoppen"><input data-reactie="'+x.id+'" placeholder="Reageren" aria-label="Reageren op dit bericht" class="s-dmclvy">'+
           '<button class="mini" data-reageer="'+x.id+'">plaatsen</button>'+
           (x.vanMij||g.mijnRol==='beheerder'?'<button class="mini" data-prikweg="'+x.id+'">weg</button>':'')+'</div></div></div>';
       }).join('') : '<div class="leeg">Het prikbord is nog leeg.</div>')+
@@ -239,12 +256,12 @@
       if (d.bij) { u.textContent = d.tekst; return; }
       u.className = '';
       u.innerHTML =
-        ((d.nieuw||d.nieuweReacties) ? '<p style="font-size:.88rem;line-height:1.55;">'+
+        ((d.nieuw||d.nieuweReacties) ? '<p class="s-1tmuwdn">'+
           (d.nieuw?d.nieuw+' nieuwe berichten':'')+(d.nieuw&&d.nieuweReacties?' · ':'')+
           (d.nieuweReacties?d.nieuweReacties+' nieuwe reacties':'')+'</p>' : '')+
-        ((d.peilingen||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:0.5rem;">Nog niet gestemd: '+
+        ((d.peilingen||[]).length ? '<p class="s-ou3ccy">Nog niet gestemd: '+
           d.peilingen.map(function(p){ return esc(p.tekst); }).join(' · ')+'</p>' : '')+
-        ((d.bijeenkomsten||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:0.5rem;">Nog niet beantwoord: '+
+        ((d.bijeenkomsten||[]).length ? '<p class="s-ou3ccy">Nog niet beantwoord: '+
           d.bijeenkomsten.map(function(b){ return esc(b.wat)+' ('+esc(b.datum)+')'; }).join(' · ')+'</p>' : '')+
         '<div class="knoppen"><button class="knop stil" id="bgezien" type="button">Gezien</button></div>';
     });
@@ -307,7 +324,7 @@
       toon('<div class="kaart"><label for="zveld">Zoek een genootschap</label>'+
         '<input id="zveld" type="search" placeholder="Op naam of onderwerp">'+
         '<div class="knoppen"><button class="knop" id="bzoek" type="button">Zoeken</button></div>'+
-        '<p style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Geheime genootschappen staan hier niet in. Die vind je alleen met een uitnodiging.</p></div>'+
+        '<p class="s-1hpvyfa">Geheime genootschappen staan hier niet in. Die vind je alleen met een uitnodiging.</p></div>'+
         '<div class="kaart" id="zuit"><div class="leeg">Zoek op een naam of een onderwerp.</div></div>');
       return;
     }
@@ -345,7 +362,7 @@
       $('#zuit').innerHTML = (d.groepen||[]).length ? d.groepen.map(function(g){
         return groepRij(g, g.ikBenLid ? '<button class="mini" data-open="'+g.id+'">openen</button>'
           : (g.soort==='openbaar'||g.uitgenodigd ? '<button class="mini" data-binnen="'+g.id+'">binnentreden</button>'
-            : '<small style="color:var(--soft);">op uitnodiging</small>'));
+            : '<small class="s-1pv2lmv">op uitnodiging</small>'));
       }).join('') : '<div class="leeg">Niets gevonden.</div>'; });
     if (id === 'bterug') { TAB='mijn'; OPEN=null; return laad(); }
     if (id === 'bvertrek') return api('/genootschap/vertrek', { groep:OPEN }).then(function(d){
@@ -377,7 +394,7 @@
         (d.bijeenkomsten.eerstvolgende ? ' · '+esc(d.bijeenkomsten.eerstvolgende.wat)+': '+
           d.bijeenkomsten.eerstvolgende.geantwoord+' van de '+d.bijeenkomsten.eerstvolgende.vanTotaal+' antwoordden' : '')+
         (d.ritme ? '<br>De meeste berichten komen op '+esc(d.ritme.drukste)+'.' : '')+
-        '<br><small style="color:var(--soft);">'+esc(d.uitleg)+'</small>';
+        '<br><small class="s-1pv2lmv">'+esc(d.uitleg)+'</small>';
     });
 
     if (id === 'balles') return api('/genootschap/uitvoer', { groep:OPEN }).then(function(d){
@@ -467,5 +484,13 @@
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

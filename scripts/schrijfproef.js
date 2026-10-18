@@ -68,10 +68,11 @@ const STANDEN = Object.freeze({
   ONBEREIKT: 'de proef kreeg de route niet aan het werk (geen lijf, geen wereld, of de deur bleef dicht)'
 });
 
-async function post(basis, pad, lijf, tok) {
+/* `koppen` is er voor het bezitsbewijs: zie meetRoute(). */
+async function post(basis, pad, lijf, tok, koppen) {
   try {
     const r = await fetch(basis + pad, { method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+      headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(koppen || {}) },
       body: JSON.stringify(lijf || {}) });
     const tekst = await r.text();
     let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
@@ -124,10 +125,30 @@ async function meetRoute(route) {
   let srv = null;
   try {
     srv = await W.start({ datamap: map, env: OMGEVING });
-    const p = (pad, lijf, tok) => post(srv.basis, pad, lijf, tok);
-    const bos = await haalSleutels({ post: p });
+    /* `srv` wisselt drie keer van server; de post leest hem daarom per oproep. */
+    const kaal = (pad, lijf, tok, koppen) => post(srv.basis, pad, lijf, tok, koppen);
+    const bos = await haalSleutels({ post: kaal });
+    /* TWEE PROEFLEDEN MET EEN GEBONDEN TOESTEL -- ./lib/proeftoestel.js, en om
+       dezelfde reden als in de idempotentieproef (scripts/idemproef-route.js).
+
+       Sinds A-P1-04 vraagt de bank, RTG Pay en de wallet een eigen account met
+       een toestel dat elk zwaar verzoek ondertekent. Deze proef klopte daar aan
+       met de demo-pas en kreeg op ELKE ledengeldroute een 403 "vraagt een eigen
+       RTG-account met een bevestigd toestel" -- al zonder verraad. Dat leest als
+       ONBEREIKT, en een register dat zo leegloopt, zou VALS_SUCCES laten dalen
+       zonder dat er een route is gerepareerd: de proef was kapot, niet beter.
+
+       De poort blijft zoals in productie; alleen de CLIENT wordt een echte
+       client. Lukt een proeflid niet, dan meet de ronde zoals vroeger en blijft
+       de route eerlijk ONBEREIKT. */
+    const { maakProeflid, metToestellen } = require('./lib/proeftoestel');
+    const proeflid = await maakProeflid({ post: kaal, naam: 'Proeflid Geld', basis: srv.basis });
+    const proefander = await maakProeflid({ post: kaal, naam: 'Proeflid Ontvanger', basis: srv.basis });
+    const p = metToestellen(kaal, { toestellen: [proefander.klaar],
+      voorLid: { lid: proeflid.klaar, van: () => bos.tokenVoor('member') } });
     const { zetWereldKlaar, gedeeldLijf, voorzieningVoor } = require('./lib/idemwereld.js');
-    const w = await zetWereldKlaar({ post: p, tokens: bos.tokens, datamap: map });
+    const w = await zetWereldKlaar({ post: p, tokens: bos.tokens, datamap: map,
+      geldlid: proeflid.klaar && proeflid.klaar.token, tweedeLid: proefander.klaar && proefander.klaar.token });
     const lijf = { ...((w.perRoute || {})[route.pad] || gedeeldLijf(w.wereld)) };
     const tok = bos.tokenVoor ? bos.tokenVoor(route.rol) : null;
     const maak = voorzieningVoor(route.pad);
@@ -143,7 +164,7 @@ async function meetRoute(route) {
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, env: { ...OMGEVING, RTG_VERRAAD: 'schrijf-verloren' } });
     const voor = beeld(map);
-    const r = await post(srv.basis, route.pad, lijf, tok);
+    const r = await p(route.pad, lijf, tok);
     const na = beeld(map);
     const opslagBewoog = voor !== na;
     /* DE BASISMETING KOMT NA DE GEMETEN OPROEP, en die volgorde is de hele
@@ -156,7 +177,7 @@ async function meetRoute(route) {
        al aan het werk, en zijn stand hangt er niet van af. */
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, env: OMGEVING });
-    const basis = await post(srv.basis, route.pad, lijf, tok);
+    const basis = await p(route.pad, lijf, tok);
     const u = weeg({ status: r.status, opslagBewoog, basisStatus: basis.status });
     return { ...u, status: r.status, basisStatus: basis.status, opslagBewoog };
   } catch (e) {

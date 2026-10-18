@@ -21,7 +21,7 @@ const { spiegel, onderscheid, MINIMUM } = require('../server/kern/toetsspiegel')
 
 let srv, base, sch, leraar, klas;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-toetskeur-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
@@ -30,16 +30,16 @@ const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'Het Kompas', plaats: 'Breda' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'Het Kompas', plaats: 'Breda' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Sam', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Sam', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     personeelId: leraar.personeelId, akkoord: true });
-  klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: '7A', trap: 'po', fase: 'po-g7' })).body;
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -137,7 +137,7 @@ test('de spiegel gaat over de toets: geen sleutel, geen naam', () => {
 
 /* ---------- en door de machine heen ---------- */
 test('de keuring draait op echte opgaven uit dezelfde generator', async () => {
-  const r = await kl('/school/toets/keuring', { doelen: ['rekenen.g7.procenten', 'rekenen.g7.verhoudingen'], perDoel: 2 });
+  const r = await kl('/api/foundation/school/toets/keuring', { doelen: ['rekenen.g7.procenten', 'rekenen.g7.verhoudingen'], perDoel: 2 });
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
   assert.equal(r.body.aantalVragen, 4);
   assert.ok(r.body.minuten > 0, 'de verwachte tijd hoort erbij');
@@ -146,17 +146,17 @@ test('de keuring draait op echte opgaven uit dezelfde generator', async () => {
   for (const p of r.body.perDoel) assert.ok(['open', 'meerkeuze', 'gemengd'].includes(p.vorm));
 
   // een leerdoel dat niet bestaat wordt geweigerd in plaats van overgeslagen
-  assert.equal((await kl('/school/toets/keuring', { doelen: ['bestaatniet.doel'], perDoel: 3 })).status, 400);
-  assert.equal((await kl('/school/toets/keuring', { doelen: [] })).status, 400);
+  assert.equal((await kl('/api/foundation/school/toets/keuring', { doelen: ['bestaatniet.doel'], perDoel: 3 })).status, 400);
+  assert.equal((await kl('/api/foundation/school/toets/keuring', { doelen: [] })).status, 400);
 });
 
 test('een verse toets krijgt geen spiegel, want er is nog niets gemaakt', async () => {
-  const t = (await kl('/school/toets/maak', { soort: 'so', naam: 'SO procenten',
+  const t = (await kl('/api/foundation/school/toets/maak', { soort: 'so', naam: 'SO procenten',
     doelen: ['rekenen.g7.procenten'], perDoel: 3 })).body;
-  const s = await kl('/school/toets/spiegel', { toetsId: t.toets.id });
+  const s = await kl('/api/foundation/school/toets/spiegel', { toetsId: t.toets.id });
   assert.equal(s.status, 200);
   assert.equal(s.body.genoeg, false);
   assert.equal(s.body.gemaakt, 0);
   assert.equal(s.body.toets.naam, 'SO procenten');
-  assert.equal((await kl('/school/toets/spiegel', { toetsId: 'bestaatniet' })).status, 404);
+  assert.equal((await kl('/api/foundation/school/toets/spiegel', { toetsId: 'bestaatniet' })).status, 404);
 });

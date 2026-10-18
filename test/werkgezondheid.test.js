@@ -30,7 +30,7 @@ let W, B, CRED;
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const w = (await api('/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
+  const w = (await api('/api/bedrijf/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
   W = w.werkruimte; B = w.beheerToken;
   CRED = { werkruimte: W, beheerToken: B };   // directie: draagt alle rechten
 });
@@ -52,10 +52,10 @@ test('1. een lege organisatie krijgt geen 100% maar geen cijfer', async () => {
 test('2. het cijfer is een breuk met een zichtbare noemer', async () => {
   /* Eén blok meetbaar maken: een contract mét einddatum, dus een groen
      contractsignaal en een groen "zonder einddatum"-signaal. */
-  await api('/contract/zet', Object.assign({ titel: 'Schoonmaak', wederpartij: 'Helder',
+  await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Schoonmaak', wederpartij: 'Helder',
     soort: 'leverancier', eindigt: '2027-12-31', opzegtermijnDagen: 30 }, CRED));
 
-  const g = (await api('/gezondheid', CRED)).body;
+  const g = (await api('/api/bedrijf/gezondheid', CRED)).body;
   assert.equal(g.gemeten.meetbaar, 2, 'het rechtblok levert twee signalen op');
   assert.equal(g.gemeten.groen, 2);
   assert.equal(g.cijfer, 100, 'twee van twee groen');
@@ -64,10 +64,10 @@ test('2. het cijfer is een breuk met een zichtbare noemer', async () => {
 });
 
 test('3. een rood signaal drukt het cijfer, met het gemeten getal erbij', async () => {
-  await api('/contract/zet', Object.assign({ titel: 'Koffie', wederpartij: 'Bonenhuis',
+  await api('/api/bedrijf/contract/zet', Object.assign({ titel: 'Koffie', wederpartij: 'Bonenhuis',
     soort: 'leverancier' }, CRED));   // geen einddatum: dit signaal wordt rood
 
-  const g = (await api('/gezondheid', CRED)).body;
+  const g = (await api('/api/bedrijf/gezondheid', CRED)).body;
   assert.equal(g.cijfer, 50, 'een van de twee meetbare signalen staat rood');
   const rood = g.rood.find(r => /zonder einddatum/.test(r.id));
   assert.ok(rood, 'het signaal staat bij rood');
@@ -76,8 +76,8 @@ test('3. een rood signaal drukt het cijfer, met het gemeten getal erbij', async 
 });
 
 test('4. de briefing zegt hetzelfde als het bord', async () => {
-  const g = (await api('/gezondheid', CRED)).body;
-  const d = (await api('/dagbeeld', CRED)).body;
+  const g = (await api('/api/bedrijf/gezondheid', CRED)).body;
+  const d = (await api('/api/bedrijf/dagbeeld', CRED)).body;
 
   assert.equal(d.cijfer, g.cijfer, 'zelfde cijfer');
   assert.deepEqual(d.gemeten, g.gemeten, 'zelfde noemer');
@@ -88,7 +88,7 @@ test('4. de briefing zegt hetzelfde als het bord', async () => {
 });
 
 test('5. "niet gemeten" staat nooit tussen het advies', async () => {
-  const d = (await api('/dagbeeld', CRED)).body;
+  const d = (await api('/api/bedrijf/dagbeeld', CRED)).body;
   assert.ok(d.nietGemeten.length, 'er zijn nog niet-meetbare signalen');
   const namen = d.advies.map(a => a.wat).join(' | ');
   assert.ok(!d.nietGemeten.some(n => namen.includes(n.wat)),

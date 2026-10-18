@@ -45,7 +45,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const wegwerp = require('./lib/wegwerpserver');
-const { nuCommit } = require('./lib/stempel');
+const { nuCommit, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
@@ -198,7 +198,7 @@ async function poortwachtRonde() {
     let uitslag;
     try { uitslag = JSON.parse(r.uit.slice(r.uit.indexOf('{'))); }
     catch (e) { return { ok: false, melding: 'de poortwacht gaf geen leesbare uitslag: ' + e.message.slice(0, 80) }; }
-    fs.writeFileSync(path.join(WORTEL, 'POORTWACHT.json'), JSON.stringify(uitslag, null, 1) + '\n');
+    if (magSchrijven(eisSchoneBoom('meetronde'), 'POORTWACHT.json')) fs.writeFileSync(path.join(WORTEL, 'POORTWACHT.json'), JSON.stringify(uitslag, null, 1) + '\n');
     return { ok: true,
       melding: uitslag.totaal + ' routes, ' + uitslag.open.length + ' open, ' +
         uitslag.dicht + ' dicht, ' + uitslag.stil + ' stil, ' + uitslag.publiek + ' publiek' };

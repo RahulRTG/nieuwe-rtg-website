@@ -487,3 +487,48 @@ test('19. dezelfde watermelding binnen een minuut geeft hetzelfde meldnummer', a
     { soort: 'wateroverlast', tekst: 'En het riool bij de brug ruikt' }, lid);
   assert.notEqual(ander.body.melding.ref, ref, 'een andere melding komt gewoon binnen');
 });
+
+/* 13. Drie deuren uit MijnOverheid die geen toets aanriep:
+   /api/overheid/bericht/gelezen, /api/overheid/voertuig/schors en
+   /api/overheid/subsidies/mijn. Alle drie gaan over de EIGEN dossiers van de
+   inwoner: een ander lid leest, schorst of ziet niets van wat niet van hem is.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/overheid/rdw.js de voorwaarde
+   `x.key === key` uit voertuigSchors() gehaald; de toets zakte op "een ander lid
+   schorst dit voertuig niet". */
+test('13. berichten afvinken, een voertuig schorsen en de eigen subsidies: alleen de eigen dossiers', async () => {
+  const u = Date.now().toString().slice(-8);
+  const ander = (await api(base, '/api/auth/register', { name: 'Buurvrouw', email: 'ob' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1988-03-03', tier: 'rtg', pasApp: 'rtg' })).body.token;
+
+  // Berichtenbox: toets 1 zette er een aanslag in
+  let bx = (await api(base, '/api/overheid/berichten', {}, lid)).body;
+  const ongelezen = bx.berichten.find(b => !b.gelezen);
+  assert.ok(ongelezen, 'er staat een ongelezen bericht');
+  const voor = bx.ongelezen;
+  assert.ok(voor > 0, 'de teller staat niet op nul');
+  assert.equal((await api(base, '/api/overheid/bericht/gelezen', { id: ongelezen.id }, ander)).status, 404, 'andermans bericht bestaat niet');
+  assert.equal((await api(base, '/api/overheid/bericht/gelezen', { id: ongelezen.id }, null)).status, 401);
+  assert.equal((await api(base, '/api/overheid/bericht/gelezen', { id: ongelezen.id }, lid)).status, 200);
+  bx = (await api(base, '/api/overheid/berichten', {}, lid)).body;
+  assert.equal(bx.berichten.find(b => b.id === ongelezen.id).gelezen, true);
+  assert.equal(bx.ongelezen, voor - 1, 'de teller zakt met precies een');
+
+  // RDW: het voertuig uit toets 3 schorsen en weer vrijgeven
+  const v = (await api(base, '/api/overheid/voertuigen', {}, lid)).body.voertuigen.find(x => x.kenteken === 'RTG01A');
+  assert.ok(v, 'het voertuig uit toets 3 staat er');
+  assert.equal((await api(base, '/api/overheid/voertuig/schors', { id: v.id }, ander)).status, 404, 'een ander lid schorst dit voertuig niet');
+  const s = await api(base, '/api/overheid/voertuig/schors', { id: v.id }, lid);
+  assert.equal(s.status, 200);
+  assert.equal(s.body.voertuig.geschorst, true);
+  const terug = await api(base, '/api/overheid/voertuig/schors', { id: v.id, schors: false }, lid);
+  assert.equal(terug.body.voertuig.geschorst, false, 'schorsen is omkeerbaar');
+
+  // Provincie: de subsidie uit toets 9 staat bij het lid, niet bij de buurvrouw
+  const mijn = await api(base, '/api/overheid/subsidies/mijn', {}, lid);
+  assert.equal(mijn.status, 200);
+  assert.ok(mijn.body.subsidies.length > 0, 'het lid heeft een subsidie');
+  assert.ok(mijn.body.subsidies.some(x => x.regeling === 'verduurzaming' && x.status === 'toegekend'),
+    'met het besluit van de ambtenaar erbij');
+  const vanAnder = await api(base, '/api/overheid/subsidies/mijn', {}, ander);
+  assert.equal(vanAnder.body.subsidies.length, 0, 'de buurvrouw ziet niets van het lid');
+});

@@ -35,8 +35,19 @@ const MAXREGELS = 40;
 /* `bijeen` (optioneel) bundelt de save van de bon en die van de sleutel tot
    een commit. Zonder die bundel bestaat er een moment op schijf waarin de bon
    staat en de sleutel niet -- en precies daar boekt een herhaling dubbel. */
-module.exports = ({ db, save, bijeen }) => {
+module.exports = ({ db, save, bijeen, inBundel }) => {
   const metIdem = require('../../lib/idem')({ d: () => db.data, save, naam: 'kassaIdem', bijeen });
+  /* DE BON STAAT ER, OF HIJ IS ER NIET (18 oktober 2026). De bundel hierboven
+     maakt bon en sleutel samen ATOMAIR, niet DUURZAAM: de zaak las "afgerekend"
+     terwijl de opslag nog niets had. De schrijfproef mat
+     /api/supplier/pos/checkout onder `schrijf-verloren` als VALS_SUCCES -- 200,
+     lasten gesloten, en na de herstart stonden ze weer open terwijl de gast
+     (bij RTG Pay) al was afgeschreven. Zonder sleutel liep het werk zelfs
+     buiten elke bundel. `eenmaligVast` zet er een DUURZAME bundel omheen; de
+     idem-bundel en de betaling (kern/pay, zelf duurzaam) doen erin mee, dus
+     geld, bon en sleutel landen als EEN bevestigde commit -- of geen van drie. */
+  const vastleggen = typeof bijeen === 'function'
+    ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'kassa' }) : null;
 
   /* De regels horen in de afdruk: dezelfde sleutel met een andere bon is een
      ander verzoek, ook als het totaal toevallig gelijk blijft. */
@@ -76,5 +87,15 @@ module.exports = ({ db, save, bijeen }) => {
      tegelijk binnenkomen leeft per instantie, dus twee exemplaren op dezelfde
      store delen wel de bewaarde sleutels en niet de lopende. Precies dat stond
      er even: routes/supplier/kassa/cadeaukaart.js bouwde er zelf een. */
-  return { eenmalig, afdruk, sleutelVan, metEigenAfdruk: metIdem };
+  async function eenmaligVast(soort, code, body, werk) {
+    if (!vastleggen) return eenmalig(soort, code, body, werk);
+    let uit;
+    const mis = await vastleggen(async () => { uit = await eenmalig(soort, code, body, werk); });
+    /* Een weigering van het werk zelf (geen open rekening, een ander bedrag
+       onder dezelfde sleutel) heeft niets geschreven en is het ware antwoord. */
+    if (uit && uit.error) return uit;
+    return mis || uit;
+  }
+
+  return { eenmalig, eenmaligVast, afdruk, sleutelVan, metEigenAfdruk: metIdem };
 };

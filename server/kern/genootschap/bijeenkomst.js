@@ -13,6 +13,7 @@
    ontstaat geen wachtlijst die iedereen hoop geeft. Wie afzegt maakt een plaats
    vrij en dat is meteen te zien. */
 const { keur } = require('../veilig');
+const { volgendId } = require('../../lib/volgendid');
 const { log } = require('../../log');
 
 module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
@@ -61,11 +62,6 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     return { gr };
   };
 
-  function nieuwId(lijst) {
-    let id = Date.now();
-    while (lijst.some(x => x.id === id)) id++;
-    return id;
-  }
 
   function roepBijeen(sess, groepId, invoer) {
     const p = poort(sess, groepId);
@@ -85,7 +81,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
 
     const lijst = lijstVan(groepId);
     const b = {
-      id: nieuwId(lijst), vanKey: sess.key, wat, waar, datum, tijd: tijd || null,
+      id: volgendId(lijst), vanKey: sess.key, wat, waar, datum, tijd: tijd || null,
       toelichting, plaatsen: Number.isInteger(plaatsen) && plaatsen > 0 && plaatsen <= 500 ? plaatsen : null,
       at: nu(), antwoorden: {}, afgelast: null
     };

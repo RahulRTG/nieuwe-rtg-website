@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-05T10:42:07.167Z",
-    "commit": "68f10da04",
+    "op": "2026-10-18T09:36:41.170Z",
+    "commit": "b7696160",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 0,
     "instrument": "scripts/positiestroom.js",
-    "node": "v24.18.0"
+    "node": "v22.22.0"
   },
   "graad": "vermoed",
   "hoe": "lexicaal: de noemer is elk bestand in server/ dat een object met lat en lng/lon bouwt (geen vaste getallen) en iets opslaat; de indeling is per stroom verklaard met een citaat dat letterlijk in de bron moet staan; de termijn komt uit het bewaarbeleid, de bewaarveger en de vergeetroute.",
@@ -22,7 +22,7 @@
     "nietGedetecteerd": 9,
     "tegenspraak": 0,
     "zonderTermijn": 1,
-    "nietVergeten": 17,
+    "nietVergeten": 0,
     "besloten": 34,
     "besluitNietUitgevoerd": [],
     "klassen": {
@@ -78,7 +78,7 @@
         "soort": "venster",
         "bestand": "server/kern/mobiliteit/voortgang.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "toegestaan",
       "status": "besloten",
@@ -106,7 +106,7 @@
         "soort": "venster",
         "bestand": "server/kern/mobiliteit/voortgang.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",
@@ -134,7 +134,7 @@
         "soort": "venster",
         "bestand": "server/kern/mobiliteit/reis.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "toegestaan",
       "status": "besloten",
@@ -162,7 +162,7 @@
         "soort": "lid",
         "bestand": "server/kern/mobiliteit/plekken.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
       "status": "besloten",
@@ -175,7 +175,7 @@
       },
       "tegenspraak": null,
       "reden": null,
-      "waarom": "het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor -- maar de vergeetroute kent mobFavorieten niet (daar staat favorieten, een andere collectie)"
+      "waarom": "het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor. Tot 18 oktober kende de vergeetroute mobFavorieten niet (daar stond favorieten, een andere collectie); nu wist kern/mobiliteit/vergeten.js ze via server/kern/vergeten/positie.js"
     },
     {
       "naam": "ov-instap",
@@ -334,7 +334,7 @@
         "soort": "venster",
         "bestand": "server/kern/veiligheid/plek.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",
@@ -362,7 +362,7 @@
         "soort": "venster",
         "bestand": "server/kern/veiligheid/plek.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",
@@ -390,7 +390,7 @@
         "soort": "module",
         "bestand": "server/kern/veiligheid/alarm.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": false,
       "klasse": "noodzakelijk",
       "status": "besloten",
@@ -446,7 +446,7 @@
         "soort": "venster",
         "bestand": "server/kern/ontmoeting/date.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",
@@ -474,7 +474,7 @@
         "soort": "module",
         "bestand": "server/kern/ontmoeting/sos.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
       "status": "besloten",
@@ -803,7 +803,7 @@
         "soort": "module",
         "bestand": "server/kern/flits.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
       "status": "besloten",
@@ -816,7 +816,7 @@
       },
       "tegenspraak": null,
       "reden": null,
-      "waarom": "een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van wie bevestigt reizen mee, en de vergeetroute kent de collectie niet"
+      "waarom": "een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van wie bevestigt reizen mee. Sinds 18 oktober haalt de vergeetroute de eigen meldingen weg en de stem uit die van anderen (flitsVergeet in kern/flits.js)"
     },
     {
       "naam": "plaats-passages",
@@ -833,7 +833,7 @@
         "tekst": "90",
         "bestand": "server/bewaarbeleid-operationeel.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": false,
       "klasse": "toegestaan",
       "status": "besloten",
@@ -863,7 +863,7 @@
         "tekst": "2",
         "bestand": "server/bewaarbeleid-operationeel.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": false,
       "klasse": "venster",
       "status": "besloten",
@@ -891,7 +891,7 @@
         "soort": "module",
         "bestand": "server/kern/gemeente/meldingen.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "toegestaan",
       "status": "besloten",
@@ -921,7 +921,7 @@
         "tekst": "3 * JAAR / DAG",
         "bestand": "server/bewaarbeleid-operationeel.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
       "status": "besloten",
@@ -950,7 +950,7 @@
         "soort": "venster",
         "bestand": "server/routes/supplier/eten.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",
@@ -978,7 +978,7 @@
         "soort": "venster",
         "bestand": "server/routes/supplier/orders/afhandeling.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",
@@ -1007,7 +1007,7 @@
         "soort": "venster",
         "bestand": "server/kern/modebezorg/koerier.js"
       },
-      "vergeten": false,
+      "vergeten": true,
       "gedetecteerd": true,
       "klasse": "venster",
       "status": "besloten",

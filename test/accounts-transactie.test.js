@@ -266,3 +266,30 @@ test('9. de releasestand volgt de STRUCTUUR en niet een vlag', () => {
     assert.equal(r.code, 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT');
   } finally { verzoekcontext.registreerDeelnemer = echt; }
 });
+
+test('10. leesVers is BEGRENSD: een stand die tijdens elke lezing verandert, faalt hardop', alsProductie(async () => {
+  /* Elke lezing ziet een eigen accountcommit voorbijkomen, dus geen enkele ronde
+     levert een verse stand op. Hier draaide de lus eindeloos door; nu geeft hij
+     na zijn grens op met een code die mirror.js in planAccountHerstel laat
+     vallen (alles opnieuw inlezen) -- nooit een oude rij over een nieuwe heen.
+     LUSSEN.json telde hem als kritieke lus zonder vast te stellen afloop. */
+  process.env.NODE_ENV = 'test'; const u = await lidMet('tien@proef.test'); process.env.NODE_ENV = 'production';
+  mirror.commitAccountWijzigingen = async (_client, lijst) => ({ geschreven: lijst.length });
+  let n = 0;
+  const s = await server(app => app.post('/x', (_q, res) => {
+    S.zin('UPDATE users SET reset_hash = ? WHERE id = ?').run('h10-' + (++n), u.id);
+    res.json({ ok: true });
+  }), nepPool());
+  try {
+    let lezingen = 0;
+    await assert.rejects(transactie.leesVers(async () => {
+      lezingen++;
+      const r = await fetch(s.basis + '/x', { method: 'POST' });   // een commit tijdens de lezing
+      assert.equal(r.status, 200);
+      return 'oud';
+    }), e => e.code === 'PG_ACCOUNTS_LEES_ONRUSTIG');
+    assert.ok(lezingen > 1 && lezingen <= 25, 'hij probeerde opnieuw, maar niet eindeloos (' + lezingen + ')');
+    // en een rustige stand leest gewoon in een keer
+    assert.equal(await transactie.leesVers(async () => 'vers'), 'vers');
+  } finally { await s.stop(); }
+}));

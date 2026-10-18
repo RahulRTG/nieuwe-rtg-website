@@ -20,6 +20,7 @@
    3. ALLES OP CODENAAM. Ook de beheerder ziet codenamen; een echte naam loopt
       alleen via kern/metier/bewijs.js, met toestemming per werkgever. */
 const { keur } = require('../veilig');
+const { volgendId } = require('../../lib/volgendid');
 
 module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify, zijnVrienden, toelating }) => {
   // ./drager-regels.js zegt wie NIET in een gedragen groep komt
@@ -43,12 +44,6 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
   const isLid = (gr, key) => !!lidRegel(gr, key);
   const isBeheer = (gr, key) => { const l = lidRegel(gr, key); return !!(l && l.rol === 'beheerder'); };
 
-  function nieuwId() {
-    const g = S();
-    let id = Date.now();
-    while (g.groepen.some(x => x.id === id)) id++;
-    return id;
-  }
 
   async function keyVan(wie) {
     const c = String(wie || '').trim();
@@ -72,7 +67,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     if (mijne(sess.key).length >= MAX_PER_LID) return { error: 'Je zit in het maximum aantal genootschappen.' };
 
     const gr = {
-      id: nieuwId(), naam, soort, over, regels, at: nu(),
+      id: volgendId(S().groepen), naam, soort, over, regels, at: nu(),
       leden: [{ key: sess.key, rol: 'beheerder', sinds: nu() }],
       uitnodigingen: []
     };

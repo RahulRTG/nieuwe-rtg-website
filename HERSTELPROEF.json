@@ -3,11 +3,11 @@
  "gemeten": {
   "paren": 100,
   "exact": 10,
-  "compensatie": 41,
+  "compensatie": 45,
   "geenHerstel": 0,
-  "nietBeproefd": 7,
+  "nietBeproefd": 3,
   "wereldOntbreekt": 42,
-  "ordeAfhankelijk": 4,
+  "ordeAfhankelijk": 3,
   "buitenTweedeRonde": 0
  },
  "per": [
@@ -68,17 +68,13 @@
    "terugStatus": 200,
    "geraakt": [
     "store.db:bankPassen",
-    "store.db:beleidsmotor",
-    "store.db:bezitsbewijzen",
-    "store.db:zetelGebruik"
+    "store.db:bezitsbewijzen"
    ],
    "nietTerug": [
     "store.db:bankPassen",
-    "store.db:beleidsmotor",
-    "store.db:bezitsbewijzen",
-    "store.db:zetelGebruik"
+    "store.db:bezitsbewijzen"
    ],
-   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/pas/uitgeven",
@@ -89,12 +85,16 @@
    "terugStatus": 200,
    "geraakt": [
     "store.db:bankPassen",
-    "store.db:bezitsbewijzen"
+    "store.db:beleidsmotor",
+    "store.db:bezitsbewijzen",
+    "store.db:zetelGebruik"
    ],
    "nietTerug": [
-    "store.db:bezitsbewijzen"
+    "store.db:beleidsmotor",
+    "store.db:bezitsbewijzen",
+    "store.db:zetelGebruik"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/terugkerend/stop",
@@ -105,15 +105,13 @@
    "terugStatus": 200,
    "geraakt": [
     "store.db:bankTerugkerend",
-    "store.db:bezitsbewijzen",
-    "store.db:wacht"
+    "store.db:bezitsbewijzen"
    ],
    "nietTerug": [
     "store.db:bankTerugkerend",
-    "store.db:bezitsbewijzen",
-    "store.db:wacht"
+    "store.db:bezitsbewijzen"
    ],
-   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/terugkerend/zet",
@@ -157,9 +155,7 @@
    "rol": "member",
    "uitslag": "nietBeproefd",
    "heenStatus": 409,
-   "geraakt": [
-    "store.db:kosten"
-   ],
+   "geraakt": [],
    "reden": "de heenweg gaf status 409 (Dat tijdslot is al bezet. Kies een ander moment.): er is niets gebeurd om terug te draaien"
   },
   {
@@ -405,17 +401,24 @@
    "nietTerug": [
     "store.db:meetKamers"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
-   "ordeAfhankelijk": true
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/meet/weg",
    "terug": "/api/meet/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404 (Die Meet-kamer bestaat niet.): er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:kosten",
+    "store.db:meetKamers"
+   ],
+   "nietTerug": [
+    "store.db:kosten",
+    "store.db:meetKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/member/rtmail/regel/maak",
@@ -515,10 +518,18 @@
    "heen": "/api/office/atelierweb/verwijder",
    "terug": "/api/office/atelierweb/bewaar",
    "rol": "office",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:atelierSites",
+    "store.db:beleidsmotor"
+   ],
+   "nietTerug": [
+    "store.db:atelierSites",
+    "store.db:beleidsmotor"
+   ],
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/office/kantoorpakket/maak",
@@ -611,18 +622,14 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:beleidsmotor",
     "store.db:bezitsbewijzen",
-    "store.db:kantoorMensdeur",
     "store.db:payTikToegang"
    ],
    "nietTerug": [
-    "store.db:beleidsmotor",
     "store.db:bezitsbewijzen",
-    "store.db:kantoorMensdeur",
     "store.db:payTikToegang"
    ],
-   "reden": "de terugweg deed werk, maar 4 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/pay/verzoek",
@@ -714,7 +721,9 @@
    "rol": "office",
    "uitslag": "nietBeproefd",
    "heenStatus": 400,
-   "geraakt": [],
+   "geraakt": [
+    "store.db:beleidsmotor"
+   ],
    "reden": "de heenweg gaf status 400 (Het veld \"naam\" bestaat niet in een beschermzaak. Deze klasse draait op een codenaam. De naam staat in de kluis, en wie ): er is niets gebeurd om terug te draaien"
   },
   {
@@ -723,7 +732,9 @@
    "rol": "office",
    "uitslag": "nietBeproefd",
    "heenStatus": 400,
-   "geraakt": [],
+   "geraakt": [
+    "store.db:beleidsmotor"
+   ],
    "reden": "de heenweg gaf status 400 (Het veld \"naam\" bestaat niet in een beschermzaak. Deze klasse draait op een codenaam. De naam staat in de kluis, en wie ): er is niets gebeurd om terug te draaien"
   },
   {
@@ -744,24 +755,31 @@
    "heen": "/api/samen/maak",
    "terug": "/api/samen/weg",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
    "geraakt": [
-    "store.db:beleidsmotor"
+    "store.db:samenKamers"
    ],
-   "reden": "de heenweg gaf status 409 (Deze Samen-code is al eenmalig getoond. Vernieuw haar vanuit de kamer.): er is niets gebeurd om terug te draaien"
+   "nietTerug": [
+    "store.db:samenKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/samen/weg",
    "terug": "/api/samen/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "terugStatus": 409,
+   "terugStatus": 200,
    "geraakt": [
     "store.db:samenKamers"
    ],
-   "reden": "de terugweg gaf status 409 (Deze Samen-code is al eenmalig getoond. Vernieuw haar vanuit de kamer.); waarschijnlijk wees het lijf niet het ding aan dat de heenweg maakte. Dat is een tekort van deze proef en geen oordeel over het paar"
+   "nietTerug": [
+    "store.db:samenKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/site/bewaar",
@@ -1180,8 +1198,8 @@
   "de opwarmronde kan een EENMALIG gevolg opslokken: kost de eerste aanmaak iets (een kostenregel, een eerste inrichting), dan gebeurt dat in de opwarmronde en ziet de meting het niet. `exact` betekent hier dus: exact bij een tweede en volgende uitvoering. Zonder die ronde was `exact` onbereikbaar, dus dit is een gekozen ruil en geen vergissing -- /api/meet/maak stond in de eerste ronde op compensatie met `kosten` als reden, en staat er nu op exact"
  ],
  "stempel": {
-  "op": "2026-10-18T13:06:07.695Z",
-  "commit": "e3e359aa4",
+  "op": "2026-10-18T16:01:13.897Z",
+  "commit": "04ea21add",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/herstelproef.js",

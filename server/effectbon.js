@@ -68,17 +68,8 @@ let aan = String(process.env.RTG_EFFECTBON || '') !== '0';
 const BLIND_ONDIEP = Object.freeze(['wijziging-zonder-lengteverschil', 'objectcollecties']);
 const BLIND_ALTIJD = Object.freeze(effectmeter.NIET_GEMETEN.slice());
 
-/* De bonnen van de laatste verzoeken, begrensd. GEEN collectie in de database: een bon
-   die blijft staan is een journaal, en daarvoor is dit niet gebouwd. Wie hem wil bewaren,
-   neemt dat besluit apart en met een bewaartermijn. */
-const RING = [];
-const RING_MAX = 200;
-
-function bewaar(bon) {
-  RING.push(bon);
-  while (RING.length > RING_MAX) RING.shift();
-  return bon;
-}
+/* De ring met de bonnen van de laatste verzoeken staat in ./effectbon-ring.js. */
+const { bewaar, bonnen, laatste, RING_MAX } = require('./effectbon-ring');
 
 /* De bon van EEN verzoek. `teller` komt van de effectmeter en wordt meegegeven en niet
    opgevraagd: een antwoord dat uit een andere context wordt verstuurd zou anders de stand
@@ -162,15 +153,6 @@ function haak(app) {
     });
   });
   return true;
-}
-
-function bonnen({ limit = 50 } = {}) {
-  const n = Math.min(RING_MAX, Math.max(1, Number(limit) || 50));
-  return RING.slice(-n);
-}
-function laatste(verzoek) {
-  for (let i = RING.length - 1; i >= 0; i--) if (RING[i].verzoek === verzoek) return RING[i];
-  return null;
 }
 
 module.exports = { haak, maak, bonnen, laatste, zetVoorspeller, BLIND_ONDIEP, BLIND_ALTIJD, RING_MAX,

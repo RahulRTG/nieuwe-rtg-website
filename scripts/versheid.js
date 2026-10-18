@@ -443,6 +443,7 @@ const REGISTERS = [
      en wat ze delen, dan de metingen over de code zelf, dan de twee kaarten. */
   ['TAFELPROEF.json', 'npm run tafelproef:vast', 'of de horecaketen sluit, van tafel tot correctie'],
   ['RITPROEF.json', 'npm run ritproef:vast', 'of de ritketen sluit, van aanvraag tot afronding'],
+  ['VOORRAADPROEF.json', 'npm run voorraadproef:vast', 'of de voorraadketen sluit, van inkoop bij de groothandel tot ontvangst in de keuken'],
   ['TOELATINGSPROEF.json', 'npm run toelatingsproef:vast', 'of de toelatingsketen sluit, van aanvraag tot zaak'],
   ['ADAMPROEF.json', 'npm run adamproef:vast', 'of een jongere van 17 zonder account een mogelijkheid bereikt, en het zelf ziet'],
   ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],

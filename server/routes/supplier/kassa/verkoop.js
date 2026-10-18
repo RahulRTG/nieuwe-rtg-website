@@ -118,10 +118,11 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const factuurRegels = items && items.length
     ? items.map(i => ({ omschrijving: i.name || 'Artikel', aantal: i.qty, stuk: i.price || (total / items.reduce((n, x) => n + x.qty, 0)) }))
     : [{ omschrijving: sale.desc || 'Verkoop', aantal: 1, stuk: total }];
-  facturatie.boekMetCodenaam({
-    soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
-    koper: { naam: req.body.codenaam || betaler || sale.room || 'Kasklant' }, regels: factuurRegels, methode: method, ref: sale.id
-  }, req.body.codenaam || betaler).catch(() => {});
+  // een factuur die niet lukt draait de betaalde bon niet terug, maar valt ook
+  // niet stil weg: hij gaat naar het techniekbord (kern/lidacties/factuur.js)
+  factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+    codenaam: req.body.codenaam || betaler, koper: { naam: req.body.codenaam || betaler || sale.room || 'Kasklant' },
+    regels: factuurRegels, methode: method, ref: sale.id });
   return { ok: true, sale, betaler };
  });
  if (antwoord && antwoord.error) return res.status(antwoord.status || 400).json({ error: antwoord.error });

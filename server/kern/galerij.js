@@ -16,11 +16,12 @@ const { toon } = require('../media/toegang');
 function maakGalerij({ db, save, crypto, schoon }) {
   const nu = () => new Date().toISOString();
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/galerij', bezit: { galerij: 'kaart' } });
   function bord(key) {
-    if (!db.data.galerij || typeof db.data.galerij !== 'object') db.data.galerij = {};
+    const g = eigen.bak('galerij');
     const k = 'lid:' + key;
-    if (!db.data.galerij[k]) db.data.galerij[k] = { albums: [], favoriet: [] };
-    return db.data.galerij[k];
+    if (!g[k]) g[k] = { albums: [], favoriet: [] };
+    return g[k];
   }
   const zelfde = (a, b) => a.bron === b.bron && String(a.id) === String(b.id);
   function geldig(item) {

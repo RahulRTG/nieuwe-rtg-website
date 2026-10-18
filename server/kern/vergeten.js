@@ -36,6 +36,8 @@ module.exports = function maakVergeten(kern) {
   const bytes = require('./vergeten/bytes')({ db, media, bestanden });
   // het account en de identiteitsmap (paspoortscans en selfies)
   const account = require('./vergeten/account')({ kern, accounts, UPLOAD_DIR });
+  // de sporen naast het lid: sessiecontext, DemocratieOS en de open sessies
+  const sporen = require('./vergeten/sporen')({ kern, sessions, forgetSession });
   // de positie van dit lid in de domeinen met een eigen deur
   const positie = require('./vergeten/positie')(kern);
   const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet });
@@ -112,23 +114,10 @@ module.exports = function maakVergeten(kern) {
     const reden = 'recht op vergetelheid (AVG art. 17)';
     const herzegeling = require('./vergeten-anker').voor(kern, key, sessie, reden);
     if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, reden);
-    /* EN HET SESSIEREGISTER VAN MIJN RTG. Dat is iets anders dan de sessies die
-       hieronder worden uitgelogd: forgetSession raakt de Map met tokens, dit
-       register houdt de CONTEXT per sessie (waar, met welk toestel, hoe zeker)
-       en overleeft het token met opzet. Zonder deze regel bleef de sleutel van
-       het lid daar staan -- de bezem van test/vergeten-gezelschap.test.js vond
-       hem terug als tak `sessiecontext (sleutel)`.
-
-       De functie woont in het register zelf en niet hier, om twee redenen: die
-       module BEZIT de collectie (kern/eigencollectie), en wissen moet kijken
-       naar wat er staat in plaats van naar wat vanLid() nog toont -- die filtert
-       op een TTL van dertig dagen, en juist de oudste rij is de rij die het
-       langst blijft liggen. */
-    if (kern.sessieregister && kern.sessieregister.wisLid) kern.sessieregister.wisLid(key);
-    /* DemocratieOS: de kwesties blijven, de weg van het inbrengersnummer naar de mens niet. */
-    if (kern.democratieVergeet) kern.democratieVergeet(key);
-    // alle sessies van dit lid uitloggen
-    for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
+    /* De sporen naast het lid: het sessieregister van Mijn RTG, de weg van een
+       inbrengersnummer naar de mens in DemocratieOS, en zijn open sessies
+       (./vergeten/sporen.js). */
+    sporen.wisSporen(key);
     /* EEN SUCCESANTWOORD BETEKENT HIER OOK: OP SCHIJF.
 
        De gewone save() is write-behind. Onder de volledige parallelle suite

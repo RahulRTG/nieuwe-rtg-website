@@ -10,7 +10,7 @@
    lid, en de uitslag is altijd zichtbaar voor de leden. Geen anonieme peilingen
    in een besloten groep -- wie iets vindt in een gezelschap, zegt het daar. */
 const { keur } = require('../veilig');
-const { volgendId } = require('./volgendid');
+const { volgendId } = require('../../lib/volgendid');
 
 module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) => {
   const TEKST_MAX = 800;

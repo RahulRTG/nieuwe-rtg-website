@@ -13,7 +13,7 @@
    ontstaat geen wachtlijst die iedereen hoop geeft. Wie afzegt maakt een plaats
    vrij en dat is meteen te zien. */
 const { keur } = require('../veilig');
-const { volgendId } = require('./volgendid');
+const { volgendId } = require('../../lib/volgendid');
 const { log } = require('../../log');
 
 module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {

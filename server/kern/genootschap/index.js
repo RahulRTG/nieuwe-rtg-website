@@ -20,7 +20,7 @@
    3. ALLES OP CODENAAM. Ook de beheerder ziet codenamen; een echte naam loopt
       alleen via kern/metier/bewijs.js, met toestemming per werkgever. */
 const { keur } = require('../veilig');
-const { volgendId } = require('./volgendid');
+const { volgendId } = require('../../lib/volgendid');
 
 module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify, zijnVrienden, toelating }) => {
   // ./drager-regels.js zegt wie NIET in een gedragen groep komt

@@ -27,7 +27,7 @@ module.exports = ({ db, save, crypto }) => {
   }
   const { ROLLEN, BESLUITTYPEN, rollenVoor, rechtenVoor, goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek } =
     bestuurMaak({ S, save, id, tekst, geldigHuis, vind, log, nu });
-  const { liveVandaag, rtmailBerichten } = vandaagMaak({ db });
+  const { liveVandaag, rtmailBerichten } = vandaagMaak({ data: () => db.data });
   function state(huisRuw, context) {
     const huis = geldigHuis(huisRuw), s = S(), inHuis = x => x.huis === huis || x.huis === 'gedeeld';
     const fr = s.fricties.filter(inHuis), jaarCenten = fr.reduce((n, f) => n + f.jaarCenten, 0);

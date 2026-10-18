@@ -5,17 +5,20 @@
    eigen codenaam en open aanvragen, en schrijft niets. Daarom apart van het
    werkgeheugen ernaast, dat wel schrijft -- en omdat dit het enige stuk van RTG
    One is dat in collecties van ANDERE domeinen kijkt, staat die lijst hier op
-   een plek. Een beperkte mail (kern/rtmail-leiding.js) komt er niet in. */
+   een plek. Een beperkte mail (kern/rtmail-leiding.js) komt er niet in.
+
+   `data` komt van ./rtgone.js: de deur naar de opslag blijft daar, ook voor
+   wat dit deel leest. */
 'use strict';
 const { isBeperkt } = require('./rtmail-leiding');
 
-module.exports = ({ db }) => {
+module.exports = ({ data }) => {
   /* Het gedeelde postvak, ook voor ./rtgone-projecten.js (een project van een
      mail). Beide lezers filteren met isBeperkt: hieronder in het overzicht,
      daar bij het zoeken van de mail. */
-  const bron = { rtmailBerichten: () => (((db.data.rtmail || {}).berichten) || []) };
+  const bron = { rtmailBerichten: () => (((data().rtmail || {}).berichten) || []) };
   function liveVandaag(huis, context) {
-    const d = db.data, lijst = x => Array.isArray(x) ? x : [], persoonlijk = !!(context && context.key);
+    const d = data(), lijst = x => Array.isArray(x) ? x : [], persoonlijk = !!(context && context.key);
     const huisTaken = lijst((d.werkplekTaken || {})[huis]).filter(t => !t.af).slice(0, 8).map(t => ({ soort: 'taak', titel: t.tekst, at: t.at || null }));
     const rtfTaken = huis === 'rtf' ? Object.values(d.rtfKantoorTaken || {}).flatMap(x => lijst(x)).filter(t => !t.af).slice(0, 8).map(t => ({ soort: 'rtf', titel: t.tekst, at: t.at || null })) : [];
     const agenda = persoonlijk ? lijst((d.agendas || {})[context.key]).filter(x => !x.afgerond && !x.af).slice(0, 8).map(x => ({ soort: 'agenda', titel: x.titel || x.tekst || x.onderwerp || 'Agenda-item', at: x.start || x.at || x.datum || null })) : [];

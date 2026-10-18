@@ -30,7 +30,7 @@ const S = require('./standen');
 const { maakSchrijver } = require('./ronde');
 const { maakZicht } = require('./zicht');
 const { maakTerugkoppeling } = require('./terugkoppeling');
-const { volgendId } = require('../genootschap/volgendid');
+const { volgendId } = require('../../lib/volgendid');
 
 module.exports = ({ db, save, codenaamVan, notify, genootschap, nu = Date.now }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/beraad/index', bezit: { beraad: 'kaart' } });

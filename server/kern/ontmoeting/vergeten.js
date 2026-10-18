@@ -15,17 +15,20 @@
      - een afspraak die nog liep, stopt: er is niemand meer aan deze kant. Een
        open voorstel vervalt om dezelfde reden.
    Van de ander blijft alles staan, ook zijn eigen positie bij een open SOS --
-   die hoort bij zijn melding en heeft een eigen termijn (N18). */
+   die hoort bij zijn melding en heeft een eigen termijn (N18).
+
+   De twee lijsten komen van ../ontmoeting.js: daar is de deur naar de opslag,
+   en die blijft er. */
 'use strict';
 const WEG = '(verwijderd)';
 const LOOPT = ['wacht-op-tekenen', 'actief', 'noodgeval'];
 
-module.exports = ({ db, save, lijsten, nu }) => {
+module.exports = ({ dateLijst, voorstelLijst, save, lijsten, nu }) => {
   function ontmoetVergeetLid(key) {
     if (!key) return { dates: 0, voorstellen: 0 };
     lijsten();
     let dates = 0, voorstellen = 0;
-    for (const d of db.data.ontmoetDates) {
+    for (const d of dateLijst()) {
       if (!d || (d.a !== key && d.b !== key)) continue;
       if (d.posities) delete d.posities[key];
       if (d.contract && d.contract.ondertekend) delete d.contract.ondertekend[key];
@@ -42,7 +45,7 @@ module.exports = ({ db, save, lijsten, nu }) => {
       if (d.b === key) d.b = null;
       dates++;
     }
-    for (const v of db.data.ontmoetVoorstellen) {
+    for (const v of voorstelLijst()) {
       if (!v || (v.a !== key && v.b !== key)) continue;
       if (v.keuzes) delete v.keuzes[key];
       if (v.status === 'open') v.status = 'verlopen';

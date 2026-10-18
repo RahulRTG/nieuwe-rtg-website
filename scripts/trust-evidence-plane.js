@@ -28,6 +28,10 @@ function report() {
   return {
     format: 'rtg-trust-evidence-plane-v3', mode: 'shadow',
     promise: 'evidence coordinates domains; domains retain meaning and ownership',
+    grens: 'Een manifest van contracten en modulevingerafdrukken, geen meting van gedrag: het zegt welke ' +
+      'capabilities, profielen en autoriteiten in server/kern/bewijsvlak zijn GEDECLAREERD en met welke bytes, ' +
+      'niet dat een domein zich eraan houdt. Dat bewijs komt uit de twee toetsen onder `proof`; de stand ' +
+      'is schaduw, dus er wordt nergens op geweigerd.',
     universalProtocol: v3Contract.PROTOCOL,
     truthClasses: v3Contract.TRUTH,
     finality: v3Contract.FINALITY,

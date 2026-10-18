@@ -12,7 +12,17 @@ const EENHEID = require('./geld/eenheid');
    Geld is hier een toezegging in het fondsgrootboek (centen); er wordt nooit
    geclaimd dat een echte betaling is verwerkt. Opslag: labFonds. */
 
-module.exports = ({ db, save, crypto, anthropic, livinglab }) => {
+module.exports = ({ db, save, crypto, anthropic, livinglab, bijeen, inBundel }) => {
+  /* DE HANDELINGEN VAN EEN LID, DUURZAAM (18 oktober 2026). Een toezegging,
+     een voorstel, een stem en een besluit zijn wat dit grootboek IS; met
+     write-behind `save()` las het lid "gelukt" terwijl de opslag nog niets had,
+     en de schrijfproef mat /api/labfonds/locatie/maak zo als VALS_SUCCES.
+     `vast(werk)` omsluit een synchrone schrijver met de duurzame bundel van
+     ../lib/duurzaam.js (zie `antwoord()` daar); de route kiest welke handeling
+     een schrijver is. Zonder bundel (een los toetsstel) draait hij zoals vroeger. */
+  const vastleggen = typeof bijeen === 'function'
+    ? require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'labfonds' }) : null;
+  const vast = (werk) => (vastleggen ? vastleggen.antwoord(werk) : Promise.resolve().then(werk));
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
@@ -134,6 +144,6 @@ module.exports = ({ db, save, crypto, anthropic, livinglab }) => {
   const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
     F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT, onderzoek });
 
-  return { labfonds: { fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom,
+  return { labfonds: { vast, fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom,
     financiering, zoekOnderzoek: onderzoek.zoek } };
 };

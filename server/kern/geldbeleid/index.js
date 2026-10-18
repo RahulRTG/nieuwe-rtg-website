@@ -29,8 +29,26 @@
 
 const MAX_CENTEN = 100000000; // 1 miljoen euro: grens op het doel (LAT.md regel 7), tegen tikfouten en overloop
 
-function maakGeldbeleid({ db, save, klok }) {
+function maakGeldbeleid({ db, save, klok, bijeen, inBundel }) {
   const nu = typeof klok === 'function' ? klok : () => new Date();
+  /* DE SCHRIJVERS VAN HET LID, DUURZAAM (18 oktober 2026). Elke schrijver
+     hieronder deed `save()` -- write-behind -- en de route antwoordde 200. De
+     schrijfproef (SCHRIJFPROEF.json, verraad `schrijf-verloren`) mat dat op
+     /api/geld/beleid/weg als VALS_SUCCES: het lid las "weg" terwijl er niets
+     bewaard was. Het duurst is de geldgrens: die WEIGERT in de waardepoort
+     (./grens.js), en een grens die het lid zet en die na een herstart weg is,
+     laat de betaling door die hij juist wilde tegenhouden.
+
+     `vast(werk)` draait een SYNCHRONE schrijver binnen de duurzame bundel van
+     server/lib/duurzaam.js (`antwoord()`, met de regels die daar staan) en
+     geeft zijn antwoord terug, of 503 als de opslag het niet bevestigde. De
+     schrijvers zelf blijven synchroon: evalueer.js en de reservering roepen ze
+     binnen een andere handeling aan, en daar beslist die handeling over de
+     commit. Zonder bundel (een los toetsstel dat alleen
+     db en save meegeeft) draait `werk` gewoon zoals vroeger. */
+  const vastleggen = typeof bijeen === 'function'
+    ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'geldbeleid' }) : null;
+  const vast = (werk) => (vastleggen ? vastleggen.antwoord(werk) : Promise.resolve().then(werk));
   const eigen = require('../eigencollectie')({ db, domein: 'kern/geldbeleid/index', bezit: { geldbeleid: 'kaart' } });
   function d() {
     const g = eigen.bak('geldbeleid', (b) => { b.perLid = {}; });
@@ -38,8 +56,15 @@ function maakGeldbeleid({ db, save, klok }) {
     return g;
   }
   const naamVan = c => String(c == null ? '' : c).trim();
-  // lezen zonder aan te maken: anders groeit perLid met een rij per lid dat een keer keek (zie kern/levensgraaf)
-  function kijk(codenaam) { const c = naamVan(codenaam); return (c && d().perLid[c]) || null; }
+  // lezen zonder aan te maken: anders groeit perLid met een rij per lid dat een keer keek (zie kern/levensgraaf).
+  // Ook de COLLECTIE zelf niet: d() schept hem, en dan schreef /api/geld/grens -- een lezer -- in de
+  // opslag (de idemproef zag `geldbeleid` bewegen en zette de route op de geldkaart). Zie
+  // test/leeszonderscheppen.test.js.
+  function kijk(codenaam) {
+    const c = naamVan(codenaam);
+    const per = eigen.kijk('geldbeleid').perLid;
+    return (c && per && typeof per === 'object' && per[c]) || null;
+  }
   function pak(codenaam) {
     const c = naamVan(codenaam);
     if (!c) return null;
@@ -73,7 +98,7 @@ function maakGeldbeleid({ db, save, klok }) {
   /* De eigen geldgrens (./grens.js) is de enige regelsoort die WEIGERT in
      plaats van waarschuwt; hij wordt afgedwongen in de waardepoort. Zie de kop
      van dat bestand voor waarom de bedenktijd opt-in is. */
-  return { geldbeleid: { regels, regelZet, regelWeg, potten, potZet, potReserveer, potWeg, log, logSchrijf, evalueer,
+  return { geldbeleid: { vast, regels, regelZet, regelWeg, potten, potZet, potReserveer, potWeg, log, logSchrijf, evalueer,
     grenzen: grens.grenzen, grensZet: grens.grensZet, grensWeg: grens.grensWeg, grensVoor: grens.grensVoor } };
 }
 

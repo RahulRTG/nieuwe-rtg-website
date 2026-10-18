@@ -20,7 +20,7 @@ module.exports = (kern, herhaling) => {
    het hele verzoek erbinnen. Zie kern/kassa/herhaling.js voor wat een
    herhaling is: dezelfde sleutel, nooit hetzelfde bedrag. */
 app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
- const antwoord = await herhaling.eenmalig('sale', req.supplier.code, req.body, async () => {
+ const antwoord = await herhaling.eenmaligVast('sale', req.supplier.code, req.body, async () => {
   let total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return { status: 400, error: 'Geen geldig bedrag.' };
   const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'contant';

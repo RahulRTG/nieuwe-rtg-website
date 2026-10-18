@@ -116,7 +116,7 @@ if (process.env.RTG_PAYROLL_BIJWERKEN !== '0') {
 /* Het Lab-fonds krijgt het Living Lab mee: een voorstel mag noemen WELK
    onderzoek het financiert. Het lab staat hierboven al, dus dit mag een waarde
    zijn en geen functie. */
-Object.assign(kern, require('../kern/labfonds')({ db, save, crypto, anthropic, livinglab: kern.livinglab }));
+Object.assign(kern, require('../kern/labfonds')({ db, save, crypto, anthropic, livinglab: kern.livinglab, bijeen: hulp.bijeen, inBundel: hulp.inBundel }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
    takenlijst; wie binnenkomt kiest eerst een huis. */

@@ -121,7 +121,7 @@ module.exports = (ctx) => {
   }
 
   // Async variant die een codenaam naar een lidsleutel oplost.
-  async function boekMetCodenaam(data, codenaam) {
+  async function koperBij(data, codenaam) {
     codenaam = scho(codenaam, 80);
     if (codenaam && keyVanCodenaam) {
       try {
@@ -130,7 +130,20 @@ module.exports = (ctx) => {
         data.koper = Object.assign({}, data.koper, key ? { key, codenaam: (t.codename || codenaam) } : { codenaam });
       } catch (e) { data.koper = Object.assign({}, data.koper, { codenaam }); }
     }
-    return boek(data);
+    return data;
+  }
+  async function boekMetCodenaam(data, codenaam) {
+    return boek(await koperBij(data, codenaam));
+  }
+  /* DE FACTUUR VAN EEN MENS, DUURZAAM (18 oktober 2026). Met de hand gemaakt
+     (/api/supplier/facturen/maak) heette hij "gemaakt" terwijl de opslag hem
+     nog niet had (SCHRIJFPROEF.json: VALS_SUCCES). Een fiscaal stuk met een
+     doorlopend nummer staat er, of bestaat niet. De automatische boekingen
+     roepen boek() BINNEN hun eigen handeling aan, die over de commit beslist.
+     Eerst de koper opzoeken (wacht op de kluis), dan synchroon in de bundel. */
+  async function boekVast(data, codenaam) {
+    await koperBij(data, codenaam);
+    return ctx.vastleggen ? ctx.vastleggen.antwoord(() => boek(data)) : boek(data);
   }
   /* Een openstaande factuur afboeken. Alleen de VERKOPER mag dat, want alleen
      hij weet of het geld binnen is; een koper die zijn eigen factuur op betaald
@@ -151,5 +164,10 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, betaald: naar };
   }
 
-  return { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, factuurBetaald };
+  // afboeken idem: de debiteurenlijst slaat een "betaalde" factuur over
+  const factuurBetaaldVast = (id, verkoperCode, betaald) => ctx.vastleggen
+    ? ctx.vastleggen.antwoord(() => factuurBetaald(id, verkoperCode, betaald))
+    : Promise.resolve(factuurBetaald(id, verkoperCode, betaald));
+
+  return { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, boekVast, factuurBetaald, factuurBetaaldVast };
 };

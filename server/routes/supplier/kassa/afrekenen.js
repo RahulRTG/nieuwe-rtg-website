@@ -18,7 +18,7 @@ module.exports = (kern, herhaling) => {
    EN maakt een bon, dus een tweede aankomst van hetzelfde verzoek zou een
    tweede bon geven op lasten die al gesloten zijn. Zie kern/kassa/herhaling.js. */
 app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
- const antwoord = await herhaling.eenmalig('checkout', req.supplier.code, req.body, async () => {
+ const antwoord = await herhaling.eenmaligVast('checkout', req.supplier.code, req.body, async () => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);

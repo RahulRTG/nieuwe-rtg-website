@@ -40,7 +40,7 @@ module.exports = (kern) => {
   /* ---------- oppakken ---------- */
   app.post('/api/supplier/horeca/pas/pak', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
-    const uit = pas.pak(r, req.body.gang, wieVan(req));
+    const uit = pas.pakOp(r, req.body.gang, wieVan(req));
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error, code: uit.code || null, claim: uit.claim });
     if (!uit.al) {
       save();

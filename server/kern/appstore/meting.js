@@ -90,7 +90,7 @@ function maakMeting({ S, save, nu }) {
     }
     snoei(r);
     const n = klokNu();
-    if (n - laatsteSchrijf > SCHRIJFRUST) { laatsteSchrijf = n; try { save(); } catch (e) {} }
+    if (n - laatsteSchrijf > SCHRIJFRUST) { laatsteSchrijf = n; try { save(); } catch (e) { console.warn('[appstore] de appmeting niet bewaard:', e && e.message); } }
   }
 
   /* De cijfers van EEN app. `dagen` is een lijst van jong naar oud, zodat een

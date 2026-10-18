@@ -72,12 +72,20 @@ test('maak weigert een bedrag van nul, onzin of zonder boeking', () => {
 test('dezelfde idem-sleutel geeft de bestaande opdracht terug, met een klacht', () => {
   const { op, klachten } = opzet();
   const a = op.maak(basis);
-  const b = op.maak(Object.assign({}, basis, { centen: 9999 }));
+  const b = op.maak(Object.assign({}, basis, { oms: 'tweede poging' }));
   assert.equal(b.id, a.id);
   assert.equal(b.hergebruikt, true);
   assert.equal(b.centen, 1250);
   assert.equal(klachten.length, 1);
   assert.match(klachten[0][0], /twee keer aangeboden/);
+  /* Een ANDER bedrag onder dezelfde sleutel is geen herhaling maar een andere
+     handeling (rij.js, 18 oktober 2026): die weigert luid, met een eigen klacht,
+     en de bestaande opdracht blijft onaangeroerd. */
+  assert.throws(() => op.maak(Object.assign({}, basis, { centen: 9999 })), e => e.code === 'idem-andere-opdracht');
+  assert.equal(klachten.length, 2);
+  assert.match(klachten[1][0], /andere opdracht/);
+  assert.deepEqual(klachten[1][1].verschil, ['centen']);
+  assert.equal(op.vindOpIdem(a.idemSleutel).centen, 1250);
 });
 
 test('een teruggang en een afwikkeling moeten functies zijn en een keer bestaan', () => {

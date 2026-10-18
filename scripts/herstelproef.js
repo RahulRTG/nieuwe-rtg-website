@@ -128,11 +128,32 @@ function zeg(antwoord) {
   return t ? String(t).slice(0, 120) : 'geen bericht';
 }
 
+/* HET BEZITSBEWIJS (18 oktober 2026). Sinds A-P1-04 vragen de bank, RTG Pay en
+   de wallet een eigen account met een toestel dat elk zwaar verzoek
+   ondertekent; de demo-pas uit /api/login kan dat per definitie niet. Zonder
+   dit kreeg elk bankpaar een 403 en heette het `nietBeproefd` -- en een
+   bevestigd paar dat zo terugvalt, laat GELDDEKKING.json zakken zonder dat er
+   een terugweg is stukgegaan. Dezelfde weg als scripts/idemproef-route.js: een
+   proeflid met een gebonden toestel (./lib/proeftoestel.js), alleen op een
+   ZWAAR pad, en alleen in plaats van de demo-pas. De poort blijft zoals in
+   productie. `TOESTEL` wijst een token naar het toestel dat ervoor tekent,
+   `ALS` een demo-token naar het proeflid dat hem op een zwaar pad vervangt. */
+const { zwaarPad } = require('../server/kern/identiteit/bezitsbewijs');
+const proeftoestel = require('./lib/proeftoestel');
+const TOESTEL = new Map();
+const ALS = new Map();
 async function roep(basis, pad, token, lijf) {
   try {
+    const koppen = { 'Content-Type': 'application/json' };
+    if (zwaarPad(pad)) {
+      if (ALS.has(token)) token = ALS.get(token);
+      const t = TOESTEL.get(token);
+      if (t) koppen[proeftoestel.KOP] = await t.teken('POST', pad);
+    }
+    koppen.Authorization = 'Bearer ' + token;
     const r = await fetch(basis + pad, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      headers: koppen,
       body: JSON.stringify(lijf)
     });
     return { status: r.status, data: await r.json().catch(() => null) };
@@ -445,11 +466,21 @@ async function main() {
         r + ' (status ' + ((sessies[r] || {}).status) + ')').join(', ') +
         ' -- dan zouden hun paren "niet beproefd" heten terwijl de proef zelf de reden is');
 
+      /* De twee proefleden. Lukt er een niet, dan meet de ronde zoals vroeger:
+         de zware paden blijven dan eerlijk `nietBeproefd`, nooit stil. */
+      const kaal = (pad, lijf, tok) => roep(srv.basis, pad, tok, lijf);
+      const pl = await proeftoestel.maakProeflid({ post: kaal, naam: 'Proeflid Herstel', basis: srv.basis });
+      const pa = await proeftoestel.maakProeflid({ post: kaal, naam: 'Proeflid Tegenrekening', basis: srv.basis });
+      for (const p of [pl, pa]) if (p.klaar) TOESTEL.set(p.klaar.token, p.klaar);
+      if (pl.klaar) ALS.set(sessies.member.token, pl.klaar.token);
+      console.log('  proefleden met een gebonden toestel: ' + [pl, pa].map(p => p.klaar
+        ? 'klaar' + (p.klaar.gekeurd ? '' : ' (NIET gekeurd: ' + p.klaar.keurReden + ')') : 'NIET -- ' + p.reden).join(', '));
+
       const voorWereld = opslagBeeld(srv.datamap);
       const klaar = await wereld.zetWereldKlaar({
         roep: (pad, tok, lijf) => roep(srv.basis, pad, tok, lijf),
         tokens: { member: sessies.member.token, office: sessies.office.token, supplier: sessies.supplier.token },
-        aanmeld
+        aanmeld, tweede: pa.klaar ? { token: pa.klaar.token, codenaam: pa.klaar.codenaam } : null
       });
       /* Wachten tot de wereld op schijf staat. Zonder dit was de rekening van
          het tweede lid er wel volgens het antwoord, maar nog niet volgens de
@@ -462,7 +493,8 @@ async function main() {
       for (const paar of lijst) {
         const u = await beproefPaar(srv, sessies[paar.rol].token, paar);
         uitslagen.push(u);
-        console.log('  ' + u.uitslag.padEnd(14) + paar.rol.padEnd(9) + paar.heen + '  ->  ' + paar.terug);
+        console.log('  ' + u.uitslag.padEnd(14) + paar.rol.padEnd(9) + paar.heen + '  ->  ' + paar.terug +
+          (u.uitslag === 'nietBeproefd' || u.uitslag === 'geen-herstel' ? '\n' + ' '.repeat(25) + '\x1b[2m' + u.reden + '\x1b[0m' : ''));
       }
     } finally { try { srv.klaar(); } catch (e) {} }
     return uitslagen;

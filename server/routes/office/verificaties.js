@@ -18,13 +18,19 @@ module.exports = (octx, gedeeld) => {
   const { wieKijkt } = gedeeld;
   const inzagelog = require('../../inzagelog');  // dezelfde als kern/kantoor: een boek, geen kopie
 
-  app.post('/api/office/verifications', kluisAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
+  /* De wachtrij toont echte namen en e-mailadressen uit de kluis: geen
+     aantoonbaar journaal, geen wachtrij (zie pendingVerifications). */
+  const NIET_VAST = 'Er is niets getoond of besloten: de inzage kon niet aantoonbaar in het inzagejournaal worden vastgelegd. Probeer het zo opnieuw.';
+  app.post('/api/office/verifications', kluisAuth, async (req, res) => {
+    const pending = await pendingVerifications(wieKijkt(req));
+    if (pending && pending.error) return res.status(pending.status || 503).json({ error: NIET_VAST });
+    res.json({ pending });
+  });
 
-  app.post('/api/office/verify', kluisAuth, (req, res) => {
+  app.post('/api/office/verify', kluisAuth, async (req, res) => {
     const user = accounts.getUserById(Number(req.body.userId));
     if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
     const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
-    accounts.setVerification(user.id, status);
     /* HET BESLUIT ZELF LIET GEEN SPOOR NA, en dat is de zwaarste handeling die
        dit kantoor kent: iemand kijkt naar een paspoortscan en een selfie, legt
        nationaliteit en geslacht vast, of wist het bewijs. De enige regel die
@@ -36,12 +42,19 @@ module.exports = (octx, gedeeld) => {
        Het inzagejournaal is hier het juiste boek en niet het kantooraudit: dit
        gaat over EEN persoon, met een reden, en er ligt een hashketen onder
        (server/lib/keten.js), dus de regel is achteraf niet stil te wijzigen.
-       Gemeten op de AUDIT-as, vastgehouden door test/kycspoor.test.js. */
-    try {
-      inzagelog.noteer({ door: wieKijkt(req), over: { id: user.id },
-        waarom: 'KYC-besluit: identiteit ' + (status === 'verified' ? 'goedgekeurd' : 'afgewezen, bewijs gewist'),
-        bron: 'backoffice/verificaties' });
-    } catch (e) {}
+       Gemeten op de AUDIT-as, vastgehouden door test/kycspoor.test.js.
+
+       EN HET SPOOR STAAT NU VOOR HET BESLUIT, en het kan weigeren (18 oktober
+       2026, LAT.md regel 21). Hier stond noteer() in een lege catch NA
+       setVerification(): faalde het journaal, dan stond het besluit vast en het
+       spoor niet (STILSPOOR.json). Nu wordt eerst duurzaam vastgelegd dat het
+       besluit is VERLEEND, en pas daarna genomen; staat de regel niet vast, dan
+       verandert er niets aan de identiteit van dit lid. */
+    const spoor = await inzagelog.noteerVast({ door: wieKijkt(req), over: { id: user.id },
+      waarom: 'KYC-besluit: identiteit ' + (status === 'verified' ? 'goedgekeurd' : 'afgewezen, bewijs gewist'),
+      bron: 'backoffice/verificaties' });
+    if (!spoor || !spoor.ok) return res.status((spoor && spoor.status) || 503).json({ error: NIET_VAST });
+    accounts.setVerification(user.id, status);
     // gezichtscontrole (selfie x paspoort) en nationaliteit vastleggen bij goedkeuren:
     // zo weten we dat het paspoort bij de codenaam en de persoon hoort (eis 5)
     if (status === 'verified') {
@@ -99,7 +112,12 @@ module.exports = (octx, gedeeld) => {
     notify('user-' + user.id, { icon: status === 'verified' ? 'pas' : 'meldingen',
       title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
       body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
-    res.json({ ok: true, status, pending: pendingVerifications(wieKijkt(req)) });
+    /* De wachtrij erna is een NIEUWE inzage met een eigen regel; faalt die, dan
+       staat het besluit wel en blijft de lijst leeg -- liever dan namen tonen
+       zonder spoor. */
+    const pending = await pendingVerifications(wieKijkt(req));
+    res.json({ ok: true, status, pending: Array.isArray(pending) ? pending : [],
+      ...(Array.isArray(pending) ? {} : { wachtrij: NIET_VAST }) });
   });
 
   /* ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ---- */

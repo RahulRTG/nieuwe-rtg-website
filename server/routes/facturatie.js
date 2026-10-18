@@ -44,9 +44,9 @@ module.exports = (kern) => {
      zaak-inlog, en de kern controleert bovendien dat de aanvrager ook echt de
      VERKOPER is: alleen hij weet of het geld binnen is. Een koper die zijn
      eigen factuur op betaald zet, is geen betaling maar een bewering. */
-  app.post('/api/supplier/facturen/betaald', supplierAuth, (req, res) => {
+  app.post('/api/supplier/facturen/betaald', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = facturatie.factuurBetaald(String((req.body || {}).id || ''),
+    const r = await facturatie.factuurBetaaldVast(String((req.body || {}).id || ''),
       req.supplier.code, (req.body || {}).betaald);
     res.status(r.status || 200).json(r);
   });
@@ -57,12 +57,14 @@ module.exports = (kern) => {
     const b = req.body || {};
     const regels = Array.isArray(b.regels) && b.regels.length ? b.regels
       : [{ omschrijving: b.omschrijving, aantal: b.aantal, stuk: b.bedrag }];
-    const r = await facturatie.boekMetCodenaam({
+    /* boekVast en niet boekMetCodenaam: deze factuur maakt een MENS, en die
+       hoort "gemaakt" pas te lezen als de opslag hem heeft (zie de motor). */
+    const r = await facturatie.boekVast({
       soort: ['verkoop', 'dienst', 'huur'].includes(b.soort) ? b.soort : 'dienst',
       verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
       koper: { naam: b.koperNaam }, regels, methode: b.methode || 'factuur'
     }, b.codenaam);
-    if (r.error) return res.status(400).json(r);
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json(Object.assign({ overzicht: facturatie.voorSupplier(req.supplier.code) }, r));
   });
   app.post('/api/supplier/facturen/ai', supplierAuth, async (req, res) => {

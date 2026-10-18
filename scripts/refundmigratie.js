@@ -212,7 +212,46 @@ const LEZERS = {
     tedoen: 'idem als de charterreis hierboven' },
   'server/kern/zaakcommand/signalen.js': { collectie: ['orders', 'rides', 'boekingen'], soort: 'telt', stand: 'geen-werk',
     wat: 'de openstaande signalen van een zaak: onaangeroerde bon, rit zonder chauffeur, boeking zonder antwoord',
-    gedaan: 'alle drie de regels toetsen ook de status, en een terugstorting zet die op een eindstand' }
+    gedaan: 'alle drie de regels toetsen ook de status, en een terugstorting zet die op een eindstand' },
+
+  /* --- boekingen en tickets, ingedeeld op 18 oktober 2026. Gelezen tegen de
+         enige terugstortweg die deze collectie vandaag kent: het lid annuleert
+         (kern/ervaring/leden/annuleren.js), en die zet `paid = false` EN de
+         status op `geweigerd`. Een lezer die die status al uitsluit, beweegt dus
+         vanzelf mee; een lezer die alleen op `paid` leunt, wacht. --- */
+  'server/kern/onderneming/klussen.js': { collectie: 'boekingen', soort: 'toont', stand: 'geen-werk',
+    wat: 'het stadium van een klus ("klaar" zodra boeking of factuur betaald is)',
+    gedaan: 'leest `paid` pas als de status `afgerond` is; annuleren weigert een afgeronde boeking en zet een teruggestorte op `geweigerd`, dus die komt hier nooit' },
+  'server/kern/reiswereld-bronnen-partner.js': { collectie: ['tickets', 'boekingen'], soort: 'toont', stand: 'geen-werk',
+    wat: 'de afspraken en activiteiten van een partner in de reiswereld',
+    gedaan: 'sluit `geannuleerd`, `geweigerd` en `terugbetaald` uit naast `paid`; een terugstorting valt er via de status buiten' },
+  'server/kern/vakwerk/index.js': { collectie: 'boekingen', soort: 'telt', stand: 'wacht',
+    wat: 'omzet per dienst en de omzet-KPI\'s (vandaag, week, maand) van een vakzaak, plus de betaalstand op het werkbeeld',
+    tedoen: '`echt` sluit alleen `wacht-op-betaling` uit, dus een geannuleerde boeking (`geweigerd`) zit erin en telt ' +
+      'nu alleen niet omdat `paid` op false gaat. Gaan boekingen om, dan blijft een teruggestorte boeking in de omzet ' +
+      'staan -- de stille soort -- en moet hier `!b.refunded` (of een tegenboeking) bij' },
+  'server/routes/member/voertuigen/charter.js': { collectie: 'boekingen', soort: 'grendel', stand: 'geen-werk',
+    wat: 'of een boot in een periode bezet is, en de eigen charters van een lid',
+    gedaan: 'beide regels sluiten `geweigerd` uit (CHARTER_KLAAR en de filter van /api/charter/mijn); een teruggestorte charter houdt geen boot bezet' },
+  'server/routes/member/voertuigen/huur.js': { collectie: 'boekingen', soort: 'grendel', stand: 'geen-werk',
+    wat: 'of een auto in een periode verhuurd is, en de eigen huur van een lid',
+    gedaan: 'idem als de charter: HUUR_KLAAR en /api/huur/mijn sluiten `geweigerd` uit' },
+  'server/routes/supplier/charter/vloot.js': { collectie: 'boekingen', soort: 'toont', stand: 'wacht',
+    wat: 'het charteroverzicht van de verhuurder (lopend, of vandaag afgerond)',
+    tedoen: 'een geweigerde charter van VANDAAG (`finishedAt || at`) valt door de tweede tak heen en wordt nu alleen ' +
+      'door `paid` tegengehouden; gaan boekingen om, dan staat een teruggestorte charter van vandaag in het overzicht' },
+  'server/routes/supplier/verhuur/vloot.js': { collectie: 'boekingen', soort: 'toont', stand: 'wacht',
+    wat: 'het huuroverzicht van de verhuurder (lopend, of vandaag afgerond)',
+    tedoen: 'idem als het charteroverzicht hierboven' },
+  'server/routes/supplier/tickets-dicht.js': { collectie: ['tickets', 'boekingen'], soort: 'telt', stand: 'geen-werk',
+    wat: 'de verkochte kaartjes van een dag die een sluiting raakt',
+    gedaan: 'sluit `geannuleerd`, `geweigerd` en `terugbetaald` uit naast `paid`' },
+  'server/routes/supplier/tickets.js': { collectie: ['tickets', 'boekingen'], soort: 'telt', stand: 'geen-werk',
+    wat: 'verkochte plaatsen per tijdslot op het ticketscherm van de zaak',
+    gedaan: 'filtert op de uitkomst van ticketsVoorSlot() (kern/leverancier/zaak.js), en die sluit `geweigerd` al uit' },
+  'public/apps/app-main/app-main-21.js': { collectie: 'boekingen', soort: 'toont', stand: 'geen-werk',
+    wat: 'de betaalknop bij de eigen afspraken van een lid',
+    gedaan: 'de lijst sluit `afgerond` en `geweigerd` uit voordat hij `paid` leest' }
 };
 
 /* Plekken die `paid` noemen zonder er een betaalstand uit te lezen. Ze staan
@@ -220,7 +259,17 @@ const LEZERS = {
 const GEEN_LEZER = {
   'server/kern/mall/bestellingen.js': 'de mall heeft een eigen bestelwereld met een eigen betaalstand; niet db.data.orders',
   'public/apps/app-main/app-main-48.js': 'leest `delen[].paid` van een GESPLITSTE rekening (/splitsen/mijn) -- een eigen betaalstand, geen bestelling',
-  'public/apps/app-main/app-main-34b.js': 'leest `ride.paid`; ritten wissen hun betaalstand nog en gaan met hun eigen kaart om (het Onderweg-paneel verhuisde op 29 september uit app-main-34.js)'
+  'public/apps/app-main/app-main-34b.js': 'leest `ride.paid`; ritten wissen hun betaalstand nog en gaan met hun eigen kaart om (het Onderweg-paneel verhuisde op 29 september uit app-main-34.js)',
+  /* De zorgwereld heeft een EIGEN collectie (`careBoekingen` en
+     `carePakketBoekingen`) met een eigen betaalstand, net als de mall hierboven.
+     Ze vallen in de telling omdat `Boeking` in de naam staat, niet omdat ze
+     db.data.boekingen lezen. Er bestaat voor die collectie ook geen
+     terugstortweg (annuleren.js kent order, ride en boeking). */
+  'server/kern/care/leden.js': 'leest `careBoekingen[].paid` en `carePakketBoekingen[].paid` -- de eigen collecties van de zorgwereld, niet db.data.boekingen',
+  'server/kern/care/zaak.js': 'idem: de zorgagenda van de zaak leest `careBoekingen`, een eigen collectie zonder terugstortweg',
+  'public/apps/app-main/app-main-13.js': 'toont de betaalstand van de eigen zorgafspraken (`/care/mijn`, careBoekingen), geen db.data.boekingen',
+  'public/apps/foundation/zorg-hulp-weergave.js': 'toont de betaalstand van een zorgafspraak uit careBoekingen, geen db.data.boekingen',
+  'public/apps/app-main/app-main-45.js': '`app.paid` is een vertaalsleutel (T(\'app.paid\', \'Betaald\')), geen veld'
 };
 
 /* STAM EN GEEN NAAM. De collectie van een bestand werd eerst gezocht op de naam

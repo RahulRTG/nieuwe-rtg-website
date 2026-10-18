@@ -10,11 +10,11 @@
    omvangregel gaat. */
 'use strict';
 
-module.exports = ({ db, lijsten, kanaalMet, codenaamVan, save, notify }) => {
+module.exports = ({ T, lijsten, kanaalMet, codenaamVan, save, notify }) => {
   function officeLijst() {
     lijsten();
-    return { wacht: db.data.theaterKanalen.filter(k => k.status === 'wacht').map(k => ({ id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, codenaam: codenaamVan(k.key), at: k.at })),
-      meldingen: db.data.theaterMeldingen.slice(-50).reverse() };
+    return { wacht: T.bak('theaterKanalen').filter(k => k.status === 'wacht').map(k => ({ id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, codenaam: codenaamVan(k.key), at: k.at })),
+      meldingen: T.bak('theaterMeldingen').slice(-50).reverse() };
   }
   function officeBeslis(kid, besluit) {
     const k = kanaalMet(kid); if (!k) return { status: 404, error: 'Kanaal niet gevonden.' };

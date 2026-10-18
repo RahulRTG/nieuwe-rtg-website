@@ -22,7 +22,7 @@ Dezelfde volgorde als bij `OBJECTMODEL.json` (waar `Asset` sneuvelde) en
 
 `npm run verstrengeling` → `VERSTRENGELING.json`
 
-<!--getal:verstrengeling.randen-->2218<!--/getal--> randen tussen de knopen van dit huis, waarvan er
+<!--getal:verstrengeling.randen-->2445<!--/getal--> randen tussen de knopen van dit huis, waarvan er
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> **onverklaard** zijn. Dat getal moet naar nul, en het
 aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben, is geen
 huis maar een map met losse programma's.
@@ -47,7 +47,7 @@ kern** — `SEMANTIEK.json` laat zien dat hetzelfde woord op drie plekken nog ge
 gedeelde betekenis is.
 
 Omgekeerd staat er wat er breekt als iets er niet is:
-<!--getal:verstrengeling.uitneembaar-->62<!--/getal--> van de <!--getal:verstrengeling.domeinen-->700<!--/getal--> domeinen sleept géén ander
+<!--getal:verstrengeling.uitneembaar-->66<!--/getal--> van de <!--getal:verstrengeling.domeinen-->738<!--/getal--> domeinen sleept géén ander
 domein mee. Bovenaan de andere kant staat `eigencollectie` met 246: dat is geen
 domein meer maar een verborgen kern, en dat is een besluit (noem het kern) of
 werk (breng de koppelingen terug).
@@ -301,8 +301,8 @@ eerste twee uitslagen is het hele punt.
 | `ontbreekt` | er staat niets |
 
 **De stand over <!--getal:meetleer.registers-->202<!--/getal--> registers.** Twee getallen die nooit worden
-opgeteld: <!--getal:meetleer.onleesbaar-->880<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
-leeg — dat daalt ook als een zin een veld wordt), en <!--getal:meetleer.blind-->8<!--/getal-->
+opgeteld: <!--getal:meetleer.onleesbaar-->876<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
+leeg — dat daalt ook als een zin een veld wordt), en <!--getal:meetleer.blind-->4<!--/getal-->
 registers zijn **blind**: die zeggen nergens wat ze niet aantonen, veld noch zin.
 Daar wordt zelfs een zorgvuldige lezer niet geremd, en dat is het gevaarlijke
 geval. De blinde acht gaat aan de ratel, de 380 niet.

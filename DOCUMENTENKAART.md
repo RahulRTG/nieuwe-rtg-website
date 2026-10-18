@@ -2535,8 +2535,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27653<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7810<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27662<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7829<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->315<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2591,7 +2591,7 @@ bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 niets"; en de <!--getal:schermgedrag.zonderGrond-->153<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
-op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->1<!--/getal-->; de aanroepgraaf begon op 587 onbekende
+op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
 doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Dat laatste nul is sinds 20 september 2026 een ANDER nul: er staat een derde
 soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->0<!--/getal-->), voor een aanroep naar een integratie die

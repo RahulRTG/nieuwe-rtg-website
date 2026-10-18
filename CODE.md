@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5474<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27653<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->7810<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5491<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27662<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->7829<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -116,7 +116,7 @@ Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geld
 `module.exports` kent **drie** standen, niet twee. Een bestand dat
 `module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
 namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
-onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2478<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2488<!--/getal--> bestanden hier. Het register draagt daarom de vórm
 (`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
 `onbekend` in plaats van op een vals `nee`.
 
@@ -134,8 +134,8 @@ elke dekkingsvraag triviaal waar; alleen de tweede teller zegt nog iets.
 bronboom aflopen (dat doet `SCHRIJFANALYSE.json`) maar het de **router** vragen —
 wat de server werkelijk aanbiedt — en daar de plek in de bron bij zoeken.
 
-<!--getal:routebron.vergeleken-->4121<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4079<!--/getal--> geven hetzelfde bestand,
-**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->42<!--/getal--> verschil dat er geen is.
+<!--getal:routebron.vergeleken-->4121<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4076<!--/getal--> geven hetzelfde bestand,
+**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->45<!--/getal--> verschil dat er geen is.
 
 Dat ene verschil is de opbrengst van de hele oefening. `POST /api/auth/me` staat
 volgens de router in `inlog-pas.js` en volgens `SCHRIJFANALYSE.json` in
@@ -159,7 +159,7 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
 per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->442<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->1010<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1222<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->144<!--/getal--> voorvoegsels.
+<!--getal:schermroutes.paden-->1010<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1224<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->143<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -179,7 +179,7 @@ het register (nul gevonden — de werkos-bundel noemt geen enkel API-pad).
 #### Wat dat gat kostte om eerlijk te krijgen
 
 De eerste versie meldde **118 dode paden**. Vrijwel allemaal onzin, in drie
-rondes teruggebracht tot <!--getal:schermroutes.dood-->1<!--/getal--> — en elke ronde is een regel die elders net zo
+rondes teruggebracht tot <!--getal:schermroutes.dood-->0<!--/getal--> — en elke ronde is een regel die elders net zo
 geldt:
 
 1. **Een pad kan verdergaan.** `'/api/agenda/' + id` is geen route maar een
@@ -197,11 +197,11 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->5529<!--/getal-->, bestaan) en `perRoute` (met bestand), en
-   <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->5530<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   <!--getal:routebron.zonderBestand-->12<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
 Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->1010<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->5529<!--/getal--> echte routes gehouden.
+<!--getal:routebron.routerRoutes-->5530<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 
@@ -864,7 +864,7 @@ Wat er ná deze ronde nog ligt, in volgorde van wat het waard is:
 En twee dingen die hier horen te blijven staan, allebei omdat ze iets zeggen over
 wat een register waard is:
 
-- De meetronde van §0.3 vond <!--getal:schermroutes.dood-->1<!--/getal--> dode paden, maar begon op 118. Die van §0.4
+- De meetronde van §0.3 vond <!--getal:schermroutes.dood-->0<!--/getal--> dode paden, maar begon op 118. Die van §0.4
   vond <!--getal:graaf.doelOnbekend-->0<!--/getal--> onbekende doelen, maar begon op 587. Beide keren zat de fout in
   de meter en niet in de code. Wie een Architect bouwt op een register dat zijn
   eigen zekerheid niet kent, bouwt een machine die 705 fouten met overtuiging

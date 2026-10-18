@@ -1,4 +1,5 @@
 {
+  "grens": "Telt alleen benoemde catalogi (een hoofdletterconstante met een gesloten verzameling ids) onder server/; een begrip dat anders wordt vastgelegd ziet hij niet. Een naam in twee domeinen met weinig gedeelde leden is een KANDIDAAT-botsing, geen bewezen misverstand: of het hetzelfde ding hoort te zijn, beslist een mens.",
   "catalogi": 1225,
   "verschillendeNamen": 750,
   "namenInMeerDomeinen": 132,
@@ -3733,5 +3734,5 @@
       ]
     }
   ],
-  "bestanden": 4464
+  "bestanden": 4465
 }

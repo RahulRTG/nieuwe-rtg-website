@@ -1,5 +1,6 @@
 {
   "uitleg": "Per domein de kern-namen die het mag aanraken, BOVEN de gedeelde interface in server/opzet/domeingrens.js. Gegenereerd met npm run grenslijst en met de hand aan te vullen; die aanvullingen blijven staan.",
+  "grens": "Een vertrekpunt en geen waarheid: dat een naam hier staat zegt alleen dat het domein hem vandaag aanraakt of dat iemand hem met de hand toevoegde, niet dat het hem nodig heeft. Namen die een bestand zelf uitrekent (genrepuls, genreplan, genreblik, werkplek-bureaus) ziet de scanner niet; die komen er pas op als de grens knelt.",
   "domeinen": {
     "aanmeldgesprek": [
       "intakeStart",

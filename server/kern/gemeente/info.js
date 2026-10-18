@@ -5,7 +5,8 @@
    ctx van kern/gemeente/index.js. */
 const { demoAan } = require('../demostand');
 module.exports = (ctx) => {
-  const { db, save, nu, vandaag, id, ref, schoon, seed, deGemeente, sseToSupplier, publiekeMelding, FRACTIES } = ctx;
+  const { save, nu, vandaag, id, ref, schoon, seed, deGemeente, sseToSupplier, publiekeMelding, FRACTIES } = ctx;
+  const G = ctx.opslag; // ./opslag.js
 
   function afvalVoor(postcode) {
     seed();
@@ -51,7 +52,7 @@ module.exports = (ctx) => {
       melderKey: sess.key, melder: codenaam, status: 'gepland', ploeg: 'reiniging',
       updates: [{ tekst: 'Aangevraagd; de reiniging plant een ophaalmoment in.', at: nu(), door: 'systeem' }], at: nu()
     };
-    db.data.gemeenteMeldingen.unshift(m);
+    G.pak('gemeenteMeldingen').unshift(m);
     save();
     if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });
     return { ok: true, aanvraag: publiekeMelding(m) };
@@ -78,22 +79,22 @@ module.exports = (ctx) => {
   function ensureAanslagen(key) {
     if (!key || !demoAan()) return;
     const jaar = new Date().getFullYear();
-    if ((db.data.gemeenteAanslagen || []).some(a => a.key === key && a.jaar === jaar)) return;
+    if (G.lijst('gemeenteAanslagen').some(a => a.key === key && a.jaar === jaar)) return;
     const h = hash(String(key) + jaar);
     BELASTINGEN.forEach((b, i) => {
       const bedrag = b.basis + ((h >>> (i * 5)) % (b.spreiding + 1));
-      db.data.gemeenteAanslagen.unshift({ id: id(), key, soort: b.soort, jaar, bedrag, betaald: false, at: nu() });
+      G.pak('gemeenteAanslagen').unshift({ id: id(), key, soort: b.soort, jaar, bedrag, betaald: false, at: nu() });
     });
-    db.data.gemeenteAanslagen = db.data.gemeenteAanslagen.slice(0, 20000);
+    G.zet('gemeenteAanslagen', G.pak('gemeenteAanslagen').slice(0, 20000));
     save();
   }
   function belastingMijn(key) {
     seed(); ensureAanslagen(key);
-    return (db.data.gemeenteAanslagen || []).filter(a => a.key === key)
+    return G.lijst('gemeenteAanslagen').filter(a => a.key === key)
       .map(a => ({ id: a.id, soort: a.soort, jaar: a.jaar, bedrag: a.bedrag, betaald: !!a.betaald }));
   }
   function belastingBetaal(key, aid) {
-    const a = (db.data.gemeenteAanslagen || []).find(x => x.id === String(aid || '') && x.key === key);
+    const a = G.lijst('gemeenteAanslagen').find(x => x.id === String(aid || '') && x.key === key);
     if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
     if (a.betaald) return { status: 409, error: 'Deze aanslag is al betaald.' };
     a.betaald = true; a.betaaldAt = nu();
@@ -102,7 +103,7 @@ module.exports = (ctx) => {
   }
   function bekendmakingen() {
     seed();
-    return { ok: true, bekendmakingen: (db.data.gemeenteBekend || []).slice(0, 40).map(b => ({ id: b.id, titel: b.titel, tekst: b.tekst, soort: b.soort, at: b.at })) };
+    return { ok: true, bekendmakingen: G.lijst('gemeenteBekend').slice(0, 40).map(b => ({ id: b.id, titel: b.titel, tekst: b.tekst, soort: b.soort, at: b.at })) };
   }
 
   /* ---- gemeente-medewerkers ---- */
@@ -113,14 +114,14 @@ module.exports = (ctx) => {
     if (titel.length < 3 || tekst.length < 3) return { status: 400, error: 'Vul een titel en tekst in.' };
     const soort = ['algemeen', 'raad', 'verkeer', 'vergunning'].includes(data.soort) ? data.soort : 'algemeen';
     const b = { id: id(), gemeente: (deGemeente() || {}).code || 'GEMEENTE', titel, tekst, soort, door: actor || 'gemeente', at: nu() };
-    db.data.gemeenteBekend.unshift(b);
-    db.data.gemeenteBekend = db.data.gemeenteBekend.slice(0, 500);
+    G.pak('gemeenteBekend').unshift(b);
+    G.zet('gemeenteBekend', G.pak('gemeenteBekend').slice(0, 500));
     save();
     return { ok: true, bekendmaking: { id: b.id, titel, tekst, soort, at: b.at } };
   }
   function regie() {
     seed();
-    const M = db.data.gemeenteMeldingen || [], A = db.data.gemeenteAfspraken || [], G = db.data.gemeenteVergunningen || [];
+    const M = G.lijst('gemeenteMeldingen'), A = G.lijst('gemeenteAfspraken'), G = G.lijst('gemeenteVergunningen');
     const open = M.filter(m => !['opgelost', 'afgewezen'].includes(m.status));
     const perPloeg = {};
     for (const m of open) perPloeg[m.ploeg] = (perPloeg[m.ploeg] || 0) + 1;
@@ -130,7 +131,7 @@ module.exports = (ctx) => {
       meldingenPerPloeg: perPloeg,
       afsprakenVandaag: A.filter(a => a.datum === vandaag() && a.status === 'gepland').length,
       vergunningenOpen: G.filter(v => ['ingediend', 'in behandeling'].includes(v.status)).length,
-      bekendmakingen: (db.data.gemeenteBekend || []).length
+      bekendmakingen: G.lijst('gemeenteBekend').length
     };
   }
 

@@ -5086,6 +5086,8 @@ console.log('\n62) een gecontracteerd domein raakt db.data alleen door zijn eige
       waarom: 'zeven schrijvers; wortel met takken, plus twee plekken die een tak VERVANGEN' },
     { map: 'server/kern/mobiliteit', deur: 'opslag.js',
       waarom: 'veertien schrijvers en 109 aanrakingen: het rommeligste domein, en daarom het meest gebaat' },
+    { map: 'server/kern/gemeente', deur: 'opslag.js',
+      waarom: 'vijf schrijvers over vijf collecties; de demo-gemeente in suppliers staat als vreemde schrijver in de deur' },
     { map: 'server/kern/command', deur: 'opslag.js',
       waarom: 'twaalf schrijvers; het eerste domein met vier soorten omgang (bezit, teller, gedeeld, vreemd)',
       ook: {

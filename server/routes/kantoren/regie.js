@@ -80,15 +80,16 @@ module.exports = (ctx) => {
   /* De AI-regie: de boardroom vult Rahuls karakter en verhaal aan. De
      vaste kern van het karakter blijft in de code staan (bewaakt door de
      drift-tests); deze aanvullingen komen live in ELKE assistent mee. */
+  const rahulProfiel = require('../../kern/rahul-profiel')({ db });
   app.post('/api/office/boardroom/rahul', boardroomAuth, (req, res) => {
-    res.json({ ok: true, profiel: db.data.rahulProfiel || { karakter: '', verhaal: '' } });
+    res.json({ ok: true, profiel: rahulProfiel.lees() || { karakter: '', verhaal: '' } });
   });
   app.post('/api/office/boardroom/rahul/zet', boardroomAuth, (req, res) => {
     const kort = v => String(v == null ? '' : v).trim().slice(0, 2000);
-    db.data.rahulProfiel = { karakter: kort(req.body.karakter), verhaal: kort(req.body.verhaal), at: new Date().toISOString() };
+    const profiel = rahulProfiel.zet({ karakter: kort(req.body.karakter), verhaal: kort(req.body.verhaal), at: new Date().toISOString() });
     save();
     sseToOffice('sync', { scope: 'boardroom' });
-    res.json({ ok: true, profiel: db.data.rahulProfiel });
+    res.json({ ok: true, profiel });
   });
 
   /* De Mall-regie: vanuit de boardroom elke leverancier in de RTG Mall bijstellen

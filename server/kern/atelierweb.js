@@ -83,7 +83,16 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return store().lijst.map(d => ({ id: d.id, titel: d.titel, bij: d.bij, blokken: (d.blokken || []).length, etalage: !!d.etalage }));
   }
   function haal(id) { return store().lijst.find(x => x.id === scho(id, 20)) || null; }
-  function verwijder(id) { const s = store(); s.lijst = s.lijst.filter(x => x.id !== scho(id, 20)); save(); return { ok: true }; }
+  /* Een sjabloon dat er niet is, is niet verwijderd: zonder deze toets gaf een
+     onbekend id `ok: true` en las de herstelproef een verwijdering die niets
+     raakte als geslaagd (MENSGROND, 18 oktober 2026). */
+  function verwijder(id) {
+    const s = store(), voor = s.lijst.length;
+    s.lijst = s.lijst.filter(x => x.id !== scho(id, 20));
+    if (s.lijst.length === voor) return { error: 'Sjabloon niet gevonden.', status: 404 };
+    save();
+    return { ok: true };
+  }
 
   /* De etalage: sjablonen die het Atelier vrijgeeft als startpunt voor
      ledensites. Vrijgeven is een uitdrukkelijke handeling van het kantoor --

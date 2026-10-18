@@ -142,9 +142,16 @@ const { zwaarPad } = require('../server/kern/identiteit/bezitsbewijs');
 const proeftoestel = require('./lib/proeftoestel');
 const TOESTEL = new Map();
 const ALS = new Map();
+let OPROEP = 0;
 async function roep(basis, pad, token, lijf) {
   try {
-    const koppen = { 'Content-Type': 'application/json' };
+    /* ELKE OPROEP VAN DEZE PROEF IS EEN BEWUSTE, APARTE OPDRACHT, en zegt dat
+       met een eigen Idempotency-Key. Zonder die kop viel de tweede voorbereiding
+       binnen het dubbeltikvenster van de idem-poort: /api/office/atelierweb/bewaar
+       kreeg dan het EERSTE antwoord terug, met het id van een sjabloon dat de
+       opwarmronde al had verwijderd, en de heenweg /verwijder raakte niets.
+       De proef mat zo de poort en niet het paar (MENSGROND, 18 oktober 2026). */
+    const koppen = { 'Content-Type': 'application/json', 'Idempotency-Key': 'herstelproef-' + (++OPROEP) };
     if (zwaarPad(pad)) {
       if (ALS.has(token)) token = ALS.get(token);
       const t = TOESTEL.get(token);

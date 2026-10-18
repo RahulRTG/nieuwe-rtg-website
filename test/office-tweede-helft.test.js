@@ -183,6 +183,8 @@ test('4. de Website-studio bewaart sjablonen -- en houdt de huisstijl vast', asy
     assert.equal((await ko('/api/office/atelierweb/verwijder', { id: d })).status, 200);
   }
   assert.equal((await ko('/api/office/atelierweb/lijst', {})).body.lijst.length, voor, 'de studio is weer opgeruimd');
+  /* een tweede keer hetzelfde sjabloon weghalen is geen verwijdering: 404, geen ok */
+  assert.equal((await ko('/api/office/atelierweb/verwijder', { id })).status, 404);
 });
 
 test('5. de kantoordrive van RTG: versies, ster, formulier en weggooien', async () => {

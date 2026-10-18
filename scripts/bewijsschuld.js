@@ -546,7 +546,7 @@ if (VASTLEGGEN) {
      bij het getal dat hij verklaart. --groei="..." schrijft hem erbij; zonder
      reden weigert dit script te groeien. */
   const groeiArg = (process.argv.find(a => a.startsWith('--groei=')) || '').slice(8);
-  const oud = (() => { try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; } })();
+  const oud = (() => { try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; } })();
   const som = (t) => t.meetwerk + t.instrument;
   if (oud && som(uit.telling) > som(oud.telling) && !groeiArg) {
     console.error('\n  Weiger vast te leggen: de achterstand groeit van ' + som(oud.telling) +

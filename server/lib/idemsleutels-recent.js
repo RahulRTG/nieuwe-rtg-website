@@ -25,6 +25,12 @@ const SLEUTELS = Object.assign({},
   /* Vier routes uit de samenvoeging van #542. Zie de kop daar. */
   require('./idemsleutels-samenvoeging').SLEUTELS,
   /* De Living Mall is een POST-projectie zonder mutatie. */
-  require('./idemsleutels-mall-living').SLEUTELS);
+  require('./idemsleutels-mall-living').SLEUTELS,
+  /* De apps van de Lifestyle Pass: gevonden door de voltooiproef van Reisboek. */
+  require('./idemsleutels-rechterhand').SLEUTELS,
+  /* RTG Veilig: een dubbeltik op de alarmknop gaf de kring twee alarmen. */
+  require('./idemsleutels-veilig').SLEUTELS,
+  /* De kluis: een dubbeltik op "document toevoegen" gaf twee documenten. */
+  require('./idemsleutels-bestanden').SLEUTELS);
 
 module.exports = { SLEUTELS };

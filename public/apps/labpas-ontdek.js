@@ -45,8 +45,8 @@
                   'de vraagstelling is daarom niet openbaar.</span>'
                 : (x.vraagstuk ? '<br>' + esc(x.vraagstuk) : '')) +
               (x.besluit ? '<br><span class="pil ok">besluit: ' + esc(x.besluit.soort) + '</span> ' + esc(x.besluit.reden || '') : '') +
-              ' <button class="knop stil" data-oopen type="button" style="font-size:.7rem;padding:.15rem .5rem;">bekijk</button>' +
-              ' <button class="knop stil" data-oklacht type="button" style="font-size:.7rem;padding:.15rem .5rem;">klacht indienen</button>' +
+              ' <button class="knop stil s-1emfcyx" data-oopen type="button">bekijk</button>' +
+              ' <button class="knop stil s-1emfcyx" data-oklacht type="button">klacht indienen</button>' +
               '<div data-odetail></div></div>';
           }).join('')
         : '<div class="leeg">Dit lab heeft nog geen onderzoek lopen.</div>';
@@ -127,7 +127,7 @@
       api('bewoner/paspoort-maak', { labId: LAB, naam: naam })
         .then(function (r) {
           $('#pasp').innerHTML = '<div class="uitdaging"><div class="sec">Uw labpaspoort</div>' +
-            '<h2 style="font-family:monospace;font-size:1.15rem;">' + esc(r.paspoort.code) + '</h2>' +
+            '<h2 class="s-1vkfgzy">' + esc(r.paspoort.code) + '</h2>' +
             '<div class="leeg">Bewaar deze code. U geeft hem op als u aan een onderzoek meedoet, ' +
             'en dan tellen uw punten over onderzoeken heen mee. Bij een onderzoek dat zijn gegevens ' +
             'gescheiden houdt kan dat niet -- daar blijven de punten binnen dat ene onderzoek.</div></div>';

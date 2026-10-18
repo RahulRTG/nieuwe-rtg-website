@@ -103,7 +103,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'EDGEDEKKING.json');
@@ -915,7 +915,7 @@ function achteruitgang(oud, nieuw) {
     schermen: regels,
     telling: t
   };
-  fs.writeFileSync(DOEL, JSON.stringify(register, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('edgedekking'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(register, null, 2) + '\n');
 
   if (!stil) {
     for (const r of samenvatting) console.log(r);

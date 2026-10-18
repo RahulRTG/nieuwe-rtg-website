@@ -70,6 +70,24 @@ module.exports = ({ LANDEN }) => {
       land: beste.land, bron: 'de plaatsenlijst van de Reiswijzer' };
   }
 
+  /* DE LANDNAMEN EEN KEER IN KLEINE LETTERS, NIET PER VRAAG. landVind() liep
+     per aanroep Object.entries(LANDEN) af en zette elke landnaam opnieuw in
+     kleine letters: ruim tweehonderd strings per vraag, en de Mall en de
+     tijdzone stellen de vraag per zaak per verzoek. In De Beproeving van 18
+     oktober 2026 was dat 58 MB aan tussenstrings per 40 s storm. De lijst
+     wordt nu onthouden en bij gebruik gecontroleerd: komt er een land bij
+     (kern/fiscaal/wereld.js vult de tabel bij het opstarten aan) of verandert
+     een naam van object, dan wordt hij opnieuw gebouwd. De volgorde (die van
+     Object.entries) en de uitkomst zijn dezelfde als voorheen. */
+  const PLAATS_LIJST = Object.entries(PLAATSEN);
+  let landLijst = null, landAantal = -1;
+  function landenLaag() {
+    const sleutels = Object.keys(LANDEN);
+    let vers = landLijst && sleutels.length === landAantal;
+    if (vers) for (let i = 0; i < landLijst.length; i++) { const r = landLijst[i]; if (LANDEN[r[0]] !== r[1] || r[1].naam !== r[2]) { vers = false; break; } }
+    if (!vers) { landLijst = sleutels.map(cc => [cc, LANDEN[cc], LANDEN[cc].naam, String(LANDEN[cc].naam).toLowerCase()]); landAantal = sleutels.length; }
+    return landLijst;
+  }
   // een land vinden in vrije tekst: code, landnaam of bekende plaats
   function landVind(invoer) {
     const t = String(invoer || '').trim();
@@ -77,8 +95,8 @@ module.exports = ({ LANDEN }) => {
     const up = t.toUpperCase();
     if (LANDEN[up]) return up;
     const laag = t.toLowerCase();
-    for (const [cc, l] of Object.entries(LANDEN)) if (laag.includes(l.naam.toLowerCase())) return cc;
-    for (const [plaats, cc] of Object.entries(PLAATSEN)) if (laag.includes(plaats)) return cc;
+    for (const r of landenLaag()) if (laag.includes(r[3])) return r[0];
+    for (const [plaats, cc] of PLAATS_LIJST) if (laag.includes(plaats)) return cc;
     return null;
   }
 

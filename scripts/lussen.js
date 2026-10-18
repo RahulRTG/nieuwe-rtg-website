@@ -62,7 +62,7 @@ const { parse } = require('./ast/parser');
    geen `boomVuil`, en daarmee kon `registersUitVuileBoom` in scripts/norm.js
    nooit iets over dit register zeggen -- een meting uit een boom die niet
    bestond, zou hier stilzwijgend voor bewijs zijn doorgegaan. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { loop: wandel } = require('./ast/walk');
 /* De indeling zelf woont in scripts/lib/lusvorm.js: die raakt geen schijf en is
    daardoor toetsbaar zonder dit register te overschrijven. */
@@ -595,9 +595,9 @@ if (process.argv.includes('--controle')) {
   process.exit(0);
 }
 
-fs.writeFileSync(path.join(WORTEL, 'LUSSEN.json'), JSON.stringify(uit, null, 1) + '\n');
+if (magSchrijven(eisSchoneBoom('lussen'), 'LUSSEN.json')) fs.writeFileSync(path.join(WORTEL, 'LUSSEN.json'), JSON.stringify(uit, null, 1) + '\n');
 const g = uit.gemeten, a = uit.assen;
-console.log('LUSSEN.json geschreven  (' + bestandenGelezen + ' bestanden, ' + bundeldelen + ' bundeldelen, ' + parsefouten.length + ' parsefouten)');
+console.log('LUSSEN  (' + bestandenGelezen + ' bestanden, ' + bundeldelen + ' bundeldelen, ' + parsefouten.length + ' parsefouten)');
 console.log('\n  ONTDEKKING -- zes assen, nooit opgeteld');
 console.log('    sleutelwoordlussen        ', a.sleutelwoordlussen);
 console.log('    callback-iteraties        ', a.callbackIteratiesGeteld, '(geindexeerd:', a.callbackIteratiesGeindexeerd + ')');

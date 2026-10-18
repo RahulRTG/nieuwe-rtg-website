@@ -71,14 +71,39 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden, 
      het PAD en dat komt van buiten, dus zonder plafond kan een vreemde met een
      geldige kantoorcode de opslag laten groeien door paden te verzinnen. */
   function pasToe(kaart, batch) {
+    /* De bezetting per plafond wordt EEN keer per batch geteld en daarna
+       bijgehouden, niet per nieuwe sleutel opnieuw over alle sleutels gelopen.
+       Dat was O(sleutels x nieuwe paden): onder de storm van De Beproeving
+       (18 oktober 2026) kostte een spoelronde zo 67 ms op de lus en 160 MB aan
+       tijdelijke sleutellijsten per 40 s. De telling is dezelfde als voorheen --
+       voor een plafond alle sleutels die met zijn voorvoegsel beginnen, voor de
+       rest alle sleutels zonder plafond -- en een sleutel die in deze ronde
+       wordt toegevoegd telt vanaf dat moment mee, precies zoals de herteling
+       hem zou hebben gezien. */
+    let bezetting = null;
+    const bakVan = pl => (pl ? pl.voorvoegsel : '');
+    const telBezetting = () => {
+      bezetting = new Map();
+      for (const k of Object.keys(kaart)) {
+        for (const x of P) if (k.startsWith(x.voorvoegsel)) bezetting.set(x.voorvoegsel, (bezetting.get(x.voorvoegsel) || 0) + 1);
+        if (!plafondVan(k)) bezetting.set('', (bezetting.get('') || 0) + 1);
+      }
+    };
     for (const [pad, tik] of batch) {
       let sleutel = pad;
       if (!kaart[sleutel]) {
         const pl = plafondVan(pad);
-        const bezet = Object.keys(kaart).filter(k => (pl ? k.startsWith(pl.voorvoegsel) : !plafondVan(k))).length;
+        if (!bezetting) telBezetting();
+        const bezet = bezetting.get(bakVan(pl)) || 0;
         if (bezet >= (pl ? pl.max : maxPaden)) sleutel = pl ? pl.voorvoegsel + 'overig' : 'overig';
       }
-      if (!kaart[sleutel]) kaart[sleutel] = Object.assign({ pad: sleutel }, leeg());
+      if (!kaart[sleutel]) {
+        kaart[sleutel] = Object.assign({ pad: sleutel }, leeg());
+        if (bezetting) {
+          for (const x of P) if (sleutel.startsWith(x.voorvoegsel)) bezetting.set(x.voorvoegsel, (bezetting.get(x.voorvoegsel) || 0) + 1);
+          if (!plafondVan(sleutel)) bezetting.set('', (bezetting.get('') || 0) + 1);
+        }
+      }
       /* `overgelopen` telt TIKKEN en geen batchregels: een sleutel die in een
          spoelronde vijf keer tikte, is vijf waarnemingen die geen eigen rij
          kregen -- en zo staat hij ook in stand.overgelopen. */

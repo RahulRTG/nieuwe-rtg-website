@@ -86,11 +86,11 @@
       '<p style="border-left:3px solid #857007;padding-left:0.8em;color:#4D4A45;">' + esc(plan.advies) + '</p>' +
       kop('De taken van vandaag') +
       plan.taken.map(function (t2) {
-        return '<div style="padding:0.25rem 0;">' + (t2.klaar ? '✓' : '○') + ' ' + esc(t2.tekst) +
+        return '<div class="s-1aably8">' + (t2.klaar ? '✓' : '○') + ' ' + esc(t2.tekst) +
           (t2.prio === 1 ? ' <b style="color:#7F1634;">(nu)</b>' : '') + '</div>';
       }).join('') +
       (blik && blik.dagen ? kop('De week vooruit') + blik.dagen.map(function (d2) {
-        return '<div style="padding:0.2rem 0;"><b style="text-transform:uppercase;font-size:0.85em;">' + esc(d2.dag) + '</b> · ' +
+        return '<div class="s-yhw1rz"><b class="s-1trvxqt">' + esc(d2.dag) + '</b> · ' +
           (d2.n ? esc(d2.items.join(' · ')) : '<span style="color:#8A8680;">rustig</span>') + '</div>';
       }).join('') : '') +
       '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">Opgesteld in de zaak-app van RTG; vinkjes zijn de stand van dit moment.</p>' +

@@ -63,6 +63,9 @@ test('aanmelden is niet binnen zijn: pas na toelating doet het lid-token iets', 
   const open = await api('/mijn-rechten', { werkruimte: W, lidToken: a.lidToken });
   assert.equal(open.status, 200);
   assert.deepEqual(open.body.rollen, [], 'toegelaten, maar nog zonder rol dus zonder rechten');
+  await api('/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen: ['medewerker'] });
+  const metRol = await api('/mijn-rechten', { werkruimte: W, lidToken: a.lidToken });
+  assert.equal(metRol.body.rollen.length, 1, 'pas met een rol staat er iets in de lijst');
 
   // afwijzen trekt de sleutel in
   const b = (await api('/lid/aanmeld', { werkruimte: W, naam: 'Afgewezen Aad' })).body;

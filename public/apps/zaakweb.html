@@ -36,11 +36,22 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+.s-prmggw:not(#_#_#_){font-size:1.2rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <a href="/apps/leverancier.html">‹ Zaak-app</a>
-  <div><div class="ey">RTG Web Platform</div><h1 style="font-size:1.1rem;">Mijn RTG-website</h1></div>
+  <div><div class="ey">RTG Web Platform</div><h1 class="s-prlthd">Mijn RTG-website</h1></div>
 </header>
 <main>
   <p class="lead">Uw zaak op het eigen web van RTG. De site wordt in één keer uit uw bedrijfsprofiel gebouwd en blijft er live mee verbonden: past u uw menukaart, kamers of activiteiten aan, dan staat het meteen op de site. Daarna is het ontwerp van u -- pas aan wat u wilt.</p>
@@ -60,7 +71,7 @@ async function toon(){
   let lijst;
   try{ lijst=(await api('mijn')).lijst||[]; }catch(e){ el.innerHTML='<span class="leeg">'+esc(e.message)+'</span>'; return; }
   if(!lijst.length){
-    el.innerHTML='<h2 style="font-size:1.2rem;">Nog geen website</h2>'+
+    el.innerHTML='<h2 class="s-prmggw">Nog geen website</h2>'+
       '<p class="mt" style="font-size:.85rem;line-height:1.6;">Eén druk op de knop en RTG bouwt hem uit uw bedrijfsprofiel: naam, aanbod, foto&#39;s, reviews en contact. U hoeft niet vanaf nul te beginnen.</p>'+
       '<div class="rij"><button class="prim" id="maak">Maak mijn website</button></div>';
     $('#maak').addEventListener('click',async()=>{
@@ -69,7 +80,7 @@ async function toon(){
     return;
   }
   const d=lijst[0];
-  el.innerHTML='<h2 style="font-size:1.2rem;">'+esc(d.titel)+'</h2>'+
+  el.innerHTML='<h2 class="s-prmggw">'+esc(d.titel)+'</h2>'+
     '<div class="mt"><span class="stip'+(d.online?' aan':'')+'"></span>'+(d.online?'Online op ':'Offline · adres ')+'<span class="adres">'+esc(d.adres||'--')+(d.adres?'.rtg':'')+'</span> · '+d.bezoeken+' bezoek'+(d.bezoeken===1?'':'en')+' · '+d.blokken+' blokken'+(d.wacht?' · <b>er staan wijzigingen klaar die nog niet online zijn</b>':'')+'</div>'+
     /* Hoort deze site bij een merk, dan zegt het scherm dat: anders zet een
        vestiging kleuren die bij het bewaren stilletjes terugspringen, en een

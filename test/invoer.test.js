@@ -174,6 +174,7 @@ test('5. een correctie maakt het onderdeel zeker; zonder correctie blijft het na
   assert.equal(zonder.body.onderdeel.soort, 'vlucht', 'het soort komt uit de boardingpass zelf');
   assert.equal(zonder.body.onderdeel.status, 'tecontroleren',
     'het afgeleide jaar staat nog onder de drempel, dus vraagt dit onderdeel aandacht');
+  assert.equal(zonder.body.onderdeel.onzeker.length, 1, 'zonder correctie is er een onzeker veld');
   assert.deepEqual(zonder.body.onderdeel.onzeker, ['van_datum']);
 
   const b = await post('/api/reis/invoer/lees', { tekst: PAS }, lid);

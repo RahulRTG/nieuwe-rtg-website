@@ -77,11 +77,11 @@ try { bedoelingen = require('../server/lib/mutatiecontracten').CONTRACTEN; } cat
 let afgeleid = {};
 try {
   afgeleid = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT-AFGELEID.json'), 'utf8')).contracten || {};
-} catch (e) {}
+} catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 const alleBedoelingen = Object.assign({}, afgeleid, bedoelingen);   // een mens wint van een script
 
 let proef = { perRoute: [] };
-try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) {}
+try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 
 /* DE TWEEDE BEWIJSLIJN, EN ALLEEN ALS VETO. SCHRIJFANALYSE.json zegt per route
    of de CODE kan schrijven. Zijn schrijfvormenlijst is met opzet te ruim, dus
@@ -91,7 +91,7 @@ let statisch = new Map();
 try {
   const sa = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHRIJFANALYSE.json'), 'utf8'));
   statisch = new Map((sa.perRoute || []).map(r => [r.route, r]));
-} catch (e) {}
+} catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 const meting = new Map((proef.perRoute || []).map(r => [sleutelVan(r.methode, r.pad), r]));
 const gemetenOp = (proef.stempel && proef.stempel.op) || null;
 

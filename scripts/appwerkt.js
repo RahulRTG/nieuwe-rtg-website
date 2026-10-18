@@ -125,7 +125,7 @@ const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
@@ -460,7 +460,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
      beoordelen of een foutmelding bruikbaar was. */
   r.bewijzen.menselijk = stuk.length || eersteBezoek.crash.length
     ? { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'een kale JS-fout of 500 bereikt de gebruiker: ' + (eersteBezoek.crash[0] || stuk[0]), bewijs: null }
-    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7', bewijs: null };
+    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7, en die levert de voltooiproef (VOLTOOIPROEF.json) voor een onderdeel met een scenario', bewijs: null };
 
   vulOngemeten(r);
   return r;
@@ -904,8 +904,8 @@ if (require.main === module) (async () => {
       process.exit(0);
     }
     const bezwaren = inventarisOordeel(null, vers).filter((b) => !b.startsWith('APPWERKT.json draagt'));
-    fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
-    log('APPWERKT.json: blok toezegklassen bijgewerkt ' + JSON.stringify(vers.telling) +
+    if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
+    log('APPWERKT.json: blok toezegklassen gemeten ' + JSON.stringify(vers.telling) +
       ' (niet geteld: ' + vers.nietGeteld.prozaMarkeringen + ' in lopende tekst, ' + vers.nietGeteld.standOnbekend + ' andere standwaarden)');
     if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
     process.exit(0);
@@ -936,8 +936,8 @@ if (require.main === module) (async () => {
     process.exit(0);
   }
   const uit = bouw(await meet());
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
-  log('\nAPPWERKT.json geschreven: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
+  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+  log('\nAPPWERKT: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);
   process.exit(0);
 })();

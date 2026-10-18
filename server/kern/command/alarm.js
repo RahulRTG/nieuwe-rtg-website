@@ -60,15 +60,25 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
       try { const r = doe(); if (r) uit.push({ id, naam, ernst, wat: r }); }
       catch (e) { uit.push({ id, naam, ernst: 'midden', wat: 'deze controle kon niet draaien: ' + e.message }); }
     };
+    /* EEN SLO-STAND PER WEGING. Vier controles hieronder (en twee in
+       ./alarm-aanvullend.js) vragen dezelfde stand binnen dezelfde synchrone
+       ronde, en elke aanroep kopieert alle meetreeksen (meting.reeksen(), ruim
+       vierduizend routes). Gemeten in De Beproeving van 18 oktober 2026: 88 MB
+       aan kopieen per 40 s storm. De stand wordt nu een keer gevraagd en
+       gedeeld; een stand die niet berekend kon worden wordt niet onthouden,
+       zodat elke controle haar eigen storing blijft melden zoals voorheen. */
+    let sloStand = null;
+    const sloStandNu = () => sloStand || (sloStand = slo.stand());
+    const sloGedeeld = slo && typeof slo === 'object' ? Object.assign(Object.create(slo), { stand: sloStandNu }) : slo;
 
     probeer('doel-gezakt', 'Een servicedoel is niet gehaald', 'hoog', () => {
-      const st = slo.stand();
+      const st = sloStandNu();
       const g = st.doelen.filter(x => x.genoeg && x.oordeel === 'niet gehaald');
       return g.length ? g.map(x => x.naam).join(', ') + ' staat over de streefwaarde' : null;
     });
 
     probeer('budget-bijna-op', 'Het foutbudget raakt op', 'midden', () => {
-      const st = slo.stand();
+      const st = sloStandNu();
       const g = st.doelen.filter(x => x.genoeg && x.budget && !x.budget.op && x.budget.restDeel < d.budgetRestDeel);
       return g.length ? g.map(x => x.naam + ' (' + Math.round(x.budget.restDeel * 100) + '% over)').join(', ') : null;
     });
@@ -101,7 +111,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     probeer('auditspoor-gebroken', 'Auditspoor gebroken of niet verankerd', 'hoog', () =>
       require('../../lib/auditwacht').bevinding());
 
-    voegAanvullendeAlarmcontrolesToe(probeer, { slo, kwaliteit, d });
+    voegAanvullendeAlarmcontrolesToe(probeer, { slo: sloGedeeld, kwaliteit, d });
 
     return uit;
   }

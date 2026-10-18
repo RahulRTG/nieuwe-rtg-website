@@ -87,7 +87,7 @@
     var items = (await w.Toestelkluis.lijst()).filter(function (x) { return x.naam.indexOf('recept_') === 0; });
     host.innerHTML = items.map(function (x) {
       return '<div class="bl-rrij"><span>' + esc(x.naam.slice(7).replace(/_/g, ' ').replace(/\.txt$/, '')) + '</span>' +
-        '<span style="white-space:nowrap;">' +
+        '<span class="s-19g2g0z">' +
         '<button class="knop" type="button" data-ropen="' + esc(x.naam) + '">Lees</button> ' +
         '<button class="knop stilrand" type="button" data-rwis="' + esc(x.naam) + '" aria-label="wis recept">&#10005;</button></span></div>';
     }).join('') || '<p class="stil h-mt40">Nog geen recepten bewaard.</p>';

@@ -28,7 +28,7 @@ const { naarBuiten, naarBinnen, STANDAARDEN, staatVan } = require('../server/ker
 
 let srv, base, sch;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overdracht-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const bh = (pad, body) => fnd(pad, Object.assign({ schoolCode: sch.schoolCode, beheerToken: sch.beheerToken }, body || {}));
@@ -41,7 +41,7 @@ const KIND = { naam: 'Iris', geboren: '2016-03-02', herkomst: 'De Vlinder', ople
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'De Vonk', plaats: 'Zutphen' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Vonk', plaats: 'Zutphen' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
@@ -245,7 +245,7 @@ test('een veld van buiten dat wij niet kennen wordt geweigerd en gemeld', () => 
 
 /* ---------- en door de machine heen ---------- */
 test('de kaart en het pakket staan achter de leerlingpoort', async () => {
-  const kaart = await bh('/school/overdracht/kaart');
+  const kaart = await bh('/api/foundation/school/overdracht/kaart');
   assert.equal(kaart.status, 200, JSON.stringify(kaart.body).slice(0, 140));
   assert.equal(kaart.body.velden.filter(v => v.klasse === 'nooit').length >= 4, true);
   assert.ok(kaart.body.standaarden.length > 0, 'de kaart toont echte overdrachtsstandaarden');
@@ -263,8 +263,8 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
     'een bron die niet zegt wanneer er is gelezen, is geen bron');
   assert.match(kaart.body.uitleg, /geen dossier mee/i);
 
-  const l = (await bh('/school/leerling/aanmeld', { naam: 'Iris', geboren: '2016-03-02' })).body;
-  const p = await bh('/school/overdracht/pakket', { leerlingId: l.leerling.id, doel: 'continuiteit', standaard: 'oso' });
+  const l = (await bh('/api/foundation/school/leerling/aanmeld', { naam: 'Iris', geboren: '2016-03-02' })).body;
+  const p = await bh('/api/foundation/school/overdracht/pakket', { leerlingId: l.leerling.id, doel: 'continuiteit', standaard: 'oso' });
   assert.equal(p.status, 200);
   assert.ok(p.body.velden.naam);
   assert.equal(p.body.vorm.velden.geboortedatum, '2016-03-02', 'de vorm van OSO gebruikt zijn eigen veldnamen');
@@ -282,17 +282,17 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
 
   /* `naam` wordt hier nu ook geweigerd, en dat is winst: OSO kent geen element
      naam. Wie het toch stuurt, stuurt iets wat de standaard niet heeft. */
-  const in1 = await bh('/school/overdracht/inlezen', { standaard: 'oso', velden: { groepscode: '3A', naam: 'Iris', onzin: 1 } });
+  const in1 = await bh('/api/foundation/school/overdracht/inlezen', { standaard: 'oso', velden: { groepscode: '3A', naam: 'Iris', onzin: 1 } });
   assert.equal(in1.status, 200);
   assert.equal(in1.body.velden.klasCode, '3A');
   assert.deepEqual(in1.body.geweigerd.map(x => x.veld).sort(), ['naam', 'onzin']);
   assert.match(in1.body.uitleg, /plaatsen doet de administratie/i);
-  assert.equal((await bh('/school/overdracht/inlezen', { standaard: 'zomaarwat', velden: {} })).status, 400);
+  assert.equal((await bh('/api/foundation/school/overdracht/inlezen', { standaard: 'zomaarwat', velden: {} })).status, 400);
 });
 
 /* ---------- de werkende overstap tussen twee RTG-scholen ---------- */
 test('een pakket is geadresseerd, verloopt, en is weg na ophalen', async () => {
-  const b = (await fnd('/school/school/maak', { naam: 'De Sprong', plaats: 'Ede' })).body;
+  const b = (await fnd('/api/foundation/school/school/maak', { naam: 'De Sprong', plaats: 'Ede' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
@@ -300,21 +300,21 @@ test('een pakket is geadresseerd, verloopt, en is weg na ophalen', async () => {
     body: JSON.stringify({ code: b.schoolCode, action: 'goedkeuren' }) });
   const bh2 = (pad, body) => fnd(pad, Object.assign({ schoolCode: b.schoolCode, beheerToken: b.beheerToken }, body || {}));
 
-  const l = (await bh('/school/leerling/aanmeld', { naam: 'Sem', geboren: '2015-05-05', herkomst: 'De Vonk' })).body;
+  const l = (await bh('/api/foundation/school/leerling/aanmeld', { naam: 'Sem', geboren: '2015-05-05', herkomst: 'De Vonk' })).body;
   /* Met een echt zorgdossier erbij, anders bewijst de restlijst niets: een
      verse leerling heeft nog geen zorg, en dan valt er ook niets weg te laten.
      Juist dit is wat over een overstap NIET mee hoort te gaan. */
-  const zorg = await bh('/school/zorg/zet', { leerlingId: l.leerling.id,
+  const zorg = await bh('/api/foundation/school/zorg/zet', { leerlingId: l.leerling.id,
     behoefte: 'extra leestijd bij begrijpend lezen', plan: 'twee keer per week met de RT-er' });
   assert.equal(zorg.status, 200, 'de zorgnotitie moest gezet kunnen worden: ' + JSON.stringify(zorg.body).slice(0, 120));
 
   // zonder naam gaat er niets de deur uit, en zonder geadresseerde ook niet
-  assert.equal((await bh('/school/overdracht/klaarzetten',
+  assert.equal((await bh('/api/foundation/school/overdracht/klaarzetten',
     { leerlingId: l.leerling.id, naarSchool: b.schoolCode })).status, 400);
-  assert.equal((await bh('/school/overdracht/klaarzetten',
+  assert.equal((await bh('/api/foundation/school/overdracht/klaarzetten',
     { leerlingId: l.leerling.id, door: 'Administratie Vonk' })).status, 404);
 
-  const zet = await bh('/school/overdracht/klaarzetten', { leerlingId: l.leerling.id,
+  const zet = await bh('/api/foundation/school/overdracht/klaarzetten', { leerlingId: l.leerling.id,
     naarSchool: b.schoolCode, door: 'Administratie Vonk', doel: 'continuiteit' });
   assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
   assert.ok(zet.body.code.startsWith('OD-'));
@@ -326,16 +326,16 @@ test('een pakket is geadresseerd, verloopt, en is weg na ophalen', async () => {
   assert.match(zet.body.uitleg, /Alleen die school/i);
 
   // het staat klaar bij de verzender, met zijn vervaldatum
-  const klaar = (await bh('/school/overdracht/klaarstaand')).body;
+  const klaar = (await bh('/api/foundation/school/overdracht/klaarstaand')).body;
   assert.equal(klaar.pakketten.filter(p => p.code === zet.body.code).length, 1);
 
   // een derde school kan hem niet ophalen: het pakket is geadresseerd
-  const derde = await bh('/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode });
+  const derde = await bh('/api/foundation/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode });
   assert.equal(derde.status, 403);
   assert.match(derde.body.error, /andere school geadresseerd/i);
 
   // de geadresseerde wel, en krijgt de restlijst mee
-  const op = await bh2('/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode });
+  const op = await bh2('/api/foundation/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode });
   assert.equal(op.status, 200);
   assert.equal(op.body.velden.naam, 'Sem');
   assert.equal(op.body.door, 'Administratie Vonk');
@@ -348,7 +348,7 @@ test('een pakket is geadresseerd, verloopt, en is weg na ophalen', async () => {
   assert.match(op.body.uitleg, /niemand automatisch ingeschreven/i);
 
   /* Weg bij de verzender: een overdracht is een overdracht en geen archief. */
-  assert.equal((await bh2('/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode })).status, 404);
-  assert.equal((await bh('/school/overdracht/klaarstaand')).body.pakketten
+  assert.equal((await bh2('/api/foundation/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode })).status, 404);
+  assert.equal((await bh('/api/foundation/school/overdracht/klaarstaand')).body.pakketten
     .filter(p => p.code === zet.body.code).length, 0);
 });

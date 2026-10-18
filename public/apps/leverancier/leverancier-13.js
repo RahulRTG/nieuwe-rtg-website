@@ -22,5 +22,5 @@
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'bo';
     let html = '<div class="st-chips">'+secs.map(s2 =>
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
-    if (kantoorMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+kantoorMsg+'</div>'; }
+    if (kantoorMsg){ html += '<div class="tkc s-9ncju4">'+kantoorMsg+'</div>'; }
 

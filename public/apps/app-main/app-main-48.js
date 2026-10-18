@@ -39,14 +39,14 @@
         API.call('/meldingen/voorkeur').then(d => d.voorkeur).catch(() => null)
       ]);
     } catch(e){ return; }
-    const kaart = inhoud => '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1.1rem;">' + inhoud + '</div>';
+    const kaart = inhoud => '<div class="s-1clsam4">' + inhoud + '</div>';
     let html = '';
     // punten: saldo, tegoed en verzilveren
     if (p) html += kaart(
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.8rem;">' +
-        '<div><b style="font-size:0.86rem;">✦ ' + T('erv.punten','RTG-punten') + '</b>' +
-        '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.25rem;">' + p.saldo + ' ' + T('erv.puntensaldo','punten') + (p.tegoed ? ' · € ' + p.tegoed + ' ' + T('erv.tegoed','tegoed (verrekent automatisch)') : '') + '</div>' +
-        '<div style="font-size:0.64rem;color:var(--soft);margin-top:0.25rem;">' + T('erv.puntenuitleg','1 punt per € 10; 100 punten = € 10 tegoed. RTG legt bij, de zaak ontvangt alles.') + '</div></div>' +
+        '<div><b class="s-2ty0gz">✦ ' + T('erv.punten','RTG-punten') + '</b>' +
+        '<div class="s-brpqsl">' + p.saldo + ' ' + T('erv.puntensaldo','punten') + (p.tegoed ? ' · € ' + p.tegoed + ' ' + T('erv.tegoed','tegoed (verrekent automatisch)') : '') + '</div>' +
+        '<div class="s-162n281">' + T('erv.puntenuitleg','1 punt per € 10; 100 punten = € 10 tegoed. RTG legt bij, de zaak ontvangt alles.') + '</div></div>' +
         (p.saldo >= 100 ? '<button class="vbtn" id="pzGo">' + T('erv.verzilver','Verzilver 100') + '</button>' : '') +
       '</div>');
     // open betaalverzoeken: mijn deel van gesplitste rekeningen
@@ -60,12 +60,12 @@
           '<span>' + s.supplierName + ' · ' + eur(s.totaal) + ' · ' + s.delen.filter(d2 => d2.paid).length + '/' + s.delen.length + ' ' + T('erv.betaald','betaald') + '</span>' +
           (mijnDeel
             ? '<button class="vbtn js-splpay" data-id="' + s.id + '" data-amt="' + mijnDeel.bedrag + '">' + T('erv.betaaldeel','Betaal mijn deel') + '</button>'
-            : '<span style="color:var(--soft);font-size:0.68rem;">' + T('erv.wachtop','wacht op vrienden') + '</span>') +
+            : '<span class="s-upu68b">' + T('erv.wachtop','wacht op vrienden') + '</span>') +
         '</div>';
       }).join(''));
     // meldingsvoorkeuren: per soort aan of uit
     if (vk) html += kaart(
-      '<b style="font-size:0.86rem;">' + T('erv.meldingen','Meldingen') + '</b>' +
+      '<b class="s-2ty0gz">' + T('erv.meldingen','Meldingen') + '</b>' +
       '<div style="display:flex;flex-wrap:wrap;gap:0.5rem 1rem;margin-top:0.5rem;">' +
       [['orders', T('erv.m.orders','Bestellingen')], ['events', T('erv.m.events','Events')], ['salon', 'De Salon'], ['live', T('erv.m.live','Onderweg')], ['wachtlijst', T('erv.wachtlijst','Wachtlijst')]].map(([k, l]) =>
         '<label style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.76rem;"><input type="checkbox" class="js-vk" data-scope="' + k + '"' + (vk[k] !== false ? ' checked' : '') + '> ' + l + '</label>'
@@ -95,9 +95,9 @@
       try { suppliers = (await API.call('/suppliers')).suppliers || []; } catch(e){}
     }
     const opties = suppliers.map(s => '<option value="' + s.code + '">' + s.name + '</option>').join('');
-    wrap.innerHTML = '<div style="margin-top:1.6rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">' + T('gc.h','Cadeaukaarten') + '</div>' +
-      '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('gc.s','Koop een cadeaukaart van een partner en geef de code cadeau. Inwisselen gaat bij de zaak.') + '</div>' +
+    wrap.innerHTML = '<div class="s-8iudka">' +
+      '<div class="s-1s5nhoq">' + T('gc.h','Cadeaukaarten') + '</div>' +
+      '<div class="s-pvbpy4">' + T('gc.s','Koop een cadeaukaart van een partner en geef de code cadeau. Inwisselen gaat bij de zaak.') + '</div>' +
       (kaarten.length ? kaarten.map(k =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;">' +
         '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--muted);letter-spacing:0.06em;">' + (k.stand === 'actief' ? T('gc.getoond','Code getoond bij aankoop') : T('gc.dicht','Code niet meer geldig')) + '</span></span>' +
@@ -105,7 +105,7 @@
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;">' +
       '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
       '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' +
-      '<button id="gcBuy" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
+      '<button id="gcBuy" class="s-1dby7yj">' + T('gc.koop','Koop') + '</button></div></div>';
     /* De code staat alleen in het antwoord op de koop. Kwijt? Een nieuwe code
        maakt de oude ongeldig en wordt ook maar een keer getoond. */
     wrap.querySelectorAll('.gcRot').forEach(b => b.addEventListener('click', async () => {

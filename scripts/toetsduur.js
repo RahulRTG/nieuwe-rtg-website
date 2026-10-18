@@ -287,7 +287,7 @@ function main() {
   if (!paden.length) paden.push(path.join(WORTEL, '.toetsduur'));
 
   let bestaand = null;
-  try { bestaand = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { /* eerste keer */ }
+  try { bestaand = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* eerste keer */ }
 
   const aanwezig = paden.filter((p) => fs.existsSync(p));
   if (!aanwezig.length && !bestaand) {

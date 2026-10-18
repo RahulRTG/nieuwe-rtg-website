@@ -128,9 +128,13 @@ function sluit(h, data, klasse) {
 
 /* De middleware. Hij hangt de handeling om het HELE verzoek: alles wat de routes
    daarna doen valt binnen deze context, inclusief timers die zij zetten. */
+/* De db-module wordt na de eerste geslaagde lading onthouden: een require() met
+   een relatief pad loopt anders per aanroep opnieuw door de padresolutie van de
+   loader (zeven stat-aanroepen, 8-10 us), en dit draait twee keer per verzoek. */
+let dbModule = null;
 function middleware(deps) {
   const geefData = (deps && deps.data) || (() => {
-    try { return require('../db').db.data; } catch (e) { return null; }
+    try { return (dbModule || (dbModule = require('../db'))).db.data; } catch (e) { return null; }
   });
   const klasse = deps && deps.klasse;
   const meld = (deps && deps.log) || ((niveau, bericht, velden) => {

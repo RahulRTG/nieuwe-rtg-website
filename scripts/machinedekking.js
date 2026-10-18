@@ -143,7 +143,7 @@ const BEWEZEN_LEZINGEN = (() => {
     for (const r of (reg.rijen || [])) {
       if (r && r.stand === 'NOT_APPLICABLE' && r.route) uit.add(String(r.route).trim());
     }
-  } catch (e) { /* geen register: dan beslist het werkwoord, zoals hiervoor */ }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* geen register: dan beslist het werkwoord, zoals hiervoor */ }
   return uit;
 })();
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[2m', reset: '\x1b[0m' };
@@ -363,7 +363,7 @@ function bouwGraaf() {
     const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'KERNHERKOMST.json'), 'utf8'));
     herkomstBron = reg.stempel || null; herkomstReg = reg;
     for (const r of reg.perNaam) if (r.herkomsten.length === 1) herkomst.set(r.naam, r.herkomsten[0].bestand);
-  } catch (e) { /* geen herkomst: de bovengrens valt terug op requires, en dat staat in de uitslag */ }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* geen herkomst: de bovengrens valt terug op requires, en dat staat in de uitslag */ }
 
   /* DE HUBGRENS. Veertig requires is geen gevoel maar de knik in de verdeling:
      de mediaan staat op nul (de meeste routebestanden krijgen alles via de tas)
@@ -461,7 +461,7 @@ function meet() {
   try {
     kaart = JSON.parse(fs.readFileSync(path.join(WORTEL, 'EXECUTION_MAP.json'), 'utf8'));
     for (const c of kaart.capabilities) kaartRij.set(c.pad, c);
-  } catch (e) { /* dan staan die assen als ongemeten in de uitslag */ }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* dan staan die assen als ongemeten in de uitslag */ }
 
   const soft = Object.entries(ASSEN).filter(([, a]) => !a.uitRouter);
   const perAs = {};

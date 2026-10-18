@@ -2,7 +2,7 @@
    surfaces van dit fundament; modules bezitten nooit de platformlaag. */
 (function (w, d) {
   'use strict';
-  var SDK = w.RTGModuleSDK, nummer = 0;
+  var SDK = w.RTGModuleSDK, nummer = 0, rechtenGedeeld = null;
   if (!SDK || !w.RTGWorkspaceRegistries || !w.RTGIdentityRuntime || !w.RTGSessionRuntime || !w.RTGWorkspaceContext ||
       !w.RTGWorkspaceNavigation || !w.RTGWorkspaceState || !w.RTGWorkspacePolicy ||
       !w.RTGWorkspaceOrchestrator || !w.RTGWorkspaceBroker || !w.RTGWorkspaceModuleHost || !w.RTGWorkspaceBlueprints) return;
@@ -16,13 +16,13 @@
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });
     var contextEngine = w.RTGWorkspaceContext();
     var navigation = w.RTGWorkspaceNavigation({ open: o.open });
-    /* Zonder eigen antwoordfunctie vraagt de runtime de SERVER welke permissies
-       gelden (kern/workspace-rechten.js). Tot dat antwoord er is, is alles dicht;
-       daarna tekent de aanroeper opnieuw via `onRechten`. */
+    /* Zonder eigen antwoordfunctie vraagt de runtime de SERVER (kern/workspace-rechten.js);
+       twee runtimes delen EEN vraag (SCHILHERSTART.json). */
     var rechten = null, serverRecht = function (p) { return !!rechten && rechten[p] === true; };
     var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission || serverRecht, tenantPolicy: o.tenantPolicy });
     if (!o.permission && identity.authenticated()) Promise.resolve().then(function () {
-      return aanvraag('/api/ik/workspace/rechten', {});
+      if (typeof o.request === 'function') return aanvraag('/api/ik/workspace/rechten', {});
+      return rechtenGedeeld || (rechtenGedeeld = aanvraag('/api/ik/workspace/rechten', {}).catch(function (e) { rechtenGedeeld = null; throw e; }));
     }).then(function (j) { rechten = j && j.bron === 'server' && j.rechten ? j.rechten : {}; if (!dood && o.onRechten) o.onRechten(); })
       .catch(function (e) { rechten = {}; fout('rechten', e); });
     var state = w.RTGWorkspaceState({ workspaceId: o.workspaceId, global: o.globalState, user: o.userState,

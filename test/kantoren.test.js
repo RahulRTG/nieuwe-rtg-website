@@ -40,36 +40,36 @@ test.after(() => {
 test('zesentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
   const dicht = await fetch(base + '/api/office/kamers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401);
-  const d = await api('kamers');
+  const d = await api('/api/office/kamers');
   assert.equal(d.status, 200);
   assert.equal(d.body.kamers.length, 26, 'zesentwintig afdelingen');
   for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect', 'regering', 'opvang', 'integraties', 'controleregister', 'reisbureau']) {
     assert.ok(d.body.kamers.some(k => k.id === id), id + ' heeft een kamer');
   }
-  const hr = await api('kamer', { id: 'hr' });
+  const hr = await api('/api/office/kamer', { id: 'hr' });
   assert.equal(hr.status, 200);
   assert.ok(hr.body.kpis.length >= 3, 'de kamer toont cijfers');
-  assert.equal((await api('kamer', { id: 'kelder' })).status, 404);
+  assert.equal((await api('/api/office/kamer', { id: 'kelder' })).status, 404);
 });
 
 test('Integratiekamer: lokale ketenproef, eigenaarsbesluit en noodstop werken echt', async () => {
-  const begin = await api('techniek/integraties');
+  const begin = await api('/api/office/techniek/integraties');
   assert.equal(begin.status, 200);
   assert.equal(begin.body.liveActivering, 'geblokkeerd', 'live heeft bewust geen schakelroute');
   assert.equal(begin.body.tegels.length, 4);
   assert.deepEqual(begin.body.tegels.map(x => x.id), ['smtp', 'sms', 'connect', 'sepa']);
   assert.ok(begin.body.tegels.every(x => x.geconfigureerd && x.aan && !x.live), 'alleen lokale sandboxes staan aan');
 
-  const keten = await api('techniek/integraties/test', { id: 'keten' });
+  const keten = await api('/api/office/techniek/integraties/test', { id: 'keten' });
   assert.equal(keten.status, 200);
   assert.equal(keten.body.proef.stappen.length, 4);
   assert.ok(keten.body.proef.stappen.every(x => x.ok));
   assert.match(keten.body.proef.stappen.find(x => x.id === 'connect').detail, /niets als omzet geboekt/i);
 
-  const eigen = await api('techniek/integraties/verantwoordelijke', { id: 'sms', naam: 'Noor · Techniek' });
+  const eigen = await api('/api/office/techniek/integraties/verantwoordelijke', { id: 'sms', naam: 'Noor · Techniek' });
   assert.equal(eigen.body.tegels.find(x => x.id === 'sms').verantwoordelijke, 'Noor · Techniek');
 
-  const verzoek = await api('techniek/integraties/schakel', { id: 'sms', aan: false });
+  const verzoek = await api('/api/office/techniek/integraties/schakel', { id: 'sms', aan: false });
   assert.equal(verzoek.status, 200);
   assert.equal(verzoek.body.tegels.find(x => x.id === 'sms').aan, true, 'verzoek schakelt nog niets');
   const verzoekId = verzoek.body.verzoek.id;
@@ -84,18 +84,18 @@ test('Integratiekamer: lokale ketenproef, eigenaarsbesluit en noodstop werken ec
   });
   assert.equal(geenBaas.status, 403, 'gedeelde kantoorcode mag geen besluit nemen');
 
-  const besluit = await api('techniek/integraties/besluit', { verzoekId, akkoord: true });
+  const besluit = await api('/api/office/techniek/integraties/besluit', { verzoekId, akkoord: true });
   assert.equal(besluit.status, 200);
   assert.equal(besluit.body.tegels.find(x => x.id === 'sms').aan, false, 'runtime-zekering staat echt uit');
 
-  const nood = await api('techniek/integraties/noodstop', { reden: 'contracttest' });
+  const nood = await api('/api/office/techniek/integraties/noodstop', { reden: 'contracttest' });
   assert.ok(nood.body.noodstop);
   assert.ok(nood.body.tegels.every(x => !x.aan), 'alle lokale rails zijn direct veilig uit');
   assert.ok(nood.body.log.some(x => x.soort === 'noodstop'), 'noodstop staat in het auditlog');
 });
 
 test('RTG Controleregister bewijst 100% en maakt geen spookwerk', async () => {
-  const matrix = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 12 });
+  const matrix = await api('/api/office/magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 12 });
   assert.equal(matrix.status, 200);
   assert.equal(matrix.body.dekking.percentage, 100);
   assert.equal(matrix.body.dekking.metGaten, 0);
@@ -106,7 +106,7 @@ test('RTG Controleregister bewijst 100% en maakt geen spookwerk', async () => {
   assert.equal(plan.body.aangemaakt, 0);
   assert.equal(plan.body.bekeken, 0);
   assert.deepEqual(plan.body.taken, []);
-  const terug = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 12 });
+  const terug = await api('/api/office/magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 12 });
   assert.equal(terug.body.taken.filter(t => t.autoDekking).length, 0);
   assert.match(plan.body.waarschuwing, /trainingsomgeving/i);
 });
@@ -124,7 +124,7 @@ test('de gatenplanner kijkt naar dezelfde gaten als het register en legt er nooi
   });
   assert.equal(dicht.status, 401, 'de gatenplanner zit achter de kantoorpoort');
 
-  const register = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
+  const register = await api('/api/office/magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
   assert.equal(register.status, 200);
 
   const plan = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 5 });
@@ -144,7 +144,7 @@ test('de gatenplanner kijkt naar dezelfde gaten als het register en legt er nooi
     assert.ok(taak.kantoor && taak.kantoor.id, 'elk gat krijgt een kantoor dat het oppakt');
   }
 
-  const staat = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
+  const staat = await api('/api/office/magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
   const open = staat.body.taken.find(t => t.autoDekking && t.status !== 'klaar');
   if (!open) {
     // geen enkel werkprocesgat: dan hoort de planner ook niets te verzinnen
@@ -153,7 +153,7 @@ test('de gatenplanner kijkt naar dezelfde gaten als het register en legt er nooi
     return;
   }
 
-  const af = await api('magnaat/controle/taak/zet',
+  const af = await api('/api/office/magnaat/controle/taak/zet',
     { taakId: open.id, status: 'klaar', bewijs: 'contracttest gatenplanner' });
   assert.equal(af.status, 200);
   assert.equal(af.body.taak.status, 'klaar', 'de dekkingstaak is afgerond en laat het gat weer vrij');
@@ -170,19 +170,19 @@ test('de gatenplanner kijkt naar dezelfde gaten als het register en legt er nooi
 });
 
 test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
-  const m = await api('kamer/taak', { id: 'sales', tekst: 'Beachclub Sol nabellen over de Zaakdoos' });
+  const m = await api('/api/office/kamer/taak', { id: 'sales', tekst: 'Beachclub Sol nabellen over de Zaakdoos' });
   assert.equal(m.status, 200);
-  const k = await api('kamer', { id: 'sales' });
+  const k = await api('/api/office/kamer', { id: 'sales' });
   const taak = k.body.taken[0];
   assert.match(taak.tekst, /Beachclub Sol/);
-  assert.ok((await api('kamer/taak-zet', { id: 'sales', taakId: taak.id, af: true })).body.ok);
-  const grid = await api('kamers');
+  assert.ok((await api('/api/office/kamer/taak-zet', { id: 'sales', taakId: taak.id, af: true })).body.ok);
+  const grid = await api('/api/office/kamers');
   const sales = grid.body.kamers.find(x => x.id === 'sales');
   assert.equal(sales.takenOpen, 0, 'afgevinkt telt niet meer als open');
 });
 
 test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan', async () => {
-  const b = await api('boardroom');
+  const b = await api('/api/office/boardroom');
   assert.equal(b.status, 200);
   assert.equal(b.body.kamers.length, 26, 'alle kamers in beeld');
   assert.ok(b.body.functies.length >= 5, 'het volledige schakelbord staat erop');
@@ -190,48 +190,48 @@ test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan
   // pak een echte functie van het bord en zet hem uit
   const alle = b.body.functies.flatMap(g => g.functies);
   const spelenFx = alle.find(f => /spel/i.test(f.naam + f.id)) || alle[0];
-  const uit = await api('boardroom/schakel', { functie: spelenFx.id, aan: false });
+  const uit = await api('/api/office/boardroom/schakel', { functie: spelenFx.id, aan: false });
   assert.equal(uit.status, 200);
-  const na = await api('boardroom');
+  const na = await api('/api/office/boardroom');
   assert.ok(na.body.functiesUit >= 1, 'het bord telt de uitgezette functie');
   // weer aan, en per doelgroep uit werkt ook
-  assert.ok((await api('boardroom/schakel', { functie: spelenFx.id, aan: true })).body.ok);
+  assert.ok((await api('/api/office/boardroom/schakel', { functie: spelenFx.id, aan: true })).body.ok);
   if (spelenFx.doelgroepen.length) {
     const dg = spelenFx.doelgroepen[0].id;
-    assert.ok((await api('boardroom/schakel', { functie: spelenFx.id, doelgroep: dg, aan: false })).body.ok);
-    const check = (await api('boardroom')).body.functies.flatMap(g => g.functies).find(f => f.id === spelenFx.id);
+    assert.ok((await api('/api/office/boardroom/schakel', { functie: spelenFx.id, doelgroep: dg, aan: false })).body.ok);
+    const check = (await api('/api/office/boardroom')).body.functies.flatMap(g => g.functies).find(f => f.id === spelenFx.id);
     assert.equal(check.doelgroepen.find(x => x.id === dg).aan, false, 'de doelgroep staat gericht uit');
-    assert.ok((await api('boardroom/schakel', { functie: spelenFx.id, doelgroep: dg, aan: true })).body.ok);
+    assert.ok((await api('/api/office/boardroom/schakel', { functie: spelenFx.id, doelgroep: dg, aan: true })).body.ok);
   }
-  assert.equal((await api('boardroom/schakel', { functie: 'bestaat-niet', aan: false })).status, 404);
+  assert.equal((await api('/api/office/boardroom/schakel', { functie: 'bestaat-niet', aan: false })).status, 404);
 });
 
 test('de paniekkamer: een knop wordt een voorstel; de boardroom discussieert en besluit', async () => {
-  const alle = (await api('boardroom')).body.functies.flatMap(g => g.functies);
+  const alle = (await api('/api/office/boardroom')).body.functies.flatMap(g => g.functies);
   const fx = alle[1] || alle[0];
   // het voorstel: uit, met reden; dubbel voorstellen wordt tegengehouden
-  const v = await api('paniek/stel', { functie: fx.id, aan: false, reden: 'Verdachte piek in het verkeer' });
+  const v = await api('/api/office/paniek/stel', { functie: fx.id, aan: false, reden: 'Verdachte piek in het verkeer' });
   assert.equal(v.status, 200);
-  assert.equal((await api('paniek/stel', { functie: fx.id, aan: false })).status, 409, 'geen dubbel voorstel voor dezelfde knop');
+  assert.equal((await api('/api/office/paniek/stel', { functie: fx.id, aan: false })).status, 409, 'geen dubbel voorstel voor dezelfde knop');
   // cruciaal: de knop is NIET omgezet; het is een voorstel
-  let check = (await api('boardroom')).body;
+  let check = (await api('/api/office/boardroom')).body;
   assert.equal(check.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, true, 'nog niets geschakeld');
   assert.ok(check.paniek.some(p => p.id === v.body.voorstel.id), 'de boardroom ziet het voorstel');
   // discussie over en weer
-  await api('paniek/bericht', { id: v.body.voorstel.id, wie: 'boardroom', tekst: 'Welke piek precies?' });
-  await api('paniek/bericht', { id: v.body.voorstel.id, wie: 'paniekkamer', tekst: 'Honderden mislukte inlogs per minuut.' });
+  await api('/api/office/paniek/bericht', { id: v.body.voorstel.id, wie: 'boardroom', tekst: 'Welke piek precies?' });
+  await api('/api/office/paniek/bericht', { id: v.body.voorstel.id, wie: 'paniekkamer', tekst: 'Honderden mislukte inlogs per minuut.' });
   const p = (await api('/api/office/paniek')).body.voorstellen.find(x => x.id === v.body.voorstel.id);
   assert.equal(p.discussie.length, 2);
   // de boardroom accepteert: nu pas schakelt hij echt
-  assert.ok((await api('paniek/besluit', { id: v.body.voorstel.id, besluit: 'accepteer' })).body.ok);
-  check = (await api('boardroom')).body;
+  assert.ok((await api('/api/office/paniek/besluit', { id: v.body.voorstel.id, besluit: 'accepteer' })).body.ok);
+  check = (await api('/api/office/boardroom')).body;
   assert.equal(check.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, false, 'na acceptatie staat de knop echt om');
   assert.ok(!check.paniek.some(x => x.id === v.body.voorstel.id), 'het voorstel is afgehandeld');
   // terug aan via een tweede voorstel dat wordt afgewezen: er verandert niets
-  const v2 = await api('paniek/stel', { functie: fx.id, aan: true });
-  assert.ok((await api('paniek/besluit', { id: v2.body.voorstel.id, besluit: 'wijs-af' })).body.ok);
-  assert.equal((await api('boardroom')).body.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, false, 'afgewezen is niet geschakeld');
-  await api('boardroom/schakel', { functie: fx.id, aan: true }); // netjes terug
+  const v2 = await api('/api/office/paniek/stel', { functie: fx.id, aan: true });
+  assert.ok((await api('/api/office/paniek/besluit', { id: v2.body.voorstel.id, besluit: 'wijs-af' })).body.ok);
+  assert.equal((await api('/api/office/boardroom')).body.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, false, 'afgewezen is niet geschakeld');
+  await api('/api/office/boardroom/schakel', { functie: fx.id, aan: true }); // netjes terug
 });
 
 test('platform-statistieken, interne chat met snap en onboarding per kamer', async () => {
@@ -242,11 +242,11 @@ test('platform-statistieken, interne chat met snap en onboarding per kamer', asy
   for (const g of ['Mensen', 'Beweging', 'Geld', 'De code zelf']) assert.ok(groepen.includes(g), g);
   // chat: bericht + snap in de sales-kamer; boardroom en paniekkamer hebben eigen kanalen
   const SNAP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
-  assert.equal((await api('kachat/stuur', { kamer: 'sales', naam: 'Stagiair Bo', tekst: 'Hallo team!', foto: SNAP })).status, 200);
-  assert.equal((await api('kachat/stuur', { kamer: 'boardroom', naam: 'Voorzitter', tekst: 'Welkom allemaal.' })).status, 200);
-  assert.equal((await api('kachat/stuur', { kamer: 'kelder', tekst: 'x' })).status, 404);
-  assert.equal((await api('kachat/stuur', { kamer: 'sales' })).status, 400, 'leeg bericht geweigerd');
-  const c = await api('kachat', { kamer: 'sales' });
+  assert.equal((await api('/api/office/kachat/stuur', { kamer: 'sales', naam: 'Stagiair Bo', tekst: 'Hallo team!', foto: SNAP })).status, 200);
+  assert.equal((await api('/api/office/kachat/stuur', { kamer: 'boardroom', naam: 'Voorzitter', tekst: 'Welkom allemaal.' })).status, 200);
+  assert.equal((await api('/api/office/kachat/stuur', { kamer: 'kelder', tekst: 'x' })).status, 404);
+  assert.equal((await api('/api/office/kachat/stuur', { kamer: 'sales' })).status, 400, 'leeg bericht geweigerd');
+  const c = await api('/api/office/kachat', { kamer: 'sales' });
   const laatste = c.body.berichten[c.body.berichten.length - 1];
   assert.equal(laatste.naam, 'Stagiair Bo');
   assert.ok(laatste.foto && laatste.foto.startsWith('data:image/'), 'de snap kwam mee');
@@ -256,24 +256,24 @@ test('platform-statistieken, interne chat met snap en onboarding per kamer', asy
   assert.match(o.body.onboarding.welkom, /gehoord, gesteund/);
   assert.ok(o.body.onboarding.regels.some(r => /vertrouwenspersoon/i.test(r)), 'de vertrouwenspersoon staat erin');
   assert.ok(o.body.onboarding.knoppen.length >= 2 && o.body.onboarding.handelingen.length >= 1);
-  const hr = await api('onboarding', { kamer: 'hr' });
+  const hr = await api('/api/office/onboarding', { kamer: 'hr' });
   assert.notDeepEqual(hr.body.onboarding.knoppen, o.body.onboarding.knoppen, 'elke afdeling zijn eigen knoppen');
 });
 
 test('aanmelden voor de dienst: kantoor of thuis, en iedereen ziet wie er werkt', async () => {
-  const d = await api('dienst/in', { naam: 'Stagiair Bo', kamer: 'sales', waar: 'thuis' });
+  const d = await api('/api/office/dienst/in', { naam: 'Stagiair Bo', kamer: 'sales', waar: 'thuis' });
   assert.equal(d.status, 200);
   assert.equal(d.body.dienst.waar, 'thuis');
-  assert.equal((await api('dienst/in', { naam: 'Stagiair Bo', kamer: 'sales' })).status, 409, 'niet dubbel aanmelden');
-  assert.equal((await api('dienst/in', { naam: 'X', kamer: 'kelder' })).status, 404);
+  assert.equal((await api('/api/office/dienst/in', { naam: 'Stagiair Bo', kamer: 'sales' })).status, 409, 'niet dubbel aanmelden');
+  assert.equal((await api('/api/office/dienst/in', { naam: 'X', kamer: 'kelder' })).status, 404);
   const nu = await api('/api/office/dienst');
   assert.ok(nu.body.aangemeld.some(x => x.naam === 'Stagiair Bo' && x.waar === 'thuis'));
-  assert.ok((await api('dienst/uit', { id: d.body.dienst.id })).body.ok);
-  assert.ok(!(await api('dienst')).body.aangemeld.some(x => x.naam === 'Stagiair Bo'), 'afgemeld is weg uit de lijst');
+  assert.ok((await api('/api/office/dienst/uit', { id: d.body.dienst.id })).body.ok);
+  assert.ok(!(await api('/api/office/dienst')).body.aangemeld.some(x => x.naam === 'Stagiair Bo'), 'afgemeld is weg uit de lijst');
 });
 
 test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
-  const v = await api('boardroom/verbeter');
+  const v = await api('/api/office/boardroom/verbeter');
   assert.equal(v.status, 200);
   assert.ok(v.body.verbeterkamer.voorstellen.length >= 1);
   assert.ok(v.body.verbeterkamer.voorstellen.every(p => p.kamer && p.tekst), 'elk voorstel wijst een kamer aan');
@@ -282,7 +282,7 @@ test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
 test('Techniek-controlekamer: de motorkap-momentopname (grootboek, motor, De Wacht)', async () => {
   const dicht = await fetch(base + '/api/office/techniek', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401, 'zonder inlog blijft de controlekamer dicht');
-  const t = await api('techniek');
+  const t = await api('/api/office/techniek');
   assert.equal(t.status, 200);
   assert.ok(t.body.grootboek && t.body.grootboek.pay, 'het pay-grootboek zit in het bord');
   assert.equal(t.body.grootboek.pay.klopt, true, 'RTG Pay sluit op de cent');
@@ -295,18 +295,18 @@ test('Techniek-controlekamer: de motorkap-momentopname (grootboek, motor, De Wac
 test('Rahul denkt mee in een kamer: adviserend, uit de echte cijfers (zonder AI-sleutel)', async () => {
   const dicht = await fetch(base + '/api/office/kamer/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'hr' }) });
   assert.equal(dicht.status, 401, 'zonder inlog blijft de kamer-AI dicht');
-  const r = await api('kamer/ai', { id: 'hr', q: 'Waar liggen de risico\'s?' });
+  const r = await api('/api/office/kamer/ai', { id: 'hr', q: 'Waar liggen de risico\'s?' });
   assert.equal(r.status, 200);
   assert.match(r.body.kamer, /HR|Human|Mensen|Personeel/i);
   assert.ok(typeof r.body.antwoord === 'string' && r.body.antwoord.length > 0, 'er komt een advies terug');
   assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de cijfers zitten erbij');
-  assert.equal((await api('kamer/ai', { id: 'kelder' })).status, 404, 'een niet-bestaande kamer geeft 404');
+  assert.equal((await api('/api/office/kamer/ai', { id: 'kelder' })).status, 404, 'een niet-bestaande kamer geeft 404');
 });
 
 test('Rahul kijkt over het hele huis: overkoepelend boardroom-advies (zonder AI-sleutel)', async () => {
   const dicht = await fetch(base + '/api/office/boardroom/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401, 'zonder inlog blijft de boardroom-AI dicht');
-  const r = await api('boardroom/ai', { q: 'Welke kamer voelt de meeste druk?' });
+  const r = await api('/api/office/boardroom/ai', { q: 'Welke kamer voelt de meeste druk?' });
   assert.equal(r.status, 200);
   assert.ok(typeof r.body.antwoord === 'string' && r.body.antwoord.length > 0, 'er komt een overkoepelend advies terug');
   assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de dagronde zitten erbij');

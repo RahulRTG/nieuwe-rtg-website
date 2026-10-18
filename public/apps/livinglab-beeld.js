@@ -36,9 +36,9 @@
   function tekenLijst(STUDIES, FILTER) {
     var lijst = STUDIES.filter(function (s) { return !FILTER || s.soort === FILTER; });
     $('#lijst').innerHTML = lijst.length ? lijst.map(function (s) {
-      return '<div class="kaart" style="margin-bottom:0.75rem;" data-s="' + esc(s.id) + '">' +
-        '<div class="rij" style="justify-content:space-between;align-items:start;">' +
-          '<h2 style="font-size:1.05rem;">' + esc(s.titel) + '</h2>' +
+      return '<div class="kaart s-j0vkha" data-s="' + esc(s.id) + '">' +
+        '<div class="rij s-l5bsco">' +
+          '<h2 class="s-hdxayl">' + esc(s.titel) + '</h2>' +
           '<span class="pil' + (s.gescheiden ? ' let' : '') + '">' + esc(s.klasse) + '</span></div>' +
         '<div class="leeg">' + esc(soortNaam(s.soort)) +
           (s.vraagstuk ? ' &middot; ' + esc(s.vraagstuk) : ' &middot; besloten onderzoek') + '</div>' +
@@ -63,7 +63,7 @@
         '<b>' + esc(t.vraag) + '</b><br>' + t.stemmen + ' stem' + (t.stemmen === 1 ? '' : 'men') +
         ' &middot; van ' + esc(t.door) +
         (t.studieId ? ' &middot; <span class="pil ok">wordt onderzocht</span>'
-          : ' &middot; <button class="knop stil" data-naar type="button" style="font-size:.72rem;padding:.2rem .55rem;">Maak er onderzoek van</button>') +
+          : ' &middot; <button class="knop stil s-1q9bgge" data-naar type="button">Maak er onderzoek van</button>') +
         '</div>';
     }).join('') : '<div class="leeg">Nog geen vragen uit de buurt. Bewoners dragen ze aan via de labpas-app.</div>';
     Array.prototype.forEach.call(document.querySelectorAll('[data-naar]'), function (b) {

@@ -36,7 +36,7 @@ const { start: wegwerp } = require('./lib/wegwerpserver');
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
    er niets over zeggen. Zeven registers misten hem; zie de kop van
    scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'DUURZAAMHEIDSKOSTEN.json');
@@ -183,7 +183,7 @@ if (require.main !== module) return;
   const blind = o.blind;
   if (blind) console.log('\n  DE METER IS BLIND: ' + o.reden);
 
-  fs.writeFileSync(UITSLAG, JSON.stringify({
+  if (magSchrijven(eisSchoneBoom('duurzaamheidskosten'), UITSLAG)) fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Gepaarde meting van de duurzame commit: dezelfde machine, dezelfde opslag, dezelfde ' +
       'belasting, alleen RTG_DUURZAAM ertussen. De controlegroep is een schrijfroute die NIET ' +

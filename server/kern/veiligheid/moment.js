@@ -13,7 +13,7 @@
    zomertijdgrens of een verlopen mandaat -- en dan is de tijdmachine precies
    zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
 const klok = require('../../lib/klok');
-module.exports = ({ opslag, save, crypto, schoon, sociaal, plek }) => {
+module.exports = ({ opslag, save, crypto, schoon, sociaal, plek, sleutelVan }) => {
   const MAX_DUUR_MIN = 48 * 60;
   const STATUSSEN = new Set(['gepland', 'onderweg', 'vertraagd', 'bijna-aangekomen', 'aangekomen', 'geannuleerd']);
   const NIVEAUS = new Set(['plan', 'voortgang', 'locatie']);
@@ -40,7 +40,10 @@ module.exports = ({ opslag, save, crypto, schoon, sociaal, plek }) => {
     const uit=[];
     for (const x of Array.isArray(invoer)?invoer:[]) {
       const soort=x && x.soort === 'bedrijf'?'bedrijf':'contact';
-      const id=schoon(x && (x.id || x.handle || x.code),40).trim();
+      const ruw=schoon(x && (x.id || x.handle || x.code),40).trim();
+      /* Een contact mag het lid bij codenaam noemen, zoals het formulier vraagt;
+         alleen onder de eigen connecties (zie sleutelVan in ./kring.js). */
+      const id=soort==='contact'&&sleutelVan?sleutelVan(handle,ruw):ruw;
       if (!id || uit.some(r=>r.soort===soort&&r.id===id)) continue;
       let niveau=NIVEAUS.has(x.niveau)?x.niveau:'voortgang';
       if (soort==='contact') {
@@ -58,7 +61,14 @@ module.exports = ({ opslag, save, crypto, schoon, sociaal, plek }) => {
     const ontvangers=schoonOntvangers(handle,body.ontvangers);
     if (!ontvangers.length) return {status:400,error:'Kies minstens één verbonden persoon of betrokken bedrijf.'};
     const minuten=Math.max(5,Math.min(MAX_DUUR_MIN,Math.round(Number(body.minuten)||180)));
-    const m={id:crypto.randomBytes(6).toString('hex'),handle,titel:schoon(body.titel,80)||'Onderweg',doel:schoon(body.doel,100)||null,
+    /* Een dubbeltik op "Moment starten" is een Moment, niet twee (voltooiproef,
+       18 oktober 2026): de ontvanger zag er twee. In de kern en niet in de
+       idem-poort, net als bij het alarm: een teruggespeeld antwoord zou een
+       Moment melden dat intussen gestopt kan zijn. */
+    const titel=schoon(body.titel,80)||'Onderweg', doel=schoon(body.doel,100)||null, wie=JSON.stringify(ontvangers);
+    const zelfde=lijst().find(m=>m.handle===handle&&actief(m)&&m.titel===titel&&m.doel===doel&&JSON.stringify(m.ontvangers)===wie&&klok.nu()-Date.parse(m.van)<5000);
+    if (zelfde) return {status:200,ok:true,moment:eigenBeeld(zelfde),herhaald:true};
+    const m={id:crypto.randomBytes(6).toString('hex'),handle,titel,doel,
       status:'gepland',eta:body.eta?schoon(body.eta,35):null,van:nu(),tot:klok.nu()+minuten*60000,ontvangers,gepauzeerd:false,
       ritRef:schoon(body.ritRef,30)||null,bijgewerkt:nu(),log:[{at:nu(),soort:'gemaakt'}]};
     lijst().push(m);save();return {status:200,ok:true,moment:eigenBeeld(m)};

@@ -12,7 +12,7 @@ const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lab-'));
-const api = (pad, body, tok) => fetch(base + '/api/lab/' + pad, {
+const api = (pad, body, tok) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/lab/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || token) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -30,11 +30,11 @@ let project;
 test('negen velden, en een project start altijd als idee', async () => {
   const dicht = await fetch(base + '/api/lab/overzicht', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401, 'zonder inlog blijft het lab dicht');
-  const o = await api('overzicht');
+  const o = await api('/api/lab/overzicht');
   assert.equal(o.status, 200);
   assert.equal(o.body.velden.length, 9, 'negen onderzoeksvelden');
   for (const v of ['hardware', 'software', 'dorp', 'meta', 'landbouw']) assert.ok(o.body.velden.some(x => x.veld === v), v + ' is een veld');
-  const p = await api('project/maak', { titel: 'Zonne-waterpomp voor een dorp', veld: 'dorp', voorWie: 'samen', doel: 'Schoon water zonder dieselpomp', budget: 25000 });
+  const p = await api('/api/lab/project/maak', { titel: 'Zonne-waterpomp voor een dorp', veld: 'dorp', voorWie: 'samen', doel: 'Schoon water zonder dieselpomp', budget: 25000 });
   assert.equal(p.status, 200);
   project = p.body.project;
   assert.equal(project.fase, 'idee');
@@ -42,45 +42,49 @@ test('negen velden, en een project start altijd als idee', async () => {
 });
 
 test('schadelijke richtingen weigert het lab hard', async () => {
-  const w = await api('project/maak', { titel: 'Slim wapensysteem', veld: 'hardware' });
+  const w = await api('/api/lab/project/maak', { titel: 'Slim wapensysteem', veld: 'hardware' });
   assert.equal(w.status, 400);
   assert.match(w.body.error, /nooit wapens/i);
 });
 
 test('de fase-keten slaat nooit een stap over, en de proef wacht op de menselijke toets', async () => {
-  assert.equal((await api('project/fase', { id: project.id, fase: 'prototype' })).status, 400, 'idee direct naar prototype mag niet');
-  assert.equal((await api('project/fase', { id: project.id, fase: 'onderzoek' })).status, 200);
-  assert.equal((await api('project/fase', { id: project.id, fase: 'prototype' })).status, 200);
-  const geblokt = await api('project/fase', { id: project.id, fase: 'proef' });
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'prototype' })).status, 400, 'idee direct naar prototype mag niet');
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'onderzoek' })).status, 200);
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'prototype' })).status, 200);
+  const geblokt = await api('/api/lab/project/fase', { id: project.id, fase: 'proef' });
   assert.equal(geblokt.status, 409, 'zonder akkoord geen proef');
   assert.match(geblokt.body.error, /veiligheids/i);
   /* DE TOETS DRAAGT ALTIJD EEN MENS, en die komt uit de SESSIE (11 oktober
      2026): de gedeelde kantoorcode heeft er geen, met of zonder getypte naam,
      en wordt geweigerd met de weg erheen. */
-  const naamloos = await api('project/veiligheid', { id: project.id, status: 'akkoord' });
+  const naamloos = await api('/api/lab/project/veiligheid', { id: project.id, status: 'akkoord' });
   assert.equal(naamloos.status, 403, 'zonder mens op naam geen toets');
   assert.equal(naamloos.body.watNu, 'inloggen-op-naam');
-  const getypt = await api('project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima' });
+  const getypt = await api('/api/lab/project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima' });
   assert.equal(getypt.status, 403, 'een getypte naam is geen mens op naam');
-  assert.equal((await api('project/fase', { id: project.id, fase: 'proef' })).status, 409, 'en de proef blijft dicht');
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'proef' })).status, 409, 'en de proef blijft dicht');
   const opNaam = await kantoorAlsPersoon(base);
   assert.ok(opNaam, 'een kantoormens op naam');
-  const akkoord = await api('project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima', notitie: 'Waterkwaliteit dubbel getest' }, opNaam);
+  const akkoord = await api('/api/lab/project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima', notitie: 'Waterkwaliteit dubbel getest' }, opNaam);
   assert.equal(akkoord.status, 200, JSON.stringify(akkoord.body));
   assert.ok(akkoord.body.project.veiligheid.door && akkoord.body.project.veiligheid.door !== 'Ir. Fatima',
     'de beslisser komt uit de sessie, niet uit het lijf');
-  assert.equal((await api('project/fase', { id: project.id, fase: 'proef' })).status, 200, 'na het akkoord opent de poort');
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'proef' })).status, 200, 'na het akkoord opent de poort');
 });
 
 test('logboek, bevindingen en een kennisbank die nooit vergeet (ook het archief)', async () => {
-  assert.equal((await api('project/log', { id: project.id, tekst: 'Eerste pomp draait op het testveld.' })).status, 200);
-  assert.equal((await api('project/bevinding', { id: project.id, titel: 'Zonnepaneel op 30 graden wint 18%', tekst: 'Gemeten over twee weken proef.' })).status, 200);
-  assert.equal((await api('project/fase', { id: project.id, fase: 'uitrol' })).status, 200);
-  assert.equal((await api('project/fase', { id: project.id, fase: 'archief' })).status, 200);
-  const kb = await api('kennisbank');
+  assert.equal((await api('/api/lab/project/log', { id: project.id, tekst: 'Eerste pomp draait op het testveld.' })).status, 200);
+  assert.equal((await api('/api/lab/project/bevinding', { id: project.id, titel: 'Zonnepaneel op 30 graden wint 18%', tekst: 'Gemeten over twee weken proef.' })).status, 200);
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'uitrol' })).status, 200);
+  assert.equal((await api('/api/lab/project/fase', { id: project.id, fase: 'archief' })).status, 200);
+  const kb = await api('/api/lab/kennisbank');
   assert.equal(kb.status, 200);
   assert.ok(kb.body.bevindingen.some(b => b.titel.includes('30 graden')), 'de bevinding blijft, ook na het archief');
-  const ai = await api('ai', { q: 'Hoe zet ik een eerlijke nulmeting op?' });
+  const dichtAi = await fetch(base + '/api/lab/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: 'x' }) });
+  assert.equal(dichtAi.status, 401, 'zonder inlog geen onderzoekscoach');
+  const ai = await api('/api/lab/ai', { q: 'Hoe zet ik een eerlijke nulmeting op?' });
   assert.equal(ai.status, 200);
   assert.ok(ai.body.antwoord.length > 20, 'de onderzoekscoach antwoordt (demo of echt)');
+  assert.equal(ai.body.ok, true);
+  if (ai.body.demo) assert.match(ai.body.antwoord, /De veiligheidstoets beslist een mens/, 'zonder model zegt de demo zelf dat een mens over de veiligheidstoets beslist');
 });

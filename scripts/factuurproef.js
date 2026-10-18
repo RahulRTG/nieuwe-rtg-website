@@ -553,7 +553,7 @@ function terugweg(uit) {
     const rijen = (h && h.per) || [];
     kandidaten = (Array.isArray(rijen) ? rijen : Object.values(rijen))
       .filter(r => r && String(r.route || r.heen || '').includes('/api/pay/saldo')).length;
-  } catch (e) { kandidaten = null; }
+  } catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; kandidaten = null; }
   try {
     primitive = /huisUit/.test(fs.readFileSync(path.join(W.WORTEL, 'server/kern/pay/huis.js'), 'utf8'));
   } catch (e) { primitive = null; }
@@ -572,7 +572,7 @@ function terugweg(uit) {
   try {
     const b = require('../HERSTELBESLUIT.json');
     besluit = (b.routes && (b.routes['POST ' + ROUTE_PAD] || b.routes[ROUTE_PAD])) || null;
-  } catch (e) { besluit = null; }
+  } catch (e) { if (!e || (e.code !== 'ENOENT' && e.code !== 'MODULE_NOT_FOUND')) throw e; besluit = null; }
   /* DE VERKLARING BLIJFT DE VERKLARING, DE METING BLIJFT DE METING.
 
      Deze stap stond tot 13 september hard op BLOCKED met de regel "ook een
@@ -702,7 +702,8 @@ function druk(u) {
    Het stempel komt uit ./lib/stempel.js en is niet zelfgemaakt -- inclusief
    `boomVuil`, want een ronde op een ongecommitte boom hoort niet bij die commit. */
 function schrijf(u) {
-  const { stempel } = require('./lib/stempel');
+  const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
+  if (!magSchrijven(eisSchoneBoom('factuurproef'), 'FACTUURPROEF.json')) return null;
   const register = Object.assign({
     soort: 'proef',
     uitleg: 'Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route ' +
@@ -721,7 +722,7 @@ function schrijf(u) {
 
 if (require.main === module) {
   meet().then(u => {
-    if (process.argv.includes('--vastleggen')) { schrijf(u); console.log('FACTUURPROEF.json geschreven.'); }
+    if (process.argv.includes('--vastleggen') && schrijf(u)) console.log('FACTUURPROEF.json geschreven.');
     if (process.argv.includes('--json')) { console.log(JSON.stringify(u, null, 1)); }
     else druk(u);
     process.exit(u.gezakt ? 1 : 0);

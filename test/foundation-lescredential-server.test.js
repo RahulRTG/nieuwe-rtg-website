@@ -21,52 +21,52 @@ test.before(async () => {
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 const post = async (pad, body) => {
-  const r = await fetch(BASE + '/api/foundation' + pad, { method: 'POST',
+  const r = await fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
   let data = null; try { data = await r.json(); } catch (e) {}
   return { status: r.status, data, cache: r.headers.get('cache-control') };
 };
-const lees = async (pad, token) => (await fetch(BASE + '/api/foundation' + pad,
+const lees = async (pad, token) => (await fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad),
   { headers: token ? { Authorization: 'Bearer ' + token } : {} })).status;
 
 test('maken, meedoen en een herhaling: de codes staan een keer in een antwoord', async () => {
-  const een = await post('/les/maak', { vak: 'Zelfde', naam: 'Juf', idem: 'k-1' });
+  const een = await post('/api/foundation/les/maak', { vak: 'Zelfde', naam: 'Juf', idem: 'k-1' });
   assert.equal(een.status, 200);
   assert.match(een.data.lescode, /^LES\.[0-9A-F]{32}$/);
   assert.equal(een.cache, 'no-store');
-  const twee = await post('/les/maak', { vak: 'Zelfde', naam: 'Juf', idem: 'k-1' });
+  const twee = await post('/api/foundation/les/maak', { vak: 'Zelfde', naam: 'Juf', idem: 'k-1' });
   assert.equal(twee.status, 409, 'dezelfde idem maakt geen tweede les');
   assert.equal(twee.data.lescode, undefined, 'en de generieke cache heronthult niets');
   assert.equal(twee.data.token, undefined);
-  const zonderIdem = await post('/les/maak', { vak: 'Zelfde', naam: 'Juf' });
+  const zonderIdem = await post('/api/foundation/les/maak', { vak: 'Zelfde', naam: 'Juf' });
   assert.notEqual(zonderIdem.data.lescode, een.data.lescode, 'een woordelijk gelijk verzoek krijgt nooit de bewaarde codes');
-  const mee = await post('/les/join', { lescode: een.data.lescode, naam: 'Sam' });
+  const mee = await post('/api/foundation/les/join', { lescode: een.data.lescode, naam: 'Sam' });
   assert.equal(mee.status, 200);
-  assert.equal((await post('/les/join', { lescode: een.data.lescode, naam: 'Sam' })).status, 409);
+  assert.equal((await post('/api/foundation/les/join', { lescode: een.data.lescode, naam: 'Sam' })).status, 409);
 });
 
 test('roteren, intrekken, een leerling eruit en de les sluiten -- elk op een echte route', async () => {
-  const d = (await post('/les/maak', { vak: 'Beheer', naam: 'Meester' })).data;
+  const d = (await post('/api/foundation/les/maak', { vak: 'Beheer', naam: 'Meester' })).data;
   const id = d.lesId;
-  const sam = (await post('/les/join', { lescode: d.lescode, naam: 'Sam' })).data;
-  const noor = (await post('/les/join', { lescode: d.lescode, naam: 'Noor' })).data;
+  const sam = (await post('/api/foundation/les/join', { lescode: d.lescode, naam: 'Sam' })).data;
+  const noor = (await post('/api/foundation/les/join', { lescode: d.lescode, naam: 'Noor' })).data;
 
   // een leerling mag niets beheren
-  assert.equal((await post('/les/code/roteer', { code: id, token: sam.token })).status, 403);
-  assert.equal((await post('/les/sluit', { code: id, token: sam.token })).status, 403);
+  assert.equal((await post('/api/foundation/les/code/roteer', { code: id, token: sam.token })).status, 403);
+  assert.equal((await post('/api/foundation/les/sluit', { code: id, token: sam.token })).status, 403);
 
-  const rot = await post('/les/code/roteer', { code: id, token: d.token });
+  const rot = await post('/api/foundation/les/code/roteer', { code: id, token: d.token });
   assert.equal(rot.status, 200);
   assert.match(rot.data.lescode, /^LES\.[0-9A-F]{32}$/);
-  assert.equal((await post('/les/join', { lescode: d.lescode, naam: 'Kim' })).status, 410, 'de oude lescode is vervangen');
-  assert.equal((await post('/les/join', { lescode: rot.data.lescode, naam: 'Kim' })).status, 200);
+  assert.equal((await post('/api/foundation/les/join', { lescode: d.lescode, naam: 'Kim' })).status, 410, 'de oude lescode is vervangen');
+  assert.equal((await post('/api/foundation/les/join', { lescode: rot.data.lescode, naam: 'Kim' })).status, 200);
 
-  const trek = await post('/les/code/intrekken', { code: id, token: d.token });
+  const trek = await post('/api/foundation/les/code/intrekken', { code: id, token: d.token });
   assert.equal(trek.status, 200);
   assert.ok(trek.data.toegang.ingetrokken_at);
   assert.equal(trek.data.toegang.code_hash, undefined, 'het antwoord toont geen hash');
-  assert.equal((await post('/les/join', { lescode: rot.data.lescode, naam: 'Lot' })).status, 410);
-  assert.equal((await post('/les/code/intrekken', { code: id, token: d.token })).status, 200, 'een tweede keer verandert niets');
+  assert.equal((await post('/api/foundation/les/join', { lescode: rot.data.lescode, naam: 'Lot' })).status, 410);
+  assert.equal((await post('/api/foundation/les/code/intrekken', { code: id, token: d.token })).status, 200, 'een tweede keer verandert niets');
 
   assert.equal(await lees('/schrift/' + id, sam.token), 200);
   /* Een OPEN live-stroom van Sam hoort bij de intrekking dicht te gaan; anders
@@ -79,7 +79,7 @@ test('roteren, intrekken, een leerling eruit en de les sluiten -- elk op een ech
   assert.equal(open.status, 200);
   const lezer = open.body.getReader();
   await lezer.read();
-  const eruit = await post('/les/leerling/intrekken', { code: id, token: d.token, studentId: sam.studentId });
+  const eruit = await post('/api/foundation/les/leerling/intrekken', { code: id, token: d.token, studentId: sam.studentId });
   const einde = await Promise.race([(async () => { for (;;) { const x = await lezer.read(); if (x.done) return 'dicht'; } })(),
     new Promise(r => setTimeout(() => r('nog open'), 3000))]);
   assert.equal(einde, 'dicht', 'de open stroom van Sam is gesloten');
@@ -88,20 +88,20 @@ test('roteren, intrekken, een leerling eruit en de les sluiten -- elk op een ech
   assert.equal(await lees('/schrift/' + id, noor.token), 200, 'Noor wel');
   assert.equal((await tik(sam.token)).status, 403, 'en krijgt geen stroomticket meer');
 
-  const dicht = await post('/les/sluit', { code: id, token: d.token });
+  const dicht = await post('/api/foundation/les/sluit', { code: id, token: d.token });
   assert.equal(dicht.status, 200);
   assert.equal(await lees('/les/' + id, d.token), 403, 'de leraarssleutel opent niets meer');
   assert.equal(await lees('/schrift/' + id, noor.token), 403);
-  assert.equal((await post('/les/sluit', { code: id, token: d.token })).status, 403, 'een gesloten les opent ook voor de leraar niets meer');
+  assert.equal((await post('/api/foundation/les/sluit', { code: id, token: d.token })).status, 403, 'een gesloten les opent ook voor de leraar niets meer');
 });
 
 test('het les-id is geen geloofsbrief, en de AI-bijles vraagt een geldige sleutel', async () => {
-  const d = (await post('/les/maak', { vak: 'Id', naam: 'Juf' })).data;
-  const k = (await post('/les/join', { lescode: d.lescode, naam: 'Kim' })).data;
+  const d = (await post('/api/foundation/les/maak', { vak: 'Id', naam: 'Juf' })).data;
+  const k = (await post('/api/foundation/les/join', { lescode: d.lescode, naam: 'Kim' })).data;
   for (const pad of ['/les/', '/bord/', '/schrift/', '/opgaven/']) assert.equal(await lees(pad + d.lesId), 403, pad);
-  assert.equal((await post('/ai', { code: d.lesId, messages: [{ role: 'user', content: 'hoi' }] })).status, 403);
-  const ai = await post('/ai', { code: d.lesId, token: k.token, messages: [{ role: 'user', content: 'breuken' }] });
+  assert.equal((await post('/api/foundation/ai', { code: d.lesId, messages: [{ role: 'user', content: 'hoi' }] })).status, 403);
+  const ai = await post('/api/foundation/ai', { code: d.lesId, token: k.token, messages: [{ role: 'user', content: 'breuken' }] });
   assert.equal(ai.status, 200);
-  const ander = (await post('/les/maak', { vak: 'Ander', naam: 'Juf' })).data;
+  const ander = (await post('/api/foundation/les/maak', { vak: 'Ander', naam: 'Juf' })).data;
   assert.equal(await lees('/bord/' + ander.lesId, k.token), 403, 'een sleutel van een andere les opent niets');
 });

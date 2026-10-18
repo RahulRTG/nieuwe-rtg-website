@@ -52,7 +52,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'TIKKEN.json');
@@ -421,7 +421,7 @@ if (require.main !== module) return;
     verlopenReden: verlopen,
     perScherm
   };
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('tikken'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
   console.log('TIKKEN.json: ' + bereikt.length + ' van ' + schermen.length + ' schermen binnen ' + GRENS + ' tikken, ' + buiten.length + ' erbuiten.');
   console.log('Verdeling: ' + Object.keys(verdeling).sort((a, b) => a - b).map((k) => k + ' tik: ' + verdeling[k]).join(', '));
   console.log('Per rol bereikt: ' + Object.entries(perRolTelling).map(([r, n]) => r + ' ' + n).join(', '));

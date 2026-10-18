@@ -57,7 +57,7 @@ test.after(() => {
 });
 
 test('1. inschrijven op codenaam: de zorgpas ligt direct in de wallet van het lid', async () => {
-  const inschrijf = await zp('/inschrijf', { codenaam: lidCode, pakket: 'plus', door: 'Ines Vos' }, segur);
+  const inschrijf = await zp('/api/supplier/zorgpolis/inschrijf', { codenaam: lidCode, pakket: 'plus', door: 'Ines Vos' }, segur);
   assert.equal(inschrijf.status, 200);
   assert.equal(inschrijf.body.maandpremie, 159);
   const pas = inschrijf.body.verzekerde.pas;
@@ -71,13 +71,13 @@ test('1. inschrijven op codenaam: de zorgpas ligt direct in de wallet van het li
   assert.match(item.geldigTot, /-12-31$/, 'geldig tot het einde van het jaar');
   assert.ok(item.titel.includes('plus'), 'de titel noemt het pakket');
   // dubbel inschrijven kan niet, en een onbekende codenaam ook niet
-  assert.equal((await zp('/inschrijf', { codenaam: lidCode, pakket: 'basis' }, segur)).status, 409, 'al actief verzekerd');
-  assert.equal((await zp('/inschrijf', { codenaam: 'ZILVEREN EENHOORN 999', pakket: 'basis' }, segur)).status, 404);
-  assert.equal((await zp('/inschrijf', { codenaam: lidCode, pakket: 'goud' }, segur)).status, 400, 'alleen basis/plus/top');
+  assert.equal((await zp('/api/supplier/zorgpolis/inschrijf', { codenaam: lidCode, pakket: 'basis' }, segur)).status, 409, 'al actief verzekerd');
+  assert.equal((await zp('/api/supplier/zorgpolis/inschrijf', { codenaam: 'ZILVEREN EENHOORN 999', pakket: 'basis' }, segur)).status, 404);
+  assert.equal((await zp('/api/supplier/zorgpolis/inschrijf', { codenaam: lidCode, pakket: 'goud' }, segur)).status, 400, 'alleen basis/plus/top');
 });
 
 test('2. het overzicht van de werkplek: kpi\'s en nooit de memberKey naar de client', async () => {
-  const o = await zp('', {}, segur);
+  const o = await zp('/api/supplier/zorgpolis', {}, segur);
   assert.equal(o.status, 200);
   assert.ok(o.body.kpi.actief >= 1);
   assert.equal(o.body.pakketten.basis, 129);
@@ -88,46 +88,48 @@ test('2. het overzicht van de werkplek: kpi\'s en nooit de memberKey naar de cli
 });
 
 test('3. de declaratieketen: een mens beslist, en afwijzen kan alleen met een reden', async () => {
-  const o = await zp('', {}, segur);
+  const o = await zp('/api/supplier/zorgpolis', {}, segur);
   const pas = o.body.verzekerden.find(x => x.codenaam === lidCode).pas;
   // indienen op de pas, met de vaste grenzen
-  assert.equal((await zp('/declaratie', { pas, omschrijving: '', bedrag: 40 }, segur)).status, 400);
-  assert.equal((await zp('/declaratie', { pas, omschrijving: 'Fysio', bedrag: -5 }, segur)).status, 400);
-  assert.equal((await zp('/declaratie', { pas: 'ZP-0000', omschrijving: 'Fysio', bedrag: 40 }, segur)).status, 409, 'onbekende pas');
-  const d1 = await zp('/declaratie', { pas, omschrijving: 'Fysiotherapie, drie behandelingen', bedrag: 135.5 }, segur);
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie', { pas, omschrijving: '', bedrag: 40 }, segur)).status, 400);
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie', { pas, omschrijving: 'Fysio', bedrag: -5 }, segur)).status, 400);
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie', { pas: 'ZP-0000', omschrijving: 'Fysio', bedrag: 40 }, segur)).status, 409, 'onbekende pas');
+  const d1 = await zp('/api/supplier/zorgpolis/declaratie', { pas, omschrijving: 'Fysiotherapie, drie behandelingen', bedrag: 135.5 }, segur);
   assert.equal(d1.status, 200);
   assert.equal(d1.body.declaratie.status, 'ingediend');
-  const d2 = await zp('/declaratie', { pas, omschrijving: 'Tandarts, controle', bedrag: 60 }, segur);
+  const d2 = await zp('/api/supplier/zorgpolis/declaratie', { pas, omschrijving: 'Tandarts, controle', bedrag: 60 }, segur);
   // goedkeuren met een tik; afwijzen alleen met een reden
-  const goed = await zp('/declaratie/beslis', { id: d1.body.declaratie.id, besluit: 'goedgekeurd', door: 'Ines Vos' }, segur);
+  const goed = await zp('/api/supplier/zorgpolis/declaratie/beslis', { id: d1.body.declaratie.id, besluit: 'goedgekeurd', door: 'Ines Vos' }, segur);
   assert.equal(goed.status, 200);
   assert.equal(goed.body.declaratie.status, 'goedgekeurd');
-  assert.equal((await zp('/declaratie/beslis', { id: d1.body.declaratie.id, besluit: 'afgewezen', reden: 'x' }, segur)).status, 409, 'er is al beslist');
-  assert.equal((await zp('/declaratie/beslis', { id: d2.body.declaratie.id, besluit: 'afgewezen' }, segur)).status, 400, 'afwijzen zonder reden kan niet');
-  const af = await zp('/declaratie/beslis', { id: d2.body.declaratie.id, besluit: 'afgewezen', reden: 'Valt onder het eigen risico.' }, segur);
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie/beslis', { id: d1.body.declaratie.id, besluit: 'afgewezen', reden: 'x' }, segur)).status, 409, 'er is al beslist');
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie/beslis', { id: d2.body.declaratie.id, besluit: 'afgewezen' }, segur)).status, 400, 'afwijzen zonder reden kan niet');
+  const af = await zp('/api/supplier/zorgpolis/declaratie/beslis', { id: d2.body.declaratie.id, besluit: 'afgewezen', reden: 'Valt onder het eigen risico.' }, segur);
   assert.equal(af.status, 200);
   assert.equal(af.body.declaratie.reden, 'Valt onder het eigen risico.');
-  assert.equal((await zp('/declaratie/beslis', { id: 'dxxx', besluit: 'goedgekeurd' }, segur)).status, 404);
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie/beslis', { id: 'dxxx', besluit: 'goedgekeurd' }, segur)).status, 404);
 });
 
 test('4. de pas-controle en de stopzetting: sober antwoord, en de pas verdwijnt uit de wallet', async () => {
-  const o = await zp('', {}, segur);
+  const o = await zp('/api/supplier/zorgpolis', {}, segur);
   const v = o.body.verzekerden.find(x => x.codenaam === lidCode);
   // de controle geeft niet meer dan actief/pakket/codenaam (kleine letters mogen ook)
   const c = await zp('/api/supplier/zorgpolis/pas', { pas: v.pas.toLowerCase() }, segur);
   assert.equal(c.status, 200);
   assert.deepEqual(Object.keys(c.body).sort(), ['actief', 'codenaam', 'pakket'], 'niet meer dan drie velden');
   assert.equal(c.body.actief, true);
-  assert.equal((await zp('/pas', { pas: 'ZP-FFFF' }, segur)).status, 404);
+  assert.equal((await zp('/api/supplier/zorgpolis/pas', { pas: 'ZP-FFFF' }, segur)).status, 404);
+  const wVoor = await wallet('', {}, lidTok);
+  assert.ok(wVoor.body.items.some(x => x.code === v.pas), 'voor het stoppen staat de zorgpas in de wallet');
   // stopzetten: de pas gaat uit de wallet, declareren kan niet meer, nog eens stoppen ook niet
   assert.equal((await zp('/api/supplier/zorgpolis/stop', { id: v.id }, segur)).status, 200);
-  assert.equal((await zp('/pas', { pas: v.pas }, segur)).body.actief, false);
-  assert.equal((await zp('/stop', { id: v.id }, segur)).status, 409, 'al gestopt');
-  assert.equal((await zp('/declaratie', { pas: v.pas, omschrijving: 'Nazorg', bedrag: 20 }, segur)).status, 409, 'op een gestopte pas declareert niemand');
+  assert.equal((await zp('/api/supplier/zorgpolis/pas', { pas: v.pas }, segur)).body.actief, false);
+  assert.equal((await zp('/api/supplier/zorgpolis/stop', { id: v.id }, segur)).status, 409, 'al gestopt');
+  assert.equal((await zp('/api/supplier/zorgpolis/declaratie', { pas: v.pas, omschrijving: 'Nazorg', bedrag: 20 }, segur)).status, 409, 'op een gestopte pas declareert niemand');
   const w = await wallet('', {}, lidTok);
   assert.ok(!w.body.items.some(x => x.code === v.pas), 'de zorgpas is uit de wallet');
   // en opnieuw inschrijven kan daarna gewoon weer
-  assert.equal((await zp('/inschrijf', { codenaam: lidCode, pakket: 'basis' }, segur)).status, 200);
+  assert.equal((await zp('/api/supplier/zorgpolis/inschrijf', { codenaam: lidCode, pakket: 'basis' }, segur)).status, 200);
 });
 
 test('5. de wallet zelf: klantenkaarten en tickets toevoegen, tonen en weghalen', async () => {
@@ -198,11 +200,12 @@ test('7. de poorten: gasten en anoniemen niet, en zonder polis-cap geen zorgtak'
   const gast = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
   assert.equal((await wallet('', {}, gast)).status, 403, 'de gratis app heeft geen wallet');
   assert.equal((await wallet('', {})).status, 401, 'zonder inlog geen wallet');
-  assert.equal((await zp('', {}, kikunoi)).status, 403, 'het restaurant is geen verzekeraar');
-  assert.equal((await zp('/inschrijf', { codenaam: lidCode, pakket: 'basis' }, kikunoi)).status, 403);
-  assert.equal((await zp('', {})).status, 401, 'zonder zaak-inlog geen werkplek');
+  assert.equal((await zp('/api/supplier/zorgpolis', {}, kikunoi)).status, 403, 'het restaurant is geen verzekeraar');
+  assert.equal((await zp('/api/supplier/zorgpolis/inschrijf', { codenaam: lidCode, pakket: 'basis' }, kikunoi)).status, 403);
+  assert.equal((await zp('/api/supplier/zorgpolis', {})).status, 401, 'zonder zaak-inlog geen werkplek');
   // en de wallet van het ene lid is niet die van het andere
   const b = await lid();
   const wb = await wallet('', {}, b.token);
   assert.equal(wb.body.items.length, 0, 'een vers lid begint met een lege wallet');
+  assert.ok((await wallet('', {}, lidTok)).body.items.length >= 1, 'terwijl de wallet van het ingeschreven lid gevuld is');
 });

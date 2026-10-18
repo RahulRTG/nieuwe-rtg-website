@@ -29,8 +29,8 @@
     if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.hidden = true; return; }
     el.hidden = false;
     el.innerHTML = '<div class="label">'+T('spel.label','Spelen')+'</div>'+
-      '<div class="big" style="font-size:1.02rem;">'+T('spel.kop','Een potje tussendoor?')+'</div>'+
-      '<div class="meta" style="margin:0.25rem 0 0.75rem;">'+T('spel.uitleg','Schaken, Woordduel, Magnaat, 30 Seconden, Proost (18+) en Vingerroulette. Tegen vrienden of een random tegenstander; samen spelen maakt je niet automatisch vrienden.')+'</div>'+
+      '<div class="big s-hdve00">'+T('spel.kop','Een potje tussendoor?')+'</div>'+
+      '<div class="meta s-x8hihn">'+T('spel.uitleg','Schaken, Woordduel, Magnaat, 30 Seconden, Proost (18+) en Vingerroulette. Tegen vrienden of een random tegenstander; samen spelen maakt je niet automatisch vrienden.')+'</div>'+
       '<button class="go" id="gaSpelen">'+T('spel.ga','Naar de spellen')+' →</button>';
     el.querySelector('#gaSpelen').addEventListener('click', () => { location.href = '/apps/spelen.html?pas=' + encodeURIComponent(vastePas || 'rtg'); });
   }
@@ -45,11 +45,11 @@
     el.style.display='';
     const conns = social.connections || [], reqs = social.requests || [];
     const totUnread = conns.reduce((n,c)=> n + (c.unread||0), 0);
-    let html = '<div class="label">Contacten'+(totUnread?' · <span style="color:var(--rtg-leesgoud,var(--gold))">'+totUnread+' nieuw</span>':'')+'</div>';
+    let html = '<div class="label">Contacten'+(totUnread?' · <span class="s-12itpbj">'+totUnread+' nieuw</span>':'')+'</div>';
     reqs.forEach(r => {
       html += '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
-        '<span class="sc-av" style="width:2rem;height:2rem;">'+initCN(r.codename)+'</span>'+
+        '<span class="sc-av s-1ibz658">'+initCN(r.codename)+'</span>'+
         '<div class="grow-min"><b>'+escT(r.codename)+'</b><div class="meta">wil verbinden</div></div>'+
-        '<button class="go" style="padding:.2rem .6rem;" data-cja="'+escT(r.key)+'">Accepteer</button>'+
-        '<button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-cnee="'+escT(r.key)+'">✕</button></div>';
+        '<button class="go s-1tbnhjz" data-cja="'+escT(r.key)+'">Accepteer</button>'+
+        '<button class="go s-5dbscx" data-cnee="'+escT(r.key)+'">✕</button></div>';
     });

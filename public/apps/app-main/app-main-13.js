@@ -3,10 +3,10 @@
       html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.activiteiten){
         const open = tkOpen === p.code + ':' + a.id;
-        html += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div class="h-flex1"><div style="font-size:0.88rem;">'+esc(a.name)+'</div>'+
+        html += '<div class="s-1yg9rkb">'+
+          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div class="h-flex1"><div class="s-2tzag1">'+esc(a.name)+'</div>'+
           (a.desc?'<div class="soft-sm">'+esc(a.desc)+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div>':'')+'</div>'+
-          '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.prijs)+' p.p.</span></div>';
+          '<span class="s-17lyjl">'+eur(a.prijs)+' p.p.</span></div>';
         if (open){
           const k = tkKeuze;
           const dagen = [];
@@ -17,8 +17,8 @@
             '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">'+(a.tijden||[]).map(t2 =>
               '<button class="bz-btn'+(k.tijd===t2?' on':'')+'" data-tkt="'+t2+'">'+t2+'</button>').join('')+'</div>'+
             '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.5rem;">'+
-            '<span style="font-size:0.78rem;color:var(--muted);">'+T('tk.personen','Personen')+'</span>'+
-            '<button class="bz-btn" data-tkp="-1" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+k.personen+'</b><button class="bz-btn" data-tkp="1" style="padding:0.2rem 0.7rem;">+</button></div>'+
+            '<span class="s-1m8ehf5">'+T('tk.personen','Personen')+'</span>'+
+            '<button class="bz-btn s-qk3yxe" data-tkp="-1">\u2212</button><b>'+k.personen+'</b><button class="bz-btn s-qk3yxe" data-tkp="1">+</button></div>'+
             '<button class="bz-groot h-mt70" id="tkKoop"'+(k.tijd?'':' disabled')+'>'+T('tk.koop','Koop tickets')+' \u00B7 '+eur(a.prijs * k.personen)+'</button></div>';
         } else {
           html += '<button class="bz-btn h-mt45" data-tkopen="'+p.code+':'+a.id+'">'+T('tk.kies','Kies datum en tijd')+'</button>';
@@ -77,11 +77,11 @@
     const el = $('#careMijn'); if (!el) return;
     if (!mijn.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:0 0 0.5rem;">'+T('care.mijn','Mijn afspraken')+'</div>'+
-      mijn.map(b => '<div class="card" style="border-color:rgba(139,195,168,0.35);">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">'+esc(b.aanbiederNaam)+'</div>'+
-        '<div style="margin-top:0.25rem;font-size:0.92rem;"><b>'+esc(b.behandelingNaam)+'</b>'+(b.behandelaarNaam?' · '+esc(b.behandelaarNaam):'')+'</div>'+
+      mijn.map(b => '<div class="card s-1poinxc">'+
+        '<div class="s-1p9m2ch">'+esc(b.aanbiederNaam)+'</div>'+
+        '<div class="s-g18z7m"><b>'+esc(b.behandelingNaam)+'</b>'+(b.behandelaarNaam?' · '+esc(b.behandelaarNaam):'')+'</div>'+
         '<div class="soft-sm h-mt15">'+b.datum+' · '+b.tijd+' · '+eur(b.prijs)+' · '+
-          (b.paid ? '<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
+          (b.paid ? '<span class="s-muqwc6">'+T('care.betaald','betaald')+'</span>' : '<span class="s-1poh6kx">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
           (b.paid ? '' : '<button class="bz-groot h-flex1" data-care-pay="'+esc(b.ref)+'">'+T('care.betaal','Betaal')+' · '+eur(b.prijs)+'</button>')+
           '<button class="bz-btn" data-care-annul="'+esc(b.ref)+'">'+T('care.annuleer','Annuleer')+'</button>'+
@@ -99,10 +99,10 @@
     const el = $('#careIntakes'); if (!el) return;
     const list = (careOv && careOv.intakes) || [];
     if (!list.length){ el.innerHTML = ''; return; }
-    el.innerHTML = '<div class="card" style="border-color:rgba(208,172,87,0.3);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">'+T('care.intakes','Gedeelde medische context')+'</div>'+
+    el.innerHTML = '<div class="card s-1jm0yoj">'+
+      '<div class="s-e1dreu">'+T('care.intakes','Gedeelde medische context')+'</div>'+
       list.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.5rem;">'+
-        '<div style="font-size:0.85rem;">'+esc(i.aanbiederNaam)+'<div class="soft-sm">'+T('care.tot','tot')+' '+i.vervaltOp+'</div></div>'+
+        '<div class="s-2txdhg">'+esc(i.aanbiederNaam)+'<div class="soft-sm">'+T('care.tot','tot')+' '+i.vervaltOp+'</div></div>'+
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+
       '</div>';
     el.querySelectorAll('[data-care-intakestop]').forEach(x => x.addEventListener('click', async () => {
@@ -116,4 +116,4 @@
     if (!aanb.length){ el.innerHTML = ''; return; }
     const dagen = [];
     for (let d = 0; d < 7; d++){ dagen.push(new Date(Date.now() + d * 86400000).toISOString().slice(0, 10)); }
-    let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.5rem;">'+T('care.aanbod','Spa’s, wellness en klinieken')+'</div>';
+    let html = '<div class="s-llzgco">'+T('care.aanbod','Spa’s, wellness en klinieken')+'</div>';

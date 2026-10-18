@@ -33,9 +33,9 @@
     h += '<div class="st-form h-mt50">' +
       '<select class="st-in" id="prSoort"><option value="post">' + T('pr2.post', 'Salon-post') + '</option><option value="deal">' + T('pr2.deal', 'Aanbieding (alleen leden)') + '</option></select>' +
       '<input class="st-in" id="prTitel" placeholder="' + T('pr2.titel', 'Titel (bij een aanbieding)') + '">' +
-      '<textarea class="st-in" id="prTekst" placeholder="' + T('pr2.tekst', 'De tekst van de post of aanbieding') + '" style="min-height:56px;resize:vertical;"></textarea>' +
+      '<textarea class="st-in s-1pd764i" id="prTekst" placeholder="' + T('pr2.tekst', 'De tekst van de post of aanbieding') + '"></textarea>' +
       '<input class="st-in" id="prOp" type="datetime-local">' +
-      '<button class="obtn primary" id="prPlanGo" style="align-self:flex-start;">' + T('pr2.inplannen', 'Plan in') + '</button></div></div>';
+      '<button class="obtn primary s-9lnaus" id="prPlanGo">' + T('pr2.inplannen', 'Plan in') + '</button></div></div>';
     return h;
   }
 
@@ -47,8 +47,8 @@
     if (nb.laatste) h += '<div class="st-row"><span>' + esc(nb.laatste.onderwerp) + '<span class="sub">' + wanneer(nb.laatste.at) + ' · ' + nb.laatste.verstuurd + ' ' + T('pr2.bezorgd', 'bezorgd') + '</span></span></div>';
     h += nb.magWeer
       ? '<div class="st-form h-mt50"><input class="st-in" id="prNbOnd" placeholder="' + T('pr2.onderwerp', 'Onderwerp') + '">' +
-        '<textarea class="st-in" id="prNbTekst" placeholder="' + T('pr2.brieftekst', 'De brief zelf') + '" style="min-height:70px;resize:vertical;"></textarea>' +
-        '<button class="obtn primary" id="prNbGo" style="align-self:flex-start;">' + T('pr2.verstuur', 'Verstuur aan alle volgers') + '</button></div>'
+        '<textarea class="st-in s-1olxuka" id="prNbTekst" placeholder="' + T('pr2.brieftekst', 'De brief zelf') + '"></textarea>' +
+        '<button class="obtn primary s-9lnaus" id="prNbGo">' + T('pr2.verstuur', 'Verstuur aan alle volgers') + '</button></div>'
       : '<div class="tkc-who h-mt40">' + T('pr2.wacht', 'De volgende brief kan 7 dagen na de vorige.') + '</div>';
     return h + '</div>';
   }
@@ -69,8 +69,8 @@
   function teken(){
     const w = document.getElementById('prPlusWortel');
     if (!w) return;
-    if (!data){ w.innerHTML = '<div class="tkc" style="grid-column:1/-1;"><h3>PR</h3><div class="tkc-who">' + T('kt.laden', 'Laden...') + '</div></div>'; return; }
-    if (data.error){ w.innerHTML = '<div class="tkc" style="grid-column:1/-1;"><h3>PR</h3><div class="tkc-who">' + esc(data.error) + '</div></div>'; return; }
+    if (!data){ w.innerHTML = '<div class="tkc s-1fuhja7"><h3>PR</h3><div class="tkc-who">' + T('kt.laden', 'Laden...') + '</div></div>'; return; }
+    if (data.error){ w.innerHTML = '<div class="tkc s-1fuhja7"><h3>PR</h3><div class="tkc-who">' + esc(data.error) + '</div></div>'; return; }
     w.innerHTML = kaartPlanner() + kaartNieuwsbrief() + kaartBereik();
   }
 

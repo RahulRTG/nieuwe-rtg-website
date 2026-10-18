@@ -60,6 +60,17 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-h4d1ic:not(#_#_#_){background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.5rem 0.7rem;font:inherit}
+.s-q78lq2:not(#_#_#_){margin-top:0.75rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header class="kop">
@@ -103,12 +114,12 @@
           <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
             <button class="knop" id="knopTelefoon" type="button">Telefonische boeking invoeren</button>
           </div>
-          <div id="telefoonVorm" class="weg" style="margin-top:0.75rem;">
+          <div id="telefoonVorm" class="weg s-q78lq2">
             <p class="stil">Vul de naam en de bestemming in; het vertrekpunt is de standplaats van de zaak.</p>
             <div style="display:grid;gap:0.5rem;margin-top:0.5rem;">
               <input id="telNaam" type="text" placeholder="Naam waaronder de rit staat"
-                style="background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.5rem 0.7rem;font:inherit;">
-              <select id="telNaar" style="background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.5rem 0.7rem;font:inherit;">
+                class="s-h4d1ic">
+              <select id="telNaar" class="s-h4d1ic">
                 <option value="">Kies een bestemming</option>
               </select>
               <button class="knop vol" id="telBoek" type="button">Opdracht aanmaken</button>

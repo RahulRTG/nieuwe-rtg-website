@@ -103,13 +103,26 @@
 <link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15e9keb:not(#_#_#_){justify-content:space-between}
+.s-1m37x9n:not(#_#_#_){text-decoration:none;color:inherit}
+.s-4t7hy3:not(#_#_#_){width:100%;margin-bottom:0.75rem}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+</style>
 </head>
 <body class="rtg-stijl rtg-daily" data-rtg-edge-na-openen-object="Een bestand is er pas als je er een opent; dan draagt de Edge een verwijzing ernaar (soort, id en naam), nooit de inhoud." data-kantoor-tool="bestanden" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-daily="bestanden" data-rtg-editorial-room="bestanden" data-rtg-layout="standard">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey">RTG</span><h1 data-i18n="dailyField.files">Bestanden</h1></span>
-  <span class="rij" style="margin-left:auto;">
+  <span class="rij s-7myv37">
     <button class="knop" id="toonBak" data-rtg-edge-bar type="button" data-i18n="dailyField.bin">Prullenbak</button>
     <button class="knop" id="nieuwMap" data-rtg-edge-bar type="button" data-i18n="dailyField.newFolder">+ Map</button>
     <input type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen" data-i18n-aria="dailyField.chooseFiles">
@@ -123,8 +136,8 @@
 <main>
 <section id="dailyIntro" aria-label="Bestanden" data-i18n-aria="dailyField.files"></section>
   <div class="daily-content">
-  <input class="veld" id="zoek" type="search" placeholder="Zoek in uw bestanden" data-i18n-ph="daily.fileSearch" aria-label="Zoeken"
-    style="width:100%;margin-bottom:0.75rem;" data-i18n-aria="dailyField.search">
+  <input class="veld s-4t7hy3" id="zoek" type="search" placeholder="Zoek in uw bestanden" data-i18n-ph="daily.fileSearch" aria-label="Zoeken"
+ data-i18n-aria="dailyField.search">
   <div class="sleep" data-i18n="dailyField.dropUpload">Laat los om te uploaden</div>
   <nav id="pad" aria-label="Mappenpad" data-i18n-aria="dailyField.folderPath"></nav>
   <h2 id="dailyFolders" data-i18n="daily.folders" class="kop">Uw mappen</h2>
@@ -136,7 +149,7 @@
   <div id="officeKop" class="kop" style="display:none;" data-i18n="dailyField.officeSource">Uit RTG Office · werken doet u daar</div>
   <div id="officeLijst"></div>
   <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="kies"><span data-i18n="daily.addFile">Bestand toevoegen</span> <span aria-hidden="true">→</span></button></div>
-<div class="daily-storage">  <div class="rij" style="justify-content:space-between;">
+<div class="daily-storage">  <div class="rij s-15e9keb">
     <span class="stil" id="quotumTekst">&nbsp;</span>
     <select class="veld" id="sorteer" aria-label="Sorteren" data-i18n-aria="dailyField.sort">
       <option value="nieuw" data-i18n="dailyField.newest">Nieuwste eerst</option>

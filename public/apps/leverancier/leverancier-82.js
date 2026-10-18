@@ -8,7 +8,7 @@
     }
     const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('alarm.noloc','locatie onbekend');
     el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('alarm.needs','heeft direct assistentie nodig'))+'</span>'+
-      '<span style="margin-top:0.5rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
+      '<span class="s-w1gbnz">'+esc(locTxt)+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
   }
   function esc(s){ return String(s).replace(/[&<>"]/g,s2=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s2])); }
@@ -81,15 +81,15 @@
     const rating = state && state.reviews && state.reviews.rating;
     const revs = (state && state.reviews && state.reviews.recent) || [];
     let h = '<div class="card"><div class="tt-h">'+T('rev2.score','Uw reputatie')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:1.4rem;font-family:\'Bodoni Moda\',serif;">'+
-      (rating ? rating.score+' <span style="font-size:0.8rem;color:var(--soft);">/ 5 · '+rating.aantal+' '+T('rev2.stuks','review(s)')+'</span>' : T('rev2.geen','Nog geen reviews'))+'</div>'+
+      '<div class="s-h0fte">'+
+      (rating ? rating.score+' <span class="s-7a7ief">/ 5 · '+rating.aantal+' '+T('rev2.stuks','review(s)')+'</span>' : T('rev2.geen','Nog geen reviews'))+'</div>'+
       '<div class="softline h-mt30">'+T('rev2.deck','Een snel, persoonlijk antwoord weegt zwaar: gasten lezen mee, en de schrijver krijgt uw reactie direct als melding.')+'</div></div>';
     h += revs.length ? revs.map(r =>
       '<div class="card">'+
-      '<div class="tt-top" style="display:flex;justify-content:space-between;gap:0.5rem;"><b>'+''.repeat(r.score)+'<span style="opacity:0.25;">'+''.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time style="color:var(--soft);font-size:0.7rem;">'+timeAgo(r.at)+'</time></div>'+
-      (r.tekst ? '<div style="margin-top:0.25rem;font-size:0.86rem;">'+esc(r.tekst)+'</div>' : '')+
+      '<div class="tt-top s-1d906h"><b>'+''.repeat(r.score)+'<span style="opacity:0.25;">'+''.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time class="s-1feg4kw">'+timeAgo(r.at)+'</time></div>'+
+      (r.tekst ? '<div class="s-g0rqkd">'+esc(r.tekst)+'</div>' : '')+
       (r.reactie
-        ? '<div style="margin-top:0.5rem;border-left:3px solid var(--gold);padding:0.4rem 0.7rem;font-size:0.82rem;"><b style="color:var(--rtg-leesgoud,var(--gold));">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
+        ? '<div class="s-dw8nnx"><b class="s-12itpbj">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
         : '<div class="tt-compose h-mt50"><input id="rv-'+r.id+'" placeholder="'+T('rev2.ph','Schrijf een persoonlijke reactie...')+'">'+
           '<button class="obtn ghost" data-rvai="'+r.id+'"></button><button data-rvsend="'+r.id+'">'+T('team.send','Stuur')+'</button></div>')+
       '</div>').join('')
@@ -122,7 +122,7 @@
     let h = '<div class="card"><div class="st-row"><span>'+T('vr.waarde','Voorraadwaarde')+'</span><b>'+geld(d.totaalWaarde)+'</b></div>'+
       '<div class="st-row"><span>'+T('vr.onder','Onder minimum')+'</span><b'+(d.onderMinimum?' style="color:#FF8589;"':'')+'>'+d.onderMinimum+'</b></div></div>';
     // het inkoopadvies: aanvullen tot twee keer het minimum
-    if ((d.advies||[]).length) h += '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="tt-h">'+T('vr.advies','Inkoopadvies')+'</div>'+
+    if ((d.advies||[]).length) h += '<div class="card s-1rt3q5q"><div class="tt-h">'+T('vr.advies','Inkoopadvies')+'</div>'+
       d.advies.map(a => '<div class="st-row"><span>'+esc(a.naam)+' <span class="sub">'+a.aantal+' '+esc(a.eenheid)+', min '+a.min+'</span></span><b>+ '+a.advies+' '+esc(a.eenheid)+(a.kosten?' <span class="sub">'+geld(a.kosten)+'</span>':'')+'</b></div>').join('')+
       (mgr?'<button class="bigbtn h-mt50" id="vrBestel">'+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
       '<div class="softline h-mt30">'+T('vr.advies.s','Geleverd = automatisch bijgeboekt, met de inkoopprijs als nieuwe kostprijs.')+'</div></div>';
@@ -130,8 +130,8 @@
     h += '<div class="card">'+(vs.length ? vs.map(v =>
       '<div class="st-row" style="align-items:center;"><span'+(v.min>0&&v.aantal<=v.min?' style="color:#FF8589;"':'')+'>'+esc(v.naam)+
         '<span class="sub">min '+v.min+(v.kostprijs?' · '+geld(v.kostprijs)+'/'+esc(v.eenheid):'')+(v.waarde?' · '+T('vr.wrd','waarde')+' '+geld(v.waarde):'')+'</span></span>'+
-      '<span style="display:flex;gap:0.35rem;align-items:center;flex-shrink:0;">'+
-        '<b style="min-width:3.6rem;text-align:center;">'+v.aantal+' '+esc(v.eenheid)+'</b>'+
+      '<span class="s-1gerota">'+
+        '<b class="s-ur4o3h">'+v.aantal+' '+esc(v.eenheid)+'</b>'+
         '<button class="obtn ghost" data-vtel="'+v.id+'" title="'+T('vr.tel','Telling')+'"></button>'+
         '<button class="obtn ghost" data-vderf="'+v.id+'" title="'+T('vr.derf','Verspilling')+'"></button>'+
         (mgr?'<button class="obtn ghost" data-vlev="'+v.id+'" title="'+T('vr.lev','Levering')+'"></button><button class="obtn warn" data-vweg="'+v.id+'"></button>':'')+'</span></div>').join('')

@@ -61,6 +61,26 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-183ghtj:not(#_#_#_){font-size:0.82rem;line-height:1.55;margin-top:0.5rem}
+.s-19heebm:not(#_#_#_){border-color:var(--rood);color:var(--rood)}
+.s-1v3bz6p:not(#_#_#_){max-width:6rem}
+.s-1v3dw5a:not(#_#_#_){max-width:9rem}
+.s-2tdkw3:not(#_#_#_){font-size:0.75rem}
+.s-b4px2c:not(#_#_#_){text-transform:uppercase}
+.s-jv4uwu:not(#_#_#_){max-width:10rem}
+.s-jv64vw:not(#_#_#_){max-width:12rem}
+.s-nqstjj:not(#_#_#_){font-size:0.83rem;line-height:1.55;margin-top:0.5rem;white-space:pre-wrap}
+.s-wo6j0o:not(#_#_#_){font-size:0.7rem;margin-top:0.5rem}
+.s-y9zsje:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.6rem;margin-top:0.5rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -68,7 +88,7 @@
   <a href="/apps/app.html" aria-label="Terug naar de hub">←</a>
   <h1 id="titel">RTG Meldkamer</h1>
   <div class="rek"></div>
-  <button class="knop" id="noodKnop" type="button" hidden style="border-color:var(--rood);color:var(--rood);">Nood</button>
+  <button class="knop s-19heebm" id="noodKnop" type="button" hidden>Nood</button>
   <span class="stil" id="wie"></span>
 </header>
 <main id="inhoud">
@@ -76,12 +96,12 @@
     <p class="stil">De meldkamer van uw korps: meldingen, eenheden over land, water en door de lucht, bijstand tussen korpsen en de AI die meedenkt. Dit is het RTG-systeem voor besturing en oefening; het vervangt geen 112 en geen enkel officieel protocol.</p>
     <div class="kaart">
       <div class="rij">
-        <input class="veld" id="lCode" placeholder="Korps-code (bijv. GUARDIA)" maxlength="20" style="text-transform:uppercase;">
+        <input class="veld s-b4px2c" id="lCode" placeholder="Korps-code (bijv. GUARDIA)" maxlength="20">
         <button class="knop" id="lZoek" type="button">Verder</button>
       </div>
       <div class="rij" id="lWieRij" hidden>
         <select id="lWie" aria-label="Wie bent u"></select>
-        <input class="veld" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8" style="max-width:6rem;">
+        <input class="veld s-1v3bz6p" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8">
         <button class="knop" id="lIn" type="button">Meld aan</button>
       </div>
       <p class="stil h-mt50" id="lFout" aria-live="polite"></p>
@@ -94,7 +114,7 @@
       <h2 class="h-mt0">De meldkamer</h2>
       <div class="rij" id="rNieuw">
         <input class="veld" id="mTekst" placeholder="Wat is er gemeld?" maxlength="300">
-        <input class="veld" id="mPlek" placeholder="Waar?" maxlength="80" style="max-width:10rem;">
+        <input class="veld s-jv4uwu" id="mPlek" placeholder="Waar?" maxlength="80">
         <select id="mPrio" aria-label="Prioriteit"><option value="1">Prio 1</option><option value="2" selected>Prio 2</option><option value="3">Prio 3</option></select>
         <button class="knop" id="mMaak" type="button">Neem aan</button>
       </div>
@@ -113,7 +133,7 @@
       <h2 class="h-mt0">Bedden en opnames</h2>
       <div id="bedden" class="stil"></div>
       <div class="rij">
-        <input class="veld" id="bTotaal" type="number" min="0" max="2000" placeholder="Totaal bedden" style="max-width:9rem;">
+        <input class="veld s-1v3dw5a" id="bTotaal" type="number" min="0" max="2000" placeholder="Totaal bedden">
         <button class="knop" id="bZet" type="button">Zet het beddenbord</button>
       </div>
       <div id="opnames"></div>
@@ -142,7 +162,7 @@
       <p class="i-m3b83 stil">Op dit bord staat een korte aanduiding, nooit een volledige naam: de echte naam blijft in de identiteitskluis.</p>
       <div class="rij">
         <input class="veld" id="pAanduiding" placeholder="Aanduiding (bijv. dhr. V., 10:15)" maxlength="60">
-        <input class="veld" id="pReden" placeholder="Reden (optioneel)" maxlength="120" style="max-width:12rem;">
+        <input class="veld s-jv64vw" id="pReden" placeholder="Reden (optioneel)" maxlength="120">
         <button class="knop" id="pAan" type="button">Meld aan</button>
       </div>
       <div id="wachtkamer"></div>
@@ -204,12 +224,12 @@
       <div class="rij h-mt70">
         <button class="knop klein" id="coordKnop" type="button">Vraag de coordinator om voorstellen</button>
       </div>
-      <div class="stil" id="coordUit" style="font-size:0.83rem;line-height:1.55;margin-top:0.5rem;white-space:pre-wrap;"></div>
-      <p class="stil" style="font-size:0.7rem;margin-top:0.5rem;">De coordinator adviseert; u beslist en wijst de eenheid zelf toe.</p>
+      <div class="stil s-nqstjj" id="coordUit"></div>
+      <p class="stil s-wo6j0o">De coordinator adviseert; u beslist en wijst de eenheid zelf toe.</p>
       <div class="rij h-mt50">
         <button class="knop klein" id="rapportKnop" type="button">Naoefening-rapport</button>
       </div>
-      <div id="rapportUit" style="font-size:0.82rem;line-height:1.55;margin-top:0.5rem;"></div>
+      <div id="rapportUit" class="s-183ghtj"></div>
     </div>
     <div class="kaart" id="kKeten">
       <h2 class="h-mt0">De ketenchat</h2>
@@ -217,14 +237,14 @@
       <div class="rij">
         <select id="ktKandidaat" aria-label="Korps om uit te nodigen"></select>
         <button class="knop klein" id="ktNodig" type="button">Nodig uit</button>
-        <span class="stil" id="ktLinks" style="font-size:0.75rem;"></span>
+        <span class="stil s-2tdkw3" id="ktLinks"></span>
       </div>
       <div id="ktInkomend" class="rij"></div>
       <div class="rij h-mt60">
         <select id="ktKanaal" aria-label="Kanaal"></select>
         <button class="knop klein" id="ktGroepToon" type="button">+ Nieuwe deelgroep</button>
       </div>
-      <div id="ktGroepMaak" hidden style="border:1px solid var(--line);border-radius:0;padding:0.6rem;margin-top:0.5rem;">
+      <div id="ktGroepMaak" hidden class="s-y9zsje">
         <div class="rij">
           <input class="veld" id="ktGroepNaam" placeholder="Naam van de groep" maxlength="60">
           <select id="ktGroepKorps" aria-label="Korps voor leden"></select>

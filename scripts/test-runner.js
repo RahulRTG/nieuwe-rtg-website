@@ -417,14 +417,16 @@ try {
    daarmee valt zijn veroudering op dezelfde manier op als die van elk ander.
 
    ALTIJD SCHRIJVEN, OOK BIJ ROOD. Een ronde die zakt is ook een feit, en juist
-   dat feit hoort niet te verdwijnen doordat iemand hem niet afmaakt.
+   dat feit hoort niet te verdwijnen doordat iemand hem niet afmaakt. Maar niet
+   op een vuile boom: dan wijst het stempel naar een commit die de geteste code
+   niet bevat (STEMPELVEILIGHEID.json), en blijft de vorige stand staan.
 
    ALLEEN BIJ EEN VOLLE RONDE. Wie `node scripts/test-runner.js pay.test.js`
    draait heeft de suite niet gedraaid; dat stempel zou de meter laten liegen
    op precies het punt waarvoor hij bestaat. */
 if (!selectie.length && !deel && !zonderIjkingen && !zonderZware) {
   try {
-    const { exactStempel } = require('./lib/stempel');
+    const { exactStempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
     const bestandenSha256 = crypto.createHash('sha256').update(bestanden.join('\n') + '\n').digest('hex');
     const tel = naam => batchBewijzen.reduce((t, b) => t + (Number.isSafeInteger(b[naam]) ? b[naam] : 0), 0);
     const tapVolledig = batchBewijzen.length > 0 && batchBewijzen.every(b => b.volledig);
@@ -434,7 +436,7 @@ if (!selectie.length && !deel && !zonderIjkingen && !zonderZware) {
     const zonderStilte = tapVolledig && telling.tests > 0 && telling.mislukt === 0 &&
       telling.geannuleerd === 0 && telling.overgeslagen === 0 && telling.todo === 0;
     if (code === 0 && !zonderStilte) code = 1;
-    fs.writeFileSync(path.join(WORTEL, 'SUITE.json'), JSON.stringify({
+    if (magSchrijven(eisSchoneBoom('test-runner'), 'SUITE.json')) fs.writeFileSync(path.join(WORTEL, 'SUITE.json'), JSON.stringify({
       stempel: exactStempel(),
       uitleg: 'De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. ' +
         'scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt ' +

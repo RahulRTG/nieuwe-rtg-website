@@ -225,6 +225,12 @@ test('tegoed op naam is voor die ene codenaam, en een onbekende naam wordt geen 
   assert.equal(koop.status, 200);
   assert.equal(koop.body.tegoed.aan, b.codenaam);
 
+  /* Eerst de gevulde kant: zolang het niet is verzilverd, staat het gerichte
+     tegoed in het overzicht van de ontvanger -- en nergens anders. */
+  const d1 = await api('/api/pay/tegoed', {}, b.token);
+  assert.equal(d1.body.voorMij.length, 1, 'het gerichte tegoed staat klaar in het overzicht van de ontvanger');
+  assert.equal((await api('/api/pay/tegoed', {}, c.token)).body.voorMij.length, 0, 'en niet bij een ander');
+
   const fout = await api('/api/pay/tegoed/verzilver', { code: koop.body.tegoed.code, idem: 'gericht-fout' }, c.token);
   assert.equal(fout.status, 403, 'een gericht tegoed gaat niet naar een ander');
 

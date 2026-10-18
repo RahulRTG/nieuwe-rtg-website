@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-10-18T09:12:40.122Z",
-  "commit": "0398fee4",
-  "boomVuil": true,
+  "op": "2026-10-18T12:29:44.055Z",
+  "commit": "a7ae8fc24",
+  "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.0"

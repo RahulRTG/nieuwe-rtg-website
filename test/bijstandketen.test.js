@@ -163,6 +163,8 @@ test('6. een andere organisatie ziet de sessie niet', async () => {
   assert.equal(ander.status, 404, 'de buurman kon het dossier openen (' + ander.status + ')');
   const lijst = await api('/api/tenant/bijstand', { werkruimte: tweede, beheerToken: tweedeBeheer });
   assert.equal(lijst.body.sessies.length, 0, 'de buurman ziet de sessie in zijn lijst staan');
+  const eigen = await klant('/api/tenant/bijstand', {});
+  assert.ok(eigen.body.sessies.some(s => s.id === SESSIE), 'terwijl de eigen organisatie hem wel in haar lijst heeft');
 });
 
 test('7. afsluiten vraagt een verslag, en dat verslag is van de klant', async () => {

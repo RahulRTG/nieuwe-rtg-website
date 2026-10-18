@@ -47,7 +47,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const sporen = require('../server/kern/auditsporen');
 
 const WORTEL = path.join(__dirname, '..');
@@ -280,7 +280,7 @@ const uit = meet();
 if (uit.fout) { console.error('\n  ' + uit.fout + '\n'); process.exitCode = 2; return; }
 if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
 
-fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
+if (magSchrijven(eisSchoneBoom('auditproef'), UITSLAG)) fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
 console.log('\n=== DE AUDIT-PROEF ===\n');
 console.log('  journaal                : ' + path.relative(WORTEL, JOURNAAL));
 console.log('  routes met waarnemingen : ' + uit.routes);

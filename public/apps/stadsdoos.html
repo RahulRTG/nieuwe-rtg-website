@@ -50,6 +50,29 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-17l0k6:not(#_#_#_){flex:1;font-size:.84rem}
+.s-1bynf4l:not(#_#_#_){word-break:break-all}
+.s-1cos01e:not(#_#_#_){font-size:.8rem;color:var(--muted);margin-bottom:0.5rem}
+.s-1el9466:not(#_#_#_){color:var(--soft);font-size:.74rem}
+.s-1el9r5p:not(#_#_#_){color:var(--soft);font-size:.75rem}
+.s-1k4tv01:not(#_#_#_){font-size:.78rem;color:var(--muted);padding:.15rem 0}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-3wpufz:not(#_#_#_){flex:1;font-size:.86rem;line-height:1.45}
+.s-7tvz5:not(#_#_#_){flex:2;min-width:11rem}
+.s-hdxayl:not(#_#_#_){font-size:1.05rem}
+.s-hx37sx:not(#_#_#_){padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0}
+.s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
+.s-ohjkjq:not(#_#_#_){font-size:.78rem}
+.s-v8t3um:not(#_#_#_){margin-top:0.5rem;font-size:.85rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -80,21 +103,21 @@
   <div class="kaart">
     <div class="sec">Ter plekke: nieuwe Stadsdoos aanmelden</div>
     <div class="i-m3b83 rij">
-      <input class="veld" id="aNaam" placeholder="bijv. Stadsdoos Brug" maxlength="60" style="flex:1;min-width:9rem;">
+      <input class="veld s-jwtsuz" id="aNaam" placeholder="bijv. Stadsdoos Brug" maxlength="60">
       <select class="i-jwt5vg veld" id="aZone" aria-label="Zone"></select>
     </div>
     <input class="i-m3b83 veld" id="aSens" placeholder="sensoren, komma (verkeer, lucht, licht)">
     <button class="i-186m9v knop" id="aMeld">Meld aan · sleutel verschijnt één keer</button>
-    <div id="aUit" style="margin-top:0.5rem;font-size:.85rem;"></div>
+    <div id="aUit" class="s-v8t3um"></div>
   </div>
 
   <div class="deel">Verbindingstest</div>
   <div class="kaart">
     <div class="sec">Verbindingstest · praat de doos met de stad?</div>
-    <p style="font-size:.8rem;color:var(--muted);margin-bottom:0.5rem;">Vul het serienummer en de apparaat-sleutel van de doos in; de test stuurt een echte hartslag over de hardware-poort.</p>
+    <p class="s-1cos01e">Vul het serienummer en de apparaat-sleutel van de doos in; de test stuurt een echte hartslag over de hardware-poort.</p>
     <div class="i-m3b83 rij">
       <input class="i-jwt5vg veld" id="tSerial" placeholder="SD-XXXXXX">
-      <input class="veld" id="tSleutel" placeholder="apparaat-sleutel" style="flex:2;min-width:11rem;">
+      <input class="veld s-7tvz5" id="tSleutel" placeholder="apparaat-sleutel">
     </div>
     <button class="i-186m9v knop stil" id="tDoe">Stuur hartslag</button>
   </div>
@@ -160,17 +183,17 @@ async function laad(){
     // de werklijst die de stad zelf voorschrijft
     $('#wTel').textContent = w.klussen.length + ' open';
     $('#wLijst').innerHTML = w.klussen.length ? w.klussen.map(k =>
-      '<div class="klus"><span style="font-size:1.05rem;">' + (KLUS_IC[k.soort] || '') + '</span>' +
-      '<span style="flex:1;font-size:.86rem;line-height:1.45;">' +
+      '<div class="klus"><span class="s-hdxayl">' + (KLUS_IC[k.soort] || '') + '</span>' +
+      '<span class="s-3wpufz">' +
       // urgent en hoog krijgen een woord, de rest niets: een lijst waarin alles
       // een merkje draagt zegt niets meer over wat er eerst moet
       (k.prioriteit === 'urgent' || k.prioriteit === 'hoog'
         ? '<span class="prio">' + esc(k.prioriteit) + '</span> ' : '') +
-      esc(k.omschrijving) + (k.zone ? '<br><span style="color:var(--soft);font-size:.75rem;">' + esc(k.zone) + '</span>' : '') + '</span>' +
-      '<button class="knop stil" data-klaar="' + esc(k.sleutel) + '" style="font-size:.78rem;">✓ Klaar</button></div>').join('')
+      esc(k.omschrijving) + (k.zone ? '<br><span class="s-1el9r5p">' + esc(k.zone) + '</span>' : '') + '</span>' +
+      '<button class="knop stil s-ohjkjq" data-klaar="' + esc(k.sleutel) + '">✓ Klaar</button></div>').join('')
       : '<div class="leeg">Niets open. De stad draait.</div>';
     $('#wKlaar').innerHTML = w.klaargemeld.length ? w.klaargemeld.map(k =>
-      '<div style="font-size:.78rem;color:var(--muted);padding:.15rem 0;">✓ ' + esc(k.sleutel) + ' · ' + esc(k.wie) + (k.notitie ? ' · ' + esc(k.notitie) : '') + ' · ' + tijd(k.at) + '</div>').join('') : 'Nog niets.';
+      '<div class="s-1k4tv01">✓ ' + esc(k.sleutel) + ' · ' + esc(k.wie) + (k.notitie ? ' · ' + esc(k.notitie) : '') + ' · ' + tijd(k.at) + '</div>').join('') : 'Nog niets.';
     $('#wLijst').querySelectorAll('[data-klaar]').forEach(btn => btn.addEventListener('click', async () => {
       if (!wie()) return meld('Vul eerst je naam in.');
       const notitie = prompt('Korte notitie bij het klaarmelden? (mag leeg)') || '';
@@ -181,8 +204,8 @@ async function laad(){
     const rij = b.nodes.slice().sort((a, z) => (a.online === z.online) ? 0 : a.online ? 1 : -1);
     $('#vLijst').innerHTML = '<div style="font-size:.78rem;color:var(--soft);margin-bottom:.35rem;">' + b.vloot.online + ' van ' + b.vloot.totaal + ' online · scenario "' + esc(b.scenario) + '"</div>' +
       rij.map(n => '<div class="klus"><span class="dot" style="background:' + (n.online ? 'var(--green)' : 'var(--burgundy)') + ';margin-top:.35rem;"></span>' +
-        '<span style="flex:1;font-size:.84rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">Magnaat Test</span>' : '') +
-        '<br><span style="color:var(--soft);font-size:.74rem;">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + (n.laatsteContact ? ' · ' + tijd(n.laatsteContact) : ' · nooit gezien') + '</span></span></div>').join('');
+        '<span class="s-17l0k6"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span class="s-1pv2lmv">Magnaat Test</span>' : '') +
+        '<br><span class="s-1el9466">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + (n.laatsteContact ? ' · ' + tijd(n.laatsteContact) : ' · nooit gezien') + '</span></span></div>').join('');
     const sel = $('#aZone');
     if (!sel.options.length) sel.innerHTML = b.zones.map(z => '<option>' + esc(z) + '</option>').join('');
   } catch (e) { $('#wLijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
@@ -194,7 +217,7 @@ $('#aMeld').addEventListener('click', async () => {
   try {
     const r = await api('stad/node/aanmeld', { doosNaam: $('#aNaam').value, zone: $('#aZone').value,
       sensoren: $('#aSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: wie() });
-    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br>manifestsleutel: <code>' + esc(r.manifestSleutel || '-') + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+    $('#aUit').innerHTML = '<div class="s-hx37sx"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code class="s-1bynf4l">' + esc(r.sleutel) + '</code><br>manifestsleutel: <code>' + esc(r.manifestSleutel || '-') + '</code><br><span class="s-1pv2lmv">' + esc(r.let_op) + '</span></div>';
     $('#tSerial').value = r.serial; $('#tSleutel').value = r.sleutel; // klaar voor de verbindingstest
     $('#aNaam').value = ''; $('#aSens').value = '';
     laad();

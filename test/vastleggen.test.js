@@ -149,3 +149,34 @@ test('de toestemming staat in het Consent Center, en intrekken stopt het schrijv
   assert.equal(beeld.vandaag, 82.4, 'en wat er lag, ligt er nog: dat is echt gemeten');
   assert.equal(beeld.vandaagDoor, kliniek.naam, 'met de naam er nog steeds bij');
 });
+
+/* /api/care/vastleggen/mijn en /api/care/vastleggen/stop: het lid ziet welke
+   behandelaar in zijn dossier mag vastleggen en trekt dat zelf in, op de eigen
+   deur (naast de algemene intrekking via het Consent Center hierboven). Een
+   ander lid trekt andermans toestemming niet in, en daarna schrijft de kliniek
+   niets meer.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/care/vastleggen.js de voorwaarde
+   `x.key === key` uit vastleggingStop() gehaald; de toets zakte op "een ander lid
+   trekt deze toestemming niet in". */
+test('de eigen lijst van toestemmingen, en zelf intrekken op de vastlegdeur', async () => {
+  const aan = await api('care/vastleggen/deel', { aanbiederId: kliniek.id }, lid);
+  assert.equal(aan.status, 200);
+  const id = aan.body.vastlegging.id;
+  const mijn = await api('care/vastleggen/mijn', {}, lid);
+  assert.equal(mijn.status, 200);
+  assert.equal(mijn.body.vastleggingen.length, 1, 'precies deze ene toestemming staat aan');
+  assert.equal(mijn.body.vastleggingen[0].aanbiederNaam, kliniek.naam);
+  assert.ok(!(await api('care/vastleggen/mijn', {}, lid2)).body.vastleggingen.some(v => v.id === id),
+    'een ander lid ziet deze toestemming niet');
+
+  assert.equal((await api('care/vastleggen/stop', { id }, lid2)).status, 404, 'een ander lid trekt deze toestemming niet in');
+  assert.equal((await api('supplier/care/vastleggen', { ref, onderwerp: 'gewicht', waarde: 81 }, sup)).status, 200,
+    'zolang hij aanstaat, legt de kliniek vast');
+  const stop = await api('care/vastleggen/stop', { id }, lid);
+  assert.equal(stop.status, 200);
+  assert.equal(stop.body.gestopt, kliniek.naam);
+  assert.equal((await api('care/vastleggen/mijn', {}, lid)).body.vastleggingen.length, 0, 'de lijst is leeg na intrekken');
+  assert.equal((await api('supplier/care/vastleggen', { ref, onderwerp: 'gewicht', waarde: 80 }, sup)).status, 403,
+    'en de kliniek legt niets meer vast');
+  assert.equal((await api('care/vastleggen/stop', { id }, lid)).status, 404, 'twee keer intrekken kan niet');
+});

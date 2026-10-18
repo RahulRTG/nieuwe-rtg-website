@@ -121,6 +121,8 @@ test('de deuren van het Ondernemers-OS: dicht, van u alleen, en heel', async () 
         pad + ' hoort voor een ander lid niet te bestaan, gaf ' + r.status + ' ' +
         JSON.stringify(r.body).slice(0, 120));
     }
+    const vanA = await post(base, '/api/onderneming/mijn', {}, A);
+    assert.ok(vanA.body.ondernemingen.some(o => o.id === id), 'lid A ziet zijn eigen onderneming wel');
     const vanB = await post(base, '/api/onderneming/mijn', {}, B);
     assert.deepEqual(vanB.body.ondernemingen, [], 'en lid B ziet niets van A');
 

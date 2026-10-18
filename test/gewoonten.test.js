@@ -65,6 +65,7 @@ test('een nieuwe gewoonte heeft GEEN teller, en die staat ook niet in het antwoo
 test('afvinken is een tik, en dezelfde tik zet hem weer uit', async () => {
   const aan = await api('gewoonten/tik', { id }, lid);
   assert.equal(aan.body.gewoonte.vandaagGedaan, true);
+  assert.equal(aan.body.gewoonte.dagen.length, 1, 'de tik zet precies een dag');
   assert.deepEqual(aan.body.gewoonte.dagen, [overDagen(0)]);
 
   const uit = await api('gewoonten/tik', { id }, lid);

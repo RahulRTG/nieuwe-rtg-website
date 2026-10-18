@@ -78,7 +78,7 @@ if (require.main === module) {
      niet bij de volgende meting. Dat is het verschil tussen een vertrekpunt en
      een generator die je werk opeet. */
   let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')).domeinen || {}; } catch (e) {}
+  try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')).domeinen || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   const samen = {};
   let bijGehouden = 0;
   for (const d of new Set([].concat(Object.keys(lijst), Object.keys(oud))).values()) {
@@ -91,6 +91,7 @@ if (require.main === module) {
   for (const d of Object.keys(samen).sort()) geordend[d] = samen[d];
   fs.writeFileSync(DOEL, JSON.stringify({
     uitleg: 'Per domein de kern-namen die het mag aanraken, BOVEN de gedeelde interface in server/opzet/domeingrens.js. Gegenereerd met npm run grenslijst en met de hand aan te vullen; die aanvullingen blijven staan.',
+    grens: 'Een vertrekpunt en geen waarheid: dat een naam hier staat zegt alleen dat het domein hem vandaag aanraakt of dat iemand hem met de hand toevoegde, niet dat het hem nodig heeft. Namen die een bestand zelf uitrekent (genrepuls, genreplan, genreblik, werkplek-bureaus) ziet de scanner niet; die komen er pas op als de grens knelt.',
     domeinen: geordend
   }, null, 2) + '\n');
   console.log('GRENZEN.json geschreven: ' + Object.keys(geordend).length + ' domeinen, ' +

@@ -13,6 +13,15 @@ const SLEUTELS = {
   'POST /api/rtgid/bevestig': { nietIdempotent: true,
     waarom: 'een WebAuthn-ceremonie is eenmalig en de kern moet een tweede poging tegen de actuele koppelstand beoordelen' },
   'POST /api/rtgid/weiger': { nietIdempotent: true,
-    waarom: 'de kern moet na de eerste weigering de actuele gesloten stand teruggeven en geen oud succes herhalen' }
+    waarom: 'de kern moet na de eerste weigering de actuele gesloten stand teruggeven en geen oud succes herhalen' },
+  /* Gevonden door de voltooiproef van "Wie heeft toegang tot mij"
+     (scripts/lib/voltooi/relaties.js, 18 oktober 2026): een machtiging die de
+     client opgaf en daarna opnieuw stuurde, gaf de ander TWEE machtigingen voor
+     dezelfde dienst. Wie er een intrekt, laat de tweede staan -- een
+     toestemming die blijft terwijl het lid denkt dat hij weg is. Dezelfde
+     codenaam, dienst en termijn binnen het venster is een herhaling. Intrekken
+     op id: de tweede keer is hij al weg. */
+  'POST /api/rtgid/machtig': { zelfdeVerzoek: true },
+  'POST /api/rtgid/machtig/intrek': { zelfdeVerzoek: true }
 };
 module.exports = { SLEUTELS };

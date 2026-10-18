@@ -33,36 +33,36 @@ test('strikte gezinsdocumenten blijven privé via API, lijst, opslag en herstart
     const kies = await api('/api/foundation/gezin/profiel/kies', { gezinscode, profielId: profiel.body.profiel.id });
     assert.equal(kies.status, 200);
     const reader = { code: owner.code, token: kies.body.token };
-    const rtf = (actie, data = {}, actor = owner) => api('/api/rtf/kantoorpakket/' + actie, { ...actor, ...data });
-    const maak = await rtf('maak', { soort: 'tekst', titel: 'Privé document' });
+    const rtf = (actie, data = {}, actor = owner) => api((actie.startsWith('/api/') ? actie : '/api/rtf/kantoorpakket/' + actie), { ...actor, ...data });
+    const maak = await rtf('/api/rtf/kantoorpakket/maak', { soort: 'tekst', titel: 'Privé document' });
     assert.equal(maak.status, 200);
     const id = maak.body.id;
-    assert.equal((await rtf('beheer', { id, classificatie: 'strikt' })).status, 200);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/beheer', { id, classificatie: 'strikt' })).status, 200);
     const before = opgeslagen(id);
     for (const rechten of ['lezen', 'bewerken']) {
-      assert.equal((await rtf('gezin', { id, rechten })).status, 409, 'strikt blokkeert ook gezinsdeling');
+      assert.equal((await rtf('/api/rtf/kantoorpakket/gezin', { id, rechten })).status, 409, 'strikt blokkeert ook gezinsdeling');
       assert.deepEqual(opgeslagen(id), before, 'weigering laat document en audit ongemoeid');
     }
-    assert.equal((await rtf('open', { id }, reader)).status, 403);
-    const list = await rtf('mijn', {}, reader);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/open', { id }, reader)).status, 403);
+    const list = await rtf('/api/rtf/kantoorpakket/mijn', {}, reader);
     assert.ok(!list.body.gedeeld.some(d => d.id === id));
 
     // De omgekeerde volgorde mag evenmin een tegenstrijdige staat opslaan.
-    assert.equal((await rtf('beheer', { id, classificatie: 'intern' })).status, 200);
-    assert.equal((await rtf('gezin', { id, rechten: 'lezen' })).status, 200);
-    const sharedList = await rtf('mijn', {}, reader);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/beheer', { id, classificatie: 'intern' })).status, 200);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/gezin', { id, rechten: 'lezen' })).status, 200);
+    const sharedList = await rtf('/api/rtf/kantoorpakket/mijn', {}, reader);
     assert.ok(sharedList.body.gedeeld.some(d => d.id === id), 'dezelfde lijst toont een toegelaten deling wel');
     const shared = opgeslagen(id);
-    assert.equal((await rtf('beheer', { id, classificatie: 'strikt' })).status, 409);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/beheer', { id, classificatie: 'strikt' })).status, 409);
     assert.deepEqual(opgeslagen(id), shared);
-    assert.equal((await rtf('open', { id }, reader)).status, 200, 'bestaande toestemming wordt niet stil ingetrokken');
-    assert.equal((await rtf('gezin', { id, rechten: 'uit' })).status, 200);
-    assert.equal((await rtf('beheer', { id, classificatie: 'strikt' })).status, 200);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/open', { id }, reader)).status, 200, 'bestaande toestemming wordt niet stil ingetrokken');
+    assert.equal((await rtf('/api/rtf/kantoorpakket/gezin', { id, rechten: 'uit' })).status, 200);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/beheer', { id, classificatie: 'strikt' })).status, 200);
     const final = opgeslagen(id);
     await stopNet(srv.child); srv = null;
     srv = await startServer({ env });
-    assert.equal((await rtf('open', { id }, reader)).status, 403);
-    assert.equal((await rtf('open', { id })).status, 200);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/open', { id }, reader)).status, 403);
+    assert.equal((await rtf('/api/rtf/kantoorpakket/open', { id })).status, 200);
     assert.deepEqual(opgeslagen(id), final, 'strikt en ingetrokken toegang blijven duurzaam');
   } finally {
     if (srv) await stopNet(srv.child);

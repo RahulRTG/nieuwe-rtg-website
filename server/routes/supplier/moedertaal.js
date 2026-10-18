@@ -18,17 +18,15 @@ module.exports = (kern) => {
   // de taal hoort bij de PERSOON: hetzelfde personeelslid, dezelfde taal, in
   // elke werk-app; het bedrijfsaccount (Beheer) krijgt een eigen sleutel per zaak
   const sleutelVan = req => (req.actor && req.actor.staffId) ? 'p' + req.actor.staffId : 'z' + req.supplier.code;
-  const bak = () => {
-    if (!db.data.staffTaal || typeof db.data.staffTaal !== 'object') db.data.staffTaal = {};
-    return db.data.staffTaal;
-  };
+  const eigen = require('../../kern/eigencollectie')({ db, domein: 'routes/supplier/moedertaal', bezit: { staffTaal: 'kaart' } });
+  const bak = () => eigen.bak('staffTaal');
   /* De leesbroer van bak(). Deze route is ook de VRAAG "welke taal spreek ik",
      en een uitgezette taal wordt hier geweigerd -- allebei mogen ze de la niet
      neerzetten voor een huis dat er nog geen had, want dan zeggen het antwoord
      (200 met 'nl', of 400) en de database iets anders over hetzelfde verzoek.
      Bestaat de la, dan is dit de echte; anders een lege vorm die nergens aan
      vastzit, en die leest even goed. */
-  const kijk = () => (db.data.staffTaal && typeof db.data.staffTaal === 'object') ? db.data.staffTaal : {};
+  const kijk = () => eigen.kijk('staffTaal');
 
   app.post('/api/supplier/mijn/taal', supplierAuth, (req, res) => {
     const k = sleutelVan(req);

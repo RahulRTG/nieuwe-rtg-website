@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2721 bestanden en 19024 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2801 bestanden en 19419 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,11 +12,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2721 |
-| losse beweringen (`test(...)`) | 19024 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2533 |
-| **overleefd**: geen mutatie kreeg hem rood | 0 |
+| toetsbestanden | 2801 |
+| losse beweringen (`test(...)`) | 19419 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2612 |
+| **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 8 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2388 bestanden, 18457 beweringen.
+2463 bestanden, 18847 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -351,7 +351,7 @@ toets omvalt.
 | `budgetterugname.test.js` | 5 | gezakt op `===->!==#0` | EEN MISLUKT BUDGET MAG EEN LID NIET BUITENSLUITEN. Twee besluiten die elk apart kloppen: kern/pay/budget.js eerst de positie klaarzetten, dan boeken -- want andersom staat er even saldo op een rekening zonder klasse,... |
 | `bugjacht.test.js` | 29 | gezakt op `liegpoort /api/` | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
 | `bundeldelen.test.js` | 6 | gezakt op `return-weg#0` | De bundels en hun losse delen mogen niet uit elkaar lopen. DIT KOMT UIT EEN ECHTE FOUT, en uit de duurste soort: eentje die niets liet zakken. |
-| `bundelprijs.test.js` | 9 | gezakt op `===->!==#0` | DE PRIJS VAN EEN AI-BUNDEL: gerekend, niet gekozen. De bundels stonden in kern/commercie/tegoed.js met capaciteit en een naam en NADRUKKELIJK zonder prijs -- de verkoopprijs hoort gerekend te worden, en de inkoopkant... |
+| `bundelprijs.test.js` | 11 | gezakt op `===->!==#0` | DE PRIJS VAN EEN AI-BUNDEL: gerekend, niet gekozen. De bundels stonden in kern/commercie/tegoed.js met capaciteit en een naam en NADRUKKELIJK zonder prijs -- de verkoopprijs hoort gerekend te worden, en de inkoopkant... |
 | `bundels-weerbaar.test.js` | 4 | gezakt op `!==->===#0` | DE STIJL- EN SCRIPTBUNDEL -- alleen eigen bestanden, en een wijziging verandert de stempel. server/middleware/stijlbundel.js en scriptbundel.js voegen bestanden uit de webroot samen tot een antwoord, op een lijst... |
 | `bureau.test.js` | 39 | gezakt op `liegpoort /api/` | Integratietests voor Het Privekantoor: de ENE app van de Lifestyle Pass. Wat hier bewezen wordt, en waarom juist dit: de poort een RTG-pas komt er niet in, op geen enkele route de projectie de Life Graph LEEST de... |
 | `busabonnee.test.js` | 2 | gezakt op `&&->||#0` | EEN BUS-ABONNEE DRAAIT NIET IN HET VERZOEK VAN DE PUBLICEERDER (Fase 2, PR 6, invariant I12). `emit` is synchroon, dus in proces draaide een abonnee (SSE, sessies, intreksignaal, deurrem) tot nu toe in de handeling,... |

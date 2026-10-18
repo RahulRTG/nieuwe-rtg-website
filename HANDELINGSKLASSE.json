@@ -4,8 +4,8 @@
   "gemeten": {
     "paden": 5148,
     "risicoGemarkeerd": 266,
-    "omkeerbaarGemeten": 44,
-    "beproefdePaden": 44
+    "omkeerbaarGemeten": 56,
+    "beproefdePaden": 56
   },
   "risicoVerdeling": {
     "geen": 64,
@@ -15,9 +15,8 @@
     "onbekend": 0
   },
   "omkeerbaarVerdeling": {
-    "onbekend": 5104,
-    "compensatie": 30,
-    "exact": 13,
-    "geen-herstel": 1
+    "onbekend": 5092,
+    "compensatie": 48,
+    "exact": 8
   }
 }

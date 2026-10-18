@@ -49,7 +49,7 @@ const { telSamen, zakt } = require('./lib/verraadtelling');
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
    er niets over zeggen. Zeven registers misten hem; zie de kop van
    scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'VERRAAD.json');
@@ -203,7 +203,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  in de catalogus staan ' + CATALOGUS.length + ' verraden; deze ronde beproeft er ' +
     t.verklaard + ' (de rest is nog niet ingebouwd).');
 
-  fs.writeFileSync(UITSLAG, JSON.stringify({
+  if (magSchrijven(eisSchoneBoom('verraadronde'), UITSLAG)) fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'De Verraadronde meldt nooit alleen PASS. TOEGEDIEND min WAARGENOMEN is het ' +
       'belangrijkste getal: dat zijn blinde injecties, en daar is niets geleerd. ' +

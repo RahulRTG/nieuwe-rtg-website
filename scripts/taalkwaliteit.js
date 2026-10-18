@@ -44,7 +44,7 @@ const { TALEN, BASIS } = require('../server/talen');
 const schrift = require('../server/taalschrift');
 const { KERN, dictVan, TALEN_MET_KERN } = require('../server/translate/woordenboek/wereld');
 const { keur } = require('../server/kern/taalkeuring');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 /* Het oordeel van een mens die de taal spreekt. Vandaag leeg, en dat staat er
    zo in -- een leeg register is een eerlijke nul en geen ontbrekend bestand. */
@@ -170,9 +170,9 @@ if (require.main === module) {
      dragen, want dat is precies de stilte die dit veld moet doorbreken. Een
      stempel hoort dus bij het WEGSCHRIJVEN en niet bij het rekenen. */
   const uit = Object.assign({ stempel: stempel(), hoe: 'npm run taalkwaliteit' }, m);
-  fs.writeFileSync(path.join(WORTEL, 'TAALKWALITEIT.json'), JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('taalkwaliteit'), 'TAALKWALITEIT.json')) fs.writeFileSync(path.join(WORTEL, 'TAALKWALITEIT.json'), JSON.stringify(uit, null, 2) + '\n');
   if (process.argv.includes('--toon')) toon(m);
-  else console.log('TAALKWALITEIT.json geschreven: ' + m.talen + ' talen, betekenis ongemeten voor ' + m.betekenisOngemeten + '.');
+  else console.log('TAALKWALITEIT: ' + m.talen + ' talen, betekenis ongemeten voor ' + m.betekenisOngemeten + '.');
 }
 
 module.exports = { meet };

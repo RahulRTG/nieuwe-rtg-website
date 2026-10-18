@@ -306,6 +306,27 @@ function eisSchoneBoom(naam, opties) {
       'als u weet dat deze ronde niet als bewijs hoeft te tellen.' };
 }
 
+/* DE GRENDEL OP HET SCHRIJFMOMENT, voor een generator die ongevraagd schrijft.
+   Het incident van 15 september (STEMPELVEILIGHEID.json) was een register met
+   `boomVuil: true` dat meeliep in een commando dat als CONTROLE leest, en dat
+   een brede add de commit in veegde. Weigeren te METEN is daar te veel: de
+   uitslag op het scherm en de afsluitcode zijn de controle, en die horen te
+   blijven. Wat niet mag, is dat de meting zich als repo-waarheid wegschrijft.
+
+   Dus: de aanroeper vraagt zelf eisSchoneBoom() (zodat de grendel in zijn eigen
+   code staat, waar scripts/stempelveiligheid.js hem leest), en deze functie zegt
+   alleen ja of nee en meldt hardop WAT er niet is geschreven en waarom. Een
+   register dat blijft staan zoals het was, wijst naar de commit waarop het
+   gemeten is; dat is de eerlijke stand. RTG_METEN_OP_VUILE_BOOM=1 blijft de
+   uitgeschreven ontsnapping. */
+function magSchrijven(poort, doel) {
+  if (poort && poort.ok) return true;
+  console.error('[' + path.basename(String(doel || 'register')) + ' niet geschreven] ' +
+    ((poort && poort.reden) || 'de schone-boompoort gaf geen antwoord'));
+  for (const f of (poort && poort.bestanden) || []) console.error('    ' + f);
+  return false;
+}
+
 /* Is dit stempel nog van deze code? Geeft een REDEN terug en niet alleen een
    ja/nee, want "verouderd" zonder waarom leidt tot een tweede onderzoek. */
 function versheid(gemeten, huidigeCommit) {
@@ -380,5 +401,5 @@ function stempelVan(bestand) {
   } catch (e) { return undefined; }   // undefined = het bestand is er niet; null = wel, maar zonder stempel
 }
 
-module.exports = { stempel, exactStempel, eisSchoneBoom, versheid, vuileBoom, sluiting,
+module.exports = { stempel, exactStempel, eisSchoneBoom, magSchrijven, versheid, vuileBoom, sluiting,
   nuCommit, stempelVan, isCodePad, CODEPADEN, CODE, WORTEL };

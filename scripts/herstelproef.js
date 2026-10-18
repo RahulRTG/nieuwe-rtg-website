@@ -47,7 +47,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { start } = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
 const wereld = require('./lib/herstelwereld');
@@ -549,7 +549,7 @@ async function main() {
     console.log('\n  Deelronde (--pad ' + deelronde + '): HERSTELPROEF.json is NIET geschreven.');
     console.log('  Een deelronde meet niet het geheel; draai `npm run herstelproef` zonder --pad om het register bij te werken.');
   } else {
-    fs.writeFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), JSON.stringify(uit, null, 1) + '\n');
+    if (magSchrijven(eisSchoneBoom('herstelproef'), 'HERSTELPROEF.json')) fs.writeFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), JSON.stringify(uit, null, 1) + '\n');
   }
   console.log('\n  exact ' + tel('exact') + ' | compensatie ' + tel('compensatie') +
     ' | geen-herstel ' + tel('geen-herstel') + ' | niet beproefd ' + tel('nietBeproefd') +

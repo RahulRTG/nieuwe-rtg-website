@@ -28,7 +28,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const cp = require('child_process');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* De getal-merktekens hebben EEN eigenaar (scripts/getallen.js); hier wordt
    zijn patroon gebruikt en niet nageschreven, anders zijn er twee. */
 const { MERK } = require('./getallen');
@@ -126,8 +126,8 @@ if (require.main === module) {
   regels.push('  ],', '  "stukken": [');
   stukken.forEach((s, i) => regels.push('    ' + JSON.stringify(s) + (i < stukken.length - 1 ? ',' : '')));
   regels.push('  ]', '}');
-  fs.writeFileSync(DOEL, regels.join('\n') + '\n');
-  console.log('KENNISINDEX.json geschreven: ' + docs.length + ' documenten, ' + stukken.length + ' stukken, ' +
+  if (magSchrijven(eisSchoneBoom('kennisindex'), DOEL)) fs.writeFileSync(DOEL, regels.join('\n') + '\n');
+  console.log('KENNISINDEX: ' + docs.length + ' documenten, ' + stukken.length + ' stukken, ' +
     overgeslagen.length + ' afdrukken overgeslagen.');
 }
 

@@ -73,7 +73,7 @@ const proefserver = require('./lib/proefserver');
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
    er niets over zeggen. Zeven registers misten hem; zie de kop van
    scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const BASIS_EXTERN = arg('--basis', null);
@@ -774,7 +774,7 @@ async function main() {
   const gecontroleerd = passief + actief + vindbaarVooraf.length;
   const uitslag = { gaten: gaten.length, gecontroleerd, onbewaakt: onbewaaktOnverklaard.length };
   try {
-    fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
+    if (magSchrijven(eisSchoneBoom('gluurronde'), UITSLAGBESTAND)) fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
       stempel: stempel(),
       uitleg: 'De gluurronde: de HORIZONTALE scheiding tussen twee leden. gaten MAG ALLEEN DALEN en proeven mag ' +
         'ALLEEN STIJGEN -- zie scripts/gluurronde.js. De dekking hangt aan wat lid B kan aanleggen (bezitStukken); ' +

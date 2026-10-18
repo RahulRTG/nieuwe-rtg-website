@@ -66,7 +66,7 @@ const proefserver = require('./lib/proefserver');
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
    er niets over zeggen. Zeven registers misten hem; zie de kop van
    scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const BASIS_EXTERN = arg('--basis', null);
@@ -265,7 +265,7 @@ async function main() {
   if (stil.length) console.log('  ' + K.geel + stil.length + ' routes gaven geen antwoord' + K.reset);
 
   try {
-    fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
+    if (magSchrijven(eisSchoneBoom('rolronde'), UITSLAGBESTAND)) fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
       stempel: stempel(null, { uitvoer: ['ROLRONDE.json'] }),
       uitleg: 'De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. ' +
         'gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. ' +

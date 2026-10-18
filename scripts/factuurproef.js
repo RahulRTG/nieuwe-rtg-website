@@ -702,7 +702,8 @@ function druk(u) {
    Het stempel komt uit ./lib/stempel.js en is niet zelfgemaakt -- inclusief
    `boomVuil`, want een ronde op een ongecommitte boom hoort niet bij die commit. */
 function schrijf(u) {
-  const { stempel } = require('./lib/stempel');
+  const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
+  if (!magSchrijven(eisSchoneBoom('factuurproef'), 'FACTUURPROEF.json')) return null;
   const register = Object.assign({
     soort: 'proef',
     uitleg: 'Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route ' +
@@ -721,7 +722,7 @@ function schrijf(u) {
 
 if (require.main === module) {
   meet().then(u => {
-    if (process.argv.includes('--vastleggen')) { schrijf(u); console.log('FACTUURPROEF.json geschreven.'); }
+    if (process.argv.includes('--vastleggen') && schrijf(u)) console.log('FACTUURPROEF.json geschreven.');
     if (process.argv.includes('--json')) { console.log(JSON.stringify(u, null, 1)); }
     else druk(u);
     process.exit(u.gezakt ? 1 : 0);

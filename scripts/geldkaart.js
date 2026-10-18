@@ -112,7 +112,7 @@ const KERNBAKKEN = Object.freeze({
    ongecommitte code is NIET te herhalen, en een register dat daarover zwijgt
    leest als een reproduceerbare meting. De norm telt zulke registers apart
    (`registersUitVuileBoom`) -- en dat werkt alleen als het veld er staat. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 /* ---------------------------------------------------------------- AS 1 */
 function kaart() {
@@ -276,7 +276,7 @@ const register = {
   }
 };
 
-fs.writeFileSync(path.join(WORTEL, 'GELDKAART.json'), JSON.stringify(register, null, 2) + '\n');
+if (magSchrijven(eisSchoneBoom('geldkaart'), 'GELDKAART.json')) fs.writeFileSync(path.join(WORTEL, 'GELDKAART.json'), JSON.stringify(register, null, 2) + '\n');
 
 /* ---------------------------------------------------------------- scherm */
 const g = n => String(n).padStart(5);

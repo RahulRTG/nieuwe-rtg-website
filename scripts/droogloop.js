@@ -40,7 +40,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { DatabaseSync } = require('node:sqlite');
 const { start } = require('./lib/wegwerpserver');
 const { gevolgVan } = require('../server/kern/stuur/gevolg');
@@ -250,7 +250,7 @@ async function main() {
     ]
   };
   Object.assign(uit, { stempel: stempel() });
-  fs.writeFileSync(path.join(WORTEL, 'DROOGLOOP.json'), JSON.stringify(uit, null, 1) + '\n');
+  if (magSchrijven(eisSchoneBoom('droogloop'), 'DROOGLOOP.json')) fs.writeFileSync(path.join(WORTEL, 'DROOGLOOP.json'), JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  ' + gemeten + ' van ' + stappen.length + ' stappen gemeten; ' +
     geraakt.length + ' collectie(s) bewogen.');
   console.log('  voorspelling: ' + kloppend + ' van ' + beoordeeld.length + ' beoordeelde stappen klopte; ' +

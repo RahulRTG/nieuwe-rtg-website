@@ -61,7 +61,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UIT = path.join(WORTEL, 'IDEMIDENTITEIT.json');
@@ -405,7 +405,7 @@ if (require.main === module) {
      stempel is een bewering zonder datum, en dan kan niemand zien of het over
      vandaag gaat (BESTUUR.md: vervallen bewijs is geen bewijs). */
   const uit = Object.assign({ stempel: stempel() }, meet());
-  fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('idemidentiteit'), UIT)) fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
 
   console.log('\n  WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK?  (graad: ' + uit.graad + ')\n');
   console.log('   ' + uit.aanroepplekken + ' aanroepplekken van metIdem onder server/\n');

@@ -40,7 +40,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
@@ -488,8 +488,10 @@ if (MEET) {
   const na = meet(gericht);
   const dun = !argv.includes('--kleiner') && !na.fout && teDun(na, vorigeRonde());
   if (dun) { console.error('\n  ' + dun + '\n'); process.exitCode = 2; return; }
-  if (!na.fout) fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(na, gericht), null, 1) + '\n');
-  console.log('  weggeschreven in OUTPUTPROEF.json\n');
+  if (!na.fout && magSchrijven(eisSchoneBoom('outputproef'), UITSLAG)) {
+    fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(na, gericht), null, 1) + '\n');
+    console.log('  weggeschreven in OUTPUTPROEF.json\n');
+  }
   process.exitCode = 0;
   return;
 }
@@ -500,7 +502,7 @@ if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); proces
 const dun = !argv.includes('--kleiner') && teDun(uit, vorigeRonde());
 if (dun) { console.error('\n  ' + dun + '\n'); process.exitCode = 2; return; }
 
-fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(uit), null, 1) + '\n');
+if (magSchrijven(eisSchoneBoom('outputproef'), UITSLAG)) fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(uit), null, 1) + '\n');
 console.log('\n=== DE OUTPUT-PROEF ===\n');
 console.log('  journaal              : ' + path.relative(WORTEL, JOURNAAL));
 console.log('  routes met een toets  : ' + uit.routes);

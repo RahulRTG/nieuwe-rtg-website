@@ -42,6 +42,7 @@ const VERBINDING = /ECONNREFUSED|ECONNRESET|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH|s
 function normaliseer(reis) {
   return {
     pad: reis.pad || reis.reis || reis.naam || '?',
+    bronlaag: reis.bronlaag || null,
     status: Number(reis.status) || 0,
     fout: String(reis.fout || reis.reden || ''),
     gelukt: typeof reis.gelukt === 'boolean' ? reis.gelukt : (Number(reis.status) >= 200 && Number(reis.status) < 400)
@@ -73,7 +74,7 @@ function duid(reizen) {
   const foutTekst = stuk.map(x => x.fout).join(' | ');
   const noem = () => stuk.map(x => `${x.pad} (${x.status || 'geen antwoord'})`).join(', ');
 
-  if (DNS.test(foutTekst)) {
+  if (stuk.some(x => x.bronlaag === 'dns') || DNS.test(foutTekst)) {
     return {
       laag: 'dns', terugrollen: false, stuk: stuk.length, totaal: r.length,
       waarom: 'De naam loste niet op: ' + noem() + '. Dat gebeurt buiten dit huis -- bij de registrar of de nameservers.',
@@ -81,7 +82,7 @@ function duid(reizen) {
     };
   }
 
-  if (TLS.test(foutTekst)) {
+  if (stuk.some(x => x.bronlaag === 'tls') || TLS.test(foutTekst)) {
     return {
       laag: 'tls', terugrollen: false, stuk: stuk.length, totaal: r.length,
       waarom: 'De TLS-verbinding kwam niet rond: ' + noem() + '. Bijna altijd een verlopen of onvolledig uitgeleverd certificaat.',
@@ -89,11 +90,29 @@ function duid(reizen) {
     };
   }
 
-  if (VERBINDING.test(foutTekst)) {
+  if (stuk.some(x => x.bronlaag === 'rand') || VERBINDING.test(foutTekst)) {
     return {
       laag: 'rand', terugrollen: false, stuk: stuk.length, totaal: r.length,
       waarom: 'De verbinding werd geweigerd of viel weg: ' + noem() + '. Dat is de rand (reverse proxy, poort, container), niet de code erachter.',
       doen: 'Kijk of de container draait en of de proxy naar de goede poort wijst. Terugrollen zet een andere versie neer achter dezelfde dichte deur.'
+    };
+  }
+
+  /* Alleen het samengevoegde vrijgavebewijs beschikbaar: een routefout zegt
+     waar het stukliep, maar bewijst niet dat ALLE gebruikersreizen stuk zijn.
+     Zonder die breedte mag dit nooit de automatische rollbackduiding krijgen. */
+  if (stuk.length === r.length && stuk.every(x => x.bronlaag === 'deels')) {
+    return {
+      laag: 'deels', terugrollen: false, stuk: stuk.length, totaal: r.length,
+      waarom: 'De publieke vrijgaveproef vond een routefout: ' + noem() + ', maar de gewone gebruikersreizen ontbreken.',
+      doen: 'Herhaal de gewone sonde en onderzoek de genoemde route. Eén vrijgavepad is geen bewijs voor een volledige rollback.'
+    };
+  }
+  if (stuk.length === r.length && stuk.every(x => x.bronlaag === 'onbekend')) {
+    return {
+      laag: 'onbekend', terugrollen: false, stuk: stuk.length, totaal: r.length,
+      waarom: 'Het publieke vrijgavebewijs is rood, maar zijn foutcode wijst geen operationele laag aan: ' + noem() + '.',
+      doen: 'Controleer de proefconfiguratie en draai daarna zowel de vrijgaveproef als de gewone sonde opnieuw.'
     };
   }
 
@@ -128,6 +147,39 @@ function duid(reizen) {
   };
 }
 
+function monstersUit(rauw) {
+  if (Array.isArray(rauw)) return rauw;
+  return rauw && (rauw.monsters || rauw.reizen) || [];
+}
+
+/* De publieke proef meet MEER dan TLS: ook DNS, readiness, HSTS, de voordeur
+   en de redirect. Zijn naam is dus geen diagnose. De foutcode is dat wel. Een
+   te groot readiness-antwoord betekent bijvoorbeeld dat TLS al rond was; hem
+   als certificaatfout duiden stuurt de operator naar de verkeerde plek. */
+function laagVanTlsBewijs(bewijs) {
+  const code = String(bewijs && bewijs.foutcode || '');
+  const fout = String(bewijs && bewijs.fout || '');
+  if (DNS.test(code + ' ' + fout)) return 'dns';
+  if (/^RTG_TLS_(?:TRUST|HOSTNAME|GELDIGHEID|PROTOCOL)$/.test(code) || TLS.test(fout)) return 'tls';
+  if (/^RTG_TLS_(?:HSTS|REDIRECT|ANTWOORD|TIMEOUT)$/.test(code) || VERBINDING.test(fout)) return 'rand';
+  /* Een niet-groene route is concrete app-evidence, maar zonder de gewone
+     sonde bewijst EEN route nog geen volledige appstoring en dus geen rollback. */
+  if (/^RTG_TLS_(?:READY|HOOFDPAGINA)$/.test(code)) return 'deels';
+  return 'onbekend';
+}
+
+/* De strenge publieke vrijgaveproef is een zelfstandige meting naast de
+   gewone gebruikersreizen. Ook als de sonde geen bestand kon schrijven,
+   blijft het rode bewijs daardoor een concrete gemeten reis. */
+function voegBewijzenSamen(sonde, tlsBewijs) {
+  const reizen = [...monstersUit(sonde)];
+  if (tlsBewijs && tlsBewijs.geslaagd === false) {
+    reizen.push({ reis: 'publieke-vrijgaveproef', bronlaag: laagVanTlsBewijs(tlsBewijs), status: 0, gelukt: false,
+      reden: String(tlsBewijs.fout || tlsBewijs.foutcode || 'de publieke TLS-vrijgaveproef is geweigerd').slice(0, 500) });
+  }
+  return reizen;
+}
+
 function toon(u) {
   return [
     'TRIAGE VAN DE LIVE-SONDE',
@@ -143,23 +195,32 @@ function toon(u) {
 if (require.main === module) {
   const argv = process.argv.slice(2);
   const uit = (argv.find(a => a.startsWith('--uit=')) || '').slice(6);
-  if (!uit) {
-    console.error('Geef de sonde-uitvoer mee: node scripts/triage.js --uit=sonde.json');
+  const tlsPad = (argv.find(a => a.startsWith('--tls=')) || '').slice(6);
+  if (!uit && !tlsPad) {
+    console.error('Geef bewijs mee: node scripts/triage.js --uit=sonde.json [--tls=tls-bewijs.json]');
     process.exit(2);
   }
-  let rauw;
+  let rauw = null, tlsBewijs = null, sondeFout = null, tlsFout = null;
   try {
-    rauw = JSON.parse(fs.readFileSync(uit, 'utf8'));
+    if (uit) rauw = JSON.parse(fs.readFileSync(uit, 'utf8'));
   } catch (e) {
-    /* Exitcode 2, niet 1: de triage kon niet duiden. Een fix-lus die hierop
-       afgaat zou anders een storing gaan zoeken die niet gemeten is. */
-    console.error('De triage kon de sonde-uitvoer niet lezen (' + uit + '): ' + e.message);
-    process.exit(2);
+    sondeFout = e;
   }
-  const uitslag = duid(Array.isArray(rauw) ? rauw : (rauw.monsters || rauw.reizen || []));
+  try {
+    if (tlsPad) tlsBewijs = JSON.parse(fs.readFileSync(tlsPad, 'utf8'));
+  } catch (e) {
+    tlsFout = e;
+  }
+  /* Een rood TLS-bewijs is al genoeg voor een concrete duiding, ook als de
+     gewone sonde daarna zelf geen bestand kon schrijven. Alleen als geen van
+     beide metingen leesbaar is, blijft de uitslag onbekend. */
+  const reizen = voegBewijzenSamen(rauw, tlsBewijs);
+  const uitslag = duid(reizen);
+  if (sondeFout) uitslag.bewijsfout = 'sonde-uitvoer onleesbaar: ' + sondeFout.message;
+  if (tlsFout) uitslag.tlsBewijsfout = 'TLS-bewijs onleesbaar: ' + tlsFout.message;
   console.log(toon(uitslag));
   fs.writeFileSync('TRIAGE.json', JSON.stringify(uitslag, null, 2) + '\n');
   process.exit(uitslag.laag === 'geen' ? 0 : (uitslag.laag === 'onbekend' ? 2 : 1));
 }
 
-module.exports = { duid, normaliseer, toon };
+module.exports = { duid, normaliseer, monstersUit, laagVanTlsBewijs, voegBewijzenSamen, toon };

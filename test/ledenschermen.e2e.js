@@ -36,7 +36,12 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ledenscherm-'));
    zichzelf belooft. */
 const OPEN = [
   { app: 'home', eist: /lampen|klimaat|gordijnen|een bediening/i },
-  { app: 'mall', eist: /alleen voor leden/i },
+  /* De levende Mall bouwt haar brongebonden etalage na `load`: eerst komen de
+     vaste schil en de gedeelde Edge op, daarna de catalogus. Op een volle
+     CI-run kon de algemene rustmeting precies tussen die twee fasen vallen.
+     Wacht daarom op de inhoudelijke belofte die de Mall zelf rendert; de
+     betekenisassertion hieronder blijft ongewijzigd. */
+  { app: 'mall', eist: /niet alleen kopen[\s\S]*uw wereld uitbreiden/i, wachtOp: 'Niet alleen kopen' },
   { app: 'nieuws', eist: /redactie|nieuws/i },
   { app: 'krant', eist: /kranten|titel/i },
   { app: 'pulse', eist: /volgend|ontdek|mijn plank/i },
@@ -152,7 +157,7 @@ test(OPEN.length + ' ledenschermen tonen waar ze voor zijn',
 
     const stuk = [];
     for (const s of OPEN) {
-      const r = await toon(o.page, base, s.app, token);
+      const r = await toon(o.page, base, s.app, token, s.wachtOp);
       if (s.deel) {
         await edgeActies(o.page);
         r.tekst = await o.page.locator('body').innerText();

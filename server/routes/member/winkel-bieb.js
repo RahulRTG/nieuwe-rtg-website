@@ -4,6 +4,7 @@
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
   const { app, auth, foodcourt, mall, appbieb, reisbieb, rtfbieb, gegevensStop } = kern;
+  const levendeEtalage = require('../../kern/mall/levende-etalage');
 
   /* Het toegangsmodel van de echte RTG Bibliotheek: BLADEREN is voor iedereen
      zichtbaar (ook de aangemelde gratis gast). Installeren uit de
@@ -26,6 +27,32 @@ module.exports = (kern) => {
 
   /* ---- de RTG Mall: de enige plek waar je bij RTG koopt ---- */
   app.post('/api/mall', auth, (req, res) => res.json(mall.overzicht()));
+  /* Eén leesprojectie voor de nieuwe Living Mall. Alle bronnen blijven bij hun
+     eigen domein: partners en aanbod bij Mall, software bij App-Bibliotheek en
+     hardware bij het bestaande eigen-merk. Hierdoor verschijnt nieuw,
+     goedgekeurd partneraanbod vanzelf zonder een tweede catalogus bij te houden. */
+  app.post('/api/mall/living', auth, (req, res) => {
+    const zoek = mall.mallZoek({
+      q: String((req.body || {}).q || '').slice(0, 120),
+      plek: (req.body || {}).plek,
+      zakelijk: req.session.tier === 'business',
+      pagina: 1,
+      per: 24,
+      noteer: false
+    });
+    const apps = appbieb.catalogus({ pagina: 1, per: 24 }).items;
+    const installedApps = appbieb.mijnApps(req.session.key);
+    const ownProducts = mall.eigenCatalogus().producten;
+    const supplierGroups = mall.overzicht().gids || [];
+    res.json(levendeEtalage.projecteerLivingMall({
+      aanbod: zoek.items,
+      apps,
+      installedApps,
+      ownProducts,
+      partial: zoek.stuk,
+      supplierGroups
+    }));
+  });
   // de catalogus van het RTG eigen-merk (hardware + de Hardwarelab-ontwerpen)
   app.post('/api/mall/eigen', auth, (req, res) => res.json(mall.eigenCatalogus()));
   // een lid bestelt een eigen-merk-product direct in de app

@@ -23,6 +23,8 @@ const SLEUTELS = Object.assign({},
   /* De TURN-uitgifte: elk antwoord is een vers geheim. Zie de kop daar. */
   require('./idemsleutels-rtc').SLEUTELS,
   /* Vier routes uit de samenvoeging van #542. Zie de kop daar. */
-  require('./idemsleutels-samenvoeging').SLEUTELS);
+  require('./idemsleutels-samenvoeging').SLEUTELS,
+  /* De Living Mall is een POST-projectie zonder mutatie. */
+  require('./idemsleutels-mall-living').SLEUTELS);
 
 module.exports = { SLEUTELS };

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-14T22:29:49.226Z",
-    "commit": "443eed01f",
+    "op": "2026-10-16T08:36:54.731Z",
+    "commit": "d879535f1",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.11.1"
+    "node": "v26.12.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -9807,6 +9807,13 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
+    "mall-living.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "mall-supplieros.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -17753,6 +17760,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "sinds de migratie van #403 is PER_ROUTE leeg: de poort houdt niets tegen, dus een mutatie in de methode- of NODE_ENV-grendel verandert niets waarneembaars (isProductie omgedraaid: 8/8 groen, terecht); wat er wel te zien is, is bewaakt: een route terug aan de grendel (/api/arrival/request) laat toets 1, 2, 6 en 8 zakken"
+    },
+    "travel-request-controller.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/travel-request-controller.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "treasury.test.js": {
       "soort": "server",

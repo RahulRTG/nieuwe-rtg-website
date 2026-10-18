@@ -11,8 +11,8 @@
    welke id's bestaan.
 
    De vestigingen staan in ./concern/vestiging.js, de juridische feiten en de
-   tijdmachine in ./concern/feiten.js, de mensenkant (dienstverbanden, uitnodigen,
-   rechten) in ./concern/mensen.js, de veranderkant in
+   tijdmachine in ./concern/feiten.js, de mensenkant (dienstverbanden, uitnodigen)
+   in ./concern/mensen.js, de rechten en kwalificaties in ./concern/rechten.js, de veranderkant in
    ./concern/verandering.js, het duiden van een naam in ./concern/duiding.js en de
    rekening van een entiteit in ./concern/rekening.js: dit bestand ging over de
    10 kB van het modulebeleid, en dat is de goede naad. */
@@ -159,6 +159,7 @@ module.exports = (kern) => {
   };
   require('./concern/vestiging')(kern, { mijn, mijnVestiging, stuur, nietGevonden, beheertZaak });
   require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden, personeelVan });
+  require('./concern/rechten')(kern, { mijn, stuur, nietGevonden });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
   require('./concern/duiding')(kern, { mijn, stuur, nietGevonden });
   require('./concern/rekening')(kern, { mijn, stuur, nietGevonden });

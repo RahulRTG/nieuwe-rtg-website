@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2670,
+        "kernelModules": 2671,
         "mutationContracts": 61,
         "routes": 64,
         "screens": 20,
@@ -389,7 +389,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 42,
+        "kernelModules": 43,
         "mutationContracts": 136,
         "routes": 140,
         "screens": 21,
@@ -475,8 +475,8 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 32,
-        "kernelModules": 61,
-        "mutationContracts": 530,
+        "kernelModules": 62,
+        "mutationContracts": 531,
         "routes": 534,
         "screens": 45,
         "dataSchema": "geen centrale uitbreiding toegestaan",
@@ -639,7 +639,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 38,
-        "kernelModules": 144,
+        "kernelModules": 145,
         "mutationContracts": 1142,
         "routes": 1172,
         "screens": 89,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2697,
+        "kernelModules": 2698,
         "mutationContracts": 2077,
         "routes": 2099,
         "screens": 98,

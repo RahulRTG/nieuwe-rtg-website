@@ -37,10 +37,7 @@ module.exports = (ctx) => {
       if (typeof p.voorraad === 'number' && p.voorraad < som)
         return { status: 409, error: 'Van ' + p.naam + ' ligt er nog ' + p.voorraad + ' ' + (p.eenheid || 'stuks') + '; pas de hoeveelheid aan.' };
       nodig.set(p.id, som);
-      /* `keukenArtikel`: het artikel van de KOPER waar deze regel voor is
-         besteld, als het inkoopadvies dat wist. Alleen een verwijzing in de
-         eigen keuken van de koper -- bij de levering zoekt kern/keuken het op
-         in die keuken en nergens anders. */
+      // keukenArtikel: het artikel van de koper (uit het inkoopadvies), alleen in diens eigen keuken.
       const ka = r.keukenArtikel ? schoon(r.keukenArtikel, 40) : '';
       regels.push(Object.assign({ productId: p.id, naam: p.naam, eenheid: p.eenheid, aantal, prijs }, ka ? { keukenArtikel: ka } : {}));
       subtotaal += prijs * aantal;
@@ -88,18 +85,17 @@ module.exports = (ctx) => {
     else if (actie === 'verder') { const volgende = GH_KETEN[o.status]; if (!volgende) return { status: 409, error: 'Geen volgende stap.' }; o.status = volgende; }
     else return { status: 400, error: 'Onbekende actie.' };
     o.stappen.push({ status: o.status, at: nu(), door: (actor && actor.name) || null });
-    /* Geleverd bij een zaak: de keukenvoorraad van de klant vult zichzelf aan,
-       en WAT er is ingeboekt komt bij de bestelling te staan. Hier stond een
-       `catch` die alles inslikte en niets bewaarde, dus "geleverd" zei niets
-       over of er ook iets binnen was. Een fout in het inboeken houdt de
-       levering niet tegen -- de dozen staan er al -- maar hij staat erbij. */
+    /* Geleverd bij een zaak: de keukenvoorraad vult zich aan en de bestelling
+       houdt bij wat er is ingeboekt. Een fout houdt de levering niet tegen
+       (de dozen staan er al), maar wordt niet meer stil ingeslikt. */
     if (o.status === 'geleverd' && o.klant.soort !== 'lid' && bijGeleverd) {
+      const niet = reden => o.regels.map(x => ({ naam: x.naam, reden }));
       try {
         const r = bijGeleverd(o);
         o.ontvangst = r ? { geboekt: r.geboekt, nietGeboekt: r.nietGeboekt, at: nu() }
-          : { geboekt: 0, nietGeboekt: o.regels.map(x => ({ naam: x.naam, reden: 'deze zaak heeft geen keukenvoorraad' })), at: nu() };
+          : { geboekt: 0, nietGeboekt: niet('deze zaak heeft geen keukenvoorraad'), at: nu() };
       } catch (e) {
-        o.ontvangst = { geboekt: 0, nietGeboekt: o.regels.map(x => ({ naam: x.naam, reden: 'inboeken mislukt' })), fout: true, at: nu() };
+        o.ontvangst = { geboekt: 0, nietGeboekt: niet('inboeken mislukt'), fout: true, at: nu() };
       }
     }
     save();

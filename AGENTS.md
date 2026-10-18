@@ -90,6 +90,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen
 - `CONSOLIDATIE.md` is het opruimbesluit van de eigenaar; lees het vóór elke PR
 - `AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is leidend
+- `CIVILIS.md` breidt uit
 
 ## Structuur en starten (kort)
 

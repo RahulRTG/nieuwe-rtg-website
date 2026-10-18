@@ -2820,3 +2820,17 @@ beveiligingsgrens. Eén integrator, geen nieuwe domeinen tot fase 4, CI genereer
 en controleert de registers, en vier harde voorwaarden: geen kunstmatige
 normverbetering, geen verborgen bewijsachterstand, geen automatische
 productie-uitrol, geen nieuwe technische schuld.
+
+**`CIVILIS.md` is het besluit van de eigenaar van 18 oktober 2026** — RTG als
+universele infrastructuur voor ondernemingen, burgers, instellingen en publieke
+dienstverlening, met de 79 genres niet langer als grens. Het legt de enige
+uitzondering op `CONSOLIDATIE.md` vast (nieuwe domeinen mogen, alleen binnen dit
+programma) en verandert verder niets aan de lanceerbare kern, de ene integrator
+of de vier voorwaarden. Lees het vóór je een sector, organisatievorm of keten
+tussen organisaties toevoegt. Drie regels die niet mogen sneuvelen: geen tweede
+waarheid (sectorclaims in het genre-register, bewijs uit `ONDERNEMERBEWIJS.json`
+en `APPWERKT.json`), geen nieuwe statusladder (*niet gebouwd, niet gemeten,
+bewezen, falend* is een leestabel op bestaande standen), en elke nieuwe keten
+krijgt een proef met schakels en storingen. De eerste staat: `voorraad-ontvangst`
+(`scripts/voorraadproef.js`), een restaurant dat inkoopt bij een groothandel. Die
+vond meteen een stil defect: geleverd zonder dat er iets in de keuken landde.

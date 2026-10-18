@@ -53,7 +53,7 @@ module.exports = (kern) => {
     for (const a of advies) {
       const naam = a.naam.toLowerCase();
       const p = gh.producten.find(x => { const pn = x.naam.toLowerCase(); return pn === naam || pn.includes(naam) || naam.includes(pn); });
-      if (p) regels.push({ productId: p.id, aantal: a.advies });
+      if (p) regels.push({ productId: p.id, aantal: a.advies, keukenArtikel: a.artikelId });
       else nietGevonden.push(a.naam);
     }
     if (!regels.length) return res.status(409).json({ error: 'Geen adviesartikel staat in het assortiment van deze groothandel.', nietGevonden });

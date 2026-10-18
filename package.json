@@ -398,6 +398,8 @@
     "gemeenschapsproef:vast": "node scripts/gemeenschapsproef.js --vastleggen",
     "ritproef": "node scripts/ritproef.js",
     "ritproef:vast": "node scripts/ritproef.js --vastleggen",
+    "voorraadproef": "node scripts/voorraadproef.js",
+    "voorraadproef:vast": "node scripts/voorraadproef.js --vastleggen",
     "romeproef": "node scripts/romeproef.js",
     "romeproef:vast": "node scripts/romeproef.js --vastleggen",
     "ketenvorm": "node scripts/ketenvorm.js",

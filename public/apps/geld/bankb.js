@@ -65,18 +65,30 @@
 
   /* Bedragen vragen we net als het origineel met prompt(): een formulier per
      rekening zou het paneel verdrievoudigen voor een invoer van een getal. */
+  /* EEN sleutel per BEDOELING, niet per klik: een dubbelklik op Overboeken gaf
+     twee sleutels en dus twee boekingen. Dezelfde handeling met dezelfde
+     velden houdt zijn sleutel tot de server antwoordt (gelukt of geweigerd). */
+  var lopend = {};
+  function bedoeling(soort, voor) {
+    if (!lopend[soort] || lopend[soort].voor !== voor) lopend[soort] = { voor: voor, idem: B.sleutel(soort) };
+    return lopend[soort].idem;
+  }
+  function klaar(soort, e) { if (!e || e.status) delete lopend[soort]; }
   B.bind = function () {
     var Geld = w.Geld;
     $('#bkNopen').addEventListener('click', async function () {
-      try { await Geld.api('/api/bank/rekening/open', { soort: $('#bkNsoort').value, idem: B.sleutel('rekopen') }); await B.herlaad(); }
-      catch (e) { Geld.melding(e.message); }
+      var soort = $('#bkNsoort').value;
+      try { await Geld.api('/api/bank/rekening/open', { soort: soort, idem: bedoeling('rekopen', soort) }); klaar('rekopen'); await B.herlaad(); }
+      catch (e) { klaar('rekopen', e); Geld.melding(e.message); }
     });
     $('#bkOdoe').addEventListener('click', async function () {
       var centen = Math.round(Number($('#bkObed').value) * 100);
+      var lijf = { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen };
+      lijf.idem = bedoeling('overboek', lijf.vanIban + '|' + lijf.naarIban + '|' + centen);
       try {
-        await Geld.api('/api/bank/overboek', { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen, idem: B.sleutel('overboek') });
-        $('#bkObed').value = ''; await B.herlaad();
-      } catch (e) { Geld.melding(e.message); }
+        await Geld.api('/api/bank/overboek', lijf);
+        klaar('overboek'); $('#bkObed').value = ''; await B.herlaad();
+      } catch (e) { klaar('overboek', e); Geld.melding(e.message); }
     });
     $('#bkAiB').addEventListener('click', function () {
       var q = $('#bkAiV').value.trim();

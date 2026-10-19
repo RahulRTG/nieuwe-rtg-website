@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "8a46052cf",
+  "commit": "bef31ca9a",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/theater.html"
+    "public/apps/krant.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1071,
-  "verwijzingen": 1296,
-  "voorvoegsels": 140,
+  "exactePaden": 1073,
+  "verwijzingen": 1299,
+  "voorvoegsels": 139,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8584,6 +8584,14 @@
    "schermen": [
     "public/apps/kantoor.html",
     "public/shared/interface/world-widget-data.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/krant/artikel",
+   "schermen": [
+    "public/apps/krant.html",
+    "public/apps/saloon/lezer.js"
    ],
    "aantal": 2
   },
@@ -11681,6 +11689,20 @@
    "aantal": 1
   },
   {
+   "pad": "/api/krant/gids",
+   "schermen": [
+    "public/apps/krant.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/krant/open",
+   "schermen": [
+    "public/apps/krant.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/leerhuis/doe",
    "schermen": [
     "public/apps/leerhuis-deur.js"
@@ -14155,13 +14177,6 @@
    "pad": "/api/mediaos/volg",
    "schermen": [
     "public/apps/saloon/acties.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/krant/artikel",
-   "schermen": [
-    "public/apps/saloon/lezer.js"
    ],
    "aantal": 1
   },
@@ -17301,10 +17316,12 @@
   },
   {
    "bestand": "public/apps/krant.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/krant/"
-   ]
+   "exact": [
+    "/api/krant/artikel",
+    "/api/krant/gids",
+    "/api/krant/open"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/lab.html",

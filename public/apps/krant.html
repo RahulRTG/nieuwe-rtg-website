@@ -98,7 +98,10 @@
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const api=(pad,body)=>fetch('/api/krant/'+pad,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+/* Het volle pad staat bij de aanroep (zie public/apps/pay.html); met een stam plus staart zag de routetelling geen enkele Krant-route.
+   De ledensessie gaat mee: gebruiken vraagt een account (AGENTS.md, besluit van 19 oktober 2026). */
+const TOKEN_LID=(()=>{try{return localStorage.getItem('rtg_member_token')||'';}catch(e){return '';}})();
+const api=(pad,body)=>fetch(pad,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},TOKEN_LID?{Authorization:'Bearer '+TOKEN_LID}:{}),body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 let ZAAK=(new URLSearchParams(location.search).get('zaak')||'').toUpperCase();
 let KRANT=null, RUBRIEK='alle', GIDS=[];
 /* Meenemen: wat er open ligt. Staat er een krant open, dan de artikelen van
@@ -141,7 +144,7 @@ window.addEventListener('resize',()=>{ clearTimeout(window._t); window._t=setTim
 /* ---- de krant tonen ---- */
 async function toonKrant(){
   document.body.dataset.view='krant';
-  if(!KRANT){ try{ KRANT=await api('open',{code:ZAAK}); }catch(e){ $('#hoofd').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; } }
+  if(!KRANT){ try{ KRANT=await api('/api/krant/open',{code:ZAAK}); }catch(e){ $('#hoofd').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; } }
   const acc=KRANT.huisstijl.accent||'#7F1634';
   document.documentElement.style.setProperty('--acc',acc);
   $('#kop').textContent=KRANT.huisstijl.naam;
@@ -171,7 +174,7 @@ async function toonKrant(){
   feed.appendChild(grid);
 }
 async function lees(id){
-  try{ const d=await api('artikel',{code:ZAAK,id}); const a=d.artikel; document.body.dataset.view='artikel';
+  try{ const d=await api('/api/krant/artikel',{code:ZAAK,id}); const a=d.artikel; document.body.dataset.view='artikel';
     document.documentElement.style.setProperty('--acc',a.accent||'#7F1634');
     $('#kop').textContent=a.naam;
     const paras=String(a.inhoud||'').split(/\n{2,}|\n/).filter(x=>x.trim()).map(p=>'<p>'+esc(p)+'</p>').join('')||'<p class="chapo">'+esc(a.chapo||'')+'</p>';
@@ -186,7 +189,7 @@ async function lees(id){
 async function gids(){
   document.body.dataset.view='gids'; $('#kop').textContent='RTG Krant';
   const h=$('#hoofd'); h.innerHTML='<div class="gids"><h1>RTG Krant</h1><p class="lead2">De kranten die nieuwsbedrijven binnen RTG uitgeven. Kies een titel om te lezen.</p><div class="grid" id="krantgrid"><div class="leeg">Laden…</div></div></div>';
-  try{ const d=await api('gids'); GIDS=d.lijst||[]; const g=$('#krantgrid'); g.innerHTML='';
+  try{ const d=await api('/api/krant/gids'); GIDS=d.lijst||[]; const g=$('#krantgrid'); g.innerHTML='';
     if(!(d.lijst||[]).length){ g.innerHTML='<div class="leeg">Nog geen kranten online.</div>'; return; }
     d.lijst.forEach(k=>{ const b=document.createElement('button'); b.className='krantkaart'; b.style.borderLeftColor=k.accent||'#7F1634';
       b.innerHTML='<div class="nm">'+esc(k.naam)+'</div><div class="po">'+esc(k.payoff||'')+'</div><div class="mt">'+k.artikelen+' artikel'+(k.artikelen===1?'':'en')+'</div>';

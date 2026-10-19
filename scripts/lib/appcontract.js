@@ -238,6 +238,9 @@ const CONTRACT = {
   'link:vooruitzicht': Object.assign({
     belofte: 'een lid legt een intentie vast, verkent routes en geeft de voorbereiding vrij, en het vooruitzicht toont uitsluitend wat een bron gaf -- geen providerstatus die niemand bevestigde'
   }, voltooi('vooruitzicht', 'het scenario loopt /api/instant-reality, /event en /partner en de acht bronnen die /apps/living-os.html ernaast leest, met een tweede lid dat zijn eigen vooruitzicht houdt')),
+  'link:krant': Object.assign({
+    belofte: 'een lid leest de kranten die nieuwsbedrijven binnen RTG publiceren, met de correcties die de redactie openbaar maakte; een concept of teruggehaald artikel bestaat voor de lezer niet'
+  }, voltooi('krant', 'het scenario loopt /api/krant/gids, /open en /artikel, de routes die /apps/krant.html zelf aanroept, met de redactie van een nieuwszaak die schrijft, publiceert, corrigeert en terughaalt')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

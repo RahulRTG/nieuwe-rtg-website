@@ -43,7 +43,7 @@ async function open(breedte, hoogte, taal = 'nl') {
   await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
   await page.waitForFunction(() => document.querySelector('#velNaar').options.length > 1);
   /* De locatievraag van plek.js komt na het laden; "Nu niet" is een echte keuze. */
-  await page.locator('.rtgplek .nee').click({ timeout: 4000 }).catch(() => {});
+  await page.locator('.rtgplek .nee').click({ timeout: 6000 }).catch(() => {});
   return { ctx, page, fouten };
 }
 async function beeld(page, naam) {

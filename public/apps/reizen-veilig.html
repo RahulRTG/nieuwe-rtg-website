@@ -3,107 +3,117 @@
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Reizen & Veilig</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/reizen-veilig.css" rel="stylesheet">
-<link href="/shared/media.css" rel="stylesheet">
-<!-- Het materiaal van TravelOS (fluweel + accent). Dit scherm deelt de
-     schil van travel-os.css NIET: het houdt zijn eigen vorm. -->
-<link href="/shared/travelos-materiaal.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/shared/poortgesprek.js"></script>
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<div class="rv-app" id="rvApp">
-  <aside class="rv-bank">
-    <nav aria-label="Reizen en veiligheid">
-      <button class="actief" data-open="overzicht" aria-current="page"><span class="rv-icoon">⌂</span><span>Vandaag</span></button>
-      <button data-open="vervoer"><span class="rv-icoon">↗</span><span>Gaan</span></button>
-      <button data-open="reisblad"><span class="rv-icoon">◇</span><span>Reizen</span></button>
-      <button data-open="veilig"><span class="rv-icoon">◈</span><span>RTG Veilig</span></button>
-      <button data-open="navigatie"><span class="rv-icoon">⌖</span><span>Navigatie</span></button>
-    </nav>
-    <div class="rv-bankvoet"><button data-open="instellingen"><span class="rv-icoon">≡</span><span>Instellingen</span></button></div>
-  </aside>
+<!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4): een
+     Collectie van reismomenten, Taak-rijen voor het delen van een aankomst en
+     Status voor wat er (nog) niet is. De werkruimte houdt haar twee panelen;
+     een paneel kan een ander scherm in een kader dragen. Geen eigen stijl. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="collectie">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+</header>
 
-  <main class="rv-werk">
-    <header class="rv-tabs"><div id="rvTabs"></div><button id="rvPlus" aria-label="Tweede scherm openen">＋</button></header>
-    <section class="rv-panes" id="rvPanes"></section>
-  </main>
-
-  <section class="rv-rahul" id="rvRahul" aria-label="Rahul reisassistent">
-    <button class="rv-mond" id="rvMond" aria-label="Rahul openen"><span>◌</span></button>
-    <div class="rv-vraag"><small id="rvContext">Vervoer, aankomst en veiligheid op één plek.</small><input id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…"></div>
-    <button class="rv-stuur" id="rvStuur" aria-label="Versturen">→</button>
-  </section>
-</div>
+<main class="ds-collectie" id="rvApp">
+  <div class="ds-collectie__kop">
+    <p class="ds-label">TravelOS</p>
+    <h1 class="ds-titel ds-titel--scherm">Reizen &amp; Veilig</h1>
+    <p class="ds-meta" id="rvContext">Vervoer, aankomst en veiligheid op één plek.</p>
+  </div>
+  <!-- De bank. In RTG Command op een telefoon draagt de buitenste balk deze
+       zes handelingen al (adaptief register); dan staat de bank hier niet. -->
+  <nav id="rvBank" aria-label="Reizen en veiligheid">
+    <div class="ds-chips">
+      <button class="ds-chip" type="button" data-open="overzicht" aria-pressed="true" data-ds-actie="Vandaag">Vandaag</button>
+      <button class="ds-chip" type="button" data-open="vervoer" aria-pressed="false" data-ds-actie="Gaan">Gaan</button>
+      <button class="ds-chip" type="button" data-open="reisblad" aria-pressed="false" data-ds-actie="Reizen">Reizen</button>
+      <button class="ds-chip" type="button" data-open="veilig" aria-pressed="false" data-ds-actie="RTG Veilig">RTG Veilig</button>
+      <button class="ds-chip" type="button" data-open="navigatie" aria-pressed="false" data-ds-actie="Navigatie">Navigatie</button>
+      <button class="ds-chip" type="button" data-open="instellingen" aria-pressed="false" data-ds-actie="Instellingen">Instellingen</button>
+    </div>
+  </nav>
+  <div id="rvRahul" aria-label="Rahul reisassistent">
+    <div class="ds-vraagrij">
+      <input class="ds-invoer" id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…">
+      <button class="ds-knop ds-knop--primair" type="button" id="rvStuur" aria-label="Versturen">Vraag</button>
+    </div>
+  </div>
+  <div class="ds-chips" role="group" aria-label="Open panelen"><div class="ds-chips" id="rvTabs"></div><button class="ds-chip" type="button" id="rvPlus" aria-label="Tweede scherm openen">+</button></div>
+  <section class="ds-panelen" id="rvPanes"></section>
+</main>
 
 <template id="rvOverzicht">
-  <article class="rv-overzicht">
-    <section class="rv-command-hero">
-      <div class="rv-ey">03 / TRAVEL OS · VANDAAG</div>
-      <div class="rv-rahulteken">◌</div>
-      <h1 data-groet>Welkom.</h1>
-      <p class="rv-intro">Ik verbind vervoer, aankomst en veiligheid zonder dat u tussen losse apps hoeft te zoeken.</p>
-      <div class="rv-suggesties"><button data-action="vervoer">Bereid mijn reis voor</button><button data-circle="maak">Deel mijn aankomst</button><button data-action="veilig">Loop met mij mee</button></div>
+  <article class="ds-taak__kop">
+    <section class="ds-taak__kop">
+      <p class="ds-label">03 / TravelOS · Vandaag</p>
+      <h2 class="ds-titel" data-groet>Welkom.</h2>
+      <p class="ds-meta">Ik verbind vervoer, aankomst en veiligheid zonder dat u tussen losse apps hoeft te zoeken.</p>
+      <div class="ds-chips"><button class="ds-chip" type="button" data-action="vervoer">Bereid mijn reis voor</button><button class="ds-chip" type="button" data-circle="maak">Deel mijn aankomst</button><button class="ds-chip" type="button" data-action="veilig">Loop met mij mee</button></div>
     </section>
-    <details class="rv-specialisten"><summary>Alle reisspecialisten</summary><div><a href="/apps/reizen.html">Reizen</a><a href="/apps/vluchten.html">Vluchten</a><a href="/apps/ov.html">OV & privévervoer</a><a href="/apps/navigatie.html">Navigatie</a><a href="/apps/flits.html">Verkeer</a><a href="/apps/stad.html">Stad</a><a href="/apps/reisboek.html">Reisboek</a><a href="/apps/hangar.html">Hangar</a><a href="/apps/residentie.html">Residentie</a></div></details>
+    <details class="ds-meta" data-specialisten><summary>Alle reisspecialisten</summary><div class="ds-chips"><a class="ds-chip" href="/apps/reizen.html">Reizen</a><a class="ds-chip" href="/apps/vluchten.html">Vluchten</a><a class="ds-chip" href="/apps/ov.html">OV & privévervoer</a><a class="ds-chip" href="/apps/navigatie.html">Navigatie</a><a class="ds-chip" href="/apps/flits.html">Verkeer</a><a class="ds-chip" href="/apps/stad.html">Stad</a><a class="ds-chip" href="/apps/reisboek.html">Reisboek</a><a class="ds-chip" href="/apps/hangar.html">Hangar</a><a class="ds-chip" href="/apps/residentie.html">Residentie</a></div></details>
     <!-- Geen groene stip en geen "staat klaar": dit scherm meet niet of RTG Veilig
          iets bewaakt, dus het zegt alleen wat er altijd geldt. -->
-    <div class="rv-status"><span><b>RTG Veilig</b><small>Er wordt niets gedeeld zonder uw toestemming.</small></span><button data-action="veilig">Open</button></div>
-    <section class="rv-moment">
+    <div class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/></svg><span><span class="ds-veld__label">RTG Veilig</span><span class="ds-veld__waarde">Er wordt niets gedeeld zonder uw toestemming.</span></span><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" data-action="veilig">Open</button></div>
+    <section class="ds-taak__kop">
       <!-- Het eerstvolgende moment komt uit RTG Move (/api/move/volgende) en
            niet uit deze opmaak. Weet Move het niet, dan staat er waarom, en de
-           gewone handeling: vertrek plannen. Er stond hier een vaste regel
-           "Nu: Vertrek plannen" onder een LIVE-label, voor iedereen gelijk. -->
-      <div class="rv-momentkop"><span>Uw eerstvolgende moment</span></div>
-      <div data-volgende><div class="rv-lijn gedimd"><time>&hellip;</time><div><b>Move kijkt in uw reis</b></div></div></div>
-      <div class="rv-lijn">
-        <time>Gaan</time><div><b>Vertrek plannen</b><small>Vergelijk OV, taxi en lopen op tijd, prijs en uitstoot.</small><button data-action="vervoer">Plan met Rahul →</button></div>
-      </div>
+           gewone handeling: vertrek plannen. -->
+      <p class="ds-label">Uw eerstvolgende moment</p>
+      <div class="ds-velden" data-volgende><div class="ds-veld" data-lijn><span></span><span><span class="ds-veld__label">Move kijkt in uw reis</span><span class="ds-veld__waarde">&hellip;</span></span><span></span></div></div>
+      <div class="ds-veld" data-lijn><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h6"/></svg><span><span class="ds-veld__label">Vertrek plannen</span><span class="ds-veld__waarde">Gaan · Vergelijk OV, taxi en lopen op tijd, prijs en uitstoot.</span></span><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" data-action="vervoer">Plan met Rahul &rarr;</button></div>
     </section>
-    <section class="rv-circle"><div><span class="rv-ey">LIVE CIRCLE</span><h2>Alleen delen wat nodig is</h2><p>Vrienden, partners en bedrijven krijgen per Moment precies genoeg informatie en nooit automatisch uw volledige locatie.</p><div class="rv-momenten" data-momenten></div></div><button data-circle="maak">Nieuw Moment</button></section>
+    <section class="ds-taak__kop">
+      <p class="ds-label">Live Circle</p>
+      <h2 class="ds-titel">Alleen delen wat nodig is</h2>
+      <p class="ds-meta">Vrienden, partners en bedrijven krijgen per Moment precies genoeg informatie en nooit automatisch uw volledige locatie.</p>
+      <div class="ds-velden" data-momenten></div>
+      <button class="ds-knop ds-knop--primair ds-knop--breed" type="button" data-circle="maak">Nieuw Moment</button>
+    </section>
   </article>
 </template>
 
 <template id="rvReizen">
-  <article class="rv-reisblad">
-    <div class="rv-ey">SAMENGESTELDE REIZEN</div>
-    <div class="rv-reisintro"><button data-action="reizen">Meenemen</button><p>Reizen die wij voor u samenstellen, met één planning voor verblijf, vervoer en veilige aankomst.</p></div>
+  <article class="ds-taak__kop">
+    <p class="ds-label">Samengestelde reizen</p>
+    <p class="ds-meta">Reizen die wij voor u samenstellen, met één planning voor verblijf, vervoer en veilige aankomst.</p>
+    <div><button class="ds-chip" type="button" data-action="reizen">Meenemen</button></div>
     <!-- De wens gaat naar het Reisbureau, de eigenaar van reisadvies
          (SCHERMEIGENAAR.json: reizen.reisbureau). Hier wordt niets geadviseerd
          en niets verstuurd; de knop brengt de wens erheen en daar drukt u zelf. -->
-    <form class="rv-reiszoek" data-wens><input name="wens" maxlength="200" placeholder="Waar hebt u zin in? Bijv. zon, strand, rust" aria-label="Reiswens"><button type="submit">Adviseer</button></form>
+    <form class="ds-vraagrij" data-wens><input class="ds-invoer" name="wens" maxlength="200" placeholder="Waar hebt u zin in? Bijv. zon, strand, rust" aria-label="Reiswens"><button class="ds-knop ds-knop--primair" type="submit">Adviseer</button></form>
     <!-- Het aanbod komt uit /api/reisbureau, dezelfde catalogus als het
-         Reisbureau. Er stonden hier twee reizen met een vaste prijs in de
-         opmaak, die bij elke wijziging van de catalogus uit elkaar liepen. -->
-    <div data-reisaanbod><p class="rv-sub">Het aanbod wordt geladen&hellip;</p></div>
-    <section class="rv-reiskaart"><span>UW REIS</span><h2>Alles in één Moment</h2><p>Open uw echte boekingen, vervoerbewijzen en veiligheidskring zonder deze werkruimte te verlaten.</p><button data-action="reizen">Open mijn reizen →</button></section>
+         Reisbureau, en niet uit de opmaak. -->
+    <div class="ds-collectie__raster" data-reisaanbod><p class="ds-meta">Het aanbod wordt geladen&hellip;</p></div>
+    <section class="ds-kaart"><div class="ds-kaart__inhoud"><p class="ds-label">Uw reis</p><h2 class="ds-kaart__titel">Alles in één Moment</h2><p class="ds-meta">Open uw echte boekingen, vervoerbewijzen en veiligheidskring zonder deze werkruimte te verlaten.</p><div><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" data-action="reizen">Open mijn reizen &rarr;</button></div></div></section>
   </article>
 </template>
 
-<dialog class="rv-dialoog" id="rvDialoog">
-  <form method="dialog" id="rvMomentForm">
-    <div class="rv-ey">NIEUWE LIVE CIRCLE</div><h2>Wie mag uw aankomst zien?</h2>
-    <label>Moment<input name="titel" maxlength="80" placeholder="Bijv. diner bij Maison" required></label>
-    <label>Bestemming<input name="doel" maxlength="100" placeholder="Alleen de naam is voldoende"></label>
-    <div class="rv-formduo"><label>Ontvanger<select name="soort"><option value="contact">Vriend of partner</option><option value="bedrijf">Betrokken bedrijf</option></select></label><label>Codenaam of bedrijfscode<input name="ontvanger" maxlength="40" required></label></div>
-    <div class="rv-formduo"><label>Delen<select name="niveau"><option value="voortgang">Voortgang en aankomsttijd</option><option value="plan">Alleen het plan</option><option value="locatie">Tijdelijke locatie (alleen connecties)</option></select></label><label>Automatisch stoppen<select name="minuten"><option value="120">Na 2 uur</option><option value="240" selected>Na 4 uur</option><option value="720">Na 12 uur</option><option value="1440">Na 24 uur</option></select></label></div>
-    <p class="rv-fout" id="rvMomentFout"></p><div class="rv-acties"><button value="cancel">Annuleren</button><button class="hoofd" value="default" id="rvMomentBewaar">Moment starten</button></div>
+<dialog class="ds-dialoog" id="rvDialoog" aria-labelledby="rvDialoogTitel">
+  <form method="dialog" id="rvMomentForm" class="ds-taak__kop">
+    <p class="ds-label">Nieuwe Live Circle</p><h2 class="ds-titel" id="rvDialoogTitel">Wie mag uw aankomst zien?</h2>
+    <label class="ds-veldlabel">Moment<input class="ds-invoer" name="titel" maxlength="80" placeholder="Bijv. diner bij Maison" required></label>
+    <label class="ds-veldlabel">Bestemming<input class="ds-invoer" name="doel" maxlength="100" placeholder="Alleen de naam is voldoende"></label>
+    <div class="ds-veldgroep"><label class="ds-veldlabel">Ontvanger<select class="ds-invoer" name="soort"><option value="contact">Vriend of partner</option><option value="bedrijf">Betrokken bedrijf</option></select></label><label class="ds-veldlabel">Codenaam of bedrijfscode<input class="ds-invoer" name="ontvanger" maxlength="40" required></label></div>
+    <div class="ds-veldgroep"><label class="ds-veldlabel">Delen<select class="ds-invoer" name="niveau"><option value="voortgang">Voortgang en aankomsttijd</option><option value="plan">Alleen het plan</option><option value="locatie">Tijdelijke locatie (alleen connecties)</option></select></label><label class="ds-veldlabel">Automatisch stoppen<select class="ds-invoer" name="minuten"><option value="120">Na 2 uur</option><option value="240" selected>Na 4 uur</option><option value="720">Na 12 uur</option><option value="1440">Na 24 uur</option></select></label></div>
+    <p class="ds-meta" id="rvMomentFout" role="alert"></p><div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil" value="cancel">Annuleren</button><button class="ds-knop ds-knop--primair" value="default" id="rvMomentBewaar">Moment starten</button></div>
   </form>
 </dialog>
 
-<script src="/shared/mond.js"></script>
 <script src="/shared/media.js"></script>
 <script src="/apps/reizen-veilig-reis.js"></script>
 <script src="/apps/reizen-veilig.js"></script>
-<!-- De zes bestaande bankhandelingen reizen in een mobiel Command-werkblad
-     naar de ene buitenste onderbalk; de uitvoering blijft in reizen-veilig.js. -->
+<!-- De zes bankhandelingen reizen in een mobiel Command-werkblad naar de ene
+     buitenste onderbalk; de uitvoering blijft in reizen-veilig.js. -->
 <script src="/shared/adaptief.js" defer></script>
 <script src="/shared/adaptief/grammatica.js" defer></script>
 <script src="/shared/objectverwijzing.js" defer></script>
@@ -111,6 +121,6 @@
 <script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/adaptief/brug.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
 </body>
 </html>

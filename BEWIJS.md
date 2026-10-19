@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2888 bestanden en 19795 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2889 bestanden en 19799 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2888 |
-| losse beweringen (`test(...)`) | 19795 |
+| toetsbestanden | 2889 |
+| losse beweringen (`test(...)`) | 19799 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 68 |
+| niets van beide | 69 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2545 bestanden, 19216 beweringen.
+2546 bestanden, 19220 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1446,6 +1446,7 @@ toets omvalt.
 | `officebord.test.js` | 2 | gezakt op `liegpoort /api/` | Het bord (Trello) als kantoortool in RTG Office. Getoetst: een lid maakt een bord, bewaart lijsten met kaarten en leest ze terug (de sanitizer klemt labels en datums); de zaak heeft hetzelfde bord als team-drive; en... |
 | `ogen.test.js` | 5 | gezakt op `===->!==#0` | DE OGENREGEL OP EEN PLEK. "Dezelfde ogen tellen niet dubbel" stond in vier formuleringen in huis en werd op vijf plekken gebruikt: de documentenuitgifte, de naheffingsaanslag, het bezwaar, het dwangbevel en de... |
 | `omgevingsstand.test.js` | 11 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `omzetdag.test.js` | 4 | -- | DE OMZETDAG (server/kern/tijdzone.js: omzetdag, eigenaarsbesluit 19 oktober 2026). De omzetdag van een zaak loopt tot 05:00 lokale tijd. |
 | `omzetproef.test.js` | 9 | geen bronmutatie mogelijk | DE GELDKETEN BLIJFT KLOPPEN -- de ratel onder scripts/omzetproef.js. De proef zelf draait een wegwerpserver op en duurt tientallen seconden; die hoort in een meetronde en niet in `npm test`. |
 | `onbewezen.test.js` | 8 | gezakt op `&&->||#0` | DE TRECHTER ONDER ONBEWEZEN. Waarom hij bestaat staat in de kop van scripts/onbewezen.js: "3430 zonder bewijs" is een werkvoorraad waar niemand aan begint, en wie er wel aan begint leest broncode voor routes die op... |
 | `onboarding-config-zet.test.js` | 1 | gezakt op `liegpoort /api/` | DE EIGENAAR ZET HET PLATFORMCONTRACT MET DE HAND -- /api/onboarding/config/zet. test/onboarding.test.js toetst het aanpassen MET AI (/config/ai); de deur waarmee de eigenaar de eisen en het contract rechtstreeks zet,... |

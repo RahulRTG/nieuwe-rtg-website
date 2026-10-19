@@ -11,7 +11,7 @@ module.exports = (kern) => {
   const { app, crypto, db, logActivity, pickupCode, save, schoon, sseToSupplier, supplierAuth } = kern;
 
   const DERVING = { verspil: 'verspilling', breuk: 'breuk', eigen: 'eigen gebruik', repro: 'repro/herdruk' };
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const { omzetdag: od, omzetdagVan: odv } = require('../../../kern/tijdzone');
   const lijst = (bak, code) => (db.data[bak] = db.data[bak] || {}, db.data[bak][code] = db.data[bak][code] || []);
   const leesItems = (body) => (Array.isArray(body.items) ? body.items : []).slice(0, 40)
     .map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
@@ -108,8 +108,8 @@ module.exports = (kern) => {
 
   /* Het dagrapport (X): vandaag in een oogopslag, ook per kassa. */
   app.post('/api/supplier/kassa/dagrapport', supplierAuth, (req, res) => {
-    const dag = vandaag();
-    const sales = (db.data.posSales[req.supplier.code] || []).filter(x => String(x.at).slice(0, 10) === dag);
+    const dag = od(req.supplier);
+    const sales = (db.data.posSales[req.supplier.code] || []).filter(x => odv(req.supplier, x.at) === dag);
     const perMethode = {}, perKassa = {}, openstaandGezet = {};
     let omzet = 0, retouren = 0, retourBedrag = 0, kortingen = 0;
     for (const s of sales) {
@@ -130,7 +130,7 @@ module.exports = (kern) => {
       if (s.korting && s.korting.bedrag) kortingen += s.korting.bedrag;
     }
     const derving = (db.data.kassaDerving && db.data.kassaDerving[req.supplier.code] || [])
-      .filter(d => String(d.at).slice(0, 10) === dag && d.soort !== 'repro');
+      .filter(d => odv(req.supplier, d.at) === dag && d.soort !== 'repro');
     res.json({ dag, bonnen: sales.filter(x => x.method !== 'kamer' && x.method !== 'tafel').length,
       omzet: Math.round(omzet * 100) / 100,
       perMethode, perKassa, openstaandGezet, retouren, retourBedrag: Math.round(retourBedrag * 100) / 100,
@@ -143,9 +143,9 @@ module.exports = (kern) => {
   app.post('/api/supplier/kassa/kasopmaak', supplierAuth, (req, res) => {
     const geteld = Number(req.body.geteld);
     if (!Number.isFinite(geteld) || geteld < 0) return res.status(400).json({ error: 'Vul het getelde bedrag in.' });
-    const dag = vandaag();
+    const dag = od(req.supplier);
     const verwacht = Math.round((db.data.posSales[req.supplier.code] || [])
-      .filter(x => String(x.at).slice(0, 10) === dag && x.method === 'contant')
+      .filter(x => odv(req.supplier, x.at) === dag && x.method === 'contant')
       .reduce((s, x) => s + x.total, 0) * 100) / 100;
     const verschil = Math.round((geteld - verwacht) * 100) / 100;
     const reg = { dag, geteld, verwacht, verschil, kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null,

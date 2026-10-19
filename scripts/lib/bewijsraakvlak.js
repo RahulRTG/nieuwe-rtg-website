@@ -263,7 +263,7 @@ function kanten(w, rel) {
 /* Welke map is `naam` in dit bestand? Alleen als het daar letterlijk staat:
    `const NAAM = path.join(__dirname, '..', '..')`. Anders null. */
 function vasteMap(bron, naam, map) {
-  const m = new RegExp('(?:const|let|var)\\s+' + naam.replace(/\$/g, '\\$') +
+  const m = new RegExp('(?:const|let|var)\\s+' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
     '\\s*=\\s*path\\.(?:join|resolve)\\(\\s*__dirname\\s*((?:,\\s*([\'"])[^\'"]*\\2\\s*)*)\\)').exec(bron);
   if (!m) return null;
   const delen = [...m[1].matchAll(/(['"])([^'"]*)\1/g)].map((x) => x[2]);

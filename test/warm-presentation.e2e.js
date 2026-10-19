@@ -1,6 +1,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
 const { startServer, stop, laadPlaywright, browserOpties, letOpFouten, edgeBediening } = require('./helper');
+const { gezinAanAccount } = require('./gezinaccount');
 let srv, browser, first, second, photo;
 const out = path.resolve(__dirname, '../../output/warm-implementation');
 async function api(route, body, token = first) {
@@ -88,24 +89,25 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
     assert.deepEqual(errors,[]);
   }finally{await ctx.close();}
 });
-test('family photo uploads, gallery, cancel and profile switches use only the selected family identity',async()=>{
+test('family photo uploads, gallery, cancel and profile switches use only the selected family identity',async(t)=>{
   for (const route of ['/api/foundation/gezin/beelden', '/api/foundation/gezin/beelden/zet',
     '/api/foundation/gezin/beelden/mijn', '/api/foundation/gezin/beelden/haal',
     '/api/foundation/gezin/beelden/upstart', '/api/foundation/gezin/beelden/updeel',
     '/api/foundation/gezin/beelden/upklaar', '/api/foundation/gezin/beelden/upload']) {
     assert.equal((await api(route, {}, first)).status, 401, route + ' rejects a member token without the chosen family profile');
   }
-  async function family(route,body){return api('/api/foundation/gezin/'+route,body,null);}
-  const made=await family('maak',{gezinsnaam:'Eigen beelden',naam:'Ouder',pin:'1234',bevoegdGezin:true,privacyAkkoord:true});assert.equal(made.status,200);const parent=made.body;
-  const child=await family('profiel/maak',{code:parent.code,token:parent.token,naam:'Milan',rol:'kind',geboortedatum:'2015-04-04',pin:'5678'});assert.equal(child.status,200);
-  const selected=await family('profiel/kies',{gezinscode: parent.gezinscode,profielId:child.body.profiel.id,pin:'5678'});assert.equal(selected.status,200);
+  const familySrv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_MAGNAAT_TEST: '1', RTF_GEZIN_ACCOUNTPLICHT: '1' } });
+  t.after(() => stop(familySrv.child));
+  async function family(route,body){ const r = await fetch(familySrv.base+'/api/foundation/gezin/'+route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); return {status:r.status,body:await r.json()}; }
+  const parent = await gezinAanAccount(familySrv.base, { gezinsnaam: 'Eigen beelden', kind: { naam: 'Milan', geboortedatum: '2015-04-04' } });
+  const selected = { body: parent.kind };
   const session={code:parent.code,token:selected.body.token,profiel:selected.body.profiel}, other={code:parent.code,token:parent.token};
   const ctx=await browser.newContext({viewport:{width:390,height:932},serviceWorkers:'block',reducedMotion:'reduce'});
   await ctx.addInitScript(({session,first})=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');localStorage.setItem('rtg_member_token',first);localStorage.setItem('rtf_sessie',JSON.stringify(session));},{session,first});
   const page=await ctx.newPage(),errors=[],memberRequests=[];letOpFouten(page,errors);
   page.on('request',r=>{if(/\/api\/(ik\/beelden|bestanden\/)/.test(r.url()))memberRequests.push(r.url());});
   try{
-    await page.goto(srv.base+'/apps/foundation/index.html');await edgeBediening(page,'Beelden aanpassen');await page.waitForSelector('.pi-editor[open]');
+    await page.goto(familySrv.base+'/apps/foundation/index.html');await edgeBediening(page,'Beelden aanpassen');await page.waitForSelector('.pi-editor[open]');
     const original=fs.readFileSync(path.join(__dirname,'../public/images/daily/agenda.webp'));
     const large=Buffer.concat([original,Buffer.alloc(4*1024*1024)]);
     await page.locator('#piUpload').setInputFiles({name:'Eigen grote foto.webp',mimeType:'image/webp',buffer:large});

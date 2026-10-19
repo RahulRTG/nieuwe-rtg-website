@@ -123,7 +123,7 @@ const maakBetaling = require('./betaal-connect')({
 const maakUitbetaling = require('./betaal/uitbetaling')({ betalenUit: BETALEN_UIT,
   haalOp: k => haalOp(k), bewaar: (k, v) => bewaar(k, v), regie, sandbox, stripe,
   demoBetalen: DEMO_BETALEN, aanbieder, eisBetaalrail, crypto,
-  uitgaandBewustDicht: UITGAAND_BEWUST_DICHT });
+  uitgaandBewustDicht: UITGAAND_BEWUST_DICHT, simulatie: SIMULATIE_AAN ? simulatie : null });
 
 /* De webhook van buiten woont in ./betaal/webhook.js -- dat is de kant die
    BINNENKOMT, en die snede houdt dit bestand onder de grens van keuringsregel 13.

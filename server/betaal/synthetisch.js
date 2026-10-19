@@ -97,11 +97,11 @@ function scenarioVan(opdracht) {
 
 /* De drie grendels. Geeft null als de bank mag draaien, anders de reden -- als
    tekst, want de aanroeper zet hem in een fout die een mens leest. */
-function waaromNiet({ env, echteRail }) {
-  const e = env || {};
-  if (e.RTG_SIMULATIEBANK !== '1')
+function waaromNiet({ env: omgeving, echteRail }) {
+  const env = omgeving || {};
+  if (env.RTG_SIMULATIEBANK !== '1')
     return 'De simulatiebank staat uit. Zet RTG_SIMULATIEBANK=1 in een omgeving die géén productie is.';
-  if (e.NODE_ENV === 'production')
+  if (env.NODE_ENV === 'production')
     return 'De simulatiebank draait nooit in productie, ook niet met RTG_SIMULATIEBANK=1. Deze rail maakt geld uit niets.';
   if (echteRail)
     return 'Er is een echte betaalprovider geconfigureerd (' + echteRail + '). ' +
@@ -142,7 +142,22 @@ module.exports = function simulatiebank({ crypto, env, echteRail }) {
     };
   }
 
-  return { aan, belet, maak, scenarioVan, SCENARIOS };
+  /* DE UITGAANDE KANT: een uitbetaling naar het IBAN van een lid (een
+     terugstorting, server/betaal/uitbetaling.js). Dezelfde drie grendels en
+     dezelfde afloop uit de sleutel; alleen de woorden zijn die van een payout:
+     betaald is afgewikkeld, geweigerd komt terug (de opdrachtenrij boekt het
+     saldo terug), traag blijft "onderweg". Er gaat nergens een euro heen. */
+  function uitbetaal(opdracht) {
+    eis();
+    const { bedrag, valuta = 'eur', referentie, idempotentieSleutel, iban } = opdracht || {};
+    const naam = scenarioVan(opdracht);
+    const status = naam === 'betaald' ? 'betaald' : naam === 'traag' ? 'open' : 'geweigerd';
+    return { id: 'sim_uit_' + naam + '_' + crypto.randomBytes(6).toString('hex'), status, aanbieder: 'simulatie',
+      simulatie: naam, waarom: SCENARIOS[naam].wat + (opdracht && opdracht.simulatie ? ' (gevraagd)' : ' (uit de sleutel)'),
+      bedrag: Math.round(bedrag), valuta, referentie: referentie || null, iban: iban || '', sleutel: idempotentieSleutel || null };
+  }
+
+  return { aan, belet, maak, uitbetaal, scenarioVan, SCENARIOS };
 };
 
 module.exports.SCENARIOS = SCENARIOS;

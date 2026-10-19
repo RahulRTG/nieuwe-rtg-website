@@ -260,6 +260,9 @@ const CONTRACT = {
   'link:rendezvous': Object.assign({
     belofte: 'Signature-leden met een geverifieerd paspoort zien elkaar op codenaam, een match ontstaat alleen wederzijds en alleen de twee zien hem, en een blokkade werkt in beide richtingen'
   }, voltooi('rendezvous', 'het scenario loopt /api/member/rendezvous/profiel, /profiel/zet, /kandidaten, /like, /pas, /matches en /blokkeer, de routes die /apps/rendezvous.html zelf aanroept, met vier leden die een medewerker op naam verifieerde en het kantoor een Lifestyle Pass gaf, en twee leden zonder het volle recht')),
+  'link:sociaal': Object.assign({
+    belofte: 'Rahul zet klaar wat er in de kring van het lid openstaat, de mens bevestigt, de ander ziet het antwoord en het actielog verantwoordt het'
+  }, voltooi('sociaal', 'het scenario loopt /api/sociaal/wereld, /command, /lijn, /object en /voorstel/bevestig, de routes die /apps/sociaal.html zelf aanroept, met twee leden in een besloten genootschap (opgebouwd over de routes van Genootschap) en een derde erbuiten')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

@@ -113,6 +113,7 @@ const SCENARIOS = {
   'rtmail.js': require('./lib/voltooi/rtmail'),
   'school.js': require('./lib/voltooi/school'),
   'sessies.js': require('./lib/voltooi/sessies'),
+  'sociaal.js': require('./lib/voltooi/sociaal'),
   'sport.js': require('./lib/voltooi/sport'),
   'table.js': require('./lib/voltooi/table'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),

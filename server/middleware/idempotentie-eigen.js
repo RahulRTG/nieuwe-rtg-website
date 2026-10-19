@@ -42,7 +42,8 @@ const EIGEN = [
   '/api/office/kantoor/uitnodiging',
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
   '/api/comm/stuur',
-  '/api/vonk/bericht'
+  '/api/vonk/bericht',
+  '/api/theater/reactie'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

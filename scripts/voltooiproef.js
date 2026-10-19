@@ -111,6 +111,7 @@ const SCENARIOS = {
   'school.js': require('./lib/voltooi/school'),
   'sessies.js': require('./lib/voltooi/sessies'),
   'table.js': require('./lib/voltooi/table'),
+  'theater.js': require('./lib/voltooi/theater'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),
   'vandaag.js': require('./lib/voltooi/vandaag'),
   'veilig.js': require('./lib/voltooi/veilig'),

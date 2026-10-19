@@ -169,6 +169,23 @@ test('4b. ondertitels: de maker schrijft ze, de kijker krijgt ze mee', async () 
   await api('/api/theater/ondertitels', { id: videoId, regels: [{ van: 1, tot: 3, tekst: 'eerst gezegd' }] }, maker);
 });
 
+/* De voltooiproef van Theater (scripts/lib/voltooi/theater.js, 19 oktober 2026)
+   zag een dubbele tik een reactie twee keer plaatsen en een tweede, lege
+   videokaart maken. Met dezelfde herhaalsleutel is het dezelfde handeling. */
+test('4c. een herhaalsleutel: een reactie en een videokaart staan er een keer', async () => {
+  const lijf = { id: videoId, tekst: 'Een keer, ook bij twee tikken.', idem: 'toets-reactie-1' };
+  const [a, b] = await Promise.all([api('/api/theater/reactie', lijf, kijker), api('/api/theater/reactie', lijf, kijker)]);
+  assert.equal(a.status, 200); assert.equal(b.status, 200);
+  const rs = (await api('/api/theater/reacties', { id: videoId }, maker)).body.reacties;
+  assert.equal(rs.filter(r => r.tekst === lijf.tekst).length, 1, 'een reactie, niet twee');
+  assert.ok(rs.every(r => !('idem' in r)), 'de sleutel gaat niet naar de lezer');
+  const kaart = { titel: 'Een kaart', duurS: 5, idem: 'toets-video-1' };
+  const [k1, k2] = await Promise.all([api('/api/theater/video/maak', kaart, maker), api('/api/theater/video/maak', kaart, maker)]);
+  assert.equal(k1.body.id, k2.body.id, 'dezelfde kaart');
+  const mijn = (await api('/api/theater/zaal', {}, maker)).body.mijn.videos.filter(v => v.titel === 'Een kaart');
+  assert.equal(mijn.length, 1);
+});
+
 test('5. verwijderen haalt ook de bytes weg (maker zelf of kantoor)', async () => {
   const vreemd = await api('/api/theater/verwijder', { id: videoId }, kijker);
   assert.equal(vreemd.status, 403, 'een kijker verwijdert andermans werk niet');

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2826 bestanden en 19552 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2827 bestanden en 19555 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2826 |
-| losse beweringen (`test(...)`) | 19552 |
+| toetsbestanden | 2827 |
+| losse beweringen (`test(...)`) | 19555 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 10 |
+| niets van beide | 11 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2488 bestanden, 18980 beweringen.
+2489 bestanden, 18983 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2187,8 +2187,9 @@ toets omvalt.
 | `terrein-en-panden.test.js` | 5 | gezakt op `liegpoort /api/` | TERREIN, PANDEN EN DIEREN -- 6 endpoints uit de supplier-groep. gebouw/zaal/weg, golf/tee/weg, pand/foto, charter/fotos, boerderij/dier en boerderij/water stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `terugstortstand.test.js` | 6 | gezakt op `liegpoort /api/` | DE TERUGSTORTSTAND -- de knop die niet regelt wat RTG doet maar wat RTG IS. WAAROM DEZE TOETS ER IS RTG wil twee juridische posities kunnen innemen, en dat is een legitieme bedrijfskeuze: gesloten saldo blijft binnen... |
 | `testwereld-adapters.test.js` | 5 | gezakt op `===->!==#0` | DE ADAPTERS VAN DE TESTWERELD -- postvanger (mail) en sms-sandbox. BETROUWBAARHEID.md par. |
+| `theater-herhaalsleutel.test.js` | 2 | -- | EEN HERHAALSLEUTEL IN HET THEATER OVERLEEFT EEN HERSTART (19 oktober 2026). De voltooiproef van Theater (scripts/lib/voltooi/theater.js) liet de maker na een crash zijn publicatie opnieuw versturen, met dezelfde... |
 | `theater-thuis.test.js` | 4 | gezakt op `liegpoort /api/` | Het Thuisarchief van RTG Theater: de maker bewaart de video op het eigen apparaat; RTG bewaart alleen titel en affiche. Kijken loopt rechtstreeks (WebRTC-datakanaal) van maker naar kijker; de server is puur... |
-| `theater.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Theater: de videobibliotheek op bioscoopniveau. Kanalen gaan pas open na menselijke goedkeuring; de bytes blijven exact het origineel (geen hercompressie) en komen met range-streaming terug; reacties op codenaam;... |
+| `theater.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Theater: de videobibliotheek op bioscoopniveau. Kanalen gaan pas open na menselijke goedkeuring; de bytes blijven exact het origineel (geen hercompressie) en komen met range-streaming terug; reacties op codenaam;... |
 | `thema.test.js` | 6 | gezakt op `+->-#1` | De themalaag: de afspraak uit shared/rtg-themas.css, machinaal gehandhaafd. Er is EEN fout die deze laag telkens opnieuw maakt, en hij heeft twee spiegelbeelden: een vlak schildert zijn grond hard en haalt zijn inkt... |
 | `thuis-zaak.test.js` | 4 | gezakt op `liegpoort /api/` | HET THUIS-KANTOOR VAN EEN ZAAK -- 5 endpoints achter de leverancier-inlog. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: huizen, blokkeer, bericht, berichten en review. |
 | `thuis.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Thuis: thuisverhuur van lid aan lid -- ons antwoord op Airbnb, met de premium functies gratis. Getest: huis live zetten (validatie), zoeken met filters, de transparante prijsopbouw met 0% servicekosten en... |

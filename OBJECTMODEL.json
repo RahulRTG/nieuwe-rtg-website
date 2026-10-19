@@ -4,13 +4,13 @@
   "gemeten": {
     "bestanden": 2971,
     "vormen": 1616,
-    "velden": 2319,
+    "velden": 2317,
     "modules": 906,
     "domeinen": 323,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1625,
-    "veldenGedeeldVanafVier": 236,
+    "veldenDomeineigen": 1623,
+    "veldenGedeeldVanafVier": 237,
     "gelijkendeVormparen": 64
   },
   "envelop": [

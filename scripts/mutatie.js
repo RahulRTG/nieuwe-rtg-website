@@ -636,6 +636,12 @@ const EIGEN_MODULE = new Map([
   ['ov-ds.e2e.js', ['public/apps/ov.html']],
   ['move-ds.e2e.js', ['public/apps/move.html']],
   ['reizen-veilig-ds.e2e.js', ['public/apps/reizen-veilig.js']],
+  /* Stroom E1 van de TravelOS-migratie: de operatieschermen op de werklaag. */
+  ['luchthaven-ds.e2e.js', ['public/apps/luchthaven-bord.js', 'public/apps/werkvloer.js']],
+  ['marechaussee-ds.e2e.js', ['public/apps/marechaussee.js']],
+  ['ovdienst-ds.e2e.js', ['public/apps/ovdienst.js']],
+  ['ovroutes-ds.e2e.js', ['public/apps/ovroutes.js']],
+  ['ovcontrol-ds.e2e.js', ['public/apps/ovcontrol.js']],
   ['ontwerpvoorbeeld.e2e.js', ['public/ds/voorbeeld.html']],
   /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
   ['move-gevolg.e2e.js', ['public/apps/move.html']],

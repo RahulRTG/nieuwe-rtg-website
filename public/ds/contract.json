@@ -35,7 +35,8 @@
     "edge",
     "melding",
     "toestel",
-    "paneel"
+    "paneel",
+    "handelingen"
   ],
   "themabaar": [
     "--ds-grond",
@@ -146,6 +147,11 @@
     "public/apps/ov.html": "test/ov-ds.e2e.js",
     "public/apps/move.html": "test/move-ds.e2e.js",
     "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
+    "public/apps/luchthaven.html": "test/luchthaven-ds.e2e.js",
+    "public/apps/marechaussee.html": "test/marechaussee-ds.e2e.js",
+    "public/apps/ovdienst.html": "test/ovdienst-ds.e2e.js",
+    "public/apps/ovroutes.html": "test/ovroutes-ds.e2e.js",
+    "public/apps/ovcontrol.html": "test/ovcontrol-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

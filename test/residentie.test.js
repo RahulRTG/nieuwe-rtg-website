@@ -76,12 +76,28 @@ test('de suite: inrichten met het atelier, open of dicht voor bezoek', async () 
   assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'troon', x: 1, y: 4 }, a.token)).status, 400, 'onbekend meubel');
   const eigen = await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, a.token);
   assert.equal(eigen.body.kamer.eigen, true);
+  await api(base, '/api/residentie/suite/zet', { open: true }, a.token); // een suite begint dicht
   const bezoek = await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, b.token);
   assert.equal(bezoek.status, 200); assert.equal(bezoek.body.kamer.eigen, false);
   await api(base, '/api/residentie/suite/zet', { open: false }, a.token);
   assert.equal((await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, b.token)).status, 403, 'dicht is dicht');
   assert.equal((await api(base, '/api/residentie/suite', {}, gast.token)).status, 403, 'gast heeft geen suite');
   assert.equal((await api(base, '/api/residentie/meubel/weg', { i: 0 }, a.token)).status, 200);
+});
+
+test('een nieuwe suite begint dicht: niet in de gids van een ander lid tot het lid hem zelf opendoet', async () => {
+  /* Bevoegd vond dat een suite met open:true ontstond: wie hem inrichtte,
+     stond in de openbare gids zonder dat zelf te hebben gekozen. */
+  const u = (Date.now() + 9).toString().slice(-8);
+  const c = (await api(base, '/api/auth/register', { name: ECHT + ' 9', email: 'res9' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const su = await api(base, '/api/residentie/suite', {}, c);
+  assert.equal(su.body.suite.open, false, 'nieuw is dicht');
+  const inGids = async () => ((await api(base, '/api/residentie/gids', {}, b.token)).body.suites || []).some(s => s.adres === su.body.suite.adres);
+  assert.equal(await inGids(), false, 'een net ingerichte suite staat niet in de gids van een ander');
+  assert.equal((await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, b.token)).status, 403);
+  assert.equal((await api(base, '/api/residentie/suite/zet', { open: true }, c)).body.suite.open, true);
+  assert.equal(await inGids(), true, 'na het opendoen wel');
 });
 
 test('een dubbeltik op neerzetten of weghalen werkt een keer, niet twee', async () => {

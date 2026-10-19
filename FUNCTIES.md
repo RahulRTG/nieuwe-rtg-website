@@ -23,7 +23,7 @@ het?**
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2883** |
 | App-pagina's (`public/apps/**.html`) | **316** |
-| Testbestanden | **2908** |
+| Testbestanden | **2915** |
 
 ## De vier werelden
 
@@ -614,7 +614,7 @@ ze werken; dit is wat hij ziet.
 - **Clips** `/apps/clips.html` — Korte video's die lokaal bij de maker blijven; een eindige dagselectie.
 - **RTG Klankwerk** `/apps/klankwerk.html` — Zelf muziek maken: een raster, een notenrol en Rahul die iets neerzet. Alles wordt opgewekt, dus alles is van jou.
 - **De Zaal** `/apps/zaal.html` — Wat leden zelf gemaakt hebben, op volgorde van wanneer het uitkwam. Geen hitlijst.
-- **Podium** `/apps/podium.html` — Je eigen live-kanaal (18+), met chat, RTG Pay-cadeaus en abonnementen.
+- **Podium** `/apps/podium.html` — Je eigen live-kanaal, met chat, RTG Pay-cadeaus en abonnementen; de 18+-zone heeft een eigen deur.
 - **Website-maker** `/apps/sitemaker.html` — Bouw met blokken je eigen RTG-site, met eigen foto's en beeld uit De Salon.
 - **RTG Browser** `/apps/browser.html` — Blader door de sites die leden in het RTG-web publiceren.
 - **RTG Werk OS** `/apps/werk.html` — De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.

@@ -145,7 +145,7 @@ const NAGEKEKEN = {
   'POST /api/mall/aanvraag': 'mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id\'s in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt',
   'POST /api/reserveer': 'reserveerTafel(req.session, ...) zet customerKey uit de SESSIE; een customerKey in het lijf wordt niet gelezen. De tegenpoging gaf 409 "al een reservering voor dit moment" door B\'s eerste reservering',
   'POST /api/vak/wachtlijst/zet': 'wachtZet({ key: req.session.key, ... }) zet B op de wachtlijst; de supplierCode is een openbare zaakcode, en de tegenpoging gaf 409 "al op de wachtlijst" door B\'s eerste poging',
-  'POST /api/code/scan': 'een dynamische code is een getoonde code die een ANDER hoort te scannen; dyncode.lees controleert alleen handtekening en geldigheid, en een verzonnen token geeft 422',
+  'POST /api/code/scan': 'een dynamische code is een getoonde code die een ANDER hoort te scannen; dyncode.lees controleert alleen handtekening en geldigheid, en een verzonnen token geeft 422. Op de integratietak draagt een pas een ondoorzichtige verwijzing (betaalcode.js, besluit eigenaar): een KASSA die scant krijgt de codenaam en verbruikt de code, een LID dat scant krijgt niets persoonlijks -- de gang-2-controle op wie A is ziet dan dat B als lid geen codenaam van A terugkrijgt',
   /* DE ZAKEN (gang 5, 19 oktober 2026): KIKUNOI tegen PONTO. Dertien
      kandidaten, alle dertien met de hand nagelezen: elke route haalt de zaak uit
      req.supplier (of de medewerker uit staffKey), en het id uit het lijf is

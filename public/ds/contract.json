@@ -35,7 +35,10 @@
     "edge",
     "melding",
     "toestel",
-    "paneel"
+    "paneel",
+    "meter",
+    "lezer",
+    "canvaslaag"
   ],
   "themabaar": [
     "--ds-grond",
@@ -146,6 +149,9 @@
     "public/apps/ov.html": "test/ov-ds.e2e.js",
     "public/apps/move.html": "test/move-ds.e2e.js",
     "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
+    "public/apps/residentie.html": "test/residentie-ds.e2e.js",
+    "public/apps/boeken.html": "test/boeken-ds.e2e.js",
+    "public/apps/stad.html": "test/stad-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

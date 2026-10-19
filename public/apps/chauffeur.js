@@ -161,7 +161,8 @@
      mens moet terugvinden, draagt een data-attribuut: data-rit (nieuw, actief,
      leeg, fout), data-volgende (de ene volgende stap) en data-passagier. */
   function ritFeiten(rit) {
-    return maak('p', 'ds-meta', [minuten(rit), km(rit), geld(rit.prijs)].join(' · '));
+    /* dir=auto: in het Arabisch blijven getal en eenheid bij elkaar. */
+    var p = maak('p', 'ds-meta', [minuten(rit), km(rit), geld(rit.prijs)].join(' · ')); p.dir = 'auto'; return p;
   }
   function routeRegel(rit) {
     return maak('h2', 'ds-kaart__titel', plaats(rit.van, 'Vertrek') + ' → ' + plaats(rit.naar, 'Bestemming'));

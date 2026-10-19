@@ -3,8 +3,9 @@
    niet opnieuw starten. De twee soorten rondes houden hun eigen bezetvlag.
    De bestaande termijnen, volgorde en foutmelding blijven behouden. */
 'use strict';
-module.exports = ({ rente, incasso, opdrachten, omgeving = process.env,
-  zet = setInterval, wis = clearInterval, meld = bericht => console.warn(bericht) }) => {
+module.exports = (ctx) => {
+  const { rente, incasso, opdrachten, omgeving = process.env,
+    zet = setInterval, wis = clearInterval, meld = bericht => console.warn(bericht) } = ctx;
   let gestopt = false;
   function plan(werk, ms, naam) {
     let bezig = false;

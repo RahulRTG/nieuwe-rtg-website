@@ -15,14 +15,14 @@
 
   /* het laatste beeld; de server blijft de waarheid */
   var C = null, B = null;
-  var ZET = '/api/geld/beleid/zet', POT = '/api/geld/pot/';
+  /* paden voluit: een opgebouwd pad ziet SCHERMROUTES.json niet */
+  var ZET = '/api/geld/beleid/zet';
 
   var SOORT = { minimumbuffer: 'Minimumbuffer', maanddrempel: 'Maanddrempel',
     'reserveer-maandelijks': 'Maandelijks reserveren', 'gift-bevestiging': 'Gift-bevestiging' };
 
-  /* Naar centen via Geld.naarCenten (hulp.js), op EEN plek: het eigen regeltje
-     dat hier stond las "1.000" als een euro en zette een minimumbuffer dus
-     duizend keer te laag, stil, waarna Rahul op die drempel handelde. */
+  /* Naar centen via Geld.naarCenten (hulp.js), op EEN plek: een eigen regeltje
+     las "1.000" als een euro (een buffer duizend keer te laag). */
   function naarCenten(v) { return w.Geld.naarCenten(v); }
 
   function kn(attr, txt) { return '<button class="knop" type="button" ' + attr + '>' + txt + '</button>'; }
@@ -116,22 +116,25 @@
   function potNieuw() {
     var naam = $('#ovPNaam').value.trim(), doel = naarCenten($('#ovPDoel').value);
     if (!naam || doel == null || doel <= 0) return meld('Naam en doel?');
-    zet(POT + 'zet', { naam: naam, doelCenten: doel });
+    zet('/api/geld/pot/zet', { naam: naam, doelCenten: doel });
   }
 
-  /* vrijgeven is negatief reserveren: een route, een waarheid */
+  /* vrijgeven is negatief reserveren: een route, een waarheid. EEN sleutel
+     per bedoeling (shared/id.js): een tweede tik zet niets nog eens opzij. */
+  var potSleutel = null;
   function potDoe(b) {
     var c = naarCenten((b.parentNode.querySelector('input') || {}).value);
     if (c == null || c <= 0) return meld('Bedrag?');
-    zet(POT + 'reserveer', { id: b.dataset.ovpot, centen: b.dataset.doe === 'vrij' ? -c : c });
+    var centen = b.dataset.doe === 'vrij' ? -c : c, voor = b.dataset.ovpot + '|' + centen;
+    if (!potSleutel || potSleutel.voor !== voor) potSleutel = { voor: voor, idem: w.RTGId('pot') };
+    api('/api/geld/pot/reserveer', { id: b.dataset.ovpot, centen: centen, idem: potSleutel.idem })
+      .then(function () { potSleutel = null; ververs(); }, function (e) { if (e.status) potSleutel = null; meld(e.message); });
   }
 
   /* gedelegeerd: de vlakken hertekenen, de omhulling gaat mee weg */
   function klik(e) {
-    /* #potten is geen stand maar het beleid-paneel van deze stand. Zonder
-       deze opvang viel de schil terug op de eerste stand en hertekende de
-       knop het overzicht, terwijl het lid dacht een reservering klaar te
-       zetten: een klaargezette handeling met een dode knop. */
+    /* #potten is het beleid-paneel van deze stand, geen stand: zonder deze
+       opvang hertekende de schil het overzicht en was de knop dood. */
     var anker = e.target.closest('[data-ovactie="#potten"]');
     if (anker) {
       e.preventDefault();
@@ -149,7 +152,7 @@
     else if ('ovdicht' in ds) $('#ovWaarom').hidden = true;
     else if (ds.ovregel) schakel(ds.ovregel);
     else if (ds.ovpot) potDoe(b);
-    else if (ds.ovpotweg && w.confirm('Deze pot opheffen?')) zet(POT + 'weg', { id: ds.ovpotweg });
+    else if (ds.ovpotweg && w.confirm('Deze pot opheffen?')) zet('/api/geld/pot/weg', { id: ds.ovpotweg });
   }
 
   function opSubmit(e) {
@@ -190,10 +193,8 @@
     if (w.RTGUitvoer) w.RTGUitvoer.bron(null);
   }
 
-  /* De stijl van dit paneel staat bij die van deel 1 (Deel.ovcss in overzicht-a.js):
-     een stand hoort EEN stijlblad te hebben, niet twee die elkaar in de head
-     verdringen -- en het scheelt hier de ruimte om uit te leggen waarom de
-     dingen staan zoals ze staan. */
+  /* De stijl van dit paneel staat bij die van deel 1 (Deel.ovcss in
+     overzicht-a.js): een stand heeft EEN stijlblad. */
 
   /* ovAlles, niet ovWrap: deel 1 tekent zelf #ovWrap en #ovVooruit in #ovVak */
   V.standen.push({

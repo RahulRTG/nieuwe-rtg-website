@@ -8,6 +8,7 @@
    twee grootboeken tegelijk raakt, en die regel hoort niet tussen deze.
    Krijgt de gedeelde ctx van kern/bank/index.js. */
 const { magBij } = require('./eigendom');
+const { providerStatus } = require('../betaalwaarheid/staten');
 
 module.exports = (ctx) => {
   const { db, save, bijeen, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje, metIdem } = ctx;
@@ -42,7 +43,14 @@ module.exports = (ctx) => {
         let betaling;
         try { betaling = await betaal.maakBetaling({ bedrag: c, referentie: 'bank-stort-' + iban + '-' + nu(), idempotentieSleutel: idem ? 'bank-stort:' + iban + ':' + idem : undefined, omschrijving: oms || 'RTG Bank storten' }); }
         catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
-        if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
+        if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') {
+          /* Geweigerd is AF, niet onderweg: "wacht op bevestiging" liet het lid
+             wachten op een storting die nooit kwam (scripts/lib/voltooi/bank.js).
+             Dezelfde vertaling van de providerstand als de betaalwaarheid. */
+          const af = ['GEWEIGERD', 'GEANNULEERD'].includes(providerStatus(betaling.aanbieder, betaling.status));
+          return { status: 402, betaalStatus: betaling.status, error: af
+            ? 'De storting is niet gelukt. Er is niets afgeschreven en niets bijgeschreven.' : 'De betaling wacht op bevestiging.' };
+        }
         ref = betaling.id;
       }
       const van = via === 'eigen' ? 'extern:emissie' : 'extern:kaart';

@@ -11,7 +11,7 @@
 
   function status(tekst, fout) { statusEl.textContent = tekst || ''; statusEl.style.color = fout ? '#e09a9a' : ''; }
   async function api(pad, body) {
-    var r = await fetch('/api/muziek/' + pad, { method: 'POST', headers: {
+    var r = await fetch(pad, { method: 'POST', headers: {
       'Content-Type': 'application/json', Authorization: 'Bearer ' + token
     }, body: JSON.stringify(body || {}) });
     var j = await r.json().catch(function () { return {}; });
@@ -51,7 +51,7 @@
       var mooi = knop('eigen-nummer__mooi', '♡ ' + (nummer.mooi || 0), 'Vind ' + nummer.naam + ' mooi'); mooi.dataset.aan = String(!!nummer.mooiVanMij);
       if (nummer.mooiVanMij) mooi.textContent = '♥ ' + nummer.mooi;
       mooi.addEventListener('click', async function () {
-        try { var r = await api('mooi', { id: nummer.id, aan: !nummer.mooiVanMij }); nummer.mooi = r.mooi; nummer.mooiVanMij = r.mooiVanMij; teken(); }
+        try { var r = await api('/api/muziek/mooi', { id: nummer.id, aan: !nummer.mooiVanMij }); nummer.mooi = r.mooi; nummer.mooiVanMij = r.mooiVanMij; teken(); }
         catch (e) { status(e.message, true); }
       });
       acties.appendChild(mooi);
@@ -59,7 +59,7 @@
         var weg = knop('eigen-nummer__weg', '×', 'Verwijder ' + nummer.naam);
         weg.addEventListener('click', async function () {
           if (!confirm(nummer.naam + ' verwijderen uit de muziekfeed?')) return;
-          try { await api('bestand-weg', { id: nummer.id }); nummers = nummers.filter(function (n) { return n.id !== nummer.id; }); teken(); status('Het nummer is verwijderd.'); }
+          try { await api('/api/muziek/bestand-weg', { id: nummer.id }); nummers = nummers.filter(function (n) { return n.id !== nummer.id; }); teken(); status('Het nummer is verwijderd.'); }
           catch (e) { status(e.message, true); }
         }); acties.appendChild(weg);
       }
@@ -99,6 +99,6 @@
     kies.disabled = true; lijstEl.innerHTML = '<p class="muziek-leeg">Log in om muziek van mensen te beluisteren en uw eigen werk te delen.</p>';
     status('De live stations kunt u wel meteen beluisteren.'); return;
   }
-  api('feed').then(function (j) { nummers = j.nummers || []; teken(); status(''); })
+  api('/api/muziek/feed').then(function (j) { nummers = j.nummers || []; teken(); status(''); })
     .catch(function (e) { status(e.message, true); lijstEl.innerHTML = '<p class="muziek-leeg">De muziekfeed kon niet worden geladen.</p>'; });
 })();

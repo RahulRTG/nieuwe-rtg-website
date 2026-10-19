@@ -76,7 +76,19 @@ function smalVoorvoegsel(v) {
   return v.replace(/^\/+|\/+$/g, '').split('/').length >= 3;
 }
 
-function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
+/* EEN GEGENEREERDE BUNDEL IS ZIJN DELEN. scripts/schermroutes.js slaat de
+   bundels (bouwuitvoer, scripts/bundel.js) bewust over en schrijft de paden
+   toe aan de delen ernaast. Een ingang die de bundel laadt, roept dus de
+   routes van die delen aan; zonder deze stap zag de koppeling van
+   /apps/residentie.html alleen /api/stroom/ticket. */
+function bundelRegister() {
+  try {
+    const b = require('../bundel');
+    return new Map(Object.entries(b.bundels).map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']));
+  } catch (e) { return new Map(); }
+}
+
+function ingangRoutes(ingang, { lees = leesStandaard, schermroutes, bundels } = {}) {
   if (!ingang || !ingang.startsWith('/')) return null;
   const sr = schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
   const perBestand = new Map(sr.perScherm.map((x) => [x.bestand, x]));
@@ -85,21 +97,20 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
   const bron = lees(html);
   if (bron !== null) {
     const map = path.posix.dirname(ingang);
+    const delen = bundels || bundelRegister();
     for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+\.js)[^"]*"/g)) {
       const src = m[1];
       if (/^[a-z]+:\/\//i.test(src)) continue;
-      bestanden.push('public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src)));
+      const b = 'public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src));
+      bestanden.push(b);
+      const deelmap = delen.get(b);
+      if (deelmap) for (const x of sr.perScherm) if (x.bestand.startsWith(deelmap)) bestanden.push(x.bestand);
     }
   }
-  /* EEN BUNDEL IS ZIJN DELEN. SCHERMROUTES.json meet bouwuitvoer niet maar de
-     delen ernaast (scripts/bundel.js): apps/library/app.js staat er dus als
-     apps/library/app/app-01.js en -02.js in. Zonder deze stap raakt een proef
-     nooit een scherm dat zijn aanroepen in een bundel draagt. */
-  let delen = [];
-  try { delen = Object.entries(require('../bundel').bundels).map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']); } catch (e) { /* geen bundelregister */ }
-  for (const [uit, map] of delen) {
-    if (bestanden.includes(uit)) for (const b of perBestand.keys()) if (b.startsWith(map)) bestanden.push(b);
-  }
+  return routesVanBestanden(bestanden, perBestand);
+}
+
+function routesVanBestanden(bestanden, perBestand) {
   const exact = new Set(), voor = new Set();
   for (const b of bestanden) {
     const rij = perBestand.get(b);
@@ -108,6 +119,22 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
     for (const v of rij.voorvoegsels || []) if (smalVoorvoegsel(v)) voor.add(v);
   }
   return { bestanden, exact, voor };
+}
+
+/* EEN TAB OF OS-APP HEEFT GEEN EIGEN ADRES, maar wel eigen code. Het contract
+   noemt dan drie dingen: `ingang` (het echte scherm waar de navigatie begint),
+   `via` (de echte stap daarheen, bijvoorbeeld `#tab=salon`, dat app-main-12a.js
+   zelf als adres met een stand kent) en `bestanden` (de delen die de tab of
+   OS-app zelf tekenen). Gekoppeld wordt op de routes van die DELEN en niet op
+   die van de hele schil: anders raakt elk scenario dat iets in /apps/app.html
+   aanroept, elke tab tegelijk. Ontbreekt een van de drie, dan is er geen
+   ingang en blijft het bewijs NIET_GETEST -- geen verzonnen adres. */
+function ingangVan(ingang, c, opties = {}) {
+  if (ingang && String(ingang).startsWith('/')) return ingangRoutes(ingang, opties);
+  if (!c || !c.via || !c.ingang || !Array.isArray(c.bestanden) || !c.bestanden.length) return null;
+  const lees = opties.lees || leesStandaard;
+  const sr = opties.schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
+  return routesVanBestanden(c.bestanden.slice(), new Map(sr.perScherm.map((x) => [x.bestand, x])));
 }
 
 function gedeeld(proef, ingang) {
@@ -219,11 +246,11 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
   }
   const lees = opties.lees || leesStandaard;
   const proef = proefRoutes(bron.instrument, lees);
-  const ing = ingangRoutes(ingang, { lees, schermroutes: opties.schermroutes });
+  const ing = ingangVan(ingang, c, { lees, schermroutes: opties.schermroutes });
   const raak = proef && ing ? gedeeld(proef, ing) : [];
   if (!raak.length) {
     return { status: 'NIET_GETEST', bewijs: null,
-      reden: 'het contract noemt ' + bron.instrument + ', maar die proef raakt geen enkele route die ' + ingang +
+      reden: 'het contract noemt ' + bron.instrument + ', maar die proef raakt geen enkele route die ' + (ing ? ingang : (c.ingang || ingang) + ' via ' + (c.via || '(geen navigatiestap in het contract)')) +
         ' aanroept; de koppeling haalt de meting niet en telt daarom niet' };
   }
   /* Een voltooiproef draagt per onderdeel per bewijs een eigen keten
@@ -254,4 +281,4 @@ function stelSamen(r, opties = {}) {
   return gedaan;
 }
 
-module.exports = { proefRoutes, ingangRoutes, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };
+module.exports = { proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

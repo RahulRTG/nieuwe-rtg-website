@@ -103,14 +103,22 @@ module.exports = ({ db, save, crypto, anthropic, livinglab, bijeen, inBundel }) 
   }
 
   // een lid zamelt in: de bijdrage gaat naar de pot van EEN locatie (de omgeving)
-  function doneer(lidKey, lidNaam, locId, euro) {
+  /* `idem`: EEN TOEZEGGING PER TIK. Zonder sleutel legde een tweede tik, of
+     een herhaling na een afgebroken antwoord, de bijdrage twee keer in de pot
+     (scripts/lib/voltooi/labfonds.js). Dezelfde sleutel geeft de eerste terug;
+     dezelfde sleutel voor een ander bedrag of een andere plek is een 409. */
+  function doneer(lidKey, lidNaam, locId, euro, idem) {
     if (!lidKey) return { status: 403, error: 'Log in met je RTG-account om mee in te zamelen.' };
     const l = loc(locId); if (!l) return { status: 404, error: 'Deze locatie bestaat niet.' };
     const c = naarCenten(euro);
     if (c < 100) return { status: 400, error: 'Zamel minimaal EUR 1 in.' };
     if (c > 5000000) return { status: 400, error: 'Dat is te veel voor een keer; verdeel het over meerdere keren.' };
+    const sleutel = schoon(idem, 80) || null;
+    const al = sleutel && F().bijdragen.find(b => b.lidKey === lidKey && b.idem === sleutel);
+    if (al) return al.locId === l.id && al.centen === c ? { ok: true, herhaald: true, locatie: locBeeld(l, lidKey) }
+      : { status: 409, error: 'Deze toezegging is al gedaan met een ander bedrag of voor een andere plek.' };
     l.pot += c; l.opgehaald += c;
-    F().bijdragen.unshift({ id: rid(), lidKey, lidNaam: schoon(lidNaam, 40) || 'Lid', locId: l.id, centen: c, at: nu() });
+    F().bijdragen.unshift({ id: rid(), lidKey, lidNaam: schoon(lidNaam, 40) || 'Lid', locId: l.id, centen: c, at: nu(), idem: sleutel });
     if (F().bijdragen.length > 5000) F().bijdragen.pop();
     save();
     return { ok: true, locatie: locBeeld(l, lidKey) };

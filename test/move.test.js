@@ -337,3 +337,22 @@ test('14. een naad is terug te voeren op zijn onderdelen', () => {
   const kenmerken = uit.naden.map(n => n.van.kenmerk + '>' + n.naar.kenmerk);
   assert.equal(new Set(kenmerken).size, kenmerken.length, 'en die paren zijn onderscheidend');
 });
+
+test('15. de volgende beweging is de eerste in de TIJD, niet de eerste in de rij', () => {
+  /* reiswereld.komend() sorteert op zijn eigen rangorde; de voltooiproef
+     (scripts/lib/voltooi/move.js) zag de knop een afspraak van 13:00 aanbieden
+     terwijl die van 10:00 eerst kwam. Hier staat de late vooraan in de rij. */
+  const { maakMove } = require('../server/kern/move');
+  const kern = {
+    reiswereld: { komend: () => ({ komend: [
+      { titel: 'Laat', soort: 'afspraak', kenmerk: 'B', van: '2099-01-02', tijd: '13:00', plek: { zaak: 'B' } },
+      { titel: 'Vroeg', soort: 'afspraak', kenmerk: 'A', van: '2099-01-02', tijd: '10:00', plek: { zaak: 'A' } }
+    ] }) },
+    plekBepaal: (p) => p.zaak === 'A' ? P(38.91, 1.43, 'A') : P(38.97, 1.41, 'B')
+  };
+  const { move } = maakMove({ kern });
+  const v = move.volgende('lid', Date.parse('2099-01-01T00:00:00Z'));
+  assert.equal(v.volgende.kenmerk, 'A', 'de afspraak van 10:00 komt eerst');
+  /* En wat al voorbij is, slaat hij over: om 11:00 is de late de volgende. */
+  assert.equal(move.volgende('lid', Date.parse('2099-01-02T11:00:00Z')).volgende.kenmerk, 'B');
+});

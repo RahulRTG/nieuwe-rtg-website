@@ -147,6 +147,18 @@ test('6. een breed voorvoegsel maakt geen koppeling', () => {
   assert.deepEqual(B.gedeeld(new Set(['/api/ride/pay']), breed), []);
 });
 
+test('6b. een gebundeld script draagt de routes van zijn delen', () => {
+  /* public/apps/office/app.js is een bundel van public/apps/office/app/*.js
+     (scripts/bundel.js); de meting schrijft de paden aan de delen toe. */
+  const sr = { perScherm: [{ bestand: 'public/apps/office/app/app-01.js', exact: [], voorvoegsels: ['/api/office/kantoorpakket/'] }] };
+  const lees = (rel) => (rel === 'public/apps/kantoor.html' ? '<script src="/apps/office/app.js?v=1"></script>' : null);
+  const ing = B.ingangRoutes('/apps/kantoor.html', { lees, schermroutes: sr });
+  assert.deepEqual(B.gedeeld(new Set(['/api/office/kantoorpakket/maak', '/api/ride/pay']), ing), ['/api/office/kantoorpakket/maak']);
+  /* Een gewoon script krijgt de delen van een ander niet. */
+  const los = B.ingangRoutes('/apps/kantoor.html', { lees: () => '<script src="/apps/los.js"></script>', schermroutes: sr });
+  assert.deepEqual(B.gedeeld(new Set(['/api/office/kantoorpakket/maak']), los), []);
+});
+
 test('7. een koppeling die de meting niet haalt, telt niet -- ook met een vers register', () => {
   const contract = { 'link:x': { belofte: 'een belofte die lang genoeg is om te tellen',
     voltooibaar: { soort: 'ketenproef', register: 'X.json', instrument: 'scripts/x.js' } } };

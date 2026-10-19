@@ -13,7 +13,7 @@
     el.textContent = tekst || ''; el.style.color = fout ? '#e09a9a' : '';
   }
   async function api(pad, body) {
-    var r = await fetch('/api/muziek/' + pad, { method: 'POST', headers: {
+    var r = await fetch(pad, { method: 'POST', headers: {
       'Content-Type': 'application/json', Authorization: 'Bearer ' + token
     }, body: JSON.stringify(body || {}) });
     var j = await r.json().catch(function () { return {}; });
@@ -79,7 +79,7 @@
     }
     try {
       status(nummer.naam + ' wordt klaargezet...');
-      var toegang = await api('bestand-ticket', { id: nummer.id });
+      var toegang = await api('/api/muziek/bestand-ticket', { id: nummer.id });
       if (G && G.stand()) G.pauze();
       actief = nummer; index = nummers.findIndex(function (n) { return n.id === nummer.id; });
       audio.src = toegang.src; audio.load(); wachtrij(); mediaSessie(); werkSpelerBij(true);

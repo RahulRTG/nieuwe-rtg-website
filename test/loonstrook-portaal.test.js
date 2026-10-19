@@ -271,3 +271,19 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
+
+/* Het scherm stuurde bij elk verzoek '{}' als lijf, ook bij het dossier: de
+   runId kwam nooit aan en elk dossier antwoordde 404. Deze toets haalt de
+   api-functie uit het scherm en kijkt wat er werkelijk over de lijn gaat. */
+test('het loonstrookscherm stuurt de runId van het dossier echt mee', async () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'loonstrook.html'), 'utf8');
+  const bron = html.match(/function api\([^)]*\) \{[\s\S]*?\n  \}/);
+  assert.ok(bron, 'de api-functie staat in het scherm');
+  const verstuurd = [];
+  const fetch = async (pad, opties) => { verstuurd.push({ pad, lijf: opties.body }); return { ok: true, json: async () => ({}) }; };
+  const api = new Function('fetch', 'tok', bron[0] + '; return api;')(fetch, 'sleutel');
+  await api('/api/member/dossier', { runId: 'run_abc' });
+  assert.equal(verstuurd[0].pad, '/api/member/dossier');
+  assert.equal(JSON.parse(verstuurd[0].lijf).runId, 'run_abc', 'de runId gaat mee in het lijf');
+  assert.match(html, /api\('\/api\/member\/dossier', \{ runId/, 'en het dossier vraagt er ook om');
+});

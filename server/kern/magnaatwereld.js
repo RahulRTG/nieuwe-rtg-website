@@ -738,11 +738,19 @@ module.exports = ({
     return { ok: true, goed: true, feedback: taak.feedback, taak: publiekeTaak(taak), speler: publiekeSpeler(p) };
   }
 
-  function taakAntwoord(key, taakId, keuze) {
+  function taakAntwoord(key, taakId, keuze, stapNr) {
     const p = speler(key);
     const taak = p.taken.find(t => t.id === tekst(taakId, 100));
     if (!taak) return { status: 404, error: 'Deze opdracht bestaat niet.' };
     if (taak.status !== 'bezig') return { status: 409, error: 'Deze opdracht is al afgerond.', taak: publiekeTaak(taak) };
+    /* EEN ANTWOORD HOORT BIJ EEN VRAAG. Het scherm stuurt de stap mee die het
+       toonde; komt hetzelfde antwoord terug nadat het al telde (een herhaling
+       na een afgebroken verbinding), dan was het voor de vorige vraag en niet
+       voor de volgende. Zonder deze controle beantwoordde de herhaling stil de
+       volgende vraag met dezelfde keuze (scripts/lib/voltooi/magnaat.js). */
+    if (stapNr !== undefined && stapNr !== null && Number(stapNr) !== taak.stap) {
+      return { status: 409, error: 'Dit antwoord is al verwerkt; de opdracht staat op de volgende vraag.', taak: publiekeTaak(taak) };
+    }
     const stap = taak.stappen[taak.stap];
     if (stap.soort === 'software') {
       return { status: 409, error: 'Open eerst ' + stap.schermNaam + ' in het RTG OS.', taak: publiekeTaak(taak) };

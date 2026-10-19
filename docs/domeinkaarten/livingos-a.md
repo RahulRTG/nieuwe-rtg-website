@@ -899,3 +899,370 @@ Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde ag
 ### h. Eindcontract, eigen eisen
 - **Levenscyclus:** van aanvraag tot uitstappen of herroepen, zonder stille fout (A3).
 - **Juridisch:** geen betaling binnen de bedenktijd, als A1 dat zo besluit.
+
+---
+
+## 9. Vonk (`link:vonk`, eigenaar `daten.vonk`)
+
+**Doel.** Een geverifieerd lid van 18 jaar of ouder vindt een passende ander, leert hem kennen in een veilige omgeving en spreekt af op een plek die de keten ook echt bevestigt.
+
+### a. Inventaris
+- **Routes:** `/api/vonk/*` (profiel, foto's, selectie van max. 6, like, bericht, halfweg, kies, betaal, blokkeer) en `/api/connection/vonk/*` (consent, tekst, media, bellen).
+- **Statussen:** van DISCOVERY tot POST_DATE, met de reservering aangevraagd → onbekend, geweigerd of bevestigd.
+- **Toegang:** 18+ met een geverifieerd paspoort (ontmoetpoort.js:38). Bellen en media alleen met wederzijdse consent. Beschikbaarheid gaat pas na een match open, als één gedeeld dagdeel.
+- **Geld:** €10 bevestiging, verdeeld RTG €5 / partner €5, met terugboeking (payment.js).
+- **Bewezen:** voltooiproef `vonk.js`. Gerepareerd: herhaalsleutel op bericht en tekst. Niet gelopen: de foto, bellen en video.
+- **Gat:** `commitmentId=null` staat hard in payment.js:78. Daardoor ontbreekt het domeinbewijs altijd totdat de zaak beslist.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Hinge (HingeX) | eerder compatibele mensen zien, prioriteit | niet openbaar; $49,99 per maand (na te gaan) ([Hinge](https://help.hinge.co/hc/en-us/articles/38014282744595-Subscription-and-Purchase-Benefits)) |
+| Tinder Select | alleen op uitnodiging, bericht zonder match | $499 per maand bij de lancering in 2023 ([TechCrunch](https://techcrunch.com/2023/09/25/tinder-snobs-can-now-pay-499-per-month-to-be-matched-with-the-most-sought-after-profiles)) |
+| The League (Investor) | exclusieve selectie | $999 per maand (na te gaan) ([Fortune 2024](https://fortune.com/2024/01/07/wealthy-gen-z-millennial-singles-paying-thousands-the-league-dating-app)) |
+
+### c. Domein
+- **DSA art. 28:** richtlijnen voor minderjarigen (14 juli 2025) ([Taylor Wessing](https://www.taylorwessing.com/en/insights-and-events/insights/2025/07/rd-european-commission-guidelines-on-protection-of-minors-under-the-digital-services-act)).
+- **EU-blauwdruk voor leeftijdsverificatie:** versie 2 sinds oktober 2025 ([Commissie](https://digital-strategy.ec.europa.eu/en/policies/eu-age-verification)).
+- **DSA art. 16, 17 en 22:** melden, een motivering bij ingrijpen en trusted flaggers. Toezicht door de ACM ([jaarverslag](https://www.acm.nl/system/files/documents/dsa-jaarverslag-2025.pdf)).
+- **Datingfraude:** de signalen zijn verliefdheid die te snel komt, niet willen videobellen en om geld vragen.
+- **Eerste date:** een openbare plek, iemand inlichten en eigen vervoer.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Vo1 | Date-check-in met Veilig | L6 | ontbreekt | Bij DATE_ACTIVE kan het lid een wacht starten (Veilig) met de eindtijd van de date. Een gemiste check-in alarmeert de eigen kring, nooit de match. | M | **A nu** |
+| Vo2 | Fraudesignaal in het gesprek | L4 | ontbreekt | Vraagt de ander om geld of een rekeningnummer (lokale patroonherkenning), dan ziet de ontvanger een waarschuwing met het advies. Er gaat niets automatisch naar het kantoor. | M | **A nu** |
+| Vo3 | Melding met motivering terug (DSA 17) | L3 | half (meldingen bestaan) | Het kantoor beslist met een reden. De melder en de gemelde horen de beslissing en hoe ze bezwaar maken. | M | A nu |
+| Vo4 | Domeinbewijs van de reservering | L5 | fout (`commitmentId` null) | Een bevestigde reservering heeft een commitment-id en de status DATE_CONFIRMED zonder dat het domeinbewijs ontbreekt. | K | **A nu** |
+| Vo5 | Na de date: wederzijds akkoord voor vervolg | L5 | half (POST_DATE) | Beide kiezen "graag weer" of "liever niet". Alleen bij twee keer ja gaat het gesprek verder; een nee wordt nooit getoond als afwijzing. | M | A later |
+| Vo6 | EU-leeftijdsverificatie (blauwdruk) | L2 | ontbreekt | — | G | B, extern |
+
+### e. RTG-exclusief
+Een date die echt gereserveerd is bij een gekeurde zaak, een check-in via Veilig bij de eigen kring, en een bevestiging van €10 die terugkomt als de zaak weigert.
+
+### g. Prioritering
+- **A nu:** Vo4 (K), Vo1, Vo2 en Vo3 (M).
+- **A later:** Vo5.
+- **B:** Vo6.
+
+### Keten "de eerste date"
+1. Match.
+2. Halfweg een plek kiezen.
+3. €10 bevestigen.
+4. De zaak bevestigt de tafel.
+5. Check-in via Veilig (Vo1).
+6. POST_DATE.
+
+**Storingen:**
+- De zaak weigert: de reservering heet geweigerd en de €10 komt terug.
+- Veilig uit: de date gaat door, en het scherm zegt "geen check-in mogelijk".
+
+### h. Eindcontract, eigen eisen
+- **Bevoegd:** een lid zonder 18+-verificatie bereikt geen enkele route (bestaat).
+- **Samenwerking:** wensen blijven bij de eigenaar. Getoetst: een match ziet geen wensen.
+
+---
+
+## 10. Theater (`link:theater`, eigenaar `media.theater`)
+
+**Doel.** Films en series kijken, kanalen volgen, een eigen kanaal met werk beheren en reacties lezen.
+
+### a. Inventaris
+- **Routes:** `/api/theater/*` (zaal, kanaal/aanmeld, video/maak, upload tot 420 MB, ondertitels, abonneer, reactie, meld, kijk/:id met stroomticket, zaakbibliotheek, kijkplicht, huisstijl).
+- **Kantoor:** keurt kanalen (wacht → goedgekeurd of geweigerd).
+- **Bewezen:** voltooiproef `theater.js` (reactie- en videoherhaling gerepareerd). Niet gelopen: het Thuisarchief (WebRTC), ondertitels, de zaakbibliotheek en de kijkplicht.
+- **Gaten:**
+  - "abonnementen beheren" is alleen volgen;
+  - series bestaan niet;
+  - geen leeftijdsregel;
+  - MAX_VIDEO_MB is een "demo-grens".
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Netflix Premium | 4K, meerdere schermen | €20,99 per maand (na te gaan) |
+| Vimeo OTT Enterprise | eigen apps, DRM, live | op offerte |
+| Patreon | betaalde lidmaatschappen voor makers | 10% voor nieuwe makers sinds augustus 2025 ([Patreon](https://support.patreon.com/hc/en-gb/articles/360024952552)) |
+
+### c. Domein
+- **Commerciële mediadienst op aanvraag:** registratie bij het CvdM, plus NICAM (Kijkwijzer) en de Reclame Code. Het artikel is na te gaan.
+- **Kijkwijzer-iconen** staan vóór het afspelen.
+- **DSA art. 16 en 17:** melden en een motivering.
+- **EAA (sinds 28 juni 2025):** de speler moet toegankelijk zijn en ondertitels doorgeven ([Taylor Wessing](https://www.taylorwessing.com/en/interface/2025/media-hot-topics-2025/access-to-audiovisual-media-services-under-the-european-accessibility-act)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| T1 | Leeftijdsclassificatie per video | L2 | ontbreekt | De maker kiest een Kijkwijzer-leeftijd. Een video van 16+ of 18+ speelt alleen voor een lid dat `volwassen()` of de leeftijd haalt; anders volgt 403 met de reden. | M | **A nu** |
+| T2 | Series (seizoen, aflevering, verder kijken) | L1 | ontbreekt | Afleveringen hangen aan een serie. Verder kijken begint bij de laatste positie van het lid. | M | A later |
+| T3 | Ondertitels altijd doorgeven (EAA) | L1 | half | Ondertitels van de maker staan in de speler, aan en uit te zetten, en worden getoetst op elke video met cues. | K | **A nu** |
+| T4 | Betaald abonnement op een kanaal | L2/L6 | ontbreekt | — | M | B: Geld (betaalWaarheid) en de PSD2-vraag (zie Podium) |
+| T5 | Registratieplicht CvdM | — | — | — | — | vraagt besluit (juridisch) |
+
+### e. RTG-exclusief
+Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtstreeks van maker naar kijker.
+
+### g. Prioritering
+- **A nu:** T3 (K) en T1 (M).
+- **A later:** T2.
+- **B:** T4.
+- **Besluit:** T5.
+
+### Keten "een video publiceren"
+1. Kanaal aanvragen.
+2. Het kantoor keurt.
+3. Uploaden met ondertitels en leeftijd.
+4. Een lid kijkt.
+5. Het lid reageert.
+
+**Storing:** de opslag is vol: de upload wordt geweigerd met de reden, en er blijft geen half bestand achter.
+
+---
+
+## 11. Podium (`link:podium`, eigenaar `media.podium`)
+
+**Doel.** Live uitzendingen kijken, chatten en cadeaus geven, of via de zaal andere kanalen vinden.
+
+### a. Inventaris
+- **Routes:** `/api/podium/*` (kanalen, live, kijk, signaal, chat, cadeau, abonneer, kaartje, koop, blokkeer, meld).
+- **Kantoor:** `/api/office/podium/beslis`.
+- **Zones:** open, creator, evenement, besloten, beperkt (18+), zaak en handel.
+- **Geld:** cadeaus en kraam via RTG Pay `pay.stuur` met herhaalsleutel.
+- **Bewezen:** voltooiproef `podium.js` (chat-idem gerepareerd). Niet gelopen: abonnementen, kaartjes, de kraam en de besloten zones.
+- **Gaten:**
+  - het commentaar zegt "strikt 18+" (index.js:7, kernlaag5.js:115), maar de zones open en creator vragen alleen een lid;
+  - de catalogus zegt nog "(18+)";
+  - het kantoorscherm voor het keuren van kanalen roept geen scherm aan;
+  - `/kaartje` en `/nodig` staan niet op podium.html.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Twitch | tier-3 sub, Turbo | $24,99 / $11,99 per maand (na te gaan) |
+| YouTube-kanaallidmaatschappen | tot 6 niveaus, de maker houdt 70% | ([YouTube](https://www.youtube.com/creators/channel-memberships/)) |
+| Patreon | lidmaatschap en live | 10% |
+
+### c. Domein
+- **Vloggers en de Mediawet (sinds 1 juli 2022):** registratie bij 500.000 volgers, 24 video's per jaar en een KvK-inschrijving. Of die drempel nog actueel is, is na te gaan ([Taylor Wessing](https://www.taylorwessing.com/en/insights-and-events/insights/2022/07/new-set-of-rules-for-influencer-marketing-in-the-netherlands)).
+- **PSD2:** een platform dat gelden ontvangt en doorbetaalt heeft een DNB-vergunning nodig, tenzij een betaalinstelling het uitvoert ([DNB](https://www.dnb.nl/voor-de-sector/open-boek-toezicht/wet-regelgeving/psd2/elektronische-handelsplatformen-e-commerce-platforms-psd2)). Dat raakt de cadeaus.
+- **Witwasrisico van cadeaus:** in de VS wordt erover geprocedeerd ([bron](https://moneylaundering.com/news/tiktok-lawsuit-highlights-potential-money-laundering-risks)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| P1 | Leeftijd per zone, eerlijk opgeschreven | L2 | fout (tekst) | Commentaar en catalogus zeggen wat de code doet: alleen de zone "beperkt" is 18+. Getoetst met een lid onder 18 in de zone "open". | K | **A nu** |
+| P2 | Plafond op cadeaus en signalen | L3 | ontbreekt | Een cadeaubedrag boven het dag- en maandplafond van het lid wordt geweigerd met de reden. Ongewone patronen gaan naar het kantoor, zonder automatische straf. | M | A nu |
+| P3 | Kaartje en uitnodiging op het scherm | L1 | half (routes bestaan) | Een kaartje voor een evenementzone geeft toegang. Zonder kaartje volgt 403 met "kaartje nodig". | M | A later |
+| P4 | Kanaal keuren op het kantoorscherm | L3 | half | Een kantoormens op naam keurt op een scherm. Hij keurt nooit zijn eigen kanaal. | M | A later |
+| P5 | Betaalvergunning voor cadeaus | — | — | — | — | vraagt besluit (Geld en juridisch: PSD2) |
+
+### g. Prioritering
+- **A nu:** P1 (K) en P2 (M).
+- **A later:** P3, P4.
+- **Besluit:** P5.
+
+### Keten "live met cadeau"
+1. Kijken.
+2. Chatten.
+3. Een cadeau geven via Pay.
+4. De maker ziet het cadeau.
+
+**Storingen:**
+- Pay weigert: geen cadeau, met de melding.
+- Kantoor uit: kanaalaanvragen blijven "wacht".
+
+---
+
+## 12. Krant (`link:krant`, eigenaar `media.krant`)
+
+**Doel.** Een lid leest artikelen of bladert door de gids van kranten. Een redactie maakt, corrigeert en publiceert.
+
+### a. Inventaris
+- **Lezers:** `/api/krant/{gids, open, artikel}` met auth.
+- **Redactie:** `/api/supplier/redactie/*`, met de capability `redactie`.
+- **Statussen:** concept en live, met eindredactie. Correcties zijn zichtbaar in publicatie.js.
+- **Bewezen:** voltooiproef `krant.js`. De openbaarheidsstap is gesloten sinds Toegang (66f413ff).
+- **Gaten:**
+  - journalistiek-krant.js:4 zegt "vraagt geen sessie", maar de routes eisen auth;
+  - "gepersonaliseerd" bestaat niet;
+  - assist (journalistiek.js:113-129) zoekt `claude.vraag`, maar server.js:1068 geeft die niet mee, dus assist draait altijd op de regel-terugval.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| FT Premium Digital | alles, analyses | rond €69 per maand (na te gaan) |
+| NRC Digitaal Compleet | krant en archief | €54,95 per maand (na te gaan) |
+| WordPress VIP (redacties) | redactieplatform | vanaf $25.000 per jaar ([WPVIP](https://wpvip.com/?p=98790)) |
+
+### c. Domein
+- **Raad voor de Journalistiek:** zelfregulering via de Leidraad (2019). De tekst over rectificatie is na te gaan ([Leidraad](https://rvdj.nl/assets/uploads/2024/01/Leidraad-aanpassing-2019.pdf)).
+- **Art. 6:167 BW:** een rechter kan rectificatie bevelen ([Dirkzwager](https://www.dirkzwager.nl/kennis/artikelen/over-de-vordering-tot-rectificatie/)).
+- Er is geen wettelijk recht op weerwoord ([IViR](https://www.ivir.nl/?p=9272)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| K1 | Correctie met datum en reden, zichtbaar boven het artikel | L2 | half | Een correctie toont wat er veranderde, wanneer en waarom. De vorige tekst blijft voor de redactie in de geschiedenis. | K | **A nu** |
+| K2 | Commentaar laten kloppen met de code | — | fout (tekst) | De kop van journalistiek-krant.js zegt dat lezen een sessie vraagt. | K | **A nu** |
+| K3 | Assist via de lokaal-eerst-keten | L4 | fout (geen `claude`) | Assist krijgt de keten van server/ai.js. Zonder model blijft de regel-terugval, met het label "zonder model". | K | A nu (melden aan WorkOS of de redactie als dat de eigenaar is) |
+| K4 | Klacht van een lezer naar de redactie | L2/L3 | ontbreekt | Een lezer meldt een fout. De redactie beslist met een reden, en de lezer hoort het. | M | A later |
+| K5 | Persoonlijke krant (rubrieken volgen) | L1 | ontbreekt | Het lid volgt rubrieken. De volgorde is uit te leggen: nooit een verborgen score. | M | A later |
+
+### g. Prioritering
+- **A nu:** K1, K2, K3 (K).
+- **A later:** K4, K5.
+
+### Keten "een fout in een artikel"
+1. Een lezer meldt de fout (K4).
+2. De redactie corrigeert (K1).
+3. De correctie staat boven het artikel.
+4. De lezer hoort het.
+
+**Storing:** redactie uit: lezen werkt door; de melding blijft "ontvangen".
+
+---
+
+## 13. Spelavond (`link:spelavond` → spelscherm.html, eigenaar `spelen.projectiescherm`)
+
+**Doel.** Een spel dat op de telefoon gestart is, projecteren op een tweede scherm, om samen aan tafel te spelen.
+
+### a. Inventaris
+- **Routes:** `/api/projectie/koppel` en `/kijk` (no-store). GET `/api/projectie/:code` geeft 410.
+- **De tv:** heeft geen account; hij krijgt een eenmalige code en daarna een gehashte schermsessie.
+- **Openen en sluiten:** alleen een speler kan dat.
+- **Scores:** alleen bij `progressieMag`.
+- **Bewezen:** voltooiproef `spelavond.js`.
+- **AI:** Rahul in spellen/rahul.js via de lokaal-eerst-keten, met vaste tips als terugval.
+- **Gaten:** geen echte. Een aparte "spelavond"-planning bestaat niet.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Jackbox Party Pack 11 | partyspellen via telefoon en tv | ongeveer $29-35 eenmalig (na te gaan) |
+| AirConsole Hero | meer dan 170 spellen, onbeperkt spelers | $7,99 per maand ([App Store](https://apps.apple.com/app/airconsole/id1017688554)) |
+| Kahoot! 360 Pro Max | tot 2.000 deelnemers | $69 per host per maand ([Kahoot](https://www.kahoot.com/pricing)) |
+
+### c. Domein
+- **Kansspelwet:** geen geldprijzen. Een promotioneel kansspel valt onder de gedragscode ([Ksa](https://kansspelautoriteit.nl/sites/default/files/2026-06/2026-06-02_21670_LOD%20illegaal%20promotioneel%20kansspel_sanctiebesluit.pdf)).
+- **PEGI vanaf juni 2026:** betaalde lootboxen worden PEGI 16, en onbeperkte chat zonder blokkeren of melden wordt PEGI 18 ([Osborne Clarke](https://www.osborneclarke.com/insights/games-loot-boxes-get-16-plus-age-rating-europe-under-pegi-overhaul)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| S1 | Avond plannen met uitnodigingen in de Agenda | L6 | ontbreekt | De gastheer plant een avond. De genodigden krijgen een agendaverwijzing. De potjes van die avond hangen eraan. | M | A later |
+| S2 | Melden en blokkeren in de spelchat | L2 | onbekend | Spelchat heeft melden en blokkeren (de PEGI-grens). Ontbreekt dat, dan geen vrije chat. | K | **A nu** (eerst meten) |
+| S3 | Geen lootboxen of geldprijzen | — | bestaat (niet gebouwd) | Een toets die vastlegt dat geen spelroute geld uitkeert of een willekeurige betaalde beloning geeft. | K | **A nu** |
+
+### g. Prioritering
+- **A nu:** S2, S3.
+- **A later:** S1.
+
+### Keten "spelavond"
+1. Plannen (S1).
+2. Starten op de telefoon.
+3. Koppelen met de tv-code.
+4. Spelen.
+5. Afsluiten.
+
+**Storing:** de tv valt weg: het potje gaat door op de telefoon, en opnieuw koppelen kan met een nieuwe code.
+
+---
+
+## 14. Camera (`link:camera`, eigenaar `media.camera`)
+
+**Doel.** Foto's maken, met tips, afwerken in de Studio, en bewaren.
+
+### a. Inventaris
+- **Scherm:** camera.html met zoeker, standen, Studio (looks en schuiven) en spraak. De enige route is `/api/fluister`.
+- **Bewezen:** schermtoets camerascherm.e2e.js, met beeld, oorzaak zonder camera, en een Studio-download als echte JPEG met de look in de pixels (2a4da64b8).
+- **Niet geregistreerd:** de eigenaar beslist of een app zonder serverstaat telt.
+- **Gaten:**
+  - "bewaren" is alleen een download in de browser;
+  - de herkenning is een lokale pixelheuristiek, geen AI;
+  - de tekst "deze mag de Salon in" heeft geen route;
+  - spraak gebruikt de Web Speech API van de browser, niet lokaal, terwijl meelezen.js die voor gesprekken uitsluit.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Adobe Creative Cloud Pro | Lightroom, generatief | $69,99 per maand ([ProVideo](https://www.provideocoalition.com/please-read-adobes-official-article-on-the-pricing-changes-coming-to-the-creative-cloud-plans/)) |
+| VSCO One | Studio Pro, zakelijk | $499,99 per jaar ([VSCO](https://vsco.co/pricing)) |
+| Halide Mark III | RAW, Process Zero, looks | $59,99 eenmalig ([PetaPixel](https://petapixel.com/2026/05/27/halide-mark-iii-promises-most-beautiful-photos-possible-on-iphone/)) |
+
+### c. Domein
+- **Portretrecht (Auteurswet art. 21):** geen publicatie als een redelijk belang zich verzet ([Dirkzwager](https://www.dirkzwager.nl/kennis/artikelen/wat-is-het-portretrecht-de-juridische-aspecten)).
+- **AVG:** een herkenbare foto is een persoonsgegeven.
+- **EXIF/GPS:** kan een adres verraden (na te gaan).
+- **Beroepsfotografen:** licentie vooraf, schriftelijk (DuPho).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| C1 | Bewaren in de kluis | L1/L6 | ontbreekt | Bewaar zet de afgewerkte foto in `docs.bestanden` (map "Foto's"), versleuteld. Is de kluis uit, dan volgt een download met de melding. | M | **A nu** |
+| C2 | Plekgegevens eraf bij delen | L1 | ontbreekt | Een gedeelde of bewaarde foto heeft geen GPS in EXIF, tenzij het lid dat per foto kiest. Getoetst door de bytes te lezen. | K | **A nu** |
+| C3 | Naar De Salon, met de Salon als eigenaar | L6 | ontbreekt | "Naar de Salon" opent het plaatsen van de Salon (LivingOS-B) met de foto als bestand-id. De Camera bezit de post niet. | M | A later |
+| C4 | Portretwaarschuwing | L4 | ontbreekt | Bij delen van een foto met een herkenbaar gezicht (lokale detectie) vraagt de app "heeft de persoon toestemming?". Er wordt niets geblokkeerd. | M | A later |
+| C5 | Spraak lokaal | L1 | fout tegen de huisregel | Spraaksturing gaat via de lokale spraakroute (meeluister) of staat uit. De browser-cloud is niet de standaard. | M | A nu (melden) |
+
+### g. Prioritering
+- **A nu:** C2 (K), C1 en C5 (M).
+- **A later:** C3, C4.
+
+### Keten "foto voor de Salon"
+1. Maken.
+2. Afwerken.
+3. Bewaren in de kluis (C1, zonder GPS: C2).
+4. Plaatsen in de Salon (C3).
+
+**Storing:** kluis uit: een download met de melding; de Salon krijgt niets zonder bestand.
+
+---
+
+## 15. App-dossier (`link:appdossier`, eigenaar `appstore.dossier`)
+
+**Doel.** Inzien welke apps het lid genomen heeft, wat het ze gaf, en dat weer intrekken. Per app: wie hem leverde en toeliet, wat hij nooit krijgt, en waar de gegevens blijven.
+
+### a. Inventaris
+- **Routes:** `/api/appstore/dossier` en `/kanaal`. Het scherm leest alleen.
+- **Publiceren:** een kantoormens op naam, met een echte toegankelijkheidskeuring (scripts/appstore-a11y.js).
+- **Bewezen:** voltooiproef `appdossier.js`.
+- **Gat:** het doel belooft "genomen apps, wat ik gaf, intrekken". De routes daarvoor bestaan (`/api/appstore/mijn`, `/weg`, `/tijdlijn`, `/vernietig`, lid.js:25-109), maar het scherm gebruikt ze niet.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Apple App Privacy-labels | zelfopgave per app; Apple controleert niet | ([BHFS](https://www.bhfs.com/insight/new-privacy-requirements-for-app-developers-using-the-apple-app-store/)) |
+| Google Play Data safety | verplicht, ook SDK's van derden | ([Google](https://support.google.com/googleplay/android-developer/answer/10787469)) |
+| Microsoft App Governance | beleid voor OAuth-apps | in Defender for Cloud Apps (na te gaan) |
+
+### c. Domein
+- **DMA art. 6(4):** alternatieve stores, met integriteitsmaatregelen die evenredig moeten zijn.
+- **AVG art. 28:** een verwerkersovereenkomst per externe verwerker.
+- **ISO 27001 A.5.19-5.23:** leveranciersbeheer van onboarding tot exit ([HighTable](https://hightable.io/iso-27001-annex-a-5-20-addressing-information-security-within-supplier-agreements)).
+- **EAA:** een toegankelijkheidsverklaring ([Taylor Wessing](https://www.taylorwessing.com/en/insights-and-events/insights/2025/09/european-accessibility-act-requirements-for-e-commerce-services)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| D1 | Mijn apps, met intrekken op het dossierscherm | L1/L5 | half (routes bestaan) | Het lid ziet zijn genomen apps en wat hij gaf, en trekt een machtiging in. Daarna krijgt de app 403 op die gegevens. Getoetst met de echte app-sessie. | M | **A nu** |
+| D2 | Tijdlijn van wat een app deed | L5 | half (`/tijdlijn`) | Per app de handelingen met gegevens, alleen voor het lid. | K | **A nu** |
+| D3 | Verwerkersovereenkomst in het dossier | L2 | ontbreekt | Het dossier toont of een overeenkomst getekend is (ja, nee of niet nodig), zoals het kantoor vastlegde. Zonder vastlegging staat er "niet vastgelegd". | M | A later |
+| D4 | Toegankelijkheidsverklaring per app | L2 | half (keuring bestaat) | De uitslag van de echte keurloper staat in het dossier, met datum en versie. | K | A later |
+| D5 | Alles van een app vernietigen | L5 | half (`/vernietig`) | Na vernietigen is er buiten de server om niets meer van die app in de opslag te vinden. | M | A later |
+
+### e. RTG-exclusief
+Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens op naam, met een echte toegankelijkheidsmeting, en het lid kan zelf intrekken.
+
+### g. Prioritering
+- **A nu:** D2 (K) en D1 (M).
+- **A later:** D3, D4, D5.
+
+### Keten "ik stop met een app"
+1. Het dossier openen.
+2. De machtiging intrekken.
+3. De app krijgt 403.
+4. Alles vernietigen.
+5. Er is niets meer in de opslag.
+
+**Storing:** de app-dienst is uit: intrekken werkt toch, want de machtiging staat bij RTG en niet bij de app.

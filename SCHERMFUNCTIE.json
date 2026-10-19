@@ -3,7 +3,7 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-19",
-    "commit": "3ea91112"
+    "commit": "d40b7457"
   },
   "bronnen": {
     "schermroutes": {
@@ -2057,8 +2057,12 @@
       "schermen": 6
     },
     {
+      "script": "public/apps/werkvloer.js",
+      "schermen": 5
+    },
+    {
       "script": "public/ds/shell.js",
-      "schermen": 17
+      "schermen": 22
     },
     {
       "script": "public/shared/adaptief/grammatica.js",
@@ -3410,10 +3414,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 3,
+      "inkomend": 4,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/reizen.html",
+        "public/apps/werkvloer.js",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel12.js"
       ]
@@ -9482,6 +9487,8 @@
       ],
       "schrijft": "ja",
       "schil": [
+        "public/ds/shell.js",
+        "public/apps/werkvloer.js",
         "public/apps/schermcontext.js"
       ],
       "paden": [
@@ -9513,10 +9520,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/marechaussee.html",
+        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel3.js"
@@ -9784,6 +9792,8 @@
       ],
       "schrijft": "ja",
       "schil": [
+        "public/ds/shell.js",
+        "public/apps/werkvloer.js",
         "public/apps/schermcontext.js"
       ],
       "paden": [
@@ -9803,11 +9813,12 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 3,
+      "inkomend": 4,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/luchthaven.html",
+        "public/ds/contract.json",
         "server/kern/appgids-data/deel3.js"
       ]
     },
@@ -10753,7 +10764,7 @@
         "/api/ov"
       ],
       "zonderServer": false,
-      "inkomend": 16,
+      "inkomend": 17,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -10761,13 +10772,13 @@
         "public/apps/reizen-veilig.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
+        "public/apps/werkvloer.js",
         "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/split.js",
         "public/shared/travel-os-config.js",
         "public/shared/travel-os.js",
-        "server/kern/appcatalogus-rijen/deel1.js",
-        "server/kern/appgids-data/deel6b.js"
+        "server/kern/appcatalogus-rijen/deel1.js"
       ]
     },
     {
@@ -10782,7 +10793,10 @@
         "supplier"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js",
+        "public/apps/werkvloer.js"
+      ],
       "paden": [
         "/api/supplier/ov/overzicht"
       ],
@@ -10791,10 +10805,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/ovdienst.html",
+        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel1b.js",
@@ -10805,7 +10820,7 @@
     {
       "bestand": "public/apps/ovdienst.html",
       "url": "/apps/ovdienst.html",
-      "titel": "OV-dienst",
+      "titel": "RTG OV-dienst",
       "h1": "OV-dienst",
       "soort": "scherm",
       "aliasNaar": null,
@@ -10814,7 +10829,10 @@
         "supplier"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js",
+        "public/apps/werkvloer.js"
+      ],
       "paden": [
         "/api/staff/mob/kaart/controle",
         "/api/staff/ov/",
@@ -10826,13 +10844,14 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/ovcontrol.html",
         "public/apps/ovroutes.html",
         "public/apps/personeel.js",
         "public/apps/personeel/personeel-25.js",
+        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appgids-data/deel6b.js"
       ]
@@ -10953,7 +10972,7 @@
     {
       "bestand": "public/apps/ovroutes.html",
       "url": "/apps/ovroutes.html",
-      "titel": "OV-routes",
+      "titel": "RTG OV-routes",
       "h1": "OV-routes",
       "soort": "scherm",
       "aliasNaar": null,
@@ -10966,7 +10985,10 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js",
+        "public/apps/werkvloer.js"
+      ],
       "paden": [
         "/api/staff/ov/"
       ],
@@ -10975,12 +10997,13 @@
         "/api/staff"
       ],
       "zonderServer": false,
-      "inkomend": 5,
+      "inkomend": 6,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23b.js",
         "public/apps/ovdienst.html",
         "public/apps/reizen.html",
+        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appgids-data/deel6b.js"
       ]
@@ -11200,7 +11223,7 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 47,
+      "inkomend": 51,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -11536,7 +11559,7 @@
       ],
       "zonderServer": false,
       "inkomend": 16,
-      "inIndex": 7,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/lifestyle.html",
@@ -11737,7 +11760,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 74,
+      "inkomend": 79,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2b.js",
@@ -12890,7 +12913,7 @@
       ],
       "zonderServer": false,
       "inkomend": 9,
-      "inIndex": 8,
+      "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/reizen-veilig.html",

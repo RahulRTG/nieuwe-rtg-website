@@ -1556,6 +1556,12 @@
       "url": "/apps/ovroutes.html"
     },
     {
+      "label": "Naar de personeels-app",
+      "app": "OV-routes",
+      "wereld": "TravelOS",
+      "url": "/apps/ovroutes.html"
+    },
+    {
       "label": "Balans",
       "app": "Overzicht",
       "wereld": "LivingOS",

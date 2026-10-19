@@ -22,7 +22,7 @@ const STUUR = Object.freeze({
     nooit: ['EXTERN_BEREIKEN', 'RECHT_VERLENEN', 'IDENTITEIT_WIJZIGEN', 'DERDENCODE_UITVOEREN',
       'ONVERTROUWDE_BYTES', 'BEVEILIGING_VERZWAKKEN', 'BULK_UITVOER', 'PLAFOND_WIJZIGEN'],
     voorwaarden: [
-      { wat: 'een ledensessie; een gast komt er niet in', bron: 'geenGast in routes/pay.js' },
+      { wat: 'een account, ook een gratis account; een bezoeker zonder account komt er niet in', bron: 'geenEchtAccount in routes/pay.js' },
       { wat: 'eenmalig het paspoort', bron: 'onboarding.payGate' },
       { wat: 'een BESTAANDE codenaam die niet de eigen is', bron: 'bestaatLid() -- anders 404' },
       { wat: 'dekking, of ruimte om bij te laden', bron: 'zorgSaldo in kern/pay/verzoeken.js' }

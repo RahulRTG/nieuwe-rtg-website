@@ -536,7 +536,10 @@
     "ik-workspace-rechten": [],
     "instant-reality": [
       "instantGet",
-      "instantMutate"
+      "instantMutate",
+      "instantPartnerVan",
+      "keyVanCodenaam",
+      "levensband"
     ],
     "inzagekaart": [
       "inzagekaartVan",

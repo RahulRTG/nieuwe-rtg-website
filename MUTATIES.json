@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T23:05:10.782Z",
-    "commit": "636fec3b6d",
+    "op": "2026-10-19T23:10:34.999Z",
+    "commit": "fcb6353f83",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -18851,12 +18851,19 @@
       }
     },
     "tijdzone.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/tijdzone.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 11,
-      "geprobeerd": 1
+      "module": "server/kern/tijdzone-format.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-cache-mutation-proof/tijdzone.test.js.evidence.json",
+        "sha256": "1a32f05a5d62ca8157581b376d00e7e0a9bcbad0d4bc8131306567572f613319",
+        "commit": "fcb6353f833ba304147b8e0a21f5ae7ab32b4281",
+        "sourceSha256": "eb04cd8e2d7e42cfb13daf42f47c6109dbb60ad24a3c1d6b0a375fedaa851229",
+        "testSha256": "6a5e023d8108b94a1b839e8ad02b6707cf4fc8f3cd6508a3ecbfe54573457dcd"
+      }
     },
     "tls-acme-boot.test.js": {
       "soort": "puur",

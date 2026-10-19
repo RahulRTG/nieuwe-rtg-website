@@ -177,6 +177,7 @@ const SCENARIOS = {
   'wonen.js': require('./lib/voltooi/wonen'),
   'vonk.js': require('./lib/voltooi/vonk'),
   'wbw.js': require('./lib/voltooi/wbw'),
+  'werk.js': require('./lib/voltooi/werk'),
   'werkos.js': require('./lib/voltooi/werkos'),
   'vluchten.js': require('./lib/voltooi/vluchten'),
   'vonk.js': require('./lib/voltooi/vonk'),

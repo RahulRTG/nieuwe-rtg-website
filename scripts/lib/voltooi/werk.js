@@ -17,11 +17,6 @@
    ========================================================================== */
 'use strict';
 const { nieuwLid, eigenaarSessie, KANTOORWERELD } = require('../voltooiwereld');
-/* GEPARKEERD (19 oktober 2026): dit scenario sluit alle vier de bewijzen
-   (node scripts/voltooiproef.js na registratie), maar test/appcontract.test.js
-   kent de os:-velden ingang/via/bestanden nog niet. Bij de registratie gaat het
-   naar scripts/lib/voltooi/werk.js, in SCENARIOS en in CONTRACT als os:werk
-   (ingang /apps/app.html, bestanden app-main-25.js). */
 
 const ROLLEN = '/api/account/rollen';
 const START = '/api/account/start';

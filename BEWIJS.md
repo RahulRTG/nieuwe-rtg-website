@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2827 bestanden en 19555 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2827 bestanden en 19557 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2827 |
-| losse beweringen (`test(...)`) | 19555 |
+| losse beweringen (`test(...)`) | 19557 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2489 bestanden, 18983 beweringen.
+2489 bestanden, 18985 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -929,7 +929,7 @@ toets omvalt.
 | `inlogrem.test.js` | 2 | gezakt op `liegpoort /api/` | DE INLOGREM MOET OOK EEN VERSPREIDE AANVAL ZIEN, EN DE EIGENAAR NOOIT BUITEN ZETTEN. WAT ER MIS WAS. |
 | `inlogspoor.test.js` | 6 | gezakt op `liegpoort /api/` | ELKE INLOGPOGING LAAT EEN SPOOR NA -- ook op de hoofdingang. HET INLOG-AUDITLOG BELOOFT DIT LETTERLIJK (server/server.js, logInlog): "Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd log:... |
 | `instant-reality-routes.test.js` | 2 | gezakt op `liegpoort /api/` | Instant Reality over de routes: /api/instant-reality, /api/instant-reality/event en /api/instant-reality/partner. test/instant-reality.test.js toetst de kern in het proces; hier komt de eigenaar uit de SESSIE, en dat... |
-| `instant-reality.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `instant-reality.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `instap.test.js` | 5 | gezakt op `liegpoort /api/` | Binnenkomen: de vervanger en de nieuwe docent. De beloftes die hier hard worden gemaakt: - een vervanger krijgt de klas, wat er vandaag speelt en het materiaal, plus wat eerdere lessen erover schreven -- en verder NIETS. |
 | `instellingsweg.test.js` | 2 | gezakt op `liegpoort /api/` | DE INSTELLINGSWEG: hoe een echte gemeente in een echte installatie komt. HET GAT DAT HIER GEDICHT IS. |
 | `integratie-routes.test.js` | 7 | gezakt op `true->false#0` | DE VIJF ROUTES DIE DEZE TAKKEN TOEVOEGDEN, over HTTP. `endpointsZonderTest` in NORM.json telt endpoints die in geen enkele toets voorkomen. |

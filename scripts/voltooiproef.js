@@ -120,6 +120,7 @@ const SCENARIOS = {
   'wereldlaag.js': require('./lib/voltooi/wereldlaag'),
   'wonen.js': require('./lib/voltooi/wonen'),
   'vonk.js': require('./lib/voltooi/vonk'),
+  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht'),
   'werkos.js': require('./lib/voltooi/werkos')
 };
 

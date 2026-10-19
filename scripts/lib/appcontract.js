@@ -235,6 +235,9 @@ const CONTRACT = {
   'link:spelavond': Object.assign({
     belofte: 'een speler koppelt met een eenmalige code een televisie aan het potje, en die toont vanaf dan elke zet -- alleen wat publiek is, met een eigen schermsessie die geen ledensessie is'
   }, voltooi('spelavond', 'het scenario loopt /api/projectie/koppel en /api/projectie/kijk, de routes die /apps/spelscherm.html zelf aanroept, met twee spelers die het potje en de code maken langs /api/member/spel/*')),
+  'link:vooruitzicht': Object.assign({
+    belofte: 'een lid legt een intentie vast, verkent routes en geeft de voorbereiding vrij, en het vooruitzicht toont uitsluitend wat een bron gaf -- geen providerstatus die niemand bevestigde'
+  }, voltooi('vooruitzicht', 'het scenario loopt /api/instant-reality, /event en /partner en de acht bronnen die /apps/living-os.html ernaast leest, met een tweede lid dat zijn eigen vooruitzicht houdt')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

@@ -14,22 +14,37 @@
    publiceert dyncode.key een keer, nooit half, nooit twee), en een dubbele tik
    of een afgebroken verzoek mag geen code opleveren die de kassa weigert.
 
-   EEN STAP BLIJFT MET OPZET OPEN zolang de code niet persoonlijk is: elke
-   ledencode is `pas|RTG` (rtgcode.js vraagt { soort: 'pas', code: 'RTG' }), dus
-   een kassa die hem leest weet alleen DAT het een RTG-pas is, niet van wie.
-   Of hij persoonlijk moet worden, en hoe zonder de codenaam leesbaar in een
-   QR te zetten (het lijf is base64, geen geheim), is een besluit van de
-   eigenaar en niet van deze proef.
+   PERSOONLIJK ZONDER NAAM (besluit van de eigenaar, 19 oktober 2026). Elke
+   ledencode draagt een ondoorzichtige verwijzing die alleen de server aan de
+   codenaam koppelt (kern/betaalcode.js). Een kassa -- hier een echte
+   zaakmedewerker, ingelogd met rooster en pincode -- krijgt bij het scannen de
+   codenaam en verbruikt de code: eenmalig, want dat is het veilige voor
+   betalen. Een ander lid krijgt niets persoonlijks. Daarmee meet persistent
+   ook de verwijzing zelf: die staat in de opslag en overleeft een herstart.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { nieuwLid, inloggen } = require('../voltooiwereld');
+const { nieuwLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
 
 const DYN = '/api/code/dyn';
+const FOODCOURT = '/api/foodcourt';
 const SCAN = '/api/code/scan';
 /* Precies wat de stand vraagt (rtgcode.js, ververs()). */
 const PAS = { soort: 'pas', code: 'RTG' };
+
+/* Een kassa: de manager van een echte zaak, langs de zaakdeur (zelfde recept
+   als ./foodcourt.js). */
+async function kassaSessie(w, tok) {
+  const zaak = ((((await w.post(FOODCOURT, {}, tok)).data) || {}).restaurants || [])[0];
+  if (!zaak) throw new Error('geen zaak om als kassa te gebruiken');
+  const rooster = await w.post('/api/supplier/roster', { code: zaak.code });
+  const man = ((rooster.data && rooster.data.staff) || []).find((x) => x.role === 'manager');
+  if (!man) throw new Error('de zaak ' + zaak.code + ' heeft geen manager in het rooster');
+  const z = await w.post('/api/supplier/login', { code: zaak.code, staffId: man.id, pin: '1234' });
+  if (!z.data || !z.data.token) throw new Error('de kassa kon niet inloggen (' + z.status + ')');
+  return z.data.token;
+}
 
 async function loop(w, stap) {
   const A = await nieuwLid(w, 'rca');
@@ -37,6 +52,9 @@ async function loop(w, stap) {
   const maak = (tok, extra) => w.post(DYN, Object.assign({}, PAS, extra || {}), tok || A.token);
   const scan = (token, tok) => w.post(SCAN, { token }, tok || A.token);
   let lang = null;
+  let K = await kassaSessie(w, A.token);
+  const codenaamVan = async (lid) => ((await w.post('/api/member/connections', {}, lid.token)).data || {}).codename;
+  const ca = await codenaamVan(A), cb = await codenaamVan(B);
 
   /* ---------------- voltooibaar ---------------- */
   await stap('voltooibaar', 'een lid krijgt een verse, ondertekende code die binnen 45 seconden vervalt, en die code klopt bij het scannen', async () => {
@@ -82,28 +100,44 @@ async function loop(w, stap) {
       ziet: 'B scant: ' + s.status + ', ziet ' + lijf.slice(0, 80) };
   });
 
-  await stap('voltooibaar', 'de code is PERSOONLIJK, zoals het scherm belooft: de codes van twee leden zeggen bij het scannen van wie ze zijn', async () => {
-    const a = await scan((await maak()).data.token);
-    const b = await scan((await maak(B.token)).data.token, B.token);
-    const zelfde = a.data && b.data && a.data.soort === b.data.soort && a.data.code === b.data.code;
-    return { klopt: !zelfde,
-      ziet: zelfde ? 'beide codes lezen als ' + a.data.soort + ' · ' + a.data.code + ': niet te onderscheiden (besluit van de eigenaar, zie de kop)' : 'verschillend' };
+  await stap('voltooibaar', 'de code is PERSOONLIJK, zoals het scherm belooft: bij de kassa leiden de codes van twee leden naar hun eigen codenaam', async () => {
+    const ta = (await maak()).data.token, tb = (await maak(B.token)).data.token;
+    const a = await scan(ta, K), b = await scan(tb, K);
+    const lijf = Buffer.from(ta.split('.')[1], 'base64url').toString('utf8');
+    return { klopt: a.status === 200 && b.status === 200 && a.data.codenaam === ca && b.data.codenaam === cb && a.data.code !== b.data.code &&
+      !lijf.includes(ca) && !lijf.includes(A.email),
+      ziet: 'kassa leest ' + (a.data && a.data.codenaam) + ' en ' + (b.data && b.data.codenaam) + '; QR-lijf zonder naam: ' + (!lijf.includes(ca)) };
+  });
+
+  await stap('voltooibaar', 'een betaalcode is eenmalig: dezelfde code een tweede keer bij de kassa wordt geweigerd met de reden', async () => {
+    const t = (await maak()).data.token;
+    const eerst = await scan(t, K), nog = await scan(t, K);
+    return { klopt: eerst.status === 200 && nog.status === 409 && /al gebruikt/.test(nog.data.error),
+      ziet: 'eerste scan ' + eerst.status + ', tweede ' + nog.status + ' (' + (nog.data && nog.data.error) + ')' };
   });
 
   /* ---------------- persistent ---------------- */
   lang = (await maak(null, { ttlMs: 300000 })).data.token;
+  const voorHerstart = (await maak(null, { ttlMs: 300000 })).data.token;
   await w.herstart();
   await stap('persistent', 'een code die voor een nette herstart werd getoond, klopt erna nog: de sleutel bleef dezelfde', async () => {
     const s = await scan(lang);
     return { klopt: s.status === 200 && s.data.ok === true, ziet: 'na SIGTERM: ' + s.status };
   });
 
-  await stap('persistent', 'de sleutel staat in de datamap (dyncode.key, alleen voor de eigenaar leesbaar) en niet in de opslag van het lid', async () => {
+  await stap('persistent', 'de sleutel staat in de datamap (0600) en de verwijzing in de opslag, onder de codenaam en zonder account', async () => {
     const pad = path.join(w.datamap, 'dyncode.key');
     const st = fs.existsSync(pad) ? fs.statSync(pad) : null;
-    const lek = w.vindInOpslag(lang).length;
-    return { klopt: !!st && (st.mode & 0o077) === 0 && lek === 0,
-      ziet: st ? 'dyncode.key ' + st.size + ' bytes, rechten ' + (st.mode & 0o777).toString(8) + '; code ' + lek + ' keer in de opslag' : 'geen dyncode.key' };
+    const ref = Buffer.from(lang.split('.')[1], 'base64url').toString('utf8').split('|')[1];
+    const rec = (w.collectie('betaalcodes') || {})[ref];
+    return { klopt: !!st && (st.mode & 0o077) === 0 && !!rec && rec.codenaam === ca && !rec.gebruikt && !JSON.stringify(rec).includes(A.email),
+      ziet: (st ? 'dyncode.key ' + (st.mode & 0o777).toString(8) : 'geen dyncode.key') + '; verwijzing ' + (rec ? 'op schijf voor ' + rec.codenaam : 'NIET op schijf') };
+  });
+
+  await stap('persistent', 'een code van voor de herstart wordt erna door de kassa nog gewoon afgerekend', async () => {
+    K = await kassaSessie(w, A.token);
+    const s2 = await scan(voorHerstart, K);
+    return { klopt: s2.status === 200 && s2.data.codenaam === ca, ziet: 'kassa na SIGTERM: ' + s2.status + ', ' + (s2.data && s2.data.codenaam) };
   });
 
   await stap('persistent', 'na de herstart logt het lid opnieuw in en de code uit de oude sessie klopt ook in de nieuwe', async () => {
@@ -121,6 +155,13 @@ async function loop(w, stap) {
       ziet: 'tikken ' + x.status + '/' + y.status + ', scans ' + sx.status + '/' + sy.status };
   });
 
+  await stap('herstelbaar', 'twee kassa-tikken tegelijk op dezelfde code: een rekent af, de ander hoort dat hij al gebruikt is', async () => {
+    const t = (await maak()).data.token;
+    const [x, y] = await w.dubbel(SCAN, { token: t }, K);
+    const st = [x.status, y.status].sort().join('/');
+    return { klopt: st === '200/409', ziet: 'kassa-tikken ' + st };
+  });
+
   await stap('herstelbaar', 'een afgebroken verversing laat niets half achter: de volgende code klopt gewoon', async () => {
     const half = await w.afgebroken(DYN, PAS, A.token);
     const r = await maak();
@@ -129,12 +170,17 @@ async function loop(w, stap) {
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), daarna ' + r.status + ', scan ' + s.status };
   });
 
-  await stap('herstelbaar', 'een code van vlak voor een crash klopt erna nog: geen nieuwe sleutel na een stroomstoring', async () => {
+  await stap('herstelbaar', 'na een crash klopt een code van vlak ervoor nog, en een al afgerekende code blijft op', async () => {
     const t = (await maak(null, { ttlMs: 300000 })).data.token;
+    const betaald = (await maak(null, { ttlMs: 300000 })).data.token;
+    const eerst = await scan(betaald, K);
     await w.crash();
+    K = await kassaSessie(w, A.token);
     const s = await scan(t);
     const ouder = await scan(lang);
-    return { klopt: s.status === 200 && ouder.status === 200, ziet: 'na SIGKILL: verse ' + s.status + ', van voor de herstart ' + ouder.status };
+    const nog = await scan(betaald, K);
+    return { klopt: s.status === 200 && ouder.status === 200 && eerst.status === 200 && nog.status === 409,
+      ziet: 'na SIGKILL: verse ' + s.status + ', van voor de herstart ' + ouder.status + ', al afgerekende code ' + nog.status };
   });
 }
 
@@ -142,7 +188,9 @@ module.exports = {
   functie: 'link:rtgcode',
   ingang: '/apps/geld.html#rtgcode',
   persona: 'lid',
-  belofte: 'een lid toont een levende, ondertekende code die alleen de RTG-app maakt en leest en die na een halve minuut vervalt; een valse, gewone of verlopen code wordt geweigerd, een ander lid leest er niets van het lid uit, en de code overleeft een herstart en een crash -- en hij is persoonlijk, zoals het scherm belooft',
+  /* de kassa is een synthetische zaak uit de seed van de testomgeving */
+  omgeving: KANTOORWERELD,
+  belofte: 'een lid toont een levende, persoonlijke code die alleen de RTG-app maakt en leest en die na een halve minuut vervalt; de kassa leest er de codenaam uit en kan hem maar een keer afrekenen, een valse, gewone of verlopen code wordt geweigerd, een ander lid leest er niets van het lid uit, en de code overleeft een herstart en een crash',
   grens: 'De camera en de QR-decoder zijn hier niet beproefd, en ook niet wat een kassa na het scannen doet (afrekenen, inchecken): dat zijn andere routes. De proef loopt /api/code/dyn en /api/code/scan, niet de stand zelf.',
   loop
 };

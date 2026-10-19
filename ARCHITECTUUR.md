@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5531 |
-| servermodules (`server/**/*.js`) | 4568 |
+| servermodules (`server/**/*.js`) | 4569 |
 | routebestanden (`server/routes/**`) | 669 |
-| kernmodules (`server/kern/**`) | 2858 |
+| kernmodules (`server/kern/**`) | 2859 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 457 |
-| toetsbestanden (`test/*.test.js`) | 2493 |
+| toetsbestanden (`test/*.test.js`) | 2494 |
 | schermtoetsen (`test/*.e2e.js`) | 339 |
 
 ## 2. De weg van een verzoek
@@ -142,9 +142,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1697 |
+| kern-namen die routes aanraken | 1698 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 260 |
-| daarvan door precies één domein | 1437 |
+| daarvan door precies één domein | 1438 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -157,7 +157,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(216) auth(132) supplierAuth(67) officeAuth(50) db(40) liveCodename(36) status(32)
-accounts(30) schoon(23) boardroomWie(22) managerOnly(20) codenaamVan(20) rtf(20)
+accounts(30) schoon(23) boardroomWie(22) codenaamVan(21) managerOnly(20) rtf(20)
 save(19) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2832 bestanden en 19574 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2833 bestanden en 19580 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2832 |
-| losse beweringen (`test(...)`) | 19574 |
+| toetsbestanden | 2833 |
+| losse beweringen (`test(...)`) | 19580 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 16 |
+| niets van beide | 17 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2493 bestanden, 19001 beweringen.
+2494 bestanden, 19007 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -271,6 +271,7 @@ toets omvalt.
 | `bestanden.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Bestanden: de kluis met mappen en quotum, versies, delen op codenaam, de prullenbak als zichtbare la en de stukken-upload voor grote bestanden. |
 | `bestemming.test.js` | 5 | gezakt op `===->!==#0` | BEREIKBAAR OP DE BEDOELDE BESTEMMING -- de pure kern (scripts/lib/bestemming.js). Vier rijen stonden op BEWEZEN terwijl een lid naar een kantoorscherm werd doorgestuurd. |
 | `betaal-providerbewijs.test.js` | 6 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `betaalcode.test.js` | 6 | -- | De persoonlijke betaalcode (server/kern/betaalcode.js, routes/code.js). Het scherm belooft "je persoonlijke code", en tot nu toe was elke ledencode `pas\|RTG`: een kassa wist dat het een RTG-pas was, niet van wie. |
 | `betaaldienst.test.js` | 5 | gezakt op `liegpoort /api/` | De betaaldienstkosten gaan DIRECT naar de ondernemer: per kassabetaling meteen verrekend op de partnerrekening (eigen grootboekregel), transparant op de bon en in het partneroverzicht -- geen verzamelfactuur... |
 | `betaaldienstfee.test.js` | 14 | gezakt op `===->!==#0` | DE BETAALDIENSTVERGOEDING: verschuldigd is iets anders dan geboekt. In kern/pay/kassa.js stond: if (kb.error) kosten = 0; Mislukte de kostenboeking, dan werden de kosten NUL -- in de teruggave aan de kassa en dus op... |
 | `betaalopdracht-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | DE BETAALOPDRACHT (server/kern/betaalopdracht/index.js), DE RANDEN. test/betaalopdracht.test.js meet de hoofdlijn met een neprail. |

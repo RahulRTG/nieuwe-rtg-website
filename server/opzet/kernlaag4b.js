@@ -114,6 +114,9 @@ Object.assign(kern, require('../kern/thuis')({ db, save, crypto, schoon, reiswij
    (kern/tafelwensen.js) brengt allergenen en wensen per stoel bij de
    bediening en per tafel bij de keuken. De checklijst (kern/checklijst.js)
    deel je met je team; iedereen vinkt zelf af. */
+/* De persoonlijke betaalcode: een ondoorzichtige verwijzing per lidcode
+   (kern/betaalcode.js), naast de ondertekening van kern/dyncode. */
+Object.assign(kern, require('../kern/betaalcode')({ db, save, bijeen, inBundel: require('../db').inBundel, crypto }));
 Object.assign(kern, require('../kern/koppel')({ db, save, crypto, schoon, dyncode: kern.dyncode, sseToSupplier }));
 Object.assign(kern, require('../kern/tafelwensen')({ db, save, crypto, schoon }));
 Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }));

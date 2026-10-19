@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-18T20:23:45.482Z",
-  "commit": "8f0a10ea7",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-10-19T07:03:53.890Z",
+  "commit": "cac9b471",
+  "boomVuil": true,
+  "boomAnders": 6,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -1150,7 +1150,7 @@
   },
   {
    "sleutel": "POST /api/code/scan",
-   "bestand": "server/routes/code.js:42",
+   "bestand": "server/routes/code.js:52",
    "staat": "bewaakt",
    "wacht": "appSessie"
   },

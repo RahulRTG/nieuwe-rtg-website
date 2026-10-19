@@ -226,6 +226,8 @@
       "status"
     ],
     "code": [
+      "betaalcode",
+      "codenaamVan",
       "dyncode",
       "resolveSession",
       "sessionFor"

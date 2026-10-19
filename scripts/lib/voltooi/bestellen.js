@@ -11,7 +11,7 @@
    MERCABIZA) die de bestelling verder zet langs /api/supplier/groothandel/
    order/status.
 
-   WAAROM DIT NIET IN scripts/lib/voltooi/ STAAT: zie de kop van ./gezin.js.
+   De koppeling van een stand zonder eigen adres: zie de kop van ./gezin.js.
    ========================================================================== */
 'use strict';
 const { nieuwLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
@@ -174,7 +174,8 @@ async function loop(w, stap) {
 
 module.exports = {
   functie: 'tab:bestellen',
-  ingang: '/apps/app.html#tab=bestellen',
+  ingang: '/apps/app.html',
+  via: '#tab=bestellen',
   persona: 'lid',
   omgeving: KANTOORWERELD,
   belofte: 'een lid bestelt boodschappen bij een groothandel die aan leden levert, volgt de bestelling tot ze geleverd is en annuleert zolang ze niet bevestigd is; wat er niet ligt, kan niet worden besteld -- ook na een herstart, een dubbeltik, een afgebroken verzoek en een crash',

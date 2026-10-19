@@ -9,7 +9,7 @@
    (hier de simulatiebank), en pas een BEVESTIGDE betaling geeft tickets,
    precies een keer (server/kern/assets/aanvraag.js).
    De afloop van de bank kiest deze proef via de sleutel, zoals ./betalen.js.
-   WAAROM DIT NIET IN scripts/lib/voltooi/ STAAT: zie ./gezin.js.
+   De koppeling van een stand zonder eigen adres: zie de kop van ./gezin.js.
    ========================================================================== */
 'use strict';
 const crypto = require('crypto');
@@ -84,13 +84,33 @@ async function loop(w, stap) {
       ziet: 'betaling ' + t.status + ' "' + (t.data && t.data.error) + '", tickets ' + (await tickets(object.id)) };
   });
 
-  await stap('voltooibaar', 'herroepen na betaling noemt niets terugbetaald dat de bank niet bevestigde, en het ticket verdwijnt niet stil', async () => {
-    const id = ((await mijn()).find((p) => p.assetId === object.id).herroepbaar[0] || {}).id;
-    const h = await w.post(HERROEP, { ticketId: id }, L.token);
+  /* Wat de simulatiebank met de terugbetaling van DIT ticket doet, staat vast in
+     de sleutels (kern/betaalwaarheid/terug.js, server/betaal/synthetisch-naslag.js):
+     'betaald' bevestigt meteen, de rest bevestigt niet of weigert. De proef rekent
+     dat vooraf uit en eist dat het scherm per ticket precies dat zegt. */
+  const terugAfloop = (ticketId) => {
+    const betaling = 'BW-' + sha('asset:' + key + '|asset-koop:' + A.id + ':' + poging(key, A.id, 'betaald')).slice(0, 20).toUpperCase();
+    return bank.scenarioVan({ idempotentieSleutel: 'terug|terug:' + betaling + ':' + sha('idem:' + sha('herroep-' + ticketId)).slice(0, 24) });
+  };
+  await stap('voltooibaar', 'herroepen na betaling zegt per ticket wat de bank deed: terugbetaald alleen als zij bevestigde, anders loopt het en verdwijnt het ticket niet', async () => {
+    /* Bevestigde eerst: een terugbetaling die de bank weigert, zet de hele betaling
+       bij RTG ter controle (kern/betaalwaarheid/terug.js), en dan start een
+       volgende terugbetaling op die betaling terecht niet. */
+    const ids = (await aanvraag(A.id)).ticketIds.slice().sort((x, y) => (terugAfloop(x) !== 'betaald') - (terugAfloop(y) !== 'betaald'));
+    const uit = []; let vrij = true, terug = 0;
+    for (const id of ids) {
+      const afloop = terugAfloop(id);
+      const h = await w.post(HERROEP, { ticketId: id }, L.token);
+      const tekst = String((h.data && (h.data.let || h.data.error)) || '');
+      const gemeld = /is terugbetaald/.test(tekst) && h.data.terug > 0;
+      const moet = afloop === 'betaald' && vrij;
+      uit.push({ goed: geen5xx(h) && !/in uw tegoed/.test(tekst) && (moet ? gemeld : (!gemeld || afloop === 'betaald') && (gemeld || h.data.terug === undefined)), r: afloop + ' -> ' + h.status + ' "' + tekst + '"' });
+      if (gemeld) terug++;
+      if (afloop !== 'betaald') vrij = false;
+    }
     const pos = (await mijn()).find((p) => p.assetId === object.id) || {};
-    const tekst = String((h.data && (h.data.let || h.data.error)) || '');
-    return { klopt: geen5xx(h) && !/is terugbetaald|in uw tegoed/.test(tekst) && h.data.terug === undefined && pos.tickets + (pos.herroepLoopt || 0) === 2,
-      ziet: 'herroep ' + h.status + ' "' + tekst + '", tickets ' + pos.tickets + ', terugbetaling loopt ' + (pos.herroepLoopt || 0) };
+    return { klopt: uit.length === 2 && uit.every((x) => x.goed) && (pos.tickets || 0) + (pos.herroepLoopt || 0) === 2 - terug,
+      ziet: uit.map((x) => x.r).join('; ') + '; daarna tickets ' + (pos.tickets || 0) + ', terugbetaling loopt ' + (pos.herroepLoopt || 0) };
   });
 
   await stap('voltooibaar', 'bevoegdheid: zonder sessie geen aanvraag, geen lijst en geen betaling (401)', async () => {
@@ -115,10 +135,12 @@ async function loop(w, stap) {
   });
 
   /* ---------------- persistent ---------------- */
+  const stand = async () => JSON.stringify((await mijn()).map((p) => [p.assetId, p.tickets, p.herroepLoopt || 0]));
+  const voor = await stand();
   await w.herstart();
-  await stap('persistent', 'na een nette herstart staan de tickets er nog en heet de aanvraag nog betaald', async () => {
-    const t = await tickets(object.id), a = await aanvraag(A.id);
-    return { klopt: t >= 1 && a && a.status === 'betaald' && a.ticketIds.length === 2, ziet: 'tickets ' + t + ', aanvraag ' + (a && a.status) };
+  await stap('persistent', 'na een nette herstart is de positie (tickets en lopende terugbetalingen) dezelfde en heet de aanvraag nog betaald', async () => {
+    const na = await stand(), a = await aanvraag(A.id);
+    return { klopt: na === voor && a && a.status === 'betaald' && a.ticketIds.length === 2, ziet: 'positie ' + voor + ' -> ' + na + ', aanvraag ' + (a && a.status) };
   });
   await stap('persistent', 'de trage betaling is na de herstart nog gewoon in behandeling, niet verdwenen en niet stil betaald', async () => {
     const b = await aanvraag(B.id);
@@ -129,16 +151,43 @@ async function loop(w, stap) {
     return { klopt: v.length >= 1, ziet: v.map((p) => p.bestand + '/' + (p.sleutel || p.tabel)).join(', ') };
   });
 
-  /* ---------------- herstelbaar: ./assets-herstel.js (om de 10 kB) ---------------- */
-  await require('./assets-herstel')(w, stap, { L, object, key, mens, merk, poging, tickets, aanvraag, geen5xx });
+  /* ---------------- herstelbaar ---------------- */
+  await stap('herstelbaar', 'een dubbele tik op "aanvragen": een aanvraag, niet twee', async () => {
+    const [a, b] = await w.dubbel(KOOP, { assetId: object.id, smaak: 'access', aantal: 1, idem: 'dubbel-' + merk }, L.token);
+    const n = (((await w.post(AANVRAGEN, {}, L.token)).data || {}).aanvragen || []).filter((x) => x.status === 'aangevraagd').length;
+    return { klopt: geen5xx(a) && geen5xx(b) && a.data.aanvraag.id === b.data.aanvraag.id && n === 2, ziet: 'antwoorden ' + a.status + '/' + b.status + ', open aanvragen ' + n + ' (met die van de bevoegdheidsstap)' };
+  });
+  await stap('herstelbaar', 'een afgebroken betaling, daarna opnieuw met dezelfde sleutel: een betaling, en tickets precies een keer', async () => {
+    const D = ((await w.post(KOOP, { assetId: object.id, smaak: 'access', aantal: 1, idem: 'half-' + merk }, L.token)).data || {}).aanvraag;
+    await w.post(BESLIS, { id: D.id, besluit: 'goedgekeurd' }, mens);
+    const voor = await tickets(object.id), idem = poging(key, D.id, 'betaald');
+    const half = await w.afgebroken(BETAAL, { id: D.id, idem }, L.token);
+    const r = await w.post(BETAAL, { id: D.id, idem }, L.token);
+    const d = await aanvraag(D.id);
+    return { klopt: r.status === 200 && d.status === 'betaald' && d.ticketIds.length === 1 && (await tickets(object.id)) === voor + 1,
+      ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + r.status + ', tickets ' + voor + ' -> ' + (await tickets(object.id)) };
+  });
+  await stap('herstelbaar', 'een crash direct na een bevestigde betaling: de tickets staan er, en nog eens betalen maakt er geen bij', async () => {
+    const E = ((await w.post(KOOP, { assetId: object.id, smaak: 'access', aantal: 1, idem: 'stroom-' + merk }, L.token)).data || {}).aanvraag;
+    await w.post(BESLIS, { id: E.id, besluit: 'goedgekeurd' }, mens);
+    const idem = poging(key, E.id, 'betaald');
+    const r = await w.post(BETAAL, { id: E.id, idem }, L.token);
+    const voor = await tickets(object.id);
+    await w.crash();
+    const nog = await w.post(BETAAL, { id: E.id, idem: idem + '-weer' }, L.token);
+    const e = await aanvraag(E.id);
+    return { klopt: r.status === 200 && e.status === 'betaald' && e.ticketIds.length === 1 && nog.status === 200 && nog.data.herhaald === true && (await tickets(object.id)) === voor,
+      ziet: 'betaling ' + r.status + ', na SIGKILL ' + (e && e.status) + ' met ' + (e && e.ticketIds.length) + ' ticket, nog eens ' + nog.status + (nog.data && nog.data.herhaald ? ' (herhaald)' : '') + ', tickets ' + voor + ' -> ' + (await tickets(object.id)) };
+  });
 }
 
 module.exports = {
   functie: 'tab:assets',
-  ingang: '/apps/app.html#tab=assets',
+  ingang: '/apps/app.html',
+  via: '#tab=assets',
   persona: 'lid',
   omgeving: Object.assign({ RTG_SIMULATIEBANK: '1' }, KANTOORWERELD),
   belofte: 'een betalend lid vraagt tickets in een object aan, een mens van RTG keurt, het lid betaalt en krijgt pas na een bevestigde betaling precies zijn tickets; herroepen zegt alleen wat waar is',
-  grens: 'De simulatiebank bevestigt geen terugbetaling (server/betaal/naslag.js kent haar niet als rail), dus herroepen na betaling bewijst hier alleen dat er niets vals wordt gemeld; de bevestigde terugbetaling staat in test/assets.test.js met een nagemaakte bank. Uitstappen, de wachtlijst, de terugkoop en de servicefee worden niet gelopen. Geen Redis of PostgreSQL.',
+  grens: 'Welke terugbetaling de simulatiebank bevestigt, volgt uit de sleutels; de proef rekent het per ticket vooraf uit, maar welke afloop twee willekeurige tickets krijgen ligt niet vast. Een bevestiging die later via de veegronde komt, staat in test/assets.test.js met een nagemaakte bank. Uitstappen, de wachtlijst, de terugkoop en de servicefee worden niet gelopen. Geen Redis of PostgreSQL.',
   loop
 };

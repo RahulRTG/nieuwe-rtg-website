@@ -390,6 +390,48 @@ const CONTRACT = {
   'link:leven': Object.assign({
     belofte: 'een lid ziet op zijn lijn alleen wat hij zelf ergens vastlegde en wat deze week speelt, zonder knop die iets voor hem doet, en niemand anders ziet het'
   }, voltooi('leven', 'het scenario loopt /api/leven/cockpit, /api/foodcourt en /api/uitgaan, de routes die /apps/leven.html zelf aanroept, met een afspraak uit de eigen agenda en een tweede lid')),
+  /* De standen van LivingOS-A in de ledenapp: geen eigen adres, dus ingang
+     /apps/app.html en de sprong #tab=<stand>; gekoppeld op de delen die de stand
+     tekenen en aanroepen (die roepen hun routes letterlijk als /api/... aan). */
+  'tab:gezin': Object.assign({
+    belofte: 'een oppas of familielid koppelt zich met de eenmalige uitnodiging van een RTFoundation-gezin, ziet wat het gezin hem toevertrouwt, stuurt het gezin een bericht en ontkoppelt zelf',
+    ingang: '/apps/app.html',
+    via: '#tab=gezin',
+    // app-main-43.js: kanaal en ontkoppelen; -44.js: overzicht, uitnodiging accepteren, bericht
+    bestanden: ['public/apps/app-main/app-main-43.js', 'public/apps/app-main/app-main-44.js']
+  }, voltooi('gezin', 'het scenario loopt /api/rtf/uitnodiging/accepteer, /overzicht, /kanaal, /bericht en /ontkoppel, de routes die de stand Gezin in app-main-43 en -44 aanroept, met een echte ouder aan de andere kant')),
+  'tab:betalen': Object.assign({
+    belofte: 'een lid rekent het betaalverzoek van een zaak een keer af, betaalt een zaak rechtstreeks en hoort het als de bank weigert',
+    ingang: '/apps/app.html',
+    via: '#tab=betalen',
+    // app-main-46.js: verzoeken, rechtstreeks betalen en de eigen betalingen
+    bestanden: ['public/apps/app-main/app-main-46.js']
+  }, voltooi('betalen', 'het scenario loopt /api/betaal/verzoeken, /verzoek/pay, /direct en /mijn, de routes die de stand Betalen in app-main-46 aanroept, met de simulatiebank en een gebonden toestel')),
+  'tab:bestellen': Object.assign({
+    belofte: 'een lid bestelt boodschappen bij een groothandel, ziet de bestelling verder gaan en annuleert er een die nog niet bevestigd is',
+    ingang: '/apps/app.html',
+    via: '#tab=bestellen',
+    // app-main-19.js: de markt, bestellen, mijn bestellingen en annuleren
+    bestanden: ['public/apps/app-main/app-main-19.js']
+  }, voltooi('bestellen', 'het scenario loopt /api/groothandel/markt, /bestel, /mijn en /annuleer, de routes die de stand Bestellen in app-main-19 aanroept, met de groothandel die de bestelling verder zet')),
+  'tab:assets': Object.assign({
+    belofte: 'een betalend lid vraagt tickets aan, een mens van RTG op naam keurt, en pas een bevestigde betaling geeft precies de tickets; herroepen zegt alleen wat waar is',
+    ingang: '/apps/app.html',
+    via: '#tab=assets',
+    // app-main-32.js: overzicht en aanvragen; -32a.js: aanvragen, betalen, intrekken; -33.js: herroepen, document, gebruik
+    bestanden: ['public/apps/app-main/app-main-32.js', 'public/apps/app-main/app-main-32a.js', 'public/apps/app-main/app-main-33.js']
+  }, voltooi('assets', 'het scenario loopt /api/assets, /api/asset/koop, /aanvragen, /aanvraag/betaal, /mijn en /herroep, de routes die de stand Assets in app-main-32, -32a en -33 aanroept, met een kantoormens op naam en de simulatiebank')),
+  /* Bellen heeft geen tegel: de werktafel is het beginscherm (WERELD.md). De
+     route is de rand "Praat met Rahul", dan "open bellen" (LivingOS-B, 19 oktober
+     2026); de functiegids opent de kiezer in app-main-26, RTGSocial.bel in -10
+     belt en -11 geeft de signalen van de live-verbinding door. */
+  'os:bellen': Object.assign({
+    belofte: 'een lid belt een verbonden lid met spraak: het gaat over, opnemen, ophangen en weigeren komen aan, niemand anders hoort iets, en van het gesprek wordt niets bewaard',
+    ingang: '/apps/app.html',
+    via: 'de rand "Praat met Rahul", dan "open bellen": de functiegids opent de kiezer met Salon-contacten, en een tik op een contact belt',
+    // app-main-26 (de kiezer) roept zelf geen route aan; de koppeling loopt op -10, -10a en -11
+    bestanden: ['public/apps/app-main/app-main-10.js', 'public/apps/app-main/app-main-10a.js', 'public/apps/app-main/app-main-11.js']
+  }, voltooi('bellen', 'het scenario loopt /api/member/call met een echte live-verbinding (/api/stroom/ticket, /api/stream) per lid, de signalering die RTGSocial.bel in app-main-10 en de doorgifte in app-main-11 gebruiken, met een onverbonden, een geblokkeerd en een gratis lid')),
 
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
@@ -535,7 +577,6 @@ const ALGEMEEN = {
    ontbreekt een ADAPTER, en dan helpt een scenario niet. Alleen wat de tabel
    als ontbrekend noemt staat hier -- geen gok per app. */
 const TESTWERELD_ONTBREEKT = {
-  'os:bellen': 'bellen vraagt test-identiteiten voor WebRTC in een headless browser, en dat vraagt een besluit (BETROUWBAARHEID.md par. 4)',
   'os:videobellen': 'videobellen vraagt test-identiteiten voor WebRTC in een headless browser, en dat vraagt een besluit (BETROUWBAARHEID.md par. 4)'
 };
 

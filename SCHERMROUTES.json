@@ -3,13 +3,26 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "00c949f0",
+  "commit": "a91053a70",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
+   "boomVuil": true,
    "ongecommitteInvoer": [
-    "ROUTEBRON.json"
+    "public/apps/app-main/app-main-01.js",
+    "public/apps/app-main/app-main-10.js",
+    "public/apps/app-main/app-main-10a.js",
+    "public/apps/app-main/app-main-11.js",
+    "public/apps/app-main/app-main-19.js",
+    "public/apps/app-main/app-main-32.js",
+    "public/apps/app-main/app-main-32a.js",
+    "public/apps/app-main/app-main-33.js",
+    "public/apps/app-main/app-main-43.js",
+    "public/apps/app-main/app-main-44.js",
+    "public/apps/app-main/app-main-46.js",
+    "public/apps/app.html",
+    "public/apps/werkruimte.html",
+    "public/sw.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -44,6 +57,7 @@
     "public/apps/app-main/app-main-09a2.js",
     "public/apps/app-main/app-main-09b.js",
     "public/apps/app-main/app-main-10.js",
+    "public/apps/app-main/app-main-10a.js",
     "public/apps/app-main/app-main-11.js",
     "public/apps/app-main/app-main-12.js",
     "public/apps/app-main/app-main-12a.js",
@@ -1998,10 +2012,10 @@
   "bekendePaden": 5516
  },
  "gemeten": {
-  "schermenMetPad": 466,
+  "schermenMetPad": 475,
   "nietGelezen": 0,
-  "exactePaden": 1488,
-  "verwijzingen": 1758,
+  "exactePaden": 1533,
+  "verwijzingen": 1811,
   "voorvoegsels": 115,
   "basisPaden": 1,
   "doodPad": 0,
@@ -2098,6 +2112,19 @@
    "aantal": 8
   },
   {
+   "pad": "/api/ice",
+   "schermen": [
+    "public/apps/app-main/app-main-10.js",
+    "public/apps/meet/kamer.js",
+    "public/apps/podium.html",
+    "public/apps/theater.html",
+    "public/shared/clipdeler/clipdeler-01.js",
+    "public/shared/connection-communication.js",
+    "public/shared/servicebel.js"
+   ],
+   "aantal": 7
+  },
+  {
    "pad": "/api/bestanden/mijn",
    "schermen": [
     "public/apps/boeken/app.js",
@@ -2132,18 +2159,6 @@
     "public/apps/rtgone.html",
     "public/apps/rtmail-voorzijde-werk.js",
     "public/shared/kantoordeur.js"
-   ],
-   "aantal": 6
-  },
-  {
-   "pad": "/api/ice",
-   "schermen": [
-    "public/apps/meet/kamer.js",
-    "public/apps/podium.html",
-    "public/apps/theater.html",
-    "public/shared/clipdeler/clipdeler-01.js",
-    "public/shared/connection-communication.js",
-    "public/shared/servicebel.js"
    ],
    "aantal": 6
   },
@@ -2238,6 +2253,24 @@
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
+  },
+  {
+   "pad": "/api/state",
+   "schermen": [
+    "public/apps/app-main/app-main-02.js",
+    "public/apps/app-main/app-main-11.js",
+    "public/apps/geld/wallet.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/member/call",
+   "schermen": [
+    "public/apps/app-main/app-main-10.js",
+    "public/apps/app-main/app-main-10a.js",
+    "public/apps/app-main/app-main-11.js"
+   ],
+   "aantal": 3
   },
   {
    "pad": "/api/care/betaal",
@@ -2456,10 +2489,10 @@
    "aantal": 3
   },
   {
-   "pad": "/api/state",
+   "pad": "/api/member/dm/send",
    "schermen": [
-    "public/apps/app-main/app-main-02.js",
-    "public/apps/geld/wallet.js"
+    "public/apps/app-main/app-main-10.js",
+    "public/apps/media/lijst.js"
    ],
    "aantal": 2
   },
@@ -2480,6 +2513,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/orders/mine",
+   "schermen": [
+    "public/apps/app-main/app-main-19.js",
+    "public/apps/app-main/app-main-43.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/bank/overzicht",
    "schermen": [
     "public/apps/app-main/app-main-30.js",
@@ -2492,6 +2533,22 @@
    "schermen": [
     "public/apps/app-main/app-main-30.js",
     "public/apps/boardroom/boardroom-02.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/asset/herroep",
+   "schermen": [
+    "public/apps/app-main/app-main-32a.js",
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/fluister/profiel",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js",
+    "public/shared/metgezel/metgezel-02.js"
    ],
    "aantal": 2
   },
@@ -3474,6 +3531,55 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/block",
+   "schermen": [
+    "public/apps/app-main/app-main-10.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/report",
+   "schermen": [
+    "public/apps/app-main/app-main-10.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/klets",
+   "schermen": [
+    "public/apps/app-main/app-main-11.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/klets/gesprek",
+   "schermen": [
+    "public/apps/app-main/app-main-11.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/klets/start",
+   "schermen": [
+    "public/apps/app-main/app-main-11.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/klets/zet",
+   "schermen": [
+    "public/apps/app-main/app-main-11.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/dm",
+   "schermen": [
+    "public/apps/app-main/app-main-11.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/care/intake/stop",
    "schermen": [
     "public/apps/app-main/app-main-13.js"
@@ -3523,9 +3629,254 @@
    "aantal": 1
   },
   {
+   "pad": "/api/groothandel/annuleer",
+   "schermen": [
+    "public/apps/app-main/app-main-19.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/groothandel/bestel",
+   "schermen": [
+    "public/apps/app-main/app-main-19.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/groothandel/markt",
+   "schermen": [
+    "public/apps/app-main/app-main-19.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/groothandel/mijn",
+   "schermen": [
+    "public/apps/app-main/app-main-19.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/verkoop/koop",
+   "schermen": [
+    "public/apps/app-main/app-main-19.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/apps",
    "schermen": [
     "public/apps/app-main/app-main-30.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/koop",
+   "schermen": [
+    "public/apps/app-main/app-main-32.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/mijn",
+   "schermen": [
+    "public/apps/app-main/app-main-32.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/wachtlijst",
+   "schermen": [
+    "public/apps/app-main/app-main-32.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/assets",
+   "schermen": [
+    "public/apps/app-main/app-main-32.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/locatie/deel",
+   "schermen": [
+    "public/apps/app-main/app-main-32.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/aanvraag/betaal",
+   "schermen": [
+    "public/apps/app-main/app-main-32a.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/aanvragen",
+   "schermen": [
+    "public/apps/app-main/app-main-32a.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/document",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/gebruik",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/asset/uitstap",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/fluister/focus",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/fluister/vergeet",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/locatie/mijn",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pakket/koop",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pakketten",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/spar/lijst",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/voorspel",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/zorgprofiel",
+   "schermen": [
+    "public/apps/app-main/app-main-33.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/order/pay",
+   "schermen": [
+    "public/apps/app-main/app-main-43.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/kanaal",
+   "schermen": [
+    "public/apps/app-main/app-main-43.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/meldingen/gelezen",
+   "schermen": [
+    "public/apps/app-main/app-main-43.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/ontkoppel",
+   "schermen": [
+    "public/apps/app-main/app-main-43.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/bericht",
+   "schermen": [
+    "public/apps/app-main/app-main-44.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/overzicht",
+   "schermen": [
+    "public/apps/app-main/app-main-44.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/uitnodiging/accepteer",
+   "schermen": [
+    "public/apps/app-main/app-main-44.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/betaal/direct",
+   "schermen": [
+    "public/apps/app-main/app-main-46.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/betaal/mijn",
+   "schermen": [
+    "public/apps/app-main/app-main-46.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/betaal/verzoek/pay",
+   "schermen": [
+    "public/apps/app-main/app-main-46.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/betaal/verzoeken",
+   "schermen": [
+    "public/apps/app-main/app-main-46.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/munt/direct",
+   "schermen": [
+    "public/apps/app-main/app-main-46.js"
    ],
    "aantal": 1
   },
@@ -8241,13 +8592,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/dm/send",
-   "schermen": [
-    "public/apps/media/lijst.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/mediaos/samen/in",
    "schermen": [
     "public/apps/media/samen.js"
@@ -12441,13 +12785,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/fluister/profiel",
-   "schermen": [
-    "public/shared/metgezel/metgezel-02.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/commerce/overdracht/lees",
    "schermen": [
     "public/shared/overdracht.js"
@@ -12753,6 +13090,37 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-10.js",
+   "exact": [
+    "/api/ice",
+    "/api/member/block",
+    "/api/member/call",
+    "/api/member/dm/send",
+    "/api/member/report"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-10a.js",
+   "exact": [
+    "/api/member/call"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-11.js",
+   "exact": [
+    "/api/klets",
+    "/api/klets/gesprek",
+    "/api/klets/start",
+    "/api/klets/zet",
+    "/api/member/call",
+    "/api/member/dm",
+    "/api/state"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-13.js",
    "exact": [
     "/api/care",
@@ -12783,6 +13151,18 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-19.js",
+   "exact": [
+    "/api/groothandel/annuleer",
+    "/api/groothandel/bestel",
+    "/api/groothandel/markt",
+    "/api/groothandel/mijn",
+    "/api/orders/mine",
+    "/api/verkoop/koop"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-24a3.js",
    "exact": [
     "/api/account/rollen"
@@ -12807,9 +13187,62 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-32.js",
+   "exact": [
+    "/api/asset/koop",
+    "/api/asset/mijn",
+    "/api/asset/wachtlijst",
+    "/api/assets",
+    "/api/locatie/deel"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-32a.js",
+   "exact": [
+    "/api/asset/aanvraag/betaal",
+    "/api/asset/aanvragen",
+    "/api/asset/herroep"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-33.js",
+   "exact": [
+    "/api/asset/document",
+    "/api/asset/gebruik",
+    "/api/asset/herroep",
+    "/api/asset/uitstap",
+    "/api/fluister/focus",
+    "/api/fluister/profiel",
+    "/api/fluister/vergeet",
+    "/api/locatie/mijn",
+    "/api/pakket/koop",
+    "/api/pakketten",
+    "/api/spar/lijst",
+    "/api/voorspel",
+    "/api/zorgprofiel"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-43.js",
    "exact": [
-    "/api/foundation"
+    "/api/foundation",
+    "/api/order/pay",
+    "/api/orders/mine",
+    "/api/rtf/kanaal",
+    "/api/rtf/meldingen/gelezen",
+    "/api/rtf/ontkoppel"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-44.js",
+   "exact": [
+    "/api/rtf/bericht",
+    "/api/rtf/overzicht",
+    "/api/rtf/uitnodiging/accepteer"
    ],
    "voorvoegsels": []
   },
@@ -12817,6 +13250,17 @@
    "bestand": "public/apps/app-main/app-main-45.js",
    "exact": [
     "/api/push/key"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-46.js",
+   "exact": [
+    "/api/betaal/direct",
+    "/api/betaal/mijn",
+    "/api/betaal/verzoek/pay",
+    "/api/betaal/verzoeken",
+    "/api/munt/direct"
    ],
    "voorvoegsels": []
   },

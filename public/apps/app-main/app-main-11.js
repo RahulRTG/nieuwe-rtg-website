@@ -3,14 +3,14 @@
       const pc = maakPc();
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      API.call('/member/call', { toKey: call.withKey, kind: 'offer', payload: offer }).catch(()=>{});
+      API.call('/api/member/call', { toKey: call.withKey, kind: 'offer', payload: offer }).catch(()=>{});
     } else if (d.kind === 'offer'){
       const pc = maakPc();
       await pc.setRemoteDescription(d.payload);
       await flushIce();
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      API.call('/member/call', { toKey: call.withKey, kind: 'answer', payload: answer }).catch(()=>{});
+      API.call('/api/member/call', { toKey: call.withKey, kind: 'answer', payload: answer }).catch(()=>{});
     } else if (d.kind === 'answer'){
       await call.pc.setRemoteDescription(d.payload);
       await flushIce();
@@ -39,7 +39,7 @@
     else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
-        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null);
+        const gesprek = API.call('/api/member/dm', { withKey: d.from }).catch(()=>null);
         if (d.postId == null) dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
         else gesprek.then(r => {
           const lijst = (r && r.messages) || [];
@@ -76,7 +76,7 @@
 
   async function kletsLaad(){
     try {
-      const d = await API.call('/klets', {});
+      const d = await API.call('/api/klets', {});
       kletsAan = !!d.aan;
       return d;
     } catch(e){ return { aan: false, gesprekken: [], uitleg: '' }; }
@@ -101,13 +101,13 @@
         : '');
     const schakel = $('#kletsSchakel');
     if (schakel) schakel.addEventListener('change', async () => {
-      try { const r = await API.call('/klets/zet', { aan: schakel.checked }); kletsAan = !!r.aan; $('#kletsGo').disabled = !kletsAan; }
+      try { const r = await API.call('/api/klets/zet', { aan: schakel.checked }); kletsAan = !!r.aan; $('#kletsGo').disabled = !kletsAan; }
       catch(e){ toast(e.message); schakel.checked = kletsAan; }
     });
     const go = $('#kletsGo');
     if (go) go.addEventListener('click', kletsStart);
     $('#kletsBody').querySelectorAll('[data-klets]').forEach(b => b.addEventListener('click', async () => {
-      try { kletsToon(await API.call('/klets/gesprek', { id: b.dataset.klets })); } catch(e){ toast(e.message); }
+      try { kletsToon(await API.call('/api/klets/gesprek', { id: b.dataset.klets })); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -126,7 +126,7 @@
     if (!dmWith) return;
     const go = $('#kletsGo');
     if (go) { go.disabled = true; go.textContent = 'Ze zijn bezig...'; }
-    try { kletsToon(await API.call('/klets/start', { vriend: dmWith })); }
+    try { kletsToon(await API.call('/api/klets/start', { vriend: dmWith })); }
     catch(e){ toast(e.message); if (go) { go.disabled = false; go.textContent = 'Laat ze kletsen'; } }
   }
 
@@ -147,7 +147,7 @@
   async function syncScope(scope){
     if (!API.live) return;
     try {
-      const data = await API.call('/state');
+      const data = await API.call('/api/state');
       applyState(data.state);
     } catch (e) { return; }
     if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }

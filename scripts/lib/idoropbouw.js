@@ -231,6 +231,7 @@ const LIJVEN = {
   '/api/supplier/horeca/haccp/batch': () => ({ naam: 'Soep ' + randomUUID().slice(0, 5), tht: over(3) }),
   '/api/supplier/horeca/offline/sync': () => ({ bonnen: [{ clientId: randomUUID(), soort: 'opgenomen', regels: [{ naam: 'Koffie', aantal: 1, centen: 250 }] }] }),
   '/api/supplier/horeca/bezorg/route': { stops: [{ id: 'a', lat: 52.40, lng: 4.90 }, { id: 'b', lat: 52.372, lng: 4.893 }, { id: 'c', lat: 52.38, lng: 4.895 }] },
+  '/api/supplier/horeca/missions/activeer': { voorstel: { titel: 'Loop de zaal rond', detail: 'Check de tafels', sectie: 'Zaal', minuten: 10 } },
   '/api/verify/selfie': { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' }
 };
 
@@ -469,14 +470,18 @@ function merkwoord() { return 'mrk' + randomUUID().replace(/-/g, '').slice(0, 10
 function zaakStappen() {
   return [
     { pad: '/api/supplier/horeca/club/band', lijf: () => ({ nummer: 'IDOR-A-' + randomUUID().slice(0, 8), bedrag: 50 }),
-      bewaar: (d, c) => { c.bandNummer = d.band && d.band.nummer; c.bonCode = (d.band && d.band.bonCode) || (d.band && d.band.bonId); } }
+      bewaar: (d, c) => { c.bandNummer = d.band && d.band.nummer; c.bonCode = d.band && d.band.bonCode; c.bonId = d.band && d.band.bonId; } },
+    /* A klokt zijn manager in (/api/staff/clock), zodat missions/wave een
+       ingeklokte medewerker hebben om aan toe te wijzen. */
+    { pad: '/api/staff/clock', lijf: {} }
   ];
 }
 
 const ZAAK_VAN_A = {
   '/api/supplier/horeca/bon': (c) => ({ bonCode: c.bonCode }),
   '/api/supplier/horeca/club/band/terug': (c) => ({ nummer: c.bandNummer }),
-  '/api/supplier/horeca/club/band/betaal': (c) => ({ nummer: c.bandNummer })
+  '/api/supplier/horeca/club/band/betaal': (c) => ({ nummer: c.bandNummer }),
+  '/api/supplier/horeca/bon/roteer': (c) => ({ id: c.bonId })
 };
 
 function zaakVanA(pad, ctx) {

@@ -803,6 +803,10 @@ if (require.main !== module) { module.exports = {}; return; }
     /* De zaak-opbouw (./lib/idoropbouw.js zaakStappen): zaak A maakt een band, en
        bonCode + nummer gaan via ZAAK_VAN_A in B's lijf, zodat B een object van A
        opzoekt (bon, club/band/terug). */
+    /* B en C klokken hun manager ook in: dan maakt elke zaak zijn EIGEN
+       servicemissie (publiek), zonder een missie van A te raken. */
+    await zroep('/api/staff/clock', {}, 12);
+    await zroep('/api/staff/clock', {}, 13);
     const zctx = {};
     for (const st of opbouwLib.zaakStappen()) {
       const lijf = typeof st.lijf === 'function' ? st.lijf(zctx) : (st.lijf || {});

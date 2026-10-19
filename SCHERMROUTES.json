@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "34e0b230",
+  "commit": "61df8a89",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/arrival.html"
+    "public/apps/move.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1043,
-  "verwijzingen": 1270,
-  "voorvoegsels": 141,
+  "exactePaden": 1045,
+  "verwijzingen": 1273,
+  "voorvoegsels": 140,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8720,6 +8720,14 @@
    "schermen": [
     "public/apps/mijnmall-mijn.js",
     "public/apps/uitgaan.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/move/volgende",
+   "schermen": [
+    "public/apps/move.html",
+    "public/apps/reizen-veilig-reis.js"
    ],
    "aantal": 2
   },
@@ -12922,6 +12930,20 @@
    "aantal": 1
   },
   {
+   "pad": "/api/move/gevolg",
+   "schermen": [
+    "public/apps/move.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/move/reis",
+   "schermen": [
+    "public/apps/move.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/muziek/bestand",
    "schermen": [
     "public/apps/muziek-feed.js"
@@ -13653,13 +13675,6 @@
    "pad": "/api/reis/gezelschap/tijdlijn",
    "schermen": [
     "public/apps/reizen-samen.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/move/volgende",
-   "schermen": [
-    "public/apps/reizen-veilig-reis.js"
    ],
    "aantal": 1
   },
@@ -17704,10 +17719,12 @@
   },
   {
    "bestand": "public/apps/move.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/move/"
-   ]
+   "exact": [
+    "/api/move/gevolg",
+    "/api/move/reis",
+    "/api/move/volgende"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/muziek-bestanden.js",

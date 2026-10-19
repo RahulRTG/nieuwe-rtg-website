@@ -220,6 +220,9 @@ const CONTRACT = {
   'link:aankomst': Object.assign({
     belofte: 'een gast zet zijn wens om in een aanvraag bij de zaak, krijgt een tijdelijke pass met beloften die de zaak persoonlijk bevestigt, en deelt vrijwillig zijn aankomststatus'
   }, voltooi('aankomst', 'het scenario loopt /api/arrival/interpret, /request, /pass en /pulse, de routes die /apps/arrival.html zelf aanroept, met de zaak die de beloften bevestigt en een tweede zaak die niets ziet')),
+  'link:move': Object.assign({
+    belofte: 'een lid ziet per overgang in zijn reis of hij het haalt, met de dekking erbij, wat er breekt als iets uitloopt en waar hij nu heen moet -- en een vraag verzet niets'
+  }, voltooi('move', 'het scenario loopt /api/move/reis, /gevolg en /volgende, de drie routes die /apps/move.html zelf aanroept, over betaalde afspraken bij twee zaken en met een tweede lid dat niets van de reis ziet')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

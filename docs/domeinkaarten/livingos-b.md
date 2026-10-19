@@ -49,11 +49,11 @@ Camera, spelavond, krant en logboek horen bij LivingOS-A. De geldapps horen bij 
    - `/api/member/report` slaat meldingen op, en niets leest ze.
    - Dat botst met de meld-, motiverings- en bezwaarplicht voor platforms. Zie de kaart van Sociaal.
    - Het concrete voorstel aan de eigenaar staat hieronder, in "Voorstel aan de eigenaar: één moderatiedienst met een kantoorkant".
-4. **Gezondheidsgegevens van derden.** Table bewaarde het dieet van een gast onbeperkt in vrije tekst. Een allergie is een bijzonder persoonsgegeven, van iemand die zelf niet instemde. **Gerepareerd op 19 oktober (d806269d4):** de veertien allergenen van bijlage II als keuzelijst, wissen in de opslag de dag na de gelegenheid (zonder datum na 30 dagen), en de maître krijgt alleen aantallen zonder namen. Entourage bewaart het dieet van reisgenoten op dezelfde manier en is nog niet gerepareerd.
+4. **Gezondheidsgegevens van derden.** Table bewaarde het dieet van een gast onbeperkt in vrije tekst. Een allergie is een bijzonder persoonsgegeven, van iemand die zelf niet instemde. **Gerepareerd op 19 oktober (d806269d4):** de veertien allergenen van bijlage II als keuzelijst, wissen in de opslag de dag na de gelegenheid (zonder datum na 30 dagen), en de maître krijgt alleen aantallen zonder namen. Entourage bewaarde het dieet van reisgenoten op dezelfde manier; **gerepareerd in a5bc914f6** (EU-lijst, een jaar na de laatste bevestiging, alleen het lid).
 5. **Snaps voor kinderen.** Dit ligt als besluit bij de eigenaar (opties A/B/C in het bericht van 19 oktober).
    - Op de gezinsroute hebben snaps en verhalen geen leeftijdsgrens. Ze gaan alleen naar door een ouder goedgekeurde vrienden, en na bekijken is de foto weg.
 6. **Herroepingsrecht.** De retourgrond "bedenktijd" bestaat, maar de wettelijke termijn van 14 dagen na levering wordt nergens gerekend.
-7. **Dynamische paden.** Table, Attenties en Cercle bouwen hun API-paden nog dynamisch op. De meting ziet hun routes daardoor niet.
+7. **Dynamische paden.** Attenties en Cercle bouwen hun API-paden nog dynamisch op. De meting ziet hun routes daardoor niet. Table (d806269d4) en Entourage (a5bc914f6) staan nu voluit.
 8. **Een fout op het scherm.** De liegronde zag op Rendez-vous de kale tekst "undefined" bij een leeg antwoord. **Gerepareerd op 19 oktober (c5d6e935e):** het scherm zegt nu dat het antwoord onvolledig was.
 
 ## Bronnen
@@ -2646,45 +2646,11 @@ Storingen in die keten:
 
 ---
 
-### RTFoundation-kiezer (os:rtf, kiezer in de ledenapp)
+### RTFoundation-kiezer (os:rtf) — staat in de kaart van FoundationOS
 
-Doel: een lid op de juiste FoundationOS-deur zetten. Dit is een navigatiekeuze, geen eigen functie.
-- De tegel opent een leeftijdskiezer (`RTF_GROEPEN` in `public/apps/app-main/app-main-24a1.js`: Mini 0–4, Kids 5–11, Tiener 12–15, Jong 16–21+, Volwassen).
-- Hij stuurt door naar `/apps/foundation/index.html?groep=…` en onthoudt de keuze in `rtf_app_groep`.
-- Eigenaar: niet geregistreerd in `SCHERMEIGENAAR.json`. De bestemming is FoundationOS (`apps/foundation/*`).
+**De kaart van FoundationOS draagt deze app** (`docs/domeinkaarten/foundationos.md`, hoofdstuk 14 "RTF-tegel"). De reden: in `SCHERMEIGENAAR.json` is `rtf.start` → `apps/foundation/index.html` de eigenaar van de bestemming, en de kiezer zelf heeft geen eigen functie of gegevens.
 
-**a. Inventaris.** Alle acht bewijzen staan op NIET_GETEST of GEEN_FIXTURE, met de reden "een kiezer in de app: het adres ontstaat pas na een keuze". Er zijn geen eigen routes. In de voltooiproef staat de kiezer als blokkade met die reden; de integrator legt aan de eigenaar voor of zulke items bij de 114 apps horen.
-
-**b. Markt.** Niet van toepassing: een kiezer heeft geen marktequivalent.
-
-**c. Domein.** De echte vraag is wie welk profiel opent. Dat regelt FoundationOS met de gezinssessie (gezinsPoort, rtfPoort, rtfSpeler). Sinds 3d0e386f2 laat Heel RTG de gezinsschermen alleen bij een gezinssessie zien, en FoundationOS heeft die regel bevestigd.
-
-**d. Functiecatalogus**
-
-| Functie | Laag | Gegevens en bron | Regels | Onzekerheid | Melding | Rollen | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Kiezer met vijf groepen | L6 | `RTF_GROEPEN` | groep naar de deur met `?groep=` | geen | — | lid | — | een lid kiest Kids en komt op de gezinsdeur voor Kids | bestaat | — | — |
-| Kiezer overslaan bij een open gezinssessie | L6 | `rtf_sessie` | is er een gezinsprofiel open, dan direct naar dat profiel | geen | — | lid met een gezinsprofiel | gedeeld toestel: per browser, niet per account (FoundationOS) | met een open profiel opent de tegel meteen dat profiel | ontbreekt | klein | later, met FoundationOS |
-| Eigen functies in de kiezer | — | — | — | — | — | — | — | — | — | — | niet doen: functies horen in FoundationOS |
-
-**e–g.** Niets RTG-exclusiefs en geen eigen bouwstenen. Prioriteit: geen.
-
-**h. Eindcontract.** Eén criterium: elke keuze leidt naar een deur die bestaat (een toets op `RTF_GROEPEN` tegenover de bestanden onder `public/apps/foundation/`). De acht APPWERKT-bewijzen gaan over de bestemming.
-
-#### Uitkomst A en B
-A: alleen de doorverwijzing en het overslaan van de kiezer bij een open gezinsprofiel. B: geen; elk proces hoort bij FoundationOS, en daar staat het domeinmaximum.
-
-**Modus LOS.** De doorverwijzing is een adres en werkt ook als FoundationOS traag is.
-
-**Modus SAMEN.** Uitgegeven: alleen de verwijzing met `groep`. Ontvangen: niets.
-
-**Gebruikersketen.** Een lid zegt "open rtf", kiest Kids en komt op de gezinsdeur.
-- **Geen gezinsprofiel:** de deur vraagt om in te loggen bij het gezin. Dat klopt.
-- **Een gedeeld toestel:** de sessie van een ander account kan zichtbaar blijven; de server weigert dan.
-
-**Vraagt besluit.** Of de kiezer bij de 114 apps hoort.
-
-**Extern.** Geen.
+Deze familie houdt alleen bij wat in LivingOS ligt: de tegel en de leeftijdskiezer (`RTF_GROEPEN` in `public/apps/app-main/app-main-24a1.js`). Een eigen voltooiscenario `os:rtf` staat daar als RTF-19. Eerder stond hier een volledige catalogus; die is vervallen om dubbel werk te voorkomen. Zie de git-historie van dit bestand vóór 19 oktober 2026 als u die nog zoekt.
 
 ---
 
@@ -3260,7 +3226,7 @@ Storingen:
 |---|---|---|
 | bereikbaar | BEWEZEN | |
 | bedienbaar | BEWEZEN | |
-| waarheidsgetrouw | NIET_GETEST | het scherm toonde "undefined" bij een leeg antwoord; dat is een echte bevinding |
+| waarheidsgetrouw | NIET_GETEST | het scherm toonde "undefined" bij een leeg antwoord; **gerepareerd in c5d6e935e** (test/rendezvous-leeg.e2e.js). Het register meet het opnieuw in de centrale ronde |
 | bevoegd | NIET_GETEST | 9 van de 38 routes niet gemeten, zoals `/api/ice` en `/api/gids/app` |
 | voltooibaar | GEEN_FIXTURE | het scenario `scripts/lib/voltooi/rendezvous.js` sluit 10/10, inclusief de chat |
 | persistent | GEEN_FIXTURE | het scenario sluit 3/3 |
@@ -3345,7 +3311,7 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
 - **Regel:** wissen, behalve wat de wet vraagt; het meten vraagt de lezer van de opslag (`vindInOpslag`).
 - **Acceptatie:** na opzeggen is het merkteken nergens in de opslag te vinden.
 
-**R9 Leeg antwoord, geen "undefined"** (L5) — ontbreekt (een APPWERKT-bevinding), klein, aanbevolen nu.
+**R9 Leeg antwoord, geen "undefined"** (L5) — **bestaat sinds c5d6e935e**: Today en Matches zeggen "Het antwoord was onvolledig, dus dit kon niet worden geladen." in plaats van de JS-fout. Toets: test/rendezvous-leeg.e2e.js.
 - **Acceptatie:** de liegronde met een leeg antwoord toont een eerlijke zin.
 
 **R10 Melden van lekken (screenshots, echte naam)** (L3) — half (melden bestaat), klein, aanbevolen nu.
@@ -3391,7 +3357,7 @@ Er zijn vier eigenaars en geen gedeelde data. Daarbij geldt overal dezelfde poor
 
 | Volgorde | Wat | Kosten |
 |---|---|---|
-| 1 | R9 leeg antwoord | klein |
+| gedaan | R9 leeg antwoord (c5d6e935e) | — |
 | 2 | R8 wissen meten | klein voor de meting |
 | 3 | R6 veilige date | klein |
 | 4 | R7 date in Agenda | klein |
@@ -4499,7 +4465,7 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 - **Poort:** alle drie zijn Privékantoor-apps van de Lifestyle Pass; Business erft mee. Ze zijn gepoort in `server/routes/member/rechterhand.js`, met 403 en "Deze app is onderdeel van de Lifestyle Pass".
 - **Pas:** die ontstaat alleen na een menselijk besluit (`kern/aanmeldingen/besluit.js`). Geen scherm en geen AI belooft toegang.
 - **Opslag:** de gegevens staan per lid in de levensbak van de Rechterhand (`server/kern/rechterhand/*`, sleutel per lid). Er is geen gedeelde database.
-- **Paden:** de schermen bouwen hun API-paden als `'/api/member/rechterhand/' + pad`. SCHERMROUTES kent alleen het voorvoegsel. Dat is een open punt in de meetbaarheid, geen functie.
+- **Paden:** Attenties en Cercle bouwen hun API-paden als `'/api/member/rechterhand/' + pad`; SCHERMROUTES kent daar alleen het voorvoegsel. Table staat sinds d806269d4 voluit. Dat is een open punt in de meetbaarheid, geen functie.
 
 ---
 
@@ -4565,8 +4531,8 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 | # | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Moment | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | T1 | Gelegenheid, gasten, tafels, menu | L1 | eigen invoer, `table.js` | grenzen 100/400/30 | geen | geen | alleen het lid | vol geeft een weigering met de reden | 12 gasten met tafel staan er na een herstart nog, en een dubbeltik geeft 1 gast | bestaat | — | (gedekt) |
-| T2 | Dieet als vaste keuzelijst plus vrije notitie | L1 | de 14 allergenen van 1169/2011 plus vegetarisch, veganistisch, halal, koosjer | per gast een set codes; vrije tekst blijft notitie | geen | geen | lid | "onbekend" is een eigen waarde, niet leeg | Het lid kiest "noten" en "lactose" uit de lijst; die verschijnen als codes in de BEO-weergave | ontbreekt | klein | aanbevolen nu |
-| T3 | Bewaartermijn van dieetgegevens | L5 | T2 | dieet wordt X dagen na de datum van de gelegenheid gewist, tenzij het lid "bewaren voor volgende keer" kiest met de vermelding "u bewaart een gezondheidsgegeven van een ander" | geen | 1 melding vooraf | lid | gelegenheid zonder datum: wissen bij weghalen | Een gelegenheid van gisteren met termijn 1 dag toont het dieet niet meer, en in de opslag staat het er niet meer | ontbreekt | klein | **aanbevolen nu** (privacy) |
+| T2 | Dieet als vaste keuzelijst plus vrije notitie | L1 | de 14 allergenen van 1169/2011 bijlage II (`server/kern/allergenen.js`, gedeeld met de tafellijst van de zaak); vegetarisch, halal en dergelijke als vrije aanvulling van 80 tekens | per gast een set codes in de volgorde van de lijst; een code buiten de lijst geeft 400 "Kies de allergenen uit de lijst; iets anders kan als korte aanvulling." | geen | geen | lid | "onbekend" als eigen waarde: nog niet gebouwd | Het lid vinkt "noten" en "melk" aan; die staan als codes bij de gast | **bestaat** (d806269d4; test/table-dieet.test.js). De BEO-weergave (T8) en "onbekend" ontbreken nog | — | gedaan |
+| T3 | Bewaartermijn van dieetgegevens | L5 | T2 | allergie en dieet worden **in de opslag** gewist de dag na de gelegenheid; zonder datum 30 dagen na invoer. De gast blijft staan. Elke lezing veegt het eigen dossier, de bewaarveger alle (`tableVergeetDieet`). De maître krijgt alleen een telling per allergeen, zonder namen | geen | het scherm toont per gast "bewaard t/m …" en een uitleg; een melding vooraf is niet gebouwd | lid | "bewaren voor volgende keer" is niet gebouwd (bewust: de integrator koos een vaste termijn) | Een gelegenheid van eergisteren toont het dieet niet meer, en in de opslag staat het er niet meer (ook na een herstart met RTG_KLOK) | **bestaat** (d806269d4; test/table-dieet.test.js) | — | gedaan |
 | T4 | Allergenen per gerecht en conflictcheck | L4 | menu × T2 | per gang: gasten met een allergeen ∩ allergenen van het gerecht | gerechten zonder allergeneninvoer heten "niet ingevuld", nooit "veilig" | bij het opslaan van een gerecht | lid | gerecht zonder allergenen: waarschuwing "niet gecontroleerd" | Gast met noten plus gerecht met noten geeft "Gang 2: noten — 1 gast (A)". Een gerecht zonder invoer zegt "niet gecontroleerd" | ontbreekt | klein | aanbevolen nu |
 | T5 | Draaiboek (tijden van de avond) | L1 | eigen invoer | gesorteerd op tijd; overlap gemarkeerd | geen | geen | lid | — | Ontvangst 19:00, gang 1 19:45 en toespraak 19:30 staan in tijdvolgorde | ontbreekt | klein | aanbevolen nu |
 | T6 | Kopiëren "zoals vorige keer" | L5 | T1 | kopie zonder datum en zonder dieet (vanwege T3), wel gasten, tafels en menu | geen | geen | lid | — | De kopie heeft dezelfde 12 gasten en 0 dieetregels; het origineel is ongewijzigd | ontbreekt | klein | aanbevolen nu |
@@ -4590,15 +4556,14 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 - de postvanger;
 - het horeca-genre.
 
+**Bestaat sinds 19 oktober:** de dieetcodes (T2), de wistermijn (T3) en letterlijke API-paden in `table.html` (d806269d4).
+
 **Ontbreekt:**
-- de dieetcodes;
-- de wistermijn;
 - de verwijzing van een gast naar een relatie (een objectverwijzing; Attenties laadt `objectverwijzing.js` al, Table niet);
-- een lus-intake vanuit een gelegenheid;
-- letterlijke API-paden in `table.html`.
+- een lus-intake vanuit een gelegenheid.
 
 #### g. Prioritering
-1. T3 en T2, privacy eerst: klein, geen afhankelijkheden.
+1. T3 en T2, privacy eerst: **gedaan** (d806269d4).
 2. T4: klein, hangt aan T2.
 3. T5 en T6: klein.
 4. T7: middel, objectverwijzing in Table.
@@ -4654,7 +4619,7 @@ Storingen:
 - **Gerecht zonder allergenen:** "niet gecontroleerd".
 
 **Vraagt besluit.**
-- De wistermijn voor dieet: welke termijn standaard.
+- De wistermijn voor dieet: **genomen** door de integrator op 19 oktober (de dag na de gelegenheid; zonder datum 30 dagen).
 - Het genre "privéchef/cateraar".
 - Gasten zonder account uitnodigen (accountregel).
 

@@ -69,13 +69,13 @@ function maakCarriereLedger(state) {
   function schrijfRegel(key, regel) {
     const rs = reeks(key);
     const r = Object.assign({ id: id(), at: nu() }, regel);
+    if (rs.length >= MAX_REGELS) return null; // vol is vol: er wordt nooit geknipt
     rs.push(r);
-    if (rs.length > MAX_REGELS) rs.splice(1, rs.length - MAX_REGELS);
     return r;
   }
 
   /* alGezet: de dubbelklik-grens, een LEZING van de reeks -- zie ./projectie.js. */
-  const { feitVan, alGezet } = require('./projectie');
+  const { feitVan, alGezet, weggehaald } = require('./projectie');
 
 
   /* ---------- schrijven ---------- */
@@ -107,6 +107,7 @@ function maakCarriereLedger(state) {
     }
     const r = schrijfRegel(key, Object.assign({ soort: 'feit' }, voorstel,
       { toelichting: scho(d.toelichting, 600) || null }));
+    if (!r) return { status: 409, error: 'Dit ledger is vol (' + MAX_REGELS + ' regels). Er verdwijnt nooit een regel, dus er kan niets meer bij.' };
     const mis = await vastleggen();
     if (mis) return mis;
     return { status: 200, regel: r };
@@ -133,8 +134,11 @@ function maakCarriereLedger(state) {
       return { status: 409, error: 'Deze bevestiging staat er al, van dezelfde partij en met ' +
         'dezelfde tekst. Twee keer hetzelfde bevestigen maakt een feit niet harder.' };
     }
+    const bezwaar = R.bevestigBezwaar(rs, f, scho(zaak, 40) || wie, weggehaald(rs));
+    if (bezwaar) return { status: 409, error: bezwaar };
     const r = schrijfRegel(key, { soort: 'bevestiging', feit: f, herkomst, door: wie, wat: tekst,
       zaak: scho(zaak, 40) || undefined });
+    if (!r) return { status: 409, error: 'Dit ledger is vol (' + MAX_REGELS + ' regels). Er verdwijnt nooit een regel, dus er kan niets meer bij.' };
     const mis = await vastleggen();
     if (mis) return mis;
     return { status: 200, regel: r };
@@ -162,6 +166,7 @@ function maakCarriereLedger(state) {
     const w = scho(reden, 300);
     if (!w) return { status: 400, error: 'Schrijf erbij waarom. Een intrekking zonder reden laat de lezer raden wat er niet klopte.' };
     const r = schrijfRegel(key, { soort: 'intrekking', doel: doel.id, door: scho(door, 120) || 'het lid', reden: w });
+    if (!r) return { status: 409, error: 'Dit ledger is vol (' + MAX_REGELS + ' regels). Er verdwijnt nooit een regel, dus er kan niets meer bij.' };
     const mis = await vastleggen();
     if (mis) return mis;
     return { status: 200, regel: r };

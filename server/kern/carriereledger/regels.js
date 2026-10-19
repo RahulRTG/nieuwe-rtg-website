@@ -139,4 +139,30 @@ function magTerug(doel, van) {
    en houdt hij de eerste vast. ./projectie.js zegt dat in het afschrift. */
 const MAX_REGELS = 500;
 
-module.exports = { KAPITALEN, HERKOMST, NOOIT, KAPITAALNAMEN, HERKOMSTNAMEN, toets, dagGeldig, magTerug, MAX_REGELS };
+/* Een ander mag het ledger niet volschrijven (19 oktober 2026). Er werd tot
+   die dag op 500 regels afgekapt door de OUDSTE te knippen, en een manager
+   kon onbeperkt bevestigen met steeds een andere tekst; zo drukte een derde
+   de vroegste feiten van een lid weg. Nu knipt niets meer, en een partij
+   (de zaak, of anders de naam) heeft per feit hoogstens een actieve
+   bevestiging en over de hele geschiedenis hoogstens drie. De laatste
+   RUIMTE_EIGENAAR regels zijn voor de eigenaar zelf. */
+const MAX_BEVESTIGINGEN_PER_PARTIJ = 3;
+const RUIMTE_EIGENAAR = 50;
+const partijVan = (r) => r.zaak || r.door || '';
+
+function bevestigBezwaar(rs, feitId, partij, weg) {
+  if (rs.length >= MAX_REGELS - RUIMTE_EIGENAAR) {
+    return 'Dit ledger is bijna vol; de laatste ruimte is voor het lid zelf. Er verdwijnt nooit een regel.';
+  }
+  const van = rs.filter((r) => r.soort === 'bevestiging' && r.feit === feitId && partijVan(r) === partij);
+  if (van.some((r) => !weg.has(r.id))) {
+    return 'Deze partij heeft dit feit al bevestigd. Trek die bevestiging eerst in als de tekst anders moet.';
+  }
+  if (van.length >= MAX_BEVESTIGINGEN_PER_PARTIJ) {
+    return 'Deze partij heeft dit feit al ' + van.length + ' keer bevestigd. Meer kan niet: een ledger wist niets, dus elke keer blijft staan.';
+  }
+  return null;
+}
+
+module.exports = { KAPITALEN, HERKOMST, NOOIT, KAPITAALNAMEN, HERKOMSTNAMEN, toets, dagGeldig, magTerug, MAX_REGELS,
+  MAX_BEVESTIGINGEN_PER_PARTIJ, RUIMTE_EIGENAAR, partijVan, bevestigBezwaar };

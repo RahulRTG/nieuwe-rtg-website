@@ -67,8 +67,10 @@ function beoordeel(invoer) {
       'Releasepoort hoort niet exact bij deze commit.');
     eis(releaseGate.bron && releaseGate.bron.boomVuil === false, 'Releasepoort is op gewijzigde code gemeten.');
     const namen = new Set((releaseGate.controles || []).filter(x => x && x.geslaagd).map(x => x.naam));
+    /* APPWERKT-versheid (BETROUWBAARHEID.md par. 4i): een release mag geen 8/8
+       erven waarvan een bewijs sinds de meting is vervallen. */
     for (const naam of ['Bron- en securityregels', 'Accountschrijfgrens', 'Servicebevoegdheden', 'Codecredentialregister', 'Mutatiecontracten',
-      'Dependency-audit', 'Backup en herstel', 'Releasebewijs terugverifiëren'])
+      'APPWERKT-versheid', 'Dependency-audit', 'Backup en herstel', 'Releasebewijs terugverifiëren'])
       eis(namen.has(naam), 'Releasepoort mist groen bewijs: ' + naam + '.');
   }
 

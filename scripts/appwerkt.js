@@ -129,6 +129,12 @@ const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
+/* Het raakvlak per bewijs (scripts/lib/bewijsraakvlak.js): EEN wereld per ronde, zodat
+   elk bestand een keer wordt gelezen en gehasht, en de hashes in het register
+   dezelfde inhoud dragen als waartegen elk bewijs vers werd verklaard. */
+const raakvlakken = require('./lib/bewijsraakvlak');
+let raakvlakWereld = null;
+const RAAKVLAKWERELD = () => (raakvlakWereld = raakvlakWereld || raakvlakken.maakWereld());
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
 /* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
@@ -474,7 +480,7 @@ function vulOngemeten(r) {
   for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
-  r.samengesteld = stelSamen(r);
+  r.samengesteld = stelSamen(r, { wereld: RAAKVLAKWERELD() });
   /* De vier randvoorwaarden uit de opdracht die hier niet gemeten worden, maar
      die wel een plek in de rij verdienen -- weglaten leest als "in orde". */
   r.mobiel = { status: 'NIET_GETEST', reden: 'deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md' };
@@ -811,7 +817,30 @@ function luister(page, base, bak) {
 }
 
 /* ---- schrijven ---- */
+/* De bewijzen die deze browserronde ZELF meet, krijgen hun raakvlak hier, op
+   het stempel van de ronde. Een samengesteld bewijs kreeg het al bij de bron;
+   menselijk heeft dan twee helften, en beide moeten vers blijven. */
+const EIGEN_BEWIJZEN = ['bereikbaar', 'bedienbaar', 'menselijk'];
+function legRaakvlakken(regels, st) {
+  const w = RAAKVLAKWERELD();
+  const grof = require('./lib/stempel').versheid;
+  for (const r of regels) {
+    for (const naam of EIGEN_BEWIJZEN) {
+      const b = r.bewijzen[naam];
+      if (!b || b.status === 'GEEN_FIXTURE') continue;
+      if ((r.samengesteld || []).includes(naam) && naam !== 'menselijk') continue;
+      const v = raakvlakken.versheidVoor(w, { ingang: r.ingang, soort: 'browser' }, grof)(st);
+      if (!v.raakvlak) continue;   // niet vers op de eigen commit: dan is er geen raakvlak om te bewaren
+      b.raakvlak = ((r.samengesteld || []).includes(naam) ? (b.raakvlak || []) : []).concat([v.raakvlak]);
+    }
+  }
+  return raakvlakken.hashes(w);
+}
+
+let laatsteHashes = null;
 function bouw(meting) {
+  const st = stempel();
+  const hashes = laatsteHashes = legRaakvlakken(meting.regels, st);
   const telling = {};
   for (const r of meting.regels) telling[r.status] = (telling[r.status] || 0) + 1;
   const perBewijs = {};
@@ -834,7 +863,13 @@ function bouw(meting) {
       GEEN_FIXTURE: 'niet te meten zonder testwereld, met de reden erbij',
       NIET_GETEST: 'deze ronde niet aangeraakt, met de reden erbij'
     },
-    stempel: stempel(),
+    stempel: st,
+    /* Het raakvlak (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i):
+       de sha256 per bestand staat in APPWERKT-RAAKVLAK.json, met hetzelfde
+       stempel, zodat dit register leesbaar blijft. Hier staat de verwijzing met
+       de samengestelde hash over die hashes; elk bewijs draagt zijn eigen
+       samengestelde hash in `raakvlak`. */
+    raakvlak: raakvlakken.verwijzing(st, hashes),
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
     /* DE MACHINE STAAT ERBIJ. Deze proef tikt met een tijdslimiet, en op een
        machine die drie keer meer werk heeft dan kernen loopt een gezonde tik
@@ -984,7 +1019,10 @@ if (require.main === module) (async () => {
     process.exit(0);
   }
   const uit = bouw(await meet());
-  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) {
+    fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+    fs.writeFileSync(raakvlakken.REGISTER_PAD, JSON.stringify(raakvlakken.register(uit.stempel, laatsteHashes), null, 1) + '\n');
+  }
   log('\nAPPWERKT: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);
   process.exit(0);

@@ -172,10 +172,11 @@ function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } 
   const bewijs = { register, op: st && st.op ? st.op : (typeof st === 'string' ? st : null),
     commit: st && st.commit ? st.commit : null, instrument: st && st.instrument ? st.instrument : null };
   if (!v.vers) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + v.reden, bewijs };
+  const metRaakvlak = (u) => (v.raakvlak ? Object.assign(u, { raakvlak: [v.raakvlak] }) : u);
   if (deel) {
     const gekozen = deel.reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), reg);
     if (!gekozen || typeof gekozen !== 'object') {
-      return { status: 'NIET_GETEST', reden: register + ' kent ' + deel.join('/') + ' niet: dit onderdeel is in die ronde niet gemeten', bewijs };
+      return metRaakvlak({ status: 'NIET_GETEST', reden: register + ' kent ' + deel.join('/') + ' niet: dit onderdeel is in die ronde niet gemeten', bewijs });
     }
     bewijs.deel = deel.join('/');
     reg = gekozen;
@@ -194,18 +195,18 @@ function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } 
      dat bij menselijk zonder uitgelokte weigering) is niet gemeten en nooit
      een defect: er is niets gezien dat stuk was. */
   if (typeof reg.nietBeproefd === 'string' && reg.nietBeproefd) {
-    return { status: 'NIET_GETEST', reden: 'vers gemeten, maar niet beproefd: ' + reg.nietBeproefd, bewijs };
+    return metRaakvlak({ status: 'NIET_GETEST', reden: 'vers gemeten, maar niet beproefd: ' + reg.nietBeproefd, bewijs });
   }
-  if (!schakels.length) return { status: 'NIET_GETEST', reden: register + ' draagt geen schakels; er is niets om te laten tellen', bewijs };
+  if (!schakels.length) return metRaakvlak({ status: 'NIET_GETEST', reden: register + ' draagt geen schakels; er is niets om te laten tellen', bewijs });
   if (niet.length || gebroken.length || t.stuk || t.gebroken || reg.sluit === false) {
     const eerste = niet[0] ? 'schakel ' + niet[0].nr + ' staat ' + niet[0].stand + ' (' + (niet[0].wat || '') + ')'
       : gebroken[0] ? 'storing "' + (gebroken[0].wat || gebroken[0].naam || '?') + '" staat ' + gebroken[0].stand
         : 'de keten zegt zelf dat hij niet sluit';
-    return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'vers gemeten en de stroom sluit niet: ' + eerste, bewijs };
+    return metRaakvlak({ status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'vers gemeten en de stroom sluit niet: ' + eerste, bewijs });
   }
-  return { status: 'BEWEZEN',
+  return metRaakvlak({ status: 'BEWEZEN',
     reden: 'vers gemeten (' + v.reden + '): ' + schakels.length + ' schakels gesloten, ' + storingen.length + ' storingen gehouden',
-    bewijs };
+    bewijs });
 }
 
 /* ---- DE SAMENSTELLING ------------------------------------------------------
@@ -232,7 +233,21 @@ function rondeUitslag(register, functie, { lees = leesStandaard, versheid } = {}
   const rij = (reg.regels || []).find((r) => r.functie === functie);
   if (!rij) return { status: 'NIET_GETEST', reden: register + ' kent ' + functie + ' niet', bewijs };
   if (!STANDEN.has(rij.status)) return { status: 'NIET_GETEST', reden: register + ' geeft ' + functie + ' de onbekende stand ' + rij.status, bewijs };
-  return { status: rij.status, reden: rij.reden, bewijs };
+  const uit = { status: rij.status, reden: rij.reden, bewijs };
+  if (v.raakvlak) uit.raakvlak = [v.raakvlak];
+  return uit;
+}
+
+/* DE VERSHEID PER BEWIJS (scripts/lib/bewijsraakvlak.js). Niet meer het hele register
+   oud bij elke codewijziging, maar alleen als er iets veranderde in de bestanden
+   die DIT bewijs van DEZE app kunnen aantasten. Is dat raakvlak niet vast te
+   stellen, dan beslist de grove regel van versheid() -- nooit "vers". Een
+   toets die zijn eigen `versheid` meegeeft, krijgt precies die. */
+let standaardWereld = null;
+function opRaakvlak(invoer, opties) {
+  const R = require('./bewijsraakvlak');
+  const w = opties.wereld || (standaardWereld = standaardWereld || R.maakWereld());
+  return R.versheidVoor(w, invoer, require('./stempel').versheid);
 }
 
 function bewijsVoor(functie, naam, ingang, opties = {}) {
@@ -242,7 +257,8 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
     const alg = (opties.algemeen || ALGEMEEN)[naam];
     if (!alg) return null;
     if (!(BRONSOORTEN[alg.soort] || []).includes(naam)) throw new Error('appcontract: een ' + alg.soort + ' mag geen ' + naam + ' leveren');
-    const uit = rondeUitslag(alg.register, functie, { lees: opties.lees || leesStandaard, versheid: opties.versheid || require('./stempel').versheid });
+    const uit = rondeUitslag(alg.register, functie, { lees: opties.lees || leesStandaard,
+      versheid: opties.versheid || opRaakvlak({ ingang, soort: 'browser' }, opties) });
     uit.bron = { soort: alg.soort, instrument: alg.instrument };
     return uit;
   }
@@ -262,7 +278,13 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
   /* Een voltooiproef draagt per onderdeel per bewijs een eigen keten
      (scripts/voltooiproef.js); een ketenproef is als geheel een keten. */
   const deel = bron.soort === 'voltooiproef' ? ['apps', functie, naam] : null;
-  const uit = ketenUitslag(bron.register, { lees, versheid: opties.versheid || require('./stempel').versheid, deel });
+  /* Het raakvlak van een routeproef: de routes van het scherm EN die van de
+     proef zelf, want het scenario raakt soms meer dan het scherm (het besluit
+     van het kantoor bij de verificatie). Bij de voltooiproef telt alleen het
+     eigen scenario van het instrument. */
+  const invoer = { ingang, soort: 'api', routeInstrument: bron.instrument,
+    scenario: bron.soort === 'voltooiproef' ? bron.instrument : undefined };
+  const uit = ketenUitslag(bron.register, { lees, versheid: opties.versheid || opRaakvlak(invoer, opties), deel });
   uit.bron = { soort: bron.soort, instrument: bron.instrument, belofte: c.belofte, gedeeldeRoutes: raak.length };
   return uit;
 }

@@ -5993,6 +5993,27 @@ console.log('\n76) geen element draagt twee class-attributen (de browser leest a
   }
 }
 
+/* DE VERSHEID VAN APPWERKT, als MELDING (BETROUWBAARHEID.md par. 4i). Deze
+   regel velt niet, en dat is een besluit (integrator, 19 oktober 2026): check
+   draait bij elke commit, en na elke wijziging in de gedeelde kern zou hij
+   rood staan tot de volgende meetronde. De grens zelf staat in de releasepoort
+   (scripts/release-gate.js, stap APPWERKT-versheid). Hier alleen het getal,
+   zodat niemand een vervallen 8/8 aanziet voor een verse. */
+console.log('\n77) de bewijzen van APPWERKT zijn nog van deze code (melding; de grens is de releasepoort)');
+try {
+  const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'APPWERKT.json'), 'utf8'));
+  const R = require('./lib/bewijsraakvlak');
+  let rv = null;
+  try { rv = JSON.parse(fs.readFileSync(R.REGISTER_PAD, 'utf8')); } catch (e) { rv = null; }
+  const u = require('./appwerkt-vers').beoordeel(reg, { raakvlakRegister: rv });
+  const vervallen = u.rijen.reduce((n, r) => n + Object.values(r.bewijzen).filter((b) => !b.vers).length, 0);
+  console.log('  · ' + vervallen + ' bewijs/bewijzen vervallen sinds de meting' +
+    (u.gezakt.length ? ', waarvan bij ' + u.gezakt.length + ' van de ' + u.achtOpAcht + ' 8/8-rijen' : '') +
+    '; draai npm run appwerkt:vers. Meldt en velt niet.');
+} catch (e) {
+  console.log('  · niet na te gaan (' + String(e.message || e).slice(0, 120) + '); draai npm run appwerkt:vers. Meldt en velt niet.');
+}
+
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 
    Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op

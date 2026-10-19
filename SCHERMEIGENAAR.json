@@ -707,7 +707,7 @@
       "klasse": "geen-dubbel",
       "stand": "blijft",
       "eigenaar": null,
-      "reden": "De labpas is een deelnemer zonder account, het Living Lab is de werkplaats van onderzoek, ethiek en toezicht."
+      "reden": "De labpas is de tweede sleutel van een bewoner met een account (eigenaarsbesluit 19 oktober 2026), het Living Lab is de werkplaats van onderzoek, ethiek en toezicht."
     },
     {
       "schermen": [
@@ -1377,13 +1377,13 @@
       "capability": "hulp.aanvraagstatus",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Met een anonieme code de eigen hulpvraag bij de RTFoundation volgen en toestemming eventueel intrekken."
+      "doel": "Met een (gratis) account en de eigen code, die het account aan het dossier koppelt, de eigen hulpvraag bij de RTFoundation volgen en toestemming eventueel intrekken."
     },
     "apps/foundation/os-donateur.html": {
       "capability": "gift.overzicht",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Met een anonieme code zien wat je hebt gegeven, waar het heen ging, en een giftbewijs opvragen."
+      "doel": "Met een (gratis) account en de eigen code, die het account aan het dossier koppelt, zien wat je hebt gegeven, waar het heen ging, en een giftbewijs opvragen."
     },
     "apps/foundation/os-portaal.html": {
       "capability": "portaal.toegang",
@@ -1395,7 +1395,7 @@
       "capability": "wereld.foundation",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Zonder in te loggen zien wat de RTFoundation in de eigen stad doet en waar je terechtkunt voor hulp, projecten, activiteiten of vrijwilligerswerk."
+      "doel": "Met een (gratis) account of een gezinsprofiel zien wat de RTFoundation in de eigen stad doet en waar je terechtkunt voor hulp, projecten, activiteiten of vrijwilligerswerk; alleen de vastgestelde jaarverslagen zijn zonder account te lezen (ANBI-publicatieplicht)."
     },
     "apps/foundation/os-veld.html": {
       "capability": "werk.veldwerk",
@@ -1407,7 +1407,7 @@
       "capability": "werk.vrijwilligerswerk",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Als vrijwilliger met een eigen code de planning, gewerkte uren en VOG-geldigheid inzien en uren doorgeven."
+      "doel": "Als vrijwilliger met een (gratis) account en een eigen code, die het account aan het dossier koppelt, de planning, gewerkte uren en VOG-geldigheid inzien en uren doorgeven."
     },
     "apps/foundation/os.html": {
       "capability": "kantoor.hub",
@@ -1581,7 +1581,7 @@
       "capability": "hulp.wegwijzer",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Zonder account anoniem beschrijven wat er speelt en op basis daarvan naar de juiste (nood)hulp geleid worden."
+      "doel": "Zonder account (de beschermingsdeur, uitzondering 5 van het accountbesluit) anoniem beschrijven wat er speelt en op basis daarvan naar de juiste (nood)hulp geleid worden."
     },
     "apps/foundation/werk.html": {
       "capability": "werk.vacatures",
@@ -1623,7 +1623,7 @@
       "capability": "horeca.tafelgast",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Als tafelgast (zonder account) zelf bestellen, de rekening volgen en afrekenen aan tafel."
+      "doel": "Als tafelgast met een (gratis) account, dat in het scherm zelf wordt aangemaakt, en de tafelcode als extra sleutel zelf bestellen, de rekening volgen en afrekenen aan tafel."
     },
     "apps/gedachten.html": {
       "capability": "leven.gedachtenboek",
@@ -1869,7 +1869,7 @@
       "capability": "onderzoek.deelname",
       "rol": "eigenaar",
       "doelgroep": "publiek",
-      "doel": "Een onderzoeksdeelnemer (zonder RTG-account, met een labpas-code) volgt de voortgang van zijn eigen onderzoek en ziet buurtvragen en punten/badges."
+      "doel": "Een onderzoeksdeelnemer (met een RTG-account en de labpas-code als tweede sleutel) volgt de voortgang van zijn eigen onderzoek en ziet buurtvragen en punten/badges."
     },
     "apps/lesmaker.html": {
       "capability": "leren.lesmaker",

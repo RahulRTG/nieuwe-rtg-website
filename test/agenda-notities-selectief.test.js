@@ -1,4 +1,6 @@
 'use strict';
+/* Echte SQLite: agenda-uitnodigingen en gedeelde notities blijven bewaard;
+   een gekoppelde herinnering deelt één FULL-commit zonder vreemde scans. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { DatabaseSync } = require('node:sqlite');

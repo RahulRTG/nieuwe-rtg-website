@@ -338,8 +338,11 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               };
               const edgeGreep = [...document.querySelectorAll(
                 '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar);
+              /* Een scherm op het Design System (public/ds/) draagt de
+                 systeemdeur in zijn eigen Edge: de Menu-knop in .ds-edge__balk. */
               return zichtbaar(document.getElementById('osMenuBtn')) ||
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
+                zichtbaar(document.querySelector('.ds-edge__balk [data-ds-edge="menu"]')) ||
                 zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')) ||
                 edgeGreep ||
                 [...document.querySelectorAll('[data-rtg-safe-exit]')].some(zichtbaar) ||
@@ -356,6 +359,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 adaptive: zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')),
                 legacy: zichtbaar(document.getElementById('osMenuBtn')),
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
+                ds: zichtbaar(document.querySelector('.ds-edge__balk [data-ds-edge="menu"]')),
                 edgeGreep: [...document.querySelectorAll(
                   '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar),
                 veiligeUitgang: [...document.querySelectorAll('[data-rtg-safe-exit]')].some(zichtbaar),
@@ -364,7 +368,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               };
             });
             gemeten++;
-            if ([deuren.edge, deuren.adaptive, deuren.legacy].filter(Boolean).length > 1) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
+            if ([deuren.edge, deuren.adaptive, deuren.legacy, deuren.ds].filter(Boolean).length > 1) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
             if ((deuren.edge || deuren.adaptive) && deuren.roots !== 1) dubbeleDeuren.push(pad + ': ' + deuren.roots + ' Edge-casco\'s');
           } catch (e) {
             if (new URL(page.url()).pathname === pad) menuFouten.push(pad);

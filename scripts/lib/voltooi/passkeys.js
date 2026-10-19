@@ -28,8 +28,8 @@ const BEVESTIG_OPTIES = '/api/webauthn/bevestig/opties';
 const WEG = '/api/webauthn/weg';
 
 async function loop(w, stap) {
-  const lid = await nieuwLid(w, 'passkey');
-  const vreemd = await nieuwLid(w, 'pkvreemd');
+  const lid = await nieuwLid(w, 'passkey', 'guest');
+  const vreemd = await nieuwLid(w, 'pkvreemd', 'guest');
   const toestel = await gebondenToestel(w, lid.token);
   let tok = lid.token;
   const host = new URL(w.basis).hostname, origin = () => new URL(w.basis).origin;

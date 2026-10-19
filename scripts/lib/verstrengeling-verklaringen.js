@@ -210,6 +210,8 @@ module.exports = [
     reden: 'config/productie-media.js gebruikt de S3-runtimeparser om de productieopstelling te keuren; dezelfde configuratieregels horen niet in twee parsers uiteen te lopen' },
   { van: 'motor:middleware', naar: 'motor:config', soort: 'BELEID',
     reden: 'foundation-productiepoort.js handhaaft het ene commitgebonden Foundation-vrijgavebesluit uit config/foundation-vrijgave; de requestpoort mag dat besluit niet opnieuw interpreteren' },
+  { van: 'domein:rtfos', naar: 'domein:codekoppel', soort: 'DOMEINRELATIE',
+    reden: 'rtfos/index.js bouwt de bestaande accountgebonden codekoppeling eenmaal voor afmaak-, doelgroep- en portaalroutes. De koppeling bezit haar opslag via eigencollectie; routes krijgen geen db of save meer. Object- en accountgrenzen worden getoetst in toegang-portalen, toegang-buurt en toegang-partnerkanaal.' },
   { van: 'domein:rtfos', naar: 'domein:codelevenscyclus', soort: 'DOMEINRELATIE',
     reden: 'rtfos/basis.js levert opslag en onderwerpbinding aan de gedeelde lifecycle die hash, verval, gebruikslimiet, rotatie en intrekking van persoonsportaalcodes bezit' },
   { van: 'domein:spellen', naar: 'domein:betaalwaarheid', soort: 'DOMEINRELATIE',

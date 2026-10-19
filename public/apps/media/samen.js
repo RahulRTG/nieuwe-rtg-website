@@ -73,26 +73,26 @@
         veld.id = 'samenNodig'; veld.maxLength = 60; veld.placeholder = 'Codenaam van wie u uitnodigt';
         beheer.appendChild(veld);
         beheer.appendChild(M.knop('Nodig uit', '', function () {
-          M.api('samen/nodig', { id: k.id, codenaam: veld.value }).then(function (r) {
+          M.api('/api/mediaos/samen/nodig', { id: k.id, codenaam: veld.value }).then(function (r) {
             if (r.error) return M.zeg(r.error);
             kamer = r.kamer; M.zeg('Uitgenodigd.'); teken();
           });
         }));
         if (k.genodigd.length) beheer.appendChild(M.el('p', 'stil', 'Uitgenodigd: ' + k.genodigd.join(', ')));
         beheer.appendChild(M.knop('Sluit de kamer', 'rood', function () {
-          M.api('samen/uit', { id: k.id }).then(function () { kamer = null; M.zeg('Kamer gesloten.'); B.dicht(); });
+          M.api('/api/mediaos/samen/uit', { id: k.id }).then(function () { kamer = null; M.zeg('Kamer gesloten.'); B.dicht(); });
         }));
         vlak.appendChild(beheer);
       } else {
         vlak.appendChild(M.knop('Verlaat de kamer', '', function () {
-          M.api('samen/uit', { id: k.id }).then(function () { kamer = null; M.zeg('U bent uit de kamer.'); B.dicht(); });
+          M.api('/api/mediaos/samen/uit', { id: k.id }).then(function () { kamer = null; M.zeg('U bent uit de kamer.'); B.dicht(); });
         }));
       }
     });
   }
 
   function erin(id, stil) {
-    return M.api('samen/in', { id: id }).then(function (r) {
+    return M.api('/api/mediaos/samen/in', { id: id }).then(function (r) {
       if (r.error) { kamer = null; return M.zeg(r.error); }
       kamer = r.kamer; lijn();
       if (!stil) teken(); else if (!$('#lade').classList.contains('open')) return; else teken();
@@ -102,18 +102,18 @@
   /* Een kamer beginnen bij een stuk: de gastheer wijst het meteen aan, zodat er
      iets te horen valt zodra de eerste gast binnenkomt. */
   function start(stukId) {
-    M.api('samen/start', {}).then(function (r) {
+    M.api('/api/mediaos/samen/start', {}).then(function (r) {
       if (r.error) return M.zeg(r.error);
       kamer = r.kamer; lijn();
       if (!stukId) return teken();
-      M.api('samen/zet', { id: kamer.id, stukId: stukId, positieS: 0 }).then(function (z) {
+      M.api('/api/mediaos/samen/zet', { id: kamer.id, stukId: stukId, positieS: 0 }).then(function (z) {
         if (z.error) return M.zeg(z.error);
         kamer = z.kamer; teken();
       });
     });
   }
   function mijn() {
-    M.api('samen/mijn', {}).then(function (d) {
+    M.api('/api/mediaos/samen/mijn', {}).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, 'Luisterkamers'));

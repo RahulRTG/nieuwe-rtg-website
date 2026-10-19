@@ -15,4 +15,10 @@ body[data-image-editor="open"]{overflow:hidden!important}body[data-image-editor=
   body[data-rtg-desktop] .pi-change{opacity:0;pointer-events:none}
   body[data-rtg-desktop] :is(.wp-photo,.wd-app-photo):is(:hover,:focus-within)>.pi-change,
   body[data-rtg-desktop] .pi-change:focus-visible{opacity:1;pointer-events:auto}
+  /* De sfeerbeeldstrook staat op pointer-events:none en krijgt dus nooit :hover;
+     zijn knop vangt de muis zelf en verschijnt onder de muis of bij focus. Op
+     80px lag de kop van de favorietenkolom over zijn onderste helft (de strook
+     is z-index 0), dus hij staat hoger, in het vrije deel van de strook. */
+  body[data-rtg-desktop] .wp-atmosphere>.pi-change{pointer-events:auto;top:40px}
+  body[data-rtg-desktop] .wp-atmosphere>.pi-change:is(:hover,:focus-visible){opacity:1}
 }

@@ -3,14 +3,12 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "2307a61bc",
+  "commit": "42b9dc232",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
-   "ongecommitteInvoer": [
-    "public/apps/thuis.html"
-   ],
+   "boomVuil": false,
+   "ongecommitteInvoer": [],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,11 +7818,11 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 449,
+  "schermenMetPad": 458,
   "nietGelezen": 0,
-  "exactePaden": 1108,
-  "verwijzingen": 1334,
-  "voorvoegsels": 137,
+  "exactePaden": 1318,
+  "verwijzingen": 1569,
+  "voorvoegsels": 124,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8031,6 +8029,16 @@
    "aantal": 4
   },
   {
+   "pad": "/api/bestanden/upload",
+   "schermen": [
+    "public/apps/memo/app.js",
+    "public/apps/scanner/app.js",
+    "public/apps/wonen.js",
+    "public/shared/interface/personal-image-editor.js"
+   ],
+   "aantal": 4
+  },
+  {
    "pad": "/api/reis/reizen",
    "schermen": [
     "public/apps/reisboek.js",
@@ -8056,6 +8064,15 @@
     "public/apps/backoffice/backoffice-04.js",
     "public/apps/kantoren.html",
     "public/apps/stadsdoos.html"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/rtgone/state",
+   "schermen": [
+    "public/apps/decision-room.js",
+    "public/apps/project-room.js",
+    "public/apps/rtgone.html"
    ],
    "aantal": 3
   },
@@ -8159,11 +8176,38 @@
    "aantal": 3
   },
   {
-   "pad": "/api/bestanden/upload",
+   "pad": "/api/member/bureau/zaken",
    "schermen": [
-    "public/apps/memo/app.js",
-    "public/apps/scanner/app.js",
-    "public/apps/wonen.js"
+    "public/apps/lifestyle.html",
+    "public/apps/living-os-data.js",
+    "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/mob/aanbod",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/reizen-performance-taxi.js",
+    "public/apps/rit.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/mob/mijn",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/reizen-performance-taxi.js",
+    "public/apps/rit.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/mob/plekken",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/reizen-performance-taxi.js",
+    "public/apps/rit.js"
    ],
    "aantal": 3
   },
@@ -8204,6 +8248,14 @@
    "aantal": 3
   },
   {
+   "pad": "/api/state",
+   "schermen": [
+    "public/apps/app-main/app-main-02.js",
+    "public/apps/geld/wallet.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/account/rollen",
    "schermen": [
     "public/apps/app-main/app-main-24a3.js",
@@ -8236,6 +8288,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/like",
+   "schermen": [
+    "public/apps/app-main/app-main-58.js",
+    "public/apps/salon.html"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/appstore/verleen",
    "schermen": [
     "public/apps/appcel.html",
@@ -8256,6 +8316,22 @@
    "schermen": [
     "public/apps/appstore-dossier.html",
     "public/apps/mall.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/arrival/pass",
+   "schermen": [
+    "public/apps/arrival.html",
+    "public/shared/plaatsnadering.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/arrival/pulse",
+   "schermen": [
+    "public/apps/arrival.html",
+    "public/shared/plaatsnadering.js"
    ],
    "aantal": 2
   },
@@ -8304,6 +8380,14 @@
    "schermen": [
     "public/apps/festival/podium.js",
     "public/apps/festival/programma.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtfos/gift/projecten",
+   "schermen": [
+    "public/apps/foundation/geven.html",
+    "public/apps/foundation/klimaatfonds.html"
    ],
    "aantal": 2
   },
@@ -8500,6 +8584,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/geld/pot/zet",
+   "schermen": [
+    "public/apps/geld/overzichtc.js",
+    "public/apps/geld/voorzijde.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/code/dyn",
    "schermen": [
     "public/apps/geld/rtgcode.js",
@@ -8588,14 +8680,6 @@
    "aantal": 2
   },
   {
-   "pad": "/api/krant/artikel",
-   "schermen": [
-    "public/apps/krant.html",
-    "public/apps/saloon/lezer.js"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/leerhuis/lees",
    "schermen": [
     "public/apps/leerhuis-deur.js",
@@ -8620,18 +8704,42 @@
    "aantal": 2
   },
   {
-   "pad": "/api/agenda/bereik",
+   "pad": "/api/member/bureau/delegatie",
    "schermen": [
-    "public/apps/living-os-data.js",
-    "public/shared/interface/world-widget-data.js"
+    "public/apps/lifestyle.html",
+    "public/apps/living-os-data.js"
    ],
    "aantal": 2
   },
   {
-   "pad": "/api/member/bureau/zaken",
+   "pad": "/api/member/bureau/overzicht",
+   "schermen": [
+    "public/apps/lifestyle.html",
+    "public/apps/living-os-data.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/member/bureau/tower",
+   "schermen": [
+    "public/apps/lifestyle.html",
+    "public/apps/living-os-data.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/member/bureau/zaak/beslis",
+   "schermen": [
+    "public/apps/lifestyle.html",
+    "public/apps/living-os-data.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/agenda/bereik",
    "schermen": [
     "public/apps/living-os-data.js",
-    "public/shared/interface/modules/coordination.js"
+    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 2
   },
@@ -8684,6 +8792,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/mediaos/volg",
+   "schermen": [
+    "public/apps/media/blad.js",
+    "public/apps/saloon/acties.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/ondertiteling/fragment",
    "schermen": [
     "public/apps/media/studio-pro.js",
@@ -8712,6 +8828,22 @@
    "schermen": [
     "public/apps/mijnmall-mijn.js",
     "public/apps/uitgaan.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/move/volgende",
+   "schermen": [
+    "public/apps/move.html",
+    "public/apps/reizen-veilig-reis.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/mob/volg",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/rit.js"
    ],
    "aantal": 2
   },
@@ -8780,26 +8912,34 @@
    "aantal": 2
   },
   {
-   "pad": "/api/mob/aanbod",
+   "pad": "/api/member/spel/antwoord",
    "schermen": [
-    "public/apps/reizen-performance-taxi.js",
-    "public/apps/rit.js"
+    "public/apps/residentie/residentie-03k.js",
+    "public/apps/spelen.html"
    ],
    "aantal": 2
   },
   {
-   "pad": "/api/mob/mijn",
+   "pad": "/api/member/spel/mijn",
    "schermen": [
-    "public/apps/reizen-performance-taxi.js",
-    "public/apps/rit.js"
+    "public/apps/residentie/residentie-03k.js",
+    "public/apps/spelen.html"
    ],
    "aantal": 2
   },
   {
-   "pad": "/api/mob/plekken",
+   "pad": "/api/member/spel/nieuw",
    "schermen": [
-    "public/apps/reizen-performance-taxi.js",
-    "public/apps/rit.js"
+    "public/apps/residentie/residentie-03k.js",
+    "public/apps/spelen.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/member/huis/dossier",
+   "schermen": [
+    "public/apps/rtg-dossier.js",
+    "public/shared/interface/modules/travel.js"
    ],
    "aantal": 2
   },
@@ -8816,6 +8956,14 @@
    "schermen": [
     "public/apps/rtg-vandaag.js",
     "public/apps/sociaal.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtgone/project/van-mail",
+   "schermen": [
+    "public/apps/rtgone.html",
+    "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 2
   },
@@ -8932,6 +9080,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/clips/signaal",
+   "schermen": [
+    "public/shared/clipdeler/clipdeler-01.js",
+    "public/shared/clipdeler/clipdeler-02.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/vertaal/ui",
    "schermen": [
     "public/shared/i18n/i18n-00c.js",
@@ -8994,6 +9150,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/snap/send",
+   "schermen": [
+    "public/apps/app-main/app-main-07.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/snaps",
+   "schermen": [
+    "public/apps/app-main/app-main-08b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/snap/view",
+   "schermen": [
+    "public/apps/app-main/app-main-09.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/pin/live",
    "schermen": [
     "public/apps/app-main/app-main-09a2.js"
@@ -9004,6 +9181,13 @@
    "pad": "/api/member/apps",
    "schermen": [
     "public/apps/app-main/app-main-30.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comment",
+   "schermen": [
+    "public/apps/app-main/app-main-58.js"
    ],
    "aantal": 1
   },
@@ -9095,6 +9279,20 @@
    "pad": "/api/appstore/naslag",
    "schermen": [
     "public/apps/appstore-uitgever.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/arrival/interpret",
+   "schermen": [
+    "public/apps/arrival.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/arrival/request",
+   "schermen": [
+    "public/apps/arrival.html"
    ],
    "aantal": 1
   },
@@ -9715,6 +9913,76 @@
    "aantal": 1
   },
   {
+   "pad": "/api/clips/feed",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/geluid",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/knip",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/maak",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/meld",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/ondertitels",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/reactie",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/reacties",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/volg",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/clips/weg",
+   "schermen": [
+    "public/apps/clips.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/comm/ai",
    "schermen": [
     "public/apps/comm.html"
@@ -9921,6 +10189,20 @@
    "pad": "/api/connect/werk",
    "schermen": [
     "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/goedkeuring",
+   "schermen": [
+    "public/apps/decision-room.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/goedkeuring/beslis",
+   "schermen": [
+    "public/apps/decision-room.js"
    ],
    "aantal": 1
   },
@@ -10275,6 +10557,34 @@
    "aantal": 1
   },
   {
+   "pad": "/api/flits/meld",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/rond",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/stem",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/vooruit",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/foodcourt/tijden",
    "schermen": [
     "public/apps/foodcourt.html"
@@ -10303,6 +10613,48 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtfos/ruil/interesse",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/lijst",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/meld",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/mijn",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/plaats",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/sluit",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/rtf/bieb/catalogus",
    "schermen": [
     "public/apps/foundation/campus.html"
@@ -10320,6 +10672,69 @@
    "pad": "/api/foundation/bespaartip",
    "schermen": [
     "public/apps/foundation/geld.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/bevestig",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/machtiging/intrek",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/machtiging/mijn",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/machtiging/teken",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/plan/mijn",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/plan/stop",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/plan/voorstel",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/stand",
+   "schermen": [
+    "public/apps/foundation/geven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/voorbereid",
+   "schermen": [
+    "public/apps/foundation/geven.html"
    ],
    "aantal": 1
   },
@@ -10362,13 +10777,6 @@
    "pad": "/api/les/mee",
    "schermen": [
     "public/apps/foundation/klas.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtfos/gift/projecten",
-   "schermen": [
-    "public/apps/foundation/klimaatfonds.html"
    ],
    "aantal": 1
   },
@@ -11031,9 +11439,16 @@
    "aantal": 1
   },
   {
-   "pad": "/api/geld/pot/zet",
+   "pad": "/api/geld/pot/reserveer",
    "schermen": [
-    "public/apps/geld/voorzijde.js"
+    "public/apps/geld/overzichtc.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/geld/pot/weg",
+   "schermen": [
+    "public/apps/geld/overzichtc.js"
    ],
    "aantal": 1
   },
@@ -11090,13 +11505,6 @@
    "pad": "/api/geld/grens/zet",
    "schermen": [
     "public/apps/geld/waardec.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/state",
-   "schermen": [
-    "public/apps/geld/wallet.js"
    ],
    "aantal": 1
   },
@@ -11689,20 +12097,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/krant/gids",
-   "schermen": [
-    "public/apps/krant.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/krant/open",
-   "schermen": [
-    "public/apps/krant.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/leerhuis/doe",
    "schermen": [
     "public/apps/leerhuis-deur.js"
@@ -11955,30 +12349,296 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/bureau/delegatie",
+   "pad": "/api/member/bureau/lus/beslis",
    "schermen": [
-    "public/apps/living-os-data.js"
+    "public/apps/lifestyle-lus.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/member/bureau/overzicht",
+   "pad": "/api/member/bureau/lus/intake",
    "schermen": [
-    "public/apps/living-os-data.js"
+    "public/apps/lifestyle-lus.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/member/bureau/tower",
+   "pad": "/api/member/bureau/lus/toelichting",
    "schermen": [
-    "public/apps/living-os-data.js"
+    "public/apps/lifestyle-lus.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/member/bureau/zaak/beslis",
+   "pad": "/api/member/bureau/lus/verrassing",
    "schermen": [
-    "public/apps/living-os-data.js"
+    "public/apps/lifestyle-lus.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/lus/zaak",
+   "schermen": [
+    "public/apps/lifestyle-lus.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/ai",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/beveiliging",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/beveiliging/incident",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/beveiliging/post",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/beveiliging/risico",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/briefing",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/collectie",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/collectie/bruikleen",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/collectie/herkomst",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/collectie/taxatie",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/collectie/terug",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/delegatie/zet",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/dieren",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/dieren/dier",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/dieren/zorg",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/graaf",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/kamers",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/knoop",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/nu",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/raakvlak",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reisdek",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reisdek/bon",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reisdek/gevolg",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reisdek/vergeten",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reisdek/verstoring",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/relaties",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/relaties/band",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/relaties/context",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/relaties/ontmoeting",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reputatie",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reputatie/lijn",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/reputatie/optreden",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/twin",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/twin/beurt",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/twin/installatie",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/twin/ruimte",
+   "schermen": [
+    "public/apps/lifestyle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/bureau/zaak/open",
+   "schermen": [
+    "public/apps/lifestyle.html"
    ],
    "aantal": 1
   },
@@ -12021,6 +12681,27 @@
    "pad": "/api/living-world/view",
    "schermen": [
     "public/apps/living-world/client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/dossier",
+   "schermen": [
+    "public/apps/loonstrook.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/identiteit/verzoeken",
+   "schermen": [
+    "public/apps/loonstrook.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/loonstroken",
+   "schermen": [
+    "public/apps/loonstrook.html"
    ],
    "aantal": 1
   },
@@ -12592,6 +13273,83 @@
    "aantal": 1
   },
   {
+   "pad": "/api/mediaos/bieb",
+   "schermen": [
+    "public/apps/media/blad.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/bord",
+   "schermen": [
+    "public/apps/media/blad.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/maker",
+   "schermen": [
+    "public/apps/media/blad.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/meldingen",
+   "schermen": [
+    "public/apps/media/blad.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/stuk",
+   "schermen": [
+    "public/apps/media/blad.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/lijst",
+   "schermen": [
+    "public/apps/media/lijst.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/lijst/deel",
+   "schermen": [
+    "public/apps/media/lijst.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/lijst/maak",
+   "schermen": [
+    "public/apps/media/lijst.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/lijst/stuk",
+   "schermen": [
+    "public/apps/media/lijst.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/lijst/zet",
+   "schermen": [
+    "public/apps/media/lijst.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/lijsten",
+   "schermen": [
+    "public/apps/media/lijst.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/dm/send",
    "schermen": [
     "public/apps/media/lijst.js"
@@ -12599,9 +13357,72 @@
    "aantal": 1
   },
   {
+   "pad": "/api/mediaos/samen/in",
+   "schermen": [
+    "public/apps/media/samen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/samen/mijn",
+   "schermen": [
+    "public/apps/media/samen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/samen/nodig",
+   "schermen": [
+    "public/apps/media/samen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/samen/start",
+   "schermen": [
+    "public/apps/media/samen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/samen/uit",
+   "schermen": [
+    "public/apps/media/samen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/samen/zet",
+   "schermen": [
+    "public/apps/media/samen.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/muziek/uitgave",
    "schermen": [
     "public/apps/media/speler.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/bewaar",
+   "schermen": [
+    "public/apps/media/wereld.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/stuur",
+   "schermen": [
+    "public/apps/media/wereld.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/wereld",
+   "schermen": [
+    "public/apps/media/wereld.js"
    ],
    "aantal": 1
   },
@@ -12914,6 +13735,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/move/gevolg",
+   "schermen": [
+    "public/apps/move.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/move/reis",
+   "schermen": [
+    "public/apps/move.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/muziek/bestand-ticket",
+   "schermen": [
+    "public/apps/muziek-bestanden.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/muziek/bestand",
    "schermen": [
     "public/apps/muziek-feed.js"
@@ -12921,9 +13763,436 @@
    "aantal": 1
   },
   {
+   "pad": "/api/muziek/bestand-weg",
+   "schermen": [
+    "public/apps/muziek-feed.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/muziek/feed",
+   "schermen": [
+    "public/apps/muziek-feed.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/muziek/mooi",
+   "schermen": [
+    "public/apps/muziek-feed.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/samen/code",
+   "schermen": [
+    "public/apps/muziek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/samen/maak",
+   "schermen": [
+    "public/apps/muziek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/samen/mee",
+   "schermen": [
+    "public/apps/muziek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/samen/muziek",
+   "schermen": [
+    "public/apps/muziek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/samen/staat",
+   "schermen": [
+    "public/apps/muziek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/samen/weg",
+   "schermen": [
+    "public/apps/muziek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/bestemmingen",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebied/kies",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebied/pakket",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebied/weg",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebieden",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/kaart",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/meld",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/poi",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/route",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/status",
+   "schermen": [
+    "public/apps/navigatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/nieuws",
+   "schermen": [
+    "public/apps/nieuws.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/nieuws/ai",
+   "schermen": [
+    "public/apps/nieuws.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/nieuws/artikel",
+   "schermen": [
+    "public/apps/nieuws.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/aanvraag",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/aanvraag/stand",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/dagbeeld",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/ingeschreven",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/intake",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/kas/saldo",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/mijn",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/nieuw",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/oprichting/zet",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/plan/vastleggen",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/rechtsvorm",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/verkenning",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/onderneming/werkruimte",
+   "schermen": [
+    "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/supplier/oog/overzicht",
    "schermen": [
     "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/abo/aanbod",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/abo/koop",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/abo/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/annuleer",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/beleid",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/aanbod",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/koop",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/toon",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/pendel",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/pendel/reserveer",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/annuleer",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/boek",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/plan",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/code",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/code/intrek",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/hier",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/kaart",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operatie/bevestig",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operatie/concept",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operatie/segment",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operaties",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/regie",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/uit",
+   "schermen": [
+    "public/apps/ov.html"
    ],
    "aantal": 1
   },
@@ -13236,6 +14505,20 @@
    "aantal": 1
   },
   {
+   "pad": "/api/staff/ov/lijn/zet",
+   "schermen": [
+    "public/apps/ovroutes.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/ov/lijnen",
+   "schermen": [
+    "public/apps/ovroutes.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/pakket/advies",
    "schermen": [
     "public/apps/pakketten.html"
@@ -13376,107 +14659,23 @@
    "aantal": 1
   },
   {
-   "pad": "/api/podium/abonneer",
+   "pad": "/api/rtgone/project/bewijs",
    "schermen": [
-    "public/apps/podium.html"
+    "public/apps/project-room.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/podium/blokkeer",
+   "pad": "/api/rtgone/project/oplever",
    "schermen": [
-    "public/apps/podium.html"
+    "public/apps/project-room.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/podium/cadeau",
+   "pad": "/api/rtgone/project/taak",
    "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/chat",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/kanaal/aanmeld",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/kanaal/zet",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/kanalen",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/kijk",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/koop",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/live",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/meld",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/mijn",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/signaal",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/waar",
-   "schermen": [
-    "public/apps/podium.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/podium/weg",
-   "schermen": [
-    "public/apps/podium.html"
+    "public/apps/project-room.js"
    ],
    "aantal": 1
   },
@@ -13754,13 +14953,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/move/volgende",
-   "schermen": [
-    "public/apps/reizen-veilig-reis.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/veiligheid/moment/maak",
    "schermen": [
     "public/apps/reizen-veilig.js"
@@ -13789,7 +14981,196 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/rendezvous/aanwezig/wis",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/akkoord",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/arrange",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/blokkeer",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/circle/rsvp",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/circles",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/concierge",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/concierge/approve",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/concierge/request",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/date",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/edge",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/encounter",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/introductie/antwoord",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/introducties",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/kandidaten",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/like",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/matches",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/pas",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/profiel",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/profiel/zet",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/rendezvous/profile-photo",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/profile-photo/order",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/profile-photo/publish",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/profile-photo/remove",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/samen",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/samen/zet",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/tafel/antwoord",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rendezvous/tafels",
    "schermen": [
     "public/apps/rendezvous.html"
    ],
@@ -13904,27 +15285,6 @@
    "pad": "/api/residentie/paar/vraag",
    "schermen": [
     "public/apps/residentie/residentie-03d.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/spel/antwoord",
-   "schermen": [
-    "public/apps/residentie/residentie-03k.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/spel/mijn",
-   "schermen": [
-    "public/apps/residentie/residentie-03k.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/spel/nieuw",
-   "schermen": [
-    "public/apps/residentie/residentie-03k.js"
    ],
    "aantal": 1
   },
@@ -14118,13 +15478,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/mob/volg",
-   "schermen": [
-    "public/apps/rit.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/office/routedekking",
    "schermen": [
     "public/apps/routedekking.html"
@@ -14135,6 +15488,20 @@
    "pad": "/api/office/routedossier",
    "schermen": [
     "public/apps/routedossier.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/huis/map",
+   "schermen": [
+    "public/apps/rtg-dossier.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/huis/rahul",
+   "schermen": [
+    "public/apps/rtg-dossier.js"
    ],
    "aantal": 1
   },
@@ -14153,16 +15520,65 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtgone/project/van-mail",
+   "pad": "/api/rtgone/automatisering/herstel",
    "schermen": [
-    "public/apps/rtmail-voorzijde-werk.js"
+    "public/apps/rtgone.html"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/like",
+   "pad": "/api/rtgone/automatisering/voer",
    "schermen": [
-    "public/apps/salon.html"
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/automatisering/voorbereid",
+   "schermen": [
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/belofte",
+   "schermen": [
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/frictie",
+   "schermen": [
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/intentie",
+   "schermen": [
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/overdracht",
+   "schermen": [
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/rol/geef",
+   "schermen": [
+    "public/apps/rtgone.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgone/rol/trek",
+   "schermen": [
+    "public/apps/rtgone.html"
    ],
    "aantal": 1
   },
@@ -14279,9 +15695,9 @@
    "aantal": 1
   },
   {
-   "pad": "/api/mediaos/volg",
+   "pad": "/api/krant/artikel",
    "schermen": [
-    "public/apps/saloon/acties.js"
+    "public/apps/saloon/lezer.js"
    ],
    "aantal": 1
   },
@@ -14314,6 +15730,223 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/spel/arcade-bord",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/arcade-score",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/dag",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/dag-klaar",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/dag-start",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/nabespreking",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/naspelen",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/online",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/opgeven",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/praat",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/praat-stuur",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/prestaties",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/projectie-open",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/projectie-sluit",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/rahul",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/random",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/sneek-score",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/staat",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/stand",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/sudoku-klaar",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/sudoku-nieuw",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/team-antwoord",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/team-mijn",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/team-nieuw",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/team-verlaat",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/toewijzen",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/uitslagen",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/varianten",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/zet",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/zichtbaar",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/spel/zichtbaar-zet",
+   "schermen": [
+    "public/apps/spelen.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/projectie/kijk",
    "schermen": [
     "public/apps/spelscherm.js"
@@ -14324,6 +15957,62 @@
    "pad": "/api/projectie/koppel",
    "schermen": [
     "public/apps/spelscherm.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/bord",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/momenten",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/plattegrond",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/sponsor",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/sponsors",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/stand",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/ticket/koop",
+   "schermen": [
+    "public/apps/sport.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/sport/tickets",
+   "schermen": [
+    "public/apps/sport.html"
    ],
    "aantal": 1
   },
@@ -14478,6 +16167,20 @@
    "pad": "/api/sport/wedstrijd/maak",
    "schermen": [
     "public/apps/sportclub.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/stad/bewoner",
+   "schermen": [
+    "public/apps/stad.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/stad/melding",
+   "schermen": [
+    "public/apps/stad.html"
    ],
    "aantal": 1
   },
@@ -14671,265 +16374,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/theater/abonneer",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/huisstijl",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/kanaal/aanmeld",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/kijkplicht/gedaan",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/kijkplicht/mijn",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/kijkplicht/stand",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/kijkplicht/zet",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/meld",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/ondertitels",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/reactie",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/reacties",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/signaal",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/thuis/aanwezig",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/video/maak",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/zaak",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/zaak/aanmeld",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/theater/zaal",
-   "schermen": [
-    "public/apps/theater.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/annuleer",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/bericht",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/beslis",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/blokkeer",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/boek",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/bord",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/checkin",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/checkuit",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/cohost",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/detail",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/huis",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/huizen",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/mijn",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/prijsadvies",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/review",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/reviews",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/typen",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/wens",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/wenslijst",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/thuis/zoek",
-   "schermen": [
-    "public/apps/thuis.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/tijdlijn",
    "schermen": [
     "public/apps/tijdlijn.html"
@@ -15094,6 +16538,48 @@
    "pad": "/api/verify/upload",
    "schermen": [
     "public/apps/verificatie.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/aanvaard",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/bevoegdheden",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/grens",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/intrek",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/mijn",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/simulatie",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
    ],
    "aantal": 1
   },
@@ -15371,6 +16857,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/clips/aanwezig",
+   "schermen": [
+    "public/shared/clipdeler/clipdeler-02.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/fout/client",
    "schermen": [
     "public/shared/foutmelder.js"
@@ -15427,16 +16920,30 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/huis/dossier",
+   "pad": "/api/bedrijf/zaakregie",
    "schermen": [
-    "public/shared/interface/modules/travel.js"
+    "public/shared/interface/modules/work.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/bedrijf/zaakregie",
+   "pad": "/api/bestanden/updeel",
    "schermen": [
-    "public/shared/interface/modules/work.js"
+    "public/shared/interface/personal-image-editor.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bestanden/upklaar",
+   "schermen": [
+    "public/shared/interface/personal-image-editor.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bestanden/upstart",
+   "schermen": [
+    "public/shared/interface/personal-image-editor.js"
    ],
    "aantal": 1
   },
@@ -15542,20 +17049,6 @@
    "pad": "/api/commerce/overdracht/lees",
    "schermen": [
     "public/shared/overdracht.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/arrival/pass",
-   "schermen": [
-    "public/shared/plaatsnadering.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/arrival/pulse",
-   "schermen": [
-    "public/shared/plaatsnadering.js"
    ],
    "aantal": 1
   },
@@ -15837,6 +17330,34 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-02.js",
+   "exact": [
+    "/api/state"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-07.js",
+   "exact": [
+    "/api/member/snap/send"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-08b.js",
+   "exact": [
+    "/api/member/snaps"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-09.js",
+   "exact": [
+    "/api/member/snap/view"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-09a2.js",
    "exact": [
     "/api/member/pin/live"
@@ -15870,6 +17391,14 @@
    "bestand": "public/apps/app-main/app-main-45.js",
    "exact": [
     "/api/push/key"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-58.js",
+   "exact": [
+    "/api/comment",
+    "/api/like"
    ],
    "voorvoegsels": []
   },
@@ -15917,10 +17446,13 @@
   },
   {
    "bestand": "public/apps/arrival.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/arrival/"
-   ]
+   "exact": [
+    "/api/arrival/interpret",
+    "/api/arrival/pass",
+    "/api/arrival/pulse",
+    "/api/arrival/request"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/attenties.html",
@@ -16142,10 +17674,19 @@
   },
   {
    "bestand": "public/apps/clips.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/clips/"
-   ]
+   "exact": [
+    "/api/clips/feed",
+    "/api/clips/geluid",
+    "/api/clips/knip",
+    "/api/clips/maak",
+    "/api/clips/meld",
+    "/api/clips/ondertitels",
+    "/api/clips/reactie",
+    "/api/clips/reacties",
+    "/api/clips/volg",
+    "/api/clips/weg"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/comm.html",
@@ -16227,11 +17768,12 @@
   {
    "bestand": "public/apps/decision-room.js",
    "exact": [
-    "/api/account/start"
+    "/api/account/start",
+    "/api/rtgone/goedkeuring",
+    "/api/rtgone/goedkeuring/beslis",
+    "/api/rtgone/state"
    ],
-   "voorvoegsels": [
-    "/api/rtgone/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/defensie/defensie-01.js",
@@ -16397,10 +17939,13 @@
   },
   {
    "bestand": "public/apps/flits.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/flits/"
-   ]
+   "exact": [
+    "/api/flits/meld",
+    "/api/flits/rond",
+    "/api/flits/stem",
+    "/api/flits/vooruit"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foodcourt.html",
@@ -16468,11 +18013,15 @@
   {
    "bestand": "public/apps/foundation/buurtruil.html",
    "exact": [
-    "/api/rtfos/publiek/steden"
+    "/api/rtfos/publiek/steden",
+    "/api/rtfos/ruil/interesse",
+    "/api/rtfos/ruil/lijst",
+    "/api/rtfos/ruil/meld",
+    "/api/rtfos/ruil/mijn",
+    "/api/rtfos/ruil/plaats",
+    "/api/rtfos/ruil/sluit"
    ],
-   "voorvoegsels": [
-    "/api/rtfos/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foundation/campus.html",
@@ -16545,10 +18094,19 @@
   },
   {
    "bestand": "public/apps/foundation/geven.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/gift/"
-   ]
+   "exact": [
+    "/api/rtfos/gift/bevestig",
+    "/api/rtfos/gift/machtiging/intrek",
+    "/api/rtfos/gift/machtiging/mijn",
+    "/api/rtfos/gift/machtiging/teken",
+    "/api/rtfos/gift/plan/mijn",
+    "/api/rtfos/gift/plan/stop",
+    "/api/rtfos/gift/plan/voorstel",
+    "/api/rtfos/gift/projecten",
+    "/api/rtfos/gift/stand",
+    "/api/rtfos/gift/voorbereid"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foundation/gevoel.html",
@@ -17199,11 +18757,12 @@
    "exact": [
     "/api/geld/beleid",
     "/api/geld/beleid/zet",
-    "/api/geld/cockpit"
+    "/api/geld/cockpit",
+    "/api/geld/pot/reserveer",
+    "/api/geld/pot/weg",
+    "/api/geld/pot/zet"
    ],
-   "voorvoegsels": [
-    "/api/geld/pot/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/geld/rtgcode.js",
@@ -17561,12 +19120,10 @@
   },
   {
    "bestand": "public/apps/krant.html",
-   "exact": [
-    "/api/krant/artikel",
-    "/api/krant/gids",
-    "/api/krant/open"
-   ],
-   "voorvoegsels": []
+   "exact": [],
+   "voorvoegsels": [
+    "/api/krant/"
+   ]
   },
   {
    "bestand": "public/apps/lab.html",
@@ -17718,11 +19275,63 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/lifestyle-lus.js",
+   "exact": [
+    "/api/member/bureau/lus/beslis",
+    "/api/member/bureau/lus/intake",
+    "/api/member/bureau/lus/toelichting",
+    "/api/member/bureau/lus/verrassing",
+    "/api/member/bureau/lus/zaak"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/lifestyle.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/bureau/"
-   ]
+   "exact": [
+    "/api/member/bureau/ai",
+    "/api/member/bureau/beveiliging",
+    "/api/member/bureau/beveiliging/incident",
+    "/api/member/bureau/beveiliging/post",
+    "/api/member/bureau/beveiliging/risico",
+    "/api/member/bureau/briefing",
+    "/api/member/bureau/collectie",
+    "/api/member/bureau/collectie/bruikleen",
+    "/api/member/bureau/collectie/herkomst",
+    "/api/member/bureau/collectie/taxatie",
+    "/api/member/bureau/collectie/terug",
+    "/api/member/bureau/delegatie",
+    "/api/member/bureau/delegatie/zet",
+    "/api/member/bureau/dieren",
+    "/api/member/bureau/dieren/dier",
+    "/api/member/bureau/dieren/zorg",
+    "/api/member/bureau/graaf",
+    "/api/member/bureau/kamers",
+    "/api/member/bureau/knoop",
+    "/api/member/bureau/nu",
+    "/api/member/bureau/overzicht",
+    "/api/member/bureau/raakvlak",
+    "/api/member/bureau/reisdek",
+    "/api/member/bureau/reisdek/bon",
+    "/api/member/bureau/reisdek/gevolg",
+    "/api/member/bureau/reisdek/vergeten",
+    "/api/member/bureau/reisdek/verstoring",
+    "/api/member/bureau/relaties",
+    "/api/member/bureau/relaties/band",
+    "/api/member/bureau/relaties/context",
+    "/api/member/bureau/relaties/ontmoeting",
+    "/api/member/bureau/reputatie",
+    "/api/member/bureau/reputatie/lijn",
+    "/api/member/bureau/reputatie/optreden",
+    "/api/member/bureau/tower",
+    "/api/member/bureau/twin",
+    "/api/member/bureau/twin/beurt",
+    "/api/member/bureau/twin/installatie",
+    "/api/member/bureau/twin/ruimte",
+    "/api/member/bureau/zaak/beslis",
+    "/api/member/bureau/zaak/open",
+    "/api/member/bureau/zaken"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/living-os-data.js",
@@ -17764,6 +19373,15 @@
    "voorvoegsels": [
     "/api/lab2/"
    ]
+  },
+  {
+   "bestand": "public/apps/loonstrook.html",
+   "exact": [
+    "/api/member/dossier",
+    "/api/member/identiteit/verzoeken",
+    "/api/member/loonstroken"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/loopbaan.html",
@@ -17962,8 +19580,26 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/media/blad.js",
+   "exact": [
+    "/api/mediaos/bieb",
+    "/api/mediaos/bord",
+    "/api/mediaos/maker",
+    "/api/mediaos/meldingen",
+    "/api/mediaos/stuk",
+    "/api/mediaos/volg"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/media/lijst.js",
    "exact": [
+    "/api/mediaos/lijst",
+    "/api/mediaos/lijst/deel",
+    "/api/mediaos/lijst/maak",
+    "/api/mediaos/lijst/stuk",
+    "/api/mediaos/lijst/zet",
+    "/api/mediaos/lijsten",
     "/api/member/connections",
     "/api/member/dm/send"
    ],
@@ -17972,6 +19608,12 @@
   {
    "bestand": "public/apps/media/samen.js",
    "exact": [
+    "/api/mediaos/samen/in",
+    "/api/mediaos/samen/mijn",
+    "/api/mediaos/samen/nodig",
+    "/api/mediaos/samen/start",
+    "/api/mediaos/samen/uit",
+    "/api/mediaos/samen/zet",
     "/api/stream"
    ],
    "voorvoegsels": []
@@ -17992,10 +19634,12 @@
   },
   {
    "bestand": "public/apps/media/wereld.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/mediaos/"
-   ]
+   "exact": [
+    "/api/mediaos/bewaar",
+    "/api/mediaos/stuur",
+    "/api/mediaos/wereld"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/medicijnen.html",
@@ -18157,49 +19801,67 @@
   },
   {
    "bestand": "public/apps/move.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/move/"
-   ]
+   "exact": [
+    "/api/move/gevolg",
+    "/api/move/reis",
+    "/api/move/volgende"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/muziek-bestanden.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/muziek/"
-   ]
+   "exact": [
+    "/api/muziek/bestand-ticket"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/muziek-feed.js",
    "exact": [
-    "/api/muziek/bestand"
+    "/api/muziek/bestand",
+    "/api/muziek/bestand-weg",
+    "/api/muziek/feed",
+    "/api/muziek/mooi"
    ],
-   "voorvoegsels": [
-    "/api/muziek/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/muziek.html",
    "exact": [
-    "/api/fluister"
+    "/api/fluister",
+    "/api/samen/code",
+    "/api/samen/maak",
+    "/api/samen/mee",
+    "/api/samen/muziek",
+    "/api/samen/staat",
+    "/api/samen/weg"
    ],
-   "voorvoegsels": [
-    "/api/samen/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/navigatie.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/nav/"
-   ]
+   "exact": [
+    "/api/nav/bestemmingen",
+    "/api/nav/gebied/kies",
+    "/api/nav/gebied/pakket",
+    "/api/nav/gebied/weg",
+    "/api/nav/gebieden",
+    "/api/nav/kaart",
+    "/api/nav/meld",
+    "/api/nav/poi",
+    "/api/nav/route",
+    "/api/nav/status"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/nieuws.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/nieuws"
-   ]
+   "exact": [
+    "/api/member/nieuws",
+    "/api/member/nieuws/ai",
+    "/api/member/nieuws/artikel"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/notities/app/app-01.js",
@@ -18222,11 +19884,22 @@
   {
    "bestand": "public/apps/onderneming.html",
    "exact": [
-    "/api/onderneming/rechtsvormen"
+    "/api/onderneming/aanvraag",
+    "/api/onderneming/aanvraag/stand",
+    "/api/onderneming/dagbeeld",
+    "/api/onderneming/ingeschreven",
+    "/api/onderneming/intake",
+    "/api/onderneming/kas/saldo",
+    "/api/onderneming/mijn",
+    "/api/onderneming/nieuw",
+    "/api/onderneming/oprichting/zet",
+    "/api/onderneming/plan/vastleggen",
+    "/api/onderneming/rechtsvorm",
+    "/api/onderneming/rechtsvormen",
+    "/api/onderneming/verkenning",
+    "/api/onderneming/werkruimte"
    ],
-   "voorvoegsels": [
-    "/api/onderneming/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/oog.html",
@@ -18239,11 +19912,39 @@
   },
   {
    "bestand": "public/apps/ov.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/mob/",
-    "/api/ov/"
-   ]
+   "exact": [
+    "/api/mob/aanbod",
+    "/api/mob/abo/aanbod",
+    "/api/mob/abo/koop",
+    "/api/mob/abo/mijn",
+    "/api/mob/annuleer",
+    "/api/mob/beleid",
+    "/api/mob/kaart/aanbod",
+    "/api/mob/kaart/koop",
+    "/api/mob/kaart/mijn",
+    "/api/mob/kaart/toon",
+    "/api/mob/mijn",
+    "/api/mob/pendel",
+    "/api/mob/pendel/reserveer",
+    "/api/mob/plekken",
+    "/api/mob/reis/annuleer",
+    "/api/mob/reis/boek",
+    "/api/mob/reis/mijn",
+    "/api/mob/reis/plan",
+    "/api/mob/volg",
+    "/api/ov/code",
+    "/api/ov/code/intrek",
+    "/api/ov/hier",
+    "/api/ov/kaart",
+    "/api/ov/mijn",
+    "/api/ov/operatie/bevestig",
+    "/api/ov/operatie/concept",
+    "/api/ov/operatie/segment",
+    "/api/ov/operaties",
+    "/api/ov/regie",
+    "/api/ov/uit"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/ovcontrol.html",
@@ -18325,10 +20026,11 @@
   },
   {
    "bestand": "public/apps/ovroutes.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/staff/ov/"
-   ]
+   "exact": [
+    "/api/staff/ov/lijn/zet",
+    "/api/staff/ov/lijnen"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/pakketten.html",
@@ -18423,33 +20125,22 @@
    "bestand": "public/apps/podium.html",
    "exact": [
     "/api/ice",
-    "/api/podium/abonneer",
-    "/api/podium/blokkeer",
-    "/api/podium/cadeau",
-    "/api/podium/chat",
-    "/api/podium/kanaal/aanmeld",
-    "/api/podium/kanaal/zet",
-    "/api/podium/kanalen",
-    "/api/podium/kijk",
-    "/api/podium/koop",
-    "/api/podium/live",
-    "/api/podium/meld",
-    "/api/podium/mijn",
-    "/api/podium/signaal",
-    "/api/podium/waar",
-    "/api/podium/weg",
     "/api/stream"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/podium/"
+   ]
   },
   {
    "bestand": "public/apps/project-room.js",
    "exact": [
-    "/api/account/start"
+    "/api/account/start",
+    "/api/rtgone/project/bewijs",
+    "/api/rtgone/project/oplever",
+    "/api/rtgone/project/taak",
+    "/api/rtgone/state"
    ],
-   "voorvoegsels": [
-    "/api/rtgone/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/pulse.html",
@@ -18657,11 +20348,36 @@
   {
    "bestand": "public/apps/rendezvous.html",
    "exact": [
-    "/api/member/rendezvous/profile-photo"
+    "/api/member/rendezvous/aanwezig/wis",
+    "/api/member/rendezvous/akkoord",
+    "/api/member/rendezvous/arrange",
+    "/api/member/rendezvous/blokkeer",
+    "/api/member/rendezvous/circle/rsvp",
+    "/api/member/rendezvous/circles",
+    "/api/member/rendezvous/concierge",
+    "/api/member/rendezvous/concierge/approve",
+    "/api/member/rendezvous/concierge/request",
+    "/api/member/rendezvous/date",
+    "/api/member/rendezvous/edge",
+    "/api/member/rendezvous/encounter",
+    "/api/member/rendezvous/introductie/antwoord",
+    "/api/member/rendezvous/introducties",
+    "/api/member/rendezvous/kandidaten",
+    "/api/member/rendezvous/like",
+    "/api/member/rendezvous/matches",
+    "/api/member/rendezvous/pas",
+    "/api/member/rendezvous/profiel",
+    "/api/member/rendezvous/profiel/zet",
+    "/api/member/rendezvous/profile-photo",
+    "/api/member/rendezvous/profile-photo/order",
+    "/api/member/rendezvous/profile-photo/publish",
+    "/api/member/rendezvous/profile-photo/remove",
+    "/api/member/rendezvous/samen",
+    "/api/member/rendezvous/samen/zet",
+    "/api/member/rendezvous/tafel/antwoord",
+    "/api/member/rendezvous/tafels"
    ],
-   "voorvoegsels": [
-    "/api/member/rendezvous/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/residentie/residentie-03.js",
@@ -18792,10 +20508,12 @@
   },
   {
    "bestand": "public/apps/rtg-dossier.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/huis/"
-   ]
+   "exact": [
+    "/api/member/huis/dossier",
+    "/api/member/huis/map",
+    "/api/member/huis/rahul"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/rtg-protect/rtg-protect-01.js",
@@ -18831,11 +20549,20 @@
   {
    "bestand": "public/apps/rtgone.html",
    "exact": [
-    "/api/account/start"
+    "/api/account/start",
+    "/api/rtgone/automatisering/herstel",
+    "/api/rtgone/automatisering/voer",
+    "/api/rtgone/automatisering/voorbereid",
+    "/api/rtgone/belofte",
+    "/api/rtgone/frictie",
+    "/api/rtgone/intentie",
+    "/api/rtgone/overdracht",
+    "/api/rtgone/project/van-mail",
+    "/api/rtgone/rol/geef",
+    "/api/rtgone/rol/trek",
+    "/api/rtgone/state"
    ],
-   "voorvoegsels": [
-    "/api/rtgone/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/rtgschool/bijles.js",
@@ -19015,6 +20742,40 @@
    "bestand": "public/apps/spelen.html",
    "exact": [
     "/api/member/connections",
+    "/api/member/spel/antwoord",
+    "/api/member/spel/arcade-bord",
+    "/api/member/spel/arcade-score",
+    "/api/member/spel/dag",
+    "/api/member/spel/dag-klaar",
+    "/api/member/spel/dag-start",
+    "/api/member/spel/mijn",
+    "/api/member/spel/nabespreking",
+    "/api/member/spel/naspelen",
+    "/api/member/spel/nieuw",
+    "/api/member/spel/online",
+    "/api/member/spel/opgeven",
+    "/api/member/spel/praat",
+    "/api/member/spel/praat-stuur",
+    "/api/member/spel/prestaties",
+    "/api/member/spel/projectie-open",
+    "/api/member/spel/projectie-sluit",
+    "/api/member/spel/rahul",
+    "/api/member/spel/random",
+    "/api/member/spel/sneek-score",
+    "/api/member/spel/staat",
+    "/api/member/spel/stand",
+    "/api/member/spel/sudoku-klaar",
+    "/api/member/spel/sudoku-nieuw",
+    "/api/member/spel/team-antwoord",
+    "/api/member/spel/team-mijn",
+    "/api/member/spel/team-nieuw",
+    "/api/member/spel/team-verlaat",
+    "/api/member/spel/toewijzen",
+    "/api/member/spel/uitslagen",
+    "/api/member/spel/varianten",
+    "/api/member/spel/zet",
+    "/api/member/spel/zichtbaar",
+    "/api/member/spel/zichtbaar-zet",
     "/api/rtf/social/connections",
     "/api/stream"
    ],
@@ -19034,10 +20795,17 @@
   },
   {
    "bestand": "public/apps/sport.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/sport"
-   ]
+   "exact": [
+    "/api/member/sport/bord",
+    "/api/member/sport/momenten",
+    "/api/member/sport/plattegrond",
+    "/api/member/sport/sponsor",
+    "/api/member/sport/sponsors",
+    "/api/member/sport/stand",
+    "/api/member/sport/ticket/koop",
+    "/api/member/sport/tickets"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/sportclub.html",
@@ -19072,11 +20840,11 @@
   {
    "bestand": "public/apps/stad.html",
    "exact": [
+    "/api/stad/bewoner",
+    "/api/stad/melding",
     "/api/stream"
    ],
-   "voorvoegsels": [
-    "/api/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/stadsdoos.html",
@@ -19195,55 +20963,20 @@
    "bestand": "public/apps/theater.html",
    "exact": [
     "/api/ice",
-    "/api/stream",
-    "/api/theater/abonneer",
-    "/api/theater/huisstijl",
-    "/api/theater/kanaal/aanmeld",
-    "/api/theater/kijkplicht/gedaan",
-    "/api/theater/kijkplicht/mijn",
-    "/api/theater/kijkplicht/stand",
-    "/api/theater/kijkplicht/zet",
-    "/api/theater/meld",
-    "/api/theater/ondertitels",
-    "/api/theater/reactie",
-    "/api/theater/reacties",
-    "/api/theater/signaal",
-    "/api/theater/thuis/aanwezig",
-    "/api/theater/video/maak",
-    "/api/theater/zaak",
-    "/api/theater/zaak/aanmeld",
-    "/api/theater/zaal"
+    "/api/stream"
    ],
    "voorvoegsels": [
+    "/api/theater/",
     "/api/theater/kijk/",
     "/api/theater/upload/"
    ]
   },
   {
    "bestand": "public/apps/thuis.html",
-   "exact": [
-    "/api/thuis/annuleer",
-    "/api/thuis/bericht",
-    "/api/thuis/beslis",
-    "/api/thuis/blokkeer",
-    "/api/thuis/boek",
-    "/api/thuis/bord",
-    "/api/thuis/checkin",
-    "/api/thuis/checkuit",
-    "/api/thuis/cohost",
-    "/api/thuis/detail",
-    "/api/thuis/huis",
-    "/api/thuis/huizen",
-    "/api/thuis/mijn",
-    "/api/thuis/prijsadvies",
-    "/api/thuis/review",
-    "/api/thuis/reviews",
-    "/api/thuis/typen",
-    "/api/thuis/wens",
-    "/api/thuis/wenslijst",
-    "/api/thuis/zoek"
-   ],
-   "voorvoegsels": []
+   "exact": [],
+   "voorvoegsels": [
+    "/api/thuis/"
+   ]
   },
   {
    "bestand": "public/apps/tijdlijn.html",
@@ -19355,10 +21088,15 @@
   },
   {
    "bestand": "public/apps/vertegenwoordiging.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/vertegenwoordiging"
-   ]
+   "exact": [
+    "/api/vertegenwoordiging/aanvaard",
+    "/api/vertegenwoordiging/bevoegdheden",
+    "/api/vertegenwoordiging/grens",
+    "/api/vertegenwoordiging/intrek",
+    "/api/vertegenwoordiging/mijn",
+    "/api/vertegenwoordiging/simulatie"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/vluchten.html",
@@ -19558,6 +21296,13 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/appshell.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/"
+   ]
+  },
+  {
    "bestand": "public/shared/basis/basis-02.js",
    "exact": [
     "/api/gids/app"
@@ -19590,15 +21335,16 @@
   {
    "bestand": "public/shared/clipdeler/clipdeler-01.js",
    "exact": [
+    "/api/clips/signaal",
     "/api/ice"
    ],
-   "voorvoegsels": [
-    "/api/clips/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/clipdeler/clipdeler-02.js",
    "exact": [
+    "/api/clips/aanwezig",
+    "/api/clips/signaal",
     "/api/stream"
    ],
    "voorvoegsels": []
@@ -19752,11 +21498,13 @@
   {
    "bestand": "public/shared/interface/personal-image-editor.js",
    "exact": [
-    "/api/bestanden/mijn"
+    "/api/bestanden/mijn",
+    "/api/bestanden/updeel",
+    "/api/bestanden/upklaar",
+    "/api/bestanden/upload",
+    "/api/bestanden/upstart"
    ],
-   "voorvoegsels": [
-    "/api/bestanden/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/interface/personal-images.js",

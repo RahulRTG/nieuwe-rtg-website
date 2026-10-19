@@ -8,7 +8,7 @@
         post.likes += post.liked ? 1 : -1;
         ev.currentTarget.classList.toggle('liked', post.liked);
         el.querySelector('.lc').textContent = post.likes;
-        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
+        if (API.live) API.call('/api/like', {postId: post.id, liked: post.liked}).catch(() => {});
       });
       const shareBtn = el.querySelector('.js-share');
       if (shareBtn) shareBtn.addEventListener('click', () => openShare(post.id));
@@ -79,8 +79,11 @@
         const inp = el.querySelector('.cform input');
         if (!inp.value.trim()) return;
         if (API.live){
-          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          // een sleutel per reactie: een tweede tik of een nieuwe poging is dezelfde
+          if (!inp.dataset.idem) inp.dataset.idem = RTGIdem('salon-reactie');
+          try { await API.call('/api/comment', {postId: post.id, text: inp.value.trim(), idem: inp.dataset.idem}); }
           catch (e) { toast(e.message || T('app.salon.notallowed','Reageren niet toegestaan.')); return; }
+          delete inp.dataset.idem;
         }
         post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
         const d = document.createElement('div');

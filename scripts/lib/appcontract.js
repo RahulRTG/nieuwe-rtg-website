@@ -382,6 +382,49 @@ const CONTRACT = {
   'link:muziek': Object.assign({
     belofte: 'een lid deelt zijn eigen muziek, een ander lid vindt, hoort en waardeert haar, alleen de maker haalt haar weg, en samen luisteren brengt de luisteraar in de kamer van de gastheer'
   }, voltooi('muziek', 'het scenario loopt /api/muziek/bestand, /feed, /bestand-ticket, /luister, /mooi en /bestand-weg, en /api/samen/maak, /mee, /muziek en /staat, de routes die /apps/muziek.html (muziek-feed.js, muziek-bestanden.js) zelf aanroept, met twee leden en een gratis account')),
+  'link:nieuws': Object.assign({
+    belofte: 'een lid leest het gepubliceerde werk van RTG Redactie per rubriek, opent een artikel en laat Rahul het samenvatten of een vraag beantwoorden uit alleen de artikeltekst; een concept of teruggetrokken stuk ziet het niet'
+  }, voltooi('nieuws', 'het scenario loopt /api/member/nieuws, /artikel en /ai, de routes die /apps/nieuws.html zelf aanroept, met twee leden en de redactie (eigenaarsaccount) die publiceert en terugtrekt')),
+  'link:sport': Object.assign({
+    belofte: 'een lid reserveert tickets op een vak van de plattegrond die de club zelf tekent, ziet zijn toegangscode, en die code gaat bij de entree een keer naar binnen; een vol vak zegt hoeveel plaatsen er nog zijn, en een herhaalde tik reserveert nooit dubbel'
+  }, voltooi('sport', 'het scenario loopt /api/member/sport/bord, /plattegrond, /ticket/koop, /tickets, /sponsors en /sponsor, de routes die /apps/sport.html zelf aanroept, met twee leden, een gratis account en de seedclub die tekent en scant')),
+  'link:clips': Object.assign({
+    belofte: 'een lid deelt een korte clip waarvan het beeld op zijn eigen toestel blijft; andere leden zien hem in een eindige dagselectie met gevolgde makers eerst, reageren en melden, en alleen de maker knipt, ondertitelt en haalt weg'
+  }, voltooi('clips', 'het scenario loopt /api/clips/feed, /maak, /volg, /reactie, /reacties, /meld, /knip, /ondertitels en /weg, de routes die /apps/clips.html zelf aanroept, met drie leden, een gratis account en het kantoor; het beeld zelf (P2P via /aanwezig en /signaal) loopt niet mee')),
+  'link:rendezvous': Object.assign({
+    belofte: 'Signature-leden met een geverifieerd paspoort zien elkaar op codenaam, een match ontstaat alleen wederzijds en alleen de twee zien hem, en een blokkade werkt in beide richtingen'
+  }, voltooi('rendezvous', 'het scenario loopt /api/member/rendezvous/profiel, /profiel/zet, /kandidaten, /like, /pas, /matches en /blokkeer, de routes die /apps/rendezvous.html zelf aanroept, met vier leden die een medewerker op naam verifieerde en het kantoor een Lifestyle Pass gaf, en twee leden zonder het volle recht')),
+  'link:sociaal': Object.assign({
+    belofte: 'Rahul zet klaar wat er in de kring van het lid openstaat, de mens bevestigt, de ander ziet het antwoord en het actielog verantwoordt het'
+  }, voltooi('sociaal', 'het scenario loopt /api/sociaal/wereld, /command, /lijn, /object en /voorstel/bevestig, de routes die /apps/sociaal.html zelf aanroept, met twee leden in een besloten genootschap (opgebouwd over de routes van Genootschap) en een derde erbuiten')),
+  'link:spelen': Object.assign({
+    belofte: 'een lid nodigt een vriend uit, ze spelen om de beurt tot het potje klaar is, en de uitslag telt alleen voor geverifieerde volwassenen; onder die grens speelt het spel gewoon en wordt er niets bewaard'
+  }, voltooi('spelen', 'het scenario loopt /api/member/spel/nieuw, /antwoord, /mijn, /staat, /zet, /uitslagen en /stand, de routes die /apps/spelen.html zelf aanroept, met twee geverifieerde volwassenen, twee leden onder de progressiegrens en een schaakpartij die echt eindigt')),
+  /* De momentproef (ZONDER_APP hieronder) blijft de deelbelofte volgen en gewekt
+     worden; dit scenario is de kernbelofte van RTG Media. */
+  'link:mediaos': Object.assign({
+    belofte: 'een lid ziet de mediawereld met bij elk stuk waarom het er staat, bewaart wat het wil houden, maakt een eigen afspeellijst en deelt die om te lezen met wie het kent; de lezer verandert niets en een vreemde ziet niets'
+  }, voltooi('mediaos', 'het scenario loopt /api/mediaos/wereld, /bewaar, /bieb, /lijsten, /lijst, /lijst/maak, /lijst/stuk, /lijst/zet en /lijst/deel, de routes die /apps/media.html (media/wereld.js, blad.js, lijst.js) zelf aanroept, met twee verbonden leden, een vreemde en een gratis account; de stukken zijn clips van het tweede lid')),
+  'link:ontdek': Object.assign({
+    belofte: 'een lid ziet in zijn Overzicht zijn dossier, wat er wacht en de afspraken van zijn eigen dag, en maakt het huis het zijne met een eigen foto die alleen hij ziet'
+  }, voltooi('ontdek', 'het scenario loopt /api/member/huis/dossier, /api/sociaal/lijn, /api/sociaal/wereld, /api/agenda/mijn-lijst, /api/bestanden/upload, /api/bestanden/haal, /api/ik/beelden en /api/ik/beelden/zet, de routes die /apps/rtg.html (rtg-dossier.js, rtg-vandaag.js, shared/interface/personal-images.js en personal-image-editor.js) zelf aanroept, met twee leden')),
+  /* LivingOS-B zonder eigen adres: de stand Salon en de os-tegel Snaps van de
+     ledenapp (19 oktober 2026). De koppeling loopt op de delen die DEZE app
+     tekenen, niet op de schil. */
+  'tab:salon': Object.assign({
+    belofte: 'een lid ziet de posts van De Salon, waardeert ze en reageert onder zijn codenaam, en een post voor vrienden ziet alleen een vriend',
+    ingang: '/apps/app.html',
+    via: '#tab=salon',
+    // app-main-58.js: de knoppen onder een Salon-bericht (waarderen, reageren)
+    bestanden: ['public/apps/app-main/app-main-58.js']
+  }, voltooi('salon', 'het scenario loopt /api/state, /api/like en /api/comment, de routes die de stand Salon van /apps/app.html (app-main-58.js) aanroept, met een vriend, een vreemde en een gratis account')),
+  'os:snaps': Object.assign({
+    belofte: 'een lid stuurt een vriend een snap, de vriend ziet hem een keer en daarna is de foto weg, ook uit de opslag',
+    ingang: '/apps/app.html',
+    via: 'de os-tegel Snaps, die de kiezer met Salon-contacten opent',
+    // app-main-07.js stuurt de snap, 08b.js tekent de strip, 09.js opent hem een keer
+    bestanden: ['public/apps/app-main/app-main-07.js', 'public/apps/app-main/app-main-08b.js', 'public/apps/app-main/app-main-09.js']
+  }, voltooi('snaps', 'het scenario loopt /api/member/snap/send, /api/member/snaps en /api/member/snap/view, de routes die de snapkiezer en de snapstrip van /apps/app.html zelf aanroepen, met een vriend, een derde lid en een blokkade')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

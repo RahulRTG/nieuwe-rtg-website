@@ -211,7 +211,7 @@
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/clips/' + pad, { method: 'POST',
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT;
@@ -242,7 +242,7 @@
     };
   });
   async function laadFeed() {
-    const r = await api('feed', { alleenOndertiteld });
+    const r = await api('/api/clips/feed', { alleenOndertiteld });
     if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
     /* Ontbreekt de lijst, dan zeggen we dat -- nooit een lege feed, die zou beweren dat er niets is (LIEGRONDE.json). */
     if (!r.body || !Array.isArray(r.body.clips)) { zeg('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); return; }
@@ -275,7 +275,7 @@
       maakKnop('▶ Speel', 'vol', () => (deler ? deler.speel(sec, c) : zeg('Afspelen kan hier niet.')));
       if (!c.mijn) {
         const vb = maakKnop(c.volgIk ? '✓ Volgend' : '+ Volg', '', async () => {
-          const r2 = await api('volg', { id: c.id, aan: !c.volgIk });
+          const r2 = await api('/api/clips/volg', { id: c.id, aan: !c.volgIk });
           if (r2.body.error) return zeg(r2.body.error);
           c.volgIk = !c.volgIk; vb.textContent = c.volgIk ? '✓ Volgend' : '+ Volg';
         });
@@ -283,12 +283,12 @@
       maakKnop('' + c.reacties, '', () => openReacties(c));
       if (c.mijn) maakKnop('Bewerken', '', () => openKnip(c));
       if (c.mijn) maakKnop('Weg', 'rood', async () => {
-        const r2 = await api('weg', { id: c.id });
+        const r2 = await api('/api/clips/weg', { id: c.id });
         if (r2.body.error) return zeg(r2.body.error);
         zeg('Clip weggehaald.'); laadFeed();
       });
       else maakKnop('Meld', '', async () => {
-        const r2 = await api('meld', { id: c.id, reden: 'Gemeld vanuit de feed' });
+        const r2 = await api('/api/clips/meld', { id: c.id, reden: 'Gemeld vanuit de feed' });
         zeg(r2.body.error || 'Gemeld bij RTG; het kantoor kijkt ernaar.');
       });
       laag.appendChild(rij); sec.appendChild(laag);
@@ -307,7 +307,7 @@
   }
 
   /* ---------- de studio: opnemen, lokaal bewaren, kaart delen ---------- */
-  let stroom = null, recorder = null, brokken = [], opnameBlob = null, opnameT = null, opnameStart = 0;
+  let stroom = null, recorder = null, brokken = [], opnameBlob = null, opnameT = null, opnameStart = 0, opnameDuurS = 0, opnameIdem = null;
   $('#studioOpen').addEventListener('click', async () => {
     $('#studio').classList.add('open');
     try {
@@ -331,6 +331,11 @@
     recorder.ondataavailable = e => { if (e.data.size) brokken.push(e.data); };
     recorder.onstop = () => {
       opnameBlob = new Blob(brokken, { type: 'video/webm' });
+      /* De duur is die van de OPNAME, gemeten bij het stoppen -- niet de tijd
+         tot het delen (wie daarna een titel typt, maakt de clip niet langer).
+         En een sleutel per opname: een tweede tik op Deel is dezelfde kaart. */
+      opnameDuurS = Math.max(1, Math.min(60, Math.round((Date.now() - opnameStart) / 1000)));
+      opnameIdem = RTGIdem('clip-deel');
       $('#deelClip').disabled = false;
       $('#studioStatus').textContent = 'Opname klaar: ' + Math.round(opnameBlob.size / 1024) + ' kB. Geef een titel en deel.';
     };
@@ -349,12 +354,13 @@
     if (!opnameBlob) return;
     const titel = $('#clipTitel').value.trim();
     if (!titel) return zeg('Geef de clip eerst een titel.');
-    const duurS = Math.max(1, Math.min(60, Math.round((Date.now() - opnameStart) / 1000)));
+    const knop = $('#deelClip'); if (knop.dataset.bezig) return; knop.dataset.bezig = '1';
     const poster = await posterVan(opnameBlob);
-    const r = await api('maak', { titel, duurS, poster, mbGeschat: Math.max(1, Math.round(opnameBlob.size / 1048576)) });
+    const r = await api('/api/clips/maak', { titel, duurS: opnameDuurS, poster, idem: opnameIdem,
+      mbGeschat: Math.max(1, Math.round(opnameBlob.size / 1048576)) }).finally(() => { delete knop.dataset.bezig; });
     if (r.body.error) return zeg(r.body.error);
     try { await deler.bewaar(r.body.id, opnameBlob); }
-    catch (e) { await api('weg', { id: r.body.id }); return zeg('Lokaal bewaren lukte niet: ' + e.message); }
+    catch (e) { await api('/api/clips/weg', { id: r.body.id }); return zeg('Lokaal bewaren lukte niet: ' + e.message); }
     zeg('"' + titel + '" staat in uw archief; kijkers halen hem rechtstreeks bij u op.');
     $('#clipTitel').value = ''; $('#deelClip').disabled = true;
     $('#studioDicht').click();
@@ -398,21 +404,21 @@
   $('#knipDicht').addEventListener('click', () => { $('#knipSheet').classList.remove('open'); knipClip = null; });
   $('#knipZet').addEventListener('click', async () => {
     if (!knipClip) return;
-    const r = await api('knip', { id: knipClip.id, van: Number($('#knipVan').value), tot: Number($('#knipTot').value) });
+    const r = await api('/api/clips/knip', { id: knipClip.id, van: Number($('#knipVan').value), tot: Number($('#knipTot').value) });
     if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
     $('#knipStatus').textContent = 'De knip staat: ' + r.body.duurNa + ' seconden. Het origineel is heel gebleven.';
     laadFeed();
   });
   $('#knipWeg').addEventListener('click', async () => {
     if (!knipClip) return;
-    const r = await api('knip', { id: knipClip.id, weg: true });
+    const r = await api('/api/clips/knip', { id: knipClip.id, weg: true });
     if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
     $('#knipStatus').textContent = 'De knip is teruggedraaid; de hele opname speelt weer.';
     laadFeed();
   });
   document.querySelectorAll('[data-geluid]').forEach(b => b.addEventListener('click', async () => {
     if (!knipClip) return;
-    const r = await api('geluid', { id: knipClip.id, soort: b.dataset.geluid });
+    const r = await api('/api/clips/geluid', { id: knipClip.id, soort: b.dataset.geluid });
     if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
     knipClip.geluid = r.body.geluid;
     document.querySelectorAll('[data-geluid]').forEach(o => {
@@ -427,7 +433,7 @@
       const i = d.querySelectorAll('input');
       return { van: Number(i[0].value), tot: Number(i[1].value), tekst: i[2].value.trim() };
     }).filter(r => r.tekst);
-    const r = await api('ondertitels', { id: knipClip.id, regels });
+    const r = await api('/api/clips/ondertitels', { id: knipClip.id, regels });
     if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
     knipClip.ondertitels = r.body.ondertitels;
     $('#knipStatus').textContent = r.body.regels + ' regel' + (r.body.regels === 1 ? '' : 's') + ' bewaard.';
@@ -467,7 +473,7 @@
   let reactieClip = null;
   async function openReacties(c) {
     reactieClip = c;
-    const r = await api('reacties', { id: c.id });
+    const r = await api('/api/clips/reacties', { id: c.id });
     $('#reactieLijst').innerHTML = (r.body.reacties || []).map(x =>
       '<div class="reactieRij"><b>' + esc(x.codenaam) + '</b> ' + esc(x.tekst) + '</div>').join('') ||
       '<p class="leeg">Nog geen reacties.</p>';
@@ -475,7 +481,7 @@
   }
   $('#reactieForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const r = await api('reactie', { id: reactieClip.id, tekst: $('#reactieVeld').value });
+    const r = await api('/api/clips/reactie', { id: reactieClip.id, tekst: $('#reactieVeld').value });
     if (r.body.error) return zeg(r.body.error);
     $('#reactieVeld').value = '';
     openReacties(reactieClip);

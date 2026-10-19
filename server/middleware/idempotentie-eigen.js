@@ -21,6 +21,10 @@ const EIGEN = [
   '/api/supplier/vracht/',
   '/api/rtgid/annuleer',
   '/api/salon/deal/claim',
+  // een reactie in De Salon draagt haar eigen sleutel (routes/member/salon.js)
+  '/api/comment',
+  // een snap draagt zijn eigen sleutel (kern/sociaal/snaps.js)
+  '/api/member/snap/send',
   '/api/supplier/salon/deal/redeem',
   '/api/office/bank/mislukking',
   '/api/festival/verkoop/rond',
@@ -91,7 +95,12 @@ const EIGEN = [
   '/api/theater/reactie',
   '/api/thuis/huis',
   '/api/rtf/bericht',
-  '/api/groothandel/bestel'
+  '/api/groothandel/bestel',
+  // een chatbericht van Vonk draagt zijn eigen sleutel (kern/connection-communication.js)
+  // een chatbericht van Rendezvous draagt dezelfde sleutel (kern/connection-communication.js)
+  '/api/connection/rendezvous/text',
+  // "Nodig uit en start" onthoudt zijn sleutel op het potje (kern/spellen/dubbeltik.js)
+  '/api/member/spel/nieuw'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

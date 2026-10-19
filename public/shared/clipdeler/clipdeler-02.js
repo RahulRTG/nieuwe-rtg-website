@@ -5,7 +5,7 @@
         if (kijkPc) { try { kijkPc.close(); } catch (e) {} }
         kijkPc = new RTCPeerConnection({ iceServers: IJS });
         kijkPc.onicecandidate = function (ev) {
-          if (ev.candidate) api('signaal', { id: d.clipId, kind: 'ice', payload: ev.candidate });
+          if (ev.candidate) api('/api/clips/signaal', { id: d.clipId, kind: 'ice', payload: ev.candidate });
         };
         kijkPc.ondatachannel = function (ev) {
           var kanaal = ev.channel;
@@ -33,7 +33,7 @@
         return kijkPc.setRemoteDescription(d.payload)
           .then(function () { return kijkPc.createAnswer(); })
           .then(function (a) { return kijkPc.setLocalDescription(a).then(function () { return a; }); })
-          .then(function (a) { return api('signaal', { id: d.clipId, kind: 'answer', payload: a }); });
+          .then(function (a) { return api('/api/clips/signaal', { id: d.clipId, kind: 'answer', payload: a }); });
       }
       if (d.kind === 'ice' && kijkPc) { try { return kijkPc.addIceCandidate(d.payload).catch(function () {}); } catch (e) {} }
       return Promise.resolve();
@@ -61,18 +61,18 @@
             })();
           };
           pc.onicecandidate = function (ev) {
-            if (ev.candidate) api('signaal', { id: d.clipId, kind: 'ice', doelKey: d.van, payload: ev.candidate });
+            if (ev.candidate) api('/api/clips/signaal', { id: d.clipId, kind: 'ice', doelKey: d.van, payload: ev.candidate });
           };
           return pc.createOffer()
             .then(function (offer) { return pc.setLocalDescription(offer).then(function () { return offer; }); })
-            .then(function (offer) { return api('signaal', { id: d.clipId, kind: 'offer', doelKey: d.van, payload: offer }); });
+            .then(function (offer) { return api('/api/clips/signaal', { id: d.clipId, kind: 'offer', doelKey: d.van, payload: offer }); });
         });
       });
     }
 
     /* ---------- aanwezigheid en het signaalkanaal ---------- */
     var eigenIds = [];
-    function hartslag() { if (eigenIds.length) api('aanwezig', { ids: eigenIds }); }
+    function hartslag() { if (eigenIds.length) api('/api/clips/aanwezig', { ids: eigenIds }); }
     var klok = setInterval(hartslag, HARTSLAG_MS);
 
     var es = null;

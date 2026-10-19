@@ -39,15 +39,15 @@
     var token = o.token;
     if (!token) return null;
     var zeg = typeof o.opStatus === 'function' ? o.opStatus : function () {};
-    var pad = o.pad || '/api/clips/';
     var haalIjs = function () {
       return fetch('/api/ice', { headers: { Authorization: 'Bearer ' + token } })
         .then(function (r) { return r.json(); }).then(function (d) { IJS = d.iceServers || []; }).catch(function () {});
     };
     haalIjs(); setInterval(haalIjs, 20 * 60 * 1000);
 
-    function api(deel, lijf) {
-      return fetch(pad + deel, {
+    // het volledige pad, letterlijk bij elke aanroep, zodat SCHERMROUTES.json het ziet
+    function api(pad, lijf) {
+      return fetch(pad, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify(lijf || {})
@@ -86,7 +86,7 @@
         if (!c.online) { zeg('De maker is nu niet online; deze clip staat alleen op diens eigen toestel.'); return false; }
         statusVan(vlak, 'Rechtstreeks ophalen bij ' + c.codenaam + '…');
         ontvangst = { clipId: c.id, clip: c, vlak: vlak, brokken: [], bytes: 0, totaal: 0 };
-        return api('signaal', { id: c.id, kind: 'vraag' }).then(function (r) {
+        return api('/api/clips/signaal', { id: c.id, kind: 'vraag' }).then(function (r) {
           if (r && r.error) { zeg(r.error); ontvangst = null; return false; }
           return true;
         });

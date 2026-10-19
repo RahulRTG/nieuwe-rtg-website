@@ -15,7 +15,7 @@
   try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) { TOKEN = null; }
 
   function api(pad, body) {
-    return fetch('/api/mediaos/' + pad, {
+    return fetch(pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
       body: JSON.stringify(body || {})
     }).then(function (r) { return r.json().catch(function () { return {}; }); });
@@ -72,7 +72,7 @@
     rij.appendChild(knop(speelNaam, 'vol', function () { S.speel(s); }));
     rij.appendChild(knop('Alles hierover', '', function () { window.RTGMediaBlad.stuk(s.id); }));
     var bew = knop(s.bewaard ? '✓ Bewaard' : '+ Bewaar', s.bewaard ? 'aan' : '', function () {
-      api('bewaar', { id: s.id, aan: !s.bewaard }).then(function (d) {
+      api('/api/mediaos/bewaar', { id: s.id, aan: !s.bewaard }).then(function (d) {
         if (d.error) return zeg(d.error);
         s.bewaard = d.bewaard;
         bew.textContent = s.bewaard ? '✓ Bewaard' : '+ Bewaar';
@@ -93,7 +93,7 @@
     if (doel && doel.maker) b.maker = doel.maker;
     if (doel && doel.onderwerp) b.onderwerp = doel.onderwerp;
     if (doel && doel.aan != null) b.aan = doel.aan;
-    api('stuur', b).then(function (d) {
+    api('/api/mediaos/stuur', b).then(function (d) {
       if (d.error) return zeg(d.error);
       zeg(d.gedaan || 'Bijgewerkt.');
       haal();
@@ -198,7 +198,7 @@
     if (d.smaak) tekenRegelaars(d); else $('#regelaars').hidden = true;
   }
   function haal() {
-    api('wereld', { modus: modus }).then(teken);
+    api('/api/mediaos/wereld', { modus: modus }).then(teken);
   }
 
   /* Wat blad.js (de lade met de hub, de maker en het bord) nodig heeft. Eén

@@ -28,6 +28,11 @@ const PADEN = [
   { pad: '/api/betaal/', reden: 'geld verplaatsen' },
   { pad: '/api/wallet/', reden: 'tegoed en passen' },
   { pad: '/api/bank/', reden: 'bankhandelingen' },
+  /* De reissom gaat uit de wallet naar het reisbureau (kern/reisbureau-betaling.js).
+     Alleen dit pad: lezen, wijzigen en afzeggen verplaatsen geen geld (besluit
+     19 oktober 2026: elk gekeurd account mag een reis betalen; de keuring is
+     de payGate in routes/member/winkel.js, het bezit staat hier). */
+  { pad: '/api/reisbureau/betaal', reden: 'geld verplaatsen: de reissom uit de wallet naar het reisbureau' },
   { pad: '/api/auth/password', reden: 'het wachtwoord wijzigen zet alle andere sessies eruit' },
   { pad: '/api/webauthn/registreer', reden: 'een nieuwe passkey is een nieuwe sleutel tot het account' },
   { pad: '/api/webauthn/weg', reden: 'een passkey verwijderen haalt een herstelroute weg' },

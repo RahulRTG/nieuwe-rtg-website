@@ -53,6 +53,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+const { bindToestel, metToestellen } = require('./lib/proeftoestel');
 /* Het volle stempel (commit + boomVuil + instrument): zonder waartegen-is-dit-
    gemeten is een register niet na te lopen. */
 const { stempel } = require('./lib/stempel');
@@ -79,10 +80,10 @@ const WEEKEND_2 = dag(37);
    staan; 45 317 centen niet. */
 const POT_CENTEN = 45317;
 
-async function post(basis, pad, lijf, tok) {
+async function post(basis, pad, lijf, tok, koppen) {
   const r = await fetch(basis + pad, {
     method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, koppen || {}),
     body: JSON.stringify(lijf || {})
   }).catch(() => null);
   if (!r) return { status: 0, data: null };
@@ -686,15 +687,25 @@ async function storingen(basis, uit, ctx) {
   /* 7. GELD BEWEEGT NIET VANZELF. Bram probeert de aanvraag van Anna te
      betalen (bestaat niet voor hem), Anna probeert te betalen voordat een mens
      van het reisbureau iets bevestigde, en de pot van Bram staat nog op nul. */
-  const bramBetaalt = ctx.aanvraag ? await P('/api/reisbureau/betaal', { ref: ctx.aanvraag.ref }, B.token) : { status: 0 };
-  const annaTeVroeg = ctx.aanvraag ? await P('/api/reisbureau/betaal', { ref: ctx.aanvraag.ref }, A.token) : { status: 0 };
+  /* Betalen is sinds 19 oktober 2026 een ZWAAR pad (kern/identiteit/bezitspaden.js):
+     zonder gebonden toestel weigert de bezitspoort al, en dan meet deze schakel
+     de poort in plaats van de eigendomsvraag erachter. Daarom binden Anna en Bram
+     hier een toestel en tekenen ze, zoals de browser (scripts/lib/proeftoestel.js);
+     de poort zelf blijft precies zoals in productie. */
+  const kaal = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const tA = await bindToestel({ post: kaal, token: A.token, naam: 'Telefoon Anna' });
+  const tB = await bindToestel({ post: kaal, token: B.token, naam: 'Telefoon Bram' });
+  const PZ = metToestellen((pad, lijf, tok, koppen) => post(basis, pad, lijf, tok, koppen), { toestellen: [tA.klaar, tB.klaar] });
+  const bramBetaalt = ctx.aanvraag ? await PZ('/api/reisbureau/betaal', { ref: ctx.aanvraag.ref }, B.token) : { status: 0 };
+  const annaTeVroeg = ctx.aanvraag ? await PZ('/api/reisbureau/betaal', { ref: ctx.aanvraag.ref }, A.token) : { status: 0 };
   const pot = ((await P('/api/geld/beleid', {}, B.token)).data || {}).potten || [];
   const stand = (pot.find(x => x.id === (ctx.potB && ctx.potB.id)) || {}).standCenten;
   noteer(7, 'betalen voor een ander, of voordat een mens bevestigde', 'geld verlaat het huis niet vanzelf',
     'een vriend kan de reis van een ander niet betalen, een onbevestigde reis wordt niet geind, en geen pot beweegt zonder het lid',
     bramBetaalt.status === 404 && annaTeVroeg.status >= 400 && annaTeVroeg.status < 500 && stand === 0,
     'vriend betaalt: ' + bramBetaalt.status + '; organisator vooraf: ' + annaTeVroeg.status + ' "' +
-      String((annaTeVroeg.data && annaTeVroeg.data.error) || '').slice(0, 80) + '"; pot van de vriend: ' + stand + ' centen');
+      String((annaTeVroeg.data && annaTeVroeg.data.error) || '').slice(0, 80) + '"; pot van de vriend: ' + stand + ' centen' +
+      (tA.klaar && tB.klaar ? '' : '; toestel niet gebonden: ' + (tA.reden || tB.reden)));
 
   /* 8. EEN VERZOEK VOOR EEN ANDER. Vrijheid neemt de persoon uit de sessie:
      Bram vraagt vrij "voor" zijn leidinggevende en krijgt zijn eigen verzoek. */

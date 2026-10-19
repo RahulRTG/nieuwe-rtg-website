@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2827 bestanden en 19560 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2828 bestanden en 19561 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2827 |
-| losse beweringen (`test(...)`) | 19560 |
+| toetsbestanden | 2828 |
+| losse beweringen (`test(...)`) | 19561 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 11 |
+| niets van beide | 12 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2489 bestanden, 18988 beweringen.
+2490 bestanden, 18989 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -767,6 +767,7 @@ toets omvalt.
 | `gezagsnoemer.test.js` | 12 | gezakt op `===->!==#1` | DE GEDEELDE NOEMER VAN DE GEZAGSSCHALEN (scripts/gezagsnoemer.js). GEZAG.json houdt vast dat dit huis de vraag "mag de machine dit zelf?" op vijf plekken met vijf eigen woordenlijsten beantwoordt, en zegt erbij dat... |
 | `gezakte-toetsen.test.js` | 6 | te langzaam | De herhaling onderaan een rode CI-stap moet de REDEN dragen, niet alleen de naam. Dat is een belofte in .github/workflows/ci.yml ("zodat een rode stap zichzelf uitlegt"), en een belofte in tekst is een belofte in code. |
 | `gezelschap.test.js` | 1 | gezakt op `liegpoort /api/` | HET GEZELSCHAP: kan iedereen elkaar bereiken -- en wie juist niet? Het proefpubliek (test/gezelschap.js) zet alle passen neer, alle RTF-leeftijden en een lid per genre. |
+| `gezin-bericht-herhaal.test.js` | 1 | -- | EEN BERICHT AAN HET GEZIN MET EEN HERHAALSLEUTEL STAAT ER EEN KEER, OOK NA EEN HERSTART (19 oktober 2026). De voltooiproef van de stand Gezin (scripts/lib/voltooi/gezin.js) zag een dubbele tik op "Stuur" het bericht... |
 | `gezin-weghalen.test.js` | 6 | gezakt op `liegpoort /api/` | HET GEZIN: DE KANT WAAR DINGEN VERDWIJNEN -- 7 endpoints. De waargenomen dekkingsmeting wees eenentwintig foundation-routes aan als nooit aangeroepen, en daar zat een patroon in: het gezinsdeel was wel beproefd op... |
 | `gezinbewaren.test.js` | 5 | gezakt op `liegpoort /api/` | DE BEWAARTERMIJN VAN EEN GEZIN (foundation/gezinbewaren.js, routes/techniek/bewaren.js; DPIA-GEZIN.md, besluit van 5 oktober 2026). Deel A is de zuivere module: welk gezin is kandidaat, en wanneer is het rijp. |
 | `gezinenleren.test.js` | 3 | gezakt op `liegpoort /api/` | HET GEZIN EN HET LEREN -- zakgeld, sterren, en de eerlijke vergeetcurve. WAAROM DEZE TWEE SAMEN Ze zijn allebei van de RTFoundation-kant en ze raken allebei kinderen, maar op een verschillende manier gevoelig: HET... |

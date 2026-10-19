@@ -44,7 +44,8 @@ const EIGEN = [
   '/api/comm/stuur',
   '/api/vonk/bericht',
   '/api/theater/reactie',
-  '/api/thuis/huis'
+  '/api/thuis/huis',
+  '/api/rtf/bericht'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

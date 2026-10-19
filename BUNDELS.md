@@ -845,7 +845,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 816 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 818 regels in de delen
 
 | deel | onderwerp |
 |---|---|

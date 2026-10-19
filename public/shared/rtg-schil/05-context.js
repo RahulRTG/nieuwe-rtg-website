@@ -4,8 +4,10 @@
      rechten, zodat de werkruimte geen sluiproute wordt naar iets waar je niet
      bij mag (WERKRUIMTE.md par. 5). */
   function context(ref) {
-    if (!ref || !ref.id) { schil.huidigeContext = null; tekenConsole(); return; }
-    schil.huidigeContext = { soort: String(ref.soort || ''), id: String(ref.id), label: String(ref.label || '') };
+    /* Ook "context weg" (null) gaat rond: anders bleven de andere surfaces op
+       de oude verwijzing staan (samenproef, keten context-naar-agenda). */
+    schil.huidigeContext = (!ref || !ref.id) ? null
+      : { soort: String(ref.soort || ''), id: String(ref.id), label: String(ref.label || '') };
     schil.luisteraars.forEach(function (fn) {
       try { fn(schil.huidigeContext); } catch (e) { /* een luisteraar die stukgaat neemt de rest niet mee */ }
     });

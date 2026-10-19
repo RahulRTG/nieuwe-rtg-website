@@ -1,0 +1,34 @@
+/* Veld: rij met icoon, label en waarde (Taak-scherm), of een invoerveld. */
+@layer rtg.component {
+  .ds-veld {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    align-items: center;
+    gap: var(--ds-ruimte-3);
+    min-block-size: 64px;
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    color: inherit;
+    text-align: start;
+    font: inherit;
+    inline-size: 100%;
+  }
+  .ds-veld__icoon { inline-size: 20px; block-size: 20px; color: var(--ds-inkt-zacht); }
+  .ds-veld__label { display: block; font-size: var(--ds-maat-klein); font-weight: 500; }
+  .ds-veld__waarde { display: block; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-veld__pijl { inline-size: 16px; block-size: 16px; color: var(--ds-inkt-zacht); }
+  [dir="rtl"] .ds-veld__pijl { transform: scaleX(-1); }
+  .ds-invoer {
+    inline-size: 100%;
+    min-block-size: var(--ds-doel);
+    padding-inline: var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-capsule);
+    color: var(--ds-inkt);
+    font: inherit;
+  }
+  .ds-invoer:focus { border-color: var(--ds-accent); outline: none; }
+}

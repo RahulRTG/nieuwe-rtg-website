@@ -1,0 +1,14 @@
+/* Detail: één object: groot beeld, naam in Bodoni, status, gegevens, één
+   actie. */
+@layer rtg.scherm {
+  .ds-detail__beeld { inline-size: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: var(--ds-beeld-positie); }
+  .ds-detail__inhoud { display: grid; gap: var(--ds-ruimte-4); padding: var(--ds-ruimte-6) var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); max-inline-size: var(--ds-breedte-lees); margin-inline: auto; }
+  .ds-detail__status { display: inline-flex; align-items: center; gap: var(--ds-ruimte-2); font-size: var(--ds-maat-klein); }
+  .ds-detail__status::before { content: ""; inline-size: 10px; block-size: 10px; border-radius: var(--ds-radius-cirkel); background: var(--ds-metaal); }
+  .ds-detail__gegevens { display: grid; gap: var(--ds-ruimte-3); margin: 0; padding: 0; list-style: none; font-size: var(--ds-maat-klein); }
+  @media (min-width: 64rem) {
+    .ds-detail { display: grid; grid-template-columns: 1.2fr 1fr; min-block-size: 100dvh; }
+    .ds-detail__beeld { block-size: 100%; aspect-ratio: auto; }
+    .ds-detail__inhoud { align-content: center; }
+  }
+}

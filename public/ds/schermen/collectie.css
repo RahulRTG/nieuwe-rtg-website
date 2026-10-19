@@ -1,0 +1,7 @@
+/* Collectie: een verzameling om uit te kiezen: filterchips en een raster
+   van beeldkaarten. Eén kolom op de telefoon, meer naarmate er ruimte is. */
+@layer rtg.scherm {
+  .ds-collectie { padding: var(--ds-ruimte-4) var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); max-inline-size: var(--ds-breedte-max); margin-inline: auto; }
+  .ds-collectie__kop { display: grid; gap: var(--ds-ruimte-2); margin-block: var(--ds-ruimte-6) var(--ds-ruimte-4); }
+  .ds-collectie__raster { display: grid; gap: var(--ds-ruimte-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); margin-block-start: var(--ds-ruimte-4); }
+}

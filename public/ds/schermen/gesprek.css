@@ -1,0 +1,11 @@
+/* Gesprek: met de concierge, een lid of een team. Bubbels zijn een
+   systeemvorm: herkenbaar rond aan de kant van de afzender. */
+@layer rtg.scherm {
+  .ds-gesprek { display: grid; grid-template-rows: auto 1fr auto; min-block-size: 100dvh; }
+  .ds-gesprek__wie { display: flex; align-items: center; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4) var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-gesprek__stroom { display: flex; flex-direction: column; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-6) var(--ds-goot); overflow-y: auto; }
+  .ds-gesprek__bericht { max-inline-size: min(80%, 30rem); padding: var(--ds-ruimte-3) var(--ds-ruimte-4); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); border-end-start-radius: var(--ds-radius-inhoud); font-size: var(--ds-maat-klein); }
+  .ds-gesprek__bericht--eigen { align-self: flex-end; background: var(--ds-accent); border-color: var(--ds-accent); color: var(--ds-accent-inkt); border-end-start-radius: var(--ds-radius-systeem); border-end-end-radius: var(--ds-radius-inhoud); }
+  .ds-gesprek__tijd { font-size: var(--ds-maat-meta); color: var(--ds-inkt-zacht); }
+  .ds-gesprek__invoer { display: flex; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-3) var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6)); }
+}

@@ -1,0 +1,21 @@
+/* Lijst: berichten, mail, documenten, reisstappen: avatar of icoon, titel,
+   voorbeeld, tijd. Dunne lijnen, geen kaartjes per rij. */
+@layer rtg.component {
+  .ds-lijst { list-style: none; margin: 0; padding: 0; }
+  .ds-lijst__rij {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: var(--ds-ruimte-3);
+    align-items: start;
+    padding-block: var(--ds-ruimte-4);
+    border-block-end: 1px solid var(--ds-lijnkleur);
+    color: inherit;
+    text-decoration: none;
+  }
+  .ds-lijst__beeld { inline-size: 44px; block-size: 44px; border-radius: var(--ds-radius-cirkel); object-fit: cover; }
+  .ds-lijst__icoon { inline-size: 20px; block-size: 20px; margin-block-start: var(--ds-ruimte-1); color: var(--ds-inkt-zacht); }
+  .ds-lijst__titel { display: block; font-size: var(--ds-maat-klein); font-weight: 600; }
+  .ds-lijst__tekst { display: block; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-lijst__tijd { font-size: var(--ds-maat-meta); color: var(--ds-inkt-zacht); white-space: nowrap; }
+  .ds-lijst__stip { display: block; inline-size: 8px; block-size: 8px; margin-block-start: var(--ds-ruimte-2); margin-inline-start: auto; border-radius: var(--ds-radius-cirkel); background: var(--ds-accent); }
+}

@@ -1,0 +1,29 @@
+{
+  "naam": "RTG Design System",
+  "versie": 1,
+  "uitleg": "Het afdwingbare contract van public/ds/. scripts/ontwerpsysteem.js --controle keurt elk bestand hiertegen; ONTWERPSYSTEEM.md legt uit waarom. Een wijziging hier is een ontwerpbesluit en hoort in dezelfde PR als de reden.",
+  "lagen": ["rtg.reset", "rtg.tokens", "rtg.thema", "rtg.component", "rtg.scherm"],
+  "werelden": ["living", "travel", "work", "foundation"],
+  "schermtypen": ["cover", "collectie", "taak", "detail", "gesprek", "canvas", "status"],
+  "componenten": ["kop", "knop", "kaart", "veld", "lijst", "chip", "dialoog", "edge"],
+  "themabaar": [
+    "--ds-grond",
+    "--ds-oppervlak",
+    "--ds-oppervlak-sterk",
+    "--ds-inkt",
+    "--ds-inkt-zacht",
+    "--ds-lijnkleur",
+    "--ds-accent",
+    "--ds-accent-hover",
+    "--ds-accent-inkt",
+    "--ds-metaal",
+    "--ds-cover-grond",
+    "--ds-cover-inkt",
+    "--ds-cover-metaal",
+    "--ds-cover-sluier",
+    "--ds-focus",
+    "--ds-beeld-positie"
+  ],
+  "talen": ["nl", "en", "de", "fr", "es", "it", "pt", "tr", "ar", "zh", "ja", "pl", "hi", "ru", "uk", "sv", "da", "no", "fi"],
+  "rechtsNaarLinks": ["ar"]
+}

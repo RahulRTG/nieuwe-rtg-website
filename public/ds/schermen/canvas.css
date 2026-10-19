@@ -1,0 +1,9 @@
+/* Canvas: een kaart, plattegrond of werkvlak dat het hele scherm vult, met
+   zwevende bediening en een objectkaart onderaan. */
+@layer rtg.scherm {
+  .ds-canvas { position: relative; min-block-size: 100dvh; overflow: hidden; }
+  .ds-canvas__vlak { position: absolute; inset: 0; }
+  .ds-canvas__bediening { position: absolute; inset-block-start: var(--ds-ruimte-4); inset-inline-end: var(--ds-goot); display: grid; gap: var(--ds-ruimte-2); }
+  .ds-canvas__bediening button { display: grid; place-items: center; inline-size: var(--ds-doel); block-size: var(--ds-doel); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-cirkel); box-shadow: var(--ds-schaduw-inhoud); color: var(--ds-inkt); cursor: pointer; }
+  .ds-canvas__object { position: absolute; inset-inline: var(--ds-goot); inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-8)); }
+}

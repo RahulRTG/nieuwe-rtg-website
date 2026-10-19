@@ -1,0 +1,11 @@
+/* WorkOS: precies, kalm, beheerst: grafiet, zwartgroen, messing
+   (HERITAGE.md par. 3). Een thema zet alleen tokens uit contract.themabaar. */
+@layer rtg.thema {
+  [data-rtg-world="work"] {
+    --ds-accent: var(--ds-p-zwartgroen);
+    --ds-accent-hover: var(--ds-p-zwartgroen-hover);
+    --ds-metaal: var(--ds-p-goud);
+    --ds-cover-metaal: var(--ds-p-champagne);
+    --ds-focus: var(--ds-p-zwartgroen-hover);
+  }
+}

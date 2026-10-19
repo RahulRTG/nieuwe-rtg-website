@@ -64,6 +64,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `MAGNAATLAB.md` is Magnaat als testhal
 - `BEWIJSMACHINE.md` is de lat boven de testhal
 - `SERVICE.md` is de laag die de hulplijnen orkestreert
+- `ONTWERPSYSTEEM.md` is de afdwingbare visuele architectuur; lees het vóór elke regel CSS
 - `ONTWERP.md` is het RTG Design System 2.0
 - `MATERIAAL.md` is de materialenleer
 - `WERELD.md` beschrijft het beginscherm
@@ -138,9 +139,10 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
    Willekeurige kaart-, veld- en knopafrondingen blijven verboden: de toegestane
    waarden wonen alleen in de centrale Heritage-tokens en componentcontracten.
    `scripts/check.js` regel 58 bewaakt precies die grens, zodat een route niet
-   alsnog een eigen SaaS-vormtaal kan invoeren.
+   alsnog een eigen SaaS-vormtaal kan invoeren. Sinds 19 oktober 2026 mogen knoppen, chips en velden een capsule zijn en heeft
+   elke wereld een eigen accent, uitsluitend via de tokens in `public/ds/`.
 4. **Veel lucht** — genereuze verticale padding; bij twijfel meer ruimte.
-5. **De Salon levert het beeld.** Site- en campagnebeeld zijn uitgelichte Salon-posts (featured, altijd met naamsvermelding — label "Uit De Salon · naam"; endpoint `/api/salon/promo`, alleen featured posts, RTG cureert). De onderliggende demo-beelden zijn AI-gegenereerd in eigen huis (`public/campagne/`, via Pollinations; quiet luxury, gedempte tinten, géén mensen) — geen stockfoto's, geen modellen, geen extern beeld. Overige visuals met CSS/SVG bouwen.
+5. **De Salon levert het beeld.** Site- en campagnebeeld zijn uitgelichte Salon-posts (featured, altijd met naamsvermelding — label "Uit De Salon · naam"; endpoint `/api/salon/promo`, alleen featured posts, RTG cureert). De onderliggende demo-beelden zijn AI-gegenereerd in eigen huis (`public/campagne/`, via Pollinations; quiet luxury, gedempte tinten; mensen alleen als sfeer, `ONTWERPSYSTEEM.md` par. 4) — geen stockfoto's, geen modellen, geen extern beeld. Overige visuals met CSS/SVG bouwen.
 
 ### Tone of voice — verschilt per pass, bewust zo
 - **RTG Pass**: "old money" — ingetogen, zeker, "je/jij"-vorm
@@ -161,6 +163,7 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 - Geen "verslavende" engagement-patronen (kunstmatige urgentie, oneindige scroll-tricks)
 - **De progressielaag stopt bij 18+.** Alles wat een prestatie bewaart búiten het potje — highscores, ranglijsten, niveaus, prestaties, toernooien, seizoenen — bestaat alleen voor leden die de 18+-poort halen (`volwassen()` in `server/kern/volwassen.js`: een eigen account, door RTG gekeurd — betrouwbaarheidsniveau A3, het identiteitsbewijs is gezien — én 18 of ouder). Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De Arena belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er bestaat geen ranglijst", en School houdt vast aan "leren is geen wedstrijd". De grens staat op één plek in de code (`progressieMag` in `server/kern/spellen/grens.js`, die `volwassen()` leest); nieuwe progressievormen hangen daaraan en krijgen geen eigen kopie van de regel. **Wat hier onder valt is de COMPETITIEVE laag — bewaren om te vergelijken of als stand te laten gelden — en niet een leerdossier** (besluit van 14 september 2026, uitgeschreven in `FOUNDATION.md` par. 5.5 en `SCHOOL.md` par. 11.1): de letterlijke lezing zou betekenen dat School van een kind niets vastlegt, en dat is niet de bescherming die deze grens bedoelt maar het tegenovergestelde. Een leerdossier mag op elke leeftijd bestaan zolang het over de persoon zelf gaat en nooit vergelijkt, geen blijvend niveau-label draagt, alleen leesbaar is voor de leerling en wie al een rechtmatige verhouding tot hem heeft, en aan de codenaam hangt; valt er een van die vier weg, dan geldt `progressieMag` weer. Let op de tweede helft: de gecontroleerde geboortedatum komt pas van het document als de keurder hem bij de goedkeuring overneemt (`server/routes/office/verificaties.js`). Doet hij dat niet, dan is de identiteit wél gezien maar staat de datum nog zoals het lid hem opgaf; RTG iD en de stempoort tonen dat verschil met `leeftijdBron`.
 - Geen nieuwe kleuren of fonts zonder de merkregels hierboven te checken
+- Geen nieuwe stijllaag: geen stijlblad, `<style>`-blok of `!important` buiten `public/ds/` (`npm run ontwerpsysteem:controle` zakt erop)
 - `server/data/` (database, sleutels) en `.env` nooit committen
 - Bij CSS-zoek-vervang: daarna clamp()/calc()-waarden en brace-balans controleren (eerder misgegaan)
 

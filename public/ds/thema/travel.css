@@ -1,0 +1,11 @@
+/* TravelOS: directioneel, verleidelijk: diepe wijn, bijna zwart, champagne
+   (HERITAGE.md par. 3). Een thema zet alleen tokens uit contract.themabaar. */
+@layer rtg.thema {
+  [data-rtg-world="travel"] {
+    --ds-accent: var(--ds-p-wijn);
+    --ds-accent-hover: var(--ds-p-wijn-hover);
+    --ds-metaal: var(--ds-p-goud);
+    --ds-cover-metaal: var(--ds-p-champagne);
+    --ds-focus: var(--ds-p-bordeaux-helder);
+  }
+}

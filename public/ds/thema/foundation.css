@@ -1,0 +1,11 @@
+/* FoundationOS: waardig, toegankelijk: nachtblauw, civiel goud, zacht wit
+   (HERITAGE.md par. 3). Een thema zet alleen tokens uit contract.themabaar. */
+@layer rtg.thema {
+  [data-rtg-world="foundation"] {
+    --ds-accent: var(--ds-p-nachtblauw);
+    --ds-accent-hover: var(--ds-p-nachtblauw-hover);
+    --ds-metaal: var(--ds-p-goud);
+    --ds-cover-metaal: var(--ds-p-champagne);
+    --ds-focus: var(--ds-p-nachtblauw-hover);
+  }
+}

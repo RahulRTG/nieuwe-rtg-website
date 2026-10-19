@@ -1,0 +1,14 @@
+/* Dialoog: een systeemlaag, dus herkenbaar rond (--ds-radius-systeem). */
+@layer rtg.component {
+  .ds-dialoog {
+    inline-size: min(100% - 2 * var(--ds-goot), 32rem);
+    padding: var(--ds-ruimte-8);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  .ds-dialoog::backdrop { background: var(--ds-glas); }
+  .ds-dialoog__acties { display: flex; gap: var(--ds-ruimte-3); justify-content: flex-end; margin-block-start: var(--ds-ruimte-6); }
+}

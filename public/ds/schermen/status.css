@@ -1,0 +1,8 @@
+/* Status: leeg, klaar, offline of fout. Ook dit is premium (HERITAGE.md
+   par. 2.5): een rustig beeld, één zin, één weg verder. */
+@layer rtg.scherm {
+  .ds-status { display: grid; align-content: center; justify-items: center; gap: var(--ds-ruimte-4); min-block-size: 100dvh; padding: var(--ds-ruimte-16) var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-16)); text-align: center; }
+  .ds-status__beeld { inline-size: min(100%, 22rem); aspect-ratio: 1; object-fit: cover; border-radius: var(--ds-radius-inhoud); }
+  .ds-status__titel { margin: var(--ds-ruimte-4) 0 0; font-family: var(--ds-letter-display); font-weight: 400; font-size: var(--ds-maat-kop); }
+  .ds-status__actie { inline-size: min(100%, 22rem); margin-block-start: var(--ds-ruimte-6); }
+}

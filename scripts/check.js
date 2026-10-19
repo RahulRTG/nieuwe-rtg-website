@@ -4721,6 +4721,10 @@ console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulev
   const mag = (v, rel) => {
     const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
     if (k === '0' || k === '0!important' || k === '50%' || k === '50%!important') return true;
+    /* public/ds/ heeft zijn eigen, strengere grens: alleen een --ds-radius-
+       token, nagelopen door scripts/ontwerpsysteem.js. Geen lijst per bestand
+       erbij, want juist die lijst hierboven groeide met elke nieuwe laag. */
+    if (rel.split(path.sep).join('/').startsWith('public/ds/')) return /^var\(--ds-radius-[a-z-]+\)$/.test(k);
     return HERITAGE.has(rel) && HERITAGE.get(rel).has(k);
   };
   const kapot = [];

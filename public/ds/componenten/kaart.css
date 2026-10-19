@@ -1,0 +1,27 @@
+/* Kaart: inhoud is vrijwel recht (--ds-radius-inhoud). Een beeldkaart
+   draagt zijn tekst op een sluier, nooit op het blote beeld. */
+@layer rtg.component {
+  .ds-kaart {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: var(--ds-oppervlak);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    color: inherit;
+    text-decoration: none;
+  }
+  .ds-kaart__beeld { inline-size: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: var(--ds-beeld-positie); }
+  .ds-kaart__inhoud { padding: var(--ds-ruimte-4); display: grid; gap: var(--ds-ruimte-1); }
+  .ds-kaart__titel { margin: 0; font-family: var(--ds-letter-display); font-weight: 400; font-size: 1.25rem; line-height: 1.2; }
+  .ds-kaart--beeld { border: 0; background: var(--ds-cover-grond); color: var(--ds-cover-inkt); }
+  .ds-kaart--beeld .ds-kaart__beeld { aspect-ratio: 16 / 9; }
+  .ds-kaart--beeld .ds-kaart__inhoud {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-cover-sluier);
+  }
+  .ds-kaart--beeld .ds-kaart__titel { font-size: 1.5rem; }
+  .ds-kaart:is(a, button):hover { border-color: var(--ds-inkt-zacht); }
+}

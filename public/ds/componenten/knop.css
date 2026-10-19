@@ -1,0 +1,30 @@
+/* Knop: één primaire actie per scherm (HERITAGE.md par. 2.6). De capsule is
+   een eigenaarsbesluit van 19 oktober 2026; de kleur komt uit het thema. */
+@layer rtg.component {
+  .ds-knop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-ruimte-2);
+    min-block-size: var(--ds-doel);
+    padding-inline: var(--ds-ruimte-6);
+    border: 1px solid transparent;
+    border-radius: var(--ds-radius-capsule);
+    font-family: var(--ds-letter-tekst);
+    font-size: var(--ds-maat-klein);
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--ds-duur-kort) var(--ds-curve), border-color var(--ds-duur-kort) var(--ds-curve);
+  }
+  .ds-knop--primair { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-knop--primair:hover { background: var(--ds-accent-hover); }
+  .ds-knop--stil { background: transparent; color: var(--ds-inkt); border-color: var(--ds-lijnkleur); }
+  .ds-knop--stil:hover { border-color: var(--ds-inkt); }
+  .ds-knop--op-beeld { background: transparent; color: var(--ds-cover-inkt); border-color: var(--ds-cover-metaal); }
+  .ds-knop--breed { inline-size: 100%; }
+  .ds-knop[disabled], .ds-knop[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+  .ds-knop__pijl { inline-size: 16px; block-size: 16px; }
+  [dir="rtl"] .ds-knop__pijl { transform: scaleX(-1); }
+}

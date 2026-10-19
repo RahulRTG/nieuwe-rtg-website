@@ -25,8 +25,13 @@ const L = require('../scripts/lib/agentinstructies');
 const BESTEMMINGEN = ['CLAUDE.md', 'AGENTS.md', 'DOCUMENTENKAART.md'];
 /* Ratel: wat Claude Code bij de start laadt (CLAUDE.md plus imports) mag niet
    groeien boven deze maat. Gemeten op 17.697 bytes; omhoog alleen met een reden
-   in de commit, en nooit door de kaart terug in de import te zetten. */
-const MAX_START_BYTES = 18000;
+   in de commit, en nooit door de kaart terug in de import te zetten.
+   18000 -> 18500 op 19 oktober 2026: het eigenaarsbesluit van ONTWERPSYSTEEM.md
+   (geen stijllaag buiten public/ds/, capsule en wereldaccent via tokens, mensen
+   in beeld) moet bij de START staan, want een agent die het pas in de kaart
+   leest heeft zijn <style>-blok al geschreven. Vier regels, de rest in de kaart.
+   Blokken 99 en 103 van de inventaris kregen daarom een nieuwe hash. */
+const MAX_START_BYTES = 18500;
 const MAX_CLAUDE_BYTES = 1000;
 
 const tekst = (b) => fs.readFileSync(path.join(L.WORTEL, b), 'utf8');

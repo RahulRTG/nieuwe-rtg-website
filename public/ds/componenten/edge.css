@@ -1,0 +1,40 @@
+/* Edge: de enige vaste systeemschil (HERITAGE.md par. 2.7), met Rahul in het
+   midden. Dit component draagt alleen de VORM; het gedrag blijft in de
+   bestaande Edge-runtime en wordt hier niet gekopieerd. */
+@layer rtg.component {
+  .ds-edge {
+    position: fixed;
+    inset-inline: var(--ds-ruimte-3);
+    inset-block-end: max(var(--ds-ruimte-3), env(safe-area-inset-bottom));
+    z-index: 20;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-items: center;
+    max-inline-size: 40rem;
+    min-block-size: var(--ds-edge-hoogte);
+    margin-inline: auto;
+    padding-inline: var(--ds-ruimte-2);
+    background: var(--ds-glas);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+    color: var(--ds-cover-inkt);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
+  .ds-edge__knop {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    min-block-size: var(--ds-doel);
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: 500 .6875rem / 1 var(--ds-letter-tekst);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ds-edge__knop svg { inline-size: 20px; block-size: 20px; }
+  .ds-edge__rahul { color: var(--ds-cover-metaal); }
+  .ds-edge__rahul svg { inline-size: 36px; block-size: 36px; }
+}

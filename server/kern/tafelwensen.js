@@ -40,8 +40,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
 
   /* De veertien wettelijke allergenen, plus de dieetwensen die een keuken
      in de praktijk net zo hard nodig heeft. */
-  const ALLERGENEN = ['gluten', 'schaaldieren', 'eieren', 'vis', 'pinda', 'noten', 'soja', 'melk',
-    'selderij', 'mosterd', 'sesam', 'sulfiet', 'lupine', 'weekdieren'];
+  const { ALLERGENEN } = require('./allergenen');
   const WENSEN = ['vegetarisch', 'veganistisch', 'halal', 'koosjer', 'glutenvrij', 'lactosevrij',
     'zoutarm', 'suikervrij', 'geen alcohol', 'geen varkensvlees', 'geen rauw'];
 

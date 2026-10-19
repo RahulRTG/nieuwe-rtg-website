@@ -46,6 +46,16 @@ async function loop(w, stap) {
     return { klopt: rs.every((r) => r.status === 200) && e.gastenAantal === 3 && !!b && b.dieet === 'vegetarisch', ziet: e.gastenAantal + ' gasten, Gast B: ' + (b && b.dieet) };
   });
 
+  await stap('voltooibaar', 'een allergeen kiest het lid uit de EU-lijst en het lid ziet tot wanneer het bewaard blijft; een code buiten de lijst wordt geweigerd met de reden', async () => {
+    const r = await w.post(GAST, { eventId: diner.id, naam: 'Gast D', allergenen: ['noten'] }, T);
+    const fout = await w.post(GAST, { eventId: diner.id, naam: 'Gast E', allergenen: ['aardbei'] }, T);
+    const e = await ev('Diner ' + merk);
+    const d = (e.gasten || []).find((g) => g.naam === 'Gast D');
+    const x = d ? await w.post(GAST_WEG, { eventId: diner.id, gastId: d.id }, T) : { status: 0 };
+    return { klopt: r.status === 200 && !!d && d.allergenen.join() === 'noten' && d.dieetTot === dag(13) && fout.status === 400 && /lijst/.test((fout.data && fout.data.error) || '') && x.status === 200,
+      ziet: 'Gast D: ' + (d && d.allergenen.join()) + ' t/m ' + (d && d.dieetTot) + '; aardbei: ' + fout.status + ' (' + (fout.data && fout.data.error) + ')' };
+  });
+
   await stap('voltooibaar', 'de tafelindeling en een dieet wijzigen bij een bestaande gast; de rest blijft staan', async () => {
     const e0 = await ev('Diner ' + merk);
     const a = e0.gasten.find((g) => g.naam === 'Gast A');

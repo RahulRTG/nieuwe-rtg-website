@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2903 bestanden en 19837 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2904 bestanden en 19843 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2903 |
-| losse beweringen (`test(...)`) | 19837 |
+| toetsbestanden | 2904 |
+| losse beweringen (`test(...)`) | 19843 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 83 |
+| niets van beide | 84 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2555 bestanden, 19251 beweringen.
+2556 bestanden, 19257 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2192,6 +2192,7 @@ toets omvalt.
 | `taaloordeel.test.js` | 4 | gezakt op `===->!==#3` | Het sprekersregister: het enige dat "ongemeten" in "gemeten" verandert. Twee dingen worden hier hard gemaakt, en de tweede is de belangrijkste: 1. |
 | `taalschil.test.js` | 9 | gezakt op `!==->===#0` | DE TAALSCHIL: werkt een taal werkelijk zonder netwerk? Het gat dat deze laag dicht is GEMETEN en niet vermoed. |
 | `taalschrift.test.js` | 6 | gezakt op `&&->||#0` | Het schriftregister: in welk schrift hoort een taal geschreven te zijn? De toewijzingen in server/taalschrift.js zijn een BEWERING. |
+| `table-dieet.test.js` | 6 | -- | TABLE: ALLERGIE EN DIEET VAN EEN DERDE (domeinkaart LivingOS-B, Table T2/T3; besluit van de integrator van 19 oktober 2026). Een allergie of een medisch dieet is een gezondheidsgegeven (art. |
 | `tafeldek.test.js` | 4 | gezakt op `liegpoort /api/` | De gedekte tafel (kern/tafeldek.js): wijst de zaak een tafel toe aan een bevestigde reservering, dan staat het gedeelde zorgprofiel van de gast als stoel 1 op de tafellijst (kern/tafelwensen.js) -- codenaam,... |
 | `tafelproef.test.js` | 9 | geen module gevonden | DE TAFELPROEF (scripts/tafelproef.js) -- de eerste gouden keten. MAATSTAF.md par. |
 | `tafelticket.test.js` | 3 | gezakt op `liegpoort /api/` | Tafelticket: de bonnen van dezelfde tafel op EEN gezegeld ticket, en in EEN keer afrekenen aan de kassa. Getoetst: het samenvoegen (uitsplitsing per gast + totaal + zegel), en de ingebouwde beveiliging: een... |

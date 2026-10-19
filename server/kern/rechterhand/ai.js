@@ -23,7 +23,15 @@ module.exports = ({ api, anthropic, schoon }) => {
   function contextVan(app, key) {
     if (app === 'reisboek') { const d = api.reizen(key); const v = d.reizen.find(r => r.komend) || d.reizen[0]; return 'Reizen in het boek: ' + d.reizen.length + (v ? '. Eerstvolgende: ' + v.naam + (v.bestemming ? ' (' + v.bestemming + ')' : '') : '') + '. Documenten die aandacht vragen: ' + d.attenties.length + '.'; }
     if (app === 'cellier') { const d = api.cellier(key); return 'Kelder: ' + d.totaalFlessen + ' flessen, ' + d.opDronk + ' nu op dronk, kelderwaarde ' + euro(d.kelderwaarde) + '.'; }
-    if (app === 'table') { const d = api.tables(key); const e = d.events.find(x => x.komend) || d.events[0]; return 'Gelegenheden: ' + d.events.length + (e ? '. Eerstvolgende: ' + e.naam + ' met ' + e.gastenAantal + ' gasten' + (e.gasten || []).filter(g => g.dieet).map(g => ' (' + g.naam + ': ' + g.dieet + ')').join('') : '') + '.'; }
+    /* Allergie en dieet zijn gezondheidsgegevens van een gast (kern/rechterhand/table.js):
+       de maître krijgt een telling per allergeen, nooit een naam of de vrije aanvulling. */
+    if (app === 'table') { const d = api.tables(key); const e = d.events.find(x => x.komend) || d.events[0];
+      const tel = {}; let aanvulling = 0;
+      for (const g of (e && e.gasten) || []) { for (const a of g.allergenen || []) tel[a] = (tel[a] || 0) + 1; if (g.dieet) aanvulling++; }
+      const allergie = Object.keys(tel).map(a => a + ' ' + tel[a]).join(', ');
+      return 'Gelegenheden: ' + d.events.length + (e ? '. Eerstvolgende: ' + e.naam + ' met ' + e.gastenAantal + ' gasten' +
+        (allergie ? '. Allergenen aan tafel (aantal gasten, zonder namen): ' + allergie : '') +
+        (aanvulling ? '. ' + aanvulling + ' gast(en) met een eigen dieetwens; die staat in Table, niet hier' : '') : '') + '.'; }
     if (app === 'garderobe') { const d = api.garderobe(key); const top = Object.entries(d.perCategorie).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => k + ' (' + n + ')').join(', '); return 'Garderobe: ' + d.aantal + ' stuks' + (top ? ', vooral ' + top : '') + '. Vaklui: ' + d.vaklui.length + '.'; }
     if (app === 'mecenaat') { const d = api.mecenaat(key); return 'Filantropie: ' + d.giften.length + ' giften, betaald ' + euro(d.betaald) + ', toegezegd ' + euro(d.toegezegd) + ', via de RTFoundation ' + euro(d.viaFoundation) + '.'; }
     if (app === 'nalatenschap') { const d = api.nalatenschap(key); return 'Nalatenschap: ' + d.documenten.length + ' documenten, ' + d.contacten.length + ' vertrouwenspersonen, ' + d.wensen.length + ' vastgelegde wensen. (De inhoud is versleuteld; ik ken alleen de aantallen en de titels.)'; }

@@ -38,6 +38,11 @@
   .item:first-child{border-top:0;}
   .item .b{flex:1;min-width:0;}
   .item .b small{color:var(--soft);}
+  .allergenen{border:0;padding:0;margin:.6rem 0 0;display:flex;flex-wrap:wrap;gap:.35rem .9rem;font-size:.86rem;}
+  .allergenen .lbl{width:100%;}
+  .allergenen label{display:inline-flex;align-items:center;gap:.35rem;}
+  .allergenen input{margin:0;}
+  .uitleg{font-size:.82rem;color:var(--soft);line-height:1.5;margin:.2rem 0 .6rem;}
   .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:0;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
   .weg:hover{border-color:var(--gold);color:var(--txt);}
   .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
@@ -85,11 +90,11 @@ const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
-const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const api=(pad,body)=>fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de maître</h2><div style="display:flex;gap:.5rem;"><input class="veld h-flex1" id="aiV" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" class="s-44g4pt"></div></div>';
-function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('/api/member/rechterhand/ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 let open=null, DATA=null;
 /* Meenemen (shared/uitvoer.js): uit het eigen model, veld voor veld. Staat er
    een gelegenheid open, dan neemt u die gastenlijst mee -- anders het
@@ -98,8 +103,8 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
   if(!DATA||!DATA.events) return null;
   const e=open?DATA.events.find(x=>x.id===open):null;
   if(e) return { naam:'gasten',
-    kolommen:['gelegenheid','datum','gast','tafel','dieet','notitie'],
-    rijen:(e.gasten||[]).map(g=>[e.naam||'', e.datum||'', g.naam||'', g.tafel||'', g.dieet||'', g.notitie||'']) };
+    kolommen:['gelegenheid','datum','gast','tafel','allergenen','dieet','notitie'],
+    rijen:(e.gasten||[]).map(g=>[e.naam||'', e.datum||'', g.naam||'', g.tafel||'', (g.allergenen||[]).join(', '), g.dieet||'', g.notitie||'']) };
   return { naam:'gelegenheden',
     kolommen:['naam','datum','tijd','locatie','gasten','gangen','notitie'],
     rijen:DATA.events.map(x=>[x.naam||'', x.datum||'', x.tijd||'', x.locatie||'',
@@ -107,7 +112,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 });
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('table'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.events))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
+  let d; try{ d=await api('/api/member/rechterhand/table'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.events))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
   DATA=d;
   if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
   let h='<div class="deel">Nieuwe gelegenheid</div><div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij h-mt40"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div class="h-mt60"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
@@ -115,23 +120,29 @@ async function laad(){
   h+= d.events.length ? d.events.map(e=>'<div class="kaart ev" data-id="'+e.id+'"><div class="nm">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie),e.gastenAantal+' gasten'].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen gelegenheden.</div></div>';
   h+='<div class="deel">De maître</div>'+AIBOX('Bijv. stel een menu voor zes gasten voor');
   $('#main').innerHTML=h;
-  $('#nDoe').onclick=async()=>{ const naam=$('#nN').value.trim(); if(!naam) return meld('Geef de gelegenheid een naam.'); try{ await api('table/zet',{naam,datum:$('#nD').value,tijd:$('#nT').value,locatie:$('#nL').value}); laad(); }catch(e){ meld(e.message); } };
+  $('#nDoe').onclick=async()=>{ const naam=$('#nN').value.trim(); if(!naam) return meld('Geef de gelegenheid een naam.'); try{ await api('/api/member/rechterhand/table/zet',{naam,datum:$('#nD').value,tijd:$('#nT').value,locatie:$('#nL').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('.ev').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
   bindAi('table');
 }
 function detail(e){
   let h='<div class="kaart"><div class="nm s-11a745m">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie)].filter(Boolean).join(' · ')+'</div><div style="margin-top:0.75rem;display:flex;gap:.5rem;"><button class="knop stil" id="terug">← alle gelegenheden</button><button class="knop stil s-1ruj7wa" id="evWeg">Verwijderen</button></div></div>';
-  h+='<div class="kaart"><h2>Gasten</h2>'+((e.gasten||[]).length?e.gasten.map(g=>'<div class="item"><div class="b"><b>'+esc(g.naam)+'</b> <small>'+[g.tafel?'tafel '+esc(g.tafel):'',esc(g.dieet),esc(g.notitie)].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-gast="'+g.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen gasten.</div>')
-    +'<div class="rij h-mt60"><input class="veld" id="gN" placeholder="naam"><input class="veld" id="gT" placeholder="tafel"><input class="veld" id="gDi" placeholder="dieet"></div><div class="h-mt50"><button class="knop stil" id="gAdd">+ gast</button></div></div>';
+  /* Allergie en dieet zijn gezondheidsgegevens van de gast (kern/rechterhand/table.js): de
+     veertien van bijlage II als keuze, een korte aanvulling, en het lid ziet tot wanneer. */
+  const ALG=(DATA&&DATA.allergenen)||[], dagen=(DATA&&DATA.dieetDagen)||30;
+  h+='<div class="kaart"><h2>Gasten</h2><p class="uitleg">Een allergie of dieet is een gezondheidsgegeven van uw gast. Alleen u ziet het per gast; de maître ziet uitsluitend aantallen, zonder namen. Wij wissen het de dag na de gelegenheid'+(e.datum?'':' (deze gelegenheid heeft geen datum: '+dagen+' dagen na invoer)')+'. De gast zelf blijft op uw lijst.</p>'
+    +((e.gasten||[]).length?e.gasten.map(g=>'<div class="item"><div class="b"><b>'+esc(g.naam)+'</b> <small>'+[g.tafel?'tafel '+esc(g.tafel):'',(g.allergenen||[]).map(esc).join(', '),esc(g.dieet),esc(g.notitie),g.dieetTot?'bewaard t/m '+dt(g.dieetTot):''].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-gast="'+g.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen gasten.</div>')
+    +'<div class="rij h-mt60"><input class="veld" id="gN" placeholder="naam"><input class="veld" id="gT" placeholder="tafel"><input class="veld" id="gDi" maxlength="80" placeholder="aanvulling, bijv. vegetarisch"></div>'
+    +'<div class="allergenen" role="group" aria-labelledby="algKop"><span class="lbl" id="algKop">Allergenen (EU-lijst)</span>'+ALG.map(a=>'<label><input type="checkbox" data-allergeen="'+esc(a)+'"> '+esc(a)+'</label>').join('')+'</div>'
+    +'<div class="h-mt50"><button class="knop stil" id="gAdd">+ gast</button></div></div>';
   h+='<div class="kaart"><h2>Menu</h2>'+((e.menu||[]).length?e.menu.map(m=>'<div class="item"><div class="b"><small>'+esc(m.gang)+'</small> <b>'+esc(m.gerecht)+'</b>'+(m.wijn?' <small>· '+esc(m.wijn)+'</small>':'')+'</div><button class="weg" data-menu="'+m.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen menu.</div>')
     +'<div class="rij h-mt60"><input class="veld" id="mG" placeholder="gang"><input class="veld" id="mGe" placeholder="gerecht"><input class="veld" id="mW" placeholder="wijn"></div><div class="h-mt50"><button class="knop stil" id="mAdd">+ gerecht</button></div></div>';
   $('#main').innerHTML=h;
   $('#terug').onclick=()=>{ open=null; laad(); };
-  $('#evWeg').onclick=async()=>{ if(!confirm('Deze gelegenheid verwijderen?'))return; try{ await api('table/weg',{id:e.id}); open=null; laad(); }catch(x){ meld(x.message); } };
-  $('#gAdd').onclick=async()=>{ const naam=$('#gN').value.trim(); if(!naam) return meld('Naam van de gast?'); try{ await api('table/gast',{eventId:e.id,naam,tafel:$('#gT').value,dieet:$('#gDi').value}); laad(); }catch(x){ meld(x.message); } };
-  $('#mAdd').onclick=async()=>{ const g=$('#mGe').value.trim(); if(!g) return meld('Welk gerecht?'); try{ await api('table/menu',{eventId:e.id,gang:$('#mG').value,gerecht:g,wijn:$('#mW').value}); laad(); }catch(x){ meld(x.message); } };
-  document.querySelectorAll('[data-gast]').forEach(b=> b.onclick=async()=>{ try{ await api('table/gast/weg',{eventId:e.id,gastId:b.dataset.gast}); laad(); }catch(x){ meld(x.message); } });
-  document.querySelectorAll('[data-menu]').forEach(b=> b.onclick=async()=>{ try{ await api('table/menu/weg',{eventId:e.id,itemId:b.dataset.menu}); laad(); }catch(x){ meld(x.message); } });
+  $('#evWeg').onclick=async()=>{ if(!confirm('Deze gelegenheid verwijderen?'))return; try{ await api('/api/member/rechterhand/table/weg',{id:e.id}); open=null; laad(); }catch(x){ meld(x.message); } };
+  $('#gAdd').onclick=async()=>{ const naam=$('#gN').value.trim(); if(!naam) return meld('Naam van de gast?'); try{ await api('/api/member/rechterhand/table/gast',{eventId:e.id,naam,tafel:$('#gT').value,dieet:$('#gDi').value,allergenen:[...document.querySelectorAll('[data-allergeen]:checked')].map(x=>x.dataset.allergeen)}); laad(); }catch(x){ meld(x.message); } };
+  $('#mAdd').onclick=async()=>{ const g=$('#mGe').value.trim(); if(!g) return meld('Welk gerecht?'); try{ await api('/api/member/rechterhand/table/menu',{eventId:e.id,gang:$('#mG').value,gerecht:g,wijn:$('#mW').value}); laad(); }catch(x){ meld(x.message); } };
+  document.querySelectorAll('[data-gast]').forEach(b=> b.onclick=async()=>{ try{ await api('/api/member/rechterhand/table/gast/weg',{eventId:e.id,gastId:b.dataset.gast}); laad(); }catch(x){ meld(x.message); } });
+  document.querySelectorAll('[data-menu]').forEach(b=> b.onclick=async()=>{ try{ await api('/api/member/rechterhand/table/menu/weg',{eventId:e.id,itemId:b.dataset.menu}); laad(); }catch(x){ meld(x.message); } });
 }
 laad();
 </script>

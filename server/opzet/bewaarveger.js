@@ -22,6 +22,8 @@ module.exports = function sluitBewaarvegerAan(deps) {
      afgewezen bewijs als vangnet). Draait elk uur en een keer bij de start. */
   const bewaarveger = require('../bewaarveger').maakBewaarveger({
     db, save, accounts, log, radarVeeg, sosVeeg, leidingVeeg,
+    // de klok van het huis (lib/klok): zonder RTG_KLOK precies Date.now(), met RTG_KLOK te verzetten
+    nu: require('../lib/klok').nu,
     identiteitsmap: require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR),
     /* TOT WANNEER IS DIT LIDMAATSCHAP BETAALD? Elke maandtermijn draagt zijn
        eigen vervaldatum (het begin van de maand die hij dekt), dus de dekking

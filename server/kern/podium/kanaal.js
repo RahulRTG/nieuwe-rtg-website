@@ -106,7 +106,7 @@ module.exports = (ctx) => {
     herstelBoom(k);                                  // wezen van vertrokken kijkers eerst herstellen
     if (nieuw || !k.boom[key]) koppel(k, key);       // hang deze kijker in de boom en laat zijn ouder aanbieden
     save();
-    return { status: 200, ok: true, kanaal: kijkBeeld(k, key), chat: (P.bak('podiumChat')[k.id] || []).slice(-40), ouder: k.boom[key].ouder };
+    return { status: 200, ok: true, kanaal: kijkBeeld(k, key), chat: (P.bak('podiumChat')[k.id] || []).slice(-40).map(({ idem, ...r }) => r), ouder: k.boom[key].ouder };
   }
   function weg(key, kid) {
     const k = kanaalMet(kid); if (!k) return { status: 200, ok: true };

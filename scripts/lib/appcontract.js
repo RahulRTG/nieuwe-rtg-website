@@ -329,6 +329,39 @@ const CONTRACT = {
   'link:berichten': Object.assign({
     belofte: 'een lid begint een gesprek met iemand die het kent, stuurt, antwoordt, wijzigt en trekt in, en de ander ziet precies dat; wie niet in het gesprek zit leest en schrijft niets'
   }, voltooi('berichten', 'het scenario loopt /api/comm/begin, /stuur, /inbox, /gesprek, /lees, /reactie, /wijzig en /wis, de routes die /apps/comm.html zelf aanroept, met een verbonden tweede lid en een derde dat buiten blijft')),
+  'link:vonk': Object.assign({
+    belofte: 'een gekeurd volwassen lid krijgt een eindige selectie van wederzijds passende mensen, en pas bij wederzijdse interesse een chat en een tafel die beiden vooraf betalen en de zaak bevestigt'
+  }, voltooi('vonk', 'het scenario loopt /api/vonk/profiel, /selectie, /like, /edge, /bericht, /mijn, /betaal en /blokkeer, de routes die /apps/vonk.html zelf aanroept, met twee gekeurde leden, de simulatiebank en de zaak die bevestigt')),
+  'link:theater': Object.assign({
+    belofte: 'een lid met een door het kantoor goedgekeurd kanaal zet een film in de zaal, byte voor byte; een ander lid kijkt met een kijkticket, spoelt, reageert, abonneert en meldt'
+  }, voltooi('theater', 'het scenario loopt /api/theater/zaal, /kanaal/aanmeld, /video/maak, /upload/:id, /kijk/:id met /api/stroom/ticket, /reactie, /reacties, /abonneer en /meld, de routes die /apps/theater.html zelf aanroept, met een tweede lid als kijker')),
+  'link:spelavond': Object.assign({
+    belofte: 'een speler koppelt met een eenmalige code een televisie aan het potje, en die toont vanaf dan elke zet -- alleen wat publiek is, met een eigen schermsessie die geen ledensessie is'
+  }, voltooi('spelavond', 'het scenario loopt /api/projectie/koppel en /api/projectie/kijk, de routes die /apps/spelscherm.html zelf aanroept, met twee spelers die het potje en de code maken langs /api/member/spel/*')),
+  'link:vooruitzicht': Object.assign({
+    belofte: 'een lid legt een intentie vast, verkent routes en geeft de voorbereiding vrij, en het vooruitzicht toont uitsluitend wat een bron gaf -- geen providerstatus die niemand bevestigde'
+  }, voltooi('vooruitzicht', 'het scenario loopt /api/instant-reality, /event en /partner en de acht bronnen die /apps/living-os.html ernaast leest, met een tweede lid dat zijn eigen vooruitzicht houdt')),
+  'link:krant': Object.assign({
+    belofte: 'een lid leest de kranten die nieuwsbedrijven binnen RTG publiceren, met de correcties die de redactie openbaar maakte; een concept of teruggehaald artikel bestaat voor de lezer niet'
+  }, voltooi('krant', 'het scenario loopt /api/krant/gids, /open en /artikel, de routes die /apps/krant.html zelf aanroept, met de redactie van een nieuwszaak die schrijft, publiceert, corrigeert en terughaalt')),
+  'link:podium': Object.assign({
+    belofte: 'een lid met een door het kantoor goedgekeurd kanaal gaat live; een kijker vindt het, kijkt mee, chat, stuurt een cadeau via RTG Pay en meldt, en de maker blokkeert wie over de schreef gaat'
+  }, voltooi('podium', 'het scenario loopt /api/podium/kanalen, /mijn, /kanaal/aanmeld, /live, /kijk, /chat, /cadeau, /blokkeer en /meld, de routes die /apps/podium.html zelf aanroept, met een gekeurde kijker die over de simulatiebank oplaadt')),
+  'link:huis': Object.assign({
+    belofte: 'een lid zet zijn huis open, een ander lid vindt en vraagt het aan zonder dat er iets wordt afgeschreven, de host beslist, en het verblijf loopt van inchecken tot review; een bezette periode blijft bezet'
+  }, voltooi('huis', 'het scenario loopt /api/thuis/huis, /huizen, /zoek, /detail, /boek, /bord, /beslis, /mijn, /checkin, /checkuit, /bericht, /review en /reviews, de routes die /apps/thuis.html zelf aanroept, met een host, een gast en een derde lid')),
+  'link:leven': Object.assign({
+    belofte: 'een lid ziet op zijn lijn alleen wat hij zelf ergens vastlegde en wat deze week speelt, zonder knop die iets voor hem doet, en niemand anders ziet het'
+  }, voltooi('leven', 'het scenario loopt /api/leven/cockpit, /api/foodcourt en /api/uitgaan, de routes die /apps/leven.html zelf aanroept, met een afspraak uit de eigen agenda en een tweede lid')),
+  'link:horeca': {
+    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
+    voltooibaar: {
+      soort: 'ketenproef',
+      register: 'TAFELPROEF.json',
+      instrument: 'scripts/tafelproef.js',
+      waarom: 'de tafelproef loopt exact die stroom over /api/supplier/horeca/*, de routes die /apps/horeca.html zelf aanroept'
+    }
+  },
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
      link:connect is /apps/connect.html, dat acht /api/connect-routes met de proef

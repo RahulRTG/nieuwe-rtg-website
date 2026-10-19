@@ -86,7 +86,12 @@ const EIGEN = [
   '/api/labfonds/doneer',
   '/api/labfonds/voorstel/maak',
   '/api/rtf/labfonds/doneer',
-  '/api/rtf/labfonds/voorstel/maak'
+  '/api/rtf/labfonds/voorstel/maak',
+  '/api/vonk/bericht',
+  '/api/theater/reactie',
+  '/api/thuis/huis',
+  '/api/rtf/bericht',
+  '/api/groothandel/bestel'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

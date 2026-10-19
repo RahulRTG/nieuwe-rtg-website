@@ -29,7 +29,7 @@ module.exports = (kern) => {
   app.post('/api/thuis/berichten', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisBerichten(cn(req), req.body.ref)); });
 
   // host (lid): aanbod, kalender, co-hosts, prijsadvies, aanvragen, dashboard
-  app.post('/api/thuis/huis', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisHuisZet(cn(req), req.body.huis || {}, req.body.id ? String(req.body.id) : null)); });
+  app.post('/api/thuis/huis', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisHuisZet(cn(req), req.body.huis || {}, req.body.id ? String(req.body.id) : null, req.body.idem)); });
   app.post('/api/thuis/huizen', auth, (req, res) => { if (gast(req, res)) return; res.json(thuis.thuisMijnHuizen(cn(req))); });
   app.post('/api/thuis/blokkeer', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisBlokkeer(cn(req), String(req.body.id || ''), req.body.van, req.body.tot, req.body.weg === true)); });
   app.post('/api/thuis/cohost', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisCoHost(cn(req), String(req.body.id || ''), req.body.wie, req.body.weg === true)); });

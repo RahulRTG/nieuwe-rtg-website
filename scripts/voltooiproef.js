@@ -100,9 +100,12 @@ const SCENARIOS = {
   'geldcommand.js': require('./lib/voltooi/geldcommand'),
   'hangar.js': require('./lib/voltooi/hangar'),
   'horeca.js': require('./lib/voltooi/horeca'),
+  'huis.js': require('./lib/voltooi/huis'),
   'ik.js': require('./lib/voltooi/ik'),
+  'krant.js': require('./lib/voltooi/krant'),
   'kwesties.js': require('./lib/voltooi/kwesties'),
   'labfonds.js': require('./lib/voltooi/labfonds'),
+  'leven.js': require('./lib/voltooi/leven'),
   'logboek.js': require('./lib/voltooi/logboek'),
   'loonstrook.js': require('./lib/voltooi/loonstrook'),
   'loopbaan.js': require('./lib/voltooi/loopbaan'),
@@ -122,6 +125,7 @@ const SCENARIOS = {
   'office.js': require('./lib/voltooi/office'),
   'partnernetwerk.js': require('./lib/voltooi/partnernetwerk'),
   'pay.js': require('./lib/voltooi/pay'),
+  'podium.js': require('./lib/voltooi/podium'),
   'post.js': require('./lib/voltooi/post'),
   'projectroom.js': require('./lib/voltooi/projectroom'),
   'pulse.js': require('./lib/voltooi/pulse'),
@@ -138,7 +142,9 @@ const SCENARIOS = {
   'sessies.js': require('./lib/voltooi/sessies'),
   'sitemaker.js': require('./lib/voltooi/sitemaker'),
   'stad.js': require('./lib/voltooi/stad'),
+  'spelavond.js': require('./lib/voltooi/spelavond'),
   'table.js': require('./lib/voltooi/table'),
+  'theater.js': require('./lib/voltooi/theater'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),
   'vandaag.js': require('./lib/voltooi/vandaag'),
   'veilig.js': require('./lib/voltooi/veilig'),
@@ -149,7 +155,10 @@ const SCENARIOS = {
   'wonen.js': require('./lib/voltooi/wonen'),
   'wbw.js': require('./lib/voltooi/wbw'),
   'werkos.js': require('./lib/voltooi/werkos'),
-  'vluchten.js': require('./lib/voltooi/vluchten')
+  'vluchten.js': require('./lib/voltooi/vluchten'),
+  'vonk.js': require('./lib/voltooi/vonk'),
+  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht'),
+  'werkos.js': require('./lib/voltooi/werkos')
 };
 
 function scenarios(alleen) {

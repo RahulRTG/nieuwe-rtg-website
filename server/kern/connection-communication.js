@@ -77,12 +77,19 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
       storageRevision: (Consent.record(r.consent, b) || {}).revision || null });
     return communicationStatus(actor, input);
   }
-  function sendText(actor, input, value) {
+  /* `idem` (19 oktober 2026): een dubbele tik of een herhaling na een
+     afgebroken verbinding plaatste het bericht twee keer (voltooiproef Vonk).
+     Dezelfde sleutel van dezelfde afzender in dit gesprek is hetzelfde
+     bericht, ook na een herstart: hij staat op het bericht zelf. */
+  function sendText(actor, input, value, idem) {
     const c = context(actor, input); if (!c) return { status: 404, error: 'Dit gesprek bestaat niet.' };
     const text = schoon(value, 1200); if (!text) return { status: 400, error: 'Schrijf eerst een bericht.' };
+    const sleutel = typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
+    if (sleutel && root().messages.some(x => x.product === product && x.scope === c.scope && x.pair === c.pair &&
+      x.from === actor && x.idempotencyKey === sleutel)) return { status: 200, ok: true, herhaald: true };
     if (!limit(actor, 'message', 40, 60000)) return { status: 429, error: 'Wacht even voordat u opnieuw verstuurt.' };
     root().messages.push({ id: id('ccm'), product, scope: c.scope, pair: c.pair, from: actor,
-      to: c.counterpart, kind: 'text', text, at: now() });
+      to: c.counterpart, kind: 'text', text, at: now(), ...(sleutel ? { idempotencyKey: sleutel } : {}) });
     root().messages = root().messages.slice(-10000); save(); ping(c.counterpart, 'message', c.scope);
     return { status: 200, ok: true };
   }

@@ -46,6 +46,34 @@ test('een host zet zijn huis live; rommel wordt geweigerd', async () => {
   assert.ok(instantId);
 });
 
+/* De voltooiproef van Logeren bij leden (scripts/lib/voltooi/huis.js, 19 oktober
+   2026): een dubbele tik op "opslaan" zette een nieuw huis er twee keer neer.
+   Met de herhaalsleutel die het scherm meestuurt, is het een huis. */
+test('dezelfde herhaalsleutel bij een nieuw huis is een huis, een nieuwe sleutel een tweede', async () => {
+  const lijf = { idem: 'toets-thuis-huis-1', huis: { titel: 'Dubbeltikhuis', plaats: 'Ibiza', prijs: 80, maxGasten: 2 } };
+  const [a, b] = await Promise.all([api('/api/thuis/huis', lijf, host.token), api('/api/thuis/huis', lijf, host.token)]);
+  assert.equal(a.status, 200); assert.equal(b.status, 200);
+  assert.equal(a.body.huis.id, b.body.huis.id, 'hetzelfde huis');
+  const nog = await api('/api/thuis/huis', Object.assign({}, lijf, { idem: 'toets-thuis-huis-2' }), host.token);
+  const mijn = (await api('/api/thuis/huizen', {}, host.token)).body.huizen.filter(h => h.titel === 'Dubbeltikhuis');
+  assert.equal(mijn.length, 2, 'een nieuwe sleutel is een bewust tweede huis');
+  for (const h of mijn) await api('/api/thuis/huis', { id: h.id, huis: { titel: 'Dubbeltikhuis', plaats: 'Ibiza', live: false } }, host.token);
+  assert.ok(nog.body.huis.id);
+});
+
+/* En na een crash: de antwoordkas in het geheugen is dan leeg, en alleen de
+   kern kan de herhaling nog herkennen, omdat de sleutel op het huis zelf staat.
+   Twee keer het domein op dezelfde gegevens -- precies wat een herstart doet. */
+test('na een herstart is dezelfde herhaalsleutel nog steeds hetzelfde huis', () => {
+  const crypto = require('crypto');
+  const maak = (data) => require('../server/kern/thuis')({ db: { data }, save: () => {}, crypto,
+    schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200), reiswijzer: null, landVind: () => null, findSupplier: () => null, LANDEN: {} });
+  const data = {};
+  const eerst = maak(data).thuis.thuisHuisZet('Gastheer', { titel: 'Na de storing', plaats: 'Ibiza' }, null, 'sleutel-1');
+  const na = maak(JSON.parse(JSON.stringify(data))).thuis.thuisHuisZet('Gastheer', { titel: 'Na de storing', plaats: 'Ibiza' }, null, 'sleutel-1');
+  assert.equal(na.huis.id, eerst.huis.id);
+});
+
 test('zoeken: filters werken en het eigen huis staat er voor de host niet tussen', async () => {
   const alles = await api('/api/thuis/zoek', { plaats: 'ibiza', gasten: 2 }, gastLid.token);
   assert.equal(alles.body.huizen.length, 2, 'de gast ziet beide huizen');

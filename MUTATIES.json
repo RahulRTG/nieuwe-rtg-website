@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T08:42:50.622Z",
-    "commit": "2404c5fb",
+    "op": "2026-10-19T09:45:54.136Z",
+    "commit": "edf04c76",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6957,6 +6957,14 @@
       "module": "server/kern/hospitality-universe/world-model.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "hotels-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/hotels-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "housekeeping.test.js": {

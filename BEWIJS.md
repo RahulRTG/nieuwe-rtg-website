@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2826 |
 | losse beweringen (`test(...)`) | 19573 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2635 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2636 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 9 |
+| niets van beide | 8 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2639,7 +2639,7 @@ toets omvalt.
 | `horeca-vloer.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET VLOERSCHERM in een echte browser: /apps/horeca-vloer.html. De regels staan vast in test/horeca-wijk.test.js. |
 | `horecascherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Het horecascherm in een echte browser: /apps/horeca.html. Twee dingen worden hier bewezen, en het zijn allebei dingen die van buiten niet te zien zijn aan een groene API-toets: 1. |
 | `horecaschermen.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE ZEVEN WERKSCHERMEN VAN HET HORECA OS, IN EEN ECHTE BROWSER. /apps/horeca.html (zaal en keuken) heeft zijn eigen toets. |
-| `hotels-ds.e2e.js` | 3 | -- | RTG Verblijven op het RTG Design System: het bewijs van batch 3 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
+| `hotels-ds.e2e.js` | 3 | gezakt op `voorwaarde-omkeren#0` | RTG Verblijven op het RTG Design System: het bewijs van batch 3 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `huis.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor Het Huis: het reisdossier op blad 02 van het magazine. test/huis.test.js bewijst de server-kant; deze bewijst dat het blad de reis toont, elke stand als woord draagt, en dat "wat er nog moet"... |
 | `identiteitschermen.e2e.js` | 2 | geen bronmutatie mogelijk | DRIE SCHERMEN DIE OVER IDENTITEIT EN RUST GAAN. Uit de 104 schermen waar geen enkele toets de weg aflegt (TAKEN 4.9) zijn dit er drie waar het duurste misverstand mogelijk is: ze gaan over wie u bent en over hoe dit... |
 | `ingebedde-chrome.e2e.js` | 1 | gezakt op `liegpoort /api/` | EEN INGEBED SCHERM HEEFT EEN BEDIENING, EN DAT IS DIE VAN ZIJN OUDER. ONTWERP.md legt dat al vast: "In een iframe, ?embed=1 of Command-oppervlak wordt geen tweede Edge gestart en wordt de lokale vaste chrome van het... |

@@ -57,14 +57,24 @@ const SCHERMEN = [
     knop: 'Salon', vrijVan: '.comm' },
   { pad: '/apps/vonk.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
   { pad: '/apps/sociaal.html', balk: '.rtg-social-commandbar' },
-  { pad: '/apps/luchthaven.html', balk: '.tos-opsnav' },
-  { pad: '/apps/ovcontrol.html', balk: '.tos-opsnav' },
+  /* luchthaven.html en ovcontrol.html stonden hier met `.tos-opsnav`. Ze
+     staan sinds TRAVELOS-MIGRATIE.md par. 1b op het Design System: er is
+     geen tweede balk meer om te claimen, en de operatienavigatie is een rij
+     chips in het scherm zelf. Wat deze regel bewaakte (een balk naast de
+     Edge, en geen bestemming kwijt) staat voor die schermen in DS_OPERATIE
+     hieronder. */
   /* De tabbalk van de twee kamers is smaller dan 60% van het scherm en werd
      daarom niet als balk herkend; hij bleef staan, precies onder de onderbalk
      van de Edge (27 september 2026: alle tabs volledig bedekt). */
   { pad: '/apps/decision-room.html', balk: '.dr-nav', knop: 'Afweging' },
   { pad: '/apps/project-room.html', balk: '.pr-nav', knop: 'Dossier' }
 ];
+
+/* De operatieschermen op het Design System: de Edge is daar de enige balk,
+   de oude ops-navigatie bestaat niet meer, en haar vier bestemmingen staan
+   bereikbaar in het scherm (de chips met data-ds-opsnav). */
+const DS_OPERATIE = ['/apps/luchthaven.html', '/apps/ovcontrol.html'];
+const OPS_BESTEMMINGEN = ['/apps/ov.html', '/apps/chauffeur.html', '/apps/luchthaven.html', '/apps/ovcontrol.html'];
 
 /* Wat de Edge NIET overneemt, hoort ook niet onder hem te liggen. In de
    compacte stand legt de Edge een onzichtbare herstelstrook over de bovenrand;
@@ -174,6 +184,23 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
             scherm.pad + ': ' + scherm.vrijVan + ' begint op ' + m.vrijTop +
             ' en loopt daarmee onder de Edge-bovenbalk door (die eindigt op ' + m.topOnder + ')');
         }
+      });
+    }
+
+    for (const pad of DS_OPERATIE) {
+      await t.test(pad + ': de Edge is de enige balk, en de operatienavigatie blijft bereikbaar', async () => {
+        await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
+        await wachtTot(page, () => !!document.querySelector('.ds-edge__balk [data-ds-edge="rahul"]') &&
+          document.querySelectorAll('[data-ds-opsnav] a').length > 0, null,
+          { wat: pad + ': de ds-Edge en de operatienavigatie staan' });
+        const m = await page.evaluate(() => ({
+          balken: document.querySelectorAll('.ds-edge__balk').length,
+          oud: document.querySelectorAll('.tos-opsnav, .rtg-adaptive-bar, .rtg-edge-chrome').length,
+          ops: [...document.querySelectorAll('[data-ds-opsnav] a')].filter(a => a.getClientRects().length).map(a => a.getAttribute('href'))
+        }));
+        assert.equal(m.balken, 1, pad + ': er hoort precies een Edge te staan');
+        assert.equal(m.oud, 0, pad + ': een oude balk of Edge staat er nog naast');
+        assert.deepEqual(m.ops, OPS_BESTEMMINGEN, pad + ': een bestemming van de operatienavigatie is kwijt');
       });
     }
 

@@ -189,7 +189,7 @@ const api = (pad, body, herkans) => fetch(pad, {
   // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
   const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api));
   if (p) return p;
-  if (!r.ok) { const error = new Error(d.error || 'Er ging iets mis.'); error.status = r.status; throw error; } return d; });
+  if (!r.ok) { const error = new Error(d.error || 'Er ging iets mis.'); error.status = r.status; error.data = d; throw error; } return d; });
 
 if (!TOKEN) {
   $('#main').innerHTML = RTGFirstSteps.welcome('reisbureau', true); RTGFirstSteps.sync();
@@ -260,6 +260,42 @@ async function laad(){
 const STAND_KLAS = { bevestigd: 'stand-bevestigd', afgewezen: 'stand-afgewezen',
   afgezegd: 'stand-afgezegd', 'wijziging-gevraagd': 'stand-wijziging-gevraagd' };
 const STAND_WOORD = { 'wijziging-gevraagd': 'wijziging gevraagd' };
+/* BETALEN (K2, docs/domeinkaarten/travelos.md). Drie standen, en "Betaald"
+   alleen als de SERVER het zegt (a.betaald, gezet na de boeking bij RTG Pay):
+   een antwoord dat onderweg verloren gaat, maakt van een reis geen betaalde.
+     open     bevestigd, nog niet betaald -- de knop staat er
+     wacht    de bank heeft nog niet bevestigd -- geen knop, niet opnieuw betalen
+     betaald  door de server bevestigd
+   Een tweede tik doet niets zolang de eerste loopt; en ook de server betaalt
+   een reis maar EEN keer (sleutel op de ref, kern/reisbureau-betaling.js). */
+const BETAAL = {};       // ref -> { wacht, tekst, kyc } uit het laatste antwoord
+const BEZIG = new Set(); // refs waarvan de betaling nu loopt
+function betaalRegel(a){
+  const b = BETAAL[a.ref] || {};
+  if (a.betaald) return '<span class="tag betaalstand" data-stand="betaald">Betaald'+
+    (a.betaald.centen ? ' · € '+esc((a.betaald.centen/100).toLocaleString(document.documentElement.lang||undefined,{minimumFractionDigits:2})) : '')+'</span>';
+  if (a.betaalWacht || b.wacht) return '<span class="tag betaalstand" data-stand="wacht">Wacht op bevestiging. '+
+    esc(b.tekst || 'De bank heeft de betaling nog niet bevestigd. Betaal niet opnieuw.')+'</span>';
+  if (a.status !== 'bevestigd') return '';
+  return '<div class="tag betaalstand" data-stand="open"><span>Bevestigd, nog niet betaald</span> '+
+    '<button class="knop klein" data-doe="betaal" data-ref="'+esc(a.ref)+'"'+(BEZIG.has(a.ref)?' disabled':'')+'>Betaal deze reis</button>'+
+    (b.tekst ? '<span class="meta toelichting" role="alert">'+esc(b.tekst)+
+      (b.kyc ? ' <a href="/apps/verificatie.html">Laat zien wie u bent</a>' : '')+'</span>' : '')+'</div>';
+}
+async function betaalReis(ref){
+  if (BEZIG.has(ref)) return;
+  BEZIG.add(ref); delete BETAAL[ref]; laadMijn();
+  try {
+    await api('/api/reisbureau/betaal', { ref });
+    meld('De betaling is ontvangen.');
+  } catch(e){
+    const d = e.data || {};
+    if (e.status === 402 && (d.pending || /wacht op bevestiging/i.test(e.message))) BETAAL[ref] = { wacht: true, tekst: e.message };
+    else if (d.kyc) BETAAL[ref] = { tekst: e.message, kyc: true };
+    else if (!e.status) BETAAL[ref] = { tekst: 'Het antwoord kwam niet aan. Ververs om te zien hoe het staat; een reis wordt maar één keer betaald.' };
+    else BETAAL[ref] = { tekst: e.message };
+  } finally { BEZIG.delete(ref); laadMijn(); }
+}
 let openPaneel = null;   // ref waarvan het paneel openstaat, zodat het na een herlading openblijft
 /* WELKE AANVRAAG HET LID AANWIJST (EDGE.md par. 14.4). Het scherm zegt het via
    RTGAdaptief.context(); het blikveld maakt er een verwijzing van (soort en
@@ -321,6 +357,7 @@ async function laadMijn(){
             ? '<button class="knop stil" data-doe="open" data-ref="'+esc(a.ref)+'">Wijzigen of afzeggen</button>'
             : '')+
       '</div>'+
+      betaalRegel(a)+
       (a.besluit && a.besluit.bericht ? '<span class="tag">'+esc(a.besluit.bericht)+'</span>' : '')+
       (a.status === 'aangevraagd' ? '<span class="tag">Een RTG-reisadviseur bevestigt de datum en stelt de reis samen.</span>' : '')+
       (a.status === 'wijziging-gevraagd' ? '<span class="tag">'+wijzigingRegel(a)+'</span>' : '')+
@@ -340,6 +377,7 @@ async function laadMijn(){
     const ref = b.dataset.ref, doe = b.dataset.doe;
     if (doe === 'open'){ openPaneel = ref; kies(ref); laadMijn(); return; }
     if (doe === 'dicht'){ openPaneel = null; laadMijn(); return; }
+    if (doe === 'betaal'){ betaalReis(ref); return; }
     try {
       if (doe === 'intrek'){ await api('/api/reisbureau/annuleer', { ref }); meld('Aanvraag ingetrokken.'); }
       if (doe === 'wijzig'){

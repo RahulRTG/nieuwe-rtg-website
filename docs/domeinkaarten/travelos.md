@@ -34,7 +34,7 @@ Hoe deze kaart is gemaakt. Elk feit over RTG komt uit de code of uit de proefreg
 | # | Defect | Bewijs | Gevolg voor het lid |
 |---|---|---|---|
 | K1 | **Een bevestigde, onbetaalde reis heet in het dossier `paid`.** Bevestigen zet `status 'paid'`; betalen raakt het dossier niet. | kern/lid/reisdossier.js:85-88 | De pil in de reistab toont "betaald" zonder dat er betaald is. Breekt "faalt het betalen, dan heet de boeking niet betaald". |
-| K2 | **Er is geen betaalknop.** Geen scherm roept `/api/reisbureau/betaal` aan. | grep in public/ (Geld bevestigde dit apart) | Een lid kan een bevestigde reis niet zelf betalen. |
+| K2 | **Er was geen betaalknop.** Geen scherm riep `/api/reisbureau/betaal` aan. *Scherm gebouwd (19 oktober 2026)*: Mijn aanvragen in reisbureau.html toont "Bevestigd, nog niet betaald" met een knop, "Wacht op bevestiging" bij een 402 met pending, en "Betaald" alleen uit `a.betaald` van de server. Het wachtpad en de paspoortpoort op deze route komen van Geld (appwerkt/geld) en staan nog niet in integraal. | grep in public/ (Geld bevestigde dit apart); test/reisbureau-betaalknop.e2e.js | Een lid kon een bevestigde reis niet zelf betalen. |
 | K3 | **Er is geen betaalbewijs.** `reisbureau-betaling.js` roept `factuurVoorLid` niet aan; `/api/facturen` leest alleen `md.invoices`. | grep 'factuur' in kern/reisbureau*.js | Het enige bewijs is het object `a.betaald` in `/api/reisbureau/mijn`. |
 | K4 | **Het bestellingenoverzicht zegt altijd "niet betaald".** | kern/mall/bestellingen.js:109 (reis), :126 (logeren) | Ook een betaalde reis staat als onbetaald. |
 | K5 | **Eén kapotte bron breekt de hele agenda.** Geen try/catch per bron (de reiswereld doet dat wel: `stil`). | spaarpot.js:10-62 vs kern/wereldkern.js:46-48 | Valt één domein uit, dan ziet het lid geen enkel programmapunt. De reis zelf blijft wel bestaan. |
@@ -189,7 +189,7 @@ Elke functiekaart heeft acht velden:
 - Uitzonderingen: een aanvraag zonder sleutel (een oud scherm) houdt de huidige 409 "al aangevraagd".
 - Klaar als: een dubbeltik, een afgebroken verzoek en een herstart geven allemaal één aanvraag en hetzelfde antwoord.
 
-**F2 · Betaalknop bij de reis** (K2). L1 · ontbreekt · K · **HERSTEL**
+**F2 · Betaalknop bij de reis** (K2). L1 · scherm gebouwd, serverproef van wachten en paspoortpoort wacht op Geld · K · **HERSTEL**
 - Gegevens: de bevestigde aanvraag met haar samenstelling (`reisbureau-betaling.js`).
 - Regels: alleen een bevestigde, uitgesplitste reis is te betalen, en alleen door het eigen account na de paspoortpoort.
 - Rekenen: de prijs komt uit de samenstelling en niet uit het scherm.

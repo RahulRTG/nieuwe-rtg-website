@@ -45,17 +45,25 @@ module.exports = (ctx) => {
      uitlegbaar. De herkomst zegt wie hem deed -- zonder herkomst is het het
      lid zelf (de route), met { wie: 'rahul' } een regel die Rahul uitvoerde;
      zo kan het log de twee nooit door elkaar halen. */
-  function potReserveer(codenaam, id, centen, herkomst) {
+  /* `idem`: EEN RESERVERING PER TIK. Zonder sleutel zette een tweede tik, of
+     een herhaling na een crash, het bedrag twee keer opzij
+     (scripts/lib/voltooi/geldcommand.js). De pot onthoudt zijn laatste sleutels. */
+  function potReserveer(codenaam, id, centen, herkomst, idem) {
     const rec = pak(codenaam);
     if (!rec) return { status: 400, error: 'Geen codenaam.' };
     const pot = rec.potten.find(x => x.id === String(id == null ? '' : id));
     if (!pot) return { status: 404, error: 'Deze pot bestaat niet.' };
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c === 0 || Math.abs(c) > MAX_CENTEN) return { status: 400, error: 'Geef een bedrag in hele centen; negatief geeft vrij.' };
+    const sleutel = idem == null ? '' : String(idem).trim().slice(0, 80);
+    const al = sleutel && (pot.idems || []).find(x => x.k === sleutel);
+    if (al) return al.c === c ? { status: 200, ok: true, herhaald: true, pot: zichtPot(pot) }
+      : { status: 409, error: 'Deze reservering is al gedaan met een ander bedrag.' };
     const nieuw = pot.standCenten + c;
     if (nieuw < 0) return { status: 400, error: 'Er staat ' + pot.standCenten + ' centen in deze pot; meer vrijgeven kan niet.' };
     if (nieuw > MAX_CENTEN) return { status: 400, error: 'Dat komt boven ' + MAX_CENTEN + ' centen in een pot; splits het doel.' };
     pot.standCenten = nieuw;
+    if (sleutel) pot.idems = (pot.idems || []).concat({ k: sleutel, c }).slice(-50);
     const h = herkomst && typeof herkomst === 'object' ? herkomst : {};
     logSchrijf(codenaam, { wie: h.wie === 'rahul' ? 'rahul' : 'lid',
       wat: (c > 0 ? 'Gereserveerd in pot ' : 'Vrijgegeven uit pot ') + pot.naam,

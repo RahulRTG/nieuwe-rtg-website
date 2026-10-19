@@ -68,7 +68,7 @@
   B.bind = function () {
     var Geld = w.Geld;
     $('#bkNopen').addEventListener('click', async function () {
-      try { await Geld.api('/api/bank/rekening/open', { soort: $('#bkNsoort').value }); await B.herlaad(); }
+      try { await Geld.api('/api/bank/rekening/open', { soort: $('#bkNsoort').value, idem: B.sleutel('rekopen') }); await B.herlaad(); }
       catch (e) { Geld.melding(e.message); }
     });
     $('#bkOdoe').addEventListener('click', async function () {

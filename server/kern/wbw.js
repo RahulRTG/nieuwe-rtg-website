@@ -100,11 +100,15 @@ function maakWbw({ db, save, crypto, schoon, codenaamVan, connectieTussen, verbA
       const r = await pay.stuur({ van: codenaamVan(key), aanCodenaam: codenaamVan(aan), centen: bedrag,
         oms: 'Wie betaalt wat · ' + g.naam, idem: idem ? 'wbw:' + g.id + ':' + key + ':' + aan + ':' + idem : undefined, soort: 'wbw' });
       if (r.error) return { status: r.status || 400, error: r.error, betalingen };
-      const regel = { id: id(), soort: 'verrekening', door: key, aan, centen: bedrag, at: nu() };
-      g.regels.push(regel);
       betalingen.push({ aan: codenaamVan(aan), centen: bedrag });
-      notify(aan, { title: g.naam, body: codenaamVan(key) + ' heeft ' + (bedrag / 100).toFixed(2).replace('.', ',') + ' verrekend.', scope: 'wbw' });
       schuld -= bedrag;
+      /* EEN BETALING IS EEN REGEL. Twee tikken met dezelfde sleutel krijgen van
+         pay.stuur dezelfde boeking, en allebei schreven ze een verrekening: een
+         betaling, twee keer in het lijstje (test/wbw-verreken-herhaal.test.js). */
+      if (r.boeking && g.regels.some(x => x.soort === 'verrekening' && x.boeking === r.boeking)) continue;
+      const regel = { id: id(), soort: 'verrekening', door: key, aan, centen: bedrag, at: nu(), boeking: r.boeking || null };
+      g.regels.push(regel);
+      notify(aan, { title: g.naam, body: codenaamVan(key) + ' heeft ' + (bedrag / 100).toFixed(2).replace('.', ',') + ' verrekend.', scope: 'wbw' });
     }
     if (g.regels.length > REGELS_MAX) g.regels = g.regels.slice(-REGELS_MAX);
     save();

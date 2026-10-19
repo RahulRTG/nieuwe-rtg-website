@@ -94,10 +94,15 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
        bijlage zelf vertelt de leeskant welke van de twee het is. */
     const bijlage = o.post ? { soort: 'post', id: o.post.id }
       : o.stuk ? Object.assign({ soort: 'stuk' }, o.stuk) : null;
+    /* Een herhaling herkennen we hier, voordat de kern het bestaande bericht
+       teruggeeft (kern/comm/bericht.js zegt dat zelf niet): de afzender stond
+       al met deze sleutel in dit gesprek. */
+    const idem = typeof o.idem === 'string' && o.idem.trim() ? o.idem.trim().slice(0, 80) : null;
+    const al = idem && comm.berichtenVan(g.id).some((x) => x.van === van && x.idem === idem);
     const m = comm.bericht({ gesprekId: g.id, van, tekst: o.tekst || '',
-      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null, idem: o.idem || null });
+      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null, idem });
     const uit = oudeVorm(m);
-    if (m.herhaald) uit.herhaald = true;
+    if (al) uit.herhaald = true;
     return uit;
   }
 

@@ -28,15 +28,17 @@ function maakBericht({ B, eis, nu, id, save, standZet, standVan, seinNaarDeRest,
       const bron = (B()[g.id] || []).find((m) => m.id === o.antwoordOp);
       if (!bron) throw new Error('Dat bericht staat niet in dit gesprek.');
     }
-    /* Een herhaalsleutel (opt-in) per afzender: komt hetzelfde verzoek terug
-       nadat het eerste al was weggeschreven (een herstart, een afgebroken
-       verbinding), dan is het hetzelfde bericht en geen tweede. De sleutel
-       staat op het bericht zelf, dus hij overleeft een crash. */
-    const idem = o.idem ? String(o.idem).slice(0, 100) : null;
-    const eerder = idem && (B()[g.id] || []).find((x) => x.van === o.van && x.idem === idem);
-    if (eerder) return Object.assign({}, eerder, { herhaald: true });
+    /* EEN HERHAALSLEUTEL PER BERICHT (19 oktober 2026). Een dubbele tik of een
+       verzoek dat na een afgebroken verbinding opnieuw gaat, plaatste het
+       bericht twee keer: de voltooiproef van Berichten zag er twee bij de
+       ontvanger. Het scherm stuurt per opgesteld bericht een sleutel mee; komt
+       die van dezelfde afzender terug in dit gesprek, dan is het hetzelfde
+       bericht -- ook na een herstart, want de sleutel staat op het bericht. */
+    const idem = typeof o.idem === 'string' && o.idem.trim() ? o.idem.trim().slice(0, 80) : null;
+    const al = idem && (B()[g.id] || []).find((x) => x.van === o.van && x.idem === idem);
+    if (al) return al;
     const m = {
-      id: id('brc'), van: o.van, at: nu(),
+      id: id('brc'), van: o.van, at: nu(), idem,
       /* Namens wie er geschreven wordt (`van`) en WIE het typte (`door`) zijn
          bij een zaak niet hetzelfde. Alleen ingevuld als het iemand uit
          dezelfde zaak is: `door` van een vreemde sleutel zou een manier zijn
@@ -53,7 +55,6 @@ function maakBericht({ B, eis, nu, id, save, standZet, standVan, seinNaarDeRest,
       lang: o.lang || null,
       reacties: {}
     };
-    if (idem) m.idem = idem;
     const lijst = B()[g.id] = B()[g.id] || [];
     lijst.push(m);
     if (lijst.length > MAX_PER_GESPREK) lijst.splice(0, lijst.length - MAX_PER_GESPREK);

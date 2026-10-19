@@ -4,6 +4,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { gezinAanAccount } = require('./gezinaccount');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 let srv, browser;
 const routes = ['/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/index.html'];
@@ -166,10 +167,15 @@ test('Work Home opens the new home with actual appointments and exposes an outag
 });
 
 test('a Foundation child keeps personal tabs and all apps in the standard Edge, with explicit calendar failure', { skip }, async () => {
-  const family = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Testgezin', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
+  /* Een gezin hangt aan een (gratis, gekeurd) ouderaccount: test/gezinaccount.js.
+     De keuring vraagt de demo, dus deze subtoets krijgt een eigen server met de
+     accountplicht aan; de andere subtoetsen houden hun server zonder demo. */
+  const hoofd = srv;
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_MAGNAAT_TEST: '1', RTF_GEZIN_ACCOUNTPLICHT: '1' } });
+  try {
+  const family = await gezinAanAccount(srv.base, { kind: { naam: 'Milan', geboortedatum: '2015-04-04', kleur: '#3A7BD5' } });
   await post('/api/foundation/gezin/agenda', { code: family.code, token: family.token, titel: 'Samen wandelen', datum: new Date().toISOString().slice(0, 10), tijd: '16:00' });
-  const child = await post('/api/foundation/gezin/profiel/maak', { code: family.code, token: family.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678', kleur: '#3A7BD5' });
-  const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: family.gezinscode, profielId: child.profiel.id, pin: '5678' });
+  const chosen = family.kind;
   const ctx = await context(null, { code: family.code, token: chosen.token, profiel: chosen.profiel }), page = await ctx.newPage();
   try {
     await open(page, routes[2]);
@@ -189,4 +195,5 @@ test('a Foundation child keeps personal tabs and all apps in the standard Edge, 
     assert.match(await page.locator('#rtfDagLijst').innerText(), /could not load your family calendar/);
     assert.match(await page.locator('#vVoorzijde .wh-free').innerText(), /100% free/);
   } finally { await ctx.close(); }
+  } finally { await stop(srv.child); srv = hoofd; }
 });

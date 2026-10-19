@@ -64,7 +64,11 @@ const EIGEN = [
   // een teamkamer: de sleutel op de kamer, de toegangscode maar een keer (kern/magnaat-trainingslobby-regie.js)
   '/api/member/magnaat/teamkamer/maak',
   // een foto in de eigen bibliotheek (kern/webmaker-fotos.js, fotoHerhaling)
-  '/api/site/foto'
+  '/api/site/foto',
+  // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
+  '/api/comm/stuur',
+  // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
+  '/api/geld/pot/reserveer'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

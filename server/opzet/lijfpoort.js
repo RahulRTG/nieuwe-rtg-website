@@ -97,6 +97,8 @@ module.exports = function lijfpoort(deps) {
      richting uitvoeren (bijvoorbeeld toestemming intrekken); daarvoor is de
      begrensde body nodig, vandaar deze plek en niet vóór express.json(). */
   app.use(require('../middleware/foundation-productiepoort')());
+  // een gezinstoken zonder eigenaar-account: 401 (foundation/accountplicht.js)
+  app.use((req, res, next) => require('../foundation').gezinAccountPoort(req, res, next));
 
   /* 3b. De idem-poort: een verzoek met een `Idempotency-Key` header krijgt bij
      een herhaling het bewaarde antwoord in plaats van het werk nog een keer.

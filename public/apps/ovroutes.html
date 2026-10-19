@@ -134,7 +134,7 @@
 (() => {
   const $ = s => document.querySelector(s);
   const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/staff/ov/' + pad, { method: 'POST',
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT;
@@ -261,7 +261,7 @@
   $('#nieuwBtn').addEventListener('click', () => openEditor(null));
   $('#bewaarBtn').addEventListener('click', async () => {
     if (!huidig) return;
-    const r = await api('lijn/zet', { id: huidig.id, naam: $('#fNaam').value, soort: $('#fSoort').value,
+    const r = await api('/api/staff/ov/lijn/zet', { id: huidig.id, naam: $('#fNaam').value, soort: $('#fSoort').value,
       frequentieMin: Number($('#fFreq').value),
       tarief: { basis: Math.round(Number($('#fBasis').value) * 100), perKm: Math.round(Number($('#fKm').value) * 100) },
       haltes: huidig.haltes });
@@ -272,7 +272,7 @@
   });
   $('#wegBtn').addEventListener('click', async () => {
     if (!huidig || !huidig.id) return;
-    const r = await api('lijn/zet', { id: huidig.id, weg: true });
+    const r = await api('/api/staff/ov/lijn/zet', { id: huidig.id, weg: true });
     if (r.body.error) return zeg(r.body.error);
     zeg('Lijn verwijderd.');
     $('#editor').classList.add('weg'); huidig = null;
@@ -292,7 +292,7 @@
 
   async function laad() {
     if (!token) { $('#vPoort').classList.remove('weg'); return; }
-    const r = await api('lijnen');
+    const r = await api('/api/staff/ov/lijnen');
     if (r.status !== 200) {
       try { RTGDeur.toon(document.querySelector('#vPoort .kaart'), { soort:'personeel', naar:'/apps/personeel.html' }); } catch(e) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; }
       $('#vPoort').classList.remove('weg'); $('#vBeheer').classList.add('weg'); return;

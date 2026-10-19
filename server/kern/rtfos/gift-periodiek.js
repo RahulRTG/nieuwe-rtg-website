@@ -111,6 +111,9 @@ module.exports = (ctx, { standVan }) => {
     if (jaren < JAREN_MIN) {
       return { status: 400, error: 'Een periodieke gift loopt ten minste ' + JAREN_MIN + ' jaar. Korter kan, maar dan is het een gewone gift met een drempel.' };
     }
+    // een dubbele tik is geen tweede plan
+    const al = P().find(x => x.codenaam === ik && x.stand === 'voorgesteld' && x.centenPerJaar === centen && x.jaren === jaren);
+    if (al) return { ok: true, bestond: true, plan: beeld(al) };
     if (P().filter(x => x.codenaam === ik && x.stand !== 'gestopt').length >= 5) {
       return { status: 429, error: 'Je hebt er al vijf lopen. Stop er eerst een.' };
     }

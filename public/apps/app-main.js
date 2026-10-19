@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'fbc44456';
+var RTG_BOUW = '1f01da20';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2699,9 +2699,9 @@ var RTG_BOUW = 'fbc44456';
      gaat over tickets. */
   async function laadTickets(){
     if (!API.live) return;
-    try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
+    try { tkPartners = (await API.call('/api/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/tickets/mijn')).tickets || []; } catch(e){}
+    try { mijn = (await API.call('/api/tickets/mijn')).tickets || []; } catch(e){}
     const mijnEl = $('#tkMijn');
     if (mijnEl) mijnEl.innerHTML = mijn.filter(t => !t.gebruikt || t.datum >= new Date().toISOString().slice(0, 10)).map(t =>
       '<div class="card s-j84k16">'+
@@ -2728,7 +2728,7 @@ var RTG_BOUW = 'fbc44456';
       '</div>').join('');
     document.querySelectorAll('[data-tktoon]').forEach(b => b.addEventListener('click', async () => {
       try {
-        const r = await API.call('/ticket/toon', { ref: b.dataset.tktoon });
+        const r = await API.call('/api/ticket/toon', { ref: b.dataset.tktoon });
         const el = document.getElementById('tkCode-' + b.dataset.tktoon);
         if (el) el.textContent = r.code;
       } catch(e){ toast(e.message); }
@@ -2736,8 +2736,8 @@ var RTG_BOUW = 'fbc44456';
     document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
       const veld = document.getElementById('trVan-' + b.dataset.trvraag);
       try {
-        const r = await API.call('/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
-        if (Number(b.dataset.trprijs) > 0) await API.call('/ride/pay', { ref: r.ride.ref });
+        const r = await API.call('/api/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
+        if (Number(b.dataset.trprijs) > 0) await API.call('/api/ride/pay', { ref: r.ride.ref });
         toast(T('tk.tr.ok','Transfer aangevraagd. U ziet hier wie u komt halen.'));
         laadTickets();
       } catch(e){ toast(e.message); }
@@ -3093,9 +3093,9 @@ var RTG_BOUW = 'fbc44456';
   }
   async function laadVerhuur(){
     if (!API.live) return;
-    try { vhPartners = (await API.call('/verhuur/aanbod')).partners || []; } catch(e){ vhPartners = []; }
+    try { vhPartners = (await API.call('/api/verhuur/aanbod')).partners || []; } catch(e){ vhPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/huur/mijn')).huren || []; } catch(e){}
+    try { mijn = (await API.call('/api/huur/mijn')).huren || []; } catch(e){}
     const el = $('#vhMijn');
     const VH_ST = { 'aangevraagd': T('vh.m.geboekt','geboekt; leg de staat vast bij het ophalen'), 'lopend': T('vh.m.lopend','onderweg; goede reis'), 'afgerond': T('vh.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(h => h.status !== 'afgerond' || h.tot >= new Date().toISOString().slice(0, 10)).map(h =>
@@ -3124,7 +3124,7 @@ var RTG_BOUW = 'fbc44456';
       file.onchange = () => {
         if (!file.files[0]) return;
         vhFotoKlein(file.files[0], async (dataUrl) => {
-          try { await API.call('/huur/foto', { ref: b.dataset.vhf, fase: b.dataset.fase, foto: dataUrl });
+          try { await API.call('/api/huur/foto', { ref: b.dataset.vhf, fase: b.dataset.fase, foto: dataUrl });
             toast(T('vh.m.foto.ok','Vastgelegd. Dit is uw bewijs van de staat.')); laadVerhuur(); }
           catch(e){ toast(e.message); }
         });
@@ -3135,7 +3135,7 @@ var RTG_BOUW = 'fbc44456';
     document.querySelectorAll('[data-vhsos]').forEach(b => b.addEventListener('click', () => {
       const bericht = prompt(T('vh.m.sosvraag','Wat is er aan de hand? (gaat direct naar de verhuurder EN naar RTG)'));
       if (bericht == null) return;
-      const stuur = (lat, lng) => API.call('/huur/sos', { ref: b.dataset.vhsos, bericht, lat, lng })
+      const stuur = (lat, lng) => API.call('/api/huur/sos', { ref: b.dataset.vhsos, bericht, lat, lng })
         .then(() => toast(T('vh.m.sosok','SOS verstuurd. De verhuurder en RTG zijn gewaarschuwd.')))
         .catch(e => toast(e.message));
       if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => stuur(p.coords.latitude, p.coords.longitude), () => stuur());
@@ -3146,11 +3146,11 @@ var RTG_BOUW = 'fbc44456';
       try {
         if (aan && navigator.geolocation){
           vhLocWatch[ref] = navigator.geolocation.watchPosition(p =>
-            API.call('/huur/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
-          await API.call('/huur/locatie', { ref, aan: true });
+            API.call('/api/huur/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
+          await API.call('/api/huur/locatie', { ref, aan: true });
         } else {
           if (vhLocWatch[ref] != null){ navigator.geolocation.clearWatch(vhLocWatch[ref]); delete vhLocWatch[ref]; }
-          await API.call('/huur/locatie', { ref, aan: false });
+          await API.call('/api/huur/locatie', { ref, aan: false });
         }
         toast(aan ? T('vh.m.locaanok','U deelt uw locatie met de verhuurder; uitzetten kan altijd.') : T('vh.m.locuitok','Locatie delen staat uit en is gewist.'));
         laadVerhuur();
@@ -3196,9 +3196,12 @@ var RTG_BOUW = 'fbc44456';
     const boek = document.getElementById('vhBoek');
     if (boek) boek.addEventListener('click', async () => {
       const [code, autoId] = vhOpen.split(':');
+      const van = $('#vhVan').value, tot = $('#vhTot').value;
+      // een sleutel per keuze: dezelfde tik is dezelfde huur, een andere periode een nieuwe
+      if (vhKeuze.idemVoor !== vhOpen + '|' + van + '|' + tot) { vhKeuze.idemVoor = vhOpen + '|' + van + '|' + tot; vhKeuze.idem = RTGIdem('huur'); }
       try {
-        const h = await API.call('/huur/boek', { supplierCode: code, autoId, van: $('#vhVan').value, tot: $('#vhTot').value });
-        await API.call('/booking/pay', { ref: h.huur.ref });
+        const h = await API.call('/api/huur/boek', { supplierCode: code, autoId, van, tot, idem: vhKeuze.idem });
+        await API.call('/api/booking/pay', { ref: h.huur.ref });
         toast(T('vh.ok','Geboekt en betaald: ') + eur(h.huur.price) + T('vh.ok2',' vast, geen verrassingen aan de balie.'));
         vhOpen = null; vhKeuze = null;
         laadVerhuur();
@@ -3210,9 +3213,9 @@ var RTG_BOUW = 'fbc44456';
   let chPartners = [], chOpen = null, chKeuze = null, chLocWatch = {};
   async function laadCharter(){
     if (!API.live) return;
-    try { chPartners = (await API.call('/charter/aanbod')).partners || []; } catch(e){ chPartners = []; }
+    try { chPartners = (await API.call('/api/charter/aanbod')).partners || []; } catch(e){ chPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/charter/mijn')).charters || []; } catch(e){}
+    try { mijn = (await API.call('/api/charter/mijn')).charters || []; } catch(e){}
     const el = $('#chMijn');
     const CH_ST = { 'aangevraagd': T('ch.m.geboekt','geboekt; leg de staat vast bij het uitvaren'), 'lopend': T('ch.m.lopend','op zee; behouden vaart'), 'afgerond': T('ch.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(c => c.status !== 'afgerond' || c.tot >= new Date().toISOString().slice(0, 10)).map(c =>
@@ -3241,7 +3244,7 @@ var RTG_BOUW = 'fbc44456';
       file.onchange = () => {
         if (!file.files[0]) return;
         vhFotoKlein(file.files[0], async (dataUrl) => {
-          try { await API.call('/charter/foto', { ref: b.dataset.chf, fase: b.dataset.fase, foto: dataUrl });
+          try { await API.call('/api/charter/foto', { ref: b.dataset.chf, fase: b.dataset.fase, foto: dataUrl });
             toast(T('ch.m.foto.ok','Vastgelegd. Dit is uw bewijs van de staat.')); laadCharter(); }
           catch(e){ toast(e.message); }
         });
@@ -3252,7 +3255,7 @@ var RTG_BOUW = 'fbc44456';
     document.querySelectorAll('[data-chsos]').forEach(b => b.addEventListener('click', () => {
       const bericht = prompt(T('ch.m.sosvraag','Wat is er aan de hand? (gaat direct naar het charterbedrijf EN naar RTG)'));
       if (bericht == null) return;
-      const stuur = (lat, lng) => API.call('/charter/sos', { ref: b.dataset.chsos, bericht, lat, lng })
+      const stuur = (lat, lng) => API.call('/api/charter/sos', { ref: b.dataset.chsos, bericht, lat, lng })
         .then(() => toast(T('ch.m.sosok','SOS verstuurd. Het charterbedrijf en RTG zijn gewaarschuwd.')))
         .catch(e => toast(e.message));
       if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => stuur(p.coords.latitude, p.coords.longitude), () => stuur());
@@ -3263,11 +3266,11 @@ var RTG_BOUW = 'fbc44456';
       try {
         if (aan && navigator.geolocation){
           chLocWatch[ref] = navigator.geolocation.watchPosition(p =>
-            API.call('/charter/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
-          await API.call('/charter/locatie', { ref, aan: true });
+            API.call('/api/charter/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
+          await API.call('/api/charter/locatie', { ref, aan: true });
         } else {
           if (chLocWatch[ref] != null){ navigator.geolocation.clearWatch(chLocWatch[ref]); delete chLocWatch[ref]; }
-          await API.call('/charter/locatie', { ref, aan: false });
+          await API.call('/api/charter/locatie', { ref, aan: false });
         }
         toast(aan ? T('ch.m.locaanok','U deelt uw positie met het charterbedrijf; uitzetten kan altijd.') : T('ch.m.locuitok','Positie delen staat uit en is gewist.'));
         laadCharter();
@@ -3321,8 +3324,8 @@ var RTG_BOUW = 'fbc44456';
       const body = { supplierCode: code, bootId, van: $('#chVan').value, tot: $('#chTot').value, gasten: Number($('#chGasten').value), metSkipper };
       if (!metSkipper && $('#chVaarbewijs')) body.vaarbewijs = $('#chVaarbewijs').checked;
       try {
-        const c = await API.call('/charter/boek', body);
-        await API.call('/booking/pay', { ref: c.charter.ref });
+        const c = await API.call('/api/charter/boek', body);
+        await API.call('/api/booking/pay', { ref: c.charter.ref });
         toast(T('ch.ok','Geboekt en betaald: ') + eur(c.charter.price) + T('ch.ok2',' vast. Behouden vaart.'));
         chOpen = null; chKeuze = null;
         laadCharter();
@@ -3336,7 +3339,7 @@ var RTG_BOUW = 'fbc44456';
   async function laadVastgoed(){
     if (!API.live) return;
     let d = { panden: [], bezichtigingen: [], biedingen: [] };
-    try { d = await API.call('/vastgoed/aanbod'); } catch(e){}
+    try { d = await API.call('/api/vastgoed/aanbod'); } catch(e){}
     const el = $('#vgMijn'); if (!el) return;
     if (!d.panden.length && !d.bezichtigingen.length && !d.biedingen.length){ el.innerHTML = ''; return; }
     let html = '';
@@ -3382,18 +3385,18 @@ var RTG_BOUW = 'fbc44456';
       const [code, pid] = b.dataset.vgint.split(':');
       const wens = prompt(T('vg.m.wensvraag','Wanneer zou u willen bezichtigen? (bijv. zaterdagochtend)'));
       if (wens === null) return;
-      try { await API.call('/vastgoed/interesse', { supplierCode: code, pandId: pid, wens }); toast(T('vg.m.intok','De makelaar krijgt uw aanvraag en bevestigt een moment.')); laadVastgoed(); }
+      try { await API.call('/api/vastgoed/interesse', { supplierCode: code, pandId: pid, wens }); toast(T('vg.m.intok','De makelaar krijgt uw aanvraag en bevestigt een moment.')); laadVastgoed(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-vgbod]').forEach(b => b.addEventListener('click', async () => {
       const [code, pid] = b.dataset.vgbod.split(':');
       const bod = prompt(T('vg.m.bodvraag','Uw bod in euro:'));
       if (!bod) return;
-      try { await API.call('/vastgoed/bod', { supplierCode: code, pandId: pid, bedrag: Number(bod) }); toast(T('vg.m.bodok','Uw bod is verstuurd naar de makelaar.')); laadVastgoed(); }
+      try { await API.call('/api/vastgoed/bod', { supplierCode: code, pandId: pid, bedrag: Number(bod) }); toast(T('vg.m.bodok','Uw bod is verstuurd naar de makelaar.')); laadVastgoed(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-vgkey]').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/vastgoed/keyless', { ref: b.dataset.vgkey }); toast('\uD83D\uDD13 '+T('vg.m.geopend','De deur is open. Code: ')+r.code); }
+      try { const r = await API.call('/api/vastgoed/keyless', { ref: b.dataset.vgkey }); toast('\uD83D\uDD13 '+T('vg.m.geopend','De deur is open. Code: ')+r.code); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -3402,7 +3405,7 @@ var RTG_BOUW = 'fbc44456';
   async function laadContracten(){
     if (!API.live) return;
     let lijst = [];
-    try { lijst = (await API.call('/contracten/mijn')).contracten || []; } catch(e){}
+    try { lijst = (await API.call('/api/contracten/mijn')).contracten || []; } catch(e){}
     const el = $('#conMijn'); if (!el) return;
     const open = lijst.filter(c => c.status !== 'geweigerd');
     if (!open.length){ el.innerHTML = ''; return; }
@@ -3419,12 +3422,12 @@ var RTG_BOUW = 'fbc44456';
     document.querySelectorAll('[data-conteken]').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('con.tekenvraag','Typ uw naam om digitaal te ondertekenen. Zo gaat u akkoord met de voorwaarden.'));
       if (!naam) return;
-      try { await API.call('/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
+      try { await API.call('/api/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-conweiger]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm(T('con.weigervraag','Dit contract weigeren?'))) return;
-      try { await API.call('/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
+      try { await API.call('/api/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -3433,7 +3436,7 @@ var RTG_BOUW = 'fbc44456';
   let bzPartners = [], bzZaak = null, bzMand = {}, bzLevering = 'bezorgen', bzGeo = null, bzAdresW = '';
   async function laadBestellen(){
     if (!API.live) return;
-    try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
+    try { bzPartners = (await API.call('/api/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
     renderBestellen();
     laadBzMijn();
   }
@@ -3443,7 +3446,7 @@ var RTG_BOUW = 'fbc44456';
     const el = $('#showroom'); if (!el || !API.live) return;
     if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
     let d, mijn;
-    try { d = await API.call('/verkoop/showroom'); mijn = await API.call('/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    try { d = await API.call('/api/verkoop/showroom'); mijn = await API.call('/api/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
@@ -3464,11 +3467,11 @@ var RTG_BOUW = 'fbc44456';
     el.innerHTML = h;
     el.querySelectorAll('.js-vkteken').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('vk.tekennaam','Typ uw naam om het koopcontract te tekenen:')); if (!naam) return;
-      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkproef').forEach(b => b.addEventListener('click', async () => {
       const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
-      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens, idem: b.dataset.idem || (b.dataset.idem = RTGIdem('vkproef')) }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
 /* een auto kopen of inruilen, met een bod */
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
@@ -3479,7 +3482,7 @@ var RTG_BOUW = 'fbc44456';
       if (wilInruil){ const merk = prompt(T('vk.inmerk','Merk + model van uw inruilauto:')); if (merk){ const jaar = prompt(T('vk.injaar','Bouwjaar?'),''); const km = prompt(T('vk.inkm','Kilometerstand?'),''); inruil = { merk, model: '', jaar, km }; } }
       const concierge = confirm(T('vk.concvraag','Concierge-aflevering op uw adres?'));
       const adres = concierge ? (prompt(T('vk.adres','Afleveradres:')) || '') : '';
-      try { await API.call('/api/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres, idem: b.dataset.idem || (b.dataset.idem = RTGIdem('vkkoop')) }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -3603,10 +3606,10 @@ var RTG_BOUW = 'fbc44456';
       const items = Object.entries(bzMand).map(([id, qty]) => ({ id, qty }));
       if (!items.length) return;
       try {
-        const b = await API.call('/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
+        const b = await API.call('/api/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
           adres: bzLevering === 'bezorgen' ? bzAdresW : undefined,
           lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
-        await API.call('/order/pay', { ref: b.order.ref });
+        await API.call('/api/order/pay', { ref: b.order.ref });
         // niet-leden zien de servicekosten eerlijk terug op de bevestiging
         // het bedrag komt van de server (order.servicekosten), niet uit deze regel:
         // stond het hier ook, dan noemt dit scherm het oude tarief bij een nieuw totaal
@@ -3637,7 +3640,7 @@ var RTG_BOUW = 'fbc44456';
          "RTG-partners in Ibiza" te zien kreeg. Zonder reis vragen we de hele
          lijst op en zegt de ondertitel dat ook. */
       const stad = trip ? trip.dest : null;
-      const [sd, od] = await Promise.all([API.call('/suppliers', stad ? { city: stad } : {}), API.call('/orders/mine')]);
+      const [sd, od] = await Promise.all([API.call('/api/suppliers', stad ? { city: stad } : {}), API.call('/api/orders/mine')]);
       suppliers = sd.suppliers || [];
       myOrders = od.orders || [];
       const waar = sd.city || stad;
@@ -6040,6 +6043,51 @@ var RTG_BOUW = 'fbc44456';
     RTGCommand.systeem(knop ? [{ sleutel: 'instellingen', naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }
+  /* ---------- Heel RTG leest de functiegids (eigenaarsbesluit 19 oktober 2026) ----------
+     Het zoekmenu "Heel RTG" in de rand (shared/rtg-edge-smart-menu.js) toonde
+     alleen de URL-catalogus van de widgets. De OS-apps -- Videobellen, Bellen,
+     Snaps, Werk -- hebben geen adres en stonden er dus niet in, terwijl Rahul ze
+     met "open videobellen" wel vindt. Hier zoekt het menu in DEZELFDE gids als
+     gidsCommando (RTGWorkspaceDirectory over RTGWorkspaceWorldCatalog, met
+     gidsToegang als poort): geen tweede lijst, en wat een lid niet mag openen
+     (werkrol, pas) vindt hij ook niet. Een treffer opent via gidsOpen, dezelfde
+     weg als Rahul; een link die de catalogus al toont, komt er niet dubbel bij. */
+  function heelRtgZoek(invoer) {
+    const D = window.RTGWorkspaceDirectory, gezicht = invoer.closest('.rtg-edge-face-all');
+    const lijst = gezicht && gezicht.querySelector('.rtg-edge-groups');
+    if (!D || !lijst) return;
+    let groep = lijst.querySelector('[data-edge-gids]');
+    const uit = D.search(invoer.value, { catalog: window.RTGWorkspaceWorldCatalog, guard: gidsContext(), allow: gidsToegang, alles: true });
+    // het adres staat in dezelfde catalogus; een OS-app heeft er geen
+    const urlVan = id => { for (const w of window.RTGWorkspaceWorldCatalog || []) for (const i of w.items || []) if (i.id === id) return i.url || null; return null; };
+    const al = new Set(Array.from(lijst.querySelectorAll('a[href]:not([data-gids-id])')).map(a => a.getAttribute('href')));
+    const treffers = uit.status === 'ready' ? uit.matches.filter(m => m.kind === 'item' && !(urlVan(m.id) && al.has(urlVan(m.id)))) : [];
+    if (!treffers.length) { if (groep) groep.remove(); return; }
+    if (!groep) {
+      groep = document.createElement('section'); groep.className = 'rtg-edge-group'; groep.setAttribute('data-edge-gids', '');
+      const kop = document.createElement('h3'); kop.textContent = T('edge.gids', 'In de app'); groep.appendChild(kop);
+      lijst.prepend(groep);
+    }
+    groep.querySelectorAll('a').forEach(a => a.remove());
+    treffers.forEach((m, i) => {
+      const a = document.createElement('a'), nr = document.createElement('span'), naam = document.createElement('b'), pijl = document.createElement('em');
+      a.href = urlVan(m.id) || '#'; a.dataset.gidsId = m.id; a.dataset.search = (m.world + ' ' + m.name).toLowerCase();
+      nr.textContent = String(i + 1).padStart(2, '0'); naam.textContent = m.name; pijl.textContent = '→';
+      a.append(nr, naam, pijl);
+      a.addEventListener('click', ev => {
+        ev.preventDefault();
+        const menu = document.querySelector('.rtg-edge-menu[aria-expanded="true"]'); if (menu) menu.click();
+        gidsOpen(m);
+      });
+      groep.appendChild(a);
+    });
+    groep.hidden = false;
+    const geen = gezicht.querySelector('.rtg-edge-none'); if (geen) geen.hidden = true;
+  }
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t && t.matches && t.matches('.rtg-edge-face-all .rtg-edge-find input')) heelRtgZoek(t);
+  });
 /* de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard */
   bouw();
 
@@ -7797,7 +7845,7 @@ var RTG_BOUW = 'fbc44456';
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(keyRes.key) });
-      await API.call('/push/subscribe', { subscription: sub });
+      await API.call('/api/push/subscribe', { subscription: sub });
       if (interactief) toast('Top! Gezinsmeldingen komen nu ook op je telefoon binnen.');
     }catch(e){ if(interactief) toast('Meldingen aanzetten lukte niet.'); }
   }
@@ -7843,7 +7891,7 @@ var RTG_BOUW = 'fbc44456';
       $('#tripList').insertAdjacentElement('afterend', wrap);
     }
     let dagen = [];
-    try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
+    try { dagen = (await API.call('/api/agenda/mijn')).dagen || []; } catch(e){ return; }
     if (!dagen.length){ wrap.innerHTML = ''; return; }
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang(), { weekday: 'long', day: 'numeric', month: 'long' });
     wrap.innerHTML = '<div class="sec-label h-mt120">' + T('erv.agenda','Mijn programma') + '</div>' +
@@ -7868,7 +7916,7 @@ var RTG_BOUW = 'fbc44456';
   async function executePay(target){
     let foundation = 0;
     if (API.live){
-      const data = await API.call('/pay', target === 'all' ? {all:true} : {invoiceId: target});
+      const data = await API.call('/api/pay', target === 'all' ? {all:true} : {invoiceId: target});
       foundation = data.foundation;
       applyState(data.state);
     } else {

@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-19T10:03:21.649Z",
-  "commit": "eb6dde1a"
+  "op": "2026-10-19T10:49:16.334Z",
+  "commit": "dc5dae5b"
  },
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
@@ -16,9 +16,9 @@
  },
  "grens": "Een verschil is pas een TEGENSPRAAK als beide betrokken bestanden stilstaan sinds het stempel van het andere register. Verschilt de leeftijd, dan vergelijk je twee momenten -- dat wordt hier apart geteld en nooit als tegenspraak gepresenteerd.",
  "gemeten": {
-  "routerRoutes": 5538,
+  "routerRoutes": 5539,
   "routerRoutesZonderBestand": 4,
-  "routerRoutesMetBestand": 5534,
+  "routerRoutesMetBestand": 5535,
   "bronRoutesMetBestand": 4441,
   "beideKennen": 4121,
   "gelijk": 4068,
@@ -26,7 +26,7 @@
   "waarvanVerouderd": 53,
   "waarvanTegenspraak": 0,
   "waarvanNietVastTeStellen": 0,
-  "alleenRouter": 1413,
+  "alleenRouter": 1414,
   "alleenBron": 320,
   "toetsbaarPct": 74.5
  },
@@ -3246,6 +3246,7 @@
   "POST /api/office/beslisgeheugen/intrek",
   "POST /api/office/beslisgeheugen/leg",
   "POST /api/office/betalingen/status",
+  "POST /api/office/betalingen/terug/afhandel",
   "POST /api/office/bewaarverzoek",
   "POST /api/office/boardroom",
   "POST /api/office/boardroom/ai",
@@ -14049,31 +14050,31 @@
   {
    "route": "POST /api/huur/boek",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 46,
+   "regel": 44,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/foto",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 115,
+   "regel": 117,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/locatie",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 153,
+   "regel": 155,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/mijn",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 91,
+   "regel": 93,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/sos",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 136,
+   "regel": 138,
    "samengesteld": false
   },
   {
@@ -20803,6 +20804,12 @@
    "samengesteld": false
   },
   {
+   "route": "POST /api/office/betalingen/terug/afhandel",
+   "bestand": "server/routes/kantoren/betaalproviders.js",
+   "regel": 16,
+   "samengesteld": false
+  },
+  {
    "route": "POST /api/office/bewaarverzoek",
    "bestand": "server/routes/office/bewaarverzoek.js",
    "regel": 26,
@@ -22353,7 +22360,7 @@
   {
    "route": "POST /api/office/pay/bewijs",
    "bestand": "server/routes/pay.js",
-   "regel": 148,
+   "regel": 150,
    "samengesteld": false
   },
   {
@@ -25491,7 +25498,7 @@
   {
    "route": "GET /api/pay/gezond",
    "bestand": "server/routes/pay.js",
-   "regel": 155,
+   "regel": 157,
    "samengesteld": false
   },
   {
@@ -25515,13 +25522,13 @@
   {
    "route": "POST /api/pay/oplaad",
    "bestand": "server/routes/pay.js",
-   "regel": 58,
+   "regel": 60,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/overzicht",
    "bestand": "server/routes/pay.js",
-   "regel": 53,
+   "regel": 55,
    "samengesteld": false
   },
   {
@@ -25539,13 +25546,13 @@
   {
    "route": "POST /api/pay/saldo",
    "bestand": "server/routes/pay.js",
-   "regel": 89,
+   "regel": 91,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/stuur",
    "bestand": "server/routes/pay.js",
-   "regel": 66,
+   "regel": 68,
    "samengesteld": false
   },
   {
@@ -25617,19 +25624,19 @@
   {
    "route": "POST /api/pay/verzoek",
    "bestand": "server/routes/pay.js",
-   "regel": 72,
+   "regel": 74,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/verzoek/betaal",
    "bestand": "server/routes/pay.js",
-   "regel": 77,
+   "regel": 79,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/verzoek/intrek",
    "bestand": "server/routes/pay.js",
-   "regel": 82,
+   "regel": 84,
    "samengesteld": false
   },
   {
@@ -38181,7 +38188,7 @@
   {
    "route": "POST /api/verhuur/aanbod",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 37,
+   "regel": 35,
    "samengesteld": false
   },
   {
@@ -38481,31 +38488,31 @@
   {
    "route": "POST /api/wallet",
    "bestand": "server/routes/zorgwallet.js",
-   "regel": 33,
+   "regel": 35,
    "samengesteld": false
   },
   {
    "route": "POST /api/wallet/munt/koop",
    "bestand": "server/routes/zorgwallet.js",
-   "regel": 48,
+   "regel": 50,
    "samengesteld": false
   },
   {
    "route": "POST /api/wallet/munt/wissel",
    "bestand": "server/routes/zorgwallet.js",
-   "regel": 52,
+   "regel": 54,
    "samengesteld": false
   },
   {
    "route": "POST /api/wallet/voeg",
    "bestand": "server/routes/zorgwallet.js",
-   "regel": 34,
+   "regel": 36,
    "samengesteld": false
   },
   {
    "route": "POST /api/wallet/weg",
    "bestand": "server/routes/zorgwallet.js",
-   "regel": 35,
+   "regel": 37,
    "samengesteld": false
   },
   {

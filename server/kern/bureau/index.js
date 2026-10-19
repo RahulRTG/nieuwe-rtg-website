@@ -39,7 +39,7 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, notifySup
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../tijdzone').datumIn();
 
   /* De graaf en de tower zijn geen eigendom van dit kantoor meer: ze staan in
      kern/levensgraaf en gelden voor elke pas, ook de gratis. Wat hier blijft is

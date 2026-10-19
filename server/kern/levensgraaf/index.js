@@ -46,7 +46,7 @@
 'use strict';
 
 module.exports = ({ db, paspoortVervalt, toestemmingen }) => {
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const { vandaag } = require('./hulp'); // de dag van het lid, op de klok
   const graafMod = require('./graaf')({ db, vandaag, paspoortVervalt, toestemmingen });
   const termijnenMod = require('./termijnen')({ graaf: graafMod.graaf });
 

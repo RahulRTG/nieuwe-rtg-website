@@ -32,9 +32,12 @@
     const boek = document.getElementById('vhBoek');
     if (boek) boek.addEventListener('click', async () => {
       const [code, autoId] = vhOpen.split(':');
+      const van = $('#vhVan').value, tot = $('#vhTot').value;
+      // een sleutel per keuze: dezelfde tik is dezelfde huur, een andere periode een nieuwe
+      if (vhKeuze.idemVoor !== vhOpen + '|' + van + '|' + tot) { vhKeuze.idemVoor = vhOpen + '|' + van + '|' + tot; vhKeuze.idem = RTGIdem('huur'); }
       try {
-        const h = await API.call('/huur/boek', { supplierCode: code, autoId, van: $('#vhVan').value, tot: $('#vhTot').value });
-        await API.call('/booking/pay', { ref: h.huur.ref });
+        const h = await API.call('/api/huur/boek', { supplierCode: code, autoId, van, tot, idem: vhKeuze.idem });
+        await API.call('/api/booking/pay', { ref: h.huur.ref });
         toast(T('vh.ok','Geboekt en betaald: ') + eur(h.huur.price) + T('vh.ok2',' vast, geen verrassingen aan de balie.'));
         vhOpen = null; vhKeuze = null;
         laadVerhuur();
@@ -46,9 +49,9 @@
   let chPartners = [], chOpen = null, chKeuze = null, chLocWatch = {};
   async function laadCharter(){
     if (!API.live) return;
-    try { chPartners = (await API.call('/charter/aanbod')).partners || []; } catch(e){ chPartners = []; }
+    try { chPartners = (await API.call('/api/charter/aanbod')).partners || []; } catch(e){ chPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/charter/mijn')).charters || []; } catch(e){}
+    try { mijn = (await API.call('/api/charter/mijn')).charters || []; } catch(e){}
     const el = $('#chMijn');
     const CH_ST = { 'aangevraagd': T('ch.m.geboekt','geboekt; leg de staat vast bij het uitvaren'), 'lopend': T('ch.m.lopend','op zee; behouden vaart'), 'afgerond': T('ch.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(c => c.status !== 'afgerond' || c.tot >= new Date().toISOString().slice(0, 10)).map(c =>
@@ -77,7 +80,7 @@
       file.onchange = () => {
         if (!file.files[0]) return;
         vhFotoKlein(file.files[0], async (dataUrl) => {
-          try { await API.call('/charter/foto', { ref: b.dataset.chf, fase: b.dataset.fase, foto: dataUrl });
+          try { await API.call('/api/charter/foto', { ref: b.dataset.chf, fase: b.dataset.fase, foto: dataUrl });
             toast(T('ch.m.foto.ok','Vastgelegd. Dit is uw bewijs van de staat.')); laadCharter(); }
           catch(e){ toast(e.message); }
         });
@@ -88,7 +91,7 @@
     document.querySelectorAll('[data-chsos]').forEach(b => b.addEventListener('click', () => {
       const bericht = prompt(T('ch.m.sosvraag','Wat is er aan de hand? (gaat direct naar het charterbedrijf EN naar RTG)'));
       if (bericht == null) return;
-      const stuur = (lat, lng) => API.call('/charter/sos', { ref: b.dataset.chsos, bericht, lat, lng })
+      const stuur = (lat, lng) => API.call('/api/charter/sos', { ref: b.dataset.chsos, bericht, lat, lng })
         .then(() => toast(T('ch.m.sosok','SOS verstuurd. Het charterbedrijf en RTG zijn gewaarschuwd.')))
         .catch(e => toast(e.message));
       if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => stuur(p.coords.latitude, p.coords.longitude), () => stuur());
@@ -99,11 +102,11 @@
       try {
         if (aan && navigator.geolocation){
           chLocWatch[ref] = navigator.geolocation.watchPosition(p =>
-            API.call('/charter/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
-          await API.call('/charter/locatie', { ref, aan: true });
+            API.call('/api/charter/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
+          await API.call('/api/charter/locatie', { ref, aan: true });
         } else {
           if (chLocWatch[ref] != null){ navigator.geolocation.clearWatch(chLocWatch[ref]); delete chLocWatch[ref]; }
-          await API.call('/charter/locatie', { ref, aan: false });
+          await API.call('/api/charter/locatie', { ref, aan: false });
         }
         toast(aan ? T('ch.m.locaanok','U deelt uw positie met het charterbedrijf; uitzetten kan altijd.') : T('ch.m.locuitok','Positie delen staat uit en is gewist.'));
         laadCharter();

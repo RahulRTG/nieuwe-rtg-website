@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2843 bestanden en 19600 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2844 bestanden en 19601 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2843 |
-| losse beweringen (`test(...)`) | 19600 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
+| toetsbestanden | 2844 |
+| losse beweringen (`test(...)`) | 19601 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 4 |
-| niets van beide | 24 |
+| niets van beide | 25 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2544,7 +2544,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-339 bestanden, 573 beweringen.
+340 bestanden, 574 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2815,6 +2815,7 @@ toets omvalt.
 | `servicehulp.e2e.js` | 5 | gezakt op `liegpoort /api/` | DE HULPLAAG IN DE APP-GIDS -- kan een lid er echt bij? WAAROM DIT EEN BROWSERTOETS IS EN GEEN API-TOETS. |
 | `servicewerkplek.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE WERKPLEK VAN EEN ZAAK BIJ RTG SERVICE. De routes bestonden al, maar een zaak kon er alleen langs de API bij -- en dat is geen kanaal maar een belofte. |
 | `sessiestroom.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE SESSIESTROOM IN EEN ECHTE BROWSER: drie schermen openen hun live-stroom met een stroomticket, en GEEN ENKEL verzoek draagt nog een sessie in het adres. De serverkant staat in test/sessiestroom.test.js. |
+| `sfeerbeeld-muis.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sociaal-edge.e2e.js` | 1 | gezakt op `liegpoort /api/` | SOCIAAL IN DE EDGE: EEN DECLARATIE, EN ELK SCHERM ZEGT ZELF WAAR JE BENT. De technische laag van de sociale schermen (het commandodeck van shared/social-intelligence-runtime.js) stond tot ronde 2 van EDGE.md in het... |
 | `spelpraat.e2e.js` | 1 | gezakt op `liegpoort /api/` | PRATEN IN HET POTJE, IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelpraat.test.js). |
 | `spelscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET GEDEELDE SCHERM IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelprojectie.test.js): een scherm krijgt uitsluitend `zicht.publiek`, en bij 30 Seconden zit de kaart daar niet in. |

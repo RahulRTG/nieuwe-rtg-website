@@ -251,3 +251,24 @@ test('typen voor het formulier, en een co-host die de hoofdhost zelf aanwijst', 
     Authorization: 'Bearer ' + host.token }, body: '{}' }).then(r => r.json());
   assert.ok(hostHuizen.huizen.some(h => h.id === huisId) && hostHuizen.huizen.some(h => h.id === instantId), 'de host ziet zijn eigen huizen');
 });
+
+/* De herhaling van een afgebroken aanvraag (19 oktober 2026): de tweede poging
+   met dezelfde sleutel kreeg "deze periode is al bezet" over de eigen boeking.
+   Nu: 200, herhaald, en precies een boeking -- ook na een herstart (de sleutel
+   staat op de boeking). Dezelfde sleutel voor een andere aanvraag is een 409. */
+test('dezelfde herhaalsleutel bij boeken geeft de eigen aanvraag terug, ook na een herstart', () => {
+  const crypto = require('crypto');
+  const maak = (data) => require('../server/kern/thuis')({ db: { data }, save: () => {}, crypto,
+    schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200), reiswijzer: null, landVind: () => null, findSupplier: () => null, LANDEN: {} }).thuis;
+  const data = {};
+  const h = maak(data).thuisHuisZet('Gastheer', { titel: 'Herhaalhuis', plaats: 'Ibiza', maxGasten: 4 }, null).huis;
+  const lijf = { id: h.id, van: dag(20), tot: dag(23), gasten: 2, idem: 'boek-1' };
+  const eerst = maak(data).thuisBoek('Gast', lijf);
+  assert.ok(eerst.ok);
+  const na = maak(JSON.parse(JSON.stringify(data)));
+  const nogEens = na.thuisBoek('Gast', lijf);
+  assert.equal(nogEens.herhaald, true, 'een herhaling en geen "al bezet"');
+  assert.equal(nogEens.boeking.ref, eerst.boeking.ref);
+  assert.equal(na.thuisMijnReizen('Gast').reizen.filter(b => b.huisId === h.id).length, 1);
+  assert.equal(na.thuisBoek('Gast', Object.assign({}, lijf, { van: dag(30), tot: dag(32) })).status, 409);
+});

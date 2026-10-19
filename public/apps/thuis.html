@@ -339,10 +339,15 @@ async function boek(){
   const van = $('#zVan').value, tot = $('#zTot').value;
   if (!van || !tot) { meld('Kies eerst aankomst- en vertrekdatum in de zoekbalk.'); return; }
   try {
-    const kost = $('#bKost');
-    const d = await api('/api/thuis/boek', { id: HUIDIG.id, van, tot, gasten: Number($('#zGasten').value)||1,
+    const kost = $('#bKost'), gasten = Number($('#zGasten').value)||1;
+    // een sleutel per aanvraag: een herhaling na een weggevallen verbinding vindt de eigen aanvraag terug
+    const vorm = [HUIDIG.id, van, tot, gasten].join('|');
+    if (boek.vorm !== vorm) { boek.idem = RTGId('thuis-boek'); boek.vorm = vorm; }
+    const d = await api('/api/thuis/boek', { id: HUIDIG.id, van, tot, gasten, idem: boek.idem,
       kostenplaats: (kost && kost.value) || undefined });
+    boek.vorm = null;
     $('#blad').classList.remove('open');
+    if (d.herhaald) { meld('Je aanvraag stond er al; er is niets dubbel geboekt.'); return; }
     meld((d.boeking.status === 'bevestigd' ? 'Geboekt! ' : 'Aangevraagd -- de host beslist. ') +
       (d.boeking.opFactuur ? 'De factuur volgt van de zaak; er is nog niets afgeschreven. ' : '') +
       (d.reiswijzer ? 'Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen.' : ''));

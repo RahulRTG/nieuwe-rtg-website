@@ -17,7 +17,8 @@ module.exports = (ctx) => {
     data = data || {};
     const sleutel = !id && typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
     const al = sleutel && Object.values(huizen()).find(h => h.host === codenaam && h.idem === sleutel);
-    if (al) return { ok: true, huis: metStats(al), herhaald: true };
+    if (al) return al.titel === schoon(data.titel, 80) ? { ok: true, huis: metStats(al), herhaald: true }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een ander huis.' };
     const bestaand = id ? huizen()[id] : null;
     if (id && !bestaand) return { status: 404, error: 'Dit huis bestaat niet.' };
     if (bestaand && !magBeheren(bestaand, codenaam)) return { status: 403, error: 'Alleen de host (of een co-host) beheert dit huis.' };

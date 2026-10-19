@@ -11,7 +11,7 @@
  "grens": "zegt niet of de wijziging ertoe doet, niet of de 4xx bereikbaar is, en niets over routes waarvan de bron niet te vinden is (die staan apart geteld).",
  "gemeten": {
   "routes": 5515,
-  "verdacht": 7,
+  "verdacht": 0,
   "bronOnvindbaar": 0
  },
  "perVorm": [

@@ -42,6 +42,8 @@
 const { randomUUID } = require('crypto');
 
 const vandaag = () => new Date().toISOString().slice(0, 10);
+const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+const over = (d) => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
 const idem = () => randomUUID();
 
 /* Zoek de eerste waarde in een antwoord: onder een sleutelnaam, of een string
@@ -118,6 +120,93 @@ const LIJVEN = {
   '/api/gegevens/zeg': { tekst: '+31612345678' },
   '/api/member/vluchten/charter': { soort: 'privejet', bestemming: 'Nice' },
   '/api/verify/upload': { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' },
+  '/api/metier/beveel-aan': (c) => ({ wie: c.tegen && c.tegen.codenaam, tekst: 'Een uitstekende collega, altijd paraat.' }),
+  '/api/metier/onderschrijf': (c) => ({ wie: c.tegen && c.tegen.codenaam, vaardigheid: 'sommelier', aan: true }),
+  '/api/metier/lid': (c) => ({ wie: c.tegen && c.tegen.codenaam }),
+  '/api/wbw/maak': (c) => ({ naam: 'Weekendje', leden: c.tegen && c.tegen.key ? [c.tegen.key] : [] }),
+  '/api/member/pulse/volg': (c) => ({ key: c.tegen && c.tegen.key }),
+  /* RTMail (routes/rtmail-*.js): het postvak komt altijd uit de sessie */
+  '/api/member/rtmail/concept/bewaar': (c) => ({ id: undefined, naar: c.ikAdres, onderwerp: 'Proef', tekst: 'proef' }),
+  '/api/member/rtmail/antwoord': { tekst: 'Re proef' },
+  '/api/member/rtmail/etiket': { label: 'proef', aan: true },
+  '/api/member/rtmail/sluimer': () => ({ tot: new Date(Date.now() + 864e5).toISOString() }),
+  '/api/member/rtmail/ster': { aan: true },
+  '/api/member/rtmail/verplaats': { map: 'archief' },
+  '/api/member/rtmail/zoek': { vraag: 'proef' },
+  '/api/member/rtmail/afwezig': { tekst: 'Ik ben weg', van: undefined, tot: undefined },
+  '/api/member/rtmail/regel/maak': { id: undefined, naam: 'Proef', veld: 'onderwerp', bevat: 'proef', actie: 'ster' },
+  '/api/member/rtmail/regel/zet': { aan: false },
+  '/api/member/rtmail/imap/sleutel': { id: undefined, naam: 'Proeftoestel', dagen: 30 },
+  '/api/member/rtmail/imap/roteer': { dagen: 30 },
+  '/api/member/rtmail/bewaring': { aan: true, zaak: 'ZAAK-1', reden: 'Proef juridische bewaring' },
+  '/api/member/rtmail/opruimen': { reden: 'Proef opruimen' },
+  '/api/member/rtmail/team/maak': { id: undefined, naam: 'Proefteam' },
+  '/api/member/rtmail/team/stuur': { tekst: 'proef' },
+  '/api/member/rtmail/team/status': { status: 'in behandeling' },
+  '/api/member/rtmail/team/prioriteit': { prioriteit: 'hoog' },
+  '/api/member/rtmail/team/notitie': { tekst: 'proef' },
+  '/api/member/rtmail/team/koppel': { klantId: 'K1', ticketId: 'T1' },
+  '/api/member/rtmail/team/bevestiging': { tekst: 'Ontvangen' },
+  '/api/member/rtmail/team/lid': (c) => ({ codenaam: c.tegen && c.tegen.codenaam, erin: true }),
+  /* Gesprekken (routes/member/comm.js) */
+  '/api/comm/begin': (c) => ({ met: c.tegen && c.tegen.key }),
+  '/api/comm/stuur': { tekst: 'proef' },
+  '/api/comm/concept': { tekst: 'proef' },
+  '/api/comm/vlag': { vlag: 'vast', aan: true },
+  '/api/comm/reactie': { teken: '+1' },
+  '/api/comm/wijzig': { tekst: 'nieuw' },
+  /* Spellen (routes/spellen.js) */
+  '/api/member/spel/nieuw': (c) => ({ soort: 'schaak', codenamen: c.tegen ? [c.tegen.codenaam] : [] }),
+  '/api/member/spel/random': { soort: 'schaak' },
+  '/api/member/spel/projectie-open': () => ({ idem: 'proef-herhaal-' + randomUUID() }),
+  '/api/member/spel/arcade-score': { spel: 'tetris', punten: 1234 },
+  '/api/member/spel/arcade-bord': { spel: 'tetris' },
+  '/api/member/spel/dag': { spel: 'sudoku' },
+  '/api/member/spel/dag-start': { spel: 'sudoku' },
+  '/api/member/spel/dag-klaar': { spel: 'sudoku', inzending: new Array(81).fill(0) },
+  '/api/member/spel/sudoku-nieuw': { niveau: 'normaal' },
+  '/api/member/spel/sudoku-klaar': { rooster: new Array(81).fill(0) },
+  '/api/member/spel/toernooi-nieuw': { soort: 'schaak', vorm: 'roundrobin', maat: 3 },
+  /* Magnaat (routes/magnaatwereld.js, magnaatstad.js) */
+  '/api/member/magnaat/leven/actie': { actie: 'slaap' },
+  '/api/member/magnaat/stad/actie': { actie: 'slaap' },
+  '/api/member/magnaat/economie/schok': { schokId: 'vraagpiek' },
+  '/api/member/magnaat/economie/volgende-dag': () => ({ commandoId: 'proef-dag-' + randomUUID().slice(0, 8) }),
+  '/api/member/magnaat/economie/analyse': { hypothese: 'vraag', maatregel: 'niets', indicatoren: ['vraag', 'verkoop'],
+    causaleKeten: 'Als de vraag stijgt, stijgt de verkoop en daarmee de omzet van de zaak.',
+    alternatief: 'De prijs verhogen om de vraag te temperen.', opportunityCost: 'Geen investering in extra capaciteit.',
+    risico: 'De vraag zakt weer voordat de voorraad op is.', omzetRichting: 'stijgt', winstRichting: 'gelijk', kasRichting: 'daalt',
+    verwachteOmzet: 10000, verwachteWinst: 1000, verwachteInflatie: 2, zekerheid: 70 },
+  /* Vakwerk (routes/member/vakpro.js): DENTAL is een vakzaak uit de initdata */
+  '/api/vak/offerte/vraag': () => ({ supplierCode: 'DENTAL', omschrijving: 'Controle en reiniging graag', wens: over(14) }),
+  '/api/vak/ritme/start': () => ({ supplierCode: 'DENTAL', serviceId: 't1', intervalWeken: 2, tijd: '10:00', start: over(7) }),
+  '/api/vak/wachtlijst/zet': () => ({ supplierCode: 'DENTAL', datum: over(7), serviceId: 't1' }),
+  '/api/vak/review': { supplierCode: 'DENTAL', ref: 'geen-boeking', sterren: 5, tekst: '' },
+  /* Commerce en winkelen */
+  '/api/commerce/etalage': { verkoper: 'TALLER', lang: 'nl' },
+  '/api/commerce/mand/zet': { koopbaarId: 'dienst:TALLER:g1', aantal: 1 },
+  '/api/commerce/overdracht/maak': { verkoper: 'TALLER' },
+  '/api/reserveer': () => ({ supplierCode: 'KIKUNOI', datum: morgen(), tijd: '20:00', personen: 2 }),
+  '/api/booking/slots': () => ({ supplierCode: 'DENTAL', serviceId: 't1', date: over(7) }),
+  '/api/booking/request': () => ({ supplierCode: 'DENTAL', serviceId: 't1', date: over(7), time: '10:00', note: '' }),
+  '/api/retail/catalogus': { supplierCode: 'MAISON', lang: 'nl' },
+  '/api/retail/wishlist': (c) => ({ supplierCode: 'MAISON', artikelId: c.artikel }),
+  '/api/reviews': { supplierCode: 'KIKUNOI' },
+  '/api/mall/aanvraag': { wat: 'Privechef gezocht', verdieping: 'eten', plek: 'Ibiza' },
+  /* Thuis, agenda, gezondheid -- privé per sleutel */
+  '/api/home/onderhoud/meld': { titel: 'Kraan lekt', plek: 'keuken', urgentie: 'normaal' },
+  '/api/agenda/bereik': () => ({ van: vandaag(), tot: over(14) }),
+  '/api/instant-reality/event': { type: 'intent.delta', value: 'vier gasten' },
+  '/api/plaats/venster': { doel: 'dienst', minuten: 60 },
+  '/api/metingen/zet': { onderwerp: 'slaap', waarde: 7 },
+  '/api/metingen/weg': () => ({ onderwerp: 'slaap', op: vandaag() }),
+  '/api/leerstof/examen': { fase: 'havo' },
+  '/api/leerstof/examen-antwoord': { nr: 1, antwoord: 'A' },
+  '/api/bieb/ai': { vraag: 'Een boek over wijn' },
+  '/api/bijles/vraag': { tekst: 'Hoe werkt breuken optellen?' },
+  '/api/fluister': { q: 'Hallo Rahul' },
+  '/api/mediaos/volg': (c) => ({ codenaam: c.tegen && c.tegen.codenaam, aan: true }),
+  '/api/push/subscribe': { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/proef123', keys: { p256dh: 'x', auth: 'y' } } },
   '/api/verify/selfie': { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' }
 };
 
@@ -140,8 +229,26 @@ const VAN_A = {
   '/api/carriere/ledger/stopdelen': (c) => ({ id: c.deelId }),
   '/api/pay/tegoed/roteer': (c) => ({ id: c.tegoed }),
   '/api/code/scan': (c) => ({ token: c.codeToken }),
-  '/api/gegevens/zeg': (c) => ({ id: c.gesprek }),
-  '/api/neiging/antwoord': (c) => (c.vraag ? { vraag: c.vraag, onderwerpen: c.onderwerpen } : {})
+  '/api/gegevens/zeg': (c) => ({ id: c.gegevensgesprek }),
+  '/api/neiging/antwoord': (c) => (c.vraag ? { vraag: c.vraag, onderwerpen: c.onderwerpen } : {}),
+  '/api/metier/naam-intrekken': () => ({ code: 'KIKUNOI' }),
+  /* RTMail: A's eigen bericht, A's eigen postvak, A's team */
+  '/api/member/rtmail/antwoord': (c) => ({ id: c.bericht }),
+  '/api/member/rtmail/etiket': (c) => ({ id: c.bericht }),
+  '/api/member/rtmail/sluimer': (c) => ({ id: c.bericht }),
+  '/api/member/rtmail/ster': (c) => ({ id: c.bericht }),
+  '/api/member/rtmail/verplaats': (c) => ({ id: c.bericht }),
+  '/api/member/rtmail/concept/verstuur': (c) => ({ id: c.concept }),
+  '/api/member/rtmail/concept/weg': (c) => ({ id: c.concept }),
+  '/api/member/rtmail/bewaring': (c) => ({ postvak: c.ikAdres }),
+  '/api/member/rtmail/opruimen': (c) => ({ postvak: c.ikAdres }),
+  ...Object.fromEntries(['af', 'bevestiging', 'dossier', 'hef', 'koppel', 'lid', 'notitie', 'overzicht', 'pak', 'postvak',
+    'prioriteit', 'status', 'stuur', 'verlaat'].map((h) => ['/api/member/rtmail/team/' + h,
+    (c) => ({ id: c.team, bericht: c.teamBericht, ...(h === 'stuur' ? { naar: c.ikAdres } : {}) })])),
+  /* Gesprekken: A's gesprek met C */
+  ...Object.fromEntries(['concept', 'gesprek', 'lees', 'por', 'stuur', 'typt', 'vlag'].map((h) => ['/api/comm/' + h, (c) => ({ id: c.gesprek })])),
+  ...Object.fromEntries(['reactie', 'wijzig', 'wis'].map((h) => ['/api/comm/' + h, (c) => ({ id: c.gesprek, berichtId: c.commBericht })])),
+  '/api/member/spel/projectie-open': (c) => ({ id: c.potje })
 };
 
 /* De opbouwstappen. `lijf(ctx)` mag lezen wat eerdere stappen bewaarden;
@@ -164,7 +271,7 @@ function stappen() {
     { pad: '/api/bank/storten', lijf: (c) => ({ iban: c.iban, centen: 5000, route: 'auto', oms: 'opbouw', idem: idem() }) },
     { pad: '/api/bank/pas/uitgeven', lijf: (c) => ({ iban: c.iban, soort: 'debit', naam: 'Mijn pas', idem: idem() }) },
     /* RTG Geld */
-    { pad: '/api/geld/pot/zet', lijf: { naam: 'Vakantie', doelCenten: 50000 } },
+    { pad: '/api/geld/pot/zet', lijf: (c) => ({ naam: 'Vakantie-' + c.merk, doelCenten: 50000 }) },
     { pad: '/api/geld/beleid/zet', lijf: { soort: 'maanddrempel', drempelCenten: 100000, niveau: 'kijken' } },
     { pad: '/api/geld/grens/zet', lijf: { periode: 'maand', centen: 50000 } },
     /* Wie betaalt wat: een lijstje met C */
@@ -202,8 +309,54 @@ function stappen() {
       const v = d.vraag || {};
       c.vraag = v.id; c.onderwerpen = (v.opties || []).slice(0, 2).map((o) => o.onderwerp).filter(Boolean);
     } },
+    /* RTMail: het eigen adres, een bericht aan zichzelf, een concept, een team
+       met een bericht erin, een regel en een IMAP-sleutel. */
+    { pad: '/api/member/rtmail/adres', lijf: {}, bewaar: (d, c) => { c.ikAdres = d.adres; } },
+    { pad: '/api/member/rtmail/concept/bewaar', lijf: (c) => ({ naar: c.ikAdres, onderwerp: 'Proef ' + c.merk, tekst: 'proef ' + c.merk }),
+      bewaar: (d, c) => { c.conceptVoorBericht = d.concept && d.concept.id; } },
+    { pad: '/api/member/rtmail/concept/verstuur', lijf: (c) => ({ id: c.conceptVoorBericht }), bewaar: (d, c) => { c.bericht = d.bericht && d.bericht.id; } },
+    { pad: '/api/member/rtmail/concept/bewaar', lijf: (c) => ({ naar: c.ikAdres, onderwerp: 'Concept ' + c.merk, tekst: 'blijft liggen' }),
+      bewaar: (d, c) => { c.concept = d.concept && d.concept.id; } },
+    { pad: '/api/member/rtmail/team/maak', lijf: (c) => ({ naam: 'Proefteam ' + c.merk }),
+      bewaar: (d, c) => { c.team = d.team && d.team.id; c.teamAdres = d.team && d.team.adres; } },
+    { pad: '/api/member/rtmail/concept/bewaar', lijf: (c) => ({ naar: c.teamAdres, onderwerp: 'Teamvraag ' + c.merk, tekst: 'graag hulp' }),
+      bewaar: (d, c) => { c.teamConcept = d.concept && d.concept.id; } },
+    { pad: '/api/member/rtmail/concept/verstuur', lijf: (c) => ({ id: c.teamConcept }), bewaar: (d, c) => { c.teamBericht = d.bericht && d.bericht.id; } },
+    { pad: '/api/member/rtmail/regel/maak', lijf: (c) => ({ naam: 'Regel ' + c.merk, veld: 'onderwerp', bevat: 'proef', actie: 'ster' }) },
+    { pad: '/api/member/rtmail/imap/sleutel', lijf: { naam: 'Proeftoestel', dagen: 30 } },
+    /* Een gesprek met C, met een bericht */
+    { pad: '/api/comm/begin', lijf: (c) => ({ met: c.tegen.key }), bewaar: (d, c) => { c.gesprek = d.gesprek && d.gesprek.id; } },
+    { pad: '/api/comm/stuur', lijf: (c) => ({ id: c.gesprek, tekst: 'proef ' + c.merk }), bewaar: (d, c) => {
+      const b = (d.gesprek && d.gesprek.berichten) || [];
+      c.commBericht = b.length ? b[b.length - 1].id : undefined;
+    } },
+    /* Een potje schaak met C */
+    { pad: '/api/member/spel/nieuw', lijf: (c) => ({ soort: 'schaak', codenamen: [c.tegen.codenaam] }), bewaar: (d, c) => { c.potje = d.id; } },
+    { pad: '/api/member/spel/sudoku-nieuw', lijf: { niveau: 'normaal' } },
+    /* Een Magnaat-stad met C erin */
+    { pad: '/api/member/magnaat/stad/maak', lijf: { moeilijkheid: 'normaal', begin: 'keuken' }, bewaar: (d, c) => { c.stad = d.stad && d.stad.code; } },
+    { als: 'tegen', pad: '/api/member/magnaat/stad/doe', lijf: (c) => ({ code: c.stad }) },
+    { pad: '/api/member/magnaat/stad/start', lijf: {} },
+    /* Vakwerk, winkelen, reserveren */
+    { pad: '/api/vak/offerte/vraag', lijf: () => ({ supplierCode: 'DENTAL', omschrijving: 'Controle en reiniging graag', wens: over(14) }) },
+    { pad: '/api/vak/ritme/start', lijf: () => ({ supplierCode: 'DENTAL', serviceId: 't1', intervalWeken: 2, tijd: '10:00', start: over(7) }) },
+    { pad: '/api/retail/catalogus', lijf: { supplierCode: 'MAISON', lang: 'nl' }, bewaar: (d, c) => {
+      const a = (d.artikelen || d.items || [])[0]; c.artikel = a && a.id;
+    } },
+    { pad: '/api/commerce/mand/zet', lijf: { koopbaarId: 'dienst:TALLER:g1', aantal: 1 } },
+    { pad: '/api/reserveer', lijf: () => ({ supplierCode: 'KIKUNOI', datum: morgen(), tijd: '20:00', personen: 2 }) },
+    { pad: '/api/mall/aanvraag', lijf: (c) => ({ wat: 'Privechef gezocht ' + c.merk, verdieping: 'eten', plek: 'Ibiza' }) },
+    /* Privé per sleutel: agenda, onderhoud, metingen, medicatie, noodkaart.
+       De namen dragen A's merkwoord, zodat A's antwoord iets van A toont. */
+    { pad: '/api/agenda/toevoegen', lijf: (c) => ({ titel: 'Afspraak ' + c.merk, datum: morgen(), tijd: '10:00' }) },
+    { pad: '/api/home/onderhoud/meld', lijf: (c) => ({ titel: 'Kraan ' + c.merk, plek: 'keuken', urgentie: 'normaal' }) },
+    { pad: '/api/metingen/zet', lijf: { onderwerp: 'slaap', waarde: 7 } },
+    { pad: '/api/medicatie/zet', lijf: (c) => ({ naam: 'Middel-' + c.merk, sterkte: '10mg' }) },
+    { pad: '/api/noodkaart/zet', lijf: (c) => ({ contactNaam: 'Contact-' + c.merk, contactTel: '0612345678' }) },
+    /* C maakt een clip, zodat er iets van C te volgen valt */
+    { als: 'tegen', pad: '/api/clips/maak', lijf: { titel: 'Proefclip', duurS: 10 } },
     /* Een gegevensgesprek */
-    { pad: '/api/gegevens/start', lijf: { soort: 'vlucht' }, bewaar: (d, c) => { c.gesprek = zoek(d, { patroon: /^gg/ }) || d.id; } }
+    { pad: '/api/gegevens/start', lijf: { soort: 'vlucht' }, bewaar: (d, c) => { c.gegevensgesprek = zoek(d, { patroon: /^gg/ }) || d.id; } }
   ];
 }
 
@@ -224,4 +377,9 @@ function vanA(pad, ctx) {
   return uit;
 }
 
-module.exports = { LIJVEN, VAN_A, stappen, lijfVoor, vanA, zoek, vandaag };
+/* A's merkwoord: spatieloos en met cijfers, zodat het een merkteken is
+   (./afbakening.js merkbaar). Alleen de opbouw van A gebruikt het; B en C sturen
+   het nooit, dus wie het in een antwoord ziet, ziet iets van A. */
+function merkwoord() { return 'mrk' + randomUUID().replace(/-/g, '').slice(0, 10); }
+
+module.exports = { LIJVEN, VAN_A, stappen, lijfVoor, vanA, zoek, vandaag, merkwoord };

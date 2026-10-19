@@ -138,6 +138,14 @@ const NAGEKEKEN = {
   'POST /api/neiging/antwoord': 'kern.neiging.antwoord(req.session.key, vraag, onderwerpen): de vraag is een id uit de vaste vragenlijst (kern/neiging/vraag-lijst.js), geen object van A; het antwoord landt op B\'s eigen sleutel',
   'POST /api/veiligheid/kring/mail': 'kringMailToevoegen(req.session.key, adres) leest geen id; de controle gaf 409 omdat B\'s eerste poging het adres al in B\'s EIGEN kring zette',
   'POST /api/veiligheid/wacht/start': 'wachtStart(req.session.key, codenaam, body) leest body.id niet en maakt een nieuwe wacht voor B; de controle gaf 409 "Er loopt al een wacht" door B\'s eerste poging',
+  /* De tweede opbouwronde (19 oktober 2026). De tegenpoging staat nu in het
+     register (`tegenpoging`); vier van de vijf vielen op 409, de TOESTAND die
+     B's eigen eerste poging zette. */
+  'POST /api/home/onderhoud/meld': 'woningOnderhoud.meld(req.session.key, body) leest geen id en maakt een nieuwe melding voor B; de tegenpoging gaf 409 door B\'s eerste melding',
+  'POST /api/mall/aanvraag': 'mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id\'s in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt',
+  'POST /api/reserveer': 'reserveerTafel(req.session, ...) zet customerKey uit de SESSIE; een customerKey in het lijf wordt niet gelezen. De tegenpoging gaf 409 "al een reservering voor dit moment" door B\'s eerste reservering',
+  'POST /api/vak/wachtlijst/zet': 'wachtZet({ key: req.session.key, ... }) zet B op de wachtlijst; de supplierCode is een openbare zaakcode, en de tegenpoging gaf 409 "al op de wachtlijst" door B\'s eerste poging',
+  'POST /api/code/scan': 'een dynamische code is een getoonde code die een ANDER hoort te scannen; dyncode.lees controleert alleen handtekening en geldigheid, en een verzonnen token geeft 422',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
@@ -238,7 +246,7 @@ if (require.main !== module) { module.exports = {}; return; }
   let C = await maakLid(3);
   if (!A || !B || !C) { console.error('kon geen drie leden registreren; A=' + !!A + ' B=' + !!B + ' C=' + !!C); klaar(); process.exit(2); }
   /* De context van de opbouw (./lib/idoropbouw.js): de tegenpartij is C. */
-  const ctx = { get tegen() { return leden[3]; }, get ik() { return leden[1]; } };
+  const ctx = { get tegen() { return leden[3]; }, get ik() { return leden[1]; }, merk: opbouwLib.merkwoord() };
   const basisLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), ctx);
 
   /* ---- DE SESSIE OVERLEEFT DE PROEF, want anders bewijst hij het tegendeel ----
@@ -306,6 +314,15 @@ if (require.main !== module) { module.exports = {}; return; }
     .filter(r => !r.pad.includes(':'));
   const verdeling = verdeelOpRol(kandidaten, ['member']);
   let routes = verdeling.metRol.filter(r => r.rol === 'member');
+  /* DE HANDLERPOORT. Een route zonder bewakerslaag controleert de sessie in de
+     handler (een stroomticket, een dynamische code, een gezins- of werkruimte-
+     token). Ledenschermen roepen er tientallen aan met een ledentoken, en
+     /api/stroom/ticket geeft een lid gewoon 200. Ze horen dus dezelfde vraag te
+     krijgen. Of een lid er binnenkomt, beslist de gang zelf: komt A er niet in,
+     dan blijft de route eerlijk onbereikbaar. */
+  const handlerRoutes = verdeling.zonderRol.filter(z => /^geen bewakerslaag/.test(z.reden))
+    .map(z => ({ methode: z.methode, pad: z.pad, rol: 'handler' }));
+  routes = routes.concat(handlerRoutes);
   if (MAX) routes = routes.slice(0, MAX);
 
   console.log('\n=== DE IDOR-PROEF ===\n');
@@ -349,6 +366,10 @@ if (require.main !== module) { module.exports = {}; return; }
     }
     const u = st.als === 'kantoor' ? await post(st.pad, lijf, kantoor)
       : st.als === 'tegen' ? await roep(st.pad, lijf, 3, C) : await roep(st.pad, lijf, 1, A);
+    /* Wat C in de opbouw maakt (een clip, een aanbeveling voor A) is van C en
+       hoort bij de controle: anders lijkt C's nieuwe object straks een
+       merkteken van A, alleen omdat C het na zijn controlegang maakte. */
+    if (st.als === 'tegen' && u.data && typeof u.data === 'object') waarden(u.data, controle);
     if (st.als) {
       if (u.status >= 200 && u.status < 300) { opbouw.geslaagd++; if (typeof st.bewaar === 'function') { try { st.bewaar(u.data, ctx); } catch (e) {} } }
       else opbouw.mislukt.push((st.als + ' ') + st.pad + ' ' + u.status + ' ' + String(u.tekst || '').slice(0, 80));
@@ -413,11 +434,11 @@ if (require.main !== module) { module.exports = {}; return; }
     if (o.staat === 'doorbraak') {
       const nep = { ...lijf };
       for (const v of velden) nep[v] = verzonnen();
-      const controle = await post(r.pad, nep, B);
-      if (controle.status >= 200 && controle.status < 300) {
+      const tegenpoging = await post(r.pad, nep, B);
+      if (tegenpoging.status >= 200 && tegenpoging.status < 300) {
         telling.publiek++;
         perRoute[sleutel] = { status: u.status, staat: 'publiek', velden,
-          reden: 'ook met een VERZONNEN id een ' + controle.status + ': de route is publiek/rol-open, ' +
+          reden: 'ook met een VERZONNEN id een ' + tegenpoging.status + ': de route is publiek/rol-open, ' +
             'A\'s id maakt geen verschil -- geen objectreferentie om te schenden' };
         continue;
       }
@@ -427,8 +448,8 @@ if (require.main !== module) { module.exports = {}; return; }
           reden: 'doorbraak-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
         continue;
       }
-      perRoute[sleutel] = { status: u.status, staat: 'doorbraak', velden,
-        reden: 'B kreeg ' + u.status + ' met A\'s id maar ' + controle.status + ' met een verzonnen id: ' +
+      perRoute[sleutel] = { status: u.status, tegenpoging: tegenpoging.status, staat: 'doorbraak', velden,
+        reden: 'B kreeg ' + u.status + ' met A\'s id maar ' + tegenpoging.status + ' met een verzonnen id: ' +
           'A\'s ECHTE object opende de deur voor B -- dit is een objectreferentie die B niet hoort te hebben' };
       telling.doorbraak++;
       continue;
@@ -440,6 +461,7 @@ if (require.main !== module) { module.exports = {}; return; }
        antwoord voor B dat een merkteken van A draagt telt nooit als scheiding. */
     if (o.staat === 'onbereikbaar' && (u.status === 400 || u.status === 422)) {
       const ijk = await roep(r.pad, lijf, 1, A);
+      if (process.env.IDOR_SPOOR && new RegExp(process.env.IDOR_SPOOR).test(r.pad)) console.error('SPOOR2', r.pad, JSON.stringify({ id: lijf.id, berichtId: lijf.berichtId, met: lijf.met }), 'B', u.status, String(u.tekst).slice(0, 100), 'A', ijk.status, String(ijk.tekst).slice(0, 200));
       if (ijk.status >= 200 && ijk.status < 300) {
         const merken = merktekens({ antwoordA: ijk.data, vanA, controle, lijf, wie: identiteit[1] });
         const gezien = merken.filter((m) => String(u.tekst || '').includes(JSON.stringify(m).slice(1, -1)));
@@ -475,6 +497,9 @@ if (require.main !== module) { module.exports = {}; return; }
     const a = await roep(r.pad, lijf, 1, A);
     if (a.status >= 200 && a.status < 300 && a.data && typeof a.data === 'object') waarden(a.data, vanA);
     const merken = merktekens({ antwoordA: a.data, vanA, controle, lijf, wie: identiteit[1] });
+    /* IDOR_SPOOR=<patroon> toont voor die routes wat A kreeg: om een open route te
+       begrijpen zonder het register te lezen. Verandert niets aan de meting. */
+    if (process.env.IDOR_SPOOR && new RegExp(process.env.IDOR_SPOOR).test(r.pad)) console.error('SPOOR4', r.pad, a.status, JSON.stringify(merken), String(a.tekst).slice(0, 400));
     const b = merken.length && a.status >= 200 && a.status < 300 ? await roep(r.pad, lijf, 2, B) : { status: 0, tekst: '' };
     let o = oordeelAfbakening({ a, b, merken });
     if (o.staat === 'doorbraak' && NAGEKEKEN[sleutel]) {

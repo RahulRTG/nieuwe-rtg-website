@@ -1179,6 +1179,10 @@ console.log('\n17) een scherm dat door de poort kan, kan het gesprek ook voeren'
       const src = m[1].split('?')[0];
       const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
       for (const p of [doel, ...(delenVan.get(doel) || [])]) {
+        /* toestelsleutel.js NOEMT zware paden om te weten wanneer hij tekent (een
+           kopie van server/kern/identiteit/bezitspaden.js); hij roept er geen
+           enkele aan. Een pagina die hem laadt, bereikt die paden er niet door. */
+        if (p === 'shared/toestelsleutel.js') continue;
         const vol = path.join(ROOT, 'public', p);
         if (fs.existsSync(vol)) { try { bereik.push(fs.readFileSync(vol, 'utf8')); } catch (e) {} }
       }

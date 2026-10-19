@@ -95,4 +95,8 @@ test('een ja op een geldvoorstel van Rahul is voorwaardelijk zwaar, het gesprek 
   const m = bron.match(/var VOORWAARDELIJK = \[([\s\S]*?)\];/);
   assert.ok(m, 'de browser kent de voorwaardelijk zware paden, anders tekent hij de ja niet');
   assert.deepEqual(m[1].match(/'[^']+'/g).map(x => x.slice(1, -1)).sort(), VOORWAARDELIJK.map(x => x.pad).sort());
+  // de browser tekent alleen een ja, en het is DEZELFDE ja als die van de server
+  const ja = bron.match(/var JA = (\/.*\/i);/);
+  assert.ok(ja, 'de browser kent het woord ja');
+  assert.equal(ja[1], String(require('../server/kern/fluister/bevestig').JA), 'browser en server herkennen dezelfde ja');
 });

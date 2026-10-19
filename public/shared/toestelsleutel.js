@@ -117,12 +117,19 @@
     '/api/ov/uit', '/api/mob/kaart/koop', '/api/mob/abo/koop', '/api/pakket/koop', '/api/vonk/betaal',
     '/api/appstore/koop', '/api/rtfos/winkel/koop', '/api/rtfos/gift/bevestig', '/api/giftcard/buy',
     '/api/wbw/verreken', '/api/podium/cadeau', '/api/podium/abonneer', '/api/podium/kaartje', '/api/podium/koop'];
-  // licht pad, maar een handeling erop is zwaar; de server beslist wanneer (bezitspaden.js)
+  /* Licht pad, maar een handeling erop is zwaar (bezitspaden.js VOORWAARDELIJK).
+     Alleen een ja wordt getekend: elk gewoon gesprek zou anders op een sleutel
+     en een handtekening wachten. JA is dezelfde als kern/fluister/bevestig.js;
+     test/geldroutes-bezit.test.js houdt ze gelijk. */
   var VOORWAARDELIJK = ['/api/fluister'];
-  function zwaar(pad) {
+  var JA = /^(ja|yes|ok[eé]?|doe maar|graag|bevestig|akkoord|prima)[.!]?$/i;
+  function isJa(lijf) {
+    try { return JA.test(String((JSON.parse(lijf) || {}).q || '').trim()); } catch (e) { return false; }
+  }
+  function zwaar(pad, lijf) {
     var p = String(pad);
     for (var i = 0; i < ZWAAR.length; i++) if (p.indexOf(ZWAAR[i]) === 0) return true;
-    for (var j = 0; j < VOORWAARDELIJK.length; j++) if (p === VOORWAARDELIJK[j]) return true;
+    for (var j = 0; j < VOORWAARDELIJK.length; j++) if (p === VOORWAARDELIJK[j]) return typeof lijf === 'string' && isJa(lijf);
     return false;
   }
 
@@ -143,7 +150,7 @@
       var url = typeof invoer === 'string' ? invoer : (invoer && invoer.url) || '';
       var pad = String(url).replace(/^https?:\/\/[^/]+/, '').split('?')[0];
       var methode = ((opties && opties.method) || (invoer && invoer.method) || 'GET').toUpperCase();
-      if (!zwaar(pad)) return origineel.apply(this, arguments);
+      if (!zwaar(pad, opties && opties.body)) return origineel.apply(this, arguments);
       var eigen = opties || {};
       return bewijsVoor(methode, pad).then(function (bewijs) {
         var koppen = new Headers(eigen.headers || (typeof invoer === 'object' && invoer.headers) || {});

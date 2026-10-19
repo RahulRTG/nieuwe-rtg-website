@@ -47,6 +47,12 @@ test('"Directe berichten" uit op het bord van een kind: geen bericht sturen of l
   const lees = await soc('/dm', Object.assign({ withKey: tante, metKey: tante, key: tante }, K));
   assert.equal(stuur.status, 403, 'met Directe berichten uit stuurt het kind toch een bericht (' + stuur.status + ')');
   assert.equal(lees.status, 403, 'met Directe berichten uit leest het kind toch berichten (' + lees.status + ')');
+  /* Een snap is een privébericht met een foto: dezelfde knop (catalogus.js). */
+  const foto = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q==';
+  const snap = await soc('/snap/send', Object.assign({ toKey: tante, foto, tekst: 'kijk' }, K));
+  const snaps = await soc('/snaps', K);
+  assert.equal(snap.status, 403, 'met Directe berichten uit snapt het kind toch (' + snap.status + ')');
+  assert.equal(snaps.status, 403, 'met Directe berichten uit opent het kind toch zijn snaps (' + snaps.status + ')');
 
   await soc('/kind/boardroom/zet', { code: g.code, token: g.token, kindHandle: kidHandle, id: 'dm', aan: true });
   assert.equal((await soc('/dm/send', Object.assign({ toKey: tante, text: 'hoi weer' }, K))).status, 200, 'na weer aanzetten kan het kind chatten');

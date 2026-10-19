@@ -1266,3 +1266,385 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 5. Er is niets meer in de opslag.
 
 **Storing:** de app-dienst is uit: intrekken werkt toch, want de machtiging staat bij RTG en niet bij de app.
+
+---
+
+## 16. Logeren bij leden (`link:huis` → thuis.html, eigenaar `verblijf.logeren-bij-leden`)
+
+**Productindeling.** Het eigenaarsbesluit van 19 oktober zet Logeren in de productindeling onder TravelOS. Het eigenaarschap blijft hier.
+
+**Doel.** Een lid zet zijn huis open voor andere leden. Een ander lid vindt het, vraagt aan, logeert en geeft een review. De host beslist, en betaald heet pas betaald.
+
+### a. Inventaris
+- **Routes:** `/api/thuis/*` (zoek, detail, boek met idem, beslis, annuleer, checkin, checkuit, review, bericht, huis met idem, cohost, prijsadvies, zakelijk).
+- **Statussen:** aangevraagd of bevestigd (instant), afgewezen, geannuleerd, ingecheckt en uitgecheckt.
+- **Deurcode:** alleen voor de gast, vanaf 3 dagen vóór aankomst.
+- **Bewezen:** voltooiproef `huis.js` (herhaalsleutels op boek en huis gerepareerd).
+- **Gaten:**
+  - SCHERMEIGENAAR r.2510 beschrijft een ander product ("woning-gerelateerde diensten");
+  - de boeking zegt "betaling loopt via RTG Pay bij bevestiging", maar `beslis` zet alleen de status;
+  - `terugPct` wordt alleen vastgelegd, er gaat geen geld terug;
+  - de uitbetaling blijft "gepland";
+  - de host krijgt geen melding van een aanvraag.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Airbnb Luxe | gekeurd huis, een vaste Trip Designer | host-fee 15,5% ([Airbnb](https://www.airbnb.ca/help/article/3301); het Luxe-tarief is na te gaan) |
+| Plum Guide | gecureerd | 16,5% host-only, of 3% plus 12% voor de gast, plus €300 onboarding ([Plum Guide](https://help.plumguide.com/en/articles/4684372-plum-guide-fees)) |
+| Booking.com / Vrbo | groot bereik | 15-18% / 5% plus 3% (na te gaan) |
+
+### c. Domein
+- **Wet toeristische verhuur van woonruimte:** de gemeente kan een registratienummer, een meldplicht en een nachtenplafond eisen. Boetes tot €8.700 en €21.750 ([Volkshuisvesting](https://www.volkshuisvestingnederland.nl/onderwerpen/toeristische-verhuur/veelgestelde-vragen-toeristische-verhuur)).
+- **EU-verordening 2024/1028 (sinds 20 mei 2026):** registratie en een plicht voor platforms om gegevens te delen ([kamerstuk 36904](https://zoek.officielebekendmakingen.nl/kst-36904-3.pdf)).
+- **Toeristenbelasting (Gemeentewet art. 224):** de verhuurder is plichtig en houdt een nachtregister bij.
+- **Nepreviews:** verboden sinds 28 mei 2022 ([ACM](https://www.acm.nl/nl/publicaties/acm-pakt-handel-nepreviews-en-neplikes-aan)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| H1 | Betalen via betaalWaarheid na bevestiging | L6 | ontbreekt (alleen tekst) | Na de bevestiging van de host betaalt de gast via betaalWaarheid (soort `thuis-boeking`). Zonder bevestigde betaling geen deurcode en geen check-in. Bij een weigering volgt "niet betaald". | M | **A nu** (met Geld) |
+| H2 | Annuleren met echte terugbetaling | L5 | ontbreekt (`terugPct` registratief) | Annuleren volgens het beleid start `terugbetalen`. Het scherm zegt pas "terugbetaald" als dat bevestigd is. | M | A nu, na H1 |
+| H3 | Melding aan de host bij een aanvraag | L1 | ontbreekt | Elke aanvraag geeft de host een melding met de datums. Een tweede aanvraag met dezelfde sleutel geeft geen tweede melding. | K | **A nu** |
+| H4 | Registratienummer en nachtenteller | L2 | ontbreekt | De host vult het registratienummer van zijn gemeente in. Zonder nummer gaat het huis niet live, als de gemeente het eist (vastgelegd door de host, RTG valideert niet). De teller toont de nachten per jaar. Boven het plafond dat de host opgaf, sluit de kalender. | M | A later |
+| H5 | Nachtregister en toeristenbelasting | L2/L6 | ontbreekt | Per verblijf een registerregel (nachten, gasten). De belasting wordt berekend als het tarief bekend is, met bron. Zonder tarief staat er "tarief niet ingevuld". | M | A later |
+| H6 | Uitbetaling aan de host | L6 | ontbreekt (gepland) | Na het uitchecken loopt de uitbetaling via Geld, die eigenaar is. Het scherm zegt "uitbetaald" pas als dat bevestigd is. | M | A later (Geld) |
+| H7 | SCHERMEIGENAAR-doel rechtzetten | — | fout (tekst) | Het doel beschrijft logeren bij leden. | K | **A nu** |
+| H8 | Gegevens delen met de overheid (2024/1028) | — | — | — | — | vraagt besluit (juridisch) |
+
+### g. Prioritering
+- **A nu:** H3, H7 (K) en H1 (M).
+- **Daarna:** H2.
+- **A later:** H4, H5, H6.
+- **Besluit:** H8.
+
+### Keten "een weekend logeren"
+1. Zoeken.
+2. Aanvragen; de host krijgt een melding (H3).
+3. Bevestigen.
+4. Betalen (H1).
+5. De deurcode komt 3 dagen vóór aankomst.
+6. Inchecken en uitchecken.
+7. Reviews.
+8. Uitbetaling (H6).
+
+**Storingen:**
+- Betaling geweigerd: geen deurcode, met de melding.
+- Geld uit: de boeking blijft "bevestigd, niet betaald".
+
+---
+
+## 17. Mijn leven (`link:leven`, eigenaar `leven.werkblad`)
+
+**Productindeling.** Het eigenaarsbesluit zegt dat Leven een overkoepelende projectie is en nooit eigenaar van gegevens.
+
+**Doel.** Een lid ziet zijn lijn (fasen, rollen, afspraken, wat deze week speelt) uit de eigen apps, zonder dat Leven iets bezit of iets voor hem doet.
+
+### a. Inventaris
+- **Routes:** alleen lezend. `/api/leven/lijn` en `/cockpit`; routes/leven.js zegt letterlijk "geen enkele schrijfroute".
+- **Cockpit:** items zijn `niveau:'kijken'`.
+- **Delen:** via levensband (`/api/leven/beleid`, `/band/*`, `/deel/*`).
+- **Mentor:** `/api/leven/mentor` via de lokaal-eerst-keten, met `spiegel()` als terugval.
+- **Bewezen:** voltooiproef `leven.js`.
+- **Gaten:**
+  - SCHERMEIGENAAR r.1884 beschrijft nog de avondcomponist, terwijl die naar avond.html verhuisd is;
+  - "Rahul" op het scherm is trefwoordrouting;
+  - leven.html roept de mentor en de levensband niet aan.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Day One Gold | AI-chat, samenvatting over meerdere notities | $74,99 per jaar ([Day One](https://dayoneapp.com/guides/premium-subscription/day-one-pricing-features-guide/)) |
+| Notion Business | life-OS-templates met AI | ongeveer $18-20 per gebruiker per maand (na te gaan) |
+| Apple Journal | dagboek | gratis |
+
+### c. Domein
+- **AVG art. 20:** dataportabiliteit van wat het lid zelf gaf.
+- **AVG art. 22 en UAVG art. 40:** geen besluit met aanmerkelijk effect dat uitsluitend geautomatiseerd tot stand komt (AP-advies 2024) ([Eerste Kamer](https://www.eerstekamer.nl/overig/20241025/advies_artikel_22_avg_en/document)).
+- **Coaching:** de EMCC/AC-code (versie 4, december 2025): de coachee beslist ([EMCC](https://www.emccglobal.org/global-code-of-ethics/)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| L1 | Bron bij elk item op de lijn | L6 | half | Elk cockpit-item noemt de app die eigenaar is en opent daar. Is die app uit, dan staat er "bron nu niet te zien", zonder kopie. | K | **A nu** |
+| L2 | Export van de eigen lijn (art. 20) | L1 | ontbreekt | Het lid downloadt zijn lijn als JSON, met de bron per regel. | K | A later |
+| L3 | Mentor op het scherm, volgens de EMCC-regel | L4 | half (route bestaat) | De mentor stelt vragen en geeft nooit een besluit of een opdracht. Zonder model komt de spiegel. Het lid kan alles wissen. | M | A later |
+| L4 | Doel in SCHERMEIGENAAR rechtzetten | — | fout (tekst) | Het doel beschrijft de lijn als projectie. | K | **A nu** |
+
+### g. Prioritering
+- **A nu:** L1, L4.
+- **A later:** L2, L3.
+
+### Keten "mijn week"
+1. De agenda, de woninggeschiedenis (Wonen W20) en Entourage leveren aan de lijn.
+2. Leven toont ze, met de bron per item.
+
+**Storing:** een bron is uit: dat deel staat er niet, en het scherm noemt welke bron.
+
+---
+
+## 18. Cellier (`link:cellier`, eigenaar `leven.cellier`, Lifestyle en Business)
+
+**Doel.** De eigen wijnkelder bijhouden, weten wat op dronk is, en schenkadvies krijgen.
+
+### a. Inventaris
+- **Routes:** `/api/member/rechterhand/cellier`, `/zet`, `/weg`, `/schenk` en `/ai`.
+- **Stand van een fles:** op dronk, laten liggen, over de top of onbekend.
+- **Bewezen:** voltooiproef `cellier.js`. Inschenken is met opzet een teller, dus niet ontdubbeld.
+- **Gat:** "een fles laten regelen" heeft geen route; alleen de AI-tekst belooft het.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| CellarTracker | drinkvensters (eigen, community en professioneel), waardering, critici | $40-500 per jaar naar keldergrootte ([CellarTracker](https://support.cellartracker.com/article/25-voluntary-payment)) |
+| InVintory Premium | 3D-keldermap, AI-sommelier | $149,99 per jaar (verkopersbron) |
+| Vivino Premium | wijnkaartscanner, AI | ongeveer $47,90 per jaar (na te gaan) |
+
+### c. Domein
+- **Bewaren:** stabiel 12-14°C, ongeveer 70% luchtvochtigheid, donker en zonder trilling (secundair).
+- **Alcoholwet art. 20 en 20a:** de leeftijd wordt gecontroleerd bij verkoop op afstand én bij aflevering ([CBL](https://www.cbl.nl/wp-content/uploads/2024/12/CBL_checklist_nix18_online_2024dec.pdf)).
+- **Accijns:** zelf meegebracht voor eigen gebruik is vrijgesteld (richtwaarde 90 liter).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Ce1 | Drinkvenster met bron | L4 | half | Een venster komt van het lid of van een opgegeven bron, met het label erbij. Zonder venster staat er "onbekend", nooit een gok. | K | **A nu** |
+| Ce2 | Plek in de kelder (rek, vak) | L1 | ontbreekt | Elke fles heeft een plek, en zoeken op plek werkt. | K | A later |
+| Ce3 | Fles bestellen bij een zaak | L2/L6 | ontbreekt (alleen AI-tekst) | Bestellen gaat via een gekeurde wijnzaak (bestaande handel) met een 18+-controle vóór en bij aflevering. Er wordt nooit iets beloofd zonder route. | M | A later |
+| Ce4 | AI-tekst eerlijk maken | — | fout (belofte) | De adviseur zegt niet "ik zet klaar" zolang Ce3 niet bestaat. | K | **A nu** |
+
+### g. Prioritering
+- **A nu:** Ce1, Ce4.
+- **A later:** Ce2, Ce3.
+
+### Keten "een fles voor zaterdag"
+1. Het lid kiest wat op dronk is.
+2. Schenkadvies.
+3. Inschenken telt af.
+
+**Storing:** model uit: een vaste tekst met `demo:true`.
+
+---
+
+## 19. Garderobe (`link:garderobe`, eigenaar `leven.garderobe`, Lifestyle en Business)
+
+**Doel.** De eigen garderobe bijhouden, de vaklui kennen (kleermaker, schoenmaker) en de stylist iets vragen.
+
+### a. Inventaris
+- **Routes:** `/api/member/rechterhand/garderobe`, `/stuk`, `/vakman` en `/ai`. Er zijn 10 categorieën en 5 vakken.
+- **Bewezen:** voltooiproef `garderobe.js`. De vaklui zijn contacten en geen accounts.
+- **Gat:** de "persoonlijke stylist" is alleen de AI.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Indyx | menselijke stylist 1:1 vanaf $60, analyses | ([Indyx](https://myindyx.com/), na te gaan) |
+| Whering | AI-styling met credits | $1,99-9,99 per credit-bundel (na te gaan) |
+| Stylebook | outfits, kalender | $4,99 eenmalig |
+
+### c. Domein
+- **Stylist:** een kastaudit (pasvorm, kleur, staat), daarna een boodschappenlijst (secundair).
+- **ISO 3758:2023:** onderhoudssymbolen ([ISO](https://www.iso.org/standard/74401.html)).
+- **UPV textiel (sinds 1 juli 2023):** 50% hergebruik of recycling in 2025, oplopend tot 75% in 2030 ([consultatie](https://internetconsultatie.nl/upv_textiel/document/7508)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Ga1 | Onderhoudssymbolen per stuk (ISO 3758) | L1 | ontbreekt | Het lid kiest de symbolen. Het stuk toont de wasinstructie, en de stylist leest ze mee. | K | **A nu** |
+| Ga2 | Opdracht aan een kleermaker of schoenmaker (vakwerk) | L2/L6 | ontbreekt | Vanuit een stuk vraagt het lid een offerte bij een zaak met het genre vakwerk (verwijzing naar het stuk). De werkbon komt terug. | M | A later |
+| Ga3 | Kastaudit | L4 | ontbreekt | Per stuk de staat en het laatste gebruik. Stukken die een jaar niet gedragen zijn, staan in een lijst met de opties herstel, verkoop en inzameling. | M | A later |
+| Ga4 | Een menselijke stylist (Lifestyle-concierge) | L2 | ontbreekt | — | M | B, besluit (rol of genre) |
+
+### g. Prioritering
+- **A nu:** Ga1.
+- **A later:** Ga2, Ga3.
+- **B:** Ga4.
+
+### Keten "het jasje laten herstellen"
+1. Stuk.
+2. Offerte bij een kleermaker (Ga2).
+3. Werkbon.
+4. Terug in de garderobe.
+
+**Storing:** vakwerk uit: het stuk krijgt het label "herstel aangevraagd, status niet te zien".
+
+---
+
+## 20. Maison (`link:maison`, eigenaar `woning.huishouden`, Lifestyle en Business)
+
+**Doel.** Een Lifestyle-lid beheert zijn huishouden: personeel, taken en het logboek van het huis.
+
+### a. Inventaris
+- **Routes:** `/api/member/rechterhand/maison`, `/staf`, `/taak`, `/taak/klaar`, `/log` en `/ai`.
+- **Bewezen:** voltooiproef `maison.js`.
+- **Gat:** het personeel heeft geen account en ontvangt niets; "via de huismeester" is alleen de AI.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Nines | huishoud-OS voor family offices: panden, personeel, HR, NDA | per pand, niet openbaar ([Wealth Mosaic](https://www.thewealthmosaic.com/vendors/nines/nines)) |
+| EstateSpace | planning, onderhoud, bezittingen | $22-34 per gebruiker per maand (na te gaan) |
+
+### c. Domein
+- **Regeling dienstverlening aan huis:**
+  - minder dan 4 dagen per week per particulier;
+  - minimumloon plus 8% vakantiegeld;
+  - bij ziekte maximaal 6 weken doorbetalen (art. 7:629 BW);
+  - vanaf 4 dagen gewoon werkgeverschap.
+  - Bron: [Rijksoverheid](https://www.rijksoverheid.nl/onderwerpen/dienstverlening-aan-huis/vraag-en-antwoord/ik-doe-huishoudelijk-werk-voor-iemand.-wat-kan-ik-afspreken).
+- **Praktijk:** een huishoudhandboek voor continuïteit; de household of estate manager doet administratie en HR.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| M1 | Dagen per medewerker met de grens van de regeling | L2 | ontbreekt | Per medewerker de dagen per week. Bij 4 of meer staat er "geen dienstverlening aan huis meer: gewoon werkgeverschap", met de bron, als uitleg en niet als oordeel. | K | **A nu** |
+| M2 | Taak voor een medewerker die zelf RTG-lid is | L3/L6 | ontbreekt | Is de medewerker lid en gekoppeld met zijn toestemming, dan ziet hij zijn taken en vinkt hij ze af. Een niet-lid blijft een notitie. | M | A later |
+| M3 | Huishoudhandboek | L1 | ontbreekt | Vaste routines per ruimte (verwijzing naar Wonen W1). Een document te delen met nieuw personeel, met een einddatum. | M | A later |
+| M4 | Loon via Geld (wbw of Pay) | L6 | ontbreekt | — | M | B, eigenaar Geld; werkgeverschap vraagt een besluit |
+
+### g. Prioritering
+- **A nu:** M1.
+- **A later:** M2, M3.
+- **B:** M4.
+
+### Keten "de week van het huis"
+1. Taken plannen.
+2. De medewerker vinkt af (M2).
+3. Het log.
+4. Het onderhoud van een installatie gaat als verwijzing naar Wonen.
+
+**Storing:** Wonen uit: de taak blijft staan zonder de installatiekoppeling.
+
+---
+
+## 21. Entourage (`link:entourage`, eigenaar `leven.entourage`, Lifestyle en Business)
+
+**Doel.** De mensen om het lid heen en hun reisdocumenten bijhouden, en een reisgezelschap samenstellen dat klaar is om te gaan.
+
+### a. Inventaris
+- **Routes:** `/api/member/rechterhand/entourage`, `/persoon`, `/doc` en `/gezelschap`.
+- **Banden:** partner, familie, vriend, zakelijk, kind en overig.
+- **Documenten:** paspoort, visum, rijbewijs, verzekering, vaccinatie en overig.
+- **Waarschuwing:** 90 dagen vooraf. `gezelschap` geeft `gereed` met wat ontbreekt.
+- **Bewezen:** voltooiproef `entourage.js`. Inreisvereisten worden met opzet niet beloofd.
+- **Gaten:**
+  - de personen zijn geen accounts en zien niets;
+  - het doel noemt "dienstverleners", maar die band bestaat niet;
+  - de AI-context noemt alleen paspoorten.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| TripIt Pro | alerts, hulp bij verstoringen | $49 per jaar (na te gaan) |
+| 1Password Families | gedeelde kluis voor documenten, 5 personen | $71,88 per jaar ([TidBITS](https://tidbits.com/?p=73397)) |
+
+### c. Domein
+- **Schengengrenscode art. 6:** voor derdelanders 3 maanden geldig na vertrek. Veel landen vragen 6 maanden ([Rijksoverheid](https://www.rijksoverheid.nl/onderwerpen/paspoort-en-identiteitskaart/vraag-en-antwoord/moet-ik-mijn-paspoort-of-identiteitskaart-meenemen-tijdens-reizen-naar-het-buitenland)).
+- **ETIAS:** €20; de start is niet officieel bevestigd ([Commissie](https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en)).
+- **Minderjarigen:** een toestemmingsformulier per kind, sterk aanbevolen ([Rijksoverheid](https://www.rijksoverheid.nl/onderwerpen/reizen-met-kinderen/documenten/formulieren/2014/02/06/formulier-toestemming-reizen-met-minderjarige-naar-het-buitenland)).
+- **AVG art. 14:** informatieplicht voor gegevens van derden. Dat geldt voor RTG als platform, eigen lezing, na te gaan.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| E1 | Geldigheid tegen de reis | L4/L6 | half (90 dagen) | Bij een reis uit TravelOS (verwijzing) toetst Entourage "nog 6 maanden geldig na terugkeer" als algemene regel. Er staat bij "check de eisen van het land", zonder belofte per land. | M | **A nu** |
+| E2 | Toestemmingsformulier voor een minderjarige | L2 | ontbreekt | Reist een kind mee zonder beide gezaghebbers, dan meldt het gezelschap "toestemmingsformulier aanbevolen" met de link naar de Rijksoverheid. | K | **A nu** |
+| E3 | Gegevens van derden: informatieplicht | L3 | ontbreekt | Bij het toevoegen van een persoon vraagt de app of die persoon op de hoogte is. Wissen per persoon wist ook de documenten. | K | **A nu** |
+| E4 | Gezelschapslid dat zelf lid is, ziet zijn eigen deel | L3/L6 | ontbreekt | Met zijn toestemming ziet een gekoppeld lid de reis en zijn eigen documentstatus, en niets van de anderen. | M | A later |
+| E5 | Band "dienstverlener" | L1 | ontbreekt | De band bestaat, zonder documenten. | K | A later |
+
+### g. Prioritering
+- **A nu:** E2, E3 (K) en E1 (M).
+- **A later:** E4, E5.
+
+### Keten "met z'n vieren naar New York"
+1. De reis staat in TravelOS.
+2. Het gezelschap.
+3. Toets op geldigheid (E1).
+4. Het kind heeft een formulier nodig (E2).
+5. Gereed.
+
+**Storing:** TravelOS uit: de toets gebruikt de datum die het lid zelf invult, en zegt dat.
+
+---
+
+## 22. Het Vooruitzicht (`link:vooruitzicht` → living-os.html, eigenaar `leven.vooruitzicht`)
+
+**Doel.** Een lid legt een intentie of beslissing vast en ziet vooruit wat er in agenda, geld, reis en veiligheid speelt. Er wordt niets geregeld zonder zijn uitdrukkelijke akkoord.
+
+### a. Inventaris
+- **Routes:** `/api/instant-reality`, `/event` en `/partner`. Werelden: ideal, likely en disruption. Statussen: draft, prepared en confirmed.
+- **Bronnen:** het scherm leest acht bronnen (bureau, geld, reis, agenda, veiligheid).
+- **Gerepareerd** (c2-fase): een provider-gebeurtenis van het lid krijgt 403, en de financiële stand heet niet meer "verified".
+- **Bewezen:** voltooiproef `vooruitzicht.js`. Er is geen providerroute.
+- **Gaten:**
+  - "klaargezet" maakt niets in een andere app;
+  - `/partner` geeft de eigen universe terug;
+  - `permissions.friends` wordt niet afgedwongen;
+  - `beslis` en `vraag` worden nooit aangeroepen;
+  - het vraagveld werkt met regex.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Motion | AI-planning van taken en agenda | ongeveer $39-69 per maand (na te gaan) |
+| Reclaim.ai | slimme agenda | ongeveer $18 per gebruiker per maand (na te gaan) |
+| TripIt Pro | proactieve alerts | $49 per jaar |
+
+Een consumentenproduct met scenario's (ideaal, waarschijnlijk, verstoring) is **niet gevonden**. Dit is een eigen RTG-categorie.
+
+### c. Domein
+- **Scenariopraktijk (Oxford, Shell):** plausibele werelden, geen voorspellingen, geen kansen ([MIT Sloan](https://www.sloanreview.mit.edu/article/using-scenario-planning-to-reshape-strategy)).
+- **AVG art. 22:** betekenisvolle menselijke tussenkomst bij een aanmerkelijk effect.
+- **Richtlijn consumentenrechten art. 22:** geen afgeleide extra betalingen en geen vooraf aangevinkte vakjes.
+- **Pakketreisrichtlijn:** een gekoppeld reisarrangement vraagt informatie vooraf.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Vz1 | Klaarzetten is een voorstel in de eigenaar-app | L6 | ontbreekt | "Klaarzetten" maakt in Agenda, Geld en reis alleen een concept of voorstel, met een verwijzing naar de intentie. Niets is bindend of betaald tot het lid het in die app bevestigt. Er zijn geen vooraf aangevinkte keuzes. | M | **A nu** |
+| Vz2 | Drie werelden zonder kansen | L4 | half | De werelden tonen gevolgen, geen percentages. Elk gevolg noemt zijn bron (een app) of "aanname van het lid". | K | **A nu** |
+| Vz3 | Vrienden-toestemming afdwingen | L3 | fout (niet afgedwongen) | `permissions.friends` bepaalt wie de intentie ziet. Een niet-genoemde vriend krijgt 403. | K | **A nu** |
+| Vz4 | `/partner` laat de echte partner zien | L3 | fout | Met een levensband-akkoord ziet de partner de gedeelde intentie, en zonder akkoord niets. | M | A later |
+| Vz5 | Verstoring van een provider (vlucht vertraagd) | L6 | ontbreekt (geen providerroute) | — | G | B: providerroute met handtekening (TravelOS) |
+
+### e. RTG-exclusief
+Eén intentie die zichtbaar wordt in de agenda, het geld, de reis en de veiligheid van dezelfde persoon, als voorstel in elke eigenaar-app. Er is geen centrale planner die iets bezit.
+
+### g. Prioritering
+- **A nu:** Vz2, Vz3 (K) en Vz1 (M).
+- **A later:** Vz4.
+- **B:** Vz5.
+
+### Keten "ik verhuis in maart"
+1. De intentie.
+2. Agenda-concepten (Vz1).
+3. De verhuischecklist van Wonen (W19) als voorstel.
+4. Een reservering in Geld als voorstel.
+5. Het lid bevestigt elk voorstel in de eigen app.
+
+**Storing:** Geld uit: dat deel staat er als "niet klaargezet". De rest gaat door.
+
+---
+
+## Samenvatting voor Centraal
+
+**Fouten in de code, gevonden met de inventaris.** Ik heb ze niet gerepareerd; dat gebeurt na een akkoord.
+- **Bellen:** het signaal `tekst` geeft 400 en de fout wordt geslikt.
+- **Gezin:** alleen het eerste gezin, `g[0]`.
+- **Assets:** stille fout bij een wachtlijstoverdracht.
+- **Vonk:** `commitmentId` staat op null.
+- **Krant:** assist krijgt de lokaal-eerst-keten niet.
+- **Camera:** spraak gaat via de cloud van de browser.
+- **Podium:** de 18+-tekst klopt niet.
+- **Logeren:**
+  - betalen, terugbetalen en uitbetalen gebeurt alleen in tekst;
+  - de host krijgt geen melding.
+- **Vooruitzicht:** de vriendentoestemming en `/partner` werken niet zoals beloofd.
+- **SCHERMEIGENAAR-doelen kloppen niet:** Logeren r.2510, Leven r.1884, en onderhoud r.2146 (Wonen W3).
+
+**Juridisch, vraagt besluit:**
+- **Assets:** een verbod op vooruitbetaling binnen de bedenktijd, als de timesharerichtlijn van toepassing is. Daarnaast de prospectusvrijstelling en het beleggingsobject.
+- **Podium en Theater:** PSD2 voor cadeaus en betaalde abonnementen; de CvdM-registratie.
+- **Logeren:** de gegevensplicht uit verordening 2024/1028.
+- **Bestellen:** alcohol, als dat verkocht wordt.

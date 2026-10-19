@@ -103,7 +103,7 @@ module.exports = (kern) => {
   app.post('/api/geld/beleid', auth, doe((c) => ({ status: 200, ok: true,
     regels: kern.geldbeleid.regels(c), potten: kern.geldbeleid.potten(c) })));
   app.post('/api/geld/beleid/zet', auth, doeVast((c, b) => kern.geldbeleid.regelZet(c, b)));
-  app.post('/api/geld/pot/zet', auth, doeVast((c, b) => kern.geldbeleid.potZet(c, b)));
+  app.post('/api/geld/pot/zet', auth, doeVast((c, b) => kern.geldbeleid.potZet(c, b, b.idem)));
   // centen mag negatief zijn: dat geeft een oormerk vrij; de kern bewaakt de nulgrens
   app.post('/api/geld/pot/reserveer', auth, doeVast((c, b) => kern.geldbeleid.potReserveer(c, String(b.id || ''), b.centen, undefined, b.idem)));
   /* opruimen hoort erbij: zonder deze route belooft de foutmelding bij

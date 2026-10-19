@@ -43,7 +43,14 @@ const EIGEN = [
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
   '/api/comm/stuur',
   // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
-  '/api/geld/pot/reserveer'
+  '/api/geld/pot/reserveer',
+  // een nieuwe pot onthoudt zijn sleutel en geeft 409 voor een andere pot (kern/geldbeleid/potten.js)
+  '/api/geld/pot/zet',
+  // een toezegging en een voorstel onthouden hun sleutel per lid, aan beide deuren (kern/labfonds.js)
+  '/api/labfonds/doneer',
+  '/api/labfonds/voorstel/maak',
+  '/api/rtf/labfonds/doneer',
+  '/api/rtf/labfonds/voorstel/maak'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

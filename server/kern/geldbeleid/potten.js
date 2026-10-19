@@ -13,7 +13,7 @@ module.exports = (ctx) => {
 
   function potten(codenaam) { const rec = kijk(codenaam); return rec ? rec.potten.map(zichtPot) : []; }
 
-  function potZet(codenaam, p) {
+  function potZet(codenaam, p, idem) {
     const rec = pak(codenaam);
     if (!rec) return { status: 400, error: 'Geen codenaam.' };
     p = p && typeof p === 'object' ? p : {};
@@ -25,7 +25,7 @@ module.exports = (ctx) => {
     if (doel == null) return { status: 400, error: 'Geef een doel in hele centen (0 tot ' + MAX_CENTEN + ').' };
     /* EEN NIEUWE POT PER TIK: zonder id maakt een tweede tik anders een tweede
        pot. Dezelfde sleutel geeft de eerste terug, een andere pot is een 409. */
-    const sleutel = !bestaand && p.idem != null ? String(p.idem).trim().slice(0, 80) : '';
+    const sleutel = !bestaand && idem != null ? String(idem).trim().slice(0, 80) : '';
     const eerder = sleutel && rec.potten.find(x => x.idem === sleutel);
     if (eerder) return eerder.naam === nm && eerder.doelCenten === doel ? { status: 200, ok: true, herhaald: true, pot: zichtPot(eerder) }
       : { status: 409, error: 'Deze sleutel hoort al bij een andere pot.' };

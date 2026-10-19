@@ -102,6 +102,7 @@ const EIGEN = [
   '/api/rtf/labfonds/doneer',
   '/api/rtf/labfonds/voorstel/maak',
   '/api/vonk/bericht',
+  '/api/connection/vonk/text',
   '/api/theater/reactie',
   '/api/thuis/huis',
   '/api/rtf/bericht',

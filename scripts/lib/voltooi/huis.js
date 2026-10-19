@@ -143,7 +143,7 @@ async function loop(w, stap) {
 
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik op "aanvragen": een boeking, niet twee', async () => {
-    const lijf = { id: huis.id, van: dag(40), tot: dag(43), gasten: 2 };
+    const lijf = { id: huis.id, van: dag(40), tot: dag(43), gasten: 2, idem: 'thuis-boek-dubbel-' + merk };
     const [a, b] = await w.dubbel(BOEK, lijf, G.token);
     const n = (await reizen()).filter((x) => x.van === dag(40) && x.huisId === huis.id).length;
     return { klopt: geen5xx(a) && geen5xx(b) && (a.status === 200 || b.status === 200) && n === 1, ziet: 'antwoorden ' + a.status + '/' + b.status + ', ' + n + ' boeking(en)' };
@@ -157,12 +157,12 @@ async function loop(w, stap) {
     return { klopt: geen5xx(a) && geen5xx(b) && n === 1, ziet: 'antwoorden ' + a.status + '/' + b.status + ', ' + n + ' huis/huizen' };
   });
 
-  await stap('herstelbaar', 'een afgebroken aanvraag, daarna opnieuw: een boeking', async () => {
-    const lijf = { id: huis.id, van: dag(70), tot: dag(72), gasten: 1 };
+  await stap('herstelbaar', 'een afgebroken aanvraag, daarna opnieuw met dezelfde sleutel: de eigen aanvraag komt terug, niet "al bezet"', async () => {
+    const lijf = { id: huis.id, van: dag(70), tot: dag(72), gasten: 1, idem: 'thuis-boek-half-' + merk };
     const half = await w.afgebroken(BOEK, lijf, G.token);
     const opnieuw = await w.post(BOEK, lijf, G.token);
     const n = (await reizen()).filter((x) => x.van === dag(70) && x.huisId === huis.id).length;
-    return { klopt: geen5xx(opnieuw) && n === 1, ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', ' + n + ' boeking(en)' };
+    return { klopt: opnieuw.status === 200 && opnieuw.data.herhaald === true && n === 1, ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', ' + n + ' boeking(en)' };
   });
 
   await stap('herstelbaar', 'een crash direct na het besluit van de host en na een nieuw huis: bevestigd blijft bevestigd, en het huis opnieuw sturen maakt er geen tweede', async () => {

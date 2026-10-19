@@ -15,12 +15,23 @@
    toelaten en de versie publiceren, en pas daarna leest het lid. Voor de
    publicatie zegt het dossier eerlijk dat er niets te zeggen valt (409); na de
    publicatie draagt het de hash die de uitgever kreeg en de naam van wie
-   aftekende. De toegankelijkheidsuitslag zet de proef zelf neer, zoals
-   test/appstore-dossier.test.js: dit gaat over het dossier, niet over de
-   keurloper.
+   aftekende. De toegankelijkheidsuitslag komt van de ECHTE keurloper
+   (scripts/appstore-a11y.js), die hier lokaal draait tegen deze wegwerpserver
+   en zijn datamap, met een echte browser -- niet van de proef zelf. Zonder die
+   uitslag weigert het kantoor de publicatie, en dat is een stap.
    ========================================================================== */
 'use strict';
+const path = require('path');
+const { spawnSync } = require('child_process');
 const { nieuwLid, inloggen, eigenaarSessie, KANTOORWERELD } = require('../voltooiwereld');
+
+/* De echte keurloper, als eigen proces naast de server, zoals in productie. */
+function keurloper(w) {
+  const r = spawnSync(process.execPath, [path.join(__dirname, '..', '..', 'appstore-a11y.js'),
+    '--server', w.basis, '--code', KANTOORWERELD.OFFICE_CODE, '--data', w.datamap],
+  { encoding: 'utf8', timeout: 180000, env: Object.assign({}, process.env, { RTG_DATA_DIR: w.datamap }) });
+  return { code: r.status, uit: String(r.stdout || '') + String(r.stderr || '') };
+}
 
 const DOSSIER = '/api/appstore/dossier';
 const KANAAL = '/api/appstore/kanaal';
@@ -96,16 +107,24 @@ async function loop(w, stap) {
       ziet: 'besluit door de uitgever ' + b.status + ' (' + ((b.data && b.data.error) || '').slice(0, 60) + '), dossier nog ' + d.status };
   });
 
-  await stap('voltooibaar', 'een herleidbaar mens van het kantoor publiceert; het lid leest de hash van de inzending en de naam van wie aftekende', async () => {
+  await stap('voltooibaar', 'zonder toegankelijkheidsuitslag weigert het kantoor de publicatie, ook voor een mens op naam', async () => {
+    const b = await w.post('/api/appstore/kantoor/besluit', { versieId: versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, KT);
+    const d = await lees();
+    return { klopt: b.status >= 400 && b.status < 500 && d.status === 409,
+      ziet: 'publiceren zonder keuring ' + b.status + ' (' + ((b.data && b.data.error) || '').slice(0, 80) + '), dossier nog ' + d.status };
+  });
+
+  await stap('voltooibaar', 'de echte keurloper rendert de bundel en noteert zijn uitslag; een herleidbaar mens publiceert; het lid leest de hash en de naam van wie aftekende', async () => {
     office = ((await w.post('/api/office/login', { code: KANTOORWERELD.OFFICE_CODE })).data || {}).token;
-    const a = await w.post('/api/appstore/kantoor/toegankelijk', { versieId: versie.id, stand: 'in-orde', fouten: 0 }, office);
+    const k = keurloper(w);
+    const a = { status: k.code === 0 ? 200 : 500 };
     const b = await w.post('/api/appstore/kantoor/besluit', { versieId: versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, KT);
     const d = await lees();
     const x = d.data || {};
     return { klopt: a.status === 200 && b.status === 200 && d.status === 200 && x.watErDraait.hash === versie.hash &&
       !!x.leverancier.toegelatenDoor && !!x.watDePoortVond.afgetekendDoor && x.leverancier.organisatie === ORG &&
       x.watHetMag.machtigingen.length === 1 && Object.keys(x.nietGebouwd || {}).length > 0,
-      ziet: 'keuring ' + a.status + ', publicatie ' + b.status + ', dossier ' + d.status + ': hash ' + String(x.watErDraait && x.watErDraait.hash).slice(0, 12) +
+      ziet: 'keurloper ' + (k.code === 0 ? 'geslaagd' : 'code ' + k.code + ': ' + k.uit.slice(-160)) + ', publicatie ' + b.status + ', dossier ' + d.status + ': hash ' + String(x.watErDraait && x.watErDraait.hash).slice(0, 12) +
         ', afgetekend door ' + (x.watDePoortVond && x.watDePoortVond.afgetekendDoor) };
   });
 
@@ -125,7 +144,7 @@ async function loop(w, stap) {
 
   await stap('voltooibaar', 'bevoegdheid: de gedeelde kantoorcode is geen mens en kan geen app aftekenen', async () => {
     const tweede = await w.post('/api/appstore/uitgever/inzenden', { manifest: Object.assign({}, MANIFEST, { versie: '1.0.1' }), bestanden: BUNDEL.concat([{ pad: 'leeg.txt', inhoud: 'v101' }]) }, Z);
-    await w.post('/api/appstore/kantoor/toegankelijk', { versieId: tweede.data && tweede.data.versie && tweede.data.versie.id, stand: 'in-orde', fouten: 0 }, office);
+    keurloper(w);
     const v2 = tweede.data && tweede.data.versie;
     const b = v2 ? await w.post('/api/appstore/kantoor/besluit', { versieId: v2.id, besluit: 'gepubliceerd', door: 'Iemand van RTG' }, office) : tweede;
     const d = await lees();
@@ -165,7 +184,7 @@ async function loop(w, stap) {
   await stap('herstelbaar', 'een dubbele tik op het publicatiebesluit maakt een live versie en geen tweede journaalbesluit', async () => {
     const v = (await w.post('/api/appstore/uitgever/inzenden', { manifest: Object.assign({}, MANIFEST, { versie: '1.1.0' }), bestanden: BUNDEL.concat([{ pad: 'leeg.txt', inhoud: 'v110' }]) }, Z)).data;
     const v2 = v && v.versie;
-    await w.post('/api/appstore/kantoor/toegankelijk', { versieId: v2 && v2.id, stand: 'in-orde', fouten: 0 }, office);
+    keurloper(w);
     const [a, b] = await w.dubbel('/api/appstore/kantoor/besluit', { versieId: v2 && v2.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, KT);
     const j = ((await w.post('/api/appstore/kantoor/journaal', { n: 200 }, KT)).data || {}).journaal || [];
     const keer = j.filter((r) => r.wat === 'versie-gepubliceerd' && r.hash === (v2 && v2.hash)).length;
@@ -197,6 +216,6 @@ module.exports = {
   persona: 'lid',
   omgeving: KANTOORWERELD,
   belofte: 'een lid leest over een app van een derde wie de leverancier is en wie hem toeliet, wat er precies draait, wat hij nooit krijgt en wat het dossier niet kan zeggen -- en dat dossier verschijnt pas nadat een mens van RTG publiceerde, en blijft gelijk na een herstart, een dubbeltik en een crash',
-  grens: 'De proef loopt de twee routes van het scherm, niet het scherm zelf. De toegankelijkheidsuitslag zet de proef zelf neer (de keurloper draait hier niet), en de bundel is een minimale app. Het besluit neemt het eigenaarsaccount van de testomgeving als kantoormens; de gedeelde kantoorcode wordt voor aftekenen geweigerd en dat is een schakel. Geen Redis of PostgreSQL.',
+  grens: 'De proef loopt de twee routes van het scherm, niet het scherm zelf. De toegankelijkheidsuitslag komt van de echte keurloper (scripts/appstore-a11y.js), lokaal met een echte browser; de bundel is een minimale app. Het besluit neemt het eigenaarsaccount van de testomgeving als kantoormens; de gedeelde kantoorcode wordt voor aftekenen geweigerd en dat is een schakel. Geen Redis of PostgreSQL.',
   loop
 };

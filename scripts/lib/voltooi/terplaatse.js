@@ -17,7 +17,7 @@
    vastgoed en bezorgen hebben elk een eigen keten en zijn hier niet bewezen.
    ========================================================================== */
 'use strict';
-const { nieuwLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
+const { nieuwLid, geverifieerdLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
 
 const AANBOD = '/api/verhuur/aanbod';
 const BOEK = '/api/huur/boek';
@@ -44,7 +44,8 @@ async function zaakLogin(w) {
 
 async function loop(w, stap) {
   const merk = Date.now().toString(36).slice(-4);
-  const A = await nieuwLid(w, 'tpa');
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  const A = await geverifieerdLid(w, 'tpa');
   const B = await nieuwLid(w, 'tpb');
   let T = A.token;
   let Z = await zaakLogin(w);

@@ -71,7 +71,16 @@ test('een huur betalen boekt het geld een keer, en annuleren geeft het terug', a
   assert.equal(await saldo(A), voor, 'annuleren geeft het betaalde bedrag terug');
 });
 
-test('zonder saldo heet de huur niet betaald en staat er geen factuur', async () => {
+/* GAAT DE BETALING NIET DOOR. "Zonder saldo" alleen is geen weigering in dit
+   huis: RTG Pay laadt een tekort zelf bij (kern/pay/dekking.js, "een knop"),
+   en in de toetsomgeving lukt dat. Een eigen server met de betaalstop aan
+   (RTG_BETALEN_UIT) maakt de weigering zeker, en dan geldt de eis van TravelOS:
+   de huur heet nergens betaald en er is geen factuur. */
+test('gaat de betaling niet door, dan heet de huur niet betaald en staat er geen factuur', async () => {
+  const hoofd = srv;
+  srv = await startServer({ env: { SMTP_URL: '', RTG_BETALEN_UIT: '1',
+    RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-verhuur-geld-stop-')) } });
+  try {
   const B = await lid();
   await keurLidGoed(srv.base, B.token, B.codenaam);
   const h = await api('/api/huur/boek', { supplierCode: 'ISLAREN', autoId: 'c2', van: D(9), tot: D(10), idem: 'huurgeld-b-' + Date.now() }, B.token);
@@ -81,6 +90,7 @@ test('zonder saldo heet de huur niet betaald en staat er geen factuur', async ()
   const mijn = (await api('/api/huur/mijn', {}, B.token)).body.huren || [];
   assert.ok(!mijn.some((x) => x.ref === h.body.huur.ref), 'Mijn huur toont alleen betaalde huren');
   assert.equal(await facturenVoor(B, h.body.huur.ref), 0, 'en er is geen factuur');
+  } finally { await stop(srv); srv = hoofd; }
 });
 
 test('een ongekeurd lid betaalt geen boeking en krijgt de paspoortweg', async () => {

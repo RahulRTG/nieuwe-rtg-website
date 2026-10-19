@@ -18,7 +18,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
@@ -38,6 +38,8 @@ test('RTG Move: twee echte boekingen worden een naad met een oordeel', async (t)
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, tok, reg.data.state.user.codename);
 
   /* Twee zaken op VERSCHILLENDE plekken, met een dienst die een duur kent --
      zonder duur is er geen moment waarop je weg kunt en dus geen overgang. */
@@ -160,6 +162,8 @@ test('een afspraak vóór een vlucht wordt een weegbare naad', async (t) => {
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, tok, reg.data.state.user.codename);
 
   const d = morgen();
   const bk = await post(base, '/api/booking/request',
@@ -193,6 +197,8 @@ test('haalbaarheid VOOR de verkoop weegt een voornemen en weigert niets', async 
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, tok, reg.data.state.user.codename);
 
   const d = morgen();
   /* Een afspraak MET een duur, want alleen dan is er een moment waarop je weg

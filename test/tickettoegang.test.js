@@ -12,7 +12,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const T0 = Date.parse('2026-09-27T12:00:00.000Z');
 const DAG = '2026-09-27';
@@ -132,7 +132,10 @@ test('7. echte server: koop zonder code, tonen roteert, de deur laat een keer bi
   try {
     const reg = n => api('/api/auth/register', { name: 'Tk ' + n, email: 'tk' + n + '@x.nl', phone: '061234' + n,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-    const lid = (await reg('5501')).body.token, ander = (await reg('5502')).body.token;
+    const regLid = (await reg('5501')).body;
+    const lid = regLid.token, ander = (await reg('5502')).body.token;
+    /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+    await keurLidGoed(base, lid, regLid.state.user.codename);
     const roster = (await api('/api/supplier/roster', { code: 'ESVEDRA' })).body.staff;
     const deur = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: roster.find(x => x.role !== 'manager').id, pin: '5678' })).body.token;
     const vandaag = new Date().toISOString().slice(0, 10);

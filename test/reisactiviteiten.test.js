@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 let srv, base, lid, manager, deur;
@@ -40,8 +40,11 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  lid = (await post('/api/auth/register', { name: 'Reiziger', email: 'ra' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+  const reg = (await post('/api/auth/register', { name: 'Reiziger', email: 'ra' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body;
+  lid = reg.token;
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.state.user.codename);
   const roster = (await post('/api/supplier/roster', { code: 'ESVEDRA' })).body;
   const man = roster.staff.find(x => x.role === 'manager');
   const rest = roster.staff.find(x => x.role !== 'manager');

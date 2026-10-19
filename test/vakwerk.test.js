@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base, lid;
 const tok = {};
@@ -34,6 +34,8 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Vak Lid', email: 'vak@x.nl', phone: '0612345677',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'lifestyle', pasApp: 'lifestyle' });
   lid = reg.body.token;
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.body.state.user.codename);
   for (const c of ['FUEGO', 'SERENA', 'AYAKA']) tok[c] = await login(c, '1234');
 });
 test.after(() => {

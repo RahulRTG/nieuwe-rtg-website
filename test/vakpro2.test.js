@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -47,9 +47,11 @@ test.before(async () => {
     const u = (Date.now() + n).toString().slice(-8);
     const r = await api(base, '/api/auth/register', { name: 'Prolid' + n, email: 'q' + n + u + '@x.nl',
       phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-    return { token: r.body.token };
+    return { token: r.body.token, codenaam: r.body.state.user.codename };
   };
   lid = await reg(1); lid2 = await reg(2);
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid.token, lid.codenaam);
   const roster = await api(base, '/api/supplier/roster', { code: 'VERDIA' });
   const mgr = (roster.body.staff || []).find(x => x.role === 'manager');
   const login = await api(base, '/api/supplier/login', { code: 'VERDIA', staffId: mgr && mgr.id, pin: '1234' });

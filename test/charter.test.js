@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const D = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 const FOTO = 'data:image/jpeg;base64,' + Buffer.from('demo-foto-charter').toString('base64');
@@ -31,6 +31,8 @@ test.before(async () => {
   const reg = await api(base, '/api/auth/register', { name: 'Charter Lid', email: 'c' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   lid = reg.body.token;
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.body.state.user.codename);
 });
 test.after(() => stop(srv && srv.child));
 

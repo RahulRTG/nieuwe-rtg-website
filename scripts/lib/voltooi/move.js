@@ -19,7 +19,7 @@
    "wat als het uitloopt" laat de reis precies zoals hij was.
    ========================================================================== */
 'use strict';
-const { nieuwLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
+const { nieuwLid, geverifieerdLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
 
 const REIS = '/api/move/reis';
 const GEVOLG = '/api/move/gevolg';
@@ -29,7 +29,8 @@ const dag = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10
 const geen5xx = (r) => r && r.status > 0 && r.status < 500;
 
 async function loop(w, stap) {
-  const lid = await nieuwLid(w, 'mov');
+  /* gekeurd: een boeking betalen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  const lid = await geverifieerdLid(w, 'mov');
   let T = lid.token;
   const B = await nieuwLid(w, 'mob');
   const morgen = dag(1);

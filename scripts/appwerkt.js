@@ -801,7 +801,9 @@ async function kijkRonde(page, gehad) {
 /* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die
    uitleg zelf op -- `hoe` in het antwoord, of een zin die naar een niet
    ingelezen bron wijst -- dus dat wordt gelezen en niet geraden. */
-const CONFIGZINNEN = /nog niet ingeladen|niet gemount|draait niet mee|is niet beschikbaar|geen model|nietGebouwd/i;
+/* Wanneer een 503 een configblokkade is en geen kale fout: een regel, gedeeld
+   met de voltooiproef (scripts/lib/configweigering.js). */
+const { isConfigWeigering } = require('./lib/configweigering');
 
 function weigerZin(lijf) {
   try { const e = JSON.parse(lijf).error; return typeof e === 'string' && e.trim().length > 3 ? e.trim() : null; }
@@ -819,7 +821,7 @@ function luister(page, base, bak) {
     let vol = '';
     try { vol = await res.text(); } catch (e) { vol = ''; }
     const lijf = vol.slice(0, 200);
-    if (s === 503 && (CONFIGZINNEN.test(lijf) || /"hoe"/.test(lijf))) bak.config.push(s + ' ' + pad + ' -- ' + lijf.slice(0, 120));
+    if (isConfigWeigering(s, vol)) bak.config.push(s + ' ' + pad + ' -- ' + lijf.slice(0, 120));
     /* De rem (429) reageert hier op de PROEF: alle browsers van deze meting
        delen een adres. Dat is een eigenschap van het instrument, geen defect. */
     else if (s === 429 && bak.rem) bak.rem.push(pad);

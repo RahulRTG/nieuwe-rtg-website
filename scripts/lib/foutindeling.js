@@ -30,7 +30,9 @@
    ========================================================================== */
 'use strict';
 
-const CONFIGZINNEN = /nog niet ingeladen|niet gemount|draait niet mee|is niet beschikbaar|geen model|nietGebouwd/i;
+/* Wanneer een 503 de omgeving uitlegt: een regel voor elk instrument
+   (./configweigering.js, sinds 19 oktober 2026; hier stond een eigen kopie). */
+const { isConfigWeigering, CONFIGZINNEN } = require('./configweigering');
 const WEIGERSTATUS = new Set([400, 409, 422]);
 
 function isZin(t) {
@@ -44,7 +46,7 @@ function isZin(t) {
 function deelFoutIn(status, lijf) {
   if (status === 401 || status === 403 || status === 404) return 'deur';
   const tekst = String(lijf || '');
-  if (status === 503 && (CONFIGZINNEN.test(tekst) || /"hoe"/.test(tekst))) return 'config';
+  if (isConfigWeigering(status, tekst)) return 'config';
   if (WEIGERSTATUS.has(status)) {
     let d = null;
     try { d = JSON.parse(tekst); } catch (e) { d = null; }

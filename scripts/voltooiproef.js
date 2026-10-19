@@ -258,7 +258,12 @@ function inWoorden(melding) {
 
 function menselijkUit(antwoorden, afgebroken) {
   const n = antwoorden.length;
-  const kaal = antwoorden.filter((a) => a.status === 0 || a.status >= 500);
+  /* Een 503 die zegt dat de omgeving iets mist, is geen kale fout maar een
+     configblokkade (scripts/lib/configweigering.js, dezelfde regel als
+     scripts/appwerkt.js). Hij staat apart, en de bewijsbron maakt er
+     GEBLOKKEERD_DOOR_CONFIG van -- niet groen, en geen defect. */
+  const config = antwoorden.filter((a) => a.config === true && a.status === 503);
+  const kaal = antwoorden.filter((a) => (a.status === 0 || a.status >= 500) && !config.includes(a));
   const leeg = antwoorden.filter((a) => a.status > 0 && !a.lijf);
   const weigeringen = antwoorden.filter((a) => a.status >= 400 && a.status < 500);
   const zonder = weigeringen.filter((a) => !inWoorden(a.melding));
@@ -280,8 +285,10 @@ function menselijkUit(antwoorden, afgebroken) {
   ];
   const t = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
   for (const s of schakels) t[s.stand]++;
-  return { schakels, storingen: [], telling: t, antwoorden: n, weigeringen: weigeringen.length,
+  const uit = { schakels, storingen: [], telling: t, antwoorden: n, weigeringen: weigeringen.length,
     sluit: t.open === 0 && t.stuk === 0 && !afgebroken };
+  if (config.length) uit.configBlokkade = config.length + ' configweigering(en): ' + samenvat(config);
+  return uit;
 }
 
 async function meet(opties) {

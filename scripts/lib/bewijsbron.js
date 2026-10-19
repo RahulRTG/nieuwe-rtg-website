@@ -217,6 +217,12 @@ function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } 
         : 'de keten zegt zelf dat hij niet sluit';
     return metRaakvlak({ status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'vers gemeten en de stroom sluit niet: ' + eerste, bewijs });
   }
+  /* Een deel dat zelf zegt dat de omgeving iets miste (de voltooiproef schrijft
+     dat bij een 503 met configzin of "hoe", scripts/lib/configweigering.js):
+     niet groen en geen defect. Een defect hierboven gaat altijd voor. */
+  if (typeof reg.configBlokkade === 'string' && reg.configBlokkade) {
+    return metRaakvlak({ status: 'GEBLOKKEERD_DOOR_CONFIG', reden: 'vers gemeten, en de omgeving miste iets: ' + reg.configBlokkade, bewijs });
+  }
   return metRaakvlak({ status: 'BEWEZEN',
     reden: 'vers gemeten (' + v.reden + '): ' + schakels.length + ' schakels gesloten, ' + storingen.length + ' storingen gehouden',
     bewijs });

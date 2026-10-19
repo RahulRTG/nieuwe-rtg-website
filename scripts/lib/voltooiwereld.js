@@ -60,7 +60,10 @@ async function maakWereld(naam, eigenEnv) {
   function noteer(pad, status, data) {
     const weigering = status >= 400 && status < 500;
     const melding = data && typeof data.error === 'string' ? data.error : null;
-    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null });
+    /* `config`: een 503 die zegt dat de omgeving iets mist (scripts/lib/
+       configweigering.js) -- een configblokkade, geen kale fout. */
+    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null,
+      config: require('./configweigering').isConfigWeigering(status, data) });
   }
 
   /* `koppen`: extra kopregels, zoals het bezitsbewijs van een gebonden toestel. */

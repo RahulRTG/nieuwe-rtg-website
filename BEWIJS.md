@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2909 bestanden en 19871 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2910 bestanden en 19874 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2909 |
-| losse beweringen (`test(...)`) | 19871 |
+| toetsbestanden | 2910 |
+| losse beweringen (`test(...)`) | 19874 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 89 |
+| niets van beide | 90 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2562 bestanden, 19286 beweringen.
+2563 bestanden, 19289 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -451,6 +451,7 @@ toets omvalt.
 | `conciergelus-regels.test.js` | 9 | gezakt op `===->!==#0` | De regels van de concierge-lus zonder server (kern/bureau/lus-regels.js en lus-intake.js). Elke toets hoort te zakken als zijn regel sneuvelt; bij de dragende regels staat de mutatie erbij die hem laat zakken. |
 | `conciergelus.test.js` | 3 | gezakt op `liegpoort /api/` | De concierge-lus tegen een echte server (CONCIERGE.md). Een lid vertelt een wens in een zin; het kantoor zoekt, de gewone route weigert, een manager biedt iets anders aan dat twaalf minuten wordt vastgehouden, het... |
 | `conciergeproef.test.js` | 5 | gezakt op `===->!==#1` | DE CONCIERGEPROEF EN ZIJN REGISTER -- sinds 11 oktober 2026 een bron van bewijs voor APPWERKT (het Privékantoor, link:rechterhand). scripts/conciergeproef.js loopt de concierge-lus af (CONCIERGE.md) tegen een... |
+| `configweigering.test.js` | 3 | -- | EEN 503 MET EEN CONFIGZIN IS EEN CONFIGBLOKKADE, GEEN KALE FOUT -- op EEN plek. Dezelfde 503 kreeg in twee instrumenten twee oordelen: scripts/appwerkt.js las een 503 met een configzin of een veld "hoe" als... |
 | `connect-afrekening.test.js` | 15 | gezakt op `===->!==#0` | PARTNERAFREKENING OVER STRIPE CONNECT (server/betaal/connect/), tegen een nagemaakte Stripe (test/nep-stripe.js). Wat hier wordt nagetrokken is ONZE kant: de standentabel, de sleutels, de twee poorten, en wat er... |
 | `connect-grootboek.test.js` | 4 | gezakt op `optie-uit#0` | STRIPE CONNECT AAN HET ECHTE GROOTBOEK, DUURZAAM, EN ONDER TWEE HANDTEKENINGEN. test/connect-afrekening.test.js beproeft de connectlaag met een nagemaakt grootboek (een Map). |
 | `connect-takken.test.js` | 23 | gezakt op `voorwaarde-omkeren#0` | PARTNERAFREKENING OVER STRIPE CONNECT, de zijpaden: de vormkeuring van een aanvraag, een herhaald id met andere gegevens, een geweigerde reservering, iedere soort melding (onbekend, ander account, ander bedrag,... |

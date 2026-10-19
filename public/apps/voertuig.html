@@ -1,110 +1,81 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8">
 <script src="/shared/id.js"></script>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Voertuig</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--groen:#69B891;--rood:#DE6E92;--let:#C9A24B;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
-  .kop{display:flex;align-items:center;gap:.7rem;padding:calc(env(safe-area-inset-top,0px) + .9rem) 1.1rem .6rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
-  .kop .rek{flex:1;}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  main{padding:0 1.1rem 3rem;max-width:46rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-top:.9rem;}
-  .kaart h2{font-family:'Bodoni Moda',serif;font-size:1.1rem;font-weight:600;margin-bottom:.5rem;}
-  .stil{color:var(--soft);font-size:.85rem;line-height:1.5;}
-  .stand{display:inline-block;padding:.2rem .6rem;border-radius:0;font-size:.78rem;font-weight:600;}
-  .ja{background:rgba(105,184,145,.16);color:var(--groen);}
-  .nee{background:rgba(222,110,146,.16);color:var(--rood);}
-  .bijna{background:rgba(201,162,75,.16);color:var(--let);}
-  .rij{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.9rem;}
-  .rij:last-child{border-bottom:0;}
-  .rij b{font-weight:600;}
-  ul{list-style:none;}
-  li{padding:.35rem 0;font-size:.9rem;}
-  .vlootrij{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);
-    color:var(--txt);padding:.6rem 0;font:inherit;cursor:pointer;}
-  .vlootrij:last-child{border-bottom:0;}
-  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);
-    border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;opacity:0;transition:opacity .2s;font-size:.9rem;}
-  .melding.zien{opacity:1;}
-</style>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <h1>Voertuig</h1>
-  <span class="rek"></span>
-  <button class="knop h-raak24" id="ververs" type="button">Ververs</button>
+<!-- Het voertuig op het RTG Design System (TRAVELOS-MIGRATIE.md par. 1b,
+     stroom E): een zaakscherm op de werklaag. Detail (een voertuig met zijn
+     papieren, bestuurder en kenmerken) en Collectie (de vloot). Geen omslag,
+     geen ledenbeeld; geen eigen stijl: alles komt uit /ds/rtg-ds.css. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="collectie">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/app.html" aria-label="Terug naar het bureaublad">RTG</a>
+  <a class="ds-kop__actie" href="/apps/leverancier.html" aria-label="Uw zaak-app"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
-<main>
-  <div class="kaart" id="geen" hidden>
-    <h2>Geen voertuig gekozen</h2>
-    <p class="stil" id="geenTekst"></p>
-  </div>
 
-  <div id="dit" hidden>
-    <div class="kaart">
-      <h2 id="vNaam">-</h2>
-      <p class="stil" id="vSub"></p>
-      <p id="vStand"></p>
-      <div id="vRedenen"></div>
-    </div>
-
-    <div class="kaart">
-      <h2>Papieren</h2>
-      <div id="vPapieren"></div>
-      <p class="stil" id="vPapierenLet"></p>
-    </div>
-
-    <div class="kaart">
-      <h2>Bestuurder</h2>
-      <div id="vBestuurder"></div>
-      <p id="vBestuurderKies" hidden>
-        <select class="h-raak24" id="vTeam" aria-label="Bestuurder uit het team"></select>
-        <button class="knop h-raak24" type="button" id="vTeamZet">Bewaar</button>
-      </p>
-      <p class="stil">Hangt de bestuurder aan een teamlid en staat dat teamlid vandaag als afwezig gemeld, dan slaat de automatische toewijzing dit voertuig over. Met de hand toewijzen kan wel, met een waarschuwing.</p>
-    </div>
-
-    <div class="kaart">
-      <h2>Wat dit voertuig kan</h2>
-      <div id="vKenmerken"></div>
+<main class="ds-collectie" id="inhoud">
+  <div class="ds-collectie__kop">
+    <p class="ds-label">RTG Mobility</p>
+    <div class="ds-schermkop">
+      <h1 class="ds-titel ds-titel--scherm">Voertuig</h1>
+      <button class="ds-knop ds-knop--stil ds-knop--klein" id="ververs" type="button" data-ds-actie="Ververs">Ververs</button>
     </div>
   </div>
 
-  <div class="kaart">
-    <h2>De vloot</h2>
-    <div id="vloot"></div>
-    <p class="stil" id="vlootLet"></p>
+  <section class="ds-status ds-status--binnen" id="geen" hidden>
+    <h2 class="ds-status__titel">Geen voertuig gekozen</h2>
+    <p class="ds-status__tekst" id="geenTekst"></p>
+  </section>
+
+  <div class="ds-panelen ds-panelen--twee">
+    <div class="ds-paneel" id="dit" hidden>
+      <section class="ds-paneel" aria-labelledby="vNaam">
+        <h2 class="ds-titel" id="vNaam">-</h2>
+        <p class="ds-meta" id="vSub"></p>
+        <p class="ds-detail__status" id="vStand"></p>
+        <ul class="ds-lijst" id="vRedenen"></ul>
+      </section>
+      <section class="ds-paneel" aria-labelledby="kopPapieren">
+        <h2 class="ds-label" id="kopPapieren">Papieren</h2>
+        <ul class="ds-lijst" id="vPapieren"></ul>
+        <p class="ds-meta" id="vPapierenLet"></p>
+      </section>
+      <section class="ds-paneel" aria-labelledby="kopBestuurder">
+        <h2 class="ds-label" id="kopBestuurder">Bestuurder</h2>
+        <ul class="ds-lijst" id="vBestuurder"></ul>
+        <div class="ds-vraagrij" id="vBestuurderKies" hidden>
+          <select class="ds-invoer" id="vTeam" aria-label="Bestuurder uit het team"></select>
+          <button class="ds-knop ds-knop--primair ds-knop--klein" type="button" id="vTeamZet" data-ds-actie="Bestuurder bewaren">Bewaar</button>
+        </div>
+        <p class="ds-meta">Hangt de bestuurder aan een teamlid en staat dat teamlid vandaag als afwezig gemeld, dan slaat de automatische toewijzing dit voertuig over. Met de hand toewijzen kan wel, met een waarschuwing.</p>
+      </section>
+      <section class="ds-paneel" aria-labelledby="kopKenmerken">
+        <h2 class="ds-label" id="kopKenmerken">Wat dit voertuig kan</h2>
+        <ul class="ds-lijst" id="vKenmerken"></ul>
+      </section>
+    </div>
+
+    <section class="ds-paneel" aria-labelledby="kopVloot">
+      <h2 class="ds-label" id="kopVloot">De vloot</h2>
+      <ul class="ds-lijst" id="vloot"></ul>
+      <p class="ds-meta" id="vlootLet"></p>
+    </section>
   </div>
 </main>
-<div class="melding" id="melding" role="status"></div>
+
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 <script src="/apps/voertuig.js"></script>
-<script src="/shared/schermbeeld.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<!-- shared/ios.js brengt het app-menu (de hamburger rechtsboven) en daarmee de
-     weg terug naar het beginscherm. Deze twee pagina's waren hem vergeten, en
-     dat is een fout zonder foutmelding: de app opent, doet alles wat hij moet
-     doen, en heeft geen enkele uitgang. test/appmenu.e2e.js loopt daarom ALLE
-     app-pagina's af -- hij ving deze twee. -->
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

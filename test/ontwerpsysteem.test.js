@@ -55,9 +55,9 @@ test('een script dat nog geen stijl injecteerde, gaat dat niet doen', () => {
 
 test('een uitzondering vraagt reden en vervaldatum, en verloopt', () => {
   const m = leeg(); m.bladen['public/shared/y.css'] = { bytes: 1, important: 0, hex: 0 };
-  assert.deepEqual(os_.ratelFouten(m, norm({ uitzonderingen: [{ pad: 'public/shared/y.css', reden: 'overgang', vervalt: '2999-01-01' }] })).fouten, []);
-  assert.match(os_.ratelFouten(m, norm({ uitzonderingen: [{ pad: 'public/shared/y.css' }] })).fouten.join(), /zonder pad, reden of vervaldatum/);
-  assert.match(os_.ratelFouten(m, norm({ uitzonderingen: [{ pad: 'public/shared/y.css', reden: 'x', vervalt: '2000-01-01' }] })).fouten.join(), /verlopen/);
+  assert.deepEqual(os_.ratelFouten(m, norm({ uitzonderingen: [{ pad: 'public/shared/y.css', eigenaar: '@RahulRTG', reden: 'overgang', plan: 'weg', vervalt: '2999-01-01' }] })).fouten, []);
+  assert.match(os_.ratelFouten(m, norm({ uitzonderingen: [{ pad: 'public/shared/y.css' }] })).fouten.join(), /zonder pad, eigenaar, reden, verwijderplan of vervaldatum/);
+  assert.match(os_.ratelFouten(m, norm({ uitzonderingen: [{ pad: 'public/shared/y.css', eigenaar: '@RahulRTG', reden: 'x', plan: 'weg', vervalt: '2000-01-01' }] })).fouten.join(), /verlopen/);
 });
 
 test('vastleggen zet de lat strakker en neemt nooit iets nieuws op', () => {
@@ -143,6 +143,40 @@ test('contract: elk schermtype, component en wereld uit het contract bestaat', (
   const contract = JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8'));
   assert.deepEqual(contract.schermtypen, ['cover', 'collectie', 'taak', 'detail', 'gesprek', 'canvas', 'status']);
   assert.equal(contract.talen.length, 19);
+});
+
+/* De nadruk (ONTWERPSYSTEEM.md par. 7): een gesloten lijst op tokens. */
+const metContract = wijzig => d => { const p = path.join(d, 'contract.json'); const c = JSON.parse(fs.readFileSync(p, 'utf8')); wijzig(c); fs.writeFileSync(p, JSON.stringify(c)); };
+
+test('een overgangsscript zonder eigenaar of verwijderplan wordt tegengehouden', () => {
+  assert.match(kopieMet(metContract(c => { delete c.overgangsscripts[0].eigenaar; })), /zonder pad, eigenaar, reden, verwijderplan of vervaldatum/);
+  assert.match(kopieMet(metContract(c => { delete c.overgangsscripts[0].plan; })), /zonder pad, eigenaar, reden, verwijderplan of vervaldatum/);
+});
+
+test('nadruk: elk schermtype heeft een standaard uit de gesloten lijst', () => {
+  const c = JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8'));
+  assert.deepEqual(Object.keys(c.nadrukken), ['beleving', 'balans', 'gereedschap', 'bevestiging']);
+  for (const t of c.schermtypen) assert.ok(c.nadrukken[c.nadrukStandaard[t]], t);
+  assert.match(kopieMet(metContract(c => { delete c.nadrukStandaard.taak; })), /schermtype taak heeft geen nadrukStandaard/);
+  assert.match(kopieMet(metContract(c => { c.nadrukStandaard.taak = 'luxe'; })), /taak -> luxe is geen nadruk/);
+});
+
+test('nadruk: tokens.css draagt elke nadruk, en de standaard is letterlijk die nadruk', () => {
+  assert.match(kopieMet(d => { const p = path.join(d, 'tokens.css'); fs.writeFileSync(p, fs.readFileSync(p, 'utf8').replace('[data-ds-nadruk="bevestiging"]', '[data-ds-nadruk="iets"]')); }), /geen regel voor \[data-ds-nadruk="bevestiging"\]/);
+  assert.match(kopieMet(d => { const p = path.join(d, 'tokens.css'); const s = fs.readFileSync(p, 'utf8'); const i = s.indexOf('.ds-scherm[data-ds-schermtype="status"]'); fs.writeFileSync(p, s.slice(0, i) + s.slice(i).replace('--ds-nadruk-uitkomst: var(--ds-maat-titel)', '--ds-nadruk-uitkomst: var(--ds-maat-kop)')); }), /schermtype status zet --ds-nadruk-uitkomst anders dan zijn standaard bevestiging/);
+});
+
+test('nadruk: alleen tokens.css zet een nadruktoken', () => {
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-knop{--ds-nadruk-titel:1rem}}\n')), /knop\.css: zet een nadruktoken/);
+});
+
+test('nadruk: een scherm met een onbekende nadruk wordt tegengehouden', () => {
+  const pub = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pub-'));
+  fs.writeFileSync(path.join(pub, 'x.html'), '<main data-ds-nadruk="spektakel"></main><section data-ds-nadruk="gereedschap"></section>');
+  const c = JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8'));
+  const fouten = require('../scripts/lib/nadruk.js').nadrukFouten(c, DS, pub);
+  fs.rmSync(pub, { recursive: true, force: true });
+  assert.deepEqual(fouten, ['public/x.html: onbekende nadruk "spektakel" (contract: beleving, balans, gereedschap, bevestiging)']);
 });
 
 test('contract: een ds-scherm zonder browsertoets, met erfenis of met een vreemde injecteur', () => {

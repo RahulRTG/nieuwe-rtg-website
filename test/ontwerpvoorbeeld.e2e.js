@@ -58,3 +58,36 @@ test('de voorbeeldpagina toont elk schermtype uit het contract, alleen met het D
   assert.deepEqual(fouten, []);
   await ctx.close();
 });
+
+/* De nadruk (ONTWERPSYSTEEM.md par. 7) verandert echt iets: per schermtype de
+   standaard uit contract.json, en data-ds-nadruk op een deel verlegt hem voor
+   alleen dat deel. Gemeten op de berekende stijl, niet op de klassenaam. */
+test('de nadruk volgt het schermtype en laat zich per deel verleggen', { skip }, async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
+  await page.goto(srv.base + '/ds/voorbeeld.html', { waitUntil: 'domcontentloaded' });
+  const meet = await page.evaluate(standaard => {
+    const uit = {};
+    const maak = (type, nadruk) => {
+      const s = document.createElement('div'); s.className = 'ds-scherm';
+      if (type) s.setAttribute('data-ds-schermtype', type);
+      if (nadruk) s.setAttribute('data-ds-nadruk', nadruk);
+      s.innerHTML = '<h2 class="ds-titel">Titel</h2><section class="ds-sectie">x</section><div class="ds-status"><p class="ds-status__titel">Klaar</p></div><div class="ds-knop">k</div>';
+      document.body.append(s);
+      const cs = el => getComputedStyle(s.querySelector(el));
+      const r = { titel: cs('.ds-titel').fontSize, lucht: cs('.ds-sectie').marginBlockStart, uitkomst: cs('.ds-status__titel').fontSize, duur: getComputedStyle(s).getPropertyValue('--ds-duur').trim() };
+      s.remove(); return r;
+    };
+    for (const t of Object.keys(standaard)) uit[t] = maak(t);
+    for (const n of ['beleving', 'balans', 'gereedschap', 'bevestiging']) uit['n:' + n] = maak('collectie', n);
+    return uit;
+  }, contract.nadrukStandaard);
+  for (const [t, n] of Object.entries(contract.nadrukStandaard)) assert.deepEqual(meet[t], meet['n:' + n], t + ' volgt zijn standaard ' + n);
+  assert.equal(meet['n:beleving'].lucht, '64px');
+  assert.equal(meet['n:balans'].lucht, '48px');
+  assert.equal(meet['n:gereedschap'].lucht, '32px');
+  assert.ok(parseFloat(meet['n:gereedschap'].titel) < parseFloat(meet['n:balans'].titel), 'gereedschap: compactere kop');
+  assert.ok(parseFloat(meet['n:bevestiging'].uitkomst) > parseFloat(meet['n:balans'].uitkomst), 'bevestiging: de uitkomst groter');
+  assert.notEqual(meet['n:gereedschap'].duur, meet['n:beleving'].duur, 'gereedschap beweegt korter');
+  await ctx.close();
+});

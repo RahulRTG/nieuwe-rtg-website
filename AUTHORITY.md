@@ -1019,6 +1019,14 @@ Uitgewerkt op dezelfde dag:
 - Een politieke partij handelt via een account met een partijrol die het kantoor
   koppelt; de partijsleutel is geen geloofsbrief meer. Dit vervangt het besluit
   van 29 september 2026 dat de partij niet aan een RTG-account hangt.
+- Een passkey en de RTG Pay-wallet horen bij elk account, ook een gratis
+  account (tweede besluit van 19 oktober 2026). Wat de wallet aan grenzen heeft
+  (limieten, keuring), blijft gelden. Een kind- of gezinsprofiel bindt geen
+  eigen toestel; dat loopt via de ouder.
+- De omzetdag van een zaak loopt tot haar sluitingstijd, zonder ingestelde tijd
+  tot 05:00 lokale tijd; een terugbetaling die vastloopt staat op de bestaande
+  kantoorlijst openstaand; en 'Heel RTG' vindt elke app die een lid mag openen
+  (zelfde dag).
 
 ## 8. Grenzen
 

@@ -8,6 +8,7 @@ module.exports = (ctx) => {
     GH_FUNCTIES, GH_KETEN, GH_KLAAR, CATEGORIEEN,
     id, nu, schoon, getal, isGroothandel, defaults, functieAan, klantSoortVan, functieVoorKlant, prijsVoor } = ctx;
   const { functieLijst, zetFunctie, zetProduct, zetVoorraad, orders, actieveGroothandels, publiekProduct, markt } = ctx;
+  const { publiekeOrder, mijnBestellingen, inkomend } = require('./orderbeeld')({ orders, klantSoortVan, GH_KLAAR });
   function plaatsBestelling(groothandelCode, koper, regelsIn, opts) {
     opts = opts || {};
     const s = findSupplier(groothandelCode);
@@ -129,27 +130,6 @@ module.exports = (ctx) => {
     save();
     sseToSupplier(o.groothandelCode, 'sync', { scope: 'groothandel' });
     return { status: 200, ok: true };
-  }
-
-  function publiekeOrder(o, kant) {
-    return {
-      ref: o.ref, groothandelCode: o.groothandelCode, groothandelNaam: o.groothandelNaam,
-      klant: kant === 'groothandel' ? o.klant : { soort: o.klant.soort, naam: o.klant.naam },
-      regels: o.regels, subtotaal: o.subtotaal, bezorgen: o.bezorgen, soort: o.soort, bron: o.bron,
-      status: o.status, at: o.at, stappen: o.stappen, ontvangst: o.ontvangst || null
-    };
-  }
-  function mijnBestellingen(koper) {
-    const soort = klantSoortVan(koper);
-    return orders().filter(o => o.klant.soort === soort && o.klant.id === koper.id).slice(0, 100).map(o => publiekeOrder(o, 'klant'));
-  }
-  function inkomend(groothandelCode) {
-    const lijst = orders().filter(o => o.groothandelCode === groothandelCode);
-    return {
-      open: lijst.filter(o => !GH_KLAAR[o.status]).map(o => publiekeOrder(o, 'groothandel')),
-      afgerond: lijst.filter(o => GH_KLAAR[o.status]).slice(0, 60).map(o => publiekeOrder(o, 'groothandel')),
-      omzet: Math.round(lijst.filter(o => o.status === 'geleverd').reduce((n, o) => n + o.subtotaal, 0) * 100) / 100
-    };
   }
 
   /* Het slimme bijbestelvoorstel is een eigen onderwerp (verkoopdata lezen,

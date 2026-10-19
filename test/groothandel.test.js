@@ -195,3 +195,27 @@ test('9. een herhaalsleutel is een bestelling, en "volgende stap" slaat geen sta
   assert.equal(a.status2 || a.status, 'bevestigd');
   assert.equal(b.status, 409, 'de tweede tik op dezelfde stand slaat geen stap over');
 });
+
+test('orderlijsten scheiden kopers en leveranciers zonder een schrijfpoort', () => {
+  const orders = [
+    { ref: 'eigen', groothandelCode: 'A', klant: { soort: 'lid', id: '1', naam: 'Een' }, status: 'aangevraagd', subtotaal: 10 },
+    { ref: 'ander', groothandelCode: 'B', klant: { soort: 'lid', id: '2', naam: 'Twee' }, status: 'aangevraagd', subtotaal: 20 },
+    { ref: 'zelfde-id-ander-type', groothandelCode: 'A', klant: { soort: 'partner', id: '1', naam: 'Zaak' }, status: 'geleverd', subtotaal: 30 },
+    { ref: 'geannuleerd', groothandelCode: 'A', klant: { soort: 'lid', id: '1', naam: 'Een' }, status: 'geannuleerd', subtotaal: 40 }
+  ];
+  const voor = JSON.stringify(orders);
+  const beeld = require('../server/kern/groothandel/orderbeeld')({
+    orders: () => orders, klantSoortVan: koper => koper.soort,
+    GH_KLAAR: { geleverd: true, geannuleerd: true }
+  });
+  const eigen = beeld.mijnBestellingen({ soort: 'lid', id: '1' });
+  assert.deepEqual(eigen.map(o => o.ref), ['eigen', 'geannuleerd']);
+  assert.ok(eigen.every(o => !Object.hasOwn(o.klant, 'id')), 'het klantbeeld geeft geen interne klant-id terug');
+  const leverancier = beeld.inkomend('A');
+  assert.deepEqual(leverancier.open.map(o => o.ref), ['eigen']);
+  assert.deepEqual(leverancier.afgerond.map(o => o.ref), ['zelfde-id-ander-type', 'geannuleerd']);
+  assert.equal(leverancier.omzet, 30, 'alleen geleverd telt als omzet');
+  assert.equal(leverancier.open[0].klant.id, '1');
+  assert.deepEqual(beeld.inkomend('onbekend'), { open: [], afgerond: [], omzet: 0 });
+  assert.equal(JSON.stringify(orders), voor, 'lezen verandert geen order');
+});

@@ -626,6 +626,12 @@ const EIGEN_MODULE = new Map([
   /* RTG Verblijven op het Design System (TRAVELOS-MIGRATIE.md, batch 3): de
      toets beoordeelt de voorzijde (collectie, verblijfsblad, aanvraag). */
   ['hotels-ds.e2e.js', ['public/apps/hotels-voorzijde.js']],
+  /* Stroom D van de TravelOS-migratie: Hangar, Zakelijk vervoer, de
+     reisuitnodiging en Living World op het Design System. */
+  ['hangar-ds.e2e.js', ['public/apps/hangar-voorzijde.js', 'public/apps/hangar-toestel.js']],
+  ['zakelijk-ds.e2e.js', ['public/apps/zakelijk-voorzijde.js']],
+  ['reisuitnodiging-ds.e2e.js', ['public/apps/reisuitnodiging-client.js']],
+  ['living-world-ds.e2e.js', ['public/apps/living-world/client.js', 'public/apps/living-world/render.js']],
   ['ontwerpvoorbeeld.e2e.js', ['public/ds/voorbeeld.html']],
   /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
   ['move-gevolg.e2e.js', ['public/apps/move.html']],

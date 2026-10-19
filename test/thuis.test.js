@@ -130,7 +130,9 @@ test('de host ziet de aanvraag op zijn bord en accepteert; de gast checkt in en 
   assert.match(inChk.body.boeking.deurcode, /^\d{6}$/, 'na check-in staat de keyless deurcode klaar');
   const uit = await api('/api/thuis/checkuit', { ref: aanvraagRef }, gastLid.token);
   assert.equal(uit.body.boeking.status, 'uitgecheckt');
-  assert.equal(uit.body.boeking.uitbetaling.status, 'gepland', 'de uitbetaling staat gepland, nooit "verwerkt"');
+  /* Tot hier stond 'gepland': een belofte die niemand uitvoerde. RTG verplaatst
+     bij logeren (nog) geen geld, en dat zegt de boeking nu (thuis-betaaltekst.test.js). */
+  assert.equal(uit.body.boeking.uitbetaling.status, 'buiten-rtg', 'de uitbetaling loopt buiten RTG, nooit "verwerkt" of "gepland"');
 });
 
 test('reviews twee kanten op, een keer per kant; het huis krijgt zijn rating', async () => {

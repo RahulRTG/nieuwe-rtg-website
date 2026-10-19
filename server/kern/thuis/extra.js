@@ -89,8 +89,8 @@ module.exports = (ctx) => {
       inkomstenTotaal: inkomsten, bezettingPct: Math.min(100, Math.round(bezetteNachten / capaciteit * 100)),
       superhost: superhost(codenaam),
       uitbetaling: String(codenaam).startsWith('zaak:')
-        ? 'Uitbetalingen staan gepland naar de zakelijke RTG Bank-rekening. Op prive-aanbod houdt RTG 0% in; op commercieel aanbod geldt de gewone partnercommissie. Het lid betaalt altijd 0% servicekosten.'
-        : 'Uitbetalingen staan gepland naar je RTG Bank-rekening; RTG houdt 0% in.' };
+        ? 'Betalen en uitbetalen via RTG kan bij logeren nog niet; de betaling loopt buiten RTG. Op prive-aanbod houdt RTG 0% in; op commercieel aanbod geldt de gewone partnercommissie. Het lid betaalt altijd 0% servicekosten.'
+        : 'Betalen en uitbetalen via RTG kan bij logeren nog niet; de betaling loopt buiten RTG. RTG houdt 0% in.' };
   }
 
   return { thuisReview: review, thuisHuisReviews: huisReviews, thuisWensToggle: wensToggle,

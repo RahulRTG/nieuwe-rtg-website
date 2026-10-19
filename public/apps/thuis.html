@@ -187,7 +187,7 @@
         <label class="i-11uf7p"><input type="checkbox" id="nKeyless" checked> Keyless deurcode</label>
         <button class="knop" id="nZet">Zet live</button>
       </div>
-      <div class="s-1oe4h5s">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Rekening. Host en gast kennen elkaar als codenaam.</div>
+      <div class="s-1oe4h5s">RTG houdt 0% in. Betalen en uitbetalen via RTG kan bij logeren nog niet; je regelt de betaling met je gast. Host en gast kennen elkaar als codenaam.</div>
     </div>
   </section>
 </main>
@@ -388,7 +388,7 @@ async function doeActie(doe, ref){
       const pad = { annuleer: '/api/thuis/annuleer', checkin: '/api/thuis/checkin', checkuit: '/api/thuis/checkuit' }[doe];
       if (!pad) return;
       const d = await api(pad, { ref });
-      meld(doe === 'annuleer' ? 'Geannuleerd; ' + d.terugPct + '% terug volgens het beleid.' : 'Gedaan.');
+      meld(doe === 'annuleer' ? 'Geannuleerd. Volgens het beleid hoort ' + d.terugPct + '% terug; via RTG is niets betaald, dus regel het met de host.' : 'Gedaan.');
     }
     laadReizen();
   } catch(e){ meld(e.message); }

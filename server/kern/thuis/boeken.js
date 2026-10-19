@@ -100,7 +100,7 @@ module.exports = (ctx) => {
       kostenplaats: opbouw.opFactuur ? (schoon(data.kostenplaats, 40) || null) : null,
       betaling: opbouw.opFactuur
         ? 'De factuur volgt van de zaak; er is nog niets afgeschreven.'
-        : 'De betaling loopt via RTG Pay bij bevestiging; er is nog niets afgeschreven.',
+        : 'Er is niets afgeschreven. Betalen via RTG kan bij logeren nog niet: spreek de betaling met de host af.',
       berichten: [], at: nu(), ...(idem ? { idem } : {})
     };
     boekingen().unshift(b);
@@ -164,7 +164,8 @@ module.exports = (ctx) => {
     if (!b || (b.gast !== codenaam && b.host !== codenaam)) return { status: 404, error: 'Deze boeking is er niet.' };
     if (b.status !== 'ingecheckt') return { status: 409, error: 'Er is niemand ingecheckt.' };
     b.status = 'uitgecheckt';
-    b.uitbetaling = { status: 'gepland', naar: 'de RTG Bank-rekening van de host', bedrag: b.prijsopbouw.totaal };
+    // RTG verplaatst bij logeren (nog) geen geld; de uitbetaling loopt buiten RTG
+    b.uitbetaling = { status: 'buiten-rtg', bedrag: b.prijsopbouw.totaal, tekst: 'Uitbetalen via RTG kan bij logeren nog niet; host en gast regelen de betaling zelf.' };
     save();
     return { ok: true, boeking: gastZicht(b), review: 'Jullie kunnen elkaar nu allebei een review geven.' };
   }

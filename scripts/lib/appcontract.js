@@ -233,6 +233,9 @@ const CONTRACT = {
   'link:loonstrook': Object.assign({
     belofte: 'een medewerker ziet zijn eigen loonstrook met uitleg en dossier, en een ander lid ziet hem niet'
   }, voltooi('loonstrook', 'het scenario loopt /api/member/loonstroken, /api/member/dossier en /api/member/identiteit/verzoeken, de routes die /apps/loonstrook.html zelf aanroept, met de strook langs zaak en kantoor op naam en een ander lid dat er niet bij komt')),
+  'link:vertegenwoordiging': Object.assign({
+    belofte: 'een lid bepaalt zelf wie namens hem mag handelen, met een eigen grens, simulatie vooraf, spoor en intrekken per direct'
+  }, voltooi('vertegenwoordiging', 'het scenario loopt /api/vertegenwoordiging/bevoegdheden, /mijn, /grens, /simulatie, /aanvaard en /intrek, de routes die /apps/vertegenwoordiging.html zelf aanroept, met de vertegenwoordiger via /voorstel en /handel en een derde lid dat er niet bij komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

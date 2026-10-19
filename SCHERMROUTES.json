@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "cf490cb6",
+  "commit": "8ca13a95",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/loonstrook.html"
+    "public/apps/vertegenwoordiging.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1059,
-  "verwijzingen": 1287,
-  "voorvoegsels": 141,
+  "exactePaden": 1065,
+  "verwijzingen": 1293,
+  "voorvoegsels": 140,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -14848,6 +14848,48 @@
    "aantal": 1
   },
   {
+   "pad": "/api/vertegenwoordiging/aanvaard",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/bevoegdheden",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/grens",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/intrek",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/mijn",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vertegenwoordiging/simulatie",
+   "schermen": [
+    "public/apps/vertegenwoordiging.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/voeding",
    "schermen": [
     "public/apps/voeding.html"
@@ -18985,10 +19027,15 @@
   },
   {
    "bestand": "public/apps/vertegenwoordiging.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/vertegenwoordiging"
-   ]
+   "exact": [
+    "/api/vertegenwoordiging/aanvaard",
+    "/api/vertegenwoordiging/bevoegdheden",
+    "/api/vertegenwoordiging/grens",
+    "/api/vertegenwoordiging/intrek",
+    "/api/vertegenwoordiging/mijn",
+    "/api/vertegenwoordiging/simulatie"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/vluchten.html",

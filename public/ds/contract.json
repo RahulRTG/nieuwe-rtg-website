@@ -39,7 +39,8 @@
     "overgang",
     "meter",
     "lezer",
-    "canvaslaag"
+    "canvaslaag",
+    "handelingen"
   ],
   "themabaar": [
     "--ds-grond",
@@ -158,6 +159,11 @@
     "public/apps/stad.html": "test/stad-ds.e2e.js",
     "public/apps/routedossier.html": "test/routedossier-ds.e2e.js",
     "public/apps/routedekking.html": "test/routedekking-ds.e2e.js",
+    "public/apps/luchthaven.html": "test/luchthaven-ds.e2e.js",
+    "public/apps/marechaussee.html": "test/marechaussee-ds.e2e.js",
+    "public/apps/ovdienst.html": "test/ovdienst-ds.e2e.js",
+    "public/apps/ovroutes.html": "test/ovroutes-ds.e2e.js",
+    "public/apps/ovcontrol.html": "test/ovcontrol-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

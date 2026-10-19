@@ -4,328 +4,119 @@
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>OV-dienst</title>
-<meta name="theme-color" content="#0C0C0B">
+<title>RTG OV-dienst</title>
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
-  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
-  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
-  .kop .rek{flex:1;}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:560px;margin:0 auto;}
-  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
-  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
-  button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font-size:0.85rem;padding:0.6rem 0.95rem;}
-  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
-  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
-  .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;
-    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
-  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
-  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
-  .rij input,.rij select{flex:1;min-width:8rem;width:auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
-  .tellers{display:flex;gap:1.4rem;}
-  .tellers b{display:block;font-family:'Bodoni Moda',serif;font-size:2rem;font-variant-numeric:tabular-nums;}
-  .tellers span{font-size:0.7rem;color:var(--soft);letter-spacing:0.1em;text-transform:uppercase;}
-  .codeIn input{font-size:1.4rem;letter-spacing:0.3em;text-transform:uppercase;text-align:center;}
-  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
-    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
-  .melding.zien{opacity:1;}
-  .weg{display:none !important;}
-  .opdracht{background:linear-gradient(145deg,rgba(201,162,75,.16),var(--card));border-color:rgba(201,162,75,.38);}
-  .veilig{display:flex;gap:.5rem;align-items:flex-start;margin:.5rem 0;color:var(--soft);font-size:.72rem;line-height:1.4}.veilig:before{content:'\2713';color:var(--groen)}
-  .nuHero{background:linear-gradient(145deg,rgba(105,184,145,.18),var(--card));border-color:rgba(105,184,145,.42);padding:1.2rem}.nuLabel{font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;color:var(--groen)}.nuHero h3{font:500 1.8rem 'Bodoni Moda',serif;margin:.4rem 0}.actieNodig{border-left:3px solid var(--gold)}
-  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
-
-  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
-     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
-     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
-  .i-11j3pi{text-decoration:none;display:inline-block}
-  .i-1v4gr3{position:absolute;left:-999px}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/travel-os.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-ndyzcf:not(#_#_#_){margin:0 0 0.5rem}
-</style>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header class="kop">
-  <a href="/apps/personeel.html" aria-label="Terug naar de personeels-app">←</a>
-  <h1>OV-dienst</h1>
-  <span class="rek"></span>
-  <span class="badge" id="dienstBadge">Geen dienst</span>
+<!-- De OV-dienst (de PDA van chauffeur en conducteur) op het RTG Design
+     System (TRAVELOS-MIGRATIE.md par. 1b, de werklaag): Taak (een dienst
+     starten, een reiziger inchecken, een kaartje controleren), Detail (de
+     lopende dienst) en Status (de deur zonder personeelsinlog). Geen eigen
+     stijl: alles komt uit /ds/rtg-ds.css. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="taak">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/personeel.html" aria-label="Terug naar de personeels-app"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
-<main>
-  <section id="vPoort" class="weg">
-    <div class="kaart"><p class="stil" id="poortReden">Log eerst in op de personeels-app van uw OV-zaak.</p></div>
+<main class="ds-collectie" id="main">
+  <div class="ds-collectie__kop">
+    <h1 class="ds-titel ds-titel--scherm">OV-dienst</h1>
+    <p class="ds-detail__status" id="dienstBadge">Geen dienst</p>
+  </div>
+  <nav class="ds-chips" aria-label="Travel OS operations" data-ds-opsnav data-rtg-platform-chrome="travel-opsnavigatie"></nav>
+
+  <section id="vPoort" hidden>
+    <div class="ds-status ds-status--binnen" id="poortDeur"><p class="ds-status__tekst" id="poortReden">Log eerst in op de personeels-app van uw OV-zaak.</p>
+      <a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/personeel.html">Naar de personeels-app</a></div>
   </section>
 
-  <section id="vDienst" class="weg">
+  <section id="vDienst" hidden>
     <!-- dienst kiezen -->
-    <div id="kies">
-      <h2>Dienst starten</h2>
-      <div class="kaart">
-        <label for="dLijn">Lijn</label><select id="dLijn"><option value="">De lijnen laden…</option></select>
-        <label for="dNaam">Voertuig</label><input id="dNaam" maxlength="40" placeholder="Bijv. Bus 4">
-        <div class="rij"><button class="knop vol" id="dStart" type="button">Start de dienst</button></div>
-        <p class="stil h-mt50">Zodra de dienst loopt deelt deze PDA de positie; leden zien uw
-          voertuig live aankomen bij hun halte.</p>
-      </div>
-      <div class="kaart">
-        <p class="stil">Beheert u de zaak? In de routetekenaar zet u met een paar tikken uw lijnen en haltes
+    <div id="kies" class="ds-velden">
+      <h2 class="ds-kaart__titel">Dienst starten</h2>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 16V6l2-2h10l2 2v10M5 16h14M7 19v-3m10 3v-3M5 11h14"/></svg><span><span class="ds-veld__label">Lijn</span><select class="ds-veld__invoer" id="dLijn"><option value="">De lijnen laden…</option></select></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="12"/><path d="M8 21h8"/></svg><span><span class="ds-veld__label">Voertuig</span><input class="ds-veld__invoer" id="dNaam" maxlength="40" placeholder="Bijv. Bus 4"></span><span></span></label>
+      <button class="ds-knop ds-knop--primair ds-knop--breed" id="dStart" type="button" data-ds-actie="Start de dienst">Start de dienst</button>
+      <p class="ds-meta">Zodra de dienst loopt deelt deze PDA de positie; leden zien uw
+        voertuig live aankomen bij hun halte.</p>
+      <section class="ds-kaart"><div class="ds-kaart__inhoud">
+        <p class="ds-meta">Beheert u de zaak? In de routetekenaar zet u met een paar tikken uw lijnen en haltes
           op de kaart; leden zien ze meteen.</p>
-        <div class="rij"><a class="i-11j3pi knop" href="/apps/ovroutes.html">Routes tekenen</a><a class="i-11j3pi knop" href="/apps/ovcontrol.html">Control Tower</a></div>
-      </div>
+        <div class="ds-veldgroep"><a class="ds-knop ds-knop--stil ds-knop--klein" href="/apps/ovroutes.html">Routes tekenen</a><a class="ds-knop ds-knop--stil ds-knop--klein" href="/apps/ovcontrol.html">Control Tower</a></div>
+      </div></section>
     </div>
 
     <!-- de lopende dienst -->
-    <div id="loopt" class="weg">
-      <div class="kaart nuHero"><div class="nuLabel">Nu</div><h3 id="nuTitel">Rijd uw lijn</h3><p class="stil">Uw positie en bezetting lopen automatisch mee. Kijk alleen naar uitzonderingen.</p><div class="tellers h-mt80"><span><b id="tAanBoord">0</b><span>aan boord</span></span><span><b id="tVandaag">0</b><span>vandaag</span></span></div><p class="stil h-mt60" id="gpsStatus">GPS delen…</p></div>
-      <h2>Hierna</h2>
-      <div class="kaart opdracht"><h2 class="s-ndyzcf">Veilige automatische dienst</h2>
-        <div class="veilig">GPS en bezetting worden bijgewerkt nadat u de dienst zelf start.</div>
-        <div class="veilig">Geld, identiteit en uitzonderingen worden nooit automatisch beslist.</div>
-        <div class="veilig">Stoppen blijft altijd direct beschikbaar.</div></div>
-      <h2>Actie nodig</h2>
-      <div class="kaart codeIn actieNodig">
-        <p class="stil">Het lid toont een oplichtende code; scan hem en de reiziger is binnen.</p>
-        <div class="rij"><button class="knop vol" id="incheckScan" type="button">Scan de incheckcode</button></div>
-        <form class="rij" id="codeForm">
-          <label for="codeVeld" class="i-1v4gr3">Incheckcode</label>
-          <input id="codeVeld" maxlength="80" autocomplete="off" placeholder="OVI.">
-          <button class="knop vol" type="submit">Check in</button>
-        </form>
-        <p class="stil h-mt50">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
-          de teller verschijnen.</p>
-        <div class="rij"><button class="knop rood" id="dStop" type="button">Stop de dienst</button></div>
-      </div>
+    <div id="loopt" class="ds-velden" hidden>
+      <section class="ds-kaart"><div class="ds-kaart__inhoud">
+        <p class="ds-label">Nu</p>
+        <h2 class="ds-titel ds-titel--scherm" id="nuTitel">Rijd uw lijn</h2>
+        <p class="ds-meta">Uw positie en bezetting lopen automatisch mee. Kijk alleen naar uitzonderingen.</p>
+        <ul class="ds-lijst" aria-label="Tellers">
+          <li class="ds-lijst__rij"><span></span><span class="ds-lijst__titel">aan boord</span><b class="ds-kaart__titel" id="tAanBoord">0</b></li>
+          <li class="ds-lijst__rij"><span></span><span class="ds-lijst__titel">vandaag</span><b class="ds-kaart__titel" id="tVandaag">0</b></li>
+        </ul>
+        <p class="ds-meta" id="gpsStatus">GPS delen…</p>
+      </div></section>
 
-      <h2>Vervoerbewijs controleren</h2>
-      <div class="kaart codeIn">
-        <p class="stil">Scan de QR op het scherm van de reiziger, of tik de code in. Het antwoord is kort:
-          geldig of niet, en waarom niet.</p>
-        <div class="rij h-mt60">
-          <button class="knop vol" id="scanKnop" type="button">Scan een kaartje</button>
-        </div>
-        <form class="rij h-mt50" id="bewijsForm">
-          <label for="bewijsVeld" class="i-1v4gr3">Code van het vervoerbewijs</label>
-          <input id="bewijsVeld" maxlength="40" autocomplete="off" placeholder="Of tik de code in">
-          <button class="knop" type="submit">Controleer</button>
+      <h2 class="ds-label">Hierna</h2>
+      <section class="ds-kaart"><div class="ds-kaart__inhoud">
+        <h3 class="ds-kaart__titel">Veilige automatische dienst</h3>
+        <ul class="ds-detail__gegevens">
+          <li class="ds-detail__gegeven"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>GPS en bezetting worden bijgewerkt nadat u de dienst zelf start.</li>
+          <li class="ds-detail__gegeven"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>Geld, identiteit en uitzonderingen worden nooit automatisch beslist.</li>
+          <li class="ds-detail__gegeven"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>Stoppen blijft altijd direct beschikbaar.</li>
+        </ul>
+      </div></section>
+
+      <h2 class="ds-label">Actie nodig</h2>
+      <section class="ds-kaart"><div class="ds-kaart__inhoud">
+        <p class="ds-meta">Het lid toont een oplichtende code; scan hem en de reiziger is binnen.</p>
+        <button class="ds-knop ds-knop--primair ds-knop--breed" id="incheckScan" type="button" data-ds-actie="Scan de incheckcode">Scan de incheckcode</button>
+        <form class="ds-vraagrij" id="codeForm">
+          <input class="ds-invoer" id="codeVeld" maxlength="80" autocomplete="off" placeholder="OVI." aria-label="Incheckcode">
+          <button class="ds-knop ds-knop--stil ds-knop--klein" type="submit">Check in</button>
         </form>
-        <div id="bewijsUit" class="weg h-mt70"></div>
-      </div>
+        <p class="ds-meta">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
+          de teller verschijnen.</p>
+        <button class="ds-knop ds-knop--stil ds-knop--breed" id="dStop" type="button" data-ds-actie="Stop de dienst">Stop de dienst</button>
+      </div></section>
+
+      <h2 class="ds-label">Vervoerbewijs controleren</h2>
+      <section class="ds-kaart"><div class="ds-kaart__inhoud">
+        <p class="ds-meta">Scan de QR op het scherm van de reiziger, of tik de code in. Het antwoord is kort:
+          geldig of niet, en waarom niet.</p>
+        <button class="ds-knop ds-knop--stil ds-knop--breed" id="scanKnop" type="button" data-ds-actie="Scan een kaartje">Scan een kaartje</button>
+        <form class="ds-vraagrij" id="bewijsForm">
+          <input class="ds-invoer" id="bewijsVeld" maxlength="40" autocomplete="off" placeholder="Of tik de code in" aria-label="Code van het vervoerbewijs">
+          <button class="ds-knop ds-knop--stil ds-knop--klein" type="submit">Controleer</button>
+        </form>
+        <div id="bewijsUit" aria-live="polite" hidden></div>
+      </div></section>
     </div>
   </section>
 </main>
-<div class="melding" id="melding" role="status"></div>
-<!-- uitvoer.js zonder defer, voor het eigen script. Deze PDA meldt geen eigen
-     model aan: hij houdt alleen een lijnkeuze en twee tellers van de lopende
-     dienst vast. Het lijnenregister zelf staat in ovroutes.html en wordt daar
-     meegegeven. -->
-<link href="/shared/media.css" rel="stylesheet">
-<!-- niet defer: RTGMedia moet er zijn voordat de inline scripts hieronder draaien -->
-<!-- plek.js VOOR de inline code hieronder: die vraagt via RTGPlek om je
-     positie, maar het script werd nergens geladen. window.RTGPlek was dus
-     altijd undefined en de vraag verscheen nooit -- de app bleef op het
-     demo-startpunt staan en toonde haltes die niets met jou te maken
-     hebben. -->
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
+<!-- plek.js met defer: de locatievraag leest de stand in DOMContentLoaded,
+     waar RTGPlek gegarandeerd geladen is. media.js, qr.js, qrscan.js en
+     scanner.js dragen de camera en het lezen van een code; het blad zelf
+     staat in ovdienst-scan.js. Deze PDA meldt geen eigen model aan bij
+     Meenemen: het lijnenregister staat in ovroutes.html. -->
 <script src="/shared/plek.js" defer></script>
 <script src="/shared/media.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/shared/deur.js"></script>
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/staff/ov/' + pad, { method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  let meldT;
-  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
-    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
-
-  let hier = { lat: 38.908, lng: 1.432 };
-  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
-  // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
-  /* De schakelaar blijft de baas, maar hier stil overslaan betekent: de app
-     toont haltes die niets met jou te maken hebben. shared/plek.js vraagt het
-     een keer, met de reden erbij; zeg je nee, dan blijft het demo-startpunt
-     staan en vraagt hij deze sessie niet opnieuw. */
-  /* DE STAND VAN DE SCHAKELAAR KOMT VAN DE CONTRACTLAAG, NIET UIT LOCALSTORAGE.
-
-     Hier stond een eigen `localStorage.getItem('rtg_os_gps')`. Dat is een
-     tweede lezer van een sleutel die een eigenaar heeft (shared/plek.js), en
-     zulke tweede lezers lopen achter zodra de eigenaar iets verandert -- exact
-     hoe deze schakelaar ooit voor iedereen op "uit" bleef staan. Het lezen
-     moest daarvoor wel VERHUIZEN: dit blok draait tijdens het parsen en
-     plek.js laadt met `defer`, dus tijdens het parsen bestaat RTGPlek nog
-     niet. Alles wat de stand nodig heeft staat daarom nu in de haak, waar
-     plek.js gegarandeerd geladen is. */
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.RTGPlek) { if (window.console) console.warn('[ov] shared/plek.js ontbreekt; zonder plek blijft het scherm bij de demo-stand.'); return; }
-    if (RTGPlek.aan()) {
-      if ('geolocation' in navigator)
-        navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
-      return;
-    }
-    RTGPlek.vraag({ waarom: 'Om je dienst en de haltes op je route te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.' })
-      .then(plek => { if (plek) location.reload(); });
-  });
-
-  let posTimer = null, standTimer = null;
-  async function start() {
-    if (!token) { $('#vPoort').classList.remove('weg'); return; }
-    // de lijnen komen uit het zaakoverzicht (zelfde inlog)
-    const r = await fetch('/api/supplier/ov/overzicht', { method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
-      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
-    if (r.status !== 200) { try { RTGDeur.toon(document.querySelector('#vPoort .kaart'), { soort:'personeel', naar:'/apps/personeel.html' }); } catch(e) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; } $('#vPoort').classList.remove('weg'); return; }
-    const sel = $('#dLijn'); sel.innerHTML = '';
-    for (const l of r.body.lijnen || []) { const o = document.createElement('option'); o.value = l.id; o.textContent = l.icoon + ' ' + l.naam; sel.appendChild(o); }
-    $('#vDienst').classList.remove('weg');
-    // liep er al een dienst? dan meteen terug in het werkscherm
-    const st = await api('stand');
-    if (st.status === 200 && st.body.aan) dienstLoopt((st.body.lijn && st.body.lijn.naam) || 'Dienst');
-  }
-
-  /* Het scherm van een LOPENDE dienst. Aparte functie omdat er twee wegen naar
-     toe leiden: de knop hieronder, en het herladen van de pagina terwijl de
-     dienst gewoon doorloopt. Die tweede weg ontbrak, en dan zag een chauffeur na
-     een hapering zijn startscherm terug met zijn dienst nog actief -- geen
-     tellers, geen GPS, en geen kaartcontrole. */
-  function dienstLoopt(lijnNaam) {
-    $('#kies').classList.add('weg'); $('#loopt').classList.remove('weg');
-    $('#dienstBadge').textContent = lijnNaam + ' · live';
-    $('#nuTitel').textContent = lijnNaam + ' is live';
-    clearInterval(posTimer); clearInterval(standTimer);
-    const deel = async () => {
-      const p = await api('pos', hier);
-      $('#gpsStatus').textContent = p.body.error ? p.body.error : 'GPS gedeeld om ' + new Date().toLocaleTimeString('nl-NL').slice(0, 5) + '; leden zien u live.';
-    };
-    deel(); posTimer = setInterval(deel, 7000);
-    const stand = async () => {
-      const s = await api('stand');
-      if (s.status === 200) { $('#tAanBoord').textContent = s.body.aanBoord; $('#tVandaag').textContent = s.body.vandaag; }
-    };
-    stand(); standTimer = setInterval(stand, 8000);
-  }
-  $('#dStart').addEventListener('click', async () => {
-    const r = await api('dienst', { lijnId: $('#dLijn').value, voertuigNaam: $('#dNaam').value });
-    if (r.body.error) return zeg(r.body.error);
-    dienstLoopt(r.body.lijn.naam);
-    if (r.body.afwezigWaarschuwing) zeg(r.body.afwezigWaarschuwing);
-  });
-  $('#dStop').addEventListener('click', async () => {
-    await api('dienst', { aan: false });
-    clearInterval(posTimer); clearInterval(standTimer);
-    $('#kies').classList.remove('weg'); $('#loopt').classList.add('weg');
-    $('#dienstBadge').textContent = 'Geen dienst';
-    zeg('Dienst gestopt.');
-  });
-  async function incheck(code) {
-    const r = await api('checkin', { code });
-    if (r.body.error) return zeg(r.body.error);
-    $('#codeVeld').value = '';
-    zeg('Reiziger ingecheckt.');
-    const s = await api('stand');
-    if (s.status === 200) { $('#tAanBoord').textContent = s.body.aanBoord; $('#tVandaag').textContent = s.body.vandaag; }
-  }
-  $('#codeForm').addEventListener('submit', e => { e.preventDefault(); incheck($('#codeVeld').value.trim()); });
-  $('#incheckScan').addEventListener('click', () => {
-    if (!window.RTGScanknop) return zeg('Scannen kan hier niet; tik de code in.');
-    RTGScanknop.open({ titel: 'Incheckcode scannen', hint: 'Laat de reiziger de oplichtende QR tonen.',
-      onCode: c => incheck(String((c && c.tekst) || c || '').trim()) });
-  });
-
-  start();
-  /* ---- vervoerbewijzen controleren ----
-     De conducteur ziet het BEWIJS en niet de persoon: product, lijn, geldigheid
-     en de codenaam. Geen e-mailadres, geen wallet, geen reisgeschiedenis -- hij
-     controleert een kaartje, hij doet geen persoonsonderzoek. */
-  async function bewijsCheck(code) {
-    const uit = $('#bewijsUit');
-    uit.classList.remove('weg');
-    uit.textContent = 'Even kijken…';
-    const r = await fetch('/api/staff/mob/kaart/controle', { method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-      body: JSON.stringify({ code: code, lijnId: $('#dLijn').value || undefined }) })
-      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
-    uit.innerHTML = '';
-    const kop = document.createElement('p');
-    kop.style.fontSize = '1rem';
-    kop.style.fontWeight = '600';
-    kop.style.color = r.body.geldig ? 'var(--groen)' : 'var(--rood)';
-    kop.textContent = r.body.geldig ? 'Geldig' : 'Niet geldig';
-    uit.appendChild(kop);
-    const sub = document.createElement('p'); sub.className = 'stil';
-    sub.textContent = r.body.geldig ? (r.body.melding || '') : (r.body.error || 'Onbekende code.');
-    uit.appendChild(sub);
-    const k = r.body.kaartje;
-    if (k) {
-      const det = document.createElement('p'); det.className = 'stil';
-      det.textContent = [k.product, k.lijnNaam, k.van ? k.van + ' → ' + k.naar : null, k.codenaam]
-        .filter(Boolean).join(' · ');
-      uit.appendChild(det);
-    }
-    zeg(r.body.geldig ? 'Geldig vervoerbewijs.' : (r.body.error || 'Niet geldig.'));
-  }
-  $('#bewijsForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const c = $('#bewijsVeld').value.trim();
-    if (!c) return zeg('Vul een code in.');
-    bewijsCheck(c);
-    $('#bewijsVeld').value = '';
-  });
-  /* Scannen via de gedeelde overlay (shared/scanknop.js): dezelfde camera-laag
-     als de kassa en de pas. Zonder camera valt die zelf terug op typen, dus een
-     scan is nooit een doodlopende weg. */
-  $('#scanKnop').addEventListener('click', () => {
-    if (!window.RTGScanknop) return zeg('Scannen kan hier niet; tik de code in.');
-    RTGScanknop.open({ titel: 'Vervoerbewijs scannen',
-      hint: 'Laat de reiziger de QR van zijn kaartje tonen.',
-      onCode: c => bewijsCheck(String((c && c.tekst) || c || '').trim()) });
-  });
-})();
-
-</script>
-<script src="/shared/qr.js" defer></script>
-<script src="/shared/qrscan.js" defer></script>
-<script src="/shared/scanknop.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/qr.js"></script>
+<script src="/shared/qrscan.js"></script>
+<script src="/shared/scanner.js"></script>
+<script src="/apps/werkvloer.js"></script>
+<script src="/apps/ovdienst-scan.js"></script>
+<script src="/apps/ovdienst.js"></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
-<script src="/shared/travel-os.js" defer></script>
 </body>
 </html>

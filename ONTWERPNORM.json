@@ -3,8 +3,8 @@
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
     "bladen": 172,
-    "schermenMetStijlblok": 277,
-    "important": 7615
+    "schermenMetStijlblok": 272,
+    "important": 7611
   },
   "uitzonderingen": [],
   "bladen": {
@@ -1932,12 +1932,6 @@
       "important": 0,
       "hex": 4
     },
-    "public/apps/luchthaven.html": {
-      "blokken": 2,
-      "bytes": 5697,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/magnaat-kantoor.html": {
       "blokken": 1,
       "bytes": 13447,
@@ -1967,12 +1961,6 @@
       "bytes": 19269,
       "important": 0,
       "hex": 19
-    },
-    "public/apps/marechaussee.html": {
-      "blokken": 2,
-      "bytes": 5296,
-      "important": 0,
-      "hex": 5
     },
     "public/apps/mecenaat.html": {
       "blokken": 1,
@@ -2112,18 +2100,6 @@
       "important": 2,
       "hex": 5
     },
-    "public/apps/ovcontrol.html": {
-      "blokken": 1,
-      "bytes": 2179,
-      "important": 0,
-      "hex": 8
-    },
-    "public/apps/ovdienst.html": {
-      "blokken": 2,
-      "bytes": 4406,
-      "important": 2,
-      "hex": 4
-    },
     "public/apps/overheid.html": {
       "blokken": 3,
       "bytes": 9066,
@@ -2135,12 +2111,6 @@
       "bytes": 5064,
       "important": 0,
       "hex": 5
-    },
-    "public/apps/ovroutes.html": {
-      "blokken": 2,
-      "bytes": 4373,
-      "important": 2,
-      "hex": 4
     },
     "public/apps/pakketten.html": {
       "blokken": 1,

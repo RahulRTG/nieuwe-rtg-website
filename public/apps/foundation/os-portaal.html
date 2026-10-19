@@ -167,6 +167,9 @@ function toonPartner(r) {
         : '<div class="leeg">Er staan nog geen documenten in uw dossier.</div>') + '</div>';
 }
 
+/* Een telling onder de drempel komt als null van de server (kern/rtfos/gemeente.js): zeg dat eerlijk. */
+const klein = n => (n === null ? 'minder dan 5' : n);
+
 function toonGemeente(r) {
   const b = r.bereik, d = r.doelen;
   $('#uit').innerHTML =
@@ -184,7 +187,7 @@ function toonGemeente(r) {
         : '<div class="leeg">Nog geen buurten geregistreerd.</div>') + '</div>' +
     '<div class="kaart"><div class="sec">Soorten hulpvraag</div>' +
       (Object.keys(b.perSoort).length ? Object.entries(b.perSoort).map(([s, n]) =>
-        '<div class="lijnrij"><span class="naam">' + esc(s) + '</span><span class="pil">' + n + '</span></div>').join('')
+        '<div class="lijnrij"><span class="naam">' + esc(s) + '</span><span class="pil">' + klein(n) + '</span></div>').join('')
         : '<div class="leeg">Nog geen hulpvragen geregistreerd.</div>') + '</div>' +
     '<div class="kaart"><div class="sec">Doelen</div>' +
       (d.gemeten ? '<div class="rij">' + stat(d.doel, 'doel') + stat(d.bereikt, 'bereikt') +
@@ -202,10 +205,11 @@ function toonGemeente(r) {
         : '<div class="leeg">Er staan nog geen opdrachten vast.</div>') + '</div>' +
     '<div class="kaart"><div class="sec">Projecten</div>' +
       (r.projecten.length ? r.projecten.map(p => '<div class="lijnrij"><span class="naam">' + esc(p.naam) + '</span>' +
-        '<span class="pil">' + esc(p.status) + '</span><span class="pil">' + p.deelnemersUniek + ' geholpen</span>' +
+        '<span class="pil">' + esc(p.status) + '</span><span class="pil">' + klein(p.deelnemersUniek) + ' geholpen</span>' +
         '<div class="sub">' + esc(p.doelgroep || '') + (p.van ? ' &middot; vanaf ' + esc(p.van) : '') + '</div>' +
-        p.indicatoren.map(i => '<div class="sub">' + esc(i.naam) + ': ' + i.bereikt + ' van ' + i.doel +
-          ' bereikt, ' + i.doorgestroomd + ' doorgestroomd, ' + i.uitgevallen + ' uitgevallen</div>').join('') +
+        (p.onderDrempel ? '<div class="uitleg">' + esc(p.onderDrempel) + '</div>' : '') +
+        p.indicatoren.map(i => '<div class="sub">' + esc(i.naam) + ': ' + klein(i.bereikt) + ' van ' + i.doel +
+          ' bereikt, ' + klein(i.doorgestroomd) + ' doorgestroomd, ' + klein(i.uitgevallen) + ' uitgevallen</div>').join('') +
         '</div>').join('') : '<div class="leeg">Nog geen lopende of afgeronde projecten.</div>') + '</div>';
 }
 

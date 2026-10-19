@@ -35,7 +35,8 @@ module.exports = (K) => {
     const lo = leden.reduce((a, l) => a + l.lo, 0), hi = leden.reduce((a, l) => a + l.hi, 0);
     return leden.some(l => Math.min(l.hi, S - (lo - l.lo)) - Math.max(l.lo, S - (hi - l.hi)) < 1);
   }
-  function buurten(perWijk) {
+  // `woord`: hoe de samengevoegde rij heet (buurten, of soorten voor de hulpvragen per soort)
+  function buurten(perWijk, woord) {
     const per = new Map();
     for (const [wijk, n] of Object.entries(perWijk || {})) {
       const k = sleutel(wijk);
@@ -59,7 +60,7 @@ module.exports = (K) => {
     while (!veilig() && groot.length) { groep.push({ aantal: groot.pop().aantal, lo: K, hi: Infinity, mee: true }); meegenomen++; }
     const ok = veilig();
     const uit = groot.slice();
-    uit.push({ wijk: 'overige buurten (' + groep.length + ')', buurten: groep.length,
+    uit.push({ wijk: 'overige ' + (woord || 'buurten') + ' (' + groep.length + ')', buurten: groep.length,
       aantal: ok ? groep.reduce((a, l) => a + l.aantal, 0) : null, samengevoegd: true,
       ...(meegenomen ? { complementair: meegenomen + ' buurt(en) boven de drempel meegenomen, anders was het aantal van een buurt af te leiden' } : {}),
       ...(ok ? {} : { onderdrukt: 'ook na samenvoegen zou het aantal van een buurt af te leiden zijn; daarom staat hier geen getal' }) });

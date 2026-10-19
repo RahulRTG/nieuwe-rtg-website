@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2911 bestanden en 19856 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2912 bestanden en 19858 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2911 |
-| losse beweringen (`test(...)`) | 19856 |
+| toetsbestanden | 2912 |
+| losse beweringen (`test(...)`) | 19858 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 91 |
+| niets van beide | 92 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2563 bestanden, 19270 beweringen.
+2564 bestanden, 19272 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -758,6 +758,7 @@ toets omvalt.
 | `geloofbieb.test.js` | 7 | gezakt op `liegpoort /api/` | De Geloof & Wijsheid-Bibliotheek: een ECHTE, leesbare kern over alle religies en levensbeschouwingen, als gelijken naast elkaar, altijd gratis (cadeau van de RTFoundation), met de leeftijdspoort van het profiel. Elk... |
 | `gemeenschapsproef-takken.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | De gemeenschapsproef (scripts/gemeenschapsproef.js) tegen een NAGEMAAKTE server: stopt het instrument met een duidelijke reden als de wereld er niet komt (geen kantoor, geen stichting, geen registratie, geen... |
 | `gemeenschapsproef.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | DE GEMEENSCHAPSPROEF -- de samenwerkingsketen van FoundationOS. scripts/gemeenschapsproef.js loopt de keten uit GEMEENSCHAP-FASE0.md par. |
+| `gemeente-drempel.test.js` | 2 | -- | HET GEMEENTEPORTAAL NOEMT GEEN KLEIN GETAL, OOK NIET PER SOORT OF PER PROJECT. Gevonden bij de domeinkaart van FoundationOS (RTF Portaal, 19 oktober 2026): de buurten gingen door de queryveilige drempel... |
 | `gemeente.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre. Vier pijlers voor inwoners, gemeente-medewerkers en RTG-partners. |
 | `genootschap-ai-leesweergave.test.js` | 4 | gezakt op `optie-uit#1` | Rahul in het genootschap krijgt een LEESWEERGAVE, nooit de modules zelf. kern/genootschap/ai.js kreeg het hele prikbord, de hele bijeenkomstmodule en het hele genootschap mee -- dus `stem`, `weg`, `plaats`,... |
 | `genootschap-beheer.test.js` | 4 | gezakt op `liegpoort /api/` | HET BEHEER VAN EEN GENOOTSCHAP -- 3 endpoints. Deze drie wees de waargenomen dekkingsmeting aan als nooit aangeroepen: pas-aan, eruit en reactie-weg. |

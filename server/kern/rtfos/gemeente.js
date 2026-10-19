@@ -92,11 +92,22 @@ module.exports = (ctx, eigen) => {
     const stad = stadVan(rij.stad);
     if (!stad) return { status: 404, error: 'De stadsafdeling achter deze code bestaat niet meer.' };
     const cij = cijfersVan(stad.id);
+    /* Dezelfde drempel per project: een telling van mensen tussen 0 en K
+       noemt het portaal niet (test/gemeente-drempel.test.js). Nul is geen mens,
+       en een doel is een afspraak. Klein project: alle tellingen dicht. */
+    const telling = n => { n = Number(n) || 0; return n === 0 || n >= K ? n : null; };
     const projecten = S().projecten.filter(p => p.stad === stad.id && ['actief', 'afgerond'].includes(p.status))
-      .map(p => ({ naam: p.naam, soort: p.soort, doelgroep: p.doelgroep, status: p.status,
-        van: p.van, tot: p.tot, deelnemersUniek: Number(p.deelnemersUniek) || 0,
-        indicatoren: (p.indicatoren || []).map(i => ({ naam: i.naam, doel: i.doel, bereikt: i.bereikt,
-          doorgestroomd: i.doorgestroomd, uitgevallen: i.uitgevallen })) }));
+      .map(p => {
+        const uniek = Number(p.deelnemersUniek) || 0, klein = telling(uniek) === null;
+        const t = n => (klein ? null : telling(n));
+        return Object.assign({ naam: p.naam, soort: p.soort, doelgroep: p.doelgroep, status: p.status,
+          van: p.van, tot: p.tot, deelnemersUniek: klein ? null : uniek,
+          indicatoren: (p.indicatoren || []).map(i => ({ naam: i.naam, doel: i.doel, bereikt: t(i.bereikt),
+            doorgestroomd: t(i.doorgestroomd), uitgevallen: t(i.uitgevallen) })) },
+        klein ? { onderDrempel: 'Minder dan ' + K + ' deelnemers: een getal zou naar mensen wijzen, daarom staat het er niet.' } : {});
+      });
+    const perSoort = {};
+    for (const r of buurten(cij.hulpvragen.perSoort, 'soorten')) perSoort[r.wijk] = r.aantal;
     return { ok: true, gemeente: { naam: rij.naam, stad: stad.naam },
       opdrachten: (rij.opdrachten || []).map(opdrachtBeeld),
       projecten,
@@ -105,7 +116,7 @@ module.exports = (ctx, eigen) => {
         uniekGeholpen: cij.mensen.uniekGeholpen, herhaaldGeholpen: cij.mensen.herhaaldGeholpen,
         vrijwilligers: cij.mensen.vrijwilligers, vrijwilligersuren: cij.mensen.vrijwilligersuren,
         hulpvragen: cij.hulpvragen.totaal, hulpvragenOpen: cij.hulpvragen.open,
-        perSoort: cij.hulpvragen.perSoort, buurten: buurten(cij.hulpvragen.perWijk)
+        perSoort, buurten: buurten(cij.hulpvragen.perWijk)
       },
       besteding: { binnen: cij.geld.binnen, besteed: cij.geld.besteed,
         kostenPerPersoon: cij.geld.kostenPerPersoon },

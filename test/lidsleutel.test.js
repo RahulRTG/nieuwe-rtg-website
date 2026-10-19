@@ -47,3 +47,15 @@ test('een id dat als getal niet meer klopt, telt niet', () => {
   assert.equal(idVanKey('user-9007199254740993'), null, 'voorbij Number.MAX_SAFE_INTEGER telt niet mee');
   assert.equal(idVanKey('user-' + Number.MAX_SAFE_INTEGER), Number.MAX_SAFE_INTEGER, 'de grens zelf mag nog wel');
 });
+
+test('de gedeelde accountlezing bewaart de juiste identiteit en blijft gesloten bij ongeldige sleutels of kluisfouten', () => {
+  const lees = require('../server/lib/account-op-sleutel');
+  const account = { id: 42 }; const ids = [];
+  const kluis = { getUserById(id) { assert.equal(this, kluis); ids.push(id); return id === 42 ? account : null; } };
+  assert.equal(lees(kluis, 'user-42'), account);
+  assert.equal(lees(kluis, 'user-43'), null);
+  for (const key of ['gast', '', null, 'user-42x', 'user-9007199254740992']) assert.equal(lees(kluis, key), null);
+  assert.deepEqual(ids, [42, 43], 'ongeldige sleutels raken de kluis niet');
+  assert.equal(lees({ getUserById() { throw Error('kluis niet beschikbaar'); } }, 'user-42'), null);
+  assert.equal(lees(null, 'user-42'), null);
+});

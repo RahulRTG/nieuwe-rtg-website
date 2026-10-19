@@ -100,3 +100,31 @@ test('5. paletUit valt niet om op een leeg of ontbrekend palet', () => {
   assert.deepEqual(O.paletUit(null, 1, 3), []);
   assert.deepEqual(O.paletUit({ ivoor: '#F2EBDD' }, 1, 5), [{ naam: 'ivoor', hex: '#F2EBDD' }]);
 });
+
+test('gedeelde bewerking behoudt opslag, statussen en projectie van elk ontwerpdomein', () => {
+  const crypto = require('node:crypto');
+  const db = { data: {} }; let opgeslagen = 0;
+  const deps = { db, crypto, save: () => { opgeslagen++; } };
+  const domeinen = [
+    require('../server/kern/architect').maakArchitect(deps).architect,
+    require('../server/kern/hardwarelab').maakHardwarelab(deps).hardware,
+    require('../server/kern/studio').maakStudio(deps).studio
+  ];
+  for (const d of domeinen) d.overzicht();
+  opgeslagen = 0;
+  const ids = domeinen.map((d, i) => {
+    assert.equal(d.ontwerpMaak({ naam: ' ' }).status, 400);
+    const r = d.ontwerpMaak({ naam: 'Ontwerp ' + i, brief: 'Eigen domein' });
+    assert.equal(r.ok, true);
+    assert.equal(d.ontwerpZet('ontbreekt', { naam: 'Nee' }).status, 404);
+    const eigenStatus = d.STATUS.find(s => s !== r.ontwerp.status);
+    const zet = d.ontwerpZet(r.ontwerp.id, { naam: 'Gewijzigd ' + i, status: eigenStatus, brief: 'x'.repeat(700) });
+    assert.equal(zet.ontwerp.status, eigenStatus);
+    assert.equal(zet.ontwerp.brief.length, 600);
+    assert.equal(d.ontwerpZet(r.ontwerp.id, { status: 'niet-toegestaan' }).ontwerp.status, eigenStatus);
+    return r.ontwerp.id;
+  });
+  for (let i = 0; i < domeinen.length; i++)
+    assert.equal(domeinen[i].ontwerpZet(ids[(i + 1) % ids.length], { naam: 'Ander domein' }).status, 404);
+  assert.equal(opgeslagen, 9, 'alleen drie echte schrijfacties per domein');
+});

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T22:54:00.015Z",
-    "commit": "bc015b5b6a",
+    "op": "2026-10-19T23:00:49.063Z",
+    "commit": "fde5d623a7",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -10519,12 +10519,19 @@
       "scherp": "gezakt"
     },
     "marktdeal-betaal.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/markt/handel/deal.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 3
+      "module": "server/kern/markt/handel.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-market-mutation-proof/marktdeal-betaal.test.js.evidence.json",
+        "sha256": "94692634a0fbde626ee0d26dc4d0e9d73d966c55d712e8898d4534bc51c66ff9",
+        "commit": "fde5d623a736057484151d793cdf5a214d6ba817",
+        "sourceSha256": "66d7082149a889e13f82d5b4539c495fba26f6ef70a64503bb347a7e1d275c70",
+        "testSha256": "b55ea90ccae0d357c3fe04d5a882f38be8f19074a4cefaf110cecdb6e70661bd"
+      }
     },
     "materiaal.test.js": {
       "soort": "puur",

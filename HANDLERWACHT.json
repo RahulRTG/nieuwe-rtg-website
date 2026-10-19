@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-10-19T06:24:14.335Z",
-  "commit": "adf6d65f",
+  "op": "2026-10-19T06:30:38.741Z",
+  "commit": "33a5db88",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 659,
+  "zonderBewakerslaag": 657,
   "bewaakt": 568,
-  "openbaarMetReden": 49,
+  "openbaarMetReden": 47,
   "eigenControle": 23,
   "sleutelDoorgegeven": 11,
   "zonderWachtMetReden": 8,
@@ -3281,14 +3281,8 @@
    "staat": "eigenControle"
   },
   {
-   "sleutel": "POST /api/mail/binnen",
-   "bestand": "server/routes/mailpost.js:58",
-   "staat": "openbaar",
-   "reden": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
-  },
-  {
    "sleutel": "POST /api/mail/ses",
-   "bestand": "server/routes/mailpost.js:82",
+   "bestand": "server/routes/mailpost.js:85",
    "staat": "openbaar",
    "reden": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
   },
@@ -4210,12 +4204,6 @@
    "bestand": "server/routes/auth/webauthn.js:96",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
-  },
-  {
-   "sleutel": "POST /api/werkmail/bezorg",
-   "bestand": "server/routes/werkmail.js:58",
-   "staat": "openbaar",
-   "reden": "inkomende post van de mailserver, met een eigen venster-rem per minuut"
   },
   {
    "sleutel": "POST /api/werkplek/mijn",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2912 bestanden en 19858 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2913 bestanden en 19859 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2912 |
-| losse beweringen (`test(...)`) | 19858 |
+| toetsbestanden | 2913 |
+| losse beweringen (`test(...)`) | 19859 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 92 |
+| niets van beide | 93 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2604,7 +2604,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-348 bestanden, 586 beweringen.
+349 bestanden, 587 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2843,6 +2843,7 @@ toets omvalt.
 | `rtc-relay.e2e.js` | 2 | gezakt op `liegpoort /api/` | EEN ECHT GESPREK VIA HET RELAIS: echte RTG-server, echte coturn, echte Chromium. De server geeft (alleen aan een ingelogd lid) een kortlevend credential uit via /api/ice. |
 | `rtfagenda.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de RTF-gezinsagenda op RTG-niveau: het maandraster met kleur per gezinslid, een punt zetten via het paneel, bewerken, en de verjaardag-snelknop die er een jaarpunt van maakt. |
 | `rtfalbum.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor het gezinsalbum: maandgroepen, het gedeelde hartje met de favorietenfilter, de kijker met pijlen, de terugblik en de jarigenstrook die de verjaardagen-app alleen meeleest. |
+| `rtfbuurt-accountdeur.e2e.js` | 1 | -- | DE BUURTPAGINA (RTF Buurt) HEEFT DE ACCOUNTDEUR IN HET SCHERM. Sinds 66f413ff vragen /api/rtfos/publiek/* een sessie (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt een account). |
 | `rtfcurve.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de eerlijke vergeetcurve op overhoren.html: het blok "Vandaag herhalen" met de dagstapel, goed = later terug, fout = vandaag nog een keer, en de eerlijke lege stand als alles gehad is. |
 | `rtfgeld.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de geldschool: de ouder zet op klusjes.html weekgeld en verzilvert sterren; het kind ziet alles eerlijk terug in zakgeld.html. |
 | `rtfhulpwijzer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de consistentieronde van golf 6 (deel 3): de hulpwijzer draait op de gedeelde coach-laag (soort 'hulp', wachttekst van Meike), de privacyregel staat onder elke chat, en veilig.html wijst warm door... |

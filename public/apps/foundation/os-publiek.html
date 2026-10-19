@@ -228,6 +228,7 @@
       <span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
     </div>
     <div class="onthaal-kies">
+      <div id="accountDeur"></div>
       <div class="buurtsec">Kies je stad</div>
       <div class="steden" id="steden"><div class="leeg">Laden...</div></div>
       <div class="stippen" id="stippen" aria-hidden="true"></div>
@@ -325,11 +326,14 @@
 </main>
 
 <script src="/shared/rtg-vandaag-luxe.js" defer></script>
+<script src="/shared/accountdeur.js"></script>
 <script src="/shared/rtg-route-memory-core.js"></script>
 <script src="/shared/rtg-route-memory.js"></script>
 <script>
-/* De publieke RTF-app: geen inlog, en daarom de strengste grens van het hele
-   systeem.
+/* De buurt-app van RTF: sinds 19 oktober 2026 met een account (een gratis
+   account is genoeg) of een gezinsprofiel, en de deur daarvoor staat in het
+   scherm zelf (shared/accountdeur.js). De strengste grens van het systeem
+   blijft.
 
    DE MAAT IS EEN POSTER IN HET BUURTHUIS. Alles wat je daar niet zou ophangen,
    staat hier niet -- en dat is de reden dat er geen enkel getal over hulpvragen
@@ -349,13 +353,14 @@ const $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* De buurt-app vraagt een account of een gezinsprofiel (eigenaarsbesluit 19 oktober 2026). */
-const lidToken = () => { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } };
+const lidToken = () => RTGAccountDeur.token();
 const gezin = () => { try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {}; } catch (e) { return {}; } };
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, lidToken() ? { Authorization: 'Bearer ' + lidToken() } : {}),
   body: JSON.stringify(Object.assign(lidToken() ? {} : { code: gezin().code, token: gezin().token }, body || {}))
 }).then(async r => {
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && lidToken()) RTGAccountDeur.vergeet();
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
   return d;
 });
@@ -447,6 +452,10 @@ if (window.RTGRouteMemory) {
 
 async function start() {
   $('#groet').textContent = groet();
+  /* Zonder account en zonder gezinsprofiel: eerst de deur, daarna gaat de
+     pagina verder waar hij was (test/rtfbuurt-accountdeur.e2e.js). */
+  if (!lidToken() && !gezin().token)
+    await RTGAccountDeur.eis($('#accountDeur'), { waarom: 'De buurtpagina opent u met een RTG-account; een gratis account is genoeg.' });
 
   try {
     const r = await api('/api/rtfos/publiek/steden');

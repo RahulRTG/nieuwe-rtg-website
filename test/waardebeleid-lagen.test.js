@@ -11,7 +11,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { toets, binnenVenster, zinnen } = require('../server/kern/waarde/policy');
 
-const om = (u, m) => new Date(2026, 9, 11, u, m || 0);
+// een klokuur in het huis (Europe/Amsterdam), niet in de container
+const om = (u, m) => require('../server/kern/tijdzone').moment('2026-10-11', u * 60 + (m || 0));
 const MIDDAG = om(12);
 
 test('1. het tijdvenster werkt ook over middernacht, en een onleesbaar venster sluit niets af', () => {

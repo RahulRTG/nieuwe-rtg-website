@@ -1,5 +1,6 @@
 /* Shared-assets (deelmodule): hertaxatie, het kantooroverzicht, terugkoop uitbetalen en de service-fees.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, vastleggen, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
@@ -30,7 +31,7 @@ module.exports = (ctx) => {
   // restdagen die dit jaar extern verhuurd kunnen worden
   function assetKantoor() {
     lijsten();
-    const jaar = String(new Date().getFullYear());
+    const jaar = String(tijdzone.jaarIn());
     return {
       ok: true,
       objecten: db.data.sharedAssets.map(a => {
@@ -65,7 +66,7 @@ module.exports = (ctx) => {
   // de jaarlijkse servicefee innen: per actief ticket een keer per jaar, naar de poolkas
   async function assetFeesInnen(wie) {
     lijsten();
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     let geind = 0, totaal = 0, mislukt = 0;
     let reden = null;
     for (const t of db.data.assetTickets) {

@@ -4,6 +4,7 @@
 
 // de tijd komt van de tijdmachine (server/lib/klok.js), zie scripts/klok.js
 const klok = require('../../../lib/klok');
+const tijdzone = require('../../../kern/tijdzone');
 const beleid=require('../../../kern/reservering/beleid');
 module.exports=kern=>{
   const {app,supplierAuth,accounts,db,crypto,save,schoon,findSupplier,notifySupplier,sseToSupplier,horeca}=kern,{H,Hlees,nu}=horeca;
@@ -12,7 +13,7 @@ module.exports=kern=>{
   function store(code){const h=H(code);h.arrivals=h.arrivals||{};return h.arrivals}
   // kijken zonder scheppen: een geweigerde aanroep laat geen verse zaakdoos achter
   const lees=code=>Hlees(code).arrivals||{};
-  function datumUit(q){const iso=q.match(/\b(20\d\d-[01]\d-[0-3]\d)\b/);if(iso)return iso[1];const d=klok.datum();const dagen=['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];const hit=dagen.findIndex(x=>q.includes(x));if(hit>=0){let plus=(hit-d.getDay()+7)%7;if(!plus)plus=7;d.setDate(d.getDate()+plus);return d.toISOString().slice(0,10)}return null}
+  function datumUit(q){const iso=q.match(/\b(20\d\d-[01]\d-[0-3]\d)\b/);if(iso)return iso[1];const d=tijdzone.datumIn(klok.datum());const dagen=['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];const hit=dagen.findIndex(x=>q.includes(x));if(hit>=0){let plus=(hit-tijdzone.weekdagVan(d)+7)%7;if(!plus)plus=7;return tijdzone.plusDagen(d,plus)}return null}
   function interpreteer(tekst){const q=String(tekst||'').toLowerCase(),tm=q.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\b/),p=q.match(/\b(?:met|voor)\s+(\d{1,2})\s*(?:mensen|personen|gasten)?/);return{datum:datumUit(q),tijd:tm?String(tm[1]).padStart(2,'0')+':'+tm[2]:null,personen:p?Math.max(1,Math.min(20,Number(p[1]))):null,toegankelijk:/rolstoel|toegankelijk|slecht ter been/.test(q),allergie:/allerg|noten|gluten|lactose|schaaldier/.test(q),gelegenheid:/verjaardag|jubileum|aanzoek|vier/.test(q)?(q.match(/verjaardag|jubileum|aanzoek/)||['bijzonder moment'])[0]:null,zone:/terras/.test(q)?'terras':/bar/.test(q)?'bar':/priv[eé]/.test(q)?'privé':'zaal'}}
   /* De capaciteitsvraag is een VRAAG en geen aanmelding: zij leest met Hlees,
      zodat een zaak die vandaag niets in de horecadoos heeft er ook geen krijgt

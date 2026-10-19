@@ -7,6 +7,7 @@
    en de medewerker zelf krijgen hem terug (kern/leverancier/logboekzicht.js). */
 'use strict';
 const klok = require('../../lib/klok');
+const tijdzone = require('../tijdzone');
 
 // `welzijn()` geeft de bak met werkstarts per lid; de datadeur blijft in ./starten.js
 module.exports = ({ welzijn, save, logInlog, logActivity }) => {
@@ -17,9 +18,9 @@ module.exports = ({ welzijn, save, logInlog, logActivity }) => {
     /* Rahuls welzijnszin: een stille, eenmalige opmerking bij de start --
        nooit een blokkade, nooit een score, alleen zorg. Diep in de nacht
        of bij een zoveelste werkstart vandaag mag dat gezegd worden. */
-    const uur = klok.datum().getHours();
+    const uur = tijdzone.uurIn(klok.datum());
     const wm = welzijn();
-    const vandaag = klok.datum().toISOString().slice(0, 10);
+    const vandaag = tijdzone.datumIn(klok.datum());
     const wr = wm[key] = (wm[key] && wm[key].dag === vandaag) ? wm[key] : { dag: vandaag, starts: 0 };
     wr.starts++;
     save();

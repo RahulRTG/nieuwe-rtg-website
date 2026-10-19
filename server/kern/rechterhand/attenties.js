@@ -2,6 +2,7 @@
    belangrijke data (verjaardag, jubileum) en hun voorkeuren; daarnaast de
    giftgeschiedenis, zodat u nooit twee keer hetzelfde geeft. Het overzicht toont
    wie er de komende dertig dagen een attentie verdient. Gemount via index.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { save, rid, nu, schoon, isDatum, getal, L } = ctx;
   const BANDEN = ['familie', 'vriend', 'zakelijk', 'mentor', 'buur', 'overig'];
@@ -41,11 +42,11 @@ module.exports = (ctx) => {
   // dagen tot de eerstvolgende keer dat een 'MM-DD' terugkomt
   function dagenTot(md) {
     if (!md) return 9999;
-    const nu2 = new Date(); const jaar = nu2.getFullYear();
+    const h = tijdzone.huis(); const jaar = h.jaar;
     const [m, d] = md.split('-').map(Number);
-    let doel = new Date(jaar, m - 1, d);
-    const vandaag0 = new Date(jaar, nu2.getMonth(), nu2.getDate());
-    if (doel < vandaag0) doel = new Date(jaar + 1, m - 1, d);
+    let doel = Date.UTC(jaar, m - 1, d);
+    const vandaag0 = Date.UTC(jaar, h.maand - 1, h.dagVanMaand);
+    if (doel < vandaag0) doel = Date.UTC(jaar + 1, m - 1, d);
     return Math.round((doel - vandaag0) / 86400000);
   }
 

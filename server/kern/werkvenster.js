@@ -23,6 +23,7 @@
 
    maakWerkvenster(state) volgt het vaste kern-patroon. */
 const { coord } = require('./util');
+const tijdzone = require('./tijdzone');
 
 const DAGEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
 const STANDEN = ['zaak', 'altijd', 'nooit', 'eigen'];
@@ -94,8 +95,7 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
   const minuten = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
 
   /* zit dit moment binnen een van/tot-slot (mag over middernacht lopen)? */
-  function binnenSlot(nu, slot) {
-    const m = nu.getHours() * 60 + nu.getMinutes();
+  function binnenSlot(m, slot) {
     const van = minuten(slot.van), tot = minuten(slot.tot);
     // over middernacht heen (18:00-02:00): binnen als NA van OF VOOR tot
     return van <= tot ? (m >= van && m < tot) : (m >= van || m < tot);
@@ -116,7 +116,8 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
       return { ok: false, error: 'De werkgever heeft de werkomgeving en de PDA voor jou op dit moment uitgezet. Vraag je leidinggevende wanneer je er weer in kunt.' };
     }
     const nu = d || new Date();
-    const dag = nu.getDay();
+    const hier = tijdzone.huis(nu, tijdzone.zaakZoneOfHuis(s)); // het venster staat in de tijd van de zaak
+    const dag = hier.dag;
     if (per.stand !== 'altijd') {
       // eigen tijden gaan voor; anders geldt het venster van de zaak
       const slot = per.stand === 'eigen' && per.van && per.tot ? { van: per.van, tot: per.tot } : w.dagen[dag];
@@ -126,7 +127,7 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
           dicht.error = 'De werkgever heeft de werkomgeving vandaag (' + DAGEN[dag] + ') gesloten voor personeel.';
           return dicht;
         }
-        if (!binnenSlot(nu, slot)) {
+        if (!binnenSlot(hier.minuten, slot)) {
           dicht.error = 'Buiten het werkvenster: vandaag mag je hier van ' + slot.van + ' tot ' + slot.tot + '. Tot dan is de werkomgeving dicht.';
           return dicht;
         }

@@ -1,5 +1,6 @@
 /* Retail (deelmodule): collecties, artikelen met varianten, voorraad en drops.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/retail.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
     ledenPrijs, gidsHaal, meldWachtlijst, MATEN, SEIZOENEN,
@@ -11,7 +12,7 @@ module.exports = (ctx) => {
     const naam = schoon(body.naam, 60);
     if (!naam) return { status: 400, error: 'Geef de collectie een naam.' };
     const seizoen = SEIZOENEN.includes(body.seizoen) ? body.seizoen : 'SS';
-    const jaar = Math.min(2100, Math.max(2020, parseInt(body.jaar, 10) || new Date().getFullYear()));
+    const jaar = Math.min(2100, Math.max(2020, parseInt(body.jaar, 10) || tijdzone.jaarIn()));
     if (body.id) {
       const c = s.collecties.find(x => x.id === body.id);
       if (c) { c.naam = naam; c.seizoen = seizoen; c.jaar = jaar; c.actief = body.actief !== false; save(); return { ok: true, collectie: c }; }

@@ -21,6 +21,7 @@
       automaat wagen 4 koos, gaat handmatig toewijzen, en dan is de motor een
       dure decoratie. Dat is dezelfde regel als bij de schoolsignalen: geen
       score zonder natrekbare uitleg. */
+const tijdzone = require('../tijdzone');
 
 const STANDAARD_GEWICHTEN = {
   nabijheid: 30,          // hoe dicht staat de wagen bij de reiziger
@@ -87,7 +88,7 @@ module.exports = (ctx) => {
 
   // hoeveel ritten heeft deze chauffeur vandaag al gehad? (de eerlijkheidsfactor)
   function ritenVandaag(vervoerder) {
-    const vanaf = new Date(); vanaf.setHours(0, 0, 0, 0);
+    const vanaf = tijdzone.middernacht(tijdzone.datumIn());
     const telling = new Map();
     for (const o of opslag.bak('mobOpdrachten') || []) {
       if (o.vervoerder !== vervoerder || !o.chauffeur) continue;

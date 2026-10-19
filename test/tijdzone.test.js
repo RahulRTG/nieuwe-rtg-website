@@ -89,3 +89,17 @@ test('zonder moment volgt hij RTG_KLOK, ook in een UTC-proces', () => {
   // de klok loopt door vanaf het gezette moment; de minuut kan dus net verspringen
   assert.match(uit, /^2026-07-16 01:3\d$/);
 });
+
+test('moment: een klokuur op een datum in het huis, ook op de zomertijdranden', () => {
+  assert.equal(tz.moment('2026-07-15', 19 * 60 + 30).toISOString(), '2026-07-15T17:30:00.000Z');
+  // 02:30 bestaat niet op 29 maart: de wandklok springt naar 03:30
+  assert.equal(tz.moment('2026-03-29', 150).toISOString(), '2026-03-29T01:30:00.000Z');
+  assert.equal(tz.moment('2026-07-15', 0, 'Asia/Tokyo').toISOString(), '2026-07-14T15:00:00.000Z');
+});
+
+test('zaakZoneOfHuis: de zone van de zaak, en anders het huis in plaats van UTC', () => {
+  assert.equal(tz.zaakZoneOfHuis({ tijdzone: 'Europe/Madrid' }), 'Europe/Madrid');
+  assert.equal(tz.zaakZoneOfHuis({ country: 'PT' }), 'Europe/Lisbon');
+  assert.equal(tz.zaakZoneOfHuis({}), 'Europe/Amsterdam');
+  assert.equal(tz.zaakZoneOfHuis(null), 'Europe/Amsterdam');
+});

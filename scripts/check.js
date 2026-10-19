@@ -5992,6 +5992,39 @@ console.log('\n76) geen element draagt twee class-attributen (de browser leest a
   }
 }
 
+/* ============================================================================
+   77) DE WANDKLOK VAN DE CONTAINER
+
+   De server draait in een UTC-container; `getHours()`, `getDay()` en hun broers
+   lezen daar UTC. Op 19 oktober 2026 zei de cockpit om 19:00 in Amsterdam
+   "Goedemiddag" en sprong een leeftijd pas om twee uur 's nachts om. Alles is
+   omgezet naar server/kern/tijdzone.js; de telling staat in
+   scripts/lib/wandklok.js, met de uitleg. Twee delen: de lokale getters en
+   setters (doel nul, uitzondering alleen met `tijd-uitzondering: <reden>`), en
+   "vandaag" als UTC-datum (een ratel die alleen omlaag mag). */
+console.log('\n77) de server leest de klok van het lid, niet die van de container');
+{
+  const { wandklok, utcVandaag, UTC_VANDAAG_MAX } = require('./lib/wandklok');
+  const plekken = wandklok(ROOT);
+  if (plekken.length) {
+    for (const p of plekken) fout(p + ' leest of zet de lokale klok van de container (UTC in productie). ' +
+      'Gebruik kern/tijdzone.js (huis, uurIn, weekdagIn, datumIn, ...) of de UTC-vorm voor een duur; ' +
+      'een uitzondering draagt `tijd-uitzondering: <reden>`');
+  } else {
+    ok('geen lokale getter of setter van Date in server/ buiten kern/tijdzone.js');
+  }
+  const n = utcVandaag(ROOT);
+  if (n > UTC_VANDAAG_MAX) {
+    fout(n + ' keer "vandaag" als UTC-datum (new Date().toISOString().slice(0, 10)) terwijl de ratel op ' +
+      UTC_VANDAAG_MAX + ' staat; gebruik tijdzone.datumIn()');
+  } else if (n < UTC_VANDAAG_MAX) {
+    fout('nog ' + n + ' keer "vandaag" als UTC-datum; zet UTC_VANDAAG_MAX in scripts/lib/wandklok.js op ' + n +
+      ' zodat de winst blijft staan');
+  } else {
+    ok(n + ' keer "vandaag" nog als UTC-datum (ratel, alleen omlaag)');
+  }
+}
+
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 
    Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op

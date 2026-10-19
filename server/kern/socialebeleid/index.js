@@ -197,7 +197,7 @@ module.exports = ({ db, save, soorten }) => {
      er zijn hier geen meldingen die iemand wakker maken. */
   function inStilte(key, nu) {
     if (knopAan(key, 'stilte')) return false;
-    const d = (nu || datum()).getDay();
+    const d = require('../tijdzone').weekdagIn(nu || datum());
     return d === 0 || d === 6;
   }
 

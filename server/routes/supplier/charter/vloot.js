@@ -2,6 +2,7 @@
    de vaart nemen en het overzicht van lopende en net afgeronde charters.
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/supplier/charter.js. */
+const tijdzone = require('../../../kern/tijdzone');
 module.exports = (cctx) => {
   const { app, crypto, db, express, logActivity, managerOnly, media, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth,
     BOOT_TYPES, isCharter, charterVan, fotosVan, getal } = cctx;
@@ -31,7 +32,7 @@ module.exports = (cctx) => {
       naam, actief: true,
       type: BOOT_TYPES.includes(req.body.type) ? req.body.type : 'Motorjacht',
       lengte: Math.min(120, Math.max(3, Number(req.body.lengte) || 12)),
-      bouwjaar: getal(req.body.bouwjaar, 1950, 2100, new Date().getFullYear()),
+      bouwjaar: getal(req.body.bouwjaar, 1950, 2100, tijdzone.jaarIn()),
       gasten: getal(req.body.gasten, 1, 500, 8),
       hutten: getal(req.body.hutten, 0, 40, 2),
       slaapplaatsen: getal(req.body.slaapplaatsen, 0, 80, 4),

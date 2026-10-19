@@ -9,14 +9,12 @@
    klaar" -- bakje 5 komt elke twee weken gewoon terug, want zo werkt een
    geheugen. De bakjes groeien lui mee met de lijst (nieuwe paren beginnen
    in bakje 1, vandaag). */
+const tijdzone = require('../../tijdzone');
 module.exports = (ctx) => {
   const { save, L, schud } = ctx;
   // rustdagen per bakje (index = bakje): 1 dagelijks .. 5 elke twee weken
   const WACHT = [0, 1, 2, 4, 7, 14];
-  const dagStr = ms => {
-    const d = new Date(ms);
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  };
+  const dagStr = ms => tijdzone.datumIn(new Date(ms));
   const vandaag = () => dagStr(Date.now());
   const plus = n => dagStr(Date.now() + n * 86400000);
 

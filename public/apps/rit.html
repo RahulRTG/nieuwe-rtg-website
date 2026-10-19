@@ -3,62 +3,51 @@
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Aankomst &amp; Chauffeur</title>
-<meta name="theme-color" content="#03101a">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/travel-os.css" rel="stylesheet">
-<link href="/shared/rtg-edge-system.css" rel="stylesheet">
-<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
-<link href="/shared/rtg-aankomst-2026.css" rel="stylesheet">
-<link href="/shared/rtg-aankomst-momenten-2026.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl travel-os rtg-travel-flow rtg-arrival-experience" data-rtg-world="travel" data-rtg-skin="heritage" data-rit-tab="aanvragen" data-rtg-layout="standard">
-<section class="ritkop" aria-labelledby="ritTitel">
-  <a class="rit-brand" href="/apps/reizen.html" aria-label="RTG TravelOS"><b>RTG</b><span>TravelOS</span><small>Van aankomst tot thuiskomst</small></a>
-  <a class="rit-bericht" href="/apps/comm.html" aria-label="Open berichten"><span aria-hidden="true">◇</span></a>
-  <div class="rit-koptekst"><span class="ey" id="ritEy">Uw transfer</span><h1 id="ritTitel">Van aankomst<br>naar bestemming.</h1><p id="ritIntro">Uw rit sluit aan op uw reis. U kiest; een chauffeur bevestigt persoonlijk.</p></div>
-</section>
+<!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4):
+     Taak (een rit aanvragen), Detail (uw chauffeur) en Status (de overdracht
+     aan uw verblijf). Dezelfde mobiliteitskern als ervoor; geen eigen stijl. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="taak" data-rit-tab="aanvragen">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/comm.html" aria-label="Open berichten"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5h16v11H9l-5 4z"/></svg></a>
+</header>
 
-<main id="main">
-  <nav class="rit-momenten" aria-label="Moment van uw aankomst">
-    <button type="button" data-t="aanvragen" aria-current="step"><b>01</b><span>Aanvragen</span></button>
-    <button type="button" data-t="chauffeur"><b>02</b><span>Chauffeur</span></button>
-    <button type="button" data-t="aankomst"><b>03</b><span>Aankomst</span></button>
+<main class="ds-taak" id="main">
+  <div class="ds-taak__kop">
+    <p class="ds-label" id="ritEy">Uw transfer</p>
+    <h1 class="ds-titel ds-titel--scherm" id="ritTitel">Van aankomst naar bestemming.</h1>
+    <p class="ds-meta" id="ritIntro">Uw rit sluit aan op uw reis. U kiest; een chauffeur bevestigt persoonlijk.</p>
+  </div>
+  <div class="ds-tabs" role="tablist" aria-label="Moment van uw aankomst">
+    <button class="ds-tab" role="tab" type="button" data-t="aanvragen" aria-selected="true">Aanvragen</button>
+    <button class="ds-tab" role="tab" type="button" data-t="chauffeur" aria-selected="false">Chauffeur</button>
+    <button class="ds-tab" role="tab" type="button" data-t="aankomst" aria-selected="false">Aankomst</button>
+  </div>
+  <div id="inhoud" role="tabpanel"><div class="ds-status ds-status--binnen"><p class="ds-status__tekst">Uw aankomst wordt veilig geladen...</p></div></div>
+  <nav class="ds-chips" aria-label="TravelOS reisflow">
+    <a class="ds-chip" href="/apps/vluchten.html?view=mijn">Vlucht</a>
+    <a class="ds-chip" href="/apps/hotels.html?view=mijn">Verblijf</a>
+    <a class="ds-chip" href="/apps/rit.html" aria-current="page">Aankomst</a>
+    <a class="ds-chip" href="/apps/navigatie.html">Navigatie</a>
   </nav>
-  <div id="inhoud"><div class="rit-leeg">Uw aankomst wordt veilig geladen…</div></div>
 </main>
 
-<nav class="rtg-deep-nav rtg-deep-nav--3" aria-label="TravelOS reisflow">
-  <a href="/apps/vluchten.html?view=mijn"><b>01</b>Vlucht</a>
-  <a href="/apps/hotels.html?view=mijn"><b>02</b>Verblijf</a>
-  <a href="/apps/rit.html" aria-current="page"><b>03</b>Aankomst</a>
-</nav>
-<nav class="rit-nav" aria-label="RTG Aankomst">
-  <button type="button" data-rit-nav="aanvragen" aria-current="page"><b>01</b>Ritten</button>
-  <button type="button" data-rit-nav="chauffeur"><b>02</b>Mijn rit</button>
-  <a href="/apps/navigatie.html"><b>03</b>Navigatie</a>
-  <button type="button" data-rit-nav="aankomst"><b>04</b>Verblijf</button>
-</nav>
-
-<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 <script src="/apps/rit-momenten.js"></script>
 <script src="/apps/rit-ontvangst.js"></script>
 <script src="/apps/rit.js"></script>
-<script src="/shared/schermbeeld.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
 </body>
 </html>

@@ -7,14 +7,17 @@ const path=require('node:path');
 const root=path.join(__dirname,'..');
 const lees=bestand=>fs.readFileSync(path.join(root,bestand),'utf8');
 
-test('Aankomst & Chauffeur draagt het goedgekeurde TravelOS-drieluik',()=>{
-  const html=lees('public/apps/rit.html'),momenten=lees('public/apps/rit-momenten.js');
-  assert.match(html,/rtg-arrival-experience/);
-  assert.match(html,/rtg-aankomst-2026\.css/);
-  assert.match(html,/Van aankomst<br>naar bestemming\./);
+test('Aankomst & Chauffeur draagt het TravelOS-drieluik op het Design System',()=>{
+  /* Het drieluik (aanvragen, chauffeur, aankomst) staat sinds batch 4 van
+     TRAVELOS-MIGRATIE.md op /ds/: Taak, Detail en Status. De teksten en de
+     drie momenten zijn dezelfde gebleven. */
+  const html=lees('public/apps/rit.html'),momenten=lees('public/apps/rit-momenten.js'),js=lees('public/apps/rit.js');
+  assert.match(html,/href="\/ds\/rtg-ds\.css"/);
+  assert.match(html,/data-ds-schermtype="taak"/);
+  assert.match(js,/Van aankomst\\nnaar bestemming\./);
   for(const id of ['aanvragen','chauffeur','aankomst'])assert.match(html,new RegExp('data-t="'+id+'"'));
   assert.match(momenten,/Uw chauffeur wordt gezocht\./);
-  assert.match(momenten,/Uw verblijf neemt het over\./);
+  assert.match(js,/Uw verblijf\\nneemt het over\./);
 });
 
 test('de drie momenten blijven op echte vervoer- en verblijfskernen',()=>{
@@ -32,9 +35,11 @@ test('chauffeur, voertuig en sleutel worden niet als belofte verzonnen',()=>{
   assert.doesNotMatch(js,/Samir El Amrani|Zwarte Mercedes/);
 });
 
-test('de nieuwe aankomstvoorzijde blijft in kleine modules en gebruikt de systeemvorm',()=>{
-  const bestanden=['public/apps/rit.js','public/apps/rit-momenten.js','public/shared/rtg-aankomst-2026.css','public/shared/rtg-aankomst-momenten-2026.css'];
+test('de aankomstvoorzijde blijft in kleine modules en gebruikt de systeemvorm',()=>{
+  const bestanden=['public/apps/rit.js','public/apps/rit-momenten.js','public/apps/rit-ontvangst.js'];
   for(const bestand of bestanden)assert.ok(Buffer.byteLength(lees(bestand))<10*1024,bestand+' is te groot');
-  assert.match(lees('public/shared/rtg-heritage-experiences.css'),/rtg-arrival-experience \.rit-nav/);
-  assert.match(lees('public/shared/travel-os-config.js'),/AANKOMST & CHAUFFEUR/);
+  /* Geen eigen blad en geen oude vormlaag: alleen /ds/ (ONTWERPSYSTEEM.md). */
+  const html=lees('public/apps/rit.html');
+  assert.doesNotMatch(html,/<style|style=|\/shared\/[\w-]+\.css/);
+  for(const bestand of bestanden)assert.doesNotMatch(lees(bestand),/style=/,bestand+' zet een stijlattribuut');
 });

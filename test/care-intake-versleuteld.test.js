@@ -92,3 +92,36 @@ test('kan er niet versleuteld worden, dan wordt er niets gedeeld en niets bewaar
   assert.match(r.error, /niets gedeeld/);
   assert.equal(bak.careIntake.length, 0, 'er bleef toch een intake achter');
 });
+
+test('intakedeling blijft per lid en aanbieder, werkt dezelfde deling bij en laat alleen de eigenaar stoppen', () => {
+  const rows = [], meldingen = [];
+  let saves = 0;
+  const sleutel = require('../server/kern/care/intakesleutel')({ haalSleutel: () => Buffer.alloc(32, 7) });
+  const leden = require('../server/kern/care/leden')({
+    opslag: { bak: n => { assert.equal(n, 'careIntake'); return rows; } },
+    save: () => { saves++; }, crypto, schoon: (s, n) => String(s || '').slice(0, n),
+    notify: (key, bericht) => meldingen.push({ key, bericht }), nu: () => '2026-10-20T00:00:00Z',
+    INTAKE_DAGEN: 90, lijsten: () => {},
+    aanbiederVan: id => id === 'a1' ? { id, naam: 'Kliniek' } : null,
+    intakeActief: (key, id) => rows.find(r => r.key === key && r.aanbiederId === id && r.status === 'actief'),
+    intakesleutel: sleutel
+  });
+  assert.equal(leden.careIntakeDeel('lid-1', 'onbekend', 'context').status, 404);
+  assert.equal(leden.careIntakeDeel('lid-1', 'a1', '').status, 400);
+  assert.equal(saves, 0);
+  const eerste = leden.careIntakeDeel('lid-1', 'a1', 'eerste context');
+  const tweede = leden.careIntakeDeel('lid-1', 'a1', 'nieuwe context');
+  assert.equal(eerste.intake.id, tweede.intake.id);
+  assert.equal(rows.length, 1);
+  assert.equal(sleutel.open(rows[0].medisch, 'intake|' + eerste.intake.id + '|lid-1'), 'nieuwe context');
+  assert.equal(sleutel.open(rows[0].medisch, 'intake|' + eerste.intake.id + '|lid-2'), null);
+  assert.equal(leden.careIntakeStop('lid-2', eerste.intake.id).status, 404);
+  assert.equal(rows[0].status, 'actief');
+  assert.equal(saves, 2);
+  assert.equal(leden.careIntakeStop('lid-1', eerste.intake.id).ok, true);
+  assert.equal(leden.careIntakeStop('lid-1', eerste.intake.id).status, 404);
+  assert.equal(saves, 3);
+  assert.equal(rows[0].status, 'gestopt');
+  assert.equal(meldingen.length, 2);
+  assert.ok(meldingen.every(m => m.key === 'lid-1'));
+});

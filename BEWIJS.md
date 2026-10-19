@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20016 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20017 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2941 |
-| losse beweringen (`test(...)`) | 20016 |
+| losse beweringen (`test(...)`) | 20017 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2752 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2563 bestanden, 19312 beweringen.
+2563 bestanden, 19313 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -373,7 +373,7 @@ toets omvalt.
 | `capabilities.test.js` | 9 | gezakt op `===->!==#0` | DE CAPABILITY-METING -- en of hij werkelijk iets onderscheidt. scripts/capabilities.js beantwoordt de vraag uit OS.md par. |
 | `capabilitycallers.test.js` | 11 | gezakt op `===->!==#0` | GEEN CAPABILITY ZONDER CALLER -- de tweede van de vier regels uit CONTROLPLANE.md, machinaal gemeten in plaats van met de hand geteld. WAT HIER WERKELIJK OP HET SPEL STAAT. |
 | `capgezondheid.test.js` | 8 | gezakt op `===->!==#0` | CAPABILITY HEALTH -- hoe gaat het met DIT onderdeel? DE FOUT DIE DIT VERVANGT. |
-| `care-intake-versleuteld.test.js` | 2 | gezakt op `liegpoort /api/` | DE MEDISCHE CONTEXT VAN EEN CARE-INTAKE STAAT NERGENS LEESBAAR IN DE OPSLAG. Gevonden door de voltooiproef van de zorgtab (scripts/lib/voltooi/tabzorg.js): zonder RTG_ENC_KEY stond wat een lid de behandelaar vooraf... |
+| `care-intake-versleuteld.test.js` | 3 | gezakt op `liegpoort /api/` | DE MEDISCHE CONTEXT VAN EEN CARE-INTAKE STAAT NERGENS LEESBAAR IN DE OPSLAG. Gevonden door de voltooiproef van de zorgtab (scripts/lib/voltooi/tabzorg.js): zonder RTG_ENC_KEY stond wat een lid de behandelaar vooraf... |
 | `care.test.js` | 8 | gezakt op `liegpoort /api/` | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
 | `carebetaal.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | Een zorgboeking is pas betaald als er geld bewoog (server/kern/care/leden.js, careBetaal). Gevonden door FoundationOS bij link:foundationzorg: /api/care/betaal zette de boeking op paid=true en "geboekt" zonder dat er... |
 | `carepakket.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | Een herstelpakket is pas betaald als beide zaken betaald zijn (server/kern/care/pakketbetaal.js). /api/care/pakket/betaal zette pakket en behandeling op paid zonder dat er geld bewoog. |

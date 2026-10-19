@@ -3,12 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "34e0b230",
+  "commit": "563ef8724",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [],
+   "boomVuil": true,
+   "ongecommitteInvoer": [
+    "public/apps/vonk.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1041,
-  "verwijzingen": 1266,
-  "voorvoegsels": 142,
+  "exactePaden": 1054,
+  "verwijzingen": 1279,
+  "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -14738,7 +14740,98 @@
    "aantal": 1
   },
   {
+   "pad": "/api/vonk/bericht",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/betaal",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/blokkeer",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/edge",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/halfweg",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/kies",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/like",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/mijn",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/profiel",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/vonk/profile-photo",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/profile-photo/order",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/profile-photo/publish",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/profile-photo/remove",
+   "schermen": [
+    "public/apps/vonk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/selectie",
    "schermen": [
     "public/apps/vonk.html"
    ],
@@ -18864,11 +18957,22 @@
   {
    "bestand": "public/apps/vonk.html",
    "exact": [
-    "/api/vonk/profile-photo"
+    "/api/vonk/bericht",
+    "/api/vonk/betaal",
+    "/api/vonk/blokkeer",
+    "/api/vonk/edge",
+    "/api/vonk/halfweg",
+    "/api/vonk/kies",
+    "/api/vonk/like",
+    "/api/vonk/mijn",
+    "/api/vonk/profiel",
+    "/api/vonk/profile-photo",
+    "/api/vonk/profile-photo/order",
+    "/api/vonk/profile-photo/publish",
+    "/api/vonk/profile-photo/remove",
+    "/api/vonk/selectie"
    ],
-   "voorvoegsels": [
-    "/api/vonk/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/websitestudio.html",

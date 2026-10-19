@@ -14,8 +14,7 @@
    proef kiest de afloop vooraf met een herhaalsleutel, zoals ../voltooi/pay.js,
    en tekent elk verzoek met een gebonden toestel. Geen vlag in een poort.
 
-   WAAROM DIT NIET IN scripts/lib/voltooi/ STAAT: zie de kop van ./gezin.js --
-   een stand zonder eigen adres hangt nog niet aan het register.
+   De koppeling van een stand zonder eigen adres: zie de kop van ./gezin.js.
    ========================================================================== */
 'use strict';
 const crypto = require('crypto');
@@ -168,7 +167,8 @@ async function loop(w, stap) {
 
 module.exports = {
   functie: 'tab:betalen',
-  ingang: '/apps/app.html#tab=betalen',
+  ingang: '/apps/app.html',
+  via: '#tab=betalen',
   persona: 'lid',
   omgeving: Object.assign({ RTG_SIMULATIEBANK: '1' }, KANTOORWERELD),
   belofte: 'een lid ziet het betaalverzoek van een zaak op zijn codenaam en rekent het een keer af, betaalt een zaak rechtstreeks, en hoort het als de bank weigert -- een betaling staat er een keer, ook na een herstart, een dubbeltik, een afgebroken verzoek en een crash',

@@ -2,7 +2,7 @@
    ziet hier wat er met zijn aanvraag gebeurt, betaalt pas na goedkeuring, en
    hoort pas van tickets als de betaling bevestigd is. */
     let aanvragen = [];
-    try { aanvragen = (await API.call('/asset/aanvragen')).aanvragen || []; } catch(e){}
+    try { aanvragen = (await API.call('/api/asset/aanvragen')).aanvragen || []; } catch(e){}
     const open = aanvragen.filter(x => ['aangevraagd', 'goedgekeurd', 'betaling-loopt'].includes(x.status));
     const STAND = { aangevraagd: T('as.st.aan','wacht op de beoordeling door een mens van RTG; er is niets afgeschreven'),
       goedgekeurd: T('as.st.goed','goedgekeurd; betaal om uw tickets te krijgen'),
@@ -15,10 +15,10 @@
         '</div></div>').join('') + '</div>');
     el.querySelectorAll('.js-asbetaal').forEach(b => b.addEventListener('click', async () => {
       if (!b.dataset.idem) b.dataset.idem = RTGId('assetbetaal');
-      try { await API.call('/asset/aanvraag/betaal', { id: b.dataset.id, idem: b.dataset.idem }); toast(T('as.betaald','Betaald en bevestigd. Uw tickets staan klaar; u heeft 14 dagen bedenktijd.')); renderAssets(); }
+      try { await API.call('/api/asset/aanvraag/betaal', { id: b.dataset.id, idem: b.dataset.idem }); toast(T('as.betaald','Betaald en bevestigd. Uw tickets staan klaar; u heeft 14 dagen bedenktijd.')); renderAssets(); }
       catch(e){ delete b.dataset.idem; toast(e.message); renderAssets(); }
     }));
     el.querySelectorAll('.js-asintrek').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/asset/herroep', { id: b.dataset.id }); toast(r.let); renderAssets(); }
+      try { const r = await API.call('/api/asset/herroep', { id: b.dataset.id }); toast(r.let); renderAssets(); }
       catch(e){ toast(e.message); }
     }));

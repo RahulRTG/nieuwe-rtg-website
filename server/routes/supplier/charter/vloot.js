@@ -69,10 +69,10 @@ module.exports = (cctx) => {
   app.post('/api/supplier/charter/overzicht', supplierAuth, (req, res) => {
     const s = req.supplier;
     if (!isCharter(s, res)) return;
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = tijdzone.datumIn();
     const lijst = db.data.boekingen
       .filter(b => b.kind === 'charter' && b.supplierCode === s.code && b.paid &&
-        (!['afgerond', 'geweigerd'].includes(b.status) || String(b.finishedAt || b.at).slice(0, 10) === vandaag))
+        (!['afgerond', 'geweigerd'].includes(b.status) || require('../../../kern/tijdzone').datumVan(b.finishedAt || b.at) === vandaag))
       .slice(0, 40)
       .map(b => {
         const f = db.data.charterFotos[b.ref] || { voor: [], na: [] };

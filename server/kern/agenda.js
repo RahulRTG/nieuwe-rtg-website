@@ -18,7 +18,7 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda' });
   const id = () => 'ag' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
-  const vandaagStr = () => new Date().toISOString().slice(0, 10);
+  const vandaagStr = () => tijdzone.datumIn();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const { agendaWortel: store, agendaItems, agendaLees } = require('./agenda-opslag')({ db });
 

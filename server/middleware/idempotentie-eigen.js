@@ -117,6 +117,8 @@ const EIGEN = [
   '/api/connection/rendezvous/text',
   // "Nodig uit en start" onthoudt zijn sleutel op het potje (kern/spellen/dubbeltik.js)
   '/api/member/spel/nieuw',
+  // en de gezinsingang van dezelfde knop, met dezelfde sleutel
+  '/api/rtf/spel/nieuw',
   '/api/asset/koop',
   '/api/asset/aanvraag/betaal'
 ];

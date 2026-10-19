@@ -19,11 +19,16 @@
 
    2. `utcVandaag(root)` -- "vandaag" als `new Date().toISOString().slice(0, 10)`.
       Dat is de UTC-datum, en tussen 22:00/23:00 en middernacht is dat in
-      Amsterdam al morgen. Het waren er 161; drie zijn mee omgezet waar ze naast
-      een gerepareerde wandklok stonden. De rest is een eigen klus, want veel van
-      die datums worden VERGELEKEN met datums die op dezelfde UTC-manier uit een
-      opgeslagen `at` zijn geknipt: een kant omzetten zonder de andere maakt
-      het erger. Daarom een ratel en geen grens: het getal mag alleen omlaag.
+      Amsterdam al morgen. Het waren er 161. Omgezet zijn de plekken waar
+      "vandaag" alleen een kalenderdatum van een lid of zaak raakt (agenda,
+      boekingen, tickets, verhuur, standaarddatums, bestandsnamen), en waar het
+      met een opgeslagen tijdstip werd vergeleken, ook die kant (`datumVan`).
+      De rest is per domein werk, want veel van die datums worden VERGELEKEN met
+      datums die op dezelfde UTC-manier uit een opgeslagen `at` zijn geknipt: een
+      kant omzetten zonder de andere maakt het erger. Bewust nog niet: de
+      levens- en geldgraaf (een samenhangend stelsel van dagknippers) en de
+      kassadag (een bar sluit na middernacht; dat vraagt een bedrijfsdag, geen
+      kalenderdag). Daarom een ratel en geen grens: het getal mag alleen omlaag.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -35,7 +40,7 @@ const UITZONDERING = /tijd-uitzondering:\s*\S.{8,}/;
 // de plek waar de wandklok WOONT
 const THUIS = 'server/kern/tijdzone.js';
 // het plafond van de tweede telling; alleen omlaag
-const UTC_VANDAAG_MAX = 158;
+const UTC_VANDAAG_MAX = 115;
 
 function bestanden(root) {
   const uit = [];

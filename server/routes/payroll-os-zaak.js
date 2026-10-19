@@ -122,7 +122,7 @@ module.exports = (kern) => {
     const van = String(b.van || '').slice(0, 10), tot = String(b.tot || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot))
       return res.status(400).json({ error: 'Geef een begin- en einddatum (JJJJ-MM-DD).' });
-    const uit = [], vandaag = new Date().toISOString().slice(0, 10);
+    const uit = [], vandaag = require('../kern/tijdzone').datumIn();
     for (const m of accounts.listStaff(req.supplier.code)) {
       // van een collega alleen VANDAAG, niet de hele periode (personeelzicht.periodeVoor)
       const p = personeelzicht.periodeVoor(req.actor, m.id, van, tot, vandaag);

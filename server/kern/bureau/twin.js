@@ -111,7 +111,7 @@ module.exports = (ctx) => {
     const wat = schoon(b.wat, 120);
     if (!wat) return { status: 400, error: 'Wat is er gedaan?' };
     if (!Array.isArray(inst.historie)) inst.historie = [];
-    inst.historie.unshift({ id: rid(), wat, op: isDatum(b.op) ? b.op : new Date().toISOString().slice(0, 10),
+    inst.historie.unshift({ id: rid(), wat, op: isDatum(b.op) ? b.op : require('../tijdzone').datumIn(),
       door: schoon(b.door, 80), kostenCenten: Math.max(0, Math.min(1e10, Math.round(Number(b.kostenCenten) || 0))) });
     if (inst.historie.length > 100) inst.historie.length = 100;
     if (isDatum(b.volgende)) inst.onderhoudOp = b.volgende;

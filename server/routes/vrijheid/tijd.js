@@ -19,7 +19,7 @@
 'use strict';
 
 const SOORTEN = ['VRIJE_DAG', 'EERDER_WEG', 'LATER_BEGINNEN'];
-const vandaag = () => new Date().toISOString().slice(0, 10);
+const vandaag = () => require('../../kern/tijdzone').datumIn();
 
 module.exports = (kern) => {
   const { app, supplierAuth, managerOnly, vrijheid } = kern;

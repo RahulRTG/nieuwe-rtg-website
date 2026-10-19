@@ -11,14 +11,16 @@
    leren-groei.js dat doet) en het kind van het gezin doet mee met de lescode.
    Een tweede gezin start een eigen les: dat is de kruisproef.
 
-   EEN OPEN SCHAKEL MET OPZET. /les/maak en /les/join vragen geen account: de
-   lessleutel is het enige wat telt. Onder het besluit van 19 oktober 2026
-   ("gebruiken vraagt een account") hoort een les maken zonder account een 401 te
-   geven. Die deur sluit de agent Toegang; tot dan blijft de eerste
-   bevoegdheidsstap hieronder open, en dat is de eerlijke stand.
+   EEN ACCOUNT VOOR DE LES. Onder het besluit van 19 oktober 2026 ("gebruiken
+   vraagt een account") maakt de ouder de les met zijn GRATIS account, en doet
+   het kind mee als gezinsprofiel onder dat account (gezinCode + gezinToken,
+   zoals leren-groei.js); een laatkomer doet mee met een eigen gratis account
+   (scripts/lib/gratisaccount.js). Zonder account is het 401 (Toegang, 51519fb6).
+   De lessleutel blijft daarbovenop de extra sleutel.
    ========================================================================== */
 'use strict';
 const { GEZINSWERELD, accountGezin, nieuweLes, doeMee, haal } = require('../voltooigezin');
+const { registreerGratis } = require('../gratisaccount');
 
 const MAAK = '/api/foundation/les/maak';
 const STROKE = '/api/foundation/bord/stroke';
@@ -41,8 +43,10 @@ async function loop(w, stap) {
   const merk = Date.now().toString(36);
   const ouder = await accountGezin(w, 'bord', { kind: true });
   const ander = await accountGezin(w, 'anders');
-  const les = await nieuweLes(w, 'Rekenen', 'Ouder bord');
-  const vreemd = await nieuweLes(w, 'Taal', 'Ouder anders');
+  const les = await nieuweLes(w, 'Rekenen', 'Ouder bord', ouder.token);
+  const vreemd = await nieuweLes(w, 'Taal', 'Ouder anders', ander.token);
+  const laat = await registreerGratis(w.basis);
+  if (!laat) throw new Error('een gratis account registreren lukte niet');
   const D = (lijf) => Object.assign({ code: les.lesId, token: les.token }, lijf);
   const bord = (tok) => haal(w, BORD + les.lesId, tok || les.token);
   const opgaven = (tok) => haal(w, OPGAVEN + les.lesId, tok || les.token);
@@ -73,7 +77,7 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'het kind doet mee met de lescode, ziet het bord, levert de opgave in, en de begeleider ziet de inzending', async () => {
-    kind = await doeMee(w, lescode, 'Kind bord');
+    kind = await doeMee(w, lescode, 'Kind bord', ouder.kind);
     const b = await bord(kind.token);
     const i = await w.post(INLEVEREN, { code: les.lesId, token: kind.token, opgaveId: opg && opg.id, antwoord: 'Antwoord ' + merk });
     const o = ((await opgaven()).data || {}).opgaven || [];
@@ -86,8 +90,8 @@ async function loop(w, stap) {
     await w.post(SCHRIFT_OPSLAAN, { code: les.lesId, token: kind.token, pages: [{ type: 'tekst', titel: 'Blad 1', inhoud: 'Mijn sommen ' + merk }] });
     const s = await haal(w, SCHRIFT + les.lesId + '/' + kind.studentId, les.token);
     const r = await w.post(ROTEER, D({}));
-    const oud = await w.post(JOIN, { lescode, naam: 'Laatkomer oud' });
-    const nieuw = await w.post(JOIN, { lescode: r.data && r.data.lescode, naam: 'Laatkomer nieuw' });
+    const oud = await w.post(JOIN, { lescode, naam: 'Laatkomer oud' }, laat.token);
+    const nieuw = await w.post(JOIN, { lescode: r.data && r.data.lescode, naam: 'Laatkomer nieuw' }, laat.token);
     lescode = r.data && r.data.lescode;
     const tekst = JSON.stringify((s.data && s.data.schrift) || {});
     return { klopt: s.status === 200 && tekst.includes('Mijn sommen ' + merk) && r.status === 200 && oud.status >= 400 && oud.status < 500 && nieuw.status === 200,
@@ -97,7 +101,7 @@ async function loop(w, stap) {
   /* Bevoegdheid. */
   await stap('voltooibaar', 'bevoegdheid: een les maken zonder RTG-account wordt geweigerd (401)', async () => {
     const r = await w.post(MAAK, { vak: 'Anoniem', naam: 'Niemand', idem: 'anoniem-' + merk });
-    return { klopt: r.status === 401, ziet: 'les maken zonder account: ' + r.status + (r.status === 200 ? ' (de deur staat open: gemeld aan Toegang)' : '') };
+    return { klopt: r.status === 401, ziet: 'les maken zonder account: ' + r.status };
   });
 
   await stap('voltooibaar', 'bevoegdheid: zonder lessleutel geen streek, geen opgave en geen bord om te lezen', async () => {
@@ -192,6 +196,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'een begeleider start een les, tekent op het bord, zet opgaven en de agenda klaar, deelt een lescode die hij kan vernieuwen, ziet de inzendingen en leest een schrift -- de klas en een andere les beschrijven zijn bord niet',
-  grens: 'De proef loopt over de routes die het scherm en Leren & Groei aanroepen, niet door het scherm zelf: de live stroom (SSE) en de presentielijst van de klas lopen hier niet mee. De les zelf vraagt geen account (/les/maak en /les/join); dat staat als open bevoegdheidsstap en is gemeld. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over de routes die het scherm en Leren & Groei aanroepen, niet door het scherm zelf: de live stroom (SSE) en de presentielijst van de klas lopen hier niet mee. De les vraagt een gratis account (maken) of een account of gezinsprofiel (meedoen); de lessleutel komt daarbovenop. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

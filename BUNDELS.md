@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 494 delen, 0 zonder onderwerp.**
+**62 bundels, 495 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 101 delen, 10049 regels in de delen
+`public/apps/app-main/` -- 102 delen, 10055 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -41,6 +41,7 @@ omlaag.
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
 | `app-main-10.js` | DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING |
+| `app-main-10a.js` | DE BELSIGNALEN VAN DE LIVE-VERBINDING (uit app-main-10.js geknipt op de 10 kB): ICE die vooruit liep, en de eerste he... |
 | `app-main-11.js` | DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE |
 | `app-main-12.js` | DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK |
 | `app-main-12a.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |

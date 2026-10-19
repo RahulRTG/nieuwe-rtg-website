@@ -109,3 +109,25 @@ test('balans: de week begint vandaag in Amsterdam, en 23:30 is laat eten', () =>
   // 21:30 UTC is 23:30 in Amsterdam (laat); 18:00 UTC is 20:00 (niet laat)
   assert.deepEqual(r, ['2026-07-16', 1]);
 });
+
+test('de agendabadge telt om 01:30 in Amsterdam de afspraak van gisteren niet meer mee', () => {
+  const r = inUtc('2026-07-15T23:30:00Z', `
+    const { maakAgenda } = require('./server/kern/agenda');
+    const a = maakAgenda({ db: { data: {} }, save() {}, bijeen: async fn => fn(), inBundel: () => false,
+      crypto: require('crypto'), anthropic: null, schoon: (s, n) => (s == null ? '' : String(s).slice(0, n)) });
+    (async () => {
+      await a.voegToe('lid:x', { titel: 'Gisteren', datum: '2026-07-15' });
+      await a.voegToe('lid:x', { titel: 'Vandaag', datum: '2026-07-16' });
+      console.log(JSON.stringify(a.telling('lid:x')));
+    })();`);
+  assert.equal(r, 1);
+});
+
+test('balans: om 00:30 in Amsterdam (22:30 UTC) begint het weekbeeld op de nieuwe dag', () => {
+  const r = inUtc('2026-07-15T22:30:00Z', `
+    const { weekBeeld } = require('./server/kern/balans');
+    const agenda = [{ datum: '2026-07-15', titel: 'gisteren' }, { datum: '2026-07-22', titel: 'over zes dagen' }];
+    const w = weekBeeld({ agenda });
+    console.log(JSON.stringify([w.dagen[0], w.dagen[6], w.perDag[0], w.perDag[6]]));`);
+  assert.deepEqual(r, ['2026-07-16', '2026-07-22', 0, 1]);
+});

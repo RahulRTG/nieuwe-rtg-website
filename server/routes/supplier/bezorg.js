@@ -66,9 +66,9 @@ app.post('/api/supplier/bezorg/overzicht', supplierAuth, (req, res) => {
   const s = req.supplier;
   const lopend = ordersVanZaak(s.code).filter(o => o.levering &&
     !['geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status) && o.status !== 'wacht-op-betaling').slice(0, 60);
-  const vandaag = new Date().toISOString().slice(0, 10);
+  const vandaag = require('../../kern/tijdzone').datumIn();
   const klaarVandaag = ordersVanZaak(s.code).filter(o => o.levering &&
-    ['bezorgd', 'opgehaald'].includes(o.status) && String(o.finishedAt || o.at).slice(0, 10) === vandaag);
+    ['bezorgd', 'opgehaald'].includes(o.status) && require('../../kern/tijdzone').datumVan(o.finishedAt || o.at) === vandaag);
   res.json({ bezorg: bezorgVan(s), lopend, zaakLoc: s.loc || null,
     vandaag: { aantal: klaarVandaag.length, omzet: klaarVandaag.reduce((x, o) => x + (o.total || 0), 0) } });
 });

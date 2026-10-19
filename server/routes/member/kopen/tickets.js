@@ -69,7 +69,7 @@ app.post('/api/transfer/aanvraag', auth, (req, res) => {
   if (!t) return res.status(404).json({ error: 'Ticket niet gevonden.' });
   if (!t.paid) return res.status(409).json({ error: 'Betaal eerst het ticket; dan regelen we de transfer.' });
   if (t.checkin) return res.status(409).json({ error: 'Dit ticket is al gebruikt.' });
-  if (t.datum < new Date().toISOString().slice(0, 10)) return res.status(409).json({ error: 'Dit ticket is verlopen.' });
+  if (t.datum < require('../../../kern/tijdzone').datumIn()) return res.status(409).json({ error: 'Dit ticket is verlopen.' });
   const s = findSupplier(t.supplierCode);
   if (!s || !s.transfer || !s.transfer.aan)
     return res.status(409).json({ error: (s ? s.name : 'Deze zaak') + ' heeft geen eigen transferdienst.' });

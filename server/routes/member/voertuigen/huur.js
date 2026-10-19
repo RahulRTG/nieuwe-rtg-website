@@ -30,7 +30,7 @@ function apkVan(plate) {
   if (kt.length < 4) return null;
   const v = (db.data.rijkVoertuigen || []).find(x => x.kenteken === kt);
   if (!v) return null;
-  return { bekend: true, apkTot: v.apkTot, geldig: !v.geschorst && v.apkTot >= new Date().toISOString().slice(0, 10) };
+  return { bekend: true, apkTot: v.apkTot, geldig: !v.geschorst && v.apkTot >= require('../../../kern/tijdzone').datumIn() };
 }
 app.post('/api/verhuur/aanbod', auth, (req, res) => {
   if (overheid && overheid.registreerVloot) overheid.registreerVloot(); // idempotent: vloot in het RDW-register
@@ -51,7 +51,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
   const idem = schoon(req.body.idem, 80); // kern/huurherhaal.js
   const h = huurHerhaling(db.data.boekingen, req.session.key, idem, { supplierCode: s.code, autoId: auto.id, van, tot });
   if (h) return h.huur ? res.json({ ok: true, herhaald: true, huur: h.huur }) : res.status(h.status).json({ error: h.error });
-  const vandaag = new Date().toISOString().slice(0, 10);
+  const vandaag = require('../../../kern/tijdzone').datumIn();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot) || van < vandaag || tot <= van)
     return res.status(400).json({ error: 'Kies een periode vanaf vandaag; inleveren na de ophaaldag.' });
   const dagen = Math.round((new Date(tot) - new Date(van)) / 86400000);

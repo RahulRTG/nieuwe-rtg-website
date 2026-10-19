@@ -123,7 +123,7 @@ app.post('/api/supplier/rides.csv', supplierAuth, (req, res) => {
     .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
   const esc = factuur.csvCel; // csv-veilig + bescherming tegen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="ritten-' + sess.code.toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.csv"');
+  res.setHeader('Content-Disposition', 'attachment; filename="ritten-' + sess.code.toLowerCase() + '-' + require('../../kern/tijdzone').datumIn() + '.csv"');
   res.write('\uFEFF' + ['datum', 'referentie', 'gast', 'van', 'naar', 'km', 'personen', 'prijs', 'chauffeur', 'voertuig'].join(';') + '\n');
   for (const r of alle) {
     res.write([

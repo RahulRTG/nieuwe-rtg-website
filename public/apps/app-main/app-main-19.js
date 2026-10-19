@@ -16,7 +16,7 @@
     const el = $('#boodschappen'); if (!el || !API.live) return;
     if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
     let markt, mijn;
-    try { markt = await API.call('/groothandel/markt'); mijn = await API.call('/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    try { markt = await API.call('/api/groothandel/markt'); mijn = await API.call('/api/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const winkels = markt.groothandels || [];
     if (!winkels.length && !(mijn.bestellingen||[]).length){ el.innerHTML = ''; return; }
     let h = '<h3 class="s-1k5gg2w">' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.5rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
@@ -30,7 +30,9 @@
     }
     if ((mijn.bestellingen||[]).length){
       h += '<div class="sub" style="margin:0.6rem 0 0.3rem;">' + T('bo.mijn','Mijn boodschappen') + '</div>';
-      h += mijn.bestellingen.slice(0,10).map(o => '<div class="s-1jikyld"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">' + escT(o.groothandelNaam) + ' · € ' + o.subtotaal + '</b><span class="sub">' + escT(o.status) + '</span></div></div>').join('');
+      h += mijn.bestellingen.slice(0,10).map(o => '<div class="s-1jikyld"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">' + escT(o.groothandelNaam) + ' · € ' + o.subtotaal + '</b><span class="sub">' + escT(o.status) + '</span>' +
+        // een nog niet bevestigde bestelling kan het lid zelf annuleren (kern/groothandel/orderlaag.js)
+        (o.status === 'aangevraagd' ? '<button class="mo-code js-boann" data-ref="' + escT(o.ref) + '">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') + '</div></div>').join('');
     }
     el.innerHTML = h;
     el.querySelectorAll('.js-bobestel').forEach(b => b.addEventListener('click', async () => {
@@ -39,13 +41,16 @@
       if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
       // een sleutel per samengestelde bestelling: een tweede tik of een herhaling is dezelfde bestelling
       const vorm = JSON.stringify(regels); if (b.dataset.idemVorm !== vorm) { b.dataset.idem = RTGId('boodschappen'); b.dataset.idemVorm = vorm; }
-      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels, idem: b.dataset.idem }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/groothandel/bestel', { groothandelCode: b.dataset.code, regels, idem: b.dataset.idem }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-boann').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/api/groothandel/annuleer', { ref: b.dataset.ref }); toast(T('bo.geann','Bestelling geannuleerd; de voorraad is terug bij de winkel.')); laadBoodschappen(); } catch(e){ toast(e.message); }
     }));
   }
   async function laadBzMijn(){
     const el = $('#bzMijn'); if (!el || !API.live) return;
     let mijn = [];
-    try { mijn = ((await API.call('/orders/mine')).orders || []).filter(o => o.levering && !['bezorgd','opgehaald','geweigerd','terugbetaald','wacht-op-betaling'].includes(o.status)); } catch(e){}
+    try { mijn = ((await API.call('/api/orders/mine')).orders || []).filter(o => o.levering && !['bezorgd','opgehaald','geweigerd','terugbetaald','wacht-op-betaling'].includes(o.status)); } catch(e){}
     if (!mijn.length){ el.innerHTML = ''; return; }
     el.innerHTML = mijn.map(o => {
       const st = { 'nieuw': T('bz.m.nieuw','ontvangen door de zaak'), 'in bereiding': T('bz.m.bereid','wordt bereid'),

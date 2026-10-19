@@ -30,7 +30,17 @@
    wordt beproefd. Een backend die iets VERKEERDS antwoordt in plaats van niets,
    wordt hier niet betrapt (de grens van scripts/lib/schermleugen.js).
 
+   DE TWEEDE RONDE: EEN VOORSPELLING ALS FEIT (19 oktober 2026). Elke rij gaat
+   daarna nog een keer open, met dezelfde persona, tegen een server die de
+   waarheid zegt. Krijgt het scherm een onzekere uitkomst -- een vooruitblik,
+   een doorrekening, een schatting; zie scripts/lib/voorspelling.js -- dan
+   moet er een voorbehoud op het scherm staan. De uitslag staat per rij in
+   `voorspelling`, in dezelfde standen, en raakt `status` (het lege antwoord)
+   NIET: of een voorspelling-als-feit bewijs 4 van een rij blokkeert, is een
+   besluit en geen bijvangst van deze meting.
+
    Draai: node scripts/liegronde.js               (meet, schrijft niets)
+          node scripts/liegronde.js --naar=pad    (meet, schrijft de uitslag naar pad)
           node scripts/liegronde.js --vastleggen  (schrijft LIEGRONDE.json)
    ========================================================================== */
 'use strict';
@@ -44,6 +54,7 @@ const { rijen, maakContext, POORTEN } = require('./appwerkt');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
+const { oordeelVoorspelling } = require('./lib/voorspelling');
 const { stempel } = require('./lib/stempel');
 
 const LIEG = '/api/';
@@ -81,6 +92,34 @@ function oordeel(m) {
   if (m.klachten.length) return { status: 'NIET_GETEST', reden: 'het scherm viel om of toonde rommel bij een leeg antwoord (' + m.klachten[0] + '); of het een toestand zou verzinnen, is zo niet vast te stellen' };
   if (!m.gelogen.length) return { status: 'NIET_GETEST', reden: 'het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen' };
   return { status: 'BEWEZEN', reden: m.gelogen.length + ' antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; ' + GRENS };
+}
+
+/* De tweede ronde voor een rij: het scherm tegen de echte backend, en de vraag
+   of een onzekere uitkomst met een voorbehoud op het scherm staat. */
+async function meetVoorspelling(rij, base, contexten) {
+  if (!rij.pad) return { status: 'NIET_GETEST', reden: 'geen eigen adres' };
+  const ctx = contexten[rij.persona];
+  if (!ctx) return { status: 'NIET_GETEST', reden: 'geen sessie voor de persona ' + rij.persona };
+  const page = await ctx.newPage();
+  const wachten = [];
+  page.on('response', (r) => {
+    const p = new URL(r.url()).pathname;
+    if (!p.startsWith('/api/') || !/json/.test(r.headers()['content-type'] || '')) return;
+    wachten.push(r.json().then((body) => ({ pad: p, body }), () => null));
+  });
+  try {
+    await page.goto(base + rij.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.waitForTimeout(2500);
+    const landing = new URL(page.url()).pathname;
+    const deur = await page.evaluate((sel) => sel.find((s) => document.querySelector(s)) || null, POORTEN);
+    const tekst = await zichtbareTekst(page);
+    const antwoorden = (await Promise.all(wachten)).filter(Boolean);
+    return oordeelVoorspelling({ antwoorden, tekst, deur, landing, pad: rij.pad });
+  } catch (e) {
+    return { status: 'NIET_GETEST', reden: 'scherm viel om: ' + String((e && e.message) || e).split('\n')[0].slice(0, 120) };
+  } finally {
+    try { await page.close(); } catch (e) {}
+  }
 }
 
 async function meetRij(rij, base, contexten) {
@@ -124,36 +163,49 @@ async function meet() {
   const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_LIEG: LIEG, RTG_LIEG_NIET: SPAAR } });
+  // de tweede server zegt de waarheid: daar wordt de voorspelling-als-feit gemeten
+  const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-waar-'));
+  const waar = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP2 } });
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   try {
     const { sessies, overgeslagen } = await haalSessies(base);
+    const waarSessies = (await haalSessies(waar.base)).sessies;
     const lijst = rijen();
     const uit = [];
     let n = 0;
     await Promise.all(Array.from({ length: PAR }, async () => {
-      const contexten = {};
+      const contexten = {}, waarContexten = {};
       for (const rol of Object.keys(sessies)) contexten[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
+      for (const rol of Object.keys(waarSessies)) waarContexten[rol] = await maakContext(browser, opslagVoor({ [rol]: waarSessies[rol] }));
       while (true) {
         const i = n++; if (i >= lijst.length) break;
-        uit.push(await meetRij(lijst[i], base, contexten));
+        const r = await meetRij(lijst[i], base, contexten);
+        r.voorspelling = await meetVoorspelling(lijst[i], waar.base, waarContexten);
+        uit.push(r);
       }
-      for (const c of Object.values(contexten)) await c.close();
+      for (const c of Object.values(contexten).concat(Object.values(waarContexten))) await c.close();
     }));
     uit.sort((a, b) => a.functie.localeCompare(b.functie));
     const telling = {};
     for (const r of uit) telling[r.status] = (telling[r.status] || 0) + 1;
+    const voorspellingTelling = {};
+    for (const r of uit) voorspellingTelling[r.voorspelling.status] = (voorspellingTelling[r.voorspelling.status] || 0) + 1;
     return {
       stempel: stempel(),
       uitleg: 'Bewijs 4 (waarheidsgetrouw) per onderdeel uit MAPPEN: het scherm met de persona van de rij, terwijl de backend buiten de deuren leeg antwoordt (RTG_LIEG). Zie de kop van scripts/liegronde.js.',
       grens: GRENS + '. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.',
       sessiesOvergeslagen: overgeslagen,
       telling,
+      voorspellingTelling,
+      voorspellingGrens: require('./lib/voorspelling').GRENS,
       regels: uit
     };
   } finally {
     await browser.close();
     try { child.kill(); } catch (e) {}
+    try { waar.child.kill(); } catch (e) {}
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+    try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
   }
 }
 
@@ -163,6 +215,10 @@ if (require.main === module) {
   meet().then((u) => {
     console.log('liegronde: ' + u.regels.length + ' onderdelen -- ' + JSON.stringify(u.telling));
     for (const r of u.regels) if (r.status === 'GEBLOKKEERD_DOOR_DEFECT') console.log('  DEFECT  ' + r.app + ' (' + r.ingang + '): ' + r.reden);
+    console.log('voorspelling als feit: ' + JSON.stringify(u.voorspellingTelling));
+    for (const r of u.regels) if (r.voorspelling.status === 'GEBLOKKEERD_DOOR_DEFECT') console.log('  VOORSPELLING ALS FEIT  ' + r.app + ' (' + r.ingang + ', ' + r.persona + '): ' + r.voorspelling.reden);
+    const naar = (process.argv.find((x) => x.startsWith('--naar=')) || '').slice(7);
+    if (naar) { fs.writeFileSync(naar, JSON.stringify(u, null, 2) + '\n'); console.log('geschreven: ' + naar); }
     if (process.argv.includes('--vastleggen')) {
       fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');
       console.log('geschreven: LIEGRONDE.json');

@@ -71,7 +71,7 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     staffId: req.actor.staffId, name: req.actor.name, soort,
-    van: soort === 'ziek' ? new Date().toISOString().slice(0, 10) : van,
+    van: soort === 'ziek' ? require('../../kern/tijdzone').datumIn() : van,
     tot: soort === 'ziek' ? null : tot,
     status: soort === 'ziek' ? 'gemeld' : 'nieuw',
     at: new Date().toISOString()

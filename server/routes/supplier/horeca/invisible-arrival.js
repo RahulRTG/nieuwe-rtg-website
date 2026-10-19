@@ -8,7 +8,7 @@ const tijdzone = require('../../../kern/tijdzone');
 const beleid=require('../../../kern/reservering/beleid');
 module.exports=kern=>{
   const {app,auth,supplierAuth,accounts,db,crypto,save,schoon,findSupplier,notifySupplier,sseToSupplier,horeca}=kern,{H,Hlees,nu}=horeca;
-  const vandaag=()=>klok.datum().toISOString().slice(0,10),rid=()=>crypto.randomBytes(16).toString('hex');
+  const vandaag=()=>tijdzone.datumIn(),rid=()=>crypto.randomBytes(16).toString('hex');
   const {arrivalpas}=kern,{interpretRem,requestRem,passRem,pulseRem,arrivalPassAuth,reserveringVan,geenOpslag}=require('./arrival-toegang')({app,db,arrivalpas,kern});
   function store(code){const h=H(code);h.arrivals=h.arrivals||{};return h.arrivals}
   // kijken zonder scheppen: een geweigerde aanroep laat geen verse zaakdoos achter

@@ -14,15 +14,16 @@
 
    ALLEEN LEZEN, EN DAT BEPAALT HERSTELBAAR: zie ./rtfbuurt.js.
 
-   EEN OPEN SCHAKEL, EN HIER EEN BOTSING TUSSEN TWEE BESLUITEN. De kop van
-   routes/rtfos/portalen.js zegt dat deze drie "geen RTG-account hebben en er
-   ook geen horen te krijgen: ze zijn geen lid, ze werken samen". Het besluit
-   van 19 oktober 2026 zegt dat gebruiken een account vraagt. Welke van de twee
-   hier geldt, beslist de eigenaar; tot dan blijft de stap open.
+   EEN ACCOUNT EN DE CODE (besluit 19 oktober 2026, Toegang efb6dae8). Het
+   portaal vraagt een account (een gratis account is genoeg), en de code is
+   daarbovenop de sleutel: het EERSTE account dat een geldige code opent, wordt
+   eraan gekoppeld (kern/codekoppel.js). Een ander account met dezelfde code
+   krijgt 404, alsof de code niet bestaat -- dat is de kruisproef hieronder.
    ========================================================================== */
 'use strict';
 const { eigenaarSessie } = require('../voltooiwereld');
 const { GEZINSWERELD, accountGezin, openStad } = require('../voltooigezin');
+const { registreerGratis } = require('../gratisaccount');
 
 const PARTNER = '/api/rtfos/portaal/partner';
 const GEMEENTE = '/api/rtfos/portaal/gemeente';
@@ -76,7 +77,16 @@ async function loop(w, stap) {
   /* Bevoegdheid. */
   await stap('voltooibaar', 'bevoegdheid: zonder account opent het portaal niets (401)', async () => {
     const r = await w.post(PARTNER, { code: p.code });
-    return { klopt: r.status === 401, ziet: 'met de code maar zonder account: ' + r.status + (r.status === 200 ? ' (de code is de enige sleutel: besluit van de eigenaar nodig)' : '') };
+    return { klopt: r.status === 401, ziet: 'met de code maar zonder account: ' + r.status };
+  });
+
+  await stap('voltooibaar', 'bevoegdheid: een ander gratis account met dezelfde codes opent niets -- de code hoort bij het account dat hem eerst opende', async () => {
+    const vreemd = await registreerGratis(w.basis);
+    if (!vreemd) return { klopt: false, ziet: 'een gratis account registreren lukte niet' };
+    const r = [await w.post(PARTNER, { code: p.code }, vreemd.token), await w.post(GEMEENTE, { code: g.code }, vreemd.token), await w.post(ONDERNEMER, { code: o.code }, vreemd.token)];
+    const t = JSON.stringify(r.map((x) => x.data));
+    return { klopt: r.every((x) => x.status === 404) && !t.includes('De Wilg') && !t.includes('Bakkerij'),
+      ziet: 'ander account: partner ' + r[0].status + ', gemeente ' + r[1].status + ', ondernemer ' + r[2].status };
   });
 
   await stap('voltooibaar', 'bevoegdheid: elke code opent alleen zijn eigen dossier -- de tweede stichting ziet de eerste niet, en een gemeentecode is geen partnercode', async () => {
@@ -145,6 +155,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'een partnerstichting, gemeente of ondernemer opent met de code van het kantoor zijn eigen dossier -- de gemeente alleen getelde cijfers -- en elke code opent precies een dossier',
-  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Het scherm leest alleen; herstelbaar is hier dat niets schrijft. De codes geeft het landelijke bestuur langs het kantoor uit; een partner op actief (met overeenkomst in het dossier) en de genootschapsroutes lopen hier niet mee. Het portaal vraagt geen account; dat staat als open bevoegdheidsstap en vraagt een besluit. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Het scherm leest alleen; herstelbaar is hier dat niets schrijft. De codes geeft het landelijke bestuur langs het kantoor uit; een partner op actief (met overeenkomst in het dossier) en de genootschapsroutes lopen hier niet mee. Het portaal vraagt een (gratis) account, en een code hoort bij het eerste account dat hem opent. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

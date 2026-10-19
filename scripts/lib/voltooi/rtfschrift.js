@@ -12,13 +12,15 @@
    Een klasgenoot doet mee met dezelfde lescode, een leerling van een andere les
    is de kruisproef.
 
-   EEN OPEN SCHAKEL MET OPZET, dezelfde als bij het bord (./rtfbord.js): meedoen
-   (/les/join) vraagt geen account; onder het besluit van 19 oktober 2026 hoort
-   dat een 401 te geven, en het kind hoort mee te doen onder het account van
-   zijn ouder. Die deur sluit de agent Toegang.
+   EEN ACCOUNT VOOR DE LES (besluit 19 oktober 2026, Toegang 51519fb6): de
+   ouder maakt de les met zijn gratis account, het kind doet mee als
+   gezinsprofiel onder dat account, en de klasgenoot en de leerling van elders
+   hebben elk een eigen gratis account (scripts/lib/gratisaccount.js). Zonder
+   account is meedoen 401.
    ========================================================================== */
 'use strict';
 const { GEZINSWERELD, accountGezin, nieuweLes, doeMee, haal } = require('../voltooigezin');
+const { registreerGratis } = require('../gratisaccount');
 
 const JOIN = '/api/foundation/les/join';
 const OPSLAAN = '/api/foundation/schrift/opslaan';
@@ -32,9 +34,11 @@ const OPGAVEN = '/api/foundation/opgaven/';
 
 async function loop(w, stap) {
   const merk = Date.now().toString(36);
-  await accountGezin(w, 'schrift', { kind: true });
-  const les = await nieuweLes(w, 'Aardrijkskunde', 'Ouder schrift');
-  const elders = await nieuweLes(w, 'Muziek', 'Andere begeleider');
+  const ouder = await accountGezin(w, 'schrift', { kind: true });
+  const [g1, g2, g3] = [await registreerGratis(w.basis), await registreerGratis(w.basis), await registreerGratis(w.basis)];
+  if (!g1 || !g2 || !g3) throw new Error('een gratis account registreren lukte niet');
+  const les = await nieuweLes(w, 'Aardrijkskunde', 'Ouder schrift', ouder.token);
+  const elders = await nieuweLes(w, 'Muziek', 'Andere begeleider', g1.token);
   const D = (b) => Object.assign({ code: les.lesId, token: les.token }, b);
   await w.post('/api/foundation/bord/stroke', D({ stroke: { tool: 'pen', kleur: '#ffffff', dikte: 3, points: [[1, 1], [9, 9]] } }));
   const OPG = 'Benoem drie rivieren ' + merk;
@@ -48,7 +52,7 @@ async function loop(w, stap) {
 
   /* ---------------- voltooibaar ---------------- */
   await stap('voltooibaar', 'het kind doet mee met de lescode en ziet het vak, het bord, de opgave en de agenda van de begeleider', async () => {
-    kind = await doeMee(w, les.lescode, 'Kind schrift');
+    kind = await doeMee(w, les.lescode, 'Kind schrift', ouder.kind);
     const l = ((await haal(w, LES + les.lesId, kind.token)).data || {}).les || {};
     const b = (((await haal(w, BORD + les.lesId, kind.token)).data) || {}).strokes || [];
     return { klopt: l.vak === 'Aardrijkskunde' && (l.opgaven || []).some((o) => o.tekst === OPG) && (l.agenda || []).length === 1 && b.length === 1,
@@ -80,7 +84,7 @@ async function loop(w, stap) {
   /* Bevoegdheid. */
   await stap('voltooibaar', 'bevoegdheid: meedoen met een les zonder RTG-account wordt geweigerd (401)', async () => {
     const r = await w.post(JOIN, { lescode: les.lescode, naam: 'Anoniem ' + merk });
-    return { klopt: r.status === 401, ziet: 'meedoen zonder account: ' + r.status + (r.status === 200 ? ' (de deur staat open: gemeld aan Toegang)' : '') };
+    return { klopt: r.status === 401, ziet: 'meedoen zonder account: ' + r.status };
   });
 
   await stap('voltooibaar', 'bevoegdheid: zonder lessleutel geen schrift lezen of schrijven, en geen inzending', async () => {
@@ -92,8 +96,8 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'bevoegdheid: een klasgenoot leest zijn eigen schrift en niet dat van het kind; een leerling van een andere les komt er niet in', async () => {
-    klasgenoot = await doeMee(w, les.lescode, 'Klasgenoot');
-    buiten = await doeMee(w, elders.lescode, 'Van elders');
+    klasgenoot = await doeMee(w, les.lescode, 'Klasgenoot', g2.token);
+    buiten = await doeMee(w, elders.lescode, 'Van elders', g3.token);
     const eigen = await mijnSchrift(klasgenoot.token);
     const vreemd = await haal(w, SCHRIFT + les.lesId, buiten.token);
     const vreemdOp = await w.post(OPSLAAN, { code: les.lesId, token: buiten.token, pages: [{ type: 'tekst', inhoud: 'erin' }] });
@@ -167,6 +171,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'een leerling doet mee met een les, ziet bord, opgaven en agenda, schrijft in zijn eigen schrift, levert in en vraagt de bijleshulp -- een klasgenoot of een andere les leest zijn schrift niet, en wie uit de les is gehaald schrijft er niet meer in',
-  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf: de live stroom (SSE) loopt hier niet mee, en de bijleshulp antwoordt zonder model met de vaste terugval. Meedoen vraagt geen account (/les/join); dat staat als open bevoegdheidsstap en is gemeld. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf: de live stroom (SSE) loopt hier niet mee, en de bijleshulp antwoordt zonder model met de vaste terugval. Meedoen vraagt een account of een gezinsprofiel onder het account van een ouder; de lessleutel komt daarbovenop. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

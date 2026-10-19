@@ -1,7 +1,7 @@
 /* DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING. */
     $('#dmInput').value = '';
     try {
-      const d = await API.call('/member/dm/send', { toKey: dmWith, text });
+      const d = await API.call('/api/member/dm/send', { toKey: dmWith, text });
       dmToevoegen(d.message);
     } catch(e){ toast(e.message); }
   }
@@ -25,7 +25,7 @@
     ).join('');
     $('#shareList').querySelectorAll('[data-deel]').forEach(b => b.addEventListener('click', async () => {
       try {
-        await API.call('/member/dm/send', { toKey: b.dataset.deel, postId: deelPost, text: '' });
+        await API.call('/api/member/dm/send', { toKey: b.dataset.deel, postId: deelPost, text: '' });
         toast(T('sal.gedeeld','Gedeeld.'));
         $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open');
       } catch(e){ toast(e.message); }
@@ -44,7 +44,7 @@
     csMee = window.RTGMeelezen.maak({
       stroom: () => (call && call.stream) || null,
       stuur: r => {
-        if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
+        if (call) API.call('/api/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
       } });
     csMee.el.style.cssText += 'position:absolute;left:12px;right:12px;bottom:96px;z-index:4;color:#F7F5F1;';
     const scherm = $('#callScreen'); if (scherm) scherm.appendChild(csMee.el);
@@ -64,11 +64,11 @@
     if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.update({duration:tijd});
   }
   let iceConfig = null;
-  async function haalIce(){ try { iceConfig = (await API.call('/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
+  async function haalIce(){ try { iceConfig = (await API.call('/api/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));
-    pc.onicecandidate = ev => { if (ev.candidate && call) API.call('/member/call', { toKey: call.withKey, kind: 'ice', payload: ev.candidate }).catch(()=>{}); };
+    pc.onicecandidate = ev => { if (ev.candidate && call) API.call('/api/member/call', { toKey: call.withKey, kind: 'ice', payload: ev.candidate }).catch(()=>{}); };
     pc.ontrack = ev => {
       const v = $('#csRemote');
       if (v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0];
@@ -111,7 +111,7 @@
     call = { withKey: dmWith, naam: dmNaam, video, richting: 'uit', pendingIce: [], stream, t0: 0 };
     $('#csLocal').srcObject = stream;
     toonGesprek(dmNaam, video);
-    try { await API.call('/member/call', { toKey: call.withKey, kind: 'ring', video }); }
+    try { await API.call('/api/member/call', { toKey: call.withKey, kind: 'ring', video }); }
     catch(e){ toast(e.message); eindeGesprek(false); }
   }
   $('#dmBel').addEventListener('click', () => beginGesprek(false));
@@ -121,8 +121,8 @@
     const keuze = prompt('Wat wil je doen met ' + dmNaam + '?\n\n1 = Blokkeren\n2 = Melden\n3 = Blokkeren en melden', '1');
     if (keuze === null) return;
     try {
-      if (keuze === '2' || keuze === '3') { const reden = prompt('Wat is er aan de hand?', '') || ''; await API.call('/member/report', { key: dmWith, reden }); }
-      if (keuze === '1' || keuze === '3') { await API.call('/member/block', { key: dmWith }); $('#dm-sheet').classList.remove('open'); loadSocial(); }
+      if (keuze === '2' || keuze === '3') { const reden = prompt('Wat is er aan de hand?', '') || ''; await API.call('/api/member/report', { key: dmWith, reden }); }
+      if (keuze === '1' || keuze === '3') { await API.call('/api/member/block', { key: dmWith }); $('#dm-sheet').classList.remove('open'); loadSocial(); }
       toast(keuze === '2' ? T('sal.gemeld', 'Bedankt, je melding is doorgegeven.') : T('sal.geblokkeerd', 'Geblokkeerd.'));
     } catch (e) { toast(e.message); }
   });
@@ -132,24 +132,24 @@
     if (!inkomend) return;
     await haalIce();
     const stream = await pakMedia(inkomend.video);
-    if (!stream){ API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{}); inkomend = null; return; }
+    if (!stream){ API.call('/api/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{}); inkomend = null; return; }
     call = { withKey: inkomend.from, naam: inkomend.codename, video: inkomend.video, richting: 'in', pendingIce: [], stream, t0: 0 };
     $('#csLocal').srcObject = stream;
     toonGesprek(inkomend.codename, inkomend.video);
-    await API.call('/member/call', { toKey: call.withKey, kind: 'accept' }).catch(()=>{});
+    await API.call('/api/member/call', { toKey: call.withKey, kind: 'accept' }).catch(()=>{});
     inkomend = null;
   }
   $('#ciJa').addEventListener('click', neemOp);
   $('#ciNee').addEventListener('click', () => {
     $('#callIncoming').classList.remove('open');
-    if (inkomend) API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
+    if (inkomend) API.call('/api/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
     inkomend = null;
     if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.close();
   });
 
   function eindeGesprek(zeggen){
     if (!call) { belUI(false); return; }
-    if (zeggen) API.call('/member/call', { toKey: call.withKey, kind: 'hangup' }).catch(()=>{});
+    if (zeggen) API.call('/api/member/call', { toKey: call.withKey, kind: 'hangup' }).catch(()=>{});
     clearInterval(call.timer);
     try { call.stream.getTracks().forEach(t => t.stop()); } catch(e){}
     try { if (call.pc) call.pc.close(); } catch(e){}
@@ -170,19 +170,3 @@
     $('#csCam').classList.toggle('dicht', !t.enabled);
   });
 
-  async function flushIce(){
-    if (!call || !call.pc || !call.pc.remoteDescription) return;
-    for (const c of call.pendingIce.splice(0)) { try { await call.pc.addIceCandidate(c); } catch(e){} }
-  }
-  async function opBelsignaal(d){
-    if (d.kind === 'ring'){
-      if (call){ API.call('/member/call', { toKey: d.from, kind: 'busy' }).catch(()=>{}); return; }
-      inkomend = { from: d.from, codename: d.codename, video: d.video };
-      $('#ciAv').textContent = initCN(d.codename);
-      $('#ciNaam').textContent = d.codename;
-      $('#ciSoort').textContent = d.video ? T('sal.videogesprek','Videogesprek') : T('sal.spraakoproep','Spraakoproep');
-      $('#callIncoming').classList.add('open');
-      const wie = inkomend; toonRand({kind:'incoming-call',name:d.codename}, () => inkomend === wie);
-      return;
-    }
-    if (!call || d.from !== call.withKey) return;

@@ -146,7 +146,10 @@ const LIJVEN = {
   '/api/member/rtmail/imap/roteer': { dagen: 30 },
   '/api/member/rtmail/bewaring': { aan: true, zaak: 'ZAAK-1', reden: 'Proef juridische bewaring' },
   '/api/member/rtmail/opruimen': { reden: 'Proef opruimen' },
-  '/api/member/rtmail/team/maak': { id: undefined, naam: 'Proefteam' },
+  /* Een team en een alias zijn uniek per adres: een vaste naam is na de eerste
+     maker bezet, en dan geeft ook A's ijking "bestaat al". */
+  '/api/member/rtmail/team/maak': () => ({ id: undefined, naam: 'Proefteam ' + randomUUID().slice(0, 6) }),
+  '/api/member/rtmail/alias': () => ({ naam: 'alias' + randomUUID().replace(/-/g, '').slice(0, 8) }),
   '/api/member/rtmail/team/stuur': { tekst: 'proef' },
   '/api/member/rtmail/team/status': { status: 'in behandeling' },
   '/api/member/rtmail/team/prioriteit': { prioriteit: 'hoog' },
@@ -248,13 +251,26 @@ const VAN_A = {
   '/api/member/rtmail/sluimer': (c) => ({ id: c.bericht }),
   '/api/member/rtmail/ster': (c) => ({ id: c.bericht }),
   '/api/member/rtmail/verplaats': (c) => ({ id: c.bericht }),
-  '/api/member/rtmail/concept/verstuur': (c) => ({ id: c.concept }),
-  '/api/member/rtmail/concept/weg': (c) => ({ id: c.concept }),
+  /* EEN EIGEN OBJECT PER VERNIETIGENDE ROUTE. De ijking speelt A's verzoek
+     letterlijk na; bij verstuur, weg, intrekken en hef maakt die ijking A's
+     object op, en dan faalde elke latere route op hetzelfde object (gemeten:
+     team/hef hief A's team op, waarna tien teamroutes "Dit team bestaat niet"
+     gaven -- ook voor A). */
+  '/api/member/rtmail/concept/bewaar': (c) => ({ id: c.concept }),
+  '/api/member/rtmail/concept/verstuur': (c) => ({ id: c.conceptVerstuur }),
+  '/api/member/rtmail/concept/weg': (c) => ({ id: c.conceptWeg }),
+  '/api/member/rtmail/regel/zet': (c) => ({ id: c.regel }),
+  '/api/member/rtmail/regel/weg': (c) => ({ id: c.regelWeg }),
+  '/api/member/rtmail/imap/roteer': (c) => ({ id: c.imap }),
+  '/api/member/rtmail/imap/intrekken': (c) => ({ id: c.imapIntrek }),
   '/api/member/rtmail/bewaring': (c) => ({ postvak: c.ikAdres }),
   '/api/member/rtmail/opruimen': (c) => ({ postvak: c.ikAdres }),
   ...Object.fromEntries(['af', 'bevestiging', 'dossier', 'hef', 'koppel', 'lid', 'notitie', 'overzicht', 'pak', 'postvak',
-    'prioriteit', 'status', 'stuur', 'verlaat'].map((h) => ['/api/member/rtmail/team/' + h,
+    'prioriteit', 'status', 'stuur'].map((h) => ['/api/member/rtmail/team/' + h,
     (c) => ({ id: c.team, bericht: c.teamBericht, ...(h === 'stuur' ? { naar: c.ikAdres } : {}) })])),
+  '/api/member/rtmail/team/hef': (c) => ({ id: c.teamHef }),
+  /* verlaten kan alleen een lid dat geen eigenaar is: het team van C, met A erin */
+  '/api/member/rtmail/team/verlaat': (c) => ({ id: c.teamVanC }),
   /* Gesprekken: A's gesprek met C */
   ...Object.fromEntries(['concept', 'gesprek', 'lees', 'por', 'stuur', 'typt', 'vlag'].map((h) => ['/api/comm/' + h, (c) => ({ id: c.gesprek })])),
   ...Object.fromEntries(['reactie', 'wijzig', 'wis'].map((h) => ['/api/comm/' + h, (c) => ({ id: c.gesprek, berichtId: c.commBericht })])),
@@ -347,8 +363,20 @@ function stappen() {
     { pad: '/api/member/rtmail/concept/bewaar', lijf: (c) => ({ naar: c.teamAdres, onderwerp: 'Teamvraag ' + c.merk, tekst: 'graag hulp' }),
       bewaar: (d, c) => { c.teamConcept = d.concept && d.concept.id; } },
     { pad: '/api/member/rtmail/concept/verstuur', lijf: (c) => ({ id: c.teamConcept }), bewaar: (d, c) => { c.teamBericht = d.bericht && d.bericht.id; } },
-    { pad: '/api/member/rtmail/regel/maak', lijf: (c) => ({ naam: 'Regel ' + c.merk, veld: 'onderwerp', bevat: 'proef', actie: 'ster' }) },
-    { pad: '/api/member/rtmail/imap/sleutel', lijf: { naam: 'Proeftoestel', dagen: 30 } },
+    { pad: '/api/member/rtmail/regel/maak', lijf: (c) => ({ naam: 'Regel ' + c.merk, veld: 'onderwerp', bevat: 'proef', actie: 'ster' }),
+      bewaar: (d, c) => { c.regel = d.regel && d.regel.id; } },
+    { pad: '/api/member/rtmail/regel/maak', lijf: (c) => ({ naam: 'Wegregel ' + c.merk, veld: 'onderwerp', bevat: 'weg', actie: 'ster' }),
+      bewaar: (d, c) => { c.regelWeg = d.regel && d.regel.id; } },
+    { pad: '/api/member/rtmail/imap/sleutel', lijf: { naam: 'Proeftoestel', dagen: 30 }, bewaar: (d, c) => { c.imap = zoek(d, { sleutel: 'id' }); } },
+    { pad: '/api/member/rtmail/imap/sleutel', lijf: { naam: 'Intrektoestel', dagen: 30 }, bewaar: (d, c) => { c.imapIntrek = zoek(d, { sleutel: 'id' }); } },
+    { pad: '/api/member/rtmail/concept/bewaar', lijf: (c) => ({ naar: c.ikAdres, onderwerp: 'Verstuur ' + c.merk, tekst: 'gaat de deur uit' }),
+      bewaar: (d, c) => { c.conceptVerstuur = d.concept && d.concept.id; } },
+    { pad: '/api/member/rtmail/concept/bewaar', lijf: (c) => ({ naar: c.ikAdres, onderwerp: 'Weg ' + c.merk, tekst: 'wordt weggegooid' }),
+      bewaar: (d, c) => { c.conceptWeg = d.concept && d.concept.id; } },
+    { pad: '/api/member/rtmail/team/maak', lijf: (c) => ({ naam: 'Hefteam ' + c.merk }), bewaar: (d, c) => { c.teamHef = d.team && d.team.id; } },
+    { als: 'tegen', pad: '/api/member/rtmail/team/maak', lijf: () => ({ naam: 'Team van C ' + randomUUID().slice(0, 6) }),
+      bewaar: (d, c) => { c.teamVanC = d.team && d.team.id; } },
+    { als: 'tegen', pad: '/api/member/rtmail/team/lid', lijf: (c) => ({ id: c.teamVanC, codenaam: c.ik.codenaam, erin: true }) },
     /* Een gesprek met C, met een bericht */
     { pad: '/api/comm/begin', lijf: (c) => ({ met: c.tegen.key }), bewaar: (d, c) => { c.gesprek = d.gesprek && d.gesprek.id; } },
     { pad: '/api/comm/stuur', lijf: (c) => ({ id: c.gesprek, tekst: 'proef ' + c.merk }), bewaar: (d, c) => {

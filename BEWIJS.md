@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2913 bestanden en 19859 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2914 bestanden en 19860 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2913 |
-| losse beweringen (`test(...)`) | 19859 |
+| toetsbestanden | 2914 |
+| losse beweringen (`test(...)`) | 19860 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 93 |
+| niets van beide | 94 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2564 bestanden, 19272 beweringen.
+2565 bestanden, 19273 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -372,6 +372,7 @@ toets omvalt.
 | `capabilities.test.js` | 9 | gezakt op `===->!==#0` | DE CAPABILITY-METING -- en of hij werkelijk iets onderscheidt. scripts/capabilities.js beantwoordt de vraag uit OS.md par. |
 | `capabilitycallers.test.js` | 11 | gezakt op `===->!==#0` | GEEN CAPABILITY ZONDER CALLER -- de tweede van de vier regels uit CONTROLPLANE.md, machinaal gemeten in plaats van met de hand geteld. WAT HIER WERKELIJK OP HET SPEL STAAT. |
 | `capgezondheid.test.js` | 8 | gezakt op `===->!==#0` | CAPABILITY HEALTH -- hoe gaat het met DIT onderdeel? DE FOUT DIE DIT VERVANGT. |
+| `care-genregrens.test.js` | 1 | -- | HET CARE-AANBOD BELOOFT GEEN ZORG DIE DE BEWIJSPOORT VRAAGT, BIJ EEN ZAAK DIE HAAR NIET HEEFT. Gevonden bij de domeinkaart van FoundationOS (Zorg, 19 oktober 2026): Kliniek Clara stond als zaak onder het open genre... |
 | `care-intake-versleuteld.test.js` | 2 | -- | DE MEDISCHE CONTEXT VAN EEN CARE-INTAKE STAAT NERGENS LEESBAAR IN DE OPSLAG. Gevonden door de voltooiproef van de zorgtab (scripts/lib/voltooi/tabzorg.js): zonder RTG_ENC_KEY stond wat een lid de behandelaar vooraf... |
 | `care.test.js` | 8 | gezakt op `liegpoort /api/` | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
 | `carebetaal.test.js` | 5 | -- | Een zorgboeking is pas betaald als er geld bewoog (server/kern/care/leden.js, careBetaal). Gevonden door FoundationOS bij link:foundationzorg: /api/care/betaal zette de boeking op paid=true en "geboekt" zonder dat er... |

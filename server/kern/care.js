@@ -48,14 +48,17 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
         {
           id: 'clara', naam: 'Kliniek Clara Ibiza', soort: 'kliniek', icon: 'zorg', waar: 'Vila, Ibiza',
           supplierCode: 'CLARA',
-          beschrijving: 'Privékliniek voor consulten, kleine ingrepen en herstelbegeleiding.',
+          /* Een zaak onder het open genre 'zorg': herstelbegeleiding, geen
+             huisarts- of fysiotherapiezorg. Die vraagt een genre uit de
+             bewijspoort (kern/aanmeldingen/bewijs.js; test/care-genregrens.test.js). */
+          beschrijving: 'Privékliniek voor herstelbegeleiding: gesprekken en bewegingsbegeleiding na een behandeling elders.',
           behandelaars: [
-            { id: 'cb1', naam: 'Dr. Elena Ruiz', functie: 'Huisarts' },
-            { id: 'cb2', naam: 'Dr. Tomas Blad', functie: 'Fysiotherapeut' }
+            { id: 'cb1', naam: 'Elena Ruiz', functie: 'Herstelcoach' },
+            { id: 'cb2', naam: 'Tomas Blad', functie: 'Bewegingscoach' }
           ],
           behandelingen: [
-            { id: 'ct1', naam: 'Consult huisarts', soort: 'medisch', duurMin: 20, prijs: 65, behandelaarId: 'cb1', tijden: ['09:00', '09:30', '10:00', '11:00'] },
-            { id: 'ct2', naam: 'Fysiotherapie', soort: 'medisch', duurMin: 30, prijs: 55, behandelaarId: 'cb2', tijden: ['13:00', '14:00', '16:00'] }
+            { id: 'ct1', naam: 'Herstelgesprek', soort: 'wellness', duurMin: 20, prijs: 65, behandelaarId: 'cb1', tijden: ['09:00', '09:30', '10:00', '11:00'] },
+            { id: 'ct2', naam: 'Bewegingsbegeleiding', soort: 'wellness', duurMin: 30, prijs: 55, behandelaarId: 'cb2', tijden: ['13:00', '14:00', '16:00'] }
           ]
         }
       ]);

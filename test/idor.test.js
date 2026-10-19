@@ -7,7 +7,7 @@
    Draai los: node --experimental-sqlite --test test/idor.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { oordeelIdor } = require('../scripts/lib/idor');
+const { oordeelIdor, verseHerhaalsleutel, idemBotsing } = require('../scripts/lib/idor');
 
 test('een 2xx is een doorbraak-BEVINDING, geen vonnis', () => {
   const o = oordeelIdor(200, '{"ok":true}');
@@ -136,6 +136,50 @@ test('een weigering aan de toesteldeur is geen scheiding: de eigenaarschapsvraag
   assert.equal(gebonden.staat, 'onbereikbaar');
   const gewoon = oordeelIdor(403, '{"error":"Dit is niet van jou."}');
   assert.equal(gewoon.staat, 'gescheiden', 'een gewone weigering blijft een scheiding');
+});
+
+test('de tegenpoging krijgt een EIGEN herhaalsleutel, zodat de idem-laag niet meespreekt', () => {
+  /* DE VALS-POSITIEF DIE DIT VASTHOUDT (besluit 19 oktober 2026). De kruisproef
+     stuurde de tegenpoging (verzonnen id) met DEZELFDE idem als B's eerste
+     poging. De idem-laag gaf dan 409 IDEM_ANDER_VERZOEK -- een botsing met B's
+     eigen verzoek -- en de proef las dat als "verzonnen id geweigerd" =
+     doorbraak. Tien geldapps stonden zo ten onrechte op DEFECT. De sleutel hoort
+     per poging vers te zijn; het id en de rest van het lijf onaangeroerd. */
+  const lijf = { idem: 'zelfde-sleutel', zaak: 'Festival', aantal: 1, id: 'A-123' };
+  const vers = verseHerhaalsleutel(lijf);
+  assert.notEqual(vers.idem, lijf.idem, 'de herhaalsleutel is vernieuwd');
+  assert.equal(vers.zaak, 'Festival', 'de rest van het lijf blijft');
+  assert.equal(vers.id, 'A-123', 'het id blijft (dat vervangt de kruisproef zelf door een verzonnen id)');
+  assert.equal(lijf.idem, 'zelfde-sleutel', 'het origineel wordt niet gemuteerd');
+  assert.notEqual(verseHerhaalsleutel(lijf).idem, verseHerhaalsleutel(lijf).idem, 'twee pogingen krijgen twee sleutels');
+
+  assert.equal(verseHerhaalsleutel({ idempotentieSleutel: 'x', a: 1 }).a, 1);
+  assert.notEqual(verseHerhaalsleutel({ idempotentieSleutel: 'x' }).idempotentieSleutel, 'x', 'ook idempotentieSleutel');
+  assert.deepEqual(verseHerhaalsleutel({ zaak: 'z' }), { zaak: 'z' }, 'een lijf zonder sleutel blijft gelijk');
+});
+
+test('een 409 IDEM_ANDER_VERZOEK telt nooit als bewijs van eigendom of scheiding', () => {
+  assert.equal(idemBotsing(409, '{"error":"...","code":"IDEM_ANDER_VERZOEK"}'), true);
+  assert.equal(idemBotsing(409, '{"error":"al een open rekening"}'), false,
+    'een ANDERE 409 (een echte toestandsbotsing) is geen idem-botsing en blijft meetellen');
+  assert.equal(idemBotsing(200, '{"code":"IDEM_ANDER_VERZOEK"}'), false, 'alleen bij 409');
+  assert.equal(idemBotsing(404, ''), false);
+});
+
+test('het IDOR-register draagt geen doorbraak die op een idem-botsing berust', () => {
+  /* De vals-positief, bewaakt in de uitslag zelf: geen enkele route mag als
+     doorbraak staan met een tegenpoging die 409 was. Een register van voor deze
+     reparatie kent het veld `tegenpoging` niet en zegt hier niets. */
+  const fs = require('fs');
+  const path = require('path');
+  let reg;
+  try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
+  catch (e) { return; } // geen register: niets te bewaken hier
+  for (const bak of ['perRoute', 'zaakPerRoute', 'werkplekPerRoute']) {
+    const fout = Object.entries(reg[bak] || {}).filter(([, v]) => v.staat === 'doorbraak' && v.tegenpoging === 409);
+    assert.deepEqual(fout.map(([r]) => r), [],
+      bak + ': een doorbraak die op een 409-tegenpoging berust is een idem-botsing, geen lek: ' + fout.map(([r]) => r).join(', '));
+  }
 });
 
 test('een weigering die een persoonsveld lekt is gescheiden EN een lek', () => {

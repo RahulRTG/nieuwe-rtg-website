@@ -35,7 +35,7 @@ const { alleRoutes, verdeelOpRol } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { maakPool } = require('./lib/objectpool');
 const { maakSessiewacht } = require('./lib/sessiewacht');
-const { oordeelIdor } = require('./lib/idor');
+const { oordeelIdor, verseHerhaalsleutel, idemBotsing } = require('./lib/idor');
 const { waarden, merktekens, oordeelAfbakening } = require('./lib/afbakening');
 const opbouwLib = require('./lib/idoropbouw');
 const { stempel } = require('./lib/stempel');
@@ -537,9 +537,24 @@ if (require.main !== module) { module.exports = {}; return; }
         continue;
       }
       if (o.staat === 'doorbraak') {
-        const nep = { ...lijf };
+        /* De tegenpoging krijgt een EIGEN herhaalsleutel: deelde hij de idem van
+           B's eerste poging, dan gaf de idem-laag 409 IDEM_ANDER_VERZOEK (zelfde
+           sleutel, ander lijf) en las de proef dat als "verzonnen id geweigerd"
+           -- een vals positief dat tien geldapps op DEFECT zette (besluit
+           19 oktober 2026; scripts/lib/idor.js). */
+        const nep = verseHerhaalsleutel({ ...lijf });
         for (const v of velden) nep[v] = verzonnen();
         const tegenpoging = await tegenB(r.pad, nep);
+        /* Een idem-botsing bewijst geen eigendom. Zou hij er toch zijn (een route
+           met een andere idem-bron dan het lijf), dan is deze route niet te
+           kruisen met deze sleutel -- geen doorbraak, geen scheiding. */
+        if (idemBotsing(tegenpoging.status, tegenpoging.tekst)) {
+          telling.onbereikbaar++;
+          perRoute[sleutel] = { status: u.status, tegenpoging: tegenpoging.status, staat: 'onbereikbaar', velden,
+            reden: 'de tegenpoging botste op de idem-laag (409 IDEM_ANDER_VERZOEK): een botsing met B\'s eigen eerste verzoek, ' +
+              'geen weigering van het verzonnen id -- geen eigendomsbewijs' };
+          continue;
+        }
         if (tegenpoging.status >= 200 && tegenpoging.status < 300) {
           telling.publiek++;
           perRoute[sleutel] = { status: u.status, staat: 'publiek', velden,

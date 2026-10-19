@@ -55,4 +55,32 @@ function oordeelIdor(status, lijf) {
   return { staat: 'onbereikbaar', reden: 'B kreeg ' + s + ': de eigenaarschapsvraag was niet aan de beurt' };
 }
 
-module.exports = { oordeelIdor, VERRAADT };
+/* EEN IDEM-BOTSING IS GEEN EIGENDOMSBEWIJS (besluit 19 oktober 2026). De
+   tegenpoging van de kruisproef (B stuurt hetzelfde lijf met een VERZONNEN id)
+   mag niet dezelfde herhaalsleutel dragen als B's eerste poging: de idem-laag
+   (server/middleware/idempotentie.js:140-150) geeft dan 409 IDEM_ANDER_VERZOEK
+   -- zelfde sleutel, ander lijf -- en dat is een botsing met B's EIGEN eerste
+   verzoek, geen weigering van het verzonnen id. Die 409 als doorbraak lezen
+   zette tien geldapps ten onrechte op DEFECT (/api/wallet/munt/koop en familie).
+
+   Twee regels, allebei puur:
+   - verseHerhaalsleutel(lijf): elke poging krijgt een EIGEN sleutel, zodat de
+     idem-laag niet meespreekt.
+   - idemBotsing(status, lijf): herkent de 409 IDEM_ANDER_VERZOEK, die nooit als
+     scheiding OF eigendom mag tellen. */
+const IDEM_VELDEN = ['idem', 'idempotentieSleutel'];
+let _teller = 0;
+function verseHerhaalsleutel(lijf) {
+  if (!lijf || typeof lijf !== 'object') return lijf;
+  const uit = { ...lijf };
+  for (const v of IDEM_VELDEN) {
+    if (typeof uit[v] === 'string') uit[v] = 'idorproef-vers-' + (++_teller) + '-' + Math.random().toString(36).slice(2, 12);
+  }
+  return uit;
+}
+function idemBotsing(status, lijf) {
+  if (Number(status) !== 409) return false;
+  return /"code"\s*:\s*"IDEM_ANDER_VERZOEK"/.test(String(lijf || ''));
+}
+
+module.exports = { oordeelIdor, VERRAADT, IDEM_VELDEN, verseHerhaalsleutel, idemBotsing };

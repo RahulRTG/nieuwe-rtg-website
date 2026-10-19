@@ -43,7 +43,7 @@ module.exports = (kern) => {
   app.post('/api/lucht/security/zet', supplierAuth, poort, (req, res) => stuur(res, lucht.securityZet(wie(req), String(req.body.id || ''), req.body || {})));
   // het charterloket (privejets en helikopters): operations beslist, nooit de AI
   app.post('/api/lucht/charters', supplierAuth, poort, (req, res) => res.json(lucht.charterLijst()));
-  app.post('/api/lucht/charter/beslis', supplierAuth, poort, (req, res) => stuur(res, lucht.charterBeslis(wie(req), String(req.body.id || ''), req.body.akkoord === true)));
+  app.post('/api/lucht/charter/beslis', supplierAuth, poort, async (req, res) => stuur(res, await lucht.charterBeslis(wie(req), String(req.body.id || ''), req.body.akkoord === true)));
   // de Koninklijke Vleugel: vips onder protocolnaam, met het vaste protocol
   app.post('/api/lucht/vip/lijst', supplierAuth, poort, (req, res) => res.json(lucht.vipLijst()));
   app.post('/api/lucht/vip/maak', supplierAuth, poort, (req, res) => stuur(res, lucht.vipMaak(wie(req), req.body || {})));

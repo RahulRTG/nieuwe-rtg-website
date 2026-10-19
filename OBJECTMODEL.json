@@ -3,7 +3,7 @@
   "vastgelegd": "2026-10-19",
   "gemeten": {
     "bestanden": 2996,
-    "vormen": 1620,
+    "vormen": 1619,
     "velden": 2318,
     "modules": 910,
     "domeinen": 325,
@@ -82,18 +82,6 @@
       ]
     },
     {
-      "veld": "key",
-      "domeinen": 18,
-      "waar": [
-        "kern/assets",
-        "kern/care",
-        "kern/ervaring",
-        "kern/gemeente",
-        "kern/instant-reality",
-        "kern/ledenbalie-inzage"
-      ]
-    },
-    {
       "veld": "supplierCode",
       "domeinen": 17,
       "waar": [
@@ -103,6 +91,18 @@
         "kern/comm",
         "kern/commercie",
         "kern/ervaring"
+      ]
+    },
+    {
+      "veld": "key",
+      "domeinen": 17,
+      "waar": [
+        "kern/assets",
+        "kern/care",
+        "kern/ervaring",
+        "kern/gemeente",
+        "kern/instant-reality",
+        "kern/ledenbalie-inzage"
       ]
     },
     {

@@ -41,8 +41,15 @@ module.exports = (ctx) => {
     return { ok: true, charters: L().charters.slice(0, 60).map(c => ({ id: c.id, code: c.code, soort: c.soort,
       icoon: CATEGORIEEN[c.soort], bestemming: c.bestemming, datum: c.datum, tijd: c.tijd, van: c.codenaam, status: c.status })) };
   }
-  function charterBeslis(actor, cid, akkoord) {
-    const ch = L().charters.find(x => x.id === String(cid || ''));
+  /* De boeking van de aanvrager loopt door de transactie van de boarding pass
+     (boardingPass.boek): hier stond een rechtstreekse schrijfactie in
+     L().boekingen, die bij twee instances verloren kon gaan. Die transactie
+     vervangt de collectie, dus na het wachten worden charter en vlucht OPNIEUW
+     opgezocht. Faalt de boeking, dan blijft de aanvraag open en verdwijnt de
+     vlucht van het bord. */
+  async function charterBeslis(actor, cid, akkoord) {
+    const zoek = () => L().charters.find(x => x.id === String(cid || ''));
+    const ch = zoek();
     if (!ch) return { status: 404, error: 'Charteraanvraag niet gevonden.' };
     if (ch.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + ch.status + '.' };
     if (!akkoord) { ch.status = 'afgewezen'; save(); return { ok: true, charter: { code: ch.code, status: ch.status } }; }
@@ -54,13 +61,21 @@ module.exports = (ctx) => {
       soort: 'vertrek', categorie: ch.soort, bestemming: ch.bestemming, datum: ch.datum, tijd: ch.tijd, gate: plek,
       toestel: ch.soort === 'helikopter' ? 'RTG-H1' : 'RTG-J1' });
     v.status = 'inchecken';
-    ch.status = 'bevestigd'; ch.vluchtId = v.id; ch.door = actor || 'operations';
-    const b = { id: boardingPass.nieuwBoekingId(), vluchtId: v.id,
-      key: ch.key, codenaam: ch.codenaam, status: 'geboekt', stoel: null,
-      koffers: 0, pass_id: null, toegang: null, pass_historie: [], pass_claims: [], at: nu() };
-    L().boekingen.unshift(b);
+    ch.status = 'in-behandeling'; // een tweede besluit tijdens het boeken kaatst af
     save();
-    return { ok: true, charter: { code: ch.code, status: ch.status }, vlucht: publiek(v), boeking: { id: b.id } };
+    let uit;
+    try { uit = await boardingPass.boek({ key: ch.key, codenaam: ch.codenaam, vluchtId: v.id }); }
+    catch (e) { uit = { status: 503, error: 'De boeking kon nu niet worden vastgelegd; probeer het opnieuw.' }; }
+    const na = zoek(), vNa = vind(v.id);
+    if (!uit || !uit.ok) {
+      if (na) na.status = 'aangevraagd';
+      if (vNa) vNa.status = 'geannuleerd';
+      save();
+      return { status: (uit && uit.status) || 503, error: (uit && uit.error) || 'De boeking kon nu niet worden vastgelegd.' };
+    }
+    na.status = 'bevestigd'; na.vluchtId = v.id; na.door = actor || 'operations';
+    save();
+    return { ok: true, charter: { code: na.code, status: na.status }, vlucht: publiek(vNa || v), boeking: { id: uit.boekingId } };
   }
   function mijnCharters(key) {
     return L().charters.filter(c => c.key === key).slice(0, 10).map(c => {

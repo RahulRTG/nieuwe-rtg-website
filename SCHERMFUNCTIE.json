@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-18",
-    "commit": "2918d3def"
+    "op": "2026-10-19",
+    "commit": "22cd8af4"
   },
   "bronnen": {
     "schermroutes": {
@@ -2143,9 +2143,9 @@
     "server/kern/wereldroutes/work.js"
   ],
   "totaal": {
-    "schermen": 327,
+    "schermen": 328,
     "aliassen": 20,
-    "zonderServer": 53,
+    "zonderServer": 54,
     "zonderInkomend": 1,
     "overlapParen": 21,
     "titelbotsingen": 1,
@@ -2534,7 +2534,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 207,
+      "inkomend": 208,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -3519,7 +3519,7 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 32,
+      "inkomend": 33,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -8183,7 +8183,7 @@
         "/api/verblijf"
       ],
       "zonderServer": false,
-      "inkomend": 15,
+      "inkomend": 16,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/leven.js",
@@ -8192,12 +8192,12 @@
         "public/apps/reizen.html",
         "public/apps/rit-momenten.js",
         "public/apps/rit.html",
+        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel1.js",
         "server/kern/appgids-data/deel1c.js",
-        "server/kern/living-world/model.js",
-        "server/kern/mall/aanbodrtg.js"
+        "server/kern/living-world/model.js"
       ]
     },
     {
@@ -8227,10 +8227,12 @@
         "/api/rahul"
       ],
       "zonderServer": false,
-      "inkomend": 9,
+      "inkomend": 11,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
+        "public/apps/hotels.html",
+        "public/ds/edge-modi.js",
         "public/shared/command/catalog.js",
         "public/shared/interface/second-screen-personal.js",
         "public/shared/rtg-adaptive-edge-services.js",
@@ -9852,7 +9854,7 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 17,
+      "inkomend": 18,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -9861,12 +9863,12 @@
         "public/apps/rtg.html",
         "public/apps/saloon/acties.js",
         "public/apps/sociaal.html",
+        "public/ds/edge-modi.js",
         "public/shared/clipdeler.js",
         "public/shared/clipdeler/clipdeler-01.js",
         "public/shared/rosapps.js",
         "public/shared/rtg-adaptive-edge-services.js",
-        "public/shared/rtg-adaptive-edge-visual.js",
-        "public/shared/split.js"
+        "public/shared/rtg-adaptive-edge-visual.js"
       ]
     },
     {
@@ -13343,7 +13345,7 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 20,
+      "inkomend": 21,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -13733,12 +13735,13 @@
         "/api/wereld"
       ],
       "zonderServer": false,
-      "inkomend": 13,
+      "inkomend": 14,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/comm.html",
         "public/apps/rtg.html",
+        "public/ds/edge-modi.js",
         "public/shared/command.js",
         "public/shared/interface/world-presentation.js",
         "public/shared/rtg-adaptive-edge-services.js",
@@ -13746,8 +13749,7 @@
         "public/shared/rtg-editorial-v4/rtg-editorial-v4-02.js",
         "public/sw.js",
         "server/kern/appgids-data/deel1.js",
-        "server/kern/lidmaatschap.js",
-        "server/kern/wereld/context.js"
+        "server/kern/lidmaatschap.js"
       ]
     },
     {
@@ -14107,6 +14109,27 @@
       "inIndex": 1,
       "inkomendVan": [
         "server/kern/appgids-data/deel3.js"
+      ]
+    },
+    {
+      "bestand": "public/ds/voorbeeld.html",
+      "url": "/ds/voorbeeld.html",
+      "titel": "RTG Design System: voorbeeld",
+      "h1": "Zeven schermtypen, een systeem.",
+      "soort": "scherm",
+      "aliasNaar": null,
+      "wereld": [],
+      "rollen": [],
+      "schrijft": "nee",
+      "schil": [],
+      "paden": [],
+      "schilPaden": [],
+      "domeinen": [],
+      "zonderServer": true,
+      "inkomend": 1,
+      "inIndex": 0,
+      "inkomendVan": [
+        "public/ds/contract.json"
       ]
     },
     {

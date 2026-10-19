@@ -47,7 +47,8 @@ test('de reiswacht op het scherm: signalen met bron, de ontbrekende bronnen, en 
 
     /* ---- eerst de rust: een lid zonder reizen ---- */
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-action').click();
+    /* De wacht staat op het Design System gewoon open onder de bladen; er is
+       geen ingeklapt wereldhuis meer om eerst te openen. */
     /* Op ZICHTBARE tekst wachten, zoals de tweede wacht hieronder al doet:
        innerText is leeg zolang de wereldstart-laag de inhoud nog verbergt, en
        textContent staat er dan al. Wie op textContent leest, meet de leegte
@@ -72,7 +73,6 @@ test('de reiswacht op het scherm: signalen met bron, de ontbrekende bronnen, en 
     assert.equal(bev.status, 200);
 
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-action').click();
     await page.waitForFunction(() => {
       const el = document.querySelector('#wacht');
       return el && !/Laden/.test(el.textContent) && /India/.test(el.innerText);
@@ -126,7 +126,6 @@ test('de knop "Los het op": van visumvraag naar een taak in de agenda, in twee k
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-action').click();
     await page.waitForSelector('#wacht [data-los]', { timeout: 20000 });
 
     await page.click('#wacht [data-los]');

@@ -50,9 +50,10 @@ test('de invoerbalie leest voor, zegt wat onzeker is, en voegt pas toe na bevest
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-domain > summary').click();
-    await page.locator('#worldTravelImport > summary').click();
-    await page.waitForSelector('#invLees', { timeout: 20000 });
+    /* Sinds de migratie naar het RTG Design System staat de balie open onder
+       de bladen (#worldTravelImport is een sectie, geen ingeklapt blok meer);
+       wachten op de knop is wachten tot het scherm er is. */
+    await page.waitForSelector('#invLees', { state: 'visible', timeout: 20000 });
 
     await page.fill('#invTekst', PAS);
     await page.click('#invLees');
@@ -75,7 +76,7 @@ test('de invoerbalie leest voor, zegt wat onzeker is, en voegt pas toe na bevest
       assert.match(tekst, /na te kijken/i, 'en het afgeleide jaar staat als na te kijken gemarkeerd');
       /* Precies EEN veld hoort onzeker te zijn: het jaar van de boardingpass.
          Zou alles gemarkeerd staan, dan zegt de markering niets meer. */
-      const gemarkeerd = await page.$$eval('#invUit .rtg-naam',
+      const gemarkeerd = await page.$$eval('#invUit [data-gelezen]',
         els => els.filter(e => /na te kijken/i.test(e.innerText)).map(e => e.innerText));
       assert.equal(gemarkeerd.length, 1, 'alleen de datum: ' + JSON.stringify(gemarkeerd));
       assert.match(gemarkeerd[0], /^Van:/i);

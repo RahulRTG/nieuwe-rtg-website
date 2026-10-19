@@ -35,12 +35,14 @@ test('Escape sluit de laag op Residentie, Food Court en Office', { skip: geenBro
     letOpFouten(page, fouten);
     const isOpen = (sel) => page.evaluate((s) => document.querySelector(s).classList.contains('open'), sel);
 
+    /* De Résidence staat op het Design System: de gids is een <dialog>, dus
+       "open" is het open-attribuut van de dialoog en niet meer een klasse. */
     await t.test('Residentie: de gids', async () => {
       await page.goto(server.base + '/apps/residentie.html', { waitUntil: 'domcontentloaded' });
       await page.locator('#knopGids').click({ timeout: 15000 });
-      await page.waitForFunction(() => document.querySelector('#gidsLaag').classList.contains('open'));
+      await page.waitForFunction(() => document.querySelector('#gidsLaag').open);
       await page.keyboard.press('Escape');
-      assert.equal(await isOpen('#gidsLaag'), false, 'de gids ging niet dicht met Escape');
+      assert.equal(await page.evaluate(() => document.querySelector('#gidsLaag').open), false, 'de gids ging niet dicht met Escape');
     });
 
     await t.test('Food Court: het reserveerblad', async () => {

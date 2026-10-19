@@ -35,6 +35,9 @@ module.exports = (ctx) => {
     if (!i) return { status: 404, error: 'Deze deling is er niet (meer).' };
     i.status = 'gestopt';
     i.gestoptOp = nu();
+    /* "Weg is weg": ook de versleutelde kopie op de boekingen bij deze
+       aanbieder gaat weg (test/care-intake-versleuteld.test.js, toets 3). */
+    for (const bk of C.bak('careBoekingen')) if (bk.key === key && bk.aanbiederId === i.aanbiederId && bk.intake) delete bk.intake;
     save();
     return { ok: true, gestopt: i.aanbiederNaam };
   }

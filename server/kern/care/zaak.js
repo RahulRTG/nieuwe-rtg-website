@@ -24,7 +24,7 @@ module.exports = (ctx) => {
         codenaam: x.codenaam, status: x.status, prijs: x.prijs,
         // de zorgcontext die het lid deelt: allergenen/dieet + (voor een
         // kliniek) de uitdrukkelijk gedeelde intake
-        zorg: x.zorg || null, intake: x.intake ? ctx.intakesleutel.open(x.intake, 'boeking|' + x.id) : null
+        zorg: x.zorg || null, intake: x.intake && intakeActief(x.key, x.aanbiederId) ? ctx.intakesleutel.open(x.intake, 'boeking|' + x.id) : null
       }));
     return { ok: true, datum, aanbieder: eigen[0].naam, behandelaars, afspraken };
   }

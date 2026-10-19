@@ -92,3 +92,31 @@ test('kan er niet versleuteld worden, dan wordt er niets gedeeld en niets bewaar
   assert.match(r.error, /niets gedeeld/);
   assert.equal(bak.careIntake.length, 0, 'er bleef toch een intake achter');
 });
+
+/* "WEG IS WEG" (app-main-13). Gevonden bij de domeinkaart van FoundationOS
+   (ZRG-28): na het stoppen van een deling las de behandelaar de intake nog bij
+   een bestaande, betaalde afspraak -- careAgenda opende de kopie op de boeking
+   zonder te kijken of de deling nog liep. Stoppen haalt hem nu overal weg. */
+test('na het stoppen van de deling ziet de behandelaar de intake niet meer, ook niet bij een betaalde afspraak', async () => {
+  if (!srv) await start();
+  const lid = (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tier: 'rtg' }) }).then(r => r.json())).token;
+  const spa = (await api('care', {}, lid)).body.aanbieders.find(a => a.soort === 'spa');
+  const beh = spa.behandelingen[0];
+  const GEHEIM = 'Gebruikt insuline; let op bij massage van de buik ' + Date.now().toString(36);
+  const deel = await api('care/intake/deel', { aanbiederId: spa.id, medisch: GEHEIM }, lid);
+  assert.equal(deel.status, 200);
+  const morgen2 = new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10);
+  const boek = await api('care/boek', { aanbiederId: spa.id, behandelingId: beh.id, datum: morgen2, tijd: beh.tijden[0] }, lid);
+  assert.equal(boek.status, 200);
+  assert.equal((await api('care/betaal', { ref: boek.body.boeking.ref }, lid)).status, 200);
+  const agenda = async () => {
+    const sup = (await api('supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+    const ag = await api('supplier/care/agenda', { datum: morgen2 }, sup);
+    return (ag.body.afspraken || []).find(x => x.ref === boek.body.boeking.ref) || {};
+  };
+  assert.equal((await agenda()).intake, GEHEIM, 'voor het stoppen ziet de behandelaar de intake');
+  const stop = await api('care/intake/stop', { id: deel.body.intake.id }, lid);
+  assert.equal(stop.status, 200);
+  assert.equal((await agenda()).intake, null, 'na het stoppen ziet de behandelaar de intake nog bij de afspraak');
+});

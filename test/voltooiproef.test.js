@@ -71,8 +71,14 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
     for (const b of BEWIJZEN.concat(AFGELEID)) {
       assert.equal(c[b] && c[b].soort, 'voltooiproef', sc.functie + ': ' + b + ' komt niet uit de voltooiproef');
       assert.equal(c[b].instrument, sc.bestand);
-      const raak = B.gedeeld(B.proefRoutes(sc.bestand), B.ingangRoutes(sc.ingang));
-      assert.ok(raak.length >= 2, sc.functie + ': het scenario raakt ' + raak.length + ' routes van ' + sc.ingang);
+      /* Minstens twee routes van de ingang, of ALLE als het scherm er minder
+         heeft: een scherm met één route (het routedossier) kan geen tweede
+         leveren, en dan moet het scenario juist die ene raken. */
+      const ingang = B.ingangRoutes(sc.ingang);
+      const raak = B.gedeeld(B.proefRoutes(sc.bestand), ingang);
+      const aantal = ingang.exact.size + ingang.voor.size;
+      assert.ok(aantal >= 1, sc.functie + ': de ingang ' + sc.ingang + ' roept geen bekende route aan');
+      assert.ok(raak.length >= Math.min(2, aantal), sc.functie + ': het scenario raakt ' + raak.length + ' van de ' + aantal + ' routes van ' + sc.ingang);
     }
   }
   /* De versheid van het register ziet alleen wat het instrument letterlijk

@@ -236,6 +236,9 @@ const CONTRACT = {
   'link:vertegenwoordiging': Object.assign({
     belofte: 'een lid bepaalt zelf wie namens hem mag handelen, met een eigen grens, simulatie vooraf, spoor en intrekken per direct'
   }, voltooi('vertegenwoordiging', 'het scenario loopt /api/vertegenwoordiging/bevoegdheden, /mijn, /grens, /simulatie, /aanvaard en /intrek, de routes die /apps/vertegenwoordiging.html zelf aanroept, met de vertegenwoordiger via /voorstel en /handel en een derde lid dat er niet bij komt')),
+  'link:onderneming': Object.assign({
+    belofte: 'een ondernemer begint met een werktitel, kiest een rechtsvorm, werkt de oprichting af en schrijft zich in, en dat staat precies een keer op zijn naam'
+  }, voltooi('onderneming', 'het scenario loopt /api/onderneming/nieuw, /mijn, /rechtsvorm, /oprichting/zet, /intake, /verkenning, /plan/vastleggen, /ingeschreven, /kas/saldo en /dagbeeld, de routes die /apps/onderneming.html zelf aanroept, met een ander lid dat er niet bij komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

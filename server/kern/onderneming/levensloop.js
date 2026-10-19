@@ -22,6 +22,14 @@ module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernem
     if (!naam) return { status: 400, error: 'Hoe zou de onderneming heten? Een werktitel is genoeg.' };
     const rvIn = (body || {}).rechtsvorm;
     if (rvIn && !RV.isRechtsvorm(rvIn)) return { status: 400, error: 'Deze rechtsvorm kennen we niet.' };
+    /* DE HERHAALSLEUTEL STAAT OP DE ONDERNEMING ZELF. Het scherm stuurt per
+       poging een `idem`; komt die terug (een tweede tik, of opnieuw na een
+       afgebroken verbinding of een herstart), dan is het dezelfde onderneming.
+       Zonder deze sleutel stond er na een stroomstoring en een herhaling een
+       tweede onderneming met dezelfde naam (scripts/lib/voltooi/onderneming.js). */
+    const idem = scho((body || {}).idem, 80) || null;
+    const eerder = idem && bak().find(x => x.eigenaar === eigenaar && x.idem === idem);
+    if (eerder) return { ok: true, herhaald: true, onderneming: ondernemingBeeld(eerder) };
     const o = {
       id: 'ond_' + crypto.randomBytes(6).toString('hex'),
       eigenaar, naam,
@@ -29,6 +37,7 @@ module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernem
       supplierCode: null, kvk: null, plan: null,
       gestart: nu()
     };
+    if (idem) o.idem = idem;
     bak().push(o);
     save();
     return { ok: true, onderneming: ondernemingBeeld(o) };

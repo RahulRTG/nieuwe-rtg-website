@@ -65,8 +65,12 @@ test('3. de bodem wordt per ID aangehouden, NIET per categorie (de snede die de 
     'Eigen apps staat UIT, ook al zit experience-platform in trede 0');
   assert.ok(!afl.uitCats.includes('Geld'), 'de eigen categorie staat niet uit');
 
-  assert.ok(afl.aanIds.has('supplier-salon'), 'het bodem-id zelf blijft wel aan');
-  assert.ok(afl.aanIds.has('experience-platform'), 'en dit bodem-id ook');
+  assert.ok(afl.aanIds.has('experience-platform'), 'een echt platform-bodem-id (trede 0, geen lanceervloer) blijft aan');
+  /* De LANCEERVLOER (salon, supplier-salon) is GEEN platform: De Salon is een
+     app en gaat uit tenzij ze zelf getest wordt. Zij staat wel in trede 0, dus
+     dit toetst dat de proef de lanceervloer eruit snijdt. */
+  assert.ok(!afl.aanIds.has('salon'), 'De Salon is een app, geen platform: niet auto-aan');
+  assert.ok(!afl.aanIds.has('supplier-salon'), 'de partnerkant van De Salon ook niet');
   const partnerIds = FUNCTIES.filter((f) => f.categorie === 'Partners (leveranciers)').map((f) => f.id);
   const nietBodem = partnerIds.filter((id) => !new Set(FASES[0].aan).has(id));
   assert.ok(nietBodem.length >= 1, 'Partners heeft functies BUITEN trede 0 (anders meet deze toets niets)');
@@ -106,6 +110,33 @@ test('6. het oordeel loopt niet door elkaar: AFGEBROKEN gaat voor, een open stap
     'valt de opbouw om, dan is er niets gemeten -- dat is geen LOS');
   assert.equal(P.oordeel({ afgebroken: 'kapot', open: [{ nr: 1 }] }), 'AFGEBROKEN',
     'afgebroken gaat voor een open stap');
+});
+
+test('8. de platformlaag blijft AAN, maar is niet "alles": Toegang heel aan, RTG-Backoffice niet', () => {
+  /* Aanscherping eigenaar 19 oktober 2026: LOS is geen kunstmatige isolatie.
+     Identiteit/sessie (Toegang en identiteit) is platform en blijft heel aan.
+     Maar RTG-Backoffice is GEMENGD -- command-* is control-plane, `office` is de
+     backoffice-APP -- dus die categorie mag NIET als platform heel aanstaan,
+     anders is de Office-app triviaal LOS. */
+  const walletAfl = P.losAfleiding({ scenarioBron: "x('/api/wallet');", ruggengraatBron: '' });
+  assert.ok(!walletAfl.uitCats.includes('Toegang en identiteit'), 'identiteit/sessie is platform en blijft aan');
+  assert.ok(walletAfl.aanCats.includes('Toegang en identiteit'));
+  assert.ok(walletAfl.uitCats.includes('RTG-Backoffice'),
+    'de backoffice-app staat uit als een ANDERE app getest wordt (geen gratis platform-status)');
+  assert.ok(walletAfl.uitCats.includes('Geld') === false || walletAfl.primair === 'Geld',
+    'de geld-APP is app-domein, niet platform');
+  /* De platformlijst is bewust kort: precies een categorie (Toegang), de rest
+     per id of ongated infra. Een categorie erbij is een besluit, geen reflex. */
+  assert.deepEqual(P.PLATFORM_CATS, ['Toegang en identiteit']);
+});
+
+test('9. tegen de eigen app staat de eigen categorie aan, ook als die normaal uit zou staan', () => {
+  /* Office: primair RTG-Backoffice. Dan hoort RTG-Backoffice AAN (eigen
+     categorie), niet uit. Zo meet de proef de app en niet een lege kamer. */
+  const officeAfl = P.losAfleiding({ scenarioBron: "a('/api/office/kantoorpakket/maak'); b('/api/office/kantoorpakket/open');", ruggengraatBron: '' });
+  assert.equal(officeAfl.primair, 'RTG-Backoffice');
+  assert.ok(officeAfl.aanCats.includes('RTG-Backoffice'));
+  assert.ok(!officeAfl.uitCats.includes('RTG-Backoffice'));
 });
 
 test('7. de kern noemt vijf bestaande scenario-bestanden, en trede 0 bestaat', () => {

@@ -96,20 +96,66 @@ function primaireCategorie(routes) {
   return beste ? categorieVan(beste) : null;
 }
 
+/* DE PLATFORMVOORZIENINGEN die AAN blijven, los van welke app getest wordt
+   (aanscherping eigenaar 19 oktober 2026: LOS is geen kunstmatige isolatie).
+   Afgeleid uit de bron, niet uit gevoel:
+
+   - PLATFORM_CATS: hele categorieen die het platform ZIJN. Alleen "Toegang en
+     identiteit" (tg-*: inloggen, account, sso, pin, rechten/zegel, link,
+     gegevenspoort, aanmelden) -- identiteit en sessie, de deur die in ELKE
+     trede open staat (server/functies/register/fasetreden.js:65-95,
+     FASE_VOORDEUR). Geen enkele andere categorie is HEEL platform: RTG-Backoffice
+     is gemengd (command-* is control-plane, maar `office`/`office-school` zijn de
+     backoffice-APP), en de boardroom-schakelaar zelf (/api/techniek, /api/boardroom)
+     staat ongated buiten het register (server/kern/bestuursroutes.js), dus die
+     hoeft hier niet aangehouden te worden -- hem uitzetten kan niet.
+   - De rest van het platform zit al in BODEM (trede 0, FASES[0].aan =
+     FASE_VOORDEUR + de lanceervloer salon/supplier-salon) en in de ruggengraat,
+     beide per FUNCTIE-ID: member + kern-* (de ledenschil/sessie),
+     verificatie/paspoort/webauthn (beveiliging en bezitsbewijs),
+     experience-platform (de app-draagschil), ov-mail-binnen (de mailpoort die
+     member nodig heeft).
+   - De betaalWAARHEID (betaalstop/geldwegen/kern-geldketen) en de
+     bewijs-/logvoorziening (auditspoor/inzagespoor) staan ongated buiten het
+     register en gaan dus nooit uit -- niets te schakelen, altijd aan. De geld-APP
+     (`dom-*`, categorie Geld) is wEl app-domein en gaat uit tenzij de app onder
+     test die zelf is. */
+const PLATFORM_CATS = ['Toegang en identiteit'];
+
+/* DE LANCEERVLOER IS GEEN PLATFORM. Trede 0 (FASES[0].aan) is de voordeur PLUS
+   de eerste lanceerbare app-snede: `salon` (De Salon) en `supplier-salon` (de
+   partnerkant daarvan). FASE_START noemt dat zelf "de voordeur plus De Salon"
+   (fasetreden.js:97-98) -- De Salon is een sociale APP, geen
+   platformvoorziening in de zin van de eigenaar (identiteit/beveiliging/
+   betaalwaarheid/bewijs). Voor modus LOS hoort De Salon dus UIT, tenzij de app
+   onder test De Salon zelf is. Dat is ook precies wat de eigenaar bij Berichten
+   vraagt: "zonder Salon als actieve interface". De voordeur blijft wel staan. */
+const LANCEERVLOER = ['salon', 'supplier-salon'];
+const PLATFORM_BODEM = new Set([...BODEM].filter((id) => !LANCEERVLOER.includes(id)));
+
 /* DE HELE AFLEIDING, PUUR. Uit de bron van het scenario en de bron van de
-   gedeelde wereldhelpers: wat aan blijft (primaire categorie, per-id-bodem),
-   wat uit gaat, en welke andere categorieen het scenario nog raakt (de
-   leun-kandidaten). Geen server, geen bestand -- test/losproef.test.js draait
-   hier recht op. */
+   gedeelde wereldhelpers: de drie groepen van de eigenaar -- EIGEN (de primaire
+   categorie), PLATFORM (blijft aan), en de OPTIONELE appkoppelingen die uit gaan
+   -- plus de leun-kandidaten (andere app-categorieen die het scenario nog
+   raakt). Geen server, geen bestand -- test/losproef.test.js draait hier recht
+   op. */
 function losAfleiding({ scenarioBron, ruggengraatBron }) {
   const scRoutes = routesUit(scenarioBron);
   const primair = primaireCategorie(scRoutes);
   const ruggengraat = idsVanRoutes(routesUit(ruggengraatBron || ''));
-  const aanIds = new Set([...BODEM, ...ruggengraat]);
-  const aanCats = new Set(); if (primair) aanCats.add(primair);
+  const aanIds = new Set([...PLATFORM_BODEM, ...ruggengraat]);
+  const aanCats = new Set(PLATFORM_CATS); if (primair) aanCats.add(primair);
   const uitCats = ALLE_CATS.filter((c) => !aanCats.has(c));
-  const andereCats = [...new Set(scRoutes.map(catVanRoute).filter((c) => c && c !== primair))];
-  return { primair, aanIds, uitCats, andereCats, scRoutes };
+  /* De leun-kandidaten: categorieen die het scenario raakt maar die nu uit
+     staan (dus niet de eigen categorie en niet het platform). */
+  const andereCats = [...new Set(scRoutes.map(catVanRoute).filter((c) => c && !aanCats.has(c)))];
+  const groepen = {
+    eigen: primair || '(volledig op de bodem)',
+    platform: [...new Set([...PLATFORM_CATS, 'bodem-ids (trede 0 + ruggengraat, per id)',
+      'ongated infra: betaalwaarheid + bewijs/log (buiten het register)'])],
+    optioneelUit: uitCats
+  };
+  return { primair, aanIds, aanCats: [...aanCats], uitCats, andereCats, groepen, scRoutes };
 }
 
 /* Het oordeel over een gedraaid scenario, puur uit zijn boek. */
@@ -119,7 +165,7 @@ function oordeel({ afgebroken, open }) {
 }
 
 module.exports = {
-  KERN, BODEM, ALLE_CATS, WORTEL,
+  KERN, BODEM, ALLE_CATS, WORTEL, PLATFORM_CATS, LANCEERVLOER, PLATFORM_BODEM,
   categorieVan, idVanRoute, catVanRoute, routesUit, idsVanRoutes, primaireCategorie,
   losAfleiding, oordeel,
   /* De tredeproef en de oude losrunner lazen losSet([]) voor de kale bodem. */

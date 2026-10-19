@@ -33,7 +33,7 @@ async function meetApp(app, sc, ctx) {
   const { fs, WORTEL } = ctx;
   const scenarioBron = fs.readFileSync(path.join(WORTEL, 'scripts', 'lib', 'voltooi', app + '.js'), 'utf8');
   const ruggengraatBron = fs.readFileSync(path.join(WORTEL, 'scripts', 'lib', 'voltooiwereld.js'), 'utf8');
-  const { primair, aanIds, uitCats, andereCats } = P.losAfleiding({ scenarioBron, ruggengraatBron });
+  const { primair, aanIds, uitCats, andereCats, groepen } = P.losAfleiding({ scenarioBron, ruggengraatBron });
 
   const w = await maakWereld('los-' + app, Object.assign({}, KANTOORWERELD, sc.omgeving));
   const boek = [];
@@ -58,7 +58,7 @@ async function meetApp(app, sc, ctx) {
   w.klaar();
 
   const open = boek.filter((s) => s.stand !== 'gesloten');
-  return { app, ingang: sc.ingang, primair, andereCats, verdict: P.oordeel({ afgebroken, open }),
+  return { app, ingang: sc.ingang, primair, andereCats, groepen, verdict: P.oordeel({ afgebroken, open }),
     afgebroken, open, stappen: boek.length, boek };
 }
 

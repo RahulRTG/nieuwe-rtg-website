@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19547 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19548 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2824 |
-| losse beweringen (`test(...)`) | 19547 |
+| losse beweringen (`test(...)`) | 19548 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2486 bestanden, 18975 beweringen.
+2486 bestanden, 18976 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -305,7 +305,7 @@ toets omvalt.
 | `bewijstoken.test.js` | 13 | gezakt op `&&->||#0` | HET BEWIJSTOKEN -- een bevoegdheid die je kunt meedragen. WAT ER OP HET SPEL STAAT. |
 | `bewijsveld.test.js` | 4 | geen bronmutatie mogelijk | LAT.md REGEL 14 -- een bewijsveld draagt een bewijsrelatie. De regel bijt waar een veldnaam binnen dezelfde bewijsvraag twee verschillende RELATIES draagt. |
 | `bezitsbewijs-afgedwongen.test.js` | 4 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `bezitsbewijs-takken.test.js` | 12 | gezakt op `voorwaarde-omkeren#0` | HET BEZITSBEWIJS TAK VOOR TAK (server/kern/identiteit/bezitsbewijs.js). Aanvulling op test/bezitsbewijs.test.js. |
+| `bezitsbewijs-takken.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | HET BEZITSBEWIJS TAK VOOR TAK (server/kern/identiteit/bezitsbewijs.js). Aanvulling op test/bezitsbewijs.test.js. |
 | `bezitsbewijs-weerbaar.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | HET BEZITSBEWIJS ONDER AANVAL (server/kern/identiteit/bezitsbewijs.js). Wat deze module beschermt: een sessietoken is een dragersbewijs, en op de zware paden (geld, passkeys, privacy-export, sessies sluiten) moet de... |
 | `bezitsbewijs.test.js` | 21 | gezakt op `true->false#0` | MIJN RTG blok 4 -- het bezitsbewijs. DE BEWERING DIE ERTOE DOET staat in toets 1: een sessietoken is een DRAGERSBEWIJS. |
 | `bezorg.test.js` | 5 | gezakt op `liegpoort /api/` | De ophaal/bezorgdienst, van assortiment tot bezorgd: de zaak zet producten en de dienst aan; het lid bestelt (ophalen of bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op eigen naam, deelt GPS... |

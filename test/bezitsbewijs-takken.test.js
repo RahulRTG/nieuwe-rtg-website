@@ -17,14 +17,14 @@ const { maakBezitsbewijs, zwaarPad, SPELING_MS } = require('../server/kern/ident
 const TOESTEL = 'c'.repeat(32);
 const PAD = '/api/pay/tik';
 
-async function opzet({ toestellen } = {}) {
+async function opzet({ toestellen, opslag } = {}) {
   const kp = await webcrypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
   const jwk = await webcrypto.subtle.exportKey('jwk', kp.publicKey);
   const pub = { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y };
-  const db = { data: {} };
+  const db = opslag ? opslag.db : { data: {} };
   let saves = 0;
   const t = toestellen || { publiekeSleutelVan: (lid, id) => (lid === 'user-1' && id === TOESTEL ? pub : null) };
-  const b = maakBezitsbewijs({ db, save() { saves++; }, toestellen: t });
+  const b = maakBezitsbewijs({ db, save(keys) { saves++; if (opslag) return opslag.save(keys); }, toestellen: t });
   const kopVan = (lading) => Buffer.from(JSON.stringify(lading)).toString('base64url');
   const teken = async (lading) => {
     const kop = kopVan(lading);
@@ -173,6 +173,31 @@ test('herhaling: een bewijs werkt een keer; verlopen merken worden opgeruimd', a
   assert.equal(weer.stand, 'geweigerd');
   assert.match(weer.reden, /al gebruikt/);
   assert.equal(saves(), 1, 'een herhaling schrijft niets');
+});
+
+test('bezitsbewijs bewaart replay en opruiming in SQLite zonder vreemde collecties te lezen', async t => {
+  const p = require('./lib/audit-rijen-fixture')(t, {
+    bezitsbewijzen: { verlopenmerk00001: Date.now() - 1000, geldigmerk0000001: Date.now() + 60000 }
+  });
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', {
+    value() { scans++; return { waarde: this.waarde }; }, configurable: true
+  });
+  const { b, teken } = await opzet({ opslag: p });
+  const payload = lading(), kop = await teken(payload);
+  const vraag = { sess: gebonden, methode: 'POST', pad: PAD, kop, stand: 'verplicht' };
+  assert.equal((await b.controleer(vraag)).stand, 'bewezen');
+  const vast = p.lees('bezitsbewijzen');
+  assert.ok(vast[payload.jti], 'het gebruikte bewijs moet echt in SQLite staan');
+  assert.equal(vast.verlopenmerk00001, undefined);
+  assert.ok(vast.geldigmerk0000001, 'andere geldige bewijzen blijven behouden');
+  assert.equal(scans, 0, 'de replayregistratie serialiseert geen ander domein');
+  // Een nieuwe verifier leest de opgeslagen registratie, niet een eigen replaycache.
+  p.db.data.bezitsbewijzen = vast;
+  const hersteld = await opzet({ opslag: p });
+  const opnieuw = await hersteld.teken(payload);
+  assert.equal((await hersteld.b.controleer({ ...vraag, kop: opnieuw })).stand, 'geweigerd');
+  assert.equal(scans, 0);
 });
 
 test('de meter telt per pad en per stand', async () => {

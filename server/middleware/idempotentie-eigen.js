@@ -49,7 +49,9 @@ const EIGEN = [
   // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
   '/api/geld/pot/reserveer',
   // een chatbericht van Vonk draagt zijn eigen sleutel (kern/connection-communication.js)
-  '/api/vonk/bericht'
+  '/api/vonk/bericht',
+  // een chatbericht van Rendezvous draagt dezelfde sleutel (kern/connection-communication.js)
+  '/api/connection/rendezvous/text'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

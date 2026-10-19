@@ -90,6 +90,37 @@ async function loop(w, stap) {
       ziet: 'like ' + r.status + ' match=' + (r.data && r.data.match) + ', A ' + mA.length + ' / B ' + mB.length + ', voorstel ' + (mA[0] && mA[0].voorstel) };
   });
 
+  /* DE CHAT VAN DE MATCH (/api/connection/rendezvous/*, public/shared/connection-communication.js,
+     door rendezvous.html op elke match gezet). Een bericht met een sleutel per opgesteld
+     bericht staat er een keer: bij een dubbele tik, een afgebroken verbinding en een crash. */
+  const TEKST = '/api/connection/rendezvous/text';
+  const STATUS = '/api/connection/rendezvous/status';
+  /* Elk lid adresseert het gesprek met de id van ZIJN match. */
+  const matchId = (met(await matches(A.token), codeB)[0] || {}).id;
+  const matchIdB = (met(await matches(B.token), codeA)[0] || {}).id;
+  const berichten = async (tok, tekst) => (((await w.post(STATUS, { id: matchIdB }, tok)).data || {}).messages || []).filter((m) => m.text === tekst);
+  await stap('voltooibaar', 'A schrijft B in de chat van de match; B leest het, een derde lid opent het gesprek niet', async () => {
+    const r = await w.post(TEKST, { id: matchId, text: 'Koffie in Alfama? ' + merk, idem: 'voltooi-rv-chat-' + merk }, A.token);
+    const bijB = await berichten(B.token, 'Koffie in Alfama? ' + merk);
+    const c = await w.post(STATUS, { id: matchId }, C.token);
+    return { klopt: r.status === 200 && bijB.length === 1 && c.status === 404, ziet: 'sturen ' + r.status + ', B leest ' + bijB.length + ', C opent ' + c.status };
+  });
+  await stap('herstelbaar', 'chat: een dubbele tik en daarna een afgebroken verzoek met dezelfde sleutel geven een bericht', async () => {
+    const lijf = { id: matchId, text: 'Dubbel ' + merk, idem: 'voltooi-rv-dubbel-' + merk };
+    const [x, y] = await w.dubbel(TEKST, lijf, A.token);
+    const half = await w.afgebroken(TEKST, lijf, A.token);
+    const n = (await berichten(B.token, 'Dubbel ' + merk)).length;
+    return { klopt: x.status === 200 && y.status === 200 && n === 1, ziet: 'tikken ' + x.status + '/' + y.status + ', afgebroken ' + (half.afgebroken ? 'gaf op' : half.status) + ', ' + n + ' bericht' };
+  });
+  await stap('herstelbaar', 'chat: een crash direct na het sturen, daarna dezelfde tik: het bericht staat er een keer', async () => {
+    const lijf = { id: matchId, text: 'Crash ' + merk, idem: 'voltooi-rv-crash-' + merk };
+    const r = await w.post(TEKST, lijf, A.token);
+    await w.crash();
+    const opnieuw = await w.post(TEKST, lijf, A.token);
+    const n = (await berichten(B.token, 'Crash ' + merk)).length;
+    return { klopt: r.status === 200 && opnieuw.status === 200 && n === 1, ziet: 'sturen ' + r.status + ', na SIGKILL ' + opnieuw.status + ', ' + n + ' bericht' };
+  });
+
   await stap('voltooibaar', 'A slaat C over: C verdwijnt uit de kandidaten van A', async () => {
     const r = await w.post(PAS, { id: keyC }, A.token);
     const l = await kandidaten(A.token);

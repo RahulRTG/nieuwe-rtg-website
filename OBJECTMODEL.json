@@ -3,15 +3,15 @@
   "vastgelegd": "2026-10-19",
   "gemeten": {
     "bestanden": 2976,
-    "vormen": 1620,
+    "vormen": 1619,
     "velden": 2319,
     "modules": 908,
     "domeinen": 324,
     "envelopDrempel": 20,
     "envelop": 29,
     "veldenDomeineigen": 1624,
-    "veldenGedeeldVanafVier": 238,
-    "gelijkendeVormparen": 65
+    "veldenGedeeldVanafVier": 237,
+    "gelijkendeVormparen": 64
   },
   "envelop": [
     "aantal",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2842 bestanden en 19598 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2843 bestanden en 19600 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2842 |
-| losse beweringen (`test(...)`) | 19598 |
+| toetsbestanden | 2843 |
+| losse beweringen (`test(...)`) | 19600 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 4 |
-| niets van beide | 23 |
+| niets van beide | 24 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2503 bestanden, 19025 beweringen.
+2504 bestanden, 19027 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -454,6 +454,7 @@ toets omvalt.
 | `connection-product-state.test.js` | 13 | gezakt op `liegpoort /api/` | RONDE 3: PRODUCT STATE & EDGE CONTRACT Deze toetsen bewijzen dat producttoestand, capabilities, Edge-projecties en transities uitsluitend door de server worden bepaald. Ze beproeven vooral wat niet mag ontstaan:... |
 | `connection-profile-media.test.js` | 8 | gezakt op `liegpoort /api/` | RONDE 6 -- veilige Profile Media. De toets loopt via de echte Vonk-routes: concept -> publicatie -> projection -> tijdelijke levering -> intrekken en blokkeren. |
 | `connection-projection.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `connection-tekst-herhaalsleutel.test.js` | 2 | -- | EEN VONK-BERICHT MET EEN HERHAALSLEUTEL STAAT ER EEN KEER (19 oktober 2026). De voltooiproef van Vonk (scripts/lib/voltooi/vonk.js) zag een dubbele tik en een nieuwe poging na een afgebroken verbinding een... |
 | `connectwebhook-ingericht.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `consent-dekking.test.js` | 5 | geen bronmutatie mogelijk | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
 | `consent-doel-termijn.test.js` | 4 | geen bruikbare mutatie | ELK VENSTER ZEGT WAARVOOR HET BESTAAT EN WANNEER HET DICHTGAAT HDI.md par. 7 regel 6. |

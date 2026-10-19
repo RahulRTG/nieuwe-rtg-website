@@ -56,15 +56,11 @@ module.exports = ({ app, auth, officeAuth, db, save, rtfos, veilig, genootschapD
     veilig(res, () => koppel.met(req, 'ondernemer', codeVan(req), () => rtfos.ondernemers.portaal(codeVan(req)))));
 
   /* ROTEREN (eigenaarsbesluit 19 oktober 2026): een kantoormens op naam, door de
-     poort van de stad, geeft een nieuwe code. De oude gaat dicht voor iedereen,
-     en de koppeling die eraan hing vervalt (kern/rtfos/coderoteer.js). */
-  const roteer = (soort) => (req, res) => veilig(res, () => {
-    const b = req.body || {};
-    const oud = rtfos.codeRoteren.codeVan(soort, b.id);
-    const r = rtfos.codeRoteren.roteer(req, soort, b.id, b.reden);
-    if (r && r.ok) koppel.vervalt(soort, oud);
-    return r;
-  });
+     poort van de stad, geeft een nieuwe code; de wissel is atomair en daarna
+     vervalt de koppeling van de oude code (kern/rtfos/coderoteer.js, met
+     kern/codekoppel.js roteer()). */
+  const roteer = (soort) => (req, res) => veilig(res, () =>
+    rtfos.codeRoteren.roteer(req, soort, (req.body || {}).id, (req.body || {}).reden));
   app.post('/api/rtfos/partner/code/roteren', officeAuth, roteer('partner'));
   app.post('/api/rtfos/gemeente/code/roteren', officeAuth, roteer('gemeente'));
   app.post('/api/rtfos/ondernemer/code/roteren', officeAuth, roteer('ondernemer'));

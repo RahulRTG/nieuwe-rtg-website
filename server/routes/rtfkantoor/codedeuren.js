@@ -54,6 +54,9 @@ module.exports = (ctx) => {
      code koppelt dat account de eerste keer aan het dossier en is daarna een
      extra sleutel naast de sessie, nooit in plaats ervan (kern/codekoppel.js). */
   const koppel = require('../../kern/codekoppel')({ db, save });
+  /* koppel.met kan een belofte geven (de koppeling is een collectietransactie);
+     de kantoorverpakking van dit domein wacht niet, dus hier wel. */
+  const wacht = (res, werk) => Promise.resolve().then(werk).then(r => veilig(res, () => r), e => veilig(res, () => { throw e; }));
 
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfcode-ip|' + String(req.ip) });
@@ -61,18 +64,18 @@ module.exports = (ctx) => {
 
   // het clubportaal: de club zelf, op de eigen clubcode (alleen het eigen dossier)
   app.post('/api/rtf/club/portaal', auth, ipRem, codeRem, (req, res) =>
-    veilig(res, () => koppel.met(req, 'club', codeVan(req), () => rtfclubs.portaal(req.body.code))));
+    wacht(res, () => koppel.met(req, 'club', codeVan(req), () => rtfclubs.portaal(req.body.code))));
   app.post('/api/rtf/club/bericht', auth, ipRem, codeRem, (req, res) =>
-    veilig(res, () => koppel.met(req, 'club', codeVan(req), () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst))));
+    wacht(res, () => koppel.met(req, 'club', codeVan(req), () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst))));
 
   // het partnerportaal: op raadcode; de partner stemt namens zijn stad
   const metPartner = (req, res, werk) => {
     const p = stadsraad.vindCode(req.body.code);
     if (!p) return res.status(404).json({ error: 'Deze raadcode kennen we niet. Vraag het RTF-kantoor om de code.' });
-    veilig(res, () => koppel.met(req, 'raad', codeVan(req), () => werk(p)));
+    wacht(res, () => koppel.met(req, 'raad', codeVan(req), () => werk(p)));
   };
   app.post('/api/rtf/partner/raad', auth, ipRem, codeRem, (req, res) =>
-    veilig(res, () => koppel.met(req, 'raad', codeVan(req), () => stadsraad.portaal(req.body.code))));
+    wacht(res, () => koppel.met(req, 'raad', codeVan(req), () => stadsraad.portaal(req.body.code))));
   app.post('/api/rtf/partner/besluit-start', auth, ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, p.naam + ' (' + p.stad + ')', 'partner')));
   app.post('/api/rtf/partner/stem', auth, ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.stem(String(req.body.besluitId || ''), 'partner', p.naam + ' (' + p.stad + ')', req.body.voor === true)));
   app.post('/api/rtf/partner/besluit-sluit', auth, ipRem, codeRem, (req, res) => metPartner(req, res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
@@ -83,14 +86,10 @@ module.exports = (ctx) => {
      eraan hing vervalt. */
   const opNaam = (req, res, werk) => {
     if (!boardroomWie(req)) return res.status(403).json({ error: 'Een code roteren doet een mens op naam, niet de gedeelde kantoorcode. Log in met uw eigen RTG-account.' });
-    veilig(res, werk);
+    Promise.resolve().then(werk).then(r => veilig(res, () => r), e => veilig(res, () => { throw e; }));
   };
-  app.post('/api/rtfkantoor/club/code/roteren', officeAuth, (req, res) => opNaam(req, res, () => {
-    const id = String((req.body || {}).id || ''); const oud = rtfclubs.codeVan(id);
-    const r = rtfclubs.codeRoteer(id); if (r && r.ok) koppel.vervalt('club', oud); return r;
-  }));
-  app.post('/api/rtfkantoor/stadsraad/partner-code/roteren', officeAuth, (req, res) => opNaam(req, res, () => {
-    const id = String((req.body || {}).id || ''); const oud = stadsraad.partnerCodeVan(id);
-    const r = stadsraad.partnerCodeRoteer(id); if (r && r.ok) koppel.vervalt('raad', oud); return r;
-  }));
+  app.post('/api/rtfkantoor/club/code/roteren', officeAuth, (req, res) =>
+    opNaam(req, res, () => rtfclubs.codeRoteer(String((req.body || {}).id || ''))));
+  app.post('/api/rtfkantoor/stadsraad/partner-code/roteren', officeAuth, (req, res) =>
+    opNaam(req, res, () => stadsraad.partnerCodeRoteer(String((req.body || {}).id || ''))));
 };

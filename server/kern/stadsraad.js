@@ -50,15 +50,15 @@ module.exports = ({ db, save, crypto }) => {
     return { ok: true, partner: Object.assign({ code: p.code }, pubPartner(p)) };
   }
   /* Een nieuwe raadcode (eigenaarsbesluit 19 oktober 2026): de oude gaat dicht
-     voor iedereen, ook voor het account dat eraan hing. */
-  function partnerCodeRoteer(id) {
-    const p = R().partners.find(x => x.id === String(id || ''));
-    if (!p) return { status: 404, error: 'Deze partner staat niet in het register.' };
-    p.code = codeMaak();
-    save();
-    return { ok: true, code: p.code, melding: 'De vorige raadcode is direct gesloten. Geef deze nieuwe persoonlijk.' };
+     voor iedereen en de koppeling eraan vervalt, atomair in een
+     collectietransactie op 'stadsraad' (kern/codekoppel.js roteer()). */
+  const koppel = require('./codekoppel')({ db });
+  async function partnerCodeRoteer(id) {
+    const uit = await koppel.roteer({ collectie: 'stadsraad', soort: 'raad', nieuw: codeMaak,
+      vind: (bron) => ((bron && Array.isArray(bron.partners)) ? bron.partners : []).find(x => x.id === String(id || '')) || null });
+    return uit ? { ok: true, code: uit.code, melding: 'De vorige raadcode is direct gesloten. Geef deze nieuwe persoonlijk.' }
+      : { status: 404, error: 'Deze partner staat niet in het register.' };
   }
-  const partnerCodeVan = (id) => { const p = R().partners.find(x => x.id === String(id || '')); return p ? p.code : null; };
   function partnerStop(id) {
     const p = R().partners.find(x => x.id === String(id || ''));
     if (!p) return { status: 404, error: 'Deze partner staat niet in het register.' };
@@ -138,5 +138,5 @@ module.exports = ({ db, save, crypto }) => {
     return Object.assign(raad('partner'), { partner: pubPartner(p) });
   }
 
-  return { stadsraad: { partnerMaak, partnerStop, partnerCodeRoteer, partnerCodeVan, raad, portaal, vindCode, besluitStart, stem, besluitSluit, SOORTEN } };
+  return { stadsraad: { partnerMaak, partnerStop, partnerCodeRoteer, raad, portaal, vindCode, besluitStart, stem, besluitSluit, SOORTEN } };
 };

@@ -76,3 +76,21 @@ test('migratie: een partij van voor het besluit komt met haar oude sleutel binne
   const nieuw = await d.register.registreer('user-kantoor', inschrijving('Partij Nieuw'));
   assert.equal(d.partijVanOudeSleutel(nieuw.sleutel), null, 'een nieuwe partij heeft geen oude sleutel, alleen een koppelcode');
 });
+
+/* De koppelingen staan per partij in een hashketen (machinedekking, keuze (a)
+   van de integrator, 19 oktober 2026): wie er namens een partij handelde, en
+   sinds wanneer niet meer, is niet stil te herschrijven. */
+test('koppelen en losmaken staan in de bewijsketen van de partij', async () => {
+  const keten = require('../server/lib/keten');
+  const db = { data: {} };
+  const d = maakDemocratie({ db, save: () => {}, bijeen: async (fn) => fn(), inBundel: () => true, crypto,
+    codenaamVan: (k) => 'Codenaam-' + k, meldLid: (k, n) => n });
+  const r = await d.register.registreer('user-kantoor', inschrijving('Partij Keten'));
+  assert.equal((await d.partijKoppel(r.sleutel, 'user-9')).ok, true);
+  assert.equal((await d.register.ontkoppel('user-kantoor', { id: r.partij.id, codenaam: 'Codenaam-user-9' })).ok, true);
+  const p = db.data.democratiePartijen[r.partij.id];
+  assert.deepEqual(p.rolketen.map(x => x.wat), ['account-los', 'account-gekoppeld'], 'nieuwste eerst, allebei geketend');
+  assert.equal(keten.verifieer(p.rolketen).ok, true, 'de keten klopt');
+  p.rolketen[1].codenaam = 'Iemand Anders';
+  assert.equal(keten.verifieer(p.rolketen).ok, false, 'wie een koppeling achteraf herschrijft, breekt de keten');
+});

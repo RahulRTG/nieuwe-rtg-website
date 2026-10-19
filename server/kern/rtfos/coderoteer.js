@@ -12,37 +12,48 @@
    het dossier zelf beheert, met een auditregel. Een lid, een partner of de
    gedeelde kantoorcode roteert niets.
 
-   Deze codes staan als tekst op het dossier en niet in de codelevenscyclus;
-   roteren is dus een nieuwe code op dezelfde rij. De oude vindt daarna geen
-   dossier meer, en de routelaag laat de koppeling van de oude code vervallen. */
+   Deze codes staan als tekst op het dossier en niet in de codelevenscyclus.
+   Dit bestand beslist WIE mag en WAT er wisselt; de wissel zelf -- oude code
+   dicht, nieuwe erin, auditregel, en daarna de koppeling weg -- loopt atomair
+   in een collectietransactie op 'rtfos', de collectie die deze kern bezit
+   (kern/codekoppel.js roteer()). */
 'use strict';
 
-module.exports = (ctx, { partners, gemeente, ondernemers }) => {
-  const { code, audit, wie, poort, save } = ctx;
+module.exports = (ctx) => {
+  const { code, audit, wie, poort, S } = ctx;
 
   const SOORTEN = {
-    partner: { vind: partners.vind, prefix: 'RTFP', recht: ['partner.beoordelen'] },
-    gemeente: { vind: gemeente.vind, prefix: 'RTFG', recht: ['stad.beheren', 'municipal_reporting'] },
-    ondernemer: { vind: ondernemers.vind, prefix: 'RTFO', recht: ['stad.beheren', 'business_sponsorships'] }
+    partner: { lijst: 'partners', prefix: 'RTFP', recht: ['partner.beoordelen'] },
+    gemeente: { lijst: 'gemeenten', prefix: 'RTFG', recht: ['stad.beheren', 'municipal_reporting'] },
+    ondernemer: { lijst: 'ondernemers', prefix: 'RTFO', recht: ['stad.beheren', 'business_sponsorships'] }
   };
 
-  function roteer(req, soort, id, reden) {
+  /* Het plan: de poort op de huidige staat, en daarna alleen nog functies die
+     in de transactie op de GEKOPIEERDE collectie werken. */
+  function plan(req, soort, id, reden) {
     const s = SOORTEN[soort];
-    if (!s) return { status: 400, error: 'Onbekend soort dossier.' };
-    const rij = s.vind(id);
-    if (!rij) return { status: 404, error: 'Dit dossier staat niet in het register.' };
+    if (!s) return { fout: { status: 400, error: 'Onbekend soort dossier.' } };
+    const rij = (S()[s.lijst] || []).find(x => x.id === String(id || ''));
+    if (!rij) return { fout: { status: 404, error: 'Dit dossier staat niet in het register.' } };
     const w = wie(req);
     const g = poort(w, rij.stad, ...s.recht);
-    if (!g.ok) return g;
-    rij.code = code(s.prefix);
-    audit(w.key, soort + '.code-geroteerd', rij.naam, String(reden || 'nieuwe code; de vorige is gesloten').slice(0, 200));
-    save();
-    return { ok: true, code: rij.code,
-      melding: 'De vorige code is direct gesloten, ook voor het account dat eraan hing. Geef deze nieuwe code persoonlijk aan een medewerker.' };
+    if (!g.ok) return { fout: g };
+    return {
+      vind: (bron) => ((bron && bron[s.lijst]) || []).find(x => x.id === rij.id) || null,
+      nieuw: () => code(s.prefix),
+      naWissel: (r, bron) => audit(w.key, soort + '.code-geroteerd', r.naam,
+        String(reden || 'nieuwe code; de vorige is gesloten').slice(0, 200), bron)
+    };
   }
 
-  // de huidige code van een dossier, voor de routelaag die de oude koppeling laat vervallen
-  const codeVan = (soort, id) => { const s = SOORTEN[soort]; const r = s && s.vind(id); return r ? r.code : null; };
+  const koppel = require('../codekoppel')({ db: { data: {} } });
+  const MELDING = 'De vorige code is direct gesloten, ook voor het account dat eraan hing. Geef deze nieuwe code persoonlijk aan een medewerker.';
+  async function roteer(req, soort, id, reden) {
+    const p = plan(req, soort, id, reden);
+    if (p.fout) return p.fout;
+    const uit = await koppel.roteer(Object.assign({ collectie: 'rtfos', soort }, p));
+    return uit ? { ok: true, code: uit.code, melding: MELDING } : { status: 404, error: 'Dit dossier staat niet in het register.' };
+  }
 
-  return { roteer, codeVan };
+  return { plan, roteer };
 };

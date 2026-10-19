@@ -123,15 +123,17 @@ module.exports = ({ db, save, crypto }) => {
   }
 
   /* Een nieuwe clubcode (eigenaarsbesluit 19 oktober 2026): de oude gaat dicht
-     voor iedereen, ook voor het account dat eraan hing. Op naam: de route
-     laat de gedeelde kantoorcode niet roteren. */
-  function codeRoteer(id) {
-    const c = vind(id); if (!c) return { status: 404, error: 'Deze club staat niet in het register.' };
-    c.code = codeMaak(); save();
-    return { ok: true, code: c.code, melding: 'De vorige clubcode is direct gesloten. Geef deze nieuwe persoonlijk aan een medewerker van de club.' };
+     voor iedereen en de koppeling eraan vervalt, atomair in een
+     collectietransactie op 'rtfClubs' (kern/codekoppel.js roteer()). Op naam:
+     de route laat de gedeelde kantoorcode niet roteren. */
+  const koppel = require('./codekoppel')({ db });
+  async function codeRoteer(id) {
+    const uit = await koppel.roteer({ collectie: 'rtfClubs', soort: 'club', nieuw: codeMaak,
+      vind: (bron) => (Array.isArray(bron) ? bron : []).find(c => c.id === String(id || '')) || null });
+    return uit ? { ok: true, code: uit.code, melding: 'De vorige clubcode is direct gesloten. Geef deze nieuwe persoonlijk aan een medewerker van de club.' }
+      : { status: 404, error: 'Deze club staat niet in het register.' };
   }
-  const codeVan = (id) => { const c = vind(id); return c ? c.code : null; };
 
   return { rtfclubs: { overzicht, clubMaak, clubZet, teamZet, programmaMaak, programmaZet,
-    afspraakMaak, afspraakZet, berichtRtf, portaal, berichtClub, codeRoteer, codeVan, STATUS } };
+    afspraakMaak, afspraakZet, berichtRtf, portaal, berichtClub, codeRoteer, STATUS } };
 };

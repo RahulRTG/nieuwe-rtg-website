@@ -22,6 +22,17 @@
    willen zijn: de koppeling wordt NA het werk nog een keer gelezen, en wie dan
    niet de gekoppelde is, krijgt 404 in plaats van het dossier.
 
+   ATOMAIR (machinedekking, 19 oktober 2026). Elke schrijfactie hier loopt door
+   een collectietransactie (db/collectie-bewerken.js: in PostgreSQL en SQLite
+   een databaseslot, in het geheugen een kopie die pas na save() verschijnt):
+   de koppeling zelf (lezen, controleren en schrijven in een slot, dus twee
+   instances kunnen niet allebei de eerste zijn), het vervallen, en ROTEREN.
+   Een rotatie is drie stappen -- oude code dicht, nieuwe code erin, koppeling
+   weg -- en de eerste twee zijn EEN wissel op het dossier, in EEN transactie op
+   de collectie van dat dossier. Valt het daarna stil, dan werkt de nieuwe code
+   al volledig en opent de oude niets meer: de koppelregel van de oude code hangt
+   dan aan een code die nergens meer bij hoort. Een tussenstand bestaat niet.
+
    WAT DIT NIET IS: een vervanging van de code. Het portaal kijkt nog steeds
    zelf of de code bestaat, verlopen of ingetrokken is. Een nieuwe code
    (roteren) is een nieuwe koppeling; het kantoor roteert juist wanneer een
@@ -30,12 +41,17 @@
 'use strict';
 
 const crypto = require('crypto');
+const verraad = require('../lib/verraad');
 
 const ONBEKEND = 'Deze code kennen we niet. Vraag de stichting om de code.';
+const volg = (r, fn) => (r && typeof r.then === 'function' ? r.then(fn) : fn(r));
 
-module.exports = ({ db, save, nu }) => {
+module.exports = ({ db, save, nu, bewerkCollectie }) => {
   const tijd = () => (typeof nu === 'function' ? nu() : new Date().toISOString());
   const bak = () => (db.data.codekoppelingen = db.data.codekoppelingen || {});
+  const bewerk = () => bewerkCollectie || require('../db').bewerkCollectie;
+  /* Een schrijfactie op een collectie, heel of niet (zie de kop). */
+  const metTransactie = (collectie, werk) => bewerk()(collectie, werk);
   const sleutel = (soort, code) => crypto.createHash('sha256')
     .update('codekoppel|' + soort + '|' + String(code || '').trim().toUpperCase()).digest('hex').slice(0, 40);
   const wie = (req) => {
@@ -46,38 +62,58 @@ module.exports = ({ db, save, nu }) => {
 
   /* met(req, soort, code, werk): voer het portaalwerk uit voor dit account.
      Geeft het antwoord van het werk, of { status, error } als de code al aan
-     een ander account hangt. Geeft `werk` een belofte, dan geeft dit er ook
-     een; anders blijft het synchroon (de kantoorverpakking van rtfkantoor
-     wacht niet). */
+     een ander account hangt. Kan een belofte teruggeven (PostgreSQL); de
+     routes wachten erop. */
   function met(req, soort, code, werk) {
     const w = wie(req);
     if (!w.key) return { status: 401, error: 'Log in met je RTG-account; een gratis account is genoeg.', accountNodig: true };
     const k = sleutel(soort, code);
     if (vreemd(bak()[k], w)) return { status: 404, error: ONBEKEND };
-    const r = werk();
-    return r && typeof r.then === 'function' ? r.then(x => leg(k, soort, w, x)) : leg(k, soort, w, r);
+    return volg(werk(), r => leg(k, soort, w, r));
   }
+  // de koppeling vastleggen: lezen, controleren en schrijven in een slot
   function leg(k, soort, w, r) {
     if (!r || r.error) return r;
-    const rij = bak()[k];
-    if (vreemd(rij, w)) return { status: 404, error: ONBEKEND };
-    const nu_ = tijd();
-    bak()[k] = Object.assign(rij || { soort, key: w.key, codenaam: w.codenaam, sinds: nu_, aantal: 0 },
-      { laatst: nu_, aantal: ((rij && rij.aantal) || 0) + 1 });
-    if (typeof save === 'function') save();
-    return r;
+    return volg(metTransactie('codekoppelingen', bron => {
+      const rij = bron[k];
+      if (vreemd(rij, w)) return false;
+      const nu_ = tijd();
+      bron[k] = Object.assign(rij || { soort, key: w.key, codenaam: w.codenaam, sinds: nu_, aantal: 0 },
+        { laatst: nu_, aantal: ((rij && rij.aantal) || 0) + 1 });
+      return true;
+    }), ok => (ok ? r : { status: 404, error: ONBEKEND }));
   }
 
-  /* Na roteren: de koppeling van de oude code vervalt. De oude code vindt in
-     het portaal al geen dossier meer; dit haalt ook de regel weg, zodat er
-     geen koppeling blijft staan aan iets dat niet meer bestaat. */
+  /* Na roteren: de koppeling van de oude code vervalt. */
   function vervalt(soort, code) {
     if (!code) return false;
     const k = sleutel(soort, code);
-    if (!bak()[k]) return false;
-    delete bak()[k];
-    if (typeof save === 'function') save();
-    return true;
+    return metTransactie('codekoppelingen', bron => {
+      if (!bron[k]) return false;
+      delete bron[k];
+      return true;
+    });
+  }
+
+  /* ROTEREN, voor elke code die als tekst op een dossier staat (partner,
+     gemeente, ondernemer, club, stadsraadpartner). `collectie` is de collectie
+     van het dossier, `vind(bron)` geeft de rij in die (gekopieerde) collectie,
+     `nieuw()` de nieuwe code, `naWissel(rij, bron)` mag in DEZELFDE transactie
+     iets vastleggen (een auditregel). Geeft { oud, code } of null. */
+  function roteer({ collectie, soort, vind, nieuw, naWissel }) {
+    return volg(metTransactie(collectie, bron => {
+      const rij = vind(bron);
+      if (!rij) return null;
+      const oud = rij.code;
+      rij.code = nieuw();                                    // stap 1 en 2: een wissel
+      if (verraad.sla('coderotatie-crasht-in-wissel')) throw new Error('verraad: coderotatie-crasht-in-wissel');
+      if (typeof naWissel === 'function') naWissel(rij, bron);
+      return { oud, code: rij.code };
+    }), uit => {
+      if (!uit) return null;
+      if (verraad.sla('coderotatie-crasht-na-wissel')) throw new Error('verraad: coderotatie-crasht-na-wissel');
+      return volg(vervalt(soort, uit.oud), () => uit);       // stap 3
+    });
   }
 
   // voor het kantoor en de toetsen: hangt deze code aan een account, en aan welke codenaam
@@ -86,5 +122,5 @@ module.exports = ({ db, save, nu }) => {
     return rij ? { soort: rij.soort, codenaam: rij.codenaam, sinds: rij.sinds, laatst: rij.laatst, aantal: rij.aantal } : null;
   }
 
-  return { met, vervalt, koppelingVan, ONBEKEND };
+  return { met, vervalt, roteer, koppelingVan, ONBEKEND };
 };

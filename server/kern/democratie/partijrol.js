@@ -36,6 +36,12 @@
 'use strict';
 
 const { schoon } = require('../util');
+/* De koppelingen staan per partij in een hashketen (`rolketen`, nieuwste eerst,
+   dezelfde server/lib/keten.js als het kwestiejournaal en de voorstellen): wie
+   er namens een partij handelt, en sinds wanneer niet meer, is achteraf niet
+   stil te herschrijven. `historie` blijft het leesbare logboek ernaast. */
+const keten = require('../../lib/keten');
+const ketenRegel = (p, regel) => keten.noteerIn(p.rolketen = Array.isArray(p.rolketen) ? p.rolketen : [], regel, 0);
 
 function maakPartijrol({ kijk, vind, vastleggen, nu, vanCode, trekIn, koppeling, wie }) {
   const actief = (p) => p && p.stand === 'actief';
@@ -54,6 +60,7 @@ function maakPartijrol({ kijk, vind, vastleggen, nu, vanCode, trekIn, koppeling,
       p.model = 'account';
       trekIn(p, 'partij', 'gekoppeld aan een account');
       p.historie.push({ wat: 'account-gekoppeld', codenaam, at: nu() });
+      ketenRegel(p, { at: nu(), wat: 'account-gekoppeld', codenaam });
     });
     return mis || { ok: true, partij: { id: p.id, aanduiding: p.aanduiding },
       let_op: 'Uw account handelt nu namens deze partij. De koppelcode werkt niet meer.' };
@@ -68,6 +75,7 @@ function maakPartijrol({ kijk, vind, vastleggen, nu, vanCode, trekIn, koppeling,
     const mis = await vastleggen(() => {
       p.rolhouders = p.rolhouders.filter(a => a !== was);
       p.historie.push({ wat: 'account-los', codenaam, door, reden: schoon(b.reden, 300) || null, at: nu() });
+      ketenRegel(p, { at: nu(), wat: 'account-los', codenaam, door });
     });
     return mis || { ok: true, gekoppeld: p.rolhouders.length };
   }

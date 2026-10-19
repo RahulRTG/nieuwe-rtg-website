@@ -126,6 +126,9 @@ const CONTRACT = {
   'link:wallet': Object.assign({
     belofte: 'een lid legt zijn kaarten in de wallet, koopt feestmunten die echt betaald worden en wisselt ze in, nooit onder nul -- een ander lid ziet of raakt er niets van, en een dubbele tik, een afgebroken verzoek of een crash laat hem nooit twee keer betalen'
   }, voltooi('wallet', 'het scenario loopt /api/wallet, /voeg, /weg, /munt/koop en /munt/wissel, de routes die /apps/geld.html#wallet (apps/geld/walletb.js) zelf aanroept, met een goedgekeurde identiteit, een gebonden toestel en de simulatiebank onder het bijladen')),
+  'link:bank': Object.assign({
+    belofte: 'zodra het kantoor de leden-bank live zet, geeft een lid akkoord, krijgt een rekening, stort geld van buiten, boekt over tussen eigen rekeningen en leest het afschrift; weigert of hangt de bank, dan hoort het lid wat er werkelijk gebeurde -- een ander lid kan er niet bij, en een dubbele tik, een afgebroken verzoek of een crash boekt nooit dubbel'
+  }, voltooi('bank', 'het scenario loopt /api/bank/overzicht, /akkoord, /rekening/open, /storten, /overboek en /afschrift, de routes die /apps/geld.html#bank (apps/geld/bankb.js en bankc.js) zelf aanroept, met de leden-bank live gezet langs /api/office/bank/leden, een gebonden toestel en de simulatiebank als rail')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'

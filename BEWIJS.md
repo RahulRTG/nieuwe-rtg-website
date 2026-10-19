@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19550 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2826 bestanden en 19553 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2825 |
-| losse beweringen (`test(...)`) | 19550 |
+| toetsbestanden | 2826 |
+| losse beweringen (`test(...)`) | 19553 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 9 |
+| niets van beide | 10 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2487 bestanden, 18978 beweringen.
+2488 bestanden, 18981 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -210,6 +210,7 @@ toets omvalt.
 | `bankhart.test.js` | 8 | gezakt op `liegpoort /api/` | Het financiele hart: de Regelwacht (belastingen en regels automatisch bij, streng gevalideerd, in place op de gedeelde landtabel), het verenigde hart-afschrift (RTG Bank + RTG Pay + de derde-partij-kaartnaad met een... |
 | `banknood-idem.test.js` | 4 | gezakt op `!==->===#0` | DEZELFDE MISLUKTE CLEARING TWEE KEER MELDEN MAG DE BANK NIET IN NOOD ZETTEN. `bankClearingMislukt()` is een teller, en bij NOOD_DREMPEL trekt hij automatisch de noodstop: de clearing valt dan terug op de kaart-rails. |
 | `bankpositie.test.js` | 5 | gezakt op `liegpoort /api/` | HET BANKSALDO VAN RTG -- server/kern/bankpositie.js (besluit C4), tegen een echte server, want dit zijn twee nieuwe routes. VIJF BEWERINGEN, en ze kunnen alle vijf zakken: 1. |
+| `bankstort-weigering.test.js` | 3 | -- | Een geweigerde storting is AF, niet onderweg (server/kern/bank/overboeken.js). Gevonden door de voltooiproef van de bank (scripts/lib/voltooi/bank.js): de simulatiebank weigerde een storting, en het lid kreeg "De... |
 | `bearercode-hmac.test.js` | 6 | gezakt op `===->!==#0` | HET HMAC-ZEGEL OP BEARERCODE V2 (server/kern/bearercode-zegel.js, de ring in bearercode-sleutelring.js, de migratie in bearercode-migratie.js). Besluit van de eigenaar, 14 oktober 2026: een kale hash beschermt niet... |
 | `bearercode-migratie-weerbaar.test.js` | 6 | gezakt op `===->!==#0` | DE MIGRATIE NAAR HET BEARERCODE-ZEGEL, WEERBAAR GEMAAKT VOOR DE UITROL (server/kern/bearercode-migratie.js en scripts/bearercode-herseal.js). Drie voorwaarden van de eigenaar voor productie: (1+3) geen onbedoelde... |
 | `bearercode-takken.test.js` | 21 | gezakt op `voorwaarde-omkeren#0` | TAKKEN VAN kern/bearercode.js DIE GEEN TOETS RAAKTE. test/bearercode.test.js legt v1 vast, test/bearercode-v2.test.js en test/bearercode-vernieuw.test.js de v2-werkwoorden. |

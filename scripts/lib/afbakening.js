@@ -72,12 +72,21 @@ function draagt(tekst, waarde) {
 }
 
 /* De merktekens van A in EEN antwoord: wat A hier terugkreeg, wat van A is
-   (vanA), wat de controle nooit zag, en wat niet in het verzoek stond. */
-function merktekens({ antwoordA, vanA, controle, lijf }) {
+   (vanA), wat de controle nooit zag, en wat niet in het verzoek stond.
+
+   `wie` is wie A IS -- codenaam en e-mail -- en die telt ook met een spatie
+   erin: een codenaam heet "Poolvos 18BB", en zonder deze uitzondering viel juist
+   het sterkste merkteken weg (gemeten: /api/metier/ik en /api/carriere/ledger/
+   mijn noemen A bij codenaam en kregen er geen enkel merkteken door). */
+function merktekens({ antwoordA, vanA, controle, lijf, wie }) {
   const lijfTekst = JSON.stringify(lijf || {});
+  const tekstA = JSON.stringify(antwoordA === undefined ? null : antwoordA);
   const uit = [];
+  for (const w of wie || []) {
+    if (typeof w === 'string' && w.length >= 6 && !controle.has(w) && draagt(tekstA, w) && !draagt(lijfTekst, w)) uit.push(w);
+  }
   for (const w of waarden(antwoordA)) {
-    if (!vanA.has(w) || controle.has(w)) continue;
+    if (!vanA.has(w) || controle.has(w) || uit.includes(w)) continue;
     if (draagt(lijfTekst, w)) continue;
     uit.push(w);
   }

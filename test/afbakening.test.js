@@ -42,3 +42,10 @@ test('B geweigerd: gescheiden, en de toesteldeur blijft onbereikbaar', () => {
   assert.equal(oordeelAfbakening({ a: { status: 200 }, b: { status: 404, tekst: '{}' }, merken }).staat, 'gescheiden');
   assert.equal(oordeelAfbakening({ a: { status: 200 }, b: { status: 403, tekst: '{"bezitsbewijs":"vereist"}' }, merken }).staat, 'onbereikbaar');
 });
+
+test('wie A is (codenaam met spatie) telt als merkteken; zonder in het antwoord niet', () => {
+  const m = merktekens({ antwoordA: { mens: 'Poolvos 18BB' }, vanA: new Set(), controle: new Set(), lijf: {}, wie: ['Poolvos 18BB', 'idor1@voorbeeld.test'] });
+  assert.deepEqual(m, ['Poolvos 18BB']);
+  assert.deepEqual(merktekens({ antwoordA: { mens: 'Poolvos 18BB' }, vanA: new Set(), controle: new Set(['Poolvos 18BB']), lijf: {}, wie: ['Poolvos 18BB'] }), [],
+    'wat de controle ook zag, telt niet');
+});

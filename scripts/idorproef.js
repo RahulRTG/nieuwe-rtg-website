@@ -37,6 +37,7 @@ const { maakPool } = require('./lib/objectpool');
 const { maakSessiewacht } = require('./lib/sessiewacht');
 const { oordeelIdor } = require('./lib/idor');
 const { waarden, merktekens, oordeelAfbakening } = require('./lib/afbakening');
+const opbouwLib = require('./lib/idoropbouw');
 const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
@@ -194,6 +195,7 @@ if (require.main !== module) { module.exports = {}; return; }
      jeugdpoort niets afsluit dat de proef aanziet voor een IDOR-weigering. */
   const geheugen = {};
   const identiteit = {};
+  const leden = {};
   let teller = 0;
   const maakLid = async (n) => {
     const email = 'idor' + n + '-' + Date.now() + '-' + (++teller) + '@voorbeeld.test';
@@ -211,7 +213,8 @@ if (require.main !== module) { module.exports = {}; return; }
     /* Wie dit lid IS, als merkteken voor de afbakening (gang 4): een codenaam of
        e-mail van A in B's antwoord is A's gegeven, wat de route ook is. */
     (identiteit[n] = identiteit[n] || new Set());
-    for (const w of [email, user && user.codename, user && user.email]) if (typeof w === 'string' && w.length >= 8) identiteit[n].add(w);
+    leden[n] = { email, codenaam: user && user.codename };
+    for (const w of [email, user && user.codename, user && user.email]) if (typeof w === 'string' && w.length >= 6) identiteit[n].add(w);
     try { await require('../test/helper').keurLidGoed(basis, tok, user && user.codename); toestelStand.gekeurd++; }
     catch (e) { toestelStand.mislukt.push('lid ' + n + ' niet gekeurd: ' + e.message); }
     return bind(n, tok);
@@ -224,6 +227,9 @@ if (require.main !== module) { module.exports = {}; return; }
      zelf niets bij A of B. */
   let C = await maakLid(3);
   if (!A || !B || !C) { console.error('kon geen drie leden registreren; A=' + !!A + ' B=' + !!B + ' C=' + !!C); klaar(); process.exit(2); }
+  /* De context van de opbouw (./lib/idoropbouw.js): de tegenpartij is C. */
+  const ctx = { tegen: leden[3] };
+  const basisLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), ctx);
 
   /* ---- DE SESSIE OVERLEEFT DE PROEF, want anders bewijst hij het tegendeel ----
 
@@ -299,7 +305,7 @@ if (require.main !== module) { module.exports = {}; return; }
      kan dus nooit een object van A zijn. */
   const controle = new Set();
   for (const r of routes) {
-    const u = await roep(r.pad, plausibelLijf(r.pad), 3, C);
+    const u = await roep(r.pad, basisLijf(r.pad), 3, C);
     if (u.data && typeof u.data === 'object') waarden(u.data, controle);
   }
   for (const w of identiteit[3] || []) controle.add(w);
@@ -310,8 +316,25 @@ if (require.main !== module) { module.exports = {}; return; }
   const pool = maakPool();
   const vanA = new Set();
   for (const r of routes) {
-    const u = await roep(r.pad, plausibelLijf(r.pad), 1, A);
+    const u = await roep(r.pad, basisLijf(r.pad), 1, A);
     if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { pool.leer(u.data, r.pad); waarden(u.data, vanA); }
+  }
+
+  /* GANG 1b: DE OPBOUW. A maakt langs de echte routes de objecten die de
+     oogstgang niet kon maken (een pot, een gesprek met C, een team). Wat
+     terugkomt leert de pool en de merktekens, net als elk ander antwoord. */
+  const opbouw = { stappen: 0, geslaagd: 0, mislukt: [] };
+  for (const st of opbouwLib.stappen(ctx)) {
+    opbouw.stappen++;
+    const lijf = typeof st.lijf === 'function' ? st.lijf(ctx) : (st.lijf || {});
+    const u = await roep(st.pad, lijf, 1, A);
+    if (u.status >= 200 && u.status < 300) {
+      opbouw.geslaagd++;
+      if (u.data && typeof u.data === 'object') {
+        pool.leer(u.data, st.pad); waarden(u.data, vanA);
+        if (typeof st.bewaar === 'function') { try { st.bewaar(u.data, ctx); } catch (e) {} }
+      }
+    } else opbouw.mislukt.push(st.pad + ' ' + u.status + ' ' + String(u.tekst || '').slice(0, 80));
   }
   const poolStand = pool.grootte();
   /* DE PROEF CONTROLEERT ZICHZELF, want dit is precies de fout die hij een
@@ -351,7 +374,7 @@ if (require.main !== module) { module.exports = {}; return; }
   const verzonnen = () => 'ZZ-' + Math.random().toString(36).slice(2, 10);
   for (const r of routes) {
     const sleutel = r.methode + ' ' + r.pad;
-    const { lijf, velden } = pool.verrijk(plausibelLijf(r.pad), r.pad);
+    const { lijf, velden } = pool.verrijk(basisLijf(r.pad), r.pad);
     if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
     const u = await roep(r.pad, lijf, 2, B);
     const o = oordeelIdor(u.status, u.tekst);
@@ -378,6 +401,25 @@ if (require.main !== module) { module.exports = {}; return; }
       telling.doorbraak++;
       continue;
     }
+    /* DE GEIJKTE 400. Een 400 voor B zegt op zichzelf niets: de validatie kan
+       eerder gestrand zijn. Maar stuurt A LETTERLIJK HETZELFDE lijf -- met zijn
+       eigen id's -- en komt A wel binnen, dan was het lijf geldig en is het
+       enige verschil wie het stuurt. Dan is B's weigering een scheiding. Een
+       antwoord voor B dat een merkteken van A draagt telt nooit als scheiding. */
+    if (o.staat === 'onbereikbaar' && (u.status === 400 || u.status === 422)) {
+      const ijk = await roep(r.pad, lijf, 1, A);
+      if (ijk.status >= 200 && ijk.status < 300) {
+        const merken = merktekens({ antwoordA: ijk.data, vanA, controle, lijf, wie: identiteit[1] });
+        const gezien = merken.filter((m) => String(u.tekst || '').includes(JSON.stringify(m).slice(1, -1)));
+        if (!gezien.length) {
+          telling.gescheiden++;
+          perRoute[sleutel] = { status: u.status, statusA: ijk.status, staat: 'gescheiden', velden,
+            reden: 'geijkt: A kwam met letterlijk hetzelfde lijf binnen (' + ijk.status + '), B kreeg ' + u.status +
+              ' -- het lijf was geldig, het enige verschil is wie het stuurt' };
+          continue;
+        }
+      }
+    }
     perRoute[sleutel] = { status: u.status, ...o, velden };
     telling[o.staat]++;
     if (o.lek) telling.lek++;
@@ -397,11 +439,10 @@ if (require.main !== module) { module.exports = {}; return; }
     const v = perRoute[sleutel];
     if (!v || v.staat !== 'onbereikbaar' || (v.velden && v.velden.length)) continue;
     afbakening.routes++;
-    const lijf = plausibelLijf(r.pad);
+    const lijf = basisLijf(r.pad);
     const a = await roep(r.pad, lijf, 1, A);
     if (a.status >= 200 && a.status < 300 && a.data && typeof a.data === 'object') waarden(a.data, vanA);
-    for (const w of identiteit[1] || []) vanA.add(w);
-    const merken = merktekens({ antwoordA: a.data, vanA, controle, lijf });
+    const merken = merktekens({ antwoordA: a.data, vanA, controle, lijf, wie: identiteit[1] });
     const b = merken.length && a.status >= 200 && a.status < 300 ? await roep(r.pad, lijf, 2, B) : { status: 0, tekst: '' };
     let o = oordeelAfbakening({ a, b, merken });
     if (o.staat === 'doorbraak' && NAGEKEKEN[sleutel]) {
@@ -573,7 +614,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar, afbakening, merktekens: { vanA: vanA.size, controle: controle.size } },
+      toestel: toestelStand, zwarePaden: zwaar, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute
@@ -587,6 +628,8 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  onbereikbaar (geen id/validatie): ' + telling.onbereikbaar);
   console.log('  weigering die een persoonsveld lekt: ' + telling.lek);
   console.log('  afbakening (gang 4, routes zonder id): ' + JSON.stringify(afbakening));
+  console.log('  opbouw (gang 1b): ' + opbouw.geslaagd + ' van ' + opbouw.stappen + ' stappen geslaagd' +
+    (opbouw.mislukt.length ? '; mislukt: ' + opbouw.mislukt.join(' | ') : ''));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');
   console.log('  toestel: ' + toestelStand.gebonden + ' bindingen, ' + toestelStand.gekeurd + ' gekeurd' +
     (toestelStand.mislukt.length ? ', MISLUKT: ' + toestelStand.mislukt.join('; ') : ''));

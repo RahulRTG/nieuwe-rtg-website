@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19553 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19554 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2825 |
-| losse beweringen (`test(...)`) | 19553 |
+| losse beweringen (`test(...)`) | 19554 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2487 bestanden, 18981 beweringen.
+2487 bestanden, 18982 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -80,7 +80,7 @@ toets omvalt.
 | `advocaat-lezer.test.js` | 4 | gezakt op `!==->===#0` | DE ADVOCATE ALS LEZER: EEN AFLOPENDE TOESTEMMING IS EEN TERMIJN HDI.md par. 7 regel 7. |
 | `adyen-config.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `adyen-eigen.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `afbakening.test.js` | 6 | -- | DE AFBAKENING, NAGETROKKEN: de vierde gang van de IDOR-proef. Een route zonder id telt pas als afgebakend als A iets van zichzelf terugkreeg en B met hetzelfde verzoek niets daarvan. |
+| `afbakening.test.js` | 7 | -- | DE AFBAKENING, NAGETROKKEN: de vierde gang van de IDOR-proef. Een route zonder id telt pas als afgebakend als A iets van zichzelf terugkreeg en B met hetzelfde verzoek niets daarvan. |
 | `afbouw-afloop-takken.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | DE AFLOOP VAN EEN AFBOUW, TAK VOOR TAK (scripts/lib/afbouw-afloop.js). test/afbouwafloop.test.js bewijst de twee sabotages met echte wezen. |
 | `afbouwafloop.test.js` | 8 | geen bronmutatie mogelijk | GEEN WERK ZONDER EIGENAAR, GEEN OPVOLGER ZOLANG WERK VAN DE VOORGANGER LEEFT. scripts/lib/afbouw-afloop.js legt vast wat er van een meetronde overblijft. |
 | `afbouwketen.test.js` | 2 | geen bronmutatie mogelijk | DE VOLLEDIGE LEVENSLOOP VAN EEN BRONMUTERENDE RONDE -- met echte processen. test/afbouwafloop.test.js beproeft de module op zichzelf. |

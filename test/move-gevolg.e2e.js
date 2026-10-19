@@ -84,22 +84,22 @@ test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets
       try { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_member_token', t); } catch (e) {}
     }, tok);
     await page.goto(base + SCHERM, { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.naad .uitloop button', { timeout: 20000 });
+    await page.waitForSelector('[data-naad] [data-uitloop] button', { timeout: 20000 });
 
-    const vraag = (await page.locator('.naad .uitloop label').first().textContent()).trim();
+    const vraag = (await page.locator('[data-naad] [data-uitloop] label').first().textContent()).trim();
     assert.match(vraag, /loopt .+ uit\?/i, 'de vraag noemt het onderdeel waar je vandaan komt: "' + vraag + '"');
 
     const gevolgVraag = page.waitForResponse(r => r.url().endsWith('/api/move/gevolg'));
-    await page.locator('.naad .uitloop select').first().selectOption('45');
-    await page.locator('.naad .uitloop button').first().click();
+    await page.locator('[data-naad] [data-uitloop] select').first().selectOption('45');
+    await page.locator('[data-naad] [data-uitloop] button').first().click();
     const antwoord = await gevolgVraag;
     assert.equal(antwoord.status(), 200, 'het scherm vraagt de echte route');
     const verstuurd = JSON.parse(antwoord.request().postData() || '{}');
     assert.equal(verstuurd.minuten, 45, 'de minuten komen uit de keuze van de reiziger');
 
-    await page.waitForSelector('.gevolg li', { timeout: 10000 });
-    const gevolg = page.locator('.gevolg').first();
-    const kop = (await gevolg.locator('.kop').textContent()).trim();
+    await page.waitForSelector('[data-gevolg] li', { timeout: 10000 });
+    const gevolg = page.locator('[data-gevolg]').first();
+    const kop = (await gevolg.locator('[data-kop]').textContent()).trim();
     assert.match(kop, /45 minuten uitloop raakt 1 overgang\./i, 'de kop telt wat de uitloop RAAKT, niet alle regels: "' + kop + '"');
     assert.match(kop, /1 overgang niet te bepalen/i, 'en zegt hardop wat Move niet kan wegen: "' + kop + '"');
     assert.equal(await gevolg.locator(':scope > ul > li').count(), 3, 'een regel per overgang na de verstoring');
@@ -127,10 +127,10 @@ test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets
        komt terug zodat de reiziger het opnieuw kan proberen. */
     /* Wachten tot de server echt weg is, niet een vaste 400 ms. */
     await stopNet(srv.child); gestopt = true;
-    await page.locator('.naad .uitloop button').first().click();
-    await page.waitForFunction(() => /niet gelukt/i.test((document.querySelector('.gevolg') || {}).textContent || ''),
+    await page.locator('[data-naad] [data-uitloop] button').first().click();
+    await page.waitForFunction(() => /niet gelukt/i.test((document.querySelector('[data-gevolg]') || {}).textContent || ''),
       null, { timeout: 10000 });
-    assert.equal(await page.locator('.naad .uitloop button').first().isEnabled(), true, 'de knop is weer te gebruiken');
+    assert.equal(await page.locator('[data-naad] [data-uitloop] button').first().isEnabled(), true, 'de knop is weer te gebruiken');
     assert.deepEqual(fouten.filter(f => !/Failed to fetch|ERR_CONNECTION|net::/i.test(f)), [],
       'geen paginafout buiten de weggevallen verbinding zelf');
     await ctx.close();

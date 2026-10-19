@@ -76,11 +76,11 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     browser = await pw.chromium.launch(browserOpties(pw));
     const { ctx, page, fouten } = await blad(browser, tok);
     await page.goto(base + SCHERM, { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.naad', { timeout: 20000 });
+    await page.waitForSelector('[data-naad]', { timeout: 20000 });
 
     const oordeel = (await page.locator('#oordeel').textContent()).trim();
     const dekking = (await page.locator('#mDekking').textContent()).trim();
-    const cijfers = (await page.locator('.naad .cijfers').first().textContent()).trim();
+    const cijfers = (await page.locator('[data-naad] [data-cijfers]').first().textContent()).trim();
     assert.match(oordeel, /betrouwbaar|lucht|lukken/i, 'het oordeel gaat over de overgang: "' + oordeel + '"');
     assert.match(dekking, /%/, 'de dekking staat erbij: "' + dekking + '"');
     assert.match(cijfers, /min/, 'de minuten staan erbij: "' + cijfers + '"');
@@ -89,8 +89,10 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     assert.match(label, /airport|luchthaven/i, 'de verderknop noemt de luchthaven: "' + label + '"');
     assert.doesNotMatch(label, /parijs|bourget/i, 'en niet de bestemming: "' + label + '"');
 
-    await require('./helper').edgeActies(page);
-    await page.locator('.rtg-adaptive-sheet #verder').click();
+    /* De verderknop is een handeling van het scherm (data-ds-actie): de Edge
+       biedt hem onder Acties aan, zoals een lid hem daar ook vindt. */
+    await page.locator('[data-ds-edge="acties"]').click();
+    await page.locator('#dsEdgeBlad button', { hasText: label }).click();
     await page.waitForURL(/navigatie\.html/, { timeout: 15000 });
     const naar = String(new URL(page.url()).searchParams.get('naar') || '').split(',').map(Number);
     assert.equal(naar.length, 2, 'Navigatie krijgt een plek mee: ' + page.url());

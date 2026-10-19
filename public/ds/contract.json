@@ -34,7 +34,9 @@
     "dialoog",
     "edge",
     "melding",
-    "toestel"
+    "toestel",
+    "rooster",
+    "sectie"
   ],
   "themabaar": [
     "--ds-grond",
@@ -132,6 +134,7 @@
   "bewijs": {
     "uitleg": "Per scherm op het Design System de browsertoets die in een echte browser bewijst dat er geen erfenisblad actief is, dat de ds-poort van de basis klopt en dat de kernhandeling slaagt.",
     "public/apps/hotels.html": "test/hotels-ds.e2e.js",
-    "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
+    "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js",
+    "public/apps/reizen.html": "test/reizen-ds.e2e.js"
   }
 }

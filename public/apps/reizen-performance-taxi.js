@@ -27,9 +27,9 @@
     var doel = $('#bestemmingSuggesties'); doel.textContent = '';
     if (!lijst.length) { doel.hidden = true; $('#naarVeld').setAttribute('aria-expanded', 'false'); return; }
     lijst.slice(0, 7).forEach(function (plek) {
-      var b = maak('button'); b.type = 'button'; b.setAttribute('role', 'option');
-      b.appendChild(maak('span', '', plek.naam || plek.label || 'Bestemming'));
-      b.appendChild(maak('small', '', plek.sub || [plek.genre, plek.stad].filter(Boolean).join(' · ')));
+      var b = maak('button', 'ds-keuze'); b.type = 'button'; b.setAttribute('role', 'option');
+      b.appendChild(maak('b', '', plek.naam || plek.label || 'Bestemming'));
+      b.appendChild(maak('span', 'ds-meta', plek.sub || [plek.genre, plek.stad].filter(Boolean).join(' · ')));
       b.addEventListener('click', function () { S.bestemming = plek; $('#naarVeld').value = plek.naam || plek.label;
         doel.hidden = true; $('#naarVeld').setAttribute('aria-expanded', 'false'); updateRouteIndicatie(); });
       doel.appendChild(b);
@@ -71,10 +71,10 @@
   R.toonLopendeRit = function (opdracht) {
     if (!opdracht) return;
     var vak = $('#lopendeRit'); vak.textContent = ''; vak.hidden = false;
-    vak.appendChild(maak('p', 'micro', 'LOPENDE RIT'));
-    vak.appendChild(maak('h3', '', (opdracht.van && opdracht.van.label ? opdracht.van.label : 'Vertrek') + ' → ' + (opdracht.naar && opdracht.naar.label ? opdracht.naar.label : 'Bestemming')));
-    vak.appendChild(maak('p', '', [opdracht.status, opdracht.ref, Number.isFinite(opdracht.prijs) ? R.eur(opdracht.prijs) : ''].filter(Boolean).join(' · ')));
-    if (opdracht.ref) { var a = maak('a', '', 'VOLG DEZE RIT →'); a.href = '/apps/rit.html?rit=' + encodeURIComponent(opdracht.ref); vak.appendChild(a); }
+    vak.appendChild(maak('p', 'ds-label', 'LOPENDE RIT'));
+    vak.appendChild(maak('h3', 'ds-kaart__titel', (opdracht.van && opdracht.van.label ? opdracht.van.label : 'Vertrek') + ' → ' + (opdracht.naar && opdracht.naar.label ? opdracht.naar.label : 'Bestemming')));
+    vak.appendChild(maak('p', 'ds-detail__status', [opdracht.status, opdracht.ref, Number.isFinite(opdracht.prijs) ? R.eur(opdracht.prijs) : ''].filter(Boolean).join(' · ')));
+    if (opdracht.ref) { var a = maak('a', 'ds-knop ds-knop--stil', 'VOLG DEZE RIT →'); a.href = '/apps/rit.html?rit=' + encodeURIComponent(opdracht.ref); vak.appendChild(a); }
   };
   R.laadLopendeRit = function () {
     if (!R.token) return Promise.resolve();

@@ -1,11 +1,11 @@
 (function (R) {
   'use strict';
   var $ = R.$, maak = R.maak;
-  var MAAND = ['JAN', 'FEB', 'MRT', 'APR', 'MEI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEC'];
 
   function datumDelen(iso) {
     var d = new Date(String(iso || '') + 'T12:00:00');
-    return isNaN(d.getTime()) ? { dag: '--', maand: '' } : { dag: String(d.getDate()).padStart(2, '0'), maand: MAAND[d.getMonth()] };
+    return isNaN(d.getTime()) ? { dag: '--', maand: '' } : { dag: String(d.getDate()).padStart(2, '0'),
+      maand: new Intl.DateTimeFormat(R.taal(), { month: 'short' }).format(d).toUpperCase() };
   }
   /* HET REISREGISTER HEEFT EEN EIGENAAR, EN DAT IS DIT BESTAND NIET.
      Hier stond renderRegister(): die vulde #komend met een PLATTE, chronologische
@@ -36,22 +36,18 @@
   function tekenMomenten(lijst) {
     var vak = $('#momenten'); if (!vak) return;
     vak.textContent = '';
-    var toe = maak('a', 'pion pion-toe');
-    toe.href = '#invoer';
-    toe.appendChild(maak('span', 'pionrond', '+'));
-    toe.appendChild(maak('small', '', 'Voeg toe'));
+    var toe = maak('a', 'ds-chip', '+ Voeg toe');
+    toe.href = '#worldTravelImport';
     vak.appendChild(toe);
     lijst.slice(0, 8).forEach(function (o) {
-      var a = maak('a', 'pion');
+      var a = maak('a', 'ds-chip');
       a.href = o.link || '#reizen';
-      var rond = maak('span', 'pionrond' + (o.sig === 'incident' ? ' let' : ''), TEKEN[o.soort] || '\u25C7');
-      a.appendChild(rond);
-      a.appendChild(maak('b', '', o.bestemming || o.titel || 'Onderdeel'));
+      if (o.sig) a.dataset.sig = o.sig;
       var d = datumDelen(o.van);
-      a.appendChild(maak('small', '', o.tijd || (d.dag + ' ' + d.maand).trim()));
+      a.textContent = (TEKEN[o.soort] || '\u25C7') + ' ' + (o.bestemming || o.titel || 'Onderdeel') + ' · ' + (o.tijd || (d.dag + ' ' + d.maand).trim());
       vak.appendChild(a);
     });
-    if (!lijst.length) vak.appendChild(maak('p', 'leegtekst', 'Nog geen onderdelen bij deze reis.'));
+    if (!lijst.length) vak.appendChild(maak('span', 'ds-meta', 'Nog geen onderdelen bij deze reis.'));
   }
 
   function updateVandaag(data) {
@@ -66,11 +62,13 @@
     tekenMomenten(lijst);
     var status = $('#statusLijst'); status.textContent = '';
     lijst.slice(0, 3).forEach(function (reis) {
-      var a = maak('a'); a.href = reis.link || '#reizen';
-      var i = maak('i', 'statusicoon ' + (reis.sig === 'gezond' ? 'goed' : reis.sig === 'incident' ? 'let' : 'wacht'), reis.teken || '·');
-      var span = maak('span'), titel = maak('b', '', reis.titel || reis.app || 'Reis');
-      span.appendChild(titel); span.appendChild(maak('small', '', [reis.status, reis.bestemming, reis.kenmerk].filter(Boolean).join(' · ')));
-      a.appendChild(i); a.appendChild(span); a.appendChild(maak('em', '', '›')); status.appendChild(a);
+      var li = maak('li'), a = maak('a', 'ds-lijst__rij'); a.href = reis.link || '#reizen';
+      if (reis.sig) a.dataset.sig = reis.sig;
+      var i = maak('span', 'ds-lijst__tijd', reis.teken || '·'); i.setAttribute('aria-hidden', 'true');
+      var span = maak('span');
+      span.appendChild(maak('span', 'ds-lijst__titel', reis.titel || reis.app || 'Reis'));
+      span.appendChild(maak('span', 'ds-lijst__tekst', [reis.status, reis.bestemming, reis.kenmerk].filter(Boolean).join(' · ')));
+      a.appendChild(i); a.appendChild(span); a.appendChild(maak('span', '', '›')); li.appendChild(a); status.appendChild(li);
     });
     if (eerst) { var datum = datumDelen(eerst.van); $('#volgendTijd').textContent = eerst.tijd || (datum.dag + ' ' + datum.maand).trim(); $('#volgendLabel').textContent = eerst.titel || 'Volgend reismoment';
       $('#volgendVan').textContent = eerst.van === R.vandaagISO(0) ? 'VANDAAG' : (eerst.van || 'DATUM ONBEKEND');

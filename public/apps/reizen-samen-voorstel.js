@@ -15,16 +15,16 @@
      vingerafdruk mee die HIER staan; is het voorstel intussen veranderd, dan
      weigert de server en tekent dit blok opnieuw. */
   var STAND = { open: 'Ligt voor', aangenomen: 'Aangenomen door iedereen', vervallen: 'Vervallen', ingetrokken: 'Ingetrokken' };
-  function knop(tekst, fn) { var k = maak('button', 'rtg-knop', tekst); k.type = 'button'; k.addEventListener('click', fn); return k; }
+  function knop(tekst, fn) { var k = maak('button', 'ds-knop ds-knop--stil ds-knop--klein', tekst); k.type = 'button'; k.addEventListener('click', fn); return k; }
   function teken(b, h) {
     var reis = h.reis, doe = h.doe, euro = h.euro;
     var v = b.groep.voorlegging, vak = $('#voorleggingInhoud'), knoppen = $('#voorleggingKnoppen');
     if (!vak || !knoppen) return; vak.textContent = ''; knoppen.textContent = '';
-    if (!v) { vak.appendChild(maak('p', 'leegtekst', 'Er ligt nog geen voorstel voor.')); return; }
+    if (!v) { vak.appendChild(maak('p', 'ds-meta', 'Er ligt nog geen voorstel voor.')); return; }
     vak.dataset.versie = v.versie; vak.dataset.stand = v.stand;
-    vak.appendChild(maak('b', '', 'Versie ' + v.versie + ': ' + v.optie.titel));
-    vak.appendChild(maak('small', '', euro(v.optie.prijsPP) + ' p.p. · ' + v.optie.van + ' t/m ' + v.optie.tot));
-    vak.appendChild(maak('p', 'rtg-sub', STAND[v.stand] + (v.reden ? ': ' + v.reden : '') +
+    vak.appendChild(maak('p', 'ds-kaart__titel', 'Versie ' + v.versie + ': ' + v.optie.titel));
+    vak.appendChild(maak('p', 'ds-meta', euro(v.optie.prijsPP) + ' p.p. · ' + v.optie.van + ' t/m ' + v.optie.tot));
+    vak.appendChild(maak('p', 'ds-detail__status', STAND[v.stand] + (v.reden ? ': ' + v.reden : '') +
       (v.stand === 'open' || v.stand === 'aangenomen' ? ' · ' + v.instemmingen.ja + ' van ' + v.instemmingen.totaal + ' stemden in' : '')));
     var mag = b.werkruimte.handelingen;
     if (mag.indexOf('instem') >= 0 && (v.stand === 'open' || v.stand === 'aangenomen')) {

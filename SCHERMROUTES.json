@@ -3,14 +3,18 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "d0c084e4a",
+  "commit": "518413d02",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/lifestyle-lus.js",
-    "public/apps/lifestyle.html"
+    "public/apps/app-main/app-main-02.js",
+    "public/apps/app-main/app-main-07.js",
+    "public/apps/app-main/app-main-08b.js",
+    "public/apps/app-main/app-main-09.js",
+    "public/apps/app-main/app-main-58.js",
+    "public/shared/appshell.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7821,10 +7825,10 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 450,
+  "schermenMetPad": 456,
   "nietGelezen": 0,
-  "exactePaden": 1093,
-  "verwijzingen": 1323,
+  "exactePaden": 1097,
+  "verwijzingen": 1329,
   "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
@@ -8214,6 +8218,14 @@
    "aantal": 3
   },
   {
+   "pad": "/api/state",
+   "schermen": [
+    "public/apps/app-main/app-main-02.js",
+    "public/apps/geld/wallet.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/account/rollen",
    "schermen": [
     "public/apps/app-main/app-main-24a3.js",
@@ -8242,6 +8254,14 @@
    "schermen": [
     "public/apps/app-main/app-main-45.js",
     "public/shared/realtime.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/like",
+   "schermen": [
+    "public/apps/app-main/app-main-58.js",
+    "public/apps/salon.html"
    ],
    "aantal": 2
   },
@@ -9020,6 +9040,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/snap/send",
+   "schermen": [
+    "public/apps/app-main/app-main-07.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/snaps",
+   "schermen": [
+    "public/apps/app-main/app-main-08b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/snap/view",
+   "schermen": [
+    "public/apps/app-main/app-main-09.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/pin/live",
    "schermen": [
     "public/apps/app-main/app-main-09a2.js"
@@ -9030,6 +9071,13 @@
    "pad": "/api/member/apps",
    "schermen": [
     "public/apps/app-main/app-main-30.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/comment",
+   "schermen": [
+    "public/apps/app-main/app-main-58.js"
    ],
    "aantal": 1
   },
@@ -11116,13 +11164,6 @@
    "pad": "/api/geld/grens/zet",
    "schermen": [
     "public/apps/geld/waardec.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/state",
-   "schermen": [
-    "public/apps/geld/wallet.js"
    ],
    "aantal": 1
   },
@@ -14403,13 +14444,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/like",
-   "schermen": [
-    "public/apps/salon.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/salon/ai/bijschrift",
    "schermen": [
     "public/apps/salon.html"
@@ -15737,6 +15771,34 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-02.js",
+   "exact": [
+    "/api/state"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-07.js",
+   "exact": [
+    "/api/member/snap/send"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-08b.js",
+   "exact": [
+    "/api/member/snaps"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-09.js",
+   "exact": [
+    "/api/member/snap/view"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-09a2.js",
    "exact": [
     "/api/member/pin/live"
@@ -15770,6 +15832,14 @@
    "bestand": "public/apps/app-main/app-main-45.js",
    "exact": [
     "/api/push/key"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-58.js",
+   "exact": [
+    "/api/comment",
+    "/api/like"
    ],
    "voorvoegsels": []
   },
@@ -19452,6 +19522,13 @@
     "/api/adres/zoek"
    ],
    "voorvoegsels": []
+  },
+  {
+   "bestand": "public/shared/appshell.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/"
+   ]
   },
   {
    "bestand": "public/shared/basis/basis-02.js",

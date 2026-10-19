@@ -191,7 +191,7 @@ var RTG_BOUW = '7be75ecc';
 
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
   async function refreshState(){
-    try { applyState((await API.call('/state')).state); } catch(e){}
+    try { applyState((await API.call('/api/state')).state); } catch(e){}
   }
 
   let toastTimer;
@@ -1030,7 +1030,7 @@ var RTG_BOUW = '7be75ecc';
     const tekst = prompt(T('snap.tekst','Tekst erbij (mag leeg):'),'') || '';
     try {
       if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast(''+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
-      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
+      else { await API.call('/api/member/snap/send', { toKey: snapNaar, foto, tekst, idem: RTGIdem('snap') }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
     } catch(err){ toast(err.message); }
   }
   function snapVerklein(file){
@@ -1456,7 +1456,7 @@ var RTG_BOUW = '7be75ecc';
     // verhalen-strip + inkomende snaps bovenaan de contactenkaart
     let stories = [], snaps = [];
     try { stories = (await API.call('/member/stories')).stories || []; } catch(e){}
-    try { snaps = (await API.call('/member/snaps')).snaps || []; } catch(e){}
+    try { snaps = (await API.call('/api/member/snaps')).snaps || []; } catch(e){}
     let box = el.querySelector('#snapStrip');
     if (!box){ box = document.createElement('div'); box.id='snapStrip'; el.insertBefore(box, el.firstChild.nextSibling); }
 /* de storyrij bovenaan De Salon */
@@ -1475,7 +1475,7 @@ var RTG_BOUW = '7be75ecc';
     box.querySelectorAll('.js-opensnap').forEach(b => b.addEventListener('click', () => openSnap(b.dataset.id)));
   }
   async function openSnap(id){
-    let d; try { d = await API.call('/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
+    let d; try { d = await API.call('/api/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
     const ov = snapOverlay();
     ov.querySelector('#snapOvVan').textContent = 'Snap van ' + d.van;
     ov.querySelector('#snapOvImg').src = d.foto;
@@ -9524,7 +9524,7 @@ var RTG_BOUW = '7be75ecc';
         post.likes += post.liked ? 1 : -1;
         ev.currentTarget.classList.toggle('liked', post.liked);
         el.querySelector('.lc').textContent = post.likes;
-        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
+        if (API.live) API.call('/api/like', {postId: post.id, liked: post.liked}).catch(() => {});
       });
       const shareBtn = el.querySelector('.js-share');
       if (shareBtn) shareBtn.addEventListener('click', () => openShare(post.id));
@@ -9595,8 +9595,11 @@ var RTG_BOUW = '7be75ecc';
         const inp = el.querySelector('.cform input');
         if (!inp.value.trim()) return;
         if (API.live){
-          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          // een sleutel per reactie: een tweede tik of een nieuwe poging is dezelfde
+          if (!inp.dataset.idem) inp.dataset.idem = RTGIdem('salon-reactie');
+          try { await API.call('/api/comment', {postId: post.id, text: inp.value.trim(), idem: inp.dataset.idem}); }
           catch (e) { toast(e.message || T('app.salon.notallowed','Reageren niet toegestaan.')); return; }
+          delete inp.dataset.idem;
         }
         post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
         const d = document.createElement('div');

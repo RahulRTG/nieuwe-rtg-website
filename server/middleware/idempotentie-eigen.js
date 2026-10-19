@@ -21,6 +21,10 @@ const EIGEN = [
   '/api/supplier/vracht/',
   '/api/rtgid/annuleer',
   '/api/salon/deal/claim',
+  // een reactie in De Salon draagt haar eigen sleutel (routes/member/salon.js)
+  '/api/comment',
+  // een snap draagt zijn eigen sleutel (kern/sociaal/snaps.js)
+  '/api/member/snap/send',
   '/api/supplier/salon/deal/redeem',
   '/api/office/bank/mislukking',
   '/api/festival/verkoop/rond',

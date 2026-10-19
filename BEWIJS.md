@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19548 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2827 bestanden en 19550 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2825 |
-| losse beweringen (`test(...)`) | 19548 |
+| toetsbestanden | 2827 |
+| losse beweringen (`test(...)`) | 19550 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 9 |
+| niets van beide | 11 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2487 bestanden, 18976 beweringen.
+2489 bestanden, 18978 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1866,6 +1866,7 @@ toets omvalt.
 | `salon-claimcode.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor Salon-claimcodes. Twee onafhankelijke app- instances delen alleen de posts-rij en moeten uitgifte en gebruik onder hetzelfde advisory slot serialiseren. |
 | `salon-claimcode.test.js` | 7 | gezakt op `getal+1#0` | Salon-claimcredential: de kale code verschijnt eenmaal; opslag, rotatie, intrekking en verzilvering delen een autoritatief collectieslot. |
 | `salon-curatie.test.js` | 8 | gezakt op `liegpoort /api/` | De Salon-curatie: het AI-oordeel over maatschappelijk belang, op een knop in de boardroom. Getest: de kandidaatselectie (partner- en RTG-curatie blijven erbuiten), de rem van maximaal BELANG_MAX posts per ronde, wat... |
+| `salon-reactie-herhaal.test.js` | 1 | -- | Een reactie in De Salon met een herhaalsleutel staat er een keer, ook na een herstart (19 oktober 2026). De voltooiproef van tab:salon zag dezelfde tik na een crash twee reacties plaatsen: de centrale antwoordkas... |
 | `salon-verplicht.test.js` | 6 | gezakt op `liegpoort /api/` | De Salon is verplicht: elke leverancier doet marketing, producten en folders via De Salon. Een partner zonder compleet profiel (bio + foto) wordt niet aan leden getoond en kan niets publiceren. |
 | `salonbeeld.test.js` | 3 | gezakt op `===->!==#0` | EEN BEELD DAT ERGENS ANDERS NOG HANGT, MAG NIET MEEVERDWIJNEN. WAT ER MISGING. |
 | `salonbron-fotobank.test.js` | 6 | gezakt op `liegpoort /api/` | Beeld "Uit De Salon" als bron in de website-makers, en foto-upload met virusscan in de Atelier-studio (pariteit met de leden-Website-maker). |
@@ -1992,6 +1993,7 @@ toets omvalt.
 | `sloophamer.pg.test.js` | 1 | slaat zichzelf over | De "sloophamer": de chaos-intentie van een aangeleverde test, maar dan tegen de ECHTE architectuur van dit platform (twee kind-processen op een gedeelde Postgres + Redis, echte HTTP-endpoints), niet tegen een... |
 | `smtp-in.test.js` | 16 | gezakt op `liegpoort /api/` | De SMTP-ONTVANGER: post van buiten aannemen. Wat hier bewezen wordt, en waarom juist dit: geen relay een RCPT TO naar een adres dat hier geen postvak is, krijgt 550 -- en wel VOOR de inhoud. |
 | `smtp.test.js` | 9 | gezakt op `===->!==#0` | Eigen SMTP-verzendclient (server/smtp.js), die nodemailer verving. We draaien tegen een nep-SMTP-server (net/tls) en controleren de protocolstappen en de MIME-opmaak: EHLO -> MAIL/RCPT/DATA, base64-body die terug... |
+| `snaps-herhaal.test.js` | 1 | -- | Een snap met een herhaalsleutel gaat een keer weg, ook bij twee gelijktijdige tikken en na een crash (19 oktober 2026). De voltooiproef van os:snaps zag dezelfde tik na een crash twee snaps bij de vriend leggen. |
 | `snaps-routes.test.js` | 2 | gezakt op `liegpoort /api/` | SNAPS EN VERHALEN AAN DE RTG-LEDENKANT: /api/member/snaps, /api/member/snap/view, /api/member/story/view en /api/member/snap/opdracht. test/foundation.test.js loopt dezelfde kern af via de gezinskant... |
 | `sni.test.js` | 5 | geen bruikbare mutatie | SNI ALLEEN BIJ EEN NAAM. WAAROM DEZE TOETS BESTAAT, en dat is de les. |
 | `sociaal-index.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -15,7 +15,7 @@
    ========================================================================== */
 'use strict';
 const crypto = require('crypto');
-const { geverifieerdLid, nieuwLid, inloggen, verbind, KANTOORWERELD } = require('../voltooiwereld');
+const { geverifieerdLid, nieuwLid, inloggen, verbind, gebondenToestel, KANTOORWERELD } = require('../voltooiwereld');
 const simulatiebank = require('../../../server/betaal/synthetisch');
 
 const MIJN = '/api/wbw/mijn';
@@ -44,6 +44,11 @@ async function loop(w, stap) {
   const A = await geverifieerdLid(w, 'wbwa');
   const B = await geverifieerdLid(w, 'wbwb');
   const v = await verbind(w, A, B);
+  /* Verrekenen verplaatst geld en draagt daarom het bezitsbewijs van een
+     gebonden toestel (kern/identiteit/bezitspaden.js), zoals de browser het
+     via shared/toestelsleutel.js meestuurt. */
+  const toestelB = await gebondenToestel(w, B.token);
+  const verreken = async (lijf, tok, t) => w.post(VERREKEN, lijf, tok || B.token, await (t || toestelB).bewijs('POST', VERREKEN));
   const groep = async (lid, gid) => w.post(GROEP, { id: gid }, lid.token);
   const saldi = async (gid) => {
     const g = ((await groep(A, gid)).data || {}).groep || { leden: [] };
@@ -86,7 +91,7 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'B verrekent in een tik: een betaling van 45 euro aan A via RTG Pay, en het lijstje staat op nul', async () => {
-    const r = await w.post(VERREKEN, { id: gid, idem: idem('eerste') }, B.token);
+    const r = await verreken({ id: gid, idem: idem('eerste') });
     const s = await saldi(gid);
     const bet = betalingen(NAAM);
     return { klopt: r.status === 200 && s.a === 0 && s.b === 0 && bet.length === 1 && bet[0].centen === 4500,
@@ -94,16 +99,17 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'nog eens verrekenen kan niet: B hoort dat hij niet rood staat, en er gaat geen geld', async () => {
-    const r = await w.post(VERREKEN, { id: gid, idem: idem('nogeens') }, B.token);
+    const r = await verreken({ id: gid, idem: idem('nogeens') });
     return { klopt: r.status === 409 && /niet rood/.test(r.data.error) && betalingen(NAAM).length === 1,
       ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
   await stap('voltooibaar', 'een ANDER lid buiten het lijstje leest het niet, schrijft er niets in en verrekent er niets', async () => {
-    const C = await nieuwLid(w, 'wbwd');
+    const C = await geverifieerdLid(w, 'wbwd');
+    const toestelC = await gebondenToestel(w, C.token);
     const lees = await groep(C, gid);
     const schrijf = await w.post(UITGAVE, { id: gid, oms: 'Indringer', centen: 100 }, C.token);
-    const verr = await w.post(VERREKEN, { id: gid, idem: merk + '-c' }, C.token);
+    const verr = await verreken({ id: gid, idem: merk + '-c' }, C.token, toestelC);
     const m = (await w.post(MIJN, {}, C.token)).data || {};
     const s = await saldi(gid);
     return { klopt: lees.status === 404 && schrijf.status === 404 && verr.status === 404 && (m.groepen || []).length === 0 &&
@@ -111,16 +117,32 @@ async function loop(w, stap) {
       ziet: 'lezen ' + lees.status + ', uitgave ' + schrijf.status + ', verrekenen ' + verr.status + ', ziet ' + (m.groepen || []).length + ' lijstjes; ' + s.regels.length + ' regels' };
   });
 
+  await stap('voltooibaar', 'uitgelogd ziet niemand een lijstje en verrekent niemand: 401, met een zin', async () => {
+    const m = await w.post(MIJN, {}, null);
+    const g = await w.post(GROEP, { id: gid }, null);
+    const v2 = await w.post(VERREKEN, { id: gid, idem: merk + '-uit' }, null);
+    return { klopt: [m, g, v2].every((r) => r.status === 401 && r.data && r.data.error) && betalingen(NAAM).length === 1,
+      ziet: 'mijn ' + m.status + ', groep ' + g.status + ', verrekenen ' + v2.status + ' (' + (m.data && m.data.error) + ')' };
+  });
+
+  await stap('voltooibaar', 'met het token van B maar zonder het bewijs van zijn toestel gaat er geen geld: een gestolen token is waardeloos', async () => {
+    await etentje(1000);
+    const r = await w.post(VERREKEN, { id: gid, idem: merk + '-gestolen' }, B.token);
+    const s2 = await saldi(gid);
+    return { klopt: r.status === 401 && s2.b === -500 && betalingen(NAAM).length === 1,
+      ziet: r.status + ' (' + (r.data && r.data.error || '').slice(0, 70) + '), B ' + s2.b };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staan de uitgave, de verrekening en de nulbalans er nog', async () => {
     const s = await saldi(gid);
-    return { klopt: s.a === 0 && s.b === 0 && s.regels.length === 2, ziet: s.regels.length + ' regels, A ' + s.a + ', B ' + s.b };
+    return { klopt: s.a === 500 && s.b === -500 && s.regels.length === 3, ziet: s.regels.length + ' regels, A ' + s.a + ', B ' + s.b };
   });
 
   await stap('persistent', 'een read-only lezer vindt het lijstje met beide regels in de opslag, en de betaling in het grootboek', async () => {
     const g = (w.collectie('wbwGroepen') || []).find((x) => x.id === gid);
-    return { klopt: !!g && g.regels.length === 2 && g.regels.some((r) => r.soort === 'verrekening' && r.centen === 4500) && betalingen(NAAM).length === 1,
+    return { klopt: !!g && g.regels.length === 3 && g.regels.some((r) => r.soort === 'verrekening' && r.centen === 4500) && betalingen(NAAM).length === 1,
       ziet: g ? g.regels.map((r) => r.soort + ' ' + r.centen).join(', ') : 'niet gevonden' };
   });
 
@@ -128,14 +150,14 @@ async function loop(w, stap) {
     const tok = await inloggen(w, B);
     const r = await w.post(GROEP, { id: gid }, tok);
     const g = (r.data && r.data.groep) || {};
-    return { klopt: r.status === 200 && g.mijnSaldo === 0 && (g.regels || []).length === 2, ziet: 'nieuwe sessie ' + r.status + ', mijn saldo ' + g.mijnSaldo };
+    return { klopt: r.status === 200 && g.mijnSaldo === -500 && (g.regels || []).length === 3, ziet: 'nieuwe sessie ' + r.status + ', mijn saldo ' + g.mijnSaldo };
   });
 
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik op Verreken (dezelfde sleutel, tegelijk) betaalt een keer, en B staat daarna niet voor', async () => {
     await etentje(3000);
     const k = idem('dubbel');
-    const [a, b] = await w.dubbel(VERREKEN, { id: gid, idem: k }, B.token);
+    const [a, b] = await Promise.all([verreken({ id: gid, idem: k }), verreken({ id: gid, idem: k })]);
     const s = await saldi(gid);
     return { klopt: a.status === 200 && b.status === 200 && s.a === 0 && s.b === 0 && betalingen(NAAM).length === 2,
       ziet: 'tikken ' + a.status + '/' + b.status + ', A ' + s.a + ', B ' + s.b + ', ' + betalingen(NAAM).length + ' betalingen in totaal' };
@@ -144,8 +166,8 @@ async function loop(w, stap) {
   await stap('herstelbaar', 'een afgebroken verrekening, daarna opnieuw met dezelfde sleutel: een keer betaald, nul in het lijstje', async () => {
     await etentje(2000);
     const k = idem('half');
-    const half = await w.afgebroken(VERREKEN, { id: gid, idem: k }, B.token);
-    const opnieuw = await w.post(VERREKEN, { id: gid, idem: k }, B.token);
+    const half = await w.afgebroken(VERREKEN, { id: gid, idem: k }, B.token, await toestelB.bewijs('POST', VERREKEN));
+    const opnieuw = await verreken({ id: gid, idem: k });
     const s = await saldi(gid);
     return { klopt: [200, 409].includes(opnieuw.status) && s.a === 0 && s.b === 0 && betalingen(NAAM).length === 3,
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', A ' + s.a + ', B ' + s.b + ', ' + betalingen(NAAM).length + ' betalingen' };
@@ -154,9 +176,9 @@ async function loop(w, stap) {
   await stap('herstelbaar', 'een crash direct na een verrekening, daarna dezelfde tik opnieuw: een keer betaald, nul in het lijstje', async () => {
     await etentje(4000);
     const k = idem('crash');
-    const r = await w.post(VERREKEN, { id: gid, idem: k }, B.token);
+    const r = await verreken({ id: gid, idem: k });
     await w.crash();
-    const opnieuw = await w.post(VERREKEN, { id: gid, idem: k }, B.token);
+    const opnieuw = await verreken({ id: gid, idem: k });
     const s = await saldi(gid);
     return { klopt: r.status === 200 && [200, 409].includes(opnieuw.status) && s.a === 0 && s.b === 0 && betalingen(NAAM).length === 4,
       ziet: 'verrekend ' + r.status + ', na SIGKILL ' + opnieuw.status + ', A ' + s.a + ', B ' + s.b + ', ' + betalingen(NAAM).length + ' betalingen' };

@@ -226,6 +226,8 @@
       "status"
     ],
     "code": [
+      "betaalcode",
+      "codenaamVan",
       "dyncode",
       "resolveSession",
       "sessionFor"
@@ -2771,6 +2773,7 @@
       "vrijheid"
     ],
     "wbw": [
+      "onboarding",
       "wbwGroep",
       "wbwMaak",
       "wbwMijn",

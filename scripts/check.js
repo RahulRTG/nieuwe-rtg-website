@@ -3543,6 +3543,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/carriereledger/deel.js', 'een deelcode gaat precies EENMAAL de deur uit; bevestigen voor de opslag hem heeft, betekent dat het lid een code in handen heeft die nergens meer bij hoort -- en dat een gestopte code na een herstart weer open zou staan'],
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
+    ['server/kern/betaalcode.js', 'geld aan de kassa: een betaalcode is eenmalig, dus een verbruik dat een crash niet overleeft is een code die twee keer afrekent, en een verwijzing die een herstart niet overleeft is een code die het scherm toont en de kassa weigert (test/betaalcode.test.js)'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
     ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen'],
     ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt'],

@@ -46,7 +46,7 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'het lid maakt een pot Vakantie met een doel van 500 euro, en het actielog draagt het', async () => {
-    const r = await w.post(POT_ZET, { naam: 'Vakantie ' + merk, doelCenten: 50000 }, T);
+    const r = await w.post(POT_ZET, { naam: 'Vakantie ' + merk, doelCenten: 50000, idem: merk + '-vak' }, T);
     vak = r.data && r.data.pot;
     const log = ((await w.post(LOG, {}, T)).data || {}).log || [];
     return { klopt: r.status === 200 && !!vak && vak.standCenten === 0 && pot(await beleid(), vak.id).doelCenten === 50000 &&
@@ -74,7 +74,7 @@ async function loop(w, stap) {
 
   await stap('voltooibaar', 'een pot waar een regel in reserveert gaat niet stil weg; een losse pot wel, en dat staat in het log', async () => {
     const vast = await w.post(POT_WEG, { id: vak.id }, T);
-    extra = (await w.post(POT_ZET, { naam: 'Los ' + merk, doelCenten: 1000 }, T)).data.pot;
+    extra = (await w.post(POT_ZET, { naam: 'Los ' + merk, doelCenten: 1000, idem: merk + '-los' }, T)).data.pot;
     const weg = await w.post(POT_WEG, { id: extra.id }, T);
     const b = await beleid();
     const log = ((await w.post(LOG, {}, T)).data || {}).log || [];
@@ -93,6 +93,14 @@ async function loop(w, stap) {
     return { klopt: (zijn.potten || []).length === 0 && (zijn.regels || []).length === 0 && log.length === 0 &&
       res.status === 404 && weg.status === 404 && p.standCenten === 10000,
       ziet: 'B ziet ' + (zijn.potten || []).length + ' potten, ' + log.length + ' logregels; reserveren ' + res.status + ', weghalen ' + weg.status + '; stand bij A ' + p.standCenten };
+  });
+
+  await stap('voltooibaar', 'uitgelogd ziet niemand een overzicht, beleid of pot en zet niemand iets opzij: 401, met een zin', async () => {
+    const c = await w.post(COCKPIT, {}, null);
+    const b = await w.post(BELEID, {}, null);
+    const r = await w.post(POT_RES, { id: vak.id, centen: 100, idem: merk + '-uit' }, null);
+    return { klopt: [c, b, r].every((x) => x.status === 401 && x.data && x.data.error) && pot(await beleid(), vak.id).standCenten === 10000,
+      ziet: 'overzicht ' + c.status + ', beleid ' + b.status + ', reserveren ' + r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
   /* ---------------- persistent ---------------- */
@@ -122,6 +130,13 @@ async function loop(w, stap) {
     const [a, b] = await w.dubbel(POT_RES, { id: vak.id, centen: 700, idem: merk + '-dubbel' }, T);
     const na = pot(await beleid(), vak.id).standCenten;
     return { klopt: a.status === 200 && b.status === 200 && na - voor === 700, ziet: 'tikken ' + a.status + '/' + b.status + ', stand +' + (na - voor) };
+  });
+
+  await stap('herstelbaar', 'een dubbele tik op Pot toevoegen (dezelfde sleutel, tegelijk) maakt een pot', async () => {
+    const lijf = { naam: 'Dubbel ' + merk, doelCenten: 2000, idem: merk + '-dubbelpot' };
+    const [a, b] = await w.dubbel(POT_ZET, lijf, T);
+    const n = ((await beleid()).potten || []).filter((p) => p.naam === lijf.naam).length;
+    return { klopt: a.status === 200 && b.status === 200 && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + n + ' pot(ten)' };
   });
 
   await stap('herstelbaar', 'een afgebroken reservering, daarna opnieuw met dezelfde sleutel: een keer opzij', async () => {

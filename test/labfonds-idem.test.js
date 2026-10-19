@@ -41,3 +41,25 @@ test('zonder sleutel blijft het oude gedrag: elke tik een toezegging', () => {
   lf.doneer('lid1', 'Amber', 'ibiza', 10);
   assert.equal(lf.fonds('lid1').mijnBijdrage, 20);
 });
+
+/* Een voorstel per tik (voorstelMaak): een dubbele tik op Indienen gaf twee
+   voorstellen voor dezelfde pot, met twee stemmingen ernaast. */
+const DOEL = 'Tien bomen langs de gracht, geplant met de buurt en twee jaar onderhouden.';
+
+test('dezelfde sleutel dient een voorstel een keer in', () => {
+  const lf = maak();
+  const a = lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20, '', 'v1');
+  const b = lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20, '', 'v1');
+  assert.equal(a.ok, true);
+  assert.equal(b.ok, true);
+  assert.equal(b.herhaald, true);
+  assert.equal(b.voorstel.id, a.voorstel.id);
+  assert.equal(lf.fonds('lid1').voorstellen.length, 1);
+});
+
+test('dezelfde sleutel voor een ander voorstel is een conflict', () => {
+  const lf = maak();
+  lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20, '', 'v1');
+  assert.equal(lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bankjes', DOEL, 20, '', 'v1').status, 409);
+  assert.equal(lf.fonds('lid1').voorstellen.length, 1);
+});

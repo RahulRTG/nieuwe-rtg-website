@@ -65,18 +65,30 @@
 
   /* Bedragen vragen we net als het origineel met prompt(): een formulier per
      rekening zou het paneel verdrievoudigen voor een invoer van een getal. */
+  /* EEN sleutel per BEDOELING, niet per klik: een dubbelklik op Overboeken gaf
+     twee sleutels en dus twee boekingen. Dezelfde handeling met dezelfde
+     velden houdt zijn sleutel tot de server antwoordt (gelukt of geweigerd). */
+  var lopend = {};
+  function bedoeling(soort, voor) {
+    if (!lopend[soort] || lopend[soort].voor !== voor) lopend[soort] = { voor: voor, idem: B.sleutel(soort) };
+    return lopend[soort].idem;
+  }
+  function klaar(soort, e) { if (!e || e.status) delete lopend[soort]; }
   B.bind = function () {
     var Geld = w.Geld;
     $('#bkNopen').addEventListener('click', async function () {
-      try { await Geld.api('/api/bank/rekening/open', { soort: $('#bkNsoort').value, idem: B.sleutel('rekopen') }); await B.herlaad(); }
-      catch (e) { Geld.melding(e.message); }
+      var soort = $('#bkNsoort').value;
+      try { await Geld.api('/api/bank/rekening/open', { soort: soort, idem: bedoeling('rekopen', soort) }); klaar('rekopen'); await B.herlaad(); }
+      catch (e) { klaar('rekopen', e); Geld.melding(e.message); }
     });
     $('#bkOdoe').addEventListener('click', async function () {
       var centen = Math.round(Number($('#bkObed').value) * 100);
+      var lijf = { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen };
+      lijf.idem = bedoeling('overboek', lijf.vanIban + '|' + lijf.naarIban + '|' + centen);
       try {
-        await Geld.api('/api/bank/overboek', { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen, idem: B.sleutel('overboek') });
-        $('#bkObed').value = ''; await B.herlaad();
-      } catch (e) { Geld.melding(e.message); }
+        await Geld.api('/api/bank/overboek', lijf);
+        klaar('overboek'); $('#bkObed').value = ''; await B.herlaad();
+      } catch (e) { klaar('overboek', e); Geld.melding(e.message); }
     });
     $('#bkAiB').addEventListener('click', function () {
       var q = $('#bkAiV').value.trim();
@@ -88,25 +100,29 @@
       var euroS = prompt('Hoeveel storten op deze rekening? (euro)');
       if (euroS == null) return;
       try {
+        var c = Math.round(Number(euroS) * 100);
         var r = await Geld.api('/api/bank/storten',
-          { iban: b.dataset.bkstort, centen: Math.round(Number(euroS) * 100), idem: B.sleutel('stort') });
+          { iban: b.dataset.bkstort, centen: c, idem: bedoeling('stort', b.dataset.bkstort + '|' + c) });
+        klaar('stort');
         Geld.melding('Gestort via ' + r.via + '. Saldo: ' + Geld.euro(r.saldoCenten));
         await B.herlaad();
-      } catch (e) { Geld.melding(e.message); }
+      } catch (e) { klaar('stort', e); Geld.melding(e.message); }
     });
     elk('[data-bkwallet]', async function (b) {
       var euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)');
       if (euroS == null) return;
       try {
-        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: Math.round(Number(euroS) * 100), idem: B.sleutel('naarwallet') });
-        await B.herlaad();
-      } catch (e) { Geld.melding(e.message); }
+        var c = Math.round(Number(euroS) * 100);
+        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: c, idem: bedoeling('naarwallet', b.dataset.bkwallet + '|' + c) });
+        klaar('naarwallet'); await B.herlaad();
+      } catch (e) { klaar('naarwallet', e); Geld.melding(e.message); }
     });
     elk('[data-bkpas]', async function (b) {
       try {
-        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit', idem: B.sleutel('pasuit') });
+        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit', idem: bedoeling('pasuit', b.dataset.bkpas) });
+        klaar('pasuit');
         Geld.melding('Pas uitgegeven: ' + r.pas.nummer);
-      } catch (e) { Geld.melding(e.message); }
+      } catch (e) { klaar('pasuit', e); Geld.melding(e.message); }
     });
     elk('[data-bkdoel]', async function (b) {
       var euroS = prompt('Wat is je spaardoel? (euro)');

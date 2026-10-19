@@ -124,6 +124,14 @@ async function loop(w, stap) {
       ziet: 'weg ' + r.status + ', nog eens ' + nog.status + ' (' + (nog.data && nog.data.error) + ')' };
   });
 
+  await stap('voltooibaar', 'uitgelogd ziet niemand de wallet en koopt of wisselt niemand iets: 401, met een zin', async () => {
+    const l = await w.post(LIJST, {}, null);
+    const k = await w.post(KOOP, { zaak: ZAAK, aantal: 1, idem: merk + '-uit' }, null);
+    const x = await w.post(WISSEL, { id: feest.id, aantal: 1 }, null);
+    return { klopt: [l, k, x].every((r) => r.status === 401 && r.data && r.data.error) && munt(await lijst(), ZAAK).saldo === 3,
+      ziet: 'lijst ' + l.status + ', kopen ' + k.status + ', inwisselen ' + x.status + ' (' + (l.data && l.data.error) + ')' };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staan de munten er nog met saldo 3, en de kaart blijft weg', async () => {

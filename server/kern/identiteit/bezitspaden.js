@@ -28,6 +28,7 @@ const PADEN = [
   { pad: '/api/betaal/', reden: 'geld verplaatsen' },
   { pad: '/api/wallet/', reden: 'tegoed en passen' },
   { pad: '/api/bank/', reden: 'bankhandelingen' },
+  { pad: '/api/wbw/verreken', reden: 'geld verplaatsen: de eigen schuld via RTG Pay naar een vriend (pay.stuur)' },
   { pad: '/api/auth/password', reden: 'het wachtwoord wijzigen zet alle andere sessies eruit' },
   { pad: '/api/webauthn/registreer', reden: 'een nieuwe passkey is een nieuwe sleutel tot het account' },
   { pad: '/api/webauthn/weg', reden: 'een passkey verwijderen haalt een herstelroute weg' },

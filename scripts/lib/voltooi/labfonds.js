@@ -57,7 +57,7 @@ async function loop(w, stap) {
 
   await stap('voltooibaar', 'A dient een voorstel in voor de pot; de scheidsrechter geeft meteen een oordeel en A stemt zelf voor', async () => {
     const r = await w.post(VOORSTEL, { locId: PLEK, titel: 'Bomen ' + merk,
-      doel: 'Tien bomen langs de gracht, geplant met de buurt en twee jaar onderhouden.', bedrag: 20 }, A.token);
+      doel: 'Tien bomen langs de gracht, geplant met de buurt en twee jaar onderhouden.', bedrag: 20, idem: merk + '-voorstel' }, A.token);
     voorstel = r.data && r.data.voorstel;
     return { klopt: r.status === 200 && !!voorstel && voorstel.status === 'open' && voorstel.voor === 1 && !!voorstel.scheids,
       ziet: 'indienen ' + r.status + ', scheidsrechter ' + (voorstel && voorstel.scheids && voorstel.scheids.oordeel) };
@@ -81,6 +81,13 @@ async function loop(w, stap) {
     const b = r.data && r.data.voorstel && r.data.voorstel.besluit;
     return { klopt: r.status === 200 && b && b.toegekend === true && voor.pot - na.pot === 20 && na.uitgekeerd - voor.uitgekeerd === 20 && nog.status === 409,
       ziet: 'besluit ' + r.status + ' (' + (b && b.reden) + '), pot -' + (voor.pot - na.pot) + ', nog eens ' + nog.status };
+  });
+
+  await stap('voltooibaar', 'uitgelogd ziet niemand het fonds en zegt niemand iets toe: 401, met een zin', async () => {
+    const o = await w.post(OVERZICHT, {}, null);
+    const d = await w.post(DONEER, { locId: PLEK, bedrag: 5, idem: merk + '-uit' }, null);
+    return { klopt: o.status === 401 && d.status === 401 && !!(d.data && d.data.error),
+      ziet: 'overzicht ' + o.status + ', toezeggen ' + d.status + ' (' + (d.data && d.data.error) + ')' };
   });
 
   /* ---------------- persistent ---------------- */
@@ -113,6 +120,13 @@ async function loop(w, stap) {
     const na = await ov();
     return { klopt: a.status === 200 && b.status === 200 && na.mijnBijdrage - voor.mijnBijdrage === 7 && plek(na).pot - plek(voor).pot === 7,
       ziet: 'tikken ' + a.status + '/' + b.status + ', eigen bijdrage +' + (na.mijnBijdrage - voor.mijnBijdrage) };
+  });
+
+  await stap('herstelbaar', 'een dubbele tik op Indienen (dezelfde sleutel, tegelijk) dient een voorstel een keer in', async () => {
+    const lijf = { locId: PLEK, titel: 'Bankjes ' + merk, doel: 'Vier bankjes aan het water, gemaakt van hout uit de buurt.', bedrag: 2, idem: merk + '-dubbelvoorstel' };
+    const [a, b] = await w.dubbel(VOORSTEL, lijf, A.token);
+    const open = ((await ov()).voorstellen || []).filter((v) => v.titel === lijf.titel);
+    return { klopt: a.status === 200 && b.status === 200 && open.length === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + open.length + ' voorstel(len)' };
   });
 
   await stap('herstelbaar', 'een afgebroken toezegging, daarna opnieuw met dezelfde sleutel: een keer in de pot', async () => {

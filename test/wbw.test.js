@@ -20,10 +20,18 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 let seq = 0;
+/* Verrekenen verplaatst geld via RTG Pay, en RTG Pay vraagt een rtg-lid
+   eenmalig zijn paspoort (onboarding.payGate). Sinds /api/wbw/verreken die
+   poort ook draagt, loopt deze toets hem gewoon af -- net als
+   test/geldbeleid.test.js -- in plaats van een lid te gebruiken dat hem nooit
+   zou passeren. */
+const MINI_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: 'w' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  const kyc = await api('/api/verify/upload', { image: MINI_PNG }, reg.body.token);
+  assert.equal(kyc.status, 200, 'het paspoort is ingestuurd: ' + JSON.stringify(kyc.body).slice(0, 120));
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }

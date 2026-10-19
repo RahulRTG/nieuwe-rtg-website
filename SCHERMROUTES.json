@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "f6b7d1bc",
+  "commit": "6c88a8f7",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7820,9 +7820,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1041,
-  "verwijzingen": 1266,
-  "voorvoegsels": 142,
+  "exactePaden": 1043,
+  "verwijzingen": 1269,
+  "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8491,6 +8491,14 @@
   },
   {
    "pad": "/api/geld/beleid",
+   "schermen": [
+    "public/apps/geld/overzichtc.js",
+    "public/apps/geld/voorzijde.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/geld/pot/zet",
    "schermen": [
     "public/apps/geld/overzichtc.js",
     "public/apps/geld/voorzijde.js"
@@ -11021,9 +11029,16 @@
    "aantal": 1
   },
   {
-   "pad": "/api/geld/pot/zet",
+   "pad": "/api/geld/pot/reserveer",
    "schermen": [
-    "public/apps/geld/voorzijde.js"
+    "public/apps/geld/overzichtc.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/geld/pot/weg",
+   "schermen": [
+    "public/apps/geld/overzichtc.js"
    ],
    "aantal": 1
   },
@@ -16727,11 +16742,12 @@
    "exact": [
     "/api/geld/beleid",
     "/api/geld/beleid/zet",
-    "/api/geld/cockpit"
+    "/api/geld/cockpit",
+    "/api/geld/pot/reserveer",
+    "/api/geld/pot/weg",
+    "/api/geld/pot/zet"
    ],
-   "voorvoegsels": [
-    "/api/geld/pot/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/geld/rtgcode.js",

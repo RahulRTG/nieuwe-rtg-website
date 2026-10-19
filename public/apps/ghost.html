@@ -5,159 +5,60 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ghost Driver</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
-  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
-  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
-  .kop .rek{flex:1;}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
-  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
-  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
-  .waarschuwing{border-left:3px solid var(--rood);}
-  .kans{font-family:'Bodoni Moda',serif;font-size:1.6rem;color:var(--rood);}
-  .rij{display:flex;gap:0.8rem;align-items:baseline;flex-wrap:wrap;}
-  .rij .rek{flex:1;}
-  ul{margin:0.4rem 0 0 1.1rem;font-size:0.82rem;color:var(--soft);line-height:1.6;}
-  .advies{margin-top:0.6rem;font-size:0.86rem;line-height:1.55;}
-  .advies b{color:var(--rtg-leesgoud,var(--gold));}
-  .sim{display:flex;gap:1.2rem;margin-top:0.6rem;font-size:0.78rem;color:var(--soft);flex-wrap:wrap;}
-  .sim b{display:block;font-size:0.95rem;color:var(--txt);font-variant-numeric:tabular-nums;}
-  .sim .winst b{color:var(--groen);}
-  .uren{display:flex;gap:0.35rem;align-items:flex-end;height:90px;margin-top:0.4rem;}
-  .uren .u{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;min-width:0;}
-  .uren .staaf{width:100%;max-width:26px;border-radius:0;background:var(--card2);
-    border:1px solid var(--line);border-bottom:none;}
-  .uren .staaf.druk{background:var(--rood);border-color:var(--rood);}
-  .uren .staaf.middel{background:var(--gold);border-color:var(--gold);}
-  .uren .t{font-size:0.58rem;color:var(--soft);font-variant-numeric:tabular-nums;}
-  .weg{display:none !important;}
-</style>
-<link href="/shared/ios.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header class="kop">
-  <a href="/apps/leverancier.html" aria-label="Terug naar de zaak-app">←</a>
-  <h1>Ghost Driver</h1>
-  <span class="rek"></span>
-  <span class="badge">Kijkt 12 uur vooruit</span>
+<!-- De Ghost Driver op het RTG Design System (TRAVELOS-MIGRATIE.md par. 1b,
+     stroom E): een zaakscherm op de werklaag. Collectie (de waarschuwingen)
+     en het uurbeeld als rustige meters. Het weerbeeld is een demo en heet zo
+     (par. 1d): dat komt van de server en blijft in beeld. Geen eigen stijl. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="collectie">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/leverancier.html" aria-label="Terug naar de zaak-app">RTG</a>
+  <a class="ds-kop__actie" href="/apps/leverancier.html" aria-label="Uw zaak-app"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
-<main>
-  <section id="vPoort" class="weg">
-    <div class="kaart"><p class="stil">Log eerst in op de zaak-app; de Ghost Driver rijdt op de inlog van uw zaak.</p></div>
+
+<main class="ds-collectie" id="inhoud">
+  <div class="ds-collectie__kop">
+    <p class="ds-label">RTG Mobility</p>
+    <h1 class="ds-titel ds-titel--scherm">Ghost Driver</h1>
+    <p class="ds-meta">Kijkt 12 uur vooruit</p>
+  </div>
+
+  <section class="ds-status ds-status--binnen" id="vPoort" hidden>
+    <h2 class="ds-status__titel">Eerst uw zaak-inlog</h2>
+    <p class="ds-status__tekst">Log eerst in op de zaak-app; de Ghost Driver rijdt op de inlog van uw zaak.</p>
+    <a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/leverancier.html">Naar de zaak-app</a>
   </section>
-  <section id="vGhost" class="weg">
-    <p class="stil" id="uitleg"></p>
-    <h2>De komende 12 uur</h2>
-    <div class="kaart">
-      <div class="uren" id="uren" role="img" aria-label="Drukteverwachting per uur"></div>
-      <p class="stil h-mt50" id="urenSub"></p>
+
+  <div class="ds-panelen ds-panelen--twee" id="vGhost" hidden>
+    <div class="ds-paneel">
+      <p class="ds-meta" id="uitleg"></p>
+      <section class="ds-paneel" aria-labelledby="kopUren">
+        <h2 class="ds-label" id="kopUren">De komende 12 uur</h2>
+        <ul class="ds-lijst ds-veldgroep" id="uren" aria-label="Drukteverwachting per uur"></ul>
+        <p class="ds-meta" id="urenSub"></p>
+      </section>
+      <section class="ds-paneel" aria-labelledby="kopBouw">
+        <h2 class="ds-label" id="kopBouw">Waar de spookrit op let</h2>
+        <p class="ds-meta" id="bouwstenen"></p>
+      </section>
     </div>
-    <h2>Waarschuwingen</h2>
-    <div id="lijst"><p class="stil">De spookrit kijkt vooruit…</p></div>
-    <h2>Waar de spookrit op let</h2>
-    <div class="kaart"><p class="stil" id="bouwstenen"></p></div>
-  </section>
+    <section class="ds-paneel" aria-labelledby="kopWaarschuwingen">
+      <h2 class="ds-label" id="kopWaarschuwingen">Waarschuwingen</h2>
+      <div class="ds-paneel" id="lijst"><p class="ds-meta">De spookrit kijkt vooruit…</p></div>
+    </section>
+  </div>
 </main>
+
 <script src="/shared/uitvoer.js"></script>
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  const token = (() => { try { return localStorage.getItem('rtg_sup_token'); } catch (e) { return null; } })();
-  /* Meenemen (shared/uitvoer.js): de spookrit levert twee echte reeksen -- de
-     waarschuwingen per knooppunt en, als er niets dreigt, het uurbeeld dat
-     altijd getekend wordt. Je neemt mee wat er op het scherm staat, met de
-     velden los in plaats van de zin "78% kans op opstopping bij Passeig". */
-  let GHOST = null;
-  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
-    if (!GHOST) return null;
-    if ((GHOST.waarschuwingen || []).length) {
-      return { naam: 'waarschuwingen',
-        kolommen: ['tijd', 'knooppunt', 'kans in procenten', 'advies', 'zonder ingrijpen', 'met advies', 'winst'],
-        rijen: GHOST.waarschuwingen.map(w => [w.tijd, w.knooppunt, w.kans, w.advies,
-          w.simulatie.zonderAdvies, w.simulatie.metAdvies, w.simulatie.winst]) };
-    }
-    if ((GHOST.uurbeeld || []).length) {
-      return { naam: 'uurbeeld',
-        kolommen: ['tijd', 'kans in procenten', 'drukste punt', 'regen'],
-        rijen: GHOST.uurbeeld.map(u => [u.tijd, u.kans, u.drukPunt || '', u.regen ? 'ja' : 'nee']) };
-    }
-    return null;
-  });
-  (async () => {
-    if (!token) { $('#vPoort').classList.remove('weg'); return; }
-    const r = await fetch('/api/supplier/ghost', { method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
-      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
-    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
-    const d = r.body;
-    GHOST = d;
-    $('#uitleg').textContent = 'De Ghost Driver rijdt de komende ' + d.horizonUren + ' uur alvast door ' + d.stad +
-      ' en meldt uren van tevoren waar het vast dreigt te lopen.';
-    const kn = d.knooppunten.slice(0, 8);
-    $('#bouwstenen').textContent = d.toelichting + ' Knooppunten (' + d.knooppunten.length + '): ' + kn.join(' · ') +
-      (d.knooppunten.length > kn.length ? ' en meer.' : '.');
-    const uren = $('#uren'); uren.innerHTML = '';
-    let drukste = null;
-    for (const u of (d.uurbeeld || [])) {
-      if (!drukste || u.kans > drukste.kans) drukste = u;
-      const el = document.createElement('span'); el.className = 'u';
-      const staaf = document.createElement('span');
-      staaf.className = 'staaf' + (u.kans >= d.drempel ? ' druk' : u.kans >= 30 ? ' middel' : '');
-      staaf.style.height = Math.max(6, Math.round(u.kans * 0.8)) + 'px';
-      const t = document.createElement('span'); t.className = 't'; t.textContent = u.tijd.slice(0, 2);
-      el.appendChild(staaf); el.appendChild(t); uren.appendChild(el);
-    }
-    $('#urenSub').textContent = drukste
-      ? 'Drukste uur: ' + drukste.tijd + ' (' + drukste.kans + '%' + (drukste.drukPunt ? ', rond ' + drukste.drukPunt : '') + ')' + (drukste.regen ? ' · regen in het beschikbare weerbeeld' : '') + '.'
-      : '';
-    const lijst = $('#lijst'); lijst.innerHTML = '';
-    if (!d.waarschuwingen.length) {
-      lijst.innerHTML = '<div class="kaart"><p class="stil">De komende ' + d.horizonUren + ' uur ziet de spookrit nergens een opstopping aankomen. Rustig rijden.</p></div>';
-    }
-    for (const w of d.waarschuwingen) {
-      const k = document.createElement('div'); k.className = 'kaart waarschuwing';
-      const oorzaken = (w.oorzaken || []).map(o => { const li = document.createElement('li'); li.textContent = o; return li; });
-      k.innerHTML = '<div class="rij"><span class="kans"></span><strong></strong><span class="rek"></span><span class="badge"></span></div>' +
-        '<ul></ul><p class="advies"></p>' +
-        '<div class="sim"><span>Zonder ingrijpen<b class="z"></b></span><span>Met advies<b class="m"></b></span><span class="winst">Winst<b class="w"></b></span></div>';
-      k.querySelector('.kans').textContent = w.kans + '%';
-      k.querySelector('strong').textContent = 'kans op opstopping bij ' + w.knooppunt;
-      k.querySelector('.badge').textContent = 'rond ' + w.tijd;
-      for (const li of oorzaken) k.querySelector('ul').appendChild(li);
-      k.querySelector('.advies').innerHTML = '<b>Advies:</b> ';
-      k.querySelector('.advies').append(w.advies);
-      k.querySelector('.z').textContent = w.simulatie.zonderAdvies;
-      k.querySelector('.m').textContent = w.simulatie.metAdvies;
-      k.querySelector('.w').textContent = w.simulatie.winst;
-      lijst.appendChild(k);
-    }
-    $('#vGhost').classList.remove('weg');
-  })();
-})();
-</script>
-<script src="/shared/rahul-mond.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
+<script src="/apps/ghost-voorzijde.js"></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

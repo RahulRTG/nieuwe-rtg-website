@@ -124,6 +124,11 @@
       "vervalt": "2027-01-31"
     },
     {
+      "pad": "public/apps/magnaat-sandbox.js",
+      "reden": "De Magnaat-proef van de chauffeurs-PDA (TRAVELOS-MIGRATIE.md par. 1d) is een rechtenpad: de sandbox vangt API-, opslag- en apparaatverkeer af voordat chauffeur.js draait, en zet het zichtbare keurmerk Magnaat Test (#rtgMagnaatTestMark) met een eigen <style>. Zonder haar zou een trainingskopie de echte API raken. Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
       "pad": "public/shared/plaatsnadering.js",
       "reden": "De aankomstpuls (zelf melden dat je in de buurt bent, test/plaatsnadering.e2e.js) is gedrag en geen versiering; zijn aanbod (.rtgnader) heeft een eigen <style>. Gaat naar het dialoog-component.",
       "vervalt": "2027-01-31"
@@ -176,6 +181,10 @@
     "public/apps/arrival.html": "test/arrival-ds.e2e.js",
     "public/apps/flits.html": "test/flits-ds.e2e.js",
     "public/apps/navigatie.html": "test/navigatie-ds.e2e.js",
+    "public/apps/dispatch.html": "test/dispatch-ds.e2e.js",
+    "public/apps/chauffeur.html": "test/chauffeur-ds.e2e.js",
+    "public/apps/ghost.html": "test/ghost-ds.e2e.js",
+    "public/apps/voertuig.html": "test/voertuig-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

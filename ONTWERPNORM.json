@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 170,
-    "schermenMetStijlblok": 268,
-    "important": 7595
+    "bladen": 169,
+    "schermenMetStijlblok": 265,
+    "important": 7586
   },
   "uitzonderingen": [],
   "bladen": {
@@ -22,11 +22,6 @@
       "bytes": 8279,
       "important": 88,
       "hex": 6
-    },
-    "public/apps/chauffeur.css": {
-      "bytes": 20668,
-      "important": 5,
-      "hex": 52
     },
     "public/apps/comm-heritage.css": {
       "bytes": 7517,
@@ -1046,12 +1041,6 @@
       "important": 0,
       "hex": 4
     },
-    "public/apps/dispatch.html": {
-      "blokken": 2,
-      "bytes": 3982,
-      "important": 3,
-      "hex": 4
-    },
     "public/apps/doelen.html": {
       "blokken": 1,
       "bytes": 1102,
@@ -1627,12 +1616,6 @@
       "bytes": 7066,
       "important": 1,
       "hex": 4
-    },
-    "public/apps/ghost.html": {
-      "blokken": 1,
-      "bytes": 2431,
-      "important": 1,
-      "hex": 3
     },
     "public/apps/handel.html": {
       "blokken": 1,
@@ -2383,12 +2366,6 @@
       "bytes": 1362,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/voertuig.html": {
-      "blokken": 1,
-      "bytes": 1924,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/vonk.html": {
       "blokken": 1,

@@ -12,7 +12,11 @@ const EDGE = lees('public/shared/rtg-edge-system.css');
 const EDGE2 = lees('public/shared/rtg-edge-2.css');
 const HERITAGE = lees('public/shared/rtg-world-palette.css');
 const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
-const CHAUFFEUR = lees('public/apps/chauffeur.css');
+/* De chauffeurs-PDA staat sinds de TravelOS-migratie (stroom E) op het Design
+   System: zijn eigen blad is weg, zijn kopknoppen zijn .ds-kop__actie. */
+const CHAUFFEUR = lees('public/apps/chauffeur.html');
+const DS_KOP = lees('public/ds/componenten/kop.css');
+const DS_TOKENS = lees('public/ds/tokens.css');
 const VERBINDING = lees('public/shared/verbinding/verbinding-02.js');
 
 function variabele(blok, naam) {
@@ -58,7 +62,13 @@ test('zichtbare Edge-bediening gebruikt minstens 44 bij 44 pixels', () => {
 });
 
 test('route-eigen mobiele bediening houdt hetzelfde volledige raakvlak', () => {
-  assert.match(CHAUFFEUR, /\.rtg-merk\{[^}]*min-width:44px;min-height:44px;[^}]*display:grid/);
+  for (const id of ['veiligKnop']) assert.match(CHAUFFEUR, new RegExp('class="ds-kop__actie" id="' + id + '"'),
+    'de beveiligingsknop van de PDA is een kopactie van het systeem');
+  assert.match(CHAUFFEUR, /class="ds-kop__actie" type="button" data-ds-zoek/, 'en de zoekknop ook');
+  assert.match(DS_KOP, /\.ds-kop__actie \{[^}]*inline-size: var\(--ds-doel\);[^}]*block-size: var\(--ds-doel\);/,
+    'een kopactie is zo breed en hoog als het raakdoel');
+  const doel = Number((DS_TOKENS.match(/--ds-doel:\s*(\d+)px/) || [])[1]);
+  assert.ok(doel >= 44, 'het raakdoel van het systeem is minstens 44px, kreeg ' + doel);
   assert.match(VERBINDING, /flex:0 0 44px;min-width:44px;min-height:44px;display:grid/);
 });
 

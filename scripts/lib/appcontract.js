@@ -312,15 +312,6 @@ const CONTRACT = {
   'link:berichten': Object.assign({
     belofte: 'een lid begint een gesprek met iemand die het kent, stuurt, antwoordt, wijzigt en trekt in, en de ander ziet precies dat; wie niet in het gesprek zit leest en schrijft niets'
   }, voltooi('berichten', 'het scenario loopt /api/comm/begin, /stuur, /inbox, /gesprek, /lees, /reactie, /wijzig en /wis, de routes die /apps/comm.html zelf aanroept, met een verbonden tweede lid en een derde dat buiten blijft')),
-  'link:horeca': {
-    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'TAFELPROEF.json',
-      instrument: 'scripts/tafelproef.js',
-      waarom: 'de tafelproef loopt exact die stroom over /api/supplier/horeca/*, de routes die /apps/horeca.html zelf aanroept'
-    }
-  },
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
      link:connect is /apps/connect.html, dat acht /api/connect-routes met de proef

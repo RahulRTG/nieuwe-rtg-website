@@ -107,17 +107,6 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes, bundels } = 
       if (deelmap) for (const x of sr.perScherm) if (x.bestand.startsWith(deelmap)) bestanden.push(x.bestand);
     }
   }
-  /* EEN BUNDEL IS DE SOM VAN ZIJN DELEN (scripts/bundel.js): de browser laadt
-     public/apps/office/app.js, maar SCHERMROUTES.json schrijft de paden toe aan
-     de delen in public/apps/office/app/, want die zijn de bron. Zonder deze stap
-     raakte geen enkele proef een gebundeld scherm, hoe precies hij ook de
-     routes van dat scherm liep. */
-  const { bundels } = require('../bundel');
-  for (const b of bestanden.slice()) {
-    const deelMap = bundels[b.replace(/^public\//, '')];
-    if (!deelMap) continue;
-    for (const rij of sr.perScherm) if (rij.bestand.startsWith('public/' + deelMap + '/')) bestanden.push(rij.bestand);
-  }
   const exact = new Set(), voor = new Set();
   for (const b of bestanden) {
     const rij = perBestand.get(b);

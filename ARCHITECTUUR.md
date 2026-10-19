@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5545 |
-| servermodules (`server/**/*.js`) | 4603 |
+| servermodules (`server/**/*.js`) | 4604 |
 | routebestanden (`server/routes/**`) | 672 |
-| kernmodules (`server/kern/**`) | 2883 |
+| kernmodules (`server/kern/**`) | 2884 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 459 |
-| toetsbestanden (`test/*.test.js`) | 2561 |
+| toetsbestanden (`test/*.test.js`) | 2562 |
 | schermtoetsen (`test/*.e2e.js`) | 347 |
 
 ## 2. De weg van een verzoek
@@ -157,14 +157,14 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(216) auth(135) supplierAuth(67) officeAuth(50) db(42) liveCodename(36) status(32)
-accounts(30) schoon(23) rtf(23) boardroomWie(22) codenaamVan(21) save(21)
-managerOnly(20) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14)
-findSupplier(13) crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11)
-noteFailedTry(10) payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9)
-loginFails(8) stuur(8) logActivity(8) resolveSession(8) mail(7) onboarding(7)
-naamAuth(7) sseToSupplier(7) zwaarbewijs(6) notifySupplier(6) talen(6) tweefactor(5)
-kluisAuth(5) tenant(5) logInlog(5) veilig(5) afdelingen(5) boardroomBaas(5)
-openVacatures(5) overheid(5) sseToCustomer(5)
+accounts(30) schoon(23) rtf(23) boardroomWie(22) managerOnly(21) codenaamVan(21)
+save(21) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
+crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
+payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
+logActivity(8) resolveSession(8) mail(7) onboarding(7) naamAuth(7) sseToSupplier(7)
+zwaarbewijs(6) notifySupplier(6) talen(6) tweefactor(5) kluisAuth(5) tenant(5)
+logInlog(5) veilig(5) afdelingen(5) boardroomBaas(5) openVacatures(5) overheid(5)
+sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2908 bestanden en 19853 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2909 bestanden en 19857 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2908 |
-| losse beweringen (`test(...)`) | 19853 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
+| toetsbestanden | 2909 |
+| losse beweringen (`test(...)`) | 19857 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 88 |
+| niets van beide | 89 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2561 bestanden, 19268 beweringen.
+2562 bestanden, 19272 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1445,6 +1445,7 @@ toets omvalt.
 | `office-save-atomic.test.js` | 1 | gezakt op `!==->===#1` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `office-tweede-helft.test.js` | 10 | gezakt op `liegpoort /api/` | De kantoordeur, tweede helft. De RTG-kant van de ontwerptak is er net zo aan toe als de RTF-kant was: alles wat MAAKT en LEEST staat in de tests, alles wat WIJZIGT en WEGGOOIT niet. |
 | `office-uitgangspoort.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | RTG Office: EEN uitgangspoort voor classificatie (OFFICE.md par. 4 grens 4, par. |
+| `office-weg.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `office-zip-xlsx-takken.test.js` | 18 | gezakt op `voorwaarde-omkeren#0` | RTG Office, de zip-lezer en de XLSX-lezer langs al hun zijpaden: elke weigering van een vreemd bestand (afgekapt, gelogen lengte, onbekende inpakmethode, te groot) en elke celsoort en trouwlijstregel van de... |
 | `office.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Office: het eigen kantoorpakket. Tekstdocumenten en rekenbladen op het account (op elk toestel terug), alleen-lezen delen op codenaam (nooit op echte naam), en per-lid/per-document begrenzingen. |
 | `officebord.test.js` | 2 | gezakt op `liegpoort /api/` | Het bord (Trello) als kantoortool in RTG Office. Getoetst: een lid maakt een bord, bewaart lijsten met kaarten en leest ze terug (de sanitizer klemt labels en datums); de zaak heeft hetzelfde bord als team-drive; en... |

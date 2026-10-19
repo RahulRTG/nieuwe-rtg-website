@@ -37,7 +37,7 @@ function maakBasis({ db, crypto, codenaamVan }) {
   const id = () => 'doc' + crypto.randomBytes(6).toString('hex');
   const nu = () => new Date().toISOString();
 
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/office/basis', bezit: { officeDocs: 'kaart', officeAntwoorden: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/office/basis', bezit: { officeDocs: 'kaart', officeAntwoorden: 'kaart', officeBewaard: 'kaart' } });
   const lijsten = () => eigen.bak('officeDocs');
   const docMet = did => Object.values(lijsten()).find(d => d.id === String(did || '')) || null;
   // de grootte van de inhoud (JSON), zodat een document niet ongelimiteerd groeit

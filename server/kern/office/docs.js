@@ -165,19 +165,8 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     return { status: 200, ok: true, gewijzigd: d.gewijzigd, fase: faseVan(d) };
   }
 
-  /* ---- verwijderen (alleen de eigenaar) ---- */
-  function weg(key, did) {
-    const d = docMet(did);
-    if (!d) return { status: 404, error: 'Document niet gevonden.' };
-    if (d.key !== key) return { status: 403, error: 'Alleen de eigenaar kan verwijderen.' };
-    delete lijsten()[d.id];
-    // een formulier neemt zijn inzendingen mee het graf in
-    delete basis.eigen.kijk('officeAntwoorden')[d.id];
-    save();
-    return { status: 200, ok: true };
-  }
-
+  // verwijderen (bewaartermijn en spoor) staat in ./weg.js
   // markeren (officeSter) staat in ./ster.js
-  return { officeMijn: mijn, officeMaak: maak, officeOpen: open, officeBewaar: bewaar,
-    officeWeg: weg };
+  return Object.assign({ officeMijn: mijn, officeMaak: maak, officeOpen: open, officeBewaar: bewaar },
+    require('./weg')({ save }, basis));
 };

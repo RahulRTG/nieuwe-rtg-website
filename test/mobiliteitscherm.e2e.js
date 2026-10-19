@@ -267,8 +267,10 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
     const page = s.page;
 
     await page.waitForFunction(() => {
+      /* Sinds de TravelOS-migratie staat het bord op het Design System: het
+         verbergt met hidden, en een open rit is een rij met zijn ref. */
       const b = document.querySelector('#vBord');
-      return b && !b.classList.contains('weg') && document.querySelectorAll('#lijstOpen .rij').length > 0;
+      return b && !b.hidden && document.querySelectorAll('#lijstOpen [data-ref]').length > 0;
     }, null, { timeout: 20000 });
 
     const open1 = await page.textContent('#lijstOpen');
@@ -277,14 +279,14 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
     /* De rekensom. Hier rekent deze toets bewust af op de FACTORNAMEN en niet op
        "er staat iets": een balkje zonder uitleg is precies het scherm dat een
        planner doet terugvallen op handmatig toewijzen. */
-    await page.waitForFunction(() => document.querySelectorAll('#lijstOpen .balk').length > 0,
+    await page.waitForFunction(() => document.querySelectorAll('#lijstOpen [data-factor]').length > 0,
       null, { timeout: 20000 });
-    const balken = await page.$$eval('#lijstOpen .balk', els => els.map(e => e.textContent));
+    const balken = await page.$$eval('#lijstOpen [data-factor]', els => els.map(e => e.textContent));
     for (const factor of ['nabijheid', 'aankomsttijd', 'eerlijk'])
       assert.ok(balken.some(b => b.includes(factor)), 'de factor "' + factor + '" staat met zijn uitleg in beeld');
 
     // en het afgewezen voertuig staat er MET reden; niet stil weggelaten
-    const uitleg = await page.$$eval('#lijstOpen .uitleg', els => els.map(e => e.textContent));
+    const uitleg = await page.$$eval('#lijstOpen [data-afgewezen]', els => els.map(e => e.textContent));
     assert.ok(uitleg.some(u => /Wagen B/.test(u) && /vergunning/.test(u)),
       'de afgewezen wagen staat erbij met zijn reden, kreeg: ' + uitleg.join(' | '));
 

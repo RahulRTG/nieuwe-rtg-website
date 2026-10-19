@@ -216,7 +216,71 @@ waarheidsgetrouw, persistent, bevoegd en herstelbaar. Het komt erbovenop.
 | 7. RTG-ketens | elke keten uit d. (L6) loopt van begin tot eind via een verwijzing of projectie, met storingen, en zonder gegevens over te nemen | een ketenproef naar het model van scripts/ritproef.js, opgenomen in scripts/ondernemerbewijs.js |
 | 8. Bewezen betrouwbaarheid | alle acht bewijzen van APPWERKT staan centraal op BEWEZEN | APPWERKT.json |
 
-## 8. Wat deze kaart niet doet
+## 8. Twee uitkomsten per app
+
+Dit volgt uit de aanvulling van de eigenaar. Elke app-kaart sluit af met twee
+uitkomsten:
+- **(A)** wat binnen de huidige architectuur en scope gebouwd kan worden;
+- **(B)** het domeinmaximum, ook buiten de scope.
+
+Uitkomst B beschrijft hele professionele processen en geen losse schermen. Een
+greep daaruit:
+- inkoop tot betaling en een kwaliteitsmanagementsysteem (werkos.md);
+- van idee tot groep, inclusief een tweede vestiging (onderneming.md);
+- een horecazaak van vergunning tot jaarafsluiting (horeca.md);
+- het werkgeverschap van aanname tot uitdiensttreding (loonstrook.md, loopbaan.md);
+- een schooljaar met formatief evalueren (school.md).
+
+De processen van de beroepen rond wonen staan in professionals-wonen.md:
+- woningverkoop;
+- verhuurcyclus;
+- bouwproject;
+- VvE-jaar.
+
+B is richting en geen toezegging. Wat B buiten de scope vraagt, staat in de
+kaart als besluit.
+
+## 9. Bevindingen in de code (19 oktober 2026)
+
+De schrijvers lazen de code voor deze kaart en noteerden wat er mis lijkt. Op één
+na is niets gerepareerd. Een bevinding is pas een fout als ze in een toets of
+proef zakt. Elke regel noemt waar je haar terugvindt.
+
+**Gerepareerd** (minimaal, met eerst een falende toets):
+- `server/kern/onderneming/contracten.js` `ondernemingWerkruimte`: elk lid kon
+  een vreemde werkruimtecode aan zijn onderneming koppelen. Daarna toonde
+  `/api/onderneming/contracten` de contracten van die werkruimte: titel,
+  wederpartij, status en einddatum. Bestaande en onbekende codes gaven ook nog
+  een verschillend antwoord, zodat codes af te tasten waren.
+  - Nu koppelt alleen een actief lid met zijn eigen RTG-account. Een vreemde
+    werkruimte krijgt hetzelfde 404-antwoord als een onbekende.
+  - Wie uit de werkruimte gaat, ziet haar contracten niet meer.
+  - Toets: `test/onderneming-contracten.test.js`.
+
+**Open (gelezen en niet beproefd)**, per kaart:
+
+| Kaart | Bevinding (pad) |
+|---|---|
+| office | `/api/supplier/kantoorpakket/weg` vraagt alleen supplierAuth; elk personeelslid verwijdert elk teamdocument hard. `office/docs.js` `weg` negeert `beheer.bewaartermijn` (7 jaar), en het spoor verdwijnt mee |
+| rtmail | `kern/rtmail-schrijf.js` `verstuur` heeft geen herhaalsleutel; een herhaling na een verbroken antwoord meldt een fout terwijl het bericht verstuurd is. `rtmail-bewaar.js` `zetTermijn` staat op een zakelijk postvak 0 dagen toe |
+| browser | `routes/webbrowser.js`: een sollicitatie via een site wordt een gewone klus (`addTicket`) en valt buiten de leidingsplek. `webmaker-blader.js` `gids` sorteert op bezoeken, wat neerkomt op een populariteitsranglijst |
+| sitemaker | `kern/webdomein-html.js`: galerijbeelden krijgen `alt=""` en `lang="nl"` staat vast; risico voor WCAG 2.1 AA (EAA) |
+| werkos | `bedrijf/project.js`: een mijlpaal kan nooit op `gehaald` komen. `werk.html` r. 133 heeft een statisch "Human Enterprise"-paneel, en "Start veilige simulatie" start niets. `contract.js` rekent euro→cent anders dan `kern/geld/eenheid.js` |
+| werk | `app-main-25.js`: de lege-staattekst raadt een PIN-koppeling aan die `eenaccount/koppelen.js` weigert. `eenaccount.js` `slice(-10)` haalt bij een elfde rol stil de oudste weg |
+| onderneming | `onderneming/beeld.js` telt vestigingen uit Mall-plekken en entiteiten als het aantal ondernemingen, niet uit Concern; zo ontstaat "groep" zonder tweede rechtspersoon. `belasting.js` heeft een eigen `zeker: true` in plaats van de klassen |
+| horeca | `routes/supplier/menukaart.js` kapt allergenen af op 12 (de EU kent er 14), zonder lijstcontrole. `/haccp/punt`: elke medewerker overschrijft een meetgrens zonder historie. `groothandel.js` heeft geen managerOnly op bestel, ai-bevestig en annuleer. `kern/agent.js` `roosterVoorstel` heeft geen rusttoets en plant 7 dagen in plaats van 3 weken |
+| loonstrook | `accounts/staff.js` `staffPositions` filtert op `active = 1`, dus een oud-medewerker verliest zijn stroken en dossier (404). Een strook draagt geen minimumloon en geen vakantiegeldopbouw (art. 7:626 BW). Payroll en HACCP staan niet in `bewaarbeleid.js` |
+| loopbaan | `kern/carriereledger/index.js` kapt af op 500 regels door de oudste te verwijderen, en `/api/supplier/carriere/bevestig` is onbeperkt. Zo kan een derde de vroegste feiten van een lid wegdrukken, wat botst met append-only |
+| vertegenwoordiging | `vertegenwoordiging.html` belooft "Voorstellen doet u", maar roept `/voorstel`, `/handel` en `/voogd/*` niet aan. `handelen.js` r. 69 antwoordt "Uitgevoerd binnen de machtiging" zonder dat er een domein is aangeroepen |
+| school | `kern/onderwijs.js` `jaarOver` heeft geen herhaalsleutel; een dubbele tik telt naar het lijkt twee leerjaren |
+| magnaat | `magnaatwereld.js` (r. 581–582, 707, 990): `virtueelBudget` en `dienstenVoltooid` groeien ook onder de 18. MAGNAATLAB.md en MAGNAATLAB.json noemen verschillende dekkingscijfers |
+| rtgone | `rtgone.js` `overdrachtMaak` zoekt op een deel van de naam ("Jan" vindt ook "Janneke") en verplaatst het eigendom niet. De audit wordt afgekapt op 500, terwijl het scherm "onveranderlijk" belooft |
+| decisionroom | "terug" sluit het besluit zonder herindienroute, waardoor het gekoppelde project blijft hangen. Een voorwaarde bij akkoord wordt opgeslagen maar nergens bewaakt |
+| projectroom | `rtgone-projecten.js` `projectTaakZet`: een opgeleverd project kan terugvallen, en na een goedgekeurd besluit springt de status terug. Het scherm belooft afhankelijkheden die niet bestaan |
+| partnernetwerk | `kern/partnernetwerk.js` bepaalt "vandaag" in UTC. Het SCHERMEIGENAAR-doel wijkt af van de code |
+| professionals-wonen | `routes/supplier/gebouwpand.js` en `gebouwplus.js` controleren de cap `gebouw` niet. `vakwerk` staat niet in VAK_GENRES, zodat een vakwerk-zaak 403 krijgt op de vakpro-laag |
+
+## 10. Wat deze kaart niet doet
 
 - Hij bouwt niets.
 - Hij voegt geen regels toe aan registers en zet niets in NORM.json.

@@ -19,6 +19,7 @@
 const { randomUUID } = require('crypto');
 const { maakSleutel } = require('../../db/economische-identiteit');
 const { boekOpSleutel } = require('../betaalopdracht/terugboeking');
+const { LOPEND } = require('../pay/oplaadstand');
 
 module.exports = (ctx) => {
   const { betaalWaarheid, grootboek, boek, boekAsync, economischeBoekingEenmaal, geldModus, rekMeta, saldoVan, seintje } = ctx;
@@ -50,8 +51,14 @@ module.exports = (ctx) => {
         idem: 'bank-stort:' + iban + ':' + (idem ? String(idem) : 'los:' + randomUUID()),
         centen, valuta: 'eur', context: { iban, oms: oms || 'Storting' } });
     } catch (e) { return { status: 409, error: e.message }; }
+    /* Een storting die al liep, is bij een herhaling niet onbekend: dezelfde
+       regel als bij opladen (../pay/oplaadstand.js). */
+    const alGestart = !!w.providerId;
     try { await betaalWaarheid.begin(w.id, { omschrijving: oms || 'RTG Bank storten' }); }
     catch (e) {
+      const nu = betaalWaarheid.van(w.id);
+      if (alGestart && nu && LOPEND.includes(nu.status) && !(e && e.code === 'BETAAL_AFHANDELING_MISLUKT'))
+        return { status: 402, betalingId: w.id, lopend: true, error: 'De betaling wacht op bevestiging.', betaalStatus: nu.providerStatus || null };
       if (e && e.code === 'BETAAL_AFHANDELING_MISLUKT')
         return { status: 502, betalingId: w.id, error: 'De storting is bevestigd maar nog niet bijgeschreven; dat gebeurt vanzelf.' };
       return { status: 502, betalingId: w.id, onbekend: true,

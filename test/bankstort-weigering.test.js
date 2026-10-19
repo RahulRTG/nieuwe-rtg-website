@@ -20,7 +20,7 @@ function bank(stand, aanbieder) {
   const rail = { stand, aanbieder: aanbieder || 'simulatie', gemaakt: 0 };
   const betaal = {
     maakBetaling: async (o) => { rail.gemaakt++; return { id: 'p-' + o.referentie, status: rail.stand, aanbieder: rail.aanbieder, bedrag: o.bedrag, valuta: 'eur' }; },
-    haalBetaling: async (a, id) => ({ id, status: rail.stand, aanbieder: rail.aanbieder })
+    haalBetaling: async (a, id) => { if (rail.haalFout) throw new Error('geen stand'); return { id, status: rail.stand, aanbieder: rail.aanbieder }; }
   };
   const betaalWaarheid = maakBetaalWaarheid({ d: () => data, save: () => {}, crypto, betaal });
   const boeken = [];
@@ -81,4 +81,15 @@ test('een storting die LATER bevestigt (webhook), wordt dan precies een keer bij
   await b.betaalWaarheid.providerMelding(Object.assign({}, melding, { eventId: 'sim-2' }));
   assert.equal(b.boeken.length, 1, 'bijgeschreven, en een herhaalde melding schrijft niet nog eens bij');
   assert.equal(b.boeken[0].centen, 1000);
+});
+
+test('dezelfde storting nog eens terwijl de bank hangt: de wachtzin, geen 502 en geen tweede betaling', async () => {
+  const b = bank('open');
+  const eerste = await stort(b, 'hangt');
+  assert.equal(eerste.status, 402);
+  b.rail.haalFout = true;
+  const nogeens = await stort(b, 'hangt');
+  assert.equal(nogeens.status, 402, JSON.stringify(nogeens));
+  assert.match(nogeens.error, /wacht op bevestiging/);
+  assert.equal(b.rail.gemaakt, 1, 'geen tweede betaling bij de rail');
 });

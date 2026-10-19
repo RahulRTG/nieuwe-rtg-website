@@ -22,6 +22,8 @@ const EIGEN = [
   '/api/rtgid/annuleer',
   // een leerjaar erbij draagt zijn sleutel op het paspoort (kern/onderwijs.js)
   '/api/onderwijs/jaar-over',
+  '/api/onderwijs/inschrijf',
+  '/api/rtf/leerling/inschrijf',
   '/api/rtf/leerling/jaar-over',
   '/api/salon/deal/claim',
   // een reactie in De Salon draagt haar eigen sleutel (routes/member/salon.js)

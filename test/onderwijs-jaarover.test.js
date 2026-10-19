@@ -55,3 +55,33 @@ test('het scherm stuurt per tik een sleutel mee', () => {
   const bron = fs.readFileSync('public/apps/rtgschool/leer.js', 'utf8');
   assert.match(bron, /\/api\/onderwijs\/jaar-over', \{ idem: RTGId\(/);
 });
+
+/* Tweede reparatieronde (19 oktober 2026): inschrijf zette altijd jaar = 1,
+   ook bij dezelfde fase, en had geen herhaalsleutel. Een dubbele tik op
+   "Inschrijven" zette havo 3 stil terug naar havo 1 -- dataverlies in het
+   leerpaspoort. */
+test('opnieuw inschrijven op dezelfde fase zet het leerjaar niet terug', () => {
+  const { O } = school();
+  O.inschrijf('lid1', { fase: 'havo' });
+  O.jaarOver('lid1', 'j1'); O.jaarOver('lid1', 'j2');
+  assert.equal(O.mijn('lid1').jaar, 3);
+  const r = O.inschrijf('lid1', { fase: 'havo' });
+  assert.equal(r.jaar, 3, 'havo 3 blijft havo 3');
+  assert.equal(r.alIngeschreven, true);
+});
+
+test('inschrijven draagt een herhaalsleutel: dezelfde sleutel na een overstap doet niets nieuws', () => {
+  const { O } = school();
+  O.inschrijf('lid1', { fase: 'havo', idem: 'in-1' });
+  O.jaarOver('lid1', 'j1');
+  const voor = O.mijn('lid1');
+  const r = O.inschrijf('lid1', { fase: 'havo', idem: 'in-1' });
+  assert.equal(r.herhaald, true);
+  assert.equal(r.jaar, voor.jaar);
+  assert.equal(O.mijn('lid1').historie.length, voor.historie.length, 'geen extra historieregel');
+});
+
+test('het scherm stuurt bij inschrijven een sleutel mee', () => {
+  const bron = fs.readFileSync('public/apps/rtgschool/leer/leer-04.js', 'utf8');
+  assert.match(bron, /\/api\/onderwijs\/inschrijf', \{ fase: f, idem: RTGId\(/);
+});

@@ -358,7 +358,7 @@
     document.getElementById('inschrijfKnop').addEventListener('click', async function () {
       var f = document.getElementById('ladderKies').value;
       if (!f) { meld('Kies eerst een fase op de ladder.'); return; }
-      try { await api('/api/onderwijs/inschrijf', { fase: f }); meld('Ingeschreven; je paspoort loopt vanaf hier mee.'); laadPaspoort(); }
+      try { await api('/api/onderwijs/inschrijf', { fase: f, idem: RTGId('in') }); meld('Ingeschreven; je paspoort loopt vanaf hier mee.'); laadPaspoort(); }
       catch (e) { meld(e.message); }
     });
     document.getElementById('jaarKnop').addEventListener('click', async function () {

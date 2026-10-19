@@ -67,11 +67,18 @@ function maakOnderwijs({ db, save, schoon }) {
       eerlijk: EERLIJK };
   }
 
+  /* Inschrijven op een fase. Tot 19 oktober 2026 zette dit altijd jaar = 1,
+     ook op dezelfde fase en zonder herhaalsleutel: een dubbele tik zette havo 3
+     stil terug naar havo 1. Nu verandert dezelfde fase niets, en de sleutel
+     woont op het paspoort (net als bij jaarOver). */
   function inschrijf(key, d) {
     d = d || {};
     const f = faseVan(String(d.fase || ''));
     if (!f) return { status: 400, error: 'Die fase staat niet op de ladder.' };
     const p = paspoort(key);
+    const idem = scho(d.idem, 64);
+    if (idem && (p.inschrijfIdem || []).includes(idem)) return Object.assign(mijn(key), { herhaald: true });
+    if (p.fase === f.id) return Object.assign(mijn(key), { alIngeschreven: true });
     if (p.fase && !magNaar(p.fase, f.id)) {
       return { status: 400, error: 'Die overstap zit niet in de doorstroomkaart. Vraag een begeleider om mee te kijken.' };
     }
@@ -79,7 +86,9 @@ function maakOnderwijs({ db, save, schoon }) {
       p.historie.push({ van: p.fase, naar: f.id, jaar: p.jaar, reden: scho(d.reden, 200) || null, op: nu() });
       if (p.historie.length > 300) p.historie.splice(0, p.historie.length - 300);
     }
-    p.fase = f.id; p.jaar = 1; p.at = nu(); save();
+    p.fase = f.id; p.jaar = 1; p.at = nu();
+    if (idem) p.inschrijfIdem = [idem].concat(p.inschrijfIdem || []).slice(0, 20);
+    save();
     return mijn(key);
   }
 

@@ -51,7 +51,7 @@ module.exports = (kern) => {
   app.post('/api/rtf/leerling/paspoort', auth, handel((l) => onderwijs.mijn(l.sleutel)));
   // hetzelfde bewijs, voor de leerling in de Foundation-app
   app.post('/api/rtf/leerling/bewijs', auth, handel((l, b) => onderwijs.bewijsVan(l.sleutel, b)));
-  app.post('/api/rtf/leerling/inschrijf', auth, handel((l, b) => faseMag(l, b.fase) ? onderwijs.inschrijf(l.sleutel, b) : dicht()));
+  app.post('/api/rtf/leerling/inschrijf', auth, handel((l, b) => faseMag(l, b.fase) ? onderwijs.inschrijf(l.sleutel, Object.assign({}, b, { idem: b.idem })) : dicht()));
   app.post('/api/rtf/leerling/jaar-over', auth, handel((l, b) => onderwijs.jaarOver(l.sleutel, b.idem)));
   app.post('/api/rtf/leerling/vakken', auth, handel((l, b) => b.fase && !faseMag(l, b.fase) ? dicht() : leerstof.leerstofVakken(l.sleutel, b)));
   app.post('/api/rtf/leerling/les', auth, handel((l, b) => doelMag(l, b.doel) ? leerstof.leerstofLes(l.sleutel, b) : dicht()));

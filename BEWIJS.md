@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2908 bestanden en 19851 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2908 bestanden en 19853 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2908 |
-| losse beweringen (`test(...)`) | 19851 |
+| losse beweringen (`test(...)`) | 19853 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2561 bestanden, 19266 beweringen.
+2561 bestanden, 19268 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1466,7 +1466,7 @@ toets omvalt.
 | `onderneming-belasting.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |
 | `onderneming-bestuur.test.js` | 28 | gezakt op `===->!==#0` | Ronde: het bestuur -- wie beslist, wie bezit, en wie er als UBO uit volgt. Vijf beweringen: 1. |
 | `onderneming-capaciteit.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de capaciteit -- kan er nog iets bij. Vier beweringen: 1. |
-| `onderneming-contracten.test.js` | 14 | gezakt op `===->!==#0` | Ronde: de contractklok op het dagbeeld. Vier beweringen: 1. |
+| `onderneming-contracten.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de contractklok op het dagbeeld. Vier beweringen: 1. |
 | `onderneming-crediteuren.test.js` | 11 | gezakt op `===->!==#0` | Ronde: de crediteuren -- wat er nog uit moet, en wanneer. Vier beweringen: 1. |
 | `onderneming-dagbeeld.test.js` | 11 | gezakt op `===->!==#0` | Ronde: het dagbeeld -- de schil die de drie assen als één scherm toont. De twee beloftes die hier worden vastgehouden: 1. |
 | `onderneming-debiteuren.test.js` | 12 | gezakt op `===->!==#0` | Ronde: de debiteuren -- wat er nog open staat, en hoe lang al. Vier beweringen: 1. |

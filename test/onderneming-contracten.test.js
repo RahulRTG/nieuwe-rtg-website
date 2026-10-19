@@ -49,7 +49,13 @@ function stubKern(contracten, werkruimteCode) {
   const wr = {};
   if (werkruimteCode !== null) {
     wr[werkruimteCode || 'WAB12'] = { code: werkruimteCode || 'WAB12', naam: 'Glas BV',
+      leden: { l1: { id: 'l1', naam: 'Eigenaar', status: 'actief', rtgKey: 'LID1' } },
       contracten: Object.fromEntries((contracten || []).map(c => [c.id, c])) };
+    /* Een tweede werkruimte van iemand anders, met een contract dat dit lid
+       nooit te zien mag krijgen. */
+    wr.WVR33 = { code: 'WVR33', naam: 'Vreemde BV',
+      leden: { v1: { id: 'v1', naam: 'Ander', status: 'actief', rtgKey: 'ANDER' } },
+      contracten: { geheim: contract({ id: 'geheim', titel: 'Geheime huur', wederpartij: 'Pand BV' }) } };
   }
   const data = { ondernemingen: [], suppliers: [zaak], posts: [], vakOffertes: [], facturen: [],
     werkruimtes: wr,
@@ -114,6 +120,33 @@ test('een werkruimte die niet bestaat wordt geweigerd', () => {
   assert.equal(K.ondernemingWerkruimte(o, 'WAB12').ok, true);
   assert.equal(K.ondernemingContracten(o, VANDAAG).stand, 'gekoppeld');
   assert.equal(K.ondernemingWerkruimte(o, '').werkruimte, null, 'loskoppelen kan ook');
+});
+
+/* ---------------- alleen de eigen werkruimte ---------------- */
+
+/* Tot 19 oktober 2026 koppelde elke bestaande werkruimtecode, ook die van een
+   ander, en toonde het dagbeeld daarna de contracten van die vreemde
+   werkruimte: titel, wederpartij, status en einddatum. Een code is kort; een
+   bestaande gaf 200 en een onbekende 404, dus de codes waren af te tasten. */
+test('een werkruimte waar het lid geen actief lid van is, koppelt niet en lekt niets', () => {
+  const K = stubKern([contract()]);
+  const o = ond(K);
+  const r = K.ondernemingWerkruimte(o, 'WVR33');
+  assert.equal(r.status, 404, 'een vreemde werkruimte koppelt niet');
+  assert.equal(r.error, 'Deze werkruimte bestaat niet.', 'en het antwoord is gelijk aan een onbekende code');
+  const c = K.ondernemingContracten(o, VANDAAG);
+  assert.equal(c.stand, 'geen-werkruimte');
+  assert.ok(!JSON.stringify(c).includes('Geheime huur'), 'geen contract van een ander');
+});
+
+test('wie uit de werkruimte gaat, ziet haar contracten niet meer', () => {
+  const K = stubKern([contract({ titel: 'Eigen huur' })]);
+  const o = ond(K, 'WAB12');
+  assert.equal(K.ondernemingContracten(o, VANDAAG).stand, 'gekoppeld');
+  K._db.data.werkruimtes.WAB12.leden.l1.status = 'uit-dienst';
+  const c = K.ondernemingContracten(o, VANDAAG);
+  assert.notEqual(c.stand, 'gekoppeld');
+  assert.ok(!JSON.stringify(c).includes('Eigen huur'), 'een oud lid leest de bibliotheek niet meer');
 });
 
 test('een werkruimte die verdwijnt geeft een eigen melding', () => {

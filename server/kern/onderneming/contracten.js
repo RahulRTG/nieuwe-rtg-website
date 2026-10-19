@@ -39,10 +39,19 @@ module.exports = ({ db }) => {
   /* De werkruimte koppelen. Hij moet bestaan -- een code uit het lichaam is
      geen bewijs dat er iets achter zit, en een koppeling naar het niets zou
      later als "geen contracten" lezen. */
+  /* Een code is geen bevoegdheid: alleen wie zelf actief lid is van de
+     werkruimte (met zijn RTG-account gekoppeld, bedrijf/aansluiting.js) mag
+     haar aan zijn onderneming hangen en haar contracten zien. Een vreemde
+     werkruimte krijgt hetzelfde antwoord als een onbekende, zodat codes niet
+     af te tasten zijn. */
+  function isLid(w, key) {
+    return !!(w && key && Object.values(w.leden || {}).some((l) => l && l.rtgKey === key && l.status === 'actief'));
+  }
+
   function ondernemingWerkruimte(o, code, save) {
     const c = String(code || '').trim().toUpperCase();
     if (!c) { delete o.werkruimte; save(); return { ok: true, werkruimte: null }; }
-    if (!werkruimtes()[c]) return { status: 404, error: 'Deze werkruimte bestaat niet.' };
+    if (!isLid(werkruimtes()[c], o.eigenaar)) return { status: 404, error: 'Deze werkruimte bestaat niet.' };
     o.werkruimte = c;
     save();
     return { ok: true, werkruimte: c };
@@ -58,6 +67,10 @@ module.exports = ({ db }) => {
         let: 'Zonder koppeling weten wij niet of u contracten heeft; dit is geen bevestiging dat er niets loopt.' };
     }
     const w = werkruimtes()[o.werkruimte];
+    if (w && !isLid(w, o.eigenaar)) {
+      return { ok: true, stand: 'geen-toegang', aantal: null, contracten: [],
+        uitleg: 'U bent geen actief lid meer van de gekoppelde werkruimte (' + o.werkruimte + '), dus wij tonen haar contracten niet.' };
+    }
     if (!w) {
       return { ok: true, stand: 'werkruimte-weg', aantal: null, contracten: [],
         uitleg: 'De gekoppelde werkruimte (' + o.werkruimte + ') bestaat niet meer.' };

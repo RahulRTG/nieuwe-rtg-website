@@ -36,7 +36,8 @@ module.exports = (kern) => {
   // erop: opladen, het overzicht, de kassacode, en sinds de derde reeks van 19
   // oktober 2026 ook sturen, Klompjes en tikken -- elk geldmoment achter de
   // paspoortpoort, die nu voor elk account geldt (test/sociaal-gratisaccount).
-  // Het tegoed (./pay-tegoed.js) en de terugstorting blijven voor leden.
+  // Sinds de vierde reeks ook het tegoed en de terugstorting (./pay-tegoed.js,
+  // ./pay-terug.js): wie kan inleggen, moet terug kunnen halen.
   const geenEchtAccount = (req, res) => {
     if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account om met RTG Pay te betalen.' }); return true; }
     return false;
@@ -124,7 +125,7 @@ module.exports = (kern) => {
      geld het huis verlaat richting het LID, en sinds die weg bestaat is
      walletsaldo elektronisch geld (zie WALLET_SALDO in kern/bevoegdheid). Zo
      zwaar iets hoort niet tussen de dunne routes hierboven te staan. */
-  require('./pay-terug')(kern, { stuur, geenGast, kyc });
+  require('./pay-terug')(kern, { stuur, geenEchtAccount, kyc });
 
   /* De ZAAKKANT (./pay-zaak.js): budget geven, vooraf vastzetten, innen,
      saldo en uitbetalen. Afgesplitst omdat dit bestand anders over de

@@ -13,12 +13,22 @@
    B (/api/member/dm), zoals de leden-app dat doet.
    ========================================================================== */
 'use strict';
-const { nieuwLid, verbind } = require('../voltooiwereld');
+const { nieuwLid, verbind, KANTOORWERELD } = require('../voltooiwereld');
 
 const GIDS = '/api/browser/gids';
 const ZOEK = '/api/browser/zoek';
 const OPEN = '/api/browser/open';
 const BERICHT = '/api/browser/bericht';
+
+async function zaakSessie(w, code) {
+  const rooster = await w.post('/api/supplier/roster', { code });
+  const man = ((rooster.data && rooster.data.staff) || []).find((x) => x.role === 'manager');
+  const z = await w.post('/api/supplier/login', { code, staffId: man && man.id, pin: '1234' });
+  if (!z.data || !z.data.token) throw new Error('de manager van ' + code + ' kon niet inloggen (' + z.status + ')');
+  return z.data.token;
+}
+const klussen = async (w, Z, tekst) => ((((await w.post('/api/supplier/state', {}, Z)).data || {}).state || {}).tickets || [])
+  .filter((t) => String(t.text).includes(tekst));
 
 async function loop(w, stap) {
   const merk = 'b' + Date.now().toString(36).slice(-5);
@@ -73,6 +83,19 @@ async function loop(w, stap) {
     return { klopt: o.status === 200 && r.status === 403 && n === 0, ziet: 'lezen ' + o.status + ', bericht ' + r.status + ', bij A ' + n };
   });
 
+  let zaakAdres = null, Z = null;
+  await stap('voltooibaar', 'een zaak zet haar site online; een lid stuurt via het formulier een reservering en die staat als klus in haar werklijst, op codenaam', async () => {
+    Z = await zaakSessie(w, 'KIKUNOI');
+    const g = await w.post('/api/supplier/site/genereer', {}, Z);
+    zaakAdres = g.data && g.data.adres;
+    const o = await w.post(OPEN, { adres: zaakAdres }, B.token);
+    const r = await w.post(BERICHT, { adres: zaakAdres, tekst: 'Tafel voor zes ' + merk, soort: 'reservering', idem: 'zaak-' + merk }, B.token);
+    const k = await klussen(w, Z, 'Tafel voor zes ' + merk);
+    return { klopt: g.status === 200 && !!zaakAdres && o.status === 200 && !!o.data.zaak && r.status === 200 && r.data.via === 'werklijst' &&
+      k.length === 1 && /RTG-web/.test(k[0].by) && !JSON.stringify(k[0]).includes('Voltooilid'),
+      ziet: 'site ' + g.status + ' op ' + zaakAdres + ', bericht ' + r.status + ' via ' + (r.data && r.data.via) + ', ' + k.length + ' klus van "' + (k[0] && k[0].by) + '"' };
+  });
+
   await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
     const l = await w.post(GIDS, {});
     const s = await w.post(BERICHT, { adres: 'x', tekst: 'Anoniem bericht' });
@@ -113,6 +136,19 @@ async function loop(w, stap) {
     return { klopt: opnieuw.status === 200 && n === 1,
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', bij A ' + n };
   });
+  await stap('herstelbaar', 'een crash direct na een bericht aan de zaak: na de herstart een klus, en dezelfde sleutel met een ander bericht is 409', async () => {
+    const t = 'Stroomtafel ' + merk;
+    const lijf = { adres: zaakAdres, tekst: t, soort: 'reservering', idem: 'zaakcrash-' + merk };
+    const r = await w.post(BERICHT, lijf, B.token);
+    await w.crash();
+    B.token = (await w.post('/api/auth/login', { login: B.email, password: B.wachtwoord })).data.token;
+    const opnieuw = await w.post(BERICHT, lijf, B.token);
+    const ander = await w.post(BERICHT, Object.assign({}, lijf, { tekst: 'Iets anders ' + merk }), B.token);
+    Z = await zaakSessie(w, 'KIKUNOI');
+    const k = await klussen(w, Z, t);
+    return { klopt: r.status === 200 && opnieuw.status === 200 && opnieuw.data.herhaald === true && ander.status === 409 && k.length === 1,
+      ziet: 'na SIGKILL: herhaling ' + opnieuw.status + ' herhaald=' + (opnieuw.data && opnieuw.data.herhaald) + ', ander bericht ' + ander.status + ', ' + k.length + ' klus' };
+  });
   await stap('herstelbaar', 'een crash direct na het versturen: na de herstart staat het er een keer, en de herhaling hoort dat', async () => {
     const t = 'Stroom ' + merk;
     const lijf = { adres, tekst: t, soort: 'vraag', idem: 'crash-' + merk };
@@ -128,9 +164,10 @@ async function loop(w, stap) {
 
 module.exports = {
   functie: 'link:browser',
+  omgeving: KANTOORWERELD,
   ingang: '/apps/browser.html',
   persona: 'lid',
   belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden; dat staat na een herstart en een crash',
-  grens: 'De proef loopt de routes van het scherm, niet het scherm zelf. Alleen de site van een lid; een zaaksite (bericht als klus in de werklijst) heeft in deze testwereld geen online site en is niet beproefd. Vertaling van een site is niet beproefd. Geen Redis of PostgreSQL.',
+  grens: 'De proef loopt de routes van het scherm, niet het scherm zelf. De zaak (KIKUNOI) zet haar site online met /api/supplier/site/genereer en logt in met de seed-personeelspin; de testwereld staat die toe. Vertaling van een site is niet beproefd. Geen Redis of PostgreSQL.',
   loop
 };

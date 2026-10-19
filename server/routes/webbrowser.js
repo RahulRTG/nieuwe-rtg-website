@@ -62,8 +62,20 @@ module.exports = (kern) => {
     const code = webmaker.zaakVanAdres(b.adres);
     const s = code && findSupplier ? findSupplier(code) : null;
     if (s) {
+      /* DE HERHAALSLEUTEL BIJ EEN ZAAK. Het bericht wordt een klus in de
+         werklijst; een herhaling na een afgebroken verbinding of een herstart
+         is dezelfde klus, een ander bericht met dezelfde sleutel 409. Op de
+         klus staat een hash van afzender en sleutel, nooit de ledensleutel
+         zelf: de werklijst is van de zaak. */
+      const merk = req.body.idem ? require('crypto').createHash('sha256')
+        .update(req.session.key + '|' + String(req.body.idem).slice(0, 80)).digest('hex').slice(0, 24) : null;
+      const vinger = merk ? require('crypto').createHash('sha256').update(soort + '|' + tekst).digest('hex').slice(0, 24) : null;
+      const eerder = merk && ((db.data.tickets || {})[s.code] || []).find(t => t.webIdem === merk);
+      if (eerder && eerder.webVinger !== vinger) return res.status(409).json({ error: 'Deze herhaalsleutel hoort bij een ander bericht; er is niets verstuurd.' });
+      if (eerder) return res.json({ ok: true, via: 'werklijst', soort, herhaald: true });
       const van = liveCodename ? liveCodename(req.session) : 'lid';
-      addTicket(s.code, { name: 'RTG-web · ' + van }, label + ' via de website: ' + tekst.slice(0, 140));
+      const klus = addTicket(s.code, { name: 'RTG-web · ' + van }, label + ' via de website: ' + tekst.slice(0, 140));
+      if (merk && klus) { klus.webIdem = merk; klus.webVinger = vinger; }
       /* Een klus in een lijst is nog geen bericht: zonder seintje kan een
          zaak dagen niet weten dat er iemand wacht. */
       if (notifySupplier) notifySupplier(s.code, { icon: 'berichten', title: label + ' via uw website', body: tekst.slice(0, 80) });

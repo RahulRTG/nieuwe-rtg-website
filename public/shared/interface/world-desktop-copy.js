@@ -40,12 +40,13 @@
   /* De schil spreekt de taal van de pagina. Zonder keuze van het lid zet i18n
      de toesteltaal alleen op tekst met een sleutel; tekst zonder sleutel blijft
      Nederlands tot het lid kiest. Een pagina zonder eigen sleutels bleef dus
-     Nederlands onder een Engelse schil (arrival.html, 19 oktober 2026). */
+     Nederlands onder een Engelse schil (arrival.html, 19 oktober 2026). De
+     regel zelf woont in i18n.js (inhoudVolgt), naast <html lang>. */
   function volgt() {
     var i = w.RTGi18n;
-    if (!i || i.lang === 'nl') return false;
-    return !!i.chosen || !!d.querySelector('[data-i18n]:not([data-i18n^="desktop"]):not([data-i18n^="widget."])');
+    return !!i && i.lang !== 'nl' && typeof i.inhoudVolgt === 'function' && i.inhoudVolgt();
   }
+  function taal() { return volgt() ? w.RTGi18n.lang : 'nl'; }
   function value(k) { return volgt() ? w.RTGi18n.t('desktop.' + k, words[k][0]) : words[k][0]; }
   function el(tag, cls, text) { var n = d.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   /* Een sleutel alleen waar de schil de i18n-laag volgt; anders zet i18n.apply
@@ -65,5 +66,5 @@
     name = aliases[name] || name;
     n.innerHTML = '<svg viewBox="0 0 24 24">' + (icons[name] || icons.grid || '') + '</svg>'; return n;
   }
-  w.RTGDesktopUI = { el: el, copy: copy, value: value, volgt: volgt, key: key, button: button, label: label, icon: icon };
+  w.RTGDesktopUI = { el: el, copy: copy, value: value, volgt: volgt, taal: taal, key: key, button: button, label: label, icon: icon };
 })(window, document);

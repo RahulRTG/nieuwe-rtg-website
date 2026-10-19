@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-19T09:45:30.964Z",
-  "commit": "a91053a70",
-  "boomVuil": true,
-  "boomAnders": 5,
+  "op": "2026-10-19T10:03:33.455Z",
+  "commit": "eb6dde1a",
+  "boomVuil": false,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
@@ -92734,7 +92734,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
-    "uitHandler": null,
+    "uitHandler": "object: code",
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },

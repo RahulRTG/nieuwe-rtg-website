@@ -3,26 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "a91053a70",
+  "commit": "eb6dde1a",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
+   "boomVuil": false,
    "ongecommitteInvoer": [
-    "public/apps/app-main/app-main-01.js",
-    "public/apps/app-main/app-main-10.js",
-    "public/apps/app-main/app-main-10a.js",
-    "public/apps/app-main/app-main-11.js",
-    "public/apps/app-main/app-main-19.js",
-    "public/apps/app-main/app-main-32.js",
-    "public/apps/app-main/app-main-32a.js",
-    "public/apps/app-main/app-main-33.js",
-    "public/apps/app-main/app-main-43.js",
-    "public/apps/app-main/app-main-44.js",
-    "public/apps/app-main/app-main-46.js",
-    "public/apps/app.html",
-    "public/apps/werkruimte.html",
-    "public/sw.js"
+    "ROUTEBRON.json"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -2006,8 +1993,8 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-19T09:27:29.111Z",
-   "commit": "00c949f0"
+   "op": "2026-10-19T10:03:21.649Z",
+   "commit": "eb6dde1a"
   },
   "bekendePaden": 5516
  },

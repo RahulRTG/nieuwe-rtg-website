@@ -5,6 +5,7 @@ module.exports = (ctx) => {
   const { save, crypto, schoon, notify, zorgVoor, zorgMee,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief } = ctx;
   const C = ctx.opslag || require('./opslag')(ctx); // ./opslag.js, gebouwd in ../care.js
+  const kluisje = ctx.intakesleutel || require('./intakesleutel')(); // art. 9: per veld, gebonden aan de rij
   function careIntakeDeel(key, aanbiederIdIn, medischIn) {
     lijsten();
     const a = aanbiederVan(aanbiederIdIn);
@@ -13,11 +14,16 @@ module.exports = (ctx) => {
     if (!medisch) return { status: 400, error: 'Vul in wat de behandelaar moet weten.' };
     // een lopende intake bijwerken in plaats van stapelen
     let i = intakeActief(key, a.id);
+    const id = i ? i.id : crypto.randomBytes(4).toString('hex');
+    /* DICHT FALEN: kan het niet versleuteld, dan wordt er niets bewaard. */
+    let dicht;
+    try { dicht = kluisje.sluit(medisch, 'intake|' + id + '|' + key); }
+    catch (e) { return { status: 503, error: 'Uw medische context kan nu niet veilig worden bewaard. Er is niets gedeeld; probeer het straks opnieuw.' }; }
     if (!i) {
-      i = { id: crypto.randomBytes(4).toString('hex'), key, aanbiederId: a.id, aanbiederNaam: a.naam, status: 'actief', at: nu() };
+      i = { id, key, aanbiederId: a.id, aanbiederNaam: a.naam, status: 'actief', at: nu() };
       C.bak('careIntake').push(i);
     }
-    i.medisch = medisch;
+    i.medisch = dicht;
     i.vervaltOp = new Date(Date.now() + INTAKE_DAGEN * 86400000).toISOString().slice(0, 10);
     save();
     notify(key, { icon: 'zorg', title: 'Intake gedeeld met ' + a.naam, body: 'Uw medische context is beschikbaar voor ' + a.naam + ' tot ' + i.vervaltOp + '. U kunt dit altijd stoppen.', scope: 'care' });
@@ -82,13 +88,17 @@ module.exports = (ctx) => {
       // het algemene zorgprofiel reist mee (met toestemming); een aparte,
       // uitdrukkelijk gedeelde intake voor deze aanbieder gaat er bovenop
       zorg: zorgMee(sess.key, { zaak: 'care:' + a.id, reden: 'zorgprofiel meegegeven bij een zorgboeking' }),
-      intake: (intakeActief(sess.key, a.id) || {}).medisch || null,
+      intake: null,   // hieronder, versleuteld en aan deze boeking gebonden
       status: 'wacht-op-betaling', paid: false, at: nu()
     };
+    const ik = intakeActief(sess.key, a.id);
+    const tekst = ik ? kluisje.open(ik.medisch, 'intake|' + ik.id + '|' + sess.key) : null;
+    if (tekst) { try { boeking.intake = kluisje.sluit(tekst, 'boeking|' + boeking.id); } catch (e) { /* dicht: dan reist hij niet mee */ } }
     C.bak('careBoekingen').unshift(boeking);
     C.zetBak('careBoekingen', C.bak('careBoekingen').slice(0, 200000));
     save();
-    return { ok: true, boeking };
+    // het lid ziet zijn eigen intake terug; in de opslag staat hij alleen versleuteld
+    return { ok: true, boeking: Object.assign({}, boeking, { intake: tekst || null }) };
   }
 
   /* BETAALD IS: ER BEWOOG GELD. Hier stond `bk.paid = true` zonder dat er een

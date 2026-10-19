@@ -162,6 +162,7 @@ const SCENARIOS = {
   'sport.js': require('./lib/voltooi/sport'),
   'stad.js': require('./lib/voltooi/stad'),
   'spelavond.js': require('./lib/voltooi/spelavond'),
+  'tabzorg.js': require('./lib/voltooi/tabzorg'),
   'table.js': require('./lib/voltooi/table'),
   'theater.js': require('./lib/voltooi/theater'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),

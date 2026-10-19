@@ -57,9 +57,9 @@ test('2. alleen de acht bewijzen, en alleen wat de bronsoort mag leveren', () =>
   for (const [functie, c] of Object.entries(CONTRACT)) {
     assert.ok(typeof c.belofte === 'string' && c.belofte.length > 20, functie + ': de belofte in woorden ontbreekt');
     for (const [naam, bron] of Object.entries(c)) {
-      /* ingang, via en bestanden zijn de navigatie van een tab of OS-app
-         (scripts/lib/bewijsbron.js, ingangVan), geen bewijs. */
-      if (naam === 'belofte' || (!functie.startsWith('link:') && ['ingang', 'via', 'bestanden'].includes(naam))) continue;
+      /* belofte, en de koppeling (ingang, via, bestanden: scripts/lib/bewijsbron.js,
+         ingangVan) -- gegevens over het contract, geen bewijzen. */
+      if (['belofte', 'ingang', 'via', 'bestanden'].includes(naam)) continue;
       assert.ok(BEWIJZEN.includes(naam), functie + ': "' + naam + '" is geen bewijs');
       assert.ok((BRONSOORTEN[bron.soort] || []).includes(naam), functie + ': een ' + bron.soort + ' mag geen ' + naam + ' leveren');
     }
@@ -79,9 +79,9 @@ test('3. elke koppeling haalt de meting: de app staat in MAPPEN en de proef raak
        contract wijst de navigatiestap en zijn eigen delen aan. */
     if (link) assert.ok(bron && bron.url, functie + ' staat niet (met een adres) in MAPPEN');
     else assert.ok(reg.los(functie).bestaat && c.ingang && c.via && Array.isArray(c.bestanden), functie + ' staat niet in de app, of mist ingang, via of bestanden');
-    const ing = link ? B.ingangRoutes(bron.url) : B.ingangVan(null, c);
+    const ing = B.ingangVan(link ? bron.url : null, c);
     for (const [naam, b] of Object.entries(c)) {
-      if (naam === 'belofte' || ['ingang', 'via', 'bestanden'].includes(naam)) continue;
+      if (['belofte', 'ingang', 'via', 'bestanden'].includes(naam)) continue;
       assert.ok(fs.existsSync(path.join(WORTEL, b.instrument)), b.instrument + ' bestaat niet');
       const proef = B.proefRoutes(b.instrument);
       const raak = B.gedeeld(proef, ing);

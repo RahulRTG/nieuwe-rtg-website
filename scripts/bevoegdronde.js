@@ -76,7 +76,10 @@ function laadRegisters({ lees, vers } = {}) {
     const s = reg.stempel && typeof reg.stempel === 'object' ? v(reg.stempel) : { vers: false, reden: 'geen stempel met commit' };
     if (!s.vers) uit.vervallen.push(naam + ': ' + s.reden);
     if (zet === 'idor') {
-      for (const [k, w] of Object.entries(reg.perRoute || {})) {
+      /* De zaak-gang (gang 5) meet leveranciersroutes met twee ZAKEN: daar is
+         "een ander bedrijf" de vraag, en ledenschermen als Horeca roepen ze aan.
+         De paden overlappen niet met de ledengang. */
+      for (const [k, w] of Object.entries(Object.assign({}, reg.zaakPerRoute || {}, reg.perRoute || {}))) {
         const [methode, pad] = k.split(' ');
         const lijst = uit.idor.get(pad) || []; lijst.push({ methode, staat: w.staat }); uit.idor.set(pad, lijst);
       }

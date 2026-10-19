@@ -81,6 +81,7 @@
           if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
+          sluitGezinssessie();              // een nieuwe inlog: geen gezinssessie van wie hier eerder zat (app-main-04.js)
           applyState(data.state);           // user = het echte account
           tier = user.tier;
           /* Registratie wisselt de uitnodiging in dezelfde serverhandeling in.
@@ -128,6 +129,7 @@
         try {
           const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
           API.token = data.token;
+          sluitGezinssessie();
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
       } else if (magnaatKopie) {

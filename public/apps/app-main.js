@@ -477,6 +477,7 @@ var RTG_BOUW = '1b45b94d';
           if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
+          sluitGezinssessie();              // een nieuwe inlog: geen gezinssessie van wie hier eerder zat (app-main-04.js)
           applyState(data.state);           // user = het echte account
           tier = user.tier;
           /* Registratie wisselt de uitnodiging in dezelfde serverhandeling in.
@@ -524,6 +525,7 @@ var RTG_BOUW = '1b45b94d';
         try {
           const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
           API.token = data.token;
+          sluitGezinssessie();
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
       } else if (magnaatKopie) {
@@ -593,8 +595,28 @@ var RTG_BOUW = '1b45b94d';
     }
   }
 
+  /* DE GEZINSSESSIE HOORT BIJ DE INLOG DIE HAAR OPENDE. rtf_sessie staat per
+     browser en niet per account, en het gezinstoken is een eigen sleutel: de
+     server vraagt er geen ledentoken bij. Na een uitlog of een nieuwe inlog op
+     een gedeeld toestel las de volgende mens anders in het gezin van de vorige.
+     Dus: weg uit de browser, en op de server ingetrokken (dezelfde route als
+     afmelden() in apps/foundation/sessie.js), zodat een kopie niets opent.
+     Toets: test/gezinssessie-gedeeld-toestel.e2e.js. */
+  function sluitGezinssessie(){
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch(e){}
+    try { localStorage.removeItem('rtf_sessie'); } catch(e){}
+    if (!s || !s.code) return;
+    [s.token, s.wissel].forEach(t => {
+      if (!t) return;
+      try { fetch('/api/foundation/gezin/sessie/intrek', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: s.code, token: t }) }).catch(() => {}); } catch(e){}
+    });
+  }
+
   async function doLogout(){
     try { if (API.live) await API.call('/logout'); } catch(e){}
+    sluitGezinssessie(); // een gedeeld toestel: het gezin van deze mens reist niet mee
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
     try { localStorage.removeItem('rtg_werktafel_pas'); } catch(e){} // en zijn pas reist niet mee naar de volgende

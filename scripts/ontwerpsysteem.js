@@ -58,7 +58,9 @@ const zonderCommentaar = s => s.replace(/\/\*[\s\S]*?\*\//g, ' ');
 function bestanden(map, patroon, uit = []) {
   if (!fs.existsSync(map)) return uit;
   for (const naam of fs.readdirSync(map).sort()) {
-    if (naam === 'node_modules' || naam.startsWith('.')) continue;
+    /* public/dist is de uitvoer van npm run build (geminimaliseerde kopie,
+       in .gitignore): geen bron, dus geen erfenis en geen nieuw bestand. */
+    if (naam === 'node_modules' || naam.startsWith('.') || path.join(map, naam) === path.join(PUBLIEK, 'dist')) continue;
     const vol = path.join(map, naam);
     const st = fs.statSync(vol);
     if (st.isDirectory()) bestanden(vol, patroon, uit);

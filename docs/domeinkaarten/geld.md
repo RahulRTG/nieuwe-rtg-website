@@ -691,4 +691,317 @@ weekbeeld gratis; een trend niet.
 
 ---
 
-*De overige families volgen.*
+## Familie 3 — samen geld
+
+### 3.1 WBW, Wie betaalt wat (`/apps/geld.html#wbw`)
+
+**a. Doel.** Met vrienden samen uitgeven zonder ruzie: weten wie wat betaalde en
+het in één tik rechtzetten.
+
+**b. Wat er is.**
+- Routes (`server/routes/wbw.js`): mijn, maak, groep, uitgave, verreken en
+  verzoek.
+  - `verreken` heeft de paspoortpoort en de bezitspoort.
+  - `geenGast` weigert elk gratis account ("Wie betaalt wat is voor leden.").
+- Kern: `server/kern/wbw.js`.
+  - Alleen Salon-vrienden.
+  - Een exacte verdeling tot op de cent.
+  - Verrekenen loopt via `pay.stuur`, met een sleutel per boeking.
+- Voltooiscenario: `voltooi/wbw.js` (`link:wbw`).
+
+**c. Objecten en eigenaar.** `wbwGroepen` (kern/wbw) hoort bij
+`geld.overzicht`. De vriendschap blijft van de Salon.
+
+**e. Rechten.**
+- Alleen een lid met een pas.
+- Alleen Salon-vrienden kunnen in een groep.
+- Grenzen: 50 groepen, 12 leden en 500 regels; € 25.000 per uitgave.
+- **Vraagt besluit**: een gratis account mag sinds 19 oktober sturen en
+  betaalverzoeken doen, maar WBW weigert het nog.
+
+**Zes lagen, oordeel.**
+- **L1** groep, uitgave en verrekenen bestaan.
+- **L4** alleen de verdeling; geen statistiek.
+- **L5** verrekenen gaat één keer, ook bij een crash. Een verzoek heeft geen
+  sleutel.
+- **L6** de Salon (vrienden) en Pay (stuur, Klompje).
+- L2 en L3: niet van toepassing.
+
+**Functiecatalogus**
+
+| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|
+| Groep, uitgave en exacte verdeling | L1 | bestaat | Drie vrienden delen een rekening; de stand klopt tot op de cent; een buitenstaander ziet niets. | — | — |
+| In één tik verrekenen | L1 | bestaat | Wie rood staat, verrekent via RTG Pay; een dubbele tik betaalt één keer. | — | — |
+| Onbeperkt uitgaven | L1 | bestaat | Er is geen daglimiet. Splitwise Free heeft er een (fragment). | — | — |
+| Bon per regel splitsen | L1 | ontbreekt | Het lid splitst een uitgave per regel van de bon over verschillende mensen. Splitwise Pro (fragment). | middel | later |
+| Valuta omrekenen in de groep | L1 | ontbreekt | Een uitgave in een andere munt telt in euro mee, met de koers en datum erbij. Splitwise Pro (fragment). | middel | later |
+| Export en afrekenoverzicht | L5 | ontbreekt | Het lid downloadt de groep met alle regels en de eindstand. Tricount haalde dit weg (fragment). | klein | nu |
+| Een sleutel op het verzoek | L5 | ontbreekt | Twee tikken op "vraag" maken één betaalverzoek. | klein | nu |
+| Automatisch de groep herkennen (GELD.md fase 4) | L4 | ontbreekt | — | — | later: het vraagt context van reis en salon, en eerst toestemming |
+
+**f. LOS en SAMEN.**
+- **LOS.** Valt Pay uit, dan houdt het lijstje de stand. Verrekenen zegt dat
+  betalen nu niet kan, en de stand blijft onveranderd.
+- **SAMEN.** Leest de vriendschap uit de Salon; verrekent via Pay; geeft een
+  verwijzing per groep uit.
+
+**Keten.** Een weekend weg (reis):
+1. Iedereen zet uitgaven in de groep.
+2. Wie rood staat, verrekent.
+3. Pay boekt het.
+4. Geld Command toont het als uitgave aan een vriend.
+
+Storingen:
+- Valt de Salon uit, dan blijft een bestaande groep werken, maar kan er geen
+  nieuw lid bij.
+- Weigert Pay, dan blijft de schuld staan en heet het niet "verrekend".
+
+**g. Betaalmuur** (fragment):
+- Splitwise Pro: onbeperkt uitgaven, bonscan, per regel splitsen, omrekenen,
+  grafieken en zoeken
+  (androidcentral.com/apps-software/the-app-splitwise-is-the-best-hack-to-split-group-trip-expenses-in-2026).
+- Tricount: gratis, maar export en statistiek zijn weggehaald
+  (help.tricount.com/articles/what-happened-with-tricount-premium).
+- Tikkie: gratis (abnamro.nl/…/tikkie/).
+
+Wij hebben:
+- onbeperkt, en direct verrekenen;
+- niet: per regel splitsen, omrekenen en export.
+
+### 3.2 Labfonds (`/apps/geld.html#labfonds`)
+
+**a. Doel.** Samen geld toezeggen aan een plek of onderzoek dat je raakt, en er
+samen over beslissen.
+
+**b. Wat er is.**
+- Routes (`server/routes/labfonds.js`): overzicht, locatie/maak, doneer,
+  voorstel/maak, stem, scheidsrechter, beslis en financiering, plus de
+  gezinsdeur `/api/rtf/labfonds/*` en `/api/labfonds/boardroom` voor het
+  kantoor.
+- Kern: `server/kern/labfonds.js`, `labfonds/voorstellen.js` en
+  `labfonds/onderzoek.js`.
+- "Een toezeggingen-grootboek en geen kas; er verhuist hier geen euro."
+- Voltooiscenario: `voltooi/labfonds.js` (`link:labfonds`).
+
+**c. Objecten en eigenaar.** `labFonds` (locaties, bijdragen en voorstellen)
+hoort bij `geld.overzicht`. De onderzoeken blijven van het RTF-onderzoekslab.
+
+**e. Rechten.**
+- Elk account, ook gratis; een anonieme gast niet.
+- Alleen wie het voorstel indiende, sluit de stemming.
+- In het gezin zegt een volwassene toe.
+
+**Zes lagen, oordeel.**
+- **L1** toezeggen, voorstellen en stemmen bestaan.
+- **L3** de scheidsrechter en het gezin bestaan.
+- **L5** een toezegging telt één keer.
+- **L6** het onderzoekslab en de Foundation.
+- L2 en L4: niet van toepassing.
+
+**Functiecatalogus**
+
+| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|
+| Toezeggen, voorstellen en stemmen | L1/L3 | bestaat | Een toezegging telt één keer; alleen de indiener sluit; een ander lid stemt. | — | — |
+| Openbare verantwoording van een pot | L5 | half | Iedereen in de pot ziet wat er is toegezegd, waaraan het besteed is en wie besloot. `financiering` bestaat; een overzicht per pot nog niet. Open Collective zet dit in een betaald pakket (fragment). | klein | nu |
+| Toezegging omzetten in een echte betaling | L6 | ontbreekt | — | — | **vraagt besluit**: vandaag beweegt er bewust geen euro; een betaling vraagt een kas en de fiscale klassen |
+
+**f. LOS en SAMEN.**
+- **LOS.** Zonder onderzoeksplatform staat er "Het onderzoeksplatform is hier
+  niet beschikbaar; koppelen kan nu niet." Toezeggen werkt gewoon.
+- **SAMEN.** Labfonds verwijst naar een studie-id en levert de financiering aan
+  `/api/lab2/publiek/onderzoek`.
+
+**Keten.** Een lid zegt toe aan een speelplek. Een ouder stelt een besteding
+voor, het gezin stemt en de indiener sluit. Geld Command toont de toezegging als
+"toegezegd, niet betaald".
+
+**g. Betaalmuur** (fragment): Open Collective Pro heeft bank-sync en beheerde
+fondsen (opencollective.com/ofico/updates/…); Snapshot-stemmen is gratis
+(help.snapshot.box/…). Wij hebben toezeggen en stemmen gratis; de verantwoording
+half.
+
+---
+
+## Familie 4 — Lifestyle (Mecenaat, Nalatenschap)
+
+Beide zijn vandaag alleen voor de Lifestyle- en Business Pass ("Deze app is
+onderdeel van de Lifestyle Pass.", `server/routes/member/rechterhand.js:20`).
+Beide bewegen geen geld en geven geen advies.
+
+### 4.1 Mecenaat (`/apps/geld.html#mecenaat`)
+
+**a. Doel.** Weten wat je geeft, aan wat en waarom, en dat het klopt bij de
+belastingaangifte zonder dat iemand je adviseert.
+
+**b. Wat er is.**
+- Routes: `/api/member/rechterhand/mecenaat`, `/gift`, `/gift/weg` en
+  `/betaald`.
+- Kern: `server/kern/rechterhand/mecenaat.js` (thema's, en een periode:
+  eenmalig, maand, kwartaal of jaar).
+- "Er beweegt geen geld; betaald is een aantekening van het lid."
+- Voltooiscenario: `voltooi/mecenaat.js`.
+
+**c. Objecten en eigenaar.** Het levensdossier-veld `mecenaat` is van de
+rechterhand.
+
+**e. Rechten.** Lifestyle en Business.
+
+**Zes lagen, oordeel.**
+- **L1** het bijhouden bestaat.
+- **L4** de regel gift-bevestiging bestaat in geldbeleid.
+- **L5** een jaaroverzicht ontbreekt.
+- **L6** de Foundation-vlag bestaat; er gaat geen aanroep naar de Foundation.
+- L2 en L3: niet van toepassing.
+
+**Functiecatalogus**
+
+| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|
+| Giften bijhouden en als betaald markeren | L1 | bestaat | Toegezegd, betaald en via de Foundation tellen apart; een gift zonder doel wordt geweigerd. | — | — |
+| Jaaroverzicht van giften | L5 | ontbreekt | Het lid downloadt per jaar zijn giften per doel. Het overzicht draagt de klasse "uitlegbaar" en zegt dat aftrekbaarheid afhangt van de ANBI-status, die het lid zelf controleert. Every.org stuurt kwitanties gratis (fragment). | klein | nu |
+| Een gift echt betalen | L6 | ontbreekt | — | — | **vraagt besluit**: dat raakt de doneerknop (`GIFT.md`) |
+| Fiscale aftrek berekenen | — | ontbreekt | — | — | niet zelfstandig: het is fiscaal "advies", een mens beoordeelt |
+
+**f. LOS en SAMEN.**
+- **LOS.** Mecenaat werkt volledig los; het is een lijst van het lid.
+- **SAMEN.** Geld Command telt de toezeggingen mee, en de regel
+  "gift-bevestiging" vraagt het lid te bevestigen.
+
+**g. Betaalmuur** (fragment): Every.org en de GoFundMe Giving Fund geven een
+jaaroverzicht gratis (every.org/pricing, gofundme.com/c/pricing); Geef.nl: niet
+gevonden. Wij hebben het bijhouden; het jaaroverzicht niet.
+
+**j. Extern.** ANBI-gegevens zijn openbaar; RTG controleert ze niet
+inhoudelijk en zegt dat.
+
+### 4.2 Nalatenschap (`/apps/geld.html#nalatenschap`)
+
+**a. Doel.** Rust voor later: weten dat je naasten vinden wat ze nodig hebben,
+zonder dat iemand het nu kan lezen.
+
+**b. Wat er is.**
+- Routes: `/api/member/rechterhand/nalatenschap`, `/doc`, `/contact` en
+  `/wens`, met hun `weg`-varianten.
+- Kern: `server/kern/rechterhand/nalatenschap.js`, met AES-256-GCM op de
+  gevoelige velden.
+- Voltooiscenario: `voltooi/nalatenschap.js`. Dat bewijst dat de gevoelige
+  velden versleuteld in de opslag staan en een crash overleven.
+
+**c. Objecten en eigenaar.** Het levensdossier-veld `nalatenschap` (documenten,
+contacten en wensen) is van de rechterhand.
+
+**e. Rechten.**
+- Lifestyle en Business; alleen het lid zelf.
+- "Notaris" is een contactlabel; er is geen rol voor de notaris.
+
+**Zes lagen, oordeel.**
+- **L1** bewaren bestaat.
+- **L2** de notaris als professional vraagt een genre en een besluit.
+- **L5** de vrijgave aan nabestaanden ontbreekt (GELD.md fase 5).
+- **L6** bewust geïsoleerd: de concierge ziet het niet.
+- L3 en L4: niet van toepassing.
+
+**Functiecatalogus**
+
+| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|
+| Documenten, contacten en wensen versleuteld bewaren | L1 | bestaat | Wat gevoelig is, staat versleuteld in de opslag; alleen het lid ziet het na inloggen. | — | — |
+| Vertrouwenspersoon met vrijgavevoorwaarde | L5 | ontbreekt | Het lid wijst iemand aan die pas na een vrijgavevoorwaarde iets ziet. Die voorwaarde is altijd een menselijke bevestiging, nooit alleen een timer. Elke inzage komt in een audit die het lid kan lezen. Google en Apple hebben dit gratis (fragment). | groot | later (GELD.md fase 5) |
+| Versiegeschiedenis en inzage-audit | L5 | ontbreekt | Het lid ziet elke wijziging en elke inzage met datum. | middel | later |
+| Notaris als professional | L2 | ontbreekt | — | — | **vraagt besluit**: een genre in de leveranciersapp (CIVILIS) |
+| Een testament opstellen | — | ontbreekt | — | — | niet: juridisch "voorbehouden" |
+
+**f. LOS en SAMEN.**
+- **LOS.** Nalatenschap werkt volledig los. Met opzet geen SAMEN: "Besloten
+  zaken (gezondheid, nalatenschap) komen hier niet binnen"
+  (`server/routes/office/concierge.js:33`). Een keten komt er pas met een
+  vrijgavevoorwaarde, en dan alleen naar de aangewezen mens.
+
+**g. Betaalmuur** (fragment):
+- Trust & Will: een membership voor de kluis (trustandwill.com/learn/trust-and-will-membership).
+- Google Inactive Account Manager en Apple Legacy Contact: gratis
+  (support.google.com/accounts/answer/3036546, support.apple.com/en-us/102631).
+- Mijndigisafe (NL): een notariële kluis tegen betaling (id.nl/…).
+
+Wij hebben de versleutelde kluis; de vrijgave aan nabestaanden niet.
+
+---
+
+## Voorstel aan de eigenaar, in drie bakken
+
+Per functie één zin, de kosten en wat er al voor bestaat. Een functie wordt pas
+werk na toezegging per familie.
+
+### Aanbevolen nu
+
+1. **Reis betalen vanaf het scherm, via de betaalwaarheid, met bijladen**
+   (middel). Er is al `reisbureau-betaling.js`, en ook `stortwaarheid` en
+   `dealbetaal` als voorbeeld. Daarbij horen de bezits- en paspoortpoort op
+   `/api/reisbureau/betaal` (klein).
+2. **De reis als verplichting en kasstroom in Geld** (middel). Bouwt op
+   `geldgraaf/vooruitblik.js`.
+3. **Paspoortpoort op direct betalen (tab Betalen) en op de bank, vóór live**
+   (klein). Voorbeeld: `payGate`.
+4. **De kascode tonen in Pay** (klein). `/api/pay/kascode` bestaat al.
+5. **Zoeken, eigen categorieën en export van de geschiedenis** (middel). De
+   bank heeft al `afschrift.csv`.
+6. **Vermogensoverzicht** (middel): de posities bij RTG en de eigen opgave
+   apart. Er is al `/api/pay/portefeuille`.
+7. **Contracten en abonnementen**: koppelen en een signaal vóór de
+   opzegdatum, plus prijsstijging (middel). Er zijn al `patronen.js` en
+   `vastelasten`.
+8. **Huishoudscenario's en kasstroomprognose** (middel). Er zijn al
+   `vooruitblik.js` en `fiscaal/scenario.js`.
+9. **Verplichtingenkalender**, met verwijzingen naar de app-eigenaar (middel).
+   Ontvangt van reis, assets en wonen.
+10. **Aflosplan als rekensom** (middel). Bestaat nog nergens.
+11. **Verloopsignaal in Wallet** (klein).
+12. **WBW-export en een sleutel op het verzoek** (klein).
+13. **Labfonds-verantwoording per pot** (klein).
+14. **Jaaroverzicht van giften in Mecenaat**, als "uitlegbaar" (klein).
+
+### Later
+
+- Een gezamenlijke pot, rekening of budget voor een huishouden (groot).
+- Afrondsparen (middel).
+- Bonregels splitsen en valuta in WBW (middel).
+- Besluitvergelijking en langetermijnplanning zonder rendement (middel).
+- Meerdere rekeningen bij de bank (klein, na live).
+- Passen uit andere apps in Wallet (middel).
+- Een offline RTG Code (middel).
+- Een trend in Balans en financieel welzijn (klein en middel).
+- In Nalatenschap: een vertrouwenspersoon met vrijgavevoorwaarde, versies en
+  audit (groot).
+- Automatisch de groep herkennen in WBW (later, eerst toestemming).
+
+### Niet doen, en waarom
+
+- **Krediet en lening in de bank.** GELD.md par. 7, en een vergunning is
+  nodig. Het bestaat al in `kern/bank/krediet.js`: **besluit gevraagd** of dat
+  blijft.
+- **AI-"advies" in de bank als advies.** Herschrijven naar uitleg met de
+  fiscale klasse.
+- **Verzekering en dekking** (aankoop, annulering, reis).
+- **Lounges en partnerabonnementen.** Verdienmodellen, geen functies.
+- **Rendement, Monte Carlo of beleggingsanalyse in de planning.** Dat is
+  beleggingsadvies.
+- **Een testament opstellen of fiscale aftrek vaststellen.** Juridisch of
+  fiscaal "voorbehouden" of "advies".
+- **Eigen kaarten uitgeven.** Dat vraagt een bankpartner.
+- **Een bankkoppeling met andere banken.** Pas met een AISP-partner (extern);
+  tot dan alleen RTG-bronnen en de eigen opgave.
+
+### Besluiten gevraagd
+
+1. Een reis: een pasfunctie of "minimaal een account"? (0.5)
+2. Geld Command en WBW weigeren elk gratis account (`geenGast`). Vallen ze
+   onder "minimaal een account"?
+3. Krediet en AI-advies in `kern/bank`: blijven ze, en zo ja onder welke
+   vergunning?
+4. Woonlasten: komt er een verplichtingenobject van Geld waar Wonen naar
+   verwijst?
+5. Mecenaat: een gift echt betalen (`GIFT.md`)? Labfonds: een toezegging echt
+   innen?
+6. Nalatenschap: een genre "notaris" onder CIVILIS?

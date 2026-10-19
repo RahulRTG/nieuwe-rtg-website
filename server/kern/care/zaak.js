@@ -114,7 +114,7 @@ module.exports = (ctx) => {
   /* Betalen aan twee zaken, naar verhouding (besluit eigenaar 19 oktober
      2026): ./pakketbetaal.js. Lezen zonder scheppen: de boekingenlijst en de
      catalogus ontstaan waar ze getoond worden, niet bij een betaling. */
-  const pakketBetaal = require('./pakketbetaal')(ctx);
+  const pakketBetaal = require('./pakketbetaal')({ ...ctx, opslag: C });
   const carePakketBetaal = (sess, refIn, verdien) => pakketBetaal.carePakketBetaal(sess, refIn, verdien, { pakketVan, nachtprijsVan });
 
   function carePakketMijn(key) {

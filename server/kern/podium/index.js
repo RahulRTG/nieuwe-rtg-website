@@ -4,8 +4,9 @@
    kanaalchat, sturen cadeautjes via RTG Pay en nemen een maandabonnement.
 
    Spelregels, bewust streng:
-   - Strikt 18+: makers EN kijkers hebben een actief RTG-geverifieerd paspoort
-     en zijn minstens 18 (zelfde poort als Salon-ontmoetingen).
+   - Leeftijd per zone (./zones.js): de gedeelde zones vragen een lid; alleen
+     de zone 'beperkt' vraagt van makers EN kijkers een RTG-geverifieerd
+     paspoort en 18 jaar (zelfde poort als Salon-ontmoetingen).
    - Een kanaal gaat pas open na menselijke goedkeuring door RTG-kantoor; het
      systeem of de AI keurt nooit zelf goed (zelfde regel als de passen).
    - Alles draait op codenamen; echte namen blijven in de kluis.

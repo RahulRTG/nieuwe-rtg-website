@@ -112,8 +112,9 @@ Object.assign(kern, maakOntmoeting({
   connectieTussen: kern.connectieTussen, verbActief: kern.verbActief,
   zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, haversine
 }));
-/* RTG Podium (kern/podium.js): het eigen live-kanaal van De Salon. Strikt 18+
-   achter dezelfde paspoortpoort als de ontmoetingen; een kanaal gaat pas open
+/* RTG Podium (kern/podium.js): het eigen live-kanaal van De Salon. De leeftijd
+   hangt aan de zone (kern/podium/zones.js): alleen 'beperkt' is 18+, achter
+   dezelfde paspoortpoort als de ontmoetingen; een kanaal gaat pas open
    na menselijke goedkeuring door kantoor; cadeautjes en abonnementen lopen
    via RTG Pay. Na pay en sociaal gemount (gebruikt beide). */
 /* Wie werkt waar (kern/werkplekken.js): het Podium (zone 'zaak'), het Theater

@@ -13,7 +13,7 @@ module.exports = [
   ['clips', 'Clips', 'media', '/apps/clips.html', 'Korte video\'s die lokaal bij de maker blijven; een eindige dagselectie.'],
   ['klankwerk', 'RTG Klankwerk', 'media', '/apps/klankwerk.html', 'Zelf muziek maken: een raster, een notenrol en Rahul die iets neerzet. Alles wordt opgewekt, dus alles is van jou.'],
   ['zaal', 'De Zaal', 'media', '/apps/zaal.html', 'Wat leden zelf gemaakt hebben, op volgorde van wanneer het uitkwam. Geen hitlijst.'],
-  ['podium', 'Podium', 'media', '/apps/podium.html', 'Je eigen live-kanaal (18+), met chat, RTG Pay-cadeaus en abonnementen.'],
+  ['podium', 'Podium', 'media', '/apps/podium.html', 'Je eigen live-kanaal, met chat, RTG Pay-cadeaus en abonnementen; de 18+-zone heeft een eigen deur.'],
   ['sitemaker', 'Website-maker', 'media', '/apps/sitemaker.html', 'Bouw met blokken je eigen RTG-site, met eigen foto\'s en beeld uit De Salon.'],
   ['browser', 'RTG Browser', 'media', '/apps/browser.html', 'Blader door de sites die leden in het RTG-web publiceren.'],
   ['werk', 'RTG Werk OS', 'media', '/apps/werk.html', 'De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.'],

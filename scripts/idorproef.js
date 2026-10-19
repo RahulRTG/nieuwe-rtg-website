@@ -176,6 +176,7 @@ const NAGEKEKEN = {
   'POST /api/metier/lid': 'Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C\'s profiel schreef, met A\'s codenaam als schrijver',
   'POST /api/metier/zoek': 'kern/metier/zoek.js: "wie niets invulde, staat niet in de etalage" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw',
   'POST /api/residentie/gids': 'de gids toont suites met s.open op codenaam; let wel: een suite ONTSTAAT open (kern/residentie/index.js suiteVan, open: true), dus wie zijn suite opent staat in de gids zonder zelf voor open te kiezen -- een productvraag over de standaard, geen IDOR',
+  'POST /api/carriere/ledger/zet': 'carriereledger.zet(key, data) leest geen id en schrijft een NIEUW feit in reeks(key) van B; de tegenpoging gaf 409 "staat er al, woord voor woord" door B\'s eigen eerste regel',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);

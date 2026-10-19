@@ -104,7 +104,10 @@ const LIJVEN = {
   '/api/metier/naam-vrij': { code: 'KIKUNOI', waarvoor: 'sollicitatie' },
   '/api/metier/naam-intrekken': { code: 'KIKUNOI' },
   /* Het loopbaanledger (routes/carriereledger.js) */
-  '/api/carriere/ledger/zet': () => ({ kapitaal: 'vermogen', wat: 'Diploma sommelier gehaald', op: vandaag() }),
+  /* Het ledger weigert elke som geld ("NOOIT.bedrag"), dus de geldvelden van het
+     plausibele lijf gaan eruit. */
+  '/api/carriere/ledger/zet': () => ({ kapitaal: 'vermogen', wat: 'Diploma sommelier gehaald', op: vandaag(),
+    bedrag: undefined, centen: undefined, bedragCenten: undefined, prijs: undefined, aantal: undefined }),
   '/api/carriere/ledger/intrek': { reden: 'verkeerde datum' },
   '/api/carriere/ledger/deel': { dagen: 7, voor: 'een opdrachtgever' },
   /* Veilig (routes/veiligheid.js) */
@@ -112,6 +115,9 @@ const LIJVEN = {
   '/api/veiligheid/plek': { lat: 52.37, lon: 4.89, lng: 4.89 },
   '/api/veiligheid/alarm': { proef: true },
   '/api/veiligheid/codewoord/zet': { zin: 'rode fiets bij de molen' },
+  '/api/veiligheid/moment/maak': (c) => ({ ontvangers: c.tegen ? [{ soort: 'contact', id: c.tegen.codenaam, niveau: 'voortgang' }] : [],
+    titel: 'Wandeling', minuten: 120 }),
+  '/api/isolatie/mijn/ontsluiting': { drager: 'sessie', naar: 'normaal', reden: 'alles is weer in orde' },
   /* Overige identiteitsroutes */
   '/api/sociaal/beleid/zet': { soort: 'antwoord', aan: true },
   '/api/isolatie/mijn/zet': { drager: 'identiteit', naar: 'normaal' },
@@ -372,6 +378,8 @@ function stappen() {
     { pad: '/api/metingen/zet', lijf: { onderwerp: 'slaap', waarde: 7 } },
     { pad: '/api/medicatie/zet', lijf: (c) => ({ naam: 'Middel-' + c.merk, sterkte: '10mg' }) },
     { pad: '/api/noodkaart/zet', lijf: (c) => ({ contactNaam: 'Contact-' + c.merk, contactTel: '0612345678' }) },
+    /* Een bijlesvraag met A's merkwoord: het bijlesgesprek is van A */
+    { pad: '/api/bijles/vraag', lijf: (c) => ({ tekst: 'Wat betekent ' + c.merk + '?' }) },
     /* C maakt een clip, zodat er iets van C te volgen valt */
     { als: 'tegen', pad: '/api/clips/maak', lijf: { titel: 'Proefclip', duurS: 10 } },
     /* Een gegevensgesprek */

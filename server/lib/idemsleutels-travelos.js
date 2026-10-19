@@ -28,6 +28,14 @@ const SLEUTELS = {
   'POST /api/staff/ov/lijn/zet': { zelfdeVerzoek: true },
   'POST /api/residentie/meubel/zet': { zelfdeVerzoek: true },
   'POST /api/residentie/meubel/weg': { zelfdeVerzoek: true },
+  /* De eigen suite lezen verandert niets. Naam en open/dicht zetten VERVANGT
+     een stand en voegt niets toe (kern/residentie/suite.js suiteZet): de
+     handler is daar zelf idempotent op. Een poort die een woordelijk gelijke
+     herhaling het oude antwoord geeft, zou open -> dicht -> open binnen het
+     venster de derde stap laten opslokken; daarom doet de poort hier niets. */
+  'POST /api/residentie/suite': { leest: true },
+  'POST /api/residentie/suite/zet': { nietIdempotent: true,
+    waarom: 'zet een stand (naam, open) en de handler is daar zelf idempotent op; een herhaald oud antwoord zou een wissel open/dicht binnen het venster opslokken' },
   'POST /api/member/vluchten/charter': { zelfdeVerzoek: true }
 };
 module.exports = { SLEUTELS };

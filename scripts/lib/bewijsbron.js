@@ -76,7 +76,19 @@ function smalVoorvoegsel(v) {
   return v.replace(/^\/+|\/+$/g, '').split('/').length >= 3;
 }
 
-function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
+/* EEN GEGENEREERDE BUNDEL IS ZIJN DELEN. scripts/schermroutes.js slaat de
+   bundels (bouwuitvoer, scripts/bundel.js) bewust over en schrijft de paden
+   toe aan de delen ernaast. Een ingang die de bundel laadt, roept dus de
+   routes van die delen aan; zonder deze stap zag de koppeling van
+   /apps/residentie.html alleen /api/stroom/ticket. */
+function bundelRegister() {
+  try {
+    const b = require('../bundel');
+    return new Map(Object.entries(b.bundels).map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']));
+  } catch (e) { return new Map(); }
+}
+
+function ingangRoutes(ingang, { lees = leesStandaard, schermroutes, bundels } = {}) {
   if (!ingang || !ingang.startsWith('/')) return null;
   const sr = schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
   const perBestand = new Map(sr.perScherm.map((x) => [x.bestand, x]));
@@ -85,22 +97,15 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
   const bron = lees(html);
   if (bron !== null) {
     const map = path.posix.dirname(ingang);
+    const delen = bundels || bundelRegister();
     for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+\.js)[^"]*"/g)) {
       const src = m[1];
       if (/^[a-z]+:\/\//i.test(src)) continue;
-      bestanden.push('public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src)));
+      const b = 'public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src));
+      bestanden.push(b);
+      const deelmap = delen.get(b);
+      if (deelmap) for (const x of sr.perScherm) if (x.bestand.startsWith(deelmap)) bestanden.push(x.bestand);
     }
-  }
-  /* EEN BUNDEL IS DE SOM VAN ZIJN DELEN (scripts/bundel.js): de browser laadt
-     public/apps/office/app.js, maar SCHERMROUTES.json schrijft de paden toe aan
-     de delen in public/apps/office/app/, want die zijn de bron. Zonder deze stap
-     raakte geen enkele proef een gebundeld scherm, hoe precies hij ook de
-     routes van dat scherm liep. */
-  const { bundels } = require('../bundel');
-  for (const b of bestanden.slice()) {
-    const deelMap = bundels[b.replace(/^public\//, '')];
-    if (!deelMap) continue;
-    for (const rij of sr.perScherm) if (rij.bestand.startsWith('public/' + deelMap + '/')) bestanden.push(rij.bestand);
   }
   const exact = new Set(), voor = new Set();
   for (const b of bestanden) {

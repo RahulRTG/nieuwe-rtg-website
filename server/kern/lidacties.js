@@ -72,40 +72,6 @@ function koopTicketVoor(session, body) {
   return { ok: true, ticket }; // afrekenen via /api/booking/pay of Rahul
 }
 
-function betaalBoekingVoor(session, body) {
-  const b = boekingMetRef(body.ref);
-  if (!b || (b.customerKey || b.customerTier) !== session.key) return { status: 404, error: 'Boeking niet gevonden.' };
-  if (b.paid) return { status: 409, error: 'Al betaald.' };
-  /* Een geannuleerde boeking blijft geannuleerd. Zonder deze regel valt de enige
-     poort weg zodra er is terugbetaald -- de annulering zet paid weer op false --
-     en kan dezelfde retour-boeking opnieuw afgerekend worden. Zelfde vorm als bij
-     de bestelling en de rit; alle drie stonden ze op alleen `paid`. */
-  if (b.refunded || ['geweigerd', 'terugbetaald', 'geannuleerd'].includes(b.status))
-    return { status: 409, error: 'Deze boeking is geannuleerd (' + b.status + ') en kan niet opnieuw betaald worden.' };
-  if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
-    return { status: 410, error: 'Deze aanvraag is verlopen. Boek opnieuw.' };
-  // punten-tegoed (RTG legt bij) en spaarpunten
-  const kortingB = pasTegoedToe(session.key, b.price || 0);
-  if (kortingB) b.puntenKorting = kortingB;
-  // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
-  const voordeelB = ledenvoordeelVoor(findSupplier(b.supplierCode), (b.price || 0) - kortingB);
-  if (voordeelB) { b.regieKorting = voordeelB; b.voordeelOpbouw = subsidie.opbouwVan((b.price || 0) - kortingB, voordeelB); }
-  b.paid = true;
-  b.paidAt = new Date().toISOString();
-  if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
-  verdienPunten(session.key, (b.price || 0) - kortingB - voordeelB, b.supplierName);
-  openLijnVoor(findSupplier(b.supplierCode), session);
-  lidSave();
-  // en de factuur, net als bij een bestelling en een rit (zie factuurVoorLid)
-  factuurVoorLid({ soort: 'dienst', supplierCode: b.supplierCode, supplierNaam: b.supplierName,
-    codenaam: b.customerCodename, ref: b.ref, methode: 'rtg',
-    regels: [{ omschrijving: (b.service && b.service.name) || 'Dienst', aantal: 1, stuk: b.price || 0 }] });
-  notifySupplier(b.supplierCode, { icon: 'agenda', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
-  sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  return { ok: true, boeking: b };
-}
-
   /* De bestel- en ritlaag draaien als submodules op een gedeelde context,
      een keer opgebouwd bij het opstarten. */
   /* De submodules krijgen `factuurVoorLid` en NIET de facturatiemotor zelf:
@@ -119,6 +85,7 @@ function betaalBoekingVoor(session, body) {
   const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);
   const { rekeningVoor, betaalRekeningVoor } = require('./lidacties/rekening')(ctx);
   const { vraagRitVoor, betaalRitVoor } = require('./lidacties/ritten')(ctx);
+  const { betaalBoekingVoor } = require('./lidacties/boekingen')(Object.assign({ subsidie }, ctx));
 
   return { plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor };
 };

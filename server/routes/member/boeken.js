@@ -59,8 +59,9 @@ module.exports = (kern) => {
     res.json({ ok: true, boeking });
   });
 
-  app.post('/api/booking/pay', auth, (req, res) => {
-    const r = betaalBoekingVoor(req.session, req.body);
+  app.post('/api/booking/pay', auth, async (req, res) => {
+    if (kyc(req, res)) return;
+    const r = await betaalBoekingVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

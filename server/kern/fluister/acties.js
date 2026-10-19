@@ -58,7 +58,7 @@ module.exports = (ctx) => {
     if (w.soort === 'ticket' && sess && acties && acties.koopTicket) {
       const r = acties.koopTicket(sess, { supplierCode: w.supplierCode, activiteitId: w.activiteitId, datum: w.datum, tijd: w.tijd, personen: w.personen });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
-      const b = acties.betaalBoeking(sess, { ref: r.ticket.ref });
+      const b = await acties.betaalBoeking(sess, { ref: r.ticket.ref });  // async sinds de boeking via RTG Pay loopt
       if (b.error) return { tekst: 'De tickets staan klaar (' + r.ticket.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
       return { tekst: 'Geboekt en betaald: ' + w.oms + ' op ' + w.datum + ' om ' + w.tijd + ', samen ' + eur((r.ticket.price || 0) * 100) + '. Uw entreecode is ' + r.ticket.code + '; laat hem bij de deur oplichten.', gedaan: true };
     }

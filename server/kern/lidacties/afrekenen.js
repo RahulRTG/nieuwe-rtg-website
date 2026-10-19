@@ -44,7 +44,7 @@ module.exports = (ctx) => {
     const r = await pay.betaalZaak({
       codenaam: liveCodename(session), supplierCode,
       centen: zelf, bijlageCenten: bij, soort,
-      oms: (soort === 'rit' ? 'Rit met ' : soort === 'rekening' ? 'Rekening bij ' : 'Bestelling bij ') + (supplierNaam || supplierCode),
+      oms: (soort === 'rit' ? 'Rit met ' : soort === 'rekening' ? 'Rekening bij ' : soort === 'boeking' ? 'Boeking bij ' : 'Bestelling bij ') + (supplierNaam || supplierCode),
       ref, idem
     });
     if (r.error) { herstelTegoed(session.key, korting); return r; }

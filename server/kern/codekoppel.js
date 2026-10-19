@@ -68,11 +68,23 @@ module.exports = ({ db, save, nu }) => {
     return r;
   }
 
+  /* Na roteren: de koppeling van de oude code vervalt. De oude code vindt in
+     het portaal al geen dossier meer; dit haalt ook de regel weg, zodat er
+     geen koppeling blijft staan aan iets dat niet meer bestaat. */
+  function vervalt(soort, code) {
+    if (!code) return false;
+    const k = sleutel(soort, code);
+    if (!bak()[k]) return false;
+    delete bak()[k];
+    if (typeof save === 'function') save();
+    return true;
+  }
+
   // voor het kantoor en de toetsen: hangt deze code aan een account, en aan welke codenaam
   function koppelingVan(soort, code) {
     const rij = bak()[sleutel(soort, code)];
     return rij ? { soort: rij.soort, codenaam: rij.codenaam, sinds: rij.sinds, laatst: rij.laatst, aantal: rij.aantal } : null;
   }
 
-  return { met, koppelingVan, ONBEKEND };
+  return { met, vervalt, koppelingVan, ONBEKEND };
 };

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T10:08:06.609Z",
-    "commit": "9eed8a0a7",
+    "op": "2026-10-19T10:52:17.619Z",
+    "commit": "00af3cc7",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -88,7 +88,10 @@
           "data-rtg-vandaag-",
           "data-rtg-world-start"
         ],
-        "opslag": [],
+        "opslag": [
+          "localStorage rtf_sessie",
+          "localStorage rtg_member_token"
+        ],
         "fetch": [
           "/api/rtfos/publiek/"
         ]

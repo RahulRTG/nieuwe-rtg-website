@@ -177,12 +177,15 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner met een grati
     assert.match(publiek, /Water op straat/i, 'de bewoner ziet waar het lab aan werkt');
     assert.ok(!/BW-/.test(publiek), 'maar geen deelnemers: dat is de buitenste ring');
 
-    // het labpaspoort: aanmaken levert een code die de drager zelf houdt
+    /* Het labpaspoort is progressie (niveaus en badges) en bestaat alleen boven
+       de 18+-poort (eigenaarsbesluit 19 oktober 2026, routes/livinglab/
+       bewonerpas.js). Dit gratis account is niet gekeurd: het scherm zegt
+       waarom er geen paspoort komt, naast de knop. */
     await bewDeel('uw-labpaspoort');
     await bew.fill('#paspNaam', 'Sam');
     await klikEnWacht(bew, '#paspMaak', '/api/lab2/');
-    await wachtOpTekst(bew, /LABPAS-/, { in: '#pasp' });
-    assert.match(await bew.textContent('#pasp'), /LABPAS-/, 'het labpaspoort krijgt een eigen code');
+    await wachtOpTekst(bew, /18 of ouder/, { in: '#pasp' });
+    assert.ok(!/LABPAS-/.test(await bew.textContent('#pasp')), 'zonder 18+-poort geen paspoortcode');
 
     // een onbekende pas geeft een nette melding en geen stilte
     await bewDeel('uw-labpas');

@@ -159,7 +159,7 @@ module.exports = (state) => {
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
     bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
     vrijwilligerportaal, deelnemerportaal, publiek,
-    veld, donateur,
+    veld, donateur, codeRoteren: require('./coderoteer')(ctx, { partners, gemeente, ondernemers }),
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };
 };

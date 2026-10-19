@@ -28,7 +28,7 @@
    vervaldatum en geen intrekknop. */
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, db, save, rtfos, veilig, genootschapDrager }) => {
+module.exports = ({ app, auth, officeAuth, db, save, rtfos, veilig, genootschapDrager }) => {
   const koppel = require('../../kern/codekoppel')({ db, save });
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
@@ -54,4 +54,18 @@ module.exports = ({ app, auth, db, save, rtfos, veilig, genootschapDrager }) => 
   // de lokale ondernemer: het eigen aanbod en waar het terecht is gekomen
   app.post('/api/rtfos/portaal/ondernemer', auth, ipRem, codeRem, (req, res) =>
     veilig(res, () => koppel.met(req, 'ondernemer', codeVan(req), () => rtfos.ondernemers.portaal(codeVan(req)))));
+
+  /* ROTEREN (eigenaarsbesluit 19 oktober 2026): een kantoormens op naam, door de
+     poort van de stad, geeft een nieuwe code. De oude gaat dicht voor iedereen,
+     en de koppeling die eraan hing vervalt (kern/rtfos/coderoteer.js). */
+  const roteer = (soort) => (req, res) => veilig(res, () => {
+    const b = req.body || {};
+    const oud = rtfos.codeRoteren.codeVan(soort, b.id);
+    const r = rtfos.codeRoteren.roteer(req, soort, b.id, b.reden);
+    if (r && r.ok) koppel.vervalt(soort, oud);
+    return r;
+  });
+  app.post('/api/rtfos/partner/code/roteren', officeAuth, roteer('partner'));
+  app.post('/api/rtfos/gemeente/code/roteren', officeAuth, roteer('gemeente'));
+  app.post('/api/rtfos/ondernemer/code/roteren', officeAuth, roteer('ondernemer'));
 };

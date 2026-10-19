@@ -14,7 +14,7 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   /* De agenda van een lid is werk van een lid: bevestigd is vastgelegd. Zie
      server/lib/duurzaam.js en GELDLAT.md; de aanroepplek staat met reden op de
      lijst van check.js regel 47. */
-  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda' });
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save: save.bind(null, ['agendas']), inBundel, bron: 'agenda' });
   const id = () => 'ag' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const vandaagStr = () => new Date().toISOString().slice(0, 10);

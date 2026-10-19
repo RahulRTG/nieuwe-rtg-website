@@ -79,7 +79,7 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     for (const [k, t] of Object.entries(kast)) if (Number(t) < nu) delete kast[k];
     if (kast[jti]) return true;
     kast[jti] = nu + SPELING_MS * 2;
-    save();
+    save(['bezitsbewijzen']);
     return false;
   }
 

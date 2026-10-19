@@ -74,6 +74,9 @@ test('ingangRoutes volgt een gegenereerde bundel naar zijn delen, waar SCHERMROU
   assert.deepEqual([...r.exact].sort(), ['/api/huis', '/api/huis/zet'], 'de delen van de bundel tellen, een andere map niet');
   /* En het echte register kent de residentie als bundel. */
   assert.ok(B.ingangRoutes('/apps/residentie.html').exact.has('/api/residentie/suite/zet'));
+  /* Maar een schilbundel (shared/metgezel.js) brengt zijn routes niet mee: die
+     zijn van de schil, niet van het scherm. */
+  assert.ok(!B.ingangRoutes('/apps/routedossier.html').exact.has('/api/service/mens'));
 });
 
 test('gedeeld: exact of via voorvoegsel, gesorteerd', () => {

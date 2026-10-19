@@ -118,6 +118,11 @@
       "pad": "public/shared/basis.js",
       "reden": "De basis houdt op een ds-scherm zijn gedrag en zet daarvoor nog een <style>: het toegankelijkheidsprofiel (rtg-tekst-*, rtg-contrast, rtg-stil, rtg-rustig, rtg-linkstreep), de hulpkaart (.bss-*) en de springlink (.rtg-spring). Gaat naar tokens en .ds-componenten.",
       "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/apps/magnaat-sandbox.js",
+      "reden": "De Magnaat-proef van de chauffeurs-PDA (TRAVELOS-MIGRATIE.md par. 1d) is een rechtenpad: de sandbox vangt API-, opslag- en apparaatverkeer af voordat chauffeur.js draait, en zet het zichtbare keurmerk Magnaat Test (#rtgMagnaatTestMark) met een eigen <style>. Zonder haar zou een trainingskopie de echte API raken. Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
     }
   ],
   "dsPoort": {
@@ -158,6 +163,10 @@
     "public/apps/stad.html": "test/stad-ds.e2e.js",
     "public/apps/routedossier.html": "test/routedossier-ds.e2e.js",
     "public/apps/routedekking.html": "test/routedekking-ds.e2e.js",
+    "public/apps/dispatch.html": "test/dispatch-ds.e2e.js",
+    "public/apps/chauffeur.html": "test/chauffeur-ds.e2e.js",
+    "public/apps/ghost.html": "test/ghost-ds.e2e.js",
+    "public/apps/voertuig.html": "test/voertuig-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

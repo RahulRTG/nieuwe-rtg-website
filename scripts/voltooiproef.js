@@ -82,6 +82,7 @@ const SCENARIOS = {
   'aankomst.js': require('./lib/voltooi/aankomst'),
   'attenties.js': require('./lib/voltooi/attenties'),
   'bescherming.js': require('./lib/voltooi/bescherming'),
+  'bank.js': require('./lib/voltooi/bank'),
   'cellier.js': require('./lib/voltooi/cellier'),
   'cercle.js': require('./lib/voltooi/cercle'),
   'commerce.js': require('./lib/voltooi/commerce'),
@@ -123,8 +124,10 @@ const SCENARIOS = {
   'veilig.js': require('./lib/voltooi/veilig'),
   'vertegenwoordiging.js': require('./lib/voltooi/vertegenwoordiging'),
   'verificatie.js': require('./lib/voltooi/verificatie'),
+  'wallet.js': require('./lib/voltooi/wallet'),
   'wereldlaag.js': require('./lib/voltooi/wereldlaag'),
   'wonen.js': require('./lib/voltooi/wonen'),
+  'wbw.js': require('./lib/voltooi/wbw'),
   'werkos.js': require('./lib/voltooi/werkos')
 };
 

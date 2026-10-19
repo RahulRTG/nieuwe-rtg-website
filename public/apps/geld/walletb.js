@@ -51,13 +51,24 @@
     }
   }
 
+  /* Kopen kost geld, dus de koop draagt een herhaalsleutel (shared/id.js). EEN
+     sleutel per bedoeling: een tweede tik of een nieuwe poging na een
+     weggevallen verbinding is dezelfde koop en betaalt niet nog eens. Pas een
+     antwoord van de server (gelukt of geweigerd) sluit de bedoeling af. */
+  var koopSleutel = null;
   async function koop() {
     var Geld = w.Geld;
+    var zaak = $('#waMuntZaak').value, aantal = $('#waMuntAantal').value;
     try {
-      var r = await Geld.api('/api/wallet/munt/koop', { zaak: $('#waMuntZaak').value, aantal: $('#waMuntAantal').value });
+      if (!koopSleutel || koopSleutel.voor !== zaak + '|' + aantal) koopSleutel = { voor: zaak + '|' + aantal, idem: w.RTGId('munt') };
+      var r = await Geld.api('/api/wallet/munt/koop', { zaak: zaak, aantal: aantal, idem: koopSleutel.idem });
+      koopSleutel = null;
       Geld.melding('Gekocht voor ' + Geld.euro(Math.round(r.prijs * 100)) + '; saldo ' + r.item.saldo + '.');
       laad();
-    } catch (e) { Geld.melding(e.message); }
+    } catch (e) {
+      if (e.status) koopSleutel = null;
+      Geld.melding(e.message);
+    }
   }
 
   async function voeg() {

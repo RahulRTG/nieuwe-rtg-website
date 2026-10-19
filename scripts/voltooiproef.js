@@ -107,6 +107,7 @@ const SCENARIOS = {
   'pulse.js': require('./lib/voltooi/pulse'),
   'rechterhand.js': require('./lib/voltooi/rechterhand'),
   'reisboek.js': require('./lib/voltooi/reisboek'),
+  'rendezvous.js': require('./lib/voltooi/rendezvous'),
   'reizen.js': require('./lib/voltooi/reizen'),
   'relaties.js': require('./lib/voltooi/relaties'),
   'rtmail.js': require('./lib/voltooi/rtmail'),

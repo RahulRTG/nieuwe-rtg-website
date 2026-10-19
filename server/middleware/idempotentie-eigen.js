@@ -39,7 +39,9 @@ const EIGEN = [
   '/api/supplier/horeca/teruggave',
   /* de kantooruitnodiging bindt haar sleutel aan de uitgifte (kern/kantoor/uitnodiging.js)
      en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
-  '/api/office/kantoor/uitnodiging'
+  '/api/office/kantoor/uitnodiging',
+  // de pot onthoudt zijn eigen sleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
+  '/api/geld/pot/reserveer'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

@@ -28,8 +28,8 @@
    vervaldatum en geen intrekknop. */
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, officeAuth, db, save, rtfos, veilig, genootschapDrager }) => {
-  const koppel = require('../../kern/codekoppel')({ db, save });
+module.exports = ({ app, auth, officeAuth, rtfos, veilig, genootschapDrager }) => {
+  const koppel = rtfos.codekoppeling;
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });

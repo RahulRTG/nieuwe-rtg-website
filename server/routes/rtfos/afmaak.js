@@ -18,9 +18,9 @@
    ELK PAD STAAT LETTERLIJK -- zie de kop van ./index.js. */
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, db, save, officeAuth, rtfos, veilig, H }) => {
+module.exports = ({ app, auth, officeAuth, rtfos, veilig, H }) => {
   // de code koppelt een account aan het dossier (eigenaarsbesluit 19 oktober 2026)
-  const koppel = require('../../kern/codekoppel')({ db, save });
+  const koppel = rtfos.codekoppeling;
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });

@@ -29,8 +29,8 @@
    tegen het lekken. */
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, db, save, officeAuth, rtfos, veilig, H, rtf, resolveSession }) => {
-  const koppel = require('../../kern/codekoppel')({ db, save });
+module.exports = ({ app, auth, officeAuth, rtfos, veilig, H, rtf, resolveSession }) => {
+  const koppel = rtfos.codekoppeling;
   /* DE BUURT VRAAGT EEN SESSIE (eigenaarsbesluit 19 oktober 2026: gebruiken
      vraagt een account). Een lid, een zaak of het kantoor met zijn sessie; een
      gezinsprofiel met code en token in het lijf, en dan alleen uit een gezin

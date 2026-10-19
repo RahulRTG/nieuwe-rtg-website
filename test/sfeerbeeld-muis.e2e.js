@@ -26,6 +26,7 @@ for (const breedte of [1440, 1100]) test('de muis bereikt "Sfeerbeeld wijzigen" 
   const page = await ctx.newPage(), fouten = []; letOpFouten(page, fouten);
   try {
     await page.goto(srv.base + '/apps/rtg.html'); await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+    await page.waitForFunction(() => document.body.dataset.rtgWorldStart === 'ready');
     const knop = page.locator('.wp-atmosphere > .pi-change');
     await knop.waitFor({ state: 'attached' });
     const vak = await knop.boundingBox(); assert.ok(vak && vak.width > 0, 'de knop heeft geen plek op het scherm');

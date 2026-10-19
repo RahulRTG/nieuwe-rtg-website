@@ -151,6 +151,7 @@ module.exports = (state) => {
 
   return { rtfos: {
     ik, auditlog,
+    codekoppeling: require('../codekoppel')({ db, save }),
     boom: steden.boom, stad: steden.stad, stadMaak: steden.stadMaak, stadStatus: steden.stadStatus,
     vlagZet: steden.vlagZet, limietZet: steden.limietZet, zetelZet: steden.zetelZet,
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,

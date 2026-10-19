@@ -301,6 +301,7 @@
 
   async function ontdek() {
     const [data,tableData,introData,circleData] = await Promise.all([api('/api/member/rendezvous/kandidaten'),api('/api/member/rendezvous/tafels'),api('/api/member/rendezvous/introducties'),api('/api/member/rendezvous/circles')]);
+    /* Zonder kandidatenlijst geen "selectie compleet" en geen JS-fout in beeld (LIEGRONDE.json). */ if (!(data && Array.isArray(data.kandidaten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     uitvoer = {naam:'kandidaten',kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],rijen:(data.kandidaten||[]).map(k=>[k.codenaam||'',k.status||'',k.zoekt||'',(k.locaties||[]).join(', '),(k.gedeeldeLocaties||[]).join(', '),(k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')])};
     let lijst = '';
     if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Open uw profiel om zichtbaar te worden.<div class="dating-actions strak"><button class="dating-button" type="button" id="rvOpenProfiel">Profiel openen</button></div></div>';
@@ -311,7 +312,7 @@
       return '<article class="dating-person">'+(photo?'<img class="rv-photo" src="'+esc(photo.src)+'" alt="'+esc(photo.alt)+'">':'')+'<div class="dating-person-main"><div class="dating-person-mark">'+(match?'Wederzijdse match':liked?'Uw interesse is genoteerd':k.likteMij?'Interesse in u':'Besloten introductie')+'</div><h3>'+esc(k.codenaam)+'</h3>'+
         (k.zoekt?'<div class="dating-meta">Zoekt · '+esc(k.zoekt)+'</div>':'')+(k.over?'<p class="dating-bio">'+esc(k.over)+'</p>':'')+
         samenRegel(k.samen)+  /* de Presence Graph: samen ergens zijn is een aanleiding, een gedeelde stad een toevalligheid */
-        '<div class="dating-chips">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'+(k.gedeeldeLocaties.length?'<div class="dating-meta">Gedeeld · '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')+'</div>'+
+        '<div class="dating-chips">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'+((k.gedeeldeLocaties||[]).length?'<div class="dating-meta">Gedeeld · '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')+'</div>'+
         '<div class="dating-person-actions">'+(match?'<button class="dating-button primary" data-matches>Open match</button>':'<button class="dating-button wine" data-like="'+esc(k.id)+'">Interesse</button><button class="dating-button" data-pass="'+esc(k.id)+'">Voorbij</button>')+'<button class="dating-button quiet" data-safe="'+esc(k.id)+'" data-name="'+esc(k.codenaam)+'">Veiligheid</button></div></article>';
     }).join('')+'</div>';
     const intros=(introData.introducties||[]).filter(x=>!x.geopend&&x.ikAntwoordde===null).slice(0,2);
@@ -339,8 +340,9 @@
   async function matches() {
     communicationClients.forEach(c=>c.unmount());communicationClients=[];
     const data=await api('/api/member/rendezvous/matches');
+    /* Zonder matchlijst geen "nog geen match" en geen JS-fout in beeld (LIEGRONDE.json). */ if (!(data && Array.isArray(data.matches))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     uitvoer={naam:'matches',kolommen:['codenaam','gedeelde locaties','tegelijk ergens','voorstel','sinds'],rijen:(data.matches||[]).map(m=>[m.codenaam||'',(m.gedeeldeLocaties||[]).join(', '),(m.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', '),m.voorstel||'',String(m.sinds||'').slice(0,10)])};
-    const lijst=!data.matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Wanneer jullie elkaar allebei kiezen, verschijnt de verbinding hier. Tot die tijd blijft elke interesse privé.</p></div>':'<div class="dating-list">'+data.matches.map(m=>'<article class="dating-person" data-connection-match="'+esc(m.id)+'" data-connection-name="'+esc(m.codenaam)+'">'+(m.media&&m.media[0]?'<img class="rv-photo" src="'+esc(m.media[0].src)+'" alt="'+esc(m.media[0].alt)+'">':'')+'<div class="dating-person-main"><div class="dating-person-mark">Open introduction</div><h3>'+esc(m.codenaam)+'</h3><div class="dating-meta">'+(m.gedeeldeLocaties.length?'Gedeelde plekken · '+m.gedeeldeLocaties.map(esc).join(', '):'Nog geen gedeelde plek')+'</div>'+
+    const lijst=!data.matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Wanneer jullie elkaar allebei kiezen, verschijnt de verbinding hier. Tot die tijd blijft elke interesse privé.</p></div>':'<div class="dating-list">'+data.matches.map(m=>'<article class="dating-person" data-connection-match="'+esc(m.id)+'" data-connection-name="'+esc(m.codenaam)+'">'+(m.media&&m.media[0]?'<img class="rv-photo" src="'+esc(m.media[0].src)+'" alt="'+esc(m.media[0].alt)+'">':'')+'<div class="dating-person-main"><div class="dating-person-mark">Open introduction</div><h3>'+esc(m.codenaam)+'</h3><div class="dating-meta">'+((m.gedeeldeLocaties||[]).length?'Gedeelde plekken · '+m.gedeeldeLocaties.map(esc).join(', '):'Nog geen gedeelde plek')+'</div>'+
       samenRegel(m.samen)+  /* waar u tegelijk bent gaat voor op waar u allebei weleens komt */
       (m.wanneer&&m.wanneer.samen?'<div class="dating-meta">'+esc(m.wanneer.tekst)+'</div>':'')+  /* het ene gedeelde dagdeel uit het rooster, pas ná de wederzijdse like */
       '<div data-rv-communication="'+esc(m.id)+'"></div><div class="dating-date" id="date-'+esc(m.id)+'" hidden></div><div id="arr-'+esc(m.id)+'"></div></div>'+

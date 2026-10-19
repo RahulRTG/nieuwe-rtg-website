@@ -33,8 +33,10 @@ module.exports = (kern) => {
     return false;
   };
   // Een anonieme demo-gast heeft geen wallet; een GRATIS ACCOUNT wel: die mag
-  // opladen en met de QR-kassacode betalen (bv. eten bestellen als niet-lid).
-  // De sociale kant van Pay (tikken, verzoeken) blijft voor leden.
+  // opladen, zijn overzicht zien en met de QR-kassacode betalen (bv. eten
+  // bestellen als niet-lid). Eigenaarsbesluit 19 oktober 2026: de wallet hoort
+  // bij elk account (test/wallet-gratisaccount.test.js). De sociale kant van
+  // Pay (tikken, verzoeken) blijft voor leden.
   const geenEchtAccount = (req, res) => {
     if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account om met RTG Pay te betalen.' }); return true; }
     return false;
@@ -51,7 +53,7 @@ module.exports = (kern) => {
 
   // alles van het lid in een scherm: saldo, verzoeken, geschiedenis
   app.post('/api/pay/overzicht', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     res.json(pay.overzicht(liveCodename(req.session)));
   });
   // opladen (Apple Pay/kaart via de betaal-naad)

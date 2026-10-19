@@ -34,8 +34,13 @@ test('eigen knoppen liggen niet onder een eigen laag van het scherm', { skip: ge
       }, lid.token);
       const page = await context.newPage();
       page.on('dialog', (d) => d.dismiss().catch(() => {}));
+      /* Een scherm op het Design System (html[data-ds], zoals navigatie.html
+         sinds batch 4 van TRAVELOS-MIGRATIE.md) heeft de ds-Edge en geen
+         adaptieve schil die 'ready' meldt; daar is de Edge-balk het teken. */
       const edgeKlaar = () => page.waitForFunction(() => document.body &&
-        document.body.getAttribute('data-rtg-adaptive-ready') === 'true', null, { timeout: 15000 });
+        (document.body.getAttribute('data-rtg-adaptive-ready') === 'true' ||
+          (document.documentElement.hasAttribute('data-ds') && !!document.querySelector('.ds-edge__balk'))),
+      null, { timeout: 15000 });
 
       await t.test(maat.width + ': navigatie, de knop Kaarten', async () => {
         await page.goto(server.base + '/apps/navigatie.html', { waitUntil: 'domcontentloaded' });

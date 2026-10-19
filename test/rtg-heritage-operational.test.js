@@ -106,7 +106,11 @@ test('de gedeelde schermlaag overschrijft geen lokaal bewezen achtergrondparen',
 
 test('kaart-, camera- en werkruimtecanvassen blijven expliciet uitgezonderd', () => {
   const canvassen = [
-    ['public/apps/navigatie.html', 'travel-os-map'],
+    /* navigatie.html staat sinds batch 4 van TRAVELOS-MIGRATIE.md op het
+       Design System: de gedeelde materiaallaag laadt daar niet, en de kaart
+       is het vlak van het Canvas-schermtype (public/ds/schermen/canvas.css),
+       dat geen rand of afronding op het doek zet. */
+    ['public/apps/navigatie.html', 'class="ds-canvas__vlak'],
     ['public/apps/camera.html', '<canvas'],
     ['public/apps/werkruimte.html', 'rtg-edge-workspace']
   ];

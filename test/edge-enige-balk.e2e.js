@@ -83,8 +83,9 @@ const OPS_BESTEMMINGEN = ['/apps/ov.html', '/apps/chauffeur.html', '/apps/luchth
 const VRIJ = [
   { pad: '/apps/browser.html', knop: 'header.ios-nav button.ga', compact: true },
   /* De kaartlagen zijn bediening OP de kaart, geen balk: die blijven bij het
-     scherm. navigatie-premium.css zette ze op 1280 breed rechtsonder, en de
-     eerste laag (bank) lag volledig onder de onderbalk van de Edge. */
+     scherm. Het oude navigatie-premium.css zette ze op 1280 breed rechtsonder,
+     en de eerste laag (bank) lag volledig onder de onderbalk van de Edge. Op
+     het Design System staan ze in het zoekvel bovenaan de kaart. */
   { pad: '/apps/navigatie.html', knop: 'nav.lagen button' }
 ];
 
@@ -207,8 +208,12 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
     for (const scherm of VRIJ) {
       await t.test(scherm.pad + ': de eigen bediening ligt niet onder de Edge', async () => {
         await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
+        /* Op een scherm op het Design System (navigatie.html sinds batch 4 van
+           TRAVELOS-MIGRATIE.md) staat de ds-Edge en geen adaptieve schil die
+           'ready' meldt; daar is de Edge-balk het teken. */
         await wachtTot(page, (g) => document.body &&
-          document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
+          (document.body.getAttribute('data-rtg-adaptive-ready') === 'true' ||
+            (document.documentElement.hasAttribute('data-ds') && !!document.querySelector('.ds-edge__balk'))) &&
           (!g.compact || document.body.getAttribute('data-rtg-edge-2-state') === 'compact') &&
           !!document.querySelector(g.knop), { knop: scherm.knop, compact: !!scherm.compact },
           { wat: scherm.pad + ': de Edge staat en ' + scherm.knop + ' is er' });

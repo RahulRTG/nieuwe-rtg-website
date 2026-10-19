@@ -1046,19 +1046,21 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const doc = f && f.contentDocument;
-      return !!(f && doc && doc.documentElement &&
+      /* Navigatie staat sinds batch 4 van TRAVELOS-MIGRATIE.md op het Design
+         System: in een blad tekent het geen tweede Edge en geen eigen kop
+         (public/ds/edge.js, ingebed), en het zegt dat met data-ds-ingebed. */
+      return !!(f && doc && doc.documentElement && doc.body &&
         f.contentWindow.location.pathname === '/apps/navigatie.html' &&
-        doc.documentElement.classList.contains('tos-ingebed') &&
-        !doc.querySelector('.tos-nav') &&
+        doc.documentElement.getAttribute('data-ds-ingebed') === '1' &&
+        !doc.querySelector('.ds-edge, .ds-kop') &&
         document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane').length === 2);
     }, null, { timeout: 20000 });
 
-    /* De terugdeur van een ingebed moduleblad blijft binnen TravelOS en houdt
-       embed=1 vast. Een kale app-shell-link mag hier niet meer bestaan. */
-    const terugAdres = await page.frameLocator('#rtgCommand .cmd-pane.actief iframe')
-      .locator('.tos-mark').getAttribute('href');
-    assert.equal(terugAdres, '/apps/reizen.html?embed=1#reizen',
-      'de ingebedde terugdeur verliest zijn eigenaar- en embedcontract');
+    /* Een ingebed moduleblad draagt geen eigen terug- of merklink: de kop
+       bestaat in een blad niet, dus er is geen tweede deur die embed=1 kan
+       verliezen. Een kale app-shell-link mag hier evenmin bestaan. */
+    assert.equal(await page.frameLocator('#rtgCommand .cmd-pane.actief iframe')
+      .locator('.ds-kop, .ds-kop__merk').count(), 0, 'het ingebedde blad tekent toch een eigen kop');
     assert.equal(await page.frameLocator('#rtgCommand .cmd-pane.actief iframe')
       .locator('a[href="/apps/app.html"]:visible').count(), 0,
     'een moduleblad biedt opnieuw een geneste app-shell aan');

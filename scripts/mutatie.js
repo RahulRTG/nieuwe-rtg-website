@@ -654,6 +654,9 @@ const EIGEN_MODULE = new Map([
   ['ovroutes-ds.e2e.js', ['public/apps/ovroutes.js']],
   ['ovcontrol-ds.e2e.js', ['public/apps/ovcontrol.js']],
   ['reizen-ds.e2e.js', ['public/apps/reizen-register.js']],
+  ['arrival-ds.e2e.js', ['public/apps/arrival-voorzijde.js']],
+  ['flits-ds.e2e.js', ['public/apps/flits-voorzijde.js']],
+  ['navigatie-ds.e2e.js', ['public/apps/navigatie-zoek.js', 'public/apps/navigatie-bediening.js']],
   ['ontwerpvoorbeeld.e2e.js', ['public/ds/voorbeeld.html']],
   /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
   ['move-gevolg.e2e.js', ['public/apps/move.html']],
@@ -1336,7 +1339,7 @@ const EIGEN_MODULE = new Map([
   /* De appbalktoets leest browsercode via fs; dezelfde bron hoort ook bij
      de mutatieproef, anders blijft deze toets ongemeten. */
   ['beproeving-contract.test.js', ['scripts/verhalen.js']],
-  ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie.html']],
+  ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie-zoek.js', 'public/apps/navigatie-bediening.js', 'public/apps/navigatie-start.js']],
   /* De moveproef toetst twee dingen die geen require() zijn: het INSTRUMENT
      (scripts/moveproef.js) en het SCHERM. modulesVan() ziet daardoor niets en
      noteerde 'geen module gevonden' -- niet te meten, terwijl de beweringen

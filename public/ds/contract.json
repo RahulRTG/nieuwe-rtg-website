@@ -42,7 +42,8 @@
     "canvaslaag",
     "handelingen",
     "rooster",
-    "sectie"
+    "sectie",
+    "vel"
   ],
   "themabaar": [
     "--ds-grond",
@@ -121,6 +122,11 @@
       "pad": "public/shared/basis.js",
       "reden": "De basis houdt op een ds-scherm zijn gedrag en zet daarvoor nog een <style>: het toegankelijkheidsprofiel (rtg-tekst-*, rtg-contrast, rtg-stil, rtg-rustig, rtg-linkstreep), de hulpkaart (.bss-*) en de springlink (.rtg-spring). Gaat naar tokens en .ds-componenten.",
       "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/plaatsnadering.js",
+      "reden": "De aankomstpuls (zelf melden dat je in de buurt bent, test/plaatsnadering.e2e.js) is gedrag en geen versiering; zijn aanbod (.rtgnader) heeft een eigen <style>. Gaat naar het dialoog-component.",
+      "vervalt": "2027-01-31"
     }
   ],
   "dsPoort": {
@@ -167,6 +173,9 @@
     "public/apps/ovroutes.html": "test/ovroutes-ds.e2e.js",
     "public/apps/ovcontrol.html": "test/ovcontrol-ds.e2e.js",
     "public/apps/reizen.html": "test/reizen-ds.e2e.js",
+    "public/apps/arrival.html": "test/arrival-ds.e2e.js",
+    "public/apps/flits.html": "test/flits-ds.e2e.js",
+    "public/apps/navigatie.html": "test/navigatie-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

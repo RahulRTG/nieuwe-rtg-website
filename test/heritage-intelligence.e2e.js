@@ -200,24 +200,28 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
       });
     });
 
-    await t.test('The map remains a native canvas in Compact and Focus', async () => {
+    /* navigatie.html staat sinds batch 4 van TRAVELOS-MIGRATIE.md op het
+       Design System: geen Edge 2 met Compact en Focus meer, maar de ds-Edge en
+       het Canvas-schermtype. Wat deze toets bewaakte blijft: de kaart is een
+       echt canvas dat het hele tekenvlak vult, ook na een andere maat, en er
+       staat precies een Edge. */
+    await t.test('The map remains a native canvas that fills the Canvas surface', async () => {
       await withPage(390, async page => {
-        await page.goto(server.base + '/apps/navigatie.html', {waitUntil:'domcontentloaded'}); await ready(page);
-        assert.equal(await page.getAttribute('body','data-rtg-edge-2-state'),'compact');
-        await page.waitForSelector('#kaart[data-rtg-native-canvas]');
+        await page.goto(server.base + '/apps/navigatie.html', {waitUntil:'domcontentloaded'});
+        await page.waitForSelector('.ds-edge__balk');
+        await page.waitForSelector('canvas#kaart.ds-canvas__vlak');
         await page.locator('.rtgplek .nee').click();
-        await page.evaluate(()=>{window.__canvasResizes=0;window.addEventListener('resize',()=>window.__canvasResizes++);});
-        await openEdgeMenu(page); await require('./helper').edgeCatalogus(page);
-        await page.click('.rtg-edge-preferences-open');
-        await page.click('[data-edge-2-mode="focus"]');
-        await page.waitForFunction(()=>window.__canvasResizes>0);
-        const r=await bounds(page,'#kaart');
-        const frame = await bounds(page,'.wd-page[data-rtg-canvas-surface]');
-        assert.ok(frame.width > 250 && frame.height > 400, 'the native map retains a usable canvas');
-        for (const key of ['x','y','width','height']) assert.ok(Math.abs(r[key]-frame[key])<1, key+' fills the shared drawing frame');
-        assert.equal(await page.locator('.rtg-edge-chrome').count(),1);
-        await page.click('.rtg-edge-2-reveal');
-        await page.waitForFunction(()=>document.body.getAttribute('data-rtg-edge-2-state')==='overview');
+        const vul = async () => {
+          const r = await bounds(page, '#kaart'), frame = await bounds(page, '.ds-canvas');
+          assert.ok(frame.width > 250 && frame.height > 400, 'the native map retains a usable canvas');
+          for (const key of ['x','y','width','height']) assert.ok(Math.abs(r[key]-frame[key])<1, key+' fills the shared drawing frame');
+        };
+        await vul();
+        await page.setViewportSize({ width: 820, height: 1000 });
+        await page.waitForFunction(() => document.querySelector('#kaart').getBoundingClientRect().width > 700);
+        await vul();
+        assert.equal(await page.locator('.ds-edge').count(),1);
+        assert.equal(await page.locator('.rtg-edge-chrome').count(),0);
       });
     });
 

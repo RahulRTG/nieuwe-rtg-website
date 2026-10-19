@@ -33,7 +33,14 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'navigatieproef.js'), 'utf8');
-const scherm = fs.readFileSync(path.join(WORTEL, 'public', 'apps', 'navigatie.html'), 'utf8');
+/* Het scherm staat sinds batch 4 van TRAVELOS-MIGRATIE.md op het Design
+   System, en zijn code is van een inline script naar zes delen naast de pagina
+   verhuisd (public/apps/navigatie-*.js). De grendels hieronder lezen dus de
+   pagina EN die delen; elke grendel kijkt binnen een enkel deel. */
+const APPS = path.join(WORTEL, 'public', 'apps');
+const scherm = [fs.readFileSync(path.join(APPS, 'navigatie.html'), 'utf8')]
+  .concat(fs.readdirSync(APPS).filter(f => /^navigatie-[a-z]+\.js$/.test(f)).sort()
+    .map(f => fs.readFileSync(path.join(APPS, f), 'utf8'))).join('\n');
 const plek = fs.readFileSync(path.join(WORTEL, 'public', 'shared', 'plek.js'), 'utf8');
 /* Commentaar eruit voordat er iets over de CODE wordt beweerd -- anders zakt een
    toets op de uitleg van de reparatie die hij bewaakt. Dat is hier twee keer

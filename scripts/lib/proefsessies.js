@@ -1,6 +1,6 @@
-/* DE VIER SESSIES DIE EEN BROWSERPROEF NODIG HEEFT, op een plek.
+/* DE SESSIES DIE EEN BROWSERPROEF NODIG HEEFT, op een plek.
 
-   Een lid, een zaak, het kantoor en een gezin -- elk langs de ECHTE route over
+   Een lid, een zaak, het personeel op de PDA, het kantoor en een gezin -- elk langs de ECHTE route over
    de server, nooit een nagebouwd token. Dat laatste is de reden dat dit bestand
    bestaat en niet ergens inline staat: een nagebouwde sessie meet je eigen
    aanname en niet de deur.
@@ -46,6 +46,23 @@ const ROLLEN = {
       return r && r.token ? r.token : null;
     }
   },
+  /* Het personeel op de PDA (rtg_pda_token): de manager van de vervoerder
+     TRANSIT, langs dezelfde rooster- en pin-inlog als `zaak`. OV-routes
+     (/apps/ovroutes.html) draait op die sessie en op geen andere. De naam is
+     die van de werkrol in de sleutelbos (/api/account/rollen), zodat een
+     ingang met `werkrol: 'personeel'` deze persona krijgt (appwerkt.js). */
+  personeel: {
+    sleutel: 'rtg_pda_token',
+    uitleg: 'de manager van een vervoerder op de personeels-PDA',
+    start: '/apps/personeel.html',
+    async haal(basis) {
+      const rooster = await post(basis + '/api/supplier/roster', { code: 'TRANSIT' });
+      const man = (rooster && rooster.staff || []).find((x) => x.role === 'manager');
+      if (!man) return null;
+      const r = await post(basis + '/api/supplier/login', { code: 'TRANSIT', staffId: man.id, pin: '1234' });
+      return r && r.token ? r.token : null;
+    }
+  },
   kantoor: {
     sleutel: 'rtg_office_token',
     uitleg: 'een medewerker van RTG met een kantoortoken',
@@ -80,7 +97,7 @@ async function post(url, lijf) {
   return r.json().catch(() => null);
 }
 
-/* Haalt de gevraagde rollen op (standaard alle vier) tegen een draaiende
+/* Haalt de gevraagde rollen op (standaard allemaal) tegen een draaiende
    server. Geeft { sessies, overgeslagen }: sessies is wat er in localStorage
    moet, overgeslagen zegt per mislukte rol waarom. */
 async function haalSessies(basis, welke) {

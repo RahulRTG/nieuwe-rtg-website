@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '7be75ecc';
+var RTG_BOUW = '67db66ba';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4072,7 +4072,7 @@ var RTG_BOUW = '7be75ecc';
     appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
     routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html', werkrol: 'kantoor' }, // zie app-main-24a3.js
-    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html', werkrol: 'personeel' }, // draait alleen op een PDA-sessie (rtg_pda_token)
     /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
        scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
        als wat een mens er doet, en de werknaam van een laag is geen productnaam

@@ -23,7 +23,20 @@ module.exports = H => {
     return uitkomst && typeof uitkomst.then === 'function' ? uitkomst.then(klaar) : klaar(uitkomst);
   }
   const onderSlot = werk => bevestigNaCommit(metActueleStaat(werk));
-  const maak = (key, invoer) => onderSlot(() => maakBinnen(key, invoer));
+  /* EEN HERHAALSLEUTEL OP DE KAMER (routes/magnaatwereld.js leest hem uit het
+     lijf). Dezelfde sleutel is dezelfde kamer -- zonder de toegangscode, die
+     staat uitsluitend in het eerste antwoord -- en dezelfde sleutel voor een
+     ander bedrijf is 409. De sleutel staat op de kamer en overleeft een crash. */
+  const maak = (key, invoer, idem) => onderSlot(() => {
+    const sleutel = String(idem || '').slice(0, 80), code = String((invoer || {}).code || '');
+    const eerder = sleutel && Object.values(staat().kamers).find(k => k.hostKey === tekst(key, 150) && k.idem === sleutel);
+    if (eerder && eerder.idemCode !== code) return { status: 409, error: 'Deze herhaalsleutel hoort bij een andere teamkamer; er is niets aangemaakt.' };
+    if (eerder) return { ok: true, herhaald: true, kamer: publiek(eerder, key) };
+    const r = maakBinnen(key, invoer);
+    const kamer = r && r.ok && sleutel && staat().kamers[r.kamer.id];
+    if (kamer) { kamer.idem = sleutel; kamer.idemCode = code; }
+    return r;
+  });
   const deelnemen = (key, code) => onderSlot(() => deelnemenBinnen(key, code));
   const roteerCode = (key, kamerId) => onderSlot(() => codeBinnen(key, kamerId, false));
   const intrekCode = (key, kamerId) => onderSlot(() => codeBinnen(key, kamerId, true));

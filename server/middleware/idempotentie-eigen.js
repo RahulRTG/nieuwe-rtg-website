@@ -60,7 +60,9 @@ const EIGEN = [
   '/api/rtf/kantoorpakket/maak',
   '/api/werkplek/kantoorpakket/maak',
   '/api/supplier/horeca/rekening/regel',
-  '/api/browser/bericht'
+  '/api/browser/bericht',
+  // een teamkamer: de sleutel op de kamer, de toegangscode maar een keer (kern/magnaat-trainingslobby-regie.js)
+  '/api/member/magnaat/teamkamer/maak'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

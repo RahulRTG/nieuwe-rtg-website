@@ -1038,7 +1038,7 @@ module.exports = ({
     werkprocesStart, kiesKantoor, scan, beslis, kantoorStatus, wereld, catalogus,
     partnerTrainingStart, partnerTrainingAntwoord,
     teamkamerMijn: (key, id) => trainingslobbies.mijn(key, id),
-    teamkamerMaak: (key, invoer) => trainingslobbies.maak(key, invoer),
+    teamkamerMaak: (key, invoer, idem) => trainingslobbies.maak(key, invoer, idem),
     teamkamerDeelnemen: (key, code) => trainingslobbies.deelnemen(key, code),
     teamkamerCode: (key, id) => trainingslobbies.roteerCode(key, id),
     teamkamerCodeIntrek: (key, id) => trainingslobbies.intrekCode(key, id),

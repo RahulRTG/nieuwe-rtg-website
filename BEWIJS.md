@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2826 bestanden en 19560 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2826 bestanden en 19561 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2826 |
-| losse beweringen (`test(...)`) | 19560 |
+| losse beweringen (`test(...)`) | 19561 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2488 bestanden, 18988 beweringen.
+2488 bestanden, 18989 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1210,7 +1210,7 @@ toets omvalt.
 | `magnaat-rust-integratie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-teamkamer-credential.test.js` | 8 | gezakt op `liegpoort /api/` | De toegangscode van een Magnaat-teamkamer (magnaat.teamkamer_toegangscode), control voor control: 128 bit en eenmaal tonen, hash-only opslag, issuer/doel/ scope, vervaltijd, max_gebruik, roteren en intrekken door de... |
 | `magnaat-teamkamer-productie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `magnaat-trainingslobby.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `magnaat-trainingslobby.test.js` | 5 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-voorzijde.test.js` | 3 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-werkroutefabriek.test.js` | 2 | gezakt op `>=->>#0` | Bewijs dat de automatische routefabriek iedere gevonden codefamilie omzet in een startbaar, synthetisch en schermgebonden trainingsdossier. |
 | `magnaat-world-boekhouding.test.js` | 7 | gezakt op `&&->||#0` | Magnaat World ronde A2.2: de vijf tegenpartijen, minimaal (MAGNAAT.md). 1. |

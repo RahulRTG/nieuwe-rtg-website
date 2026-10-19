@@ -80,38 +80,47 @@ function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu }) {
        boeking wijst, is een bewering zonder bewijs. */
     const metBoeking = geldrijenVoor({ trip, personen: a.personen, boekingId: b.boeking.id, valuta: 'EUR' });
     const stempel = klok();
-    /* VELD VOOR VELD EN NIET MET EEN SPREAD: scripts/doorbelasting.js leest
-       bewaarde vormen statisch en kijkt niet door `...r` heen. Zelfde richting
-       als AI-CONTEXT-01. */
-    for (const r of metBoeking.rijen) {
-      const rijId = nieuwId('RGH');
-      eigen.bak('reisGeldrijen').push({
-        id: rijId, ref: a.ref, at: stempel,
-        bedragCenten: r.bedragCenten, valuta: r.valuta,
-        /* De PRECIEZE namen: kort `herkomst` botst met het gelijknamige veld in
-           reisbureau-samenstelling.js, dat iets anders betekent. */
-        economischeHerkomst: r.economischeHerkomst,
-        economischeEigenaar: r.economischeEigenaar, naarWie: r.naarWie,
-        grond: r.grond, bronObject: r.bronObject, relatie: r.relatie,
-        land: r.land, bewijs: r.bewijs
-      });
-    }
+    /* EEN HERHALING NA EEN CRASH schrijft de herkomst niet opnieuw. De boeking
+       komt dan terug op dezelfde sleutel; stonden haar rijen er al (het proces
+       viel weg voor markeerBetaald), dan zou een tweede set ook de uitkeringen
+       dubbel klaarzetten, en betaalt een mens het hotel twee keer
+       (test/reisbetaling-herhaal.test.js). */
+    const bron = 'payboeking:' + b.boeking.id;
+    const alGeschreven = eigen.kijk('reisGeldrijen').some(g => g.ref === a.ref && g.bronObject === bron);
+    if (!alGeschreven) {
+      /* VELD VOOR VELD EN NIET MET EEN SPREAD: scripts/doorbelasting.js leest
+         bewaarde vormen statisch en kijkt niet door `...r` heen. Zelfde richting
+         als AI-CONTEXT-01. */
+      for (const r of metBoeking.rijen) {
+        const rijId = nieuwId('RGH');
+        eigen.bak('reisGeldrijen').push({
+          id: rijId, ref: a.ref, at: stempel,
+          bedragCenten: r.bedragCenten, valuta: r.valuta,
+          /* De PRECIEZE namen: kort `herkomst` botst met het gelijknamige veld in
+             reisbureau-samenstelling.js, dat iets anders betekent. */
+          economischeHerkomst: r.economischeHerkomst,
+          economischeEigenaar: r.economischeEigenaar, naarWie: r.naarWie,
+          grond: r.grond, bronObject: r.bronObject, relatie: r.relatie,
+          land: r.land, bewijs: r.bewijs
+        });
+      }
 
-    /* Klaargezet en niet uitgevoerd; elke uitkering wijst naar de HERKOMSTRIJ
-       die hij afwikkelt en niet alleen naar de reis. */
-    for (const g of eigen.kijk('reisGeldrijen')) {
-      if (g.ref !== a.ref || g.at !== stempel || g.economischeEigenaar === 'rtg') continue;
-      eigen.bak('reisUitkeringen').push({
-        id: nieuwId('RUK'), geldrij: g.id, ref: a.ref, at: stempel,
-        centen: g.bedragCenten, valuta: g.valuta,
-        /* Op de rij ZELF en niet alleen in `geldrij`: dat is een verwijzing, en
-           een keten die je niet in EEN rij ziet, kun je bij een geschil ook niet
-           in een rij tonen. */
-        economischeHerkomst: g.economischeHerkomst,
-        aan: g.economischeEigenaar, relatie: g.relatie, grond: g.grond,
-        uitgevoerd: false,
-        hoe: 'klaargezet; een mens van het kantoor voert hem uit langs kern/pay (GELD.md)'
-      });
+      /* Klaargezet en niet uitgevoerd; elke uitkering wijst naar de HERKOMSTRIJ
+         die hij afwikkelt en niet alleen naar de reis. */
+      for (const g of eigen.kijk('reisGeldrijen')) {
+        if (g.ref !== a.ref || g.at !== stempel || g.economischeEigenaar === 'rtg') continue;
+        eigen.bak('reisUitkeringen').push({
+          id: nieuwId('RUK'), geldrij: g.id, ref: a.ref, at: stempel,
+          centen: g.bedragCenten, valuta: g.valuta,
+          /* Op de rij ZELF en niet alleen in `geldrij`: dat is een verwijzing, en
+             een keten die je niet in EEN rij ziet, kun je bij een geschil ook niet
+             in een rij tonen. */
+          economischeHerkomst: g.economischeHerkomst,
+          aan: g.economischeEigenaar, relatie: g.relatie, grond: g.grond,
+          uitgevoerd: false,
+          hoe: 'klaargezet; een mens van het kantoor voert hem uit langs kern/pay (GELD.md)'
+        });
+      }
     }
 
     /* De EIGENAAR schrijft de betaling op zijn eigen rij; mislukt dat, dan

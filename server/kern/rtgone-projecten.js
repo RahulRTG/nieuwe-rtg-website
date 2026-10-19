@@ -42,10 +42,14 @@ module.exports = function projectenMaak(h) {
     const s = S(), p = vind(s.projecten, projectId); if (!p) return { status: 404, error: 'Project niet gevonden.' };
     if (!context || !context.key) return { status: 403, error: 'Projectuitvoering vraagt een persoonlijk personeelsaccount.' };
     if (p.eigenaarKey && p.eigenaarKey !== context.key && !context.baas) return { status: 403, error: 'Alleen de projecteigenaar kan deze uitvoering wijzigen.' };
+    // een menselijke oplevering is definitief (19 oktober 2026: "Heropen" zette hem terug)
+    if (p.status === 'afgerond') return { status: 400, error: 'Dit project is al opgeleverd; een taak heropenen kan niet meer.' };
     const t = p.taken.find(x => x.id === String(taakId || '')); if (!t) return { status: 404, error: 'Projecttaak niet gevonden.' };
     t.af = af === true; const klaar = p.taken.filter(x => x.af).length, besluit = p.goedkeuringId && vind(s.goedkeuringen, p.goedkeuringId);
     p.voortgang = Math.min(90, 12 + Math.round(klaar / Math.max(1, p.taken.length) * 60));
-    p.status = klaar === p.taken.length ? (besluit && besluit.status !== 'goedgekeurd' ? 'besluit' : 'oplevering') : 'in-voorbereiding';
+    // na een goedgekeurd besluit blijft het project in uitvoering tot alles af is
+    const goed = besluit && besluit.status === 'goedgekeurd';
+    p.status = klaar === p.taken.length ? (besluit && !goed ? 'besluit' : 'oplevering') : (goed ? 'uitvoering' : 'in-voorbereiding');
     p.tijdlijn.push({ at: nu(), soort: 'taak', tekst: (t.af ? 'Afgerond: ' : 'Heropend: ') + t.tekst });
     log(context.label, 'projecttaak-' + (t.af ? 'af' : 'open'), p.id + ':' + t.id, p.huis); save(); return { ok: true, project: p };
   }

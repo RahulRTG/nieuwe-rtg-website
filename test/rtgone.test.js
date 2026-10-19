@@ -115,6 +115,10 @@ test('één persoonlijk RTMAIL-bericht wordt een volledige, traceerbare werkstro
   one.goedkeuringBeslis(besluit.id, 'goedkeuren', opA, { reden: 'Route is uitvoerbaar.' });
   assert.equal(one.goedkeuringBeslis(besluit.id, 'goedkeuren', opB, { reden: 'Tweede operationele toets akkoord.' }).goedkeuring.status, 'goedgekeurd');
   assert.ok(r.project.taken.some(x => x.besluitId === besluit.id), 'goedkeuring maakt één echte uitvoeringstaak');
+  /* 19 oktober 2026: na een goedgekeurd besluit zette elke taakwijziging het
+     project terug op in-voorbereiding, alsof het besluit er niet was. */
+  assert.equal(r.project.status, 'uitvoering', 'een goedgekeurd besluit zet het project in uitvoering');
+  assert.equal(one.projectTaakZet(r.project.id, first.id, false, context).project.status, 'uitvoering', 'een taak heropenen valt niet terug voor het besluit');
   for (const taak of r.project.taken.filter(x => !x.af)) one.projectTaakZet(r.project.id, taak.id, true, context);
   assert.equal(one.projectOplever({ projectId: r.project.id, uitkomst: 'Route werkt.' }, context).status, 409, 'een takenlijst zonder bewijs is geen resultaat');
   const bewijs = one.projectBewijs({ projectId: r.project.id, titel: 'Proefritverslag', uitleg: 'Toont dat de route in de praktijk werkt.', bron: 'RTDocs versie 4' }, context);
@@ -124,6 +128,10 @@ test('één persoonlijk RTMAIL-bericht wordt een volledige, traceerbare werkstro
   const oplevering = one.projectOplever({ projectId: r.project.id, uitkomst: 'De route werkt binnen de afgesproken kwaliteit.', leren: 'Controleer voortaan voor vertrek.' }, context).project;
   assert.equal(oplevering.status, 'afgerond'); assert.equal(oplevering.voortgang, 100); assert.equal(oplevering.oplevering.door, 'Noordster');
   assert.equal(one.projectOplever({ projectId: r.project.id, uitkomst: 'De route werkt binnen de afgesproken kwaliteit.' }, context).status, 400, 'oplevering kan nooit dubbel schrijven');
+  /* 19 oktober 2026: "Heropen" op een opgeleverd project zette het terug op
+     in-voorbereiding; een menselijke oplevering is definitief. */
+  assert.equal(one.projectTaakZet(r.project.id, first.id, false, context).status, 400, 'een opgeleverd project heropent geen taak');
+  assert.equal(r.project.status, 'afgerond');
   assert.equal(one.projectVanMail({ huis: 'rtg', mailId: 'mail-1' }, context).status, 409, 'één bronbericht wordt nooit dubbel project');
 });
 

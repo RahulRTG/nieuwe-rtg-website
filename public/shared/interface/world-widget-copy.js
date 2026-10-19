@@ -36,5 +36,6 @@
   };
   w.I18N = w.I18N || {}; w.I18N.en = w.I18N.en || {};
   Object.keys(words).forEach(function (k) { w.I18N.en['widget.' + k] = words[k][1]; });
-  w.RTGWidgetCopy = function (k) { return w.RTGi18n ? w.RTGi18n.t('widget.' + k, words[k][0]) : words[k][0]; };
+  // Dezelfde taalregel als de schil (world-desktop-copy.js).
+  w.RTGWidgetCopy = function (k) { return w.RTGDesktopUI && w.RTGDesktopUI.volgt() ? w.RTGi18n.t('widget.' + k, words[k][0]) : words[k][0]; };
 })(window);

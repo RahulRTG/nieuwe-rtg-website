@@ -3,7 +3,7 @@
   w.RTGWidgetSurfaces = function (app, root, o) {
     var U = w.RTGDesktopUI, T = w.RTGWidgetCopy;
     function text(tag, cls, value) { var n = U.el(tag, cls, value); n.dataset.userContent = ''; return n; }
-    function copy(tag, cls, key) { var n = U.el(tag, cls, T(key)); n.dataset.i18n = 'widget.' + key; return n; }
+    function copy(tag, cls, key) { return U.key(U.el(tag, cls, T(key)), 'widget.' + key); }
     function button(key, fn, cls) { var b = copy('button', cls || 'wd-primary', key); b.type = 'button'; b.onclick = fn; return b; }
     function open(key) { return button(key || 'open', o.open); }
     function date(value, opt) { var x = new Date(String(value).length === 10 ? value + 'T12:00:00' : value);

@@ -24,7 +24,7 @@ const HOOG = 3, MIDDEN = 2, LAAG = 1;
 
 module.exports = (ctx) => {
   const { tower, cases, samenvatting, graaf } = ctx;
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../tijdzone').datumIn(); // de dag van het lid, zoals de toren
 
   function nuBeeld(key, voorafG, voorafT) {
     // ook de tower mag meekomen: hij sorteert twaalfduizend termijnen, en dat

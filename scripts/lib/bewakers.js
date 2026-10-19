@@ -176,6 +176,7 @@ const KAART = new Map([
   // ---- verfijner: versmalt binnen een al vastgestelde rol, nooit alleen ----
   ['rijk', ['verfijner', null, 'rijksdienst binnen supplierAuth']],
   ['poort', ['verfijner', null, 'marechaussee-dienst binnen supplierAuth']],
+  ['eenAccount', ['verfijner', null, 'sluit een bezoeker zonder account uit binnen auth; een gratis account mag (de RTG Wallet, 19 oktober 2026)']],
   ['geenGast', ['verfijner', null, 'sluit meelezende gasten uit binnen auth']],
   ['pro', ['verfijner', null, 'zakelijke laag binnen auth']],
   ['gem', ['verfijner', null, 'gemeentedienst binnen supplierAuth']],

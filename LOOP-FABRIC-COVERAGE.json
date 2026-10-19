@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5527,
-    "mutationContracts": 5398,
+    "mutationContracts": 5405,
     "screens": 327
   },
   "classifications": [
@@ -2863,6 +2863,7 @@
       "server/routes/gemeente.js",
       "server/routes/gemoed.js",
       "server/routes/gewoonten.js",
+      "server/routes/gids.js",
       "server/routes/home.js",
       "server/routes/ik.js",
       "server/routes/instant-reality.js",
@@ -2928,6 +2929,7 @@
       "server/routes/link.js",
       "server/routes/livinglab/bewoner.js",
       "server/routes/livinglab/index.js",
+      "server/routes/livinglab/openbaar.js",
       "server/routes/livinglab/werk.js",
       "server/routes/loop-fabric.js",
       "server/routes/luchthaven.js",
@@ -3060,6 +3062,7 @@
       "server/routes/rtfkantoor/index.js",
       "server/routes/rtfleerling.js",
       "server/routes/rtfos/bescherming.js",
+      "server/routes/rtfos/doelgroepen.js",
       "server/routes/rtfos/index.js",
       "server/routes/rtfos/netwerk.js",
       "server/routes/rtfos/ruil.js",
@@ -3832,7 +3835,9 @@
       "server/kern/livinglab/observatoriumseinen.js",
       "server/kern/livinglab/opslag.js",
       "server/kern/livinglab/publicatie.js",
+      "server/kern/livinglab/spel.js",
       "server/kern/livinglab/studie.js",
+      "server/kern/livinglab/themas.js",
       "server/kern/livinglab/uitleen.js",
       "server/kern/livinglab/uitleenketen.js",
       "server/kern/livinglab/vraagbesluit.js",
@@ -4196,6 +4201,7 @@
       "server/lib/mutatiecontracten-connect2.js",
       "server/lib/mutatiecontracten-connect3.js",
       "server/lib/mutatiecontracten-connection-final.js",
+      "server/lib/mutatiecontracten-democratie-connector.js",
       "server/lib/mutatiecontracten-effect.js",
       "server/lib/mutatiecontracten-effectguard.js",
       "server/lib/mutatiecontracten-geld-b.js",
@@ -4296,6 +4302,7 @@
       "server/routes/connect.js",
       "server/routes/connection-policy.js",
       "server/routes/democratie/kantoor.js",
+      "server/routes/democratie/partij.js",
       "server/routes/doos-kloon.js",
       "server/routes/doos-wacht.js",
       "server/routes/economie.js",
@@ -4350,6 +4357,7 @@
       "server/routes/member/persoonlijk-care.js",
       "server/routes/member/privacy.js",
       "server/routes/member/rendezvous.js",
+      "server/routes/member/toestellen.js",
       "server/routes/member/tweefactor.js",
       "server/routes/member/vooruit.js",
       "server/routes/mobiliteit/vervoerbewijs.js",
@@ -4418,6 +4426,7 @@
       "server/routes/supplier/werving/sollchat.js",
       "server/routes/supplier/werving/sollicitaties.js",
       "server/routes/supplier/werving/talentmatch.js",
+      "server/routes/supplier/werving/uitnodiging-afnemers.js",
       "server/routes/supplier/werving/uitnodiging-na.js",
       "server/routes/supplier/werving/uitnodiging.js",
       "server/routes/techniek/functie.js",
@@ -5209,6 +5218,7 @@
       "server/kern/context.js",
       "server/kern/creator.js",
       "server/kern/defensie/index.js",
+      "server/kern/democratie/partijen.js",
       "server/kern/dienstidentiteit.js",
       "server/kern/document-capability.js",
       "server/kern/document-contracten.js",
@@ -5993,6 +6003,7 @@
       "server/db/tx/namen.js",
       "server/db/tx/pgachter.js",
       "server/eigenaar.js",
+      "server/foundation.js",
       "server/foundation/accountplicht.js",
       "server/foundation/basis.js",
       "server/foundation/gasten/gezinsagenda.js",
@@ -6524,6 +6535,7 @@
       "server/kern/livinglab/mensen.js",
       "server/kern/livinglab/observatoriumseinen.js",
       "server/kern/livinglab/plan.js",
+      "server/kern/livinglab/spel.js",
       "server/kern/livinglab/studie.js",
       "server/kern/livinglab/uitleen.js",
       "server/kern/livinglab/uitleenketen.js",
@@ -7349,6 +7361,7 @@
       "server/routes/geld.js",
       "server/routes/geldrahul.js",
       "server/routes/gemoed.js",
+      "server/routes/gids.js",
       "server/routes/isolatie.js",
       "server/routes/journaal.js",
       "server/routes/journalistiek.js",
@@ -7473,6 +7486,7 @@
       "server/routes/rtfos/governance.js",
       "server/routes/rtfos/index.js",
       "server/routes/rtfos/netwerk.js",
+      "server/routes/rtfos/portalen.js",
       "server/routes/rtfos/ruil.js",
       "server/routes/rtfos/uitvoering.js",
       "server/routes/rtfos/voordeur.js",
@@ -10048,8 +10062,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 6,
-        "mutationRoutes": 6,
-        "declaredMutationSemantics": 6,
+        "mutationRoutes": 7,
+        "declaredMutationSemantics": 7,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 0,
@@ -10062,6 +10076,7 @@
         "screens": [],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "version",
           "ai"
         ]
@@ -10075,8 +10090,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
@@ -16745,8 +16764,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 687,
-        "mutationRoutes": 667,
-        "declaredMutationSemantics": 392,
+        "mutationRoutes": 668,
+        "declaredMutationSemantics": 393,
         "sourceFileCount": 114,
         "kernelDependencyCount": 157,
         "screenCount": 21,
@@ -22151,8 +22170,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 22,
-        "mutationRoutes": 22,
-        "declaredMutationSemantics": 5,
+        "mutationRoutes": 24,
+        "declaredMutationSemantics": 7,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 2,
@@ -22254,8 +22273,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 202,
-        "mutationRoutes": 202,
-        "declaredMutationSemantics": 57,
+        "mutationRoutes": 205,
+        "declaredMutationSemantics": 60,
         "sourceFileCount": 9,
         "kernelDependencyCount": 0,
         "screenCount": 14,
@@ -28244,15 +28263,21 @@
           "public/apps/rtg.html"
         ],
         "screensOmitted": 0,
-        "signals": []
+        "signals": [
+          "decision"
+        ]
       },
       "classification": "NO_LEARNING_VALUE",
       "classificationReason": "Deze capability is een read model, transport- of presentatielaag en bezit geen semantische leeruitkomst.",
       "loop": {
         "occurrences": [],
         "observations": [],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [],
         "verification": [],
@@ -30486,6 +30511,7 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "ai"
         ]
       },
@@ -30498,8 +30524,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
@@ -31157,6 +31187,7 @@
         "screens": [],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "event",
           "ai"
         ]
@@ -31170,8 +31201,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"

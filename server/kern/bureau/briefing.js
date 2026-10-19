@@ -28,7 +28,7 @@ const NOOIT = new Set(['gezondheid', 'nalatenschap']);
 
 module.exports = (ctx) => {
   const { nuBeeld, tower, cases, graaf } = ctx;
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const tijdzone = require('../tijdzone'), vandaag = () => tijdzone.datumIn(); // de dag van het lid, zoals de toren
 
   const zichtbaar = z => !z.besloten && !NOOIT.has(z.domein);
 
@@ -41,7 +41,7 @@ module.exports = (ctx) => {
     for (const z of cases(key).zaken) {
       if (!zichtbaar(z)) continue;
       for (const stap of (z.tijdlijn || [])) {
-        if (String(stap.op).slice(0, 10) !== t) continue;
+        if (tijdzone.datumVan(stap.op) !== t) continue;
         uit.push({ zaak: z.titel, id: z.id, status: stap.status, notitie: stap.notitie,
           door: stap.door, op: stap.op });
       }

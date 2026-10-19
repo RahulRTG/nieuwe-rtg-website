@@ -120,6 +120,8 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
       tekst: cijfers.afhandelingWacht + ' bevestigde betaling(en) wachten nog op veilige domeinafhandeling.' });
     if (cijfers.terugbetalingControle) problemen.push({ ernst: 'kritiek', code: 'TERUGBETALING-CONTROLE',
       tekst: cijfers.terugbetalingControle + ' terugbetaling(en) wachten op menselijke controle.' });
+    // regels met een knop: vastgelopen terugbetalingen en betalingen op controle (./betaalregie-waarheid.js)
+    problemen.push(...cijfers.regels);
     if (cijfers.terugbetalingWacht) problemen.push({ ernst: 'waarschuwing', code: 'TERUGBETALING-WACHT',
       tekst: cijfers.terugbetalingWacht + ' terugbetaling(en) wachten op providerbevestiging.' });
     const inbox = Object.values(d().betaalWaarheidMeldingen || {});

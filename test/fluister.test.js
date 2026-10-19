@@ -10,6 +10,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const assetkoop = require('./lib/assetkoop');
+const { betaaldeSleutel } = require('../scripts/lib/voltooizorggeld');
 
 let srv, base;
 let lid, pda;
@@ -31,6 +32,13 @@ test.before(async () => {
     body: JSON.stringify({ code: 'HOSHI', staffId: m.id, pin: '1234' })
   })).json()).token;
   assert.ok(lid && pda);
+  /* Het lid heeft tegoed, zodat elke Tik en elk afrekenen in dit bestand uit het saldo gaat en niet langs
+     de simulatiebank: die kiest per sleutel een afloop (geweigerd, traag),
+     en dan hing deze toets van het lot af. Opladen gebeurt met een sleutel die
+     de bank "betaald" laat zeggen (scripts/lib/voltooizorggeld.js). */
+  const ik = (await api('auth/me', {}, lid)).body.user.codename;
+  const op = await api('pay/oplaad', { centen: 50000, idem: betaaldeSleutel(ik, 'fluister-oplaad-') }, lid);
+  assert.equal(op.status, 200, 'het tegoed staat erop: ' + JSON.stringify(op.body));
 });
 test.after(() => {
   stop(srv && srv.child);

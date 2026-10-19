@@ -26,9 +26,9 @@ module.exports = (kern) => {
   const herbevestiging = maakHerbevestiging({ accounts, zwaarVan: () => kern.zwaarbewijs,
     tooManyTries, noteFailedTry });
 
-  const eisLid = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
-    if (!req.session.account) { res.status(403).json({ error: 'Dit hoort bij een eigen RTG-account.' }); return false; }
+  // elk eigen account, ook gratis (besluit 19-10-2026); gast en gezinsprofiel niet
+  const eisAccount = (req, res) => {
+    if (!req.session.account) { res.status(403).json({ error: 'Dit hoort bij een eigen RTG-account; een gratis account is genoeg.' }); return false; }
     return true;
   };
   const spoor = (req, wat, extra) => {
@@ -47,13 +47,13 @@ module.exports = (kern) => {
      grens 1 in kern/identiteit/toestellen.js.
      ---------------------------------------------------------------------- */
   app.post('/api/mijn/toestel/uitdaging', auth, (req, res) => {
-    if (!eisLid(req, res)) return;
+    if (!eisAccount(req, res)) return;
     if (!toestellen) return res.status(503).json({ error: 'Toestelbinding is hier niet beschikbaar.' });
     res.json(toestellen.uitdaging(req.session.key));
   });
 
   app.post('/api/mijn/toestel/bind', auth, async (req, res) => {
-    if (!eisLid(req, res)) return;
+    if (!eisAccount(req, res)) return;
     if (!toestellen) return res.status(503).json({ error: 'Toestelbinding is hier niet beschikbaar.' });
 
     /* EEN SESSIE BINDT EEN KEER (P1-1). De sleutelbinding is wat een gestolen
@@ -141,7 +141,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/mijn/toestel/noem', auth, (req, res) => {
-    if (!eisLid(req, res)) return;
+    if (!eisAccount(req, res)) return;
     if (!toestellen) return res.status(503).json({ error: 'Toestelbinding is hier niet beschikbaar.' });
     const r = toestellen.noem(req.session.key, String(req.body.toestelId || ''), req.body.naam);
     res.status(r.error ? 400 : 200).json(r);
@@ -153,7 +153,7 @@ module.exports = (kern) => {
      dat iemand kwijt is. */
   app.post('/api/mijn/toestel/introk', auth, async (req, res, next) => {
     try {
-    if (!eisLid(req, res)) return;
+    if (!eisAccount(req, res)) return;
     if (!toestellen) return res.status(503).json({ error: 'Toestelbinding is hier niet beschikbaar.' });
     const tid = String(req.body.toestelId || '');
     const r = toestellen.trekIn(req.session.key, tid);

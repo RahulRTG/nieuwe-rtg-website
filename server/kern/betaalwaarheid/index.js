@@ -183,8 +183,11 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     return Object.assign(a, { hervat: h, terug: t });
   }
   const openstaand = () => Object.assign(veeg.openstaand(), terugveeg.openstaand());
+  // een betaling op controle afronden: alleen een mens op naam (./controle.js)
+  const controle = require('./controle')({ doos, save, nuIso, gebeurtenis, STATUS });
 
   return { STATUS, maak, bereidVoor: veeg.bereidVoor, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
-    registreerAfhandeling, ronde, openstaand, definitiefBetaald };
+    registreerAfhandeling, ronde, openstaand, definitiefBetaald,
+    terugAfhandelen: terugveeg.terugAfhandelen, controleAfronden: controle.controleAfronden };
 };

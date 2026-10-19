@@ -152,45 +152,12 @@ const PUBLIEK = new Map([
      code koppelt dat account aan het dossier en is daarna een extra sleutel
      naast de sessie (kern/codekoppel.js). Ze staan dus achter `auth`. */
 
-  /* HET RTF LIVING LAB (routes/livinglab/bewoner.js). Dezelfde familie, en om
-     een reden die in het ontwerp zelf zit: een Living Lab waarin een bewoner
-     een account nodig heeft om een vraag aan te dragen of zijn eigen
-     onderzoek te openen, is geen Living Lab meer. Twee soorten deuren:
-
-     - OP EEN CODE (de labpas, het labpaspoort). De pas is de geloofsbrief
-       (mensen.opPas) en bepaalt de alias; die wordt nooit uit het lijf
-       gelezen, want een alias staat in het teambeeld en bewijst dus niets
-       (regel 8). Ze dragen dezelfde twee remmen als de andere codedeuren:
-       20/min per bron tegen het afgrazen, 60/min per code tegen veel bronnen
-       op een code.
-     - ZONDER CODE (een vraag aandragen, stemmen, een klacht indienen, het
-       publieke labbeeld). Die kennen geen geheim en horen dat ook niet te
-       kennen. Ze geven per constructie alleen de BUITENSTE ring terug
-       (kern/livinglab/studie.js: geen deelnemers, geen observaties, en bij een
-       gescheiden studie zelfs geen vraagstelling), en de schrijfkant staat op
-       10/min per bron omdat daar inhoud binnenkomt.
-
-     De klacht staat er bewust zonder pas bij: een klacht kan juist gaan over
-     hoe het onderzoek met je omging, en "log eerst in" is daar het verkeerde
-     antwoord. Wat blijft staan voor de externe toets, net als bij de club- en
-     raadcodes: passen zonder vervaldatum en zonder intrekknop. */
-  ['/api/lab2/mijn', 'de labpas is de geloofsbrief (opPas); alleen het eigen onderzoek van die ene deelnemer'],
-  ['/api/lab2/mijn/observatie', 'idem; de alias komt uit de pas en niet uit het lijf'],
-  ['/api/lab2/mijn/reflectie', 'idem; juist het gedrag dat dit lab wil hebben, dus het mag geen drempel krijgen'],
-  ['/api/lab2/mijn/venster', 'idem; de deelnemer haalt de vragen op die HIJ moet invullen -- welke studie dat is, volgt uit zijn pas'],
-  ['/api/lab2/mijn/meting', 'idem; de meting gaat de studie in op de alias uit de pas, met de toestemmingsgrond van die studie'],
-  ['/api/lab2/mijn/terugtrekken', 'toestemming intrekken moet werken met wat de deelnemer zelf heeft: zijn pas'],
-  ['/api/lab2/mijn/terugtrekken/gevolg', 'idem, en dit leest alleen: het rekent voor wat terugtrekken zou betekenen zonder iets te wissen'],
-  ['/api/lab2/publiek/apparatuur', 'de leenbare apparatuur van een lab, met de eisen erbij; wie iets wil lenen heeft geen RTG-account en dat hoort geen drempel te zijn'],
-  ['/api/lab2/publiek/uitleen-aanvraag', 'idem: een school vraagt een apparaat aan. Het lab beslist erover met een naam eronder; de aanvraag zelf is geen bevoegdheid'],
-  ['/api/lab2/publiek/vragen', 'de buurtvragen met hun stand -- juist ook de afgewezen, met de reden; wie zijn vraag niet kan terugvinden, heeft geen antwoord gekregen'],
-  ['/api/lab2/publiek/onderzoeken', 'de openbare onderzoekskaarten: alleen wat een mens van het lab heeft gepubliceerd, zonder aliassen en zonder waarnemingen'],
-  ['/api/lab2/publiek/onderzoek', 'idem, een kaart -- openbaar zijn is hier het hele punt: onderzoek dat niemand kan nakijken, is geen onderzoek'],
-  ['/api/lab2/bewoner/studie', 'idem per onderzoek; bij een gescheiden studie niet meer dan titel en stap'],
-  ['/api/lab2/bewoner/klacht', 'de klachtenprocedure mag geen inlog vragen: de klacht kan over het onderzoek zelf gaan'],
-  ['/api/lab2/bewoner/paspoort', 'de paspoortcode is de geloofsbrief; toont alleen punten, niveau en badges'],
-  ['/api/lab2/bewoner/paspoort-maak', 'een labpaspoort aanmaken op een zelfgekozen roepnaam (rem 10/min per bron)'],
-  ['/api/lab2/bewoner/kader', 'de spelregels van het lab: cyclus, methoden en bewijsgraden horen juist openbaar te zijn'],
+  /* HET RTF LIVING LAB (routes/livinglab/). Alle deuren van het buurtlab
+     stonden hier: de labpas, het labpaspoort, de buurtvragen, de klacht, het
+     kader en de onderzoekskaarten. Sinds het eigenaarsbesluit van 19 oktober 2026
+     vragen ze allemaal een account of een gezinsprofiel onder een ouderaccount
+     (routes/livinglab/bewoneraccount.js); de labpas is daarnaast de tweede sleutel
+     voor het eigen onderzoek, en het paspoort loopt ook door de 18+-poort. */
 
   /* De codeportalen van het Foundation OS (routes/rtfos/portalen.js,
      doelgroepen.js en afmaak.js: partner, gemeente, ondernemer, vrijwilliger,

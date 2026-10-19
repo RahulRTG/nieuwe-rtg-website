@@ -37,7 +37,7 @@ const KLOMPJE = Object.freeze({
       'IDENTITEIT_WIJZIGEN', 'DERDENCODE_UITVOEREN', 'ONVERTROUWDE_BYTES',
       'BEVEILIGING_VERZWAKKEN', 'BULK_UITVOER', 'PLAFOND_WIJZIGEN'],
     voorwaarden: [
-      { wat: 'een ledensessie; een gast komt er niet in', bron: 'geenGast in routes/pay.js' },
+      { wat: 'een account, ook een gratis account; een bezoeker zonder account komt er niet in', bron: 'geenEchtAccount in routes/pay.js' },
       { wat: 'minstens een en hoogstens tien BESTAANDE codenamen, en niet de eigen',
         bron: 'kern/pay/verzoeken.js: de lijst wordt ontdubbeld, op 10 afgekapt, en elke naam ' +
           'langs bestaatLid() -- anders 404 met de naam erbij' },

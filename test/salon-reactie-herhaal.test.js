@@ -35,15 +35,19 @@ test('dezelfde reactie met dezelfde sleutel staat er na een herstart een keer; e
   const posts = async () => (((await roep('/api/state', {}, tok)).d || {}).state || {}).posts || [];
   const doel = (await posts()).find((p) => p.canEngage && !p.partner);
   assert.ok(doel, 'geen post om op te reageren in de testomgeving');
-  const lijf = { postId: doel.id, text: 'Herhaal ' + t, idem: 'salon-herhaal-' + t };
+  /* De tekst draagt het merk in letters: een cijferreeks als 06 + acht cijfers
+     leest kern/veilig.js terecht als telefoonnummer, en dan hing de toets af
+     van het tijdstip. */
+  const merk = t.replace(/\d/g, (c) => 'abcdefghij'[c]);
+  const lijf = { postId: doel.id, text: 'Herhaal ' + merk, idem: 'salon-herhaal-' + t };
   assert.equal((await roep('/api/comment', lijf, tok)).status, 200);
   child.kill('SIGKILL');
   await new Promise((r) => child.once('exit', r));
   await start();
   assert.equal((await roep('/api/comment', lijf, tok)).status, 200);
-  const anders = await roep('/api/comment', Object.assign({}, lijf, { text: 'Anders ' + t }), tok);
+  const anders = await roep('/api/comment', Object.assign({}, lijf, { text: 'Anders ' + merk }), tok);
   assert.equal(anders.status, 409, 'dezelfde sleutel met een andere tekst hoort een conflict te zijn');
   const p = (await posts()).find((x) => x.id === doel.id);
-  assert.equal(p.comments.filter((c) => c.text === 'Herhaal ' + t).length, 1);
-  assert.equal(p.comments.filter((c) => c.text === 'Anders ' + t).length, 0);
+  assert.equal(p.comments.filter((c) => c.text === 'Herhaal ' + merk).length, 1);
+  assert.equal(p.comments.filter((c) => c.text === 'Anders ' + merk).length, 0);
 });

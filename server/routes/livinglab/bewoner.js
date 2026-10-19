@@ -3,8 +3,8 @@
    Een Living Lab dat alleen achter een personeelsinlog bestaat, is geen Living
    Lab. Een bewoner draagt een vraag aan, stemt, opent zijn onderzoek met zijn
    labpas en dient een klacht in. Sinds het eigenaarsbesluit van 19 oktober
-   2026 vragen de buurtdeuren (labs, themas, thema, stem, overzicht) een
-   account of gezinsprofiel: ./bewoneraccount.js.
+   2026 vraagt elke buurtdeur een account of gezinsprofiel: ./bewoneraccount.js
+   (klacht, studie, paspoort en kader in ./bewonerpas.js).
 
    ---------- DE REM ----------
 
@@ -55,13 +55,17 @@ module.exports = (kern, hulp) => {
   const remLezen = rem({ windowMs: 60000, limit: 60 });
 
   /* ---------- de labpas: mijn eigen onderzoek ----------
+     Een account EN de labpas (eigenaarsbesluit 19 oktober 2026: alles van het
+     buurtlab achter een account). De labpas wordt met opzet NIET aan het account
+     gekoppeld: bij een gescheiden studie is juist die koppeling wat niet mag
+     bestaan (kern/livinglab/mensen.js). Het account is de deur, de pas de rol.
      Geeft de studie zoals een teamlid hem mag zien, wat er nu moet gebeuren, en
      de eigen stand in het spel. */
-  app.post('/api/lab2/mijn', remBron, remCode, (req, res) => veilig(res, () => livinglab.mijn(codeUit(req))));
+  app.post('/api/lab2/mijn', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => livinglab.mijn(codeUit(req))));
 
   /* Een observatie insturen met de labpas. De alias komt uit de pas -- zie de
      kop van dit bestand voor waarom dat niet uit de body mag komen. */
-  app.post('/api/lab2/mijn/observatie', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/observatie', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     const b = Object.assign({}, lijf(req), { door: wie.alias });
@@ -77,13 +81,13 @@ module.exports = (kern, hulp) => {
      cel zonder netwerk en kan een meting dus niet terugsturen -- en zou dat ook
      niet mogen: een meting draagt een toestemmingsgrond en hoort bij een studie
      van de stichting (kern/livinglab/instrument.js). */
-  app.post('/api/lab2/mijn/venster', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/venster', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.instrument.venster(wie.studieId, wie.alias);
   }));
 
-  app.post('/api/lab2/mijn/meting', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/meting', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.instrument.metingBij(wie.studieId, wie.alias, lijf(req));
@@ -93,7 +97,7 @@ module.exports = (kern, hulp) => {
      welke eerdere conclusie herzien moet worden. Dit staat open voor bewoners
      omdat het juist het gedrag is dat dit lab wil hebben -- en het is bovendien
      het zwaarst beloonde (zie kern/livinglab/spel.js). */
-  app.post('/api/lab2/mijn/reflectie', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/reflectie', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.bewijs.reflectieBij(wie.studieId, lijf(req), wie.alias);
@@ -106,13 +110,13 @@ module.exports = (kern, hulp) => {
      verandert niets: wat verdwijnt, wat in een dataset is opgegaan en welke
      conclusies in bewijsgraad zakken. Een deelnemer die dat pas ná het wissen
      hoort, heeft geen keuze gehad maar een mededeling gekregen. */
-  app.post('/api/lab2/mijn/terugtrekken/gevolg', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/terugtrekken/gevolg', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.terugtrekken.gevolg(wie.studieId, wie.alias);
   }));
 
-  app.post('/api/lab2/mijn/terugtrekken', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/terugtrekken', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.mensen.deelnemerWeg(wie.studieId, { alias: wie.alias }, 'deelnemer zelf');
@@ -143,33 +147,19 @@ module.exports = (kern, hulp) => {
     if (!bewoner(req)) return res.status(401).json(GEEN_ACCOUNT);
     veilig(res, () => livinglab.studie.overzicht(lijf(req).labId, null));
   });
-  app.post('/api/lab2/bewoner/studie', remLezen, (req, res) => veilig(res, () => livinglab.studie.studie(lijf(req).id, null)));
   app.post('/api/lab2/bewoner/labs', remLezen, (req, res) => bewoner(req) ? veilig(res, () => {
     const r = livinglab.bestuur.labs();
     // alleen de actieve labs, zonder het bestuurlijke deel (budget, tekenaars, partners)
     return { ok: true, labs: r.labs.filter(l => l.actief).map(l => ({ id: l.id, stad: l.stad, naam: l.naam, land: l.land, toegang: l.toegang })) };
   }) : res.status(401).json(GEEN_ACCOUNT));
 
-  /* ---------- de klachtenprocedure ----------
-     Bewust zonder pas te gebruiken: een klacht kan juist gaan over hoe het
-     onderzoek met je omging, en dan is "log eerst in" het verkeerde antwoord.
-     De klacht blijft zichtbaar tot een tekenbevoegde hem afhandelt (de kern
-     laat hem niet wegklikken), en hij blokkeert intussen de deelnemersstap. */
-  app.post('/api/lab2/bewoner/klacht', remSchrijf, (req, res) => veilig(res, () => livinglab.ethiek.klacht(lijf(req).id, lijf(req))));
-
-  /* ---------- het labpaspoort ---------- */
-  app.post('/api/lab2/bewoner/paspoort', remBron, remCode, (req, res) => veilig(res, () => livinglab.spel.paspoort(codeUit(req))));
-  app.post('/api/lab2/bewoner/paspoort-maak', remSchrijf, (req, res) => veilig(res, () => livinglab.spel.paspoortMaak(lijf(req))));
-
-  /* Het kader ook publiek: het bewonersscherm bouwt zijn keuzelijsten uit
-     dezelfde tabel als het kantoorscherm, zodat er maar één waarheid is over wat
-     de cyclus en de methoden zijn (regel 4). Er staat niets vertrouwelijks in --
-     het zijn de spelregels, en die horen juist openbaar te zijn. */
-  app.post('/api/lab2/bewoner/kader', remLezen, (req, res) => veilig(res, () => livinglab.kaderVoorScherm()));
+  /* De klacht, het labpaspoort en het kader staan in ./bewonerpas.js, achter
+     hetzelfde account (eigenaarsbesluit 19 oktober 2026). */
+  require('./bewonerpas')(kern, { veilig, lijf, codeUit, bewoner, GEEN_ACCOUNT, remBron, remCode, remLezen, remSchrijf });
 
   /* De deuren voor wie alleen KIJKT -- de onderzoekskaarten, de buurtvragen met
      hun stand, de leenbare apparatuur -- staan in ./openbaar.js. Ze krijgen
      dezelfde rem mee, want dat is dezelfde vraag: afgrazen tegenhouden zonder
      iemand buiten te sluiten die er wel bij hoort. */
-  require('./openbaar')(kern, { veilig, lijf, remLezen, remSchrijf });
+  require('./openbaar')(kern, { veilig, lijf, remLezen, remSchrijf, bewoner, GEEN_ACCOUNT });
 };

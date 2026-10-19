@@ -41,8 +41,11 @@
       if (!$('#pNiveau').options.length) {
         $('#pNiveau').innerHTML = d.niveaus.map(n => '<option value="' + esc(n) + '">' + esc(n) + '</option>').join('');
       }
-      $('#partijen').innerHTML = d.partijen.length ? d.partijen.map(rij).join('')
-        : '<div class="leeg">Er staat nog geen partij in het register.</div>';
+      const oud = Number(d.oudePartijen) || 0;
+      $('#partijen').innerHTML = (oud ? '<div class="meta">Nog ' + oud + ' partij' + (oud === 1 ? '' : 'en') +
+        ' van voor 19 oktober 2026 zonder gekoppeld account: geef ze een nieuwe koppelcode.</div>' : '') +
+        (d.partijen.length ? d.partijen.map(rij).join('')
+        : '<div class="leeg">Er staat nog geen partij in het register.</div>');
     } catch (e) { $('#partijen').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
   }
 

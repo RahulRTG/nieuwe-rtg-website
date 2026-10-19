@@ -767,6 +767,29 @@ in de werklijst en staat op het wijkblok van de PDA, met de weg naar de vloer
 erbij. Alleen het aantal: de handeling blijft waar de hele verdeling erbij staat
 (`test/horeca-pda.e2e.js`).
 
+## De omzetdag loopt tot de sluiting
+
+**Eigenaarsbesluit van 19 oktober 2026.** De omzetdag van een zaak loopt tot
+haar sluitingstijd. Is er geen sluitingstijd ingesteld, dan loopt hij tot
+05:00 lokale tijd, in de zone van de zaak (`tijdzone.zaakZoneOfHuis`). Een
+kasopmaak om 00:30 telt dus de hele avond, en niet alleen het halve uur sinds
+middernacht. Daarvoor rekende De Kassa met de UTC-datum van de bon. Daardoor
+brak een winteravond om 01:00 lokale tijd in tweeën, en in de zomer om 02:00.
+
+De regel woont op één plek: `omzetdag()` in `server/kern/tijdzone.js`. Het dagrapport (X)
+en de kasopmaak in `routes/supplier/kassa/premium.js` lezen hem daar, en de
+weektrend en "omzet vandaag" van de backoffice (`routes/supplier/backoffice.js`)
+ook, zodat het dashboard om 00:30 dezelfde dag toont als de kasopmaak. De toets
+is `test/omzetdag.test.js`: een verkoop om 23:30 en een om 00:30, met een
+kasopmaak om 01:00, vallen op dezelfde dag.
+
+Vandaag geldt voor elke zaak 05:00. De enige sluitingstijd die een zaak nu al
+heeft, is `vakUren.tot` van een dienstverlener, en die ligt altijd op de dag
+van de opening. Als grens zou hij een ontbijtzaak die om 11:00 sluit haar
+ochtend bij gisteren laten boeken. Een sluitingstijd na middernacht bestaat nog
+nergens. Komt die er, dan wordt hij de grens in `omzetdag()`; er komt
+geen tweede regel ernaast, en zonder overleg ook geen nieuw instellingenscherm.
+
 ## De grenzen
 
 *Zoals in elk diepte-document van dit huis: waar een functie botst met een

@@ -4,7 +4,8 @@ const V = require('../server/bedrijf/praktijk-vorm');
 function maak() {
   const db = { data: { werkruimtes: {} } }, routes = {};
   const ctx = { db, crypto, save() {}, rechtenVan: () => ['werkruimte','project','klant'], W: () => db.data.werkruimtes,
-    app: { post(p, fn) { routes[p] = fn; } }, werkPoort() {},
+    // de gast-, leveranciers- en betaalroutes staan sinds 19 oktober 2026 achter `auth` uit de kern; hier alleen opgehangen, niet aangeroepen
+    app: { post(p, ...fn) { routes[p] = fn[fn.length - 1]; } }, werkPoort() {}, kern: { auth() {} },
     rid: (n = 8) => crypto.randomBytes(n).toString('hex'), nu: () => new Date().toISOString(),
     dag: () => new Date().toISOString().slice(0,10), log() {} };
   const api = require('../server/bedrijf/praktijk')(ctx).praktijk;

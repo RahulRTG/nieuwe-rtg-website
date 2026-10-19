@@ -103,7 +103,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
        precies de knop waarmee je een dagrapport verschuift. Alleen als sein,
        nooit als bron. */
     offlineVanaf: req.body.offlineVanaf ? String(req.body.offlineVanaf).slice(0, 30) : null,
-    at: new Date().toISOString()
+    at: require('../../../lib/klok').datum().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   list.unshift(sale);

@@ -82,7 +82,30 @@ module.exports = function maakTerugveeg({ doos, save, nuIso, gebeurtenis, betaal
     return uit;
   }
 
-  return { veeg, openstaand };
+  /* DE MENS OP NAAM (eigenaarsbesluit 19 oktober 2026): een vastgelopen
+     terugbetaling staat op de lijst van de betaalkamer, en een mens legt vast
+     wat hij bij de provider zag. Het geld is terug, of het is niet terug; beide
+     lopen via providerTerugbetaling, dus precies een keer en nooit zonder dat
+     iemand het zag. Naam, tijd en reden blijven bij de opdracht. */
+  async function terugAfhandelen({ betalingId, opdrachtId, uitkomst, door, reden } = {}) {
+    const wie = String(door || '').trim(), waarom = String(reden || '').trim();
+    if (!wie) return { status: 403, error: 'Een vastgelopen terugbetaling handelt een mens op naam af.' };
+    if (!['terug', 'niet-terug'].includes(uitkomst)) return { status: 400, error: 'Kies: het geld is terug, of het is niet terug.' };
+    if (waarom.length < 10) return { status: 400, error: 'Schrijf op wat u bij de provider zag (minstens tien tekens).' };
+    const r = doos()[String(betalingId || '')];
+    const op = r && ((r.terugbetaalOpdrachten || []).find(x => x.id === String(opdrachtId || '')));
+    if (!op) return { status: 404, error: 'Deze terugbetaling bestaat niet.' };
+    if (op.mens || !op.escalatie || op.status !== 'BIJ_PROVIDER')
+      return { status: 409, error: 'Deze terugbetaling is al afgehandeld, of is niet vastgelopen.' };
+    op.mens = { door: wie, at: nuIso(), uitkomst, reden: waarom.slice(0, 300) };
+    gebeurtenis(r, 'TERUGBETALING_DOOR_MENS', { opdrachtId: op.id, door: wie, uitkomst });
+    save();
+    await providerTerugbetaling({ eventId: 'mens:' + op.id, aanbieder: r.provider, providerRefundId: op.providerRefundId,
+      referentie: r.id, gelukt: uitkomst === 'terug', centen: op.centen, valuta: r.valuta });
+    return { ok: true, betalingId: r.id, opdrachtId: op.id, stand: r.status };
+  }
+
+  return { veeg, openstaand, terugAfhandelen };
 };
 
 module.exports.WACHT_MS = WACHT_MS;

@@ -60,7 +60,10 @@
     if (!query || /(?:https?:\/\/|javascript:|data:|\/api\/|\.\.\/)/.test(query)) return dicht('query');
     var all = rows(options.catalog, options.allow), exact = [], related = [];
     all.forEach(function (row) { var score = match(row, query); if (score === 2) exact.push(row); else if (score === 1) related.push(row); });
-    var found = exact.length ? exact : related;
+    /* Rahul kiest: een exacte naam wint. Een zoeklijst (Heel RTG, `alles`) toont
+       ook wat er alleen op lijkt: "video" hoort Videobellen te vinden, ook al
+       heet Clips ook "Video". */
+    var found = options.alles === true ? exact.concat(related) : (exact.length ? exact : related);
     return Object.freeze({ version: 1, status: found.length ? 'ready' : 'unknown', reason: found.length ? (exact.length ? 'exact' : 'related') : 'not-found',
       query: query, matches: Object.freeze(found.slice(0, 12).map(veilig)) });
   }

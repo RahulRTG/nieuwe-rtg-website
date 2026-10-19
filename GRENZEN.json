@@ -657,6 +657,7 @@
       "beleidsmotor",
       "betaal",
       "betaalRegie",
+      "betaalWaarheid",
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
@@ -829,6 +830,7 @@
       "staf",
       "veilig",
       "veiligAsync",
+      "volwassen",
       "wie"
     ],
     "loop-fabric": [

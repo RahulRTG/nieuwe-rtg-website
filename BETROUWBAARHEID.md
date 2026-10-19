@@ -144,7 +144,8 @@ framework:
   in drie stappen waarvan de eerste die faalt de uitslag bepaalt: de **koppeling**
   is gemeten (de proef raakt routes die de ingang aanroept, via
   `SCHERMROUTES.json` en de scripts die de ingang laadt), het register is **vers**
-  (`versheid()` uit `scripts/lib/stempel.js`, en met opzet geen tweede grendel),
+  (sinds 19 oktober 2026 per bewijs op zijn raakvlak, par. 4i; is dat niet vast
+  te stellen, dan `versheid()` uit `scripts/lib/stempel.js`),
   en de keten **sluit** (de schakels zelf, niet de samenvattende telling).
 - Verouderd is `NIET_GETEST` en nooit `GEBLOKKEERD_DOOR_DEFECT`: er is dan niets
   gemeten dat stuk was. Vers met een open schakel is `DEFECT` en nooit
@@ -578,6 +579,101 @@ Een onderdeel zonder scenario houdt `GEEN_FIXTURE`, en de reden zegt nu wat er
 ontbreekt: een scenario (de testwereld staat), een eigen adres (een stand of tab
 in de app), of een adapter (`TESTWERELD_ONTBREEKT` in
 `scripts/lib/appcontract.js`: bellen en videobellen, WebRTC).
+
+## 4i. Versheid per bewijs — het raakvlak
+
+**Staat** (19 oktober 2026, eis van de eigenaar: "een bewijs moet opnieuw
+ongeldig worden wanneer een relevante codewijziging de betrouwbaarheid ervan kan
+aantasten"). Tot nu toe verklaarde `versheid()` een heel register oud zodra er
+sinds de meting iets in `server/` of `public/` veranderde. Dat is veilig en te
+grof: één regel in een willekeurig routebestand maakte alle 114 apps oud, en bij
+de nulmeting stonden waarheidsgetrouw en bevoegd zo op 0 met 191 gewijzigde
+bestanden. Een meter die altijd rood staat, wordt eindeloos herdraaid of
+genegeerd.
+
+**De regel.** Een bewijs is vers als elk bestand in zijn **raakvlak** nu dezelfde
+inhoud heeft als op de commit waarop het gemeten is
+(`scripts/lib/bewijsraakvlak.js`). Verandert er één bestand in het raakvlak, dan
+vervalt alleen dat bewijs van die app, met de naam van dat bestand. Een bestand
+buiten elk raakvlak maakt niets oud. De voorwaarden van het stempel zelf
+(commit, geen vuile boom, de commit bestaat) blijven onverkort gelden.
+
+**Wat er in het raakvlak zit.**
+
+- **gedeeld** — alles onder `server/` wat niet aantoonbaar alleen achter routes
+  hangt. Dit is omgekeerd opgezet: een bestand is gedeeld tenzij bewezen is dat
+  het dat niet is. De server spuit zijn kern (db, accounts, de poorten, de
+  domeingrens) in elke router, en welk stuk een handler gebruikt, is niet
+  statisch te volgen. Dus telt de hele opstartsluiting van `server/server.js`
+  voor elk bewijs van elke app: de auth-middleware, de sessie, de opzet die de
+  routes ophangt. Ook gedeeld: elk niet-`.js`-bestand onder `server/`, elk
+  serverbestand dat niemand statisch laadt (het kan dynamisch geladen worden), elk
+  routebestand dat middleware hangt (`.use(`), en elk bestand onder `public/`
+  dat de server bij een bestandsoperatie noemt.
+- **het scherm** — de ingang met wat hij werkelijk laadt: scripts, stijlen,
+  bundeldelen, en wat een berekend pad met een letterlijk begin kan opleveren
+  (`'/shared/' + naam + '.js'`). Daarbij hoort ook de gedeelde schil:
+  `basis.js` en `rtg-world-desktop.js` laden op vrijwel elk scherm tientallen
+  modules, en een wijziging daar maakt dus vrijwel elk scherm oud. Dat volgt uit
+  de laadsluiting en niet uit een aanname. Wat een scherm alleen noemt (een link,
+  een afbeelding) telt als bestand en wordt niet gevolgd.
+- **de handlers** — de routes die het scherm (of het scenario) noemt, als patroon
+  (`'/api/' + w + '/doe/bevestig'` is `/api/STER/doe/bevestig`), gevraagd aan de
+  router van de huidige boom (`scripts/lib/routes.js`). Daarbij hoort hun
+  require-sluiting en de domein-index die ze ophangt. Een tekst die alleen wordt
+  vergeleken (`indexOf('/api/')`), roept niets aan.
+- **het instrument** — de require-sluiting van het meetinstrument, zoals
+  `sluiting()` die al rekende. Bij de voltooiproef telt alleen het eigen
+  scenario: elk scenario draait met een eigen datamap en een eigen server.
+  Een proef over de API (de voltooiproef, een ketenproef) leest geen scherm.
+  Daar telt van `public/` alleen de code die bepaalt welke routes het scherm
+  aanroept.
+
+**Waarom dat ruim genoeg is.** Het raakvlak wordt op de huidige boom berekend.
+Een bestand dat bij de meting in het raakvlak zat en nu niet meer, kan daar
+alleen uit gevallen zijn doordat een bestand dat er nu nog in zit veranderde:
+de require, de route of de verwijzing is weg. Dat bestand maakt het bewijs dan
+al oud. Een bestand dat er nieuw in komt, stond op de meetcommit niet of anders
+in de boom. Een verwijderd serverbestand maakt alles oud. Is het raakvlak niet
+vast te stellen, dan valt dat bewijs terug op de grove regel en nooit op vers.
+Dat gebeurt bij een berekende require die niet te volgen is (de twee die wel te
+volgen zijn staan in `DYNAMISCH`), een route zonder bronbestand, een code-pad dat
+op niets past, of een ingang die geen adres is. Het ene dat hier wordt
+aangenomen, staat uitgeschreven in de kop van het scherm-deel: een `src` met
+alleen een naam neemt zijn waarde uit een pad of patroon in hetzelfde bestand, of
+uit een blob. `test/bewijsraakvlak.test.js` legt elke tak vast, en is met vier
+mutaties nagetrokken: geen wijziging zien, geen gedeelde kern, onbepaald als
+vers, en geen controle per bestand. Alle vier gaan rood.
+
+**Knoeien.** `APPWERKT.json` bewaart per bestand een sha256 (`raakvlak.hashes`),
+en elk bewijs zijn samengestelde hash (`raakvlak` in het bewijs). Bij de controle
+moet de huidige inhoud gelijk zijn aan de bewaarde hash én aan de inhoud op de
+meetcommit (de blob-id van git). Er zijn drie manieren om te knoeien, en geen
+ervan maakt iets vers:
+
+- een hash bijwerken naar nieuwe code: dan is het bewijs `VERVALLEN`;
+- een hash veranderen terwijl de code gelijk bleef: dan is het `ONGELDIG`;
+- een hash weglaten: ook `ONGELDIG`.
+
+Wat dit niet afvangt, en ook niet kan: wie de commit in het stempel vervalst,
+vervalst de meting zelf.
+
+**Voortdurend.** `npm run appwerkt:vers` meldt zonder browser per app en per
+bewijs wat vervallen is en door welk bestand, in ongeveer tien seconden. `npm run
+appwerkt:vers:controle` zakt zodra een rij die als 8/8 geldt een bewijs heeft dat
+niet vers is.
+
+**Gemeten op de geschiedenis** (19 oktober 2026). Van de laatste 88 commits die
+`server/` of `public/` raakten, maakte de grove regel er 88 alles oud. Op het
+raakvlak van nu zijn dat er 60. Twee commits maken een deel oud, en 26 maken geen
+enkele app oud. Die 60 zijn geen fout in de meting maar de bouw van het huis:
+
+- 26 raakten de geïnjecteerde serverkern;
+- 34 raakten de schil die vrijwel elk scherm laadt.
+
+De volgende verfijning ligt bij de kern. `GRENZEN.json` zegt per domein welke
+kernnamen een router mag zien, en een vertaling van naam naar bestand kan de
+gedeelde serverkern per domein versmallen.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

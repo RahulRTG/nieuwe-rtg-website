@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19547 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19566 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2824 |
-| losse beweringen (`test(...)`) | 19547 |
+| toetsbestanden | 2825 |
+| losse beweringen (`test(...)`) | 19566 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 8 |
+| niets van beide | 9 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2486 bestanden, 18975 beweringen.
+2487 bestanden, 18994 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -300,6 +300,7 @@ toets omvalt.
 | `bewijsladder.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | DE BEWIJSLADDER -- levert dit huis nog elk soort bewijs, en waar? Twee beweringen worden hier hard gemaakt, en ze zijn allebei een ANDERE dan die van test/ci-lokaal.test.js (dat gaat over pariteit per poort): 1. |
 | `bewijsmatrix-audit.test.js` | 4 | gezakt op `!==->===#6` | DE AUDIT-KOLOM HEEFT TWEE BRONNEN, EN ALLEBEI MOETEN ZE AAN BOD KOMEN. DIT IS TWEE KEER MISGEGAAN, en beide keren op dezelfde manier: een tak die de cel ook claimde als hij NIETS wist, met een `continue` erachter. |
 | `bewijsmatrix.test.js` | 28 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
+| `bewijsraakvlak.test.js` | 19 | -- | HET RAAKVLAK -- een bewijs vervalt alleen door een bestand dat het kan raken. scripts/lib/bewijsraakvlak.js vervangt voor APPWERKT de grove regel "er veranderde iets in server/ of public/, dus alles is oud" door een... |
 | `bewijsregister.test.js` | 5 | gezakt op `===->!==#9` | ROOD BEWIJS MOET BLIJVEN STAAN. Tot 9 september 2026 was BEPROEVING.json tegelijk het VERSLAG van de laatste ronde en de INVOER van de prestatieratel. |
 | `bewijsschuld.test.js` | 9 | gezakt op `!==->===#0` | DE BEWIJSSCHULD MAG ALLEEN KRIMPEN. WAAROM DIT BESTAAT. |
 | `bewijstoken.test.js` | 13 | gezakt op `&&->||#0` | HET BEWIJSTOKEN -- een bevoegdheid die je kunt meedragen. WAT ER OP HET SPEL STAAT. |

@@ -129,6 +129,12 @@ const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
+/* Het raakvlak per bewijs (scripts/lib/bewijsraakvlak.js): EEN wereld per ronde, zodat
+   elk bestand een keer wordt gelezen en gehasht, en de hashes in het register
+   dezelfde inhoud dragen als waartegen elk bewijs vers werd verklaard. */
+const raakvlakken = require('./lib/bewijsraakvlak');
+let raakvlakWereld = null;
+const RAAKVLAKWERELD = () => (raakvlakWereld = raakvlakWereld || raakvlakken.maakWereld());
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
 /* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
@@ -474,7 +480,7 @@ function vulOngemeten(r) {
   for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
-  r.samengesteld = stelSamen(r);
+  r.samengesteld = stelSamen(r, { wereld: RAAKVLAKWERELD() });
   /* De vier randvoorwaarden uit de opdracht die hier niet gemeten worden, maar
      die wel een plek in de rij verdienen -- weglaten leest als "in orde". */
   r.mobiel = { status: 'NIET_GETEST', reden: 'deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md' };
@@ -811,7 +817,29 @@ function luister(page, base, bak) {
 }
 
 /* ---- schrijven ---- */
+/* De bewijzen die deze browserronde ZELF meet, krijgen hun raakvlak hier, op
+   het stempel van de ronde. Een samengesteld bewijs kreeg het al bij de bron;
+   menselijk heeft dan twee helften, en beide moeten vers blijven. */
+const EIGEN_BEWIJZEN = ['bereikbaar', 'bedienbaar', 'menselijk'];
+function legRaakvlakken(regels, st) {
+  const w = RAAKVLAKWERELD();
+  const grof = require('./lib/stempel').versheid;
+  for (const r of regels) {
+    for (const naam of EIGEN_BEWIJZEN) {
+      const b = r.bewijzen[naam];
+      if (!b || b.status === 'GEEN_FIXTURE') continue;
+      if ((r.samengesteld || []).includes(naam) && naam !== 'menselijk') continue;
+      const v = raakvlakken.versheidVoor(w, { ingang: r.ingang, soort: 'browser' }, grof)(st);
+      if (!v.raakvlak) continue;   // niet vers op de eigen commit: dan is er geen raakvlak om te bewaren
+      b.raakvlak = ((r.samengesteld || []).includes(naam) ? (b.raakvlak || []) : []).concat([v.raakvlak]);
+    }
+  }
+  return raakvlakken.hashes(w);
+}
+
 function bouw(meting) {
+  const st = stempel();
+  const hashes = legRaakvlakken(meting.regels, st);
   const telling = {};
   for (const r of meting.regels) telling[r.status] = (telling[r.status] || 0) + 1;
   const perBewijs = {};
@@ -834,7 +862,14 @@ function bouw(meting) {
       GEEN_FIXTURE: 'niet te meten zonder testwereld, met de reden erbij',
       NIET_GETEST: 'deze ronde niet aangeraakt, met de reden erbij'
     },
-    stempel: stempel(),
+    stempel: st,
+    /* Het raakvlak (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i): per
+       bestand dat in een raakvlak van een bewijs hieronder zit, de sha256 van
+       zijn inhoud. Elk bewijs draagt zijn eigen samengestelde hash in
+       `raakvlak`; npm run appwerkt:vers legt beide naast de boom van nu. */
+    raakvlak: { uitleg: 'Een bewijs is vers zolang geen bestand in zijn raakvlak veranderde sinds de commit waarop het gemeten is. Is het raakvlak niet vast te stellen, dan beslist de grove regel van versheid().',
+      hoe: 'npm run appwerkt:vers  (--controle zakt als een rij die als 8/8 geldt een vervallen bewijs heeft)',
+      bestanden: Object.keys(hashes).length, hashes },
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
     /* DE MACHINE STAAT ERBIJ. Deze proef tikt met een tijdslimiet, en op een
        machine die drie keer meer werk heeft dan kernen loopt een gezonde tik

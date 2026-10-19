@@ -3,13 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "a59fe89ea",
+  "commit": "6182dd227",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/spelen.html"
+    "public/shared/clipdeler/clipdeler-01.js",
+    "public/shared/clipdeler/clipdeler-02.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7823,9 @@
  "gemeten": {
   "schermenMetPad": 458,
   "nietGelezen": 0,
-  "exactePaden": 1316,
-  "verwijzingen": 1566,
-  "voorvoegsels": 125,
+  "exactePaden": 1318,
+  "verwijzingen": 1569,
+  "voorvoegsels": 124,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -9078,6 +9079,14 @@
    "schermen": [
     "public/shared/basis/basis-02b.js",
     "public/shared/interface/modules/coordination.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/clips/signaal",
+   "schermen": [
+    "public/shared/clipdeler/clipdeler-01.js",
+    "public/shared/clipdeler/clipdeler-02.js"
    ],
    "aantal": 2
   },
@@ -16851,6 +16860,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/clips/aanwezig",
+   "schermen": [
+    "public/shared/clipdeler/clipdeler-02.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/fout/client",
    "schermen": [
     "public/shared/foutmelder.js"
@@ -21322,15 +21338,16 @@
   {
    "bestand": "public/shared/clipdeler/clipdeler-01.js",
    "exact": [
+    "/api/clips/signaal",
     "/api/ice"
    ],
-   "voorvoegsels": [
-    "/api/clips/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/clipdeler/clipdeler-02.js",
    "exact": [
+    "/api/clips/aanwezig",
+    "/api/clips/signaal",
     "/api/stream"
    ],
    "voorvoegsels": []

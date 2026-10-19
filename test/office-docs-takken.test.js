@@ -282,13 +282,13 @@ test('verwijderen: alleen de eigenaar, en een formulier neemt zijn inzendingen m
    het antwoord op het eerste kwam nooit bij het scherm aan. */
 test('dezelfde herhaalsleutel maakt geen tweede document, ook niet na een herstart', () => {
   const { d } = wereld();
-  const a = d.officeMaak('a', { soort: 'tekst', titel: 'Notulen', idem: 'poging-1' });
-  const b = d.officeMaak('a', { soort: 'tekst', titel: 'Notulen', idem: 'poging-1' });
+  const a = d.officeMaak('a', { soort: 'tekst', titel: 'Notulen' }, undefined, 'poging-1');
+  const b = d.officeMaak('a', { soort: 'tekst', titel: 'Notulen' }, undefined, 'poging-1');
   assert.equal(b.herhaald, true);
   assert.equal(b.id, a.id);
   assert.equal(d.officeMijn('a').docs.filter((x) => x.titel === 'Notulen').length, 1);
-  assert.notEqual(d.officeMaak('b', { soort: 'tekst', idem: 'poging-1' }).id, a.id, 'de sleutel van een ander is een eigen document');
-  const ander = d.officeMaak('a', { soort: 'blad', titel: 'Begroting', idem: 'poging-1' });
+  assert.notEqual(d.officeMaak('b', { soort: 'tekst' }, undefined, 'poging-1').id, a.id, 'de sleutel van een ander is een eigen document');
+  const ander = d.officeMaak('a', { soort: 'blad', titel: 'Begroting' }, undefined, 'poging-1');
   assert.equal(ander.status, 409, 'dezelfde sleutel bij een ander verzoek is een fout, geen stille herhaling');
 });
 

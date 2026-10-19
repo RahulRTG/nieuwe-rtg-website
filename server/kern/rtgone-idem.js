@@ -20,8 +20,11 @@ function vingerafdruk(body) {
   return JSON.stringify(Object.keys(b).sort().map(k => [k, b[k]]));
 }
 
-module.exports = ({ S, save, vind, nu }) => function eenmalig(soort, lijst, body, wie, maak) {
-  const sleutel = String((body && body.idem) || '').slice(0, 80);
+/* `idem` geeft de route mee (routes/rtgone.js leest hem uit het lijf): de
+   route beslist welke sleutel geldt, en staat daarom in
+   middleware/idempotentie-eigen.js. */
+module.exports = ({ S, save, vind, nu }) => function eenmalig(soort, lijst, body, wie, maak, idem) {
+  const sleutel = String(idem || '').slice(0, 80);
   if (!sleutel) return maak();
   const s = S();
   if (!s.idem || typeof s.idem !== 'object' || Array.isArray(s.idem)) s.idem = {};

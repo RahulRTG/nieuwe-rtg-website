@@ -60,9 +60,9 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
   }
 
   /* ---- een nieuw document (leeg of vanuit een sjabloon) ---- */
-  function maak(key, data, kring) {
+  function maak(key, data, kring, idemRuw) {
     const alle = lijsten();
-    const idem = schoon(data.idem, 80) || null, eerder = herhaling.gemaakt(alle, key, idem, herhaling.verzoekVan(data));
+    const idem = schoon(idemRuw, 80) || null, eerder = herhaling.gemaakt(alle, key, idem, herhaling.verzoekVan(data));
     if (eerder) return eerder;
     const sjab = SJABLONEN[data.sjabloon] || null;
     const soort = sjab ? sjab.soort : (SOORTEN.includes(data.soort) ? data.soort : 'tekst');

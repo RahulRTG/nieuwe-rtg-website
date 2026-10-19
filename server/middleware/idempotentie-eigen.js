@@ -39,7 +39,28 @@ const EIGEN = [
   '/api/supplier/horeca/teruggave',
   /* de kantooruitnodiging bindt haar sleutel aan de uitgifte (kern/kantoor/uitnodiging.js)
      en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
-  '/api/office/kantoor/uitnodiging'
+  '/api/office/kantoor/uitnodiging',
+  /* WorkOS (19 oktober 2026): deze routes lezen hun eigen sleutel, onthouden hem
+     BIJ het object (zodat hij een crash overleeft) en geven bij een ANDER
+     verzoek met dezelfde sleutel 409; een bewaard eerste antwoord zou die 409
+     overstemmen. RTG One en Decision Room (kern/rtgone-idem.js), een
+     onderneming (kern/onderneming/levensloop.js), een document in elke drive
+     (kern/office/herhaling.js), een regel op een horecarekening (een tik is een
+     regel) en het formulier van een RTG-site (kern/comm/bericht.js). */
+  '/api/rtgone/intentie',
+  '/api/rtgone/belofte',
+  '/api/rtgone/frictie',
+  '/api/rtgone/overdracht',
+  '/api/rtgone/goedkeuring',
+  '/api/rtgone/automatisering/voorbereid',
+  '/api/onderneming/nieuw',
+  '/api/kantoorpakket/maak',
+  '/api/office/kantoorpakket/maak',
+  '/api/supplier/kantoorpakket/maak',
+  '/api/rtf/kantoorpakket/maak',
+  '/api/werkplek/kantoorpakket/maak',
+  '/api/supplier/horeca/rekening/regel',
+  '/api/browser/bericht'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

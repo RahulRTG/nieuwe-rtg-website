@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19558 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19559 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2824 |
-| losse beweringen (`test(...)`) | 19558 |
+| toetsbestanden | 2825 |
+| losse beweringen (`test(...)`) | 19559 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 8 |
+| niets van beide | 9 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2486 bestanden, 18986 beweringen.
+2487 bestanden, 18987 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -857,6 +857,7 @@ toets omvalt.
 | `horeca-leen-dienst.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Horeca: EEN LEEN EN HET EINDE VAN DE DIENST. HORECA.md, "Wat de vloer nog niet kan": een leen kende geen einde van de dienst. |
 | `horeca-pas.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: DE PAS -- wie pakt een gereed staande gang op, en wie draagt hem. Het patroon bestond al voor gastverzoeken ("ik ga" en "gedaan" zijn twee knoppen), maar niet voor het eten bij de pas. |
 | `horeca-rahul.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: WAT RAHUL MAG, en de actiebon die er altijd bij hoort. De opdracht was letterlijk: een AI-voorstel kan nooit ONGEMERKT een allergie aanpassen, een betaling uitvoeren, een medewerker beoordelen, een... |
+| `horeca-regel-herhaal.test.js` | 1 | -- | EEN TIK IS EEN REGEL, EN EEN HERHAALDE TIK IS DEZELFDE REGEL. Op een horecarekening zijn twee identieke tikken twee bestellingen: twee biertjes zijn geen dubbeltik. |
 | `horeca-rekening.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 1: de rekening die blijft leven -- openen, regels, gangen, verplaatsen, samenvoegen, splitsen, fooi, betalen, bonnen en de offline-wachtrij. De zwaarste bewering staat in de eerste twee toetsen en... |
 | `horeca-samenvoegen.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Horeca: SAMENVOEGEN -- wat een toestel zonder lijn deed, en wat daarvan nog waar is. De kassa en de PDA sturen een PAKKET opnieuw: een bon, een opgenomen bestelling. |
 | `horeca-stappen.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: BEREIDINGSSTAPPEN -- een gerecht is zelden één handeling. De keten in HORECA.md loopt bestelling -> gang -> gerecht -> BEREIDINGSSTAPPEN -> station, en die ene schakel was er niet. |

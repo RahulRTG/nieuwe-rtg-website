@@ -102,6 +102,15 @@ module.exports = (kern) => {
        iets dat niet op de kaart staat, is echt werk en geen misbruik. Wat er
        niet mag, is een itemId MET een eigen prijs -- dan zou de kaartprijs
        ongemerkt overschreven kunnen worden. */
+    /* EEN TIK IS EEN REGEL: twee biertjes zijn twee tikken met elk een eigen
+       sleutel. Komt DEZELFDE tik terug (een afgebroken verbinding, een
+       herstart), dan is het dezelfde regel; een ander verzoek met die sleutel
+       is 409. De sleutel staat op de regel, dus hij overleeft een crash. */
+    const idem = schoon(req.body.idem, 80) || null;
+    const vinger = JSON.stringify([req.body.itemId || '', req.body.naam || '', req.body.prijs, req.body.centen, req.body.aantal || 1]);
+    const eerder = idem && r.regels.find(x => x.idem === idem);
+    if (eerder && eerder.idemVinger !== vinger) return res.status(409).json({ error: 'Deze tik hoort bij een andere regel; er is niets aangeslagen.' });
+    if (eerder) return res.json({ ok: true, herhaald: true, regel: eerder, rekening: publiek(r) });
     let invoer = req.body;
     if (req.body.itemId) {
       const item = kaartVanZaak(req.supplier.code).find(x => x.id === String(req.body.itemId));
@@ -112,6 +121,7 @@ module.exports = (kern) => {
     const uit = bouwRegel(req.supplier.code, invoer, req.actor.name);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     const regel = uit.regel;
+    if (idem) { regel.idem = idem; regel.idemVinger = vinger; }
     r.regels.push(regel);
     save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'horeca' });

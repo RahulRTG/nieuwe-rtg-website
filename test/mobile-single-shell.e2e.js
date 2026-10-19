@@ -15,8 +15,27 @@ async function open(route, width = 390) {
   await ctx.addInitScript(() => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
   const page = await ctx.newPage();
   await page.goto(srv.base + route, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('body[data-rtg-desktop-state="ready"][data-rtg-adaptive-ready="true"]');
+  /* Een wereld op het RTG Design System (TravelOS) draagt de oude
+     desktopschil niet; hij is gereed als zijn ene ds-Edge staat. */
+  await page.waitForSelector('body[data-rtg-desktop-state="ready"][data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk');
   return { page, ctx };
+}
+/* Hetzelfde bewijs voor een ds-wereld: de Cover is de ene kop (de scene), er
+   staat geen tweede hero onder, de eigen inhoud is zichtbaar, en die inhoud
+   blijft hetzelfde knooppunt na een wissel naar bureau en terug, met één Edge
+   en zonder overloop. */
+async function dsWereld(page, route) {
+  assert.equal(await page.locator('.ds-cover').isVisible(), true, route + ': the Cover leads on mobile');
+  assert.equal(await page.locator('h1:visible').count(), 1, route + ': no second hero under the Cover');
+  const original = await page.locator('#inhoud').evaluate(el => { window.__mobileOriginalNode = el; return el.getClientRects().length > 0; });
+  assert.equal(original, true, route + ': actual home content is visible');
+  await page.setViewportSize({ width: 1440, height: 1050 });
+  assert.equal(await page.locator('#inhoud').isVisible(), true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.evaluate(() => document.getElementById('inhoud') === window.__mobileOriginalNode), true);
+  assert.equal(await page.locator('.ds-edge:visible').count(), 1);
+  assert.equal(await page.locator('.rtg-adaptive-bar').count(), 0, route + ': no second, legacy Edge');
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route);
 }
 test('mobile login has one content surface, without a second title, tabs or desktop widgets', { skip }, async () => {
   const { page, ctx } = await open('/apps/app.html');
@@ -42,6 +61,7 @@ test('the four mobile worlds expose their original content and keep it when chan
   for (const route of ['/apps/rtg.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/os-publiek.html']) {
     const { page, ctx } = await open(route);
     try {
+      if (await page.locator('html[data-ds]').count()) { await dsWereld(page, route); continue; }
       /* De gedeelde cinematic scene is de mobiele kop (#534, besluit van de eigenaar van
          11 oktober 2026); de eigen inhoud van de wereld staat eronder en blijft zichtbaar. */
       await page.locator('.wd-home>.wp-scene').waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});

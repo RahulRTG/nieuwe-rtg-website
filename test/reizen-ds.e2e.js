@@ -167,7 +167,7 @@ test('Rahul en Samen: het gesprek en het gezelschap laden op de ds-vorm', { skip
   await ctx.close();
 });
 
-for (const [naam, w, h, taal] of [['820', 820, 1180, 'nl'], ['1440', 1440, 900, 'nl'], ['390-ar', 390, 844, 'ar']]) {
+for (const [naam, w, h, taal] of [['320', 320, 700, 'nl'], ['820', 820, 1180, 'nl'], ['1440', 1440, 900, 'nl'], ['390-ar', 390, 844, 'ar']]) {
   test('geen horizontale overloop op ' + naam, { skip }, async () => {
     const { ctx, page, fouten } = await open(w, h, taal);
     if (taal === 'ar') await page.waitForFunction(() => document.documentElement.dir === 'rtl');

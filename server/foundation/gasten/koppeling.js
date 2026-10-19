@@ -69,7 +69,7 @@ module.exports = (ctx) => {
     if (!g) return null;
     const p = Object.values(g.profielen).find(x => x.koppel && x.koppel.userId === userId);
     if (!p) return null;
-    const token = gezinstoken.geef(g, p, { geldigMs: gezinstoken.KANAAL_MS }); save();
+    const token = gezinstoken.geef(g, p, { geldigMs: gezinstoken.KANAAL_MS, door: userId }); save();
     return {
       code: g.code, gezinNaam: g.naam, profielId: p.id, token,
       leden: Object.values(g.profielen).filter(x => x.id !== p.id).map(x => ({ id: x.id, naam: x.naam, avatar: x.avatar, kleur: x.kleur, rol: x.rol }))

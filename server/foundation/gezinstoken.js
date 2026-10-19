@@ -52,10 +52,16 @@ function maak({ crypto, nu = () => klok.datum().toISOString() }) {
   const levend = t => t && !t.ingetrokken_at && Date.parse(t.expires_at) > Date.parse(nu());
 
   /* Een nieuwe sessie voor dit profiel; de kale waarde komt EEN keer terug. */
-  function geef(g, p, { geldigMs } = {}) {
+  /* `door`: het RTG-account dat de sessie opvroeg (userId), of niets voor het
+     toestel van een kind met gezinscode en pincode. accountplicht.js poort()
+     weigert een verzoek dat dit token met de ledensessie van een ANDER account
+     draagt (gedeeld toestel, gevonden door FoundationOS). */
+  function geef(g, p, { geldigMs, door } = {}) {
     if (!g || !p || !g.code || !p.id) throw new Error('gezinstoken vereist een gezin en een profiel');
+    const o = { gezin: String(g.code), profiel: String(p.id), rol: rolVan(p), epoch: epoch(p) };
+    if (Number.isSafeInteger(door)) o.door = door;
     const m = bearer.maak({ prefix: 'GZ', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE,
-      onderwerp: { gezin: String(g.code), profiel: String(p.id), rol: rolVan(p), epoch: epoch(p) },
+      onderwerp: o,
       geldigheid: { duurMs: Math.min(Number(geldigMs) || GELDIG_MS, GELDIG_MS) }, gebruik: 'sessie',
       afgeleid: 'perAanroep' });
     const rij = (Array.isArray(p.sessies) ? p.sessies : []).filter(levend);
@@ -102,7 +108,7 @@ function maak({ crypto, nu = () => klok.datum().toISOString() }) {
     const rest = Date.parse(h.t.expires_at) - Date.parse(nu());
     if (!(rest > 0)) return null;
     bearer.intrekken(h.t, 'houder', verleng ? 'verlengd' : 'geroteerd');
-    return geef(g, h.p, { geldigMs: verleng ? GELDIG_MS : rest });
+    return geef(g, h.p, { geldigMs: verleng ? GELDIG_MS : rest, door: h.t.onderwerp && h.t.onderwerp.door });
   }
   function intrek(g, raw) {
     const h = zoek(g, raw);

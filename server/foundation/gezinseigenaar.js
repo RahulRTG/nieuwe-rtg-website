@@ -69,7 +69,7 @@ module.exports = (gctx, ctx, plicht) => {
       eigenaar: { userId, codenaam: codenaam || null, at: nu() },
       registratie: { door: pid, bevoegdVerklaard: true, privacyAkkoord: true, via: 'account', at: nu() } };
     G()[g.code] = g;
-    const token = gezinstoken.geef(g, profiel); save();
+    const token = gezinstoken.geef(g, profiel, { door: userId }); save();
     try { gctx.welkomRtf(profiel.codenaam); } catch (e) {}
     return Object.assign(overzicht(g, userId), { code: g.code, token, profiel: pubProfiel(profiel, true) });
   }
@@ -86,7 +86,7 @@ module.exports = (gctx, ctx, plicht) => {
       return { status: 403, error: 'Een andere beheerder logt zelf in.' };
     if (isBeschermd(p) && volwassen !== true)
       return { status: 403, error: 'Kinderfuncties gaan open zodra RTG je paspoort heeft gecontroleerd.', hoe: 'paspoort' };
-    const token = gezinstoken.geef(g, p); save();
+    const token = gezinstoken.geef(g, p, { door: userId }); save();
     return { code: g.code, token, profiel: pubProfiel(p, true), gezin: pubGezin(g) };
   }
 

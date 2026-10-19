@@ -94,7 +94,8 @@ async function loop(w, stap) {
   const B = await nieuwLid(w, 'nvb');
   let T = A.token;
   const meldingenRond = async (p, tok) => ((((await w.post(POI, Object.assign({ lagen: ['flits'] }, p), tok || T)).data) || {}).lagen || {}).flits || [];
-  const opPlek = (lijst, p) => lijst.filter((m) => Math.abs(m.lat - p.lat) < 1e-6 && Math.abs(m.lng - p.lng) < 1e-6);
+  // het beeld geeft de plek op drie decimalen (kern/flits.js), dus binnen een halve eenheid daarvan
+  const opPlek = (lijst, p) => lijst.filter((m) => Math.abs(m.lat - p.lat) < 0.0006 && Math.abs(m.lng - p.lng) < 0.0006);
   let zaak = null, route = null;
 
   /* ---------------- voltooibaar ---------------- */
@@ -135,17 +136,21 @@ async function loop(w, stap) {
       ziet: 'kaart ' + k.status + ' met ' + (k.data.plekken || []).length + ' plekken; catalogus: ' + (g.data && g.data.reden) };
   });
 
-  await stap('voltooibaar', 'het lid meldt een object op de weg; de melding staat op de kaart onder zijn codenaam', async () => {
+  /* Sinds 19 oktober 2026 gaat de melder niet mee in het beeld (kern/flits.js):
+     een codenaam met een plek en een tijd is een spoor. In de opslag staat hij
+     wel, op codenaam, voor stemmen en vergeten. */
+  await stap('voltooibaar', 'het lid meldt een object op de weg; de melding staat op de kaart, zonder de melder, en in de opslag op codenaam', async () => {
     const m = await w.post(MELD, plek(0), T);
     const rond = opPlek(await meldingenRond(plek(0)), plek(0));
-    return { klopt: m.status === 200 && m.data.melding.soort === 'object' && rond.length === 1 && !!m.data.melding.door,
-      ziet: 'melden ' + m.status + ' door ' + (m.data && m.data.melding && m.data.melding.door) + ', ' + rond.length + ' melding op die plek' };
+    const rij = (w.collectie('flitsMeldingen') || []).find((x) => m.data && m.data.melding && x.id === m.data.melding.id);
+    return { klopt: m.status === 200 && m.data.melding.soort === 'object' && rond.length === 1 && !('door' in rond[0]) && !!rij && !!rij.door,
+      ziet: 'melden ' + m.status + ', ' + rond.length + ' melding op die plek, melder in het beeld: ' + (rond[0] && 'door' in rond[0] ? 'JA' : 'nee') + ', in de opslag: ' + (rij && rij.door ? 'op codenaam' : 'NIET') };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet de melding, met alleen de codenaam -- geen naam en geen e-mailadres van de melder', async () => {
+  await stap('voltooibaar', 'een ander lid ziet de melding zonder melder -- geen codenaam, geen naam en geen e-mailadres', async () => {
     const zichtB = opPlek(await meldingenRond(plek(0), B.token), plek(0));
     const tekst = JSON.stringify(zichtB) + JSON.stringify(w.collectie('flitsMeldingen') || []);
-    return { klopt: zichtB.length === 1 && !tekst.includes('Voltooilid') && !tekst.includes(A.email) && !tekst.includes(A.token),
+    return { klopt: zichtB.length === 1 && !('door' in zichtB[0]) && !tekst.includes('Voltooilid') && !tekst.includes(A.email) && !tekst.includes(A.token),
       ziet: 'B ziet ' + zichtB.length + ' melding' + (tekst.includes('Voltooilid') || tekst.includes(A.email) ? ', MET NAAM OF ADRES' : ', zonder naam of adres, ook niet in de opslag') };
   });
 

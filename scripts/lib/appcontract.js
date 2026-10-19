@@ -248,6 +248,9 @@ const CONTRACT = {
   'link:muziek': Object.assign({
     belofte: 'een lid deelt zijn eigen muziek, een ander lid vindt, hoort en waardeert haar, alleen de maker haalt haar weg, en samen luisteren brengt de luisteraar in de kamer van de gastheer'
   }, voltooi('muziek', 'het scenario loopt /api/muziek/bestand, /feed, /bestand-ticket, /luister, /mooi en /bestand-weg, en /api/samen/maak, /mee, /muziek en /staat, de routes die /apps/muziek.html (muziek-feed.js, muziek-bestanden.js) zelf aanroept, met twee leden en een gratis account')),
+  'link:nieuws': Object.assign({
+    belofte: 'een lid leest het gepubliceerde werk van RTG Redactie per rubriek, opent een artikel en laat Rahul het samenvatten of een vraag beantwoorden uit alleen de artikeltekst; een concept of teruggetrokken stuk ziet het niet'
+  }, voltooi('nieuws', 'het scenario loopt /api/member/nieuws, /artikel en /ai, de routes die /apps/nieuws.html zelf aanroept, met twee leden en de redactie (eigenaarsaccount) die publiceert en terugtrekt')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

@@ -13,7 +13,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const T0 = Date.parse('2026-09-27T12:00:00.000Z');
 const PRODUCTEN = { enkel: { ritten: 1 }, retour: { ritten: 2 } };
@@ -119,7 +119,10 @@ test('7. echte server: Mijn kaartjes toont geen code, tonen roteert, de controle
   try {
     const reg = n => api('/api/auth/register', { name: 'Ovk ' + n, email: 'ovk' + n + '@x.nl', phone: '061237' + n,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-    const lid = (await reg('7701')).body.token, ander = (await reg('7702')).body.token;
+    const lidReg = (await reg('7701')).body, ander = (await reg('7702')).body.token;
+    const lid = lidReg.token;
+    /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+    await keurLidGoed(base, lid, lidReg.state.user.codename);
     const kantoor = (await api('/api/office/login', { code: 'KANTOOR-OVK-1' })).body.token;
     for (const m of ['partner_contracts', 'public_transport_ticketing'])
       await api('/api/office/mob/module/zet', { id: m, aan: true }, kantoor);

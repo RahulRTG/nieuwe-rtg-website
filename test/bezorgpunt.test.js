@@ -23,7 +23,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let BASE, child, KIKU, MAISON;
@@ -51,6 +51,8 @@ async function maakLid(naam, metAdres) {
     phone: '06' + u.slice(-8), password: 'geheim123',
     geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, 'lid aangemaakt: ' + JSON.stringify(reg.body).slice(0, 160));
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(BASE, reg.body.token, reg.body.state.user.codename);
   if (metAdres) {
     const start = await post('/api/gegevens/start', { soort: 'bezorging' }, reg.body.token);
     if (start.body && start.body.id)

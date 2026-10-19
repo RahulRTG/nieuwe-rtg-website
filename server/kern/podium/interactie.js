@@ -95,6 +95,18 @@ module.exports = (ctx) => {
     return { status: 200, ok: true };
   }
 
-  return { podiumChatStuur: chat, podiumCadeau: cadeau, podiumAbonneer: abonneer, podiumBlokkeer: blokkeer,
+  /* Bestaat deze geldvorm hier wel? Voor de route, die de paspoortpoort pas
+     daarna vraagt: wie in de open wereld een abonnement probeert, hoort dat het
+     er niet is, en niet dat hij eerst zijn paspoort moet tonen voor iets dat
+     niet bestaat. Zelfde volgorde als hierboven: kanaal, toegang, zone. */
+  function voorGeld(key, kid, vorm) {
+    const k = kanaalMet(kid); if (!k || k.status !== 'goedgekeurd') return null;
+    const m = poort.magKanaal(key, k); if (!m.ok) return null;
+    return poort.geldMag(k, vorm) ? null : { status: 409, error: ZONEZIN[vorm] };
+  }
+  const ZONEZIN = { cadeau: 'In deze zone gaan geen cadeaus.', abonnement: 'In deze zone bestaat geen abonnement.',
+    kaartje: 'In deze zone worden geen kaartjes verkocht.', verkoop: 'In deze zone wordt niets verkocht.' };
+
+  return { podiumVoorGeld: voorGeld, podiumChatStuur: chat, podiumCadeau: cadeau, podiumAbonneer: abonneer, podiumBlokkeer: blokkeer,
     podiumMeld: meld, podiumKaartje: toegang.kaartje, podiumNodig: toegang.nodig };
 };

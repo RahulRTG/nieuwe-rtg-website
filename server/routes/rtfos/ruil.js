@@ -24,7 +24,11 @@
 
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
+module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig, onboarding }) => {
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = onboarding && onboarding.payGate ? onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
   const ik = req => liveCodename(req.session);
   const lijf = req => req.body || {};
 
@@ -95,6 +99,7 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     veilig(res, () => rtfos.winkel.etalage());
   });
   app.post('/api/rtfos/winkel/koop', auth, schrijfRem, (req, res) => {
+    if (kyc(req, res)) return;
     if (geenGast(req, res)) return;
     /* GEEN GEGEVENSPOORT, EN DAT IS EEN BESLUIT MET EEN HOUDBAARHEIDSDATUM.
        Hij stond er even wel, met soort 'bestelling' -- maar die vraagt een
@@ -139,6 +144,7 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
   /* De bevestiging: hier beweegt er geld. De codenaam komt uit de SESSIE en
      niet uit het lijf -- anders geeft de een namens de ander. */
   app.post('/api/rtfos/gift/bevestig', auth, schrijfRem, (req, res) => {
+    if (kyc(req, res)) return;
     if (geenGast(req, res)) return;
     veilig(res, () => rtfos.gift.bevestig(Object.assign({}, lijf(req), { codenaam: ik(req) })));
   });

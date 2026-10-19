@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, keurLidGoed } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoorpasskey-'));
@@ -58,8 +58,11 @@ async function medewerker(merk) {
 
 async function lidMetRekening(naam) {
   const u = (Date.now() + Math.random()).toString(36).replace('.', '');
-  const t = (await api('/api/auth/register', { name: naam, email: 'kr' + u + '@voorbeeld.test',
-    phone: telefoon(), password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = (await api('/api/auth/register', { name: naam, email: 'kr' + u + '@voorbeeld.test',
+    phone: telefoon(), password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  const t = reg.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, t, reg.state.user.codename);
   const akk = await api('/api/bank/akkoord', {}, t);
   assert.equal(akk.status, 200, 'rekening voor ' + naam + ': ' + JSON.stringify(akk.body).slice(0, 140));
   return { token: t, iban: akk.body.rekening.iban };

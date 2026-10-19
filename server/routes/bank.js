@@ -10,6 +10,11 @@ module.exports = (kern) => {
   const gast = (req, res) => { if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Bank is voor leden.' }); return true; } return false; };
   const dicht = (req, res) => { if (!kern.bankLedenAan()) { res.status(403).json({ error: 'De RTG Bank is nog niet live voor leden.' }); return true; } return false; };
   const gate = (req, res) => gast(req, res) || dicht(req, res); // niet-gast EN de bank moet live zijn
+  /* Geld verplaatsen vraagt bovendien eenmalig het paspoort, voor elk account
+     (besluit 19 oktober 2026; kern/onboarding payGate). Kijken blijft vrij. */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
+  const geld = (req, res) => gate(req, res) || kyc(req, res);
   const cn = req => liveCodename(req.session);
 
   // het scherm: online? akkoord? mijn rekeningen. Werkt altijd (online:false als dicht)
@@ -17,7 +22,7 @@ module.exports = (kern) => {
   // akkoord geven: opent meteen de eerste betaalrekening (de module bewaakt online)
   app.post('/api/bank/akkoord', auth, async (req, res) => { if (gast(req, res)) return; stuur(res, await bank.bankLedenAkkoord(cn(req), req.session.tier)); });
 
-  app.post('/api/bank/rekening/open', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.rekeningOpen({ codenaam: cn(req), soort: req.body.soort, naam: req.body.naam, wie: 'lid', idem: req.body.idem || req.body.idempotentieSleutel })); });
+  app.post('/api/bank/rekening/open', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.rekeningOpen({ codenaam: cn(req), soort: req.body.soort, naam: req.body.naam, wie: 'lid', idem: req.body.idem || req.body.idempotentieSleutel })); });
   app.post('/api/bank/rekening', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.rekeningDetail(String(req.body.iban || ''), cn(req))); });
   app.post('/api/bank/afschrift', auth, (req, res) => {
     if (gate(req, res)) return;
@@ -27,11 +32,11 @@ module.exports = (kern) => {
   });
   app.post('/api/bank/bevries', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.rekeningBevries(String(req.body.iban || ''), req.body.aan === true, cn(req))); });
 
-  app.post('/api/bank/storten', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankStorten({ iban: String(req.body.iban || ''), centen: req.body.centen, route: req.body.route, codenaam: cn(req), idem: req.body.idem, oms: req.body.oms })); });
-  app.post('/api/bank/overboek', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankOverboek({ vanIban: String(req.body.vanIban || ''), naarIban: String(req.body.naarIban || ''), centen: req.body.centen, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
-  app.post('/api/bank/naar-wallet', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankBankNaarWallet({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, idem: req.body.idem })); });
-  app.post('/api/bank/van-wallet', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankWalletNaarBank({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, idem: req.body.idem })); });
-  app.post('/api/bank/sepa', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankSepaUit({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, naarIban: req.body.naarIban, begunstigde: req.body.begunstigde, oms: req.body.oms, idem: req.body.idem })); });
+  app.post('/api/bank/storten', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankStorten({ iban: String(req.body.iban || ''), centen: req.body.centen, route: req.body.route, codenaam: cn(req), idem: req.body.idem, oms: req.body.oms })); });
+  app.post('/api/bank/overboek', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankOverboek({ vanIban: String(req.body.vanIban || ''), naarIban: String(req.body.naarIban || ''), centen: req.body.centen, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
+  app.post('/api/bank/naar-wallet', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankBankNaarWallet({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, idem: req.body.idem })); });
+  app.post('/api/bank/van-wallet', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankWalletNaarBank({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, idem: req.body.idem })); });
+  app.post('/api/bank/sepa', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankSepaUit({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, naarIban: req.body.naarIban, begunstigde: req.body.begunstigde, oms: req.body.oms, idem: req.body.idem })); });
   app.post('/api/bank/spaardoel', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankSpaardoelZet({ iban: String(req.body.iban || ''), euro: req.body.euro, codenaam: cn(req) })); });
   app.post('/api/bank/rente-voorbeeld', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankRenteVoorbeeld(req.body.euro)); });
 
@@ -40,22 +45,22 @@ module.exports = (kern) => {
   app.post('/api/bank/pas/uitgeven', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankPasUitgeven({ iban: String(req.body.iban || ''), soort: req.body.soort, naam: req.body.naam, codenaam: cn(req), idem: req.body.idem })); });
   app.post('/api/bank/pas/bevries', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankPasBevries(String(req.body.id || ''), req.body.aan === true, cn(req))); });
   app.post('/api/bank/pas/limiet', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankPasLimiet(String(req.body.id || ''), req.body.euro, cn(req))); });
-  app.post('/api/bank/pas/betaal', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankPasBetaal({ id: String(req.body.id || ''), centen: req.body.centen, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
+  app.post('/api/bank/pas/betaal', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankPasBetaal({ id: String(req.body.id || ''), centen: req.body.centen, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
   app.post('/api/bank/pas/sluit', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankPasSluit(String(req.body.id || ''), cn(req))); });
 
   // krediet
   app.post('/api/bank/krediet', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankKredieten(cn(req))); });
   app.post('/api/bank/krediet/aanvraag', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankKredietAanvraag({ iban: String(req.body.iban || ''), euro: req.body.euro, looptijdMnd: req.body.looptijdMnd, codenaam: cn(req) })); });
-  app.post('/api/bank/krediet/aflossing', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankKredietAflossing({ id: String(req.body.id || ''), centen: req.body.centen, codenaam: cn(req) })); });
+  app.post('/api/bank/krediet/aflossing', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankKredietAflossing({ id: String(req.body.id || ''), centen: req.body.centen, codenaam: cn(req) })); });
 
   // terugkerende betalingen
   app.post('/api/bank/terugkerend', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankTerugkerend(cn(req))); });
-  app.post('/api/bank/terugkerend/zet', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankTerugkerendZet({ vanIban: String(req.body.vanIban || ''), naarIban: String(req.body.naarIban || ''), centen: req.body.centen, interval: req.body.interval, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
+  app.post('/api/bank/terugkerend/zet', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankTerugkerendZet({ vanIban: String(req.body.vanIban || ''), naarIban: String(req.body.naarIban || ''), centen: req.body.centen, interval: req.body.interval, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
   app.post('/api/bank/terugkerend/stop', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankTerugkerendStop({ id: String(req.body.id || ''), codenaam: cn(req) })); });
 
   // zakelijk bankieren
-  app.post('/api/bank/bulk', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankBulkBetaal({ vanIban: String(req.body.vanIban || ''), posten: req.body.posten, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
-  app.post('/api/bank/salaris', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: req.body.posten, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
+  app.post('/api/bank/bulk', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankBulkBetaal({ vanIban: String(req.body.vanIban || ''), posten: req.body.posten, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
+  app.post('/api/bank/salaris', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: req.body.posten, oms: req.body.oms, codenaam: cn(req), idem: req.body.idem })); });
 
   // de AI-bankier (Rahul): advies over de eigen rekeningen; adviseert, beslist niet
   app.post('/api/bank/advies', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankAdvies({ codenaam: cn(req), vraag: req.body.vraag })); });

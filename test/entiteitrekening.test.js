@@ -14,7 +14,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed } = require('./helper');
 
 let srv, BAAS, W, B, E, OWN, FIN, ANDER;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-entiteitrekening-'));
@@ -99,6 +99,8 @@ test('3-4. betalen langs een uitgave die rond is, een keer, door een ander dan d
   // geld op de rekening van de entiteit: vanaf de eigen rekening van de eigenaar
   assert.equal((await api('/api/office/bank/leden', { aan: true, naam: 'boardroom' }, BAAS)).body.ledenAan, true, 'de leden-bank live');
   await api('/api/bank/akkoord', {}, OWN.rtg.token);
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(srv.base, OWN.rtg.token, OWN.rtg.codenaam);
   const po = await api('/api/bank/rekening/open', { soort: 'betaal' }, OWN.rtg.token);
   assert.equal(po.status, 200, 'een eigen rekening voor de eigenaar: ' + JSON.stringify(po.body));
   const prive = po.body.rekening;

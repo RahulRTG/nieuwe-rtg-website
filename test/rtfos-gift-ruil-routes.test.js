@@ -49,7 +49,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed } = require('./helper');
 
 /* De twee getallen die deze toets nodig heeft komen UIT de bron en staan hier
    niet nog een keer overgetypt (LAT.md regel 4): een tweede kopie van de
@@ -143,6 +143,8 @@ test.before(async () => {
 
   [A, B, C, G, P, H, K] = await Promise.all([lid('Aafke Buur'), lid('Bram Buur'),
     lid('Cato Buur'), lid('Gijs Gever'), lid('Pia Plan'), lid('Hidde Gever'), lid('Koos Koper')]);
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, K.token, K.codenaam);
 });
 test.after(() => stop(srv));
 

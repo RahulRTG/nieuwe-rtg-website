@@ -114,7 +114,9 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'een ANDER lid ziet deze rekeningen niet, leest het afschrift niet en kan er niet van afboeken', async () => {
-    const ander = await nieuwLid(w, 'bankander');
+    /* gekeurd, zoals elk lid dat geld verplaatst (payGate, besluit 19 oktober
+       2026): anders houdt de paspoortpoort hem tegen en meet dit de eigendom niet */
+    const ander = await geverifieerdLid(w, 'bankander');
     const t2 = await gebondenToestel(w, ander.token);
     await post(AKKOORD, {}, ander.token, t2);
     const zijn = await ov(ander.token, t2);

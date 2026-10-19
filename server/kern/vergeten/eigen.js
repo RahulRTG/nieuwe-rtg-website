@@ -74,6 +74,11 @@ module.exports = ({ db, lidBoardLogWis }) => {
        sleutel maar een laag dieper (db.data.vonk.profielen), dus de lijst
        hierboven raakte hem niet en bleef de plek van een vergeten lid staan. */
     if (db.data.vonk && db.data.vonk.profielen) delete db.data.vonk.profielen[key];
+    /* HET ONBOARDINGPROFIEL (intakevelden, ondertekening, de paspoortscan en de
+       vlag dat RTG Pay gebruikt is), ook een laag dieper. Hij bleef staan na
+       wissing; dat viel op toen de paspoortpoort hem bij elk geldmoment ging
+       aanmaken (payGate, besluit 19 oktober 2026). */
+    if (db.data.onboarding && db.data.onboarding.profielen) delete db.data.onboarding.profielen[key];
     /* DE IDEMPOTENTIESLEUTELS VAN BETALEN. betaalIdem is geen tak op de sleutel
        van het lid maar een ring van antwoorden op een idem-sleutel, en in zo'n
        bewaard antwoord staat de codenaam. Een `delete tak[key]` raakt hem dus

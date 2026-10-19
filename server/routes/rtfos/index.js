@@ -107,7 +107,7 @@ module.exports = (kern) => {
   /* De buurtruil hangt aan de LEDENdeur en niet aan de kantoordeur; hij krijgt
      daarom andere onderdelen mee dan de rest van dit domein. */
   require('./ruil')({ app, auth: kern.auth, geenGast: kern.geenGast,
-    liveCodename: kern.liveCodename, rtfos, veilig });
+    liveCodename: kern.liveCodename, rtfos, veilig, onboarding: kern.onboarding });
   /* De schakelaar zelf: alleen de boardroom. Hij staat hier en niet bij de
      ledendeur hierboven, want dat is de hele grens (GIFT.md par. 4). */
   /* En de LEESkant voor het kantoor. De ledendeur heeft er al een

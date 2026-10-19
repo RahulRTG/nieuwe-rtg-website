@@ -6,6 +6,10 @@ const { wie: envelopWie } = require('../../opzet/envelop');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, pushLive,
     liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, bevestigAankomst } = kern;
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
   const liveSave = () => typeof save.sleutels === 'function' ? save.sleutels(['live']) : save();
 
   app.post('/api/live/start', auth, (req, res) => {
@@ -129,6 +133,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/ride/pay', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     const r = await betaalRitVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);

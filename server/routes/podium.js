@@ -6,7 +6,18 @@ module.exports = (kern) => {
   const { app, auth, officeAuth, podiumKanalen, podiumKanaalMaak, podiumKanaalZet, podiumMijn,
     podiumLiveZet, podiumKijk, podiumWeg, podiumSignaal, podiumChatStuur, podiumCadeau,
     podiumAbonneer, podiumBlokkeer, podiumMeld, podiumOfficeLijst, podiumOfficeBeslis,
-    podiumKaartje, podiumNodig, podiumWaarZet, podiumKoop } = kern;
+    podiumKaartje, podiumNodig, podiumWaarZet, podiumKoop, podiumVoorGeld } = kern;
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
+  /* Eerst of de geldvorm in deze zone bestaat, dan pas het paspoort: in de open
+     wereld hoort "hier bestaat geen abonnement", niet "toon eerst uw paspoort". */
+  const geld = (req, res, vorm) => {
+    const z = podiumVoorGeld ? podiumVoorGeld(req.session.key, String((req.body || {}).id || ''), vorm) : null;
+    if (z) { res.status(z.status).json({ error: z.error }); return true; }
+    return kyc(req, res);
+  };
   /* Bij een weigering gaat er meer mee dan de tekst: `mag` (mag ik in deze
      wereld), `kaartje` (het ligt aan een kaartje en niet aan de deur) en de
      zonelijst. Zonder die velden moet het scherm de reden uit de zin raden, en
@@ -64,18 +75,18 @@ module.exports = (kern) => {
     stuur(res, podiumChatStuur(req.session.key, String(req.body.id || ''), req.body.tekst, req.body.idem));
   });
   app.post('/api/podium/cadeau', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenGast(req, res) || geld(req, res, 'cadeau')) return;
     stuur(res, await podiumCadeau(req.session.key, String(req.body.id || ''), String(req.body.cadeau || ''), req.body.idem));
   });
   app.post('/api/podium/abonneer', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenGast(req, res) || geld(req, res, 'abonnement')) return;
     stuur(res, await podiumAbonneer(req.session.key, String(req.body.id || ''), req.body.idem));
   });
   /* Een kaartje voor een evenement: eenmalig, via RTG Pay, en het loopt vanzelf
      af. Geen abonnement dat doorloopt -- dat is een andere knop in een andere
      zone, en dat verschil hoort te blijven bestaan. */
   app.post('/api/podium/kaartje', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenGast(req, res) || geld(req, res, 'kaartje')) return;
     stuur(res, await podiumKaartje(req.session.key, String(req.body.id || ''), req.body.idem));
   });
   /* De kraam van de verkoopwereld: de maker legt productkaarten klaar, een
@@ -86,7 +97,7 @@ module.exports = (kern) => {
     stuur(res, podiumWaarZet(req.session.key, req.body || {}));
   });
   app.post('/api/podium/koop', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenGast(req, res) || geld(req, res, 'verkoop')) return;
     stuur(res, await podiumKoop(req.session.key, String(req.body.id || ''), String(req.body.waarId || ''), req.body.idem));
   });
   // uitnodigen voor een besloten kanaal (alleen de maker, op codenaam)

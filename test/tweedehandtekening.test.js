@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, keurLidGoed } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweehand-'));
@@ -96,9 +96,12 @@ test.before(async () => {
   sleutelB = await pk.zet(lidB, 'Geheim123!');
 
   const u = Date.now().toString(36);
-  lid = (await api('/api/auth/register', { name: 'Rekeninghouder', email: 'rh' + u + '@voorbeeld.test',
+  const regLid = await api('/api/auth/register', { name: 'Rekeninghouder', email: 'rh' + u + '@voorbeeld.test',
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
-    geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  lid = regLid.body.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, regLid.body.state.user.codename);
   const akk = await api('/api/bank/akkoord', {}, lid);
   assert.equal(akk.status, 200, 'het lid opent een rekening: ' + JSON.stringify(akk.body).slice(0, 140));
   iban = akk.body.rekening.iban;

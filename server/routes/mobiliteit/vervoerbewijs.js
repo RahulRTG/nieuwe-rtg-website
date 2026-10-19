@@ -26,6 +26,10 @@ module.exports = (kern, hulp) => {
     reisPlan, reisBoek, reisMijn, reisAnnuleer,
     dienstStart, dienstSoort, dienstEind, cdtBeeld, regimeZet,
     cdtExport, cdtExportLijst, cdtOverdracht, dienstverlenerZet, koppelingStand } = kern;
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
   const { stuur } = hulp;
 
   const geenGast = (req, res) => {
@@ -46,6 +50,7 @@ module.exports = (kern, hulp) => {
      vervoerbewijs is een afspraak met een DERDE partij (de vervoerder), en bij
      een controle of een terugbetaling moet die u kunnen bereiken. */
   app.post('/api/mob/kaart/koop', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     if (geenGast(req, res)) return;
     if (gegevensStop(req, res, 'reservering')) return;
     /* De herhaalsleutel hoort bij het kaartje en de kern beslist over een
@@ -74,6 +79,7 @@ module.exports = (kern, hulp) => {
     stuur(res, aboAanbod(req.session, req.body || {}));
   });
   app.post('/api/mob/abo/koop', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     if (geenGast(req, res)) return;
     if (gegevensStop(req, res, 'reservering')) return;
     const b = req.body || {};   // de herhaalsleutel: zie kaart/koop hierboven

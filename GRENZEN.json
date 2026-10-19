@@ -124,12 +124,14 @@
     ],
     "bank": [
       "bank",
-      "bankLedenAan"
+      "bankLedenAan",
+      "onboarding"
     ],
     "bankhart": [
       "bank",
       "bankLedenAan",
       "herkomst",
+      "onboarding",
       "regelwacht",
       "zzpwacht"
     ],
@@ -1444,6 +1446,7 @@
       "modBord",
       "modStoring",
       "modZet",
+      "onboarding",
       "ontvangstBevestig",
       "ontvangstProbleem",
       "opdrachtBeeld",
@@ -1638,6 +1641,7 @@
       "vervolg"
     ],
     "ov": [
+      "onboarding",
       "ovCheckUit",
       "ovCodeIn",
       "ovCodeIntrek",
@@ -1739,6 +1743,7 @@
       "weddings"
     ],
     "podium": [
+      "onboarding",
       "podiumAbonneer",
       "podiumBlokkeer",
       "podiumCadeau",
@@ -1757,6 +1762,7 @@
       "podiumOfficeBeslis",
       "podiumOfficeLijst",
       "podiumSignaal",
+      "podiumVoorGeld",
       "podiumWaarZet",
       "podiumWeg"
     ],
@@ -1807,6 +1813,7 @@
     "rtfos": [
       "boardroomAuth",
       "genootschapDrager",
+      "onboarding",
       "resolveSession",
       "rtf",
       "rtfos"
@@ -2535,6 +2542,7 @@
     ],
     "supplier-deel2": [],
     "synergie": [
+      "onboarding",
       "synergie"
     ],
     "techniek": [

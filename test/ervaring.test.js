@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -26,6 +26,8 @@ async function nieuwLid(naam) {
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   assert.ok(reg.body.token, 'registratie ' + naam);
   const st = await api(base, '/api/state', {}, reg.body.token);
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, reg.body.token, st.body.state.user.codename);
   return { token: reg.body.token, codename: st.body.state.user.codename };
 }
 

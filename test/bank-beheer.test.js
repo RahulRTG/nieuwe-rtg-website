@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base, lid, ander, gast, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankbeheer-'));
@@ -48,6 +48,9 @@ async function nieuwLid(naam) {
       password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
   }).then(x => x.json());
   assert.ok(r.token, 'lid ' + naam + ' geregistreerd');
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit
+     19 oktober 2026; test/bank-paspoortpoort.test.js) */
+  await keurLidGoed(base, r.token, r.state.user.codename);
   return { token: r.token };
 }
 const inloggen = (tier) => fetch(base + '/api/login', {

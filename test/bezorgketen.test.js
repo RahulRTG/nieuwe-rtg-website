@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bzk-'));
@@ -26,6 +26,8 @@ test.before(async () => {
   const reg = await json(await api('/api/auth/register', { name: 'Keten Lid', email: 'keten@x.nl', phone: '0612345688',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
   lidToken = reg.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(BASE, reg.token, reg.state.user.codename);
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   const man = roster.staff.find(x => x.role === 'manager');
   const staff = roster.staff.find(x => x.role !== 'manager');

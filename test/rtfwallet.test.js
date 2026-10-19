@@ -21,7 +21,7 @@
    Draai los: node --test test/rtfwallet.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
 
 let srv, base, board;
 /* De code en de PIN uit het aanmaken: de PIN is daarna niet meer op te vragen
@@ -135,6 +135,8 @@ test('de stichting krijgt een gift binnen en betaalt zichzelf uit', async () => 
     email: 'rtfw-' + t + '@toets.example', password: 'geheim123',
     geboortedatum: '1980-01-01', tier: 'rtg' });
   assert.ok(reg.body.token, JSON.stringify(reg.body).slice(0, 200));
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, reg.body.token, reg.body.state.user.codename);
 
   const gift = await api('/api/rtfos/gift/bevestig', { euro: 40, vorm: 'eenmalig', idem: 'k1' }, reg.body.token);
   assert.equal(gift.status, 200, JSON.stringify(gift.body).slice(0, 300));

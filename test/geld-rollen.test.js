@@ -38,7 +38,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base, office, A = {}, B = {};
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldrollen-'));
@@ -58,6 +58,9 @@ async function maakLid(merk) {
     tier: 'business', pasApp: 'business'
   });
   assert.ok(r.body.token, merk + ' moet een sessie krijgen: ' + JSON.stringify(r.body).slice(0, 120));
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026);
+     anders meet toets 2 de paspoortpoort in plaats van het eigendomsrecht */
+  await keurLidGoed(base, r.body.token, r.body.state.user.codename);
   return { token: r.body.token };
 }
 

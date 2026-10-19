@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 const { zzpBerekening } = require('../server/kern/fiscaal/zzp');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-adm-'));
@@ -61,6 +61,8 @@ test('de boekhouding: de btw-uitsplitsing klopt tot op de cent', async () => {
       geboortedatum: '1985-03-03', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
     });
     assert.ok(reg.body.token, 'de klant is aangemeld: ' + JSON.stringify(reg.body).slice(0, 160));
+    /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+    await keurLidGoed(base, reg.body.token, reg.body.state.user.codename);
     const kaart = (state.supplier && state.supplier.menu) || state.menu || [];
     assert.ok(kaart.length, 'de menukaart is gevonden: ' + JSON.stringify(Object.keys(state)).slice(0, 160));
     const eten = kaart.filter(m => m.station !== 'bar').slice(0, 2);

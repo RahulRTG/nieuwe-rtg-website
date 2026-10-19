@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -25,8 +25,11 @@ test.before(async () => {
   base = srv.base;
   winkel = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
   const u = Date.now().toString().slice(-8);
-  lid = (await api(base, '/api/auth/register', { name: 'Betaal Lid', email: 'p' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+  const reg = (await api(base, '/api/auth/register', { name: 'Betaal Lid', email: 'p' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body;
+  lid = reg.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.state.user.codename);
 });
 test.after(() => stop(srv && srv.child));
 
@@ -125,8 +128,11 @@ test('6. de betaalgeschiedenis van het lid toont de betalingen', async () => {
 test('7. tempolimiet: hooguit 12 betaalpogingen per minuut, maar een idempotente retry blijft altijd werken', async () => {
   // een vers lid, zodat de teller op nul begint
   const u = (Date.now() + 7).toString().slice(-8);
-  const vers = (await api(base, '/api/auth/register', { name: 'Tempo Lid', email: 't' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+  const versReg = (await api(base, '/api/auth/register', { name: 'Tempo Lid', email: 't' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body;
+  const vers = versReg.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, vers, versReg.state.user.codename);
   // eerste betaling met een vaste idem-sleutel (telt als poging 1)
   const eerste = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 5, idem: 'vast' }, vers);
   assert.equal(eerste.status, 200);

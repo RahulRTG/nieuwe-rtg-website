@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
 
 let srv, base, office;
 let volwassen, tweede, jong, kaal;          // vier soorten leden
@@ -228,6 +228,9 @@ test('7. events: zonder kaartje kom je er niet in, met kaartje wel', async () =>
   assert.equal(aan.status, 200);
   eventId = aan.body.kanaal.id;
   await api('/api/office/podium/beslis', { id: eventId, besluit: 'goedgekeurd' }, office);
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026);
+     de toetsen die op een kaal lid leunen (1 en 3) zijn hiervoor al gelopen */
+  await keurLidGoed(base, kaal.token, kaal.codenaam);
 
   const zonder = await api('/api/podium/kijk', { id: eventId }, kaal.token);
   assert.equal(zonder.status, 403);

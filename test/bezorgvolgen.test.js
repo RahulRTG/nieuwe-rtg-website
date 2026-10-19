@@ -32,7 +32,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 const bezorgvolg = require('../server/kern/bezorgvolg');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-volg-'));
@@ -63,13 +63,15 @@ async function zaakKlaar(P) {
   return { token, zaak: ((lg.body.state || {}).supplier || {}).loc, productId: prod.body.producten[0].id };
 }
 
-async function nieuwLid(P, naam) {
+async function nieuwLid(P, naam, base) {
   const u = String(Date.now()).slice(-7) + Math.floor(Math.random() * 900 + 100);
   const r = await P('/api/auth/register', {
     name: naam, email: naam.toLowerCase() + u + '@x.nl', phone: '06' + u.slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, naam + ' is aangemeld');
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, r.body.token, r.body.state.user.codename);
   return r.body.token;
 }
 
@@ -78,7 +80,7 @@ test('het volgscherm: drie bestellingen tegelijk, elk in zijn eigen fase', async
   try {
     const P = post(base);
     const { token: zaakToken, productId } = await zaakKlaar(P);
-    const lid = await nieuwLid(P, 'Volglid');
+    const lid = await nieuwLid(P, 'Volglid', base);
 
     // drie bestellingen op drie adressen
     const refs = [];
@@ -192,7 +194,7 @@ test('de afhaalbon loopt zijn eigen keten af, van bestellen tot opgehaald', asyn
   try {
     const P = post(base);
     const { token: zaakToken, productId } = await zaakKlaar(P);
-    const lid = await nieuwLid(P, 'Ophaallid');
+    const lid = await nieuwLid(P, 'Ophaallid', base);
 
     const b = await P('/api/bezorg/bestel', {
       supplierCode: 'KIKUNOI', levering: 'ophalen', items: [{ id: productId, qty: 1 }]

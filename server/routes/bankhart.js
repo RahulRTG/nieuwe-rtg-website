@@ -9,13 +9,18 @@ module.exports = (kern) => {
   const gast = (req, res) => { if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Bank is voor leden.' }); return true; } return false; };
   const dicht = (req, res) => { if (!kern.bankLedenAan()) { res.status(403).json({ error: 'De RTG Bank is nog niet live voor leden.' }); return true; } return false; };
   const gate = (req, res) => gast(req, res) || dicht(req, res);
+  /* Geld verplaatsen vraagt bovendien eenmalig het paspoort, voor elk account
+     (besluit 19 oktober 2026; kern/onboarding payGate). Kijken blijft vrij. */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
+  const geld = (req, res) => gate(req, res) || kyc(req, res);
   const cn = req => liveCodename(req.session);
 
   /* ---------- het hart voor het lid ---------- */
   app.post('/api/bank/hart', auth, (req, res) => { if (gate(req, res)) return; res.json(bank.bankHart(cn(req), Math.min(200, Number(req.body.limit) || 60))); });
   app.post('/api/bank/inzichten', auth, (req, res) => { if (gate(req, res)) return; res.json(bank.bankInzichten(cn(req), req.body.maand)); });
   app.post('/api/bank/vastelasten', auth, (req, res) => { if (gate(req, res)) return; res.json({ vasteLasten: bank.bankVasteLasten(cn(req)) }); });
-  app.post('/api/bank/veeg', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankVeegWisselgeld(cn(req))); });
+  app.post('/api/bank/veeg', auth, async (req, res) => { if (geld(req, res)) return; stuur(res, await bank.bankVeegWisselgeld(cn(req))); });
 
   /* ---------- de zakelijke rekening van de zaak (werkgever) ----------
      De zaak bankiert onder de eigen vlag 'zaak:<code>': de manager opent

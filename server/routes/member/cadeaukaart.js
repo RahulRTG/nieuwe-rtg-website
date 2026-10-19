@@ -15,6 +15,10 @@
 module.exports = (kern) => {
   const { app, auth, findSupplier, schoon, notifySupplier, sseToSupplier,
     cadeaukaart, PERSONAS, pay } = kern;
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
   const codenaamVan = req => (req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename);
 
   /* EEN CADEAUKAART KOPEN KOSTTE NIETS, EN DAT IS HIER GEREPAREERD.
@@ -36,6 +40,7 @@ module.exports = (kern) => {
      dat ook: daar staat de klant aan de balie en rekent hij aan de kassa af.
      Daar is de betaling het werk van de kassa, niet van deze code. */
   app.post('/api/giftcard/buy', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const s = findSupplier(req.body.supplierCode);
     if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });

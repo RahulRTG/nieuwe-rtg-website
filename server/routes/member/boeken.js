@@ -13,6 +13,10 @@ module.exports = (kern) => {
     notifySupplier, sseToSupplier, sseToOffice, PERSONAS, publicSupplier,
     isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, ordersVanKlant,
     txLedgerActief, txLedgerVanKlant, txLedgerTel , gegevensStop, ledenInhoudVan} = kern;
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
 
   app.post('/api/booking/request', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -108,6 +112,7 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/order/pay', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     const r = await betaalOrderVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
@@ -120,6 +125,7 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/rekening/betaal', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     const r = await betaalRekeningVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);

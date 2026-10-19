@@ -11,7 +11,7 @@
    Draai los: node --test test/gegevenspoort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, keurLidGoed } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 async function api(base, pad, body, token) {
@@ -124,6 +124,9 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
       geboortedatum: '1988-04-04', tier: 'rtg', pasApp: 'rtg'
     });
     const vt = vers.body.token;
+    /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026);
+       zo meet /api/pakket/koop hieronder de gegevenspoort en niet de paspoortpoort */
+    await keurLidGoed(base, vt, vers.body.state.user.codename);
     const paden = [
       ['/api/reserveer', { supplierCode: 'KIKUNOI', personen: 2 }],
       ['/api/verblijf', { supplierCode: 'KIKUNOI' }],

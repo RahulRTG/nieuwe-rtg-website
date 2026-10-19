@@ -17,7 +17,7 @@
    Draai los: node --test test/rtfos-routes.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
 
 let srv, base, board, lid, WCODE, PLAN;
 
@@ -36,6 +36,8 @@ test.before(async () => {
     geboortedatum: '1980-01-01', tier: 'rtg' });
   lid = reg.body.token;
   assert.ok(lid, JSON.stringify(reg.body).slice(0, 160));
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.body.state.user.codename);
 
   const w = await api('/api/office/rtfwallet', {}, board);
   if (!w.body.bestaat) {

@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bezorg-'));
 
@@ -99,6 +99,8 @@ test('de bezorging: de manager richt in, een lid bestelt, de bezorger krijgt een
       password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
     });
     const lid = reg.body.token;
+    /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+    await keurLidGoed(base, lid, reg.body.state.user.codename);
     const partners = await P('/api/bezorg/partners', {}, lid);
     assert.ok((partners.body.partners || []).some(p => p.code === 'KIKUNOI'),
       'KIKUNOI staat nu tussen de bezorgpartners: ' + JSON.stringify(partners.body).slice(0, 200));

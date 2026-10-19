@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-podiumzaak-'));
 let srv, base, office;
@@ -79,6 +79,9 @@ test.before(async () => {
   await werkBij(zaakA, baas, 'manager');
   await werkBij(zaakA, collega, 'staff');
   await werkBij(zaakB, vreemde, 'manager');
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026);
+     zonder keuring zou toets 4 op de paspoortpoort stuiten en niets over de zone bewijzen */
+  await keurLidGoed(base, collega.token, collega.codenaam);
 });
 test.after(() => {
   stop(srv && srv.child);

@@ -17,7 +17,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let BASE, child, EIG, BAAS;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitgavemix-'));
@@ -34,6 +34,8 @@ async function rtgAccount(naam) {
   const r = (await api('/api/auth/register', { name: naam, email: 'mix' + u + '@voorbeeld.test', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg', pasApp: 'rtg' })).body;
   const me = (await api('/api/auth/me', {}, r.token)).body;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(BASE, r.token, me.user.codename);
   return { token: r.token, codenaam: me.user.codename };
 }
 async function lid(naam, rollen, rtg) {

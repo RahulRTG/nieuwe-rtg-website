@@ -21,7 +21,7 @@
    ========================================================================== */
 'use strict';
 const crypto = require('crypto');
-const { nieuwLid, inloggen, eigenaarSessie, KANTOORWERELD } = require('../voltooiwereld');
+const { nieuwLid, geverifieerdLid, inloggen, eigenaarSessie, KANTOORWERELD } = require('../voltooiwereld');
 const simulatiebank = require('../../../server/betaal/synthetisch');
 
 const AANBOD = '/api/mob/kaart/aanbod';
@@ -58,7 +58,8 @@ async function zaakSessie(w, code) {
 }
 
 async function loop(w, stap) {
-  const lid = await nieuwLid(w, 'ova');
+  /* gekeurd: een kaartje kopen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  const lid = await geverifieerdLid(w, 'ova');
   const B = await nieuwLid(w, 'ovb');
   let T = lid.token;
   const codenaam = ((((await w.post('/api/member/connections', {}, T)).data) || {}).codename);

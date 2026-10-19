@@ -6,6 +6,10 @@ module.exports = (kern) => {
   const { app, auth, supplierAuth, managerOnly, ovKaart, ovCodeMaak, ovCodeIntrek, ovHierIn, ovCheckUit, ovMijn,
     ovDienst, ovPos, ovCodeIn, ovStand, ovOverzicht, ovLijnenBeheer, ovLijnZet, ovRegie, ovRegieZet,
     ovOperatieOverzicht, ovOperatieConcept, ovOperatieBevestig, ovOperatieAnnuleer, ovOperatieSegment } = kern;
+  /* Geld uit de eigen wallet: eenmalig het paspoort, voor elk account (besluit
+     19 oktober 2026; kern/onboarding payGate, test/ledengeld-paspoortpoort.test.js). */
+  const kyc = (req, res) => { const g = kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(req.session) : { ok: true };
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; } return false; };
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG OV is voor leden.' }); return true; }
@@ -36,6 +40,7 @@ module.exports = (kern) => {
     stuur(res, ovHierIn(req.session.key, { lat: req.body.lat, lng: req.body.lng }));
   });
   app.post('/api/ov/uit', auth, async (req, res) => {
+    if (kyc(req, res)) return;
     if (geenGast(req, res)) return;
     stuur(res, await ovCheckUit(req.session.key, { lat: req.body.lat, lng: req.body.lng }, req.body.idem));
   });

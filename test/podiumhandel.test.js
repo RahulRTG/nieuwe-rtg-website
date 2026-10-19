@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stroomAdres } = require('./helper');
+const { startServer, stop, stroomAdres, keurLidGoed } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-podiumhandel-'));
 let srv, base, office;
@@ -81,6 +81,9 @@ test.before(async () => {
   maker = await lid('Marktkoopman');
   koper = await lid('Koper');
   tweede = await lid('Tweede koper');
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, koper.token, koper.codenaam);
+  await keurLidGoed(base, tweede.token, tweede.codenaam);
   openMaker = await lid('Gewone maker');
 
   const aan = await api('/api/podium/kanaal/aanmeld', { naam: 'De kraam', zone: 'handel', genre: 'lifestyle' }, maker.token);

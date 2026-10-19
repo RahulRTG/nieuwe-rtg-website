@@ -178,7 +178,8 @@ test('de keukenlijn: een bon is pas klaar als elke sectie klaar is', async () =>
   try {
     const P = post(base);
     const { token: keuken, state } = await zaak(P, 'KIKUNOI');
-    const lid = await nieuwLid(P, 'Tafelgast');
+    /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+    const lid = await nieuwLid(P, 'Tafelgast', base);
 
     const kaart = (state.supplier && state.supplier.menu) || state.menu || [];
     const eten = kaart.filter(m => m.station !== 'bar').slice(0, 2);

@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bugjacht-'));
@@ -42,9 +42,12 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'MERCABIZA' } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  lid = (await api('/api/auth/register', { name: 'Bug Jager', email: 'bj' + u + '@x.nl',
-    phone: '064' + u.slice(1), password: 'geheim123', geboortedatum: '1985-03-03', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = (await api('/api/auth/register', { name: 'Bug Jager', email: 'bj' + u + '@x.nl',
+    phone: '064' + u.slice(1), password: 'geheim123', geboortedatum: '1985-03-03', tier: 'rtg', pasApp: 'rtg' })).body;
+  lid = reg.token;
   assert.ok(lid, 'het testlid is aangemeld');
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.state.user.codename);
   /* Een ECHT account zonder geboortedatum. Aanmelden via het formulier vraagt
      er altijd om, maar createUserSync in de opstart doet dat niet: het
      demo-eigenaarsaccount heeft geen `geboren` in zijn ledenstaat. Dat is

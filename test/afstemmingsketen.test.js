@@ -29,7 +29,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop, stopNet, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, stopNet, kantoorKoppelBody, keurLidGoed } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-afstemketen-'));
@@ -50,6 +50,8 @@ async function registreer(n, naam) {
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(r.body.token, naam + ' geregistreerd');
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, r.body.token, r.body.state.user.codename);
   return r.body.token;
 }
 async function medewerker(n) {

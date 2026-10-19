@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stroomAdres } = require('./helper');
+const { startServer, stroomAdres, keurLidGoed } = require('./helper');
 // de les vraagt een account (eigenaarsbesluit 19 oktober 2026): les maken en meedoen met een gratis account
 require('./lesaccount').zetLesAccount();
 
@@ -935,6 +935,8 @@ test('gratis account met paspoort: bestellen, betalen en de betaalgeschiedenis t
   assert.ok(reg.token, 'gratis registratie met paspoort geeft een token');
   assert.equal(reg.state.user.tier, 'guest', 'het is een gratis (guest) account, geen betaalde pas');
   const gtok = reg.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(BASE, gtok, reg.state.user.codename);
   // bestellen en betalen bij een partner
   const order = await json(await raw('/order', { supplierCode: 'KIKUNOI', items: [{ id: 'm2', qty: 1 }] }, gtok));
   assert.ok(order.order && order.order.ref, 'gratis account plaatst een bestelling');

@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base, office, lid, sup, genre;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geld-'));
@@ -26,8 +26,11 @@ test.before(async () => {
   // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
   office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   const u = Date.now().toString().slice(-8);
-  lid = (await api('/api/auth/register', { name: 'Geldlid', email: 'geld' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = (await api('/api/auth/register', { name: 'Geldlid', email: 'geld' + u + '@x.nl', phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body;
+  lid = reg.token;
+  /* gekeurd: geld verplaatsen vraagt eenmalig het paspoort (payGate, besluit 19 oktober 2026) */
+  await keurLidGoed(base, lid, reg.state.user.codename);
   // de demo-zaak KIKUNOI met een vaste kaart, om het ledenvoordeel echt af te rekenen
   const login = await api('/api/supplier/login', { username: 'rahul', password: 'Imran' });
   sup = { token: login.body.token, code: 'KIKUNOI' };

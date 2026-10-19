@@ -55,13 +55,17 @@ module.exports = (kern, hulp) => {
   const remLezen = rem({ windowMs: 60000, limit: 60 });
 
   /* ---------- de labpas: mijn eigen onderzoek ----------
+     Een account EN de labpas (eigenaarsbesluit 19 oktober 2026: alles van het
+     buurtlab achter een account). De labpas wordt met opzet NIET aan het account
+     gekoppeld: bij een gescheiden studie is juist die koppeling wat niet mag
+     bestaan (kern/livinglab/mensen.js). Het account is de deur, de pas de rol.
      Geeft de studie zoals een teamlid hem mag zien, wat er nu moet gebeuren, en
      de eigen stand in het spel. */
-  app.post('/api/lab2/mijn', remBron, remCode, (req, res) => veilig(res, () => livinglab.mijn(codeUit(req))));
+  app.post('/api/lab2/mijn', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => livinglab.mijn(codeUit(req))));
 
   /* Een observatie insturen met de labpas. De alias komt uit de pas -- zie de
      kop van dit bestand voor waarom dat niet uit de body mag komen. */
-  app.post('/api/lab2/mijn/observatie', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/observatie', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     const b = Object.assign({}, lijf(req), { door: wie.alias });
@@ -77,13 +81,13 @@ module.exports = (kern, hulp) => {
      cel zonder netwerk en kan een meting dus niet terugsturen -- en zou dat ook
      niet mogen: een meting draagt een toestemmingsgrond en hoort bij een studie
      van de stichting (kern/livinglab/instrument.js). */
-  app.post('/api/lab2/mijn/venster', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/venster', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.instrument.venster(wie.studieId, wie.alias);
   }));
 
-  app.post('/api/lab2/mijn/meting', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/meting', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.instrument.metingBij(wie.studieId, wie.alias, lijf(req));
@@ -93,7 +97,7 @@ module.exports = (kern, hulp) => {
      welke eerdere conclusie herzien moet worden. Dit staat open voor bewoners
      omdat het juist het gedrag is dat dit lab wil hebben -- en het is bovendien
      het zwaarst beloonde (zie kern/livinglab/spel.js). */
-  app.post('/api/lab2/mijn/reflectie', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/reflectie', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.bewijs.reflectieBij(wie.studieId, lijf(req), wie.alias);
@@ -106,13 +110,13 @@ module.exports = (kern, hulp) => {
      verandert niets: wat verdwijnt, wat in een dataset is opgegaan en welke
      conclusies in bewijsgraad zakken. Een deelnemer die dat pas ná het wissen
      hoort, heeft geen keuze gehad maar een mededeling gekregen. */
-  app.post('/api/lab2/mijn/terugtrekken/gevolg', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/terugtrekken/gevolg', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.terugtrekken.gevolg(wie.studieId, wie.alias);
   }));
 
-  app.post('/api/lab2/mijn/terugtrekken', remBron, remCode, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/mijn/terugtrekken', remBron, remCode, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
     return livinglab.mensen.deelnemerWeg(wie.studieId, { alias: wie.alias }, 'deelnemer zelf');
@@ -157,5 +161,5 @@ module.exports = (kern, hulp) => {
      hun stand, de leenbare apparatuur -- staan in ./openbaar.js. Ze krijgen
      dezelfde rem mee, want dat is dezelfde vraag: afgrazen tegenhouden zonder
      iemand buiten te sluiten die er wel bij hoort. */
-  require('./openbaar')(kern, { veilig, lijf, remLezen, remSchrijf });
+  require('./openbaar')(kern, { veilig, lijf, remLezen, remSchrijf, bewoner, GEEN_ACCOUNT });
 };

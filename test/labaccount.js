@@ -3,7 +3,7 @@
    een thema of een stem als middel gebruiken en niet de deur zelf meten.
 
    zetLabAccount(): een toetsbestand roept dit een keer aan. Daarna krijgt elk
-   verzoek naar /api/lab2/bewoner/{labs,themas,thema,stem,overzicht,studie,klacht,kader,paspoort,paspoort-maak} zonder eigen
+   verzoek naar een buurtdeur van het lab (/api/lab2/bewoner/*, /mijn/*, /publiek/*) zonder eigen
    Authorization-kop een gratis account mee -- en wel EEN PER ALIAS uit het lijf.
    Die toetsen lieten verschillende aliassen als verschillende bewoners stemmen;
    sinds de stem aan het account hangt, is dat precies wat een eigen account per
@@ -11,7 +11,7 @@
    (test/toegang-lab.test.js). */
 'use strict';
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
-const DEUR = /^(https?:\/\/[^/]+)\/api\/lab2\/bewoner\/(labs|themas|thema|stem|overzicht|studie|klacht|kader|paspoort|paspoort-maak)(\?|$)/;
+const DEUR = /^(https?:\/\/[^/]+)\/api\/lab2\/(bewoner\/(labs|themas|thema|stem|overzicht|studie|klacht|kader|paspoort|paspoort-maak)|mijn(\/[a-z/]+)?|publiek\/[a-z-]+)(\?|$)/;
 
 function zetLabAccount() {
   if (globalThis.__rtgLabAccount) return;

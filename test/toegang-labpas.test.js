@@ -55,3 +55,22 @@ test('studie, klacht, kader en paspoort vragen een account, en het paspoort de 1
   const b = await volwassen();
   assert.equal((await post('/api/lab2/bewoner/paspoort', { code }, b.token)).status, 404, 'een ander account met dezelfde code niet');
 });
+
+/* De labpas en de openbare kant van het lab (tweede besluit van 19 oktober
+   2026, keuze (a)): mijn/* vraagt een account EN de labpas, publiek/* een
+   account. Een onderzoekskaart is geen wettelijk openbaar stuk. */
+test('mijn/* vraagt een account en de labpas, publiek/* een account', async () => {
+  const MIJN = ['/api/lab2/mijn', '/api/lab2/mijn/observatie', '/api/lab2/mijn/venster', '/api/lab2/mijn/meting',
+    '/api/lab2/mijn/reflectie', '/api/lab2/mijn/terugtrekken', '/api/lab2/mijn/terugtrekken/gevolg'];
+  const PUBLIEK = ['/api/lab2/publiek/apparatuur', '/api/lab2/publiek/uitleen-aanvraag', '/api/lab2/publiek/vragen',
+    '/api/lab2/publiek/onderzoeken', '/api/lab2/publiek/onderzoek'];
+  for (const pad of MIJN.concat(PUBLIEK))
+    assert.equal((await post(pad, { pas: 'LABPAS-ZZZZZZZ' })).status, 401, pad + ' zonder account');
+
+  const g = await registreerGratis(BASE);
+  const lab = ((await post('/api/lab2/bewoner/labs', {}, g.token)).body.labs || [])[0];
+  assert.equal((await post('/api/lab2/publiek/onderzoeken', { labId: lab.id }, g.token)).status, 200, 'de onderzoekskaarten met een gratis account');
+  assert.equal((await post('/api/lab2/publiek/apparatuur', { labId: lab.id }, g.token)).status, 200, 'de apparatuur met een gratis account');
+  assert.equal((await post('/api/lab2/mijn', { pas: 'LABPAS-ZZZZZZZ' }, g.token)).status, 404,
+    'een account zonder geldige labpas opent geen onderzoek: de pas blijft de tweede sleutel');
+});

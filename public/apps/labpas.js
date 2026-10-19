@@ -53,7 +53,7 @@
 
   /* ---------- mijn onderzoek ---------- */
   function openPas(pas) {
-    return api('mijn', { pas: pas }).then(function (d) {
+    return window.LabpasBuurt.deur().then(function () { return api('mijn', { pas: pas }); }).then(function (d) {
       PAS = pas;
       try { sessionStorage.setItem('rtg_labpas', pas); } catch (e) {}
       teken(d);

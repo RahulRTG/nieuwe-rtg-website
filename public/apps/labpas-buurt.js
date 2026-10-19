@@ -6,7 +6,8 @@
    de trechter waar een Living Lab uit put. Wel vraagt het een account (een
    gratis account is genoeg) of een gezinsprofiel onder het account van een
    ouder: eigenaarsbesluit 19 oktober 2026, en een stem is een per account.
-   De deur daarvoor staat hier in het scherm (deur(), shared/accountdeur.js).
+   De deur daarvoor staat hier in het scherm (deur(), shared/accountdeur.js),
+   ook voor de labpas: labpas.js opent een pas pas na deur().
 
    Afgesplitst uit ./labpas.js toen die de 10 KB passeerde. Hij krijgt zijn
    gereedschap (api, esc, meld) van de hoofdmodule mee in plaats van

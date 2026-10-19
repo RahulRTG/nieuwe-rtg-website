@@ -116,6 +116,16 @@ module.exports = (ctx) => {
 
     // betalen met autolaad, dezelfde weg als elke andere RTG-betaling
     const codenaam = codenaamVan(session.key);
+    /* MET EEN IDEM VOLGT HET ID UIT DE SLEUTEL. De idem-poort is na een crash
+       leeg; met een vers id weigerde de geldlaag de herhaling ("sleutel hoort
+       bij een andere boeking"), en viel de crash tussen boeking en kaartje, dan
+       was er betaald zonder kaartje (scripts/lib/voltooi/ov.js). */
+    const aankoopId = body.idem ? 'kt' + crypto.createHash('sha256')
+      .update(codenaam + '\u0000' + schoon(body.idem, 60)).digest('hex').slice(0, 16) : id('kt');
+    const al = body.idem ? kaartMet(aankoopId) : null;
+    if (al) return al.key === session.key && al.lijnId === lijn.id && al.product === product
+      ? { ok: true, herhaald: true, kaartje: ctx.kaartBeeld(al, true) }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere aankoop.' };
     const rek = 'lid:' + codenaam;
     const tekort = prijs - pay.saldoVan(rek);
     if (tekort > 0) {
@@ -123,8 +133,7 @@ module.exports = (ctx) => {
         idem: body.idem ? 'kaartlaad:' + schoon(body.idem, 60) : undefined });
       if (l.error) return { status: l.status || 402, error: l.error };
     }
-    // id voor de boeking, sleutel eraan: zie ./abonnement.js
-    const aankoopId = id('kt');
+    // id voor de boeking (hierboven), sleutel eraan: zie ./abonnement.js
     const b = await pay.boekAsync({ van: rek, naar: 'partner:' + zaak.code, centen: prijs, soort: 'ovkaart',
       oms: p.naam + ' · ' + lijn.naam + (van ? ' · ' + van.naam + ' - ' + naar.naam : ''), ref: aankoopId,
       economischeSleutel: maakSleutel('pay-handeling', body.idem

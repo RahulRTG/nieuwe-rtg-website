@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "449a6e94",
+  "commit": "1f1aa134",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/navigatie.html"
+    "public/apps/ov.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1055,
-  "verwijzingen": 1283,
-  "voorvoegsels": 139,
+  "exactePaden": 1081,
+  "verwijzingen": 1313,
+  "voorvoegsels": 137,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8164,6 +8164,33 @@
     "public/apps/memo/app.js",
     "public/apps/scanner/app.js",
     "public/apps/wonen.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/mob/aanbod",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/reizen-performance-taxi.js",
+    "public/apps/rit.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/mob/mijn",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/reizen-performance-taxi.js",
+    "public/apps/rit.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/mob/plekken",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/reizen-performance-taxi.js",
+    "public/apps/rit.js"
    ],
    "aantal": 3
   },
@@ -8732,6 +8759,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/mob/volg",
+   "schermen": [
+    "public/apps/ov.html",
+    "public/apps/rit.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/supplier/ov/overzicht",
    "schermen": [
     "public/apps/ovcontrol.html",
@@ -8791,30 +8826,6 @@
    "pad": "/api/mob/vraag",
    "schermen": [
     "public/apps/reizen-performance-boeken.js",
-    "public/apps/rit.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/mob/aanbod",
-   "schermen": [
-    "public/apps/reizen-performance-taxi.js",
-    "public/apps/rit.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/mob/mijn",
-   "schermen": [
-    "public/apps/reizen-performance-taxi.js",
-    "public/apps/rit.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/mob/plekken",
-   "schermen": [
-    "public/apps/reizen-performance-taxi.js",
     "public/apps/rit.js"
    ],
    "aantal": 2
@@ -13028,6 +13039,188 @@
    "aantal": 1
   },
   {
+   "pad": "/api/mob/abo/aanbod",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/abo/koop",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/abo/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/annuleer",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/beleid",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/aanbod",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/koop",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/kaart/toon",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/pendel",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/pendel/reserveer",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/annuleer",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/boek",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mob/reis/plan",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/code",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/code/intrek",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/hier",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/kaart",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/mijn",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operatie/bevestig",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operatie/concept",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operatie/segment",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/operaties",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/regie",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ov/uit",
+   "schermen": [
+    "public/apps/ov.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/staff/mob/kaart/controle",
    "schermen": [
     "public/apps/ovdienst.html"
@@ -14102,13 +14295,6 @@
    "pad": "/api/mob/ontvangst/probleem",
    "schermen": [
     "public/apps/rit-ontvangst.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/mob/volg",
-   "schermen": [
-    "public/apps/rit.js"
    ],
    "aantal": 1
   },
@@ -17882,11 +18068,39 @@
   },
   {
    "bestand": "public/apps/ov.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/mob/",
-    "/api/ov/"
-   ]
+   "exact": [
+    "/api/mob/aanbod",
+    "/api/mob/abo/aanbod",
+    "/api/mob/abo/koop",
+    "/api/mob/abo/mijn",
+    "/api/mob/annuleer",
+    "/api/mob/beleid",
+    "/api/mob/kaart/aanbod",
+    "/api/mob/kaart/koop",
+    "/api/mob/kaart/mijn",
+    "/api/mob/kaart/toon",
+    "/api/mob/mijn",
+    "/api/mob/pendel",
+    "/api/mob/pendel/reserveer",
+    "/api/mob/plekken",
+    "/api/mob/reis/annuleer",
+    "/api/mob/reis/boek",
+    "/api/mob/reis/mijn",
+    "/api/mob/reis/plan",
+    "/api/mob/volg",
+    "/api/ov/code",
+    "/api/ov/code/intrek",
+    "/api/ov/hier",
+    "/api/ov/kaart",
+    "/api/ov/mijn",
+    "/api/ov/operatie/bevestig",
+    "/api/ov/operatie/concept",
+    "/api/ov/operatie/segment",
+    "/api/ov/operaties",
+    "/api/ov/regie",
+    "/api/ov/uit"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/ovcontrol.html",

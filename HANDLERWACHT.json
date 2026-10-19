@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-19T06:16:52.652Z",
-  "commit": "5d57f36c",
+  "op": "2026-10-19T06:24:14.335Z",
+  "commit": "adf6d65f",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -9,11 +9,11 @@
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 661,
+  "zonderBewakerslaag": 659,
   "bewaakt": 568,
   "openbaarMetReden": 49,
-  "eigenControle": 24,
-  "sleutelDoorgegeven": 12,
+  "eigenControle": 23,
+  "sleutelDoorgegeven": 11,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
@@ -1118,11 +1118,6 @@
    "bestand": "server/routes/kantoren/geld.js:37",
    "staat": "openbaar",
    "reden": "het betaaldiensttarief staat in de partnervoorwaarden"
-  },
-  {
-   "sleutel": "POST /api/book",
-   "bestand": "server/routes/member/partnerkanaal.js:28",
-   "staat": "sleutelDoorgegeven"
   },
   {
    "sleutel": "POST /api/carriere/regel/toon",
@@ -3337,7 +3332,7 @@
   },
   {
    "sleutel": "POST /api/partnertrips",
-   "bestand": "server/routes/member/partnerkanaal.js:15",
+   "bestand": "server/routes/member/partnerkanaal.js:16",
    "staat": "sleutelDoorgegeven"
   },
   {
@@ -4083,11 +4078,6 @@
    "bestand": "server/routes/kantoren/stad.js:103",
    "staat": "openbaar",
    "reden": "idem"
-  },
-  {
-   "sleutel": "POST /api/staff",
-   "bestand": "server/routes/staff.js:46",
-   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/stroom/ticket",

@@ -126,9 +126,9 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     const toestelId = binding && binding.keyRef;
     if (!toestelId) {
       /* Geen stil privilege: een sessie die niet kan binden (gast, pas zonder eigen account)
-         krijgt een zwaar pad niet omdat binden technisch onmogelijk is. */
+         krijgt een zwaar pad niet omdat binden onmogelijk is. Elk account kan binden. */
       if (stand === 'verplicht') {
-        const kanBinden = sess && sess.account && sess.tier !== 'guest';
+        const kanBinden = !!(sess && sess.account);
         return { stand: 'geweigerd', code: 403, reden: kanBinden
           ? 'Deze handeling vraagt een toestel dat zijn sleutel kan aantonen. Bevestig dit toestel in "Waar ben ik aanwezig".'
           : 'Deze handeling vraagt een eigen RTG-account met een bevestigd toestel. Maak of gebruik een account en bevestig daarna dit toestel.' };

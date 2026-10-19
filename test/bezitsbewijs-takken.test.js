@@ -80,12 +80,17 @@ test('zonder meegegeven stand telt de omgeving: leeg is verplicht, schaduw laat 
 
 test('verplicht zonder binding: een gast of een sessie zonder account krijgt de accountweg', async () => {
   const { b } = await opzet();
-  for (const sess of [null, { key: 'g', tier: 'guest', account: 'x' }, { key: 'p', tier: 'rtg' }]) {
+  for (const sess of [null, { key: 'g', tier: 'guest' }, { key: 'p', tier: 'rtg' }]) {
     const uit = await b.controleer({ sess, methode: 'POST', pad: PAD, stand: 'verplicht' });
     assert.equal(uit.stand, 'geweigerd');
     assert.equal(uit.code, 403);
     assert.match(uit.reden, /eigen RTG-account/);
   }
+  /* Een gratis account (tier guest MET account) kan sinds 19 oktober 2026 een
+     toestel binden, en hoort dus de toestelweg (test/toegang-bezitszin.test.js). */
+  const gratis = await b.controleer({ sess: { key: 'g', tier: 'guest', account: 'x' }, methode: 'POST', pad: PAD, stand: 'verplicht' });
+  assert.equal(gratis.code, 403);
+  assert.match(gratis.reden, /Waar ben ik aanwezig/);
 });
 
 test('een onleesbaar register sluit, ook in aanbevolen; in de schaduw niet', async () => {

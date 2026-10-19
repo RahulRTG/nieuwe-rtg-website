@@ -119,8 +119,11 @@ test('een aangewezen reisaanvraag reist van het scherm tot in de prompt, en alle
     const voorEdge = model.verzoeken.length;
     await page.locator('.ds-edge__balk [data-ds-edge="rahul"]').click();
     await page.locator('.ds-edge__veld').fill('Wat staat er in deze aanvraag?');
+    /* Het model krijgt de prompt voordat /api/fluister antwoordt; wachten op
+       dat antwoord is dus wachten op de toestand en niet op de klok. */
+    const antwoord = page.waitForResponse(r => new URL(r.url()).pathname === '/api/fluister');
     await page.locator('.ds-edge__veld').press('Enter');
-    for (let i = 0; i < 100 && model.verzoeken.length === voorEdge; i++) await page.waitForTimeout(100);
+    await antwoord;
     assert.ok(JSON.stringify(model.verzoeken.slice(voorEdge)).includes('opgezocht door RTG: reisaanvraag ' + ref),
       'de Edge-vraag brengt de aangewezen aanvraag in de prompt');
     await page.keyboard.press('Escape');

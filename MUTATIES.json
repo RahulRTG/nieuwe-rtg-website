@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-19T12:49:41.352Z",
-    "commit": "30dc2ac1",
-    "boomVuil": false,
+    "op": "2026-10-19T13:27:52.643Z",
+    "commit": "ac75cecb",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
@@ -2314,6 +2314,14 @@
       "module": "server/web/body.js",
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "boeken-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/boeken/app.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "boeken.e2e.js": {
@@ -13892,9 +13900,27 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reisboek-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisboek.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "reisboek-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "reisbureau-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 6,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/reisbureau-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "reisbureau-genre.test.js": {
       "soort": "puur",
@@ -14249,6 +14275,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "residentie-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "geen bruikbare mutatie",
+      "modules": [
+        "public/apps/residentie/residentie-04.js"
+      ],
+      "posities": 1
+    },
     "residentie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14488,6 +14522,16 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "routedekking-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/routedekking-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
     "routedekking.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14501,6 +14545,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "routedossier-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/routedossier-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "routedossier.test.js": {
       "soort": "server",
@@ -17226,6 +17280,14 @@
       "gezakt": 5,
       "geprobeerd": 2
     },
+    "stad-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/stad.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "stad.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -19329,6 +19391,14 @@
     "vlucht-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "vluchten-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/vluchten-voorzijde.js",
+      "operator": "api-actie-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "voeding-scherm.e2e.js": {
       "soort": "server",

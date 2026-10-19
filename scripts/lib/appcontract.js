@@ -255,15 +255,14 @@ const CONTRACT = {
      loopt als LID over /api/connect, de deur die connect.html zelf aanroept; de
      gezinsdeur /api/rtf/connect is dezelfde motor maar wordt niet gelopen, en dat
      staat in `waarom` in plaats van weggelaten. */
-  'link:connect': {
-    belofte: 'je ontdekt iets, begrijpt het, doet er iets mee, en een ander bevestigt dat het hem hielp -- zonder score, rangorde of niveau',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'LUSPROEF.json',
-      instrument: 'scripts/lusproef.js',
-      waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
-    }
-  },
+  /* Sinds 19 oktober 2026 komen alle vier de bewijzen uit de voltooiproef, die
+     de GEZINSDEUR loopt -- de persona van deze rij, en de deur die connect.html
+     bij een gezinssessie kiest. De lusproef (LUSPROEF.json, scripts/lusproef.js)
+     blijft bestaan en loopt de ledendeur met een tweede mens die bevestigt; dat
+     deel van de belofte draagt de voltooiproef niet, en dat staat in zijn grens. */
+  'link:connect': Object.assign({
+    belofte: 'je ontdekt iets, begrijpt het, doet er iets mee, en een ander bevestigt dat het hem hielp -- zonder score, rangorde of niveau'
+  }, voltooi('connect', 'het scenario loopt /api/rtf/connect/ontdek, /open, /signaal, /schuif, /horizon, /dossier, /portfolio, /noteer en /werk, de gezinsdeur die /apps/connect.html bij een gezinssessie aanroept; de bevestiging door een tweede mens loopt de lusproef')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

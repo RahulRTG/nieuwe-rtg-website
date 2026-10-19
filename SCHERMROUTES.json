@@ -3,15 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "3f05a06d",
+  "commit": "bd41a86a",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/library/api.js",
-    "public/apps/library/app/app-01.js",
-    "public/apps/library/app/app-02.js"
+    "public/apps/connect.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7824,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1094,
-  "verwijzingen": 1320,
-  "voorvoegsels": 143,
+  "exactePaden": 1102,
+  "verwijzingen": 1328,
+  "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -9921,6 +9919,62 @@
   },
   {
    "pad": "/api/connect/werk",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/dossier",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/horizon",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/ontdek",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/open",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/portfolio",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/schuif",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/signaal",
+   "schermen": [
+    "public/apps/connect.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/connect/werk",
    "schermen": [
     "public/apps/connect.html"
    ],
@@ -16121,12 +16175,17 @@
     "/api/connect/portfolio",
     "/api/connect/schuif",
     "/api/connect/signaal",
-    "/api/connect/werk"
+    "/api/connect/werk",
+    "/api/rtf/connect/dossier",
+    "/api/rtf/connect/horizon",
+    "/api/rtf/connect/ontdek",
+    "/api/rtf/connect/open",
+    "/api/rtf/connect/portfolio",
+    "/api/rtf/connect/schuif",
+    "/api/rtf/connect/signaal",
+    "/api/rtf/connect/werk"
    ],
-   "voorvoegsels": [
-    "/api/connect/",
-    "/api/rtf/connect/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/decision-room.js",

@@ -24,9 +24,11 @@ const { nieuwLid, inloggen } = require('../voltooiwereld');
 const BALANS = '/api/balans';
 const AGENDA_ZET = '/api/agenda/toevoegen';
 const AGENDA_WIJZIG = '/api/agenda/wijzig';
-const DAG = 86400000;
-/* Dezelfde dagen als kern/balans.js (weekBeeld): vandaag en de zes erna, in UTC. */
-const dag = (i) => new Date(Date.now() + i * DAG).toISOString().slice(0, 10);
+const tijdzone = require('../../../server/kern/tijdzone');
+/* Dezelfde dagen als kern/balans.js (weekBeeld): vandaag en de zes erna, op de
+   kalender van het huis -- in UTC liep de proef elke avond na 22:00/23:00 UTC
+   een dag uit de pas met de kern (gevonden door Tijd). */
+const dag = (i) => tijdzone.plusDagen(tijdzone.datumIn(), i);
 
 async function loop(w, stap) {
   const merk = 'bl' + Date.now().toString(36);

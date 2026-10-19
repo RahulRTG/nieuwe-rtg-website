@@ -96,10 +96,13 @@ test('4. de ruggengraat uit de wereldhelpers komt per id terug, niet per categor
 });
 
 test('5. andereCats noemt de leun-kandidaten: wat het scenario raakt en nu uit staat', () => {
-  const afl = P.losAfleiding({ scenarioBron: "a('/api/office/kantoorpakket/maak'); b('/api/supplier/roster');", ruggengraatBron: '' });
+  /* De eigen route als constante (zo leidt de proef EIGEN af als er geen
+     contract is), de vreemde route alleen aangeroepen -> die laatste is de
+     leun-kandidaat, niet de eigen categorie. */
+  const afl = P.losAfleiding({ scenarioBron: "const MAAK = '/api/office/kantoorpakket/maak';\nb('/api/supplier/roster');", ruggengraatBron: '' });
   assert.equal(afl.primair, 'RTG-Backoffice');
   assert.ok(afl.andereCats.includes('Partners (leveranciers)'),
-    'de supplier-route zit in een andere categorie en hoort bij de kandidaten');
+    'de supplier-route zit niet in de eigenclausule en hoort bij de kandidaten');
   assert.ok(!afl.andereCats.includes('RTG-Backoffice'), 'de eigen categorie is geen leun-kandidaat');
 });
 

@@ -527,7 +527,7 @@ const CONTRACT = {
     via: '#tab=salon',
     // app-main-58.js: de knoppen onder een Salon-bericht (waarderen, reageren)
     bestanden: ['public/apps/app-main/app-main-58.js']
-  }, voltooi('salon', 'het scenario loopt /api/state, /api/like en /api/comment, de routes die de stand Salon van /apps/app.html (app-main-58.js) aanroept, met een vriend, een vreemde en een gratis account')),
+  }, voltooi('salon', 'het scenario loopt /api/state, /api/like, /api/comment en /api/salon/plaats, de routes die de stand Salon van /apps/app.html aanroept (waarderen en reageren in app-main-58.js, een eigen post plaatsen via /api/salon/plaats), met een vriend, een vreemde en een gratis account')),
   'os:snaps': Object.assign({
     belofte: 'een lid stuurt een vriend een snap, de vriend ziet hem een keer en daarna is de foto weg, ook uit de opslag',
     ingang: '/apps/app.html',

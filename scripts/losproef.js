@@ -167,6 +167,31 @@ const PLATFORM_CATS = ['Toegang en identiteit'];
 const LANCEERVLOER = ['salon', 'supplier-salon'];
 const PLATFORM_BODEM = new Set([...BODEM].filter((id) => !LANCEERVLOER.includes(id)));
 
+/* PLATFORM per FUNCTIE-ID, bovenop de bodem, op eigenaarsruling van 19 oktober
+   2026: RTG iD-machtigen (`dom-rtgid`, /api/rtgid/*) en de paspoortkeuring
+   (`dom-onboarding`, /api/onboarding/*) zijn identiteit en toestemming -- net als
+   /api/toestemming (dat ongated buiten het register al altijd aan staat). Per id
+   en niet de hele categorie "Identiteit en veiligheid": `dom-veiligheid`,
+   `dom-kmar` e.d. in diezelfde categorie zijn wEl apps. */
+const PLATFORM_EXTRA = ['dom-rtgid', 'dom-onboarding'];
+
+/* DE EIGEN CATEGORIEEN van een app: de categorieen die zijn eigen routes raken
+   (uit de contract-eigenclausule, zie eigenRoutes), zonder het platform. Een app
+   is niet per se EEN categorie -- de Gezin-app bezit `rtf-contacten` (Sociaal) en
+   de gezinsfuncties onder /api/foundation/gezin (RTFoundation). Eigendom volgt
+   SCHERMEIGENAAR, niet het routepad (eigenaarsruling 19 oktober 2026), en het
+   appcontract noemt die eigen routes. Alle eigen categorieen blijven samen aan;
+   een route BUITEN die set en buiten het platform is een leun op een andere app. */
+function eigenCategorieën(routes, aanIds) {
+  const cats = new Set();
+  for (const r of (routes || [])) {
+    const id = idVanRoute(r); if (!id || aanIds.has(id)) continue;
+    const c = categorieVan(id); if (!c || PLATFORM_CATS.includes(c)) continue;
+    cats.add(c);
+  }
+  return cats;
+}
+
 /* DE HELE AFLEIDING, PUUR. Uit de bron van het scenario en de bron van de
    gedeelde wereldhelpers: de drie groepen van de eigenaar -- EIGEN (de primaire
    categorie), PLATFORM (blijft aan), en de OPTIONELE appkoppelingen die uit gaan
@@ -176,17 +201,18 @@ const PLATFORM_BODEM = new Set([...BODEM].filter((id) => !LANCEERVLOER.includes(
 function losAfleiding({ scenarioBron, ruggengraatBron, functieLink }) {
   const scRoutes = routesUit(scenarioBron);
   const ruggengraat = idsVanRoutes(routesUit(ruggengraatBron || ''));
-  const aanIds = new Set([...PLATFORM_BODEM, ...ruggengraat]);
+  const aanIds = new Set([...PLATFORM_BODEM, ...ruggengraat, ...PLATFORM_EXTRA]);
   /* EIGEN leidt de proef af uit de routes die de ingang zelf aanroept (contract,
      anders de scenario-constanten), niet uit alle scenario-routes: de gedeelde
-     setup (inloggen, member-connect, een andere app vullen) telt niet mee voor
-     WELKE categorie de app zelf is. De platform-bodem en het platform zelf tellen
-     evenmin mee als "eigen". Lukt dat niet, dan valt het terug op alle routes. */
+     setup (inloggen, member-connect, een andere app vullen) telt niet mee. De
+     app mag meer dan EEN eigen categorie hebben; alle blijven aan. Lukt de
+     eigenclausule niet, dan valt het terug op alle scenario-routes. */
   const heeftContract = !!(functieLink && CONTRACT[functieLink] && CONTRACT[functieLink].voltooibaar && CONTRACT[functieLink].voltooibaar.waarom);
   const eigen = eigenRoutes(functieLink, scenarioBron);
   const eigenBron = heeftContract ? 'contract' : (eigen ? 'scenario-constanten' : 'alle-routes (onzeker)');
-  const primair = primaireCategorie(eigen || scRoutes, aanIds, PLATFORM_CATS);
-  const aanCats = new Set(PLATFORM_CATS); if (primair) aanCats.add(primair);
+  const eigenCats = eigenCategorieën(eigen || scRoutes, aanIds);
+  const primair = eigenCats.size ? [...eigenCats].join(' + ') : null;
+  const aanCats = new Set([...PLATFORM_CATS, ...eigenCats]);
   const uitCats = ALLE_CATS.filter((c) => !aanCats.has(c));
   /* De leun-kandidaten: categorieen die het scenario raakt maar die nu uit
      staan (dus niet de eigen categorie en niet het platform). */
@@ -197,7 +223,7 @@ function losAfleiding({ scenarioBron, ruggengraatBron, functieLink }) {
       'ongated infra: betaalwaarheid + bewijs/log (buiten het register)'])],
     optioneelUit: uitCats
   };
-  return { primair, eigenBron, aanIds, aanCats: [...aanCats], uitCats, andereCats, groepen, scRoutes };
+  return { primair, eigenCats: [...eigenCats], eigenBron, aanIds, aanCats: [...aanCats], uitCats, andereCats, groepen, scRoutes };
 }
 
 /* Het oordeel over een gedraaid scenario, puur uit zijn boek.
@@ -219,7 +245,7 @@ function oordeel({ afgebroken, open }) {
 
 module.exports = {
   KERN, BODEM, ALLE_CATS, WORTEL, PLATFORM_CATS, LANCEERVLOER, PLATFORM_BODEM,
-  categorieVan, idVanRoute, catVanRoute, routesUit, idsVanRoutes, primaireCategorie, eigenRoutes,
+  categorieVan, idVanRoute, catVanRoute, routesUit, idsVanRoutes, primaireCategorie, eigenRoutes, eigenCategorieën, PLATFORM_EXTRA,
   losAfleiding, oordeel,
   /* De tredeproef en de oude losrunner lazen losSet([]) voor de kale bodem. */
   losSet: (routes) => {

@@ -252,7 +252,18 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
     for (const match of html.matchAll(/data-rtg-component-variant="([^"]+)"/g)) assert.ok(variants.has(match[1]), file + ': onbekende componentvariant ' + match[1]);
   }
   for (const route of Object.keys(registry.canvas)) {
-    const body = lees('public' + route).match(/<body\b[^>]*>/i)[0];
+    const html = lees('public' + route), body = html.match(/<body\b[^>]*>/i)[0];
+    /* Een canvas op het RTG Design System kent geen Edge 2 meer: zijn Edge
+       komt van /ds/edge.js en opent nooit vanzelf. Wat hier bewaakt werd (het
+       vlak krijgt de ruimte) is daar het schermtype Canvas, met dezelfde
+       vlakken die het register noemt. */
+    if (/class="[^"]*\bds-scherm\b/.test(body)) {
+      assert.match(body, /data-ds-schermtype="canvas"/, route + ': een canvas op het Design System is een Canvas-scherm');
+      for (const id of registry.canvas[route].split(',').map(s => s.trim()).filter(s => s.startsWith('#'))) {
+        assert.ok(html.includes('id="' + id.slice(1) + '"'), route + ': het vlak ' + id + ' uit het register bestaat');
+      }
+      continue;
+    }
     assert.match(body, /data-rtg-edge-2-state="compact"/, route + ': canvas opent compact');
     assert.match(body, /data-rtg-edge-2-auto="false"/, route + ': bediening wacht op de gebruiker');
   }

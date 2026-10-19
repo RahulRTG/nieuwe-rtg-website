@@ -41,13 +41,13 @@
 </div>
 
 <main class="ds-collectie" id="inhoud">
-  <div class="ds-tabs hoofdtabs" role="tablist" aria-label="RTG Reizen">
+  <div class="hoofdtabs"><div class="ds-tabs" role="tablist" aria-label="RTG Reizen">
     <button class="ds-tab" role="tab" type="button" data-tab="vandaag" aria-selected="true">Vandaag</button>
     <button class="ds-tab" role="tab" type="button" data-tab="reizen" aria-selected="false">Reizen</button>
     <button class="ds-tab" role="tab" type="button" data-tab="taxi" aria-selected="false">Taxi</button>
     <button class="ds-tab" role="tab" type="button" data-tab="samen" aria-selected="false">Samen</button>
     <button class="ds-tab" role="tab" type="button" data-tab="rahul" aria-selected="false">Rahul</button>
-  </div>
+  </div></div>
 
   <!-- VANDAAG: de reis zoals hij nu loopt (Collectie), met het volgende
        moment, de momenten, de stand van vandaag en een vraag aan Rahul. -->
@@ -368,6 +368,9 @@
 <script src="/shared/canvas-taal.js"></script>
 <script src="/shared/rtg-route-memory-core.js"></script>
 <script src="/shared/rtg-route-memory.js"></script>
+<!-- De gedeelde overgang (reisboekrij wordt het reisboek). Op een ds-scherm laadt
+     de basis hem niet; hij zet geen stijl, alleen een naam bij pageswap. -->
+<script src="/shared/rtg-heritage-transition.js"></script>
 <script src="/apps/reizen-performance.js"></script>
 <script src="/apps/reizen-stand.js"></script>
 <script src="/apps/reizen-register.js"></script>

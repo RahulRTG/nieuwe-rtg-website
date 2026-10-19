@@ -114,4 +114,21 @@
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', startAdaptief);
   else startAdaptief();
+
+  /* EEN WERKBLAD TEKENT GEEN TWEEDE EDGE. De werktafel (shared/command/
+     bladhaak.js) markeert een blad met html.rtg-command-blad en draagt zelf de
+     ene Edge; de oude rand week daar met een stijlregel op [data-rtg-edge-bar].
+     De ds-Edge kent die markering nog niet (TRAVELOS-MIGRATIE.md, open punt
+     voor /ds/shell.js), dus wijkt hij hier zolang dit scherm een blad is.
+     Ingebed (?embed=1, bijvoorbeeld in Reizen & Veilig) draagt de ouder de
+     bediening; dan wijken ook de eigen tabs. */
+  function blad() {
+    var html = d.documentElement, ingebed = html.classList.contains('tos-ingebed');
+    var edge = d.querySelector('.ds-edge'), tabs = d.querySelector('.hoofdtabs');
+    if (edge) edge.hidden = ingebed || html.classList.contains('rtg-command-blad');
+    if (tabs) tabs.hidden = ingebed;
+  }
+  new MutationObserver(blad).observe(d.documentElement, { attributes: true, attributeFilter: ['class'] });
+  if (d.body) new MutationObserver(blad).observe(d.body, { childList: true });
+  blad();
 })(window, document);

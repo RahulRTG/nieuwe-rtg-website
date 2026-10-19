@@ -91,6 +91,9 @@ module.exports = (ctx) => {
     if (data.weg) {
       const l = lijnVan(s, String(data.id || ''));
       if (!l) return { status: 404, error: 'Lijn niet gevonden.' };
+      // een reiziger aan boord checkt straks uit op deze lijn (prijs, halte)
+      const aanBoord = (db.data.ovRitten || []).filter(r => r.code === s.code && r.lijnId === l.id && r.status === 'in').length;
+      if (aanBoord) return { status: 409, error: 'Op deze lijn zijn nu ' + aanBoord + ' reiziger(s) aan boord; verwijder hem als iedereen is uitgecheckt.' };
       s.lijnen = s.lijnen.filter(x => x.id !== l.id);
       db.data.ovVoertuigen = db.data.ovVoertuigen.filter(v => !(v.code === s.code && v.lijnId === l.id));
       save();
@@ -127,7 +130,10 @@ module.exports = (ctx) => {
     ensureOv();
     const vandaag = nu().slice(0, 10);
     const ritten = db.data.ovRitten.filter(r => r.code === s.code && String(r.in.at).slice(0, 10) === vandaag);
-    const operaties = (db.data.ovOperaties || []).filter(o => ['gereed-voor-boeken', 'in-regie', 'gereed', 'onderweg'].includes(o.status));
+    /* Alleen operaties waarvan een segment bij DEZE zaak ligt: de private
+       operaties van leden zijn niet van elke OV-zaak (hier stonden ze allemaal). */
+    const operaties = (db.data.ovOperaties || []).filter(o => ['gereed-voor-boeken', 'in-regie', 'gereed', 'onderweg'].includes(o.status) &&
+      (o.segmenten || []).some(x => x.leverancier === s.code));
     const operatieBeeld = {
       actief: operaties.length,
       segmenten: operaties.reduce((n, o) => n + (o.segmenten || []).length, 0),

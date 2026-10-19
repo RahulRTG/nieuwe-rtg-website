@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2891 bestanden en 19801 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2892 bestanden en 19803 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2891 |
-| losse beweringen (`test(...)`) | 19801 |
+| toetsbestanden | 2892 |
+| losse beweringen (`test(...)`) | 19803 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 71 |
+| niets van beide | 72 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2547 bestanden, 19221 beweringen.
+2548 bestanden, 19223 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1533,6 +1533,7 @@ toets omvalt.
 | `ovhalte.test.js` | 6 | gezakt op `+->-#0` | OV: halte in plaats van punt, een jaar (NAVIGATIE.md N17). Het tarief heeft een AFSTAND nodig en geen punt. |
 | `ovincheckcode.test.js` | 8 | gezakt op `liegpoort /api/` | De OV-incheckcode (travelos.ov_incheckcode, server/kern/ov/incheckcode.js): een money-credential, want een geslaagde claim start een betaalde rit op naam van het lid. Elke control uit RELEASEKANDIDAAT.md B9 heeft... |
 | `ovkaart.test.js` | 14 | gezakt op `liegpoort /api/` | De OV-kaartverkoop: een vervoerbewijs mag alleen bestaan als er een geldige overeenkomst met de vervoerder onder ligt. Draai los: node --test test/ovkaart.test.js Wat deze toetsen bewaken: 1. |
+| `ovroutes-grenzen.test.js` | 2 | -- | Twee fouten uit de premiumdomeinkaart (docs/domeinkaarten/travelos.md 8.2): - een lijn met een reiziger aan boord kon gewoon worden verwijderd, en dan rekende het uitchecken op een lijn die er niet meer is; - het... |
 | `padgrens.test.js` | 4 | gezakt op `true->false#0` | Een voorvoegsel dekt een pad op een PADgrens, niet op een woordgrens. |
 | `paginaroutes.test.js` | 6 | gezakt op `!==->===#0` | DE ROUTES BUITEN /api/ -- de zeven die geen enkele meter kende. WAAROM DIT BESTAND ER IS. |
 | `paginascripts.test.js` | 2 | geen module gevonden | Syntaxbewaking op de inline scripts van elke pagina. Waarom dit bestaat: de apps van RTG dragen hun JavaScript in een groot inline `<script>`-blok. |

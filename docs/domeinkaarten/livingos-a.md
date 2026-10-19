@@ -941,7 +941,7 @@ Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde ag
 | Vo1 | Date-check-in met Veilig | L6 | ontbreekt | Bij DATE_ACTIVE kan het lid een wacht starten (Veilig) met de eindtijd van de date. Een gemiste check-in alarmeert de eigen kring, nooit de match. | M | **A nu** |
 | Vo2 | Fraudesignaal in het gesprek | L4 | ontbreekt | Vraagt de ander om geld of een rekeningnummer (lokale patroonherkenning), dan ziet de ontvanger een waarschuwing met het advies. Er gaat niets automatisch naar het kantoor. | M | **A nu** |
 | Vo3 | Melding met motivering terug (DSA 17) | L3 | half (meldingen bestaan) | Het kantoor beslist met een reden. De melder en de gemelde horen de beslissing en hoe ze bezwaar maken. | M | A nu |
-| Vo4 | Domeinbewijs van de reservering | L5 | fout (`commitmentId` null) | Een bevestigde reservering heeft een commitment-id en de status DATE_CONFIRMED zonder dat het domeinbewijs ontbreekt. | K | **A nu** |
+| Vo4 | Domeinbewijs van de reservering | L5 | geen fout (nagemeten 19 oktober) | `commitmentId` is null zolang de zaak niet besliste: het domeinbewijs wordt pas bij het besluit van de zaak vastgelegd (`server/opzet/trust-bewijs.js`, `bewijsHospitalityBesluit`). Dat is fail-closed en blijft zo. | — | vervalt |
 | Vo5 | Na de date: wederzijds akkoord voor vervolg | L5 | half (POST_DATE) | Beide kiezen "graag weer" of "liever niet". Alleen bij twee keer ja gaat het gesprek verder; een nee wordt nooit getoond als afwijzing. | M | A later |
 | Vo6 | EU-leeftijdsverificatie (blauwdruk) | L2 | ontbreekt | — | G | B, extern |
 
@@ -949,7 +949,7 @@ Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde ag
 Een date die echt gereserveerd is bij een gekeurde zaak, een check-in via Veilig bij de eigen kring, en een bevestiging van €10 die terugkomt als de zaak weigert.
 
 ### g. Prioritering
-- **A nu:** Vo4 (K), Vo1, Vo2 en Vo3 (M).
+- **A nu:** Vo1, Vo2 en Vo3 (M). Vo4 vervalt: geen fout.
 - **A later:** Vo5.
 - **B:** Vo6.
 
@@ -1210,7 +1210,7 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 | C2 | Plekgegevens eraf bij delen | L1 | ontbreekt | Een gedeelde of bewaarde foto heeft geen GPS in EXIF, tenzij het lid dat per foto kiest. Getoetst door de bytes te lezen. | K | **A nu** |
 | C3 | Naar De Salon, met de Salon als eigenaar | L6 | ontbreekt | "Naar de Salon" opent het plaatsen van de Salon (LivingOS-B) met de foto als bestand-id. De Camera bezit de post niet. | M | A later |
 | C4 | Portretwaarschuwing | L4 | ontbreekt | Bij delen van een foto met een herkenbaar gezicht (lokale detectie) vraagt de app "heeft de persoon toestemming?". Er wordt niets geblokkeerd. | M | A later |
-| C5 | Spraak lokaal | L1 | fout tegen de huisregel | Spraaksturing gaat via de lokale spraakroute (meeluister) of staat uit. De browser-cloud is niet de standaard. | M | A nu (melden) |
+| C5 | Spraak lokaal | L1 | fout tegen de huisregel, gemeld | Spraaksturing gaat via de lokale spraakroute (meeluister) of staat uit. De browser-cloud is niet de standaard. Besluit Centraal 19 oktober: aanbevolen nu, nog niet omgebouwd. Ook 'bewaren' is alleen een download. | M | aanbevolen nu |
 
 ### g. Prioritering
 - **A nu:** C2 (K), C1 en C5 (M).
@@ -1636,7 +1636,19 @@ Eén intentie die zichtbaar wordt in de agenda, het geld, de reis en de veilighe
 
 ## Samenvatting voor Centraal
 
-**Fouten in de code, gevonden met de inventaris.** Ik heb ze niet gerepareerd; dat gebeurt na een akkoord.
+**Reparaties na het akkoord van 19 oktober** (failing-first, één commit per fout, tak `appwerkt/living-a`):
+- **Vooruitzicht** (bevoegdheid, eerst): `/partner` met `van` vraagt een bevestigde levensband en een deling van "afspraken"; `permissions.friends` bepaalt de velden. Toets `test/instant-reality-partner.test.js`.
+- **Bellen:** het signaal `tekst` staat in de lijst. Toets `test/bellen-tekst.test.js`.
+- **Gezin:** chat en antwoord gaan naar het gekozen gezin. Toets `test/gezin-keuze.e2e.js`.
+- **Assets:** een mislukte betaling bij de wachtlijstoverdracht of terugkoop wordt gemeld en laat het verzoek open. Toetsen in `test/assets.test.js`. Bedragen boven het plafond van €5000 per boeking vragen de bankrail (Geld en eigenaar).
+- **Krant:** assist loopt via de lokaal-eerst-keten en vraagt een sessie. Toets `test/journalistiek-assist.test.js`.
+- **Podium:** de tekst zegt dat alleen de zone 'beperkt' 18+ is. Toets `test/podium-leeftijdtekst.test.js`.
+- **SCHERMEIGENAAR:** doelen van thuis, leven en onderhoud rechtgezet. Toets `test/schermeigenaar-doelen-livinga.test.js`.
+- **Logeren:** de teksten beloven geen betaling meer; de uitbetaling heeft status `buiten-rtg`. Toets `test/thuis-betaaltekst.test.js`. Het betalen zelf en de hostmelding wachten op de toezegging.
+- **Vonk:** geen fout, zie Vo4.
+- **Camera:** gemeld, niet omgebouwd (C5).
+
+**Fouten in de code, gevonden met de inventaris** (de oorspronkelijke lijst):
 - **Bellen:** het signaal `tekst` geeft 400 en de fout wordt geslikt.
 - **Gezin:** alleen het eerste gezin, `g[0]`.
 - **Assets:** stille fout bij een wachtlijstoverdracht.

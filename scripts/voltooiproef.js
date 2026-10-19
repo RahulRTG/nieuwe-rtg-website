@@ -83,6 +83,7 @@ const SCENARIOS = {
   'bescherming.js': require('./lib/voltooi/bescherming'),
   'cellier.js': require('./lib/voltooi/cellier'),
   'cercle.js': require('./lib/voltooi/cercle'),
+  'clips.js': require('./lib/voltooi/clips'),
   'commerce.js': require('./lib/voltooi/commerce'),
   'entourage.js': require('./lib/voltooi/entourage'),
   'foodcourt.js': require('./lib/voltooi/foodcourt'),

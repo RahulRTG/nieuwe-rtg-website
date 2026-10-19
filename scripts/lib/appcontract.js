@@ -254,6 +254,9 @@ const CONTRACT = {
   'link:sport': Object.assign({
     belofte: 'een lid reserveert tickets op een vak van de plattegrond die de club zelf tekent, ziet zijn toegangscode, en die code gaat bij de entree een keer naar binnen; een vol vak zegt hoeveel plaatsen er nog zijn, en een herhaalde tik reserveert nooit dubbel'
   }, voltooi('sport', 'het scenario loopt /api/member/sport/bord, /plattegrond, /ticket/koop, /tickets, /sponsors en /sponsor, de routes die /apps/sport.html zelf aanroept, met twee leden, een gratis account en de seedclub die tekent en scant')),
+  'link:clips': Object.assign({
+    belofte: 'een lid deelt een korte clip waarvan het beeld op zijn eigen toestel blijft; andere leden zien hem in een eindige dagselectie met gevolgde makers eerst, reageren en melden, en alleen de maker knipt, ondertitelt en haalt weg'
+  }, voltooi('clips', 'het scenario loopt /api/clips/feed, /maak, /volg, /reactie, /reacties, /meld, /knip, /ondertitels en /weg, de routes die /apps/clips.html zelf aanroept, met drie leden, een gratis account en het kantoor; het beeld zelf (P2P via /aanwezig en /signaal) loopt niet mee')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

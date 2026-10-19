@@ -43,10 +43,15 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
       return { status: 400, error: 'Een clip duurt 1 tot ' + CLIP_MAX_S + ' seconden.' };
     const poster = typeof data.poster === 'string' && data.poster.startsWith('data:image/') && data.poster.length <= POSTER_MAX
       ? data.poster : null;
+    /* De herhaalsleutel staat OP de kaart: een tweede tik op "Deel", of dezelfde
+       tik na een crash, vindt de eerste kaart terug in plaats van een tweede. */
+    const idem = schoon(data.idem, 200) || null;
+    const al = idem && eigen.bak('clips').find(c => c.key === key && c.idem === idem);
+    if (al) return { status: 200, ok: true, id: al.id, herhaald: true };
     if (eigen.bak('clips').filter(c => c.key === key).length >= CLIPS_PER_MAKER)
       return { status: 409, error: 'U heeft het maximum van ' + CLIPS_PER_MAKER + ' clips; haal er eerst een weg.' };
     const c = { id: id(), key, titel, duurS, poster,
-      mbGeschat: Math.min(200, Math.max(1, Math.round(Number(data.mbGeschat) || 1))), at: nu() };
+      mbGeschat: Math.min(200, Math.max(1, Math.round(Number(data.mbGeschat) || 1))), at: nu(), idem };
     eigen.bak('clips').push(c);
     save();
     aanwezigheid.set(c.id, Date.now());
@@ -154,39 +159,15 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     return { status: 200, ok: true, reactie: r };
   }
   const reacties = cid => { lijsten(); return { status: 200, reacties: (eigen.bak('clipsReacties')[String(cid || '')] || []).slice(-40) }; };
-  function meld(key, cid, reden) {
-    lijsten();
-    const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
-    eigen.bak('clipsMeldingen').push({ id: id(), clipId: c.id, titel: c.titel, maker: codenaamVan(c.key),
-      van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
-    /* Geen kap hier: die draait in het onderhoud (kern/kappen.js, houd 200).
-       Een kap in het verzoek houdt een weigering van de begroting in stand. */
-    save(); sseToOffice('sync', { scope: 'clips' });
-    return { status: 200, ok: true };
-  }
-  function officeLijst() {
-    lijsten();
-    return { status: 200, meldingen: eigen.bak('clipsMeldingen').slice(-50).reverse(),
-      totaal: eigen.bak('clips').length };
-  }
-  // kantoor haalt de kaart weg; het beeld zelf stond nooit bij RTG
-  function officeVerwijder(cid) {
-    lijsten();
-    const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
-    eigen.zetBak('clips', eigen.bak('clips').filter(x => x.id !== c.id));
-    delete eigen.bak('clipsReacties')[c.id];
-    eigen.zetBak('clipsMeldingen', eigen.bak('clipsMeldingen').filter(m => m.clipId !== c.id));
-    aanwezigheid.delete(c.id);
-    save();
-    return { status: 200, ok: true };
-  }
+  /* Melden en wat het kantoor ermee doet: ./clips-kantoor.js. */
+  const kantoor = require('./clips-kantoor')({ save, schoon, codenaamVan, sseToOffice, eigen, lijsten, clipMet, id, nu, aanwezigheid });
 
   return Object.assign(studio, { clipsMaak: maak, clipsWeg: weg, clipsAanwezig: aanwezig, clipsSignaal: signaal,
     clipsFeed: feed, clipsVolg: volg, clipsVolgMaker: volgMaker,
     clipsVan: lezers.clipsVan, clipsMetTrack: lezers.clipsMetTrack,
     clipsVolgersVan: lezers.clipsVolgersVan,
     clipsReactie: reactie, clipsReacties: reacties,
-    clipsMeld: meld, clipsOfficeLijst: officeLijst, clipsOfficeVerwijder: officeVerwijder });
+    clipsMeld: kantoor.meld, clipsOfficeLijst: kantoor.officeLijst, clipsOfficeVerwijder: kantoor.officeVerwijder });
 }
 
 module.exports = { maakClips };

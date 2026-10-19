@@ -87,3 +87,22 @@ test('meteen betaald: betaald, en nog eens betalen kan niet en kost niets', asyn
   assert.equal(w.rail.gemaakt, 1);
   assert.equal(naarVerkoper(w).length, 1);
 });
+
+test('chat en deal werken met een onveranderlijke context zonder database- of providerobject', () => {
+  const chats = {};
+  const ad = { id: 'fiets', titel: 'Fiets', prijs: 120, verkoper: VERKOPER };
+  const ctx = Object.freeze({ save: () => {}, store: () => ({ chats, geblokkeerd: {} }),
+    nu: () => '2026-10-20T10:00:00Z', clip: (v, n) => String(v || '').slice(0, n),
+    pk: p => p.soort + '|' + p.id, vind: id => id === ad.id ? ad : null,
+    zichtbaar: () => true });
+  const handel = require('../server/kern/markt/handel')(ctx);
+  const geopend = handel.reageer(ad.id, KOPER, 'Is deze fiets nog beschikbaar?');
+  assert.equal(geopend.ok, true);
+  assert.equal(geopend.chat.berichten[0].tekst, 'Is deze fiets nog beschikbaar?');
+  assert.equal(handel.chatOpen(geopend.chat.id, { soort: 'lid', id: 'vreemde' }).status, 403);
+  const voorstel = handel.dealVoorstel(geopend.chat.id, VERKOPER, 120);
+  assert.equal(voorstel.ok, true);
+  assert.equal(voorstel.chat.deal.bedrag, 120);
+  assert.equal(handel.postvak(KOPER).length, 1);
+  assert.equal(Object.hasOwn(ctx, 'chatPub'), false, 'deelmodules schrijven geen functies terug in de context');
+});

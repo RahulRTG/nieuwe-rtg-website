@@ -18,7 +18,7 @@
 
 /* De spelregels (categorieen, verbodslijsten, richtprijzen, drempels) staan
    als pure data in markt/regels.js. */
-const { CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN, RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS } = require('./markt/regels');
+const { CATEGORIEEN, STATEN, LEVERING } = require('./markt/regels');
 // de openbaarheidsregel staat apart; de Mall-vindlaag deelt hem
 const { advertentieOpenbaar } = require('./markt/openbaar');
 
@@ -150,12 +150,10 @@ function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier
   /* De handel (chat + veilige deal) en het toezicht (melden/blokkeren + AI)
      draaien als submodules op een gedeelde context, een keer opgebouwd bij
      het opstarten. */
-  const ctx = { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal, betaalWaarheid,
-    CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
-    RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS,
-    store, rid, nu, clip, pk, keurTekst, scanVeiligheid, pub, zichtbaar, vind };
+  const ctx = { save, notify, notifySupplier, haversine, betaalWaarheid,
+    store, nu, clip, pk, zichtbaar, vind };
   const { reageer, antwoord, postvak, chatOpen, chatPub, dealVoorstel, dealHier, dealBetaal } = require('./markt/handel')(ctx);
-  const { meld, blokkeer, deblokkeer, aiHelp } = require('./markt/toezicht')(ctx);
+  const { meld, blokkeer, deblokkeer, aiHelp } = require('./markt/toezicht')({ save, anthropic, store, nu, clip, pk, vind });
 
   return {
     CATEGORIEEN, STATEN, LEVERING,

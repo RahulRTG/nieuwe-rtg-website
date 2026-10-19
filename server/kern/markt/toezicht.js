@@ -1,11 +1,9 @@
 /* Markt-toezicht: melden en blokkeren (drie meldingen = verborgen) en de
    AI-hulp (prijsadvies, veiligheidsscan, nette beschrijving). Krijgt de
    gedeelde context een keer bij het opstarten vanuit kern/markt.js. */
+const { CATEGORIEEN, STATEN, RICHTPRIJS, STAAT_FACTOR, SCAM_WOORDEN, CONTACT_BUITEN } = require('./regels');
 module.exports = (ctx) => {
-  const { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal,
-    CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
-    RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS,
-    store, rid, nu, clip, pk, keurTekst, scanVeiligheid, pub, zichtbaar, vind } = ctx;
+  const { save, anthropic, store, nu, clip, pk, vind } = ctx;
   /* ---------- melden & blokkeren ---------- */
   function meld(id, melder, reden) {
     const ad = vind(id);

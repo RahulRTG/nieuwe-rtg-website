@@ -4,11 +4,9 @@
    opstarten vanuit kern/markt/handel.js. */
 const S = require('./samenkomst');
 const tijdzone = require('../../tijdzone');
+const { SAMEN_METER, SAMEN_VERS_MS } = require('../regels');
 module.exports = (ctx) => {
-  const { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine,
-    CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
-    RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS,
-    store, rid, nu, clip, pk, keurTekst, scanVeiligheid, pub, zichtbaar, vind } = ctx;
+  const { save, haversine, store, nu, pk, vind } = ctx;
   const { chatId, sein } = ctx;
   /* ---------- veilig samen betalen (GPS bij elkaar -> factuur -> Apple Pay) ----------
      De koper betaalt de verkoper pas nadat ze fysiek samen zijn: beide delen bij

@@ -142,6 +142,8 @@ function maakTokens(getUserById) {
       return u;
     } catch (e) { return null; }
   }
+  // een storing is geen uitlog (X1): ./tokenstoring.js
+  const identiteitOnbepaald = require('./tokenstoring')({ strikt, isIngetrokken, sessieIngetrokken, getUserById });
   /* De DOEL-GEBONDEN tokens (2FA-bewijs, e-mailbevestiging, mailwissel,
      sso-overdracht) staan in ./actietokens.js. Ze zijn een andere KLASSE dan een
      sessietoken en tekenen met een per-doel afgeleide sleutel; de scheiding staat
@@ -159,7 +161,7 @@ function maakTokens(getUserById) {
      aanroepers niets merken van de knip. */
   const herstel = require('./herstel').maakHerstel(getUserById);
 
-  return { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, identiteitOnbepaald, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
     ...herstel };
 }
 

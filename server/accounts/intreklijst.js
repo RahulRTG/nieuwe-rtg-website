@@ -15,6 +15,7 @@ const S = require('./state');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 const intrekSignaal = require('../kern/intreksignaal');
+const verraad = require('../lib/verraad');
 
 module.exports = function maakIntreklijst(strikt) {
   function schrijfIntrekking(soort, waarde, hash, exp) {
@@ -173,6 +174,7 @@ module.exports = function maakIntreklijst(strikt) {
       throw e;
     }
     try {
+      if (verraad.sla('intreklijst-onleesbaar')) throw new Error('verraad: intreklijst-onleesbaar');
       const r = S.zin('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
         .get(kluis.sign(String(token)));
       return !!r && Number(r.verloopt) >= klok.nu();

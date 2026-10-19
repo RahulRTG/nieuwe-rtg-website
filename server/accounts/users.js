@@ -290,7 +290,7 @@ const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 /* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
    in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
    zodat aanroepers niets merken. */
-const { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
+const { issueToken, verifyToken, identiteitOnbepaald, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, consumeReset, setPassword } = require('./tokens').maakTokens(getUserById);
 
 /* Openbaar profiel voor de client (nooit de wachtwoord-hash of ruwe kluis). */
@@ -325,7 +325,7 @@ module.exports = {
   findByPublicMail, reservePublicMail,
   renameUser, setTier, opPasOvergang, pasMeldStand, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone, setEmail,
   zetSessiegrens,
-  issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
+  issueToken, verifyToken, identiteitOnbepaald, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, consumeReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

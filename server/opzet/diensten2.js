@@ -225,6 +225,9 @@ function auth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   const sess = resolveSession(token);
+  // een storing in de kluis of intreklijst is geen uitlog: 503, zodat de client het token houdt
+  if (!sess && token && accounts.identiteitOnbepaald && accounts.identiteitOnbepaald(token))
+    return res.status(503).json({ error: 'Uw sessie kan even niet worden gecontroleerd. Probeer het zo opnieuw.', code: 'IDENTITEIT_ONBEPAALD' });
   if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
   // Alleen leden-sessies horen hier: een echt account, of een demo-pas met een
   // bekende persona-tier. Leverancier- en kantoor-sessies (met een eigen auth

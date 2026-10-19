@@ -299,12 +299,14 @@ function contractFouten(meting, DS = module.exports.DS) {
   for (const t of contract.schermtypen) if (!fs.existsSync(path.join(DS, 'schermen', t + '.css'))) fouten.push('schermtype ' + t + ' staat in het contract maar public/ds/schermen/' + t + '.css ontbreekt');
   for (const c of contract.componenten) if (!fs.existsSync(path.join(DS, 'componenten', c + '.css'))) fouten.push('component ' + c + ' staat in het contract maar public/ds/componenten/' + c + '.css ontbreekt');
   for (const w of contract.werelden) if (!fs.existsSync(path.join(DS, 'thema', w + '.css'))) fouten.push('wereld ' + w + ' staat in het contract maar public/ds/thema/' + w + '.css ontbreekt');
+  /* 9. De nadruk: een gesloten lijst, gedragen door tokens (par. 7). */
+  fouten.push(...require('./lib/nadruk.js').nadrukFouten(contract, DS, path.join(WORTEL, 'public')));
   /* Een scherm op het systeem laadt geen erfenis, draagt geen eigen blok en
      laadt geen stijlinjecterend script buiten de overgangslijst. Half
      migreren bestaat niet (ONTWERPSYSTEEM.md par. 5). */
   const overgang = new Map();
   for (const o of contract.overgangsscripts || []) {
-    if (!o.pad || !o.reden || !o.vervalt) fouten.push('contract.overgangsscripts: ' + (o.pad || '?') + ' zonder pad, reden of vervaldatum');
+    if (!o.pad || !o.reden || !o.vervalt || !o.eigenaar || !o.plan) fouten.push('contract.overgangsscripts: ' + (o.pad || '?') + ' zonder pad, eigenaar, reden, verwijderplan of vervaldatum');
     else if (o.vervalt < vandaag()) fouten.push('contract.overgangsscripts: ' + o.pad + ' is verlopen op ' + o.vervalt);
     else overgang.set(o.pad, o);
   }
@@ -331,7 +333,7 @@ function ratelFouten(meting, norm) {
   const fouten = [], ruimer = [];
   const uitz = new Map();
   for (const u of norm.uitzonderingen || []) {
-    if (!u.pad || !u.reden || !u.vervalt) { fouten.push('uitzondering zonder pad, reden of vervaldatum: ' + JSON.stringify(u)); continue; }
+    if (!u.pad || !u.reden || !u.vervalt || !u.eigenaar || !u.plan) { fouten.push('uitzondering zonder pad, eigenaar, reden, verwijderplan of vervaldatum: ' + JSON.stringify(u)); continue; }
     if (u.vervalt < vandaag()) { fouten.push('uitzondering voor ' + u.pad + ' is verlopen op ' + u.vervalt); continue; }
     uitz.set(u.pad, u);
   }

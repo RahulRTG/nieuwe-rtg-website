@@ -308,7 +308,7 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/nav/' + pad, { method: 'POST',
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let toastT;
@@ -657,7 +657,7 @@
      laat dan alleen de afstanden weg. Dus sturen we wat we weten, en niets meer. */
   async function zoekBestemmingen(q) {
     const vraag = ++zoekVraag;
-    const r = await api('bestemmingen', hier ? { q, lat: hier.lat, lng: hier.lng } : { q });
+    const r = await api('/api/nav/bestemmingen', hier ? { q, lat: hier.lat, lng: hier.lng } : { q });
     if (vraag !== zoekVraag) return;
     if (r.status !== 200) return meldInLijst(r.body.error || 'Zoeken lukt hier nu niet.');
     const rij = (r.body.bestemmingen || []).slice(0, 18);
@@ -692,7 +692,7 @@
        en aankomstpunt" terug op een veld dat hij nooit heeft gezien. De uitweg
        staat al in de poort: kies zelf waar u vertrekt. */
     if (!hier) { zeg('Ik weet nog niet waar u bent. Kies eerst uw vertrekpunt.'); vraagVertrekpunt(); return; }
-    const r = await api('route', { van: hier, naar, modus, profiel });
+    const r = await api('/api/nav/route', { van: hier, naar, modus, profiel });
     if (r.status !== 200) { zeg(r.body.error || 'Geen route gevonden.'); return; }
     route = r.body;
     toonRoute();
@@ -790,7 +790,7 @@
      niemand het antwoord ophaalde. Een badge die niet is bijgewerkt is geen
      lege badge; hij liegt. */
   async function haalStatus() {
-    const r = await api('status', hier ? { lat: hier.lat, lng: hier.lng, land } : {});
+    const r = await api('/api/nav/status', hier ? { lat: hier.lat, lng: hier.lng, land } : {});
     if (r.status !== 200) return;
     $('#sourceNetwork').textContent = r.body.live ? r.body.live.netwerk : '0';
     $('#sourcePartners').textContent = r.body.live ? r.body.live.partners : '0';
@@ -859,7 +859,7 @@
   });
   async function zoekVertrek(q) {
     const vraag = ++startVraag;
-    const r = await api('bestemmingen', { q });
+    const r = await api('/api/nav/bestemmingen', { q });
     if (r.status !== 200 || vraag !== startVraag) return;
     const lijst = $('#startResultaten'); lijst.innerHTML = '';
     for (const p of (r.body.bestemmingen || []).slice(0, 8)) {
@@ -890,7 +890,7 @@
   }));
   async function haalFlits() {
     if (!hier) return;
-    const r = await api('poi', { lagen: ['flits'], lat: hier.lat, lng: hier.lng, land });
+    const r = await api('/api/nav/poi', { lagen: ['flits'], lat: hier.lat, lng: hier.lng, land });
     if (r.status === 200) flitsPunten = (r.body.lagen.flits || []).map(f => ({ ...f, laag: 'flits' }));
   }
 
@@ -914,7 +914,7 @@
     toonMeldkeuze(false); $('#meldknop').focus();
     if (!soort) return;
     if (!hier) return zeg('Ik weet nog niet waar u bent; een melding zonder plek zegt niets.');
-    const r = await api('meld', { soort, lat: hier.lat, lng: hier.lng, land });
+    const r = await api('/api/nav/meld', { soort, lat: hier.lat, lng: hier.lng, land });
     if (r.body.error) return zeg(r.body.error);
     zeg(r.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : MELDNAAM[soort] + ' gemeld voor het netwerk.');
     await haalFlits(); bouwPinnen();
@@ -974,7 +974,7 @@
   /* ---- start ---- */
   async function initialiseerKaart() {
     if (kaartBegonnen || !hier) return;
-    const r = await api('kaart', { lat: hier.lat, lng: hier.lng });
+    const r = await api('/api/nav/kaart', { lat: hier.lat, lng: hier.lng });
     if (r.status !== 200) {
       await haalStatus();                       // de badge hoort hetzelfde te zeggen als de poort
       $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.';
@@ -1146,7 +1146,7 @@
   }
 
   async function kaartenLaad() {
-    const r = await api('gebieden');
+    const r = await api('/api/nav/gebieden');
     if (r.status !== 200) { zeg(r.body.error || 'De kaarten zijn niet op te halen.'); return; }
     kaartenStand = r.body;
     await toestelMeten();
@@ -1226,7 +1226,7 @@
       return;
     }
     tk.textContent = 'Manifest...';
-    const mf = await api('gebied/pakket', { code });
+    const mf = await api('/api/nav/gebied/pakket', { code });
     if (mf.status !== 200) {
       tk.disabled = false; tk.textContent = 'Naar toestel';
       zeg(mf.body.error || 'Deze kaart is niet op te halen.');
@@ -1251,7 +1251,7 @@
     const code = knop.dataset.code;
     const gekozen = knop.getAttribute('aria-pressed') === 'true';
     knop.disabled = true;
-    const r = await api(gekozen ? 'gebied/weg' : 'gebied/kies', { code });
+    const r = await api(gekozen ? '/api/nav/gebied/weg' : '/api/nav/gebied/kies', { code });
     knop.disabled = false;
     if (r.status !== 200) { zeg(r.body.error || 'Dat lukte niet.'); return; }
     /* De hele stand opnieuw ophalen in plaats van de knop zelf omzetten: de

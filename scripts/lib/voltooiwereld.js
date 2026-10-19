@@ -315,4 +315,29 @@ async function verbind(w, A, B) {
   return { a: { key: ca.me, codenaam: ca.codename }, b: { key: cb.me, codenaam: cb.codename } };
 }
 
-module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, verbind, KANTOORWERELD };
+/* EEN MEDEWERKER VAN HET KANTOOR OP NAAM, langs de enige weg die die rol aan
+   een account hangt (AUTHORITY.md fase 2): een vers lid, de eigenaar maakt een
+   uitnodiging op zijn codenaam, het lid koppelt de kantoorrol met die
+   uitnodiging en start daarna met zijn eigen account een kantoorsessie
+   (/api/account/start, rol kantoor) -- precies wat RTG One, Decision Room en
+   Project Room zelf doen. Buiten productie maakt de eigenaar de uitnodiging
+   zonder passkey (de terugval die de route zelf zo noemt). Geeft het lid terug
+   met `kantoor` (de kantoorsessie) en `codenaam`. */
+async function kantoorMedewerker(w, merk) {
+  const lid = await nieuwLid(w, merk);
+  const c = (await w.post('/api/member/connections', {}, lid.token)).data || {};
+  if (!c.codename) throw new Error('het nieuwe lid heeft geen codenaam');
+  const K = await eigenaarSessie(w);
+  const u = await w.post('/api/office/kantoor/uitnodiging', { codenaam: c.codename, idem: 'voltooi-' + merk + '-' + c.codename }, K);
+  if (u.status !== 200 || !u.data || !u.data.code) throw new Error('de eigenaar kon geen kantooruitnodiging maken (' + u.status + ')');
+  const k = await w.post('/api/account/koppel', { soort: 'kantoor', uitnodiging: u.data.code }, lid.token);
+  if (k.status !== 200) throw new Error('de kantoorrol koppelen lukte niet (' + k.status + ')');
+  const s = await w.post('/api/account/start', { rol: 'kantoor' }, lid.token);
+  if (s.status !== 200 || !s.data || !s.data.token) throw new Error('de kantoorsessie starten lukte niet (' + s.status + ')');
+  lid.codenaam = c.codename;
+  lid.key = c.me;
+  lid.kantoor = s.data.token;
+  return lid;
+}
+
+module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, verbind, kantoorMedewerker, KANTOORWERELD };

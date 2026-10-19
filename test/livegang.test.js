@@ -16,11 +16,12 @@ const { startServer } = require('./helper');
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-live-'));
 
-async function api(pad, body) {
+async function api(pad, body, token) {
   return fetch(BASE + pad, {
     method: 'POST',
     // productie stuurt http door naar https; achter de proxy telt dit header-bewijs
-    headers: { 'Content-Type': 'application/json', 'X-Forwarded-Proto': 'https' },
+    headers: Object.assign({ 'Content-Type': 'application/json', 'X-Forwarded-Proto': 'https' },
+      token ? { Authorization: 'Bearer ' + token } : {}),
     body: JSON.stringify(body || {})
   });
 }
@@ -66,9 +67,17 @@ test('productie start schoon: geen demozaken, geen demopersoneel, geen voorbeeld
   // de openbare personeelskiezer is in productie dicht, vóór een zaak wordt opgezocht
   assert.equal((await api('/api/supplier/roster', { code: 'KIKUNOI' })).status, 403);
   assert.equal((await api('/api/supplier/roster', { code: 'VORA' })).status, 403);
-  // een gast ziet een lege Salon (geen geseede verhalen) en lege catalogus
-  const gast = await (await api('/api/login', { tier: 'guest' })).json();
-  const state = gast.state;
+  /* een gratis account ziet een lege Salon (geen geseede verhalen) en een lege
+     catalogus. Dit was de gastinlog; die bestaat buiten de demo niet meer
+     (eigenaarsbesluit 19 oktober 2026), en dat staat hier dan ook vast. */
+  const zonderAccount = await api('/api/login', { tier: 'guest' });
+  assert.equal(zonderAccount.status, 403, 'in productie geeft de gastinlog geen sessie');
+  assert.equal((await zonderAccount.json()).token, undefined);
+  const u = Date.now().toString().slice(-8);
+  const gratis = await (await api('/api/auth/register', { name: 'Proefgenoot', email: 'live' + u + '@voorbeeld.nl',
+    phone: '06' + u, password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'guest' })).json();
+  assert.ok(gratis.token, 'een gratis account langs de echte registratie: ' + JSON.stringify(gratis).slice(0, 160));
+  const state = (await (await api('/api/state', {}, gratis.token)).json()).state;
   assert.equal((state.posts || []).filter(p => typeof p.id === 'number' && p.id <= 6).length, 0, 'geen voorbeeldposts');
   assert.equal((state.suppliers || []).length, 0, 'geen demozaken in de catalogus');
 });

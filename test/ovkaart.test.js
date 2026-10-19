@@ -429,3 +429,21 @@ test('12. de teruggave bij een storing rekent een abonnement op DAGbasis af', as
   const nog = await api('/api/staff/mob/kaart/controle', { code: await toonCode(ab.id, lidE), lijnId: 'L1' }, pda);
   assert.equal(nog.status, 200, 'de reiziger mag er nog steeds mee reizen');
 });
+
+test('13. dezelfde herhaalsleutel na een crash geeft hetzelfde kaartje, geen tweede en geen technische weigering', async () => {
+  /* De idem-poort is een geheugenlaag en is na een crash leeg. Met een vers
+     aankoop-id weigerde de geldlaag de herhaling met "Deze economische sleutel
+     hoort al bij een andere boeking" (scripts/lib/voltooi/ov.js). */
+  const lidF = await lid();
+  const lijf = { vervoerder: 'TRANSIT', lijnId: 'L1', van: 'h-stad', naar: 'h-tal', product: 'enkel', idem: 'crash-1' };
+  const eerst = await api('/api/mob/kaart/koop', lijf, lidF);
+  assert.equal(eerst.status, 200, eerst.body.error || '');
+  stop(srv && srv.child);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
+  base = srv.base;
+  const weer = await api('/api/mob/kaart/koop', lijf, lidF);
+  assert.equal(weer.status, 200, 'geen weigering: ' + (weer.body.error || ''));
+  assert.equal(weer.body.kaartje.id, eerst.body.kaartje.id, 'hetzelfde kaartje');
+  const mijn = (await api('/api/mob/kaart/mijn', {}, lidF)).body.kaartjes;
+  assert.equal(mijn.length, 1, 'en er is er een, niet twee');
+});

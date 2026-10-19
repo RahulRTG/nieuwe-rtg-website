@@ -56,15 +56,20 @@ test('4. de lezer van APPWERKT leest het echte register als een gesloten keten',
   assert.equal(u.status, 'BEWEZEN', REGISTER + ' leest als ' + u.status + ': ' + u.reden);
 });
 
-test('5. het contract wijst het Privékantoor aan, en de proef raakt de routes van zijn scherm', () => {
-  const { CONTRACT } = require('../scripts/lib/appcontract');
+/* Sinds 19 oktober 2026 levert de voltooiproef voltooibaar voor het
+   Privékantoor (scripts/lib/voltooi/rechterhand.js); deze keten staat dan met
+   zijn reden in ZONDER_APP en mag nergens stil verdwijnen. */
+test('5. de keten staat met reden in ZONDER_APP, en de proef raakt de routes van het scherm', () => {
+  const { CONTRACT, ZONDER_APP } = require('../scripts/lib/appcontract');
   const c = CONTRACT['link:rechterhand'];
-  assert.ok(c && c.voltooibaar && c.voltooibaar.register === REGISTER, 'link:rechterhand leest dit register niet');
+  const zonder = ZONDER_APP.find((z) => z.register === REGISTER);
+  assert.ok(c && c.voltooibaar && c.voltooibaar.instrument === 'scripts/lib/voltooi/rechterhand.js', 'link:rechterhand leest het scenario niet');
+  assert.ok(zonder && zonder.reden && zonder.nodig, REGISTER + ' staat niet met zijn reden in ZONDER_APP');
   /* De koppeling die scripts/lib/bewijsbron.js eist: de proef raakt de
      lid-routes die het tabblad Zaken (apps/lifestyle-lus.js) aanroept. */
   const scherm = fs.readFileSync(path.join(WORTEL, 'public', 'apps', 'lifestyle-lus.js'), 'utf8');
   for (const pad of ['lus/intake', 'lus/zaak', 'lus/beslis', 'lus/toelichting']) {
-    assert.ok(scherm.includes("'" + pad + "'"), 'het scherm roept ' + pad + ' niet aan');
+    assert.ok(scherm.includes("'/api/member/bureau/" + pad + "'"), 'het scherm roept ' + pad + ' niet aan');
     assert.ok(bron.includes('/api/member/bureau/' + pad), 'de proef loopt ' + pad + ' niet');
   }
 });

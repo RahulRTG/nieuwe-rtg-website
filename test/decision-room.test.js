@@ -20,8 +20,8 @@ test('Decision Room leest echte RTG One-data en bewaart de menselijke grens', ()
   const controller = lees('public/apps/decision-room.js');
   const afweging = lees('public/apps/decision-room-afweging.js');
   const besluit = lees('public/apps/decision-room-besluit.js');
-  assert.match(controller, /api\('state'/);
-  assert.match(controller, /api\('goedkeuring\/beslis'/);
+  assert.match(controller, /api\('\/api\/rtgone\/state'/);
+  assert.match(controller, /api\('\/api\/rtgone\/goedkeuring\/beslis'/);
   assert.match(afweging, /x\.bronMailId/);
   assert.match(afweging, /x\.documentId/);
   assert.match(besluit, /Rahul kan voorbereiden, nooit bevestigen/);

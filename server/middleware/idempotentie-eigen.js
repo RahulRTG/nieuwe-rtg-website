@@ -40,7 +40,9 @@ const EIGEN = [
   /* de kantooruitnodiging bindt haar sleutel aan de uitgifte (kern/kantoor/uitnodiging.js)
      en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
   '/api/office/kantoor/uitnodiging',
-  // de pot onthoudt zijn eigen sleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
+  // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
+  '/api/comm/stuur',
+  // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
   '/api/geld/pot/reserveer'
 ];
 

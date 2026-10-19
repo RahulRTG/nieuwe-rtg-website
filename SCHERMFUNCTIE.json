@@ -3,12 +3,12 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-19",
-    "commit": "f6b7d1bc"
+    "commit": "e41e09ca"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-10-19",
-      "commit": "f6b7d1bc",
+      "commit": "e41e09ca",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -2145,9 +2145,9 @@
   "totaal": {
     "schermen": 327,
     "aliassen": 20,
-    "zonderServer": 53,
+    "zonderServer": 52,
     "zonderInkomend": 1,
-    "overlapParen": 21,
+    "overlapParen": 22,
     "titelbotsingen": 1,
     "menuOpAlias": 0
   },
@@ -2356,6 +2356,19 @@
       "voorbeeld": [
         "/api/office/",
         "/api/office/stream"
+      ]
+    },
+    {
+      "a": "public/apps/ov.html",
+      "b": "public/apps/rit.html",
+      "gedeeld": 4,
+      "jaccard": 0.12,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/mob/aanbod",
+        "/api/mob/mijn",
+        "/api/mob/plekken",
+        "/api/mob/volg"
       ]
     },
     {
@@ -2732,7 +2745,10 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/arrival/"
+        "/api/arrival/interpret",
+        "/api/arrival/pass",
+        "/api/arrival/pulse",
+        "/api/arrival/request"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3732,7 +3748,9 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/rtgone/"
+        "/api/rtgone/goedkeuring",
+        "/api/rtgone/goedkeuring/beslis",
+        "/api/rtgone/state"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9375,12 +9393,18 @@
         }
       ],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/member/dossier",
+        "/api/member/identiteit/verzoeken",
+        "/api/member/loonstroken"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/member"
+      ],
+      "zonderServer": false,
       "inkomend": 3,
       "inIndex": 7,
       "inkomendVan": [
@@ -10341,7 +10365,9 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/move/"
+        "/api/move/gevolg",
+        "/api/move/reis",
+        "/api/move/volgende"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10448,7 +10474,16 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/nav/"
+        "/api/nav/bestemmingen",
+        "/api/nav/gebied/kies",
+        "/api/nav/gebied/pakket",
+        "/api/nav/gebied/weg",
+        "/api/nav/gebieden",
+        "/api/nav/kaart",
+        "/api/nav/meld",
+        "/api/nav/poi",
+        "/api/nav/route",
+        "/api/nav/status"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10723,8 +10758,36 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/mob/",
-        "/api/ov/"
+        "/api/mob/aanbod",
+        "/api/mob/abo/aanbod",
+        "/api/mob/abo/koop",
+        "/api/mob/abo/mijn",
+        "/api/mob/annuleer",
+        "/api/mob/beleid",
+        "/api/mob/kaart/aanbod",
+        "/api/mob/kaart/koop",
+        "/api/mob/kaart/mijn",
+        "/api/mob/kaart/toon",
+        "/api/mob/mijn",
+        "/api/mob/pendel",
+        "/api/mob/pendel/reserveer",
+        "/api/mob/plekken",
+        "/api/mob/reis/annuleer",
+        "/api/mob/reis/boek",
+        "/api/mob/reis/mijn",
+        "/api/mob/reis/plan",
+        "/api/mob/volg",
+        "/api/ov/code",
+        "/api/ov/code/intrek",
+        "/api/ov/hier",
+        "/api/ov/kaart",
+        "/api/ov/mijn",
+        "/api/ov/operatie/bevestig",
+        "/api/ov/operatie/concept",
+        "/api/ov/operatie/segment",
+        "/api/ov/operaties",
+        "/api/ov/regie",
+        "/api/ov/uit"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11304,7 +11367,10 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/rtgone/"
+        "/api/rtgone/project/bewijs",
+        "/api/rtgone/project/oplever",
+        "/api/rtgone/project/taak",
+        "/api/rtgone/state"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -12190,7 +12256,17 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/rtgone/"
+        "/api/rtgone/automatisering/herstel",
+        "/api/rtgone/automatisering/voer",
+        "/api/rtgone/automatisering/voorbereid",
+        "/api/rtgone/belofte",
+        "/api/rtgone/frictie",
+        "/api/rtgone/intentie",
+        "/api/rtgone/overdracht",
+        "/api/rtgone/project/van-mail",
+        "/api/rtgone/rol/geef",
+        "/api/rtgone/rol/trek",
+        "/api/rtgone/state"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13454,7 +13530,12 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/vertegenwoordiging"
+        "/api/vertegenwoordiging/aanvaard",
+        "/api/vertegenwoordiging/bevoegdheden",
+        "/api/vertegenwoordiging/grens",
+        "/api/vertegenwoordiging/intrek",
+        "/api/vertegenwoordiging/mijn",
+        "/api/vertegenwoordiging/simulatie"
       ],
       "schilPaden": [],
       "domeinen": [

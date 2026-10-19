@@ -48,6 +48,18 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1fhp8yt:not(#_#_#_){background:var(--goud)}
+.s-1fnqv1m:not(#_#_#_){background:var(--rood)}
+.s-xlt4sp:not(#_#_#_){background:var(--groen)}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -76,9 +88,9 @@
     <div class="uitkomst" id="over" aria-live="polite">0,00</div>
     <div class="balk" id="verdeling" aria-hidden="true"></div>
     <div class="legenda">
-      <span><i style="background:var(--rood)"></i>vaste lasten</span>
-      <span><i style="background:var(--goud)"></i>vrij uitgeven</span>
-      <span><i style="background:var(--groen)"></i>sparen en over</span>
+      <span><i class="s-1fnqv1m"></i>vaste lasten</span>
+      <span><i class="s-1fhp8yt"></i>vrij uitgeven</span>
+      <span><i class="s-xlt4sp"></i>sparen en over</span>
     </div>
     <ul class="advies" id="advies"></ul>
   </div>

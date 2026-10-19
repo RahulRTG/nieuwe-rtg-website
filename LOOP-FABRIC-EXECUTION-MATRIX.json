@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2686,
+        "kernelModules": 2722,
         "mutationContracts": 61,
         "routes": 64,
         "screens": 20,
@@ -140,7 +140,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 149,
+        "kernelModules": 152,
         "mutationContracts": 291,
         "routes": 291,
         "screens": 8,
@@ -202,7 +202,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 13,
-        "kernelModules": 165,
+        "kernelModules": 169,
         "mutationContracts": 1077,
         "routes": 1098,
         "screens": 30,
@@ -317,7 +317,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 8,
-        "kernelModules": 27,
+        "kernelModules": 28,
         "mutationContracts": 93,
         "routes": 95,
         "screens": 8,
@@ -477,7 +477,7 @@
         "sourceOwners": 32,
         "kernelModules": 62,
         "mutationContracts": 531,
-        "routes": 534,
+        "routes": 535,
         "screens": 45,
         "dataSchema": "geen centrale uitbreiding toegestaan",
         "newSharedPrimitive": "partitionerings- en querycontract vereist vóór brede aansluiting",
@@ -639,7 +639,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 38,
-        "kernelModules": 145,
+        "kernelModules": 147,
         "mutationContracts": 1142,
         "routes": 1172,
         "screens": 89,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2713,
+        "kernelModules": 2750,
         "mutationContracts": 2077,
         "routes": 2099,
         "screens": 98,

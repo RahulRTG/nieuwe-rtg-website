@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-11T09:51:38.291Z",
-    "commit": "d4750b85b",
+    "op": "2026-10-18T17:45:55.643Z",
+    "commit": "0b79bad50",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 4,
     "instrument": "scripts/idemidentiteit.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "soort": "triage",
   "uitleg": "Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast. Gelezen is elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die daar met de hand omheen gaat; lexicaal, dus zonder iets uit te voeren.",
@@ -13,15 +13,15 @@
   "graad": "vermoed",
   "waaromVermoed": "de argumenten worden uit de BRON gelezen en niet uitgevoerd; een naam die via een hulpfunctie in de afdruk belandt, telt hier als een naam en niet als de velden erachter.",
   "aanroepplekken": 32,
-  "verklaard": 1,
+  "verklaard": 3,
   "geenAfdruk": 0,
-  "voegtNietsToe": 2,
+  "voegtNietsToe": 0,
   "voegtToe": 25,
   "nietTeLezen": 4,
   "voegtToeIsGeenGoedkeuring": true,
   "handwerkPlekken": 5,
-  "handwerkVergelijkt": 4,
-  "handwerkGeenVergelijking": 1,
+  "handwerkVergelijkt": 5,
+  "handwerkGeenVergelijking": 0,
   "plekken": [
     {
       "bestand": "server/kern/bank/incasso.js",
@@ -48,18 +48,20 @@
     },
     {
       "bestand": "server/kern/bank/ledenbank.js",
-      "regel": 53,
+      "regel": 54,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
         "c"
       ],
       "afdrukNamen": [
-        "c"
+        "c",
+        "codenaam",
+        "idemContract",
+        "identiteitVan"
       ],
-      "regelTekst": "const vast = await metIdem('bankakkoord:' + c, 'bankakkoord|' + c, () => {",
-      "afdrukExtra": [],
-      "uitspraak": "voegtNietsToe"
+      "regelTekst": "const vast = await metIdem('bankakkoord:' + c, idemContract.identiteitVan('bank.akkoord', { codenaam: c }), () => {",
+      "uitspraak": "verklaard"
     },
     {
       "bestand": "server/kern/bank/overboeken.js",
@@ -226,7 +228,7 @@
     },
     {
       "bestand": "server/kern/kassa/herhaling.js",
-      "regel": 67,
+      "regel": 78,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -329,7 +331,7 @@
     },
     {
       "bestand": "server/kern/pay/partner-uitbetaal.js",
-      "regel": 52,
+      "regel": 54,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -337,11 +339,12 @@
         "supplierCode"
       ],
       "afdrukNamen": [
+        "idemContract",
+        "identiteitVan",
         "supplierCode"
       ],
-      "regelTekst": "return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {",
-      "afdrukExtra": [],
-      "uitspraak": "voegtNietsToe"
+      "regelTekst": "return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null,",
+      "uitspraak": "verklaard"
     },
     {
       "bestand": "server/kern/pay/partner.js",
@@ -593,7 +596,7 @@
     },
     {
       "bestand": "server/kern/podium/interactie.js",
-      "regel": 32,
+      "regel": 33,
       "soort": "eigen",
       "binding": "server/kern/podium/index.js",
       "uitspraak": "nietTeLezen",
@@ -601,7 +604,7 @@
     },
     {
       "bestand": "server/kern/podium/interactie.js",
-      "regel": 51,
+      "regel": 52,
       "soort": "eigen",
       "binding": "server/kern/podium/index.js",
       "uitspraak": "nietTeLezen",
@@ -642,11 +645,16 @@
   "handwerk": [
     {
       "bestand": "server/kern/betaalopdracht/rij.js",
-      "regel": 58,
+      "regel": 74,
       "opzoeker": "vindOpIdem",
       "gevondenAls": "bestaand",
-      "vergeleken": [],
-      "uitspraak": "geenVergelijking",
+      "vergeleken": [
+        "bestemming",
+        "bron",
+        "centen",
+        "soort"
+      ],
+      "uitspraak": "vergelijkt",
       "regelTekst": "const bestaand = vindOpIdem(o.idemSleutel);"
     },
     {

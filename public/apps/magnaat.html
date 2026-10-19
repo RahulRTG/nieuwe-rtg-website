@@ -118,6 +118,16 @@
 <script src="/shared/media.js"></script>
 <script src="/shared/realtime.js"></script>
 <link href="/shared/rtg-magnaat-2026.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14svwza:not(#_#_#_){margin-top:1.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -338,7 +348,7 @@
             <label>RTF-bijdrage (% omzet)<input id="ecoImpact" name="impactPct" type="number" min="0" max="20" step="0.1" required></label>
             <button class="btn primary wide" type="submit">Strategie vastleggen</button>
           </form>
-          <div class="eyebrow" style="margin-top:1.25rem">Stress-test volgende dag</div><div class="scenario-row" id="ecoScenarios"></div>
+          <div class="eyebrow s-14svwza">Stress-test volgende dag</div><div class="scenario-row" id="ecoScenarios"></div>
         </section>
         <section class="ecopanel"><div class="eyebrow">Omzet en winst · praktijkbedrijf</div><h3>Bedrijfsprestatie</h3><div class="chartlegend"><span><i></i>Omzet</span><span><i class="winst"></i>Winst</span></div><div class="ecochart" id="ecoChart"></div><table class="companytable"><thead><tr><th>Bedrijf</th><th>Omzet</th><th>Winst</th><th>Kas</th><th>Team</th><th>Kwaliteit</th></tr></thead><tbody id="ecoCompanies"></tbody></table></section>
       </div>

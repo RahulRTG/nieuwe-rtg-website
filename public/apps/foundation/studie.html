@@ -28,6 +28,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-166nr9c:not(#_#_#_){color:var(--zacht);font-size:.82rem;padding:.3rem 0 0}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -56,7 +66,7 @@
       <textarea class="veld" id="vraag" rows="1" placeholder="Ik zou graag..." maxlength="1000"></textarea>
       <button class="knop" id="stuur" data-hoofdactie>Vraag</button>
     </div>
-    <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
+    <div class="s-166nr9c">Wat je hier typt wordt niet bewaard.</div>
     <div class="knoprij h-mt90">
       <a class="knop grijs klein" href="cv.html">Werk aan je cv</a>
       <a class="knop grijs klein" href="dromen.html">Zet het als doel</a>

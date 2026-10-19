@@ -36,7 +36,7 @@
     const t = ttHuidig;
     const gasten = Object.entries(t.perGast || {});
     container.innerHTML =
-      '<div class="tt-tot" style="border-top:none;padding-top:0;"><span>' + (t.table || '') + '</span><span>' + t.aantalBonnen + ' ' + T('tt.bonnen','bon(nen)') + ' · ' + t.aantalGasten + ' ' + T('tt.gasten','gast(en)') + '</span></div>' +
+      '<div class="tt-tot s-1ptwtu"><span>' + (t.table || '') + '</span><span>' + t.aantalBonnen + ' ' + T('tt.bonnen','bon(nen)') + ' · ' + t.aantalGasten + ' ' + T('tt.gasten','gast(en)') + '</span></div>' +
       gasten.map(([naam, som]) => '<div class="tt-gast"><span>' + naam + '</span><span class="n">' + eur(som) + '</span></div>').join('') +
       (t.bonnen || []).map(b => '<div class="tt-bon">• ' + b.ref + ' · ' + b.codename + ' · ' + eur(b.total) + '</div>').join('') +
       '<div class="tt-tot"><span>' + T('tt.totaal','Totaal') + '</span><span>' + eur(t.subtotaal) + '</span></div>' +
@@ -51,7 +51,7 @@
       ttHuidig = d.ticket;
       const box = document.getElementById('ttBody');
       if (box) ttRender(box);
-    } catch(e){ ttHuidig = null; const box = document.getElementById('ttBody'); if (box) box.innerHTML = '<div class="tt-bon" style="padding:.6rem .1rem;">' + e.message + '</div>'; }
+    } catch(e){ ttHuidig = null; const box = document.getElementById('ttBody'); if (box) box.innerHTML = '<div class="tt-bon s-1gbkfgg">' + e.message + '</div>'; }
   }
   async function ttAfrekenen(){
     if (!ttHuidig) return;
@@ -106,7 +106,7 @@
       (m.role === 'ai' ? '<span class="who">AI</span>' : '') +
       m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
       (m.did ? '<span class="ai-did">✓ ' + T('ai.did','uitgevoerd') + '</span>' : '') + '</div>'
-    ).join('') : '<div class="pcempty" style="padding:1.4rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;">' + T('ai.empty','Uw assistent kent het hele bedrijf: de kassa, de kamers, de klussen, de gasten. Vraag iets of geef een opdracht.') + '</div>';
+    ).join('') : '<div class="pcempty s-cfyima">' + T('ai.empty','Uw assistent kent het hele bedrijf: de kassa, de kamers, de klussen, de gasten. Vraag iets of geef een opdracht.') + '</div>';
     t.scrollTop = t.scrollHeight;
   }
   async function sendAI(){

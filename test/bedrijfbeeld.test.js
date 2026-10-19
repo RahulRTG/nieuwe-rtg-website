@@ -27,9 +27,9 @@ const api = (pad, body, bearer) => fetch(BASE +
 
 let W, B, DIR, MED, dochter;
 async function lid(naam, rollen) {
-  const a = (await api('/lid/aanmeld', { werkruimte: W, naam })).body;
-  await api('/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
-  if (rollen.length) await api('/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen });
+  const a = (await api('/api/bedrijf/lid/aanmeld', { werkruimte: W, naam })).body;
+  await api('/api/bedrijf/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
+  if (rollen.length) await api('/api/bedrijf/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen });
   return { werkruimte: W, lidToken: a.lidToken, id: a.lidId, wie: naam };
 }
 async function nieuwLid() {
@@ -44,11 +44,11 @@ async function nieuwLid() {
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const w = (await api('/werkruimte/maak', { naam: 'RTG Holding', land: 'NL' })).body;
+  const w = (await api('/api/bedrijf/werkruimte/maak', { naam: 'RTG Holding', land: 'NL' })).body;
   W = w.werkruimte; B = w.beheerToken;
   DIR = await lid('Dana', ['directie']);
   MED = await lid('Mo', ['medewerker']);
-  dochter = (await api('/werkruimte/maak', {
+  dochter = (await api('/api/bedrijf/werkruimte/maak', {
     naam: 'RTG Belgie', land: 'BE', moeder: W, moederBeheerToken: B
   })).body;
 });
@@ -58,7 +58,7 @@ test.after(() => {
 });
 
 test('het beeld maakt van niets geen nul, en voorspelt niets', async () => {
-  const leeg = (await api('/beeld', DIR)).body;
+  const leeg = (await api('/api/bedrijf/beeld', DIR)).body;
   const blokken = leeg.nietGemeten.map(x => x.blok);
   assert.ok(blokken.includes('verkoop') && blokken.includes('service') && blokken.includes('bouw'),
     'lege modules staan als niet gemeten: ' + JSON.stringify(blokken));
@@ -73,15 +73,15 @@ test('het beeld maakt van niets geen nul, en voorspelt niets', async () => {
   assert.ok(leeg.gemetenOp, 'wel een tijdstempel');
 
   // zodra er iets is, verdwijnt het uit nietGemeten
-  await api('/project/maak', Object.assign({ naam: 'Uitrol', werkvorm: 'stadsuitrol' }, DIR));
-  const na = (await api('/beeld', DIR)).body;
+  await api('/api/bedrijf/project/maak', Object.assign({ naam: 'Uitrol', werkvorm: 'stadsuitrol' }, DIR));
+  const na = (await api('/api/bedrijf/beeld', DIR)).body;
   assert.equal(na.projecten.lopend, 1);
   assert.ok(!na.nietGemeten.map(x => x.blok).includes('projecten'));
   assert.equal(na.projecten.deelKlaar, null, 'zonder taken geen percentage');
 });
 
 test('een medewerker zonder cijferrecht komt niet bij het directiebeeld', async () => {
-  const dicht = await api('/beeld', MED);
+  const dicht = await api('/api/bedrijf/beeld', MED);
   assert.equal(dicht.status, 403);
   assert.match(dicht.body.error, /cijfer/);
 });
@@ -106,22 +106,22 @@ test('een moeder telt een dochter alleen mee met haar sleutel', async () => {
 
 test('een koppeling geeft tellingen en geen inhoud, en niemand koppelt het account van een ander', async () => {
   const token = await nieuwLid();
-  const voor = (await api('/koppeling', MED)).body;
+  const voor = (await api('/api/bedrijf/koppeling', MED)).body;
   assert.equal(voor.gekoppeld, false);
 
-  const zonderSessie = await api('/lid/koppel', MED);
+  const zonderSessie = await api('/api/bedrijf/lid/koppel', MED);
   assert.ok(zonderSessie.status >= 400, 'koppelen zonder RTG-sessie kan niet');
 
-  const uit = (await api('/lid/koppel', MED, token)).body;
+  const uit = (await api('/api/bedrijf/lid/koppel', MED, token)).body;
   assert.equal(uit.gekoppeld, true);
   assert.ok(uit.codenaam, 'de koppeling draait op de codenaam');
   assert.match(uit.let, /de inhoud niet/i);
 
-  const dubbel = await api('/lid/koppel', DIR, token);
+  const dubbel = await api('/api/bedrijf/lid/koppel', DIR, token);
   assert.equal(dubbel.status, 409, 'hetzelfde RTG-account koppelt niet aan twee leden');
   assert.match(dubbel.body.error, /al gekoppeld aan Mo/);
 
-  const start = (await api('/start', MED)).body;
+  const start = (await api('/api/bedrijf/start', MED)).body;
   assert.ok(start.blokken.agenda, 'het agendablok komt nu uit de bestaande RTG Agenda');
   assert.equal(start.blokken.agenda.bron, 'RTG Agenda');
   assert.equal(start.blokken.agenda.openItems, 0, 'een nieuw lid heeft nog niets in zijn agenda');
@@ -134,8 +134,8 @@ test('een koppeling geeft tellingen en geen inhoud, en niemand koppelt het accou
   const plat = JSON.stringify(start.blokken);
   assert.ok(!/wachtwoord|inhoud|tekst":/i.test(plat), 'er reist geen inhoud mee, alleen tellingen en titels');
 
-  const los = (await api('/lid/ontkoppel', MED)).body;
+  const los = (await api('/api/bedrijf/lid/ontkoppel', MED)).body;
   assert.equal(los.gekoppeld, false);
-  const naLos = (await api('/start', MED)).body;
+  const naLos = (await api('/api/bedrijf/start', MED)).body;
   assert.ok(naLos.nietGemeten.map(x => x.blok).includes('agenda'), 'na losmaken is het blok weer weg');
 });

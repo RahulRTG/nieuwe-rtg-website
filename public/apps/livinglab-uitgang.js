@@ -23,13 +23,13 @@
           ' &middot; <span class="pil' + (x.status === 'uitgevoerd' ? ' ok' : '') + '">' + esc(x.status) + '</span>' +
           (x.koppeling ? ' &middot; staat in het Onderzoekslab' : '') +
           '<div class="rij h-mt30">' +
-            '<select class="veld" data-ustatus aria-label="Status" style="font-size:.78rem;">' +
+            '<select class="veld s-ohjkjq" data-ustatus aria-label="Status">' +
               KADER.uitgangstatus.map(function (st) { return '<option value="' + esc(st) + '">' + esc(st) + '</option>'; }).join('') +
             '</select>' +
-            '<input class="veld" data-unotitie placeholder="Waaraan is dat te zien? (verplicht bij uitgevoerd)" style="font-size:.78rem;">' +
-            '<button class="knop stil" data-uzet type="button" style="font-size:.72rem;padding:.2rem .55rem;">Zet status</button>' +
+            '<input class="veld s-ohjkjq" data-unotitie placeholder="Waaraan is dat te zien? (verplicht bij uitgevoerd)">' +
+            '<button class="knop stil s-1q9bgge" data-uzet type="button">Zet status</button>' +
             (x.uitgang === 'pilot' && !x.koppeling
-              ? '<button class="knop stil" data-unaarlab type="button" style="font-size:.72rem;padding:.2rem .55rem;">Naar het Onderzoekslab</button>' : '') +
+              ? '<button class="knop stil s-1q9bgge" data-unaarlab type="button">Naar het Onderzoekslab</button>' : '') +
           '</div></div>';
       }).join('') : '<div class="leeg">Nog niets doorgezet. Een resultaat kan een pilot, werkorder, subsidieaanvraag, ' +
         'beleidsvoorstel, startupconcept, onderwijsproject of nieuw onderzoek worden.</div>') +

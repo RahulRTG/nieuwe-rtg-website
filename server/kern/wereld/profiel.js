@@ -52,11 +52,8 @@ const VELDEN = [
 ];
 
 module.exports = ({ db, zijnVrienden }) => {
-  const Z = () => {
-    if (!db.data.wereld || typeof db.data.wereld !== 'object') db.data.wereld = {};
-    if (!db.data.wereld.zicht || typeof db.data.wereld.zicht !== 'object') db.data.wereld.zicht = {};
-    return db.data.wereld.zicht;
-  };
+  const opslag = require('./opslag')({ db });
+  const Z = () => opslag.tak('zicht');
 
   /* ---------- de vier bronnen, alleen lezen ---------- */
   const salonBio = (key) => ((db.data.salon || {}).bio || {})[key] || {};

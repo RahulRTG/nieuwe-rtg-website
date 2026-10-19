@@ -83,14 +83,14 @@
     catch(e){ wvRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
     renderWinkelvloer();
   }
-  function wvInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" style="flex:1;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:0;padding:0.7rem 0.85rem;font-size:0.9rem;color:var(--txt);outline:none;font-family:inherit;">'; }
+  function wvInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" class="s-13hz826">'; }
   function wvKlantKaart(k){
     const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
-    return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--rtg-leesgoud,var(--gold));">'+eur(k.besteedTotaal)+'</span></div>'+
-      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
-      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
-      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+    return '<div class="s-1ss1yu0">'+
+      '<div class="s-7l4opl"><b>'+esc(k.codenaam||k.key)+'</b><span class="s-12itpbj">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div class="s-1qn5v5s">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div class="s-6giw2j">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div class="s-g5v041">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
       '</div>';
   }
   function renderWinkelvloer(){
@@ -99,16 +99,16 @@
     if (!wvRetail){ wrap.innerHTML = '<div class="empty">…</div>'; laadWinkelvloer(); return; }
     const cartTot = wvCart.reduce((n, r) => n + r.price * r.aantal, 0);
     let html = '';
-    html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('wv.kassa','Mobiele kassa')+
-      (wvKlant?'<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.7rem;">'+esc(wvKlant.codenaam||wvKlant.key)+'</span>':'')+'</div>'+
+    html += '<div class="card"><div class="tt-h s-1jdlxp5">'+T('wv.kassa','Mobiele kassa')+
+      (wvKlant?'<span class="s-1pyr07c">'+esc(wvKlant.codenaam||wvKlant.key)+'</span>':'')+'</div>'+
       (wvCart.length ? '<div class="h-mt50">'+wvCart.map((r,i) =>
         '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.naam)+' · '+esc(r.kleur)+' · '+esc(r.maat)+'</span><span class="pr">'+eur(r.price)+' × '+r.aantal+'</span></div>'+
         '<button class="obtn h-mt30" data-wvdel="'+i+'">✕ '+T('wv.weg','Weg')+'</button></div>').join('')+
-        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.5rem;"><span>'+T('wv.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;"><button class="obtn primary" data-wvbetaal="rtgpay">RTG Pay</button>'+
+        '<div class="s-1kx3s0t"><span>'+T('wv.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
+        '<div class="s-1e47xc3"><button class="obtn primary" data-wvbetaal="rtgpay">RTG Pay</button>'+
         '<button class="obtn" data-wvbetaal="contant">'+T('wv.contant','Contant')+'</button>'+
         '<button class="obtn" id="wvLeeg">'+T('wv.leeg','Bon leegmaken')+'</button></div>'
         : '<div class="empty">'+T('wv.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
     html += '<div class="card"><div class="tt-h">'+T('wv.zoek','Voorraad opzoeken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
+      '<div class="s-v4g2d9">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
       '<div id="wvZoekUit" class="h-mt50"></div></div>';

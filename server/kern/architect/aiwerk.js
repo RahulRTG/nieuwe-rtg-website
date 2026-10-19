@@ -67,15 +67,19 @@ module.exports = (ctx) => {
       'Beleving: ' + (c.voorzieningen[0] || 'de voorziening') + ' is het verschil met de rest; maak dat voelbaar bij binnenkomst.'
     ];
     const v = String(vraag || '').replace(/[<>]/g, '').trim().slice(0, 300);
+    let modelTekst = '';
     if (anthropic) {
       try {
         const sys = require('../rahul').RAHUL_LEAD + 'je bent de chef-architect van RTG Architectenbureau. Geef een korte, scherpe maar respectvolle kritiek: typologie, constructie, materiaal en de beleving van de ruimte. In het Nederlands. Situatie: ' +
           o.naam + ' (' + ((DISCIPLINES[o.discipline] || {}).label) + '), ' + c.typologie + ', ' + c.constructie + ', tinten ' + c.kleuren.map(k => k.naam).join('/') + '.';
         const r = await anthropic.messages.create({ model: 'claude-sonnet-5', max_tokens: 450, system: sys, messages: [{ role: 'user', content: v || 'Geef je kritiek en een concreet verbeterpunt.' }] });
-        const t = (r && r.content && r.content[0] && r.content[0].text || '').trim();
-        if (t) { o.kritiek = t; o.updatedAt = nu(); save(); return { ok: true, kritiek: t, ontwerp: publiek(o) }; }
-      } catch (e) { /* regelgebaseerde terugval */ }
+        modelTekst = (r && r.content && r.content[0] && r.content[0].text || '').trim();
+      } catch (e) { /* regelgebaseerde terugval: het MODEL viel weg, niet de opslag */ }
     }
+    /* Het bewaren staat BUITEN de vanger (18 oktober 2026, STILSPOOR.json). Het
+       stond erin, en dan las een mislukte save() als "het model gaf niets" en
+       volgde stil de regelgebaseerde terugval met een tweede save(). */
+    if (modelTekst) { o.kritiek = modelTekst; o.updatedAt = nu(); save(); return { ok: true, kritiek: modelTekst, ontwerp: publiek(o) }; }
     o.kritiek = regels.join(' '); o.updatedAt = nu(); save();
     return { ok: true, kritiek: o.kritiek, punten: regels, ontwerp: publiek(o) };
   }

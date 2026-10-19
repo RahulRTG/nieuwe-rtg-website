@@ -4,6 +4,13 @@
    alleen een melding onderdrukken is onvoldoende. LEGACY betekent: bekend,
    fout en nog niet opgelost. Noem zo'n relatie geen DOMEINRELATIE. */
 module.exports = [
+  /* HET REISAANBOD EN HET REISBUREAU DELEN EEN DEUR. kern/reisaanbod.js schrijft
+     het aanbod en telt de open aanvragen erbij, kern/reisbureau.js schrijft de
+     aanvragen en leest het aanbod: een domein (RTG Reizen) met twee collecties,
+     en dus een opslagcontract (kern/reisbureau-opslag.js) in plaats van twee
+     bestanden die elk zelf in db.data keken (de dbDeuren-ronde). */
+  { van: 'domein:reisaanbod', naar: 'domein:reisbureau-opslag', soort: 'DOMEINRELATIE',
+    reden: 'het reisaanbod gebruikt de ene opslagdeur van RTG Reizen voor partnerTrips (schrijven) en reisAanvragen (lezen); de deur kent geen prijs- of besluitlogica' },
   { van: 'domein:experience', naar: 'domein:living-world', soort: 'ORKESTRATIE',
     reden: 'De Experience Broker registreert de actiewoordenlijst en voert bevestigde intents uit via de Living World-adapter. Het brondomein blijft eigenaar van bevoegdheid, revisie, levensloop en duurzame ontvangstbewijzen; de Broker kopieert geen domeinwaarheid.' },
   /* DE BOARDROOM ZOEKT HET OP. kern/afdelingen/kameradvies.js laat de

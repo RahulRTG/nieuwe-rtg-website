@@ -72,7 +72,10 @@ const LADDER = [
     patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /releaseketenwacht\.js$/, /ci-lokaal\.js$/,
       /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/,
       /* register tegen code, statisch en in seconden (ZERO.md golf A) */
-      /schermfunctie\.js$/] },
+      /schermfunctie\.js$/,
+      /* de instroompoort naast de deltapoort: een nieuwe route komt met een
+         toets (ZERO.md par. 7, weer aan sinds 18 oktober 2026) */
+      /nieuweroutes\.js$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
     patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /toetsroutes\.js$/, /verstrengeling\.js$/, /activering\.js$/,
       /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs
@@ -414,7 +417,7 @@ if (require.main === module) {
 
   if (argv.includes('--controle')) {
     let oud = null;
-    try { oud = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) {}
+    try { oud = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
     if (!oud) { console.error('Geen BEWIJSLADDER.json om tegen te vergelijken -- draai `npm run bewijsladder:vast`.'); process.exitCode = 1; return; }
     const gegroeid = uitslag.zonderTrede.filter(z => !(oud.zonderTrede || []).some(o => o.doel === z.doel));
     if (gegroeid.length) {

@@ -344,7 +344,7 @@ De meter (`npm run mensgrond`, `MENSGROND.json`) verzint geen tweede classificat
 hij vertaalt de effecten (`kern/isolatie/effecten.js`), de bodem
 (`kern/frictie/bodem.js`), `NOOIT_AUTONOOM` en de deur van de eigenaar naar een woord
 uit de lijst, en legt de herstelregisters ernaast. De eerste meting over
-<!--getal:mensgrond.muterend-->4028<!--/getal--> muterende handelingen:
+<!--getal:mensgrond.muterend-->4130<!--/getal--> muterende handelingen:
 
 - **<!--getal:mensgrond.overtreding-->6<!--/getal--> overtredingen**, en het zijn precies de
   kleine handelingen van het beleid (`mediaos/stuur` en `/volg`, `leerstof/oefen` en
@@ -354,12 +354,12 @@ uit de lijst, en legt de herstelregisters ernaast. De eerste meting over
   nog niet in een handeling die zelfstandig liep.
 - **<!--getal:mensgrond.schuld-->0<!--/getal--> automatiseringsschuld.** Dat is geen
   compliment maar een gevolg van het bewijs: van de muterende handelingen hebben er
-  <!--getal:mensgrond.terugweg-->79<!--/getal--> een bewezen terugweg (of een meting
+  <!--getal:mensgrond.terugweg-->91<!--/getal--> een bewezen terugweg (of een meting
   zonder effect). De mens staat er vrijwel overal OOK omdat de terugweg onbewezen is,
-  en <!--getal:mensgrond.totBewijs-->39<!--/getal--> handelingen hebben geen andere
+  en <!--getal:mensgrond.totBewijs-->45<!--/getal--> handelingen hebben geen andere
   grond dan dat -- dat is de werkelijke voorraad automatiseringskandidaten, en hij
   groeit met de herstelproef en niet met een besluit.
-- **<!--getal:mensgrond.onbekend-->30<!--/getal--> onbekend**, nooit gelezen als geldig of
+- **<!--getal:mensgrond.onbekend-->31<!--/getal--> onbekend**, nooit gelezen als geldig of
   als schuld.
 
 Drie fouten die de meter in zijn eerste rondes maakte, en die als toets vastliggen

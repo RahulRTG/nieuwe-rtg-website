@@ -26,7 +26,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dagplan-'));
 const api = (pad, body) => fetch(base + '/api' + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -125,25 +125,25 @@ test('het dagplan bewaart niets: geen reeks, geen dagen achter elkaar', async ()
 });
 
 test('in een klas komt het huiswerk van de leraar vooraan', async () => {
-  const sch = (await fnd('/school/school/maak', { naam: 'De Boog', plaats: 'Assen' })).body;
+  const sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Boog', plaats: 'Assen' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  const leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Ties', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: leraar.personeelId, akkoord: true });
-  const klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken, naam: '5C', trap: 'po', fase: 'po-g5' })).body;
+  const leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Ties', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: leraar.personeelId, akkoord: true });
+  const klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken, naam: '5C', trap: 'po', fase: 'po-g5' })).body;
 
-  const gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Boog', naam: 'Ouder Boog', pin: '4321' })).body;
-  const kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Loes', rol: 'kind', groep: 'kind' })).body;
-  const kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
-  await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
-  await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
-  await fnd('/school/huiswerk/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  const gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Boog', naam: 'Ouder Boog', pin: '4321' })).body;
+  const kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Loes', rol: 'kind', groep: 'kind' })).body;
+  const kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
+  await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
+  await fnd('/api/foundation/school/huiswerk/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     klasCode: klas.code, titel: 'Tafels', doel: 'rekenen.g5.tafels-tot-10' });
 
-  const plan = (await fnd('/school/dag', { code: gezin.code, token: kindToken, klasCode: klas.code })).body;
+  const plan = (await fnd('/api/foundation/school/dag', { code: gezin.code, token: kindToken, klasCode: klas.code })).body;
   assert.ok(plan.stukken.length >= 1);
   assert.equal(plan.stukken[0].soort, 'huiswerk', 'wat een mens vroeg gaat voor wat de motor voorstelt');
   assert.equal(plan.stukken[0].doel, 'rekenen.g5.tafels-tot-10');

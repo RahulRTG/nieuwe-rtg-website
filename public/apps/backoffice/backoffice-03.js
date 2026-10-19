@@ -62,7 +62,7 @@
     try { convData = (await call('/office/conversations')).conversations || []; } catch(e){ return; }
     $('#concierge').innerHTML = convData.length ? convData.map(c =>
       '<div class="vrow" data-uid="'+c.userId+'"><div class="vi"><div class="nm">'+escHtml(c.codename)+
-        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(c.tier)+'</span>'+
+        ' <span class="s-1caek87">· '+escHtml(c.tier)+'</span>'+
         (c.needsConcierge?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
         '<div class="sub">'+(c.lastFrom==='concierge'?'↩ ':'')+escHtml((c.last||'').slice(0,55))+'</div></div>'+
         '<button class="vbtn ok" data-open>'+T('bo.open','Open')+'</button></div>'
@@ -77,7 +77,7 @@
   async function loadTrust(){
     try { trustData = (await call('/office/trust')).threads || []; } catch(e){ return; }
     $('#trustList').innerHTML = trustData.length ? trustData.map(t =>
-      '<div class="vrow"><div class="vi"><div class="nm">'+escHtml(t.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(t.company)+'</span>'+
+      '<div class="vrow"><div class="vi"><div class="nm">'+escHtml(t.name)+' <span class="s-1caek87">· '+escHtml(t.company)+'</span>'+
       (t.open?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
       '<div class="sub">'+escHtml(((t.messages[t.messages.length-1]||{}).text||'').slice(0,55))+'</div></div>'+
       '<button class="vbtn ok" data-trust="'+t.id+'">'+T('bo.open','Open')+'</button></div>'
@@ -157,8 +157,8 @@
     const maxOmzet = Math.max.apply(null, perf.map(p=>p.omzet).concat([1]));
     const medaille = ['1.','2.','3.'];
     $('#perfList').innerHTML = perf.length ? perf.filter(p => past(p.name, p.code, p.type)).map((p, i) =>
-      '<div class="row"><div class="r1"><div style="flex:1;min-width:0;"><div class="nm">'+(medaille[i]||'')+' '+p.name+
-        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+p.code+'</span></div>'+
+      '<div class="row"><div class="r1"><div class="s-1ujuoye"><div class="nm">'+(medaille[i]||'')+' '+p.name+
+        ' <span class="s-1caek87">· '+p.code+'</span></div>'+
         '<div class="sub">'+p.aantal+' '+T('bo.trans','transactie(s)')+' · '+p.openNu+' '+T('bo.opennow','nu open')+
         (p.gemMin!=null?' · Ø '+p.gemMin+' '+T('bo.minride','min per rit'):'')+'</div>'+
         '<div class="perfbar"><i style="width:'+Math.max(2, Math.round(p.omzet/maxOmzet*100))+'%;"></i></div></div>'+
@@ -177,7 +177,7 @@
     const live = (state.live || []).filter(g => past(g.codename, (g.dest&&g.dest.name)||'', (g.partners||[]).join(' ')));
     $('#liveList').innerHTML = live.length ? live.map(g =>
       '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(g.codename)+
-        (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+escHtml(g.dest.name)+'</span>':'')+'</div>'+
+        (g.dest?' <span class="s-rv1n8c">· '+T('bo.to','naar')+' '+escHtml(g.dest.name)+'</span>':'')+'</div>'+
         '<div class="sub">'+(g.arrived?'✓ '+T('bo.arrived','gearriveerd'):T('bo.onthemove','onderweg')+' ('+T('bo.mode.'+g.mode, g.mode==='walking'?'lopend':g.mode==='flying'?'vliegend':'rijdend')+')')+
         ' · '+escHtml((g.partners||[]).join(', '))+'</div></div>'+
         '<span class="pill '+(g.arrived?'klaar':'bereiding')+'">'+(g.arrived?T('bo.arrived','gearriveerd'):T('bo.live','live'))+'</span></div></div>'
@@ -197,8 +197,8 @@
     $('#appsList').innerHTML = apps.length ? apps.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='aangenomen'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.ap.new','nieuw'):x.status==='aangenomen'?T('bo.ap.hired','aangenomen'):T('bo.ap.rejected','afgewezen');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.func)+'</span>'+
-        (x.viaRTG?' <span style="font-size:0.58rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</span>':'')+'</div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span class="s-rv1n8c">· '+escHtml(x.func)+'</span>'+
+        (x.viaRTG?' <span class="s-1unsk08">RTG</span>':'')+'</div>'+
         '<div class="sub">'+escHtml(x.company)+' · '+timeAgo(x.at)+'</div></div>'+
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
@@ -213,27 +213,27 @@
       const eisKlaar = e => ['geverifieerd','niet_van_toepassing'].includes(e.status) &&
         !(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
       const open = eisen.filter(e => !eisKlaar(e));
-      const controleHtml = toel ? '<div style="display:grid;gap:.3rem;margin-top:.55rem;">'+eisen.map(e => {
+      const controleHtml = toel ? '<div class="s-1aiwwx5">'+eisen.map(e => {
         const klaar = eisKlaar(e);
         const verlopen = e.status==='geverifieerd'&&!klaar;
         const referentie = e.gecontroleerd && e.gecontroleerd.referentie || e.referentie || '';
         return '<div style="border-left:2px solid '+(klaar?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding-left:.55rem;">'+
-          '<div class="sub"><b style="color:var(--text)">'+(klaar?'✓ ':e.status==='afgekeurd'?'✕ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+
+          '<div class="sub"><b class="s-1pvgdpg">'+(klaar?'✓ ':e.status==='afgekeurd'?'✕ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+
           (verlopen?' · verlopen':'')+(referentie?' · '+escHtml(referentie):'')+'</div>'+
-          (x.status==='nieuw'&&!klaar?'<div style="display:flex;gap:.3rem;margin-top:.25rem;"><button class="vbtn ok" data-pactl="'+x.id+'" data-paeis="'+e.id+'">'+T('bo.pa.check','Controleren')+'</button>'+
+          (x.status==='nieuw'&&!klaar?'<div class="s-1obp109"><button class="vbtn ok" data-pactl="'+x.id+'" data-paeis="'+e.id+'">'+T('bo.pa.check','Controleren')+'</button>'+
             (e.magNietVanToepassing?'<button class="vbtn" data-panvt="'+x.id+'" data-paeis="'+e.id+'">N.v.t.</button>':'')+'</div>':'')+'</div>';
       }).join('')+'</div>' : '<div class="sub" style="color:#df6b7d;margin-top:.45rem;">Oude aanvraag zonder toelatingsdossier · opnieuw laten aanvragen</div>';
       const reg = x.registratie || {};
       const pre = reg.voorcontrole || {};
       const regNummer = reg.nummer || reg.kvkNummer || '';
       const regTitel = (reg.landNaam || (reg.kvkNummer ? 'Nederland' : '')) + (reg.regioOfStaat ? ' · ' + reg.regioOfStaat : '');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.company)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.type)+' · '+escHtml(x.city)+'</span></div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.company)+' <span class="s-rv1n8c">· '+escHtml(x.type)+' · '+escHtml(x.city)+'</span></div>'+
         '<div class="sub">'+escHtml(x.contactName)+' · '+escHtml(x.email)+(x.phone?' · '+escHtml(x.phone):'')+' · '+timeAgo(x.at)+
           (regNummer?'<br>'+escHtml(regTitel)+' · registratie '+escHtml(regNummer)+(reg.vestigingsnummer?' · vestiging '+escHtml(reg.vestigingsnummer):'')+' · voorcontrole '+escHtml(pre.status||'handmatig'):'')+
           (reg.registerBron?'<br><a href="'+escHtml(reg.registerBron)+'" target="_blank" rel="noopener">Open officieel register</a>':'')+
           (x.note?'<br>"'+escHtml(x.note.slice(0,120))+'"':'')+(x.code?' · code '+escHtml(x.code):'')+'</div>'+controleHtml+'</div>'+
         (x.status==='nieuw'
-          ? '<div style="display:flex;gap:0.4rem;flex-shrink:0;align-items:flex-start;">'+(toel&&open.length===0?'<button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button>':'<span class="pill nieuw">'+(toel?open.length+' open':'geblokkeerd')+'</span>')+'<button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
+          ? '<div class="s-qwtwh">'+(toel&&open.length===0?'<button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button>':'<span class="pill nieuw">'+(toel?open.length+' open':'geblokkeerd')+'</span>')+'<button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
           : '<span class="pill '+pc+'">'+st+'</span>')+
         '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nopa','Nog geen aanvragen. Bedrijven melden zich aan via de pagina "Partner worden" op de site.')+'</div>';
@@ -283,9 +283,9 @@
     // nadat RTG hem hier goedkeurt
     const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));
     $('#schoolList').innerHTML = scholen.length ? scholen.map(x =>
-      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.naam)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.plaats||'')+'</span></div>'+
+      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.naam)+' <span class="s-rv1n8c">· '+escHtml(x.plaats||'')+'</span></div>'+
         '<div class="sub">'+T('bo.sc.code','code')+' '+escHtml(x.code)+' · '+x.personeel+' '+T('bo.sc.staff','aanmelding(en) personeel')+' · '+timeAgo(x.at)+'</div></div>'+
-        '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-scok="'+escHtml(x.code)+'">'+T('bo.sc.approve','Goedkeuren')+'</button><button class="vbtn" data-scno="'+escHtml(x.code)+'">'+T('bo.sc.reject','Afwijzen')+'</button></div>'+
+        '<div class="s-mif44q"><button class="vbtn ok" data-scok="'+escHtml(x.code)+'">'+T('bo.sc.approve','Goedkeuren')+'</button><button class="vbtn" data-scno="'+escHtml(x.code)+'">'+T('bo.sc.reject','Afwijzen')+'</button></div>'+
       '</div></div>'
     ).join('') : '<div class="empty">'+T('bo.nosc','Geen wachtende schoolaanmeldingen. Scholen melden zich aan via de RTFoundation-app; hier keurt u ze goed voordat ze personeel en klassen kunnen aanmaken.')+'</div>';
     document.querySelectorAll('[data-scok]').forEach(b => b.addEventListener('click', async () => {
@@ -318,7 +318,7 @@
           (w.door?' · '+T('bo.cw.door','door')+' '+escHtml(w.door):'')+
           (w.notitie?'<br>"'+escHtml(w.notitie.slice(0,120))+'"':'')+'</div></div>'+
         (st ? '<span class="pill '+(w.besluit==='opgepakt'?'klaar':'bereiding')+'">'+st+'</span>'
-            : '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-cwok="'+escHtml(w.id)+'">'+T('bo.cw.pak','Opgepakt')+'</button><button class="vbtn" data-cwno="'+escHtml(w.id)+'">'+T('bo.cw.wijs','Afwijzen')+'</button></div>')+
+            : '<div class="s-mif44q"><button class="vbtn ok" data-cwok="'+escHtml(w.id)+'">'+T('bo.cw.pak','Opgepakt')+'</button><button class="vbtn" data-cwno="'+escHtml(w.id)+'">'+T('bo.cw.wijs','Afwijzen')+'</button></div>')+
         '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nocw','Nog geen bedrijven uit de onboarding. Leden geven bij het aanmelden op of ze er een hebben.')+'</div>';
     document.querySelectorAll('[data-cwok]').forEach(function(b){

@@ -76,6 +76,8 @@ module.exports = function maakPlaats({ db, save, crypto, weefsel, navPoi }) {
       plaatsWaarneem: (codenaam, w, key) => wrn.waarneem(codenaam, w, key),
       // zelf-inzage: alles wat RTG nu van mij weet over plaats
       plaatsStand: (codenaam) => wrn.stand(codenaam),
+      // en alles weer weg, als het lid vergeten wil worden (AVG art. 17)
+      plaatsVergeet: (codenaam) => opslag.vergeet(codenaam),
       /* Voor andere domeinen: binnen of buiten, met een tijd. Dit is met opzet
          het enige dat een domein (en dus een werkgever) krijgt -- grens 4 uit
          PLAATS.md. Geen coördinaat, en ook niet hoe ver erbuiten. */

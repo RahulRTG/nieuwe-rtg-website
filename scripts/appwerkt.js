@@ -125,7 +125,7 @@ const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
@@ -247,6 +247,9 @@ async function meet() {
 
   const lijst = rijen();
   log(lijst.length + ' onderdelen uit MAPPEN');
+  const kernen = (os.cpus() || []).length || 1;
+  const last = () => Math.round(os.loadavg()[0] / kernen * 100) / 100;
+  const belasting = { kernen, perKernBijStart: last() };
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const uit = [];
   let n = 0;
@@ -279,7 +282,8 @@ async function meet() {
   try { child.kill(); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   uit.sort((a, b) => (a.wereld + a.app).localeCompare(b.wereld + b.app));
-  return { regels: uit, sessiesOvergeslagen: overgeslagen };
+  belasting.perKernBijEinde = last();
+  return { regels: uit, sessiesOvergeslagen: overgeslagen, belasting };
 }
 
 async function maakContext(browser, opslag) {
@@ -460,7 +464,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
      beoordelen of een foutmelding bruikbaar was. */
   r.bewijzen.menselijk = stuk.length || eersteBezoek.crash.length
     ? { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'een kale JS-fout of 500 bereikt de gebruiker: ' + (eersteBezoek.crash[0] || stuk[0]), bewijs: null }
-    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7', bewijs: null };
+    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7, en die levert de voltooiproef (VOLTOOIPROEF.json) voor een onderdeel met een scenario', bewijs: null };
 
   vulOngemeten(r);
   return r;
@@ -521,6 +525,22 @@ async function bezoek(ctx, base, pad) {
 }
 
 /* ---- de bediening: tikken op wat er staat ---- */
+/* WAAROM EEN TIK NIET LUKTE, uit de log van Playwright. De vijf bekende
+   redenen eerst. Daarna twee die eerst als "reden niet gemeld" in het register
+   stonden en wel degelijk iets zeggen: de tik is VERSTUURD maar de pagina
+   rondde hem niet af binnen de limiet (de laag erachter kan dus open staan),
+   of de pagina antwoordde niet eens op de vraag of de knop zichtbaar en stil
+   staat (de hoofddraad was bezet). Allebei traagheid, en nadrukkelijk geen
+   bewijs dat de knop werkt: ze blijven "niet aan te tikken". */
+function klikReden(log) {
+  const l = String(log || '');
+  const bekend = l.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i);
+  if (bekend) return bekend[0];
+  if (/performing click action/i.test(l)) return 'tik verstuurd maar niet afgerond binnen de limiet';
+  if (/waiting for element to be visible, enabled and stable/i.test(l)) return 'pagina antwoordde niet binnen de limiet';
+  return 'reden niet gemeld';
+}
+
 /* Het element dat de klik opving, uit de log van Playwright: "<a ...>…</a> from
    <div id="x" ...>…</div> subtree intercepts pointer events" -> div#x. Bij een
    subtree telt de WORTEL (die ligt over de knop), niet het kind. */
@@ -602,13 +622,28 @@ async function bedien(ctx, base, pad) {
            Zonder die reden is "niet aan te tikken" een dood getal: een knop
            onder een balk is iets anders dan een knop die er niet is. */
         const log = String(e.message || e);
-        const waarom = (log.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i) || ['reden niet gemeld'])[0];
+        const waarom = klikReden(log);
         nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
         /* WIE ligt erover. "intercepts pointer events" alleen zegt niet of het
            een lade is die een mens eerst dichttikt of een balk die de knop
            voorgoed bedekt (BETROUWBAARHEID.md par. 7, stap 1). Playwright noemt
            het element; dat wordt bewaard als tag#id.klasse, zonder tekst. */
         if (/intercepts pointer events/i.test(waarom)) onderschept.push({ knop: k.tekst || '(naamloos)', door: onderschepper(log) });
+        /* OOK NA EEN MISLUKTE TIK DICHT, zoals na een geslaagde. Een tik die in
+           de tijdslimiet loopt, kan WEL zijn aangekomen: Playwright stuurt de muis
+           en wacht dan tot de pagina hem heeft verwerkt ("performing click
+           action"). Op een volle machine duurt dat langer dan 2,5 s, de laag
+           (de sprong, het paneel van Rahul, Meenemen) staat dan open, en zonder
+           deze Escape lag hij over elke volgende knop. Gemeten op 18 oktober
+           2026, load average 25 op 4 kernen: Vonk, Food Court, Podium, Wonen en
+           Vluchten verloren zo hun hele bediening aan EEN trage tik, en de
+           onderschepper wees de eigen laag van het scherm aan als boosdoener.
+           Dezelfde ronde op de code van 11 oktober (toen 96 BEWEZEN) gaf
+           hetzelfde beeld: het was de machine, niet de code. Wat na Escape nog
+           over een knop ligt, sluit niet met Escape -- en dat blijft een
+           bevinding, precies zoals bij een geslaagde tik. */
+        await page.keyboard.press('Escape').catch(() => {});
+        await page.waitForTimeout(250).catch(() => {});
       }
       if (page.url().replace(base, '').split('#')[0] !== pad) {
         try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { break; }
@@ -669,7 +704,12 @@ async function bedektDoorSchil(page) {
   try {
     return await page.evaluate(() => {
       const SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal';
+      /* Een knop in een dichtgeklapte <details> ziet niemand: een regel die de
+         inhoud van <details> een vaste display geeft, geeft hem toch een vak.
+         Zo meldde deze meting op 18 oktober 2026 de standen van rtg.html als
+         "bedekt door de schil" terwijl ze in "Uw volledige overzicht" dicht lagen. */
       const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+        if (el.closest('details:not([open])') && !el.closest('summary')) return false;
         if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
         const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
       const uit = [];
@@ -700,6 +740,7 @@ async function bedektDoorSchil(page) {
 async function kijkRonde(page, gehad) {
   return page.evaluate((alGehad) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+      if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
@@ -795,6 +836,13 @@ function bouw(meting) {
     },
     stempel: stempel(),
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
+    /* DE MACHINE STAAT ERBIJ. Deze proef tikt met een tijdslimiet, en op een
+       machine die drie keer meer werk heeft dan kernen loopt een gezonde tik
+       daar overheen (18 oktober 2026: van 96 naar 89 BEWEZEN zonder dat de code
+       het verschil maakte). Wie twee rondes vergelijkt, ziet zo of ze onder
+       dezelfde last liepen. Een getal, geen correctie: de uitslag zelf wordt er
+       niet op aangepast. */
+    belasting: meting.belasting || null,
     gemeten: { onderdelen: meting.regels.length, defecten: defecten.length,
       knoppenGevonden: meting.regels.reduce((n, r) => n + (r.gevonden || 0), 0),
       knoppenAangetikt: meting.regels.reduce((n, r) => n + (r.geklikt || 0), 0),
@@ -890,7 +938,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { onderschepper, klikReden, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {
@@ -904,8 +952,8 @@ if (require.main === module) (async () => {
       process.exit(0);
     }
     const bezwaren = inventarisOordeel(null, vers).filter((b) => !b.startsWith('APPWERKT.json draagt'));
-    fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
-    log('APPWERKT.json: blok toezegklassen bijgewerkt ' + JSON.stringify(vers.telling) +
+    if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
+    log('APPWERKT.json: blok toezegklassen gemeten ' + JSON.stringify(vers.telling) +
       ' (niet geteld: ' + vers.nietGeteld.prozaMarkeringen + ' in lopende tekst, ' + vers.nietGeteld.standOnbekend + ' andere standwaarden)');
     if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
     process.exit(0);
@@ -936,8 +984,8 @@ if (require.main === module) (async () => {
     process.exit(0);
   }
   const uit = bouw(await meet());
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
-  log('\nAPPWERKT.json geschreven: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
+  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+  log('\nAPPWERKT: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);
   process.exit(0);
 })();

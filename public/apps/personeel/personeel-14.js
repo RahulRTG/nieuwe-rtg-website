@@ -94,13 +94,13 @@
       (mijn.length ? mijn.map(r => {
         const nxt = NEXT_RIDE[r.status];
         const st = RIT_ST[r.status];
-        return '<div class="task"><span class="ic">'+(jet?'':'')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' ·  '+esc(r.note):'')+(r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
+        return '<div class="task"><span class="ic">'+(jet?'':'')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' ·  '+esc(r.note):'')+(r.zorg?'<span class="s-12agxa1">'+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
           (nxt ? '<button class="abtn" data-pdgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_LBL[nxt][0], RIDE_LBL[nxt][1])+'</button>' : '')+'</div>';
-      }).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
+      }).join('') : '<div class="s-1sydj7f">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.r.openh','Open aanvragen')+' ('+open.length+')</div>'+
       (open.length ? open.map(r =>
         '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc(regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>'
-      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>')+'</div>'+
+      ).join('') : '<div class="s-1sydj7f">'+T('pd.r.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>')+'</div>'+
       (gepland.length ? '<div class="card"><div class="k">'+T('pd.r.gepland','Gepland')+' ('+gepland.length+')</div>'+
         gepland.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc((r.when || '') + ' · ' + regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>').join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.r.vandaag','Vandaag')+'</div>'+

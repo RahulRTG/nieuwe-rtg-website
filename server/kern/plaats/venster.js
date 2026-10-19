@@ -11,7 +11,7 @@
 
 const VENSTER_MAX_MIN = 12 * 60;      // een venster van meer dan een dienst is geen venster
 
-module.exports = ({ db, save, opslag, DOELEN, DOEL, kentHek }) => {
+module.exports = ({ save, opslag, DOELEN, DOEL, kentHek }) => {
   const { nu, id, vensters, ruim, schrijfLog, open } = opslag;
 
   /* Een venster openen. `bron` zegt WAAROM het openging -- een lopende dienst,
@@ -66,7 +66,7 @@ module.exports = ({ db, save, opslag, DOELEN, DOEL, kentHek }) => {
     ruim();
     const v = vensters().find(x => x.codenaam === codenaam && x.doel === String(doel || '') && open(x));
     if (!v) return { status: 404, error: 'Geen open venster voor dit doel.' };
-    db.data.plaatsVensters = vensters().filter(x => x.id !== v.id);
+    opslag.zet('plaatsVensters', vensters().filter(x => x.id !== v.id));
     ruim();
     schrijfLog(codenaam, 'venster-gesloten', { doel: v.doel, bron: v.bron });
     save();

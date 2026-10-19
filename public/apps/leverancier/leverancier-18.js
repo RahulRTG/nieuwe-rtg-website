@@ -11,14 +11,14 @@
         const taken=(e.guests||[]).reduce((n,g)=>n+g.qty,0);
         const rs = e.runsheet || [];
         const stOpts = [['keuken','\uD83D\uDD25 '+T('kt.keuken','Keuken')],['bar','\uD83C\uDF78 Bar'],['bediening','\uD83E\uDDFE '+T('kt.bediening','Bediening')],['party','\uD83C\uDF9F Party manager'],['alle','\uD83D\uDCE2 '+T('rs.all','Iedereen')]];
-        return '<div class="tkc'+(e.published?'':' dim')+' h-volbreed"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
+        return '<div class="tkc'+(e.published?'':' dim')+' h-volbreed"><div class="tkc-top"><span class="s-12h62uq">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
         '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</div>'+
         '<h3 class="h-mt40">\uD83D\uDC68\u200D\uD83C\uDF73 '+T('ek.h','Event-keuken')+'</h3>'+
         '<div class="st-form"><select class="st-in" id="kcm'+e.id+'">'+
           '<option value="geen"'+(e.catering.mode==='geen'?' selected':'')+'>'+T('ek.none','Geen eten / n.v.t.')+'</option>'+
           '<option value="menu"'+(e.catering.mode==='menu'?' selected':'')+'>'+T('ek.menu','Vast menu')+'</option>'+
           '<option value="alacarte"'+(e.catering.mode==='alacarte'?' selected':'')+'>\u00c0 la carte</option></select>'+
-        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+(state.menu||[]).filter(m=>m.station!=='bar').map(m=>
+        '<div class="s-1fa4ugf">'+(state.menu||[]).filter(m=>m.station!=='bar').map(m=>
           '<button class="mn-station'+(e.catering.itemIds.includes(m.id)?'" style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));':'"')+'" data-kdish="'+m.id+'" data-ev="'+e.id+'">'+m.name+'</button>').join('')+'</div>'+
         '<button class="obtn" data-kcat="'+e.id+'">'+T('ek.save','Bewaar de eventkeuken')+'</button></div>'+
         '<div class="st-form h-mt50">'+
@@ -30,22 +30,22 @@
         '<button class="obtn" data-kaladd="'+e.id+'">'+T('ek.addal','Allergeen registreren')+'</button>'+
         '<button class="obtn primary" data-kmep="'+e.id+'">\u2728 '+T('ek.mep','Organiseer de mise en place')+'</button></div>'+
         '<h3 class="h-mt60">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
-        (rs.length ? rs.map(it=>'<div class="st-row"><span>'+(it.daysBefore?'<span style="font-size:0.6rem;letter-spacing:0.06em;color:var(--soft);margin-right:0.5rem;">D-'+it.daysBefore+'</span>':'')+'<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.5rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
+        (rs.length ? rs.map(it=>'<div class="st-row"><span>'+(it.daysBefore?'<span class="s-10r37a5">D-'+it.daysBefore+'</span>':'')+'<b class="s-v20qaz">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
           '<button class="obtn warn" data-krdel="'+e.id+'" data-item="'+it.id+'">\u2715</button></div>').join('')
           : '<div class="tkc-who">'+T('rs.none','Nog geen draaiboek. Voer regels in, plak een bestaand draaiboek, of laat de AI er een opstellen.')+'</div>')+
         '<div class="st-form"><div class="row-gap"><input class="st-in h-flex1" type="time" id="krT'+e.id+'">'+
         '<select class="st-in h-flex1" id="krD'+e.id+'"><option value="0">'+T('rs.d0','Dag zelf')+'</option><option value="1">D-1</option><option value="2">D-2</option><option value="3">D-3</option></select>'+
-        '<select class="st-in" id="krS'+e.id+'" style="flex:1.4;">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
+        '<select class="st-in s-stwpme" id="krS'+e.id+'">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
         '<input class="st-in" id="krX'+e.id+'" placeholder="'+T('rs.what','Wat moet er gebeuren?')+'">'+
         '<button class="obtn" data-kradd="'+e.id+'">'+T('rs.add','Regel toevoegen')+'</button></div>'+
         '<div class="st-form h-mt70">'+
-        '<textarea class="st-in" id="krP'+e.id+'" placeholder="'+T('rs.paste','Plak hier een bestaand draaiboek (per regel een tijd en taak), of kies een bestand...')+'" style="min-height:64px;resize:vertical;"></textarea>'+
-        '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'+
+        '<textarea class="st-in s-bi8iov" id="krP'+e.id+'" placeholder="'+T('rs.paste','Plak hier een bestaand draaiboek (per regel een tijd en taak), of kies een bestand...')+'"></textarea>'+
+        '<div class="s-11bcvsg">'+
         '<label class="obtn" style="cursor:pointer;">\uD83D\uDCC4 '+T('rs.upload','Upload bestand')+'<input type="file" accept=".txt,.csv,.md,text/plain" data-krfile="'+e.id+'" style="display:none;"></label>'+
         '<button class="obtn" data-krimp="'+e.id+'">'+T('rs.import','Verwerk met AI')+'</button>'+
         '<button class="obtn primary" data-krai="'+e.id+'">\u2728 '+T('rs.suggest','Laat de AI een draaiboek opstellen')+'</button></div></div>'+
         '<div class="tkc-act h-mt70"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
-        '<button class="tkc-start" data-kevdel="'+e.id+'" style="flex:0 0 auto;">\u2715</button></div></div>';
+        '<button class="tkc-start s-12c0kj4" data-kevdel="'+e.id+'">\u2715</button></div></div>';
       }).join('');
     }
     if (kantoorSec === 'kamers'){

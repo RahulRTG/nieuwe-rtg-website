@@ -22,7 +22,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const { meet, deelIn, ijk, IJKVOORBEELDEN } = require('../scripts/stillezing.js');
+const { meet, deelIn, ijk, IJKVOORBEELDEN, telBewijslezingen, constantenVan } = require('../scripts/stillezing.js');
 const REGISTER = JSON.parse(fs.readFileSync(path.join(WORTEL, 'STILLEZING.json'), 'utf8'));
 
 test('1. de meter kan alle vijf zijn uitgangen toekennen', () => {
@@ -103,4 +103,39 @@ test('6. besturingsproef -- de meter vindt werkelijk iets', () => {
     'de meter hoort honderden bewijslezingen te vinden; vindt hij er nauwelijks, ' +
     'dan is de registerlijst of de leesherkenning stuk');
   assert.ok(vers.uit.scripts.length > 0, 'en minstens een vanger eromheen');
+});
+
+/* 7. HET BEREIK TELT LEZINGEN, GEEN NABIJHEID (eigenaarsbesluit 18 oktober 2026).
+
+   Een bewijslezing telt alleen als het register in de ARGUMENTEN van de aanroep
+   staat: letterlijk, of via een const die als argument wordt doorgegeven. Hier
+   stond een venster van 200 tekens, en dat telde de kale stdlib-require boven
+   in een meetscript mee zodra er twee regels lager `const DOEL = ...'X.json'`
+   stond. Beide kanten hieronder, op een stuk bron dat precies die vorm heeft.
+
+   MUTATIE GEZIEN ZAKKEN: in telBewijslezingen() de argumentlijst vervangen door
+   `code.slice(m.index, m.index + 200)` -- de oude regel. Kant (b) zakt dan, want
+   de require('path') en de require('./lib/stempel') tellen weer mee; kant (a)
+   blijft groen. */
+test('7. het bereik telt lezingen in de argumenten, en niet een require vlak boven een registernaam', () => {
+  const registers = ['PROEF.json', 'ANDER.json', 'NORM.json'];
+  const bron = [
+    "const path = require('path');",
+    "const DOEL = path.join(WORTEL, 'PROEF.json');",
+    "const a = JSON.parse(fs.readFileSync(DOEL, 'utf8'));",
+    "const b = require('../ANDER.json');",
+    "const c = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8'));",
+    "const d = require('./lib/stempel');",
+    "const e = 'NORM.json';"
+  ].join('\n');
+  const n = telBewijslezingen(bron, constantenVan(bron), registers);
+  /* (a) de drie echte lezingen: een doorgegeven const, een letterlijke require en
+     een letterlijk pad in path.join. (b) en NIET de require('path') erboven of de
+     require('./lib/stempel') eronder, ook al staat er binnen 200 tekens een register. */
+  assert.equal(n, 3, 'drie echte bewijslezingen, en geen enkele import die toevallig naast een registernaam staat');
+
+  /* De grens van de argumentlijst zelf: een haakje IN een pad breekt de telling
+     niet, en een lezing van iets dat geen register is telt niet. */
+  assert.equal(telBewijslezingen("fs.readFileSync(path.join(W, 'map(1)', 'PROEF.json'))", new Map(), registers), 1);
+  assert.equal(telBewijslezingen("fs.readFileSync(path.join(W, 'leesmij.txt'))", new Map(), registers), 0);
 });

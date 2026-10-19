@@ -83,7 +83,17 @@ module.exports = ({ store, save }) => {
     };
   }
 
-  function wis(id) { const p = pot(); delete p[id]; }
+  /* WISSEN LEGT GEEN BAK AAN. Hier stond `const p = pot(); delete p[id];`, en
+     pot() maakt de bak als hij er niet is -- dus het verwijderen van een site
+     zonder meting liet een lege `meting: {}` achter. Precies het omgekeerde
+     van wat webmaker.js bij verwijder() belooft ("een site die weg is, laat
+     niets achter"), en de herstelproef zag het: /api/site/bewaar ->
+     /api/site/verwijder stond daardoor op compensatie in plaats van exact. */
+  function wis(id) {
+    const p = store().meting;
+    if (!p || typeof p !== 'object' || !Object.prototype.hasOwnProperty.call(p, id)) return;
+    delete p[id];
+  }
 
   return { bezoek, formulier, cijfers, overzicht, wis };
 };

@@ -38,7 +38,7 @@ function api(pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const ev = (pad, body, token) => api('/api/supplier/event' + pad, body, token);
+const ev = (pad, body, token) => api((pad.startsWith('/api/') ? pad : '/api/supplier/event' + pad), body, token);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -62,7 +62,7 @@ test.after(() => {
 });
 
 test('1. een event met een eventkeuken: het vaste menu komt uit de eigen kaart', async () => {
-  const mk = await ev('', { action: 'add', event: { name: 'Kersteditie', date: '2027-12-18', time: '19:00', capacity: 40, price: 95 } }, chef);
+  const mk = await ev('/api/supplier/event', { action: 'add', event: { name: 'Kersteditie', date: '2027-12-18', time: '19:00', capacity: 40, price: 95 } }, chef);
   assert.equal(mk.status, 200);
   eventId = mk.body.events[0].id;
 
@@ -70,17 +70,17 @@ test('1. een event met een eventkeuken: het vaste menu komt uit de eigen kaart',
   assert.ok(kaart.length >= 2, 'de zaak heeft een kaart om uit te kiezen');
   const gangen = kaart.slice(0, 2).map(m => m.id);
 
-  const cat = await ev('/catering', { id: eventId, mode: 'menu', itemIds: gangen.concat(['bestaatniet']), note: 'Vier gangen, wijnarrangement apart.' }, chef);
+  const cat = await ev('/api/supplier/event/catering', { id: eventId, mode: 'menu', itemIds: gangen.concat(['bestaatniet']), note: 'Vier gangen, wijnarrangement apart.' }, chef);
   assert.equal(cat.status, 200);
   assert.deepEqual(cat.body.event.catering.itemIds, gangen, 'gerechten die niet op de kaart staan vallen eruit');
-  assert.equal((await ev('/catering', { id: 'bestaatniet', mode: 'menu' }, chef)).status, 404);
-  assert.equal((await ev('/catering', { id: eventId, mode: 'menu' }, kok)).status, 403, 'de eventkeuken instellen is van de manager');
+  assert.equal((await ev('/api/supplier/event/catering', { id: 'bestaatniet', mode: 'menu' }, chef)).status, 404);
+  assert.equal((await ev('/api/supplier/event/catering', { id: eventId, mode: 'menu' }, kok)).status, 403, 'de eventkeuken instellen is van de manager');
 });
 
 test('2. de allergenenlijst: eenmaal per allergeen, met een aantal erbij', async () => {
-  assert.equal((await ev('/allergy', { id: eventId, action: 'add', allergen: '  ' }, chef)).status, 400, 'een leeg allergeen is geen allergeen');
+  assert.equal((await ev('/api/supplier/event/allergy', { id: eventId, action: 'add', allergen: '  ' }, chef)).status, 400, 'een leeg allergeen is geen allergeen');
 
-  const noten = await ev('/allergy', { id: eventId, action: 'add', allergen: 'Noten', count: 3 }, chef);
+  const noten = await ev('/api/supplier/event/allergy', { id: eventId, action: 'add', allergen: 'Noten', count: 3 }, chef);
   assert.equal(noten.status, 200);
   const a = noten.body.event.allergies.find(x => x.allergen === 'noten');
   assert.ok(a, 'het allergeen staat er in kleine letters in');
@@ -88,21 +88,21 @@ test('2. de allergenenlijst: eenmaal per allergeen, met een aantal erbij', async
   assert.equal(a.alternative, null, 'er is nog geen vervangend gerecht');
   allergieId = a.id;
 
-  assert.equal((await ev('/allergy', { id: eventId, action: 'add', allergen: 'noten' }, chef)).status, 409, 'twee keer hetzelfde allergeen kan niet');
-  assert.equal((await ev('/allergy', { id: eventId, action: 'poets' }, chef)).status, 400, 'een onbekende actie doet niets');
-  assert.equal((await ev('/allergy', { id: eventId, action: 'add', allergen: 'gluten', count: 2 }, chef)).status, 200);
+  assert.equal((await ev('/api/supplier/event/allergy', { id: eventId, action: 'add', allergen: 'noten' }, chef)).status, 409, 'twee keer hetzelfde allergeen kan niet');
+  assert.equal((await ev('/api/supplier/event/allergy', { id: eventId, action: 'poets' }, chef)).status, 400, 'een onbekende actie doet niets');
+  assert.equal((await ev('/api/supplier/event/allergy', { id: eventId, action: 'add', allergen: 'gluten', count: 2 }, chef)).status, 200);
 
   // en weghalen kan ook weer
-  const weg = await ev('/allergy', { id: eventId, action: 'add', allergen: 'schaaldieren' }, chef);
+  const weg = await ev('/api/supplier/event/allergy', { id: eventId, action: 'add', allergen: 'schaaldieren' }, chef);
   const schaalId = weg.body.event.allergies.find(x => x.allergen === 'schaaldieren').id;
-  const na = await ev('/allergy', { id: eventId, action: 'remove', allergyId: schaalId }, chef);
+  const na = await ev('/api/supplier/event/allergy', { id: eventId, action: 'remove', allergyId: schaalId }, chef);
   assert.ok(!na.body.event.allergies.some(x => x.id === schaalId), 'het allergeen is weg');
   assert.equal(na.body.event.allergies.length, 2, 'noten en gluten blijven staan');
 });
 
 test('3. een vervangend gerecht, ook zonder AI-sleutel', async () => {
-  assert.equal((await ev('/allergy/alt', { id: eventId, allergyId: 'bestaatniet' }, chef)).status, 404);
-  const alt = await ev('/allergy/alt', { id: eventId, allergyId: allergieId }, kok);
+  assert.equal((await ev('/api/supplier/event/allergy/alt', { id: eventId, allergyId: 'bestaatniet' }, chef)).status, 404);
+  const alt = await ev('/api/supplier/event/allergy/alt', { id: eventId, allergyId: allergieId }, kok);
   assert.equal(alt.status, 200, 'de kok mag dit ook: het is keukenwerk');
   assert.ok(alt.body.alternative.name && alt.body.alternative.name.length > 3, 'er komt een naam terug');
   assert.match(alt.body.alternative.name + ' ' + alt.body.alternative.desc, /noten/i, 'het allergeen staat erin');
@@ -110,7 +110,7 @@ test('3. een vervangend gerecht, ook zonder AI-sleutel', async () => {
 });
 
 test('4. de mise en place: per allergeen een taak die gescheiden werken afdwingt', async () => {
-  const mep = await ev('/mep', { id: eventId }, kok);
+  const mep = await ev('/api/supplier/event/mep', { id: eventId }, kok);
   assert.equal(mep.status, 200);
   assert.ok(mep.body.added >= 6, 'er komt een echt takenlijstje uit');
   const taken = mep.body.event.runsheet.filter(x => x.mep);
@@ -128,54 +128,54 @@ test('4. de mise en place: per allergeen een taak die gescheiden werken afdwingt
   /* Opnieuw organiseren mag geen dubbels geven: de vorige automatische taken
      gaan eruit voordat de nieuwe erin komen. Een draaiboek dat bij elke klik
      langer wordt, leest niemand meer. */
-  const nogmaals = await ev('/mep', { id: eventId }, kok);
+  const nogmaals = await ev('/api/supplier/event/mep', { id: eventId }, kok);
   assert.equal(nogmaals.body.event.runsheet.filter(x => x.mep).length, taken.length, 'even lang als daarvoor');
 });
 
 test('5. het draaiboek met de hand: regels erbij, afvinken en weghalen', async () => {
-  assert.equal((await ev('/runsheet', { id: eventId, action: 'add', item: { text: '   ' } }, chef)).status, 400);
-  const bij = await ev('/runsheet', { id: eventId, action: 'add', item: { time: '17:30', station: 'bediening', text: 'Tafelschikking nalopen met de gastvrouw' } }, chef);
+  assert.equal((await ev('/api/supplier/event/runsheet', { id: eventId, action: 'add', item: { text: '   ' } }, chef)).status, 400);
+  const bij = await ev('/api/supplier/event/runsheet', { id: eventId, action: 'add', item: { time: '17:30', station: 'bediening', text: 'Tafelschikking nalopen met de gastvrouw' } }, chef);
   assert.equal(bij.status, 200);
   const regel = bij.body.event.runsheet.find(x => x.text.startsWith('Tafelschikking'));
   assert.ok(regel, 'de regel staat in het draaiboek');
-  assert.equal((await ev('/runsheet', { id: eventId, action: 'add', item: { text: 'iets' } }, kok)).status, 403, 'het draaiboek vullen is van de manager');
+  assert.equal((await ev('/api/supplier/event/runsheet', { id: eventId, action: 'add', item: { text: 'iets' } }, kok)).status, 403, 'het draaiboek vullen is van de manager');
 
   // afvinken mag de kok wel, en er komt een naam bij te staan
-  const af = await ev('/runsheet/done', { id: eventId, itemId: regel.id }, kok);
+  const af = await ev('/api/supplier/event/runsheet/done', { id: eventId, itemId: regel.id }, kok);
   assert.equal(af.status, 200);
   const naAf = af.body.event.runsheet.find(x => x.id === regel.id);
   assert.equal(naAf.done, true);
   assert.ok(naAf.doneBy, 'er staat bij wie het afvinkte');
-  const terug = await ev('/runsheet/done', { id: eventId, itemId: regel.id }, kok);
+  const terug = await ev('/api/supplier/event/runsheet/done', { id: eventId, itemId: regel.id }, kok);
   assert.equal(terug.body.event.runsheet.find(x => x.id === regel.id).done, false, 'per ongeluk afvinken is te herstellen');
-  assert.equal((await ev('/runsheet/done', { id: eventId, itemId: 'bestaatniet' }, kok)).status, 404);
+  assert.equal((await ev('/api/supplier/event/runsheet/done', { id: eventId, itemId: 'bestaatniet' }, kok)).status, 404);
 
-  const weg = await ev('/runsheet', { id: eventId, action: 'remove', itemId: regel.id }, chef);
+  const weg = await ev('/api/supplier/event/runsheet', { id: eventId, action: 'remove', itemId: regel.id }, chef);
   assert.ok(!weg.body.event.runsheet.some(x => x.id === regel.id), 'de regel is weg');
-  assert.equal((await ev('/runsheet', { id: eventId, action: 'poets' }, chef)).status, 400);
+  assert.equal((await ev('/api/supplier/event/runsheet', { id: eventId, action: 'poets' }, chef)).status, 400);
 });
 
 test('6. het draaiboek uit de AI-hulp draait ook zonder sleutel', async () => {
-  const voor = (await ev('/runsheet', { id: eventId, action: 'add', item: { text: 'anker' } }, chef)).body.event.runsheet.length;
-  const sug = await ev('/runsheet/ai', { id: eventId, mode: 'suggest' }, chef);
+  const voor = (await ev('/api/supplier/event/runsheet', { id: eventId, action: 'add', item: { text: 'anker' } }, chef)).body.event.runsheet.length;
+  const sug = await ev('/api/supplier/event/runsheet/ai', { id: eventId, mode: 'suggest' }, chef);
   assert.equal(sug.status, 200);
   assert.ok(sug.body.event.runsheet.length > voor, 'er komen regels bij');
-  assert.equal((await ev('/runsheet/ai', { id: 'bestaatniet' }, chef)).status, 404);
-  assert.equal((await ev('/runsheet/ai', { id: eventId }, kok)).status, 403, 'ook dit is van de manager');
+  assert.equal((await ev('/api/supplier/event/runsheet/ai', { id: 'bestaatniet' }, chef)).status, 404);
+  assert.equal((await ev('/api/supplier/event/runsheet/ai', { id: eventId }, kok)).status, 403, 'ook dit is van de manager');
 });
 
 test('7. inchecken aan de deur: alleen een gast die op de lijst staat', async () => {
-  await ev('', { action: 'publish', id: eventId }, chef);
+  await ev('/api/supplier/event', { action: 'publish', id: eventId }, chef);
   const rsvp = await api('/api/event/rsvp', { supplierCode: 'KIKUNOI', eventId, qty: 2 }, lid);
   assert.equal(rsvp.status, 200, 'het lid meldt zich aan');
 
-  assert.equal((await ev('/checkin', { eventId: 'bestaatniet', key: 'x' }, chef)).status, 404);
-  assert.equal((await ev('/checkin', { eventId, key: 'iemand-anders' }, chef)).status, 404, 'wie niet op de lijst staat, checkt niet in');
+  assert.equal((await ev('/api/supplier/event/checkin', { eventId: 'bestaatniet', key: 'x' }, chef)).status, 404);
+  assert.equal((await ev('/api/supplier/event/checkin', { eventId, key: 'iemand-anders' }, chef)).status, 404, 'wie niet op de lijst staat, checkt niet in');
 
   const gast = (await api('/api/supplier/state', {}, chef)).body.state.events.find(x => x.id === eventId).guests[0];
-  const inc = await ev('/checkin', { eventId, key: gast.key }, kok);
+  const inc = await ev('/api/supplier/event/checkin', { eventId, key: gast.key }, kok);
   assert.equal(inc.status, 200, 'de deur mag dit zonder manager te zijn');
   assert.equal(inc.body.event.guests.find(g => g.key === gast.key).checkedIn, true);
-  const uit = await ev('/checkin', { eventId, key: gast.key }, kok);
+  const uit = await ev('/api/supplier/event/checkin', { eventId, key: gast.key }, kok);
   assert.equal(uit.body.event.guests.find(g => g.key === gast.key).checkedIn, false, 'per ongeluk inchecken is te herstellen');
 });

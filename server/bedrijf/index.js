@@ -32,10 +32,8 @@ module.exports = (kern) => {
   const rid = (n) => crypto.randomBytes(n || 4).toString('hex');
   const dag = () => nu().slice(0, 10);
 
-  function W() {
-    if (!db.data.werkruimtes) db.data.werkruimtes = {};
-    return db.data.werkruimtes;
-  }
+  // de werkruimtes achter de deur van de bedrijvenkant (kern/tenant/opslag.js)
+  const W = require('../kern/tenant/opslag')({ db }).werkruimtes;
 
   /* De twee deuren staan in ./deuren.js: het contractquotum en de
      organisatiemeting hangen eraan, en die horen op één plek te hangen. */

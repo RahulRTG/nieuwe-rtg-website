@@ -143,7 +143,8 @@ test('4. DE BYTES zitten achter de deur, niet alleen de lijst', async () => {
   /* Dit is de toets die telt. Een interne bibliotheek die alleen uit de lijsten
      is weggelaten, is geen interne bibliotheek: wie het video-id heeft haalt de
      beelden dan gewoon op met een link. */
-  const kijk = tok => stroomAdres(base, '/api/theater/kijk/' + videoId, tok, { stroom: 'theater-kijk', id: videoId }).then(a => fetch(a));
+  // de deur heet in de routekaart /api/theater/kijk/:id
+  const kijk = tok => stroomAdres(base, '/api/theater/kijk/:id'.replace(':id', videoId), tok, { stroom: 'theater-kijk', id: videoId }).then(a => fetch(a));
   const mag = await kijk(collega.token);
   assert.equal(mag.status, 200, 'de collega krijgt beeld');
 

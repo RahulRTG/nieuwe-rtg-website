@@ -37,7 +37,7 @@ const post = (pad, body, tok) => fetch(BASE + pad, {
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const os_ = (pad, body, tok) => post('/api/rtfos/' + pad, body, tok || LAND);
+const os_ = (pad, body, tok) => post((pad.startsWith('/api/') ? pad : '/api/rtfos/' + pad), body, tok || LAND);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
@@ -45,28 +45,28 @@ test.before(async () => {
   LAND = await kantoorAlsPersoon(BASE);
   assert.ok(LAND, 'geen kantoorsessie');
 
-  STAD = (await os_('stad/maak', { naam: 'Zaanstad' })).body.stad.id;
-  await os_('stad/status', { id: STAD, status: 'actief' });
+  STAD = (await os_('/api/rtfos/stad/maak', { naam: 'Zaanstad' })).body.stad.id;
+  await os_('/api/rtfos/stad/status', { id: STAD, status: 'actief' });
   for (const vlag of ['individual_cases', 'donations', 'youth_programs']) {
-    await os_('stad/module', { id: STAD, vlag, aan: true });
+    await os_('/api/rtfos/stad/module', { id: STAD, vlag, aan: true });
   }
   // een medewerker: de laagste rol, met opzet -- die heeft geen casus.lezen
   const reg = await post('/api/auth/register', { name: 'Medewerker Fatima', email: 'mf@rtfosaf.test',
     phone: '0612345688', password: 'geheim123', geboortedatum: '1992-01-01', pasApp: 'rtg' });
   await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   WERKER = (await post('/api/account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
-  KEY_WERKER = (await os_('ik', {}, WERKER)).body.key;
-  await os_('zetel', { stad: STAD, key: KEY_WERKER, naam: 'Fatima', rol: 'medewerker' });
+  KEY_WERKER = (await os_('/api/rtfos/ik', {}, WERKER)).body.key;
+  await os_('/api/rtfos/zetel', { stad: STAD, key: KEY_WERKER, naam: 'Fatima', rol: 'medewerker' });
 
-  const p = await os_('project/maak', { stad: STAD, naam: 'Huiswerkklas Zaandam', soort: 'jongeren',
+  const p = await os_('/api/rtfos/project/maak', { stad: STAD, naam: 'Huiswerkklas Zaandam', soort: 'jongeren',
     budget: 700, doelgroep: 'jongeren 12-18' });
   PROJECT = p.body.project.id;
   for (const st of ['aanvraag', 'beoordeling', 'goedgekeurd', 'actief']) {
-    await os_('project/status', { id: PROJECT, status: st });
+    await os_('/api/rtfos/project/status', { id: PROJECT, status: st });
   }
-  CASUS = (await os_('casus/maak', { stad: STAD, soort: 'voedsel', urgentie: 'hoog', wijk: 'Poelenburg',
+  CASUS = (await os_('/api/rtfos/casus/maak', { stad: STAD, soort: 'voedsel', urgentie: 'hoog', wijk: 'Poelenburg',
     vraag: 'geen geld voor eten deze week', contact: 'Aisha M., Zonnelaan 4, 0655544433' })).body.casus.id;
-  ANDERE = (await os_('casus/maak', { stad: STAD, soort: 'schoolspullen', urgentie: 'middel',
+  ANDERE = (await os_('/api/rtfos/casus/maak', { stad: STAD, soort: 'schoolspullen', urgentie: 'middel',
     vraag: 'schoolspullen voor twee kinderen', contact: 'Peter G., 0699988877' })).body.casus.id;
 });
 
@@ -74,70 +74,70 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
 
 /* ------------------------------------------------------------------------- */
 test('de veld-app toont alleen wat is toegewezen, en niets van de rest van de stad', async () => {
-  const leeg = await os_('veld/lijst', {}, WERKER);
+  const leeg = await os_('/api/rtfos/veld/lijst', {}, WERKER);
   assert.equal(leeg.status, 200);
   assert.equal(leeg.body.aantal, 0, 'de medewerker zag hulpvragen zonder toewijzing');
 
-  const dicht = await os_('veld/hulpvraag', { id: CASUS }, WERKER);
+  const dicht = await os_('/api/rtfos/veld/hulpvraag', { id: CASUS }, WERKER);
   assert.equal(dicht.status, 403);
   assert.match(dicht.body.error, /niet aan u toegewezen/);
 
   // toewijzen aan iemand zonder zetel in deze stad kan niet
-  const buiten = await os_('casus/toewijzen', { id: CASUS, key: 'user-bestaatniet' });
+  const buiten = await os_('/api/rtfos/casus/toewijzen', { id: CASUS, key: 'user-bestaatniet' });
   assert.equal(buiten.status, 400);
   assert.match(buiten.body.error, /geen zetel in deze stadsafdeling/);
 
-  const toe = await os_('casus/toewijzen', { id: CASUS, key: KEY_WERKER });
+  const toe = await os_('/api/rtfos/casus/toewijzen', { id: CASUS, key: KEY_WERKER });
   assert.equal(toe.status, 200);
 
-  const lijst = await os_('veld/lijst', {}, WERKER);
+  const lijst = await os_('/api/rtfos/veld/lijst', {}, WERKER);
   assert.equal(lijst.body.aantal, 1, 'de toegewezen hulpvraag stond niet in de lijst');
   assert.equal(lijst.body.hulpvragen[0].codenaam.length > 0, true);
 
   // de andere hulpvraag in dezelfde stad blijft dicht
-  const ander = await os_('veld/hulpvraag', { id: ANDERE }, WERKER);
+  const ander = await os_('/api/rtfos/veld/hulpvraag', { id: ANDERE }, WERKER);
   assert.equal(ander.status, 403, 'een niet-toegewezen hulpvraag in dezelfde stad ging open');
 
   // en intrekken sluit hem weer
-  await os_('casus/toewijzen', { id: CASUS, key: KEY_WERKER, weg: true });
-  assert.equal((await os_('veld/hulpvraag', { id: CASUS }, WERKER)).status, 403,
+  await os_('/api/rtfos/casus/toewijzen', { id: CASUS, key: KEY_WERKER, weg: true });
+  assert.equal((await os_('/api/rtfos/veld/hulpvraag', { id: CASUS }, WERKER)).status, 403,
     'na het intrekken van de toewijzing bleef het dossier open');
-  await os_('casus/toewijzen', { id: CASUS, key: KEY_WERKER });
+  await os_('/api/rtfos/casus/toewijzen', { id: CASUS, key: KEY_WERKER });
 });
 
 /* ------------------------------------------------------------------------- */
 test('het adres opent apart en komt in het auditspoor, ook vanuit de veld-app', async () => {
-  const voor = (await os_('audit', { wat: 'casus.contact-open' })).body.totaal;
+  const voor = (await os_('/api/rtfos/audit', { wat: 'casus.contact-open' })).body.totaal;
 
-  const a = await os_('veld/adres', { id: CASUS }, WERKER);
+  const a = await os_('/api/rtfos/veld/adres', { id: CASUS }, WERKER);
   assert.equal(a.status, 200);
   assert.match(a.body.contact, /Zonnelaan/, 'het adres kwam niet uit de kluis');
 
-  const na = await os_('audit', { wat: 'casus.contact-open' });
+  const na = await os_('/api/rtfos/audit', { wat: 'casus.contact-open' });
   assert.equal(na.body.totaal, voor + 1, 'het openen van het adres kwam niet in het auditspoor');
   assert.match(na.body.regels[0].extra || '', /veld-app/, 'het spoor zegt niet waar het openen vandaan kwam');
 
   // een niet-toegewezen dossier geeft ook geen adres
-  const dicht = await os_('veld/adres', { id: ANDERE }, WERKER);
+  const dicht = await os_('/api/rtfos/veld/adres', { id: ANDERE }, WERKER);
   assert.equal(dicht.status, 403);
 });
 
 /* ------------------------------------------------------------------------- */
 test('een bezoekrapport draagt een vervolg, en de medewerker rondt niet af', async () => {
-  const zonder = await os_('veld/rapport', { id: CASUS, soort: 'contact',
+  const zonder = await os_('/api/rtfos/veld/rapport', { id: CASUS, soort: 'contact',
     tekst: 'langsgeweest, pakket afgegeven' }, WERKER);
   assert.equal(zonder.status, 400);
   assert.match(zonder.body.error, /Wanneer is het vervolg/);
   assert.match(zonder.body.error, /blijft liggen/);
 
   // "geen vervolg" mag, maar niet zonder reden
-  const kaal = await os_('veld/rapport', { id: CASUS, soort: 'hulpactie',
+  const kaal = await os_('/api/rtfos/veld/rapport', { id: CASUS, soort: 'hulpactie',
     tekst: 'pakket afgegeven, het gezin redt het verder', geenVervolg: true }, WERKER);
   assert.equal(kaal.status, 400);
   assert.match(kaal.body.error, /Waarom is er geen vervolg nodig/);
 
   const morgen = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
-  const goed = await os_('veld/rapport', { id: CASUS, soort: 'contact',
+  const goed = await os_('/api/rtfos/veld/rapport', { id: CASUS, soort: 'contact',
     tekst: 'langsgeweest, pakket afgegeven en de aanvraag bijzondere bijstand samen ingevuld',
     vervolgOp: morgen, vervolgWat: 'nabellen of de aanvraag door is' }, WERKER);
   assert.equal(goed.status, 200);
@@ -146,7 +146,7 @@ test('een bezoekrapport draagt een vervolg, en de medewerker rondt niet af', asy
   /* AFRONDEN KAN HIER NIET, en de weigering legt uit waarom. Een knop die er
      niet is leest als een gebrek; een medewerker die niet weet waarom hij het
      niet kan, doet het ergens anders. */
-  const af = await os_('veld/afronden', { id: CASUS }, WERKER);
+  const af = await os_('/api/rtfos/veld/afronden', { id: CASUS }, WERKER);
   assert.equal(af.status, 403);
   assert.match(af.body.error, /coordinator/i);
   assert.match(af.body.error, /bewaartermijn/);
@@ -154,12 +154,12 @@ test('een bezoekrapport draagt een vervolg, en de medewerker rondt niet af', asy
 
 /* ------------------------------------------------------------------------- */
 test('de gever ziet zijn eigen giften en waar ze heen gingen, en niets van een ander', async () => {
-  const mijn = await os_('bron/maak', { stad: STAD, soort: 'donatie', gever: 'Familie Bakker',
+  const mijn = await os_('/api/rtfos/bron/maak', { stad: STAD, soort: 'donatie', gever: 'Familie Bakker',
     bedrag: 250, projectId: PROJECT });
-  const nogEen = await os_('bron/maak', { stad: STAD, soort: 'donatie', gever: 'Familie Bakker', bedrag: 100 });
-  await os_('bron/maak', { stad: STAD, soort: 'donatie', gever: 'Iemand anders', bedrag: 5000 });
+  const nogEen = await os_('/api/rtfos/bron/maak', { stad: STAD, soort: 'donatie', gever: 'Familie Bakker', bedrag: 100 });
+  await os_('/api/rtfos/bron/maak', { stad: STAD, soort: 'donatie', gever: 'Iemand anders', bedrag: 5000 });
 
-  const code = await os_('donateur/code', { bronId: mijn.body.bron.id,
+  const code = await os_('/api/rtfos/donateur/code', { bronId: mijn.body.bron.id,
     // Een naam is geen donoridentiteit: het kantoor bevestigt exact welke
     // bronnen bij dezelfde gever horen voordat er één portaalcode ontstaat.
     gift_ids: [mijn.body.bron.id, nogEen.body.bron.id] });
@@ -198,17 +198,17 @@ test('de gever ziet zijn eigen giften en waar ze heen gingen, en niets van een a
   assert.match(bewijs.body.bewijs.toelichting, /drempel/);
 
   // onder de vijf jaar is het geen periodieke gift
-  const kort = await os_('donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 3,
+  const kort = await os_('/api/rtfos/donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 3,
     kenmerk: 'RTF-2026-01', tot: '2029-01-01' });
   assert.equal(kort.status, 400);
   assert.match(kort.body.error, /ten minste 5 jaar/);
 
   // zonder kenmerk ook niet: dan is er niets vastgelegd
-  const naamloos = await os_('donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 5, tot: '2031-01-01' });
+  const naamloos = await os_('/api/rtfos/donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 5, tot: '2031-01-01' });
   assert.equal(naamloos.status, 400);
   assert.match(naamloos.body.error, /kenmerk/);
 
-  const vast = await os_('donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 5,
+  const vast = await os_('/api/rtfos/donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 5,
     kenmerk: 'RTF-2026-01', tot: '2031-01-01' });
   assert.equal(vast.status, 200);
   const nu = await post('/api/rtfos/portaal/donateur/bewijs', { code: code.body.code, giftId: mijn.body.bron.id });
@@ -218,8 +218,8 @@ test('de gever ziet zijn eigen giften en waar ze heen gingen, en niets van een a
 
 /* ------------------------------------------------------------------------- */
 test('waar het geen gift is, komt er geen giftbewijs maar de reden', async () => {
-  const sponsor = await os_('bron/maak', { stad: STAD, soort: 'sponsoring', gever: 'Garage Zaandam', bedrag: 800 });
-  const code = (await os_('donateur/code', { bronId: sponsor.body.bron.id })).body.code;
+  const sponsor = await os_('/api/rtfos/bron/maak', { stad: STAD, soort: 'sponsoring', gever: 'Garage Zaandam', bedrag: 800 });
+  const code = (await os_('/api/rtfos/donateur/code', { bronId: sponsor.body.bron.id })).body.code;
   const p = await post('/api/rtfos/portaal/donateur', { code });
   const g = p.body.donateur.giften[0];
   assert.equal(g.bewijs.kan, false);
@@ -230,8 +230,8 @@ test('waar het geen gift is, komt er geen giftbewijs maar de reden', async () =>
 
   /* En een grote gift waarvan de herkomst nog open staat, krijgt ook geen
      bewijs -- de stichting weet dan zelf nog niet of ze hem houdt. */
-  const groot = await os_('bron/maak', { stad: STAD, soort: 'donatie', gever: 'Onbekende weldoener', bedrag: 30000 });
-  const gcode = (await os_('donateur/code', { bronId: groot.body.bron.id })).body.code;
+  const groot = await os_('/api/rtfos/bron/maak', { stad: STAD, soort: 'donatie', gever: 'Onbekende weldoener', bedrag: 30000 });
+  const gcode = (await os_('/api/rtfos/donateur/code', { bronId: groot.body.bron.id })).body.code;
   const gp = await post('/api/rtfos/portaal/donateur', { code: gcode });
   assert.equal(gp.body.donateur.giften[0].bewijs.kan, false);
   assert.match(gp.body.donateur.giften[0].bewijs.waarom, /nog beoordeeld/);
@@ -239,12 +239,12 @@ test('waar het geen gift is, komt er geen giftbewijs maar de reden', async () =>
 
 /* ------------------------------------------------------------------------- */
 test('de publieke campagnelijst toont lopende campagnes zonder een enkel bedrag', async () => {
-  const c = await os_('campagne/maak', { naam: 'Winterjassen 2026', doel: 'jassen voor kinderen' });
+  const c = await os_('/api/rtfos/campagne/maak', { naam: 'Winterjassen 2026', doel: 'jassen voor kinderen' });
   assert.equal(c.status, 200, JSON.stringify(c.body).slice(0, 200));
-  const sleutel = await os_('campagne/sleutel', { id: c.body.campagne.id,
+  const sleutel = await os_('/api/rtfos/campagne/sleutel', { id: c.body.campagne.id,
     delen: [{ stad: STAD, procent: 100, reden: 'enige actieve afdeling' }] });
   assert.equal(sleutel.status, 200, JSON.stringify(sleutel.body).slice(0, 200));
-  const live = await os_('campagne/status', { id: c.body.campagne.id, status: 'live' });
+  const live = await os_('/api/rtfos/campagne/status', { id: c.body.campagne.id, status: 'live' });
   assert.equal(live.status, 200, JSON.stringify(live.body).slice(0, 200));
 
   const open = await post('/api/rtfos/publiek/campagnes', {});

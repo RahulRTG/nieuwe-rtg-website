@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-16T12:04:18.324Z",
-  "commit": "7ecba8058",
+  "op": "2026-10-18T21:08:40.786Z",
+  "commit": "e88cf3b44",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -28,6 +28,7 @@
     "server/accounts/index.js",
     "server/accounts/intreklijst.js",
     "server/accounts/kluis.js",
+    "server/accounts/mirror-intrekking.js",
     "server/accounts/mirror-wachtrij.js",
     "server/accounts/mirror.js",
     "server/accounts/onderhoud.js",
@@ -78,6 +79,7 @@
     "server/bedrijf/gevolg.js",
     "server/bedrijf/gezondheid.js",
     "server/bedrijf/handeling-lijst.js",
+    "server/bedrijf/handeling-uitvoering.js",
     "server/bedrijf/handeling.js",
     "server/bedrijf/herkomst.js",
     "server/bedrijf/index.js",
@@ -124,6 +126,7 @@
     "server/bedrijf/sleutels.js",
     "server/bedrijf/start.js",
     "server/bedrijf/storing.js",
+    "server/bedrijf/taak-idem.js",
     "server/bedrijf/taak.js",
     "server/bedrijf/tekengrens.js",
     "server/bedrijf/toen.js",
@@ -202,6 +205,7 @@
     "server/db/audit-projectie.js",
     "server/db/audit-publicatie.js",
     "server/db/audit-sqlite.js",
+    "server/db/audit-stage.js",
     "server/db/audit-vorm.js",
     "server/db/bijeen.js",
     "server/db/botsing.js",
@@ -262,6 +266,7 @@
     "server/db/voorcheck.js",
     "server/dkim.js",
     "server/effectbon-classificatie.js",
+    "server/effectbon-ring.js",
     "server/effectbon.js",
     "server/effectmeter-http.js",
     "server/effectmeter.js",
@@ -309,6 +314,7 @@
     "server/foundation/onderwijs/stroomticket.js",
     "server/foundation/onderwijs/toegang-beheer.js",
     "server/foundation/onderwijs/toegang.js",
+    "server/foundation/opslag.js",
     "server/foundation/rem.js",
     "server/foundation/sollicitaties.js",
     "server/foundation/systeembericht.js",
@@ -548,7 +554,10 @@
     "server/kern/bankregie/stand.js",
     "server/kern/bankregie/vergunning.js",
     "server/kern/bearercode-keten.js",
+    "server/kern/bearercode-migratie.js",
+    "server/kern/bearercode-sleutelring.js",
     "server/kern/bearercode-v2.js",
+    "server/kern/bearercode-zegel.js",
     "server/kern/bearercode.js",
     "server/kern/bedrijfscontrole.js",
     "server/kern/bedrijfsmaat/beoordeel.js",
@@ -617,6 +626,7 @@
     "server/kern/bestanden.js",
     "server/kern/bestuursroutes.js",
     "server/kern/betaalopdracht/afstemming.js",
+    "server/kern/betaalopdracht/bevestiging.js",
     "server/kern/betaalopdracht/index.js",
     "server/kern/betaalopdracht/inzending.js",
     "server/kern/betaalopdracht/rij.js",
@@ -637,6 +647,7 @@
     "server/kern/betekenis.js",
     "server/kern/betrouwbaarheid.js",
     "server/kern/beveiliging.js",
+    "server/kern/beveiliging/opslag.js",
     "server/kern/beveiliging/pda/index.js",
     "server/kern/beveiliging/pda/patrouille.js",
     "server/kern/beveiliging/rooster.js",
@@ -718,6 +729,7 @@
     "server/kern/bureau/beveiliging.js",
     "server/kern/bureau/briefing.js",
     "server/kern/bureau/cases-bureau.js",
+    "server/kern/bureau/cases-overzicht.js",
     "server/kern/bureau/cases-soorten.js",
     "server/kern/bureau/cases.js",
     "server/kern/bureau/collectie.js",
@@ -745,6 +757,7 @@
     "server/kern/cadeaukaart.js",
     "server/kern/care.js",
     "server/kern/care/leden.js",
+    "server/kern/care/opslag.js",
     "server/kern/care/vastleggen.js",
     "server/kern/care/wachtlijst.js",
     "server/kern/care/zaak.js",
@@ -778,6 +791,7 @@
     "server/kern/comm/wie-buiten.js",
     "server/kern/comm/wie.js",
     "server/kern/command/alarm-aanvullend.js",
+    "server/kern/command/alarm-controles.js",
     "server/kern/command/alarm-uitgang.js",
     "server/kern/command/alarm.js",
     "server/kern/command/apipoort-controle.js",
@@ -841,6 +855,7 @@
     "server/kern/command/transactie.js",
     "server/kern/command/uitrolmeting.js",
     "server/kern/command/uitrolregie.js",
+    "server/kern/command/uitrolweging.js",
     "server/kern/command/vermogens.js",
     "server/kern/command/vlootbeeld-incidenten.js",
     "server/kern/command/vlootbeeld.js",
@@ -902,6 +917,7 @@
     "server/kern/commercie/tegoed/betaalbewijs.js",
     "server/kern/commercie/tegoed/inhoud.js",
     "server/kern/commercie/tegoed/plafond.js",
+    "server/kern/commercie/tegoed/rij.js",
     "server/kern/commercie/veiligheidskern.js",
     "server/kern/commercie/vergoeding.js",
     "server/kern/commercie/verrekening.js",
@@ -1001,6 +1017,7 @@
     "server/kern/democratie/voorstellen.js",
     "server/kern/democratie/wek.js",
     "server/kern/demostand.js",
+    "server/kern/dienst-opslag.js",
     "server/kern/dienstidentiteit.js",
     "server/kern/directpay/betalen.js",
     "server/kern/directpay/index.js",
@@ -1039,6 +1056,7 @@
     "server/kern/ervaring/afgerond.js",
     "server/kern/ervaring/leden/annuleren.js",
     "server/kern/ervaring/leden/index.js",
+    "server/kern/ervaring/leden/punten-plafond.js",
     "server/kern/ervaring/leden/punten-tegoed.js",
     "server/kern/ervaring/leden/punten.js",
     "server/kern/ervaring/leden/spaarpot.js",
@@ -1087,6 +1105,7 @@
     "server/kern/experience/projections.js",
     "server/kern/experience/volgorde.js",
     "server/kern/facturatie.js",
+    "server/kern/facturatie/btw.js",
     "server/kern/facturatie/loket.js",
     "server/kern/facturatie/motor.js",
     "server/kern/factuur.js",
@@ -1232,6 +1251,7 @@
     "server/kern/gemeente/index.js",
     "server/kern/gemeente/info.js",
     "server/kern/gemeente/meldingen.js",
+    "server/kern/gemeente/opslag.js",
     "server/kern/gemeente/vergunningen.js",
     "server/kern/gemoed.js",
     "server/kern/genootschap/ai.js",
@@ -1293,8 +1313,10 @@
     "server/kern/horeca/dienstmeting.js",
     "server/kern/horeca/foliolaag.js",
     "server/kern/horeca/gezelschap.js",
+    "server/kern/horeca/happy.js",
     "server/kern/horeca/kaart.js",
     "server/kern/horeca/keukenlaag.js",
+    "server/kern/horeca/pas-gereed.js",
     "server/kern/horeca/pas.js",
     "server/kern/horeca/pols.js",
     "server/kern/horeca/polsmeting.js",
@@ -1334,6 +1356,7 @@
     "server/kern/identiteit/bezitspaden.js",
     "server/kern/identiteit/bezitsstand.js",
     "server/kern/identiteit/commercieel.js",
+    "server/kern/identiteit/demo-inlog.js",
     "server/kern/identiteit/doelen.js",
     "server/kern/identiteit/doelpoort.js",
     "server/kern/identiteit/gegevenskaart.js",
@@ -1348,6 +1371,7 @@
     "server/kern/identiteit/sessielijst.js",
     "server/kern/identiteit/sessieregister.js",
     "server/kern/identiteit/sessievelden.js",
+    "server/kern/identiteit/toestelgrens.js",
     "server/kern/identiteit/toestellen.js",
     "server/kern/identiteit/toestelsleutels.js",
     "server/kern/identiteit/tweedestap-rem.js",
@@ -1440,6 +1464,7 @@
     "server/kern/kantoor/index.js",
     "server/kern/kantoor/intrekking.js",
     "server/kern/kantoor/kluispoort.js",
+    "server/kern/kantoor/kycwachtrij.js",
     "server/kern/kantoor/mensdeur-spoel.js",
     "server/kern/kantoor/mensdeur.js",
     "server/kern/kantoor/metrics-week.js",
@@ -1755,6 +1780,7 @@
     "server/kern/luchthaven/vluchten.js",
     "server/kern/machtiging.js",
     "server/kern/magnaat-capabilities-bronnen.js",
+    "server/kern/magnaat-capabilities-routes.js",
     "server/kern/magnaat-capabilities.js",
     "server/kern/magnaat-controle.js",
     "server/kern/magnaat-dekkingsmatrix.js",
@@ -1861,6 +1887,7 @@
     "server/kern/mall/extern.js",
     "server/kern/mall/index.js",
     "server/kern/mall/kaart.js",
+    "server/kern/mall/levende-etalage.js",
     "server/kern/mall/lijsten.js",
     "server/kern/mall/lijstregel.js",
     "server/kern/mall/lijsttonen.js",
@@ -1917,6 +1944,7 @@
     "server/kern/metier/index.js",
     "server/kern/metier/loon.js",
     "server/kern/metier/netwerk.js",
+    "server/kern/metier/opslag.js",
     "server/kern/metier/zoek.js",
     "server/kern/metingen.js",
     "server/kern/mobiliteit/abonnement.js",
@@ -1957,6 +1985,7 @@
     "server/kern/mobiliteit/reiziger.js",
     "server/kern/mobiliteit/ritpunten.js",
     "server/kern/mobiliteit/storing.js",
+    "server/kern/mobiliteit/vergeten.js",
     "server/kern/mobiliteit/voertuigcatalogus.js",
     "server/kern/mobiliteit/voortgang.js",
     "server/kern/mobiliteit/zakelijk.js",
@@ -2122,6 +2151,7 @@
     "server/kern/ontmoeting/date.js",
     "server/kern/ontmoeting/radar.js",
     "server/kern/ontmoeting/sos.js",
+    "server/kern/ontmoeting/vergeten.js",
     "server/kern/ontmoetpoort.js",
     "server/kern/ontvanger.js",
     "server/kern/ontwerpbank.js",
@@ -2166,6 +2196,7 @@
     "server/kern/pasgeschiedenis.js",
     "server/kern/pasladder.js",
     "server/kern/paspoort.js",
+    "server/kern/paspoort/opslag.js",
     "server/kern/paspoort/toezicht.js",
     "server/kern/paspoort/verzoeken.js",
     "server/kern/pasprijs.js",
@@ -2258,6 +2289,7 @@
     "server/kern/pdf-redactie.js",
     "server/kern/pdf-xref.js",
     "server/kern/pdf.js",
+    "server/kern/personas.js",
     "server/kern/personeel.js",
     "server/kern/persoonseis-lijst.js",
     "server/kern/persoonseis.js",
@@ -2296,6 +2328,7 @@
     "server/kern/rahul-fases.js",
     "server/kern/rahul-hart.js",
     "server/kern/rahul-omgang.js",
+    "server/kern/rahul-profiel.js",
     "server/kern/rahul.js",
     "server/kern/rahul/stemming.js",
     "server/kern/rahul/taal.js",
@@ -2347,6 +2380,7 @@
     "server/kern/reisbureau-context.js",
     "server/kern/reisbureau-geldrijen.js",
     "server/kern/reisbureau-nazorg.js",
+    "server/kern/reisbureau-opslag.js",
     "server/kern/reisbureau-samenstelling.js",
     "server/kern/reisbureau-terugboeking.js",
     "server/kern/reisbureau-teruggave.js",
@@ -2420,7 +2454,9 @@
     "server/kern/revenue/entitlement-projectie-v1/gedelegeerd.js",
     "server/kern/revenue/entitlement-projectie-v1/tenant.js",
     "server/kern/revenue/entitlement-projectie-v1/workos.js",
+    "server/kern/revenue/immutable.js",
     "server/kern/revenue/index.js",
+    "server/kern/revenue/subscription-source-audit-v1.js",
     "server/kern/rijksbieb-data.js",
     "server/kern/rijksbieb.js",
     "server/kern/routedekking.js",
@@ -2480,6 +2516,7 @@
     "server/kern/rtfos/netwerk-meting.js",
     "server/kern/rtfos/netwerk.js",
     "server/kern/rtfos/ondernemers.js",
+    "server/kern/rtfos/opslag.js",
     "server/kern/rtfos/partners-portaal.js",
     "server/kern/rtfos/partners.js",
     "server/kern/rtfos/projecten-besluit.js",
@@ -2515,7 +2552,9 @@
     "server/kern/rtgid-regie.js",
     "server/kern/rtgid.js",
     "server/kern/rtgonderzoeker.js",
+    "server/kern/rtgone-bestuur.js",
     "server/kern/rtgone-projecten.js",
+    "server/kern/rtgone-vandaag.js",
     "server/kern/rtgone.js",
     "server/kern/rtmail-adres.js",
     "server/kern/rtmail-ai.js",
@@ -2529,6 +2568,7 @@
     "server/kern/rtmail-leidingtermijn.js",
     "server/kern/rtmail-lijn.js",
     "server/kern/rtmail-links.js",
+    "server/kern/rtmail-opslag.js",
     "server/kern/rtmail-recht.js",
     "server/kern/rtmail-regels.js",
     "server/kern/rtmail-schrijf.js",
@@ -2608,6 +2648,7 @@
     "server/kern/sleutelwoorden.js",
     "server/kern/sociaal.js",
     "server/kern/sociaal/dmpost.js",
+    "server/kern/sociaal/opslag.js",
     "server/kern/sociaal/pin-beveiliging.js",
     "server/kern/sociaal/pin-clusterrem.js",
     "server/kern/sociaal/pin-deur-rem.js",
@@ -2845,6 +2886,7 @@
     "server/kern/stuur/menscontext-presentatie.js",
     "server/kern/stuur/menscontext-ref.js",
     "server/kern/stuur/menscontext-relatie.js",
+    "server/kern/stuur/menscontext-saneer.js",
     "server/kern/stuur/menscontext-uit.js",
     "server/kern/stuur/menscontext-vers.js",
     "server/kern/stuur/menscontext.js",
@@ -2888,6 +2930,7 @@
     "server/kern/tenant/journaal.js",
     "server/kern/tenant/levensloop.js",
     "server/kern/tenant/merkkern.js",
+    "server/kern/tenant/opslag.js",
     "server/kern/tenant/register.js",
     "server/kern/tenant/uitgang-leesbaar.js",
     "server/kern/tenant/uitgang.js",
@@ -2895,6 +2938,7 @@
     "server/kern/theater/index.js",
     "server/kern/theater/kantoor.js",
     "server/kern/theater/kijkplicht.js",
+    "server/kern/theater/opslag.js",
     "server/kern/theater/video.js",
     "server/kern/theater/zaak.js",
     "server/kern/theater/zaal.js",
@@ -2943,6 +2987,8 @@
     "server/kern/veiligheid/opslag.js",
     "server/kern/veiligheid/plek.js",
     "server/kern/veiligheid/rust.js",
+    "server/kern/veiligheid/vergeten.js",
+    "server/kern/veiligheid/vriendopcodenaam.js",
     "server/kern/veiligheid/wacht.js",
     "server/kern/verblijf.js",
     "server/kern/verblijf/gast.js",
@@ -2954,10 +3000,13 @@
     "server/kern/verbond/wijzig.js",
     "server/kern/vergeten-anker.js",
     "server/kern/vergeten.js",
+    "server/kern/vergeten/account.js",
     "server/kern/vergeten/anoniem.js",
     "server/kern/vergeten/bytes.js",
     "server/kern/vergeten/eigen.js",
     "server/kern/vergeten/gesprekken.js",
+    "server/kern/vergeten/positie.js",
+    "server/kern/vergeten/sporen.js",
     "server/kern/vertegenwoordiging/acties.js",
     "server/kern/vertegenwoordiging/bevoegdheden.js",
     "server/kern/vertegenwoordiging/handelen.js",
@@ -3096,6 +3145,7 @@
     "server/kern/wereld/koppel.js",
     "server/kern/wereld/lijsten.js",
     "server/kern/wereld/netwerk.js",
+    "server/kern/wereld/opslag.js",
     "server/kern/wereld/profiel.js",
     "server/kern/wereld/rechten.js",
     "server/kern/wereld/saloon/bronnen.js",
@@ -3109,6 +3159,7 @@
     "server/kern/wereldroutes/life.js",
     "server/kern/wereldroutes/work.js",
     "server/kern/werk-bezorging.js",
+    "server/kern/werk-opslag.js",
     "server/kern/werk.js",
     "server/kern/werkbetaling.js",
     "server/kern/werkbijlogin.js",
@@ -3214,6 +3265,8 @@
     "server/lib/idem-nieuwwerk.js",
     "server/lib/idem-poort.js",
     "server/lib/idem-sleutelbepaling.js",
+    "server/lib/idem-vlucht.js",
+    "server/lib/idem-zondersleutel.js",
     "server/lib/idem.js",
     "server/lib/idemring.js",
     "server/lib/idemsleutels-aankomst.js",
@@ -3222,6 +3275,7 @@
     "server/lib/idemsleutels-beelden.js",
     "server/lib/idemsleutels-beraad.js",
     "server/lib/idemsleutels-bescherming.js",
+    "server/lib/idemsleutels-bestanden.js",
     "server/lib/idemsleutels-bundel.js",
     "server/lib/idemsleutels-carriere.js",
     "server/lib/idemsleutels-commerce.js",
@@ -3247,6 +3301,7 @@
     "server/lib/idemsleutels-lidabonnement.js",
     "server/lib/idemsleutels-loop-fabric.js",
     "server/lib/idemsleutels-magnaatleven.js",
+    "server/lib/idemsleutels-mall-living.js",
     "server/lib/idemsleutels-media.js",
     "server/lib/idemsleutels-move.js",
     "server/lib/idemsleutels-neiging.js",
@@ -3282,6 +3337,7 @@
     "server/lib/idemsleutels-praktijk.js",
     "server/lib/idemsleutels-proefronde.js",
     "server/lib/idemsleutels-recent.js",
+    "server/lib/idemsleutels-rechterhand.js",
     "server/lib/idemsleutels-reisconcept.js",
     "server/lib/idemsleutels-reisgezelschap.js",
     "server/lib/idemsleutels-reisherkomst.js",
@@ -3294,11 +3350,14 @@
     "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-stage.js",
     "server/lib/idemsleutels-toestemming.js",
+    "server/lib/idemsleutels-tweedelid.js",
+    "server/lib/idemsleutels-veilig.js",
     "server/lib/idemsleutels-verbond.js",
     "server/lib/idemsleutels-vracht.js",
     "server/lib/idemsleutels-vrijgave.js",
     "server/lib/idemsleutels-weerbaarheid.js",
     "server/lib/idemsleutels-werelden.js",
+    "server/lib/idemsleutels-zaakregie.js",
     "server/lib/idemsleutels.js",
     "server/lib/jws.js",
     "server/lib/keten-anker.js",
@@ -3355,6 +3414,7 @@
     "server/lib/mutatiecontracten-eigengezin.js",
     "server/lib/mutatiecontracten-geld-b.js",
     "server/lib/mutatiecontracten-geld-lees.js",
+    "server/lib/mutatiecontracten-geld-tegenboeking.js",
     "server/lib/mutatiecontracten-geld.js",
     "server/lib/mutatiecontracten-geldgrens.js",
     "server/lib/mutatiecontracten-gelduit.js",
@@ -3393,6 +3453,7 @@
     "server/lib/mutatiecontracten-machinesleutels.js",
     "server/lib/mutatiecontracten-magnaatleven.js",
     "server/lib/mutatiecontracten-mall-aanvraag.js",
+    "server/lib/mutatiecontracten-mall-living.js",
     "server/lib/mutatiecontracten-move.js",
     "server/lib/mutatiecontracten-muziekfeed.js",
     "server/lib/mutatiecontracten-naargast.js",
@@ -3480,6 +3541,7 @@
     "server/lib/vertaalkast.js",
     "server/lib/vervalstaat.js",
     "server/lib/vingerafdruk.js",
+    "server/lib/volgendid.js",
     "server/lib/voordeuren.js",
     "server/lib/x509-pakket.js",
     "server/lib/x509.js",
@@ -3750,7 +3812,9 @@
     "server/routes/commerce.js",
     "server/routes/concern.js",
     "server/routes/concern/duiding.js",
+    "server/routes/concern/feiten.js",
     "server/routes/concern/mensen.js",
+    "server/routes/concern/rechten.js",
     "server/routes/concern/rekening.js",
     "server/routes/concern/verandering.js",
     "server/routes/concern/vestiging.js",
@@ -3765,6 +3829,7 @@
     "server/routes/democratie/partij.js",
     "server/routes/doelen.js",
     "server/routes/doos-kloon.js",
+    "server/routes/doos-rapport.js",
     "server/routes/doos-wacht.js",
     "server/routes/doos.js",
     "server/routes/drm.js",
@@ -4211,6 +4276,7 @@
     "server/routes/supplier/horeca/verdeling.js",
     "server/routes/supplier/horeca/verzoeken.js",
     "server/routes/supplier/horeca/werklijst.js",
+    "server/routes/supplier/horeca/wijk-nemen.js",
     "server/routes/supplier/horeca/wijk-overdracht.js",
     "server/routes/supplier/horeca/wijk.js",
     "server/routes/supplier/hrplus.js",
@@ -5761,7 +5827,7 @@
     "git log -1 --format=%cI",
     "node scripts/routekaart.js --json"
    ],
-   "nodeHoofdversie": 24
+   "nodeHoofdversie": 22
   }
  },
  "vergelekenMet": {
@@ -5775,17 +5841,17 @@
  },
  "grens": "Een verschil is pas een TEGENSPRAAK als beide betrokken bestanden stilstaan sinds het stempel van het andere register. Verschilt de leeftijd, dan vergelijk je twee momenten -- dat wordt hier apart geteld en nooit als tegenspraak gepresenteerd.",
  "gemeten": {
-  "routerRoutes": 5530,
+  "routerRoutes": 5531,
   "routerRoutesZonderBestand": 4,
-  "routerRoutesMetBestand": 5526,
+  "routerRoutesMetBestand": 5527,
   "bronRoutesMetBestand": 4441,
   "beideKennen": 4121,
-  "gelijk": 4079,
-  "verschillend": 42,
-  "waarvanVerouderd": 42,
+  "gelijk": 4068,
+  "verschillend": 53,
+  "waarvanVerouderd": 53,
   "waarvanTegenspraak": 0,
   "waarvanNietVastTeStellen": 0,
-  "alleenRouter": 1405,
+  "alleenRouter": 1406,
   "alleenBron": 320,
   "toetsbaarPct": 74.6
  },
@@ -5856,6 +5922,110 @@
    "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
   },
   {
+   "route": "POST /api/concern/feit/beeindig",
+   "volgensRouter": "server/routes/concern/feiten.js",
+   "volgensBron": "server/routes/concern.js",
+   "routerRegel": 32,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/feiten.js": true,
+    "server/routes/concern.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/feit/zet",
+   "volgensRouter": "server/routes/concern/feiten.js",
+   "volgensBron": "server/routes/concern.js",
+   "routerRegel": 21,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/feiten.js": true,
+    "server/routes/concern.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/functiescheiding",
+   "volgensRouter": "server/routes/concern/rechten.js",
+   "volgensBron": "server/routes/concern/mensen.js",
+   "routerRegel": 31,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/rechten.js": true,
+    "server/routes/concern/mensen.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/geschiedenis",
+   "volgensRouter": "server/routes/concern/feiten.js",
+   "volgensBron": "server/routes/concern.js",
+   "routerRegel": 54,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/feiten.js": true,
+    "server/routes/concern.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/kwalificatie/zet",
+   "volgensRouter": "server/routes/concern/rechten.js",
+   "volgensBron": "server/routes/concern/mensen.js",
+   "routerRegel": 40,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/rechten.js": true,
+    "server/routes/concern/mensen.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/kwalificaties",
+   "volgensRouter": "server/routes/concern/rechten.js",
+   "volgensBron": "server/routes/concern/mensen.js",
+   "routerRegel": 52,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/rechten.js": true,
+    "server/routes/concern/mensen.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/mag",
+   "volgensRouter": "server/routes/concern/rechten.js",
+   "volgensBron": "server/routes/concern/mensen.js",
+   "routerRegel": 18,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/rechten.js": true,
+    "server/routes/concern/mensen.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/concern/opdatum",
+   "volgensRouter": "server/routes/concern/feiten.js",
+   "volgensBron": "server/routes/concern.js",
+   "routerRegel": 47,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/concern/feiten.js": true,
+    "server/routes/concern.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
    "route": "POST /api/concern/vestiging/nieuw",
    "volgensRouter": "server/routes/concern/vestiging.js",
    "volgensBron": "server/routes/concern.js",
@@ -5916,6 +6086,19 @@
    "gewijzigdNaStempel": {
     "server/routes/concern/vestiging.js": true,
     "server/routes/concern.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/doos/rapport",
+   "volgensRouter": "server/routes/doos-rapport.js",
+   "volgensBron": "server/routes/doos.js",
+   "routerRegel": 14,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/doos-rapport.js": true,
+    "server/routes/doos.js": true
    },
    "soort": "verouderd",
    "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
@@ -6241,6 +6424,32 @@
    "gewijzigdNaStempel": {
     "server/routes/supplier/horeca/rekeninglezen.js": true,
     "server/routes/supplier/horeca/rekening.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/supplier/horeca/wijk/laat",
+   "volgensRouter": "server/routes/supplier/horeca/wijk-nemen.js",
+   "volgensBron": "server/routes/supplier/horeca/wijk.js",
+   "routerRegel": 27,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/supplier/horeca/wijk-nemen.js": true,
+    "server/routes/supplier/horeca/wijk.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/supplier/horeca/wijk/neem",
+   "volgensRouter": "server/routes/supplier/horeca/wijk-nemen.js",
+   "volgensBron": "server/routes/supplier/horeca/wijk.js",
+   "routerRegel": 13,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/supplier/horeca/wijk-nemen.js": true,
+    "server/routes/supplier/horeca/wijk.js": true
    },
    "soort": "verouderd",
    "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
@@ -8084,6 +8293,7 @@
   "POST /api/mall/lijst/weg",
   "POST /api/mall/lijst/zet",
   "POST /api/mall/lijsten",
+  "POST /api/mall/living",
   "POST /api/mall/plekken",
   "POST /api/mall/reis",
   "POST /api/mall/reis/catalogus",
@@ -13003,19 +13213,19 @@
   {
    "route": "POST /api/bedrijf/handeling/bonnen",
    "bestand": "server/bedrijf/handeling.js",
-   "regel": 194,
+   "regel": 174,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/handeling/doe",
    "bestand": "server/bedrijf/handeling.js",
-   "regel": 130,
+   "regel": 133,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/handeling/plan",
    "bestand": "server/bedrijf/handeling.js",
-   "regel": 86,
+   "regel": 89,
    "samengesteld": false
   },
   {
@@ -13459,31 +13669,31 @@
   {
    "route": "POST /api/bedrijf/taak/kolom",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 101,
+   "regel": 86,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taak/maak",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 43,
+   "regel": 33,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taak/uren",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 127,
+   "regel": 112,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taak/wacht-op",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 80,
+   "regel": 65,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/taken",
    "bestand": "server/bedrijf/taak.js",
-   "regel": 142,
+   "regel": 127,
    "samengesteld": false
   },
   {
@@ -13627,7 +13837,7 @@
   {
    "route": "POST /api/bedrijf/zaakregie",
    "bestand": "server/bedrijf/zaakregie.js",
-   "regel": 46,
+   "regel": 49,
    "samengesteld": false
   },
   {
@@ -14407,7 +14617,7 @@
   {
    "route": "POST /api/cluster/:actie",
    "bestand": "server/server.js",
-   "regel": 897,
+   "regel": 877,
    "samengesteld": false
   },
   {
@@ -15229,7 +15439,7 @@
   {
    "route": "POST /api/concern/boom",
    "bestand": "server/routes/concern.js",
-   "regel": 60,
+   "regel": 58,
    "samengesteld": false
   },
   {
@@ -15271,49 +15481,49 @@
   {
    "route": "POST /api/concern/entiteit",
    "bestand": "server/routes/concern.js",
-   "regel": 78,
+   "regel": 76,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/entiteit/groep",
    "bestand": "server/routes/concern.js",
-   "regel": 84,
+   "regel": 82,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/entiteit/nieuw",
    "bestand": "server/routes/concern.js",
-   "regel": 74,
+   "regel": 72,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/entiteit/onderneming",
    "bestand": "server/routes/concern.js",
-   "regel": 99,
+   "regel": 97,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/entiteit/registratie",
    "bestand": "server/routes/concern.js",
-   "regel": 90,
+   "regel": 88,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/entiteit/verwijder",
    "bestand": "server/routes/concern.js",
-   "regel": 109,
+   "regel": 107,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/entiteiten",
    "bestand": "server/routes/concern.js",
-   "regel": 70,
+   "regel": 68,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/feit/beeindig",
-   "bestand": "server/routes/concern.js",
-   "regel": 130,
+   "bestand": "server/routes/concern/feiten.js",
+   "regel": 32,
    "samengesteld": false
   },
   {
@@ -15324,14 +15534,14 @@
   },
   {
    "route": "POST /api/concern/feit/zet",
-   "bestand": "server/routes/concern.js",
-   "regel": 119,
+   "bestand": "server/routes/concern/feiten.js",
+   "regel": 21,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/functiescheiding",
-   "bestand": "server/routes/concern/mensen.js",
-   "regel": 167,
+   "bestand": "server/routes/concern/rechten.js",
+   "regel": 31,
    "samengesteld": false
   },
   {
@@ -15348,8 +15558,8 @@
   },
   {
    "route": "POST /api/concern/geschiedenis",
-   "bestand": "server/routes/concern.js",
-   "regel": 146,
+   "bestand": "server/routes/concern/feiten.js",
+   "regel": 54,
    "samengesteld": false
   },
   {
@@ -15360,26 +15570,26 @@
   },
   {
    "route": "POST /api/concern/kwalificatie/zet",
-   "bestand": "server/routes/concern/mensen.js",
-   "regel": 176,
+   "bestand": "server/routes/concern/rechten.js",
+   "regel": 40,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/kwalificaties",
-   "bestand": "server/routes/concern/mensen.js",
-   "regel": 182,
+   "bestand": "server/routes/concern/rechten.js",
+   "regel": 52,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/launch",
    "bestand": "server/routes/concern.js",
-   "regel": 182,
+   "regel": 145,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/mag",
-   "bestand": "server/routes/concern/mensen.js",
-   "regel": 154,
+   "bestand": "server/routes/concern/rechten.js",
+   "regel": 18,
    "samengesteld": false
   },
   {
@@ -15415,13 +15625,13 @@
   {
    "route": "POST /api/concern/nieuw",
    "bestand": "server/routes/concern.js",
-   "regel": 56,
+   "regel": 54,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/opdatum",
-   "bestand": "server/routes/concern.js",
-   "regel": 139,
+   "bestand": "server/routes/concern/feiten.js",
+   "regel": 47,
    "samengesteld": false
   },
   {
@@ -15457,13 +15667,13 @@
   {
    "route": "POST /api/concern/overzicht",
    "bestand": "server/routes/concern.js",
-   "regel": 52,
+   "regel": 50,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/readiness",
    "bestand": "server/routes/concern.js",
-   "regel": 176,
+   "regel": 139,
    "samengesteld": false
   },
   {
@@ -15481,13 +15691,13 @@
   {
    "route": "POST /api/concern/tekenen",
    "bestand": "server/routes/concern.js",
-   "regel": 162,
+   "regel": 125,
    "samengesteld": false
   },
   {
    "route": "POST /api/concern/ubo",
    "bestand": "server/routes/concern.js",
-   "regel": 154,
+   "regel": 117,
    "samengesteld": false
   },
   {
@@ -15535,7 +15745,7 @@
   {
    "route": "POST /api/concern/verloopt",
    "bestand": "server/routes/concern.js",
-   "regel": 169,
+   "regel": 132,
    "samengesteld": false
   },
   {
@@ -15942,14 +16152,14 @@
   },
   {
    "route": "GET /api/doos/rapport",
-   "bestand": "server/routes/doos.js",
-   "regel": 144,
+   "bestand": "server/routes/doos-rapport.js",
+   "regel": 40,
    "samengesteld": false
   },
   {
    "route": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js",
-   "regel": 118,
+   "bestand": "server/routes/doos-rapport.js",
+   "regel": 14,
    "samengesteld": false
   },
   {
@@ -16531,13 +16741,13 @@
   {
    "route": "POST /api/foodcourt",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 18,
+   "regel": 19,
    "samengesteld": false
   },
   {
    "route": "POST /api/foodcourt/tijden",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 21,
+   "regel": 22,
    "samengesteld": false
   },
   {
@@ -19039,67 +19249,67 @@
   {
    "route": "POST /api/geld/actielog",
    "bestand": "server/routes/geld.js",
-   "regel": 103,
+   "regel": 113,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/beleid",
    "bestand": "server/routes/geld.js",
-   "regel": 93,
+   "regel": 103,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/beleid/weg",
    "bestand": "server/routes/geld.js",
-   "regel": 101,
+   "regel": 111,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/beleid/zet",
    "bestand": "server/routes/geld.js",
-   "regel": 95,
+   "regel": 105,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/cockpit",
    "bestand": "server/routes/geld.js",
-   "regel": 84,
+   "regel": 94,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/grens",
    "bestand": "server/routes/geld.js",
-   "regel": 111,
+   "regel": 121,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/grens/weg",
    "bestand": "server/routes/geld.js",
-   "regel": 113,
+   "regel": 123,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/grens/zet",
    "bestand": "server/routes/geld.js",
-   "regel": 112,
+   "regel": 122,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/pot/reserveer",
    "bestand": "server/routes/geld.js",
-   "regel": 98,
+   "regel": 108,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/pot/weg",
    "bestand": "server/routes/geld.js",
-   "regel": 102,
+   "regel": 112,
    "samengesteld": false
   },
   {
    "route": "POST /api/geld/pot/zet",
    "bestand": "server/routes/geld.js",
-   "regel": 96,
+   "regel": 106,
    "samengesteld": false
   },
   {
@@ -19525,7 +19735,7 @@
   {
    "route": "GET /api/health",
    "bestand": "server/server.js",
-   "regel": 833,
+   "regel": 813,
    "samengesteld": false
   },
   {
@@ -20761,55 +20971,55 @@
   {
    "route": "POST /api/labfonds/beslis",
    "bestand": "server/routes/labfonds.js",
-   "regel": 83,
+   "regel": 86,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/boardroom",
    "bestand": "server/routes/labfonds.js",
-   "regel": 105,
+   "regel": 108,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/doneer",
    "bestand": "server/routes/labfonds.js",
-   "regel": 79,
+   "regel": 82,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/financiering",
    "bestand": "server/routes/labfonds.js",
-   "regel": 89,
+   "regel": 92,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/locatie/maak",
    "bestand": "server/routes/labfonds.js",
-   "regel": 78,
+   "regel": 81,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/overzicht",
    "bestand": "server/routes/labfonds.js",
-   "regel": 77,
+   "regel": 80,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/scheidsrechter",
    "bestand": "server/routes/labfonds.js",
-   "regel": 82,
+   "regel": 85,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/stem",
    "bestand": "server/routes/labfonds.js",
-   "regel": 81,
+   "regel": 84,
    "samengesteld": false
   },
   {
    "route": "POST /api/labfonds/voorstel/maak",
    "bestand": "server/routes/labfonds.js",
-   "regel": 80,
+   "regel": 83,
    "samengesteld": false
   },
   {
@@ -21523,19 +21733,19 @@
   {
    "route": "POST /api/mail/binnen",
    "bestand": "server/routes/mailpost.js",
-   "regel": 57,
+   "regel": 58,
    "samengesteld": false
   },
   {
    "route": "POST /api/mail/ses",
    "bestand": "server/routes/mailpost.js",
-   "regel": 81,
+   "regel": 82,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 28,
+   "regel": 29,
    "samengesteld": false
   },
   {
@@ -21577,37 +21787,37 @@
   {
    "route": "POST /api/mall/apps",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 55,
+   "regel": 82,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/apps/catalogus",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 57,
+   "regel": 84,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/apps/installeer",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 59,
+   "regel": 86,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/apps/mijn",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 72,
+   "regel": 99,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/apps/weg",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 65,
+   "regel": 92,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/bestel",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 32,
+   "regel": 59,
    "samengesteld": false
   },
   {
@@ -21649,7 +21859,7 @@
   {
    "route": "POST /api/mall/eigen",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 30,
+   "regel": 57,
    "samengesteld": false
   },
   {
@@ -21661,13 +21871,13 @@
   {
    "route": "POST /api/mall/land",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 39,
+   "regel": 66,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/land-bestel",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 45,
+   "regel": 72,
    "samengesteld": false
   },
   {
@@ -21713,6 +21923,12 @@
    "samengesteld": false
   },
   {
+   "route": "POST /api/mall/living",
+   "bestand": "server/routes/member/winkel-bieb.js",
+   "regel": 34,
+   "samengesteld": false
+  },
+  {
    "route": "POST /api/mall/plekken",
    "bestand": "server/routes/member/mall-vindlaag.js",
    "regel": 26,
@@ -21721,67 +21937,67 @@
   {
    "route": "POST /api/mall/reis",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 77,
+   "regel": 104,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/reis/catalogus",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 78,
+   "regel": 105,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/reis/installeer",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 85,
+   "regel": 112,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/reis/lees",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 80,
+   "regel": 107,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/reis/mijn",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 95,
+   "regel": 122,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/reis/weg",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 90,
+   "regel": 117,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/rtf",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 101,
+   "regel": 128,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/rtf/catalogus",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 102,
+   "regel": 129,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/rtf/installeer",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 103,
+   "regel": 130,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/rtf/mijn",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 113,
+   "regel": 140,
    "samengesteld": false
   },
   {
    "route": "POST /api/mall/rtf/weg",
    "bestand": "server/routes/member/winkel-bieb.js",
-   "regel": 108,
+   "regel": 135,
    "samengesteld": false
   },
   {
@@ -24097,7 +24313,7 @@
   {
    "route": "POST /api/member/rtmail/bijlagen",
    "bestand": "server/routes/mailpost.js",
-   "regel": 117,
+   "regel": 118,
    "samengesteld": true
   },
   {
@@ -24757,13 +24973,13 @@
   {
    "route": "POST /api/member/taal",
    "bestand": "server/routes/member/taal.js",
-   "regel": 10,
+   "regel": 11,
    "samengesteld": false
   },
   {
    "route": "POST /api/member/taal/zet",
    "bestand": "server/routes/member/taal.js",
-   "regel": 13,
+   "regel": 14,
    "samengesteld": false
   },
   {
@@ -25663,13 +25879,13 @@
   {
    "route": "POST /api/notifications",
    "bestand": "server/server.js",
-   "regel": 1044,
+   "regel": 1024,
    "samengesteld": false
   },
   {
    "route": "POST /api/notifications/read",
    "bestand": "server/server.js",
-   "regel": 1047,
+   "regel": 1027,
    "samengesteld": false
   },
   {
@@ -26431,13 +26647,13 @@
   {
    "route": "POST /api/office/boardroom/rahul",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 83,
+   "regel": 84,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/boardroom/rahul/zet",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 86,
+   "regel": 87,
    "samengesteld": false
   },
   {
@@ -27505,37 +27721,37 @@
   {
    "route": "POST /api/office/mail/opnieuw",
    "bestand": "server/routes/mailpost.js",
-   "regel": 35,
+   "regel": 36,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/mail/origineel",
    "bestand": "server/routes/mailpost.js",
-   "regel": 145,
+   "regel": 144,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/mail/uit",
    "bestand": "server/routes/mailpost.js",
-   "regel": 154,
+   "regel": 153,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/mail/wachtrij",
    "bestand": "server/routes/mailpost.js",
-   "regel": 25,
+   "regel": 26,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/mail/werk",
    "bestand": "server/routes/mailpost.js",
-   "regel": 29,
+   "regel": 30,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/mall",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 96,
+   "regel": 97,
    "samengesteld": false
   },
   {
@@ -27565,7 +27781,7 @@
   {
    "route": "POST /api/office/mall/zet",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 97,
+   "regel": 98,
    "samengesteld": false
   },
   {
@@ -27769,25 +27985,25 @@
   {
    "route": "POST /api/office/paniek",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 106,
+   "regel": 107,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/paniek/bericht",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 129,
+   "regel": 130,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/paniek/besluit",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 112,
+   "regel": 113,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/paniek/stel",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 107,
+   "regel": 108,
    "samengesteld": false
   },
   {
@@ -28663,13 +28879,13 @@
   {
    "route": "POST /api/office/school/decide",
    "bestand": "server/routes/office/partners/kantoorlijsten.js",
-   "regel": 33,
+   "regel": 30,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/schools",
    "bestand": "server/routes/office/partners/kantoorlijsten.js",
-   "regel": 26,
+   "regel": 23,
    "samengesteld": false
   },
   {
@@ -29125,13 +29341,13 @@
   {
    "route": "POST /api/office/trust",
    "bestand": "server/routes/office/partners/kantoorlijsten.js",
-   "regel": 47,
+   "regel": 44,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/trust/reply",
    "bestand": "server/routes/office/partners/kantoorlijsten.js",
-   "regel": 56,
+   "regel": 53,
    "samengesteld": false
   },
   {
@@ -29161,7 +29377,7 @@
   {
    "route": "POST /api/office/vakbewijs/intrek",
    "bestand": "server/routes/vakbewijs-kantoor.js",
-   "regel": 151,
+   "regel": 156,
    "samengesteld": false
   },
   {
@@ -29173,7 +29389,7 @@
   {
    "route": "POST /api/office/vakbewijs/teken",
    "bestand": "server/routes/vakbewijs-kantoor.js",
-   "regel": 142,
+   "regel": 147,
    "samengesteld": false
   },
   {
@@ -29185,13 +29401,13 @@
   {
    "route": "POST /api/office/verifications",
    "bestand": "server/routes/office/verificaties.js",
-   "regel": 21,
+   "regel": 24,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/verify",
    "bestand": "server/routes/office/verificaties.js",
-   "regel": 23,
+   "regel": 30,
    "samengesteld": false
   },
   {
@@ -29725,13 +29941,13 @@
   {
    "route": "POST /api/office/wereld",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 133,
+   "regel": 134,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/wereld/actie",
    "bestand": "server/routes/kantoren/regie.js",
-   "regel": 134,
+   "regel": 135,
    "samengesteld": false
   },
   {
@@ -31429,7 +31645,7 @@
   {
    "route": "POST /api/push/subscribe",
    "bestand": "server/server.js",
-   "regel": 1236,
+   "regel": 1216,
    "samengesteld": false
   },
   {
@@ -31453,7 +31669,7 @@
   {
    "route": "GET /api/ready",
    "bestand": "server/server.js",
-   "regel": 867,
+   "regel": 847,
    "samengesteld": false
   },
   {
@@ -32437,49 +32653,49 @@
   {
    "route": "POST /api/rtf/labfonds/beslis",
    "bestand": "server/routes/labfonds.js",
-   "regel": 101,
+   "regel": 104,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/doneer",
    "bestand": "server/routes/labfonds.js",
-   "regel": 97,
+   "regel": 100,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/financiering",
    "bestand": "server/routes/labfonds.js",
-   "regel": 102,
+   "regel": 105,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/locatie/maak",
    "bestand": "server/routes/labfonds.js",
-   "regel": 96,
+   "regel": 99,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/overzicht",
    "bestand": "server/routes/labfonds.js",
-   "regel": 95,
+   "regel": 98,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/scheidsrechter",
    "bestand": "server/routes/labfonds.js",
-   "regel": 100,
+   "regel": 103,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/stem",
    "bestand": "server/routes/labfonds.js",
-   "regel": 99,
+   "regel": 102,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/labfonds/voorstel/maak",
    "bestand": "server/routes/labfonds.js",
-   "regel": 98,
+   "regel": 101,
    "samengesteld": false
   },
   {
@@ -33451,13 +33667,13 @@
   {
    "route": "POST /api/rtf/talent/interesse",
    "bestand": "server/routes/member/werk/talent.js",
-   "regel": 10,
+   "regel": 11,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/talent/mijn",
    "bestand": "server/routes/member/werk/talent.js",
-   "regel": 47,
+   "regel": 48,
    "samengesteld": false
   },
   {
@@ -36013,25 +36229,25 @@
   {
    "route": "POST /api/staff/clock",
    "bestand": "server/routes/staff/dienst-klok.js",
-   "regel": 51,
+   "regel": 52,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/dm/history",
    "bestand": "server/routes/staff/collega.js",
-   "regel": 98,
+   "regel": 101,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/dm/lijst",
    "bestand": "server/routes/staff/collega.js",
-   "regel": 77,
+   "regel": 80,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/dm/send",
    "bestand": "server/routes/staff/collega.js",
-   "regel": 109,
+   "regel": 112,
    "samengesteld": false
   },
   {
@@ -36115,25 +36331,25 @@
   {
    "route": "POST /api/staff/klok/correctie",
    "bestand": "server/routes/staff/collega.js",
-   "regel": 31,
+   "regel": 32,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/klok/overzicht",
    "bestand": "server/routes/staff/collega.js",
-   "regel": 10,
+   "regel": 11,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/leave/request",
    "bestand": "server/routes/staff/dienst.js",
-   "regel": 38,
+   "regel": 39,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/mine",
    "bestand": "server/routes/staff/dienst.js",
-   "regel": 28,
+   "regel": 29,
    "samengesteld": false
   },
   {
@@ -36277,7 +36493,7 @@
   {
    "route": "POST /api/staff/pauze",
    "bestand": "server/routes/staff/dienst-klok.js",
-   "regel": 83,
+   "regel": 84,
    "samengesteld": false
   },
   {
@@ -36367,19 +36583,19 @@
   {
    "route": "POST /api/supplier/aanwezig",
    "bestand": "server/server.js",
-   "regel": 1365,
+   "regel": 1345,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/aanwezig/leeg",
    "bestand": "server/server.js",
-   "regel": 1377,
+   "regel": 1357,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/aanwezig/pas",
    "bestand": "server/server.js",
-   "regel": 1366,
+   "regel": 1346,
    "samengesteld": false
   },
   {
@@ -37669,7 +37885,7 @@
   {
    "route": "POST /api/supplier/facturen/ai",
    "bestand": "server/routes/facturatie.js",
-   "regel": 68,
+   "regel": 70,
    "samengesteld": false
   },
   {
@@ -37879,79 +38095,79 @@
   {
    "route": "POST /api/supplier/gebouwpand/bhv",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 123,
+   "regel": 124,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwpand/installatie",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 64,
+   "regel": 65,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwpand/installatie/keuring",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 77,
+   "regel": 78,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwpand/overzicht",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 56,
+   "regel": 57,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwpand/parkeer",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 109,
+   "regel": 110,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwpand/post",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 90,
+   "regel": 91,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwpand/post/opgehaald",
    "bestand": "server/routes/supplier/gebouwpand.js",
-   "regel": 100,
+   "regel": 101,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwplus/contract",
    "bestand": "server/routes/supplier/gebouwplus.js",
-   "regel": 75,
+   "regel": 76,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwplus/contract/zet",
    "bestand": "server/routes/supplier/gebouwplus.js",
-   "regel": 93,
+   "regel": 94,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwplus/energie",
    "bestand": "server/routes/supplier/gebouwplus.js",
-   "regel": 136,
+   "regel": 137,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwplus/lead",
    "bestand": "server/routes/supplier/gebouwplus.js",
-   "regel": 112,
+   "regel": 113,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwplus/lead/fase",
    "bestand": "server/routes/supplier/gebouwplus.js",
-   "regel": 123,
+   "regel": 124,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/gebouwplus/overzicht",
    "bestand": "server/routes/supplier/gebouwplus.js",
-   "regel": 67,
+   "regel": 68,
    "samengesteld": false
   },
   {
@@ -38898,14 +39114,14 @@
   },
   {
    "route": "POST /api/supplier/horeca/wijk/laat",
-   "bestand": "server/routes/supplier/horeca/wijk.js",
-   "regel": 151,
+   "bestand": "server/routes/supplier/horeca/wijk-nemen.js",
+   "regel": 27,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/horeca/wijk/neem",
-   "bestand": "server/routes/supplier/horeca/wijk.js",
-   "regel": 137,
+   "bestand": "server/routes/supplier/horeca/wijk-nemen.js",
+   "regel": 13,
    "samengesteld": false
   },
   {
@@ -38923,7 +39139,7 @@
   {
    "route": "POST /api/supplier/horeca/wijk/weg",
    "bestand": "server/routes/supplier/horeca/wijk.js",
-   "regel": 126,
+   "regel": 130,
    "samengesteld": false
   },
   {
@@ -38935,7 +39151,7 @@
   {
    "route": "POST /api/supplier/horeca/wijk/zet",
    "bestand": "server/routes/supplier/horeca/wijk.js",
-   "regel": 115,
+   "regel": 117,
    "samengesteld": false
   },
   {
@@ -39817,7 +40033,7 @@
   {
    "route": "POST /api/supplier/mijn/taal",
    "bestand": "server/routes/supplier/moedertaal.js",
-   "regel": 33,
+   "regel": 31,
    "samengesteld": false
   },
   {
@@ -40771,91 +40987,91 @@
   {
    "route": "POST /api/supplier/retail",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 19,
+   "regel": 21,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/annuleer",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 129,
+   "regel": 131,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/apart",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 70,
+   "regel": 72,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/artikel",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 29,
+   "regel": 31,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/bon",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 143,
+   "regel": 145,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/collectie",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 24,
+   "regel": 26,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/drop/release",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 42,
+   "regel": 44,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/klant",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 53,
+   "regel": 55,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/klant/maten",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 59,
+   "regel": 61,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/klant/notitie",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 64,
+   "regel": 66,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/paskamer/breng",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 77,
+   "regel": 79,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/styling",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 83,
+   "regel": 85,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/verkoop",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 90,
+   "regel": 92,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/voorraad",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 35,
+   "regel": 37,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/retail/zoek",
    "bestand": "server/routes/supplier/retail.js",
-   "regel": 48,
+   "regel": 50,
    "samengesteld": false
   },
   {
@@ -41029,7 +41245,7 @@
   {
    "route": "POST /api/supplier/rtmail/bijlagen",
    "bestand": "server/routes/mailpost.js",
-   "regel": 117,
+   "regel": 118,
    "samengesteld": true
   },
   {
@@ -42109,7 +42325,7 @@
   {
    "route": "POST /api/supplier/vertaal/ui",
    "bestand": "server/routes/supplier/moedertaal.js",
-   "regel": 50,
+   "regel": 48,
    "samengesteld": false
   },
   {
@@ -42361,7 +42577,7 @@
   {
    "route": "POST /api/supplier/zegel/check",
    "bestand": "server/server.js",
-   "regel": 1351,
+   "regel": 1331,
    "samengesteld": false
   },
   {
@@ -42481,7 +42697,7 @@
   {
    "route": "POST /api/talen",
    "bestand": "server/server.js",
-   "regel": 1315,
+   "regel": 1295,
    "samengesteld": false
   },
   {
@@ -43399,7 +43615,7 @@
   {
    "route": "POST /api/translate",
    "bestand": "server/server.js",
-   "regel": 1274,
+   "regel": 1254,
    "samengesteld": false
   },
   {
@@ -43813,7 +44029,7 @@
   {
    "route": "POST /api/vertaal/ui",
    "bestand": "server/server.js",
-   "regel": 1400,
+   "regel": 1380,
    "samengesteld": false
   },
   {
@@ -44173,7 +44389,7 @@
   {
    "route": "POST /api/wereld/feed",
    "bestand": "server/routes/wereld.js",
-   "regel": 125,
+   "regel": 121,
    "samengesteld": false
   },
   {
@@ -44203,7 +44419,7 @@
   {
    "route": "POST /api/wereld/modus",
    "bestand": "server/routes/wereld.js",
-   "regel": 115,
+   "regel": 111,
    "samengesteld": false
   },
   {
@@ -44233,7 +44449,7 @@
   {
    "route": "POST /api/wereld/state",
    "bestand": "server/routes/wereld.js",
-   "regel": 86,
+   "regel": 82,
    "samengesteld": false
   },
   {
@@ -44983,19 +45199,19 @@
   {
    "route": "POST /api/zegel/controleer",
    "bestand": "server/server.js",
-   "regel": 1344,
+   "regel": 1324,
    "samengesteld": false
   },
   {
    "route": "POST /api/zegel/maak",
    "bestand": "server/server.js",
-   "regel": 1332,
+   "regel": 1312,
    "samengesteld": false
   },
   {
    "route": "GET /api/zegel/sleutel",
    "bestand": "server/server.js",
-   "regel": 1326,
+   "regel": 1306,
    "samengesteld": false
   },
   {

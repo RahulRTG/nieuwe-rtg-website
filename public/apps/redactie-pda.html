@@ -45,6 +45,18 @@
   .hint{color:var(--soft);font-size:.8rem;line-height:1.5;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-gidsbo:not(#_#_#_){font-size:1rem}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -77,13 +89,13 @@ if(window.RTGUitvoer) RTGUitvoer.bron(function(){
 });
 function render(s){
   const opts=RUBRIEKEN.map(r=>'<option>'+esc(r)+'</option>').join('');
-  $('#hoofd').innerHTML='<div class="kaart"><h2 style="font-size:1.1rem;">Snel vanaf locatie</h2><p class="hint">Schrijf kort, publiceer meteen. Bijschaven kan later op de redactie.</p>'+
+  $('#hoofd').innerHTML='<div class="kaart"><h2 class="s-prlthd">Snel vanaf locatie</h2><p class="hint">Schrijf kort, publiceer meteen. Bijschaven kan later op de redactie.</p>'+
     '<label class="lab">Kop</label><input id="titel" maxlength="160" placeholder="Wat gebeurt er?">'+
     '<label class="lab">Rubriek</label><select id="rubriek">'+opts+'</select>'+
     '<label class="lab">Tekst</label><textarea id="tekst" rows="6" maxlength="20000" placeholder="Korte verslaggeving…"></textarea>'+
     '<button class="knop prim" id="pub">Publiceer nu</button>'+
     '<button class="knop stil" id="concept">Bewaar als concept</button></div>'+
-    '<div class="kaart"><h2 style="font-size:1rem;">Recent</h2><div class="h-mt40" id="recent"></div></div>';
+    '<div class="kaart"><h2 class="s-gidsbo">Recent</h2><div class="h-mt40" id="recent"></div></div>';
   $('#pub').addEventListener('click',()=>verstuur(true));
   $('#concept').addEventListener('click',()=>verstuur(false));
   const r=$('#recent'); const lijst=(s.recent||[]).slice(0,10);
@@ -102,7 +114,7 @@ async function verstuur(publiceren){
   try{ if(publiceren) await api('snel',body); else await api('artikel/bewaar',body); meld(publiceren?'Gepubliceerd.':'Concept bewaard.'); laad(); }
   catch(e){ meld(e.message); }
 }
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p class="hint h-mt60">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 class="s-14jo6ez">Log in op de zaak-app</h2><p class="hint h-mt60">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
 else laad();
 </script>
 <script src="/shared/basis.js" defer></script>

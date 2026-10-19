@@ -90,6 +90,25 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15g919n:not(#_#_#_){max-width:7rem;flex:1}
+.s-1p274fk:not(#_#_#_){border-color:var(--gold)}
+.s-1swp8vd:not(#_#_#_){display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem}
+.s-1v3d95r:not(#_#_#_){max-width:8rem}
+.s-1v3dw5a:not(#_#_#_){max-width:9rem}
+.s-1w7kwnq:not(#_#_#_){color:var(--muted)}
+.s-53krcx:not(#_#_#_){font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.s-iuiki6:not(#_#_#_){white-space:nowrap;color:var(--muted)}
+.s-ji67kl:not(#_#_#_){color:var(--leesgoud);font-size:.82rem}
+.s-tdav1m:not(#_#_#_){font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -124,20 +143,20 @@
 
   <!-- de wallet -->
   <section id="vPay" hidden>
-    <div class="kaart" style="border-color:var(--gold);">
-      <div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Saldo van <span id="pNaam" class="h-leesgoud"></span></div>
+    <div class="kaart s-1p274fk">
+      <div class="s-53krcx">Saldo van <span id="pNaam" class="h-leesgoud"></span></div>
       <div class="saldo" id="pSaldo">0,00<small> eur</small></div>
       <div class="chiprij" role="group" aria-label="Oplaadbedrag">
         <button class="chip" data-laad="2500">+ 25</button>
         <button class="chip" data-laad="5000">+ 50</button>
         <button class="chip" data-laad="10000">+ 100</button>
-        <input class="veld" id="pLaadVrij" inputmode="numeric" placeholder="anders..." style="max-width:7rem;flex:1;">
+        <input class="veld s-15g919n" id="pLaadVrij" inputmode="numeric" placeholder="anders...">
       </div>
       <button class="knop pay" id="pLaad">Opladen met Apple Pay</button>
     </div>
 
     <h3 class="sec">Tikken</h3>
-    <div class="kaart" style="border-color:var(--gold);">
+    <div class="kaart s-1p274fk">
       <div class="rij">
         <input class="veld h-breed7" id="xBedrag" inputmode="decimal" placeholder="Euro">
         <input class="veld h-rek8" id="xOms" placeholder="Waarvoor? (mag leeg)" maxlength="80">
@@ -160,7 +179,7 @@
     <h3 class="sec">Klompje, voor wie er niet bij is</h3>
     <div class="kaart">
       <div class="rij">
-        <input class="veld" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro" style="max-width:9rem;">
+        <input class="veld s-1v3dw5a" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro">
         <input class="veld h-rek10" id="tOms" placeholder="Waarvoor?" maxlength="80">
       </div>
       <div class="h-mt60">
@@ -215,7 +234,7 @@
     <div class="kaart">
       <div id="kasUit">
         <div class="rij">
-          <input class="veld" id="kMax" inputmode="numeric" placeholder="Max (150)" style="max-width:8rem;">
+          <input class="veld s-1v3d95r" id="kMax" inputmode="numeric" placeholder="Max (150)">
           <button class="knop" id="kMaak">Maak mijn betaalcode</button>
         </div>
       </div>
@@ -387,12 +406,12 @@ async function laadTiks(){
     el.hidden = false;
     const wanneer = at => new Date(at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     el.innerHTML = r.tiks.map(t =>
-      '<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem;">'+
+      '<div class="s-1swp8vd">'+
         '<span>'+(t.richting === 'uit'
           ? 'Jij tikte <b class="h-leesgoud">'+esc(t.met)+'</b>'
           : '<b class="h-leesgoud">'+esc(t.met)+'</b> tikte jou')+
-          (t.oms && t.oms !== 'Tik' ? ' <span style="color:var(--muted);">· '+esc(t.oms)+'</span>' : '')+'</span>'+
-        '<span style="white-space:nowrap;color:var(--muted);">'+(t.richting==='uit'?'-':'+')+' '+euro(t.centen)+' · '+wanneer(t.at)+'</span>'+
+          (t.oms && t.oms !== 'Tik' ? ' <span class="s-1w7kwnq">· '+esc(t.oms)+'</span>' : '')+'</span>'+
+        '<span class="s-iuiki6">'+(t.richting==='uit'?'-':'+')+' '+euro(t.centen)+' · '+wanneer(t.at)+'</span>'+
       '</div>').join('');
   } catch (e) {}
 }
@@ -470,13 +489,13 @@ async function verversTegoed(){
   const g = $('#gGekocht');
   g.hidden = !open.length;
   if (open.length) {
-    g.innerHTML = '<div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem;">Klaargezet door jou</div>' +
+    g.innerHTML = '<div class="s-tdav1m">Klaargezet door jou</div>' +
       open.map(t =>
       '<div class="tikkie"><div class="wie"><b>'+esc(euro(t.centen))+' eur</b>'+
         '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+'</small></div>'+
         (t.verlopen
           ? '<button class="knop stil" data-terug="'+esc(t.id)+'">Neem terug</button>'
-          : '<span style="color:var(--leesgoud);font-size:.82rem;">wacht op ophalen</span>'+
+          : '<span class="s-ji67kl">wacht op ophalen</span>'+
             '<button class="knop stil" data-roteer="'+esc(t.id)+'">Nieuwe code</button>'+
             '<button class="knop stil" data-intrek="'+esc(t.id)+'">Trek in</button>')+
       '</div>').join('');

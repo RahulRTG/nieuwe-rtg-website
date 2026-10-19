@@ -3,11 +3,12 @@
    staten voor lid en kantoor. Krijgt de gedeelde context een keer bij het
    opstarten vanuit kern/ontmoeting.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, accounts, leeftijdVan, notify, sseToCustomer, sseToOffice,
+  const { save, crypto, accounts, leeftijdVan, notify, sseToCustomer, sseToOffice,
     connectieTussen, verbActief, zijnVrienden, codenaamVan, haversine,
     RADIUS_M, POS_TTL_MS, VOORSTEL_TTL_MS, MIN_LEEFTIJD, ACTIVITEITEN, ACT_IDS,
     lijsten, accountVanKey, memberState, geslachtVan, mag, staatAan, zet, pos, versePositie, id, nu, paar } = ctx;
   const { radar, lopendVoorstel, lopendeDate, verlopenVoorstel, beslisActiviteit, contractTekst, actLabel, actIcon } = ctx;
+  const O = ctx.opslag; // kern/eigencollectie.js, gebouwd in ../ontmoeting.js
   function maakDate(a, b, activiteit, voorstelId) {
     const d = {
       id: id(), a, b, activiteit, voorstelId,
@@ -15,13 +16,13 @@ module.exports = (ctx) => {
       contract: { tekst: contractTekst(activiteit), ondertekend: {} },
       posities: {}, sos: [], afgerondAt: null
     };
-    db.data.ontmoetDates.unshift(d);
-    db.data.ontmoetDates = db.data.ontmoetDates.slice(0, 4000);
+    O.bak('ontmoetDates').unshift(d);
+    O.zetBak('ontmoetDates', O.bak('ontmoetDates').slice(0, 4000));
     return d;
   }
   function dateVoor(key, dateId) {
-    lijsten();   // borgt db.data.ontmoetDates ook als die collectie nog nooit is opgeslagen (Postgres-boot)
-    const d = db.data.ontmoetDates.find(x => x.id === dateId);
+    lijsten();   // borgt O.bak('ontmoetDates') ook als die collectie nog nooit is opgeslagen (Postgres-boot)
+    const d = O.bak('ontmoetDates').find(x => x.id === dateId);
     if (!d || (d.a !== key && d.b !== key)) return null;
     return d;
   }
@@ -76,13 +77,13 @@ module.exports = (ctx) => {
   /* De noodknop, het afmelden en het meekijk-kanaal staan in ./sos.js: dat is
      het stuk waar een lid op moet kunnen rekenen als het misgaat, en als enige
      opent het een kanaal naar het kantoorscherm. */
-  const noodlaag = require('./sos')({ db, nu, save, id, lijsten, dateVoor, codenaamVan, notify, sseToCustomer, sseToOffice });
+  const noodlaag = require('./sos')({ opslag: O, nu, save, id, lijsten, dateVoor, codenaamVan, notify, sseToCustomer, sseToOffice });
   const { sos, sosAf, signaalNaarKantoor, signaalNaarLid, vergeetSosPosities } = noodlaag;
 
   function opschonen() {
     lijsten();
     let veranderd = false;
-    for (const v of db.data.ontmoetVoorstellen) if (v.status === 'open' && verlopenVoorstel(v)) { v.status = 'verlopen'; veranderd = true; }
+    for (const v of O.bak('ontmoetVoorstellen')) if (v.status === 'open' && verlopenVoorstel(v)) { v.status = 'verlopen'; veranderd = true; }
     if (ctx.vergeetOudePosities && ctx.vergeetOudePosities()) veranderd = true;
     if (veranderd) save();
   }
@@ -104,14 +105,14 @@ module.exports = (ctx) => {
   function mijnState(key) {
     lijsten(); opschonen();
     const m = mag(key);
-    const voorstellen = db.data.ontmoetVoorstellen.filter(v => (v.a === key || v.b === key) && v.status === 'open').map(v => publiekVoorstel(v, key));
-    const dates = db.data.ontmoetDates.filter(d => (d.a === key || d.b === key) && ['wacht-op-tekenen', 'actief', 'noodgeval'].includes(d.status)).map(d => publiekeDate(d, key));
+    const voorstellen = O.bak('ontmoetVoorstellen').filter(v => (v.a === key || v.b === key) && v.status === 'open').map(v => publiekVoorstel(v, key));
+    const dates = O.bak('ontmoetDates').filter(d => (d.a === key || d.b === key) && ['wacht-op-tekenen', 'actief', 'noodgeval'].includes(d.status)).map(d => publiekeDate(d, key));
     return { aan: staatAan(key), mag: m.ok, reden: m.ok ? null : m.reden, geslachtBekend: geslachtVan(key) != null, activiteiten: ACTIVITEITEN, voorstellen, dates };
   }
   // RTG-kantoor: alle lopende afspraken met live-locatie, plus de open SOS-en
   function kantoorState() {
     lijsten(); opschonen();
-    const lopend = db.data.ontmoetDates.filter(d => ['wacht-op-tekenen', 'actief', 'noodgeval'].includes(d.status));
+    const lopend = O.bak('ontmoetDates').filter(d => ['wacht-op-tekenen', 'actief', 'noodgeval'].includes(d.status));
     const dates = lopend.map(d => ({
       id: d.id, activiteit: d.activiteit, activiteitLabel: actLabel(d.activiteit), icon: actIcon(d.activiteit),
       status: d.status, at: d.at, gestartAt: d.gestartAt || null,

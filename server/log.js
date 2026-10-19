@@ -102,7 +102,9 @@ const log = {
     if (veiligContext.p != null) veiligContext.p = journaalPad(veiligContext.p);
     const veld = Object.assign({ fout: schoonErr.message, stack: schoonErr.stack }, veiligContext);
     schrijf('error', 'uitzondering', veld);
-    try { noteerFout(schoonErr, veiligContext); } catch (e) {}
+    // niet maskeren en niet stil: kaal naar stderr, buiten deze logger om
+    try { noteerFout(schoonErr, veiligContext); }
+    catch (e) { try { process.stderr.write('[log] foutaggregatie mislukt: ' + String(e && e.message) + '\n'); } catch (x) { /* stderr dicht */ } }
     try { require('./log-meting').telServerfout(schoonErr, veiligContext); } catch (e) {}
     if (foutHaak) { try { foutHaak(schoonErr, veiligContext); } catch (e) {} }
   }

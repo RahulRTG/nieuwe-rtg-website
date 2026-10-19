@@ -19,10 +19,8 @@ function maakMeet({ db, save, bewerkCollectie, crypto, schoon, codenaamVan, sseT
   const toegang = require('./meet-toegang')({ crypto, nu });
   const afdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
 
-  const bron = () => {
-    if (!Array.isArray(db.data.meetKamers)) db.data.meetKamers = [];
-    return db.data.meetKamers;
-  };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/meet', bezit: { meetKamers: 'lijst' } });
+  const bron = () => eigen.bak('meetKamers');
   const herstel = (doel, json) => {
     const oud = JSON.parse(json); doel.splice(0, doel.length, ...oud);
   };

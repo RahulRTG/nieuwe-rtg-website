@@ -6,7 +6,13 @@
 (function () {
   'use strict';
 
+  /* Welke vraag staat er nu. Gaat mee met het antwoord, zodat een tweede tik
+     op een trage verbinding niet de VOLGENDE vraag beantwoordt (zie
+     server/kern/leerstof-vervolg.js, examenAntwoord). */
+  var huidigeNr = null;
+
   function toonVraag(d) {
+    huidigeNr = d.nr;
     document.getElementById('examenStand').textContent = d.nr + '/' + d.totaal;
     document.getElementById('examenVraag').textContent = d.vraag;
     var oEl = document.getElementById('examenOpties');
@@ -35,7 +41,7 @@
 
   async function antwoord(antw) {
     try {
-      var d = await api('/api/leerstof/examen-antwoord', { antwoord: antw });
+      var d = await api('/api/leerstof/examen-antwoord', { antwoord: antw, nr: huidigeNr });
       if (!d.klaar) { toonVraag(d); return; }
       document.getElementById('examenBlok').hidden = true;
       var uit = document.getElementById('examenUit');

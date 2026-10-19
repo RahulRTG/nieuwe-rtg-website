@@ -25,7 +25,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -147,7 +147,7 @@ const uit = {
   let: 'Deze meting zegt welke stations NAAR ELKAAR VERWIJZEN in de code. Zij zegt niet of die verwijzing altijd gevuld is, en niet of het om hetzelfde onderzoek gaat.'
 };
 
-fs.writeFileSync(path.join(WORTEL, 'ONDERZOEKSKETEN.json'), JSON.stringify(uit, null, 2) + '\n');
+if (magSchrijven(eisSchoneBoom('onderzoeksketen'), 'ONDERZOEKSKETEN.json')) fs.writeFileSync(path.join(WORTEL, 'ONDERZOEKSKETEN.json'), JSON.stringify(uit, null, 2) + '\n');
 
 console.log('DE ONDERZOEKSKETEN, GEMETEN');
 console.log('  stations           : ' + STATIONS.length);

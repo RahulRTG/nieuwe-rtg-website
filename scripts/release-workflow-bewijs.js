@@ -15,6 +15,13 @@ const WORTEL = path.join(__dirname, '..');
 const FORMAAT = 'rtg-prerelease-workflows-v2';
 const STANDAARD = '.release/prerelease-workflows.json';
 const SHA = /^[0-9a-f]{40}$/;
+/* De BRON is de ref waarop de release-imageworkflow zelf draait: main, of de
+   branch die de eigenaar als integratiebranch heeft aangewezen (CONSOLIDATIE.md,
+   18 oktober 2026). Een tag heeft geen eigen workflowruns en valt terug op main.
+   Het blijft dezelfde regel: de vier workflows moeten groen zijn op exact deze
+   commit, en een run op een ANDERE ref telt niet. */
+const BRON_STANDAARD = 'main';
+const BRONNAAM = /^(?!.*\.\.)(?!\/)(?!.*\/$)[A-Za-z0-9._\/-]{1,200}$/;
 const DIGEST = /^sha256:[0-9a-f]{64}$/;
 
 /* CI moet het evidence-book hebben: alleen de volledige bewijsroute publiceert
@@ -26,7 +33,7 @@ const VEREISTEN = Object.freeze([
     maxLeeftijdUur:24, artifacts:Object.freeze(['beproeving']) }),
   Object.freeze({ naam:'desktop-mobiel', workflow:'desktop-standard.yml', events:Object.freeze(['push', 'workflow_dispatch']),
     maxLeeftijdUur:72, artifacts:Object.freeze(['desktop-standard-1440', 'desktop-standard-390']) }),
-  Object.freeze({ naam:'codeql', workflow:'codeql.yml', events:Object.freeze(['push', 'schedule']),
+  Object.freeze({ naam:'codeql', workflow:'codeql.yml', events:Object.freeze(['push', 'schedule', 'workflow_dispatch']),
     maxLeeftijdUur:72, artifacts:Object.freeze(['codeql-verdict']) })
 ]);
 
@@ -48,12 +55,19 @@ function nieuwsteEerst(a, b) {
   return verschil || Number(b.run_attempt || 0) - Number(a.run_attempt || 0) || Number(b.id || 0) - Number(a.id || 0);
 }
 
-function kiesRun(eis, runs, commit, nu = Date.now(), huidigeRun) {
+function bronNaam(bron) {
+  const naam = bron == null || bron === '' ? BRON_STANDAARD : String(bron);
+  if (!BRONNAAM.test(naam)) throw new Error('releasebron is geen geldige branchnaam: ' + naam);
+  return naam;
+}
+
+function kiesRun(eis, runs, commit, nu = Date.now(), huidigeRun, bron) {
   if (!SHA.test(String(commit || ''))) throw new Error('releasecommit is geen volledige Git-SHA');
+  const ref = bronNaam(bron);
   const kandidaten = (Array.isArray(runs) ? runs : []).filter(run =>
-    run && run.head_sha === commit && run.head_branch === 'main' && eis.events.includes(run.event) &&
+    run && run.head_sha === commit && run.head_branch === ref && eis.events.includes(run.event) &&
     run.path === '.github/workflows/' + eis.workflow).sort(nieuwsteEerst);
-  if (!kandidaten.length) throw new Error(eis.naam + ': geen workflowrun op exact ' + commit);
+  if (!kandidaten.length) throw new Error(eis.naam + ': geen workflowrun op exact ' + commit + ' op ' + ref);
   const run = kandidaten[0];
   if (String(run.id) === String(huidigeRun || '')) throw new Error(eis.naam + ': workflow mag zichzelf niet bewijzen');
   if (run.status !== 'completed' || run.conclusion !== 'success') {
@@ -113,8 +127,9 @@ function apiBasis(api, repository) {
     encodeURIComponent(delen[0]) + '/' + encodeURIComponent(delen[1]);
 }
 
-async function verzamel({ repository, token, commit, eventCommit, huidigeRun, api, nu, request } = {}) {
+async function verzamel({ repository, token, commit, eventCommit, huidigeRun, api, nu, request, bron } = {}) {
   const nuMs = nu == null ? Date.now() : Number(nu);
+  const ref = bronNaam(bron);
   if (!Number.isFinite(nuMs)) throw new Error('controletijd ontbreekt');
   if (!token) throw new Error('GITHUB_TOKEN ontbreekt voor commitgebonden workflowbewijs');
   if (!SHA.test(String(commit || '')) || commit !== eventCommit || commit !== gitCommit()) {
@@ -123,9 +138,9 @@ async function verzamel({ repository, token, commit, eventCommit, huidigeRun, ap
   const basis = apiBasis(api, repository), haal = request || vraag, workflows = [];
   for (const eis of VEREISTEN) {
     const runsUrl = basis + '/actions/workflows/' + encodeURIComponent(eis.workflow) +
-      '/runs?branch=main&head_sha=' + encodeURIComponent(commit) + '&per_page=100';
+      '/runs?branch=' + encodeURIComponent(ref) + '&head_sha=' + encodeURIComponent(commit) + '&per_page=100';
     const antwoord = await haal(runsUrl, token);
-    const run = kiesRun(eis, antwoord.workflow_runs, commit, nuMs, huidigeRun);
+    const run = kiesRun(eis, antwoord.workflow_runs, commit, nuMs, huidigeRun, ref);
     let artifacts = [];
     if (eis.artifacts.length) {
       const art = await haal(basis + '/actions/runs/' + run.id + '/artifacts?per_page=100', token);
@@ -139,6 +154,7 @@ async function verzamel({ repository, token, commit, eventCommit, huidigeRun, ap
     profiel:'release-workflows-v2',
     stand:'VERIFIED',
     commit,
+    releaseRef:ref,
     repository,
     waargenomen:new Date(nuMs).toISOString(),
     geldigTot:new Date(vervalt).toISOString(),
@@ -169,10 +185,11 @@ async function hoofd() {
     commit:process.env.RTG_RELEASE_EXPECTED_COMMIT,
     eventCommit:process.env.GITHUB_SHA,
     huidigeRun:process.env.GITHUB_RUN_ID,
-    api:process.env.GITHUB_API_URL
+    api:process.env.GITHUB_API_URL,
+    bron:process.env.RTG_RELEASE_BRON
   });
   const doel = schrijf(argument('uit') || STANDAARD, bewijs);
-  console.log('Prerelease-workflowbewijs VERIFIED: ' + bewijs.commit + ' · ' +
+  console.log('Prerelease-workflowbewijs VERIFIED: ' + bewijs.commit + ' op ' + bewijs.releaseRef + ' · ' +
     bewijs.workflows.length + ' workflows · ' + path.relative(WORTEL, doel));
 }
 
@@ -181,5 +198,5 @@ if (require.main === module) hoofd().catch(e => {
   process.exitCode = 1;
 });
 
-module.exports = { FORMAAT, STANDAARD, VEREISTEN, gitCommit, tijd, nieuwsteEerst,
-  kiesRun, artifactBewijs, runBewijs, apiBasis, verzamel, schrijf };
+module.exports = { FORMAAT, STANDAARD, VEREISTEN, BRON_STANDAARD, gitCommit, tijd, nieuwsteEerst,
+  bronNaam, kiesRun, artifactBewijs, runBewijs, apiBasis, verzamel, schrijf };

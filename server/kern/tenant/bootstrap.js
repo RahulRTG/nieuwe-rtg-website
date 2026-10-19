@@ -46,7 +46,7 @@ const NIET_GEBOUWD = [
 
 module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop, bewijs }) => {
   function ruimte(code) {
-    const w = db.data.werkruimtes || {};
+    const w = require('./opslag')({ db }).werkruimtesKijk();
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
   }
 

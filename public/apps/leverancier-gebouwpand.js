@@ -25,7 +25,7 @@
       var vandaag = new Date().toISOString().slice(0, 10);
       var h = '<div class="st-sec h-mt120">' + T('gp.kop', 'Het hele pand') + '</div>';
       if ((p.signalen || []).length) {
-        h += '<div style="border:1px solid var(--gold);border-radius:0;padding:0.6rem 0.8rem;">' +
+        h += '<div class="s-2faxfq">' +
           p.signalen.map(function (s) { return '<div class="sub" style="padding:0.15rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') + '</div>';
       }
 
@@ -37,9 +37,9 @@
         '<button id="gpINieuw" style="' + GOUD + 'flex:1;">' + T('gp.i.leg', 'Leg vast') + '</button></div>';
       h += (p.installaties || []).map(function (i) {
         var te = i.keuringTot < vandaag;
-        return '<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">' +
-          '<b style="flex:1;font-size:0.84rem;">' + esc(i.naam) + '</b><span class="sub">' + (NAAM_INST[i.soort] || i.soort) + ' · ' +
-          T('gp.i.tot', 'keuring t/m') + ' <span style="' + (te ? 'color:var(--burgundy-on-dark,#C23A5E);' : '') + '">' + esc(i.keuringTot) + '</span></span>' +
+        return '<div class="s-57bs1i">' +
+          '<b class="s-1q6jol6">' + esc(i.naam) + '</b><span class="sub">' + (NAAM_INST[i.soort] || i.soort) + ' · ' +
+          T('gp.i.tot', 'keuring t/m') + ' <span class="' + (te ? 's-hvqb4w' : '') + '">' + esc(i.keuringTot) + '</span></span>' +
           '<button data-gpkeur="' + i.id + '" style="' + STIL + '">' + T('gp.i.herkeur', 'Herkeurd') + '</button></div>';
       }).join('') || '<p class="sub">' + T('gp.i.geen', 'Nog geen installaties vastgelegd.') + '</p>';
 
@@ -48,8 +48,8 @@
         '<input id="gpPWat" ' + IN + ' placeholder="' + T('gp.p.wat', 'Wat (pakket, aangetekend...)') + '" maxlength="80" style="flex:2;">' +
         '<button id="gpPNieuw" style="' + GOUD + 'flex:1;">' + T('gp.p.aan', 'Neem aan') + '</button></div>';
       h += (p.post || []).filter(function (x) { return x.status === 'aangekomen'; }).map(function (x) {
-        return '<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">' +
-          '<b style="flex:1;font-size:0.84rem;">' + esc(x.voorWie) + '</b><span class="sub">' + esc(x.omschrijving) + ' · ' + esc(x.dag) + '</span>' +
+        return '<div class="s-57bs1i">' +
+          '<b class="s-1q6jol6">' + esc(x.voorWie) + '</b><span class="sub">' + esc(x.omschrijving) + ' · ' + esc(x.dag) + '</span>' +
           '<button data-gppost="' + x.id + '" style="' + STIL + '">' + T('gp.p.klaar', 'Opgehaald') + '</button></div>';
       }).join('') || '<p class="sub">' + T('gp.p.geen', 'De mailroom is leeg.') + '</p>';
 
@@ -57,9 +57,9 @@
         '<div class="row-gap"><input class="h-flex1" id="gpKPlek" ' + IN + ' placeholder="P1-04" maxlength="12">' +
         '<input id="gpKWie" ' + IN + ' placeholder="' + T('gp.k.wie', 'Huurder (leeg = vrij)') + '" maxlength="60" style="flex:2;">' +
         '<button id="gpKZet" style="' + GOUD + 'flex:1;">' + T('gp.k.zet', 'Wijs toe') + '</button></div>' +
-        '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">' +
+        '<div class="s-1pmqbw7">' +
         (p.parkeer || []).map(function (x) {
-          return '<span title="' + esc(x.huurder || T('gp.k.vrij', 'vrij')) + '" style="border:1px solid ' + (x.huurder ? 'var(--burgundy,#7F1634)' : 'var(--line)') + ';border-radius:0;padding:0.25rem 0.55rem;font-size:0.72rem;color:' + (x.huurder ? 'inherit' : 'var(--soft)') + ';">' + esc(x.plek) + '</span>';
+          return '<span title="' + esc(x.huurder || T('gp.k.vrij', 'vrij')) + '" class="' + (x.huurder ? 's-1rmpo0f' : 's-1fq9ihs') + '">' + esc(x.plek) + '</span>';
         }).join('') + '</div>';
 
       h += '<div class="st-sec h-mt100">' + T('gp.bhv', 'BHV en ontruiming') + '</div>' +

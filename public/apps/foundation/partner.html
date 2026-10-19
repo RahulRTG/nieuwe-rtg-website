@@ -31,15 +31,25 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1s5fts2:not(#_#_#_){margin-bottom:.6rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="foundation.partner" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header><div class="ey">RTFoundation · Stadsraad</div><h1>Het partnerportaal</h1></header>
 <main id="main">
   <div class="kaart" id="poort">
     <div class="sec">Toegang voor de stadspartner</div>
-    <p class="noot" style="margin-bottom:.6rem;">Elke stad waar wij aanwezig zijn heeft een invloedrijke partner -- een foundation, club of instelling. Met uw raadcode zit u aan tafel in het gezamenlijke foundation-kantoor en beslist u samen met RTG-personeel over de lab-uitslagen van het onderzoek.</p>
+    <p class="noot s-1s5fts2">Elke stad waar wij aanwezig zijn heeft een invloedrijke partner -- een foundation, club of instelling. Met uw raadcode zit u aan tafel in het gezamenlijke foundation-kantoor en beslist u samen met RTG-personeel over de lab-uitslagen van het onderzoek.</p>
     <div class="rij"><input class="veld" id="code" placeholder="RAAD-XXXXXX" autocomplete="off"><button class="knop hoofd" id="open" data-hoofdactie>Naar de raadstafel</button></div>
     <div class="fout" id="fout" hidden></div>
   </div>
@@ -128,5 +138,13 @@ if (CODE) { $('#code').value = CODE; laad(); }
 <script src="/shared/ios.js" defer></script>
 <script src="schil-os.js" defer></script>
 <script src="premium.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

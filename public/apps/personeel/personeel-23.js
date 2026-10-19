@@ -1,6 +1,6 @@
 /* het team van vandaag */
     $('#teamWrap').innerHTML =
-      (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span style="display:flex;gap:0.4rem;"><button class="abtn" id="teamCall" style="font-size:0.66rem;">'+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">'+T('pd.buzzall','Iedereen')+'</button></span></div>'+
+      (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span class="s-1x93582"><button class="abtn" id="teamCall" style="font-size:0.66rem;">'+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">'+T('pd.buzzall','Iedereen')+'</button></span></div>'+
         staff.map(m=>{
           const in2 = !!(state.klok && (state.klok.binnen||[]).includes(m.name));
           return '<div class="task"><span class="ic">'+(m.role==='manager'?'':'')+'</span><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+(in2?' ·  '+T('pd.ingeklokt','ingeklokt'):'')+'</span></div>'+
@@ -10,18 +10,18 @@
         }).join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
       (team.length ? team.map(m=>'<div class="msg '+(m.who===me.name?'me':'other')+'"><span class="who">'+esc(m.who)+'</span>'+
-        esc(m.text)+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
+        esc(m.text)+'</div>').join('') : '<div class="s-7a7ief">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
       '</div><div class="compose"><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
       '<div class="card"><div class="k">'+T('pd.activity','Wie deed wat')+'</div>'+
-      (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
+      (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div class="s-gv2ws1">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
       // Aparte ruimte: het personeelsnetwerk met andere zaken (met toestemming).
       '<div class="card"><div class="k">'+T('pd.net','Netwerk met andere zaken')+'</div>'+
-      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.5rem;">'+T('pd.net.sub','Aparte ruimte. Alleen zaken die uw manager heeft verbonden.')+'</div>'+
+      '<div class="s-1hi0vlo">'+T('pd.net.sub','Aparte ruimte. Alleen zaken die uw manager heeft verbonden.')+'</div>'+
       (netwerk.length ? netwerk.map(v => {
         if (v.status==='akkoord') return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.open','tik om te chatten')+'</span></div><button class="abtn ghost" data-netopen="'+v.code+'"></button></div>';
-        if (v.inkomend) return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
+        if (v.inkomend) return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span class="s-14zm4p4">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
         return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
-      }).join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
+      }).join('') : '<div class="s-7a7ief">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
       (me.role==='manager' ? '<div class="compose h-mt50"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
       '<div id="netChat"></div></div>';
     const send = async () => {
@@ -67,7 +67,7 @@
     const naam = (netwerk.find(v => v.code === netOpen) || {}).naam || netOpen;
     box.innerHTML = '<div class="k h-mt70">'+esc(naam)+'</div><div class="chat">'+
       (netBerichten.length ? netBerichten.map(m => '<div class="msg '+(m.code===code?'me':'other')+'"><span class="who">'+esc(m.naam+' · '+m.door)+'</span>'+esc(m.tekst)+'</div>').join('')
-        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.nomsg','Nog geen berichten.')+'</div>')+
+        : '<div class="s-7a7ief">'+T('pd.net.nomsg','Nog geen berichten.')+'</div>')+
       '</div><div class="compose"><input id="netMsg" placeholder="'+T('pd.net.msgph','Bericht')+'"><button id="netSend">'+T('pd.send','Stuur')+'</button></div>';
     const doSend = async () => {
       const i = document.getElementById('netMsg'); const t = (i.value||'').trim(); if (!t) return; i.value = '';

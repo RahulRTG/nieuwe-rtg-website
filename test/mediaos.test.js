@@ -441,3 +441,31 @@ test('12. meldingen per maker: één keer volgen, zelf kiezen waarvoor', async (
   assert.deepEqual(v.body.meldingen, ['muziek', 'live'], 'de keuze blijft staan over het volgen heen');
   assert.equal((await api('/api/mediaos/meldingen', { soorten: ['muziek'] }, kijker)).status, 400, 'zonder maker geen voorkeur');
 });
+
+/* 13. /api/mediaos/smaak: het lid leest zijn eigen regelaars terug. Wat /stuur
+   zette staat er letterlijk in, en een reset op dat onderwerp haalt precies dat
+   ene signaal weer weg. Een ander lid ziet er niets van: het profiel is van u.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/mediaos/smaak.js de regel
+   `s[nooit].push(naam)` weggehaald; de toets zakte op "nooit staat in de lijst". */
+test('13. smaak: wat u bijstuurde leest u terug, en van niemand anders', async () => {
+  const onderwerp = 'smaaktoets-' + Date.now();
+  assert.equal((await api('/api/mediaos/stuur', { richting: 'meer', onderwerp }, kijker)).status, 200);
+  let s = await api('/api/mediaos/smaak', {}, kijker);
+  assert.equal(s.status, 200);
+  assert.equal(s.body.smaak.onderwerpen[onderwerp], 1, 'meer staat als +1 in het profiel');
+  assert.ok(s.body.regelaars, 'de regelaars komen mee, zodat het scherm ze niet hoeft te raden');
+
+  assert.equal((await api('/api/mediaos/stuur', { richting: 'nooit', onderwerp }, kijker)).status, 200);
+  s = await api('/api/mediaos/smaak', {}, kijker);
+  assert.ok(s.body.smaak.nooitOnderwerpen.includes(onderwerp), 'nooit staat in de lijst');
+  assert.equal(s.body.smaak.onderwerpen[onderwerp], undefined, 'en niet meer als meer');
+
+  const ander = await api('/api/mediaos/smaak', {}, maker);
+  assert.equal(ander.status, 200);
+  assert.ok(!ander.body.smaak.nooitOnderwerpen.includes(onderwerp), 'een ander lid ziet dit profiel niet');
+
+  assert.equal((await api('/api/mediaos/stuur', { richting: 'reset', onderwerp }, kijker)).status, 200);
+  s = await api('/api/mediaos/smaak', {}, kijker);
+  assert.ok(!s.body.smaak.nooitOnderwerpen.includes(onderwerp), 'reset op het onderwerp haalt het weer weg');
+  assert.equal((await api('/api/mediaos/smaak', {}, null)).status, 401);
+});

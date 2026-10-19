@@ -11,6 +11,9 @@ on:
     branches: [ main, master ]
   schedule:
     - cron: '30 4 * * 1'
+  # Met de hand, voor het releasebewijs op een integratiebranch
+  # (scripts/release-workflow-bewijs.js eist een run op exact de commit).
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

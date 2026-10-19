@@ -83,6 +83,24 @@ test('3. elk woord in een paar bestaat echt als laatste segment van een route', 
   assert.deepEqual(dood, [], 'woord(en) in een paar die nergens als route-einde voorkomen: ' + dood.join(' '));
 });
 
+test('3b. een domeinpaar wijst naar twee routes die bestaan, met de plek in de code erbij', () => {
+  /* scripts/herstel.js DOMEINPAREN (18 oktober 2026): tegenhangers die het
+     domein zelf noemt maar die geen woordpaar vindt. Een paar dat naar een
+     verdwenen route wijst, of geen grond draagt, is een belofte zonder adres. */
+  const { DOMEINPAREN } = require('../scripts/herstel');
+  const bestaat = new Set(ROUTES);
+  for (const [heen, terug, grond] of DOMEINPAREN) {
+    assert.ok(bestaat.has(heen), 'domeinpaar: ' + heen + ' bestaat niet (meer)');
+    assert.ok(bestaat.has(terug), 'domeinpaar: ' + terug + ' bestaat niet (meer)');
+    assert.notEqual(heen, terug);
+    assert.match(String(grond || ''), /\.js:/, heen + ': een domeinpaar noemt de plek in de code');
+    const v = R.per[heen];
+    assert.ok(v && v.tegenhanger === terug, heen + ' hoort ' + terug + ' als tegenhanger te dragen');
+    /* En ook hier: een regel in de lijst bewijst niets. */
+    assert.ok(v.graad === 'vermoed' || v.graad === 'bevestigd', heen + ' draagt graad ' + v.graad);
+  }
+});
+
 test('4. elke vermoede tegenhanger is een route die bestaat', () => {
   const bestaat = new Set(ROUTES);
   for (const [pad, v] of Object.entries(R.per)) {

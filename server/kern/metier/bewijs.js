@@ -23,12 +23,8 @@ module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplie
   inzagelog = require('../../inzagelog') }) => {
   const LOG_MAX = 200;
   const nu = () => new Date().toISOString();
-  const metier = () => {
-    if (!db.data.metier || typeof db.data.metier !== 'object') db.data.metier = {};
-    const m = db.data.metier;
-    for (const k of ['naamvrij', 'inzagelog']) if (!m[k] || typeof m[k] !== 'object') m[k] = {};
-    return m;
-  };
+  const opslag = require('./opslag')({ db }); // de deur naar db.data.metier
+  const metier = () => opslag.wortel(['naamvrij', 'inzagelog']);
   const codeVan = (x) => String(x || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 24);
 
   /* Vrijgeven aan een zaak. Bewust een handeling met een reden erbij: het lid

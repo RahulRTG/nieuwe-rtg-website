@@ -19,7 +19,7 @@
       h += '<div title="' + esc('Verdieping ' + i + (wie ? ' · ' + wie : ' · vrij')) + '" style="position:absolute;left:0;right:0;height:11px;bottom:' + ((i - 1) * 13) + 'px;transform:rotateX(55deg) rotateZ(-45deg);border-radius:0;' +
         (wie ? 'background:var(--burgundy,#7F1634);opacity:0.9;' : 'background:none;border:1px solid var(--line);opacity:0.7;') + '"></div>';
     }
-    return '<div style="display:flex;gap:1.2rem;align-items:flex-end;">' +
+    return '<div class="s-1ri15g1">' +
       '<div style="position:relative;width:120px;height:' + (n * 13 + 30) + 'px;perspective:600px;flex:0 0 120px;">' + h + '</div>' +
       '<div class="sub h-flex1">' + esc(d.naam || '') + ' · ' + n + ' verdiepingen · ' + (d.kpi ? d.kpi.bezetting : 0) + '% verhuurd<br>' +
       'Bordeaux is verhuurd; een open plak is vrij. Beweeg eroverheen voor de huurder.</div></div>';
@@ -50,8 +50,8 @@
         '<div class="row-gap h-mt40"><input class="h-flex1" id="geCS" ' + IN + ' type="date"><input class="h-flex1" id="geCE" ' + IN + ' type="date">' +
         '<button id="geCNieuw" style="' + GOUD + 'flex:1;">' + T('ge.c.leg', 'Leg vast') + '</button></div>';
       h += (p.contracten || []).map(function (c) {
-        return '<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">' +
-          '<b style="flex:1;font-size:0.84rem;">' + esc(c.huurder) + '</b><span class="sub">' + esc(c.verdiepingen || '') + ' · ' + eur(c.maandhuur) + '/mnd · t/m ' + esc(c.eind) + ' · ' + esc(c.status) + '</span>' +
+        return '<div class="s-57bs1i">' +
+          '<b class="s-1q6jol6">' + esc(c.huurder) + '</b><span class="sub">' + esc(c.verdiepingen || '') + ' · ' + eur(c.maandhuur) + '/mnd · t/m ' + esc(c.eind) + ' · ' + esc(c.status) + '</span>' +
           (c.status === 'actief' ? '<button data-geverleng="' + c.id + '" style="' + STIL + '">' + T('ge.c.verleng', 'Verleng') + '</button>' +
             '<button data-gebeeindig="' + c.id + '" style="' + STIL + '">' + T('ge.c.stop', 'Beeindig') + '</button>' : '') + '</div>';
       }).join('') || '<p class="sub">' + T('ge.c.geen', 'Nog geen contracten vastgelegd.') + '</p>';
@@ -61,8 +61,8 @@
         '<input id="geLW" ' + IN + ' placeholder="' + T('ge.l.wens', 'Wens (m2, verdieping, wanneer)') + '" maxlength="160" style="flex:3;">' +
         '<button id="geLNieuw" style="' + GOUD + 'flex:1;">' + T('ge.l.leg', 'Voeg toe') + '</button></div>';
       h += (p.leads || []).map(function (l) {
-        return '<div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:0.35rem 0;">' +
-          '<b style="flex:1;font-size:0.84rem;">' + esc(l.naam) + '</b><span class="sub">' + esc(l.wens || '') + ' · sinds ' + esc(l.sinds) + '</span>' +
+        return '<div class="s-59jodx">' +
+          '<b class="s-1q6jol6">' + esc(l.naam) + '</b><span class="sub">' + esc(l.wens || '') + ' · sinds ' + esc(l.sinds) + '</span>' +
           p.fasen.map(function (f) {
             return '<button data-gefase="' + l.id + ':' + f + '" style="' + STIL + (l.fase === f ? 'border-color:var(--gold);color:var(--txt);' : '') + '">' + f + '</button>';
           }).join('') + '</div>';
@@ -75,7 +75,7 @@
         '<input class="h-flex1" id="geES" ' + IN + ' type="number" min="0" placeholder="kWh">' +
         '<input class="h-flex1" id="geEA" ' + IN + ' type="number" min="0" placeholder="m3 water">' +
         '<button id="geENieuw" style="' + GOUD + 'flex:1;">' + T('ge.e.leg', 'Noteer') + '</button></div>' +
-        '<div style="display:flex;gap:3px;align-items:flex-end;height:56px;margin-top:0.5rem;">' +
+        '<div class="s-1qgsyzo">' +
         (p.energie || []).slice(0, 16).reverse().map(function (x) {
           return '<div title="' + esc(x.week + ' · ' + x.stroomKwh + ' kWh') + '" style="flex:1;background:var(--burgundy,#7F1634);opacity:0.85;height:' + Math.max(6, Math.round(x.stroomKwh / em * 52)) + 'px;border-radius:0;"></div>';
         }).join('') + '</div>';

@@ -398,8 +398,10 @@ test('7c. een onleesbaar register of een kapotte verifier sluit, en ook dat telt
 test('8. een pad dat op een zwaar pad lijkt is niet zwaar; een dieper adres onder een zwaar pad wel', async () => {
   for (const licht of ['/api/payment', '/api/paybox', '/api/walletjes', '/API/PAY/x', 'api/pay/x', '', undefined, 42])
     assert.equal(zwaarPad(licht), null, String(licht) + ' is geen zwaar pad');
-  for (const zwaar of ['/api/pay/a/b/c', '/api/auth/password/reset', '/api/privacy/delete?id=1', '/api/gegevens/telefoon'])
+  for (const zwaar of ['/api/pay/a/b/c', '/api/auth/password/reset', '/api/privacy/delete?id=1', '/api/gegevens/zeg'])
     assert.ok(zwaarPad(zwaar), zwaar + ' is zwaar');
+  // Lezen wat er ontbreekt schrijft niets en is sinds 18 oktober 2026 niet zwaar.
+  assert.equal(zwaarPad('/api/gegevens/nodig'), null, '/api/gegevens/nodig leest alleen');
   // Elk zwaar pad uit de lijst is als zodanig herkenbaar en draagt zijn eigen reden.
   for (const p of PADEN) assert.equal(zwaarPad(p.pad).reden, p.reden);
 

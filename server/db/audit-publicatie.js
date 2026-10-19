@@ -39,7 +39,7 @@ module.exports = ({ db, cache, leesBinnen }) => {
   }
   function naCommit(_results, doos, voorbereid) {
     for (const publiceer of voorbereid.resultaten) publiceer();
-    if (doos?.auditOps) { doos.auditOps.length = 0; doos.auditViews.clear(); }
+    if (doos?.auditOps) { doos.auditOps.length = 0; doos.auditViews.clear(); if (doos.auditBeelden) doos.auditBeelden.clear(); }
     for (const [naam, nieuw] of voorbereid.snapshots) {
       db.data[naam] = nieuw.waarde; nieuw.root = db.data; nieuw.pending = null; cache.set(naam, nieuw);
     }

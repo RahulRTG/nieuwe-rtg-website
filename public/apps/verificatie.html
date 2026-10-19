@@ -129,7 +129,10 @@ const $=s=>document.querySelector(s);
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1';
   clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',3600); }
-const api=(pad,body)=>fetch('/api/verify'+pad,{method:'POST',
+/* De paden staan voluit en niet als een vast voorvoegsel plus een staart: een opgebouwd pad ziet
+   de routecensus niet (SCHERMROUTES.json), en dan kan geen proef aantonen dat
+   hij de routes van dit scherm raakt. */
+const api=(pad,body)=>fetch(pad,{method:'POST',
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
   body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;});
@@ -152,7 +155,7 @@ function toonStand(s){
 }
 
 async function laadStand(){
-  try{ toonStand((await api('/status')).status); }
+  try{ toonStand((await api('/api/verify/status')).status); }
   catch(e){ $('#stand').textContent=e.message; }
 }
 
@@ -186,8 +189,8 @@ function koppel(knopId, veldId, pad, klaarId, gelukt){
   });
 }
 
-koppel('kiesDoc','doc','/upload','docKlaar','Uw identiteitsbewijs is verstuurd.');
-koppel('kiesSelfie','selfie','/selfie','selfieKlaar','Uw selfie is verstuurd.');
+koppel('kiesDoc','doc','/api/verify/upload','docKlaar','Uw identiteitsbewijs is verstuurd.');
+koppel('kiesSelfie','selfie','/api/verify/selfie','selfieKlaar','Uw selfie is verstuurd.');
 laadStand();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>

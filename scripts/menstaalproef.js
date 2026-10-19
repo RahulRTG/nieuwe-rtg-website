@@ -67,7 +67,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { start } = require('./lib/wegwerpserver');
 
 const WORTEL = path.join(__dirname, '..');
@@ -1031,7 +1031,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
       'tools kiezen, en dan zegt deze uitslag niets over die rail.',
     rijen
   };
-  if (!nietSchrijven) fs.writeFileSync(doel, JSON.stringify(uit, null, 2) + '\n');
+  if (!nietSchrijven && magSchrijven(eisSchoneBoom('menstaalproef'), doel)) fs.writeFileSync(doel, JSON.stringify(uit, null, 2) + '\n');
 
   if (!stil) {
     for (const r of rijen.filter((x) => x.uitslag !== 'nietGemeten'))

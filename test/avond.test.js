@@ -435,3 +435,41 @@ test('de club: aanvragen is niet binnenkomen, en dat weet de deur ook', async ()
   assert.equal(binnen.status, 200);
   assert.equal(binnen.body.binnen, 3, 'nu staan ze binnen');
 });
+
+/* /api/avond/koppel: een stap zelf koppelen aan iets wat het lid elders al regelde.
+   De staat moet een bestaande staat zijn, de stap moet in DIT plan staan, en de
+   avond is van het lid zelf: een ander lid koppelt niets aan andermans avond.
+   Pas als ALLE stappen bevestigd zijn, is de avond rond -- een koppeling op een
+   stap maakt het plan niet stilletjes zeker.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/avond/plan.js de grendel
+   `!STATEN.includes(String(staat))` op `false`; de toets zakte op "een
+   verzonnen staat wordt geweigerd". */
+test('koppelen: een eigen stap aan een eigen boeking, en de avond wordt pas rond als alles klopt', async () => {
+  const uit = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '00:30',
+    personen: 2, plafondPP: 12000, titel: 'Koppeltoets' }, LID);
+  assert.equal(uit.status, 200);
+  const a = uit.body.avond;
+  assert.ok(a.stappen.length > 0, 'er staan stappen in het plan');
+  const eerste = a.stappen[0];
+
+  assert.equal((await post('/api/avond/koppel', { id: a.id, stap: eerste.id, staat: 'heel-zeker' }, LID)).status, 400,
+    'een verzonnen staat wordt geweigerd');
+  assert.equal((await post('/api/avond/koppel', { id: a.id, stap: 'geen-stap', staat: 'bevestigd' }, LID)).status, 404);
+  const u = String(Date.now());
+  const ander = (await post('/api/auth/register', { name: 'Ander', email: 'avk' + u + '@voorbeeld.nl',
+    phone: '06' + u.slice(-8), password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.equal((await post('/api/avond/koppel', { id: a.id, stap: eerste.id, staat: 'bevestigd' }, ander)).status, 404,
+    'andermans avond bestaat hier niet');
+  assert.equal((await post('/api/avond/koppel', { id: a.id, stap: eerste.id, staat: 'bevestigd' }, null)).status, 401);
+
+  const k = await post('/api/avond/koppel', { id: a.id, stap: eerste.id, staat: 'bevestigd',
+    domein: 'ov', boeking: 'RIT-123' }, LID);
+  assert.equal(k.status, 200, JSON.stringify(k.body).slice(0, 160));
+  const stap = k.body.avond.stappen.find(x => x.id === eerste.id);
+  assert.equal(stap.staat, 'bevestigd');
+  assert.deepEqual(stap.boeking, { domein: 'ov', id: 'RIT-123' });
+  const terug = (await post('/api/avond', { id: a.id }, LID)).body.avond;
+  assert.equal(terug.stappen.find(x => x.id === eerste.id).staat, 'bevestigd', 'de koppeling is bewaard');
+  if (a.stappen.length > 1) assert.equal(terug.staat, 'loopt', 'een stap bevestigd maakt de avond nog niet rond');
+  else assert.equal(terug.staat, 'rond');
+});

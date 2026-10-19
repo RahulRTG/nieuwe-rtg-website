@@ -1,4 +1,5 @@
-/* Concern (deelmodule): DE MENSEN -- dienstverbanden, uitnodigen, rechten.
+/* Concern (deelmodule): DE MENSEN -- dienstverbanden en uitnodigen. Wat een mens
+   hier MAG (rechten, kwalificaties) staat in ./rechten.js.
 
    Afgesplitst van ../concern.js dat over de 10 kB ging. De naad is inhoudelijk
    en niet cosmetisch: daar staat het BEDRIJF (entiteit, vestiging, juridische
@@ -11,10 +12,9 @@
    ooit ergens beginnen. Wat hem binnenlaat is de code, en die is eenmalig. */
 module.exports = (kern, hulp) => {
   const { app, auth, employmentVind, employmentNieuw, employmentBeeindig, employmentZet,
-    employmentVanEntiteit, employmentVanPersoon, employmentOpDatum, employmentOrganigram,
+    employmentVanEntiteit, employmentOpDatum, employmentOrganigram,
     uitnodigingNieuw, uitnodigingAccepteer, uitnodigingIntrek, uitnodigingRoteer, uitnodigingVind,
     uitnodigingVanEntiteit, uitnodigingBulk, uitnodigingBulkVerstuur,
-    scopeMag, scopeFunctiescheiding, kwalificatieZet, kwalificatiesVan,
     werkOverzicht, entiteitVind } = kern;
   const { mijn, stuur, nietGevonden } = hulp;
 
@@ -145,49 +145,5 @@ module.exports = (kern, hulp) => {
     const e = mijn(req);
     if (!e) return stuur(res, nietGevonden);
     res.json(Object.assign({ ok: true }, employmentOrganigram(e.id)));
-  });
-
-  /* ---- rechten ----
-     Deze route VERLEENT NIETS. Zij antwoordt op "mag deze persoon dit, hier?"
-     en geeft de uitleg mee -- ook bij ja. Een systeem dat niet kan zeggen waarom
-     iemand ergens NIET bij kan, leert mensen rechten stapelen tot het werkt. */
-  app.post('/api/concern/mag', auth, (req, res) => {
-    const e = mijn(req);
-    if (!e) return stuur(res, nietGevonden);
-    const b = req.body || {};
-    const doel = b.doel && b.doel.soort ? b.doel : { soort: 'entiteit', id: e.id };
-    /* De uitslag gaat ONGEWIJZIGD de deur uit. Er stond hier even een `ok: true`
-       omheen, en dat is precies verkeerd: scopeMag() draagt zijn eigen `ok`, en
-       een tweede eromheen maakt van "mag niet" een geslaagd antwoord. */
-    res.json(scopeMag(String(b.persoon || ''), String(b.recht || ''), doel,
-      /* `binnen`: anders las een eigenaar via `bijna` iemands rollen bij ANDERE werkgevers. */
-      { kwalificatie: b.kwalificatie || null, binnen: e.id }));
-  });
-
-  app.post('/api/concern/functiescheiding', auth, (req, res) => {
-    const e = mijn(req);
-    if (!e) return stuur(res, nietGevonden);
-    res.json(Object.assign({ ok: true }, scopeFunctiescheiding(e.id)));
-  });
-
-  /* ---- kwalificaties ----
-     De rol geeft mogelijke toegang; dit bepaalt de werkelijke. Verloopt er een,
-     dan valt het werk weg en blijft de rol staan. */
-  app.post('/api/concern/kwalificatie/zet', auth, (req, res) => {
-    const e = mijn(req);
-    if (!e) return stuur(res, nietGevonden);
-    stuur(res, kwalificatieZet(req.body || {}));
-  });
-
-  app.post('/api/concern/kwalificaties', auth, (req, res) => {
-    const e = mijn(req);
-    if (!e) return stuur(res, nietGevonden);
-    const b = req.body || {};
-    /* Alleen van iemand die hier werkt: kwalificaties van een willekeurige
-       codenaam opvragen zou een leesbare persoonslijst opleveren. */
-    const persoon = String(b.persoon || '');
-    const werkt = employmentVanPersoon(persoon, true).some(x => x.entiteit === e.id);
-    if (!werkt) return stuur(res, { status: 404, error: 'Deze persoon werkt hier niet.' });
-    res.json({ ok: true, kwalificaties: kwalificatiesVan(persoon) });
   });
 };

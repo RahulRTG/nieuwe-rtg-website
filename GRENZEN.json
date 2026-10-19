@@ -1,5 +1,6 @@
 {
   "uitleg": "Per domein de kern-namen die het mag aanraken, BOVEN de gedeelde interface in server/opzet/domeingrens.js. Gegenereerd met npm run grenslijst en met de hand aan te vullen; die aanvullingen blijven staan.",
+  "grens": "Een vertrekpunt en geen waarheid: dat een naam hier staat zegt alleen dat het domein hem vandaag aanraakt of dat iemand hem met de hand toevoegde, niet dat het hem nodig heeft. Namen die een bestand zelf uitrekent (genrepuls, genreplan, genreblik, werkplek-bureaus) ziet de scanner niet; die komen er pas op als de grens knelt.",
   "domeinen": {
     "aanmeldgesprek": [
       "intakeStart",
@@ -72,6 +73,7 @@
       "forgetSessionDuurzaam",
       "geboren",
       "hasCred",
+      "herstelSmsDicht",
       "herstelStart",
       "isBaas",
       "leeftijdVan",
@@ -133,12 +135,12 @@
     ],
     "bedrijf": [
       "agenda",
-      "betaal",
-      "betaalWaarheid",
       "assetBeeld",
       "assetMet",
       "bedrijf",
       "bestanden",
+      "betaal",
+      "betaalWaarheid",
       "bijeen",
       "bureau",
       "concernMagTekenen",
@@ -198,12 +200,6 @@
     "boeken": [
       "boeken"
     ],
-    "library": [
-      "library"
-    ],
-    "loop-fabric": [
-      "loopFabric"
-    ],
     "borden": [],
     "carriereledger": [
       "carriereledger"
@@ -248,9 +244,6 @@
       "status"
     ],
     "concern": [
-      "entiteitRekening",
-      "entiteitRekeningOpen",
-      "entiteitRekeningStand",
       "accounts",
       "app",
       "auth",
@@ -291,6 +284,9 @@
       "entiteitNieuw",
       "entiteitOnderneming",
       "entiteitRegistratie",
+      "entiteitRekening",
+      "entiteitRekeningOpen",
+      "entiteitRekeningStand",
       "entiteitVanEigenaar",
       "entiteitVerwijder",
       "entiteitVind",
@@ -330,6 +326,7 @@
       "connect"
     ],
     "connect-gezinsdeur": [],
+    "connection-policy": [],
     "consent": [
       "commercieelStand",
       "commercieelZet",
@@ -343,6 +340,9 @@
     "dagcoach": [
       "dagVoor"
     ],
+    "democratie": [
+      "democratie"
+    ],
     "doelen": [
       "doelMaak",
       "doelMeet",
@@ -355,6 +355,12 @@
       "afdelingen",
       "beveilig",
       "doosSleutels",
+      "zaakdoos"
+    ],
+    "doos-kloon": [
+      "afdelingen"
+    ],
+    "doos-rapport": [
       "zaakdoos"
     ],
     "doos-wacht": [],
@@ -523,6 +529,7 @@
       "toegankelijkVan",
       "toegankelijkZet"
     ],
+    "ik-workspace-rechten": [],
     "instant-reality": [
       "instantGet",
       "instantMutate"
@@ -584,6 +591,11 @@
       "officeVul",
       "officeWeg",
       "rtf",
+      "werkplek"
+    ],
+    "kantoorpakket-formaten": [
+      "boardroomBaas",
+      "office",
       "werkplek"
     ],
     "kantoorpakket-huis": [
@@ -754,6 +766,7 @@
       "employmentVanPersoon",
       "entiteitVind",
       "kluisAuth",
+      "library",
       "rtfos"
     ],
     "leerstof": [
@@ -784,6 +797,9 @@
     "levenmentor": [
       "levenslijn"
     ],
+    "library": [
+      "library"
+    ],
     "life": [
       "lifeVoor"
     ],
@@ -809,9 +825,13 @@
       "veiligAsync",
       "wie"
     ],
+    "loop-fabric": [
+      "loopFabric"
+    ],
     "luchthaven": [
       "lucht"
     ],
+    "magnaatstad": [],
     "magnaatwereld": [
       "boardroomAuth",
       "magnaatPartnerstudio",
@@ -879,8 +899,6 @@
       "noteFailedTry"
     ],
     "member": [
-      "reserveringUitzondering",
-      "contextDomeinen",
       "AUTHOR_TIER",
       "DOOR_RELOCK_MS",
       "LANDEN",
@@ -983,6 +1001,7 @@
       "conciergeIntrek",
       "conciergeVerzoeken",
       "conciergeVraag",
+      "contextDomeinen",
       "convOf",
       "crClub",
       "crClubWeg",
@@ -1009,6 +1028,7 @@
       "favorietenVan",
       "findPartner",
       "findSupplier",
+      "flitsVergeet",
       "fluister",
       "fluisterFocus",
       "fluisterOnthoud",
@@ -1053,6 +1073,7 @@
       "handelingsspoor",
       "hangar",
       "haversine",
+      "herstelSmsDicht",
       "hgToestel",
       "hgToestelWeg",
       "hgVlucht",
@@ -1103,6 +1124,7 @@
       "mbAanvraag",
       "mbCode",
       "mbMijn",
+      "mbVergeet",
       "mecBetaald",
       "mecGift",
       "mecGiftWeg",
@@ -1122,6 +1144,7 @@
       "mijnStyling",
       "mijnVerblijven",
       "mijnWachtlijst",
+      "mobVergeetLid",
       "munten",
       "myApplications",
       "nalatenschap",
@@ -1190,6 +1213,7 @@
       "ontmoetSos",
       "ontmoetStop",
       "ontmoetTeken",
+      "ontmoetVergeetLid",
       "ontmoetZet",
       "openLijn",
       "openVacatures",
@@ -1199,6 +1223,7 @@
       "ordersVoegToe",
       "overheid",
       "partnerCode",
+      "partnerPersoneelscode",
       "paspoortBeslis",
       "paspoortMijn",
       "paspoortStatus",
@@ -1206,6 +1231,7 @@
       "pay",
       "pestgrens",
       "pickupCode",
+      "plaats",
       "plaatsOrderVoor",
       "plaatsReview",
       "postdatum",
@@ -1240,6 +1266,7 @@
       "reizen",
       "rekeningVoor",
       "reserveerTafel",
+      "reserveringUitzondering",
       "residentie",
       "resolveSession",
       "retailCatalogus",
@@ -1328,6 +1355,7 @@
       "vastleggingDeel",
       "vastleggingStop",
       "vastleggingenVan",
+      "veiligVergeet",
       "verblijfAnnuleer",
       "verblijfBoek",
       "verbond",
@@ -1342,6 +1370,7 @@
       "wachtlijstZet",
       "wauwStemmingZet",
       "wauwTerugblik",
+      "weefsel",
       "werkgeversVan",
       "wishlistToggle",
       "zetOpWachtlijst",
@@ -1352,10 +1381,8 @@
       "zorgVan",
       "zorgVoor",
       "zorgZet",
-      "zzpwacht",
-      "partnerPersoneelscode",
       "zwaarbewijs",
-      "herstelSmsDicht"
+      "zzpwacht"
     ],
     "memo": [],
     "meting": [],
@@ -1406,6 +1433,8 @@
       "modBord",
       "modStoring",
       "modZet",
+      "ontvangstBevestig",
+      "ontvangstProbleem",
       "opdrachtBeeld",
       "opdrachtMet",
       "opdrachtNaar",
@@ -1431,9 +1460,7 @@
       "stuur",
       "zakelijkBesluit",
       "zakelijkOverzicht",
-      "zakelijkWacht",
-      "ontvangstBevestig",
-      "ontvangstProbleem"
+      "zakelijkWacht"
     ],
     "move": [
       "move"
@@ -1527,6 +1554,7 @@
       "conciergeVoortgang",
       "eigenaar",
       "ensureSupplierDefaults",
+      "findPartner",
       "findSupplier",
       "forgetSession",
       "forgetSessionDuurzaam",
@@ -1554,6 +1582,7 @@
       "ontmoetKantoorState",
       "ontmoetSignaalLid",
       "ontmoetSosAf",
+      "partnerPersoneelscode",
       "paspoortBeoordeel",
       "paspoortIncidenten",
       "pendingVerifications",
@@ -1576,17 +1605,16 @@
       "salonItemsVan",
       "salonProfielCompleet",
       "securityLogKeten",
+      "sessiestroom",
       "sessionFor",
       "sessions",
+      "status",
       "totpOk",
       "trChat",
       "veiligGelijk",
       "vertegenwoordiging",
       "wieKijkt",
-      "zaakAbonnement",
-      "findPartner",
-      "partnerPersoneelscode",
-      "sessiestroom"
+      "zaakAbonnement"
     ],
     "onboarding": [
       "eigenaar",
@@ -1719,6 +1747,8 @@
       "podiumWaarZet",
       "podiumWeg"
     ],
+    "presentatie-beelden": [],
+    "presentatie-gezinsbeelden": [],
     "regering": [
       "afdelingen",
       "afdelingshotel",
@@ -1738,6 +1768,9 @@
       "reiswereld",
       "reiswijzer",
       "tooManyTries"
+    ],
+    "reis-opgave": [
+      "reisgezelschap"
     ],
     "rtfbieb": [
       "bibliothecaris",
@@ -1885,6 +1918,9 @@
       "servicePost",
       "spraaktekst"
     ],
+    "service-kantoor-learning": [
+      "serviceLoopSource"
+    ],
     "service-kantoor-zaakbeeld": [],
     "service-zaak": [
       "serviceBevestiging",
@@ -1913,6 +1949,7 @@
       "connectieTussen",
       "dagOpdracht",
       "deblokkeer",
+      "dmPost",
       "dmSleutel",
       "gezinsPoort",
       "isGeblokkeerd",
@@ -2097,13 +2134,13 @@
       "oogSpullen",
       "oogUitgifteLog",
       "oogVoertuigen",
+      "partnerPersoneelscode",
       "payrollOS",
       "plaats",
       "publicPartner",
       "stuurLus",
       "trustVan",
-      "werkbeleidPauzeStand",
-      "partnerPersoneelscode"
+      "werkbeleidPauzeStand"
     ],
     "stuur": [
       "isolatie",
@@ -2114,7 +2151,6 @@
       "stuurRoep"
     ],
     "supplier": [
-      "horecaTerugbetaling",
       "ALT_IDEE",
       "ANNULEERGRONDEN",
       "AUTOVERKOOP_BRANDSTOF",
@@ -2126,11 +2162,11 @@
       "C",
       "DEMO",
       "DEMO_SUPPLIER",
-      "doosSleutels",
       "GROOTHANDEL_CATEGORIEEN",
       "H",
       "HK_STATUSES",
       "Hlees",
+      "Hopener",
       "KANALEN",
       "LANDEN",
       "PASPOORT_NIVEAUS",
@@ -2227,6 +2263,7 @@
       "defensie",
       "dienstverbandUitAanname",
       "doel",
+      "doosSleutels",
       "dorpBuurt",
       "dorpDrukte",
       "dorpKan",
@@ -2291,6 +2328,7 @@
       "horecaPas",
       "horecaPubliek",
       "horecaRekVan",
+      "horecaTerugbetaling",
       "hulpdienst",
       "huurVan",
       "i18n",
@@ -2310,6 +2348,7 @@
       "keylessToegang",
       "klantProfiel",
       "klantSalon",
+      "klokVan",
       "kortingCenten",
       "ledenPrijs",
       "leeftijdVan",
@@ -2411,6 +2450,7 @@
       "scope",
       "sectiesForOrder",
       "seizoen",
+      "sessiestroom",
       "sessionFor",
       "setRoomHk",
       "shiftSamenvatting",
@@ -2435,6 +2475,7 @@
       "trChat",
       "transactie",
       "trekInviteIn",
+      "tweefactor",
       "uitEuro",
       "unlockDoor",
       "vakbewijsHeeft",
@@ -2475,10 +2516,7 @@
       "zetWerkvenster",
       "zin",
       "zoekZone",
-      "zorgketen",
-      "sessiestroom",
-      "tweefactor",
-      "klokVan"
+      "zorgketen"
     ],
     "supplier-deel2": [],
     "synergie": [
@@ -2530,6 +2568,7 @@
       "techniek",
       "tenant",
       "tooManyTries",
+      "tweefactor",
       "wacht",
       "webauthn",
       "webauthnAantal",
@@ -2537,8 +2576,7 @@
       "webauthnStapOpOpties",
       "zekeringMag",
       "zwaar",
-      "zwaarbewijs",
-      "tweefactor"
+      "zwaarbewijs"
     ],
     "tenant": [
       "bedrijf",
@@ -2548,6 +2586,7 @@
     ],
     "theater": [
       "resolveSession",
+      "sessiestroom",
       "theaterAbonneer",
       "theaterHuisstijl",
       "theaterKanaalMaak",
@@ -2569,8 +2608,7 @@
       "theaterVideoUpload",
       "theaterZaakMaak",
       "theaterZaakZaal",
-      "theaterZaal",
-      "sessiestroom"
+      "theaterZaal"
     ],
     "thuis": [
       "thuis"
@@ -2581,6 +2619,7 @@
     "tijdlijn": [
       "tijdlijnVoor"
     ],
+    "toestel": [],
     "toestellen": [
       "status",
       "toestelIntrek",
@@ -2693,7 +2732,6 @@
       "vonkBericht",
       "vonkBetaal",
       "vonkBlokkeer",
-      "vonkEdge",
       "vonkCommCallAnswer",
       "vonkCommCallEnd",
       "vonkCommCallPoll",
@@ -2706,6 +2744,7 @@
       "vonkCommReport",
       "vonkCommStatus",
       "vonkCommText",
+      "vonkEdge",
       "vonkFotoLever",
       "vonkFotoOrden",
       "vonkFotoPubliceer",
@@ -2852,9 +2891,6 @@
       "status",
       "wallet",
       "zorgpolis"
-    ],
-    "democratie": [
-      "democratie"
     ]
   }
 }

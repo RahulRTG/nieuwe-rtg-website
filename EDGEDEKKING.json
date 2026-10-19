@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:13:05.276Z",
-    "commit": "e5b7388e",
+    "op": "2026-10-18T12:19:46.517Z",
+    "commit": "4f934f6e9",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
@@ -997,7 +997,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -1099,7 +1099,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -1544,7 +1544,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -1904,7 +1904,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -2202,7 +2202,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -2428,7 +2428,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -3796,7 +3796,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -4732,7 +4732,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -4948,7 +4948,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -6535,7 +6535,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -6607,7 +6607,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -6679,7 +6679,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -6895,7 +6895,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -7049,7 +7049,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -7553,7 +7553,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -7625,7 +7625,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -9281,7 +9281,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -9723,7 +9723,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -9795,7 +9795,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -9867,7 +9867,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -10299,7 +10299,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -11965,7 +11965,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -12263,7 +12263,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -12485,7 +12485,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -13647,7 +13647,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -13883,7 +13883,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -13955,7 +13955,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -14037,7 +14037,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -14911,7 +14911,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -15055,7 +15055,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -15500,7 +15500,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -15644,7 +15644,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -15932,7 +15932,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -16220,7 +16220,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -16292,7 +16292,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -16654,7 +16654,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -16808,7 +16808,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -17168,7 +17168,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -17539,7 +17539,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -17785,7 +17785,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -17939,7 +17939,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -18155,7 +18155,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -18515,7 +18515,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -18886,7 +18886,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -19246,7 +19246,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -19318,7 +19318,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -19390,7 +19390,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -20324,7 +20324,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -21217,7 +21217,7 @@
       },
       "context": {
         "ja": 285,
-        "zelf": 17,
+        "zelf": 65,
         "nee": 0,
         "nvt": 0,
         "na-openen": 0,

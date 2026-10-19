@@ -50,7 +50,8 @@ module.exports = (ctx) => {
       Object.assign(db.data, d.data);
       save();
       st.laatsteKloon = klokNu();
-    } catch (e) { /* geen lijn: de pinger regelt de modus */ }
+    } catch (e) { /* geen lijn: de pinger regelt de modus -- maar een kloon die niet
+       landde, staat in het log (STILSPOOR.json) */ console.warn('[zaakdoos] de kloon niet bewaard:', e && e.message); }
   }
 
   /* ---------- naspelen na herstel ---------- */

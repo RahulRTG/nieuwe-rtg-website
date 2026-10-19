@@ -146,10 +146,23 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
 <link href="/shared/rtg-edge-system.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1cuiwfl:not(#_#_#_){margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap}
+.s-1hjpjwj:not(#_#_#_){margin-top:0.9rem}
+.s-1x93s7l:not(#_#_#_){display:flex;gap:0.5rem}
+.s-5iufzb:not(#_#_#_){width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl travel-os" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="ov" class="rtg-stijl travel-os" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
   <h1>RTG Vervoer</h1>
@@ -182,7 +195,7 @@
       <div class="keten" id="lopendKeten" aria-hidden="true"></div>
       <div id="lopendEtappes"></div>
       <p class="stil" id="lopendVoertuig"></p>
-      <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <div class="s-1cuiwfl">
         <button class="knop" id="lopendAnnuleer" type="button">Annuleren</button>
         <button class="knop" id="lopendDeel" type="button">Deel deze rit</button>
       </div>
@@ -216,7 +229,7 @@
         <div id="beleidKaart" class="weg" style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">
           <p class="stil" id="beleidUit"></p>
         </div>
-        <div style="margin-top:0.9rem;">
+        <div class="s-1hjpjwj">
           <button class="knop vol hoofd" id="velPlan" type="button" data-hoofdactie>Plan mijn reis</button>
         </div>
         <p class="i-1hjmzy stil">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
@@ -310,7 +323,7 @@
     <h2>De pendel van uw werkgever</h2>
     <div class="kaart">
       <label for="velWerkgever">Bedrijfscode</label>
-      <div style="display:flex;gap:0.5rem;">
+      <div class="s-1x93s7l">
         <input id="velWerkgever" type="text" placeholder="Bijv. MKKX" autocomplete="off">
         <button class="knop" id="pendelHaal" type="button">Toon</button>
       </div>
@@ -336,7 +349,7 @@
 </div>
 <div class="codeScherm" id="qrScherm" role="dialog" aria-label="Uw vervoerbewijs">
   <p class="stil" id="qrTitel"></p>
-  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;">
+  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" class="s-5iufzb">
   <p class="stil" id="qrCode" style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;"></p>
   <button class="knop" id="qrDicht" type="button">Sluiten</button>
 </div>
@@ -1047,5 +1060,13 @@
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/travel-os-config.js" defer></script>
 <script src="/shared/travel-os.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

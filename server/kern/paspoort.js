@@ -44,11 +44,8 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   const nu = () => new Date().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200);
 
-  function lijsten() {
-    if (!Array.isArray(db.data.paspoortVerzoeken)) db.data.paspoortVerzoeken = [];
-    if (!Array.isArray(db.data.paspoortIncidenten)) db.data.paspoortIncidenten = [];
-    if (!Array.isArray(db.data.paspoortLog)) db.data.paspoortLog = [];
-  }
+  const opslag = require('./paspoort/opslag')({ db }); // de enige deur naar de drie lijsten
+  const lijsten = opslag.alle;
   // Een sleutel ('user-<id>') terug naar het account. Alleen echte accounts
   // hebben een paspoort; persona's/gasten niet.
   function accountVanKey(key) {
@@ -108,8 +105,8 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   }
   function log(entry) {
     lijsten();
-    db.data.paspoortLog.unshift({ id: id(), at: nu(), ...entry });
-    db.data.paspoortLog = db.data.paspoortLog.slice(0, 50000);
+    opslag.bak('paspoortLog').unshift({ id: id(), at: nu(), ...entry });
+    opslag.zet('paspoortLog', opslag.bak('paspoortLog').slice(0, 50000));
   }
 
   // De ja/nee-bevestiging: altijd beschikbaar, nooit met naam of foto.
@@ -166,7 +163,7 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   /* De toezicht- en verzoekenlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten; de toezichtlaag gaat
      eerst de context in omdat de verzoekenketen publiekVerzoek gebruikt. */
-  const ctx = { db, save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
+  const ctx = { db, opslag, save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
     leesUploadDataUrl, leeftijdVan, gidsHaal, NIVEAUS, VIEW_TTL_MS, KIND_GRENS,
     lijsten, accountVanKey, memberState, leeftijdVanAccount, log, bevestigingVan, inhoudVoor, codenaamUitGids, id, schoon, nu };
   const deelToezicht = require('./paspoort/toezicht')(ctx);

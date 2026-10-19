@@ -46,6 +46,18 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
     if (!ont.alle.length && !ont.mails.length)
       return { status: 400, error: 'Je kring is leeg; er is niemand om te waarschuwen. Zet eerst iemand in je kring.' };
 
+    /* EEN DUBBELTIK IS EEN ALARM, NIET TWEE (gevonden door de voltooiproef,
+       18 oktober 2026). Twee keer dezelfde knop binnen een paar tellen gaf de
+       kring twee alarmen -- en vals alarm sloopt een veiligheidssysteem. Dit
+       staat HIER en niet in de idem-poort: die speelt een oud antwoord terug,
+       en dan heet een alarm "verstuurd" terwijl de kring intussen leeg is
+       (test/veiligheid.test.js toets 11). Na de controle hierboven dus, op
+       een alarm dat nog open staat. */
+    const nuMs = Date.now();
+    const zelfde = alarmen.find(a => a.handle === handle && !a.afgesloten && a.soort === soort
+      && a.proef === !!proef && a.notitie === (notitie ? String(notitie).slice(0, 200) : '')
+      && nuMs - new Date(a.at).getTime() < 5000);
+    if (zelfde) return { status: 200, ok: true, id: zelfde.id, naar: zelfde.naar.length, mails: zelfde.mails, herhaald: true };
     const id = crypto.randomBytes(6).toString('hex');
     const kop = proef ? 'RTG proefalarm' : 'RTG alarm';
     const zin = (TEKST[proef ? 'proef' : soort] || TEKST.knop)(codenaam || 'Een lid van je kring');

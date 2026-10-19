@@ -126,7 +126,7 @@
     window.RTGDaily.render('bestanden', first ? 'empty' : 'ready', { retry: laad });
     $('#officeKop').style.display = office.length ? '' : 'none';
     $('#officeLijst').innerHTML = office.map(function (d) {
-      return '<a class="item" href="/apps/office.html" style="text-decoration:none;color:inherit;">' +
+      return '<a class="item s-1m37x9n" href="/apps/office.html">' +
         '<span class="ext" aria-hidden="true">' + esc(d.soort) + '</span>' +
         '<span class="wat"><b data-user-content>' + esc(d.titel) + '</b><span>RTG Office · ' + esc(String(d.gewijzigd || '').slice(0, 10)) + '</span></span></a>';
     }).join('');

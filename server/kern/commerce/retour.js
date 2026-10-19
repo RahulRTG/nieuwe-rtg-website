@@ -50,10 +50,8 @@ module.exports = ({ db, save, nu, btwUit, zaakVan }) => {
   const klok = () => (typeof nu === 'function' ? nu() : require('../../lib/klok').nu());
   const tekst = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 200);
 
-  function pot() {
-    if (!Array.isArray(db.data.commerceRetouren)) db.data.commerceRetouren = [];
-    return db.data.commerceRetouren;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commerce/retour', bezit: { commerceRetouren: 'lijst' } });
+  const pot = () => eigen.bak('commerceRetouren');
   const bij = (id) => pot().find(r => r.id === String(id || '')) || null;
 
   /* Vervallen op het moment dat er toch al naar de tabel wordt gekeken -- zelfde

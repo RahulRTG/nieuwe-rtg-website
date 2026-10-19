@@ -37,7 +37,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { TREDEN } = require('../server/kern/stuur/plafond');
 
 const WORTEL = path.join(__dirname, '..');
@@ -189,7 +189,7 @@ const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const controle = process.argv.includes('--controle');
 const uit = bouw(args[0] || 'MENSTAALPROEF.json', args[1] || 'MENSTAALPROEF-ANDER.json');
 if (uit.fout) { console.error(uit.fout); process.exit(2); }
-fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+if (magSchrijven(eisSchoneBoom('railvergelijk'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
 const t = uit.telling;
 console.log('RAILVERGELIJK: ' + uit.rails.basis + ' tegenover ' + (uit.rails.ander || 'GEEN_RAIL') +
   ' -- ' + t.gelijk + ' gelijk, ' + t.lager + ' voorzichtiger, ' + t.hoger + ' hoger, ' +

@@ -12,7 +12,7 @@ const { startServer, stop } = require('./helper');
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
-  return fetch(base + '/api/office/' + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
+  return fetch(base + (pad.startsWith('/api/') ? pad : '/api/office/' + pad), { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
@@ -30,7 +30,7 @@ test.before(async () => {
 test.after(() => stop(srv && srv.child));
 
 test('1. de zelfzorg-status toont versie, schema, klaarstaande upgrade en de automaat', async () => {
-  const r = await api(base, 'zelfzorg', {}, office);
+  const r = await api(base, '/api/office/zelfzorg', {}, office);
   assert.equal(r.status, 200);
   assert.ok(r.body.versie, 'pakketversie aanwezig');
   assert.equal(typeof r.body.schema, 'number');
@@ -40,16 +40,16 @@ test('1. de zelfzorg-status toont versie, schema, klaarstaande upgrade en de aut
 });
 
 test('2. opruimen veegt verlopen inhoud en schrijft het in het journaal', async () => {
-  const r = await api(base, 'zelfzorg/opruim', { naam: 'Testmens' }, office);
+  const r = await api(base, '/api/office/zelfzorg/opruim', { naam: 'Testmens' }, office);
   assert.equal(r.status, 200);
   assert.ok(r.body.ok);
-  const s = await api(base, 'zelfzorg', {}, office);
+  const s = await api(base, '/api/office/zelfzorg', {}, office);
   const regel = s.body.journaal.find(j => j.soort === 'opruimen' && j.door === 'Testmens');
   assert.ok(regel, 'de opruimronde staat met naam in het journaal');
 });
 
 test('3. de beschermronde draait de checks en geeft adviezen, geen ingrepen', async () => {
-  const r = await api(base, 'zelfzorg/bescherm', { naam: 'Testmens' }, office);
+  const r = await api(base, '/api/office/zelfzorg/bescherm', { naam: 'Testmens' }, office);
   assert.equal(r.status, 200);
   assert.ok(['ok', 'let-op'].includes(r.body.oordeel), 'een eerlijk oordeel');
   assert.ok(r.body.checks.ok + r.body.checks.waarschuwing + r.body.checks.fout > 5, 'de gezondheidschecks zijn echt gedraaid');
@@ -60,15 +60,15 @@ test('3. de beschermronde draait de checks en geeft adviezen, geen ingrepen', as
 });
 
 test('4. repareren herstelt een kapotte kerncollectie en meldt wat er gebeurd is', async () => {
-  const r = await api(base, 'zelfzorg/herstel', { naam: 'Testmens' }, office);
+  const r = await api(base, '/api/office/zelfzorg/herstel', { naam: 'Testmens' }, office);
   assert.equal(r.status, 200);
   assert.ok(Array.isArray(r.body.reparaties));
   assert.ok(Array.isArray(r.body.adviezen), 'geld-afwijkingen zouden hier als advies staan');
 });
 
 test('5. upgraden: de knop voert de klaarstaande migraties uit en de kast komt op de doelversie', async () => {
-  const voor = (await api(base, 'zelfzorg', {}, office)).body;
-  const r = await api(base, 'zelfzorg/upgrade', { naam: 'Testmens' }, office);
+  const voor = (await api(base, '/api/office/zelfzorg', {}, office)).body;
+  const r = await api(base, '/api/office/zelfzorg/upgrade', { naam: 'Testmens' }, office);
   assert.equal(r.status, 200);
   assert.equal(r.body.schema, voor.doelSchema, 'de kast staat nu op de doelversie');
   if (voor.wachtend.length) {
@@ -76,7 +76,7 @@ test('5. upgraden: de knop voert de klaarstaande migraties uit en de kast komt o
     assert.ok(r.body.acties.some(a => /back-up/i.test(a.wat)), 'er is eerst een back-up gemaakt (of eerlijk gemeld waarom niet)');
   }
   // idempotent: nog een keer drukken is veilig en doet niets
-  const r2 = await api(base, 'zelfzorg/upgrade', { naam: 'Testmens' }, office);
+  const r2 = await api(base, '/api/office/zelfzorg/upgrade', { naam: 'Testmens' }, office);
   assert.equal(r2.body.bijgewerkt, false, 'tweede druk: niets meer te doen');
 });
 

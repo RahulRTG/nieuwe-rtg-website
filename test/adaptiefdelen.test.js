@@ -29,7 +29,15 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const SCHERMEN = ['office', 'app', 'bestanden', 'reizen-veilig', 'reizen',
   'sociaal', 'comm', 'meet', 'vonk', 'rendezvous', 'entourage', 'attenties', 'cercle', 'sociaal-prive', 'magnaat',
-  'leverancier-aanvragen', 'mijnmall', 'wereld', 'living-world', 'library', 'agenda', 'notities', 'reisbureau'];
+  'leverancier-aanvragen', 'mijnmall', 'wereld', 'living-world', 'library', 'agenda', 'notities', 'reisbureau',
+  /* De schuldlijst van besluit 11 (CONTEXT_SCHULD, scripts/edgedekking.js), afgelost
+     met apps/schermcontext.js: elk van deze schermen laadt het register
+     om zijn eigen context te kunnen zeggen. De tien RTFoundation-schermen van die
+     portie staan onder apps/foundation/ en vallen buiten deze map. */
+  'avond', 'belastingkantoor', 'browser', 'clips', 'concern', 'defensie', 'galerij', 'gemeenteloket', 'gemeentepda',
+  'genootschap', 'home', 'klankwerk', 'labpas', 'lesmaker', 'luchthaven', 'mall', 'marechaussee', 'media', 'muziek',
+  'onderneming', 'ov', 'overheidspda', 'partner-worden', 'passkeys', 'podium', 'rechtbank', 'rijksloket', 'rtgid',
+  'rtgschool', 'scanner', 'sitemaker', 'sportclub', 'techniek', 'theater', 'thuis', 'websitestudio'];
 /* De volgorde die het register eist: eerst de leer, dan de delen, dan het register.
    De objectpoort (shared/objectverwijzing.js, stap 20) is zo'n deel: het register
    pakt hem bij het laden, en zonder poort gaat er geen object door. */

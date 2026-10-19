@@ -92,6 +92,18 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1a0mbsa:not(#_#_#_){background:var(--goud-h)}
+.s-5tp3bc:not(#_#_#_){background:#2a2620}
+.s-v51nj1:not(#_#_#_){background:var(--blauw)}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -129,9 +141,9 @@
         <span class="rtf">10% RTF</span>
       </div>
       <div class="legenda">
-        <span><i style="background:#2a2620;"></i>70% &mdash; de reis zelf</span>
-        <span><i style="background:var(--goud-h);"></i>20% &mdash; jouw eigen buurt</span>
-        <span><i style="background:var(--blauw);"></i>10% &mdash; de foundation: lab, clubs &amp; gezinnen</span>
+        <span><i class="s-5tp3bc"></i>70% &mdash; de reis zelf</span>
+        <span><i class="s-1a0mbsa"></i>20% &mdash; jouw eigen buurt</span>
+        <span><i class="s-v51nj1"></i>10% &mdash; de foundation: lab, clubs &amp; gezinnen</span>
       </div>
     </div>
   </article>

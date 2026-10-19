@@ -35,25 +35,21 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   const THUIS_SIGNALEN = ['vraag', 'offer', 'answer', 'ice', 'klaar', 'stop'];
   const thuisAanwezigheid = new Map();   // videoId -> ts van de laatste hartslag van de maker
 
-  function lijsten() {
-    if (!Array.isArray(db.data.theaterKanalen)) db.data.theaterKanalen = [];
-    if (!Array.isArray(db.data.theaterVideos)) db.data.theaterVideos = [];
-    if (!db.data.theaterReacties) db.data.theaterReacties = {};
-    if (!Array.isArray(db.data.theaterMeldingen)) db.data.theaterMeldingen = [];
-  }
+  const T = require('./opslag')({ db }); // de enige deur van dit domein naar db.data
+  const lijsten = T.alle;
   /* HET PERSOONLIJKE kanaal van dit lid. Een INTERN kanaal (van een zaak, zie
      ./zaak.js) draagt een zaakCode en telt hier niet mee: het hoort bij een
      organisatie en niet bij een mens, en wie de bibliotheek van zijn werk
      beheert mag daarnaast gewoon een eigen kanaal hebben. */
-  const kanaalVan = key => { lijsten(); return db.data.theaterKanalen.find(k => k.key === key && !k.zaakCode) || null; };
+  const kanaalVan = key => { lijsten(); return T.bak('theaterKanalen').find(k => k.key === key && !k.zaakCode) || null; };
   /* Bij welke organisaties hoort dit lid? Zelfde bron als het Podium
      (kern/werkplekken.js) -- een tweede antwoord op een toegangsvraag is er
      een te veel (LAT.md regel 4). */
   const { zakenVan, personeelVan } = require('../werkplekken').maakWerkplekken({ accounts, findSupplier });
-  const kanaalMet = kid => { lijsten(); return db.data.theaterKanalen.find(k => k.id === kid) || null; };
-  const videoMet = vid => { lijsten(); return db.data.theaterVideos.find(v => v.id === vid) || null; };
+  const kanaalMet = kid => { lijsten(); return T.bak('theaterKanalen').find(k => k.id === kid) || null; };
+  const videoMet = vid => { lijsten(); return T.bak('theaterVideos').find(v => v.id === vid) || null; };
   const mbVan = bytes => bytes ? Math.max(0.1, Math.round(bytes / 1048576 * 10) / 10) : 0;
-  const kanaalBytes = k => db.data.theaterVideos.filter(v => v.kanaalId === k.id && v.klaar).reduce((n, v) => n + (v.bytes || 0), 0);
+  const kanaalBytes = k => T.bak('theaterVideos').filter(v => v.kanaalId === k.id && v.klaar).reduce((n, v) => n + (v.bytes || 0), 0);
   const thuisOnline = v => v.bewaring === 'thuis' && Date.now() - (thuisAanwezigheid.get(v.id) || 0) < THUIS_TTL_MS;
 
   /* ---- het kanaal: aanmelden, en pas open na een mens van kantoor ---- */
@@ -63,14 +59,14 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     const naam = schoon(data.naam, 40); if (!naam) return { status: 400, error: 'Geef het kanaal een naam.' };
     const k = { id: id(), key, naam, genre: GENRES.includes(data.genre) ? data.genre : 'salon',
       bio: schoon(data.bio, 300), status: 'wacht', volgers: [], at: nu() };
-    db.data.theaterKanalen.push(k); save();
+    T.bak('theaterKanalen').push(k); save();
     sseToOffice('sync', { scope: 'theater' });
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
   }
   /* De kantoorkant (de wachtrij en het besluit) staat in ./kantoor.js: dat is
      wat een MENS VAN RTG doet, en dat is een ander onderwerp dan wat een lid of
      een zaak met een kanaal doet. */
-  const kantoor = require('./kantoor')({ db, lijsten, kanaalMet, codenaamVan, save, notify });
+  const kantoor = require('./kantoor')({ T, lijsten, kanaalMet, codenaamVan, save, notify });
 
   /* ---- de zaal: chronologisch, abonnementen eerst, geen algoritme ---- */
   function videoBeeld(v) {
@@ -91,16 +87,16 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
          ze hebben voordat het beeld begint (kern/ondertitels.js). */
       ondertitels: Array.isArray(v.ondertitels) ? v.ondertitels : [],
       ondertiteld: !!(v.ondertitels && v.ondertitels.length),
-      codenaam: codenaamVan(v.key), reacties: (db.data.theaterReacties[v.id] || []).length, at: v.at };
+      codenaam: codenaamVan(v.key), reacties: (T.bak('theaterReacties')[v.id] || []).length, at: v.at };
   }
   function eigenBeeld(k) {
     return { id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, status: k.status,
       volgers: (k.volgers || []).length, gebruiktMb: mbVan(kanaalBytes(k)), maxMb: MAX_KANAAL_MB,
-      videos: db.data.theaterVideos.filter(v => v.kanaalId === k.id).map(videoBeeld) };
+      videos: T.bak('theaterVideos').filter(v => v.kanaalId === k.id).map(videoBeeld) };
   }
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, fs, path, mediaDir, schoon, nu, id, lijsten, kanaalVan, kanaalMet, videoMet,
+    db, opslag: T, save, fs, path, mediaDir, schoon, nu, id, lijsten, kanaalVan, kanaalMet, videoMet,
     kanaalBytes, mbVan, sseToCustomer, sseToOffice, thuisAanwezigheid, thuisOnline,
     zakenVan, personeelVan, videoBeeld, eigenBeeld, codenaamVan, GENRES, REACTIES_MAX,
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB
@@ -137,7 +133,7 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   const videosVanMaker = (makerKey) => {
     const k = kanaalVan(makerKey);
     if (!k || k.status !== 'goedgekeurd') return [];
-    return db.data.theaterVideos.filter(x => x.kanaalId === k.id && x.klaar).map(videoBeeld);
+    return T.bak('theaterVideos').filter(x => x.kanaalId === k.id && x.klaar).map(videoBeeld);
   };
   const volgtMaker = (key, makerKey) => {
     const k = kanaalVan(makerKey);

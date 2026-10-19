@@ -45,22 +45,21 @@ module.exports = ({ db, save, stukken }) => {
 
   const leeg = () => ({ nooit: [], standaardTot: TOT_STANDAARD });
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/levensbeleid', bezit: { levensbeleid: 'kaart' } });
   function kijk(wie) {
-    const alles = db.data.levensbeleid;
+    const alles = eigen.kijk('levensbeleid');
     const w = String(wie || '');
-    const r = alles && alles[w];
+    const r = alles[w];
     return r && typeof r === 'object' ? r : leeg();
   }
 
   /* Opslag pas als er echt iets bewaard wordt; kijken laat geen spoor achter. */
   function pak(wie) {
-    if (!db.data.levensbeleid || typeof db.data.levensbeleid !== 'object') db.data.levensbeleid = {};
+    const alles = eigen.bak('levensbeleid');
     const w = String(wie || '');
     if (!w) return null;
-    if (!db.data.levensbeleid[w] || typeof db.data.levensbeleid[w] !== 'object') {
-      db.data.levensbeleid[w] = leeg();
-    }
-    const r = db.data.levensbeleid[w];
+    if (!alles[w] || typeof alles[w] !== 'object') alles[w] = leeg();
+    const r = alles[w];
     if (!Array.isArray(r.nooit)) r.nooit = [];
     if (!Number.isFinite(r.standaardTot)) r.standaardTot = TOT_STANDAARD;
     return r;

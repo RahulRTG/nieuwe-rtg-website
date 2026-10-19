@@ -39,10 +39,8 @@ module.exports = ({ db, save, nu }) => {
   const klok = () => (typeof nu === 'function' ? nu() : huisklok());
   const sleutelVan = (s) => String(s == null ? '' : s).slice(0, 120);
 
-  function pot() {
-    if (!db.data.commerceManden || typeof db.data.commerceManden !== 'object') db.data.commerceManden = {};
-    return db.data.commerceManden;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commerce/mand', bezit: { commerceManden: 'kaart' } });
+  const pot = () => eigen.bak('commerceManden');
 
   /* Vervallen manden gaan eruit op het moment dat er toch al naar de tabel
      wordt gekeken. Een eigen veger zou een tweede plek zijn die weet wanneer

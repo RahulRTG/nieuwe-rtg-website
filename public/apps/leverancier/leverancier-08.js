@@ -56,9 +56,9 @@
       '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
       '<div class="row-gap"><select class="st-in h-flex2" id="ovGerecht">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
-      '<input class="st-in" id="ovAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
-      '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:0;">'+T('over.is','Is over')+'</button></div>'+
-      (l.length ? l.map(x => '<div class="st-row"><span><b style="color:var(--rtg-leesgoud,var(--gold));">'+x.qty+'×</b> '+MTX(x.name)+'<span class="sub">'+timeAgo(x.at)+' · '+(x.door||'')+'</span></span>'+
+      '<input class="st-in s-mbp5mo" id="ovAantal" type="number" inputmode="numeric" min="1" value="1">'+
+      '<button class="tkc-start s-1kswpwe" id="ovBij">'+T('over.is','Is over')+'</button></div>'+
+      (l.length ? l.map(x => '<div class="st-row"><span><b class="s-12itpbj">'+x.qty+'×</b> '+MTX(x.name)+'<span class="sub">'+timeAgo(x.at)+' · '+(x.door||'')+'</span></span>'+
         '<span class="acts"><button class="obtn primary" data-overgebruikt="'+x.id+'">'+T('over.gebruikt','Gebruikt')+'</button><button class="obtn warn" data-overweg="'+x.id+'">✕</button></span></div>').join('')
       : '<div class="tkc-who">'+T('over.leeg','Er ligt nu niets over.')+'</div>')+'</div>';
   }
@@ -127,7 +127,7 @@
          wie kookt. Op het keukenscherm nam die regel de plek in van een
          gerechtregel zonder dat de kok er iets mee kan; bij de bar staat er
          alcohol op de bon en daar telt hij wel. */
-      (o.leeftijdOk && st !== 'keuken'?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
+      (o.leeftijdOk && st !== 'keuken'?'<div class="tkc-alg s-1u23sv3">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
       ((st==='keuken'||st==='bar')&&!opts.dim?(function(){
         const vp = vuurplan(o);
         const kanten = Object.keys(vp.plan);

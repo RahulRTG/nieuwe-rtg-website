@@ -46,11 +46,11 @@
           '<b>' + esc(d.titel || '(zonder titel)') + '</b>' +
           '<span>' + esc(String(d.tekst || '').split('\n')[0].slice(0, 42)) + '</span></button>';
       }).join('') + (magBewerken
-        ? '<button class="knop" id="diaErbij" type="button" style="width:100%;margin-top:0.5rem;">+ Dia</button>' +
+        ? '<button class="knop s-15bgfuc" id="diaErbij" type="button">+ Dia</button>' +
           /* het thema staat in de dia-kolom omdat het over het HELE deck gaat;
              naast de indeling van één dia zou het lezen als iets per dia */
           '<select id="deckThema" aria-label="Thema van het hele deck" title="Thema van het hele deck"' +
-          ' style="width:100%;margin-top:0.5rem;">' + THEMAS.map(function (t) {
+          ' class="s-15bgfuc">' + THEMAS.map(function (t) {
             return '<option value="' + t[0] + '"' + (t[0] === thema ? ' selected' : '') + '>Thema: ' + t[1] + '</option>';
           }).join('') + '</select>' : '');
       Array.prototype.forEach.call(rail.querySelectorAll('[data-dia]'), function (b) {
@@ -82,7 +82,7 @@
             INDELINGEN.map(function (x) {
               return '<option value="' + x[0] + '"' + (x[0] === d.indeling ? ' selected' : '') + '>' + x[1] + '</option>';
             }).join('') + '</select>' +
-          '<span style="color:var(--zacht);font-size:.75rem;">' + esc(uitleg) + '</span>' +
+          '<span class="s-uc2itn">' + esc(uitleg) + '</span>' +
           '<span class="h-flex1"></span>' +
           (magBewerken ? '<button class="mini" id="diaOp" type="button" title="Naar voren">↑</button>' +
             '<button class="mini" id="diaNeer" type="button" title="Naar achteren">↓</button>' +

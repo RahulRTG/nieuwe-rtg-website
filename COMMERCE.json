@@ -2,18 +2,18 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-10-18",
   "gemeten": {
-    "bestanden": 2933,
-    "domeinenTotaal": 728,
-    "koopbareVormen": 616,
+    "bestanden": 2971,
+    "domeinenTotaal": 737,
+    "koopbareVormen": 617,
     "koopbareDomeinen": 126,
     "envelopDrempel": 8,
     "envelop": 45,
-    "veldenDomeineigen": 792,
-    "veldenNietEnvelop": 1062,
+    "veldenDomeineigen": 793,
+    "veldenNietEnvelop": 1063,
     "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 44,
+    "werkwoordCombinaties": 43,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -76,7 +76,7 @@
     "prijs": 41,
     "beschikbaarheid": 55,
     "reserveer": 32,
-    "bevestig": 62,
+    "bevestig": 63,
     "lever": 25,
     "annuleer": 37,
     "retour": 9
@@ -192,7 +192,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "bereken",
-        "beschikbaarheid": "geefSlotTerug",
+        "beschikbaarheid": "Hopener",
         "reserveer": "claims",
         "bevestig": "bevestig",
         "lever": "bezorgCheck",
@@ -490,6 +490,27 @@
       "telt": 6
     },
     {
+      "domein": "bedrijf",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "prijs",
+        "beschikbaarheid": "open",
+        "bevestig": "boek",
+        "annuleer": "intrek"
+      },
+      "telt": 5
+    },
+    {
       "domein": "kern/bureau",
       "heeft": {
         "toon": true,
@@ -698,26 +719,6 @@
         "lever": "laadMeegeleverd"
       },
       "telt": 5
-    },
-    {
-      "domein": "bedrijf",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": true,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "prijs": "prijs",
-        "beschikbaarheid": "open",
-        "annuleer": "intrek"
-      },
-      "telt": 4
     },
     {
       "domein": "kern/assets",

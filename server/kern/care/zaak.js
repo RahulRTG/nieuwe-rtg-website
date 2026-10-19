@@ -6,6 +6,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, schoon, notify, zorgVoor,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief } = ctx;
   const { careBoek, careBetaal, aanbiedersVanSupplier } = ctx;
+  const C = ctx.opslag || require('./opslag')(ctx); // ./opslag.js, gebouwd in ../care.js
   function careAgenda(supplierCode, datumIn) {
     lijsten();
     const eigen = aanbiedersVanSupplier(supplierCode);
@@ -13,7 +14,7 @@ module.exports = (ctx) => {
     const ids = eigen.map(a => a.id);
     const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(datumIn || '')) ? datumIn : vandaag();
     const behandelaars = [].concat(...eigen.map(a => (a.behandelaars || []).map(b => ({ id: b.id, naam: b.naam, functie: b.functie }))));
-    const afspraken = db.data.careBoekingen
+    const afspraken = C.bak('careBoekingen')
       .filter(x => ids.includes(x.aanbiederId) && x.datum === datum && x.paid && x.status !== 'geannuleerd')
       .sort((p, q) => p.tijd.localeCompare(q.tijd))
       .map(x => ({
@@ -31,7 +32,7 @@ module.exports = (ctx) => {
   function careAfronden(supplierCode, refIn) {
     lijsten();
     const ids = aanbiedersVanSupplier(supplierCode).map(a => a.id);
-    const bk = db.data.careBoekingen.find(x => x.ref === String(refIn || '') && ids.includes(x.aanbiederId));
+    const bk = C.bak('careBoekingen').find(x => x.ref === String(refIn || '') && ids.includes(x.aanbiederId));
     if (!bk) return { status: 404, error: 'Afspraak niet gevonden.' };
     if (!bk.paid) return { status: 409, error: 'Deze afspraak is nog niet betaald.' };
     bk.status = 'afgerond';
@@ -47,20 +48,20 @@ module.exports = (ctx) => {
      agenda (met dezelfde schaarste en zorgcontext) en legt het verblijf erbij
      vast. Betalen loopt via RTG Pay, net als de rest. */
   const pakketten = () => {
-    if (!db.data.carePakketBoekingen) db.data.carePakketBoekingen = [];
-    if (!Array.isArray(db.data.carePakketten) || !db.data.carePakketten.length) {
-      db.data.carePakketten = [
+    C.bak('carePakketBoekingen');
+    if (!C.bak('carePakketten').length) {
+      C.zetBak('carePakketten', [
         { id: 'herstel', naam: 'Herstel & Ontspan', aanbiederId: 'zenith', behandelingId: 'zt2',
           hotelCode: 'HOSHI', hotelNaam: 'Aguamarina Ibiza', nachten: 2, prijs: 995,
           beschrijving: 'Twee nachten aan zee bij Aguamarina met een hot stone massage bij Zenith. Kom thuis alsof u weken weg was.' },
         { id: 'balans', naam: 'Balans-weekend', aanbiederId: 'zenith', behandelingId: 'zt3',
           hotelCode: 'HOSHI', hotelNaam: 'Aguamarina Ibiza', nachten: 1, prijs: 545,
           beschrijving: 'Een nacht rust met een gezichtsbehandeling. Een korte adempauze op het eiland.' }
-      ];
+      ]);
       save();
     }
   };
-  const pakketVan = id => (db.data.carePakketten || []).find(p => p.id === String(id || ''));
+  const pakketVan = id => C.kijk('carePakketten').find(p => p.id === String(id || ''));
 
   // de richtprijs per nacht van het gekoppelde hotel: de goedkoopste kamer,
   // zodat het losse alternatief eerlijk wordt berekend (en dus het voordeel)
@@ -74,7 +75,7 @@ module.exports = (ctx) => {
     pakketten();
     return {
       ok: true,
-      pakketten: db.data.carePakketten.map(p => {
+      pakketten: C.bak('carePakketten').map(p => {
         const a = aanbiederVan(p.aanbiederId);
         const b = behandelingVan(a, p.behandelingId);
         const los = (b ? b.prijs : 0) + p.nachten * nachtprijsVan(p.hotelCode); // losse prijs: behandeling + verblijf
@@ -104,8 +105,8 @@ module.exports = (ctx) => {
       datum: r.boeking.datum, tijd: r.boeking.tijd, prijs: p.prijs,
       status: 'wacht-op-betaling', paid: false, at: nu()
     };
-    db.data.carePakketBoekingen.unshift(pb);
-    db.data.carePakketBoekingen = db.data.carePakketBoekingen.slice(0, 100000);
+    C.bak('carePakketBoekingen').unshift(pb);
+    C.zetBak('carePakketBoekingen', C.bak('carePakketBoekingen').slice(0, 100000));
     save();
     return { ok: true, pakket: pb, behandeling: r.boeking };
   }
@@ -114,13 +115,13 @@ module.exports = (ctx) => {
      aan (met een save()), en die hoort te ontstaan waar hij getoond wordt --
      niet bij een betaling die vier regels verder op 404 eindigt. */
   function carePakketBetaal(sess, refIn, verdien) {
-    const boekingen = Array.isArray(db.data.carePakketBoekingen) ? db.data.carePakketBoekingen : [];
+    const boekingen = C.kijk('carePakketBoekingen');
     const pb = boekingen.find(x => x.ref === String(refIn || '') && x.key === sess.key);
     if (!pb) return { status: 404, error: 'Pakketboeking niet gevonden.' };
     if (pb.paid) return { status: 409, error: 'Al betaald.' };
     if (Date.now() - Date.parse(pb.at) > 30 * 60000) return { status: 410, error: 'Deze boeking is verlopen. Boek opnieuw.' };
     // de behandeling in de agenda meebevestigen (zonder los te betalen)
-    const bk = (db.data.careBoekingen || []).find(x => x.ref === pb.careRef && x.key === sess.key);
+    const bk = C.kijk('careBoekingen').find(x => x.ref === pb.careRef && x.key === sess.key);
     if (bk && !bk.paid) { bk.paid = true; bk.paidAt = nu(); bk.status = 'geboekt'; }
     pb.paid = true; pb.paidAt = nu(); pb.status = 'geboekt';
     save();
@@ -133,7 +134,7 @@ module.exports = (ctx) => {
     pakketten();
     return {
       ok: true,
-      pakketten: db.data.carePakketBoekingen.filter(x => x.key === key && x.status !== 'geannuleerd').slice(0, 20)
+      pakketten: C.bak('carePakketBoekingen').filter(x => x.key === key && x.status !== 'geannuleerd').slice(0, 20)
         .map(x => ({ ref: x.ref, naam: x.naam, hotelNaam: x.hotelNaam, nachten: x.nachten, datum: x.datum, tijd: x.tijd, prijs: x.prijs, paid: x.paid, status: x.status }))
     };
   }

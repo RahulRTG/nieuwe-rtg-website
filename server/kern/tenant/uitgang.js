@@ -72,10 +72,11 @@ function zonderGeheim(v) {
 const tel = (v) => (Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : (v == null ? 0 : 1)));
 
 module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
+  const opslag = require('./opslag')({ db }); // de deur naar de werkruimtes
   const munt = crypt || crypto;
   const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
   function ruimte(code) {
-    const w = db.data.werkruimtes || {};
+    const w = opslag.werkruimtesKijk();
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
   }
 
@@ -154,7 +155,7 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const c = controleer(uitvoer);
     if (!c.ok) return { error: c.reden, status: 400 };
     const o = opties || {};
-    const W = (db.data.werkruimtes = db.data.werkruimtes || {});
+    const W = opslag.werkruimtes();
     let code; do { code = 'W' + munt.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (W[code]);
 
     const kop = uitvoer.werkruimte || {};

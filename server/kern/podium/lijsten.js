@@ -12,7 +12,8 @@
 
    Krijgt de gedeelde ctx van kern/podium/index.js. */
 module.exports = (ctx) => {
-  const { db, lijsten, kanaalVan, kijkBeeld, eigenBeeld, poort, zones, CADEAUS, GENRES } = ctx;
+  const { lijsten, kanaalVan, kijkBeeld, eigenBeeld, poort, zones, CADEAUS, GENRES } = ctx;
+  const P = ctx.opslag; // kern/eigencollectie.js, gebouwd in ./index.js
 
   /* Een zone die niet in de gedeelde index staat (besloten, zaak) toont alleen
      wat voor JOU openstaat; de 18+-zone heeft een eigen index en dus een eigen
@@ -22,7 +23,7 @@ module.exports = (ctx) => {
     const m = poort.magZone(key, zone);
     if (!m.ok) return { status: 403, error: m.reden, mag: false, zone, zones: zones.zoneLijst(key, poort) };
     lijsten();
-    const rijen = db.data.podiumKanalen
+    const rijen = P.bak('podiumKanalen')
       .filter(k => k.status === 'goedgekeurd' && zones.zoneVan(k) === zone)
       .filter(k => zones.ZONES[zone].index !== 'geen' || poort.magKanaal(key, k).ok)
       .map(k => kijkBeeld(k, key))
@@ -42,7 +43,7 @@ module.exports = (ctx) => {
     lijsten();
     const open = Object.keys(zones.ZONES)
       .filter(z => zones.ZONES[z].index === 'gedeeld' && poort.magZone(key, z).ok);
-    const rijen = db.data.podiumKanalen
+    const rijen = P.bak('podiumKanalen')
       .filter(k => k.status === 'goedgekeurd' && open.includes(zones.zoneVan(k)))
       .filter(k => poort.magKanaal(key, k).ok)
       .map(k => kijkBeeld(k, key))
@@ -57,7 +58,7 @@ module.exports = (ctx) => {
      het kanaal met de werkplekken van de kijker). */
   function zaakKanalen(key) {
     lijsten();
-    return db.data.podiumKanalen
+    return P.bak('podiumKanalen')
       .filter(k => k.status === 'goedgekeurd' && zones.zoneVan(k) === 'zaak')
       .filter(k => poort.magKanaal(key, k).ok)
       .map(k => kijkBeeld(k, key))
@@ -68,7 +69,7 @@ module.exports = (ctx) => {
     const k = kanaalVan(key);
     return { status: 200, mag: true, kanaal: k ? eigenBeeld(k) : null,
       zones: zones.zoneLijst(key, poort),
-      chat: k ? (db.data.podiumChat[k.id] || []).slice(-40) : [] };
+      chat: k ? (P.bak('podiumChat')[k.id] || []).slice(-40) : [] };
   }
 
   return { kanalen, gedeeld, mijnPodium, zaakKanalen };

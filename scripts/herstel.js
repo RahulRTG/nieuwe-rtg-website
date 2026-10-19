@@ -44,13 +44,38 @@ const PAREN = Object.freeze([
   ['reserveer', 'annuleer'], ['verzoek', 'intrek'], ['uitnodig', 'intrek']
 ]);
 
+/* DE TEGENHANGERS DIE HET DOMEIN ZELF NOEMT, en die een woordvergelijking
+   niet kan vinden (18 oktober 2026). De woordparen hierboven kijken alleen
+   naar BUREN met elkaars omgekeerde naam. Op de geldroutes heet de terugweg
+   vaak anders: een KIND van de heenweg (/api/pay/kascode -> /kascode/intrek),
+   of een buur met een woord dat alleen in dat domein het omgekeerde is
+   (treasury apart -> vrij). Van 42 geldroutes zonder beproefde terugweg
+   (GELDDEKKING.json) stonden er zo zeven met een tegenhanger in de code die
+   deze afleiding nooit voorstelde.
+
+   Exacte paden en geen nieuwe woordparen: een woordpaar geldt voor het hele
+   huis en zou in andere domeinen paren voorstellen die niemand heeft gelezen.
+   Elk paar draagt de plek in de code waar de tegenhanger staat. De graad blijft
+   `vermoed` tot de herstelproef het paar heeft UITGEVOERD -- een regel in deze
+   lijst bewijst net zo weinig als een naam. */
+const DOMEINPAREN = Object.freeze([
+  ['/api/pay/kascode', '/api/pay/kascode/intrek', 'routes/pay-tegoed.js: pay.kasIntrek trekt de openstaande kassacode van het lid in'],
+  ['/api/pay/tikcode', '/api/pay/tikcode/intrek', 'routes/pay-tegoed.js: pay.tikIntrek trekt de tikcode van het lid in'],
+  ['/api/pay/verzoek', '/api/pay/verzoek/intrek', 'routes/pay.js: pay.verzoekIntrek trekt een eigen betaalverzoek in'],
+  ['/api/pay/tegoed/koop', '/api/pay/tegoed/terug', 'routes/pay-tegoed.js: pay.tegoedTerug zet een gekocht tegoed terug'],
+  ['/api/supplier/giftcard/sell', '/api/supplier/giftcard/intrek', 'routes/supplier/kassa/cadeaukaart.js: cadeaukaart.intrek trekt de code van een verkochte kaart in'],
+  ['/api/supplier/pay/treasury/apart', '/api/supplier/pay/treasury/vrij', 'routes/pay-zaak-treasury.js: pay.treasuryVrij geeft apart gezet geld weer vrij'],
+  ['/api/wallet/voeg', '/api/wallet/weg', 'routes/zorgwallet.js: wallet.weg haalt een toegevoegde kaart weer weg'],
+  ['/api/geld/beleid/weg', '/api/geld/beleid/zet', 'routes/geld.js: geldbeleid.regelZet zet een weggehaalde regel opnieuw (een nieuwe regel, het log blijft: compensatie en geen omkering)']
+]);
+
 const laatste = p => p.split('/').pop();
 const prefix = p => p.split('/').slice(0, -1).join('/');
 
 function routes() {
   let reg;
   try { reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
-  catch (e) { return null; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
   return [...new Set((reg.perRoute || [])
     .filter(r => r && r.methode === 'POST' && typeof r.pad === 'string').map(r => r.pad))].sort();
 }
@@ -69,8 +94,10 @@ function bouw() {
   try {
     for (const u of (JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), 'utf8')).per || []))
       beproefd[u.heen] = u;
-  } catch (e) { /* geen proef gedraaid: dan blijft alles vermoed, en dat is de eerlijke stand */ }
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* geen proef gedraaid: dan blijft alles vermoed, en dat is de eerlijke stand */ }
   let vermoed = 0, dubbelzinnig = 0;
+  const bestaat = new Set(alle);
+  const domeinVan = new Map(DOMEINPAREN.filter(([h, t]) => bestaat.has(h) && bestaat.has(t)).map(([h, t, g]) => [h, { t, g }]));
   for (const p of alle) {
     const l = laatste(p), pre = prefix(p);
     const doelen = new Set();
@@ -78,8 +105,11 @@ function bouw() {
       if (l === a && (buren[pre] || []).includes(b)) doelen.add(b);
       if (l === b && (buren[pre] || []).includes(a)) doelen.add(a);
     }
-    if (doelen.size === 1) {
-      const tegen = pre + '/' + [...doelen][0];
+    /* Een domeinpaar telt alleen waar de namen NIETS vonden: wat al een
+       woordpaar heeft, houdt dat. */
+    const dom = doelen.size === 0 ? domeinVan.get(p) : null;
+    if (doelen.size === 1 || dom) {
+      const tegen = dom ? dom.t : pre + '/' + [...doelen][0];
       /* IS HET PAAR OOK UITGEVOERD? scripts/herstelproef.js draait heen en terug
          tegen een wegwerpserver en vergelijkt de INHOUD van de opslag. Alleen
          die proef kan een graad boven `vermoed` opleveren -- deze afleiding
@@ -90,12 +120,16 @@ function bouw() {
       const bewijs = beproefd[p];
       if (bewijs && (bewijs.uitslag === 'exact' || bewijs.uitslag === 'compensatie') && bewijs.terug === tegen) {
         bevestigd.push({ heen: p, terug: tegen, soort: bewijs.uitslag });
-        per[p] = { graad: 'bevestigd', soort: bewijs.uitslag, tegenhanger: tegen, reden: bewijs.reden };
+        per[p] = { graad: 'bevestigd', soort: bewijs.uitslag, tegenhanger: tegen, reden: bewijs.reden,
+          ...(dom ? { bron: 'domein', grond: dom.g } : {}) };
         continue;
       }
       vermoed++;
-      per[p] = { graad: 'vermoed', tegenhanger: tegen,
-        reden: 'de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is' };
+      per[p] = dom
+        ? { graad: 'vermoed', tegenhanger: tegen, bron: 'domein',
+            reden: 'het domein noemt deze tegenhanger (' + dom.g + '); niemand heeft bevestigd dat de handeling dat ook is' }
+        : { graad: 'vermoed', tegenhanger: tegen,
+            reden: 'de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is' };
     } else if (doelen.size > 1) {
       dubbelzinnig++;
       per[p] = { graad: 'onbepaald', kandidaten: [...doelen].map(d => pre + '/' + d),
@@ -150,4 +184,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { bouw, PAREN, laatste, prefix };
+module.exports = { bouw, PAREN, DOMEINPAREN, laatste, prefix };

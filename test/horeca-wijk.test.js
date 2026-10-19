@@ -519,3 +519,33 @@ test('19. een aanbod reist mee naar de PDA, want daar staat de mens', async () =
   await B('/api/supplier/horeca/wijk/trek-in', { overdrachtId: bod.body.overdracht.id });
   assert.equal((await lijst(A, {})).voorMij, 0, 'ingetrokken telt niet meer mee');
 });
+
+/* 20. EEN GEWEIGERDE WIJK LAAT GEEN DOOS ACHTER. De route gaf `zet` eerst de
+   echte doos (H) en die ontstond daarmee ook voor een verzoek dat met 400 of
+   404 terugging (scripts/laatspoor.js). Nu keurt `zet` op de leesvorm en opent
+   hij de doos pas als hij schrijft. Dit toetst de kern rechtstreeks, met een
+   opener die telt: bij een weigering nul keer, bij een echte wijk een keer.
+   Beide kanten, want een opener die nooit wordt geroepen zou ook "geen spoor"
+   geven terwijl er dan ook nooit een wijk ontstaat. */
+test('20. een geweigerde wijk opent de doos niet; een echte wel', () => {
+  const maakWijk = require('../server/kern/horeca/wijk');
+  const wijk = maakWijk({ horeca: { nu: () => new Date().toISOString(), id: () => 'w' + Math.random().toString(36).slice(2, 6) },
+    schoon: (v, n) => String(v == null ? '' : v).slice(0, n) });
+  const leesvorm = { rekeningen: {}, instel: {}, wachtrij: [] };
+  let geopend = 0;
+  const doos = { rekeningen: {}, instel: {}, wachtrij: [] };
+  const open = () => { geopend++; return doos; };
+
+  const zonderNaam = wijk.zet(leesvorm, { naam: '  ', tafels: ['1'] }, open);
+  assert.equal(zonderNaam.status, 400);
+  const onbekend = wijk.zet(leesvorm, { wijkId: 'bestaat-niet', naam: 'Terras', tafels: [] }, open);
+  assert.equal(onbekend.status, 404);
+  assert.equal(geopend, 0, 'twee weigeringen, en de doos is nooit geopend');
+  assert.ok(!leesvorm.instel.wijken, 'ook de leesvorm kreeg geen wijkenlijst');
+
+  const echt = wijk.zet(leesvorm, { naam: 'Terras', tafels: ['1', '2'] }, open);
+  assert.equal(echt.ok, true);
+  assert.equal(geopend, 1, 'een echte wijk opent de doos precies een keer');
+  assert.equal(doos.instel.wijken.length, 1, 'en de wijk staat in de ECHTE doos, niet in de leesvorm');
+  assert.ok(!leesvorm.instel.wijken, 'de leesvorm blijft leeg');
+});

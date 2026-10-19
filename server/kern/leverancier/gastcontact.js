@@ -50,7 +50,7 @@ module.exports = (ctx) => {
       g.opening(s.code, customerKey, 'Team',
         'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon.',
         { codename: codename || customerKey, tier: tier || 'rtg' });
-      try { save(); } catch (e) {}
+      try { save(); } catch (e) { console.warn('[gastcontact] de nieuwe lijn niet bewaard:', e && e.message); }
       try { notify(customerKey, { icon: 'berichten', title: 'Open lijn met ' + s.name, body: 'App direct en bekijk elkaars Salon.', scope: 'gchat' }); } catch (e) {}
       try { sseToCustomer(customerKey, 'sync', { scope: 'gchat' }); } catch (e) {}
       try { sseToSupplier(s.code, 'sync', { scope: 'gchat' }); } catch (e) {}

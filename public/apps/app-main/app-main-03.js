@@ -101,9 +101,15 @@
           const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
           const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg', 'guest'] : [vastePas]) : [];
           if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
-            try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
-            location.replace(pasAdres(doelPas));
-            return true;
+            if (vastePas){
+              try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
+              location.replace(pasAdres(doelPas));
+              return true;
+            }
+            /* een kale poort: de pas aannemen zonder de werktafel te herladen
+               (neemPasAan, app-main-02b.js), en onthouden wat de server bevestigde */
+            neemPasAan(doelPas);
+            try { localStorage.setItem('rtg_werktafel_pas', doelPas); } catch (e2) {}
           }
         } catch (e) { throw e; }
       } else {

@@ -13,7 +13,7 @@ let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onderwijs-'));
 
 function api(pad, body, tok) {
-  return fetch(base + '/api/onderwijs' + pad, { method: 'POST',
+  return fetch(base + (pad.startsWith('/api/') ? pad : '/api/onderwijs' + pad), { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || token) },
     body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -35,7 +35,7 @@ test.after(() => {
 });
 
 test('1. de ladder staat compleet en is eerlijk over wat wij niet zijn', async () => {
-  const l = await api('/ladder');
+  const l = await api('/api/onderwijs/ladder');
   assert.equal(l.status, 200);
   assert.equal(l.body.fasen.length, 25, 'van groep 1 tot een leven lang leren');
   assert.ok(l.body.fasen.some(f => f.id === 'po-g1') && l.body.fasen.some(f => f.id === 'wo-phd'));
@@ -45,35 +45,35 @@ test('1. de ladder staat compleet en is eerlijk over wat wij niet zijn', async (
 });
 
 test('2. een leven op de ladder: van groep 1 via het schooladvies naar de universiteit', async () => {
-  assert.equal((await api('/inschrijf', { fase: 'po-g1' })).status, 200);
+  assert.equal((await api('/api/onderwijs/inschrijf', { fase: 'po-g1' })).status, 200);
   // de basisschool door, trede voor trede
   for (const g of ['po-g2', 'po-g3', 'po-g4', 'po-g5', 'po-g6', 'po-g7', 'po-g8']) {
-    assert.equal((await api('/inschrijf', { fase: g })).status, 200, 'over naar ' + g);
+    assert.equal((await api('/api/onderwijs/inschrijf', { fase: g })).status, 200, 'over naar ' + g);
   }
   // vanuit groep 8 mag het schooladvies alle kanten op; wij kiezen vwo
-  const vwo = await api('/inschrijf', { fase: 'vwo', reden: 'schooladvies' });
+  const vwo = await api('/api/onderwijs/inschrijf', { fase: 'vwo', reden: 'schooladvies' });
   assert.equal(vwo.status, 200);
   assert.equal(vwo.body.fase.id, 'vwo');
   // leerjaren stapelen binnen de fase
-  assert.equal((await api('/jaar-over')).body.jaar, 2);
+  assert.equal((await api('/api/onderwijs/jaar-over')).body.jaar, 2);
   // en door naar de universiteit, tot het leren nooit meer stopt
   for (const f of ['wo-b', 'wo-m', 'wo-phd', 'leven']) {
-    assert.equal((await api('/inschrijf', { fase: f })).status, 200, 'over naar ' + f);
+    assert.equal((await api('/api/onderwijs/inschrijf', { fase: f })).status, 200, 'over naar ' + f);
   }
-  const mijn = await api('/mijn');
+  const mijn = await api('/api/onderwijs/mijn');
   assert.equal(mijn.body.fase.id, 'leven');
   assert.ok(mijn.body.historie.length >= 11, 'het paspoort onthoudt de hele levensloop');
 });
 
 test('3. de doorstroomkaart houdt rare sprongen tegen en het paspoort kent geen namen', async () => {
   // vanuit 'leven' bestaat geen route terug naar groep 3
-  assert.equal((await api('/inschrijf', { fase: 'po-g3' })).status, 400);
-  assert.equal((await api('/inschrijf', { fase: 'bestaat-niet' })).status, 400);
+  assert.equal((await api('/api/onderwijs/inschrijf', { fase: 'po-g3' })).status, 400);
+  assert.equal((await api('/api/onderwijs/inschrijf', { fase: 'bestaat-niet' })).status, 400);
   // leerdoelen: alleen nette ids, en het antwoord bevat nooit de echte naam
-  assert.equal((await api('/doel', { doel: 'rekenen.g3.optellen-tot-20' })).status, 200);
-  assert.equal((await api('/doel', { doel: '<script>' })).status, 400);
-  const alles = JSON.stringify((await api('/mijn')).body);
+  assert.equal((await api('/api/onderwijs/doel', { doel: 'rekenen.g3.optellen-tot-20' })).status, 200);
+  assert.equal((await api('/api/onderwijs/doel', { doel: '<script>' })).status, 400);
+  const alles = JSON.stringify((await api('/api/onderwijs/mijn')).body);
   assert.doesNotMatch(alles, /Leerling Levenslang|Levenslang/, 'het leerpaspoort draait op de codenaam');
   // en dicht zonder token
-  assert.equal((await api('/mijn', {}, 'nep')).status, 401);
+  assert.equal((await api('/api/onderwijs/mijn', {}, 'nep')).status, 401);
 });

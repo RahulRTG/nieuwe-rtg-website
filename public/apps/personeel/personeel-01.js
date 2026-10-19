@@ -98,13 +98,13 @@
     html += '<div class="card"><div class="k">'+T('pd.geb.receptie','Receptie')+' ('+verwacht.length+')</div>'+
       (verwacht.length ? verwacht.map(b => '<div class="task"><div class="t"><b>'+esc(b.naam)+'</b><span>'+esc(b.voorWie)+' · '+esc(b.status)+(b.badge?' · '+esc(b.badge):'')+'</span></div>'+
         (b.status==='verwacht' ? '<button class="abtn" data-pgbin="'+b.id+'">'+T('pd.geb.binnen','Binnen')+'</button>' : '<button class="abtn" data-pgweg="'+b.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.geb.weg','Weg')+'</button>')+'</div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.geb.rustig','Geen bezoekers in de rij.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.geb.rustig','Geen bezoekers in de rij.')+'</div>')+'</div>';
     // facilitair: de meldingen van het huis
     const open = (d.meldingen||[]).filter(m => m.status !== 'klaar');
     html += '<div class="card"><div class="k">'+T('pd.geb.fac','Facilitair')+' ('+open.length+')</div>'+
       (open.length ? open.map(m => '<div class="task"><div class="t"><b>'+esc(m.tekst)+'</b><span>'+MELD[m.soort]+' · '+T('pd.geb.verd','verdieping')+' '+m.verdieping+' · '+esc(m.status)+'</span></div>'+
         (m.status==='open' ? '<button class="abtn" data-pgmb="'+m.id+'">'+T('pd.geb.pak','Pak op')+'</button>' : '<button class="abtn" data-pgmk="'+m.id+'">'+T('pd.geb.klaar','Klaar')+'</button>')+'</div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.geb.oporde','Het huis is op orde.')+'</div>')+'</div>';
+        : '<div class="s-1sydj7f">'+T('pd.geb.oporde','Het huis is op orde.')+'</div>')+'</div>';
     // valet en de jetset-diensten voor de concierge
     const valet = (d.valet||[]).filter(v => v.status !== 'klaar');
     const jetset = (d.jetset||[]).filter(j => j.status !== 'afgerond');

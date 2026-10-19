@@ -29,9 +29,10 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, schoon, id, nu, lijsten, kanaalMet, videoBeeld, zakenVan, GENRES } = ctx;
+  const { save, schoon, id, nu, lijsten, kanaalMet, videoBeeld, zakenVan, GENRES } = ctx;
+  const T = ctx.opslag; // ./opslag.js
 
-  const zaakKanalen = () => { lijsten(); return db.data.theaterKanalen.filter(k => !!k.zaakCode); };
+  const zaakKanalen = () => { lijsten(); return T.bak('theaterKanalen').filter(k => !!k.zaakCode); };
   const kanaalVanZaak = (code) => zaakKanalen().find(k => k.zaakCode === code) || null;
   /* De codes van de zaken waar dit lid werkt. Dit is de hele deur: staat de
      code van het kanaal er niet bij, dan bestaat dat kanaal voor deze kijker
@@ -45,7 +46,7 @@ module.exports = (ctx) => {
       leiding: !!(zaak && zaak.leiding),
       // de eigen naam en kleur van deze organisatie (./huisstijl.js)
       huisstijl: ctx.merk ? ctx.merk.huisstijlVan(k, zaak && zaak.naam) : null,
-      videos: db.data.theaterVideos.filter(v => v.kanaalId === k.id).map(videoBeeld) };
+      videos: T.bak('theaterVideos').filter(v => v.kanaalId === k.id).map(videoBeeld) };
   }
 
   /* ---- het interne kanaal aanmelden ----
@@ -64,7 +65,7 @@ module.exports = (ctx) => {
     const k = { id: id(), key, zaakCode: zaak.code, naam,
       genre: GENRES.includes((data || {}).genre) ? data.genre : 'salon',
       bio: schoon((data || {}).bio, 300), status: 'wacht', volgers: [], at: nu() };
-    db.data.theaterKanalen.push(k); save();
+    T.bak('theaterKanalen').push(k); save();
     ctx.sseToOffice('sync', { scope: 'theater' });
     return { status: 200, ok: true, kanaal: beeld(k, key) };
   }
@@ -80,7 +81,7 @@ module.exports = (ctx) => {
     }
     const kanalen = zaakKanalen().filter(k => codes.has(k.zaakCode) && k.status === 'goedgekeurd');
     const kIds = new Set(kanalen.map(k => k.id));
-    const videos = db.data.theaterVideos.filter(v => v.klaar && kIds.has(v.kanaalId)).map(videoBeeld)
+    const videos = T.bak('theaterVideos').filter(v => v.klaar && kIds.has(v.kanaalId)).map(videoBeeld)
       .sort((a, b) => String(b.at).localeCompare(String(a.at)));
     /* Ook de zaken ZONDER bibliotheek komen mee, met of u er de leiding heeft.
        Anders ziet iemand een lege wereld en leest hij nergens dat er iets te

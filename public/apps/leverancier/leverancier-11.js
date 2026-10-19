@@ -13,9 +13,9 @@
       if (mijn !== coachSeq) return; // er is al een nieuwere render
       if (!d.lines || !d.lines.length){ box.style.display = 'none'; return; }
       box.style.display = 'block';
-      box.innerHTML = '<div class="tkc" style="border-color:rgba(169,143,28,0.5);">'+
+      box.innerHTML = '<div class="tkc s-9zkwi0">'+
         '<h3>\uD83E\uDD16 '+T('kc.h','Keukenhulp')+(d.ai?' \u00b7 Claude':'')+'</h3>'+
-        d.lines.map(l=>'<div style="font-size:0.9rem;line-height:1.6;padding:0.2rem 0;">'+l+'</div>').join('')+'</div>';
+        d.lines.map(l=>'<div class="s-djfgbg">'+l+'</div>').join('')+'</div>';
     } catch(e){ box.style.display = 'none'; }
   }
   /* Het gerechtenmenu: tik op een gerecht en kies recept, bereidingswijze,

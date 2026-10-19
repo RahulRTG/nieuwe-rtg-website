@@ -61,7 +61,7 @@ function perCapability() {
 
 module.exports = ({ register, contract, levensloop, ssoKoppelingen, db, herstelproef }) => {
   function werkruimtesVan(t) {
-    const w = db.data.werkruimtes || {};
+    const w = require('./opslag')({ db }).werkruimtesKijk();
     return t.werkruimtes.map(c => (Object.prototype.hasOwnProperty.call(w, c) ? w[c] : null)).filter(Boolean);
   }
 

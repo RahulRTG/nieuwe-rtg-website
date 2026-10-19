@@ -42,3 +42,19 @@ test('een lange weigering wordt als geheel gelezen, niet afgekapt', () => {
   assert.equal(weigerZin(lang), 'Hiervoor heb ik nog je paspoortgegevens nodig; dat vraag ik even.');
   assert.equal(weigerZin(lang.slice(0, 200)), null, 'zo zag de meter het vroeger: afgekapt is het geen JSON');
 });
+
+/* Een tik die in de limiet liep, zegt via de log van Playwright HOE ver hij
+   kwam. "reden niet gemeld" verborg dat de tik vaak wel was verstuurd -- en dan
+   staat de laag erachter open (zie de Escape na een mislukte tik in
+   scripts/appwerkt.js). Traag is nooit "aangetikt": alle drie blijven een
+   reden waarom de knop NIET is aangetikt. */
+test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of bezet', () => {
+  const { klikReden } = require('../scripts/appwerkt');
+  assert.equal(klikReden('Timeout\n - <div class="x"></div> intercepts pointer events'), 'intercepts pointer events');
+  assert.equal(klikReden('Timeout 2500ms exceeded.\n - waiting for element to be visible, enabled and stable\n - element is visible, enabled and stable\n - scrolling into view if needed\n - done scrolling\n - performing click action'),
+    'tik verstuurd maar niet afgerond binnen de limiet');
+  assert.equal(klikReden('Timeout 2500ms exceeded.\n - attempting click action\n - waiting for element to be visible, enabled and stable'),
+    'pagina antwoordde niet binnen de limiet');
+  assert.equal(klikReden('Timeout 2500ms exceeded.\n - waiting for locator'), 'reden niet gemeld');
+  assert.equal(klikReden(''), 'reden niet gemeld');
+});

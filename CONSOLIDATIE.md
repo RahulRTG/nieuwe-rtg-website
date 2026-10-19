@@ -27,3 +27,12 @@ worden doorgeschoven.
 4. **Geen nieuwe technische schuld.** Een reparatie introduceert geen nieuwe uitzondering, geen duplicatie en geen ongedocumenteerde afhankelijkheid.
 
 **Domeingrenzen, geen bestandsgrenzen.** Wie `server/server.js` of een ander te groot bestand opknipt, brengt echte domeingrenzen aan. Een bestand alleen onder de 10 kB krijgen verplaatst de schuld en lost haar niet op.
+
+## Werkwijze voor de V1-afbouw (besluit van de eigenaar, 18 oktober 2026)
+
+Dit vervangt voor de duur van de V1-afbouw het deel "elke PR gaat naar main" uit **Eén integrator** hierboven. De rest van dit besluit blijft staan.
+
+- **Eén integratiebranch, geen merges naar main tot V1.** De afbouw loopt op `claude/v1-integratie`, afgetakt van main op `dc91a23a921e70d3290b6aadc0377751cf21995b`. Tot V1 gereed is (de einddefinitie in `AFBOUWPROGRAMMA.md` par. 10), gaat er niets van deze afbouw naar main. Eén draft-PR van de integratiebranch naar main blijft open als het enige spoor dat CI en reviewers zien; hij wordt pas gemerged na het integratiebesluit van de eigenaar. Dat besluit viel op de avond van 18 oktober 2026: de eigenaar liet V1 naar main brengen, zodat main en de integratiebranch weer één lijn zijn.
+- **Open PR's worden in de branch geïntegreerd, niet in main.** Beveiligingsfixes eerst, daarna overlappend productwerk ontdubbeld. Elke geïntegreerde PR krijgt een eigen mergecommit die zijn nummer noemt, zodat terug te vinden is wat er van wie kwam.
+- **Geen merges is geen vrijbrief voor één oncontroleerbare megawijziging.** Kleine commits, elk met de toetsen die het raakt groen; de release-image-workflow draait op de branch (workflow_dispatch); reviews gaan per commit of per fase, en wat niet bewezen is staat er met de reden bij.
+- **Main loopt niet stil mee.** Wat er toch op main landt, wordt met een mergecommit in de branch gehaald (nooit rebase of force-push), zodat de eindmerge geen verrassing bevat.

@@ -42,6 +42,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1v3d95r:not(#_#_#_){max-width:8rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -56,7 +66,7 @@
     <div id="doelen"><div class="leeg">Laden...</div></div>
     <div class="rijveld h-mt100">
       <input class="veld" id="nDoel" placeholder="Waar sparen we naartoe? (bijv. een fiets)" maxlength="60">
-      <input class="veld" id="nBedrag" style="max-width:8rem;" inputmode="decimal" placeholder="Bedrag €">
+      <input class="veld s-1v3d95r" id="nBedrag" inputmode="decimal" placeholder="Bedrag €">
     </div>
     <div class="fout" id="dFout"></div>
     <button class="knop h-mt60" id="dMaak" data-hoofdactie>Spaardoel toevoegen</button>

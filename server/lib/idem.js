@@ -25,6 +25,7 @@
 const MAX = 20000; // ring: zoveel sleutels houden we vast
 /* De handeling waarin een boeking valt: ./idem-handeling.js. */
 const { handeling, volgendeStap } = require('./idem-handeling');
+const { zonderSleutelPad, nietVastgelegd, vergeetSleutel } = require('./idem-zondersleutel');
 
 /* `naam` is de sleutel in de database, bijv. 'payIdem' of 'bankIdem'; de
    afdrukken staan naast in '<naam>Afdruk'. `d` geeft het datablok, `save`
@@ -83,45 +84,11 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
   const inVlucht = new Map();
 
   return async function metIdem(sleutel, afdruk, werk, opties) {
-    /* GEEN SLEUTEL IS GEEN VERZOEK -- op de handelingen die geld verplaatsen.
-
-       `if (!sleutel) return werk()` was hier de hele regel: stuurt een client
-       geen sleutel, dan gebeurt het werk gewoon. Voor het meeste in dit huis is
-       dat de juiste afweging, maar de kale ronde van de idemproef mat achttien
-       geldroutes waar een woordelijk gelijke herhaling ZONDER sleutel het werk
-       opnieuw deed -- /api/bank/overboek boekte twee keer, /api/bank/sepa
-       stuurde twee keer het huis uit. Een dubbeltik op een trage verbinding is
-       precies dat verzoek, twee keer.
-
-       WAAROM HIER EN NIET IN DE HTTP-POORT. Daar heeft het gestaan, en het was
-       fout: server/lib/idem-poort.js draait VOOR de bewakers, dus een lid dat de
-       rekening van een ander probeerde kreeg 400 in plaats van 404, en twee
-       toetsen die juist die eigendomsgrens meten zagen hem niet meer. Hier staat
-       de weigering NA de eigenaarscontrole van de aanroeper (zie
-       ../kern/bank/overboeken.js: `if (!eigenaar(...)) return 404` staat boven de
-       metIdem-aanroep) en VOOR het werk. Dat is de enige plek waar allebei waar
-       is.
-
-       De aanroeper verklaart het, met een reden die in de weigering terechtkomt.
-       Geen lijst van paden hier: deze laag kent geen routes, en een tweede lijst
-       naast de aanroepplek loopt uit elkaar. */
-    if (!sleutel && opties && opties.geld) {
-      return { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
-        error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. ' +
-          'Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
-        waarom: String(opties.geld) };
-    }
-    if (!sleutel && typeof sleutelPlicht === 'function' && sleutelPlicht() && !handeling.getStore()) {
-      return { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
-        error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. ' +
-          'Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
-        waarom: 'elke boeking bij het grootboek draagt een sleutel die een herhaling herkent' };
-    }
-    if (!sleutel) {
-      const dicht = poortVoorNieuwWerk(opties);
-      if (dicht) return dicht;
-      return werk();
-    }
+    /* Alles zonder sleutel woont in ./idem-zondersleutel.js: de weigering op
+       geld en de sleutelplicht, de vrijgavepoort, en het werk zelf -- in een
+       duurzame laag door dezelfde bundel als met sleutel. */
+    if (!sleutel) return zonderSleutelPad({ opties, werk, bijeen, duurzaam, naam, sleutelPlicht, poortVoorNieuwWerk,
+      inHandeling: () => !!handeling.getStore() });
     /* `_keys` is de ring en `__proto__` het prototype: geen sleutel, en nooit
        een plek om een antwoord neer te zetten (test/idem-sleutelnaam.test.js). */
     if (sleutel === '_keys' || sleutel === '__proto__') {
@@ -174,9 +141,14 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
        daarna keert de aanroeper terug. Zonder dat is de bundel wel ATOMAIR maar
        niet DUURZAAM -- en dan blijft de fout bestaan die de ketenronde vond:
        bevestigd aan de klant, na een herstart weg. Zie GELDLAT.md. */
-    if (bijeen) await bijeen(doeWerkEnLegVast, duurzaam ? { duurzaam: true } : undefined);
-    else await doeWerkEnLegVast();
+    // bevestigt de opslag niet: 503 en geen hangende vlucht (de worp liep langs inVlucht.delete en klaar() heen)
+    let opslagFout = null;
+    try {
+      if (bijeen) await bijeen(doeWerkEnLegVast, duurzaam ? { duurzaam: true } : undefined);
+      else await doeWerkEnLegVast();
+    } catch (e) { opslagFout = e; }
     inVlucht.delete(sleutel);
+    if (opslagFout && !fout) { vergeetSleutel(s, a, sleutel); const nee = nietVastgelegd(naam, opslagFout); klaar(nee); return nee; }
     klaar(fout ? { status: 500, error: 'De vorige poging met deze sleutel mislukte.' } : r);
     if (fout) throw fout;
     return r;

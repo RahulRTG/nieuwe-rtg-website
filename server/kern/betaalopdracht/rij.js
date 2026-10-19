@@ -1,7 +1,7 @@
 /* De betaalopdrachten als RIJ: alles wat over de verzameling gaat in plaats van
    over één opdracht. Wat een opdracht is staat in ./index, het aanbieden bij de
-   rail in ./inzending; hier staat wie er aan de beurt is, wat er nog openstaat,
-   en de bevestiging van buiten.
+   rail in ./inzending, de bevestiging van buiten in ./bevestiging; hier staat
+   wie er aan de beurt is en wat er nog openstaat.
 
    De snede zit op die grens en niet op een willekeurige regel: die kant weet hoe
    een betaling zich gedraagt, deze kant weet alleen dat het er meer dan een
@@ -54,8 +54,34 @@ module.exports = (ctx) => {
     return null;
   }
 
+  /* DEZELFDE SLEUTEL IS NOG NIET DEZELFDE HANDELING. Tot 18 oktober 2026 gaf
+     plaats() bij een bekende sleutel de bestaande opdracht terug zonder te
+     kijken wat er nu werd aangeboden (IDEMIDENTITEIT.json: `geenVergelijking`).
+     Twee aanroepers bouwen de sleutel uit een idem van de CLIENT
+     ('bank-sepa:<iban>:<idem>', 'pay-uit:<zaak>:<idem>'), en de afboeking
+     ervoor is dan al gedaan. Kwam dezelfde idem terug met een ander bedrag of
+     een andere bestemming, dan stond het nieuwe geld op de tussenrekening en
+     ging de OUDE opdracht de deur uit -- het verschil verdween zonder spoor.
+
+     Daarom de economische identiteit vergelijken: soort, bedrag, bron en
+     bestemming. Wijkt er een af, dan is dit een ANDERE handeling onder een
+     gebruikte sleutel, en dat is een fout van de aanroeper die luid hoort te
+     zijn. maak() gooit al bij een ongeldig bedrag of een ontbrekende boeking;
+     dit is dezelfde vorm, zodat de omvattende bundel de afboeking mee
+     terugdraait in plaats van haar te laten staan. De omschrijving en het
+     moment tellen NIET mee: die verschillen legitiem tussen twee pogingen. */
   function plaats(o) {
     const bestaand = vindOpIdem(o.idemSleutel);
+    if (bestaand && (bestaand.soort !== o.soort || bestaand.centen !== o.centen ||
+        bestaand.bron !== o.bron || bestaand.bestemming !== o.bestemming)) {
+      klacht('een gebruikte idempotentiesleutel kwam terug met een andere opdracht', {
+        idemSleutel: o.idemSleutel, bestaand: bestaand.id,
+        verschil: ['soort', 'centen', 'bron', 'bestemming'].filter(k => bestaand[k] !== o[k]) });
+      const e = new Error('Deze idempotentiesleutel hoort al bij een andere betaalopdracht ' +
+        '(ander bedrag, andere bron of andere bestemming). Er is niets aangeboden.');
+      e.code = 'idem-andere-opdracht';
+      throw e;
+    }
     if (bestaand) {
       klacht('dezelfde economische handeling werd twee keer aangeboden', {
         idemSleutel: o.idemSleutel, bestaand: bestaand.id, status: bestaand.status, centen: o.centen });
@@ -106,63 +132,10 @@ module.exports = (ctx) => {
     return { ok: true, gedaan, gelukt, opgegeven };
   }
 
-  /* DE BEVESTIGING VAN BUITEN (de provider-webhook): pas hier gaat een opdracht
-     van "aangenomen" naar "definitief". Dit is het enige punt waarop RTG mag
-     zeggen dat het geld er is, want tot dan weten we alleen dat de rail hem
-     heeft aangenomen.
-
-     Aanroepen kan op twee manieren: met onze eigen `id` (het kantoor), of met de
-     `settlementRef` van de provider. Dat tweede is de payout-webhook in
-     server/opzet/webhooks.js: die kent onze id niet, alleen zijn eigen.
-
-     Meldt de rail een MISLUKKING, dan is de status zetten niet genoeg -- het
-     geld staat van de klant af en komt nergens aan. Dan draait dezelfde
-     terugboeking als bij opgeven. Zonder dat zou hier precies het gat terugkomen
-     dat deze hele module dichtzet, alleen een dag later in de tijdlijn. */
-  async function bevestig({ id, settlementRef, gelukt = true, reden }) {
-    const o = id ? vind(id) : vindOpSettlement(settlementRef);
-    if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
-    if (gelukt) {
-      const voor = Object.assign({}, o);
-      zet(o, STATUS.AFGEWIKKELD, { settlementRef: settlementRef || o.settlementRef });
-      try { save(); }
-      catch (e) {
-        /* Een mislukte persist mag niet alleen in RAM definitief worden. Een
-           providerretry moet dezelfde overgang opnieuw kunnen vastleggen. */
-        for (const sleutel of Object.keys(o)) if (!Object.prototype.hasOwnProperty.call(voor, sleutel)) delete o[sleutel];
-        Object.assign(o, voor);
-        throw e;
-      }
-      /* Een late `paid` na een al teruggeboekte mislukking is een conflict,
-         geen toestemming om alsnog de interne claim/ledgerfinalisatie te
-         draaien. Alleen de werkelijk afgewikkelde staat mag die haak bereiken. */
-      if (o.status !== STATUS.AFGEWIKKELD) return publiek(o);
-      const klaar = await ctx.verwerkAfwikkeling(o);
-      if (!klaar) {
-        const e = new Error('De payout is extern bevestigd, maar intern nog niet volledig afgehandeld.');
-        e.code = 'PAYOUT_AFHANDELING_MISLUKT';
-        throw e;
-      }
-      return publiek(o);
-    }
-    if (o.status === STATUS.TERUGGEBOEKT) return publiek(o);
-    const voor = Object.assign({}, o);
-    zet(o, STATUS.MISLUKT, { laatsteFout: String(reden || 'de rail meldde een mislukking').slice(0, 300), volgendeAt: null });
-    try { save(); }
-    catch (e) {
-      for (const sleutel of Object.keys(o)) if (!Object.prototype.hasOwnProperty.call(voor, sleutel)) delete o[sleutel];
-      Object.assign(o, voor);
-      throw e;
-    }
-    /* Ook een al eerder als MISLUKT vastgelegde payout moet hier terugkomen:
-       het proces kan precies tussen die save en de teruggang zijn gestopt. */
-    if (o.status === STATUS.MISLUKT && !(await ctx.draaiTerug(o))) {
-      const e = new Error('De mislukte payout kon nog niet veilig worden teruggeboekt.');
-      e.code = 'PAYOUT_TERUGBOEKING_MISLUKT';
-      throw e;
-    }
-    return publiek(o);
-  }
+  /* DE BEVESTIGING VAN BUITEN (de provider-webhook) woont in ./bevestiging.js:
+     dat is de grens tussen wat RTG zelf over de rij weet en wat de rail ons
+     vertelt. Hij leest de rij via vind() en vindOpSettlement() hieronder. */
+  const { bevestig } = require('./bevestiging')(ctx, { vind: (id) => vind(id), vindOpSettlement: (r) => vindOpSettlement(r) });
 
   function openstaand() { return maakOpenstaandOverzicht(rij()); }
 

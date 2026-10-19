@@ -247,6 +247,11 @@ function analyse(modules, opties) {
   }
 
   return {
+    /* Wat deze meting NIET aantoont, als veld (scripts/meetleer.js leest het). */
+    grens: 'Een require die er staat zegt dat de simulatielaag een kern AANRAAKT, niet dat zij hem ' +
+      'beproeft of dat een uitkomst in Magnaat iets over productie bewijst. Een gedeelde naam is geen ' +
+      'gedeelde kern en een gedeelde vorm is geen fout: twee uitvoeringen kunnen terecht zijn. Gemeten ' +
+      'op statische requires; een kern die via een omweg wordt geladen, telt hier niet mee.',
     simulatiemodules: sim.length,
     kernmodules: rest.length,
     kernDomeinen: kernDomeinen.size,

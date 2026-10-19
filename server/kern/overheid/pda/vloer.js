@@ -4,7 +4,7 @@
    rondes en handelt incidenten af, en de schoonmaak vinkt de dagtaken per
    ruimte af en geeft extra werk door. Krijgt de subctx van ./index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, id, schoon, P, loc, vandaag, zorgTaken, LOCATIES, INCIDENT_SOORTEN } = ctx;
+  const { save, crypto, nu, id, schoon, P, loc, vandaag, zorgTaken, LOCATIES, INCIDENT_SOORTEN } = ctx;
 
   /* ---- receptie: bezoekers met een badge ---- */
   function pdaBezoekerIn(actor, l, data) {
@@ -15,7 +15,7 @@ module.exports = (ctx) => {
     const b = { id: id(), locatie: l, naam, voor: schoon(data.voor, 80) || 'bezoek',
       badge: 'B-' + crypto.randomBytes(2).toString('hex').toUpperCase(), door: actor || 'receptie', at: nu(), uit: null };
     P().bezoekers.unshift(b);
-    db.data.overheidPda.bezoekers = P().bezoekers.slice(0, 20000);
+    P().bezoekers = P().bezoekers.slice(0, 20000);
     save();
     return { ok: true, bezoeker: b };
   }
@@ -39,7 +39,7 @@ module.exports = (ctx) => {
     if (!l) return { status: 400, error: 'Kies een geldige locatie.' };
     const r = { id: id(), locatie: l, checkpoints: LOCATIES[l].ruimtes.length, door: actor || 'security', at: nu() };
     P().rondes.unshift(r);
-    db.data.overheidPda.rondes = P().rondes.slice(0, 5000);
+    P().rondes = P().rondes.slice(0, 5000);
     let incident = null;
     if (bevinding && schoon(bevinding.tekst, 300)) {
       const ir = pdaIncident(actor, l, bevinding);
@@ -58,7 +58,7 @@ module.exports = (ctx) => {
       ernst: Math.min(3, Math.max(1, Math.round(Number(data.ernst) || 1))),
       tekst, door: actor || 'security', at: nu(), gesloten: null };
     P().incidenten.unshift(i);
-    db.data.overheidPda.incidenten = P().incidenten.slice(0, 10000);
+    P().incidenten = P().incidenten.slice(0, 10000);
     save();
     return { ok: true, incident: i };
   }

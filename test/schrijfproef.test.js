@@ -22,9 +22,27 @@ const assert = require('node:assert/strict');
 const sp = require('../scripts/schrijfproef.js');
 
 test('een 2xx over een onveranderde opslag is een VALS SUCCES', () => {
-  const u = sp.weeg({ status: 200, opslagBewoog: false, basisStatus: 200 });
+  const u = sp.weeg({ status: 200, opslagBewoog: false, basisStatus: 200, basisBewoog: true });
   assert.equal(u.stand, 'VALS_SUCCES');
   assert.match(u.reden, /niets is bewaard/);
+  /* Is het beeld van de basis ONBEKEND, dan blijft het een vals succes: de
+     voorzichtige kant, en de vorm die oudere registers hadden. */
+  assert.equal(sp.weeg({ status: 200, opslagBewoog: false, basisStatus: 200 }).stand, 'VALS_SUCCES');
+});
+
+/* EEN LEZER IS GEEN LEUGENAAR. Bewoog de opslag ook zonder verraad niet, dan
+   was er geen schrijfactie om te verliezen -- en dan hoort de route niet op de
+   geldkaart, maar hij heeft niet gelogen. Mutatie gedaan: `basisBewoog`
+   negeren in weeg() laat de eerste bewering zakken; `basisBewoog: true' als
+   lezer tellen laat de tweede zakken. */
+test('bewoog de opslag ook zonder verraad niet, dan is het geen vals succes maar een lezer', () => {
+  const u = sp.weeg({ status: 200, opslagBewoog: false, basisStatus: 200, basisBewoog: false });
+  assert.equal(u.stand, 'GEEN_SCHRIJFACTIE');
+  assert.match(u.reden, /zonder verraad/);
+  assert.equal(sp.weeg({ status: 200, opslagBewoog: false, basisStatus: 200, basisBewoog: true }).stand, 'VALS_SUCCES',
+    'een route die in de basis WEL schrijft en dat onder verraad verliest, blijft een vals succes');
+  assert.equal(sp.weeg({ status: 200, opslagBewoog: true, basisStatus: 200, basisBewoog: false }).stand, 'SCHREEF_TOCH',
+    'en een opslag die onder verraad toch bewoog gaat voor');
 });
 
 /* DE KERN VAN DIT BESTAND. Zonder de basismeting is `WEIGERT` een leugen: hij
@@ -53,9 +71,9 @@ test('een 4xx komt niet aan schrijven toe, en een dode verbinding ook niet', () 
   assert.equal(sp.weeg({ status: 0, opslagBewoog: false, basisStatus: 200 }).stand, 'ONBEREIKT');
 });
 
-test('de vier standen zijn gesloten en dragen elk een uitleg', () => {
+test('de vijf standen zijn gesloten en dragen elk een uitleg', () => {
   assert.deepEqual(Object.keys(sp.STANDEN).sort(),
-    ['ONBEREIKT', 'SCHREEF_TOCH', 'VALS_SUCCES', 'WEIGERT']);
+    ['GEEN_SCHRIJFACTIE', 'ONBEREIKT', 'SCHREEF_TOCH', 'VALS_SUCCES', 'WEIGERT']);
   for (const [k, v] of Object.entries(sp.STANDEN))
     assert.ok(v && v.length > 30, k + ' hoort uit te leggen wat hij betekent');
 });

@@ -14,6 +14,19 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/glyf.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12sbaw3:not(#_#_#_){flex:0 1 7rem}
+.s-12sbxvm:not(#_#_#_){flex:0 1 8rem}
+.s-1pgqttp:not(#_#_#_){margin:0.5rem 0 0.75rem}
+.s-1ts0ngc:not(#_#_#_){flex:0 1 20rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -27,12 +40,12 @@
   <div class="kaart">
     <div class="kop">Wat u nodig heeft</div>
     <div class="rij">
-      <select class="veld" id="hModus" aria-label="Hoe u inkoopt" style="flex:0 1 20rem;">
+      <select class="veld s-1ts0ngc" id="hModus" aria-label="Hoe u inkoopt">
         <option value="aanvraag">Uitzetten bij een soort bedrijf &mdash; offertes vergelijken</option>
         <option value="bestelling">Bestellen bij een bekende zaak &mdash; prijs staat vast</option>
       </select>
     </div>
-    <p class="stil" id="hUitleg" style="margin:0.5rem 0 0.75rem;">
+    <p class="stil s-1pgqttp" id="hUitleg">
       Een aanvraag gaat naar een heel soort bedrijf, niet naar één adres. Elke zaak van dat
       soort ziet hem &mdash; ook een die zich gisteren heeft aangemeld. U kiest daarna zelf
       uit de offertes die binnenkomen.
@@ -45,8 +58,8 @@
     </div>
     <div class="rij h-mt50">
       <input class="veld" id="hWat" maxlength="60" placeholder="Wat u nodig heeft" aria-label="Wat u nodig heeft">
-      <input class="veld" id="hAantal" type="number" min="1" step="1" placeholder="Aantal" aria-label="Aantal" style="flex:0 1 7rem;">
-      <select class="veld" id="hEenheid" aria-label="Eenheid" style="flex:0 1 8rem;"></select>
+      <input class="veld s-12sbaw3" id="hAantal" type="number" min="1" step="1" placeholder="Aantal" aria-label="Aantal">
+      <select class="veld s-12sbxvm" id="hEenheid" aria-label="Eenheid"></select>
       <button class="knop" id="hRegel" type="button">Regel erbij</button>
     </div>
     <div class="h-mt50" id="hRegels"></div>

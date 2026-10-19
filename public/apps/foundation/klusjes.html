@@ -41,6 +41,21 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1bqj2a7:not(#_#_#_){margin-bottom:0.5rem;font-size:.88rem}
+.s-1dvc0l6:not(#_#_#_){max-width:6.5rem}
+.s-1fbe644:not(#_#_#_){margin:0.5rem 0 0;width:100%}
+.s-5s403b:not(#_#_#_){font-size:.82rem;color:var(--zacht);margin-left:auto}
+.s-m3b83:not(#_#_#_){margin-bottom:0.5rem}
+.s-q9vs12:not(#_#_#_){flex-wrap:wrap}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -59,14 +74,14 @@
 
   <div class="kaart blok" id="geldBlok" style="display:none;border-color:var(--goud);">
     <h2>De geldschool</h2>
-    <div class="intro" id="geldUitleg" style="margin-bottom:0.5rem;font-size:.88rem;"></div>
+    <div class="intro s-1bqj2a7" id="geldUitleg"></div>
     <div class="ranglijst" id="geldKinderen"></div>
     <div class="fout" id="geldFout"></div>
   </div>
 
   <div class="kaart blok" id="maakBlok" style="display:none;">
     <h2>Nieuw klusje klaarzetten</h2>
-    <input class="veld" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80" style="margin-bottom:0.5rem;">
+    <input class="veld s-m3b83" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80">
     <div class="rijveld">
       <select class="veld" id="kVoor"><option value="iedereen">Voor iedereen</option></select>
       <select class="veld" id="kSterren"></select>
@@ -162,17 +177,17 @@ async function laadGeld(){
     const week = k.weekgeldCenten ? euro(k.weekgeldCenten).replace('€ ','€ ')+' p/w' : 'geen weekgeld';
     let beheer='';
     if (d.magBeheren) beheer =
-      '<div class="rijveld" style="margin:0.5rem 0 0;width:100%;">'+
+      '<div class="rijveld s-1fbe644">'+
       '<input class="veld" data-wg="'+k.id+'" inputmode="decimal" placeholder="Weekgeld (bijv. 2,50)">'+
       '<button class="knop grijs klein" data-wgzet="'+k.id+'">Zet</button>'+
       (k.beschikbaar>0
-        ? '<input class="veld" data-vs="'+k.id+'" inputmode="numeric" placeholder="Sterren" style="max-width:6.5rem;">'+
-          '<input class="veld" data-vb="'+k.id+'" inputmode="decimal" placeholder="Euro" style="max-width:6.5rem;">'+
+        ? '<input class="veld s-1dvc0l6" data-vs="'+k.id+'" inputmode="numeric" placeholder="Sterren">'+
+          '<input class="veld s-1dvc0l6" data-vb="'+k.id+'" inputmode="decimal" placeholder="Euro">'+
           '<button class="knop klein" data-verz="'+k.id+'">Verzilver</button>'
         : '')+
       '</div>';
-    return '<div class="ster" style="flex-wrap:wrap;"><span class="nm">'+esc(k.naam)+'</span>'+
-      '<span style="font-size:.82rem;color:var(--zacht);margin-left:auto;">'+
+    return '<div class="ster s-q9vs12"><span class="nm">'+esc(k.naam)+'</span>'+
+      '<span class="s-5s403b">'+
       k.beschikbaar+' van '+k.sterren+' sterren open · '+week+'</span>'+beheer+'</div>';
   }).join('') || '<div class="leeg">Nog geen gezinsleden.</div>';
   $('#geldKinderen').querySelectorAll('[data-wgzet]').forEach(b=> b.onclick = async ()=>{

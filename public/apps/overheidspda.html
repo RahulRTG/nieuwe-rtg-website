@@ -61,17 +61,34 @@
   .terug{background:none;border:none;color:var(--soft);font:inherit;font-size:.8rem;cursor:pointer;padding:0 0 .6rem;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-1cv76ip:not(#_#_#_){flex:1;min-width:10rem}
+.s-1kikgg6:not(#_#_#_){font-size:.95rem;margin:0.25rem 0 0.25rem}
+.s-4mhsan:not(#_#_#_){color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem}
+.s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
+.s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
+.s-qge8k0:not(#_#_#_){font-size:1.15rem;margin-bottom:0.5rem}
+.s-vgbzx0:not(#_#_#_){background:var(--card2)}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/personeel.html" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="overheidspda" class="rtg-stijl" data-workos-premium data-workos-home="/apps/personeel.html" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header><div class="ey">Rijksoverheid · personeel</div><h1 id="kop">Overheids-PDA</h1></header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">De werktelefoon voor al het personeel van alle rijkskantoren: receptie, security, schoonmaak en de bode. Log in met je persoonlijke pincode.</p>
+    <p class="s-4mhsan">De werktelefoon voor al het personeel van alle rijkskantoren: receptie, security, schoonmaak en de bode. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
+    <button class="knop prim s-186m9vs" id="loginGo" data-hoofdactie>Inloggen</button>
   </div>
   <div id="app" hidden></div>
 </main>
@@ -147,19 +164,19 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+OVER.rondesVandaag+'</b><span>Rondes vandaag</span></div>'+
       (LOC === 'rechtbank' ? '<div class="kpi"><b>'+OVER.zittingenVandaag+'</b><span>Zittingen vandaag</span></div>' : '')+
     '</div>'+
-    '<h3 style="font-size:.95rem;margin:0.25rem 0 0.25rem;">Locatie</h3>'+
+    '<h3 class="s-1kikgg6">Locatie</h3>'+
     '<div class="keuze">'+OVER.locaties.map(l => '<button data-loc="'+l.id+'" class="'+(l.id===LOC?'aan':'')+'"><span class="ic">'+l.icoon+'</span>'+esc(l.label)+'</button>').join('')+'</div>'+
-    '<h3 style="font-size:.95rem;margin:0.25rem 0 0.25rem;">Jouw rol</h3>'+
+    '<h3 class="s-1kikgg6">Jouw rol</h3>'+
     '<div class="keuze">'+OVER.rollen.map(r => '<button data-rol="'+r.id+'"><span class="ic">'+r.icoon+'</span>'+esc(r.label)+'<span class="sub">'+esc(r.wat)+'</span></button>').join('')+'</div>';
   $('#app').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => { LOC = b.dataset.loc; kiesScherm(); }));
   $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => { ROL = b.dataset.rol; rolScherm(); }));
 }
 
 function kopStuk(titel){
-  return '<button class="terug" id="terug">← locatie en rol kiezen</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>';
+  return '<button class="terug" id="terug">← locatie en rol kiezen</button><h2 class="s-qge8k0">'+titel+'</h2>';
 }
 function aiBlok(hint){
-  return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-conciërge denkt mee; jij handelt.</div></div>';
+  return '<div class="ai"><div class="rij h-mt0"><input class="veld s-jwtsuz" id="aiV" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-conciërge denkt mee; jij handelt.</div></div>';
 }
 function koppelBasis(herlaad){
   $('#terug').addEventListener('click', kiesScherm);
@@ -183,8 +200,8 @@ async function rolScherm(){
 /* ---- receptie ---- */
 async function schermReceptie(){
   $('#app').innerHTML = kopStuk('Receptie')+
-    '<div class="item" style="background:var(--card2);"><h4>Bezoeker aanmelden</h4>'+
-    '<div class="rij"><input class="veld" id="bNaam" style="flex:1;min-width:8rem;" placeholder="Naam bezoeker" maxlength="60"><input class="veld" id="bVoor" style="flex:1;min-width:8rem;" placeholder="Voor (afspraak, zitting, loket)" maxlength="80"><button class="knop" id="bIn">Badge</button></div></div>'+
+    '<div class="item s-vgbzx0"><h4>Bezoeker aanmelden</h4>'+
+    '<div class="rij"><input class="veld s-jwt5vg" id="bNaam" placeholder="Naam bezoeker" maxlength="60"><input class="veld s-jwt5vg" id="bVoor" placeholder="Voor (afspraak, zitting, loket)" maxlength="80"><button class="knop" id="bIn">Badge</button></div></div>'+
     '<div id="bLijst"></div>'+aiBlok('Bijv. wat doe ik met een bezoeker zonder afspraak?');
   koppelBasis();
   $('#bIn').addEventListener('click', async () => {
@@ -211,11 +228,11 @@ async function laadBezoekers(){
 /* ---- security ---- */
 async function schermSecurity(){
   $('#app').innerHTML = kopStuk('Security')+
-    '<div class="item" style="background:var(--card2);"><h4>Ronde lopen</h4><div class="meta">Een ronde gaat langs alle ruimtes van dit gebouw. Iets gezien? Meld het als incident.</div>'+
+    '<div class="item s-vgbzx0"><h4>Ronde lopen</h4><div class="meta">Een ronde gaat langs alle ruimtes van dit gebouw. Iets gezien? Meld het als incident.</div>'+
     '<div class="rij"><button class="knop" id="ronde">Ronde gelopen ✓</button><span class="status" id="rondeInfo"></span></div></div>'+
-    '<div class="item" style="background:var(--card2);"><h4>Incident melden</h4>'+
+    '<div class="item s-vgbzx0"><h4>Incident melden</h4>'+
     '<div class="rij"><select class="veld" id="iRuimte"></select><select class="veld" id="iSoort"></select><select class="veld" id="iErnst"><option value="1">ernst 1</option><option value="2">ernst 2</option><option value="3">ernst 3</option></select></div>'+
-    '<div class="rij"><input class="veld" id="iTekst" style="flex:1;min-width:10rem;" placeholder="Wat speelt er?" maxlength="300"><button class="knop rood" id="iMeld">Meld</button></div>'+
+    '<div class="rij"><input class="veld s-1cv76ip" id="iTekst" placeholder="Wat speelt er?" maxlength="300"><button class="knop rood" id="iMeld">Meld</button></div>'+
     '<div class="meta">Bij echt gevaar: eerst 112, dan melden.</div></div>'+
     '<div id="iLijst"></div>'+aiBlok('Bijv. hoe schaal ik op bij agressie aan de balie?');
   koppelBasis();
@@ -252,8 +269,8 @@ async function laadIncidenten(){
 /* ---- schoonmaak ---- */
 async function schermSchoonmaak(){
   $('#app').innerHTML = kopStuk('Schoonmaak')+
-    '<div class="item" style="background:var(--card2);"><h4>Extra werk doorgeven</h4>'+
-    '<div class="rij"><select class="veld" id="tRuimte"></select><input class="veld" id="tTekst" style="flex:1;min-width:9rem;" placeholder="Wat moet er gebeuren?" maxlength="200"><button class="knop stil" id="tExtra">Zet erbij</button></div></div>'+
+    '<div class="item s-vgbzx0"><h4>Extra werk doorgeven</h4>'+
+    '<div class="rij"><select class="veld" id="tRuimte"></select><input class="veld s-jwtsuz" id="tTekst" placeholder="Wat moet er gebeuren?" maxlength="200"><button class="knop stil" id="tExtra">Zet erbij</button></div></div>'+
     '<div id="tLijst"></div>'+aiBlok('Bijv. waar begin ik vandaag?');
   koppelBasis();
   $('#tRuimte').innerHTML = OVER.ruimtes.map(r => '<option>'+esc(r)+'</option>').join('');
@@ -282,7 +299,7 @@ async function laadTaken(){
 /* ---- bode (rechtbank) ---- */
 async function schermBode(){
   $('#app').innerHTML = kopStuk('Bode')+
-    '<div class="item" style="background:var(--card2);"><h4>De zittingsrol</h4><div class="meta">Rechtstreeks uit het rechtbanksysteem: zet de zalen op volgorde van de rol klaar en meld ze gereed. Na elke zitting staat de zaal automatisch op de schoonmaaklijst.</div></div>'+
+    '<div class="item s-vgbzx0"><h4>De zittingsrol</h4><div class="meta">Rechtstreeks uit het rechtbanksysteem: zet de zalen op volgorde van de rol klaar en meld ze gereed. Na elke zitting staat de zaal automatisch op de schoonmaaklijst.</div></div>'+
     '<div id="zLijst"></div>'+aiBlok('Bijv. wat hoort er allemaal bij een zaal klaarzetten?');
   koppelBasis();
   laadZittingen();
@@ -317,5 +334,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); L
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/workos-premium.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

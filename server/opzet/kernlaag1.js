@@ -85,10 +85,12 @@ Object.assign(kern, require('../kern/spellen')({
    van het lid). */
 const { meldAan, meldLid } = require('./meldaan')({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToUser });
 
+// een getypte codenaam, alleen onder de eigen connecties (zie het bestand)
+const vriendOpCodenaam = require('../kern/veiligheid/vriendopcodenaam')(() => kern.socialConnecties);
 Object.assign(kern, require('../kern/veiligheid')({
   db, save, crypto, schoon, mail,
   kluis: require('../accounts/kluis'),
-  sociaal: { codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden },
+  sociaal: { codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden, vriendOpCodenaam },
   meldAan,
   appUrl: () => process.env.APP_URL || ''
 }));

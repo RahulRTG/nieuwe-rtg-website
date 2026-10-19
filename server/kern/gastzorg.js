@@ -80,7 +80,12 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
       inzagelog.noteer({ door: (s && s.name) || zaak, over: { id },
         waarom: door.reden || 'zorgprofiel gelezen bij een bestelling of verblijf',
         bron: 'zorgprofiel' });
-    } catch (e) {}
+    } catch (e) {
+      /* Het profiel is op dit punt al gelezen; weigeren kan hier niets meer
+         tegenhouden. Stil is het niet (STILSPOOR.json): een zorgprofiel dat
+         zonder journaalregel is ingezien, hoort luid in het log. */
+      console.error('[gastzorg] inzage van een zorgprofiel ZONDER journaalregel:', e && e.message);
+    }
     save();
   }
 

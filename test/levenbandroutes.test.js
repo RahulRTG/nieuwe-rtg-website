@@ -38,7 +38,7 @@ const dag = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-levenband-'));
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, ANTHROPIC_API_KEY: '' } });
   base = srv.base;
 
   const t = Date.now();
@@ -234,4 +234,66 @@ test('11. wat onlangs eindigde staat er, zonder wie het deed en zonder reden', a
   for (const woord of ['verbrokenDoor', 'reden', kindNaam, lidNaam]) {
     assert.equal(tekst.includes(woord), false, woord + ' hoort hier niet in te staan');
   }
+});
+
+/* 11. De LEDENKANT van delen, intrekken en verbreken: /api/leven/deel/zet,
+   /api/leven/deel/in en /api/leven/band/verbreek. De toetsen hierboven doen dat
+   vanaf de gezinskant; hier deelt het lid zelf iets terug, trekt het weer in, en
+   verbreekt de band. Een stuk zonder einddatum deelt niemand, en wie geen partij
+   is bij de band, verbreekt hem niet.
+   MUTATIE GEZIEN ZAKKEN: de 'trekIn'-actie in server/routes/levenband.js laten
+   wijzen naar bandVerbreek in plaats van deelIn; de toets zakte op "intrekken
+   laat de band staan". */
+test('11. het lid deelt zelf, trekt in en verbreekt -- over de ledendeur', async () => {
+  const v = await post('/api/leven/band/vraag', { codenaam: kindNaam, soort: 'mentor', vervalt: dag(120) }, lidTok);
+  assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 160));
+  const bandId = v.body.band.id;
+  assert.equal((await huis('/api/rtf/leven/band/bevestig', { bandId }, kindTok)).status, 200);
+
+  const t = Date.now();
+  const ander = (await post('/api/auth/register', { name: 'Buiten Staander', email: 'lbx' + t + '@e.test',
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' })).body.token;
+
+  assert.equal((await post('/api/leven/deel/zet', { bandId, stuk: 'afspraken' }, lidTok)).status, 400, 'geen einddatum, geen deling');
+  assert.equal((await post('/api/leven/deel/zet', { bandId, stuk: 'afspraken', vervalt: dag(10) }, ander)).status, 403,
+    'wie geen partij is, deelt niets via deze band');
+  const d = await post('/api/leven/deel/zet', { bandId, stuk: 'afspraken', vervalt: dag(10) }, lidTok);
+  assert.equal(d.status, 200, JSON.stringify(d.body).slice(0, 160));
+  let bijKind = (await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.find(b => b.id === bandId);
+  assert.deepEqual(bijKind.ikZie.map(s => s.stuk), ['afspraken'], 'het kind ziet wat het lid gaf');
+
+  assert.equal((await post('/api/leven/deel/in', { delingId: d.body.deling.id }, ander)).status, 403,
+    'een buitenstaander trekt andermans deling niet in');
+  const uit = await post('/api/leven/deel/in', { delingId: d.body.deling.id }, lidTok);
+  assert.equal(uit.status, 200);
+  bijKind = (await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.find(b => b.id === bandId);
+  assert.ok(bijKind, 'intrekken laat de band staan');
+  assert.deepEqual(bijKind.ikZie, [], 'maar het kind ziet niets meer');
+
+  assert.equal((await post('/api/leven/band/verbreek', { bandId }, ander)).status, 403, 'een buitenstaander verbreekt niets');
+  assert.equal((await post('/api/leven/band/verbreek', { bandId }, null)).status, 401);
+  const weg = await post('/api/leven/band/verbreek', { bandId }, lidTok);
+  assert.equal(weg.status, 200);
+  assert.ok(!(await post('/api/leven/kring', {}, lidTok)).body.banden.some(b => b.id === bandId), 'de band is weg bij het lid');
+  assert.ok(!(await huis('/api/rtf/leven/kring', {}, kindTok)).body.banden.some(b => b.id === bandId), 'en bij het kind');
+});
+
+/* 12. /api/leven/mentor zonder model: hij SPIEGELT wat er op de levenslijn
+   staat en verzint geen advies (LEVEN.md par. 2.2), en elk antwoord draagt de
+   bronregels waar het op rust. Gasten komen er niet in.
+   MUTATIE GEZIEN ZAKKEN: in server/routes/levenmentor.js `gegevens` uit het
+   antwoord zonder model weggelaten; de toets zakte op "het antwoord draagt zijn
+   bronnen". */
+test('12. de mentor zonder model spiegelt de lijn en noemt zijn bronnen', async () => {
+  const r = await post('/api/leven/mentor', { vraag: 'Wat moet ik dit jaar gaan doen?' }, lidTok);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+  assert.ok(Array.isArray(r.body.gegevens) && r.body.gegevens.length >= 2, 'het antwoord draagt zijn bronnen');
+  assert.ok(r.body.gegevens.every(g => typeof g === 'string' && g.length > 0));
+  assert.ok(r.body.gegevens.some(g => /^levenslijn: /.test(g)), 'de bron is de levenslijn');
+  assert.match(r.body.antwoord, /lijn/i, 'hij spiegelt wat er op de lijn staat');
+  assert.doesNotMatch(r.body.antwoord, /niets voor u|slaagkans|moet u gaan/i, 'en adviseert of oordeelt niet');
+
+  const gast = (await post('/api/login', { tier: 'guest' })).body.token;
+  assert.equal((await post('/api/leven/mentor', { vraag: 'x' }, gast)).status, 403);
+  assert.equal((await post('/api/leven/mentor', { vraag: 'x' })).status, 401);
 });

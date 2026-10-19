@@ -230,7 +230,7 @@ const WACHT_OP_BESLUIT = {
 
 function leesProef() {
   try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
-  catch (e) { return null; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 function groepVan(rol) {

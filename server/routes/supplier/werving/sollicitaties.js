@@ -2,13 +2,13 @@
    het besluit (met automatische uitnodiging via maakInvite uit de personeels-
    laag); de sollicitatiechat staat in ./sollchat.js. Gemount vanuit
    routes/supplier/werving.js. */
-const { eigenVeld } = require('../../../kern/util');
 const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
   const { kern, maakInvite, neemAan, wervingsBasis, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
           findSupplier, logActivity, managerOnly, notifyApplicant, notifySupplier, save, schoon,
           sseToOffice, sseToSupplier, supplierAuth } = kern;
+  const werving = require('../../../kern/werk-opslag')({ db }); // de deur naar sollicitatie, vacature en chat
 const { sollGeremd } = require('./sollrem');
 app.post('/api/supplier/apply', (req, res) => {
   const s = findSupplier(req.body.code);
@@ -24,9 +24,9 @@ app.post('/api/supplier/apply', (req, res) => {
     name, func, contact, note, status: 'nieuw',
     at: new Date().toISOString()
   };
-  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  const list = werving.sollicitatiesVan(s.code);
   list.unshift(entry);
-  db.data.applications[s.code] = list.slice(0, 100);
+  werving.zetSollicitaties(s.code, list.slice(0, 100));
   save();
   // sollicitatiegegevens horen bij de werving: alleen de managers (kern/leverancier/personeelzicht.js)
   notifySupplier(s.code, { icon: 'werk', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.', beperkt: 'werving' });
@@ -37,7 +37,7 @@ app.post('/api/supplier/apply', (req, res) => {
 
 app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   if (!managerOnly(req, res)) return;
-  const a = (db.data.applications[req.supplier.code] || []).find(x => x.id === req.body.id);
+  const a = werving.sollicitatiesVan(req.supplier.code).find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Sollicitatie niet gevonden.' });
   if (req.body.action === 'uitnodigen') {
     // gesprek: open de chat, nog geen personeelsaccount
@@ -109,8 +109,8 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-require('./sollchat')(kern, { chatVan: (id) => eigenVeld(db.data.applyChats, id),
-  sollicitatieVan: (code, id) => (db.data.applications[code] || []).find(x => x.id === id),
+require('./sollchat')(kern, { chatVan: werving.chat,
+  sollicitatieVan: (code, id) => werving.sollicitatiesVan(code).find(x => x.id === id),
   heeftMeldingen: (key) => !!db.data.notifications[key] });
 
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
@@ -125,22 +125,22 @@ app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
      en de toestand veranderde toch: vacatures" -- en via VERTROUWEN.json en de
      schorspoort werd die route met een 503 dichtgezet.
      De lijst wordt nu pas VASTGEZET als er werkelijk iets bij komt. */
-  const list = db.data.vacatures[req.supplier.code] || [];
+  const list = werving.vacaturesVan(req.supplier.code);
   const bestaand = b.id ? list.find(v => v.id === b.id) : null;
   const vac = bestaand || { id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString() };
   const ingevuld = vulVacature(vac, b, VAC_SOORTEN);
   if (ingevuld.error) return res.status(400).json({ error: ingevuld.error });
   if (!bestaand) { list.unshift(vac); }
-  db.data.vacatures[req.supplier.code] = list.slice(0, 40);
+  werving.zetVacatures(req.supplier.code, list.slice(0, 40));
   save();
   logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + ingevuld.func);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-  res.json({ ok: true, vacatures: (db.data.vacatures[req.supplier.code] || []).slice(0, 40) });
+  res.json({ ok: true, vacatures: werving.vacaturesVan(req.supplier.code).slice(0, 40) });
 });
 
 app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
-  const list = db.data.vacatures[req.supplier.code] || [];
+  const list = werving.vacaturesVan(req.supplier.code);
   const i = list.findIndex(v => v.id === req.body.id);
   if (i < 0) return res.status(404).json({ error: 'Vacature niet gevonden.' });
   const soort = req.body.action === 'sluit' || req.body.action === 'open';
@@ -152,5 +152,5 @@ app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
 });
 
 // de anonieme talentmatch: ./talentmatch.js (de opslag gaat als functie mee)
-require('./talentmatch')(kern, { interesses: () => (Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : []) });
+require('./talentmatch')(kern, { interesses: werving.talent });
 };

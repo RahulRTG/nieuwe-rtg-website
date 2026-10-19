@@ -76,17 +76,11 @@ const verhalen = require('./verhalen');
 /* CPU, event-loop, database en het herstel na de storm. Eigen module: dit
    harnas stond al op 58 kB en die meters hebben elk hun eigen uitleg nodig. */
 const belasting = require('./lib/belasting');
-/* De geldproef gebruikt dezelfde cryptografische toestelbinding als de browser.
-   Zware betaalpaden staan in productie achter het bezitsbewijs; een kale bearer
-   token zou daar terecht 403 krijgen en de proef ten onrechte als een kapotte
-   wallet rapporteren. De serverpoort blijft ongewijzigd: alleen de proefclient
-   bindt en tekent zoals een echt toestel. */
-const { bindToestel, metToestellen } = require('./lib/proeftoestel');
 /* De hardere rol-scheidingsproef: lekkende weigeringen en half uitgevoerde
    schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
 const rolproef = require('./lib/rolproef');
 /* WANNEER en TEGEN WELKE CODE dit is gemeten; zie scripts/versheid.js. */
-const { exactStempel } = require('./lib/stempel');
+const { exactStempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -166,12 +160,11 @@ function verzoek(method, pad, token, body, timeoutMs) {
   });
 }
 // volledige variant voor geld/misbruik: de body wordt geparsed teruggegeven
-function haal(method, pad, token, body, extraKoppen) {
+function haal(method, pad, token, body, koppen) {
   return new Promise(resolve => {
     const data = method === 'GET' ? null : JSON.stringify(body === undefined ? {} : body);
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, koppen || {});
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    Object.assign(headers, extraKoppen || {});
     if (data) headers['Content-Length'] = Buffer.byteLength(data);
     const req = http.request({ host: '127.0.0.1', port: PORT, path: pad, method, headers, agent }, res => {
       let buf = ''; res.on('data', c => buf += c); res.on('end', () => { let d = {}; try { d = JSON.parse(buf); } catch (e) {} resolve({ status: res.statusCode, data: d }); });
@@ -182,6 +175,15 @@ function haal(method, pad, token, body, extraKoppen) {
   });
 }
 const post = (pad, body, token, koppen) => haal('POST', pad, token, body, koppen);
+/* DE ZWARE PADEN VRAGEN EEN GEBONDEN TOESTEL. Sinds A-P1-04 (6 oktober 2026)
+   staat het bezitsbewijs standaard op `verplicht` (server/kern/identiteit/
+   bezitsstand.js): /api/pay/* weigert elke sessie zonder toestelsleutel met 403,
+   ook een eigen account met getoond paspoort. Fase B, D en de ijking van E3
+   deden hun geld met kale tokens en zakten daardoor sinds die dag met "B heeft
+   geen codenaam (wallet onbereikbaar)" -- het saldo was er wel, de deur niet.
+   De poort blijft zoals hij in productie staat; de proefCLIENT bindt een
+   toestel en tekent, zoals de browser (scripts/lib/proeftoestel.js). */
+const { bindToestel, metToestellen } = require('./lib/proeftoestel');
 
 /* ---------- alle routes + hun auth-rol uit de bron ---------- */
 // De platformbrede schakelkast-endpoints (de "grote hendel" en per-functie
@@ -406,51 +408,55 @@ async function registreerAccount(merk) {
   // Fase B niet het geld maar de KYC-poort (en zou vacuous slagen op 0 -> 0).
   let kyc = 'n/a';
   if (token) { const u = await post('/api/verify/upload', { image: KYC_PNG }, token); kyc = u.data && u.data.status || u.status; }
-  const binding = token ? await bindToestel({ post, token, naam: 'Beproeving ' + merk }) : null;
-  return { email, ww, token, status: r.status, kyc,
-    toestel: binding && binding.klaar, toestelFout: binding && binding.reden };
+  // En een gebonden toestel, want zonder sleutel komt dit lid zijn eigen
+  // portemonnee niet in (zie de kop boven `bindToestel` hierboven).
+  const t = token ? await bindToestel({ post, token, naam: 'Beproeving ' + merk }) : { klaar: null, reden: 'geen token' };
+  return { email, ww, token, status: r.status, kyc, toestel: t.klaar, toestelReden: t.reden };
 }
-async function saldoVan(stuur, token) { const r = await stuur('/api/pay/overzicht', {}, token); return { saldo: r.data && typeof r.data.saldo === 'number' ? r.data.saldo : null, codenaam: r.data && r.data.codenaam }; }
+/* Een `post` die voor deze toestellen tekent op de zware paden en overal
+   anders gewoon `post` is -- dezelfde schil als de idempotentieproef gebruikt. */
+const getekend = (...toestellen) => metToestellen(post, { toestellen });
+async function saldoVan(token, p = post) { const r = await p('/api/pay/overzicht', {}, token); return { saldo: r.data && typeof r.data.saldo === 'number' ? r.data.saldo : null, codenaam: r.data && r.data.codenaam }; }
 
 async function geldIntegriteit() {
   const fouten = [];
   const A = await registreerAccount('a'), B = await registreerAccount('b');
   if (!A.token || !B.token) return { fouten: ['registratie mislukte (A=' + A.status + ', B=' + B.status + ')'], A, B };
-  if (!A.toestel || !B.toestel) return { fouten: ['toestelbinding mislukte (A=' + (A.toestelFout || 'onbekend') + ', B=' + (B.toestelFout || 'onbekend') + ')'], A, B };
-  const postGeld = metToestellen(post, { toestellen: [A.toestel, B.toestel] });
-  const bCode = (await saldoVan(postGeld, B.token)).codenaam;
+  if (!A.toestel || !B.toestel) return { fouten: ['toestel binden mislukte (A: ' + (A.toestelReden || 'gebonden') + '; B: ' + (B.toestelReden || 'gebonden') + ')'], A, B };
+  const postT = getekend(A.toestel, B.toestel);
+  const bCode = (await saldoVan(B.token, postT)).codenaam;
   if (!bCode) return { fouten: ['B heeft geen codenaam (wallet onbereikbaar)'], A, B };
 
   const K1 = 'idem-oplaad-1';
-  await postGeld('/api/pay/oplaad', { centen: 500000, idem: K1 }, A.token);
-  const naOplaad = (await saldoVan(postGeld, A.token)).saldo;
-  await postGeld('/api/pay/oplaad', { centen: 500000, idem: K1 }, A.token);
-  const naDubbel = (await saldoVan(postGeld, A.token)).saldo;
+  await postT('/api/pay/oplaad', { centen: 500000, idem: K1 }, A.token);
+  const naOplaad = (await saldoVan(A.token, postT)).saldo;
+  await postT('/api/pay/oplaad', { centen: 500000, idem: K1 }, A.token);
+  const naDubbel = (await saldoVan(A.token, postT)).saldo;
   if (naDubbel !== naOplaad) fouten.push('idempotente oplaad boekte dubbel (' + naOplaad + ' -> ' + naDubbel + ')');
 
-  const a0 = (await saldoVan(postGeld, A.token)).saldo, b0 = (await saldoVan(postGeld, B.token)).saldo;
+  const a0 = (await saldoVan(A.token, postT)).saldo, b0 = (await saldoVan(B.token, postT)).saldo;
   const totVoor = a0 + b0;
-  for (let i = 0; i < 25; i++) await postGeld('/api/pay/stuur', { aan: bCode, centen: 1000, oms: 'test', idem: 'stuur-' + i }, A.token);
-  const a1 = (await saldoVan(postGeld, A.token)).saldo, b1 = (await saldoVan(postGeld, B.token)).saldo;
+  for (let i = 0; i < 25; i++) await postT('/api/pay/stuur', { aan: bCode, centen: 1000, oms: 'test', idem: 'stuur-' + i }, A.token);
+  const a1 = (await saldoVan(A.token, postT)).saldo, b1 = (await saldoVan(B.token, postT)).saldo;
   if (a1 + b1 !== totVoor) fouten.push('interne overboeking lekte centen (' + totVoor + ' -> ' + (a1 + b1) + ')');
   if (b1 - b0 !== 25000) fouten.push('B ontving niet exact 25000 centen (kreeg ' + (b1 - b0) + ')');
 
   const KS = 'idem-stuur-stabiel';
-  await postGeld('/api/pay/stuur', { aan: bCode, centen: 7000, oms: 'idem', idem: KS }, A.token);
-  const a2 = (await saldoVan(postGeld, A.token)).saldo, b2 = (await saldoVan(postGeld, B.token)).saldo;
-  await postGeld('/api/pay/stuur', { aan: bCode, centen: 7000, oms: 'idem', idem: KS }, A.token);
-  const a3 = (await saldoVan(postGeld, A.token)).saldo, b3 = (await saldoVan(postGeld, B.token)).saldo;
+  await postT('/api/pay/stuur', { aan: bCode, centen: 7000, oms: 'idem', idem: KS }, A.token);
+  const a2 = (await saldoVan(A.token, postT)).saldo, b2 = (await saldoVan(B.token, postT)).saldo;
+  await postT('/api/pay/stuur', { aan: bCode, centen: 7000, oms: 'idem', idem: KS }, A.token);
+  const a3 = (await saldoVan(A.token, postT)).saldo, b3 = (await saldoVan(B.token, postT)).saldo;
   if (a3 !== a2 || b3 !== b2) fouten.push('idempotente overboeking boekte dubbel (A ' + a2 + '->' + a3 + ', B ' + b2 + '->' + b3 + ')');
 
-  const aVoorOnzin = (await saldoVan(postGeld, A.token)).saldo;
+  const aVoorOnzin = (await saldoVan(A.token, postT)).saldo;
   const onzin = [-5000, 0, 1e18, Number.NaN, 'veel', null, 9999999999999];
   const stuk = [];
   for (const c of onzin) {
-    const r = await postGeld('/api/pay/stuur', { aan: bCode, centen: c, oms: 'onzin', idem: 'onzin-' + String(c) }, A.token);
+    const r = await postT('/api/pay/stuur', { aan: bCode, centen: c, oms: 'onzin', idem: 'onzin-' + String(c) }, A.token);
     if (r.status >= 200 && r.status < 300) stuk.push(String(c) + '->2xx');
     if (r.status >= 500) stuk.push(String(c) + '->5xx');
   }
-  const aNaOnzin = (await saldoVan(postGeld, A.token)).saldo;
+  const aNaOnzin = (await saldoVan(A.token, postT)).saldo;
   if (stuk.length) fouten.push('onrealistische bedragen niet netjes geweigerd: ' + stuk.join(', '));
   if (aNaOnzin !== aVoorOnzin) fouten.push('onzin-bedragen raakten het saldo (' + aVoorOnzin + ' -> ' + aNaOnzin + ')');
 
@@ -654,24 +660,21 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
     const baas2 = (await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).data.token; await allesAan(baas2);
     const herA = (await post('/api/auth/login', { login: geld.A.email, password: geld.A.ww })).data.token;
     const herB = (await post('/api/auth/login', { login: geld.B.email, password: geld.B.ww })).data.token;
+    /* Een nieuwe sessie is niet gebonden: de sleutelbinding hangt aan de sessie
+       en niet aan het account, dus na het opnieuw inloggen bindt elke beurs
+       zijn toestel opnieuw -- precies wat de browser bij een nieuwe inlog doet. */
+    const bindA = herA ? await bindToestel({ post, token: herA, naam: 'Beproeving a na herstart' }) : { klaar: null };
+    const bindB = herB ? await bindToestel({ post, token: herB, naam: 'Beproeving b na herstart' }) : { klaar: null };
     if (!herA || !herB) duurFouten.push('opnieuw inloggen na herstart mislukte');
+    else if (!bindA.klaar || !bindB.klaar) duurFouten.push('toestel binden na herstart mislukte (A: ' + (bindA.reden || 'gebonden') + '; B: ' + (bindB.reden || 'gebonden') + ')');
     else {
-      /* Een nieuwe login is bewust een nieuwe sessie en erft geen toestelbinding.
-         Bind beide sessies opnieuw, zoals de browser na een nieuwe aanmelding
-         doet, voordat we de zware betaalpaden na de herstart beproeven. */
-      const herAToestel = await bindToestel({ post, token: herA, naam: 'Beproeving herstart A' });
-      const herBToestel = await bindToestel({ post, token: herB, naam: 'Beproeving herstart B' });
-      if (!herAToestel.klaar || !herBToestel.klaar) {
-        duurFouten.push('toestelbinding na herstart mislukte (A=' + (herAToestel.reden || 'onbekend') + ', B=' + (herBToestel.reden || 'onbekend') + ')');
-      } else {
-        const postHerstart = metToestellen(post, { toestellen: [herAToestel.klaar, herBToestel.klaar] });
-        const sA = (await saldoVan(postHerstart, herA)).saldo, sB = (await saldoVan(postHerstart, herB)).saldo;
-        if (sA !== geld.saldoA) duurFouten.push('saldo A overleefde de herstart niet (' + geld.saldoA + ' -> ' + sA + ')');
-        if (sB !== geld.saldoB) duurFouten.push('saldo B overleefde de herstart niet (' + geld.saldoB + ' -> ' + sB + ')');
-        await postHerstart('/api/pay/stuur', { aan: geld.bCode, centen: 7000, oms: 'idem', idem: geld.idemStuur }, herA);
-        const sA2 = (await saldoVan(postHerstart, herA)).saldo;
-        if (sA2 !== sA) duurFouten.push('idempotentie overleefde de herstart niet (A ' + sA + ' -> ' + sA2 + ')');
-      }
+      const postH = getekend(bindA.klaar, bindB.klaar);
+      const sA = (await saldoVan(herA, postH)).saldo, sB = (await saldoVan(herB, postH)).saldo;
+      if (sA !== geld.saldoA) duurFouten.push('saldo A overleefde de herstart niet (' + geld.saldoA + ' -> ' + sA + ')');
+      if (sB !== geld.saldoB) duurFouten.push('saldo B overleefde de herstart niet (' + geld.saldoB + ' -> ' + sB + ')');
+      await postH('/api/pay/stuur', { aan: geld.bCode, centen: 7000, oms: 'idem', idem: geld.idemStuur }, herA);
+      const sA2 = (await saldoVan(herA, postH)).saldo;
+      if (sA2 !== sA) duurFouten.push('idempotentie overleefde de herstart niet (A ' + sA + ' -> ' + sA2 + ')');
     }
     if (duurFouten.length === 0) rij('duurzaamheid', 'geld en idempotentie overleefden de herstart');
     else for (const f of duurFouten) rij('  DUURZAAMHEID-FOUT', f);
@@ -679,6 +682,14 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
   // na de herstart weer alle tokens vers ophalen voor de storm
   const tok2 = await tokens();
   tokVoor.member = tok2.member; tokVoor.supplier = tok2.supplier; tokVoor.office = tok2.office;
+  /* HET LID VOOR DE ROL-SCHEIDINGSPROEF (E3), nu al: de ijking van de
+     vingerafdruk daar is een kleine oplading op het eigen saldo, en die loopt
+     over /api/pay -- een zwaar pad. De demo-pas uit /api/login heeft geen account
+     en kan niet binden; dit lid wel. Het wordt VOOR de storm geregistreerd omdat
+     de noodrem (server/beveiliging.js) tijdens de storm de registratiezekering
+     eruit haalt, en een lid dat je na de storm niet meer kunt maken, laat de
+     meter ten onrechte 'stuk' zeggen. */
+  let lidRol = await registreerAccount('rol');
   await allesAan(tok2._baas);
 
   // ---------- machine-kalibratie (voor het LATENTIE-oordeel) ----------
@@ -738,13 +749,7 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
       const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
       await post('/api/verify/upload', { image: pixel }, tok);
     }
-    /* De omstander is ook de vaste meetgebruiker van de rol-lekmeter. Omdat
-       die meter met een legitieme RTG Pay-oplading bewijst dat zijn
-       vingerafdruk kan bewegen, moet deze echte accountclient hetzelfde
-       bezitsbewijs dragen als de browser. Geen vrijstelling aan de serverkant. */
-    const binding = tok ? await bindToestel({ post, token: tok, naam: 'Omstander meettoestel' }) : null;
-    return { member: tok ? [tok] : [], supplier: [], office: [],
-      toestel: binding && binding.klaar, toestelFout: binding && binding.reden };
+    return { member: tok ? [tok] : [], supplier: [], office: [] };
   })();
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
@@ -958,18 +963,21 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
      geweigerd VOORDAT de autorisatie aan de beurt is. Deze proef stuurt daarom
      plausibele invoer en kijkt naar het lijf en naar de blijvende toestand. */
   kop('FASE E3: ROL-SCHEIDING - lekt de weigering, en blijft de toestand echt gelijk?');
-  const postRolproef = sessieVanVoorDeStorm.toestel
-    ? metToestellen(post, { toestellen: [sessieVanVoorDeStorm.toestel] })
-    : post;
+  /* Leeft het rol-lid de storm nog? De storm trekt tokens in en sluit sessies;
+     is dit lid meegesleurd, dan een vers lid -- en lukt ook dat niet, dan zegt
+     de ijking van de vingerafdruk het zelf (BLIND), niet deze regel. */
+  const leeft = async (l) => !!(l.toestel && (await getekend(l.toestel)('/api/pay/overzicht', {}, l.token)).status === 200);
+  if (!(await leeft(lidRol))) lidRol = await registreerAccount('rol2');
+  rij('lid voor de rol-scheiding', lidRol.toestel ? 'eigen account met gebonden toestel' : '\x1b[31mGEEN -- ' + (lidRol.toestelReden || 'registratie gaf ' + lidRol.status) + '\x1b[0m');
   const rp = await rolproef.draaiRolproef({
     /* post (= haal) en NIET verzoek: die laatste gooit het antwoordlijf weg en
        geeft alleen de status terug. Daarmee stonden de lekscan en de
-       toestandsvergelijking leeg te draaien. */
-    post: postRolproef,
+       toestandsvergelijking leeg te draaien.
+       Op een ZWAAR pad klopt de ledenrol aan als het rol-lid en tekent; op elk
+       ander pad blijft het token zoals het was (scripts/lib/proeftoestel.js). */
+    post: lidRol.toestel ? metToestellen(post, { voorLid: { lid: lidRol.toestel, van: () => tokVoor.member } }) : post,
     routes: routes.map(r => ({ ...r, rol: r.rol === 'open' ? 'openbaar' : r.rol })), tokensVoor: () => ({
-      /* De member is de gebonden omstander: een demo-token kan geen toestel
-         binden en zou de vingerafdruk-ijking op zware betaalpaden blind maken. */
-      member: (sessieVanVoorDeStorm.member && sessieVanVoorDeStorm.member[0]) || rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
+      member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
       office: rkeuze(tokVoor.office.length ? tokVoor.office : tokVoor.member)
     }),
@@ -1337,6 +1345,10 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
      meting, maar hij hoort nooit meer te zeggen dat hij niets kán controleren. */
   const schrijf = (naam, inhoud) => {
     try {
+      /* "Altijd" betekent: ook rood, niet: ook op een vuile boom. Een meting op
+         ongecommitte code wijst naar een commit die haar invoer niet bevat
+         (STEMPELVEILIGHEID.json); dan blijft het vorige register staan. */
+      if (!magSchrijven(eisSchoneBoom('beproeving'), naam)) return false;
       fs.writeFileSync(path.join(__dirname, '..', naam), JSON.stringify(inhoud, null, 2) + '\n');
       return true;
     } catch (e) {

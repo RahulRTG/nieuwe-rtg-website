@@ -10,25 +10,25 @@
       } else {
         const b = boData;
         html += '<div class="tkc h-volbreed">'+
-          '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:0.55rem;">'+
+          '<div class="s-1gyqkqu">'+
           [[T('bz.today','Omzet vandaag'), eur(b.stats.omzetVandaag)],
            [T('bz.trans','Transacties'), b.stats.transactiesVandaag],
            [T('bz.kassa','Waarvan kassa'), eur(b.stats.kassaVandaag)],
            [T('bz.week','Weekomzet'), eur(b.stats.omzetWeek)],
            [T('bz.binnen','Nu ingeklokt'), b.stats.binnenNu],
            [T('bz.acties','Open acties'), b.stats.openActies]]
-          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.8rem;">'+
-            '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
-            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--rtg-leesgoud,var(--gold));margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
+          .map(x => '<div class="s-yabwgt">'+
+            '<div class="s-1pbo3xb">'+x[0]+'</div>'+
+            '<div class="s-ifv4d7">'+x[1]+'</div></div>').join('')+'</div>'+
           '<div class="tkc-who h-mt50">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
-          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;">'+
+          '<div class="s-zuehxw">'+
           '<button class="obtn" id="boBrief">'+T('bz.brief','Dagbriefing')+'</button>'+
           '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button>'+
           '<button class="obtn ghost" id="boPresent">'+T('z3.pres','Presentatie')+'</button></div>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
         // de kantoorvleugel: de week als 3D-skyline op de huiseigen Drie-motor
         html += '<div class="tkc h-volbreed" id="zaak3dKaart"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
-          '<canvas id="zaak3d" style="display:block;width:100%;border-radius:0;touch-action:none;cursor:grab;" aria-label="'+T('z3.aria','Een draaibare 3D-skyline van uw omzet per dag: hoe hoger het blok, hoe meer omzet; vandaag in bordeaux en een gouden pin op de beste dag.')+'"></canvas>'+
+          '<canvas id="zaak3d" class="s-10g6mn8" aria-label="'+T('z3.aria','Een draaibare 3D-skyline van uw omzet per dag: hoe hoger het blok, hoe meer omzet; vandaag in bordeaux en een gouden pin op de beste dag.')+'"></canvas>'+
           '<div class="tkc-who" id="zaak3dUitleg"></div></div>';
         html += '<div class="tkc h-volbreed"><h3>'+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+
           (b.alerts.length ? b.alerts.map(a =>

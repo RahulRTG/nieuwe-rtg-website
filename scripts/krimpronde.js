@@ -131,6 +131,11 @@ const WAAKT_G = /"grens":([0-9.]+)/;
    Gescand op de bron en niet op de meting, want een kap die geen enkele toets
    uitlokt is precies de kap die je later verrast. */
 const KAP = /db\.data\.([A-Za-z0-9_]+)\s*=\s*[^;\n]*\.slice\(/g;
+/* EN DEZELFDE KAP ACHTER EEN DOMEINDEUR. Sinds de opslagdeuren (18 oktober
+   2026) schrijft een domein `G.zet('gemeenteMeldingen', lijst.slice(0, N))` in
+   plaats van `db.data.gemeenteMeldingen = ...slice(...)`. Dat is dezelfde kap
+   in hetzelfde verzoek; zonder deze vorm zag de scan hem niet meer. */
+const KAP_DEUR = /\.(?:zet|zetBak)\(\s*['"]([A-Za-z0-9_]+)['"]\s*,[^;\n]*\.slice\(/g;
 
 function kappen() {
   const wortel = path.join(WORTEL, 'server');
@@ -155,7 +160,7 @@ function kappen() {
       if (st.isDirectory()) { loop(p); continue; }
       if (!n.endsWith('.js')) continue;
       const bron = fs.readFileSync(p, 'utf8');
-      for (const m of bron.matchAll(KAP)) {
+      for (const m of [...bron.matchAll(KAP), ...bron.matchAll(KAP_DEUR)]) {
         const waar = path.relative(WORTEL, p).replace(/\\/g, '/');
         if (!uit.has(m[1])) uit.set(m[1], { onderhoud: false, verzoek: [] });
         const c = uit.get(m[1]);
@@ -298,7 +303,7 @@ if (!uit.collecties.length) {
 
    Dus per gemeten grens een eigen sleutel, en de rest blijft staan. */
 const bestaand = (() => {
-  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; }
+  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 })();
 const rondes = (bestaand && bestaand.rondes && typeof bestaand.rondes === 'object')
   ? bestaand.rondes : {};

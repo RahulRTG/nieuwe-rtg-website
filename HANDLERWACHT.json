@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-16T12:12:27.788Z",
-  "commit": "d00a21e69",
+  "op": "2026-10-18T20:23:45.482Z",
+  "commit": "8f0a10ea7",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -521,19 +521,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/bonnen",
-   "bestand": "server/bedrijf/handeling.js:194",
+   "bestand": "server/bedrijf/handeling.js:174",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/doe",
-   "bestand": "server/bedrijf/handeling.js:130",
+   "bestand": "server/bedrijf/handeling.js:133",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/plan",
-   "bestand": "server/bedrijf/handeling.js:86",
+   "bestand": "server/bedrijf/handeling.js:89",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -941,31 +941,31 @@
   },
   {
    "sleutel": "POST /api/bedrijf/taak/kolom",
-   "bestand": "server/bedrijf/taak.js:101",
+   "bestand": "server/bedrijf/taak.js:86",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/maak",
-   "bestand": "server/bedrijf/taak.js:43",
+   "bestand": "server/bedrijf/taak.js:33",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/uren",
-   "bestand": "server/bedrijf/taak.js:127",
+   "bestand": "server/bedrijf/taak.js:112",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taak/wacht-op",
-   "bestand": "server/bedrijf/taak.js:80",
+   "bestand": "server/bedrijf/taak.js:65",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/taken",
-   "bestand": "server/bedrijf/taak.js:142",
+   "bestand": "server/bedrijf/taak.js:127",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -1138,7 +1138,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:897",
+   "bestand": "server/server.js:877",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -1168,7 +1168,7 @@
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:118",
+   "bestand": "server/routes/doos-rapport.js:14",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
@@ -3299,13 +3299,13 @@
   },
   {
    "sleutel": "POST /api/mail/binnen",
-   "bestand": "server/routes/mailpost.js:57",
+   "bestand": "server/routes/mailpost.js:58",
    "staat": "openbaar",
    "reden": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
   },
   {
    "sleutel": "POST /api/mail/ses",
-   "bestand": "server/routes/mailpost.js:81",
+   "bestand": "server/routes/mailpost.js:82",
    "staat": "openbaar",
    "reden": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
   },
@@ -4014,13 +4014,13 @@
   },
   {
    "sleutel": "POST /api/rtf/talent/interesse",
-   "bestand": "server/routes/member/werk/talent.js:10",
+   "bestand": "server/routes/member/werk/talent.js:11",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/talent/mijn",
-   "bestand": "server/routes/member/werk/talent.js:47",
+   "bestand": "server/routes/member/werk/talent.js:48",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },
@@ -4293,7 +4293,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1344",
+   "bestand": "server/server.js:1324",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

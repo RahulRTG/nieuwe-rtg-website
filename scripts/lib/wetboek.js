@@ -134,7 +134,7 @@ function lees() {
    dan is er niets gemeten, en dat woord staat er ook (LAT.md regel 3). */
 function leesUitslag() {
   try { return JSON.parse(fs.readFileSync(UITSLAG_PAD, 'utf8')); }
-  catch (e) { return null; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; }
 }
 
 /* DE STAND VAN EEN WET, op EEN plek uitgerekend.

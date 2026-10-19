@@ -73,26 +73,9 @@ async function commitAccountWijzigingen(client, wijzigingen) {
 function accountPool() { return PGMODE && pgKlaar && pg ? pg.pool : null; }
 const { leesVers } = require('./transactie');
 
-function eisIntrekkingen() {
-  if (!PGMODE) return null;
-  if (!pgKlaar || !pg || !pg.intrekkingen) {
-    const e = new Error('de gedeelde PostgreSQL-intrekkingsoutbox is niet gereed');
-    e.code = 'INTREKOPSLAG_ONZEKER'; throw e;
-  }
-  return pg.intrekkingen;
-}
-async function bewaarIntrekking(rij) {
-  const laag = eisIntrekkingen();
-  return laag ? laag.bewaar(rij) : true;
-}
-async function gedeeldeIntrekkingen() {
-  const laag = eisIntrekkingen();
-  return laag ? laag.lijst(Date.now()) : [];
-}
-async function voltooiIntrekkingen(sleutels) {
-  const laag = eisIntrekkingen();
-  return laag ? laag.voltooi(sleutels) : true;
-}
+/* De gedeelde intrekkingsoutbox is een eigen onderwerp: ./mirror-intrekking.js. */
+const { bewaarIntrekking, gedeeldeIntrekkingen, voltooiIntrekkingen } =
+  require('./mirror-intrekking')({ PGMODE, laag: () => (pgKlaar && pg ? pg.intrekkingen : null) });
 
 // Trek een enkele, door NOTIFY gemelde rij van een ander proces in de lokale cache.
 function upsertLocalUser(r) {
@@ -196,7 +179,9 @@ async function flushBijAfsluiten() {
   gestopt = true;
   if (herstelTimer) clearTimeout(herstelTimer);
   herstelTimer = null;
-  if (PGMODE && pg && pgKlaar) { try { await wachtrij.flush(); } catch (e) {} }
+  /* Bij het afsluiten mag een flush de rest niet tegenhouden, maar wat niet is
+     weggeschreven hoort in het log te staan (STILSPOOR.json). */
+  if (PGMODE && pg && pgKlaar) { try { await wachtrij.flush(); } catch (e) { console.error('[accounts] de laatste accountmutaties niet weggeschreven:', e && e.message); } }
   if (pg) { try { await pg.sluit(); } catch (e) {} }
   pgKlaar = false;
 }

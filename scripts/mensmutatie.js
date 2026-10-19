@@ -54,7 +54,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'MENSMUTATIE.json');
@@ -425,7 +425,7 @@ if (require.main !== module) { module.exports = { MUTATIES, WACHTEN }; return; }
       'rail; een modelrail kiest andere gereedschappen en dan zegt deze uitslag niets over die rail.',
     mutaties: rijen
   };
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('mensmutatie'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
 
   console.log('\nMENSMUTATIE: ' + uit.telling.gezakt + ' van ' + rijen.length +
     ' mutaties lieten een wacht zakken, ' + gaten.length + ' zonder wacht' +

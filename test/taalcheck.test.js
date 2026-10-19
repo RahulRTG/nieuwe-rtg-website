@@ -24,7 +24,7 @@ const { DOELEN } = require('../server/kern/leerstof');
 
 let srv, base, sch, leraar, klas, gezin, kind, kindToken, sleutel;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taalcheck-'));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
@@ -33,25 +33,25 @@ const kl = (pad, body) => fnd(pad, Object.assign({ klasCode: klas.code,
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  sch = (await fnd('/school/school/maak', { naam: 'De Horizon', plaats: 'Tilburg' })).body;
+  sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Horizon', plaats: 'Tilburg' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Mentor Dara', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
+  leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Mentor Dara', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken,
     personeelId: leraar.personeelId, akkoord: true });
-  klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
+  klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken,
     naam: '6C', trap: 'po', fase: 'po-g6' })).body;
-  gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Horizon', naam: 'Ouder Horizon', pin: '4321' })).body;
-  kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Amir', rol: 'kind', groep: 'kind' })).body;
-  kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
-  await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
-  await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
-  sleutel = (await kl('/school/klas')).body.leerlingen[0].sleutel;
+  gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Horizon', naam: 'Ouder Horizon', pin: '4321' })).body;
+  kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Amir', rol: 'kind', groep: 'kind' })).body;
+  kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
+  await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
+  sleutel = (await kl('/api/foundation/school/klas')).body.leerlingen[0].sleutel;
   // de thuistaal van dit kind
-  await fnd('/school/taal', { code: gezin.code, token: kindToken, klasCode: klas.code, taal: 'en' });
+  await fnd('/api/foundation/school/taal', { code: gezin.code, token: kindToken, klasCode: klas.code, taal: 'en' });
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -128,7 +128,7 @@ test('de uitkomst is een aanwijzing voor een gesprek, zonder niveau of etiket', 
 
 /* ---------- en door de machine heen ---------- */
 test('zes vragen, dezelfde sommen, en er blijft niets achter', async () => {
-  const start = await kl('/school/taalcheck/start', { leerling: sleutel, doel: 'rekenen.g7.procenten' });
+  const start = await kl('/api/foundation/school/taalcheck/start', { leerling: sleutel, doel: 'rekenen.g7.procenten' });
   assert.equal(start.status, 200, JSON.stringify(start.body).slice(0, 160));
   assert.equal(start.body.totaal, VRAGEN * 2);
   assert.equal(start.body.ronde, 'nl');
@@ -136,13 +136,13 @@ test('zes vragen, dezelfde sommen, en er blijft niets achter', async () => {
 
   // alles fout: dan wijst het naar de stof en niet naar de taal
   let r = start.body;
-  for (let i = 0; i < VRAGEN * 2; i++) r = (await kl('/school/taalcheck/antwoord', { leerling: sleutel, antwoord: 'fout' })).body;
+  for (let i = 0; i < VRAGEN * 2; i++) r = (await kl('/api/foundation/school/taalcheck/antwoord', { leerling: sleutel, antwoord: 'fout' })).body;
   assert.equal(r.klaar, true);
   assert.equal(r.uitkomst.soort, 'stof-zelf');
   assert.match(r.uitleg, /niets vastgelegd/i);
 
   // de sessie is weg: een afgeronde vergelijking blijft niet liggen
-  assert.equal((await kl('/school/taalcheck/antwoord', { leerling: sleutel, antwoord: 'x' })).status, 400);
+  assert.equal((await kl('/api/foundation/school/taalcheck/antwoord', { leerling: sleutel, antwoord: 'x' })).status, 400);
 
   /* En er wordt niets vastgelegd. Dat is op de MODULE gemeten en niet op een
      antwoord: een uitkomst die stil in de database belandt komt niet
@@ -153,7 +153,7 @@ test('zes vragen, dezelfde sommen, en er blijft niets achter', async () => {
   assert.doesNotMatch(bron, /\.taalcheck\s*=|\.taalniveau\s*=/, 'er wordt een uitkomst aan een leerling gehangen');
 
   // een taalvak wordt geweigerd met een uitleg
-  const nee = await kl('/school/taalcheck/start', { leerling: sleutel, doel: 'taal.g7.leestekens' });
+  const nee = await kl('/api/foundation/school/taalcheck/start', { leerling: sleutel, doel: 'taal.g7.leestekens' });
   assert.equal(nee.status, 400);
   assert.match(nee.body.error, /taal zelf/i);
 });

@@ -77,14 +77,26 @@ function generatie() { return generatieTeller; }
    de volledige herbouw). Wacht tot er geen werkkopie open staat, leest, en leest
    OPNIEUW als er ondertussen een eigen commit is gepubliceerd -- anders zet de
    aanroeper een oudere rij over een zojuist gepubliceerde heen. Na de laatste
-   await is er geen werkkopie open, dus de synchrone schrijfstap erna wacht niet. */
+   await is er geen werkkopie open, dus de synchrone schrijfstap erna wacht niet.
+
+   BEGRENSD, en dat was hij niet. Een reeks werkkopieen zonder pauze (of een
+   commit tijdens elke lezing) hield deze lus eindeloos aan de gang, met elke
+   wachtende NOTIFY-pull erbij in het geheugen. Na de grens faalt hij hardop;
+   beide aanroepers (accounts/mirror.js) vallen dan in planAccountHerstel:
+   readiness dicht en alles opnieuw inlezen -- dezelfde weg als elke andere
+   gemiste accountmelding, en nooit een oude rij over een nieuwe heen. */
+const LEES_POGINGEN = 25;
+const LEES_WACHT_MAX = 1000;
 async function leesVers(lees) {
-  for (;;) {
-    while (actief) await wachtVrij();
+  for (let poging = 0; poging < LEES_POGINGEN; poging++) {
+    for (let w = 0; actief && w < LEES_WACHT_MAX; w++) await wachtVrij();
+    if (actief) break;
     const g = generatieTeller;
     const uit = await lees();
     if (!actief && generatieTeller === g) return uit;
   }
+  throw fout('PG_ACCOUNTS_LEES_ONRUSTIG', 'De accountstand bleef veranderen tijdens het inlezen; ' +
+    'de cache wordt volledig opnieuw opgebouwd.');
 }
 function wachtVrij() {
   return actief ? new Promise(r => wachters.push(r)) : Promise.resolve();

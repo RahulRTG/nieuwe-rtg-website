@@ -61,10 +61,23 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1emfcyx:not(#_#_#_){font-size:.7rem;padding:.15rem .5rem}
+.s-1q9bgge:not(#_#_#_){font-size:.72rem;padding:.2rem .55rem}
+.s-1vkfgzy:not(#_#_#_){font-family:monospace;font-size:1.15rem}
+.s-jv64vw:not(#_#_#_){max-width:12rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="labpas" class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div class="ey">RTFoundation &middot; Living Lab</div>
   <h1 id="kop">Mijn onderzoek</h1>
@@ -93,7 +106,7 @@
     <div class="sec">Vragen uit de buurt</div>
     <div class="leeg">Wat zou hier onderzocht moeten worden? Iedereen mag een vraag aandragen en op vragen stemmen.</div>
     <div class="rij">
-      <select class="veld" id="bLab" style="max-width:12rem;" aria-label="Kies een lab"></select>
+      <select class="veld s-jv64vw" id="bLab" aria-label="Kies een lab"></select>
     </div>
     <div class="rij h-mt40">
       <input class="veld" id="bVraag" placeholder="Bijv. Kan deze straat beter omgaan met zware regen?" maxlength="300">
@@ -140,5 +153,13 @@
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

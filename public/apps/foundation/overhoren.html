@@ -49,6 +49,19 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10ksllx:not(#_#_#_){display:flex;gap:.5rem}
+.s-1fpqyo3:not(#_#_#_){width:100%;margin-top:.4rem}
+.s-1vlg7rj:not(#_#_#_){text-align:center;margin:.5rem 0 .1rem;color:var(--zacht);font-size:.8rem}
+.s-4nau5o:not(#_#_#_){padding:.3rem 0 0}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -70,9 +83,9 @@
     <div class="kaart blok">
       <input class="veld" id="mNaam" placeholder="Naam van je lijst (bijv. Frans hoofdstuk 3)" maxlength="60">
       <textarea class="veld h-mt40" id="mParen" placeholder="Elke regel een paar, met = ertussen:&#10;de hond = le chien&#10;de kat = le chat"></textarea>
-      <button class="knop" id="mMaak" style="width:100%;margin-top:.4rem;" data-hoofdactie>Lijst maken</button>
-      <div style="text-align:center;margin:.5rem 0 .1rem;color:var(--zacht);font-size:.8rem;">of laat je buddy er een maken</div>
-      <div style="display:flex;gap:.5rem;">
+      <button class="knop s-1fpqyo3" id="mMaak" data-hoofdactie>Lijst maken</button>
+      <div class="s-1vlg7rj">of laat je buddy er een maken</div>
+      <div class="s-10ksllx">
         <input class="veld h-flex1" id="mOnderwerp" placeholder="Waarover? (bijv. hoofdsteden van Europa)" maxlength="80">
         <button class="knop grijs" id="mAi">Maak</button>
       </div>
@@ -131,7 +144,7 @@
     <div class="kaart blok">
       <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
       <input class="veld h-mt30" id="sCodenaam" placeholder="Of daag uit op codenaam">
-      <div class="leeg" style="padding:.3rem 0 0;">Samen leren maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
+      <div class="leeg s-4nau5o">Samen leren maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <button class="i-15bgfu knop" id="sStart">Daag uit</button>
       <div class="fout" id="sFout"></div>
     </div>

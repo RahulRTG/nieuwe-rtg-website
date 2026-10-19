@@ -142,7 +142,7 @@ function vergeet(k) { laatsteGrootte.delete(k); laatsteLengte.delete(k); laatste
 let naTimer = null;
 function planNaronde(save) {
   if (naTimer) return;
-  naTimer = setTimeout(() => { naTimer = null; try { save(); } catch (e) {} }, GROOT_MS + 50);
+  naTimer = setTimeout(() => { naTimer = null; try { save(); } catch (e) { console.warn('[voorcheck] de naronde niet bewaard:', e && e.message); } }, GROOT_MS + 50);
   if (naTimer.unref) naTimer.unref();
 }
 

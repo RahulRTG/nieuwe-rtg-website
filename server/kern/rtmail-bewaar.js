@@ -23,7 +23,6 @@
    recht EN een reden (kern/rtmail-recht.js), en hij komt altijd in het
    journaal. Een export is een kopie die het systeem verlaat; wie dat stil kan
    doen, heeft geen postvak maar een lek. */
-const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 module.exports = ({ db, save, rtmail, recht, zelfdeMens }) => {
@@ -34,20 +33,10 @@ module.exports = ({ db, save, rtmail, recht, zelfdeMens }) => {
   };
   const kap = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').trim().slice(0, n);
 
-  function B() {
-    if (!db.data.rtmailBewaar || typeof db.data.rtmailBewaar !== 'object')
-      db.data.rtmailBewaar = { vakken: {}, vernietigingen: [] };
-    const b = db.data.rtmailBewaar;
-    if (!b.vakken || typeof b.vakken !== 'object') b.vakken = {};
-    if (!Array.isArray(b.vernietigingen)) b.vernietigingen = [];
-    return b;
-  }
   const beleidVan = (adres) => B().vakken[busVan(adres)] || { dagen: 0, bewaring: null };
-  const store = () => {
-    if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
-    return db.data.rtmail;
-  };
+  const opslag = require('./rtmail-opslag')({ db, save });
+  const store = opslag.postvak; // beperkte post nooit in het gedeelde postvak (./rtmail-opslag.js)
+  const B = opslag.bewaarbak;
   const inVak = (m, bus) => busVan(m.naar) === bus || busVan(m.van) === bus;
   const termijn = require('./rtmail-leidingtermijn')({ B, store, save, busVan, kap, nu, zelfdeMens });
 

@@ -25,6 +25,13 @@ module.exports = ({ db, save, crypto }) => {
   const vensters = () => bak('plaatsVensters');
   const waarnemingen = () => bak('plaatsWaarnemingen');
   const logboek = () => bak('plaatsLog');
+  /* Een lijst VERVANGEN (filteren, kappen). Hier en nergens anders: ./venster.js
+     en ./waarnemen.js deden het eerst zelf in db.data. */
+  const zet = (naam, lijst) => {
+    if (!Array.isArray(lijst)) throw new Error('kern/plaats/opslag: "' + naam + '" hoort een lijst te zijn');
+    db.data[naam] = lijst;
+    return lijst;
+  };
 
   const open = (v) => v && new Date(v.sluit).getTime() > Date.now();
 
@@ -57,6 +64,21 @@ module.exports = ({ db, save, crypto }) => {
     }
   }
 
-  return { nu, id, bak, vensters, waarnemingen, logboek, open, ruim, schrijfLog,
+  /* VERGETEN (AVG art. 17). De drie lijsten hangen aan de codenaam, en de
+     vergeetroute kende ze niet: het actielog bleef 90 dagen staan met elk hek
+     waar dit lid langskwam. Alles hier is van hem alleen, dus het gaat weg --
+     vensters, waarnemingen en log in een keer, zodat er geen waarneming
+     achterblijft waarvan het venster al verdwenen is. */
+  function vergeet(codenaam) {
+    if (!codenaam) return { weg: 0 };
+    const voor = vensters().length + waarnemingen().length + logboek().length;
+    db.data.plaatsVensters = vensters().filter(v => v.codenaam !== codenaam);
+    db.data.plaatsWaarnemingen = waarnemingen().filter(w => w.codenaam !== codenaam);
+    db.data.plaatsLog = logboek().filter(r => r.codenaam !== codenaam);
+    save();
+    return { weg: voor - (vensters().length + waarnemingen().length + logboek().length) };
+  }
+
+  return { nu, id, bak, zet, vensters, waarnemingen, logboek, open, ruim, schrijfLog, vergeet,
     WAARNEEM_MAX, LOG_MAX };
 };

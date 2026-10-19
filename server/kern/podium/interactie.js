@@ -3,9 +3,10 @@
    maandabonnement, en de veiligheid in de zaal (blokkeren gooit de kijker er direct
    uit, en melden bij RTG-kantoor). Krijgt de gedeelde ctx van kern/podium/index.js. */
 module.exports = (ctx) => {
-  const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, isAbonnee, stuurRond, metIdem,
+  const { save, schoon, id, nu, mag, lijsten, kanaalMet, isAbonnee, stuurRond, metIdem,
     codenaamVan, sseToCustomer, sseToOffice, pay, herstelBoom, CADEAUS, CHAT_MAX, ABB_DAGEN,
     zones, poort } = ctx;
+  const P = ctx.opslag; // kern/eigencollectie.js, gebouwd in ./index.js
 
   function chat(key, kid, tekst) {
     const k = kanaalMet(kid); if (!k || !k.live) return { status: 409, error: 'Dit kanaal is nu niet live.' };
@@ -14,8 +15,8 @@ module.exports = (ctx) => {
     if (k.key !== key && !(k.kijkers || {})[key]) return { status: 403, error: 'Kijk eerst mee met dit kanaal.' };
     tekst = schoon(tekst, 300); if (!tekst) return { status: 400, error: 'Leeg bericht.' };
     const regel = { van: key, codenaam: codenaamVan(key), tekst, abonnee: isAbonnee(k, key), maker: k.key === key, at: nu() };
-    const lijst = db.data.podiumChat[k.id] = db.data.podiumChat[k.id] || [];
-    lijst.push(regel); if (lijst.length > CHAT_MAX) db.data.podiumChat[k.id] = lijst.slice(-CHAT_MAX);
+    const C = P.bak('podiumChat'), lijst = C[k.id] = C[k.id] || [];
+    lijst.push(regel); if (lijst.length > CHAT_MAX) C[k.id] = lijst.slice(-CHAT_MAX);
     save(); stuurRond(k, { kind: 'chat', kanaalId: k.id, regel });
     return { status: 200, ok: true, regel };
   }
@@ -35,8 +36,8 @@ module.exports = (ctx) => {
       if (r.error) return { status: r.status || 400, error: r.error };
       k.verdiend = Math.round((k.verdiend || 0) + c.centen);
       const regel = { van: key, codenaam: codenaamVan(key), cadeau: { id: c.id, naam: c.naam, icoon: c.icoon, centen: c.centen }, abonnee: isAbonnee(k, key), at: nu() };
-      const lijst = db.data.podiumChat[k.id] = db.data.podiumChat[k.id] || [];
-      lijst.push(regel); if (lijst.length > CHAT_MAX) db.data.podiumChat[k.id] = lijst.slice(-CHAT_MAX);
+      const C = P.bak('podiumChat'), lijst = C[k.id] = C[k.id] || [];
+      lijst.push(regel); if (lijst.length > CHAT_MAX) C[k.id] = lijst.slice(-CHAT_MAX);
       save(); stuurRond(k, { kind: 'cadeau', kanaalId: k.id, regel });
       return { status: 200, ok: true, regel, saldo: r.saldo };
     });
@@ -80,9 +81,9 @@ module.exports = (ctx) => {
     /* De melding draagt de ZONE mee, want hij hoort in de wachtrij van die
        wereld. Een melding over een 18+-kanaal tussen de schoolstreams zetten,
        is precies de vermenging die deze hele indeling moet voorkomen. */
-    db.data.podiumMeldingen.push({ id: id(), kanaalId: k.id, kanaal: k.naam, zone: zones.zoneVan(k),
+    P.bak('podiumMeldingen').push({ id: id(), kanaalId: k.id, kanaal: k.naam, zone: zones.zoneVan(k),
       van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
-    db.data.podiumMeldingen = db.data.podiumMeldingen.slice(-200);
+    P.zetBak('podiumMeldingen', P.bak('podiumMeldingen').slice(-200));
     save(); sseToOffice('sync', { scope: 'podium' });
     return { status: 200, ok: true };
   }

@@ -322,7 +322,7 @@ async function main() {
      machine. */
   const heleRonde = !ALLEEN.length;
   let norm = null;
-  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) {}
+  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   if (heleRonde && norm && norm.meters) {
     if (VASTLEGGEN) {
       const p = norm.meters[METER], pN = norm.meters[METER_N];

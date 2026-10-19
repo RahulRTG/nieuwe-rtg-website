@@ -26,12 +26,12 @@
   function teken(w, p, ctx) {
     var esc = ctx.esc, T = ctx.T;
     var h = '<div class="st-sec h-mt120">' + T('pu.kop', 'De pols van vandaag') + '</div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:0.5rem;">' +
+    h += '<div class="s-usu03v">' +
       p.meters.map(function (m) {
-        return '<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.05rem;display:block;">' + esc(String(m[1])) + '</b><span class="sub">' + esc(m[0]) + '</span></div>';
+        return '<div class="s-1fk9glc"><b class="s-rxp94n">' + esc(String(m[1])) + '</b><span class="sub">' + esc(m[0]) + '</span></div>';
       }).join('') + '</div>';
     if ((p.signalen || []).length) {
-      h += '<div style="border:1px solid var(--gold);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.6rem;">' +
+      h += '<div class="s-dbbihd">' +
         p.signalen.map(function (s) { return '<div class="sub" style="padding:0.15rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') + '</div>';
     } else {
       h += '<p class="sub h-mt50">' + T('pu.rust', 'Geen signalen; de dag loopt zoals hij hoort.') + '</p>';
@@ -71,10 +71,10 @@
       '<p style="color:#8A8680;margin-top:0;">Polsrapport · ' + new Date().toLocaleDateString('nl-NL') + '</p>' +
       '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">De meters van vandaag</h2>' +
       '<table style="border-collapse:collapse;">' + p.meters.map(function (m) {
-        return '<tr><td style="padding:0.3rem 0.6rem 0.3rem 0;color:#4D4A45;">' + esc(m[0]) + '</td><td style="padding:0.3rem 0;font-weight:600;">' + esc(String(m[1])) + '</td></tr>';
+        return '<tr><td class="s-fuwtu8">' + esc(m[0]) + '</td><td class="s-c40mid">' + esc(String(m[1])) + '</td></tr>';
       }).join('') + '</table>' +
       ((p.signalen || []).length ? '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">Signalen</h2>' +
-        p.signalen.map(function (s) { return '<div style="padding:0.2rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') : '<p>Geen signalen vandaag.</p>') +
+        p.signalen.map(function (s) { return '<div class="s-yhw1rz">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') : '<p>Geen signalen vandaag.</p>') +
       '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">Opgesteld in de zaak-app van RTG; de stand van dit moment.</p>' +
       '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script></body></html>';
     var b = new Blob([h], { type: 'text/html;charset=utf-8' });

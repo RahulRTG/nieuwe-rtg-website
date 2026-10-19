@@ -1,19 +1,20 @@
 {
   "schema": "RTG_CONNECTION_CONSTITUTION",
   "version": 7,
-  "source_sha256": "6bdd3fc0487baebf4bd867cade68789fbb7cffd512c8f60642aab2ac0fa36cb0",
+  "grens": "Een audit op de VORM van de toetsen, niet op hun uitslag: elke proof hier is PROVEN zodra een toets met de genoemde naam in de bron staat en de policy het contract draagt, zonder dat die toets hier is gedraaid. Dat hij slaagt bewijst npm test; dit register bewijst dat hij bestaat en dat geen ongeimplementeerde capability naar buiten staat. De source_sha256 zegt over welke bron dat gold.",
+  "source_sha256": "b36787e519ce6f812b959e6153464f0e91120f56860f0a3b4c8b988113f167b6",
   "tests": {
-    "total": 117,
-    "passed": 117,
+    "total": 120,
+    "passed": 120,
     "failed": 0,
     "baseline_tests": 58,
     "constitution_tests": 8,
     "consent_tests": 4,
     "projection_tests": 8,
-    "product_state_tests": 12,
+    "product_state_tests": 13,
     "edge_experience_tests": 10,
     "profile_media_tests": 8,
-    "final_product_tests": 9
+    "final_product_tests": 11
   },
   "proofs": {
     "default_deny": "PROVEN",

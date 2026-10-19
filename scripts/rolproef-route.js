@@ -114,10 +114,10 @@ wachtOpSchoneBoom();
      rol met een ECHT object-id bereikt de eigenaarschapsvraag zelf -- precies
      de laag waar de kale lijven op 404 strandden. */
   const pool = maakPool();
-  const post = async (pad, lijf, tok) => {
+  const post = async (pad, lijf, tok, extraKoppen) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(extraKoppen || {}) },
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
@@ -175,6 +175,8 @@ wachtOpSchoneBoom();
     supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
   };
   const eigenTokens = { member, supplier, office };
+
+
   const wacht = maakSessiewacht({ post, rollen: Object.fromEntries(Object.keys(versToken).map(rol => [rol, {
     vers: async () => { try { return await versToken[rol](); } catch (e) { return null; } },
     zet: (t) => { eigenTokens[rol] = t; }
@@ -187,9 +189,41 @@ wachtOpSchoneBoom();
   if (wacht.hernieuwd()) console.log('  sessie hernieuwd tijdens de oogstgang : ' + wacht.hernieuwd() +
     '  (deze gang raakt ook de uitlogroutes aan)');
 
+  /* EEN PROEFLID MET EEN GEBONDEN TOESTEL -- ./lib/proeftoestel.js, dezelfde
+     weg als de idempotentieproef. Sinds het bezitsbewijs standaard `verplicht`
+     staat, weigert elk zwaar pad (geld, bank, privacy) de demo-pas met een 403:
+     geen eigen account, dus geen toestel, dus geen handtekening. De ijking van
+     de vingerafdruk doet precies zo'n zware handeling (/api/pay/oplaad) en zag
+     daardoor niets bewegen -- de ronde van 18 oktober 2026 stopte terecht met
+     "DE METER IS BLIND", maar de oorzaak lag bij de client en niet bij de meter.
+
+     De poort blijft zoals hij in productie staat. Alleen de CLIENT wordt echt:
+     op een zwaar pad klopt de ledenrol aan als het proeflid, met een vers
+     bewijs van zijn toestelsleutel in de kop; op elk ander pad verandert er
+     niets, en de verkeerde rollen (office, supplier) kloppen ongetekend aan,
+     zoals een aanvaller dat ook zou doen. Lukt het proeflid niet, dan zegt de
+     ronde dat en meet hij als vanouds -- en dan zegt de ijking opnieuw dat hij
+     blind is, in plaats van te zwijgen.
+
+     NA DE OOGSTGANG, en dat is geen detail. Die gang roept elke schrijfroute
+     met de eigen rol aan, ook /api/privacy/delete, /api/auth/password en
+     /api/mijn/sessies/sluit. Als het proeflid daar al bestaat, doet de gang die
+     handelingen ALS het proeflid, met een geldige handtekening -- en dan is het
+     account weg of de sessie dicht voordat de ijking begint. De gang loopt dus
+     met de demo-pas (zware paden weigeren, zoals altijd), en het proeflid komt
+     pas daarna, voor de kruisronde en de ijking. In de kruisronde komt de
+     ledenrol op een zwaar pad alleen via de vingerafdruk langs; de verkeerde
+     rollen krijgen het proeflid nooit te zien. */
+  const { maakProeflid, metToestellen } = require('./lib/proeftoestel');
+  const proeflid = await maakProeflid({ post, naam: 'Proeflid Rolproef', basis });
+  console.log('  proeflid met een gebonden toestel    : ' + (proeflid.klaar
+    ? 'klaar (' + (proeflid.klaar.codenaam || '?') + (proeflid.klaar.gekeurd ? ', paspoort gekeurd' : ', NIET gekeurd: ' + proeflid.klaar.keurReden) + ')'
+    : 'NIET -- ' + proeflid.reden));
+  const postT = metToestellen(post, { voorLid: { lid: proeflid.klaar, van: () => eigenTokens.member } });
+
   /* tokensVoor leest uit eigenTokens en niet uit de drie constanten van de
      inlog: na de oogstgang kunnen die vervangen zijn. */
-  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ ...eigenTokens }), maxPogingen: MAX,
+  const uit = await draaiRolproef({ post: postT, routes, tokensVoor: () => ({ ...eigenTokens }), maxPogingen: MAX,
     lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf });
 
   if (uit.bevindingen.meterStuk) {

@@ -97,6 +97,40 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-113xzjr:not(#_#_#_){display:flex;justify-content:space-between;margin-top:0.25rem}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-18e8s1e:not(#_#_#_){font-size:.78rem;margin-top:0.5rem}
+.s-1a4wr79:not(#_#_#_){border-color:var(--groen)}
+.s-1eilbb2:not(#_#_#_){font-size:.82rem;line-height:1.5;margin-bottom:0.5rem}
+.s-1fqte8o:not(#_#_#_){border-color:var(--accent-tekst)}
+.s-1kgluco:not(#_#_#_){font-size:.76rem;margin-top:0.25rem}
+.s-1p27b3t:not(#_#_#_){border-color:var(--goud)}
+.s-1smiubo:not(#_#_#_){font-size:.83rem;margin-top:0.25rem}
+.s-1tmya1u:not(#_#_#_){padding:.8rem 1rem}
+.s-9g83p7:not(#_#_#_){font-size:.8rem;margin-top:0.25rem}
+.s-a82pd9:not(#_#_#_){color:var(--goud2);text-decoration:underline}
+.s-bnvo7e:not(#_#_#_){font-size:.85rem;color:var(--zacht)}
+.s-g12u82:not(#_#_#_){color:var(--zacht);font-size:.85rem;margin-bottom:0.5rem}
+.s-iyaud3:not(#_#_#_){color:var(--zacht);font-size:.85rem;margin:0.25rem 0 0.5rem}
+.s-jl9j7m:not(#_#_#_){display:flex;gap:.6rem;margin:0.5rem 0;font-size:.8rem}
+.s-kb0n9k:not(#_#_#_){font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 0.25rem}
+.s-mn09nt:not(#_#_#_){font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht)}
+.s-oi067g:not(#_#_#_){font-size:.83rem}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+.s-prnqfy:not(#_#_#_){font-size:1.4rem}
+.s-rmwfyz:not(#_#_#_){margin:0.5rem 0;padding:.7rem .85rem;background:var(--paneel2)}
+.s-u9auyg:not(#_#_#_){font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem}
+.s-ucmbf0:not(#_#_#_){color:var(--zacht);font-size:.85rem}
+.s-x1ua0f:not(#_#_#_){width:100%;background:#000;color:#fff}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -106,7 +140,7 @@
   <h1>Koopje</h1>
 
   <div class="veiligbalk">
-    <span style="font-size:1.1rem;"></span>
+    <span class="s-prlthd"></span>
     <div><b>Veilig en met respect.</b> Spreek af op een openbare plek, betaal nooit vooruit en houd het gesprek in de app. Verboden waar en kwetsende taal horen hier niet. Twijfel je? Meld of blokkeer.</div>
   </div>
 
@@ -165,10 +199,10 @@
         <button type="button" class="chip" data-lev="verzenden">Verzenden</button>
       </div>
       <label class="vl">Foto's (optioneel)</label>
-      <input type="file" id="pFotos" accept="image/*" multiple style="font-size:.85rem;color:var(--zacht);">
+      <input type="file" id="pFotos" accept="image/*" multiple class="s-bnvo7e">
       <div class="fotorij" id="pFotoVoor"></div>
-      <label class="akkoord"><input type="checkbox" id="pAkkoord"><span>Ik plaats alleen wat is toegestaan, houd het netjes en respectvol, en ga akkoord met de <a href="veilig.html" style="color:var(--goud2);text-decoration:underline;">huisregels</a>.</span></label>
-      <button type="button" class="knop" id="pPlaatsBtn" style="width:100%;">Plaats op Koopje</button>
+      <label class="akkoord"><input type="checkbox" id="pAkkoord"><span>Ik plaats alleen wat is toegestaan, houd het netjes en respectvol, en ga akkoord met de <a href="veilig.html" class="s-a82pd9">huisregels</a>.</span></label>
+      <button type="button" class="knop s-186m9vs" id="pPlaatsBtn">Plaats op Koopje</button>
     </div>
   </div>
 
@@ -297,7 +331,7 @@
       $('#vDetail').innerHTML =
         '<button type="button" class="terug" id="dTerug">← Terug naar het aanbod</button>' +
         '<div class="paneel detail">' + fotos +
-        badge(a.verkoper) + ' <span style="color:var(--zacht);font-size:.85rem;">' + esc(a.verkoper.naam) + '</span>' +
+        badge(a.verkoper) + ' <span class="s-ucmbf0">' + esc(a.verkoper.naam) + '</span>' +
         '<h2>' + esc(a.titel) + '</h2>' +
         '<div class="prijsgroot">' + eur(a.prijs) + '</div>' +
         '<div class="meta"><span>' + catNaam(a.categorie) + '</span><span>' + ({ nieuw: 'Nieuw', zgan: 'Zo goed als nieuw', gebruikt: 'Gebruikt' }[a.staat] || a.staat) + '</span>' +
@@ -405,9 +439,9 @@
       const el = $('#mijnLijst');
       if (!d.ads || !d.ads.length) { el.innerHTML = '<div class="leeg">Je hebt nog niets geplaatst. Ga naar "Plaatsen" om te beginnen.</div>'; return; }
       el.innerHTML = d.ads.map(a =>
-        '<div class="paneel" style="padding:.8rem 1rem;">' +
+        '<div class="paneel s-1tmya1u">' +
         '<div class="mijnkop"><b>' + esc(a.titel) + '</b><span class="statuspil ' + a.status + '">' + a.status + '</span></div>' +
-        '<div style="color:var(--zacht);font-size:.85rem;margin:0.25rem 0 0.5rem;">' + eur(a.prijs) + (a.meldingen ? ' · ' + a.meldingen + ' melding(en)' : '') + '</div>' +
+        '<div class="s-iyaud3">' + eur(a.prijs) + (a.meldingen ? ' · ' + a.meldingen + ' melding(en)' : '') + '</div>' +
         '<div class="acties">' +
         (a.status !== 'verkocht' ? '<button type="button" class="knop grijs klein" data-res="' + a.id + '">Gereserveerd</button><button type="button" class="knop groen klein" data-verk="' + a.id + '">Verkocht</button>' : '<button type="button" class="knop grijs klein" data-heropen="' + a.id + '">Opnieuw te koop</button>') +
         '<button type="button" class="knop rood klein" data-del="' + a.id + '">Verwijder</button></div></div>'
@@ -429,7 +463,7 @@
       const el = $('#postvak');
       if (!d.postvak || !d.postvak.length) { el.innerHTML = '<div class="leeg">Nog geen berichten. Reageer op een advertentie om een gesprek te starten.</div>'; return; }
       el.innerHTML = d.postvak.map(c =>
-        '<button type="button" class="chatrow" data-chat="' + c.id + '"><span style="font-size:1.4rem;"></span>' +
+        '<button type="button" class="chatrow" data-chat="' + c.id + '"><span class="s-prnqfy"></span>' +
         '<div class="ct"><b>' + esc(c.adTitel) + '</b><span>' + esc(c.metNaam) + ': ' + esc(c.laatste) + '</span></div>' +
         '<span class="mini-badge ' + (c.rol === 'verkoper' ? 'gezin' : 'zaak') + '">' + (c.rol === 'verkoper' ? 'Verkoop' : 'Koop') + '</span></button>'
       ).join('');
@@ -444,35 +478,35 @@
     const verkoper = c.rol === 'verkoper';
     if (!d) {
       // nog geen deal: prijs afspreken
-      return '<div class="paneel" style="border-color:var(--accent-tekst);"><b>Veilig samen betalen</b>' +
-        '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
+      return '<div class="paneel s-1fqte8o"><b>Veilig samen betalen</b>' +
+        '<div class="zacht s-u9auyg">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
         '<div class="rijveld"><input class="veld" id="dBedrag" type="number" inputmode="numeric" placeholder="€ prijs"><button type="button" class="knop" id="dAfspreek">Spreek prijs af</button></div></div>';
     }
-    let h = '<div class="paneel" style="border-color:var(--goud);"><b>Deal: € ' + d.bedrag + '</b>';
+    let h = '<div class="paneel s-1p27b3t"><b>Deal: € ' + d.bedrag + '</b>';
     if (d.betaald) {
-      return '<div class="paneel" style="border-color:var(--groen);"><b>Betaald: € ' + d.bedrag + '</b>' +
-        '<div class="zacht" style="font-size:.83rem;margin-top:0.25rem;">Via ' + (d.methode === 'apple-pay' ? 'Apple Pay' : d.methode) + '. Factuur ' + esc(d.factuur ? d.factuur.nummer : '') + '.</div></div>';
+      return '<div class="paneel s-1a4wr79"><b>Betaald: € ' + d.bedrag + '</b>' +
+        '<div class="zacht s-1smiubo">Via ' + (d.methode === 'apple-pay' ? 'Apple Pay' : d.methode) + '. Factuur ' + esc(d.factuur ? d.factuur.nummer : '') + '.</div></div>';
     }
     // status voor het samenkomen
-    h += '<div style="display:flex;gap:.6rem;margin:0.5rem 0;font-size:.8rem;">' +
+    h += '<div class="s-jl9j7m">' +
       '<span class="' + (d.ikGedeeld ? '' : 'zacht') + '">' + (d.ikGedeeld ? 'jij bent er' : '○ jij: nog niet') + '</span>' +
       '<span class="' + (d.anderGedeeld ? '' : 'zacht') + '">' + (d.anderGedeeld ? 'de ander is er' : '○ de ander: nog niet') + '</span></div>';
     if (!d.samen) {
-      h += '<div class="zacht" style="font-size:.82rem;line-height:1.5;margin-bottom:0.5rem;">Zijn jullie samen bij de overhandiging? Deel je locatie. Zodra beide locaties dichtbij zijn, komt de factuur vrij.' +
+      h += '<div class="zacht s-1eilbb2">Zijn jullie samen bij de overhandiging? Deel je locatie. Zodra beide locaties dichtbij zijn, komt de factuur vrij.' +
         (d.ikGedeeld && d.anderGedeeld && d.afstand != null ? ' (nu ~' + d.afstand + ' m uit elkaar)' : '') + '</div>' +
-        '<button type="button" class="knop" id="dHier" style="width:100%;">Ik ben hier (deel locatie)</button>';
-      if (verkoper) h += '<div class="zacht" style="font-size:.78rem;margin-top:0.5rem;">De koper betaalt zodra jullie samen zijn.</div>';
+        '<button type="button" class="knop s-186m9vs" id="dHier">Ik ben hier (deel locatie)</button>';
+      if (verkoper) h += '<div class="zacht s-18e8s1e">De koper betaalt zodra jullie samen zijn.</div>';
     } else {
       // samen: factuur + betalen
-      h += '<div class="paneel" style="margin:0.5rem 0;padding:.7rem .85rem;background:var(--paneel2);">' +
-        '<div style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);">Factuur</div>' +
-        '<div style="display:flex;justify-content:space-between;margin-top:0.25rem;"><span>' + esc(d.factuur ? d.factuur.nummer : '') + '</span><b>€ ' + d.bedrag + '</b></div>' +
-        '<div class="zacht" style="font-size:.8rem;margin-top:0.25rem;">' + esc(c.adTitel || '') + '</div></div>';
+      h += '<div class="paneel s-rmwfyz">' +
+        '<div class="s-mn09nt">Factuur</div>' +
+        '<div class="s-113xzjr"><span>' + esc(d.factuur ? d.factuur.nummer : '') + '</span><b>€ ' + d.bedrag + '</b></div>' +
+        '<div class="zacht s-9g83p7">' + esc(c.adTitel || '') + '</div></div>';
       if (d.magBetalen) {
-        h += '<button type="button" class="knop" id="dPay" style="width:100%;background:#000;color:#fff;"> Apple Pay · € ' + d.bedrag + '</button>' +
-          '<div class="zacht" style="font-size:.76rem;margin-top:0.25rem;">Je betaalt rechtstreeks via je account aan de verkoper.</div>';
+        h += '<button type="button" class="knop s-x1ua0f" id="dPay"> Apple Pay · € ' + d.bedrag + '</button>' +
+          '<div class="zacht s-1kgluco">Je betaalt rechtstreeks via je account aan de verkoper.</div>';
       } else {
-        h += '<div class="zacht" style="font-size:.83rem;">Jullie zijn samen. De koper kan nu via Apple Pay betalen.</div>';
+        h += '<div class="zacht s-oi067g">Jullie zijn samen. De koper kan nu via Apple Pay betalen.</div>';
       }
     }
     return h + '</div>';
@@ -482,8 +516,8 @@
     function render(c) {
       $('#vChat').innerHTML =
         '<button type="button" class="terug" id="cTerug">← Terug naar berichten</button>' +
-        '<div class="paneel"><h2 style="font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 0.25rem;">' + esc(c.adTitel || '') + '</h2>' +
-        '<div style="color:var(--zacht);font-size:.85rem;margin-bottom:0.5rem;">met ' + esc(c.metNaam || '') + '</div>' +
+        '<div class="paneel"><h2 class="s-kb0n9k">' + esc(c.adTitel || '') + '</h2>' +
+        '<div class="s-g12u82">met ' + esc(c.metNaam || '') + '</div>' +
         '<div class="chat" id="cBerichten">' + (c.berichten || []).map(b =>
           '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '"' + (b.systeem ? ' style="align-self:center;background:var(--paneel2);border:1px solid var(--goud);color:var(--goud2);font-size:.82rem;"' : '') + '>' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">let op: nooit vooruit betalen</span>' : '') + '</div>'
         ).join('') + '</div>' +

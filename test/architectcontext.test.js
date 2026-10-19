@@ -20,10 +20,23 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const A = require('../scripts/lib/codearchitect');
+const { invoerVersheid } = require('../scripts/lib/invoerspoor');
 
 const WORTEL = path.join(__dirname, '..');
 const { taken } = require('./fixtures/contextijking.json');
 const lezer = A.maakLezer();
+
+/* `vers` is de enige eis die van de OMGEVING afhangt: de symboolmeting is
+   alleen actueel onder de Node-hoofdversie waarmee hij gemeten is
+   (scripts/lib/invoerspoor.js). Lokaal en in CI (.nvmrc) kan dat verschillen,
+   en de vastlegging zakte dan om beurten aan een van beide kanten. De
+   vastlegging noemt `vers` daarom niet; hij hoort erbij precies wanneer de
+   symboolmeting hier niet aantoonbaar actueel is. */
+const symboolActueel = invoerVersheid(require('../SYMBOLEN.json').stempel, { wortel: WORTEL }).stand === 'actueel';
+function verwachtOntbreekt(t) {
+  const vast = t.ontbreekt.filter((e) => e !== 'vers');
+  return A.TAAKKLASSEN[t.taakklasse].eist.includes('vers') && !symboolActueel ? vast.concat('vers') : vast;
+}
 
 test('1. vijf ijktaken, elk met de vastgelegde uitslag, en elke onvoldoende met reden', () => {
   assert.equal(taken.length, 5);
@@ -32,7 +45,7 @@ test('1. vijf ijktaken, elk met de vastgelegde uitslag, en elke onvoldoende met 
     const c = A.context(lezer, t.taakklasse, t.onderwerp);
     const v = c.voldoendheid;
     assert.equal(v.uitslag, t.verwacht, t.id + ': ' + JSON.stringify(v.ontbreekt));
-    assert.deepEqual(v.ontbreekt.map((o) => o.eis), t.ontbreekt, t.id);
+    assert.deepEqual(v.ontbreekt.map((o) => o.eis), verwachtOntbreekt(t), t.id);
     for (const o of v.ontbreekt) assert.ok(o.reden && o.reden.length > 10, t.id + ' ' + o.eis + ' zonder reden');
     if (v.uitslag === 'onvoldoende') onvoldoende++;
   }

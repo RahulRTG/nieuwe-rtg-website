@@ -82,6 +82,9 @@ module.exports = (sctx) => {
     return null;
   }
 
+  /* De uitvoering per handeling staat in ./handeling-uitvoering.js, naast de lijst. */
+  const voerUit = require('./handeling-uitvoering')({ rid, nu, zetWie: (...a) => sctx.zetWie(...a) });
+
   /* ---------- 1. het plan ---------- */
   app.post('/api/bedrijf/handeling/plan', (req, res) => {
     const g = werkPoort(req, res); if (!g) return;
@@ -149,7 +152,7 @@ module.exports = (sctx) => {
       return res.status(403).json({ error: 'U had het recht "' + h.recht + '" toen dit plan werd gemaakt, en nu niet meer. Er is niets uitgevoerd.', recht: h.recht });
     }
 
-    const uit = voerUit(g, plan, h);
+    const uit = voerUit(g, plan);
     delete P(g.w)[plan.id];                       // een plan is voor EEN keer
 
     const bon = { id: rid(5), handeling: plan.handeling, bedoeling: plan.bedoeling,
@@ -166,29 +169,6 @@ module.exports = (sctx) => {
     res.json({ ok: true, actiebon: bon, resultaat: uit.resultaat,
       let: 'Uitgevoerd, en vastgelegd in een actiebon. Die staat ook in het journaal van deze werkruimte.' });
   });
-
-  /* De uitvoering zelf. Elke handeling schrijft in de bak waar dat soort al
-     woonde -- er komt geen tweede opslag naast de modules, want dan staat
-     dezelfde taak op twee plekken. */
-  function voerUit(g, plan, h) {
-    if (plan.handeling === 'taak.maak') {
-      const T = (g.w.taken = g.w.taken || {});
-      const t = { id: rid(5), titel: plan.velden.titel, projectId: null, ouderId: null,
-        omschrijving: null, deadline: null, prioriteit: 'normaal', kolom: 'te doen',
-        wachtOp: [], uren: 0, sprint: null, at: nu(), door: plan.door };
-      sctx.zetWie(g.w, t, 'wie', plan.door);
-      T[t.id] = t;
-      return { ok: true, resultaat: t, verwijzing: { soort: 'taak', id: t.id, titel: t.titel } };
-    }
-    if (plan.handeling === 'ticket.maak') {
-      const S = (g.w.tickets = g.w.tickets || {});
-      const t = { id: rid(5), titel: plan.velden.titel, klantId: null, prioriteit: 'normaal',
-        status: 'open', reacties: [], at: nu(), door: plan.door };
-      S[t.id] = t;
-      return { ok: true, resultaat: t, verwijzing: { soort: 'ticket', id: t.id, titel: t.titel } };
-    }
-    return { ok: false, status: 409, reden: 'Deze handeling heeft geen uitvoering.', verwijzing: null };
-  }
 
   /* ---------- 3. de bonnen ---------- */
   app.post('/api/bedrijf/handeling/bonnen', (req, res) => {

@@ -81,6 +81,21 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/rtg-eten-uitgaan-2026.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-16gpxl2:not(#_#_#_){color:var(--muted);margin-top:0.5rem;line-height:1.6}
+.s-16j2h7l:not(#_#_#_){min-width:2.5rem;text-align:center;font-size:1.05rem}
+.s-1ik90f3:not(#_#_#_){font-family:'Bodoni Moda',serif;font-size:1.3rem}
+.s-1prfxw6:not(#_#_#_){margin-top:0.75rem;gap:1rem;align-items:flex-end}
+.s-z2auej:not(#_#_#_){font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -123,13 +138,13 @@
 <section class="blad" id="blad" aria-label="Reserveren">
   <div class="blad-kop">
     <button class="terug" id="bladTerug">← Food Court</button>
-    <div><div class="ey" id="bladMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey s-z2auej" id="bladMeta"></div><h1 id="bladNaam" class="s-1ik90f3"></h1></div>
   </div>
   <div class="paneel">
     <div id="bladDeal"></div>
-    <div class="rij" style="margin-top:0.75rem;gap:1rem;align-items:flex-end;">
+    <div class="rij s-1prfxw6">
       <div><label class="lbl" for="rDatum">Datum</label><input class="veld" id="rDatum" type="date"></div>
-      <div><div class="lbl">Gezelschap</div><div class="step"><button type="button" id="rMin" aria-label="Een persoon minder">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus" aria-label="Een persoon meer">+</button></div></div>
+      <div><div class="lbl">Gezelschap</div><div class="step"><button type="button" id="rMin" aria-label="Een persoon minder">−</button><span id="rAantal" class="s-16j2h7l">2</span><button type="button" id="rPlus" aria-label="Een persoon meer">+</button></div></div>
     </div>
     <div class="sec">Vrije tijden</div>
     <div id="rSlots"><div class="leeg">Kies een datum.</div></div>
@@ -164,8 +179,8 @@ const api = (pad, body, herkans) => fetch(pad, {
   if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; } return d; });
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De Food Court is er voor leden. Open de app en log in met je RTG-account.</p>'+
+  $('#main').innerHTML = '<div class="inlog"><h2 class="s-14jo6ez">Log eerst in</h2>'+
+    '<p class="s-16gpxl2">De Food Court is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 }
 

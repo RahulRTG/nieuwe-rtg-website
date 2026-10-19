@@ -42,6 +42,17 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-17h3obv:not(#_#_#_){background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem 0 0}
+.s-1papx63:not(#_#_#_){font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -65,19 +76,19 @@
 
   <div class="deel">Als het misgaat</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Als het echt misgaat</h2>
+    <h2 class="s-1papx63">Als het echt misgaat</h2>
     <p class="hulp">Ben je afgeperst, bestolen of staat er iets van jou online dat er niet hoort te staan: <b>zeg het tegen een volwassene die je vertrouwt</b>, ook als je je schaamt en ook als je zelf iets stoms hebt gedaan. Bewaar de berichten en maak schermafbeeldingen voordat je iets blokkeert; dat is later je bewijs. Betaal nooit, want betalen stopt het bijna nooit. In Nederland kun je terecht bij de politie (aangifte kan ook online), bij de Kindertelefoon voor een gesprek, en bij Helpwanted voor hulp bij beeld dat verspreid wordt. Deze app geeft algemene uitleg, geen juridisch advies.</p>
   </div>
 
   <div class="deel">Sparren</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Even sparren over schermen?</h2>
+    <h2 class="s-1papx63">Even sparren over schermen?</h2>
     <div class="chat" id="chat"><div class="b ai">Vragen over schermen, games of appgroepen? Vertel maar, ik denk zonder preken mee.</div></div>
     <div class="rijveld">
       <textarea class="veld" id="vraag" rows="1" placeholder="Waar loop je tegenaan?" maxlength="1000"></textarea>
       <button class="knop klein" id="stuur">Stuur</button>
     </div>
-    <div class="mini" style="background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard. Vragen naar je wachtwoord doe ik nooit.</div>
+    <div class="mini s-17h3obv">Wat je hier typt wordt niet bewaard. Vragen naar je wachtwoord doe ik nooit.</div>
   </div>
 </div>
 

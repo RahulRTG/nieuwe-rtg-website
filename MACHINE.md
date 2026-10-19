@@ -93,7 +93,7 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->246<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->244<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
 | mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->324<!--/getal--> | `kern/kantoor/kluispoort.js` |
@@ -115,7 +115,7 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2714<!--/getal--> van de
+1. <!--getal:machine.zonderAs-->2723<!--/getal--> van de
    <!--getal:machine.muterend-->4130<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
@@ -221,9 +221,9 @@ afgehandeld (**World Model** is bezet met zes betekenissen en heet hier
 levensgraaf, **Capability Mesh** half, **Trust Kernel** half, **Intent Engine**
 vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven die
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
-<!--getal:semantiek.namen-->132<!--/getal--> namen in meer dan één domein heeft,
-waarvan <!--getal:semantiek.betekenissen-->114<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->427<!--/getal-->
+<!--getal:semantiek.namen-->133<!--/getal--> namen in meer dan één domein heeft,
+waarvan <!--getal:semantiek.betekenissen-->115<!--/getal--> met meer dan één
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->432<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).

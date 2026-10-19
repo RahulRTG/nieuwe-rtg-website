@@ -34,7 +34,7 @@
 const fs = require('fs');
 const path = require('path');
 const { alleRoutes } = require('./lib/routes');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
@@ -117,7 +117,7 @@ if (require.main !== module) return;
 
 const uit = meet();
 if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); return; }
-fs.writeFileSync(path.join(WORTEL, 'LAATSPOOR.json'), JSON.stringify(uit, null, 1) + '\n');
+if (magSchrijven(eisSchoneBoom('laatspoor'), 'LAATSPOOR.json')) fs.writeFileSync(path.join(WORTEL, 'LAATSPOOR.json'), JSON.stringify(uit, null, 1) + '\n');
 console.log('\n=== EEN SPOOR NA EEN WEIGERING ===\n');
 console.log('  schrijfroutes onderzocht : ' + uit.gemeten.routes);
 console.log('  VERDACHT                 : ' + uit.gemeten.verdacht);

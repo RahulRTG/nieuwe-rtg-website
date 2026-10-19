@@ -150,7 +150,9 @@ module.exports = (ctx) => {
 
   const api = { collecties, toon, vanZaak, SOORTEN, MAX_REGELS };
   // samenstellen en verwijderen staan in ./collecties-beheer.js
-  Object.assign(api, require('./collecties-beheer')(ctx, { bak: () => bak(true), toon, SOORTEN, MAX_REGELS, MAX_PER_ZAAK, isDatum, schoonTekst }));
+  // zet(): de lijst vervangen (kap op 2000) gaat ook door bak()'s deur, en niet langs db.data
+  const zet = (lijst) => { if (!Array.isArray(lijst)) throw new Error('mall/collecties: een lijst'); db.data.mallCollecties = lijst; };
+  Object.assign(api, require('./collecties-beheer')(ctx, { bak: () => bak(true), zet, toon, SOORTEN, MAX_REGELS, MAX_PER_ZAAK, isDatum, schoonTekst }));
   ctx.collecties = api;
   return { mallCollecties: api };
 };

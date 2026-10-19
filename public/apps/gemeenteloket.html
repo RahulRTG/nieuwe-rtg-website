@@ -66,16 +66,29 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-104g3mn:not(#_#_#_){padding:.2rem .55rem}
+.s-9cvirx:not(#_#_#_){width:100%;min-height:3rem;resize:vertical}
+.s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
+.s-xrzp1e:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="gemeenteloket" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div class="ey">Gemeente-medewerker</div><h1 id="titel">RTG Gemeente-loket</h1>
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem;">Log in als medewerker van de gemeente met je persoonlijke pincode.</p>
+    <p class="s-xrzp1e">Log in als medewerker van de gemeente met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden...</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="i-186m9v knop prim" id="loginGo" data-hoofdactie>Inloggen</button>
@@ -91,7 +104,7 @@
       <div class="item">
         <h3>Nieuwe bekendmaking</h3>
         <div class="lbl">Titel</div><input class="i-186m9v veld" id="bekTitel" maxlength="120">
-        <div class="lbl">Tekst</div><textarea class="veld" id="bekTekst" maxlength="800" style="width:100%;min-height:3rem;resize:vertical;"></textarea>
+        <div class="lbl">Tekst</div><textarea class="veld s-9cvirx" id="bekTekst" maxlength="800"></textarea>
         <div class="lbl">Soort</div>
         <select class="veld" id="bekSoort"><option value="algemeen">Algemeen</option><option value="raad">Raad</option><option value="verkeer">Verkeer</option><option value="vergunning">Vergunning</option></select>
         <div class="rij"><button class="knop" id="bekGo">Plaatsen</button></div>
@@ -104,7 +117,7 @@
 <div class="melding" id="melding" role="status"></div>
 <button class="rahulfab" id="rahulFab" type="button" style="display:none;">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
-  <div class="rahulkop"><b>Rahul · gemeentebalie</b><button class="knop stil" id="rahulSluit" type="button" aria-label="Sluiten" style="padding:.2rem .55rem;">✕</button></div>
+  <div class="rahulkop"><b>Rahul · gemeentebalie</b><button class="knop stil s-104g3mn" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
   <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Vraag om een briefing of een actie" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
@@ -262,7 +275,7 @@ async function laadMeldingen(){
     '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+' · '+esc(m.ploeg)+'</h4>'+
     '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder)+'</div>'+
     '<div class="rij"><select class="veld st">'+MELD_ST.map(s => '<option'+(s===m.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
-    '<input class="veld upd" placeholder="Update voor de melder" style="flex:1;min-width:8rem;">'+
+    '<input class="veld upd s-jwt5vg" placeholder="Update voor de melder">'+
     '<button class="knop zet">Opslaan</button></div></div>').join('') : '<div class="leeg">Geen open meldingen.</div>';
   $('#p-meld').querySelectorAll('.item').forEach(it => it.querySelector('.zet').addEventListener('click', async () => {
     try { await api('/api/gemeente/melding/zet', { ref: it.dataset.ref, patch: { status: it.querySelector('.st').value, update: it.querySelector('.upd').value.trim() } });
@@ -284,7 +297,7 @@ async function laadVergunningen(){
   $('#p-verg').innerHTML = l.length ? l.map(v =>
     '<div class="item" data-ref="'+esc(v.ref)+'"><h4>'+esc(v.soortLabel)+'</h4><div class="meta">'+esc(v.omschrijving)+(v.locatie?' · '+esc(v.locatie):'')+' · '+esc(v.aanvrager||'')+'</div>'+
     '<span class="status">'+esc(v.status)+'</span>'+
-    '<div class="rij"><input class="veld vw" placeholder="Voorwaarde (optioneel)" style="flex:1;min-width:8rem;">'+
+    '<div class="rij"><input class="veld vw s-jwt5vg" placeholder="Voorwaarde (optioneel)">'+
     '<button class="knop bes" data-b="verleend">Verlenen</button>'+
     '<button class="knop rood bes" data-b="geweigerd">Weigeren</button></div></div>').join('') : '<div class="leeg">Geen openstaande aanvragen.</div>';
   $('#p-verg').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
@@ -319,5 +332,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

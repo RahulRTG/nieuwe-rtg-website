@@ -126,7 +126,22 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
       waarschuwingen: r.waarschuwingen.slice(0, 3).map(w => ({ tijd: w.tijd, knooppunt: w.knooppunt, kans: w.kans })) };
   }
 
-  return { flitsMeld: meld, flitsStem: stem, flitsRond: rond, flitsVooruit: vooruit, flitsVerbodenIn };
+  /* ---- vergeten (AVG art. 17) ----
+     Een melding is de plek waar dit lid was, met zijn codenaam erop, en een
+     stem draagt zijn sleutel. Zijn eigen meldingen gaan weg (ze leven hooguit
+     een dag, en zonder melder bewijzen ze niets meer); uit de meldingen van
+     anderen gaat alleen zijn stem. */
+  function vergeet(key, codenaam) {
+    const rij = lijst();
+    const houd = rij.filter(m => !(m && codenaam && m.door === codenaam));
+    for (const m of houd) if (m && Array.isArray(m.stemmers)) m.stemmers = m.stemmers.filter(k => k !== key);
+    eigen.zetBak('flitsMeldingen', houd);
+    laatsteMelder.delete(key);
+    save();
+    return { weg: rij.length - houd.length };
+  }
+
+  return { flitsMeld: meld, flitsStem: stem, flitsRond: rond, flitsVooruit: vooruit, flitsVerbodenIn, flitsVergeet: vergeet };
 }
 
 module.exports = { maakFlits };

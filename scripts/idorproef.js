@@ -118,7 +118,12 @@ const NAGEKEKEN = {
   'POST /api/meet/maak': 'meet.meetMaak(req.session.key, ...) maakt een NIEUWE vergadering voor B; het id uit het lijf wijst niets aan',
   'POST /api/mijn/post/zet': 'commercieel.zet(req.session.key, soort, kanalen) zet B\'s EIGEN posttoestemming per soort; een soort is een categorie en geen object',
   'POST /api/opvang/vraag': 'de code is de openbare code van een opvang; de aanvraag komt op B\'s eigen codenaam (opvangwijzerVraag(sess, codenaam, ...))',
-  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B'
+  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B',
+  /* De ronde van 18 oktober 2026 (na de integratie van het toetsenspoor): drie
+     nieuwe kandidaten, met de hand nagelezen, alle drie B die iets van B doet. */
+  'POST /api/auth/aanmeldkanaal': 'leest alleen req.session.account (de eigen ledenstand) en het gekozen kanaal; een `id` in het lijf wordt nergens gelezen',
+  'POST /api/member/magnaat/stad/maak': 'stad.maak(req.session.key, b) leest uit het lijf alleen moeilijkheid en begin en maakt een NIEUWE stad met een verse code; een meegestuurde code wijst niets aan',
+  'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
@@ -130,15 +135,54 @@ if (require.main !== module) { module.exports = {}; return; }
   const server = await start({ naam: 'idor', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
 
-  const post = async (pad, lijf, tok) => {
+  const kaal = async (pad, lijf, tok, koppen) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(koppen || {}) },
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
       return { status: r.status, data, tekst };
     } catch (e) { return { status: 0, data: null, tekst: String(e.message) }; }
+  };
+
+  /* A EN B MET EEN GEBONDEN TOESTEL -- ./lib/proeftoestel.js, dezelfde weg als
+     De Beproeving, de rolproef en de tredeproef (18 oktober 2026).
+
+     Zonder toestel kon deze proef op de ZWARE paden (kern/identiteit/
+     bezitspaden.js: geld, bank, privacy, sessies, het herstelkanaal) A en B
+     niet kruisen: elke vraag strandde aan de toesteldeur met `bezitsbewijs:
+     'vereist'`, voor A in de oogstgang net zo goed als voor B -- dus er werd
+     niets geoogst en niets geprobeerd, en de eigenaarschapsvraag bleef daar
+     ongesteld (scripts/lib/idor.js telt die weigering terecht als
+     onbereikbaar). Precies op de paden waar een lek het duurst is, zei het
+     register niets.
+
+     De poort blijft zoals in productie. Alleen de CLIENT wordt echt: beide
+     leden binden een toestel aan hun EIGEN sessie, en elk zwaar verzoek draagt
+     een vers bewijs van de sleutel die bij DAT token hoort. B tekent dus met
+     B's toestel -- een aanvaller heeft zijn eigen toestel, niet dat van A -- en
+     de vraag op een zwaar pad wordt daarmee weer: mag B met zijn eigen, geldige
+     toestel bij het object van A?
+
+     DE BINDING HOORT BIJ DE SESSIE, dus elke verse sessie bindt opnieuw. Deze
+     proef loopt langs /api/logout, /api/mijn/toestel/introk en
+     /api/privacy/delete; de sessiewacht haalt dan een nieuwe sessie of een nieuw
+     lid, en zonder herbinding zou de rest van de gang weer stil aan de
+     toesteldeur blijven. Lukt een binding niet, dan staat dat met de reden in
+     het register (`gemeten.toestel`), en dan telt de toesteldeur weer als
+     onbereikbaar -- eerlijk ongemeten, nooit als scheiding. */
+  const { bindToestel, metToestellen } = require('./lib/proeftoestel');
+  const { zwaarPad } = require('../server/kern/identiteit/bezitsbewijs');
+  const toestelVan = new Map();
+  const toestelStand = { gebonden: 0, gekeurd: 0, mislukt: [] };
+  const post = metToestellen(kaal, { toestellen: () => [...toestelVan.values()] });
+  const bind = async (n, tok) => {
+    if (!tok) return tok;
+    const t = await bindToestel({ post: kaal, token: tok, naam: 'IDOR-toestel lid ' + n });
+    if (t.klaar) { toestelVan.set(tok, t.klaar); toestelStand.gebonden++; }
+    else toestelStand.mislukt.push('lid ' + n + ': ' + t.reden);
+    return tok;
   };
 
   /* TWEE ECHTE LEDEN. auth/register geeft elk een eigen user-sleutel; alleen
@@ -153,7 +197,15 @@ if (require.main !== module) { module.exports = {}; return; }
       name: 'IDOR Lid ' + n, email, phone: '06123456' + (10 + n), password: wachtwoord,
       geboortedatum: '1990-01-0' + n, pasApp: 'rtg' });
     geheugen[n] = { email, wachtwoord };
-    return r.data && r.data.token;
+    const tok = r.data && r.data.token;
+    if (!tok) return tok;
+    /* Gekeurd, zoals een echt lid dat geld beweegt: RTG Pay vraagt eenmalig het
+       paspoort, en zonder keuring zou A op de betaalpaden niets oogsten. De
+       keuring loopt langs de echte weg (test/helper.js keurLidGoed). */
+    const user = r.data.state && r.data.state.user;
+    try { await require('../test/helper').keurLidGoed(basis, tok, user && user.codename); toestelStand.gekeurd++; }
+    catch (e) { toestelStand.mislukt.push('lid ' + n + ' niet gekeurd: ' + e.message); }
+    return bind(n, tok);
   };
   let A = await maakLid(1);
   let B = await maakLid(2);
@@ -201,7 +253,7 @@ if (require.main !== module) { module.exports = {}; return; }
   let vervangen = 0;
   const versLid = async (n) => {
     const r = await post('/api/auth/login', { login: geheugen[n].email, password: geheugen[n].wachtwoord });
-    if (r.data && r.data.token) return r.data.token;
+    if (r.data && r.data.token) return bind(n, r.data.token);
     if (vervangen >= 6) return null;              // begrensd: een route die elk lid wist, moet opvallen
     vervangen++;
     return maakLid(n);
@@ -441,6 +493,17 @@ if (require.main !== module) { module.exports = {}; return; }
   klaar();
 
   const doorbraken = Object.entries(perRoute).filter(([, v]) => v.staat === 'doorbraak');
+  /* DE ZWARE PADEN APART GETELD: dat is waar het toestel voor is, en een totaal
+     over 2000 routes laat niet zien of juist die nu gekruist zijn. `aanDeDeur`
+     telt wat nog steeds aan de toesteldeur strandde -- blijft dat hoog terwijl
+     het toestel gebonden is, dan tekent de client verkeerd. */
+  const zwaar = { routes: 0, gescheiden: 0, doorbraak: 0, nagekeken: 0, publiek: 0, onbereikbaar: 0, aanDeDeur: 0 };
+  for (const [sleutel, v] of Object.entries(perRoute)) {
+    if (!zwaarPad(sleutel.split(' ')[1])) continue;
+    zwaar.routes++;
+    zwaar[v.staat] = (zwaar[v.staat] || 0) + 1;
+    if (/bezitsbewijs vereist/.test(v.reden || '')) zwaar.aanDeDeur++;
+  }
   const uit = {
     stempel: stempel(),
     uitleg: 'Twee echte leden met dezelfde rol: A oogst objecten (objectpool), B probeert ze te ' +
@@ -451,7 +514,8 @@ if (require.main !== module) { module.exports = {}; return; }
       'alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.',
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
-        herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen },
+        herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
+      toestel: toestelStand, zwarePaden: zwaar },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute
@@ -465,6 +529,9 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  onbereikbaar (geen id/validatie): ' + telling.onbereikbaar);
   console.log('  weigering die een persoonsveld lekt: ' + telling.lek);
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');
+  console.log('  toestel: ' + toestelStand.gebonden + ' bindingen, ' + toestelStand.gekeurd + ' gekeurd' +
+    (toestelStand.mislukt.length ? ', MISLUKT: ' + toestelStand.mislukt.join('; ') : ''));
+  console.log('  zware paden: ' + JSON.stringify(zwaar));
   console.log('\n  WERKPLEK-POORT (de objectpoort-routes), geijkt op de eigenaar:');
   console.log('    gescheiden (eigenaar erin, B eruit): ' + werkplekTelling.gescheiden);
   console.log('    doorbraak (B kwam ook binnen)       : ' + werkplekTelling.doorbraak);

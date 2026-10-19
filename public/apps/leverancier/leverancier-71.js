@@ -32,9 +32,9 @@
         const r = await API.call('/supplier/paspoort/vraag', { codenaam, niveau: 'bevestiging', minLeeftijd: min });
         const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
         uit.innerHTML = ok
-          ? '<b style="color:var(--rtg-leesgroen,var(--green,#7ecb8f));font-size:1rem;">'+esc(codenaam)+' '+T('dorp.lft.ja','is')+' '+min+'+</b>'
-          : '<b style="color:var(--burgundy,#C23A5E);font-size:1rem;">'+esc(codenaam)+' '+T('dorp.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
-      } catch(e){ uit.innerHTML = '<b style="color:var(--burgundy,#C23A5E);">'+esc(e.message)+'</b>'; }
+          ? '<b class="s-13791xt">'+esc(codenaam)+' '+T('dorp.lft.ja','is')+' '+min+'+</b>'
+          : '<b class="s-1f73nxk">'+esc(codenaam)+' '+T('dorp.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
+      } catch(e){ uit.innerHTML = '<b class="s-1cx07o7">'+esc(e.message)+'</b>'; }
     }));
     // het logmoment: een tik en het staat geklokt als afgeronde post
     el.querySelectorAll('.js-dactie').forEach(b => b.addEventListener('click', async () => {
@@ -75,7 +75,7 @@
       return '<button class="mb-room' + (mbRoom === r ? ' on' : '') + '" data-mbroom="' + r.replace(/"/g,'&quot;') + '">' + (done ? '✓ ' : '') + r + '</button>';
     }).join('') + '</div>';
     if (mbRoom){
-      html += '<div style="margin-top:0.75rem;font-size:0.74rem;color:var(--soft);">' + T('mb.howmany','Hoeveel is er gebruikt uit') + ' ' + mbRoom + '?</div>';
+      html += '<div class="s-vm08fj">' + T('mb.howmany','Hoeveel is er gebruikt uit') + ' ' + mbRoom + '?</div>';
       html += mb.catalog.map(m => {
         const q = mbQty[m.id] || 0;
         return '<div class="mb-item"><div class="mi"><b>' + m.name + '</b><span>' + eur(m.price) + '</span></div>' +
@@ -92,17 +92,17 @@
     const notCounted = rooms.filter(r => !mb.countedToday.includes(r));
     html += '<div class="card"><div class="tt-h">' + T('mb.today','Vandaag geteld') + ' (' + mb.countedToday.length + '/' + rooms.length + ')</div>' +
       (notCounted.length
-        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--amber);">' + T('mb.todo','Nog tellen:') + ' ' + notCounted.join(', ') + '</div>'
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--rtg-leesgroen,var(--green));">✓ ' + T('mb.alldone','Alle kamers zijn vandaag geteld.') + '</div>') +
+        ? '<div class="s-g6iei2">' + T('mb.todo','Nog tellen:') + ' ' + notCounted.join(', ') + '</div>'
+        : '<div class="s-1hjg3ow">✓ ' + T('mb.alldone','Alle kamers zijn vandaag geteld.') + '</div>') +
       (mb.recent.length ? mb.recent.map(e =>
         '<div class="pos-sale"><div><b>' + e.room + '</b><span>' + (e.items.length ? e.items.map(i => i.qty + 'x ' + i.name).join(', ') : T('mb.nothing','niets gebruikt')) + ' · ' + e.actor + ' · ' + timeAgo(e.at) + '</span></div>' +
-        '<div class="amt" style="font-family:\'Bodoni Moda\',serif;">' + (e.total ? eur(e.total) : '') + '</div></div>').join('') : '') +
+        '<div class="amt s-14jo6ez">' + (e.total ? eur(e.total) : '') + '</div></div>').join('') : '') +
       '</div>';
 
     // catalogus
     html += '<div class="card"><div class="tt-h">' + T('mb.catalog','Catalogus') + '</div>' +
-      mb.catalog.map(m => '<div class="pos-sale"><div><b>' + m.name + '</b></div><div class="row-mid-gap"><span class="amt" style="font-family:\'Bodoni Moda\',serif;">' + eur(m.price) + '</span><button class="rr-del" data-mbdel="' + m.id + '">✕</button></div></div>').join('') +
-      '<div class="tt-add"><input id="mbName" placeholder="' + T('mb.newitem','Nieuw artikel') + '" style="flex:2;min-width:110px;"><input id="mbPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:60px;"><button id="mbAdd">' + T('team.add','Toevoegen') + '</button></div></div>';
+      mb.catalog.map(m => '<div class="pos-sale"><div><b>' + m.name + '</b></div><div class="row-mid-gap"><span class="amt s-14jo6ez">' + eur(m.price) + '</span><button class="rr-del" data-mbdel="' + m.id + '">✕</button></div></div>').join('') +
+      '<div class="tt-add"><input id="mbName" placeholder="' + T('mb.newitem','Nieuw artikel') + '" class="s-7sjb3"><input id="mbPrice" type="number" inputmode="decimal" placeholder="€" class="s-jwqj8c"><button id="mbAdd">' + T('team.add','Toevoegen') + '</button></div></div>';
 
     el.innerHTML = html;
     el.querySelectorAll('[data-mbroom]').forEach(b => b.addEventListener('click', () => { mbRoom = b.dataset.mbroom; mbQty = {}; renderMinibar(); openTab('minibar'); }));

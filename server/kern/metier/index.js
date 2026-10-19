@@ -33,13 +33,9 @@ module.exports = ({ db, save, liveCodename, codenaamVan, findSupplier }) => {
   const PAGINA = 20;
   const nu = () => new Date().toISOString();
 
+  const opslag = require('./opslag')({ db }); // de deur naar db.data.metier
   function S() {
-    if (!db.data.metier || typeof db.data.metier !== 'object') db.data.metier = {};
-    const m = db.data.metier;
-    for (const k of ['profiel', 'aanbeveling', 'onderschrijving', 'naamvrij', 'inzagelog']) {
-      if (!m[k] || typeof m[k] !== 'object') m[k] = {};
-    }
-    return m;
+    return opslag.wortel(['profiel', 'aanbeveling', 'onderschrijving', 'naamvrij', 'inzagelog']);
   }
 
   const leegProfiel = () => ({ kop: '', over: '', plaats: '', open: false, rollen: [], vaardigheden: [], talen: [], portfolio: [], bij: null });

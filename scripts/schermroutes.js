@@ -212,7 +212,14 @@ try {
   const rauw = rb.alleRoutes || (rb.perRoute || []).map(r => r.route);
   bekend = new Set(rauw.map(r => r.split(' ').slice(1).join(' ')));
   routebronStempel = rb.stempel || null;
-} catch (e) { /* geen routerwaarheid: dan wordt er niets dood verklaard */ }
+} catch (e) {
+  /* GEEN routerwaarheid: dan wordt er niets dood verklaard, en dat is de
+     voorzichtige kant. Maar alleen als het register er NIET is. Een register
+     dat er staat en niet parseert, is geen afwezig register: dan meldt deze
+     meter "geen enkele dode route" omdat hij de routelijst niet kon lezen, en
+     dat is een meting die liegt (scripts/stillezing.js). */
+  if (!e || e.code !== 'ENOENT') throw new Error('ROUTEBRON.json is onleesbaar (' + (e && e.message) + '); de schermroutes verklaren niets dood op een kapot register');
+}
 
 const naarScherm = new Map();
 const dood = [], basis = new Set();

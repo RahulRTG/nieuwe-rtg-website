@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-19T19:06:09.169Z",
-    "commit": "6083f652",
+    "op": "2026-10-18T09:37:13.307Z",
+    "commit": "b7696160",
     "boomVuil": false,
-    "boomAnders": 31,
+    "boomAnders": 2,
     "instrument": "scripts/wekkers.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "hoe": "npm run wekkers:vast",
   "grens": "Dit vindt ingangen aan hun PATROON in de code (setInterval, subscribe, createServer, spawn) plus de verklaarde webhooks. Wat hij NIET aantoont: dat een gevonden wekker ook echt loopt, en dat de lijst compleet is -- een ingang in een vorm die hier niet staat, bestaat voor deze meter niet. Een wekker BINNEN de envelop van een functie gaat bovendien niet vanzelf uit als die functie uit gaat.",
-  "gemetenOp": "2026-09-19",
+  "gemetenOp": "2026-10-18",
   "meetAlleen": "deze meter blokkeert niets; hij loopt in de schaduw (CONTROLPLANE.md: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen)",
   "aiIsGeenGat": "kern/stuur.js r.130 roept zijn paden aan met fetch('http://127.0.0.1:'+poort+pad): de AI gaat over echte HTTP en komt dus langs dezelfde functieschakelaars als een mens",
   "watDitNietZegt": "een wekker IN de envelop van een functie wordt niet automatisch uitgezet als die functie uit gaat -- de schakelaar staat op de route, niet op de timer. De nul is wel hard: nul functies betekent dat niets hem raakt.",
-  "wekkers": 61,
+  "wekkers": 65,
   "perSoort": {
-    "KLOK": 39,
+    "KLOK": 42,
     "BUS": 7,
-    "LUISTERAAR": 11,
+    "LUISTERAAR": 12,
     "WERKER": 4
   },
   "webhooks": [
@@ -48,7 +48,9 @@
   "functieUitMaarUitvoerbaarAltijd": 1,
   "zonderTrede": 0,
   "zonderTredeLijst": [],
-  "verklaringenOngebruikt": [],
+  "verklaringenOngebruikt": [
+    "server/opzet/diensten2.js"
+  ],
   "ongeschakeldLijst": [],
   "lijst": [
     {
@@ -171,6 +173,15 @@
       "trede": null
     },
     {
+      "soort": "KLOK",
+      "bestand": "server/lib/auditwacht.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de periodieke integriteitscontrole van de auditketens (audit P1-4); een wacht op het spoor die je uit kunt zetten, meldt een vervalsing nooit meer -- en wie hem uitzet is precies wie het spoor wil laten breken",
+      "trede": null
+    },
+    {
       "soort": "WERKER",
       "bestand": "server/lib/cdp.js",
       "aantal": 1,
@@ -213,15 +224,6 @@
       "functies": 0,
       "welke": [],
       "verklaard": "de TLS-kant van diezelfde voordeur",
-      "trede": null
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/opzet/diensten2.js",
-      "aantal": 1,
-      "functies": 0,
-      "welke": [],
-      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
       "trede": null
     },
     {
@@ -441,13 +443,23 @@
     },
     {
       "soort": "KLOK",
-      "bestand": "server/kern/zaakdoos/index.js",
+      "bestand": "server/kern/wacht/index.js",
       "aantal": 1,
       "functies": 1,
       "welke": [
-        "dom-doos"
+        "office"
       ],
       "trede": "alles"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/stroomtoegang.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "kern-live"
+      ],
+      "trede": "start"
     },
     {
       "soort": "KLOK",
@@ -471,7 +483,7 @@
     },
     {
       "soort": "KLOK",
-      "bestand": "server/routes/supplier.js",
+      "bestand": "server/routes/supplier/prplus.js",
       "aantal": 1,
       "functies": 1,
       "welke": [
@@ -481,7 +493,7 @@
     },
     {
       "soort": "KLOK",
-      "bestand": "server/routes/supplier/prplus.js",
+      "bestand": "server/routes/supplier/stroom.js",
       "aantal": 1,
       "functies": 1,
       "welke": [
@@ -502,79 +514,39 @@
     },
     {
       "soort": "KLOK",
+      "bestand": "server/kern/aanmeldingen/naargast.js",
+      "aantal": 1,
+      "functies": 3,
+      "welke": [
+        "office",
+        "ondernemersos",
+        "tg-aanmeld"
+      ],
+      "trede": "alles"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/zaakdoos/index.js",
+      "aantal": 1,
+      "functies": 3,
+      "welke": [
+        "supplier",
+        "office",
+        "dom-doos"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
       "bestand": "server/kern/webmaker-plan.js",
       "aantal": 1,
       "functies": 5,
       "welke": [
         "supplier",
         "office",
-        "dom-site",
         "ov-browser",
+        "dom-site",
         "dom-eigendomein"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/server.js",
-      "aantal": 1,
-      "functies": 5,
-      "welke": [
-        "supplier",
-        "kern-meldingen",
-        "kern-live",
-        "tg-zegel",
-        "kern-taal"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/kern/payroll/bijwerken.js",
-      "aantal": 1,
-      "functies": 7,
-      "welke": [
-        "supplier",
-        "office",
-        "member",
-        "staff",
-        "command-zien",
-        "command-doen",
-        "command-besturen"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "BUS",
-      "bestand": "server/kern/sessies.js",
-      "aantal": 1,
-      "functies": 9,
-      "welke": [
-        "supplier",
-        "member",
-        "tg-inlog",
-        "staff",
-        "verificatie",
-        "dom-fluister",
-        "stuur",
-        "tg-zegel"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/kern/bank/index.js",
-      "aantal": 2,
-      "functies": 14,
-      "welke": [
-        "supplier",
-        "office",
-        "dom-bank-spaardoel",
-        "dom-bank-inzicht",
-        "dom-bank-vastelasten",
-        "dom-rekening",
-        "dom-bank-rekening-open",
-        "dom-bank-storten"
       ],
       "trede": "partners"
     },
@@ -582,16 +554,33 @@
       "soort": "KLOK",
       "bestand": "server/kern/agenda-ics.js",
       "aantal": 1,
-      "functies": 17,
+      "functies": 16,
       "welke": [
         "supplier",
         "office",
         "member",
         "rtf-contacten",
-        "kern-meldingen",
+        "foundation",
         "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "werk-rtf",
+        "levenos"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/bank/index.js",
+      "aantal": 2,
+      "functies": 16,
+      "welke": [
+        "supplier",
+        "office",
+        "ondernemersos",
+        "bedrijf",
+        "dom-bank-spaardoel",
+        "dom-bank-inzicht",
+        "dom-bank-vastelasten",
+        "dom-rekening"
       ],
       "trede": "partners"
     },
@@ -599,16 +588,16 @@
       "soort": "BUS",
       "bestand": "server/kern/link/rem.js",
       "aantal": 1,
-      "functies": 17,
+      "functies": 16,
       "welke": [
         "supplier",
         "office",
         "member",
-        "kern-meldingen",
-        "kern-live",
         "levenos",
         "staff",
-        "ov-browser"
+        "ov-browser",
+        "leerhuis",
+        "ov-mail-binnen"
       ],
       "trede": "partners"
     },
@@ -616,16 +605,16 @@
       "soort": "KLOK",
       "bestand": "server/foundation/berichten.js",
       "aantal": 1,
-      "functies": 18,
+      "functies": 17,
       "welke": [
         "supplier",
         "office",
         "member",
         "rtf-contacten",
-        "kern-meldingen",
+        "foundation",
         "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "werk-rtf",
+        "levenos"
       ],
       "trede": "partners"
     },
@@ -633,16 +622,33 @@
       "soort": "KLOK",
       "bestand": "server/foundation/onderwijs/les.js",
       "aantal": 1,
-      "functies": 18,
+      "functies": 17,
       "welke": [
         "supplier",
         "office",
         "member",
         "rtf-contacten",
-        "kern-meldingen",
+        "foundation",
         "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "werk-rtf",
+        "levenos"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/payroll/bijwerken.js",
+      "aantal": 1,
+      "functies": 17,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "foundation",
+        "foundation-school",
+        "staff",
+        "bedrijf",
+        "zakelijk"
       ],
       "trede": "partners"
     },
@@ -650,16 +656,50 @@
       "soort": "KLOK",
       "bestand": "server/school/bellen.js",
       "aantal": 1,
-      "functies": 18,
+      "functies": 17,
       "welke": [
         "supplier",
         "office",
         "member",
         "rtf-contacten",
-        "kern-meldingen",
+        "foundation",
         "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "werk-rtf",
+        "levenos"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/rtc/relaystand.js",
+      "aantal": 1,
+      "functies": 23,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "foundation",
+        "dom-werkplek",
+        "werk-rtf",
+        "levenos"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/kern/rtc/turnclient.js",
+      "aantal": 1,
+      "functies": 23,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "foundation",
+        "dom-werkplek",
+        "werk-rtf",
+        "levenos"
       ],
       "trede": "partners"
     },
@@ -672,11 +712,28 @@
         "supplier",
         "office",
         "betalen",
-        "dom-bank-spaardoel",
-        "dom-bank-inzicht",
-        "dom-bank-vastelasten",
         "supplier-pos",
-        "dom-pay-wallet"
+        "fs-werk",
+        "dom-pay-wallet",
+        "fs-terrein",
+        "dom-bank-spaardoel"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/kern/sessies.js",
+      "aantal": 1,
+      "functies": 27,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "foundation",
+        "dom-werkplek",
+        "werk-rtf",
+        "levenos"
       ],
       "trede": "partners"
     },
@@ -684,16 +741,16 @@
       "soort": "BUS",
       "bestand": "server/kern/intreksignaal.js",
       "aantal": 1,
-      "functies": 50,
+      "functies": 54,
       "welke": [
         "supplier",
         "office",
         "member",
         "rtf-contacten",
-        "kern-meldingen",
+        "foundation",
         "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "werk-rtf",
+        "levenos"
       ],
       "trede": "partners"
     },
@@ -701,16 +758,16 @@
       "soort": "KLOK",
       "bestand": "server/kern/command/tikker.js",
       "aantal": 1,
-      "functies": 207,
+      "functies": 211,
       "welke": [
         "supplier",
         "office",
         "member",
         "rtf-contacten",
-        "kern-meldingen",
+        "foundation",
         "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "werk-rtf",
+        "levenos"
       ],
       "trede": "partners"
     }

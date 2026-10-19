@@ -174,3 +174,23 @@ test('9. de kijker mag de selectie beperken tot wat hij kan volgen', async () =>
     'je eigen werk verdwijnt niet uit je eigen lijst, ook niet met het filter aan');
   assert.equal(alleen.body.einde, 'Dat was het voor nu.', 'de selectie houdt zijn expliciete einde');
 });
+
+/* 10. /api/clips/aanwezig: de maker meldt dat zijn clips op zijn toestel klaarstaan.
+   Alleen EIGEN clips worden aangenomen -- een kijker die andermans id meestuurt,
+   zet die maker niet online en krijgt hem niet terug in `geaccepteerd`.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/clips.js `c.key === key` uit de
+   voorwaarde gehaald; de toets zakte op "andermans clip neemt hij niet aan". */
+test('10. aanwezig: alleen de eigen clips gaan online, en zonder sessie niets', async () => {
+  const eigen = await api('/api/clips/maak', { titel: 'Aanwezig-toets', duurS: 5, poster: POSTER }, maker);
+  assert.equal(eigen.status, 200);
+  const r = await api('/api/clips/aanwezig', { ids: [eigen.body.id, 'bestaat-niet'] }, maker);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.geaccepteerd.length, 1, 'een van de twee ids wordt aangenomen');
+  assert.deepEqual(r.body.geaccepteerd, [eigen.body.id], 'alleen de eigen, bestaande clip');
+  assert.ok(r.body.ttlS > 0, 'de aanwezigheid verloopt vanzelf');
+
+  const vreemd = await api('/api/clips/aanwezig', { ids: [eigen.body.id] }, kijker);
+  assert.equal(vreemd.status, 200);
+  assert.deepEqual(vreemd.body.geaccepteerd, [], 'andermans clip neemt hij niet aan');
+  assert.equal((await api('/api/clips/aanwezig', { ids: [eigen.body.id] }, null)).status, 401);
+});

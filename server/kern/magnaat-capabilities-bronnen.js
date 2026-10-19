@@ -11,8 +11,8 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 const { isDeepStrictEqual } = require('node:util');
+const routes = require('./magnaat-capabilities-routes');
 
-const API_RE = /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*(['"`])([^'"`]+)\2/g;
 const waarschuwingen = new Set();
 
 function waarschuwEenmaal(sleutel, boodschap) {
@@ -47,16 +47,6 @@ function titelVanBestand(bestand) {
   return tekst(titel ? titel[1].split(/[·|]/)[0] : path.basename(bestand, '.html'));
 }
 
-function toegangVan(bron, einde) {
-  const kop = bron.slice(einde, einde + 240).split(/=>|\{/)[0];
-  if (/boardroomAuth/.test(kop)) return 'boardroom';
-  if (/officeAuth/.test(kop)) return 'office';
-  if (/staffAuth/.test(kop)) return 'staff';
-  if (/supplierAuth/.test(kop)) return 'supplier';
-  if (/auth/.test(kop)) return 'member';
-  return 'publiek';
-}
-
 function scanApps(root) {
   return bestanden(path.join(root, 'public/apps'), '.html').map(bestand => ({
     pad: '/' + path.relative(path.join(root, 'public'), bestand).split(path.sep).join('/'),
@@ -66,22 +56,9 @@ function scanApps(root) {
 }
 
 function scanEndpoints(root) {
-  const uniek = new Map();
-  for (const bestand of bestanden(path.join(root, 'server'), '.js')) {
-    const bron = lees(bestand);
-    API_RE.lastIndex = 0;
-    let m;
-    while ((m = API_RE.exec(bron))) {
-      if (!m[3].startsWith('/api/')) continue;
-      const sleutel = m[1].toUpperCase() + ' ' + m[3];
-      uniek.set(sleutel, {
-        sleutel, methode: m[1].toUpperCase(), route: m[3],
-        bestand: path.relative(root, bestand).split(path.sep).join('/'),
-        toegang: toegangVan(bron, API_RE.lastIndex)
-      });
-    }
-  }
-  return [...uniek.values()].sort((a, b) => a.sleutel.localeCompare(b.sleutel));
+  const bronnen = new Map();
+  for (const bestand of bestanden(path.join(root, 'server'), '.js')) bronnen.set(bestand, lees(bestand));
+  return routes.scanEndpoints(root, bronnen);
 }
 
 function leesKantoren(root, functies) {

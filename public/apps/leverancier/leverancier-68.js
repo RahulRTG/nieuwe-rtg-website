@@ -23,14 +23,14 @@
     let html = '';
     // dienststatus + schakelaars
     html += '<div class="card"><div class="tt-h">'+T('bz.dienst','De dienst')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.85rem;color:'+(b.aan?'var(--green)':'var(--soft)')+';">'+
+      '<div class="' + (b.aan ? 's-ahxg3t' : 's-2t82vw') + '">'+
       (b.aan ? '\u25CF ' + T('bz.open','Open: leden kunnen bestellen.') : '\u25CB ' + T('bz.dicht','Gesloten: leden zien u niet in de bestellijst.'))+'</div>'+
-      (canEdit ? '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;">'+
+      (canEdit ? '<div class="s-d7civ9">'+
         '<button class="obtn'+(b.aan?'':' primary')+'" data-bzaan="'+(b.aan?'0':'1')+'">'+(b.aan?T('bz.zetdicht','Dienst sluiten'):T('bz.zetopen','Dienst openen'))+'</button>'+
         '<button class="obtn" data-bzk="ophalen" data-bzv="'+(b.ophalen?'0':'1')+'">'+(b.ophalen?'\u2713 ':'')+T('bz.ophalen','Ophalen')+'</button>'+
         '<button class="obtn" data-bzk="bezorgen" data-bzv="'+(b.bezorgen?'0':'1')+'">'+(b.bezorgen?'\u2713 ':'')+T('bz.bezorgen','Bezorgen')+'</button>'+
       '</div>' : '')+
-      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--soft);">'+T('bz.vandaag','Vandaag afgerond:')+' <b>'+(b.vandaagKlaar||0)+'</b></div></div>';
+      '<div class="s-n64piw">'+T('bz.vandaag','Vandaag afgerond:')+' <b>'+(b.vandaagKlaar||0)+'</b></div></div>';
     // lopende leveringen met statusknoppen
     const lopend = b.lopend || [];
     html += '<div class="card"><div class="tt-h">'+T('bz.lopend','Lopende leveringen')+' ('+lopend.length+')</div>'+
@@ -41,7 +41,7 @@
         if (o.status === 'nieuw') knop = '<button class="obtn" data-bzord="'+o.ref+'" data-st="in bereiding">'+T('bz.bereiden','In bereiding')+'</button>';
         else if (o.status === 'in bereiding') knop = '<button class="obtn" data-bzord="'+o.ref+'" data-st="klaar">'+T('bz.klaar','Klaar')+'</button>';
         else if (o.status === 'klaar' && o.levering === 'ophalen') knop = '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="opgehaald">'+T('bz.opgehaald','Opgehaald')+'</button>';
-        else if (o.status === 'klaar' && o.levering === 'bezorgen') knop = o.bezorger ? '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="onderweg">'+T('bz.vertrek','Onderweg')+'</button>' : '<span style="font-size:0.72rem;color:var(--soft);">'+T('bz.wachtbez','wacht op een bezorger (PDA)')+'</span>';
+        else if (o.status === 'klaar' && o.levering === 'bezorgen') knop = o.bezorger ? '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="onderweg">'+T('bz.vertrek','Onderweg')+'</button>' : '<span class="s-9uxsi">'+T('bz.wachtbez','wacht op een bezorger (PDA)')+'</span>';
         else if (o.status === 'onderweg') knop = '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="bezorgd">'+T('bz.bezorgd','Bezorgd')+'</button>';
         return '<div class="mitem"><div class="r1"><span class="nm">'+(o.levering==='bezorgen'?'\uD83D\uDEF5':'\uD83E\uDDFA')+' '+esc(o.customerCodename)+' \u00B7 '+T('bz.st.'+o.status, BZ_ST[o.status]||o.status)+wie+eta+'</span><span class="pr">'+eur(o.total)+'</span></div>'+
           '<div class="ds">'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+(o.levering==='bezorgen'&&o.adres?' \u00B7 \uD83D\uDCCD '+esc(o.adres):' \u00B7 '+T('bz.code','code')+' <b>'+o.pickup+'</b>')+'</div>'+
@@ -95,9 +95,9 @@
     const el = $('#receptieWrap'); if (!el) return;
     let r; try { r = await API.call('/supplier/receptie', {}); } catch(e){ el.innerHTML = ''; return; }
     const leeg = !r.aanvragen.length && !r.aankomsten.length && !r.inHuis.length && !r.komend.length;
-    const rij = (v, knoppen, sub) => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.5rem;font-size:0.82rem;flex-wrap:wrap;" data-vb="'+v.id+'">'+
+    const rij = (v, knoppen, sub) => '<div class="s-18ylv35" data-vb="'+v.id+'">'+
       '<span><b class="cn">'+esc(v.codenaam)+'</b> · '+esc(v.roomName)+' · '+(sub||v.aankomst+' tot '+v.vertrek+' · '+v.personen+'p · '+eur(v.totaal))+
       (v.notitie?' ·  '+esc(v.notitie):'')+
-      (v.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(v.zorg))+'</span>':'')+'</span>'+
-      (knoppen?'<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+knoppen+'</span>':'')+
+      (v.zorg?'<span class="s-12agxa1">'+esc(zorgTekst(v.zorg))+'</span>':'')+'</span>'+
+      (knoppen?'<span class="s-1wrzvzr">'+knoppen+'</span>':'')+
     '</div>';

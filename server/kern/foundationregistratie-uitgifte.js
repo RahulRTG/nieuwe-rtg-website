@@ -5,16 +5,11 @@
 'use strict';
 
 module.exports = ({ db, crypto, nu, rid }) => {
-  function os() {
-    if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
-    for (const k of ['steden','vrijwilligers','partners']) if (!Array.isArray(db.data.rtfos[k])) db.data.rtfos[k] = [];
-    return db.data.rtfos;
-  }
-  function scholen() {
-    if (!db.data.foundation || typeof db.data.foundation !== 'object') db.data.foundation = {};
-    if (!db.data.foundation.scholen || typeof db.data.foundation.scholen !== 'object') db.data.foundation.scholen = {};
-    return db.data.foundation.scholen;
-  }
+  // twee deuren: Foundation OS (./rtfos/opslag.js) en de RTFoundation (../foundation/opslag.js)
+  const rtfosOpslag = require('./rtfos/opslag')({ db });
+  const foundationOpslag = require('../foundation/opslag')({ db });
+  const os = () => rtfosOpslag.wortel(['steden', 'vrijwilligers', 'partners']);
+  const scholen = () => foundationOpslag.tak('scholen');
   function uniekeCode(prefix, bestaand) {
     const tekens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code;

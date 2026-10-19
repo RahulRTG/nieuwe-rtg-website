@@ -29,9 +29,9 @@
     try { lijst = (await call('/aanmelding/lijst', { status: 'in behandeling' })).aanmeldingen || []; } catch(e){ return; }
     el.innerHTML = lijst.length ? lijst.map(a => {
       const gedaan = (a.reis || []).map(s => s.naam).join(' · ');
-      const uitnod = a.viaUitnodiging ? ' <span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.7rem;">op uitnodiging</span>' : '';
+      const uitnod = a.viaUitnodiging ? ' <span class="s-1pyr07c">op uitnodiging</span>' : '';
       return '<div class="vrow" data-id="'+a.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
+        '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span class="s-1caek87">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
           '<div class="sub">'+escHtml(a.contact||'')+'</div>' +
           '<div class="sub" style="color:var(--soft);">'+T('bo.aanmklaar','AI klaar')+': '+escHtml(gedaan)+'</div></div>' +
         '<button class="vbtn ok" data-ok>'+T('bo.accept','Accepteren')+'</button>' +
@@ -50,9 +50,9 @@
       const eur = n => '€ ' + (Math.round(Number(n))).toLocaleString('nl-NL');
       if (b && b.aantalLeden) {
         el.insertAdjacentHTML('beforeend',
-          '<div style="margin-top:0.75rem;border-top:1px solid var(--line,#2a2a2a);padding-top:.6rem;font-size:0.8rem;color:var(--soft);line-height:1.7;">' +
-          '<b style="color:var(--txt);">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
-          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(b.totaal.foundation)+'</b> ('+
+          '<div class="s-1n8k5z6">' +
+          '<b class="s-1btm41d">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
+          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b class="s-12itpbj">'+eur(b.totaal.foundation)+'</b> ('+
           T('bo.aanmlokaal','20% lokaal')+' '+eur(b.totaal.lokaal)+' &middot; '+T('bo.aanmrtf','10% RTF')+' '+eur(b.totaal.rtf)+')</div>');
       }
     } catch(e){}

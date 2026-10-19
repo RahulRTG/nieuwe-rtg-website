@@ -74,7 +74,7 @@ test('elke catalogus-app achter een werkrol of pas vindt zijn ingang in de gids,
   }
   assert.ok(gedekt >= 20, 'te weinig beperkte catalogus-apps gevonden (' + gedekt + '); is de lezer stuk?');
   const menu = fs.readFileSync(path.join(WORTEL, 'public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js'), 'utf8');
-  assert.match(menu, /poort && poort\(app\.url\) === false/, 'het menu vraagt de poort niet');
+  assert.match(menu, /poort && poort\(app\.url, app\) === false/, 'het menu vraagt de poort niet');
   const app29d = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-29d.js'), 'utf8');
   assert.match(app29d, /window\.RTGAppCatalogusPoort = [\s\S]*?gidsToegang\(id\)/, 'de poort is niet die van de gids');
 });
@@ -111,4 +111,25 @@ test('de gemeten werkrol-schermen hebben een ingang met hun werkrol in de gids, 
     }
   }
   assert.equal(n, 55);
+});
+
+/* De gezinsrol is een regel op een plek: een catalogusscherm dat op de
+   gezinsprofielsessie draait (het laadt apps/foundation/sessie.js) draagt
+   `gezinssessie`, en de poort toont het alleen met een sessie, behalve de deur.
+   Geen ander scherm draagt de vlag. */
+test('de gezinsrol: de catalogus draagt de vlag uit het scherm, de poort volgt hem op een plek', () => {
+  const apps = require('../public/shared/interface/world-widget-catalog.json').apps;
+  for (const a of apps) {
+    const html = fs.readFileSync(path.join(WORTEL, 'public', a.url.split(/[?#]/)[0]), 'utf8');
+    const laadt = a.url.startsWith('/apps/foundation/') && /<script[^>]*\ssrc="(?:\/apps\/foundation\/)?sessie\.js"/.test(html);
+    assert.equal(!!a.gezinssessie, laadt, a.id + ': de vlag gezinssessie volgt het scherm niet');
+  }
+  for (const id of ['foundation-zakgeld', 'foundation-arena', 'foundation-societeit', 'foundation-school', 'foundation-index'])
+    assert.ok(apps.find((a) => a.id === id).gezinssessie, id + ' draagt de vlag niet');
+  for (const id of ['foundation-wegwijzer', 'foundation-os-deelnemer', 'foundation-winkel', 'foundation-onveilig', 'foundation-registreren'])
+    assert.ok(!apps.find((a) => a.id === id).gezinssessie, id + ' draait niet op de gezinssessie en hoort de vlag niet te dragen');
+  const app29d = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-29d.js'), 'utf8');
+  assert.match(app29d, /app && app\.gezinssessie && doel\.split\('#'\)\[0\] !== GEZINSDEUR \? gezinssessie\(\) : null/, 'de poort volgt de gezinsrol niet');
+  assert.match(app29d, /const GEZINSDEUR = '\/apps\/foundation\/index\.html'/);
+  assert.match(app29d, /gezinsPoort,\s+rtfPoort, rtfSpeler/, 'de regel noemt de serverpoorten niet die hij volgt');
 });

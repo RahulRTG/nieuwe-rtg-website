@@ -728,7 +728,8 @@
         "Wie gaat mee"
       ],
       "description": "Alle afspraken van het gezin op een rij, voor iedereen zichtbaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-arena",
@@ -746,7 +747,8 @@
         "Spelregels"
       ],
       "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-babyboek",
@@ -764,7 +766,8 @@
         "Herinneringen"
       ],
       "description": "De eerste momenten in een boekje, met zinnen die vanzelf mooi worden.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-beheer",
@@ -782,7 +785,8 @@
         "Bericht of oproep sturen"
       ],
       "description": "De mensen en gesprekken die voor u tellen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-beroepen",
@@ -800,7 +804,8 @@
         "Opleidingsroutes"
       ],
       "description": "Wat je later kunt worden: honderden beroepen, eerlijk beschreven.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-bieb",
@@ -818,7 +823,8 @@
         "Uw volgende keuze"
       ],
       "description": "Gratis kind- en gezinsapps van de RTFoundation.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-bord",
@@ -836,7 +842,8 @@
         "Agenda en huiswerk"
       ],
       "description": "Een bord met kaartjes: ideeen, plannen en wat af is.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-budget",
@@ -854,7 +861,8 @@
         "Ruimte om te sparen"
       ],
       "description": "Wat komt binnen, wat gaat eruit, wat houd je over; rekent mee terwijl je typt.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-buurtruil",
@@ -890,7 +898,8 @@
         "Vier verbonden werelden"
       ],
       "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-club",
@@ -908,7 +917,8 @@
         "Contact"
       ],
       "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-clubswerk",
@@ -944,7 +954,8 @@
         "Gedeelde momenten"
       ],
       "description": "De mensen en gesprekken die voor u tellen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-cv",
@@ -962,7 +973,8 @@
         "Opleiding + Toevoegen"
       ],
       "description": "Je eerste cv, in nette zinnen, klaar om te versturen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-dromen",
@@ -980,7 +992,8 @@
         "Samen bespreken"
       ],
       "description": "Waar het gezin van droomt, bewaard en af en toe teruggelezen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-geld-later",
@@ -998,7 +1011,8 @@
         "Uw route. Uw toekomst."
       ],
       "description": "Begrijp uw geld van vandaag en vind een rustige route naar leren, studie en werk.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-geld",
@@ -1016,7 +1030,8 @@
         "Vraag het je geldmaatje"
       ],
       "description": "Snappen wat geld is en wat dingen kosten, spelenderwijs.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-geloofbieb",
@@ -1034,7 +1049,8 @@
         "Uw leesplek"
       ],
       "description": "Alle tradities als gelijken naast elkaar, met echte leesbare teksten.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-geven",
@@ -1070,7 +1086,8 @@
         "Even praten"
       ],
       "description": "Tik het gezichtje aan dat bij je past; er wordt niets opgeslagen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-gezondheid-welzijn",
@@ -1088,7 +1105,8 @@
         "Een ritme dat bij u past."
       ],
       "description": "Vandaag, uw eigen ritme en echte zorgcontacten rustig bij elkaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-gezondheid",
@@ -1106,7 +1124,8 @@
         "Medische informatie"
       ],
       "description": "Medicijnen, afspraken en groeicurve.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-hulpwijzer",
@@ -1124,7 +1143,8 @@
         "Hulp vinden"
       ],
       "description": "Welke hulp bestaat er, en waar klop je aan? Alles op een rij.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-index",
@@ -1142,7 +1162,8 @@
         "Uw ontwikkeling"
       ],
       "description": "Gratis hulp voor je gezin: alles wat de RTFoundation biedt op één plek.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-kantoor",
@@ -1178,7 +1199,8 @@
         "Vaste boodschappen"
       ],
       "description": "Wat eten we: recepten, boodschappen en de weekplanning.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-klas",
@@ -1196,7 +1218,8 @@
         "Terugkijken"
       ],
       "description": "Het klasoverzicht: wie zit erin, wat staat er deze week op het rooster.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-kleuren",
@@ -1214,7 +1237,8 @@
         "Spelregels"
       ],
       "description": "Zoek de rode cirkel: spelen op kleur, op vorm, of op allebei tegelijk.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-klimaatfonds",
@@ -1250,7 +1274,8 @@
         "Samen terugkijken"
       ],
       "description": "Klusjes verdelen en sterren verdienen, zonder gedoe aan tafel.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-kompas",
@@ -1268,7 +1293,8 @@
         "Uw aantekeningen"
       ],
       "description": "Het tienerkompas: koers houden als alles tegelijk komt.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-kwestiekantoor",
@@ -1316,7 +1342,8 @@
         "Behaalde doelen"
       ],
       "description": "Je leerlijn, lessen, opgaven, behaalde doelen en bijles in één persoonlijke werkplek.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-leren",
@@ -1334,7 +1361,8 @@
         "Iemand naast u nodig?"
       ],
       "description": "Zie wat vandaag telt, wat al groeit en krijg hulp op je eigen tempo.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-liedjes",
@@ -1352,7 +1380,8 @@
         "Recent"
       ],
       "description": "Oude Nederlandse liedjes met de tekst groot in beeld, om samen te zingen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-magazine",
@@ -1370,7 +1399,8 @@
         "Eigen bijdragen"
       ],
       "description": "Het RTF-magazine: verhalen, tips en werk van gezinnen zelf.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-mail",
@@ -1388,7 +1418,8 @@
         "Afspraken"
       ],
       "description": "Je eigen Foundation-postvak, publiek uitsluitend op codenaam.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-markt",
@@ -1406,7 +1437,8 @@
         "Voorwaarden"
       ],
       "description": "Ruilen, weggeven en delen in de buurt.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-mediawijs",
@@ -1424,7 +1456,8 @@
         "Terugkijken"
       ],
       "description": "Echte situaties van je telefoon, met eerlijke uitleg over wat je keuze oplevert.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-meedoen-ontdekken",
@@ -1442,7 +1475,8 @@
         "Dichtbij, zonder u te volgen."
       ],
       "description": "Ontdek open activiteiten en projecten dichtbij, zonder dat uw locatie wordt gevolgd.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-memorie",
@@ -1460,7 +1494,8 @@
         "Spelregels"
       ],
       "description": "Kaartjes omdraaien en paren zoeken, met drie, zes of acht paren.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-mijnbanden",
@@ -1478,7 +1513,8 @@
         "Gedeelde momenten"
       ],
       "description": "Wie er iets van jou mag zien, per onderdeel en tot wanneer; altijd terug te nemen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-ochtend",
@@ -1496,7 +1532,8 @@
         "Samen verder"
       ],
       "description": "Aankleden, tanden, jas: de ochtend in stapjes die een kleuter zelf snapt.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-onveilig",
@@ -1532,7 +1569,8 @@
         "Eten en bedtijd"
       ],
       "description": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-opvoeden",
@@ -1550,7 +1588,8 @@
         "Hulp vinden"
       ],
       "description": "Rustige hulp bij het gedoe van elke dag, zonder oordeel.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-os-bestuur",
@@ -1712,7 +1751,8 @@
         "Jouw duels"
       ],
       "description": "Woordjes en sommen overhoren; alleen of als duel met een vriend.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-partner",
@@ -1748,7 +1788,8 @@
         "Praat met een maatje"
       ],
       "description": "Wat je kunt doen als je gepest wordt, en bij wie je terechtkunt.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-presenteren",
@@ -1766,7 +1807,8 @@
         "Hardop oefenen"
       ],
       "description": "Je verhaal opbouwen in vaste stukken, met tijdverdeling en een oefenklok.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-privacy",
@@ -1802,7 +1844,8 @@
         "Taken (tik om een taak te pakken)"
       ],
       "description": "Werkstukken en groepswerk stap voor stap, met taken en een planning.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-rechten",
@@ -1820,7 +1863,8 @@
         "Lees dit erbij"
       ],
       "description": "Werken, geld, school en zorg per leeftijd, met de werktijden erbij.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-registreren",
@@ -1856,7 +1900,8 @@
         "Onderweg"
       ],
       "description": "Samen op pad: inpakken, plannen en onderweg iets te doen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-rust",
@@ -1874,7 +1919,8 @@
         "Geluid naar keuze"
       ],
       "description": "Een stille plek in de app als het te druk wordt in je hoofd.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-samen-thuis",
@@ -1892,7 +1938,8 @@
         "Ons gezin."
       ],
       "description": "Vandaag, ieder gezinslid en iets regelen vanuit één rustig overzicht.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-school",
@@ -1910,7 +1957,8 @@
         "Terugkijken"
       ],
       "description": "Klas, rooster, huiswerk en cijfers voor het hele gezin.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-schoolbieb",
@@ -1928,7 +1976,8 @@
         "Oefenmateriaal"
       ],
       "description": "Lesmateriaal en oefenstof per vak en per jaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-schrift",
@@ -1946,7 +1995,8 @@
         "Opgaven"
       ],
       "description": "Je eigen schrift: aantekeningen en sommen netjes bij elkaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-schrijven",
@@ -1964,7 +2014,8 @@
         "Voorvertoning"
       ],
       "description": "Samen verhalen bedenken en schrijven; de app helpt met een begin.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-societeit",
@@ -1982,7 +2033,8 @@
         "Hoe spelen jullie?"
       ],
       "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-speelhal",
@@ -2000,7 +2052,8 @@
         "Spelregels"
       ],
       "description": "Zeven eindige spellen voor rekenen, taal, geheugen, klokkijken en logisch denken.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-speeltuin",
@@ -2018,7 +2071,8 @@
         "Spelregels"
       ],
       "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-steun",
@@ -2036,7 +2090,8 @@
         "Wanneer het te veel wordt"
       ],
       "description": "Een luisterend oor en echte hulplijnen, altijd bereikbaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-studie",
@@ -2054,7 +2109,8 @@
         "Terugkijken"
       ],
       "description": "Opleidingen en vervolgstappen verkennen, zonder druk.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-tellen",
@@ -2072,7 +2128,8 @@
         "Spelregels"
       ],
       "description": "Dingen aantikken en samen hardop tellen; geen klok, geen puntentelling.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-toetsen",
@@ -2090,7 +2147,8 @@
         "Oefenstof"
       ],
       "description": "Je toetsweek uitgesmeerd over de dagen, zodat je niet hoeft te stampen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-veilig-vertrouwd",
@@ -2108,7 +2166,8 @@
         "U bepaalt wie dichtbij mag komen."
       ],
       "description": "Uw kring, uw keuzes en hulp wanneer dat nodig is.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-veilig",
@@ -2126,7 +2185,8 @@
         "Ik voel me niet veilig"
       ],
       "description": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-verhaaltje",
@@ -2144,7 +2204,8 @@
         "Recent"
       ],
       "description": "Zes korte verhaaltjes om samen voor te lezen, bladzijde voor bladzijde.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-verjaardagen",
@@ -2162,7 +2223,8 @@
         "Samen iets regelen"
       ],
       "description": "Niemand vergeten: verjaardagen en wensenlijstjes bij elkaar.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-vrienden",
@@ -2180,7 +2242,8 @@
         "Gedeelde momenten"
       ],
       "description": "Vrienden, snaps en verhalen van 24 uur, veilig en op codenaam.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-wegwijzer",
@@ -2216,7 +2279,8 @@
         "Beste volgende kansen"
       ],
       "description": "Bijbanen en vacatures, met een sollicitatie die je zelf kunt volgen.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-winkel",
@@ -2252,7 +2316,8 @@
         "Bewegingen"
       ],
       "description": "Het zakgeldpotje: sparen voor iets, samen bijgehouden.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "foundation-zorg",
@@ -2270,7 +2335,8 @@
         "Waar kunnen we bij helpen?"
       ],
       "description": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
-      "maturity": "L0"
+      "maturity": "L0",
+      "gezinssessie": true
     },
     {
       "id": "galerij",

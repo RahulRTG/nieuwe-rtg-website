@@ -46,10 +46,24 @@
      ingang in de gids: null, en het menu laat hem staan zoals voorheen. Het adres
      telt zonder query, met hash (/apps/geld.html#wallet is een eigen ingang). */
   const zonderQuery = u => { const s = String(u || ''), h = s.indexOf('#'); return (h < 0 ? s : s.slice(0, h)).split('?')[0] + (h < 0 ? '' : s.slice(h)); };
-  window.RTGAppCatalogusPoort = url => {
+  /* DE GEZINSROL: een regel, hier en nergens anders. Een catalogusscherm met
+     `gezinssessie` (scripts/world-widgets.js leest dat uit het scherm: het laadt
+     apps/foundation/sessie.js) draait op een gezinsprofielsessie, en de server
+     opent zijn routes alleen via rtf.verifieerProfiel(code, token): gezinsPoort,
+     rtfPoort, rtfSpeler, rtfSociaal en profiel()/sessieVan, allemaal via
+     server/foundation/gezinstoken.js. Een ledentoken opent daar niets, ook niet
+     voor een volwassene zonder gezinsprofiel. Dus: zonder sessie (rtf_sessie
+     met code, token en profiel) toont Heel RTG ze niet -- behalve de deur,
+     index.html, waar je met de gezinscode inlogt (os:rtf en accounts-os.js
+     wijzen erheen). Een verlopen sessie toont het scherm, dat dan opnieuw om de
+     gezinscode vraagt: nooit meer toegang dan de server geeft. */
+  const GEZINSDEUR = '/apps/foundation/index.html';
+  const gezinssessie = () => { try { const s = JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); return !!(s && s.code && s.token && s.profiel); } catch (e) { return false; } };
+  window.RTGAppCatalogusPoort = (url, app) => {
     const doel = zonderQuery(url), ids = [];
     for (const w of window.RTGWorkspaceWorldCatalog || []) for (const i of w.items || []) if (i.url && zonderQuery(i.url) === doel) ids.push(i.id);
-    return ids.length ? ids.some(id => gidsToegang(id)) : null;
+    if (ids.length) return ids.some(id => gidsToegang(id));
+    return app && app.gezinssessie && doel.split('#')[0] !== GEZINSDEUR ? gezinssessie() : null;
   };
   document.addEventListener('input', e => {
     const t = e.target;

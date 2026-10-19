@@ -34,10 +34,15 @@ function gegevens() {
     const html = fs.readFileSync(file, 'utf8'), spec = design[url] || {}, source = meta.get(url) || {};
     const world = identity.classify(url), name = source.name || spec.name || clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
     const sections = spec.sections || [...html.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>/gi)].map(x => clean(x[1])).filter(Boolean).slice(0, 3);
-    return { id: url.slice(6).replace(/\.html/g, '').replace(/[^a-z0-9]+/g, '-'), url, name: name.slice(0, 80),
+    const uit = { id: url.slice(6).replace(/\.html/g, '').replace(/[^a-z0-9]+/g, '-'), url, name: name.slice(0, 80),
       world, worlds: spec.shared ? ['living', 'travel', 'work', 'foundation'] : [...new Set([world].concat(source.foundation ? ['foundation'] : []))],
       type: spec.type || 'workspace', icon: spec.icon || 'grid', sections: sections.slice(0, 3),
       description: source.description || spec.intro || '', maturity: 'L0' };
+    /* Een feit over het scherm, uit het scherm gelezen: het draait op de
+       gezinsprofielsessie van de RTFoundation (het laadt apps/foundation/sessie.js).
+       Wat Heel RTG daarmee doet, beslist de poort in app-main-29d.js. */
+    if (url.startsWith('/apps/foundation/') && /<script[^>]*\ssrc="(?:\/apps\/foundation\/)?sessie\.js"/.test(html)) uit.gezinssessie = true;
+    return uit;
   });
 }
 function bouw() { return JSON.stringify({ version: 1, apps: gegevens() }, null, 2) + '\n'; }

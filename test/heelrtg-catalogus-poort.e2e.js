@@ -54,12 +54,13 @@ async function zaakLid(post, code) {
 
 /* Heel RTG openen zoals een lid en zoeken. Geeft per zoekterm de catalogus-apps
    die zichtbaar in de lijst staan. */
-async function zoekInHeelRtg(browser, base, tok, termen) {
+async function zoekInHeelRtg(browser, base, tok, termen, gezin) {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
   await ctx.route('**/api/onboarding/status', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"klaar":true}' }));
-  await ctx.addInitScript((t) => {
-    try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-  }, tok);
+  await ctx.addInitScript(([t, g]) => {
+    try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+      if (g) localStorage.setItem('rtf_sessie', JSON.stringify(g)); } catch (e) {}
+  }, [tok, gezin || null]);
   const p = await ctx.newPage();
   const fouten = []; letOpFouten(p, fouten);
   await p.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
@@ -141,6 +142,42 @@ test('Heel RTG: een lid vindt het tweede scherm niet, een zaakmanager wel; kanto
     const z = await zoekInHeelRtg(browser, base, Z, ['scherm']);
     assert.ok(z.uit.scherm.includes('scherm'), 'een zaakmanager vindt zijn tweede scherm niet: ' + z.uit.scherm.join(','));
     assert.deepEqual(z.fouten, [], 'paginafouten bij de zaakmanager');
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* DE GEZINSROL (19 oktober 2026). De schermen van de RTFoundation die op een
+   gezinsprofielsessie draaien (ze laden apps/foundation/sessie.js), opent de
+   server alleen met die sessie (rtf.verifieerProfiel achter gezinsPoort,
+   rtfPoort, rtfSpeler). Heel RTG toont ze een lid zonder sessie niet; de deur
+   (index.html, inloggen met de gezinscode) blijft staan. Met een sessie die de
+   server uitgaf -- een gezin, een profiel, gekozen langs /api/foundation --
+   staan ze er wel. */
+test('Heel RTG: zonder gezinssessie geen Zakgeld, wel de deur van de RTFoundation; met een gezinssessie wel Zakgeld',
+  { skip: geenBrowser(pw), timeout: 240000 }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-heelrtg-gezin-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const post = maakPost(base);
+    const A = await lid(post, 'hrg');
+    const g = (await post('/api/foundation/gezin/maak', { gezinsnaam: 'Zoekgezin', naam: 'Ouder Zoek', pin: '1234' })).data;
+    assert.ok(g && g.code && g.token, 'geen gezin: ' + JSON.stringify(g).slice(0, 120));
+    const p = (await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind Zoek', rol: 'kind', groep: 'tiener' })).data;
+    const kies = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.profiel.id })).data;
+    assert.ok(kies && kies.token && kies.profiel, 'geen profielsessie: ' + JSON.stringify(kies).slice(0, 120));
+    const sessie = { code: g.code, token: kies.token, gezin: g.gezin || null, profiel: kies.profiel };
+    browser = await pw.chromium.launch(browserOpties(pw, {}));
+    const zonder = await zoekInHeelRtg(browser, base, A, ['zakgeld', 'rtfoundation', 'registreren']);
+    assert.ok(!zonder.uit.zakgeld.includes('foundation-zakgeld'), 'een lid zonder gezinssessie ziet Zakgeld: ' + zonder.uit.zakgeld.join(','));
+    assert.ok(zonder.uit.rtfoundation.includes('foundation-index'), 'de deur van de RTFoundation is weg: ' + zonder.uit.rtfoundation.join(','));
+    assert.ok(zonder.uit.registreren.includes('foundation-registreren'), 'een gezin aanmaken is weg: ' + zonder.uit.registreren.join(','));
+    assert.deepEqual(zonder.fouten, [], 'paginafouten zonder sessie');
+    const met = await zoekInHeelRtg(browser, base, A, ['zakgeld'], sessie);
+    assert.ok(met.uit.zakgeld.includes('foundation-zakgeld'), 'met een gezinssessie vindt het lid Zakgeld niet: ' + met.uit.zakgeld.join(','));
   } finally {
     if (browser) await browser.close();
     await stop(child);

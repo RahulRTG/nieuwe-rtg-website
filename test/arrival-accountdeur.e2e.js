@@ -50,8 +50,10 @@ test('arrival: zonder sessie een gratis account in het scherm, daarna verder; ee
     await a.goto(base + '/apps/arrival.html', { waitUntil: 'domcontentloaded' });
     await a.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor({ timeout: 15000 });
     assert.equal(await a.locator('#wish').isVisible(), false, 'zonder account staat de wensbox er nog niet');
-    // het oude blok stuurde de gast weg naar de app ("LOG EERST IN" met een link); de schil
-    // (metgezel.js) mag zelf wel een link naar de app tekenen, dus alleen #main telt hier
+    // het oude blok stuurde de gast weg naar de app ("LOG EERST IN" met een link). Buiten main
+    // tekent de desktopschil (rtg-world-desktop.js, aside.wd-people in div.wd-shell) zelf een
+    // link "View your conversations" naar /apps/app.html, en alleen als dat uitgestelde script
+    // op tijd is: gemeten in 3 van 20 runs met de bredere assert. Daarom telt alleen main.
     assert.equal(await a.locator('main a[href="/apps/app.html"]').count(), 0, 'geen wegsturen naar de app meer');
     assert.equal(await a.getByText('LOG EERST IN').count(), 0);
 

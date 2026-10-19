@@ -76,3 +76,16 @@ test('een ander vult het ledger niet tot de rand: de laatste ruimte is voor de e
   const z = await L.zet('ka', { kapitaal: 'vermogen', wat: 'Mijn eigen nieuwe feit', op: GISTEREN });
   assert.equal(z.status, 200, 'de eigenaar kan nog wel schrijven');
 });
+
+test('een vol afschrift zegt dat het vol is, en niet meer dat er oudere regels kunnen ontbreken', async () => {
+  const { db, L } = huis();
+  await L.zet('ka', { kapitaal: 'vermogen', wat: 'NK junior', op: GISTEREN });
+  const rs = reeks(db);
+  while (rs.length < R.MAX_REGELS) rs.push({ id: 'v' + rs.length, at: new Date().toISOString(), soort: 'feit', kapitaal: 'vermogen', wat: 'vul ' + rs.length, op: GISTEREN, herkomst: 'zelf' });
+  const a = L.afschrift('ka');
+  assert.equal(a.vol, true, 'het afschrift zegt dat het ledger vol is');
+  assert.equal(a.misschienAfgekapt, undefined, 'de oude vlag bestaat niet meer: er wordt niets geknipt');
+  assert.ok(!a.nietZegt.some((z) => /kunnen oudere regels ontbreken|ontbreken -- ook een intrekking/.test(z)), 'en het belooft geen gemis meer');
+  const bron = require('fs').readFileSync('public/apps/loopbaan.html', 'utf8');
+  assert.ok(!/oudere regels kunnen ontbreken/.test(bron), 'het scherm zegt het ook niet meer');
+});

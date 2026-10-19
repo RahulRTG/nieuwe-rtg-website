@@ -111,21 +111,19 @@ module.exports = function maakProjectie({ reeksKijk, naam }) {
        vragen hoort hetzelfde te geven (het mutatiecontract noemt hem lezend). De
        regels dragen hun eigen tijd; de bestandsnaam krijgt de datum op het
        toestel. */
-    /* De reeks kapt bij `max` regels aan de voorkant (./index.js, schrijfRegel),
-       en houdt alleen de eerste vast. Een ledger dat die grens raakte, kan dus
-       regels missen -- ook een intrekking, en dan staat een ingetrokken feit hier
-       als niet ingetrokken. Of dat GEBEURD is, weet deze lezing niet; wel of het
-       KAN. Dat staat erin in plaats van dat de zinnen hieronder het verzwijgen. */
-    const misschienAfgekapt = !!max && rs.length >= max;
+    /* Sinds 19 oktober 2026 knipt de reeks nooit (./index.js, schrijfRegel): een
+       vol ledger neemt geen nieuwe regel meer aan, en er ontbreekt niets. Wat het
+       afschrift zegt, is dus alleen OF het vol is. */
+    const vol = !!max && rs.length >= max;
     return { status: 200, vorm: 'rtg-loopbaan-afschrift/1',
-      mens: naam(key), feiten, misschienAfgekapt, herkomst: R.HERKOMST, kapitalen: R.KAPITALEN, nooit: R.NOOIT,
+      mens: naam(key), feiten, vol, herkomst: R.HERKOMST, kapitalen: R.KAPITALEN, nooit: R.NOOIT,
       nietZegt: [
         'Dit afschrift is niet ondertekend. Buiten RTG bewijst het uit zichzelf niets; een lezer kijkt een regel na met een deelcode die u per regel maakt.',
         'Een bevestiging zegt wat zij zegt en niet meer: per bevestiging staat erbij wat zij wel en niet vaststelt.',
         'Wat hier niet staat, is niet gebeurd volgens dit ledger -- niet volgens de wereld. Het ledger bevat alleen wat u of een ander erin heeft gezet.',
         'Een ingetrokken regel is niet gewist: hij staat er met de reden.',
-        'Een ledger bewaart hoogstens ' + max + ' regels en houdt daarboven alleen de eerste vast. Staat ' +
-          '`misschienAfgekapt` op waar, dan kunnen oudere regels ontbreken -- ook een intrekking.'
+        'Een ledger bewaart hoogstens ' + max + ' regels en wist er nooit een. Staat `vol` op waar, dan ' +
+          'kan er niets meer bij; wat erin staat, is compleet.'
       ] };
   }
 

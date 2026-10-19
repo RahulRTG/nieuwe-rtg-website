@@ -77,7 +77,7 @@ test('1. het afschrift: het hele eigen ledger, met de reden van een intrekking, 
   assert.equal(kok.bevestigingen[0].wat, 'Werkte bij ons in de keuken');
   assert.equal(kok.bevestigingen[0].intrekking.reden, 'Verkeerde periode', 'ook de intrekking van een bevestiging, met reden');
   assert.match(kok.bevestigingen[0].intrekking.door, /\(/, 'op naam van de zaak met de medewerker erachter');
-  assert.equal(a.body.misschienAfgekapt, false, 'twee feiten raken de grens van het ledger niet');
+  assert.equal(a.body.vol, false, 'twee feiten raken de grens van het ledger niet');
   assert.ok(a.body.nietZegt.some(z => /niet ondertekend/i.test(z)), 'het afschrift doet zich niet voor als bewijs');
   const tekst = JSON.stringify(a.body);
   assert.equal(tekst.includes('Regel van een ander'), false, 'het lichaam kan geen ander ledger aanwijzen');

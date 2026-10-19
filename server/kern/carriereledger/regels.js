@@ -135,8 +135,9 @@ function magTerug(doel, van) {
   return null;
 }
 
-/* Hoeveel regels een ledger bewaart; daarboven kapt ./index.js aan de voorkant
-   en houdt hij de eerste vast. ./projectie.js zegt dat in het afschrift. */
+/* Hoeveel regels een ledger bewaart. Daarboven neemt ./index.js geen regel
+   meer aan (er wordt nooit geknipt); ./projectie.js zegt in het afschrift of
+   het ledger vol is. */
 const MAX_REGELS = 500;
 
 /* Een ander mag het ledger niet volschrijven (19 oktober 2026). Er werd tot

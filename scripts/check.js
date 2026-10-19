@@ -2057,7 +2057,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      betekenissen, in de veiligheidslaag. */
   // praktijkMutatie bewaakt via werkPoort binnen de duurzame commit; actuele
   // rechten en herhaling worden via echte HTTP bewezen in praktijk-http.test.js.
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|praktijkMutatie|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|praktijkMutatie|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|rtfSpeler|sessie)\s*\(|\bpoort\s*\(\s*req/;
 
   /* PUBLIEK MET REDEN woont in ./lib/publiek.js, en daar alleen: keuringsregel
      28, scripts/handlerwacht.js en het mutatiecontractregister stellen dezelfde

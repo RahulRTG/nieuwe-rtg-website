@@ -239,6 +239,18 @@ const CONTRACT = {
   'link:ov': Object.assign({
     belofte: 'een lid koopt bij een vervoerder waarmee RTG een overeenkomst heeft een kaartje uit zijn wallet, toont het, en de controleur ziet het een keer als geldig; weigert de bank, dan is er geen kaartje'
   }, voltooi('ov', 'het scenario loopt /api/mob/kaart/aanbod, /koop, /mijn en /toon, de routes die /apps/ov.html zelf aanroept, met de overeenkomst langs het kantoor, de controleur van de vervoerder en de simulatiebank als rail')),
+  'link:ovroutes': Object.assign({
+    belofte: 'de manager van een OV-zaak tekent een lijn met haltes, frequentie en tarief, en leden zien hem meteen op de OV-kaart; weghalen haalt hem ook bij hen weg'
+  }, voltooi('ovroutes', 'het scenario loopt /api/staff/ov/lijnen en /lijn/zet, de routes die /apps/ovroutes.html zelf aanroept, met een lid dat de lijn op de OV-kaart ziet en een chauffeur en een horecazaak die niet mogen tekenen')),
+  'link:stad': Object.assign({
+    belofte: 'een bewoner ziet hoe de stad erbij staat en meldt iets dat kapot of vol is; de melding staat meteen op de werklijst van de veldploeg en hij ziet op codenaam wanneer die klaar is'
+  }, voltooi('stad', 'het scenario loopt /api/stad/bewoner en /api/stad/melding, de routes die /apps/stad.html zelf aanroept, met de veldploeg die klaarmeldt en een tweede lid dat de melding niet ziet')),
+  'link:residentie': Object.assign({
+    belofte: 'een lid richt zijn eigen suite in met de Maison-catalogus, geeft hem een naam en zet hem open of dicht; de gids toont een open suite en een ander lid kan hem binnenlopen, een gesloten niet'
+  }, voltooi('residentie', 'het scenario loopt /api/residentie/suite, /suite/zet, /meubel/zet, /meubel/weg, /gids en /betreed, de routes die de bundel van /apps/residentie.html aanroept, met een tweede lid als bezoeker')),
+  'link:flits': Object.assign({
+    belofte: 'een lid meldt met een tik wat hij onderweg ziet en wie in de buurt is ziet het op codenaam; vlakbij dezelfde soort is een bevestiging, drie verschillende leden halen hem weg, en waar het verboden is wordt een flitser geweigerd'
+  }, voltooi('flits', 'het scenario loopt /api/flits/rond, /meld, /stem en /vooruit, de routes die /apps/flits.html zelf aanroept, met drie andere leden die bevestigen en wegstemmen')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

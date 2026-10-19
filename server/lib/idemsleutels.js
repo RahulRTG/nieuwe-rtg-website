@@ -99,6 +99,8 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-isolatie').SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
+  /* TravelOS-schermen die de voltooiproef dubbel zag werken; zie de kop daar. */
+  require('./idemsleutels-travelos').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
   /* De zware poort en het eigenaarsherstel: negen van de tien nietIdempotent,
      elk met een eigen reden. Zie de kop van ./idemsleutels-eigenaar.js. */

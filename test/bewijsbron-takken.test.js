@@ -62,6 +62,20 @@ test('ingangRoutes leest SCHERMROUTES.json via de lezer, en een ontbrekende inga
   assert.equal(zonder.exact.size, 0);
 });
 
+test('ingangRoutes volgt een gegenereerde bundel naar zijn delen, waar SCHERMROUTES de paden toeschrijft', () => {
+  const html = '<script src="/apps/bundel.js" defer></script>';
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/bundel/deel-01.js', exact: ['/api/huis/zet'] },
+    { bestand: 'public/apps/bundel/deel-02.js', exact: ['/api/huis'] },
+    { bestand: 'public/apps/ander/deel-01.js', exact: ['/api/vreemd'] }
+  ] };
+  const bundels = new Map([['public/apps/bundel.js', 'public/apps/bundel/']]);
+  const r = B.ingangRoutes('/apps/b.html', { lees: lezer({ 'public/apps/b.html': html }), schermroutes, bundels });
+  assert.deepEqual([...r.exact].sort(), ['/api/huis', '/api/huis/zet'], 'de delen van de bundel tellen, een andere map niet');
+  /* En het echte register kent de residentie als bundel. */
+  assert.ok(B.ingangRoutes('/apps/residentie.html').exact.has('/api/residentie/suite/zet'));
+});
+
 test('gedeeld: exact of via voorvoegsel, gesorteerd', () => {
   const ing = { exact: new Set(['/api/b']), voor: new Set(['/api/supplier/horeca/']) };
   assert.deepEqual(B.gedeeld(new Set(['/api/supplier/horeca/menu', '/api/b', '/api/c']), ing),

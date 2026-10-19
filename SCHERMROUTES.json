@@ -3,12 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "e41e09ca",
+  "commit": "d2991a7b",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [],
+   "boomVuil": true,
+   "ongecommitteInvoer": [
+    "public/apps/flits.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7818,11 +7820,11 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 450,
+  "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1105,
-  "verwijzingen": 1340,
-  "voorvoegsels": 135,
+  "exactePaden": 1089,
+  "verwijzingen": 1321,
+  "voorvoegsels": 136,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8054,15 +8056,6 @@
     "public/apps/backoffice/backoffice-04.js",
     "public/apps/kantoren.html",
     "public/apps/stadsdoos.html"
-   ],
-   "aantal": 3
-  },
-  {
-   "pad": "/api/rtgone/state",
-   "schermen": [
-    "public/apps/decision-room.js",
-    "public/apps/project-room.js",
-    "public/apps/rtgone.html"
    ],
    "aantal": 3
   },
@@ -8850,14 +8843,6 @@
    "schermen": [
     "public/apps/rtg-vandaag.js",
     "public/apps/sociaal.html"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/rtgone/project/van-mail",
-   "schermen": [
-    "public/apps/rtgone.html",
-    "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 2
   },
@@ -9981,20 +9966,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtgone/goedkeuring",
-   "schermen": [
-    "public/apps/decision-room.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/goedkeuring/beslis",
-   "schermen": [
-    "public/apps/decision-room.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/doelen",
    "schermen": [
     "public/apps/doelen.html"
@@ -10341,6 +10312,34 @@
    "pad": "/api/festival/gast/programma",
    "schermen": [
     "public/apps/festival-gast.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/meld",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/rond",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/stem",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/vooruit",
+   "schermen": [
+    "public/apps/flits.html"
    ],
    "aantal": 1
   },
@@ -12081,27 +12080,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/dossier",
-   "schermen": [
-    "public/apps/loonstrook.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/identiteit/verzoeken",
-   "schermen": [
-    "public/apps/loonstrook.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/loonstroken",
-   "schermen": [
-    "public/apps/loonstrook.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/concern/mijnwerk",
    "schermen": [
     "public/apps/loopbaan.html"
@@ -13579,6 +13557,20 @@
    "aantal": 1
   },
   {
+   "pad": "/api/staff/ov/lijn/zet",
+   "schermen": [
+    "public/apps/ovroutes.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/ov/lijnen",
+   "schermen": [
+    "public/apps/ovroutes.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/pakket/advies",
    "schermen": [
     "public/apps/pakketten.html"
@@ -13715,27 +13707,6 @@
    "pad": "/api/office/platformregister",
    "schermen": [
     "public/apps/platformregister.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/project/bewijs",
-   "schermen": [
-    "public/apps/project-room.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/project/oplever",
-   "schermen": [
-    "public/apps/project-room.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/project/taak",
-   "schermen": [
-    "public/apps/project-room.js"
    ],
    "aantal": 1
   },
@@ -14398,65 +14369,9 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtgone/automatisering/herstel",
+   "pad": "/api/rtgone/project/van-mail",
    "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/automatisering/voer",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/automatisering/voorbereid",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/belofte",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/frictie",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/intentie",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/overdracht",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/rol/geef",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/rol/trek",
-   "schermen": [
-    "public/apps/rtgone.html"
+    "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 1
   },
@@ -14786,6 +14701,20 @@
    "pad": "/api/sport/wedstrijd/maak",
    "schermen": [
     "public/apps/sportclub.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/stad/bewoner",
+   "schermen": [
+    "public/apps/stad.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/stad/melding",
+   "schermen": [
+    "public/apps/stad.html"
    ],
    "aantal": 1
   },
@@ -15143,48 +15072,6 @@
    "pad": "/api/verify/upload",
    "schermen": [
     "public/apps/verificatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/aanvaard",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/bevoegdheden",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/grens",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/intrek",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/mijn",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/simulatie",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
    ],
    "aantal": 1
   },
@@ -16216,12 +16103,11 @@
   {
    "bestand": "public/apps/decision-room.js",
    "exact": [
-    "/api/account/start",
-    "/api/rtgone/goedkeuring",
-    "/api/rtgone/goedkeuring/beslis",
-    "/api/rtgone/state"
+    "/api/account/start"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/rtgone/"
+   ]
   },
   {
    "bestand": "public/apps/defensie/defensie-01.js",
@@ -16387,10 +16273,13 @@
   },
   {
    "bestand": "public/apps/flits.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/flits/"
-   ]
+   "exact": [
+    "/api/flits/meld",
+    "/api/flits/rond",
+    "/api/flits/stem",
+    "/api/flits/vooruit"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foodcourt.html",
@@ -17754,15 +17643,6 @@
    ]
   },
   {
-   "bestand": "public/apps/loonstrook.html",
-   "exact": [
-    "/api/member/dossier",
-    "/api/member/identiteit/verzoeken",
-    "/api/member/loonstroken"
-   ],
-   "voorvoegsels": []
-  },
-  {
    "bestand": "public/apps/loopbaan.html",
    "exact": [
     "/api/concern/mijnwerk"
@@ -18361,10 +18241,11 @@
   },
   {
    "bestand": "public/apps/ovroutes.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/staff/ov/"
-   ]
+   "exact": [
+    "/api/staff/ov/lijn/zet",
+    "/api/staff/ov/lijnen"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/pakketten.html",
@@ -18468,13 +18349,11 @@
   {
    "bestand": "public/apps/project-room.js",
    "exact": [
-    "/api/account/start",
-    "/api/rtgone/project/bewijs",
-    "/api/rtgone/project/oplever",
-    "/api/rtgone/project/taak",
-    "/api/rtgone/state"
+    "/api/account/start"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/rtgone/"
+   ]
   },
   {
    "bestand": "public/apps/pulse.html",
@@ -18856,20 +18735,11 @@
   {
    "bestand": "public/apps/rtgone.html",
    "exact": [
-    "/api/account/start",
-    "/api/rtgone/automatisering/herstel",
-    "/api/rtgone/automatisering/voer",
-    "/api/rtgone/automatisering/voorbereid",
-    "/api/rtgone/belofte",
-    "/api/rtgone/frictie",
-    "/api/rtgone/intentie",
-    "/api/rtgone/overdracht",
-    "/api/rtgone/project/van-mail",
-    "/api/rtgone/rol/geef",
-    "/api/rtgone/rol/trek",
-    "/api/rtgone/state"
+    "/api/account/start"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/rtgone/"
+   ]
   },
   {
    "bestand": "public/apps/rtgschool/bijles.js",
@@ -19106,11 +18976,11 @@
   {
    "bestand": "public/apps/stad.html",
    "exact": [
+    "/api/stad/bewoner",
+    "/api/stad/melding",
     "/api/stream"
    ],
-   "voorvoegsels": [
-    "/api/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/stadsdoos.html",
@@ -19354,15 +19224,10 @@
   },
   {
    "bestand": "public/apps/vertegenwoordiging.html",
-   "exact": [
-    "/api/vertegenwoordiging/aanvaard",
-    "/api/vertegenwoordiging/bevoegdheden",
-    "/api/vertegenwoordiging/grens",
-    "/api/vertegenwoordiging/intrek",
-    "/api/vertegenwoordiging/mijn",
-    "/api/vertegenwoordiging/simulatie"
-   ],
-   "voorvoegsels": []
+   "exact": [],
+   "voorvoegsels": [
+    "/api/vertegenwoordiging"
+   ]
   },
   {
    "bestand": "public/apps/vluchten.html",

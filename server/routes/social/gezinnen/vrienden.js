@@ -98,7 +98,7 @@ app.post('/api/rtf/social/dm', (req, res) => {
 });
 app.post('/api/rtf/social/dm/send', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = socialDmSend(s.handle, String(req.body.toKey || ''), req.body.text);
+  const r = socialDmSend(s.handle, String(req.body.toKey || ''), req.body.text, req.body.idem);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, messages: metPosts(s, r.messages) });
 });

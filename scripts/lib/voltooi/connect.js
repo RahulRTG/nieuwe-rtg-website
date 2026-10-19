@@ -156,6 +156,18 @@ async function loop(w, stap) {
     return { klopt: a.status === 200 && b.status === 200 && na === voor, ziet: 'tikken ' + a.status + '/' + b.status + ', gezien ' + voor + ' -> ' + na };
   });
 
+  await stap('herstelbaar', 'een dubbele tik op Meer hiervan telt een keer; dezelfde sleutel na een crash ook', async () => {
+    const O = 'planeten' + merk;
+    const gewicht = async () => (((await post(HORIZON, {})).data || {}).onderwerpen || []).find((x) => x.onderwerp === O) || {};
+    const [a, b] = await w.dubbel(SIGNAAL, G({ onderwerp: O, signaal: 'meer', idem: 'tik-' + merk + '-1' }));
+    const na = (await gewicht()).gewicht;
+    await w.crash();
+    const nogEens = await post(SIGNAAL, { onderwerp: O, signaal: 'meer', idem: 'tik-' + merk + '-1' });
+    const naCrash = (await gewicht()).gewicht;
+    return { klopt: a.status === 200 && b.status === 200 && na === 1 && nogEens.status === 200 && naCrash === 1,
+      ziet: 'tikken ' + a.status + '/' + b.status + ', gewicht ' + na + ', na SIGKILL dezelfde sleutel ' + nogEens.status + ', gewicht ' + naCrash };
+  });
+
   await stap('herstelbaar', 'een afgebroken schuifbeweging en daarna opnieuw: de schuif staat waar hij heen moest', async () => {
     const half = await w.afgebroken(SCHUIF, G({ schuif: 20 }));
     const opnieuw = await post(SCHUIF, { schuif: 20 });
@@ -179,6 +191,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'je ontdekt iets, opent het, zegt wat je meer of minder wilt en wat je begrepen hebt, zet de schuif tussen vertrouwd en nieuw, en je dossier en portfolio zeggen wat er gebeurde -- zonder score of niveau, en geen ander gezin of profiel leest het',
-  grens: 'De proef loopt de gezinsdeur /api/rtf/connect/*, die connect.html bij een gezinssessie kiest, niet door het scherm zelf. De ledendeur en de bevestiging door een ander mens (naklank) loopt de lusproef (scripts/lusproef.js). Of een dubbele tik op Meer hiervan een of twee keer telt, is hier niet beproefd: een signaal draagt geen herhaalsleutel en telt per tik. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt de gezinsdeur /api/rtf/connect/*, die connect.html bij een gezinssessie kiest, niet door het scherm zelf. De ledendeur en de bevestiging door een ander mens (naklank) loopt de lusproef (scripts/lusproef.js). Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

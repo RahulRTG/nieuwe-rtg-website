@@ -220,7 +220,10 @@
       el.querySelectorAll('[' + attr + ']').forEach(b => b.addEventListener('click', async () => {
         const onderwerp = b.getAttribute(attr);
         try {
-          await roep('/api/connect/signaal', '/api/rtf/connect/signaal', { onderwerp, signaal: welk });
+          /* Een sleutel per knop zolang hij er staat: een dubbele tik is een
+             bedoeling. Na het opnieuw tekenen is een tik een nieuwe keuze. */
+          b.dataset.idem = b.dataset.idem || RTGId('signaal');
+          await roep('/api/connect/signaal', '/api/rtf/connect/signaal', { onderwerp, signaal: welk, idem: b.dataset.idem });
           Veilig.melding('Genoteerd. Dit stuurt wat u ziet en niets anders.');
           laad();
         } catch (e) { Veilig.melding(e.message); }
@@ -241,7 +244,8 @@
     $('#onderwerpen').innerHTML = (kandidaten || []).map(o =>
       '<button class="merk" data-kies="' + esc(o) + '">' + esc(o) + '</button>').join('');
     $('#onderwerpen').querySelectorAll('[data-kies]').forEach(b => b.addEventListener('click', async () => {
-      try { await roep('/api/connect/signaal', '/api/rtf/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer' }); laad(); }
+      b.dataset.idem = b.dataset.idem || RTGId('signaal');
+      try { await roep('/api/connect/signaal', '/api/rtf/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer', idem: b.dataset.idem }); laad(); }
       catch (e) { Veilig.melding(e.message); }
     }));
     $('#mijnOnderwerpen').innerHTML = h.onderwerpen && h.onderwerpen.length

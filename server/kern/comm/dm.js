@@ -95,7 +95,7 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
     const bijlage = o.post ? { soort: 'post', id: o.post.id }
       : o.stuk ? Object.assign({ soort: 'stuk' }, o.stuk) : null;
     const m = comm.bericht({ gesprekId: g.id, van, tekst: o.tekst || '',
-      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null });
+      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null, idem: o.idem || null });
     return oudeVorm(m);
   }
 

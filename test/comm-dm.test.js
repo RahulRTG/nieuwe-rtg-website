@@ -130,3 +130,18 @@ test('een bevroren kopie die AL in de kern staat, komt in de oude berichtvorm al
   assert.ok(m, 'controle: het bevroren bericht wordt gelezen');
   assert.deepEqual(m.post, { id: 7 }, 'de oude berichtvorm gaf een bevroren kopie van de post door');
 });
+
+/* Een herhaalsleutel per opgesteld bericht (voltooiproef van Vrienden, 19 oktober
+   2026). De centrale antwoordkas vangt een dubbele tik alleen zolang hij in het
+   geheugen staat; na een herstart is de sleutel op het bericht de enige grens.
+   Dit draait daarom op de kern zelf, zonder die kas ervoor. */
+test('dezelfde herhaalsleutel is hetzelfde bericht, een nieuwe sleutel een nieuw bericht', () => {
+  const { dm } = opzet();
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-1' });
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-1' });
+  assert.equal(dm.berichten('a', 'b', 80).filter((m) => m.text === 'Kom je spelen?').length, 1,
+    'dezelfde sleutel zette het bericht twee keer neer');
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-2' });
+  assert.equal(dm.berichten('a', 'b', 80).filter((m) => m.text === 'Kom je spelen?').length, 2,
+    'een bewust tweede bericht met een eigen sleutel hoort er wel bij');
+});

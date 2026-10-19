@@ -42,6 +42,11 @@ const EIGEN = [
   '/api/office/kantoor/uitnodiging',
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
   '/api/comm/stuur',
+  // dezelfde kern voor een gezins-DM: de sleutel staat op het bericht (kern/sociaal/vrienden/contact.js)
+  '/api/rtf/social/dm/send',
+  // een signaal in Connect onthoudt zijn sleutel per tik bij de horizon (kern/connect/horizon.js)
+  '/api/connect/signaal',
+  '/api/rtf/connect/signaal',
   // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
   '/api/geld/pot/reserveer'
 ];

@@ -818,10 +818,14 @@ async function laadChat(){
 $('#chatX').addEventListener('click', ()=> $('#chatOv').classList.remove('open'));
 $('#chatSend').addEventListener('click', chatStuur);
 $('#chatIn').addEventListener('keydown', e=>{ if(e.key==='Enter') chatStuur(); });
+/* Een herhaalsleutel per opgesteld bericht: een dubbele tik of een nieuwe poging
+   na een fout is hetzelfde bericht, en de server zet het er een keer neer. */
+let chatSleutel=null;
 async function chatStuur(){
   const t=$('#chatIn').value.trim(); if(!t||!chatMet) return; $('#chatIn').value='';
-  try{ const d=await soc('/api/rtf/social/dm/send',{ toKey:chatMet, text:t }); const box=$('#chatMsgs'); box.innerHTML=''; (d.messages||[]).forEach(m=> box.appendChild(chatBel(m))); box.scrollTop=box.scrollHeight; }
-  catch(e){ alert(e.message); }
+  const idem=chatSleutel||(chatSleutel=RTGId('dm'));
+  try{ const d=await soc('/api/rtf/social/dm/send',{ toKey:chatMet, text:t, idem }); chatSleutel=null; const box=$('#chatMsgs'); box.innerHTML=''; (d.messages||[]).forEach(m=> box.appendChild(chatBel(m))); box.scrollTop=box.scrollHeight; }
+  catch(e){ $('#chatIn').value=t; alert(e.message); }
 }
 $('#snapBtn').addEventListener('click', ()=> kiesSnap(chatMet, chatCn));
 $('#chatBel').addEventListener('click', ()=>{ if(chatMet) belStart(chatMet, chatCn, false); });

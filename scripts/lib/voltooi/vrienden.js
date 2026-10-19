@@ -13,10 +13,10 @@
    Alles loopt over /api/rtf/social, met code en token van het gezinsprofiel in
    het lijf, zoals soc() in vrienden.html.
 
-   EEN BERICHT DRAAGT GEEN HERHAALSLEUTEL, en dat is in een chat geen fout: twee
-   keer "ja" is twee berichten. Herstelbaar meet daarom bij een afgebroken
-   bericht dat het er hooguit een keer staat en dat de chat laat zien of het
-   aankwam -- niet dat de server een tweede verzending zou samenvoegen.
+   EEN BERICHT DRAAGT EEN HERHAALSLEUTEL PER OPGESTELD BERICHT (RTGId in het
+   scherm, kern/comm/bericht.js): een dubbele tik, een nieuwe poging na een
+   afgebroken verzoek en een herhaling na een crash zijn hetzelfde bericht; een
+   bewust tweede "ja" krijgt een eigen sleutel.
    ========================================================================== */
 'use strict';
 const { GEZINSWERELD, accountGezin } = require('../voltooigezin');
@@ -134,20 +134,31 @@ async function loop(w, stap) {
     return { klopt: [a.status, b.status].includes(200) && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + n + ' verzoek bij de ouder van D' };
   });
 
-  await stap('herstelbaar', 'een afgebroken bericht staat er hooguit een keer, en de chat laat zien of het aankwam', async () => {
+  await stap('herstelbaar', 'een afgebroken bericht en daarna opnieuw met dezelfde sleutel: het staat er precies een keer', async () => {
     const T = 'Neem je bal mee ' + merk;
-    const half = await w.afgebroken(DM_SEND, { code: A.kind.code, token: A.kind.token, toKey: kb.me, text: T });
-    const n = (await berichten(A.kind, kb.me)).filter((x) => x.text === T).length;
-    const bijB = (await berichten(B.kind, ka.me)).filter((x) => x.text === T).length;
-    return { klopt: n <= 1 && n === bijB, ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), in de chat van A ' + n + ', bij B ' + bijB };
+    const lijf = { code: A.kind.code, token: A.kind.token, toKey: kb.me, text: T, idem: 'dm-' + merk + '-half' };
+    const half = await w.afgebroken(DM_SEND, lijf);
+    const opnieuw = await w.post(DM_SEND, lijf);
+    const n = (await berichten(B.kind, ka.me)).filter((x) => x.text === T).length;
+    return { klopt: opnieuw.status === 200 && n === 1,
+      ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', bij B ' + n + ' bericht' };
   });
 
-  await stap('herstelbaar', 'een crash direct na een bericht verliest het niet', async () => {
+  await stap('herstelbaar', 'een crash direct na een bericht verliest het niet, en dezelfde sleutel daarna verdubbelt het niet', async () => {
     const T = 'Tot zaterdag ' + merk;
-    const s = await soc(A.kind, DM_SEND, { toKey: kb.me, text: T });
+    const lijf = { toKey: kb.me, text: T, idem: 'dm-' + merk + '-crash' };
+    const s = await soc(A.kind, DM_SEND, lijf);
     await w.crash();
+    const nogEens = await soc(A.kind, DM_SEND, lijf);
     const n = (await berichten(B.kind, ka.me)).filter((x) => x.text === T).length;
-    return { klopt: s.status === 200 && n === 1, ziet: 'sturen ' + s.status + ', na SIGKILL ' + n + ' bericht bij B' };
+    return { klopt: s.status === 200 && nogEens.status === 200 && n === 1, ziet: 'sturen ' + s.status + ', na SIGKILL dezelfde sleutel ' + nogEens.status + ', bij B ' + n + ' bericht' };
+  });
+
+  await stap('herstelbaar', 'een dubbele tik op Stuur met dezelfde sleutel is een bericht', async () => {
+    const T = 'Dubbel getikt ' + merk;
+    const [a, b] = await w.dubbel(DM_SEND, { code: A.kind.code, token: A.kind.token, toKey: kb.me, text: T, idem: 'dm-' + merk + '-dubbel' });
+    const n = (await berichten(B.kind, ka.me)).filter((x) => x.text === T).length;
+    return { klopt: a.status === 200 && b.status === 200 && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', bij B ' + n + ' bericht' };
   });
 }
 
@@ -157,6 +168,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'een kind zoekt niet zelf: zijn ouder voegt een vriendje toe, de ouder van dat vriendje keurt goed, en pas dan sturen de kinderen elkaar berichten -- een vreemde ouder, een ander gezin of het kind zelf slaat die stappen niet over',
-  grens: 'De proef loopt over /api/rtf/social, de routes die het scherm aanroept, niet door het scherm zelf. Snaps, verhalen, de contactpin, bellen (WebRTC) en de live stroom lopen hier niet mee. Een bericht draagt geen herhaalsleutel, dus een dubbel verstuurd bericht is twee berichten; dat is hier niet als fout gemeten. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over /api/rtf/social, de routes die het scherm aanroept, niet door het scherm zelf. Snaps, verhalen, de contactpin, bellen (WebRTC) en de live stroom lopen hier niet mee. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

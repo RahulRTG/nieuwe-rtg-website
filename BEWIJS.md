@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2838 bestanden en 19607 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2839 bestanden en 19612 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2838 |
-| losse beweringen (`test(...)`) | 19607 |
+| toetsbestanden | 2839 |
+| losse beweringen (`test(...)`) | 19612 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 22 |
+| niets van beide | 23 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2499 bestanden, 19034 beweringen.
+2500 bestanden, 19039 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -368,6 +368,7 @@ toets omvalt.
 | `capgezondheid.test.js` | 8 | gezakt op `===->!==#0` | CAPABILITY HEALTH -- hoe gaat het met DIT onderdeel? DE FOUT DIE DIT VERVANGT. |
 | `care.test.js` | 8 | gezakt op `liegpoort /api/` | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
 | `carebetaal.test.js` | 5 | -- | Een zorgboeking is pas betaald als er geld bewoog (server/kern/care/leden.js, careBetaal). Gevonden door FoundationOS bij link:foundationzorg: /api/care/betaal zette de boeking op paid=true en "geboekt" zonder dat er... |
+| `carepakket.test.js` | 5 | -- | Een herstelpakket is pas betaald als beide zaken betaald zijn (server/kern/care/pakketbetaal.js). /api/care/pakket/betaal zette pakket en behandeling op paid zonder dat er geld bewoog. |
 | `carriereledger.e2e.test.js` | 12 | gezakt op `liegpoort /api/` | HET CARRIERE LEDGER OVER HTTP -- drie partijen aan dezelfde regel. test/carriereledger.test.js beproeft het BESLUIT zonder server. |
 | `carriereledger.test.js` | 19 | gezakt op `===->!==#0` | HET CARRIERE LEDGER -- chronologisch, per regel bewijsbaar, met herkomst. CARRIERE.md par. |
 | `catalogus-wensen.test.js` | 4 | gezakt op `liegpoort /api/` | DE KANTOORKANT VAN DE CATALOGUS-WENSEN. De onboarding vraagt een nieuw lid of het een bedrijf heeft, en met een vinkje legt het de wens vast om in de RTG-catalogus te komen (kern/onboarding/meebouwen.js). |

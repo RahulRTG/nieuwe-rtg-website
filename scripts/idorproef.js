@@ -128,6 +128,16 @@ const NAGEKEKEN = {
   /* De eerste afbakeningsronde (gang 4, 19 oktober 2026): B kreeg met
      hetzelfde verzoek een merkteken van A terug, met de hand nagelezen. */
   'POST /api/browser/gids': 'webmaker-blader gids() geeft alleen sites die hun maker zelf online zette (d.online && d.adres): een openbare gids, en het adres is de codenaam die de maker publiceerde',
+  /* De opbouwronde (19 oktober 2026, ./lib/idoropbouw.js): A had voor het eerst
+     potten, een kring en een loopbaanprofiel, en vier nieuwe kandidaten kwamen
+     boven. Met de hand nagelezen, alle vier B die iets van B doet. Twee ervan
+     tonen een zwakte van de ijking zelf: de tweede poging van B (met een
+     verzonnen id) faalde op de TOESTAND die B's eerste poging had gezet (409),
+     niet op het id. */
+  'POST /api/metier/naam-vrij': 'metierBewijs.geefVrij(req.session.key, code, waarvoor): B geeft zijn EIGEN naam vrij aan een zaak; de code is de openbare zaakcode, een verzonnen code geeft "Deze zaak kennen we niet"',
+  'POST /api/neiging/antwoord': 'kern.neiging.antwoord(req.session.key, vraag, onderwerpen): de vraag is een id uit de vaste vragenlijst (kern/neiging/vraag-lijst.js), geen object van A; het antwoord landt op B\'s eigen sleutel',
+  'POST /api/veiligheid/kring/mail': 'kringMailToevoegen(req.session.key, adres) leest geen id; de controle gaf 409 omdat B\'s eerste poging het adres al in B\'s EIGEN kring zette',
+  'POST /api/veiligheid/wacht/start': 'wachtStart(req.session.key, codenaam, body) leest body.id niet en maakt een nieuwe wacht voor B; de controle gaf 409 "Er loopt al een wacht" door B\'s eerste poging',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
@@ -228,7 +238,7 @@ if (require.main !== module) { module.exports = {}; return; }
   let C = await maakLid(3);
   if (!A || !B || !C) { console.error('kon geen drie leden registreren; A=' + !!A + ' B=' + !!B + ' C=' + !!C); klaar(); process.exit(2); }
   /* De context van de opbouw (./lib/idoropbouw.js): de tegenpartij is C. */
-  const ctx = { tegen: leden[3] };
+  const ctx = { get tegen() { return leden[3]; }, get ik() { return leden[1]; } };
   const basisLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), ctx);
 
   /* ---- DE SESSIE OVERLEEFT DE PROEF, want anders bewijst hij het tegendeel ----
@@ -324,10 +334,26 @@ if (require.main !== module) { module.exports = {}; return; }
      oogstgang niet kon maken (een pot, een gesprek met C, een team). Wat
      terugkomt leert de pool en de merktekens, net als elk ander antwoord. */
   const opbouw = { stappen: 0, geslaagd: 0, mislukt: [] };
+  let kantoor = null;
+  const hulp = { post, A: () => A, C: () => C };
   for (const st of opbouwLib.stappen(ctx)) {
     opbouw.stappen++;
+    if (typeof st.doe === 'function') {
+      try { await st.doe(hulp, ctx); opbouw.geslaagd++; }
+      catch (e) { opbouw.mislukt.push(st.naam + ': ' + e.message); }
+      continue;
+    }
     const lijf = typeof st.lijf === 'function' ? st.lijf(ctx) : (st.lijf || {});
-    const u = await roep(st.pad, lijf, 1, A);
+    if (st.als === 'kantoor' && !kantoor) {
+      kantoor = ((await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data || {}).token || null;
+    }
+    const u = st.als === 'kantoor' ? await post(st.pad, lijf, kantoor)
+      : st.als === 'tegen' ? await roep(st.pad, lijf, 3, C) : await roep(st.pad, lijf, 1, A);
+    if (st.als) {
+      if (u.status >= 200 && u.status < 300) { opbouw.geslaagd++; if (typeof st.bewaar === 'function') { try { st.bewaar(u.data, ctx); } catch (e) {} } }
+      else opbouw.mislukt.push((st.als + ' ') + st.pad + ' ' + u.status + ' ' + String(u.tekst || '').slice(0, 80));
+      continue;
+    }
     if (u.status >= 200 && u.status < 300) {
       opbouw.geslaagd++;
       if (u.data && typeof u.data === 'object') {
@@ -374,7 +400,13 @@ if (require.main !== module) { module.exports = {}; return; }
   const verzonnen = () => 'ZZ-' + Math.random().toString(36).slice(2, 10);
   for (const r of routes) {
     const sleutel = r.methode + ' ' + r.pad;
-    const { lijf, velden } = pool.verrijk(basisLijf(r.pad), r.pad);
+    const verrijkt = pool.verrijk(basisLijf(r.pad), r.pad);
+    /* A's eigen verwijzingen uit de opbouw (./lib/idoropbouw.js VAN_A) gaan er
+       NA het verrijken op: de pool kent een IBAN niet en deelt een `id` per
+       domein, en B hoort precies A's object te noemen. */
+    const eigen = opbouwLib.vanA(r.pad, ctx);
+    const lijf = Object.assign(verrijkt.lijf, eigen);
+    const velden = [...new Set([...verrijkt.velden, ...Object.keys(eigen)])];
     if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
     const u = await roep(r.pad, lijf, 2, B);
     const o = oordeelIdor(u.status, u.tekst);

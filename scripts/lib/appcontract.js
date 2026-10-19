@@ -197,6 +197,9 @@ const CONTRACT = {
   'link:foundationzorg': Object.assign({
     belofte: 'het gezin ziet zijn zorgafspraken (betalen, annuleren) en de gezondheidskaart van het gezin bij elkaar, en een hulpwijzer denkt mee zonder de tekst te bewaren'
   }, voltooi('foundationzorg', 'het scenario loopt /api/care, /api/care/mijn, /betaal, /annuleer, /api/foundation/gezin/:code/gezondheid en /api/foundation/hulp/ai, de routes die /apps/foundation/zorg.html via zorg-hulp.js aanroept')),
+  'link:passkeys': Object.assign({
+    belofte: 'een lid zet na zijn wachtwoord een passkey op zijn account, logt daarna in zonder wachtwoord, ziet zijn sleutels en haalt er een weg met zijn vinger'
+  }, voltooi('passkeys', 'het scenario loopt /api/webauthn/registreer/opties, /registreer, /lijst, /opties, /login, /bevestig/opties en /weg, de routes die /apps/passkeys.html zelf aanroept, met een software-authenticator')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

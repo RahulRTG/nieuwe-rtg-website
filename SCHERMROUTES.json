@@ -3,12 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "190558c5",
+  "commit": "4e9badbe",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
-   "ongecommitteInvoer": [],
+   "ongecommitteInvoer": [
+    "public/apps/passkeys.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,8 +7822,8 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1134,
-  "verwijzingen": 1362,
+  "exactePaden": 1137,
+  "verwijzingen": 1369,
   "voorvoegsels": 140,
   "basisPaden": 1,
   "doodPad": 0,
@@ -8602,6 +8604,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/webauthn/lijst",
+   "schermen": [
+    "public/apps/kantoren.html",
+    "public/apps/passkeys.html"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/leerhuis/lees",
    "schermen": [
     "public/apps/leerhuis-deur.js",
@@ -8734,6 +8744,30 @@
    "schermen": [
     "public/apps/overheid.html",
     "public/apps/rijksloket.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/webauthn/bevestig/opties",
+   "schermen": [
+    "public/apps/passkeys.html",
+    "public/shared/herbevestig.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/webauthn/registreer",
+   "schermen": [
+    "public/apps/passkeys.html",
+    "public/shared/toestelsleutel.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/webauthn/weg",
+   "schermen": [
+    "public/apps/passkeys.html",
+    "public/shared/toestelsleutel.js"
    ],
    "aantal": 2
   },
@@ -12031,13 +12065,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/webauthn/lijst",
-   "schermen": [
-    "public/apps/kantoren.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/supplier/pos/sale",
    "schermen": [
     "public/apps/kassa/wachtrij.js"
@@ -13879,6 +13906,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/webauthn/login",
+   "schermen": [
+    "public/apps/passkeys.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/webauthn/opties",
+   "schermen": [
+    "public/apps/passkeys.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/webauthn/registreer/opties",
+   "schermen": [
+    "public/apps/passkeys.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/link/cap/maak",
    "schermen": [
     "public/apps/pay.html"
@@ -15587,13 +15635,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/webauthn/bevestig/opties",
-   "schermen": [
-    "public/shared/herbevestig.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/talen",
    "schermen": [
     "public/shared/i18n/i18n-03.js"
@@ -15896,20 +15937,6 @@
   },
   {
    "pad": "/api/rtgid/machtig",
-   "schermen": [
-    "public/shared/toestelsleutel.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/webauthn/registreer",
-   "schermen": [
-    "public/shared/toestelsleutel.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/webauthn/weg",
    "schermen": [
     "public/shared/toestelsleutel.js"
    ],
@@ -18615,10 +18642,16 @@
   },
   {
    "bestand": "public/apps/passkeys.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/webauthn/"
-   ]
+   "exact": [
+    "/api/webauthn/bevestig/opties",
+    "/api/webauthn/lijst",
+    "/api/webauthn/login",
+    "/api/webauthn/opties",
+    "/api/webauthn/registreer",
+    "/api/webauthn/registreer/opties",
+    "/api/webauthn/weg"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/pay.html",

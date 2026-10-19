@@ -35,12 +35,7 @@ const NIET_GEBOUWD = [
     reden: 'Dat zijn gegevens van een andere zaak; die deelt RTG niet.' }
 ];
 
-function mediaan(getallen) {
-  const g = getallen.slice().sort((a, b) => a - b);
-  if (!g.length) return null;
-  const m = Math.floor(g.length / 2);
-  return g.length % 2 ? g[m] : Math.round((g[m - 1] + g[m]) / 2);
-}
+const { mediaan } = require('./util');
 
 module.exports = ({ db, mall, bureauZaak, samenwerking, nu = () => new Date() }) => {
   const gemeten = (waarde, bron) => ({ waarde, bron });

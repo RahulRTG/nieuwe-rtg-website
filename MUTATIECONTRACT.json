@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-19T08:42:45.337Z",
-  "commit": "21938d15",
+  "op": "2026-10-19T09:01:58.367Z",
+  "commit": "cea06cb5",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5400,
-  "geclassificeerd": 5375,
+  "totaal": 5405,
+  "geclassificeerd": 5380,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1298,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 707,
-   "INTENTIONALLY_NON_IDEMPOTENT": 206
+   "INTENTIONALLY_NON_IDEMPOTENT": 211
   },
-  "vastgesteldDoorMens": 2263,
+  "vastgesteldDoorMens": 2268,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4468,
+   "AUTHENTICATED": 4473,
    "PUBLIC": 105,
    "OBJECT_SCOPED": 785,
    "(niet af te leiden -- vraagt een verklaring)": 26,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 253
+   "niet gemeten": 258
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -470,6 +470,36 @@
   {
    "route": "POST /api/rtf/partner/raad",
    "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfkantoor/club/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfkantoor/stadsraad/partner-code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/gemeente/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/ondernemer/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/partner/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -93979,6 +94009,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfkantoor.club.code.roteren",
+   "route": "POST /api/rtfkantoor/club/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfkantoor.club.maak",
    "route": "POST /api/rtfkantoor/club/maak",
    "semantiek": {
@@ -94380,6 +94431,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfkantoor.stadsraad.partnercode.roteren",
+   "route": "POST /api/rtfkantoor/stadsraad/partner-code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -95998,6 +96070,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.gemeente.code.roteren",
+   "route": "POST /api/rtfos/gemeente/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.gemeente.maak",
    "route": "POST /api/rtfos/gemeente/maak",
    "semantiek": {
@@ -97169,6 +97262,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.ondernemer.code.roteren",
+   "route": "POST /api/rtfos/ondernemer/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.ondernemer.koppel",
    "route": "POST /api/rtfos/ondernemer/koppel",
    "semantiek": {
@@ -97273,6 +97387,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.partner.code.roteren",
+   "route": "POST /api/rtfos/partner/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

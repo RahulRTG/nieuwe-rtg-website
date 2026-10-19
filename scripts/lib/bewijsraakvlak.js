@@ -353,9 +353,11 @@ function gedeeld(w) {
    van een andere app, een landingspagina, een afbeelding van iemand anders)
    maakt dat scherm niet oud.
 
-   GENOEMD telt als bestand maar wordt niet gevolgd: een link naar een ander
-   scherm, een afbeelding, een lettertype. Een gelinkt scherm volgen maakt van
-   elk scherm het hele huis; wat dat scherm zelf doet, is zijn eigen meting.
+   GENOEMD telt als bestand maar wordt niet gevolgd: een afbeelding, een
+   lettertype. Een link naar een ANDER scherm telt niet: dat scherm draait
+   hier niet, en wat het doet is zijn eigen meting. Gemeten op 19 oktober
+   2026: het menu van de schil noemt vrijwel elk scherm, en met links erbij
+   maakte een regel in mijn-post.html alle 101 apps oud.
 
    BEREKENDE PADEN. `'/shared/' + bron[0] + '.js'` levert elk bestand dat op
    /shared/STER.js past, met de ster binnen een padsegment; een staart die open
@@ -388,7 +390,12 @@ function verwijzingen(w, f) {
   w.cache.set(sleutel, uit);
   const buf = w.inhoud(f);
   if (buf === null || !/\.(m?js|css|html?|json|webmanifest)$/.test(f)) return uit;
-  const plaats = (doelen) => { for (const d of doelen) (LAADT.test(d) ? uit.laadt : uit.noemt).push(d); };
+  /* Een ander SCHERM (.html) is een bestemming: het draait niet in dit scherm,
+     en wat het doet is zijn eigen meting. De schil linkt naar vrijwel elk
+     scherm, dus anders zou elke schermwijziging elk bewijs oud maken. Een
+     afbeelding of lettertype draait ook niet, maar kan wel de bladzijde
+     verschuiven (een knop onder iets anders): die telt mee. */
+  const plaats = (doelen) => { for (const d of doelen) { if (LAADT.test(d)) uit.laadt.push(d); else if (!/\.html?$/.test(d)) uit.noemt.push(d); } };
   const zoek = (ref) => {
     const kaal = ref.split('#')[0].split('?')[0];
     if (!kaal || /^[a-z]+:/i.test(kaal) || kaal.startsWith('//')) return [];

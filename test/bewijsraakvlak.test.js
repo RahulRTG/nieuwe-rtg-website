@@ -30,7 +30,9 @@ const BESTANDEN = {
   'server/routes/b.js': "module.exports = ({ app }) => app.get('/api/b', (q, s) => s.json({}));\n",
   'server/routes/c.js': "const naam = process.env.X;\nconst m = require(naam);\nmodule.exports = ({ app }) => app.get('/api/c', m);\n",
   'public/shared/schil.js': "window.schil = 1;\n",
-  'public/apps/a.html': '<!doctype html><script src="/shared/schil.js"></script><script src="/apps/a.js"></script>\n',
+  'public/apps/a.html': '<!doctype html><script src="/shared/schil.js"></script><script src="/apps/a.js"></script>' +
+    '<a href="/apps/b.html">B</a><img src="/apps/a.png">\n',
+  'public/apps/a.png': 'png',
   'public/apps/a.js': "fetch('/api/a/lijst');\n",
   'public/apps/b.html': "<!doctype html><script src=\"/shared/schil.js\"></script><script>fetch('/api/b');</script>\n",
   'public/apps/c.html': "<!doctype html><script>fetch('/api/c');</script>\n",
@@ -143,6 +145,13 @@ test('een wijziging in een scherm maakt alleen dat scherm oud; in de schil die h
   assert.equal(nu('a').stand, 'VERS');
   assert.equal(nu('b').stand, 'VERVALLEN');
   schrijf(map, 'public/shared/schil.js', 'window.schil = 2;\n');
+  assert.equal(nu('a').stand, 'VERVALLEN');
+}));
+
+test('een link naar een ander scherm maakt dat scherm geen deel van het raakvlak; een afbeelding wel', () => metRepo(({ map, nu }) => {
+  schrijf(map, 'public/apps/b.html', BESTANDEN['public/apps/b.html'] + '<p>anders</p>\n');
+  assert.equal(nu('a').stand, 'VERS', 'A linkt naar B, maar B draait niet in A');
+  schrijf(map, 'public/apps/a.png', 'andere png');
   assert.equal(nu('a').stand, 'VERVALLEN');
 }));
 

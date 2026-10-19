@@ -615,8 +615,11 @@ buiten elk raakvlak maakt niets oud. De voorwaarden van het stempel zelf
   (`'/shared/' + naam + '.js'`). Daarbij hoort ook de gedeelde schil:
   `basis.js` en `rtg-world-desktop.js` laden op vrijwel elk scherm tientallen
   modules, en een wijziging daar maakt dus vrijwel elk scherm oud. Dat volgt uit
-  de laadsluiting en niet uit een aanname. Wat een scherm alleen noemt (een link,
-  een afbeelding) telt als bestand en wordt niet gevolgd.
+  de laadsluiting en niet uit een aanname. Een afbeelding of lettertype telt als
+  bestand (het kan een knop verschuiven) en wordt niet gevolgd. Een link naar een
+  ander scherm telt niet: dat draait hier niet. Het menu van de schil noemt
+  vrijwel elk scherm, en met links erbij maakte één regel in `mijn-post.html`
+  alle 101 apps oud.
 - **de handlers** — de routes die het scherm (of het scenario) noemt, als patroon
   (`'/api/' + w + '/doe/bevestig'` is `/api/STER/doe/bevestig`), gevraagd aan de
   router van de huidige boom (`scripts/lib/routes.js`). Daarbij hoort hun

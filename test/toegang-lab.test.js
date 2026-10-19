@@ -52,3 +52,23 @@ test('de bewonersroutes vragen een account, en een stem is een per account', asy
   assert.equal(twee.status, 200, 'een tweede account stemt, ook met dezelfde alias: ' + JSON.stringify(twee.body));
   assert.equal(twee.body.thema.stemmen, 2);
 });
+
+/* De stemmerssleutel hangt aan de vaste accountsleutel (user-N), niet aan de
+   sessie: hetzelfde account dat opnieuw inlogt -- een tweede toestel, of na
+   uitloggen -- stemt niet nog eens. */
+test('hetzelfde account in een tweede sessie stemt niet nog eens', async () => {
+  const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+  const cred = { login: 'stemmer' + u + '@voorbeeld.nl', password: 'geheim12345' };
+  const reg = await post('/api/auth/register', { name: 'Stemmer Twee', email: cred.login, phone: '06' + u.slice(0, 8),
+    password: cred.password, geboortedatum: '1985-05-05', tier: 'guest' });
+  assert.ok(reg.body.token, JSON.stringify(reg.body).slice(0, 160));
+  const tweede = await post('/api/auth/login', cred);
+  assert.ok(tweede.body.token && tweede.body.token !== reg.body.token, 'een tweede, eigen sessie: ' + JSON.stringify(tweede.body).slice(0, 160));
+
+  const lab = ((await post('/api/lab2/bewoner/labs', {}, reg.body.token)).body.labs || [])[0];
+  const t = await post('/api/lab2/bewoner/thema', { labId: lab.id, vraag: 'Waar kan de buurt samen groente telen?', alias: 'Teler' }, reg.body.token);
+  assert.equal(t.status, 200, JSON.stringify(t.body));
+  assert.equal((await post('/api/lab2/bewoner/stem', { id: t.body.thema.id, alias: 'Teler' }, reg.body.token)).status, 200);
+  const nogEens = await post('/api/lab2/bewoner/stem', { id: t.body.thema.id, alias: 'Andere Naam' }, tweede.body.token);
+  assert.equal(nogEens.status, 409, 'dezelfde mens in een tweede sessie stemt niet nog eens: ' + JSON.stringify(nogEens.body));
+});

@@ -137,6 +137,7 @@ const NAGEKEKEN = {
   'POST /api/metier/naam-vrij': 'metierBewijs.geefVrij(req.session.key, code, waarvoor): B geeft zijn EIGEN naam vrij aan een zaak; de code is de openbare zaakcode, een verzonnen code geeft "Deze zaak kennen we niet"',
   'POST /api/neiging/antwoord': 'kern.neiging.antwoord(req.session.key, vraag, onderwerpen): de vraag is een id uit de vaste vragenlijst (kern/neiging/vraag-lijst.js), geen object van A; het antwoord landt op B\'s eigen sleutel',
   'POST /api/veiligheid/kring/mail': 'kringMailToevoegen(req.session.key, adres) leest geen id; de controle gaf 409 omdat B\'s eerste poging het adres al in B\'s EIGEN kring zette',
+  'POST /api/wallet/munt/koop': 'wallet.muntKoop(req.session.key, body) leest geen id en geen code: B koopt munten voor zijn EIGEN wallet uit zijn EIGEN saldo. De tegenpoging gaf 409 IDEM_ANDER_VERZOEK omdat de proef hetzelfde lijf met dezelfde herhaalsleutel stuurt en alleen het id vervangt; met een verse sleutel geeft een verzonnen id ook 200. A betaalt niets en A\'s munt blijft onveranderd (test/wallet-muntkoop-idor.test.js)',
   'POST /api/veiligheid/wacht/start': 'wachtStart(req.session.key, codenaam, body) leest body.id niet en maakt een nieuwe wacht voor B; de controle gaf 409 "Er loopt al een wacht" door B\'s eerste poging',
   /* De tweede opbouwronde (19 oktober 2026). De tegenpoging staat nu in het
      register (`tegenpoging`); vier van de vijf vielen op 409, de TOESTAND die

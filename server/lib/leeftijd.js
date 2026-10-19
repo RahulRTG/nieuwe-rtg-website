@@ -9,6 +9,7 @@
    toetsen -- je kunt niet wachten tot de jarige jarig is. Met de klok wel. */
 
 const { datum } = require('./klok');
+const tijdzone = require('../kern/tijdzone');
 
 /* DE LEEFTIJDSGRENZEN VAN EEN RTG-LIDMAATSCHAP: EEN PLEK.
 
@@ -28,11 +29,13 @@ const LID_MAX_LEEFTIJD = 120;
 // Hele jaren tussen een geboortedatum (YYYY-MM-DD) en vandaag; null bij ongeldig.
 function leeftijdVan(geboren) {
   if (!geboren || !/^\d{4}-\d{2}-\d{2}$/.test(String(geboren))) return null;
-  const g = new Date(geboren);
-  if (isNaN(g)) return null;
-  const nu = datum();
-  let j = nu.getFullYear() - g.getFullYear();
-  if (nu.getMonth() < g.getMonth() || (nu.getMonth() === g.getMonth() && nu.getDate() < g.getDate())) j--;
+  if (isNaN(new Date(geboren))) return null;
+  /* Vandaag is vandaag in Nederland: wie om half een 's nachts jarig wordt, is
+     dat in een UTC-container pas om twee uur. Een geboortedatum is een
+     kalenderdag, dus hij wordt als tekst vergeleken en niet als moment. */
+  const nu = tijdzone.datumIn(datum());
+  let j = Number(nu.slice(0, 4)) - Number(geboren.slice(0, 4));
+  if (nu.slice(5) < String(geboren).slice(5, 10)) j--;
   return j;
 }
 

@@ -3,6 +3,7 @@
    chatlaag via de context. Krijgt de gedeelde context een keer bij het
    opstarten vanuit kern/markt/handel.js. */
 const S = require('./samenkomst');
+const tijdzone = require('../../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal,
     CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
@@ -69,7 +70,7 @@ module.exports = (ctx) => {
   function maakFactuur(chat) {
     const m = store();
     m.teller = (m.teller || 0) + 1;
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     return {
       nummer: 'SAL-' + jaar + '-' + String(m.teller).padStart(6, '0'),
       bedrag: chat.deal.bedrag, verkoper: chat.verkoper.naam, koper: chat.koper.naam,

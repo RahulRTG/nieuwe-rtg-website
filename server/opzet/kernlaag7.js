@@ -92,9 +92,8 @@ require('../kern/rahul').zetGeslachtBron((key) => {
   if (!md) return null;
   let lft = null;
   if (md.geboren) {
-    const g = new Date(md.geboren), nu2 = new Date();
-    lft = nu2.getFullYear() - g.getFullYear();
-    if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
+    // lib/leeftijd rekent de verjaardag op de kalender van het huis, niet van de container
+    lft = require('../lib/leeftijd').leeftijdVan(md.geboren);
   }
   /* De levensfase (kern/rahul-fases.js) bepaalt in welke ROL Rahul staat:
      kind, scholier, student, volwassen of senior. De leeftijd geeft de

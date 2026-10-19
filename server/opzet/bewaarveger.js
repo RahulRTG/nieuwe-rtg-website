@@ -39,7 +39,7 @@ module.exports = function sluitBewaarvegerAan(deps) {
       }
       if (!laatst) return 0;
       const d = new Date(laatst);
-      d.setMonth(d.getMonth() + 1);
+      d.setUTCMonth(d.getUTCMonth() + 1);
       return d.getTime();
     }
   });

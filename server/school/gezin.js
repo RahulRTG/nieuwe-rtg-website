@@ -19,7 +19,7 @@ module.exports = (sctx) => {
     const s = gezinSessie(req, res); if (!s) return;
     // een ouder ziet alle gekoppelde kinderen; een kind alleen zichzelf
     const mijnIds = s.beheerder ? Object.keys(s.g.profielen) : [s.p.id];
-    const DAG = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][new Date().getDay()];
+    const DAG = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][require('../kern/tijdzone').weekdagIn()];
     const uit = [];
     for (const k of Object.values(K())) {
       for (const l of (k.leerlingen || [])) {

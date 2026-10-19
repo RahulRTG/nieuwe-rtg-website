@@ -1,5 +1,6 @@
 /* Shared-assets (deelmodule): mijn tickets, een 24-uursblok boeken en de uitstap (terugkoop of overdracht).
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
@@ -9,7 +10,7 @@ module.exports = (ctx) => {
     actieveVan, bezetVan, magKopen, kasAdd, binnenBedenktijd } = ctx;
   function assetMijn(key) {
     lijsten();
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     const posities = db.data.sharedAssets.map(a => {
       const mijn = actieveVan(a.id).filter(t => t.key === key);
       const wachtend = db.data.assetTerugkoop.filter(v => v.assetId === a.id && v.key === key && v.status === 'aangevraagd');

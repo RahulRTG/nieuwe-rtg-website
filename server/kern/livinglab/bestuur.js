@@ -165,7 +165,7 @@ module.exports = (ctx) => {
     let geveegd = 0, regels = 0;
     for (const s of S().studies) {
       const l = vindLab(s.labId); if (!l) continue;
-      const grens = new Date(ref); grens.setMonth(grens.getMonth() - l.bewaarMaanden);
+      const grens = new Date(ref); grens.setUTCMonth(grens.getUTCMonth() - l.bewaarMaanden);
       if (new Date(s.at) > grens || s.geveegd) continue;
       const d = s.dossier;
       regels += d.observaties.length + d.deelnemers.length + d.datasets.length;

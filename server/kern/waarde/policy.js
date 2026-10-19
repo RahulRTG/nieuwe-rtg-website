@@ -32,6 +32,7 @@
    aantrekt, is niet te beproeven. Wie zelf een klok meegeeft, houdt die. */
 const { nu: klokNu } = require('../../lib/klok');
 const { KLASSEN, STANDAARD } = require('./klassen');
+const tijdzone = require('../tijdzone');
 
 const zinnen = {
   klasse: 'Deze soort waarde kent deze handeling niet.',
@@ -52,7 +53,7 @@ const nee = (reden, extra) => ({ mag: false, reden, uitleg: zinnen[reden], ...(e
 function binnenVenster(venster, datum) {
   const m = /^(\d{2}):(\d{2})-(\d{2}):(\d{2})$/.exec(String(venster || ''));
   if (!m) return true;
-  const minuut = datum.getHours() * 60 + datum.getMinutes();
+  const minuut = tijdzone.huis(datum).minuten;
   const van = Number(m[1]) * 60 + Number(m[2]);
   const tot = Number(m[3]) * 60 + Number(m[4]);
   return van <= tot ? (minuut >= van && minuut <= tot) : (minuut >= van || minuut <= tot);

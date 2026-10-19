@@ -9,6 +9,7 @@ const kluis = require('./kluis');
 const gebonden = require('./gebonden'); // kluis, gebonden aan (kolom, rij-id)
 const mirror = require('./mirror');
 const { uitgezet } = require('./sessiegrens');
+const tijdzone = require('../kern/tijdzone');
 
 /* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
    voor het opstart-seed en tests, waar blokkeren geen kwaad kan. */
@@ -304,8 +305,8 @@ function publicUser(u) {
   return {
     id: u.id, tier: u.tier, name: shortName, full,
     email: emailOf(u), phone: phoneOf(u), codename: u.codename,
-    number: 'RTG · ' + since.getFullYear() + ' · ' + String(1000 + u.id).slice(-4),
-    since: months[since.getMonth()] + ' ' + since.getFullYear(),
+    number: 'RTG · ' + tijdzone.jaarIn(since) + ' · ' + String(1000 + u.id).slice(-4),
+    since: months[tijdzone.maandIn(since) - 1] + ' ' + tijdzone.jaarIn(since),
     account: true, verified: u.verified || 'unverified', emailVerified: !!u.email_verified
   };
 }

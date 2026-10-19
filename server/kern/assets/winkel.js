@@ -1,5 +1,6 @@
 /* Shared-assets (deelmodule): overzicht, ticketdocument, kopen, herroepen en de wachtlijst.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
@@ -77,7 +78,7 @@ module.exports = (ctx) => {
     if (aantal > beschikbaar) return { status: 409, error: 'Uitverkocht: er zijn nog ' + beschikbaar + ' van de ' + TICKETS_PER_OBJECT + ' tickets beschikbaar. Zet u op de wachtlijst.' };
     const prijs = smaak === 'asset' ? prijsAssetVan(a) : prijsAccessVan(a);
     const vervalt = new Date();
-    vervalt.setFullYear(vervalt.getFullYear() + JAREN_GELDIG);
+    vervalt.setUTCFullYear(vervalt.getUTCFullYear() + JAREN_GELDIG);
     const tickets = [];
     for (let i = 0; i < aantal; i++) {
       tickets.push({
@@ -88,7 +89,7 @@ module.exports = (ctx) => {
         smaak, prijs, urenPerJaar: UREN_PER_TICKET,
         at: nu(), vervaltOp: vervalt.toISOString().slice(0, 10),
         akkoord: smaak === 'asset' ? nu() : null,
-        status: 'actief', uitstap: null, feeJaar: new Date().getFullYear()
+        status: 'actief', uitstap: null, feeJaar: tijdzone.jaarIn()
       });
     }
     db.data.assetTickets.unshift(...tickets);

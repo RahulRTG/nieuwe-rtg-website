@@ -40,9 +40,9 @@ function geboorteInfo(v, vandaag = klokDatum()) {
   const jaar = Number(m[1]), maand = Number(m[2]), dag = Number(m[3]);
   const datum = new Date(Date.UTC(jaar, maand - 1, dag));
   if (datum.getUTCFullYear() !== jaar || datum.getUTCMonth() !== maand - 1 || datum.getUTCDate() !== dag) return null;
-  const nuJaar = vandaag.getFullYear(), nuMaand = vandaag.getMonth() + 1, nuDag = vandaag.getDate();
-  let leeftijd = nuJaar - jaar;
-  if (nuMaand < maand || (nuMaand === maand && nuDag < dag)) leeftijd -= 1;
+  const n = require('../kern/tijdzone').huis(vandaag);
+  let leeftijd = n.jaar - jaar;
+  if (n.maand < maand || (n.maand === maand && n.dagVanMaand < dag)) leeftijd -= 1;
   if (leeftijd < 0 || leeftijd > 120) return null;
   return { datum: tekst, leeftijd };
 }

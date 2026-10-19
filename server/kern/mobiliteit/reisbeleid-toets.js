@@ -6,6 +6,7 @@
    Dat zijn twee vragen met twee lezers -- het scherm van de werkgever tegen
    de boekingsmotor -- en ze veranderen om verschillende redenen. */
 'use strict';
+const tijdzone = require('../tijdzone');
 
 // zelfde lijst als in ./reisbeleid.js: de dagnamen komen in het antwoord terug
 const DAGNAMEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
@@ -54,14 +55,15 @@ module.exports = (ctx) => {
 
     const wanneer = voorstel.wanneer ? new Date(voorstel.wanneer) : new Date();
     if (!isNaN(wanneer)) {
-      if (b.dagen && b.dagen.length && !b.dagen.includes(wanneer.getDay()))
+      const hier = tijdzone.huis(wanneer);
+      if (b.dagen && b.dagen.length && !b.dagen.includes(hier.dag))
         redenen.push('Zakelijk reizen mag op ' + b.dagen.map(d => DAGNAMEN[d]).join(', ') +
-          '; dit is een ' + DAGNAMEN[wanneer.getDay()] + '.');
+          '; dit is een ' + DAGNAMEN[hier.dag] + '.');
       if (b.van && b.tot) {
-        const m = wanneer.getHours() * 60 + wanneer.getMinutes();
+        const m = hier.minuten;
         if (m < minuten(b.van) || m > minuten(b.tot))
           redenen.push('Zakelijk reizen mag tussen ' + b.van + ' en ' + b.tot + '; het is nu ' +
-            String(wanneer.getHours()).padStart(2, '0') + ':' + String(wanneer.getMinutes()).padStart(2, '0') + '.');
+            hier.hhmm + '.');
       }
     }
 

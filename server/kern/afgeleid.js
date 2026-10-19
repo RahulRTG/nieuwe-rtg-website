@@ -1,5 +1,6 @@
 /* Zuivere afgeleide berekeningen en projecties: geen gedeelde staat, alleen
    invoer -> uitvoer. Los-testbaar buiten de grote server.js. */
+const tijdzone = require('./tijdzone');
 
 // Publieke projectie van een partner: nooit meer velden dan hier naar buiten.
 function publicPartner(p) {
@@ -8,7 +9,7 @@ function publicPartner(p) {
 
 // Drukte-factor per weekdag (voor omzetprognoses). 0 = zondag.
 function weekdagFactor(d) {
-  const wd = d.getDay();
+  const wd = tijdzone.weekdagIn(d);
   if (wd === 5 || wd === 6) return [1.25, 'vrijdag/zaterdag, druk'];
   if (wd === 0) return [1.0, 'zondag, gemiddeld'];
   return [0.85, 'doordeweeks, rustiger'];

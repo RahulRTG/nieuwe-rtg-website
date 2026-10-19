@@ -35,6 +35,7 @@ const LAND_ZONE = {
   IN: 'Asia/Kolkata', HK: 'Asia/Hong_Kong', AU: 'Australia/Sydney', NZ: 'Pacific/Auckland'
 };
 const TERUGVAL = 'UTC';
+const klok = require('../lib/klok');
 
 /* EEN FORMATTER PER ZONE, NIET PER VRAAG. `new Intl.DateTimeFormat` laadt
    ICU-gegevens en is met tientallen microseconden de duurste regel van dit
@@ -91,7 +92,7 @@ const DAGEN = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
    zone zelf, want een zaak die om 23:00 lokaal nog open is, is dat op een
    andere kalenderdag dan de server denkt. */
 function lokaal(zone, wanneer) {
-  const d = wanneer instanceof Date ? wanneer : new Date();
+  const d = alsDatum(wanneer);
   const z = geldigeZone(zone) ? zone : TERUGVAL;
   const delen = formatterVoor(z).formatToParts(d);
   const op = {};
@@ -101,9 +102,64 @@ function lokaal(zone, wanneer) {
     zone: z,
     datum: op.year + '-' + op.month + '-' + op.day,
     dag: DAGEN[op.weekday] != null ? DAGEN[op.weekday] : d.getUTCDay(),
-    minuten: uur * 60 + Number(op.minute)
+    minuten: uur * 60 + Number(op.minute),
+    jaar: Number(op.year), maand: Number(op.month), dagVanMaand: Number(op.day),
+    uur, minuut: Number(op.minute),
+    hhmm: String(uur).padStart(2, '0') + ':' + op.minute
   };
 }
+
+// een Date, ms of ISO-tekst; anders NU, van lib/klok (dus ook RTG_KLOK)
+function alsDatum(wanneer) {
+  const d = wanneer instanceof Date || wanneer == null ? wanneer : new Date(wanneer);
+  return d && Number.isFinite(d.getTime()) ? d : klok.datum();
+}
+
+/* DE ZONE VAN HET HUIS. In de UTC-container lezen `getHours()` en zijn broers
+   UTC. Een lid heeft geen eigen tijdzone in zijn profiel; zonder zaak met een
+   eigen zone is dat Amsterdam. Wie een andere zone kent, geeft hem mee. */
+const HUIS_ZONE = 'Europe/Amsterdam';
+const zoneOf = zone => (zone || HUIS_ZONE);
+
+// het hele lokaal()-antwoord in het huis (of `zone`), en de losse delen
+const huis = (wanneer, zone) => lokaal(zoneOf(zone), wanneer);
+const uurIn = (wanneer, zone) => huis(wanneer, zone).uur;
+const weekdagIn = (wanneer, zone) => huis(wanneer, zone).dag;
+const datumIn = (wanneer, zone) => huis(wanneer, zone).datum;
+const jaarIn = (wanneer, zone) => huis(wanneer, zone).jaar;
+const maandIn = (wanneer, zone) => huis(wanneer, zone).maand;
+const hhmmIn = (wanneer, zone) => huis(wanneer, zone).hhmm;
+
+/* De zone van een zaak, en zonder eigen zone of bekend land het huis: voor
+   een rooster of kassa in Nederland is UTC een uur ernaast. */
+function zaakZoneOfHuis(s) {
+  const z = zaakZone(s);
+  return z.bron === 'terugval' ? HUIS_ZONE : z.zone;
+}
+
+/* Kalenderrekenen op 'YYYY-MM-DD', in UTC op de kalender zelf: een dag is
+   door de zomertijd niet altijd 24 uur. */
+const kalender = (datum, plus) => {
+  const [j, m, d] = String(datum).slice(0, 10).split('-').map(Number);
+  return Date.UTC(j, m - 1, d + (plus || 0));
+};
+const plusDagen = (datum, n) => new Date(kalender(datum, n)).toISOString().slice(0, 10);
+const weekdagVan = datum => new Date(kalender(datum)).getUTCDay();
+
+/* Het moment waarop het in `zone` `datum` is, `minuten` na middernacht: wat
+   `new Date(j, m, d, u, mi)` deed, maar in de zone van het lid. Twee rondes
+   voor de zomertijd; 02:30 op de voorjaarsdag wordt 03:30, zoals de wandklok. */
+function moment(datum, minuten, zone) {
+  const z = zoneOf(zone);
+  const wens = kalender(datum) + (Number(minuten) || 0) * 60000;
+  let t = wens;
+  for (let i = 0; i < 2; i++) {
+    const l = lokaal(z, new Date(t));
+    t += wens - (kalender(l.datum) + l.minuten * 60000);
+  }
+  return new Date(t);
+}
+const middernacht = (datum, zone) => moment(datum, 0, zone);
 
 /* EEN antwoord op "in welke zone staat deze zaak", voor het hele huis.
 
@@ -133,24 +189,8 @@ function zaakZone(s) {
 // hoe laat het is BIJ DE ZAAK; de vorm die de bellers werkelijk gebruiken
 const nuBijZaak = (s, wanneer) => lokaal(zaakZone(s).zone, wanneer);
 
-/* DE OMGEKEERDE VRAAG: welk tijdstip is "om 10:00 op deze dag" in deze zone?
-   Een afspraak bij een zaak staat in de tijd van de zaak, niet in UTC
-   (kern/move/naad.js las hem als UTC en zat in de zomer twee uur mis). Twee
-   keer bijstellen met lokaal(): de eerste ronde vindt de offset, de tweede
-   vangt een zomertijdwissel tussen gok en antwoord. Geen dag of uur: null. */
-function instantIn(zone, datum, tijd) {
-  const d = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(datum || ''));
-  const u = /^(\d{2}):(\d{2})/.exec(String(tijd || ''));
-  if (!d || !u) return null;
-  const doel = Date.UTC(+d[1], +d[2] - 1, +d[3], +u[1], +u[2]);
-  if (!Number.isFinite(doel)) return null;
-  const z = geldigeZone(zone) ? zone : TERUGVAL;
-  let t = doel;
-  for (let i = 0; i < 2; i++) {
-    const l = lokaal(z, new Date(t));
-    t += doel - (Date.parse(l.datum + 'T00:00:00Z') + l.minuten * 60000);
-  }
-  return t;
-}
+// een lokale dag en een uur als tijdstip in een zone: ./tijdzone-instant.js
+const instantIn = (...a) => require('./tijdzone-instant')(...a);
 
-module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak, instantIn };
+module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak, instantIn,
+  HUIS_ZONE, huis, uurIn, weekdagIn, datumIn, jaarIn, maandIn, hhmmIn, plusDagen, weekdagVan, middernacht, moment, zaakZoneOfHuis };

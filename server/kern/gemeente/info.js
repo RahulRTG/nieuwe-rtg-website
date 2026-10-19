@@ -4,6 +4,7 @@
    bekendmakingen. Plus het regie-dashboard van de medewerker. Krijgt de gedeelde
    ctx van kern/gemeente/index.js. */
 const { demoAan } = require('../demostand');
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { save, nu, vandaag, id, ref, schoon, seed, deGemeente, sseToSupplier, publiekeMelding, FRACTIES } = ctx;
   const G = ctx.opslag; // ./opslag.js
@@ -24,17 +25,17 @@ module.exports = (ctx) => {
     const pat = g.gemeente.afval.patroon;
     // de postcode schuift het patroon een paar dagen op, zodat wijken verschillen
     const off = [...String(postcode || '00000')].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7) % 7;
-    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const start = tijdzone.datumIn(); // de ophaaldag is een dag in de gemeente, niet in de container
     const uit = {};
     for (const [fr, wd] of Object.entries(pat)) {
       const doel = (wd + off) % 7;
       const data = [];
       for (let i = 0; i < 28 && data.length < 3; i++) {
-        const d = new Date(start.getTime() + i * 86400000);
-        if (d.getDay() !== doel) continue;
+        const d = tijdzone.plusDagen(start, i);
+        if (tijdzone.weekdagVan(d) !== doel) continue;
         // papier tweewekelijks
-        if (fr === 'papier' && g && g.gemeente.afval.biweekPapier && Math.floor((d - start) / (7 * 86400000)) % 2 === 1) continue;
-        data.push(d.toISOString().slice(0, 10));
+        if (fr === 'papier' && g && g.gemeente.afval.biweekPapier && Math.floor(i / 7) % 2 === 1) continue;
+        data.push(d);
       }
       uit[fr] = { label: FRACTIES[fr], data };
     }
@@ -78,7 +79,7 @@ module.exports = (ctx) => {
   function hash(s) { let h = 0x811c9dc5 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h >>> 0; }
   function ensureAanslagen(key) {
     if (!key || !demoAan()) return;
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     if (G.lijst('gemeenteAanslagen').some(a => a.key === key && a.jaar === jaar)) return;
     const h = hash(String(key) + jaar);
     BELASTINGEN.forEach((b, i) => {

@@ -31,6 +31,7 @@
 const { schoon, coordPaar } = require('../util');
 const { CATS, PLOEG, OBJECTSOORT, PRIO, UIT_STAD } = require('./categorien');
 const { herhaling } = require('./herhaal');
+const tijdzone = require('../tijdzone');
 
 const STATUS = ['open', 'in-behandeling', 'klaar', 'afgewezen'];
 const PRIOS = ['laag', 'normaal', 'hoog', 'urgent'];
@@ -140,7 +141,7 @@ module.exports = (ctx) => {
     if (zaken().length >= MAX_ZAKEN) return { status: 429, error: 'De zakenlijst zit vol.' };
     const z = {
       id: 'Z-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-      ref: 'Z-' + new Date(nu()).getFullYear() + '-' + String(zaken().length + 1).padStart(5, '0'),
+      ref: 'Z-' + tijdzone.jaarIn(nu()) + '-' + String(zaken().length + 1).padStart(5, '0'),
       categorie, categorieLabel: CATS[categorie], objectId,
       lat: plek.lat, lng: plek.lng, gebied: plek.gebied, zone: plek.zone,
       status: 'open', prioriteit: PRIO[categorie] || 'normaal', ploeg: PLOEG[categorie],

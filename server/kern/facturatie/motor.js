@@ -3,6 +3,7 @@
    van de zaak), regels verwerken en het tweezijdige boeken (op code of
    codenaam). Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/facturatie.js. */
+const tijdzone = require('../tijdzone');
 
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
@@ -19,7 +20,7 @@ module.exports = (ctx) => {
   function nummer() {
     const s = store();
     s.factuurTeller += 1;
-    return 'RTG-' + new Date().getFullYear() + '-' + String(s.factuurTeller).padStart(6, '0');
+    return 'RTG-' + tijdzone.jaarIn() + '-' + String(s.factuurTeller).padStart(6, '0');
   }
   /* Het btw-tarief per factuur en per regel woont in ./btw.js (de fiscale laag). */
   const { standaardBtw, verwerkRegels } = require('./btw')({ db, scho });

@@ -111,3 +111,28 @@ test('datumVan: de dag van een opgeslagen tijdstip in het huis; leeg is null en 
   assert.equal(tz.datumVan(''), null);
   assert.equal(tz.datumVan('rommel'), null);
 });
+
+test('herhaalde tijdomzetting is begrensd, exact en geeft geen gedeeld bewerkbaar antwoord', () => {
+  const origineel = Intl.DateTimeFormat.prototype.formatToParts;
+  let omzettingen = 0;
+  Intl.DateTimeFormat.prototype.formatToParts = function (...args) {
+    omzettingen++; return origineel.apply(this, args);
+  };
+  try {
+    const tijd = Date.parse('2041-05-17T12:34:56.789Z');
+    const eerste = tz.lokaal('Europe/Amsterdam', tijd);
+    const kosten = omzettingen;
+    const verwacht = { ...eerste };
+    eerste.datum = 'beschadigd';
+    assert.deepEqual(tz.lokaal('Europe/Amsterdam', tijd), verwacht, 'een lezer kan de cache niet wijzigen');
+    assert.equal(omzettingen, kosten, 'dezelfde invoer hoeft niet opnieuw door ICU');
+    tz.lokaal('Europe/Amsterdam', tijd + 1);
+    assert.equal(omzettingen, kosten + 1, 'milliseconden worden niet afgerond');
+    const elders = tz.lokaal('Asia/Tokyo', tijd);
+    assert.notEqual(elders.hhmm, verwacht.hhmm, 'zones delen geen cacheantwoord');
+    for (let i = 1; i <= 300; i++) tz.lokaal('Europe/Amsterdam', tijd + i * 60000);
+    const voor = omzettingen;
+    assert.deepEqual(tz.lokaal('Europe/Amsterdam', tijd), verwacht);
+    assert.equal(omzettingen, voor + 1, 'oude invoer is uit de begrensde cache verwijderd');
+  } finally { Intl.DateTimeFormat.prototype.formatToParts = origineel; }
+});

@@ -79,6 +79,7 @@ const AFGELEID = 'menselijk';
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'aankomst.js': require('./lib/voltooi/aankomst'),
   'attenties.js': require('./lib/voltooi/attenties'),
   'bescherming.js': require('./lib/voltooi/bescherming'),
   'cellier.js': require('./lib/voltooi/cellier'),
@@ -97,8 +98,11 @@ const SCENARIOS = {
   'mall.js': require('./lib/voltooi/mall'),
   'mecenaat.js': require('./lib/voltooi/mecenaat'),
   'mijnmall.js': require('./lib/voltooi/mijnmall'),
+  'move.js': require('./lib/voltooi/move'),
   'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
+  'navigatie.js': require('./lib/voltooi/navigatie'),
   'neigingen.js': require('./lib/voltooi/neigingen'),
+  'ov.js': require('./lib/voltooi/ov'),
   'pay.js': require('./lib/voltooi/pay'),
   'post.js': require('./lib/voltooi/post'),
   'pulse.js': require('./lib/voltooi/pulse'),

@@ -216,6 +216,19 @@ const CONTRACT = {
   'link:attenties': Object.assign({
     belofte: 'een Lifestyle-lid onderhoudt zijn relaties: wie binnen dertig dagen een attentie verdient, met de giftgeschiedenis'
   }, voltooi('attenties', 'het scenario loopt /api/member/rechterhand/attenties, /relatie en /gift, onder het voorvoegsel dat /apps/attenties.html aanroept')),
+  /* TravelOS: aankomst, vervoer en verblijf (19 oktober 2026). */
+  'link:aankomst': Object.assign({
+    belofte: 'een gast zet zijn wens om in een aanvraag bij de zaak, krijgt een tijdelijke pass met beloften die de zaak persoonlijk bevestigt, en deelt vrijwillig zijn aankomststatus'
+  }, voltooi('aankomst', 'het scenario loopt /api/arrival/interpret, /request, /pass en /pulse, de routes die /apps/arrival.html zelf aanroept, met de zaak die de beloften bevestigt en een tweede zaak die niets ziet')),
+  'link:move': Object.assign({
+    belofte: 'een lid ziet per overgang in zijn reis of hij het haalt, met de dekking erbij, wat er breekt als iets uitloopt en waar hij nu heen moet -- en een vraag verzet niets'
+  }, voltooi('move', 'het scenario loopt /api/move/reis, /gevolg en /volgende, de drie routes die /apps/move.html zelf aanroept, over betaalde afspraken bij twee zaken en met een tweede lid dat niets van de reis ziet')),
+  'link:navigatie': Object.assign({
+    belofte: 'een lid zoekt een bestemming uit de eigen bronnen, krijgt een route van het eigen wegennet of een eerlijke weigering waar dat net er niet is, en meldt onderweg wat hij ziet op codenaam'
+  }, voltooi('navigatie', 'het scenario loopt /api/nav/status, /bestemmingen, /route, /kaart, /gebieden, /meld en /poi, de routes die /apps/navigatie.html zelf aanroept, met een tweede lid dat de melding alleen op codenaam ziet')),
+  'link:ov': Object.assign({
+    belofte: 'een lid koopt bij een vervoerder waarmee RTG een overeenkomst heeft een kaartje uit zijn wallet, toont het, en de controleur ziet het een keer als geldig; weigert de bank, dan is er geen kaartje'
+  }, voltooi('ov', 'het scenario loopt /api/mob/kaart/aanbod, /koop, /mijn en /toon, de routes die /apps/ov.html zelf aanroept, met de overeenkomst langs het kantoor, de controleur van de vervoerder en de simulatiebank als rail')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

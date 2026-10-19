@@ -1,5 +1,5 @@
-/* Kop: de vaste schermkop uit de mockups: zoeken, RTG, profiel. Eén
-   dominante titel per scherm daaronder (HERITAGE.md par. 4). */
+/* Kop: zoeken, RTG, profiel (alle mockups). Daaronder één schermtitel in
+   Bodoni; op beeld valt de kop weg in de foto. */
 @layer rtg.component {
   .ds-kop {
     position: sticky;
@@ -11,14 +11,15 @@
     min-block-size: 56px;
     padding-inline: var(--ds-ruimte-2);
     background: var(--ds-grond);
-    border-block-end: 1px solid var(--ds-lijnkleur);
+    color: var(--ds-inkt);
   }
-  .ds-kop--op-beeld { background: transparent; border-block-end-color: transparent; color: var(--ds-cover-inkt); }
+  .ds-kop--op-beeld { position: absolute; inset-inline: 0; background: transparent; color: var(--ds-cover-inkt); }
+  .ds-kop--op-beeld .ds-kop__merk { color: var(--ds-cover-metaal); }
   .ds-kop__merk {
     justify-self: center;
     font-family: var(--ds-letter-display);
     font-size: 1.375rem;
-    letter-spacing: .04em;
+    letter-spacing: .02em;
     color: inherit;
     text-decoration: none;
   }
@@ -33,7 +34,8 @@
     cursor: pointer;
     border-radius: var(--ds-radius-cirkel);
   }
-  .ds-kop__actie svg { inline-size: 20px; block-size: 20px; }
+  .ds-kop__actie svg { inline-size: 20px; block-size: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .ds-schermkop { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); padding-block: var(--ds-ruimte-2) var(--ds-ruimte-4); }
   .ds-titel {
     margin: 0;
     font-family: var(--ds-letter-display);
@@ -42,6 +44,7 @@
     line-height: 1.05;
     letter-spacing: -.01em;
   }
+  .ds-titel--scherm { font-size: var(--ds-maat-kop); }
   .ds-label {
     margin: 0;
     font-size: var(--ds-maat-meta);

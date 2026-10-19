@@ -1,7 +1,8 @@
-/* Collectie: een verzameling om uit te kiezen: filterchips en een raster
-   van beeldkaarten. Eén kolom op de telefoon, meer naarmate er ruimte is. */
+/* Collectie (mockup): schermtitel, filterchips, en daaronder beeldkaarten
+   die het scherm vullen. Eén kolom op de telefoon, meer op een groter scherm. */
 @layer rtg.scherm {
-  .ds-collectie { padding: var(--ds-ruimte-4) var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); max-inline-size: var(--ds-breedte-max); margin-inline: auto; }
-  .ds-collectie__kop { display: grid; gap: var(--ds-ruimte-2); margin-block: var(--ds-ruimte-6) var(--ds-ruimte-4); }
-  .ds-collectie__raster { display: grid; gap: var(--ds-ruimte-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); margin-block-start: var(--ds-ruimte-4); }
+  .ds-collectie { padding: 0 var(--ds-ruimte-4) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); max-inline-size: var(--ds-breedte-max); margin-inline: auto; }
+  .ds-collectie__kop { display: grid; gap: var(--ds-ruimte-1); margin-block: var(--ds-ruimte-4) var(--ds-ruimte-2); }
+  .ds-collectie__raster { display: grid; gap: var(--ds-ruimte-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); margin-block-start: var(--ds-ruimte-3); }
+  @container ds (min-width: 48rem) { .ds-collectie { padding-inline: var(--ds-goot); } .ds-collectie__raster { gap: var(--ds-ruimte-6); } }
 }

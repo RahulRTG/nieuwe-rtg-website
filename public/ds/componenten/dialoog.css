@@ -25,7 +25,7 @@
     background: var(--ds-grond);
   }
   .ds-dialoog__acties { display: flex; gap: var(--ds-ruimte-3); justify-content: flex-end; margin-block-start: var(--ds-ruimte-6); }
-  @media (min-width: 48rem) {
+  @container ds (min-width: 48rem) {
     .ds-dialoog--vol { inline-size: min(100% - 2 * var(--ds-goot), 44rem); block-size: auto; max-block-size: calc(100dvh - 2 * var(--ds-goot)); margin: auto; border-radius: var(--ds-radius-systeem); }
   }
 }

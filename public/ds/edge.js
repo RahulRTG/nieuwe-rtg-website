@@ -28,7 +28,7 @@
   }
   function rahulKnop() {
     var b = el('button', 'ds-edge__knop ds-edge__knop--rahul', { type: 'button', 'data-ds-edge': 'rahul', 'aria-label': 'Vraag Rahul' });
-    b.innerHTML = svg(h.LIPPEN);
+    b.innerHTML = h.lippen();
     b.addEventListener('click', function () { api.modus('rahul'); });
     return b;
   }

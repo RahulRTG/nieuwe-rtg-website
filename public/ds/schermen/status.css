@@ -1,11 +1,11 @@
-/* Status: leeg, klaar, offline of fout. Ook dit is premium (HERITAGE.md
-   par. 2.5): een rustig beeld, één zin, één weg verder. */
+/* Status (mockup "Nog niets hier."): een rustig beeld, één zin in Bodoni,
+   één regel uitleg, één weg verder. Ook leeg, fout en offline zijn premium
+   (HERITAGE.md par. 2.5). */
 @layer rtg.scherm {
-  .ds-status { display: grid; align-content: center; justify-items: center; gap: var(--ds-ruimte-4); min-block-size: 100dvh; padding: var(--ds-ruimte-16) var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-16)); text-align: center; }
-  .ds-status__beeld { inline-size: min(100%, 22rem); aspect-ratio: 1; object-fit: cover; border-radius: var(--ds-radius-inhoud); }
-  .ds-status__titel { margin: var(--ds-ruimte-4) 0 0; font-family: var(--ds-letter-display); font-weight: 400; font-size: var(--ds-maat-kop); }
-  .ds-status__actie { inline-size: min(100%, 22rem); margin-block-start: var(--ds-ruimte-6); }
-  /* Binnen een scherm: dezelfde toestand, zonder het hele scherm te vullen. */
+  .ds-status { display: grid; align-content: start; justify-items: center; gap: var(--ds-ruimte-3); min-block-size: var(--ds-schermhoogte); padding-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); text-align: center; }
+  .ds-status__beeld { inline-size: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .ds-status__titel { margin: var(--ds-ruimte-8) 0 0; font-family: var(--ds-letter-display); font-weight: 400; font-size: var(--ds-maat-kop); }
+  .ds-status__tekst { margin: 0; max-inline-size: 28rem; padding-inline: var(--ds-ruimte-6); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-status__actie { inline-size: min(100% - 2 * var(--ds-ruimte-6), 24rem); margin-block-start: var(--ds-ruimte-8); }
   .ds-status--binnen { min-block-size: 0; padding: var(--ds-ruimte-12) var(--ds-ruimte-4); }
-  .ds-status__tekst { margin: 0; max-inline-size: 28rem; color: var(--ds-inkt-zacht); }
 }

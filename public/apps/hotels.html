@@ -25,20 +25,20 @@
 <main class="ds-collectie" id="main">
   <div class="ds-collectie__kop">
     <p class="ds-label" id="verblijfEy">Verblijven</p>
-    <h1 class="ds-titel" id="verblijfTitel">Waar wilt u thuiskomen?</h1>
+    <h1 class="ds-titel ds-titel--scherm" id="verblijfTitel">Waar wilt u thuiskomen?</h1>
     <p class="ds-meta" id="verblijfIntro">Vind een verblijf dat past bij uw reis en de manier waarop u wilt leven.</p>
   </div>
+  <div class="ds-tabs" role="tablist" aria-label="Verblijfsmoment">
+    <button class="ds-tab" role="tab" type="button" data-t="zoeken" aria-selected="true">Verblijven</button>
+    <button class="ds-tab" role="tab" type="button" data-t="mijn" aria-selected="false" data-ds-actie="Mijn reizen">Mijn reizen</button>
+    <button class="ds-tab" role="tab" type="button" data-t="service" aria-selected="false">Ter plaatse</button>
+  </div>
+  <div id="inhoud" role="tabpanel"><div class="ds-status ds-status--binnen"><p class="ds-status__tekst">Verblijven laden...</p></div></div>
   <nav class="ds-chips" aria-label="TravelOS reisflow">
     <a class="ds-chip" href="/apps/vluchten.html?view=mijn">Vlucht</a>
     <a class="ds-chip" href="/apps/hotels.html?view=mijn" aria-current="page">Verblijf</a>
     <a class="ds-chip" href="/apps/rit.html">Aankomst</a>
   </nav>
-  <div class="ds-tabs" role="tablist" aria-label="Verblijfsmoment">
-    <button class="ds-tab" role="tab" type="button" data-t="zoeken" aria-selected="true">Verblijven</button>
-    <button class="ds-tab" role="tab" type="button" data-t="mijn" aria-selected="false">Mijn reizen</button>
-    <button class="ds-tab" role="tab" type="button" data-t="service" aria-selected="false">Ter plaatse</button>
-  </div>
-  <div id="inhoud" role="tabpanel"><div class="ds-status ds-status--binnen"><p class="ds-status__tekst">Verblijven laden...</p></div></div>
 </main>
 
 <dialog class="ds-dialoog ds-dialoog--vol" id="verblijfBlad" aria-labelledby="bladNaam">
@@ -48,11 +48,11 @@
     <p class="ds-label" id="bladMeta"></p>
     <h2 class="ds-titel" id="bladNaam"></h2>
     <p class="ds-meta" id="bladVerhaal"></p>
-    <div class="ds-taak__kop" id="kamers" role="group" aria-label="Kamers"></div>
-    <div class="ds-veldgroep">
-      <label class="ds-veldlabel">Aankomst<input class="ds-invoer" id="rAan" type="date"></label>
-      <label class="ds-veldlabel">Vertrek<input class="ds-invoer" id="rVer" type="date"></label>
-      <label class="ds-veldlabel">Gasten<select class="ds-invoer" id="rAantal"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+    <div class="ds-velden" id="kamers" role="group" aria-label="Kamers"></div>
+    <div class="ds-velden">
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span><span class="ds-veld__label">Aankomst</span><input class="ds-veld__invoer" id="rAan" type="date"></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span><span class="ds-veld__label">Vertrek</span><input class="ds-veld__invoer" id="rVer" type="date"></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5M3 20c0-4 2-6 5-6s5 2 5 6m1-6c4 0 6 2 6 6"/></svg><span><span class="ds-veld__label">Gasten</span><select class="ds-veld__invoer" id="rAantal"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></span><span></span></label>
     </div>
     <p class="ds-detail__status" id="rTotaal" aria-live="polite"></p>
     <button class="ds-knop ds-knop--primair ds-knop--breed" id="rBoek" type="button" data-ds-actie="Verblijf aanvragen" disabled>Kies eerst een kamer</button>

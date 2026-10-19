@@ -33,7 +33,8 @@
     "chip",
     "dialoog",
     "edge",
-    "melding"
+    "melding",
+    "toestel"
   ],
   "themabaar": [
     "--ds-grond",
@@ -130,6 +131,7 @@
   },
   "bewijs": {
     "uitleg": "Per scherm op het Design System de browsertoets die in een echte browser bewijst dat er geen erfenisblad actief is, dat de ds-poort van de basis klopt en dat de kernhandeling slaagt.",
-    "public/apps/hotels.html": "test/hotels-ds.e2e.js"
+    "public/apps/hotels.html": "test/hotels-ds.e2e.js",
+    "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

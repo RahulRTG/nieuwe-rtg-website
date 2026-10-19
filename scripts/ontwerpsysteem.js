@@ -186,7 +186,9 @@ function meet() {
      contract.json (elk met reden en vervaldatum). */
   let overgang = new Set();
   try { overgang = new Set((JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8')).overgangsscripts || []).map(o => o.pad)); } catch (e) { /* zonder contract: niets toegestaan */ }
-  const gemigreerd = Object.entries(paginas).filter(([, v]) => v.ds && v.erfenis === 0 && !v.stijlblok &&
+  /* public/ds/voorbeeld.html is de voorbeeldpagina van het systeem en geen
+     productscherm: het contract keurt hem wel, de migratieteller niet. */
+  const gemigreerd = Object.entries(paginas).filter(([k, v]) => !k.startsWith('public/ds/') && v.ds && v.erfenis === 0 && !v.stijlblok &&
     v.injecteert.every(j => overgang.has(j))).map(([k]) => k);
   return { bladen, blokken, injectie, paginas, geladenDoor, wezen, gemigreerd };
 }

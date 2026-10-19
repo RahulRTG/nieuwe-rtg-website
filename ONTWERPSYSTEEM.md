@@ -84,6 +84,17 @@ laadvolgorde.
   alleen logische eigenschappen. Arabisch werkt dus vanzelf van rechts naar
   links zodra i18n `dir="rtl"` zet, zonder aparte RTL-bladen.
 
+- **Elk scherm meet zichzelf.** `.ds-scherm` is een container
+  (`container: ds / inline-size`). Schermtypen reageren dus met
+  `@container ds` op hun eigen breedte, en maten en goten rekenen in `cqi`
+  in plaats van `vw`. Daardoor klopt een scherm ook in een split-paneel, een
+  ingebed kader of het telefoonkader. De schermhoogte is een token
+  (`--ds-schermhoogte`), dat het kader verzet.
+- **De voorbeeldpagina** (`/ds/voorbeeld.html`) zet alle zeven schermtypen in
+  een telefoonkader naast elkaar, gebouwd uit niets anders dan de echte
+  componenten. Dit is de plek om het systeem naast de goedgekeurde mockups te
+  leggen; `test/ontwerpvoorbeeld.e2e.js` bewaakt hem.
+
 `public/ds/contract.json` is de machineleesbare vorm hiervan: lagen, werelden,
 schermtypen, componenten, themabare tokens en talen.
 

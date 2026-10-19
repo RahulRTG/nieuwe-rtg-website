@@ -42,8 +42,11 @@
   }
   .ds-edge__knop:hover { color: var(--ds-cover-metaal); }
   .ds-edge__knop svg { inline-size: 20px; block-size: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  .ds-edge__knop--rahul { flex: 0 0 64px; color: var(--ds-cover-metaal); }
-  .ds-edge__knop--rahul svg { inline-size: 44px; block-size: 22px; fill: currentColor; stroke: none; }
+  .ds-edge__knop--rahul { flex: 0 0 76px; }
+  .ds-edge__knop--rahul svg { inline-size: 54px; block-size: 27px; stroke: none; filter: drop-shadow(0 1px 6px var(--ds-glasrand)); }
+  /* De lippen: champagne naar brons, het herkenbare midden (mockup Edge). */
+  .ds-edge__lippen-licht { stop-color: var(--ds-lippen-licht); }
+  .ds-edge__lippen-diep { stop-color: var(--ds-lippen-diep); }
   .ds-edge__knop[aria-expanded="true"] { color: var(--ds-cover-metaal); }
   .ds-edge__veld {
     flex: 1 1 auto;

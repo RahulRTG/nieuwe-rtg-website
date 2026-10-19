@@ -90,7 +90,7 @@
     sluit.addEventListener('click', function () { E.terug(); });
     balk.appendChild(sluit);
     var mond = el('span', 'ds-edge__knop ds-edge__knop--rahul', { 'aria-hidden': 'true' });
-    mond.innerHTML = svg(h.LIPPEN);
+    mond.innerHTML = h.lippen();
     balk.appendChild(mond);
     var veld = veldMetStuur(balk, 'Vraag Rahul', 300, function (q, stuur) { vraagRahul(q, stuur); });
     if (opties && opties.vraag) veld.value = opties.vraag;

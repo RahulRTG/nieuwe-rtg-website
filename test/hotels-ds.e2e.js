@@ -88,7 +88,7 @@ test('alleen het Design System: geen erfenisblad, geen tweede greep, de Edge sta
   const edge = await page.locator('.ds-edge__balk > *').evaluateAll(x => x.map(e => e.textContent.trim() || e.getAttribute('aria-label')));
   assert.deepEqual(edge, ['Home', 'Werelden', 'Vraag Rahul', 'Acties', 'Menu']);
   await page.locator('[data-ds-edge="acties"]').click();
-  assert.ok((await page.locator('#dsEdgeBlad').textContent()).includes('Vind mijn verblijf'), 'Acties toont de handelingen van dit scherm');
+  assert.ok((await page.locator('#dsEdgeBlad').textContent()).includes('Mijn reizen'), 'Acties toont de handelingen van dit scherm');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#dsEdgeBlad').isHidden(), true, 'Escape sluit het blad');
   assert.deepEqual(fouten, []);

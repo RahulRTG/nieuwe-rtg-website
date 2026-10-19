@@ -31,7 +31,17 @@
   };
   /* De lippen: het gezicht van Rahul. Altijd met een zichtbaar of
      voorleesbaar woord erbij; het teken alleen is geen uitleg. */
-  var LIPPEN = '<path d="M2 11c3-4.6 6.4-6.4 8.6-4.9.8.5 1.1.5 1.4.5s.6 0 1.4-.5C15.6 4.6 19 6.4 22 11c-1.6.4-3.1.9-4.4 1.1C15.4 16.7 13.6 18 12 18s-3.4-1.3-5.6-5.9C5.1 11.9 3.6 11.4 2 11Zm4.6 1.2c2 .4 3.6.6 5.4.6s3.4-.2 5.4-.6c-1.9 3.4-3.6 4.6-5.4 4.6s-3.5-1.2-5.4-4.6Z" fill-rule="evenodd"/>';
+  var LIPPEN = '<path d="M2 12C8 6 14 3 19 4c2 .5 4 2 5 2s3-1.5 5-2c5-1 11 2 17 8-6 .5-12 1-22 1S8 12.5 2 12Z"/>' +
+    '<path d="M2 12.6c6 1.4 12 1.9 22 1.9s16-.5 22-1.9C42 18.5 34 22 24 22S6 18.5 2 12.6Z"/>';
+  var lippenTeller = 0;
+  /* De lippen met hun eigen verloop (champagne naar brons); elk exemplaar een
+     eigen id, want twee keer hetzelfde id in een pagina breekt de verwijzing. */
+  function lippen() {
+    var id = 'dsLippen' + (++lippenTeller);
+    return '<svg viewBox="0 0 48 24" aria-hidden="true" focusable="false"><defs><linearGradient id="' + id +
+      '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="ds-edge__lippen-licht"/><stop offset="1" class="ds-edge__lippen-diep"/></linearGradient></defs>' +
+      '<g fill="url(#' + id + ')">' + LIPPEN + '</g></svg>';
+  }
 
   function svg(pad) {
     return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + pad + '</svg>';
@@ -52,7 +62,7 @@
   }
 
   /* RTGDs.hulp is voor de twee Edge-scripts hieronder, niet voor schermen. */
-  w.RTGDs = { versie: 1, token: token, hulp: { ICONEN: ICONEN, LIPPEN: LIPPEN, svg: svg, el: el } };
+  w.RTGDs = { versie: 1, token: token, hulp: { ICONEN: ICONEN, lippen: lippen, svg: svg, el: el } };
 
   /* De zoekknop in de kop opent de sprong (shared/sprong.js, door de server
      op elke pagina gezet): twee tikken naar elke functie (TIKKEN.md). */

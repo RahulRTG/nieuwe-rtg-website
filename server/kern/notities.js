@@ -25,7 +25,7 @@ function maakNotities({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodena
      boodschap die weer aanstaat, een notitie die terugkomt nadat je hem
      weggooide. Alleen de gemeten knop repareren is het symptoom repareren
      (LAT.md, regel 1). De LEESkant schrijft niets en gaat hier niet doorheen. */
-  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'notities' });
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save: save.bind(null, ['notities']), inBundel, bron: 'notities' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const eigenNotities = require('./eigencollectie')({ db, domein: 'kern/notities', bezit: { notities: 'kaart' } });

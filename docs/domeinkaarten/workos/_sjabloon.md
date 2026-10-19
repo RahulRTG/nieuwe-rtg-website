@@ -100,6 +100,30 @@ RTG-ketens en bewezen betrouwbaarheid. Geef per dimensie:
 
 Het contract VERVANGT NOOIT de acht bewijzen van APPWERKT.
 
+## Twee uitkomsten
+
+Dit is een aanvulling van de eigenaar, eveneens van 19 oktober. Elke kaart sluit
+af met twee uitkomsten.
+
+**(A) Binnen de huidige architectuur en scope.** Dit is wat gebouwd kan worden met
+de bestaande motoren, eigenaren en besluiten: de bak "aanbevolen nu" en "later"
+uit g. Noem per regel de functie, de kosten en waar het op bouwt.
+
+**(B) Het uiteindelijke domeinmaximum, ook buiten de huidige scope.** Beperk dit
+niet tot het bestaande. Beschrijf volledige professionele PROCESSEN die RTG kan
+ondersteunen. Denk aan het hele traject van een onderneming of een beroepsgroep,
+van begin tot eind, en niet aan losse schermen.
+
+Geef per proces:
+- de stappen;
+- de betrokken rollen en organisaties;
+- welke RTG-apps het samen dragen en wie de eigenaar is;
+- wat ervoor nodig zou zijn buiten de huidige scope: een nieuw domein, een
+  besluit of een externe koppeling.
+
+B is een richting voor de eigenaar en geen toezegging. Een nieuw domein vóór V1
+blijft uitgesloten. Wat B vraagt, staat dus als besluit en niet als werk.
+
 ## Vraagt besluit
 
 Eigenaarsvragen in meerkeuze. Zet de aanbeveling vooraan en geef per optie wat

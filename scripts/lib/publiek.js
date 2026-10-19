@@ -386,6 +386,7 @@ const ALLEEN_ANONIEM = new Map([
   ['/api/foundation/health', 'leven-teken van de RTF (zonder cijfers, zie server/foundation.js)'],
   ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
   ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],
+  ['/api/loop/operations', 'dezelfde meetpoort (magMeten in server/routes/loop-fabric.js): van buiten 404, alleen intern of met RTG_METRICS_TOKEN; een anonieme klop van 127.0.0.1 is binnen'],
   ['/api/doos/rapport', 'de zaakdoos meldt zijn dagrapport op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
 
   // ---- publieke verantwoording en vaste teksten ----

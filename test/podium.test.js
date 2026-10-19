@@ -131,6 +131,23 @@ test('3. live: kijker komt binnen, chat komt aan en het WebRTC-doorgeefluik werk
   assert.equal(sig2.status, 200, 'maker -> kijker signaal is een doorgeefluik');
 });
 
+/* De voltooiproef van Podium (scripts/lib/voltooi/podium.js, 19 oktober 2026):
+   een dubbele tik op verstuur zette een chatregel er twee keer. Met de
+   herhaalsleutel die het scherm meestuurt, is het een regel; de sleutel gaat
+   niet mee naar wie de chat leest. */
+test('3a. dezelfde herhaalsleutel in de chat is een regel', async () => {
+  const lijf = { id: kanaalId, tekst: 'Een keer, ook bij twee tikken.', idem: 'toets-podium-chat-1' };
+  const [a, b] = await Promise.all([api(base, '/api/podium/chat', lijf, kijker.token), api(base, '/api/podium/chat', lijf, kijker.token)]);
+  assert.equal(a.status, 200); assert.equal(b.status, 200);
+  const kijk = await api(base, '/api/podium/kijk', { id: kanaalId }, kijker.token);
+  assert.equal((kijk.body.chat || []).filter(r => r.tekst === lijf.tekst).length, 1, 'een regel, niet twee');
+  assert.ok(!JSON.stringify(kijk.body.chat).includes('toets-podium-chat-1'), 'de sleutel gaat niet naar de lezer');
+  const nog = await api(base, '/api/podium/chat', Object.assign({}, lijf, { idem: 'toets-podium-chat-2' }), kijker.token);
+  assert.equal(nog.status, 200);
+  const na = await api(base, '/api/podium/kijk', { id: kanaalId }, kijker.token);
+  assert.equal((na.body.chat || []).filter(r => r.tekst === lijf.tekst).length, 2, 'een nieuwe sleutel is een nieuw bericht');
+});
+
 test('3b. de relay-boom: kijkers dragen elkaar door, zodat er onbeperkt kunnen kijken', async () => {
   // de bron draagt maar een handvol (FANOUT) directe kijkers; daarna wordt een
   // kijker de ouder van de volgende. 'kijker' (uit test 3) is al kind van de bron.

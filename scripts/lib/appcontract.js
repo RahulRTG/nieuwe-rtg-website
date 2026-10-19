@@ -241,6 +241,9 @@ const CONTRACT = {
   'link:krant': Object.assign({
     belofte: 'een lid leest de kranten die nieuwsbedrijven binnen RTG publiceren, met de correcties die de redactie openbaar maakte; een concept of teruggehaald artikel bestaat voor de lezer niet'
   }, voltooi('krant', 'het scenario loopt /api/krant/gids, /open en /artikel, de routes die /apps/krant.html zelf aanroept, met de redactie van een nieuwszaak die schrijft, publiceert, corrigeert en terughaalt')),
+  'link:podium': Object.assign({
+    belofte: 'een lid met een door het kantoor goedgekeurd kanaal gaat live; een kijker vindt het, kijkt mee, chat, stuurt een cadeau via RTG Pay en meldt, en de maker blokkeert wie over de schreef gaat'
+  }, voltooi('podium', 'het scenario loopt /api/podium/kanalen, /mijn, /kanaal/aanmeld, /live, /kijk, /chat, /cadeau, /blokkeer en /meld, de routes die /apps/podium.html zelf aanroept, met een gekeurde kijker die over de simulatiebank oplaadt')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

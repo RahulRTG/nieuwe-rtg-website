@@ -69,7 +69,7 @@ module.exports = (ctx) => {
     const k = kanaalVan(key);
     return { status: 200, mag: true, kanaal: k ? eigenBeeld(k) : null,
       zones: zones.zoneLijst(key, poort),
-      chat: k ? (P.bak('podiumChat')[k.id] || []).slice(-40) : [] };
+      chat: k ? (P.bak('podiumChat')[k.id] || []).slice(-40).map(({ idem, ...r }) => r) : [] };
   }
 
   return { kanalen, gedeeld, mijnPodium, zaakKanalen };

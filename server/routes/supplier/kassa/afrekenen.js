@@ -52,13 +52,13 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
     desc: (open[0].method === 'tafel' ? 'Rekening ' : 'Check-out ') + room + ' (' + open.length + ' post(en))',
     room, items: null, total, method, betaler,
     betaaldienstKosten: betaaldienstKosten || null,
-    at: new Date().toISOString()
+    at: require('../../../lib/klok').datum().toISOString()
   };
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
   // na het uitchecken staat de kamer automatisch op "vuil" voor housekeeping
   const rm = (req.supplier.rooms || []).find(r => r.name === room);
-  if (rm) rm.hk = { status: 'vuil', by: 'Systeem (check-out)', at: new Date().toISOString() };
+  if (rm) rm.hk = { status: 'vuil', by: 'Systeem (check-out)', at: require('../../../lib/klok').datum().toISOString() };
   // en een afgerekende tafel staat weer vrij voor de volgende gasten
   const tf = (req.supplier.tables || []).find(t => t.name === room);
   if (tf) tf.status = 'vrij';
@@ -105,7 +105,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   const codenames = [];
   for (const o of chk.bonnen) {
     o.paid = true;
-    o.paidAt = new Date().toISOString();
+    o.paidAt = require('../../../lib/klok').datum().toISOString();
     o.betaaldMet = method; // waarmee de tafel werkelijk afrekende (TAKEN.md 4.59)
     if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
     o.rekeningVoldaan = true;
@@ -134,7 +134,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
     desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
     room: chk.table, items: null, total: chk.subtotaal, method, omzetElders: 'bestellingen',
-    at: new Date().toISOString()
+    at: require('../../../lib/klok').datum().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   list.unshift(sale);

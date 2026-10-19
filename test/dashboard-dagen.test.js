@@ -35,9 +35,8 @@ test('kantooroverzicht om 00:30 in Amsterdam: vandaag is de nieuwe dag, 23:30 ho
 
 /* De backoffice draait op een echte server met de klok op 01:30 lokale
    wintertijd (00:30 UTC). Volgens de oude regel was het dan al de 16e; voor
-   de zaak is het nog de omzetdag van de 15e. (Een bon van NU is hier niet te
-   maken: de kassa stempelt met de echte klok, niet met RTG_KLOK -- klokschuld
-   die KLOK.json telt, niet deze toets.) */
+   de zaak is het nog de omzetdag van de 15e. De kassa stempelt met lib/klok,
+   dus een bon van NU draagt het verzette moment en telt in die omzetdag. */
 let srv, baas;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dashdag-'));
 async function api(pad, body, token) {
@@ -64,6 +63,18 @@ test('backoffice om 01:30 lokaal: de omzetdag is nog gisteren, en de week eindig
   assert.equal(week.length, 7);
   assert.equal(week[6].date, '2026-01-15', 'de omzetdag loopt tot 05:00');
   assert.equal(week[0].date, '2026-01-09', 'en de week telt zeven omzetdagen terug');
+});
+
+test('een bon van nu op de verzette klok draagt dat moment en telt in de omzetdag', async () => {
+  const bon = await api('/api/supplier/pos/sale', { total: 17, method: 'contant', kassa: 'Kassa bar',
+    items: [{ name: 'Nachtcava', qty: 1, price: 17 }] }, baas);
+  assert.equal(bon.status, 200);
+  assert.match(bon.body.sale.at, /^2026-01-16T00:3/, 'de kassa stempelt met de klok van het huis (RTG_KLOK)');
+  const b = await api('/api/supplier/backoffice', {}, baas);
+  assert.equal(b.body.stats.kassaVandaag, 17, 'en de bon van 01:30 lokaal telt bij de omzetdag van gisteren');
+  const x = await api('/api/supplier/kassa/kasopmaak', { geteld: 17, kassa: 'Kassa bar' }, baas);
+  assert.equal(x.status, 200);
+  assert.equal(x.body.opmaak.verwacht, 17, 'de kasopmaak telt hem ook');
 });
 
 /* De hotelreceptie (kern/verblijf/receptie.js) en het beveiligingsrooster

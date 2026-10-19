@@ -5,457 +5,54 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Airport (operations)</title>
+<meta name="theme-color" content="#F4EFE7">
+<meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icons/partners.svg">
 <link rel="manifest" href="/manifests/luchthaven.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Airport Ops">
 <link href="/fonts/fonts.css" rel="stylesheet">
-  <link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{
-    --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
-  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-  header h1{font-size:1.25rem;}
-  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;}
-  main{padding:1rem;max-width:760px;margin:0 auto;}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:.5rem;margin-bottom:.9rem;}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;}
-  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;display:block;}
-  .kpi span{font-size:.64rem;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;}
-  .kpi.goud{border-color:rgba(169,143,7,.4);} .kpi.goud b{color:var(--rtg-leesgoud,var(--gold));}
-  .keuze{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.6rem 0 1rem;}
-  .keuze button{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem .7rem;color:var(--txt);font:inherit;cursor:pointer;text-align:left;}
-  .keuze button .ic{font-size:1.3rem;display:block;margin-bottom:.3rem;}
-  .keuze button .sub{display:block;font-size:.7rem;color:var(--soft);margin-top:.15rem;line-height:1.35;}
-  .item{border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card);}
-  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:.98rem;}
-  .item .meta{font-size:.76rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
-  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
-  .veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.84rem;padding:.42rem .6rem;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:0;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
-  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
-  .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);}
-  .status.open{border-color:var(--burgundy);color:var(--burgundy);}
-  .status.ok{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
-  .status.goud{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .sig{border-left:3px solid var(--burgundy);}
-  .sig.security{border-left-color:var(--gold);} .sig.draai{border-left-color:var(--gold);}
-  .leeg{color:var(--muted);font-size:.86rem;padding:.9rem 0;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
-  .login{max-width:340px;margin:2.5rem auto;padding:0 1rem;text-align:center;}
-  .login .veld{width:100%;margin-bottom:.6rem;}
-  .ai{border:1px solid rgba(169,143,7,.4);border-radius:0;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.8rem .9rem;margin:1rem 0;}
-  .ai .uit{font-size:.84rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.45rem;}
-  .terug{background:none;border:none;color:var(--soft);font:inherit;font-size:.8rem;cursor:pointer;padding:0 0 .6rem;}
-  .nr{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.05em;}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/travel-os.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-130u08v:not(#_#_#_){padding:.15rem .5rem;font-size:.7rem}
-.s-132o9z0:not(#_#_#_){margin-left:0}
-.s-1344oln:not(#_#_#_){font-size:.95rem;margin:0.75rem 0 0.25rem}
-.s-186m9vs:not(#_#_#_){width:100%}
-.s-186qv2w:not(#_#_#_){width:6rem}
-.s-1hv4dhs:not(#_#_#_){color:var(--soft);font-family:Inter}
-.s-4mhsan:not(#_#_#_){color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem}
-.s-eq0sgi:not(#_#_#_){margin:0 0 0.75rem}
-.s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
-.s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
-.s-qge8k0:not(#_#_#_){font-size:1.15rem;margin-bottom:0.5rem}
-.s-rrt1xk:not(#_#_#_){font-size:.95rem;margin:0.5rem 0 0.25rem}
-.s-vgbzx0:not(#_#_#_){background:var(--card2)}
-</style>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body data-rtg-context-bron="luchthaven" class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header>
-  <div><div class="ey">RTG Airport · operations</div><h1 id="kop">De Operatie</h1></div>
-  <a href="/apps/marechaussee.html">KMar →</a>
-  <a href="/apps/vluchten.html" class="s-132o9z0">Reizigers-app →</a>
+<!-- RTG Airport op het RTG Design System (TRAVELOS-MIGRATIE.md par. 1b, de
+     werklaag): Taak (de inlog met pincode), Collectie (de cockpit, de
+     werkplekken en hun lijsten). Geen Cover en geen fotografie: dit is een
+     werkplek. Geen eigen stijl: alles komt uit /ds/rtg-ds.css. -->
+<body data-rtg-context-bron="luchthaven" class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="taak">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <button class="ds-kop__actie" id="wissel" type="button" aria-label="Wissel van medewerker" title="Wissel" hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
 </header>
-<main id="main">
-  <div class="login" id="login">
-    <p class="s-4mhsan">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
-    <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
-    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="knop prim s-186m9vs" id="loginGo" data-hoofdactie>Inloggen</button>
+<main class="ds-collectie" id="main">
+  <div class="ds-collectie__kop">
+    <p class="ds-label">RTG Airport · operations</p>
+    <h1 class="ds-titel ds-titel--scherm" id="kop">De Operatie</h1>
   </div>
+  <nav class="ds-chips" aria-label="Travel OS operations" data-ds-opsnav data-rtg-platform-chrome="travel-opsnavigatie"></nav>
+  <section id="login" aria-label="Inloggen">
+    <p class="ds-meta">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
+    <div class="ds-velden">
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span><span class="ds-veld__label">Medewerker</span><select class="ds-veld__invoer" id="wie"><option value="">Laden…</option></select></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span><span class="ds-veld__label">Pincode</span><input class="ds-veld__invoer" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode"></span><span></span></label>
+    </div>
+    <button class="ds-knop ds-knop--primair ds-knop--breed ds-taak__actie" id="loginGo" type="button" data-ds-actie="Inloggen">Inloggen</button>
+  </section>
   <div id="app" hidden></div>
+  <nav class="ds-chips" aria-label="Verder">
+    <a class="ds-chip" href="/apps/marechaussee.html">KMar →</a>
+    <a class="ds-chip" href="/apps/vluchten.html">Reizigers-app →</a>
+  </nav>
 </main>
-<div class="melding" id="melding" role="status"></div>
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 <script src="/shared/uitvoer.js"></script>
-<script>
-const $ = s => document.querySelector(s);
-const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
-
-/* Meenemen (shared/uitvoer.js): elke werkplek heeft zijn eigen register --
-   het vluchtbord, de kofferketen, de charteraanvragen, de vip-protocollen,
-   de gasten in de lounges. Het scherm dat u openzet meldt zijn eigen model
-   aan, zodat wat u meeneemt hetzelfde is als wat u ziet. De reizigers zelf
-   blijven op codenaam, net als op het scherm. */
-let UIT = null;
-function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam: naam, kolommen: kolommen, rijen: rijen } : null; }
-if (window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
-let TOKEN = null, C = null;
-const api = (pad, body) => fetch(pad, {
-  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
-  body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (r.status === 401 && TOKEN) afgemeld(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
-
-const CODE = 'LUCHT';
-/* Altijd aangemeld op de werkvloer: de dienst blijft op dit toestel staan.
-   Verloopt de sessie, dan val je DIRECT terug op het inlogscherm; wisselen
-   van collega kan met de wissel-knop in de kop. */
-const SLEUTEL = 'rtg_werk_' + CODE.toLowerCase();
-function afgemeld(){
-  TOKEN = null;
-  try { localStorage.removeItem(SLEUTEL); } catch(e){}
-  const w = document.getElementById('wissel'); if (w) w.hidden = true;
-  $('#app').hidden = true; $('#login').hidden = false;
-}
-function wisselToon(){
-  let w = document.getElementById('wissel');
-  if (!w){
-    const h = document.querySelector('header');
-    if (!h) return;
-    w = document.createElement('button');
-    w.id = 'wissel'; w.textContent = 'Wissel';
-    w.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.10);border-radius:0;color:rgba(244,241,236,0.68);font:inherit;font-size:.8rem;padding:.35rem .7rem;cursor:pointer;margin-left:.4rem;';
-    w.addEventListener('click', () => { afgemeld(); meld('Afgemeld; kies wie je bent.'); });
-    h.appendChild(w);
-  }
-  w.hidden = false;
-}
-async function vulWie(){
-  try { const r = await api('/api/supplier/roster', { code: CODE });
-    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.func||m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
-  } catch(e){ $('#wie').innerHTML = '<option value="">Luchthaven niet bereikbaar</option>'; }
-}
-vulWie();
-$('#loginGo').addEventListener('click', async () => {
-  const staffId = $('#wie').value, pin = $('#pin').value.trim();
-  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
-  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token; try { localStorage.setItem(SLEUTEL, TOKEN); } catch(e){}
-    $('#login').hidden = true; $('#app').hidden = false; wisselToon(); kiesScherm();
-  } catch(e){ meld(e.message); }
-});
-
-const ROLLEN = [
-  ['vluchtleiding','','Vluchtleiding','het bord: lijnvluchten, privejets en helikopters'],
-  ['platform','','Platform','de draai, per categorie licht of volledig'],
-  ['toren','','Toren','klaring op een baan of een helipad'],
-  ['bagage','','Bagagekelder','de kofferketen, vermist en gevonden'],
-  ['security','','Security','de filters en de live wachttijden'],
-  ['vip','','VIP en Royal','charters bevestigen en het koninklijk protocol'],
-  ['lounge','','Lounge','gasten op de boarding pass; royal alleen vip']
-];
-
-async function kiesScherm(){
-  UIT = null;   // de keuzepagina heeft zelf geen register
-  try { C = await api('/api/lucht/cockpit'); } catch(e){ meld(e.message); return; }
-  $('#kop').textContent = 'RTG Airport';
-  $('#app').innerHTML =
-    '<div class="kpis">'+
-      '<div class="kpi goud"><b>'+C.vluchtenVandaag+'</b><span>Vluchten vandaag</span></div>'+
-      '<div class="kpi"><b>'+C.vertrokken+'</b><span>Vertrokken</span></div>'+
-      '<div class="kpi"><b>'+C.geland+'</b><span>Geland</span></div>'+
-      '<div class="kpi"><b>'+C.vertraagd+'</b><span>Vertraagd</span></div>'+
-      '<div class="kpi"><b>'+C.ingecheckt+'</b><span>Ingecheckt</span></div>'+
-      '<div class="kpi"><b>'+C.koffersInSysteem+'</b><span>Koffers · '+C.koffersVermist+' vermist</span></div>'+
-      '<div class="kpi"><b>'+C.chartersWachtend+'</b><span>Charters wachtend</span></div>'+
-      '<div class="kpi"><b>'+C.vipsActief+'</b><span>Vip-protocollen</span></div>'+
-      '<div class="kpi"><b>'+C.loungeGasten+'</b><span>In de lounges</span></div>'+
-    '</div>'+
-    (C.signalen.length ? C.signalen.map(s => '<div class="item sig '+esc(s.soort)+'"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
-    '<h3 class="s-rrt1xk">Jouw werkplek</h3>'+
-    '<div class="keuze">'+ROLLEN.map(([id,ic,naam,sub]) => '<button data-rol="'+id+'"><span class="ic">'+ic+'</span>'+naam+'<span class="sub">'+sub+'</span></button>').join('')+'</div>';
-  $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => rolScherm(b.dataset.rol)));
-}
-function kopStuk(titel){ return '<button class="terug" id="terug">← de operatie</button><h2 class="s-qge8k0">'+titel+'</h2>'; }
-function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld s-jwtsuz" id="aiV" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-operations adviseert; schakelen doet u zelf. Veiligheid voor snelheid.</div></div>'; }
-function koppelBasis(){
-  $('#terug').addEventListener('click', kiesScherm);
-  $('#aiK').addEventListener('click', async () => {
-    const v = $('#aiV').value.trim(); if (!v) return;
-    $('#aiA').textContent = 'Een ogenblik…';
-    try { const r = await api('/api/lucht/ai', { vraag: v }); $('#aiA').textContent = r.antwoord; $('#aiV').value = ''; }
-    catch(e){ $('#aiA').textContent = e.message; }
-  });
-  $('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
-}
-function rolScherm(rol){
-  UIT = null;   // elk scherm meldt hierna zijn eigen register aan
-  if (rol === 'vluchtleiding') return schermVluchtleiding();
-  if (rol === 'platform') return schermPlatform();
-  if (rol === 'toren') return schermToren();
-  if (rol === 'bagage') return schermBagage();
-  if (rol === 'security') return schermSecurity();
-  if (rol === 'vip') return schermVip();
-  if (rol === 'lounge') return schermLounge();
-}
-function plekkenVoor(cat){ return cat === 'helikopter' ? C.helipads : cat === 'privejet' ? C.stands : C.gates; }
-function vertrekStap(v){
-  return v.status === 'gepland' ? 'inchecken' : v.status === 'inchecken' ? 'boarding' : v.status === 'boarding' ? 'vertrokken' : null;
-}
-function aankomstStap(v){
-  return v.status === 'onderweg' ? 'geland' : v.status === 'geland' ? 'bagage-op-band' : v.status === 'bagage-op-band' ? 'afgerond' : null;
-}
-
-/* ---- vluchtleiding ---- */
-async function schermVluchtleiding(){
-  $('#app').innerHTML = kopStuk('Vluchtleiding')+
-    '<div class="item s-vgbzx0"><h4>Nieuwe vlucht op het bord</h4>'+
-    '<div class="rij"><input class="veld s-186qv2w" id="nNr" placeholder="RT123" maxlength="8"><select class="veld" id="nSoort"><option value="vertrek">vertrek</option><option value="aankomst">aankomst</option></select><select class="veld" id="nCat"><option value="lijn">lijnvlucht</option><option value="privejet">privejet</option><option value="helikopter">helikopter</option></select><input class="veld s-jwt5vg" id="nBest" placeholder="Bestemming / herkomst" maxlength="60"></div>'+
-    '<div class="rij"><input class="veld" id="nTijd" type="time" value="12:00"><select class="veld" id="nGate"></select><button class="knop" id="nMaak">Op het bord</button></div></div>'+
-    '<div id="vlLijst"></div>'+aiBlok('Bijv. welke kist verdient nu voorrang?');
-  koppelBasis();
-  const vulPlekken = () => { $('#nGate').innerHTML = plekkenVoor($('#nCat').value).map(g => '<option>'+g+'</option>').join(''); };
-  vulPlekken();
-  $('#nCat').addEventListener('change', vulPlekken);
-  $('#nMaak').addEventListener('click', async () => {
-    try { await api('/api/lucht/vlucht/maak', { nummer: $('#nNr').value, soort: $('#nSoort').value, categorie: $('#nCat').value, bestemming: $('#nBest').value, tijd: $('#nTijd').value, gate: $('#nGate').value });
-      meld('Op het bord.'); laadVluchten(); } catch(e){ meld(e.message); }
-  });
-  laadVluchten();
-}
-function vluchtKaart(v, acties){
-  const st = v.geannuleerd ? '<span class="status open">geannuleerd</span>'
-    : '<span class="status '+(v.status==='vertrokken'||v.status==='afgerond'?'ok':'goud')+'">'+esc(v.status)+'</span>';
-  const ver = v.vertraging ? ' <span class="status open">+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</span>' : '';
-  const kl = v.klaring ? ' <span class="status ok">klaring '+esc(v.klaring.baan)+'</span>' : '';
-  const band = v.band ? ' <span class="status">band '+v.band+'</span>' : '';
-  const vip = v.vip ? ' <span class="status '+(v.vip.rond?'ok':'open')+'">'+esc(v.vip.soort)+(v.vip.rond?' · gereed':' · protocol loopt')+'</span>' : '';
-  return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' <small class="s-1hv4dhs">'+esc(v.soort)+'</small>'+vip+'</h4>'+
-    '<div class="meta">'+esc(v.tijd)+' · gate '+esc(v.gate)+' · '+esc(v.toestel)+' · '+st+ver+kl+band+
-    (v.draai ? ' · draai '+(v.draai.klaar?'<span class="status ok">rond</span>':'<span class="status open">'+v.draai.taken.filter(t=>!t.klaar).length+' open</span>') : '')+'</div>'+(acties||'')+'</div>';
-}
-async function laadVluchten(){
-  try {
-    const r = await api('/api/lucht/bord', {});
-    $('#vlLijst').innerHTML = r.vluchten.length ? r.vluchten.map(v => {
-      const stap = v.geannuleerd ? null : (v.soort === 'vertrek' ? vertrekStap(v) : aankomstStap(v));
-      const acties = '<div class="rij">'+
-        (stap ? '<button class="knop" data-stap="'+v.id+'" data-naar="'+stap+'">→ '+stap+'</button>' : '')+
-        (!v.geannuleerd && !['vertrokken','afgerond'].includes(v.status) ? '<button class="knop stil" data-ver="'+v.id+'">Vertraging</button><button class="knop stil" data-gate="'+v.id+'">Gate</button><button class="knop rood" data-ann="'+v.id+'">Annuleer</button>' : '')+
-        '</div>';
-      return vluchtKaart(v, acties);
-    }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
-    zetUit('vluchten', ['nummer','soort','categorie','bestemming','tijd','gate','status'],
-      r.vluchten.map(v => [v.nummer, v.soort, v.categorie, v.bestemming, v.tijd, v.gate, v.geannuleerd ? 'geannuleerd' : v.status]));
-    $('#vlLijst').querySelectorAll('[data-stap]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('/api/lucht/vlucht/status', { id: b.dataset.stap, status: b.dataset.naar }); meld('Bijgewerkt.'); laadVluchten(); } catch(e){ meld(e.message); } }));
-    $('#vlLijst').querySelectorAll('[data-ver]').forEach(b => b.addEventListener('click', async () => {
-      const m = prompt('Hoeveel minuten vertraging?', '30'); if (!m) return;
-      const reden = prompt('Reden (komt op het bord):', 'late aankomst toestel') || '';
-      try { await api('/api/lucht/vlucht/vertraag', { id: b.dataset.ver, minuten: m, reden }); meld('Vertraging op het bord.'); laadVluchten(); } catch(e){ meld(e.message); } }));
-    $('#vlLijst').querySelectorAll('[data-gate]').forEach(b => b.addEventListener('click', async () => {
-      const g = prompt('Nieuwe gate ('+C.gates.join(', ')+'):', C.gates[0]); if (!g) return;
-      try { await api('/api/lucht/vlucht/gate', { id: b.dataset.gate, gate: g }); meld('Gate gewijzigd.'); laadVluchten(); } catch(e){ meld(e.message); } }));
-    $('#vlLijst').querySelectorAll('[data-ann]').forEach(b => b.addEventListener('click', async () => {
-      if (!confirm('Deze vlucht annuleren?')) return;
-      try { await api('/api/lucht/vlucht/status', { id: b.dataset.ann, status: 'geannuleerd' }); meld('Geannuleerd.'); laadVluchten(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-/* ---- platform: de draai ---- */
-async function schermPlatform(){
-  $('#app').innerHTML = kopStuk('Platform · de draai')+
-    '<div class="item s-vgbzx0"><div class="meta">Elke vertrekkende kist heeft zes platformtaken. Pas als de draai rond is, mag de gate het boarden starten.</div></div>'+
-    '<div id="drLijst"></div>'+aiBlok('Bijv. welke draai pak ik als eerste?');
-  koppelBasis();
-  try {
-    const r = await api('/api/lucht/bord', { soort: 'vertrek' });
-    const actief = r.vluchten.filter(v => !v.geannuleerd && !['vertrokken'].includes(v.status));
-    $('#drLijst').innerHTML = actief.length ? actief.map(v =>
-      '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' · '+esc(v.tijd)+' '+(v.draai.klaar?'<span class="status ok">draai rond</span>':'<span class="status open">'+v.draai.taken.filter(t=>!t.klaar).length+' taken open</span>')+'</h4>'+
-      '<div class="rij">'+v.draai.taken.map(t => t.klaar ? '<span class="status ok">'+esc(t.taak)+' ✓</span>' : '<button class="knop stil" data-vl="'+v.id+'" data-taak="'+esc(t.taak)+'">'+esc(t.taak)+'</button>').join('')+'</div></div>').join('')
-      : '<div class="leeg">Geen kisten op het platform.</div>';
-    $('#drLijst').querySelectorAll('[data-taak]').forEach(b => b.addEventListener('click', async () => {
-      try { const r2 = await api('/api/lucht/draai/taak', { id: b.dataset.vl, taak: b.dataset.taak });
-        meld(r2.rond ? 'De draai is rond; de kist mag boarden.' : 'Afgevinkt.'); schermPlatform(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-/* ---- toren ---- */
-async function schermToren(){
-  $('#app').innerHTML = kopStuk('Toren · verkeersleiding')+
-    '<div class="item s-vgbzx0"><div class="meta">Zonder klaring van de toren vertrekt er niets. Klaring volgt pas als de kist aan het boarden is; de mens in de toren beslist. Banen: '+C.banen.join(' en ')+'.</div></div>'+
-    '<div id="toLijst"></div>'+aiBlok('Bijv. welke baan geef ik de volgende vertrekker?');
-  koppelBasis();
-  try {
-    const r = await api('/api/lucht/bord', { soort: 'vertrek' });
-    const wacht = r.vluchten.filter(v => !v.geannuleerd && v.status !== 'vertrokken');
-    $('#toLijst').innerHTML = wacht.length ? wacht.map(v => {
-      const keuze = v.categorie === 'helikopter' ? C.helipads : C.banen;
-      return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.tijd)+' · '+esc(v.status)+'</h4>'+
-      '<div class="meta">'+(v.klaring ? '<span class="status ok">klaring '+esc(v.klaring.baan)+'</span>' : v.status === 'boarding' ? '<span class="status goud">wacht op klaring</span>' : '<span class="status">nog niet aan het boarden</span>')+'</div>'+
-      (!v.klaring && v.status === 'boarding' ? '<div class="rij">'+keuze.map(b => '<button class="knop" data-kl="'+v.id+'" data-baan="'+b+'">Klaring '+b+'</button>').join('')+'</div>' : '')+'</div>';
-    }).join('')
-      : '<div class="leeg">Geen vertrekkers in de wacht.</div>';
-    $('#toLijst').querySelectorAll('[data-kl]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('/api/lucht/toren/klaring', { id: b.dataset.kl, baan: b.dataset.baan }); meld('Klaring gegeven.'); schermToren(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-/* ---- bagagekelder ---- */
-async function schermBagage(){
-  $('#app').innerHTML = kopStuk('Bagagekelder')+
-    '<div class="item s-vgbzx0"><div class="meta">De kofferketen: ingecheckt → gesorteerd → geladen → op de band → opgehaald. Achteruit draait hij nooit; vermist kan altijd gemeld en teruggevonden.</div></div>'+
-    '<div class="rij s-eq0sgi"><select class="veld" id="bgFilter"><option value="">Alle koffers</option><option>ingecheckt</option><option>gesorteerd</option><option>geladen</option><option>op-band</option><option value="vermist">vermist</option></select></div>'+
-    '<div id="bgLijst"></div>'+aiBlok('Bijv. hoe voorkom ik gemiste aansluitingen?');
-  koppelBasis();
-  $('#bgFilter').addEventListener('change', laadBagage);
-  laadBagage();
-}
-async function laadBagage(){
-  try {
-    const r = await api('/api/lucht/bagage', { status: $('#bgFilter').value });
-    const volgende = s => s === 'ingecheckt' ? 'gesorteerd' : s === 'gesorteerd' ? 'geladen' : s === 'op-band' ? 'opgehaald' : null;
-    $('#bgLijst').innerHTML = r.koffers.length ? r.koffers.map(k => {
-      const stap = volgende(k.status);
-      return '<div class="item"><h4><span class="nr">'+esc(k.tag)+'</span> · '+esc(k.vlucht)+' <span class="status '+(k.status==='vermist'?'open':k.status==='opgehaald'?'ok':'goud')+'">'+esc(k.status)+(k.band?' · band '+k.band:'')+'</span></h4>'+
-        '<div class="meta">'+esc(k.codenaam)+'</div><div class="rij">'+
-        (stap ? '<button class="knop stil" data-tag="'+esc(k.tag)+'" data-naar="'+stap+'">→ '+stap+'</button>' : '')+
-        (k.status !== 'vermist' && k.status !== 'opgehaald' ? '<button class="knop rood" data-tag="'+esc(k.tag)+'" data-naar="vermist">Vermist</button>' : '')+
-        (k.status === 'vermist' ? '<button class="knop" data-tag="'+esc(k.tag)+'" data-naar="op-band">Gevonden → band</button>' : '')+
-        '</div></div>';
-    }).join('') : '<div class="leeg">Geen koffers in deze selectie.</div>';
-    zetUit('koffers', ['tag','vlucht','reiziger','status','band'],
-      r.koffers.map(k => [k.tag, k.vlucht, k.codenaam, k.status, k.band || '']));
-    $('#bgLijst').querySelectorAll('[data-tag]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('/api/lucht/bagage/zet', { tag: b.dataset.tag, status: b.dataset.naar }); meld('Bijgewerkt.'); laadBagage(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-/* ---- security ---- */
-async function schermSecurity(){
-  $('#app').innerHTML = kopStuk('Security · de filters')+
-    '<div class="item s-vgbzx0"><div class="meta">De wachttijden staan live op het bord van de reizigers. Loopt een filter vol, open er dan een extra.</div></div>'+
-    '<div id="seLijst"></div>'+aiBlok('Bijv. wanneer open ik het tweede filter?');
-  koppelBasis();
-  try {
-    const r = await api('/api/lucht/bord', {});
-    $('#seLijst').innerHTML = r.security.map(f =>
-      '<div class="item"><h4>'+esc(f.naam)+' '+(f.open?'<span class="status ok">open · '+f.wachtMinuten+' min</span>':'<span class="status open">dicht</span>')+'</h4>'+
-      '<div class="rij"><button class="knop stil" data-f="'+f.id+'" data-open="'+(!f.open)+'">'+(f.open?'Sluit':'Open')+'</button>'+
-      (f.open ? '<button class="knop stil" data-w="'+f.id+'">Wachttijd</button>' : '')+'</div></div>').join('');
-    $('#seLijst').querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('/api/lucht/security/zet', { id: b.dataset.f, open: b.dataset.open === 'true' }); meld('Gezet.'); schermSecurity(); } catch(e){ meld(e.message); } }));
-    $('#seLijst').querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', async () => {
-      const w = prompt('Actuele wachttijd in minuten:', '10'); if (w == null) return;
-      try { await api('/api/lucht/security/zet', { id: b.dataset.w, wachtMinuten: w }); meld('Wachttijd op het bord.'); schermSecurity(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-/* ---- VIP en Royal: het charterloket + de Koninklijke Vleugel ---- */
-async function schermVip(){
-  $('#app').innerHTML = kopStuk('VIP en Royal')+
-    '<div class="item s-vgbzx0"><h4>Nieuw vip-protocol</h4><div class="meta">Onder PROTOCOLNAAM, nooit de echte naam. Een vip-vlucht boardt pas als alle stappen zijn afgevinkt.</div>'+
-    '<div class="rij"><input class="veld s-186qv2w" id="vVlucht" placeholder="RT101" maxlength="8"><input class="veld s-jwtsuz" id="vNaam" placeholder="Protocolnaam, bijv. Valk Een" maxlength="60"><select class="veld" id="vSoort"><option value="koninklijk">koninklijk</option><option value="staatsbezoek">staatsbezoek</option><option value="vip">vip</option></select><button class="knop" id="vMaak">Start protocol</button></div></div>'+
-    '<div id="vipLijst"></div>'+
-    '<h3 class="s-1344oln">Het charterloket</h3>'+
-    '<div class="item s-vgbzx0"><div class="meta">Leden vragen een privejet of helikopter aan via de Vluchten-app; OPERATIONS beslist, nooit de AI. Bij bevestiging komt de vlucht direct op het bord met een vrije stand of helipad.</div></div>'+
-    '<div id="chLijst"></div>'+aiBlok('Bijv. hoe plan ik een staatsbezoek naast de middagpiek?');
-  koppelBasis();
-  $('#vMaak').addEventListener('click', async () => {
-    try { await api('/api/lucht/vip/maak', { vlucht: $('#vVlucht').value, protocolnaam: $('#vNaam').value, soort: $('#vSoort').value });
-      meld('Protocol gestart.'); $('#vVlucht').value = $('#vNaam').value = ''; laadVips(); } catch(e){ meld(e.message); }
-  });
-  laadVips(); laadCharters();
-}
-async function laadVips(){
-  try {
-    const r = await api('/api/lucht/vip/lijst');
-    $('#vipLijst').innerHTML = r.vips.length ? r.vips.map(v =>
-      '<div class="item"><h4>'+esc(v.protocolnaam)+' <small class="s-1hv4dhs">'+esc(v.soort)+' · '+esc(v.suite)+' · '+esc(v.vlucht)+' '+esc(v.tijd)+'</small> '+(v.rond?'<span class="status ok">gereed</span>':'<span class="status open">protocol loopt</span>')+'</h4>'+
-      '<div class="rij">'+v.protocol.map(p => p.klaar ? '<span class="status ok">'+esc(p.stap)+' ✓</span>' : '<button class="knop stil" data-vip="'+v.id+'" data-stap="'+esc(p.stap)+'">'+esc(p.stap)+'</button>').join('')+'</div></div>').join('')
-      : '<div class="leeg">Geen lopende vip-protocollen.</div>';
-    $('#vipLijst').querySelectorAll('[data-vip]').forEach(b => b.addEventListener('click', async () => {
-      try { const r2 = await api('/api/lucht/vip/taak', { id: b.dataset.vip, stap: b.dataset.stap });
-        meld(r2.rond ? 'Het protocol is rond; de Vleugel is gereed.' : 'Afgevinkt.'); laadVips(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-async function laadCharters(){
-  try {
-    const r = await api('/api/lucht/charters');
-    $('#chLijst').innerHTML = r.charters.length ? r.charters.map(c =>
-      '<div class="item"><h4>'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' <small class="s-1hv4dhs">'+esc(c.van)+' · '+esc(c.datum)+' '+esc(c.tijd)+'</small> <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+'</span></h4>'+
-      (c.status === 'aangevraagd' ? '<div class="rij"><button class="knop" data-ok="'+c.id+'">Bevestig (uw besluit)</button><button class="knop rood" data-nee="'+c.id+'">Wijs af</button></div>' : '')+'</div>').join('')
-      : '<div class="leeg">Geen charteraanvragen.</div>';
-    zetUit('charters', ['code','van','bestemming','datum','tijd','status'],
-      r.charters.map(c => [c.code, c.van, c.bestemming, c.datum, c.tijd, c.status]));
-    $('#chLijst').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => {
-      try { const r2 = await api('/api/lucht/charter/beslis', { id: b.dataset.ok, akkoord: true });
-        meld('Bevestigd: '+r2.vlucht.nummer+' op '+r2.vlucht.gate+'.'); laadCharters(); } catch(e){ meld(e.message); } }));
-    $('#chLijst').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('/api/lucht/charter/beslis', { id: b.dataset.nee, akkoord: false }); meld('Afgewezen.'); laadCharters(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-/* ---- de lounges: binnen op de boarding pass ---- */
-async function schermLounge(){
-  $('#app').innerHTML = kopStuk('De lounges')+
-    '<div class="item s-vgbzx0"><h4>Gast ontvangen</h4><div class="meta">Op vertoon van een geldige boarding pass. De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.</div>'+
-    '<div class="rij"><input class="veld s-jwtsuz" id="lgCode" placeholder="Boarding pass-code (BP.… )" maxlength="80" autocomplete="off" spellcheck="false"><select class="veld" id="lgWaar"><option value="salon">Salon Lounge</option><option value="royal">De Koninklijke Vleugel</option></select><button class="knop" id="lgIn">Welkom ✓</button></div></div>'+
-    '<div id="lgLijst"></div>'+aiBlok('Bijv. hoe druk wordt het rond de avondvertrekken?');
-  koppelBasis();
-  $('#lgIn').addEventListener('click', async () => {
-    try { const r = await api('/api/lucht/lounge/in', { lounge: $('#lgWaar').value, code: $('#lgCode').value });
-      meld('Welkom in '+r.lounge+', '+r.gast.codenaam+'.'); $('#lgCode').value = ''; laadLounge(); } catch(e){ meld(e.message); }
-  });
-  laadLounge();
-}
-async function laadLounge(){
-  try {
-    const r = await api('/api/lucht/lounge');
-    $('#lgLijst').innerHTML = r.lounges.map(l =>
-      '<div class="item"><h4>'+(l.id==='royal'?'':'')+esc(l.naam)+' <span class="status '+(l.binnen>=l.capaciteit?'open':'goud')+'">'+l.binnen+' / '+l.capaciteit+'</span></h4>'+
-      (l.gasten.length ? l.gasten.map(g => '<div class="meta">'+esc(g.codenaam)+' · '+esc(g.vlucht)+' '+esc(g.tijd)+' <button class="knop stil s-130u08v" data-uit="'+g.id+'">uitchecken</button></div>').join('') : '<div class="meta">Nog geen gasten.</div>')+'</div>').join('');
-    const gasten = [];
-    r.lounges.forEach(l => l.gasten.forEach(g => gasten.push([l.naam, g.codenaam, g.vlucht, g.tijd])));
-    zetUit('loungegasten', ['lounge','gast','vlucht','tijd'], gasten);
-    $('#lgLijst').querySelectorAll('[data-uit]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('/api/lucht/lounge/uit', { id: b.dataset.uit }); meld('Tot ziens.'); laadLounge(); } catch(e){ meld(e.message); } }));
-  } catch(e){ meld(e.message); }
-}
-
-// de bewaarde dienst van dit toestel: meteen naar binnen, nooit onaangemeld blijven hangen
-try { TOKEN = localStorage.getItem(SLEUTEL); } catch(e){}
-if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); kiesScherm(); }
-</script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/schermbeeld.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
+<script src="/apps/werkvloer.js"></script>
+<script src="/apps/luchthaven-bord.js"></script>
+<script src="/apps/luchthaven-loket.js"></script>
+<script src="/apps/luchthaven.js"></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
-<script src="/shared/travel-os.js" defer></script>
 <!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
      apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
 <script src="/shared/adaptief.js" defer></script>

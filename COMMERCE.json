@@ -262,7 +262,7 @@
         "toon": "bankbeeld",
         "prijs": "afkoopsom",
         "beschikbaarheid": "capaciteit",
-        "reserveer": "maakBoekhouding",
+        "reserveer": "inhoudVan",
         "bevestig": "afkoopsom",
         "lever": "levering",
         "annuleer": "vervalMs"

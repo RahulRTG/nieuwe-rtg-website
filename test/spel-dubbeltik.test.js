@@ -1,29 +1,32 @@
-/* DE DUBBELE TIK OP "NODIG UIT EN START" maakt een potje, niet twee.
+/* "NODIG UIT EN START" MET EEN HERHAALSLEUTEL maakt een potje, niet twee.
 
    Gevonden door de voltooiproef van Spelen (scripts/lib/voltooi/spelen.js):
    twee gelijke verzoeken tegelijk gaven twee potjes en de vriend twee
-   uitnodigingen. Zonder kern/spellen/dubbeltik.js zakt de eerste toets. De
-   andere twee bewaken dat het geen rem op gewoon uitnodigen werd.
+   uitnodigingen. De sleutel staat op het potje (kern/spellen/dubbeltik.js), dus
+   een nieuwe kern op dezelfde opslag -- een herstart -- herkent hem ook. Zonder
+   die sleutel zakken de eerste drie toetsen; de laatste bewaakt dat bewust
+   twee keer uitnodigen gewoon kan.
 
    Draai los: node --test test/spel-dubbeltik.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const maakSpellen = require('../server/kern/spellen');
-const { dubbeltik, VENSTER_MS } = require('../server/kern/spellen/dubbeltik');
 
-function opstelling() {
-  const db = { data: { spellen: { potjes: {}, wachtrij: {} } } };
-  const kern = maakSpellen({ db, save() {}, crypto: require('crypto'), zijnVrienden: () => true,
+function kernOp(db) {
+  return maakSpellen({ db, save() {}, crypto: require('crypto'), zijnVrienden: () => true,
     codenaamVan: (x) => 'CN-' + x, sseToCustomer() {}, isGeblokkeerd: () => false,
     socialZoek: async () => [], sociaalRate: () => true, volwassen: () => true,
     sseClients: [], lidBoardUit: () => false });
-  return { db, kern };
+}
+function opstelling() {
+  const db = { data: { spellen: { potjes: {}, wachtrij: {} } } };
+  return { db, kern: kernOp(db) };
 }
 const wachtend = (db) => Object.values(db.data.spellen.potjes).filter((p) => p.status === 'wacht');
 
-test('twee gelijke verzoeken tegelijk: een potje, en allebei krijgen hetzelfde id', async () => {
+test('twee gelijke verzoeken met een sleutel tegelijk: een potje, en allebei krijgen hetzelfde id', async () => {
   const { db, kern } = opstelling();
-  const lijf = { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg' };
+  const lijf = { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-een' };
   const [x, y] = await Promise.all([kern.spelNieuw('a', lijf), kern.spelNieuw('a', lijf)]);
   assert.equal(x.status, 200);
   assert.equal(y.status, 200);
@@ -31,20 +34,34 @@ test('twee gelijke verzoeken tegelijk: een potje, en allebei krijgen hetzelfde i
   assert.equal(wachtend(db).length, 1);
 });
 
-test('een ander spel of een andere vriend is gewoon een nieuw potje', async () => {
+test('na een herstart (een nieuwe kern op dezelfde opslag) geeft dezelfde sleutel hetzelfde potje, ook later', async () => {
   const { db, kern } = opstelling();
-  await kern.spelNieuw('a', { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg' });
-  await kern.spelNieuw('a', { soort: 'schaak', grootte: 2, vrienden: ['c'], wereld: 'rtg' });
-  await kern.spelNieuw('a', { soort: 'woord', grootte: 2, vrienden: ['b'], wereld: 'rtg' });
-  assert.equal(wachtend(db).length, 3);
+  const lijf = { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-herstart' };
+  const x = await kern.spelNieuw('a', lijf);
+  const opnieuw = JSON.parse(JSON.stringify(db));
+  const y = await kernOp(opnieuw).spelNieuw('a', lijf);
+  assert.equal(y.status, 200);
+  assert.equal(y.id, x.id);
+  assert.equal(y.herhaald, true);
+  assert.equal(wachtend(opnieuw).length, 1);
 });
 
-test('buiten het venster, of zodra de vriend ja zei, telt het niet meer als dezelfde tik', () => {
-  const at = new Date(0).toISOString();
-  const p = { id: 'p', status: 'wacht', soort: 'schaak', grootte: 2, spelers: ['a'], uitgenodigd: ['b'], at };
-  const vraag = { soort: 'schaak', grootte: 2, uitgenodigd: ['b'] };
-  assert.equal(dubbeltik({ p }, 'a', vraag, 1000), p);
-  assert.equal(dubbeltik({ p }, 'a', vraag, VENSTER_MS), null);
-  assert.equal(dubbeltik({ p: Object.assign({}, p, { status: 'bezig' }) }, 'a', vraag, 1000), null);
-  assert.equal(dubbeltik({ p }, 'z', vraag, 1000), null);
+test('dezelfde sleutel voor een ander spel of andere spelers is een conflict; dezelfde sleutel van een ander lid niet', async () => {
+  const { db, kern } = opstelling();
+  await kern.spelNieuw('a', { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-x' });
+  const spel = await kern.spelNieuw('a', { soort: 'woord', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-x' });
+  const vriend = await kern.spelNieuw('a', { soort: 'schaak', grootte: 2, vrienden: ['c'], wereld: 'rtg', idem: 'tik-x' });
+  const ander = await kern.spelNieuw('z', { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-x' });
+  assert.equal(spel.status, 409);
+  assert.equal(vriend.status, 409);
+  assert.equal(ander.status, 200);
+  assert.equal(wachtend(db).length, 2);
+});
+
+test('zonder venster: bewust een tweede potje met dezelfde vriend, met een nieuwe sleutel, is gewoon een tweede', async () => {
+  const { db, kern } = opstelling();
+  await kern.spelNieuw('a', { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-1' });
+  await kern.spelNieuw('a', { soort: 'schaak', grootte: 2, vrienden: ['b'], wereld: 'rtg', idem: 'tik-2' });
+  await kern.spelNieuw('a', { soort: 'woord', grootte: 2, vrienden: ['b'], wereld: 'rtg' });
+  assert.equal(wachtend(db).length, 3);
 });

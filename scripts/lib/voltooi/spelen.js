@@ -161,11 +161,21 @@ async function loop(w, stap) {
 
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik op "nodig uit en start" (tegelijk): een uitnodiging, niet twee', async () => {
-    const lijf = { soort: 'schaak', grootte: 2, vrienden: [ab.b.key], codenamen: [], taal: 'nl' };
+    const lijf = { soort: 'schaak', grootte: 2, vrienden: [ab.b.key], codenamen: [], taal: 'nl', idem: 'voltooi-spel-dubbel-' + Date.now() };
     const [a, b] = await w.dubbel(NIEUW, lijf, A.token);
     const wacht = (((await w.post(MIJN, {}, B.token)).data || {}).uitnodigingen || []).filter((u) => [a.data && a.data.id, b.data && b.data.id].includes(u.id));
     return { klopt: a.status === 200 && b.status === 200 && a.data.id === b.data.id && wacht.length === 1,
       ziet: 'tikken ' + a.status + '/' + b.status + ', ids ' + (a.data && a.data.id) + '/' + (b.data && b.data.id) + ', B heeft ' + wacht.length + ' uitnodiging(en)' };
+  });
+  await stap('herstelbaar', 'een crash direct na "nodig uit en start", daarna dezelfde tik: een uitnodiging; dezelfde sleutel voor een ander spel is 409', async () => {
+    const lijf = { soort: 'schaak', grootte: 2, vrienden: [ab.b.key], codenamen: [], taal: 'nl', idem: 'voltooi-spel-crash-' + Date.now() };
+    const r = await w.post(NIEUW, lijf, A.token);
+    await w.crash();
+    const opnieuw = await w.post(NIEUW, lijf, A.token);
+    const anders = await w.post(NIEUW, Object.assign({}, lijf, { soort: 'woord' }), A.token);
+    const wacht = (((await w.post(MIJN, {}, B.token)).data || {}).uitnodigingen || []).filter((u) => u.id === (r.data && r.data.id));
+    return { klopt: r.status === 200 && opnieuw.status === 200 && opnieuw.data.id === r.data.id && anders.status === 409 && wacht.length === 1,
+      ziet: 'start ' + r.status + ', na SIGKILL ' + opnieuw.status + (opnieuw.data && opnieuw.data.herhaald ? ' (herhaald)' : '') + ', ander spel ' + anders.status + ', B heeft ' + wacht.length + ' uitnodiging' };
   });
   await stap('herstelbaar', 'een dubbele tik op een zet (tegelijk): de zet staat er een keer, de tweede tik hoort dat de ander aan zet is', async () => {
     const [a, b] = await w.dubbel(ZET, { id: lopend, zet: NARRENMAT[2] }, A.token);

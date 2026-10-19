@@ -801,7 +801,10 @@ $('#nStart').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
     const cn = $('#nCodenaam').value.trim();
-    const d = await api('/api/member/spel/nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
+    // een sleutel per uitnodiging: een tweede tik of een nieuwe poging is hetzelfde potje
+    const knop = $('#nStart'); if (!knop.dataset.idem) knop.dataset.idem = RTGIdem('spel-nieuw');
+    const d = await api('/api/member/spel/nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined, variant: variantMee(), idem: knop.dataset.idem });
+    delete knop.dataset.idem;
     meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
     toon('vLobby'); laadLobby();
   }catch(e){ $('#nFout').textContent = e.message; }

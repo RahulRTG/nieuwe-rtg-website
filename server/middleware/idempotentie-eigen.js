@@ -51,7 +51,9 @@ const EIGEN = [
   // een chatbericht van Vonk draagt zijn eigen sleutel (kern/connection-communication.js)
   '/api/vonk/bericht',
   // een chatbericht van Rendezvous draagt dezelfde sleutel (kern/connection-communication.js)
-  '/api/connection/rendezvous/text'
+  '/api/connection/rendezvous/text',
+  // "Nodig uit en start" onthoudt zijn sleutel op het potje (kern/spellen/dubbeltik.js)
+  '/api/member/spel/nieuw'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

@@ -7,7 +7,10 @@
    na het scrollen gewoon bij kon. Twee knoppen op een synthetische pagina:
      - een onder de vouw die vrijkomt als je scrolt: NIET bedekt;
      - een tegenproef die vast onder de balk zit (fixed, geen scroll helpt):
-       WEL bedekt, anders bewijst de eerste niets. */
+       WEL bedekt, anders bewijst de eerste niets;
+     - een knop in een dichtgeklapte <details> op dezelfde plek: die ziet
+       niemand, dus is hij ook niet bedekt (18 oktober 2026, de standen van
+       rtg.html in "Uw volledige overzicht"). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -24,6 +27,10 @@ const PAGINA = '<!doctype html><html style="scroll-behavior:smooth"><body style=
   '<button id="vrij" style="display:block;height:40px">Onder de vouw</button>' +
   '<div style="height:1000px"></div>' +
   '<button id="vast" style="position:fixed;bottom:10px;left:10px;height:40px">Vast onder de balk</button>' +
+  /* Chrome geeft de inhoud van een dichte <details> een vak maar tekent hem
+     niet: de knop ligt binnen beeld onder de balk, en zonder de details-regel
+     in de meting telt hij daardoor als bedekt. */
+  '<details style="position:fixed;bottom:40px;left:300px"><summary>Overzicht</summary><button id="dicht" aria-label="In een dichte details">In een dichte details</button></details>' +
   '<div class="rtg-edge-chrome" style="position:fixed;left:0;right:0;bottom:0;height:80px;background:#000"></div>' +
   '</body></html>';
 
@@ -38,6 +45,7 @@ test('de bedekt-meting scrolt direct: wat vrijkomt is niet bedekt, wat vastzit w
     const uit = await bedektDoorSchil(page);
     assert.ok(!uit.some((r) => /Onder de vouw/.test(r)), 'een knop die bij het scrollen vrijkomt, is niet bedekt: ' + JSON.stringify(uit));
     assert.ok(uit.some((r) => /Vast onder de balk/.test(r)), 'de tegenproef: een knop die echt vastzit, wordt gemeld: ' + JSON.stringify(uit));
+    assert.ok(!uit.some((r) => /dichte details/.test(r)), 'een knop in een dichte details ziet niemand, dus is hij niet bedekt: ' + JSON.stringify(uit));
   } finally {
     await browser.close();
     srv.close();

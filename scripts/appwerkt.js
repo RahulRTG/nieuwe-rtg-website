@@ -704,7 +704,12 @@ async function bedektDoorSchil(page) {
   try {
     return await page.evaluate(() => {
       const SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal';
+      /* Een knop in een dichtgeklapte <details> ziet niemand: een regel die de
+         inhoud van <details> een vaste display geeft, geeft hem toch een vak.
+         Zo meldde deze meting op 18 oktober 2026 de standen van rtg.html als
+         "bedekt door de schil" terwijl ze in "Uw volledige overzicht" dicht lagen. */
       const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+        if (el.closest('details:not([open])') && !el.closest('summary')) return false;
         if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
         const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
       const uit = [];
@@ -735,6 +740,7 @@ async function bedektDoorSchil(page) {
 async function kijkRonde(page, gehad) {
   return page.evaluate((alGehad) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+      if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),

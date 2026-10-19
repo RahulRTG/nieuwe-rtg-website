@@ -271,6 +271,9 @@ const CONTRACT = {
   'link:vluchten': Object.assign({
     belofte: 'een lid boekt een vlucht na het opgeven van zijn paspoortgegevens, checkt in met koffers en krijgt een boarding pass met een eenmalige code die hij kan roteren of intrekken, en vraagt een charter aan'
   }, voltooi('vluchten', 'het scenario loopt /api/member/vluchten/bord, /boek, /mijn, /incheck, /pass/roteer, /pass/intrek en /charter, de routes die /apps/vluchten.html zelf aanroept, met een tweede lid dat niets van de boeking ziet')),
+  'link:routedossier': Object.assign({
+    belofte: 'een medewerker van het kantoor ziet per schakel hoeveel routes bewezen, gezakt of ongemeten zijn, filtert en bladert, en opent een route met al zijn cellen en hun bron'
+  }, voltooi('routedossier', 'het scenario loopt /api/office/routedossier, de enige route die /apps/routedossier.html aanroept, met een lid, een zaak en een vreemde die de kantoordeur dicht vinden')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

@@ -374,3 +374,17 @@ test('zonder faalproef-register blijft FAILURE gewoon ongemeten', () => {
   const c = leeg().rijen.find(r => r.pad === '/api/proef/schrijf').cellen.FAILURE;
   assert.equal(c.staat, 'ongemeten');
 });
+
+test('elke cel ongemeten of verklaard draagt een reden -- het routedossier belooft "ongemeten met de reden erbij"', () => {
+  /* De terugval van elke tak gaf { staat: 'ongemeten' } zonder woord; in het
+     dossier waren dat ruim 9.700 cellen (scripts/lib/voltooi/routedossier.js). */
+  for (const r of leeg().rijen) {
+    for (const s of SCHAKELS) {
+      const c = r.cellen[s.id];
+      if (c.staat === 'ongemeten' || c.staat === 'verklaard')
+        assert.ok(typeof c.reden === 'string' && c.reden.length > 8, s.id + ' op ' + r.methode + ' ' + r.pad + ' staat ' + c.staat + ' zonder reden');
+    }
+  }
+  assert.match(rij('POST', '/api/proef/kaal').cellen.AUTH.reden, /geen register noemt deze route/);
+  assert.match(rij('POST', '/api/proef/schrijf').cellen.AUTH.reden, /verklaard door auth/);
+});

@@ -129,6 +129,7 @@ const SCENARIOS = {
   'relaties.js': require('./lib/voltooi/relaties'),
   'rtgone.js': require('./lib/voltooi/rtgone'),
   'residentie.js': require('./lib/voltooi/residentie'),
+  'routedossier.js': require('./lib/voltooi/routedossier'),
   'rtmail.js': require('./lib/voltooi/rtmail'),
   'school.js': require('./lib/voltooi/school'),
   'rtgcode.js': require('./lib/voltooi/rtgcode'),

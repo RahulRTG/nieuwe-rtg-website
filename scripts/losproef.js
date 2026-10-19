@@ -158,10 +158,21 @@ function losAfleiding({ scenarioBron, ruggengraatBron }) {
   return { primair, aanIds, aanCats: [...aanCats], uitCats, andereCats, groepen, scRoutes };
 }
 
-/* Het oordeel over een gedraaid scenario, puur uit zijn boek. */
+/* Het oordeel over een gedraaid scenario, puur uit zijn boek.
+
+   LOS-KERN is de verfijning van de eigenaar voor Office: de eigen belofte sluit,
+   en de enige open stap is een ISOLATIE-stap die een tegenspeler uit een andere
+   app opbouwt (B.v. "een zaak kan dit kantoordocument niet openen" -- dat vraagt
+   een zaak uit de partnerapp). Die tegenspeler kan in LOS-modus niet bestaan, dus
+   de stap breekt bij de opbouw (stand 'stuk') op een 503 van een andere app. Dat
+   is geen leunende belofte maar een proef die het isolatiebewijs alleen in SAMEN
+   kan leveren (BEWIJSMACHINE.md par. 6a). Een open stap ZONDER zo'n cross-app-503
+   is wel een echte kern-leun -> LEUNT. */
 function oordeel({ afgebroken, open }) {
   if (afgebroken) return 'AFGEBROKEN';
-  return (open && open.length) ? 'LEUNT' : 'LOS';
+  if (!open || !open.length) return 'LOS';
+  const alleenIsolatie = open.every((s) => s && s.isolatie);
+  return alleenIsolatie ? 'LOS-KERN' : 'LEUNT';
 }
 
 module.exports = {

@@ -45,6 +45,10 @@ async function meetApp(app, sc, ctx) {
     catch (e) { uitslag = { nr, bewijs, wat, stand: 'stuk', fout: String((e && e.message) || e).slice(0, 220) }; }
     const blok = w.antwoorden().slice(voor).filter((a) => a && a.status === 503);
     if (blok.length) uitslag.leunt = [...new Set(blok.map((a) => (P.catVanRoute(a.pad) || '?') + ' (' + a.pad + ')'))];
+    /* Een ISOLATIE-stap: brak bij de opbouw van een tegenspeler (stand 'stuk')
+       op een 503 van een andere app. Dat is geen leunende eigen belofte, maar
+       een bewijs dat alleen in SAMEN te leveren is. */
+    uitslag.isolatie = uitslag.stand === 'stuk' && Array.isArray(uitslag.leunt) && uitslag.leunt.length > 0;
     boek.push(uitslag);
   };
   let afgebroken = null;
@@ -99,8 +103,9 @@ async function main({ fs, WORTEL }) {
     try { uit.push(await meetApp(app, sc, { fs, WORTEL })); }
     catch (e) { uit.push({ app, verdict: 'OMGEVALLEN', fout: String((e && e.stack) || e).slice(0, 500) }); }
   }
+  const label = (v) => v === 'LOS-KERN' ? 'LOS-KERN (kern LOS; isolatiebewijs vraagt SAMEN)' : v;
   for (const r of uit) {
-    console.log('\n### ' + r.app + '  ->  ' + r.verdict + (r.primair ? '  (eigen categorie: ' + r.primair + ')' : '  (volledig op de bodem)'));
+    console.log('\n### ' + r.app + '  ->  ' + label(r.verdict) + (r.primair ? '  (eigen categorie: ' + r.primair + ')' : '  (volledig op de bodem)'));
     if (r.fout) { console.log('   ' + r.fout); continue; }
     if (r.andereCats && r.andereCats.length) console.log('   raakt ook (nu uit): ' + r.andereCats.join(', '));
     if (r.afgebroken) console.log('   AFGEBROKEN bij de opbouw: ' + r.afgebroken);

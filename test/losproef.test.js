@@ -103,13 +103,19 @@ test('5. andereCats noemt de leun-kandidaten: wat het scenario raakt en nu uit s
   assert.ok(!afl.andereCats.includes('RTG-Backoffice'), 'de eigen categorie is geen leun-kandidaat');
 });
 
-test('6. het oordeel loopt niet door elkaar: AFGEBROKEN gaat voor, een open stap is LEUNT', () => {
+test('6. het oordeel loopt niet door elkaar: AFGEBROKEN voor, kern-leun LEUNT, isolatie LOS-KERN', () => {
   assert.equal(P.oordeel({ afgebroken: null, open: [] }), 'LOS');
-  assert.equal(P.oordeel({ afgebroken: null, open: [{ nr: 1 }] }), 'LEUNT');
+  assert.equal(P.oordeel({ afgebroken: null, open: [{ nr: 1 }] }), 'LEUNT',
+    'een open stap zonder isolatie-vlag is een echte kern-leun');
   assert.equal(P.oordeel({ afgebroken: 'de opbouw viel om', open: [] }), 'AFGEBROKEN',
     'valt de opbouw om, dan is er niets gemeten -- dat is geen LOS');
   assert.equal(P.oordeel({ afgebroken: 'kapot', open: [{ nr: 1 }] }), 'AFGEBROKEN',
     'afgebroken gaat voor een open stap');
+  /* De verfijning van de eigenaar voor Office: enkel isolatie-stappen open ->
+     kern LOS, isolatiebewijs vraagt SAMEN. */
+  assert.equal(P.oordeel({ afgebroken: null, open: [{ nr: 1, isolatie: true }] }), 'LOS-KERN');
+  assert.equal(P.oordeel({ afgebroken: null, open: [{ nr: 1, isolatie: true }, { nr: 2, isolatie: false }] }), 'LEUNT',
+    'EEN echte kern-leun ertussen maakt het weer LEUNT');
 });
 
 test('8. de platformlaag blijft AAN, maar is niet "alles": Toegang heel aan, RTG-Backoffice niet', () => {

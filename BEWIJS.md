@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2833 bestanden en 19584 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2834 bestanden en 19594 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2833 |
-| losse beweringen (`test(...)`) | 19584 |
+| toetsbestanden | 2834 |
+| losse beweringen (`test(...)`) | 19594 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 17 |
+| niets van beide | 18 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2495 bestanden, 19012 beweringen.
+2496 bestanden, 19022 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2200,6 +2200,7 @@ toets omvalt.
 | `tickettoegang.test.js` | 8 | gezakt op `liegpoort /api/` | De entreecode van een activiteitenticket (travelos.activity_ticket_entry), control voor control: 128 bits en kaal eenmaal, hash-only, issuer/doel/scope, verval aan het eind van de ticketdag, max_gebruik 1, intrekken... |
 | `tiener.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de tiener-tools: de toetsplanner (leerplan gespreid over de dagen, stappen afvinken, opruimen), het zakgeldpotje (boeken, saldo-bewaking, spaardoelen met inleg en teruggave), de gast-poort en de... |
 | `tijdlijn.test.js` | 7 | gezakt op `liegpoort /api/` | DE CONFIGURATIETIJDLIJN: acht beweringen, en ze gaan allemaal over de manier waarop een "wat is er veranderd"-scherm normaal gesproken onwaar wordt. 1. |
+| `tijdzone.test.js` | 10 | -- | DE KLOK VAN HET HUIS (server/kern/tijdzone.js). De server draait in productie in een UTC-container. |
 | `tls-acme-boot.test.js` | 2 | gezakt op `===->!==#0` | Bewijst de boot-lijm (server/lib/tls-acme.js): de ACME-accountsleutel en het opgehaalde certificaat persisteren, en -- het echte werk -- dat startAcme een vers uitgegeven certificaat LIVE in een draaiende native... |
 | `tls-acme.test.js` | 3 | gezakt op `===->!==#0` | Bewijst de JOSE/JWS-laag en de VOLLEDIGE ACME-toestandsmachine offline: een nep-CA (een injecteerbare transport) speelt Let's Encrypt na en VERIFIEERT elke JWS-handtekening met de accountsleutel, en "valideert" de... |
 | `tls-boot.test.js` | 3 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

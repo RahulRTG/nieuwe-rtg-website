@@ -2805,11 +2805,11 @@ var RTG_BOUW = '7be75ecc';
   const careSoort = { spa: 'Spa', wellness: 'Wellness', kliniek: 'Kliniek' };
   async function laadCare(){
     if (!API.live) return;
-    try { careOv = await API.call('/care', {}); } catch(e){ careOv = null; }
+    try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
     let mijn = [];
-    try { mijn = (await API.call('/care/mijn', {})).boekingen || []; } catch(e){}
-    try { carePak = (await API.call('/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
-    try { carePakMijn = (await API.call('/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
+    try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
+    try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
+    try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
     renderCareMijn(mijn);
     renderCareIntakes();
     renderCarePakketten();
@@ -2830,11 +2830,11 @@ var RTG_BOUW = '7be75ecc';
           '<button class="bz-btn" data-care-annul="'+esc(b.ref)+'">'+T('care.annuleer','Annuleer')+'</button>'+
         '</div></div>').join('');
     el.querySelectorAll('[data-care-pay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/betaal', { ref: x.dataset.carePay }); toast(T('care.paytoast','Betaald. Tot uw afspraak.')); laadCare(); }
+      try { await API.call('/api/care/betaal', { ref: x.dataset.carePay }); toast(T('care.paytoast','Betaald. Tot uw afspraak.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-care-annul]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/annuleer', { ref: x.dataset.careAnnul }); toast(T('care.annultoast','Afspraak geannuleerd.')); laadCare(); }
+      try { await API.call('/api/care/annuleer', { ref: x.dataset.careAnnul }); toast(T('care.annultoast','Afspraak geannuleerd.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -2849,7 +2849,7 @@ var RTG_BOUW = '7be75ecc';
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+
       '</div>';
     el.querySelectorAll('[data-care-intakestop]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/intake/stop', { id: x.dataset.careIntakestop }); toast(T('care.stoptoast','Deling gestopt. Weg is weg.')); laadCare(); }
+      try { await API.call('/api/care/intake/stop', { id: x.dataset.careIntakestop }); toast(T('care.stoptoast','Deling gestopt. Weg is weg.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -2906,7 +2906,7 @@ var RTG_BOUW = '7be75ecc';
     el.querySelectorAll('[data-care-intaketxt]').forEach(t => t.addEventListener('input', () => { careIntakeTekst[t.dataset.careIntaketxt] = t.value; }));
     el.querySelectorAll('[data-care-intakedeel]').forEach(x => x.addEventListener('click', async () => {
       const id = x.dataset.careIntakedeel;
-      try { await API.call('/care/intake/deel', { aanbiederId: id, medisch: careIntakeTekst[id] || '' }); careIntakeTekst[id] = ''; toast(T('care.deeltoast','Gedeeld. Alleen deze kliniek ziet het, tot u stopt.')); laadCare(); }
+      try { await API.call('/api/care/intake/deel', { aanbiederId: id, medisch: careIntakeTekst[id] || '' }); careIntakeTekst[id] = ''; toast(T('care.deeltoast','Gedeeld. Alleen deze kliniek ziet het, tot u stopt.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-careopen]').forEach(x => x.addEventListener('click', () => {
@@ -2918,8 +2918,8 @@ var RTG_BOUW = '7be75ecc';
     if (boek) boek.addEventListener('click', async () => {
       const [aanbiederId, behandelingId] = careOpen.split(':');
       try {
-        const r = await API.call('/care/boek', { aanbiederId, behandelingId, datum: careKeuze.datum, tijd: careKeuze.tijd });
-        await API.call('/care/betaal', { ref: r.boeking.ref });
+        const r = await API.call('/api/care/boek', { aanbiederId, behandelingId, datum: careKeuze.datum, tijd: careKeuze.tijd });
+        await API.call('/api/care/betaal', { ref: r.boeking.ref });
         toast(T('care.oktoast','Geboekt en betaald. Tot uw afspraak.'));
         careOpen = null; careKeuze = null;
         laadCare();
@@ -3052,7 +3052,7 @@ var RTG_BOUW = '7be75ecc';
     el.innerHTML = html;
 /* de knoppen onder een zorgpakket: betalen en openen */
     el.querySelectorAll('[data-carepakpay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
+      try { await API.call('/api/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-carepakopen]').forEach(x => x.addEventListener('click', () => {
@@ -3063,8 +3063,8 @@ var RTG_BOUW = '7be75ecc';
     const pb = document.getElementById('carePakBoek');
     if (pb) pb.addEventListener('click', async () => {
       try {
-        const r = await API.call('/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
-        await API.call('/care/pakket/betaal', { ref: r.pakket.ref });
+        const r = await API.call('/api/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
+        await API.call('/api/care/pakket/betaal', { ref: r.pakket.ref });
         toast(T('care.paktoast','Pakket betaald. Fijn verblijf.'));
         carePakOpen = null; carePakKeuze = null;
         laadCare();

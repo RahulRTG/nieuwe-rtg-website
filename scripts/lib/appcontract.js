@@ -219,6 +219,16 @@ const CONTRACT = {
   'link:passkeys': Object.assign({
     belofte: 'een lid zet na zijn wachtwoord een passkey op zijn account, logt daarna in zonder wachtwoord, ziet zijn sleutels en haalt er een weg met zijn vinger'
   }, voltooi('passkeys', 'het scenario loopt /api/webauthn/registreer/opties, /registreer, /lijst, /opties, /login, /bevestig/opties en /weg, de routes die /apps/passkeys.html zelf aanroept, met een software-authenticator')),
+  /* De zorgtab heeft geen eigen adres: de ledenapp kent de sprong #tab=zorg
+     (app-main-12a.js) en de knop #tabZorg. Gekoppeld wordt op de drie delen die
+     de tab tekenen en aanroepen: app-main-13 (laden, betalen, annuleren, intake
+     stoppen), -14 (intake delen, boeken) en -15 (pakketten). */
+  'tab:zorg': Object.assign({
+    belofte: 'het lid ziet het zorgaanbod, boekt en betaalt een behandeling of pakket, deelt medische context apart met een kliniek en stopt dat zelf, en annuleert wat hij niet meer wil',
+    ingang: '/apps/app.html',
+    via: '#tab=zorg',
+    bestanden: ['public/apps/app-main/app-main-13.js', 'public/apps/app-main/app-main-14.js', 'public/apps/app-main/app-main-15.js']
+  }, voltooi('tabzorg', 'het scenario loopt /api/care, /mijn, /boek, /betaal, /annuleer, /intake/deel, /intake/stop en /pakket/*, de routes die de zorgtab in app-main-13, -14 en -15 aanroept')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

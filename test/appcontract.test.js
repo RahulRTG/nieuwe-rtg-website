@@ -57,7 +57,9 @@ test('2. alleen de acht bewijzen, en alleen wat de bronsoort mag leveren', () =>
   for (const [functie, c] of Object.entries(CONTRACT)) {
     assert.ok(typeof c.belofte === 'string' && c.belofte.length > 20, functie + ': de belofte in woorden ontbreekt');
     for (const [naam, bron] of Object.entries(c)) {
-      if (naam === 'belofte') continue;
+      /* belofte, en voor een tab of OS-app de koppeling (ingang, via, bestanden:
+         commit 930667b1) -- dat zijn gegevens over het contract, geen bewijzen. */
+      if (['belofte', 'ingang', 'via', 'bestanden'].includes(naam)) continue;
       assert.ok(BEWIJZEN.includes(naam), functie + ': "' + naam + '" is geen bewijs');
       assert.ok((BRONSOORTEN[bron.soort] || []).includes(naam), functie + ': een ' + bron.soort + ' mag geen ' + naam + ' leveren');
     }
@@ -72,14 +74,17 @@ test('3. elke koppeling haalt de meting: de app staat in MAPPEN en de proef raak
   for (const [functie, c] of Object.entries(CONTRACT)) {
     const i = functie.indexOf(':');
     const bron = functie.slice(0, i) === 'link' ? reg.LINKS[functie.slice(i + 1)] : reg.OSAPPS[functie.slice(i + 1)];
-    assert.ok(bron && bron.url, functie + ' staat niet (met een adres) in MAPPEN');
+    /* Een tab zonder eigen adres koppelt via zijn navigatiestap en eigen delen
+       (B.ingangVan, commit 930667b1), en de app moet hem kennen. */
+    const viaDelen = !(bron && bron.url) && c.via && c.ingang && reg.los(functie).bestaat;
+    assert.ok((bron && bron.url) || viaDelen, functie + ' staat niet (met een adres) in MAPPEN');
     for (const [naam, b] of Object.entries(c)) {
-      if (naam === 'belofte') continue;
+      if (['belofte', 'ingang', 'via', 'bestanden'].includes(naam)) continue;
       assert.ok(fs.existsSync(path.join(WORTEL, b.instrument)), b.instrument + ' bestaat niet');
       const proef = B.proefRoutes(b.instrument);
-      const ing = B.ingangRoutes(bron.url);
+      const ing = viaDelen ? B.ingangVan(null, c) : B.ingangRoutes(bron.url);
       const raak = B.gedeeld(proef, ing);
-      assert.ok(raak.length > 0, functie + ': ' + b.instrument + ' raakt geen route van ' + bron.url);
+      assert.ok(raak.length > 0, functie + ': ' + b.instrument + ' raakt geen route van ' + (viaDelen ? c.via : bron.url));
     }
   }
   for (const z of ZONDER_APP) assert.ok(z.reden && z.nodig, 'een keten zonder app draagt zijn reden en wat er nodig is');

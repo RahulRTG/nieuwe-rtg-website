@@ -1,6 +1,6 @@
 /* de knoppen onder een zorgpakket: betalen en openen */
     el.querySelectorAll('[data-carepakpay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
+      try { await API.call('/api/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-carepakopen]').forEach(x => x.addEventListener('click', () => {
@@ -11,8 +11,8 @@
     const pb = document.getElementById('carePakBoek');
     if (pb) pb.addEventListener('click', async () => {
       try {
-        const r = await API.call('/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
-        await API.call('/care/pakket/betaal', { ref: r.pakket.ref });
+        const r = await API.call('/api/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
+        await API.call('/api/care/pakket/betaal', { ref: r.pakket.ref });
         toast(T('care.paktoast','Pakket betaald. Fijn verblijf.'));
         carePakOpen = null; carePakKeuze = null;
         laadCare();

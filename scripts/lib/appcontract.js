@@ -348,6 +348,17 @@ const CONTRACT = {
   'link:partnernetwerk': Object.assign({
     belofte: 'een partnerzaak ziet de vragen van leden die bij haar passen, haar beloften en wat aandacht vraagt, met bij elk getal zijn bron, en antwoordt op een vraag'
   }, voltooi('partnernetwerk', 'het scenario loopt /api/supplier/netwerk/overzicht en /api/supplier/mall/aanvraag/reageer, de routes die /apps/partner-network.html zelf aanroept, met een lid dat de vraag stelt en het antwoord leest en een andere zaak die het niet ziet')),
+  /* Werk heeft geen eigen adres: het is de werkkiezer in /apps/app.html. Het
+     OS-beginscherm is bewust onbereikbaar (WERELD.md), dus de via loopt langs
+     de rand: "open werk" bij Rahul lost in de functiegids exact op naar os:werk
+     (app-main-29.js) en openItem opent de kiezer (app-main-26.js). */
+  'os:werk': Object.assign({
+    belofte: 'een lid opent zijn werk met zijn eigen account, in de rollen die er werkelijk aan hangen, en een rol die hij niet heeft opent niets',
+    ingang: '/apps/app.html',
+    via: 'de rand: "Praat met Rahul" -> "open werk", dat in de functiegids exact op os:werk uitkomt en de werkkiezer opent',
+    // app-main-25.js: de werkkiezer (openWerkKiezer) met /api/account/rollen en /api/account/start
+    bestanden: ['public/apps/app-main/app-main-25.js']
+  }, voltooi('werk', 'het scenario loopt /api/account/rollen en /api/account/start, de routes die de werkkiezer in app-main-25.js zelf aanroept, met personeel via de wervingslink, het kantoor via een uitnodiging en een ander lid dat geen rol krijgt')),
   'link:browser': Object.assign({
     belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden'
   }, voltooi('browser', 'het scenario loopt /api/browser/gids, /zoek, /open en /bericht, de routes die /apps/browser.html zelf aanroept, met de maker die het gesprek leest, een zaak die de klus in haar werklijst ziet en een vreemde die er niet door komt')),

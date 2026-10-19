@@ -160,76 +160,117 @@ body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard
 body[data-rtg-skin="heritage"][data-rtg-world="work"][data-rtg-world-dashboard-ready="true"] :is(
   .merkkop .onder,.wereldvoet span){color:#d8d2c9!important}
 
-/* Het echte beginscherm volgt dezelfde volgorde als de referentie: eerst de
-   menselijke vraag, daarna vier herkenbare werelden. Geen verzonnen activiteit. */
+/* Het echte beginscherm volgt dezelfde redactionele compositie als de publieke
+   website: een rustige vraag, Rahul als directe ingang en fotografische
+   werelden. De inhoud en routes blijven uit de bestaande Command-bron komen. */
 body[data-rtg-skin="heritage"] .cmd-leeg{
-  align-content:start!important;place-items:stretch!important;overflow:auto;
-  padding:clamp(32px,7vw,72px) clamp(18px,6vw,64px) 108px!important;
-  background:transparent!important;color:var(--rtg-world-muted)!important
+  align-content:start!important;place-items:stretch!important;overflow-x:hidden;overflow-y:auto;
+  min-height:100%;padding:clamp(38px,7vw,76px) clamp(18px,5vw,64px) calc(116px + env(safe-area-inset-bottom,0px))!important;
+  background:
+    radial-gradient(42rem 24rem at 96% -4rem,color-mix(in srgb,var(--rtg-world-metal) 10%,transparent),transparent 68%),
+    linear-gradient(180deg,color-mix(in srgb,var(--rtg-world-bg) 97%,white) 0%,var(--rtg-world-bg) 52%,color-mix(in srgb,var(--rtg-world-bg) 96%,black) 100%)!important;
+  color:var(--rtg-world-muted)!important;scroll-padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))
+}
+body[data-rtg-skin="heritage"] .cmd-beginkop{
+  width:min(100%,980px);margin:0 auto
 }
 body[data-rtg-skin="heritage"] .cmd-groet{
-  width:min(100%,780px);margin:0 auto 8px!important;text-align:left!important;
-  color:var(--rtg-world-ink)!important;font-size:clamp(38px,7vw,64px)!important
+  margin:0!important;text-align:left!important;color:var(--rtg-world-ink)!important;
+  font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif)!important;
+  font-size:clamp(48px,7vw,78px)!important;font-weight:430!important;line-height:.98!important;
+  letter-spacing:-.045em!important;text-wrap:balance
 }
-body[data-rtg-skin="heritage"] .cmd-groet::after{
-  content:"Wat wilt u vandaag doen?";display:block;margin-top:8px;
-  color:var(--rtg-world-muted);font:500 14px/1.45 var(--rtg-interface,Inter,sans-serif);
-  letter-spacing:0
+body[data-rtg-skin="heritage"] .cmd-belofte{
+  margin:14px 0 0;color:var(--rtg-world-muted);
+  font:500 clamp(14px,1.6vw,17px)/1.5 var(--rtg-interface,Inter,sans-serif);letter-spacing:0
 }
 body[data-rtg-skin="heritage"] .cmd-intentie{
-  width:min(100%,780px)!important;min-height:58px;margin:16px auto 34px!important;
-  padding:0 54px 0 18px!important;border:1px solid var(--rtg-world-line)!important;
-  background:var(--rtg-world-card-strong)!important;
-  color:var(--rtg-world-muted)!important;box-shadow:var(--rtg-depth-content)!important
+  display:grid!important;grid-template-columns:34px minmax(0,1fr) 36px;align-items:center;gap:12px;
+  width:min(100%,980px)!important;min-height:68px;margin:24px auto 46px!important;
+  padding:8px 10px 8px 18px!important;border:1px solid color-mix(in srgb,var(--rtg-world-metal) 32%,var(--rtg-world-line))!important;
+  background:color-mix(in srgb,var(--rtg-world-card-strong) 78%,transparent)!important;
+  color:var(--rtg-world-ink)!important;box-shadow:var(--rtg-depth-content)!important;
+  backdrop-filter:blur(22px) saturate(1.08);-webkit-backdrop-filter:blur(22px) saturate(1.08)
 }
-body[data-rtg-skin="heritage"] .cmd-intentie::after{
-  content:"✦";float:right;color:var(--rtg-world-metal);font-size:18px
+body[data-rtg-skin="heritage"] .cmd-intentie:hover,
+body[data-rtg-skin="heritage"] .cmd-intentie:focus-visible{
+  border-color:color-mix(in srgb,var(--rtg-world-metal) 70%,var(--rtg-world-line))!important;
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"] .cmd-intentie-golf{
+  display:flex;min-width:34px;height:28px;align-items:center;justify-content:center;gap:3px;color:var(--rtg-world-metal)
+}
+body[data-rtg-skin="heritage"] .cmd-intentie-golf i{
+  display:block;width:2px;height:var(--golf-hoogte);background:currentColor;opacity:.82
+}
+body[data-rtg-skin="heritage"] .cmd-intentie-tekst{
+  max-width:none;text-align:left;font:520 clamp(14px,1.8vw,17px)/1.35 var(--rtg-interface,Inter,sans-serif)
+}
+body[data-rtg-skin="heritage"] .cmd-intentie-actie{
+  display:grid;max-width:none;width:36px;height:36px;place-items:center;border-radius:50%;
+  background:color-mix(in srgb,var(--rtg-world-metal) 12%,transparent);color:var(--rtg-world-metal);font-size:17px
 }
 body[data-rtg-skin="heritage"] .cmd-starttitel{
-  width:min(100%,780px);margin:0 auto 12px;color:var(--rtg-world-ink)!important;
-  font:650 14px/1.2 var(--rtg-interface,Inter,sans-serif)!important;letter-spacing:0
+  width:min(100%,980px);margin:0 auto 18px;color:var(--rtg-world-ink)!important;
+  font:430 clamp(28px,4vw,40px)/1.05 var(--rtg-display,"Bodoni Moda",Georgia,serif)!important;
+  letter-spacing:-.035em!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwerelden{
   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;
-  width:min(100%,780px)!important;margin:0 auto!important
+  width:min(100%,980px)!important;margin:0 auto!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld{
-  position:relative;display:flex!important;min-height:176px;padding:18px!important;
-  flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:5px;
+  position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) 48px;grid-template-rows:1fr auto;
+  min-height:238px;padding:22px!important;align-items:end;gap:8px 12px;
   overflow:hidden;border:1px solid color-mix(in srgb,var(--rtg-world-metal) 34%,var(--rtg-world-line))!important;
-  background:
-    linear-gradient(180deg,rgba(5,5,5,.04) 8%,rgba(5,5,5,.18) 42%,rgba(5,5,5,.92) 100%),
-    var(--rtg-card-photo),var(--rtg-world-card)!important;
-  background-size:auto,cover,auto!important;background-position:center,center,center!important;
+  background:var(--rtg-world-card)!important;
   color:#fff8ee!important;box-shadow:var(--rtg-depth-focus);text-align:left!important;
-  text-shadow:0 2px 12px rgba(0,0,0,.78)
+  text-shadow:0 2px 14px rgba(0,0,0,.72);isolation:isolate
 }
-body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="living"]{
-  --rtg-card-photo:none;background-position:center,62% center,center!important
+body[data-rtg-skin="heritage"] .cmd-wereldbeeld{
+  position:absolute;inset:0;z-index:-2;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;
+  filter:saturate(.84) contrast(1.03)
 }
-body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="travel"]{
-  --rtg-card-photo:none;background-position:center,68% center,center!important
-}
-body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="work"]{
-  --rtg-card-photo:none;background-position:center,70% center,center!important
-}
-body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="foundation"]{
-  --rtg-card-photo:none;background-position:center,66% center,center!important
-}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="living"] .cmd-wereldbeeld{object-position:62% center}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="travel"] .cmd-wereldbeeld{object-position:68% center}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="work"] .cmd-wereldbeeld{object-position:70% center}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="foundation"] .cmd-wereldbeeld{object-position:66% center}
 body[data-rtg-skin="heritage"] .cmd-startwereld::before{
-  content:"";position:absolute;top:16px;left:16px;width:9px;height:9px;border-radius:50%;
-  background:var(--rtg-world-metal);box-shadow:0 0 0 5px rgba(0,0,0,.32),0 0 18px var(--rtg-world-metal)
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,5,5,.05) 0%,rgba(5,5,5,.1) 33%,rgba(5,5,5,.88) 100%)
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(110deg,rgba(255,255,255,.1),transparent 34%);opacity:.45
+}
+body[data-rtg-skin="heritage"] .cmd-wereldsignaal{
+  position:absolute;top:18px;left:18px;width:9px;height:9px;max-width:none;border-radius:50%;
+  background:var(--rtg-world-metal);box-shadow:0 0 0 5px rgba(0,0,0,.26),0 0 18px rgba(229,201,132,.55)
+}
+body[data-rtg-skin="heritage"] .cmd-wereldtekst{
+  display:flex;max-width:none;min-width:0;flex-direction:column;align-items:flex-start;gap:6px;text-align:left
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld strong{
   position:relative;z-index:1;color:#fff8ee!important;
-  font:450 24px/1.05 var(--rtg-display,"Bodoni Moda",Georgia,serif)
+  font:430 clamp(30px,4.2vw,42px)/.98 var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  letter-spacing:-.035em
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld small{
-  position:relative;z-index:1;display:block;color:#f2e7d8!important;font-size:11px;line-height:1.35
+  position:relative;z-index:1;display:block;color:#f2e7d8!important;
+  font:500 12px/1.4 var(--rtg-interface,Inter,sans-serif);letter-spacing:.01em
+}
+body[data-rtg-skin="heritage"] .cmd-wereldpijl{
+  display:grid;max-width:none;width:44px;height:44px;place-items:center;justify-self:end;
+  border:1px solid rgba(255,248,238,.4);border-radius:50%;color:#fff8ee;font-size:19px;
+  background:rgba(7,7,6,.24);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld:hover,
 body[data-rtg-skin="heritage"] .cmd-startwereld:focus-visible{
-  padding-left:18px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 56%,transparent)!important
+  padding-left:22px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 68%,transparent)!important
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld:hover .cmd-wereldpijl,
+body[data-rtg-skin="heritage"] .cmd-startwereld:focus-visible .cmd-wereldpijl{
+  background:var(--rtg-world-metal);border-color:var(--rtg-world-metal);color:#0c0c0b
 }
 
 /* De toegangspoort blijft compact, maar verbergt geen betekenisvolle delen:
@@ -476,7 +517,34 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) #rtg-cookie{
     bottom:14px!important
   }
-  body[data-rtg-skin="heritage"] .cmd-startwerelden{grid-template-columns:1fr}
+  body[data-rtg-skin="heritage"] .cmd-leeg{
+    padding:32px var(--rtg-frame-mobile,16px) calc(112px + env(safe-area-inset-bottom,0px))!important
+  }
+  body[data-rtg-skin="heritage"] .cmd-groet{font-size:clamp(46px,13.5vw,62px)!important}
+  body[data-rtg-skin="heritage"] .cmd-belofte{margin-top:12px;font-size:15px}
+  body[data-rtg-skin="heritage"] .cmd-intentie{
+    min-height:66px;margin:22px auto 40px!important;padding-left:14px!important;grid-template-columns:30px minmax(0,1fr) 36px;gap:10px
+  }
+  body[data-rtg-skin="heritage"] .cmd-intentie-golf{min-width:30px}
+  body[data-rtg-skin="heritage"] .cmd-starttitel{margin-bottom:16px;font-size:30px!important}
+  body[data-rtg-skin="heritage"] .cmd-startwerelden{grid-template-columns:1fr;gap:14px!important}
+  body[data-rtg-skin="heritage"] .cmd-startwereld{min-height:228px;padding:20px!important}
+  body[data-rtg-skin="heritage"] .cmd-startwereld:first-child{min-height:300px}
+  body[data-rtg-skin="heritage"] .cmd-startwereld:hover,
+  body[data-rtg-skin="heritage"] .cmd-startwereld:focus-visible{padding-left:20px!important}
+  body[data-rtg-skin="heritage"] .cmd-startwereld strong{font-size:clamp(34px,10vw,44px)}
+  body[data-rtg-skin="heritage"] .cmd-wereldsignaal{top:16px;left:16px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-skin="heritage"] :is(.cmd-intentie,.cmd-startwereld,.cmd-wereldpijl){transition:none!important}
+}
+
+@media(forced-colors:active){
+  body[data-rtg-skin="heritage"] .cmd-leeg,
+  body[data-rtg-skin="heritage"] .cmd-intentie,
+  body[data-rtg-skin="heritage"] .cmd-startwereld{background:Canvas!important;color:CanvasText!important}
+  body[data-rtg-skin="heritage"] .cmd-startwereld :is(strong,small,.cmd-wereldpijl){color:CanvasText!important;text-shadow:none!important}
 }
 
 /* HIER STOND "DE ENE MOBIELE RAND", EN HIJ IS TERUGGEDRAAID -----------------

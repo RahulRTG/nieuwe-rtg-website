@@ -16,6 +16,7 @@ const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
 const SIMPLE = lees('public/shared/rtg-simple.css');
 const PALETTE = lees('public/shared/rtg-world-palette.css');
 const WERELDSCHERMEN = lees('public/shared/rtg-world-screen.css');
+const BEGIN = lees('public/shared/command/beginscherm.js');
 const EDGE = lees('public/shared/rtg-edge-library.js');
 const CHECK = lees('scripts/check.js');
 
@@ -141,6 +142,22 @@ test('iedere wereld krijgt een rustig eigen accent zonder globale herhaalfoto', 
     assert.ok(block.includes('--rtg-world-signature:'+accent+'!important'));
   }
   assert.match(PALETTE,/--rtg-world-photo:none!important/);
+});
+
+test('het Command-beginscherm gebruikt Rahul en de vier bestaande Heritage-werelden', () => {
+  assert.match(BEGIN, /Vraag Rahul om iets te regelen/);
+  assert.match(BEGIN, /o\.praat/);
+  assert.match(BEGIN, /o\.werelden/);
+  assert.match(BEGIN, /o\.open\(x\.url,x\.naam\)/);
+  for (const wereld of ['living', 'travel', 'work', 'foundation']) {
+    assert.match(BEGIN, new RegExp(wereld + '-heritage-v2\\.jpg'), wereld + ' mist het bestaande filmische wereldbeeld');
+  }
+  assert.match(BEGIN, /beeld\.loading=index===0\?'eager':'lazy'/,
+    'beelden onder de primaire wereld horen pas op aanvraag te laden');
+  assert.match(SIMPLE, /\.cmd-startwereld:first-child\{min-height:300px\}/,
+    'de primaire mobiele wereld mist zijn redactionele diepte');
+  assert.match(SIMPLE, /@media\(forced-colors:active\)/,
+    'het filmische beginscherm mist een hoog-contrast terugval');
 });
 
 test('de vaste volgorde is Home, Werelden, AI, Acties, Menu', () => {

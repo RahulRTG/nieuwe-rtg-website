@@ -47,14 +47,23 @@
          herhaald (MENS.md par. 3). */
       var uur=new Date().getHours();
       var groet=uur<6?'Goedenacht.':uur<12?'Goedemorgen.':uur<18?'Goedemiddag.':'Goedenavond.';
-      var kop=d.createElement('p');kop.className='cmd-groet';kop.textContent=groet;m.appendChild(kop);
+      var begin=d.createElement('header');begin.className='cmd-beginkop';
+      var kop=d.createElement('p');kop.className='cmd-groet';kop.textContent=groet;begin.appendChild(kop);
+      var belofte=d.createElement('p');belofte.className='cmd-belofte';
+      belofte.textContent='Wat wilt u vandaag doen?';begin.appendChild(belofte);m.appendChild(begin);
       /* GEEN VOORNAAMWOORD IN DEZE ZIN. De toon verschilt per pas -- je/jij bij
          RTG Pass, u bij Lifestyle en Business (CLAUDE.md) -- en deze schil weet
          niet welke pas er kijkt. "Wat wil je doen?" is op twee van de drie
          passen fout; een zin zonder voornaamwoord is op alle drie goed. */
       var vraag=d.createElement('button');vraag.type='button';vraag.className='cmd-intentie';
-      vraag.textContent='Typ of zeg wat er geregeld moet worden';
-      vraag.setAttribute('aria-label','Zeg wat er geregeld moet worden');
+      vraag.setAttribute('aria-label','Open Rahul en zeg wat er geregeld moet worden');
+      var golf=d.createElement('span');golf.className='cmd-intentie-golf';golf.setAttribute('aria-hidden','true');
+      [7,14,21,12,18].forEach(function(hoogte){var lijn=d.createElement('i');lijn.style.setProperty('--golf-hoogte',hoogte+'px');golf.appendChild(lijn)});
+      var vraagtekst=d.createElement('span');vraagtekst.className='cmd-intentie-tekst';
+      vraagtekst.textContent='Vraag Rahul om iets te regelen';
+      var vraagactie=d.createElement('span');vraagactie.className='cmd-intentie-actie';
+      vraagactie.setAttribute('aria-hidden','true');vraagactie.textContent='✦';
+      vraag.appendChild(golf);vraag.appendChild(vraagtekst);vraag.appendChild(vraagactie);
       vraag.onclick=function(){if(o.praat)o.praat()};
       m.appendChild(vraag);
       var lijst=[];try{lijst=(o.werelden&&o.werelden())||[]}catch(e){}
@@ -70,14 +79,25 @@
           travel:'Reizen en onderweg',
           foundation:'Samen helpen en bijdragen'
         };
-        lijst.forEach(function(x){
+        var beelden={
+          living:'/images/worlds/heritage/living-heritage-v2.jpg',
+          travel:'/images/worlds/heritage/travel-heritage-v2.jpg',
+          work:'/images/worlds/heritage/work-heritage-v2.jpg',
+          foundation:'/images/worlds/heritage/foundation-heritage-v2.jpg'
+        };
+        lijst.forEach(function(x,index){
           var b=d.createElement('button');b.type='button';b.className='cmd-startwereld';
           var sleutel=(x.naam+' '+x.url).toLowerCase();
           var wereld=sleutel.indexOf('living')>-1?'living':sleutel.indexOf('work')>-1||sleutel.indexOf('kantoor')>-1?'work':
             sleutel.indexOf('travel')>-1||sleutel.indexOf('reiz')>-1?'travel':'foundation';
           var naam=d.createElement('strong');naam.textContent=x.naam;
           var uitleg=d.createElement('small');uitleg.textContent=omschrijvingen[wereld];
-          b.dataset.url=x.url;b.dataset.world=wereld;b.appendChild(naam);b.appendChild(uitleg);
+          var beeld=d.createElement('img');beeld.className='cmd-wereldbeeld';beeld.src=beelden[wereld];beeld.alt='';
+          beeld.loading=index===0?'eager':'lazy';beeld.decoding='async';if(index===0)beeld.fetchPriority='high';
+          var signaal=d.createElement('span');signaal.className='cmd-wereldsignaal';signaal.setAttribute('aria-hidden','true');
+          var pijl=d.createElement('span');pijl.className='cmd-wereldpijl';pijl.setAttribute('aria-hidden','true');pijl.textContent='\u2192';
+          var tekst=d.createElement('span');tekst.className='cmd-wereldtekst';tekst.appendChild(naam);tekst.appendChild(uitleg);
+          b.dataset.url=x.url;b.dataset.world=wereld;b.appendChild(beeld);b.appendChild(signaal);b.appendChild(tekst);b.appendChild(pijl);
           b.onclick=function(){o.open(x.url,x.naam)};
           nav.appendChild(b);});
         m.appendChild(nav);

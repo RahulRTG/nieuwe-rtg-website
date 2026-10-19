@@ -134,7 +134,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
          DE MUTATIE: zet in shared/command/beginscherm.js de oude regel terug. */
       assert.match(start.leeg, /LivingOS/,
         'de werelden staan niet met hun naam op de werktafel: "' + start.leeg + '"');
-      assert.match(start.leeg, /geregeld moet worden/,
+      assert.match(start.leeg, /Vraag Rahul om iets te regelen/,
         'er staat geen ingang in gewone taal op de werktafel: "' + start.leeg + '"');
       assert.equal(start.springboard, false, 'het springboard staat weer in beeld');
       assert.equal(start.klok, false, 'de klok is terug op het beginscherm');

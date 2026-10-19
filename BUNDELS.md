@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 103 delen, 10097 regels in de delen
+`public/apps/app-main/` -- 103 delen, 10109 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -826,7 +826,7 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 295 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 300 regels in de delen
 
 | deel | onderwerp |
 |---|---|

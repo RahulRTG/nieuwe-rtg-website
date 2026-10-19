@@ -39,6 +39,18 @@
     groep.hidden = false;
     const geen = gezicht.querySelector('.rtg-edge-none'); if (geen) geen.hidden = true;
   }
+  /* EN DE CATALOGUS LOOPT DOOR DEZELFDE POORT. De widgetcatalogus van Heel RTG
+     kent geen werkrol en geen pas, en toonde zo "Tweede scherm" (werkrol zaak)
+     aan elk lid. Heeft een catalogusadres een ingang in de gids, dan beslist
+     gidsToegang: false als geen van die ingangen voor dit lid zichtbaar is. Geen
+     ingang in de gids: null, en het menu laat hem staan zoals voorheen. Het adres
+     telt zonder query, met hash (/apps/geld.html#wallet is een eigen ingang). */
+  const zonderQuery = u => { const s = String(u || ''), h = s.indexOf('#'); return (h < 0 ? s : s.slice(0, h)).split('?')[0] + (h < 0 ? '' : s.slice(h)); };
+  window.RTGAppCatalogusPoort = url => {
+    const doel = zonderQuery(url), ids = [];
+    for (const w of window.RTGWorkspaceWorldCatalog || []) for (const i of w.items || []) if (i.url && zonderQuery(i.url) === doel) ids.push(i.id);
+    return ids.length ? ids.some(id => gidsToegang(id)) : null;
+  };
   document.addEventListener('input', e => {
     const t = e.target;
     if (t && t.matches && t.matches('.rtg-edge-face-all .rtg-edge-find input')) heelRtgZoek(t);

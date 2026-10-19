@@ -3,12 +3,15 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "b1497bc9c",
+  "commit": "9cd499eed",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
-   "ongecommitteInvoer": [],
+   "ongecommitteInvoer": [
+    "public/apps/app-main/app-main-29d.js",
+    "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",

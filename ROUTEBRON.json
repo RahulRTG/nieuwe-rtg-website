@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-19T11:26:06.688Z",
-  "commit": "3786f016"
+  "op": "2026-10-19T11:41:25.428Z",
+  "commit": "b19b2d25"
  },
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
@@ -22437,7 +22437,7 @@
   {
    "route": "POST /api/office/pay/bewijs",
    "bestand": "server/routes/pay.js",
-   "regel": 150,
+   "regel": 151,
    "samengesteld": false
   },
   {
@@ -25575,7 +25575,7 @@
   {
    "route": "GET /api/pay/gezond",
    "bestand": "server/routes/pay.js",
-   "regel": 157,
+   "regel": 158,
    "samengesteld": false
   },
   {
@@ -25587,25 +25587,25 @@
   {
    "route": "POST /api/pay/kascode",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 75,
+   "regel": 76,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/kascode/intrek",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 79,
+   "regel": 80,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/oplaad",
    "bestand": "server/routes/pay.js",
-   "regel": 60,
+   "regel": 61,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/overzicht",
    "bestand": "server/routes/pay.js",
-   "regel": 55,
+   "regel": 56,
    "samengesteld": false
   },
   {
@@ -25617,103 +25617,103 @@
   {
    "route": "POST /api/pay/rekening",
    "bestand": "server/routes/pay-terug.js",
-   "regel": 31,
+   "regel": 33,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/saldo",
    "bestand": "server/routes/pay.js",
-   "regel": 91,
+   "regel": 92,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/stuur",
    "bestand": "server/routes/pay.js",
-   "regel": 68,
+   "regel": 69,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tegoed",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 26,
+   "regel": 27,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tegoed/koop",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 30,
+   "regel": 31,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tegoed/roteer",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 46,
+   "regel": 47,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tegoed/terug",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 41,
+   "regel": 42,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tegoed/verzilver",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 35,
+   "regel": 36,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/terug",
    "bestand": "server/routes/pay-terug.js",
-   "regel": 37,
+   "regel": 39,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/terugstand",
    "bestand": "server/routes/pay-terug.js",
-   "regel": 25,
+   "regel": 27,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tik",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 64,
+   "regel": 65,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tikcode",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 56,
+   "regel": 57,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tikcode/intrek",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 60,
+   "regel": 61,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/tiks",
    "bestand": "server/routes/pay-tegoed.js",
-   "regel": 69,
+   "regel": 70,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/verzoek",
    "bestand": "server/routes/pay.js",
-   "regel": 74,
+   "regel": 75,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/verzoek/betaal",
    "bestand": "server/routes/pay.js",
-   "regel": 79,
+   "regel": 80,
    "samengesteld": false
   },
   {
    "route": "POST /api/pay/verzoek/intrek",
    "bestand": "server/routes/pay.js",
-   "regel": 84,
+   "regel": 85,
    "samengesteld": false
   },
   {

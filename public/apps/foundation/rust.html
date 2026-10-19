@@ -61,10 +61,24 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-6u92nb:not(#_#_#_){background:#5FA56A}
+.s-7bb9ev:not(#_#_#_){background:#6FB1E6}
+.s-d9qe6k:not(#_#_#_){background:#C9A24B}
+.s-e2p904:not(#_#_#_){background:#E0796F}
+.s-l40qr3:not(#_#_#_){background:#fff}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
+<body data-rtg-context-bron="foundation.rust" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <div class="topnav"><span class="brand">Rahul Travel <b>Foundation</b></span><a href="index.html">← Foundation</a></div>
 <div class="seg">
   <button data-t="adem" class="aan">Adem</button>
@@ -94,11 +108,11 @@
 
   <div class="tab" id="tab-teken">
     <div class="tekentools">
-      <span class="kl aan" data-kl="#C9A24B" style="background:#C9A24B"></span>
-      <span class="kl" data-kl="#6FB1E6" style="background:#6FB1E6"></span>
-      <span class="kl" data-kl="#5FA56A" style="background:#5FA56A"></span>
-      <span class="kl" data-kl="#E0796F" style="background:#E0796F"></span>
-      <span class="kl" data-kl="#ffffff" style="background:#fff"></span>
+      <span class="kl aan s-d9qe6k" data-kl="#C9A24B"></span>
+      <span class="kl s-7bb9ev" data-kl="#6FB1E6"></span>
+      <span class="kl s-6u92nb" data-kl="#5FA56A"></span>
+      <span class="kl s-e2p904" data-kl="#E0796F"></span>
+      <span class="kl s-l40qr3" data-kl="#ffffff"></span>
       <button class="knop klein grijs" id="tekenWis">Leeg</button>
     </div>
     <div class="tekenbox"><canvas id="doodle"></canvas></div>
@@ -210,5 +224,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/uitstap.js" defer></script>
 <script src="premium.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

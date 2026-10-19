@@ -128,6 +128,6 @@ module.exports = (kern) => {
     try {
       if (!req.session.account || !antwoord) return;
       noteerBeurt(req.session.account, req.body.q, antwoord, req.body.lang);
-    } catch (e) { /* het gesprek loggen mag het antwoord nooit in de weg zitten */ }
+    } catch (e) { /* het gesprek loggen mag het antwoord nooit in de weg zitten, wel opvallen */ console.warn('[rahul] de gespreksbeurt niet vastgelegd:', e && e.message); }
   }
 };

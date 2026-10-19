@@ -44,7 +44,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cmdherstel-'));
 const CODE = 'KANTOOR-CMDHERSTEL-1';
 let srv, base, office;
 
-const api = (pad, body) => fetch(base + '/api/command/' + pad, {
+const api = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/command/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + office },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -67,7 +67,7 @@ test.before(async () => {
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('1. de runbooks dragen hun eigen oordeel, met de opbouw erbij', async () => {
-  const l = await moet('runbooks', {}, 'de runbooklijst');
+  const l = await moet('/api/command/runbooks', {}, 'de runbooklijst');
   assert.ok(l.runbooks.length > 0, 'er staan recepten in');
   for (const r of l.runbooks) {
     assert.ok(r.oordeel && ['auto', 'assist', 'hand'].includes(r.oordeel.niveau),
@@ -78,14 +78,14 @@ test('1. de runbooks dragen hun eigen oordeel, met de opbouw erbij', async () =>
 });
 
 test('2. wie droog vergeet, verandert niets', async () => {
-  const l = await moet('runbooks', {}, 'de lijst');
+  const l = await moet('/api/command/runbooks', {}, 'de lijst');
   const rb = l.runbooks.find(r => r.oordeel.niveau === 'auto') || l.runbooks[0];
 
-  const zonderVeld = await moet('runbook/voer', { id: rb.id, reden: 'de routetoets vergeet het veld' },
+  const zonderVeld = await moet('/api/command/runbook/voer', { id: rb.id, reden: 'de routetoets vergeet het veld' },
     'draaien zonder het droog-veld');
   assert.equal(zonderVeld.run.droog, true, 'de standaard is droog, niet nat');
 
-  const nat = await moet('runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets draait nat',
+  const nat = await moet('/api/command/runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets draait nat',
     menselijkAkkoord: true }, 'nat draaien');
   assert.equal(nat.run.droog, false, 'nu pas gaat hij echt');
   assert.equal(typeof nat.run.geraakt, 'number', 'en zegt hoeveel objecten hij raakte');
@@ -95,9 +95,9 @@ test('2b. de herstelroute loopt door de transactie', async () => {
   /* De bedradingsvraag: komen de vier stukken van de transactie werkelijk uit
      deze route? Een route die stilletjes weer rechtstreeks op runbooks.voer()
      zit, rekent nog steeds netjes -- en kijkt niets meer na. */
-  const l = await moet('runbooks', {}, 'de lijst');
+  const l = await moet('/api/command/runbooks', {}, 'de lijst');
   const rb = l.runbooks[0];
-  const droog = await moet('runbook/voer', { id: rb.id, droog: true }, 'droog draaien');
+  const droog = await moet('/api/command/runbook/voer', { id: rb.id, droog: true }, 'droog draaien');
   assert.ok(droog.certificaat, 'de uitslag draagt geen certificaat');
   assert.ok(Array.isArray(droog.voorcontrole.stappen) && droog.voorcontrole.stappen.length >= 3,
     'de voorcontrole is niet gelopen');
@@ -111,7 +111,7 @@ test('2b. de herstelroute loopt door de transactie', async () => {
     assert.ok(namen.includes(n), 'de voorwaarde ' + n + ' staat niet in de keten');
   }
 
-  const nat = await moet('runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets',
+  const nat = await moet('/api/command/runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets',
     menselijkAkkoord: true }, 'nat draaien');
   assert.equal(nat.keten[0], 'voorcontrole');
   assert.equal(nat.keten[3], 'verificatie');
@@ -119,38 +119,38 @@ test('2b. de herstelroute loopt door de transactie', async () => {
 });
 
 test('3. een teruggedraaide run zegt dat zelf, en staat zo in de runlijst', async () => {
-  const l = await moet('runbooks', {}, 'de lijst');
+  const l = await moet('/api/command/runbooks', {}, 'de lijst');
   const rb = l.runbooks.find(r => r.terugDraaibaar);
   assert.ok(rb, 'er is een terugdraaibaar recept');
-  const uit = await moet('runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets',
+  const uit = await moet('/api/command/runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets',
     menselijkAkkoord: true }, 'nat draaien');
 
-  const terug = await moet('runbook/terug', { run: uit.run.id, reden: 'de routetoets draait terug' },
+  const terug = await moet('/api/command/runbook/terug', { run: uit.run.id, reden: 'de routetoets draait terug' },
     'terugdraaien');
   assert.equal(terug.run.teruggedraaid, true, 'de run draagt zijn eigen terugdraaiing');
   assert.ok(terug.run.terugDoor, 'en de naam van wie het deed');
 
-  const een = await moet('runs', { id: uit.run.id }, 'die ene run opvragen');
+  const een = await moet('/api/command/runs', { id: uit.run.id }, 'die ene run opvragen');
   assert.equal(een.run.teruggedraaid, true, 'ook los opgevraagd staat het er');
-  const lijst = await moet('runs', { n: 10 }, 'de runlijst');
+  const lijst = await moet('/api/command/runs', { n: 10 }, 'de runlijst');
   assert.ok(lijst.runs.some(r => r.id === uit.run.id), 'de run staat in de lijst');
 
-  const onbekend = await api('runbook/terug', { run: 'bestaat-niet', reden: 'x' });
+  const onbekend = await api('/api/command/runbook/terug', { run: 'bestaat-niet', reden: 'x' });
   assert.equal(onbekend.status, 404, 'een onbekende run is 404 en geen stille nul');
 });
 
 test('4. een zaak loopt open, in behandeling, afgehandeld -- en niet andersom', async () => {
-  const open = await moet('zaak/open', { titel: 'Routetoets', domein: 'command',
+  const open = await moet('/api/command/zaak/open', { titel: 'Routetoets', domein: 'command',
     oorzaak: 'toets', reden: 'de routetoets opent er een' }, 'openen');
   const id = open.zaak.id;
   assert.equal(open.zaak.status, 'open');
   assert.equal(open.zaak.eigenaar, null, 'een verse zaak heeft nog geen eigenaar');
 
-  const neem = await moet('zaak/neem', { id }, 'oppakken');
+  const neem = await moet('/api/command/zaak/neem', { id }, 'oppakken');
   assert.equal(neem.zaak.status, 'in behandeling');
   assert.ok(neem.zaak.eigenaar, 'de eigenaar komt uit de sessie en niet uit de body');
 
-  const besluit = await moet('zaak/besluit', { id, keuze: 'opgelost',
+  const besluit = await moet('/api/command/zaak/besluit', { id, keuze: 'opgelost',
     reden: 'de routetoets sluit hem' }, 'besluiten');
   assert.equal(besluit.zaak.status, 'afgehandeld');
   assert.equal(besluit.zaak.besluit.keuze, 'opgelost');
@@ -161,68 +161,68 @@ test('4. een zaak loopt open, in behandeling, afgehandeld -- en niet andersom', 
      een toets die er maar een van raakt, laat de andere ongemerkt verdwijnen.
      Dat is hier ook gebeurd: de mutatieproef haalde de bovenste weg en alles
      bleef groen. Vandaar deze twee regels naast elkaar. */
-  const nogmaals = await api('zaak/besluit', { id, keuze: 'opgelost', reden: 'nog een keer' });
+  const nogmaals = await api('/api/command/zaak/besluit', { id, keuze: 'opgelost', reden: 'nog een keer' });
   assert.equal(nogmaals.status, 409, 'een afgehandelde zaak is niet nog eens te besluiten');
-  const opnieuwOppakken = await api('zaak/neem', { id });
+  const opnieuwOppakken = await api('/api/command/zaak/neem', { id });
   assert.equal(opnieuwOppakken.status, 409, 'en ook niet nog eens op te pakken');
 
-  const lijst = await moet('zaken', { max: 50 }, 'de zakenlijst');
+  const lijst = await moet('/api/command/zaken', { max: 50 }, 'de zakenlijst');
   assert.ok(lijst.tellingen && Array.isArray(lijst.leerpunten),
     'de lijst komt met tellingen en leerpunten');
 });
 
 test('5. de operator verzint niets: een plan zonder kandidaten blijft leeg', async () => {
-  const p = await moet('operator/plan', { q: 'herstel alle vastgelopen ritten' }, 'een plan maken');
+  const p = await moet('/api/command/operator/plan', { q: 'herstel alle vastgelopen ritten' }, 'een plan maken');
   assert.ok(p.plan.id && p.plan.vraag, 'het plan draagt de vraag en een id');
   assert.equal(typeof p.plan.totaal, 'number', 'het plan telt zijn eigen gevallen');
   assert.ok(p.plan.tekst && p.plan.tekst.length > 20,
     'de verwoording staat er ook zonder AI-sleutel: ' + p.plan.tekst);
   if (p.plan.totaal === 0) assert.equal(p.plan.delen.length, 0, 'nul gevallen betekent nul delen');
 
-  const uit = await moet('operator/uitvoeren', { plan: p.plan.id, reden: 'de routetoets voert uit' },
+  const uit = await moet('/api/command/operator/uitvoeren', { plan: p.plan.id, reden: 'de routetoets voert uit' },
     'het plan uitvoeren');
   assert.equal(uit.hersteld, p.plan.veilig, 'er is precies hersteld wat het plan veilig noemde');
 
-  const recent = await moet('operator/recent', { n: 5 }, 'de recente plannen');
+  const recent = await moet('/api/command/operator/recent', { n: 5 }, 'de recente plannen');
   const mijn = recent.plannen.find(x => x.id === p.plan.id);
   assert.ok(mijn && mijn.uitgevoerd === true, 'het plan staat als uitgevoerd in de lijst');
 
-  const weg = await api('operator/uitvoeren', { plan: 'bestaat-niet', reden: 'x' });
+  const weg = await api('/api/command/operator/uitvoeren', { plan: 'bestaat-niet', reden: 'x' });
   assert.equal(weg.status, 404, 'een plan dat er niet is, wordt niet stilzwijgend overgeslagen');
 });
 
 test('6. de zandbak draait een runbook op zijn eigen kopie', async () => {
-  await moet('zandbak/maak', { naam: 'herstelbak', waarvoor: 'de routetoets' }, 'een zandbak maken');
-  const l = await moet('runbooks', {}, 'de lijst');
+  await moet('/api/command/zandbak/maak', { naam: 'herstelbak', waarvoor: 'de routetoets' }, 'een zandbak maken');
+  const l = await moet('/api/command/runbooks', {}, 'de lijst');
   const rb = l.runbooks[0];
 
-  const in1 = await moet('zandbak/runbook', { naam: 'herstelbak', runbook: rb.id, droog: false,
+  const in1 = await moet('/api/command/zandbak/runbook', { naam: 'herstelbak', runbook: rb.id, droog: false,
     reden: 'de routetoets draait in de bak' }, 'in de zandbak draaien');
   assert.equal(in1.zandbak, 'herstelbak', 'elk antwoord draagt de naam van de bak');
   assert.ok(in1.run, 'er is in de bak echt een run gemaakt');
 
-  const echt = await moet('runs', { n: 50 }, 'de echte runlijst');
+  const echt = await moet('/api/command/runs', { n: 50 }, 'de echte runlijst');
   assert.equal(echt.runs.filter(r => r.id === in1.run.id).length, 0,
     'de run uit de zandbak staat NIET in het echte runjournaal');
 
-  const geenBak = await api('zandbak/runbook', { naam: 'bestaat-niet', runbook: rb.id });
+  const geenBak = await api('/api/command/zandbak/runbook', { naam: 'bestaat-niet', runbook: rb.id });
   assert.equal(geenBak.status, 404, 'een zandbak die er niet is, is 404');
 });
 
 test('7. de overname leest in en stelt voor, maar verzint geen soort', async () => {
-  const lijst = await moet('overname', {}, 'de overnamelijst');
+  const lijst = await moet('/api/command/overname', {}, 'de overnamelijst');
   assert.ok(lijst.soorten.length > 0, 'de lijst noemt welke soorten hij kent');
   const soort = lijst.soorten[0];
 
-  const onzin = await api('overname/lees', { naam: 'Onzin BV', soort: 'ditbestaatniet', rijen: [{}] });
+  const onzin = await api('/api/command/overname/lees', { naam: 'Onzin BV', soort: 'ditbestaatniet', rijen: [{}] });
   assert.equal(onzin.status, 404, 'een onbekende soort wordt geweigerd en niet geraden');
 
-  const gelezen = await moet('overname/lees', { naam: 'Routetoets BV', soort: soort.type,
+  const gelezen = await moet('/api/command/overname/lees', { naam: 'Routetoets BV', soort: soort.type,
     rijen: [{ naam: 'Een rij uit de toets', code: 'ROUTETOETS-1' }] }, 'inlezen');
   const id = gelezen.partij && gelezen.partij.id;
   assert.ok(id, 'de inlezing krijgt een id: ' + JSON.stringify(gelezen).slice(0, 200));
   assert.equal(gelezen.partij.stand, 'ingelezen', 'inlezen is nog geen overnemen');
 
-  const voorstel = await moet('overname/voorstel', { id }, 'het afbeeldvoorstel');
+  const voorstel = await moet('/api/command/overname/voorstel', { id }, 'het afbeeldvoorstel');
   assert.ok(voorstel && typeof voorstel === 'object', 'er komt een voorstel terug');
 });

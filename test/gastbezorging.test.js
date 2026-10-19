@@ -211,6 +211,14 @@ test('buiten de zone wordt er geen rekening geopend en geen slot bezet', async (
   const na = (await post('/api/supplier/horeca/bezorg/sloten', {}, ZAAK)).body.sloten
     .reduce((t, s) => t + s.gebruiktMinuten, 0);
   assert.equal(na, voor, 'een geweigerde bestelling mag geen keukenminuten vasthouden');
+  /* De gevulde kant eerst: een lid BINNEN de zone ziet zijn bestelling wel in
+     /mijn staan. Zonder die helft zegt de nul hieronder niets. */
+  const lid4 = await maakLid('Dichtbij', true);
+  const duur = kaart.filter(k => !k.alcohol).sort((a, b) => b.centen - a.centen)[0];
+  const binnen = await post('/api/gast/bezorg/bestel', { zaak: 'KIKUNOI', postcode: '1012CD',
+    adres: 'Kalverstraat 4', items: [{ itemId: duur.id, aantal: 2 }] }, lid4);
+  assert.equal(binnen.status, 200, JSON.stringify(binnen.body).slice(0, 160));
+  assert.equal((await post('/api/gast/bezorg/mijn', {}, lid4)).body.bestellingen.length, 1, 'binnen de zone staat de bestelling in /mijn');
   const mijn = await post('/api/gast/bezorg/mijn', {}, lid3);
   assert.equal(mijn.body.bestellingen.length, 0, 'en er hoort geen lege rekening te blijven staan');
 });
@@ -225,6 +233,7 @@ test('afhalen geeft een uitspreekbare code, en de zaak ziet dezelfde rekening', 
   assert.equal(uit.status, 200, JSON.stringify(uit.body).slice(0, 200));
   assert.match(uit.body.afhaal.code, /^[A-HJ-NP-Z]\d{2}$/,
     'de afhaalcode is een letter en twee cijfers, zonder I en O');
+  assert.ok(uit.body.rekening.regels.length > 0, 'de bestelde regel staat op de rekening');
   assert.ok(!uit.body.rekening.regels.some(r => /Bezorging/.test(r.naam)),
     'afhalen kent geen bezorgkosten');
 

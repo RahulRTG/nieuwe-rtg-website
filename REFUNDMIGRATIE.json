@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-04T12:37:58.654Z",
-  "commit": "785176c2",
+  "op": "2026-10-18T12:29:44.055Z",
+  "commit": "a7ae8fc24",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/refundmigratie.js",
@@ -28,20 +28,20 @@
    "scherm": 0
   },
   "tickets": {
-   "verklaard": 5,
-   "onbekend": 5,
+   "verklaard": 8,
+   "onbekend": 0,
    "om": 0,
-   "geenWerk": 1,
+   "geenWerk": 4,
    "wacht": 4,
-   "scherm": 2
+   "scherm": 0
   },
   "boekingen": {
-   "verklaard": 6,
-   "onbekend": 14,
+   "verklaard": 16,
+   "onbekend": 0,
    "om": 0,
-   "geenWerk": 2,
-   "wacht": 4,
-   "scherm": 3
+   "geenWerk": 9,
+   "wacht": 7,
+   "scherm": 1
   }
  },
  "verklaard": [
@@ -288,6 +288,31 @@
    "tedoen": "twee optellingen op `b.paid` zonder `refunded` ernaast -- dit is de stille soort, dus hij gaat mee op de dag dat boekingen omgaan"
   },
   {
+   "bestand": "server/kern/onderneming/klussen.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "het stadium van een klus (\"klaar\" zodra boeking of factuur betaald is)",
+   "gedaan": "leest `paid` pas als de status `afgerond` is; annuleren weigert een afgeronde boeking en zet een teruggestorte op `geweigerd`, dus die komt hier nooit"
+  },
+  {
+   "bestand": "server/kern/reiswereld-bronnen-partner.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": [
+    "tickets",
+    "boekingen"
+   ],
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "de afspraken en activiteiten van een partner in de reiswereld",
+   "gedaan": "sluit `geannuleerd`, `geweigerd` en `terugbetaald` uit naast `paid`; een terugstorting valt er via de status buiten"
+  },
+  {
    "bestand": "server/kern/tafelticket.js",
    "treffers": 1,
    "laag": "server",
@@ -311,6 +336,17 @@
    "stand": "geen-werk",
    "wat": "of een ticket een entreecode krijgt en of de deur hem binnenlaat",
    "gedaan": "sluit `refunded` en geweigerd/geannuleerd VOOR `paid` uit, dus een teruggestort ticket opent niets"
+  },
+  {
+   "bestand": "server/kern/vakwerk/index.js",
+   "treffers": 3,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "telt",
+   "stand": "wacht",
+   "wat": "omzet per dienst en de omzet-KPI's (vandaag, week, maand) van een vakzaak, plus de betaalstand op het werkbeeld",
+   "tedoen": "`echt` sluit alleen `wacht-op-betaling` uit, dus een geannuleerde boeking (`geweigerd`) zit erin en telt nu alleen niet omdat `paid` op false gaat. Gaan boekingen om, dan blijft een teruggestorte boeking in de omzet staan -- de stille soort -- en moet hier `!b.refunded` (of een tegenboeking) bij"
   },
   {
    "bestand": "server/kern/zaakcommand/signalen.js",
@@ -340,6 +376,28 @@
    "stand": "wacht",
    "wat": "de eigen kaartjes van een lid, de betaalstand van de transferrit, en de grendel op een transfer zonder betaald ticket",
    "tedoen": "drie plekken: de lijst en de grendel sluiten `refunded` niet uit, en de transferrit toont zijn betaalstand door -- alle drie gaan mee met hun eigen collectie"
+  },
+  {
+   "bestand": "server/routes/member/voertuigen/charter.js",
+   "treffers": 2,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "grendel",
+   "stand": "geen-werk",
+   "wat": "of een boot in een periode bezet is, en de eigen charters van een lid",
+   "gedaan": "beide regels sluiten `geweigerd` uit (CHARTER_KLAAR en de filter van /api/charter/mijn); een teruggestorte charter houdt geen boot bezet"
+  },
+  {
+   "bestand": "server/routes/member/voertuigen/huur.js",
+   "treffers": 2,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "grendel",
+   "stand": "geen-werk",
+   "wat": "of een auto in een periode verhuurd is, en de eigen huur van een lid",
+   "gedaan": "idem als de charter: HUUR_KLAAR en /api/huur/mijn sluiten `geweigerd` uit"
   },
   {
    "bestand": "server/routes/member/zakelijk.js",
@@ -397,6 +455,17 @@
    "tedoen": "sluit `refunded` niet uit; na de omzetting kan een teruggestorte reis alsnog starten"
   },
   {
+   "bestand": "server/routes/supplier/charter/vloot.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "toont",
+   "stand": "wacht",
+   "wat": "het charteroverzicht van de verhuurder (lopend, of vandaag afgerond)",
+   "tedoen": "een geweigerde charter van VANDAAG (`finishedAt || at`) valt door de tweede tak heen en wordt nu alleen door `paid` tegengehouden; gaan boekingen om, dan staat een teruggestorte charter van vandaag in het overzicht"
+  },
+  {
    "bestand": "server/routes/supplier/kassa/afrekenen.js",
    "treffers": 1,
    "laag": "server",
@@ -441,6 +510,20 @@
    "gedaan": "filtert op status nieuw/in bereiding en beweegt daarom vanzelf mee"
   },
   {
+   "bestand": "server/routes/supplier/tickets-dicht.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": [
+    "tickets",
+    "boekingen"
+   ],
+   "soort": "telt",
+   "stand": "geen-werk",
+   "wat": "de verkochte kaartjes van een dag die een sluiting raakt",
+   "gedaan": "sluit `geannuleerd`, `geweigerd` en `terugbetaald` uit naast `paid`"
+  },
+  {
    "bestand": "server/routes/supplier/tickets-verkoop.js",
    "treffers": 1,
    "laag": "server",
@@ -450,6 +533,20 @@
    "stand": "wacht",
    "wat": "de deurverkoop: een herhaling met dezelfde sleutel neemt de vastgehouden plek (`!t.paid`)",
    "tedoen": "leest `paid` alleen om een eigen, nog onbetaalde vasthouding terug te vinden; gaan tickets om, dan mag een teruggestort kaartje (paid, refunded) daar nooit voor een open vasthouding doorgaan"
+  },
+  {
+   "bestand": "server/routes/supplier/tickets.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": [
+    "tickets",
+    "boekingen"
+   ],
+   "soort": "telt",
+   "stand": "geen-werk",
+   "wat": "verkochte plaatsen per tijdslot op het ticketscherm van de zaak",
+   "gedaan": "filtert op de uitkomst van ticketsVoorSlot() (kern/leverancier/zaak.js), en die sluit `geweigerd` al uit"
   },
   {
    "bestand": "server/routes/supplier/verhuur/rit.js",
@@ -463,6 +560,17 @@
    "tedoen": "idem als de charterreis hierboven"
   },
   {
+   "bestand": "server/routes/supplier/verhuur/vloot.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "toont",
+   "stand": "wacht",
+   "wat": "het huuroverzicht van de verhuurder (lopend, of vandaag afgerond)",
+   "tedoen": "idem als het charteroverzicht hierboven"
+  },
+  {
    "bestand": "public/apps/app-main/app-main-20.js",
    "treffers": 5,
    "laag": "scherm",
@@ -472,6 +580,17 @@
    "stand": "geen-werk",
    "wat": "de bestellingen van het lid ter plaatse",
    "gedaan": "filtert status `terugbetaald` weg voordat het `paid` leest"
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-21.js",
+   "treffers": 1,
+   "laag": "scherm",
+   "leesbreedte": "venster",
+   "collectie": "boekingen",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "de betaalknop bij de eigen afspraken van een lid",
+   "gedaan": "de lijst sluit `afgerond` en `geweigerd` uit voordat hij `paid` leest"
   },
   {
    "bestand": "public/apps/app-main/app-main-43.js",
@@ -540,156 +659,16 @@
    "gedaan": "las `refunded` al -- dit is het scherm waar de terugstorting vandaan komt"
   }
  ],
- "onbekend": [
-  {
-   "bestand": "server/kern/care/leden.js",
-   "treffers": 3,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/kern/care/zaak.js",
-   "treffers": 4,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/kern/onderneming/klussen.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/kern/reiswereld-bronnen-partner.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "tickets",
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/kern/vakwerk/index.js",
-   "treffers": 3,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/routes/member/voertuigen/charter.js",
-   "treffers": 2,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/routes/member/voertuigen/huur.js",
-   "treffers": 2,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/routes/supplier/charter/vloot.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/routes/supplier/tickets-dicht.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "tickets",
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/routes/supplier/tickets.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "tickets",
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "server/routes/supplier/verhuur/vloot.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-13.js",
-   "treffers": 2,
-   "laag": "scherm",
-   "leesbreedte": "bestand",
-   "collecties": [
-    "tickets",
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-21.js",
-   "treffers": 1,
-   "laag": "scherm",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-45.js",
-   "treffers": 1,
-   "laag": "scherm",
-   "leesbreedte": "bestand",
-   "collecties": [
-    "tickets"
-   ]
-  },
-  {
-   "bestand": "public/apps/foundation/zorg-hulp-weergave.js",
-   "treffers": 2,
-   "laag": "scherm",
-   "leesbreedte": "venster",
-   "collecties": [
-    "boekingen"
-   ]
-  }
- ],
+ "onbekend": [],
  "verdwenen": [],
  "telling": {
   "bestanden": 62,
-  "verklaard": 44,
-  "onbekend": 15,
+  "verklaard": 54,
+  "onbekend": 0,
   "verdwenen": 0,
-  "server": 48,
-  "scherm": 11,
-  "scherp": 54,
-  "ruim": 5
+  "server": 46,
+  "scherm": 8,
+  "scherp": 51,
+  "ruim": 3
  }
 }

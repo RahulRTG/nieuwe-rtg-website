@@ -5,6 +5,7 @@ module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, commDm } = ctx;
+const S = ctx.opslag || require('../opslag')({ db: ctx.db }); // de vijf sociale lijsten
 /* De priveberichten wonen sinds de verhuizing in de communicatiekern
    (kern/comm + kern/comm/dm). Deze laag houdt wat van haar is -- de
    vriendschapscontrole, de blokkade en de snelheidslimiet -- en laat het
@@ -25,7 +26,7 @@ function socialAntwoord(mij, ander, action) {
     sseToCustomer(ander, 'social', { kind: 'accepted', by: codenaamVan(mij) });
     return { status: 200, ok: true, st: verbActief(c) ? 'verbonden' : 'wacht-op-ouder' };
   }
-  db.data.connections = db.data.connections.filter(x => x !== c); save();
+  S.zet('connections', S.lijst('connections').filter(x => x !== c)); save();
   return { status: 200, ok: true, st: 'geen' };
 }
 /* EEN VERZOEK DAT IK ZELF STUURDE, WEER INTREKKEN.
@@ -48,13 +49,13 @@ function socialIntrek(mij, ander) {
   const c = connectieTussen(mij, ander);
   if (!c || c.status !== 'pending' || c.requestedBy !== mij)
     return { status: 404, error: 'Er staat geen verzoek van jou open bij deze codenaam.' };
-  db.data.connections = db.data.connections.filter(x => x !== c); save();
+  S.zet('connections', S.lijst('connections').filter(x => x !== c)); save();
   return { status: 200, ok: true, st: 'geen' };
 }
 
 // mijn vrienden + openstaande verzoeken
 function socialConnecties(mij) {
-  const conns = db.data.connections.filter(c => (c.a === mij || c.b === mij) && verbActief(c)).map(c => {
+  const conns = S.lijst('connections').filter(c => (c.a === mij || c.b === mij) && verbActief(c)).map(c => {
     const ander = c.a === mij ? c.b : c.a;
     /* Teller en laatste regel komen uit de kern, niet meer uit een eigen
        voorraad: twee tellers voor hetzelfde aantal is hoe ze uit elkaar gaan
@@ -64,7 +65,7 @@ function socialConnecties(mij) {
     try { const b = DM(); laatst = b.laatste(mij, ander); unread = b.ongelezen(mij, ander); } catch (e) {}
     return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : laatst.stuk ? '↗ stuk' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
   }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
-  const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at, via: c.via || null }));
+  const requests = S.lijst('connections').filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at, via: c.via || null }));
   return { connections: conns, requests };
 }
 // DM lezen/sturen (werkt over beide werelden zolang de vriendschap actief is)
@@ -89,7 +90,7 @@ const zijnVrienden = (a, b) => verbActief(connectieTussen(a, b));
 // vriendschapsverzoeken van kinderen van dit gezin die op ouderakkoord wachten
 function socialTeKeuren(gezinCode) {
   const kids = new Set(rtf.socialProfielen().filter(sp => sp.gezinCode === gezinCode && sp.beschermd).map(sp => sp.handle));
-  return db.data.connections.filter(c => c.status === 'pending' && c.voogdWacht && c.voogdWacht.some(h => kids.has(h))).map(c => {
+  return S.lijst('connections').filter(c => c.status === 'pending' && c.voogdWacht && c.voogdWacht.some(h => kids.has(h))).map(c => {
     const kid = c.voogdWacht.find(h => kids.has(h));
     const ander = c.a === kid ? c.b : c.a;
     return { kindHandle: kid, kind: codenaamVan(kid), anderKey: ander, ander: codenaamVan(ander), anderSoort: soortVan(ander), volwassene: !isKindHandle(ander), richting: c.requestedBy === kid ? 'uit' : 'in', at: c.at };
@@ -100,7 +101,7 @@ function socialGoedkeur(gezinCode, kidHandle, anderHandle, akkoord) {
   if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
   const c = connectieTussen(kidHandle, anderHandle);
   if (!c || c.status !== 'pending') return { status: 404, error: 'Verzoek niet gevonden.' };
-  if (!akkoord) { db.data.connections = db.data.connections.filter(x => x !== c); save(); return { status: 200, ok: true, st: 'afgewezen' }; }
+  if (!akkoord) { S.zet('connections', S.lijst('connections').filter(x => x !== c)); save(); return { status: 200, ok: true, st: 'afgewezen' }; }
   c.voogdWacht = (c.voogdWacht || []).filter(h => h !== kidHandle);
   // als het kind de ontvanger is, geldt het ouderakkoord ook als accepteren
   if (c.requestedBy !== kidHandle && c.status === 'pending') { c.status = 'accepted'; c.acceptedAt = new Date().toISOString(); }

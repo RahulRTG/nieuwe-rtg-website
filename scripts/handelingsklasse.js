@@ -61,7 +61,7 @@ function meet() {
     beproefdePaden: k.beproefdePaden() };
 }
 
-function lees() { try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { return null; } }
+function lees() { try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; } }
 
 function schrijf(nu) {
   fs.writeFileSync(REGISTER, JSON.stringify({

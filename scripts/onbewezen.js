@@ -239,7 +239,7 @@ function meet() {
     jRuw = j;
     for (const r of (j.perRoute || [])) ruw[r.methode.toUpperCase() + ' ' + r.pad] = r;
     metingOp = j.stempel && j.stempel.op ? Date.parse(j.stempel.op) : null;
-  } catch (e) {}
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
 
   /* De statussen uit het mutatieboek, want dat is de plek waar ze wonen. Een
      tweede afleiding hier zou binnen een week uit de pas lopen (LAT.md regel 4). */

@@ -13,7 +13,7 @@ let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boeken-'));
 
 function api(pad, body, tok) {
-  return fetch(base + '/api/boeken' + pad, { method: 'POST',
+  return fetch(base + (pad.startsWith('/api/') ? pad : '/api/boeken' + pad), { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || token) },
     body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -35,22 +35,22 @@ test.after(() => {
 });
 
 test('1. de huisbibliotheek staat klaar en een boek heeft echt tekst', async () => {
-  const b = await api('/bieb');
+  const b = await api('/api/boeken/bieb');
   assert.equal(b.status, 200);
   assert.ok(b.body.boeken.length >= 5, 'een gevulde startplank');
   assert.ok(b.body.boeken.every(x => x.titel && x.woorden > 50), 'elke titel draagt een echt verhaal');
-  const boek = await api('/boek', { id: 'haas' });
+  const boek = await api('/api/boeken/boek', { id: 'haas' });
   assert.equal(boek.status, 200);
   assert.match(boek.body.tekst, /schildpad/i);
-  assert.equal((await api('/boek', { id: 'bestaat-niet' })).status, 404);
+  assert.equal((await api('/api/boeken/boek', { id: 'bestaat-niet' })).status, 404);
 });
 
 test('2. de leesplek reist mee: zetten, teruglezen, en alleen de plek', async () => {
-  const zet = await api('/lees', { boek: 'haas', plek: 0.42 });
+  const zet = await api('/api/boeken/lees', { boek: 'haas', plek: 0.42 });
   assert.equal(zet.status, 200);
   assert.equal(zet.body.plek, 0.42);
-  await api('/lees', { boek: 'kluis:abc123', plek: 1 });
-  const v = await api('/voortgang');
+  await api('/api/boeken/lees', { boek: 'kluis:abc123', plek: 1 });
+  const v = await api('/api/boeken/voortgang');
   assert.equal(v.body.voortgang.haas.plek, 0.42);
   assert.equal(v.body.voortgang['kluis:abc123'].plek, 1, 'ook een kluisboek heeft gewoon een plek');
   const sleutels = Object.keys(v.body.voortgang.haas);
@@ -58,8 +58,8 @@ test('2. de leesplek reist mee: zetten, teruglezen, en alleen de plek', async ()
 });
 
 test('3. nette grenzen: rare plekken geweigerd, en dicht zonder token', async () => {
-  assert.equal((await api('/lees', { boek: 'haas', plek: 1.4 })).status, 400);
-  assert.equal((await api('/lees', { boek: '', plek: 0.5 })).status, 400);
-  assert.equal((await api('/bieb', {}, 'nep')).status, 401);
-  assert.equal((await api('/lees', { boek: 'haas', plek: 0.5 }, 'nep')).status, 401);
+  assert.equal((await api('/api/boeken/lees', { boek: 'haas', plek: 1.4 })).status, 400);
+  assert.equal((await api('/api/boeken/lees', { boek: '', plek: 0.5 })).status, 400);
+  assert.equal((await api('/api/boeken/bieb', {}, 'nep')).status, 401);
+  assert.equal((await api('/api/boeken/lees', { boek: 'haas', plek: 0.5 }, 'nep')).status, 401);
 });

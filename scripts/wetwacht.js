@@ -207,6 +207,11 @@ function toon(bevindingen) {
   return r.join('\n');
 }
 
+/* Wat een uitslag van deze wacht NIET zegt, als veld (scripts/meetleer.js leest het). */
+const WETWACHT_GRENS = 'Een veranderde vingerafdruk zegt alleen DAT de tekst van een bron anders is, niet WAT er ' +
+  'juridisch veranderde: ook een nieuwe voettekst telt. Geen bevinding is geen bewijs dat de wet gelijk bleef ' +
+  'buiten de gevolgde bronnen, en een onbereikbare bron is ONGEMETEN. Dit is geen juridisch oordeel.';
+
 if (require.main === module) {
   (async () => {
     const vastleggen = process.argv.includes('--vastleggen');
@@ -216,7 +221,7 @@ if (require.main === module) {
 
     console.log(toon(bevindingen));
     fs.writeFileSync(path.join(WORTEL, 'WETWACHT.json'),
-      JSON.stringify({ gemetenOp: new Date().toISOString(), bevindingen }, null, 2) + '\n');
+      JSON.stringify({ gemetenOp: new Date().toISOString(), grens: WETWACHT_GRENS, bevindingen }, null, 2) + '\n');
 
     if (vastleggen) {
       const nu = new Date().toISOString().slice(0, 10);

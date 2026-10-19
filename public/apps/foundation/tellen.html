@@ -44,6 +44,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1papx63:not(#_#_#_){font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -71,7 +81,7 @@
   </div>
 
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Voor de grote mee-teller</h2>
+    <h2 class="s-1papx63">Voor de grote mee-teller</h2>
     <p class="ouder">Tel samen hardop en wijs elk ding aan; dat is precies wat een kleuter nodig heeft om getallen aan hoeveelheden te koppelen. Het Pakken-spel oefent de andere kant op: van het getal naar de hoeveelheid ("pak er drie"), en terugleggen is gewoon nog eens tikken -- niets is fout. Er zit geen tijd op, geen geluid en geen beloningssysteem in.</p>
   </div>
 </div>

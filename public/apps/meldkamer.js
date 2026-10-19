@@ -66,7 +66,7 @@
       const vrij = (d.eenheden || []).filter(e => e.status === 'vrij');
       const kanWijzen = m.status !== 'afgerond';
       return '<div class="melding"><span class="prio p' + m.prio + '">P' + m.prio + '</span><b>' + esc(m.tekst) + '</b>' +
-        (m.plek ? ' · ' + esc(m.plek) : '') + ' · ' + esc(m.status) + (m.viaBijstand ? ' · <span style="color:var(--rtg-leesgoud,var(--gold));">bijstandsverzoek</span>' : '') +
+        (m.plek ? ' · ' + esc(m.plek) : '') + ' · ' + esc(m.status) + (m.viaBijstand ? ' · <span class="s-12itpbj">bijstandsverzoek</span>' : '') +
         '<div class="rij">' +
         (kanWijzen && vrij.length ? '<select data-wijs-e="' + m.id + '">' + vrij.map(e => '<option value="' + e.id + '">' + esc(e.naam) + ' (' + e.soort + ')</option>').join('') + '</select>' +
           '<button class="knop klein" data-wijs="' + m.id + '" type="button">Stuur</button>' : '') +
@@ -117,7 +117,7 @@
       $('#wachtkamer').innerHTML = z.receptie.length ? z.receptie.map(p =>
         '<div class="melding"><b>' + esc(p.aanduiding) + '</b>' + (p.reden ? ' · ' + esc(p.reden) : '') + ' · ' + esc(p.status) + (p.kamer ? ' (' + esc(p.kamer) + ')' : '') +
         '<div class="rij">' +
-        (p.status === 'wacht' ? '<input class="veld" data-pkamer="' + p.id + '" placeholder="Kamer" maxlength="30" style="max-width:8rem;">' +
+        (p.status === 'wacht' ? '<input class="veld s-1v3d95r" data-pkamer="' + p.id + '" placeholder="Kamer" maxlength="30">' +
           '<button class="knop klein" data-proep="' + p.id + '" type="button">Roep op</button>' : '') +
         '<button class="knop klein" data-pklaar="' + p.id + '" type="button">Klaar</button></div></div>').join('')
         : '<p class="stil">De wachtkamer is leeg.</p>';
@@ -291,7 +291,7 @@
     $('#ktKandidaat').innerHTML = (st.kandidaten || []).map(k => '<option value="' + k.code + '">' + esc(k.naam) + '</option>').join('');
     $('#ktLinks').textContent = (st.links || []).filter(l => l.status === 'akkoord').map(l => l.metNaam).join(' · ') || 'nog niet verbonden';
     $('#ktInkomend').innerHTML = (st.links || []).filter(l => l.inkomend).map(l =>
-      '<span class="stil" style="font-size:0.78rem;">' + esc(l.metNaam) + ' nodigt u uit</span>' +
+      '<span class="stil s-2tfhuo">' + esc(l.metNaam) + ' nodigt u uit</span>' +
       '<button class="knop klein" data-ktja="' + l.met + '" type="button">Akkoord</button>' +
       '<button class="knop klein" data-ktnee="' + l.met + '" type="button">Weiger</button>').join('');
     document.querySelectorAll('[data-ktja]').forEach(b => b.addEventListener('click', () => ktDoe('keten/beslis', { korps: b.dataset.ktja, akkoord: true })));
@@ -311,7 +311,7 @@
     try {
       const g = await api('keten/gesprek', { kanaal: ktGekozen });
       $('#ktChat').innerHTML = (g.berichten || []).map(m =>
-        '<div class="b"><span class="stil" style="display:block;font-size:0.68rem;">' + esc(m.van) + ' · ' + esc(m.korpsNaam || m.korps) + '</span>' + esc(m.tekst) + '</div>').join('')
+        '<div class="b"><span class="stil s-m7re55">' + esc(m.van) + ' · ' + esc(m.korpsNaam || m.korps) + '</span>' + esc(m.tekst) + '</div>').join('')
         || '<p class="stil">Nog geen berichten' + (g.kijktMee ? ' (u kijkt mee als meldkamer)' : '') + '.</p>';
       $('#ktTekst').disabled = g.magSchrijven === false;
       $('#ktTekst').placeholder = g.magSchrijven === false ? 'U kijkt mee als meldkamer; alleen de leden schrijven.' : 'Bericht aan de keten of de groep';
@@ -339,7 +339,7 @@
     try {
       const d = await api('roster', { code });
       $('#ktGroepLeden').insertAdjacentHTML('beforeend', d.staff.map(m =>
-        '<label class="stil" style="font-size:0.75rem;display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" data-ktlid="' + code + ':' + m.id + ':' + esc(m.name) + '">' + esc(m.name) + ' (' + code + ')</label>').join(''));
+        '<label class="stil s-47s4fr"><input type="checkbox" data-ktlid="' + code + ':' + m.id + ':' + esc(m.name) + '">' + esc(m.name) + ' (' + code + ')</label>').join(''));
     } catch (e) { $('#ktUit').textContent = e.message; }
   });
   $('#ktGroepMaakKnop').addEventListener('click', async () => {
@@ -365,22 +365,22 @@
     $('#kRamp').hidden = false;
     const nu = (b.ramp && b.ramp.niveau) || 'normaal';
     $('#rampNiveau').innerHTML = NIVEAUS.map(n => '<button class="nvl' + (n === nu ? ' on' : '') + '" data-nvl="' + n + '" type="button">' + n + '</button>').join('') +
-      (b.ramp && b.ramp.door ? '<span class="stil" style="font-size:0.72rem;">gezet door ' + esc(b.ramp.door) + '</span>' : '');
+      (b.ramp && b.ramp.door ? '<span class="stil s-2tbnxi">gezet door ' + esc(b.ramp.door) + '</span>' : '');
     const t = b.totalen;
     $('#rampKpis').innerHTML =
-      '<div class="rkpi"><b style="color:var(--groen);">' + t.eenhedenVrij + '</b><span>eenheden vrij</span></div>' +
-      '<div class="rkpi"><b style="color:var(--rtg-leesgoud,var(--gold));">' + t.eenhedenIngezet + '</b><span>ingezet</span></div>' +
-      '<div class="rkpi"><b style="color:var(--groen);">' + t.beddenVrij + '</b><span>bedden vrij</span></div>' +
+      '<div class="rkpi"><b class="s-1tbkltg">' + t.eenhedenVrij + '</b><span>eenheden vrij</span></div>' +
+      '<div class="rkpi"><b class="s-12itpbj">' + t.eenhedenIngezet + '</b><span>ingezet</span></div>' +
+      '<div class="rkpi"><b class="s-1tbkltg">' + t.beddenVrij + '</b><span>bedden vrij</span></div>' +
       '<div class="rkpi"><b>' + t.sehWachtend + '</b><span>SEH wacht</span></div>' +
-      '<div class="rkpi"><b style="color:var(--rood);">' + t.meldingenOpen + '</b><span>open meldingen</span></div>';
+      '<div class="rkpi"><b class="s-1puizbz">' + t.meldingenOpen + '</b><span>open meldingen</span></div>';
     let h = '';
-    if (b.korpsen.length) h += '<div class="h-mt50"><b style="font-size:0.8rem;">Korpsen</b>' + b.korpsen.map(k =>
-      '<div class="melding" style="padding:0.4rem 0;">' + esc(k.naam) + ' · ' + k.vrij + ' vrij / ' + k.inzet + ' ingezet' +
+    if (b.korpsen.length) h += '<div class="h-mt50"><b class="s-paonzv">Korpsen</b>' + b.korpsen.map(k =>
+      '<div class="melding s-zfzakd">' + esc(k.naam) + ' · ' + k.vrij + ' vrij / ' + k.inzet + ' ingezet' +
       (k.perSoort.length ? ' <span class="stil">(' + k.perSoort.map(p => p.vrij + ' ' + p.soort).join(', ') + ')</span>' : '') + '</div>').join('') + '</div>';
-    if (b.ziekenhuizen.length) h += '<div class="h-mt50"><b style="font-size:0.8rem;">Ziekenhuizen</b>' + b.ziekenhuizen.map(z =>
-      '<div class="melding" style="padding:0.4rem 0;">' + esc(z.naam) + ' · ' + z.beddenVrij + '/' + z.beddenTotaal + ' bedden vrij · SEH: ' + z.sehWachtend + ' wacht</div>').join('') + '</div>';
-    if (b.defensie.length) h += '<div class="h-mt50"><b style="font-size:0.8rem;">Defensie</b>' + b.defensie.map(d =>
-      '<div class="melding" style="padding:0.4rem 0;">' + esc(d.naam) + ' · ' + d.gevechtsgereed + ' gevechtsgereed, ' + d.beperkt + ' beperkt · ' + d.gewonden + ' gewonden</div>').join('') + '</div>';
+    if (b.ziekenhuizen.length) h += '<div class="h-mt50"><b class="s-paonzv">Ziekenhuizen</b>' + b.ziekenhuizen.map(z =>
+      '<div class="melding s-zfzakd">' + esc(z.naam) + ' · ' + z.beddenVrij + '/' + z.beddenTotaal + ' bedden vrij · SEH: ' + z.sehWachtend + ' wacht</div>').join('') + '</div>';
+    if (b.defensie.length) h += '<div class="h-mt50"><b class="s-paonzv">Defensie</b>' + b.defensie.map(d =>
+      '<div class="melding s-zfzakd">' + esc(d.naam) + ' · ' + d.gevechtsgereed + ' gevechtsgereed, ' + d.beperkt + ' beperkt · ' + d.gewonden + ' gewonden</div>').join('') + '</div>';
     $('#rampDetail').innerHTML = h;
     document.querySelectorAll('[data-nvl]').forEach(x => x.addEventListener('click', async () => {
       try {
@@ -399,12 +399,12 @@
   function toonRapport(ev) {
     const m = ev.meldingen, e = ev.evacuaties;
     $('#rapportUit').innerHTML =
-      '<div class="melding" style="padding:0.5rem 0;"><b>Meldingen</b>: ' + m.totaal + ' (prio 1: ' + m.perPrio[1] + ', 2: ' + m.perPrio[2] + ', 3: ' + m.perPrio[3] + '), ' + m.bemand + ' bemand.' +
+      '<div class="melding s-zx0wyk"><b>Meldingen</b>: ' + m.totaal + ' (prio 1: ' + m.perPrio[1] + ', 2: ' + m.perPrio[2] + ', 3: ' + m.perPrio[3] + '), ' + m.bemand + ' bemand.' +
       (m.gemAanrijMin != null ? ' Gem. aanrijtijd ' + m.gemAanrijMin + ' min.' : '') +
       (m.gemAfhandelMin != null ? ' Gem. afhandeltijd ' + m.gemAfhandelMin + ' min' + (m.langsteAfhandelMin != null ? ' (langste ' + m.langsteAfhandelMin + ' min)' : '') + '.' : '') + '</div>' +
-      '<div class="melding" style="padding:0.5rem 0;"><b>Evacuaties</b>: ' + e.totaal +
+      '<div class="melding s-zx0wyk"><b>Evacuaties</b>: ' + e.totaal +
       (e.totaal ? ' (' + Object.entries(e.perTriage).map(function(t){return t[1]+' '+t[0];}).join(', ') + ')' : '') + '.</div>' +
-      '<div class="melding" style="padding:0.5rem 0;"><b>Knelpunten</b><ul style="margin:0.25rem 0 0 1.25rem;">' + ev.knelpunten.map(function(k){return '<li>'+esc(k)+'</li>';}).join('') + '</ul></div>';
+      '<div class="melding s-zx0wyk"><b>Knelpunten</b><ul class="s-1bz9bon">' + ev.knelpunten.map(function(k){return '<li>'+esc(k)+'</li>';}).join('') + '</ul></div>';
   }
   $('#rapportKnop').addEventListener('click', async () => {
     $('#rapportUit').textContent = 'Rapport opstellen…';

@@ -23,7 +23,7 @@ const { tel } = require('../server/school/denkfout');
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-denkfout-'));
-const api = (pad, body) => fetch(base + '/api' + pad, { method: 'POST',
+const api = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -152,28 +152,28 @@ test('twee keer hetzelfde patroon stuurt het advies, en blijft vriendelijk', asy
 });
 
 test('de klas telt patronen zonder wie, en besproken is weg', async () => {
-  const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+  const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-  const sch = (await fnd('/school/school/maak', { naam: 'De Kring', plaats: 'Deventer' })).body;
+  const sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Kring', plaats: 'Deventer' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  const leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf Nore', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: leraar.personeelId, akkoord: true });
-  const klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken, naam: '5B', trap: 'po', fase: 'po-g5' })).body;
+  const leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf Nore', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: leraar.personeelId, akkoord: true });
+  const klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken, naam: '5B', trap: 'po', fase: 'po-g5' })).body;
   const kl = (p, b) => fnd(p, Object.assign({ klasCode: klas.code, personeelToken: leraar.personeelToken, schoolCode: sch.schoolCode }, b || {}));
 
-  const gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Kring', naam: 'Ouder Kring', pin: '4321' })).body;
-  const kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Bram', rol: 'kind', groep: 'kind' })).body;
-  const kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
-  await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
-  await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
+  const gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Kring', naam: 'Ouder Kring', pin: '4321' })).body;
+  const kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Bram', rol: 'kind', groep: 'kind' })).body;
+  const kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
+  await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 
-  const hw = (await kl('/school/huiswerk/maak', { titel: 'Tafels oefenen', doel: 'rekenen.g5.tafels-tot-10' })).body;
+  const hw = (await kl('/api/foundation/school/huiswerk/maak', { titel: 'Tafels oefenen', doel: 'rekenen.g5.tafels-tot-10' })).body;
   const hwId = (hw.huiswerk && hw.huiswerk.id) || hw.id;
   assert.ok(hwId, 'het huiswerk is aangemaakt: ' + JSON.stringify(hw).slice(0, 160));
 
@@ -197,16 +197,16 @@ test('de klas telt patronen zonder wie, en besproken is weg', async () => {
   const echtFout = (t) => { const m = /^(\d+) x (\d+)/.exec(t); return !!m && (+m[1] + +m[2]) !== (+m[1] * +m[2]); };
   let v = null;
   for (let poging = 0; poging < 25 && !(v && echtFout(v.vraag)); poging++) {
-    v = (await fnd('/school/huiswerk/oefen', { code: gezin.code, token: kindToken, klasCode: klas.code, huiswerkId: hwId })).body;
+    v = (await fnd('/api/foundation/school/huiswerk/oefen', { code: gezin.code, token: kindToken, klasCode: klas.code, huiswerkId: hwId })).body;
   }
   assert.ok(v && echtFout(v.vraag),
     'na 25 rondes nog geen som waarin "plus in plaats van maal" ook echt fout is; gekregen: ' + JSON.stringify(v && v.vraag));
-  const eerste = (await fnd('/school/huiswerk/oefen-antwoord', { code: gezin.code, token: kindToken,
+  const eerste = (await fnd('/api/foundation/school/huiswerk/oefen-antwoord', { code: gezin.code, token: kindToken,
     klasCode: klas.code, antwoord: plus(v.vraag) })).body;
   assert.equal(eerste.denkfout.id, 'maal.plus-in-plaats-van-maal');
   assert.ok(eerste.anders && eerste.anders.tekst, 'ook hier komt er een andere uitleg bij');
 
-  const beeld = (await kl('/school/denkfout/klas')).body;
+  const beeld = (await kl('/api/foundation/school/denkfout/klas')).body;
   const rij = beeld.patronen.find(x => x.id === 'maal.plus-in-plaats-van-maal');
   assert.ok(rij, 'de leraar ziet het patroon in zijn klas');
   assert.equal(rij.aantal, 1);
@@ -218,8 +218,8 @@ test('de klas telt patronen zonder wie, en besproken is weg', async () => {
   assert.doesNotMatch(tekst, /sleutel|profielId|Bram/i, 'het klasbeeld voert terug op een kind');
 
   // besproken is weg, en er blijft niets achter
-  assert.equal((await kl('/school/denkfout/besproken', { doel: 'rekenen.g5.tafels-tot-10', denkfout: 'maal.plus-in-plaats-van-maal' })).status, 200);
-  const na = (await kl('/school/denkfout/klas')).body;
+  assert.equal((await kl('/api/foundation/school/denkfout/besproken', { doel: 'rekenen.g5.tafels-tot-10', denkfout: 'maal.plus-in-plaats-van-maal' })).status, 200);
+  const na = (await kl('/api/foundation/school/denkfout/klas')).body;
   assert.equal(na.patronen.filter(x => x.id === 'maal.plus-in-plaats-van-maal').length, 0);
-  assert.equal((await kl('/school/denkfout/besproken', { doel: 'rekenen.g5.tafels-tot-10', denkfout: 'maal.plus-in-plaats-van-maal' })).status, 404);
+  assert.equal((await kl('/api/foundation/school/denkfout/besproken', { doel: 'rekenen.g5.tafels-tot-10', denkfout: 'maal.plus-in-plaats-van-maal' })).status, 404);
 });

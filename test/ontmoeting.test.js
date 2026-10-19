@@ -198,3 +198,55 @@ test('8. de functie uitzetten laat openstaande voorstellen vervallen', async () 
   assert.equal(st.body.aan, false);
   assert.equal((st.body.voorstellen || []).length, 0, 'geen open voorstellen meer na uitzetten');
 });
+
+/* 9. /api/ontmoeten/stop: een lopende afspraak wordt AFGEROND en verdwijnt van
+   het live-scherm van kantoor en uit de lijst van beide leden (en daarmee hun
+   live-locatie); een afspraak die nog niet liep wordt GEANNULEERD; een derde kan
+   niets stoppen.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/ontmoeting/date.js
+   `gestart ? 'afgerond' : 'geannuleerd'` vervangen door `'afgerond'`; de toets
+   zakte op "wat niet begon, wordt geannuleerd". */
+test('9. stoppen: lopend wordt afgerond en verdwijnt van het live-scherm, nog niet begonnen wordt geannuleerd', async () => {
+  const vrouw = await nieuwLid('v');
+  const man = await nieuwLid('m');
+  const derde = await nieuwLid('v');
+  await verbind(vrouw, man);
+  let voorstel = await inDeBuurt(vrouw, man);
+  await api(base, '/api/ontmoeten/kies', { voorstelId: voorstel.id, keuze: 'wandelen' }, vrouw.token);
+  const match = await api(base, '/api/ontmoeten/kies', { voorstelId: voorstel.id, keuze: 'wandelen' }, man.token);
+  const dateId = match.body.dateId;
+  assert.ok(dateId, 'er is een afspraak');
+  await api(base, '/api/ontmoeten/teken', { dateId }, vrouw.token);
+  await api(base, '/api/ontmoeten/teken', { dateId }, man.token);
+  await api(base, '/api/ontmoeten/hier-date', { dateId, lat: 38.9088, lng: 1.4329 }, vrouw.token);
+  let d = (await api(base, '/api/office/ontmoetingen', {}, office)).body.dates.find(x => x.id === dateId);
+  assert.ok(d.deelnemers.some(p => p.pos && Number.isFinite(p.pos.lat)), 'tijdens de afspraak ziet kantoor de locatie');
+
+  assert.equal((await api(base, '/api/ontmoeten/stop', { dateId }, derde.token)).status, 404, 'een derde stopt niets');
+  assert.equal((await api(base, '/api/ontmoeten/stop', { dateId }, null)).status, 401);
+
+  const stop1 = await api(base, '/api/ontmoeten/stop', { dateId }, vrouw.token);
+  assert.equal(stop1.status, 200, JSON.stringify(stop1.body).slice(0, 160));
+  assert.equal(stop1.body.status, 'afgerond');
+  d = (await api(base, '/api/office/ontmoetingen', {}, office)).body.dates.find(x => x.id === dateId);
+  assert.equal(d, undefined, 'een afgeronde afspraak staat niet meer op het live-scherm van kantoor');
+  for (const wie of [vrouw, man]) {
+    const st = (await api(base, '/api/ontmoeten/state', {}, wie.token)).body;
+    assert.ok(!(st.dates || []).some(x => x.id === dateId), 'en niet meer bij de leden');
+  }
+  assert.equal((await api(base, '/api/ontmoeten/hier-date', { dateId, lat: 38.9, lng: 1.4 }, vrouw.token)).status, 409,
+    'na afloop wordt er geen locatie meer aangenomen');
+  const nogEens = await api(base, '/api/ontmoeten/stop', { dateId }, man.token);
+  assert.equal(nogEens.body.status, 'afgerond', 'nogmaals stoppen verandert niets');
+
+  // een tweede afspraak die nog niet getekend is: stoppen is annuleren
+  const a2 = await nieuwLid('v');
+  const b2 = await nieuwLid('m');
+  await verbind(a2, b2);
+  voorstel = await inDeBuurt(a2, b2);
+  await api(base, '/api/ontmoeten/kies', { voorstelId: voorstel.id, keuze: 'borrelen' }, a2.token);
+  const m2 = await api(base, '/api/ontmoeten/kies', { voorstelId: voorstel.id, keuze: 'borrelen' }, b2.token);
+  const af = await api(base, '/api/ontmoeten/stop', { dateId: m2.body.dateId }, b2.token);
+  assert.equal(af.status, 200);
+  assert.equal(af.body.status, 'geannuleerd', 'wat niet begon, wordt geannuleerd en niet afgerond');
+});

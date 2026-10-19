@@ -5,6 +5,7 @@ module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate } = ctx;
+const S = ctx.opslag || require('./opslag')({ db: ctx.db }); // de vijf sociale lijsten
 const { zijnVrienden } = ctx;
 /* ---------- snaps en 24-uurs verhalen (Snapchat-achtig) ----------
    Een snap is een foto die je naar een vriend stuurt; die kan hem een keer
@@ -21,13 +22,13 @@ function geldigeFoto(s) { return typeof s === 'string' && /^data:image\/(jpeg|pn
 function wisFoto(item) { if (item && item.foto && media) media.verwijder(item.foto); }
 function opschonenSnaps() {
   const nu = Date.now();
-  const voor = db.data.snaps.length + db.data.stories.length;
-  const dodeSnaps = db.data.snaps.filter(s => s.bekeken || (nu - new Date(s.at).getTime()) >= SNAP_TTL);
-  const dodeStories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) >= STORY_TTL);
+  const voor = S.lijst('snaps').length + S.lijst('stories').length;
+  const dodeSnaps = S.lijst('snaps').filter(s => s.bekeken || (nu - new Date(s.at).getTime()) >= SNAP_TTL);
+  const dodeStories = S.lijst('stories').filter(s => (nu - new Date(s.at).getTime()) >= STORY_TTL);
   dodeSnaps.forEach(wisFoto); dodeStories.forEach(wisFoto);   // ook de bestanden opruimen
-  db.data.snaps = db.data.snaps.filter(s => !s.bekeken && (nu - new Date(s.at).getTime()) < SNAP_TTL);
-  db.data.stories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) < STORY_TTL);
-  if (voor !== db.data.snaps.length + db.data.stories.length) save();
+  S.zet('snaps', S.lijst('snaps').filter(s => !s.bekeken && (nu - new Date(s.at).getTime()) < SNAP_TTL));
+  S.zet('stories', S.lijst('stories').filter(s => (nu - new Date(s.at).getTime()) < STORY_TTL));
+  if (voor !== S.lijst('snaps').length + S.lijst('stories').length) save();
 }
 /* ---------- de vuurtjes zijn eruit, en dat is een besluit ----------
    Hier stond een snap-streak per vriendenpaar: snapten jullie allebei op
@@ -75,7 +76,7 @@ async function snapSturen(van, naar, foto, tekst) {
   const ref = await media.bewaar(foto, 900 * 1024);
   if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
   const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto: ref, tekst: String(tekst || '').replace(/[<>]/g, '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
-  db.data.snaps.push(snap);
+  S.lijst('snaps').push(snap);
   // de bovengrens (en het opruimen van de bestanden eronder) staat in
   // kern/kappen.js en draait in de onderhoudsronde, buiten dit verzoek
   save();
@@ -85,17 +86,17 @@ async function snapSturen(van, naar, foto, tekst) {
 // binnengekomen snaps voor 'mij' (alleen dat er een is, nog niet de foto)
 function snapsVoor(mij) {
   opschonenSnaps();
-  return db.data.snaps.filter(s => s.naar === mij && !s.bekeken)
+  return S.lijst('snaps').filter(s => s.naar === mij && !s.bekeken)
     .map(s => ({ id: s.id, van: codenaamVan(s.van), at: s.at, tekst: s.tekst }));
 }
 // een snap openen: lees het bestand, geef de foto eenmalig terug als data-URL en
 // gooi zowel de snap als het bestand meteen weg (kijk-een-keer).
 async function snapOpenen(mij, id) {
-  const s = db.data.snaps.find(x => x.id === id && x.naar === mij && !x.bekeken);
+  const s = S.lijst('snaps').find(x => x.id === id && x.naar === mij && !x.bekeken);
   if (!s) return { status: 404, error: 'Deze snap is er niet meer.' };
   const foto = await media.leesDataUrl(s.foto), tekst = s.tekst, van = codenaamVan(s.van);
   wisFoto(s); // het bestand meteen weg: na bekijken bewaren we de foto niet
-  db.data.snaps = db.data.snaps.filter(x => x.id !== id);
+  S.zet('snaps', S.lijst('snaps').filter(x => x.id !== id));
   save();
   return { status: 200, foto, tekst, van };
 }
@@ -103,11 +104,11 @@ async function verhaalPlaatsen(van, foto, tekst, metOpdracht) {
   if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
   const ref = await media.bewaar(foto, 900 * 1024);
   if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
-  db.data.stories.filter(s => s.van === van).forEach(wisFoto);   // oud verhaal-bestand weg
-  db.data.stories = db.data.stories.filter(s => !(s.van === van)); // een verhaal per persoon tegelijk (het nieuwste)
+  S.lijst('stories').filter(s => s.van === van).forEach(wisFoto);   // oud verhaal-bestand weg
+  S.zet('stories', S.lijst('stories').filter(s => !(s.van === van))); // een verhaal per persoon tegelijk (het nieuwste)
   // meedoen met de dag-opdracht: het verhaal draagt de opdracht van vandaag als badge
   const opdracht = metOpdracht === true ? dagOpdracht() : null;
-  db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto: ref, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [], opdracht: opdracht ? opdracht.emoji + ' ' + opdracht.tekst : null });
+  S.lijst('stories').push({ id: crypto.randomBytes(5).toString('hex'), van, foto: ref, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [], opdracht: opdracht ? opdracht.emoji + ' ' + opdracht.tekst : null });
   // bovengrens: zie kern/kappen.js (onderhoudsronde)
   save();
   return { status: 200, ok: true };
@@ -115,13 +116,13 @@ async function verhaalPlaatsen(van, foto, tekst, metOpdracht) {
 // de verhalen van mijn vrienden (en die van mezelf)
 function verhalenVoor(mij) {
   opschonenSnaps();
-  return db.data.stories.filter(s => s.van === mij || zijnVrienden(mij, s.van))
+  return S.lijst('stories').filter(s => s.van === mij || zijnVrienden(mij, s.van))
     .sort((a, b) => String(b.at).localeCompare(String(a.at)))
     .map(s => ({ id: s.id, van: codenaamVan(s.van), vanMij: s.van === mij, at: s.at, gezien: s.kijkers.includes(mij), opdracht: s.opdracht || null }));
 }
 async function verhaalBekijken(mij, id) {
   opschonenSnaps();
-  const s = db.data.stories.find(x => x.id === id);
+  const s = S.lijst('stories').find(x => x.id === id);
   if (!s || (s.van !== mij && !zijnVrienden(mij, s.van))) return { status: 404, error: 'Dit verhaal is er niet meer.' };
   if (!s.kijkers.includes(mij)) { s.kijkers.push(mij); save(); }
   return { status: 200, foto: await media.leesDataUrl(s.foto), tekst: s.tekst, van: codenaamVan(s.van), at: s.at, opdracht: s.opdracht || null };

@@ -172,15 +172,59 @@ function opVerzoek(code) {
   for (const { i } of schrijfregels) {
     /* Kijk twintig regels terug naar een vlagcontrole, en stop bij een regel die
        een nieuwe functie opent -- dan hoort de vlag bij iets anders. */
+    /* TWEE VORMEN DIE DE VLAG NIET VERANDEREN EN DIE HIJ NIET ZAG (18 oktober
+       2026): de argumentenlijst heet ook `args` (activering.js, verstrengeling.js:
+       `args.includes('--vastleggen')`), en de vlag staat ook als CONSTANTE in
+       hoofdletters (`const VASTLEGGEN = argv.includes(...)`; `if (VAST) {...}` in
+       ondernemerbewijs.js, refundmigratie.js, idorproef.js). Beide schreven alleen
+       op verzoek en stonden toch in de risicoklasse. Toets 6f en 6g houden ze vast,
+       en 6c en 6e bewijzen dat een kale aanroep en een vlag elders nog tellen. */
     let vlag = false;
     for (let j = i; j >= Math.max(0, i - 20); j--) {
-      if (/argv\s*\.\s*includes\s*\(\s*['"]--(vast|vastleggen|schrijf|write)/.test(regels[j]) ||
-          /\b(vastleggen|vast|schrijven)\b\s*(&&|\))/.test(regels[j])) { vlag = true; break; }
+      if (/\b(argv|args)\s*\.\s*includes\s*\(\s*['"]--(vast|vastleggen|schrijf|write)/.test(regels[j]) ||
+          /\b(vastleggen|vast|schrijven)\b\s*(&&|\))/i.test(regels[j])) { vlag = true; break; }
       if (j < i && /^\s*(function|const .*=>\s*{)/.test(regels[j])) break;
     }
     if (vlag) achter++;
   }
   return { alle: achter === schrijfregels.length, plekken: schrijfregels.length, achterVlag: achter };
+}
+
+/* EEN SCRIPT INDELEN, los van het lezen van de map: `code` is de bron ZONDER
+   commentaar, `via` de npm-scripts en werkstromen die hem bereiken. Apart zodat
+   een toets een VERZONNEN getuige kan indelen -- het bekende geval van 15
+   september (rolronde.js) is gerepareerd en kan dus niet meer zelf getuigen. */
+function klasseer(naam, code, via) {
+  const zichtbaar = zonderTekst(code);
+  const stempelt = /require\(\s*['"][^'"]*lib\/stempel['"]\s*\)/.test(code);
+  const grendelt = /\beisSchoneBoom\s*\(/.test(zichtbaar);
+  const vlag = opVerzoek(code);
+  const viaPoort = via.filter(n => n.startsWith('werkstroom:') ||
+    POORTEN.some(p => n === p || n.startsWith(p + ':')));
+
+  let klasse, waarom;
+  if (stempelt && grendelt) {
+    klasse = 'SCHONE_BOOM_VEREIST';
+    waarom = 'roept eisSchoneBoom() aan en weigert dus op een vuile boom';
+  } else if (stempelt && !vlag.alle) {
+    klasse = 'KAN_COMMITBEWIJS_ONGELDIG_MAKEN';
+    waarom = 'stempelt (claimt repo-waarheid), grendelt niet, en ' +
+      (vlag.achterVlag ? vlag.plekken - vlag.achterVlag + ' van de ' + vlag.plekken +
+        ' schrijfplekken hangt niet achter een vlag'
+        : 'schrijft zonder dat iemand erom vraagt') +
+      (viaPoort.length ? ' -- en hij loopt mee in: ' + viaPoort.join(', ') : '');
+  } else if (stempelt) {
+    klasse = 'VUILE_BOOM_TOEGESTAAN';
+    waarom = 'stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; ' +
+      'een mens die die vlag typt op een vuile boom neemt een besluit';
+  } else {
+    klasse = 'SCHRIJFT_AFGELEID_REGISTER';
+    waarom = 'schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs ' +
+      'dat ongeldig kan worden';
+  }
+  return { naam, klasse, waarom, stempelt, grendelt,
+    schrijfplekken: vlag.plekken, achterVlag: vlag.achterVlag,
+    npmScripts: via.length, viaPoort };
 }
 
 function meet() {
@@ -190,7 +234,8 @@ function meet() {
 
   for (const naam of namen) {
     let code;
-    try { code = zonderCommentaar(fs.readFileSync(path.join(MAP, naam), 'utf8')); } catch (e) { continue; }
+    try { code = zonderCommentaar(fs.readFileSync(path.join(MAP, naam), 'utf8')); }
+    catch (e) { throw new Error('stempelveiligheid: scripts/' + naam + ' is niet te lezen (' + e.message + '); een onleesbare schrijver is geen afwezige'); }
     if (!SCHRIJFAANROEP.test(zonderTekst(code))) continue;
 
     /* DRIE KEER DEZELFDE BLINDHEID, DRIE KEER EEN ANDERE RICHTING -- en alle
@@ -204,37 +249,7 @@ function meet() {
 
        De grendel wordt daarom gezocht als AANROEP in de code zonder tekst. Het
        stempel juist met tekst: dat is een require-PAD en dus per se een string. */
-    const zichtbaar = zonderTekst(code);
-    const stempelt = /require\(\s*['"][^'"]*lib\/stempel['"]\s*\)/.test(code);
-    const grendelt = /\beisSchoneBoom\s*\(/.test(zichtbaar);
-    const vlag = opVerzoek(code);
-    const via = perBestand[naam] || [];
-    const viaPoort = via.filter(n => n.startsWith('werkstroom:') ||
-      POORTEN.some(p => n === p || n.startsWith(p + ':')));
-
-    let klasse, waarom;
-    if (stempelt && grendelt) {
-      klasse = 'SCHONE_BOOM_VEREIST';
-      waarom = 'roept eisSchoneBoom() aan en weigert dus op een vuile boom';
-    } else if (stempelt && !vlag.alle) {
-      klasse = 'KAN_COMMITBEWIJS_ONGELDIG_MAKEN';
-      waarom = 'stempelt (claimt repo-waarheid), grendelt niet, en ' +
-        (vlag.achterVlag ? vlag.plekken - vlag.achterVlag + ' van de ' + vlag.plekken +
-          ' schrijfplekken hangt niet achter een vlag'
-          : 'schrijft zonder dat iemand erom vraagt') +
-        (viaPoort.length ? ' -- en hij loopt mee in: ' + viaPoort.join(', ') : '');
-    } else if (stempelt) {
-      klasse = 'VUILE_BOOM_TOEGESTAAN';
-      waarom = 'stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; ' +
-        'een mens die die vlag typt op een vuile boom neemt een besluit';
-    } else {
-      klasse = 'SCHRIJFT_AFGELEID_REGISTER';
-      waarom = 'schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs ' +
-        'dat ongeldig kan worden';
-    }
-    rijen.push({ naam, klasse, waarom, stempelt, grendelt,
-      schrijfplekken: vlag.plekken, achterVlag: vlag.achterVlag,
-      npmScripts: via.length, viaPoort });
+    rijen.push(klasseer(naam, code, perBestand[naam] || []));
   }
 
   const perKlasse = {};
@@ -333,7 +348,7 @@ function druk(u) {
    echt script toevallig welke vorm draagt -- en twee van de drie blinde
    vlekken hieronder hebben vandaag geen enkel echt voorbeeld. Een grendel
    zonder getuige is een bewering. */
-module.exports = { meet, DOEL, POORTEN, opVerzoek, SCHRIJFAANROEP };
+module.exports = { meet, DOEL, POORTEN, opVerzoek, klasseer, SCHRIJFAANROEP };
 
 if (require.main === module) {
   const u = meet();

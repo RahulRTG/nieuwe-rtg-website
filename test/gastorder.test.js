@@ -156,6 +156,7 @@ test('afwijzen kan niet zonder reden, en de gast leest die reden', async () => {
   const best = await post('/api/gast/bestel', { sleutel: aan.sleutel,
       allergie: 'schaaldieren, ernstig', items: [{ itemId: item.id, aantal: 1 }] });
   const rekId = best.body.rekening.rekeningId;
+  assert.equal(best.body.rekening.regels.length, 1, 'de bestelde regel staat eerst op de rekening');
   const wacht = await post('/api/supplier/horeca/gast/wachtrij', {}, zaak);
   const regelId = wacht.body.wachtrij[0].regelId;
 
@@ -258,6 +259,11 @@ test('afrekenen doet alleen wat er echt kan, en zegt wat er niet kan', async () 
   const rekId = (await post('/api/gast/rekening', { sleutel: a.sleutel })).body.rekening.rekeningId;
   await post('/api/supplier/horeca/rekening/regel',
       { rekeningId: rekId, naam: 'Tafelwater', centen: 1000, aantal: 1 }, zaak);
+
+  /* Eerst staat hij open bij de zaak; zonder deze helft zou "niet meer open"
+     hieronder ook slagen als de zaak nooit een open rekening te zien kreeg. */
+  const voorBetalen = await post('/api/supplier/horeca/rekeningen', { status: 'open' }, zaak);
+  assert.ok(voorBetalen.body.rekeningen.some(r => r.id === rekId), 'voor het betalen staat de rekening open bij de zaak');
 
   // kaart en online bestaan hier niet vanaf de telefoon: dat wordt gezegd
   const pin = await post('/api/gast/betaal', { sleutel: a.sleutel, wijze: 'pin' });

@@ -3,12 +3,12 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-18",
-    "commit": "82e623157"
+    "commit": "2918d3def"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-10-16",
-      "commit": "ad4a27cce",
+      "op": "2026-10-18",
+      "commit": "8df75d5a2",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -732,6 +732,8 @@
           "public/apps/maison.html",
           "public/apps/mall-aanvraag-acties.js",
           "public/apps/mall-aanvraag-edge.js",
+          "public/apps/mall-experience-view.js",
+          "public/apps/mall-experience.js",
           "public/apps/mall.html",
           "public/apps/marechaussee.html",
           "public/apps/mecenaat.html",
@@ -980,6 +982,7 @@
           "public/apps/scanner/app.js",
           "public/apps/scanner/pdfje.js",
           "public/apps/scherm.html",
+          "public/apps/schermcontext.js",
           "public/apps/schoolpartner.html",
           "public/apps/schoolpartner/aandacht.js",
           "public/apps/schoolpartner/app/app-01.js",
@@ -1397,6 +1400,7 @@
           "public/shared/rosapps.js",
           "public/shared/rosthema.js",
           "public/shared/rtg-action-dock.js",
+          "public/shared/rtg-adaptive-edge-cinema.js",
           "public/shared/rtg-adaptive-edge-claim.js",
           "public/shared/rtg-adaptive-edge-controls.js",
           "public/shared/rtg-adaptive-edge-core.js",
@@ -1405,6 +1409,7 @@
           "public/shared/rtg-adaptive-edge-services.js",
           "public/shared/rtg-adaptive-edge-signals.js",
           "public/shared/rtg-adaptive-edge-surface.js",
+          "public/shared/rtg-adaptive-edge-visual.js",
           "public/shared/rtg-adaptive-edge.js",
           "public/shared/rtg-cinematic-system.js",
           "public/shared/rtg-communication-surface.js",
@@ -1427,6 +1432,10 @@
           "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
           "public/shared/rtg-edge-system.js",
           "public/shared/rtg-edge-worlds.js",
+          "public/shared/rtg-editorial-v4-header.js",
+          "public/shared/rtg-editorial-v4-model.js",
+          "public/shared/rtg-editorial-v4/rtg-editorial-v4-01.js",
+          "public/shared/rtg-editorial-v4/rtg-editorial-v4-02.js",
           "public/shared/rtg-first-steps.js",
           "public/shared/rtg-heritage-components.js",
           "public/shared/rtg-heritage-motion.js",
@@ -1787,6 +1796,9 @@
             "pad": "public/images/first-steps"
           },
           {
+            "pad": "public/images/mall"
+          },
+          {
             "pad": "public/images/music"
           },
           {
@@ -1919,6 +1931,9 @@
             "pad": "public/shared/rtg-edge-smart-menu"
           },
           {
+            "pad": "public/shared/rtg-editorial-v4"
+          },
+          {
             "pad": "public/shared/rtg-schil"
           },
           {
@@ -1970,7 +1985,7 @@
         "omgevingGekopieerd": false,
         "omgeving": [],
         "onwaarneembaar": [],
-        "nodeHoofdversie": 24
+        "nodeHoofdversie": 22
       }
     },
     "schermgedrag": {
@@ -2028,6 +2043,10 @@
     {
       "script": "public/apps/rtg-protect.js",
       "schermen": 6
+    },
+    {
+      "script": "public/apps/schermcontext.js",
+      "schermen": 47
     },
     {
       "script": "public/apps/translate.js",
@@ -2781,7 +2800,9 @@
         "member"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/avond/aanvragen",
         "/api/avond/mijn",
@@ -2905,7 +2926,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/overheid/bd/aanslagen",
         "/api/overheid/bd/ai",
@@ -3211,7 +3234,9 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/browser/"
       ],
@@ -3403,7 +3428,8 @@
       "rollen": [],
       "schrijft": "niet vast te stellen",
       "schil": [
-        "public/apps/rtg-protect.js"
+        "public/apps/rtg-protect.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/clips/"
@@ -3471,7 +3497,20 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/comm",
+        "/api/comm/ai",
+        "/api/comm/begin",
+        "/api/comm/concept",
+        "/api/comm/gesprek",
+        "/api/comm/inbox",
+        "/api/comm/lees",
+        "/api/comm/por",
+        "/api/comm/reactie",
+        "/api/comm/stuur",
+        "/api/comm/typt",
+        "/api/comm/vlag",
+        "/api/comm/wijzig",
+        "/api/comm/wis",
+        "/api/comm/zoek",
         "/api/stream"
       ],
       "schilPaden": [],
@@ -3580,7 +3619,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/concern/",
         "/api/onderneming/rechtsvormen"
@@ -3724,7 +3765,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/supplier/"
       ],
@@ -4421,7 +4464,8 @@
       "schil": [
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/schil-os.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/rtf/club/"
@@ -4868,7 +4912,8 @@
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/foundation/impact",
@@ -4996,7 +5041,8 @@
       "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/sessie.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/les/antwoord",
@@ -5743,7 +5789,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [
         "public/apps/foundation/schil-os.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/rtfos/portaal/"
@@ -5775,7 +5822,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [
         "public/apps/foundation/schil-os.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/rtfos/portaal/"
@@ -5811,7 +5859,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [
         "public/apps/foundation/schil-os.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/rtfos/portaal/"
@@ -5917,7 +5966,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [
         "public/apps/foundation/schil-os.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/rtfos/portaal/"
@@ -6013,7 +6063,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [
         "public/apps/foundation/schil-os.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/rtf/partner/"
@@ -6235,7 +6286,8 @@
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/foundation/reis/aanvraag"
@@ -6268,7 +6320,8 @@
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
-        "public/apps/foundation/premium.js"
+        "public/apps/foundation/premium.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [],
       "schilPaden": [],
@@ -7073,7 +7126,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/"
       ],
@@ -7463,7 +7518,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/gemeente/afspraken",
         "/api/gemeente/bekendmaking",
@@ -7502,7 +7559,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/gemeente/melding/zet",
         "/api/gemeente/meldingen",
@@ -7532,7 +7591,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
@@ -7718,7 +7779,9 @@
         "member"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/home",
         "/api/home/alles-uit",
@@ -8525,7 +8588,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/muziek/"
       ],
@@ -8687,7 +8752,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/lab2/"
       ],
@@ -8772,7 +8839,9 @@
         "openbaar"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/les/apps",
         "/api/les/leraar",
@@ -9395,7 +9464,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/lucht/ai",
         "/api/lucht/bagage",
@@ -9589,7 +9660,9 @@
         "member"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/appstore/bon",
         "/api/appstore/catalogus",
@@ -9613,6 +9686,7 @@
         "/api/mall/apps/mijn",
         "/api/mall/apps/weg",
         "/api/mall/bestel",
+        "/api/mall/bewaar",
         "/api/mall/eigen",
         "/api/mall/home",
         "/api/mall/land",
@@ -9620,6 +9694,7 @@
         "/api/mall/lijst/nieuw",
         "/api/mall/lijst/voegtoe",
         "/api/mall/lijsten",
+        "/api/mall/living",
         "/api/mall/plekken",
         "/api/mall/reis",
         "/api/mall/reis/catalogus",
@@ -9636,6 +9711,7 @@
         "/api/move/vooraf",
         "/api/retail/catalogus",
         "/api/retail/wishlist",
+        "/api/reviews",
         "/api/vak/offerte/akkoord",
         "/api/vak/offerte/intrek",
         "/api/vak/offerte/vraag",
@@ -9656,6 +9732,7 @@
         "/api/mall",
         "/api/move",
         "/api/retail",
+        "/api/reviews",
         "/api/vak"
       ],
       "zonderServer": false,
@@ -9689,7 +9766,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/kmar/ai",
         "/api/kmar/cockpit",
@@ -9754,7 +9833,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/mediaos/",
         "/api/member/dm/send",
@@ -10203,7 +10284,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/mall/aanvraag",
         "/api/mall/aanvraag/",
@@ -10294,7 +10377,9 @@
         "member"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/fluister",
         "/api/muziek/",
@@ -10558,7 +10643,9 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/onderneming/",
         "/api/onderneming/rechtsvormen"
@@ -10632,7 +10719,9 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/mob/",
         "/api/ov/"
@@ -10804,7 +10893,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/overheid/pda/ai",
         "/api/overheid/pda/bezoeker/in",
@@ -10943,7 +11034,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
@@ -10967,7 +11060,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/webauthn/"
       ],
@@ -11146,7 +11241,8 @@
       "rollen": [],
       "schrijft": "niet vast te stellen",
       "schil": [
-        "public/apps/rtg-protect.js"
+        "public/apps/rtg-protect.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/podium/",
@@ -11270,7 +11366,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/overheid/bezwaren",
         "/api/overheid/rb/ai",
@@ -11750,7 +11848,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/overheid/bekendmaking",
         "/api/overheid/bezwaar/beslis",
@@ -12002,7 +12102,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/rtgid/",
         "/api/webauthn/"
@@ -12111,7 +12213,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/bijles/gesprek",
         "/api/bijles/vraag",
@@ -12268,7 +12372,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/bestanden/upload"
       ],
@@ -12428,7 +12534,9 @@
         "member"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/salon/promo",
         "/api/site/"
@@ -12667,7 +12775,9 @@
         "supplier"
       ],
       "schrijft": "ja",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/sport/ai",
         "/api/sport/cockpit",
@@ -12852,7 +12962,8 @@
       "rollen": [],
       "schrijft": "onbekend",
       "schil": [
-        "public/apps/util.js"
+        "public/apps/util.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/techniek/ai",
@@ -12921,7 +13032,8 @@
       "rollen": [],
       "schrijft": "niet vast te stellen",
       "schil": [
-        "public/apps/rtg-protect.js"
+        "public/apps/rtg-protect.js",
+        "public/apps/schermcontext.js"
       ],
       "paden": [
         "/api/stream",
@@ -12965,7 +13077,9 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/thuis/"
       ],
@@ -13258,7 +13372,9 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/verify"
+        "/api/verify/selfie",
+        "/api/verify/status",
+        "/api/verify/upload"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13560,7 +13676,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/apps/schermcontext.js"
+      ],
       "paden": [
         "/api/office/atelierweb/"
       ],

@@ -113,16 +113,16 @@
     catch(e){ kluisDicht($('#verify'), e); return; }
     $('#verify').innerHTML = pend.length ? pend.map(v =>
       '<div class="vrow" data-id="'+v.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.codename)+'</span></div>' +
+        '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span class="s-1caek87">· '+escHtml(v.codename)+'</span></div>' +
           '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
-        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
+        '<label class="s-1bc3spk"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
         /* De geboortedatum van het DOCUMENT. Voorgevuld met wat het lid zelf
            opgaf, zodat de keurder vergelijkt in plaats van overtypt; wijkt hij
            af, dan wint het document. Zonder dit veld rustte elke leeftijdsclaim
            in het huis op een zelf ingetypte datum. */
-        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;">'+T('bo.dob','Geb. op document')+
-          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" style="font:inherit;font-size:0.72rem;"></label>' +
+        '<label class="s-1bc3spk">'+T('bo.dob','Geb. op document')+
+          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" class="s-1sy5mu3"></label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
         /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de
@@ -207,9 +207,9 @@
     try { lijst = (await call('/aanmelding/lijst', { status: 'in behandeling' })).aanmeldingen || []; } catch(e){ return; }
     el.innerHTML = lijst.length ? lijst.map(a => {
       const gedaan = (a.reis || []).map(s => s.naam).join(' · ');
-      const uitnod = a.viaUitnodiging ? ' <span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.7rem;">op uitnodiging</span>' : '';
+      const uitnod = a.viaUitnodiging ? ' <span class="s-1pyr07c">op uitnodiging</span>' : '';
       return '<div class="vrow" data-id="'+a.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
+        '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span class="s-1caek87">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
           '<div class="sub">'+escHtml(a.contact||'')+'</div>' +
           '<div class="sub" style="color:var(--soft);">'+T('bo.aanmklaar','AI klaar')+': '+escHtml(gedaan)+'</div></div>' +
         '<button class="vbtn ok" data-ok>'+T('bo.accept','Accepteren')+'</button>' +
@@ -228,9 +228,9 @@
       const eur = n => '€ ' + (Math.round(Number(n))).toLocaleString('nl-NL');
       if (b && b.aantalLeden) {
         el.insertAdjacentHTML('beforeend',
-          '<div style="margin-top:0.75rem;border-top:1px solid var(--line,#2a2a2a);padding-top:.6rem;font-size:0.8rem;color:var(--soft);line-height:1.7;">' +
-          '<b style="color:var(--txt);">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
-          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(b.totaal.foundation)+'</b> ('+
+          '<div class="s-1n8k5z6">' +
+          '<b class="s-1btm41d">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
+          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b class="s-12itpbj">'+eur(b.totaal.foundation)+'</b> ('+
           T('bo.aanmlokaal','20% lokaal')+' '+eur(b.totaal.lokaal)+' &middot; '+T('bo.aanmrtf','10% RTF')+' '+eur(b.totaal.rtf)+')</div>');
       }
     } catch(e){}
@@ -445,7 +445,7 @@
     try { inc = (await call('/office/incidenten', { alleen: 'open' })).incidenten || []; } catch(e){ return; }
     el.innerHTML = inc.length ? inc.map(i =>
       '<div class="vrow" data-id="'+i.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(i.codenaam||'\u2013')+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(i.supplierName)+' · '+escHtml(i.gevraagdNiveau)+'</span></div>' +
+        '<div class="vi"><div class="nm">'+escHtml(i.codenaam||'\u2013')+' <span class="s-1caek87">· '+escHtml(i.supplierName)+' · '+escHtml(i.gevraagdNiveau)+'</span></div>' +
           '<div class="sub">'+escHtml(i.reden)+'</div></div>' +
         '<button class="vbtn ok" data-vrij>'+T('bo.release','Vrijgeven')+'</button>' +
         '<button class="vbtn no" data-afw>'+T('bo.declineinc','Afwijzen')+'</button>' +
@@ -469,7 +469,7 @@
     const kop = '<div class="vrow"><div class="vi"><div class="nm">'+d.compleet+' / '+d.totaal+' '+T('bo.saloncompleet','profielen compleet')+'</div>'+
       '<div class="sub">'+(d.achter.length ? d.achter.length+' '+T('bo.salonachter','partner(s) nog niet zichtbaar voor leden') : T('bo.salonok','alle partners zijn zichtbaar'))+'</div></div></div>';
     const rows = (d.partners || []).map(p =>
-      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✓':'⚠')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
+      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✓':'⚠')+' '+escHtml(p.name)+' <span class="s-1caek87">· '+escHtml(p.type)+'</span></div>'+
       '<div class="sub">'+(p.bio?'✓':'✗')+' bio · '+(p.foto?'✓':'✗')+' foto · '+p.items+' '+T('bo.salonitems','items')+' · '+p.volgers+' '+T('bo.salonvolgers','volgers')+'</div></div></div>').join('');
     el.innerHTML = kop + rows;
   }
@@ -487,15 +487,15 @@
       const status = dt.status === 'noodgeval' ? ''+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? ''+T('bo.ontactief','loopt') : ''+T('bo.onttekenen','wacht op tekenen');
       let sosBlok = '';
       if (nood) sosBlok = dt.sos.map(s =>
-        '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:0;padding:0.5rem 0.7rem;">'+
-        '<b style="color:#ff8a8a;">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
-        '<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        '<div class="s-1d6sgl7">'+
+        '<b class="s-1l3c0pq">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
+        '<div class="s-15zpg3n">'+
         '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">'+T('bo.ontlive','Live meekijken')+'</button>'+
-        '<a class="vbtn" href="tel:112" style="text-decoration:none;background:#c62828;color:#fff;">'+T('bo.ont112','Bel 112')+'</a>'+
+        '<a class="vbtn s-16ipkp2" href="tel:112">'+T('bo.ont112','Bel 112')+'</a>'+
         '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+
         '</div></div>').join('');
-      return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:0;':'')+'"><div class="vi" style="width:100%;">'+
-        '<div class="nm">'+RTGGlyf.tekst(dt.icon)+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
+      return '<div class="vrow ' + (nood ? 's-1o5v06e' : '') + '"><div class="vi s-186m9vs">'+
+        '<div class="nm">'+RTGGlyf.tekst(dt.icon)+' '+escHtml(dt.activiteitLabel)+' <span class="s-1caek87">· '+namen+'</span></div>'+
         '<div class="sub">'+status+' · '+pos+'</div>'+ sosBlok +'</div></div>';
     }).join('');
     el.querySelectorAll('[data-sosaf]').forEach(b => b.addEventListener('click', async () => {
@@ -568,7 +568,7 @@
     try { convData = (await call('/office/conversations')).conversations || []; } catch(e){ return; }
     $('#concierge').innerHTML = convData.length ? convData.map(c =>
       '<div class="vrow" data-uid="'+c.userId+'"><div class="vi"><div class="nm">'+escHtml(c.codename)+
-        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(c.tier)+'</span>'+
+        ' <span class="s-1caek87">· '+escHtml(c.tier)+'</span>'+
         (c.needsConcierge?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
         '<div class="sub">'+(c.lastFrom==='concierge'?'↩ ':'')+escHtml((c.last||'').slice(0,55))+'</div></div>'+
         '<button class="vbtn ok" data-open>'+T('bo.open','Open')+'</button></div>'
@@ -583,7 +583,7 @@
   async function loadTrust(){
     try { trustData = (await call('/office/trust')).threads || []; } catch(e){ return; }
     $('#trustList').innerHTML = trustData.length ? trustData.map(t =>
-      '<div class="vrow"><div class="vi"><div class="nm">'+escHtml(t.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(t.company)+'</span>'+
+      '<div class="vrow"><div class="vi"><div class="nm">'+escHtml(t.name)+' <span class="s-1caek87">· '+escHtml(t.company)+'</span>'+
       (t.open?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
       '<div class="sub">'+escHtml(((t.messages[t.messages.length-1]||{}).text||'').slice(0,55))+'</div></div>'+
       '<button class="vbtn ok" data-trust="'+t.id+'">'+T('bo.open','Open')+'</button></div>'
@@ -663,8 +663,8 @@
     const maxOmzet = Math.max.apply(null, perf.map(p=>p.omzet).concat([1]));
     const medaille = ['1.','2.','3.'];
     $('#perfList').innerHTML = perf.length ? perf.filter(p => past(p.name, p.code, p.type)).map((p, i) =>
-      '<div class="row"><div class="r1"><div style="flex:1;min-width:0;"><div class="nm">'+(medaille[i]||'')+' '+p.name+
-        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+p.code+'</span></div>'+
+      '<div class="row"><div class="r1"><div class="s-1ujuoye"><div class="nm">'+(medaille[i]||'')+' '+p.name+
+        ' <span class="s-1caek87">· '+p.code+'</span></div>'+
         '<div class="sub">'+p.aantal+' '+T('bo.trans','transactie(s)')+' · '+p.openNu+' '+T('bo.opennow','nu open')+
         (p.gemMin!=null?' · Ø '+p.gemMin+' '+T('bo.minride','min per rit'):'')+'</div>'+
         '<div class="perfbar"><i style="width:'+Math.max(2, Math.round(p.omzet/maxOmzet*100))+'%;"></i></div></div>'+
@@ -683,7 +683,7 @@
     const live = (state.live || []).filter(g => past(g.codename, (g.dest&&g.dest.name)||'', (g.partners||[]).join(' ')));
     $('#liveList').innerHTML = live.length ? live.map(g =>
       '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(g.codename)+
-        (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+escHtml(g.dest.name)+'</span>':'')+'</div>'+
+        (g.dest?' <span class="s-rv1n8c">· '+T('bo.to','naar')+' '+escHtml(g.dest.name)+'</span>':'')+'</div>'+
         '<div class="sub">'+(g.arrived?'✓ '+T('bo.arrived','gearriveerd'):T('bo.onthemove','onderweg')+' ('+T('bo.mode.'+g.mode, g.mode==='walking'?'lopend':g.mode==='flying'?'vliegend':'rijdend')+')')+
         ' · '+escHtml((g.partners||[]).join(', '))+'</div></div>'+
         '<span class="pill '+(g.arrived?'klaar':'bereiding')+'">'+(g.arrived?T('bo.arrived','gearriveerd'):T('bo.live','live'))+'</span></div></div>'
@@ -703,8 +703,8 @@
     $('#appsList').innerHTML = apps.length ? apps.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='aangenomen'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.ap.new','nieuw'):x.status==='aangenomen'?T('bo.ap.hired','aangenomen'):T('bo.ap.rejected','afgewezen');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.func)+'</span>'+
-        (x.viaRTG?' <span style="font-size:0.58rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</span>':'')+'</div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span class="s-rv1n8c">· '+escHtml(x.func)+'</span>'+
+        (x.viaRTG?' <span class="s-1unsk08">RTG</span>':'')+'</div>'+
         '<div class="sub">'+escHtml(x.company)+' · '+timeAgo(x.at)+'</div></div>'+
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
@@ -719,27 +719,27 @@
       const eisKlaar = e => ['geverifieerd','niet_van_toepassing'].includes(e.status) &&
         !(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
       const open = eisen.filter(e => !eisKlaar(e));
-      const controleHtml = toel ? '<div style="display:grid;gap:.3rem;margin-top:.55rem;">'+eisen.map(e => {
+      const controleHtml = toel ? '<div class="s-1aiwwx5">'+eisen.map(e => {
         const klaar = eisKlaar(e);
         const verlopen = e.status==='geverifieerd'&&!klaar;
         const referentie = e.gecontroleerd && e.gecontroleerd.referentie || e.referentie || '';
         return '<div style="border-left:2px solid '+(klaar?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding-left:.55rem;">'+
-          '<div class="sub"><b style="color:var(--text)">'+(klaar?'✓ ':e.status==='afgekeurd'?'✕ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+
+          '<div class="sub"><b class="s-1pvgdpg">'+(klaar?'✓ ':e.status==='afgekeurd'?'✕ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+
           (verlopen?' · verlopen':'')+(referentie?' · '+escHtml(referentie):'')+'</div>'+
-          (x.status==='nieuw'&&!klaar?'<div style="display:flex;gap:.3rem;margin-top:.25rem;"><button class="vbtn ok" data-pactl="'+x.id+'" data-paeis="'+e.id+'">'+T('bo.pa.check','Controleren')+'</button>'+
+          (x.status==='nieuw'&&!klaar?'<div class="s-1obp109"><button class="vbtn ok" data-pactl="'+x.id+'" data-paeis="'+e.id+'">'+T('bo.pa.check','Controleren')+'</button>'+
             (e.magNietVanToepassing?'<button class="vbtn" data-panvt="'+x.id+'" data-paeis="'+e.id+'">N.v.t.</button>':'')+'</div>':'')+'</div>';
       }).join('')+'</div>' : '<div class="sub" style="color:#df6b7d;margin-top:.45rem;">Oude aanvraag zonder toelatingsdossier · opnieuw laten aanvragen</div>';
       const reg = x.registratie || {};
       const pre = reg.voorcontrole || {};
       const regNummer = reg.nummer || reg.kvkNummer || '';
       const regTitel = (reg.landNaam || (reg.kvkNummer ? 'Nederland' : '')) + (reg.regioOfStaat ? ' · ' + reg.regioOfStaat : '');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.company)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.type)+' · '+escHtml(x.city)+'</span></div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.company)+' <span class="s-rv1n8c">· '+escHtml(x.type)+' · '+escHtml(x.city)+'</span></div>'+
         '<div class="sub">'+escHtml(x.contactName)+' · '+escHtml(x.email)+(x.phone?' · '+escHtml(x.phone):'')+' · '+timeAgo(x.at)+
           (regNummer?'<br>'+escHtml(regTitel)+' · registratie '+escHtml(regNummer)+(reg.vestigingsnummer?' · vestiging '+escHtml(reg.vestigingsnummer):'')+' · voorcontrole '+escHtml(pre.status||'handmatig'):'')+
           (reg.registerBron?'<br><a href="'+escHtml(reg.registerBron)+'" target="_blank" rel="noopener">Open officieel register</a>':'')+
           (x.note?'<br>"'+escHtml(x.note.slice(0,120))+'"':'')+(x.code?' · code '+escHtml(x.code):'')+'</div>'+controleHtml+'</div>'+
         (x.status==='nieuw'
-          ? '<div style="display:flex;gap:0.4rem;flex-shrink:0;align-items:flex-start;">'+(toel&&open.length===0?'<button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button>':'<span class="pill nieuw">'+(toel?open.length+' open':'geblokkeerd')+'</span>')+'<button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
+          ? '<div class="s-qwtwh">'+(toel&&open.length===0?'<button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button>':'<span class="pill nieuw">'+(toel?open.length+' open':'geblokkeerd')+'</span>')+'<button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
           : '<span class="pill '+pc+'">'+st+'</span>')+
         '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nopa','Nog geen aanvragen. Bedrijven melden zich aan via de pagina "Partner worden" op de site.')+'</div>';
@@ -789,9 +789,9 @@
     // nadat RTG hem hier goedkeurt
     const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));
     $('#schoolList').innerHTML = scholen.length ? scholen.map(x =>
-      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.naam)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.plaats||'')+'</span></div>'+
+      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.naam)+' <span class="s-rv1n8c">· '+escHtml(x.plaats||'')+'</span></div>'+
         '<div class="sub">'+T('bo.sc.code','code')+' '+escHtml(x.code)+' · '+x.personeel+' '+T('bo.sc.staff','aanmelding(en) personeel')+' · '+timeAgo(x.at)+'</div></div>'+
-        '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-scok="'+escHtml(x.code)+'">'+T('bo.sc.approve','Goedkeuren')+'</button><button class="vbtn" data-scno="'+escHtml(x.code)+'">'+T('bo.sc.reject','Afwijzen')+'</button></div>'+
+        '<div class="s-mif44q"><button class="vbtn ok" data-scok="'+escHtml(x.code)+'">'+T('bo.sc.approve','Goedkeuren')+'</button><button class="vbtn" data-scno="'+escHtml(x.code)+'">'+T('bo.sc.reject','Afwijzen')+'</button></div>'+
       '</div></div>'
     ).join('') : '<div class="empty">'+T('bo.nosc','Geen wachtende schoolaanmeldingen. Scholen melden zich aan via de RTFoundation-app; hier keurt u ze goed voordat ze personeel en klassen kunnen aanmaken.')+'</div>';
     document.querySelectorAll('[data-scok]').forEach(b => b.addEventListener('click', async () => {
@@ -824,7 +824,7 @@
           (w.door?' · '+T('bo.cw.door','door')+' '+escHtml(w.door):'')+
           (w.notitie?'<br>"'+escHtml(w.notitie.slice(0,120))+'"':'')+'</div></div>'+
         (st ? '<span class="pill '+(w.besluit==='opgepakt'?'klaar':'bereiding')+'">'+st+'</span>'
-            : '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-cwok="'+escHtml(w.id)+'">'+T('bo.cw.pak','Opgepakt')+'</button><button class="vbtn" data-cwno="'+escHtml(w.id)+'">'+T('bo.cw.wijs','Afwijzen')+'</button></div>')+
+            : '<div class="s-mif44q"><button class="vbtn ok" data-cwok="'+escHtml(w.id)+'">'+T('bo.cw.pak','Opgepakt')+'</button><button class="vbtn" data-cwno="'+escHtml(w.id)+'">'+T('bo.cw.wijs','Afwijzen')+'</button></div>')+
         '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nocw','Nog geen bedrijven uit de onboarding. Leden geven bij het aanmelden op of ze er een hebben.')+'</div>';
     document.querySelectorAll('[data-cwok]').forEach(function(b){
@@ -874,7 +874,7 @@
           (r.dates ? ' · '+escHtml(r.dates) : '')+
           (r.door ? ' · '+T('ra.door','door')+' '+escHtml(r.door) : '')+
           (r.desc ? '<br>'+escHtml(r.desc.slice(0,140)) : '')+'</div></div>'+
-        '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn" data-raweg="'+escHtml(r.id)+'">'+T('ra.weg','Uit het aanbod')+'</button></div>'+
+        '<div class="s-mif44q"><button class="vbtn" data-raweg="'+escHtml(r.id)+'">'+T('ra.weg','Uit het aanbod')+'</button></div>'+
       '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nora','Nog geen reizen in het aanbod. Zolang hier niets staat, is het reisbureau voor leden leeg en kan er niets worden aangevraagd.')+'</div>';
     document.querySelectorAll('[data-raweg]').forEach(function(b){
@@ -921,7 +921,7 @@
           (a.besluit && a.besluit.door ? ' · '+T('rb.door','door')+' '+escHtml(a.besluit.door) : '')+
           (a.besluit && a.besluit.reden ? '<br>"'+escHtml(a.besluit.reden.slice(0,120))+'"' : '')+'</div></div>'+
         (af ? '<span class="pill '+(a.status==='bevestigd'?'klaar':'bereiding')+'">'+escHtml(stand || a.status)+'</span>'
-            : '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-rbok="'+escHtml(a.ref)+'">'+T('rb.bev','Bevestigen')+'</button><button class="vbtn no" data-rbno="'+escHtml(a.ref)+'">'+T('rb.wijs','Afwijzen')+'</button></div>')+
+            : '<div class="s-mif44q"><button class="vbtn ok" data-rbok="'+escHtml(a.ref)+'">'+T('rb.bev','Bevestigen')+'</button><button class="vbtn no" data-rbno="'+escHtml(a.ref)+'">'+T('rb.wijs','Afwijzen')+'</button></div>')+
       '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.norb','Nog geen reisaanvragen. Leden vragen een reis aan in het reisbureau; hier bevestigt u de datum of wijst u af.')+'</div>';
     document.querySelectorAll('[data-rbok]').forEach(function(b){
@@ -1005,9 +1005,9 @@
     $('#orders').innerHTML = tl.items.length ? tl.items.map(x => {
       const pc = (x.status==='nieuw'||x.status==='aangevraagd')?'nieuw':KLAAR_R[x.status]?'klaar':'bereiding';
       const icoon = x.soort==='order'?'hotel':x.soort==='jet'?'✈':'auto';
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span class="s-rv1n8c">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
         '<div class="sub">'+icoon+' '+escHtml(x.sub||'')+' · '+timeAgo(x.at)+(x.when?' · '+escHtml(x.when):'')+' · '+(x.teruggestort?T('bo.refunded','teruggestort'):x.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
-        '<div style="text-align:right;"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
+        '<div class="s-dkemdj"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
     const pager = $('#tlPager');
     pager.style.display = tl.pages > 1 ? 'flex' : 'none';

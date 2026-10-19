@@ -44,59 +44,24 @@ module.exports = ({ horeca, schoon }) => {
     if (!rek.pas || typeof rek.pas !== 'object') rek.pas = {};
     return rek.pas;
   }
+  /* Kijken zonder de la neer te zetten: elke weigering hieronder leest EERST
+     en schrijft pas als er werkelijk een claim bij komt. Een geweigerde
+     oppak-poging laat zo geen lege `pas` achter op de rekening
+     (scripts/laatspoor.js). */
+  const claimsKijk = (rek) => (rek.pas && typeof rek.pas === 'object') ? rek.pas : {};
   const sleutel = (gang) => String(Math.max(0, Math.min(9, parseInt(gang, 10) || 0)));
 
   // de regels van één gang die nog niet de deur uit zijn
   const gangRegels = (rek, gang) => (rek.regels || [])
     .filter((r) => r.vrijAt && r.stand !== 'uitgegeven' && String(r.gang || 0) === sleutel(gang));
 
-  /* Alles wat compleet klaar staat, over de hele zaak. Dit is de werklijst van
-     de pas en van de bar; welk station het is, staat op de borden zelf. */
-  function gereed(h) {
-    const uit = [];
-    for (const rek of Object.values(h.rekeningen || {})) {
-      if (rek.status !== 'open' && rek.status !== 'betaald') continue;
-      const perGang = new Map();
-      for (const r of (rek.regels || [])) {
-        if (!r.vrijAt || r.stand === 'uitgegeven') continue;
-        const k = String(r.gang || 0);
-        if (!perGang.has(k)) perGang.set(k, []);
-        perGang.get(k).push(r);
-      }
-      for (const [gang, regels] of perGang) {
-        // punt 1: een half klare gang is geen taak
-        if (!regels.every((r) => r.stand === 'klaar')) continue;
-        const c = claims(rek)[gang] || null;
-        /* Compleet sinds het LAATSTE bord klaar was -- dat is het moment waarop
-           er iets te dragen viel. Het eerste bord staat dan al langer, en dat
-           getal staat op het regiescherm (staat-koud); hier gaat het over de
-           gang als geheel. */
-        const compleetAt = regels.reduce((laatste, r) =>
-          !r.klaarAt ? laatste : (!laatste || r.klaarAt > laatste ? r.klaarAt : laatste), null);
-        uit.push({
-          rekeningId: rek.id, tafel: rek.tafel || rek.kanaal, kanaal: rek.kanaal,
-          gang: Number(gang), borden: regels.length,
-          serveerOm: regels.map((r) => r.serveerOm).find(Boolean) || null,
-          gereedSinds: minutenSinds(compleetAt),
-          stations: [...new Set(regels.map((r) => r.station || 'warm'))],
-          allergieen: [...new Set(regels.map((r) => r.allergie).filter(Boolean))],
-          /* Waar elk bord heen moet. De runner draagt vier borden en heeft aan
-             "gastNr 3" niets; de stoel draagt hier zijn naam. */
-          regels: regels.map((r) => ({ regelId: r.id, naam: r.naam, aantal: r.aantal,
-            station: r.station || 'warm', allergie: r.allergie || null,
-            stoel: gezelschap.handleVan(rek, r.gastNr) })),
-          claim: c ? { naam: c.naam, staffId: c.staffId, minuten: minutenSinds(c.at),
-            overgenomenVan: c.overgenomenVan || null } : null
-        });
-      }
-    }
-    /* Wat het langst klaar staat, bovenaan. Niet de duurste tafel en niet
-       tafel 1: eten dat staat te wachten wordt koud, en dat is het enige waar
-       op deze lijst tijd doorheen loopt. */
-    return uit.sort((a, b) => b.gereedSinds - a.gereedSinds);
-  }
+  /* De werklijst van de pas (wat compleet klaar staat) staat in ./pas-gereed.js. */
+  const gereed = require('./pas-gereed')({ claimsKijk, minutenSinds, gezelschap });
 
-  function pak(rek, gang, wie) {
+  /* `pakOp` en niet `pak`: in dit huis is `pak()` de naam van de pak-of-maak-getter
+     (eigencollectie), en een domeinwerkwoord met dezelfde naam leest voor mens en
+     meter als een la die bij het lezen ontstaat. Dit pakt een GANG op. */
+  function pakOp(rek, gang, wie) {
     const regels = gangRegels(rek, gang);
     if (!regels.length) return { status: 404, error: 'Er staat niets meer open in gang ' + gang + ' op deze tafel.' };
     if (!regels.every((r) => r.stand === 'klaar')) {
@@ -105,7 +70,7 @@ module.exports = ({ horeca, schoon }) => {
         error: 'Deze gang is nog niet compleet: ' + nog.length + ' van de ' + regels.length +
           ' borden staan nog in de keuken (' + nog.map((r) => r.naam).join(', ') + ').' };
     }
-    const c = claims(rek)[sleutel(gang)];
+    const c = claimsKijk(rek)[sleutel(gang)];
     if (c) {
       if (String(c.staffId) === String(wie.staffId)) return { ok: true, claim: c, al: true };
       return { status: 409, code: 'al-geclaimd',
@@ -120,7 +85,7 @@ module.exports = ({ horeca, schoon }) => {
   /* Loslaten kan alleen wat van jou is -- of door een manager, want die moet
      een tafel kunnen deblokkeren als iemand naar huis is. */
   function los(rek, gang, wie) {
-    const c = claims(rek)[sleutel(gang)];
+    const c = claimsKijk(rek)[sleutel(gang)];
     if (!c) return { status: 404, error: 'Deze gang is niet opgepakt.' };
     if (String(c.staffId) !== String(wie.staffId) && !wie.manager) return { status: 403,
       error: 'Deze gang is opgepakt door ' + c.naam + '. Neem hem over, of laat het hem zelf loslaten.' };
@@ -132,7 +97,7 @@ module.exports = ({ horeca, schoon }) => {
      herclaim -- wie een bord van een collega overneemt, hoort dat te zien en
      achteraf te kunnen navertellen. */
   function neemOver(rek, gang, wie) {
-    const c = claims(rek)[sleutel(gang)];
+    const c = claimsKijk(rek)[sleutel(gang)];
     if (!c) return { status: 404, error: 'Deze gang is niet opgepakt; je kunt hem gewoon oppakken.' };
     if (String(c.staffId) === String(wie.staffId)) return { status: 409, error: 'Deze gang heb je zelf al.' };
     const van = c.naam;
@@ -166,5 +131,5 @@ module.exports = ({ horeca, schoon }) => {
     for (const gang of Object.keys(doos)) if (!gangRegels(rek, gang).length) delete doos[gang];
   }
 
-  return { gereed, pak, los, neemOver, geefUit, ruimOp };
+  return { gereed, pakOp, los, neemOver, geefUit, ruimOp };
 };

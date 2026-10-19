@@ -51,10 +51,11 @@ const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 const GELDIG_DAGEN = 183;
 
 module.exports = ({ db, save, register, uitgang, log }) => {
-  const W = () => (db.data.werkruimtes = db.data.werkruimtes || {});
+  const ts = require('./opslag')({ db }); // de deur naar werkruimtes, tenants en proefruimtes
+  const W = ts.werkruimtes;
 
   /* Het register van tijdelijke werkruimtes. BUITEN de werkruimte, zie regel 2. */
-  const bak = () => (db.data.herstelproefRuimtes = db.data.herstelproefRuimtes || []);
+  const bak = ts.herstelproefRuimtes;
 
   /* Achtergebleven proefwerkruimtes van een afgebroken run. Ze worden bij ELKE
      proef opgeruimd en niet alleen bij de eigen: een oude die blijft staan is
@@ -64,7 +65,7 @@ module.exports = ({ db, save, register, uitgang, log }) => {
     const lijst = bak();
     let weg = 0;
     for (const code of lijst) if (w[code]) { delete w[code]; weg++; }
-    if (lijst.length) { db.data.herstelproefRuimtes = []; save(); }
+    if (lijst.length) { ts.zetHerstelproefRuimtes([]); save(); }
     return weg;
   }
 
@@ -115,7 +116,7 @@ module.exports = ({ db, save, register, uitgang, log }) => {
          eerst langs; dat is precies waarvoor finally bestaat. */
       if (proefCode) {
         delete W()[proefCode];
-        db.data.herstelproefRuimtes = bak().filter(c => c !== proefCode);
+        ts.zetHerstelproefRuimtes(bak().filter(c => c !== proefCode));
         save();
       }
     }
@@ -125,7 +126,7 @@ module.exports = ({ db, save, register, uitgang, log }) => {
     const t = register.vanWerkruimte(code);
     const rij = Object.assign({ at: klokDatum().toISOString(), werkruimte: code }, uitslag);
     if (t) {
-      const opslag = db.data.tenants[t.org];
+      const opslag = ts.tenantsKijk()[t.org];
       opslag.herstelproeven = [rij].concat(opslag.herstelproeven || []).slice(0, 20);
       save();
       if (log) log('tenant.herstelproef', { org: t.org, gelukt: rij.gelukt, verschillen: rij.verschillen.length });
@@ -141,7 +142,8 @@ module.exports = ({ db, save, register, uitgang, log }) => {
      betekenis, en een gelijkenis die geen gelijkenis is, misleidt. */
   function laatsteGeslaagde(org) {
     const t = register.haal(org);
-    const rijen = (t && db.data.tenants[t.org] && db.data.tenants[t.org].herstelproeven) || [];
+    const tn = t && ts.tenantsKijk()[t.org];
+    const rijen = (tn && tn.herstelproeven) || [];
     const goed = rijen.filter(r => r.gelukt);
     if (!goed.length) return { ok: false, reden: rijen.length
       ? 'de laatste herstelproef (' + rijen[0].at.slice(0, 10) + ') is niet geslaagd'

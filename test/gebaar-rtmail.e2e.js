@@ -117,8 +117,29 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
        door aria-hidden heen in het oude postvak probeert te grijpen. */
     await edgeActies(page);
     await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
+    /* Zakt dit alleen in CI (18 oktober 2026: drie runs op rij, lokaal niet na
+       te bootsen), dan zegt de melding waarom: wat de Edge toonde en of de
+       bronknop op het klikmoment voor de Edge bereikbaar was (avail() in
+       rtg-adaptive-edge-controls.js weigert stil bij hidden, inert, aria-hidden
+       of display:none boven de bron). */
     await wachtTot(() => Promise.resolve(lijstAangevraagd), Boolean,
-      'Alle post hoort via de Edge de nieuwe serverlijst aan te vragen');
+      'Alle post hoort via de Edge de nieuwe serverlijst aan te vragen').catch(async (fout) => {
+      const staat = await page.evaluate(() => {
+        const bron = document.querySelector('.rtm-nav [data-rtm-diep="inbox"]'), keten = [];
+        for (let p = bron; p; p = p.parentElement) {
+          const c = getComputedStyle(p);
+          if (p.hidden || p.inert || p.getAttribute('aria-hidden') === 'true' || c.display === 'none')
+            keten.push(p.tagName + '.' + String(p.className).slice(0, 30) + (p.hidden ? ' hidden' : '') + (p.inert ? ' inert' : '') +
+              (p.getAttribute('aria-hidden') === 'true' ? ' aria-hidden' : '') + (c.display === 'none' ? ' none' : ''));
+        }
+        const v = document.getElementById('rtmVoorzijde');
+        return { edge: Array.from(document.querySelectorAll('.rtg-adaptive-controls button')).map((b) => b.textContent.trim()),
+          sheet: !!document.querySelector('.rtg-adaptive-sheet:not([hidden])'), bron: !!bron, verbonden: !!(bron && bron.isConnected),
+          bovenBron: keten, voorzijde: v && { hidden: v.hidden, busy: v.getAttribute('aria-busy') } };
+      }).catch((e) => ({ evaluate: e.message }));
+      fout.message += ' | staat: ' + JSON.stringify(staat);
+      throw fout;
+    });
     await nieuweLijst;
     try {
       assert.equal(await page.locator('#main').getAttribute('aria-hidden'), 'true',

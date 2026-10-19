@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-17T20:50:37.721Z",
-    "commit": "78af1b371",
+    "op": "2026-10-18T21:33:31.699Z",
+    "commit": "d1a9a85f9",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bodemdruk.js",
-    "node": "v24.18.0"
+    "node": "v22.22.0"
   },
   "graad": "vermoed",
   "uitleg": "Per scherm dat een pad van de universele bodem aanroept (afgeleid uit de verklaring, het functieregister en SCHERMROUTES.json): staat er een uitnodiging om te betalen op? SAMENLEVING.md par. 6, eis 5.",

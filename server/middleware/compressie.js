@@ -90,6 +90,10 @@ function jsonGzip() {
          De koppen worden pas gezet als de compressie GELUKT is: zou
          Content-Encoding er al staan en de compressie daarna falen, dan beloofde
          het antwoord een verpakking die er niet is. */
+      /* De idem-poort hangt BINNEN deze wikkel en zag een antwoord dat hier
+         gecomprimeerd wordt nooit (zie server/lib/idem-poort.js, idemZie). */
+      const idemZie = res[Symbol.for('rtg.idemZie')];
+      if (typeof idemZie === 'function') idemZie(data);
       const bron = Buffer.from(s);
       const klaar = (err, uit) => {
         if (res.headersSent) return;

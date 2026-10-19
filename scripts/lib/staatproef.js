@@ -100,7 +100,7 @@ function boekhoudcollecties() {
     const reg = JSON.parse(require('fs').readFileSync(
       path.join(__dirname, '..', '..', 'IDEMBESLUIT.json'), 'utf8'));
     for (const n of Object.keys(reg.vastlegging || {})) uit.add(n);
-  } catch (e) {}
+  } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   return uit;
 }
 const BOEKHOUDING = boekhoudcollecties();

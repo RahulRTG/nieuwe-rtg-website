@@ -51,6 +51,18 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-b64cpl:not(#_#_#_){display:flex;flex-wrap:wrap;gap:.35rem}
+.s-en9thp:not(#_#_#_){margin:0 0 0.25rem}
+.s-q7ihj6:not(#_#_#_){padding:0 1rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -65,7 +77,7 @@
 
 <div class="cvapp" id="cvapp" role="main">
   <div class="form-col">
-    <div class="hint" style="padding:0 1rem;">Alles wat je invult wordt automatisch op dit toestel bewaard en blijft privé. Rechts zie je je cv meteen verschijnen.</div>
+    <div class="hint s-q7ihj6">Alles wat je invult wordt automatisch op dit toestel bewaard en blijft privé. Rechts zie je je cv meteen verschijnen.</div>
 
     <div class="deel">Wie ben je</div>
     <div class="kaart sec">
@@ -86,8 +98,8 @@
     <div class="kaart sec">
       <h3>Over jou</h3>
       <textarea class="veld" data-f="profiel" placeholder="Een paar zinnen over wie je bent en wat je goed kunt. Bijvoorbeeld: 'Ik werk hard, ben op tijd en leer snel.'"></textarea>
-      <div class="hint" style="margin:0 0 0.25rem;">Weet je niet hoe je moet beginnen? Tik een zin aan en maak hem van jezelf.</div>
-      <div id="hulpzinnen" style="display:flex;flex-wrap:wrap;gap:.35rem;"></div>
+      <div class="hint s-en9thp">Weet je niet hoe je moet beginnen? Tik een zin aan en maak hem van jezelf.</div>
+      <div id="hulpzinnen" class="s-b64cpl"></div>
     </div>
 
     <div class="deel">Werkervaring</div>

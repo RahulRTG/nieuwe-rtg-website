@@ -42,7 +42,24 @@ function maakModebezorg({ db, save, crypto, bewerkCollectie, dataDir, findSuppli
   const { isRetail, instel, setup, magLeveren, accountVerified, aanvraag, codeNieuw, winkelOverzicht, winkelBeeld, klantBeeld, mijnBezorgingen } = deelWinkel;
   const { route, bezorging, neem, gps, overhandig, retour } = deelKoerier;
 
+  /* VERGETEN (AVG art. 17). Een bezorging is ook de administratie van de
+     winkel en blijft; wat weggaat is het lid -- zijn sleutel en codenaam -- en
+     elk punt: de bestemming en de laatste koerierpositie bij hem voor de deur.
+     Het adres als tekst blijft bij een bezorging die nog loopt (de koerier is
+     onderweg) en gaat weg bij een die klaar is. */
+  function vergeet(key) {
+    let n = 0;
+    for (const b of key ? lijst() : []) {
+      if (!b || b.key !== key) continue;
+      b.loc = null; b.gps = null; b.key = null; b.codenaam = '(verwijderd)';
+      if (KLAAR[b.status]) b.adres = null;
+      n++;
+    }
+    return { bezorgingen: n };
+  }
+
   return {
+    mbVergeet: vergeet,
     MODEBEZORG_KETEN: KETEN,
     mbSetup: setup, mbInstel: instel, mbMagLeveren: magLeveren, mbAanvraag: aanvraag, mbCode: codeNieuw,
     mbWinkelOverzicht: winkelOverzicht, mbRoute: route, mbNeem: neem, mbGps: gps,

@@ -13,10 +13,11 @@ module.exports = (kern) => {
   const MAX = 300;
   const INSTALLATIES = ['lift', 'klimaat', 'brandmeld', 'noodverlichting', 'toegang', 'zonwering'];
 
+  const eigen = require('../../kern/eigencollectie')({ db, domein: 'routes/supplier/gebouwpand', bezit: { gebouwPand: 'kaart' } });
   function bak(code) {
-    if (!db.data.gebouwPand) db.data.gebouwPand = {};
-    if (!db.data.gebouwPand[code]) db.data.gebouwPand[code] = { installaties: [], post: [], parkeer: [], bhv: [] };
-    return db.data.gebouwPand[code];
+    const p = eigen.bak('gebouwPand');
+    if (!p[code]) p[code] = { installaties: [], post: [], parkeer: [], bhv: [] };
+    return p[code];
   }
   /* KIJKEN ZONDER SCHEPPEN, en dat onderscheid is hier geen netheid.
 
@@ -30,7 +31,7 @@ module.exports = (kern) => {
      keuringsdatum die je hier vindt en bijwerkt, landt gewoon in de opslag.
      Bestaat het niet, dan krijg je een lege vorm die nergens aan vastzit, en
      loopt elke zoektocht dood op een nette 404. */
-  const lees = (code) => (db.data.gebouwPand && db.data.gebouwPand[code])
+  const lees = (code) => eigen.kijk('gebouwPand')[code]
     || { installaties: [], post: [], parkeer: [], bhv: [] };
   const cap = l => { if (l.length > MAX) l.length = MAX; };
   const vandaag = () => new Date().toISOString().slice(0, 10);

@@ -252,10 +252,52 @@ function kaal(bron, regelCommentaar, heel) {
       while (j < n && s[j] !== c && (meerRegelig || s[j] !== '\n')) { if (s[j] === '\\') j++; j++; }
       if (j < n && s[j] === c) { uit += s.slice(i, j + 1); i = j + 1; continue; }
     }
+    /* EEN REGEX-LITERAL IS OOK EEN STRING, alleen met andere aanhalingstekens.
+       `/(['"`])/` draagt een quote en een backtick die hier geen string openen.
+       Las de walker ze wel zo, dan opende de backtick een "template" die pas bij
+       de volgende backtick sloot -- regels verderop, dwars door blokcommentaar
+       heen, dat daardoor als CODE bleef staan. Zo claimde het voorbeeld
+       `app.get(BASIS + '/Users', ...)` in een commentaarblok van
+       server/kern/magnaat-capabilities-routes.js dezelfde route als
+       server/routes/scim.js, en verloren GET /api/scim/v2/Users en zeven
+       golfroutes hun bron (test/routesbron.test.js). Een `/` is een regex als
+       het vorige teken geen waarde afsluit (regexMag); hij eindigt op dezelfde
+       regel bij de eerste `/` buiten een tekenklasse, en anders was het een
+       deelteken en lezen we gewoon verder. */
+    if (regelCommentaar && c === '/' && s[i + 1] !== '/' && regexMag(uit)) {
+      let j = i + 1;
+      let klasse = false;
+      while (j < n && s[j] !== '\n') {
+        if (s[j] === '\\') { j += 2; continue; }
+        if (s[j] === '[') klasse = true;
+        else if (s[j] === ']') klasse = false;
+        else if (s[j] === '/' && !klasse) break;
+        j++;
+      }
+      if (j < n && s[j] === '/') { uit += s.slice(i, j + 1); i = j + 1; continue; }
+    }
     uit += c;
     i++;
   }
   return uit;
+}
+
+/* Mag op deze plek een regex beginnen? Ja na een operator of opener, na een
+   sleutelwoord als `return`, en aan het begin; nee na een naam, een getal, een
+   `)` of een `]` -- daar is `/` een deling. `}` telt als deling: dat is de
+   voorzichtige kant, want dan blijft het gedrag van voor deze regel staan. */
+const REGEX_NA_TEKEN = new Set('(,=:[!&|?{};~+-*%<>^'.split(''));
+const REGEX_NA_WOORD = new Set(['return', 'typeof', 'case', 'in', 'of', 'void', 'delete',
+  'throw', 'new', 'else', 'do', 'yield', 'await', 'instanceof']);
+function regexMag(voor) {
+  let p = voor.length - 1;
+  while (p >= 0 && /\s/.test(voor[p])) p--;
+  if (p < 0) return true;
+  if (REGEX_NA_TEKEN.has(voor[p])) return true;
+  if (!/[\w$]/.test(voor[p])) return false;
+  let b = p;
+  while (b > 0 && /[\w$]/.test(voor[b - 1])) b--;
+  return REGEX_NA_WOORD.has(voor.slice(b, p + 1));
 }
 
 /* EN DE TEKENREEKSEN, met de regelnummers heel.

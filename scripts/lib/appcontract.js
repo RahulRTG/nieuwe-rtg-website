@@ -73,8 +73,17 @@ const BRONSOORTEN = {
      uitkomst daarna in een nieuwe sessie EN in de opslag buiten de server om
      (persistent), en laat het proces sterven direct na een bevestiging, herhaalt
      en breekt verzoeken af (herstelbaar). Hij leest geen scherm en kruist geen
-     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet. */
-  voltooiproef: ['voltooibaar', 'persistent', 'herstelbaar']
+     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet.
+     MENSELIJK (18 oktober 2026) levert hij als vierde, en alleen de helft die
+     scripts/appwerkt.js niet kon: dat scherm ziet of een kale fout de
+     gebruiker bereikt bij de bediening, en zei zelf dat de bruikbaarheid van
+     een melding "de storingen uit bewijs 7" vraagt. De voltooiproef leidt het
+     af uit alle antwoorden onder die storingen (geen kale 5xx, geen leeg
+     antwoord, elke weigering met een melding in woorden); een scenario kan het
+     niet zelf schrijven, en zonder uitgelokte weigering is het niet beproefd.
+     Een kale fout die APPWERKT zelf op het scherm zag, blijft staan: de
+     bewijsbron vervangt een GEBLOKKEERD_DOOR_DEFECT van het scherm nooit. */
+  voltooiproef: ['voltooibaar', 'persistent', 'herstelbaar', 'menselijk']
 };
 
 /* Een onderdeel met een scenario in scripts/lib/voltooi/ krijgt zijn drie
@@ -83,7 +92,7 @@ const BRONSOORTEN = {
    gedeelde instrument noemt de routes van geen enkel scherm. */
 function voltooi(scenario, waarom) {
   const bron = { soort: 'voltooiproef', register: 'VOLTOOIPROEF.json', instrument: 'scripts/lib/voltooi/' + scenario + '.js', waarom };
-  return { voltooibaar: bron, persistent: bron, herstelbaar: bron };
+  return { voltooibaar: bron, persistent: bron, herstelbaar: bron, menselijk: bron };
 }
 
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
@@ -95,6 +104,114 @@ const CONTRACT = {
   'link:post': Object.assign({
     belofte: 'een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar'
   }, voltooi('post', 'het scenario loopt /api/mijn/post, /zet, /alles-uit en /geschiedenis, de routes die /apps/mijn-post.html zelf aanroept')),
+  /* Instellingen: wie ik ben, wat RTG van mij denkt te weten, wie bij mij mag,
+     en mijn identiteit (18 oktober 2026). */
+  'link:verificatie': Object.assign({
+    belofte: 'een lid stuurt zijn identiteitsbewijs en een selfie in, een medewerker op naam beslist, het lid ziet de uitkomst en krijgt bericht, en een afwijzing wist het bewijs'
+  }, voltooi('verificatie', 'het scenario loopt /api/verify/upload, /selfie en /status, de routes die /apps/verificatie.html zelf aanroept, met het besluit langs /api/office/verify')),
+  'link:neigingen': Object.assign({
+    belofte: 'een lid vertelt RTG wat hij graag doet, ziet op een geheugenkaart wat RTG van hem denkt te weten, en haalt het weg of verbiedt het gebruik'
+  }, voltooi('neigingen', 'het scenario loopt /api/neiging/intake, /antwoord, /geheugen, /vergeet, /niet-voor, /overslaan en /opnieuw, de routes die /apps/mijn-neigingen.html zelf aanroept')),
+  'link:relaties': Object.assign({
+    belofte: 'een lid ziet per partij wie wat van hem mag, bekijkt vooraf wat sluiten doet, en zet het bij de bron stop -- en de andere partij merkt het'
+  }, voltooi('relaties', 'het scenario loopt /api/toestemming, /relaties, /relatie/gevolgen, /relatie/sluit en /intrek, de routes die /apps/mijn-relaties.html zelf aanroept, met een tweede lid dat de machtiging ontvangt')),
+  'link:ik': Object.assign({
+    belofte: 'een lid zegt hoe hij genoemd wil worden, welke toon Rahul aanslaat en hoe elk scherm zich gedraagt, binnen de grens van zijn leeftijd'
+  }, voltooi('ik', 'het scenario loopt /api/ik, /api/ik/zet en /api/ik/toegankelijk/zet, de routes die /apps/ik.html zelf aanroept')),
+  /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
+  'link:veilig': Object.assign({
+    belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'
+  }, voltooi('veilig', 'het scenario loopt /api/veiligheid, /kring/toevoegen, /aanpassen, /verwijderen, /mail, /plek, /alarm en /alarm/afsluiten, de routes die /apps/veilig.html zelf aanroept, met een tweede lid dat het alarm ontvangt')),
+  'link:reizen': Object.assign({
+    belofte: 'een lid deelt een Moment rond een reis met wie hij kiest, op het niveau dat hij kiest, de ontvanger ziet de voortgang, en na een pauze of stop niets meer'
+  }, voltooi('reizen', 'het scenario loopt /api/veiligheid/moment, /maak, /status, /pauze en /stop, de routes die /apps/reizen-veilig.html zelf aanroept, met de codenaam die het formulier vraagt en een tweede lid als ontvanger')),
+  'link:foodcourt': Object.assign({
+    belofte: 'een lid ziet de restaurants en hun vrije tijden, vraagt een tafel aan, en de zaak beslist -- het lid ziet de bevestiging'
+  }, voltooi('foodcourt', 'het scenario loopt /api/foodcourt, /api/foodcourt/tijden, /api/reserveer en /api/reserveringen/mijn, de routes die /apps/foodcourt.html zelf aanroept, met de zaak die bevestigt')),
+  'link:uitgaan': Object.assign({
+    belofte: 'een lid zet zich met zijn gezelschap op de gastenlijst van een avond, de zaak ziet hem op codenaam, en afmelden geeft de plek vrij'
+  }, voltooi('uitgaan', 'het scenario loopt /api/uitgaan, /api/uitgaan/mijn, /api/event/rsvp en /api/event/rsvp/annuleer, de routes die /apps/uitgaan.html zelf aanroept, met de zaak die de gastenlijst leest')),
+  'link:commerce': Object.assign({
+    belofte: 'een lid legt koopbare dingen in een mand, ziet per verkoper een afrekening met btw en wat bevestigen blokkeert, en geeft zijn keuze als briefje door aan de deur die wel bevestigt'
+  }, voltooi('commerce', 'het scenario loopt /api/commerce/aanbod, /mand, /mand/zet, /mand/leeg en /overdracht/maak, de routes die /apps/commerce.html zelf aanroept, met een ander lid dat het briefje niet mag lezen')),
+  /* De tweede ronde van 18 oktober 2026: werelden met een tweede lid (Pulse,
+     RTMail, de wereldlaag), het eigen dossier (gegevens, bescherming,
+     loopbaan) en de Mall, School en Kwesties. */
+  'link:mall': Object.assign({
+    belofte: 'een lid vindt aanbod in de Mall, zet het in een eigen lijst, bewaart het met een hartje in een vaste lijst, en zet een app uit de bibliotheek in zijn kast'
+  }, voltooi('mall', 'het scenario loopt /api/mall/zoek, de lijstroutes, /bewaar en /bewaard en /api/mall/apps/*, de routes die /apps/mall.html zelf aanroept')),
+  'link:pulse': Object.assign({
+    belofte: 'een lid schrijft een kort bericht, een ander lid vindt het, waardeert het, reageert en bewaart het; wie het schreef haalt het weg en dan is het voor iedereen weg'
+  }, voltooi('pulse', 'het scenario loopt /api/member/pulse/* en /api/member/wauw/stemming, de routes die /apps/pulse.html zelf aanroept, met een tweede lid')),
+  'link:rtmail': Object.assign({
+    belofte: 'een lid verstuurt binnen RTG een bericht naar een ander lid, dat het ongelezen in zijn postvak op codenaam ziet en leest; andermans post is niet te lezen'
+  }, voltooi('rtmail', 'het scenario loopt /api/member/rtmail/adres, /inbox, /lees en de conceptroutes, de routes die /apps/rtmail.html zelf aanroept, met een tweede lid')),
+  'link:gegevens': Object.assign({
+    belofte: 'een lid ziet wat RTG van hem heeft, neemt het mee onder zijn codenaam, ziet wie in zijn dossier was, en wijzigt zijn wachtwoord zo dat het oude nergens meer opent'
+  }, voltooi('gegevens', 'het scenario loopt /api/mijn/gegevens, /api/privacy/export, /inzage en /api/auth/password, de routes die /apps/mijn-gegevens.html zelf aanroept')),
+  'link:loopbaan': Object.assign({
+    belofte: 'een lid schrijft feiten in een ledger dat niets wist, trekt er een terug met reden, en deelt een feit met een code die hij weer stopzet'
+  }, voltooi('loopbaan', 'het scenario loopt /api/carriere/ledger/* en /api/carriere/regel/toon, de routes die /apps/loopbaan.html zelf aanroept, met een vreemde zonder sessie')),
+  'link:bescherming': Object.assign({
+    belofte: 'een lid zet zijn eigen beveiliging zonder drempel strenger en krijgt hem alleen via een ceremonie met reden en stappen weer omlaag'
+  }, voltooi('bescherming', 'het scenario loopt /api/isolatie/mijn, /zet en de ontsluitceremonie, de routes die /apps/mijn-isolatie.html zelf aanroept')),
+  'link:school': Object.assign({
+    belofte: 'een lid oefent een examen zoals bij een echt examen en krijgt aan het eind een terugblik en een oefenindicatie die geen echt cijfer is'
+  }, voltooi('school', 'het scenario loopt /api/leerstof/examen, /examen-antwoord en /api/onderwijs/advies, de routes die /apps/rtgschool.html zelf aanroept')),
+  'link:kwesties': Object.assign({
+    belofte: 'een mens brengt in wat er speelt, ziet de kwestie op zijn naam, opent de uitkomst en trekt hem in -- een ander kan er niets mee'
+  }, voltooi('kwesties', 'het scenario loopt /api/member/democratie/kwestie/*, de routes die /apps/foundation/kwesties.html zelf aanroept, als lid en met een tweede lid')),
+  'link:wereldlaag': Object.assign({
+    belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
+  }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),
+  'link:vandaag': Object.assign({
+    belofte: 'een lid houdt zijn dag bij: een gewoonte afvinken en weer uitzetten, een meting met herkomst, een dagcheck-in, en een noodkaart die alleen hij zelf toont'
+  }, voltooi('vandaag', 'het scenario loopt /api/life, /api/gewoonten (maak, tik, reeks, stop), /api/metingen (zet, weg), /api/gemoed (zet, weg) en /api/noodkaart (zet, weg), de routes die /apps/life.html zelf aanroept')),
+  'link:wonen': Object.assign({
+    belofte: 'een lid meldt wat er thuis stuk is zonder dat RTG een vakman veinst, en houdt zijn woningdocumenten bij in een eigen dossier in de kluis'
+  }, voltooi('wonen', 'het scenario loopt /api/home/onderhoud, /meld, /annuleer, /api/bestanden/map, /upload en /mijn, de routes die /apps/wonen.html zelf aanroept')),
+  'link:mijnmall': Object.assign({
+    belofte: 'een lid vraagt wat niemand aanbiedt, alleen zaken met het juiste vak zien het, het lid kiest een reactie en vindt het antwoord terug -- zonder boeking of betaling'
+  }, voltooi('mijnmall', 'het scenario loopt /api/mall/aanvraag, /aanvragen/mijn, /aanvraag/kies en /wijzig, de routes die /apps/mijnmall.html zelf aanroept, met twee zaken aan de andere kant')),
+  /* De apps van de Lifestyle Pass (18 oktober 2026). Elk scenario loopt met een
+     lid dat zijn pas kreeg langs het menselijke besluit van het kantoor; het
+     scenario van Reisboek loopt dat besluit zelf als schakels. */
+  'link:reisboek': Object.assign({
+    belofte: 'een Lifestyle-lid -- na het menselijke besluit van het kantoor -- legt een reis vast met vluchten, verblijven, documenten en programma en ziet op tijd welk document verloopt'
+  }, voltooi('reisboek', 'het scenario loopt /api/member/rechterhand/reisboek, /reis/zet, /reis/item en /weg, de routes die /apps/reisboek.html zelf aanroept, met een lid dat zijn pas via /api/aanmelding/beslis kreeg')),
+  'link:cellier': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn wijnkelder bij: aantal, waarde en drinkvenster per fles, wat op dronk is, en inschenken telt af'
+  }, voltooi('cellier', 'het scenario loopt /api/member/rechterhand/cellier, /zet, /schenk en /weg, onder het voorvoegsel dat /apps/cellier.html aanroept')),
+  'link:table': Object.assign({
+    belofte: 'een Lifestyle-lid organiseert een prive-diner: gelegenheid, gastenlijst met dieet en tafelindeling, en het menu per gang'
+  }, voltooi('table', 'het scenario loopt /api/member/rechterhand/table en zijn gast- en menuroutes, onder het voorvoegsel dat /apps/table.html aanroept')),
+  'link:maison': Object.assign({
+    belofte: 'een Lifestyle-lid bestuurt zijn huishouden: staf, taken voor wie en wanneer, af te vinken, en een logboek'
+  }, voltooi('maison', 'het scenario loopt /api/member/rechterhand/maison en zijn staf-, taak- en logroutes, onder het voorvoegsel dat /apps/maison.html aanroept')),
+  'link:garderobe': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn garderobe bij: per stuk wat het is en waar het hangt, per categorie geteld, met zijn vaklui'
+  }, voltooi('garderobe', 'het scenario loopt /api/member/rechterhand/garderobe, /stuk en /vakman, onder het voorvoegsel dat /apps/garderobe.html aanroept')),
+  'link:mecenaat': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn filantropie bij: doel, bedrag, toegezegd of betaald, en het deel via de RTFoundation'
+  }, voltooi('mecenaat', 'het scenario loopt /api/member/rechterhand/mecenaat, /gift, /betaald en /gift/weg, de routes die /apps/geld.html zelf aanroept')),
+  'link:nalatenschap': Object.assign({
+    belofte: 'een Lifestyle-lid legt zijn nalatenschap vast -- documenten, vertrouwenspersonen, wensen -- met de gevoelige velden versleuteld op schijf'
+  }, voltooi('nalatenschap', 'het scenario loopt /api/member/rechterhand/nalatenschap en zijn doc-, contact- en wensroutes, de routes die /apps/geld.html zelf aanroept')),
+  'link:logboek': Object.assign({
+    belofte: 'een Lifestyle-lid houdt het onderhoud van kostbaar bezit bij, en het overzicht seint wat binnenkort weer moet'
+  }, voltooi('logboek', 'het scenario loopt /api/member/rechterhand/logboek, /object en /regel, de routes die /apps/geld.html zelf aanroept')),
+  'link:cercle': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn clubs bij, vraagt waar hij in een stad terecht kan, en zijn gastpassen lopen met een boekhouding terug'
+  }, voltooi('cercle', 'het scenario loopt /api/member/rechterhand/cercle, /club, /gast, /gast/terug en /waarheen, onder het voorvoegsel dat /apps/cercle.html aanroept')),
+  'link:hangar': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn toestellen en vluchten bij: laatst bekende positie, eerstvolgende vlucht en vlieguren'
+  }, voltooi('hangar', 'het scenario loopt /api/member/rechterhand/hangar, /toestel en /vlucht, onder het voorvoegsel dat /apps/hangar.html aanroept')),
+  'link:entourage': Object.assign({
+    belofte: 'een Lifestyle-lid houdt zijn reisgezelschap bij: documenten met vervaldatum, en bij het samenstellen ziet hij wat ontbreekt'
+  }, voltooi('entourage', 'het scenario loopt /api/member/rechterhand/entourage, /persoon, /doc en /gezelschap, onder het voorvoegsel dat /apps/entourage.html aanroept')),
+  'link:attenties': Object.assign({
+    belofte: 'een Lifestyle-lid onderhoudt zijn relaties: wie binnen dertig dagen een attentie verdient, met de giftgeschiedenis'
+  }, voltooi('attenties', 'het scenario loopt /api/member/rechterhand/attenties, /relatie en /gift, onder het voorvoegsel dat /apps/attenties.html aanroept')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

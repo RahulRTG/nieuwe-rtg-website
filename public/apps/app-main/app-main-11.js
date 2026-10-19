@@ -92,10 +92,10 @@
       '</label>' +
       '<button class="knop" id="kletsGo"' + (kletsAan ? '' : ' disabled') + '>Laat ze kletsen</button>' +
       (d.gesprekken && d.gesprekken.length
-        ? '<div style="margin-top:1.25rem;border-top:1px solid var(--line);padding-top:.8rem;">' +
+        ? '<div class="s-j1o3rf">' +
           d.gesprekken.slice(0, 8).map(g =>
             '<button class="klets-eerder" data-klets="' + escT(g.id) + '" style="display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:.5rem 0;font:inherit;cursor:pointer;">' +
-            '<b style="font-size:.78rem;color:var(--rtg-leesgoud,var(--gold));">' + escT(g.metCodenaam) + '</b>' +
+            '<b class="s-13g16je">' + escT(g.metCodenaam) + '</b>' +
             '<span style="display:block;font-size:.82rem;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escT(g.eerste) + '</span></button>'
           ).join('') + '</div>'
         : '');
@@ -115,7 +115,7 @@
     $('#kletsBody').innerHTML =
       '<div class="klets-draad">' + (g.beurten || []).map(b =>
         '<div class="dm-m' + (b.mij ? ' mine' : '') + '">' + escT(b.tekst) + '</div>').join('') + '</div>' +
-      '<p style="font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem;">' + escT(g.noot || '') +
+      '<p class="s-1bpjqct">' + escT(g.noot || '') +
       (g.echt ? '' : ' Dit antwoord komt uit de ingebouwde assistent; vrije AI is niet actief.') + '</p>' +
       '<button class="knop h-mt70" id="kletsTerug">Terug</button>';
     const t = $('#kletsTerug');
@@ -134,7 +134,7 @@
     if (!dmWith) return;
     $('#kletsNaam').textContent = dmNaam || '';
     $('#klets-sheet').classList.add('open'); $('#klets-scrim').classList.add('open');
-    $('#kletsBody').innerHTML = '<p style="color:var(--soft);font-size:.85rem;">Laden...</p>';
+    $('#kletsBody').innerHTML = '<p class="s-1eltjr2">Laden...</p>';
     kletsTekenLeeg(await kletsLaad());
   }
   const kletsDicht = () => { $('#klets-sheet').classList.remove('open'); $('#klets-scrim').classList.remove('open'); };

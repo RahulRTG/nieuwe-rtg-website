@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-17T20:02:38.054Z",
-  "commit": "ab4c08c25",
+  "op": "2026-10-18T19:50:29.476Z",
+  "commit": "8f7e59c7c",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
@@ -7948,7 +7948,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "object: werkruimte",
@@ -8416,7 +8416,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -8470,7 +8470,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -8713,7 +8713,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -8821,7 +8821,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -8848,7 +8848,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -48312,7 +48312,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49407,7 +49407,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49515,7 +49515,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49569,7 +49569,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49623,7 +49623,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49704,7 +49704,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49758,7 +49758,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49785,7 +49785,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49812,7 +49812,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49839,7 +49839,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49866,7 +49866,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49893,7 +49893,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49920,7 +49920,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49947,7 +49947,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49974,7 +49974,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50001,7 +50001,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50028,7 +50028,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50055,7 +50055,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50082,7 +50082,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50109,7 +50109,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50136,7 +50136,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50163,7 +50163,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50190,7 +50190,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50217,7 +50217,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50244,7 +50244,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50271,7 +50271,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50298,7 +50298,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50325,7 +50325,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50352,7 +50352,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50379,7 +50379,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50406,7 +50406,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50433,7 +50433,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50460,7 +50460,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50487,7 +50487,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50514,7 +50514,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50541,7 +50541,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50568,7 +50568,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50595,7 +50595,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50622,7 +50622,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50649,7 +50649,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50676,7 +50676,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50703,7 +50703,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50730,7 +50730,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50784,7 +50784,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50811,7 +50811,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50838,7 +50838,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50865,7 +50865,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50892,7 +50892,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50919,7 +50919,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50946,7 +50946,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -50973,7 +50973,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51000,7 +51000,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51027,7 +51027,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51054,7 +51054,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51081,7 +51081,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51108,7 +51108,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51135,7 +51135,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51162,7 +51162,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51189,7 +51189,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51216,7 +51216,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51243,7 +51243,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51270,7 +51270,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51297,7 +51297,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51324,7 +51324,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51351,7 +51351,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51378,7 +51378,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51405,7 +51405,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51432,7 +51432,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51459,7 +51459,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51486,7 +51486,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51513,7 +51513,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51540,7 +51540,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -51567,7 +51567,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -52674,7 +52674,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -52701,7 +52701,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -52728,7 +52728,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -56052,7 +56052,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -83583,7 +83583,7 @@
    "mutatieId": "pay.verzoek.betaal",
    "route": "POST /api/pay/verzoek/betaal",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -99909,7 +99909,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -99937,7 +99937,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -101039,7 +101039,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -101228,7 +101228,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -101363,7 +101363,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -137227,7 +137227,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137254,7 +137254,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137281,7 +137281,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137470,7 +137470,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137497,7 +137497,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137524,7 +137524,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137551,7 +137551,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137578,7 +137578,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
@@ -137605,7 +137605,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -137632,7 +137632,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -137659,7 +137659,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -137686,7 +137686,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -137713,7 +137713,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -137740,7 +137740,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",

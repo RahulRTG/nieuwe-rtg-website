@@ -24,11 +24,13 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
   const eur = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
   const INTAKE_DAGEN = 90; // een gedeelde intake vervalt vanzelf na een kwartaal
 
+  // de collecties van RTG Care, met hun vorm (./care/opslag.js); de deelbestanden krijgen ctx.opslag
+  const C = require('./care/opslag')({ db });
   const lijsten = () => {
-    if (!db.data.careBoekingen) db.data.careBoekingen = [];     // geboekte behandelingen
-    if (!db.data.careIntake) db.data.careIntake = [];            // toestemmingen: dossier delen met een aanbieder
-    if (!Array.isArray(db.data.careAanbieders) || !db.data.careAanbieders.length) {
-      db.data.careAanbieders = [
+    C.bak('careBoekingen');
+    C.bak('careIntake');
+    if (!C.bak('careAanbieders').length) {
+      C.zetBak('careAanbieders', [
         {
           id: 'zenith', naam: 'Zenith Spa & Wellness', soort: 'spa', icon: 'beauty', waar: 'Talamanca, Ibiza',
           supplierCode: 'ZENITH', // gekoppeld leveranciersaccount voor de aanbieder-agenda
@@ -56,12 +58,12 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
             { id: 'ct2', naam: 'Fysiotherapie', soort: 'medisch', duurMin: 30, prijs: 55, behandelaarId: 'cb2', tijden: ['13:00', '14:00', '16:00'] }
           ]
         }
-      ];
+      ]);
       save();
     }
   };
 
-  const aanbiederVan = id => (db.data.careAanbieders || []).find(a => a.id === String(id || ''));
+  const aanbiederVan = id => C.kijk('careAanbieders').find(a => a.id === String(id || ''));
   const behandelingVan = (a, id) => a && (a.behandelingen || []).find(b => b.id === String(id || ''));
 
   /* ---- de intake: een lid deelt medische context met een aanbieder ----
@@ -69,7 +71,7 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
      einddatum en altijd te stoppen (door het lid of door de aanbieder). */
   const intakeActief = (key, aanbiederId) => {
     lijsten();
-    return db.data.careIntake.find(i => i.key === key && i.aanbiederId === aanbiederId &&
+    return C.bak('careIntake').find(i => i.key === key && i.aanbiederId === aanbiederId &&
       i.status === 'actief' && i.vervaltOp >= vandaag());
   };
 
@@ -77,7 +79,7 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
      gedeelde context, een keer opgebouwd bij het opstarten; de ledenlaag
      gaat eerst de context in omdat de pakketlaag careBoek/careBetaal
      hergebruikt. */
-  const ctx = { db, save, crypto, schoon, notify, zorgVoor, zorgMee,
+  const ctx = { db, opslag: C, save, crypto, schoon, notify, zorgVoor, zorgMee,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief };
   /* De wachtlijst gaat VOOR de ledenlaag de context in: careAnnuleer meldt een
      vrijgekomen slot en pakt slotVrij op aanroepmoment uit diezelfde context. */

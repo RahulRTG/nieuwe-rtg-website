@@ -103,7 +103,7 @@ module.exports = function maakOnderzoeker({ zaken, loop, machtigingen, bevestigi
       if (z) loop.noteer(z, { soort: 'notitie', van: 'systeem', wie: TOONNAAM,
         tekst: 'RTG AI heeft om toegang gevraagd (' + k.teVragen.join(', ') + '). Het lid beslist.' });
       if (z) save();
-    } catch (e) {}
+    } catch (e) { console.warn('[service] de tijdlijnnotitie van het toegangsverzoek niet vastgelegd:', e && e.message); }
     return Object.assign({}, v, { aanvrager: TOONNAAM, machine: true, nietGevraagd: k.uitkomst.filter(u => !u.kan) });
   }
 

@@ -39,15 +39,15 @@
               (x.voor ? ' &middot; voor ' + esc(x.voor) : '') +
               (x.deadline ? ' &middot; <span class="pil' + (!x.af && x.deadline < vandaag ? ' let' : '') + '">' +
                 esc(x.deadline) + '</span>' : '') +
-              (x.af ? '' : ' <button class="knop stil" data-tafvink type="button" style="font-size:.7rem;padding:.15rem .5rem;">afvinken</button>') +
+              (x.af ? '' : ' <button class="knop stil s-1emfcyx" data-tafvink type="button">afvinken</button>') +
               '</div>';
           }).join('')
         : '<div class="leeg">Nog geen taken.</div>') +
       '<div class="rij h-mt35">' +
         '<input class="veld" data-wtekst placeholder="Wat moet er gebeuren?" maxlength="300">' +
-        (aliassen ? '<select class="veld" data-wvoor aria-label="Voor wie" style="max-width:11rem;">' +
+        (aliassen ? '<select class="veld s-jv5hwd" data-wvoor aria-label="Voor wie">' +
           '<option value="">voor het team</option>' + aliassen + '</select>' : '') +
-        '<input class="veld" data-wdeadline type="date" aria-label="Deadline" style="max-width:9.5rem;">' +
+        '<input class="veld s-1fagvrr" data-wdeadline type="date" aria-label="Deadline">' +
         '<button class="knop stil" data-wtaak type="button">Zet op de lijst</button></div>' +
 
       // documenten met versies
@@ -70,7 +70,7 @@
       }).join('') || '<div class="leeg">Nog niets.</div>') +
       '<div class="rij h-mt35">' +
         '<input class="veld" data-ltekst placeholder="Wat is er gebeurd?" maxlength="600">' +
-        '<input class="veld" data-lapp placeholder="apparatuur (komma\'s)" maxlength="200" style="max-width:11rem;">' +
+        '<input class="veld s-jv5hwd" data-lapp placeholder="apparatuur (komma\'s)" maxlength="200">' +
         '<button class="knop stil" data-llog type="button">Noteer</button></div>' +
 
       '<div class="sec h-mt90">Besluitenlog</div>' +
@@ -83,7 +83,7 @@
       '<div class="rij h-mt35">' +
         '<input class="veld" data-btekst placeholder="Wat is er besloten?" maxlength="500">' +
         '<input class="veld" data-bwaarom placeholder="Waarom?" maxlength="500">' +
-        '<input class="veld" data-bdoor placeholder="Door wie" maxlength="80" style="max-width:9rem;">' +
+        '<input class="veld s-1v3dw5a" data-bdoor placeholder="Door wie" maxlength="80">' +
         '<button class="knop stil" data-bbesluit type="button">Leg vast</button></div></div>';
   }
 
@@ -122,7 +122,7 @@
         ? s.reserveringen.filter(function (r) { return !r.weg; }).map(function (r) {
             return '<div class="log" data-resv="' + esc(r.id) + '|' + esc(r.apparaatId) + '"><b>' + esc(r.apparaat) +
               '</b> &middot; ' + esc(r.van) + ' t/m ' + esc(r.tot) + ' &middot; door ' + esc(r.door) +
-              ' <button class="knop stil" data-resvweg type="button" style="font-size:.7rem;padding:.15rem .5rem;">intrekken</button>' +
+              ' <button class="knop stil s-1emfcyx" data-resvweg type="button">intrekken</button>' +
               '<br>kalibratie bij gebruik: ' + (r.kalibratie && r.kalibratie.op ? esc(r.kalibratie.op) +
                 (r.kalibratie.stand ? ' (' + esc(r.kalibratie.stand) + ')' : '') : 'n.v.t.') + '</div>';
           }).join('')
@@ -132,9 +132,9 @@
           apparatuur.filter(function (a) { return a.actief; }).map(function (a) {
             return '<option value="' + esc(a.id) + '">' + esc(a.naam) + '</option>';
           }).join('') + '</select>' +
-        '<input class="veld" data-resvvan type="date" aria-label="van" style="max-width:9.5rem;">' +
-        '<input class="veld" data-resvtot type="date" aria-label="tot" style="max-width:9.5rem;">' +
-        '<input class="veld" data-resvdoor placeholder="op naam van" style="max-width:9rem;">' +
+        '<input class="veld s-1fagvrr" data-resvvan type="date" aria-label="van">' +
+        '<input class="veld s-1fagvrr" data-resvtot type="date" aria-label="tot">' +
+        '<input class="veld s-1v3dw5a" data-resvdoor placeholder="op naam van">' +
         '<button class="knop stil" data-resvzet type="button">Reserveer</button></div></div>';
   }
 

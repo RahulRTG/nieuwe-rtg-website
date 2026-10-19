@@ -7,6 +7,7 @@ module.exports = (ctx) => {
     connectieTussen, verbActief, zijnVrienden, codenaamVan, haversine,
     RADIUS_M, POS_TTL_MS, VOORSTEL_TTL_MS, MIN_LEEFTIJD, ACTIVITEITEN, ACT_IDS,
     lijsten, accountVanKey, memberState, geslachtVan, mag, staatAan, zet, pos, versePositie, id, nu, paar } = ctx;
+  const O = ctx.opslag; // kern/eigencollectie.js, gebouwd in ../ontmoeting.js
   // late binding: de datelaag wordt na deze laag gemount; kies() maakt pas
   // per verzoek een date aan, dus tegen die tijd staat maakDate in de context.
   const maakDate = (...a) => ctx.maakDate(...a);
@@ -30,8 +31,8 @@ module.exports = (ctx) => {
         vervalt: new Date(Date.now() + VOORSTEL_TTL_MS).toISOString(),
         keuzes: {}, dateId: null
       };
-      db.data.ontmoetVoorstellen.unshift(v);
-      db.data.ontmoetVoorstellen = db.data.ontmoetVoorstellen.slice(0, 4000);
+      O.bak('ontmoetVoorstellen').unshift(v);
+      O.zetBak('ontmoetVoorstellen', O.bak('ontmoetVoorstellen').slice(0, 4000));
       for (const k of [key, ander]) {
         sseToCustomer(k, 'sync', { scope: 'ontmoeting' });
         notify(k, { icon: '\u{1F31F}', title: 'Iemand in de buurt', body: 'Een connectie is vlakbij. Kies samen: Wandelen, Borrelen of Jetset.', scope: 'ontmoeting' });
@@ -41,17 +42,17 @@ module.exports = (ctx) => {
     return nieuw;
   }
   function lopendVoorstel(a, b) {
-    return db.data.ontmoetVoorstellen.find(v => v.status === 'open' && paar(v.a, v.b) === paar(a, b) && !verlopenVoorstel(v));
+    return O.bak('ontmoetVoorstellen').find(v => v.status === 'open' && paar(v.a, v.b) === paar(a, b) && !verlopenVoorstel(v));
   }
   function lopendeDate(a, b) {
-    return db.data.ontmoetDates.find(d => ['wacht-op-tekenen', 'actief', 'noodgeval'].includes(d.status) && paar(d.a, d.b) === paar(a, b));
+    return O.bak('ontmoetDates').find(d => ['wacht-op-tekenen', 'actief', 'noodgeval'].includes(d.status) && paar(d.a, d.b) === paar(a, b));
   }
   function verlopenVoorstel(v) { return v.vervalt && new Date(v.vervalt).getTime() < Date.now(); }
 
   /* ---- een keuze maken (of niets doen = afwijzen) ---- */
   function kies(key, voorstelId, keuze) {
     lijsten();
-    const v = db.data.ontmoetVoorstellen.find(x => x.id === voorstelId);
+    const v = O.bak('ontmoetVoorstellen').find(x => x.id === voorstelId);
     if (!v || (v.a !== key && v.b !== key)) return { status: 404, error: 'Voorstel niet gevonden.' };
     if (v.status !== 'open' || verlopenVoorstel(v)) { if (v.status === 'open') v.status = 'verlopen'; save(); return { status: 409, error: 'Dit voorstel is verlopen.' }; }
     if (keuze === 'afwijzen') {

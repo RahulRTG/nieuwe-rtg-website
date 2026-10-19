@@ -4,9 +4,10 @@
    signalering, en de lijsten die kijker en maker zien. Krijgt de gedeelde ctx van
    kern/podium/index.js. */
 module.exports = (ctx) => {
-  const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
+  const { save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
     stuurRond, kijkBeeld, eigenBeeld, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk,
     koppel, herstelBoom, ouderKeyVan, GENRES, CADEAUS, SIGNALEN, zones, poort } = ctx;
+  const P = ctx.opslag; // kern/eigencollectie.js, gebouwd in ./index.js
 
   /* De lijsten (de zaal van een zone, de gedeelde index voor de Media OS en het
      eigen kanaal) staan in ./lijsten.js: dat is een eigen onderwerp -- WAT
@@ -37,7 +38,7 @@ module.exports = (ctx) => {
     const k = { id: id(), key, naam, zone, zaakCode, genre: GENRES.includes(data.genre) ? data.genre : 'salon',
       bio: schoon(data.bio, 300), status: 'wacht', abbCenten: 0, verdiend: 0,
       live: null, kijkers: {}, abonnees: {}, kaartjes: {}, genodigd: [], geblokkeerd: [], at: nu() };
-    db.data.podiumKanalen.push(k); save();
+    P.bak('podiumKanalen').push(k); save();
     sseToOffice('sync', { scope: 'podium' });
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
   }
@@ -57,11 +58,11 @@ module.exports = (ctx) => {
      het kantoor het altijd kreeg. */
   function officeLijst(zone) {
     lijsten();
-    const rij = db.data.podiumKanalen.filter(k => k.status === 'wacht' && (!zone || zones.zoneVan(k) === zone));
-    const meldingen = db.data.podiumMeldingen.filter(m => !zone || m.zone === zone);
+    const rij = P.bak('podiumKanalen').filter(k => k.status === 'wacht' && (!zone || zones.zoneVan(k) === zone));
+    const meldingen = P.bak('podiumMeldingen').filter(m => !zone || m.zone === zone);
     return { zone: zone || null,
       wachtrijen: Object.keys(zones.ZONES).map(z => ({ zone: z, naam: zones.ZONES[z].naam,
-        wacht: db.data.podiumKanalen.filter(k => k.status === 'wacht' && zones.zoneVan(k) === z).length })),
+        wacht: P.bak('podiumKanalen').filter(k => k.status === 'wacht' && zones.zoneVan(k) === z).length })),
       wacht: rij.map(k => ({ id: k.id, naam: k.naam, zone: zones.zoneVan(k), genre: k.genre, bio: k.bio,
         codenaam: codenaamVan(k.key), at: k.at })),
       meldingen: meldingen.slice(-50).reverse() };
@@ -105,7 +106,7 @@ module.exports = (ctx) => {
     herstelBoom(k);                                  // wezen van vertrokken kijkers eerst herstellen
     if (nieuw || !k.boom[key]) koppel(k, key);       // hang deze kijker in de boom en laat zijn ouder aanbieden
     save();
-    return { status: 200, ok: true, kanaal: kijkBeeld(k, key), chat: (db.data.podiumChat[k.id] || []).slice(-40), ouder: k.boom[key].ouder };
+    return { status: 200, ok: true, kanaal: kijkBeeld(k, key), chat: (P.bak('podiumChat')[k.id] || []).slice(-40), ouder: k.boom[key].ouder };
   }
   function weg(key, kid) {
     const k = kanaalMet(kid); if (!k) return { status: 200, ok: true };

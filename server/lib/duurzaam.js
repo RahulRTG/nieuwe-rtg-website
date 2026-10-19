@@ -98,7 +98,7 @@ module.exports = function maakVastleggen({ bijeen, save, inBundel, bron, store }
      mutatie en deze aanroep geen `await` staat -- dan kan geen ander verzoek de
      halve toestand zien of wegschrijven. */
   const niets = () => {};
-  return async function vastleggen(mutatie = niets) {
+  async function vastleggen(mutatie = niets) {
     if (!DUURZAAM_UIT && pgZonderBevestiging(store)) {
       console.warn('[' + naam + '] niet vastgelegd: PostgreSQL kan buiten een verzoek niets bevestigen.');
       return { status: 503, error: 'Dit is niet vastgelegd; probeer het zo nog een keer.',
@@ -130,5 +130,35 @@ module.exports = function maakVastleggen({ bijeen, save, inBundel, bron, store }
       return { status: 503, error: 'Dit is niet vastgelegd; probeer het zo nog een keer.' };
     }
     return null;
+  }
+
+  /* DE DERDE VORM: een SCHRIJVER die zelf zijn antwoord teruggeeft.
+
+     Veel domeinen hebben synchrone schrijvers in het huispatroon -- ze muteren,
+     doen `save()` en geven `{ ok: true, ... }` of `{ status, error }` terug --
+     en worden ook BINNEN een andere handeling aangeroepen, waar die handeling
+     over de commit beslist. Die schrijvers async maken breekt elke binnenste
+     aanroeper; de route moet hem dus kunnen omsluiten. Dat is deze functie, en
+     hij staat hier en niet in elk domein, want dezelfde acht regels in twee
+     domeinen is twee plekken die een waarheid vasthouden (LAT.md regel 4).
+
+     Drie dingen die hij bewaakt:
+       - een fout IN de schrijver is geen opslagfout: die gaat als fout omhoog,
+         anders leest een programmeerfout als een storing van de schijf;
+       - een schrijver die zelf weigerde (400, 404, 409) heeft niets geschreven,
+         en zijn weigering is dan het ware antwoord -- ook als de lege commit
+         faalde, want "probeer het zo nog eens" is voor een onbekende id een
+         belofte die nooit uitkomt;
+       - anders wint het oordeel van de opslag: 503 als die niet bevestigde. */
+  vastleggen.antwoord = async function antwoord(werk) {
+    let uit, fout = null;
+    const mis = await vastleggen(() => { try { uit = werk(); } catch (e) { fout = e; } });
+    if (fout) throw fout;
+    if (uit && typeof uit.then === 'function') {
+      throw new Error('vastleggen.antwoord() neemt een SYNCHRONE schrijver; een belofte zou na de commit pas muteren');
+    }
+    if (uit && uit.error) return uit;
+    return mis || uit;
   };
+  return vastleggen;
 };

@@ -3,9 +3,10 @@
    partner en kantoor. Krijgt de gedeelde context een keer bij het opstarten
    vanuit kern/paspoort.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
+  const { save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
     leesUploadDataUrl, leeftijdVan, gidsHaal, NIVEAUS, VIEW_TTL_MS, KIND_GRENS,
     lijsten, accountVanKey, memberState, leeftijdVanAccount, log, bevestigingVan, inhoudVoor, codenaamUitGids, id, schoon, nu } = ctx;
+  const opslag = ctx.opslag; // ./opslag.js, gebouwd in ../paspoort.js
   function dienIncidentIn(supplier, key, reden, niveau, actor) {
     lijsten();
     const u = accountVanKey(key);
@@ -20,8 +21,8 @@ module.exports = (ctx) => {
       door: (actor && actor.name) || 'Team', at: nu(),
       beoordeeldDoor: null, beoordeeldAt: null, besluit: null, verzoekId: null
     };
-    db.data.paspoortIncidenten.unshift(inc);
-    db.data.paspoortIncidenten = db.data.paspoortIncidenten.slice(0, 50000);
+    opslag.bak('paspoortIncidenten').unshift(inc);
+    opslag.zet('paspoortIncidenten', opslag.bak('paspoortIncidenten').slice(0, 50000));
     log({ soort: 'incident-ingediend', incidentId: inc.id, supplierCode: supplier.code, key, codenaam, door: inc.door });
     save();
     // het lid weet dat er een incident loopt; de identiteit is nog NIET vrijgegeven
@@ -34,7 +35,7 @@ module.exports = (ctx) => {
   // RTG-kantoor beoordeelt: vrijgeven (maakt een goedgekeurde inzage aan) of afwijzen
   function beoordeelIncident(incidentId, besluit, beoordelaar) {
     lijsten();
-    const inc = db.data.paspoortIncidenten.find(x => x.id === incidentId);
+    const inc = opslag.bak('paspoortIncidenten').find(x => x.id === incidentId);
     if (!inc) return { status: 404, error: 'Incident niet gevonden.' };
     if (inc.status !== 'ingediend') return { status: 409, error: 'Dit incident is al beoordeeld.' };
     inc.beoordeeldAt = nu();
@@ -49,7 +50,7 @@ module.exports = (ctx) => {
         reden: 'Incident: ' + inc.reden.slice(0, 120), door: 'RTG-kantoor', incident: true,
         at: nu(), beslistAt: nu(), vervalt: new Date(Date.now() + VIEW_TTL_MS).toISOString()
       };
-      db.data.paspoortVerzoeken.unshift(v);
+      opslag.bak('paspoortVerzoeken').unshift(v);
       inc.verzoekId = v.id;
       log({ soort: 'incident-vrijgegeven', incidentId: inc.id, verzoekId: v.id, supplierCode: inc.supplierCode, key: inc.key, door: inc.beoordeeldDoor });
       notifySupplier(inc.supplierCode, { icon: 'slot', title: 'Incident vrijgegeven', body: 'RTG gaf de identiteit voor uw incident vrij. U kunt de inzage 10 minuten openen.' });
@@ -86,25 +87,25 @@ module.exports = (ctx) => {
     lijsten();
     const nuMs = Date.now();
     let veranderd = false;
-    for (const v of db.data.paspoortVerzoeken) {
+    for (const v of opslag.bak('paspoortVerzoeken')) {
       if (v.status === 'goedgekeurd' && v.vervalt && new Date(v.vervalt).getTime() < nuMs) { v.status = 'verlopen'; veranderd = true; }
     }
     if (veranderd) save();
   }
   function mijnVerzoeken(key) {
     lijsten();
-    return db.data.paspoortVerzoeken.filter(v => v.key === key).slice(0, 60).map(publiekVerzoek);
+    return opslag.bak('paspoortVerzoeken').filter(v => v.key === key).slice(0, 60).map(publiekVerzoek);
   }
   function partnerVerzoeken(supplierCode) {
     lijsten(); vervalOpschonen();
     return {
-      verzoeken: db.data.paspoortVerzoeken.filter(v => v.supplierCode === supplierCode).slice(0, 60).map(publiekVerzoek),
-      incidenten: db.data.paspoortIncidenten.filter(i => i.supplierCode === supplierCode).slice(0, 40).map(publiekIncident)
+      verzoeken: opslag.bak('paspoortVerzoeken').filter(v => v.supplierCode === supplierCode).slice(0, 60).map(publiekVerzoek),
+      incidenten: opslag.bak('paspoortIncidenten').filter(i => i.supplierCode === supplierCode).slice(0, 40).map(publiekIncident)
     };
   }
   function incidentenVoorOffice(alleen) {
     lijsten();
-    let lijst = db.data.paspoortIncidenten;
+    let lijst = opslag.bak('paspoortIncidenten');
     if (alleen === 'open') lijst = lijst.filter(i => i.status === 'ingediend');
     return lijst.slice(0, 200).map(publiekIncident);
   }

@@ -12,7 +12,7 @@
     var Geld = w.Geld, ov = B.ov, reks = ov.rekeningen || [];
     return '<h2>De AI-bankier</h2>' +
       '<div class="kaart">' +
-        '<div id="bkAiWe" style="white-space:pre-wrap;font-size:.85rem;line-height:1.55;">' +
+        '<div id="bkAiWe" class="s-1szr3a1">' +
           'Ik kijk mee met je rekeningen en geef eerlijk advies. Ik adviseer; beslissen doe jij.</div>' +
         '<div class="bk-snel">' +
           '<button class="knop bk-mini" data-bkq="Hoe kan ik het beste sparen?">Beter sparen?</button>' +
@@ -20,9 +20,9 @@
           '<button class="knop bk-mini" data-bkq="Wat kost een lening bij jullie en hoe werkt het?">Lening?</button>' +
         '</div>' +
         '<div class="bk-rij h-mt70">' +
-          '<input id="bkAiV" placeholder="Vraag de AI-bankier iets…" style="flex:1;min-width:10rem;">' +
+          '<input id="bkAiV" placeholder="Vraag de AI-bankier iets…" class="s-1cv76ip">' +
           '<button class="knop hoofd" id="bkAiB">Vraag</button></div>' +
-        '<ul id="bkAiTips" class="stil" style="margin:0.5rem 0 0 1.25rem;line-height:1.6;font-size:.8rem;"></ul>' +
+        '<ul id="bkAiTips" class="stil s-1qazw07"></ul>' +
       '</div>' +
       '<h2>Mijn rekeningen · totaal ' + Geld.euro(ov.totaalCenten) + '</h2>' +
       '<div class="kaart">' + (reks.length ? reks.map(B.rekHtml).join('') : '<p class="leeg">Nog geen rekeningen.</p>') + '</div>' +
@@ -37,7 +37,7 @@
         '<span><label class="lbl" for="bkOvan">Van</label>' + B.rekSelect('bkOvan') + '</span>' +
         '<span><label class="lbl" for="bkOnaar">Naar</label>' + B.rekSelect('bkOnaar') + '</span>' +
         '<span><label class="lbl" for="bkObed">Bedrag (€)</label>' +
-          '<input id="bkObed" type="number" min="0" step="0.01" style="width:7rem;"></span>' +
+          '<input id="bkObed" type="number" min="0" step="0.01" class="s-186ri2f"></span>' +
         '<button class="knop hoofd" id="bkOdoe">Overboek</button></div></div>' +
       '<h2>Het financiële hart</h2>' +
       '<div class="kaart"><p class="stil">Alles op één afschrift: je bankrekeningen, je RTG Pay-wallet en ' +

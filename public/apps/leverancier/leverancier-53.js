@@ -1,7 +1,7 @@
 /* de skischool: groepslessen en de rest */
     h += '<div class="st-sec h-mt100">'+T('al.school','De skischool')+'</div>';
-    h += d.groepslessen.map(l=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+' · '+esc(l.tijd)+'</b><span class="sub">'+l.deelnemers.length+' van '+l.capaciteit+'</span></div>'+
+    h += d.groepslessen.map(l=>'<div class="s-q8bqou">'+
+      '<div class="s-tbd6xd"><b class="s-1q6kbkp">'+esc(l.naam)+' · '+esc(l.tijd)+'</b><span class="sub">'+l.deelnemers.length+' van '+l.capaciteit+'</span></div>'+
       (l.deelnemers.length?'<div class="sub h-mt30">'+l.deelnemers.slice(0,10).map(esc).join(' · ')+'</div>':'')+
       '<div class="row-gap h-mt45"><input data-algn="'+l.id+'" class="st-in h-flex2" placeholder="'+T('al.deelnemer','Naam deelnemer')+'" maxlength="60">'+knop('data-algi', l.id, T('al.meld','Meld aan'), true)+'</div></div>').join('');
     h += '<div class="row-gap h-mt50"><select id="alIns" class="st-in h-flex2">'+d.instructeurs.map(i=>'<option value="'+i.id+'">'+esc(i.naam)+' · priveles '+eur(i.prijs)+'</option>').join('')+'</select>'+
@@ -12,7 +12,7 @@
     // de chalets
     h += '<div class="st-sec h-mt100">'+T('al.chalets','De chalets')+'</div>'+
       '<div class="row-gap"><select id="alCh" class="st-in h-flex2">'+d.chalets.map(c=>'<option value="'+c.id+'">'+esc(c.naam)+' · '+c.bedden+' bedden · '+eur(c.nachtprijs)+'/n</option>').join('')+'</select>'+
-      '<input id="alCNaam" class="st-in h-flex1" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60"><input id="alCVan" class="st-in h-flex1" type="date"><input id="alCNachten" class="st-in" type="number" min="1" max="28" value="7" style="flex:0 0 4.5rem;">'+
+      '<input id="alCNaam" class="st-in h-flex1" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60"><input id="alCVan" class="st-in h-flex1" type="date"><input id="alCNachten" class="st-in s-mbp5mo" type="number" min="1" max="28" value="7">'+
       '<button id="alChalet" style="flex:1;'+goud+'">'+T('al.boek','Boek')+'</button></div>';
     h += (d.chaletBoekingen||[]).map(b=>'<div class="sub" style="padding:0.3rem 0;">'+esc(b.chalet)+' · '+esc(b.naam)+' · '+esc(b.van)+' tot '+esc(b.tot)+' · '+eur(b.prijs)+'</div>').join('');
     h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';
@@ -47,26 +47,26 @@
     const knop = (attr, id, tekst, vol) => '<button '+attr+'="'+id+'" style="'+(vol?'background:var(--gold);color:#000;border:none;':'background:none;border:1px solid var(--line);color:var(--soft);')+'border-radius:0;padding:0.35rem 0.7rem;font-family:inherit;font-size:0.72rem;'+(vol?'font-weight:600;':'')+'">'+tekst+'</button>';
     const k = d.kpi;
     let h = '<div class="st-sec h-mt140">'+T('zp.kop','Zorgverzekering · de werkplek')+'</div>'+
-      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+      '<div class="s-1ah2knl">'+
       [[k.actief, T('zp.k.actief','actieve polissen')],[k.open, T('zp.k.open','declaraties open')],[k.goedgekeurd, T('zp.k.goed','goedgekeurd')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div class="s-1fk9glc"><b class="s-123kxff">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // inschrijven: op codenaam, door een mens; de pas landt in de wallet
     h += '<div class="row-gap h-mt70"><input id="zpCode" class="st-in h-flex2" placeholder="'+T('zp.codenaam','Codenaam van het lid')+'" maxlength="60">'+
       '<select id="zpPakket" class="st-in h-flex1">'+Object.keys(d.pakketten).map(p=>'<option value="'+p+'">'+p+' · '+eur(d.pakketten[p])+' p/m</option>').join('')+'</select>'+
       '<button id="zpIn" style="flex:1;'+goud+'">'+T('zp.schrijfin','Schrijf in')+'</button></div>'+
       '<p class="sub h-mt30">'+T('zp.regel','Inschrijven doet altijd een medewerker, op codenaam; de zorgpas verschijnt direct in de RTG Wallet van het lid.')+'</p>';
-    h += (d.verzekerden||[]).slice(0,10).map(v=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
-      '<span class="sub" style="flex:0 0 4.5rem;">'+esc(v.pas)+'</span><b style="flex:1;font-size:0.85rem;">'+esc(v.codenaam)+'</b><span class="sub">'+esc(v.pakket)+' · '+esc(v.status)+'</span>'+
+    h += (d.verzekerden||[]).slice(0,10).map(v=>'<div class="s-57bs1i">'+
+      '<span class="sub" style="flex:0 0 4.5rem;">'+esc(v.pas)+'</span><b class="s-1q6kbkp">'+esc(v.codenaam)+'</b><span class="sub">'+esc(v.pakket)+' · '+esc(v.status)+'</span>'+
       (v.status==='actief'?knop('data-zpstop', v.id, T('zp.stop','Stop polis')):'')+'</div>').join('');
 
     // declaraties: invoeren en beslissen (mens beslist; afwijzen met reden)
     h += '<div class="st-sec h-mt100">'+T('zp.decl','Declaraties')+'</div>'+
-      '<div class="row-gap"><input id="zpDPas" class="st-in" placeholder="'+T('zp.pasnr','Pasnummer (ZP-XXXX)')+'" maxlength="12" style="flex:1;text-transform:uppercase;">'+
-      '<input id="zpDOms" class="st-in h-flex2" placeholder="'+T('zp.oms','Waar gaat het over?')+'" maxlength="160"><input id="zpDBedrag" class="st-in" type="number" min="1" step="0.01" placeholder="EUR" style="flex:0 0 6rem;">'+
+      '<div class="row-gap"><input id="zpDPas" class="st-in s-1hwwkj3" placeholder="'+T('zp.pasnr','Pasnummer (ZP-XXXX)')+'" maxlength="12">'+
+      '<input id="zpDOms" class="st-in h-flex2" placeholder="'+T('zp.oms','Waar gaat het over?')+'" maxlength="160"><input id="zpDBedrag" class="st-in s-12b91id" type="number" min="1" step="0.01" placeholder="EUR">'+
       '<button id="zpDIn" style="flex:1;'+goud+'">'+T('zp.dien','Dien in')+'</button></div>';
-    h += (d.declaraties||[]).map(x=>'<div style="border:1px solid '+(x.status==='ingediend'?'var(--gold)':'var(--line)')+';border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(x.codenaam)+' · '+esc(x.omschrijving)+'</b><span class="sub">'+eur(x.bedrag)+' · '+esc(x.status)+'</span></div>'+
+    h += (d.declaraties||[]).map(x=>'<div class="' + (x.status==='ingediend' ? 's-dbavhu' : 's-q8bqou') + '">'+
+      '<div class="s-tbd6xd"><b class="s-1q6kbkp">'+esc(x.codenaam)+' · '+esc(x.omschrijving)+'</b><span class="sub">'+eur(x.bedrag)+' · '+esc(x.status)+'</span></div>'+
       (x.reden?'<div class="sub">'+T('zp.reden','Reden')+': '+esc(x.reden)+'</div>':'')+
       (x.status==='ingediend'?'<div class="row-gap h-mt45">'+knop('data-zpgoed', x.id, T('zp.goed','Keur goed'), true)+
         '<input data-zpredin="'+x.id+'" class="st-in h-flex2" placeholder="'+T('zp.redenwaarom','Reden bij afwijzen')+'" maxlength="160">'+knop('data-zpaf', x.id, T('zp.af','Wijs af'))+'</div>':'')+'</div>').join('');

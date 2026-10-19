@@ -7,8 +7,9 @@
 const { coord } = require('../util');
 const { zelfdeMeldingKortGeleden } = require('../dubbelemelding');
 module.exports = (ctx) => {
-  const { db, save, anthropic, nu, id, ref, schoon, seed, deGemeente, publiekeMelding,
+  const { save, anthropic, nu, id, ref, schoon, seed, deGemeente, publiekeMelding,
     notify, notifySupplier, sseToSupplier, weefsel, CATS, PLOEG, MELD_STATUS } = ctx;
+  const G = ctx.opslag; // ./opslag.js
 
   function meld(sess, codenaam, data) {
     seed();
@@ -19,7 +20,7 @@ module.exports = (ctx) => {
     /* Dezelfde melder, dezelfde categorie, dezelfde tekst binnen een minuut is
        DEZELFDE melding -- geen tweede dossier in de wachtrij van de behandelaar.
        Zie kern/dubbelemelding.js voor waarom een idem-sleutel hier niet volstaat. */
-    const eerder = zelfdeMeldingKortGeleden(db.data.gemeenteMeldingen, { melderKey: sess.key, categorie, tekst },
+    const eerder = zelfdeMeldingKortGeleden(G.lijst('gemeenteMeldingen'), { melderKey: sess.key, categorie, tekst },
       ['categorie', 'tekst']);
     if (eerder) return { ok: true, melding: publiekeMelding(eerder), herhaald: true };
     const g = deGemeente();
@@ -31,8 +32,8 @@ module.exports = (ctx) => {
       melderKey: sess.key, melder: codenaam,
       status: 'nieuw', ploeg: PLOEG[categorie], updates: [], at: nu()
     };
-    db.data.gemeenteMeldingen.unshift(m);
-    db.data.gemeenteMeldingen = db.data.gemeenteMeldingen.slice(0, 20000);
+    G.pak('gemeenteMeldingen').unshift(m);
+    G.zet('gemeenteMeldingen', G.pak('gemeenteMeldingen').slice(0, 20000));
     /* En dezelfde melding gaat als WAARNEMING naar het stadsweefsel. Twee
        waarheden zijn dat niet: dit dossier is de BEHANDELING van de gemeente
        (ploeg, updates, status naar de melder), de zaak in het weefsel is het
@@ -57,14 +58,14 @@ module.exports = (ctx) => {
     return { ok: true, melding: publiekeMelding(m) };
   }
   function mijnMeldingen(key) {
-    return (db.data.gemeenteMeldingen || []).filter(m => m.melderKey === key).slice(0, 50).map(publiekeMelding);
+    return G.lijst('gemeenteMeldingen').filter(m => m.melderKey === key).slice(0, 50).map(publiekeMelding);
   }
 
   /* ---- gemeente-medewerkers ---- */
   function meldingenLijst(filter) {
     seed();
     filter = filter || {};
-    let list = (db.data.gemeenteMeldingen || []);
+    let list = G.lijst('gemeenteMeldingen');
     if (filter.ploeg) list = list.filter(m => m.ploeg === filter.ploeg);
     if (filter.status) list = list.filter(m => m.status === filter.status);
     else list = list.filter(m => !['opgelost', 'afgewezen'].includes(m.status));
@@ -72,7 +73,7 @@ module.exports = (ctx) => {
   }
   function meldingZet(actor, r, patch) {
     patch = patch || {};
-    const m = (db.data.gemeenteMeldingen || []).find(x => x.ref === String(r || ''));
+    const m = G.lijst('gemeenteMeldingen').find(x => x.ref === String(r || ''));
     if (!m) return { status: 404, error: 'Melding niet gevonden.' };
     if (typeof patch.status === 'string' && MELD_STATUS.includes(patch.status)) {
       m.status = patch.status;
@@ -147,5 +148,13 @@ module.exports = (ctx) => {
     } catch (e) { return { ok: true, ...val, bron: 'regel' }; }
   }
 
-  return { meld, mijnMeldingen, meldingenLijst, meldingZet, triage };
+  // VERGETEN (AVG art. 17): de knip van N21 hierboven, op verzoek en voor alles
+  function vergeetMelder(key, cn) {
+    let n = 0;
+    for (const m of G.lijst('gemeenteMeldingen'))
+      if (m && ((key && m.melderKey === key) || (cn && m.melder === cn))) { delete m.melderKey; delete m.melder; m.melderLos = nu(); n++; }
+    return { los: n };
+  }
+
+  return { meld, mijnMeldingen, meldingenLijst, meldingZet, triage, vergeetMelder };
 };

@@ -10,13 +10,9 @@ const { datum: klokDatum, nu: klokNu } = require('../lib/klok');
 module.exports = ({ db, save, crypto, schoon }) => {
   const nu = () => klokDatum().toISOString();
   const hash = v => cryptoNode.createHash('sha256').update(String(v || '')).digest('hex');
-  const lijst = () => (db.data.foundationRegistraties = Array.isArray(db.data.foundationRegistraties)
-    ? db.data.foundationRegistraties : []);
-  const rtfos = () => {
-    if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
-    for (const k of ['steden','vrijwilligers','partners']) if (!Array.isArray(db.data.rtfos[k])) db.data.rtfos[k] = [];
-    return db.data.rtfos;
-  };
+  const opslag = require('./rtfos/opslag')({ db }); // de deur naar rtfos en de registraties
+  const lijst = opslag.registraties;
+  const rtfos = () => opslag.wortel(['steden', 'vrijwilligers', 'partners']);
   const rid = n => crypto.randomBytes(n || 8).toString('hex');
   const emailOk = v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
   const alleen = v => String(v || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
@@ -79,7 +75,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
       return { status:429, error:'Er staan al meerdere open aanvragen op dit e-mailadres.' };
     const token = rid(24); a.statusTokenHash = hash(token);
     a.toelating = controle.startControle(type, a, at);
-    lijst().unshift(a); db.data.foundationRegistraties = lijst().slice(0, 1000); save();
+    lijst().unshift(a); opslag.zetRegistraties(lijst().slice(0, 1000)); save();
     return { ok:true, id:a.id, statusToken:token, aanvraag:publiek(a) };
   }
 

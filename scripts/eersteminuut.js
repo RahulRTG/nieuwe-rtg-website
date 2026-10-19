@@ -60,7 +60,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'EERSTEMINUUT.json');
@@ -322,7 +322,7 @@ if (require.main !== module) {
   if (!token) {
     const uit = { stempel: stempel(), gemeten: false,
       reden: 'registratie langs /api/auth/register mislukte; er is NIET gemeten' };
-    fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+    if (magSchrijven(eisSchoneBoom('eersteminuut'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
     console.error('NIET GEMETEN: registratie mislukte. Draait de server op ' + BASIS + '?');
     process.exit(controle ? 1 : 2);
   }
@@ -441,7 +441,7 @@ if (require.main !== module) {
         reden: 'de ledenapp is niet bereikt: geen #rtgCommand en geen #onbGate. ' +
                'Er is dus NIETS gemeten. Bovenste kop op het scherm: "' + binnen.kop + '".',
         hoe: 'node scripts/eersteminuut.js' };
-      fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+      if (magSchrijven(eisSchoneBoom('eersteminuut'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
       console.error('NIET GEMETEN: de ledenapp is niet bereikt (kop: "' + binnen.kop + '").');
       console.log('EERSTE_MINUUT: NIET GEMETEN');
       await browser.close();
@@ -642,7 +642,7 @@ if (require.main !== module) {
                nietMeetbaar: toetsen.filter((t) => t.uitslag === 'nietMeetbaar').length },
     toetsen
   };
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('eersteminuut'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
 
   if (!stil) {
     console.log('EERSTEMINUUT.json -- ' + uit.telling.gehaald + ' gehaald, ' + uit.telling.gezakt +

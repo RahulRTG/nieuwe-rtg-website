@@ -32,7 +32,7 @@
 'use strict';
 
 /* ---- 1. DE WERELD: wat er eenmalig aan moet ------------------------------ */
-async function zetWereldKlaar({ roep, tokens, aanmeld }) {
+async function zetWereldKlaar({ roep, tokens, aanmeld, tweede }) {
   const gedaan = [];
   const sleutels = {};
   /* De leden-bank staat in een verse database niet live, en dat gaf vier
@@ -54,16 +54,40 @@ async function zetWereldKlaar({ roep, tokens, aanmeld }) {
      bestaat -- en een extern voorbeeld-IBAN is dat niet ("De tegenrekening
      bestaat niet"). Zelfde ingreep als scripts/lib/idemwereld.js, en om dezelfde
      reden: geld sturen vraagt iemand anders. */
-  if (aanmeld) {
-    const ander = await aanmeld('/api/login', { tier: 'lifestyle' });
+  /* `tweede` is een PROEFLID met een gebonden toestel (./proeftoestel.js): de
+     bank vraagt sinds A-P1-04 een eigen account, en een demo-pas kreeg hier een
+     403 op /api/bank/akkoord. Zonder `tweede` blijft het de oude weg. */
+  if (tweede || aanmeld) {
+    const ander = tweede || await aanmeld('/api/login', { tier: 'lifestyle' });
+    if (ander && ander.codenaam) sleutels.anderCodenaam = ander.codenaam;
     if (ander && ander.token) {
       const ak2 = await roep('/api/bank/akkoord', ander.token, {});
       const iban2 = ak2 && ak2.data && ak2.data.rekening && ak2.data.rekening.iban;
       if (iban2) { sleutels.naarIban = iban2; gedaan.push('een tweede lid met een rekening'); }
     }
   }
+  /* GELD OP DE PAS EN IN DE KASSA (18 oktober 2026), voor de geldparen uit de
+     domeinlijst van scripts/herstel.js. Een tegoed kopen vraagt saldo, en geld
+     apart zetten vraagt omzet bij de zaak -- die komt van een kascode van het
+     lid, ingeind aan de kassa, langs de gewone routes en hun eigen poorten. */
+  const op = await roep('/api/pay/oplaad', tokens.member, { centen: 20000, idem: 'herstelwereld-' + vers() });
+  if (op && op.status >= 200 && op.status < 300) gedaan.push('saldo op de pas van het lid');
+  if (tokens.supplier) {
+    const kas = await roep('/api/pay/kascode', tokens.member, { centen: 10000, idem: 'herstelwereld-' + vers() });
+    const code = kas && kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code));
+    if (code) {
+      const v = await roep('/api/supplier/pos/sale', tokens.supplier,
+        { total: 100, method: 'rtgpay', payCode: code, idem: 'herstelwereld-' + vers() });
+      if (v && v.status >= 200 && v.status < 300) gedaan.push('omzet bij de zaak');
+      /* De kascode is daarmee gebruikt; de kascode van het paar is een verse. */
+    }
+  }
   return { gedaan, sleutels };
 }
+const vers = () => Math.random().toString(36).slice(2, 10);
+/* Een dag een eind vooruit, uit de klok; zie `straks` verderop. */
+const dagNa = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+let careDag = 0;
 
 /* ---- 2. HET LIJF: de velden die deze route eist -------------------------- */
 /* Per route, met de reden waarom dat veld er moet zijn -- overgenomen uit het
@@ -93,6 +117,48 @@ const LIJVEN = Object.freeze({
   '/api/bank/terugkerend/zet': (k) => ({ vanIban: k.iban, naarIban: k.naarIban,
     centen: 100, interval: 'maand', oms: 'proef',
     idem: 'herstelproef-' + Math.random().toString(36).slice(2, 10) }),
+
+  /* DE GELDPAREN uit DOMEINPAREN in scripts/herstel.js. Elk veld komt uit de
+     foutmelding van de route zelf (dezelfde waarden als scripts/lib/idemwereld.js),
+     en elke `idem` is vers per poging -- om dezelfde reden als hierboven. */
+  '/api/pay/kascode': () => ({ centen: 100, idem: 'herstelproef-' + vers() }),
+  '/api/pay/verzoek': (k) => ({ aan: [k.anderCodenaam], totaalCenten: 500, oms: 'proefklompje', idem: 'herstelproef-' + vers() }),
+  '/api/pay/tegoed/koop': (k) => ({ centen: 500, aan: k.anderCodenaam, oms: 'prooftegoed', idem: 'herstelproef-' + vers() }),
+  /* Een tegoed dat nog loopt, neemt de route alleen terug MET intrekken: de
+     code mag dan niet meer werken (kern/pay/tegoed.js). Zonder die vlag gaf zij
+     409 "terugnemen kan pas na de vervaldatum" -- de route zegt zelf hoe. */
+  '/api/pay/tegoed/terug': () => ({ intrekken: true, idem: 'herstelproef-' + vers() }),
+  '/api/supplier/giftcard/sell': () => ({ bedrag: 25, idem: 'herstelproef-' + vers() }),
+  /* Een VERSE naam per poging. Apart zetten onder een naam die al bestaat, TELT
+     BIJ dat oormerk op (kern/waarde/oormerk.js), en vrijgeven geeft het hele
+     oormerk vrij. Met een vaste naam stond het oormerk van de opwarmronde er
+     nog, zette de meetronde er 50 cent bij en gaf de terugweg het geheel vrij
+     -- inclusief het restant van de opwarming. Dan meet je het restant en niet
+     het paar; zelfde les als het verse adres bij publiceren. */
+  '/api/supplier/pay/treasury/apart': () => ({ naam: 'Proefoormerk ' + vers(), centen: 50, doel: 'btw' }),
+  '/api/wallet/voeg': () => ({ soort: 'klantenkaart', titel: 'Proefkaart', code: 'PROEF-' + vers() }),
+  /* De terugweg van een weggehaalde regel is een NIEUWE regel, dus zonder het
+     id van de oude: met dat id gaf regelZet 404 "deze regel bestaat niet". */
+  '/api/geld/beleid/zet': () => ({ soort: 'minimumbuffer', drempelCenten: 10000, niveau: 'kijken', id: undefined }),
+
+  /* EEN VERS TIJDSLOT PER POGING bij Care. De opzoeking vindt EEN behandeling
+     met haar vaste tijden, en die tijden hangen niet aan een dag: de agenda
+     van de behandelaar is per (dag, tijd) schaars (kern/care/leden.js). De
+     opwarmronde bezette dus het slot van de meetronde, en de heenweg kreeg 409
+     "Dat tijdslot is al bezet" -- van zijn eigen opwarming. Een andere DAG per
+     poging geeft elke boeking een vrij slot, zonder de bezetregel te raken:
+     dezelfde les als het verse adres bij publiceren hierboven. */
+  '/api/care/boek': () => ({ datum: dagNa(3 + (++careDag)) }),
+  /* DE BESCHERMZAAK KENT GEEN NAAM, en het plausibele lijf stuurt er een mee
+     (`naam`, `email`). De klasse weigert die velden hard
+     (kern/beschermzaak/klasse.js, WEIGERT) -- terecht, en dat blijft zo. Het
+     lijf hoort dus te sturen wat deze route vraagt: een aanleiding en een korte
+     feitelijke omschrijving; de codenaam maakt de zaak zelf. `undefined` valt
+     bij het versturen weg, zodat de velden echt ontbreken. */
+  '/api/rtfos/bescherming/open': { naam: undefined, email: undefined,
+    aanleiding: 'anders', wat: 'Proefzaak: een korte feitelijke omschrijving zonder namen.' },
+  '/api/rtfos/bescherming/sluit': { naam: undefined, email: undefined,
+    uitkomst: 'Proefzaak afgerond.', bewaarDagen: 30, bewaarWaarom: 'Proeftermijn van de herstelproef.' },
 
   '/api/member/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
   '/api/supplier/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
@@ -209,6 +275,14 @@ const ONBEREIKBAAR = Object.freeze({
   '/api/thuis/annuleer': 'een huis in de zaaiset',
   '/api/rtfos/meldcode/open': 'een stadsafdeling in de zaaiset',
   '/api/rtfos/meldcode/sluit': 'een stadsafdeling in de zaaiset',
+  /* Gemeten op 18 oktober 2026, met het lijf dat de beschermzaak WEL vraagt
+     (zie LIJVEN): de heenweg geeft dan 404 "Deze stadsafdeling bestaat niet".
+     Een beschermzaak hangt aan een stad, net als het meldcode-dossier hierboven,
+     en de zaaiset heeft er geen. Zelfde besluit als bij de meldcode: de proef
+     richt geen stad in om zichzelf iets te meten te geven. Het lijf blijft
+     staan, zodat dit paar meteen meetbaar is zodra de wereld een stad heeft. */
+  '/api/rtfos/bescherming/open': 'een stadsafdeling in de zaaiset; een beschermzaak hangt aan een stad',
+  '/api/rtfos/bescherming/sluit': 'een stadsafdeling in de zaaiset; een beschermzaak hangt aan een stad',
   '/api/office/afdelingshotel/boek': 'een afdeling in het afdelingshotel',
   '/api/office/afdelingshotel/annuleer': 'een afdeling in het afdelingshotel',
   '/api/vak/ritme/start': 'een zaak met vaste afspraken',

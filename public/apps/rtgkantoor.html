@@ -56,13 +56,31 @@
 <script src="/shared/kantoorgesprek.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-1sfr7pa:not(#_#_#_){border-top:none}
+.s-1xjix7q:not(#_#_#_){background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;font:inherit;padding:0}
+.s-ejfhpw:not(#_#_#_){font-size:.9rem}
+.s-hdxayl:not(#_#_#_){font-size:1.05rem}
+.s-hfkoqo:not(#_#_#_){font-size:1.35rem}
+.s-kba0f8:not(#_#_#_){margin:0.5rem 0 0.5rem}
+.s-xqgtey:not(#_#_#_){font-size:.95rem;margin-top:0.75rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <a class="terug" href="/apps/app.html">← Apps</a>
-  <div><div class="ey">Het RTG Kantoor</div><h1 style="font-size:1.35rem;">De RTG AI</h1></div>
+  <div><div class="ey">Het RTG Kantoor</div><h1 class="s-hfkoqo">De RTG AI</h1></div>
 </header>
 <main id="main" role="main">
   <section id="vLogin" class="kaart" hidden>
@@ -81,7 +99,7 @@
         <span class="stil" id="sinds"></span>
       </div>
       <div class="h-mt80">
-        <div class="i-15e9ke rij"><b style="font-size:.9rem;">Gereedheid</b><b id="pct" style="color:var(--gold);font-variant-numeric:tabular-nums;"></b></div>
+        <div class="i-15e9ke rij"><b class="s-ejfhpw">Gereedheid</b><b id="pct" style="color:var(--gold);font-variant-numeric:tabular-nums;"></b></div>
         <div class="meter"><i id="meter" style="width:0%;"></i></div>
         <span class="stil" id="meterUit"></span>
       </div>
@@ -101,28 +119,28 @@
 
     <div class="deel">Het journaal</div>
     <div class="kaart">
-      <h2 style="font-size:1.05rem;">Het journaal van de AI</h2>
+      <h2 class="s-hdxayl">Het journaal van de AI</h2>
       <div class="journaal" id="journaal"><div>Laden…</div></div>
     </div>
 
     <div class="deel">De Onderzoeker</div>
     <div class="kaart">
       <div class="i-15e9ke rij">
-        <h2 style="font-size:1.05rem;">De Onderzoeker · de tweede AI</h2>
+        <h2 class="s-hdxayl">De Onderzoeker · de tweede AI</h2>
         <span class="fase meelezen" id="oFase">…</span>
       </div>
-      <p class="stil" style="margin:0.5rem 0 0.5rem;">De RTG AI bouwt deze tweede AI zelf, met zijn meelees-kennis als leerstof. Af? Dan werkt de Onderzoeker agentisch: een vraag wordt een plan, het plan een reeks stappen langs de bronnen, en de reeks een rapport. Hij leest alleen en adviseert alleen; wat er met een rapport gebeurt, beslist u.</p>
+      <p class="stil s-kba0f8">De RTG AI bouwt deze tweede AI zelf, met zijn meelees-kennis als leerstof. Af? Dan werkt de Onderzoeker agentisch: een vraag wordt een plan, het plan een reeks stappen langs de bronnen, en de reeks een rapport. Hij leest alleen en adviseert alleen; wat er met een rapport gebeurt, beslist u.</p>
       <div class="rij">
         <button class="knop stil2" id="oBouw">Bouwstap door de RTG AI</button>
         <span class="stil" id="oBouwUit"></span>
       </div>
       <div class="rij h-mt80">
-        <input class="veld" id="oVraag" maxlength="160" placeholder="Onderzoeksvraag (bijv. hoe lopen de vrachtstromen?)" style="flex:1;min-width:12rem;">
+        <input class="veld s-1cv8ghr" id="oVraag" maxlength="160" placeholder="Onderzoeksvraag (bijv. hoe lopen de vrachtstromen?)">
         <button class="knop" id="oGo" disabled>Start onderzoek</button>
       </div>
       <div id="oRapport" class="journaal"></div>
       <div class="regel">Vaste regel: de Onderzoeker verandert nooit iets in het systeem. Hij verzamelt, analyseert en rapporteert; beslissen blijft mensenwerk.</div>
-      <h2 style="font-size:.95rem;margin-top:0.75rem;">Eerdere rapporten en het bouwlogboek</h2>
+      <h2 class="s-xqgtey">Eerdere rapporten en het bouwlogboek</h2>
       <div class="journaal" id="oLog"><div>Laden…</div></div>
     </div>
   </section>
@@ -176,7 +194,7 @@ async function ververs(){
   $('#kRoer').hidden = S.fase === 'aan-het-roer';
   $('#kTerug').hidden = S.fase !== 'aan-het-roer';
   $('#journaal').innerHTML = (S.journaal || []).map(j =>
-    '<div class="'+esc(j.soort)+'"><span style="color:var(--soft);">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De AI leest rustig mee; het journaal vult zich vanzelf.</div>';
+    '<div class="'+esc(j.soort)+'"><span class="s-1pv2lmv">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De AI leest rustig mee; het journaal vult zich vanzelf.</div>';
 }
 /* ---- de Onderzoeker: de tweede AI, gebouwd door de eerste ---- */
 let O = null;
@@ -190,16 +208,16 @@ async function verversO(){
   $('#oBouwUit').textContent = klaar ? 'af: alle ' + O.bouwplan + ' bouwstappen gedaan' : 'bouwstap ' + O.bouwstappen + ' van ' + O.bouwplan;
   $('#oGo').disabled = !klaar;
   $('#oLog').innerHTML = (O.rapporten || []).map(r =>
-    '<div><button class="oOpen" data-id="'+esc(r.id)+'" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;font:inherit;padding:0;">'+new Date(r.gestart).toLocaleTimeString('nl-NL')+' · '+esc(r.vraag)+'</button> <span style="color:var(--soft);">('+r.stappen+' stappen)</span></div>').join('') +
-    (O.logboek || []).map(j => '<div class="'+esc(j.soort)+'"><span style="color:var(--soft);">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De Onderzoeker wacht op zijn eerste bouwstap.</div>';
+    '<div><button class="oOpen s-1xjix7q" data-id="'+esc(r.id)+'">'+new Date(r.gestart).toLocaleTimeString('nl-NL')+' · '+esc(r.vraag)+'</button> <span class="s-1pv2lmv">('+r.stappen+' stappen)</span></div>').join('') +
+    (O.logboek || []).map(j => '<div class="'+esc(j.soort)+'"><span class="s-1pv2lmv">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De Onderzoeker wacht op zijn eerste bouwstap.</div>';
   document.querySelectorAll('.oOpen').forEach(b => b.addEventListener('click', async () => {
     try { const r = await api('onderzoeker/rapport', { id: b.dataset.id }); toonRapport(r.rapport); } catch(e){ alert(e.message); }
   }));
 }
 function toonRapport(r){
-  $('#oRapport').innerHTML = '<div class="klaar" style="border-top:none;">Rapport · '+esc(r.vraag)+'</div>' +
-    r.stappen.filter(st => st.soort !== 'analyse').map(st => '<div><b style="color:var(--soft);">stap '+st.nr+' · '+esc(st.soort)+'</b> · '+esc(st.tekst)+'</div>').join('') +
-    '<div><b style="color:var(--soft);">de analyse</b> · '+esc(r.analyse)+'</div>' +
+  $('#oRapport').innerHTML = '<div class="klaar s-1sfr7pa">Rapport · '+esc(r.vraag)+'</div>' +
+    r.stappen.filter(st => st.soort !== 'analyse').map(st => '<div><b class="s-1pv2lmv">stap '+st.nr+' · '+esc(st.soort)+'</b> · '+esc(st.tekst)+'</div>').join('') +
+    '<div><b class="s-1pv2lmv">de analyse</b> · '+esc(r.analyse)+'</div>' +
     '<div class="roer">'+esc(r.advies)+'</div>';
 }
 $('#oBouw').addEventListener('click', async () => { try { await api('onderzoeker/ontwikkel'); verversO(); ververs(); } catch(e){ alert(e.message); } });

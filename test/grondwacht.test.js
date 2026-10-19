@@ -112,6 +112,48 @@ test('eenWaarheid: een ontbrekende verplichte bron is hard, een losse workflow z
   assert.equal(per['ci.yml#1'], 'zacht');
 });
 
+/* PIN EN BAND. engines.node is een band (">=22.13 <27"), geen pin. De wacht
+   las daar eerst alleen de 22 uit en stond wekenlang rood op "engines=22,
+   .nvmrc=26" (issue #293) -- terwijl CI en container het gewoon eens waren.
+   Beide kanten worden hier vastgezet: een pin BINNEN de band is geen
+   bevinding, een pin ERBUITEN is hard. */
+const band = (tekst) => ({ naam: 'package.json engines.node', major: grondwacht.bandUit(tekst).min, band: grondwacht.bandUit(tekst), tekst, verplicht: true, hoe: 'x' });
+
+test('eenWaarheid: een pin binnen de engines-band is geen onenigheid', () => {
+  const u = grondwacht.eenWaarheid([band('>=22.13 <27'), bron('.nvmrc', 26), bron('Dockerfile', 26)]);
+  assert.deepEqual(u.bevindingen, []);
+  assert.equal(u.major, 26, 'de pin is de draaiende waarheid, niet de bodem van de band');
+});
+
+test('eenWaarheid: een pin buiten de engines-band is HARD', () => {
+  for (const pin of [27, 20]) {
+    const u = grondwacht.eenWaarheid([band('>=22.13 <27'), bron('.nvmrc', pin), bron('Dockerfile', pin)]);
+    const b = u.bevindingen.find(x => x.code === 'VERSIE_BUITEN_BAND');
+    assert.ok(b, `pin ${pin} buiten de band moet zakken`);
+    assert.equal(b.ernst, 'hard');
+    assert.match(b.wat, new RegExp(`\\.nvmrc=${pin}`));
+  }
+});
+
+test('eenWaarheid: een band maakt pinnen die het oneens zijn niet eens', () => {
+  const u = grondwacht.eenWaarheid([band('>=22 <27'), bron('.nvmrc', 24), bron('Dockerfile', 26)]);
+  assert.ok(u.bevindingen.some(x => x.code === 'VERSIES_ONEENS'), 'beide binnen de band, toch oneens');
+  assert.equal(u.major, null);
+});
+
+test('bandUit: leest een enkel interval, en weigert wat het niet zeker weet', () => {
+  assert.deepEqual(grondwacht.bandUit('>=22.13 <27'), { min: 22, max: 26 });
+  assert.deepEqual(grondwacht.bandUit('>=22'), { min: 22, max: Infinity });
+  assert.deepEqual(grondwacht.bandUit('<=24'), { min: 0, max: 24 });
+  assert.deepEqual(grondwacht.bandUit('<26.4'), { min: 0, max: 26 });
+  assert.deepEqual(grondwacht.bandUit('^22.0.0'), { min: 22, max: 22 });
+  assert.deepEqual(grondwacht.bandUit('22'), { min: 22, max: 22 });
+  assert.equal(grondwacht.bandUit('^22 || ^24'), null, 'twee intervallen: dan de strenge lezing');
+  assert.equal(grondwacht.bandUit('lts/*'), null);
+  assert.equal(grondwacht.bandUit('>=27 <22'), null);
+  assert.equal(grondwacht.bandUit(null), null);
+});
+
 test('majorUit: leest de major uit elke vorm waarin hij hier voorkomt', () => {
   for (const [tekst, verwacht] of [['22', 22], ['v22', 22], ['22.11.0', 22], ['>=22', 22], ['^22.0.0', 22], ['22-slim', 22]]) {
     assert.equal(grondwacht.majorUit(tekst), verwacht, tekst);

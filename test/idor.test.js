@@ -101,9 +101,26 @@ test('de proef overleeft zijn eigen ronde: een 401 van een DODE sessie telt niet
      lid meer om in te loggen. Gemeten op route 1147 van de 1480: alles daarna
      oogstte niets. De proef vervangt zijn proefpersoon nu, en dat hoort te
      gebeuren; blijft dit nul, kijk dan of privacy/delete nog in de rij zit. */
-  assert.ok((reg.gemeten || {}).subjectVervangen >= 1,
-    'de proef wist zijn eigen proefpersoon en hoort hem te vervangen; gemeten: ' +
-    JSON.stringify((reg.gemeten || {}).subjectVervangen));
+  /* Sinds /api/privacy/delete een zwaar pad is (kern/identiteit/
+     bezitsbewijs.js) komt de proef zonder gebonden toestel niet meer tot het
+     wissen: dan is er niets te vervangen. Nul is dan alleen goed als het
+     register ZEGT dat de route aan de toesteldeur bleef -- niet als hij stil uit
+     de rij verdween, en niet als hij als "gescheiden" telt. */
+  const wis = (reg.perRoute || {})['POST /api/privacy/delete'];
+  const aanDeToesteldeur = !!wis && wis.staat === 'onbereikbaar' && /bezitsbewijs vereist/.test(wis.reden || '');
+  assert.ok((reg.gemeten || {}).subjectVervangen >= 1 || aanDeToesteldeur,
+    'de proef wist zijn eigen proefpersoon en hoort hem te vervangen, of het register zegt dat privacy/delete aan de toesteldeur bleef; gemeten: ' +
+    JSON.stringify((reg.gemeten || {}).subjectVervangen) + ', privacy/delete: ' + JSON.stringify(wis));
+});
+
+test('een weigering aan de toesteldeur is geen scheiding: de eigenaarschapsvraag is niet gesteld', () => {
+  const deur = oordeelIdor(403, '{"error":"Deze handeling vraagt een toestel dat zijn sleutel kan aantonen.","bezitsbewijs":"vereist"}');
+  assert.equal(deur.staat, 'onbereikbaar', 'een zwaar pad weigert ook het eigen object van B zonder toestel');
+  assert.match(deur.reden, /bezitsbewijs vereist/);
+  const gebonden = oordeelIdor(401, '{"error":"Deze sessie is aan een sleutel gebonden.","bezitsbewijs":"vereist"}');
+  assert.equal(gebonden.staat, 'onbereikbaar');
+  const gewoon = oordeelIdor(403, '{"error":"Dit is niet van jou."}');
+  assert.equal(gewoon.staat, 'gescheiden', 'een gewone weigering blijft een scheiding');
 });
 
 test('een weigering die een persoonsveld lekt is gescheiden EN een lek', () => {

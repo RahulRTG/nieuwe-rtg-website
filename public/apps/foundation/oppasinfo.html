@@ -42,6 +42,17 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12izg7a:not(#_#_#_){color:var(--rtg-leesgoud,var(--goud))}
+.s-1ewfnyq:not(#_#_#_){color:var(--zacht);font-size:.85rem;margin-bottom:.7rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -61,7 +72,7 @@
 
     <div class="kaart blok">
       <h2>Noodnummers</h2>
-      <div class="h" style="color:var(--zacht);font-size:.85rem;margin-bottom:.7rem;">Alleen voor noodgevallen: huisarts, 112, een buur. Het gezin zelf bereik je via <a href="contact.html" style="color:var(--rtg-leesgoud,var(--goud))">Contact</a> in de app, geen telefoonnummer nodig.</div>
+      <div class="h s-1ewfnyq">Alleen voor noodgevallen: huisarts, 112, een buur. Het gezin zelf bereik je via <a href="contact.html" class="s-12izg7a">Contact</a> in de app, geen telefoonnummer nodig.</div>
       <div id="contacten"><div class="leeg">Nog geen noodnummers ingevuld.</div></div>
     </div>
     <div class="kaart blok">

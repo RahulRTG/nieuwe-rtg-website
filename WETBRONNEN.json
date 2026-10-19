@@ -1,5 +1,6 @@
 {
   "_uitleg": "Het register van de wetwacht (scripts/wetwacht.js). Per regeling: de bron die gevolgd wordt, de vingerafdruk van de laatst geziene tekst, en welke documenten in dit huis eraan hangen. De wacht meldt alleen DAT een bron veranderd is; wat dat betekent beoordeelt een mens (CONCERN.md: de AI is geen juridische autoriteit). Afdrukken vastleggen: npm run wetwacht:vast.",
+  "grens": "De afdruk per bron is de laatst GEZIENE tekst, geen bevestiging dat die tekst nog geldt of dat iemand hem juridisch heeft beoordeeld. Een regeling die hier niet als bron staat, wordt niet gevolgd.",
   "bronnen": [
     {
       "code": "avg",

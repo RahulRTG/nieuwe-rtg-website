@@ -55,6 +55,20 @@
   @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12izg7a:not(#_#_#_){color:var(--rtg-leesgoud,var(--goud))}
+.s-155en9g:not(#_#_#_){--kleur:var(--campus-blauw)}
+.s-17m64j4:not(#_#_#_){--kleur:var(--campus-groen)}
+.s-1blzjxo:not(#_#_#_){--kleur:var(--campus-paars)}
+.s-kg2gig:not(#_#_#_){--kleur:var(--goud)}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -110,10 +124,10 @@
       </section>
       <section class="sectie"><div class="sectiekop"><div><h2>Vier verbonden werelden</h2><p>Één profiel, één voortgang en één veilige omgeving.</p></div></div>
         <div class="werelden">
-          <button class="wereld" style="--kleur:var(--campus-blauw)" data-url="school.html" data-titel="Mijn school" data-app="rtf-school"><small>Leren</small><h3>School</h3><p>Rooster, huiswerk, lessen, cijfers en contact met de klas.</p><b>Open school →</b></button>
-          <button class="wereld" style="--kleur:var(--campus-groen)" data-url="leerpaspoort.html" data-titel="Leerpaspoort" data-app="rtf-leerpaspoort"><small>Oefenen</small><h3>Leerpaspoort</h3><p>Oefen in je eigen tempo en krijg uitleg zonder prestatiedruk.</p><b>Start een leerroute →</b></button>
-          <button class="wereld" style="--kleur:var(--goud)" data-url="speelhal.html" data-titel="Game Hall" data-app="rtf-speelhal"><small>Toepassen</small><h3>Game Hall</h3><p>Speel korte, eindige spellen die denken, rekenen en samenwerken trainen.</p><b>Ga naar de hal →</b></button>
-          <button class="wereld" style="--kleur:var(--campus-paars)" data-url="/apps/spelen.html?pas=foundation&open=magnaat" data-titel="Magnaat" data-app="rtf-magnaat"><small>Ondernemen</small><h3>Magnaat</h3><p>Bouw een eerlijke onderneming en leer over risico, bank, handel en mensen.</p><b>Bouw je bedrijf →</b></button>
+          <button class="wereld s-155en9g" data-url="school.html" data-titel="Mijn school" data-app="rtf-school"><small>Leren</small><h3>School</h3><p>Rooster, huiswerk, lessen, cijfers en contact met de klas.</p><b>Open school →</b></button>
+          <button class="wereld s-17m64j4" data-url="leerpaspoort.html" data-titel="Leerpaspoort" data-app="rtf-leerpaspoort"><small>Oefenen</small><h3>Leerpaspoort</h3><p>Oefen in je eigen tempo en krijg uitleg zonder prestatiedruk.</p><b>Start een leerroute →</b></button>
+          <button class="wereld s-kg2gig" data-url="speelhal.html" data-titel="Game Hall" data-app="rtf-speelhal"><small>Toepassen</small><h3>Game Hall</h3><p>Speel korte, eindige spellen die denken, rekenen en samenwerken trainen.</p><b>Ga naar de hal →</b></button>
+          <button class="wereld s-1blzjxo" data-url="/apps/spelen.html?pas=foundation&open=magnaat" data-titel="Magnaat" data-app="rtf-magnaat"><small>Ondernemen</small><h3>Magnaat</h3><p>Bouw een eerlijke onderneming en leer over risico, bank, handel en mensen.</p><b>Bouw je bedrijf →</b></button>
         </div>
       </section>
       <section class="sectie"><div class="sectiekop"><div><h2>Leerreizen</h2><p>Geen losse apps, maar routes met een duidelijk doel.</p></div></div>
@@ -185,7 +199,7 @@
   }
   async function laadEco(){
     const s=window.Sessie&&Sessie.huidig&&Sessie.huidig();
-    if(!s||!s.code||!s.token){document.getElementById('ecoStatus').textContent='Kies eerst je gezinsprofiel; daarna toont de Campus automatisch alles wat bij jouw leeftijd past.';document.getElementById('ecoGrid').innerHTML='<div class="eco-leeg"><a href="index.html" style="color:var(--rtg-leesgoud,var(--goud))">Kies een profiel om de hele Foundation te openen →</a></div>';return;}
+    if(!s||!s.code||!s.token){document.getElementById('ecoStatus').textContent='Kies eerst je gezinsprofiel; daarna toont de Campus automatisch alles wat bij jouw leeftijd past.';document.getElementById('ecoGrid').innerHTML='<div class="eco-leeg"><a href="index.html" class="s-12izg7a">Kies een profiel om de hele Foundation te openen →</a></div>';return;}
     try{
       toegang=await Sessie.toegang('campus'); if(!toegang||!toegang.toegestaan)return;
       const mag=new Set(toegang.apps||[]);

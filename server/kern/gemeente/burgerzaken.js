@@ -4,7 +4,8 @@
    eigen afspraken volgen/annuleren. De medewerker ziet de dagplanning. Krijgt de
    gedeelde ctx van kern/gemeente/index.js. */
 module.exports = (ctx) => {
-  const { db, save, nu, vandaag, isDatum, id, ref, schoon, seed, deGemeente, sseToSupplier, BURGERZAKEN, BALIE_SLOTS } = ctx;
+  const { save, nu, vandaag, isDatum, id, ref, schoon, seed, deGemeente, sseToSupplier, BURGERZAKEN, BALIE_SLOTS } = ctx;
+  const G = ctx.opslag; // ./opslag.js
 
   /* GEEN GEMEENTE, GEEN BALIE. `!g ||` betekende: is er geen gemeente, dan is de
      balie OPEN. Dat is precies verkeerd om -- een balie van een gemeente die
@@ -21,7 +22,7 @@ module.exports = (ctx) => {
     };
   }
   function bezetOp(datum, tijd) {
-    return (db.data.gemeenteAfspraken || []).filter(a => a.datum === datum && a.tijd === tijd && a.status === 'gepland').length;
+    return G.lijst('gemeenteAfspraken').filter(a => a.datum === datum && a.tijd === tijd && a.status === 'gepland').length;
   }
   function burgerzakenSlots(soort, datum) {
     seed();
@@ -46,15 +47,15 @@ module.exports = (ctx) => {
     const g = deGemeente();
     const cap = (g && g.gemeente && g.gemeente.balie.capaciteitPerSlot) || 2;
     if (bezetOp(data.datum, data.tijd) >= cap) return { status: 409, error: 'Dit tijdslot is vol. Kies een ander tijdstip.' };
-    if ((db.data.gemeenteAfspraken || []).some(a => a.key === sess.key && a.soort === soort && a.status === 'gepland'))
+    if (G.lijst('gemeenteAfspraken').some(a => a.key === sess.key && a.soort === soort && a.status === 'gepland'))
       return { status: 409, error: 'Je hebt al een afspraak voor ' + BURGERZAKEN[soort].label + ' openstaan.' };
     const a = {
       id: id(), ref: ref('A'), gemeente: g ? g.code : 'GEMEENTE', soort, soortLabel: BURGERZAKEN[soort].label,
       datum: data.datum, tijd: data.tijd, key: sess.key, codenaam, notitie: schoon(data.notitie, 200),
       status: 'gepland', at: nu()
     };
-    db.data.gemeenteAfspraken.unshift(a);
-    db.data.gemeenteAfspraken = db.data.gemeenteAfspraken.slice(0, 20000);
+    G.pak('gemeenteAfspraken').unshift(a);
+    G.zet('gemeenteAfspraken', G.pak('gemeenteAfspraken').slice(0, 20000));
     save();
     if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });
     return { ok: true, afspraak: { ref: a.ref, soort, soortLabel: a.soortLabel, datum: a.datum, tijd: a.tijd, status: a.status } };
@@ -71,17 +72,17 @@ module.exports = (ctx) => {
       nieuwAdres, huidigAdres: schoon(data.huidigAdres, 160) || null, aantal: Math.min(12, Math.max(1, parseInt(data.aantal, 10) || 1)),
       status: 'ontvangen', at: nu()
     };
-    db.data.gemeenteAfspraken.unshift(a);
+    G.pak('gemeenteAfspraken').unshift(a);
     save();
     if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });
     return { ok: true, aanvraag: { ref: a.ref, soortLabel: a.soortLabel, nieuwAdres, status: a.status } };
   }
   function mijnAfspraken(key) {
-    return (db.data.gemeenteAfspraken || []).filter(a => a.key === key).slice(0, 50)
+    return G.lijst('gemeenteAfspraken').filter(a => a.key === key).slice(0, 50)
       .map(a => ({ ref: a.ref, soort: a.soort, soortLabel: a.soortLabel, datum: a.datum, tijd: a.tijd, status: a.status, nieuwAdres: a.nieuwAdres || null }));
   }
   function afspraakAnnuleer(key, r) {
-    const a = (db.data.gemeenteAfspraken || []).find(x => x.ref === String(r || '') && x.key === key);
+    const a = G.lijst('gemeenteAfspraken').find(x => x.ref === String(r || '') && x.key === key);
     if (!a) return { status: 404, error: 'Afspraak niet gevonden.' };
     if (!['gepland', 'ontvangen'].includes(a.status)) return { status: 409, error: 'Deze afspraak is al ' + a.status + '.' };
     a.status = 'geannuleerd';
@@ -93,7 +94,7 @@ module.exports = (ctx) => {
   function afsprakenLijst(datum) {
     seed();
     const d = isDatum(datum) ? datum : vandaag();
-    return { ok: true, datum: d, afspraken: (db.data.gemeenteAfspraken || [])
+    return { ok: true, datum: d, afspraken: G.lijst('gemeenteAfspraken')
       .filter(a => (a.datum === d || (a.soort === 'verhuizing' && a.status === 'ontvangen')) && a.status !== 'geannuleerd')
       .map(a => ({ ref: a.ref, soort: a.soort, soortLabel: a.soortLabel, tijd: a.tijd, codenaam: a.codenaam, status: a.status, nieuwAdres: a.nieuwAdres || null })) };
   }

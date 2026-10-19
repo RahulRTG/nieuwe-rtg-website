@@ -74,7 +74,7 @@ Object.assign(kern, require('../kern/balans').maakBalans({
 /* De AI-regie: de boardroom kan Rahuls karakter en verhaal aanvullen
    (kern/rahul.js leest het profiel live uit de database; de vaste kern
    blijft in de code en wordt door de drift-tests bewaakt). */
-require('../kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
+require('../kern/rahul').zetRahulBron(require('../kern/rahul-profiel')({ db }).lees);
 
 /* De omgangsvormen van Rahul (kern/rahul.js, rahulLeadVoor): het geslacht van
    het lid komt uit het eigen profiel (v/m/x). Volwassen leden krijgen de

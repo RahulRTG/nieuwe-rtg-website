@@ -30,11 +30,8 @@ const TTL_MS = 90 * 24 * 60 * 60 * 1000;
 const MAX_PER_LID = 200;
 
 module.exports = ({ db, codenaamVan }) => {
-  function B() {
-    if (!db.data.wereld || typeof db.data.wereld !== 'object') db.data.wereld = {};
-    if (!db.data.wereld.bezoek || typeof db.data.wereld.bezoek !== 'object') db.data.wereld.bezoek = {};
-    return db.data.wereld.bezoek;
-  }
+  const opslag = require('./opslag')({ db });
+  const B = () => opslag.tak('bezoek');
 
   /* Noteer dat `kijker` het profiel van `doel` opende.
 

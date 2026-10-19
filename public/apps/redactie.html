@@ -123,6 +123,18 @@
   .i-x8hihn{margin:0.25rem 0 0.75rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
+.s-16gpxl2:not(#_#_#_){color:var(--muted);margin-top:0.5rem;line-height:1.6}
+.s-1cv8ghr:not(#_#_#_){flex:1;min-width:12rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -315,8 +327,8 @@ function huisstijlTab(){
   DESIGN=STAAT.site&&STAAT.site.blokken?JSON.parse(JSON.stringify(STAAT.site)):{blokken:[],volgorde:null}; DESIGN.volgorde=DESIGN.volgorde||null;
   const H=STAAT.huisstijl;
   $('#hoofd').innerHTML='<div class="kaart"><h3>Huisstijl</h3>'+
-    '<div class="rij h-mt60"><div style="flex:1;min-width:12rem;"><label class="lab">Naam van de krant</label><input class="veld" id="h_naam" maxlength="60" value="'+esc(H.naam)+'"></div>'+
-    '<div style="flex:1;min-width:12rem;"><label class="lab">Pay-off</label><input class="veld" id="h_payoff" maxlength="100" value="'+esc(H.payoff||'')+'"></div></div>'+
+    '<div class="rij h-mt60"><div class="s-1cv8ghr"><label class="lab">Naam van de krant</label><input class="veld" id="h_naam" maxlength="60" value="'+esc(H.naam)+'"></div>'+
+    '<div class="s-1cv8ghr"><label class="lab">Pay-off</label><input class="veld" id="h_payoff" maxlength="100" value="'+esc(H.payoff||'')+'"></div></div>'+
     '<label class="lab">Accentkleur</label><div class="swatches" id="h_swatches"></div>'+
     '<div class="rij h-mt70"><button class="knop" id="h_thema">Thema: '+(H.thema==='licht'?'Licht':'Donker')+'</button><button class="knop" id="h_bewaar">Huisstijl bewaren</button></div></div>'+
     '<div class="kaart"><div class="bouwbalk"><h3 class="h-flex1">Homepage</h3>'+
@@ -336,7 +348,7 @@ function bouwBlokkies(){const g=$('#blokkies');g.innerHTML='';BLOKTYPES.forEach(
 function bouwBeeldgrid(){const g=$('#beeldgrid');g.innerHTML='';BEELDEN.forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>{if(beeldDoel&&beeldDoel.zet)beeldDoel.zet(src);$('#beeldSheet').classList.remove('open');});g.appendChild(b);});}
 
 /* ---------- bediening ---------- */
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De redactie hoort bij je nieuwsbedrijf. Log in op de leverancier-app; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; document.querySelector('nav.tabs').style.display='none'; $('#snelKnop').style.display='none'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 class="s-14jo6ez">Log in op de zaak-app</h2><p class="s-16gpxl2">De redactie hoort bij je nieuwsbedrijf. Log in op de leverancier-app; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; document.querySelector('nav.tabs').style.display='none'; $('#snelKnop').style.display='none'; }
 else {
   document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>toon(b.dataset.t)));
   document.querySelectorAll('.sheet').forEach(sh=>sh.addEventListener('click',e=>{if(e.target===sh)sh.classList.remove('open');}));

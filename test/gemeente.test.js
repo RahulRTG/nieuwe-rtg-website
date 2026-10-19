@@ -189,3 +189,36 @@ test('dezelfde melding binnen een minuut geeft hetzelfde meldnummer, niet een tw
     { categorie: 'wegdek', tekst: 'Lantaarnpaal 12 doet het niet' }, lid);
   assert.notEqual(andereCat.body.melding.ref, ref, 'zelfde tekst, andere categorie: eigen dossier');
 });
+
+/* /api/gemeente/afspraken/mijn: de inwoner ziet zijn eigen afspraken met de
+   status zoals de gemeente hem bijhoudt -- ook een geannuleerde -- en een andere
+   inwoner ziet er niets van.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/gemeente/burgerzaken.js de filter
+   `a.key === key` in mijnAfspraken() op `true`; de toets zakte op "een andere
+   inwoner ziet deze afspraken niet". */
+test('mijn afspraken: eigen afspraken met hun status, van niemand anders', async () => {
+  const datum = overNdagen(5);
+  const slots = await api(base, '/api/gemeente/burgerzaken/slots', { soort: 'paspoort', datum }, lid);
+  const vrij = slots.body.slots.find(s => !s.vol);
+  assert.ok(vrij, 'er is een vrij tijdslot');
+  // test 2 annuleerde al een paspoortafspraak; een nieuwe mag dus weer
+  const a = await api(base, '/api/gemeente/afspraak', { soort: 'paspoort', datum, tijd: vrij.tijd }, lid);
+  assert.equal(a.status, 200, JSON.stringify(a.body).slice(0, 160));
+
+  const mijn = await api(base, '/api/gemeente/afspraken/mijn', {}, lid);
+  assert.equal(mijn.status, 200);
+  assert.ok(mijn.body.afspraken.length >= 2, 'de inwoner heeft afspraken');
+  const gepland = mijn.body.afspraken.find(x => x.ref === a.body.afspraak.ref);
+  assert.ok(gepland, 'de nieuwe afspraak staat erin');
+  assert.equal(gepland.status, 'gepland');
+  assert.equal(gepland.datum, datum);
+  assert.ok(mijn.body.afspraken.some(x => x.status === 'geannuleerd'), 'de in toets 2 geannuleerde afspraak blijft zichtbaar met zijn status');
+
+  const u = Date.now().toString().slice(-8);
+  const ander = (await api(base, '/api/auth/register', { name: 'Buurman', email: 'b' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const vanAnder = await api(base, '/api/gemeente/afspraken/mijn', {}, ander);
+  assert.equal(vanAnder.status, 200);
+  assert.ok(!vanAnder.body.afspraken.some(x => x.ref === a.body.afspraak.ref), 'een andere inwoner ziet deze afspraken niet');
+  assert.equal((await api(base, '/api/gemeente/afspraken/mijn', {}, null)).status, 401);
+});

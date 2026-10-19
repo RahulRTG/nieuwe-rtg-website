@@ -130,10 +130,55 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10kryme:not(#_#_#_){display:flex;gap:.4rem}
+.s-10ksllx:not(#_#_#_){display:flex;gap:.5rem}
+.s-11qe8p2:not(#_#_#_){margin:0.25rem 0 0.5rem}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-18e8s1e:not(#_#_#_){font-size:.78rem;margin-top:0.5rem}
+.s-1b4loep:not(#_#_#_){width:100%;height:120px;display:block}
+.s-1dcamif:not(#_#_#_){font-size:.75rem;margin-bottom:0.25rem}
+.s-1dxigij:not(#_#_#_){font-size:.76rem;margin-bottom:0.75rem}
+.s-1f8bdb1:not(#_#_#_){width:6rem;margin-bottom:0}
+.s-1gbowd5:not(#_#_#_){padding:.6rem .8rem}
+.s-1lip1to:not(#_#_#_){white-space:pre-wrap;font-size:.72rem;max-height:22rem;overflow:auto}
+.s-1oadtmp:not(#_#_#_){display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap;align-items:center}
+.s-1tm6avw:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap}
+.s-1v0qglo:not(#_#_#_){min-height:3rem;resize:vertical;margin-top:0.5rem}
+.s-1xkemiw:not(#_#_#_){padding:.7rem}
+.s-2fpzs8:not(#_#_#_){font-size:.8rem;margin-bottom:0.75rem}
+.s-2rzjzf:not(#_#_#_){margin:0 0 0.75rem;font-size:.9rem}
+.s-40wpk4:not(#_#_#_){margin:0}
+.s-72nn53:not(#_#_#_){max-height:22rem;overflow:auto;font-size:.76rem}
+.s-98k82s:not(#_#_#_){margin:0 0 0.25rem;font-weight:600}
+.s-9g83p7:not(#_#_#_){font-size:.8rem;margin-top:0.25rem}
+.s-faelie:not(#_#_#_){font-size:.74rem;margin-top:0.25rem}
+.s-j0h75i:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
+.s-j4q4w6:not(#_#_#_){min-height:3.4rem;resize:vertical;margin-top:0.5rem}
+.s-ndyzcf:not(#_#_#_){margin:0 0 0.5rem}
+.s-ohh0lm:not(#_#_#_){font-size:.74rem}
+.s-sv8jh7:not(#_#_#_){padding:.7rem;margin-bottom:0.75rem}
+.s-tk7yx:not(#_#_#_){display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem}
+.s-u7etlx:not(#_#_#_){flex:1;margin-bottom:0;min-width:11rem}
+.s-u7gqki:not(#_#_#_){flex:1;margin-bottom:0;min-width:14rem}
+.s-ulacx:not(#_#_#_){display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap}
+.s-vebk1y:not(#_#_#_){font-size:.76rem;margin-bottom:0.5rem}
+.s-vplm6p:not(#_#_#_){display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:0.5rem}
+.s-xjcbw8:not(#_#_#_){font-size:.72rem;margin-top:0.5rem}
+.s-xmivqi:not(#_#_#_){margin-bottom:1.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="techniek" class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <main class="wrap" id="hoofd" tabindex="-1">
   <section id="vLogin" class="kaart login" hidden>
@@ -142,7 +187,7 @@
     <input class="veld" id="liLogin" placeholder="E-mail of gebruikersnaam" autocomplete="username">
     <input class="veld" id="liPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
     <input class="veld" id="liCode" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Code uit uw authenticator of herstelcode" aria-label="Code van de tweede factor" hidden>
-    <button class="hoofd knop" id="bLogin" style="width:100%;" data-hoofdactie>Inloggen</button>
+    <button class="hoofd knop s-186m9vs" id="bLogin" data-hoofdactie>Inloggen</button>
     <div class="fout" id="loginFout"></div>
   </section>
 
@@ -152,7 +197,7 @@
         <h1><span class="merkvlak">RTG Techniek</span></h1>
         <div class="sub" id="wieSub"></div>
       </div>
-      <div style="display:flex;gap:.5rem;">
+      <div class="s-10ksllx">
         <button class="knop grijs klein" id="bVernieuw">Vernieuwen</button>
         <button class="knop grijs klein" id="bUit">Uitloggen</button>
       </div>
@@ -199,7 +244,7 @@
       <div id="beveiligBlok" hidden>
         <div class="i-1mh3zp sec">
           <span>Beveiliging &amp; inbraakdetectie</span>
-          <span style="display:flex;gap:.4rem;">
+          <span class="s-10kryme">
             <button class="knop grijs klein" id="bBevAuto" hidden>Noodrem</button>
             <button class="knop grijs klein" id="bBevAf" hidden>Alles gezien</button>
           </span>
@@ -227,42 +272,42 @@
         <div class="sec">Archiefkast (live-venster)</div>
         <div class="kaart">
           <div class="i-ohzj7x muted" id="archiefInfo"></div>
-          <div style="display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap;align-items:center;">
+          <div class="s-1oadtmp">
             <label class="i-ejeuqd muted">Afgeronde tickets ouder dan</label>
-            <input class="veld" id="archiefDagen" type="number" inputmode="numeric" min="1" max="3650" style="width:6rem;margin-bottom:0;">
+            <input class="veld s-1f8bdb1" id="archiefDagen" type="number" inputmode="numeric" min="1" max="3650">
             <span class="i-ejeuqd muted">dagen archiveren</span>
             <button class="knop" id="archiefZet">Toepassen</button>
           </div>
-          <div class="muted" style="font-size:.72rem;margin-top:0.5rem;">Kleiner venster = kleinere levende kast = sneller onder zware belasting. De boekhouding en export tellen het archief altijd mee.</div>
+          <div class="muted s-xjcbw8">Kleiner venster = kleinere levende kast = sneller onder zware belasting. De boekhouding en export tellen het archief altijd mee.</div>
         </div>
       </div>
       <div id="papierenBlok" hidden>
         <div class="sec">Het papierwerk: Rahul vraagt het uit</div>
         <div class="kaart">
           <div class="i-ohzj7x muted">Het verwerkingsregister (AVG art. 30) en het datalek-draaiboek (art. 33) staan klaar, op een paar plekken na die alleen u weet. Rahul stelt ze hier &eacute;&eacute;n voor &eacute;&eacute;n. Hij <b>verzint nooit een antwoord</b>: een verzonnen KvK-nummer of telefoonnummer is erger dan een leeg veld, want een leeg veld ziet iedereen. Weet u iets nu niet, dan parkeert hij het &mdash; het blijft dan gewoon openstaan.</div>
-          <div class="muted" id="papStand" style="font-size:.78rem;margin-top:0.5rem;"></div>
+          <div class="muted s-18e8s1e" id="papStand"></div>
           <div class="h-mt80" id="papVraagBlok">
-            <p id="papVraag" style="margin:0 0 0.25rem;font-weight:600;"></p>
+            <p id="papVraag" class="s-98k82s"></p>
             <div class="i-ejeuqd muted" id="papWaarom"></div>
-            <div class="muted" id="papVoorbeeld" style="font-size:.74rem;margin-top:0.25rem;"></div>
-            <textarea class="veld" id="papAntwoord" placeholder="Uw antwoord, in uw eigen woorden&hellip;" aria-label="Antwoord op de vraag van Rahul" style="min-height:3rem;resize:vertical;margin-top:0.5rem;"></textarea>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+            <div class="muted s-faelie" id="papVoorbeeld"></div>
+            <textarea class="veld s-1v0qglo" id="papAntwoord" placeholder="Uw antwoord, in uw eigen woorden&hellip;" aria-label="Antwoord op de vraag van Rahul"></textarea>
+            <div class="s-j0h75i">
               <button class="knop" id="bPapOk">Vastleggen</button>
               <button class="knop grijs klein" id="bPapParkeer">Weet ik nu niet</button>
             </div>
           </div>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem;">
+          <div class="s-tk7yx">
             <button class="knop grijs klein" id="bPapReg">Register lezen</button>
             <button class="knop grijs klein" id="bPapLek">Datalek-draaiboek lezen</button>
           </div>
-          <pre id="papDoc" class="advies" hidden style="white-space:pre-wrap;font-size:.72rem;max-height:22rem;overflow:auto;"></pre>
+          <pre id="papDoc" class="advies s-1lip1to" hidden></pre>
         </div>
       </div>
       <div id="moderniseerBlok" hidden>
         <div class="sec">Modernisering: vraag de AI om een update</div>
         <div class="kaart">
           <div class="i-ohzj7x muted">Beschrijf in gewone taal wat u wilt vernieuwen, verbeteren of moderniseren. De AI geeft een veilig plan. Er gaat <b>niets live</b> naar de gasten: het wordt een voorstel (pull request) dat u eerst goedkeurt. Privacy en beveiliging blijven de strengste norm.</div>
-          <textarea class="veld" id="modVraag" placeholder="Bijv.: moderniseer de betaalpagina, of scherp de beveiliging van de inlog verder aan&hellip;" aria-label="Moderniseringsverzoek" style="min-height:3.4rem;resize:vertical;margin-top:0.5rem;"></textarea>
+          <textarea class="veld s-j4q4w6" id="modVraag" placeholder="Bijv.: moderniseer de betaalpagina, of scherp de beveiliging van de inlog verder aan&hellip;" aria-label="Moderniseringsverzoek"></textarea>
           <div class="i-1v8vht">
             <button class="knop" id="bMod">Vraag de AI</button>
             <span class="i-ohfqmk muted" id="modBron"></span>
@@ -274,16 +319,16 @@
       <div id="eigenaarBlok" hidden>
         <div class="sec">Eigenaarschap</div>
         <div class="kaart">
-          <p style="margin:0 0 0.5rem;">Eigenaar van dit platform:
+          <p class="s-ndyzcf">Eigenaar van dit platform:
             <b id="eigNu">-</b> <span class="muted" id="eigHerkomst"></span></p>
-          <p class="muted" style="margin:0 0 0.75rem;font-size:.9rem;">
+          <p class="muted s-2rzjzf">
             De eigenaar is de enige die zekeringen omzet, functies uitschakelt en anderen
             toegang geeft. Overdragen kan alleen naar een adres waar al een RTG-account
             bij hoort, anders zou deze pagina voor iedereen dichtzitten.</p>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-            <input class="veld" id="eigEmail" type="email" autocomplete="off"
+          <div class="s-1tm6avw">
+            <input class="veld s-u7gqki" id="eigEmail" type="email" autocomplete="off"
               aria-label="E-mailadres van de nieuwe eigenaar"
-              placeholder="E-mailadres van de nieuwe eigenaar" style="flex:1;margin-bottom:0;min-width:14rem;">
+              placeholder="E-mailadres van de nieuwe eigenaar">
             <input class="i-u7fglg veld" id="eigWw" type="password" autocomplete="current-password"
               aria-label="Uw eigen wachtwoord ter bevestiging"
               placeholder="Uw eigen wachtwoord">
@@ -297,7 +342,7 @@
         <div class="sec">Toegang beheren</div>
         <div class="kaart">
           <div id="toegangLijst"></div>
-          <div style="display:flex;gap:.5rem;margin-top:0.75rem;flex-wrap:wrap;">
+          <div class="s-ulacx">
             <input class="i-u7fglg veld" id="grantEmail" placeholder="E-mail van een RTG-account">
             <button class="knop klein" id="bGrant">Toegang geven</button>
           </div>
@@ -307,9 +352,9 @@
     </div>
 
     <div id="tabBetalen" role="tabpanel" aria-labelledby="tabBtnBetalen" hidden>
-      <div class="kaart" style="margin-bottom:0.75rem;">
+      <div class="kaart s-j0vkha">
         <div class="naam">Stripe, Mollie en Adyen · één veilige regie</div>
-        <div class="muted" style="font-size:.8rem;margin-top:0.25rem;">Open de aanvraag bij de provider, volg de controle, stel de geheime waarden uitsluitend in de beveiligde serveromgeving in en voer daarna een proefbetaling én terugbetaling uit. Geen enkele API-sleutel wordt in dit scherm opgeslagen.</div>
+        <div class="muted s-9g83p7">Open de aanvraag bij de provider, volg de controle, stel de geheime waarden uitsluitend in de beveiligde serveromgeving in en voer daarna een proefbetaling én terugbetaling uit. Geen enkele API-sleutel wordt in dit scherm opgeslagen.</div>
       </div>
       <div class="telrij" id="bpTellers"></div>
       <div class="bp-grid" id="bpProviders"></div>
@@ -322,11 +367,11 @@
     <div id="tabFuncties" role="tabpanel" aria-labelledby="tabBtnFuncties" hidden>
       <div id="verzoekBlok" hidden>
         <div class="sec">Wachtend op bevestiging van de eigenaar</div>
-        <div class="kaart" id="verzoeken" style="margin-bottom:1.25rem;"></div>
+        <div class="kaart s-xmivqi" id="verzoeken"></div>
       </div>
-      <div class="kaart aibox" style="margin-bottom:1.25rem;">
+      <div class="kaart aibox s-xmivqi">
         <div class="naam">AI-hulp voor de controlekamer</div>
-        <div class="muted" style="margin:0.25rem 0 0.5rem;">Vraag iets of geef een instructie in gewone taal, bijvoorbeeld: &bdquo;zet de sociale laag uit voor Lifestyle&rdquo; of &bdquo;wat doet de kassa-schakelaar?&rdquo;. De AI stelt de wijziging voor; niets gaat automatisch om.</div>
+        <div class="muted s-11qe8p2">Vraag iets of geef een instructie in gewone taal, bijvoorbeeld: &bdquo;zet de sociale laag uit voor Lifestyle&rdquo; of &bdquo;wat doet de kassa-schakelaar?&rdquo;. De AI stelt de wijziging voor; niets gaat automatisch om.</div>
         <textarea class="veld" id="aiVraag" placeholder="Typ je vraag of instructie&hellip;" aria-label="Vraag of instructie voor de AI"></textarea>
         <div class="i-1v8vht">
           <button class="knop" id="bAiVraag">Vraag de AI</button>
@@ -334,7 +379,7 @@
         </div>
         <div class="advies" id="aiAntwoord" hidden></div>
         <div class="h-mt60" id="aiVoorstelBlok" hidden>
-          <div class="muted" style="font-size:.75rem;margin-bottom:0.25rem;">Voorgestelde wijzigingen:</div>
+          <div class="muted s-1dcamif">Voorgestelde wijzigingen:</div>
           <div id="aiVoorstel"></div>
           <button class="knop klein h-mt50" id="bAiVoorstel">Deze wijzigingen aanvragen</button>
         </div>
@@ -343,27 +388,27 @@
       <div class="chips" id="dgChips" role="group" aria-label="Filter op doelgroep"></div>
 
       <div class="i-evfons">
-        <input class="veld" id="fnZoek" placeholder="Zoek een functie of app&hellip;" aria-label="Zoek een functie of app" style="flex:1;margin-bottom:0;min-width:11rem;">
+        <input class="veld s-u7etlx" id="fnZoek" placeholder="Zoek een functie of app&hellip;" aria-label="Zoek een functie of app">
         <button class="knop grijs klein" id="bAllesAan">Alles aan</button>
         <button class="knop rood klein" id="bAllesUit">Alles uit</button>
       </div>
-      <div class="muted" id="ctxUitleg" style="font-size:.76rem;margin-bottom:0.75rem;"></div>
+      <div class="muted s-1dxigij" id="ctxUitleg"></div>
       <div id="functies"></div>
     </div>
 
     <!-- De Wacht: immuunsysteem + meters/grafiek + raadkamer -->
     <div id="tabWacht" role="tabpanel" aria-labelledby="tabBtnWacht" hidden>
-      <div class="muted" style="font-size:.8rem;margin-bottom:0.75rem;">
+      <div class="muted s-2fpzs8">
         De Wacht bewaakt het platform: live meters, een grafiek, een afweer die indringers afsnijdt,
         zelf opruimen, en een raadkamer waarin de AI voorstellen doet die u accepteert, afwijst of inconclaaf laat.
       </div>
       <!-- HET DOORGEEFJOURNAAL. De grafiek hieronder toont hoeveel; dit toont WAT.
            Dat verschil kostte vannacht uren: een sms die stil op de grond viel is
            in een grafiek onzichtbaar, in een regel niet. -->
-      <div class="kaart" id="journaalKaart" style="padding:.7rem;margin-bottom:0.75rem;">
-        <div style="display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:0.5rem;">
-          <div class="sec" style="margin:0;">Doorgeefjournaal</div>
-          <span class="muted" id="journaalTel" style="font-size:.74rem;"></span>
+      <div class="kaart s-sv8jh7" id="journaalKaart">
+        <div class="s-vplm6p">
+          <div class="sec s-40wpk4">Doorgeefjournaal</div>
+          <span class="muted s-ohh0lm" id="journaalTel"></span>
           <span class="h-flex1"></span>
           <button class="knop-klein" id="journaalAlles" aria-pressed="true">alles</button>
           <button class="knop-klein" id="journaalFouten" aria-pressed="false">alleen fouten</button>
@@ -373,21 +418,21 @@
         <div class="i-t2n41w muted">
           Een regel per binnenkomend verzoek en per uitgaand bericht. Op codenaam en op domein: nooit een naam, adres of nummer.
         </div>
-        <div id="journaalLijst" style="max-height:22rem;overflow:auto;font-size:.76rem;"></div>
+        <div id="journaalLijst" class="s-72nn53"></div>
       </div>
       <div class="telrij" id="wachtMeters"></div>
       <div id="wachtLastafworp"></div>
-      <div class="kaart" id="wachtRand" style="padding:.6rem .8rem;"></div>
-      <div class="kaart" style="padding:.7rem;">
+      <div class="kaart s-1gbowd5" id="wachtRand"></div>
+      <div class="kaart s-1xkemiw">
         <div class="i-t2n41w muted">Laatste ~30 minuten · verzoeken (wit), alarmen (bordeaux), quarantaine (goud)</div>
-        <canvas id="wachtGrafiek" height="120" style="width:100%;height:120px;display:block;"></canvas>
+        <canvas id="wachtGrafiek" height="120" class="s-1b4loep"></canvas>
       </div>
 
       <div class="blok-kop h-mt100">
         <h2>De Ontsmetter (malware-scanner)</h2>
         <button class="knop grijs klein" id="bAvTest" hidden>EICAR-test</button>
       </div>
-      <div class="muted" style="font-size:.76rem;margin-bottom:0.5rem;">Elke geuploade foto/document wordt gescand op malware (handtekeningen, heuristiek, entropie). Besmet wordt geweigerd.</div>
+      <div class="muted s-vebk1y">Elke geuploade foto/document wordt gescand op malware (handtekeningen, heuristiek, entropie). Besmet wordt geweigerd.</div>
       <div class="telrij" id="avMeters"></div>
       <div class="kaart" id="avLaatste"></div>
 
@@ -428,5 +473,13 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

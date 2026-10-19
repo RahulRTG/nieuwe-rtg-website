@@ -34,7 +34,9 @@ function verhuisOude({ db, save, boek }) {
     return 0;
   }
   delete db.data.doorgeefjournaal;
-  try { save(); } catch (e) {}
+  /* Mislukt dit, dan staat de oude collectie na een herstart weer in de
+     database: dubbel werk en geen verlies (zie hierboven) -- maar wel gemeld. */
+  try { save(); } catch (e) { console.warn('[journaal] het weghalen van de verhuisde collectie niet bewaard:', e && e.message); }
   console.log('[journaal] ' + n + ' bewaarde regels verhuisd van de database naar ' + stand.map);
   return n;
 }

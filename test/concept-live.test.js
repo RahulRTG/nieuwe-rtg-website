@@ -65,12 +65,13 @@ function nepModel() {
 
 let model, server, base, A, B;
 const ROME = 'Ik wil met zes vrienden vier dagen naar Rome, maximaal €800 per persoon.';
-const api = (pad, body, token) => fetch(base + pad, { method: 'POST',
-  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+const api = (pad, body, token, extra) => fetch(base + pad, { method: 'POST',
+  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(extra || {}) },
   body: JSON.stringify(body || {}) }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const mijn = async (lid) => (await api('/api/reisbureau/mijn', {}, lid.token)).body.aanvragen;
-const wijzig = (lid, c, velden, versie) => api('/api/fluister/concept',
-  { id: c.id, versie: versie == null ? c.versie : versie, velden }, lid.token);
+const wijzig = (lid, c, velden, versie, sleutel) => api('/api/fluister/concept',
+  { id: c.id, versie: versie == null ? c.versie : versie, velden }, lid.token,
+  sleutel ? { 'Idempotency-Key': sleutel } : null);
 const stand = async (lid, id) => (await api('/api/fluister/concept', { id, versie: 0, velden: {} }, lid.token));
 const ctx = (verwijzingen, op) => ({ app: 'Rahul', deel: 'Reisconcept', wereld: 'travel', verwijzingen, op: op || Date.now() });
 
@@ -146,11 +147,28 @@ test('3. gelijktijdig op dezelfde versie: een wint, de ander krijgt 409 met de s
 });
 
 test('4. een dubbel verzoek met dezelfde waarden maakt geen tweede versie', async () => {
+  /* TWEE LAGEN, en ze worden hier allebei bewezen. De route verklaart een
+     woordelijk gelijk verzoek als dubbeltik (server/lib/idemsleutels-reisconcept.js):
+     binnen het venster geeft de idem-poort het EERSTE antwoord terug, met
+     `herhaald: true`. Tot 18 oktober 2026 gebeurde dat voor dit antwoord niet,
+     omdat het boven 1 kB komt en de compressie om de poort heen stuurde
+     (292ddb701); deze toets las toen de route zelf, en dat was het gat. */
   const c = await rome(A);
   const [x, y] = await Promise.all([wijzig(A, c, { dagen: 6 }), wijzig(A, c, { dagen: 6 })]);
   assert.deepEqual([x.status, y.status], [200, 200]);
-  assert.deepEqual([x.body.gewijzigd, y.body.gewijzigd].sort(), [false, true]);
-  const z = await wijzig(A, c, { dagen: 6 }, 1);
+  assert.deepEqual([x.body.herhaald === true, y.body.herhaald === true].sort(), [false, true],
+    'de tweede klik is een herhaling van de eerste en draait niet opnieuw');
+  assert.deepEqual([x.body.concept.versie, y.body.concept.versie], [2, 2]);
+  assert.equal((await stand(A, c.id)).body.concept.versie, 2, 'precies een nieuwe versie');
+  /* En de route staat er ook ZONDER de poort tegen: met een eigen sleutel per
+     verzoek (een eigen sleutel wint van de verklaring) draaien ze allebei, en
+     dan verandert de tweede niets. */
+  const d = await rome(A);
+  const [p, q] = await Promise.all([wijzig(A, d, { dagen: 6 }, null, 'cl4-a-' + d.id), wijzig(A, d, { dagen: 6 }, null, 'cl4-b-' + d.id)]);
+  assert.deepEqual([p.status, q.status], [200, 200]);
+  assert.deepEqual([p.body.gewijzigd, q.body.gewijzigd].sort(), [false, true]);
+  assert.ok(!p.body.herhaald && !q.body.herhaald, 'met een eigen sleutel is niets herhaald');
+  const z = await wijzig(A, d, { dagen: 6 }, 1, 'cl4-c-' + d.id);
   assert.equal(z.status, 200, 'dezelfde klik met een oude versie is geen conflict, want er verandert niets');
   assert.equal(z.body.concept.versie, 2);
 });

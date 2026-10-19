@@ -131,26 +131,8 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
     if (resultaat && typeof resultaat.then === 'function') throw new Error('Auditbewerker moet synchroon zijn.');
     vervang(op.naam, waarde, m); return { op, resultaat };
   }
-  function stage(doos, op) {
-    if (!doos.auditOps) { doos.auditOps = []; doos.auditViews = new Map(); }
-    const basis = doos.auditViews.get(op.naam) || view(op.naam);
-    const waarde = op.type === 'append'
-      ? vorm.pak(op.naam, [...vorm.rijen(op.naam, basis)], vorm.totaal(op.naam, basis), vorm.extra(op.naam, basis))
-      : vorm.kopie(basis);
-    let resultaat;
-    if (op.type === 'append') {
-      const lijst = vorm.rijen(op.naam, waarde), spec = vorm.eis(op.naam);
-      const volgorde = spec.omgekeerd ? lijst : [...lijst].reverse();
-      const top = volgorde.find(r => !op.kopTest || op.kopTest(r));
-      resultaat = op.maak(top || null, vorm.totaal(op.naam, waarde));
-      if (spec.omgekeerd) { lijst.unshift(resultaat); lijst.splice(spec.max); }
-      else { lijst.push(resultaat); if (lijst.length > spec.max) lijst.splice(0, lijst.length - spec.max); waarde.commandJournaalTotaal = vorm.totaal(op.naam, basis) + 1; }
-    } else resultaat = op.werk(waarde);
-    if (resultaat && typeof resultaat.then === 'function') throw new Error('Auditbewerker moet synchroon zijn.');
-    publiceerResultaat(op.resultaat, resultaat);
-    doos.auditOps.push(op); doos.auditViews.set(op.naam, vorm.alleenLezen(waarde));
-    return op.resultaat;
-  }
+  // de bundel (stage): een auditbewerking voorlopig binnen een doos, vóór de commit -- ./audit-stage.js
+  const stage = require('./audit-stage')({ cache, projectie, view, publiceerResultaat });
   function snapshots() { return q.metas.all().map(({ naam }) => [naam, leesBinnen(naam)]); }
   function publiceerSnapshots(lijst) { for (const [naam, nieuw] of lijst) publiceer(naam, nieuw); }
   function laad(data, lijst) {

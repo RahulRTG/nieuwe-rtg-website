@@ -26,6 +26,14 @@ const SLEUTELS = Object.assign({},
   require('./idemsleutels-samenvoeging').SLEUTELS,
   /* De Living Mall is een POST-projectie zonder mutatie. */
   require('./idemsleutels-mall-living').SLEUTELS,
+  /* De apps van de Lifestyle Pass: gevonden door de voltooiproef van Reisboek. */
+  require('./idemsleutels-rechterhand').SLEUTELS,
+  /* RTG Veilig: een dubbeltik op de alarmknop gaf de kring twee alarmen. */
+  require('./idemsleutels-veilig').SLEUTELS,
+  /* De kluis: een dubbeltik op "document toevoegen" gaf twee documenten. */
+  require('./idemsleutels-bestanden').SLEUTELS,
+  /* Pulse, De Salon en RTMail: een dubbeltik gaf de ander alles twee keer. */
+  require('./idemsleutels-tweedelid').SLEUTELS,
   /* WorkOS-zaakregie projecteert een bestaande eigen zaak en schrijft niet. */
   require('./idemsleutels-zaakregie').SLEUTELS);
 

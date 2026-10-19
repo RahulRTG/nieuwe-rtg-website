@@ -89,6 +89,7 @@ module.exports = ({ save }) => {
     const voor = persistentieStand();
     let alGelijk = false;
     let sqliteBevestigd = false;
+    let geschreven = null;               // welke collecties de commit schreef; alleen sqlite weet het
     if (STORE === 'sqlite') {
       /* Een bundel die al exact weet welke collecties zij muteerde hoeft voor
          duurzaamheid niet alsnog de hele wereld te serialiseren. De lijst
@@ -97,6 +98,7 @@ module.exports = ({ save }) => {
       const uit = sqlite.saveSqlite(false, sleutels, [], true);
       alGelijk = !!(uit && uit.alGelijk);
       sqliteBevestigd = uit?.duurzaam === true;
+      geschreven = Array.isArray(uit?.collecties) ? uit.collecties : null;
       /* Een procescrash na COMMIT was al door scripts/crashgrenzen.js bewezen.
          Dat bewijst geen stroomuitval: die garantie komt nu van FULL op deze
          eigen transactie, of de gecontroleerde checkpoint bij een netto-noop. */
@@ -133,7 +135,7 @@ module.exports = ({ save }) => {
 
        SIGKILL en geen process.exit: een nette afsluiting laat afsluithaken lopen
        en bewijst daarmee iets over een pad dat bij een echte crash niet bestaat. */
-    if (bevestigd && verraad.sla('sterf-na-commit')) {
+    if (bevestigd && verraad.raaktDoel(geschreven) && verraad.sla('sterf-na-commit')) {
       try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
     }
     return { duurzaam: bevestigd, bevestigbaar, stand: na,

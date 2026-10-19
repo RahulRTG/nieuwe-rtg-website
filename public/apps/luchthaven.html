@@ -63,21 +63,43 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-130u08v:not(#_#_#_){padding:.15rem .5rem;font-size:.7rem}
+.s-132o9z0:not(#_#_#_){margin-left:0}
+.s-1344oln:not(#_#_#_){font-size:.95rem;margin:0.75rem 0 0.25rem}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-186qv2w:not(#_#_#_){width:6rem}
+.s-1hv4dhs:not(#_#_#_){color:var(--soft);font-family:Inter}
+.s-4mhsan:not(#_#_#_){color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem}
+.s-eq0sgi:not(#_#_#_){margin:0 0 0.75rem}
+.s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
+.s-jwtsuz:not(#_#_#_){flex:1;min-width:9rem}
+.s-qge8k0:not(#_#_#_){font-size:1.15rem;margin-bottom:0.5rem}
+.s-rrt1xk:not(#_#_#_){font-size:.95rem;margin:0.5rem 0 0.25rem}
+.s-vgbzx0:not(#_#_#_){background:var(--card2)}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="luchthaven" class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
   <div><div class="ey">RTG Airport · operations</div><h1 id="kop">De Operatie</h1></div>
   <a href="/apps/marechaussee.html">KMar →</a>
-  <a href="/apps/vluchten.html" style="margin-left:0;">Reizigers-app →</a>
+  <a href="/apps/vluchten.html" class="s-132o9z0">Reizigers-app →</a>
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
+    <p class="s-4mhsan">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
+    <button class="knop prim s-186m9vs" id="loginGo" data-hoofdactie>Inloggen</button>
   </div>
   <div id="app" hidden></div>
 </main>
@@ -167,12 +189,12 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+C.loungeGasten+'</b><span>In de lounges</span></div>'+
     '</div>'+
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig '+esc(s.soort)+'"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
-    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Jouw werkplek</h3>'+
+    '<h3 class="s-rrt1xk">Jouw werkplek</h3>'+
     '<div class="keuze">'+ROLLEN.map(([id,ic,naam,sub]) => '<button data-rol="'+id+'"><span class="ic">'+ic+'</span>'+naam+'<span class="sub">'+sub+'</span></button>').join('')+'</div>';
   $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => rolScherm(b.dataset.rol)));
 }
-function kopStuk(titel){ return '<button class="terug" id="terug">← de operatie</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>'; }
-function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-operations adviseert; schakelen doet u zelf. Veiligheid voor snelheid.</div></div>'; }
+function kopStuk(titel){ return '<button class="terug" id="terug">← de operatie</button><h2 class="s-qge8k0">'+titel+'</h2>'; }
+function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld s-jwtsuz" id="aiV" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-operations adviseert; schakelen doet u zelf. Veiligheid voor snelheid.</div></div>'; }
 function koppelBasis(){
   $('#terug').addEventListener('click', kiesScherm);
   $('#aiK').addEventListener('click', async () => {
@@ -204,8 +226,8 @@ function aankomstStap(v){
 /* ---- vluchtleiding ---- */
 async function schermVluchtleiding(){
   $('#app').innerHTML = kopStuk('Vluchtleiding')+
-    '<div class="item" style="background:var(--card2);"><h4>Nieuwe vlucht op het bord</h4>'+
-    '<div class="rij"><input class="veld" id="nNr" style="width:6rem;" placeholder="RT123" maxlength="8"><select class="veld" id="nSoort"><option value="vertrek">vertrek</option><option value="aankomst">aankomst</option></select><select class="veld" id="nCat"><option value="lijn">lijnvlucht</option><option value="privejet">privejet</option><option value="helikopter">helikopter</option></select><input class="veld" id="nBest" style="flex:1;min-width:8rem;" placeholder="Bestemming / herkomst" maxlength="60"></div>'+
+    '<div class="item s-vgbzx0"><h4>Nieuwe vlucht op het bord</h4>'+
+    '<div class="rij"><input class="veld s-186qv2w" id="nNr" placeholder="RT123" maxlength="8"><select class="veld" id="nSoort"><option value="vertrek">vertrek</option><option value="aankomst">aankomst</option></select><select class="veld" id="nCat"><option value="lijn">lijnvlucht</option><option value="privejet">privejet</option><option value="helikopter">helikopter</option></select><input class="veld s-jwt5vg" id="nBest" placeholder="Bestemming / herkomst" maxlength="60"></div>'+
     '<div class="rij"><input class="veld" id="nTijd" type="time" value="12:00"><select class="veld" id="nGate"></select><button class="knop" id="nMaak">Op het bord</button></div></div>'+
     '<div id="vlLijst"></div>'+aiBlok('Bijv. welke kist verdient nu voorrang?');
   koppelBasis();
@@ -225,7 +247,7 @@ function vluchtKaart(v, acties){
   const kl = v.klaring ? ' <span class="status ok">klaring '+esc(v.klaring.baan)+'</span>' : '';
   const band = v.band ? ' <span class="status">band '+v.band+'</span>' : '';
   const vip = v.vip ? ' <span class="status '+(v.vip.rond?'ok':'open')+'">'+esc(v.vip.soort)+(v.vip.rond?' · gereed':' · protocol loopt')+'</span>' : '';
-  return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(v.soort)+'</small>'+vip+'</h4>'+
+  return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' <small class="s-1hv4dhs">'+esc(v.soort)+'</small>'+vip+'</h4>'+
     '<div class="meta">'+esc(v.tijd)+' · gate '+esc(v.gate)+' · '+esc(v.toestel)+' · '+st+ver+kl+band+
     (v.draai ? ' · draai '+(v.draai.klaar?'<span class="status ok">rond</span>':'<span class="status open">'+v.draai.taken.filter(t=>!t.klaar).length+' open</span>') : '')+'</div>'+(acties||'')+'</div>';
 }
@@ -260,7 +282,7 @@ async function laadVluchten(){
 /* ---- platform: de draai ---- */
 async function schermPlatform(){
   $('#app').innerHTML = kopStuk('Platform · de draai')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">Elke vertrekkende kist heeft zes platformtaken. Pas als de draai rond is, mag de gate het boarden starten.</div></div>'+
+    '<div class="item s-vgbzx0"><div class="meta">Elke vertrekkende kist heeft zes platformtaken. Pas als de draai rond is, mag de gate het boarden starten.</div></div>'+
     '<div id="drLijst"></div>'+aiBlok('Bijv. welke draai pak ik als eerste?');
   koppelBasis();
   try {
@@ -279,7 +301,7 @@ async function schermPlatform(){
 /* ---- toren ---- */
 async function schermToren(){
   $('#app').innerHTML = kopStuk('Toren · verkeersleiding')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">Zonder klaring van de toren vertrekt er niets. Klaring volgt pas als de kist aan het boarden is; de mens in de toren beslist. Banen: '+C.banen.join(' en ')+'.</div></div>'+
+    '<div class="item s-vgbzx0"><div class="meta">Zonder klaring van de toren vertrekt er niets. Klaring volgt pas als de kist aan het boarden is; de mens in de toren beslist. Banen: '+C.banen.join(' en ')+'.</div></div>'+
     '<div id="toLijst"></div>'+aiBlok('Bijv. welke baan geef ik de volgende vertrekker?');
   koppelBasis();
   try {
@@ -300,8 +322,8 @@ async function schermToren(){
 /* ---- bagagekelder ---- */
 async function schermBagage(){
   $('#app').innerHTML = kopStuk('Bagagekelder')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">De kofferketen: ingecheckt → gesorteerd → geladen → op de band → opgehaald. Achteruit draait hij nooit; vermist kan altijd gemeld en teruggevonden.</div></div>'+
-    '<div class="rij" style="margin:0 0 0.75rem;"><select class="veld" id="bgFilter"><option value="">Alle koffers</option><option>ingecheckt</option><option>gesorteerd</option><option>geladen</option><option>op-band</option><option value="vermist">vermist</option></select></div>'+
+    '<div class="item s-vgbzx0"><div class="meta">De kofferketen: ingecheckt → gesorteerd → geladen → op de band → opgehaald. Achteruit draait hij nooit; vermist kan altijd gemeld en teruggevonden.</div></div>'+
+    '<div class="rij s-eq0sgi"><select class="veld" id="bgFilter"><option value="">Alle koffers</option><option>ingecheckt</option><option>gesorteerd</option><option>geladen</option><option>op-band</option><option value="vermist">vermist</option></select></div>'+
     '<div id="bgLijst"></div>'+aiBlok('Bijv. hoe voorkom ik gemiste aansluitingen?');
   koppelBasis();
   $('#bgFilter').addEventListener('change', laadBagage);
@@ -330,7 +352,7 @@ async function laadBagage(){
 /* ---- security ---- */
 async function schermSecurity(){
   $('#app').innerHTML = kopStuk('Security · de filters')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">De wachttijden staan live op het bord van de reizigers. Loopt een filter vol, open er dan een extra.</div></div>'+
+    '<div class="item s-vgbzx0"><div class="meta">De wachttijden staan live op het bord van de reizigers. Loopt een filter vol, open er dan een extra.</div></div>'+
     '<div id="seLijst"></div>'+aiBlok('Bijv. wanneer open ik het tweede filter?');
   koppelBasis();
   try {
@@ -350,11 +372,11 @@ async function schermSecurity(){
 /* ---- VIP en Royal: het charterloket + de Koninklijke Vleugel ---- */
 async function schermVip(){
   $('#app').innerHTML = kopStuk('VIP en Royal')+
-    '<div class="item" style="background:var(--card2);"><h4>Nieuw vip-protocol</h4><div class="meta">Onder PROTOCOLNAAM, nooit de echte naam. Een vip-vlucht boardt pas als alle stappen zijn afgevinkt.</div>'+
-    '<div class="rij"><input class="veld" id="vVlucht" style="width:6rem;" placeholder="RT101" maxlength="8"><input class="veld" id="vNaam" style="flex:1;min-width:9rem;" placeholder="Protocolnaam, bijv. Valk Een" maxlength="60"><select class="veld" id="vSoort"><option value="koninklijk">koninklijk</option><option value="staatsbezoek">staatsbezoek</option><option value="vip">vip</option></select><button class="knop" id="vMaak">Start protocol</button></div></div>'+
+    '<div class="item s-vgbzx0"><h4>Nieuw vip-protocol</h4><div class="meta">Onder PROTOCOLNAAM, nooit de echte naam. Een vip-vlucht boardt pas als alle stappen zijn afgevinkt.</div>'+
+    '<div class="rij"><input class="veld s-186qv2w" id="vVlucht" placeholder="RT101" maxlength="8"><input class="veld s-jwtsuz" id="vNaam" placeholder="Protocolnaam, bijv. Valk Een" maxlength="60"><select class="veld" id="vSoort"><option value="koninklijk">koninklijk</option><option value="staatsbezoek">staatsbezoek</option><option value="vip">vip</option></select><button class="knop" id="vMaak">Start protocol</button></div></div>'+
     '<div id="vipLijst"></div>'+
-    '<h3 style="font-size:.95rem;margin:0.75rem 0 0.25rem;">Het charterloket</h3>'+
-    '<div class="item" style="background:var(--card2);"><div class="meta">Leden vragen een privejet of helikopter aan via de Vluchten-app; OPERATIONS beslist, nooit de AI. Bij bevestiging komt de vlucht direct op het bord met een vrije stand of helipad.</div></div>'+
+    '<h3 class="s-1344oln">Het charterloket</h3>'+
+    '<div class="item s-vgbzx0"><div class="meta">Leden vragen een privejet of helikopter aan via de Vluchten-app; OPERATIONS beslist, nooit de AI. Bij bevestiging komt de vlucht direct op het bord met een vrije stand of helipad.</div></div>'+
     '<div id="chLijst"></div>'+aiBlok('Bijv. hoe plan ik een staatsbezoek naast de middagpiek?');
   koppelBasis();
   $('#vMaak').addEventListener('click', async () => {
@@ -367,7 +389,7 @@ async function laadVips(){
   try {
     const r = await api('/api/lucht/vip/lijst');
     $('#vipLijst').innerHTML = r.vips.length ? r.vips.map(v =>
-      '<div class="item"><h4>'+esc(v.protocolnaam)+' <small style="color:var(--soft);font-family:Inter;">'+esc(v.soort)+' · '+esc(v.suite)+' · '+esc(v.vlucht)+' '+esc(v.tijd)+'</small> '+(v.rond?'<span class="status ok">gereed</span>':'<span class="status open">protocol loopt</span>')+'</h4>'+
+      '<div class="item"><h4>'+esc(v.protocolnaam)+' <small class="s-1hv4dhs">'+esc(v.soort)+' · '+esc(v.suite)+' · '+esc(v.vlucht)+' '+esc(v.tijd)+'</small> '+(v.rond?'<span class="status ok">gereed</span>':'<span class="status open">protocol loopt</span>')+'</h4>'+
       '<div class="rij">'+v.protocol.map(p => p.klaar ? '<span class="status ok">'+esc(p.stap)+' ✓</span>' : '<button class="knop stil" data-vip="'+v.id+'" data-stap="'+esc(p.stap)+'">'+esc(p.stap)+'</button>').join('')+'</div></div>').join('')
       : '<div class="leeg">Geen lopende vip-protocollen.</div>';
     $('#vipLijst').querySelectorAll('[data-vip]').forEach(b => b.addEventListener('click', async () => {
@@ -379,7 +401,7 @@ async function laadCharters(){
   try {
     const r = await api('/api/lucht/charters');
     $('#chLijst').innerHTML = r.charters.length ? r.charters.map(c =>
-      '<div class="item"><h4>'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(c.van)+' · '+esc(c.datum)+' '+esc(c.tijd)+'</small> <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+'</span></h4>'+
+      '<div class="item"><h4>'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' <small class="s-1hv4dhs">'+esc(c.van)+' · '+esc(c.datum)+' '+esc(c.tijd)+'</small> <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+'</span></h4>'+
       (c.status === 'aangevraagd' ? '<div class="rij"><button class="knop" data-ok="'+c.id+'">Bevestig (uw besluit)</button><button class="knop rood" data-nee="'+c.id+'">Wijs af</button></div>' : '')+'</div>').join('')
       : '<div class="leeg">Geen charteraanvragen.</div>';
     zetUit('charters', ['code','van','bestemming','datum','tijd','status'],
@@ -395,8 +417,8 @@ async function laadCharters(){
 /* ---- de lounges: binnen op de boarding pass ---- */
 async function schermLounge(){
   $('#app').innerHTML = kopStuk('De lounges')+
-    '<div class="item" style="background:var(--card2);"><h4>Gast ontvangen</h4><div class="meta">Op vertoon van een geldige boarding pass. De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.</div>'+
-    '<div class="rij"><input class="veld" id="lgCode" style="flex:1;min-width:9rem;" placeholder="Boarding pass-code (BP.… )" maxlength="80" autocomplete="off" spellcheck="false"><select class="veld" id="lgWaar"><option value="salon">Salon Lounge</option><option value="royal">De Koninklijke Vleugel</option></select><button class="knop" id="lgIn">Welkom ✓</button></div></div>'+
+    '<div class="item s-vgbzx0"><h4>Gast ontvangen</h4><div class="meta">Op vertoon van een geldige boarding pass. De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.</div>'+
+    '<div class="rij"><input class="veld s-jwtsuz" id="lgCode" placeholder="Boarding pass-code (BP.… )" maxlength="80" autocomplete="off" spellcheck="false"><select class="veld" id="lgWaar"><option value="salon">Salon Lounge</option><option value="royal">De Koninklijke Vleugel</option></select><button class="knop" id="lgIn">Welkom ✓</button></div></div>'+
     '<div id="lgLijst"></div>'+aiBlok('Bijv. hoe druk wordt het rond de avondvertrekken?');
   koppelBasis();
   $('#lgIn').addEventListener('click', async () => {
@@ -410,7 +432,7 @@ async function laadLounge(){
     const r = await api('/api/lucht/lounge');
     $('#lgLijst').innerHTML = r.lounges.map(l =>
       '<div class="item"><h4>'+(l.id==='royal'?'':'')+esc(l.naam)+' <span class="status '+(l.binnen>=l.capaciteit?'open':'goud')+'">'+l.binnen+' / '+l.capaciteit+'</span></h4>'+
-      (l.gasten.length ? l.gasten.map(g => '<div class="meta">'+esc(g.codenaam)+' · '+esc(g.vlucht)+' '+esc(g.tijd)+' <button class="knop stil" style="padding:.15rem .5rem;font-size:.7rem;" data-uit="'+g.id+'">uitchecken</button></div>').join('') : '<div class="meta">Nog geen gasten.</div>')+'</div>').join('');
+      (l.gasten.length ? l.gasten.map(g => '<div class="meta">'+esc(g.codenaam)+' · '+esc(g.vlucht)+' '+esc(g.tijd)+' <button class="knop stil s-130u08v" data-uit="'+g.id+'">uitchecken</button></div>').join('') : '<div class="meta">Nog geen gasten.</div>')+'</div>').join('');
     const gasten = [];
     r.lounges.forEach(l => l.gasten.forEach(g => gasten.push([l.naam, g.codenaam, g.vlucht, g.tijd])));
     zetUit('loungegasten', ['lounge','gast','vlucht','tijd'], gasten);
@@ -434,5 +456,13 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); k
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/travel-os-config.js" defer></script>
 <script src="/shared/travel-os.js" defer></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

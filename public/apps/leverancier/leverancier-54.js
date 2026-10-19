@@ -40,12 +40,12 @@
     const dagLbl = d => { try { return new Date(d+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{weekday:'short',day:'numeric',month:'short'}); } catch(e){ return d; } };
     const inp = 'style="background:var(--card,var(--bg));border:1px solid var(--line);border-radius:0;padding:0.5rem 0.6rem;color:var(--txt);"';
     const items = o.items||[];
-    return '<div class="card"><div class="tt-h">'+T('ag.titel','Agenda')+(o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'')+'</div>'+
-      (items.length ? items.map(i => '<div class="mitem" data-agitem="'+i.id+'" style="opacity:'+(i.gedaan?'0.55':'1')+';"><div class="r1"><span class="nm">'+(i.gedaan?'✓ ':'')+esc(i.titel)+'</span><span class="pr" style="color:var(--soft);">'+esc(dagLbl(i.datum))+(i.tijd?' · '+esc(i.tijd):'')+'</span></div>'+
-        (canEdit?'<div style="margin-top:0.25rem;display:flex;gap:0.4rem;">'+(!i.gedaan?'<button class="obtn" data-'+prefix+'done="'+i.id+'">'+T('ag.gedaan','Gedaan')+'</button>':'')+'<button class="rr-del" data-'+prefix+'del="'+i.id+'">✕</button></div>':'')+'</div>').join('')
+    return '<div class="card"><div class="tt-h">'+T('ag.titel','Agenda')+(o.telling?' <span class="s-14n40hq">('+o.telling+')</span>':'')+'</div>'+
+      (items.length ? items.map(i => '<div class="mitem" data-agitem="'+i.id+'" style="opacity:'+(i.gedaan?'0.55':'1')+';"><div class="r1"><span class="nm">'+(i.gedaan?'✓ ':'')+esc(i.titel)+'</span><span class="pr s-1pv2lmv">'+esc(dagLbl(i.datum))+(i.tijd?' · '+esc(i.tijd):'')+'</span></div>'+
+        (canEdit?'<div class="s-xivkzw">'+(!i.gedaan?'<button class="obtn" data-'+prefix+'done="'+i.id+'">'+T('ag.gedaan','Gedaan')+'</button>':'')+'<button class="rr-del" data-'+prefix+'del="'+i.id+'">✕</button></div>':'')+'</div>').join('')
         : '<div class="ds h-mt50">'+T('ag.leeg','Nog niets gepland. Typ hieronder of laat de AI het inplannen.')+'</div>')+
-      (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.75rem;flex-wrap:wrap;"><input id="'+prefix+'Titel" placeholder="'+T('ag.wat','Afspraak')+'" '+inp+' style="flex:1;min-width:8rem;"><input id="'+prefix+'Datum" type="date" '+inp+'><input id="'+prefix+'Tijd" type="time" '+inp+'><button class="obtn primary" id="'+prefix+'Add">+</button></div>'+
-        '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;"><div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.25rem;">'+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="'+prefix+'AiOut"></div><div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="'+prefix+'AiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' class="h-flex1"><button class="obtn primary" id="'+prefix+'AiGo">'+T('ag.plan','Plan')+'</button></div></div>' : '')+'</div>';
+      (canEdit ? '<div class="s-1l9czlq"><input id="'+prefix+'Titel" placeholder="'+T('ag.wat','Afspraak')+'" '+inp+' style="flex:1;min-width:8rem;"><input id="'+prefix+'Datum" type="date" '+inp+'><input id="'+prefix+'Tijd" type="time" '+inp+'><button class="obtn primary" id="'+prefix+'Add">+</button></div>'+
+        '<div class="s-e7t9zs"><div class="s-oqfvs0">'+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="'+prefix+'AiOut"></div><div class="s-1stuony"><input id="'+prefix+'AiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' class="h-flex1"><button class="obtn primary" id="'+prefix+'AiGo">'+T('ag.plan','Plan')+'</button></div></div>' : '')+'</div>';
   }
   function renderAgendaSup(){
     const el = $('#agendaSupCard'); if (!el) return;
@@ -55,7 +55,7 @@
     el.querySelectorAll('[data-sagdone]').forEach(b => b.addEventListener('click', async () => { try { agendaToeSup(await API.call('/supplier/agenda/wijzig', { id: b.dataset.sagdone, gedaan: true })); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-sagdel]').forEach(b => b.addEventListener('click', async () => { try { agendaToeSup(await API.call('/supplier/agenda/verwijder', { id: b.dataset.sagdel })); } catch(e){ toast(e.message); } }));
     const add = $('#sagAdd'); if (add) add.addEventListener('click', async () => { const titel = $('#sagTitel').value.trim(); const datum = $('#sagDatum').value; if (!titel||!datum){ toast(T('ag.vulin','Vul een afspraak en datum in.')); return; } try { agendaToeSup(await API.call('/supplier/agenda/toevoegen', { titel, datum, tijd: $('#sagTijd').value })); } catch(e){ toast(e.message); } });
-    const aiGo = $('#sagAiGo'); if (aiGo){ const doe = async () => { const opdracht = $('#sagAiIn').value.trim(); if (!opdracht) return; const out = $('#sagAiOut'); out.innerHTML = '<div class="ds">…</div>'; try { const r = await API.call('/supplier/agenda/ai', { opdracht }); out.innerHTML = '<div class="ds" style="color:'+(r.gedaan?'#7EE0A3':'var(--txt)')+';">'+esc(r.antwoord)+'</div>'; $('#sagAiIn').value=''; agendaToeSup(r); } catch(e){ out.innerHTML = '<div class="ds" style="color:#E0736A;">'+esc(e.message)+'</div>'; } }; aiGo.addEventListener('click', doe); const i2 = $('#sagAiIn'); if (i2) i2.addEventListener('keydown', e => { if (e.key==='Enter') doe(); }); }
+    const aiGo = $('#sagAiGo'); if (aiGo){ const doe = async () => { const opdracht = $('#sagAiIn').value.trim(); if (!opdracht) return; const out = $('#sagAiOut'); out.innerHTML = '<div class="ds">…</div>'; try { const r = await API.call('/supplier/agenda/ai', { opdracht }); out.innerHTML = '<div class="ds ' + (r.gedaan ? 's-yc9v9z' : 's-1btm41d') + '">'+esc(r.antwoord)+'</div>'; $('#sagAiIn').value=''; agendaToeSup(r); } catch(e){ out.innerHTML = '<div class="ds s-14n40hq">'+esc(e.message)+'</div>'; } }; aiGo.addEventListener('click', doe); const i2 = $('#sagAiIn'); if (i2) i2.addEventListener('keydown', e => { if (e.key==='Enter') doe(); }); }
   }
 
   async function renderZaakBoard(){
@@ -64,7 +64,7 @@
     renderPostSup();      // en wat er uit de post te bevestigen valt (55d)
     renderAgendaSup();
     let d; try { d = await API.call('/supplier/zaak/board'); } catch(e){ return; }
-    const zbChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
+    const zbChips = '<div class="s-c1fzjn">'+
       (d.functies||[]).map(f => '<button class="js-zbf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:0;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+
       '</div>';
     let h = funcBlok(T('zb.functies','Functies (aan/uit)'), d.functies||[], zbChips);

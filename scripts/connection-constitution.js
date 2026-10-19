@@ -125,6 +125,10 @@ for (const bestand of BRONNEN) hash.update(bestand).update('\0').update(tekst(be
 const bewijs = {
   schema: 'RTG_CONNECTION_CONSTITUTION',
   version: 7,
+  grens: 'Een audit op de VORM van de toetsen, niet op hun uitslag: elke proof hier is PROVEN zodra een ' +
+    'toets met de genoemde naam in de bron staat en de policy het contract draagt, zonder dat die toets ' +
+    'hier is gedraaid. Dat hij slaagt bewijst npm test; dit register bewijst dat hij bestaat en dat ' +
+    'geen ongeimplementeerde capability naar buiten staat. De source_sha256 zegt over welke bron dat gold.',
   source_sha256: hash.digest('hex'),
   tests: {
     total: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests + profileMediaTests + finalTests,

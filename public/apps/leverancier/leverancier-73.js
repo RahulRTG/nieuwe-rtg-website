@@ -28,9 +28,9 @@
         ? '<button class="obtn primary" data-tk="' + t.id + '" data-tkst="bezig">' + T('tk.pickup','Oppakken') + '</button>'
         : '<button class="obtn primary" data-tk="' + t.id + '" data-tkst="klaar">' + T('tk.done','Klaar') + '</button>') +
       '</div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--rtg-leesgroen,var(--green));padding:0.6rem 0;">✓ ' + T('tk.none','Geen openstaande klussen.') + '</div>';
-    html += '<div class="tt-add h-wrap"><input id="tkText" placeholder="' + T('tk.newph','Nieuwe klus, bijv. lamp vervangen') + '" style="flex:2;min-width:140px;">' +
-      '<select id="tkRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('tk.noroom','Algemeen') + '</option>' + roomOpts + '</select>' +
+    ).join('') : '<div class="s-1yjf63y">✓ ' + T('tk.none','Geen openstaande klussen.') + '</div>';
+    html += '<div class="tt-add h-wrap"><input id="tkText" placeholder="' + T('tk.newph','Nieuwe klus, bijv. lamp vervangen') + '" class="s-7ug9o">' +
+      '<select id="tkRoom" class="s-162476n"><option value="">' + T('tk.noroom','Algemeen') + '</option>' + roomOpts + '</select>' +
       '<button id="tkAdd">' + T('team.add','Toevoegen') + '</button></div>';
     if (done.length) html += '<div class="tt-h h-mt100">' + T('tk.donelist','Afgerond') + '</div>' + done.map(t =>
       '<div class="tk-row done"><div class="tk-t"><b>' + t.text + '</b><span>' + (t.doneBy || '') + (t.doneAt ? ' · ' + timeAgo(t.doneAt) : '') + '</span></div><span class="pill klaar">✓</span></div>').join('');
@@ -42,9 +42,9 @@
       '<div class="tk-row"><div class="tk-t"><b>' + l.item + '</b><span>' + (l.room ? l.room + ' · ' : '') + (l.storage ? T('lf.at','ligt bij') + ' ' + l.storage + ' · ' : '') + l.by + ' · ' + timeAgo(l.at) + '</span></div>' +
       '<button class="obtn" data-lf="' + l.id + '">' + T('lf.picked','Opgehaald') + '</button></div>'
     ).join('') : '<div class="softline">' + T('lf.none','Niets in bewaring.') + '</div>';
-    html += '<div class="tt-add h-wrap"><input id="lfItem" placeholder="' + T('lf.itemph','Voorwerp, bijv. zonnebril') + '" style="flex:2;min-width:120px;">' +
-      '<input id="lfStorage" placeholder="' + T('lf.storageph','Bewaarplek') + '" style="flex:1;min-width:90px;">' +
-      '<select id="lfRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('lf.noroom','Elders') + '</option>' + roomOpts + '</select>' +
+    html += '<div class="tt-add h-wrap"><input id="lfItem" placeholder="' + T('lf.itemph','Voorwerp, bijv. zonnebril') + '" class="s-7t6am">' +
+      '<input id="lfStorage" placeholder="' + T('lf.storageph','Bewaarplek') + '" class="s-jwsg6x">' +
+      '<select id="lfRoom" class="s-162476n"><option value="">' + T('lf.noroom','Elders') + '</option>' + roomOpts + '</select>' +
       '<button id="lfAdd">' + T('team.add','Toevoegen') + '</button></div></div>';
 
     el.innerHTML = html;
@@ -109,13 +109,13 @@
   function gastLocBlok(){
     const lijst = gastLoc || [];
     return '<div class="card"><div class="tt-h">'+T('gl.h','Live meekijken (met toestemming)')+'</div>'+
-      '<div style="font-size:0.75rem;color:var(--soft);margin-bottom:0.5rem;">'+T('gl.sub','De gast deelt zelf de live gps-locatie met uw zaak. Zet het uit zodra u het niet meer nodig heeft; de gast krijgt daar direct bericht van.')+'</div>'+
+      '<div class="s-v8lhz3">'+T('gl.sub','De gast deelt zelf de live gps-locatie met uw zaak. Zet het uit zodra u het niet meer nodig heeft; de gast krijgt daar direct bericht van.')+'</div>'+
       (lijst.length ? lijst.map(g =>
-        '<div class="guest-row" style="flex-wrap:wrap;gap:0.4rem;"><span class="cn">'+esc(g.codenaam)+'</span>'+
+        '<div class="guest-row s-l69yql"><span class="cn">'+esc(g.codenaam)+'</span>'+
         (g.wachtOpLocatie ? '<span class="ge">'+T('gl.wacht','toestemming, wacht op gps')+'</span>'
           : '<span class="ge"><b>'+(g.km!=null?g.km+' km':'')+'</b>'+(g.etaMin!=null?' · ~'+g.etaMin+' min':'')+'</span>')+
         '<button class="obtn" data-glstop="'+g.id+'" style="font-size:0.62rem;">'+T('gl.stop','Niet meer nodig')+'</button>'+
-        (g.zorg ? '<div style="flex-basis:100%;font-size:0.74rem;color:#E2B93B;">'+esc(zorgTekst(g.zorg))+'</div>' : '')+
+        (g.zorg ? '<div class="s-11c0pg1">'+esc(zorgTekst(g.zorg))+'</div>' : '')+
         '</div>').join('')
       : '<div class="softline">'+T('gl.leeg','Nog geen gasten die hun locatie met u delen.')+'</div>')+'</div>';
   }

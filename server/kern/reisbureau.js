@@ -15,8 +15,9 @@
    .js) dezelfde projectie nodig heeft en er geen tweede versie van de prijs-
    en veldnamen mag ontstaan (LAT-regel 4): een reis die hier EUR 2200 kost en
    in de Mall EUR 22 is precies het soort verschil dat niemand ziet aankomen. */
+const maakReisOpslag = require('./reisbureau-opslag');
 function reisAanbod(db) {
-  return ((db.data || {}).partnerTrips || []).map(t => ({
+  return maakReisOpslag({ db }).reizen().map(t => ({
     id: t.id, titel: t.title, bestemming: t.dest, dates: t.dates || null,
     prijs: Math.max(0, Number(t.netto) || 0),
     omschrijving: t.desc || null,
@@ -27,6 +28,7 @@ function reisAanbod(db) {
 
 function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan }) {
   const nu = () => new Date().toISOString();
+  const opslag = maakReisOpslag({ db }); // de deur naar aanbod en aanvragen (./reisbureau-opslag.js)
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
   /* De weg waarlangs een besluit BIJ HET LID komt. Laat gebonden, want de
@@ -62,15 +64,15 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
   // een lid vraagt een reis aan; de aanvraag komt bij het reisbureau te liggen
   async function boek(sess, codename, data) {
     data = data || {};
-    const trip = (db.data.partnerTrips || []).find(t => t.id === String(data.tripId || ''));
+    const trip = opslag.reizen().find(t => t.id === String(data.tripId || ''));
     if (!trip) return { status: 404, error: 'Reis niet gevonden.' };
     const personen = Math.min(20, Math.max(1, Math.round(Number(data.personen) || 1)));
     const vertrek = /^\d{4}-\d{2}-\d{2}$/.test(String(data.vertrek || '')) ? data.vertrek : null;
     const notitie = String(data.notitie || '').replace(/[<>]/g, '').trim().slice(0, 300);
     const pp = Math.max(0, Number(trip.netto) || 0);
-    if (!Array.isArray(db.data.reisAanvragen)) db.data.reisAanvragen = [];
+    const rij = opslag.pakAanvragen();
     // dubbele aanvraag remmen: dezelfde reis, nog open, van hetzelfde lid
-    if (db.data.reisAanvragen.some(a => a.status === 'aangevraagd' && a.customerKey === sess.key && a.tripId === trip.id))
+    if (rij.some(a => a.status === 'aangevraagd' && a.customerKey === sess.key && a.tripId === trip.id))
       return { status: 409, error: 'Je aanvraag voor deze reis staat al open. Een reisadviseur neemt contact met je op.' };
     const entry = {
       ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
@@ -79,8 +81,8 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
       prijs: { pp, totaal: Math.round(pp * personen * 100) / 100, valuta: 'EUR' },
       status: 'aangevraagd', at: nu()
     };
-    db.data.reisAanvragen.unshift(entry);
-    db.data.reisAanvragen = db.data.reisAanvragen.slice(0, 5000);
+    rij.unshift(entry);
+    opslag.zetAanvragen(rij.slice(0, 5000));
     save();
     // is de bestemming visumplichtig, dan staat de aanvraag-taak meteen klaar
     const vt = visum();
@@ -99,7 +101,7 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
      bericht genoeg. Het besluit zelf staat wel op de aanvraag, want het kantoor
      leest dezelfde rij. */
   function mijn(key) {
-    return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).slice(0, 50)
+    return opslag.aanvragen().filter(a => a.customerKey === key).slice(0, 50)
       .map(a => a.besluit
         ? Object.assign({}, a, { besluit: { at: a.besluit.at, bericht: a.besluit.bericht } })
         : a)
@@ -110,7 +112,7 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
 
   // een lid trekt zijn eigen aanvraag in zolang die nog openstaat
   async function annuleer(key, ref) {
-    const a = (db.data.reisAanvragen || []).find(x => x.ref === String(ref || '') && x.customerKey === key);
+    const a = opslag.aanvragen().find(x => x.ref === String(ref || '') && x.customerKey === key);
     if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
     a.status = 'geannuleerd';
@@ -126,19 +128,18 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
 
   // het reisbureau-kantoor: de openstaande aanvragen (codenamen, nooit echte namen)
   function aanvragen() {
-    return { ok: true, aanvragen: (db.data.reisAanvragen || []).slice(0, 200) };
+    return { ok: true, aanvragen: opslag.aanvragen().slice(0, 200) };
   }
   /* Het BESLUIT van de reisadviseur (bevestigen, afwijzen, en de kantooringang
      besluit()) staat in ./reisbureau-besluit.js -- zie de kop daar voor de naad. */
-  const { bevestig, wijsAf, besluit } = require('./reisbureau-besluit')({ db, save, nu, dossier, visum, meldLid });
+  const { bevestig, wijsAf, besluit } = require('./reisbureau-besluit')({ rij: opslag.aanvragen, save, nu, dossier, visum, meldLid });
   /* DE NAZORG (./reisbureau-nazorg.js): wijzigen en afzeggen van een reis die al
      bevestigd is. Dat was een doodlopende weg -- zie de kop daar. Hij deelt de
      aanvraag, het dossier en de visumtaak met het besluit hierboven, zodat er
      EEN plek blijft waar een aanvraag van stand verandert. */
   const nazorg = require('./reisbureau-nazorg')({
-    /* De aanvragenrij gaat MEE naar beneden in plaats van dat de nazorg zelf
-       db.data opzoekt: waar deze collectie woont, hoort op een plek te staan. */
-    rij: () => (Array.isArray(db.data.reisAanvragen) ? db.data.reisAanvragen : []),
+    // de aanvragenrij gaat mee naar beneden; hij woont in ./reisbureau-opslag.js
+    rij: opslag.aanvragen,
     save, nu, dossier, visum, meldLid,
     // laat gebonden: de betaallaag wordt na het reisbureau gemount (opzet/kernlaag2.js)
     terugboeken: (ref, o) => { const rb = reisbetalingVan && reisbetalingVan();
@@ -147,10 +148,10 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
   /* De deur voor kern/reisbureau-betaling.js: twee lezers en EEN schrijver, zodat
      die laag niet in deze bak hoeft te graaien. Waarom, staat in de kop daar. */
   function aanvraagVan(ref) {
-    return (db.data.reisAanvragen || []).find(a => a.ref === String(ref || '')) || null;
+    return opslag.aanvragen().find(a => a.ref === String(ref || '')) || null;
   }
   function tripVan(id) {
-    return (db.data.partnerTrips || []).find(t => t.id === String(id || '')) || null;
+    return opslag.reizen().find(t => t.id === String(id || '')) || null;
   }
   /* Een tweede betaling wordt geweigerd en niet overschreven: dat zou een
      eerdere boeking onvindbaar maken. */

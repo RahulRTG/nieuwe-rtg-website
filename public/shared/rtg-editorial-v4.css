@@ -680,6 +680,12 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"]{
   padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;
 }
+/* Een wereldstart is alleen op de telefoon een cover onder de kop. Vanaf 700px is het een
+   dashboard: de inhoud begint onder de vaste kop, en er schemert niets doorheen. */
+@media(min-width:700px){
+  html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"][data-world-home]{padding-top:var(--v4-header)!important}
+  html body.rtg-stijl.rtg-edge-host[data-rtg-editorial-v4="true"][data-rtg-v4-kind="cover"][data-world-home]>header.rtg-v4-header{background:rgba(12,12,11,.97)!important;border-bottom:1px solid rgba(226,195,142,.16)!important}
+}
 html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"]{
   padding-top:0!important;background:#0c0c0b!important;color:#fffaf2!important;
 }

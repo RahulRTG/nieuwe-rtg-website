@@ -81,6 +81,25 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-10kryme:not(#_#_#_){display:flex;gap:.4rem}
+.s-1kjjbu5:not(#_#_#_){display:flex;align-items:center;margin-bottom:0.5rem}
+.s-6u92nb:not(#_#_#_){background:#5FA56A}
+.s-7bb9ev:not(#_#_#_){background:#6FB1E6}
+.s-7myv37:not(#_#_#_){margin-left:auto}
+.s-d9qe6k:not(#_#_#_){background:#C9A24B}
+.s-e2p904:not(#_#_#_){background:#E0796F}
+.s-m3b83:not(#_#_#_){margin-bottom:0.5rem}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+.s-ujqmzb:not(#_#_#_){background:#ffffff}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -103,11 +122,11 @@
       <button class="tbtn" data-tool="marker" title="Marker">✎</button>
       <button class="tbtn" data-tool="gum" title="Gum">◻</button>
       <span class="i-85uhvc"></span>
-      <span class="kleur aan" data-kleur="#ffffff" style="background:#ffffff"></span>
-      <span class="kleur" data-kleur="#C9A24B" style="background:#C9A24B"></span>
-      <span class="kleur" data-kleur="#6FB1E6" style="background:#6FB1E6"></span>
-      <span class="kleur" data-kleur="#5FA56A" style="background:#5FA56A"></span>
-      <span class="kleur" data-kleur="#E0796F" style="background:#E0796F"></span>
+      <span class="kleur aan s-ujqmzb" data-kleur="#ffffff"></span>
+      <span class="kleur s-d9qe6k" data-kleur="#C9A24B"></span>
+      <span class="kleur s-7bb9ev" data-kleur="#6FB1E6"></span>
+      <span class="kleur s-6u92nb" data-kleur="#5FA56A"></span>
+      <span class="kleur s-e2p904" data-kleur="#E0796F"></span>
       <input type="range" id="dikte" min="1" max="40" value="4" title="Dikte">
       <span class="i-85uhvc"></span>
       <button class="tbtn" id="btnUndo" title="Ongedaan maken">↶</button>
@@ -128,8 +147,8 @@
     </div>
     <div class="kaart paneel">
       <h3>Agenda / huiswerk</h3>
-      <input class="veld" id="agTekst" placeholder="Bijv. Maak §3.2, opgave 1 t/m 8" style="margin-bottom:0.5rem;">
-      <div style="display:flex;gap:.4rem;">
+      <input class="veld s-m3b83" id="agTekst" placeholder="Bijv. Maak §3.2, opgave 1 t/m 8">
+      <div class="s-10kryme">
         <input class="veld h-flex1" id="agDatum" type="date">
         <button class="knop klein" id="agAdd">+</button>
       </div>
@@ -139,9 +158,9 @@
 </div>
 
 <dialog id="dlgSchrift"><div class="kaart modal">
-  <div style="display:flex;align-items:center;margin-bottom:0.5rem;">
-    <h3 id="svNaam" style="font-size:1.1rem;">Schrift</h3>
-    <button class="knop grijs klein" style="margin-left:auto;" data-sluit="dlgSchrift">Sluiten</button>
+  <div class="s-1kjjbu5">
+    <h3 id="svNaam" class="s-prlthd">Schrift</h3>
+    <button class="knop grijs klein s-7myv37" data-sluit="dlgSchrift">Sluiten</button>
   </div>
   <div id="svBody"></div>
 </div></dialog>

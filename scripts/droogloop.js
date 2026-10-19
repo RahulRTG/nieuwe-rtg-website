@@ -40,7 +40,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 const { DatabaseSync } = require('node:sqlite');
 const { start } = require('./lib/wegwerpserver');
 const { gevolgVan } = require('../server/kern/stuur/gevolg');
@@ -116,7 +116,10 @@ function opslagBeeld(datamap) {
    verandering en het hoort in de uitslag, maar wie het op een hoop gooit met
    het gevolg van de handeling zelf, krijgt vijf stappen die allemaal "raakt
    van alles aan" heten. Twee lijsten dus, en de reden staat erbij. */
-const SPOREN = ['apiSpoor', 'handelingLog', 'rtgai'];
+/* `audit_rij` is de sqlite-tabel waarin diezelfde twee journalen (apiSpoor en
+   handelingLog) sinds server/db/audit-sqlite.js als rijen wonen; zonder hem hier
+   bewoog "de opslag" bij elke oproep en las elke lezer als schrijver. */
+const SPOREN = ['apiSpoor', 'handelingLog', 'rtgai', 'audit_rij'];
 const isSpoor = (naam) => SPOREN.includes(String(naam).split(':').pop());
 
 /* TWEE BEELDEN, TWEE VRAGEN. Hierboven telt `ver` -- het versienummer van een
@@ -250,7 +253,7 @@ async function main() {
     ]
   };
   Object.assign(uit, { stempel: stempel() });
-  fs.writeFileSync(path.join(WORTEL, 'DROOGLOOP.json'), JSON.stringify(uit, null, 1) + '\n');
+  if (magSchrijven(eisSchoneBoom('droogloop'), 'DROOGLOOP.json')) fs.writeFileSync(path.join(WORTEL, 'DROOGLOOP.json'), JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  ' + gemeten + ' van ' + stappen.length + ' stappen gemeten; ' +
     geraakt.length + ' collectie(s) bewogen.');
   console.log('  voorspelling: ' + kloppend + ' van ' + beoordeeld.length + ' beoordeelde stappen klopte; ' +

@@ -6,15 +6,15 @@
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, db, save, talen } = kern;
+  const eigen = require('../../kern/eigencollectie')({ db, domein: 'routes/member/taal', bezit: { memberTaal: 'kaart' } });
 
   app.post('/api/member/taal', auth, (req, res) =>
-    res.json({ ok: true, taal: (db.data.memberTaal || {})[req.session.key] || null, talen: talen.actieve() }));
+    res.json({ ok: true, taal: eigen.kijk('memberTaal')[req.session.key] || null, talen: talen.actieve() }));
 
   app.post('/api/member/taal/zet', auth, (req, res) => {
     const code = String((req.body || {}).code || '').toLowerCase();
     if (!talen.isActief(code)) return res.status(400).json({ error: 'Kies een actieve taal; de Boardroom bepaalt welke wereldtalen aanstaan.' });
-    db.data.memberTaal = db.data.memberTaal || {};
-    db.data.memberTaal[req.session.key] = code;
+    eigen.bak('memberTaal')[req.session.key] = code;
     save();
     res.json({ ok: true, taal: code });
   });

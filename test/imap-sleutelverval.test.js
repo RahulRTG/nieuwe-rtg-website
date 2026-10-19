@@ -110,18 +110,28 @@ test('5. over HTTP roteren lid en zaak hun eigen apparaatsleutel', async () => {
     const manager = (rooster.body.staff || []).find(x => x.role === 'manager');
     const zaak = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: manager.id, pin: '1234' })).body.token;
     assert.ok(lid && zaak);
+    /* De paden staan voluit per kant en worden niet opgebouwd: de routedekking
+       (scripts/lib/routedekking.js) ziet een opgebouwd pad niet, en dan telt
+       precies de route die hier wel wordt beproefd als 'nooit aangeroepen'. */
+    const DEUREN = {
+      member: { roteer: '/api/member/rtmail/imap/roteer', sleutel: '/api/member/rtmail/imap/sleutel', sleutels: '/api/member/rtmail/imap/sleutels' },
+      supplier: { roteer: '/api/supplier/rtmail/imap/roteer', sleutel: '/api/supplier/rtmail/imap/sleutel', sleutels: '/api/supplier/rtmail/imap/sleutels' }
+    };
     for (const [kant, tok] of [['member', lid], ['supplier', zaak]]) {
-      const pad = '/api/' + kant + '/rtmail/imap/';
-      assert.ok([401, 403].includes((await api(pad + 'roteer', { id: 'x' })).status), kant + ': niet zonder inlog');
-      const m = await api(pad + 'sleutel', { naam: 'Telefoon', dagen: 30 }, tok);
+      const D = DEUREN[kant];
+      assert.ok([401, 403].includes((await api(D.roteer, { id: 'x' })).status), kant + ': niet zonder inlog');
+      const m = await api(D.sleutel, { naam: 'Telefoon', dagen: 30 }, tok);
       assert.equal(m.status, 200, kant + ': ' + JSON.stringify(m.body).slice(0, 160));
       assert.match(m.koppen.get('cache-control') || '', /no-store/);
-      assert.equal((await api(pad + 'sleutel', { naam: 'Telefoon', dagen: 999 }, tok)).status, 400);
-      const r = await api(pad + 'roteer', { id: m.body.id }, tok);
+      assert.equal((await api(D.sleutel, { naam: 'Telefoon', dagen: 999 }, tok)).status, 400);
+      assert.equal((await api(D.roteer, { id: m.body.id, dagen: 999 }, tok)).status, 400, kant + ': ook roteren houdt zich aan de bovengrens');
+      assert.equal((await api(D.roteer, { id: 'bestaat-niet' }, tok)).status, 400, kant + ': een onbekende sleutel roteert niet');
+      const r = await api(D.roteer, { id: m.body.id }, tok);
       assert.equal(r.status, 200, kant + ': ' + JSON.stringify(r.body).slice(0, 160));
       assert.match(r.koppen.get('cache-control') || '', /no-store/);
+      assert.equal(r.body.id, m.body.id, kant + ': hetzelfde apparaat');
       assert.notEqual(r.body.sleutel, m.body.sleutel);
-      const lijst = (await api(pad + 'sleutels', {}, tok)).body.sleutels;
+      const lijst = (await api(D.sleutels, {}, tok)).body.sleutels;
       assert.equal(lijst.length, 1, kant + ': roteren maakt geen tweede sleutel');
       assert.ok(lijst[0].vervalt && !JSON.stringify(lijst).includes(r.body.sleutel));
     }

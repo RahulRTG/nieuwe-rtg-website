@@ -5,12 +5,14 @@
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
   const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media, commDm, dyncodeGeef } = core;
+  // de vijf sociale lijsten achter een deur (./sociaal/opslag.js); de PIN-laag heeft zijn eigen
+  const S = require('./sociaal/opslag')({ db });
   /* Dit domein schrijft uitsluitend zijn sociale voorraden. Een verbinding of
      snap hoeft daarom geen facturen, reizen en bedrijfsdata te serialiseren. */
   const sociaalSleutels = ['blocks', 'connections', 'reports', 'snaps', 'stories',
     'contactPins', 'contactPinRetired', 'contactPinSecurity'];
   const sociaalSave = () => {
-    const sleutels = sociaalSleutels.filter(k => Object.hasOwn(db.data, k));
+    const sleutels = S.aanwezig(sociaalSleutels);
     return sleutels.length && typeof save.sleutels === 'function'
       ? save.sleutels(sleutels)
       : save();
@@ -18,7 +20,7 @@ module.exports = (core) => {
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
-  return db.data.connections.find(c => (c.a === a && c.b === b) || (c.a === b && c.b === a));
+  return S.lijst('connections').find(c => (c.a === a && c.b === b) || (c.a === b && c.b === a));
 }
 
 const isRtf = h => typeof h === 'string' && h.startsWith('rtf:');
@@ -45,21 +47,21 @@ function verbActief(c) { return !!(c && c.status === 'accepted' && (!c.voogdWach
 /* ---------- sociale veiligheid: blokkeren, melden, snelheidslimiet ----------
    Blokkeren werkt beide kanten op: geen verzoek, chat, snap of belsignaal meer.
    De snelheidslimiet remt spam en pesten (te veel verzoeken/berichten/snaps).
-   Een melding komt in db.data.reports terecht voor de backoffice. */
-const isGeblokkeerd = (a, b) => db.data.blocks.some(x => (x.door === a && x.doel === b) || (x.door === b && x.doel === a));
+   Een melding komt in de lijst `reports` terecht voor de backoffice. */
+const isGeblokkeerd = (a, b) => S.lijst('blocks').some(x => (x.door === a && x.doel === b) || (x.door === b && x.doel === a));
 function blokkeer(mij, doel) {
   if (!mij || !doel || mij === doel) return { status: 400, error: 'Ongeldig.' };
-  if (!db.data.blocks.some(x => x.door === mij && x.doel === doel)) db.data.blocks.push({ door: mij, doel, at: new Date().toISOString() });
+  if (!S.lijst('blocks').some(x => x.door === mij && x.doel === doel)) S.lijst('blocks').push({ door: mij, doel, at: new Date().toISOString() });
   // bestaande vriendschap of openstaand verzoek meteen weg
-  db.data.connections = db.data.connections.filter(c => !((c.a === mij && c.b === doel) || (c.a === doel && c.b === mij)));
+  S.zet('connections', S.lijst('connections').filter(c => !((c.a === mij && c.b === doel) || (c.a === doel && c.b === mij))));
   sociaalSave();
   return { status: 200, ok: true };
 }
-function deblokkeer(mij, doel) { db.data.blocks = db.data.blocks.filter(x => !(x.door === mij && x.doel === doel)); sociaalSave(); return { status: 200, ok: true }; }
+function deblokkeer(mij, doel) { S.zet('blocks', S.lijst('blocks').filter(x => !(x.door === mij && x.doel === doel))); sociaalSave(); return { status: 200, ok: true }; }
 function meldMisbruik(mij, doel, reden) {
   if (!doel) return { status: 400, error: 'Wie wil je melden?' };
-  db.data.reports.push({ door: mij, doel, codenaamDoel: codenaamVan(doel), reden: String(reden || '').replace(/[<>]/g, '').slice(0, 300), at: new Date().toISOString() });
-  db.data.reports = db.data.reports.slice(-5000);
+  S.lijst('reports').push({ door: mij, doel, codenaamDoel: codenaamVan(doel), reden: String(reden || '').replace(/[<>]/g, '').slice(0, 300), at: new Date().toISOString() });
+  S.zet('reports', S.lijst('reports').slice(-5000));
   sociaalSave();
   return { status: 200, ok: true };
 }
@@ -77,7 +79,7 @@ function sociaalRate(mij, actie, max, perMs) {
 /* De vriendenlaag en de snaps/verhalen-laag draaien als submodules op een
    gedeelde context, een keer opgebouwd bij het opstarten; de vriendenlaag
    levert zijnVrienden aan de snapslaag via die context. */
-const ctx = { db, save: sociaalSave, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm, dyncodeGeef,
+const ctx = { db, opslag: S, save: sociaalSave, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm, dyncodeGeef,
   dmSleutel, connectieTussen, isRtf, codeExists, codeBestaat, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate };
 const deelVrienden = require('./sociaal/vrienden')(ctx);

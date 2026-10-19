@@ -21,14 +21,14 @@
     });
     if (!m.length){ $('#msFoot').innerHTML = ''; return; }
     if (menuState.supplier.ordersOpen === false){
-      $('#msFoot').innerHTML = '<div style="padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft);">' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
+      $('#msFoot').innerHTML = '<div class="s-12zxnen">' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
       return;
     }
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
     const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
     const tafels = menuState.supplier.tableNames || [];
     $('#msFoot').innerHTML =
-      (tafels.length ? '<select class="ms-note" id="msTable" style="margin-bottom:0.5rem;">'+
+      (tafels.length ? '<select class="ms-note s-m3b83" id="msTable">'+
         '<option value="">' + T('app.ms.tableq','Aan welke tafel zit u? (optioneel)') + '</option>'+
         tafels.map(t => '<option' + (menuState.table === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' : '') +
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
@@ -41,12 +41,12 @@
       '</select>' +
       '<div style="font-size:0.66rem;color:var(--soft);margin:0.25rem 0;">' + T('app.ms.los','U bestelt rechtstreeks bij deze zaak: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de zaak.') + '</div>' +
       ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
-        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.25rem 0;">' +
+        ? '<div class="s-77nxhn">' +
           (menuState.alcohol && menuState.alcohol.mag === false
             ? T('app.ms.geenalc','Alcohol staat voor u uit:') + ' ' + (menuState.alcohol.land || '') + ' ' + T('app.ms.vanaf','hanteert') + ' ' + menuState.alcohol.grens + '+ ' + T('app.ms.pasp','(leeftijd geverifieerd via uw paspoort).')
             : 'Alcohol: ' + ((menuState.alcohol && menuState.alcohol.grens) || 18) + '+; ' + T('app.ms.18b','de zaak kan om legitimatie vragen.')) + '</div>' : '') +
       '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>' +
-      (count ? '<button class="ms-order" id="msKassa" style="margin-top:0.5rem;background:none;border:1px solid var(--line);color:var(--txt);">' + T('app.ms.naarkassa','Stuur naar de kassa, betaal aan de balie') + '</button>' : '');
+      (count ? '<button class="ms-order s-1df46c7" id="msKassa">' + T('app.ms.naarkassa','Stuur naar de kassa, betaal aan de balie') + '</button>' : '');
     const mt = $('#msTable');
     if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
     $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
@@ -66,17 +66,17 @@
     let html = '<div class="ms-cat">' + T('rt.m.cat','Collectie') + '</div>';
     // eigen apart-artikelen en stylingvoorstellen bij dit merk
     const apart = (mijn.apart || []).filter(a => a.supplierName === r.supplier.name);
-    if (apart.length) html += '<div style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + T('rt.m.apart','Voor u apart gelegd') + '</div>' +
-      apart.map(a => '<div style="font-size:0.82rem;margin-top:0.3rem;">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span style="color:var(--soft);">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') +
-      '<button class="rt-bezorg" style="margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
-      '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.3rem;">' + T('mb.veiliguitleg','Met bezorgcode, live volgen en pas-aan-de-deur. Dure stukken: ID aan de deur.') + '</div></div>';
+    if (apart.length) html += '<div class="s-vheoej"><div class="s-q9kr8e">' + T('rt.m.apart','Voor u apart gelegd') + '</div>' +
+      apart.map(a => '<div class="s-cjhok5">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span class="s-1pv2lmv">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') +
+      '<button class="rt-bezorg s-1m7x24a">' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
+      '<div class="s-1p5q1dn">' + T('mb.veiliguitleg','Met bezorgcode, live volgen en pas-aan-de-deur. Dure stukken: ID aan de deur.') + '</div></div>';
     // lopende bezorgingen van deze winkel
     const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
-    if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
-      '<button data-mbcode="' + esc(b.ref) + '" style="margin-top:0.4rem;background:none;border:1px solid var(--gold);color:inherit;border-radius:0;padding:0.35rem 0.7rem;font-family:inherit;cursor:pointer;">' + T('mb.toon','Nieuwe bezorgcode') + '</button>' +
-      '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
+    if (bez.length) html += bez.map(b => '<div class="s-1klloxj"><div class="s-q9kr8e">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
+      '<button data-mbcode="' + esc(b.ref) + '" class="s-wsds8w">' + T('mb.toon','Nieuwe bezorgcode') + '</button>' +
+      '<div class="s-12gyt3u">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
-    if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + esc(v.titel) + '</div>' +
-      (v.bericht ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + esc(v.bericht) + '</div>' : '') +
-      '<div style="font-size:0.8rem;margin-top:0.25rem;">' + v.items.map(i => esc(i.naam)).join(' · ') + '</div><div style="font-size:0.68rem;color:var(--soft);margin-top:0.25rem;">' + T('rt.m.van','van') + ' ' + esc(v.van) + '</div></div>').join('');
+    if (styling.length) html += styling.map(v => '<div class="s-vheoej"><div class="s-q9kr8e">' + esc(v.titel) + '</div>' +
+      (v.bericht ? '<div class="s-o2xnz3">' + esc(v.bericht) + '</div>' : '') +
+      '<div class="s-12wf5w5">' + v.items.map(i => esc(i.naam)).join(' · ') + '</div><div class="s-1k33i11">' + T('rt.m.van','van') + ' ' + esc(v.van) + '</div></div>').join('');
     // de artikelen

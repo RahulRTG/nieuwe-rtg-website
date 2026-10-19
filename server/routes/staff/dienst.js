@@ -24,12 +24,13 @@ module.exports = (actx) => {
 require('./dienst-fluister')({ app, accounts, supplierAuth, fluister, stuurLus });
 // de klok, de pauze en de aanwezigheid: zie de kop hierboven
 require('./dienst-klok')(actx);
+const dienstOpslag = require('../../kern/dienst-opslag')({ db }); // het verlof van de zaak
 
 app.post('/api/staff/mine', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
   res.json({
     klok: klokVan(req.supplier.code, req.actor.staffId),
-    verlof: (db.data.verlof[req.supplier.code] || []).filter(v => v.staffId === req.actor.staffId).slice(0, 10),
+    verlof: dienstOpslag.verlof(req.supplier.code).filter(v => v.staffId === req.actor.staffId).slice(0, 10),
     pauze: werkbeleidPauzeStand(req.supplier.code, req.actor.staffId),
     trust: trustVan(req.supplier.code, req.actor.staffId)
   });
@@ -66,7 +67,7 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
      een reden wel nodig kan zijn, loopt niet via deze route. */
   if (soort === 'verlof' && schoon(req.body.reden, 140))
     return res.status(422).json({ error: 'Voor verlof is geen reden nodig, en die wordt ook niet bewaard. Vraag het aan zonder toelichting.' });
-  const lijst = db.data.verlof[req.supplier.code] = db.data.verlof[req.supplier.code] || [];
+  const lijst = dienstOpslag.verlof(req.supplier.code);
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     staffId: req.actor.staffId, name: req.actor.name, soort,
@@ -76,7 +77,7 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
     at: new Date().toISOString()
   };
   lijst.unshift(entry);
-  db.data.verlof[req.supplier.code] = lijst.slice(0, 2000);
+  dienstOpslag.zetVerlof(req.supplier.code, lijst.slice(0, 2000));
 
   /* Dezelfde melding ook naar de verzuimlaag van Payroll OS. Die kent de
      doorbetalingspercentages per verlofsoort en weet wanneer het UWV eraan te
@@ -84,7 +85,7 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
      betaalde hij honderd procent door.
 
      EEN SCHRIJFPAD, TWEE GEZICHTEN -- en dat is met opzet geen tweede invoer.
-     `db.data.verlof` hierboven is de goedkeuringsstroom van de zaak-app (nieuw
+     Het verlof hierboven (kern/dienst-opslag.js) is de goedkeuringsstroom (nieuw
      -> goedgekeurd/afgewezen); de verzuimlaag is wat de payroll ervan moet
      weten. Zou een mens ze allebei moeten invullen, dan lopen ze uiteen en
      klopt de loondoorbetaling niet met het rooster. */

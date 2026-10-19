@@ -107,6 +107,34 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-first-steps.css" rel="stylesheet">
 <script src="/shared/rtg-first-steps.js"></script>
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15ai77r:not(#_#_#_){padding:0}
+.s-1d2pkk7:not(#_#_#_){padding:.7rem .9rem}
+.s-1de689b:not(#_#_#_){color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem}
+.s-1eltjr2:not(#_#_#_){color:var(--soft);font-size:.85rem}
+.s-1fuhja7:not(#_#_#_){grid-column:1/-1}
+.s-1m90qxm:not(#_#_#_){font-size:.6rem;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.02rem .4rem}
+.s-1ymxrjr:not(#_#_#_){font-size:1rem;margin-bottom:0.75rem}
+.s-8znlsy:not(#_#_#_){display:block;font-size:1rem;color:var(--txt);font-family:'Bodoni Moda',serif}
+.s-alkl69:not(#_#_#_){background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer}
+.s-beigzh:not(#_#_#_){font-size:.87rem;line-height:1.55;margin-bottom:0.75rem}
+.s-bro4np:not(#_#_#_){font-size:.75rem;color:var(--soft)}
+.s-jeokyc:not(#_#_#_){display:block;font-size:1.15rem;color:var(--txt);font-family:'Bodoni Moda',serif}
+.s-l4hgma:not(#_#_#_){display:flex;gap:1.1rem;font-size:.76rem;color:var(--muted)}
+.s-qw9v7y:not(#_#_#_){padding:1.2rem}
+.s-re1pff:not(#_#_#_){display:flex;gap:1.3rem;font-size:.74rem;color:var(--muted);margin:0.5rem 0 0.25rem}
+.s-uyke0t:not(#_#_#_){color:var(--muted);font-size:.86rem;line-height:1.5;margin-bottom:0.5rem}
+.s-xczbsa:not(#_#_#_){color:var(--soft);font-size:.85rem;margin-top:0.5rem}
+.s-xgxb7v:not(#_#_#_){padding:.4rem 0 0}
+.s-xjt35b:not(#_#_#_){color:var(--soft);font-size:.74rem;margin-top:.2rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -305,13 +333,13 @@ async function tekenFeed(){
       rijen:POSTS.map(p=>[String(p.at||'').slice(0,10), p.author, p.place||'', p.text||'',
         (p.onderwerpen||[]).join(' '), p.likes, p.reacties]) };
   });
-  const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Je archief</h2>'
-    : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Wat je bewaarde</h2>'
+  const kop = ARCHIEF ? '<h2 class="s-1ymxrjr">Je archief</h2>'
+    : TAB==='bewaard' ? '<h2 class="s-1ymxrjr">Wat je bewaarde</h2>'
     : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>'+esc(ZOEK)+'</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
-    : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">wissen</button></div>' : '';
+    : ONDERWERP ? '<div class="kaart s-1d2pkk7">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini s-alkl69" id="wisOnderwerp">wissen</button></div>' : '';
   toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : !ARCHIEF && TAB==='feed' && !ZOEK && !ONDERWERP ? RTGFirstSteps.welcome('salon') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Er zijn geen momenten gevonden die bij uw zoekopdracht passen.')+'</div>')
     + (d.meer ? '<button class="meer" id="meer">Meer laden</button>'
-              : (POSTS.length?'<div class="leeg" style="padding:1.2rem;">Je bent bij.</div>':'')));
+              : (POSTS.length?'<div class="leeg s-qw9v7y">Je bent bij.</div>':'')));
   const momentStand=$('#salonMomenten'), mensenStand=$('#salonMensen');
   if(momentStand) momentStand.textContent=POSTS.length+' '+(POSTS.length===1?'moment':'momenten');
   if(mensenStand) mensenStand.textContent=new Set(POSTS.map(p=>p.author).filter(Boolean)).size+' '+
@@ -325,19 +353,19 @@ async function tekenFeed(){
 
 /* ---------- ontdekken: onderwerpen, niet een motor die voor jou kiest ---------- */
 async function tekenOntdek(){
-  toon('<div class="kaart"><label for="zoekveld">Zoeken in De Salon</label><input id="zoekveld" type="search" value="'+esc(ZOEK)+'" placeholder="Zoek op woord, plaats of codenaam"><div class="knoppen"><button class="knop" id="zoekknop" type="button">Zoeken</button></div></div><div id="onderwerpen" class="kaart"><h2>Waar het over gaat</h2><p style="color:var(--soft);font-size:.85rem;">Laden...</p></div>');
+  toon('<div class="kaart"><label for="zoekveld">Zoeken in De Salon</label><input id="zoekveld" type="search" value="'+esc(ZOEK)+'" placeholder="Zoek op woord, plaats of codenaam"><div class="knoppen"><button class="knop" id="zoekknop" type="button">Zoeken</button></div></div><div id="onderwerpen" class="kaart"><h2>Waar het over gaat</h2><p class="s-1eltjr2">Laden...</p></div>');
   const voerZoek=()=>{ ZOEK=$('#zoekveld').value.trim(); ONDERWERP=''; TAB='feed'; NA=null; teken(); };
   $('#zoekknop').onclick=voerZoek;
   $('#zoekveld').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); voerZoek(); } };
   try{
     const d=await api('/api/salon/ai/waarover',{});
     $('#onderwerpen').innerHTML='<h2>Waar het over gaat</h2>'+
-      (d.tekst?'<p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-bottom:0.5rem;">'+esc(d.tekst)+'</p>':'')+
+      (d.tekst?'<p class="s-uyke0t">'+esc(d.tekst)+'</p>':'')+
       (d.onderwerpen&&d.onderwerpen.length
-        ? '<div class="onderw" style="padding:0;">'+d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.naam)+'">#'+esc(o.naam)+' ('+o.aantal+')</button>').join('')+'</div>'
-        : '<p style="color:var(--soft);font-size:.85rem;">Er is nog weinig gedeeld.</p>');
+        ? '<div class="onderw s-15ai77r">'+d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.naam)+'">#'+esc(o.naam)+' ('+o.aantal+')</button>').join('')+'</div>'
+        : '<p class="s-1eltjr2">Er is nog weinig gedeeld.</p>');
     knopen();
-  }catch(e){ $('#onderwerpen').innerHTML='<h2>Waar het over gaat</h2><p style="color:var(--soft);font-size:.85rem;">'+esc(e.message)+'</p>'; }
+  }catch(e){ $('#onderwerpen').innerHTML='<h2>Waar het over gaat</h2><p class="s-1eltjr2">'+esc(e.message)+'</p>'; }
 }
 
 /* ---------- plaatsen, met karrousel en toegankelijke beschrijving ---------- */
@@ -485,24 +513,24 @@ async function tekenInzicht(){
   try{ d=await api('/api/salon/inzicht',{}); }
   catch(e){ toon('<div class="leeg">'+esc(e.message)+'</div>'); return; }
   const t=d.totaal||{posts:0,mooi:0,reacties:0,bewaard:0};
-  const cijfer=(n,l)=>'<span><b style="display:block;font-size:1.15rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+n+'</b>'+l+'</span>';
+  const cijfer=(n,l)=>'<span><b class="s-jeokyc">'+n+'</b>'+l+'</span>';
   toon('<div class="kaart"><h2>Wat jouw posts deden</h2>'+
-    '<div class="cijfers" style="display:flex;gap:1.3rem;font-size:.74rem;color:var(--muted);margin:0.5rem 0 0.25rem;">'+
+    '<div class="cijfers s-re1pff">'+
       cijfer(t.posts,'posts')+cijfer(t.mooi,'mooi')+cijfer(t.reacties,'reacties')+cijfer(t.bewaard,'bewaard')+'</div>'+
-    '<p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem;">Alleen van jou, en alleen voor jou. Je ziet dat iets bewaard is, nooit door wie.</p>'+
+    '<p class="s-1de689b">Alleen van jou, en alleen voor jou. Je ziet dat iets bewaard is, nooit door wie.</p>'+
     '<div class="knoppen"><button class="knop stil" id="archknop" type="button">Toon je archief</button></div></div>'+
-    ((d.onderwerpen||[]).length?'<div class="kaart"><h2>Wat aansloeg</h2><div class="onderw" style="padding:.4rem 0 0;">'+
+    ((d.onderwerpen||[]).length?'<div class="kaart"><h2>Wat aansloeg</h2><div class="onderw s-xgxb7v">'+
       d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.onderwerp)+'">#'+esc(o.onderwerp)+', '+(o.mooi+o.reacties+o.bewaard)+'</button>').join('')+
-      '</div><p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem;">Je onderwerpen, op wat ze losmaakten. Over de inhoud, niet over hoe vaak je plaatst.</p></div>':'')+
+      '</div><p class="s-1de689b">Je onderwerpen, op wat ze losmaakten. Over de inhoud, niet over hoe vaak je plaatst.</p></div>':'')+
     '<div class="kaart"><h2>Per post</h2>'+
       ((d.posts||[]).length? d.posts.map(p=>
         '<div class="reactie"><span class="wie">'+esc(p.tekst||'(zonder tekst)')+'</span>'+
-        (p.gearchiveerd?' <span style="font-size:.6rem;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.02rem .4rem;">archief</span>':'')+
-        '<div style="color:var(--soft);font-size:.74rem;margin-top:.2rem;">'+
+        (p.gearchiveerd?' <span class="s-1m90qxm">archief</span>':'')+
+        '<div class="s-xjt35b">'+
           p.mooi+' mooi, '+p.reacties+' reacties, '+p.bewaard+' bewaard'+
           '<button class="mini" data-arch="'+p.id+'" data-aan="'+(p.gearchiveerd?'0':'1')+'">'+(p.gearchiveerd?'terugzetten':'archiveren')+'</button>'+
           '<button class="mini" data-reacties="'+p.id+'">openen</button></div></div>').join('')
-        : '<p style="color:var(--soft);font-size:.85rem;">Je hebt nog niets geplaatst.</p>')+'</div>');
+        : '<p class="s-1eltjr2">Je hebt nog niets geplaatst.</p>')+'</div>');
   knopen();
   $('#archknop').onclick=()=>{ TAB='feed'; ARCHIEF=true; NA=null; ONDERWERP=''; ZOEK=''; tekenTabs(); tekenFeed(); };
 }
@@ -515,12 +543,12 @@ async function toonProfiel(wie){
   const r=d.raster;
   toon('<div class="kaart">'+
     '<div class="profiel"><div><h2>'+esc(d.codenaam||'Lid')+'</h2>'+
-      (d.plaats?'<div class="plek" style="font-size:.75rem;color:var(--soft);">'+esc(d.plaats)+'</div>':'')+'</div></div>'+
-    (d.bio?'<p style="font-size:.87rem;line-height:1.55;margin-bottom:0.75rem;">'+esc(d.bio)+'</p>':'')+
-    '<div class="cijfers" style="display:flex;gap:1.1rem;font-size:.76rem;color:var(--muted);">'+
-      '<span><b style="display:block;font-size:1rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+d.posts+'</b>posts</span>'+
-      '<span><b style="display:block;font-size:1rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+d.volgers+'</b>volgers</span>'+
-      '<span><b style="display:block;font-size:1rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+d.volgend+'</b>volgend</span></div>'+
+      (d.plaats?'<div class="plek s-bro4np">'+esc(d.plaats)+'</div>':'')+'</div></div>'+
+    (d.bio?'<p class="s-beigzh">'+esc(d.bio)+'</p>':'')+
+    '<div class="cijfers s-l4hgma">'+
+      '<span><b class="s-8znlsy">'+d.posts+'</b>posts</span>'+
+      '<span><b class="s-8znlsy">'+d.volgers+'</b>volgers</span>'+
+      '<span><b class="s-8znlsy">'+d.volgend+'</b>volgend</span></div>'+
     '<div class="knoppen">'+(d.ikZelf
       ? '<button class="knop stil" id="bioknop" type="button">Bio aanpassen</button>'
       : '<button class="knop" id="volgknop" type="button">'+(d.volgIk?'Ontvolgen':'Volgen')+'</button>')+
@@ -529,7 +557,7 @@ async function toonProfiel(wie){
       (p.media[0]?(p.media[0].type==='video'?'<video src="'+esc(p.media[0].src)+'" muted playsinline preload="metadata" aria-label="'+esc(p.media[0].alt||'Video')+'"></video>'
                  :'<img src="'+esc(p.media[0].src)+'" alt="'+esc(p.media[0].alt||'Foto')+'">')
                  :'<span class="geen">'+esc((p.text||'').slice(0,60))+'</span>')+'</button>').join('')
-      : '<div class="leeg" style="grid-column:1/-1;">Nog niets geplaatst.</div>')+'</div>');
+      : '<div class="leeg s-1fuhja7">Nog niets geplaatst.</div>')+'</div>');
   $('#terugknop').onclick=()=>{ TAB='feed'; NA=null; teken(); };
   if($('#volgknop')) $('#volgknop').onclick=()=>werk($('#volgknop'),async()=>{
     await api('/api/salon/volg-lid',{wie:d.codenaam,aan:!d.volgIk}); toonProfiel(wie); });
@@ -554,13 +582,13 @@ async function toonReacties(id, alleen){
       (c.vanMij?' <button class="mini" data-rweg="'+c.id+'">weg</button>':'')+
       (c.antwoorden||[]).map(a=>'<div class="reactie antwoord"><span class="wie">'+esc(a.who)+'</span> '+esc(a.text)+
         (a.vanMij?' <button class="mini" data-rweg="'+a.id+'">weg</button>':'')+'</div>').join('')+'</div>').join('')
-      : '<p style="color:var(--soft);font-size:.85rem;">Nog geen reacties.</p>')+
+      : '<p class="s-1eltjr2">Nog geen reacties.</p>')+
     (d.magIkReageren
       ? '<label for="rtekst">Reageren. Noem iemand met @codenaam.</label><input id="rtekst" maxlength="300">'+
         '<div class="knoppen"><button class="knop" id="rknop" type="button">Plaatsen</button>'+
         (post&&post.vanMij?'<button class="knop stil" id="rsamen" type="button">Vat de reacties samen</button>':'')+
         '<button class="knop stil" id="rterug" type="button">Terug</button></div>'
-      : '<p style="color:var(--soft);font-size:.85rem;margin-top:0.5rem;">De maker heeft reacties beperkt.</p><div class="knoppen"><button class="knop stil" id="rterug" type="button">Terug</button></div>')+
+      : '<p class="s-xczbsa">De maker heeft reacties beperkt.</p><div class="knoppen"><button class="knop stil" id="rterug" type="button">Terug</button></div>')+
     '</div>';
   toon(html);
   let opId=null;

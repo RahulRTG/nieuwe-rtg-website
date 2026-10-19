@@ -121,19 +121,33 @@ async function maakProeflid({ post, naam, basis }) {
      token van `voorLid.van()` (de demo-pas) aanklopt, klopt aan als het proeflid
      -- want een demo-pas kan per definitie niet binden, en de vraag die de proef
      stelt ("doet een herhaling iets") gaat over de route en niet over welk lid.
-     Op elk ander pad blijft het token zoals het was: de meting van de rest van
-     het huis verandert niet.
+     `van()` mag ook een LIJST tokens geven: De Beproeving heeft twee demo-passen
+     (RTG en Business) in de ledenrol. Op elk ander pad blijft het token zoals
+     het was: de meting van de rest van het huis verandert niet.
    - elk token dat bij een gebonden toestel hoort, krijgt een vers bewijs.
 
    Een token dat niemand kent gaat ongemoeid door: de SERVER beslist of dat mag,
-   niet deze schil. */
+   niet deze schil.
+
+   `toestellen` mag ook een FUNCTIE zijn die de lijst per verzoek geeft. Dat is
+   voor een proef waarvan de leden onderweg een vers token krijgen -- de
+   IDOR-proef loopt langs /api/logout en /api/privacy/delete, en een nieuwe
+   sessie moet dan opnieuw binden. Een lijst die bij het aanmaken wordt
+   vastgezet, zou het verse token niet kennen en het zware pad stil ongetekend
+   laten vertrekken. */
 function metToestellen(post, { toestellen, voorLid } = {}) {
-  const bekend = (toestellen || []).filter(Boolean);
-  if (!bekend.length && !(voorLid && voorLid.lid)) return post;
+  const levend = typeof toestellen === 'function';
+  const lijst = () => ((levend ? toestellen() : toestellen) || []).filter(Boolean);
+  const bekendBijStart = levend ? null : lijst();
+  if (!levend && !bekendBijStart.length && !(voorLid && voorLid.lid)) return post;
   return async (pad, lijf, token, koppen) => {
     if (!zwaarPad(pad)) return post(pad, lijf, token, koppen);
+    const bekend = levend ? lijst() : bekendBijStart;
     let t = token;
-    if (voorLid && voorLid.lid && token && token === voorLid.van()) t = voorLid.lid.token;
+    if (voorLid && voorLid.lid && token) {
+      const van = voorLid.van();
+      if (Array.isArray(van) ? van.includes(token) : token === van) t = voorLid.lid.token;
+    }
     const toestel = (voorLid && voorLid.lid && voorLid.lid.token === t) ? voorLid.lid : bekend.find(x => x.token === t);
     if (!toestel) return post(pad, lijf, t, koppen);
     const bewijs = await toestel.teken('POST', pad);

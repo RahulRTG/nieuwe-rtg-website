@@ -6,10 +6,11 @@ module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
   dmSleutel, connectieTussen, isRtf, codeBestaat, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate } = ctx;
+const S = ctx.opslag || require('../opslag')({ db: ctx.db }); // de vijf sociale lijsten
 function kindContacten(gezinCode, kidHandle) {
   const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.beschermd);
   if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
-  const contacten = db.data.connections.filter(c => c.a === kidHandle || c.b === kidHandle).map(c => {
+  const contacten = S.lijst('connections').filter(c => c.a === kidHandle || c.b === kidHandle).map(c => {
     const ander = c.a === kidHandle ? c.b : c.a;
     return { key: ander, codename: codenaamVan(ander), soort: soortVan(ander), volwassene: !isKindHandle(ander), status: verbActief(c) ? 'vriend' : (c.voogdWacht && c.voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd') };
   });
@@ -18,7 +19,7 @@ function kindContacten(gezinCode, kidHandle) {
 function kindVerwijder(gezinCode, kidHandle, anderHandle) {
   const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.beschermd);
   if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
-  db.data.connections = db.data.connections.filter(c => !((c.a === kidHandle && c.b === anderHandle) || (c.a === anderHandle && c.b === kidHandle)));
+  S.zet('connections', S.lijst('connections').filter(c => !((c.a === kidHandle && c.b === anderHandle) || (c.a === anderHandle && c.b === kidHandle))));
   save();
   return { status: 200, ok: true };
 }
@@ -84,7 +85,7 @@ async function socialVerbind(mij, naar, doorOuder, via) {
   if (isBeschermdHandle(naar)) voogdWacht.push(naar);
   c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht,
     via: via === 'pin' || via === 'code' ? via : null };
-  db.data.connections.push(c); save();
+  S.lijst('connections').push(c); save();
   sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
   return { status: 200, ok: true, st: voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd' };
 }

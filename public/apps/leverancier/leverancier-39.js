@@ -23,7 +23,7 @@
     const zoekBtn = el.querySelector('#rZoekBtn');
     const doeZoek = async () => {
       try { const r = await API.call('/supplier/retail/zoek', { q: $('#rZoek').value }); const uit = $('#rZoekUit');
-        uit.innerHTML = r.resultaten.length ? r.resultaten.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr" style="color:'+(v.laag?'var(--amber)':'var(--txt)')+';">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+geld(v.price)+'</div></div>').join('') : '<div class="empty">'+T('rt.nietsgevonden','Niets gevonden.')+'</div>';
+        uit.innerHTML = r.resultaten.length ? r.resultaten.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr ' + (v.laag ? 's-1qeblr2' : 's-1btm41d') + '">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+geld(v.price)+'</div></div>').join('') : '<div class="empty">'+T('rt.nietsgevonden','Niets gevonden.')+'</div>';
       } catch(e){ toast(e.message); }
     };
     if (zoekBtn) zoekBtn.addEventListener('click', doeZoek);
@@ -75,11 +75,11 @@
     // aanvraagformulier
     html += '<div class="card"><div class="tt-h">'+T('pn.vraag','Identiteit opvragen')+'</div>'+
       '<div class="field"><label>'+T('pn.codenaam','Codenaam van de gast')+'</label><input id="pnCode" placeholder="'+T('pn.codeph','Bijv. Zilveren Valk 12')+'" autocomplete="off"></div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">'+
-        '<div class="field" style="margin:0;"><label>'+T('pn.minleeftijd','Leeftijdseis (optioneel)')+'</label><input id="pnLeeftijd" type="number" placeholder="18" inputmode="numeric"></div>'+
-        '<div class="field" style="margin:0;"><label>'+T('pn.reden','Reden (optioneel)')+'</label><input id="pnReden" placeholder="'+T('pn.redenph','Bijv. leeftijdscontrole')+'"></div>'+
+      '<div class="s-imadgu">'+
+        '<div class="field s-40wpk4"><label>'+T('pn.minleeftijd','Leeftijdseis (optioneel)')+'</label><input id="pnLeeftijd" type="number" placeholder="18" inputmode="numeric"></div>'+
+        '<div class="field s-40wpk4"><label>'+T('pn.reden','Reden (optioneel)')+'</label><input id="pnReden" placeholder="'+T('pn.redenph','Bijv. leeftijdscontrole')+'"></div>'+
       '</div>'+
-      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.75rem;">'+
+      '<div class="s-1l8bx7q">'+
         '<button class="obtn primary" data-pnvraag="bevestiging">'+T('pn.jaNee','Ja/nee-check')+'</button>'+
         '<button class="obtn" data-pnvraag="idkaart">'+T('pn.idkaart','ID-kaart vragen')+'</button>'+
         '<button class="obtn" data-pnvraag="paspoort">'+T('pn.paspoort','Paspoort vragen')+'</button>'+
@@ -90,7 +90,7 @@
     // lopende en afgehandelde verzoeken
     const vz = paspoortData.verzoeken || [];
     html += '<div class="card"><div class="tt-h">'+T('pn.verzoeken','Mijn verzoeken')+'</div>'+
-      (vz.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+vz.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.codenaam||'\u2013')+'</span>'+pnBadge(v.status)+'</div>'+
+      (vz.length ? '<div class="s-1ydy0fl">'+vz.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.codenaam||'\u2013')+'</span>'+pnBadge(v.status)+'</div>'+
         '<div class="ds">'+T('pn.niveau.'+v.niveau, v.niveau)+(v.incident?' · '+T('pn.viaIncident','via incident'):'')+(v.reden?' · '+esc(v.reden):'')+'</div>'+
         (v.status==='goedgekeurd'?'<div class="h-mt40"><button class="obtn primary" data-pnbekijk="'+v.id+'">'+T('pn.bekijk','Inzage openen')+'</button>'+(v.vervalt?' <span class="ds">'+T('pn.tot','geldig tot')+' '+new Date(v.vervalt).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span>':'')+'</div>':'')+
         '</div>').join('')+'</div>'

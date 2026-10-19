@@ -19,10 +19,10 @@ const { startServer, stop } = require('./helper');
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bewijs-'));
-const api = (pad, body) => fetch(base + '/api' + pad, { method: 'POST',
+const api = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const fnd = (pad, body) => fetch(base + '/api/foundation' + pad, { method: 'POST',
+const fnd = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -73,54 +73,54 @@ test('een leerling kent zichzelf geen toets of observatie toe', async () => {
 
 test('een becijferde schooltoets landt als bewijs in het paspoort, met de leraar erbij', async () => {
   // school, leraar en klas
-  const sch = (await fnd('/school/school/maak', { naam: 'De Meander', plaats: 'Zwolle' })).body;
+  const sch = (await fnd('/api/foundation/school/school/maak', { naam: 'De Meander', plaats: 'Zwolle' })).body;
   const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
   await fetch(base + '/api/office/school/decide', { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
     body: JSON.stringify({ code: sch.schoolCode, action: 'goedkeuren' }) });
-  const leraar = (await fnd('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Bram', rol: 'leraar' })).body;
-  await fnd('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: leraar.personeelId, akkoord: true });
-  const klas = (await fnd('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken, naam: '5A', trap: 'po', fase: 'po-g5' })).body;
+  const leraar = (await fnd('/api/foundation/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Bram', rol: 'leraar' })).body;
+  await fnd('/api/foundation/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: leraar.personeelId, akkoord: true });
+  const klas = (await fnd('/api/foundation/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: leraar.personeelToken, naam: '5A', trap: 'po', fase: 'po-g5' })).body;
 
   // een gezin met een kind: de ouder nodigt uit, het kind accepteert zelf
-  const gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Bewijs', naam: 'Ouder Bewijs', pin: '4321' })).body;
-  const kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token,
+  const gezin = (await fnd('/api/foundation/gezin/maak', { gezinsnaam: 'Familie Bewijs', naam: 'Ouder Bewijs', pin: '4321' })).body;
+  const kind = (await fnd('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token,
     naam: 'Sanne', rol: 'kind', groep: 'kind' })).body;
-  const kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
-  await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
-  await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
+  const kindToken = (await fnd('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
+  await fnd('/api/foundation/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
+  await fnd('/api/foundation/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 
   // de leraar zet een toets klaar op een leerdoel en het kind maakt hem goed
   const kl = (p, b) => fnd(p, Object.assign({ klasCode: klas.code, personeelToken: leraar.personeelToken, schoolCode: sch.schoolCode }, b || {}));
-  const toets = (await kl('/school/toets/maak', { soort: 'so', naam: 'SO tafels', doelen: ['rekenen.g5.tafels-tot-10'], perDoel: 3 })).body;
-  let v = (await fnd('/school/toets/start', { code: gezin.code, token: kindToken, klasCode: klas.code, toetsId: toets.toets.id })).body;
+  const toets = (await kl('/api/foundation/school/toets/maak', { soort: 'so', naam: 'SO tafels', doelen: ['rekenen.g5.tafels-tot-10'], perDoel: 3 })).body;
+  let v = (await fnd('/api/foundation/school/toets/start', { code: gezin.code, token: kindToken, klasCode: klas.code, toetsId: toets.toets.id })).body;
   const los = (t) => { const m = String(t).match(/^(\d+) x (\d+)/); return m ? String(+m[1] * +m[2]) : 'x'; };
-  for (let i = 0; i < 3; i++) v = (await fnd('/school/toets/antwoord', { code: gezin.code, token: kindToken,
+  for (let i = 0; i < 3; i++) v = (await fnd('/api/foundation/school/toets/antwoord', { code: gezin.code, token: kindToken,
     klasCode: klas.code, toetsId: toets.toets.id, antwoord: los(v.vraag) })).body;
   assert.equal(v.klaar, true);
   assert.equal(v.aantalGoed, 3);
 
-  const lijst = (await kl('/school/toets/lijst')).body;
+  const lijst = (await kl('/api/foundation/school/toets/lijst')).body;
   const rij = lijst.toetsen[0].leerlingen.find(x => x.naam === 'Sanne');
-  const cijfer = (await kl('/school/toets/cijfer', { toetsId: toets.toets.id, leerling: rij.sleutel })).body;
+  const cijfer = (await kl('/api/foundation/school/toets/cijfer', { toetsId: toets.toets.id, leerling: rij.sleutel })).body;
   assert.ok(cijfer.cijfer, 'het cijfer landt in het boek');
   assert.match(cijfer.bewijs, /leerpaspoort/, 'en het bewijs gaat naar het paspoort');
 
   // de leraar ziet alleen de doelen van zijn eigen klas terug
-  const beeld = (await kl('/school/bewijs/leerling', { leerling: rij.sleutel })).body;
+  const beeld = (await kl('/api/foundation/school/bewijs/leerling', { leerling: rij.sleutel })).body;
   const doel = beeld.doelen.find(x => x.doel === 'rekenen.g5.tafels-tot-10');
   assert.ok(doel, 'het leerdoel van de toets staat erbij');
   assert.ok(doel.stukken >= 1);
   assert.doesNotMatch(JSON.stringify(beeld), /taal\.|aardrijkskunde\./, 'doelen buiten deze klas horen hier niet');
 
   // en een observatie erbovenop maakt het bewijs sterker
-  const obs = await kl('/school/bewijs/observatie', { leerling: rij.sleutel, doel: 'rekenen.g5.tafels-tot-10',
+  const obs = await kl('/api/foundation/school/bewijs/observatie', { leerling: rij.sleutel, doel: 'rekenen.g5.tafels-tot-10',
     notitie: 'legde de tafel van 8 uit aan een klasgenoot' });
   assert.equal(obs.status, 200);
   assert.equal(obs.body.beheersing.woord, 'sterk', 'een toets en een observatie zijn twee onafhankelijke bevestigingen');
   assert.match(obs.body.beheersing.uitleg, /bevestigd door school/);
 
   // een observatie zonder waarneming is een vinkje, en wordt geweigerd
-  assert.equal((await kl('/school/bewijs/observatie', { leerling: rij.sleutel, doel: 'rekenen.g5.delen', notitie: '' })).status, 400);
+  assert.equal((await kl('/api/foundation/school/bewijs/observatie', { leerling: rij.sleutel, doel: 'rekenen.g5.delen', notitie: '' })).status, 400);
 });

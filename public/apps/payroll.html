@@ -62,6 +62,19 @@
   .i-jwtsuz{flex:1;min-width:9rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-15bgfuc:not(#_#_#_){width:100%;margin-top:0.5rem}
+.s-186qv2w:not(#_#_#_){width:6rem}
+.s-7vsxq:not(#_#_#_){flex:2;min-width:14rem}
+.s-jwt5vg:not(#_#_#_){flex:1;min-width:8rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -134,7 +147,7 @@
       <div class="i-m3b83 noot">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
       <div class="rij">
         <select class="i-7uiyo veld" id="ctZaak"></select>
-        <input class="veld" id="ctDatum" style="flex:1;min-width:8rem;" placeholder="peildatum 2026-07-01">
+        <input class="veld s-jwt5vg" id="ctDatum" placeholder="peildatum 2026-07-01">
         <button class="knop" id="ctLaad">Toon personeel</button>
       </div>
       <div class="h-mt60" id="ctLijst"></div>
@@ -189,9 +202,9 @@
       <div class="sec">Een bron toevoegen</div>
       <div class="i-m3b83 noot">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
       <div class="rij">
-        <input class="veld" id="brLand" style="width:6rem;" placeholder="NL" maxlength="2">
+        <input class="veld s-186qv2w" id="brLand" placeholder="NL" maxlength="2">
         <input class="i-jwtsuz veld" id="brNaam" placeholder="Naam van de bron">
-        <input class="veld" id="brUrl" style="flex:2;min-width:14rem;" placeholder="https://...">
+        <input class="veld s-7vsxq" id="brUrl" placeholder="https://...">
         <button class="knop" id="brZet">Voeg toe</button>
       </div>
     </div>
@@ -778,7 +791,7 @@ function toonDossier(d){
   const knop = document.getElementById('dsStappen');
   if (knop) knop.addEventListener('click', () => {
     knop.disabled = true;
-    knop.insertAdjacentHTML('afterend', '<div class="kpi" style="width:100%;margin-top:0.5rem;">' +
+    knop.insertAdjacentHTML('afterend', '<div class="kpi s-15bgfuc">' +
       a.waarom.stappen.map(s => esc(s.stap) +
         (s.uitleg ? ' · ' + esc(s.uitleg) : '') +
         (s.tarief != null ? ' · tarief ' + esc(s.tarief) : '') +

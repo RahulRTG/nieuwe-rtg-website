@@ -51,13 +51,27 @@ async function maakWereld(naam, eigenEnv) {
   let srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
   const herstarts = { netjes: 0, crash: 0 };
 
+  /* ELK ANTWOORD DAT HET LID KREEG, voor bewijs 8 (menselijk). De scenario's
+     schrijven hun eigen schakels voor voltooibaar, persistent en herstelbaar;
+     wat de gebruiker intussen te zien kreeg -- ook tijdens de dubbeltik, het
+     afgebroken verzoek en na de crash -- leidt scripts/voltooiproef.js hieruit
+     af. Alleen de soort en de melding, nooit de inhoud van het antwoord. */
+  const antwoorden = [];
+  function noteer(pad, status, data) {
+    const weigering = status >= 400 && status < 500;
+    const melding = data && typeof data.error === 'string' ? data.error : null;
+    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null });
+  }
+
   /* `koppen`: extra kopregels, zoals het bezitsbewijs van een gebonden toestel. */
   async function post(pad, lijf, tok, koppen) {
     const h = Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, koppen || {});
     let r;
     try { r = await fetch(srv.basis + pad, { method: 'POST', headers: h, body: JSON.stringify(lijf || {}) }); }
-    catch (e) { return { status: 0, data: null, fout: String(e && e.message || e) }; }
-    return { status: r.status, data: await r.json().catch(() => null) };
+    catch (e) { noteer(pad, 0, null); return { status: 0, data: null, fout: String(e && e.message || e) }; }
+    const data = await r.json().catch(() => null);
+    noteer(pad, r.status, data);
+    return { status: r.status, data };
   }
 
   /* Een verzoek dat de client halverwege opgeeft. Het lijf is verstuurd; het
@@ -74,6 +88,13 @@ async function maakWereld(naam, eigenEnv) {
        zodat de volgende stap niet met een half verzoek racet. */
     await new Promise((r) => setTimeout(r, 300));
     return uit;
+  }
+
+  /* EEN DUBBELTIK: hetzelfde verzoek twee keer TEGELIJK, zoals een tweede tik
+     op een trage verbinding aankomt terwijl de eerste nog loopt. Achter elkaar
+     sturen is een andere (mildere) proef: dan is de eerste al klaar. */
+  async function dubbel(pad, lijf, tok, koppen) {
+    return Promise.all([post(pad, lijf, tok, koppen), post(pad, lijf, tok, koppen)]);
   }
 
   async function opnieuw() {
@@ -115,25 +136,67 @@ async function maakWereld(naam, eigenEnv) {
     return JSON.parse(require('../../server/kluis').ontsleutel(rij.val));
   }
 
+  /* WAAR STAAT DIT MERKTEKEN OP SCHIJF? Een scenario dat zijn uitkomst met een
+     uniek merkteken maakt (een reisnaam, een notitie), kan zonder de
+     opslagvorm van elk domein te kennen nagaan dat het ERGENS in de opslag
+     staat -- en, net zo belangrijk, dat het na een verwijdering NERGENS meer
+     staat. Gelezen uit de bestanden zelf, readOnly, met dezelfde kluis als de
+     server (zonder RTG_ENC_KEY is dat een doorgeefluik). Elke rij van elke
+     tabel in elk .db-bestand van de datamap; bij de kv-opslag de sleutel erbij,
+     zodat de uitslag zegt WELKE collectie het draagt. Een kluis- of
+     auditspoor telt mee als vindplaats: dat het daar staat is waar, en een
+     scenario dat "weg" bewijst, moet zelf zeggen welke vindplaats het bedoelt. */
+  function vindInOpslag(merk) {
+    const { DatabaseSync } = require('node:sqlite');
+    const kluis = require('../../server/kluis');
+    const uit = [];
+    for (const bestand of fs.readdirSync(datamap).filter((f) => f.endsWith('.db')).sort()) {
+      const db = new DatabaseSync(path.join(datamap, bestand), { readOnly: true });
+      try {
+        const tabellen = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+        for (const tabel of tabellen) {
+          for (const rij of db.prepare('SELECT * FROM "' + tabel.replace(/"/g, '') + '"').all()) {
+            if (bestand === 'store.db' && tabel === 'kv') {
+              if (rij.deleted) continue;
+              let val = rij.val;
+              try { val = kluis.ontsleutel(val); } catch (e) { /* onleesbaar is niet gevonden */ }
+              if (String(val).includes(merk)) uit.push({ bestand, tabel, sleutel: rij.key });
+              continue;
+            }
+            const tekst = Object.values(rij).map((v) => {
+              if (typeof v !== 'string') return String(v);
+              try { return kluis.ontsleutel(v); } catch (e) { return v; }
+            }).join('\u0000');
+            if (tekst.includes(merk)) uit.push({ bestand, tabel });
+          }
+        }
+      } finally { db.close(); }
+    }
+    return uit;
+  }
+
   function klaar() {
     try { srv.kind.kill('SIGKILL'); } catch (e) { /* al weg */ }
     try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) { /* al weg */ }
   }
   process.on('exit', klaar);
 
-  return { post, afgebroken, herstart, crash, opslag, collectie, klaar, datamap, herstarts,
+  return { post, dubbel, afgebroken, herstart, crash, opslag, collectie, vindInOpslag, klaar, datamap, herstarts,
+    antwoorden: () => antwoorden.slice(),
     berichten: () => postvanger.berichten(datamap),
     get basis() { return srv.basis; } };
 }
 
 /* Een vers lid langs de echte registratie, met een eigen account (de
    sessiepagina en de postpagina eisen dat; een demo-persona heeft er geen). */
-async function nieuwLid(w, merk) {
+/* `tier`: standaard een RTG Pass; 'guest' is het gratis account (SAMENLEVING.md
+   par. 11.4), waarvoor sommige deuren pas na een paspoortcontrole opengaan. */
+async function nieuwLid(w, merk, tier) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const email = (merk || 'vp') + u + '@voorbeeld.nl';
   const wachtwoord = 'geheim12345';
   const r = await w.post('/api/auth/register', { name: 'Voltooilid', email, phone: '06' + u.slice(0, 8),
-    password: wachtwoord, geboortedatum: '1985-05-05', tier: 'rtg' });
+    password: wachtwoord, geboortedatum: '1985-05-05', tier: tier || 'rtg' });
   if (r.status !== 200 || !r.data || !r.data.token) throw new Error('registratie lukte niet (' + r.status + ')');
   return { token: r.data.token, email, wachtwoord };
 }
@@ -144,4 +207,112 @@ async function inloggen(w, lid) {
   return r.data.token;
 }
 
-module.exports = { maakWereld, nieuwLid, inloggen };
+/* DE KANTOORWERELD: een wegwerpserver waarin een HERLEIDBAAR mens van RTG kan
+   beslissen. Een Lifestyle- of Business Pass ontstaat uitsluitend na menselijke
+   goedkeuring (kern/aanmeldingen/besluit.js), en de gedeelde kantoorcode is geen
+   mens -- die weigert het besluit terecht. De testomgeving (NODE_ENV=test met
+   RTG_DEMO=1, server/testomgeving.js) maakt bij de opstart het
+   eigenaarsaccount aan; met DIE inlog beslist de proef, precies zoals
+   scripts/toelatingsproef.js. Geen nieuwe deur en geen vlag in de poort: in
+   productie weigert de configuratie RTG_DEMO (server/config/productie-lokaal.js),
+   en de sleutel hieronder gaat alleen naar deze wegwerpserver. */
+const EIGENAAR = { email: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com',
+  wachtwoord: process.env.DEMO_PASS || 'Imran' };
+const KANTOORWERELD = { RTG_DEMO: '1', RTG_OWNER_BOOTSTRAP: 'proefsleutel-voltooiwereld-2026',
+  OFFICE_CODE: 'RTG-VOLTOOI-KANTOOR' };
+
+async function eigenaarSessie(w) {
+  const r = await w.post('/api/auth/login', { login: EIGENAAR.email, password: EIGENAAR.wachtwoord });
+  if (r.status !== 200 || !r.data || !r.data.token) {
+    throw new Error('geen eigenaarssessie (status ' + r.status + ') -- draait het scenario in de kantoorwereld (omgeving: KANTOORWERELD)?');
+  }
+  return r.data.token;
+}
+
+/* Een lid met een Lifestyle Pass, langs de ENIGE weg die die pas geeft: een
+   vers RTG-lid vraagt hem aan, en een herleidbaar mens van het kantoor
+   accepteert met een afgesproken contractbedrag. Daarna logt het lid opnieuw in
+   (de pas hoort bij de nieuwe sessie). Lukt een stap niet, dan gooit dit met de
+   stap erbij: een scenario dat op een Lifestyle-lid bouwt, mag niet stil met een
+   RTG-lid verder. */
+async function lifestyleLid(w, merk) {
+  const lid = await nieuwLid(w, merk);
+  const a = await w.post('/api/aanmelding/aanvraag', { pas: 'lifestyle', naam: 'Voltooilid ' + merk,
+    contact: lid.email, viaUitnodiging: true }, lid.token);
+  const id = a.data && a.data.aanmelding && a.data.aanmelding.id;
+  if (a.status !== 200 || !id) throw new Error('de Lifestyle-aanvraag lukte niet (' + a.status + ')');
+  const K = await eigenaarSessie(w);
+  const b = await w.post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, K);
+  if (b.status !== 200) throw new Error('het kantoor kon de Lifestyle Pass niet toekennen (' + b.status + ': ' + (b.data && b.data.error) + ')');
+  lid.token = await inloggen(w, lid);
+  lid.aanmelding = id;
+  return lid;
+}
+
+/* Een lid wiens identiteit RTG heeft gezien (niveau A3), langs de enige weg:
+   het lid stuurt een beeld in, een medewerker op naam keurt goed en neemt de
+   geboortedatum van het document over (routes/office/verificaties.js). Het
+   beeld is een pixel; de schakels van die keuring zelf staan in het scenario
+   van Identiteit aantonen (./voltooi/verificatie.js). Gooit met de stap erbij
+   als het niet lukt. */
+const PIXEL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+async function geverifieerdLid(w, merk, tier) {
+  const lid = await nieuwLid(w, merk, tier);
+  const u = await w.post('/api/verify/upload', { image: PIXEL }, lid.token);
+  if (u.status !== 200) throw new Error('het identiteitsbewijs insturen lukte niet (' + u.status + ')');
+  const K = await eigenaarSessie(w);
+  const rij = ((await w.post('/api/office/verifications', {}, K)).data || {}).pending || [];
+  const mijn = rij.find((x) => x.email === lid.email);
+  if (!mijn) throw new Error('het lid staat niet in de verificatiewachtrij van het kantoor');
+  const b = await w.post('/api/office/verify', { userId: mijn.userId || mijn.id, decision: 'approve', geboortedatum: '1985-05-05' }, K);
+  if (b.status !== 200) throw new Error('het kantoor kon de identiteit niet goedkeuren (' + b.status + ')');
+  lid.token = await inloggen(w, lid);
+  lid.userId = mijn.userId || mijn.id;
+  return lid;
+}
+
+/* EEN GEBONDEN TOESTEL. Zware handelingen (een machtiging geven, een toestel op
+   afstand sluiten) vragen een bezitsbewijs: het toestel tekent elk verzoek met
+   een niet-exporteerbare P-256-sleutel, zoals de browser dat doet
+   (kern/identiteit/bezitsbewijs.js). Dit bindt zo'n sleutel aan de sessie langs
+   de routes van "Waar ben ik aanwezig" en geeft `bewijs(methode, pad)` terug:
+   de kopregel voor een getekend verzoek. Hetzelfde recept als in
+   ./voltooi/sessies.js, waar het binden zelf als schakel wordt gemeten. */
+async function gebondenToestel(w, tok) {
+  const { webcrypto, randomBytes } = require('crypto');
+  const kp = await webcrypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
+  const jwk = await webcrypto.subtle.exportKey('jwk', kp.publicKey);
+  const teken = async (t) => Buffer.from(await webcrypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' },
+    kp.privateKey, Buffer.from(t, 'utf8'))).toString('base64url');
+  const u = await w.post('/api/mijn/toestel/uitdaging', {}, tok);
+  if (!u.data || !u.data.nonce) throw new Error('geen uitdaging voor het toestel (' + u.status + ')');
+  const b = await w.post('/api/mijn/toestel/bind', { jwk, handtekening: await teken(u.data.nonce), naam: 'Voltooitoestel' }, tok);
+  if (b.status !== 200) throw new Error('het toestel binden lukte niet (' + b.status + ')');
+  const bewijs = async (methode, pad) => {
+    const kop = Buffer.from(JSON.stringify({ methode, pad, tijd: Date.now(),
+      jti: 'v' + randomBytes(12).toString('base64url').replace(/[^A-Za-z0-9_-]/g, 'x') })).toString('base64url');
+    return { 'rtg-bezitsbewijs': kop + '.' + await teken(kop) };
+  };
+  return { bewijs };
+}
+
+/* TWEE LEDEN DIE ELKAAR KENNEN, langs de Salon: A zoekt B op codenaam, stuurt
+   een verzoek, B accepteert (routes/social/leden.js). Veel beloftes rusten op
+   een bestaande connectie (de veiligheidskring, berichten, samen betalen); de
+   proef maakt die connectie zoals leden dat doen, en legt hem niet neer. Geeft
+   per lid de sessiesleutel (`key`, waarop de vriendenlaag draait) en de
+   codenaam terug. */
+async function verbind(w, A, B) {
+  const ca = (await w.post('/api/member/connections', {}, A.token)).data || {};
+  const cb = (await w.post('/api/member/connections', {}, B.token)).data || {};
+  const f = await w.post('/api/member/find', { q: cb.codename }, A.token);
+  const doel = ((f.data && f.data.results) || []).find((x) => x.codename === cb.codename);
+  if (!doel) throw new Error('A vindt B niet op codenaam (' + f.status + ')');
+  const c = await w.post('/api/member/connect', { key: doel.key }, A.token);
+  if (c.status !== 200) throw new Error('het verzoek van A aan B lukte niet (' + c.status + ')');
+  const r = await w.post('/api/member/connect/respond', { key: ca.me, action: 'accept' }, B.token);
+  if (r.status !== 200 || (r.data && r.data.status) !== 'verbonden') throw new Error('B kon A niet accepteren (' + r.status + ')');
+  return { a: { key: ca.me, codenaam: ca.codename }, b: { key: cb.me, codenaam: cb.codename } };
+}
+
+module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, verbind, KANTOORWERELD };

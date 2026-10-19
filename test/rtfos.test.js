@@ -69,7 +69,7 @@ const post = (pad, body, tok) => fetch(BASE + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-const os_ = (pad, body, tok) => post('/api/rtfos/' + pad, body, tok);
+const os_ = (pad, body, tok) => post((pad.startsWith('/api/') ? pad : '/api/rtfos/' + pad), body, tok);
 
 // Een gewoon lid dat de kantoordeur opent met de backoffice-code. Dat levert
 // een office-sessie MET een sleutel eraan (lidKey), en dat is wat een zetel
@@ -87,7 +87,7 @@ async function kantoorLid(naam, mail) {
      dat is dezelfde sleutel die de zetel straks draagt, uit dezelfde bron. Hem
      hier zelf in elkaar zetten zou een tweede waarheid zijn (LAT.md regel 4),
      en dan toetst deze suite haar eigen gok in plaats van de server. */
-  const ik = await os_('ik', {}, start.body.token);
+  const ik = await os_('/api/rtfos/ik', {}, start.body.token);
   assert.ok(ik.body.key, 'de kantoorsessie draagt geen sleutel: ' + JSON.stringify(ik.body).slice(0, 150));
   return { office: start.body.token, key: ik.body.key };
 }
@@ -99,18 +99,18 @@ test.before(async () => {
   // het landelijke bestuur: de eigenaar, via zijn eigen account de backoffice in
   LAND = await kantoorAlsPersoon(BASE);
   assert.ok(LAND, 'geen kantoorsessie voor de eigenaar');
-  const ik = await os_('ik', {}, LAND);
+  const ik = await os_('/api/rtfos/ik', {}, LAND);
   assert.equal(ik.body.landelijk, true, 'de eigenaar hoort het landelijke bestuur te zijn');
 
   // twee steden, allebei actief, met de modules die deze toets gebruikt
-  const h = await os_('stad/maak', { naam: 'Haarlem' }, LAND);
-  const a = await os_('stad/maak', { naam: 'Amsterdam' }, LAND);
+  const h = await os_('/api/rtfos/stad/maak', { naam: 'Haarlem' }, LAND);
+  const a = await os_('/api/rtfos/stad/maak', { naam: 'Amsterdam' }, LAND);
   HAARLEM = h.body.stad.id;
   AMSTERDAM = a.body.stad.id;
   for (const stad of [HAARLEM, AMSTERDAM]) {
-    await os_('stad/status', { id: stad, status: 'actief' }, LAND);
+    await os_('/api/rtfos/stad/status', { id: stad, status: 'actief' }, LAND);
     for (const vlag of ['youth_programs', 'donations', 'volunteer_management', 'individual_cases', 'municipal_reporting']) {
-      await os_('stad/module', { id: stad, vlag, aan: true }, LAND);
+      await os_('/api/rtfos/stad/module', { id: stad, vlag, aan: true }, LAND);
     }
   }
 
@@ -119,24 +119,24 @@ test.before(async () => {
   const bestuur = await kantoorLid('Bestuur Haarlem', 'bestuur@rtfos.test');
   LEIDER = leider.office;
   BESTUUR = bestuur.office;
-  const zL = await os_('zetel', { stad: HAARLEM, key: leider.key, naam: 'Leider Haarlem', rol: 'projectleider' }, LAND);
-  const zB = await os_('zetel', { stad: HAARLEM, key: bestuur.key, naam: 'Bestuur Haarlem', rol: 'stadsbestuur' }, LAND);
+  const zL = await os_('/api/rtfos/zetel', { stad: HAARLEM, key: leider.key, naam: 'Leider Haarlem', rol: 'projectleider' }, LAND);
+  const zB = await os_('/api/rtfos/zetel', { stad: HAARLEM, key: bestuur.key, naam: 'Bestuur Haarlem', rol: 'stadsbestuur' }, LAND);
   assert.equal(zL.status, 200, 'zetel projectleider mislukte: ' + JSON.stringify(zL.body).slice(0, 150));
   assert.equal(zB.status, 200, 'zetel stadsbestuur mislukte: ' + JSON.stringify(zB.body).slice(0, 150));
 
   // twee projecten in Haarlem, allebei tot en met "actief"
   for (const [naam, soort] of [['Jongerenwerk Schalkwijk', 'jongeren'], ['Maaltijden Oost', 'maaltijden']]) {
-    if (soort === 'maaltijden') await os_('stad/module', { id: HAARLEM, vlag: 'food_distribution', aan: true }, LAND);
+    if (soort === 'maaltijden') await os_('/api/rtfos/stad/module', { id: HAARLEM, vlag: 'food_distribution', aan: true }, LAND);
     // budget bewust onder de 2.500 van het stadsbestuur: deze twee projecten
     // zijn het decor, en het decor hoort niet op een grendel te stuiten.
-    const p = await os_('project/maak', { stad: HAARLEM, naam, soort, budget: 2000, doelgroep: 'buurt' }, BESTUUR);
+    const p = await os_('/api/rtfos/project/maak', { stad: HAARLEM, naam, soort, budget: 2000, doelgroep: 'buurt' }, BESTUUR);
     assert.ok(p.body.project, naam + ' aanmaken mislukte: ' + JSON.stringify(p.body).slice(0, 150));
     const id = p.body.project.id;
-    await os_('project/status', { id, status: 'aanvraag' }, LEIDER);
-    await os_('project/status', { id, status: 'beoordeling' }, LEIDER);
-    const goed = await os_('project/status', { id, status: 'goedgekeurd' }, BESTUUR);
+    await os_('/api/rtfos/project/status', { id, status: 'aanvraag' }, LEIDER);
+    await os_('/api/rtfos/project/status', { id, status: 'beoordeling' }, LEIDER);
+    const goed = await os_('/api/rtfos/project/status', { id, status: 'goedgekeurd' }, BESTUUR);
     assert.equal(goed.status, 200, 'goedkeuren mislukte: ' + JSON.stringify(goed.body).slice(0, 150));
-    await os_('project/status', { id, status: 'actief' }, BESTUUR);
+    await os_('/api/rtfos/project/status', { id, status: 'actief' }, BESTUUR);
     if (soort === 'jongeren') JONGEREN = id; else VOEDSEL = id;
   }
 });
@@ -154,25 +154,25 @@ test('geoormerkt geld gaat niet naar een ander project', async () => {
      toets gaat over het OORMERK; een gift van twintigduizend zou eerst blijven
      staan voor de herkomstcontrole, en dan toetst hij twee dingen tegelijk. Dat
      die tweede grendel werkt, staat in test/rtfos-governance.test.js. */
-  const bron = await os_('bron/maak', { stad: HAARLEM, soort: 'donatie', gever: 'Fonds Kennemerland',
+  const bron = await os_('/api/rtfos/bron/maak', { stad: HAARLEM, soort: 'donatie', gever: 'Fonds Kennemerland',
     bedrag: 2000, projectId: JONGEREN, herbestemming: 'nooit' }, BESTUUR);
   assert.equal(bron.status, 200, JSON.stringify(bron.body).slice(0, 150));
   const bronId = bron.body.bron.id;
   assert.equal(bron.body.bron.geoormerkt, true);
 
-  const fout = await os_('uitgave/aanvraag', { projectId: VOEDSEL, bronId,
+  const fout = await os_('/api/rtfos/uitgave/aanvraag', { projectId: VOEDSEL, bronId,
     omschrijving: 'inkoop maaltijden', bedrag: 100 }, LEIDER);
   assert.equal(fout.status, 403, 'het oormerk hield niet: ' + JSON.stringify(fout.body).slice(0, 200));
   assert.match(fout.body.error, /Jongerenwerk Schalkwijk/, 'de zin noemt niet waar het geld wel voor is');
   assert.match(fout.body.error, /Maaltijden Oost/, 'de zin noemt niet waar het geld heen zou gaan');
 
   // en op het eigen project kan het wel: anders bewijst het verbod niets
-  const goed = await os_('uitgave/aanvraag', { projectId: JONGEREN, bronId,
+  const goed = await os_('/api/rtfos/uitgave/aanvraag', { projectId: JONGEREN, bronId,
     omschrijving: 'trainer jongerenavond', bedrag: 100 }, LEIDER);
   assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 200));
 
   // herbestemmen is uitgesloten door de gever, en dat geldt ook landelijk
-  const verplaats = await os_('bron/verplaats', { id: bronId, projectId: VOEDSEL,
+  const verplaats = await os_('/api/rtfos/bron/verplaats', { id: bronId, projectId: VOEDSEL,
     reden: 'het jongerenproject stopt', toestemming: true }, LAND);
   assert.equal(verplaats.status, 403, 'een uitgesloten herbestemming kwam er toch doorheen');
   assert.match(verplaats.body.error, /uitgesloten|terug naar de gever/i);
@@ -185,19 +185,19 @@ test('geoormerkt geld gaat niet naar een ander project', async () => {
    het bedrag.
    ------------------------------------------------------------------------- */
 test('wie een uitgave aanvraagt, keurt hem niet zelf goed', async () => {
-  const bron = await os_('bron/maak', { stad: HAARLEM, soort: 'donatie', gever: 'Anonieme gever',
+  const bron = await os_('/api/rtfos/bron/maak', { stad: HAARLEM, soort: 'donatie', gever: 'Anonieme gever',
     bedrag: 1000, anoniem: true }, BESTUUR);
   const bronId = bron.body.bron.id;
-  const aanvraag = await os_('uitgave/aanvraag', { projectId: JONGEREN, bronId,
+  const aanvraag = await os_('/api/rtfos/uitgave/aanvraag', { projectId: JONGEREN, bronId,
     omschrijving: 'materiaal', bedrag: 40 }, LEIDER);
   assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 200));
   const id = aanvraag.body.uitgave.id;
 
-  const zelf = await os_('uitgave/besluit', { id, akkoord: true }, LEIDER);
+  const zelf = await os_('/api/rtfos/uitgave/besluit', { id, akkoord: true }, LEIDER);
   assert.equal(zelf.status, 403, 'de aanvrager kon zijn eigen uitgave goedkeuren');
   assert.match(zelf.body.error, /vierogen|zelf aangevraagd/i);
 
-  const ander = await os_('uitgave/besluit', { id, akkoord: true }, BESTUUR);
+  const ander = await os_('/api/rtfos/uitgave/besluit', { id, akkoord: true }, BESTUUR);
   assert.equal(ander.status, 200, 'een ander kon hem niet goedkeuren: ' + JSON.stringify(ander.body).slice(0, 200));
   assert.equal(ander.body.uitgave.status, 'goedgekeurd');
 });
@@ -208,28 +208,28 @@ test('wie een uitgave aanvraagt, keurt hem niet zelf goed', async () => {
    landelijk. De limiet hangt aan wie BESLUIT, niet aan wie aanvraagt.
    ------------------------------------------------------------------------- */
 test('boven de limiet van de rol beslist een hogere trede', async () => {
-  const bron = await os_('bron/maak', { stad: HAARLEM, soort: 'subsidie', gever: 'Gemeente Haarlem',
+  const bron = await os_('/api/rtfos/bron/maak', { stad: HAARLEM, soort: 'subsidie', gever: 'Gemeente Haarlem',
     bedrag: 50000 }, BESTUUR);
   const bronId = bron.body.bron.id;
 
   // 400 euro: te groot voor de projectleider, binnen bereik van het stadsbestuur
-  const a1 = await os_('uitgave/aanvraag', { projectId: JONGEREN, bronId, omschrijving: 'zaalhuur', bedrag: 400 }, BESTUUR);
-  const teGroot = await os_('uitgave/besluit', { id: a1.body.uitgave.id, akkoord: true }, LEIDER);
+  const a1 = await os_('/api/rtfos/uitgave/aanvraag', { projectId: JONGEREN, bronId, omschrijving: 'zaalhuur', bedrag: 400 }, BESTUUR);
+  const teGroot = await os_('/api/rtfos/uitgave/besluit', { id: a1.body.uitgave.id, akkoord: true }, LEIDER);
   assert.equal(teGroot.status, 403, 'de projectleider mocht 400 euro goedkeuren');
   assert.match(teGroot.body.error, /grens|stadsbestuur/i);
 
   // 9.000 euro: te groot voor het stadsbestuur; hier moet landelijk aan te pas komen
-  const a2 = await os_('uitgave/aanvraag', { projectId: JONGEREN, bronId, omschrijving: 'busvervoer jaar', bedrag: 9000 }, LEIDER);
+  const a2 = await os_('/api/rtfos/uitgave/aanvraag', { projectId: JONGEREN, bronId, omschrijving: 'busvervoer jaar', bedrag: 9000 }, LEIDER);
   assert.equal(a2.body.nodig, 'landelijk', 'de aanvraag wijst niet naar het landelijke bestuur');
-  const stadTeGroot = await os_('uitgave/besluit', { id: a2.body.uitgave.id, akkoord: true }, BESTUUR);
+  const stadTeGroot = await os_('/api/rtfos/uitgave/besluit', { id: a2.body.uitgave.id, akkoord: true }, BESTUUR);
   assert.equal(stadTeGroot.status, 403, 'het stadsbestuur mocht 9.000 euro goedkeuren');
   assert.match(stadTeGroot.body.error, /landelijke RTF-bestuur/i);
 
-  const landelijk = await os_('uitgave/besluit', { id: a2.body.uitgave.id, akkoord: true }, LAND);
+  const landelijk = await os_('/api/rtfos/uitgave/besluit', { id: a2.body.uitgave.id, akkoord: true }, LAND);
   assert.equal(landelijk.status, 200, 'het landelijke bestuur kon niet besluiten: ' + JSON.stringify(landelijk.body).slice(0, 200));
 
   // en de stad kan zijn eigen limiet niet omhoog schroeven
-  const omhoog = await os_('stad/limiet', { id: HAARLEM, rol: 'stadsbestuur', bedrag: 100000 }, LAND);
+  const omhoog = await os_('/api/rtfos/stad/limiet', { id: HAARLEM, rol: 'stadsbestuur', bedrag: 100000 }, LAND);
   assert.equal(omhoog.status, 400, 'de landelijke bovengrens liet zich verhogen');
   assert.match(omhoog.body.error, /verlagen, niet verhogen/i);
 });
@@ -239,15 +239,15 @@ test('boven de limiet van de rol beslist een hogere trede', async () => {
    Anders is "modules per stad" een lijstje vinkjes zonder gevolg.
    ------------------------------------------------------------------------- */
 test('een uitgezette module blokkeert het werk in die stad', async () => {
-  const uit = await os_('stad/module', { id: AMSTERDAM, vlag: 'youth_programs', aan: false }, LAND);
+  const uit = await os_('/api/rtfos/stad/module', { id: AMSTERDAM, vlag: 'youth_programs', aan: false }, LAND);
   assert.equal(uit.status, 200);
-  const p = await os_('project/maak', { stad: AMSTERDAM, naam: 'Jongerenhuis Noord', soort: 'jongeren', budget: 1000 }, LAND);
+  const p = await os_('/api/rtfos/project/maak', { stad: AMSTERDAM, naam: 'Jongerenhuis Noord', soort: 'jongeren', budget: 1000 }, LAND);
   assert.equal(p.status, 403, 'een project kwam er doorheen terwijl de module uit stond');
   assert.match(p.body.error, /youth_programs.*uit|uit voor/i);
 
   // weer aan, en dan kan het wel -- anders bewijst de blokkade niets
-  await os_('stad/module', { id: AMSTERDAM, vlag: 'youth_programs', aan: true }, LAND);
-  const weer = await os_('project/maak', { stad: AMSTERDAM, naam: 'Jongerenhuis Noord', soort: 'jongeren', budget: 1000 }, LAND);
+  await os_('/api/rtfos/stad/module', { id: AMSTERDAM, vlag: 'youth_programs', aan: true }, LAND);
+  const weer = await os_('/api/rtfos/project/maak', { stad: AMSTERDAM, naam: 'Jongerenhuis Noord', soort: 'jongeren', budget: 1000 }, LAND);
   assert.equal(weer.status, 200, JSON.stringify(weer.body).slice(0, 200));
 });
 
@@ -258,24 +258,24 @@ test('een uitgezette module blokkeert het werk in die stad', async () => {
    komt, en dat is precies de avond waarop het misgaat.
    ------------------------------------------------------------------------- */
 test('zonder geldige VOG geen vrijwilliger op werk met kinderen', async () => {
-  const v = await os_('vrijwilliger/maak', { stad: HAARLEM, naam: 'Nieuwe Vrijwilliger' }, BESTUUR);
+  const v = await os_('/api/rtfos/vrijwilliger/maak', { stad: HAARLEM, naam: 'Nieuwe Vrijwilliger' }, BESTUUR);
   const id = v.body.vrijwilliger.id;
-  await os_('vrijwilliger/zet', { id, status: 'actief', gedragscode: true }, BESTUUR);
+  await os_('/api/rtfos/vrijwilliger/zet', { id, status: 'actief', gedragscode: true }, BESTUUR);
 
-  const zonder = await os_('vrijwilliger/koppel', { id, projectId: JONGEREN }, BESTUUR);
+  const zonder = await os_('/api/rtfos/vrijwilliger/koppel', { id, projectId: JONGEREN }, BESTUUR);
   assert.equal(zonder.status, 403, 'iemand zonder VOG kwam op het jongerenproject');
   assert.match(zonder.body.error, /VOG/);
 
   // een VERLOPEN VOG is geen VOG: dat is de val waar een boolean in trapt
-  await os_('vrijwilliger/zet', { id, vogGeldigTot: '2020-01-01' }, BESTUUR);
-  const verlopen = await os_('vrijwilliger/koppel', { id, projectId: JONGEREN }, BESTUUR);
+  await os_('/api/rtfos/vrijwilliger/zet', { id, vogGeldigTot: '2020-01-01' }, BESTUUR);
+  const verlopen = await os_('/api/rtfos/vrijwilliger/koppel', { id, projectId: JONGEREN }, BESTUUR);
   assert.equal(verlopen.status, 403, 'een verlopen VOG telde als geldig');
   assert.match(verlopen.body.error, /verlopen op 2020-01-01/);
 
   // met een geldige VOG kan het wel
   const jaar = new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10);
-  await os_('vrijwilliger/zet', { id, vogGeldigTot: jaar }, BESTUUR);
-  const met = await os_('vrijwilliger/koppel', { id, projectId: JONGEREN }, BESTUUR);
+  await os_('/api/rtfos/vrijwilliger/zet', { id, vogGeldigTot: jaar }, BESTUUR);
+  const met = await os_('/api/rtfos/vrijwilliger/koppel', { id, projectId: JONGEREN }, BESTUUR);
   assert.equal(met.status, 200, JSON.stringify(met.body).slice(0, 200));
 });
 
@@ -284,15 +284,15 @@ test('zonder geldige VOG geen vrijwilliger op werk met kinderen', async () => {
    En de contactgegevens zijn een aparte handeling met een eigen spoor.
    ------------------------------------------------------------------------- */
 test('een hulpvraag gaat niet naar een partner zonder vastgelegde toestemming', async () => {
-  const p = await os_('partner/maak', { stad: HAARLEM, naam: 'Stichting Buurtkracht', kvk: '12345678' }, BESTUUR);
+  const p = await os_('/api/rtfos/partner/maak', { stad: HAARLEM, naam: 'Stichting Buurtkracht', kvk: '12345678' }, BESTUUR);
   const partnerId = p.body.partner.id;
-  await os_('partner/status', { id: partnerId, status: 'in_toetsing' }, BESTUUR);
-  await os_('partner/status', { id: partnerId, status: 'goedgekeurd' }, LAND);
-  await os_('partner/document', { id: partnerId, soort: 'overeenkomst', naam: 'Samenwerking 2026' }, LAND);
-  const actief = await os_('partner/status', { id: partnerId, status: 'actief' }, LAND);
+  await os_('/api/rtfos/partner/status', { id: partnerId, status: 'in_toetsing' }, BESTUUR);
+  await os_('/api/rtfos/partner/status', { id: partnerId, status: 'goedgekeurd' }, LAND);
+  await os_('/api/rtfos/partner/document', { id: partnerId, soort: 'overeenkomst', naam: 'Samenwerking 2026' }, LAND);
+  const actief = await os_('/api/rtfos/partner/status', { id: partnerId, status: 'actief' }, LAND);
   assert.equal(actief.status, 200, JSON.stringify(actief.body).slice(0, 200));
 
-  const c = await os_('casus/maak', { stad: HAARLEM, soort: 'voedsel', urgentie: 'hoog',
+  const c = await os_('/api/rtfos/casus/maak', { stad: HAARLEM, soort: 'voedsel', urgentie: 'hoog',
     vraag: 'geen eten in huis deze week', wijk: 'Schalkwijk', contact: 'A. de Vries, 0612345678' }, LEIDER);
   assert.equal(c.status, 200, JSON.stringify(c.body).slice(0, 200));
   const id = c.body.casus.id;
@@ -300,15 +300,15 @@ test('een hulpvraag gaat niet naar een partner zonder vastgelegde toestemming', 
   assert.match(c.body.casus.codenaam, /^HV-/);
   assert.equal(JSON.stringify(c.body).includes('0612345678'), false, 'het telefoonnummer stond in het gewone antwoord');
 
-  await os_('casus/status', { id, status: 'intake' }, LEIDER);
-  const zonder = await os_('casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
+  await os_('/api/rtfos/casus/status', { id, status: 'intake' }, LEIDER);
+  const zonder = await os_('/api/rtfos/casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
   assert.equal(zonder.status, 400, 'koppelen kon zonder toestemming');
 
-  const leeg = await os_('casus/status', { id, status: 'toestemming', toestemming: 'ja' }, LEIDER);
+  const leeg = await os_('/api/rtfos/casus/status', { id, status: 'toestemming', toestemming: 'ja' }, LEIDER);
   assert.equal(leeg.status, 400, 'een loze toestemming werd geaccepteerd');
-  await os_('casus/status', { id, status: 'toestemming',
+  await os_('/api/rtfos/casus/status', { id, status: 'toestemming',
     toestemming: 'naam en telefoon mogen naar Stichting Buurtkracht voor een voedselpakket' }, LEIDER);
-  const met = await os_('casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
+  const met = await os_('/api/rtfos/casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
   assert.equal(met.status, 200, JSON.stringify(met.body).slice(0, 200));
 
   /* EN DE TOESTEMMING WORDT BIJ ELKE STAP OPNIEUW GELEZEN.
@@ -319,41 +319,41 @@ test('een hulpvraag gaat niet naar een partner zonder vastgelegde toestemming', 
      Dat was geen fout in de mutatie maar in de toets -- en in het ontwerp:
      toestemming die je een keer afvinkt, is geen toestemming die je kunt
      intrekken. Nu kan dat, en nu bijt de grendel ook echt. */
-  const intrek = await os_('casus/toestemming-weg', { id, reden: 'hulpvrager wil het niet meer' }, LEIDER);
+  const intrek = await os_('/api/rtfos/casus/toestemming-weg', { id, reden: 'hulpvrager wil het niet meer' }, LEIDER);
   assert.equal(intrek.status, 200, JSON.stringify(intrek.body).slice(0, 200));
-  const naIntrek = await os_('casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
+  const naIntrek = await os_('/api/rtfos/casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
   assert.equal(naIntrek.status, 403, 'na intrekken kon de hulpvraag toch naar een partner');
   assert.match(naIntrek.body.error, /Zonder vastgelegde toestemming/);
-  const doorwerken = await os_('casus/status', { id, status: 'in_uitvoering' }, LEIDER);
+  const doorwerken = await os_('/api/rtfos/casus/status', { id, status: 'in_uitvoering' }, LEIDER);
   assert.equal(doorwerken.status, 403, 'na intrekken liep het werk gewoon door');
 
   // Meesturen in dezelfde stap helpt niet: opnieuw toestemmen is een eigen
   // handeling en geen veld in een ander verzoek.
-  const sluip = await os_('casus/status', { id, status: 'gekoppeld', partnerId,
+  const sluip = await os_('/api/rtfos/casus/status', { id, status: 'gekoppeld', partnerId,
     toestemming: 'opnieuw toegestemd' }, LEIDER);
   assert.equal(sluip.status, 403, 'toestemming liet zich in dezelfde stap meesmokkelen');
 
   // de weg terug bestaat wel, en die loopt via de toestemming zelf
-  const terug = await os_('casus/status', { id, status: 'toestemming',
+  const terug = await os_('/api/rtfos/casus/status', { id, status: 'toestemming',
     toestemming: 'na een gesprek opnieuw akkoord met doorgifte aan Stichting Buurtkracht' }, LEIDER);
   assert.equal(terug.status, 200, JSON.stringify(terug.body).slice(0, 200));
-  const opnieuw = await os_('casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
+  const opnieuw = await os_('/api/rtfos/casus/status', { id, status: 'gekoppeld', partnerId }, LEIDER);
   assert.equal(opnieuw.status, 200, JSON.stringify(opnieuw.body).slice(0, 200));
 
   // het contact is apart op te vragen, en dat komt in het auditspoor
-  const contact = await os_('casus/contact', { id }, LEIDER);
+  const contact = await os_('/api/rtfos/casus/contact', { id }, LEIDER);
   assert.equal(contact.status, 200);
   assert.match(contact.body.contact, /0612345678/);
-  const audit = await os_('audit', { wat: 'casus.contact-open' }, LAND);
+  const audit = await os_('/api/rtfos/audit', { wat: 'casus.contact-open' }, LAND);
   assert.equal(audit.status, 200);
   assert.ok(audit.body.regels.length >= 1, 'het openen van contactgegevens liet geen spoor na');
 
   // afronden kan niet zolang er geen hulpactie in het dossier staat
-  await os_('casus/status', { id, status: 'in_uitvoering' }, LEIDER);
-  const teVroeg = await os_('casus/status', { id, status: 'afgerond' }, LEIDER);
+  await os_('/api/rtfos/casus/status', { id, status: 'in_uitvoering' }, LEIDER);
+  const teVroeg = await os_('/api/rtfos/casus/status', { id, status: 'afgerond' }, LEIDER);
   assert.equal(teVroeg.status, 400, 'afronden kon zonder dat er iets was gedaan');
-  await os_('casus/stap', { id, soort: 'hulpactie', tekst: 'voedselpakket bezorgd' }, LEIDER);
-  const af = await os_('casus/status', { id, status: 'afgerond' }, LEIDER);
+  await os_('/api/rtfos/casus/stap', { id, soort: 'hulpactie', tekst: 'voedselpakket bezorgd' }, LEIDER);
+  const af = await os_('/api/rtfos/casus/status', { id, status: 'afgerond' }, LEIDER);
   assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 200));
   assert.ok(af.body.casus.bewaarTot, 'er is geen bewaartermijn gezet bij afronding');
   assert.match(af.body.casus.afgerondOp || '', /^\d{4}-\d{2}-\d{2}$/, 'afronden zet de dag van afronden (besluit C3)');
@@ -370,12 +370,12 @@ test('een zetel in de ene stad komt niet bij de andere', async () => {
     const r = await os_(pad, body, BESTUUR);
     assert.equal(r.status, 403, pad + ' liet Haarlem in Amsterdam kijken');
   }
-  const boom = await os_('boom', {}, BESTUUR);
+  const boom = await os_('/api/rtfos/boom', {}, BESTUUR);
   assert.equal(boom.body.steden.length, 1, 'de boom toonde meer steden dan de eigen');
   assert.equal(boom.body.steden[0].id, HAARLEM);
 
   // en het auditspoor is landelijk
-  const audit = await os_('audit', {}, BESTUUR);
+  const audit = await os_('/api/rtfos/audit', {}, BESTUUR);
   assert.equal(audit.status, 403, 'een stadsbestuur kon het auditspoor lezen');
 });
 
@@ -385,13 +385,13 @@ test('een zetel in de ene stad komt niet bij de andere', async () => {
    apart genoemd, want dat is in een paar straten geen statistiek meer.
    ------------------------------------------------------------------------- */
 test('het gemeentenportaal toont getelde cijfers en nooit een persoon', async () => {
-  const g = await os_('gemeente/maak', { stad: HAARLEM, naam: 'Gemeente Haarlem', contact: 'S. Jansen' }, BESTUUR);
+  const g = await os_('/api/rtfos/gemeente/maak', { stad: HAARLEM, naam: 'Gemeente Haarlem', contact: 'S. Jansen' }, BESTUUR);
   assert.equal(g.status, 200, JSON.stringify(g.body).slice(0, 200));
   const code = g.body.gemeente.code;
-  await os_('gemeente/opdracht', { id: g.body.gemeente.id, omschrijving: 'Jongerenwerk Schalkwijk 2026',
+  await os_('/api/rtfos/gemeente/opdracht', { id: g.body.gemeente.id, omschrijving: 'Jongerenwerk Schalkwijk 2026',
     kpi: '100 jongeren begeleiden', bedrag: 20000, deadline: '2027-01-31' }, BESTUUR);
-  await os_('project/deelnemers', { id: JONGEREN, uniek: 87, herhaald: 31 }, BESTUUR);
-  await os_('project/indicator', { id: JONGEREN, naam: 'jongeren begeleid', doel: 100, bereikt: 87,
+  await os_('/api/rtfos/project/deelnemers', { id: JONGEREN, uniek: 87, herhaald: 31 }, BESTUUR);
+  await os_('/api/rtfos/project/indicator', { id: JONGEREN, naam: 'jongeren begeleid', doel: 100, bereikt: 87,
     doorgestroomd: 31, uitgevallen: 12 }, BESTUUR);
 
   const portaal = await post('/api/rtfos/portaal/gemeente', { code });
@@ -423,20 +423,20 @@ test('het gemeentenportaal toont getelde cijfers en nooit een persoon', async ()
    9. EEN MELDING IS NIET TE WISSEN, EN KRITIEK GAAT OMHOOG
    ------------------------------------------------------------------------- */
 test('kritieke meldingen gaan landelijk en niemand kan ze verwijderen', async () => {
-  const m = await os_('melding/maak', { stad: HAARLEM, soort: 'incident', zwaarte: 'kritiek',
+  const m = await os_('/api/rtfos/melding/maak', { stad: HAARLEM, soort: 'incident', zwaarte: 'kritiek',
     tekst: 'een vrijwilliger is alleen met een kind achtergebleven' }, LEIDER);
   assert.equal(m.status, 200, JSON.stringify(m.body).slice(0, 200));
   assert.equal(m.body.landelijk, true, 'een kritieke melding werd niet naar landelijk getild');
 
   // de stad kan hem niet afhandelen: kritiek is landelijk werk
-  const stad = await os_('melding/sluit', { id: m.body.melding.id, uitkomst: 'met de vrijwilliger gesproken, klaar' }, BESTUUR);
+  const stad = await os_('/api/rtfos/melding/sluit', { id: m.body.melding.id, uitkomst: 'met de vrijwilliger gesproken, klaar' }, BESTUUR);
   assert.equal(stad.status, 403, 'de stad sloot een kritieke melding');
 
   // sluiten zonder uitkomst is stil wegwerken
-  const leeg = await os_('melding/sluit', { id: m.body.melding.id, uitkomst: 'ok' }, LAND);
+  const leeg = await os_('/api/rtfos/melding/sluit', { id: m.body.melding.id, uitkomst: 'ok' }, LAND);
   assert.equal(leeg.status, 400, 'een melding werd zonder uitkomst afgehandeld');
 
-  const dicht = await os_('melding/sluit', { id: m.body.melding.id,
+  const dicht = await os_('/api/rtfos/melding/sluit', { id: m.body.melding.id,
     uitkomst: 'onderzocht met de vertrouwenspersoon; vrijwilliger is geschorst en de ouders zijn ingelicht' }, LAND);
   assert.equal(dicht.status, 200, JSON.stringify(dicht.body).slice(0, 200));
 
@@ -445,14 +445,14 @@ test('kritieke meldingen gaan landelijk en niemand kan ze verwijderen', async ()
   assert.equal(weg.status, 404, 'er is een weg om een melding te verwijderen');
 
   // een anonieme melding bewaart geen sleutel
-  const anon = await os_('melding/maak', { stad: HAARLEM, soort: 'klokkenluider', zwaarte: 'hoog',
+  const anon = await os_('/api/rtfos/melding/maak', { stad: HAARLEM, soort: 'klokkenluider', zwaarte: 'hoog',
     tekst: 'het stadsbestuur gunt opdrachten aan een eigen bedrijf', anoniem: true }, LEIDER);
   assert.equal(anon.body.melding.melder, 'anoniem');
   // en een klokkenluidersmelding gaat buiten de stad om
-  const stadsblik = await os_('meldingen', { stad: HAARLEM }, BESTUUR);
+  const stadsblik = await os_('/api/rtfos/meldingen', { stad: HAARLEM }, BESTUUR);
   assert.equal(stadsblik.body.meldingen.some(x => x.soort === 'klokkenluider'), false,
     'het stadsbestuur zag de klokkenluidersmelding over zichzelf');
-  const landblik = await os_('meldingen', {}, LAND);
+  const landblik = await os_('/api/rtfos/meldingen', {}, LAND);
   assert.equal(landblik.body.meldingen.some(x => x.soort === 'klokkenluider'), true,
     'het landelijke bestuur zag de klokkenluidersmelding niet');
 });
@@ -462,9 +462,9 @@ test('kritieke meldingen gaan landelijk en niemand kan ze verwijderen', async ()
    Springen mag niet, en goedkeuren doet een ander dan aanvragen.
    ------------------------------------------------------------------------- */
 test('een project springt niet door de keten heen', async () => {
-  const p = await os_('project/maak', { stad: HAARLEM, naam: 'Taalcafe', soort: 'taal', budget: 800 }, LEIDER);
+  const p = await os_('/api/rtfos/project/maak', { stad: HAARLEM, naam: 'Taalcafe', soort: 'taal', budget: 800 }, LEIDER);
   const id = p.body.project.id;
-  const sprong = await os_('project/status', { id, status: 'actief' }, BESTUUR);
+  const sprong = await os_('/api/rtfos/project/status', { id, status: 'actief' }, BESTUUR);
   assert.equal(sprong.status, 400, 'een project sprong van idee naar actief');
   assert.match(sprong.body.error, /Van "idee"/);
 
@@ -473,36 +473,36 @@ test('een project springt niet door de keten heen', async () => {
      recht om te besluiten, en dan zou deze toets op de verkeerde zin slagen --
      precies de val van LAT.md regel 9 (een status die een hele klasse
      toelaat). Daarom staan de twee weigeringen hier als twee beweringen. */
-  await os_('project/status', { id, status: 'aanvraag' }, BESTUUR);
-  await os_('project/status', { id, status: 'beoordeling' }, BESTUUR);
+  await os_('/api/rtfos/project/status', { id, status: 'aanvraag' }, BESTUUR);
+  await os_('/api/rtfos/project/status', { id, status: 'beoordeling' }, BESTUUR);
 
-  const leider = await os_('project/status', { id, status: 'goedgekeurd' }, LEIDER);
+  const leider = await os_('/api/rtfos/project/status', { id, status: 'goedgekeurd' }, LEIDER);
   assert.equal(leider.status, 403, 'een projectleider keurde een project goed');
   assert.match(leider.body.error, /stadsbestuur|landelijke/i);
 
-  const zelf = await os_('project/status', { id, status: 'goedgekeurd' }, BESTUUR);
+  const zelf = await os_('/api/rtfos/project/status', { id, status: 'goedgekeurd' }, BESTUUR);
   assert.equal(zelf.status, 403, 'de indiener keurde zijn eigen project goed');
   assert.match(zelf.body.error, /zelf goed/i);
 
-  const ander = await os_('project/status', { id, status: 'goedgekeurd' }, LAND);
+  const ander = await os_('/api/rtfos/project/status', { id, status: 'goedgekeurd' }, LAND);
   assert.equal(ander.status, 200, JSON.stringify(ander.body).slice(0, 200));
 
   // een indicator die zichzelf tegenspreekt komt er niet in
-  const onzin = await os_('project/indicator', { id, naam: 'deelnemers', doel: 20, bereikt: 12,
+  const onzin = await os_('/api/rtfos/project/indicator', { id, naam: 'deelnemers', doel: 20, bereikt: 12,
     doorgestroomd: 31, uitgevallen: 0 }, BESTUUR);
   assert.equal(onzin.status, 400, '31 doorgestroomd van 12 bereikt werd geaccepteerd');
 });
 
 test('een partner gaat niet actief zonder overeenkomst, en niet zonder landelijk besluit', async () => {
-  const p = await os_('partner/maak', { stad: HAARLEM, naam: 'Stichting Zonder Papieren' }, BESTUUR);
+  const p = await os_('/api/rtfos/partner/maak', { stad: HAARLEM, naam: 'Stichting Zonder Papieren' }, BESTUUR);
   const id = p.body.partner.id;
-  await os_('partner/status', { id, status: 'in_toetsing' }, BESTUUR);
-  const stad = await os_('partner/status', { id, status: 'goedgekeurd' }, BESTUUR);
+  await os_('/api/rtfos/partner/status', { id, status: 'in_toetsing' }, BESTUUR);
+  const stad = await os_('/api/rtfos/partner/status', { id, status: 'goedgekeurd' }, BESTUUR);
   assert.equal(stad.status, 403, 'de stad keurde zijn eigen partner goed');
   assert.match(stad.body.error, /landelijk/i);
 
-  await os_('partner/status', { id, status: 'goedgekeurd' }, LAND);
-  const zonderPapier = await os_('partner/status', { id, status: 'actief' }, LAND);
+  await os_('/api/rtfos/partner/status', { id, status: 'goedgekeurd' }, LAND);
+  const zonderPapier = await os_('/api/rtfos/partner/status', { id, status: 'actief' }, LAND);
   assert.equal(zonderPapier.status, 400, 'een partner werd actief zonder samenwerkingsovereenkomst');
   assert.match(zonderPapier.body.error, /overeenkomst/i);
 });
@@ -512,16 +512,16 @@ test('een partner gaat niet actief zonder overeenkomst, en niet zonder landelijk
    Toezicht stopt de uitvoering; het wist de geschiedenis niet.
    ------------------------------------------------------------------------- */
 test('een geblokkeerde stad blijft leesbaar maar niet schrijfbaar', async () => {
-  await os_('stad/status', { id: HAARLEM, status: 'geblokkeerd' }, LAND);
-  const lezen = await os_('projecten', { stad: HAARLEM }, BESTUUR);
+  await os_('/api/rtfos/stad/status', { id: HAARLEM, status: 'geblokkeerd' }, LAND);
+  const lezen = await os_('/api/rtfos/projecten', { stad: HAARLEM }, BESTUUR);
   assert.equal(lezen.status, 200, 'een geblokkeerde stad werd ook onleesbaar');
   assert.ok(lezen.body.projecten.length >= 2, 'de geschiedenis is verdwenen');
 
-  const schrijven = await os_('project/maak', { stad: HAARLEM, naam: 'Nog een project', soort: 'taal', budget: 100 }, BESTUUR);
+  const schrijven = await os_('/api/rtfos/project/maak', { stad: HAARLEM, naam: 'Nog een project', soort: 'taal', budget: 100 }, BESTUUR);
   assert.equal(schrijven.status, 403, 'er kon in een geblokkeerde stad geschreven worden');
   assert.match(schrijven.body.error, /geblokkeerd/);
 
-  await os_('stad/status', { id: HAARLEM, status: 'actief' }, LAND);
-  const weer = await os_('project/maak', { stad: HAARLEM, naam: 'Nog een project', soort: 'taal', budget: 100 }, BESTUUR);
+  await os_('/api/rtfos/stad/status', { id: HAARLEM, status: 'actief' }, LAND);
+  const weer = await os_('/api/rtfos/project/maak', { stad: HAARLEM, naam: 'Nog een project', soort: 'taal', budget: 100 }, BESTUUR);
   assert.equal(weer.status, 200, 'na deblokkeren kon er nog steeds niets: ' + JSON.stringify(weer.body).slice(0, 200));
 });

@@ -54,6 +54,19 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-12izg7a:not(#_#_#_){color:var(--rtg-leesgoud,var(--goud))}
+.s-1j87t4f:not(#_#_#_){margin:0.5rem 0 0}
+.s-1puizbz:not(#_#_#_){color:var(--rood)}
+.s-1v3wyk0:not(#_#_#_){display:block;font-size:.82rem;color:var(--zacht);margin:0.25rem 0 0.25rem}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -119,9 +132,9 @@
 
   <div class="kaart blok">
     <h2>Gegevens en privacy</h2>
-    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--rtg-leesgoud,var(--goud))">privacy en veiligheid</a>-pagina.</div>
+    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" class="s-12izg7a">privacy en veiligheid</a>-pagina.</div>
     <button class="knop rood" id="wisAlles">Alle gegevens van ons gezin verwijderen</button>
-    <div class="h" id="wisUitleg" style="margin:0.5rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
+    <div class="h s-1j87t4f" id="wisUitleg">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
   </div>
 </div>
 
@@ -147,7 +160,7 @@
     <option value="beheerder">Beheerder</option>
   </select>
   <div class="rolhint" id="rolhint" hidden>Een oppas, opa/oma of familielid ziet alleen het broodnodige: waar de kinderen zijn, contact met het gezin, en samen leren of even rust. De privezaken van het gezin (geld, steun, dromen) blijven verborgen.</div>
-  <label style="display:block;font-size:.82rem;color:var(--zacht);margin:0.25rem 0 0.25rem;">Geboortedatum voor de automatische leeftijdspas</label>
+  <label class="s-1v3wyk0">Geboortedatum voor de automatische leeftijdspas</label>
   <input class="veld" id="dGeboren" type="date" autocomplete="bday">
   <div class="rolhint" id="groephint">De server rekent hier zelf Mini, Kind, Tiener, Jong of Volwassen uit. Op een verjaardag verandert de toegang automatisch; een leerling zonder geboortedatum komt de Campus niet in.</div>
   <input class="veld" id="dPin" placeholder="Pincode (leeg = geen)" inputmode="numeric" maxlength="6">
@@ -195,7 +208,7 @@ $('#dRol').addEventListener('change', ()=>{ $('#rolhint').hidden = $('#dRol').va
 async function laad(){
   const d = await fetch('/api/foundation/gezin/'+s.code+'/mij',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
   if (d.error || !d.profiel){ location.href='index.html'; return; }
-  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--rtg-leesgoud,var(--goud))">Terug naar de app</a>.</p>'; return; }
+  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" class="s-12izg7a">Terug naar de app</a>.</p>'; return; }
   Sessie.balk($('#balk'), { terug:'index.html', terugTekst:'← Terug' });
   $('#zin').textContent = 'Beheer het gezin "' + d.gezin.naam + '". Voeg profielen toe en houd iedereen op de hoogte.';
   // profielen
@@ -223,7 +236,7 @@ async function laad(){
   if (d.wisVerzoek && !d.wisVerzoek.vanMij){
     $('#wisAlles').textContent = 'Toestemming geven om alles te verwijderen';
     $('#wisAlles').dataset.mode = 'bevestig';
-    $('#wisUitleg').innerHTML = '<b style="color:var(--rood)">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" style="color:var(--rtg-leesgoud,var(--goud))">wijs het verzoek af</a>.';
+    $('#wisUitleg').innerHTML = '<b class="s-1puizbz">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" class="s-12izg7a">wijs het verzoek af</a>.';
     $('#wisWeiger').onclick = async (e)=>{ e.preventDefault(); try{ await api('/gezin/wissen/intrekken', { code:s.code, token:s.token }); laad(); }catch(err){ alert(err.message); } };
   } else if (d.wisVerzoek && d.wisVerzoek.vanMij){
     $('#wisAlles').textContent = 'Verzoek intrekken';

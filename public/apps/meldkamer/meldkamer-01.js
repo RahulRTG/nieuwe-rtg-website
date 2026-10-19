@@ -66,7 +66,7 @@
       const vrij = (d.eenheden || []).filter(e => e.status === 'vrij');
       const kanWijzen = m.status !== 'afgerond';
       return '<div class="melding"><span class="prio p' + m.prio + '">P' + m.prio + '</span><b>' + esc(m.tekst) + '</b>' +
-        (m.plek ? ' · ' + esc(m.plek) : '') + ' · ' + esc(m.status) + (m.viaBijstand ? ' · <span style="color:var(--rtg-leesgoud,var(--gold));">bijstandsverzoek</span>' : '') +
+        (m.plek ? ' · ' + esc(m.plek) : '') + ' · ' + esc(m.status) + (m.viaBijstand ? ' · <span class="s-12itpbj">bijstandsverzoek</span>' : '') +
         '<div class="rij">' +
         (kanWijzen && vrij.length ? '<select data-wijs-e="' + m.id + '">' + vrij.map(e => '<option value="' + e.id + '">' + esc(e.naam) + ' (' + e.soort + ')</option>').join('') + '</select>' +
           '<button class="knop klein" data-wijs="' + m.id + '" type="button">Stuur</button>' : '') +
@@ -117,7 +117,7 @@
       $('#wachtkamer').innerHTML = z.receptie.length ? z.receptie.map(p =>
         '<div class="melding"><b>' + esc(p.aanduiding) + '</b>' + (p.reden ? ' · ' + esc(p.reden) : '') + ' · ' + esc(p.status) + (p.kamer ? ' (' + esc(p.kamer) + ')' : '') +
         '<div class="rij">' +
-        (p.status === 'wacht' ? '<input class="veld" data-pkamer="' + p.id + '" placeholder="Kamer" maxlength="30" style="max-width:8rem;">' +
+        (p.status === 'wacht' ? '<input class="veld s-1v3d95r" data-pkamer="' + p.id + '" placeholder="Kamer" maxlength="30">' +
           '<button class="knop klein" data-proep="' + p.id + '" type="button">Roep op</button>' : '') +
         '<button class="knop klein" data-pklaar="' + p.id + '" type="button">Klaar</button></div></div>').join('')
         : '<p class="stil">De wachtkamer is leeg.</p>';

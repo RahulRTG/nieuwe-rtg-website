@@ -272,7 +272,7 @@ if (!VASTLEGGEN && !JSONUIT) {
     console.log('    bewijsstuk : ' + c.bewijsstuk);
     console.log('    grens      : ' + c.grens);
   }
-  const oud = (() => { try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; } })();
+  const oud = (() => { try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; return null; } })();
   if (oud) {
     console.log('\n  laatst gemeten:');
     for (const c of oud.controls || []) {

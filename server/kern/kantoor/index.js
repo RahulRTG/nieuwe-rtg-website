@@ -134,40 +134,9 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
     };
   }
 
-  /* Backoffice: identiteitsverificaties beoordelen.
-
-     Dit is de grootste inzage die er bestaat: de backoffice ziet hier de echte
-     naam EN het e-mailadres van iedereen in de wachtrij. Precies daarom gaat
-     het door het inzagejournaal (server/inzagelog.js) -- één regel per keer dat
-     het scherm wordt geopend, met de id's die erin stonden. Anders is dit een
-     kluisdeur die openstaat zonder dat er ooit iets van te merken is.
-
-     wie = de backoffice-medewerker of eigenaar die het scherm opende; de route
-     geeft die mee. Wordt hij niet meegegeven, dan staat er 'backoffice' -- dat
-     is minder waard, maar nog altijd oneindig veel meer dan niets. */
-  function pendingVerifications(wie) {
-    const rij = accounts.listByVerification('pending');
-    try {
-      inzagelog.noteerVeel({
-        door: wie && wie.id != null ? { id: wie.id, naam: wie.naam } : { naam: 'backoffice' },
-        overIds: rij.map(u => u.id),
-        waarom: 'KYC: identiteitsverificaties beoordelen',
-        bron: 'backoffice/verificaties'
-      });
-    } catch (e) {}
-    // De backoffice mag voor de KYC-controle de echte naam/e-mail uit de kluis zien.
-    /* De OPGEGEVEN geboortedatum gaat mee, zodat de keurder hem naast het
-       document kan leggen. Hij is namelijk zelf ingetypt bij de aanmelding en
-       tot nu toe werd hij bij de goedkeuring nooit tegen het paspoort
-       gehouden -- zie routes/office/verificaties.js. */
-    return rij.map(u => {
-      let md = {};
-      try { md = accounts.getMemberState(u.id) || {}; } catch (e) { md = {}; }
-      return { id: u.id, name: accounts.realNameOf(u), email: accounts.emailOf(u), codename: u.codename,
-        tier: u.tier, doc: u.id_doc, at: u.created_at,
-        geborenOpgegeven: md.geboren || null, geborenBron: md.geborenBron || 'opgegeven' };
-    });
-  }
+  /* De KYC-wachtrij -- de grootste inzage die er bestaat -- woont in
+     ./kycwachtrij.js, met het spoor dat kan weigeren. */
+  const { pendingVerifications } = require('./kycwachtrij')({ accounts, inzagelog });
 
   return { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications,
     /* de schaduwmeting van ./mensdeur.js; leest alleen */

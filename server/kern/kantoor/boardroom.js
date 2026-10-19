@@ -18,10 +18,8 @@ module.exports = function maakBoardroom({ db, sessionFor, accounts, eigenaar, of
    IDENTITEIT: het eigen RTG-account (direct, of als kantoor-rol via het
    ene account). Een anonieme backoffice-code heeft geen identiteit en
    komt er daarom nooit in; de rest van het kantoor blijft gewoon open. */
-function boardroomLijst() {
-  if (!Array.isArray(db.data.boardroomToegang)) db.data.boardroomToegang = [];
-  return db.data.boardroomToegang;
-}
+const eigen = require('../eigencollectie')({ db, domein: 'kern/kantoor/boardroom', bezit: { boardroomToegang: 'lijst' } });
+function boardroomLijst() { return eigen.bak('boardroomToegang'); }
 function boardroomWie(req) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;

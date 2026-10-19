@@ -57,7 +57,7 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
        Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
     if (!gewijzigd.length && !verwijderd.length && !auditOps.length) {
       mutaties.bevestig(nagekeken);
-      return { alGelijk: !uitgesteld };
+      return { alGelijk: !uitgesteld, collecties: [] };
     }
     const { bump, huidig, lees, up, weg } = statements();
     const vastgelegd = [], weggeschreven = [], overgenomenGrafstenen = [];
@@ -119,7 +119,10 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
     }
     audits.naCommit(auditResultaten, doos, auditSnapshots);
     mutaties.bevestig(nagekeken);
-    return { alGelijk: false, committed: true };
+    /* `collecties`: wat deze commit werkelijk schreef. Het verraad richt er zijn
+       dood na de commit op (server/lib/verraad.js, RTG_VERRAAD_DOEL). */
+    return { alGelijk: false, committed: true, collecties: [...new Set([...vastgelegd.map(([k]) => k),
+      ...weggeschreven.map(([k]) => k), ...auditOps.map(op => op.naam)])] };
   }
   return saveSqlite;
 };

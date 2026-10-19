@@ -77,11 +77,8 @@ module.exports = ({ db, save, bewerkCollectie, crypto, boardroomWie, magBoardroo
     // Persoonscodes hebben verval, gebruik, intrekking en eigen opslag.
     codelevenscycli: [],
     audit: [] };
-  function S() {
-    if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
-    for (const k of Object.keys(LEEG)) if (!Array.isArray(db.data.rtfos[k])) db.data.rtfos[k] = [];
-    return db.data.rtfos;
-  }
+  const opslag = require('./opslag')({ db }); // de deur naar db.data.rtfos
+  const S = () => opslag.wortel(Object.keys(LEEG));
 
   /* ---------- het auditspoor ----------
      Elke muterende handeling schrijft hier. Append-only voor iedereen: er is

@@ -89,10 +89,20 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1v4gr3o:not(#_#_#_){position:absolute;left:-999px}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body data-rtg-context-bron="podium" class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#inhoud">Naar inhoud</a>
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
@@ -147,7 +157,7 @@
     <p class="stil h-mt50" id="kijkWie"></p>
     <div id="chatKijk" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
     <form class="rij" id="chatForm">
-      <label for="chatVeld" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
+      <label for="chatVeld" class="s-1v4gr3o">Bericht in de kanaalchat</label>
       <input id="chatVeld" maxlength="300" placeholder="Praat mee (op codenaam)" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
     </form>
@@ -169,14 +179,14 @@
       <span class="tel" id="studioTel"></span>
     </div>
     <div class="rij">
-      <label for="studioTitel" style="position:absolute;left:-999px;">Titel van de uitzending</label>
+      <label for="studioTitel" class="s-1v4gr3o">Titel van de uitzending</label>
       <input id="studioTitel" maxlength="80" placeholder="Titel van de uitzending">
       <button class="knop" id="studioAbb" type="button" aria-pressed="false">Alleen abonnees</button>
       <button class="knop vol" id="studioKnop" type="button">Ga live</button>
     </div>
     <div id="chatStudio" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
     <form class="rij" id="chatFormStudio">
-      <label for="chatVeldStudio" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
+      <label for="chatVeldStudio" class="s-1v4gr3o">Bericht in de kanaalchat</label>
       <input id="chatVeldStudio" maxlength="300" placeholder="Praat met de zaal" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
     </form>
@@ -670,5 +680,13 @@
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/leeg.js"></script>
+<!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
+     apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/schermcontext.js" defer></script>
 </body>
 </html>

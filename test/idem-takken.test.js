@@ -199,3 +199,50 @@ test('volgendeStap telt binnen de handeling en is null daarbuiten', async () => 
   assert.deepEqual(r.a, { naam: 'proefIdem', sleutel: 's', stap: 0 });
   assert.equal(r.b.stap, 1);
 });
+
+/* ZONDER SLEUTEL, MET DEZELFDE BELOFTE (18 oktober 2026). Een laag die
+   `duurzaam` verklaarde, liet werk zonder sleutel buiten elke bundel om lopen
+   (write-behind): de schrijfproef mat /api/bank/rekening/open en
+   /api/bank/pas/uitgeven als VALS_SUCCES. Nu gaat ook dat werk door een
+   duurzame bundel. Mutatie gedaan: `return werk()` terug op die tak laat de
+   eerste en de tweede bewering zakken. */
+test('zonder sleutel loopt het werk in een duurzame laag toch door een duurzame bundel', async () => {
+  const opties = [];
+  const bijeen = async (fn, o) => { opties.push(o); await fn(); };
+  const { idem } = opzet({ bijeen, duurzaam: true });
+  const r = await idem(null, null, async () => ({ ok: true, n: 1 }));
+  assert.deepEqual(r, { ok: true, n: 1 });
+  assert.deepEqual(opties, [{ duurzaam: true }], 'een bundel, en duurzaam');
+  /* Zonder de vlag blijft het zoals het was: geen bundel voor werk zonder sleutel. */
+  const b = opzet({ bijeen: async (fn, o) => { opties.push('nee'); await fn(); } });
+  await b.idem(null, null, async () => ({ ok: true }));
+  assert.equal(opties.length, 1, 'een niet-duurzame laag bundelt werk zonder sleutel niet');
+});
+
+test('bevestigt de opslag het werk zonder sleutel niet, dan is dat een 503 en geen 200', async () => {
+  const bijeen = async (fn) => { await fn(); throw new Error('de opslag bevestigt niet'); };
+  const { idem } = opzet({ bijeen, duurzaam: true });
+  const r = await idem(null, null, async () => ({ ok: true }));
+  assert.equal(r.status, 503);
+  assert.match(r.error, /niet vastgelegd/);
+  /* Een eigen weigering van het werk is het ware antwoord, ook als de lege commit faalde. */
+  const w = await idem(null, null, async () => ({ status: 404, error: 'bestaat niet' }));
+  assert.equal(w.status, 404);
+  /* En een fout IN het werk blijft een fout: geen 503 over een programmeerfout. */
+  await assert.rejects(idem(null, null, async () => { throw new Error('kapot'); }), /kapot/);
+});
+
+test('met sleutel: een opslag die niet bevestigt geeft 503, en de vlucht blijft niet hangen', async () => {
+  let keer = 0;
+  const bijeen = async (fn) => { await fn(); if (++keer === 1) throw new Error('de opslag bevestigt niet'); };
+  const { idem, data } = opzet({ bijeen, duurzaam: true });
+  let gedaan = 0;
+  const werk = async () => { gedaan++; return { ok: true, n: gedaan }; };
+  const r1 = await idem('s1', 'a', werk);
+  assert.equal(r1.status, 503, 'de eerste poging: niet vastgelegd');
+  assert.ok(!data.proefIdem || !Object.hasOwn(data.proefIdem, 's1'), 'een niet-bevestigd antwoord wordt niet als herhaling bewaard');
+  /* Dezelfde sleutel nog een keer: geen eeuwig wachten op een vlucht die nooit
+     landde, maar gewoon een nieuwe poging. */
+  const r2 = await Promise.race([idem('s1', 'a', werk), new Promise(res => setTimeout(() => res('HANGT'), 2000))]);
+  assert.deepEqual(r2, { ok: true, n: 2 });
+});

@@ -29,7 +29,7 @@
           (r.dates ? ' · '+escHtml(r.dates) : '')+
           (r.door ? ' · '+T('ra.door','door')+' '+escHtml(r.door) : '')+
           (r.desc ? '<br>'+escHtml(r.desc.slice(0,140)) : '')+'</div></div>'+
-        '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn" data-raweg="'+escHtml(r.id)+'">'+T('ra.weg','Uit het aanbod')+'</button></div>'+
+        '<div class="s-mif44q"><button class="vbtn" data-raweg="'+escHtml(r.id)+'">'+T('ra.weg','Uit het aanbod')+'</button></div>'+
       '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nora','Nog geen reizen in het aanbod. Zolang hier niets staat, is het reisbureau voor leden leeg en kan er niets worden aangevraagd.')+'</div>';
     document.querySelectorAll('[data-raweg]').forEach(function(b){
@@ -76,7 +76,7 @@
           (a.besluit && a.besluit.door ? ' · '+T('rb.door','door')+' '+escHtml(a.besluit.door) : '')+
           (a.besluit && a.besluit.reden ? '<br>"'+escHtml(a.besluit.reden.slice(0,120))+'"' : '')+'</div></div>'+
         (af ? '<span class="pill '+(a.status==='bevestigd'?'klaar':'bereiding')+'">'+escHtml(stand || a.status)+'</span>'
-            : '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-rbok="'+escHtml(a.ref)+'">'+T('rb.bev','Bevestigen')+'</button><button class="vbtn no" data-rbno="'+escHtml(a.ref)+'">'+T('rb.wijs','Afwijzen')+'</button></div>')+
+            : '<div class="s-mif44q"><button class="vbtn ok" data-rbok="'+escHtml(a.ref)+'">'+T('rb.bev','Bevestigen')+'</button><button class="vbtn no" data-rbno="'+escHtml(a.ref)+'">'+T('rb.wijs','Afwijzen')+'</button></div>')+
       '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.norb','Nog geen reisaanvragen. Leden vragen een reis aan in het reisbureau; hier bevestigt u de datum of wijst u af.')+'</div>';
     document.querySelectorAll('[data-rbok]').forEach(function(b){

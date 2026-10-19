@@ -1614,8 +1614,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->132<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->114<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->427<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->133<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->115<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->432<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1916,14 +1916,6 @@ de richting bepaalt is dat de schil al blijft staan, maar dat elk BLAD zijn hele
 stapel opnieuw opstart. Het doel is geen toestemming voor een grote verhuizing:
 de volgende trede is een wereld als Living Module op één route (TravelOS), met
 acceptatiecriteria en een terugval.
-
-**`TRAVELOS-SPATIAL-VERTICAL-SLICE.md` is het implementatiepassport voor die
-volgende trede** — één echte catalogusreisaanvraag in de bestaande Travel Living
-Module, boven op dezelfde TravelOS-routes, Workspace Runtime, serverrechten,
-Edge en Rahul-contextbrug als vandaag. Het document legt bronwaarheid, handoff,
-onzekere antwoordstatus, privacy, performance, acceptatiebewijs en vier kleine
-PR-stappen vast. Het bouwt geen vierde host en geeft nog geen toestemming voor
-de productimplementatie.
 
 **`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die
 zonder commit verschuift (runtime, browser, live-site, wet) en de herstellus
@@ -2543,8 +2535,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27898<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7830<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27990<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7958<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->316<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2680,7 +2672,7 @@ motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
 bestaande meter deed: van de <!--getal:machine.muterend-->4130<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2714<!--/getal--> geen
+muterende routes raken er <!--getal:machine.zonderAs-->2723<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2841,6 +2833,12 @@ beveiligingsgrens. Eén integrator, geen nieuwe domeinen tot fase 4, CI genereer
 en controleert de registers, en vier harde voorwaarden: geen kunstmatige
 normverbetering, geen verborgen bewijsachterstand, geen automatische
 productie-uitrol, geen nieuwe technische schuld.
+Sinds 18 oktober 2026 liep de V1-afbouw op één integratiebranch
+(`claude/v1-integratie`), en open PR's werden daarin geïntegreerd. Op de avond
+van 18 oktober besloot de eigenaar V1 ook naar main te brengen: main en de
+integratiebranch zijn sindsdien weer één lijn. De einddefinitie van V1 staat in
+`AFBOUWPROGRAMMA.md` par. 10.
+
 De aanvulling van 16 oktober staat afhankelijke stappen op één afgeschermde
 integratietak toe. Dat verandert niets aan de menselijke poorten voor `main`,
 releases en productie, en niets aan de harde grens voor accountisolatie,

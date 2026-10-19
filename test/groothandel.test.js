@@ -119,3 +119,47 @@ test('7. de AI-heuristiek kiest het juiste product uit de verkoop', () => {
   assert.ok(r.regels.some(x => x.productId === 'p1'), 'de tonijn wordt voorgesteld (kwam in de verkoop voor)');
   assert.ok(!r.regels.some(x => x.productId === 'p2'), 'servetten niet (geen verkoopsignaal)');
 });
+
+/* 8. /api/groothandel/annuleer: een lid annuleert zijn eigen boodschappen zolang
+   de groothandel nog niet bevestigde, en de voorraad komt terug. Daarna niet meer,
+   en een ander lid kan andermans bestelling niet aanraken.
+   MUTATIE GEZIEN ZAKKEN: in server/kern/groothandel/orderlaag.js de regel
+   `voorraadTerug(o);` in annuleer() weggehaald; de toets zakte op "de voorraad
+   komt terug". */
+test('8. een lid annuleert zijn eigen, nog niet bevestigde bestelling en de voorraad komt terug', async () => {
+  const product = async () => {
+    const m = (await api(base, '/api/groothandel/markt', {}, lid)).body.groothandels.find(x => x.code === 'MERCABIZA');
+    return m.producten.find(x => x.voorraad >= 10);
+  };
+  const p = await product();
+  assert.ok(p, 'er is een product met voorraad');
+  const best = await api(base, '/api/groothandel/bestel', { groothandelCode: 'MERCABIZA', regels: [{ productId: p.id, aantal: 2 }] }, lid);
+  assert.equal(best.status, 200, JSON.stringify(best.body).slice(0, 160));
+  const ref = best.body.order.ref;
+  const tussen = (await api(base, '/api/groothandel/markt', {}, lid)).body.groothandels
+    .find(x => x.code === 'MERCABIZA').producten.find(x => x.id === p.id);
+
+  const u = Date.now().toString().slice(-8);
+  const ander = (await api(base, '/api/auth/register', { name: 'Ander Lid', email: 'ga' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.equal((await api(base, '/api/groothandel/annuleer', { ref }, ander)).status, 404, 'andermans bestelling bestaat niet voor dit lid');
+  assert.equal((await api(base, '/api/groothandel/annuleer', { ref }, null)).status, 401);
+
+  const weg = await api(base, '/api/groothandel/annuleer', { ref }, lid);
+  assert.equal(weg.status, 200, JSON.stringify(weg.body).slice(0, 160));
+  const o = (await api(base, '/api/groothandel/mijn', {}, lid)).body.bestellingen.find(x => x.ref === ref);
+  assert.equal(o.status, 'geannuleerd');
+  assert.equal(tussen.voorraad, p.voorraad - 2, 'bestellen haalt de voorraad eraf');
+  const na = (await api(base, '/api/groothandel/markt', {}, lid)).body.groothandels
+    .find(x => x.code === 'MERCABIZA').producten.find(x => x.id === p.id);
+  assert.equal(na.voorraad, p.voorraad, 'de voorraad komt terug');
+  assert.equal((await api(base, '/api/groothandel/annuleer', { ref }, lid)).status, 409, 'twee keer annuleren kan niet');
+
+  // een bevestigde bestelling annuleert het lid niet meer
+  const twee = await api(base, '/api/groothandel/bestel', { groothandelCode: 'MERCABIZA', regels: [{ productId: p.id, aantal: 1 }] }, lid);
+  assert.equal(twee.status, 200);
+  const st = await api(base, '/api/supplier/groothandel/order/status', { ref: twee.body.order.ref, actie: 'verder' }, gh);
+  assert.equal(st.body.status, 'bevestigd');
+  assert.equal((await api(base, '/api/groothandel/annuleer', { ref: twee.body.order.ref }, lid)).status, 409,
+    'na bevestiging is annuleren niet meer aan het lid');
+});

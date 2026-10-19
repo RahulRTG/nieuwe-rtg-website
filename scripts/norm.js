@@ -48,6 +48,14 @@ const { vuileRegisters } = require('./lib/paspoort');
 
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
+/* Wat NORM.json NIET aantoont, als veld in het register zelf. De meetleer
+   (scripts/meetleer.js) telde dit bestand als blind: het droeg geen enkele
+   regel over zijn eigen grens, terwijl het de lat van het hele huis is. */
+const NORM_GRENS = 'Een ratel over AANTALLEN, geen oordeel over gedrag: dat een meter op de norm staat, zegt dat ' +
+  'het getal niet slechter werd dan bij de vorige --vastleggen, niet dat het onderliggende risico klein is of ' +
+  'dat de meter zelf nog hetzelfde meet (daarvoor: test/meterijk.test.js en de ijking per meter). Een meter ' +
+  'die hier niet staat, wordt door niets vastgehouden (metingenZonderRatel); een verlaging met de hand heeft ' +
+  'een notitie nodig (scripts/normverval.js). Zegt niets over routedekking, ketens of documentwaarheid.';
 
 /* Elke meter met de richting waarin hij mag bewegen. `omlaag` betekent: een
    lager getal is beter (minder ongedekte endpoints). `omhoog`: hoger is beter. */
@@ -2197,7 +2205,7 @@ function main() {
   if (!norm) {
     console.log('\n\x1b[1mDE NORM\x1b[0m -- nog niet vastgelegd.\n');
     for (const m of METERS) console.log('  ' + m.sleutel.padEnd(22) + String(nu[m.sleutel]).padStart(6) + '   ' + m.wat);
-    fs.writeFileSync(NORMBESTAND, JSON.stringify({ vastgelegd: new Date().toISOString().slice(0, 10), meters: nu }, null, 2) + '\n');
+    fs.writeFileSync(NORMBESTAND, JSON.stringify({ vastgelegd: new Date().toISOString().slice(0, 10), grens: NORM_GRENS, meters: nu }, null, 2) + '\n');
     console.log('\n  \x1b[32mNORM.json aangemaakt.\x1b[0m Vanaf nu mag geen van deze meters nog slechter worden.\n');
     return 0;
   }
@@ -2372,6 +2380,7 @@ function main() {
       if (pres.kalibratie) uit.prestatieKalibratie = pres.kalibratie;
       uit.prestatieGemeten = pres.gedraaid;
     }
+    uit.grens = NORM_GRENS;
     fs.writeFileSync(NORMBESTAND, JSON.stringify(uit, null, 2) + '\n');
     if (beterDan.length) {
       console.log('\n  \x1b[32mNorm strakker gezet op ' + beterDan.length + ' punt(en).\x1b[0m');

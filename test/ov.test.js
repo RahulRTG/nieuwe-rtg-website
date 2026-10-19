@@ -159,6 +159,8 @@ test('7. de routetekenaar: de manager zet zelf een lijn op de kaart en leden zie
   // weghalen ruimt ook de voertuigen van die lijn op
   await api('/api/staff/ov/dienst', { lijnId: nieuw.body.lijn.id, voertuigNaam: 'Bus 9' }, pda);
   await api('/api/staff/ov/pos', { lat: 38.912, lng: 1.436 }, pda);
+  const voorWeg = await api('/api/supplier/ov/overzicht', {}, baas);
+  assert.ok(voorWeg.body.voertuigen.some(v => /Bus 9/.test(v.naam)), 'voor het weghalen rijdt Bus 9 live op het overzicht');
   const weg = await api('/api/staff/ov/lijn/zet', { id: nieuw.body.lijn.id, weg: true }, baas);
   assert.equal(weg.status, 200);
   const over = await api('/api/supplier/ov/overzicht', {}, baas);

@@ -162,3 +162,34 @@ test('de hulp raakt nooit een gesprek van iemand anders aan', async () => {
   const r = await post('/api/member/rtmail/hulp', { id: m.id }, bTok);
   assert.match(r.error, /staat niet in dit postvak/);
 });
+
+/* /api/member/rtmail/assist: de lokale assistent bij het eigen postvak. Zonder
+   model vat hij samen met de lokale regels en zegt hij dat ook (ai: false); een
+   antwoordvoorstel gaat alleen over een bericht uit het EIGEN postvak, en is een
+   voorstel -- er wordt niets verstuurd.
+   MUTATIE GEZIEN ZAKKEN: in server/routes/rtmail.js de 404 bij een onbekend
+   bericht in assist() weggehaald; de toets zakte op "een bericht uit een ander
+   postvak bestaat hier niet". */
+test('de assistent vat het eigen postvak samen en stelt een antwoord voor, zonder te versturen', async () => {
+  const m = await schrijf(aTok, bAdres, 'Vraag over de factuur', 'Klopt het bedrag op de factuur van maart?');
+  const sam = await post('/api/member/rtmail/assist', {}, bTok);
+  assert.equal(sam.ok, true, JSON.stringify(sam).slice(0, 160));
+  assert.equal(sam.ai, false, 'zonder model zegt hij dat hij lokaal samenvat');
+  assert.equal(sam.bron, 'lokale-regels');
+  assert.ok(String(sam.samenvatting).length > 0, 'er is een samenvatting');
+
+  const voor = (await post('/api/member/rtmail/inbox', {}, bTok));
+  const aantalVoor = JSON.stringify(voor).length;
+  const v = await post('/api/member/rtmail/assist', { actie: 'antwoord', id: m.id }, bTok);
+  assert.equal(v.ok, true, JSON.stringify(v).slice(0, 160));
+  assert.match(v.voorstel.onderwerp, /^Re: Vraag over de factuur/);
+  assert.ok(v.voorstel.tekst.length > 0);
+  assert.equal(JSON.stringify(await post('/api/member/rtmail/inbox', {}, bTok)).length, aantalVoor, 'er is niets verstuurd');
+
+  const r = await fetch(BASE + '/api/member/rtmail/assist', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + bTok },
+    body: JSON.stringify({ actie: 'antwoord', id: 'bestaat-niet' }) });
+  assert.equal(r.status, 404, 'een bericht uit een ander postvak bestaat hier niet');
+  const zonder = await fetch(BASE + '/api/member/rtmail/assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(zonder.status, 401);
+});

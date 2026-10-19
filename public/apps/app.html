@@ -56,7 +56,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="0fd82c96">
+<meta name="rtg-bouw" content="7be75ecc">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -1821,63 +1821,374 @@ try {
 #etalage-ov .salon-etalage-volg{margin-left:auto;background:none;color:var(--rtg-leesgoud,var(--goud));border:1px solid var(--rtg-leesgoud,var(--goud));border-radius:0;padding:0.3rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;}
 #etalage-ov .salon-etalage-volg.volgt{background:var(--rtg-leesgoud,var(--goud));color:#000;}
 </style>
-<script src="/shared/command/catalog.js?v=0fd82c96" defer></script>
-<script src="/shared/command/console.js?v=0fd82c96" defer></script>
-<script src="/shared/command/verdeler.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/module-sdk.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-world-catalog.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-directory.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-continuity.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-composer.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-registries.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-session.js?v=0fd82c96" defer></script>
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1046wa2:not(#_#_#_){padding:0.4rem 0.95rem;font-size:0.7rem}
+.s-10mclmr:not(#_#_#_){margin-top:0.35rem;font-size:0.92rem}
+.s-10qur68:not(#_#_#_){color:var(--rtg-leesgroen,var(--green,#2E7D4F));font-size:0.72rem}
+.s-10y4xe9:not(#_#_#_){font-size:0.66rem;color:var(--soft);margin:0.5rem 0}
+.s-11fvs7:not(#_#_#_){color:var(--soft);margin-bottom:0.5rem}
+.s-11guwa8:not(#_#_#_){font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy)}
+.s-11qe8p2:not(#_#_#_){margin:0.25rem 0 0.5rem}
+.s-125le67:not(#_#_#_){border-top:1px solid var(--line,rgba(255,255,255,0.08));margin-top:0.5rem;padding-top:0.55rem}
+.s-129gr8o:not(#_#_#_){font-size:0.72rem;color:var(--rtg-leesgoud,var(--gold));margin-top:0.3rem}
+.s-12gyt3u:not(#_#_#_){font-size:0.68rem;color:var(--soft);margin-top:0.2rem}
+.s-12h61dc:not(#_#_#_){font-weight:400}
+.s-12h62uq:not(#_#_#_){font-weight:600}
+.s-12itpbj:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold))}
+.s-12mp3uh:not(#_#_#_){width:34px;height:34px;font-size:0.7rem}
+.s-12wf5w5:not(#_#_#_){font-size:0.8rem;margin-top:0.25rem}
+.s-12zxnen:not(#_#_#_){padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft)}
+.s-13g16je:not(#_#_#_){font-size:.78rem;color:var(--rtg-leesgoud,var(--gold))}
+.s-13nstzw:not(#_#_#_){padding:2rem 1rem;color:var(--soft);text-align:center;font-size:0.85rem}
+.s-14gsrlv:not(#_#_#_){background:var(--burgundy-deep);border:1px solid var(--burgundy);color:#fff;border-radius:0;padding:0.5rem 1rem;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit}
+.s-14n40hq:not(#_#_#_){color:#E0736A}
+.s-14nhwbq:not(#_#_#_){border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem}
+.s-14woazw:not(#_#_#_){font-size:0.72rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem}
+.s-14zm4p4:not(#_#_#_){font-size:0.7rem;color:var(--soft)}
+.s-1530dfj:not(#_#_#_){font-size:0.8rem;color:var(--muted);white-space:pre-wrap;margin-top:0.25rem}
+.s-159we3d:not(#_#_#_){margin:0.5rem 0 0.5rem;font-size:0.74rem;color:var(--soft)}
+.s-15ikrh4:not(#_#_#_){margin-top:0.75rem;line-height:1.55}
+.s-15mj4ev:not(#_#_#_){font-size:0.72rem;color:var(--muted);margin-top:0.5rem}
+.s-162n281:not(#_#_#_){font-size:0.64rem;color:var(--soft);margin-top:0.25rem}
+.s-17jmyk4:not(#_#_#_){width:100%;margin-top:0.5rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.7rem;font-family:inherit;font-size:0.8rem;cursor:pointer}
+.s-17lyjl:not(#_#_#_){color:var(--gold);font-size:0.82rem;white-space:nowrap}
+.s-17xbfa6:not(#_#_#_){background:linear-gradient(135deg,#2A2724,#0C0C0B)}
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-18rb9yl:not(#_#_#_){border-color:var(--gold,#c9a227)}
+.s-19g2g0z:not(#_#_#_){white-space:nowrap}
+.s-19zowa4:not(#_#_#_){margin-top:0.25rem;font-size:0.72rem;color:var(--soft)}
+.s-1ajy4dw:not(#_#_#_){padding:1rem 1.1rem}
+.s-1ax41pp:not(#_#_#_){font-size:0.74rem;color:var(--muted)}
+.s-1b3kkgt:not(#_#_#_){font-size:0.6rem;color:var(--burgundy)}
+.s-1bpjqct:not(#_#_#_){font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem}
+.s-1brp54q:not(#_#_#_){background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.4rem 0.5rem;color:var(--txt);font-family:inherit;font-size:0.7rem}
+.s-1bs2pmo:not(#_#_#_){width:2.2rem;height:2.2rem;cursor:pointer}
+.s-1btm41d:not(#_#_#_){color:var(--txt)}
+.s-1bv06p0:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.68rem;cursor:pointer}
+.s-1c3qrvd:not(#_#_#_){background:none;border:none;color:var(--soft);cursor:pointer}
+.s-1clsam4:not(#_#_#_){margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1.1rem}
+.s-1cv7w1d:not(#_#_#_){font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgroen,var(--green))}
+.s-1cwacto:not(#_#_#_){background:var(--card2);color:var(--txt,#fff);border:1px solid var(--line);border-radius:0;padding:0.3rem 0.6rem;font-size:0.72rem}
+.s-1d8d9fj:not(#_#_#_){font-size:0.68rem;color:var(--burgundy);margin-left:auto}
+.s-1dby7yj:not(#_#_#_){background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit}
+.s-1ddhxfb:not(#_#_#_){padding:.12rem .5rem;font-size:0.66rem;margin-left:0.25rem}
+.s-1df46c7:not(#_#_#_){margin-top:0.5rem;background:none;border:1px solid var(--line);color:var(--txt)}
+.s-1dljalm:not(#_#_#_){margin-top:0.55rem;border-top:1px solid var(--line);padding-top:0.5rem}
+.s-1dmjw6v:not(#_#_#_){font-size:0.72rem;color:var(--rtg-leesgoud,var(--gold));margin-top:0.35rem}
+.s-1eltjr2:not(#_#_#_){color:var(--soft);font-size:.85rem}
+.s-1epvdch:not(#_#_#_){font-size:0.62rem;color:var(--soft)}
+.s-1eqe06d:not(#_#_#_){margin:0.6rem 1.1rem 0;border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem}
+.s-1f3kzms:not(#_#_#_){font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
+.s-1feg4kw:not(#_#_#_){color:var(--soft);font-size:0.7rem}
+.s-1fp57vo:not(#_#_#_){font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft)}
+.s-1fpfxg0:not(#_#_#_){margin-top:0.7rem;border:1px solid var(--gold-soft,rgba(201,154,46,0.4));border-radius:0;padding:0.6rem 0.75rem;font-size:0.78rem}
+.s-1fsatoi:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer}
+.s-1fu02n3:not(#_#_#_){font-size:0.74rem;color:var(--soft);margin-top:0.2rem}
+.s-1fu784g:not(#_#_#_){background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.55rem 0.95rem;font-size:0.74rem;font-weight:600;font-family:inherit}
+.s-1fz03j1:not(#_#_#_){margin-top:0.5rem;font-size:0.74rem;color:var(--gold-bright,#C99A2E)}
+.s-1gro5v2:not(#_#_#_){background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.35rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;cursor:pointer}
+.s-1gwpioo:not(#_#_#_){font-size:0.56rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.08rem 0.4rem;vertical-align:middle}
+.s-1gzoq4v:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));white-space:nowrap}
+.s-1h7u973:not(#_#_#_){background:none;border:none;color:var(--soft);font-size:0.66rem;font-family:inherit;cursor:pointer;padding:0.15rem 0}
+.s-1hi0vlo:not(#_#_#_){font-size:0.72rem;color:var(--soft);margin-bottom:0.5rem}
+.s-1i1ycbi:not(#_#_#_){font-size:0.76rem;color:var(--muted);margin-top:0.5rem;line-height:1.5}
+.s-1ibz658:not(#_#_#_){width:2rem;height:2rem}
+.s-1ic66q7:not(#_#_#_){font-size:0.64rem;color:var(--soft)}
+.s-1iuy32v:not(#_#_#_){margin-top:0.25rem;font-size:0.78rem;color:var(--muted)}
+.s-1ixati5:not(#_#_#_){color:var(--gold);font-size:0.82rem}
+.s-1ixwj23:not(#_#_#_){color:var(--gold);font-size:0.95rem}
+.s-1jdfvby:not(#_#_#_){width:100%;justify-content:center;padding:0.8rem}
+.s-1jikyld:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.5rem 0.7rem;margin-bottom:0.35rem}
+.s-1jm0yoj:not(#_#_#_){border-color:rgba(208,172,87,0.3)}
+.s-1jmxn9a:not(#_#_#_){font-size:0.76rem;color:var(--muted);margin-top:0.2rem}
+.s-1jmzk7v:not(#_#_#_){font-size:0.76rem;color:var(--muted);margin-top:0.5rem}
+.s-1juc3eu:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.15rem 0.45rem;color:var(--soft);font-size:0.68rem;cursor:pointer}
+.s-1k33i11:not(#_#_#_){font-size:0.68rem;color:var(--soft);margin-top:0.25rem}
+.s-1k5gg2w:not(#_#_#_){margin:1.25rem 0 0.25rem;font-size:1rem}
+.s-1klloxj:not(#_#_#_){background:var(--card);border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem}
+.s-1kq2jw2:not(#_#_#_){background:var(--gold);border:none;border-radius:0;padding:0.45rem 0.7rem;color:#000;font-weight:700;cursor:pointer}
+.s-1ky6zsv:not(#_#_#_){background:none;border:none;color:var(--soft);font-size:1.3rem}
+.s-1l48cal:not(#_#_#_){background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer}
+.s-1l7nmif:not(#_#_#_){font-size:0.7rem;color:var(--soft);margin-top:0.5rem;line-height:1.5}
+.s-1lyh03x:not(#_#_#_){font-size:0.66rem;color:var(--soft)}
+.s-1m7x24a:not(#_#_#_){margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer}
+.s-1m8ehf5:not(#_#_#_){font-size:0.78rem;color:var(--muted)}
+.s-1mczpd2:not(#_#_#_){font-size:0.72rem;margin-top:0.35rem;color:var(--muted)}
+.s-1mhyeg9:not(#_#_#_){padding:0.35rem 0.9rem;font-size:0.7rem}
+.s-1ms83wl:not(#_#_#_){border-color:rgba(194,58,94,0.35)}
+.s-1mys5tf:not(#_#_#_){font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft)}
+.s-1n6ndqa:not(#_#_#_){height:70px;border-radius:0}
+.s-1nggdyi:not(#_#_#_){margin-top:0.75rem;background:transparent;color:var(--muted)}
+.s-1oqk5rc:not(#_#_#_){margin-top:0.5rem;background:none;border:none;color:var(--soft);font-size:0.68rem;font-family:inherit;cursor:pointer;text-decoration:underline}
+.s-1p5pee4:not(#_#_#_){font-size:0.66rem;color:var(--soft);margin-top:0.2rem}
+.s-1p5q1dn:not(#_#_#_){font-size:0.66rem;color:var(--soft);margin-top:0.3rem}
+.s-1p9m2ch:not(#_#_#_){font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8)}
+.s-1pfuym5:not(#_#_#_){width:100%;max-width:460px;background:var(--bg);border-radius:0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem}
+.s-1poh6kx:not(#_#_#_){color:var(--gold)}
+.s-1poinxc:not(#_#_#_){border-color:rgba(139,195,168,0.35)}
+.s-1pv2lmv:not(#_#_#_){color:var(--soft)}
+.s-1pvkitr:not(#_#_#_){margin-top:0.5rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem}
+.s-1pzgnpd:not(#_#_#_){min-width:0}
+.s-1q33w57:not(#_#_#_){max-width:100%;max-height:72vh;border-radius:0}
+.s-1qj41co:not(#_#_#_){cursor:pointer;font-size:0.74rem;color:var(--gold)}
+.s-1qjvvfe:not(#_#_#_){background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.45rem 0.6rem;font-size:0.8rem;color:var(--txt)}
+.s-1qms1gn:not(#_#_#_){font-size:.92rem;line-height:1.4;margin-top:0.25rem;white-space:pre-wrap}
+.s-1qo8mlg:not(#_#_#_){width:100%;max-width:460px;max-height:80vh;overflow-y:auto;background:var(--bg);border-radius:0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem}
+.s-1quc4ip:not(#_#_#_){font-size:0.66rem;color:var(--soft);margin:0.5rem 0 0}
+.s-1qxd7lr:not(#_#_#_){background:transparent;padding:.2rem .35rem;color:var(--muted)}
+.s-1r077af:not(#_#_#_){font-size:0.6rem;color:var(--soft);margin-top:0.25rem}
+.s-1r0hyp:not(#_#_#_){width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt)}
+.s-1s5nhoq:not(#_#_#_){font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
+.s-1sagto5:not(#_#_#_){margin-top:0.75rem;font-size:0.72rem;color:var(--soft);line-height:1.6}
+.s-1sf9ess:not(#_#_#_){margin-top:0.35rem;font-size:0.62rem;color:var(--soft)}
+.s-1sjhcqo:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.8rem;margin-bottom:0.7rem}
+.s-1skp4oz:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));font-size:0.82rem;white-space:nowrap}
+.s-1spsht7:not(#_#_#_){font-size:0.78rem;color:var(--soft);text-align:center;margin:auto 0}
+.s-1syecv:not(#_#_#_){margin-top:0.4rem;font-size:0.8rem;color:var(--rtg-leesgroen,var(--green))}
+.s-1sz4b3v:not(#_#_#_){font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.25rem}
+.s-1taai30:not(#_#_#_){margin-left:auto;background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.8rem;font-size:0.85rem}
+.s-1tbmukg:not(#_#_#_){padding:.2rem .5rem}
+.s-1tbnhjz:not(#_#_#_){padding:.2rem .6rem}
+.s-1tcx70d:not(#_#_#_){text-align:right;color:var(--gold)}
+.s-1ts2o85:not(#_#_#_){font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:0.3rem}
+.s-1txy447:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer}
+.s-1u77twy:not(#_#_#_){margin-top:0.3rem;font-size:0.85rem}
+.s-1ua0si0:not(#_#_#_){width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer}
+.s-1uadirr:not(#_#_#_){font-size:0.82rem;margin-bottom:0.5rem}
+.s-1udjibf:not(#_#_#_){margin-top:0.5rem;font-size:0.64rem;color:var(--soft)}
+.s-1uebhe5:not(#_#_#_){font-size:0.85rem;color:var(--muted)}
+.s-1uejbpr:not(#_#_#_){font-size:0.74rem;color:var(--rtg-leesgoud,var(--gold));font-weight:600}
+.s-1ugu57s:not(#_#_#_){border-color:rgba(91,185,140,0.4)}
+.s-1v8rjju:not(#_#_#_){font-size:0.8rem;color:var(--soft);margin-bottom:0.75rem}
+.s-1w7kwnq:not(#_#_#_){color:var(--muted)}
+.s-1wdaki3:not(#_#_#_){font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
+.s-1wylukt:not(#_#_#_){background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.45rem 0.5rem;color:var(--txt);font-family:inherit;font-size:0.74rem}
+.s-1wywltl:not(#_#_#_){margin:0.6rem 1.1rem 0;border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem}
+.s-1x92ywz:not(#_#_#_){margin-top:0.3rem;font-size:0.78rem;color:var(--muted)}
+.s-1xcc3mv:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.55rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer}
+.s-1y2q84y:not(#_#_#_){margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem}
+.s-1yg5jge:not(#_#_#_){font-size:0.76rem;color:var(--muted);line-height:1.5;margin-top:0.25rem}
+.s-1yg9rkb:not(#_#_#_){margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.6rem}
+.s-1ygaeju:not(#_#_#_){margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.7rem}
+.s-1ygboiw:not(#_#_#_){margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.9rem}
+.s-23ibup:not(#_#_#_){margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.5rem;font-size:0.64rem}
+.s-28el48:not(#_#_#_){width:100%;margin-top:0.25rem}
+.s-2k7uh7:not(#_#_#_){background:transparent;color:var(--muted)}
+.s-2l133r:not(#_#_#_){margin-top:0.5rem;font-size:0.68rem;color:var(--soft)}
+.s-2sufa9:not(#_#_#_){font-size:0.66rem}
+.s-2svp9b:not(#_#_#_){font-size:0.68rem}
+.s-2tfhuo:not(#_#_#_){font-size:0.78rem}
+.s-2tvgiv:not(#_#_#_){font-size:0.82rem}
+.s-2twqhx:not(#_#_#_){font-size:0.84rem}
+.s-2txdhg:not(#_#_#_){font-size:0.85rem}
+.s-2ty0gz:not(#_#_#_){font-size:0.86rem}
+.s-2tzag1:not(#_#_#_){font-size:0.88rem}
+.s-2uf948:not(#_#_#_){font-size:0.92rem}
+.s-2uh62t:not(#_#_#_){font-size:0.95rem}
+.s-3233cq:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));font-size:0.72rem}
+.s-3heyfw:not(#_#_#_){color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold)}
+.s-3hoiwu:not(#_#_#_){font-size:0.72rem;color:var(--soft);margin-top:0.5rem}
+.s-3yp4ek:not(#_#_#_){width:100%;cursor:pointer}
+.s-4ggspn:not(#_#_#_){width:64px;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.45rem 0.6rem;font-size:0.8rem;color:var(--txt)}
+.s-4of7a1:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.85rem;margin-bottom:0.7rem}
+.s-4ofu9k:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.85rem;margin-bottom:0.8rem}
+.s-4v5kng:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.5rem 0.65rem}
+.s-5dbscx:not(#_#_#_){background:transparent;color:var(--muted);padding:.2rem .4rem}
+.s-5lm50i:not(#_#_#_){font-size:0.78rem;line-height:1.4}
+.s-5sxgye:not(#_#_#_){margin-top:0.55rem;margin-right:0.4rem;background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.85rem;color:var(--txt);font-family:inherit;font-size:0.7rem;cursor:pointer}
+.s-6l3cb6:not(#_#_#_){width:100%;margin-top:0.4rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt)}
+.s-6yvbc8:not(#_#_#_){font-size:0.66rem;color:var(--muted);margin:0.25rem 0}
+.s-77nxhn:not(#_#_#_){font-size:0.66rem;color:var(--soft);margin:0.25rem 0}
+.s-78xvax:not(#_#_#_){font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem}
+.s-7vwgh8:not(#_#_#_){font-size:0.6rem;color:var(--soft);line-height:1.5}
+.s-8iudka:not(#_#_#_){margin-top:1.6rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem}
+.s-8tu4cc:not(#_#_#_){margin-top:0.5rem;padding-top:0.55rem;border-top:1px solid var(--line);color:var(--gold)}
+.s-8z81b3:not(#_#_#_){font-size:0.78rem;color:var(--soft);margin-bottom:0.8rem}
+.s-95yjkc:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.7rem 0.85rem}
+.s-9i9wrg:not(#_#_#_){cursor:pointer;border:1px solid var(--line);border-radius:0;padding:0.75rem 0.9rem;margin-bottom:0.55rem}
+.s-9uxsi:not(#_#_#_){font-size:0.72rem;color:var(--soft)}
+.s-aekzga:not(#_#_#_){font-weight:600;color:var(--txt)}
+.s-b27r2w:not(#_#_#_){border-color:rgba(194,58,94,0.3)}
+.s-b2r6ud:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.9rem 1rem;margin-bottom:0.8rem;background:rgba(255,255,255,0.02)}
+.s-b47pda:not(#_#_#_){margin-top:0.55rem;border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem}
+.s-b4px2c:not(#_#_#_){text-transform:uppercase}
+.s-b4rdxo:not(#_#_#_){font-size:0.78rem;color:var(--soft)}
+.s-bqgib1:not(#_#_#_){font-weight:600;font-size:0.9rem;margin-top:0.25rem}
+.s-brpqsl:not(#_#_#_){font-size:0.72rem;color:var(--muted);margin-top:0.25rem}
+.s-c771kx:not(#_#_#_){width:100%;margin-top:0.75rem;justify-content:center}
+.s-cdhbl8:not(#_#_#_){font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold)}
+.s-cjhok5:not(#_#_#_){font-size:0.82rem;margin-top:0.3rem}
+.s-ctdunv:not(#_#_#_){font-size:0.64rem;color:var(--soft);margin-top:0.5rem}
+.s-czkj07:not(#_#_#_){margin-top:0.5rem;font-size:0.68rem;color:var(--muted);border-top:1px solid var(--line);padding-top:0.6rem}
+.s-d0tyu4:not(#_#_#_){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-de44td:not(#_#_#_){margin-top:0.5rem;font-size:0.85rem;color:var(--muted)}
+.s-dkemdj:not(#_#_#_){text-align:right}
+.s-doqu8l:not(#_#_#_){margin-top:0.25rem;font-size:0.76rem;color:var(--muted)}
+.s-dpl4qm:not(#_#_#_){background:linear-gradient(135deg,#9E1C40,#4A0C1E)}
+.s-e1dreu:not(#_#_#_){font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold)}
+.s-e7t9zs:not(#_#_#_){margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem}
+.s-e7z6gs:not(#_#_#_){font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft)}
+.s-g18z7m:not(#_#_#_){margin-top:0.25rem;font-size:0.92rem}
+.s-g7amkl:not(#_#_#_){font-size:.72rem;color:var(--muted)}
+.s-gidsbo:not(#_#_#_){font-size:1rem}
+.s-gl2mqk:not(#_#_#_){font-weight:600;margin-bottom:0.5rem}
+.s-hdve00:not(#_#_#_){font-size:1.02rem}
+.s-hdxayl:not(#_#_#_){font-size:1.05rem}
+.s-hfkoqo:not(#_#_#_){font-size:1.35rem}
+.s-hfmpdj:not(#_#_#_){text-align:right;white-space:nowrap}
+.s-i9i8ru:not(#_#_#_){margin-top:0.75rem;font-size:0.68rem;color:var(--soft)}
+.s-iy4lih:not(#_#_#_){margin-bottom:0.25rem}
+.s-j0vkha:not(#_#_#_){margin-bottom:0.75rem}
+.s-j1o3rf:not(#_#_#_){margin-top:1.25rem;border-top:1px solid var(--line);padding-top:.8rem}
+.s-j2iv9o:not(#_#_#_){background:transparent;padding:.2rem .4rem}
+.s-j3l0p6:not(#_#_#_){margin-top:0.5rem;font-size:0.8rem;color:var(--green)}
+.s-j84k16:not(#_#_#_){border-color:rgba(208,172,87,0.35)}
+.s-j918ji:not(#_#_#_){font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em}
+.s-ja8t72:not(#_#_#_){font-size:0.8rem;line-height:1.55;margin-top:0.25rem;white-space:pre-wrap}
+.s-jjtw56:not(#_#_#_){margin-top:0.5rem;font-size:0.76rem;color:var(--soft)}
+.s-js2oc2:not(#_#_#_){font-size:0.86rem;margin-top:0.2rem}
+.s-kzdem1:not(#_#_#_){font-size:0.9rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));font-weight:700;word-break:break-all}
+.s-l8jeci:not(#_#_#_){color:var(--soft);text-align:center;margin:auto;font-size:0.82rem}
+.s-llzgco:not(#_#_#_){font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.5rem}
+.s-lmex1z:not(#_#_#_){font-size:0.7rem;color:var(--soft);margin-top:0.2rem}
+.s-lmgu0k:not(#_#_#_){font-size:0.7rem;color:var(--soft);margin-top:0.5rem}
+.s-lovzo:not(#_#_#_){border-color:rgba(91,185,140,0.35)}
+.s-lq7mlt:not(#_#_#_){width:100%;border-radius:0;margin-bottom:0.5rem;max-height:180px;object-fit:cover}
+.s-lzrpeq:not(#_#_#_){margin-top:0.5rem;font-size:0.8rem;color:var(--muted)}
+.s-m03fy7:not(#_#_#_){font-size:1.05rem;line-height:1.4}
+.s-m3b83:not(#_#_#_){margin-bottom:0.5rem}
+.s-m6row9:not(#_#_#_){margin-top:0.75rem;width:100%}
+.s-m8u63a:not(#_#_#_){font-size:0.66rem;color:var(--muted);margin:0.3rem 0}
+.s-ml86rw:not(#_#_#_){background:none;border:1px solid var(--line);border-radius:0;padding:0.7rem;font-size:0.8rem;color:var(--soft)}
+.s-mnxbj2:not(#_#_#_){margin-top:0.5rem;font-size:0.82rem;color:var(--muted)}
+.s-mqnrrw:not(#_#_#_){margin:0 0 0.9rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.8rem 1rem;font-size:0.7rem;color:var(--muted);line-height:1.8}
+.s-muqwc6:not(#_#_#_){color:var(--green,#8bc3a8)}
+.s-mv5v6f:not(#_#_#_){width:auto;padding:.5rem 1rem}
+.s-mvq09e:not(#_#_#_){background:transparent;padding:.2rem .35rem}
+.s-n0q1ml:not(#_#_#_){white-space:pre-wrap;font-family:inherit;font-size:0.64rem;color:var(--soft);background:rgba(0,0,0,0.15);border-radius:0;padding:0.6rem;max-height:8rem;overflow:auto}
+.s-nbcnb4:not(#_#_#_){margin-top:0.5rem;font-size:0.62rem;color:var(--soft);line-height:1.5}
+.s-ndv50u:not(#_#_#_){height:4px;border-radius:0;background:rgba(255,255,255,0.08);margin-top:0.25rem;overflow:hidden}
+.s-noy0gp:not(#_#_#_){padding-top:0.35rem}
+.s-npapob:not(#_#_#_){padding:.15rem .55rem}
+.s-nqrzav:not(#_#_#_){margin-top:0.25rem;font-size:0.76rem;line-height:1.45}
+.s-o2xnz3:not(#_#_#_){font-size:0.78rem;color:var(--muted);margin-top:0.25rem}
+.s-old2n:not(#_#_#_){font-size:0.66rem;color:var(--soft);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.25rem}
+.s-oqfvs0:not(#_#_#_){font-size:0.72rem;color:var(--soft);margin-bottom:0.25rem}
+.s-paonzv:not(#_#_#_){font-size:0.8rem}
+.s-papaze:not(#_#_#_){font-size:0.9rem}
+.s-pcf0s6:not(#_#_#_){color:var(--txt);white-space:pre-wrap}
+.s-popvjv:not(#_#_#_){color:var(--burgundy)}
+.s-prlthd:not(#_#_#_){font-size:1.1rem}
+.s-prn3gf:not(#_#_#_){font-size:1.3rem}
+.s-pvbpy4:not(#_#_#_){font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5}
+.s-px7l9h:not(#_#_#_){font-size:0.68rem;color:var(--soft);margin-bottom:0.3rem}
+.s-q9kr8e:not(#_#_#_){font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase}
+.s-qdf6eq:not(#_#_#_){color:#fff;font-size:.85rem;margin-bottom:.6rem}
+.s-qk3yxe:not(#_#_#_){padding:0.2rem 0.7rem}
+.s-qny34e:not(#_#_#_){font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.5rem}
+.s-qopcz1:not(#_#_#_){color:var(--gold);white-space:nowrap}
+.s-rcd040:not(#_#_#_){width:3.6rem;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.35rem;color:var(--txt);font-family:inherit}
+.s-rwgmky:not(#_#_#_){margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer}
+.s-s5i11x:not(#_#_#_){margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer}
+.s-sg9uhw:not(#_#_#_){width:100%;min-height:52px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.5rem 0.6rem;color:var(--txt);font-family:inherit;font-size:0.74rem;margin-top:0.4rem}
+.s-sgiodz:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.85rem 1rem;margin-bottom:0.6rem}
+.s-sig8z1:not(#_#_#_){background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.75rem;padding:0}
+.s-sjmz8t:not(#_#_#_){margin-top:0.4rem;font-size:0.9rem}
+.s-su8fqg:not(#_#_#_){font-size:0.72rem;color:var(--muted);margin-top:0.25rem;line-height:1.5}
+.s-t0wuo2:not(#_#_#_){margin-top:0.5rem;width:100%;background:none;border:none;text-align:center;color:var(--soft);cursor:pointer;font-family:inherit;font-size:0.8rem;padding:0.5rem}
+.s-t2hr14:not(#_#_#_){margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:0;padding:0.55rem}
+.s-tt7aum:not(#_#_#_){color:var(--soft);font-size:0.8rem;padding:1rem 0}
+.s-u3fnfk:not(#_#_#_){font-weight:600;margin-top:0.3rem}
+.s-ua8ht7:not(#_#_#_){background:none;border:1px solid var(--line);color:var(--txt)}
+.s-uksiok:not(#_#_#_){font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.25rem}
+.s-upu68b:not(#_#_#_){color:var(--soft);font-size:0.68rem}
+.s-uqa4wi:not(#_#_#_){color:var(--soft);font-size:0.72rem}
+.s-uqdyto:not(#_#_#_){color:var(--soft);font-size:0.78rem}
+.s-uz7hnr:not(#_#_#_){font-size:0.7rem;color:var(--soft);margin-top:0.15rem}
+.s-v125gn:not(#_#_#_){background:linear-gradient(135deg,#F3EBDA,#E4CF9E)}
+.s-vheoej:not(#_#_#_){background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem}
+.s-vhujod:not(#_#_#_){font-size:0.7rem;color:var(--soft);font-weight:400}
+.s-w12m0g:not(#_#_#_){border:1px solid var(--line);border-radius:0;padding:0.2rem 0.6rem}
+.s-w616es:not(#_#_#_){width:auto;padding:0.2rem 0.55rem;font-size:0.7rem}
+.s-wexjct:not(#_#_#_){color:#fff;margin-top:.7rem;text-align:center}
+.s-wpymed:not(#_#_#_){width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.82rem}
+.s-wsds8w:not(#_#_#_){margin-top:0.4rem;background:none;border:1px solid var(--gold);color:inherit;border-radius:0;padding:0.35rem 0.7rem;font-family:inherit;cursor:pointer}
+.s-x78icb:not(#_#_#_){font-size:0.74rem;color:var(--muted);margin-top:0.5rem;line-height:1.4}
+.s-x8hihn:not(#_#_#_){margin:0.25rem 0 0.75rem}
+.s-xu75cl:not(#_#_#_){padding:0.25rem 0.7rem;font-size:0.68rem}
+.s-xzkep3:not(#_#_#_){width:100%;box-sizing:border-box;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:0;padding:0.5rem 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;resize:vertical}
+.s-ye06vw:not(#_#_#_){margin-top:0.5rem;background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.8rem;color:var(--muted);font-family:inherit;font-size:0.66rem;cursor:pointer}
+.s-yqyuqh:not(#_#_#_){min-height:70px}
+.s-yqzhq0:not(#_#_#_){min-height:80px}
+.s-yr04pj:not(#_#_#_){min-height:90px}
+.s-yxa018:not(#_#_#_){width:76px;margin-top:0}
+.s-yztz7f:not(#_#_#_){white-space:pre-wrap;line-height:1.4;font-size:.92rem}
+.s-z2eubj:not(#_#_#_){font-size:0.62rem;color:var(--soft);margin-top:0.25rem}
+</style>
+<script src="/shared/command/catalog.js?v=7be75ecc" defer></script>
+<script src="/shared/command/console.js?v=7be75ecc" defer></script>
+<script src="/shared/command/verdeler.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/module-sdk.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-world-catalog.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-directory.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-continuity.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-composer.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-registries.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-session.js?v=7be75ecc" defer></script>
 <script src="/shared/experience-intent.js" defer></script>
-<script src="/shared/interface/workspace-intents.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-policy.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-assistant-manifest.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-context.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-navigation.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-state.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-orchestrator.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-blueprints.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-broker.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-module-host.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-runtime.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-legacy.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/workspace-empty.js?v=0fd82c96" defer></script>
+<script src="/shared/interface/workspace-intents.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-policy.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-assistant-manifest.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-context.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-navigation.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-state.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-orchestrator.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-blueprints.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-broker.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-module-host.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-runtime.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-legacy.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/workspace-empty.js?v=7be75ecc" defer></script>
 <!-- RTG_WORKSPACE_MODULES_START: nieuwe modules komen via scripts/workspace-module.js binnen -->
-<script src="/shared/interface/second-screen-modules.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/context.js?v=0fd82c96" defer></script>
+<script src="/shared/interface/second-screen-modules.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/context.js?v=7be75ecc" defer></script>
 <script src="/shared/travel-request-controller.js" defer></script>
-<script src="/shared/interface/modules/travel-dossier-view.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/travel-view.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/travel-edge.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/travel-continuity.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/travel-actions.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/travel.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/work-view.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/work-edge.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/work.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/coordination-view.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/coordination-edge.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/coordination.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/modules/safety.js?v=0fd82c96" defer></script>
+<script src="/shared/interface/modules/travel-dossier-view.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/travel-view.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/travel-edge.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/travel-continuity.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/travel-actions.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/travel.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/work-view.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/work-edge.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/work.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/coordination-view.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/coordination-edge.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/coordination.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/modules/safety.js?v=7be75ecc" defer></script>
 <!-- RTG_WORKSPACE_MODULES_END -->
-<script src="/shared/interface/workspace-experience.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/second-screen.js?v=0fd82c96" defer></script>
-<script src="/shared/interface/second-screen-personal.js?v=0fd82c96" defer></script>
-<script src="/shared/command/bank.js?v=0fd82c96" defer></script>
-<script src="/shared/command/praat.js?v=0fd82c96" defer></script>
-<script src="/shared/command/inlogpoort.js?v=0fd82c96" defer></script>
-<script src="/shared/command/bladhaak.js?v=0fd82c96" defer></script>
-<script src="/shared/command/romp.js?v=0fd82c96" defer></script>
-<script src="/shared/command/geheugen.js?v=0fd82c96" defer></script>
+<script src="/shared/interface/workspace-experience.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/second-screen.js?v=7be75ecc" defer></script>
+<script src="/shared/interface/second-screen-personal.js?v=7be75ecc" defer></script>
+<script src="/shared/command/bank.js?v=7be75ecc" defer></script>
+<script src="/shared/command/praat.js?v=7be75ecc" defer></script>
+<script src="/shared/command/inlogpoort.js?v=7be75ecc" defer></script>
+<script src="/shared/command/bladhaak.js?v=7be75ecc" defer></script>
+<script src="/shared/command/romp.js?v=7be75ecc" defer></script>
+<script src="/shared/command/geheugen.js?v=7be75ecc" defer></script>
 <script src="/shared/edge/rahulzicht.js" defer></script>
 <script src="/shared/rahul-tab/helpers.js" defer></script>
-<script src="/shared/command/beginscherm.js?v=0fd82c96" defer></script>
-<script src="/shared/command/bladstand.js?v=0fd82c96" defer></script>
-<script src="/shared/command/werktafel.js?v=0fd82c96" defer></script>
-<script src="/shared/command.js?v=0fd82c96" defer></script>
+<script src="/shared/command/beginscherm.js?v=7be75ecc" defer></script>
+<script src="/shared/command/bladstand.js?v=7be75ecc" defer></script>
+<script src="/shared/command/werktafel.js?v=7be75ecc" defer></script>
+<script src="/shared/command.js?v=7be75ecc" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -1992,13 +2303,13 @@ try {
       </div>
       <div class="notif-list" id="notifList"></div>
       <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
-        <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
+        <button id="logoutBtn" class="s-ml86rw" data-i18n="app.logout">Uitloggen</button>
         <div class="privrij">
           <button id="privExport" class="privknop" data-i18n="app.priv.export">Download mijn gegevens</button>
           <button id="privDelete" class="privknop wis" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
         </div>
         <div class="privrij"><button id="privKoppel" class="privknop" data-i18n="app.priv.koppel">Mijn koppelingen</button></div>
-        <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
+        <div class="s-7vwgh8" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
       </div>
     </div>
     <div class="notif-scrim" id="notifScrim"></div>
@@ -2259,9 +2570,9 @@ try {
         <div class="os-cc-rij" id="osCcThema">
           <span class="os-cc-label" data-i18n="os.cc.thema">Thema</span>
           <div class="os-cc-knoppen os-cc-thema">
-            <button data-thema="parelmoer"><span class="os-thema-stip" style="background:linear-gradient(135deg,#F3EBDA,#E4CF9E)"></span><span data-i18n="os.cc.champagne">Champagne</span></button>
-            <button data-thema="standaard"><span class="os-thema-stip" style="background:linear-gradient(135deg,#2A2724,#0C0C0B)"></span><span data-i18n="os.cc.donker">Donker</span></button>
-            <button data-thema="bordeaux"><span class="os-thema-stip" style="background:linear-gradient(135deg,#9E1C40,#4A0C1E)"></span><span data-i18n="os.cc.bordeaux">Bordeaux</span></button>
+            <button data-thema="parelmoer"><span class="os-thema-stip s-v125gn"></span><span data-i18n="os.cc.champagne">Champagne</span></button>
+            <button data-thema="standaard"><span class="os-thema-stip s-17xbfa6"></span><span data-i18n="os.cc.donker">Donker</span></button>
+            <button data-thema="bordeaux"><span class="os-thema-stip s-dpl4qm"></span><span data-i18n="os.cc.bordeaux">Bordeaux</span></button>
           </div>
         </div>
         <div class="os-cc-rij">
@@ -2350,10 +2661,10 @@ try {
       <div class="field h-mt60"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
       <div class="field"><label data-i18n="cv.contact">Telefoon of e-mail</label><input id="cvContact"></div>
       <div class="field"><label data-i18n="cv.headline">Gewenste functie</label><input id="cvHeadline" placeholder="Bijv. Bediening of Receptie" data-i18n-ph="cv.headline.ph"></div>
-      <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" style="min-height:90px;" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
+      <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" class="s-yr04pj" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
       <div class="field"><label data-i18n="cv.skills">Vaardigheden (komma's)</label><input id="cvSkills" placeholder="wijnkennis, kassa, gastvrijheid" data-i18n-ph="cv.skills.ph"></div>
       <div class="field"><label data-i18n="cv.lang">Talen (komma's)</label><input id="cvLang" placeholder="Nederlands, Engels"></div>
-      <div class="field"><label data-i18n="cv.about">Over jou (kort)</label><textarea id="cvAbout" style="min-height:70px;"></textarea></div>
+      <div class="field"><label data-i18n="cv.about">Over jou (kort)</label><textarea id="cvAbout" class="s-yqyuqh"></textarea></div>
     </div>
     <div class="ms-foot"><button class="ms-order" id="cvSave" data-i18n="cv.save">Bewaar mijn cv</button></div>
   </div>
@@ -2393,7 +2704,7 @@ try {
       <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="pc-depts" id="pcDepts"></div>
-    <div class="pc-depts" id="pcAttn" style="padding-top:0.35rem;">
+    <div class="pc-depts s-noy0gp" id="pcAttn">
       <button data-attn="hulp"><span data-i18n="app.attn.roep">Roep de bediening</span></button>
       <button data-attn="rekening"><span data-i18n="app.attn.rekening">De rekening</span></button>
       <button data-attn="bestellen"><span data-i18n="app.attn.bestellen">Ik wil bestellen</span></button>
@@ -2441,7 +2752,7 @@ try {
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">
-      <div style="font-size:0.66rem;color:var(--soft);margin:0.25rem 0;" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
+      <div class="s-77nxhn" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
       <button class="ms-order" id="rideGo" data-i18n="ride.go">Vraag de rit aan</button>
     </div>
   </div>
@@ -2473,7 +2784,7 @@ try {
       <div><b>Rahul &amp; Rahul</b><span>Een gesprek over jullie dag &middot; <span id="kletsNaam"></span></span></div>
       <button class="ms-close" id="kletsClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ms-body" id="kletsBody" style="padding:1rem 1.1rem;"></div>
+    <div class="ms-body s-1ajy4dw" id="kletsBody"></div>
   </div>
 
   <!-- salon-post delen met een connectie -->
@@ -2483,7 +2794,7 @@ try {
       <div><b data-i18n="sal.share.h">Deel met een connectie</b></div>
       <button class="ms-close" id="shareClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ms-body" id="shareList" style="padding:1rem 1.1rem;"></div>
+    <div class="ms-body s-1ajy4dw" id="shareList"></div>
   </div>
 
   <!-- inkomende oproep -->
@@ -2564,8 +2875,8 @@ try {
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=0fd82c96"></script>
-<script src="/apps/magnaat-data.js?v=0fd82c96"></script>
+<script src="/apps/magnaat-sandbox.js?v=7be75ecc"></script>
+<script src="/apps/magnaat-data.js?v=7be75ecc"></script>
 <script src="/apps/access/meaning.js"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>

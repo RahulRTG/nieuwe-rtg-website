@@ -28,7 +28,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const cp = require('child_process');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* De getal-merktekens hebben EEN eigenaar (scripts/getallen.js); hier wordt
    zijn patroon gebruikt en niet nageschreven, anders zijn er twee. */
 const { MERK } = require('./getallen');
@@ -117,17 +117,21 @@ if (require.main === module) {
   const kop = { stempel: stempel(), soort: 'gegevens',
     uitleg: 'De documenten van dit huis, opgeknipt per kop, voor de registerblik (server/kern/registerblik/kennis.js). ' +
       'Een document is een BEWERING en geen meting: wat hier staat heeft de graad vermoed, en de huidige werkelijkheid staat in de registers die een stuk noemt.',
-    grens: 'Gebouwd uit de documenten op het moment van het stempel. Een document dat daarna veranderde, staat hier in zijn oude vorm; npm run kennisindex ververst hem.',
     documenten: docs.length, stukken: stukken.length, overgeslagen };
-  if (process.argv.includes('--droog')) { console.log(JSON.stringify(Object.assign({}, kop, { stempel: undefined }), null, 1)); process.exit(0); }
+  /* De grens staat BOVENAAN en niet in de kop, en dat is geen smaak: de meetleer
+     (scripts/meetleer.js) leest de slots van een register op het hoogste niveau,
+     en met de grens in `kop` gold dit register als blind -- een register dat
+     wel zei wat het niet aantoont, maar op een plek waar geen machine het las. */
+  const grens = 'Gebouwd uit de documenten op het moment van het stempel. Een document dat daarna veranderde, staat hier in zijn oude vorm; npm run kennisindex ververst hem. Een document is een bewering en geen meting: dit register bewijst niets over de code, alleen wat de tekst zegt.';
+  if (process.argv.includes('--droog')) { console.log(JSON.stringify(Object.assign({ grens }, kop, { stempel: undefined }), null, 1)); process.exit(0); }
   /* Een stuk per regel: een gewijzigd document geeft een kleine diff. */
-  const regels = ['{', '  "kop": ' + JSON.stringify(kop) + ',', '  "docs": ['];
+  const regels = ['{', '  "grens": ' + JSON.stringify(grens) + ',', '  "kop": ' + JSON.stringify(kop) + ',', '  "docs": ['];
   docs.forEach((d, i) => regels.push('    ' + JSON.stringify(d) + (i < docs.length - 1 ? ',' : '')));
   regels.push('  ],', '  "stukken": [');
   stukken.forEach((s, i) => regels.push('    ' + JSON.stringify(s) + (i < stukken.length - 1 ? ',' : '')));
   regels.push('  ]', '}');
-  fs.writeFileSync(DOEL, regels.join('\n') + '\n');
-  console.log('KENNISINDEX.json geschreven: ' + docs.length + ' documenten, ' + stukken.length + ' stukken, ' +
+  if (magSchrijven(eisSchoneBoom('kennisindex'), DOEL)) fs.writeFileSync(DOEL, regels.join('\n') + '\n');
+  console.log('KENNISINDEX: ' + docs.length + ' documenten, ' + stukken.length + ' stukken, ' +
     overgeslagen.length + ' afdrukken overgeslagen.');
 }
 

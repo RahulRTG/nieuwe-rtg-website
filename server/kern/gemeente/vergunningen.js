@@ -4,7 +4,8 @@
    wordt automatisch een openbare bekendmaking. Krijgt de gedeelde ctx van
    kern/gemeente/index.js. */
 module.exports = (ctx) => {
-  const { db, save, nu, id, ref, schoon, seed, deGemeente, notifySupplier, sseToSupplier, VERGUNNINGEN } = ctx;
+  const { save, nu, id, ref, schoon, seed, deGemeente, notifySupplier, sseToSupplier, VERGUNNINGEN } = ctx;
+  const G = ctx.opslag; // ./opslag.js
 
   function vergunningAanvraag(aanvrager, data) {
     seed();
@@ -21,8 +22,8 @@ module.exports = (ctx) => {
       supplierCode: aanvrager.supplierCode || null, bedrijf: aanvrager.bedrijf || null,
       status: 'ingediend', voorwaarden: [], besluit: null, bekend: false, at: nu()
     };
-    db.data.gemeenteVergunningen.unshift(v);
-    db.data.gemeenteVergunningen = db.data.gemeenteVergunningen.slice(0, 20000);
+    G.pak('gemeenteVergunningen').unshift(v);
+    G.zet('gemeenteVergunningen', G.pak('gemeenteVergunningen').slice(0, 20000));
     save();
     if (g && notifySupplier) notifySupplier(g.code, { icon: '\u{1F4DC}', title: 'Vergunningaanvraag: ' + VERGUNNINGEN[soort], body: (v.aanvrager || v.bedrijf || 'aanvrager') + ': ' + omschrijving.slice(0, 80) });
     if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });
@@ -33,24 +34,24 @@ module.exports = (ctx) => {
       status: v.status, voorwaarden: v.voorwaarden || [], besluit: v.besluit, at: v.at };
   }
   function mijnVergunningen(key) {
-    return (db.data.gemeenteVergunningen || []).filter(v => v.aanvragerKey === key).slice(0, 50).map(publiekeVerg);
+    return G.lijst('gemeenteVergunningen').filter(v => v.aanvragerKey === key).slice(0, 50).map(publiekeVerg);
   }
   function vergunningenVanPartner(code) {
-    return (db.data.gemeenteVergunningen || []).filter(v => v.supplierCode === code).slice(0, 50).map(publiekeVerg);
+    return G.lijst('gemeenteVergunningen').filter(v => v.supplierCode === code).slice(0, 50).map(publiekeVerg);
   }
 
   /* ---- gemeente-medewerkers ---- */
   function vergunningenLijst(filter) {
     seed();
     filter = filter || {};
-    let list = (db.data.gemeenteVergunningen || []);
+    let list = G.lijst('gemeenteVergunningen');
     if (filter.status) list = list.filter(v => v.status === filter.status);
     else list = list.filter(v => ['ingediend', 'in behandeling'].includes(v.status));
     return { ok: true, vergunningen: list.slice(0, 200).map(v => ({ ...publiekeVerg(v), aanvrager: v.aanvrager || v.bedrijf || null })) };
   }
   function vergunningBeslis(actor, r, data) {
     data = data || {};
-    const v = (db.data.gemeenteVergunningen || []).find(x => x.ref === String(r || ''));
+    const v = G.lijst('gemeenteVergunningen').find(x => x.ref === String(r || ''));
     if (!v) return { status: 404, error: 'Vergunning niet gevonden.' };
     const besluit = data.besluit;
     if (!['verleend', 'geweigerd', 'in behandeling'].includes(besluit)) return { status: 400, error: 'Kies een geldig besluit.' };
@@ -61,7 +62,7 @@ module.exports = (ctx) => {
     // een verleende vergunning wordt een openbare bekendmaking
     if (besluit === 'verleend' && data.bekend !== false && !v.bekend) {
       v.bekend = true;
-      db.data.gemeenteBekend.unshift({ id: id(), gemeente: v.gemeente, titel: 'Verleend: ' + v.soortLabel + (v.locatie ? ' (' + v.locatie + ')' : ''),
+      G.pak('gemeenteBekend').unshift({ id: id(), gemeente: v.gemeente, titel: 'Verleend: ' + v.soortLabel + (v.locatie ? ' (' + v.locatie + ')' : ''),
         tekst: v.omschrijving.slice(0, 200), soort: 'vergunning', at: nu() });
       save();
     }

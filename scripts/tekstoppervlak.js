@@ -52,7 +52,7 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('./ast/parser');
 const { loop } = require('./ast/walk');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 
 const WORTEL = process.cwd();
 const UIT = path.join(WORTEL, 'TEKSTOPPERVLAK.json');
@@ -627,7 +627,7 @@ function main() {
      identiek uit aan een verse (scripts/lib/stempel.js). Alleen bij het SCHRIJVEN,
      niet in meet() -- de keuring meet vers en hoeft git daarvoor niet te vragen. */
   Object.assign(uit, { stempel: stempel() });
-  fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
+  if (magSchrijven(eisSchoneBoom('tekstoppervlak'), UIT)) fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
 
   const n = x => String(x).padStart(7);
   console.log('\nHET TEKSTOPPERVLAK VAN RTG\n');

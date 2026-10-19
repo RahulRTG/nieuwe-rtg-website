@@ -1,8 +1,8 @@
     // de pas-controle
     html += '<div class="card"><div class="k">'+T('pd.pol.pas','Pas-controle')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="ppPas" placeholder="ZP-XXXX" maxlength="12" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;text-transform:uppercase;">'+
+      '<div class="s-1stuony"><input id="ppPas" placeholder="ZP-XXXX" maxlength="12" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;text-transform:uppercase;">'+
       '<button class="abtn" id="ppGo">'+T('pd.pol.check','Controleer')+'</button></div>'+
-      '<div id="ppUit" style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);"></div></div>';
+      '<div id="ppUit" class="s-1sydj7f"></div></div>';
     wrap.innerHTML = html;
     const doe2 = (sel, fn) => wrap.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', () => fn(b.dataset)));
     doe2('data-ppak', async ds => {

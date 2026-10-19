@@ -33,7 +33,7 @@
         '<div class="tkc-who">'+T('spoed.deck','Gerecht gevallen of vergeten? Zet het als gewone bon op de lijn; de keuken ziet gewoon een bon erbij.')+'</div>'+
         '<div class="row-gap"><select class="st-in h-flex2" id="spGerecht">'+
           (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
-        '<input class="st-in" id="spAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
+        '<input class="st-in s-mbp5mo" id="spAantal" type="number" inputmode="numeric" min="1" value="1">'+
         '<select class="st-in h-flex1" id="spTafel"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name+'">'+t.name+'</option>').join('')+'</select></div>'+
         '<div class="tkc-act"><button class="tkc-ready" id="spGo">\u26A1 '+T('spoed.go','Zet op de lijn')+'</button></div></div>';
@@ -61,7 +61,7 @@
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
         '<button class="obtn" data-aanwezig style="width:100%;margin-bottom:0.5rem;">\u{1F465} '+T('st.aanwezig','Aanwezigheid (binnen + man/vrouw)')+'</button>'+
         '<button class="obtn" data-idcheck style="width:100%;margin-bottom:0.5rem;">\u{1F6E1}\uFE0F '+T('st.idcheck','ID / leeftijd controleren (Zegel scannen)')+'</button>'+
-        '<a class="tkc" style="text-decoration:none;align-items:flex-start;" href="/apps/personeel.html"><b style="font-size:0.95rem;">\uD83D\uDCF1 '+T('st.pda','Open de volledige PDA')+'</b><span style="font-size:0.74rem;color:var(--soft);">'+T('st.pda.s','Rooster, taken, teamchat, videobellen en SOS.')+'</span></a>';
+        '<a class="tkc s-atntux" href="/apps/personeel.html"><b class="s-2uh62t">\uD83D\uDCF1 '+T('st.pda','Open de volledige PDA')+'</b><span class="s-3w5r68">'+T('st.pda.s','Rooster, taken, teamchat, videobellen en SOS.')+'</span></a>';
     } else if (stationMode === 'events'){
       const evs = state.events || [];
       html += runsheetStrip('party');
@@ -69,11 +69,11 @@
         const taken = (e.guests||[]).reduce((n,g)=>n+g.qty,0);
         const inb = (e.guests||[]).filter(g=>g.checkedIn).reduce((n,g)=>n+g.qty,0);
         return '<div class="tkc'+(e.published?'':' dim')+'">'+
-          '<div class="tkc-top"><span style="font-size:1.05rem;font-weight:600;">'+e.name+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
+          '<div class="tkc-top"><span class="s-ilwx04">'+e.name+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
           (e.desc?'<div class="tkc-who">'+e.desc+'</div>':'')+
           '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+' \u00b7 '+inb+' '+T('ev.inside','binnen')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+'</div>'+
           '<div class="ev-bar"><i style="width:'+Math.min(100, Math.round(taken/e.capacity*100))+'%;"></i></div>'+
-          ((e.guests||[]).length ? '<div style="display:flex;flex-direction:column;">'+e.guests.map(g =>
+          ((e.guests||[]).length ? '<div class="s-pgepwb">'+e.guests.map(g =>
             '<div class="st-row"><span>'+g.codename+' \u00b7 '+g.qty+' '+T('ev.pers','pers.')+'</span>'+
             '<button class="obtn'+(g.checkedIn?' primary':'')+'" data-evcheck="'+e.id+'" data-key="'+g.key+'">'+(g.checkedIn?'\u2713 '+T('ev.in','binnen'):T('ev.checkin','Check in'))+'</button></div>'
           ).join('')+'</div>' : '<div class="tkc-who">'+T('ev.noguests','Nog geen aanmeldingen.')+'</div>')+
@@ -98,5 +98,5 @@
       html += actief.length ? actief.map(r => {
         const nxt = NEXT_RIDE[r.status];
         return '<div class="tkc h-volbreed">'+
-          '<div class="tkc-top"><span class="tkc-code" style="font-size:1.3rem;">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
-          '<div class="tkc-who" style="font-size:0.95rem;">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
+          '<div class="tkc-top"><span class="tkc-code s-prn3gf">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
+          '<div class="tkc-who s-2uh62t">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+

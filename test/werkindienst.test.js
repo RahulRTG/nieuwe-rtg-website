@@ -21,23 +21,23 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkindienst-'));
-const api = (pad, body) => fetch(BASE + '/api/bedrijf' + pad, {
+const api = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/bedrijf' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 let W, B, HR, IT, NIEUW;
 const stand = async (lidId) =>
-  (await api('/indienst', Object.assign({ lidId }, HR.cred))).body.indienst[0];
+  (await api('/api/bedrijf/indienst', Object.assign({ lidId }, HR.cred))).body.indienst[0];
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const w = (await api('/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
+  const w = (await api('/api/bedrijf/werkruimte/maak', { naam: 'Noordkaap Holding', land: 'NL' })).body;
   W = w.werkruimte; B = w.beheerToken;
 
   const mk = async (naam, rollen) => {
-    const a = (await api('/lid/aanmeld', { werkruimte: W, naam })).body;
-    await api('/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
-    if (rollen) await api('/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen });
+    const a = (await api('/api/bedrijf/lid/aanmeld', { werkruimte: W, naam })).body;
+    await api('/api/bedrijf/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
+    if (rollen) await api('/api/bedrijf/lid/rollen', { werkruimte: W, beheerToken: B, lidId: a.lidId, rollen });
     /* De sleutels en het id STRIKT gescheiden. `/indienst` en `/apparaten`
        lezen allebei `lidId` als filter, dus een helper die hem meegeeft laat
        een toets stil naar één rij kijken terwijl hij denkt alles te zien. */
@@ -54,15 +54,15 @@ test.after(() => {
 });
 
 test('1. een gemeten stap heeft geen vinkje, ook niet als hij al gedaan is', async () => {
-  const uit = await api('/indienst/stap', Object.assign({ lidId: NIEUW.lidId, stap: 'rollen toegekend' }, HR.cred));
+  const uit = await api('/api/bedrijf/indienst/stap', Object.assign({ lidId: NIEUW.lidId, stap: 'rollen toegekend' }, HR.cred));
   assert.equal(uit.status, 409, 'afvinken wordt geweigerd');
   assert.match(uit.body.error, /gemeten en niet afgevinkt/i);
   assert.match(uit.body.let, /tweede waarheid/i, 'met de reden erbij');
 
   /* En ook nadat de handeling ECHT is gedaan blijft het vinkje geweigerd: het
      gaat niet om "nog niet gebeurd" maar om wie de waarheid draagt. */
-  await api('/lid/rollen', { werkruimte: W, beheerToken: B, lidId: NIEUW.lidId, rollen: ['medewerker'] });
-  const nogsteeds = await api('/indienst/stap', Object.assign({ lidId: NIEUW.lidId, stap: 'rollen toegekend' }, HR.cred));
+  await api('/api/bedrijf/lid/rollen', { werkruimte: W, beheerToken: B, lidId: NIEUW.lidId, rollen: ['medewerker'] });
+  const nogsteeds = await api('/api/bedrijf/indienst/stap', Object.assign({ lidId: NIEUW.lidId, stap: 'rollen toegekend' }, HR.cred));
   assert.equal(nogsteeds.status, 409);
   assert.equal(nogsteeds.body.gedaan, true, 'de stap staat wel op gedaan');
 });
@@ -79,9 +79,9 @@ test('2. een gemeten stap gaat vanzelf op groen, en 3. "nog niet" heeft een rede
 
   /* De handeling gebeurt in een HEEL ANDERE module (IT geeft een laptop uit).
      Niemand raakt het instroomdossier aan. */
-  await api('/apparaat/zet', Object.assign({ soort: 'laptop', nummer: 'NB-2291', model: 'X13' }, IT.cred));
-  const app = (await api('/apparaten', IT.cred)).body.apparaten[0];
-  const uit = await api('/apparaat/uitgeven', Object.assign({ apparaatId: app.id, lidId: NIEUW.lidId }, IT.cred));
+  await api('/api/bedrijf/apparaat/zet', Object.assign({ soort: 'laptop', nummer: 'NB-2291', model: 'X13' }, IT.cred));
+  const app = (await api('/api/bedrijf/apparaten', IT.cred)).body.apparaten[0];
+  const uit = await api('/api/bedrijf/apparaat/uitgeven', Object.assign({ apparaatId: app.id, lidId: NIEUW.lidId }, IT.cred));
   assert.equal(uit.status, 200, 'IT geeft de laptop uit');
 
   const na = await stand(NIEUW.lidId);
@@ -92,7 +92,7 @@ test('2. een gemeten stap gaat vanzelf op groen, en 3. "nog niet" heeft een rede
 });
 
 test('4. mensenwerk draagt een naam, en gaat niet twee keer', async () => {
-  const eerste = await api('/indienst/stap', Object.assign({ lidId: NIEUW.lidId,
+  const eerste = await api('/api/bedrijf/indienst/stap', Object.assign({ lidId: NIEUW.lidId,
     stap: 'welkomstgesprek gevoerd', notitie: 'Rondleiding gedaan' }, HR.cred));
   assert.equal(eerste.status, 200);
 
@@ -101,20 +101,20 @@ test('4. mensenwerk draagt een naam, en gaat niet twee keer', async () => {
   assert.equal(s.door, 'Hanna', 'de verklaring van een mens draagt zijn naam');
   assert.equal(s.notitie, 'Rondleiding gedaan');
 
-  const nog = await api('/indienst/stap', Object.assign({ lidId: NIEUW.lidId,
+  const nog = await api('/api/bedrijf/indienst/stap', Object.assign({ lidId: NIEUW.lidId,
     stap: 'welkomstgesprek gevoerd' }, HR.cred));
   assert.equal(nog.status, 409, 'en hij gaat niet twee keer');
 });
 
 test('5. het dossier ontstaat vanzelf, voor iedereen die is toegelaten', async () => {
-  const alles = (await api('/indienst', HR.cred)).body;
+  const alles = (await api('/api/bedrijf/indienst', HR.cred)).body;
   assert.equal(alles.aantal, 3, 'alle drie de toegelaten leden hebben een dossier');
   assert.ok(alles.nietKlaar >= 1, 'en wat nog niet af is, wordt geteld');
   assert.ok(alles.indienst.every(r => r.stappen.length === 6), 'zes stappen per mens');
 
   /* De aanmelding die nog niet is toegelaten hoort er NIET in te staan: een
      instroomproces voor iemand die misschien nooit begint, is ruis. */
-  await api('/lid/aanmeld', { werkruimte: W, naam: 'Twijfel' });
-  const na = (await api('/indienst', HR.cred)).body;
+  await api('/api/bedrijf/lid/aanmeld', { werkruimte: W, naam: 'Twijfel' });
+  const na = (await api('/api/bedrijf/indienst', HR.cred)).body;
   assert.equal(na.aantal, 3, 'een openstaande aanmelding krijgt geen instroomdossier');
 });

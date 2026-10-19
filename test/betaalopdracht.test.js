@@ -322,13 +322,23 @@ test('dezelfde economische handeling levert EEN opdracht, hoe vaak je hem ook aa
   const { op } = maak();
   const eerste = op.maak({ ...basis, idemSleutel: 'rtf:LID7:FACT-1' });
   const tweede = op.maak({ ...basis, idemSleutel: 'rtf:LID7:FACT-1' });
-  const derde = op.maak({ ...basis, centen: 999999, idemSleutel: 'rtf:LID7:FACT-1' });
+  /* EEN ANDER BEDRAG ONDER DEZELFDE SLEUTEL IS GEEN HERHALING (18 oktober
+     2026). Hier stond dat de derde aanroep stil de EERSTE opdracht terugkreeg.
+     Dat hield de rij op een opdracht, maar de aanroeper had zijn afboeking van
+     999999 dan al gedaan en kreeg een opdracht van het oude bedrag terug: het
+     verschil stond op de tussenrekening en ging nergens heen. Nu weigert de
+     rij luid, en blijven de twee dingen die deze toets bewaakte gewoon staan:
+     een opdracht in de rij, met het bedrag van de eerste handeling. */
+  assert.throws(() => op.maak({ ...basis, centen: 999999, idemSleutel: 'rtf:LID7:FACT-1' }),
+    e => e.code === 'idem-andere-opdracht',
+    'een gebruikte sleutel met een ander bedrag hoort te weigeren, niet stil de oude opdracht te geven');
+  assert.throws(() => op.maak({ ...basis, bestemming: 'NL02ABNA0123456789', idemSleutel: 'rtf:LID7:FACT-1' }),
+    e => e.code === 'idem-andere-opdracht', 'en een andere bestemming evenmin');
 
   assert.equal(tweede.id, eerste.id, 'een herhaling hoort dezelfde handeling te raken');
-  assert.equal(derde.id, eerste.id, 'ook als er een ander bedrag bij staat');
   assert.equal(tweede.hergebruikt, true,
     'stil dezelfde opdracht teruggeven zou een tweede stil gedrag zijn op de plek waar we er een weghalen');
-  assert.equal(derde.centen, basis.centen, 'en het bedrag van de EERSTE handeling blijft staan');
+  assert.equal(op.vindOpIdem('rtf:LID7:FACT-1').centen, basis.centen, 'en het bedrag van de EERSTE handeling blijft staan');
 
   const alles = op.lijst({ limit: 50 });
   assert.equal(alles.aantal, 1, 'een opdracht in de rij, niet drie');

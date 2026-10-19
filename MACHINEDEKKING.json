@@ -3,17 +3,17 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. Sinds 6 oktober 2026 een derde meetweg, `tas` (scripts/lib/kerntas.js): de module die een fabriek of toewijzing in de kern-tas legt, telt een as alleen als zij of een directe require de BRON van die as inlaadt (structureel, geen woord), plus de ingespoten collectietransactie als aanroep. Ook `tas` wordt nooit bij de andere twee opgeteld. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-10-14T08:44:35.043Z",
-  "commit": "518d86bd1",
+  "op": "2026-10-18T16:13:29.985Z",
+  "commit": "b5cf704e6",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/machinedekking.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "bronnen": {
-  "EXECUTION_MAP.json": "30248812c97e57a5",
+  "EXECUTION_MAP.json": "ede14d3aabd1a206",
   "KERNHERKOMST.json": "f78a14a2b756a50f",
-  "MUTATIECONTRACT.json": "a2c9168d5d2400a4",
+  "MUTATIECONTRACT.json": "c51e292ac8e365fa",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
    "op": "2026-10-14",
@@ -214,9 +214,9 @@
   }
  },
  "gemeten": {
-  "routes": 5529,
+  "routes": 5530,
   "muterend": 4130,
-  "leesroutesUitRegister": 1296,
+  "leesroutesUitRegister": 1297,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
@@ -271,18 +271,18 @@
    },
    "envelop": {
     "handler": 14,
-    "bestand": 246,
+    "bestand": 244,
     "tas": 16
    },
    "idempotentie": {
     "handler": 28,
-    "bestand": 300,
+    "bestand": 292,
     "tas": 0
    },
    "atomair": {
     "handler": 4,
     "bestand": 65,
-    "tas": 198
+    "tas": 196
    },
    "bewijsketen": {
     "handler": 4,
@@ -468,7 +468,7 @@
      "server/kern/kantoor/geldketen/weging.js"
     ],
     "routesHandler": 14,
-    "routesBestand": 246,
+    "routesBestand": 244,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -480,7 +480,7 @@
     "zakLezers": 0,
     "lezers": [],
     "routesHandler": 28,
-    "routesBestand": 300,
+    "routesBestand": 292,
     "tokens": 5,
     "graad": "vermoed"
    },
@@ -671,7 +671,7 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2714,
+  "mutatiesZonderEnigeAs": 2723,
   "mutatiesAlleenViaTas": 107,
   "kerntas": {
    "namenGevolgd": 852,
@@ -4546,11 +4546,9 @@
   {
    "methode": "POST",
    "pad": "/api/concern/feit/beeindig",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/feiten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
@@ -4564,21 +4562,17 @@
   {
    "methode": "POST",
    "pad": "/api/concern/feit/zet",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/feiten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/functiescheiding",
-   "bestand": "server/routes/concern/mensen.js",
+   "bestand": "server/routes/concern/rechten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
@@ -4600,31 +4594,25 @@
   {
    "methode": "POST",
    "pad": "/api/concern/geschiedenis",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/feiten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/kwalificatie/zet",
-   "bestand": "server/routes/concern/mensen.js",
+   "bestand": "server/routes/concern/rechten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/kwalificaties",
-   "bestand": "server/routes/concern/mensen.js",
+   "bestand": "server/routes/concern/rechten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
@@ -4640,11 +4628,9 @@
   {
    "methode": "POST",
    "pad": "/api/concern/mag",
-   "bestand": "server/routes/concern/mensen.js",
+   "bestand": "server/routes/concern/rechten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
@@ -4705,11 +4691,9 @@
   {
    "methode": "POST",
    "pad": "/api/concern/opdatum",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/feiten.js",
    "onder": [],
-   "boven": [
-    "idempotentie"
-   ],
+   "boven": [],
    "tas": []
   },
   {
@@ -5290,14 +5274,10 @@
   {
    "methode": "POST",
    "pad": "/api/doos/rapport",
-   "bestand": "server/routes/doos.js",
+   "bestand": "server/routes/doos-rapport.js",
    "onder": [],
-   "boven": [
-    "envelop"
-   ],
-   "tas": [
-    "atomair"
-   ]
+   "boven": [],
+   "tas": []
   },
   {
    "methode": "POST",
@@ -32374,7 +32354,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/wijk/laat",
-   "bestand": "server/routes/supplier/horeca/wijk.js",
+   "bestand": "server/routes/supplier/horeca/wijk-nemen.js",
    "onder": [],
    "boven": [],
    "tas": []
@@ -32382,7 +32362,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/wijk/neem",
-   "bestand": "server/routes/supplier/horeca/wijk.js",
+   "bestand": "server/routes/supplier/horeca/wijk-nemen.js",
    "onder": [],
    "boven": [],
    "tas": []

@@ -45,6 +45,21 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-186m9vs:not(#_#_#_){width:100%}
+.s-1auu4ix:not(#_#_#_){color:var(--rood);font-size:.85rem;min-height:1.1rem}
+.s-1gh2jvp:not(#_#_#_){display:flex;gap:.5rem;margin-top:.5rem}
+.s-1m9a70q:not(#_#_#_){text-align:center}
+.s-9u1b1a:not(#_#_#_){flex:1;text-align:center;text-decoration:none}
+.s-i6wi0a:not(#_#_#_){margin-top:.6rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.95rem;line-height:1.5;word-break:break-word}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -84,16 +99,16 @@
   <div class="kaart blok">
     <h2>Geen bereik? Noodbericht via satelliet</h2>
     <div class="h">Nieuwere telefoons kunnen zonder bereik een sms via een satelliet sturen (buiten, met vrij zicht op de lucht). De app zet een zo kort mogelijk noodbericht voor je klaar, met de tijd en je locatie erin; je telefoon biedt de satellietweg zelf aan zodra er geen bereik is. Bij direct gevaar en gewoon bereik: bel altijd eerst 112.</div>
-    <button class="knop" id="nsMaak" style="width:100%;">Maak mijn noodbericht</button>
-    <div id="nsTekst" style="margin-top:.6rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.95rem;line-height:1.5;word-break:break-word;" hidden></div>
-    <div id="nsKnoppen" style="display:flex;gap:.5rem;margin-top:.5rem;" hidden>
-      <a class="knop" id="nsSms" style="flex:1;text-align:center;text-decoration:none;">Open in Berichten</a>
+    <button class="knop s-186m9vs" id="nsMaak">Maak mijn noodbericht</button>
+    <div id="nsTekst" class="s-i6wi0a" hidden></div>
+    <div id="nsKnoppen" class="s-1gh2jvp" hidden>
+      <a class="knop s-9u1b1a" id="nsSms">Open in Berichten</a>
       <button class="knop grijs h-flex1" id="nsKopie">Kopieer</button>
     </div>
-    <div class="fout" id="nsFout" style="color:var(--rood);font-size:.85rem;min-height:1.1rem;"></div>
+    <div class="fout s-1auu4ix" id="nsFout"></div>
   </div>
 
-  <div class="privaat" style="text-align:center;">Zit je ergens mee, ook als het niet om nu gaat? Praat even op <a href="steun.html" class="i-12izg7">Steun</a> of kijk in de <a href="hulpwijzer.html" class="i-12izg7">Hulpwijzer</a> waar je gratis hulp vindt.</div>
+  <div class="privaat s-1m9a70q">Zit je ergens mee, ook als het niet om nu gaat? Praat even op <a href="steun.html" class="i-12izg7">Steun</a> of kijk in de <a href="hulpwijzer.html" class="i-12izg7">Hulpwijzer</a> waar je gratis hulp vindt.</div>
 </div>
 
 <script src="/shared/uitvoer.js"></script>

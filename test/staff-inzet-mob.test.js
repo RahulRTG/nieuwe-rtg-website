@@ -245,6 +245,9 @@ test('3. de positieprik: alleen op de eigen rit, en alleen met een echt punt', a
    bewegingsprofiel van iemand die allang is uitgestapt. De weigering staat op
    de kern (EIND in kern/mobiliteit/keten.js) en niet op een scherm. */
 test('4. na het afrekenen komt er geen prik meer bij, en de rit verhuist naar klaar', async () => {
+  // de beginstand van dit blok: de rit staat nog bij het lopende werk
+  const ervoor = await api('/api/staff/mob/mijn', {}, taxiPda);
+  assert.ok(ervoor.body.lopend.some(o => o.ref === ref), 'voor het afrekenen staat de rit bij het lopende werk');
   for (const s of ['onderweg', 'aangekomen', 'ingestapt', 'rijdt', 'voltooid', 'afgerekend']) {
     const r = await api('/api/staff/mob/status', { ref, status: s }, taxiPda);
     assert.equal(r.status, 200, 'stap ' + s + ': ' + (r.body.error || ''));

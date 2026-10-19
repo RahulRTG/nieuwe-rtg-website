@@ -131,7 +131,17 @@ test('de schuldlijst groeit niet, en kan zakken', () => {
   assert.ok(pad, 'er hoort minstens een scherm met eigen hoofdactie buiten de lijst te staan (de eerste portie)');
   kopie.schermen[pad].herkomst.context = 'edge-casco';
   assert.ok(contextSchuld(kopie).some((x) => x.startsWith(pad + ': heeft een eigen hoofdactie')), 'een scherm dat terugvalt op het casco hoort te zakken');
-  const schuld = CONTEXT_SCHULD[0];
+  /* De andere richting: een scherm dat zelf spreekt en toch op de lijst staat,
+     moet eraf. Sinds de lijst leeg is (18 oktober 2026) gaat dat via een
+     proeflijst als tweede argument, met een scherm dat volgens het register zelf
+     spreekt; zolang er nog schulden staan, nemen we de eerste daarvan. */
+  const schuld = CONTEXT_SCHULD[0] || Object.keys(kopie.schermen).find((p) => p !== pad && kopie.schermen[p].status === 'gemeten' &&
+    (kopie.schermen[p].herkomst || {}).hoofdactie === 'scherm:data-hoofdactie');
+  assert.ok(schuld, 'er hoort een tweede gemeten scherm met eigen hoofdactie te zijn om de lijst mee na te lopen');
+  const proeflijst = CONTEXT_SCHULD.length ? CONTEXT_SCHULD : [schuld];
   kopie.schermen[schuld].herkomst.context = 'scherm';
-  assert.ok(contextSchuld(kopie).some((x) => x.startsWith(schuld + ': publiceert zijn context zelf')), 'een afgelost scherm hoort van de lijst te moeten');
+  assert.ok(contextSchuld(kopie, proeflijst).some((x) => x.startsWith(schuld + ': publiceert zijn context zelf')), 'een afgelost scherm hoort van de lijst te moeten');
+  /* En een naam op de lijst die niet (meer) onder de regel valt, zakt ook. */
+  assert.ok(contextSchuld(kopie, ['/apps/bestaat-niet.html']).some((x) => x.startsWith('/apps/bestaat-niet.html: staat op CONTEXT_SCHULD maar valt niet')),
+    'een schuld zonder gemeten scherm hoort te zakken');
 });

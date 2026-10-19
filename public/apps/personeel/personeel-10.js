@@ -12,9 +12,9 @@
         const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
         if (navigator.vibrate) navigator.vibrate(ok ? 80 : [200, 80, 200]);
         uit.innerHTML = ok
-          ? '<b style="color:var(--rtg-leesgroen,var(--green,#7ecb8f));font-size:1rem;">'+esc(codenaam)+' '+T('pd.lft.ja','is')+' '+min+'+</b>'
-          : '<b style="color:#E36385;font-size:1rem;">'+esc(codenaam)+' '+T('pd.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
-      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">'+esc(e.message)+'</b>'; }
+          ? '<b class="s-13791xt">'+esc(codenaam)+' '+T('pd.lft.ja','is')+' '+min+'+</b>'
+          : '<b class="s-1psrm17">'+esc(codenaam)+' '+T('pd.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
+      } catch(e){ uit.innerHTML = '<b class="s-14oqrbo">'+esc(e.message)+'</b>'; }
     }));
     wrap.querySelectorAll('[data-pkdmeter]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/dorp/drukte', { afdeling: pkDorpKant, stand: b.dataset.pkdmeter }); pkToolsKant = null; pkLaadTools(); } catch(e){ toast(e.message); }

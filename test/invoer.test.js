@@ -38,8 +38,16 @@ const dataUrl = (mime, tekst) => 'data:' + mime + ';base64,' + Buffer.from(tekst
 
 let srv, base, lid;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-invoer-'));
-const post = (pad, body, token) => fetch(base + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+/* `nieuw` zegt: dit is bewust een NIEUWE opdracht, geen dubbeltik. Dezelfde
+   boardingpass twee keer binnen vijf seconden lezen is anders voor de
+   idem-poort een herhaling (server/lib/idemsleutels-werelden.js), en dan krijgt
+   de tweede lezing het voorstel van de eerste terug -- ook als dat al is
+   bevestigd. Een lid dat een tweede document inleest, doet dat niet binnen het
+   dubbeltikvenster; deze toets wel, dus zegt hij het met een eigen sleutel. */
+let volgnummer = 0;
+const post = (pad, body, token, nieuw) => fetch(base + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}),
+    ...(nieuw ? { 'Idempotency-Key': 'invoer-toets-' + (++volgnummer) } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -137,7 +145,7 @@ test('4. de zekerheden komen van de lezer, niet van de aanvrager', async () => {
   /* Een GELEZEN veld is niet van buitenaf te schrijven. Deze aanvraag probeert
      het vluchtnummer uit de boardingpass te overschrijven; dat veld staat niet
      in de lijst die een mens mag zetten, dus er verandert niets. */
-  const pasLees = await post('/api/reis/invoer/lees', { tekst: PAS }, lid);
+  const pasLees = await post('/api/reis/invoer/lees', { tekst: PAS }, lid, true);
   const bev = await post('/api/reis/invoer/bevestig', { id: pasLees.body.voorstel.id, velden: {
     titel: 'Vlucht', vlucht: 'ZZ999', van_datum: '2030-01-01'
   } }, lid);
@@ -160,13 +168,20 @@ test('4. de zekerheden komen van de lezer, niet van de aanvrager', async () => {
     'en wat de lezer ervan maakte blijft ernaast staan');
 
   // een onzin-waarde levert geen datum op, en dan gaat het onderdeel niet door
-  const rommel = await post('/api/reis/invoer/lees', { tekst: PAS }, lid);
+  /* en een echte dubbeltik (zonder eigen sleutel, binnen het venster) is geen
+     tweede voorstel: hij krijgt het eerste terug, gemerkt als herhaling */
+  const tik1 = await post('/api/reis/invoer/lees', { tekst: PAS + ' ' }, lid);
+  const tik2 = await post('/api/reis/invoer/lees', { tekst: PAS + ' ' }, lid);
+  assert.equal(tik2.body.voorstel.id, tik1.body.voorstel.id, 'een dubbeltik maakt geen tweede voorstel');
+  assert.equal(tik2.body.herhaald, true);
+
+  const rommel = await post('/api/reis/invoer/lees', { tekst: PAS }, lid, true);
   assert.equal((await post('/api/reis/invoer/bevestig', { id: rommel.body.voorstel.id, velden: {
     titel: 'Vlucht', van_datum: { waarde: '2030-01-01' } } }, lid)).status, 400);
 });
 
 test('5. een correctie maakt het onderdeel zeker; zonder correctie blijft het na te kijken', async () => {
-  const a = await post('/api/reis/invoer/lees', { tekst: PAS }, lid);
+  const a = await post('/api/reis/invoer/lees', { tekst: PAS }, lid, true);
   /* Geen `soort` meegestuurd: de strook zei zelf al dat dit een vlucht is. */
   const zonder = await post('/api/reis/invoer/bevestig', { id: a.body.voorstel.id,
     velden: { titel: 'AC834 naar Frankfurt', bestemming: 'Monaco' } }, lid);
@@ -174,9 +189,10 @@ test('5. een correctie maakt het onderdeel zeker; zonder correctie blijft het na
   assert.equal(zonder.body.onderdeel.soort, 'vlucht', 'het soort komt uit de boardingpass zelf');
   assert.equal(zonder.body.onderdeel.status, 'tecontroleren',
     'het afgeleide jaar staat nog onder de drempel, dus vraagt dit onderdeel aandacht');
+  assert.equal(zonder.body.onderdeel.onzeker.length, 1, 'zonder correctie is er een onzeker veld');
   assert.deepEqual(zonder.body.onderdeel.onzeker, ['van_datum']);
 
-  const b = await post('/api/reis/invoer/lees', { tekst: PAS }, lid);
+  const b = await post('/api/reis/invoer/lees', { tekst: PAS }, lid, true);
   const met = await post('/api/reis/invoer/bevestig', { id: b.body.voorstel.id,
     velden: { titel: 'AC834 naar Frankfurt', bestemming: 'Monaco', van_datum: dag(60) } }, lid);
   assert.equal(met.body.onderdeel.status, 'ingelezen', 'met de datum bevestigd is er niets meer na te kijken');

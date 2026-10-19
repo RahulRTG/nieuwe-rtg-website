@@ -84,6 +84,16 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
 <link rel="stylesheet" href="/shared/rtg-deep-flows-2026.css">
+<style data-rtg-stijlattr>
+/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
+   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
+   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
+   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
+   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
+   wint van elke gewone regel in de bladen, verliest net als het attribuut van
+   !important, en een el.style-schrijfactie wint er nog steeds van. */
+.s-1ta0zs6:not(#_#_#_){color:var(--goud2)}
+</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -139,7 +149,7 @@
     <div class="fout" id="afFout"></div>
     <div id="afSchool" style="display:none;color:var(--rtg-leesgoud,var(--goud));font-size:.85rem;">
       Dit punt komt van school en leest de agenda alleen mee.
-      Afvinken en plannen doe je in <a href="school.html" style="color:var(--goud2);">School</a>.</div>
+      Afvinken en plannen doe je in <a href="school.html" class="s-1ta0zs6">School</a>.</div>
     <div class="rijknoppen">
       <button class="knop" id="afBewaar" type="button">Bewaar</button>
       <button class="knop" id="afVerjaardag" type="button">Dit is een verjaardag</button>

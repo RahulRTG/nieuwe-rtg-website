@@ -163,7 +163,7 @@ try {
       kernfabrieken.get(h.bestand).add(m[1]);
     }
   }
-} catch (e) { /* geen register: dan blijft alles zoals het was, en dat staat in de uitslag */ }
+} catch (e) { if (!e || e.code !== 'ENOENT') throw e; /* geen register: dan blijft alles zoals het was, en dat staat in de uitslag */ }
 
 const BOMEN = ['server'];
 const lijst = BOMEN.flatMap(bestanden);

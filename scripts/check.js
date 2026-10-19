@@ -513,10 +513,12 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
     'server/accounts/users.js',
     'server/kern/fiscaal/index.js',
-    'server/kern/vergeten.js',
     'server/opzet/diensten2.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
+    /* server/kern/vergeten.js STOND HIER en is er weer af (18 oktober 2026): het
+       account met zijn identiteitsmap woont in kern/vergeten/account.js en de
+       positie per domein in kern/vergeten/positie.js. Van 12,2 naar 9,8 KB. */
     /* server/db/postgres-verzoeken.js STOND HIER en is er weer af: de naad die
        er met naam bij stond is gemaakt. De vertaling van een opslagfout naar een
        antwoord (foutAntwoord, namenVan, de logregel) woont nu in
@@ -535,18 +537,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
            stil naast het register laten staan. Ze draaien nu bij het bouwen:
            het register geeft zijn OP_ID mee.
 
-       De derde is geknipt en staat er nog:
+       De derde is in twee keer geknipt en staat er niet meer:
 
-         server/kern/command/uitrolregie.js  13,0 -> 10,1 KB
-           het METEN is eruit (./uitrolmeting.js), met de drie keuzes uit de kop
-           mee -- een reden die achterblijft bij een bestand dat de code niet
-           meer draagt, leest niemand meer. Wat er nu nog over de grens staat is
-           geen tweede naad maar 113 bytes; de volgende echte naad is het BEELD
-           (`stand()`, wat de bediener ziet) los van de BEDIENING (zet, klim,
-           pauze, bevestig). Die is bewust NIET geknipt om een teller te halen:
-           `stand()` heeft zes stukken bedrading nodig, en dat is een duurdere
-           naad dan de winst. */
-    'server/kern/command/uitrolregie.js',
+         server/kern/command/uitrolregie.js  13,0 -> 10,1 -> 8,9 KB
+           eerst het METEN (./uitrolmeting.js), met de drie keuzes uit de kop
+           mee. Op 18 oktober 2026 de AUTOMAAT (./uitrolweging.js): weeg() is
+           de enige plek die BESLUIT of er vanzelf iets gebeurt -- zakken,
+           klimmen of stilstaan voor de mensrem -- en de doctrine van die rem
+           is met de code meeverhuisd. De regie houdt de handelingen (zet,
+           klim, pauze, bevestig) en het beeld. De naad BEELD/BEDIENING die
+           hier eerst stond, is nog steeds niet geknipt: `stand()` blijft bij
+           de handelingen, met dezelfde reden. */
     /* Drie van de vier NOG-gevallen uit de samenvoeging van 24 augustus
        (state.js, functieschakelaars.js, poortwachters.js) staan er niet meer:
        op 26 augustus zijn ze onder de grens teruggebracht door het proza in te
@@ -647,7 +648,9 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     // De geïmporteerde enterprise-motoren hebben benoemde sneden, maar hun
     // opslag- en migratiebedrading wordt pas na deze release afzonderlijk
     // geknipt met de integratietoetsen ernaast.
-    'server/kern/rtgone.js',
+    /* server/kern/rtgone.js STOND HIER en is er af (18 oktober 2026): het
+       BESTUUR (rollen, rechten, goedkeuringen) woont in kern/rtgone-bestuur.js
+       en de projectie VANDAAG in kern/rtgone-vandaag.js. Van 15,7 naar 8,5 KB. */
     'server/kern/magnaat-controle.js',
     'server/kern/magnaatwereld.js'
   ]);
@@ -3514,6 +3517,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
+    ['server/lib/idem-zondersleutel.js', 'de tak van lib/idem.js voor werk ZONDER sleutel in een laag die duurzaam verklaarde: dezelfde belofte als met sleutel (schrijfproef 18 oktober 2026: /api/bank/rekening/open en /api/bank/pas/uitgeven gaven 200 over een opslag die niets had)'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
     ['server/kern/pay/idemlaag.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed (de idem-laag van RTG Pay; stond op kern/pay/index.js tot die op 7 oktober 2026 is geknipt -- VERPLAATST, niet gegroeid)'],
@@ -3524,6 +3528,11 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/mall/aanvragen.js', 'aanvraag, keuze en antwoord zijn werk van een lid en zaak: geen bevestiging vóór opslag; rollback bij fout'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
+    ['server/kern/labfonds.js', 'het Lab-fonds is een toezeggingen-grootboek: een toezegging, voorstel, stem of besluit dat "gelukt" heet en na een herstart weg is, is een grootboek dat liegt (SCHRIJFPROEF.json mat /api/labfonds/locatie/maak als VALS_SUCCES, 18 oktober 2026)'],
+    ['server/kern/facturatie.js', 'een factuur die een MENS maakt of afboekt is een fiscaal stuk met een doorlopend nummer: hij staat er of hij bestaat niet (SCHRIJFPROEF.json mat /api/supplier/facturen/maak als VALS_SUCCES, 18 oktober 2026); de automatische boekingen blijven binnen hun eigen handeling'],
+    ['server/kern/kassa/herhaling.js', 'de kassa: geld, bon en idem-sleutel landen als EEN bevestigde commit -- anders staan de lasten na een herstart weer open terwijl de gast al is afgeschreven (SCHRIJFPROEF.json mat /api/supplier/pos/checkout als VALS_SUCCES, 18 oktober 2026)'],
+    ['test/duurzaam-antwoord.test.js','de toets van vastleggen.antwoord(): een nagemaakte bundel, er wordt niets gecommit'],
+    ['server/kern/geldbeleid/index.js','het geldbeleid van een lid: een geldgrens WEIGERT in de waardepoort, dus een grens die "gezet" heet en na een herstart weg is laat juist de betaling door die het lid wilde tegenhouden (SCHRIJFPROEF.json mat /api/geld/beleid/weg als VALS_SUCCES, 18 oktober 2026)'],
     ['server/kern/vrijheid/huis.js', 'een besluit over iemands vrije tijd (verzoek, goedkeuring, verjaardag) heet pas gelukt als de opslag het bevestigt (VRIJHEID.md)'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],
     ['server/kern/democratie/index.js', 'NIEMAND KWIJT (POLITIEK.md, DO-02): een burger die een kwestie inbrengt en "ontvangen" leest terwijl de opslag hem nog niet heeft, is precies de mens die tussen twee systemen verdwijnt; hetzelfde geldt voor een eindstand, want de terugkoppeling hangt eraan'],
@@ -4821,10 +4830,12 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
      het niet zeker weten. */
   {
     const REG = path.join(ROOT, 'BEDRADING.json');
-    let oud = null;
-    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { oud = null; }
+    let oud = null, onleesbaar = null;
+    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); }
+    catch (e) { if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message); }
     if (!oud) {
-      fout('BEDRADING.json ontbreekt of is onleesbaar -- draai node scripts/check.js met een verse meting');
+      fout('BEDRADING.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'ontbreekt') +
+        ' -- draai node scripts/check.js met een verse meting');
     } else {
       if (r.kanten.onbekend.length > oud.gemeten.onbekend) {
         fout('de bedradingsonzekerheid groeit: ' + oud.gemeten.onbekend + ' -> ' +
@@ -5075,6 +5086,18 @@ console.log('\n62) een gecontracteerd domein raakt db.data alleen door zijn eige
       waarom: 'zeven schrijvers; wortel met takken, plus twee plekken die een tak VERVANGEN' },
     { map: 'server/kern/mobiliteit', deur: 'opslag.js',
       waarom: 'veertien schrijvers en 109 aanrakingen: het rommeligste domein, en daarom het meest gebaat' },
+    { map: 'server/kern/gemeente', deur: 'opslag.js',
+      waarom: 'vijf schrijvers over vijf collecties; de demo-gemeente in suppliers staat als vreemde schrijver in de deur' },
+    { map: 'server/kern/theater', deur: 'opslag.js',
+      waarom: 'vijf schrijvers over vier collecties; lijsten() was een afspraak, bak() is nu een poort' },
+    { map: 'server/kern/podium', deur: '../eigencollectie.js',
+      waarom: 'drie schrijvers over drie collecties; de lichte vorm volstaat, gebouwd in index.js en via ctx.opslag gedeeld' },
+    { map: 'server/kern/beveiliging', deur: 'opslag.js',
+      waarom: 'vijf schrijvers over vier lijsten; de deelbestanden vervingen een lijst buiten de accessor om' },
+    { map: 'server/kern/plaats', deur: 'opslag.js',
+      waarom: 'de deur stond er al; venster.js en waarnemen.js vervingen een lijst er nog langs, nu via zet()' },
+    { map: 'server/kern/commerce', deur: '../eigencollectie.js',
+      waarom: 'vier modules met elk precies een eigen collectie; de lichte vorm volstaat en regel 63 bewaakt het eigenaarschap' },
     { map: 'server/kern/command', deur: 'opslag.js',
       waarom: 'twaalf schrijvers; het eerste domein met vier soorten omgang (bezit, teller, gedeeld, vreemd)',
       ook: {
@@ -5757,10 +5780,11 @@ console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is e
   if (!fs.existsSync(P)) {
     fout('EERSTEMINUUT.json ontbreekt -- draai: npm run eersteminuut');
   } else {
-    let r = null;
-    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { r = null; }
+    let r = null, onleesbaar = null;
+    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { onleesbaar = String(e && e.message); }
     if (!r || !r.telling) {
-      fout('EERSTEMINUUT.json is onleesbaar of draagt geen telling -- draai: npm run eersteminuut');
+      fout('EERSTEMINUUT.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'draagt geen telling') +
+        ' -- draai: npm run eersteminuut');
     } else {
       const gezakt = (r.toetsen || []).filter((t) => t.uitslag === 'gezakt');
       const wacht = r.wachten || {};

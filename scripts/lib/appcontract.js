@@ -232,6 +232,9 @@ const CONTRACT = {
   'link:theater': Object.assign({
     belofte: 'een lid met een door het kantoor goedgekeurd kanaal zet een film in de zaal, byte voor byte; een ander lid kijkt met een kijkticket, spoelt, reageert, abonneert en meldt'
   }, voltooi('theater', 'het scenario loopt /api/theater/zaal, /kanaal/aanmeld, /video/maak, /upload/:id, /kijk/:id met /api/stroom/ticket, /reactie, /reacties, /abonneer en /meld, de routes die /apps/theater.html zelf aanroept, met een tweede lid als kijker')),
+  'link:spelavond': Object.assign({
+    belofte: 'een speler koppelt met een eenmalige code een televisie aan het potje, en die toont vanaf dan elke zet -- alleen wat publiek is, met een eigen schermsessie die geen ledensessie is'
+  }, voltooi('spelavond', 'het scenario loopt /api/projectie/koppel en /api/projectie/kijk, de routes die /apps/spelscherm.html zelf aanroept, met twee spelers die het potje en de code maken langs /api/member/spel/*')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

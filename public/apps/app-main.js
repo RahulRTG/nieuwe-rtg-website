@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '7be75ecc';
+var RTG_BOUW = '7dd65a74';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4631,9 +4631,13 @@ var RTG_BOUW = '7be75ecc';
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
+    /* De paden van de werkkiezer staan voluit, zodat de routemeting
+       (SCHERMROUTES.json) ziet welke deuren hij aanroept; API.call zet zelf
+       /api ervoor, dus dat gaat er hier weer af. */
+    const werkApi = (pad, body) => API.call(pad.replace(/^\/api(?=\/)/, ''), body);
     belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
-    API.call('/account/rollen', {}).then(d => {
+    werkApi('/api/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
       if (!rollen.length) {
         const leeg = document.createElement('div');
@@ -4666,12 +4670,12 @@ var RTG_BOUW = '7be75ecc';
               if (u.geenPasskey) { location.href = deur.PASSKEYS; return; }
               if (!u.token) throw new Error(u.error || T('werk.mis', 'Openen lukte niet.'));
               s = u;
-            } else try { s = await API.call('/account/start', body); }
+            } else try { s = await werkApi('/api/account/start', body); }
             catch (e1) {
               if (!(e1.data && e1.data.locatieNodig)) throw e1;
               const pos = await vraagPositie();
               if (!pos) throw e1;
-              s = await API.call('/account/start', Object.assign({ positie: pos }, body));
+              s = await werkApi('/api/account/start', Object.assign({ positie: pos }, body));
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren

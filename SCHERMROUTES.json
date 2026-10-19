@@ -3,32 +3,18 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "6a78db7b4",
+  "commit": "0bd546559",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/arrival.html",
-    "public/apps/comm.html",
-    "public/apps/flits.html",
-    "public/apps/foundation/buurtruil.html",
-    "public/apps/foundation/geven.html",
-    "public/apps/foundation/sessie/sessie-00.js",
-    "public/apps/geld/bankb.js",
-    "public/apps/geld/labfondsb.js",
-    "public/apps/geld/overzichtc.js",
-    "public/apps/geld/walletb.js",
-    "public/apps/lifestyle-lus.js",
-    "public/apps/lifestyle.html",
-    "public/apps/move.html",
-    "public/apps/muziek-bestanden.js",
-    "public/apps/muziek-feed.js",
-    "public/apps/muziek.html",
-    "public/apps/navigatie.html",
-    "public/apps/ov.html",
-    "public/apps/ovroutes.html",
-    "public/apps/stad.html"
+    "public/apps/app-main/app-main-01.js",
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/app.html",
+    "public/apps/foundation/sw.js",
+    "public/apps/werkruimte.html",
+    "public/sw.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7839,10 +7825,10 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 451,
+  "schermenMetPad": 452,
   "nietGelezen": 0,
   "exactePaden": 1213,
-  "verwijzingen": 1455,
+  "verwijzingen": 1457,
   "voorvoegsels": 129,
   "basisPaden": 2,
   "doodPad": 0,
@@ -7965,6 +7951,18 @@
    "aantal": 7
   },
   {
+   "pad": "/api/account/start",
+   "schermen": [
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/decision-room.js",
+    "public/apps/project-room.js",
+    "public/apps/rtgone.html",
+    "public/apps/rtmail-voorzijde-werk.js",
+    "public/shared/kantoordeur.js"
+   ],
+   "aantal": 6
+  },
+  {
    "pad": "/api/ice",
    "schermen": [
     "public/apps/meet/kamer.js",
@@ -7995,17 +7993,6 @@
     "public/apps/media/lijst.js",
     "public/apps/pay.html",
     "public/apps/spelen.html"
-   ],
-   "aantal": 5
-  },
-  {
-   "pad": "/api/account/start",
-   "schermen": [
-    "public/apps/decision-room.js",
-    "public/apps/project-room.js",
-    "public/apps/rtgone.html",
-    "public/apps/rtmail-voorzijde-werk.js",
-    "public/shared/kantoordeur.js"
    ],
    "aantal": 5
   },
@@ -8068,6 +8055,15 @@
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
+  },
+  {
+   "pad": "/api/account/rollen",
+   "schermen": [
+    "public/apps/app-main/app-main-24a3.js",
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/personeel/personeel-04a.js"
+   ],
+   "aantal": 3
   },
   {
    "pad": "/api/office/stream",
@@ -8266,14 +8262,6 @@
     "public/shared/interface/modules/safety.js"
    ],
    "aantal": 3
-  },
-  {
-   "pad": "/api/account/rollen",
-   "schermen": [
-    "public/apps/app-main/app-main-24a3.js",
-    "public/apps/personeel/personeel-04a.js"
-   ],
-   "aantal": 2
   },
   {
    "pad": "/api/bank/overzicht",
@@ -16617,6 +16605,14 @@
    "bestand": "public/apps/app-main/app-main-24a3.js",
    "exact": [
     "/api/account/rollen"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-25.js",
+   "exact": [
+    "/api/account/rollen",
+    "/api/account/start"
    ],
    "voorvoegsels": []
   },

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20004 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20005 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,11 +13,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2941 |
-| losse beweringen (`test(...)`) | 20004 |
+| losse beweringen (`test(...)`) | 20005 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2739 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2743 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 184 |
+| niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 2 |
 | niets van beide | 16 |
 
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2563 bestanden, 19301 beweringen.
+2563 bestanden, 19302 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1027,7 +1027,7 @@ toets omvalt.
 | `kern-events.test.js` | 6 | geen bruikbare mutatie | Tests voor de event-/keukenlaag (server/kern/events.js). De functies dragen crypto + sectiesForOrder; we voeren echte stubs op. |
 | `kern-fiscaal.test.js` | 18 | gezakt op `===->!==` | Tests voor de fiscale/financiele laag (server/kern/fiscaal.js). De rekenlaag draagt db + helpers; we voeren een minimale db-stub op. |
 | `kern-live.test.js` | 5 | gezakt op `===->!==` | Tests voor de live-/geo-laag (server/kern/live.js). De functies dragen db + de bus + SSE-routers + geo + i18n; we voeren stubs op en gebruiken de echte geo-helpers. |
-| `kern-util.test.js` | 4 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
+| `kern-util.test.js` | 5 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
 | `kernroutes-lid.test.js` | 6 | gezakt op `liegpoort /api/` | ACHT LEDENDEUREN UIT DE LANCEERBARE KERN DIE GEEN ENKELE TOETS AANRIEP. De keuring (scripts/keuring.js, dekking) telde deze routes als "komt in geen test voor". |
 | `kerntas.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | DE KERN-TAS VAN DE MACHINEDEKKING (scripts/lib/kerntas.js). De derde meetweg is er gekomen omdat de meter LibraryOS en de Loop Fabric niet zag (besluit van de eigenaar, 6 oktober 2026). |
 | `keten.test.js` | 31 | gezakt op `===->!==#0` | DE KETEN (server/lib/keten.js) en het inzagejournaal dat eraan hangt. WAT HIER BEWEZEN WORDT. |
@@ -1856,7 +1856,7 @@ toets omvalt.
 | `rtg-heritage.test.js` | 16 | geen bronmutatie mogelijk | DE HERITAGE-DOCTRINE IS CODE, GEEN MOODBOARD. Deze toets borgt de vaste wereldpaletten, centrale geometrieën, vier dieptelagen en de componentrollen waarmee routes gefaseerd worden opgebouwd. |
 | `rtg-operation.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-route-memory.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rtg-vandaag-lokaal.test.js` | 1 | geen module gevonden | VANDAAG IS DE DAG VAN HET LID, NIET DIE VAN GREENWICH. Het kompas van het Overzicht (/apps/rtg.html, apps/rtg-vandaag.js) toonde de afspraken van `new Date().toISOString().slice(0, 10)`: de UTC-datum. |
+| `rtg-vandaag-lokaal.test.js` | 1 | gezakt op `expliciete bronmutatie` | VANDAAG IS DE DAG VAN HET LID, NIET DIE VAN GREENWICH. Het kompas van het Overzicht (/apps/rtg.html, apps/rtg-vandaag.js) toonde de afspraken van `new Date().toISOString().slice(0, 10)`: de UTC-datum. |
 | `rtg-world-identity.test.js` | 9 | gezakt op `===->!==#0` | DE HERITAGE-ROUTEKAART IS FAIL-CLOSED. Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude redirect mag geen tweede productoppervlak worden. |
 | `rtg.test.js` | 11 | gezakt op `===->!==#0` | HET GEREEDSCHAP -- rtg new, check, dev en sdk. De belofte van dit gereedschap is niet "het draait" maar iets scherpers: het bouwt niets na**. |
 | `rtgai.test.js` | 4 | gezakt op `liegpoort /api/` | De RTG AI van het RTG Kantoor: leest mee, traint zichzelf, meldt zich klaar, en krijgt het roer ALLEEN via de knop; daarna draait het aantoonbare rondes automatisch door en de terug-knop werkt. |
@@ -1942,7 +1942,7 @@ toets omvalt.
 | `schermmutatie.test.js` | 8 | gezakt op `+->-#0` | DE SCHERMMUTATIEMOTOR ZELF -- want een meter die je niet kunt narekenen is een belofte. WAAROM DIT BESTAAT. |
 | `schermronde.test.js` | 5 | gezakt op `===->!==#0` | EEN MISLUKTE RONDE MAG ZICH NIET VOORDOEN ALS EEN GEMETEN RONDE. HET GEVAL, EN HET IS ECHT GEBEURD (18 augustus 2026). |
 | `schermsuite-bewijs.test.js` | 4 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `schil-taal.test.js` | 5 | geen module gevonden | DE SCHIL SPREEKT DE TAAL VAN DE PAGINA. Gevonden door TravelOS op /apps/arrival.html (19 oktober 2026): op een toestel in het Engels stond in het personenpaneel van de werktafel "View your conversations" boven een... |
+| `schil-taal.test.js` | 5 | gezakt op `expliciete bronmutatie` | DE SCHIL SPREEKT DE TAAL VAN DE PAGINA. Gevonden door TravelOS op /apps/arrival.html (19 oktober 2026): op een toestel in het Engels stond in het personenpaneel van de werktafel "View your conversations" boven een... |
 | `schild-weerbaar.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | HET SCHILD, WEERBAAR (server/kern/schild.js). Het schild is de voordeur: een applicatie-WAF op pad, query en user-agent, een DDoS-rem per IP, de banlijst, en de poort waar De Wacht zijn quarantaine afdwingt. |
 | `schild.test.js` | 4 | gezakt op `liegpoort /api/` | Het schild: de applicatie-WAF, de DDoS-banlijst en de kortlevende TURN-inloggegevens. Extern verkeer wordt gesimuleerd met een X-Forwarded-For-header (trust proxy staat aan); localhost zelf is uitgezonderd zodat... |
 | `schoneboom.test.js` | 8 | al rood | EEN MEETRONDE DIE TOCH NIET MEETELT, HOORT NIET TE BEGINNEN. HET PROBLEEM. |
@@ -2050,7 +2050,7 @@ toets omvalt.
 | `sospositie.test.js` | 8 | gezakt op `true->false#0` | EEN SOS-POSITIE HOORT BIJ DE MELDING (NAVIGATIE.md N18). Vijf stromen, een regel (server/kern/sospositie.js): zolang de melding open is blijft de positie, 90 dagen na het sluiten gaat hij eraf, en een proef of een... |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
 | `spel-dubbeltik.test.js` | 4 | gezakt op `return-weg#4` | "NODIG UIT EN START" MET EEN HERHAALSLEUTEL maakt een potje, niet twee. Gevonden door de voltooiproef van Spelen (scripts/lib/voltooi/spelen.js): twee gelijke verzoeken tegelijk gaven twee potjes en de vriend twee... |
-| `spel-nieuw-sleutel.test.js` | 1 | geen module gevonden | Elk scherm dat "Nodig uit en start" aanroept, stuurt de herhaalsleutel mee (19 oktober 2026). De kern onthoudt hem bij het potje (kern/spellen/ dubbeltik.js), maar een scherm dat hem niet meestuurt heeft die... |
+| `spel-nieuw-sleutel.test.js` | 1 | gezakt op `expliciete bronmutatie` | Elk scherm dat "Nodig uit en start" aanroept, stuurt de herhaalsleutel mee (19 oktober 2026). De kern onthoudt hem bij het potje (kern/spellen/ dubbeltik.js), maar een scherm dat hem niet meestuurt heeft die... |
 | `spelaandeel.test.js` | 13 | gezakt op `===->!==#0` | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbank.test.js` | 21 | gezakt op `===->!==#0` | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |
 | `spelbeleid.test.js` | 11 | gezakt op `return-weg#0` | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |
@@ -2246,7 +2246,7 @@ toets omvalt.
 | `tiener.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de tiener-tools: de toetsplanner (leerplan gespreid over de dagen, stappen afvinken, opruimen), het zakgeldpotje (boeken, saldo-bewaking, spaardoelen met inleg en teruggave), de gast-poort en de... |
 | `tijdlijn.test.js` | 7 | gezakt op `liegpoort /api/` | DE CONFIGURATIETIJDLIJN: acht beweringen, en ze gaan allemaal over de manier waarop een "wat is er veranderd"-scherm normaal gesproken onwaar wordt. 1. |
 | `tijdzone-instant.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | instantIn (server/kern/tijdzone.js): een lokale dag en een uur in een IANA-zone als tijdstip. "Om 10:00" bij een zaak is 10:00 op de klok van die zaak, ook in de zomertijd. |
-| `tijdzone-plekken.test.js` | 12 | geen module gevonden | DE PLEKKEN DIE DE KLOK VAN DE CONTAINER LAZEN. Elke toets hieronder draait in een proces met TZ=UTC -- precies zoals de server in productie draait -- op een vast moment (RTG_KLOK of een meegegeven Date) waarop de... |
+| `tijdzone-plekken.test.js` | 12 | gezakt op `expliciete bronmutatie` | DE PLEKKEN DIE DE KLOK VAN DE CONTAINER LAZEN. Elke toets hieronder draait in een proces met TZ=UTC -- precies zoals de server in productie draait -- op een vast moment (RTG_KLOK of een meegegeven Date) waarop de... |
 | `tijdzone.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | DE KLOK VAN HET HUIS (server/kern/tijdzone.js). De server draait in productie in een UTC-container. |
 | `tls-acme-boot.test.js` | 2 | gezakt op `===->!==#0` | Bewijst de boot-lijm (server/lib/tls-acme.js): de ACME-accountsleutel en het opgehaalde certificaat persisteren, en -- het echte werk -- dat startAcme een vers uitgegeven certificaat LIVE in een draaiende native... |
 | `tls-acme.test.js` | 3 | gezakt op `===->!==#0` | Bewijst de JOSE/JWS-laag en de VOLLEDIGE ACME-toestandsmachine offline: een nep-CA (een injecteerbare transport) speelt Let's Encrypt na en VERIFIEERT elke JWS-handtekening met de accountsleutel, en "valideert" de... |

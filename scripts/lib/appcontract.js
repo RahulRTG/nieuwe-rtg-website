@@ -170,6 +170,9 @@ const CONTRACT = {
   'link:buurtruil': Object.assign({
     belofte: 'een buurtbewoner zet iets weg te geven of gezocht in zijn RTF-stad, een buur toont belangstelling en de eigenaar sluit het als het weg is'
   }, voltooi('buurtruil', 'het scenario loopt /api/rtfos/publiek/steden en /api/rtfos/ruil/lijst, /mijn, /plaats, /interesse en /sluit, de routes die /apps/foundation/buurtruil.html zelf aanroept, met een buur en het kind van het gezin')),
+  'link:geven': Object.assign({
+    belofte: 'wie geeft ziet eerst wat er zou gebeuren en bevestigt een keer; een oormerk landt op een echt project, en een meerjarig plan en zijn machtiging beheert de gever zelf'
+  }, voltooi('geven', 'het scenario loopt /api/rtfos/gift/stand, /voorbereid, /bevestig, /projecten, /plan/* en /machtiging/*, de routes die /apps/foundation/geven.html zelf aanroept, met het kantoor dat het plan vastlegt')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

@@ -416,6 +416,27 @@ test('de bron ontstaat na de boeking, met de codenaam als gever', async () => {
     'de bron droeg het oormerk niet, of een ander id dan het gekozen project');
 });
 
+/* Gevonden door de voltooiproef (scripts/lib/voltooi/geven.js): na een crash
+   kent de route het antwoord van de eerste bevestiging niet meer, de betaallaag
+   herkent de sleutel wel ("herhaald", er boekt niets) -- en toch ontstond er een
+   TWEEDE bron. De stichting verantwoordde dan een gift die er een keer was als
+   twee. Hier met de echte bronlaag (./geld.js), zodat de sleutel tot daar reist. */
+test('een herhaalde bevestiging met dezelfde sleutel maakt geen tweede bron', async () => {
+  const b = bouwMetPay();
+  const geld = require('../server/kern/rtfos/geld')(b.ctx);
+  b.ctx.bronUitGift = (x) => geld.bronUitGift(x);
+  let keer = 0;
+  b.ctx.pay = { partnerIn: async (x) => (++keer === 1 ? { ok: true, centen: x.centen, kosten: 35 }
+    : { ok: true, centen: x.centen, kosten: 35, herhaald: true }) };
+  const een = await b.gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 25, idem: 'sleutel-1' });
+  const twee = await b.gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 25, idem: 'sleutel-1' });
+  const giften = b.ctx.S().bronnen.filter(x => x.uitGift);
+  assert.equal(giften.length, 1, 'een herhaalde bevestiging zette een tweede bron in de boekhouding');
+  assert.equal(twee.bron, een.bron, 'de herhaalde bevestiging wees naar een andere bron');
+  await b.gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 25, idem: 'sleutel-2' });
+  assert.equal(b.ctx.S().bronnen.filter(x => x.uitGift).length, 2, 'een nieuwe sleutel is wel een nieuwe gift');
+});
+
 test('een gift boven de drempel meldt vooraf dat hij eerst beoordeeld wordt', async () => {
   const { gift } = bouwMetPay();
   const drempel = require('../server/kern/rtfos/herkomst').DREMPEL_CENTEN / 100;
@@ -468,6 +489,18 @@ test('een voorstel is nog geen overeenkomst, en zegt dat ook', () => {
   assert.ok(p.zegt.some(z => /nog een voorstel/i.test(z)));
   assert.ok(p.zegt.some(z => /gewone gift/i.test(z)),
     'tot het vastleggen is elke betaling een gewone gift; dat hoort de gever te weten');
+});
+
+/* Ook gevonden door de voltooiproef: een dubbele tik op Voorstellen zette twee
+   gelijke plannen neer, elk met eigen termijnen en een eigen machtiging. */
+test('een dubbele tik op voorstellen zet een plan neer en geen twee', () => {
+  const { gift } = bouwPlan();
+  const a = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 });
+  const b = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 });
+  assert.equal(a.plan.id, b.plan.id, 'een dubbele tik gaf twee plannen');
+  assert.equal(gift.plan.mijn('Poolvos 1BE9').plannen.length, 1);
+  assert.ok(gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 200, jaren: 5 }).plan.id !== a.plan.id,
+    'een ander plan werd opgeslokt');
 });
 
 test('vastleggen vraagt een vindbaar stuk, en doet de stichting', () => {

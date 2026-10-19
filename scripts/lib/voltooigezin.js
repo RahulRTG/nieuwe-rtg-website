@@ -59,3 +59,63 @@ async function openStad(w, naam) {
 }
 
 module.exports = { GEZINSWERELD, accountGezin, openStad };
+
+/* Een ACTIEF project in die stad, langs de keten van het kantoor: idee,
+   aanvraag, beoordeling, goedkeuring, actief (kern/rtfos/projecten-besluit.js).
+   VIER OGEN: wie indient, keurt niet zelf goed. Een projectleider op naam (een
+   lid dat de eigenaar als kantoormens uitnodigde, met een zetel in de stad)
+   dient in; het landelijke bestuur keurt goed. */
+async function projectleider(w, stad) {
+  const lid = await nieuwLid(w, 'pl');
+  const me = await w.post('/api/auth/me', {}, lid.token);
+  const u = me.data && me.data.user;
+  const uit = await w.post('/api/office/kantoor/uitnodiging', { codenaam: u && u.codename }, stad.kantoor);
+  if (!uit.data || !uit.data.code) throw new Error('geen kantooruitnodiging (' + uit.status + ')');
+  const k = await w.post('/api/account/koppel', { soort: 'kantoor', uitnodiging: uit.data.code }, lid.token);
+  if (k.status !== 200) throw new Error('de kantoorrol koppelen lukte niet (' + k.status + ')');
+  const s = await w.post('/api/account/start', { rol: 'kantoor' }, lid.token);
+  if (!s.data || !s.data.token) throw new Error('de kantoordeur ging niet open (' + s.status + ')');
+  const z = await w.post('/api/rtfos/zetel', { stad: stad.id, rol: 'projectleider', key: 'user-' + u.id, naam: 'Projectleider' }, stad.kantoor);
+  if (z.status !== 200) throw new Error('de zetel toekennen lukte niet (' + z.status + ': ' + (z.data && z.data.error) + ')');
+  return s.data.token;
+}
+
+async function actiefProject(w, stad, naam, soort) {
+  const P = await projectleider(w, stad);
+  const m = await w.post('/api/rtfos/project/maak', { stad: stad.id, naam, soort: soort || 'jongeren', budget: 0 }, P);
+  const id = m.data && m.data.project && m.data.project.id;
+  if (m.status !== 200 || !id) throw new Error('het project maken lukte niet (' + m.status + ': ' + (m.data && m.data.error) + ')');
+  for (const [st, wie] of [['aanvraag', P], ['beoordeling', P], ['goedgekeurd', stad.kantoor], ['actief', P]]) {
+    const r = await w.post('/api/rtfos/project/status', { id, status: st }, wie);
+    if (r.status !== 200) throw new Error('het project naar ' + st + ' zetten lukte niet (' + r.status + ': ' + (r.data && r.data.error) + ')');
+  }
+  return { id, naam };
+}
+
+module.exports.actiefProject = actiefProject;
+
+/* EEN LES, zoals Leren & Groei hem start (apps/foundation/leren-groei.js): de
+   begeleider maakt hem met /les/maak en krijgt de docentensleutel en de
+   lescode; een leerling doet mee met /les/join op die lescode. Beide sleutels
+   zet het scherm in sessionStorage (rtf_docent, rtf_leerling). */
+async function nieuweLes(w, vak, naam) {
+  const r = await w.post('/api/foundation/les/maak', { vak, naam, idem: 'voltooi-les-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) });
+  if (r.status !== 200 || !r.data || !r.data.token) throw new Error('de les maken lukte niet (' + r.status + ')');
+  return { lesId: r.data.lesId, token: r.data.token, lescode: r.data.lescode };
+}
+async function doeMee(w, lescode, naam) {
+  const r = await w.post('/api/foundation/les/join', { lescode, naam });
+  if (r.status !== 200 || !r.data || !r.data.token) throw new Error('meedoen met de les lukte niet (' + r.status + ')');
+  return { token: r.data.token, studentId: r.data.studentId, lesId: r.data.lesId };
+}
+/* De leesroutes van de les zijn GET met de sleutel als Bearer, zoals get() in
+   bord.html en schrift.html. De wereld kent alleen POST; dit leest zonder dat
+   het antwoord in bewijs 8 meetelt. */
+async function haal(w, pad, tok) {
+  const r = await fetch(w.basis + pad, { headers: tok ? { Authorization: 'Bearer ' + tok } : {} });
+  return { status: r.status, data: await r.json().catch(() => null) };
+}
+
+module.exports.nieuweLes = nieuweLes;
+module.exports.doeMee = doeMee;
+module.exports.haal = haal;

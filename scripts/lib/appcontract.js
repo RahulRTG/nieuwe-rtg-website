@@ -266,6 +266,11 @@ const CONTRACT = {
   'link:spelen': Object.assign({
     belofte: 'een lid nodigt een vriend uit, ze spelen om de beurt tot het potje klaar is, en de uitslag telt alleen voor geverifieerde volwassenen; onder die grens speelt het spel gewoon en wordt er niets bewaard'
   }, voltooi('spelen', 'het scenario loopt /api/member/spel/nieuw, /antwoord, /mijn, /staat, /zet, /uitslagen en /stand, de routes die /apps/spelen.html zelf aanroept, met twee geverifieerde volwassenen, twee leden onder de progressiegrens en een schaakpartij die echt eindigt')),
+  /* De momentproef (ZONDER_APP hieronder) blijft de deelbelofte volgen en gewekt
+     worden; dit scenario is de kernbelofte van RTG Media. */
+  'link:mediaos': Object.assign({
+    belofte: 'een lid ziet de mediawereld met bij elk stuk waarom het er staat, bewaart wat het wil houden, maakt een eigen afspeellijst en deelt die om te lezen met wie het kent; de lezer verandert niets en een vreemde ziet niets'
+  }, voltooi('mediaos', 'het scenario loopt /api/mediaos/wereld, /bewaar, /bieb, /lijsten, /lijst, /lijst/maak, /lijst/stuk, /lijst/zet en /lijst/deel, de routes die /apps/media.html (media/wereld.js, blad.js, lijst.js) zelf aanroept, met twee verbonden leden, een vreemde en een gratis account; de stukken zijn clips van het tweede lid')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

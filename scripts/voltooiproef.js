@@ -97,6 +97,7 @@ const SCENARIOS = {
   'maison.js': require('./lib/voltooi/maison'),
   'mall.js': require('./lib/voltooi/mall'),
   'mecenaat.js': require('./lib/voltooi/mecenaat'),
+  'mediaos.js': require('./lib/voltooi/mediaos'),
   'mijnmall.js': require('./lib/voltooi/mijnmall'),
   'muziek.js': require('./lib/voltooi/muziek'),
   'nalatenschap.js': require('./lib/voltooi/nalatenschap'),

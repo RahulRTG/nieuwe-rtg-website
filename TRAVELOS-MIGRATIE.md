@@ -74,8 +74,8 @@ simulatie als echt toont, is erger dan een lelijk scherm dat de waarheid zegt.
 | # | Batch | Bewijs | Stand |
 |---|---|---|---|
 | 1 | Nulmeting | dit document, par. 1 | **gedaan** |
-| 2 | Schil en Edge: `/ds/shell.js`, `/ds/edge.js` en `/ds/edge-modi.js` vervangen op een gemigreerd scherm `shared/basis.js`, en daarmee ruim 150 kB Edge-CSS | contracttoetsen, en een browsertoets die bewijst dat er geen erfenisblad laadt | **gebouwd**; de browsertoets komt mee met batch 3 |
-| 3 | Eerste ledenroute volledig over, met alle bewijzen uit par. 3 | | open |
+| 2 | Schil en Edge: `/ds/shell.js`, `/ds/edge.js` en `/ds/edge-modi.js`. `shared/basis.js` kent `html[data-ds]`: het gedrag blijft, de oude vormlagen (ruim 150 kB Edge-CSS, Heritage, iOS, thema's) laden niet | contracttoetsen; `contract.json` → `dsPoort`, in de browser bewezen door de toets van batch 3 | **gedaan** |
+| 3 | Eerste ledenroute: `hotels` (Collectie, Detail, Taak, Status) | `test/hotels-ds.e2e.js` (5 toetsen, gevoelig volgens de mutatiemotor): geen erfenisblad actief, ook niet in de stijlbundel; ds-poort klopt; Edge staat; een aanvraag loopt over de echte verblijfskern en blijft "Aangevraagd"; geen overloop op 390/820/1440 en in het Arabisch (rtl). Oude bladen `rtg-verblijven-2026.css` en `-momenten` verwijderd | **gedaan** |
 | 4 | De overige ledenroutes uit 1a, `reizen` als laatste | | open |
 | 5 | De operatie- en kantoorroutes uit 1b | | open |
 | 6 | Oude TravelOS-bladen ontkoppelen en verwijderen; `ONTWERPNORM.json` strakker zetten | | open |
@@ -107,6 +107,16 @@ Een route telt pas als gemigreerd als alle punten hieronder aantoonbaar zijn.
   actieve oproep, de appcarrousel en e-mail opstellen komen pas als ze aan de
   bestaande gesprek- en postlaag zijn gekoppeld. Tot dan bestaan ze niet: een
   knop die niets doet, zetten we niet neer.
+- **Overgangsscripts.** Op een ds-scherm zetten zes gedeelde scripts nog een
+  eigen, afgebakend `<style>`: `basis.js` (toegankelijkheidsprofiel,
+  hulpkaart, springlink), `i18n.js`, `poortgesprek.js`, `cookie.js`,
+  `uitvoer.js` en `sprong.js`. Ze staan in `contract.json` → `overgangsscripts`,
+  met een reden en een vervaldatum (31 januari 2027). Een zevende kan er niet
+  stil bij komen.
+- **Vertaling in de toets.** De toetsserver heeft geen vertaalmodel. In het
+  Arabisch is daar alleen te bewijzen dat `dir="rtl"` staat en dat niets
+  overloopt. De vertaalde tekst zelf komt uit de bestaande vertaalkast
+  (`RTGAutoVertaling`) en wordt hier niet opnieuw bewezen.
 - **De taalkiezer van `i18n.js`** zet nog een eigen `<style>` neer. Dat blok
   is beperkt tot `.rtg-lang-*`, plus één regel voor verminderde beweging. Het
   hoort in batch 6 naar een `.ds-`-component te gaan.

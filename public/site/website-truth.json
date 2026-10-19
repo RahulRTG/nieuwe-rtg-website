@@ -9,7 +9,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "ad80a03b553bb66603c508b6ba4ac03790be6893493b41127ccc8a3569fd13f5",
+  "sourceHash": "61b50a7cf8329545c02dea23d467e34bf852c1ab6585c553261551df7bceeca0",
   "platform": [
     {
       "id": "organisatie",
@@ -25,7 +25,7 @@
         "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
       ],
       "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij.",
-      "sourceHash": "34a5af9c45933b8f5b5433693e481a7269149891468c8f62faff133ef6f01583"
+      "sourceHash": "f5e1211a89d4a691565ebe20e589b61ffda1b703112ae492bb11c34331df22cc"
     },
     {
       "id": "partner",
@@ -40,7 +40,7 @@
         "Stuur uw team aan met rooster en taken"
       ],
       "note": "Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.",
-      "sourceHash": "4eebe1fd1c2f12dc678943c7a69563d8d10c21d8ccb6cdd4244f897b71f54115"
+      "sourceHash": "4606ae89e768572f7c5c43e2ee59a4e3829e46af2b72724514acd20c438bbdeb"
     },
     {
       "id": "gebruiker",

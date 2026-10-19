@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T20:23:45.482Z",
-  "commit": "8f0a10ea7",
+  "op": "2026-10-19T06:16:52.652Z",
+  "commit": "5d57f36c",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -9,9 +9,9 @@
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 670,
+  "zonderBewakerslaag": 661,
   "bewaakt": 568,
-  "openbaarMetReden": 58,
+  "openbaarMetReden": 49,
   "eigenControle": 24,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -3162,18 +3162,6 @@
    "reden": "een fout uit de browser: JUIST zonder poort, want een fout die het inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden (zie server/routes/fout.js voor wat er wel en niet meegaat)"
   },
   {
-   "sleutel": "POST /api/gast/aanschuiven",
-   "bestand": "server/routes/gast/tafel.js:70",
-   "staat": "openbaar",
-   "reden": "aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)"
-  },
-  {
-   "sleutel": "POST /api/gast/tafel",
-   "bestand": "server/routes/gast/tafel.js:45",
-   "staat": "openbaar",
-   "reden": "de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)"
-  },
-  {
    "sleutel": "POST /api/gids/app",
    "bestand": "server/routes/gids.js:8",
    "staat": "openbaar",
@@ -4107,12 +4095,6 @@
    "staat": "eigenControle"
   },
   {
-   "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
-   "staat": "openbaar",
-   "reden": "solliciteren bij een zaak kan zonder account"
-  },
-  {
    "sleutel": "POST /api/supplier/login",
    "bestand": "server/routes/supplier/toegang.js:20",
    "staat": "eigenControle"
@@ -4238,42 +4220,6 @@
    "bestand": "server/routes/auth/webauthn.js:96",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
-  },
-  {
-   "sleutel": "POST /api/werk-gast/beeld",
-   "bestand": "server/bedrijf/praktijk-gast.js:11",
-   "staat": "openbaar",
-   "reden": "Een gast heeft geen RTG-account: een tijdelijk 256-bit geheim toont precies één afspraak; opslag bewaart alleen de hash en iedere lezing controleert intrekking en tenantstatus."
-  },
-  {
-   "sleutel": "POST /api/werk-gast/besluit",
-   "bestand": "server/bedrijf/praktijk-gast.js:16",
-   "staat": "openbaar",
-   "reden": "Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten."
-  },
-  {
-   "sleutel": "POST /api/werk-gast/betaling/start",
-   "bestand": "server/bedrijf/praktijk-betalen-routes.js:9",
-   "staat": "openbaar",
-   "reden": "Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren."
-  },
-  {
-   "sleutel": "POST /api/werk-gast/betaling/status",
-   "bestand": "server/bedrijf/praktijk-betalen-routes.js:24",
-   "staat": "openbaar",
-   "reden": "Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client."
-  },
-  {
-   "sleutel": "POST /api/werk-leverancier/beeld",
-   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:10",
-   "staat": "openbaar",
-   "reden": "Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd."
-  },
-  {
-   "sleutel": "POST /api/werk-leverancier/besluit",
-   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:14",
-   "staat": "openbaar",
-   "reden": "Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang."
   },
   {
    "sleutel": "POST /api/werkmail/bezorg",

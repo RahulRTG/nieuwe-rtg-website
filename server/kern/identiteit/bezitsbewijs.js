@@ -79,8 +79,6 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     for (const [k, t] of Object.entries(kast)) if (Number(t) < nu) delete kast[k];
     if (kast[jti]) return true;
     kast[jti] = nu + SPELING_MS * 2;
-    // Alleen dit register veranderde. Gebruik dezelfde opslagpoort, zonder
-    // bij elk geldig bewijs ook alle andere domeinen te laten serialiseren.
     save(['bezitsbewijzen']);
     return false;
   }

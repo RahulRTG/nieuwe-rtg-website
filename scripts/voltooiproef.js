@@ -80,7 +80,9 @@ const AFGELEID = 'menselijk';
    stil niet mee te tellen. */
 const SCENARIOS = {
   'aankomst.js': require('./lib/voltooi/aankomst'),
+  'appdossier.js': require('./lib/voltooi/appdossier'),
   'attenties.js': require('./lib/voltooi/attenties'),
+  'berichten.js': require('./lib/voltooi/berichten'),
   'bescherming.js': require('./lib/voltooi/bescherming'),
   'bank.js': require('./lib/voltooi/bank'),
   'cellier.js': require('./lib/voltooi/cellier'),

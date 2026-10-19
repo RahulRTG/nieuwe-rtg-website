@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-10-19",
   "gemeten": {
-    "bestanden": 2980,
-    "domeinenTotaal": 739,
+    "bestanden": 2993,
+    "domeinenTotaal": 745,
     "koopbareVormen": 618,
     "koopbareDomeinen": 126,
     "envelopDrempel": 8,
     "envelop": 45,
-    "veldenDomeineigen": 795,
-    "veldenNietEnvelop": 1064,
+    "veldenDomeineigen": 798,
+    "veldenNietEnvelop": 1070,
     "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -17,9 +17,9 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 122,
+    "optellingen": 123,
     "optelDomeinen": 62,
-    "optelCenten": 68,
+    "optelCenten": 69,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 49
@@ -262,7 +262,7 @@
         "toon": "bankbeeld",
         "prijs": "afkoopsom",
         "beschikbaarheid": "capaciteit",
-        "reserveer": "maakBoekhouding",
+        "reserveer": "inhoudVan",
         "bevestig": "afkoopsom",
         "lever": "levering",
         "annuleer": "vervalMs"
@@ -2868,6 +2868,14 @@
       ]
     },
     {
+      "domein": "kern/assets",
+      "plekken": 2,
+      "waar": [
+        "server/kern/assets/aanvraag-betaal.js",
+        "server/kern/assets/aanvraag.js"
+      ]
+    },
+    {
       "domein": "kern/bank",
       "plekken": 2,
       "waar": [
@@ -2961,14 +2969,6 @@
       "waar": [
         "server/kern/thuis/aanbod.js",
         "server/kern/thuis/extra.js"
-      ]
-    },
-    {
-      "domein": "kern/voorspel",
-      "plekken": 2,
-      "waar": [
-        "server/kern/voorspel/index.js",
-        "server/kern/voorspel/rekenen.js"
       ]
     }
   ]

@@ -36,6 +36,9 @@
       <nav class="ds-cover__nav" aria-label="TravelOS">
         <a href="#reizen" data-naar-blad="reizen">Reizen</a><a href="#taxi" data-naar-blad="taxi">Taxi</a><a href="#samen" data-naar-blad="samen">Samen</a><a href="#rahul" data-naar-blad="rahul">Rahul</a>
       </nav>
+      <!-- Het hoofdbeeld is van het lid: een eigen foto met een eigen uitsnede
+           voor desktop en mobiel (reizen-beeld.js, /api/ik/beelden). -->
+      <button class="ds-knop ds-knop--op-beeld ds-knop--klein" type="button" id="beeldWijzig" aria-haspopup="dialog" data-ds-actie="Foto wijzigen"><svg viewBox="0 0 24 24" aria-hidden="true" class="ds-knop__pijl"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Foto wijzigen</button>
     </div>
   </section>
 </div>
@@ -365,6 +368,37 @@
   </form>
 </dialog>
 
+<!-- Uw eigen beelden: kies een eigen foto (of upload er een) en zet de
+     uitsnede voor desktop en voor mobiel. Alleen zichtbaar voor u. -->
+<dialog class="ds-dialoog ds-dialoog--vol" id="beeldDialoog" aria-labelledby="beeldTitel">
+  <div class="ds-detail__inhoud">
+    <div class="ds-schermkop"><h2 class="ds-titel ds-titel--scherm" id="beeldTitel">Uw eigen beelden</h2><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" id="beeldSluit">Sluiten</button></div>
+    <p class="ds-label">Hoofdfoto van TravelOS</p>
+    <div class="ds-handelingen">
+      <button class="ds-knop ds-knop--stil ds-knop--klein" type="button" id="beeldMijn">Mijn foto’s</button>
+      <button class="ds-knop ds-knop--stil ds-knop--klein" type="button" id="beeldStandaard">RTG-beeld</button>
+      <button class="ds-knop ds-knop--stil ds-knop--klein" type="button" id="beeldUploadKnop">Upload foto</button>
+      <input type="file" id="beeldUpload" accept="image/jpeg,image/png,image/webp" hidden>
+    </div>
+    <div class="ds-beeldsnede" id="beeldSnede" data-ds-snede="desktop"><svg class="ds-beeldsnede__vlak" id="beeldVlak" role="img" aria-label="Voorbeeld van uw uitsnede"></svg></div>
+    <p class="ds-meta">Versleep de foto of gebruik de schuifregelaars voor de uitsnede.</p>
+    <div class="ds-veldgroep">
+      <label class="ds-veldlabel">Vergroten<input class="ds-beeldsnede__schuif" id="beeldZoom" type="range" min="1" max="3" step="0.01"></label>
+      <label class="ds-veldlabel">Horizontaal<input class="ds-beeldsnede__schuif" id="beeldX" type="range" min="0" max="100" step="1"></label>
+      <label class="ds-veldlabel">Verticaal<input class="ds-beeldsnede__schuif" id="beeldY" type="range" min="0" max="100" step="1"></label>
+    </div>
+    <div class="ds-chips" role="group" aria-label="Uitsnede voor">
+      <button class="ds-chip" type="button" id="beeldDesktop" aria-pressed="true">Desktop</button>
+      <button class="ds-chip" type="button" id="beeldMobiel" aria-pressed="false">Mobiel</button>
+    </div>
+    <div class="ds-veldgroep" id="beeldGalerij" aria-label="Mijn foto’s"></div>
+    <div><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" id="beeldHerstel">Herstel RTG-beeld</button></div>
+    <p class="ds-meta" id="beeldStatus" role="status" aria-live="polite"></p>
+    <p class="ds-meta">Alleen zichtbaar voor u</p>
+    <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil" type="button" id="beeldAnnuleer">Annuleren</button><button class="ds-knop ds-knop--primair" type="button" id="beeldBewaar">Opslaan</button></div>
+  </div>
+</dialog>
+
 <p class="ds-melding" id="toast" role="status" aria-live="polite"></p>
 
 <script src="/shared/canvas.js"></script>
@@ -394,6 +428,11 @@
 <script src="/apps/reizen-samen-voorstel.js"></script>
 <script src="/apps/reizen-samen-besluit.js"></script>
 <script src="/apps/reizen-context.js"></script>
+<!-- Het eigen hoofdbeeld van de Cover en zijn editor; het uploaden gaat langs
+     dezelfde weg als Bestanden (bestand-upload.js zet geen stijl). -->
+<script src="/shared/bestand-upload.js"></script>
+<script src="/apps/reizen-beeld.js"></script>
+<script src="/apps/reizen-beeld-editor.js"></script>
 <!-- De vijf TravelOS-bladen reizen als capabilities naar de ene balk van de
      werktafel; de uitvoering blijft in reizen-performance.js. -->
 <script src="/shared/adaptief.js" defer></script>

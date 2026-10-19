@@ -168,6 +168,14 @@ const NAGEKEKEN = {
   'POST /api/supplier/training/remove': 'zoekt de tip op titel in de lijst van req.supplier.code; B verwijderde zijn EIGEN tip uit de vorige route, daarna vond de tegenpoging niets (404)',
   'POST /api/supplier/verkoopweg/zet': 'commerce.wegZet(req.supplier.code, ...): de eigen verkoopwegen; soort en toegang zijn catalogus-waarden, verzonnen waarden geven 400',
   'POST /api/supplier/zaak/functie': 'zaakZet(req.supplier, id, aan): de functie-id is een catalogus-id; verzonnen geeft 400',
+  /* WIE A IS, IN B'S ANTWOORD (19 oktober 2026): de 2xx-routes die eerst
+     ongezien `publiek` heetten, worden nu gelezen op A's codenaam, e-mail en
+     merkwoord. Vier treffers, met de hand nagelezen; alle vier een openbare
+     etalage op codenaam, en nergens een sleutel of persoonsgegeven. */
+  'POST /api/member/pulse/bewaard': 'pulseBewaard(req.session.key): B\'s EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin',
+  'POST /api/metier/lid': 'Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C\'s profiel schreef, met A\'s codenaam als schrijver',
+  'POST /api/metier/zoek': 'kern/metier/zoek.js: "wie niets invulde, staat niet in de etalage" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw',
+  'POST /api/residentie/gids': 'de gids toont suites met s.open op codenaam; let wel: een suite ONTSTAAT open (kern/residentie/index.js suiteVan, open: true), dus wie zijn suite opent staat in de gids zonder zelf voor open te kiezen -- een productvraag over de standaard, geen IDOR',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
@@ -177,8 +185,14 @@ const VASTLEGGEN = argv.includes('--vastleggen');
 if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
-  const server = await start({ naam: 'idor', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
-  const { basis, klaar } = server;
+  /* Het kaatsmodel (./lib/kaatsmodel.js) is de lokale modelserver van deze
+     wereld: een AI-route geeft dan terug wat de server in de prompt zette, en een
+     merkwoord van A in B's prompt valt op. Zonder model antwoordden die routes
+     503 en bleef de vraag ongesteld. */
+  const kaats = await require('./lib/kaatsmodel').start();
+  const server = await start({ naam: 'idor', env: Object.assign({ RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }, kaats.omgeving) });
+  const { basis } = server;
+  const klaar = () => { kaats.stop(); server.klaar(); };
 
   const kaal = async (pad, lijf, tok, koppen) => {
     try {
@@ -458,7 +472,28 @@ if (require.main !== module) { module.exports = {}; return; }
       const velden = [...new Set([...verrijkt.velden, ...Object.keys(eigen)])];
       if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
       const u = await roepB(r.pad, lijf);
+      if (spoor(r.pad)) console.error('SPOOR2B', r.pad, u.status, String(u.tekst).slice(0, 200));
       const o = oordeelIdor(u.status, u.tekst);
+      /* WIE A IS, IN B'S ANTWOORD. Een 2xx voor B die ook met een verzonnen id
+         2xx blijft, heette publiek -- zonder dat iemand in het antwoord keek.
+         Draagt B's antwoord A's codenaam, e-mail of merkwoord, dan kreeg B iets
+         van A, welke statuscode de tegenpoging ook geeft. (Gemeten toen het
+         kaatsmodel meedraaide: een AI-route die A's profiel in B's prompt zet,
+         zou anders als "publiek" door de meting gaan.) */
+      const zagA = (wie() || []).filter((w) => typeof w === 'string' && w.length >= 6 && !controle.has(w) &&
+        !String(JSON.stringify(lijf)).includes(w) && String(u.tekst || '').includes(JSON.stringify(w).slice(1, -1)));
+      if (o.staat === 'doorbraak' && zagA.length) {
+        if (NAGEKEKEN[sleutel]) {
+          telling.nagekeken++;
+          perRoute[sleutel] = { status: u.status, staat: 'nagekeken', velden, gezien: zagA.slice(0, 3),
+            reden: 'B zag wie A is; met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
+          continue;
+        }
+        perRoute[sleutel] = { status: u.status, staat: 'doorbraak', velden, gezien: zagA.slice(0, 3),
+          reden: 'B kreeg ' + u.status + ' en zijn antwoord draagt wie A is (' + zagA.length + ' merkteken(s)): NAKIJKEN' };
+        telling.doorbraak++;
+        continue;
+      }
       if (o.staat === 'doorbraak') {
         const nep = { ...lijf };
         for (const v of velden) nep[v] = verzonnen();
@@ -551,7 +586,10 @@ if (require.main !== module) { module.exports = {}; return; }
 
   /* GANG 2 EN 4: de leden. */
   const { perRoute, telling, afbakening } = await kruis({ routes, pool, basis: basisLijf,
-    eigenVan: (pad) => opbouwLib.vanA(pad, ctx), vanA, controle, wie: () => identiteit[1],
+    /* Wie A IS: codenaam, e-mail, en A's merkwoord. Dat laatste staat alleen in
+       wat A zelf maakte; een antwoord voor B dat het draagt, ergens in een lange
+       tekst (een AI-prompt, een chatgeschiedenis), toont iets van A. */
+    eigenVan: (pad) => opbouwLib.vanA(pad, ctx), vanA, controle, wie: () => [...(identiteit[1] || []), ctx.merk],
     roepA: (pad, lijf) => roep(pad, lijf, 1, A), roepB: (pad, lijf) => roep(pad, lijf, 2, B),
     tegenB: (pad, lijf) => post(pad, lijf, B) });
 
@@ -826,7 +864,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
+      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute,

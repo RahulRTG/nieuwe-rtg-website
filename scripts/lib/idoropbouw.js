@@ -284,7 +284,7 @@ function stappen() {
     { pad: '/api/code/dyn', lijf: { soort: 'zegel', code: 'proefzegel1', ttlMs: 300000 },
       bewaar: (d, c) => { c.codeToken = zoek(d, { sleutel: 'token' }); } },
     /* Metier: een eigen profiel, en aanbevelingen over en weer met C */
-    { pad: '/api/metier/kaart', lijf: { kop: 'Sommelier', over: 'Twintig jaar wijn', plaats: 'Amsterdam' } },
+    { pad: '/api/metier/kaart', lijf: (c) => ({ kop: 'Sommelier', over: 'Twintig jaar wijn ' + c.merk, plaats: 'Amsterdam' }) },
     { pad: '/api/metier/rol', lijf: { wat: 'Barman', waar: 'Cafe Proef' }, bewaar: (d, c) => { c.rol = d.rol && d.rol.id; } },
     { pad: '/api/metier/lijst', lijf: { veld: 'vaardigheden', waarden: ['sommelier'] } },
     { als: 'tegen', pad: '/api/metier/lijst', lijf: { veld: 'vaardigheden', waarden: ['sommelier'] } },
@@ -292,6 +292,9 @@ function stappen() {
       bewaar: (d, c) => { c.aanbeveling = d.aanbeveling && d.aanbeveling.id; } },
     { als: 'tegen', pad: '/api/metier/beveel-aan', lijf: (c) => ({ wie: c.ik.codenaam, tekst: 'Een uitstekende collega, altijd paraat.' }),
       bewaar: (d, c) => { c.aanbevelingOpA = d.aanbeveling && d.aanbeveling.id; } },
+    { pad: '/api/metier/naam-vrij', lijf: { code: 'KIKUNOI', waarvoor: 'sollicitatie' } },
+    /* Een vraag aan Rahul met A's merkwoord: de chatgeschiedenis is van A */
+    { pad: '/api/chat/send', lijf: (c) => ({ text: 'Vraag ' + c.merk, lang: 'nl' }) },
     /* Het loopbaanledger: een feit en een deelcode */
     { pad: '/api/carriere/ledger/zet', lijf: () => ({ kapitaal: 'vermogen', wat: 'Diploma sommelier gehaald', op: vandaag() }),
       bewaar: (d, c) => { c.feit = d.regel && d.regel.id; } },

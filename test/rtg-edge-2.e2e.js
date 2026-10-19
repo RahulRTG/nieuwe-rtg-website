@@ -35,7 +35,10 @@ const ROUTES = [
     ]
   },
   {
-    naam: 'TravelOS Vandaag', pad: '/apps/reizen.html', wereld: 'travel',
+    /* TravelOS staat op het RTG Design System (TRAVELOS-MIGRATIE.md): daar is
+       de ds-Edge de ene rand en bestaat Edge 2 niet. De rij blijft staan en
+       wordt met hetzelfde contract op de ds-vorm gekeurd (controleerDsRoute). */
+    naam: 'TravelOS Vandaag', pad: '/apps/reizen.html', wereld: 'travel', ds: true,
     context: ['travel-header', 'hoofdtabs'],
     oud: [
       '.reisapp > .prestatiekop', '.reisapp > .hoofdtabs', '.tos-topbar', '.tos-nav',
@@ -355,7 +358,36 @@ async function controleerV4Route(page, route, scherm) {
     document.querySelector('.rtg-adaptive-sheet').hidden);
 }
 
+/* Een ds-route: precies een Edge (de ds-Edge), geen Edge-chrome van de oude
+   generaties, geen oude schermbalk zichtbaar, de eigen tabs in de inhoud, en
+   Escape brengt een andere Edge-modus terug naar de navigatie. */
+async function controleerDsRoute(page, route, scherm) {
+  await page.setViewportSize(scherm.maat);
+  await page.goto(route.basis + route.pad, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]', { timeout: 15000 });
+  const label = route.naam + ' · ' + scherm.naam;
+  const m = await page.evaluate((r) => {
+    const zichtbaar = (el) => { if (!el) return false; const st = getComputedStyle(el), b = el.getBoundingClientRect();
+      return st.display !== 'none' && st.visibility !== 'hidden' && b.width > 0 && b.height > 0 && b.top < innerHeight && b.bottom > 0; };
+    return { edges: [...document.querySelectorAll('.ds-edge')].filter(zichtbaar).length,
+      oudeChrome: document.querySelectorAll('.rtg-edge-chrome,.rtg-adaptive-bar,.rtg-edge-top,.rtg-edge-side').length,
+      oudZichtbaar: r.oud.filter((sel) => [...document.querySelectorAll(sel)].some(zichtbaar)),
+      wereld: document.body.getAttribute('data-rtg-world'), tabs: document.querySelectorAll('#inhoud [data-tab]').length };
+  }, route);
+  assert.equal(m.edges, 1, label + ': er hoort precies één zichtbare Edge te zijn');
+  assert.equal(m.oudeChrome, 0, label + ': een oude Edge-generatie staat naast de ds-Edge');
+  assert.deepEqual(m.oudZichtbaar, [], label + ': zichtbare oude chrome');
+  assert.equal(m.wereld, route.wereld, label + ': verkeerde wereld');
+  assert.equal(m.tabs, 5, label + ': de lokale bediening (vijf bladen) staat niet meer in de inhoud');
+  await page.locator('[data-ds-edge="rahul"]').click();
+  assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'rahul');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'navigatie', label + ': Escape herstelt de navigatie');
+  return { omgeleid: null };
+}
+
 async function controleerRoute(page, route, scherm) {
+  if (route.ds) return controleerDsRoute(page, route, scherm);
   await page.setViewportSize(scherm.maat);
   await page.goto(route.basis + route.pad, { waitUntil: 'domcontentloaded' });
   const geland = new URL(await page.url());
@@ -536,6 +568,17 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
                   frame.contentDocument.readyState === 'complete' && frame.contentDocument.body;
               } catch (e) { return false; }
             }, route.pad, { timeout: 15000 });
+            if (route.ds) {
+              /* Ook een ds-scherm brengt in een kader geen tweede Edge mee. */
+              const k = await page.evaluate(() => {
+                const f = document.getElementById('rtg-edge-2-proefframe'), d = f.contentDocument, w = f.contentWindow;
+                const zichtbaar = (el) => !!(el && w.getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+                return { edges: [...d.querySelectorAll('.ds-edge')].filter(zichtbaar).length, oud: d.querySelectorAll('.rtg-edge-chrome').length,
+                  buitensteRoots: document.querySelectorAll('.rtg-edge-chrome').length };
+              });
+              assert.deepEqual(k, { edges: 0, oud: 0, buitensteRoots: 1 }, route.naam + ': iframe bouwt een geneste Edge');
+              return;
+            }
             const m = await page.evaluate(ingebeddeToestand, route);
             const verwachtPad = new URL(base + route.pad).pathname;
             if (m.pad !== verwachtPad) {

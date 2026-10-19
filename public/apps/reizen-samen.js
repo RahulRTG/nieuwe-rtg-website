@@ -33,7 +33,7 @@
     var t = new Date(String(iso || ''));
     return isNaN(t.getTime()) ? '' : t.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
   }
-  function leeg(vak, tekst) { vak.textContent = ''; vak.appendChild(maak('p', 'leegtekst', tekst)); }
+  function leeg(vak, tekst) { vak.textContent = ''; vak.appendChild(maak('p', 'ds-meta', tekst)); }
 
   /* WELKE REIS. Het gezelschap hoort bij één reis, dus als er meer reizen zijn
      moet de lezer kiezen -- en dat is een keuze en geen aanname.
@@ -46,11 +46,11 @@
     vak.textContent = '';
     if (!reizen.length) { leeg(vak, 'U heeft nog geen reis, en u bent nog nergens bij uitgenodigd.'); return; }
     reizen.forEach(function (reis) {
-      var knop = maak('button', 'reiskeuze' + (reis.id === huidig ? ' actief' : ''));
+      var knop = maak('button', 'ds-chip');
       knop.type = 'button';
-      knop.appendChild(maak('b', '', reis.bestemming));
-      knop.appendChild(maak('small', '', (reis.venster.van + ' t/m ' + reis.venster.tot)
-        + (reis.van ? ' · reis van ' + reis.van : '')));
+      knop.setAttribute('aria-pressed', String(reis.id === huidig));
+      knop.textContent = reis.bestemming + ' · ' + reis.venster.van + ' t/m ' + reis.venster.tot
+        + (reis.van ? ' · reis van ' + reis.van : '');
       knop.addEventListener('click', function () { huidig = reis.id; laad(); });
       vak.appendChild(knop);
     });

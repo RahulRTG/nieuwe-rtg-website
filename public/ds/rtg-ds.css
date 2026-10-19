@@ -33,6 +33,8 @@
 @import url("componenten/lezer.css");
 @import url("componenten/canvaslaag.css");
 @import url("componenten/handelingen.css");
+@import url("componenten/rooster.css");
+@import url("componenten/sectie.css");
 @import url("schermen/cover.css");
 @import url("schermen/collectie.css");
 @import url("schermen/taak.css");

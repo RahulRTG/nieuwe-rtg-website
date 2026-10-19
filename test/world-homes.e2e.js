@@ -20,9 +20,14 @@ async function context(token, family) {
     if (family) localStorage.setItem('rtf_sessie', JSON.stringify(family));
   }, { token, family }); return ctx;
 }
+/* TravelOS staat op het RTG Design System: geen oude desktopschil of
+   Adaptive Edge, maar een Cover en de ene ds-Edge. Elke eis hieronder krijgt
+   voor zo'n wereld haar ds-tegenhanger, en blijft voor de andere gelijk. */
+const isDs = (page) => page.locator('html[data-ds]').count().then(n => n > 0);
 async function open(page, route) {
   await page.goto(srv.base + route, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk');
+  if (await isDs(page)) return;
   await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
   if (await page.locator('.wp-domain:not([open])>summary:visible').count()) await page.locator('.wp-domain>summary').click();
   await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-world-start') || document.body.dataset.rtgWorldStart === 'ready');
@@ -47,8 +52,10 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
       await page.setViewportSize({ width, height: 900 });
       for (const route of routes) {
         await open(page, route);
-        await page.waitForFunction(() => [...document.querySelectorAll('.wh-photo>img,.wp-photo>img')].filter(e => e.checkVisibility()).some(e => e.complete && e.naturalWidth));
-        assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
+        const ds = await isDs(page);
+        await page.waitForFunction(() => [...document.querySelectorAll('.wh-photo>img,.wp-photo>img,.ds-cover__beeld')].filter(e => e.checkVisibility()).some(e => e.complete && e.naturalWidth));
+        assert.equal(await page.locator(ds ? '.ds-edge' : '.rtg-adaptive-bar').count(), 1);
+        if (ds) assert.equal(await page.locator('.rtg-adaptive-bar').count(), 0, route + ': no second, legacy Edge');
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route + ' at ' + width);
         if (width === 390) {
           await page.evaluate(() => window.RTGi18n.set('ar'));
@@ -58,9 +65,10 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
         }
         /* Sinds #534 is de cinematic scene ook de mobiele kop (besluit van de eigenaar,
            11 oktober 2026); de oude fotokop wijkt daar, zodat er een kop overblijft. */
-        const heading = page.locator('.wp-heading h2:visible').first();
+        const heading = page.locator(ds ? '.ds-cover__wereld' : '.wp-heading h2:visible').first();
         assert.match(await heading.evaluate(e => getComputedStyle(e).fontFamily), /Bodoni/);
-        if (width < 1000) {
+        if (ds) assert.equal(await page.locator('h1:visible').count(), 1, 'one Cover, no second hero: ' + route + ' @' + width);
+        else if (width < 1000) {
           assert.equal(await page.locator('.wp-scene:visible').count(), 1, 'mobile leads with the one shared cinematic scene: ' + route + ' @' + width);
           assert.equal(await page.locator('.wh-photo:has(h1) :is(h1,img):visible').count(), 0, 'and not with a second hero underneath it: ' + route + ' @' + width);
         }
@@ -127,7 +135,7 @@ test('a confirmed journey reaches the new hero and language changes preserve imp
     await open(page, routes[0]);
     await page.waitForSelector('#worldTravelDetail:not([hidden])');
     assert.match(await page.locator('#worldTravelDetail').innerText(), /Dubai/);
-    await page.locator('#worldTravelImport>summary').click();
+    /* De invoerbalie staat op het Design System open onder de bladen. */
     await page.fill('#invTekst', 'Mijn eigen bevestiging');
     await page.evaluate(() => window.RTGi18n.set('en'));
     assert.equal(await page.locator('#invTekst').inputValue(), 'Mijn eigen bevestiging');

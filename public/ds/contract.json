@@ -40,7 +40,9 @@
     "meter",
     "lezer",
     "canvaslaag",
-    "handelingen"
+    "handelingen",
+    "rooster",
+    "sectie"
   ],
   "themabaar": [
     "--ds-grond",
@@ -164,6 +166,7 @@
     "public/apps/ovdienst.html": "test/ovdienst-ds.e2e.js",
     "public/apps/ovroutes.html": "test/ovroutes-ds.e2e.js",
     "public/apps/ovcontrol.html": "test/ovcontrol-ds.e2e.js",
+    "public/apps/reizen.html": "test/reizen-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

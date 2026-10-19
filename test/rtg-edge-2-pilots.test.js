@@ -26,7 +26,6 @@ const FOUNDATION = lees('public/apps/foundation/os-publiek.html');
 const PAGINAS = [
   { bestand: 'public/apps/rtg.html', context: 'living-bank,living-top', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/kantoor.html', context: 'wereldtabs,wereldapps', stand: 'overview', auto: 'true' },
-  { bestand: 'public/apps/reizen.html', context: 'travel-header,hoofdtabs', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/foundation/os-publiek.html', context: 'wereldtabs,wereldapps', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/agenda.html', context: 'native-header,duimbalk', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/reisboek.html', context: 'native-header', stand: 'overview', auto: 'true' },
@@ -45,7 +44,7 @@ function bodyVan(html) {
   return match[0];
 }
 
-test('acht pilots gebruiken zeven route-entrypagina\'s met de gesloten contextmatrix', () => {
+test('acht pilots gebruiken hun route-entrypagina\'s met de gesloten contextmatrix', () => {
   assert.equal(ROUTES.length, 8);
   for (const pagina of PAGINAS) {
     const html = lees(pagina.bestand);
@@ -67,16 +66,28 @@ test('acht pilots gebruiken zeven route-entrypagina\'s met de gesloten contextma
     assert.doesNotMatch(html, /rtg-edge-2-(?:loader|context)\.js|rtg-edge-2\.js|rtg-edge-2\.css/,
       pagina.bestand + ' mag de centrale Edge2-loader niet dupliceren');
   }
+  /* TravelOS staat sinds de migratie op het RTG Design System (TRAVELOS-
+     MIGRATIE.md). Daar is /ds/shell.js de ene Edge-ingang; de oude randen.js
+     en de Edge2-loader horen er dan juist NIET te staan, anders tekent het
+     scherm twee randen over elkaar. */
+  const reizen = lees('public/apps/reizen.html');
+  assert.equal((reizen.match(/\/ds\/shell\.js/g) || []).length, 1, 'reizen houdt één Edge-ingang: /ds/shell.js');
+  assert.doesNotMatch(reizen, /shared\/randen\.js|rtg-edge-2-(?:loader|context)\.js|rtg-edge-2\.js|rtg-edge-2\.css/,
+    'reizen laadt naast de ds-Edge geen tweede Edge');
 });
 
 test('vier homes zijn native dashboards; drie subroutes houden alleen hun wereldpalet', () => {
   for (const [bestand, wereld] of [
     ['public/apps/rtg.html', 'living'], ['public/apps/kantoor.html', 'work'],
-    ['public/apps/reizen.html', 'travel'], ['public/apps/foundation/os-publiek.html', 'foundation']
+    ['public/apps/foundation/os-publiek.html', 'foundation']
   ]) {
     assert.match(bodyVan(lees(bestand)),
       new RegExp('data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
   }
+  /* Het huis van TravelOS is sinds de migratie een Cover op het Design System:
+     de wereld draagt zijn eigen beeld en wereldnaam, niet de dashboardlaag. */
+  assert.match(bodyVan(lees('public/apps/reizen.html')), /class="ds-scherm" data-rtg-world="travel"[^>]*data-ds-schermtype="cover"/);
+  assert.match(lees('public/apps/reizen.html'), /class="ds-cover"[\s\S]*travel-heritage-v2\.jpg[\s\S]*ds-cover__wereld[^>]*>TravelOS</);
   assert.match(bodyVan(lees('public/apps/agenda.html')),
     /data-rtg-world="living"[^>]*data-rtg-daily="agenda"[^>]*data-rtg-editorial-room="agenda"/);
   /* Reisboek staat op het Design System: zijn palet is het TravelOS-thema. */

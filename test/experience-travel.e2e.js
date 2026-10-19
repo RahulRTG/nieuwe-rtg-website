@@ -14,39 +14,21 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
   const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block',reducedMotion:'reduce'});
   await ctx.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');},token);
   const page=await ctx.newPage(),errors=[];page.setDefaultTimeout(15000);h.letOpFouten(page,errors);
-  await page.goto(srv.base+'/apps/reizen.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
-  const edgeBar=page.locator('.rtg-adaptive-bar:visible');
-  const edgeMenu=page.locator('.rtg-adaptive-bar:visible [data-rtg-adaptive-action="menu"]:visible');
-  await page.waitForFunction(()=>document.body.dataset.rtgAdaptiveReady==='true');
-  /* Op een zwaar belaste WebKit-run kan Quiet Presence al actief zijn tegen
-     de tijd dat de route klaar is. Aanwijzen wekt dezelfde Edge zoals een
-     echte pointer dat doet en voorkomt een klik op een intussen verborgen vak. */
-  await edgeBar.hover();
-  await edgeMenu.waitFor({state:'visible',timeout:h.geduld(15000)});
-  let app;
-  if(width<1000){
-   await edgeMenu.click({timeout:h.geduld(15000)});
-   await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
-   await page.locator('[data-edge-smart-search]').click();
-   await page.locator('.rtg-edge-find input:visible').fill('reisbureau');
-   await page.locator('.rtg-edge-group a[href="/apps/reisbureau.html"]:visible').click();
-   await page.waitForURL('**/apps/werkruimte.html?gebied=reizen&open=reisbureau');
-   app=await (await page.waitForSelector('iframe[src*="/apps/reisbureau.html"]:visible')).contentFrame();
-   await app.waitForSelector('html[data-ds] #lijst [data-id]'); // reisbureau staat op het Design System (TRAVELOS-MIGRATIE.md)
-   assert.equal(await page.locator('.rtg-adaptive-bar').count(),1,'één Edge rondom de geopende reisapp');
-  }else{
-   /* Desktop gebruikt dezelfde zichtbare Edge-route als telefoon. De oude
-      bibliotheek blijft alleen als functionele bron bestaan en mag niet weer
-      een tweede navigatiepaneel in de definitieve schil worden. */
-   await edgeMenu.click({timeout:h.geduld(15000)});
-   await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
-   await page.locator('[data-edge-smart-search]').click();
-   await page.locator('.rtg-edge-find input:visible').fill('reisbureau');
-   await page.locator('.rtg-edge-group a[href="/apps/reisbureau.html"]:visible').click();
-   await page.waitForURL('**/apps/werkruimte.html?gebied=reizen&open=reisbureau');
-   app=await (await page.waitForSelector('iframe[src*="/apps/reisbureau.html"]:visible')).contentFrame();
-   await app.waitForSelector('html[data-ds] #lijst [data-id]'); // reisbureau staat op het Design System (TRAVELOS-MIGRATIE.md)
-  }
+  /* TravelOS staat op het RTG Design System (TRAVELOS-MIGRATIE.md): de ingang
+     naar het reisbureau is de beeldkaart Reisinspiratie in de Collectie van
+     het huis, op telefoon en desktop dezelfde weg. Er is precies een Edge, die
+     van het scherm zelf; de reisapp opent in hetzelfde venster. */
+  await page.goto(srv.base+'/apps/reizen.html',{waitUntil:'domcontentloaded'});
+  await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+  assert.equal(await page.locator('.ds-edge').count(),1,'één Edge rondom TravelOS');
+  await page.locator('.ds-kaart--beeld[href="/apps/reisbureau.html"]').click();
+  await page.waitForURL('**/apps/reisbureau.html');
+  const app=page.mainFrame();
+  /* Ook het reisbureau staat op het Design System; zijn Edge ligt op 390 px
+     als vaste balk onderin, dus deze toets bedient de onderste knoppen met het
+     toetsenbord, een even echte weg. */
+  const druk=async sel=>{await app.locator(sel).focus();await app.locator(sel).press('Enter');};
+  await app.waitForSelector('html[data-ds] #lijst [data-id]');
   await app.locator('#lijst [data-id="ibiza-jetset"]').click();
   const date=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   await app.locator('#rDatum').fill(date);await app.locator('#rPlus').click();
@@ -67,18 +49,19 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
   assert.equal(await app.locator('#rBoek').isDisabled(),true);assert.equal(await app.locator('#rDatum').inputValue(),date);
   // Een mislukte broncontrole blijft onzeker en veroorzaakt geen tweede mutatie.
   await page.route('**/api/reisbureau/mijn',route=>route.abort('failed'));
-  await app.locator('#rCheck').click();await app.waitForFunction(()=>document.querySelector('#rStatus').textContent.includes('Controleren lukt nu niet'));
+  await druk('#rCheck');await app.waitForFunction(()=>document.querySelector('#rStatus').textContent.includes('Controleren lukt nu niet'));
   assert.equal(sends,1);await page.unroute('**/api/reisbureau/mijn');
-  await app.locator('#rCheck').click();await app.waitForSelector('#rTrips:not([hidden])');
+  await druk('#rCheck');await app.waitForSelector('#rTrips:not([hidden])');
   assert.match(await app.locator('#rStatus').textContent(),/nog niet bevestigd/);
   const rows=(await api('/api/reisbureau/mijn',{},token)).aanvragen;assert.equal(rows.length,1);const ref=rows[0].ref;
   assert.equal(rows[0].personen,3);assert.equal(rows[0].vertrek,date);
   await app.waitForSelector('[data-aanvraag="'+ref+'"]',{state:'attached'});
   assert.equal(await app.evaluate(()=>JSON.parse(sessionStorage.getItem('rtg.intent.v1')).rows.filter(r=>r.purpose==='travel'&&r.status==='ACTIVE').length),0);
   await api('/api/office/reisbureau/besluit',{ref,besluit:'bevestigd',bericht:'Uw vertrek is bevestigd.'},office);
-  await app.locator('#rTrips').click();
+  await druk('#rTrips');
   await app.waitForURL('**/apps/reizen.html#reizen',{waitUntil:'domcontentloaded'});
-  await app.waitForSelector('body[data-rtg-world-start="ready"]');
+  await app.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+  await app.waitForFunction(()=>!document.querySelector('[data-blad="reizen"]').hidden,null);
   try { await app.waitForFunction(ref=>{const el=document.querySelector('#komend');return el&&el.innerText.includes(ref)&&el.innerText.toLowerCase().includes('bevestigd');},ref); }
   catch(e) { await page.screenshot({path:path.join(out,'travel-overview-error-'+width+'.png')}); console.log('Reisoverzicht',ref,await app.locator('#komend').innerText(),await app.locator('#komend').textContent()); throw e; }
   assert.match(await app.locator('#komend').innerText(),/Ibiza/);

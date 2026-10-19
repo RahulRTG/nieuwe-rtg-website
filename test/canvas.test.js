@@ -44,6 +44,16 @@ const WERELDEN = [
 ];
 // de drie die het Canvas al DRAGEN; de andere vijf laden alleen de vorm
 const DRAGERS = ['public/apps/kantoor.html', 'public/apps/reizen.html', 'public/apps/sociaal.html'];
+/* Een scherm op het RTG Design System (het laadt /ds/shell.js) draagt zijn
+   schermlogica in eigen scripts onder /apps/ en niet inline. Gemeten wordt dan
+   de HTML plus die eigen scripts: dezelfde regels, op de plek waar ze staan. */
+const dsScherm = (html) => /\/ds\/shell\.js/.test(html);
+function schermBron(p) {
+  const html = lees(p);
+  if (!dsScherm(html)) return html;
+  const eigen = [...html.matchAll(/<script src="(\/apps\/[^"]+\.js)"/g)].map((m) => lees('public' + m[1]));
+  return [html].concat(eigen).join('\n');
+}
 
 /* --------------------------------------------------------------------------
    Een minimale DOM, zodat shared/canvas.js hier ECHT draait.
@@ -274,14 +284,19 @@ test('6. elke klasse die canvas.js tekent, bestaat in canvas.css', () => {
 test('7. de acht domeinschermen dragen dezelfde opbouw: allemaal canvas.css', () => {
   /* CANVAS.md: "Een eigen variant bedenken is de duurste manier om het geheel
      goedkoop te laten voelen." */
+  /* Een scherm op het RTG Design System laadt geen erfenisblad meer; daar is
+     /ds/rtg-ds.css de ene gedeelde opbouw (ONTWERPSYSTEEM.md par. 5), en het
+     Canvas-gedrag wordt hieronder in toets 8 op zijn eigen scripts gemeten. */
   for (const p of WERELDEN) {
-    assert.match(lees(p), /\/shared\/canvas\.css/, p + ' hoort het Canvas-blad te laden');
+    const html = lees(p);
+    if (dsScherm(html)) assert.match(html, /\/ds\/rtg-ds\.css/, p + ' hoort het Design System te laden');
+    else assert.match(html, /\/shared\/canvas\.css/, p + ' hoort het Canvas-blad te laden');
   }
 });
 
 test('8. wie het Canvas TEKENT, laadt de motor -- en niet uitgesteld', () => {
   for (const p of DRAGERS) {
-    const html = lees(p);
+    const html = schermBron(p);
     assert.match(html, /<script src="\/shared\/canvas\.js"><\/script>/,
       p + ' roept RTGCanvas aan; dan hoort canvas.js er te staan');
     /* En het taalblad, NA het tekenblad. Zonder canvas-taal.js bestaat
@@ -295,7 +310,14 @@ test('8. wie het Canvas TEKENT, laadt de motor -- en niet uitgesteld', () => {
        gedefinieerd en breekt het hele blok. */
     assert.ok(!/canvas\.js"\s+defer/.test(html), p + ' laadt canvas.js uitgesteld; ' +
       'dan bestaat RTGCanvas nog niet als het scherm zijn stand tekent');
-    assert.match(html, /RTGCanvas\.stand\(/, p + ' hoort met laag 0 te openen');
+    /* Een ds-scherm tekent laag 0 en 3 in ds-vorm (canvas.js kent alleen
+       .cv-klassen) maar neemt de zin over uit de gedeelde laag, en houdt de
+       regel dat er zonder meting Onbekend staat en geen cijfers. */
+    if (dsScherm(lees(p))) {
+      assert.match(html, /RTGCanvas\.zin\(/, p + ' hoort de zin van de stand uit canvas-taal.js te halen');
+      assert.match(html, /'canvas\.onbekend', 'Onbekend'/, p + ' hoort zonder meting Onbekend te zeggen');
+      assert.match(html, /var cijfers = s \?/, p + ' hoort zonder meting geen cijfers te tonen');
+    } else assert.match(html, /RTGCanvas\.stand\(/, p + ' hoort met laag 0 te openen');
     assert.match(html, /tekenStand\(\{\}\)/, p + ' hoort de stand al te tekenen VOOR het antwoord ' +
       'binnen is; een leeg gat waar het oordeel hoort te staan leest als "niets aan de hand"');
 
@@ -304,11 +326,12 @@ test('8. wie het Canvas TEKENT, laadt de motor -- en niet uitgesteld', () => {
        precies de "eigen variant" waar CANVAS.md voor waarschuwt. */
     assert.match(html, /id="vandaagVak" hidden/, p + ' mist de tijdlijn van vandaag (laag 3), ' +
       'of laat hem niet leeg beginnen');
-    assert.match(html, /RTGCanvas\.lijn\(/, p + ' vult zijn tijdlijn niet met het Canvas');
+    if (dsScherm(lees(p))) assert.match(html, /function lijn\(punten\)[\s\S]*p\.uur \|\| '-'/, p + ' tekent zijn tijdlijn niet, of verzint een uur');
+    else assert.match(html, /RTGCanvas\.lijn\(/, p + ' vult zijn tijdlijn niet met het Canvas');
     /* En de andere helft van dezelfde regel: wat op de lijn staat, hoort NIET
        ook in het register. Zonder deze filter staat hetzelfde overleg twee keer
        op een scherm dat zijn bestaan aan weglaten ontleent. */
-    assert.match(html, /filter\(x => !opDeKlok\(x\)\)/,
+    assert.match(html, /filter\((?:x => |function \(x\) \{ return )!opDeKlok\(x\)/,
       p + ' laat het register ook tonen wat al op de tijdlijn staat');
   }
 });

@@ -24,7 +24,11 @@ test('de volledige Edge blijft in rust bedienbaar, focusveilig en vastgezet',
     }));
     await context.addInitScript(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
     const page = await context.newPage();
-    await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    /* Dit bewijs gaat over de bestaande Adaptive Edge. TravelOS draagt die
+       sinds zijn migratie niet meer (hij staat op het RTG Design System, zie de
+       toets hieronder); de proef draait daarom op een wereldhuis dat de
+       Adaptive Edge nog wel draagt. */
+    await page.goto(srv.base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await gereed(page);
     await page.clock.install();
     await page.evaluate(() => RTGAdaptiveEdge.setState('dock'));
@@ -115,6 +119,55 @@ test('de volledige Edge blijft in rust bedienbaar, focusveilig en vastgezet',
     await page.goForward({ waitUntil: 'domcontentloaded' });
     assert.equal(new URL(page.url()).pathname, '/apps/reisboek.html');
     await eenDsEdge(); // vooruit-herstel tekent precies één Edge
+  } finally {
+    if (browser) await browser.close();
+    await stop(srv.child);
+  }
+});
+
+/* Hetzelfde bewijs op TravelOS, nu op het RTG Design System: de ds-Edge kent
+   geen verkleinstanden en blijft in rust volledig staan, met vijf bereikbare
+   doelen van minstens 44 px, ook als een veld of Rahul de focus heeft, en na
+   routeherstel staat er precies een Edge. */
+test('de ds-Edge op TravelOS blijft in rust bedienbaar en wordt bij herstel een keer getekend',
+  { skip: geenBrowser(pw) }, async () => {
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  const dsGereed = (page) => page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+    await context.addInitScript(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
+    const page = await context.newPage();
+    await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    await dsGereed(page);
+    await page.clock.install();
+    const maat = () => page.locator('.ds-edge__balk').evaluate(node => {
+      const r = node.getBoundingClientRect();
+      const doelen = [].map.call(node.children, b => { const x = b.getBoundingClientRect(); return { width: x.width, height: x.height }; });
+      return { width: r.width, height: r.height, zichtbaar: r.bottom <= innerHeight && r.height > 0, doelen };
+    });
+    await page.mouse.move(10, 10);
+    await page.clock.runFor(7200);
+    let m = await maat();
+    assert.ok(m.zichtbaar && m.width > 300 && m.height >= 63.5, 'stilte verbergt geen primaire navigatie: ' + JSON.stringify(m));
+    assert.equal(m.doelen.length, 5, 'de Edge houdt alle vijf functies zichtbaar');
+    m.doelen.forEach(d => assert.ok(d.width >= 44 && d.height >= 44, JSON.stringify(m)));
+    await page.locator('#rahulSnel').focus();
+    await page.clock.runFor(7200);
+    assert.ok((await maat()).zichtbaar, 'een actieve invoer verkleint de Edge niet');
+    await page.locator('[data-ds-edge="rahul"]').click();
+    assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'rahul');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'navigatie', 'Escape brengt de navigatie terug');
+
+    await page.goto(srv.base + '/apps/reisboek.html', { waitUntil: 'domcontentloaded' });
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+    await dsGereed(page);
+    assert.equal(await page.locator('.ds-edge').count(), 1, 'routeherstel tekent precies één Edge');
+    assert.equal(await page.locator('.ds-edge__balk a[href="/apps/app.html"]').count(), 1, 'Home blijft bereikbaar');
+    await page.goForward({ waitUntil: 'domcontentloaded' });
+    assert.equal(new URL(page.url()).pathname, '/apps/reisboek.html');
   } finally {
     if (browser) await browser.close();
     await stop(srv.child);

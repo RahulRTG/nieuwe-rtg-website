@@ -764,8 +764,9 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const h = f && f.contentDocument && f.contentDocument.documentElement;
+      /* TravelOS staat op het RTG Design System: het blad is er als de Cover er is. */
       return !!(h && h.classList.contains('rtg-command-mobiel') &&
-        f.contentDocument.querySelector('.prestatiekop'));
+        f.contentDocument.querySelector('.ds-cover'));
     }, null, { timeout: 20000 });
     await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { state: 'attached', timeout: 20000 });
     await require('./helper').edgeActies(page);
@@ -782,6 +783,9 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
       const doc = f.contentDocument;
       const balk = document.querySelector('.rtg-adaptive-bar');
       const eigen = doc.querySelector('.hoofdtabs');
+      /* Een ds-scherm draagt zijn eigen Edge; in een blad hoort die te wijken
+         voor de ene Edge van de werktafel, en telt hij dus mee als onderbalk. */
+      const eigenEdge = doc.querySelector('.ds-edge');
       const werelden = doc.querySelector('.os-switcher');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
         el.getBoundingClientRect().height > 0);
@@ -790,7 +794,7 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
         schilbalk: zichtbaar(balk) && document.querySelectorAll('.rtg-adaptive-edge').length === 1,
         eigenBalk: zichtbaar(eigen),
         wereldbalk: zichtbaar(werelden),
-        onderbalken: [balk, eigen].filter(zichtbaar).length,
+        onderbalken: [balk, eigen, eigenEdge].filter(zichtbaar).length,
         navRuimte: getComputedStyle(doc.documentElement).getPropertyValue('--nav').trim(),
         acties: [...document.querySelectorAll('.rtg-adaptive-controls .cmd-actie')].map(b => b.dataset.cap),
         heeftMeer: zichtbaar(document.querySelector('#rtgCommand .cmd-meer'))
@@ -1345,6 +1349,8 @@ test('Lege familiekaarten openen direct hun bestaande invullaag',
     const rahulVraag = reizen.locator('[data-blad="rahul"]:not([hidden]) #rahulVraag');
     await rahulVraag.waitFor({ state: 'visible' });
     assert.equal(await rahulVraag.isEnabled(), true);
-    assert.equal(await reizen.locator('[data-tab="rahul"]').getAttribute('aria-current'), 'page');
+    /* De bladen zijn op het Design System een tablijst: het gekozen blad
+       draagt aria-selected in plaats van aria-current. */
+    assert.equal(await reizen.locator('[data-tab="rahul"]').getAttribute('aria-selected'), 'true');
   });
 });

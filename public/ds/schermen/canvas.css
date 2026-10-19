@@ -1,9 +1,21 @@
-/* Canvas: een kaart, plattegrond of werkvlak dat het hele scherm vult, met
-   zwevende bediening en een objectkaart onderaan. */
+/* Canvas (mockup Parijs): een vlak dat het scherm vult, ronde zwevende
+   bediening aan de eindkant en een objectkaart onderaan. */
 @layer rtg.scherm {
-  .ds-canvas { position: relative; min-block-size: 100dvh; overflow: hidden; }
-  .ds-canvas__vlak { position: absolute; inset: 0; }
-  .ds-canvas__bediening { position: absolute; inset-block-start: var(--ds-ruimte-4); inset-inline-end: var(--ds-goot); display: grid; gap: var(--ds-ruimte-2); }
-  .ds-canvas__bediening button { display: grid; place-items: center; inline-size: var(--ds-doel); block-size: var(--ds-doel); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-cirkel); box-shadow: var(--ds-schaduw-inhoud); color: var(--ds-inkt); cursor: pointer; }
-  .ds-canvas__object { position: absolute; inset-inline: var(--ds-goot); inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-8)); }
+  .ds-canvas { position: relative; min-block-size: var(--ds-schermhoogte); overflow: hidden; }
+  /* Een vlak dat zelf donker tekent (De Résidence) heeft ook een donkere grond,
+     zodat de coverinkt erop leesbaar is voordat er getekend is. */
+  .ds-canvas--donker { background: var(--ds-cover-grond); }
+  /* Op een canvas zweeft de kop boven een vlak waarvan de kleur niet vaststaat
+     (een lichte kaart, een donkere zaal): merk en knoppen krijgen het vlak van
+     de zwevende bediening, zodat hun contrast nooit van de tekening afhangt. */
+  .ds-scherm:has(> .ds-canvas) .ds-kop--op-beeld .ds-kop__merk { padding-inline: var(--ds-ruimte-3); background: var(--ds-oppervlak-sterk); border-radius: var(--ds-radius-capsule); box-shadow: var(--ds-schaduw-systeem); color: var(--ds-inkt); }
+  .ds-scherm:has(> .ds-canvas) .ds-kop--op-beeld .ds-kop__actie { background: var(--ds-oppervlak-sterk); border-radius: var(--ds-radius-cirkel); box-shadow: var(--ds-schaduw-systeem); color: var(--ds-inkt); }
+  .ds-canvas__vlak { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; background: var(--ds-oppervlak-zacht); color: var(--ds-inkt-zacht); }
+  .ds-canvas__water { color: var(--ds-water); }
+  .ds-canvas__speld { color: var(--ds-accent); }
+  .ds-canvas__bediening { position: absolute; inset-block-start: 72px; inset-inline-end: var(--ds-ruimte-4); display: grid; gap: var(--ds-ruimte-3); }
+  .ds-canvas__knop { display: grid; place-items: center; inline-size: var(--ds-doel); block-size: var(--ds-doel); background: var(--ds-oppervlak-sterk); border: 0; border-radius: var(--ds-radius-cirkel); box-shadow: var(--ds-schaduw-systeem); color: var(--ds-inkt); cursor: pointer; }
+  .ds-canvas__knop svg { inline-size: 20px; block-size: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .ds-canvas__object { position: absolute; inset-inline: var(--ds-ruimte-3); inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6)); display: flex; align-items: center; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-3); background: var(--ds-oppervlak-sterk); border-radius: var(--ds-radius-beeld); box-shadow: var(--ds-schaduw-systeem); color: inherit; text-decoration: none; }
+  .ds-canvas__object img { inline-size: 64px; block-size: 64px; flex: none; border-radius: var(--ds-radius-knop); object-fit: cover; }
 }

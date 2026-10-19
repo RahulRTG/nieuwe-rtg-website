@@ -5,87 +5,66 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Verblijven</title>
+<meta name="theme-color" content="#F4EFE7">
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/travel-os.css" rel="stylesheet">
-<link href="/shared/rtg-edge-system.css" rel="stylesheet">
-<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
-<link href="/shared/rtg-verblijven-2026.css" rel="stylesheet">
-<link href="/shared/rtg-verblijven-momenten-2026.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
-<script src="/shared/seizoen.js" defer></script>
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-xorkf1:not(#_#_#_){--deep-nav-count:3}
-</style>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl travel-os rtg-travel-flow rtg-stay-experience" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header class="verblijfkop">
-  <a class="verblijf-brand" href="/apps/reizen.html" aria-label="RTG TravelOS"><b>RTG</b><span>TravelOS</span><small>Van aankomst tot thuiskomst</small></a>
-  <div class="verblijf-koptekst"><span class="ey" id="verblijfEy">Verblijven</span><h1 id="verblijfTitel">Waar wilt u thuiskomen?</h1><p id="verblijfIntro">Vind een verblijf dat past bij uw reis en de manier waarop u wilt leven.</p></div>
+<!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 3):
+     Collectie (zoeken), Detail + Taak (het verblijfsblad) en Status (leeg,
+     ter plaatse). Geen eigen stijl: alles komt uit /ds/rtg-ds.css. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="collectie">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
-<main id="main">
-  <div class="tabs" id="tabs" aria-label="Verblijfsmoment">
-    <button class="tab aan" type="button" data-t="zoeken">Verblijven</button>
-    <button class="tab" type="button" data-t="mijn">Mijn reizen</button>
-    <button class="tab" type="button" data-t="service">Ter plaatse</button>
+
+<main class="ds-collectie" id="main">
+  <div class="ds-collectie__kop">
+    <p class="ds-label" id="verblijfEy">Verblijven</p>
+    <h1 class="ds-titel ds-titel--scherm" id="verblijfTitel">Waar wilt u thuiskomen?</h1>
+    <p class="ds-meta" id="verblijfIntro">Vind een verblijf dat past bij uw reis en de manier waarop u wilt leven.</p>
   </div>
-  <div id="inhoud"><div class="leeg">Verblijven laden...</div></div>
+  <div class="ds-tabs" role="tablist" aria-label="Verblijfsmoment">
+    <button class="ds-tab" role="tab" type="button" data-t="zoeken" aria-selected="true">Verblijven</button>
+    <button class="ds-tab" role="tab" type="button" data-t="mijn" aria-selected="false" data-ds-actie="Mijn reizen">Mijn reizen</button>
+    <button class="ds-tab" role="tab" type="button" data-t="service" aria-selected="false">Ter plaatse</button>
+  </div>
+  <div id="inhoud" role="tabpanel"><div class="ds-status ds-status--binnen"><p class="ds-status__tekst">Verblijven laden...</p></div></div>
+  <nav class="ds-chips" aria-label="TravelOS reisflow">
+    <a class="ds-chip" href="/apps/vluchten.html?view=mijn">Vlucht</a>
+    <a class="ds-chip" href="/apps/hotels.html?view=mijn" aria-current="page">Verblijf</a>
+    <a class="ds-chip" href="/apps/rit.html">Aankomst</a>
+  </nav>
 </main>
 
-<nav class="rtg-deep-nav s-xorkf1" aria-label="TravelOS reisflow">
-  <a href="/apps/vluchten.html?view=mijn"><b>01</b>Vlucht</a>
-  <a href="/apps/hotels.html?view=mijn" aria-current="page"><b>02</b>Verblijf</a>
-  <a href="/apps/rit.html"><b>03</b>Aankomst</a>
-</nav>
-<nav class="verblijf-nav" aria-label="RTG Verblijven">
-  <button type="button" data-verblijf-nav="zoeken" aria-current="page"><b>01</b>Verblijven</button>
-  <button type="button" data-verblijf-nav="mijn"><b>02</b>Mijn reizen</button>
-  <a href="/apps/reizen.html"><b>03</b>TravelOS</a>
-  <button type="button" data-verblijf-nav="service"><b>04</b>Ter plaatse</button>
-</nav>
-
-<section class="verblijf-blad" id="verblijfBlad" aria-label="Verblijf aanvragen" hidden>
-  <div class="blad-kop"><button class="terug" id="bladTerug" type="button">Terug</button><div><span class="ey" id="bladMeta"></span><h2 id="bladNaam"></h2></div></div>
-  <div class="boek-paneel">
-    <p class="blad-verhaal" id="bladVerhaal"></p>
-    <div class="kamers" id="kamers"></div>
-    <div class="boek-velden">
-      <label>Aankomst<input class="veld" id="rAan" type="date"></label>
-      <label>Vertrek<input class="veld" id="rVer" type="date"></label>
-      <label>Gasten<select class="veld" id="rAantal"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+<dialog class="ds-dialoog ds-dialoog--vol" id="verblijfBlad" aria-labelledby="bladNaam">
+  <img class="ds-detail__beeld" id="bladBeeld" alt="">
+  <div class="ds-detail__inhoud">
+    <div><button class="ds-knop ds-knop--stil" id="bladTerug" type="button">Terug</button></div>
+    <p class="ds-label" id="bladMeta"></p>
+    <h2 class="ds-titel" id="bladNaam"></h2>
+    <p class="ds-meta" id="bladVerhaal"></p>
+    <div class="ds-velden" id="kamers" role="group" aria-label="Kamers"></div>
+    <div class="ds-velden">
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span><span class="ds-veld__label">Aankomst</span><input class="ds-veld__invoer" id="rAan" type="date"></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span><span class="ds-veld__label">Vertrek</span><input class="ds-veld__invoer" id="rVer" type="date"></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5M3 20c0-4 2-6 5-6s5 2 5 6m1-6c4 0 6 2 6 6"/></svg><span><span class="ds-veld__label">Gasten</span><select class="ds-veld__invoer" id="rAantal"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></span><span></span></label>
     </div>
-    <div class="boeksom" id="rTotaal"></div>
-    <button class="knop" id="rBoek" type="button" disabled>Kies eerst een kamer</button>
-    <p class="menselijke-grens">U vraagt het verblijf aan. Het huis bevestigt persoonlijk.</p>
+    <p class="ds-detail__status" id="rTotaal" aria-live="polite"></p>
+    <button class="ds-knop ds-knop--primair ds-knop--breed" id="rBoek" type="button" data-ds-actie="Verblijf aanvragen" disabled>Kies eerst een kamer</button>
+    <p class="ds-meta">U vraagt het verblijf aan. Het huis bevestigt persoonlijk.</p>
   </div>
-</section>
+</dialog>
 
-<div class="melding" id="melding" role="status"></div>
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/hotels-momenten.js"></script>
 <script src="/apps/hotels-voorzijde.js"></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
-<script src="/shared/travel-os.js" defer></script>
 </body>
 </html>

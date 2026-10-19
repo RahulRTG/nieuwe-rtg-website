@@ -1,0 +1,11 @@
+/* Overgang: de zachte overgang tussen twee pagina's, en het gedeelde element
+   dat ermee meereist (shared/rtg-heritage-transition.js geeft de bron zijn
+   naam bij vertrek). Het doel draagt de naam hier VAST, omdat de nieuwe
+   pagina hem bij haar eerste beeld al moet hebben. Wie minder beweging vraagt,
+   krijgt geen overgang: dan staat de navigatieovergang zelf niet aan. */
+@layer rtg.component {
+  .ds-gedeeld--reisboek { view-transition-name: rtg-gedeeld-reisboek; }
+  @media (prefers-reduced-motion: no-preference) {
+    @view-transition { navigation: auto; }
+  }
+}

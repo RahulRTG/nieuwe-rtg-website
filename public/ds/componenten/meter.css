@@ -1,0 +1,54 @@
+/* Meter: hoe ver iets is, zonder dat een script stijl zet. De voortgang
+   (hoe ver je in een boek bent) is een native <progress>: een dunne rustige
+   balk in metaal. De schuif is de timing-meter van een spel in De Résidence:
+   een native <input type="range"> waarvan het scherm de waarde zet; de wijzer
+   is de duim, het midden van de baan is de goede plek. Waar de meter niet
+   meedoet (tikspellen, vrij richten) zet het scherm data-rust en wijkt hij. */
+@layer rtg.component {
+  .ds-voortgang {
+    appearance: none;
+    display: block;
+    inline-size: 100%;
+    block-size: 4px;
+    border: 0;
+    border-radius: 0;
+    background: var(--ds-oppervlak-zacht);
+    color: var(--ds-metaal);
+  }
+  .ds-voortgang::-webkit-progress-bar { background: var(--ds-oppervlak-zacht); }
+  .ds-voortgang::-webkit-progress-value { background: var(--ds-metaal); }
+  .ds-voortgang::-moz-progress-bar { background: var(--ds-metaal); }
+
+  .ds-schuif {
+    appearance: none;
+    display: block;
+    inline-size: 100%;
+    block-size: 20px;
+    margin: 0;
+    background: transparent;
+    pointer-events: none;
+  }
+  .ds-schuif::-webkit-slider-runnable-track {
+    block-size: 10px;
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    background: linear-gradient(90deg, var(--ds-oppervlak-zacht), var(--ds-accent) 42%, var(--ds-metaal) 50%, var(--ds-accent) 58%, var(--ds-oppervlak-zacht));
+  }
+  .ds-schuif::-moz-range-track {
+    block-size: 10px;
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    background: linear-gradient(90deg, var(--ds-oppervlak-zacht), var(--ds-accent) 42%, var(--ds-metaal) 50%, var(--ds-accent) 58%, var(--ds-oppervlak-zacht));
+  }
+  .ds-schuif::-webkit-slider-thumb {
+    appearance: none;
+    inline-size: 4px;
+    block-size: 20px;
+    margin-block-start: -6px;
+    border: 0;
+    border-radius: 0;
+    background: var(--ds-inkt);
+  }
+  .ds-schuif::-moz-range-thumb { inline-size: 4px; block-size: 20px; border: 0; border-radius: 0; background: var(--ds-inkt); }
+  .ds-schuif[data-rust] { opacity: .25; }
+}

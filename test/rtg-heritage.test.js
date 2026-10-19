@@ -236,6 +236,15 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
     const body = (html.match(/<body\b[^>]*>/i) || [''])[0];
     const material = (body.match(/data-rtg-eigenvlak="([^"]+)"/) || [])[1];
     assert.equal(material, undefined, file + ' gebruikt nog een oude materiaalvariant');
+    /* Een scherm op het RTG Design System heeft zijn eigen schil: de layout en
+       de desktoploader van Heritage horen daar juist NIET (ONTWERPSYSTEEM.md
+       par. 5); zijn schil bewijst test/ontwerpsysteem.test.js en zijn eigen
+       browsertoets uit public/ds/contract.json "bewijs". */
+    if (/class="[^"]*\bds-scherm\b/.test(body)) {
+      assert.match(html, /href="\/ds\/rtg-ds\.css"/, file + ' draagt ds-scherm zonder het Design System');
+      assert.doesNotMatch(html, /rtg-world-desktop\.js|data-rtg-layout=/, file + ' mengt de oude schil met het Design System');
+      continue;
+    }
     if (identity.classify('/apps/'+file) !== 'redirect') {
       assert.match(body, /data-rtg-layout="standard"/, file+' mist de standaard');
       assert.equal((html.match(/src="\/shared\/rtg-world-desktop\.js"/g)||[]).length,1,file+' mist de desktoploader');
@@ -243,7 +252,18 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
     for (const match of html.matchAll(/data-rtg-component-variant="([^"]+)"/g)) assert.ok(variants.has(match[1]), file + ': onbekende componentvariant ' + match[1]);
   }
   for (const route of Object.keys(registry.canvas)) {
-    const body = lees('public' + route).match(/<body\b[^>]*>/i)[0];
+    const html = lees('public' + route), body = html.match(/<body\b[^>]*>/i)[0];
+    /* Een canvas op het RTG Design System kent geen Edge 2 meer: zijn Edge
+       komt van /ds/edge.js en opent nooit vanzelf. Wat hier bewaakt werd (het
+       vlak krijgt de ruimte) is daar het schermtype Canvas, met dezelfde
+       vlakken die het register noemt. */
+    if (/class="[^"]*\bds-scherm\b/.test(body)) {
+      assert.match(body, /data-ds-schermtype="canvas"/, route + ': een canvas op het Design System is een Canvas-scherm');
+      for (const id of registry.canvas[route].split(',').map(s => s.trim()).filter(s => s.startsWith('#'))) {
+        assert.ok(html.includes('id="' + id.slice(1) + '"'), route + ': het vlak ' + id + ' uit het register bestaat');
+      }
+      continue;
+    }
     assert.match(body, /data-rtg-edge-2-state="compact"/, route + ': canvas opent compact');
     assert.match(body, /data-rtg-edge-2-auto="false"/, route + ': bediening wacht op de gebruiker');
   }

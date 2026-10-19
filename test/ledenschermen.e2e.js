@@ -158,7 +158,13 @@ test(OPEN.length + ' ledenschermen tonen waar ze voor zijn',
     const stuk = [];
     for (const s of OPEN) {
       const r = await toon(o.page, base, s.app, token, s.wachtOp);
-      if (s.deel) {
+      /* Op het Design System (stad, TRAVELOS-MIGRATIE.md) is er geen deelmenu
+         meer: het deel staat als Status op het scherm zelf. Dezelfde eis: het
+         deel is er en draagt de standen van de stad. */
+      if (s.deel && await o.page.locator('html[data-ds]').count()) {
+        await o.page.getByText(s.deel, { exact: true }).waitFor({ state: 'visible' });
+        await o.page.locator('#app [data-stand]').first().waitFor({ state: 'visible' });
+      } else if (s.deel) {
         await edgeActies(o.page);
         r.tekst = await o.page.locator('body').innerText();
         await o.page.locator('.rtg-adaptive-controls').getByRole('button', { name: s.deel, exact: true }).click();

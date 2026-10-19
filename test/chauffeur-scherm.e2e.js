@@ -33,6 +33,11 @@
    speechSynthesis zijn er niet in een headless browser), het incident en de
    Magnaat-trainingskopie (die heeft zijn eigen ingang en raakt de API niet).
 
+   SINDS DE TRAVELOS-MIGRATIE (stroom E) staat de PDA op het Design System.
+   De toets volgt de kaarten nu aan hun data-attributen (data-rit, data-bekijk,
+   data-volgende, data-passagier, data-status) in plaats van aan de klassen
+   van het oude blad; wat hij bewaakt is hetzelfde gebleven.
+
    Draai los: node --test test/chauffeur-scherm.e2e.js */
 'use strict';
 const test = require('node:test');
@@ -100,12 +105,12 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
         const page = await ctx.newPage();
         const fouten = letOpFouten(page, []);
         await page.goto(base + '/apps/chauffeur.html', { waitUntil: 'domcontentloaded' });
-        await page.waitForSelector('#werkstapel .foutkaart', { state: 'visible', timeout: 20000 });
-        const kaart = await page.locator('#werkstapel .foutkaart').textContent();
+        await page.waitForSelector('#werkstapel [data-rit="fout"]', { state: 'visible', timeout: 20000 });
+        const kaart = await page.locator('#werkstapel [data-rit="fout"]').textContent();
         assert.match(kaart, /AANMELDEN NODIG/, 'de kaart zegt dat er aangemeld moet worden: ' + kaart.slice(0, 160));
         assert.match(kaart, /U bent niet aangemeld als chauffeur/);
         assert.doesNotMatch(kaart, /VERBINDING NODIG|PROBEER OPNIEUW/, 'niet aangemeld is geen storing, en krijgt geen knop die niets oplost');
-        assert.equal(await page.locator('#werkstapel .foutkaart a.hoofdactie').getAttribute('href'),
+        assert.equal(await page.locator('#werkstapel [data-rit="fout"] a.ds-knop').getAttribute('href'),
           '/apps/leverancier.html', 'de uitweg is de personeelslogin');
         assert.match(await page.locator('#verbinding').textContent(), /AANMELDEN/,
           'de verbindingschip zegt AANMELDEN en niet STORING');
@@ -124,9 +129,9 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
       const page = await ctx.newPage();
       const fouten = letOpFouten(page, []);
       await page.goto(base + '/apps/chauffeur.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#werkstapel .ritkaart.nieuw', { state: 'visible', timeout: 20000 });
+      await page.waitForSelector('#werkstapel [data-rit="nieuw"]', { state: 'visible', timeout: 20000 });
 
-      const aanvraag = await page.locator('#werkstapel .ritkaart.nieuw').textContent();
+      const aanvraag = await page.locator('#werkstapel [data-rit="nieuw"]').textContent();
       assert.match(aanvraag, /NIEUWE RITAANVRAAG/);
       assert.match(aanvraag, /Marina Botafoch/, 'het vertrekpunt van het lid staat op de kaart');
       assert.match(aanvraag, /Sal de Mar/, 'en de bestemming');
@@ -137,15 +142,15 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
       assert.equal(await page.locator('#deelPositie').isDisabled(), true, 'zonder levende rit is de positieknop dood');
 
       // bekijken, en aannemen via het dialoogvenster
-      await page.locator('#werkstapel .ritkaart.nieuw button.hoofdactie').click();
+      await page.locator('#werkstapel [data-rit="nieuw"] [data-bekijk]').click();
       await page.waitForSelector('#ritDialoog[open]', { timeout: 10000 });
       assert.match(await page.locator('#dialoogFeiten').textContent(), new RegExp(ref), 'het dialoogvenster toont de referentie van deze rit');
       const toegewezen = page.waitForResponse(r => r.url().endsWith('/api/supplier/mob/toewijzen'));
       await page.locator('#accepteerRit').click();
       assert.equal((await toegewezen).status(), 200, 'aannemen via het scherm lukt');
-      await page.waitForSelector('#werkstapel .ritkaart.actief', { state: 'visible', timeout: 20000 });
+      await page.waitForSelector('#werkstapel [data-rit="actief"]', { state: 'visible', timeout: 20000 });
       assert.equal((await page.locator('#rittenTitel').textContent()).trim(), 'RIT TOEGEWEZEN');
-      assert.equal((await page.locator('#werkstapel .statuschip').textContent()).trim(), 'Rit aangenomen');
+      assert.equal((await page.locator('#werkstapel [data-status]').textContent()).trim(), 'Rit aangenomen');
       assert.equal(await page.locator('#pda').getAttribute('data-ritfase'), 'geaccepteerd');
 
       /* DE VOLGORDE IS VAN DE SERVER. Het scherm toont een knop; dat het er
@@ -156,7 +161,7 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
       assert.match(sprong.body.error || '', /onderweg/, 'en de weigering noemt wat er wel mag');
 
       /* ---- 3. de positie: alleen tijdens een levende rit ---- */
-      await page.locator('.pda-nav [data-naar="navigatie"]').click();
+      await page.locator('[data-naar="navigatie"]').click();
       await page.waitForSelector('section[data-blad="navigatie"]:not([hidden])', { timeout: 10000 });
       assert.equal(await page.locator('#deelPositie').isDisabled(), false, 'met een levende rit leeft de positieknop');
       assert.match(await page.locator('#navigatiekaart').textContent(), /Marina Botafoch/, 'het routebeeld komt uit de actieve rit');
@@ -172,13 +177,13 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
         null, { timeout: 10000 });
 
       /* ---- 4. de keten, stap voor stap met de ene knop op de kaart ---- */
-      await page.locator('.pda-nav [data-naar="ritten"]').click();
+      await page.locator('[data-naar="ritten"]').click();
       const STAPPEN = [['VERTREK NAAR KLANT', 'onderweg'], ['IK BEN BIJ DE KLANT', 'aangekomen'],
         ['KLANT AAN BOORD', 'ingestapt'], ['START DE RIT', 'rijdt'], ['RIT VOLTOOID', 'voltooid']];
       for (const [label, status] of STAPPEN) {
-        const knop = page.locator('#werkstapel .ritkaart.actief button.hoofdactie', { hasText: label });
+        const knop = page.locator('#werkstapel [data-rit="actief"] [data-volgende]', { hasText: label });
         await knop.waitFor({ state: 'visible', timeout: 20000 });
-        assert.equal(await page.locator('#werkstapel .ritkaart.actief button.hoofdactie').count(), 1,
+        assert.equal(await page.locator('#werkstapel [data-rit="actief"] [data-volgende]').count(), 1,
           'er staat precies een volgende stap op de kaart, en dat is ' + label);
         const [antwoord] = await Promise.all([
           page.waitForResponse(r => r.url().endsWith('/api/staff/mob/status'), {timeout:12000}),
@@ -187,8 +192,8 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
         assert.equal(antwoord.status(), 200, 'stap "' + status + '" via het scherm');
         assert.equal((await antwoord.json()).opdracht.status, status, 'de server zette de rit op ' + status);
         if (status === 'aangekomen') {
-          await page.waitForSelector('#werkstapel .passagierkaart', { state: 'visible', timeout: 20000 });
-          assert.match(await page.locator('#werkstapel .passagierkaart').textContent(), /PASSAGIER/,
+          await page.waitForSelector('#werkstapel [data-passagier]', { state: 'visible', timeout: 20000 });
+          assert.match(await page.locator('#werkstapel [data-passagier]').textContent(), /PASSAGIER/,
             'bij de klant verschijnt de passagierskaart, met de codenaam en niet een naam');
         }
       }
@@ -199,7 +204,7 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
       assert.match(await page.locator('#navigatiekaart').textContent(), /GEEN ACTIEVE ROUTE/);
 
       /* ---- 5. vandaag: verversen haalt de dienst opnieuw op ---- */
-      await page.locator('.pda-nav [data-naar="vandaag"]').click();
+      await page.locator('[data-naar="vandaag"]').click();
       const ververst = page.waitForResponse(r => r.url().endsWith('/api/staff/mob/mijn'));
       await page.locator('#verversVandaag').click();
       assert.equal((await ververst).status(), 200, 'verversen vraagt de dienst opnieuw aan de server');

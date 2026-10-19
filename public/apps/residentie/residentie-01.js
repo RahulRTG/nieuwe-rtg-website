@@ -9,7 +9,16 @@
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
     body: JSON.stringify(body || {})
   }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
-  function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
+  function meld(t){ const m = $('#melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove('toon'), 2600); }
+  /* Op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom G) is elke laag
+     (gids, atelier, huistelefoon, spel) een <dialog>; dit script zet nergens
+     stijl. Openen en sluiten lopen via deze twee, zodat een laag die al open
+     staat gewoon zijn nieuwe inhoud krijgt. */
+  function laagOpen(id){ const d = $(id); if (!d.open) d.showModal(); }
+  function laagDicht(id){ const d = $(id); if (d.open) d.close(); }
+  // een rij in een laag: een rustige ds-veld-rij, met een lid of een zaal ervoor
+  const RIJICOON = '<svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>';
+  const DEURICOON = '<svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4h12v17M4 21h16"/><circle cx="15" cy="12.5" r=".8"/></svg>';
 
   /* ---------- de wereldstaat ---------- */
   const S = {
@@ -36,9 +45,10 @@
   let W = 0, H = 0, DPR = 1, TW = 64, TH = 32, OX = 0, OY = 0, MUUR = 84;
   function maat() {
     DPR = Math.min(2, window.devicePixelRatio || 1);
-    W = window.innerWidth; H = window.innerHeight;
+    /* het vlak meet zichzelf (.ds-canvas__vlak vult het scherm); de pixels
+       volgen die maat, zodat er geen stijl uit dit script hoeft te komen */
+    W = canvas.clientWidth || window.innerWidth; H = canvas.clientHeight || window.innerHeight;
     canvas.width = W * DPR; canvas.height = H * DPR;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (S.kamer) {
       const b = S.kamer.b, d = S.kamer.d;
@@ -67,6 +77,8 @@
   /* ---------- de zaal: sfeerlicht, muren, marmer ---------- */
   function tekenZaal() {
     ctx.clearRect(0, 0, W, H);
+    // de nacht van het huis onder alles: de gloed hieronder is half doorzichtig
+    ctx.fillStyle = '#0A0908'; ctx.fillRect(0, 0, W, H);
     const b = S.kamer.b, d = S.kamer.d;
     const sfeer = S.kamer.soort === 'suite' ? KLEUR.goud : (SFEER[S.kamer.id] || KLEUR.goud);
     // avondlicht van boven: een warme gloed in de zaalkleur, met meer contrast

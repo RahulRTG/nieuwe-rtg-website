@@ -6,34 +6,36 @@
     try {
       const d = await api('/api/residentie/gids', {});
       $('#gidsZalen').innerHTML = d.zalen.map(z =>
-        '<button class="rij-item" data-kamer="' + esc(z.id) + '"><span><b>' + esc(z.naam) + '</b><span class="m">' + esc(z.sub) + '</span></span>' +
-        '<span class="tel">' + z.aanwezig + ' aanwezig</span></button>').join('');
+        '<button class="ds-veld" data-kamer="' + esc(z.id) + '">' + DEURICOON + '<span><span class="ds-veld__label">' + esc(z.naam) + '</span><span class="ds-veld__waarde">' + esc(z.sub) + '</span></span>' +
+        '<span class="ds-meta">' + z.aanwezig + ' aanwezig</span></button>').join('');
       $('#gidsSuites').innerHTML = d.suites.length ? d.suites.map(s2 =>
-        '<button class="rij-item" data-kamer="' + esc(s2.adres) + '"><span><b>' + esc(s2.naam) + '</b><span class="m">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
-        '<span class="tel">' + s2.aanwezig + ' aanwezig</span></button>').join('')
-        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Nog geen open suites; richt de uwe in en zet hem open.</div>';
-      $('#gidsLaag').classList.add('open');
+        '<button class="ds-veld" data-kamer="' + esc(s2.adres) + '">' + DEURICOON + '<span><span class="ds-veld__label">' + esc(s2.naam) + '</span><span class="ds-veld__waarde">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
+        '<span class="ds-meta">' + s2.aanwezig + ' aanwezig</span></button>').join('')
+        : '<p class="ds-meta">Nog geen open suites; richt de uwe in en zet hem open.</p>';
+      laagOpen('#gidsLaag');
       $('#gidsLaag').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => {
-        $('#gidsLaag').classList.remove('open');
+        laagDicht('#gidsLaag');
         S.editor = null; $('#knopAtelier').classList.remove('aan');
         betreed(b.dataset.kamer);
       }));
     } catch (e) { meld(e.message); }
   }
   $('#knopGids').addEventListener('click', toonGids);
-  $('#gidsDicht').addEventListener('click', () => $('#gidsLaag').classList.remove('open'));
+  $('#gidsDicht').addEventListener('click', () => laagDicht('#gidsLaag'));
   /* ESCAPE SLUIT DE BOVENSTE LAAG, via zijn eigen sluitknop, zodat sluiten doet
      wat het altijd deed. De gids, het atelier en de huistelefoon hadden alleen
      die knop; een toetsenbordgebruiker kwam er niet meer uit (gemeten 27
      september 2026). Een LOPEND spel sluit Escape met opzet niet: #spelWeg
      verlaat het potje, en dat hoort een bewuste tik te zijn en geen toets die je
-     per ongeluk raakt. De keuze- en uitslagschermen van het spel sluiten wel. */
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    const open = Array.from(document.querySelectorAll('section.laag.open')).pop();
-    const knop = open && open.querySelector('#gidsDicht,#atelierDicht,#belDicht,#spelKeuzeWeg,#paarKeuzeWeg,#kiesWeg,#spelUitslagWeg');
+     per ongeluk raakt. De keuze- en uitslagschermen van het spel sluiten wel.
+     Een laag is nu een <dialog>: Escape wordt daar een 'cancel' op de bovenste
+     laag. Die sluit niet vanzelf, maar drukt dezelfde sluitknop als altijd; een
+     uitnodiging (Graag / Nu even niet) blijft dus staan tot er gekozen is. */
+  document.querySelectorAll('dialog.laag').forEach(laag => laag.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    const knop = laag.querySelector('#gidsDicht,#atelierDicht,#belDicht,#spelKeuzeWeg,#paarKeuzeWeg,#kiesWeg,#spelUitslagWeg');
     if (knop && knop.offsetParent !== null) knop.click();
-  });
+  }));
 
   /* mijn suite: binnenlopen en het atelier openen */
   async function naarMijnSuite() {
@@ -49,11 +51,11 @@
     $('#suiteNaam').value = S.suite ? S.suite.naam : '';
     $('#suiteOpen').textContent = S.suite && S.suite.open ? 'Open voor bezoek: ja' : 'Open voor bezoek: nee';
     $('#catalogus').innerHTML = S.catalogus.map(c =>
-      '<button class="cat' + (S.editor && S.editor.soort === c.soort ? ' aan' : '') + '" data-soort="' + esc(c.soort) + '">' + esc(c.naam) +
-      '<span style="display:block;color:var(--soft);font-size:.66rem;">' + c.b + 'x' + c.d + (c.zit ? ' · zitplek' : '') + '</span></button>').join('');
+      '<button class="ds-keuze" type="button" aria-pressed="' + !!(S.editor && S.editor.soort === c.soort) + '" data-soort="' + esc(c.soort) + '">' + esc(c.naam) +
+      '\n<span class="ds-meta">' + c.b + 'x' + c.d + (c.zit ? ' · zitplek' : '') + '</span></button>').join('');
     $('#catalogus').querySelectorAll('[data-soort]').forEach(b => b.addEventListener('click', () => {
       S.editor = { soort: b.dataset.soort };
-      $('#atelierWeg').classList.remove('aan');
+      $('#atelierWeg').setAttribute('aria-pressed', 'false');
       tekenAtelier();
       meld('Tik op een tegel om "' + b.textContent.split('\n')[0].trim() + '" neer te zetten.');
     }));
@@ -61,14 +63,14 @@
   $('#knopAtelier').addEventListener('click', async () => {
     if (!S.suite) { try { const d = await api('/api/residentie/suite', {}); S.suite = d.suite; S.catalogus = d.catalogus; } catch (e) { return meld(e.message); } }
     tekenAtelier();
-    $('#atelierLaag').classList.add('open');
+    laagOpen('#atelierLaag');
   });
-  $('#atelierDicht').addEventListener('click', () => { $('#atelierLaag').classList.remove('open'); });
+  $('#atelierDicht').addEventListener('click', () => { laagDicht('#atelierLaag'); });
   $('#atelierWeg').addEventListener('click', () => {
     S.editor = S.editor && S.editor.weg ? null : { weg: true };
-    $('#atelierWeg').classList.toggle('aan', !!(S.editor && S.editor.weg));
+    $('#atelierWeg').setAttribute('aria-pressed', String(!!(S.editor && S.editor.weg)));
     tekenAtelier();
-    if (S.editor) { $('#atelierLaag').classList.remove('open'); meld('Weghaal-modus: tik op een meubel in de suite.'); }
+    if (S.editor) { laagDicht('#atelierLaag'); meld('Weghaal-modus: tik op een meubel in de suite.'); }
   });
   $('#suiteNaamZet').addEventListener('click', async () => {
     try { const r = await api('/api/residentie/suite/zet', { naam: $('#suiteNaam').value });
@@ -103,10 +105,11 @@
 
   /* ---------- de start: poort of naar binnen ---------- */
   if (!TOKEN) {
-    document.querySelector('.kop').style.display = 'none';
-    $('#poort').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.5rem;">De Résidence</h2>' +
-      '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
-      '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
+    $('#zaalKop').hidden = true;
+    $('#poort').innerHTML = '<div class="ds-canvaslaag__vlak"><h2 class="ds-titel ds-titel--scherm">De Résidence</h2>' +
+      '<p class="ds-meta">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
+      '<a class="ds-knop ds-knop--primair" href="/apps/app.html">Naar de app →</a></div>';
+    $('#poort').hidden = false;
   } else {
     const wens = new URLSearchParams(location.search).get('kamer') || 'lobby';
     betreed(wens);

@@ -77,7 +77,9 @@ async function proef(reducedMotion) {
       try { return f.contentWindow.location.pathname === '/apps/reizen.html'; } catch (e) { return false; } }), null, { timeout: 20000 });
     const reizen = blad();
     assert.ok(reizen, 'TravelOS staat als blad in de werktafel');
-    await reizen.waitForSelector('a.wh-service[href="/apps/reisboek.html"]', { state: 'attached', timeout: 20000 });
+    /* Op het RTG Design System is de reisboekkaart een rustige rij in
+       "Alles voor onderweg" (.ds-lijst__rij) met dezelfde markering. */
+    await reizen.waitForSelector('a.ds-lijst__rij[href="/apps/reisboek.html"][data-rtg-gedeeld="reisboek"]', { state: 'attached', timeout: 20000 });
     /* De kaart wordt op zijn ADRES gezocht en niet op zijn markering: dan
        meet een toets zonder markering (de mutatieproef) een kaart die gewoon
        navigeert, en zakt hij op de overgang in plaats van op het zoeken. */
@@ -91,7 +93,7 @@ async function proef(reducedMotion) {
        kant van de groep onder belasting niet vast -- 6 van 9 keer rood in drie
        parallelle rondes, en zo ook in CI. Een duim tikt alleen op wat hij ziet,
        dus de toets schuift hem eerst in beeld en tikt dan met de muis. */
-    const kaart = reizen.locator('a.wh-service[href="/apps/reisboek.html"]');
+    const kaart = reizen.locator('a.ds-lijst__rij[href="/apps/reisboek.html"][data-rtg-gedeeld="reisboek"]');
     await kaart.waitFor({ state: 'visible', timeout: 20000 });
     await kaart.scrollIntoViewIfNeeded();
     await reizen.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
@@ -105,8 +107,8 @@ async function proef(reducedMotion) {
        `ready` later dan 800 ms, en dan las de eerste versie een lege lijst en
        zakte een op de acht keer zonder dat er iets mis was. */
     await doel.waitForFunction(() => window.__gedeeld && window.__gedeeld.klaar, null, { timeout: 15000 });
-    const uit = await doel.evaluate(() => ({ g: window.__gedeeld, naam: getComputedStyle(document.querySelector('.reisboek-kop')).viewTransitionName }));
-    assert.equal(uit.naam, 'rtg-gedeeld-reisboek', 'het doel draagt zijn naam bij binnenkomst (rtg-uniform.css)');
+    const uit = await doel.evaluate(() => ({ g: window.__gedeeld, naam: getComputedStyle(document.querySelector('[data-rtg-gedeeld-doel="reisboek"]')).viewTransitionName }));
+    assert.equal(uit.naam, 'rtg-gedeeld-reisboek', 'het doel draagt zijn naam bij binnenkomst (/ds/componenten/overgang.css)');
     return { uit, fouten };
   } finally {
     if (browser) await browser.close().catch(() => {});

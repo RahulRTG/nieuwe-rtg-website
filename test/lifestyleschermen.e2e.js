@@ -205,7 +205,16 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
 
       /* Waar de lijst achter een tabblad zit: erop tikken, zoals een gebruiker
          ook doet. Een tab die niet te vinden is, is zelf een bevinding. */
-      if (a.tab) {
+      /* Een scherm op het Design System (Hangar, TRAVELOS-MIGRATIE.md) heeft
+         geen adaptieve balk: zijn vloot staat als Collectie op het scherm zelf,
+         en wat nog achter een tab zit, is een ds-tab in het hoofdvlak. De
+         eis eronder (de eigen gegevens staan op het scherm) blijft dezelfde. */
+      const ds = await page.locator('html[data-ds]').count();
+      if (a.tab && ds) {
+        const naam = new RegExp('^' + a.tab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|$)', 'i');
+        const tab = page.locator('#main').getByRole('tab', { name: naam }).first();
+        if (await tab.count()) { await tab.click(); await wachtOpRust(page); }
+      } else if (a.tab) {
         await edgeActies(page);
         /* Zoek expliciet naar een knop. De Hangar-voorpagina gebruikt "VLOOT"
            ook als kop in de servicelijn; een vrije tekstzoeker tikte daardoor

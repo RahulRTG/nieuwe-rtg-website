@@ -32,13 +32,13 @@
     }
     const anderen = [...S.leden.values()].filter(l => l.codenaam !== S.ik);
     if (!anderen.length) return meld('U bent hier nog alleen.');
-    $('#spelKeuze').innerHTML = '<h2>Samen wandelen</h2><div class="sub">vast aan elkaar door het huis, zolang u allebei hier bent</div>' +
-      anderen.map(l => '<button class="rij-item" data-paar="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">vraag</span></button>').join('') +
-      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
-    $('#spelLaag').classList.add('open');
-    $('#paarKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Samen wandelen</h2><p class="ds-meta">vast aan elkaar door het huis, zolang u allebei hier bent</p>' +
+      anderen.map(l => '<button class="ds-veld" data-paar="' + esc(l.codenaam) + '">' + RIJICOON + '<span><span class="ds-veld__label">' + esc(l.codenaam) + '</span></span><span class="ds-meta">vraag</span></button>').join('') +
+      '<button class="ds-knop ds-knop--stil ds-knop--breed" id="paarKeuzeWeg" type="button">Toch niet</button>';
+    laagOpen('#spelLaag');
+    $('#paarKeuzeWeg').addEventListener('click', () => laagDicht('#spelLaag'));
     $('#spelKeuze').querySelectorAll('[data-paar]').forEach(b => b.addEventListener('click', async () => {
-      $('#spelLaag').classList.remove('open');
+      laagDicht('#spelLaag');
       try { await api('/api/residentie/paar/vraag', { codenaam: b.dataset.paar });
         meld('Gevraagd; even wachten op ' + b.dataset.paar + '.'); } catch (e) { meld(e.message); }
     }));
@@ -56,19 +56,19 @@
 
   function paarSein(d) {
     if (d.kind === 'paar-verzoek') {
-      $('#spelKeuze').innerHTML = '<h2>Samen wandelen?</h2>' +
-        '<div class="sub">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-        '<button class="knop2 h-flex1" id="paarJa" type="button">Graag</button>' +
-        '<button class="knop2 stil2 h-flex1" id="paarNee" type="button">Liever niet</button></div>';
-      $('#spelLaag').classList.add('open');
+      $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Samen wandelen?</h2>' +
+        '<p class="ds-meta">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</p>' +
+        '<div class="ds-dialoog__acties">' +
+        '<button class="ds-knop ds-knop--primair" id="paarJa" type="button">Graag</button>' +
+        '<button class="ds-knop ds-knop--stil" id="paarNee" type="button">Liever niet</button></div>';
+      laagOpen('#spelLaag');
       $('#paarJa').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { const r = await api('/api/residentie/paar/antwoord', { ja: true }); S.paar = r.paar || d.van; zetKnopPaar(); }
         catch (e) { meld(e.message); }
       });
       $('#paarNee').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { await api('/api/residentie/paar/antwoord', { ja: false }); } catch (e) {}
       });
     }
@@ -76,14 +76,14 @@
       if (S.kamer && S.kamer.paren && !S.kamer.paren.some(p2 => p2.includes(d.a))) S.kamer.paren.push([d.a, d.b]);
       if (d.a === S.ik || d.b === S.ik) {
         S.paar = d.a === S.ik ? d.b : d.a; zetKnopPaar();
-        $('#spelKeuze').innerHTML = '<h2>U wandelt samen</h2>' +
-          '<div class="sub">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</div>' +
-          '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-          '<button class="knop2 h-flex1" id="paarVriend" type="button">Word ook vrienden</button>' +
-          '<button class="knop2 stil2 h-flex1" id="paarKlaar" type="button">Verder</button></div>';
-        $('#spelLaag').classList.add('open');
-        $('#paarVriend').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); wordVrienden(S.paar); });
-        $('#paarKlaar').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+        $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">U wandelt samen</h2>' +
+          '<p class="ds-meta">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</p>' +
+          '<div class="ds-dialoog__acties">' +
+          '<button class="ds-knop ds-knop--primair" id="paarVriend" type="button">Word ook vrienden</button>' +
+          '<button class="ds-knop ds-knop--stil" id="paarKlaar" type="button">Verder</button></div>';
+        laagOpen('#spelLaag');
+        $('#paarVriend').addEventListener('click', () => { laagDicht('#spelLaag'); wordVrienden(S.paar); });
+        $('#paarKlaar').addEventListener('click', () => laagDicht('#spelLaag'));
       } else meld(d.a + ' en ' + d.b + ' wandelen nu samen.');
     }
     if (d.kind === 'paar-los') {

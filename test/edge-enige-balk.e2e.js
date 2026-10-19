@@ -21,9 +21,10 @@
       versie zette die op nul, en toen liep de titel van Berichten onder de
       bovenbalk door. Nul was het verkeerde getal; de inzet van de Edge is het
       goede.
-   3. DE GRENDEL: EEN NAAM IS GEEN BALK. `ios.js` plakt `ios-nav` ook op
-      `header.ritkop` van rit.html, en rtg-aankomst-2026.css maakt daar een hero
-      van 430px met een foto van. Wie op de klassenaam claimt, haalt daar de
+   3. DE GRENDEL: EEN NAAM IS GEEN BALK. `ios.js` plakte `ios-nav` ook op
+      `header.ritkop` van rit.html, en rtg-aankomst-2026.css maakte daar een hero
+      van 430px met een foto van (rit.html staat inmiddels op /ds/; de proef
+      bouwt die hero nu zelf na). Wie op de klassenaam claimt, haalt daar de
       INHOUD weg. De claim meet daarom of het ding op dat moment ook werkelijk
       een balk is. Zonder deze derde proef zou de toets groen staan terwijl de
       regel te grof is -- en dat is precies het geval dat je niet ziet aankomen.
@@ -56,14 +57,24 @@ const SCHERMEN = [
     knop: 'Salon', vrijVan: '.comm' },
   { pad: '/apps/vonk.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
   { pad: '/apps/sociaal.html', balk: '.rtg-social-commandbar' },
-  { pad: '/apps/luchthaven.html', balk: '.tos-opsnav' },
-  { pad: '/apps/ovcontrol.html', balk: '.tos-opsnav' },
+  /* luchthaven.html en ovcontrol.html stonden hier met `.tos-opsnav`. Ze
+     staan sinds TRAVELOS-MIGRATIE.md par. 1b op het Design System: er is
+     geen tweede balk meer om te claimen, en de operatienavigatie is een rij
+     chips in het scherm zelf. Wat deze regel bewaakte (een balk naast de
+     Edge, en geen bestemming kwijt) staat voor die schermen in DS_OPERATIE
+     hieronder. */
   /* De tabbalk van de twee kamers is smaller dan 60% van het scherm en werd
      daarom niet als balk herkend; hij bleef staan, precies onder de onderbalk
      van de Edge (27 september 2026: alle tabs volledig bedekt). */
   { pad: '/apps/decision-room.html', balk: '.dr-nav', knop: 'Afweging' },
   { pad: '/apps/project-room.html', balk: '.pr-nav', knop: 'Dossier' }
 ];
+
+/* De operatieschermen op het Design System: de Edge is daar de enige balk,
+   de oude ops-navigatie bestaat niet meer, en haar vier bestemmingen staan
+   bereikbaar in het scherm (de chips met data-ds-opsnav). */
+const DS_OPERATIE = ['/apps/luchthaven.html', '/apps/ovcontrol.html'];
+const OPS_BESTEMMINGEN = ['/apps/ov.html', '/apps/chauffeur.html', '/apps/luchthaven.html', '/apps/ovcontrol.html'];
 
 /* Wat de Edge NIET overneemt, hoort ook niet onder hem te liggen. In de
    compacte stand legt de Edge een onzichtbare herstelstrook over de bovenrand;
@@ -72,8 +83,9 @@ const SCHERMEN = [
 const VRIJ = [
   { pad: '/apps/browser.html', knop: 'header.ios-nav button.ga', compact: true },
   /* De kaartlagen zijn bediening OP de kaart, geen balk: die blijven bij het
-     scherm. navigatie-premium.css zette ze op 1280 breed rechtsonder, en de
-     eerste laag (bank) lag volledig onder de onderbalk van de Edge. */
+     scherm. Het oude navigatie-premium.css zette ze op 1280 breed rechtsonder,
+     en de eerste laag (bank) lag volledig onder de onderbalk van de Edge. Op
+     het Design System staan ze in het zoekvel bovenaan de kaart. */
   { pad: '/apps/navigatie.html', knop: 'nav.lagen button' }
 ];
 
@@ -176,11 +188,32 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       });
     }
 
+    for (const pad of DS_OPERATIE) {
+      await t.test(pad + ': de Edge is de enige balk, en de operatienavigatie blijft bereikbaar', async () => {
+        await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
+        await wachtTot(page, () => !!document.querySelector('.ds-edge__balk [data-ds-edge="rahul"]') &&
+          document.querySelectorAll('[data-ds-opsnav] a').length > 0, null,
+          { wat: pad + ': de ds-Edge en de operatienavigatie staan' });
+        const m = await page.evaluate(() => ({
+          balken: document.querySelectorAll('.ds-edge__balk').length,
+          oud: document.querySelectorAll('.tos-opsnav, .rtg-adaptive-bar, .rtg-edge-chrome').length,
+          ops: [...document.querySelectorAll('[data-ds-opsnav] a')].filter(a => a.getClientRects().length).map(a => a.getAttribute('href'))
+        }));
+        assert.equal(m.balken, 1, pad + ': er hoort precies een Edge te staan');
+        assert.equal(m.oud, 0, pad + ': een oude balk of Edge staat er nog naast');
+        assert.deepEqual(m.ops, OPS_BESTEMMINGEN, pad + ': een bestemming van de operatienavigatie is kwijt');
+      });
+    }
+
     for (const scherm of VRIJ) {
       await t.test(scherm.pad + ': de eigen bediening ligt niet onder de Edge', async () => {
         await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
+        /* Op een scherm op het Design System (navigatie.html sinds batch 4 van
+           TRAVELOS-MIGRATIE.md) staat de ds-Edge en geen adaptieve schil die
+           'ready' meldt; daar is de Edge-balk het teken. */
         await wachtTot(page, (g) => document.body &&
-          document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
+          (document.body.getAttribute('data-rtg-adaptive-ready') === 'true' ||
+            (document.documentElement.hasAttribute('data-ds') && !!document.querySelector('.ds-edge__balk'))) &&
           (!g.compact || document.body.getAttribute('data-rtg-edge-2-state') === 'compact') &&
           !!document.querySelector(g.knop), { knop: scherm.knop, compact: !!scherm.compact },
           { wat: scherm.pad + ': de Edge staat en ' + scherm.knop + ' is er' });
@@ -219,23 +252,32 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       assert.equal(balk.veldZichtbaar, true, 'het adresveld zelf is niet meer te zien');
     });
 
-    /* DE GRENDEL. De hero van rit.html is een inhoudelijke sectie van ruim
-       200px en geen systeembalk. Zonder deze proef zou een grovere claimregel
-       onopgemerkt de inhoud van dat scherm weghalen. */
+    /* DE GRENDEL. De hero van rit.html was een inhoudelijke sectie van ruim
+       200px en geen systeembalk. rit.html staat sinds batch 4 van
+       TRAVELOS-MIGRATIE.md op het Design System en draagt die oude laag niet
+       meer; de regel die hij bewaakte geldt nog wel. Daarom staat de hero hier
+       zelf, met een naam uit de claimlijst, op een scherm dat de claim nog
+       draait. Zonder deze proef zou een grovere claimregel onopgemerkt inhoud
+       wegnemen. */
     await t.test('een hero die alleen de naam draagt, blijft staan', async () => {
-      await page.goto(base + '/apps/rit.html', { waitUntil: 'domcontentloaded' });
+      await page.goto(base + '/apps/browser.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
-        document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('.ritkop'), null,
-        { wat: 'de inhoudelijke hero van rit.html' });
+        document.body.getAttribute('data-rtg-adaptive-ready') === 'true' && !!window.RTGAdaptiveEdgeClaim, null,
+        { wat: 'een scherm waarop de claim draait' });
       const hero = await page.evaluate(() => {
-        const el = document.querySelector('.ritkop');
+        const el = document.createElement('section');
+        el.className = 'rtg-deep-nav';
+        el.setAttribute('data-proefhero', '');
+        el.textContent = 'Van aankomst naar bestemming.';
+        el.style.cssText = 'position:relative;display:block;height:430px';
+        document.body.prepend(el);
+        window.RTGAdaptiveEdgeClaim.claim(document, window);
         const s = getComputedStyle(el), r = el.getBoundingClientRect();
-        return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), positie: s.position,
-          hoogte: Math.round(r.height), zichtbaar: s.display !== 'none' && r.height > 0 };
+        return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), hoogte: Math.round(r.height),
+          zichtbaar: s.display !== 'none' && r.height > 0 };
       });
       assert.equal(hero.geclaimd, false, 'de Edge claimde een hero alsof het een balk was');
-      assert.equal(hero.zichtbaar, true, 'de hero van rit.html is van het scherm verdwenen');
+      assert.equal(hero.zichtbaar, true, 'de hero is van het scherm verdwenen');
       assert.ok(hero.hoogte > 200, 'de hero is geen hero meer (' + hero.hoogte + 'px); de grendel toetst niets meer');
     });
   } finally {

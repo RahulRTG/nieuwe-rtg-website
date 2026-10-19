@@ -1,42 +1,27 @@
 /* RTG Voertuig -- EEN voertuig uit de vloot, met een adres.
 
    WAAROM DIT SCHERM ER IS. De verwijsvorm van dit huis (rtg://<soort>/<id>) kon
-   nergens heen voor een voertuig: er was geen app die er EEN opende. Een ticket
-   over een kapotte bus droeg daardoor hooguit "bus 28" in de vrije tekst, en dat
-   is geen verwijzing maar een hoop. Dit is het adres dat daaraan ontbrak.
+   nergens heen voor een voertuig. Een ticket over een kapotte bus droeg daardoor
+   hooguit "bus 28" in de vrije tekst, en dat is geen verwijzing maar een hoop.
 
    TWEE DINGEN HETEN HIER VOERTUIG, EN DIT IS DE DUURZAME. `db.data.ovVoertuigen`
-   is een LIVE positie met een houdbaarheid van twee minuten -- die verdwijnt
-   zodra een chauffeur zijn dienst beeindigt, en er dus naar verwijzen zou een
-   link opleveren die vrijwel altijd dood is. Dit scherm toont een `mobAsset`:
-   het voertuig zelf, met zijn papieren, en dat bestaat morgen nog. "Bus 28 is
-   defect" gaat over dit ding en niet over een positie.
+   is een LIVE positie met een houdbaarheid van twee minuten. Dit scherm toont een
+   `mobAsset`: het voertuig zelf, met zijn papieren, en dat bestaat morgen nog.
 
-   DE KERN VAN HET SCHERM IS DE FAIL-CLOSED PAPIERENREGEL die in
-   kern/mobiliteit/assets.js staat: een verplicht document zonder geldige
-   einddatum telt als ONGELDIG en niet als "vast wel in orde". Er wordt hier
-   niets bijgerekend -- inzetbaar, de redenen en wat er bijna afloopt komen
-   kant-en-klaar van de server, want twee plekken die uitrekenen of een taxi mag
-   rijden, lopen uiteen (LAT-regel 4). Dit bestand tekent ze alleen.
+   DE KERN IS DE FAIL-CLOSED PAPIERENREGEL uit kern/mobiliteit/assets.js: een
+   verplicht document zonder geldige einddatum telt als ONGELDIG. Er wordt hier
+   niets bijgerekend -- inzetbaar, de redenen en wat bijna afloopt komen van de
+   server (LAT-regel 4). Dit bestand tekent ze alleen, in de vorm van /ds/.
 
    WIE ER BINNENKOMT is de vervoerder zelf: /api/supplier/mob/vloot hangt achter
    supplierAuth. Wie geen sleutel heeft, ziet dat en niet een leeg scherm. */
 (() => {
   const $ = s => document.querySelector(s);
-  /* TWEE DEUREN KOMEN OP DEZELFDE SESSIE UIT, EN DIT SCHERM KENT ZE ALLEBEI.
-     /api/supplier/mob/vloot hangt achter supplierAuth, en die vraagt een sessie
-     met rol 'supplier'. Die krijg je langs twee wegen: de PDA-kant van het
-     personeel (routes/supplier/pda/posities.js, bewaard als `rtg_pda_token`) en
-     de leverancier-inlog zelf (apps/leverancier.js, `rtg_sup_token`). Hier stond
-     eerst alleen de eerste, en dan kreeg de vervoerder die via zijn EIGEN
-     inlog binnenkomt de gesloten deur te zien terwijl hij de sleutel op zak had.
-     Volgorde: de PDA eerst, want wie op de vloer staat opent dit scherm vanuit
-     zijn dienst; wie beide heeft, gebruikt de sessie waar hij nu in werkt.
-
-     Allebei UITGESCHREVEN en niet uit een lijstje gelezen: de scanners van
-     test/blindevlek.test.js lezen `getItem('...')` met een letterlijke naam, dus
-     een lus over een array maakt dit scherm voor die controle onzichtbaar. Een
-     bewaking die je stil uitschakelt is erger dan geen (LAT-regel 9). */
+  /* TWEE DEUREN KOMEN OP DEZELFDE SESSIE UIT (rol 'supplier'): de PDA-kant van
+     het personeel (`rtg_pda_token`) en de leverancier-inlog zelf
+     (`rtg_sup_token`). De PDA eerst: wie op de vloer staat opent dit scherm
+     vanuit zijn dienst. Allebei UITGESCHREVEN: test/blindevlek.test.js leest
+     `getItem('...')` met een letterlijke naam (LAT-regel 9). */
   const token = (() => {
     try { return localStorage.getItem('rtg_pda_token') || localStorage.getItem('rtg_sup_token'); }
     catch (e) { return null; }
@@ -48,16 +33,24 @@
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
   let meldT;
-  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
-    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 4200); };
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('toon');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('toon'), 4200); };
   const leeg = el => { while (el.firstChild) el.removeChild(el.firstChild); };
+  const maak = (tag, klasse, tekst) => { const e = document.createElement(tag);
+    if (klasse) e.className = klasse; if (tekst != null) e.textContent = tekst; return e; };
+  /* Een einddatum volgt de taal van de pagina; wat geen datum is, blijft staan. */
+  const datum = t => { const d = new Date(t);
+    return isNaN(d) ? String(t) : d.toLocaleDateString(document.documentElement.lang || 'nl', { dateStyle: 'medium' }); };
+  const STIP = '<svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="3"/></svg>';
 
+  /* Een rij: naam links, waarde rechts. `let` maakt een afwijking zichtbaar in
+     tekst (data-let), nooit alleen in kleur. */
   function rij(naam, waarde, klasse) {
-    const d = document.createElement('div'); d.className = 'rij';
-    const a = document.createElement('span'); a.textContent = naam;
-    const b = document.createElement('b'); b.textContent = waarde;
-    if (klasse) { b.className = 'stand ' + klasse; }
-    d.appendChild(a); d.appendChild(b); return d;
+    const li = maak('li', 'ds-lijst__rij'); li.innerHTML = STIP;
+    const t = maak('span'); t.appendChild(maak('span', 'ds-lijst__titel', naam)); li.appendChild(t);
+    const w = maak('span', 'ds-lijst__tijd', waarde);
+    if (klasse) li.dataset.let = klasse;
+    li.appendChild(w); return li;
   }
 
   function toonPapieren(v) {
@@ -71,48 +64,34 @@
     const papieren = v.papieren || {};
     for (const naam of verplicht) {
       const p = papieren[naam];
-      const tot = p && (p.tot || p.geldigTot || p.einddatum);
-      doel.appendChild(rij(naam, tot ? 'tot ' + tot : 'geen einddatum', tot ? '' : 'nee'));
+      /* De kern bewaart een papier als zijn einddatum (kern/mobiliteit/assets.js);
+         hier stond alleen de objectvorm, en dan las elk geldig papier als
+         "geen einddatum" naast een voertuig dat de server inzetbaar noemde. */
+      const tot = typeof p === 'string' ? p : p && (p.tot || p.geldigTot || p.einddatum);
+      doel.appendChild(rij(naam, tot ? 'tot ' + datum(tot) : 'geen einddatum', tot ? '' : 'nee'));
     }
-    /* De zin die dit scherm draagt. Hij staat er ALTIJD, ook als alles groen is:
-       wie hem alleen bij een probleem leest, denkt bij een leeg scherm dat er
+    /* De zin die dit scherm draagt. Hij staat er ALTIJD, ook als alles in orde
+       is: wie hem alleen bij een probleem leest, denkt bij een leeg scherm dat er
        niets gecontroleerd is. */
     $('#vPapierenLet').textContent = 'Een verplicht document zonder geldige einddatum telt als ONGELDIG, niet als "vast wel in orde" -- daarom staat een voertuig zonder papieren niet op beschikbaar maar op geblokkeerd, met de reden erbij.';
   }
 
   function toonDit(v) {
     $('#dit').hidden = false; $('#geen').hidden = true;
+    document.body.dataset.dsSchermtype = 'detail';
     $('#vNaam').textContent = v.naam || v.id;
     $('#vSub').textContent = [v.categorieNaam, v.registratie, v.laag].filter(Boolean).join(' · ');
 
-    const stand = $('#vStand'); leeg(stand);
-    const s = document.createElement('span');
-    s.className = 'stand ' + (v.inzetbaar ? 'ja' : 'nee');
-    s.textContent = v.inzetbaar ? 'inzetbaar' : 'niet inzetbaar';
-    stand.appendChild(s);
-    if ((v.bijnaOp || []).length) {
-      const b = document.createElement('span');
-      b.className = 'stand bijna'; b.textContent = v.bijnaOp.length + ' loopt bijna af';
-      stand.appendChild(document.createTextNode(' '));
-      stand.appendChild(b);
-    }
+    const bijna = (v.bijnaOp || []).length;
+    $('#vStand').textContent = (v.inzetbaar ? 'inzetbaar' : 'niet inzetbaar') + (bijna ? ' · ' + bijna + ' loopt bijna af' : '');
+    $('#vStand').dataset.inzetbaar = v.inzetbaar ? 'ja' : 'nee';
 
     const red = $('#vRedenen'); leeg(red);
-    const lijst = document.createElement('ul');
-    for (const r of (v.redenen || [])) {
-      const li = document.createElement('li'); li.textContent = '· ' + r; lijst.appendChild(li);
-    }
+    for (const r of (v.redenen || [])) red.appendChild(rij(r, 'blokkeert', 'nee'));
     for (const b of (v.bijnaOp || [])) {
-      const li = document.createElement('li');
-      li.textContent = '· loopt bijna af: ' + (typeof b === 'string' ? b : (b.naam || JSON.stringify(b)));
-      lijst.appendChild(li);
+      red.appendChild(rij('loopt bijna af: ' + (typeof b === 'string' ? b : (b.naam || b.papier || JSON.stringify(b))), '', 'bijna'));
     }
-    if (!lijst.childNodes.length) {
-      const li = document.createElement('li');
-      li.textContent = 'Geen blokkade en niets dat bijna afloopt.';
-      lijst.appendChild(li);
-    }
-    red.appendChild(lijst);
+    if (!red.childNodes.length) red.appendChild(rij('Geen blokkade en niets dat bijna afloopt.', ''));
 
     const ken = $('#vKenmerken'); leeg(ken);
     ken.appendChild(rij('plaatsen', String(v.plaatsen)));
@@ -133,10 +112,10 @@
     $('#vBestuurderKies').hidden = !team;
     if (!team) return;
     const sel = $('#vTeam'); leeg(sel);
-    const geen = document.createElement('option'); geen.value = ''; geen.textContent = 'geen teamlid';
+    const geen = maak('option', '', 'geen teamlid'); geen.value = '';
     sel.appendChild(geen);
     for (const m of team) {
-      const o = document.createElement('option'); o.value = String(m.id); o.textContent = m.name;
+      const o = maak('option', '', m.name); o.value = String(m.id);
       if (m.id === v.bestuurderStaffId) o.selected = true;
       sel.appendChild(o);
     }
@@ -150,14 +129,17 @@
   function toonVloot(assets) {
     const doel = $('#vloot'); leeg(doel);
     for (const a of assets) {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'vlootrij';
-      b.textContent = (a.naam || a.id) + ' · ' + (a.inzetbaar ? 'inzetbaar' : 'niet inzetbaar');
+      const li = maak('li');
+      const b = maak('button', 'ds-keuze'); b.type = 'button'; b.dataset.voertuig = a.id;
+      b.setAttribute('aria-pressed', String(a.id === gevraagd));
+      b.appendChild(maak('span', 'ds-veld__label', a.naam || a.id));
+      b.appendChild(maak('span', 'ds-veld__waarde', a.inzetbaar ? 'inzetbaar' : 'niet inzetbaar'));
       b.addEventListener('click', () => {
         history.replaceState(null, '', '?voertuig=' + encodeURIComponent(a.id));
+        for (const x of doel.querySelectorAll('[aria-pressed]')) x.setAttribute('aria-pressed', String(x === b));
         toonDit(a); toonPapieren(a); toonBestuurder(a);
       });
-      doel.appendChild(b);
+      li.appendChild(b); doel.appendChild(li);
     }
     $('#vlootLet').textContent = assets.length
       ? 'Deze vloot is van de vervoerder waarmee u bent aangemeld; voertuigen van een andere vervoerder staan hier niet.'
@@ -187,10 +169,9 @@
     const v = assets.find(a => a.id === gevraagd);
     if (!v) {
       $('#geen').hidden = false;
-      /* Er wordt NIET geraden welk voertuig bedoeld werd. Een id dat hier niet
-         staat, hoort bij een andere vervoerder of bestaat niet meer -- en die
-         twee zeggen we niet uit elkaar, want dat verschil verraadt of een
-         voertuig bij een ander bestaat. */
+      /* Er wordt NIET geraden welk voertuig bedoeld werd: een vreemd id en een
+         verdwenen id zeggen we niet uit elkaar, want dat verschil verraadt of
+         een voertuig bij een ander bestaat. */
       $('#geenTekst').textContent = 'Voertuig "' + gevraagd + '" staat niet in deze vloot. Dat betekent of dat het niet (meer) bestaat, of dat het bij een andere vervoerder hoort; welke van de twee zegt dit scherm bewust niet.';
       return;
     }

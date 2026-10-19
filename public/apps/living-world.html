@@ -1,39 +1,44 @@
 <!doctype html>
-<html lang="nl" data-rtg-thema="onyx">
+<html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RTG Living World · TravelOS</title><meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#180b12"><link rel="icon" href="/icon.svg">
-<link href="/fonts/fonts.css" rel="stylesheet"><link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet"><link href="/shared/rtg-edge-system.css" rel="stylesheet">
-<link href="/apps/living-world/world.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<meta name="theme-color" content="#F4EFE7"><link rel="icon" href="/icon.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="native-header" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
-<a class="skip" href="#lwMain">Naar de inhoud</a>
-<header class="lw-header"><a href="/apps/reizen.html">RTG · TravelOS</a></header>
-<main id="lwMain" class="lw-main">
-<nav class="lw-tabs" aria-label="Living World">
-<button type="button" data-lw-tab="world">Wereld</button><button type="button" data-lw-tab="plans">Mijn ervaringen</button>
-<button type="button" data-lw-tab="studio">Werkplaats</button></nav>
-<section class="lw-hero"><p class="lw-eyebrow">RTG LIVING WORLD</p><h1>See the world.<br>Make it yours.</h1>
-<p>Ontdek een plek. Maak een ervaring van wat u raakt.<br>Laat iets achter dat de volgende helpt.</p>
-<a href="#lwContent">Ontdek uw wereld <span aria-hidden="true">↓</span></a></section>
-<div class="lw-toolbar"><p id="lwStatus" role="status" aria-live="polite">Uw wereld wordt geladen…</p><button type="button" id="lwRefresh">Vernieuwen</button></div>
+<!-- Living World op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom D):
+     Collectie (Wereld, Mijn ervaringen, Werkplaats), Detail (een plek,
+     blueprint, plan of bijdrage) en Taak (het formulier met voorvertoning en
+     bevestiging). Geen eigen stijl: alles komt uit /ds/rtg-ds.css. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="collectie">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+</header>
+<main id="lwMain" class="ds-collectie">
+<nav class="ds-chips" aria-label="Living World">
+<button class="ds-chip" type="button" data-lw-tab="world">Wereld</button><button class="ds-chip" type="button" data-lw-tab="plans">Mijn ervaringen</button>
+<button class="ds-chip" type="button" data-lw-tab="studio">Werkplaats</button></nav>
+<div id="lwHero"><section class="ds-kaart ds-kaart--beeld" aria-labelledby="lwHeroTitel"><img class="ds-kaart__beeld" src="/images/worlds/heritage/travel-heritage-v2.jpg" alt="">
+<div class="ds-kaart__inhoud"><p class="ds-kaart__sub">RTG LIVING WORLD</p><h1 class="ds-kaart__titel" id="lwHeroTitel">See the world. Make it yours.</h1>
+<p class="ds-kaart__sub">Ontdek een plek. Maak een ervaring van wat u raakt. Laat iets achter dat de volgende helpt.</p></div></section></div>
+<div class="ds-schermkop"><p class="ds-meta" id="lwStatus" role="status" aria-live="polite">Uw wereld wordt geladen…</p><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" id="lwRefresh">Vernieuwen</button></div>
 <div id="lwContent"></div>
 </main>
-<dialog id="lwDialog" class="lw-dialog" aria-labelledby="lwDialogTitle">
-<header><h2 id="lwDialogTitle"></h2><button type="button" id="lwClose" aria-label="Sluiten">×</button></header>
-<p id="lwDialogIntro"></p><form id="lwForm"><div id="lwFields"></div><p id="lwFormError" role="alert"></p>
-<div id="lwPreview" hidden></div><button type="submit" id="lwSubmit">Bekijk en bevestig</button></form>
+<dialog id="lwDialog" class="ds-dialoog ds-dialoog--vol" aria-labelledby="lwDialogTitle">
+<div class="ds-taak">
+<div class="ds-schermkop"><h2 class="ds-titel ds-titel--scherm" id="lwDialogTitle"></h2><button class="ds-kop__actie" type="button" id="lwClose" aria-label="Sluiten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<p class="ds-meta" id="lwDialogIntro"></p><form class="ds-velden" id="lwForm"><div class="ds-velden" id="lwFields"></div><p class="ds-meta" id="lwFormError" role="alert"></p>
+<div id="lwPreview" hidden></div><button class="ds-knop ds-knop--primair ds-knop--breed" type="submit" id="lwSubmit">Bekijk en bevestig</button></form>
+</div>
 </dialog>
 <script src="/apps/living-world/forms.js"></script><script src="/apps/living-world/details.js"></script><script src="/apps/living-world/render.js"></script>
 <script src="/shared/adaptief.js"></script><script src="/shared/adaptief/grammatica.js"></script>
 <script src="/shared/objectverwijzing.js"></script><script src="/shared/adaptief/vorm.js"></script>
 <script src="/shared/adaptief/register.js"></script><script src="/apps/living-world/client.js"></script>
-<script src="/shared/basis.js" defer></script><script src="/shared/randen.js" defer></script>
-<script src="/shared/metgezel.js" defer></script><script src="/shared/bediening.js" defer></script>
+<script src="/shared/basis.js" defer></script><script src="/shared/cookie.js" defer></script>
 </body></html>

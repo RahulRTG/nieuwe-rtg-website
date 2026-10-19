@@ -14,11 +14,8 @@
    6. kaart: laadt de kaart-uitwijk bij (shared/kaart.js), die geo:-links op
       desktop/iOS opvangt met een eigen paneeltje - coördinaten tonen en laten
       kopiëren, zonder ook maar iets naar een kaart-provider te sturen
-   7. (vervallen) de OS-klok is nu zelf een rustige analoge wijzerplaat in
-      shared/klok.js; het uitbundige 3D-skelet (klok3d.js) wordt niet meer
-      standaard over elke ring gelegd. Het losse vitrinescherm daarvoor is weg (19
-      augustus 2026, nergens vandaan te bereiken); de mechaniek zelf leeft in
-      shared/horlogewerk.js, op het inlogscherm
+   7. (vervallen) de OS-klok woont in shared/klok.js, de mechaniek in
+      shared/horlogewerk.js
    8. navigatie: verzekert de centrale iOS-laag en het appmenu op iedere app
       die de basis laadt, tenzij het scherm zichzelf expliciet uitsluit
    9. overdracht: laadt shared/overdracht.js bij zodra er `?overdracht=` in het
@@ -32,11 +29,14 @@
   'use strict';
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
+  /* html[data-ds] (/ds/shell.js): het gedrag blijft, de oude vormlagen niet
+     (ONTWERPSYSTEEM.md par. 5: een blad buiten een cascadelaag wint). */
+  var ds = document.documentElement.hasAttribute('data-ds');
 
   /* ---- vaste wereldidentiteit, voor alle andere gedeelde lagen -----------
      De toetsbare routekaart vult alleen een ontbrekende wereld aan. Het
      heritage-blad komt bewust LAAT in <head>, na de stijl van het scherm. */
-  if (document.body) document.body.setAttribute('data-rtg-skin', 'heritage');
+  if (document.body && !ds) document.body.setAttribute('data-rtg-skin', 'heritage');
 
   function laadEditorialBlad() {
     if (document.getElementById('rtgEditorialV4Css') ||
@@ -72,7 +72,7 @@
       if (window.RTGWorldIdentity && window.RTGWorldIdentity.apply) {
         window.RTGWorldIdentity.apply(document, location.href);
       }
-    } finally { laadHeritageBlad(); }
+    } finally { if (!ds) laadHeritageBlad(); }
   }
 
   if (window.RTGWorldIdentity) pasWereldIdentiteitToe();
@@ -86,7 +86,7 @@
       identiteitScript.async = false;
     }
     identiteitScript.addEventListener('load', pasWereldIdentiteitToe, { once: true });
-    identiteitScript.addEventListener('error', laadHeritageBlad, { once: true });
+    identiteitScript.addEventListener('error', function () { if (!ds) laadHeritageBlad(); }, { once: true });
     if (!identiteitScript.parentNode) {
       (document.head || document.documentElement).appendChild(identiteitScript);
     }
@@ -106,7 +106,7 @@
      ook productervaring. Iedere bestaande en toekomstige app met deze basis
      krijgt daarom dezelfde RTG Access Experience; de laag wordt alleen
      zichtbaar wanneer zij werkelijk een toegangspoort vindt. */
-  if (!window.RTGAccessExperience && !document.querySelector('script[src^="/shared/toegang.js"]')) {
+  if (!ds && !window.RTGAccessExperience && !document.querySelector('script[src^="/shared/toegang.js"]')) {
     var toegangScript = document.createElement('script');
     toegangScript.src = '/shared/toegang.js'; toegangScript.async = false;
     (document.head || document.documentElement).appendChild(toegangScript);
@@ -129,7 +129,7 @@
      expliciete volgorde, maatwerkschermen houden hun eigen uiterlijk en krijgen
      alleen de zwevende menuknop/home-veeg. data-ios-uit blijft de bewuste
      ontsnappingsroute voor een scherm dat echt alle OS-chrome zelf verzorgt. */
-  if (document.body && !document.body.hasAttribute('data-ios-uit') &&
+  if (!ds && document.body && !document.body.hasAttribute('data-ios-uit') &&
       !document.body.hasAttribute('data-ios-home') && !window.RTGiOS &&
       !document.querySelector('script[src^="/shared/ios.js"]')) {
     var ios = document.createElement('script');
@@ -178,7 +178,7 @@
      De sleutel is rtg_thema_v2 en die staat los van de oude donker/licht-keuze
      in shared/thema.js. Een pagina die nog niet om is, merkt niets: zonder
      attribuut geldt gewoon wat de UI-kit al zei. */
-  if (!document.documentElement.hasAttribute('data-rtg-thema') && !document.getElementById('rtgThemasJs')) {
+  if (!ds && !document.documentElement.hasAttribute('data-rtg-thema') && !document.getElementById('rtgThemasJs')) {
     var th = document.createElement('script');
     th.id = 'rtgThemasJs';
     th.src = '/shared/rtg-themas.js';
@@ -186,7 +186,7 @@
   }
 /* Heritage Motion vult alleen declaratieve status en toegankelijkheid aan. De
    app houdt haar eigen klik, bevoegdheid en route; dubbel laden is uitgesloten. */
-  if (!window.RTGHeritageMotion && !document.getElementById('rtgHeritageMotionJs') &&
+  if (!ds && !window.RTGHeritageMotion && !document.getElementById('rtgHeritageMotionJs') &&
       !document.querySelector('script[src^="/shared/rtg-heritage-motion.js"]')) {
     var bewegingScript = document.createElement('script');
     bewegingScript.id = 'rtgHeritageMotionJs';
@@ -196,7 +196,7 @@
   }
 /* De Continue Key verrijkt uitsluitend de al gemarkeerde Edge-hoofdactie. De
    passieve kern staat ervoor; async=false bewaakt de toevoegvolgorde. */
-  if (!window.RTGContinueKeyCore && !document.getElementById('rtgContinueKeyCoreJs') &&
+  if (!ds && !window.RTGContinueKeyCore && !document.getElementById('rtgContinueKeyCoreJs') &&
       !document.querySelector('script[src^="/shared/rtg-continue-key-core.js"]')) {
     var verderKern = document.createElement('script');
     verderKern.id = 'rtgContinueKeyCoreJs';
@@ -204,7 +204,7 @@
     verderKern.async = false;
     (document.head || document.documentElement).appendChild(verderKern);
   }
-  if (!window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&
+  if (!ds && !window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&
       !document.querySelector('script[src^="/shared/rtg-continue-key.js"]')) {
     var verderScript = document.createElement('script');
     verderScript.id = 'rtgContinueKeyJs';
@@ -214,7 +214,7 @@
   }
 /* Routes mogen functionele CSS bijladen, maar Heritage blijft het laatste
    materiaalblad. De helper verplaatst alleen de bestaande link. */
-  if (!window.RTGHeritageOrder && !document.getElementById('rtgHeritageOrderJs') &&
+  if (!ds && !window.RTGHeritageOrder && !document.getElementById('rtgHeritageOrderJs') &&
       !document.querySelector('script[src^="/shared/rtg-heritage-order.js"]')) {
     var heritageOrderScript = document.createElement('script');
     heritageOrderScript.id = 'rtgHeritageOrderJs';
@@ -228,7 +228,7 @@
 (function () {
   'use strict';
   var b = document.body;
-  if (!b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
+  if (ds || !b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
   if (window.RTGRanden || window.__RTGRandenBoot || document.getElementById('rtgRandenJs') ||
       document.querySelector('script[src^="/shared/randen.js"],script[src^="../shared/randen.js"]')) return;
   var s = document.createElement('script');
@@ -243,7 +243,7 @@
     ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
     ['rtg-editorial-v4-header', 'RTGEditorialV4Header'],
     ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
-    if (window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
+    if (ds || window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
     var script = document.createElement('script');
     script.src = '/shared/' + bron[0] + '.js'; script.async = false;
     (document.head || document.documentElement).appendChild(script);
@@ -316,9 +316,11 @@
   /* de gedeelde rustlaag: één ingetogen stijl die overal dezelfde kalmte legt
      (zachte, trage overgangen + een rustige focusrand). Als apart bestand zodat
      het cachet en pagina's het kunnen overschrijven. */
-  var rl = document.createElement('link');
-  rl.rel = 'stylesheet'; rl.href = '/shared/rust.css';
-  (document.head || document.documentElement).appendChild(rl);
+  if (!ds) {
+    var rl = document.createElement('link');
+    rl.rel = 'stylesheet'; rl.href = '/shared/rust.css';
+    (document.head || document.documentElement).appendChild(rl);
+  }
 
   /* de trage helft van de toegankelijkheid: bij de server ophalen wat het lid
      heeft ingesteld, zodat een tweede toestel het ook krijgt. Zonder haast --
@@ -336,7 +338,7 @@
 
      Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
      laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
-  if (!window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+  if (!ds && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
     var gb = document.createElement('script');
     gb.src = '/shared/gebaar.js'; gb.async = true;
     (document.head || document.documentElement).appendChild(gb);
@@ -568,15 +570,19 @@
     }
   }
   /* ---- 5. het lopende werk: de gangreserve-laag van het huis ---- */
-  var uw = document.createElement('script');
-  uw.src = '/shared/uurwerk.js'; uw.async = true;
-  (document.head || document.documentElement).appendChild(uw);
+  if (!ds) {
+    var uw = document.createElement('script');
+    uw.src = '/shared/uurwerk.js'; uw.async = true;
+    (document.head || document.documentElement).appendChild(uw);
+  }
 
   /* ---- 6. de kaart-uitwijk: geo:-links op desktop/iOS opvangen met een eigen
      paneeltje (coördinaten tonen + kopiëren), zonder iets naar derden ---- */
-  var km = document.createElement('script');
-  km.src = '/shared/kaart.js'; km.async = true;
-  (document.head || document.documentElement).appendChild(km);
+  if (!ds) {
+    var km = document.createElement('script');
+    km.src = '/shared/kaart.js'; km.async = true;
+    (document.head || document.documentElement).appendChild(km);
+  }
 
   /* ---- 7. de OS-klok is nu zelf een rustige analoge wijzerplaat (shared/klok.js):
      gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een

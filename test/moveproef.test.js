@@ -112,26 +112,30 @@ test('7. het scherm voert niets uit', () => {
     'het scherm boekt en verzet niets');
 });
 
-test('8. de onderbalk houdt zijn ruimte, en dat is een reparatie met een reden', () => {
-  /* De cookiemelding zoekt met elementsFromPoint wat er ACHTER haar ligt en
-     slaat `pointer-events:none` en `visibility:hidden` over. Een balk die
-     onaanraakbaar is of pas later hoogte krijgt, wordt daardoor NIET ontweken --
-     in de browser gemeten: 60 klikpogingen, "#rtg-cookie intercepts pointer
-     events", en een lid dat de knop niet kan indrukken. Beide eigenschappen
-     staan hier vast omdat de fix aan beide hing. */
-  const balk = (schermCode.match(/\.verderbalk\{[^}]*\}/) || [''])[0];
-  assert.match(balk, /position:fixed/, 'de balk staat vast onderaan');
-  assert.match(balk, /min-height:calc\(52px \+ 2rem\)/, 'met een hoogte die niet later verspringt');
-  assert.ok(!/pointer-events:none/.test(balk), 'en hij is aanraakbaar, anders ziet de cookiemelding hem niet');
-  assert.match(schermCode, /\[data-leeg="ja"\]\{visibility:hidden;\}/,
-    'de lege knop houdt zijn ruimte in plaats van te verdwijnen');
+test('8. de verderknop bestaat pas met een bestemming, ook voor de Edge', () => {
+  /* Hier stond de reparatie van de eigen onderbalk (.verderbalk): een vaste,
+     aanraakbare balk met een onzichtbare lege knop, zodat de cookiemelding er
+     niet overheen viel. Sinds batch 4 van TRAVELOS-MIGRATIE.md staat het scherm
+     op het Design System: de Edge is de enige onderbalk en de knop is een
+     gewone handeling van het scherm (data-ds-actie). Wat de reparatie bewaakte,
+     blijft: er staat nooit een knop die nergens heen gaat. De knop woont in een
+     vak dat verborgen is tot /api/move/volgende een echte plek heeft, en de
+     Edge slaat een handeling in een verborgen vak over (public/ds/edge-modi.js). */
+  assert.match(scherm, /<div id="verderVak" hidden>\s*<button[^>]*id="verder"[^>]*data-ds-actie=/,
+    'de verderknop staat in een verborgen vak en is een handeling van het scherm');
+  assert.match(schermCode, /\$\('#verderVak'\)\.hidden = false;/, 'het vak gaat pas open met een plek');
+  const edge = fs.readFileSync(path.join(WORTEL, 'public', 'ds', 'edge-modi.js'), 'utf8');
+  assert.match(edge, /!x\.closest\('\[hidden\]'\)/, 'de Edge biedt geen handeling aan uit een verborgen vak');
 });
 
-test('9. de hoek van de route-inhoud blijft 0', () => {
+test('9. de hoek van de route-inhoud komt uit het systeem en niet uit het scherm', () => {
   /* Keuring 58: route-inhoud is recht; een afgeronde systeemlaag mag alleen uit
-     de centrale Heritage-CSS komen. De Continue Key is zo'n systeemlaag en
-     hoort daarom in de SCHIL en niet in dit scherm -- zie MOVE.md par. 6. */
+     de centrale laag komen. Sinds het Design System draagt dit scherm geen
+     eigen stijl meer: geen <style>-blok en geen stijlattribuut, dus ook geen
+     eigen hoek. De hoeken komen uit de radius-tokens van public/ds/. */
+  assert.ok(!/<style\b/i.test(scherm), 'move.html draagt een eigen <style>-blok');
+  assert.ok(!/\sstyle=/.test(scherm), 'move.html draagt een stijlattribuut');
   for (const m of schermCode.matchAll(/border-radius\s*:\s*([^;}]+)/g)) {
-    assert.match(m[1].trim(), /^(0|50%)$/, 'ongeclassificeerde hoek in move.html: ' + m[1].trim());
+    assert.fail('ongeclassificeerde hoek in move.html: ' + m[1].trim());
   }
 });

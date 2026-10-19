@@ -13,9 +13,8 @@
   function sceneMaat() {
     if (!SC.aan) return;
     SDPR = Math.min(2, window.devicePixelRatio || 1);
-    SW = window.innerWidth; SH = window.innerHeight;
+    SW = veld.clientWidth || window.innerWidth; SH = veld.clientHeight || window.innerHeight;
     veld.width = SW * SDPR; veld.height = SH * SDPR;
-    veld.style.width = SW + 'px'; veld.style.height = SH + 'px';
     sctx.setTransform(SDPR, 0, 0, SDPR, 0, 0);
   }
   window.addEventListener('resize', sceneMaat);
@@ -24,11 +23,12 @@
     if (!SCENES[spel]) return;
     SC.aan = true; SC.spel = spel; SC.anims = [];
     if (SCENES[spel].reset) SCENES[spel].reset();
-    veld.hidden = false; document.body.classList.add('scene-aan');
+    /* tijdens een potje wijkt de kop van de zaal: alle aandacht naar het speelveld */
+    veld.hidden = false; document.body.classList.add('scene-aan'); $('#zaalKop').hidden = true;
     sceneMaat();
     requestAnimationFrame(sceneLus);
   }
-  function sceneDicht() { SC.aan = false; veld.hidden = true; document.body.classList.remove('scene-aan'); }
+  function sceneDicht() { SC.aan = false; veld.hidden = true; document.body.classList.remove('scene-aan'); $('#zaalKop').hidden = false; }
 
   function sceneLus() {
     if (!SC.aan) return;

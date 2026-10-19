@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 179,
-    "schermenMetStijlblok": 290,
-    "important": 7717
+    "bladen": 168,
+    "schermenMetStijlblok": 265,
+    "important": 7586
   },
   "uitzonderingen": [],
   "bladen": {
@@ -22,11 +22,6 @@
       "bytes": 8279,
       "important": 88,
       "hex": 6
-    },
-    "public/apps/chauffeur.css": {
-      "bytes": 20668,
-      "important": 5,
-      "hex": 52
     },
     "public/apps/comm-heritage.css": {
       "bytes": 7517,
@@ -58,11 +53,6 @@
       "important": 3,
       "hex": 15
     },
-    "public/apps/living-world/world.css": {
-      "bytes": 4929,
-      "important": 6,
-      "hex": 0
-    },
     "public/apps/media/studio-pro.css": {
       "bytes": 9410,
       "important": 6,
@@ -77,11 +67,6 @@
       "bytes": 9870,
       "important": 145,
       "hex": 21
-    },
-    "public/apps/navigatie-premium.css": {
-      "bytes": 15416,
-      "important": 2,
-      "hex": 33
     },
     "public/apps/office/collab.css": {
       "bytes": 5186,
@@ -102,11 +87,6 @@
       "bytes": 5190,
       "important": 13,
       "hex": 35
-    },
-    "public/apps/reizen-performance.css": {
-      "bytes": 41881,
-      "important": 10,
-      "hex": 111
     },
     "public/apps/rtg-onthul.css": {
       "bytes": 690,
@@ -323,16 +303,6 @@
       "important": 0,
       "hex": 19
     },
-    "public/shared/rtg-aankomst-2026.css": {
-      "bytes": 8168,
-      "important": 46,
-      "hex": 20
-    },
-    "public/shared/rtg-aankomst-momenten-2026.css": {
-      "bytes": 8724,
-      "important": 0,
-      "hex": 8
-    },
     "public/shared/rtg-adaptive-edge.css": {
       "bytes": 39439,
       "important": 229,
@@ -479,7 +449,7 @@
       "hex": 1
     },
     "public/shared/rtg-heritage-experiences.css": {
-      "bytes": 3553,
+      "bytes": 3254,
       "important": 0,
       "hex": 0
     },
@@ -563,11 +533,6 @@
       "important": 18,
       "hex": 0
     },
-    "public/shared/rtg-reisboek-2026.css": {
-      "bytes": 15624,
-      "important": 2,
-      "hex": 34
-    },
     "public/shared/rtg-schil.css": {
       "bytes": 22558,
       "important": 9,
@@ -622,21 +587,6 @@
       "bytes": 10226,
       "important": 4,
       "hex": 44
-    },
-    "public/shared/rtg-verblijven-2026.css": {
-      "bytes": 8629,
-      "important": 14,
-      "hex": 21
-    },
-    "public/shared/rtg-verblijven-momenten-2026.css": {
-      "bytes": 3626,
-      "important": 0,
-      "hex": 15
-    },
-    "public/shared/rtg-vlucht-2026.css": {
-      "bytes": 10236,
-      "important": 25,
-      "hex": 29
     },
     "public/shared/rtg-warm-details.css": {
       "bytes": 9202,
@@ -747,11 +697,6 @@
       "bytes": 37518,
       "important": 281,
       "hex": 61
-    },
-    "public/shared/travelos-materiaal.css": {
-      "bytes": 2553,
-      "important": 0,
-      "hex": 12
     },
     "public/shared/uitleg.css": {
       "bytes": 1469,
@@ -947,12 +892,6 @@
       "important": 0,
       "hex": 5
     },
-    "public/apps/arrival.html": {
-      "blokken": 1,
-      "bytes": 1896,
-      "important": 0,
-      "hex": 15
-    },
     "public/apps/attenties.html": {
       "blokken": 2,
       "bytes": 4301,
@@ -1018,12 +957,6 @@
       "bytes": 542,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/boeken.html": {
-      "blokken": 1,
-      "bytes": 3009,
-      "important": 1,
-      "hex": 4
     },
     "public/apps/browser.html": {
       "blokken": 2,
@@ -1103,12 +1036,6 @@
       "important": 0,
       "hex": 4
     },
-    "public/apps/dispatch.html": {
-      "blokken": 2,
-      "bytes": 3982,
-      "important": 3,
-      "hex": 4
-    },
     "public/apps/doelen.html": {
       "blokken": 1,
       "bytes": 1102,
@@ -1138,12 +1065,6 @@
       "bytes": 6226,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/flits.html": {
-      "blokken": 1,
-      "bytes": 4232,
-      "important": 2,
-      "hex": 4
     },
     "public/apps/foodcourt.html": {
       "blokken": 2,
@@ -1691,23 +1612,11 @@
       "important": 1,
       "hex": 4
     },
-    "public/apps/ghost.html": {
-      "blokken": 1,
-      "bytes": 2431,
-      "important": 1,
-      "hex": 3
-    },
     "public/apps/handel.html": {
       "blokken": 1,
       "bytes": 696,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/hangar.html": {
-      "blokken": 2,
-      "bytes": 4446,
-      "important": 0,
-      "hex": 6
     },
     "public/apps/hardware-pda.html": {
       "blokken": 2,
@@ -1780,12 +1689,6 @@
       "bytes": 4216,
       "important": 0,
       "hex": 1
-    },
-    "public/apps/hotels.html": {
-      "blokken": 1,
-      "bytes": 575,
-      "important": 0,
-      "hex": 0
     },
     "public/apps/ik.html": {
       "blokken": 2,
@@ -1985,12 +1888,6 @@
       "important": 0,
       "hex": 4
     },
-    "public/apps/luchthaven.html": {
-      "blokken": 2,
-      "bytes": 5697,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/magnaat-kantoor.html": {
       "blokken": 1,
       "bytes": 13447,
@@ -2020,12 +1917,6 @@
       "bytes": 19269,
       "important": 0,
       "hex": 19
-    },
-    "public/apps/marechaussee.html": {
-      "blokken": 2,
-      "bytes": 5296,
-      "important": 0,
-      "hex": 5
     },
     "public/apps/mecenaat.html": {
       "blokken": 1,
@@ -2117,12 +2008,6 @@
       "important": 1,
       "hex": 6
     },
-    "public/apps/move.html": {
-      "blokken": 1,
-      "bytes": 8602,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/muziek.html": {
       "blokken": 2,
       "bytes": 10391,
@@ -2134,12 +2019,6 @@
       "bytes": 680,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/navigatie.html": {
-      "blokken": 1,
-      "bytes": 13025,
-      "important": 0,
-      "hex": 15
     },
     "public/apps/nieuws.html": {
       "blokken": 2,
@@ -2171,24 +2050,6 @@
       "important": 2,
       "hex": 5
     },
-    "public/apps/ov.html": {
-      "blokken": 2,
-      "bytes": 12718,
-      "important": 3,
-      "hex": 16
-    },
-    "public/apps/ovcontrol.html": {
-      "blokken": 1,
-      "bytes": 2179,
-      "important": 0,
-      "hex": 8
-    },
-    "public/apps/ovdienst.html": {
-      "blokken": 2,
-      "bytes": 4406,
-      "important": 2,
-      "hex": 4
-    },
     "public/apps/overheid.html": {
       "blokken": 3,
       "bytes": 9066,
@@ -2200,12 +2061,6 @@
       "bytes": 5064,
       "important": 0,
       "hex": 5
-    },
-    "public/apps/ovroutes.html": {
-      "blokken": 2,
-      "bytes": 4373,
-      "important": 2,
-      "hex": 4
     },
     "public/apps/pakketten.html": {
       "blokken": 1,
@@ -2285,47 +2140,11 @@
       "important": 0,
       "hex": 5
     },
-    "public/apps/reisbureau.html": {
-      "blokken": 2,
-      "bytes": 7363,
-      "important": 1,
-      "hex": 14
-    },
-    "public/apps/reisuitnodiging.html": {
-      "blokken": 1,
-      "bytes": 593,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/reizen.html": {
-      "blokken": 2,
-      "bytes": 1550,
-      "important": 2,
-      "hex": 0
-    },
-    "public/apps/residentie.html": {
-      "blokken": 2,
-      "bytes": 8333,
-      "important": 2,
-      "hex": 18
-    },
     "public/apps/rijksloket.html": {
       "blokken": 3,
       "bytes": 7866,
       "important": 0,
       "hex": 8
-    },
-    "public/apps/routedekking.html": {
-      "blokken": 1,
-      "bytes": 3210,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/routedossier.html": {
-      "blokken": 1,
-      "bytes": 4812,
-      "important": 0,
-      "hex": 2
     },
     "public/apps/rtg.html": {
       "blokken": 2,
@@ -2441,12 +2260,6 @@
       "important": 0,
       "hex": 5
     },
-    "public/apps/stad.html": {
-      "blokken": 2,
-      "bytes": 4088,
-      "important": 0,
-      "hex": 6
-    },
     "public/apps/stadsdoos.html": {
       "blokken": 2,
       "bytes": 4215,
@@ -2543,23 +2356,11 @@
       "important": 0,
       "hex": 3
     },
-    "public/apps/vluchten.html": {
-      "blokken": 2,
-      "bytes": 5224,
-      "important": 0,
-      "hex": 8
-    },
     "public/apps/voeding.html": {
       "blokken": 1,
       "bytes": 1362,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/voertuig.html": {
-      "blokken": 1,
-      "bytes": 1924,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/vonk.html": {
       "blokken": 1,
@@ -2626,12 +2427,6 @@
       "bytes": 5148,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/zakelijk.html": {
-      "blokken": 2,
-      "bytes": 4399,
-      "important": 3,
-      "hex": 5
     },
     "public/apps/zorgbalie.html": {
       "blokken": 1,

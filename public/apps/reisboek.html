@@ -3,67 +3,59 @@
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG TravelOS · Reisboek</title>
-<meta name="theme-color" content="#03101a">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/travel-os.css" rel="stylesheet">
-<link href="/shared/rtg-edge-system.css" rel="stylesheet">
-<link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
-<link href="/shared/rtg-reisboek-2026.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl travel-os rtg-reisboek" data-rtg-world="travel" data-rtg-vandaag-luxe="surface" data-rtg-vandaag-surface="reisboek" data-rtg-vandaag-surface-title="Uw reis" data-rtg-edge-2-context="native-header" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rb-tab="vandaag" data-rtg-layout="standard">
-<header class="reisboek-kop" data-rtg-gedeeld-doel="reisboek">
-  <a class="reisboek-brand" href="/apps/reizen.html" aria-label="RTG TravelOS"><b>RTG</b><span>TravelOS</span><small>Alles wat met u meereist</small></a>
-  <a class="reisboek-bericht" href="/apps/comm.html" aria-label="Open berichten"><span aria-hidden="true">◇</span></a>
-  <div class="reisboek-koptekst"><span class="ey" id="rbEy">Vandaag</span><h1 id="rbTitel">Uw reis beweegt<br>met u mee.</h1><p id="rbIntro">Vlucht, chauffeur, verblijf en plannen vormen samen één rustige reis.</p></div>
+<!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4):
+     Detail (Vandaag, met groot beeld en de reisregels), Collectie (de
+     documenten), Status (wijzigingen, leeg) en Taak (het beheerblad). Geen
+     eigen stijl: alles komt uit /ds/rtg-ds.css. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="detail" data-rb-tab="vandaag">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/comm.html" aria-label="Open berichten"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5h16v11H9l-5 4z"/></svg></a>
 </header>
 
-<main id="main">
-  <nav class="reisboek-momenten" aria-label="Onderdelen van uw reisboek">
-    <button type="button" data-rb-tabknop="vandaag" aria-current="step"><b>01</b><span>Vandaag</span></button>
-    <button type="button" data-rb-tabknop="documenten"><b>02</b><span>Documenten</span></button>
-    <button type="button" data-rb-tabknop="wijzigingen"><b>03</b><span>Wijzigingen</span></button>
+<main class="ds-collectie" id="main">
+  <div class="ds-collectie__kop ds-gedeeld--reisboek" data-rtg-gedeeld-doel="reisboek">
+    <p class="ds-label" id="rbEy">Vandaag</p>
+    <h1 class="ds-titel ds-titel--scherm" id="rbTitel">Uw reis beweegt<br>met u mee.</h1>
+    <p class="ds-meta" id="rbIntro">Vlucht, chauffeur, verblijf en plannen vormen samen één rustige reis.</p>
+  </div>
+  <div class="ds-tabs" role="tablist" aria-label="Onderdelen van uw reisboek">
+    <button class="ds-tab" role="tab" type="button" data-rb-tabknop="vandaag" aria-selected="true">Vandaag</button>
+    <button class="ds-tab" role="tab" type="button" data-rb-tabknop="documenten" aria-selected="false" data-ds-actie="Documenten">Documenten</button>
+    <button class="ds-tab" role="tab" type="button" data-rb-tabknop="wijzigingen" aria-selected="false" data-ds-actie="Wijzigingen">Wijzigingen</button>
+  </div>
+  <div id="inhoud" role="tabpanel"><div class="ds-status ds-status--binnen"><p class="ds-status__tekst">Uw reisboek wordt veilig geladen…</p></div></div>
+  <nav class="ds-chips" aria-label="TravelOS Reisboek">
+    <a class="ds-chip" href="/apps/reisboek.html" aria-current="page">Reisboek</a>
+    <a class="ds-chip" href="/apps/reizen.html">Mijn reizen</a>
+    <a class="ds-chip" href="/apps/app.html#profiel">Profiel</a>
   </nav>
-  <div id="inhoud"><div class="rb-leeg">Uw reisboek wordt veilig geladen…</div></div>
 </main>
 
-<nav class="reisboek-nav" aria-label="TravelOS Reisboek">
-  <button type="button" data-rb-nav="vandaag" aria-current="page"><b>▣</b>Reisboek</button>
-  <a href="/apps/reizen.html"><b>▢</b>Mijn reizen</a>
-  <a href="/apps/reizen.html"><b>◇</b>TravelOS</a>
-  <a href="/apps/app.html#profiel"><b>♙</b>Profiel</a>
-</nav>
-
-<dialog class="rb-beheer" id="rbBeheer" aria-labelledby="rbBeheerTitel">
-  <div class="rb-beheer-kop"><div><span>UW EIGEN REISBOEK</span><h2 id="rbBeheerTitel">Reis beheren</h2></div><button type="button" data-beheer-sluit aria-label="Sluiten">×</button></div>
-  <div id="rbBeheerInhoud"></div>
+<dialog class="ds-dialoog ds-dialoog--vol" id="rbBeheer" aria-labelledby="rbBeheerTitel">
+  <div class="ds-taak">
+    <div class="ds-schermkop"><div><p class="ds-label">Uw eigen reisboek</p><h2 class="ds-titel ds-titel--scherm" id="rbBeheerTitel">Reis beheren</h2></div><button class="ds-knop ds-knop--stil ds-knop--klein" type="button" data-beheer-sluit aria-label="Sluiten">Sluiten</button></div>
+    <div class="ds-velden" id="rbBeheerInhoud"></div>
+  </div>
 </dialog>
-<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 
-<script src="/shared/deur.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/reisboek-momenten.js"></script>
 <script src="/apps/reisboek-beheer.js"></script>
 <script src="/apps/reisboek.js"></script>
-<script src="/shared/rtg-vandaag-luxe.js" defer></script>
-<script src="/shared/deelmenu.js" defer></script>
-<script src="/shared/schermbeeld.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
 </body>
 </html>

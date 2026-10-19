@@ -5,164 +5,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Reisbureau</title>
+<meta name="theme-color" content="#F4EFE7">
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
-  <link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/apps/rtg-onthul.css" rel="stylesheet">
-<script src="/apps/rtg-onthul.js" defer></script>
-<script src="/shared/adresvoorstel.js"></script>
+<link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{
-    --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
-  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  a{color:inherit;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,#E7A8B8);}
-  header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
-  main{padding:1.1rem;max-width:900px;margin:0 auto;}
-  .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.9rem;margin-top:.9rem;}
-  .reis{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
-  .reis:hover{border-color:var(--gold);transform:translateY(-2px);}
-  .reis h3{font-size:1.2rem;}
-  .reis .meta{font-size:.74rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
-  .reis .tag{font-size:.86rem;color:var(--muted);line-height:1.55;}
-  .reis .prijs{font-size:.86rem;color:var(--rtg-leesgoud,#E7A8B8);font-variant-numeric:tabular-nums;margin-top:.15rem;}
-  .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
-  .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
-  .blad.open{display:block;}
-  body.rtg-stijl #blad .paneel{padding-bottom:calc(190px + env(safe-area-inset-bottom));}
-  .blad{scroll-padding-block:90px 160px;}
-  .blad :is(button,input,a){scroll-margin-block:90px 160px;}
-  [hidden]{display:none!important;}
-  .reis-context{margin:.9rem 0;line-height:1.6;}
-  .reis-context p,#rStatus,#rSummary{margin:.7rem 0;overflow-wrap:anywhere;}
-  .knop:disabled{opacity:.55;cursor:wait;}
-  .lijst{grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));}
-  .blad-kop{position:sticky;top:0;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  .paneel{max-width:560px;margin:0 auto;padding:1.1rem;}
-  .veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;width:100%;}
-  .rij{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;}
-  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;}
-  .step{display:flex;align-items:center;gap:.5rem;}
-  .step button{width:2.2rem;height:2.2rem;border-radius:0;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:1.1rem;cursor:pointer;}
-  .sec{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 .5rem;}
-  .inbeg{list-style:none;display:flex;flex-direction:column;gap:.35rem;}
-  .inbeg li{font-size:.86rem;color:var(--muted);padding-left:1.1rem;position:relative;}
-  .inbeg li::before{content:'✓';position:absolute;left:0;color:var(--rtg-leesgoud,#E7A8B8);}
-  .knop{width:100%;margin-top:1.1rem;background:var(--gold);color:#000;border:none;border-radius:0;padding:.8rem;font:inherit;font-weight:600;font-size:.95rem;cursor:pointer;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
-  .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
-  .inlog a{color:var(--rtg-leesgoud,#E7A8B8);border-bottom:1px solid var(--gold);}
-  /* De nazorg (wijzigen, afzeggen) en "mijn aanvragen": eigen klassen in plaats
-     van style="..." -- elk van die attributen houdt style-src-attr in de CSP
-     open, en NORM.json telt ze (inlineStijlAttributen). */
-  .nazorg{display:block;margin-top:.6rem;padding:.7rem;border:1px solid var(--line);}
-  .nazorg .lbl-blok{display:block;margin-bottom:.3rem;}
-  .nazorg .lbl-afzeg{display:block;margin:.6rem 0 .3rem;}
-  .nazorg .veld-blok{width:100%;padding:.4rem;margin-bottom:.5rem;}
-  .nazorg .veld-blok.ruim{margin-bottom:.6rem;}
-  .nazorg .toelichting{display:block;margin-top:.6rem;}
-  .knop.klein{width:auto;margin:0;padding:.45rem .8rem;}
-  .knop.stil{width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;}
-  .knop.stil.zacht{color:var(--soft);}
-  .mijn-kop{font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;}
-  .reis.aanvraag{cursor:default;flex-direction:column;align-items:stretch;gap:.4rem;}
-  .reis.aanvraag[aria-current="true"]{box-shadow:inset 3px 0 0 var(--gold,#857007);}
-  .aanvraag-rij{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
-  .aanvraag-rij h3{font-size:1rem;}
-  .stand-bevestigd{color:var(--green);}
-  .stand-afgewezen,.stand-afgezegd{color:var(--burgundy);}
-  .stand-wijziging-gevraagd{color:var(--gold,#857007);}
-</style>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/rtg-edge-system.css" rel="stylesheet">
-<link href="/shared/rtg-first-steps.css" rel="stylesheet">
-<script src="/shared/rtg-first-steps.js"></script>
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-12ziu9c:not(#_#_#_){min-width:7.5rem;color:var(--soft);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding-top:.15rem}
-.s-16j2h7l:not(#_#_#_){min-width:2.5rem;text-align:center;font-size:1.05rem}
-.s-1e3l51k:not(#_#_#_){color:var(--soft);font-size:.76rem;margin-top:0.5rem}
-.s-1grrhzp:not(#_#_#_){color:var(--rtg-leesgoud,#E7A8B8)}
-.s-1ik90f3:not(#_#_#_){font-family:'Bodoni Moda',serif;font-size:1.3rem}
-.s-1ke48o0:not(#_#_#_){color:var(--rtg-leesgoud,#E7A8B8);margin-bottom:.35rem}
-.s-1u9jfh1:not(#_#_#_){margin-top:0.75rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums}
-.s-gadqz5:not(#_#_#_){font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,#E7A8B8)}
-.s-jkn0mr:not(#_#_#_){color:var(--muted);font-size:.9rem;line-height:1.6}
-.s-popvjv:not(#_#_#_){color:var(--burgundy)}
-.s-v7dap9:not(#_#_#_){font-size:.86rem;color:var(--muted);line-height:1.7}
-.s-wo6tnb:not(#_#_#_){width:auto;margin-left:.4rem;padding:.3rem .7rem;font-size:.78rem}
-</style>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-rtg-editorial-room data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header>
-  <a class="terug" href="/apps/app.html">← App</a>
-  <div><div class="ey">Samengestelde reizen</div><h1>RTG Reisbureau</h1></div>
+<!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4):
+     Collectie (de samengestelde reizen), Gesprek (de reiswens aan Rahul),
+     Detail + Taak (het reisblad) en Status (leeg, gast). Geen eigen stijl:
+     alles komt uit /ds/rtg-ds.css. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="collectie">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
-<main id="main">
-  <div class="lijst" id="lijst"><p class="leeg">We halen het reisaanbod voor u op.</p></div>
-  <section id="travelAdvice" hidden aria-labelledby="travelAdviceTitle">
-    <h2 id="travelAdviceTitle">Vertel ons hoe u wilt reizen.</h2>
-    <p>Rahul kijkt welke reizen bij uw wensen passen. Er wordt niets geboekt.</p>
-    <label for="adviesIn">Wat zou deze reis voor u bijzonder maken?</label>
-    <input class="veld" id="adviesIn" maxlength="200" placeholder="Bijvoorbeeld: een rustige week aan zee met mijn gezin.">
-    <button class="knop" id="adviesGo" type="button">Bekijk wat bij mij past</button>
-    <div id="adviesUit" role="status"></div>
-  </section>
+
+<main class="ds-collectie" id="main">
+  <div class="ds-collectie__kop">
+    <p class="ds-label">Samengestelde reizen</p>
+    <h1 class="ds-titel ds-titel--scherm">RTG Reisbureau</h1>
+  </div>
+  <div id="lijst"><div class="ds-status ds-status--binnen"><p class="ds-status__tekst">We halen het reisaanbod voor u op.</p></div></div>
+  <div id="travelAdvice" hidden>
+    <section aria-labelledby="travelAdviceTitle">
+      <div class="ds-gesprek__wie"><span class="ds-gesprek__monogram" aria-hidden="true">R</span><span><b class="ds-veld__label" id="travelAdviceTitle">Vertel ons hoe u wilt reizen.</b><span class="ds-veld__waarde">Rahul kijkt welke reizen bij uw wensen passen. Er wordt niets geboekt.</span></span></div>
+      <div class="ds-gesprek__stroom" id="adviesUit" role="status" aria-live="polite"></div>
+      <div class="ds-velden">
+        <label class="ds-veldlabel" for="adviesIn">Wat zou deze reis voor u bijzonder maken?</label>
+        <input class="ds-invoer" id="adviesIn" maxlength="200" placeholder="Bijvoorbeeld: een rustige week aan zee met mijn gezin.">
+        <button class="ds-knop ds-knop--primair" id="adviesGo" type="button" data-ds-actie="Bekijk wat bij mij past">Bekijk wat bij mij past</button>
+      </div>
+    </section>
+  </div>
   <div id="mijnWrap"></div>
+  <nav class="ds-chips" aria-label="TravelOS reisflow">
+    <a class="ds-chip" href="/apps/reisbureau.html" aria-current="page">Reis</a>
+    <a class="ds-chip" href="/apps/vluchten.html?view=mijn">Vlucht</a>
+    <a class="ds-chip" href="/apps/hotels.html?view=mijn">Verblijf</a>
+  </nav>
 </main>
 
-<section class="blad" id="blad" aria-label="Reis aanvragen">
-  <div class="blad-kop">
-    <button class="terug" id="bladTerug">← Reisbureau</button>
-    <div><div class="ey s-gadqz5" id="bladMeta"></div><h1 id="bladNaam" class="s-1ik90f3"></h1></div>
-  </div>
-  <div class="paneel">
-    <p id="bladTag" class="s-jkn0mr"></p>
-    <div class="sec">Inbegrepen</div>
-    <ul class="inbeg" id="bladInbeg"></ul>
-    <div class="sec">Alle regels van je bestemming</div>
-    <div id="bladRegels" class="s-v7dap9">Laden…</div>
-    <div class="sec">Jouw aanvraag</div>
-    <div class="rij">
-      <div><label class="lbl" for="rDatum">Voorkeursdatum</label><input class="veld" id="rDatum" type="date"></div>
-      <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin" aria-label="Minder reizigers">−</button><span id="rAantal" class="s-16j2h7l">2</span><button type="button" id="rPlus" aria-label="Meer reizigers">+</button></div></div>
+<dialog class="ds-dialoog ds-dialoog--vol" id="blad" aria-labelledby="bladNaam">
+  <img class="ds-detail__beeld" id="bladBeeld" alt="">
+  <div class="ds-detail__inhoud">
+    <div><button class="ds-knop ds-knop--stil ds-knop--klein" id="bladTerug" type="button">Terug naar het reisbureau</button></div>
+    <p class="ds-label" id="bladMeta"></p>
+    <h2 class="ds-titel" id="bladNaam"></h2>
+    <p class="ds-meta" id="bladTag"></p>
+    <p class="ds-label">Inbegrepen</p>
+    <ul class="ds-detail__gegevens" id="bladInbeg"></ul>
+    <p class="ds-label">Alle regels van je bestemming</p>
+    <div id="bladRegels">Laden…</div>
+    <p class="ds-label">Jouw aanvraag</p>
+    <div class="ds-velden">
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span><span class="ds-veld__label">Voorkeursdatum</span><input class="ds-veld__invoer" id="rDatum" type="date"></span><span></span></label>
+      <div class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5M3 20c0-4 2-6 5-6s5 2 5 6m1-6c4 0 6 2 6 6"/></svg><span><span class="ds-veld__label">Reizigers</span><span class="ds-veld__waarde" id="rAantal" aria-live="polite">2</span></span><span class="ds-chips"><button class="ds-chip" type="button" id="rMin" aria-label="Minder reizigers">−</button><button class="ds-chip" type="button" id="rPlus" aria-label="Meer reizigers">+</button></span></div>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg><span><span class="ds-veld__label">Wensen (optioneel)</span><input class="ds-veld__invoer" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></span><span></span></label>
+      <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg><span><span class="ds-veld__label">Bewaar datum en reizigers voor deze reiswens</span><span class="ds-veld__waarde" id="travelContext" role="status">Alleen na uw keuze, in dit tabblad, maximaal twee uur.</span></span><input type="checkbox" id="travelRemember"></label>
     </div>
-    <div class="h-mt80"><label class="lbl" for="rNotitie">Wensen (optioneel)</label><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
-    <div class="reis-context">
-      <label><input type="checkbox" id="travelRemember"> Bewaar datum en reizigers voor deze reiswens</label>
-      <p id="travelContext" role="status">Alleen na uw keuze, in dit tabblad, maximaal twee uur.</p>
-      <button type="button" class="knop stil" id="travelForget">Nieuwe reiswens</button>
-    </div>
-    <div id="rTotaal" class="s-1u9jfh1"></div>
-    <button type="button" class="knop" id="rReview">Controleer uw aanvraag</button>
-    <p id="rSummary"></p>
-    <button type="button" class="knop" id="rBoek" hidden>Verstuur deze reisaanvraag</button>
-    <p id="rStatus" role="status" aria-live="polite"></p>
-    <button type="button" class="knop" id="rCheck" hidden>Controleer mijn aanvraag</button>
-    <a class="nazorg" id="rTrips" href="/apps/reizen.html#reizen" hidden>Bekijk uw reisoverzicht</a>
+    <div><button type="button" class="ds-knop ds-knop--stil ds-knop--klein" id="travelForget">Nieuwe reiswens</button></div>
+    <p class="ds-detail__status" id="rTotaal"></p>
+    <button type="button" class="ds-knop ds-knop--primair ds-knop--breed" id="rReview" data-ds-actie="Controleer uw aanvraag">Controleer uw aanvraag</button>
+    <p class="ds-meta" id="rSummary"></p>
+    <button type="button" class="ds-knop ds-knop--primair ds-knop--breed" id="rBoek" data-ds-actie="Verstuur deze reisaanvraag" hidden>Verstuur deze reisaanvraag</button>
+    <p class="ds-meta" id="rStatus" role="status" aria-live="polite"></p>
+    <button type="button" class="ds-knop ds-knop--stil ds-knop--breed" id="rCheck" hidden>Controleer mijn aanvraag</button>
+    <a class="ds-knop ds-knop--stil ds-knop--breed" id="rTrips" href="/apps/reizen.html#reizen" hidden>Bekijk uw reisoverzicht</a>
   </div>
-</section>
+</dialog>
 
-<div class="melding" id="melding" role="status"></div>
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 <!-- Het register van de Edge, zodat dit scherm zelf zegt welke aanvraag het lid
      aanwijst: het blikveld maakt er een verwijzing van, en Rahul krijgt die mee
      (EDGE.md par. 14.4). Zonder defer: het eigen script hieronder spreekt al. -->
@@ -171,267 +86,15 @@
 <script src="/shared/objectverwijzing.js"></script>
 <script src="/shared/adaptief/vorm.js"></script>
 <script src="/shared/adaptief/register.js"></script>
-<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/edge/blikveld.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/rtg-first-steps.js"></script>
 <script src="/shared/experience-intent.js"></script>
 <script src="/shared/travel-request-controller.js"></script>
 <script src="/apps/reisbureau-experience.js"></script>
-<script>
-const $ = s => document.querySelector(s);
-const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
-function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3000); }
-const api = (pad, body, herkans) => fetch(pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
-  body: JSON.stringify(body || {})
-}).then(async r => {
-  const d = await r.json().catch(() => ({}));
-  // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
-  const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api));
-  if (p) return p;
-  if (!r.ok) { const error = new Error(d.error || 'Er ging iets mis.'); error.status = r.status; throw error; } return d; });
-
-if (!TOKEN) {
-  $('#main').innerHTML = RTGFirstSteps.welcome('reisbureau', true); RTGFirstSteps.sync();
-} else { laad(); }
-
-let ALLE = [], HUIDIG = null, travelFlow;
-/* Meenemen (shared/uitvoer.js): de reizen die klaarstaan gaan mee met de velden
-   los -- reis, bestemming, periode en de nettoprijs per persoon -- en niet als
-   de regel "Ibiza · 7 dagen · vanaf € 2200" die op de kaart staat. Wie zijn
-   eigen aanvragen wil, ziet die onder "Mijn aanvragen"; die staan hier niet in,
-   want dit is de etalage. */
-if (window.RTGUitvoer) RTGUitvoer.bron(function () {
-  if (!ALLE.length) return null;
-  return { naam: 'reizen', kolommen: ['reis', 'bestemming', 'periode', 'prijs per persoon'],
-    rijen: ALLE.map(function (r) { return [r.titel || '', r.bestemming || '', r.dates || '', r.prijs || 0]; }) };
-});
-async function laad(){
-  let d;
-  try { d = await api('/api/reisbureau'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  ALLE = d.reizen || [];
-  $('#lijst').innerHTML = ALLE.length ? ALLE.map(r =>
-    '<button class="reis" data-id="'+esc(r.id)+'">'+
-      '<span class="meta">'+esc(r.bestemming)+(r.dates?' · '+esc(r.dates):'')+'</span>'+
-      '<h3>'+esc(r.titel)+'</h3>'+
-      (r.omschrijving?'<span class="tag">'+esc(r.omschrijving)+'</span>':'')+
-      '<span class="prijs">Vanaf € '+esc(r.prijs)+' per persoon</span>'+
-    '</button>').join('') : RTGFirstSteps.welcome('reisbureau');
-  RTGFirstSteps.sync();
-  $('#travelAdvice').hidden = !ALLE.length;
-  /* Een andere ingang (Reizen & Veilig) mag een wens of een reis MEEGEVEN, nooit
-     een advies opvragen of iets versturen: de wens wordt ingevuld en drukken doet
-     het lid hier zelf. Een reis-id die niet in de catalogus staat, opent niets. */
-  const mee = new URLSearchParams(location.search);
-  if (mee.get('wens') && ALLE.length && !$('#adviesIn').value) {
-    $('#adviesIn').value = mee.get('wens').slice(0, 200);
-    $('#travelAdvice').hidden = false;
-  } else if (mee.get('wens') && !ALLE.length) {
-    /* Een wens die nergens heen kan, verdwijnt niet stil. */
-    meld('Er is nu geen samengestelde reis om uw wens tegen te leggen. Uw wens is niet verstuurd.');
-  }
-  if (mee.get('reis') && typeof openReis === 'function') openReis(mee.get('reis'));
-  $('#lijst').querySelectorAll('.reis').forEach(b => b.addEventListener('click', () => openReis(b.dataset.id)));
-  laadMijn();
-}
-/* MIJN AANVRAGEN -- en met opzet niet alleen de open aanvragen. Zolang alleen
-   "aangevraagd" hier stond, verdween een reis uit beeld op het moment dat de
-   reisadviseur hem bevestigde: precies het bericht waar je op wacht, en juist
-   dat viel weg. Nu blijft elke aanvraag staan met zijn stand erbij, en het
-   bericht van de adviseur eronder.
-
-   WAT ER PER STAND KAN, en dat is sinds de nazorg (kern/reisbureau-nazorg.js)
-   iets anders dan hiervoor:
-
-     aangevraagd         intrekken -- er is nog niets toegezegd
-     bevestigd           een wijziging VRAGEN, of afzeggen met een reden
-     wijziging-gevraagd  de wens staat er; afzeggen kan nog steeds
-     afgewezen/afgezegd  klaar, met de reden erbij
-
-   Een wijziging is een verzoek en geen knop die iets verzet: de reisadviseur
-   beslist erover. Dat staat er ook zo bij, want een lid dat denkt dat zijn
-   datum verzet is en dat niet is, staat straks voor niets op Schiphol.
-
-   AFZEGGEN VRAAGT EEN REDEN EN GEEN "WEET U HET ZEKER". Het veld IS de rem: wie
-   een reden typt, heeft nagedacht. Twintig bevestigingsvragen leren mensen op ja
-   drukken (GRAMMATICA.md). */
-/* De kleur van een stand is een KLASSE (zie de stylesheet): een style-attribuut
-   met de kleur erin zou style-src-attr in de CSP openhouden. */
-const STAND_KLAS = { bevestigd: 'stand-bevestigd', afgewezen: 'stand-afgewezen',
-  afgezegd: 'stand-afgezegd', 'wijziging-gevraagd': 'stand-wijziging-gevraagd' };
-const STAND_WOORD = { 'wijziging-gevraagd': 'wijziging gevraagd' };
-let openPaneel = null;   // ref waarvan het paneel openstaat, zodat het na een herlading openblijft
-/* WELKE AANVRAAG HET LID AANWIJST (EDGE.md par. 14.4). Het scherm zegt het via
-   RTGAdaptief.context(); het blikveld maakt er een verwijzing van (soort en
-   ref), en Rahul krijgt alleen die mee. Wat er over de aanvraag in het gesprek
-   komt, zoekt de server zelf op -- dit scherm geeft geen velden door. */
-let gekozen = null;
-function spreek(a){
-  if (!window.RTGAdaptief) return;
-  RTGAdaptief.context(a
-    ? { bron: 'reisbureau', titel: 'Mijn aanvragen', object: { soort: 'reisaanvraag', id: a.ref, label: a.titel || a.ref } }
-    : { bron: 'reisbureau', titel: 'Reisbureau' });
-}
-spreek(null);
-
-function wijzigingRegel(a){
-  const w = (a.wijziging||{}).gevraagd || {};
-  const d = [];
-  if (w.vertrek) d.push('vertrek naar '+esc(w.vertrek));
-  if (w.personen) d.push(esc(w.personen)+' personen');
-  if ((a.wijziging||{}).toelichting) d.push('"'+esc(a.wijziging.toelichting)+'"');
-  return d.length ? 'Gevraagd: '+d.join(', ')+'. De reisadviseur bekijkt het.' : '';
-}
-
-function paneelHtml(a){
-  if (openPaneel !== a.ref) return '';
-  return '<div class="tag nazorg">'+
-    (a.status === 'bevestigd'
-      ? '<label class="meta lbl-blok">Andere vertrekdatum</label>'+
-        '<input type="date" id="wDatum" value="'+esc(a.vertrek||'')+'" class="veld-blok">'+
-        '<label class="meta lbl-blok">Aantal personen</label>'+
-        '<input type="number" id="wPers" min="1" max="20" value="'+esc(a.personen)+'" class="veld-blok">'+
-        '<label class="meta lbl-blok">Of vertel wat u anders wilt</label>'+
-        '<input type="text" id="wTekst" maxlength="300" placeholder="Bijvoorbeeld: een kamer met uitzicht" class="veld-blok ruim">'+
-        '<button class="knop klein" data-doe="wijzig" data-ref="'+esc(a.ref)+'">Vraag deze wijziging</button> '
-      : '')+
-    '<label class="meta lbl-afzeg">Afzeggen? Vertel kort waarom; de reisadviseur leest het.</label>'+
-    '<input type="text" id="aReden" maxlength="300" placeholder="Reden" class="veld-blok ruim">'+
-    '<button class="knop stil" data-doe="afzeg" data-ref="'+esc(a.ref)+'">Zeg deze reis af</button> '+
-    '<button class="knop stil zacht" data-doe="dicht">Laat maar</button>'+
-    '<span class="meta toelichting">Een afzegging verplaatst geen geld. Loopt er een betaling, dan handelt een medewerker die met u af.</span>'+
-  '</div>';
-}
-
-async function laadMijn(){
-  let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){
-    $('#mijnWrap').innerHTML = '<p role="status">Uw aanvragen konden niet worden opgehaald. '+esc(e.message)+'</p><button type="button" class="knop stil" id="mijnOpnieuw">Probeer opnieuw</button>';
-    $('#mijnOpnieuw').addEventListener('click',laadMijn); return;
-  }
-  const rijen = (d.aanvragen||[]).slice(0, 8);
-  if (!rijen.length){ $('#mijnWrap').innerHTML = ''; return; }
-  $('#mijnWrap').innerHTML = '<h2 class="mijn-kop">Mijn aanvragen</h2>'+
-    rijen.map(a => '<div class="reis aanvraag" tabindex="0" data-ref="'+esc(a.ref)+'"'+(gekozen===a.ref?' aria-current="true"':'')+'>'+
-      '<div class="aanvraag-rij">'+
-        '<div><h3>'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+esc(a.personen)+' pers'+
-        (a.vertrek ? ' · '+esc(a.vertrek) : '')+' · <span class="'+(STAND_KLAS[a.status]||'')+'">'+esc(STAND_WOORD[a.status]||a.status)+'</span></span></div>'+
-        (a.status === 'aangevraagd'
-          ? '<button class="knop stil" data-doe="intrek" data-ref="'+esc(a.ref)+'">Intrekken</button>'
-          : (a.status === 'bevestigd' || a.status === 'wijziging-gevraagd')
-            ? '<button class="knop stil" data-doe="open" data-ref="'+esc(a.ref)+'">Wijzigen of afzeggen</button>'
-            : '')+
-      '</div>'+
-      (a.besluit && a.besluit.bericht ? '<span class="tag">'+esc(a.besluit.bericht)+'</span>' : '')+
-      (a.status === 'aangevraagd' ? '<span class="tag">Een RTG-reisadviseur bevestigt de datum en stelt de reis samen.</span>' : '')+
-      (a.status === 'wijziging-gevraagd' ? '<span class="tag">'+wijzigingRegel(a)+'</span>' : '')+
-      (a.afzegging ? '<span class="tag">Afgezegd door '+esc(a.afzegging.door === 'lid' ? 'u' : 'het reisbureau')+': '+esc(a.afzegging.reden)+'</span>' : '')+
-      paneelHtml(a)+
-    '</div>').join('');
-
-  /* Aanwijzen: een tik op de aanvraag zelf (niet op een knop erin), of Enter. */
-  const kies = (ref) => { gekozen = ref; spreek(rijen.find(x => x.ref === ref) || null);
-    $('#mijnWrap').querySelectorAll('.aanvraag').forEach(r => r.setAttribute('aria-current', String(r.dataset.ref === ref))); };
-  $('#mijnWrap').querySelectorAll('.aanvraag').forEach(r => {
-    r.addEventListener('click', (e) => { if (!e.target.closest('button,input,label')) kies(r.dataset.ref); });
-    r.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === r) kies(r.dataset.ref); });
-  });
-  if (gekozen && !rijen.some(x => x.ref === gekozen)) { gekozen = null; spreek(null); }
-  $('#mijnWrap').querySelectorAll('button[data-doe]').forEach(b => b.addEventListener('click', async () => {
-    const ref = b.dataset.ref, doe = b.dataset.doe;
-    if (doe === 'open'){ openPaneel = ref; kies(ref); laadMijn(); return; }
-    if (doe === 'dicht'){ openPaneel = null; laadMijn(); return; }
-    try {
-      if (doe === 'intrek'){ await api('/api/reisbureau/annuleer', { ref }); meld('Aanvraag ingetrokken.'); }
-      if (doe === 'wijzig'){
-        const lijf = { ref, toelichting: ($('#wTekst')||{}).value || '' };
-        if ($('#wDatum') && $('#wDatum').value) lijf.vertrek = $('#wDatum').value;
-        if ($('#wPers') && $('#wPers').value) lijf.personen = $('#wPers').value;
-        await api('/api/reisbureau/wijzig', lijf);
-        meld('Uw verzoek ligt bij de reisadviseur. Er is nog niets veranderd aan de reis.');
-      }
-      if (doe === 'afzeg'){
-        const reden = (($('#aReden')||{}).value || '').trim();
-        if (!reden){ meld('Vertel kort waarom, dan weet de reisadviseur wat er speelt.'); return; }
-        await api('/api/reisbureau/afzeggen', { ref, reden });
-        meld('De reis is afgezegd. Loopt er een betaling, dan neemt een medewerker contact met u op.');
-      }
-      openPaneel = null;
-      laadMijn();
-    } catch(e){ meld(e.message); }
-  }));
-}
-/* Vanaf hier hoort er een ingelogd lid te zijn. Zonder token heeft de tak
-   hierboven de opmaak al vervangen, dus deze elementen bestaan niet meer en
-   liep het script hier stuk -- zonder dat iemand het zag. */
-if (TOKEN) {
-travelFlow = RTGTravelExperience({token:TOKEN,api,refresh:laadMijn});
-$('#main').addEventListener('click', e => {
-  const preference = e.target.closest('[data-first-preference]');
-  if (preference) {
-    document.querySelectorAll('[data-first-preference]').forEach(b=>b.setAttribute('aria-pressed', String(b===preference)));
-    const wensen = { rest: 'Ik wil tot rust komen.', company: 'Ik wil samen op reis.', explore: 'Ik wil iets nieuws ontdekken.' };
-    $('#adviesIn').value = wensen[preference.dataset.firstPreference];
-  }
-  if (e.target.closest('[data-first-action="wish"]')) {
-    $('#travelAdvice').hidden = false;
-    $('#travelAdvice').scrollIntoView({block:'center'}); $('#adviesIn').focus();
-  }
-});
-$('#adviesGo').addEventListener('click', async () => {
-  const wens = $('#adviesIn').value.trim();
-  if (!wens){ meld('Vertel eerst waar je zin in hebt.'); return; }
-  $('#adviesUit').textContent = 'Rahul denkt mee...';
-  try {
-    const d = await api('/api/reisbureau/advies', { wens });
-    if (d.reis){ $('#adviesUit').innerHTML = '<b class="s-1grrhzp">'+esc(d.reis.titel)+'</b> · '+esc(d.reden)+' <button class="knop s-wo6tnb" id="adviesOpen">Bekijk</button>';
-      const ob = $('#adviesOpen'); if (ob) ob.addEventListener('click', () => openReis(d.reis.id)); }
-    else $('#adviesUit').textContent = 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.';
-  } catch(e){ $('#adviesUit').textContent = e.status === 404 ? 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.' : e.message; }
-});
-function openReis(id){
-  const next = ALLE.find(r => r.id === id); if (!next) return;
-  if (!travelFlow.open(next)) { $('#blad').classList.add('open'); return; }
-  HUIDIG = next;
-  $('#bladNaam').textContent = HUIDIG.titel;
-  $('#bladMeta').textContent = HUIDIG.bestemming;
-  $('#bladTag').textContent = HUIDIG.omschrijving || '';
-  $('#bladInbeg').innerHTML = (HUIDIG.inbegrepen||[]).map(x => '<li>'+esc(x)+'</li>').join('') || '<li>Op maat samengesteld</li>';
-  laadRegels(HUIDIG.bestemming);
-  $('#blad').classList.add('open');
-}
-/* De Reiswijzer: wie ergens naartoe gaat, krijgt ALLE regels van dat land --
-   visum, paspoort, verkeer, alarmnummer, water, fooi, alcohol en let-op.
-   Automatisch bijgehouden door de Regelwacht. */
-async function laadRegels(bestemming){
-  const el = $('#bladRegels');
-  el.textContent = 'Laden…';
-  try {
-    const w = await api('/api/reis/wijzer', { bestemming });
-    const rij = (k, v) => '<div style="display:flex;gap:.6rem;"><span class="s-12ziu9c">'+k+'</span><span>'+v+'</span></div>';
-    el.innerHTML =
-      '<div class="s-1ke48o0"><b>'+esc(w.naam)+'</b> · '+esc(w.regio)+'</div>' +
-      rij('Visum', esc(w.visum.tekst)) +
-      rij('Paspoort', esc(w.paspoort)) +
-      rij('Verkeer', 'Er wordt '+esc(w.rijden)+' gereden') +
-      rij('Alarmnummer', esc(w.alarm)) +
-      rij('Kraanwater', esc(w.waterTekst)) +
-      rij('Fooi', esc(w.fooi)) +
-      rij('Alcohol', 'Vanaf '+w.alcoholLeeftijd+' jaar') +
-      rij('Btw', w.btwStandaard+'% standaardtarief') +
-      (w.letOp ? rij('Let op', '<span class="s-popvjv">'+esc(w.letOp)+'</span>') : '') +
-      '<div class="s-1e3l51k">'+esc(w.basis)+'</div>';
-  } catch(e){ el.textContent = e.message; }
-}
-$('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
-}
-</script>
-<script src="/shared/metgezel.js" defer></script>
+<script src="/apps/reisbureau-aanvragen.js"></script>
+<script src="/apps/reisbureau-voorzijde.js"></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,21 @@
+/* Lezer: een lange tekst om rustig in te lezen (RTG Boeken). Een eigen
+   scrollvlak, omdat de leesplek de scrollpositie van DIT vlak is en niet die
+   van de pagina. Bodoni op papier, ruime regels; de lettermaat kiest het lid
+   en het scherm zet die als data-maat, niet als stijl. */
+@layer rtg.component {
+  .ds-lezer {
+    block-size: max(16rem, calc(var(--ds-schermhoogte) - var(--ds-edge-hoogte) - 16rem));
+    overflow-y: auto;
+    padding: var(--ds-ruimte-6);
+    background: var(--ds-oppervlak-sterk);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    font-family: var(--ds-letter-display);
+    font-size: 1rem;
+    line-height: 1.85;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .ds-lezer[data-maat="1"] { font-size: 1.15rem; }
+  .ds-lezer[data-maat="2"] { font-size: 1.32rem; }
+}

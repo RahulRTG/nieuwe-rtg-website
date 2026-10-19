@@ -22,7 +22,7 @@
   var RONDE_MS = 6000;
   var taal = (d.documentElement && d.documentElement.lang) || undefined;   // de taal van de pagina, niet een vaste
 
-  function euro(c) { return '€ ' + Math.round(c / 100).toLocaleString(taal); }
+  function euro(c) { return new Intl.NumberFormat(taal || 'nl', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Math.round(c / 100)); }
   function tijd(iso) {
     var t = new Date(String(iso || ''));
     return isNaN(t.getTime()) ? '' : t.toLocaleTimeString(taal, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -33,7 +33,7 @@
     if (!vak) return;
     Array.prototype.slice.call(vak.querySelectorAll('label')).forEach(function (l) { l.remove(); });
     keuzes.forEach(function (k) {
-      var l = maak('label', 'besluitkeuze'), i = d.createElement('input');
+      var l = maak('label', 'ds-chip'), i = d.createElement('input');
       i.type = 'checkbox'; i.name = naam; i.value = k; i.checked = (gekozen || []).indexOf(k) >= 0;
       l.appendChild(i); l.appendChild(d.createTextNode(' ' + k)); vak.appendChild(l);
     });
@@ -51,27 +51,27 @@
 
   function tekenOpties(b) {
     var ul = $('#besluitOpties'); if (!ul) return; ul.textContent = '';
-    if (!b.groep.opties.length) { ul.appendChild(maak('li', 'leegtekst', 'Er staan nog geen opties klaar.')); return; }
+    if (!b.groep.opties.length) { ul.appendChild(maak('li', 'ds-meta', 'Er staan nog geen opties klaar.')); return; }
     b.groep.opties.forEach(function (o) {
-      var li = maak('li', 'besluitoptie'), mijn = b.jij.opties[o.id];
+      var li = maak('li', 'ds-taak__kop'), mijn = b.jij.opties[o.id];
       li.dataset.optie = o.id;
-      li.appendChild(maak('b', '', o.titel));
-      li.appendChild(maak('small', '', euro(o.prijsPP) + ' p.p. · ' + o.van + ' t/m ' + o.tot +
+      li.appendChild(maak('p', 'ds-kaart__titel', o.titel));
+      li.appendChild(maak('p', 'ds-meta', euro(o.prijsPP) + ' p.p. · ' + o.van + ' t/m ' + o.tot +
         (o.kenmerken && o.kenmerken.length ? ' · ' + o.kenmerken.join(', ') : '')));
       var groep = o.voorIedereen === true ? 'Past voor iedereen' : o.voorIedereen === false ? 'Past niet voor iedereen' : 'Nog niet vast te stellen';
-      var g = maak('span', 'besluitgroep', groep); g.dataset.uitkomst = String(o.voorIedereen); li.appendChild(g);
+      var g = maak('p', 'ds-detail__status', groep); g.dataset.uitkomst = String(o.voorIedereen); li.appendChild(g);
       if (mijn) {
-        var j = maak('span', 'besluitjij', mijn.past ? 'Past voor u' : 'Past niet voor u'); j.dataset.past = String(mijn.past);
+        var j = maak('p', 'ds-meta', mijn.past ? 'Past voor u' : 'Past niet voor u'); j.dataset.past = String(mijn.past);
         li.appendChild(j);
-        if (!mijn.past) mijn.redenen.forEach(function (r) { li.appendChild(maak('p', 'rtg-sub besluitreden', r)); });
+        if (!mijn.past) mijn.redenen.forEach(function (r) { li.appendChild(maak('p', 'ds-meta', r)); });
       }
       if (b.werkruimte.handelingen.indexOf('voorstel.leg') >= 0 && o.voorIedereen === true) {
-        var leg = maak('button', 'rtg-knop', 'LEG VOOR AAN DE GROEP'); leg.type = 'button';
+        var leg = maak('button', 'ds-knop ds-knop--primair ds-knop--klein', 'LEG VOOR AAN DE GROEP'); leg.type = 'button';
         leg.addEventListener('click', function () { doe('/api/reis/gezelschap/voorstel/leg', { reis: reis, optie: o.id }); });
         li.appendChild(leg);
       }
       if (b.werkruimte.handelingen.indexOf('optie.wis') >= 0) {
-        var weg = maak('button', 'rtg-knop', 'HAAL WEG'); weg.type = 'button';
+        var weg = maak('button', 'ds-knop ds-knop--stil ds-knop--klein', 'HAAL WEG'); weg.type = 'button';
         weg.addEventListener('click', function () { doe('/api/reis/gezelschap/opties/wis', { reis: reis, id: o.id }); });
         li.appendChild(weg);
       }

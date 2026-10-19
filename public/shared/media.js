@@ -89,7 +89,7 @@
   function kan(wat) { return reden(wat) === null; }
 
   /* DE MELDING, op het moment van gebruik -- geen banner die je een half uur
-     eerder wegklikte. Opmaak in shared/media.css; zonder dat blad staat de TEKST
+     eerder wegklikte. Opmaak in shared/media.css (op ds: melding.css); zonder dat blad staat de TEKST
      er nog, en dat is de kant waar dit hoort te falen. */
   function meld(fout) {
     var r = (fout && fout.rtg) || TEKST.onbekend;
@@ -97,10 +97,13 @@
     var oud = d.querySelector('.rtg-media-melding');
     if (oud && oud.parentNode) oud.parentNode.removeChild(oud);
     var el = d.createElement('div');
-    el.className = 'rtg-media-melding';
+    /* Op een ds-scherm geeft het Design System de vorm (melding.css) en laadt
+       shared/media.css niet; de klasse rtg-media-melding blijft de haak. */
+    var ds = d.documentElement.hasAttribute('data-ds');
+    el.className = 'rtg-media-melding' + (ds ? ' ds-melding ds-melding--blijft toon' : '');
     el.setAttribute('role', 'alert');
     var tekst = d.createElement('div');
-    var kop = d.createElement('strong'); kop.textContent = r.kort;
+    var kop = d.createElement('strong'); kop.textContent = r.kort; if (ds) kop.className = 'ds-melding__kop';
     var p = d.createElement('p'); p.textContent = r.uitleg;
     tekst.appendChild(kop); tekst.appendChild(p);
     // bij een onveilig adres het https-adres ERBIJ; anders blijft het abstract
@@ -110,7 +113,7 @@
       var wrap = d.createElement('p'); wrap.appendChild(c); tekst.appendChild(wrap);
     }
     var x = d.createElement('button');
-    x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', 'Melding sluiten');
+    x.type = 'button'; if (ds) x.className = 'ds-melding__sluit'; x.textContent = '✕'; x.setAttribute('aria-label', 'Melding sluiten');
     x.addEventListener('click', function () { if (el.parentNode) el.parentNode.removeChild(el); });
     el.appendChild(tekst); el.appendChild(x);
     d.body.appendChild(el);

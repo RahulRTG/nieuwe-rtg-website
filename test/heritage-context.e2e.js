@@ -14,9 +14,14 @@ test('Heritage context returns through real navigation without writes', async t 
     const context = await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
     await context.addInitScript(token => { localStorage.setItem('rtg_member_token',token);localStorage.setItem('rtg_cookieinfo_v1','1');localStorage.setItem('rtg_lang','nl'); },login.token);
     const page = await context.newPage();
+    /* Een scherm op het RTG Design System (html[data-ds]) is gereed als de
+       ds-Edge staat; de oude laadlaag en Edge 2 bestaan daar niet. */
+    const gereed = () => window.RTGRouteMemory && (document.documentElement.hasAttribute('data-ds')
+      ? !!document.querySelector('.ds-edge__balk')
+      : document.body.getAttribute('data-rtg-world-start') !== 'loading' && document.body.getAttribute('data-rtg-edge-2-rendered') === 'true');
     async function visit(path) {
       await page.goto(server.base + path);
-      await page.waitForFunction(() => window.RTGRouteMemory && document.body.getAttribute('data-rtg-world-start') !== 'loading' && document.body.getAttribute('data-rtg-edge-2-rendered') === 'true', null, {timeout:geduld(12000)});
+      await page.waitForFunction(gereed, null, {timeout:geduld(12000)});
     }
     /* Op mobiel staat de statusknop niet in de bovenbalk (www-stijl, #534); de Edge
        bereikt hem met zijn actie 'status', en die doet precies deze klik op de knop
@@ -28,7 +33,7 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.evaluate(() => window.RTGRouteMemory.save());
       await visit('/apps/bestanden.html');
       await page.goBack();
-      await page.waitForFunction(() => window.RTGRouteMemory && document.body.getAttribute('data-rtg-world-start') !== 'loading' && document.body.getAttribute('data-rtg-edge-2-rendered') === 'true');
+      await page.waitForFunction(gereed);
       assert.ok(page.url().includes(path));
     }
     await t.test('Agenda restores view and selected week', async () => {

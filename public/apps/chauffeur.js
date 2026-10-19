@@ -57,23 +57,14 @@
     if (tekst != null) el.textContent = tekst;
     return el;
   }
-  function icoon(paden) {
-    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
-    paden.forEach(function (d) {
-      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttribute('d', d); s.appendChild(p);
-    });
-    return s;
-  }
   function leeg(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
   function toonDialoog(el) { if (typeof el.showModal === 'function') el.showModal(); else el.setAttribute('open', ''); }
   function sluitDialoog(el) { if (typeof el.close === 'function') el.close(); else el.removeAttribute('open'); }
 
   var toastTimer;
   function toast(tekst) {
-    var el = $('#toast'); el.textContent = tekst; el.classList.add('zichtbaar');
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('zichtbaar'); }, 3600);
+    var el = $('#toast'); el.textContent = tekst; el.classList.add('toon');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('toon'); }, 3600);
   }
   function api(pad, body) {
     return fetch(pad, { method: 'POST', headers: {
@@ -101,13 +92,15 @@
     if (typeof v === 'string') return v;
     return v.label || v.naam || v.code || v.adres || terugval || 'Onbekend';
   }
+  /* Bedragen, tijden en datums volgen de taal van de pagina (Intl). */
+  function taal() { return document.documentElement.lang || 'nl'; }
   function geld(centen) {
-    return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
+    return new Intl.NumberFormat(taal(), { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
   }
   function km(rit) { return Number.isFinite(rit && rit.km) ? String(rit.km).replace('.', ',') + ' KM' : 'AFSTAND VOLGT'; }
   function minuten(rit) { return Number.isFinite(rit && rit.minuten) ? rit.minuten + ' MIN' : 'DUUR VOLGT'; }
   function tijdKort(iso) {
-    var d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    var d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString(taal(), { hour: '2-digit', minute: '2-digit' });
   }
   function geleden(iso) {
     var min = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
@@ -148,9 +141,10 @@
     return openRitten().concat((staat.gegevens && staat.gegevens.lopend) || []).find(function (r) { return r.ref === ref; }) || null;
   }
 
+  /* De stand staat in woorden (LIVE, AANMELDEN, STORING), niet in een lampje. */
   function zetVerbinding(goed, tekst) {
-    var el = $('#verbinding'); el.lastChild.textContent = ' ' + (tekst || (goed ? 'LIVE' : 'OFFLINE'));
-    el.classList.toggle('uit', !goed); el.querySelector('i').style.background = goed ? 'var(--groen)' : 'var(--rood)';
+    var el = $('#verbinding'); el.textContent = tekst || (goed ? 'LIVE' : 'OFFLINE');
+    el.setAttribute('data-stand', goed ? 'aan' : 'uit');
     $('#apiStand').textContent = goed ? 'Verbonden' : 'Niet bereikbaar';
     $('#apparaatStand').textContent = navigator.onLine ? 'Online' : 'Offline';
   }
@@ -163,111 +157,104 @@
     $('#voorleesStand').textContent = staat.automatischVoorlezen ? 'Aan' : 'Uit';
   }
 
+  /* De kaarten van de werkvloer, in de vorm van /ds/. Wat een toets of een
+     mens moet terugvinden, draagt een data-attribuut: data-rit (nieuw, actief,
+     leeg, fout), data-volgende (de ene volgende stap) en data-passagier. */
   function ritFeiten(rit) {
-    var vak = maak('p', 'ritfeiten');
-    [minuten(rit), km(rit), geld(rit.prijs)].forEach(function (tekst, i) {
-      if (i) vak.appendChild(maak('i'));
-      vak.appendChild(maak('span', i === 2 ? 'prijs' : '', tekst));
-    });
-    return vak;
+    /* dir=auto: in het Arabisch blijven getal en eenheid bij elkaar. */
+    var p = maak('p', 'ds-meta', [minuten(rit), km(rit), geld(rit.prijs)].join(' · ')); p.dir = 'auto'; return p;
   }
   function routeRegel(rit) {
-    var route = maak('div', 'ritroute');
-    route.appendChild(maak('span', '', plaats(rit.van, 'Vertrek')));
-    route.appendChild(maak('b', '', '→'));
-    route.appendChild(maak('span', '', plaats(rit.naar, 'Bestemming')));
-    return route;
+    return maak('h2', 'ds-kaart__titel', plaats(rit.van, 'Vertrek') + ' → ' + plaats(rit.naar, 'Bestemming'));
+  }
+  function knop(klasse, tekst, doe) {
+    var b = maak('button', 'ds-knop ds-knop--breed ' + klasse); b.type = 'button';
+    b.appendChild(maak('span', '', tekst)); if (doe) b.addEventListener('click', doe); return b;
   }
   function voorleesKnop(rit) {
-    var b = maak('button', 'voorleesactie'); b.type = 'button';
-    b.appendChild(icoon(['M5 9v6h4l5 4V5L9 9H5Z', 'M17 9c1 1 1 5 0 6', 'M20 6c3 3 3 9 0 12']));
-    b.appendChild(maak('span', '', 'WORDT VOORGELEZEN'));
-    b.addEventListener('click', function () { spreekRit(rit, true); }); return b;
+    return knop('ds-knop--stil ds-knop--klein', 'WORDT VOORGELEZEN', function () { spreekRit(rit, true); });
+  }
+  function kaartMet(soort) {
+    var kaart = maak('article', 'ds-kaart'); kaart.setAttribute('data-rit', soort);
+    var binnen = maak('div', 'ds-kaart__inhoud'); kaart.appendChild(binnen); return { kaart: kaart, binnen: binnen };
   }
 
   function tekenAanvraag(rit) {
-    var kaart = maak('article', 'ritkaart nieuw');
-    var kop = maak('div', 'nieuwe-kop'); kop.appendChild(maak('i')); kop.appendChild(maak('span', '', 'NIEUWE RITAANVRAAG')); kaart.appendChild(kop);
-    kaart.appendChild(maak('p', 'afstand', geleden(rit.gemaakt)));
-    kaart.appendChild(routeRegel(rit)); kaart.appendChild(ritFeiten(rit)); kaart.appendChild(voorleesKnop(rit));
-    var bekijken = maak('button', 'hoofdactie'); bekijken.type = 'button'; bekijken.appendChild(maak('span', '', 'BEKIJK RIT')); bekijken.appendChild(maak('b', '', '→'));
-    bekijken.addEventListener('click', function () { openRitDialoog(rit); }); kaart.appendChild(bekijken);
-    var lopen = maak('button', 'stille-actie', 'LAAT LOPEN'); lopen.type = 'button'; lopen.addEventListener('click', function () { laatLopen(rit); }); kaart.appendChild(lopen);
-    return kaart;
+    var k = kaartMet('nieuw'), b = k.binnen;
+    b.appendChild(maak('p', 'ds-label', 'NIEUWE RITAANVRAAG'));
+    b.appendChild(maak('p', 'ds-meta', geleden(rit.gemaakt)));
+    b.appendChild(routeRegel(rit)); b.appendChild(ritFeiten(rit)); b.appendChild(voorleesKnop(rit));
+    var bekijken = knop('ds-knop--primair', 'BEKIJK RIT', function () { openRitDialoog(rit); });
+    bekijken.setAttribute('data-ds-actie', 'Bekijk rit'); bekijken.setAttribute('data-bekijk', '');
+    b.appendChild(bekijken);
+    b.appendChild(knop('ds-knop--stil', 'LAAT LOPEN', function () { laatLopen(rit); }));
+    return k.kaart;
   }
 
   function tekenActief(rit) {
-    var luchthavenrit = /ibiza airport/i.test(plaats(rit.van));
-    var kaart = maak('article', 'ritkaart actief' + (luchthavenrit ? ' met-beeld' : ''));
-    if (luchthavenrit) {
-      var beeld = maak('div', 'ritbeeld');
-      var beeldtekst = maak('div');
-      beeldtekst.appendChild(maak('small', '', 'OPHAALPUNT'));
-      beeldtekst.appendChild(maak('strong', '', plaats(rit.van)));
-      beeldtekst.appendChild(maak('span', '', rit.notitie || 'Volg de officiële ophaalzone in de ritinformatie.'));
-      beeld.appendChild(beeldtekst); kaart.appendChild(beeld);
-    }
-    var kop = maak('div', 'actiefkop'), titels = maak('div');
-    titels.appendChild(maak('p', 'kaartlabel', 'ACTIEVE RIT'));
-    titels.appendChild(maak('h2', '', rit.reizigerCodenaam || 'RTG-reiziger'));
-    kop.appendChild(titels); kop.appendChild(maak('span', 'statuschip', STATUS_NAAM[rit.status] || rit.status)); kaart.appendChild(kop);
-    kaart.appendChild(maak('p', 'afstand', rit.ref)); kaart.appendChild(routeRegel(rit)); kaart.appendChild(ritFeiten(rit));
-    var balk = maak('div', 'fasebalk'), fase = FASE[rit.status] || 1;
-    for (var i = 1; i <= 5; i++) balk.appendChild(maak('i', i <= fase ? 'gedaan' : ''));
-    kaart.appendChild(balk);
-    var fasen = maak('div', 'faselabels');
-    ['TOEGEWEZEN', 'ONDERWEG', 'AANGEKOMEN', 'AAN BOORD', 'KLAAR'].forEach(function (label, index) {
-      fasen.appendChild(maak('span', index + 1 <= fase ? 'gedaan' : '', label));
-    });
-    kaart.appendChild(fasen);
-    if (rit.notitie && !luchthavenrit) kaart.appendChild(maak('p', 'afstand', rit.notitie));
+    var k = kaartMet('actief'), b = k.binnen;
+    b.appendChild(maak('p', 'ds-label', 'ACTIEVE RIT · ' + rit.ref));
+    b.appendChild(maak('h2', 'ds-kaart__titel', rit.reizigerCodenaam || 'RTG-reiziger'));
+    var stand = maak('p', 'ds-detail__status', STATUS_NAAM[rit.status] || rit.status); stand.setAttribute('data-status', rit.status);
+    b.appendChild(stand);
+    b.appendChild(maak('p', 'ds-meta', plaats(rit.van, 'Vertrek') + ' → ' + plaats(rit.naar, 'Bestemming')));
+    b.appendChild(ritFeiten(rit));
+    /* De fase als rustige meter, met het woord erbij: een balk alleen zegt niets. */
+    var fase = FASE[rit.status] || 1, LABELS = ['TOEGEWEZEN', 'ONDERWEG', 'AANGEKOMEN', 'AAN BOORD', 'KLAAR'];
+    var meter = maak('progress', 'ds-voortgang'); meter.max = 5; meter.value = fase;
+    meter.setAttribute('aria-label', 'Fase ' + fase + ' van 5: ' + LABELS[fase - 1]); b.appendChild(meter);
+    b.appendChild(maak('p', 'ds-label', LABELS.slice(0, fase).join(' · ')));
+    /* Op de luchthaven staat de ophaalzone bij het vertrekpunt. */
+    if (rit.notitie) b.appendChild(maak('p', 'ds-meta', rit.notitie));
+    else if (/ibiza airport/i.test(plaats(rit.van))) b.appendChild(maak('p', 'ds-meta', 'Volg de officiële ophaalzone in de ritinformatie.'));
     if (['aangekomen', 'ingestapt', 'rijdt'].includes(rit.status)) {
-      var passagier = maak('div', 'passagierkaart');
-      var persoon = maak('div');
-      persoon.appendChild(maak('small', '', 'PASSAGIER'));
-      persoon.appendChild(maak('strong', '', rit.reizigerCodenaam || 'RTG-reiziger'));
-      persoon.appendChild(maak('span', '', (rit.reizigers || 1) + ' reiziger' + ((rit.reizigers || 1) === 1 ? '' : 's') + ' · ' + (rit.bagage || 0) + ' bagage'));
-      passagier.appendChild(persoon);
-      if (rit.ophaalcode) {
-        var code = maak('div', 'ophaalcode');
-        code.appendChild(maak('small', '', 'OPHAALCODE'));
-        code.appendChild(maak('b', '', String(rit.ophaalcode)));
-        passagier.appendChild(code);
-      }
-      kaart.appendChild(passagier);
+      var passagier = maak('ul', 'ds-detail__gegevens'); passagier.setAttribute('data-passagier', '');
+      var n = rit.reizigers || 1;
+      passagier.appendChild(lijstRij('PASSAGIER', rit.reizigerCodenaam || 'RTG-reiziger', n + ' reiziger' + (n === 1 ? '' : 's') + ' · ' + (rit.bagage || 0) + ' bagage'));
+      if (rit.ophaalcode) passagier.appendChild(lijstRij('OPHAALCODE', String(rit.ophaalcode), ''));
+      b.appendChild(passagier);
     }
     var volgende = STATUS[rit.status];
     if (volgende) {
-      var actie = maak('button', 'hoofdactie'); actie.type = 'button'; actie.appendChild(maak('span', '', volgende[1])); actie.appendChild(maak('b', '', '→'));
-      actie.addEventListener('click', function () { zetRitStatus(rit, volgende[0], actie); }); kaart.appendChild(actie);
+      var actie = knop('ds-knop--primair', volgende[1]);
+      actie.setAttribute('data-volgende', volgende[0]); actie.setAttribute('data-ds-actie', volgende[1]);
+      actie.addEventListener('click', function () { zetRitStatus(rit, volgende[0], actie); }); b.appendChild(actie);
     } else {
-      var klaar = maak('div', 'veiligheidsnoot'); klaar.appendChild(icoon(['M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z']));
-      var p = maak('p'); p.appendChild(maak('b', '', 'Rit veilig vastgelegd')); p.appendChild(maak('span', '', 'De centrale handelt de financiële afronding af.')); klaar.appendChild(p); kaart.appendChild(klaar);
+      b.appendChild(maak('p', 'ds-lijst__titel', 'Rit veilig vastgelegd'));
+      b.appendChild(maak('p', 'ds-meta', 'De centrale handelt de financiële afronding af.'));
     }
-    return kaart;
+    return k.kaart;
+  }
+  /* Een gegeven: het label klein ervoor, de waarde erachter (ds-detail__gegeven). */
+  function lijstRij(label, titel, tekst) {
+    var li = maak('li', 'ds-detail__gegeven'); li.appendChild(maak('span', 'ds-label', label));
+    var t = maak('span'); t.appendChild(maak('strong', '', titel));
+    if (tekst) t.appendChild(maak('span', 'ds-lijst__tekst', tekst));
+    li.appendChild(t); return li;
   }
 
+  function statusVak(soort, label, titel, tekst) {
+    var s = maak('section', 'ds-status ds-status--binnen'); s.setAttribute('data-rit', soort);
+    if (label) s.appendChild(maak('p', 'ds-label', label));
+    s.appendChild(maak('h2', 'ds-status__titel', titel)); s.appendChild(maak('p', 'ds-status__tekst', tekst));
+    return s;
+  }
   function tekenLeeg() {
-    var kaart = maak('article', 'ritkaart leeg'); kaart.appendChild(maak('p', 'kaartlabel', 'RTG MOBILITY'));
-    kaart.appendChild(maak('h2', '', 'Geen open aanvragen'));
-    kaart.appendChild(maak('p', '', staat.demo ? 'Gebruik Hulp om een nieuwe ritaanvraag te simuleren.' : 'Nieuwe aanvragen van uw vervoerder verschijnen hier automatisch.'));
-    return kaart;
+    return statusVak('leeg', 'RTG MOBILITY', 'Geen open aanvragen',
+      staat.demo ? 'Gebruik Hulp om een nieuwe ritaanvraag te simuleren.' : 'Nieuwe aanvragen van uw vervoerder verschijnen hier automatisch.');
   }
   function tekenFout() {
     var aanmelden = staat.foutsoort === 'aanmelden';
-    var kaart = maak('article', 'ritkaart leeg foutkaart');
-    kaart.appendChild(maak('p', 'kaartlabel', aanmelden ? 'AANMELDEN NODIG' : 'VERBINDING NODIG'));
-    kaart.appendChild(maak('h2', '', aanmelden ? 'U bent niet aangemeld als chauffeur' : 'Ritten konden niet worden geladen'));
-    kaart.appendChild(maak('p', '', staat.fout || 'Controleer uw verbinding en probeer opnieuw.'));
+    var kaart = statusVak('fout', aanmelden ? 'AANMELDEN NODIG' : 'VERBINDING NODIG',
+      aanmelden ? 'U bent niet aangemeld als chauffeur' : 'Ritten konden niet worden geladen',
+      staat.fout || 'Controleer uw verbinding en probeer opnieuw.');
     /* Een knop die niets kan doen, hoort er niet te staan: opnieuw proberen
        lost een ontbrekende aanmelding nooit op. */
     if (aanmelden) {
-      var a = maak('a', 'hoofdactie'); a.href = '/apps/leverancier.html';
-      a.appendChild(maak('span', '', 'NAAR DE PERSONEELSLOGIN')); a.appendChild(maak('b', '', '\u2192'));
+      var a = maak('a', 'ds-knop ds-knop--primair ds-status__actie', 'NAAR DE PERSONEELSLOGIN'); a.href = '/apps/leverancier.html';
       kaart.appendChild(a);
     } else {
-      var b = maak('button', 'hoofdactie'); b.type = 'button';
-      b.appendChild(maak('span', '', 'PROBEER OPNIEUW')); b.appendChild(maak('b', '', '\u2192'));
+      var b = maak('button', 'ds-knop ds-knop--primair ds-status__actie', 'PROBEER OPNIEUW'); b.type = 'button';
       b.addEventListener('click', laad); kaart.appendChild(b);
     }
     return kaart;
@@ -292,16 +279,16 @@
 
   function tekenVandaag() {
     var klaar = (staat.gegevens && staat.gegevens.klaar) || [];
-    $('#vandaagDatum').textContent = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+    $('#vandaagDatum').textContent = new Date().toLocaleDateString(taal(), { weekday: 'long', day: 'numeric', month: 'long' });
     $('#cijferRitten').textContent = String(klaar.length);
-    $('#cijferKm').textContent = klaar.reduce(function (n, r) { return n + (Number(r.km) || 0); }, 0).toLocaleString('nl-NL', { maximumFractionDigits: 1 });
+    $('#cijferKm').textContent = klaar.reduce(function (n, r) { return n + (Number(r.km) || 0); }, 0).toLocaleString(taal(), { maximumFractionDigits: 1 });
     $('#cijferOmzet').textContent = geld(klaar.reduce(function (n, r) { return n + (Number(r.prijs) || 0); }, 0));
     var log = $('#ritlog'); leeg(log);
-    if (!klaar.length) { log.appendChild(maak('p', 'leegregel', 'Nog geen ritten afgerond tijdens deze dienst.')); return; }
+    if (!klaar.length) { log.appendChild(maak('li', 'ds-meta', 'Nog geen ritten afgerond tijdens deze dienst.')); return; }
     klaar.forEach(function (r) {
-      var regel = maak('div', 'logregel klaar'); regel.appendChild(maak('i'));
-      var tekst = maak('div'); tekst.appendChild(maak('b', '', ritNaam(r))); tekst.appendChild(maak('span', '', r.ref)); regel.appendChild(tekst);
-      regel.appendChild(maak('time', '', geld(r.prijs))); log.appendChild(regel);
+      var regel = maak('li', 'ds-lijst__rij'); regel.insertAdjacentHTML('beforeend', '<svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 12 4 4 10-10"/></svg>');
+      var tekst = maak('span'); tekst.appendChild(maak('span', 'ds-lijst__titel', ritNaam(r))); tekst.appendChild(maak('span', 'ds-lijst__tekst', r.ref)); regel.appendChild(tekst);
+      regel.appendChild(maak('span', 'ds-lijst__tijd', geld(r.prijs))); log.appendChild(regel);
     });
   }
 
@@ -309,15 +296,12 @@
     var rit = actieveRit(), kaart = $('#navigatiekaart'); leeg(kaart);
     var open = $('#openNavigatie'), deel = $('#deelPositie'); open.disabled = !rit; deel.disabled = !rit;
     if (!rit) {
-      var kompas = maak('div', 'kompas'); kompas.appendChild(icoon(['m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z', 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'])); kaart.appendChild(kompas);
-      kaart.appendChild(maak('p', '', 'GEEN ACTIEVE ROUTE')); kaart.appendChild(maak('h2', '', 'Neem eerst een rit aan.'));
-      kaart.appendChild(maak('span', '', 'Daarna verschijnen vertrek, bestemming en de veilige locatiedeling hier.')); return;
+      kaart.appendChild(maak('p', 'ds-label', 'GEEN ACTIEVE ROUTE')); kaart.appendChild(maak('h2', 'ds-titel', 'Neem eerst een rit aan.'));
+      kaart.appendChild(maak('p', 'ds-meta', 'Daarna verschijnen vertrek, bestemming en de veilige locatiedeling hier.')); return;
     }
-    var route = maak('div', 'navroute');
-    [['OPHALEN', plaats(rit.van)], ['BESTEMMING', plaats(rit.naar)]].forEach(function (rij) {
-      var div = maak('div'); div.appendChild(maak('i')); var tekst = maak('span'); tekst.appendChild(maak('small', '', rij[0])); tekst.appendChild(maak('b', '', rij[1])); div.appendChild(tekst); route.appendChild(div);
-    });
-    kaart.appendChild(maak('p', '', STATUS_NAAM[rit.status] || rit.status)); kaart.appendChild(maak('h2', '', minuten(rit) + ' · ' + km(rit))); kaart.appendChild(route);
+    var route = maak('ul', 'ds-detail__gegevens');
+    [['OPHALEN', plaats(rit.van)], ['BESTEMMING', plaats(rit.naar)]].forEach(function (rij) { route.appendChild(lijstRij(rij[0], rij[1], '')); });
+    kaart.appendChild(maak('p', 'ds-label', STATUS_NAAM[rit.status] || rit.status)); kaart.appendChild(maak('h2', 'ds-titel', minuten(rit) + ' · ' + km(rit))); kaart.appendChild(route);
   }
 
   function render() {
@@ -332,6 +316,7 @@
     var naam = actor() && actor().name ? actor().name.split(/\s+/)[0] : 'chauffeur';
     $('#groet').textContent = groet() + ', ' + naam.toLocaleUpperCase('nl-NL');
   }
+  function tik() { var k = $('#klok'); if (k) { var nu = new Date(); k.dateTime = nu.toISOString(); k.textContent = nu.toLocaleTimeString(taal(), { hour: '2-digit', minute: '2-digit' }); } }
   function groet() { var uur = new Date().getHours(); return uur < 12 ? 'GOEDEMORGEN' : uur < 18 ? 'GOEDEMIDDAG' : 'GOEDEAVOND'; }
 
   function nieuweRitSignaal(rit) {
@@ -379,7 +364,7 @@
     $('#dialoogVan').textContent = plaats(rit.van); $('#dialoogNaar').textContent = plaats(rit.naar);
     var feiten = $('#dialoogFeiten'); leeg(feiten);
     [['Duur', minuten(rit)], ['Afstand', km(rit)], ['Ritprijs', geld(rit.prijs)], ['Reizigers', String(rit.reizigers || 1)], ['Bagage', String(rit.bagage || 0)], ['Referentie', rit.ref]].forEach(function (rij) {
-      var div = maak('div'), dt = maak('dt', '', rij[0]), dd = maak('dd', '', rij[1]); div.appendChild(dt); div.appendChild(dd); feiten.appendChild(div);
+      feiten.appendChild(lijstRij(rij[0], rij[1], ''));
     });
     $('#accepteerRit').hidden = !['aangevraagd', 'geprijsd', 'aangeboden'].includes(rit.status);
     $('#laatLopenDialoog').hidden = $('#accepteerRit').hidden;
@@ -480,8 +465,8 @@
 
   function wisselBlad(naam) {
     staat.blad = naam;
-    $$('[data-blad]').forEach(function (el) { var aan = el.dataset.blad === naam; el.hidden = !aan; el.classList.toggle('actief', aan); });
-    $$('[data-naar]').forEach(function (b) { var aan = b.dataset.naar === naam; b.classList.toggle('actief', aan); if (aan) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    $$('[data-blad]').forEach(function (el) { el.hidden = el.dataset.blad !== naam; });
+    $$('[data-naar]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.naar === naam)); });
     if (naam === 'navigatie') tekenNavigatie(); if (naam === 'vandaag') tekenVandaag();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -523,5 +508,5 @@
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !staat.demo) laad(); });
   window.addEventListener('beforeunload', stopPositie);
 
-  zetModus(); laad();
+  zetModus(); tik(); setInterval(tik, 15000); laad();
 })();

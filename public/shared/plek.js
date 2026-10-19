@@ -55,7 +55,7 @@
         '.rtgplek .rij{display:flex;gap:.6rem;}' +
         '.rtgplek button{flex:1;border:none;border-radius:0;padding:.6rem;font:inherit;' +
           'font-size:.82rem;font-weight:600;cursor:pointer;}' +
-        '.rtgplek .ja{background:var(--gold,#857007);color:#0C0C0B;}' +
+        '.rtgplek .ja{background:var(--ds-accent,var(--gold,#857007));color:var(--ds-accent-inkt,#0C0C0B);}' +
         '.rtgplek .nee{background:none;color:var(--muted,#8A8680);font-weight:500;}';
       document.head.appendChild(st);
 

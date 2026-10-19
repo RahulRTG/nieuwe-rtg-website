@@ -345,6 +345,21 @@ async function bewijsHandeling(page, route, maat) {
     }, null, { timeout: geduld(6000) });
     return;
   }
+  if (route.wereld === 'travel' && await page.locator('html[data-ds]').count()) {
+    /* Op het Design System: de echte handeling op het huis (Open reis bij het
+       volgende moment) opent het register, en de tab volgt. */
+    const actie = '#reisVolgende [data-naar-blad="reizen"]';
+    await page.waitForSelector(actie, { state: 'visible', timeout: geduld(15000) });
+    await page.locator(actie).scrollIntoViewIfNeeded();
+    await raakdoel(page, actie, label);
+    await page.click(actie);
+    await page.waitForFunction(() => {
+      const blad = document.querySelector('[data-blad="reizen"]');
+      const tab = document.querySelector('[data-tab="reizen"]');
+      return blad && !blad.hidden && tab && tab.getAttribute('aria-selected') === 'true';
+    }, null, { timeout: geduld(6000) });
+    return;
+  }
   if (route.wereld === 'travel') {
     await page.locator('[data-wh-copy="travelDetails"]').click();
     for (const selector of ['.dagdek', '.strook', '.kaartraster', '.kompas'])
@@ -399,6 +414,12 @@ test('vier wereldhomes blijven native dashboards op zes schermbreedtes',
           letOpFouten(page, fouten);
           try {
             await page.goto(base + route.pad, { waitUntil: 'domcontentloaded' });
+            if (await page.locator('html[data-ds]').count()) {
+              await keurDsWereld(page, route, maat);
+              await bewijsHandeling(page, route, maat);
+              assert.deepEqual(fouten, [], labelVoor(route, maat) + ': paginafouten: ' + fouten.join(' | '));
+              return;
+            }
             await page.waitForFunction((cfg) => {
               const hoofd = document.querySelector(cfg.hoofd);
               return document.body.getAttribute('data-rtg-world-start') === 'ready' && document.body.getAttribute('data-rtg-world-dashboard-ready') === 'true' &&
@@ -436,3 +457,35 @@ test('vier wereldhomes blijven native dashboards op zes schermbreedtes',
 });
 
 function labelVoor(route, maat) { return route.naam + ' @ ' + maat.naam; }
+
+/* EEN WERELD OP HET RTG DESIGN SYSTEM (TravelOS, TRAVELOS-MIGRATIE.md). De
+   dashboardlaag en Edge 2 bestaan daar niet; de grens die deze proef bewaakt
+   wel: de eigen inhoud in de eigen main, precies een Edge, geen oude lokale
+   balk, meerdere echte panelen, geen afgesneden canvas, en toegankelijk. */
+async function keurDsWereld(page, route, maat) {
+  const label = labelVoor(route, maat);
+  await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]', { timeout: geduld(20000) });
+  await page.waitForSelector('#reisVolgende:not([hidden]), #reisBronState:not([hidden])');
+  const m = await page.evaluate((cfg) => {
+    const zichtbaar = (el) => { if (!el) return false; const r = el.getBoundingClientRect(), st = getComputedStyle(el);
+      return st.display !== 'none' && st.visibility !== 'hidden' && r.width > 1 && r.height > 1; };
+    const html = document.documentElement;
+    return {
+      wereld: document.body.dataset.rtgWorld, hoofd: !!document.querySelector(cfg.hoofd),
+      edges: document.querySelectorAll('.ds-edge').length, oudeEdge: document.querySelectorAll('.rtg-edge-chrome,.rtg-adaptive-bar').length,
+      oudZichtbaar: cfg.oud.filter((sel) => [...document.querySelectorAll(sel)].some(zichtbaar)),
+      panelen: ['.ds-cover', '[data-blad="vandaag"]', '#momenten', '.ds-collectie__raster', '#wacht'].filter((sel) => zichtbaar(document.querySelector(sel))),
+      overloop: Math.max(html.scrollWidth, document.body.scrollWidth) - html.clientWidth
+    };
+  }, route);
+  assert.equal(m.wereld, route.wereld, label + ': verkeerde wereldrol');
+  assert.equal(m.hoofd, true, label + ': de oorspronkelijke main ontbreekt');
+  assert.equal(m.edges, 1, label + ': niet exact een Edge');
+  assert.equal(m.oudeEdge, 0, label + ': een tweede, oude Edge staat naast de ds-Edge');
+  assert.deepEqual(m.oudZichtbaar, [], label + ': oude lokale balk zichtbaar');
+  assert.ok(m.panelen.length >= 3, label + ': het huis toont geen meervoudige echte panelen: ' + m.panelen.join(', '));
+  assert.ok(m.overloop <= 1, label + ': document is ' + Math.ceil(m.overloop) + 'px horizontaal te breed');
+  const a11y = await page.evaluate(A11Y);
+  assert.deepEqual(a11y.overtredingen, [], route.naam + ' toegankelijkheid na volledige render');
+  assert.deepEqual(a11y.contrast, [], route.naam + ' contrast na volledige render');
+}

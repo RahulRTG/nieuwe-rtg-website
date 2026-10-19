@@ -3,6 +3,9 @@
   .ds-chips { display: flex; gap: var(--ds-ruimte-2); overflow-x: auto; scrollbar-width: none; padding-block: var(--ds-ruimte-2); }
   .ds-chip {
     flex: none;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
     min-block-size: 36px;
     padding-inline: var(--ds-ruimte-4);
     background: var(--ds-oppervlak-sterk);
@@ -12,7 +15,7 @@
     font: 500 var(--ds-maat-meta) / 1 var(--ds-letter-tekst);
     cursor: pointer;
   }
-  .ds-chip[aria-pressed="true"], .ds-chip[aria-selected="true"] { background: var(--ds-inkt); border-color: var(--ds-inkt); color: var(--ds-grond); }
+  .ds-chip[aria-pressed="true"], .ds-chip[aria-selected="true"], .ds-chip[aria-current="page"], .ds-chip[aria-current="step"] { background: var(--ds-inkt); border-color: var(--ds-inkt); color: var(--ds-grond); }
   .ds-tabs { display: flex; gap: var(--ds-ruimte-6); border-block-end: 1px solid var(--ds-lijnkleur); }
   .ds-tab {
     padding-block: var(--ds-ruimte-3);

@@ -5,16 +5,22 @@
   .ds-scherm, .ds-scherm *, .ds-scherm *::before, .ds-scherm *::after { box-sizing: border-box; }
   .ds-scherm {
     margin: 0;
-    min-block-size: 100dvh;
+    min-block-size: var(--ds-schermhoogte);
     background: var(--ds-grond);
     color: var(--ds-inkt);
     font-family: var(--ds-letter-tekst);
     font-size: var(--ds-maat-tekst);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    /* Elk scherm meet zichzelf: schermtypen reageren op hun EIGEN breedte
+       (@container ds), niet op het venster. Zo klopt een scherm ook in een
+       split-paneel, een ingebed kader of het telefoonkader van de voorbeeldpagina. */
+    container: ds / inline-size;
     text-rendering: optimizeLegibility;
   }
   .ds-scherm img { display: block; max-inline-size: 100%; }
   .ds-scherm :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
-  .ds-scherm [hidden] { display: none; }
+  /* De enige !important van het systeem: in de vroegste laag wint hij van elk
+     component, zodat hidden altijd verbergt (scripts/ontwerpsysteem.js regel 2). */
+  .ds-scherm [hidden] { display: none !important; }
 }

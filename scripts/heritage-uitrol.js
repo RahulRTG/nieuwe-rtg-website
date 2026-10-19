@@ -77,6 +77,15 @@ function gewenst(bestand, bron) {
 
   const body = bron.match(/<body\b[^>]*>/i);
   if (!body) throw new Error('Geen <body> in ' + route);
+  /* Een scherm op het RTG Design System (ONTWERPSYSTEEM.md) draagt het
+     Heritage-blad NIET: een blad buiten een cascadelaag wint van elke laag, en
+     deze uitrol zou het scherm dan stil terugzetten naar de oude vorm. Alleen
+     de wereld moet kloppen met de routekaart. */
+  if (/<link\b[^>]*href=["']\/ds\/rtg-ds\.css["']/i.test(bron)) {
+    const w = attribuut(body[0], 'data-rtg-world');
+    if (w !== wereld) throw new Error(route + ' noemt ' + w + ', routekaart noemt ' + wereld);
+    return bron;
+  }
   const bestaandeWereld = attribuut(body[0], 'data-rtg-world');
   const bestaandeSkin = attribuut(body[0], 'data-rtg-skin');
   if (bestaandeWereld && bestaandeWereld !== wereld && bestaandeWereld !== 'core') {

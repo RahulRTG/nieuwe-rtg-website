@@ -1580,11 +1580,15 @@ function meet(bronnen) {
   /* Hoeveel app-pagina's dragen de vormtaal nog niet? Geteld op de INSLUITING
      en niet op het gebruik: een pagina die rtg-ontwerp.css laadt kan er nog
      weinig mee doen, maar een pagina die hem niet laadt kan er zeker niets mee.
-     Dit is de goedkope, eerlijke ondergrens van adoptie. */
+     Dit is de goedkope, eerlijke ondergrens van adoptie. Een scherm op het
+     RTG Design System (/ds/rtg-ds.css, ONTWERPSYSTEEM.md) draagt de opvolger
+     van die tokenlaag en telt dus als ingesloten. */
   const appMap = path.join(WORTEL, 'public', 'apps');
   const appPaginas = fs.readdirSync(appMap).filter(f => f.endsWith('.html'));
-  const schermenZonderVormtaal = appPaginas.filter(f =>
-    !fs.readFileSync(path.join(appMap, f), 'utf8').includes('rtg-ontwerp.css')).length;
+  const schermenZonderVormtaal = appPaginas.filter(f => {
+    const html = fs.readFileSync(path.join(appMap, f), 'utf8');
+    return !html.includes('rtg-ontwerp.css') && !html.includes('/ds/rtg-ds.css');
+  }).length;
 
   /* Tel de toetsen die zichzelf kunnen overslaan. We tellen de AANROEP, niet
      het bestand: een bestand met acht toetsen achter een poort is acht toetsen

@@ -34,9 +34,14 @@ test('Agenda gebruikt de editorial kamer; Reisboek en Projecten behouden hun wer
     assert.equal(AGENDA.split('/shared/' + asset).length - 1, 1, asset + ' wordt één keer geladen');
   }
   assert.doesNotMatch(AGENDA, /data-rtg-world-dashboard=|rtg-vandaag-luxe\.(?:css|js)/);
-  assert.match(REISBOEK, /<body[^>]+data-rtg-world="travel"[^>]+data-rtg-vandaag-luxe="surface"/);
+  /* Reisboek staat op het RTG Design System (TRAVELOS-MIGRATIE.md): het
+     wereldpalet komt daar uit het TravelOS-thema van /ds/rtg-ds.css, en het
+     Vandaag-blad laadt er niet meer. */
+  assert.match(REISBOEK, /<body[^>]+data-rtg-world="travel"/);
+  assert.ok(REISBOEK.includes('/ds/rtg-ds.css'));
+  assert.doesNotMatch(REISBOEK, /rtg-vandaag-luxe\.(?:css|js)|data-rtg-world-dashboard=/);
   assert.match(WORK, /<body[^>]+data-rtg-world="work"[^>]+data-rtg-vandaag-surface="projecten"/);
-  for (const html of [REISBOEK, WORK]) {
+  for (const html of [WORK]) {
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.js/g) || []).length, 1);
     assert.doesNotMatch(html, /data-rtg-world-dashboard=/);

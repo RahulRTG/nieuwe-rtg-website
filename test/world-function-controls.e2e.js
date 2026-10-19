@@ -114,11 +114,18 @@ test('switching worlds reaches their current homes through the visible Edge', { 
     await open(page, '/apps/kantoor.html');
     for (const [name, route] of [['LivingOS', '/apps/wereld.html'], ['TravelOS', '/apps/reizen.html'],
       ['FoundationOS', '/apps/foundation/index.html'], ['WorkOS', '/apps/kantoor.html']]) {
+      /* Op een ds-wereld (TravelOS) is "Werelden" in de ds-Edge de weg naar
+         de werelden; daar kiest het lid verder met dezelfde zichtbare Edge. */
+      if (await page.locator('html[data-ds]').count()) {
+        await page.locator('.ds-edge__balk a[href="/apps/wereld.html"]').click();
+        await page.waitForURL(srv.base + '/apps/wereld.html');
+        await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      }
       await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"]').click();
       await page.locator('.rtg-edge-worlds a').filter({ hasText: name }).click();
       await page.waitForURL(srv.base + route);
-      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
-      assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
+      await page.waitForSelector('body[data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk');
+      assert.equal(await page.locator(await page.locator('html[data-ds]').count() ? '.ds-edge' : '.rtg-adaptive-bar').count(), 1);
     }
     assert.deepEqual(errors, [], 'world switches preserve working navigation without application errors');
   } finally { await ctx.close(); }
@@ -133,16 +140,20 @@ test('mobile office screens keep the standard Edge inside the physical viewport'
     ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
     await ctx.addInitScript(data => { for (const [k, v] of Object.entries(data)) localStorage.setItem(k, v); },
       { ...opslagVoor(auth.sessies), rtg_lang: 'nl' });
-    for (const route of ['/apps/kantoren.html', '/apps/routedossier.html']) {
+    /* routedossier staat op het Design System (TRAVELOS-MIGRATIE.md par. 1b):
+       zijn Edge is .ds-edge__balk en zijn acties openen #dsEdgeBlad. De eis is
+       dezelfde: de vaste Edge blijft binnen de telefoon en zijn acties openen. */
+    for (const [route, ds] of [['/apps/kantoren.html', false], ['/apps/routedossier.html', true]]) {
       const page = await ctx.newPage();
-      await page.goto(staff.base + route);
-      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
-      const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]');
+      await page.goto(staff.base + route, { waitUntil: 'domcontentloaded' });
+      if (ds) await page.waitForSelector('#lijst [data-pad]', { timeout: 30000 });
+      else await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      const edge = page.locator(ds ? '.ds-edge__balk [data-ds-edge="acties"]' : '.rtg-adaptive-bar [data-rtg-adaptive-action="context"]');
       const rect = await edge.boundingBox();
       assert.ok(rect && rect.y >= 0 && rect.y + rect.height <= 844 && rect.x + rect.width <= 390,
         route + ': content overflow must not push the fixed Edge outside the phone screen');
       await edge.click();
-      assert.equal(await page.locator('.rtg-adaptive-controls').isVisible(), true);
+      assert.equal(await page.locator(ds ? '#dsEdgeBlad' : '.rtg-adaptive-controls').isVisible(), true);
       await page.close();
     }
   } finally { if (ctx) await ctx.close(); await stop(staff.child); }

@@ -112,6 +112,7 @@ const EIGENAAR = {
   'TOEZEGKLASSEN.json': { handmatig: true, lezer: 'scripts/lib/toezegklassen.js',
     waarom: 'Handgeschreven besluitbestand van de inventaris (AFBOUWPROGRAMMA.md): afgewezen en extern zijn een oordeel en geen markering. scripts/lib/toezegklassen.js leest het en schrijft het niet; test/toezegklassen.test.js houdt elk citaat tegen zijn document.' },
   'ONTWERPSYSTEEM.md': { soort: 'BRON', waarom: 'Handgeschreven eigenaarsbesluit en architectuur van het RTG Design System (19 oktober 2026); scripts/ontwerpsysteem.js en test/ontwerpsysteem.test.js leveren het bewijs.' },
+  'TRAVELOS-MIGRATIE.md': { soort: 'BRON', waarom: 'Handgeschreven werkdossier van de TravelOS-migratie (nulmeting, batches, open punten); de browsertoetsen per scherm leveren het bewijs.' },
   'ONTWERPSTANDAARD-METING.md': { soort: 'BRON', waarom: 'Handgeschreven meetverslag van website tegenover app (#585), op een genoemde commit; verandert geen code.' },
   'TRAVELOS-SPATIAL-VERTICAL-SLICE.md': { soort: 'BRON',
     waarom: 'Handgeschreven implementatiepassport voor de eerste TravelOS Spatial-proef; het beschrijft een voorstel en bestaand bronbewijs, geen generator schrijft dit document.' },

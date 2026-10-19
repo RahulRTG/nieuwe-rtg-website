@@ -42,7 +42,7 @@ module.exports = (kern, gedeeld) => {
     stuur(res, await fn(s, req.body || {}));
   };
   app.post('/api/rtf/kantoorpakket/mijn', rtfPoort, rtfDoe((s) => office.mijn(s.key, s.kring)));
-  app.post('/api/rtf/kantoorpakket/maak', rtfPoort, rtfDoe((s, b) => office.maak(s.key, b, s.kring), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/maak', rtfPoort, rtfDoe((s, b) => office.maak(s.key, b, s.kring, b.idem), { schrijf: true }));
   app.post('/api/rtf/kantoorpakket/open', rtfPoort, rtfDoe((s, b) => office.open(s.key, b.id, s.kring)));
   app.post('/api/rtf/kantoorpakket/bewaar', ruim, rtfPoort, rtfDoe((s, b) => office.bewaar(s.key, b.id, b, s.kring), { schrijf: true, ruim: true }));
   app.post('/api/rtf/kantoorpakket/weg', rtfPoort, rtfDoe((s, b) => office.weg(s.key, b.id), { schrijf: true }));
@@ -87,7 +87,7 @@ module.exports = (kern, gedeeld) => {
   }
   const huisDoe = (fn) => async (req, res) => stuur(res, await fn(req.drive, req.body || {}));
   app.post('/api/werkplek/kantoorpakket/mijn', huisPoort, huisDoe((s) => office.mijn(s.key, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/maak', huisPoort, huisDoe((s, b) => office.maak(s.key, b, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/maak', huisPoort, huisDoe((s, b) => office.maak(s.key, b, s.kring, b.idem)));
   app.post('/api/werkplek/kantoorpakket/open', huisPoort, huisDoe((s, b) => office.open(s.key, b.id, s.kring)));
   app.post('/api/werkplek/kantoorpakket/bewaar', ruim, huisPoort, huisDoe((s, b) => office.bewaar(s.key, b.id, b, s.kring), { ruim: true }));
   app.post('/api/werkplek/kantoorpakket/weg', huisPoort, huisDoe((s, b) => office.weg(s.key, b.id)));

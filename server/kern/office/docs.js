@@ -60,9 +60,9 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
   }
 
   /* ---- een nieuw document (leeg of vanuit een sjabloon) ---- */
-  function maak(key, data, kring) {
+  function maak(key, data, kring, idemRuw) {
     const alle = lijsten();
-    const idem = schoon(data.idem, 80) || null, eerder = herhaling.gemaakt(alle, key, idem); // ./herhaling.js
+    const idem = schoon(idemRuw, 80) || null, eerder = herhaling.gemaakt(alle, key, idem, herhaling.verzoekVan(data));
     if (eerder) return eerder;
     const sjab = SJABLONEN[data.sjabloon] || null;
     const soort = sjab ? sjab.soort : (SOORTEN.includes(data.soort) ? data.soort : 'tekst');
@@ -84,7 +84,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
       beheer: { classificatie: 'intern', bewaartermijn: '7jaar', herzienOp: '', tags: [] },
       gemaakt: nu(), gewijzigd: nu(), laatstDoor: naamVan(key) };
     if (kring) { d.kring = kring; d.kringDeel = null; }
-    if (idem) d.idem = idem;
+    herhaling.merk(d, idem, data);
     schrijfAudit(d, key, 'aangemaakt', { naar: 'concept' });
     alle[d.id] = d;
     save();

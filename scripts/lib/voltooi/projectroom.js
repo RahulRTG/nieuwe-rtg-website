@@ -93,6 +93,13 @@ async function loop(w, stap) {
       ziet: 'collega: taak ' + taak.status + ', bewijs ' + bewijs.status + '; lid ' + lid.status + '; project ongewijzigd ' + (!q.taken[0].af && q.bewijs.length === 0) };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(STATE, { huis: 'rtg' });
+    const s = await w.post(BEWIJS, { projectId: 'x', titel: 'Anoniem', uitleg: 'zonder sessie' });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staat het project opgeleverd, met zijn bewijs en tijdlijn', async () => {

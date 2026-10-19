@@ -100,12 +100,12 @@ module.exports = ({ db, save, crypto }) => {
     save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen: BESLUITTYPEN, goedkeuringMaak
   });
   return { rtgone: { state,
-    intentieMaak: (body, actor) => eenmalig('intentie', 'intenties', body, actor, () => intentieMaak(body, actor)),
-    belofteMaak: (body, actor) => eenmalig('belofte', 'beloften', body, actor, () => belofteMaak(body, actor)),
-    frictieMaak: (body, actor) => eenmalig('frictie', 'fricties', body, actor, () => frictieMaak(body, actor)),
-    overdrachtMaak: (body, actor) => eenmalig('overdracht', 'overdrachten', body, actor, () => overdrachtMaak(body, actor)),
-    automatiseringVoorbereid: (body, actor) => eenmalig('automatisering', 'automatiseringen', body, actor, () => automatiseringVoorbereid(body, actor)),
+    intentieMaak: (body, actor, idem) => eenmalig('intentie', 'intenties', body, actor, () => intentieMaak(body, actor), idem),
+    belofteMaak: (body, actor, idem) => eenmalig('belofte', 'beloften', body, actor, () => belofteMaak(body, actor), idem),
+    frictieMaak: (body, actor, idem) => eenmalig('frictie', 'fricties', body, actor, () => frictieMaak(body, actor), idem),
+    overdrachtMaak: (body, actor, idem) => eenmalig('overdracht', 'overdrachten', body, actor, () => overdrachtMaak(body, actor), idem),
+    automatiseringVoorbereid: (body, actor, idem) => eenmalig('automatisering', 'automatiseringen', body, actor, () => automatiseringVoorbereid(body, actor), idem),
     automatiseringVoer, automatiseringHerstel,
-    goedkeuringMaak: (body, context) => eenmalig('goedkeuring', 'goedkeuringen', body, context && context.key, () => goedkeuringMaak(body, context)),
+    goedkeuringMaak: (body, context, idem) => eenmalig('goedkeuring', 'goedkeuringen', body, context && context.key, () => goedkeuringMaak(body, context), idem),
     goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };
 };

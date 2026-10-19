@@ -637,7 +637,9 @@ function updateTeamSummary(k){
 }
 let TEAM_CODE=null;/* de kale kamercode alleen in het geheugen van deze pagina: de server toont hem een keer */
 function onthoudTeamCode(k){if(k&&k.toegangscode)TEAM_CODE={id:k.id,code:k.toegangscode}}
-async function createTeamRoom(code){try{const d=await api('teamkamer/maak',{code});onthoudTeamCode(d.kamer);TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('Premium teamkamer gemaakt. Deel alleen de tijdelijke toegangscode.')}catch(e){toast(e.message)}}
+/* een herhaalsleutel per kamer die je wilt maken; na succes een nieuwe */
+let TEAM_IDEM='',TEAM_IDEM_VOOR='';
+async function createTeamRoom(code){if(!TEAM_IDEM||TEAM_IDEM_VOOR!==code){TEAM_IDEM=RTGId('kamer');TEAM_IDEM_VOOR=code;}try{const d=await api('teamkamer/maak',{code,idem:TEAM_IDEM});TEAM_IDEM='';onthoudTeamCode(d.kamer);TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('Premium teamkamer gemaakt. Deel alleen de tijdelijke toegangscode.')}catch(e){toast(e.message)}}
 async function openTeamRoom(id){try{const d=await api('teamkamer/mijn',{id});TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom()}catch(e){toast(e.message)}}
 async function joinTeamRoom(){const code=$('#teamJoinCode').value.trim();if(!code){toast('Vul de toegangscode in.');return}try{const d=await api('teamkamer/deelnemen',{code});TEAM_ROOM=d.kamer;$('#teamJoinCode').value='';updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('U werkt nu mee in het gedeelde synthetische dossier.')}catch(e){toast(e.message)}}
 function renderTeamRoom(){

@@ -16,7 +16,7 @@ module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernem
   /* ---- aanmaken: de onderneming bestaat vanaf "misschien" ----
      Rechtsvorm mag leeg blijven. "Ik weet nog niet wat ik word" is een echte
      stand in de ideefase en krijgt hier geen standaardwaarde aangemeten. */
-  function ondernemingNieuw(eigenaar, body) {
+  function ondernemingNieuw(eigenaar, body, idemRuw) {
     if (!eigenaar) return { status: 401, error: 'Log in om een onderneming te beginnen.' };
     const naam = scho((body || {}).naam, 80);
     if (!naam) return { status: 400, error: 'Hoe zou de onderneming heten? Een werktitel is genoeg.' };
@@ -27,8 +27,10 @@ module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernem
        afgebroken verbinding of een herstart), dan is het dezelfde onderneming.
        Zonder deze sleutel stond er na een stroomstoring en een herhaling een
        tweede onderneming met dezelfde naam (scripts/lib/voltooi/onderneming.js). */
-    const idem = scho((body || {}).idem, 80) || null;
+    const idem = scho(idemRuw, 80) || null;
     const eerder = idem && bak().find(x => x.eigenaar === eigenaar && x.idem === idem);
+    if (eerder && (eerder.naam !== naam || (eerder.rechtsvorm || null) !== (rvIn || null)))
+      return { status: 409, error: 'Deze herhaalsleutel hoort bij een andere onderneming; er is niets aangemaakt.' };
     if (eerder) return { ok: true, herhaald: true, onderneming: ondernemingBeeld(eerder) };
     const o = {
       id: 'ond_' + crypto.randomBytes(6).toString('hex'),

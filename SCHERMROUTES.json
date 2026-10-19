@@ -3,16 +3,20 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "d912838c",
+  "commit": "e47081ed4",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/ovroutes.html",
-    "public/apps/residentie/residentie-04.js",
-    "public/apps/stad.html",
-    "public/apps/vluchten.html"
+    "public/apps/app-main/app-main-01.js",
+    "public/apps/app-main/app-main-23a.js",
+    "public/apps/app-main/app-main-24a3.js",
+    "public/apps/app.html",
+    "public/apps/partner-network.html",
+    "public/apps/partner-network.js",
+    "public/apps/werkruimte.html",
+    "public/sw.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7823,20 +7827,25 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 451,
+  "schermenMetPad": 453,
   "nietGelezen": 0,
-  "exactePaden": 1202,
-  "verwijzingen": 1444,
-  "voorvoegsels": 130,
+  "exactePaden": 1214,
+  "verwijzingen": 1459,
+  "voorvoegsels": 129,
   "basisPaden": 2,
-  "doodPad": 0,
-  "doodPadVerwijzingen": 0
+  "doodPad": 1,
+  "doodPadVerwijzingen": 1
  },
  "basisPadLijst": [
   "/api/foundation",
   "/api/rtf/social"
  ],
- "doodPad": [],
+ "doodPad": [
+  {
+   "pad": "/api/supplier/netwerk/overzicht",
+   "scherm": "public/apps/partner-network.js"
+  }
+ ],
  "nietGelezen": [],
  "perPad": [
   {
@@ -7949,6 +7958,18 @@
    "aantal": 7
   },
   {
+   "pad": "/api/account/start",
+   "schermen": [
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/decision-room.js",
+    "public/apps/project-room.js",
+    "public/apps/rtgone.html",
+    "public/apps/rtmail-voorzijde-werk.js",
+    "public/shared/kantoordeur.js"
+   ],
+   "aantal": 6
+  },
+  {
    "pad": "/api/ice",
    "schermen": [
     "public/apps/meet/kamer.js",
@@ -7979,17 +8000,6 @@
     "public/apps/media/lijst.js",
     "public/apps/pay.html",
     "public/apps/spelen.html"
-   ],
-   "aantal": 5
-  },
-  {
-   "pad": "/api/account/start",
-   "schermen": [
-    "public/apps/decision-room.js",
-    "public/apps/project-room.js",
-    "public/apps/rtgone.html",
-    "public/apps/rtmail-voorzijde-werk.js",
-    "public/shared/kantoordeur.js"
    ],
    "aantal": 5
   },
@@ -8052,6 +8062,15 @@
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
+  },
+  {
+   "pad": "/api/account/rollen",
+   "schermen": [
+    "public/apps/app-main/app-main-24a3.js",
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/personeel/personeel-04a.js"
+   ],
+   "aantal": 3
   },
   {
    "pad": "/api/office/stream",
@@ -8250,14 +8269,6 @@
     "public/shared/interface/modules/safety.js"
    ],
    "aantal": 3
-  },
-  {
-   "pad": "/api/account/rollen",
-   "schermen": [
-    "public/apps/app-main/app-main-24a3.js",
-    "public/apps/personeel/personeel-04a.js"
-   ],
-   "aantal": 2
   },
   {
    "pad": "/api/bank/overzicht",
@@ -8680,6 +8691,14 @@
    "schermen": [
     "public/apps/leven-panelen.js",
     "public/apps/uitgaan.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/supplier/mall/aanvraag/reageer",
+   "schermen": [
+    "public/apps/leverancier-aanvragen.js",
+    "public/apps/partner-network.js"
    ],
    "aantal": 2
   },
@@ -9793,6 +9812,34 @@
    "pad": "/api/boeken/voortgang",
    "schermen": [
     "public/apps/boeken/app.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/bericht",
+   "schermen": [
+    "public/apps/browser.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/gids",
+   "schermen": [
+    "public/apps/browser.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/open",
+   "schermen": [
+    "public/apps/browser.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/zoek",
+   "schermen": [
+    "public/apps/browser.html"
    ],
    "aantal": 1
   },
@@ -11996,13 +12043,6 @@
   },
   {
    "pad": "/api/supplier/mall",
-   "schermen": [
-    "public/apps/leverancier-aanvragen.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/supplier/mall/aanvraag/reageer",
    "schermen": [
     "public/apps/leverancier-aanvragen.js"
    ],
@@ -14221,6 +14261,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/supplier/netwerk/overzicht",
+   "schermen": [
+    "public/apps/partner-network.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/link/cap/maak",
    "schermen": [
     "public/apps/pay.html"
@@ -15229,6 +15276,104 @@
    "aantal": 1
   },
   {
+   "pad": "/api/site/ai",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/bewaar",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/foto",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/fotos",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/haal",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/herstel",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/live",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/mijn",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/offline",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/persoonlijk",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/publiceer",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/sjablonen",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/sjabloon",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/versies",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/sociaal/command",
    "schermen": [
     "public/apps/sociaal.html"
@@ -15827,55 +15972,6 @@
    "pad": "/api/vertegenwoordiging/simulatie",
    "schermen": [
     "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/boek",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/bord",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/charter",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/incheck",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/mijn",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/pass/intrek",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/pass/roteer",
-   "schermen": [
-    "public/apps/vluchten.html"
    ],
    "aantal": 1
   },
@@ -16528,6 +16624,14 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/app-main/app-main-25.js",
+   "exact": [
+    "/api/account/rollen",
+    "/api/account/start"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/app-main/app-main-30.js",
    "exact": [
     "/api/bank/overzicht",
@@ -16784,10 +16888,13 @@
   },
   {
    "bestand": "public/apps/browser.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/browser/"
-   ]
+   "exact": [
+    "/api/browser/bericht",
+    "/api/browser/gids",
+    "/api/browser/open",
+    "/api/browser/zoek"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/camera.html",
@@ -19152,6 +19259,14 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/partner-network.js",
+   "exact": [
+    "/api/supplier/mall/aanvraag/reageer",
+    "/api/supplier/netwerk/overzicht"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/passkeys.html",
    "exact": [],
    "voorvoegsels": [
@@ -19803,11 +19918,23 @@
   {
    "bestand": "public/apps/sitemaker.html",
    "exact": [
-    "/api/salon/promo"
+    "/api/salon/promo",
+    "/api/site/ai",
+    "/api/site/bewaar",
+    "/api/site/foto",
+    "/api/site/fotos",
+    "/api/site/haal",
+    "/api/site/herstel",
+    "/api/site/live",
+    "/api/site/mijn",
+    "/api/site/offline",
+    "/api/site/persoonlijk",
+    "/api/site/publiceer",
+    "/api/site/sjablonen",
+    "/api/site/sjabloon",
+    "/api/site/versies"
    ],
-   "voorvoegsels": [
-    "/api/site/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/sociaal.html",
@@ -20143,16 +20270,10 @@
   },
   {
    "bestand": "public/apps/vluchten.html",
-   "exact": [
-    "/api/member/vluchten/boek",
-    "/api/member/vluchten/bord",
-    "/api/member/vluchten/charter",
-    "/api/member/vluchten/incheck",
-    "/api/member/vluchten/mijn",
-    "/api/member/vluchten/pass/intrek",
-    "/api/member/vluchten/pass/roteer"
-   ],
-   "voorvoegsels": []
+   "exact": [],
+   "voorvoegsels": [
+    "/api/member/vluchten"
+   ]
   },
   {
    "bestand": "public/apps/voeding.html",

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '7be75ecc';
+var RTG_BOUW = '6b29161f';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4001,7 +4001,8 @@ var RTG_BOUW = '7be75ecc';
        niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
-    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
+    // de netwerkkant van een partnerzaak: alleen voor wie een zaak opent (werkrol, app-main-24a3.js)
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html', werkrol: 'zaak' },
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
@@ -4524,7 +4525,12 @@ var RTG_BOUW = '7be75ecc';
     fetch('/api/account/rollen', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { werkrollen = new Set(((d && d.rollen) || []).map((r) => r.rol)); if (werkrollen.size) bouw(); })
+      /* Een manager die via zijn dienstverband aan een zaak hangt (rol
+         personeel, manager) opent de zaak-app net als wie de zaak koppelde
+         (app-main-25.js); voor een ingang met werkrol 'zaak' telt hij dus ook. */
+      .then((d) => { const rollen = (d && d.rollen) || [];
+        werkrollen = new Set(rollen.map((r) => r.rol).concat(rollen.some((r) => r.rol === 'personeel' && r.manager) ? ['zaak'] : []));
+        if (werkrollen.size) bouw(); })
       .catch(() => {});
   })();
 
@@ -4631,9 +4637,13 @@ var RTG_BOUW = '7be75ecc';
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
+    /* De paden van de werkkiezer staan voluit, zodat de routemeting
+       (SCHERMROUTES.json) ziet welke deuren hij aanroept; API.call zet zelf
+       /api ervoor, dus dat gaat er hier weer af. */
+    const werkApi = (pad, body) => API.call(pad.replace(/^\/api(?=\/)/, ''), body);
     belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
-    API.call('/account/rollen', {}).then(d => {
+    werkApi('/api/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
       if (!rollen.length) {
         const leeg = document.createElement('div');
@@ -4666,12 +4676,12 @@ var RTG_BOUW = '7be75ecc';
               if (u.geenPasskey) { location.href = deur.PASSKEYS; return; }
               if (!u.token) throw new Error(u.error || T('werk.mis', 'Openen lukte niet.'));
               s = u;
-            } else try { s = await API.call('/account/start', body); }
+            } else try { s = await werkApi('/api/account/start', body); }
             catch (e1) {
               if (!(e1.data && e1.data.locatieNodig)) throw e1;
               const pos = await vraagPositie();
               if (!pos) throw e1;
-              s = await API.call('/account/start', Object.assign({ positie: pos }, body));
+              s = await werkApi('/api/account/start', Object.assign({ positie: pos }, body));
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren

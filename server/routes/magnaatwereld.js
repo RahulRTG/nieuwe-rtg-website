@@ -39,7 +39,7 @@ module.exports = (kern) => {
   app.post('/api/member/magnaat/partner/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.partnerTrainingStart(key, b.code)));
   app.post('/api/member/magnaat/partner/stap', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.partnerTrainingAntwoord(key, b.trainingId, b.keuze)));
   app.post('/api/member/magnaat/teamkamer/mijn', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMijn(key, b.id)));
-  app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMaak(key, b)));
+  app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMaak(key, b, b.idem)));
   app.post('/api/member/magnaat/teamkamer/deelnemen', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerDeelnemen(key, b.code)));
   app.post('/api/member/magnaat/teamkamer/code', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerCode(key, b.id)));
   app.post('/api/member/magnaat/teamkamer/code/intrek', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerCodeIntrek(key, b.id)));

@@ -130,18 +130,28 @@ test('één persoonlijk RTMAIL-bericht wordt een volledige, traceerbare werkstro
 test('een herhaalsleutel overleeft een herstart: dezelfde belofte of hetzelfde voorstel komt er nooit twee keer', () => {
   const crypto = require('node:crypto'), db = { data: {} };
   const eerste = require('../server/kern/rtgone')({ db, save: () => {}, crypto }).rtgone;
-  const a = eerste.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-1' }, 'Noordster');
+  const a = eerste.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag' }, 'Noordster', 'form-1');
   assert.equal(a.ok, true);
   /* Een nieuw proces op dezelfde opslag: niets uit het geheugen van het eerste. */
   const tweede = require('../server/kern/rtgone')({ db: { data: JSON.parse(JSON.stringify(db.data)) }, save: () => {}, crypto }).rtgone;
-  const herhaling = tweede.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-1' }, 'Noordster');
+  const herhaling = tweede.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag' }, 'Noordster', 'form-1');
   assert.equal(herhaling.herhaald, true);
   assert.equal(herhaling.belofte.id, a.belofte.id);
   assert.equal(tweede.state('rtg').beloften.length, 1, 'de herhaling na een herstart maakt geen tweede belofte');
-  assert.equal(tweede.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-1' }, 'Westwind').herhaald, undefined,
+  assert.equal(tweede.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag' }, 'Westwind', 'form-1').herhaald, undefined,
     'dezelfde sleutel van een andere medewerker is een eigen verzoek');
   const ctx = { key: 'user-8', label: 'Noordster' };
-  const g = tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren', idem: 'dr-1' }, ctx);
-  assert.equal(tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren', idem: 'dr-1' }, ctx).goedkeuring.id, g.goedkeuring.id);
+  const g = tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren' }, ctx, 'dr-1');
+  assert.equal(tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren' }, ctx, 'dr-1').goedkeuring.id, g.goedkeuring.id);
   assert.equal(tweede.state('rtg').goedkeuringen.length, 1);
+});
+
+test('dezelfde herhaalsleutel bij een ANDER verzoek is een fout (409), geen stille herhaling', () => {
+  const crypto = require('node:crypto'), db = { data: {} };
+  const one = require('../server/kern/rtgone')({ db, save: () => {}, crypto }).rtgone;
+  assert.equal(one.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag' }, 'Noordster', 'form-9').ok, true);
+  const ander = one.belofteMaak({ huis: 'rtg', belofte: 'Iets heel anders' }, 'Noordster', 'form-9');
+  assert.equal(ander.status, 409);
+  assert.match(ander.error, /ander verzoek/);
+  assert.equal(one.state('rtg').beloften.length, 1);
 });

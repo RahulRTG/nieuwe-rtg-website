@@ -78,6 +78,13 @@ async function loop(w, stap) {
       ziet: 'opnieuw ' + v.status + ', stand ' + g.status };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(STATE, { huis: 'rtg' });
+    const s = await w.post(AANVRAAG, { huis: 'rtg', titel: 'Anoniem', reden: 'zonder sessie' });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staat het besluit er nog, goedgekeurd met twee stemmen', async () => {

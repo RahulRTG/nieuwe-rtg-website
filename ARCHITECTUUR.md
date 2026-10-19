@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5531 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5532 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5531 |
-| servermodules (`server/**/*.js`) | 4571 |
-| routebestanden (`server/routes/**`) | 669 |
+| API-endpoints | 5532 |
+| servermodules (`server/**/*.js`) | 4573 |
+| routebestanden (`server/routes/**`) | 670 |
 | kernmodules (`server/kern/**`) | 2860 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 457 |
-| toetsbestanden (`test/*.test.js`) | 2497 |
+| toetsbestanden (`test/*.test.js`) | 2499 |
 | schermtoetsen (`test/*.e2e.js`) | 338 |
 
 ## 2. De weg van een verzoek
@@ -118,7 +118,7 @@ zie §5 -- er zijn nog 260 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 55 |
 | `member` | 770 | 79 | 17 | 462 |
-| `supplier` | 640 | 140 | 6 | 349 |
+| `supplier` | 641 | 141 | 6 | 348 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 10 | 1 | 43 |
 | `social` | 79 | 11 | 33 | 74 |
@@ -156,7 +156,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(216) auth(132) supplierAuth(67) officeAuth(50) db(40) liveCodename(36) status(32)
+app(216) auth(132) supplierAuth(67) officeAuth(50) db(40) liveCodename(35) status(32)
 accounts(30) schoon(23) boardroomWie(22) managerOnly(20) codenaamVan(20) rtf(20)
 save(19) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)

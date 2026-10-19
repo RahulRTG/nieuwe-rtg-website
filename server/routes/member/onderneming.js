@@ -67,7 +67,8 @@ module.exports = (kern) => {
   });
 
   app.post('/api/onderneming/nieuw', auth, (req, res) => {
-    stuur(res, ondernemingNieuw(req.session.key, req.body || {}));
+    // de herhaalsleutel leest de route zelf (middleware/idempotentie-eigen.js)
+    stuur(res, ondernemingNieuw(req.session.key, req.body || {}, req.body.idem));
   });
 
   app.post('/api/onderneming/beeld', auth, (req, res) => {

@@ -97,3 +97,18 @@ test('een buitenstaander kan een teamkamer niet lezen of bedienen', () => {
   assert.equal(lobby.kiesRol('derde', k.id, 'lead', k.revisie).status, 403);
   assert.equal(lobby.deelnemen('derde', 'VERKEERD').status, 404);
 });
+
+/* Een herhaalde "Maak teamkamer" (afgebroken verbinding, herstart) is dezelfde
+   kamer en geen tweede. De toegangscode komt maar een keer over de lijn; de
+   herhaling toont hem niet nog eens (de host roteert hem als hij kwijt is).
+   Dezelfde sleutel voor een ander bedrijf is 409. */
+test('een herhaalde teamkamer met dezelfde sleutel is dezelfde kamer, zonder de code opnieuw', async () => {
+  const { lobby } = omgeving();
+  const a = await lobby.maak('host', { code: 'ACME' }, 'kamer-1');
+  const b = await lobby.maak('host', { code: 'ACME' }, 'kamer-1');
+  assert.equal(b.herhaald, true);
+  assert.equal(b.kamer.id, a.kamer.id);
+  assert.equal(b.kamer.toegangscode, undefined, 'de code verschijnt maar een keer');
+  assert.equal((await lobby.mijn('host')).kamers.length, 1);
+  assert.equal((await lobby.maak('host', { code: 'ANDER' }, 'kamer-1')).status, 409);
+});

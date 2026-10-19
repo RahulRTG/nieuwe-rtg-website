@@ -303,6 +303,17 @@ const CONTRACT = {
   'link:office': Object.assign({
     belofte: 'een medewerker maakt een document in de kantoordrive, bewaart met versies en zet een versie terug; een oud venster schrijft er niet overheen en een zaak of lid komt er niet bij'
   }, voltooi('office', 'het scenario loopt /api/office/kantoorpakket/mijn, /maak, /open, /bewaar, /versies en /terug, het voorvoegsel dat /apps/office.html in de kantoorstand aanroept, met een zaak en een lid die er niet bij komen')),
+  'link:sitemaker': Object.assign({
+    belofte: 'een lid bouwt een eigen website, zet hem online en bepaalt zelf wanneer een wijziging naar buiten gaat, en een ander lid komt er niet aan'
+  }, voltooi('sitemaker', 'het scenario loopt /api/site/sjablonen, /mijn, /haal, /bewaar, /publiceer, /live, /versies, /herstel en /offline, de routes die /apps/sitemaker.html zelf aanroept, met een bezoeker via /api/browser/open en een ander lid dat er niet bij komt')),
+  /* Partner Network, echt gebouwd op besluit van de eigenaar (19 oktober 2026):
+     de netwerkkant van een partnerzaak, alleen tellingen met een bron. */
+  'link:partnernetwerk': Object.assign({
+    belofte: 'een partnerzaak ziet de vragen van leden die bij haar passen, haar beloften en wat aandacht vraagt, met bij elk getal zijn bron, en antwoordt op een vraag'
+  }, voltooi('partnernetwerk', 'het scenario loopt /api/supplier/netwerk/overzicht en /api/supplier/mall/aanvraag/reageer, de routes die /apps/partner-network.html zelf aanroept, met een lid dat de vraag stelt en het antwoord leest en een andere zaak die het niet ziet')),
+  'link:browser': Object.assign({
+    belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden'
+  }, voltooi('browser', 'het scenario loopt /api/browser/gids, /zoek, /open en /bericht, de routes die /apps/browser.html zelf aanroept, met de maker die het gesprek leest, een zaak die de klus in haar werklijst ziet en een vreemde die er niet door komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

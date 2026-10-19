@@ -91,6 +91,13 @@ async function loop(w, stap) {
       ziet: 'start ' + s.status + ', lezen ' + l.status + ', schrijven ' + b.status + ', ingeschoven ' + telBelofte(t, 'Ingeschoven ' + merk) };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(STATE, { huis: 'rtg' });
+    const s = await w.post(BELOFTE, { huis: 'rtg', belofte: 'Anoniem' });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staat de belofte er nog precies een keer, weer open', async () => {

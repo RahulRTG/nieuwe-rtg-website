@@ -30,8 +30,8 @@ async function loop(w, stap) {
   const merk = 'ruil' + Date.now().toString(36);
   const stad = await openStad(w, 'Zwolle');
   const ouder = await accountGezin(w, 'ruil', { kind: true });
-  const buur = await nieuwLid(w, 'buur');
-  const derde = await nieuwLid(w, 'derde');
+  const buur = await nieuwLid(w, 'buur', 'guest');
+  const derde = await nieuwLid(w, 'derde', 'guest');
   const lijst = (tok) => w.post(LIJST, { stad: stad.id }, tok);
   const mijn = (tok) => w.post(MIJN, {}, tok || ouder.token);
   const rijen = (r) => (r && r.data && r.data.ruil) || [];
@@ -42,7 +42,7 @@ async function loop(w, stap) {
 
   /* ---------------- voltooibaar ---------------- */
   await stap('voltooibaar', 'de ouder opent de buurtruil, ziet de open stad en een lege lijst', async () => {
-    const s = await w.post(STEDEN, {});
+    const s = await w.post(STEDEN, {}, ouder.token);
     const l = await lijst(ouder.token);
     const zwolle = ((s.data && s.data.steden) || []).find((x) => x.id === stad.id);
     return { klopt: !!zwolle && l.status === 200 && rijen(l).length === 0,

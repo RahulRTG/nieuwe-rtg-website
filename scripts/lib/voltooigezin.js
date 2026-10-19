@@ -26,12 +26,15 @@ const { nieuwLid, geverifieerdLid, eigenaarSessie, KANTOORWERELD } = require('./
 
 const GEZINSWERELD = Object.assign({ RTF_GEZIN_ACCOUNTPLICHT: '1' }, KANTOORWERELD);
 
-/* `kind`: met een kinderprofiel (dan is de ouder een geverifieerd lid). Geeft
+/* De ouder heeft een GRATIS account (tier 'guest', dezelfde registratie als
+   scripts/lib/gratisaccount.js): het besluit vraagt minimaal dat, en een pas
+   is voor een gezin niet nodig.
+   `kind`: met een kinderprofiel (dan is de ouder een geverifieerd lid). Geeft
    het lid terug met `gezin` (code + token van de beheerder) en, met kind,
    `kind` (code + token van het kinderprofiel). Gooit met de stap erbij. */
 async function accountGezin(w, merk, opties) {
   const o = opties || {};
-  const lid = o.kind ? await geverifieerdLid(w, merk) : await nieuwLid(w, merk);
+  const lid = o.kind ? await geverifieerdLid(w, merk, o.tier || 'guest') : await nieuwLid(w, merk, o.tier || 'guest');
   const g = await w.post('/api/rtf/eigen-gezin/maak', { gezinsnaam: 'Gezin ' + merk, naam: 'Ouder ' + merk,
     bevoegdGezin: true, privacyAkkoord: true }, lid.token);
   if (g.status !== 200 || !g.data || !g.data.token) throw new Error('het gezin maken lukte niet (' + g.status + ': ' + (g.data && g.data.error) + ')');
@@ -97,14 +100,20 @@ module.exports.actiefProject = actiefProject;
 /* EEN LES, zoals Leren & Groei hem start (apps/foundation/leren-groei.js): de
    begeleider maakt hem met /les/maak en krijgt de docentensleutel en de
    lescode; een leerling doet mee met /les/join op die lescode. Beide sleutels
-   zet het scherm in sessionStorage (rtf_docent, rtf_leerling). */
-async function nieuweLes(w, vak, naam) {
-  const r = await w.post('/api/foundation/les/maak', { vak, naam, idem: 'voltooi-les-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) });
+   zet het scherm in sessionStorage (rtf_docent, rtf_leerling).
+   GEBRUIKEN VRAAGT EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, Toegang
+   51519fb6): maken met het ledentoken van de begeleider als Bearer; meedoen
+   met een ledentoken, of als gezinsprofiel onder het account van een ouder
+   (gezinCode + gezinToken in het lijf, zoals leren-groei.js dat meestuurt).
+   `wie` is dus een token (string) of een gezinssessie {code, token}. */
+async function nieuweLes(w, vak, naam, account) {
+  const r = await w.post('/api/foundation/les/maak', { vak, naam, idem: 'voltooi-les-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }, account);
   if (r.status !== 200 || !r.data || !r.data.token) throw new Error('de les maken lukte niet (' + r.status + ')');
   return { lesId: r.data.lesId, token: r.data.token, lescode: r.data.lescode };
 }
-async function doeMee(w, lescode, naam) {
-  const r = await w.post('/api/foundation/les/join', { lescode, naam });
+const alsLid = (wie) => (wie && typeof wie === 'object' ? { gezinCode: wie.code, gezinToken: wie.token } : {});
+async function doeMee(w, lescode, naam, wie) {
+  const r = await w.post('/api/foundation/les/join', Object.assign({ lescode, naam }, alsLid(wie)), typeof wie === 'string' ? wie : undefined);
   if (r.status !== 200 || !r.data || !r.data.token) throw new Error('meedoen met de les lukte niet (' + r.status + ')');
   return { token: r.data.token, studentId: r.data.studentId, lesId: r.data.lesId };
 }
@@ -119,3 +128,4 @@ async function haal(w, pad, tok) {
 module.exports.nieuweLes = nieuweLes;
 module.exports.doeMee = doeMee;
 module.exports.haal = haal;
+module.exports.alsLid = alsLid;

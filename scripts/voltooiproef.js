@@ -101,6 +101,7 @@ const SCENARIOS = {
   'geven.js': require('./lib/voltooi/geven'),
   'gegevens.js': require('./lib/voltooi/gegevens'),
   'geldcommand.js': require('./lib/voltooi/geldcommand'),
+  'balans.js': require('./lib/voltooi/balans'),
   'hangar.js': require('./lib/voltooi/hangar'),
   'horeca.js': require('./lib/voltooi/horeca'),
   'huis.js': require('./lib/voltooi/huis'),
@@ -111,6 +112,11 @@ const SCENARIOS = {
   'library.js': require('./lib/voltooi/library'),
   'labfonds.js': require('./lib/voltooi/labfonds'),
   'leven.js': require('./lib/voltooi/leven'),
+  'gezin.js': require('./lib/voltooi/gezin'),
+  'betalen.js': require('./lib/voltooi/betalen'),
+  'bestellen.js': require('./lib/voltooi/bestellen'),
+  'assets.js': require('./lib/voltooi/assets'),
+  'bellen.js': require('./lib/voltooi/bellen'),
   'logboek.js': require('./lib/voltooi/logboek'),
   'loonstrook.js': require('./lib/voltooi/loonstrook'),
   'loopbaan.js': require('./lib/voltooi/loopbaan'),
@@ -165,6 +171,7 @@ const SCENARIOS = {
   'tabzorg.js': require('./lib/voltooi/tabzorg'),
   'table.js': require('./lib/voltooi/table'),
   'theater.js': require('./lib/voltooi/theater'),
+  'tweedescherm.js': require('./lib/voltooi/tweedescherm'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),
   'vandaag.js': require('./lib/voltooi/vandaag'),
   'veilig.js': require('./lib/voltooi/veilig'),
@@ -176,11 +183,10 @@ const SCENARIOS = {
   'wonen.js': require('./lib/voltooi/wonen'),
   'vonk.js': require('./lib/voltooi/vonk'),
   'wbw.js': require('./lib/voltooi/wbw'),
+  'werk.js': require('./lib/voltooi/werk'),
   'werkos.js': require('./lib/voltooi/werkos'),
   'vluchten.js': require('./lib/voltooi/vluchten'),
-  'vonk.js': require('./lib/voltooi/vonk'),
-  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht'),
-  'werkos.js': require('./lib/voltooi/werkos')
+  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht')
 };
 
 function scenarios(alleen) {

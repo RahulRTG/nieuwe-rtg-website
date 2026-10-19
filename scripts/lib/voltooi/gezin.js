@@ -16,16 +16,10 @@
    gezin (/api/rtf/eigen-gezin/*), die de uitnodiging maakt en de gezinsinfo
    zet langs de gezinsdeur van FoundationOS (/api/foundation/gezin/*).
 
-   WAAROM DIT BESTAND NIET IN scripts/lib/voltooi/ STAAT (19 oktober 2026). De
-   voltooiproef en de koppeling (scripts/lib/bewijsbron.js) kennen alleen een
-   onderdeel met een eigen adres: test/voltooiproef.test.js en
-   test/appcontract.test.js eisen een link: uit MAPPEN met een url, de rij in
-   APPWERKT.json heet "(tab in de app, geen eigen adres)", en SCHERMROUTES.json
-   telt de aanroepen van de stand niet (API.call('/rtf/...') zet /api er pas bij
-   het versturen voor). Dit scenario sluit -- gemeten via de voltooiproef --
-   maar hangt pas aan het register als die drie de navigatieroute
-   /apps/app.html#tab=<stand> kennen. Dat is een besluit over gedeelde
-   infrastructuur en niet over dit onderdeel; tot dan staat het hier klaar.
+   DE KOPPELING (19 oktober 2026, ronde 4). Een stand heeft geen eigen adres;
+   de ingang is /apps/app.html, via #tab=gezin, en de koppeling loopt op de
+   delen die de stand tekenen en aanroepen (app-main-43 en -44, die hun routes
+   nu letterlijk als /api/rtf/... aanroepen zodat SCHERMROUTES.json ze ziet).
    ========================================================================== */
 'use strict';
 const { nieuwLid, inloggen } = require('../voltooiwereld');
@@ -168,7 +162,8 @@ async function loop(w, stap) {
 
 module.exports = {
   functie: 'tab:gezin',
-  ingang: '/apps/app.html#tab=gezin',
+  ingang: '/apps/app.html',
+  via: '#tab=gezin',
   persona: 'lid',
   belofte: 'een oppas of familielid koppelt zich met de persoonlijke uitnodiging van een gezin, leest wat het gezin hem toevertrouwt en stuurt het gezin een bericht, zonder ouderrechten, en kan altijd ontkoppelen -- ook na een herstart, een dubbeltik, een afgebroken verzoek en een crash',
   grens: 'De stand heeft geen eigen scherm: de ingang is de navigatieroute /apps/app.html#tab=gezin, en de proef loopt de routes van de stand, niet de stand zelf. Bellen en chatten met het gezin (GezinRT, WebRTC) en de webpush naar de telefoon worden niet gelopen. De ouder werkt via zijn eigen gezin en de gezinsdeur van FoundationOS. Geen Redis of PostgreSQL.',

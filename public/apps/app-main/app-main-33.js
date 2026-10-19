@@ -1,7 +1,7 @@
 /* een asset herroepen binnen de bedenktijd */
     el.querySelectorAll('.js-asherroep').forEach(b => b.addEventListener('click', async () => {
       if (!window.confirm(T('as.herroepvraag','Herroepen binnen de bedenktijd? De volledige koopsom') + ' (' + eur(Number(b.dataset.p)) + ') ' + T('as.herroepvraag2','gaat terug naar de rekening waarmee u betaalde.'))) return;
-      try { const r = await API.call('/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + r.let); renderAssets(); }
+      try { const r = await API.call('/api/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + r.let); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asdoc').forEach(b => b.addEventListener('click', async () => {
@@ -9,7 +9,7 @@
       if (!uit) return;
       if (uit.style.display !== 'none'){ uit.style.display = 'none'; return; }
       try {
-        const d = (await API.call('/asset/document', { assetId: b.dataset.id })).document;
+        const d = (await API.call('/api/asset/document', { assetId: b.dataset.id })).document;
         uit.innerHTML = '<b style="color:var(--txt);">' + esc(d.object) + '</b> · ' + esc(d.entiteit) + '<br>' +
           esc(d.gebruik) + '<br><b>Access:</b> ' + esc(d.smaken.access.aard) + '<br><b>Asset:</b> ' + esc(d.smaken.asset.aard) + '<br>' +
           esc(d.kosten.serviceFee) + '<br>' + esc(d.kosten.overdracht) + '<br><b>' + T('as.doc.uit','Uitstappen') + ':</b> ' + esc(d.uitstappen) + '<br><b>' + T('as.doc.bed','Bedenktijd') + ':</b> ' + esc(d.bedenktijd) + '<br><b>' + T('as.doc.risico','Risico') + ':</b> ' + esc(d.risico);
@@ -19,12 +19,12 @@
     el.querySelectorAll('.js-asboek').forEach(b => b.addEventListener('click', async () => {
       const datum = (el.querySelector('[data-asdatum="' + b.dataset.id + '"]') || {}).value;
       if (!datum){ toast(T('as.kiesdag','Kies eerst een dag.')); return; }
-      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
+      try { const r = await API.call('/api/asset/gebruik', { assetId: b.dataset.id, datum }); toast('' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asuit').forEach(b => b.addEventListener('click', async () => {
       if (!window.confirm(T('as.uitvraag','Uitstappen? RTG betaalt de actuele ticketwaarde') + ' (' + eur(Number(b.dataset.w)) + ') ' + T('as.uitvraag2','uit via een Tik en het ticket gaat terug in de pool.'))) return;
-      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      try { const r = await API.call('/api/asset/uitstap', { ticketId: b.dataset.tid }); toast('' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -39,21 +39,21 @@
     // de inklap-laag deelt (alleen) de gebruikstellers, zodat Rahul leert
     if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
       fluisterSyncAt = Date.now();
-      API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
+      API.call('/api/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
     }
     let prof;
-    try { prof = await API.call('/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
+    try { prof = await API.call('/api/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
     // de voorspeller: RTG leert uw ritme en zet de beste verwachting klaar
     let vw = null;
-    try { vw = await API.call('/voorspel'); } catch(e){}
+    try { vw = await API.call('/api/voorspel'); } catch(e){}
     const v = vw && (vw.verwachtingen || [])[0];
     // synergie-pakketten: aanbod dat zaken samen hebben samengesteld
     let pk = [];
-    try { pk = ((await API.call('/pakketten')).pakketten || []).slice(0, 2); } catch(e){}
+    try { pk = ((await API.call('/api/pakketten')).pakketten || []).slice(0, 2); } catch(e){}
     // sparren: gedachten die Rahul heeft geparkeerd om er op een rustig moment
     // op terug te komen
     let sparLijst = [];
-    try { sparLijst = ((await API.call('/spar/lijst', {})).spar) || []; } catch(e){}
+    try { sparLijst = ((await API.call('/api/spar/lijst', {})).spar) || []; } catch(e){}
     el.innerHTML =
       (v
         ? '<div class="live-start s-j0vkha">' +
@@ -91,7 +91,7 @@
         sparBlokHtml(sparLijst) +
       '</div>';
     el.querySelectorAll('.js-flweg').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vsdoe').forEach(b => b.addEventListener('click', () => {
       const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
@@ -103,7 +103,7 @@
       const prijs = '€ ' + (Number(b.dataset.pkprijs)/100).toFixed(2).replace('.', ',');
       if (!window.confirm(T('pk.zeker','Pakket boeken voor') + ' ' + prijs + '? ' + T('pk.zeker2','Het bedrag gaat direct van uw RTG Pay-saldo.'))) return;
       try {
-        await API.call('/pakket/koop', { id: b.dataset.pk, idem: RTGIdem('pk') });
+        await API.call('/api/pakket/koop', { id: b.dataset.pk, idem: RTGIdem('pk') });
         toast('' + T('pk.ok','Geboekt. De zaken weten ervan.'));
         renderFluister();
       } catch(e){ toast(e.message); }
@@ -116,6 +116,6 @@
     if (!API.live){ el.innerHTML = ''; return; }
     let zorg, delen;
     try {
-      zorg = (await API.call('/zorgprofiel')).zorg;
-      delen = await API.call('/locatie/mijn');
+      zorg = (await API.call('/api/zorgprofiel')).zorg;
+      delen = await API.call('/api/locatie/mijn');
     } catch(e){ el.innerHTML = ''; return; }

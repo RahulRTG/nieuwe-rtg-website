@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-19T09:27:29.111Z",
-  "commit": "00c949f0"
+  "op": "2026-10-19T10:03:21.649Z",
+  "commit": "eb6dde1a"
  },
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
@@ -18849,67 +18849,67 @@
   {
    "route": "POST /api/member/spel/antwoord",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/arcade-bord",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/arcade-score",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/dag",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/dag-klaar",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/dag-start",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/kijk",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/klasgenoten",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/mijn",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/nabespreking",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/naspelen",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
@@ -18921,187 +18921,187 @@
   {
    "route": "POST /api/member/spel/online",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/opgeven",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/praat",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/praat-stuur",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/prestaties",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/projectie-open",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/projectie-sluit",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/rahul",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/random",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/replay",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/sneek-bord",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/sneek-score",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/staat",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/stand",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/sudoku-klaar",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/sudoku-nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/team-antwoord",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/team-mijn",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/team-nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/team-nodig",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/team-verlaat",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/toernooi-antwoord",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/toernooi-mijn",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/toernooi-nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/toernooi-staat",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/toewijzen",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/uitslagen",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/varianten",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/zet",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/zichtbaar",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
    "route": "POST /api/member/spel/zichtbaar-zet",
    "bestand": "server/routes/spellen.js",
-   "regel": 151,
+   "regel": 155,
    "samengesteld": true
   },
   {
@@ -27627,259 +27627,259 @@
   {
    "route": "POST /api/rtf/spel/antwoord",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/arcade-bord",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/arcade-score",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/dag",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/dag-klaar",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/dag-start",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/kijk",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/klasgenoten",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/mijn",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/nabespreking",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/naspelen",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
-   "samengesteld": true
+   "regel": 150,
+   "samengesteld": false
   },
   {
    "route": "POST /api/rtf/spel/online",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/opgeven",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/praat",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/praat-stuur",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/prestaties",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/projectie-open",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/projectie-sluit",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/rahul",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/random",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/replay",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/sneek-bord",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/sneek-score",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/staat",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/stand",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/sudoku-klaar",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/sudoku-nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/team-antwoord",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/team-mijn",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/team-nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/team-nodig",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/team-verlaat",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/toernooi-antwoord",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/toernooi-mijn",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/toernooi-nieuw",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/toernooi-staat",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/toewijzen",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/uitslagen",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/varianten",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/zet",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/zichtbaar",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {
    "route": "POST /api/rtf/spel/zichtbaar-zet",
    "bestand": "server/routes/spellen.js",
-   "regel": 155,
+   "regel": 159,
    "samengesteld": true
   },
   {

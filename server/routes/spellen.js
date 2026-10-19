@@ -142,17 +142,21 @@ module.exports = (kern) => {
   /* "Nodig uit en start" van een lid leest zijn eigen herhaalsleutel
      (kern/spellen/dubbeltik.js), dus hij staat hier letterlijk, voor de lus: de
      centrale laag gaat er niet voor staan (EIGEN in middleware/idempotentie-eigen.js).
-     De gezinsingang geeft de sleutel nog niet door; dat is aan FoundationOS. */
+     De gezinsingang doet hetzelfde achter de gezinspoort rtfSpeler. */
   app.post('/api/member/spel/nieuw', auth, (req, res) => {
     if (geenGast(req, res)) return;
     veilig(res, () => ACTIES.nieuw(req.session.key, req.body || {}, 'rtg', req.body && req.body.idem), 'nieuw', req);
+  });
+  app.post('/api/rtf/spel/nieuw', (req, res) => {
+    const mij = rtfSpeler(req, res); if (!mij) return;
+    veilig(res, () => ACTIES.nieuw(mij, req.body || {}, 'rtf', req.body && req.body.idem), 'nieuw', req);
   });
   for (const [naam, doe] of Object.entries(ACTIES)) {
     if (naam !== 'nieuw') app.post('/api/member/spel/' + naam, auth, (req, res) => {
       if (geenGast(req, res)) return;
       veilig(res, () => doe(req.session.key, req.body || {}, 'rtg'), naam, req);
     });
-    app.post('/api/rtf/spel/' + naam, (req, res) => {
+    if (naam !== 'nieuw') app.post('/api/rtf/spel/' + naam, (req, res) => {
       const mij = rtfSpeler(req, res); if (!mij) return;
       veilig(res, () => doe(mij, req.body || {}, 'rtf'), naam, req);
     });

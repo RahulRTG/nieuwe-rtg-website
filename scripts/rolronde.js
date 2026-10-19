@@ -170,6 +170,12 @@ function beoordeel(uitslag, normMeters) {
    Een filter zonder namen zou hetzelfde effect hebben en niemand zou het zien
    groeien -- zelfde afspraak als GEDEELD_BEDOELD in scripts/gluurronde.js. */
 const ROLGEDEELD = new Map([
+  ['GET /api/push/key', {
+    reden: 'Alle ingelogde schermen gebruiken dezelfde publieke VAPID-sleutel; geen privésleutel of persoonsdata.',
+    toets: 'test/publieke-rand.test.js', zelfdeOpenbareInhoud: true }],
+  ...['steden', 'campagnes'].map(naam => ['POST /api/rtfos/publiek/' + naam, {
+    reden: 'De buurtprojectie bevat uitsluitend openbare bekendmakingen voor iedere ingelogde rol; geen hulpdossiers.',
+    toets: 'test/toegang-buurt.test.js', zelfdeOpenbareInhoud: true }]),
   ['POST /api/link/koppelingen', {
     reden: 'het loket "wat staat er van mij open". Een zaak heeft daar bonnen (de kassa aanvaardt '
       + 'capabilities) maar geen ledensleutel, en komt binnen op zijn EIGEN naam: linkWieId(wie) rekent uit '
@@ -181,6 +187,15 @@ const ROLGEDEELD = new Map([
       + 'ondoorzichtig label van ZIJN sessie (kern/rtc/ijs.js); er komen geen gegevens van een ander mee.',
     toets: 'test/rtc-relay.test.js -- "end-to-end: /api/ice alleen voor een sessie, kortlevend, HMAC klopt"' }]),
 ]);
+
+// Gedeeld is een inhoudscontract, geen vrijstelling voor crashes of andere data.
+function gedeeldAntwoordGeldig(route, lid, ander) {
+  const contract = ROLGEDEELD.get(route);
+  if (!contract || ander.status < 200 || ander.status >= 300) return false;
+  if (!contract.zelfdeOpenbareInhoud) return true;
+  return lid.status === 200 && ander.status === 200 &&
+    require('node:util').isDeepStrictEqual(lid.data, ander.data);
+}
 
 async function main() {
   let srv = null, basis = BASIS_EXTERN;
@@ -246,7 +261,7 @@ async function main() {
       /* Een loket dat met opzet voor meer dan een rol opengaat telt hier niet
          als gat -- maar wel als REGEL, want het staat bij naam in ROLGEDEELD
          hierboven met zijn reden en zijn toets. */
-      const bewustGedeeld = ROLGEDEELD.has(r.methode + ' ' + pad);
+      const bewustGedeeld = gedeeldAntwoordGeldig(r.methode + ' ' + pad, l, a);
       if (bewustGedeeld) { gedeeld.push(r.methode + ' ' + pad + ' [' + rol + ']'); continue; }
       if (!bewustDicht && (a.status < 400 || a.status >= 500))
         gaten.push({ route: r.methode + ' ' + pad, rol, status: a.status, bestand: r.bestand + ':' + r.regel });
@@ -315,4 +330,4 @@ async function main() {
 }
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { beoordeel, METER, METER_N };
+module.exports = { beoordeel, gedeeldAntwoordGeldig, METER, METER_N };

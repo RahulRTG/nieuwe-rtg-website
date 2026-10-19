@@ -40,3 +40,24 @@ test('de buurtroutes: zonder account 401; een lid en een gezinsprofiel aan een o
   assert.equal((await post('/api/rtfos/publiek/steden', { code: gezin.code, token: 'GZ.' + '0'.repeat(32) })).status, 401,
     'een verzonnen gezinstoken opent niets');
 });
+
+// De buurtprojectie is voor alle ingelogde rollen dezelfde openbare informatie.
+// Een leverancier krijgt daarmee geen ledenrecht op een naastgelegen dossier.
+test('zaak en kantoor zien dezelfde openbare buurtprojectie, geen ledenrechten', async () => {
+  const lid = await registreerGratis(BASE);
+  const zaak = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  const kantoor = await post('/api/office/login', { code: 'RTG-OFFICE' });
+  for (const rol of [zaak, kantoor]) {
+    assert.equal(rol.status, 200);
+    assert.ok(rol.body.token);
+    for (const pad of ['/api/rtfos/publiek/steden', '/api/rtfos/publiek/campagnes']) {
+      const eigen = await post(pad, {}, lid.token);
+      const ander = await post(pad, {}, rol.body.token);
+      assert.equal(eigen.status, 200);
+      assert.equal(ander.status, 200);
+      assert.deepEqual(ander.body, eigen.body);
+      assert.equal((await post(pad, {}, 'verzonnen-token')).status, 401);
+    }
+    assert.equal((await post('/api/rtfos/portaal/deelnemer', { code: 'RTFD-onbekend' }, rol.body.token)).status, 401);
+  }
+});

@@ -132,6 +132,17 @@ test('3. de pushsleutel hoort bij een ingelogd scherm, en het is alleen de publi
   assert.equal((await get('/api/push/key', zaak)).status, 200, 'een zaaksessie haalt hem op');
   const r = await get('/api/push/key', lid.token);
   assert.equal(r.status, 200, 'een lid haalt hem op');
+  const kantoor = await post('/api/office/login', { code: 'KANTOOR-RAND' });
+  assert.equal(kantoor.status, 200);
+  assert.ok(kantoor.body.token);
+  for (const token of [zaak, kantoor.body.token]) {
+    const gedeeld = await get('/api/push/key', token);
+    assert.equal(gedeeld.status, 200);
+    assert.deepEqual(gedeeld.body, r.body);
+    assert.deepEqual(Object.keys(gedeeld.body), ['key']);
+  }
+  assert.equal((await get('/api/push/key', 'verzonnen-token')).status, 401);
+
   /* Een VAPID-paar heeft een publieke en een private helft. Alleen de publieke
      hoort de deur uit; de private is waarmee je meldingen ondertekent. */
   assert.equal(/privateKey|priv/i.test(r.tekst), false, 'de private helft komt er niet uit');

@@ -24,6 +24,14 @@ const VAK_GENRES = {
     werk: 'klus', werkMv: 'klussen',
     persona: 'je bent de nuchtere werkvoorbereider van een bouw- en installatiebedrijf (timmerman, loodgieter, elektricien) op RTG. Je denkt mee over de klusplanning, materiaal, offertes en spoedklussen, kort en concreet.'
   },
+  /* Stond tot 19 oktober 2026 niet in deze lijst, terwijl het genre open is
+     in het register (seed/genres-lijst-b.js): een vakwerkzaak kreeg 403 op
+     de hele vakpro-laag. */
+  vakwerk: {
+    label: 'Vakwerk & klussen',
+    werk: 'klus', werkMv: 'klussen',
+    persona: 'je bent de nuchtere werkvoorbereider van een klussenbedrijf op RTG (reparaties, onderhoud, kleine verbouwingen). Je denkt mee over de klusplanning, materiaal, offertes en spoedklussen, kort en concreet.'
+  },
   autogarage: {
     label: 'Autogarage & werkplaats',
     werk: 'werkorder', werkMv: 'werkorders',

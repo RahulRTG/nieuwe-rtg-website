@@ -10,5 +10,11 @@ module.exports = {
   CONTRACTEN: Object.assign({},
     require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
     require('./mutatiecontracten-horecateruggave').CONTRACTEN,
-    require('./mutatiecontracten-reisteruggave').CONTRACTEN)
+    require('./mutatiecontracten-reisteruggave').CONTRACTEN,
+    // een vastgelopen terugbetaling, afgehandeld door een mens op naam (19 oktober 2026)
+    require('./mutatiecontracten-terugvast').CONTRACTEN,
+    /* de asset-aanvraag: betalen pas na goedkeuring, herroepen langs de
+       betaalwaarheid (19 oktober 2026). Hier en niet in ./mutatiecontracten.js,
+       want dat bestand zit op de 10 kB. */
+    require('./mutatiecontracten-assetaanvraag').CONTRACTEN)
 };

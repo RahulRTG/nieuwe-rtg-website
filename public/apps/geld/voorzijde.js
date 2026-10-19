@@ -3,6 +3,7 @@
    bank-, wallet- of verdeellogica. */
 (function (w, d) {
   'use strict';
+  var doelSleutel = null;
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
   var $ = function (s) { return d.querySelector(s); };
   var esc = function (s) { return w.Geld.esc(s); };
@@ -86,8 +87,10 @@
         e.preventDefault();
         var centen = w.Geld.naarCenten($('#gxDoelBedrag').value), naam = $('#gxDoelNaam').value.trim();
         if (!naam || centen == null || centen <= 0) return w.Geld.melding('Vul een naam en een doelbedrag in.');
-        try { await w.Geld.api('/api/geld/pot/zet', { naam: naam, doelCenten: centen }); await vooruitLaad(); }
-        catch (x) { w.Geld.melding(x.message); }
+        /* een sleutel per bedoeling: een dubbele tik maakt geen tweede pot */
+        if (!doelSleutel || doelSleutel.voor !== naam + '|' + centen) doelSleutel = { voor: naam + '|' + centen, idem: w.RTGId('pot') };
+        try { await w.Geld.api('/api/geld/pot/zet', { naam: naam, doelCenten: centen, idem: doelSleutel.idem }); doelSleutel = null; await vooruitLaad(); }
+        catch (x) { if (x.status) doelSleutel = null; w.Geld.melding(x.message); }
       });
     } catch (e) { vak.innerHTML = fout(e); }
   }

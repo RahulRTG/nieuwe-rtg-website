@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-10-18T12:29:44.055Z",
-  "commit": "a7ae8fc24",
-  "boomVuil": false,
+  "op": "2026-10-19T08:31:20.018Z",
+  "commit": "a99cdacc",
+  "boomVuil": true,
   "boomAnders": 0,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.0"
@@ -662,7 +662,7 @@
  "onbekend": [],
  "verdwenen": [],
  "telling": {
-  "bestanden": 62,
+  "bestanden": 63,
   "verklaard": 54,
   "onbekend": 0,
   "verdwenen": 0,

@@ -78,9 +78,18 @@ module.exports = (ctx) => {
         return { status: 409, betalingId: w.id, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
       return { status: 200, ok: true, betaling: publiek(b), betalingId: w.id };
     }
+    /* GEWEIGERD IS AF, NIET ONDERWEG -- dezelfde regel als kern/pay/opladen.js.
+       Hier stond voor elke niet-bevestigde afloop "nog niet definitief
+       bevestigd", ook als de bank had geweigerd: het lid wachtte dan op niets
+       (voltooiproef tab:betalen, 19 oktober 2026). */
+    const stand = r && r.status;
+    if (stand === 'GEWEIGERD' || stand === 'GEANNULEERD')
+      return { status: 402, pending: false, betalingId: w.id,
+        error: 'De betaling is niet gelukt. Er is niets afgeschreven en niets bij de partner geboekt.' };
     return { status: 402, pending: true, betalingId: w.id, providerId: (r && r.providerId) || null,
       clientSecret: (uit && uit.actie && uit.actie.clientSecret) || null,
-      error: 'De kaartbetaling is nog niet definitief bevestigd. Er is niets bij de partner geboekt.' };
+      error: stand === 'CONTROLE_NODIG' ? 'De betaling ligt bij RTG ter controle. Betaal niet opnieuw.'
+        : 'De kaartbetaling is nog niet definitief bevestigd. Er is niets bij de partner geboekt.' };
   }
 
   /* Een met munten (crypto) betaalde directe betaling vastleggen. Het geld is al

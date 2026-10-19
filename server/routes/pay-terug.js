@@ -14,28 +14,30 @@
    nooit een knop hoeft te tonen die zonder uitleg niet werkt -- bij geld belt
    iemand daar niet over, hij vertrouwt het niet meer.
 
-   Alle drie langs de KYC-poort. Een gast zonder echt account komt er sowieso
-   niet bij: er is dan geen dossier waar een rekening in kan staan. */
-module.exports = (kern, { stuur, geenGast, kyc }) => {
+   Alle drie langs de KYC-poort. Sinds de vierde reeks van 19 oktober 2026 ook
+   voor een gratis account: wie geld kan inleggen, moet het ook terug kunnen
+   halen (test/tegoedterug-gratisaccount.test.js). Een bezoeker zonder account
+   komt er niet bij: er is dan geen dossier waar een rekening in kan staan. */
+module.exports = (kern, { stuur, geenEchtAccount, kyc }) => {
   const { app, auth, liveCodename, pay } = kern;
 
   /* `terugstand` eerst: een scherm hoort te weten wat er kan vóór het een knop
      tekent. Het antwoord draagt de blokkades met hun reden, dus er hoeft nooit
      iets uitgegrijsd te staan zonder uitleg. */
   app.post('/api/pay/terugstand', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     if (!pay.terugstortenStand) return res.status(501).json({ error: 'Terugstorten draait hier niet.' });
     stuur(res, pay.terugstortenStand({ codenaam: liveCodename(req.session), userId: (req.session.account && req.session.account.id) || null }));
   });
   app.post('/api/pay/rekening', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     if (!pay.rekeningZet) return res.status(501).json({ error: 'Terugstorten draait hier niet.' });
     stuur(res, pay.rekeningZet({ userId: (req.session.account && req.session.account.id) || null, iban: req.body.iban, naam: req.body.naam }));
   });
   app.post('/api/pay/terug', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     if (!pay.terugstorten) return res.status(501).json({ error: 'Terugstorten draait hier niet.' });
     const r = await pay.terugstorten({ codenaam: liveCodename(req.session), userId: (req.session.account && req.session.account.id) || null,

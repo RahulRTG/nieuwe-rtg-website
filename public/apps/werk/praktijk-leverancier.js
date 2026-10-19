@@ -30,11 +30,14 @@
   if (!location.hash.startsWith('#leverancier=')) return;
   const sleutel = location.hash.slice(13), el = document.createElement('main');
   document.body.classList.add('pr-gast'); el.id = 'praktijkGast'; el.className = 'praktijk'; document.body.append(el);
+  // De link is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026): eerst inloggen of gratis aanmelden, hier in het scherm.
+  const deur = window.RTGAccountDeur;
   async function api(pad, b = {}) {
-    const r = await fetch('/api/werk-leverancier/' + pad, { method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...b, sleutel }) });
-    const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Dit is niet gelukt.'); return d;
+    const r = await fetch('/api/werk-leverancier/' + pad, { method: 'POST', cache: 'no-store', headers: deur.kop({ 'Content-Type': 'application/json' }), body: JSON.stringify({ ...b, sleutel }) });
+    const d = await r.json(); if (r.status === 401) deur.vergeet(); if (!r.ok) throw Object.assign(new Error(d.error || 'Dit is niet gelukt.'), { status: r.status }); return d;
   }
   async function laad() {
+    await deur.eis(el, { waarom: 'Deze opdracht is met u gedeeld. Om hem te bekijken en te beantwoorden heeft u een RTG-account nodig; een gratis account is genoeg.' });
     try {
       const d = await api('beeld'), annulering = d.stand === 'annulering-gevraagd';
       el.innerHTML = '<p>Leveranciersopdracht van ' + e(d.organisatie) + '</p><h1>' + e(d.titel) + '</h1><p>' + e(d.leverancier) + '</p>' +
@@ -51,7 +54,7 @@
         try { await api('besluit', { ...Object.fromEntries(new FormData(f)), versie: d.versie }); await laad(); }
         catch (err) { f.querySelector('[role=status]').textContent = err.message; k.disabled = false; }
       });
-    } catch (err) { el.textContent = err.message; }
+    } catch (err) { if (err.status === 401) return laad(); el.textContent = err.message; }
   }
   laad();
 })();

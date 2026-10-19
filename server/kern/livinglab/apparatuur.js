@@ -110,7 +110,7 @@ module.exports = (ctx) => {
     if (!a.kalibratie.geldigMaanden) return { nvt: true, geldig: true, tot: null };
     if (!a.kalibratie.op) return { nvt: false, geldig: false, tot: null, reden: 'nooit gekalibreerd' };
     const tot = new Date(a.kalibratie.op);
-    tot.setMonth(tot.getMonth() + a.kalibratie.geldigMaanden);
+    tot.setUTCMonth(tot.getUTCMonth() + a.kalibratie.geldigMaanden);
     const totS = tot.toISOString().slice(0, 10);
     const ref = dag(opDatum) || nu().slice(0, 10);
     return { nvt: false, geldig: ref <= totS, tot: totS, reden: ref <= totS ? '' : 'kalibratie verlopen op ' + totS };

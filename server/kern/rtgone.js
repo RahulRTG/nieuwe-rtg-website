@@ -28,6 +28,7 @@ module.exports = ({ db, save, crypto }) => {
   const { ROLLEN, BESLUITTYPEN, rollenVoor, rechtenVoor, goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek } =
     bestuurMaak({ S, save, id, tekst, geldigHuis, vind, log, nu });
   const { liveVandaag, rtmailBerichten } = vandaagMaak({ data: () => db.data });
+  const eenmalig = require('./rtgone-idem')({ S, save, vind, nu });
   function state(huisRuw, context) {
     const huis = geldigHuis(huisRuw), s = S(), inHuis = x => x.huis === huis || x.huis === 'gedeeld';
     const fr = s.fricties.filter(inHuis), jaarCenten = fr.reduce((n, f) => n + f.jaarCenten, 0);
@@ -98,6 +99,13 @@ module.exports = ({ db, save, crypto }) => {
     rtmailBerichten,
     save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen: BESLUITTYPEN, goedkeuringMaak
   });
-  return { rtgone: { state, intentieMaak, belofteMaak, frictieMaak, overdrachtMaak, automatiseringVoorbereid, automatiseringVoer, automatiseringHerstel,
-    goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };
+  return { rtgone: { state,
+    intentieMaak: (body, actor, idem) => eenmalig('intentie', 'intenties', body, actor, () => intentieMaak(body, actor), idem),
+    belofteMaak: (body, actor, idem) => eenmalig('belofte', 'beloften', body, actor, () => belofteMaak(body, actor), idem),
+    frictieMaak: (body, actor, idem) => eenmalig('frictie', 'fricties', body, actor, () => frictieMaak(body, actor), idem),
+    overdrachtMaak: (body, actor, idem) => eenmalig('overdracht', 'overdrachten', body, actor, () => overdrachtMaak(body, actor), idem),
+    automatiseringVoorbereid: (body, actor, idem) => eenmalig('automatisering', 'automatiseringen', body, actor, () => automatiseringVoorbereid(body, actor), idem),
+    automatiseringVoer, automatiseringHerstel,
+    goedkeuringMaak: (body, context, idem) => eenmalig('goedkeuring', 'goedkeuringen', body, context && context.key, () => goedkeuringMaak(body, context), idem),
+    goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };
 };

@@ -16,6 +16,7 @@
    Wie ooit "u heeft nog geen X" als kaart wil toevoegen, leest eerst par. 2.2:
    het platform mag nooit de reden zijn dat iemand zich tekort voelt schieten. */
 'use strict';
+const tijdzone = require('../tijdzone');
 
 /* De vensters van de Control Tower, oplopend. Alleen de eerste twee halen de
    cockpit: wat achterstallig is en wat deze week speelt. De rest staat op de
@@ -85,7 +86,7 @@ module.exports = ({ feiten }) => {
     const huidige = (f.lijn.fasen || []).find(x => x.id === (f.lijn.nu && f.lijn.nu.faseId)) || null;
 
     return {
-      groet: groetVan(new Date().getHours(), huidige),
+      groet: groetVan(tijdzone.uurIn(), huidige),
       telling: f.telling,
       uitzonderingen,
       lijn: f.lijn,

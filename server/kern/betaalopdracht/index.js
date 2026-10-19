@@ -37,7 +37,7 @@
      ./rij        de verzameling -- wie is aan de beurt, wat staat er open */
 'use strict';
 
-const { STATUS, OVERGANG, AF, OPEN, DEFINITIEF,
+const { STATUS, OVERGANG, AF, OPEN, DEFINITIEF, MISLUKT_RAIL,
   BACKOFF_MS, MAX_POGINGEN, RAM_MAX } = require('./status');
 
 module.exports = function maakBetaalopdrachten(opties) {
@@ -148,7 +148,7 @@ module.exports = function maakBetaalopdrachten(opties) {
   }
 
   const ctx = { rij, save, nu, klacht, publiek, zet, wacht, maxPogingen,
-    STATUS, AF, OPEN, DEFINITIEF, ramMax: RAM_MAX, railInzenden, terugboeken, verwerkAfwikkeling };
+    STATUS, AF, OPEN, DEFINITIEF, MISLUKT_RAIL, ramMax: RAM_MAX, railInzenden, terugboeken, verwerkAfwikkeling };
   const derij = require('./rij')(ctx);
   ctx.plaats = derij.plaats;
   ctx.vind = derij.vind;

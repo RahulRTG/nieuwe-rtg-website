@@ -15,10 +15,10 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, dealer, lid;
+let srv, base, dealer, lid, TMP;
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-av-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-av-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'ISLAREN' } });
   base = srv.base;
   dealer = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
@@ -74,6 +74,10 @@ test('4. kopen met bod + inruil + concierge, contract tekenen en afleveren', asy
   // tekenen kan pas na aanvaarden
   const teken = await api(base, '/api/verkoop/teken', { ref, naam: 'Auto Lid' }, lid);
   assert.equal(teken.body.status, 'getekend');
+  // een tweede tik op tekenen is dezelfde handtekening, geen "nog geen aanvaard aanbod"
+  const weer = await api(base, '/api/verkoop/teken', { ref, naam: 'Auto Lid' }, lid);
+  assert.equal(weer.status, 200, JSON.stringify(weer.body));
+  assert.equal(weer.body.status, 'getekend');
   // afleveren
   const afg = await api(base, '/api/supplier/verkoop/deal', { ref, actie: 'afgeleverd' }, dealer);
   assert.equal(afg.body.status, 'afgeleverd');
@@ -123,4 +127,35 @@ test('inruil: alleen laten taxeren levert een taxatie-deal op, zonder verzonnen 
   assert.equal(d.inruil.merk, 'Fiat');
   assert.equal(d.inruil.km, 98000);
   assert.equal(d.inruil.taxatie, null, 'het lid zet geen taxatiebedrag; dat doet de zaak');
+});
+
+test('herhaalsleutel: een dubbeltik op proefrit of kopen is een aanvraag; een andere auto onder die sleutel een 409', async () => {
+  /* De voltooiproef van de reistab (scripts/lib/voltooi/reistab.js) zag twee
+     proefritaanvragen na een dubbeltik. De sleutel staat bij de deal, dus hij
+     overleeft ook een herstart. */
+  const sr = (await api(base, '/api/verkoop/showroom', {}, lid)).body.autos.filter(a => a.status === 'te koop' || !a.status);
+  const [a1, a2] = sr;
+  const voor = (await api(base, '/api/verkoop/mijn', {}, lid)).body.deals.length;
+  const pr = { supplierCode: a1.supplierCode, autoId: a1.id, wens: 'zondag', idem: 'pr-' + Date.now() };
+  const [x, y] = await Promise.all([api(base, '/api/verkoop/proefrit', pr, lid), api(base, '/api/verkoop/proefrit', pr, lid)]);
+  assert.equal(x.status, 200); assert.equal(y.status, 200);
+  assert.equal(x.body.deal.ref, y.body.deal.ref, 'dezelfde aanvraag');
+  assert.equal((await api(base, '/api/verkoop/mijn', {}, lid)).body.deals.length, voor + 1, 'een proefrit erbij, niet twee');
+  const ander = await api(base, '/api/verkoop/proefrit', Object.assign({}, pr, { autoId: a2.id }), lid);
+  assert.equal(ander.status, 409);
+  assert.ok(ander.body.error);
+  const ko = { supplierCode: a2.supplierCode, autoId: a2.id, bod: a2.prijs, idem: 'ko-' + Date.now() };
+  const k1 = await api(base, '/api/verkoop/koop', ko, lid);
+  const k2 = await api(base, '/api/verkoop/koop', ko, lid);
+  assert.equal(k1.status, 200);
+  assert.equal(k2.status, 200, 'dezelfde tik is geen "niet meer beschikbaar"');
+  assert.equal(k1.body.deal.ref, k2.body.deal.ref);
+  // de sleutel staat bij de deal: na een herstart is dezelfde tik nog steeds dezelfde aanvraag
+  stop(srv && srv.child);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'ISLAREN' } });
+  base = srv.base;
+  const z = await api(base, '/api/verkoop/proefrit', pr, lid);
+  assert.equal(z.status, 200);
+  assert.equal(z.body.deal.ref, x.body.deal.ref, 'na de herstart geen tweede proefrit');
+  assert.equal((await api(base, '/api/verkoop/mijn', {}, lid)).body.deals.filter(d => d.soort === 'proefrit' && d.autoNaam === x.body.deal.autoNaam && d.status === 'aangevraagd').length, 1);
 });

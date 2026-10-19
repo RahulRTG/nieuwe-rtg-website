@@ -247,10 +247,14 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     const hh = String(tijd.getHours()).padStart(2, '0') + ':' + String(tijd.getMinutes()).padStart(2, '0');
     const dag = tijd.getFullYear() + '-' + String(tijd.getMonth() + 1).padStart(2, '0') +
       '-' + String(tijd.getDate()).padStart(2, '0');
+    /* een account voor alles (19 oktober 2026): de aanvraag doet een ingelogd lid */
+    const u = String(Date.now()).slice(-8);
+    const lid = (await post(base, '/api/auth/register', { name: 'Aankomend Lid', email: 'pd' + u + '@voorbeeld.nl',
+      phone: '06' + u, password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' })).body.token;
     const pass = (await post(base, '/api/arrival/request', {
       requestToken: 'pdahostaanvraagcode1234.geheimgeheimgeheim1234ab',
-      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum: dag,
-      tijd: hh, personen: 2, allergie: true })).body.pass;
+      supplierCode: 'KIKUNOI', datum: dag,
+      tijd: hh, personen: 2, allergie: true }, lid)).body.pass;
     assert.ok(pass, 'de aankomst is aangevraagd');
 
     await page.click('[data-modus="host"]');

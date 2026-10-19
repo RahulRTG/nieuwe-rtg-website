@@ -30,7 +30,7 @@ function groen() {
       toetslijstSha256: pgLijst.toetslijstSha256 },
     releaseGate: { geslaagd: true, bron, controles: [
       'Bron- en securityregels', 'Accountschrijfgrens', 'Servicebevoegdheden', 'Codecredentialregister', 'Mutatiecontracten',
-      'Dependency-audit', 'Backup en herstel', 'Releasebewijs terugverifiëren'
+      'APPWERKT-versheid', 'Dependency-audit', 'Backup en herstel', 'Releasebewijs terugverifiëren'
     ].map(naam => ({ naam, geslaagd: true })) },
     staging: { geslaagd: true, bron, tijdelijkeDataVerwijderd: true,
       controles: Object.fromEntries(['schermen', 'spelers', 'gameplay', 'economie',
@@ -120,6 +120,19 @@ test('dirty code, stale suite en een ontbrekende controle kunnen niet worden weg
   assert.ok(uit.blokkades.some(x => /code wijkt af/.test(x)));
   assert.ok(uit.blokkades.some(x => /suite hoort niet/.test(x)));
   assert.ok(uit.blokkades.some(x => /Servicebevoegdheden/.test(x)));
+});
+
+test('een releasepoort zonder groene APPWERKT-versheid is nooit READY (BETROUWBAARHEID.md par. 4i)', () => {
+  const zonder = groen();
+  zonder.releaseGate.controles = zonder.releaseGate.controles.filter(x => x.naam !== 'APPWERKT-versheid');
+  const a = beoordeel(zonder);
+  assert.equal(a.status, 'BLOCKED');
+  assert.ok(a.blokkades.some(x => /APPWERKT-versheid/.test(x)));
+  const rood = groen();
+  rood.releaseGate.controles.find(x => x.naam === 'APPWERKT-versheid').geslaagd = false;
+  const b = beoordeel(rood);
+  assert.equal(b.status, 'BLOCKED');
+  assert.ok(b.blokkades.some(x => /APPWERKT-versheid/.test(x)));
 });
 
 test('gesloten accountwrites zijn een machineleesbare releaseblokkade, de transactionele stand niet', () => {

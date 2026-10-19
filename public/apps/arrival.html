@@ -44,7 +44,6 @@
     <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span><span class="ds-veld__label">Datum</span><input class="ds-veld__invoer" id="date" type="date"></span><span></span></label>
     <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span><span class="ds-veld__label">Tijd</span><input class="ds-veld__invoer" id="time" type="time"></span><span></span></label>
     <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5M3 20c0-4 2-6 5-6s5 2 5 6m1-6c4 0 6 2 6 6"/></svg><span><span class="ds-veld__label">Gasten</span><input class="ds-veld__invoer" id="people" type="number" min="1" max="20" placeholder="Gasten"></span><span></span></label>
-    <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span><span class="ds-veld__label">Naam voor ontvangst</span><input class="ds-veld__invoer" id="name" placeholder="Naam voor ontvangst"></span><span></span></label>
     <label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 20V9l6-5 6 5v11"/></svg><span><span class="ds-veld__label">Plek</span><select class="ds-veld__invoer" id="zone"><option>zaal</option><option>terras</option><option>bar</option><option>privé</option></select></span><span></span></label>
     <button class="ds-knop ds-knop--primair ds-knop--breed ds-taak__actie" id="request" type="button" data-ds-actie="Controleer en verstuur aanvraag">Controleer en verstuur aanvraag</button>
   </section>
@@ -69,6 +68,7 @@
 </main>
 
 <p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
+<script src="/shared/accountdeur.js"></script>
 <script src="/apps/arrival-voorzijde.js"></script>
 <script src="/shared/plek.js" defer></script>
 <script src="/shared/plaats.js" defer></script>

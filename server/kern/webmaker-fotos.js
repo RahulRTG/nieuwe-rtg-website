@@ -63,5 +63,26 @@ module.exports = function maakWebmakerFotos({ store, save, media }) {
     return { ok: true, fotos: fotos(key) };
   }
 
-  return { fotos, fotoBewaar, fotoWeg, nogInGebruik, FOTO_MAX };
+  /* EEN HERHAALDE UPLOAD IS DEZELFDE FOTO. De route vraagt dit VOOR hij iets
+     naar de mediastore schrijft: dezelfde sleutel geeft de eerste verwijzing
+     terug, een andere afbeelding met die sleutel is 409. Per lid de laatste
+     vijftig sleutels; meer herhalingen tegelijk bestaan niet. */
+  function fotoHerhaling(key, idem, vinger, url) {
+    const s = store();
+    if (!s.fotoIdem || typeof s.fotoIdem !== 'object') s.fotoIdem = {};
+    const boek = s.fotoIdem[key] = s.fotoIdem[key] || {};
+    if (url) {
+      boek[idem] = { url, vinger };
+      const sleutels = Object.keys(boek);
+      for (const oud of sleutels.slice(0, Math.max(0, sleutels.length - 50))) delete boek[oud];
+      save();
+      return null;
+    }
+    const eerder = boek[idem];
+    if (!eerder) return null;
+    if (eerder.vinger !== vinger) return { status: 409, error: 'Deze herhaalsleutel hoort bij een andere foto; er is niets opgeslagen.' };
+    return { ok: true, herhaald: true, url: eerder.url, fotos: fotos(key) };
+  }
+
+  return { fotos, fotoBewaar, fotoWeg, fotoHerhaling, nogInGebruik, FOTO_MAX };
 };

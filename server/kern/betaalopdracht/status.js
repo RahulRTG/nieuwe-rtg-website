@@ -24,6 +24,10 @@ const OVERGANG = {
 const AF = new Set([STATUS.AFGEWIKKELD, STATUS.TERUGGEBOEKT]);
 const OPEN = new Set([STATUS.GEBOEKT, STATUS.INGEDIEND, STATUS.MISLUKT, STATUS.ONBEKEND]);
 const DEFINITIEF = new Set(['betaald', 'succeeded', 'paid', 'settled', 'afgewikkeld']);
+/* Een UITSPRAAK van de rail dat hij niet uitvoert (de simulatieve uitbetaalrail
+   zegt `geweigerd`, een echte rail `failed` of `rejected`). Dat is geen stilte en
+   geen time-out: het geld ging niet weg, dus het hoort meteen terug. */
+const MISLUKT_RAIL = new Set(['geweigerd', 'failed', 'rejected', 'canceled', 'cancelled']);
 const BACKOFF_MS = [30000, 120000, 600000, 1800000, 3600000];
 const MAX_POGINGEN = 6;
 const RAM_MAX = 50000;
@@ -51,5 +55,5 @@ function maakOpenstaandOverzicht(rij) {
   return uit;
 }
 
-module.exports = { STATUS, OVERGANG, AF, OPEN, DEFINITIEF, BACKOFF_MS,
+module.exports = { STATUS, OVERGANG, AF, OPEN, DEFINITIEF, MISLUKT_RAIL, BACKOFF_MS,
   MAX_POGINGEN, RAM_MAX, maakOpenstaandOverzicht };

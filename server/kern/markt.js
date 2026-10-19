@@ -22,7 +22,7 @@ const { CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONT
 // de openbaarheidsregel staat apart; de Mall-vindlaag deelt hem
 const { advertentieOpenbaar } = require('./markt/openbaar');
 
-function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal }) {
+function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal, betaalWaarheid }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/markt', bezit: { markt: 'kaart' } });
   function store() {
     const m = eigen.bak('markt');
@@ -150,7 +150,7 @@ function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier
   /* De handel (chat + veilige deal) en het toezicht (melden/blokkeren + AI)
      draaien als submodules op een gedeelde context, een keer opgebouwd bij
      het opstarten. */
-  const ctx = { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal,
+  const ctx = { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal, betaalWaarheid,
     CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
     RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS,
     store, rid, nu, clip, pk, keurTekst, scanVeiligheid, pub, zichtbaar, vind };

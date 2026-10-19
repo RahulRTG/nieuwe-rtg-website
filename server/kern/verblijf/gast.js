@@ -12,7 +12,7 @@ module.exports = (ctx) => {
     if (!kamer) return { status: 404, error: 'Deze kamer is er niet (meer).' };
     const aankomst = String(body.aankomst || '');
     const vertrek = String(body.vertrek || '');
-    if (!isDatum(aankomst) || aankomst < vandaag()) return { status: 400, error: 'Kies een aankomstdatum vanaf vandaag.' };
+    if (!isDatum(aankomst) || aankomst < vandaag(s)) return { status: 400, error: 'Kies een aankomstdatum vanaf vandaag.' };
     if (!isDatum(vertrek) || vertrek <= aankomst) return { status: 400, error: 'De vertrekdatum moet na de aankomst liggen.' };
     const nachten = nachtenTussen(aankomst, vertrek);
     if (nachten > 60) return { status: 400, error: 'Boeken kan tot zestig nachten in een keer.' };

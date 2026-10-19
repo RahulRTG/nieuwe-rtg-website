@@ -24,6 +24,7 @@
       alsnog als "nu" gepresenteerd. Liever een gat met uitleg dan een gevuld
       veld dat niet klopt. */
 'use strict';
+const tijdzone = require('../tijdzone');
 
 const ONDERWERPEN = {
   wachttijd: { naam: 'Wachttijd in de keuken', eenheid: 'min', bronnen: ['gemeten'] },
@@ -43,7 +44,7 @@ module.exports = ({ save, schoon, horeca }) => {
   const { H, nu } = horeca;
   const gemeten = require('./polsmeting')({ horeca, ONDERWERPEN });
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 1e9;
-  const klok = (at) => { const d = new Date(at); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  const klok = (at) => tijdzone.hhmmIn(new Date(at));
 
   function P(zaakcode) {
     const h = H(zaakcode);

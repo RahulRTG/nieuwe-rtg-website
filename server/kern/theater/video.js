@@ -33,6 +33,11 @@ module.exports = (ctx) => {
     if (!k) return { status: 404, error: 'Meld eerst een kanaal aan.' };
     if (k.status !== 'goedgekeurd') return { status: 403, error: 'Uw kanaal wacht nog op goedkeuring door RTG-kantoor.' };
     const titel = schoon(data.titel, 80); if (!titel) return { status: 400, error: 'Geef de video een titel.' };
+    /* Een dubbele tik op "publiceer" maakte een tweede, lege kaart (voltooiproef
+       Theater). Dezelfde sleutel van dezelfde maker is dezelfde kaart. */
+    const idem = typeof data.idem === 'string' && data.idem.trim() ? data.idem.trim().slice(0, 80) : null;
+    const al = idem && T.bak('theaterVideos').find(x => x.key === key && x.idem === idem);
+    if (al) return { status: 200, ok: true, id: al.id, maxMb: MAX_VIDEO_MB, bewaring: al.bewaring, herhaald: true };
     let poster = null;
     if (typeof data.poster === 'string' && /^data:image\/(jpeg|webp);base64,/.test(data.poster) && data.poster.length < 120000) poster = data.poster;
     const thuis = data.bewaring === 'thuis';
@@ -42,7 +47,7 @@ module.exports = (ctx) => {
       // een thuis-video is meteen 'klaar': de bytes blijven bij de maker,
       // wij noteren alleen de (door de maker gemelde) omvang voor de kijker
       klaar: thuis, mbGeschat: thuis ? Math.min(Math.max(Math.round(Number(data.mbGeschat) || 0), 0), 100000) : 0,
-      bytes: 0, ext: null, at: nu() };
+      bytes: 0, ext: null, at: nu(), ...(idem ? { idem } : {}) };
     T.bak('theaterVideos').push(v); save();
     return { status: 200, ok: true, id: v.id, maxMb: MAX_VIDEO_MB, bewaring: v.bewaring };
   }

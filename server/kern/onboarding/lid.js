@@ -94,7 +94,10 @@ module.exports = (ctx) => {
   function payGate(sess) {
     const tier = (sess && sess.tier) || 'guest';
     if (tier === 'lifestyle' || tier === 'business') return { ok: true };
-    if (tier !== 'rtg') return { ok: true };
+    /* Elk account, ook een gratis account (tier 'guest'): eigenaarsbesluit van
+       19 oktober 2026. Hier stond `if (tier !== 'rtg') return { ok: true }`, en
+       een ongekeurd gratis account laadde zonder paspoort op tot het
+       walletplafond (test/paspoort-gratisaccount.test.js). */
     const profiel = profielVan(profielId(sess));
     if (!profiel.payGebruikt) { profiel.payGebruikt = true; save(); }
     const acc = sess && sess.account;

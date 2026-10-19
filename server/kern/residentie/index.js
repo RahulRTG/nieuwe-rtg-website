@@ -19,7 +19,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
   const kamer = id => (R().kamers[id] = R().kamers[id] || { leden: {}, chat: [] });
 
   function suiteVan(key, codenaam) {
-    const s = R().suites[key] = R().suites[key] || { codenaam, naam: 'Suite ' + codenaam, open: true, meubels: [] };
+    const s = R().suites[key] = R().suites[key] || { codenaam, naam: 'Suite ' + codenaam, open: false, meubels: [] };
     s.codenaam = codenaam || s.codenaam;
     if (s.codenaam) R().wie[s.codenaam] = key; // eigen index: suite-adres -> sleutel
     // elke suite is vanaf dag een een compleet penthouse (deluxe-inrichting);

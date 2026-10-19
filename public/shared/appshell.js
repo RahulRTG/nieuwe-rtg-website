@@ -18,7 +18,8 @@
         var headers = { 'Content-Type': 'application/json' };
         if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
         var lang = (w.RTGi18n ? w.RTGi18n.lang : 'nl');
-        var res = await fetch(prefix + pad, {
+        // een volledig /api/-pad gaat letterlijk, zodat SCHERMROUTES.json het ziet
+        var res = await fetch((String(pad).indexOf('/api/') === 0 ? '' : prefix) + pad, {
           method: 'POST', headers: headers,
           body: JSON.stringify(Object.assign({ lang: lang }, body || {}))
         });

@@ -20,6 +20,10 @@ module.exports = (ctx, verbindCode) => {
     } catch (e) { return null; }
   }
 
+  /* Besluit van de eigenaar, 19 oktober 2026: aannemen koppelt de nieuwe
+     medewerker direct aan zijn eigen account, zonder kassacode. Sinds
+     solliciteren een account vraagt, heeft elke sollicitatie een sleutel en
+     loopt aannemen dus altijd hierlangs (test/staffinvite.test.js). */
   async function neemAan(supplier, uitgegeven, sollicitatieKey) {
     const id = idVanKey(sollicitatieKey);
     if (id == null) return null;

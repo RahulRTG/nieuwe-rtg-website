@@ -23,6 +23,7 @@
      pda.js         de Overheids-PDA voor al het personeel van alle
                     rijkskantoren (receptie, security, schoonmaak, bode) */
 const { demoAan } = require('../demostand');
+const tijdzone = require('../tijdzone');
 
 // inkomstenbelasting (demo, twee schijven; peiljaar volgt de klok)
 const IB = { schijf: 75000, tarief1: 0.37, tarief2: 0.495, heffingskorting: 3070 };
@@ -56,7 +57,7 @@ const WATER_STATUS = ['nieuw', 'in behandeling', 'opgelost', 'afgewezen'];
 function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
   bankLive, bankBoek, bankSaldo, lidstandVan }) {
   const nu = () => new Date().toISOString();
-  const jaar = () => new Date().getFullYear();
+  const jaar = () => tijdzone.jaarIn();
   const id = () => crypto.randomBytes(4).toString('hex');
   const ref = p => 'RTG-' + p + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);

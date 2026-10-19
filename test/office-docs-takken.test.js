@@ -21,7 +21,8 @@ function wereld(o = {}) {
     sseToCustomer: (k, kanaal, data) => { if (o.seinGooit) throw new Error('weg'); seinen.push({ k, kanaal, data }); }
   };
   const basis = maakBasis(state);
-  const d = maakDocs(state, basis);
+  // markeren woont sinds 19 oktober 2026 in office/ster.js; samen is het dezelfde kern als in kern/office.js
+  const d = Object.assign(maakDocs(state, basis), require('../server/kern/office/ster')(state, basis));
   return { db, d, basis, seinen, saves: () => saves, alle: () => db.data.officeDocs };
 }
 
@@ -275,4 +276,37 @@ test('verwijderen: alleen de eigenaar, en een formulier neemt zijn inzendingen m
   delete db.data.officeAntwoorden;
   assert.equal(d.officeWeg('a', ander).ok, true);
   assert.equal(Object.keys(alle()).length, 0);
+});
+
+/* Een herhaald verzoek is geen nieuw verzoek (server/kern/office/herhaling.js):
+   het antwoord op het eerste kwam nooit bij het scherm aan. */
+test('dezelfde herhaalsleutel maakt geen tweede document, ook niet na een herstart', () => {
+  const { d } = wereld();
+  const a = d.officeMaak('a', { soort: 'tekst', titel: 'Notulen' }, undefined, 'poging-1');
+  const b = d.officeMaak('a', { soort: 'tekst', titel: 'Notulen' }, undefined, 'poging-1');
+  assert.equal(b.herhaald, true);
+  assert.equal(b.id, a.id);
+  assert.equal(d.officeMijn('a').docs.filter((x) => x.titel === 'Notulen').length, 1);
+  assert.notEqual(d.officeMaak('b', { soort: 'tekst' }, undefined, 'poging-1').id, a.id, 'de sleutel van een ander is een eigen document');
+  const ander = d.officeMaak('a', { soort: 'blad', titel: 'Begroting' }, undefined, 'poging-1');
+  assert.equal(ander.status, 409, 'dezelfde sleutel bij een ander verzoek is een fout, geen stille herhaling');
+});
+
+test('dezelfde autosave nog eens geeft geen vals versieconflict; een andere inhoud op een oude stand wel', () => {
+  const { d, alle } = wereld();
+  const id = d.officeMaak('a', { soort: 'tekst' }).id;
+  // een stand van gisteren, zodat de bewaring hieronder aantoonbaar een nieuwere tijd krijgt
+  alle()[id].gewijzigd = '2026-01-01T00:00:00.000Z';
+  const oud = d.officeOpen('a', id).gewijzigd;
+  const lijf = { titel: 'Nieuw document', inhoud: { tekst: 'Eerste regel' }, verwachtGewijzigd: oud };
+  const eerste = d.officeBewaar('a', id, lijf);
+  assert.equal(eerste.status, 200);
+  /* Het antwoord kwam niet aan: het scherm stuurt precies hetzelfde, met de oude stand. */
+  const herhaling = d.officeBewaar('a', id, lijf);
+  assert.equal(herhaling.status, 200, 'de eigen bewaring is geen wijziging van iemand anders');
+  assert.equal(herhaling.gewijzigd, eerste.gewijzigd);
+  assert.equal(d.officeOpen('a', id).versies, 1, 'en er komt geen versie bij');
+  const ander = d.officeBewaar('a', id, Object.assign({}, lijf, { inhoud: { tekst: 'Ander venster' } }));
+  assert.equal(ander.status, 409, 'een andere inhoud op een oude stand blijft een conflict');
+  assert.equal(ander.code, 'VERSIECONFLICT');
 });

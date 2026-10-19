@@ -80,7 +80,8 @@
        niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
-    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
+    // de netwerkkant van een partnerzaak: alleen voor wie een zaak opent (werkrol, app-main-24a3.js)
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html', werkrol: 'zaak' },
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },

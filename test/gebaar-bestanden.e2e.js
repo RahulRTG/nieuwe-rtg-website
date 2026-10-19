@@ -188,3 +188,69 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
       /* Op de doelbreedte zelf en niet "binnen een halve pixel": een lade die
          nog groeit liet een knop half uitsteken en verborg zo dat hij in rust
          1px uitstak, omdat een reset de content-box overschreef. */
+      return doel > 0 && Math.abs(parseFloat(st.width) - doel) < 0.05;
+    }, null, { timeout: 15000 });
+    const uit = await page.evaluate(() => {
+      const l = document.querySelector('#lijst .gb-lade');
+      if (!l) return ['er staat geen open lade om te meten'];
+      const lb = l.getBoundingClientRect();
+      return [...l.querySelectorAll('.gb-doe')]
+        .filter((e) => e.getBoundingClientRect().right > lb.right + 0.6)
+        .map((e) => e.textContent.trim() + ' steekt ' +
+          Math.round((e.getBoundingClientRect().right - lb.right) * 10) / 10 + 'px uit zijn lade');
+    });
+    assert.deepEqual(uit, [], 'geen enkele knop mag over de rand van zijn lade steken');
+    await page.keyboard.press('Escape');
+    // en tot hij WEG is; anders begint de volgende veeg op een lade die nog dichtgaat
+    await page.waitForFunction(() => !document.querySelector('#lijst .gb-lade'), null, { timeout: 15000 });
+
+    // 1. doorvegen zet het bestand er ECHT in -- gemeten aan de server, niet aan het scherm
+    const rij = page.locator('#lijst .item').first();
+    const naam = (await rij.locator('b').textContent()).trim();
+    await veegDoor(page, await maat(rij), { kiezer: await kiezerVan(rij) });
+    await wachtTot(() => staatVan(naam), (s) => s && s.weg,
+      'doorvegen hoort ' + naam + ' bij de server in de prullenbak te zetten');
+    assert.match(await page.locator('.gb-terug').textContent(), new RegExp(naam.slice(0, 8), 'i'),
+      'de melding hoort te zeggen WELK bestand er weg is, niet alleen dat er iets weg is');
+
+    // 2. en de weg terug haalt hem er ook echt uit
+    await page.locator('.gb-terug button').click();
+    await wachtTot(() => staatVan(naam), (s) => s && !s.weg,
+      'Terugdraaien hoort het bestand terug in de kluis te zetten');
+
+    // 3. de andere kant draagt andere acties, en de ster is ook echt omkeerbaar
+    const weer = page.locator('#lijst .item.gb-rij').filter({ hasText: naam }).first();
+    await weer.waitFor({ state: 'visible', timeout: 15000 });
+    const naam2 = (await weer.locator('b').textContent()).trim();
+    const d2 = await maat(weer);
+    assert.ok(d2, 'het teruggezette bestand hoort weer een meetbare regel te zijn');
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16, kiezer: await kiezerVan(weer) });
+    assert.deepEqual(await page.evaluate(() =>
+      [...document.querySelectorAll('#lijst .gb-lade .gb-doe > span')].map((s) => s.textContent)),
+      ['Ster', 'Overnemen'], 'naar rechts horen de ster en overnemen te liggen');
+    await page.keyboard.press('Escape');
+
+    // 4. wat de server weigert, komt TERUG op het scherm -- stil falen is hier het ergst
+    await page.route('**/api/bestanden/actie', (r) => r.fulfill({
+      status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'De kluis is even niet bereikbaar.' })
+    }));
+    const derde = page.locator('#lijst .item').first();
+    const naam3 = (await derde.locator('b').textContent()).trim();
+    await veegDoor(page, await maat(derde), { kiezer: await kiezerVan(derde) });
+    await page.waitForFunction(() => {
+      const t = document.querySelector('.gb-terug');
+      return t && /niet bereikbaar/i.test(t.textContent);
+    }, null, { timeout: 8000 });
+    await page.waitForFunction((n) => [...document.querySelectorAll('#lijst .item b')]
+      .some((b) => b.textContent.trim() === n), naam3, { timeout: 8000 });
+    assert.equal((await staatVan(naam3)).weg, false,
+      'een geweigerde veeg mag bij de server niets veranderd hebben');
+    await page.unroute('**/api/bestanden/actie');
+
+    assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het vegen');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

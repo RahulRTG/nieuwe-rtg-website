@@ -76,7 +76,25 @@ function smalVoorvoegsel(v) {
   return v.replace(/^\/+|\/+$/g, '').split('/').length >= 3;
 }
 
-function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
+/* EEN GEGENEREERDE BUNDEL IS ZIJN DELEN. scripts/schermroutes.js slaat de
+   bundels (bouwuitvoer, scripts/bundel.js) bewust over en schrijft de paden
+   toe aan de delen ernaast. Een ingang die de bundel laadt, roept dus de
+   routes van die delen aan; zonder deze stap zag de koppeling van
+   /apps/residentie.html alleen /api/stroom/ticket. */
+function bundelRegister() {
+  try {
+    const b = require('../bundel');
+    /* ALLEEN APP-BUNDELS. De schilbundels onder public/shared/ (metgezel,
+       basis, ...) laadt bijna elk scherm; hun routes zijn van de schil en niet
+       van de belofte van het scherm. Telden ze mee, dan koppelde elk scenario
+       dat /api/service raakt aan elk scherm -- en kreeg het routedossier er
+       vijftien routes bij die het zelf nooit aanroept. */
+    return new Map(Object.entries(b.bundels).filter(([uit]) => uit.startsWith('apps/'))
+      .map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']));
+  } catch (e) { return new Map(); }
+}
+
+function ingangRoutes(ingang, { lees = leesStandaard, schermroutes, bundels } = {}) {
   if (!ingang || !ingang.startsWith('/')) return null;
   const sr = schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
   const perBestand = new Map(sr.perScherm.map((x) => [x.bestand, x]));
@@ -85,12 +103,20 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
   const bron = lees(html);
   if (bron !== null) {
     const map = path.posix.dirname(ingang);
+    const delen = bundels || bundelRegister();
     for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+\.js)[^"]*"/g)) {
       const src = m[1];
       if (/^[a-z]+:\/\//i.test(src)) continue;
-      bestanden.push('public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src)));
+      const b = 'public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src));
+      bestanden.push(b);
+      const deelmap = delen.get(b);
+      if (deelmap) for (const x of sr.perScherm) if (x.bestand.startsWith(deelmap)) bestanden.push(x.bestand);
     }
   }
+  return routesVanBestanden(bestanden, perBestand);
+}
+
+function routesVanBestanden(bestanden, perBestand) {
   const exact = new Set(), voor = new Set();
   for (const b of bestanden) {
     const rij = perBestand.get(b);
@@ -99,6 +125,35 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
     for (const v of rij.voorvoegsels || []) if (smalVoorvoegsel(v)) voor.add(v);
   }
   return { bestanden, exact, voor };
+}
+
+/* EEN TAB OF OS-APP HEEFT GEEN EIGEN ADRES, maar wel eigen code. Het contract
+   noemt dan drie dingen: `ingang` (het echte scherm waar de navigatie begint),
+   `via` (de echte stap daarheen, bijvoorbeeld `#tab=salon`, dat app-main-12a.js
+   zelf als adres met een stand kent) en `bestanden` (de delen die de tab of
+   OS-app zelf tekenen). Gekoppeld wordt op de routes van die DELEN en niet op
+   die van de hele schil: anders raakt elk scenario dat iets in /apps/app.html
+   aanroept, elke tab tegelijk. Ontbreekt een van de drie, dan is er geen
+   ingang en blijft het bewijs NIET_GETEST -- geen verzonnen adres. */
+function ingangVan(ingang, c, opties = {}) {
+  if (ingang && String(ingang).startsWith('/')) {
+    const heel = ingangRoutes(ingang, opties);
+    /* EEN SCHERM IS NIET ZIJN SCHIL, EN EEN STAND NIET ZIJN SCHERM. Het geldscherm
+       laadt de delen van alle standen (Balans telde zo 113 routes), en elk scherm
+       laadt de gedeelde schil (Rahul, de stroom, de gids). Het contract mag
+       daarom de delen noemen die DEZE ingang zelf tekenen -- maar alleen delen
+       die het scherm echt laadt; anders is er geen ingang en blijft het bewijs
+       NIET_GETEST. Bevoegd (scripts/bevoegdronde.js) blijft alle routes eisen. */
+    if (!heel || !c || !Array.isArray(c.bestanden) || !c.bestanden.length) return heel;
+    if (!c.bestanden.every((b) => heel.bestanden.includes(b))) return null;
+    const lees = opties.lees || leesStandaard;
+    const sr = opties.schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
+    return routesVanBestanden(c.bestanden.slice(), new Map(sr.perScherm.map((x) => [x.bestand, x])));
+  }
+  if (!c || !c.via || !c.ingang || !Array.isArray(c.bestanden) || !c.bestanden.length) return null;
+  const lees = opties.lees || leesStandaard;
+  const sr = opties.schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
+  return routesVanBestanden(c.bestanden.slice(), new Map(sr.perScherm.map((x) => [x.bestand, x])));
 }
 
 function gedeeld(proef, ingang) {
@@ -130,10 +185,11 @@ function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } 
   const bewijs = { register, op: st && st.op ? st.op : (typeof st === 'string' ? st : null),
     commit: st && st.commit ? st.commit : null, instrument: st && st.instrument ? st.instrument : null };
   if (!v.vers) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + v.reden, bewijs };
+  const metRaakvlak = (u) => (v.raakvlak ? Object.assign(u, { raakvlak: [v.raakvlak] }) : u);
   if (deel) {
     const gekozen = deel.reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), reg);
     if (!gekozen || typeof gekozen !== 'object') {
-      return { status: 'NIET_GETEST', reden: register + ' kent ' + deel.join('/') + ' niet: dit onderdeel is in die ronde niet gemeten', bewijs };
+      return metRaakvlak({ status: 'NIET_GETEST', reden: register + ' kent ' + deel.join('/') + ' niet: dit onderdeel is in die ronde niet gemeten', bewijs });
     }
     bewijs.deel = deel.join('/');
     reg = gekozen;
@@ -152,18 +208,18 @@ function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } 
      dat bij menselijk zonder uitgelokte weigering) is niet gemeten en nooit
      een defect: er is niets gezien dat stuk was. */
   if (typeof reg.nietBeproefd === 'string' && reg.nietBeproefd) {
-    return { status: 'NIET_GETEST', reden: 'vers gemeten, maar niet beproefd: ' + reg.nietBeproefd, bewijs };
+    return metRaakvlak({ status: 'NIET_GETEST', reden: 'vers gemeten, maar niet beproefd: ' + reg.nietBeproefd, bewijs });
   }
-  if (!schakels.length) return { status: 'NIET_GETEST', reden: register + ' draagt geen schakels; er is niets om te laten tellen', bewijs };
+  if (!schakels.length) return metRaakvlak({ status: 'NIET_GETEST', reden: register + ' draagt geen schakels; er is niets om te laten tellen', bewijs });
   if (niet.length || gebroken.length || t.stuk || t.gebroken || reg.sluit === false) {
     const eerste = niet[0] ? 'schakel ' + niet[0].nr + ' staat ' + niet[0].stand + ' (' + (niet[0].wat || '') + ')'
       : gebroken[0] ? 'storing "' + (gebroken[0].wat || gebroken[0].naam || '?') + '" staat ' + gebroken[0].stand
         : 'de keten zegt zelf dat hij niet sluit';
-    return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'vers gemeten en de stroom sluit niet: ' + eerste, bewijs };
+    return metRaakvlak({ status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'vers gemeten en de stroom sluit niet: ' + eerste, bewijs });
   }
-  return { status: 'BEWEZEN',
+  return metRaakvlak({ status: 'BEWEZEN',
     reden: 'vers gemeten (' + v.reden + '): ' + schakels.length + ' schakels gesloten, ' + storingen.length + ' storingen gehouden',
-    bewijs };
+    bewijs });
 }
 
 /* ---- DE SAMENSTELLING ------------------------------------------------------
@@ -190,7 +246,21 @@ function rondeUitslag(register, functie, { lees = leesStandaard, versheid } = {}
   const rij = (reg.regels || []).find((r) => r.functie === functie);
   if (!rij) return { status: 'NIET_GETEST', reden: register + ' kent ' + functie + ' niet', bewijs };
   if (!STANDEN.has(rij.status)) return { status: 'NIET_GETEST', reden: register + ' geeft ' + functie + ' de onbekende stand ' + rij.status, bewijs };
-  return { status: rij.status, reden: rij.reden, bewijs };
+  const uit = { status: rij.status, reden: rij.reden, bewijs };
+  if (v.raakvlak) uit.raakvlak = [v.raakvlak];
+  return uit;
+}
+
+/* DE VERSHEID PER BEWIJS (scripts/lib/bewijsraakvlak.js). Niet meer het hele register
+   oud bij elke codewijziging, maar alleen als er iets veranderde in de bestanden
+   die DIT bewijs van DEZE app kunnen aantasten. Is dat raakvlak niet vast te
+   stellen, dan beslist de grove regel van versheid() -- nooit "vers". Een
+   toets die zijn eigen `versheid` meegeeft, krijgt precies die. */
+let standaardWereld = null;
+function opRaakvlak(invoer, opties) {
+  const R = require('./bewijsraakvlak');
+  const w = opties.wereld || (standaardWereld = standaardWereld || R.maakWereld());
+  return R.versheidVoor(w, invoer, require('./stempel').versheid);
 }
 
 function bewijsVoor(functie, naam, ingang, opties = {}) {
@@ -200,7 +270,8 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
     const alg = (opties.algemeen || ALGEMEEN)[naam];
     if (!alg) return null;
     if (!(BRONSOORTEN[alg.soort] || []).includes(naam)) throw new Error('appcontract: een ' + alg.soort + ' mag geen ' + naam + ' leveren');
-    const uit = rondeUitslag(alg.register, functie, { lees: opties.lees || leesStandaard, versheid: opties.versheid || require('./stempel').versheid });
+    const uit = rondeUitslag(alg.register, functie, { lees: opties.lees || leesStandaard,
+      versheid: opties.versheid || opRaakvlak({ ingang, soort: 'browser' }, opties) });
     uit.bron = { soort: alg.soort, instrument: alg.instrument };
     return uit;
   }
@@ -210,17 +281,23 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
   }
   const lees = opties.lees || leesStandaard;
   const proef = proefRoutes(bron.instrument, lees);
-  const ing = ingangRoutes(ingang, { lees, schermroutes: opties.schermroutes });
+  const ing = ingangVan(ingang, c, { lees, schermroutes: opties.schermroutes });
   const raak = proef && ing ? gedeeld(proef, ing) : [];
   if (!raak.length) {
     return { status: 'NIET_GETEST', bewijs: null,
-      reden: 'het contract noemt ' + bron.instrument + ', maar die proef raakt geen enkele route die ' + ingang +
+      reden: 'het contract noemt ' + bron.instrument + ', maar die proef raakt geen enkele route die ' + (ing ? ingang : (c.ingang || ingang) + ' via ' + (c.via || '(geen navigatiestap in het contract)')) +
         ' aanroept; de koppeling haalt de meting niet en telt daarom niet' };
   }
   /* Een voltooiproef draagt per onderdeel per bewijs een eigen keten
      (scripts/voltooiproef.js); een ketenproef is als geheel een keten. */
   const deel = bron.soort === 'voltooiproef' ? ['apps', functie, naam] : null;
-  const uit = ketenUitslag(bron.register, { lees, versheid: opties.versheid || require('./stempel').versheid, deel });
+  /* Het raakvlak van een routeproef: de routes van het scherm EN die van de
+     proef zelf, want het scenario raakt soms meer dan het scherm (het besluit
+     van het kantoor bij de verificatie). Bij de voltooiproef telt alleen het
+     eigen scenario van het instrument. */
+  const invoer = { ingang, soort: 'api', routeInstrument: bron.instrument,
+    scenario: bron.soort === 'voltooiproef' ? bron.instrument : undefined };
+  const uit = ketenUitslag(bron.register, { lees, versheid: opties.versheid || opRaakvlak(invoer, opties), deel });
   uit.bron = { soort: bron.soort, instrument: bron.instrument, belofte: c.belofte, gedeeldeRoutes: raak.length };
   return uit;
 }
@@ -245,4 +322,4 @@ function stelSamen(r, opties = {}) {
   return gedaan;
 }
 
-module.exports = { proefRoutes, ingangRoutes, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };
+module.exports = { proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

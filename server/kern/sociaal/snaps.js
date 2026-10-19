@@ -67,7 +67,24 @@ function dagOpdracht() {
   return Object.assign({ dag }, OPDRACHTEN[h % OPDRACHTEN.length]);
 }
 
-async function snapSturen(van, naar, foto, tekst) {
+/* EEN HERHAALSLEUTEL PER SNAP (19 oktober 2026): na een crash stuurde dezelfde
+   tik de snap twee keer, en twee gelijktijdige tikken kwamen allebei langs de
+   controle omdat het bewaren van de foto wacht. `idem` is optioneel (de
+   gezinsroute geeft hem nog niet mee); hij staat gehasht op de snap. */
+const onderweg = new Map();
+function snapSturen(van, naar, foto, tekst, idem) {
+  const sl = typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
+  if (!sl) return snapSturenNu(van, naar, foto, tekst, null);
+  const merk = crypto.createHash('sha256').update(van + '|' + naar + '|' + sl).digest('hex').slice(0, 32);
+  const al = S.lijst('snaps').find(s => s.idem === merk);
+  if (al) return al.tekst === String(tekst || '').replace(/[<>]/g, '').slice(0, 120)
+    ? { status: 200, ok: true, herhaald: true } : { status: 409, error: 'Deze snap is al met een andere tekst verstuurd.' };
+  if (onderweg.has(merk)) return onderweg.get(merk);
+  const taak = snapSturenNu(van, naar, foto, tekst, merk).finally(() => onderweg.delete(merk));
+  onderweg.set(merk, taak);
+  return taak;
+}
+async function snapSturenNu(van, naar, foto, tekst, merk) {
   if (isGeblokkeerd(van, naar)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
   if (!zijnVrienden(van, naar)) return { status: 403, error: 'Je kunt alleen snappen naar een vriend.' };
   if (!sociaalRate(van, 'snap', 40, 5 * 60 * 1000)) return { status: 429, error: 'Rustig aan met snaps sturen.' };
@@ -76,6 +93,7 @@ async function snapSturen(van, naar, foto, tekst) {
   const ref = await media.bewaar(foto, 900 * 1024);
   if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
   const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto: ref, tekst: String(tekst || '').replace(/[<>]/g, '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
+  if (merk) snap.idem = merk;
   S.lijst('snaps').push(snap);
   // de bovengrens (en het opruimen van de bestanden eronder) staat in
   // kern/kappen.js en draait in de onderhoudsronde, buiten dit verzoek

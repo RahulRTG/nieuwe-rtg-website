@@ -44,7 +44,7 @@
     el.querySelectorAll('[data-care-intaketxt]').forEach(t => t.addEventListener('input', () => { careIntakeTekst[t.dataset.careIntaketxt] = t.value; }));
     el.querySelectorAll('[data-care-intakedeel]').forEach(x => x.addEventListener('click', async () => {
       const id = x.dataset.careIntakedeel;
-      try { await API.call('/care/intake/deel', { aanbiederId: id, medisch: careIntakeTekst[id] || '' }); careIntakeTekst[id] = ''; toast(T('care.deeltoast','Gedeeld. Alleen deze kliniek ziet het, tot u stopt.')); laadCare(); }
+      try { await API.call('/api/care/intake/deel', { aanbiederId: id, medisch: careIntakeTekst[id] || '' }); careIntakeTekst[id] = ''; toast(T('care.deeltoast','Gedeeld. Alleen deze kliniek ziet het, tot u stopt.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-careopen]').forEach(x => x.addEventListener('click', () => {
@@ -56,8 +56,8 @@
     if (boek) boek.addEventListener('click', async () => {
       const [aanbiederId, behandelingId] = careOpen.split(':');
       try {
-        const r = await API.call('/care/boek', { aanbiederId, behandelingId, datum: careKeuze.datum, tijd: careKeuze.tijd });
-        await API.call('/care/betaal', { ref: r.boeking.ref });
+        const r = await API.call('/api/care/boek', { aanbiederId, behandelingId, datum: careKeuze.datum, tijd: careKeuze.tijd });
+        await API.call('/api/care/betaal', { ref: r.boeking.ref });
         toast(T('care.oktoast','Geboekt en betaald. Tot uw afspraak.'));
         careOpen = null; careKeuze = null;
         laadCare();

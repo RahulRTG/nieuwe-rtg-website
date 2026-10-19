@@ -33,7 +33,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
-test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder account',
+test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner met een gratis account uit het scherm zelf',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livinglab-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'LIVINGLAB-E2E-1' } });
@@ -148,13 +148,25 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
       await wachtOpRust(bew, '#main', { rondes: 3 });
     };
 
+    /* Zonder account staat de accountdeur in het scherm (eigenaarsbesluit 19
+       oktober 2026: de buurtdeuren vragen een account, een gratis account is
+       genoeg). De bewoner maakt er een, hier en nu, en gaat verder waar hij was. */
     await bewDeel('vragen-uit-de-buurt');
+    await bew.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor();
+    assert.equal(await bew.locator('#bLab option').count(), 0, 'zonder account stond er toch een lab in de keuzelijst');
+    const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    await bew.getByLabel('Naam', { exact: true }).fill('Bewoner Toets');
+    await bew.getByLabel('E-mailadres', { exact: true }).fill('bewoner' + u + '@voorbeeld.nl');
+    await bew.getByLabel('Geboortedatum', { exact: true }).fill('1985-05-05');
+    await bew.getByLabel('Wachtwoord (minstens zes tekens)', { exact: true }).fill('geheim12345');
+    await bew.getByRole('button', { name: 'Account maken en doorgaan', exact: true }).click();
+    await wachtTot(bew, () => document.querySelectorAll('#bLab option').length > 0, null, { wat: 'de labs na het gratis account' });
     assert.ok((await bew.locator('#bLab option').count()) > 0, 'de bewoner ziet welke labs er zijn');
     await bew.fill('#bVraag', 'Kan de speeltuin veiliger tijdens het spitsuur?');
     await klikEnWacht(bew, '#bStuur', '/api/lab2/');
     await wachtOpTekst(bew, /speeltuin/i, { in: '#bLijst' });
     assert.match(await bew.textContent('#bLijst'), /speeltuin/i,
-      'een bewoner draagt een onderzoeksvraag aan zonder account');
+      'een bewoner draagt een onderzoeksvraag aan met een gratis account');
 
     /* Het publieke onderzoeksoverzicht: de BUITENSTE ring. De studie die deze
        toets hierboven aanmaakte staat erin, met haar vraag -- want die is niet
@@ -165,12 +177,15 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
     assert.match(publiek, /Water op straat/i, 'de bewoner ziet waar het lab aan werkt');
     assert.ok(!/BW-/.test(publiek), 'maar geen deelnemers: dat is de buitenste ring');
 
-    // het labpaspoort: aanmaken levert een code die de drager zelf houdt
+    /* Het labpaspoort is progressie (niveaus en badges) en bestaat alleen boven
+       de 18+-poort (eigenaarsbesluit 19 oktober 2026, routes/livinglab/
+       bewonerpas.js). Dit gratis account is niet gekeurd: het scherm zegt
+       waarom er geen paspoort komt, naast de knop. */
     await bewDeel('uw-labpaspoort');
     await bew.fill('#paspNaam', 'Sam');
     await klikEnWacht(bew, '#paspMaak', '/api/lab2/');
-    await wachtOpTekst(bew, /LABPAS-/, { in: '#pasp' });
-    assert.match(await bew.textContent('#pasp'), /LABPAS-/, 'het labpaspoort krijgt een eigen code');
+    await wachtOpTekst(bew, /18 of ouder/, { in: '#pasp' });
+    assert.ok(!/LABPAS-/.test(await bew.textContent('#pasp')), 'zonder 18+-poort geen paspoortcode');
 
     // een onbekende pas geeft een nette melding en geen stilte
     await bewDeel('uw-labpas');

@@ -60,8 +60,8 @@ module.exports = (ctx) => {
     const m = Math.round(Number(minuten) || 0);
     if (m < 5 || m > 720) return { status: 400, error: 'Een vertraging is 5 tot 720 minuten.' };
     const [uu, mm] = v.tijd.split(':').map(Number);
-    const t = new Date(2000, 0, 1, uu, mm + m);
-    v.tijd = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+    const t = (uu * 60 + mm + m) % 1440; // een klokuur rekenen, geen moment: zonder Date
+    v.tijd = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
     v.vertraging = { minuten: (v.vertraging ? v.vertraging.minuten : 0) + m, reden: schoon(reden, 120) || 'operationele redenen', door: actor || 'vluchtleiding', at: nu() };
     save();
     return { ok: true, vlucht: publiek(v) };

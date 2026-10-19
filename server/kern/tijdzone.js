@@ -35,6 +35,7 @@ const LAND_ZONE = {
   IN: 'Asia/Kolkata', HK: 'Asia/Hong_Kong', AU: 'Australia/Sydney', NZ: 'Pacific/Auckland'
 };
 const TERUGVAL = 'UTC';
+const klok = require('../lib/klok');
 
 /* EEN FORMATTER PER ZONE, NIET PER VRAAG. `new Intl.DateTimeFormat` laadt
    ICU-gegevens en is met tientallen microseconden de duurste regel van dit
@@ -91,7 +92,7 @@ const DAGEN = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
    zone zelf, want een zaak die om 23:00 lokaal nog open is, is dat op een
    andere kalenderdag dan de server denkt. */
 function lokaal(zone, wanneer) {
-  const d = wanneer instanceof Date ? wanneer : new Date();
+  const d = alsDatum(wanneer);
   const z = geldigeZone(zone) ? zone : TERUGVAL;
   const delen = formatterVoor(z).formatToParts(d);
   const op = {};
@@ -101,9 +102,73 @@ function lokaal(zone, wanneer) {
     zone: z,
     datum: op.year + '-' + op.month + '-' + op.day,
     dag: DAGEN[op.weekday] != null ? DAGEN[op.weekday] : d.getUTCDay(),
-    minuten: uur * 60 + Number(op.minute)
+    minuten: uur * 60 + Number(op.minute),
+    jaar: Number(op.year), maand: Number(op.month), dagVanMaand: Number(op.day),
+    uur, minuut: Number(op.minute),
+    hhmm: String(uur).padStart(2, '0') + ':' + op.minute
   };
 }
+
+// een Date, ms of ISO-tekst; anders NU, van lib/klok (dus ook RTG_KLOK)
+function alsDatum(wanneer) {
+  const d = wanneer instanceof Date || wanneer == null ? wanneer : new Date(wanneer);
+  return d && Number.isFinite(d.getTime()) ? d : klok.datum();
+}
+
+/* DE ZONE VAN HET HUIS: een lid heeft geen eigen zone in zijn profiel, dus
+   Amsterdam. Wie een andere zone kent, geeft hem mee. */
+const HUIS_ZONE = 'Europe/Amsterdam';
+const zoneOf = zone => (zone || HUIS_ZONE);
+
+const huis = (wanneer, zone) => lokaal(zoneOf(zone), wanneer);
+const uurIn = (wanneer, zone) => huis(wanneer, zone).uur;
+const weekdagIn = (wanneer, zone) => huis(wanneer, zone).dag;
+const datumIn = (wanneer, zone) => huis(wanneer, zone).datum;
+const jaarIn = (wanneer, zone) => huis(wanneer, zone).jaar;
+const maandIn = (wanneer, zone) => huis(wanneer, zone).maand;
+const hhmmIn = (wanneer, zone) => huis(wanneer, zone).hhmm;
+// de dag van een OPGESLAGEN tijdstip; leeg of rommel is null, nooit vandaag
+const datumVan = (t, zone) => {
+  const d = t == null || t === '' ? null : new Date(t);
+  return d && Number.isFinite(d.getTime()) ? huis(d, zone).datum : null;
+};
+
+// de zone van een zaak, en zonder eigen zone of bekend land het huis (niet UTC)
+function zaakZoneOfHuis(s) {
+  const z = zaakZone(s);
+  return z.bron === 'terugval' ? HUIS_ZONE : z.zone;
+}
+
+// rekenen op de kalender zelf ('YYYY-MM-DD'): een dag is niet altijd 24 uur
+const kalender = (datum, plus) => {
+  const [j, m, d] = String(datum).slice(0, 10).split('-').map(Number);
+  return Date.UTC(j, m - 1, d + (plus || 0));
+};
+const plusDagen = (datum, n) => new Date(kalender(datum, n)).toISOString().slice(0, 10);
+const weekdagVan = datum => new Date(kalender(datum)).getUTCDay();
+
+/* Het moment van `datum` + `minuten` in `zone` (wat new Date(j, m, d, u, mi)
+   deed). Twee rondes voor de zomertijd; 02:30 in maart wordt 03:30. */
+function moment(datum, minuten, zone) {
+  const z = zoneOf(zone);
+  const wens = kalender(datum) + (Number(minuten) || 0) * 60000;
+  let t = wens;
+  for (let i = 0; i < 2; i++) {
+    const l = lokaal(z, new Date(t));
+    t += wens - (kalender(l.datum) + l.minuten * 60000);
+  }
+  return new Date(t);
+}
+const middernacht = (datum, zone) => moment(datum, 0, zone);
+
+/* DE OMZETDAG van een zaak loopt tot 05:00 lokaal (eigenaarsbesluit 19 oktober
+   2026, HORECA.md): een kasopmaak om 00:30 telt de hele avond. */
+const OMZETDAG_GRENS = 5 * 60;
+function omzetdag(s, wanneer) { // zonder moment: nu
+  const h = huis(wanneer, zaakZoneOfHuis(s));
+  return h.minuten < OMZETDAG_GRENS ? plusDagen(h.datum, -1) : h.datum;
+}
+const omzetdagVan = (s, t) => (datumVan(t) ? omzetdag(s, t) : null); // leeg: null
 
 /* EEN antwoord op "in welke zone staat deze zaak", voor het hele huis.
 
@@ -133,4 +198,8 @@ function zaakZone(s) {
 // hoe laat het is BIJ DE ZAAK; de vorm die de bellers werkelijk gebruiken
 const nuBijZaak = (s, wanneer) => lokaal(zaakZone(s).zone, wanneer);
 
-module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak };
+// een lokale dag en een uur als tijdstip in een zone: ./tijdzone-instant.js
+const instantIn = (...a) => require('./tijdzone-instant')(...a);
+
+module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak, instantIn,
+  HUIS_ZONE, huis, uurIn, weekdagIn, datumIn, datumVan, jaarIn, maandIn, hhmmIn, plusDagen, weekdagVan, middernacht, moment, zaakZoneOfHuis, OMZETDAG_GRENS, omzetdag, omzetdagVan };

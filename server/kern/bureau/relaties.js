@@ -90,7 +90,7 @@ module.exports = (ctx) => {
     const wat = schoon(x.wat, 400);
     if (!wat) return { status: 400, error: 'Waar ging het over?' };
     if (d.ontmoetingen.length >= 300) d.ontmoetingen.pop();
-    d.ontmoetingen.unshift({ id: rid(), op: isDatum(x.op) ? x.op : new Date().toISOString().slice(0, 10),
+    d.ontmoetingen.unshift({ id: rid(), op: isDatum(x.op) ? x.op : require('../tijdzone').datumIn(),
       waar: schoon(x.waar, 100), wat, at: nu() });
     save();
     return { status: 200, ok: true };

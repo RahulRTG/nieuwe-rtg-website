@@ -148,7 +148,8 @@ module.exports = (ctx) => {
      blijft hier en gaat als referentie mee. */
   const octx = { router, F, save, nu, rid, schoon, crypto, anthropic, SYSTEM, DEMO, TIPS,
     teVaak, misluktePoging, goedePoging, ipVan, toegang, ruimOudeLessen, rolVanVerzoek,
-    sse, stuur, online, presentie, lesVan, sleutelInAdres, docentCheck, leerlingVan, lesPubliek };
+    sse, stuur, online, presentie, lesVan, sleutelInAdres, docentCheck, leerlingVan, lesPubliek,
+    gezinsCtx: ctx }; // de gezinsregels (G, profielVan) staan er pas per verzoek op: zie onderwijs/les.js
   require('./onderwijs/les')(octx);
   require('./onderwijs/lesbeheer')(octx);
   require('./onderwijs/schrift')(octx);

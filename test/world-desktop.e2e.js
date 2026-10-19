@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { gezinAanAccount } = require('./gezinaccount');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 let srv, browser, token, note;
 async function post(url, data, auth = token) {
@@ -202,11 +203,15 @@ test('the direct task action opens the original form and a rejected update never
   } finally { await ctx.close(); }
 });
 test('Foundation widgets read the chosen family profile without a paid member account', { skip }, async () => {
-  const family = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Desktop gezin', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true }, null);
-  await post('/api/foundation/gezin/agenda', { code: family.code, token: family.token, titel: 'Samen wandelen', datum: new Date().toLocaleDateString('sv-SE'), tijd: '16:00' }, null);
-  const child = await post('/api/foundation/gezin/profiel/maak', { code: family.code, token: family.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' }, null);
-  const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: family.gezinscode, profielId: child.profiel.id, pin: '5678' }, null);
-  family.token = chosen.token; family.profiel = chosen.profiel;
+  /* Een gezin hangt aan een (gratis, gekeurd) ouderaccount: test/gezinaccount.js.
+     De keuring vraagt de demo, dus deze subtoets krijgt een eigen server met de
+     accountplicht aan; de andere subtoetsen houden hun server zonder demo. */
+  const hoofd = srv;
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_MAGNAAT_TEST: '1', RTF_GEZIN_ACCOUNTPLICHT: '1' } });
+  try {
+  const g = await gezinAanAccount(srv.base, { gezinsnaam: 'Desktop gezin', kind: { naam: 'Milan', geboortedatum: '2015-04-04' } });
+  await post('/api/foundation/gezin/agenda', { code: g.code, token: g.token, titel: 'Samen wandelen', datum: new Date().toLocaleDateString('sv-SE'), tijd: '16:00' }, null);
+  const family = { code: g.code, token: g.kind.token, profiel: g.kind.profiel };
   const ctx = await context(null), page = await ctx.newPage();
   await ctx.addInitScript(f => localStorage.setItem('rtf_sessie', JSON.stringify({ code: f.code, token: f.token, profiel: f.profiel })), family);
   try {
@@ -227,6 +232,7 @@ test('Foundation widgets read the chosen family profile without a paid member ac
     await page.waitForFunction(() => !document.documentElement.classList.contains('rtf-toegang-dicht'));
     assert.equal(await page.locator('.wd-home').isVisible(), true, 'the authorized family can still use the actual agenda');
   } finally { await ctx.close(); }
+  } finally { await stop(srv.child); srv = hoofd; }
 });
 /* HOME OVERLEEFT EEN HERSTART VAN DE EDGE. Het tweede register begint bij elke
    start leeg en de observer van het bureau koppelt los na de eerste keer, dus

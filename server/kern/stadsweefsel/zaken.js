@@ -1,10 +1,7 @@
 /* RTG Stadsweefsel, deel "zaken": EEN zaak- en incidentmotor voor de hele stad.
 
-   Dit lost het gat op dat in de inventarisatie het duidelijkst was: een bewoner
-   die een kapotte lantaarn meldde in Mijn Stad kwam bij de veldploeg terecht,
-   dezelfde lantaarn gemeld via de gemeente kwam bij een ambtenaar terecht, en
-   die twee wisten niets van elkaar. Tien meldingen over dezelfde paal werden
-   tien klussen.
+   Een lantaarn gemeld via Mijn Stad en via de gemeente werd vroeger twee
+   klussen die niets van elkaar wisten; tien meldingen, tien klussen.
 
    Een WAARNEMING is wat er binnenkomt, uit welk kanaal dan ook: bewonersapp,
    gemeenteloket, telefoon, een ambtenaar, een Stadsdoos, een vervoerder. Een
@@ -30,6 +27,8 @@
    ./zaakbeeld.js. Krijgt de gedeelde ctx van kern/stadsweefsel/index.js. */
 const { schoon, coordPaar } = require('../util');
 const { CATS, PLOEG, OBJECTSOORT, PRIO, UIT_STAD } = require('./categorien');
+const { herhaling } = require('./herhaal');
+const tijdzone = require('../tijdzone');
 
 const STATUS = ['open', 'in-behandeling', 'klaar', 'afgewezen'];
 const PRIOS = ['laag', 'normaal', 'hoog', 'urgent'];
@@ -113,6 +112,8 @@ module.exports = (ctx) => {
     const plek = plaatsBepaal({ ...inv, tekst });
     if (!plek) return { status: 400, error: 'Waar is het? Geef een gebied of een positie binnen de stad.' };
     const melder = schoon(inv.melder, 60) || null;
+    const ih = herhaling(zaken(), melder, inv.idem, categorie, plek.gebied, publiek); // ./herhaal.js
+    if (ih.uit) return ih.uit;
     if (melder && zaken().filter(z => open(z) && z.waarnemingen.some(w => w.melder === melder)).length >= MAX_OPEN_PER_MELDER)
       return { status: 429, error: 'Je hebt al ' + MAX_OPEN_PER_MELDER + ' open meldingen; de veldploeg is ermee bezig.' };
 
@@ -124,7 +125,7 @@ module.exports = (ctx) => {
       if (dichtbij) objectId = dichtbij.object.id;
     }
     const w = { id: 'W-' + crypto.randomBytes(3).toString('hex').toUpperCase(), kanaal, melder,
-      tekst, bronRef: schoon(inv.bronRef, 40) || null, at: nu() };
+      tekst, bronRef: schoon(inv.bronRef, 40) || null, at: nu(), idem: ih.idem };
 
     const bestaand = zelfdeZaak({ categorie, objectId, lat: plek.lat, lng: plek.lng });
     if (bestaand) {
@@ -137,7 +138,7 @@ module.exports = (ctx) => {
     if (zaken().length >= MAX_ZAKEN) return { status: 429, error: 'De zakenlijst zit vol.' };
     const z = {
       id: 'Z-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-      ref: 'Z-' + new Date(nu()).getFullYear() + '-' + String(zaken().length + 1).padStart(5, '0'),
+      ref: 'Z-' + tijdzone.jaarIn(nu()) + '-' + String(zaken().length + 1).padStart(5, '0'),
       categorie, categorieLabel: CATS[categorie], objectId,
       lat: plek.lat, lng: plek.lng, gebied: plek.gebied, zone: plek.zone,
       status: 'open', prioriteit: PRIO[categorie] || 'normaal', ploeg: PLOEG[categorie],

@@ -34,7 +34,7 @@
 
   /* ---- de hub rond één stuk ---- */
   function stuk(id) {
-    M.api('stuk', { id: id }).then(function (d) {
+    M.api('/api/mediaos/stuk', { id: id }).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         var s = d.stuk;
@@ -49,8 +49,7 @@
           a.href = x.url; rij.appendChild(a);
         });
         rij.appendChild(M.knop('Naar ' + s.maker.codenaam, '', function () { maker(s.maker.codenaam); }));
-        /* In een lijst zetten en delen staan in ./lijst.js; hier alleen de
-           twee knoppen, zodat het bij het stuk staat waar u naar kijkt. */
+        /* In een lijst zetten en delen staan in ./lijst.js; hier de knoppen. */
         rij.appendChild(M.knop('In lijst', '', function () { window.RTGMediaLijst.inLijst(s.id); }));
         rij.appendChild(M.knop('Deel', '', function () { window.RTGMediaLijst.deel(s.id); }));
         rij.appendChild(M.knop('Samen luisteren', '', function () { window.RTGMediaSamen.start(s.id); }));
@@ -83,7 +82,7 @@
 
   /* ---- één maker, alle vormen, één volgknop ---- */
   function maker(codenaam) {
-    M.api('maker', { codenaam: codenaam }).then(function (d) {
+    M.api('/api/mediaos/maker', { codenaam: codenaam }).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, d.maker.codenaam));
@@ -93,7 +92,7 @@
           var rij = M.el('div', 'rij');
           rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.margin = '0.8rem 0';
           var vb = M.knop(d.volg.aan ? '✓ Volgend' : '+ Volg', d.volg.aan ? 'aan' : 'vol', function () {
-            M.api('volg', { codenaam: d.maker.codenaam, aan: !d.volg.aan }).then(function (r) {
+            M.api('/api/mediaos/volg', { codenaam: d.maker.codenaam, aan: !d.volg.aan }).then(function (r) {
               if (r.error) return M.zeg(r.error);
               d.volg.aan = r.volg;
               vb.textContent = d.volg.aan ? '✓ Volgend' : '+ Volg';
@@ -113,7 +112,7 @@
              geen bezorging die er niet is (regel 6). */
           ['muziek', 'video', 'flow', 'live'].forEach(function (soort) {
             rij.appendChild(M.knop('Meld ' + soort, '', function () {
-              M.api('meldingen', { codenaam: d.maker.codenaam, soorten: [soort] }).then(function (r) {
+              M.api('/api/mediaos/meldingen', { codenaam: d.maker.codenaam, soorten: [soort] }).then(function (r) {
                 if (r.error) return M.zeg(r.error);
                 M.zeg(r.let || ('Vastgelegd voor ' + d.maker.codenaam + ': ' + r.soorten.join(', ') + '.'));
               });
@@ -132,7 +131,7 @@
 
   /* ---- de bibliotheek over de vier vormen heen ---- */
   function bieb() {
-    M.api('bieb', {}).then(function (d) {
+    M.api('/api/mediaos/bieb', {}).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         vlak.appendChild(M.el('div', 'vorm', 'Mijn media'));
@@ -155,7 +154,7 @@
 
   /* ---- het makersbord: wat er echt geteld wordt, en wat niet ---- */
   function bord() {
-    M.api('bord', {}).then(function (d) {
+    M.api('/api/mediaos/bord', {}).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, 'Uw makersbord'));

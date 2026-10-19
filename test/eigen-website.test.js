@@ -203,3 +203,36 @@ test('6. de fotobibliotheek is per lid, en neemt alleen eigen media aan', async 
   assert.equal(weg.status, 200);
   assert.equal(weg.body.fotos.length, 0, 'en een foto gaat er weer af');
 });
+
+/* Een nieuw ontwerp heeft nog geen id. Kwam het antwoord op de eerste bewaring
+   niet aan, dan stuurt de maker dezelfde herhaalsleutel opnieuw mee (de knop of
+   de volgende autosave): dat hoort dezelfde site te zijn, geen tweede. */
+test('7. een herhaalde eerste bewaring maakt geen tweede site', async () => {
+  const ontwerp = (kop) => ({ design: { titel: 'Herhaal', idem: 'eerste-bewaring-1', blokken: [{ type: 'hero', kop }] } });
+  const a = await api('/api/site/bewaar', ontwerp('een'), lid);
+  const b = await api('/api/site/bewaar', ontwerp('twee'), lid);
+  assert.equal(a.status, 200);
+  assert.equal(b.status, 200);
+  assert.equal(b.body.design.id, a.body.design.id, 'de herhaling bewaart in dezelfde site');
+  const mijn = (await api('/api/site/mijn', {}, lid)).body.lijst.filter(x => x.titel === 'Herhaal');
+  assert.equal(mijn.length, 1);
+  const c = await api('/api/site/bewaar', ontwerp('van de buur'), buur);
+  assert.notEqual(c.body.design.id, a.body.design.id, 'dezelfde sleutel van een ander lid is een eigen site');
+});
+
+/* Een herhaalde upload (de knop na een afgebroken verbinding) is dezelfde
+   foto: geen tweede bestand en geen tweede plek in de bibliotheek. Dezelfde
+   sleutel bij een andere afbeelding is 409. */
+test('8. een herhaalde foto-upload met dezelfde sleutel is dezelfde foto', async () => {
+  const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  const voor = (await api('/api/site/fotos', {}, buur)).body.fotos.length;
+  const a = await api('/api/site/foto', { dataUrl: png, idem: 'foto-1' }, buur);
+  const b = await api('/api/site/foto', { dataUrl: png, idem: 'foto-1' }, buur);
+  assert.equal(a.status, 200);
+  assert.equal(b.status, 200);
+  assert.equal(b.body.herhaald, true);
+  assert.equal(b.body.url, a.body.url, 'dezelfde verwijzing, geen tweede bestand');
+  assert.equal((await api('/api/site/fotos', {}, buur)).body.fotos.length, voor + 1);
+  const ander = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  assert.equal((await api('/api/site/foto', { dataUrl: ander, idem: 'foto-1' }, buur)).status, 409);
+});

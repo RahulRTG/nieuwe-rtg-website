@@ -17,56 +17,58 @@
 module.exports = (kern, { stuur, geenGast, kyc, geenEchtAccount }) => {
   const { app, auth, liveCodename, pay } = kern;
 
-  /* Tegoed: een lid koopt tegoed voor een ander (kern/pay/tegoed.js). Kopen en
+  /* Tegoed: een account (ook gratis, besluit 19 oktober 2026) koopt tegoed voor
+     een ander (kern/pay/tegoed.js). Kopen en
      verzilveren zijn geld-momenten en dragen dezelfde twee poorten als de rest
      hier; het overzicht, het terugnemen en een nieuwe code niet -- kijken kost
      niets, en terugnemen haalt je eigen geld op uit een bon die je zelf hebt
      betaald. De kale code staat alleen in het antwoord op /koop en /roteer
      (lib/eenmalig-geheim-routes.js houdt elke retrycache daarbuiten). */
   app.post('/api/pay/tegoed', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     res.json(await pay.tegoedOverzicht(liveCodename(req.session)));
   });
   app.post('/api/pay/tegoed/koop', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     stuur(res, await pay.tegoedKoop({ codenaam: liveCodename(req.session), centen: req.body.centen, aanCodenaam: req.body.aan, oms: req.body.oms, idem: req.body.idem }));
   });
   app.post('/api/pay/tegoed/verzilver', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     stuur(res, await pay.tegoedVerzilver({ codenaam: liveCodename(req.session), code: req.body.code,
       tegoedId: req.body.id, idem: req.body.idem }));
   });
   app.post('/api/pay/tegoed/terug', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     stuur(res, await pay.tegoedTerug({ codenaam: liveCodename(req.session), tegoedId: String(req.body.id || ''),
       intrekken: req.body.intrekken === true, idem: req.body.idem }));
   });
   app.post('/api/pay/tegoed/roteer', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     stuur(res, await pay.tegoedRoteer({ codenaam: liveCodename(req.session), tegoedId: String(req.body.id || ''), idem: req.body.idem }));
   });
 
-  // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
+  // de tik: ontvangen met een aanraking (tikcode), betalen met een knop; voor
+  // elk account, ook een gratis account (besluit 19 oktober 2026)
   /* Tik- en kascode staan alleen kaal in het antwoord op hun uitgifte
      (lib/eenmalig-geheim-routes.js: no-store, buiten elke retrycache); intrekken
      is server-side en raakt alleen de open codes van de aanroeper zelf. */
   app.post('/api/pay/tikcode', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     stuur(res, await pay.tikCode({ codenaam: liveCodename(req.session), idem: req.body.idem }));
   });
   app.post('/api/pay/tikcode/intrek', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     stuur(res, await pay.tikIntrek({ codenaam: liveCodename(req.session) }));
   });
   app.post('/api/pay/tik', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     stuur(res, await pay.tikBetaal({ van: liveCodename(req.session), code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem }));
   });
   app.post('/api/pay/tiks', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     res.json(pay.tikFeed(liveCodename(req.session)));
   });
   /* de kassacode: vijf minuten geldig, tot een zelfgekozen maximum. Een nieuwe

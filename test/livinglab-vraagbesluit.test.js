@@ -21,6 +21,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+// de buurtdeuren van het lab vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per alias
+require('./labaccount').zetLabAccount();
 const { REDENEN, STANDEN } = require('../server/kern/livinglab/vraagbesluit');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vraag-'));

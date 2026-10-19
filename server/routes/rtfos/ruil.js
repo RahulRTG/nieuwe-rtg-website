@@ -43,7 +43,7 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
   });
   app.post('/api/rtfos/ruil/plaats', auth, schrijfRem, (req, res) => {
     if (geenGast(req, res)) return;
-    veilig(res, () => rtfos.ruil.plaats(ik(req), lijf(req)));
+    veilig(res, () => rtfos.ruil.plaats(ik(req), Object.assign({}, lijf(req), { idem: req.body && req.body.idem })));
   });
   app.post('/api/rtfos/ruil/sluit', auth, schrijfRem, (req, res) => {
     if (geenGast(req, res)) return;
@@ -76,7 +76,7 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
      want een voorstel van een gever is nog geen overeenkomst. */
   app.post('/api/rtfos/gift/plan/voorstel', auth, schrijfRem, (req, res) => {
     if (geenGast(req, res)) return;
-    veilig(res, () => rtfos.gift.plan.voorstel(ik(req), lijf(req)));
+    veilig(res, () => rtfos.gift.plan.voorstel(ik(req), Object.assign({}, lijf(req), { idem: req.body && req.body.idem })));
   });
   app.post('/api/rtfos/gift/plan/mijn', auth, leesRem, (req, res) => {
     if (geenGast(req, res)) return;

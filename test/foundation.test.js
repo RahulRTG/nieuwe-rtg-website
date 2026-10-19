@@ -10,6 +10,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stroomAdres } = require('./helper');
+// de les vraagt een account (eigenaarsbesluit 19 oktober 2026): les maken en meedoen met een gratis account
+require('./lesaccount').zetLesAccount();
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-'));
@@ -552,6 +554,16 @@ test('cross-app vrienden: RTF en RTG vinden elkaar op codenaam, chatten, snappen
   assert.equal((await raw('/rtf/social/dm/send', { code: g.code, token: g.token, toKey: verzoek.key, text: 'Hoi RTG!' })).status, 200);
   const rtgThread = await json(await raw('/member/dm', { withKey: ouderKey }, rtgTok));
   assert.ok((rtgThread.messages || []).some(m => /Hoi RTG/.test(m.text)), 'RTG leest het bericht van de RTF-ouder');
+  /* Een herhaalsleutel per opgesteld bericht (gevonden door de voltooiproef van
+     Vrienden): een dubbele tik met dezelfde sleutel is EEN bericht, een nieuw
+     bericht met een eigen sleutel gewoon een tweede. */
+  const dub = { code: g.code, token: g.token, toKey: verzoek.key, text: 'Twee keer getikt', idem: 'dm-dubbel-proef-1' };
+  const tikken = await Promise.all([raw('/rtf/social/dm/send', dub), raw('/rtf/social/dm/send', dub)]);
+  assert.deepEqual(tikken.map(r => r.status), [200, 200]);
+  await raw('/rtf/social/dm/send', Object.assign({}, dub, { idem: 'dm-dubbel-proef-2' }));
+  const naTik = await json(await raw('/member/dm', { withKey: ouderKey }, rtgTok));
+  assert.equal((naTik.messages || []).filter(m => m.text === 'Twee keer getikt').length, 2,
+    'een dubbele tik met dezelfde sleutel zette het bericht twee keer neer (of een nieuwe sleutel geen tweede)');
 
   // Het KIND (15 of jonger) is beschermd: onvindbaar voor RTG, en alleen de
   // ouder voegt vrienden toe (oudervoeg). Daarna accepteert de RTG-kant gewoon.

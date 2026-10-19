@@ -35,6 +35,13 @@ const ROUTES = new Set([
      herhaald vervangen een NIEUWE sleutel. */
   'POST /api/office/democratie/partij/registreer',
   'POST /api/office/democratie/partij/sleutel',
+  /* Roteren van de codeportalen (kern/rtfos/coderoteer.js, rtfclubs, stadsraad):
+     elke oproep een nieuwe code, de vorige dicht. */
+  'POST /api/rtfos/partner/code/roteren',
+  'POST /api/rtfos/gemeente/code/roteren',
+  'POST /api/rtfos/ondernemer/code/roteren',
+  'POST /api/rtfkantoor/club/code/roteren',
+  'POST /api/rtfkantoor/stadsraad/partner-code/roteren',
   // Human approval is consumed once; replay must reach current auth and the approval store.
   'POST /api/member/doe/bevestig',
   'POST /api/werving/verbind',

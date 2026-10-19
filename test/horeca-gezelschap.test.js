@@ -25,10 +25,23 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let BASE, child, tok;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezelschap-'));
-const api = (pad, body, token) => fetch(BASE + pad, {
+/* De gast aan tafel heeft een gratis account (eigenaarsbesluit 19 oktober 2026):
+   de QR is een extra sleutel bij de sessie, nooit een vervanging. Een /api/gast-
+   aanroep zonder eigen token reist met dat account mee; een expliciete null is
+   een aanroep zonder account. */
+const gastLeden = new Map();
+async function api(pad, body, token) {
+  if (token === undefined && String(pad).startsWith('/api/gast/')) {
+    if (!gastLeden.has(BASE)) gastLeden.set(BASE, await registreerGratis(BASE));
+    token = (gastLeden.get(BASE) || {}).token;
+  }
+  return apiKaal(pad, body, token);
+}
+const apiKaal = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -193,7 +206,8 @@ test('wie via de QR aanschuift staat op het bedieningsscherm, en andersom', asyn
   const open = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen.find(x => x.tafel === 'S8');
   assert.ok(open, 'de gastrekening staat gewoon in de lijst van de zaal');
   const g = (await H('/api/supplier/horeca/gezelschap', { rekeningId: open.id })).body.gezelschap;
-  const noor = g.stoelen.find(s => s.handle === 'Noor');
+  // Noor staat er op de codenaam van haar account (eigenaarsbesluit 19 oktober 2026)
+  const noor = g.stoelen.find(s => s.handle === gastLeden.get(BASE).codenaam);
   assert.ok(noor, 'Noor zit aan tafel');
   assert.equal(noor.eigenSessie, true, 'hij heeft wel een eigen telefoon');
 

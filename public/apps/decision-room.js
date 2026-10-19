@@ -24,7 +24,7 @@
     } catch (e) { return false; }
   }
   async function api(pad, body) {
-    var r = await fetch('/api/rtgone/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || '') }, body: JSON.stringify(body || {}) });
+    var r = await fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || '') }, body: JSON.stringify(body || {}) });
     var uit = await r.json().catch(function () { return {}; });
     if (!r.ok) throw new Error(uit.error || 'Decision Room kon de handeling niet verwerken.');
     return uit;
@@ -55,7 +55,7 @@
   async function laad() {
     if (!token && !(await persoonlijkToken())) { w.location.href = '/apps/rtgkantoor.html'; return; }
     try {
-      staat = await api('state', { huis: huis });
+      staat = await api('/api/rtgone/state', { huis: huis });
       alle('[data-dr-huis]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.drHuis === huis)); });
       if (gekozenId && !gekozen()) gekozenId = '';
       teken();
@@ -64,8 +64,12 @@
       if (!intakeEenmaal && (params.get('document') || params.get('nieuw'))) { intakeEenmaal = true; openIntake(); }
     } catch (e) { root.querySelector('#drAgenda').innerHTML = '<div class="dr-leeg"><h2>Decision Room kon niet laden.</h2><p>' + veilig(e.message) + '</p></div>'; }
   }
+  /* Een herhaalsleutel per geopende intake: een tweede tik of een herhaling
+     na een afgebroken verbinding maakt geen tweede voorstel (kern/rtgone.js). */
+  var intakeIdem = '';
   function openIntake() {
     intake.reset();
+    intakeIdem = w.RTGId('dr');
     intake.elements.titel.value = params.get('titel') || '';
     intake.elements.documentId.value = params.get('document') || '';
     intake.elements.documentTitel.value = params.get('titel') || '';
@@ -85,9 +89,9 @@
   laag.addEventListener('click', function (e) { if (e.target === laag || e.target.closest('[data-dr-sluit]')) sluitIntake(); });
   intake.addEventListener('submit', async function (e) {
     e.preventDefault(); var knop = e.submitter, fd = new FormData(intake), body = { huis: huis };
-    fd.forEach(function (v, k) { body[k] = v; }); body.omkeerbaar = intake.elements.omkeerbaar.checked;
+    fd.forEach(function (v, k) { body[k] = v; }); body.omkeerbaar = intake.elements.omkeerbaar.checked; body.idem = intakeIdem;
     knop.disabled = true;
-    try { var uit = await api('goedkeuring', body); gekozenId = uit.goedkeuring.id; sluitIntake(); await laad(); open('afweging'); melding('Het voorstel staat controleerbaar klaar voor menselijke afweging.'); }
+    try { var uit = await api('/api/rtgone/goedkeuring', body); gekozenId = uit.goedkeuring.id; sluitIntake(); await laad(); open('afweging'); melding('Het voorstel staat controleerbaar klaar voor menselijke afweging.'); }
     catch (fout) { melding(fout.message); } finally { knop.disabled = false; }
   });
   root.addEventListener('submit', async function (e) {
@@ -95,7 +99,7 @@
     var fd = new FormData(e.target), reden = String(fd.get('reden') || '').trim();
     if (!reden) { melding('Leg kort vast waarom u deze keuze maakt.'); e.target.elements.reden.focus(); return; }
     var knop = e.submitter; knop.disabled = true;
-    try { var uit = await api('goedkeuring/beslis', { id: gekozenId, besluit: fd.get('besluit'), reden: reden, voorwaarde: fd.get('voorwaarde') }); staat.goedkeuringen = staat.goedkeuringen.map(function (x) { return x.id === uit.goedkeuring.id ? uit.goedkeuring : x; }); open('besluit'); melding(uit.goedkeuring.status === 'wacht' ? 'Uw beoordeling staat vast. De volgende bevoegde beoordelaar is nu aan zet.' : 'Het menselijke besluit en de reden zijn vastgelegd.'); }
+    try { var uit = await api('/api/rtgone/goedkeuring/beslis', { id: gekozenId, besluit: fd.get('besluit'), reden: reden, voorwaarde: fd.get('voorwaarde') }); staat.goedkeuringen = staat.goedkeuringen.map(function (x) { return x.id === uit.goedkeuring.id ? uit.goedkeuring : x; }); open('besluit'); melding(uit.goedkeuring.status === 'wacht' ? 'Uw beoordeling staat vast. De volgende bevoegde beoordelaar is nu aan zet.' : 'Het menselijke besluit en de reden zijn vastgelegd.'); }
     catch (fout) { melding(fout.message); } finally { knop.disabled = false; }
   });
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !laag.hidden) sluitIntake(); });

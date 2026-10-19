@@ -101,14 +101,20 @@ module.exports = (ctx) => {
   }
 
   // een gekoppelde oppas/familie stuurt vanuit de RTG-app een bericht terug naar het gezin
-  function berichtVanGast({ userId, code, tekst }) {
+  /* `idem` (19 oktober 2026): een dubbele tik op "Stuur" in de stand Gezin
+     plaatste het bericht twee keer bij het gezin (voltooiproef tab:gezin).
+     Dezelfde sleutel van hetzelfde profiel is hetzelfde bericht, ook na een
+     herstart; de sleutel gaat niet mee naar wie de berichten leest. */
+  function berichtVanGast({ userId, code, tekst, idem }) {
     const g = G()[String(code || '').toUpperCase()];
     if (!g) return { error: 'Dit gezin kennen we niet.', status: 404 };
     const p = Object.values(g.profielen).find(x => x.koppel && x.koppel.userId === userId);
     if (!p) return { error: 'Je bent niet (meer) aan dit gezin gekoppeld.', status: 403 };
     const schoonTekst = schoon(tekst, 800);
     if (!schoonTekst) return { error: 'Schrijf een bericht.', status: 400 };
-    const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar: 'allen', soort: 'bericht', tekst: encS(schoonTekst), at: nu(), gelezenDoor: [p.id] };
+    const sleutel = typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
+    if (sleutel && (g.berichten || []).some(x => x.van === p.id && x.idem === sleutel)) return { ok: true, herhaald: true };
+    const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar: 'allen', soort: 'bericht', tekst: encS(schoonTekst), at: nu(), gelezenDoor: [p.id], ...(sleutel ? { idem: sleutel } : {}) };
     if (!g.berichten) g.berichten = [];
     g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
     bezorgAanGasten(g, b); // andere gekoppelde gasten krijgen het ook

@@ -113,7 +113,9 @@ require('./kernlaag4-comm')(kern, hulp);
    breuk waar opzet/domeingrens.js over gaat. Bij de samenvoeging van de
    Life-tak eerst weggevallen; vier zorgtoetsen wezen hem meteen aan. */
 Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee,
-  metingVanBehandelaar: (...a) => kern.metingVanBehandelaar(...a) }));
+  metingVanBehandelaar: (...a) => kern.metingVanBehandelaar(...a),
+  // een zorgboeking wordt betaald via RTG Pay (kern/care/leden.js, careBetaal)
+  betaalZaak: (...a) => kern.pay.betaalZaak(...a) }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 /* Geldregie (kern/geldregie.js): RTG bepaalt de geldkant vanuit de boardroom:
    pasprijzen (publiek zichtbaar), de interne partnervergoeding per genre of

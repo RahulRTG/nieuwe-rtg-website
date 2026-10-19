@@ -1,18 +1,18 @@
 {
  "stempel": {
-  "op": "2026-10-18T18:53:46.499Z",
-  "commit": "bd56c161b",
+  "op": "2026-10-19T08:50:41.265Z",
+  "commit": "1284f13a",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/rolproef-route.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.",
- "nietBeproefbaar": 813,
+ "nietBeproefbaar": 822,
  "redenenNietBeproefbaar": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 589,
+   "aantal": 590,
    "routes": [
     "POST /api/auth/tweede",
     "POST /api/bedrijf/apparaat/innemen",
@@ -469,6 +469,7 @@
     "POST /api/foundation/school/zorg/sessie",
     "POST /api/foundation/school/zorg/zet",
     "POST /api/foundation/schrift/opslaan",
+    "POST /api/gids/app",
     "POST /api/herstel/eigenaar/passkey",
     "POST /api/herstel/eigenaar/passkey/opties",
     "POST /api/link/koppelingen",
@@ -860,6 +861,20 @@
    ]
   },
   {
+   "reden": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache",
+   "aantal": 8,
+   "routes": [
+    "POST /api/lab2/bewoner/labs",
+    "POST /api/lab2/bewoner/overzicht",
+    "POST /api/lab2/bewoner/stem",
+    "POST /api/lab2/bewoner/thema",
+    "POST /api/lab2/bewoner/themas",
+    "POST /api/rtfos/publiek/campagnes",
+    "POST /api/rtfos/publiek/stad",
+    "POST /api/rtfos/publiek/steden"
+   ]
+  },
+  {
    "reden": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache",
    "aantal": 3,
    "routes": [
@@ -869,11 +884,11 @@
    ]
   },
   {
-   "reden": "lichaamssleutel: mw+arrivalPassAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "reden": "verzoeksignatuur: mailpoort -- de HMAC is aan lichaam, event-id en tijd gebonden; een bearer kruisen meet dit niet, de eigen HTTP-proef tekent het verzoek",
    "aantal": 2,
    "routes": [
-    "POST /api/arrival/pass",
-    "POST /api/arrival/pulse"
+    "POST /api/mail/binnen",
+    "POST /api/werkmail/bezorg"
    ]
   },
   {
@@ -884,7 +899,7 @@
    ]
   }
  ],
- "routesGevonden": 5427,
+ "routesGevonden": 5429,
  "nietTeKruisen": [
   {
    "methode": "POST",
@@ -907,30 +922,6 @@
   {
    "methode": "POST",
    "pad": "/api/aanmelding/bewijs",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/arrival/interpret",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/arrival/pass/intrek",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/arrival/pass/roteer",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/arrival/request",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
   },
@@ -1027,12 +1018,6 @@
   {
    "methode": "POST",
    "pad": "/api/betaaldiensttarief",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/book",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
   },
@@ -1146,24 +1131,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/gast/aanschuiven",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/gast/tafel",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/gids/app",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/herstel/eigenaar/start",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
@@ -1194,24 +1161,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/krant/artikel",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/krant/gids",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/krant/open",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/lab2/bewoner/kader",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
@@ -1219,18 +1168,6 @@
   {
    "methode": "POST",
    "pad": "/api/lab2/bewoner/klacht",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/labs",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/overzicht",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
   },
@@ -1248,25 +1185,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/lab2/bewoner/stem",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/lab2/bewoner/studie",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/thema",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/themas",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
   },
@@ -1395,12 +1314,6 @@
    "pad": "/api/login",
    "rol": "eigen-poort",
    "reden": "de rol `eigen-poort` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/mail/binnen",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
   },
   {
    "methode": "POST",
@@ -1572,25 +1485,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/publiek/campagnes",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/rtfos/publiek/jaarverslagen",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/publiek/stad",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/publiek/steden",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
   },
@@ -1680,18 +1575,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/staff",
-   "rol": "eigen-poort",
-   "reden": "de rol `eigen-poort` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/apply",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/login",
    "rol": "eigen-poort",
    "reden": "de rol `eigen-poort` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
@@ -1752,48 +1635,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werk-gast/beeld",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werk-gast/besluit",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werk-gast/betaling/start",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werk-gast/betaling/status",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werk-leverancier/beeld",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werk-leverancier/besluit",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkmail/bezorg",
-   "rol": "openbaar",
-   "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/werving/kijk",
    "rol": "openbaar",
    "reden": "de rol `openbaar` heeft geen sleutel (scripts/lib/proefsleutels.js): er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop"
@@ -1806,10 +1647,10 @@
   }
  ],
  "gemeten": {
-  "routesMetRol": 4614,
-  "beproefd": 4461,
-  "pogingen": 9261,
-  "nietTeKruisen": 153,
+  "routesMetRol": 4607,
+  "beproefd": 4483,
+  "pogingen": 9305,
+  "nietTeKruisen": 124,
   "aclOpen": 0,
   "privacyLek": 0,
   "zijeffecten": 0,
@@ -2744,6 +2585,72 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/arrival/interpret",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/arrival/pass",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/arrival/pass/intrek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/arrival/pass/roteer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/arrival/pulse",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/arrival/request",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/asset/document",
    "rol": "member",
    "geprobeerd": [
@@ -3405,6 +3312,17 @@
   {
    "methode": "POST",
    "pad": "/api/bedrijf/post/omzetten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/zaakregie",
    "rol": "member",
    "geprobeerd": [
     "supplier",
@@ -4103,6 +4021,17 @@
   {
    "methode": "POST",
    "pad": "/api/boeken/voortgang",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/book",
    "rol": "member",
    "geprobeerd": [
     "supplier",
@@ -8438,6 +8367,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/gast/aanschuiven",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/gast/afhaal/bestel",
    "rol": "member",
    "geprobeerd": [
@@ -8615,6 +8555,17 @@
   {
    "methode": "POST",
    "pad": "/api/gast/foodcourt/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/tafel",
    "rol": "member",
    "geprobeerd": [
     "supplier",
@@ -10485,6 +10436,39 @@
   {
    "methode": "POST",
    "pad": "/api/kosten/vooruitblik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/krant/artikel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/krant/gids",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/krant/open",
    "rol": "member",
    "geprobeerd": [
     "supplier",
@@ -36117,6 +36101,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/staff",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/staff/balans",
    "rol": "supplier",
    "geprobeerd": [
@@ -37155,6 +37150,17 @@
    "rol": "supplier",
    "geprobeerd": [
     "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/apply",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
     "office"
    ],
    "acl": "dicht",
@@ -43521,6 +43527,17 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/net/verzoek",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/netwerk/overzicht",
    "rol": "supplier",
    "geprobeerd": [
     "member",
@@ -50809,6 +50826,72 @@
   {
    "methode": "POST",
    "pad": "/api/wereld/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werk-gast/beeld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werk-gast/besluit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werk-gast/betaling/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werk-gast/betaling/status",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werk-leverancier/beeld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werk-leverancier/besluit",
    "rol": "member",
    "geprobeerd": [
     "supplier",

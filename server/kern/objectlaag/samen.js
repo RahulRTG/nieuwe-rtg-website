@@ -70,7 +70,7 @@ module.exports = ({ kern }) => {
      hier wordt alleen gefilterd. Een bijeenkomst waar de ander niet op
      geantwoord heeft, is geen gedeeld moment maar een hoop. */
   function bijeenkomsten(key, codenaam) {
-    const vandaag = datum().toISOString().slice(0, 10);
+    const vandaag = require('../tijdzone').datumIn(datum());
     const uit = [];
     const sess = { key };
     for (const gr of lijst(kern.genootschap.mijne(key)).slice(0, GROEP_MAX)) {

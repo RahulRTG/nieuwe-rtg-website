@@ -42,17 +42,26 @@ module.exports = (ctx) => {
     if (w.uitslag) return { status: 409, error: 'Deze wedstrijd is al gespeeld.' };
     const vak = c.plattegrond.vakken.find(x => x.id === String(data.vak || ''));
     if (!vak) return { status: 404, error: 'Kies een vak op de plattegrond.' };
+    /* De herhaalsleutel staat OP het ticket: een tik die na een crash opnieuw
+       komt, vindt zijn reservering terug in plaats van een tweede plaats te
+       bezetten (de algemene laag onthoudt alleen in het geheugen). */
+    const idem = String(data.idem || '').trim().slice(0, 200) || null;
+    const al = idem && c.tickets.find(t => t.key === sess.key && t.idem === idem);
+    if (al) return Object.assign(ticketUit(al, vindWedstrijd(c, al.wedstrijdId) || w, c.plattegrond.vakken.find(x => x.id === al.vak) || vak), { herhaald: true });
     const aantal = Math.max(1, Math.min(8, Math.round(Number(data.aantal) || 1)));
     const bezet = c.tickets.filter(t => t.wedstrijdId === w.id && t.vak === vak.id && t.status !== 'geannuleerd')
       .reduce((s, t) => s + t.aantal, 0);
     if (bezet + aantal > vak.capaciteit) return { status: 409, error: vak.naam + ' is (bijna) vol: nog ' + Math.max(0, vak.capaciteit - bezet) + ' plaats(en).' };
     const t = { id: id('tk'), code: 'ST-' + crypto.randomBytes(3).toString('hex').toUpperCase(), wedstrijdId: w.id,
       vak: vak.id, aantal, prijsCenten: vak.prijsCenten * aantal, key: sess.key,
-      codenaam: schoon(codenaam, 60) || 'Supporter', status: 'gereserveerd', at: nu() };
+      codenaam: schoon(codenaam, 60) || 'Supporter', status: 'gereserveerd', at: nu(), idem };
     c.tickets.unshift(t);
     c.tickets = c.tickets.slice(0, 100000);
     save();
-    return { ok: true, ticket: { code: t.code, vak: vak.naam, aantal, prijsCenten: t.prijsCenten,
+    return ticketUit(t, w, vak);
+  }
+  function ticketUit(t, w, vak) {
+    return { ok: true, ticket: { code: t.code, vak: vak.naam, aantal: t.aantal, prijsCenten: t.prijsCenten,
       wedstrijd: (w.thuis ? 'FC ' : '') + 'RTG - ' + w.tegenstander, datum: w.datum, tijd: w.tijd,
       let: 'Afrekenen aan de poort: contant of RTG Pay bij de kassa.' } };
   }

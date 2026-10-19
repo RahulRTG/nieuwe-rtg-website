@@ -13,7 +13,7 @@
     });
   }
   function api(pad, body) {
-    return fetch('/api/member/huis/' + pad, {
+    return fetch(pad, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(body || {})
@@ -33,7 +33,7 @@
     return;
   }
 
-  api('dossier').then(function (d) {
+  api('/api/member/huis/dossier').then(function (d) {
     if (!d || !d.ok) throw new Error('geen dossier');
     if (window.RTGUitvoer) RTGUitvoer.bron(function () {
       if (!d.reis || !d.tijdlijn || !d.tijdlijn.length) return null;
@@ -72,7 +72,7 @@
       '<p class="paginanr">' + esc(d.bron) + '</p>';
 
     document.getElementById('dosMap').addEventListener('click', function () {
-      api('map').then(function (m) {
+      api('/api/member/huis/map').then(function (m) {
         if (!m || !m.tekst) return;
         var a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([m.tekst], { type: 'text/plain;charset=utf-8' }));
@@ -86,7 +86,7 @@
       var tekst = document.getElementById('dosRahulTekst');
       knop.disabled = true;
       knop.textContent = 'Rahul leest mee…';
-      api('rahul').then(function (r) {
+      api('/api/member/huis/rahul').then(function (r) {
         tekst.textContent = (r && r.tekst) || d.tekst;
         tekst.hidden = false;
         knop.remove();

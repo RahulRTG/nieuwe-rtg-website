@@ -31,6 +31,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, stroomAdres } = require('./helper');
+// de les vraagt een account (eigenaarsbesluit 19 oktober 2026): les maken en meedoen met een gratis account
+require('./lesaccount').zetLesAccount();
 
 let srv, base, zaak, lid, G, kindHandle;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-laatste-'));

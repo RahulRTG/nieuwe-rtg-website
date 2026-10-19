@@ -32,7 +32,7 @@ module.exports = (ctx) => {
     return maandCentenUit(geldPasprijzen, a && a.pas);
   }
   // een maand erbij op een ISO-datum (voor het 12-maands-schema)
-  function plusMaanden(iso, n) { const d = new Date(iso); d.setMonth(d.getMonth() + n); return d.toISOString(); }
+  function plusMaanden(iso, n) { const d = new Date(iso); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString(); }
 
   /* HET SCHEMA KOMT UIT HET CONTRACT, niet uit "maak er twaalf".
 

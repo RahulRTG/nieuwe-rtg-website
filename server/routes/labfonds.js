@@ -52,8 +52,10 @@ module.exports = (kern) => {
   const DOEN = {
     overzicht: (wie) => labfonds.fonds(wie),
     locatie: vast((wie, nm, b) => labfonds.locatieMaak(b.naam, b.land)),
-    doneer: vast((wie, nm, b) => labfonds.doneer(wie, nm, String(b.locId || ''), b.bedrag)),
-    voorstel: vast((wie, nm, b) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek)),
+    /* `idem` geeft de ROUTE mee (hieronder, bij beide deuren): dan ziet
+       test/idempotentie.test.js dat deze routes hun herhaling zelf doen. */
+    doneer: vast((wie, nm, b, idem) => labfonds.doneer(wie, nm, String(b.locId || ''), b.bedrag, idem)),
+    voorstel: vast((wie, nm, b, idem) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek, idem)),
     stem: vast((wie, nm, b) => labfonds.stem(wie, String(b.id || ''), String(b.keuze || ''))),
     scheidsrechter: (wie, nm, b) => labfonds.scheidsrechter(String(b.id || '')),
     beslis: vast((wie, nm, b) => labfonds.beslis(String(b.id || ''), wie)),
@@ -79,8 +81,8 @@ module.exports = (kern) => {
   // Het overzicht is ook voor leden; wie niet ingelogd is, ziet het via de OS-kaart.
   app.post('/api/labfonds/overzicht', auth, alsLid(DOEN.overzicht, false));
   app.post('/api/labfonds/locatie/maak', auth, alsLid(DOEN.locatie, true));
-  app.post('/api/labfonds/doneer', auth, alsLid(DOEN.doneer, true));
-  app.post('/api/labfonds/voorstel/maak', auth, alsLid(DOEN.voorstel, true));
+  app.post('/api/labfonds/doneer', auth, alsLid((wie, nm, b) => DOEN.doneer(wie, nm, b, b.idem), true));
+  app.post('/api/labfonds/voorstel/maak', auth, alsLid((wie, nm, b) => DOEN.voorstel(wie, nm, b, b.idem), true));
   app.post('/api/labfonds/stem', auth, alsLid(DOEN.stem, true));
   app.post('/api/labfonds/scheidsrechter', auth, alsLid(DOEN.scheidsrechter, false));
   app.post('/api/labfonds/beslis', auth, alsLid(DOEN.beslis, true));
@@ -97,8 +99,8 @@ module.exports = (kern) => {
      laten sluiten en de andere niet. */
   app.post('/api/rtf/labfonds/overzicht', gezinsPoort, alsGezin(DOEN.overzicht));
   app.post('/api/rtf/labfonds/locatie/maak', gezinsPoort, nietBeschermd, alsGezin(DOEN.locatie));
-  app.post('/api/rtf/labfonds/doneer', gezinsPoort, nietBeschermd, alsGezin(DOEN.doneer));
-  app.post('/api/rtf/labfonds/voorstel/maak', gezinsPoort, nietBeschermd, alsGezin(DOEN.voorstel));
+  app.post('/api/rtf/labfonds/doneer', gezinsPoort, nietBeschermd, alsGezin((wie, nm, b) => DOEN.doneer(wie, nm, b, b.idem)));
+  app.post('/api/rtf/labfonds/voorstel/maak', gezinsPoort, nietBeschermd, alsGezin((wie, nm, b) => DOEN.voorstel(wie, nm, b, b.idem)));
   app.post('/api/rtf/labfonds/stem', gezinsPoort, nietBeschermd, alsGezin(DOEN.stem));
   app.post('/api/rtf/labfonds/scheidsrechter', gezinsPoort, alsGezin(DOEN.scheidsrechter));
   app.post('/api/rtf/labfonds/beslis', gezinsPoort, nietBeschermd, alsGezin(DOEN.beslis));

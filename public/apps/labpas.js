@@ -22,13 +22,14 @@
     });
   };
 
-  /* De bewonersdeuren dragen geen token; ze hebben een rem per bron en (waar er
-     een code is) per code. Een 429 hoort daarom een begrijpelijke zin te geven
-     en niet "er ging iets mis": dit is de enige app in huis waar een gebruiker
-     zonder account tegen een rem kan lopen. */
+  /* De buurtdeuren vragen een account of gezinsprofiel (eigenaarsbesluit 19
+     oktober 2026); de labpas blijft de sleutel van het eigen onderzoek. Er is
+     een rem per bron en per code, dus een 429 krijgt een begrijpelijke zin. */
   function api(pad, body) {
+    var g = window.LabpasBuurt.gezin();
     return fetch('/api/lab2/' + pad, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+      method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(Object.assign({ gezinCode: g.code, gezinToken: g.token }, body || {}))
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
         if (!r.ok) throw new Error(d.error || (r.status === 429
@@ -52,7 +53,7 @@
 
   /* ---------- mijn onderzoek ---------- */
   function openPas(pas) {
-    return api('mijn', { pas: pas }).then(function (d) {
+    return window.LabpasBuurt.deur().then(function () { return api('mijn', { pas: pas }); }).then(function (d) {
       PAS = pas;
       try { sessionStorage.setItem('rtg_labpas', pas); } catch (e) {}
       teken(d);
@@ -148,7 +149,7 @@
   }
 
   /* ---------- starten ---------- */
-  api('bewoner/kader').then(function (k) {
+  window.LabpasBuurt.deur().then(function () { return api('bewoner/kader'); }).then(function (k) {
     KADER = k;
     return api('bewoner/labs');
   }).then(function (d) {

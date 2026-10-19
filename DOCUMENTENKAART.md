@@ -199,6 +199,9 @@ gaf; dat is nu op naam. Namen: `benoeming`, `orggraaf` en `tekengrens` zijn vrij
 `beleidsmotor` is nu in gebruik;
 `policy`, `capability`, `machtiging`, `lidmaatschap` en `delegatie` zijn bezet.
 
+Par. 7a van `AUTHORITY.md` is het accountbesluit van 19 oktober 2026: gebruiken
+vraagt minimaal een gratis account, met zeven uitzonderingen.
+
 **`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development
 Infrastructure, als richtingsdocument met per onderdeel of het **staat**, **een
 stap weg** is, **een besluit vraagt** of **jaren weg** is (zoals PLATFORM.md en

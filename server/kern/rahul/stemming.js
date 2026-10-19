@@ -22,6 +22,7 @@
        helemaal weg en is hij gewoon rustig en warm. Zie stemmingVoor().
    Zonder die grens zou dit een leuk trucje zijn dat mensen op hun slechtste
    moment in de kou zet. */
+const tijdzone = require('../tijdzone');
 
 /* De standen. `uur` verschuift de kans naar de uren waarop een stemming
    logisch is: moe eerder 's avonds laat, wervelend eerder in de ochtend. */
@@ -80,7 +81,7 @@ module.exports = ({ db, save, crypto }) => {
     return eigen.bak('rahulStemming');
   }
 
-  const uurNu = () => new Date().getHours();
+  const uurNu = () => tijdzone.uurIn();
 
   // valt dit uur binnen het venster van de stand (mag over middernacht heen)
   function inVenster(s, u) {

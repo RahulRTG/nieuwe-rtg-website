@@ -32,10 +32,10 @@
       const items = Object.entries(bzMand).map(([id, qty]) => ({ id, qty }));
       if (!items.length) return;
       try {
-        const b = await API.call('/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
+        const b = await API.call('/api/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
           adres: bzLevering === 'bezorgen' ? bzAdresW : undefined,
           lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
-        await API.call('/order/pay', { ref: b.order.ref });
+        await API.call('/api/order/pay', { ref: b.order.ref });
         // niet-leden zien de servicekosten eerlijk terug op de bevestiging
         // het bedrag komt van de server (order.servicekosten), niet uit deze regel:
         // stond het hier ook, dan noemt dit scherm het oude tarief bij een nieuw totaal
@@ -66,7 +66,7 @@
          "RTG-partners in Ibiza" te zien kreeg. Zonder reis vragen we de hele
          lijst op en zegt de ondertitel dat ook. */
       const stad = trip ? trip.dest : null;
-      const [sd, od] = await Promise.all([API.call('/suppliers', stad ? { city: stad } : {}), API.call('/orders/mine')]);
+      const [sd, od] = await Promise.all([API.call('/api/suppliers', stad ? { city: stad } : {}), API.call('/api/orders/mine')]);
       suppliers = sd.suppliers || [];
       myOrders = od.orders || [];
       const waar = sd.city || stad;

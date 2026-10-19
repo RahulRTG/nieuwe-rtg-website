@@ -3,6 +3,7 @@
    boeken of aanvragen, het annuleringsbeleid, check-in met keyless deurcode
    en check-uit met een geplande uitbetaling. Nooit de belofte dat een
    betaling al verwerkt is. Krijgt de gedeelde ctx. */
+const herhaal = require('./herhaal');
 module.exports = (ctx) => {
   const { save, crypto, schoon, huizen, boekingen, TYPES, ANNULERING, geldigeDatum,
     nachten, vrij, nu, reiswijzer, ratingVan, gastScore, superhost, hostNaam } = ctx;
@@ -72,12 +73,15 @@ module.exports = (ctx) => {
 
   function boek(codenaam, data) {
     data = data || {};
+    // een herhaalsleutel per aanvraag (./herhaal.js)
+    const idem = herhaal.sleutelVan(data), al = herhaal.eerdereAanvraag(boekingen(), codenaam, data, idem, gastZicht);
+    if (al) return al;
     const h = huizen()[String(data.id || '')];
     if (!h || !h.live) return { status: 404, error: 'Dit huis bestaat niet (meer).' };
     if (h.host === codenaam || (h.coHosts || []).includes(codenaam)) return { status: 400, error: 'Je eigen huis boeken hoeft niet -- je hebt de sleutel al.' };
     const van = data.van, tot = data.tot;
     if (!geldigeDatum(van) || !geldigeDatum(tot) || van >= tot) return { status: 400, error: 'Kies een geldige periode.' };
-    if (van < new Date().toISOString().slice(0, 10)) return { status: 400, error: 'De aankomstdatum ligt in het verleden.' };
+    if (van < require('../tijdzone').datumIn()) return { status: 400, error: 'De aankomstdatum ligt in het verleden.' };
     const n = nachten(van, tot);
     if (n < h.minNachten) return { status: 400, error: 'Dit huis vraagt minimaal ' + h.minNachten + ' nacht(en).' };
     const gasten = Math.round(Number(data.gasten) || 1);
@@ -97,7 +101,7 @@ module.exports = (ctx) => {
       betaling: opbouw.opFactuur
         ? 'De factuur volgt van de zaak; er is nog niets afgeschreven.'
         : 'De betaling loopt via RTG Pay bij bevestiging; er is nog niets afgeschreven.',
-      berichten: [], at: nu()
+      berichten: [], at: nu(), ...(idem ? { idem } : {})
     };
     boekingen().unshift(b);
     if (boekingen().length > 20000) boekingen().length = 20000;

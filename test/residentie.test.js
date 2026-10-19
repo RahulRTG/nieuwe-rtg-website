@@ -76,12 +76,42 @@ test('de suite: inrichten met het atelier, open of dicht voor bezoek', async () 
   assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'troon', x: 1, y: 4 }, a.token)).status, 400, 'onbekend meubel');
   const eigen = await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, a.token);
   assert.equal(eigen.body.kamer.eigen, true);
+  await api(base, '/api/residentie/suite/zet', { open: true }, a.token); // een suite begint dicht
   const bezoek = await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, b.token);
   assert.equal(bezoek.status, 200); assert.equal(bezoek.body.kamer.eigen, false);
   await api(base, '/api/residentie/suite/zet', { open: false }, a.token);
   assert.equal((await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, b.token)).status, 403, 'dicht is dicht');
   assert.equal((await api(base, '/api/residentie/suite', {}, gast.token)).status, 403, 'gast heeft geen suite');
   assert.equal((await api(base, '/api/residentie/meubel/weg', { i: 0 }, a.token)).status, 200);
+});
+
+test('een nieuwe suite begint dicht: niet in de gids van een ander lid tot het lid hem zelf opendoet', async () => {
+  /* Bevoegd vond dat een suite met open:true ontstond: wie hem inrichtte,
+     stond in de openbare gids zonder dat zelf te hebben gekozen. */
+  const u = (Date.now() + 9).toString().slice(-8);
+  const c = (await api(base, '/api/auth/register', { name: ECHT + ' 9', email: 'res9' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const su = await api(base, '/api/residentie/suite', {}, c);
+  assert.equal(su.body.suite.open, false, 'nieuw is dicht');
+  const inGids = async () => ((await api(base, '/api/residentie/gids', {}, b.token)).body.suites || []).some(s => s.adres === su.body.suite.adres);
+  assert.equal(await inGids(), false, 'een net ingerichte suite staat niet in de gids van een ander');
+  assert.equal((await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, b.token)).status, 403);
+  assert.equal((await api(base, '/api/residentie/suite/zet', { open: true }, c)).body.suite.open, true);
+  assert.equal(await inGids(), true, 'na het opendoen wel');
+});
+
+test('een dubbeltik op neerzetten of weghalen werkt een keer, niet twee', async () => {
+  /* De voltooiproef (scripts/lib/voltooi/residentie.js) zag twee banken op
+     dezelfde plek, en weghalen op volgnummer haalde ook het meubel weg dat
+     daarna op dat nummer schoof. Verklaard in server/lib/idemsleutels-travelos.js. */
+  const zet = { soort: 'kruk', x: 3, y: 6 };
+  const voor = (await api(base, '/api/residentie/suite', {}, b.token)).body.suite.meubels.length;
+  await Promise.all([api(base, '/api/residentie/meubel/zet', zet, b.token), api(base, '/api/residentie/meubel/zet', zet, b.token)]);
+  const na = (await api(base, '/api/residentie/suite', {}, b.token)).body.suite.meubels;
+  assert.equal(na.length, voor + 1, 'een kruk erbij, niet twee');
+  const i = na.findIndex(m => m.soort === 'kruk' && m.x === 3 && m.y === 6);
+  await Promise.all([api(base, '/api/residentie/meubel/weg', { i }, b.token), api(base, '/api/residentie/meubel/weg', { i }, b.token)]);
+  assert.equal((await api(base, '/api/residentie/suite', {}, b.token)).body.suite.meubels.length, voor, 'precies die kruk weg, niet ook het volgende meubel');
 });
 
 test('de gids: alle zalen met wie er is, en open suites op codenaam', async () => {
@@ -153,4 +183,15 @@ test('een geweigerde spelvraag legt de residentie-collectie niet aan', () => {
       wat + ' legde een lege potjes-tak aan terwijl hij weigerde');
   }
   assert.equal(bewaard, 1, 'alleen het binnenkomen bewaarde; de weigeringen niet');
+});
+
+test('de herhaalsleutel staat bij het meubel: dezelfde tik is hetzelfde meubel, een ander meubel onder die sleutel een 409', async () => {
+  const voor = (await api(base, '/api/residentie/suite', {}, a.token)).body.suite.meubels.length;
+  const lijf = { soort: 'kruk', x: 8, y: 6, idem: 'meubel-sleutel-1' };
+  await api(base, '/api/residentie/meubel/zet', lijf, a.token);
+  await new Promise(r => setTimeout(r, 5200)); // voorbij het dubbeltikvenster van de idem-poort
+  const weer = await api(base, '/api/residentie/meubel/zet', lijf, a.token);
+  assert.equal(weer.status, 200);
+  assert.equal((await api(base, '/api/residentie/suite', {}, a.token)).body.suite.meubels.length, voor + 1, 'een kruk, niet twee');
+  assert.equal((await api(base, '/api/residentie/meubel/zet', Object.assign({}, lijf, { x: 9 }), a.token)).status, 409);
 });

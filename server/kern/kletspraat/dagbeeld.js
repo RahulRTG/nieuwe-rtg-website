@@ -16,6 +16,7 @@
 
    Pure functie op meegegeven lijsten: de lezers (ordersVanKlant en
    boekingenVanKlant) komen van buiten, zodat dit los te toetsen is. */
+const tijdzone = require('../tijdzone');
 
 const MAX = 12;                    // meer dan twaalf dingen op een dag is ruis
 
@@ -28,7 +29,7 @@ function omvang(n) {
 }
 const uurVan = (iso) => {
   const d = new Date(iso);
-  return Number.isFinite(d.getTime()) ? d.getHours() : null;
+  return Number.isFinite(d.getTime()) ? tijdzone.uurIn(d) : null;
 };
 const dagdeelVan = (u) => u == null ? '' : (u < 6 ? 'vannacht' : u < 12 ? 'vanochtend' : u < 18 ? 'vanmiddag' : 'vanavond');
 

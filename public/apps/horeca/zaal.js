@@ -136,7 +136,7 @@
       if (!huidig) return meld('Open eerst een rekening.');
       var naam = $('zNaam').value.trim();
       if (!naam) return meld('Wat wordt er besteld?');
-      api('/rekening/regel', { rekeningId: huidig, naam: naam, prijs: Number($('zPrijs').value) || 0,
+      api('/rekening/regel', { rekeningId: huidig, idem: RTGId('tik'), naam: naam, prijs: Number($('zPrijs').value) || 0,
         aantal: Number($('zAantal').value) || 1, gang: Number($('zGang').value) || 0,
         station: $('zStation').value.trim(), allergie: $('zAllergie').value.trim(),
         // leeg = voor de tafel; de server maakt er null van

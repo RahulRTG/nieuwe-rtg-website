@@ -11,7 +11,7 @@
      uit `net` en `routeerbaarHier` van de motor zelf, en een demonstratienet
      heet ook zo. */
   N.haalStatus = async function haalStatus() {
-    const r = await api('status', S.hier ? { lat: S.hier.lat, lng: S.hier.lng, land: S.land } : {});
+    const r = await api('/api/nav/status', S.hier ? { lat: S.hier.lat, lng: S.hier.lng, land: S.land } : {});
     if (r.status !== 200) return;
     $('#sourceNetwork').textContent = r.body.live ? r.body.live.netwerk : '0';
     $('#sourcePartners').textContent = r.body.live ? r.body.live.partners : '0';
@@ -69,7 +69,7 @@
   });
   async function zoekVertrek(q) {
     const vraag = ++startVraag;
-    const r = await api('bestemmingen', { q });
+    const r = await api('/api/nav/bestemmingen', { q });
     if (r.status !== 200 || vraag !== startVraag) return;
     const lijst = $('#startResultaten'); lijst.textContent = '';
     for (const p of (r.body.bestemmingen || []).slice(0, 8)) {
@@ -106,7 +106,7 @@
   N.haalFlits = haalFlits;
   async function haalFlits() {
     if (!S.hier) return;
-    const r = await api('poi', { lagen: ['flits'], lat: S.hier.lat, lng: S.hier.lng, land: S.land });
+    const r = await api('/api/nav/poi', { lagen: ['flits'], lat: S.hier.lat, lng: S.hier.lng, land: S.land });
     if (r.status === 200) S.flitsPunten = (r.body.lagen.flits || []).map(f => ({ ...f, laag: 'flits' }));
   }
 
@@ -127,7 +127,7 @@
     toonMeldkeuze(false); $('#meldknop').focus();
     if (!soort) return;
     if (!S.hier) return zeg('Ik weet nog niet waar u bent; een melding zonder plek zegt niets.');
-    const r = await api('meld', { soort, lat: S.hier.lat, lng: S.hier.lng, land: S.land });
+    const r = await api('/api/nav/meld', { soort, lat: S.hier.lat, lng: S.hier.lng, land: S.land });
     if (r.body.error) return zeg(r.body.error);
     zeg(r.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : MELDNAAM[soort] + ' gemeld voor het netwerk.');
     await haalFlits(); N.bouwPinnen();

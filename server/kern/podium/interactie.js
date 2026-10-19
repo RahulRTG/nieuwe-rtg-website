@@ -8,15 +8,22 @@ module.exports = (ctx) => {
     zones, poort } = ctx;
   const P = ctx.opslag; // kern/eigencollectie.js, gebouwd in ./index.js
 
-  function chat(key, kid, tekst) {
+  /* `idem` (19 oktober 2026): een dubbele tik, een herhaling na afbreken of na
+     een crash zette een chatregel er twee keer (voltooiproef Podium). Dezelfde
+     sleutel van dezelfde kijker in dit kanaal is dezelfde regel; de sleutel
+     gaat niet mee naar wie de chat leest. */
+  function chat(key, kid, tekst, idem) {
     const k = kanaalMet(kid); if (!k || !k.live) return { status: 409, error: 'Dit kanaal is nu niet live.' };
     const m = poort.magKanaal(key, k); if (!m.ok) return { status: 403, error: m.reden };
     if ((k.geblokkeerd || []).includes(key)) return { status: 403, error: 'Dit kanaal is niet beschikbaar.' };
     if (k.key !== key && !(k.kijkers || {})[key]) return { status: 403, error: 'Kijk eerst mee met dit kanaal.' };
     tekst = schoon(tekst, 300); if (!tekst) return { status: 400, error: 'Leeg bericht.' };
-    const regel = { van: key, codenaam: codenaamVan(key), tekst, abonnee: isAbonnee(k, key), maker: k.key === key, at: nu() };
+    const sleutel = typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
     const C = P.bak('podiumChat'), lijst = C[k.id] = C[k.id] || [];
-    lijst.push(regel); if (lijst.length > CHAT_MAX) C[k.id] = lijst.slice(-CHAT_MAX);
+    const al = sleutel && lijst.find(r => r.van === key && r.idem === sleutel);
+    if (al) { const { idem: _a, ...regel } = al; return { status: 200, ok: true, regel, herhaald: true }; }
+    const regel = { van: key, codenaam: codenaamVan(key), tekst, abonnee: isAbonnee(k, key), maker: k.key === key, at: nu() };
+    lijst.push(sleutel ? { ...regel, idem: sleutel } : regel); if (lijst.length > CHAT_MAX) C[k.id] = lijst.slice(-CHAT_MAX);
     save(); stuurRond(k, { kind: 'chat', kanaalId: k.id, regel });
     return { status: 200, ok: true, regel };
   }

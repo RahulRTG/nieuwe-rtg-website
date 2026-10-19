@@ -64,7 +64,7 @@ module.exports = (ctx) => {
     }
     // een behandeling: boeken en direct afrekenen (het zorgprofiel reist mee)
     if (w.soort === 'behandeling' && sess && acties && acties.boekBehandeling) {
-      const r = acties.boekBehandeling(sess, { aanbiederId: w.aanbiederId, behandelingId: w.behandelingId, datum: w.datum, tijd: w.tijd, codenaam });
+      const r = await acties.boekBehandeling(sess, { aanbiederId: w.aanbiederId, behandelingId: w.behandelingId, datum: w.datum, tijd: w.tijd, codenaam });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       return { tekst: 'Geboekt en betaald: ' + w.oms + ' op ' + w.datum + ' om ' + w.tijd + ' (referentie ' + r.boeking.ref + '). Uw zorgprofiel reisde mee.' +
         (w.medisch ? ' Wilt u de behandelaar vooraf meer vertellen? Deel een intake in de Care-tab.' : ''), gedaan: true };

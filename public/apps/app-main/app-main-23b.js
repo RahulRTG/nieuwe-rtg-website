@@ -32,13 +32,15 @@
     uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
     foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
     spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },
-    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html' },
+    /* Het tweede scherm toont keuken, bar en kassa van een zaak en leest alleen de
+       zaaksessie (rtg_sup_token); een lid zag een tegel die nooit opende. */
+    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html', werkrol: 'zaak' }, // zie app-main-24a3.js
     /* Het inkoopdossier staat bij het LID en niet achter een kantoorpoort
        (APPSTORE.md). Dat het nergens aan hing, maakte die belofte leeg. */
     appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
     routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html', werkrol: 'kantoor' }, // zie app-main-24a3.js
-    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html', werkrol: 'personeel' }, // draait alleen op een PDA-sessie (rtg_pda_token)
     /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
        scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
        als wat een mens er doet, en de werknaam van een laag is geen productnaam

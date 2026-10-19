@@ -1,6 +1,7 @@
-/* Terugbetalingen bij de betaalwaarheid. Zowel een RTG-opdracht als een
-   provider-webhook komt hier uit; één provider-refund telt daardoor nooit
-   dubbel, ook niet als de webhook opnieuw of na een herstart arriveert. */
+/* Terugbetalingen bij de betaalwaarheid. Opdracht en webhook komen hier uit;
+   een provider-refund telt nooit dubbel. Een weigering zet de HELE betaling op
+   CONTROLE_NODIG, met opzet: daarna gaat er niets meer terug, ook geen tweede
+   ticket, tot een mens keek en afrondde (./controle.js). */
 'use strict';
 
 module.exports = function teruglaag(ctx) {

@@ -18,7 +18,7 @@ module.exports = (kern, { stuur, doe, eisCapability }) => {
     ?stuurBuffer(req,res,item.bytes,item.mime,'private, no-store'):res.status(404).end();}catch(e){if(!res.headersSent)res.status(404).end();}});
   app.post('/api/connection/rendezvous/status',auth,doe('connection.message',(k,b)=>rvCommStatus(k,b)));
   app.post('/api/connection/rendezvous/consent',auth,doe('connection.communication.consent',(k,b)=>rvCommConsent(k,b,b.capability,b.active!==false)));
-  app.post('/api/connection/rendezvous/text',auth,doe('connection.message',(k,b)=>rvCommText(k,b,b.text)));
+  app.post('/api/connection/rendezvous/text',auth,doe('connection.message',(k,b)=>rvCommText(k,b,b.text,b.idem)));
   app.post('/api/connection/rendezvous/message/remove',auth,doe('connection.message',(k,b)=>rvCommRemove(k,b,b.messageId)));
   app.post('/api/connection/rendezvous/message/report',auth,doe('connection.safety.block',(k,b)=>rvCommReport(k,b,b.messageId,b.reason)));
   app.post('/api/connection/rendezvous/message-media',auth,express.raw({type:()=>true,limit:'8mb'}),(req,res)=>{

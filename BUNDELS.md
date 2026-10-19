@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 492 delen, 0 zonder onderwerp.**
+**62 bundels, 496 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9990 regels in de delen
+`public/apps/app-main/` -- 103 delen, 10112 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -41,6 +41,7 @@ omlaag.
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
 | `app-main-10.js` | DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING |
+| `app-main-10a.js` | DE BELSIGNALEN VAN DE LIVE-VERBINDING (uit app-main-10.js geknipt op de 10 kB): ICE die vooruit liep, en de eerste he... |
 | `app-main-11.js` | DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE |
 | `app-main-12.js` | DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK |
 | `app-main-12a.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |
@@ -77,10 +78,12 @@ omlaag.
 | `app-main-29.js` | de realtime-verbinding starten en herstellen |
 | `app-main-29b.js` | het gesprek met Rahul op het beginscherm |
 | `app-main-29c.js` | de werelden aanreiken aan de bank van RTG Command |
+| `app-main-29d.js` | Heel RTG leest de functiegids (eigenaarsbesluit 19 oktober 2026) |
 | `app-main-30.js` | de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard |
 | `app-main-31.js` | Achtergrond (wallpaper) in het bedieningspaneel |
 | `app-main-31c.js` | Onderweg: de live reis |
 | `app-main-32.js` | het live-paneel: van modus wisselen |
+| `app-main-32a.js` | RTG Shared Assets: een koop is een aanvraag (kern/assets/aanvraag.js) |
 | `app-main-33.js` | een asset herroepen binnen de bedenktijd |
 | `app-main-34.js` | mijn zorgprofiel |
 | `app-main-34b.js` | het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst |
@@ -203,7 +206,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 422 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 442 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -214,7 +217,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9899 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9910 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -366,7 +369,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 1021 regels in de delen
+`public/apps/office/app/` -- 9 delen, 1027 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -578,6 +581,7 @@ omlaag.
 | `basis-01ab-heritage-order.js` | Routes mogen functionele CSS bijladen, maar Heritage blijft het laatste materiaalblad |
 | `basis-01ac-edge.js` | Iedere echte wereldkamer gebruikt dezelfde Edge |
 | `basis-01ad-intelligence.js` | De centrale controllers laden één keer, ook als een route een adapter vóór basis nodig heeft |
+| `basis-01ae-sessie.js` | De sessie van dit scherm, voor de app-gids (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt een account; server/ke... |
 | `basis-01b.js` | Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van de consolidatieronde; de bundelvolgorde is... |
 | `basis-01c.js` | de toegankelijkheidshelpers van de gedeelde laag |
 | `basis-02.js` | 5. het lopende werk: de gangreserve-laag van het huis |
@@ -711,7 +715,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1933 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1946 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -822,7 +826,7 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 295 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 300 regels in de delen
 
 | deel | onderwerp |
 |---|---|

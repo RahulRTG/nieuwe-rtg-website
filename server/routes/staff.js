@@ -42,8 +42,10 @@ module.exports = (kern) => {
    credential per medewerker (kern/partnerpersoneelscode.js): hij opent het
    bedrijfsbeeld van zijn partner zolang hij geldig is, wordt hier NIET verbruikt
    (dat doet pas een boeking) en gaat nooit terug in het antwoord. Een onbekende,
-   verlopen, ingetrokken of opgebruikte code krijgt hetzelfde antwoord. */
-app.post('/api/staff', (req, res) => {
+   verlopen, ingetrokken of opgebruikte code krijgt hetzelfde antwoord.
+   Sinds het eigenaarsbesluit van 19 oktober 2026 is de code een EXTRA sleutel
+   bij een account: zonder sessie 401. */
+app.post('/api/staff', kern.auth, (req, res) => {
   res.set('Cache-Control', 'no-store');
   let partner, personeel = null;
   if (hasCred(req.body)) {

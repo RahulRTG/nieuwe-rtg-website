@@ -11,19 +11,15 @@
    keer; de les dat '2027-13-45' door een regex heen komt is daar al geleerd. */
 'use strict';
 
-const { isDatum } = require('../levensgraaf/hulp');
-
-const vandaag = () => new Date().toISOString().slice(0, 10);
+// de dag van het lid en de dag van een tijdstip: dezelfde als in de levensgraaf
+const { isDatum, vandaag, dagVan: graafDag } = require('../levensgraaf/hulp');
 const huidigJaar = () => Number(vandaag().slice(0, 4));
 
 /* Van een tijdstip (ms of ISO) naar een ISO-dag. Null bij rommel, want een
    halve datum is gevaarlijker dan geen datum: hij komt wel op de lijn te
    staan, alleen op de verkeerde plek. */
 function dagVan(t) {
-  if (t == null || t === '') return null;
-  const d = new Date(t);
-  if (Number.isNaN(d.getTime())) return null;
-  const dag = d.toISOString().slice(0, 10);
+  const dag = graafDag(t);
   return isDatum(dag) ? dag : null;
 }
 

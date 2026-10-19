@@ -30,8 +30,8 @@ test('2. de klok-kern: wekkers en timers gaan af op de server, precies een keer'
     sseToCustomer: (key, ev, d) => seintjes.push({ key, ev, d }), sendPushToUser: null });
 
   // een losse wekker op dit moment: de veeg laat hem afgaan en zet hem uit
-  const nu = new Date();
-  const hhmm = String(nu.getHours()).padStart(2, '0') + ':' + String(nu.getMinutes()).padStart(2, '0');
+  // de wekker staat op de klok van het lid (het huis), niet op die van de container
+  const hhmm = require('../server/kern/tijdzone').hhmmIn(new Date());
   const w = klok.klokWekker('lidA', { tijd: hhmm, label: 'Proef' });
   assert.ok(w.id);
   assert.ok(klok.klokWekker('lidA', { tijd: '25:00' }).error, 'een onmogelijke tijd is een nette fout');

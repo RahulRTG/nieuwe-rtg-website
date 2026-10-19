@@ -80,10 +80,16 @@ const DOELGROEPEN = {
   gast: {
     uitleg: 'de gratis app zonder pas: een bezoeker en een gratis account met paspoortcontrole',
     vormen: {
+      /* DE BEZOEKER IS DE UITGELOGDE MENS (eigenaarsbesluit 19 oktober 2026).
+         Hij was de demo-inlog met tier 'guest'; die bestaat buiten de demo niet
+         meer. Wat overblijft is iemand zonder enig token, en van hem willen we
+         continu zien dat hij NIETS bereikt buiten de uitzonderingen
+         (scripts/doelgroepbereik.js, bezoekerDefecten). `haal` geeft een
+         merkteken en geen token: hij hoeft nergens in te loggen. */
       bezoeker: {
-        uitleg: 'een bezoeker zonder account (demo-inlog)',
-        haal: async (basis) => (await post(basis + '/api/login', { tier: 'guest' }) || {}).token || null,
-        draag: viaKop
+        uitleg: 'een uitgelogde bezoeker, zonder token; hij hoort alleen de uitzonderingen te bereiken',
+        haal: async () => 'uitgelogd',
+        draag: () => ({ kop: {}, lijf: {} })
       },
       account: {
         uitleg: 'een gratis RTG-account waarvan RTG het paspoort heeft gezien',

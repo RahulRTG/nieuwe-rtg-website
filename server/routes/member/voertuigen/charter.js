@@ -39,7 +39,7 @@ app.post('/api/charter/boek', auth, (req, res) => {
   const boot = (s.boten || []).find(v => v.id === req.body.bootId && v.actief !== false);
   if (!boot) return res.status(404).json({ error: 'Dit vaartuig is niet (meer) beschikbaar.' });
   const van = String(req.body.van || ''), tot = String(req.body.tot || '');
-  const vandaag = new Date().toISOString().slice(0, 10);
+  const vandaag = require('../../../kern/tijdzone').datumIn();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot) || van < vandaag || tot <= van)
     return res.status(400).json({ error: 'Kies een periode vanaf vandaag; teruggeven na de vaardag.' });
   const dagen = Math.round((new Date(tot) - new Date(van)) / 86400000);

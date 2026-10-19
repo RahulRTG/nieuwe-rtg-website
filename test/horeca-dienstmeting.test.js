@@ -104,7 +104,7 @@ test('4. een echte dienst komt er als getal uit', async () => {
 
   await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
   const straks = new Date(Date.now() + 30 * 60000);
-  const serveerOm = String(straks.getHours()).padStart(2, '0') + ':' + String(straks.getMinutes()).padStart(2, '0');
+  const serveerOm = require('../server/kern/tijdzone').hhmmIn(straks); // de klok van de zaak, niet van de container
   await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 2, serveerOm });
 
   await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: glas.id, stand: 'klaar' });
@@ -181,9 +181,10 @@ const { belofte } = require('../server/kern/horeca/dienstmeting-tijden');
 function gangMet(vrij, klaar, om) {
   return [{ regels: [{ gang: 2, serveerOm: om, vrijAt: vrij.toISOString(), klaarAt: klaar.toISOString() }] }];
 }
+// een klokuur in de zaak (het huis, Europe/Amsterdam), niet in de container
 const opDag = (u, m, dagen) => {
-  const d = new Date(2026, 7, 20 + (dagen || 0), u, m, 0, 0);
-  return d;
+  const tz = require('../server/kern/tijdzone');
+  return tz.moment(tz.plusDagen('2026-08-20', dagen || 0), u * 60 + m);
 };
 
 test('6. een serveertijd na middernacht is geen gang van gisteren', () => {
@@ -229,18 +230,20 @@ test('7. een gang die om 23:55 klaarstaat met belofte 00:20 is 25 minuten TE VRO
 
   const tijden = require('../server/kern/horeca/dienstmeting-tijden');
   const naam = 'beloofde versus werkelijke';
-  const dag = '2026-08-26T';
+  // een klokuur in de zaak (het huis), niet in de container
+  const tz = require('../server/kern/tijdzone');
+  const dag = (hhmm) => tz.moment('2026-08-26', Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5))).toISOString();
   const rek = (klaar, om) => ([{ regels: [{ gang: 2, serveerOm: om, klaarAt: klaar }] }]);
 
   /* Over middernacht: klaar om 23:55, belofte 00:20 (de volgende dag). */
-  const over = tijden.belofte(rek(dag + '23:55:00', '00:20'), naam);
+  const over = tijden.belofte(rek(dag('23:55'), '00:20'), naam);
   assert.equal(over.soort, 'gemeten', 'er was een serveertijd afgesproken');
   assert.ok(over.waarde <= 30,
     'de belofte hoort op de VOLGENDE dag te vallen, niet 23 uur eerder: ' + over.waarde);
 
   /* En de tegenproef, want een reparatie die ALLES dichtbij maakt meet niets:
      een gewone avond hoort onveranderd te blijven. */
-  const gewoon = tijden.belofte(rek(dag + '20:25:00', '20:00'), naam);
+  const gewoon = tijden.belofte(rek(dag('20:25'), '20:00'), naam);
   assert.equal(gewoon.soort, 'gemeten');
   assert.equal(gewoon.waarde, 25, 'een gewone avond blijft 25 minuten te laat: ' + gewoon.waarde);
 });

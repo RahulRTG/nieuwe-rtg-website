@@ -1,5 +1,5 @@
 /* Foundation-shell: network-first met een offline vangnet. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-c20a6fe0';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-5538dd2d';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',

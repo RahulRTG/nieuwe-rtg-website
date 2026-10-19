@@ -7,10 +7,14 @@ module.exports = (wctx) => {
   const { kern, maakInvite, neemAan, wervingsBasis, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
           findSupplier, logActivity, managerOnly, notifyApplicant, notifySupplier, save, schoon,
-          sseToOffice, sseToSupplier, supplierAuth } = kern;
+          sseToOffice, sseToSupplier, supplierAuth, auth } = kern;
   const werving = require('../../../kern/werk-opslag')({ db }); // de deur naar sollicitatie, vacature en chat
 const { sollGeremd } = require('./sollrem');
-app.post('/api/supplier/apply', (req, res) => {
+const { handleVan } = require('../../../kern/gast/naad')(); // de codenaam van de sessie, nooit een echte naam
+/* Solliciteren vraagt een account (eigenaarsbesluit 19 oktober 2026): minimaal een
+   gratis account, en de sollicitatie hangt aan zijn codenaam en sleutel -- zoals
+   /api/member/apply. De werkgever ziet de codenaam niet (kern/werk.js). */
+app.post('/api/supplier/apply', auth, (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
   const name = schoon(req.body.name, 60);
@@ -22,6 +26,8 @@ app.post('/api/supplier/apply', (req, res) => {
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     name, func, contact, note, status: 'nieuw',
+    codename: handleVan(req.session),
+    key: req.session.key,
     at: new Date().toISOString()
   };
   const list = werving.sollicitatiesVan(s.code);

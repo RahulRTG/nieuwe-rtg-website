@@ -39,11 +39,11 @@ module.exports = (ctx) => {
   const magBeheer = s => ['beheerder', 'ouder'].includes(s.p.rol);
   // dagen tot de eerstvolgende verjaardag (0 = vandaag), en de leeftijd die je wordt
   function komend(dag, maand, jaar) {
-    const nu2 = new Date(); nu2.setHours(0, 0, 0, 0);
-    let d = new Date(nu2.getFullYear(), maand - 1, dag);
-    if (d < nu2) d = new Date(nu2.getFullYear() + 1, maand - 1, dag);
+    const h = require('../../kern/tijdzone').huis(), nu2 = Date.UTC(h.jaar, h.maand - 1, h.dagVanMaand);
+    let d = new Date(Date.UTC(h.jaar, maand - 1, dag));
+    if (d < nu2) d = new Date(Date.UTC(h.jaar + 1, maand - 1, dag));
     const dagen = Math.round((d - nu2) / 86400000);
-    const wordt = jaar ? d.getFullYear() - jaar : null;
+    const wordt = jaar ? d.getUTCFullYear() - jaar : null;
     return { dagenTot: dagen, vandaag: dagen === 0, wordt, opDatum: d.toISOString().slice(0, 10) };
   }
 
@@ -55,7 +55,7 @@ module.exports = (ctx) => {
     const dag = Math.round(Number(req.body.dag));
     const maand = Math.round(Number(req.body.maand));
     if (!(dag >= 1 && dag <= 31 && maand >= 1 && maand <= 12)) return res.status(400).json({ error: 'Kies een geldige dag en maand.' });
-    const jaar = Number(req.body.jaar) >= 1900 && Number(req.body.jaar) <= new Date().getFullYear() ? Math.round(Number(req.body.jaar)) : null;
+    const jaar = Number(req.body.jaar) >= 1900 && Number(req.body.jaar) <= require('../../kern/tijdzone').jaarIn() ? Math.round(Number(req.body.jaar)) : null;
     const pid = req.body.pid && s.g.profielen[req.body.pid] ? req.body.pid : '';
     const v = kijk(s.g);
     if (v.mensen.length >= 100) return res.status(400).json({ error: 'Het boek is vol.' });

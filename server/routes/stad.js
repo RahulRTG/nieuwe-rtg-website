@@ -21,7 +21,9 @@ module.exports = (kern) => {
   // iets melden dat stuk of vol is; het staat direct op de veldwerk-lijst
   app.post('/api/stad/melding', auth, (req, res) => {
     if (!paspoortdeur(req, res)) return;
-    stuur(res, stad.stadBewonerMeld({ codenaam: cn(req), zone: req.body.zone, soort: req.body.soort, tekst: req.body.tekst }));
+    /* de herhaalsleutel hoort bij de waarneming en de kern beslist over een
+       herhaling (EIGEN in middleware/idempotentie-eigen.js) */
+    stuur(res, stad.stadBewonerMeld({ codenaam: cn(req), zone: req.body.zone, soort: req.body.soort, tekst: req.body.tekst, idem: req.body.idem }));
   });
 
   /* HET ALGORITMEREGISTER, EN HET IS MET OPZET OPENBAAR.

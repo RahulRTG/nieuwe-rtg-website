@@ -15,6 +15,7 @@
 
    Krijgt de gedeelde ctx plus de besluithelpers van ./bestuur.js. */
 const { schoon } = require('../util');
+const tijdzone = require('../tijdzone');
 
 module.exports = (ctx, H) => {
   const { save, crypto, nu, geo } = ctx;
@@ -35,7 +36,7 @@ module.exports = (ctx, H) => {
     if (gebied && !g) return { status: 404, error: 'Onbekend gebied.' };
     const b = {
       id: 'B-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-      ref: 'B-' + new Date(nu()).getFullYear() + '-' + String(besluiten().length + 1).padStart(4, '0'),
+      ref: 'B-' + tijdzone.jaarIn(nu()) + '-' + String(besluiten().length + 1).padStart(4, '0'),
       orgaan: o.id, orgaanNaam: o.naam, titel: t, toelichting: schoon(toelichting, 600) || null,
       bedrag: Number(bedrag) > 0 ? Math.round(Number(bedrag)) : null,
       projectId: schoon(projectId, 20) || null, doelId: schoon(doelId, 20) || null,

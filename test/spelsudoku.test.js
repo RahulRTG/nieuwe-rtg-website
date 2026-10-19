@@ -339,8 +339,8 @@ test('onder de 18+-grens: je speelt en je hoort je tijd, er wordt alleen niets b
    maar de andere helft van dezelfde maatregel. */
 test('de pagina maakt geen eigen puzzel meer en stuurt geen eigen score op', () => {
   const pagina = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'spelen.html'), 'utf8');
-  assert.ok(pagina.includes("api('sudoku-nieuw'"), 'de pagina vraagt de puzzel op bij de server');
-  assert.ok(pagina.includes("api('sudoku-klaar'"), 'en levert het rooster daar in');
+  assert.ok(pagina.includes("api('/api/member/spel/sudoku-nieuw'"), 'de pagina vraagt de puzzel op bij de server');
+  assert.ok(pagina.includes("api('/api/member/spel/sudoku-klaar'"), 'en levert het rooster daar in');
   assert.equal(/arcade-score'\s*,\s*\{\s*spel\s*:\s*'sudoku'/.test(pagina), false,
     'de pagina stuurt nog een eigen sudoku-score op');
   assert.equal(/function suVol\b/.test(pagina), false, 'de puzzelmaker staat nog in de pagina');

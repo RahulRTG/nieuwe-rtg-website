@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-18T18:54:37.309Z",
-    "commit": "bd56c161b",
+    "op": "2026-10-19T05:08:56.486Z",
+    "commit": "55ed79f9",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v22.22.0"
   },
@@ -254,7 +254,7 @@
       "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/BGTUGN/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/HFCZH6/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -354,9 +354,9 @@
       "ingang": "/apps/horeca.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 138,
-      "open": 136,
-      "reden": "136 van de 138 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca/arrival/promise staat niet in IDOR.json"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca*: de registers kennen geen route onder dit voorvoegsel"
     },
     {
       "functie": "link:huis",
@@ -657,9 +657,9 @@
       "ingang": "/apps/ovroutes.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/checkin staat niet in IDOR.json; /api/staff/ov/dienst staat niet in IDOR.json"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/*: de registers kennen geen route onder dit voorvoegsel"
     },
     {
       "functie": "link:partnernetwerk",
@@ -685,9 +685,9 @@
       "ingang": "/apps/pay.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/login staat niet in IDOR.json"
+      "routes": 17,
+      "open": 5,
+      "reden": "5 van de 17 routes niet gemeten, o.a. /api/link/cap/maak is in IDOR.json onbereikbaar; /api/login staat niet in IDOR.json; /api/pay/oplaad is in IDOR.json onbereikbaar"
     },
     {
       "functie": "link:podium",
@@ -1155,7 +1155,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/BGTUGN/mij",
+          "verzoek": "GET /api/foundation/gezin/HFCZH6/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -1269,9 +1269,9 @@
       "ingang": "/apps/werk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 5,
-      "reden": "5 van de 5 routes niet gemeten, o.a. /api/bedrijf/mijn is in IDOR.json onbereikbaar; /api/tenant/bijstand*: de registers kennen geen route onder dit voorvoegsel; /api/tenant/bootstrap staat niet in IDOR.json"
+      "routes": 8,
+      "open": 8,
+      "reden": "8 van de 8 routes niet gemeten, o.a. /api/bedrijf/mijn is in IDOR.json onbereikbaar; /api/bedrijf/start staat niet in IDOR.json; /api/bedrijf/taak/maak staat niet in IDOR.json"
     },
     {
       "functie": "link:wonen",

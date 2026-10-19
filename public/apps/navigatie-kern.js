@@ -15,7 +15,7 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/nav/' + pad, { method: 'POST',
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let toastT;

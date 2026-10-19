@@ -21,6 +21,7 @@
 const klok = require('../../lib/klok');
 const { maandCentenUit } = require('../pasprijs');
 const btw = require('../commercie/btw');
+const tijdzone = require('../tijdzone');
 
 const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
 
@@ -125,12 +126,13 @@ function maakFacturen({ i18n, deps }) {
     if (!['rtg', 'lifestyle', 'business'].includes(tier)) return null;
     const d = opDatum ? new Date(opDatum) : klok.datum();
     if (isNaN(d.getTime())) return null;
-    const m2 = String(d.getMonth() + 1).padStart(2, '0');
-    const verval = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    const h = tijdzone.huis(d); // de factuurmaand is de maand in Nederland, niet in de container
+    const m2 = String(h.maand).padStart(2, '0');
+    const verval = { maand: h.maand % 12, jaar: h.maand === 12 ? h.jaar + 1 : h.jaar };
     return {
-      id: 'RTG-' + d.getFullYear() + '-' + m2 + '-' + String(userId || 0).padStart(4, '0'),
+      id: 'RTG-' + h.jaar + '-' + m2 + '-' + String(userId || 0).padStart(4, '0'),
       desc: 'Maandbijdrage lidmaatschap',
-      maand: d.getFullYear() + '-' + m2,
+      maand: h.jaar + '-' + m2,
       /* HET BEDRAG STAAT ER OOK ECHT OP.
 
          ./lid/facturen.js vult de prijs bij het TONEN in (uit de boardroom), en
@@ -141,7 +143,7 @@ function maakFacturen({ i18n, deps }) {
          prijs (Business is op maat), dan blijft het bedrag 0 en spreekt RTG het
          met het lid af -- er wordt hier niets verzonnen. */
       netto: 0, bijdrage: centenNaarBijdrage(tier), status: 'open',
-      date: 'Vervalt 1 ' + MAAND_NL[verval.getMonth()] + ' ' + verval.getFullYear()
+      date: 'Vervalt 1 ' + MAAND_NL[verval.maand] + ' ' + verval.jaar
     };
   }
 

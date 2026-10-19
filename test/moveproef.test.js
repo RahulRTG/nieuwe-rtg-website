@@ -106,7 +106,8 @@ test('7. het scherm voert niets uit', () => {
   /* RTG Move zet klaar; verzetten raakt een tweede persoon en gebeurt in het
      domein na een bevestiging (MOVE.md grens 5). Dit scherm mag dus alleen de
      drie lezende routes aanroepen. */
-  const paden = [...schermCode.matchAll(/'\/api\/move\/' \+ pad|api\('([a-z]+)'\)/g)].map(m => m[1]).filter(Boolean);
+  const paden = [...schermCode.matchAll(/'\/api\/move\/([a-z]+)'/g)].map(m => m[1]);
+  assert.ok(paden.length >= 3, 'het scherm noemt zijn move-paden letterlijk');
   for (const p of paden) assert.ok(['reis', 'gevolg', 'volgende'].includes(p), 'onbekend move-pad: ' + p);
   assert.ok(!/\/api\/(booking|reisbureau|member)\//.test(schermCode),
     'het scherm boekt en verzet niets');

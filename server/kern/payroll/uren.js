@@ -25,6 +25,7 @@
    Stilzwijgend afronden op "waarschijnlijk acht uur" is precies hoe iemand te
    weinig of te veel betaald krijgt zonder dat iemand het ziet. */
 'use strict';
+const tijdzone = require('../tijdzone');
 
 const UUR = 3600000;
 /* De nacht loopt van 00:00 tot 06:00. Dat is een bedrijfsregel en hoort dus
@@ -41,7 +42,7 @@ function nachtUren(van, tot, nachtVan, nachtTot) {
   let ms = 0;
   for (let t = van; t < tot; t += UUR) {
     const eind = Math.min(t + UUR, tot);
-    const uurVanDeDag = new Date(t).getHours();
+    const uurVanDeDag = tijdzone.uurIn(t); // de cao rekent in Nederlandse tijd
     const inNacht = nachtVan < nachtTot
       ? (uurVanDeDag >= nachtVan && uurVanDeDag < nachtTot)
       : (uurVanDeDag >= nachtVan || uurVanDeDag < nachtTot);
@@ -116,7 +117,7 @@ function maakUren({ opslag, regels }) {
         const duur = (tot - van) / UUR;
         feit.uren += duur;
         feit.nachturen += nachtUren(van, tot, cfg.nachtVan, cfg.nachtTot);
-        if (new Date(van).getDay() === 0) feit.zondaguren += duur;
+        if (tijdzone.weekdagIn(van) === 0) feit.zondaguren += duur;
         feit.diensten++;
         vorigEind = tot;
       }

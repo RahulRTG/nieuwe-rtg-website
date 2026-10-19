@@ -104,7 +104,7 @@
     clearTimeout(el._timer); el._timer = setTimeout(() => { el.style.opacity = '0'; }, 3200);
   }
   async function api(pad, body) {
-    const r = await fetch('/api/member/rendezvous/' + pad, { method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}, body:JSON.stringify(body || {}) });
+    const r = await fetch(pad, { method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}, body:JSON.stringify(body || {}) });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) { const fout = new Error(data.error || 'Er ging iets mis.'); fout.status = r.status; fout.code = data.code; throw fout; }
     return data;
@@ -150,7 +150,7 @@
     const reden = $('#safetyReason').value.trim();
     if (report && !reden) { meld('Vul kort een reden in voor RTG.'); return; }
     try {
-      await api('blokkeer', { id:safetyTarget.id, meld:report ? reden : '' });
+      await api('/api/member/rendezvous/blokkeer', { id:safetyTarget.id, meld:report ? reden : '' });
       $('#safetyDialog').close(); meld(report ? 'Geblokkeerd en veilig gemeld bij RTG.' : 'Geblokkeerd. Jullie zien elkaar niet meer.'); laad();
     } catch (e) { meld(e.message); }
   }
@@ -169,7 +169,7 @@
   function startConnectionEdge() {
     if (!window.RTGConnectionEdge) return;
     connectionEdge = RTGConnectionEdge.create({ product:'rendezvous',
-      load:ctx => api('edge', ctx.kind === 'introduction' ? { kind:'introduction', id:ctx.id } : ctx.kind === 'match' ? {kind:'match',id:ctx.id} : {}),
+      load:ctx => api('/api/member/rendezvous/edge', ctx.kind === 'introduction' ? { kind:'introduction', id:ctx.id } : ctx.kind === 'match' ? {kind:'match',id:ctx.id} : {}),
       onError:fout => meld(fout.message || 'De bediening kon niet worden bijgewerkt.'),
       onAction:async ({ action, context, projection }) => {
         if (context.kind === 'root') {
@@ -181,7 +181,7 @@
         if (action.id === 'safety') { openSafety(context.id, context.label || 'Dit lid'); return; }
         if (action.id === 'conversation'||action.id === 'voice'||action.id === 'video') { const attr=context.kind==='match'?'data-connection-match':'data-connection-introduction';const card=document.querySelector('['+attr+'="'+CSS.escape(context.id)+'"]');const target=card&&card.querySelector(action.id==='conversation'?'[data-cc-text]':'[data-cc-call="'+action.id+'"]');if(target){if(action.id==='conversation')target.focus();else target.click();}return; }
         if (action.id !== 'not_now' && action.id !== 'open_to_introduction') return;
-        const r = await api('introductie/antwoord', { id:context.id,
+        const r = await api('/api/member/rendezvous/introductie/antwoord', { id:context.id,
           ja:action.intent === 'accept', stateRevision:projection.stateRevision });
         meld(r.geopend ? 'De introductie is open.' : 'Genoteerd.'); await laad();
       }});
@@ -239,7 +239,7 @@
   function mediaStudio(media){const labels={DISCOVERY:'Bij introductions',AFTER_MATCH:'Pas na wederzijds contact',PRIVATE:'Alleen voor mij'};return '<section class="rv-media"><div class="dating-section-head"><div><span class="dating-eyebrow">Profile presence</span><h2>Uw portret.</h2></div><p>Maximaal zes beelden. Het eerste beeld is het hoofdbeeld; publicatie en zichtbaarheid blijven afzonderlijke keuzes.</p></div><div class="dating-actions"><select class="dating-input" id="rvPhotoVisibility">'+Object.entries(labels).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+'</select><button class="dating-button" id="rvPhotoChoose" type="button">Foto toevoegen</button><input id="rvPhotoInput" type="file" accept="image/jpeg,image/png" hidden></div><div class="dating-list">'+(media||[]).map((m,i)=>'<article class="dating-person"><div class="dating-person-main"><img class="rv-photo" src="'+esc(m.src)+'" alt="'+esc(m.alt||'Eigen portret')+'"><div class="dating-person-mark">'+(i===0?'Hoofdbeeld · ':'')+esc(labels[m.visibility])+'</div></div><div class="dating-person-actions"><button class="dating-button" data-rv-photo-move="'+esc(m.id)+'" data-direction="-1"'+(i===0?' disabled':'')+'>Eerder</button><button class="dating-button" data-rv-photo-move="'+esc(m.id)+'" data-direction="1"'+(i===(media||[]).length-1?' disabled':'')+'>Later</button><button class="dating-button" data-rv-photo-publish="'+esc(m.id)+'" data-visibility="'+esc(m.visibility)+'">'+(m.publicationState==='PUBLISHED'?'Intrekken':'Publiceren')+'</button><button class="dating-button quiet" data-rv-photo-remove="'+esc(m.id)+'">Verwijderen</button></div></article>').join('')+'</div></section>';}
 
   async function profiel() {
-    const data = await api('profiel'); /* Zonder profiel geen leeg formulier dat doet alsof er niets was ingevuld (LIEGRONDE.json). */ if (!(data && data.profiel && typeof data.profiel === 'object')) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); const p = data.profiel; locaties = [...(p.locaties || [])];
+    const data = await api('/api/member/rendezvous/profiel'); /* Zonder profiel geen leeg formulier dat doet alsof er niets was ingevuld (LIEGRONDE.json). */ if (!(data && data.profiel && typeof data.profiel === 'object')) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); const p = data.profiel; locaties = [...(p.locaties || [])];
     const buiten = (p.wensen || []).filter(x => !voorkeuren.some(v => v.toLowerCase() === String(x).toLowerCase()));
     const checks = voorkeuren.map(v => '<label><input type="checkbox" data-pref="'+esc(v)+'"'+((p.wensen||[]).some(x=>String(x).toLowerCase()===v.toLowerCase())?' checked':'')+'><span>'+esc(v)+'</span></label>').join('');
     let werk = mediaStudio(p.media||[])+'<div class="dating-visibility"><div><strong>Profielzichtbaarheid</strong><small>U verschijnt uitsluitend op codenaam in de besloten Signature-selectie.</small></div><label class="dating-switch"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+' aria-label="Profiel zichtbaar"><span></span></label></div>'+
@@ -270,14 +270,14 @@
     const addLoc = () => { const v=$('#locInput').value.trim(); if(!v)return; if(!locaties.some(x=>x.toLowerCase()===v.toLowerCase())&&locaties.length<12)locaties.push(v); $('#locInput').value='';renderLocs(); };
     renderLocs(); $('#addLoc').onclick=addLoc; $('#locInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addLoc();}};
     const photoInput=$('#rvPhotoInput');$('#rvPhotoChoose').onclick=()=>photoInput.click();photoInput.onchange=async()=>{const f=photoInput.files&&photoInput.files[0];if(!f)return;try{await photoUpload(f,$('#rvPhotoVisibility').value);meld('Uw foto is veilig verwerkt en staat als concept klaar.');laad();}catch(e){meld(e.message);}};
-    document.querySelectorAll('[data-rv-photo-publish]').forEach(b=>b.onclick=async()=>{try{await api('profile-photo/publish',{id:b.dataset.rvPhotoPublish,visibility:b.dataset.visibility,publish:b.textContent!=='Intrekken'});laad();}catch(e){meld(e.message);}});
-    document.querySelectorAll('[data-rv-photo-remove]').forEach(b=>b.onclick=async()=>{try{await api('profile-photo/remove',{id:b.dataset.rvPhotoRemove});laad();}catch(e){meld(e.message);}});
-    document.querySelectorAll('[data-rv-photo-move]').forEach(b=>b.onclick=async()=>{const ids=(p.media||[]).map(x=>x.id),i=ids.indexOf(b.dataset.rvPhotoMove),j=i+Number(b.dataset.direction);if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];try{await api('profile-photo/order',{ids});meld(j===0?'Hoofdbeeld bijgewerkt.':'Fotovolgorde bijgewerkt.');laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-rv-photo-publish]').forEach(b=>b.onclick=async()=>{try{await api('/api/member/rendezvous/profile-photo/publish',{id:b.dataset.rvPhotoPublish,visibility:b.dataset.visibility,publish:b.textContent!=='Intrekken'});laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-rv-photo-remove]').forEach(b=>b.onclick=async()=>{try{await api('/api/member/rendezvous/profile-photo/remove',{id:b.dataset.rvPhotoRemove});laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-rv-photo-move]').forEach(b=>b.onclick=async()=>{const ids=(p.media||[]).map(x=>x.id),i=ids.indexOf(b.dataset.rvPhotoMove),j=i+Number(b.dataset.direction);if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];try{await api('/api/member/rendezvous/profile-photo/order',{ids});meld(j===0?'Hoofdbeeld bijgewerkt.':'Fotovolgorde bijgewerkt.');laad();}catch(e){meld(e.message);}});
     $('#bewaar').onclick = async () => {
       const wensen = [...document.querySelectorAll('[data-pref]:checked')].map(x=>x.dataset.pref).concat($('#extraWensen').value.split(',').map(x=>x.trim()).filter(Boolean));
-      try { await api('profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen,locaties}); $('#saveStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); meld('Uw profiel is veilig bewaard.'); } catch(e){ meld(e.message); }
+      try { await api('/api/member/rendezvous/profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen,locaties}); $('#saveStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); meld('Uw profiel is veilig bewaard.'); } catch(e){ meld(e.message); }
     };
-    $('#aan').onchange = async () => { try { await api('profiel/zet',{aan:$('#aan').checked}); meld($('#aan').checked?'Uw profiel is nu zichtbaar op codenaam.':'Uw profiel is verborgen.'); } catch(e){ $('#aan').checked=!$('#aan').checked; meld(e.message); } };
+    $('#aan').onchange = async () => { try { await api('/api/member/rendezvous/profiel/zet',{aan:$('#aan').checked}); meld($('#aan').checked?'Uw profiel is nu zichtbaar op codenaam.':'Uw profiel is verborgen.'); } catch(e){ $('#aan').checked=!$('#aan').checked; meld(e.message); } };
     /* De handlers van de Presence-kant, ongewijzigd uit de ONTMOETEN.md-ronde:
        bewaren vervangt de lijst (zie kern/rendezvous-aanwezig.js), wissen is
        één handeling over alles wat u over uw verblijfplaats opgaf. */
@@ -287,20 +287,20 @@
       const aanwezig = Array.from(document.querySelectorAll('#periodes .per')).map(r => ({
         stad: r.querySelector('[data-stad]').value, van: r.querySelector('[data-van]').value, tot: r.querySelector('[data-tot]').value
       })).filter(v => v.stad && v.van && v.tot);
-      try { await api('profiel/zet', { thuis: $('#thuis').value, aanwezig }); meld('Bewaard.'); laad(); } catch (e) { meld(e.message); }
+      try { await api('/api/member/rendezvous/profiel/zet', { thuis: $('#thuis').value, aanwezig }); meld('Bewaard.'); laad(); } catch (e) { meld(e.message); }
     };
     $('#wis').onclick = async () => {
       if (!confirm('Alles wissen wat u over uw verblijfplaats hebt opgegeven? Uw profiel en matches blijven.')) return;
-      try { await api('aanwezig/wis'); meld('Gewist.'); laad(); } catch (e) { meld(e.message); }
+      try { await api('/api/member/rendezvous/aanwezig/wis'); meld('Gewist.'); laad(); } catch (e) { meld(e.message); }
     };
     $('#bewaarWanneer').onclick = async () => {
       const beschikbaar = Array.from(document.querySelectorAll('[data-slot]')).filter(c => c.checked).map(c => c.dataset.slot);
-      try { await api('profiel/zet', { beschikbaar }); meld('Bewaard.'); } catch (e) { meld(e.message); }
+      try { await api('/api/member/rendezvous/profiel/zet', { beschikbaar }); meld('Bewaard.'); } catch (e) { meld(e.message); }
     };
   }
 
   async function ontdek() {
-    const [data,tableData,introData,circleData] = await Promise.all([api('kandidaten'),api('tafels'),api('introducties'),api('circles')]);
+    const [data,tableData,introData,circleData] = await Promise.all([api('/api/member/rendezvous/kandidaten'),api('/api/member/rendezvous/tafels'),api('/api/member/rendezvous/introducties'),api('/api/member/rendezvous/circles')]);
     uitvoer = {naam:'kandidaten',kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],rijen:(data.kandidaten||[]).map(k=>[k.codenaam||'',k.status||'',k.zoekt||'',(k.locaties||[]).join(', '),(k.gedeeldeLocaties||[]).join(', '),(k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')])};
     let lijst = '';
     if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Open uw profiel om zichtbaar te worden.<div class="dating-actions strak"><button class="dating-button" type="button" id="rvOpenProfiel">Profiel openen</button></div></div>';
@@ -327,8 +327,8 @@
     ].filter(Boolean).join('');
     const werk='<div class="dating-section-head"><div><span class="dating-eyebrow">'+new Date().toLocaleDateString(document.documentElement.lang||undefined,{weekday:'long',day:'numeric',month:'long'})+'</span><h2>Today.</h2></div><p>Een rustige selectie van introductions, aanwezigheid en Society-context die vandaag werkelijk bestaat.</p></div><p class="rv-today-note">Rendez-vous toont liever één relevante introduction dan twintig kaarten. Een eerste ja blijft geheim; alleen wederkerigheid opent een nieuwe context.</p>'+(context?'<div class="rv-today-grid">'+context+'</div>':'')+lijst+'<div class="dating-actions"><button class="dating-button quiet" id="rvEditProfile" type="button">Profiel en Presence beheren</button>'+(context?'<button class="dating-button" id="rvOpenSociety" type="button">Open Society</button>':'')+'</div>';
     $('#main').innerHTML=shell(werk,trust('Rust boven bereik','Een like wordt pas een verbinding wanneer de ander u ook kiest. Afwijzen blijft stil en privé.'),'Uw Signature-selectie',data.kandidaten.length+' introducties');
-    document.querySelectorAll('[data-like]').forEach(b=>b.onclick=async()=>{try{const r=await api('like',{id:b.dataset.like});meld(r.match?'Het is wederzijds. Uw match staat klaar.':'Uw interesse is discreet genoteerd.');laad();}catch(e){meld(e.message);}});
-    document.querySelectorAll('[data-pass]').forEach(b=>b.onclick=async()=>{try{await api('pas',{id:b.dataset.pass});laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-like]').forEach(b=>b.onclick=async()=>{try{const r=await api('/api/member/rendezvous/like',{id:b.dataset.like});meld(r.match?'Het is wederzijds. Uw match staat klaar.':'Uw interesse is discreet genoteerd.');laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-pass]').forEach(b=>b.onclick=async()=>{try{await api('/api/member/rendezvous/pas',{id:b.dataset.pass});laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-matches]').forEach(b=>b.onclick=()=>{tab='matches';laad();});
     document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe,b.dataset.name));
     const profielKnop=$('#rvOpenProfiel');if(profielKnop)profielKnop.onclick=()=>zetTab('profiel');
@@ -338,7 +338,7 @@
 
   async function matches() {
     communicationClients.forEach(c=>c.unmount());communicationClients=[];
-    const data=await api('matches');
+    const data=await api('/api/member/rendezvous/matches');
     uitvoer={naam:'matches',kolommen:['codenaam','gedeelde locaties','tegelijk ergens','voorstel','sinds'],rijen:(data.matches||[]).map(m=>[m.codenaam||'',(m.gedeeldeLocaties||[]).join(', '),(m.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', '),m.voorstel||'',String(m.sinds||'').slice(0,10)])};
     const lijst=!data.matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Wanneer jullie elkaar allebei kiezen, verschijnt de verbinding hier. Tot die tijd blijft elke interesse privé.</p></div>':'<div class="dating-list">'+data.matches.map(m=>'<article class="dating-person" data-connection-match="'+esc(m.id)+'" data-connection-name="'+esc(m.codenaam)+'">'+(m.media&&m.media[0]?'<img class="rv-photo" src="'+esc(m.media[0].src)+'" alt="'+esc(m.media[0].alt)+'">':'')+'<div class="dating-person-main"><div class="dating-person-mark">Open introduction</div><h3>'+esc(m.codenaam)+'</h3><div class="dating-meta">'+(m.gedeeldeLocaties.length?'Gedeelde plekken · '+m.gedeeldeLocaties.map(esc).join(', '):'Nog geen gedeelde plek')+'</div>'+
       samenRegel(m.samen)+  /* waar u tegelijk bent gaat voor op waar u allebei weleens komt */
@@ -365,23 +365,23 @@
     }
     async function toonArrange(id, extra) {
       const doel = $('#arr-'+CSS.escape(id)); doel.innerHTML = '<div class="dating-meta">Rahul stelt samen…</div>';
-      try { const r = await api('arrange', Object.assign({ id }, extra || {})); doel.innerHTML = arrangeHtml(id, r); koppelArrange(); }
+      try { const r = await api('/api/member/rendezvous/arrange', Object.assign({ id }, extra || {})); doel.innerHTML = arrangeHtml(id, r); koppelArrange(); }
       catch (e) { doel.innerHTML = '<div class="dating-meta">'+esc(e.message)+'</div>'; }
     }
     function koppelArrange() {
       document.querySelectorAll('[data-setting]').forEach(b => b.onclick = () => toonArrange(b.dataset.setting, { setting: b.dataset.s }));
       document.querySelectorAll('[data-akkoord]').forEach(b => b.onclick = async () => {
-        try { await api('akkoord', { id: b.dataset.akkoord, ja: b.dataset.ja === '1' }); toonArrange(b.dataset.akkoord); }
+        try { await api('/api/member/rendezvous/akkoord', { id: b.dataset.akkoord, ja: b.dataset.ja === '1' }); toonArrange(b.dataset.akkoord); }
         catch (e) { meld(e.message); } });
     }
     document.querySelectorAll('[data-arrange]').forEach(b => b.onclick = () => toonArrange(b.dataset.arrange));
     /* U zet alleen uw EIGEN helft. Pas als de ander hetzelfde doet, bestaat
        "samen" -- zie de kop van kern/rendezvous-samen.js. */
     document.querySelectorAll('[data-samen]').forEach(b => b.onclick = async () => {
-      try { const r = await api('samen/zet', { met: b.dataset.samen });
+      try { const r = await api('/api/member/rendezvous/samen/zet', { met: b.dataset.samen });
         meld(r.samen ? 'U bent allebei samen. De introducties stoppen.' : 'Genoteerd. Zodra de ander hetzelfde zegt, stoppen de introducties.');
       } catch (e) { meld(e.message); } });
-    document.querySelectorAll('[data-date]').forEach(b=>b.onclick=async()=>{const box=$('#date-'+CSS.escape(b.dataset.date));box.hidden=false;box.textContent='Rahul bereidt een discreet voorstel voor…';try{const r=await api('date',{id:b.dataset.date});box.textContent=r.antwoord;}catch(e){box.textContent=e.message;}});
+    document.querySelectorAll('[data-date]').forEach(b=>b.onclick=async()=>{const box=$('#date-'+CSS.escape(b.dataset.date));box.hidden=false;box.textContent='Rahul bereidt een discreet voorstel voor…';try{const r=await api('/api/member/rendezvous/date',{id:b.dataset.date});box.textContent=r.antwoord;}catch(e){box.textContent=e.message;}});
     document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe,b.dataset.name));
     document.querySelectorAll('[data-rv-communication]').forEach(el=>{const c=RTGConnectionCommunication.create({product:'rendezvous',token,onError:e=>meld(e.message),onNotice:meld});communicationClients.push(c);c.mount(el,el.dataset.rvCommunication);});
     document.querySelectorAll('[data-connection-match]').forEach(card=>{const open=()=>connectionEdge&&connectionEdge.openLayer({kind:'match',id:card.dataset.connectionMatch,label:card.dataset.connectionName});card.addEventListener('focusin',open);card.addEventListener('pointerdown',open,{passive:true});});
@@ -392,7 +392,7 @@
      Together. Wat hier NIET staat is net zo belangrijk als wat er wel staat:
      geen gastenlijst bij een tafel, en geen enkel spoor van wie er al ja zei. */
   async function kring() {
-    const [t, i, sm, circleData] = await Promise.all([api('tafels'), api('introducties'), api('samen'), api('circles')]);
+    const [t, i, sm, circleData] = await Promise.all([api('/api/member/rendezvous/tafels'), api('/api/member/rendezvous/introducties'), api('/api/member/rendezvous/samen'), api('/api/member/rendezvous/circles')]);
     uitvoer = { naam:'kring', kolommen:['soort','wat','wanneer','status'],
       rijen:(t.tafels||[]).map(x=>['tafel',x.naam,(x.datum||'')+' '+(x.tijd||''),x.mijnStatus])
         .concat((i.introducties||[]).map(x=>['introductie',x.codenaam,String(x.at||'').slice(0,10),x.geopend?'open':'in behandeling'])) };
@@ -432,24 +432,24 @@
 
     $('#main').innerHTML = shell(werk, trust('De kring is besloten','Een tafel toont nooit de gastenlijst en een introductie verklapt nooit wie er al ja zei. Alles blijft op codenaam.'), 'Uw kring', sm.samen ? 'Samen' : 'Open voor introducties');
     document.querySelectorAll('[data-tafel]').forEach(b => b.onclick = async () => {
-      try { await api('tafel/antwoord', { id: b.dataset.tafel, ja: b.dataset.ja === '1' }); laad(); } catch (e) { meld(e.message); } });
-    document.querySelectorAll('[data-circle]').forEach(b=>b.onclick=async()=>{try{await api('circle/rsvp',{circleId:b.dataset.circle,gatheringId:b.dataset.gathering,yes:b.dataset.yes==='1'});laad();}catch(e){meld(e.message);}});
+      try { await api('/api/member/rendezvous/tafel/antwoord', { id: b.dataset.tafel, ja: b.dataset.ja === '1' }); laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-circle]').forEach(b=>b.onclick=async()=>{try{await api('/api/member/rendezvous/circle/rsvp',{circleId:b.dataset.circle,gatheringId:b.dataset.gathering,yes:b.dataset.yes==='1'});laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-intro]').forEach(b => b.onclick = async () => {
-      try { const r = await api('introductie/antwoord', { id: b.dataset.intro, ja: b.dataset.ja === '1' });
+      try { const r = await api('/api/member/rendezvous/introductie/antwoord', { id: b.dataset.intro, ja: b.dataset.ja === '1' });
         meld(r.geopend ? 'De introductie is open.' : 'Genoteerd.'); laad(); } catch (e) { meld(e.message); } });
     document.querySelectorAll('[data-rv-intro-communication]').forEach(el=>{const c=RTGConnectionCommunication.create({product:'rendezvous',token,onError:e=>meld(e.message),onNotice:meld});communicationClients.push(c);c.mount(el,el.dataset.rvIntroCommunication);});
     $('#pinOk').onclick = async () => {
-      try { const r = await api('encounter', { pin: $('#pin').value });
+      try { const r = await api('/api/member/rendezvous/encounter', { pin: $('#pin').value });
         meld(r.wacht ? 'Genoteerd. Zodra de ander uw pin ook invoert, krijgt u allebei de vraag.' : 'Genoteerd. U krijgt allebei de vraag.');
         $('#pin').value = ''; laad(); } catch (e) { meld(e.message); } };
     const los = $('#losser'); if (los) los.onclick = async () => {
-      try { await api('samen/zet', { ja: false }); meld('Bijgewerkt.'); laad(); } catch (e) { meld(e.message); } };
+      try { await api('/api/member/rendezvous/samen/zet', { ja: false }); meld('Bijgewerkt.'); laad(); } catch (e) { meld(e.message); } };
     bindIntroductionContexts();
   }
 
-  async function concierge(){const data=await api('concierge');const requests=data.requests||[];const history=requests.length?'<div class="dating-list">'+requests.map(r=>'<article class="rv-service"><div><span class="rv-state">'+esc(r.state)+'</span><strong>'+esc(r.subject)+'</strong><p>'+esc(r.request)+'</p>'+(r.proposal?'<p><b>Voorstel</b><br>'+esc(r.proposal)+'</p>':'')+(r.confirmation?'<p><b>Bevestigd</b><br>'+esc(r.confirmation)+'</p>':'')+'</div>'+(r.state==='PROPOSED'?'<div class="dating-actions"><button class="dating-button primary" data-concierge-approve="'+esc(r.id)+'" data-yes="1">Goedkeuren</button><button class="dating-button quiet" data-concierge-approve="'+esc(r.id)+'" data-yes="0">Aanpassen</button></div>':'')+'</article>').join('')+'</div>':'<p class="dating-copy">U heeft nog geen verzoek openstaan.</p>';
+  async function concierge(){const data=await api('/api/member/rendezvous/concierge');const requests=data.requests||[];const history=requests.length?'<div class="dating-list">'+requests.map(r=>'<article class="rv-service"><div><span class="rv-state">'+esc(r.state)+'</span><strong>'+esc(r.subject)+'</strong><p>'+esc(r.request)+'</p>'+(r.proposal?'<p><b>Voorstel</b><br>'+esc(r.proposal)+'</p>':'')+(r.confirmation?'<p><b>Bevestigd</b><br>'+esc(r.confirmation)+'</p>':'')+'</div>'+(r.state==='PROPOSED'?'<div class="dating-actions"><button class="dating-button primary" data-concierge-approve="'+esc(r.id)+'" data-yes="1">Goedkeuren</button><button class="dating-button quiet" data-concierge-approve="'+esc(r.id)+'" data-yes="0">Aanpassen</button></div>':'')+'</article>').join('')+'</div>':'<p class="dating-copy">U heeft nog geen verzoek openstaan.</p>';
     const work='<div class="dating-section-head"><div><span class="dating-eyebrow">De Rechterhand</span><h2>Concierge.</h2></div><p>Vertel wat u nodig heeft. Rahul routeert; een mens behandelt; pas na uw akkoord kan iets bevestigd worden.</p></div><div class="dating-form-grid"><div class="dating-field"><label for="conciergeSubject">Onderwerp</label><input class="dating-input" id="conciergeSubject" maxlength="80" placeholder="Een diner, kaartjes of een bijzonder moment"></div><div class="dating-field"><label for="conciergeCity">Stad</label><input class="dating-input" id="conciergeCity" maxlength="60"></div><div class="dating-field wide"><label for="conciergeRequest">Uw verzoek</label><textarea class="dating-input" id="conciergeRequest" maxlength="800"></textarea></div><div class="dating-field"><label for="conciergeWindow">Wanneer</label><input class="dating-input" id="conciergeWindow" maxlength="120" placeholder="Bijvoorbeeld vrijdagavond"></div></div><div class="dating-actions"><button class="dating-button primary" id="conciergeSend" type="button">Verzoek indienen</button></div><div class="dating-section-head dating-ruim"><div><span class="dating-eyebrow">Service states</span><h2>Uw verzoeken.</h2></div><p>Geen magische bevestigingen: u ziet precies of iets is ontvangen, in behandeling, voorgesteld of werkelijk bevestigd.</p></div>'+history;
-    $('#main').innerHTML=shell(work,'','Concierge','Menselijke fulfilment');$('#conciergeSend').onclick=async()=>{try{await api('concierge/request',{subject:$('#conciergeSubject').value,city:$('#conciergeCity').value,window:$('#conciergeWindow').value,request:$('#conciergeRequest').value,idempotencyKey:RTGId('rv-concierge')});meld('Uw verzoek is ontvangen.');concierge();}catch(e){meld(e.message);}};document.querySelectorAll('[data-concierge-approve]').forEach(b=>b.onclick=async()=>{try{await api('concierge/approve',{id:b.dataset.conciergeApprove,approve:b.dataset.yes==='1'});concierge();}catch(e){meld(e.message);}});}
+    $('#main').innerHTML=shell(work,'','Concierge','Menselijke fulfilment');$('#conciergeSend').onclick=async()=>{try{await api('/api/member/rendezvous/concierge/request',{subject:$('#conciergeSubject').value,city:$('#conciergeCity').value,window:$('#conciergeWindow').value,request:$('#conciergeRequest').value,idempotencyKey:RTGId('rv-concierge')});meld('Uw verzoek is ontvangen.');concierge();}catch(e){meld(e.message);}};document.querySelectorAll('[data-concierge-approve]').forEach(b=>b.onclick=async()=>{try{await api('/api/member/rendezvous/concierge/approve',{id:b.dataset.conciergeApprove,approve:b.dataset.yes==='1'});concierge();}catch(e){meld(e.message);}});}
 
   async function laad() {
     communicationClients.forEach(c=>c.unmount());communicationClients=[];

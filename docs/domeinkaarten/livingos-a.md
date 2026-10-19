@@ -412,3 +412,490 @@ Dit contract vervangt de acht bewijzen nooit. Elke regel wordt een stap in een v
 - Betaling geweigerd: de werkbon heet "niet betaald" en de melding blijft open.
 - Kluis uit: het bewijs is niet bewaard, maar de melding is wel opgelost.
 - Vakwerk uit: de melding blijft "gemeld" met "status vakman niet te zien".
+
+---
+
+## Werkwijze voor de overige apps
+
+Elke app volgt de vorm van Wonen, compacter:
+- a. inventaris (gebouwd en bewezen);
+- b. markt (ook het duurste pakket);
+- c. domein;
+- d. catalogus;
+- e. RTG-exclusief;
+- f. bouwstenen;
+- g. prioritering met uitkomst A en B;
+- h. eindcontract.
+
+Per app staat er ook een gebruikersketen met storingen. Elk acceptatiecriterium wordt een stap in de voltooiproef van die app. De bronnen zijn geraadpleegd op 19 oktober 2026; "na te gaan" betekent dat de bron secundair is.
+
+**Eindcontract (h):** dezelfde acht dimensies als bij Wonen 1i. Het vervangt nooit de acht bewijzen van APPWERKT.json (bereikbaar, bedienbaar, menselijk, voltooibaar, waarheidsgetrouw, persistent, bevoegd, herstelbaar). Per app staan alleen de dimensies die iets eigens vragen.
+
+---
+
+## 2. RTG Veilig (`link:veilig`, eigenaar `veilig.noodcontacten`)
+
+**Doel.** Wie het lid zelf koos, krijgt bericht als het misgaat, met alleen wat het lid per persoon toestond. Een lege kring wordt eerlijk geweigerd.
+
+### a. Inventaris
+- **Scherm:** veilig.html met vijf standen: vandaag, wacht, codewoord, vitaal en rust. Thuiswacht, thuisrust, vitaal en codewoord zijn omleidingen.
+- **Kern:** kern/veiligheid/:
+  - kring: hooguit 8 contacten en 4 e-mailadressen; een contact moet een actieve Salon-verbinding zijn en wordt bij elk alarm opnieuw getoetst;
+  - escalatie: eerst een por aan het lid zelf met genadetijd (10 minuten), dan de kring;
+  - het codewoord slaat de por over en blijft stil;
+  - een dubbeltik binnen 5 seconden telt als één alarm;
+  - alarmplekken worden na 90 dagen gewist;
+  - de grenszin: "geen alarmcentrale, niemand wordt gebeld, niets zonder internet".
+- **Bewezen:** voltooiproef `veilig.js`. Niet gelopen: push op het toestel, de thuiswacht, het codewoord en rust.
+- **Gaten:**
+  - `/api/veiligheid/alarm/afsluiten` wordt door geen scherm aangeroepen;
+  - een handmatige alarmknop (`soort:'knop'` bestaat in de kern) staat niet op het scherm;
+  - de alarmen die het lid als kringlid ontvangt (`voorMij`) worden niet getoond;
+  - `safety.incident.started` wordt gelezen (workspace-orchestrator.js:44) maar nergens uitgegeven.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Life360 Platinum | SOS met meldkamer 24/7, crashdetectie, pechhulp, identiteitsbescherming | $199,99 per jaar in de VS ([Life360 SOS](https://intl.life360.com/blog/help-is-just-a-tap-away-introducing-sos-with-24-7-emergency-dispatch); prijs na te gaan) |
+| Noonlight | stil alarm naar een meldkamer, watch en widget | prijs niet openbaar ([help](https://help.noonlight.com/en/articles/3270559-how-much-does-noonlight-cost)) |
+| bSafe Premium | timer, "Follow Me" met automatisch alarm, video bij SOS | oude prijs, na te gaan |
+
+### c. Domein
+- **Alarmcentrales** zijn gecertificeerd volgens EN 50518 (Kiwa, CCV) ([Kiwa](https://www.kiwa.com/nl-be/nl/diensten/certificering/en-50518-monitoring-and-alarm-receiving-centre/)). RTG is dat niet en zegt het.
+- **HartslagNu** wordt alleen door de 112-meldkamer gealarmeerd, bij een hartstilstand ([HartslagNu](https://hartslagnu.nl/wp-content/uploads/2023/07/Presentatie_Over-HartslagNu-2023.pdf)). Burgers zetten zichzelf daar niet in gang.
+- **112.** De plicht geldt voor telecomaanbieders, niet voor spraak in apps ([ACM](https://www.acm.nl/nl/publicaties/acm-stelt-beleidsregel-vast-voor-mobiel-bellen-naar-alarmnummer-112)). Veilig mag dus nooit lijken op een route naar 112.
+- **Locatie** is een persoonsgegeven (AVG art. 6). Toestemming per contact bestaat al.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| V1 | Alarmknop op het scherm | L1 | half (`soort:'knop'`) | De knop vraagt één bevestiging, slaat de por over en stuurt de kring een bericht met plek waar dat is toegestaan. Een dubbeltik geeft één alarm. Met een lege kring wordt hij geweigerd met de reden. | K | **A nu** |
+| V2 | Alarm afsluiten op het scherm | L5 | half (route bestaat) | Afsluiten meldt elke ontvanger dat het voorbij is. Een tweede keer afsluiten verandert niets. | K | **A nu** |
+| V3 | "Voor mij": alarmen die ik als kringlid ontvang | L2/L6 | ontbreekt | B ziet het alarm van A met de toegestane plek, en drukt "ik kom" of "ik bel". A ziet dat. Na afsluiten verdwijnt de plek bij B. | M | **A nu** |
+| V4 | 112-wegwijzer | L1 | ontbreekt | Een knop opent de telefoonkiezer met 112 (`tel:112`). RTG belt niet en zegt dat ook. Bij een alarm staat de 112-knop bovenaan. | K | **A nu** |
+| V5 | Incident uitgeven aan de werkruimte | L6 | half | Een alarm geeft `safety.incident.started` uit, zonder inhoud, alleen soort en id. Afsluiten geeft het einde. | K | **A nu** |
+| V6 | Incidentdossier na afloop | L5 | ontbreekt | Een tijdlijn van wie wat zag en wanneer, alleen voor het lid. Wordt gewist na 90 dagen, gelijk met de plekken. | M | A later |
+| V7 | Veiligheidskaart van het huis (Wonen W18) | L6 | ontbreekt | Vanuit Veilig is de kaart van Wonen te zien als verwijzing. Is Wonen uit, dan staat er "kaart nu niet te zien". | K | A later |
+| V8 | Vertrouwde contacten uit Instellingen | L6 | ontbreekt | De kring kiest uit de relatie-objecten van Instellingen (naad met Toegang). Er is geen tweede lijst. | M | A later |
+| V9 | Doorschakelen naar een gecertificeerde meldkamer (EN 50518) | L2 | ontbreekt | — | G | B, extern contract |
+
+### e. RTG-exclusief
+- De kring bestaat uit echte Salon-verbindingen en wordt bij elk alarm opnieuw getoetst.
+- Thuisrust houdt meldingen tegen, maar een alarm gaat door.
+- Een reis-moment, de thuiswacht en de veiligheidskaart van Wonen raken één kring.
+
+### f. Bouwstenen
+- kern/veiligheid (alarm, kring, wacht);
+- meldAan en push;
+- mail.send;
+- shared/interface/modules/safety.js;
+- Wonen W18;
+- Instellingen (relaties, Toegang).
+
+### g. Prioritering
+- **A nu:** V1, V2, V4, V5 (K) en V3 (M).
+- **A later:** V6, V7, V8.
+- **B:** V9. Die vraagt een contract met een meldkamer en een besluit van de eigenaar over de verhouding tot "RTG is geen alarmcentrale".
+
+### Keten "ik voel me niet veilig onderweg"
+1. Het lid start de wacht.
+2. Het mist de check-in.
+3. Het krijgt een por en genadetijd.
+4. De kring krijgt een alarm met plek.
+5. B drukt "ik kom" (V3).
+6. A sluit af (V2).
+7. Iedereen hoort dat het voorbij is.
+
+**Storingen:**
+- Mail uit: push gaat wel, en het scherm zegt "e-mail niet verstuurd".
+- Een kringlid is geen verbinding meer: hij wordt overgeslagen en het lid ziet wie.
+- Geen internet: de grenszin met de 112-knop (V4).
+
+### h. Eindcontract, eigen eisen
+- **Los functioneren:** zonder Salon-verbindingen weigert de kring met de reden.
+- **Samenwerking:** een kringlid ziet nooit meer dan per contact is toegestaan (plek aan of uit). Dat wordt getoetst met een tweede kringlid zonder plekrecht.
+- **Bewezen betrouwbaarheid:** dubbeltik, crash tijdens een lopende wacht (de wacht loopt door na een herstart), en het wissen na 90 dagen.
+
+---
+
+## 3. Berichten (`link:berichten`, eigenaar `comm.berichten`)
+
+**Doel.** Berichten sturen en ontvangen met de mensen dichtbij, met een samenvatting die het gesprek kort maakt zonder iets te verzinnen.
+
+### a. Inventaris
+- **Scherm:** comm.html, met inbox, gesprek, reacties, wijzigen, wissen, vlaggen, typ-indicator, por, zoeken, groepen, @Rahul en bel- en videoknoppen.
+- **Routes:** `/api/comm/*` (comm.js, comm-stand.js). Starten met `/begin` vraagt een vriendschap met elke deelnemer.
+- **AI** (kern/berichten/ai.js):
+  - samenvatten is lokaal en extractief, zonder model;
+  - afspraken herkent de app met lokale patronen;
+  - een concept loopt via de lokaal-eerst-keten, en zonder model geeft dat 503;
+  - de regel: AI stelt op, de mens verstuurt.
+- **Bewezen:** voltooiproef `berichten.js` (sturen, herhaalsleutel, herstel; een fout is gerepareerd met `test/comm-herhaalsleutel.test.js`). Niet gelopen: bellen, de por, @Rahul, zoeken en het realtime seintje.
+- **Gat:** afspraken staan alleen als tekst op het scherm (comm.html:683-686), zonder agendaknop, terwijl ai.js r.98-100 die belooft.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| WhatsApp | AI-samenvatting via "Private Processing", standaard uit | gratis ([Meta engineering](https://engineering.fb.com/2025/04/29/security/building-private-processing-for-ai-tools-on-whatsapp/)) |
+| Signal | end-to-end-versleuteling, zelfwissende berichten | gratis |
+| Microsoft Teams Premium | intelligente samenvatting met notities, taken en hoofdstukken | $10 per gebruiker per maand als add-on (na te gaan) |
+
+### c. Domein
+- **DSA art. 16:** een meldmechanisme met motivering, de beslissing terug naar de melder en bezwaarmogelijkheid ([tekst](https://www.springlex.eu/en/packages/dsa/dsa-regulation/article-16/)).
+- **Telecommunicatiewet art. 11.7a:** iets op het toestel opslaan of uitlezen mag alleen met toestemming.
+- **De praktijk:** de beste diensten hebben end-to-end-versleuteling, en AI-samenvatting staat er standaard uit.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| B1 | Herkende afspraak naar de Agenda | L6 | half | Een herkende afspraak heeft een knop "in agenda". Er ontstaat een afspraak met een verwijzing naar het gesprek. Is de Agenda uit, dan blijft de tekst en staat er "niet in agenda gezet". | K | **A nu** |
+| B2 | Een bericht melden in DSA-vorm | L2/L3 | half (melden bestaat bij vonk, niet bij comm) | Een melding vraagt een reden. Het kantoor beslist, en de melder hoort de beslissing en hoe hij bezwaar maakt. | M | **A nu** |
+| B3 | Herkomst van de samenvatting | L4 | half | Elke samenvattingszin verwijst naar het bericht waar hij uit komt, met het label "lokaal, extractief". Een zin zonder bron bestaat niet. | K | **A nu** |
+| B4 | Bijlage uit de kluis als verwijzing | L6 | ontbreekt | Een document uit `docs.bestanden` gaat als verwijzing mee. De ander opent het alleen als het gedeeld is. | M | A later |
+| B5 | Zelfwissende berichten per gesprek | L1 | ontbreekt | Een termijn per gesprek. Na afloop is het bericht uit de opslag; dat wordt getoetst buiten de server om. | M | A later |
+| B6 | End-to-end-versleuteling | L1 | ontbreekt | — | G | B, vraagt besluit: botst met samenvatten, melden en moderatie op de server |
+
+### e. RTG-exclusief
+Een afspraak uit een gesprek wordt een agendapunt, een gedeeld document blijft in de kluis, en bellen zit in hetzelfde gesprek. Er ontstaan nergens kopieën.
+
+### f. Bouwstenen
+- kern/comm en kern/berichten;
+- agenda (`/api/agenda/bewaar`);
+- bestanden-delen;
+- de bestaande meldroute van vonk (connection-communication) als vorm voor B2.
+
+### g. Prioritering
+- **A nu:** B1, B3 (K) en B2 (M).
+- **A later:** B4, B5.
+- **B:** B6.
+
+### Keten "we spreken af"
+1. Het bericht noemt "donderdag 19:00 bij Sal de Mar".
+2. De app herkent een afspraak.
+3. De afspraak komt in de Agenda.
+4. Er komt een herinnering.
+
+**Storingen:**
+- Agenda uit: de afspraak blijft als tekst, met een melding.
+- Model uit: samenvatten werkt lokaal; een concept geeft 503 met "schrijf zelf".
+- De ander heeft geblokkeerd: 403 met de reden.
+
+### h. Eindcontract, eigen eisen
+- **Domeinintelligentie:** geen samenvattingszin zonder bronbericht (B3).
+- **Samenwerking:** een niet-deelnemer leest, wijzigt of meldt niets (bestaat; houden).
+
+---
+
+## 4. Bellen (`os:bellen`, onder `kern.app`)
+
+**Doel.** Een verbonden lid bellen met spraak. Niemand anders hoort iets, en van het gesprek wordt niets bewaard.
+
+### a. Inventaris
+- **Signalering:** `/api/member/call`. Een doorgeefluik zonder opslag, met de signalen ring, accept, offer, answer, ice, hangup, decline en busy, via SSE.
+- **Bewezen:** voltooiproef `bellen.js` (6/6, 3/3, 3/3), en het media-deel voor video in videobellen-echt.e2e (LivingOS-B).
+- **Fout gevonden:**
+  - app-main-10.js:46 stuurt `kind:'tekst'` voor de meeleesbaan;
+  - de whitelist in routes/social/leden.js:158 kent `'tekst'` niet, dus de server antwoordt 400;
+  - de client slikt die fout (`.catch(()=>{})`);
+  - getypte meeleesregels komen bij een gewoon gesprek dus nooit aan.
+
+  Dit is een reparatie, geen nieuwe functie. Ik bouw hem na een akkoord van Centraal.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| FaceTime en WhatsApp | gratis spraak en video, versleuteld | gratis |
+| Zoom Workplace Business Plus | telefonie, hoge limieten | $22,49 per gebruiker per maand bij jaarbetaling (na te gaan) |
+| Teams Phone | telefonie met belplan | $10-34 per gebruiker per maand (na te gaan) |
+
+### c. Domein
+- **112** hoeft niet via app-spraak ([ACM](https://www.acm.nl/nl/publicaties/acm-stelt-beleidsregel-vast-voor-mobiel-bellen-naar-alarmnummer-112)). Het scherm moet dat zeggen.
+- **Opnemen:** een deelnemer mag opnemen, een buitenstaander niet afluisteren (Sr 139a/b; bron na te gaan). De AVG kan gelden.
+- **Toegankelijkheid:** de European Accessibility Act geldt sinds 28 juni 2025. Real-time text in noodcommunicatie volgt uiterlijk op 28 juni 2027 ([EENA](https://eena.org/news/european-accessibility-act-begins-applying-across-the-eu/)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Be1 | Meeleesregel komt aan (reparatie) | L1 | fout | Signaal `tekst` geeft 200 en de ander ontvangt de regel. Een fout wordt getoond, niet geslikt. | K | **A nu** |
+| Be2 | Gemiste oproep | L5/L6 | ontbreekt | Een oproep die niet beantwoord wordt, wordt een melding en een regel in het gesprek in Berichten, met wie en wanneer, zonder inhoud. | M | **A nu** |
+| Be3 | 112-zin in de kiezer | L1 | ontbreekt | De kiezer zegt "RTG-bellen is geen 112" en heeft een knop `tel:112`. | K | **A nu** |
+| Be4 | Gespreksgeschiedenis zonder inhoud | L1 | ontbreekt | Alleen wie, wanneer en hoe lang, alleen voor de twee deelnemers. Wissen kan per regel. | M | A later |
+| Be5 | TURN voor strenge netwerken | L1 | ontbreekt | — | M | A later, extern (relay) |
+| Be6 | Opnemen | — | — | — | — | niet doen: botst met "van het gesprek wordt niets bewaard" |
+
+### e. RTG-exclusief
+Bellen kan alleen tussen echte verbindingen, met de meeleesbaan en lokale ondertitels als toegankelijkheid, zonder dat er iets bewaard wordt.
+
+### f. Bouwstenen
+- `/api/member/call`;
+- de live-stroom;
+- meelezen.js en meeluister.js (lokaal model);
+- kern/comm voor Be2.
+
+### g. Prioritering
+- **A nu:** Be1, Be3 (K) en Be2 (M).
+- **A later:** Be4, Be5.
+
+### Keten "bellen vanuit een gesprek"
+1. Het lid belt vanuit Berichten.
+2. Het gaat over bij B.
+3. B mist de oproep.
+4. B krijgt een melding en een regel in het gesprek (Be2).
+5. B belt terug.
+
+**Storingen:**
+- B is niet live verbonden: A hoort "niet bereikbaar" na de wachttijd, en de oproep wordt gemist.
+- Blokkade: 403 met de reden.
+
+### h. Eindcontract, eigen eisen
+- **Betrouwbaarheid:** er blijft niets van een gesprek in de opslag (bestaat, persistente stap 3).
+- **Toegankelijkheid:** Be1 is getoetst (een meeleesregel komt aan).
+
+---
+
+## 5. Vandaag (`link:vandaag` → life.html, eigenaar `dag.overzicht`)
+
+**Doel.** In één dagoverzicht zien hoe het gaat: stemming, gewoonten, medicatie, metingen, noodkaart en toestellen. Het is nooit een diagnose.
+
+### a. Inventaris
+- **Scherm:** life.html met de routes `/api/life`, `/api/dag`, `/gewoonten`, `/metingen`, `/gemoed`, `/noodkaart`, `/toestellen` en `/medicatie`.
+- **Gemoed:** zes stemmingen. Als de grens aanslaat, komt er een escalatie zonder tip (gemoed.js:91).
+- **Noodkaart:** niet op afstand op te vragen.
+- **Bewezen:** voltooiproef `vandaag.js`. Niet gelopen: medicatie en toestellen.
+- **Gaten:**
+  - de grens van de proef noemt `/api/dag` een "modelvraag", maar kern/dagcoach.js is regelgestuurd. De tekst in de proef klopt dus niet;
+  - de proef noemt een veiligheidskring die het scherm meeleest, maar life.html roept `/api/veiligheid` niet aan;
+  - het noodcontact op de noodkaart is een vrij tekstveld.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Oura Membership | diepere inzichten, trends, AI | €69,99 per jaar ([Oura](https://support.ouraring.com/hc/lv/articles/4409086524819-Oura-Membership)) |
+| Withings+ | gezondheidsscore, AI-assistent, ECG beoordeeld door een cardioloog | €99,50 per jaar ([Withings](https://support.withings.com/hc/en-us/articles/14166469200529)) |
+| Bearable Premium | correlatierapporten over 365 dagen, eigen metingen | $34,99 per jaar ([Bearable](https://bearable.app/pricing)) |
+
+### c. Domein
+- **MDR regel 11 / MDCG 2019-11:** software die informatie geeft voor diagnose of therapie is minstens klasse IIa. Alleen opslaan of doorsturen is geen medisch hulpmiddel ([samenvatting](https://openregulatory.com/mdcg/mdcg-2019-11), na te gaan). Vandaag blijft daarom onder "opslaan en tonen", nooit "beoordelen".
+- **Medicatie:** loopt via het LSP met opt-in in Mitz ([kamerstuk](https://zoek.officielebekendmakingen.nl/kst-27529-AG.pdf)). Dat is extern en voor zorgaanbieders.
+- **AVG art. 9:** gezondheidsgegevens vragen uitdrukkelijke toestemming ([EDPB](https://edpb.europa.eu/sites/default/files/files/file1/edpb_guidelines_202003_healthdatascientificresearchcovid19_nl.pdf)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Va1 | Noodcontact uit de Veilig-kring | L6 | ontbreekt | De noodkaart kiest een kringlid als verwijzing. Verdwijnt de verbinding, dan staat er "noodcontact niet meer verbonden". | K | **A nu** |
+| Va2 | Grenstekst van de proef rechtzetten | — | fout in de documentatie | De grens van de proef zegt dat `/api/dag` regelgestuurd is. | K | **A nu** |
+| Va3 | Trends over eigen metingen, zonder oordeel | L4 | ontbreekt | Gemiddelde en spreiding per week. Zonder 7 metingen geen trend. De tekst zegt "geen diagnose" (MDR-grens). | M | A later |
+| Va4 | Export voor de eigen zorgverlener | L6 | ontbreekt | Het lid kiest een periode en maakt een pdf. Er gaat niets automatisch naar buiten. | M | A later |
+| Va5 | Medicatieoverzicht uit het LSP | — | — | — | — | niet doen: extern, voor zorgaanbieders (Mitz) |
+| Va6 | Correlaties (slaap tegenover stemming) | L4 | ontbreekt | — | G | B: dicht tegen MDR-klasse IIa; vraagt besluit |
+
+### e. RTG-exclusief
+De dag ziet de agenda, de wacht van Veilig en het eigen gemoed bij elkaar. Gemoed verlaat het account nooit, en een werkgever ziet niets.
+
+### f. Bouwstenen
+- kern/life, dagcoach, gemoed (zorgniveau), metingen en noodkaart;
+- kern/veiligheid voor Va1.
+
+### g. Prioritering
+- **A nu:** Va1, Va2.
+- **A later:** Va3, Va4.
+- **B:** Va6.
+
+### Keten "een slechte dag"
+1. Het lid kiest een sombere stemming.
+2. Een herhaling raakt de grens.
+3. De app verwijst door zonder tip.
+4. Het noodcontact is een echt kringlid (Va1).
+
+**Storing:** Veilig uit: de noodkaart toont "kring nu niet te zien", en de noodkaart zelf blijft werken.
+
+### h. Eindcontract, eigen eisen
+- **Domeinintelligentie:** er is geen tekst die een diagnose stelt. Een toets zoekt naar woorden als "u heeft" of "diagnose" in de antwoorden van de app.
+
+---
+
+## 6. Gezin (`tab:gezin`, onder `kern.app`)
+
+**Doel.** Een oppas of familielid koppelt zich met de eenmalige uitnodiging van een RTFoundation-gezin. Hij ziet wat het gezin hem toevertrouwt, stuurt berichten en ontkoppelt zelf.
+
+### a. Inventaris
+- **Routes:** `/api/rtf/*` (uitnodiging, overzicht, kanaal, bericht, ontkoppel).
+- **Uitnodiging:** 48 uur geldig, alleen de hash wordt bewaard.
+- **Kanaaltoken:** 12 uur geldig.
+- **Kind:** alles wat een kind raakt vraagt `volwassen()`.
+- **Agenda:** een gezinsagenda met de sleutel `gezin:<code>`.
+- **Bewezen:** voltooiproef `gezin.js` (6/6, 3/3, 4/4).
+- **Fout gevonden:** chat en antwoord gebruiken alleen het eerste gezin (`g[0]`, app-main-43.js:92 en app-main-44.js:62). Wie twee gezinnen volgt, schrijft altijd naar het eerste.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| FamilyWall Premium | gezinsagenda, documenten, plek-alerts | $44,99 per jaar ([App Store](https://apps.apple.com/app/id496889629)) |
+| Cozi Gold | gedeelde agenda, herinneringen, meldingen bij wijzigingen | $39 per jaar (na te gaan) |
+| Life360 Platinum | plek en SOS | zie Veilig |
+
+### c. Domein
+- **Gastouder (Wet kinderopvang):** een VOG en het Personenregister Kinderopvang met continue screening ([kamerstuk](https://zoek.officielebekendmakingen.nl/kst-33538-3.pdf)).
+- **Particuliere oppas:** er is geen VOG-plicht gevonden. De ouder kan erom vragen (na te gaan).
+- **AVG art. 8:** onder 16 jaar is toestemming van de ouder nodig ([tekst](https://gdpr-text.com/nl/read/article-8/)).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| G1 | Het juiste gezin kiezen (reparatie) | L1 | fout | Wie twee gezinnen volgt, kiest het gezin, en het bericht komt bij dat gezin aan. Getoetst met twee gezinnen. | K | **A nu** |
+| G2 | Oppasbeurt in de gezinsagenda | L6 | half (gezinsagenda bestaat) | De ouder plant een oppasbeurt, en de oppas ziet hem in zijn eigen agenda als verwijzing. | M | A later |
+| G3 | Aankomst en vertrek van de oppas | L5 | ontbreekt | De oppas tikt "ik ben er" en "ik ga". De ouder krijgt een melding, zonder plek tenzij hij die vraagt. | M | A later |
+| G4 | VOG op verzoek van de ouder | L2 | ontbreekt | — | M | B, vraagt besluit: persoonseis "oppas" (kern/persoonseis.js); RTG valideert niets inhoudelijk |
+| G5 | Oppas betalen | L6 | ontbreekt | — | M | B, eigenaar Geld |
+
+### e. RTG-exclusief
+- De oppas is een gekeurd RTG-lid, met een eenmalige uitnodiging en een verloop van 12 uur.
+- De gezinsinfo blijft van het gezin; de oppas ziet alleen wat het gezin hem toevertrouwt.
+
+### f. Bouwstenen
+foundation/gasten (koppeling, gezinsuitnodiging, gezinsagenda), pushHook en persoonseis.
+
+### g. Prioritering
+- **A nu:** G1.
+- **A later:** G2, G3.
+- **B:** G4, G5.
+
+### Keten "de oppasavond"
+1. De ouder plant de avond (G2).
+2. De oppas tikt "ik ben er" (G3).
+3. Hij leest de noodcontacten.
+4. Hij stuurt een bericht.
+5. Hij tikt "ik ga".
+
+**Storingen:**
+- Kanaaltoken verlopen: het scherm vraagt opnieuw te openen.
+- De ouder heeft ontkoppeld: 403 met de reden.
+
+---
+
+## 7. Bestellen (`tab:bestellen`, onder `kern.app`)
+
+**Doel.** Boodschappen bij een groothandel of supermarkt bestellen, en eten bij een zaak. De bestelling volgen tot de deur, en annuleren wat nog kan.
+
+### a. Inventaris
+- **Groothandel:** `/api/groothandel/markt`, `/bestel` (idem), `/mijn` en `/annuleer`. Statussen: aangevraagd → bevestigd → onderweg → geleverd, plus geweigerd en geannuleerd. Annuleren staat op het scherm sinds d53698410.
+- **Eten:** `/api/bezorg/*`, `/api/order/pay` (zaakbetaling) en live volgen via SSE.
+- **Bewezen:** voltooiproef `bestellen.js` (7/7, 3/3, 4/4) en de schermtoets bestellen-scherm.e2e.
+- **Gaten:**
+  - de groothandel laat alleen "Bezorgen" kiezen; de server neemt `true` aan (winkel.js:39), dus afhalen kan niet;
+  - de stand heeft geen eigen regel in SCHERMEIGENAAR, terwijl apps/bestellen.html (`horeca.bestellen`) dezelfde eetbestelling aanbiedt.
+
+### b. Markt
+| Aanbieder | Topfunctie | Prijs en bron |
+|---|---|---|
+| Uber One | gratis bezorging vanaf €18 (restaurant) en €40 (supermarkt) | €89,99 per jaar ([Uber](https://www.uber.com/nl/nl/uber-one/)) |
+| Thuisbezorgd Plus | gratis bezorging boven een minimum | prijs tegenstrijdig, na te gaan |
+| Picnic | gratis bezorging, minimum €35 | geen abonnement (na te gaan) |
+| Makro | groothandelsprijzen | alleen voor bedrijven met KvK |
+
+### c. Domein
+- **Alcoholwet, verkoop op afstand:** de leeftijd wordt gecontroleerd vóór de aankoop (actieve invoer) én bij elke aflevering ([Ondernemersplein](https://ondernemersplein.overheid.nl/bedrijfsvoering/juridische-zaken/doe-een-leeftijdscontrole-bij-alcohol-verkopen-op-afstand/)). Een boete voor bezorgdiensten is gepland voor 2027 ([Rijksoverheid](https://www.rijksoverheid.nl/actueel/nieuws/2026/01/09/boete-bezorgdienst-bij-afleveren-alcohol-aan-18-minners)).
+- **Allergenen (EU 1169/2011):** de 14 allergenen, ook bij verkoop op afstand vóór de aankoop.
+- **Herroepingsrecht:** de uitzondering voor snel bederfelijke waar (BW 6:230p; bron secundair).
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| Bs1 | Afhalen bij de groothandel | L1 | ontbreekt (alleen bezorgen) | Het lid kiest afhalen. De bestelling heeft `bezorgen:false` en de groothandel ziet "afhalen". | K | **A nu** |
+| Bs2 | Allergenen vóór het bestellen | L2/L1 | ontbreekt | Elk product toont de allergenen die de zaak opgaf. Ontbreekt de opgave, dan staat er "niet opgegeven door de zaak", nooit "geen". | M | **A nu** |
+| Bs3 | Leeftijd bij alcohol | L2 | ontbreekt | Een product met alcohol vraagt `volwassen()` vóór het bestellen. De bezorger krijgt "leeftijd controleren bij afgifte". | M | A nu, als er alcohol verkocht wordt |
+| Bs4 | Gedeelde boodschappenlijst met het gezin | L6 | ontbreekt | Gezinsleden vullen één lijst. Eén persoon bestelt. | M | A later |
+| Bs5 | Vaste bestelling herhalen | L5 | ontbreekt | Het lid zet een herhaling. Elke keer komt er een voorstel, en nooit een automatische betaling of bestelling. | M | A later |
+| Bs6 | Wie is eigenaar: de stand of bestellen.html? | — | vraagt besluit | — | — | SCHERMEIGENAAR |
+
+### e. RTG-exclusief
+Een gezinsboodschappenlijst, rekeningen splitsen met verbindingen, en "betaald" alleen na bevestiging via de zaakbetaling.
+
+### f. Bouwstenen
+- kern/groothandel (orderlaag);
+- bezorg en zaakbetaling;
+- `volwassen()`;
+- de gezinsagendasleutel als vorm voor Bs4.
+
+### g. Prioritering
+- **A nu:** Bs1 (K) en Bs2 (M).
+- **Mits alcohol:** Bs3.
+- **A later:** Bs4, Bs5.
+- **Besluit:** Bs6.
+
+### Keten "boodschappen voor het weekend"
+1. Het lid kiest producten met allergenen erbij (Bs2).
+2. Het kiest afhalen (Bs1).
+3. De groothandel bevestigt.
+4. Het lid haalt af.
+
+**Storingen:**
+- Groothandel uit: de bestelling blijft "aangevraagd", en het scherm zegt dat er nog niets is bevestigd.
+- Dubbeltik: één bestelling (bestaat).
+
+---
+
+## 8. Assets (`tab:assets`, onder `kern.app`)
+
+**Doel.** Een betalend lid vraagt gebruiksrechten in een object aan (een jet, jacht of villa: 300 tickets, 24 uur per jaar, 10 jaar). Een mens van RTG keurt. Pas een bevestigde betaling geeft de tickets. Herroepen zegt alleen wat waar is.
+
+### a. Inventaris
+- Gebouwd op 19 oktober 2026 (e36fe0acc): de aanvraag, een mens op naam die keurt, betaalWaarheid, tickets precies één keer, en herroepen via terugbetalen.
+- **Bewezen:** `test/assets.test.js` (16) en voltooiproef `assets.js` (9/9, 3/3, 3/3).
+- **Gaten:**
+  - na het boeken van een dag zegt de app "het team neemt vooraf contact op" (gebruik.js:70), maar er is geen taak en geen agendapunt;
+  - bij overdracht via de wachtlijst slikken `try{}catch(e){}` rond `pay.huisIn/huisUit` (gebruik.js:95-96) een fout stil.
+
+### b. Markt
+| Aanbieder | Wat | Prijs en bron |
+|---|---|---|
+| NetJets (fractional) | 1/16 voor ongeveer 50 vlieguren per jaar | $0,5-3,2M aankoop plus $12-28K per maand (na te gaan, [luxe.digital](https://luxe.digital/travel/netjets-cost/)) |
+| Pacaso | 1/8 van een woning, 44 nachten per jaar | 10-12% opslag plus maandbedrag (na te gaan) |
+| Yacht Quarters (Princess F70) | 1/8 van een jacht | £330.000 plus £56.000 per jaar (na te gaan) |
+
+### c. Domein, met belangrijke bevindingen
+- **Timeshare (Richtlijn 2008/122/EG, BW 7:50a e.v.):** 14 dagen bedenktijd en een **verbod op vooruitbetaling tijdens die termijn**. Dit is dwingend recht (art. 7:50i) ([kamerstuk](https://zoek.officielebekendmakingen.nl/kst-32422-3.pdf)).
+  - Valt een Access-ticket voor de villa daaronder (een gebruiksrecht op accommodatie, langer dan een jaar), dan **mag de betaling niet binnen de bedenktijd vallen**.
+  - Nu kan een lid direct na goedkeuring betalen. **Dit vraagt een juridisch besluit vóór livegang.**
+- **Asset-smaak (deelneming met restwaarde):**
+  - een vrijstelling van de prospectusplicht vraagt een informatiedocument en een melding bij de AFM; de grens is volgens de AFM €12M sinds 5 juni 2026 ([AFM](https://www.afm.nl/~/profmedia/files/rapporten/2025/risicos-op-crimineel-gedrag-bij-vrijgestelde-aanbiedingen.pdf));
+  - aanbieden van een beleggingsobject kan een vergunning vragen (Wft; bron uit 2014, na te gaan).
+  - Ook dit vraagt een besluit.
+
+### d. Catalogus
+| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
+|---|---|---|---|---|---|---|
+| A1 | Juridische toets timeshare en Wft | — | ontbreekt | — | — | **vraagt besluit** (eigenaar, Geld, juridisch) |
+| A2 | Betaling pas na de bedenktijd, of in bewaring | L5 | ontbreekt | Hangt af van A1. Binnen 14 dagen na akkoord kan er niet betaald worden, of het geld blijft in bewaring tot dag 15. Herroepen binnen de termijn kost niets. | M | A, na A1 |
+| A3 | Wachtlijstoverdracht niet stil laten falen (reparatie) | L5 | fout | Weigert `pay.huisIn` of `huisUit`, dan gaat de overdracht niet door en zegt het scherm waarom. Er wordt geen ticket overgezet zonder geld. | K | **A nu** |
+| A4 | Geboekte dag naar Agenda, met een taak voor het team | L6 | ontbreekt | De dag staat in de agenda van het lid (verwijzing), en het kantoor ziet een open taak. Is de Agenda uit, dan blijft de boeking staan met de melding. | M | **A nu** |
+| A5 | Servicefee in de verplichtingenkalender van Geld | L6 | half | Geld toont bedrag, vervaldag en ticket-id. Betalen gaat via betaalWaarheid. Er wordt nooit automatisch afgeschreven. | K | A later (Geld) |
+| A6 | Dagen ruilen tussen poolleden | L3 | ontbreekt | Twee leden ruilen een dag met allebei een akkoord. Een gemiste bevestiging betekent geen ruil. | M | B |
+
+### e. RTG-exclusief
+Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde agenda als de reis van TravelOS. Zo zijn het een gebruiksrecht en een reis, niet twee losse dingen.
+
+### g. Prioritering
+- **Eerst A1 (besluit).**
+- **A nu:** A3 (K, reparatie) en A4 (M).
+- **Na A1:** A2.
+- **A later:** A5.
+- **B:** A6.
+
+### Keten "een dag op het jacht"
+1. Aanvraag.
+2. Goedkeuring.
+3. De bedenktijd verstrijkt (A2).
+4. Betaling.
+5. Tickets.
+6. De dag boeken.
+7. Het agendapunt en de taak voor het team (A4).
+
+**Storingen:**
+- Betaling geweigerd: geen ticket (bestaat).
+- Agenda uit: de boeking blijft staan, met de melding.
+- Terugbetaling niet bevestigd: "loopt" (bestaat).
+
+### h. Eindcontract, eigen eisen
+- **Levenscyclus:** van aanvraag tot uitstappen of herroepen, zonder stille fout (A3).
+- **Juridisch:** geen betaling binnen de bedenktijd, als A1 dat zo besluit.

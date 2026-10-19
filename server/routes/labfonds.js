@@ -53,7 +53,7 @@ module.exports = (kern) => {
     overzicht: (wie) => labfonds.fonds(wie),
     locatie: vast((wie, nm, b) => labfonds.locatieMaak(b.naam, b.land)),
     doneer: vast((wie, nm, b) => labfonds.doneer(wie, nm, String(b.locId || ''), b.bedrag, b.idem)),
-    voorstel: vast((wie, nm, b) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek)),
+    voorstel: vast((wie, nm, b) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek, b.idem)),
     stem: vast((wie, nm, b) => labfonds.stem(wie, String(b.id || ''), String(b.keuze || ''))),
     scheidsrechter: (wie, nm, b) => labfonds.scheidsrechter(String(b.id || '')),
     beslis: vast((wie, nm, b) => labfonds.beslis(String(b.id || ''), wie)),

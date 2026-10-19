@@ -144,9 +144,15 @@
     $(s).addEventListener('input', tekenLijst); $(s).addEventListener('change', tekenLijst);
   });
 
+  /* Een sleutel per poging, pas na succes een nieuwe: een tweede tik of een
+     herhaling na een afgebroken verbinding maakt geen tweede document
+     (server/kern/office/herhaling.js). */
+  var nieuwIdem = '', nieuwVoor = '';
   function nieuw(soort, sjabloon) {
-    api('maak', sjabloon ? { sjabloon: sjabloon } : { soort: soort }).then(function (r) {
+    if (!nieuwIdem || nieuwVoor !== (sjabloon || soort)) { nieuwIdem = RTGId('doc'); nieuwVoor = sjabloon || soort; }
+    api('maak', sjabloon ? { sjabloon: sjabloon, idem: nieuwIdem } : { soort: soort, idem: nieuwIdem }).then(function (r) {
       if (r.body.error) return zeg(r.body.error);
+      nieuwIdem = '';
       openen(r.body.id);
     });
   }

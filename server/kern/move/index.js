@@ -118,11 +118,15 @@ module.exports.maakMove = ({ kern }) => {
      Een Continue Key die een bestemming raadt, stuurt iemand met één tik naar de
      verkeerde stad -- en dat is precies het defect dat RTG Navigatie al een keer
      had (een kaart rond een eiland waar de gebruiker niet was). */
+  /* DE EERSTE IN DE TIJD, NIET DE EERSTE IN DE RIJ. reiswereld.komend()
+     sorteert op zijn eigen rangorde en niet op het uur -- dezelfde val als in
+     ./haalbaar.js. De voltooiproef zag het: met afspraken om 10:00 en 13:00
+     bood de knop de afspraak van 13:00 aan. */
   function moveVolgende(key, nuMs) {
     const nu = Number.isFinite(nuMs) ? nuMs : Date.now();
-    const onderdelen = onderdelenVan(key);
+    const onderdelen = onderdelenVan(key).filter(o => o.nodigAt != null).sort((a, b) => a.nodigAt - b.nodigAt);
     for (const o of onderdelen) {
-      if (o.nodigAt != null && o.nodigAt > nu && o.plek) {
+      if (o.nodigAt > nu && o.plek) {
         return { status: 200, volgende: {
           titel: o.titel || '', soort: o.soort || '', kenmerk: o.kenmerk || '',
           nodigAt: new Date(o.nodigAt).toISOString(),

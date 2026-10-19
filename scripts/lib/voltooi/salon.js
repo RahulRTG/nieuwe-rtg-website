@@ -145,7 +145,7 @@ async function loop(w, stap) {
 module.exports = {
   functie: 'tab:salon',
   ingang: '/apps/app.html',
-  via: 'de stand Salon (knop data-tab="salon" in de ledenapp)',
+  via: '#tab=salon',
   persona: 'lid',
   omgeving: KANTOORWERELD,
   belofte: 'een lid ziet de posts van De Salon, waardeert ze en reageert onder zijn codenaam; een post voor vrienden ziet alleen een vriend -- zonder inlog, als vreemde of zonder pas waardeert of reageert niemand, en een herstart, dubbele tik, afgebroken verzoek of crash verliest of verdubbelt niets',

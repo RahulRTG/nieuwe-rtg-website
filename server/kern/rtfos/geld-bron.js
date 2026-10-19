@@ -119,6 +119,11 @@ module.exports = (ctx, eigen) => {
      registratie maar de afspraak van het hele huis: de echte naam woont in de
      kluis, en het donateursportaal werkt op een code die de stichting uitgeeft. */
   function bronUitGift(b) {
+    /* Een herhaalde bevestiging (dezelfde sleutel, na een crash) is geen tweede
+       bron: het geld boekte ook maar een keer (gift-betalen.js). */
+    const idem = schoon(b.idem, 120) || null;
+    const al = idem && S().bronnen.find(x => x.uitGift && x.idem === idem);
+    if (al) return al;
     const centen = Math.max(0, Math.round(Number(b.centen) || 0));
     const soort = ['donatie', 'maandelijkse_donatie', 'sponsoring'].includes(b.soort) ? b.soort : 'donatie';
     const bron = { id: rid(), stad: b.stad || null, projectId: b.projectId || null, soort,
@@ -128,7 +133,7 @@ module.exports = (ctx, eigen) => {
          alleen met toestemming. Zonder oormerk is hij stadsbreed en geldt
          dezelfde regel -- vrij herbestemmen is nooit de stand bij een gift. */
       herbestemming: 'met_toestemming', kenmerk: schoon(b.kenmerk, 60) || 'online gift',
-      uitGift: true, door: b.door || null, at: nu() };
+      uitGift: true, idem, door: b.door || null, at: nu() };
     const gemarkeerd = ctx.herkomstBepaal ? ctx.herkomstBepaal(bron) : null;
     S().bronnen.push(bron);
     audit(b.door, 'bron.uit-gift', bron.kenmerk,

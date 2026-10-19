@@ -62,17 +62,37 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
   assert.ok(lijst.length >= 2, 'minder dan twee scenario\'s');
   for (const sc of lijst) {
     const sleutel = sc.functie.slice(sc.functie.indexOf(':') + 1);
-    const bron = reg.LINKS[sleutel];
-    assert.ok(bron && bron.url, sc.functie + ' staat niet met een adres in MAPPEN');
-    assert.equal(bron.url, sc.ingang, sc.functie + ': het scenario noemt een andere ingang dan MAPPEN');
-    assert.ok(sc.belofte && sc.grens && typeof sc.loop === 'function', sc.bestand + ' mist belofte, grens of loop');
     const c = CONTRACT[sc.functie];
     assert.ok(c, sc.functie + ' heeft een scenario maar geen contract: zijn bewijs telt dan stil niet mee');
+    if (sc.functie.startsWith('link:')) {
+      const bron = reg.LINKS[sleutel];
+      assert.ok(bron && bron.url, sc.functie + ' staat niet met een adres in MAPPEN');
+      assert.equal(bron.url, sc.ingang, sc.functie + ': het scenario noemt een andere ingang dan MAPPEN');
+    } else {
+      /* Een tab of OS-app heeft geen eigen adres. Hij telt alleen als de app hem
+         echt kent, het contract de echte navigatiestap noemt en zijn eigen delen
+         aanwijst die SCHERMROUTES.json kent -- nooit via een verzonnen adres. */
+      const los = reg.los(sc.functie);
+      assert.ok(los.bestaat, sc.functie + ' kent de app niet als tab of OS-app');
+      assert.ok(c.ingang && c.ingang === sc.ingang, sc.functie + ': het contract en het scenario noemen een andere ingang');
+      assert.ok(typeof c.via === 'string' && c.via.trim(), sc.functie + ': het contract noemt geen navigatiestap (via)');
+      const sr = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHERMROUTES.json'), 'utf8'));
+      const bekend = new Set(sr.perScherm.map((x) => x.bestand));
+      assert.ok(Array.isArray(c.bestanden) && c.bestanden.length, sc.functie + ': het contract wijst geen eigen delen aan');
+      for (const b of c.bestanden) assert.ok(bekend.has(b), sc.functie + ': ' + b + ' staat niet in SCHERMROUTES.json');
+    }
+    assert.ok(sc.belofte && sc.grens && typeof sc.loop === 'function', sc.bestand + ' mist belofte, grens of loop');
     for (const b of BEWIJZEN.concat(AFGELEID)) {
       assert.equal(c[b] && c[b].soort, 'voltooiproef', sc.functie + ': ' + b + ' komt niet uit de voltooiproef');
       assert.equal(c[b].instrument, sc.bestand);
-      const raak = B.gedeeld(B.proefRoutes(sc.bestand), B.ingangRoutes(sc.ingang));
-      assert.ok(raak.length >= 2, sc.functie + ': het scenario raakt ' + raak.length + ' routes van ' + sc.ingang);
+      /* Minstens twee routes van de ingang, of ALLE als het scherm er minder
+         heeft: een scherm met één route (het routedossier) kan geen tweede
+         leveren, en dan moet het scenario juist die ene raken. */
+      const ingang = sc.functie.startsWith('link:') ? B.ingangRoutes(sc.ingang) : B.ingangVan(null, c);
+      const raak = B.gedeeld(B.proefRoutes(sc.bestand), ingang);
+      const aantal = ingang.exact.size + ingang.voor.size;
+      assert.ok(aantal >= 1, sc.functie + ': de ingang ' + sc.ingang + ' roept geen bekende route aan');
+      assert.ok(raak.length >= Math.min(2, aantal), sc.functie + ': het scenario raakt ' + raak.length + ' van de ' + aantal + ' routes van ' + sc.ingang);
     }
   }
   /* De versheid van het register ziet alleen wat het instrument letterlijk

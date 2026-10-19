@@ -108,11 +108,24 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
     const centen = Math.round(aantal * MUNT_PRIJS * 100);
     const betaald = await pay.huisIn({ vanCodenaam: codenaam, centen, oms: titel, idem: schoon(b.idem, 60) || null });
     if (betaald.error) return betaald;
+    /* EEN BETALING GEEFT EEN KEER MUNTEN. Komt dezelfde sleutel terug (een
+       retry na een crash, een tweede tik), dan antwoordt huisIn met de bewaarde
+       boeking en betaalt niet opnieuw -- en hier stonden de munten dan toch
+       nog een keer bij: na een SIGKILL en dezelfde tik had het lid tien munten
+       voor een betaling van vijf (scripts/lib/voltooi/wallet.js). De munt
+       onthoudt daarom welke boekingen hij al verwerkte. Opnieuw opzoeken, want
+       een gelijktijdige tik kan de regel intussen hebben gemaakt. */
+    m = kijk(key).find(x => x.soort === 'munt' && x.titel === titel);
+    const ref = betaald.boeking || null;
+    if (m && ref && (m.betalingen || []).includes(ref)) {
+      return { status: 200, ok: true, item: m, prijs: centen / 100, betaaldCenten: centen, bijgeladen: betaald.bijgeladen || 0, herhaald: true };
+    }
     /* Pas NA de betaling ontstaan de munten. voeg() kan hier niet meer op null
        lopen: de wallet-ruimte is hierboven al gecontroleerd en er is sindsdien
        niets aan deze bak toegevoegd. */
     if (!m) m = voeg(key, { soort: 'munt', titel, code: 'M-' + crypto.randomBytes(2).toString('hex').toUpperCase(), bron: 'munt', saldo: 0 });
     m.saldo += aantal;
+    if (ref) m.betalingen = (m.betalingen || []).concat(ref).slice(-50);
     save();
     return { status: 200, ok: true, item: m, prijs: centen / 100, betaaldCenten: centen, bijgeladen: betaald.bijgeladen || 0 };
   }

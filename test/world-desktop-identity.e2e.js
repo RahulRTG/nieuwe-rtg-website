@@ -1,9 +1,11 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { gezinAanAccount } = require('./gezinaccount');
 const pw = laadPlaywright();
 test('a family profile never borrows an existing member identity for desktop widgets', { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { RTG_DEMO: '0', RTG_AI_UIT: '1', SMTP_URL: '' } }); let browser;
+  // het gezin hangt aan een gekeurd ouderaccount (test/gezinaccount.js); de keuring vraagt de demo
+  const srv = await startServer({ env: { RTG_MAGNAAT_TEST: '1', RTF_GEZIN_ACCOUNTPLICHT: '1', RTG_AI_UIT: '1', SMTP_URL: '' } }); let browser;
   const post = async (path, body) => {
     const r = await fetch(srv.base + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json(); assert.equal(r.status, 200, path + JSON.stringify(j)); return j;
@@ -11,9 +13,8 @@ test('a family profile never borrows an existing member identity for desktop wid
   try {
     const n = Date.now(), member = await post('/api/auth/register', { name: 'Ouder account', email: 'parent' + n + '@e.test',
       phone: '06' + String(n).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg' });
-    const f = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Gescheiden profielen', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
-    const c = await post('/api/foundation/gezin/profiel/maak', { code: f.code, token: f.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' });
-    const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: f.gezinscode, profielId: c.profiel.id, pin: '5678' });
+    const f = await gezinAanAccount(srv.base, { gezinsnaam: 'Gescheiden profielen', kind: { naam: 'Milan', geboortedatum: '2015-04-04' } });
+    const chosen = f.kind;
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 1050 }, serviceWorkers: 'block' });
     await ctx.addInitScript(({ member, f, chosen }) => {

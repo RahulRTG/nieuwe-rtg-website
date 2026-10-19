@@ -62,6 +62,20 @@ test('ingangRoutes leest SCHERMROUTES.json via de lezer, en een ontbrekende inga
   assert.equal(zonder.exact.size, 0);
 });
 
+test('ingangRoutes volgt een gegenereerde bundel naar zijn delen, waar SCHERMROUTES de paden toeschrijft', () => {
+  const html = '<script src="/apps/bundel.js" defer></script>';
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/bundel/deel-01.js', exact: ['/api/huis/zet'] },
+    { bestand: 'public/apps/bundel/deel-02.js', exact: ['/api/huis'] },
+    { bestand: 'public/apps/ander/deel-01.js', exact: ['/api/vreemd'] }
+  ] };
+  const bundels = new Map([['public/apps/bundel.js', 'public/apps/bundel/']]);
+  const r = B.ingangRoutes('/apps/b.html', { lees: lezer({ 'public/apps/b.html': html }), schermroutes, bundels });
+  assert.deepEqual([...r.exact].sort(), ['/api/huis', '/api/huis/zet'], 'de delen van de bundel tellen, een andere map niet');
+  /* En het echte register kent de residentie als bundel. */
+  assert.ok(B.ingangRoutes('/apps/residentie.html').exact.has('/api/residentie/suite/zet'));
+});
+
 test('gedeeld: exact of via voorvoegsel, gesorteerd', () => {
   const ing = { exact: new Set(['/api/b']), voor: new Set(['/api/supplier/horeca/']) };
   assert.deepEqual(B.gedeeld(new Set(['/api/supplier/horeca/menu', '/api/b', '/api/c']), ing),
@@ -249,4 +263,22 @@ test('zonder opgegeven lezer en versheid gebruikt bewijsVoor de echte, en dat bl
   const r = B.bewijsVoor('bestaat-niet', 'waarheidsgetrouw', '/apps/app.html');
   assert.ok(['BEWEZEN', 'GEBLOKKEERD_DOOR_DEFECT', 'GEBLOKKEERD_DOOR_CONFIG', 'NIET_GETEST'].includes(r.status), r.status);
   assert.equal(r.bron.soort, 'liegronde');
+});
+
+test('een tab zonder eigen adres koppelt alleen via ingang, via en zijn eigen delen', () => {
+  /* Een tab koppelt op de routes van ZIJN delen, niet op die van de hele schil:
+     anders "bewijst" elk scenario dat iets in /apps/app.html aanroept alle tabs.
+     Ontbreekt de navigatiestap of de delen, dan is er geen ingang. */
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/app.html', exact: ['/api/schil/a', '/api/schil/b'] },
+    { bestand: 'public/apps/app-main/tab-x.js', exact: ['/api/tabx/lees', '/api/tabx/zet'] }] };
+  const vol = { ingang: '/apps/app.html', via: '#tab=x', bestanden: ['public/apps/app-main/tab-x.js'] };
+  const ing = B.ingangVan('(tab in de app, geen eigen adres)', vol, { schermroutes });
+  assert.deepEqual([...ing.exact].sort(), ['/api/tabx/lees', '/api/tabx/zet']);
+  assert.ok(!ing.exact.has('/api/schil/a'), 'de schil telt niet mee voor een tab');
+  for (const zonder of ['via', 'ingang', 'bestanden']) {
+    const c = Object.assign({}, vol); delete c[zonder];
+    assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', c, { schermroutes }), null, 'zonder ' + zonder + ' geen ingang');
+  }
+  assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', null, { schermroutes }), null);
 });

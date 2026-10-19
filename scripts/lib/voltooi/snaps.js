@@ -153,7 +153,7 @@ async function loop(w, stap) {
 module.exports = {
   functie: 'os:snaps',
   ingang: '/apps/app.html',
-  via: 'de os-tegel Snaps in de ledenapp, die de kiezer met Salon-contacten opent',
+  via: 'de os-tegel Snaps, die de kiezer met Salon-contacten opent',
   persona: 'lid',
   belofte: 'een lid stuurt een vriend een snap, de vriend ziet hem een keer en daarna is de foto weg, ook uit de opslag -- zonder inlog, als vreemde of na een blokkade stuurt of opent niemand er een, en een herstart, dubbele tik, afgebroken verzoek of crash verliest, verdubbelt of herstelt niets',
   grens: 'De proef loopt de routes die de kiezer en de snapstrip van de ledenapp aanroepen, niet het scherm zelf; het verkleinen van de foto in de browser loopt niet mee. Verhalen (24 uur) en de dag-opdracht lopen hier niet. De vriendschap ontstaat langs De Salon. Geen Redis of PostgreSQL in de wereld.',

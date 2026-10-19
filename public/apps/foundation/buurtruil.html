@@ -145,7 +145,7 @@ const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&a
 
 function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
 
-const api = (pad, body) => fetch('/api/rtfos/' + pad, {
+const api = (pad, body) => fetch(pad, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
   body: JSON.stringify(body || {})
@@ -207,8 +207,8 @@ function rij(r) {
 
 async function teken() {
   try {
-    const r = TAB === 'mijn' ? await api('ruil/mijn', {})
-      : await api('ruil/lijst', { stad: STAD, soort: TAB || undefined });
+    const r = TAB === 'mijn' ? await api('/api/rtfos/ruil/mijn', {})
+      : await api('/api/rtfos/ruil/lijst', { stad: STAD, soort: TAB || undefined });
     const rijen = r.ruil || [];
     $('#lijst').innerHTML = rijen.length ? rijen.map(rij).join('')
       : '<div class="leeg">' + (TAB === 'mijn'
@@ -216,16 +216,16 @@ async function teken() {
         : 'Nog niets in deze stad. Het eerste mag van jou zijn.') + '</div>';
 
     $('#lijst').querySelectorAll('[data-int]').forEach(b => b.addEventListener('click', () => doe(
-      'ruil/interesse', { id: b.dataset.int },
+      '/api/rtfos/ruil/interesse', { id: b.dataset.int },
       'Genoteerd. De eigenaar ziet dat je belangstelling hebt en kan contact zoeken; wij sturen niets.')));
     $('#lijst').querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', () => doe(
-      'ruil/sluit', { id: b.dataset.sluit, status: 'weg' }, 'Afgerond.')));
+      '/api/rtfos/ruil/sluit', { id: b.dataset.sluit, status: 'weg' }, 'Afgerond.')));
     $('#lijst').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', () => doe(
-      'ruil/sluit', { id: b.dataset.intrek, status: 'ingetrokken' }, 'Ingetrokken.')));
+      '/api/rtfos/ruil/sluit', { id: b.dataset.intrek, status: 'ingetrokken' }, 'Ingetrokken.')));
     $('#lijst').querySelectorAll('[data-meld]').forEach(b => b.addEventListener('click', async () => {
       const reden = prompt('Wat klopt er niet aan dit aanbod?');
       if (reden === null) return;
-      try { const r2 = await api('ruil/meld', { id: b.dataset.meld, reden }); zeg(r2.bericht, true); teken(); }
+      try { const r2 = await api('/api/rtfos/ruil/meld', { id: b.dataset.meld, reden }); zeg(r2.bericht, true); teken(); }
       catch (e) { zeg(e.message); }
     }));
   } catch (e) { $('#lijst').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
@@ -246,7 +246,7 @@ $('#plaats').addEventListener('click', async () => {
   const titel = $('#nTitel').value.trim();
   if (!STAD || titel.length < 3) { zeg('Wat is het? Een paar woorden is genoeg.'); return; }
   try {
-    await api('ruil/plaats', { stad: STAD, soort: $('#nSoort').value, titel,
+    await api('/api/rtfos/ruil/plaats', { stad: STAD, soort: $('#nSoort').value, titel,
       wat: $('#nWat').value.trim(), staat: $('#nStaat').value.trim() });
     $('#nTitel').value = ''; $('#nWat').value = ''; $('#nStaat').value = '';
     zeg('Staat erbij.', true);

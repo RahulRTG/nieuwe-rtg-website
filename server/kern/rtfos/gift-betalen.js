@@ -87,7 +87,8 @@ module.exports = (ctx, { standVan, voorbereidVan, bronUitGift, termijnAf }) => {
         projectId: v.voornemen.projectId || null,
         soort: v.voornemen.soort,
         centen, gever: codenaam, anoniem: v.voornemen.anoniem,
-        kenmerk: 'online gift', door: codenaam
+        kenmerk: 'online gift', door: codenaam,
+        idem: 'gift:' + codenaam + ':' + idem
       });
     } catch (e) { bronFout = String((e && e.message) || e); }
 

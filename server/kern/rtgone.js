@@ -28,6 +28,7 @@ module.exports = ({ db, save, crypto }) => {
   const { ROLLEN, BESLUITTYPEN, rollenVoor, rechtenVoor, goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek } =
     bestuurMaak({ S, save, id, tekst, geldigHuis, vind, log, nu });
   const { liveVandaag, rtmailBerichten } = vandaagMaak({ data: () => db.data });
+  const eenmalig = require('./rtgone-idem')({ S, save, vind, nu });
   function state(huisRuw, context) {
     const huis = geldigHuis(huisRuw), s = S(), inHuis = x => x.huis === huis || x.huis === 'gedeeld';
     const fr = s.fricties.filter(inHuis), jaarCenten = fr.reduce((n, f) => n + f.jaarCenten, 0);
@@ -98,6 +99,13 @@ module.exports = ({ db, save, crypto }) => {
     rtmailBerichten,
     save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen: BESLUITTYPEN, goedkeuringMaak
   });
-  return { rtgone: { state, intentieMaak, belofteMaak, frictieMaak, overdrachtMaak, automatiseringVoorbereid, automatiseringVoer, automatiseringHerstel,
-    goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };
+  return { rtgone: { state,
+    intentieMaak: (body, actor) => eenmalig('intentie', 'intenties', body, actor, () => intentieMaak(body, actor)),
+    belofteMaak: (body, actor) => eenmalig('belofte', 'beloften', body, actor, () => belofteMaak(body, actor)),
+    frictieMaak: (body, actor) => eenmalig('frictie', 'fricties', body, actor, () => frictieMaak(body, actor)),
+    overdrachtMaak: (body, actor) => eenmalig('overdracht', 'overdrachten', body, actor, () => overdrachtMaak(body, actor)),
+    automatiseringVoorbereid: (body, actor) => eenmalig('automatisering', 'automatiseringen', body, actor, () => automatiseringVoorbereid(body, actor)),
+    automatiseringVoer, automatiseringHerstel,
+    goedkeuringMaak: (body, context) => eenmalig('goedkeuring', 'goedkeuringen', body, context && context.key, () => goedkeuringMaak(body, context)),
+    goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };
 };

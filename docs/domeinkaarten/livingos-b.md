@@ -20,6 +20,29 @@ Elke functie is bouwbaar beschreven: gegevens en bron, regels, rekenwijze, onzek
 
 Per app sluit een toetsbaar eindcontract over acht dimensies af. Dat contract vervangt de acht APPWERKT-bewijzen nooit.
 
+## Hoe te lezen: versie 3 (afbouwformaat, 19 oktober 2026)
+
+Op verzoek van de integrator is elke app aangevuld met één blok **"v3 — afbouw"**, als laatste onderdeel van zijn sectie. Er is niets weggehaald.
+
+- **LOS in drie groepen.** De functies van de app zijn verdeeld in:
+  - eigen functies (werken zonder andere app);
+  - noodzakelijke platformdiensten (zonder deze werkt de kern niet), met wat het lid ziet als zo'n dienst uitvalt;
+  - optionele koppelingen (de app werkt zonder; met is beter).
+
+  Bij elke functie staat de letterlijke schermtekst en het bestand.
+- **SAMEN in de velden van het appcontract.** Per app een blok met `uitgeeft`, `ontvangt` en `ketens`, in de vorm van `scripts/lib/appcontract.js`.
+  - Deze velden bestaan daar nog niet; `test/appcontract.test.js` weigert vandaag onbekende sleutels.
+  - Het blok is dus een voorstel voor het register, geen code. Het wordt pas code als de integrator het veld invoert.
+- **Per familie** een `FAMILIES`-entry (apps, gedeelde bouwstenen, eigenaar per app volgens `SCHERMEIGENAAR.json`) en `ONTBREKEND`-regels: één regel per schakel die ontbreekt.
+- **"Aanbevolen nu" is gesplitst:**
+  - **nu · HERSTEL**: de app belooft het of de wet of de huisregels vragen het, en het werkt niet (goed). Denk aan een fout, een privacy- of bevoegdheidsgat of een ontbrekende eerlijkheidszin.
+  - **nu · VERDIEPING**: een nieuwe functie die de app beter maakt, maar geen belofte breekt.
+  - Bij twijfel is gekozen voor VERDIEPING.
+- **Volledige werkzaamheid.** Per app één regel: wie doet hier zijn hele werk, voor wie is het maar een deel, en welke externe software blijft nodig.
+- **(te controleren).** Een wets- of marktregel uit een zoekfragment, een secundaire bron of een bron van derden draagt dit label.
+  - Zo'n regel stuurt geen weigerregel en geen 'bepaald'-uitkomst. Tot de controle waarschuwt de functie en weigert ze niet.
+  - Een primaire bron (de wettekst, de eigen prijspagina van de aanbieder) draagt het label niet.
+
 ## Verdeling (afgestemd met LivingOS-A en Geld; Centraal besliste)
 
 LivingOS-B heeft 25 apps:

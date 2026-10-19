@@ -83,6 +83,16 @@ test('alleen het Design System, en de bank staat eenmaal onder Acties', { skip }
   }
   await blad.getByRole('button', { name: 'Reizen', exact: true }).click();
   await page.waitForSelector('[data-id="reisblad"][data-actief] [data-reisaanbod]');
+  /* De melding van de mediapoort krijgt hier haar vorm van het Design System
+     (shared/media.css laadt niet): zichtbaar, met een sluitknop van 44px. */
+  await page.evaluate(() => RTGMedia.meld({ rtg: RTGMedia.teksten.geweigerd }));
+  const melding = await page.locator('.rtg-media-melding').evaluate(el => {
+    const s = getComputedStyle(el), k = el.querySelector('button').getBoundingClientRect();
+    return { positie: s.position, zicht: s.opacity, sluit: Math.min(k.width, k.height) };
+  });
+  assert.deepEqual(melding, { positie: 'fixed', zicht: '1', sluit: 44 });
+  await page.locator('.rtg-media-melding button').click();
+  assert.equal(await page.locator('.rtg-media-melding').count(), 0, 'de melding sluit');
   assert.equal(await page.locator('[data-open="reisblad"]').getAttribute('aria-pressed'), 'true');
   assert.deepEqual(fouten, []);
   await ctx.close();

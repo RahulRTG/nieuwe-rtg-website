@@ -21,4 +21,12 @@
   }
   .ds-melding.toon { opacity: 1; transform: none; }
   .ds-melding:empty { display: none; }
+  /* Een melding die blijft staan tot ze wordt gesloten (de mediapoort: waarom
+     camera of microfoon niet opengaat). Leesbaar en aanraakbaar. */
+  .ds-melding--blijft { display: flex; gap: var(--ds-ruimte-3); align-items: flex-start; pointer-events: auto; }
+  .ds-melding__kop { display: block; color: var(--ds-cover-metaal); font-weight: 600; margin-block-end: var(--ds-ruimte-1); }
+  .ds-melding__sluit {
+    flex: 0 0 auto; min-inline-size: 44px; min-block-size: 44px;
+    background: none; border: 0; color: inherit; font: inherit; cursor: pointer;
+  }
 }

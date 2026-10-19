@@ -3027,7 +3027,9 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
       if (!s.includes('/shared/media.js')) {
         misDeur++;
         fout(web(p) + ' gebruikt RTGMedia maar laadt /shared/media.js niet');
-      } else if (!s.includes('/shared/media.css')) {
+      } else if (!s.includes('/shared/media.css') && !s.includes('/ds/shell.js')) {
+        /* Een ds-scherm laadt geen erfenisblad; daar geeft .ds-melding--blijft
+           (public/ds/componenten/melding.css) de melding haar vorm. */
         misDeur++;
         fout(web(p) + ' laadt de mediapoort maar niet /shared/media.css; de melding staat er dan zonder vorm');
       }

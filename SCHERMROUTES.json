@@ -3,12 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "3ec35b97",
+  "commit": "d2991a7b",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
-   "ongecommitteInvoer": [],
+   "ongecommitteInvoer": [
+    "public/apps/flits.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1085,
-  "verwijzingen": 1317,
-  "voorvoegsels": 137,
+  "exactePaden": 1089,
+  "verwijzingen": 1321,
+  "voorvoegsels": 136,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -10310,6 +10312,34 @@
    "pad": "/api/festival/gast/programma",
    "schermen": [
     "public/apps/festival-gast.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/meld",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/rond",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/stem",
+   "schermen": [
+    "public/apps/flits.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/flits/vooruit",
+   "schermen": [
+    "public/apps/flits.html"
    ],
    "aantal": 1
   },
@@ -16243,10 +16273,13 @@
   },
   {
    "bestand": "public/apps/flits.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/flits/"
-   ]
+   "exact": [
+    "/api/flits/meld",
+    "/api/flits/rond",
+    "/api/flits/stem",
+    "/api/flits/vooruit"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foodcourt.html",

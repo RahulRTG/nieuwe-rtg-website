@@ -11,11 +11,21 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const CODE = 'PARTNERKANAAL-KANTOOR';
 const VORM = /^PK\.[0-9A-F]{32}$/;
 let srv, gedeeld, eig, map;
-function api(pad, body, token, koppen) {
+/* Boeken en de personeelsdeur vragen een account (eigenaarsbesluit 19 oktober
+   2026): de personeelscode is een extra sleutel bij de sessie. Een aanroep van
+   /api/book of /api/staff zonder eigen token reist met een gratis account mee;
+   een expliciete null is een aanroep zonder account. */
+let klant = null;
+async function api(pad, body, token, koppen) {
+  if (token === undefined && (pad === '/api/book' || pad === '/api/staff')) {
+    klant = klant || await registreerGratis(srv.base);
+    token = klant.token;
+  }
   return fetch(srv.base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}, koppen || {}),
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, kop: r.headers, body: await r.json().catch(() => ({})) }));
@@ -46,6 +56,8 @@ test('1. de partnercode is een attributie: geen tarief, geen bedrijfsgegevens, g
     assert.ok(reizen.body.trips.every(t => !('staffPrice' in t)), 'geen personeelstarief op een partnercode: ' + JSON.stringify(lijf));
   }
   assert.equal((await api('/api/staff', { staffCode: 'ATLAS' })).status, 404, 'de partnercode is geen personeelscode');
+  assert.equal((await api('/api/book', { tripId: 'gstaad-alpien', name: 'Test Reiziger', email: 'reiziger@test.nl' }, null)).status, 401, 'boeken zonder account');
+  assert.equal((await api('/api/staff', { staffCode: 'ATLAS' }, null)).status, 401, 'de personeelsdeur zonder account');
   const zonder = await boek();
   const met = await boek({ code: 'ATLAS' });
   assert.equal(met.status, 200);

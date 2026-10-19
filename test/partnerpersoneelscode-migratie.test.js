@@ -85,6 +85,7 @@ test('3. fail-closed: zonder collectietransactie of op een vreemde vorm weigert 
 test('4. echte server: bij de opslagstart is de oude code weg, het kantoor ziet wanneer, en een herstart doet niets',
   { timeout: 240000 }, async () => {
     const { startServer, stopNet, kantoorAlsPersoon } = require('./helper');
+    const { registreerGratis } = require('../scripts/lib/gratisaccount');
     const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-b21-'));
     const env = { SMTP_URL: '', RTG_DATA_DIR: map, RTG_STORE: 'json', OFFICE_CODE: 'B21-KANTOOR' };
     const DB = path.join(map, 'db.json');
@@ -109,9 +110,11 @@ test('4. echte server: bij de opslagstart is de oude code weg, het kantoor ziet 
       const o = await overzicht();
       assert.equal(o.oudeKaleCode, false, 'na de start staat er geen oude code meer');
       assert.match(String(o.oudeCodeGewistOp), /^\d{4}-\d\d-\d\dT/, 'en het kantoor ziet wanneer hij gewist is');
-      const staff = await fetch(srv.base + '/api/staff', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      // de personeelscode is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026)
+      const lid = await registreerGratis(srv.base);
+      const staff = await fetch(srv.base + '/api/staff', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid.token },
         body: JSON.stringify({ staffCode: OUD }) });
-      assert.equal(staff.status, 404, 'de oude code opent niets');
+      assert.equal(staff.status, 404, 'de oude code opent niets, ook niet met een account');
       await stopNet(srv.child);
       const na = fs.readFileSync(DB, 'utf8');
       assert.ok(!na.includes(OUD), 'de oude code staat niet meer in db.json');

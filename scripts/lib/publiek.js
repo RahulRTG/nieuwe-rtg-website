@@ -268,7 +268,6 @@ const PUBLIEK = new Map([
   ['/api/krant/artikel', 'idem'],
   ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
   ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
-  ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
   /* Een klaargezette reis wordt geopend door iemand die nog GEEN lid is --
      dat is de hele opzet van de reisuitnodiging. Het slot is de code zelf
      (128 bits uit crypto.randomBytes); wat er zonder opeisen te zien is,

@@ -87,7 +87,8 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.equal((await post('/api/login', { tier: 'business' })).status, 403, 'demo-pas-login is dicht');
   assert.equal((await post('/api/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (leden)');
   assert.equal((await post('/api/supplier/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (leveranciers)');
-  assert.equal((await post('/api/staff', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (personeel)');
+  // de personeelsdeur vraagt eerst een account (eigenaarsbesluit 19 oktober 2026): zonder account 401
+  assert.equal((await post('/api/staff', { username: 'Rahul', password: 'Imran' })).status, 401, 'zonder account opent het demo-account niets (personeel)');
 
   /* En kaal http wordt onherroepelijk naar https gestuurd. Let op WELK adres
      we daarvoor nemen: een gewone pagina, niet /api/health. De prikken van de

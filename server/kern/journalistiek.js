@@ -7,7 +7,7 @@
 
    Alles per leverancier-code, geschoond en begrensd. Beeld verwijst naar eigen
    RTG-campagne of Salon; we bewaren alleen de verwijzing. */
-module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
+module.exports = ({ db, save, crypto, schoon, findSupplier, anthropic }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
@@ -116,15 +116,12 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
     // eenvoudige kop-suggesties zonder sleutel
     const woorden = inhoud.replace(/\s+/g, ' ').trim().split(' ').slice(0, 8).join(' ');
     val.koppen = [titel || woorden, (woorden.slice(0, 60))].filter(Boolean);
-    if (!claude || !claude.beschikbaar || !claude.beschikbaar()) return val;
-    try {
-      const uit = await claude.vraag({
-        systeem: 'Je bent een ervaren eindredacteur. Antwoord in het Nederlands, kort en zakelijk, geen opsmuk.',
-        prompt: 'Geef voor dit artikel een chapo (max 240 tekens) en drie kop-opties. Titel: "' + titel + '". Tekst: ' + inhoud.slice(0, 3000),
-        max: 400
-      });
-      if (uit) val.ai = String(uit).slice(0, 1200);
-    } catch (e) {}
+    // via de lokaal-eerst-keten van het huis (server/ai.js); null bij geen model of een fout
+    const uit = await require('../ai-kort').tekst(anthropic,
+      'Je bent een ervaren eindredacteur. Antwoord in het Nederlands, kort en zakelijk, geen opsmuk.',
+      'Geef voor dit artikel een chapo (max 240 tekens) en drie kop-opties. Titel: "' + titel + '". Tekst: ' + inhoud.slice(0, 3000),
+      { max: 400 });
+    if (uit) val.ai = String(uit).slice(0, 1200);
     return val;
   }
 

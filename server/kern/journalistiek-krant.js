@@ -1,9 +1,10 @@
 /* DE KRANT ZOALS EEN BEZOEKER HEM ZIET.
 
    Deze drie functies horen bij journalistiek.js maar hebben een andere lezer:
-   de redactie schrijft, het publiek leest. /api/krant/* vraagt geen sessie, dus
-   dit is de enige kant van dit domein die een vreemde kan aanroepen -- en juist
-   daarom moet hij lezen zonder te scheppen (zie kijk() in kern/eigencollectie.js):
+   de redactie schrijft, het publiek leest. /api/krant/* vraagt een ledensessie
+   (routes/journalistiek.js, besluit van 19 oktober 2026: gebruiken vraagt een
+   account), maar de lezer is geen redactie -- en juist daarom moet hij lezen
+   zonder te scheppen (zie kijk() in kern/eigencollectie.js):
    met bak() zou een onbekende code een redactie laten ontstaan, aangemaakt door
    iemand die geen krant heeft.
 

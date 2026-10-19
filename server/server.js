@@ -1065,7 +1065,7 @@ const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypt
 // dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
 const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });
 // Het Journalistiek-genre (kern/journalistiek.js): redactie + eigen krantsite.
-const journalistiek = require('./kern/journalistiek')({ db, save, crypto, schoon, findSupplier });
+const journalistiek = require('./kern/journalistiek')({ db, save, crypto, schoon, findSupplier, anthropic });
 // De content-creator-laag (kern/creator.js): carriere-profiel, platforms, tarieven,
 // portfolio, content-kalender en een AI content/script-helper.
 const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthropic, schoon });

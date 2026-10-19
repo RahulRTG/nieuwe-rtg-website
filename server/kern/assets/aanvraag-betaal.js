@@ -6,7 +6,7 @@
 const tijdzone = require('../tijdzone');
 
 module.exports = (ctx, { lijst, publiek, SOORT }) => {
-  const { db, save, crypto, notify, betaalWaarheid, nu, objectVan, ticketWaarde, kasAdd, binnenBedenktijd,
+  const { ticketsVoor, geefTicketsUit, save, crypto, notify, betaalWaarheid, nu, objectVan, ticketWaarde, kasAdd, binnenBedenktijd,
     bezetVan, UREN_PER_TICKET, JAREN_GELDIG, BEDENKTIJD_DAGEN, TICKETS_PER_OBJECT } = ctx;
 
   /* Stap 4: de tickets, precies een keer, alleen na een definitieve betaling. */
@@ -19,7 +19,7 @@ module.exports = (ctx, { lijst, publiek, SOORT }) => {
       key: x.key, codenaam: x.codenaam, tier: x.tier, smaak: x.smaak, prijs: x.prijs, urenPerJaar: UREN_PER_TICKET,
       at: nu(), vervaltOp: vervalt.toISOString().slice(0, 10), akkoord: x.akkoord, status: 'actief', uitstap: null,
       feeJaar: tijdzone.jaarIn(), aanvraagId: x.id, betalingId: x.betalingId });
-    db.data.assetTickets.unshift(...tickets);
+    geefTicketsUit(tickets);
     const a = objectVan(x.assetId);
     if (x.smaak === 'asset' && a) kasAdd(a.id, (x.prijs - ticketWaarde(a)) * 100 * x.aantal);
     x.status = 'betaald'; x.ticketIds = tickets.map(t => t.id); x.betaaldAt = nu();
@@ -83,7 +83,7 @@ module.exports = (ctx, { lijst, publiek, SOORT }) => {
   /* Een terugbetaling die later bevestigd wordt (webhook, veegronde) rondt de
      herroeping af zodra het lid kijkt. */
   function bijwerken(key) {
-    for (const t of db.data.assetTickets) if (t.key === key && t.status === 'herroep-loopt' && terugStand(t) === 'BEVESTIGD') rondAf(t);
+    for (const t of ticketsVoor(key)) if (t.status === 'herroep-loopt' && terugStand(t) === 'BEVESTIGD') rondAf(t);
   }
 
   /* Herroepen: een open aanvraag sluiten, of een betaald ticket binnen de
@@ -96,7 +96,7 @@ module.exports = (ctx, { lijst, publiek, SOORT }) => {
       x.status = 'ingetrokken'; save();
       return { ok: true, aanvraag: publiek(x), let: 'De aanvraag is gesloten. Er was niets afgeschreven.' };
     }
-    const t = db.data.assetTickets.find(y => y.id === id && y.key === sess.key && ['actief', 'herroep-loopt'].includes(y.status));
+    const t = ticketsVoor(sess.key).find(y => y.id === id && ['actief', 'herroep-loopt'].includes(y.status));
     if (!t) return { status: 404, error: 'Ticket niet gevonden.' };
     if (t.status === 'herroep-loopt') {
       const s = terugStand(t);

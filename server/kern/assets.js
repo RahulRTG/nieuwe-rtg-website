@@ -82,6 +82,15 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay, bet
     // oudere pools: elk object hoort in een eigen entiteit
     for (const a of db.data.sharedAssets) if (!a.entiteit) a.entiteit = 'RTG Asset Pool ' + a.naam.split(',')[0] + ' B.V.';
   };
+  // Aanvragen en ticketuitgifte blijven onder dezelfde poolopslag als de winkel.
+  // De betaalafhandelaar krijgt alleen deze operaties, niet de volledige database.
+  const aanvragen = () => {
+    lijsten();
+    if (!Array.isArray(db.data.assetAanvragen)) db.data.assetAanvragen = [];
+    return db.data.assetAanvragen;
+  };
+  const ticketsVoor = key => { lijsten(); return db.data.assetTickets.filter(t => t.key === key); };
+  const geefTicketsUit = tickets => { lijsten(); db.data.assetTickets.unshift(...tickets); };
   const objectVan = id => { lijsten(); return db.data.sharedAssets.find(a => a.id === String(id || '')); };
   const ticketWaarde = a => Math.round(a.waarde / TICKETS_PER_OBJECT);
   const prijsAccessVan = a => netjes(ticketWaarde(a) * ACCESS_FACTOR);
@@ -101,7 +110,7 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay, bet
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
     TERUGKOOP_VENSTER_DAGEN, SERVICE_FEE_PCT, OVERDRACHT_FEE_PCT, ONDERHOUD_DAGEN, PIEK_MAANDEN,
     ACCESS_FACTOR, ASSET_FACTOR, netjes,
-    nu, vandaag, lijsten, objectVan, ticketWaarde, prijsAccessVan, prijsAssetVan, serviceFeeVan,
+    nu, vandaag, lijsten, aanvragen, ticketsVoor, geefTicketsUit, objectVan, ticketWaarde, prijsAccessVan, prijsAssetVan, serviceFeeVan,
     actieveVan, bezetVan, magKopen, kasAdd, binnenBedenktijd };
   const deelWinkel = require('./assets/winkel')(ctx);
   Object.assign(ctx, deelWinkel);

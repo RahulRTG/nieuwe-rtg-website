@@ -23,10 +23,9 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { save, crypto, schoon, notify, nu, lijsten, objectVan, db,
+  const { save, crypto, schoon, notify, nu, aanvragen: lijst, objectVan,
     prijsAccessVan, prijsAssetVan, bezetVan, magKopen, TICKETS_PER_OBJECT, TERUGKOOP_VENSTER_DAGEN } = ctx;
   const SOORT = 'asset-koop';
-  const lijst = () => { lijsten(); if (!Array.isArray(db.data.assetAanvragen)) db.data.assetAanvragen = []; return db.data.assetAanvragen; };
   const sleutelVan = (idem) => typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
   const publiek = (a) => ({ id: a.id, assetId: a.assetId, assetNaam: a.assetNaam, smaak: a.smaak, aantal: a.aantal,
     prijs: a.prijs, totaal: a.totaalCenten / 100, status: a.status, at: a.at, besloten: a.besluit ? { at: a.besluit.at, besluit: a.besluit.besluit } : null,

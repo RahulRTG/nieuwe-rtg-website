@@ -8,8 +8,9 @@
    oktober 2026 (derde reeks) rondt een mens op naam de controle af, op de
    regel "Betaling op controle" van de betaalkamer; daarna gaat het tweede
    ticket terug. De kerntoets staat in test/controleafronden.test.js; deze loopt
-   de hele weg met de echte routes en de simulatiebank, en kiest de afloop met
-   test/lib/assetkoop.js#terugAfloop. */
+   de hele weg met de echte routes en de simulatiebank. Alleen de twee
+   terugbetalingsscenario’s worden in de geïsoleerde testserver vastgezet;
+   autorisatie, betaalwaarheid en providerafhandeling blijven echt. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -28,29 +29,44 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
 }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_SIMULATIEBANK: '1', OFFICE_CODE: CODE } });
+  // De oude fixture kocht maximaal 60 willekeurige tickets en hoopte op een
+  // weigering (7% per ticket). Dat faalt circa 1,3% van de runs vóór de proef.
+  // Injecteer de scenariofunctie in de bestaande provider, alleen in dit kindproces.
+  const naslag = require.resolve('../server/betaal/synthetisch-naslag');
+  const script = path.join(TMP, 'controle-server.cjs');
+  fs.writeFileSync(script, `
+    const pad = ${JSON.stringify(naslag)};
+    const origineel = require(pad);
+    const scenarioPerSleutel = new Map();
+    require.cache[pad].exports = Object.assign(function (ctx) {
+      return origineel({ ...ctx, scenarioVan(o) {
+        const sleutel = o.idempotentieSleutel;
+        if (!scenarioPerSleutel.has(sleutel)) scenarioPerSleutel.set(sleutel,
+          scenarioPerSleutel.size === 0 ? 'geweigerd' : 'betaald');
+        return scenarioPerSleutel.get(sleutel);
+      } });
+    }, origineel);
+    require(${JSON.stringify(require.resolve('../server/server'))});
+  `);
+  srv = await startServer({ script, env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_SIMULATIEBANK: '1', OFFICE_CODE: CODE } });
   base = srv.base;
   zakelijk = (await api('login', { tier: 'business' })).body.token;
   opNaam = await kantoorAlsPersoon(base, CODE);
   gedeeld = (await api('office/login', { code: CODE })).body.token;
   assert.ok(zakelijk && opNaam && gedeeld);
 });
-test.after(async () => { await stop(srv); });
+test.after(async () => {
+  await stop(srv);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 test('na een geweigerde terugbetaling gaat het tweede ticket pas terug als een mens op naam de controle afrondt', async () => {
   const villa = (await api('assets', {}, zakelijk)).body.assets.find((a) => a.soort === 'villa');
-  /* een aanvraag van vijf tickets waarin de bank er een weigert en een ander betaalt */
-  let aanvraag, geweigerd, betaald;
-  for (let poging = 0; poging < 12 && !(geweigerd && betaald); poging++) {
-    const k = await assetkoop.gekocht(api, { token: zakelijk, pas: 'business', opNaam,
-      body: { assetId: villa.id, smaak: 'access', aantal: 5 } });
-    assert.equal(k.status, 200, JSON.stringify(k.body));
-    aanvraag = k.body.aanvraag;
-    const afloop = (id) => assetkoop.terugAfloop('business', aanvraag.id, id);
-    geweigerd = k.body.ticketIds.find((id) => afloop(id) === 'geweigerd');
-    betaald = k.body.ticketIds.find((id) => afloop(id) === 'betaald');
-  }
-  assert.ok(geweigerd && betaald, 'een aanvraag met een geweigerde en een betaalde terugbetaling');
+  const k = await assetkoop.gekocht(api, { token: zakelijk, pas: 'business', opNaam,
+    body: { assetId: villa.id, smaak: 'access', aantal: 2 } });
+  assert.equal(k.status, 200, JSON.stringify(k.body));
+  assert.equal(k.body.ticketIds.length, 2);
+  const [geweigerd, betaald] = k.body.ticketIds;
 
   const eerste = await api('asset/herroep', { ticketId: geweigerd }, zakelijk);
   assert.equal(eerste.status, 409, JSON.stringify(eerste.body));

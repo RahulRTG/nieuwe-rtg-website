@@ -8,10 +8,12 @@ const path = require('path');
 const functies = require('../server/functies');
 const maak = require('../server/kern/magnaatwereld');
 
-function wereld() {
+/* De spelers in deze toetsen zijn gekeurde volwassenen (progressieMag); wat
+   er onder de 18+-grens gebeurt, staat in een eigen toets hieronder. */
+function wereld(progressieMag = () => true) {
   const db = { data: {} };
   let saves = 0;
-  const { magnaatWereld } = maak({ db, save: () => { saves += 1; }, crypto, functies });
+  const { magnaatWereld } = maak({ db, save: () => { saves += 1; }, crypto, functies, progressieMag });
   return { db, saves: () => saves, w: magnaatWereld };
 }
 
@@ -88,6 +90,26 @@ test('een missie controleert dat de speler het juiste echte RTG-scherm opent', (
   assert.equal(goed.ok, true);
   assert.equal(goed.taak.huidig.soort, 'keuze');
   assert.ok(goed.taak.punten >= 75);
+});
+
+test('onder de 18+-grens is elke dienst speelbaar maar worden xp, niveau en reputatie niet bewaard', () => {
+  /* CLAUDE.md: niveaus en prestaties buiten het potje bestaan alleen voor wie
+     volwassen() haalt, via progressieMag (server/kern/spellen/grens.js). */
+  const mag = (key) => key === 'user-volwassen';
+  const { w } = wereld(mag);
+  const c = w.catalogus.find(x => x.id === 'betalen');
+  const jong = voltooi(w, 'user-jong', c.id);
+  assert.equal(jong.taak.status, 'klaar', 'het dossier is gewoon af te maken');
+  const sJong = w.overzicht('user-jong').speler;
+  assert.equal(sJong.xp, 0, 'er wordt geen xp bewaard');
+  assert.equal(sJong.niveau, 1);
+  assert.equal(sJong.reputatie, 50, 'en geen reputatie');
+  const oud = voltooi(w, 'user-volwassen', c.id);
+  assert.ok(w.overzicht('user-volwassen').speler.xp >= oud.taak.punten, 'een gekeurde volwassene bouwt wel op');
+  /* Zonder bedrading geen progressie: de grens faalt dicht. */
+  const { magnaatWereld: kaal } = maak({ db: { data: {} }, save: () => {}, crypto, functies });
+  voltooi(kaal, 'user-x', c.id);
+  assert.equal(kaal.overzicht('user-x').speler.xp, 0);
 });
 
 test('een herhaald antwoord beantwoordt niet stil de volgende vraag', () => {

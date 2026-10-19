@@ -21,7 +21,9 @@ const partnerstudio = require('../kern/magnaat-partnerstudio')({ db, save, crypt
 Object.assign(kern, partnerstudio);
 Object.assign(kern, require('../kern/magnaatwereld')({
   db, save, bewerkCollectie, crypto, functies: require('../functies'), sseToCustomer,
-  partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan
+  partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan,
+  // xp, niveau en reputatie alleen voor 18+ en gekeurd (CLAUDE.md, kern/spellen/grens.js)
+  progressieMag: require('../kern/spellen/grens')({ volwassen: kern.volwassen }).progressieMag
 }));
 /* Magnaat Van Nul (V1): een leven per lid, met al het geld door het grootboek.
    Het hangt onder Magnaat Wereld en krijgt geen eigen kernnaam. */

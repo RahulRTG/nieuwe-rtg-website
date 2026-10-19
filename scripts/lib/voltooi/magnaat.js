@@ -90,6 +90,20 @@ async function loop(w, stap) {
       ziet: 'antwoord ' + a.status + ', handeling ' + h.status + ', B heeft xp ' + b.xp + '; de taak van A blijft op stap ' + (zelf.actieveTaak && zelf.actieveTaak.stap) };
   });
 
+  await stap('voltooibaar', 'een lid zonder gekeurde identiteit speelt een dossier helemaal af, maar bouwt geen xp of reputatie op (18+-grens)', async () => {
+    const J = await nieuwLid(w, 'magj');
+    const t = await maakAf(await begin(J.token), J.token);
+    const s = await speler(J.token);
+    return { klopt: t.status === 'klaar' && s.voltooid === 1 && s.xp === 0 && s.niveau === 1 && s.reputatie === 50 && /18 of ouder/.test(t.feedback),
+      ziet: 'dossier ' + t.status + ', voltooid ' + s.voltooid + ', xp ' + s.xp + ', reputatie ' + s.reputatie };
+  });
+
+  await stap('voltooibaar', 'zonder sessie opent niemand Magnaat of een dossier', async () => {
+    const o = await w.post(OVERZICHT, {});
+    const st = await w.post(START, { functieId: 'betalen', apparaat: 'computer' });
+    return { klopt: o.status === 401 && st.status === 401, ziet: 'overzicht ' + o.status + ', start ' + st.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staan punten, voltooid dossier en de lopende opdracht er nog', async () => {

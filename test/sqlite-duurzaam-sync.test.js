@@ -30,6 +30,34 @@ function setup(t) {
 const writes = p => p.sql.filter(r => r.text === 'BEGIN IMMEDIATE');
 const commits = p => p.sql.filter(r => r.text === 'COMMIT');
 
+test('kritieke auditpoort bewaart toestemming vóór uitvoering met alleen haar eigen journaal', async t => {
+  const p = setup(t);
+  const spoor = p.handeling();
+  const poort = require('../server/opzet/kritiekspoor');
+  poort.haak({ handelingsspoor: spoor,
+    vastleggen: require('../server/lib/duurzaam')({ ...p,
+      save: p.save.bind(null, ['handelingLog']), bron: 'handelingsspoor' }) });
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() {
+    scans++; return { waarde: this.waarde };
+  } });
+  p.sql.length = 0;
+  await new Promise((resolve, reject) => {
+    poort.poort({ method: 'POST', path: '/api/pay/overzicht', id: 'audit-test' },
+      { status: code => ({ json: body => reject(new Error(code + ': ' + JSON.stringify(body))) }) }, 'sam', () => {
+        try {
+          const rijen = p.lees('handelingLog');
+          assert.equal(rijen.length, 1);
+          assert.equal(rijen[0].stand, 'toegestaan');
+          assert.equal(rijen[0].wie, 'sam');
+          assert.equal(scans, 0);
+          assert.deepEqual(commits(p).filter(r => r.mode === 2).map(r => r.mode), [2]);
+          resolve();
+        } catch (e) { reject(e); }
+      });
+  });
+});
+
 test('FULL legt KV en audit atomair vast, publiceert na commit en scant één keer zonder checkpoint', async t => {
   const p = setup(t), j = journal(p); p.sql.length = 0; p.checkpoints.length = 0;
   let scans = 0;

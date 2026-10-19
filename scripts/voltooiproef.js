@@ -88,6 +88,7 @@ const SCENARIOS = {
   'connect.js': require('./lib/voltooi/connect'),
   'entourage.js': require('./lib/voltooi/entourage'),
   'foodcourt.js': require('./lib/voltooi/foodcourt'),
+  'foundationzorg.js': require('./lib/voltooi/foundationzorg'),
   'garderobe.js': require('./lib/voltooi/garderobe'),
   'geven.js': require('./lib/voltooi/geven'),
   'gegevens.js': require('./lib/voltooi/gegevens'),

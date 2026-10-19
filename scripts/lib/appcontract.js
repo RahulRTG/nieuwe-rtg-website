@@ -194,6 +194,9 @@ const CONTRACT = {
   'link:vrienden': Object.assign({
     belofte: 'een kind zoekt niet zelf: zijn ouder voegt een vriendje toe, de ouder van dat vriendje keurt goed, en pas dan sturen de kinderen elkaar berichten'
   }, voltooi('vrienden', 'het scenario loopt /api/rtf/social/connections, /find, /connect, /oudervoeg, /goedkeuren, /dm, /dm/send en /kind/contacten, de routes die /apps/foundation/vrienden.html zelf aanroept, met drie gezinnen')),
+  'link:foundationzorg': Object.assign({
+    belofte: 'het gezin ziet zijn zorgafspraken (betalen, annuleren) en de gezondheidskaart van het gezin bij elkaar, en een hulpwijzer denkt mee zonder de tekst te bewaren'
+  }, voltooi('foundationzorg', 'het scenario loopt /api/care, /api/care/mijn, /betaal, /annuleer, /api/foundation/gezin/:code/gezondheid en /api/foundation/hulp/ai, de routes die /apps/foundation/zorg.html via zorg-hulp.js aanroept')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

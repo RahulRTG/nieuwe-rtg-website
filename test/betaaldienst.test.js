@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -24,8 +24,12 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  lid = (await api(base, '/api/auth/register', { name: 'Kosten Lid', email: 'bd' + u + '@x.nl',
-    phone: '061' + u.slice(1), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = (await api(base, '/api/auth/register', { name: 'Kosten Lid', email: 'bd' + u + '@x.nl',
+    phone: '061' + u.slice(1), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  lid = reg.token;
+  /* gekeurd: een kassacode is een geldmoment en vraagt eenmalig het paspoort
+     (payGate, besluit 19 oktober 2026; test/kascode-gratisaccount.test.js) */
+  await keurLidGoed(base, lid, reg.state.user.codename);
   const roster = await api(base, '/api/supplier/roster', { code: 'LUCHT' });
   const man = roster.body.staff.find(m => m.role === 'manager');
   zaak = (await api(base, '/api/supplier/login', { code: 'LUCHT', staffId: man.id, pin: '1234' })).body.token;

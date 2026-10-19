@@ -11,7 +11,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-auditatomair-'));
 let srv;
@@ -26,6 +26,9 @@ test('SQLite: faalt de auditschrijf, dan geen 2xx en geen vastgelegde kascode', 
   const reg = await api('/api/auth/register', { name: 'Atomair Proef', email: 'atomair@x.nl', phone: '0611223344',
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, JSON.stringify(reg.body));
+  /* gekeurd: een kassacode is een geldmoment en vraagt eenmalig het paspoort
+     (payGate, besluit 19 oktober 2026; test/kascode-gratisaccount.test.js) */
+  await keurLidGoed(srv.base, reg.body.token, reg.body.state.user.codename);
   const ok = await api('/api/pay/kascode', { maxCenten: 1000, idem: 'eerst' }, reg.body.token);
   assert.equal(ok.status, 200, 'controle zonder storing: ' + JSON.stringify(ok.body));
 

@@ -65,6 +65,9 @@ test('auditspoor in PostgreSQL: atomair met de mutatie, vervalsing wordt 503 + a
         password: 'geheim123', phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' });
       const token = reg.token;
       assert.ok(token, JSON.stringify(reg));
+      /* een kassacode is een geldmoment en vraagt eenmalig het paspoort (payGate,
+         besluit 19 oktober 2026); een ingediend bewijs zet de keuring op 'pending' */
+      await api('/api/verify/upload', { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' }, token);
 
       await t.test('1a. controle: een kascode laat in DEZELFDE commit een regel `vastgelegd` achter', async () => {
         const k = await api('/api/pay/kascode', { maxCenten: 1000, idem: 'k0' }, token);

@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 const { combinatiesUit } = require('../server/kern/voorspel');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dealkans-'));
@@ -49,6 +49,9 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Combi Lid', email: 'combi@x.nl', phone: '0655544433',
     password: 'geheim123', geboortedatum: '1986-06-06', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
+  /* gekeurd: een kassacode is een geldmoment en vraagt eenmalig het paspoort
+     (payGate, besluit 19 oktober 2026; test/kascode-gratisaccount.test.js) */
+  await keurLidGoed(srv.base, lid, reg.body.state.user.codename);
   assert.ok(kikunoi && sakura && lid);
 });
 test.after(() => {

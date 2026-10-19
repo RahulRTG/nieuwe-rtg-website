@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 const { gewoontenUit, seintjeVoor, ketenUit } = require('../server/kern/voorspel');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-voorspel-'));
@@ -26,6 +26,9 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Ritme Lid', email: 'ritme@x.nl', phone: '0611122233',
     password: 'geheim123', geboortedatum: '1988-03-03', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
+  /* gekeurd: een kassacode is een geldmoment en vraagt eenmalig het paspoort
+     (payGate, besluit 19 oktober 2026; test/kascode-gratisaccount.test.js) */
+  await keurLidGoed(base, lid, reg.body.state.user.codename);
   const zl = await api('/api/supplier/login', { username: 'rahul', password: 'Imran' });
   zaak = zl.body.token;
   assert.ok(lid && zaak, 'lid en zaak ingelogd');

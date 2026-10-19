@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T14:41:21.646Z",
-    "commit": "0e33781e",
+    "op": "2026-10-19T15:38:39.447Z",
+    "commit": "dfd18882",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -14230,7 +14230,7 @@
       "staat": "gezakt",
       "module": "public/apps/reizen-register.js",
       "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "reizen-veilig-ds.e2e.js": {

@@ -2,6 +2,14 @@
    bediening aan de eindkant en een objectkaart onderaan. */
 @layer rtg.scherm {
   .ds-canvas { position: relative; min-block-size: var(--ds-schermhoogte); overflow: hidden; }
+  /* Een vlak dat zelf donker tekent (De Résidence) heeft ook een donkere grond,
+     zodat de coverinkt erop leesbaar is voordat er getekend is. */
+  .ds-canvas--donker { background: var(--ds-cover-grond); }
+  /* Op een canvas zweeft de kop boven een vlak waarvan de kleur niet vaststaat
+     (een lichte kaart, een donkere zaal): merk en knoppen krijgen het vlak van
+     de zwevende bediening, zodat hun contrast nooit van de tekening afhangt. */
+  .ds-scherm:has(> .ds-canvas) .ds-kop--op-beeld .ds-kop__merk { padding-inline: var(--ds-ruimte-3); background: var(--ds-oppervlak-sterk); border-radius: var(--ds-radius-capsule); box-shadow: var(--ds-schaduw-systeem); color: var(--ds-inkt); }
+  .ds-scherm:has(> .ds-canvas) .ds-kop--op-beeld .ds-kop__actie { background: var(--ds-oppervlak-sterk); border-radius: var(--ds-radius-cirkel); box-shadow: var(--ds-schaduw-systeem); color: var(--ds-inkt); }
   .ds-canvas__vlak { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; background: var(--ds-oppervlak-zacht); color: var(--ds-inkt-zacht); }
   .ds-canvas__water { color: var(--ds-water); }
   .ds-canvas__speld { color: var(--ds-accent); }

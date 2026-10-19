@@ -21,7 +21,7 @@
   .ds-cover__zin { margin: 0; max-inline-size: 16ch; font-family: var(--ds-letter-display); font-size: clamp(1.625rem, 1.3rem + 1.4cqi, 2.25rem); line-height: 1.12; }
   .ds-cover__streep { display: block; inline-size: 48px; block-size: 1px; background: var(--ds-cover-metaal); }
   .ds-cover__nav { display: flex; justify-content: space-between; gap: var(--ds-ruimte-4); inline-size: 100%; font-family: var(--ds-letter-display); font-size: .9375rem; }
-  .ds-cover__nav a { color: inherit; text-decoration: none; opacity: .92; }
+  .ds-cover__nav a { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); color: inherit; text-decoration: none; opacity: .92; }
   .ds-cover__nav a:hover { color: var(--ds-cover-metaal); }
   @container ds (min-width: 64rem) {
     .ds-cover { text-align: start; padding-inline: calc(var(--ds-goot) * 2); }

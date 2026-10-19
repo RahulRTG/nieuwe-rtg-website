@@ -19,7 +19,8 @@
   .ds-veld__label { display: block; font-size: var(--ds-maat-klein); font-weight: 500; }
   /* Een invoer IN een rij (mockup Taak: Datum 17 apr. 2025): de rij is de
      vorm, het veld zelf heeft er geen. */
-  .ds-veld__invoer { display: block; inline-size: 100%; padding: 0; border: 0; background: transparent; color: var(--ds-inkt-zacht); font: inherit; font-size: var(--ds-maat-klein); }
+  /* Het bedienbare deel zelf haalt 24px (WCAG 2.5.8), niet alleen de rij. */
+  .ds-veld__invoer { display: block; inline-size: 100%; min-block-size: 1.75rem; padding: 0; border: 0; background: transparent; color: var(--ds-inkt-zacht); font: inherit; font-size: var(--ds-maat-klein); }
   .ds-veld__invoer:focus { outline: none; color: var(--ds-inkt); }
   .ds-veld:focus-within { border-color: var(--ds-accent); }
   .ds-velden { display: grid; gap: var(--ds-ruimte-2); }

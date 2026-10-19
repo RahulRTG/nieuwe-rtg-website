@@ -842,6 +842,65 @@ if (require.main !== module) { module.exports = {}; return; }
     if (stroom.staat !== 'onbereikbaar') perRoute['POST /api/stroom/ticket'] = { gang: 'stroom', ...stroom };
   }
 
+  /* ---- GANG 7: DE PASSKEY (/api/webauthn/registreer, /weg, /bevestig/opties) ----
+
+     Een passkey-ceremonie is niet na te doen met een verzonnen lijf, en dus
+     stonden deze drie routes open op elk identiteitsscherm. De authenticator
+     van test/webauthn-authenticator.js tekent met een echte P-256-sleutel; met
+     hem registreert A een passkey langs de echte ceremonie. Daarna:
+       registreer   B speelt A's ondertekende registratie na onder zijn eigen
+                    sessie -- dat hoort te stranden (de challenge is van A);
+       bevestig     A's ceremonie noemt A's credential; die van B hoort dat niet
+                    te doen (anders weet B welke sleutels A heeft);
+       weg          B probeert A's passkey weg te halen; daarna moet hij bij A
+                    nog staan, en de ijking is dat A hem ZELF wel weg kan halen.
+     Deze gang loopt als laatste: een passkey maakt A's herbevestiging zwaar, en
+     dat zou de gangen hierboven anders raken. */
+  const passkey = {};
+  {
+    const { maakAuthenticator } = require('../test/webauthn-authenticator');
+    const url = new URL(basis);
+    const sleutel = maakAuthenticator(url.hostname);
+    const credVan = async (tok) => ((((await post('/api/webauthn/lijst', {}, tok)).data) || {}).sleutels || []).map((x) => x.id);
+    const oA = await post('/api/webauthn/registreer/opties', { huidig: geheugen[1].wachtwoord }, A);
+    const ch = oA.data && oA.data.opties && oA.data.opties.challenge;
+    const antwoordA = ch ? sleutel.registratieAntwoord(ch, url.origin) : null;
+    const regA = antwoordA ? await post('/api/webauthn/registreer', { antwoord: antwoordA, naam: 'IDOR passkey A' }, A) : { status: 0 };
+    const credA = regA.status === 200 ? (await credVan(A))[0] : null;
+    if (!credA) {
+      passkey.reden = 'A kon geen passkey registreren (opties ' + oA.status + ', registreer ' + regA.status + '); zonder passkey van A is er niets te kruisen';
+    } else {
+      const oB = await post('/api/webauthn/registreer/opties', { huidig: geheugen[2].wachtwoord }, B);
+      const naspel = await post('/api/webauthn/registreer', { antwoord: antwoordA, naam: 'nagespeeld' }, B);
+      const bHeeft = (await credVan(B)).includes(credA);
+      passkey.registreer = (naspel.status >= 400 && naspel.status < 500 && !bHeeft)
+        ? { staat: 'gescheiden', status: naspel.status, reden: 'A registreerde een passkey (200); B speelde A\'s ondertekende registratie na onder zijn eigen sessie en kreeg ' +
+            naspel.status + ', en A\'s credential staat niet in B\'s lijst' }
+        : { staat: 'doorbraak', status: naspel.status, opties: oB.status, reden: 'B\'s nagespeelde registratie van A gaf ' + naspel.status + (bHeeft ? ' en A\'s credential staat in B\'s lijst' : '') + ': NAKIJKEN' };
+      const bevA = await post('/api/webauthn/bevestig/opties', { actie: 'passkey-weg' }, A);
+      const bevB = await post('/api/webauthn/bevestig/opties', { actie: 'passkey-weg' }, B);
+      const zieA = String(bevA.tekst || '').includes(credA), zieB = String(bevB.tekst || '').includes(credA);
+      passkey.bevestig = !zieA ? { staat: 'onbereikbaar', reden: 'A\'s eigen ceremonie noemde A\'s credential niet (' + bevA.status + '): niets om in B\'s ceremonie te zoeken' }
+        : zieB ? { staat: 'doorbraak', reden: 'B\'s ceremonie noemde A\'s credential: NAKIJKEN' }
+          : { staat: 'afgebakend', status: bevB.status, reden: 'A\'s ceremonie noemde A\'s credential, die van B (' + bevB.status + ') niet' };
+      const wegB = await post('/api/webauthn/weg', { id: credA }, B);
+      const nogBijA = (await credVan(A)).includes(credA);
+      let wegA = { status: 0 };
+      if (bevA.data && bevA.data.ceremonie && bevA.data.opties) {
+        wegA = await post('/api/webauthn/weg', { id: credA, ceremonie: bevA.data.ceremonie,
+          antwoord: sleutel.loginAntwoord(bevA.data.opties.challenge, url.origin, 1) }, A);
+      }
+      const ob = oordeelIdor(wegB.status, wegB.tekst);
+      passkey.weg = !(wegA.status >= 200 && wegA.status < 300) ? { staat: 'onbereikbaar', reden: 'A kon zijn eigen passkey niet weghalen (' + wegA.status + '): de deur is voor niemand open, een weigering voor B bewijst niets' }
+        : !nogBijA ? { staat: 'doorbraak', status: wegB.status, reden: 'na B\'s poging (' + wegB.status + ') stond A\'s passkey niet meer bij A: NAKIJKEN' }
+          : ob.staat === 'gescheiden' ? { staat: 'gescheiden', status: wegB.status, reden: 'B kreeg ' + wegB.status + ' op A\'s passkey, die stond daarna nog bij A, en A haalde hem zelf weg (' + wegA.status + ')' }
+            : { staat: ob.staat === 'doorbraak' ? 'doorbraak' : 'onbereikbaar', status: wegB.status, reden: 'B kreeg ' + wegB.status + ' op A\'s passkey: ' + ob.reden };
+      perRoute['POST /api/webauthn/registreer'] = { gang: 'passkey', ...passkey.registreer };
+      perRoute['POST /api/webauthn/bevestig/opties'] = { gang: 'passkey', ...passkey.bevestig };
+      perRoute['POST /api/webauthn/weg'] = { gang: 'passkey', ...passkey.weg };
+    }
+  }
+
   klaar();
 
   const doorbraken = Object.entries(perRoute).concat(Object.entries(zaakPerRoute)).filter(([, v]) => v.staat === 'doorbraak');
@@ -867,7 +926,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
+      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, passkey, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute,
@@ -884,6 +943,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  afbakening (gang 4, routes zonder id): ' + JSON.stringify(afbakening));
   console.log('  zaken (gang 5, KIKUNOI tegen PONTO): ' + JSON.stringify(zaak));
   console.log('  stroom (gang 6): ' + JSON.stringify(stroom));
+  console.log('  passkey (gang 7): ' + JSON.stringify(passkey));
   console.log('  opbouw (gang 1b): ' + opbouw.geslaagd + ' van ' + opbouw.stappen + ' stappen geslaagd' +
     (opbouw.mislukt.length ? '; mislukt: ' + opbouw.mislukt.join(' | ') : ''));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');

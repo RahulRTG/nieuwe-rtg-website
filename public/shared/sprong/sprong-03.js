@@ -192,7 +192,11 @@
      (test/sprong-zonderbody.test.js; run 38331448632 zag het in WebKit.) */
   function start() {
     if (!d.body || !lid() || verboden()) return;
-    stijl(); greepje();
+    /* Op een scherm van het RTG Design System (html[data-ds]) is de zoekknop
+       linksboven in de kop de greep: dezelfde plek op elk scherm, een tik
+       (/ds/shell.js koppelt [data-ds-zoek] aan open()). Een tweede zwevende
+       greep zou daar een losse laag naast de Edge zijn. */
+    stijl(); if (!d.documentElement.hasAttribute('data-ds')) greepje();
     if (w.requestIdleCallback) w.requestIdleCallback(vooraf, { timeout: 1500 }); else setTimeout(vooraf, 300);
     d.addEventListener('keydown', function (e) {
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); open(); return; }

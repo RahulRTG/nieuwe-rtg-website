@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19568 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2826 bestanden en 19573 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2825 |
-| losse beweringen (`test(...)`) | 19568 |
+| toetsbestanden | 2826 |
+| losse beweringen (`test(...)`) | 19573 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2635 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 8 |
+| niets van beide | 9 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2487 bestanden, 18996 beweringen.
+2487 bestanden, 18998 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1474,7 +1474,7 @@ toets omvalt.
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
 | `ontwerpbureaus-verwijder.test.js` | 1 | gezakt op `liegpoort /api/` | EEN ONTWERP WEGHALEN UIT DE VIER ONTWERPBUREAUS VAN HET KANTOOR. RTG Atelier, de Ontwerpstudio, het Hardwarelab en het Architectenbureau (server/routes/kantoren/bureaus.js) hebben elk een /verwijder-deur die door... |
-| `ontwerpsysteem.test.js` | 21 | gezakt op `voorwaarde-omkeren#0` | De tand van ONTWERPSYSTEEM.md: gaat hij echt dicht? Een grendel die nooit zakt is niet te onderscheiden van een grendel die niets meet. |
+| `ontwerpsysteem.test.js` | 23 | gezakt op `voorwaarde-omkeren#0` | De tand van ONTWERPSYSTEEM.md: gaat hij echt dicht? Een grendel die nooit zakt is niet te onderscheiden van een grendel die niets meet. |
 | `onvervreemdbaar.test.js` | 7 | gezakt op `===->!==#0` | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 15 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
@@ -2527,7 +2527,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-338 bestanden, 572 beweringen.
+339 bestanden, 575 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2639,6 +2639,7 @@ toets omvalt.
 | `horeca-vloer.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET VLOERSCHERM in een echte browser: /apps/horeca-vloer.html. De regels staan vast in test/horeca-wijk.test.js. |
 | `horecascherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Het horecascherm in een echte browser: /apps/horeca.html. Twee dingen worden hier bewezen, en het zijn allebei dingen die van buiten niet te zien zijn aan een groene API-toets: 1. |
 | `horecaschermen.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE ZEVEN WERKSCHERMEN VAN HET HORECA OS, IN EEN ECHTE BROWSER. /apps/horeca.html (zaal en keuken) heeft zijn eigen toets. |
+| `hotels-ds.e2e.js` | 3 | -- | RTG Verblijven op het RTG Design System: het bewijs van batch 3 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `huis.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor Het Huis: het reisdossier op blad 02 van het magazine. test/huis.test.js bewijst de server-kant; deze bewijst dat het blad de reis toont, elke stand als woord draagt, en dat "wat er nog moet"... |
 | `identiteitschermen.e2e.js` | 2 | geen bronmutatie mogelijk | DRIE SCHERMEN DIE OVER IDENTITEIT EN RUST GAAN. Uit de 104 schermen waar geen enkele toets de weg aflegt (TAKEN 4.9) zijn dit er drie waar het duurste misverstand mogelijk is: ze gaan over wie u bent en over hoe dit... |
 | `ingebedde-chrome.e2e.js` | 1 | gezakt op `liegpoort /api/` | EEN INGEBED SCHERM HEEFT EEN BEDIENING, EN DAT IS DIE VAN ZIJN OUDER. ONTWERP.md legt dat al vast: "In een iframe, ?embed=1 of Command-oppervlak wordt geen tweede Edge gestart en wordt de lokale vaste chrome van het... |

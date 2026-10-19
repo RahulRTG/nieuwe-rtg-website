@@ -308,7 +308,11 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
        declaratieve schermvorm gebruikt daarom rechtstreeks de technische
        wauw-laag; alle gewone apps houden de volledige metgezel. */
     const projectie = /<body[^>]*\bdata-rtg-projectie\b/i.test(s) && s.includes('/shared/wauw.js');
-    if (!s.includes('/shared/metgezel.js') && !projectie) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
+    /* Een scherm op het RTG Design System draagt Rahul in zijn Edge
+       (/ds/edge-modi.js, dezelfde /api/fluister als de metgezel); de metgezel
+       zou er een tweede Rahul-balk met eigen stijl naast zetten. */
+    const dsEdge = s.includes('/ds/shell.js') && s.includes('/ds/rtg-ds.css');
+    if (!s.includes('/shared/metgezel.js') && !projectie && !dsEdge) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
     const gids = appgids.gidsVan('/' + rel);
     if (!gids || gids.algemeen) { np++; fout('9+: geen eigen app-gids voor /' + rel + ' (vul kern/appgids.js aan)'); }
   }

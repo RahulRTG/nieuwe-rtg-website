@@ -139,20 +139,35 @@ function meet() {
     }
     return uit.filter(p => p && fs.existsSync(p));
   };
+  /* De server zet zelf scripts op elke pagina (server/middleware/kopinjectie.js:
+     de foutmelder, de hand, de sprong). Die staan niet in de HTML, maar laden
+     wel; een telling zonder hen noemt een scherm schoon dat het niet is. */
+  const kop = path.join(WORTEL, 'server', 'middleware', 'kopinjectie.js');
+  const serverScripts = fs.existsSync(kop) ? [...new Set([...fs.readFileSync(kop, 'utf8').matchAll(/['"]?(\/shared\/[\w.-]+\.js)/g)].map(m => path.join(PUBLIEK, m[1].slice(1))))].filter(f => fs.existsSync(f)) : [];
   const geladenDoor = {};
   const paginas = {};
   for (const p of html) {
-    const gezien = new Set(), rij = [p];
+    /* Een scherm op het Design System wordt DIRECT gemeten: wat in zijn HTML
+       staat (plus de @imports van die bladen) en wat de server erbij zet. De
+       transitieve graaf over scripts is te grof voor een oordeel over één
+       scherm -- een script dat een ander alleen NOEMT, telt daarin als laden.
+       Wat er in de browser werkelijk laadt, bewijst de browsertoets die
+       contract.json "bewijs" per ds-scherm eist. */
+    const isDs = /<link\b[^>]*href=["']\/ds\/rtg-ds\.css["']/i.test(lees(p));
+    const gezien = new Set(p.startsWith(PUBLIEK) ? serverScripts : []), rij = [p, ...gezien];
     while (rij.length) {
       const f = rij.pop();
+      if (isDs && f !== p && f.endsWith('.js')) continue;
       for (const b of buren(f)) if (!gezien.has(b)) { gezien.add(b); rij.push(b); }
     }
     const lijst = [...gezien].filter(f => f.endsWith('.css')).map(rel).sort();
+    const injecteert = [...gezien].filter(f => f.endsWith('.js') && injectie[rel(f)] && !rel(f).startsWith('public/ds/')).map(rel).sort();
     paginas[rel(p)] = {
       bladen: lijst,
       ds: lijst.some(b => b.startsWith('public/ds/')),
       erfenis: lijst.filter(b => !b.startsWith('public/ds/') && b !== 'public/fonts/fonts.css').length,
       stijlblok: Boolean(blokken[rel(p)]),
+      injecteert,
     };
     for (const b of lijst) (geladenDoor[b] = geladenDoor[b] || []).push(rel(p));
   }
@@ -166,7 +181,13 @@ function meet() {
   for (const b of Object.keys(bladen)) if (serverBron.includes(path.basename(b))) genoemd.add(b);
   const wezen = Object.keys(bladen).filter(b => !geladenDoor[b] && !genoemd.has(b) && !b.startsWith('public/ds/')).sort();
 
-  const gemigreerd = Object.entries(paginas).filter(([, v]) => v.ds && v.erfenis === 0 && !v.stijlblok).map(([k]) => k);
+  /* Gemigreerd: het systeem, geen erfenisblad, geen eigen blok, en geen
+     script dat stijl injecteert behalve de benoemde overgangsscripts uit
+     contract.json (elk met reden en vervaldatum). */
+  let overgang = new Set();
+  try { overgang = new Set((JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8')).overgangsscripts || []).map(o => o.pad)); } catch (e) { /* zonder contract: niets toegestaan */ }
+  const gemigreerd = Object.entries(paginas).filter(([, v]) => v.ds && v.erfenis === 0 && !v.stijlblok &&
+    v.injecteert.every(j => overgang.has(j))).map(([k]) => k);
   return { bladen, blokken, injectie, paginas, geladenDoor, wezen, gemigreerd };
 }
 
@@ -198,6 +219,11 @@ function contractFouten(meting, DS = module.exports.DS) {
     const s = zonderCommentaar(fs.readFileSync(f, 'utf8'));
     const deel = path.relative(DS, f).split(path.sep).join('/');
 
+    /* 0. De accolades sluiten. Een zoek-vervang die er een laat staan of
+          opslokt, maakt van de rest van het blad een andere regel zonder dat
+          de browser iets meldt (AGENTS.md: "brace-balans controleren"). */
+    { let diep = 0, min = 0; for (const c of s) { if (c === '{') diep++; else if (c === '}') { diep--; min = Math.min(min, diep); } }
+      if (diep !== 0 || min < 0) { fouten.push(r + ': accolades sluiten niet (' + (diep > 0 ? diep + ' open' : 'een } te veel') + ')'); continue; } }
     /* 1. Alles zit in een benoemde cascadelaag uit het contract. Een regel
           buiten een laag wint van elke laag -- dat is precies het lek. */
     let diepte = 0, buiten = '';
@@ -264,10 +290,25 @@ function contractFouten(meting, DS = module.exports.DS) {
   for (const t of contract.schermtypen) if (!fs.existsSync(path.join(DS, 'schermen', t + '.css'))) fouten.push('schermtype ' + t + ' staat in het contract maar public/ds/schermen/' + t + '.css ontbreekt');
   for (const c of contract.componenten) if (!fs.existsSync(path.join(DS, 'componenten', c + '.css'))) fouten.push('component ' + c + ' staat in het contract maar public/ds/componenten/' + c + '.css ontbreekt');
   for (const w of contract.werelden) if (!fs.existsSync(path.join(DS, 'thema', w + '.css'))) fouten.push('wereld ' + w + ' staat in het contract maar public/ds/thema/' + w + '.css ontbreekt');
-  /* Een gemigreerd scherm laadt geen erfenis en draagt geen eigen blok. */
+  /* Een scherm op het systeem laadt geen erfenis, draagt geen eigen blok en
+     laadt geen stijlinjecterend script buiten de overgangslijst. Half
+     migreren bestaat niet (ONTWERPSYSTEEM.md par. 5). */
+  const overgang = new Map();
+  for (const o of contract.overgangsscripts || []) {
+    if (!o.pad || !o.reden || !o.vervalt) fouten.push('contract.overgangsscripts: ' + (o.pad || '?') + ' zonder pad, reden of vervaldatum');
+    else if (o.vervalt < vandaag()) fouten.push('contract.overgangsscripts: ' + o.pad + ' is verlopen op ' + o.vervalt);
+    else overgang.set(o.pad, o);
+  }
+  const bewijs = contract.bewijs || {};
   for (const [p, v] of Object.entries(meting.paginas)) {
     if (!v.ds) continue;
+    const toets = bewijs[p];
+    const route = '/' + p.replace(/^public\//, '');
+    if (!toets) fouten.push(p + ': draagt het Design System zonder browsertoets in contract.json "bewijs" (TRAVELOS-MIGRATIE.md par. 3)');
+    else if (!fs.existsSync(path.join(WORTEL, toets)) || !fs.readFileSync(path.join(WORTEL, toets), 'utf8').includes(route)) fouten.push(p + ': de browsertoets ' + toets + ' bestaat niet of opent ' + route + ' niet');
     if (v.stijlblok) fouten.push(p + ': draagt het Design System en tegelijk een eigen <style>-blok');
+    if (v.erfenis) fouten.push(p + ': draagt het Design System en laadt ' + v.erfenis + ' erfenisblad(en): ' + v.bladen.filter(b => !b.startsWith('public/ds/') && b !== 'public/fonts/fonts.css').slice(0, 5).join(', '));
+    for (const j of v.injecteert || []) if (!overgang.has(j)) fouten.push(p + ': draagt het Design System en laadt ' + j + ', dat zelf stijl injecteert');
   }
   return fouten;
 }

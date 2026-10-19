@@ -1,20 +1,19 @@
 /* RTG Design System: de schil van een gemigreerd scherm.
 
-   Een gemigreerd scherm laadt /ds/rtg-ds.css en dit script, en verder niets
-   van de oude gedeelde laag. shared/basis.js laadt bij elke start zelf
-   rtg-heritage.css, rtg-editorial-v4.css en via randen.js drie generaties
-   Edge-CSS (samen ruim 150 kB en zo'n 700x !important); daarnaast kan geen
-   gelaagd systeem bestaan (ONTWERPSYSTEEM.md par. 5). Deze schil levert het
-   deel van die laag dat een scherm nodig heeft, zonder stijl in te spuiten:
+   Een gemigreerd scherm laadt /ds/rtg-ds.css, dit script in de <head> en
+   daarna gewoon shared/basis.js. Dit script zet html[data-ds] VOORDAT de
+   basis draait; de basis houdt dan al zijn gedrag (offline, begrenzing, de
+   springlink, het toegankelijkheidsprofiel, de toestelsleutel, de gids, de
+   taal) en laat zijn oude vormlagen weg: het Heritage- en editorial-blad,
+   rust.css, de iOS-laag en de drie generaties Edge (samen ruim 150 kB CSS
+   met zo'n 700x !important). Wat dit script daarvoor in de plaats zet:
 
    1. de Edge (/ds/edge.js voor de vorm en het wisselen, /ds/edge-modi.js
       voor wat er in een modus staat);
-   2. offline: de service worker van het leden-OS en een melding;
-   3. taal: shared/i18n.js, die de DOM vertaalt en `dir` zet. Dat script
-      spuit voor zijn eigen taalkiezer nog een <style>; dat staat als open
-      punt in TRAVELOS-MIGRATIE.md;
-   4. het lid: alleen het token dat al in localStorage staat. Deze schil
-      beslist nergens over toegang; de server doet dat bij elke aanroep. */
+   2. de zoekknop in de kop als ingang van de sprong.
+
+   Het lid is alleen het token dat al in localStorage staat. Deze schil
+   beslist nergens over toegang; de server doet dat bij elke aanroep. */
 (function (w, d) {
   'use strict';
   if (w.RTGDs) return;
@@ -52,23 +51,16 @@
     (d.head || d.documentElement).appendChild(s);
   }
 
-  /* offline */
-  function meld(t) {
-    var m = el('p', 'ds-verborgen', { role: 'status' });
-    m.textContent = t;
-    d.body.appendChild(m);
-    setTimeout(function () { if (m.parentNode) m.parentNode.removeChild(m); }, 4000);
-  }
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-    w.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
-  }
-  w.addEventListener('offline', function () { meld('Geen verbinding; de app werkt door waar dat kan.'); });
-  w.addEventListener('online', function () { meld('De verbinding is terug.'); });
-
   /* RTGDs.hulp is voor de twee Edge-scripts hieronder, niet voor schermen. */
   w.RTGDs = { versie: 1, token: token, hulp: { ICONEN: ICONEN, LIPPEN: LIPPEN, svg: svg, el: el } };
 
+  /* De zoekknop in de kop opent de sprong (shared/sprong.js, door de server
+     op elke pagina gezet): twee tikken naar elke functie (TIKKEN.md). */
+  d.addEventListener('click', function (ev) {
+    var z = ev.target.closest && ev.target.closest('[data-ds-zoek]');
+    if (z && w.RTGSprong) { ev.preventDefault(); w.RTGSprong.open(); }
+  });
+
   laad('/ds/edge.js');
   laad('/ds/edge-modi.js');
-  if (!w.RTGi18n) laad('/shared/i18n.js');
 }(window, document));

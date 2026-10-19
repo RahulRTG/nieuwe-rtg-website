@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 179,
-    "schermenMetStijlblok": 290,
-    "important": 7717
+    "bladen": 177,
+    "schermenMetStijlblok": 289,
+    "important": 7703
   },
   "uitzonderingen": [],
   "bladen": {
@@ -479,7 +479,7 @@
       "hex": 1
     },
     "public/shared/rtg-heritage-experiences.css": {
-      "bytes": 3553,
+      "bytes": 3254,
       "important": 0,
       "hex": 0
     },
@@ -622,16 +622,6 @@
       "bytes": 10226,
       "important": 4,
       "hex": 44
-    },
-    "public/shared/rtg-verblijven-2026.css": {
-      "bytes": 8629,
-      "important": 14,
-      "hex": 21
-    },
-    "public/shared/rtg-verblijven-momenten-2026.css": {
-      "bytes": 3626,
-      "important": 0,
-      "hex": 15
     },
     "public/shared/rtg-vlucht-2026.css": {
       "bytes": 10236,
@@ -1780,12 +1770,6 @@
       "bytes": 4216,
       "important": 0,
       "hex": 1
-    },
-    "public/apps/hotels.html": {
-      "blokken": 1,
-      "bytes": 575,
-      "important": 0,
-      "hex": 0
     },
     "public/apps/ik.html": {
       "blokken": 2,

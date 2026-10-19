@@ -87,6 +87,10 @@ test('contract: een regel buiten een cascadelaag', () => {
   assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n.ds-knop{color:var(--ds-inkt)}\n')), /buiten een cascadelaag/);
 });
 
+test('contract: accolades die niet sluiten', () => {
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-knop{color:var(--ds-inkt)}\n')), /accolades sluiten niet/);
+});
+
 test('contract: !important', () => {
   assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-knop{color:var(--ds-inkt)!important}}\n')), /!important/);
 });
@@ -133,6 +137,13 @@ test('contract: elk schermtype, component en wereld uit het contract bestaat', (
   const contract = JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8'));
   assert.deepEqual(contract.schermtypen, ['cover', 'collectie', 'taak', 'detail', 'gesprek', 'canvas', 'status']);
   assert.equal(contract.talen.length, 19);
+});
+
+test('contract: een ds-scherm zonder browsertoets, met erfenis of met een vreemde injecteur', () => {
+  const pagina = (extra) => ({ paginas: { 'public/apps/nep.html': { ds: true, erfenis: 0, stijlblok: false, injecteert: [], bladen: [], ...extra } } });
+  assert.match(os_.contractFouten(pagina({}), DS).join(), /zonder browsertoets/);
+  assert.match(os_.contractFouten(pagina({ erfenis: 1, bladen: ['public/shared/rtg-heritage.css'] }), DS).join(), /erfenisblad/);
+  assert.match(os_.contractFouten(pagina({ injecteert: ['public/shared/ios.js'] }), DS).join(), /ios\.js, dat zelf stijl injecteert/);
 });
 
 test('rtg-ds.css laadt elk bestand van het systeem precies één keer', () => {

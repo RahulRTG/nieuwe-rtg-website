@@ -14,7 +14,8 @@
      bezit ze, met zijn eigen listeners en rechten; de Edge toont en klikt. */
   function schermActies() {
     return Array.prototype.slice.call(d.querySelectorAll('[data-ds-actie]')).filter(function (x) {
-      return !x.closest('.ds-edge') && !x.disabled && x.getAttribute('aria-disabled') !== 'true' && !x.closest('[hidden]');
+      return !x.closest('.ds-edge') && !x.disabled && x.getAttribute('aria-disabled') !== 'true' && !x.closest('[hidden]') &&
+        !x.closest('dialog:not([open])');
     }).map(function (x) {
       return { label: x.getAttribute('data-ds-actie') || x.textContent.trim(), doe: function () { x.click(); } };
     });

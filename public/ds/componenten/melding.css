@@ -1,0 +1,24 @@
+/* Melding: een korte bevestiging of fout (role="status"), boven de Edge. Een
+   melding vraagt geen handeling; wat een handeling vraagt, is een dialoog. */
+@layer rtg.component {
+  .ds-melding {
+    position: fixed;
+    inset-inline: var(--ds-goot);
+    inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-8));
+    z-index: 25;
+    max-inline-size: 30rem;
+    margin-inline: auto;
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    border-radius: var(--ds-radius-inhoud);
+    box-shadow: var(--ds-schaduw-systeem);
+    font-size: var(--ds-maat-klein);
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity var(--ds-duur) var(--ds-curve), transform var(--ds-duur) var(--ds-curve);
+  }
+  .ds-melding.toon { opacity: 1; transform: none; }
+  .ds-melding:empty { display: none; }
+}

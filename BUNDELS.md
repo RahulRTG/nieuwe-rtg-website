@@ -568,7 +568,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 933 regels in de delen
+`public/shared/basis/` -- 10 delen, 939 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -866,7 +866,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 332 regels in de delen
+`public/shared/sprong/` -- 3 delen, 336 regels in de delen
 
 | deel | onderwerp |
 |---|---|

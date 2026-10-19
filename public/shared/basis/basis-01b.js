@@ -66,9 +66,11 @@
   /* de gedeelde rustlaag: één ingetogen stijl die overal dezelfde kalmte legt
      (zachte, trage overgangen + een rustige focusrand). Als apart bestand zodat
      het cachet en pagina's het kunnen overschrijven. */
-  var rl = document.createElement('link');
-  rl.rel = 'stylesheet'; rl.href = '/shared/rust.css';
-  (document.head || document.documentElement).appendChild(rl);
+  if (!ds) {
+    var rl = document.createElement('link');
+    rl.rel = 'stylesheet'; rl.href = '/shared/rust.css';
+    (document.head || document.documentElement).appendChild(rl);
+  }
 
   /* de trage helft van de toegankelijkheid: bij de server ophalen wat het lid
      heeft ingesteld, zodat een tweede toestel het ook krijgt. Zonder haast --
@@ -86,7 +88,7 @@
 
      Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
      laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
-  if (!window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+  if (!ds && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
     var gb = document.createElement('script');
     gb.src = '/shared/gebaar.js'; gb.async = true;
     (document.head || document.documentElement).appendChild(gb);

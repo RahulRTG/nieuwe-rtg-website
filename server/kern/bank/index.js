@@ -128,31 +128,9 @@ module.exports = (deps) => {
     bankOpdrachtVind: (id) => opdrachten.vind(id), bankOpdrachtStemAf: (a) => opdrachten.stemAf(a || {}), bankAfstemBlik: (a) => opdrachten.afstemBlik(a) };
   Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart, entiteit);
 
-  /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
-     op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen
-     afhandelt. De boardroom-knoppen blijven bestaan voor een handmatige ronde;
-     unref() zodat de timer een proces nooit wakker houdt (zelfde patroon als de
-     tx-veegronde). */
-  const RONDE_MS = Number(process.env.BANK_RONDE_MS || 3600000);
-  const rondeTimer = setInterval(() => {
-    // de rondes zijn async (ze kunnen via de motor lopen); ketenen en de fouten
-    // opvangen zodat een hapering het proces nooit omver trekt.
-    Promise.resolve()
-      .then(() => api.bankRenteRonde({}))
-      .then(() => api.bankIncassoRonde({}))
-      .catch(e => console.warn('[bank] ronde mislukt:', e.message));
-  }, RONDE_MS);
-  if (rondeTimer.unref) rondeTimer.unref();
-
-  /* De opdrachtenronde loopt VEEL vaker dan de uurtik: een mislukte inzending is
-     geen maandelijkse rente maar geld dat vaststaat, en een uur wachten op de
-     eerste herhaling is voor wie net op "verstuur" drukte een storing. De
-     backoff in de opdracht bepaalt wie aan de beurt is; deze tik kijkt alleen. */
-  const OPDRACHT_RONDE_MS = Number(process.env.BANK_OPDRACHT_RONDE_MS || 60000);
-  const opdrachtTimer = setInterval(() => {
-    opdrachten.ronde({}).catch(e => console.warn('[bank] opdrachtenronde mislukt:', e.message));
-  }, OPDRACHT_RONDE_MS);
-  if (opdrachtTimer.unref) opdrachtTimer.unref();
+  // Periodieke uitvoering heeft eigen overlapbewaking; boekhouding blijft in haar bestaande eigenaars.
+  require('./rondes')({ rente: () => api.bankRenteRonde({}),
+    incasso: () => api.bankIncassoRonde({}), opdrachten: () => opdrachten.ronde({}) });
 
   return { bank: api };
 };

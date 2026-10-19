@@ -11,7 +11,7 @@
 'use strict';
 
 module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag,
-  markProviderEvidence, vrijgave }) {
+  markProviderEvidence, vrijgave, simulatie }) {
   /* De vrijgavepoort (server/kern/vrijgave/). Standaard het ene exemplaar per
      proces; een toets kan een eigen exemplaar meegeven om de volgorde van de
      twee poorten na te trekken. */
@@ -54,6 +54,8 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
         valuta: p.amount && String(p.amount.currency || '').toLowerCase(),
         checkoutUrl: p.url, betaalId: p.pspReference || null }, 'adyen');
     }
+    /* de simulatiebank (./synthetisch-naslag.js); alleen doorgegeven als hij aan staat */
+    if (aanbieder === 'simulatie' && simulatie) return simulatie.haal(id);
     throw new Error('Deze betaalprovider is niet beschikbaar.');
   }
 
@@ -91,6 +93,12 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
       { idempotencyKey: idempotentieSleutel });
       return { id: r.pspReference || r.id, status: r.status || 'received',
         aanbieder: 'adyen', providerId, bedrag: Math.round(bedrag), valuta };
+    }
+    /* De simulatiebank: dezelfde vrijgavepoort, op de neprail; de grendel voor
+       echt geld naar buiten hoort er niet bij, want er gaat niets naar buiten. */
+    if (aanbieder === 'simulatie' && simulatie) {
+      poort().eis('geld.terugbetaling', { actor: { soort: 'systeem' }, provider: 'simulatie', rail: 'simulatie' });
+      return simulatie.terugbetaal({ providerId, bedrag, valuta, idempotentieSleutel, referentie: opdracht.referentie });
     }
     if (aanbieder === 'magnaat-test' && !stripe && !mollie && !adyen)
       return { id: 'magnaat_ref_' + crypto.randomBytes(8).toString('hex'), status: 'refunded',

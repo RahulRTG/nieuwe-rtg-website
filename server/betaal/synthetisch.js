@@ -109,7 +109,7 @@ function waaromNiet({ env: omgeving, echteRail }) {
   return null;
 }
 
-module.exports = function simulatiebank({ crypto, env, echteRail }) {
+module.exports = function simulatiebank({ crypto, env, echteRail, nu }) {
   const belet = () => waaromNiet({ env, echteRail });
   const aan = () => belet() === null;
 
@@ -117,6 +117,8 @@ module.exports = function simulatiebank({ crypto, env, echteRail }) {
     const reden = belet();
     if (reden) { const e = new Error(reden); e.code = 'SIMULATIEBANK_UIT'; throw e; }
   }
+  /* opzoeken en terugbetalen: ./synthetisch-naslag.js */
+  const naslag = require('./synthetisch-naslag')({ crypto, eis, scenarioVan, nu });
 
   /* Een boeking door de simulatiebank. Dezelfde vorm als de andere rails, zodat
      alles erboven -- de poort, de waarheidslaag, de webhook-afhandeling -- niet
@@ -128,7 +130,7 @@ module.exports = function simulatiebank({ crypto, env, echteRail }) {
     const naam = scenarioVan(opdracht);
     const s = SCENARIOS[naam];
     return {
-      id: 'sim_' + naam + '_' + crypto.randomBytes(6).toString('hex'),
+      id: 'sim_' + naam + '_' + naslag.startTijd() + '_' + crypto.randomBytes(6).toString('hex'),
       status: s.status,
       aanbieder: 'simulatie',
       simulatie: naam,
@@ -157,9 +159,11 @@ module.exports = function simulatiebank({ crypto, env, echteRail }) {
       bedrag: Math.round(bedrag), valuta, referentie: referentie || null, iban: iban || '', sleutel: idempotentieSleutel || null };
   }
 
-  return { aan, belet, maak, uitbetaal, scenarioVan, SCENARIOS };
+  return { aan, belet, maak, uitbetaal, scenarioVan, SCENARIOS,
+    haal: naslag.haal, terugbetaal: naslag.terugbetaal, terugScenarioVan: naslag.terugScenarioVan };
 };
 
 module.exports.SCENARIOS = SCENARIOS;
+module.exports.VERLOOP_MS = require('./synthetisch-naslag').VERLOOP_MS;
 module.exports.waaromNiet = waaromNiet;
 module.exports.getal = getal;

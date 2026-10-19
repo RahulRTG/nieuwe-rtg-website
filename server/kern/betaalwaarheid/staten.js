@@ -41,6 +41,8 @@ function providerStatus(aanbieder, stand, gebeurtenis) {
     if (s === 'betaald') return STATUS.BEVESTIGD;
     if (s === 'geweigerd' || s === 'teruggeboekt') return STATUS.GEWEIGERD;
     if (s === 'open') return STATUS.WACHT_OP_KLANT;
+    /* een trage simulatie die uitliep (server/betaal/synthetisch-naslag.js) */
+    if (s === 'verlopen') return STATUS.GEANNULEERD;
   }
   if (aanbieder === 'mollie') {
     if (s === 'paid') return STATUS.BEVESTIGD;

@@ -53,12 +53,12 @@ async function loop(w, stap) {
       ziet: 'flitser ' + f.status + ' (' + (f.data && f.data.error || '').slice(0, 60) + '), file ' + ok.status };
   });
 
-  await stap('voltooibaar', 'het lid meldt een flitser; een ander lid in de buurt ziet hem, op codenaam', async () => {
+  await stap('voltooibaar', 'het lid meldt een flitser; een ander lid in de buurt ziet hem, zonder de melder', async () => {
     const m = await w.post(MELD, Object.assign({ soort: 'flitser' }, plek(0)), T);
     flitser = m.data && m.data.melding;
     const b = flitser && await metId(flitser.id, plek(0), B.token);
-    return { klopt: m.status === 200 && !!b && b.soort === 'flitser' && !!b.door && !JSON.stringify(b).includes('Voltooilid') && !JSON.stringify(b).includes(A.email),
-      ziet: 'melden ' + m.status + ', B ziet ' + (b ? b.naam + ' door ' + b.door + ' op ' + b.afstandKm + ' km' : 'NIETS') };
+    return { klopt: m.status === 200 && !!b && b.soort === 'flitser' && !('door' in b) && !JSON.stringify(b).includes('Voltooilid') && !JSON.stringify(b).includes(A.email),
+      ziet: 'melden ' + m.status + ', B ziet ' + (b ? b.naam + ' op ' + b.afstandKm + ' km, melder ' + ('door' in b ? 'ZICHTBAAR' : 'niet zichtbaar') : 'NIETS') };
   });
 
   await stap('voltooibaar', 'een tweede lid meldt dezelfde flitser vlakbij: dat is een bevestiging, geen tweede melding', async () => {
@@ -175,7 +175,7 @@ module.exports = {
   ingang: '/apps/flits.html',
   persona: 'lid',
   omgeving: KANTOORWERELD,
-  belofte: 'een lid meldt met een tik wat hij onderweg ziet en wie in de buurt is ziet het op codenaam; een melding vlakbij van dezelfde soort door een ander is een bevestiging, een melder bevestigt zichzelf nooit, "klopt nog" verlengt, drie verschillende leden halen hem weg, en in landen waar het verboden is wordt een flitser geweigerd -- ook na een herstart, een dubbele tik, een afgebroken verzoek en een crash',
+  belofte: 'een lid meldt met een tik wat hij onderweg ziet en wie in de buurt is ziet het, zonder te zien wie het meldde; een melding vlakbij van dezelfde soort door een ander is een bevestiging, een melder bevestigt zichzelf nooit, "klopt nog" verlengt, drie verschillende leden halen hem weg, en in landen waar het verboden is wordt een flitser geweigerd -- ook na een herstart, een dubbele tik, een afgebroken verzoek en een crash',
   grens: 'De proef loopt de routes van het scherm, niet het scherm zelf. De chauffeurskant (/api/staff/flits/*) en het verlopen van een melding op zijn houdbaarheid (dat vraagt een klok die vooruit kan) zijn niet gelopen. Officiele flitserdata is er niet; het beeld komt van het eigen netwerk. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

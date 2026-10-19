@@ -196,7 +196,7 @@
     if (!m) { el.classList.remove('zien'); return; }
     $('#alarmIcoon').textContent = m.icoon;
     $('#alarmWat').textContent = m.naam + ' over ' + (m.afstandKm < 1 ? Math.round(m.afstandKm * 1000) + ' m' : m.afstandKm + ' km');
-    $('#alarmSub').textContent = 'Gemeld door ' + m.door + (m.bevestigingen ? ' · ' + m.bevestigingen + 'x bevestigd' : '');
+    $('#alarmSub').textContent = 'Gemeld door het netwerk' + (m.bevestigingen ? ' · ' + m.bevestigingen + 'x bevestigd' : '');
     el.classList.add('zien');
     if (!gesproken[m.id]) { gesproken[m.id] = true; spreek(m.naam + ' over ' + (m.afstandKm < 1 ? Math.round(m.afstandKm * 1000) + ' meter' : m.afstandKm + ' kilometer')); }
   }
@@ -231,7 +231,7 @@
       const d = document.createElement('div'); d.className = 'r';
       d.innerHTML = '<span aria-hidden="true">' + m.icoon + '</span><span>' + m.naam + '</span>' +
         '<span class="afstand">' + m.afstandKm + ' km</span><span class="wie"></span>';
-      d.querySelector('.wie').textContent = m.door;
+      d.querySelector('.wie').textContent = m.bevestigingen ? m.bevestigingen + 'x bevestigd' : '';
       lijst.appendChild(d);
     }
     toonAlarm(rond.meldingen.find(m => m.afstandKm != null && m.afstandKm <= 1.2) || null);

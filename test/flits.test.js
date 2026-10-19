@@ -53,7 +53,11 @@ test('1. melden en zien: een lid meldt, het netwerk ziet het met afstand en code
   const f = (rond.body.meldingen || []).find(x => x.soort === 'flitser');
   assert.ok(f, 'de melding is zichtbaar voor het netwerk');
   assert.ok(f.afstandKm >= 0.5 && f.afstandKm <= 3, 'met een kloppende afstand');
-  assert.ok(f.door && !/Lid |Prins|Vidal/.test(f.door), 'de melder staat er op codenaam, nooit met echte naam');
+  /* Wie het meldde gaat niet naar anderen: een codenaam met een exacte plek en
+     een tijd is een spoor van die codenaam. Het netwerk ziet wat, waar (op
+     ongeveer 100 m) en hoe vaak bevestigd -- niet wie. */
+  assert.ok(!('door' in f), 'geen melder in het beeld van een ander');
+  for (const c of [f.lat, f.lng]) assert.ok(Math.abs(c * 1000 - Math.round(c * 1000)) < 1e-6, 'de plek is afgerond op drie decimalen: ' + c);
   assert.ok(!('punten' in rond.body) && !('score' in f), 'geen spelmechaniek in het antwoord');
 });
 
@@ -178,7 +182,7 @@ test('8. navigatie over de routes: kaart, bestemmingen, POI en melden, alleen vo
   const rond = await api('/api/flits/rond', { lat: IBIZA.lat + 0.02, lng: IBIZA.lng, land: 'ES' }, b);
   const w = (rond.body.meldingen || []).find(x => x.soort === 'wegwerk');
   assert.ok(w, 'de melding uit de navigatie staat in het Flits-netwerk');
-  assert.ok(w.door && !/Lid /.test(w.door), 'op codenaam');
+  assert.ok(!('door' in w), 'zonder melder');
 });
 
 test('9. een melder bevestigt zijn eigen melding niet: "klopt" geeft een 403 met een zin en telt niet', async () => {

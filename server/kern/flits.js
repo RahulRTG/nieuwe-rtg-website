@@ -123,12 +123,17 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
     return { status: 200, ok: true, weg: (m.weg || 0) >= WEG_STEMMEN };
   }
 
-  /* ---- het rondom-beeld voor het rijscherm ---- */
+  /* ---- het rondom-beeld voor het rijscherm ----
+     Zonder melder en met de plek op drie decimalen (ongeveer 100 m): een
+     codenaam met een exacte plek en een tijd is een spoor van die codenaam, en
+     voor een waarschuwing is "hier ongeveer" genoeg. De afstand rekent op de
+     echte plek; de melder blijft in de opslag (stemmen, vergeten). */
+  const rond3 = (x) => Math.round(x * 1000) / 1000;
   function beeld(m, hier) {
     const s = SOORTEN[m.soort];
-    return { id: m.id, soort: m.soort, naam: s.naam, icoon: s.icoon, lat: m.lat, lng: m.lng,
+    return { id: m.id, soort: m.soort, naam: s.naam, icoon: s.icoon, lat: rond3(m.lat), lng: rond3(m.lng),
       afstandKm: hier ? Math.round(haversine(hier, m) / 100) / 10 : null,   // haversine rekent in meters
-      bevestigingen: m.bevestigingen || 0, door: m.door, at: m.at };
+      bevestigingen: m.bevestigingen || 0, at: m.at };
   }
   function rond(hier, land) {
     const lat = Number(hier.lat), lng = Number(hier.lng);

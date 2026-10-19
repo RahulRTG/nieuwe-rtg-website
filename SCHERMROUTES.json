@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "6c88a8f7",
+  "commit": "460ad153",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7821,7 +7821,7 @@
   "schermenMetPad": 449,
   "nietGelezen": 0,
   "exactePaden": 1043,
-  "verwijzingen": 1269,
+  "verwijzingen": 1270,
   "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
@@ -8526,6 +8526,14 @@
    "schermen": [
     "public/apps/geld/voorzijde.js",
     "public/apps/geld/wbwb.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/wbw/verreken",
+   "schermen": [
+    "public/apps/geld/wbwb.js",
+    "public/shared/toestelsleutel.js"
    ],
    "aantal": 2
   },
@@ -11156,13 +11164,6 @@
   },
   {
    "pad": "/api/wbw/uitgave",
-   "schermen": [
-    "public/apps/geld/wbwb.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/wbw/verreken",
    "schermen": [
     "public/apps/geld/wbwb.js"
    ],
@@ -19559,6 +19560,7 @@
     "/api/privacy/export",
     "/api/privacy/inzage",
     "/api/rtgid/machtig",
+    "/api/wbw/verreken",
     "/api/webauthn/registreer",
     "/api/webauthn/weg"
    ],

@@ -439,4 +439,256 @@ ondergrens is dus gratis, en dat zijn wij.
 
 ---
 
+## Familie 2 — rekening en overzicht
+
+Drie apps:
+- de **Bank**: de echte rekening, zodra het kantoor hem live zet;
+- **Geld Command**: het overzicht met beleid, potten en vooruitblik; hier komen
+  de zes uitbreidingen van de eigenaar en de zes "Beyond"-systemen samen;
+- **Balans**: werk, privé en rust.
+
+### 2.1 Bank (`/apps/geld.html#bank`)
+
+**a. Doel.** Een eigen rekening waarop je geld ontvangt, spaart en overboekt,
+met een afschrift dat klopt tot op de cent.
+
+**b. Wat er is.**
+- Routes (`server/routes/bank.js`, `bankhart.js`): akkoord, rekening/open,
+  storten, overboeken, naar-wallet en van-wallet, sepa, spaardoel, passen,
+  krediet, terugkerend, bulk, salaris, advies en `afschrift.csv`, plus `hart`,
+  `inzichten`, `vastelasten` en `veeg`.
+- Alles achter `gate`: "De RTG Bank is nog niet live voor leden."
+- Kern: `server/kern/bank/*`.
+  - Storten loopt via de betaalwaarheid (`stortwaarheid.js`).
+  - SEPA-uit loopt via de opdrachtenrij.
+  - Er draaien ronden voor rente en incasso.
+- Voltooiscenario: `voltooi/bank.js` (`link:bank`).
+
+**c. Objecten en eigenaar.** `bankRekeningen`, `bankSaldi`, `bankBoekingen`,
+`bankKredieten` en `bankAkkoord` horen bij `geld.overzicht`.
+
+**e. Rechten.**
+- Een lid met een pas, en alleen als het kantoor de leden-bank live zet.
+- Een zaak heeft een zakelijke rekening (`supplierAuth`).
+- Het kantoor zet de regels en de schakelaar.
+- Er is geen paspoortpoort in de bankroutes (gemeten).
+
+**Zes lagen, oordeel.**
+- **L1** rekening, storten, overboeken en afschrift bestaan.
+- **L2** de zakelijke rekening, zzp en salaris bestaan.
+- **L3** bulkbetalingen en salaris bestaan; meerdere handtekeningen binnen een
+  bedrijf niet.
+- **L4** `inzichten` en `vastelasten` bestaan.
+- **L5** van akkoord tot sluiten, met de opdrachtenrij en rondes.
+- **L6** de wallet wordt gedekt vanuit de bank (`walletbrug.js`).
+
+**Afwijking van een harde grens (vraagt besluit).** In de code staan twee dingen
+die `GELD.md` par. 7 uitsluit:
+- **krediet**: `server/kern/bank/krediet.js`, leningen van € 100 tot € 50
+  miljoen tegen 7% rente; het kantoor beslist;
+- **advies**: `server/kern/bank/advies.js`, een AI-bankier die "concreet,
+  eerlijk advies" geeft over rood staan en sparen.
+
+Beide staan achter de leden-bank, die uit staat. Ik bouw hier niets bij en
+haal ook niets weg: of ze blijven is aan de eigenaar. Krediet vraagt hoe dan
+ook een vergunning.
+
+**Functiecatalogus**
+
+| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|
+| Rekening openen, storten, overboeken, afschrift | L1 | bestaat | Na akkoord opent het lid een rekening, stort er geld op en boekt over; het afschrift sluit. Een dubbele tik boekt één keer. | — | — |
+| Meerdere eigen rekeningen (potjes met IBAN) | L1 | half | Het lid opent een spaarrekening naast de betaalrekening. Bij bunq is 5 of 25 betaald (fragment). | klein | later (na live) |
+| Vaste lasten zien | L4 | bestaat | `vastelasten` toont de terugkerende afschrijvingen. | — | — |
+| Paspoortpoort op de bank | L1 | ontbreekt | Een ongekeurd account opent geen rekening en krijgt de paspoortweg. | klein | nu (vóór live) |
+| Gezamenlijke rekening | L3 | ontbreekt | Twee leden openen samen een rekening; elk ziet alles, en overboeken boven een grens vraagt beide. | groot | later |
+| Krediet en lening | — | bestaat | — | — | **niet**, tenzij de eigenaar anders besluit: GELD.md par. 7 sluit krediet uit, en het vraagt een vergunning |
+| AI-bankier "advies" | L4 | bestaat | — | — | **vraagt besluit**: alleen uitleg en geen advies. De tekst herschrijven naar de fiscale klassen ("advies" betekent: een mens beoordeelt) |
+
+**f. LOS en SAMEN.**
+- **LOS.** Staat de bank niet live, dan toont het scherm "RTG Rekening opent hier
+  zodra RTG hem live zet. Je RTG Pay-wallet werkt gewoon door." De wallet blijft
+  werken.
+- **SAMEN.** De bank geeft een IBAN en een boekingsnummer uit, dekt de wallet
+  (`pay.koppelBank`) en ontvangt salaris.
+
+**Keten.** Het salaris komt binnen via de payroll. De bank boekt het, en Geld
+Command toont "inkomen verwacht en binnen".
+
+Storingen:
+- Valt de payroll uit, dan blijft de bankboeking staan.
+- Valt de bank uit, dan heet het salaris "verwacht" en niet "ontvangen".
+
+**g. Betaalmuur** (fragment):
+- bunq: extra IBAN's en het aanmaken van een gezamenlijke rekening zijn
+  betaald (us.fitgap.com/products/bunq;
+  help.bunq.com/articles/whats-a-joint-account-and-how-do-i-create-one).
+- Monzo Extra: andere banken koppelen en eigen categorieën
+  (monzo.com/current-account/extra).
+
+Wij hebben:
+- de rekening;
+- de vaste lasten (gratis);
+- half: meerdere rekeningen;
+- niet: de gezamenlijke rekening.
+
+**j. Extern.**
+- Een bankvergunning, of een gereguleerde bankpartner; zonder dat blijft de
+  leden-bank uit.
+- SEPA via een partner.
+- Krediet: een vergunning plus een eigen besluit.
+
+### 2.2 Geld Command (`/apps/geld.html`, eerste stand)
+
+**a. Doel.** In één oogopslag weten hoe je ervoor staat, wat er aankomt en
+wat je moet doen, en verder niets.
+
+**b. Wat er is.**
+- Routes (`server/routes/geld.js`): `/api/geld/cockpit`, beleid,
+  pot/zet/reserveer/weg, actielog, grens/zet/weg, en `/api/geld/rahul`.
+- Kern:
+  - `server/kern/geldbeleid/` (regels met vier niveaus, potten, een harde
+    geldgrens die weigert, het actielog: alleen toevoegen, maximaal 200);
+  - `server/kern/geldgraaf/` (een alleen-lezen projectie over wallet, wbw,
+    mecenaat, labfonds en payroll; `patronen.js` herkent terugkerende posten;
+    `vooruitblik.js` geeft het verwachte saldo per horizon; `tijdlijn`).
+- Voltooiscenario: `voltooi/geldcommand.js` (`link:geldcommand`).
+- GELD.md fase 1 staat "in aanbouw"; fase 2 tot en met 5 nog niet.
+
+**c. Objecten en eigenaar.** `geldbeleid.perLid[codenaam]` (regels, potten, log,
+grenzen) hoort bij `geld.overzicht`. De geldgraaf heeft niets eigens; hij is een
+projectie.
+
+**e. Rechten.**
+- Alleen een lid met een pas: `geenGast` weigert ook een gratis account ("RTG
+  Geld is voor leden.").
+- **Vraagt besluit**: valt Geld Command onder "minimaal een account", zoals
+  Wallet en Pay?
+
+**Zes lagen, oordeel.**
+- **L1** beleid, potten en grens bestaan.
+- **L4** de vooruitblik en de patronen bestaan; scenario's ontbreken.
+- **L5** het actielog bestaat; een jaararchief ontbreekt.
+- **L6** de projectie over vijf bronnen bestaat.
+- L2 en L3: niet van toepassing, of bij Bank en Pay.
+
+**De zes uitbreidingen van de eigenaar, naast wat er al is.**
+
+| Functie | Laag | Stand | Wat er al voor is | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Vermogensoverzicht | L1 | half | `/api/pay/portefeuille` (vrij besteedbaar en gebonden, per positie), `bank/overzicht` | Het lid ziet al zijn eigen posities bij RTG naast elkaar, en zelf ingevoerde bezittingen en schulden apart gemarkeerd als "eigen opgave". Er is geen totaal zonder bron. Bij Emma Pro, bij Monarch Core (fragment). | middel | nu |
+| Schuldenplanning (aflosplan) | L4 | ontbreekt | niets (alleen in het spel Magnaat) | Het lid voert zelf een schuld in met bedrag, rente en termijn, en ziet hoe lang aflossen duurt bij een gekozen bedrag per maand. Er staat bij dat dit een rekensom is, geen advies. Undebt.it heeft het gratis (fragment). | middel | nu |
+| Contracten en abonnementen | L1/L4 | half | `geldgraaf/patronen.js` herkent terugkerende posten; `bank/vastelasten` | Het lid ziet zijn terugkerende afschrijvingen als lijst, kan er zelf een contract met einddatum en opzegtermijn aan koppelen, en krijgt een signaal vóór de opzegdatum. Opzeggen doet het lid zelf. Dyme heeft een gratis overzicht; bij Rocket Money is een opzegdienst betaald (fragment). | middel | nu |
+| Prijsstijging en ongebruikt abonnement | L4 | ontbreekt | `patronen.js` (ritme, geen bedrag) | Stijgt een terugkerende post, dan ziet het lid het verschil en de datum. "Ongebruikt" verschijnt alleen als het lid zelf aangeeft dat hij het niet gebruikt. GELD.md fase 2. | klein | nu |
+| Huishoudscenario's | L4 | half | `kern/fiscaal/scenario.js` (zaken: personeel, omzet; schrijft niets); `geldgraaf/vooruitblik.js` | Het lid kiest "wat als" (een reis, een aankoop, minder inkomen) en ziet het verwachte saldo per maand ernaast, met de aanname. Niets wordt opgeslagen als feit. GELD.md fase 2. Bij Monarch is forecasting alleen Plus (fragment). | middel | nu |
+| Verplichtingenkalender en financiële gebeurtenissen | L4/L6 | half | `vooruitblik.js` neemt gedateerde verplichtingen mee; `kern/commercie/contract/verplichting.js` (RTG-contracten) | Het lid ziet per maand wat er vast moet gebeuren (verwachte afschrijving, bevestigde reis, servicefee, contractdatum), elk met een verwijzing naar de app die het bezit. Wat geen datum heeft, staat apart. Monarch heeft een kalender (fragment). | middel | nu |
+| Gezamenlijke budgetten | L3 | ontbreekt | WBW (een gedeeld lijstje), potten (per lid) | Twee leden maken samen een budget; elk ziet de stand; wat privé blijft, blijft privé. Bij Emma alleen Ultimate (fragment). | groot | later |
+| Kasstroomprognose | L4 | half | `vooruitblik.js` (7/30/90 dagen) | Het lid ziet de verwachte in- en uitstroom per week of maand; verwacht heet "verwacht", nooit "geboekt"; een post zonder datum telt niet mee. | klein | nu |
+| Besluitvergelijking | L4 | ontbreekt | `fiscaal/scenario.js`-vorm | Het lid zet twee keuzes naast elkaar (huren of kopen, nu of later betalen) met zijn eigen getallen, en ziet het verschil per jaar. Geen advies over beleggen, krediet of verzekeren; de uitkomst draagt de fiscale klasse "advies". | middel | later |
+| Langetermijnplanning | L4 | ontbreekt | potten met doel | Het lid zet een doel met bedrag en datum en ziet hoeveel per maand nodig is. Er is geen rendement of beleggingsaanname. Boldin noemt Monte Carlo betaald (fragment); dat doen wij niet. | middel | later |
+
+**De zes "Beyond"-systemen van de eigenaar, naast wat er al is.** Er komt geen
+nieuwe laag (bijstelling van 19 oktober):
+
+| Systeem | Bestaat al als | Wat het nog vraagt |
+|---|---|---|
+| Financiële werkelijkheid | geldgraaf (projectie over vijf bronnen), portefeuille, de betaalwaarheid (alleen bevestigd heet betaald) | meer bronnen als verwijzing: bank, reis, assets, zorg |
+| Toekomstsimulator | `geldgraaf/vooruitblik.js`, `fiscaal/scenario.js` | huishoudscenario's (hierboven) |
+| Beslismotor | `geldbeleid/regels.js` en `evalueer.js` (vier niveaus, gift-bevestiging) | besluitvergelijking (hierboven) |
+| Contractbewaking | `patronen.js`, `bank/vastelasten` | een contract koppelen met opzegtermijn (hierboven) |
+| Automatisering met goedkeuring | geldbeleid: automatisch alleen de maandelijkse reservering binnen het eigen tegoed; de rest klaarzetten. Stuurlaag: `kern/stuur/beleid.js`, `mandaat.js` | niets nieuws; de grens blijft (geld verlaat het huis nooit vanzelf) |
+| Financieel geheugen | `geldbeleid/actielog.js` (alleen toevoegen), `geldgraaf.tijdlijn` | een jaaroverzicht en export (Familie 1, Pay) |
+
+**f. LOS en SAMEN.**
+- **LOS.** Valt een bron uit, dan zegt het overzicht "Niet opgehaald: … Dit
+  beeld is niet compleet." (`overzicht.js:122`) en rekent niet verder op een
+  gat. Geld Command werkt met wat er is.
+- **SAMEN.** Geld Command ontvangt projecties van Pay, WBW, Mecenaat, Labfonds
+  en payroll, en (voorstel) van een reis, assets en wonen (zie L6 hieronder).
+  Het geeft alleen links uit naar `/apps/geld.html#<stand>`.
+
+**Keten.** Een lid zet een pot voor de huur. De geldgrens weigert een betaling
+die de buffer zou breken. Het actielog bewaart beide.
+
+Storingen:
+- Valt de geldgraaf uit, dan blijven pot en grens werken; de grens zit in de
+  betaalpoort.
+
+**Ontvangen ketens (L6), uit LivingOS-A en -B (voorlopig).**
+- **Assets:** koop en herroeping via de betaalwaarheid. De servicefee: het
+  voorstel is dat Assets eigenaar blijft en Geld alleen de projectie in de
+  verplichtingenkalender toont.
+- **Wonen:** woonlasten. Een eigen verplichtingenobject bestaat niet. Het
+  voorstel aan de eigenaar is "verplichting van Geld"; tot dan geldt "Wonen
+  verwijst".
+- **Vakwerk:** een betaling per opdracht met bronRef.
+- **Sport:** een stadionticket.
+- **Mall en foodcourt:** bestellingen.
+- **Table:** een aanbetaling, waar die bestaat.
+
+Bij alle ketens geldt: het lid bevestigt elke betaling, en geen gegevens
+worden gedeeld.
+
+**g. Betaalmuur** (fragment, 19 oktober 2026):
+- YNAB: alles betaald, er is geen gratis laag (ynab.com/pricing).
+- Monarch Core: budgetten, nettovermogen en een gedeelde partner; Plus-only:
+  forecasting en het modelleren van levensgebeurtenissen
+  (help.monarch.com/hc/en-us/articles/48349699981972-Monarch-Plus-Tier).
+- Emma Pro: nettovermogen, eigen categorieën en export; Ultimate-only: "Spaces"
+  (een gedeeld budget)
+  (help.emma-app.com/en/article/what-are-the-features-of-emma-plus-pro-and-ultimate-678fjp/).
+- Dyme (NL): een gratis abonnementsoverzicht; budgetten en export betaald
+  (financer.nl/persoonlijke-financien/dyme-app-review).
+
+Wij hebben:
+- budgetregels, potten, de vooruitblik en de terugkerende posten (gratis);
+- half: het vermogensoverzicht;
+- niet: scenario's, de gezamenlijke budgetten en de kalender als scherm.
+
+**j. Extern.** Een bankkoppeling met andere banken (PSD2) vraagt een
+AISP-vergunning of -partner; tot dan alleen RTG-bronnen en de eigen opgave.
+
+### 2.3 Balans (`/apps/geld.html#balans`)
+
+**a. Doel.** Rust: zien of je week ademt, zonder dat iemand je bijhoudt.
+
+**b. Wat er is.**
+- Routes: `/api/balans` (`server/routes/balans.js`) en `/api/staff/balans`.
+- Kern: `server/kern/balans.js`, een weekbeeld uit de eigen agenda en de
+  grootboekrijen, met adviezen. Er wordt niets nieuws vastgelegd.
+- Voltooiscenario: `voltooi/balans.js` (`link:balans`).
+
+**c. Objecten en eigenaar.** Balans heeft niets eigens; het leest de agenda en
+de boekingen.
+
+**Zes lagen, oordeel.**
+- **L1** het weekbeeld bestaat.
+- **L4** de adviezen zijn regels, geen voorspelling.
+- **L6** leest de agenda en Pay.
+- L2, L3 en L5: niet van toepassing. Het weekbeeld voor personeel (`staff`)
+  bestaat al.
+
+**Functiecatalogus**
+
+| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|
+| Weekbeeld en rustadvies | L1 | bestaat | Een lege week "ademt"; een volle week geeft een rustadvies; een ander lid ziet niets. | — | — |
+| Trend over meerdere weken | L4 | ontbreekt | Het lid ziet vier weken naast elkaar; er wordt niets opgeslagen, alles wordt berekend uit de agenda. Reclaim heeft analyse in een betaald pakket (fragment). | klein | later |
+| Financieel welzijn (GELD.md fase 3) | L4 | ontbreekt | Balans toont naast de tijd ook de vrije ruimte deze maand, uit Geld Command, als verwijzing. | middel | later |
+
+**f. LOS en SAMEN.**
+- **LOS.** Zonder agenda toont Balans een lege week en zegt dat de agenda de
+  bron is.
+- **SAMEN.** Balans leest de agenda en Pay; het geeft niets uit.
+
+**Keten.** Een lid plant vier avonden; Balans raadt een rustdag aan.
+- Valt de agenda uit, dan geeft Balans geen verzonnen beeld.
+
+**g. Betaalmuur** (fragment): Reclaim Starter (People Analytics) en Clockwise
+Teams (team analytics) zijn betaald (reclaim.ai/pricing,
+support.getclockwise.com/article/75-clockwise-plan-offerings). Wij hebben het
+weekbeeld gratis; een trend niet.
+
+---
+
 *De overige families volgen.*

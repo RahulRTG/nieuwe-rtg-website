@@ -41,7 +41,9 @@ const EIGEN = [
      en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
   '/api/office/kantoor/uitnodiging',
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
-  '/api/comm/stuur'
+  '/api/comm/stuur',
+  // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
+  '/api/geld/pot/reserveer'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { gezinAanAccount } = require('./gezinaccount');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 let srv, browser;
 test.before(async () => {
@@ -225,11 +226,8 @@ test('Sound lends its real playback controls to the single Edge', { skip }, asyn
 });
 
 test('Foundation keeps its original view actions inside one mobile Edge', { skip }, async () => {
-  const response = await fetch(srv.base + '/api/foundation/gezin/maak', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gezinsnaam: 'Edge proef', naam: 'Beheerder', pin: '4321', geboortedatum: '1985-04-12' })
-  });
-  const gezin = await response.json();
+  // een gezin hangt aan een gratis ouderaccount (test/gezinaccount.js); de beheerder vraagt geen keuring
+  const gezin = await gezinAanAccount(srv.base, { gezinsnaam: 'Edge proef', naam: 'Beheerder' });
   assert.ok(gezin.token, 'a real isolated test family owns the session');
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce', hasTouch: true });
   try {

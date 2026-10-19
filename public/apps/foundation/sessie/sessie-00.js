@@ -108,3 +108,23 @@
         return d;
       }).catch(function () { toegangSlot('De toegangscontrole is nu niet bereikbaar. Uit veiligheid blijft deze ruimte dicht; probeer het zo opnieuw.', false); return null; });
   }
+  /* EEN GEZIN ZONDER EIGENAAR-ACCOUNT (eigenaarsbesluit 19 oktober 2026: gebruiken
+     vraagt een account). Buiten de demo antwoordt de server op een gezinstoken
+     van een anoniem gezin met 401 en `accountNodig`. Dan is de bewaarde sessie
+     niets meer waard: hij gaat weg, en de gezinsdeur wijst de weg naar een gezin
+     aan het account van een ouder. Eén plek, omdat elk Foundation-scherm zijn
+     eigen fetch heeft; de server blijft de poort, dit is alleen de weg terug. */
+  if (w.fetch && !w.__rtfAccountNodig) {
+    w.__rtfAccountNodig = true;
+    var kaleFetch = w.fetch;
+    w.fetch = function () {
+      return kaleFetch.apply(this, arguments).then(function (r) {
+        if (r && r.status === 401 && /\/api\/(rtf|foundation)\//.test(String(r.url || ''))) {
+          r.clone().json().then(function (d) {
+            if (d && d.accountNodig && Sessie.actief()) { schrijf(null); Sessie.deur('gezin'); }
+          }).catch(function () {});
+        }
+        return r;
+      });
+    };
+  }

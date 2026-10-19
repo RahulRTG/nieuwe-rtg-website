@@ -44,15 +44,27 @@ const BEKEND_OPEN = {
   'scripts/moveproef.js': '/api/booking/pay met een ref per run',
   'scripts/omzetproef.js': '/api/order/pay met een ref per run',
   'scripts/romeproef.js': '/api/reisbureau/betaal',
+  'scripts/lib/herstelwereld.js': '/api/pay/oplaad bij het klaarzetten van de wereld, met een sleutel waarvan niet is nagegaan wat de bank zegt',
+  'scripts/lib/idemwereld.js': '/api/pay/oplaad; de idemproef meet de herhaling, maar de afloop van de eerste oplading ligt niet vast',
+  'scripts/lib/rolproef.js': '/api/pay/oplaad in de rolwereld',
   'scripts/lib/voltooi/assets.js': '/api/asset/aanvraag/betaal',
   'scripts/lib/voltooi/move.js': '/api/booking/pay',
   'scripts/lib/voltooi/pay.js': '/api/pay/oplaad; het scenario meet ook de weigering, maar via een sleutel die niet is vastgelegd',
   'scripts/lib/voltooi/terplaatse.js': '/api/booking/pay'
 };
 
+/* Bestanden die een railroute als GEGEVEN noemen en hem niet aanroepen. */
+const NOEMT_ALLEEN = new Set(['simulatieafloop.js', 'appcontract.js']);
+
 function proefBestanden() {
   const uit = fs.readdirSync(path.join(WORTEL, 'scripts')).filter((f) => /proef.*\.js$|ronde\.js$/.test(f)).map((f) => 'scripts/' + f);
   for (const f of fs.readdirSync(path.join(WORTEL, 'scripts/lib/voltooi'))) if (f.endsWith('.js')) uit.push('scripts/lib/voltooi/' + f);
+  /* Ook de bibliotheken: een opbouw of wereld die oplaadt, betaalt net zo goed
+     (scripts/lib/idoropbouw.js gaf in ronde 11 een 402). Niet de registers die
+     de routes alleen NOEMEN. */
+  for (const f of fs.readdirSync(path.join(WORTEL, 'scripts/lib'))) {
+    if (f.endsWith('.js') && !NOEMT_ALLEEN.has(f)) uit.push('scripts/lib/' + f);
+  }
   return uit.sort();
 }
 

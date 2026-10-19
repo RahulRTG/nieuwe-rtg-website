@@ -45,6 +45,7 @@ const vandaag = () => new Date().toISOString().slice(0, 10);
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 const over = (d) => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
 const idem = () => randomUUID();
+const { betaaldeSleutel } = require('./voltooizorggeld');
 
 /* Zoek de eerste waarde in een antwoord: onder een sleutelnaam, of een string
    die op een patroon past. Voor de opbouw die een id moet onthouden. */
@@ -329,7 +330,10 @@ function stappen() {
     { pad: '/api/wbw/maak', lijf: (c) => ({ naam: 'Weekendje', leden: [c.tegen.key] }) },
     /* RTG Pay */
     { pad: '/api/pay/rekening', lijf: { iban: 'NL91ABNA0417164300', naam: 'Proef Rekening' } },
-    { pad: '/api/pay/oplaad', lijf: () => ({ centen: 5000, idem: idem() }) },
+    /* De afloop van de bank ligt vast (scripts/lib/simulatieafloop.js): met een
+       sleutel per run gaf de simulatiebank in ronde 11 een 402, en dan miste A
+       zijn geldobjecten in de tegenpoging. */
+    { pad: '/api/pay/oplaad', lijf: (c) => ({ centen: 5000, idem: betaaldeSleutel(c.ik.codenaam, 'idor-opbouw-oplaad-') }) },
     { pad: '/api/pay/tegoed/koop', lijf: (c) => ({ centen: 500, aan: c.tegen.codenaam, oms: 'proef', idem: idem() }),
       bewaar: (d, c) => { c.tegoed = zoek(d, { sleutel: 'tegoedId' }) || zoek(d, { sleutel: 'id' }); } },
     { pad: '/api/code/dyn', lijf: { soort: 'zegel', code: 'proefzegel1', ttlMs: 300000 },

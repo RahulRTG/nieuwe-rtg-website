@@ -1,0 +1,31 @@
+/* Dialoog: een systeemlaag, dus herkenbaar rond (--ds-radius-systeem). */
+@layer rtg.component {
+  .ds-dialoog {
+    inline-size: min(100% - 2 * var(--ds-goot), 32rem);
+    padding: var(--ds-ruimte-8);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  .ds-dialoog::backdrop { background: var(--ds-glas); }
+  /* Vol: een Detail of Taak die het scherm overneemt (het verblijfsblad).
+     Op de telefoon het hele scherm, daarboven een ruim venster. */
+  .ds-dialoog--vol {
+    inline-size: 100%;
+    max-inline-size: 100%;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+    background: var(--ds-grond);
+  }
+  .ds-dialoog__acties { display: flex; gap: var(--ds-ruimte-3); justify-content: flex-end; margin-block-start: var(--ds-ruimte-6); }
+  @container ds (min-width: 48rem) {
+    .ds-dialoog--vol { inline-size: min(100% - 2 * var(--ds-goot), 44rem); block-size: auto; max-block-size: calc(100dvh - 2 * var(--ds-goot)); margin: auto; border-radius: var(--ds-radius-systeem); }
+  }
+}

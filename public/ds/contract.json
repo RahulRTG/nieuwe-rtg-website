@@ -1,0 +1,191 @@
+{
+  "naam": "RTG Design System",
+  "versie": 1,
+  "uitleg": "Het afdwingbare contract van public/ds/. scripts/ontwerpsysteem.js --controle keurt elk bestand hiertegen; ONTWERPSYSTEEM.md legt uit waarom. Een wijziging hier is een ontwerpbesluit en hoort in dezelfde PR als de reden.",
+  "lagen": [
+    "rtg.reset",
+    "rtg.tokens",
+    "rtg.thema",
+    "rtg.component",
+    "rtg.scherm"
+  ],
+  "werelden": [
+    "living",
+    "travel",
+    "work",
+    "foundation"
+  ],
+  "schermtypen": [
+    "cover",
+    "collectie",
+    "taak",
+    "detail",
+    "gesprek",
+    "canvas",
+    "status"
+  ],
+  "componenten": [
+    "kop",
+    "knop",
+    "kaart",
+    "veld",
+    "lijst",
+    "chip",
+    "dialoog",
+    "edge",
+    "melding",
+    "toestel",
+    "paneel",
+    "overgang",
+    "meter",
+    "lezer",
+    "canvaslaag",
+    "handelingen",
+    "rooster",
+    "sectie",
+    "vel",
+    "beeldsnede"
+  ],
+  "themabaar": [
+    "--ds-grond",
+    "--ds-oppervlak",
+    "--ds-oppervlak-sterk",
+    "--ds-inkt",
+    "--ds-inkt-zacht",
+    "--ds-lijnkleur",
+    "--ds-accent",
+    "--ds-accent-hover",
+    "--ds-accent-inkt",
+    "--ds-metaal",
+    "--ds-cover-grond",
+    "--ds-cover-inkt",
+    "--ds-cover-metaal",
+    "--ds-cover-sluier",
+    "--ds-focus",
+    "--ds-beeld-positie"
+  ],
+  "talen": [
+    "nl",
+    "en",
+    "de",
+    "fr",
+    "es",
+    "it",
+    "pt",
+    "tr",
+    "ar",
+    "zh",
+    "ja",
+    "pl",
+    "hi",
+    "ru",
+    "uk",
+    "sv",
+    "da",
+    "no",
+    "fi"
+  ],
+  "rechtsNaarLinks": [
+    "ar"
+  ],
+  "overgangsscripts": [
+    {
+      "pad": "public/shared/i18n.js",
+      "reden": "De automatische DOM-vertaling is de enige vertaalweg van de TravelOS-schermen; hij zet een <style> voor zijn eigen taalkiezer (.rtg-lang-*) plus een regel voor verminderde beweging. Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/poortgesprek.js",
+      "reden": "Het gegevensgesprek (428 van de gegevenspoort) is een rechtenpad en geen versiering; zijn dialoog (.rp-*) heeft een eigen <style>. Gaat naar het dialoog-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/cookie.js",
+      "reden": "De wettelijke opslagmelding (#rtg-cookie) heeft een eigen <style>. Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/uitvoer.js",
+      "reden": "Meenemen (gegevensportabiliteit) zet een eigen <style> voor .rtguitvoer. Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/sprong.js",
+      "reden": "De sprong (twee tikken naar elke functie, TIKKEN.md) zet de server op elke pagina; op een ds-scherm tekent hij geen eigen greep meer, maar zijn luik heeft nog een eigen <style> (.rtgsprong-*). Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/plek.js",
+      "reden": "De locatievraag (rtg_os_gps, TIKKEN en de gps-schakelaar) is een rechtenpad: zonder haar vraagt OV nooit om je plek en valt inchecken met een tik stil. Haar kaart (.rtgplek) zet een eigen <style>. Gaat naar het dialoog-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/basis.js",
+      "reden": "De basis houdt op een ds-scherm zijn gedrag en zet daarvoor nog een <style>: het toegankelijkheidsprofiel (rtg-tekst-*, rtg-contrast, rtg-stil, rtg-rustig, rtg-linkstreep), de hulpkaart (.bss-*) en de springlink (.rtg-spring). Gaat naar tokens en .ds-componenten.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/apps/magnaat-sandbox.js",
+      "reden": "De Magnaat-proef van de chauffeurs-PDA (TRAVELOS-MIGRATIE.md par. 1d) is een rechtenpad: de sandbox vangt API-, opslag- en apparaatverkeer af voordat chauffeur.js draait, en zet het zichtbare keurmerk Magnaat Test (#rtgMagnaatTestMark) met een eigen <style>. Zonder haar zou een trainingskopie de echte API raken. Gaat naar een .ds-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
+      "pad": "public/shared/plaatsnadering.js",
+      "reden": "De aankomstpuls (zelf melden dat je in de buurt bent, test/plaatsnadering.e2e.js) is gedrag en geen versiering; zijn aanbod (.rtgnader) heeft een eigen <style>. Gaat naar het dialoog-component.",
+      "vervalt": "2027-01-31"
+    }
+  ],
+  "dsPoort": {
+    "uitleg": "Wat shared/basis.js op een scherm met html[data-ds] NIET laadt (de ds-poort in basis/*.js). De statische laadgraaf slaat deze verwijzingen over op een ds-scherm; test/hotels-ds.e2e.js bewijst in de browser dat ze ook echt niet laden.",
+    "public/shared/basis.js": [
+      "/shared/rtg-editorial-v4.css",
+      "/shared/rtg-heritage.css",
+      "/shared/rust.css",
+      "/shared/toegang.js",
+      "/shared/ios.js",
+      "/shared/rtg-themas.js",
+      "/shared/rtg-heritage-motion.js",
+      "/shared/rtg-continue-key-core.js",
+      "/shared/rtg-continue-key.js",
+      "/shared/rtg-heritage-order.js",
+      "/shared/randen.js",
+      "/shared/gebaar.js",
+      "/shared/uurwerk.js",
+      "/shared/kaart.js"
+    ]
+  },
+  "bewijs": {
+    "uitleg": "Per scherm op het Design System de browsertoets die in een echte browser bewijst dat er geen erfenisblad actief is, dat de ds-poort van de basis klopt en dat de kernhandeling slaagt.",
+    "public/apps/hotels.html": "test/hotels-ds.e2e.js",
+    "public/apps/hangar.html": "test/hangar-ds.e2e.js",
+    "public/apps/zakelijk.html": "test/zakelijk-ds.e2e.js",
+    "public/apps/reisuitnodiging.html": "test/reisuitnodiging-ds.e2e.js",
+    "public/apps/living-world.html": "test/living-world-ds.e2e.js",
+    "public/apps/rit.html": "test/rit-ds.e2e.js",
+    "public/apps/ov.html": "test/ov-ds.e2e.js",
+    "public/apps/move.html": "test/move-ds.e2e.js",
+    "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
+    "public/apps/reisbureau.html": "test/reisbureau-ds.e2e.js",
+    "public/apps/vluchten.html": "test/vluchten-ds.e2e.js",
+    "public/apps/reisboek.html": "test/reisboek-ds.e2e.js",
+    "public/apps/residentie.html": "test/residentie-ds.e2e.js",
+    "public/apps/boeken.html": "test/boeken-ds.e2e.js",
+    "public/apps/stad.html": "test/stad-ds.e2e.js",
+    "public/apps/routedossier.html": "test/routedossier-ds.e2e.js",
+    "public/apps/routedekking.html": "test/routedekking-ds.e2e.js",
+    "public/apps/luchthaven.html": "test/luchthaven-ds.e2e.js",
+    "public/apps/marechaussee.html": "test/marechaussee-ds.e2e.js",
+    "public/apps/ovdienst.html": "test/ovdienst-ds.e2e.js",
+    "public/apps/ovroutes.html": "test/ovroutes-ds.e2e.js",
+    "public/apps/ovcontrol.html": "test/ovcontrol-ds.e2e.js",
+    "public/apps/reizen.html": "test/reizen-ds.e2e.js",
+    "public/apps/arrival.html": "test/arrival-ds.e2e.js",
+    "public/apps/flits.html": "test/flits-ds.e2e.js",
+    "public/apps/navigatie.html": "test/navigatie-ds.e2e.js",
+    "public/apps/dispatch.html": "test/dispatch-ds.e2e.js",
+    "public/apps/chauffeur.html": "test/chauffeur-ds.e2e.js",
+    "public/apps/ghost.html": "test/ghost-ds.e2e.js",
+    "public/apps/voertuig.html": "test/voertuig-ds.e2e.js",
+    "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
+  }
+}

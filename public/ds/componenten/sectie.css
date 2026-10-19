@@ -1,0 +1,17 @@
+/* Sectie: het ritme tussen de delen van een lang scherm (een wereldhuis met
+   register, wacht en invoer onder elkaar). Veel lucht en een dunne lijn
+   ertussen, zodat delen niet tegen elkaar aan lopen (AGENTS.md: bij twijfel
+   meer ruimte). Een link in lopende tekst draagt het accent. */
+@layer rtg.component {
+  .ds-sectie {
+    display: grid;
+    gap: var(--ds-ruimte-3);
+    margin-block-start: var(--ds-ruimte-12);
+    padding-block-start: var(--ds-ruimte-8);
+    border-block-start: 1px solid var(--ds-lijnkleur);
+  }
+  .ds-sectie--open { margin-block-start: var(--ds-ruimte-6); padding-block-start: 0; border-block-start: 0; }
+  .ds-sectie p > a { color: var(--ds-accent); text-underline-offset: 3px; }
+  /* Een regel van losse gegevens naast elkaar (bestemming, periode). */
+  .ds-sectie__regel > * + * { margin-inline-start: var(--ds-ruimte-3); }
+}

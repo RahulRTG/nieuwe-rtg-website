@@ -1,0 +1,31 @@
+/* Cover: het binnenkomen van een wereld (mockup TravelOS): volle foto, RTG in
+   champagne, de wereldnaam groot in Bodoni, één zin, één ingang op beeld, de
+   rubrieken van de wereld, en de Edge eronder. */
+@layer rtg.scherm {
+  .ds-scherm--cover { background: var(--ds-cover-grond); color: var(--ds-cover-inkt); }
+  .ds-cover {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-block-size: var(--ds-schermhoogte);
+    padding: 72px var(--ds-goot) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-8));
+    overflow: hidden;
+    isolation: isolate;
+    text-align: center;
+  }
+  .ds-cover__beeld { position: absolute; inset: 0; z-index: -2; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: var(--ds-beeld-positie); }
+  .ds-cover::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ds-cover-sluier); }
+  .ds-cover__wereld { margin: 0; font-family: var(--ds-letter-display); font-weight: 400; font-size: clamp(2.75rem, 1.8rem + 4.5cqi, 5rem); line-height: 1; letter-spacing: -.01em; }
+  .ds-cover__ondertitel { margin: var(--ds-ruimte-2) 0 0; font-family: var(--ds-letter-display); font-size: 1.0625rem; opacity: .9; }
+  .ds-cover__onder { align-self: end; display: grid; justify-items: start; gap: var(--ds-ruimte-6); text-align: start; }
+  .ds-cover__zin { margin: 0; max-inline-size: 16ch; font-family: var(--ds-letter-display); font-size: clamp(1.625rem, 1.3rem + 1.4cqi, 2.25rem); line-height: 1.12; }
+  .ds-cover__streep { display: block; inline-size: 48px; block-size: 1px; background: var(--ds-cover-metaal); }
+  .ds-cover__nav { display: flex; justify-content: space-between; gap: var(--ds-ruimte-4); inline-size: 100%; font-family: var(--ds-letter-display); font-size: .9375rem; }
+  .ds-cover__nav a { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); color: inherit; text-decoration: none; opacity: .92; }
+  .ds-cover__nav a:hover { color: var(--ds-cover-metaal); }
+  @container ds (min-width: 64rem) {
+    .ds-cover { text-align: start; padding-inline: calc(var(--ds-goot) * 2); }
+    .ds-cover__onder { max-inline-size: 36rem; }
+    .ds-cover__nav { justify-content: start; gap: var(--ds-ruimte-8); }
+  }
+}

@@ -1,132 +1,133 @@
 <!doctype html>
-<html lang="nl" data-rtg-thema="onyx">
+<html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Chauffeur</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifests/chauffeur.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/apps/chauffeur.css" rel="stylesheet">
-<!-- Het materiaal van TravelOS (fluweel + accent). Dit scherm deelt de
-     schil van travel-os.css NIET: het houdt zijn eigen vorm. -->
-<link href="/shared/travelos-materiaal.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<a class="skip" href="#inhoud">Naar de inhoud</a>
+<!-- De chauffeurs-PDA op het RTG Design System (TRAVELOS-MIGRATIE.md par. 1b,
+     stroom E): een werkscherm op de werklaag. Taak (de ene volgende stap van
+     de rit), Collectie (het ritlog) en Status (niet aangemeld, geen aanvraag).
+     De vier bladen zijn tabs; de Edge blijft de weg naar de rest van het huis.
+     De Magnaat-proef houdt zijn eigen keurmerk (par. 1d). Geen eigen stijl. -->
+<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="taak">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/leverancier.html" aria-label="Naar RTG Werkplek">RTG</a>
+  <button class="ds-kop__actie" id="veiligKnop" type="button" aria-label="Bekijk de beveiliging van dit scherm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/></svg></button>
+</header>
 
-<div class="pda" id="pda">
-  <header class="pda-kop">
-    <a class="rtg-merk" href="/apps/leverancier.html" aria-label="Naar RTG Werkplek">RTG</a>
-    <div class="pda-identiteit"><strong>CHAUFFEUR</strong><small id="modusLabel">PDA</small></div>
-    <button class="veilig" id="veiligKnop" type="button" aria-label="Bekijk de beveiliging van dit scherm">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/></svg>
-      <i></i><span>BEVEILIGD</span>
-    </button>
-  </header>
+<main class="ds-taak" id="inhoud">
+<div class="ds-paneel" id="pda">
+  <div class="ds-taak__kop">
+    <p class="ds-label">Chauffeur · <span id="modusLabel">PDA</span></p>
+    <p class="ds-label" id="groet">GOEDEMIDDAG</p>
+  </div>
+  <div class="ds-tabs" role="tablist" aria-label="Chauffeurs-PDA">
+    <button class="ds-tab" role="tab" type="button" data-naar="vandaag" aria-selected="false">Vandaag</button>
+    <button class="ds-tab" role="tab" type="button" data-naar="ritten" aria-selected="true">Ritten</button>
+    <button class="ds-tab" role="tab" type="button" data-naar="navigatie" aria-selected="false">Navigatie</button>
+    <button class="ds-tab" role="tab" type="button" data-naar="hulp" aria-selected="false">Hulp</button>
+  </div>
 
-  <main id="inhoud">
-    <section class="pda-blad actief" data-blad="ritten" aria-labelledby="rittenTitel">
-      <div class="chauffeur-hero">
-        <div class="beschikbaarheid">
-          <p class="bovenregel" id="groet">GOEDEMIDDAG</p>
-          <div class="beschikbaar-kop">
-            <h1 id="rittenTitel">U BENT BESCHIKBAAR</h1>
-            <span class="verbinding" id="verbinding"><i></i> LIVE</span>
-          </div>
-        </div>
+  <section class="ds-paneel" data-blad="ritten" role="tabpanel" aria-labelledby="rittenTitel">
+    <h1 class="ds-titel ds-titel--scherm" id="rittenTitel">U BENT BESCHIKBAAR</h1>
+    <p class="ds-meta">Officiële RTG-tijd <time id="klok">--:--</time> · <span id="verbinding" data-stand="aan">LIVE</span></p>
+    <div class="ds-paneel" id="werkstapel" aria-live="polite" aria-busy="true">
+      <p class="ds-meta">Ritten worden veilig opgehaald…</p>
+    </div>
+    <div class="ds-veld" id="volgendeReservering" hidden>
+      <svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>
+      <span><span class="ds-veld__label">Volgende reservering</span><span class="ds-veld__waarde" id="reserveringTekst"></span></span><span></span>
+    </div>
+  </section>
 
-        <section class="klokpodium" aria-label="Huidige tijd">
-          <p>OFFICIËLE RTG-TIJD</p>
-          <div class="klokhouder"><div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div></div>
-        </section>
-      </div>
+  <section class="ds-paneel" data-blad="vandaag" role="tabpanel" aria-labelledby="vandaagTitel" hidden>
+    <p class="ds-label">Dienstoverzicht</p>
+    <h1 class="ds-titel ds-titel--scherm" id="vandaagTitel">Vandaag</h1>
+    <p class="ds-meta" id="vandaagDatum"></p>
+    <ul class="ds-lijst">
+      <li class="ds-lijst__rij"><svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 12 4 4 10-10"/></svg><span class="ds-lijst__titel">Afgerond</span><span class="ds-lijst__tijd"><strong id="cijferRitten">0</strong> ritten</span></li>
+      <li class="ds-lijst__rij"><svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 19h4l3-14h2l3 14h4M12 9v2m0 3v2"/></svg><span class="ds-lijst__titel">Afstand</span><span class="ds-lijst__tijd"><strong id="cijferKm">0</strong> kilometer</span></li>
+      <li class="ds-lijst__rij"><svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 7a6 6 0 1 0 0 10M5 10h8M5 14h8"/></svg><span class="ds-lijst__titel">Omzet zaak</span><span class="ds-lijst__tijd"><strong id="cijferOmzet">€ 0</strong> vandaag</span></li>
+    </ul>
+    <div class="ds-schermkop"><h2 class="ds-label">Ritlog</h2><button class="ds-knop ds-knop--stil ds-knop--klein" id="verversVandaag" type="button">Ververs</button></div>
+    <ul class="ds-lijst" id="ritlog"></ul>
+  </section>
 
-      <div class="werkstapel" id="werkstapel" aria-live="polite" aria-busy="true">
-        <section class="ritkaart laadkaart">
-          <p class="kaartlabel">RTG MOBILITY</p>
-          <h2>Ritten worden veilig opgehaald…</h2>
-          <div class="laadlijn"><i></i></div>
-        </section>
-      </div>
+  <section class="ds-paneel" data-blad="navigatie" role="tabpanel" aria-labelledby="navigatieTitel" hidden>
+    <p class="ds-label">RTG Navigatie</p>
+    <h1 class="ds-titel ds-titel--scherm" id="navigatieTitel">Routebeeld</h1>
+    <p class="ds-meta">De bestemming komt uitsluitend uit de actieve rit.</p>
+    <div class="ds-paneel" id="navigatiekaart">
+      <p class="ds-label">GEEN ACTIEVE ROUTE</p><h2 class="ds-titel">Neem eerst een rit aan.</h2><p class="ds-meta">Daarna verschijnen vertrek, bestemming en de veilige locatiedeling hier.</p>
+    </div>
+    <button class="ds-knop ds-knop--primair ds-knop--breed" id="openNavigatie" type="button" disabled data-ds-actie="Open navigatie">Open navigatie</button>
+    <button class="ds-knop ds-knop--stil ds-knop--breed" id="deelPositie" type="button" disabled data-ds-actie="Deel huidige positie">Deel huidige positie</button>
+    <p class="ds-meta">Locatie wordt alleen gedeeld tijdens een levende rit en stopt automatisch na afronding.</p>
+  </section>
 
-      <section class="reservering" id="volgendeReservering" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg>
-        <div><small>VOLGENDE RESERVERING</small><strong id="reserveringTekst"></strong></div>
-      </section>
-    </section>
-
-    <section class="pda-blad" data-blad="vandaag" aria-labelledby="vandaagTitel" hidden>
-      <header class="bladkop"><p>DIENSTOVERZICHT</p><h1 id="vandaagTitel">Vandaag</h1><span id="vandaagDatum"></span></header>
-      <div class="cijferraster">
-        <article><small>AFGEROND</small><strong id="cijferRitten">0</strong><span>ritten</span></article>
-        <article><small>AFSTAND</small><strong id="cijferKm">0</strong><span>kilometer</span></article>
-        <article><small>OMZET ZAAK</small><strong id="cijferOmzet">€ 0</strong><span>vandaag</span></article>
-      </div>
-      <section class="lijstvak"><div class="lijstkop"><h2>Ritlog</h2><button id="verversVandaag" type="button">VERVERS</button></div><div id="ritlog"></div></section>
-    </section>
-
-    <section class="pda-blad" data-blad="navigatie" aria-labelledby="navigatieTitel" hidden>
-      <header class="bladkop"><p>RTG NAVIGATIE</p><h1 id="navigatieTitel">Routebeeld</h1><span>De bestemming komt uitsluitend uit de actieve rit.</span></header>
-      <section class="navigatiekaart" id="navigatiekaart">
-        <div class="kompas" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z"/><circle cx="12" cy="12" r="9"/></svg></div>
-        <p>GEEN ACTIEVE ROUTE</p><h2>Neem eerst een rit aan.</h2><span>Daarna verschijnen vertrek, bestemming en de veilige locatiedeling hier.</span>
-      </section>
-      <button class="hoofdactie" id="openNavigatie" type="button" disabled><span>OPEN NAVIGATIE</span><b>→</b></button>
-      <button class="stille-actie" id="deelPositie" type="button" disabled>DEEL HUIDIGE POSITIE</button>
-      <p class="privacyregel">Locatie wordt alleen gedeeld tijdens een levende rit en stopt automatisch na afronding.</p>
-    </section>
-
-    <section class="pda-blad" data-blad="hulp" aria-labelledby="hulpTitel" hidden>
-      <header class="bladkop"><p>VEILIG &amp; WERKBAAR</p><h1 id="hulpTitel">Hulp</h1><span>Alles wat een chauffeur tijdens een rit direct nodig heeft.</span></header>
-      <div class="hulpopties">
-        <button id="meldingenKnop" type="button"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg><span><b>Ritmeldingen</b><small id="meldingStand">Schakel apparaatmeldingen in</small></span><em>›</em></button>
-        <button id="voorlezenKnop" type="button"><svg viewBox="0 0 24 24"><path d="M5 9v6h4l5 4V5L9 9H5ZM17 9c1 1 1 5 0 6M20 6c3 3 3 9 0 12"/></svg><span><b>Automatisch voorlezen</b><small id="voorleesStand">Uit</small></span><em>›</em></button>
-        <button id="noodKnop" class="noodoptie" type="button"><svg viewBox="0 0 24 24"><path d="M12 3 3 20h18L12 3Zm0 6v5m0 3h.01"/></svg><span><b>Hulp bij een incident</b><small>Bel de centrale en houd de ritreferentie bij de hand</small></span><em>›</em></button>
-      </div>
-      <section class="systeemkaart"><p>VERBINDING</p><div><span>Versleutelde sessie</span><strong id="sessieStand">Controleren…</strong></div><div><span>Mobility API</span><strong id="apiStand">Controleren…</strong></div><div><span>Apparaat</span><strong id="apparaatStand">Online</strong></div></section>
-      <button class="demoactie" id="demoKnop" type="button" hidden>MAGNAAT TEST · NIEUWE RITAANVRAAG</button>
-    </section>
-  </main>
-
-  <nav class="pda-nav" aria-label="Chauffeurs-PDA">
-    <button type="button" data-naar="vandaag"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg><span>Vandaag</span></button>
-    <button class="actief" type="button" data-naar="ritten" aria-current="page"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V4h8v3M8 12h8M12 10v4"/></svg><span>Ritten</span></button>
-    <button type="button" data-naar="navigatie"><svg viewBox="0 0 24 24"><path d="m20 4-7 16-2-7-7-2 16-7Z"/></svg><span>Navigatie</span></button>
-    <button type="button" data-naar="hulp"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Hulp</span></button>
-  </nav>
+  <section class="ds-paneel" data-blad="hulp" role="tabpanel" aria-labelledby="hulpTitel" hidden>
+    <p class="ds-label">Veilig &amp; werkbaar</p>
+    <h1 class="ds-titel ds-titel--scherm" id="hulpTitel">Hulp</h1>
+    <p class="ds-meta">Alles wat een chauffeur tijdens een rit direct nodig heeft.</p>
+    <div class="ds-velden">
+      <button class="ds-veld" id="meldingenKnop" type="button"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg><span><span class="ds-veld__label">Ritmeldingen</span><span class="ds-veld__waarde" id="meldingStand">Schakel apparaatmeldingen in</span></span><svg class="ds-veld__pijl" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      <button class="ds-veld" id="voorlezenKnop" type="button"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9v6h4l5 4V5L9 9H5ZM17 9c1 1 1 5 0 6M20 6c3 3 3 9 0 12"/></svg><span><span class="ds-veld__label">Automatisch voorlezen</span><span class="ds-veld__waarde" id="voorleesStand">Uit</span></span><svg class="ds-veld__pijl" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      <button class="ds-veld" id="noodKnop" type="button" data-ds-actie="Hulp bij een incident"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3 20h18L12 3Zm0 6v5m0 3h.01"/></svg><span><span class="ds-veld__label">Hulp bij een incident</span><span class="ds-veld__waarde">Bel de centrale en houd de ritreferentie bij de hand</span></span><svg class="ds-veld__pijl" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <h2 class="ds-label">Verbinding</h2>
+    <ul class="ds-lijst">
+      <li class="ds-lijst__rij"><svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"/></svg><span class="ds-lijst__titel">Versleutelde sessie</span><strong class="ds-lijst__tijd" id="sessieStand">Controleren…</strong></li>
+      <li class="ds-lijst__rij"><svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 18a12 12 0 0 1 16 0M7 15a7 7 0 0 1 10 0M12 12h.01"/></svg><span class="ds-lijst__titel">Mobility API</span><strong class="ds-lijst__tijd" id="apiStand">Controleren…</strong></li>
+      <li class="ds-lijst__rij"><svg class="ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 3h8v18H8zM11 18h2"/></svg><span class="ds-lijst__titel">Apparaat</span><strong class="ds-lijst__tijd" id="apparaatStand">Online</strong></li>
+    </ul>
+    <button class="ds-knop ds-knop--stil ds-knop--breed" id="demoKnop" type="button" hidden>MAGNAAT TEST · NIEUWE RITAANVRAAG</button>
+  </section>
 </div>
+</main>
 
-<dialog class="ritdialoog" id="ritDialoog" aria-labelledby="dialoogTitel">
-  <div class="dialoog-binnen">
-    <header><div><p id="dialoogLabel">NIEUWE RITAANVRAAG</p><h2 id="dialoogTitel">Rit bekijken</h2></div><button id="sluitDialoog" type="button" aria-label="Sluiten">×</button></header>
-    <div class="dialoogroute"><span id="dialoogVan"></span><b>→</b><span id="dialoogNaar"></span></div>
-    <dl id="dialoogFeiten"></dl>
-    <div class="veiligheidsnoot"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/></svg><p><b>Gegevensbescherming actief</b><span>U ziet alleen de ritinformatie die nodig is om deze opdracht veilig uit te voeren.</span></p></div>
-    <button class="hoofdactie" id="accepteerRit" type="button"><span>NEEM RIT AAN</span><b>→</b></button>
-    <button class="stille-actie" id="laatLopenDialoog" type="button">LAAT LOPEN</button>
+<dialog class="ds-dialoog" id="ritDialoog" aria-labelledby="dialoogTitel">
+  <div class="ds-paneel">
+    <div class="ds-schermkop"><p class="ds-label" id="dialoogLabel">NIEUWE RITAANVRAAG</p><button class="ds-kop__actie" id="sluitDialoog" type="button" aria-label="Sluiten">×</button></div>
+    <h2 class="ds-titel" id="dialoogTitel">Rit bekijken</h2>
+    <p class="ds-meta"><span id="dialoogVan"></span> → <span id="dialoogNaar"></span></p>
+    <ul class="ds-detail__gegevens" id="dialoogFeiten"></ul>
+    <p class="ds-meta"><b>Gegevensbescherming actief.</b> U ziet alleen de ritinformatie die nodig is om deze opdracht veilig uit te voeren.</p>
+    <button class="ds-knop ds-knop--primair ds-knop--breed" id="accepteerRit" type="button"><span>NEEM RIT AAN</span></button>
+    <button class="ds-knop ds-knop--stil ds-knop--breed" id="laatLopenDialoog" type="button">LAAT LOPEN</button>
   </div>
 </dialog>
 
-<dialog class="veiligdialoog" id="veiligDialoog" aria-labelledby="veiligTitel">
-  <div><header><p>RTG BESCHERMING</p><button id="sluitVeilig" type="button" aria-label="Sluiten">×</button></header><h2 id="veiligTitel">Dit scherm werkt onder uw persoonlijke personeelssessie.</h2><ul><li><b>✓</b><span>Alleen ritten van uw vervoerder</span></li><li><b>✓</b><span>Statusovergangen worden door de server gecontroleerd</span></li><li><b>✓</b><span>Locatie stopt na afronding van de rit</span></li></ul></div>
+<dialog class="ds-dialoog" id="veiligDialoog" aria-labelledby="veiligTitel">
+  <div class="ds-paneel">
+    <div class="ds-schermkop"><p class="ds-label">RTG Bescherming</p><button class="ds-kop__actie" id="sluitVeilig" type="button" aria-label="Sluiten">×</button></div>
+    <h2 class="ds-titel" id="veiligTitel">Dit scherm werkt onder uw persoonlijke personeelssessie.</h2>
+    <ul class="ds-detail__gegevens"><li class="ds-detail__gegeven">✓ Alleen ritten van uw vervoerder</li><li class="ds-detail__gegeven">✓ Statusovergangen worden door de server gecontroleerd</li><li class="ds-detail__gegeven">✓ Locatie stopt na afronding van de rit</li></ul>
+  </div>
 </dialog>
 
-<dialog class="nooddialoog" id="noodDialoog" aria-labelledby="noodTitel">
-  <div><header><p>INCIDENTHULP</p><button id="sluitNood" type="button" aria-label="Sluiten">×</button></header><h2 id="noodTitel">Bent u of de reiziger direct in gevaar?</h2><a href="tel:112" class="hoofdactie"><span>BEL 112</span><b>→</b></a><button id="meldIncident" class="stille-actie" type="button">MELD INCIDENT BIJ RTG</button><p>Een incidentmelding verandert de ritstatus en wordt met tijdstip vastgelegd.</p></div>
+<dialog class="ds-dialoog" id="noodDialoog" aria-labelledby="noodTitel">
+  <div class="ds-paneel">
+    <div class="ds-schermkop"><p class="ds-label">Incidenthulp</p><button class="ds-kop__actie" id="sluitNood" type="button" aria-label="Sluiten">×</button></div>
+    <h2 class="ds-titel" id="noodTitel">Bent u of de reiziger direct in gevaar?</h2>
+    <a href="tel:112" class="ds-knop ds-knop--primair ds-knop--breed">BEL 112</a>
+    <button id="meldIncident" class="ds-knop ds-knop--stil ds-knop--breed" type="button">MELD INCIDENT BIJ RTG</button>
+    <p class="ds-meta">Een incidentmelding verandert de ritstatus en wordt met tijdstip vastgelegd.</p>
+  </div>
 </dialog>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="/shared/uurwerk.js"></script>
-<script src="/shared/klok.js"></script>
+<p class="ds-melding" id="toast" role="status" aria-live="polite"></p>
 <script src="/apps/magnaat-sandbox.js"></script>
 <script src="/apps/chauffeur.js"></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>
 </html>

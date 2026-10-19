@@ -1,0 +1,105 @@
+/* Edge: de enige vaste systeemschil (HERITAGE.md par. 2.7), met Rahul in het
+   midden. Dit blad draagt alleen de VORM; /ds/shell.js tekent de balk en
+   wisselt de modi, en de bevoegdheid blijft bij de server (EDGE.md: "de Edge
+   presenteert bevoegdheid; hij verleent haar nooit"). */
+@layer rtg.component {
+  .ds-edge {
+    position: fixed;
+    inset-inline: var(--ds-ruimte-3);
+    inset-block-end: max(var(--ds-ruimte-3), env(safe-area-inset-bottom));
+    z-index: 20;
+    max-inline-size: 40rem;
+    margin-inline: auto;
+    color: var(--ds-cover-inkt);
+  }
+  .ds-edge__balk {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-ruimte-1);
+    min-block-size: var(--ds-edge-hoogte);
+    padding-inline: var(--ds-ruimte-2);
+    background: var(--ds-glas);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
+  .ds-edge__knop {
+    flex: 1 1 0;
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    min-block-size: var(--ds-doel);
+    min-inline-size: var(--ds-doel);
+    padding: 0;
+    border: 0;
+    border-radius: var(--ds-radius-capsule);
+    background: transparent;
+    color: inherit;
+    font: 500 .6875rem / 1 var(--ds-letter-tekst);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ds-edge__knop:hover { color: var(--ds-cover-metaal); }
+  .ds-edge__knop svg { inline-size: 20px; block-size: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ds-edge__knop--rahul { flex: 0 0 76px; }
+  .ds-edge__knop--rahul svg { inline-size: 54px; block-size: 27px; stroke: none; filter: drop-shadow(0 1px 6px var(--ds-glasrand)); }
+  /* De lippen: champagne naar brons, het herkenbare midden (mockup Edge). */
+  .ds-edge__lippen-licht { stop-color: var(--ds-lippen-licht); }
+  .ds-edge__lippen-diep { stop-color: var(--ds-lippen-diep); }
+  .ds-edge__knop[aria-expanded="true"] { color: var(--ds-cover-metaal); }
+  .ds-edge__veld {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    min-block-size: 44px;
+    padding-inline: var(--ds-ruimte-4);
+    background: transparent;
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-capsule);
+    color: var(--ds-cover-inkt);
+    font: 400 var(--ds-maat-klein) / 1.2 var(--ds-letter-tekst);
+  }
+  .ds-edge__veld::placeholder { color: var(--ds-cover-inkt); opacity: .6; }
+  .ds-edge__veld:focus { outline: none; border-color: var(--ds-cover-metaal); }
+  .ds-edge__object { flex: 0 0 44px; inline-size: 44px; block-size: 44px; border-radius: var(--ds-radius-inhoud); object-fit: cover; }
+  .ds-edge__blad {
+    margin-block-end: var(--ds-ruimte-2);
+    padding: var(--ds-ruimte-6);
+    max-block-size: min(70dvh, 32rem);
+    overflow-y: auto;
+    background: var(--ds-glas);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
+  .ds-edge__bladtitel { margin: 0 0 var(--ds-ruimte-2); font-family: var(--ds-letter-display); font-weight: 400; font-size: 1.375rem; }
+  .ds-edge__bladtekst { margin: 0 0 var(--ds-ruimte-4); font-size: var(--ds-maat-klein); line-height: 1.5; opacity: .88; white-space: pre-wrap; }
+  .ds-edge__lijst { display: grid; gap: var(--ds-ruimte-1); margin: 0; padding: 0; list-style: none; }
+  .ds-edge__regel {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-ruimte-3);
+    inline-size: 100%;
+    min-block-size: var(--ds-doel);
+    padding-inline: var(--ds-ruimte-3);
+    border: 0;
+    border-radius: var(--ds-radius-inhoud);
+    background: transparent;
+    color: inherit;
+    font: 500 var(--ds-maat-klein) / 1.2 var(--ds-letter-tekst);
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ds-edge__regel:hover { color: var(--ds-cover-metaal); }
+  .ds-edge__regel svg { inline-size: 18px; block-size: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .ds-verborgen {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

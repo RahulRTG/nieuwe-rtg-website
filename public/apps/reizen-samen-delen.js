@@ -18,7 +18,7 @@
     var t = new Date(String(iso || ''));
     return isNaN(t.getTime()) ? '' : t.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
   }
-  function leeg(vak, tekst) { vak.textContent = ''; vak.appendChild(maak('p', 'leegtekst', tekst)); }
+  function leeg(vak, tekst) { vak.textContent = ''; vak.appendChild(maak('p', 'ds-meta', tekst)); }
 
   function tekenTijdlijn(uit) {
     var vak = $('#samenTijdlijn'); if (!vak) return;
@@ -26,20 +26,18 @@
     var rij = uit.posts || [];
     if (!rij.length) { leeg(vak, 'Nog niets gedeeld. Wat u hier schrijft, leest het hele gezelschap.'); return; }
     rij.forEach(function (p) {
-      var post = maak('article', 'gezelpost');
-      post.appendChild(maak('span', 'pionrond klein', (p.van || '?').slice(0, 2).toUpperCase()));
+      var post = maak('article', 'ds-gesprek__bericht');
+      post.setAttribute('data-user-content', '');
       var body = maak('div');
-      var kop = maak('div', 'gezelkop');
-      kop.appendChild(maak('b', '', p.van));
-      kop.appendChild(maak('small', '', tijd(p.at) + ' · ' + p.rol));
-      body.appendChild(kop);
+      body.appendChild(maak('b', '', p.van));
+      body.appendChild(maak('span', 'ds-meta', ' ' + tijd(p.at) + ' · ' + p.rol));
       if (p.tekst) body.appendChild(maak('p', '', p.tekst));
       if (p.soort === 'beeld') {
         /* De bytes staan in de kluis van de reiziger en komen daar vandaan --
            met de sessie van de LEZER, zodat de kluis zelf beslist of hij ze
            krijgt. Dit scherm bewaart geen kopie en kent geen adres. */
-        var beeld = maak('div', 'postbeeld');
-        beeld.appendChild(maak('small', '', 'Beeld uit de kluis van ' + p.van));
+        var beeld = maak('div');
+        beeld.appendChild(maak('span', 'ds-meta', 'Beeld uit de kluis van ' + p.van));
         body.appendChild(beeld);
         R.api('/api/bestanden/haal', { id: p.bestand }).then(function (uit) {
           if (!uit || !uit.dataUrl) return;
@@ -64,10 +62,10 @@
     var vak = $('#samenZicht'); if (!vak || !uit || !uit.reis) return;
     var reis = uit.reis;
     vak.textContent = '';
-    vak.appendChild(maak('b', '', reis.bestemming + ' · ' + reis.venster.van + ' t/m ' + reis.venster.tot));
-    vak.appendChild(maak('small', '', 'U kijkt hier als ' + reis.rol + (uit.van ? ', op de reis van ' + uit.van : '') + '.'));
+    vak.appendChild(maak('p', 'ds-kaart__titel', reis.bestemming + ' · ' + reis.venster.van + ' t/m ' + reis.venster.tot));
+    vak.appendChild(maak('p', 'ds-meta', 'U kijkt hier als ' + reis.rol + (uit.van ? ', op de reis van ' + uit.van : '') + '.'));
     if ((reis.nietZichtbaar || []).length) {
-      vak.appendChild(maak('small', 'nietzicht', 'Niet zichtbaar voor deze rol: ' + reis.nietZichtbaar.join(', ') + '.'));
+      vak.appendChild(maak('p', 'ds-detail__status', 'Niet zichtbaar voor deze rol: ' + reis.nietZichtbaar.join(', ') + '.'));
     }
   }
 
@@ -82,13 +80,14 @@
     vak.textContent = '';
     var b = uit.beleid || {};
     Object.keys(b).forEach(function (veld) {
-      var regel = maak('div', 'deelregel');
-      var label = maak('span', 'gezelnaam');
-      label.appendChild(maak('b', '', veld === 'aankomst' ? 'Aankomst melden' : veld));
-      label.appendChild(maak('small', '', veld === 'aankomst'
+      var regel = maak('li', 'ds-lijst__rij');
+      regel.appendChild(maak('span'));
+      var label = maak('span');
+      label.appendChild(maak('span', 'ds-lijst__titel', veld === 'aankomst' ? 'Aankomst melden' : veld));
+      label.appendChild(maak('span', 'ds-lijst__tekst', veld === 'aankomst'
         ? 'Meekijkers zien dat u er bent. Wie meereist ziet het altijd.' : ''));
       regel.appendChild(label);
-      var knop = maak('button', 'schakel' + (b[veld] ? ' aan' : ''), b[veld] ? 'AAN' : 'UIT');
+      var knop = maak('button', 'ds-chip', b[veld] ? 'AAN' : 'UIT');
       knop.type = 'button';
       knop.setAttribute('aria-pressed', b[veld] ? 'true' : 'false');
       knop.addEventListener('click', function () {
@@ -100,12 +99,13 @@
       vak.appendChild(regel);
     });
     (uit.bestaatNiet || []).forEach(function (x) {
-      var regel = maak('div', 'deelregel');
-      var label = maak('span', 'gezelnaam');
-      label.appendChild(maak('b', '', x.naam.charAt(0).toUpperCase() + x.naam.slice(1)));
-      label.appendChild(maak('small', '', x.reden));
+      var regel = maak('li', 'ds-lijst__rij');
+      regel.appendChild(maak('span'));
+      var label = maak('span');
+      label.appendChild(maak('span', 'ds-lijst__titel', x.naam.charAt(0).toUpperCase() + x.naam.slice(1)));
+      label.appendChild(maak('span', 'ds-lijst__tekst', x.reden));
       regel.appendChild(label);
-      regel.appendChild(maak('em', 'rolpil', 'BESTAAT NIET'));
+      regel.appendChild(maak('span', 'ds-label', 'BESTAAT NIET'));
       vak.appendChild(regel);
     });
   }

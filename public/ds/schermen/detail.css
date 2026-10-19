@@ -1,0 +1,17 @@
+/* Detail (mockup Hôtel Plaza Athénée): groot beeld bovenaan, de naam in
+   Bodoni, de plaats, een status met stip, de gegevens als icoonrijen en één
+   volle knop. Op een breed scherm staan beeld en inhoud naast elkaar. */
+@layer rtg.scherm {
+  .ds-detail__beeld { display: block; inline-size: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: var(--ds-beeld-positie); }
+  .ds-detail__inhoud { display: grid; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-6) var(--ds-ruimte-6) var(--ds-ruimte-8); max-inline-size: var(--ds-breedte-lees); margin-inline: auto; }
+  .ds-detail__status { display: inline-flex; align-items: center; gap: var(--ds-ruimte-3); margin: 0; font-size: var(--ds-maat-klein); }
+  .ds-detail__status::before { content: ""; inline-size: 12px; block-size: 12px; border-radius: var(--ds-radius-cirkel); background: var(--ds-metaal); }
+  .ds-detail__gegevens { display: grid; gap: var(--ds-ruimte-3); margin: var(--ds-ruimte-2) 0; padding: 0; list-style: none; font-size: var(--ds-maat-klein); }
+  .ds-detail__gegeven { display: flex; align-items: center; gap: var(--ds-ruimte-3); }
+  .ds-detail__gegeven svg { inline-size: 18px; block-size: 18px; flex: none; color: var(--ds-inkt-zacht); fill: none; stroke: currentColor; stroke-width: 1.4; }
+  @container ds (min-width: 64rem) {
+    .ds-detail { display: grid; grid-template-columns: 1.2fr 1fr; min-block-size: var(--ds-schermhoogte); }
+    .ds-detail__beeld { block-size: 100%; aspect-ratio: auto; }
+    .ds-detail__inhoud { align-content: center; }
+  }
+}

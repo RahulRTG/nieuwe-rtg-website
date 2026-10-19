@@ -6,7 +6,7 @@
     ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
     ['rtg-editorial-v4-header', 'RTGEditorialV4Header'],
     ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
-    if (window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
+    if (ds || window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
     var script = document.createElement('script');
     script.src = '/shared/' + bron[0] + '.js'; script.async = false;
     (document.head || document.documentElement).appendChild(script);

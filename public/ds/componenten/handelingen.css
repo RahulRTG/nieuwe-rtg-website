@@ -1,0 +1,9 @@
+/* Handelingen: de kleine knoppen onder een regel in een werklijst (de
+   operatieschermen, TRAVELOS-MIGRATIE.md par. 1b: een vlucht een stap
+   verder zetten, een koffer vermist melden, een reiziger vrijgeven). Ze
+   lopen door naar een volgende regel in plaats van uit beeld te schuiven:
+   een handeling die je niet ziet, is er niet (ADAPTIEF.md). */
+@layer rtg.component {
+  .ds-handelingen { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-2); }
+  .ds-handelingen > .ds-invoer { flex: 1 1 12rem; min-inline-size: 0; }
+}

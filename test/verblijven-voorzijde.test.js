@@ -7,11 +7,14 @@ const path = require('node:path');
 const root = path.join(__dirname, '..');
 const lees = bestand => fs.readFileSync(path.join(root, bestand), 'utf8');
 
-test('RTG Verblijven draagt het goedgekeurde TravelOS-drieluik', () => {
+test('RTG Verblijven draagt het TravelOS-drieluik, op het RTG Design System', () => {
+  /* Sinds batch 3 van TRAVELOS-MIGRATIE.md komt de vorm uit /ds/ en niet meer
+     uit rtg-verblijven-2026.css. Wat deze toets bewaakte blijft: de wereld,
+     de drie momenten en hun zinnen. */
   const html = lees('public/apps/hotels.html');
   const voorzijde = lees('public/apps/hotels-voorzijde.js');
-  assert.match(html, /rtg-stay-experience/);
-  assert.match(html, /rtg-verblijven-2026\.css/);
+  assert.match(html, /data-rtg-world="travel"/);
+  assert.match(html, /href="\/ds\/rtg-ds\.css"/);
   assert.match(html, /Waar wilt u thuiskomen\?/);
   assert.match(voorzijde, /Alles staat voor u klaar\./);
   assert.match(voorzijde, /Zeg wat u nodig heeft\./);
@@ -41,11 +44,13 @@ test('verblijfsservice vraagt de juiste menselijke afdeling zonder toezegging', 
   assert.match(js, /Een medewerker reageert persoonlijk/);
 });
 
-test('de verblijfsvoorzijde blijft in kleine modules en gebruikt de systeemvorm', () => {
-  const bestanden = ['public/apps/hotels-voorzijde.js', 'public/apps/hotels-momenten.js',
-    'public/shared/rtg-verblijven-2026.css', 'public/shared/rtg-verblijven-momenten-2026.css'];
-  for (const bestand of bestanden) assert.ok(Buffer.byteLength(lees(bestand)) < 10 * 1024, bestand + ' is te groot');
-  const css = lees('public/shared/rtg-verblijven-2026.css') + lees('public/shared/rtg-verblijven-momenten-2026.css');
-  assert.doesNotMatch(css, /border-radius:var\(--rtg-radius-system\)/);
-  assert.match(lees('public/shared/rtg-heritage-experiences.css'), /rtg-stay-experience \.verblijf-nav/);
+test('de verblijfsvoorzijde blijft in kleine modules en draagt geen eigen vormtaal', () => {
+  for (const bestand of ['public/apps/hotels-voorzijde.js', 'public/apps/hotels-momenten.js'])
+    assert.ok(Buffer.byteLength(lees(bestand)) < 10 * 1024, bestand + ' is te groot');
+  /* Gemigreerd volgens de meting zelf: het systeem, geen erfenisblad, geen
+     eigen <style>-blok en geen stijlinjectie buiten de overgangslijst. */
+  const { meet } = require('../scripts/ontwerpsysteem.js');
+  assert.ok(meet().gemigreerd.includes('public/apps/hotels.html'), 'hotels.html telt als gemigreerd');
+  for (const weg of ['public/shared/rtg-verblijven-2026.css', 'public/shared/rtg-verblijven-momenten-2026.css'])
+    assert.ok(!fs.existsSync(path.join(root, weg)), weg + ' hoort weg te zijn: niemand laadt hem nog');
 });

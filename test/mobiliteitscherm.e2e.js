@@ -110,12 +110,12 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
     await page.click('#velPlan');
     await page.waitForFunction(() => {
       const m = document.querySelector('#melding');
-      return m && m.classList.contains('zien') && m.textContent.trim().length > 5;
+      return m && m.classList.contains('toon') && m.textContent.trim().length > 5;
     }, null, { timeout: 20000 });
     const reden = (await page.textContent('#melding')) || '';
     assert.match(reden, /locatie|plek|waar/i,
       'zonder locatie zegt het scherm waarom het niet kan: ' + reden.slice(0, 120));
-    const geenOpties = await page.$$eval('#opties .kaart', els => els.length);
+    const geenOpties = await page.$$eval('#opties .ds-kaart', els => els.length);
     assert.equal(geenOpties, 0, 'en er staat geen verzonnen reis op het scherm');
 
     /* EN DAN DE ECHTE WEG die daarvoor in de plaats komt: de reiziger kiest
@@ -145,9 +145,9 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
        knop. Dat is het verschil tussen een reisplanner en een bestelknop. */
     await page.waitForFunction(() => {
       const b = document.querySelector('#optieBlok');
-      return b && !b.classList.contains('weg') && b.querySelectorAll('.kaart').length > 0;
+      return b && !b.hidden && b.querySelectorAll('.ds-kaart').length > 0;
     }, null, { timeout: 20000 });
-    const kaarten = await page.$$eval('#opties .kaart', els => els.map(e => e.textContent));
+    const kaarten = await page.$$eval('#opties .ds-kaart', els => els.map(e => e.textContent));
     assert.ok(kaarten.length >= 1, 'er staat minstens een reisoptie op het scherm');
     assert.ok(kaarten.some(k => /min/.test(k) && /€/.test(k) && /CO₂/.test(k)),
       'elke optie toont tijd, prijs en uitstoot, kreeg: ' + kaarten[0].slice(0, 120));
@@ -155,14 +155,14 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
       'en de uitstoot heet op het scherm een schatting, geen meting');
 
     // boeken: daarna staat de reis in beeld en is het formulier weg
-    await page.click('#opties .kaart button.vol');
+    await page.click('#opties .ds-kaart [data-boek]');
     await page.waitForFunction(() => {
       const k = document.querySelector('#lopendKaart');
-      return k && !k.classList.contains('weg');
+      return k && !k.hidden;
     }, null, { timeout: 20000 });
-    assert.ok(await page.$eval('#boekBlok', el => el.classList.contains('weg')),
+    assert.ok(await page.$eval('#boekBlok', el => el.hidden),
       'het planformulier is weg zodra er een reis loopt');
-    const etappes = await page.$$eval('#lopendEtappes .rijtje', els => els.map(e => e.textContent));
+    const etappes = await page.$$eval('#lopendEtappes .ds-veld', els => els.map(e => e.textContent));
     assert.ok(etappes.length >= 1, 'de etappes van de reis staan op het scherm');
 
     // en de server is het ermee eens
@@ -197,7 +197,7 @@ test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er
     const reden = await page.textContent('#kaartReden');
     assert.match(reden, /Partnercontracten|overeenkomst|beschikbaar/i,
       'het scherm legt uit waarom er niets te koop is, kreeg: ' + reden);
-    assert.ok(await page.$eval('#kaartVorm', el => el.classList.contains('weg')),
+    assert.ok(await page.$eval('#kaartVorm', el => el.hidden),
       'en er staat geen koopknop bij iets dat niet te koop is');
 
     // nu het kantoor de module aanzet en een overeenkomst vastlegt
@@ -218,7 +218,7 @@ test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er
     await page.evaluate(() => { document.querySelector('#tabOv').click(); });
     await page.waitForFunction(() => {
       const v = document.querySelector('#kaartVorm');
-      return v && !v.classList.contains('weg');
+      return v && !v.hidden;
     }, null, { timeout: 20000 });
 
     await page.evaluate(() => { document.querySelector('#kaartKoop').click(); });
@@ -267,8 +267,10 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
     const page = s.page;
 
     await page.waitForFunction(() => {
+      /* Sinds de TravelOS-migratie staat het bord op het Design System: het
+         verbergt met hidden, en een open rit is een rij met zijn ref. */
       const b = document.querySelector('#vBord');
-      return b && !b.classList.contains('weg') && document.querySelectorAll('#lijstOpen .rij').length > 0;
+      return b && !b.hidden && document.querySelectorAll('#lijstOpen [data-ref]').length > 0;
     }, null, { timeout: 20000 });
 
     const open1 = await page.textContent('#lijstOpen');
@@ -277,14 +279,14 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
     /* De rekensom. Hier rekent deze toets bewust af op de FACTORNAMEN en niet op
        "er staat iets": een balkje zonder uitleg is precies het scherm dat een
        planner doet terugvallen op handmatig toewijzen. */
-    await page.waitForFunction(() => document.querySelectorAll('#lijstOpen .balk').length > 0,
+    await page.waitForFunction(() => document.querySelectorAll('#lijstOpen [data-factor]').length > 0,
       null, { timeout: 20000 });
-    const balken = await page.$$eval('#lijstOpen .balk', els => els.map(e => e.textContent));
+    const balken = await page.$$eval('#lijstOpen [data-factor]', els => els.map(e => e.textContent));
     for (const factor of ['nabijheid', 'aankomsttijd', 'eerlijk'])
       assert.ok(balken.some(b => b.includes(factor)), 'de factor "' + factor + '" staat met zijn uitleg in beeld');
 
     // en het afgewezen voertuig staat er MET reden; niet stil weggelaten
-    const uitleg = await page.$$eval('#lijstOpen .uitleg', els => els.map(e => e.textContent));
+    const uitleg = await page.$$eval('#lijstOpen [data-afgewezen]', els => els.map(e => e.textContent));
     assert.ok(uitleg.some(u => /Wagen B/.test(u) && /vergunning/.test(u)),
       'de afgewezen wagen staat erbij met zijn reden, kreeg: ' + uitleg.join(' | '));
 
@@ -339,7 +341,7 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
     });
     await page.waitForFunction(() => {
       const sc = document.querySelector('#qrScherm');
-      return sc && sc.classList.contains('zien');
+      return sc && sc.open;
     }, null, { timeout: 20000 });
     const qr = await page.$eval('#qrBeeld', el => ({ src: el.src, verborgen: el.hidden, breed: el.naturalWidth }));
     assert.ok(qr.src.startsWith('data:image/png'), 'de QR is een echte afbeelding, kreeg: ' + qr.src.slice(0, 40));
@@ -431,7 +433,8 @@ test('de werkgever zet zijn beleid, ziet de aanvraag en geeft akkoord',
 
     // het beleid op het scherm zetten: een drempel van vijf euro
     await page.evaluate(() => { document.querySelector('#tabs button[data-tab="beleid"]').click(); });
-    await page.waitForFunction(() => !document.querySelector('#tBeleid').classList.contains('weg'),
+    // sinds de Design System-migratie verbergt het scherm een tab met [hidden]
+    await page.waitForFunction(() => !document.querySelector('#tBeleid').hidden,
       null, { timeout: 20000 });
     await page.fill('#bDrempel', '5');
     await page.evaluate(() => { document.querySelector('#bBewaar').click(); });

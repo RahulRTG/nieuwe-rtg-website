@@ -15,7 +15,7 @@
 
    MUTATIES, elk nagetrokken (12 oktober 2026); het is een proef, dus hij zakt
    op de eerste stap die niet meer klopt: haal spreek() uit de klik in
-   reisbureau.html (zakt bij 1), laat voorRahul() de verwijzingen leeg laten
+   reisbureau-aanvragen.js (zakt bij 1), laat voorRahul() de verwijzingen leeg laten
    (zakt bij 1), haal de keydown-luisteraar weg (zakt bij 3).
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen. */
@@ -85,7 +85,7 @@ test('een aangewezen reisaanvraag reist van het scherm tot in de prompt, en alle
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
     await page.goto(srv.base + '/apps/reisbureau.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
-    const rij = page.locator('.aanvraag[data-ref="' + ref + '"]');
+    const rij = page.locator('[data-aanvraag="' + ref + '"]');
     await rij.waitFor({ timeout: 20000 });
     await page.waitForFunction(() => !!window.RTGEdgeBlikveld && typeof RTGEdgeBlikveld.voorRahul === 'function',
       null, { timeout: 20000 });
@@ -113,6 +113,20 @@ test('een aangewezen reisaanvraag reist van het scherm tot in de prompt, en alle
     assert.ok(nieuw.includes('opgezocht door RTG: reisaanvraag ' + ref), 'de aanvraag staat in de prompt');
     assert.ok(nieuw.includes('personen 6'), 'met de waarde van de server, niet die uit de vraag');
     assert.ok(!nieuw.includes(MERK), 'de notitie van het lid gaat niet naar het model');
+
+    // 2b) Dezelfde weg via de Edge van het Design System: Rahul in de balk
+    //     stuurt de verwijzing van het blikveld mee (/ds/edge-modi.js).
+    const voorEdge = model.verzoeken.length;
+    await page.locator('.ds-edge__balk [data-ds-edge="rahul"]').click();
+    await page.locator('.ds-edge__veld').fill('Wat staat er in deze aanvraag?');
+    /* Het model krijgt de prompt voordat /api/fluister antwoordt; wachten op
+       dat antwoord is dus wachten op de toestand en niet op de klok. */
+    const antwoord = page.waitForResponse(r => new URL(r.url()).pathname === '/api/fluister');
+    await page.locator('.ds-edge__veld').press('Enter');
+    await antwoord;
+    assert.ok(JSON.stringify(model.verzoeken.slice(voorEdge)).includes('opgezocht door RTG: reisaanvraag ' + ref),
+      'de Edge-vraag brengt de aangewezen aanvraag in de prompt');
+    await page.keyboard.press('Escape');
 
     // 3) Aanwijzen kan ook met het toetsenbord.
     await page.evaluate(() => RTGAdaptief.context({ bron: 'reisbureau', titel: 'Reisbureau' }));

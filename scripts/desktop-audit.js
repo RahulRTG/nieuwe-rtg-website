@@ -46,8 +46,9 @@ async function main() {
              maken; de concrete DOM-, beeld- en stabiliteitscontroles hieronder
              bewijzen afzonderlijk dat het scherm bruikbaar klaarstaat. */
           await page.waitForLoadState('load', { timeout: 12000 }).catch(() => {});
-          await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform],body[data-rtg-projectie]', { timeout: 12000 });
-          if (route.startsWith('/apps/')) await page.waitForFunction(() =>
+          await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform],body[data-rtg-projectie],body.ds-scherm', { timeout: 12000 });
+          row.ds = await page.evaluate(() => document.body.classList.contains('ds-scherm'));
+          if (route.startsWith('/apps/') && !row.ds) await page.waitForFunction(() =>
             document.body.dataset.rtgEditorialV4 === 'true' || document.body.hasAttribute('data-rtg-projectie'), null, { timeout:12000 });
           row.contentReadyMs = Date.now() - started;
           row.access = await page.evaluate(() => [...document.querySelectorAll('[data-rtg-access]')].some(e =>
@@ -55,6 +56,8 @@ async function main() {
           row.projection = await page.evaluate(() => document.body.hasAttribute('data-rtg-projectie'));
           if (route === '/apps/reisuitnodiging.html') {
             await require('./lib/desktop-guest')(page, row, errors);
+          } else if (row.ds) {
+            await require('./lib/desktop-ds')(page, row, errors);
           } else if (row.projection) {
             // A shared-room projection is deliberately not a personal app
             // surface: no account chrome, no Adaptive Edge and no personal

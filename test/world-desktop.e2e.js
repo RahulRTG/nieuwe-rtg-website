@@ -14,9 +14,16 @@ async function context(auth = token) {
   await ctx.addInitScript(token => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     if (token) localStorage.setItem('rtg_member_token', token); }, auth); return ctx;
 }
+/* TravelOS staat op het RTG Design System: zonder de oude desktopschil
+   (wd-*) en zonder Adaptive Edge, met een Cover en de ene ds-Edge. De
+   desktopcompositie met aanmeldpaneel, favorieten en bibliotheek bestaat daar
+   (nog) niet; wat deze toetsen er wel van eisen, eisen ze van de ds-vorm. */
+const isDs = (page) => page.locator('html[data-ds]').count().then(n => n > 0);
 async function open(page, route = '/apps/wereld.html') {
   await page.goto(srv.base + route, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('body[data-rtg-desktop]'); await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+  await page.waitForSelector('body[data-rtg-desktop], html[data-ds] .ds-edge__balk');
+  if (await isDs(page)) return;
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
   await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-world-start') || document.body.dataset.rtgWorldStart === 'ready');
 }
 test.before(async () => {
@@ -46,6 +53,21 @@ test('four desktop worlds use one composition and one Edge; the mobile home stay
   try {
     for (const route of ['/apps/rtg.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/os-publiek.html']) {
       await open(page, route);
+      if (await isDs(page)) {
+        /* Een Edge, geen overloop, en wie niet is aangemeld krijgt de weg naar
+           aanmelden in plaats van een leeg dashboard; ook mobiel bruikbaar. */
+        assert.equal(await page.locator('.ds-edge').count(), 1);
+        assert.equal(await page.locator('.rtg-adaptive-bar').count(), 0, route + ': no second, legacy Edge');
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route);
+        await page.waitForSelector('body[data-world-home-state="guest"]');
+        assert.equal(await page.locator('#worldTravelAction').getAttribute('href'), '/apps/app.html');
+        assert.match(await page.locator('#worldTravelMessage').innerText(), /Meld u aan/);
+        await page.setViewportSize({ width: 390, height: 844 });
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route + ' mobile');
+        assert.equal(await page.locator('.ds-cover').isVisible(), true, route + ' mobile');
+        await page.setViewportSize({ width: 1440, height: 1050 });
+        continue;
+      }
       assert.equal(await page.locator('.wd-people').isVisible(), true);
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
       if (route !== '/') assert.ok(await page.locator('.wd-world-label').evaluate(e => e.getBoundingClientRect().bottom <= e.closest('header').getBoundingClientRect().bottom));
@@ -89,6 +111,14 @@ test('the workspace context reads the Edge field of view: TravelOS by route', { 
   const ctx = await context(null), page = await ctx.newPage();
   try {
     await open(page, '/apps/reizen.html');
+    if (await isDs(page)) {
+      /* Op het Design System is er geen eigen werkruimtecontext; de wereld komt
+         uit de route en staat op de body, waar het blikveld van de werktafel
+         hem leest (test/edgeblikveld.e2e.js bewijst die weg in een blad). */
+      assert.equal(await page.locator('body').getAttribute('data-rtg-world'), 'travel');
+      assert.equal(await page.locator('body').getAttribute('data-world-home'), 'travel');
+      return;
+    }
     await page.waitForFunction(() => !!window.RTGEdgeBlikveld && !!window.RTGWorkspaceContext);
     const wereld = await page.evaluate(() => window.RTGWorkspaceContext().get().velden.wereld);
     assert.deepEqual([wereld.waarde, wereld.herkomst], ['travel', 'route']);
@@ -208,6 +238,12 @@ test('Home on the world desktop survives a restart of the Edge', { skip }, async
   try {
     for (const route of ['/apps/wereld.html', '/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html']) {
       await open(page, route);
+      if (await isDs(page)) {
+        /* De ds-Edge heeft geen herstartbaar model en het ds-huis geen
+           desktopframe; Home blijft er een gewone link naar de werktafel. */
+        assert.equal(await page.locator('.ds-edge__balk a[href="/apps/app.html"]').count(), 1, route + ': Home stays reachable');
+        continue;
+      }
       await page.evaluate(() => { window.RTGAdaptiveEdge.destroy(); window.RTGAdaptiveEdge.start(document, window); window.__rtgMerk = route => route; });
       await page.waitForSelector('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
       await page.locator('.wd-favorites [data-widget-open="notities"]').click();

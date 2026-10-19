@@ -20,9 +20,26 @@ const HOMES = [
   ['foundation', 'public/apps/foundation/os-publiek.html', '/apps/foundation/os-publiek.html', '#main', 'foundation-heritage-v2.jpg']
 ];
 
+/* TravelOS staat sinds de migratie op het RTG Design System (TRAVELOS-
+   MIGRATIE.md): daar laadt de dashboardlaag niet meer, en zou hij dat wel
+   doen, dan kreeg het scherm de oude vorm terug. Wat deze toetsen voor de
+   andere drie homes bewaken (een eigen wereldbeeld, de echte hoofdacties,
+   geen bestemming voor de bron antwoordt), eisen ze voor reizen van de ds-vorm. */
+const dsHome = (bestand) => /\/ds\/shell\.js/.test(lees(bestand));
+const REIZEN_JS = ['reizen-register.js', 'reizen-stand.js'].map((f) => lees('public/apps/' + f)).join('\n');
+
 test('de vier dashboardroutes laden één runtime, stijl en hun vastgelegde wereldbeeld', () => {
   for (const [wereld, bestand] of HOMES) {
     const html = lees(bestand);
+    if (dsHome(bestand)) {
+      assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + wereld + '"'), bestand);
+      assert.doesNotMatch(html, /rtg-vandaag-luxe\.(?:css|js)/, bestand + ' laadt op het Design System geen dashboardlaag');
+      const eigen = HOMES.find((h) => h[0] === wereld)[4];
+      assert.equal((html.match(new RegExp('<link[^>]+href="/images/worlds/heritage/' + eigen.replace(/\./g, '\\.') + '"[^>]+rel="preload"', 'g')) || []).length, 1, bestand);
+      assert.match(html, new RegExp('class="ds-cover__beeld" src="/images/worlds/heritage/' + eigen.replace(/\./g, '\\.') + '"'), bestand);
+      assert.doesNotMatch(html, /wereld-atlas\.jpg/, bestand + ' mag geen quadrant uit de oude atlas laden');
+      continue;
+    }
     assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + wereld +
       '"[^>]+data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1, bestand);
@@ -126,7 +143,7 @@ test('de vier bestaande panelstructuren en hun echte hoofdacties blijven bron-DO
     ['public/apps/rtg.html', ['class="dag"', 'class="kompas"', 'id="reisdossier"',
       'class="rtg-dashboard-hero-cta" href="/apps/life.html"']],
     ['public/apps/kantoor.html', ['class="doelgroep"', 'class="cv-rij"', 'id="werkdag"', 'id="poorten"']],
-    ['public/apps/reizen.html', ['class="dagdek"', 'class="strook"', 'class="kaartraster"',
+    ['public/apps/reizen.html', ['data-blad="vandaag"', 'id="momenten"', 'class="ds-collectie__raster"',
       'data-naar-blad="reizen"']],
     ['public/apps/foundation/os-publiek.html', ['class="onthaal"', 'class="tweeluik"',
       'class="doen"', 'class="band"']]
@@ -181,13 +198,13 @@ test('Agenda surface behoudt een stille Heritage-atmosfeer', () => {
 
 test('Travel toont geen bestemming of zekerheid voordat de reisbron antwoordt', () => {
   const html = lees('public/apps/reizen.html');
-  assert.doesNotMatch(html, /<h1 id="titelVandaag">IBIZA<\/h1>/);
-  assert.doesNotMatch(html, /<p class="sub" id="dagzin">Alles staat klaar\.<\/p>/);
-  assert.match(html, /<h1 id="titelVandaag">Uw reizen<\/h1>/);
-  assert.match(html, /function zetReisdek\(reizen, toestand\)/);
-  assert.match(html, /const bestemming = String\(eerste\.bestemming \|\| ''\)\.trim\(\)/);
-  assert.match(html, /zetReisdek\(reizen, 'geladen'\)/);
-  assert.match(html, /zetReisdek\(\[\], 'fout'\)/);
+  assert.doesNotMatch(html, /id="titelVandaag">IBIZA</);
+  assert.doesNotMatch(html, /id="dagzin">Alles staat klaar\.</);
+  assert.match(html, /id="titelVandaag">Uw reizen<\/h2>/);
+  assert.match(REIZEN_JS, /function zetReisdek\(reizen, toestand\)/);
+  assert.match(REIZEN_JS, /var bestemming = String\(eerste\.bestemming \|\| ''\)\.trim\(\)/);
+  assert.match(REIZEN_JS, /zetReisdek\(reizen, 'geladen'\)/);
+  assert.match(REIZEN_JS, /zetReisdek\(\[\], 'fout'\)/);
 });
 
 test('dashboardtop blijft onder een viewport en de rasters schalen tot 320px', () => {

@@ -68,14 +68,14 @@ test('de reiziger bevestigt zelf, onder de melding van de chauffeur', { skip: ge
     const page = await ctx.newPage(); letOpFouten(page, fouten);
     await page.addInitScript((t) => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, lid);
     await page.goto(base + '/apps/rit.html?rit=' + encodeURIComponent(RIT) + '&view=chauffeur', { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForSelector('.rit-ontvangst', { timeout: 30000 });
-    assert.match(await page.textContent('.rit-ontvangst'), /Chauffeur meldde aankomst om .* nog niet door u bevestigd/);
+    await page.waitForSelector('[data-ontvangstblok]', { timeout: 30000 });
+    assert.match(await page.textContent('[data-ontvangstblok]'), /Chauffeur meldde aankomst om .* nog niet door u bevestigd/);
     await page.click('[data-ontvangst="aankomst"]');
-    await page.waitForFunction(() => /u bevestigde om/.test((document.querySelector('.rit-ontvangst') || {}).textContent || ''), null, { timeout: 15000 });
+    await page.waitForFunction(() => /u bevestigde om/.test((document.querySelector('[data-ontvangstblok]') || {}).textContent || ''), null, { timeout: 15000 });
     let o = (await moet('/api/mob/volg', { ref: RIT }, lid, 'volgen')).opdracht;
     assert.ok(o.ontvangst.aankomst.bevestigdDoorReiziger, 'de bevestiging van de reiziger staat op de server');
     await page.selectOption('[data-probleem]', 'ander-voertuig');
-    await page.waitForFunction(() => /U meldde: Er staat een ander voertuig/.test((document.querySelector('.rit-ontvangst') || {}).textContent || ''), null, { timeout: 15000 });
+    await page.waitForFunction(() => /U meldde: Er staat een ander voertuig/.test((document.querySelector('[data-ontvangstblok]') || {}).textContent || ''), null, { timeout: 15000 });
     o = (await moet('/api/mob/volg', { ref: RIT }, lid, 'volgen')).opdracht;
     assert.equal(o.status, 'aangekomen', 'een melding verandert niets aan de rit');
   } finally { await browser.close().catch(() => {}); }

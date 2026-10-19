@@ -6,17 +6,18 @@
    - HET SCHERM LIEGT NIET. Wat er in beeld staat is hetzelfde getal als wat de
      API teruggeeft. Een dekkingsscherm dat een eigen som maakt, is precies het
      soort tweede waarheid waarvoor deze hele meting bestaat (LAT.md regel 4).
-   - DE LIJST IS ER ECHT. De routes zitten achter het derde deel van het
-     deelmenu (shared/deelmenu.js maakt van de drie koppen tabbladen). "Uitzien"
-     is de opdracht, dus moet die lijst na een klik ook werkelijk in beeld staan
-     -- niet alleen in de HTML aanwezig zijn.
+   - DE LIJST IS ER ECHT. De routes zitten achter het derde tabblad (sinds het
+     Design System een .ds-tabs-rij; vroeger maakte shared/deelmenu.js dat van
+     de drie koppen). "Uitzien" is de opdracht, dus moet die lijst na een klik
+     ook werkelijk in beeld staan -- niet alleen in de HTML aanwezig zijn.
    - DE STAND LEUNT NIET OP KLEUR. Naast de kleur hoort er een teken te staan,
-     voor wie kleur niet ziet en voor een zwart-witte afdruk (ONTWERP.md par. 5).
+     in de zichtbare tekst, voor wie kleur niet ziet en voor een zwart-witte
+     afdruk (ONTWERP.md par. 5).
 
    Draai los: node --experimental-sqlite --test test/routedekking.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 const pw = laadPlaywright();
@@ -82,23 +83,21 @@ test('het dekkingsscherm toont het cijfer van de server, en de routes zijn door 
       return { sig: e.dataset.sig, teken: e.dataset.teken, woord: e.textContent.trim() };
     });
     assert.ok(stand.teken && stand.teken.length, 'de stand draagt een teken uit data-teken');
+    assert.ok(stand.woord.startsWith(stand.teken + ' '), 'en dat teken staat ook in de zichtbare tekst: ' + stand.woord);
     assert.ok(stand.woord.length, 'en een woord, niet alleen een kleur: ' + JSON.stringify(stand));
     assert.equal(stand.sig, api.stand === 'in orde' ? 'gezond' : stand.sig,
       'bij een goede stand staat het signaal op gezond');
 
-    /* 3) DE ROUTES ZIJN TE ZIEN. shared/deelmenu.js maakt van de drie koppen
-       tabbladen en toont er een; de lijst staat achter "Alle routes". Zonder de
-       klik zou deze toets alleen bewijzen dat de rijen in de HTML staan, en dat
-       is niet hetzelfde als kunnen inzien. */
-    const tab = page.locator('.rtgdeel-balk button', { hasText: /alle routes/i });
-    if (await tab.count()) {
-      await edgeActies(page);
-      await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /alle routes/i }).click();
-    }
-    await page.waitForSelector('#lijst .rij', { state: 'visible', timeout: 10000 });
-    assert.equal(await page.locator('#lijst .rij').count(), api.lijst.resultaten.length,
+    /* 3) DE ROUTES ZIJN TE ZIEN. Het scherm toont een tabblad tegelijk; de
+       lijst staat achter "Alle routes". Zonder de klik zou deze toets alleen
+       bewijzen dat de rijen in de HTML staan, en dat is niet hetzelfde als
+       kunnen inzien. */
+    assert.equal(await page.locator('#lijst').isVisible(), false, 'de lijst wacht achter zijn tabblad');
+    await page.getByRole('tab', { name: /alle routes/i }).click();
+    await page.waitForSelector('#lijst .ds-lijst__rij', { state: 'visible', timeout: 10000 });
+    assert.equal(await page.locator('#lijst .ds-lijst__rij').count(), api.lijst.resultaten.length,
       'evenveel rijen op het scherm als in het antwoord');
-    const eerste = (await page.locator('#lijst .rij').first().textContent()).replace(/\s+/g, ' ').trim();
+    const eerste = (await page.locator('#lijst .ds-lijst__rij').first().textContent()).replace(/\s+/g, ' ').trim();
     assert.ok(eerste.includes(api.lijst.resultaten[0].methode), 'de methode staat in de rij: ' + eerste);
     assert.ok(eerste.includes(api.lijst.resultaten[0].pad), 'en het patroon ook: ' + eerste);
 
@@ -106,10 +105,10 @@ test('het dekkingsscherm toont het cijfer van de server, en de routes zijn door 
     await page.fill('#zoek', 'routedekking');
     await page.click('#zoeken');
     await page.waitForFunction(() => {
-      const r = document.querySelectorAll('#lijst .rij');
+      const r = document.querySelectorAll('#lijst .ds-lijst__rij');
       return r.length > 0 && r.length < 40;
     }, null, { timeout: 10000 });
-    const gevonden = await page.locator('#lijst .rij').allTextContents();
+    const gevonden = await page.locator('#lijst .ds-lijst__rij').allTextContents();
     assert.ok(gevonden.some(t => t.includes('/api/office/routedekking')),
       'het scherm vindt zijn eigen route terug: ' + JSON.stringify(gevonden).slice(0, 200));
 

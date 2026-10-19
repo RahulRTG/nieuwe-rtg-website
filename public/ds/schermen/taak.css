@@ -1,0 +1,7 @@
+/* Taak (mockup): iets regelen in rustige rijen (icoon, label, waarde,
+   chevron), en één volle knop onderaan, boven de Edge. */
+@layer rtg.scherm {
+  .ds-taak { display: grid; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4) var(--ds-ruimte-4) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); max-inline-size: var(--ds-breedte-lees); margin-inline: auto; }
+  .ds-taak__kop { display: grid; gap: var(--ds-ruimte-2); }
+  .ds-taak__actie { margin-block-start: var(--ds-ruimte-4); }
+}

@@ -21,8 +21,8 @@ for(const width of [390,1440])test(width+'px: handmatige wereldreis, concept, ga
   await page.reload();await page.waitForSelector('#rp-bewaard .rp-saved');await page.locator('#rp-bewaard button').first().click();assert.equal(await page.locator('#rp-titel').inputValue(),'Rome · van deur tot deur');assert.equal(await page.locator('#rp-onderdelen>li').count(),8);
   await page.locator('#rp-voorbeeld').click();assert.match(await page.locator('#rp-preview').innerText(),/Suite met privétransfer/);
   await page.locator('#rp-toestemming').check();await page.locator('#rp-deel').click();await page.waitForSelector('#rp-link input');const link=await page.locator('#rp-link input').inputValue();assert.equal(await page.locator('#rp-bewaard .rp-saved').count(),1);assert.equal(new URL(link).origin,srv.base);
-  const guest=await browser.newContext({viewport:{width,height:1000}}),g=await guest.newPage();h.letOpFouten(g,errors);await g.goto(link);await g.waitForSelector('.rp-tijdlijn');
-  assert.equal(await g.locator('.rp-step').count(),8);assert.match(await g.locator('#vak').innerText(),/Hotel in Rome/);assert.equal(await g.locator('#rGo,.tos-hero,.rtg-adaptive-bar').count(),0);assert.equal(new URL(g.url()).hash,'');
+  const guest=await browser.newContext({viewport:{width,height:1000}}),g=await guest.newPage();h.letOpFouten(g,errors);await g.goto(link);await g.waitForSelector('[data-rp="tijdlijn"]');
+  assert.equal(await g.locator('[data-rp="stap"]').count(),8);assert.match(await g.locator('#vak').innerText(),/Hotel in Rome/);assert.equal(await g.locator('#rGo,.tos-hero,.rtg-adaptive-bar,.ds-edge').count(),0);assert.equal(new URL(g.url()).hash,'');
   assert.equal(await g.evaluate(()=>localStorage.getItem('rtg_member_token')),null);assert.ok(!await g.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1));
   const dir=path.join(__dirname,'../artifacts/reisprogramma');fs.mkdirSync(dir,{recursive:true});await g.screenshot({path:path.join(dir,'guest-'+width+'.png'),fullPage:true});await page.locator('#rp-titel').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(dir,'editor-'+width+'.png')});
   await page.locator('#rp-titel').fill('Wereldreis · 東京 → New York');await page.locator('#rp-bewaar').click();await page.waitForFunction(()=>document.querySelector('#rp-bericht').textContent.includes('Versie 3 bewaard'));await g.locator('#gast-ververs').click();await g.waitForFunction(()=>document.querySelector('#vak').textContent.includes('Wereldreis · 東京'));
@@ -33,7 +33,7 @@ for(const width of [390,1440])test(width+'px: handmatige wereldreis, concept, ga
   const edits=await Promise.all(['one','two'].map(idem=>api('/api/office/reisbureau/klaarzetten',{id,versie:row.versie,programma:row.programma,idem:'concurrent-'+idem},office)));assert.deepEqual(edits.map(r=>r.status).sort(),[200,409]);
   const c=new URL(link).hash.split('=')[1];const read=await fetch(srv.base+'/api/reis/uitnodiging/open',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:c})});assert.equal(read.headers.get('cache-control'),'no-store');
   assert.equal((await api('/api/reis/uitnodiging/open',{code:'WRONG'})).status,404);
-  await api('/api/office/reisbureau/uitnodiging-weg',{id},office);await g.locator('#gast-ververs').click();await g.waitForFunction(()=>!document.querySelector('.rp-tijdlijn'));assert.doesNotMatch(await g.locator('#vak').innerText(),/Hotel in Rome/);
+  await api('/api/office/reisbureau/uitnodiging-weg',{id},office);await g.locator('#gast-ververs').click();await g.waitForFunction(()=>!document.querySelector('[data-rp="tijdlijn"]'));assert.doesNotMatch(await g.locator('#vak').innerText(),/Hotel in Rome/);
   assert.deepEqual(errors,[]);
  }finally{if(browser)await browser.close();await h.stop(srv.child);}
 });

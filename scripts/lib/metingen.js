@@ -737,7 +737,8 @@ const REGISTER = {
      script. Allebei zeggen het in hun eigen uitleg met zoveel woorden: "MAG
      ALLEEN KRIMPEN". Dat is een ratel, ook al staat hij niet in NORM.json. */
   'BEREIK.json': { eigenRatel: 'test/bereikbaar.test.js' },
-  'SCHERMLEUGEN.json': { eigenRatel: 'test/liegend-scherm.e2e.js' }
+  'SCHERMLEUGEN.json': { eigenRatel: 'test/liegend-scherm.e2e.js' },
+  'ONTWERPNORM.json': { eigenRatel: 'scripts/ontwerpsysteem.js' }
 };
 
 module.exports = { REGISTER, GEEN_METING };

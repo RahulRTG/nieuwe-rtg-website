@@ -258,9 +258,9 @@ const KAART = [
   ['basis/basis-01ac-edge.js', 'laden', 'wereld:l', [
     ['beslist', 'wereld:l', 'randen.js alleen bij een wereld', "indexOf(b.getAttribute('data-rtg-world')) < 0) return;"]]],
   ['basis/basis-01ad-intelligence.js', 'laden', '', [
-    ['beslist', '-', 'laadt controllers die ontbreken', 'if (window[bron[1]] || document.querySelector(']]],
+    ['beslist', '-', 'laadt controllers die ontbreken', 'if (ds || window[bron[1]] || document.querySelector(']]],
   ['basis/basis-01aa-continue.js', 'laden', '', [
-    ['beslist', '-', 'laadt de Continue Key', "if (!window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&"]]],
+    ['beslist', '-', 'laadt de Continue Key', "if (!ds && !window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&"]]],
   ['command.js', 'schil', 'bevoegdheid:b identiteit:l', [
     ['beslist', 'bevoegdheid:b', 'sessie en dichte intakepoort', 'function mag(){return aangemeld()&&poortDicht()}'],
     ['leest', 'identiteit:l', 'sessiestand van app-main', "return !!(app&&app.classList.contains('active'))"],

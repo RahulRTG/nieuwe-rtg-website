@@ -1,55 +1,56 @@
 (function(w){
 'use strict';
 w.LivingWorldDetail=function(o){
+var taal=function(){return document.documentElement.lang||undefined;};
 var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,card=o.card,section=o.section,info=o.info;
   function detail(row,type){
-    var d=el('article','lw-detail');d.appendChild(el('p','lw-eyebrow',(labels[row.status]||row.status)+' · '+row.author));
-    d.appendChild(el('h2','',row.title));d.appendChild(el('p','',row.summary||row.description||row.text||''));
-    if(row.sourceChanged||row.sourceWithdrawn||row.knowledgeChanged)d.appendChild(el('p','lw-warning',
+    var d=el('article','ds-detail__inhoud');d.dataset.lwDetail=type;d.appendChild(el('p','ds-label',(labels[row.status]||row.status)+' · '+row.author));
+    d.appendChild(el('h2','ds-titel ds-titel--scherm',row.title));d.appendChild(el('p','ds-meta',row.summary||row.description||row.text||''));
+    if(row.sourceChanged||row.sourceWithdrawn||row.knowledgeChanged)d.appendChild(el('p','ds-detail__status',
       row.sourceWithdrawn?'De bron is ingetrokken. Nieuwe uitvoering is geblokkeerd. Neem contact op met de organisator.':
       'De ervaring of gebruikte kennis is gewijzigd. Werk uw plan bij en laat de uitvoering opnieuw beoordelen.'));
     if(type==='blueprint'){
-      var dl=el('dl');info(dl,'Plek',(view.places.find(function(p){return p.id===row.placeId;})||{}).title);
+      var dl=el('ul','ds-detail__gegevens');info(dl,'Plek',(view.places.find(function(p){return p.id===row.placeId;})||{}).title);
       info(dl,'Organisator',row.organizer);info(dl,'Activiteit',row.activity);info(dl,'Route',row.route);info(dl,'Moment',row.season);
       info(dl,'Uitrusting',row.equipment);info(dl,'Vervoer',row.transport);info(dl,'Gezelschap',row.crew);d.appendChild(dl);
-      d.appendChild(el('p','lw-meta','Blueprintversie '+row.version+' · aanvragen worden persoonlijk behandeld'));
-      if(row.derivedFrom)d.appendChild(el('p','lw-meta','Gebaseerd op '+row.derivedFrom.title+' · '+row.derivedFrom.author+' · versie '+row.derivedFrom.version));
+      d.appendChild(el('p','ds-meta','Blueprintversie '+row.version+' · aanvragen worden persoonlijk behandeld'));
+      if(row.derivedFrom)d.appendChild(el('p','ds-meta','Gebaseerd op '+row.derivedFrom.title+' · '+row.derivedFrom.author+' · versie '+row.derivedFrom.version));
       if(row.media){var a=el('a','','Bekijk de verbonden media');a.href=row.media.url;d.appendChild(a);}
-      if(row.mediaUnavailable)d.appendChild(el('p','lw-warning','De gekoppelde media is momenteel niet beschikbaar.'));
-      if(row.mediaChanged)d.appendChild(el('p','lw-warning','De media is gewijzigd sinds deze blueprintversie.'));
+      if(row.mediaUnavailable)d.appendChild(el('p','ds-detail__status','De gekoppelde media is momenteel niet beschikbaar.'));
+      if(row.mediaChanged)d.appendChild(el('p','ds-detail__status','De media is gewijzigd sinds deze blueprintversie.'));
       requirements(d,row);steps(d,row);
       row.improvements.forEach(function(c){d.appendChild(card(c,'contribution'));});
     }
     if(type==='plan'){
-      var stages=el('ol','lw-stages');['planning','requested','accepted','active','completed'].forEach(function(s){var li=el('li','',labels[s]);if(s===row.status)li.setAttribute('aria-current','step');stages.appendChild(li);});d.appendChild(stages);
-      d.appendChild(el('p','',row.date?new Date(row.date).toLocaleString():'Kies uw gewenste moment.'));
-      d.appendChild(el('p','',row.notes));d.appendChild(el('p','lw-meta','Organisator · '+row.organizer));
+      var stages=el('ol','ds-chips');stages.dataset.lwStages='';stages.setAttribute('aria-label','Voortgang');['planning','requested','accepted','active','completed'].forEach(function(s){var li=el('li',s===row.status?'ds-chip ds-detail__status':'ds-chip',labels[s]);if(s===row.status)li.setAttribute('aria-current','step');stages.appendChild(li);});d.appendChild(stages);
+      d.appendChild(el('p','ds-detail__status',row.date?new Date(row.date).toLocaleString(taal()):'Kies uw gewenste moment.'));
+      d.appendChild(el('p','',row.notes));d.appendChild(el('p','ds-meta','Organisator · '+row.organizer));
       requirements(d,row);steps(d,row);
       if(row.connections&&row.connections.length){
-        d.appendChild(el('h3','','Verbonden met mijn ervaring'));
+        d.appendChild(el('h3','ds-kaart__titel','Verbonden met mijn ervaring'));
         row.connections.forEach(function(c){var p=el('p','',c.title+(c.status?' · '+c.status:''));
           if(c.changed)p.appendChild(el('strong','',' · Gewijzigd bij de bron'));
           if(c.url){var a=el('a','',' Open bron');a.href=c.url;p.appendChild(a);}d.appendChild(p);});
       }
-      if(row.decision)d.appendChild(el('p','lw-warning','Besluit · '+row.decision.reason));
-      if(row.issue&&row.status==='waiting')d.appendChild(el('p','lw-warning','Bij '+row.issue.owner+' in behandeling · '+row.issue.reason));
-      if(row.participation)d.appendChild(el('p','lw-warning',row.participation.revokedAt?'Deelnameverklaring ingetrokken: '+row.participation.revokeReason:
+      if(row.decision)d.appendChild(el('p','ds-detail__status','Besluit · '+row.decision.reason));
+      if(row.issue&&row.status==='waiting')d.appendChild(el('p','ds-detail__status','Bij '+row.issue.owner+' in behandeling · '+row.issue.reason));
+      if(row.participation)d.appendChild(el('p','ds-detail__status',row.participation.revokedAt?'Deelnameverklaring ingetrokken: '+row.participation.revokeReason:
         'Verklaring organisator: '+row.participation.statement+(row.acknowledgedAt?' · Door u bevestigd.':' · Wacht op bevestiging van de deelnemer.')));
       if(row.mine&&row.status==='completed'&&row.acknowledgedAt){
         var place=view.places.find(function(p){return p.id===row.placeId;});
-        if(place){var c=el('button','','Iets achterlaten');c.type='button';c.onclick=function(){act('contribution.create',place);};d.appendChild(c);}
+        if(place){var c=el('button','ds-knop ds-knop--stil','Iets achterlaten');c.type='button';c.onclick=function(){act('contribution.create',place);};d.appendChild(c);}
         var media=el('a','','Maak een verhaal of film');media.href='/apps/media.html';d.appendChild(media);
       }
     }
     if(type==='contribution'){
-      d.appendChild(el('p','lw-meta','Waargenomen '+new Date(row.observedAt).toLocaleString()+(row.validUntil?' · geldig tot '+new Date(row.validUntil).toLocaleString():'')));
-      d.appendChild(el('p','lw-meta',row.basis==='member_observation'?'Waarneming van een lid':'Gekoppeld aan deelname met twee verklaringen'));
+      d.appendChild(el('p','ds-meta','Waargenomen '+new Date(row.observedAt).toLocaleString(taal())+(row.validUntil?' · geldig tot '+new Date(row.validUntil).toLocaleString(taal()):'')));
+      d.appendChild(el('p','ds-meta',row.basis==='member_observation'?'Waarneming van een lid':'Gekoppeld aan deelname met twee verklaringen'));
       if(row.review)d.appendChild(el('p','','Beoordeling · '+row.review.reason));
-      if(!row.current&&row.status==='accepted')d.appendChild(el('p','lw-warning','Deze bijdrage is niet meer actueel of de bewijsgrond is gewijzigd.'));
-      if(row.impact){var i=row.impact;d.appendChild(el('h3','','Your contribution travelled.'));
+      if(!row.current&&row.status==='accepted')d.appendChild(el('p','ds-detail__status','Deze bijdrage is niet meer actueel of de bewijsgrond is gewijzigd.'));
+      if(row.impact){var i=row.impact;d.appendChild(el('h3','ds-kaart__titel','Your contribution travelled.'));
         d.appendChild(el('p','',i.usedInPlans+' deelnemers namen dit op in hun plan. '+i.confirmedParticipants+
           ' deelnemers bevestigden de uitvoering. '+i.returnedContributions+' beoordeelde bijdragen kwamen terug.'));
-        d.appendChild(el('p','lw-meta',i.basis+' Weergaven worden niet gemeten.'));}
+        d.appendChild(el('p','ds-meta',i.basis+' Weergaven worden niet gemeten.'));}
     }
     d.appendChild(actions(row,type));host.appendChild(d);
     if(type==='place'){
@@ -62,12 +63,12 @@ var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,
       type==='place'?['place.publish','blueprint.create','contribution.create']:
       ['contribution.review','contribution.adopt'];
     var primary=null;order.some(function(id){primary=d.querySelector('[data-lw-action="'+id+'"]');return!!primary;});
-    if(primary){primary.dataset.lwPrimary='';primary.classList.add('lw-primary');}
+    if(primary){primary.dataset.lwPrimary='';primary.className='ds-knop ds-knop--primair ds-knop--klein';}
   }
-  function requirements(d,row){if(row.requirements.length){d.appendChild(el('h3','','Voorbereiding en vereisten'));var ul=el('ul');row.requirements.forEach(function(r){ul.appendChild(el('li','',r));});d.appendChild(ul);}}
-  function steps(d,row){if(row.steps.length){d.appendChild(el('h3','','Uw weg naar deze ervaring'));row.steps.forEach(function(s){var p=el('p','',s.text+' '),a=el('a','',s.label+' openen');a.href=s.url;p.appendChild(a);d.appendChild(p);});}}
+  function requirements(d,row){if(row.requirements.length){d.appendChild(el('h3','ds-kaart__titel','Voorbereiding en vereisten'));var ul=el('ul','ds-meta');row.requirements.forEach(function(r){ul.appendChild(el('li','',r));});d.appendChild(ul);}}
+  function steps(d,row){if(row.steps.length){d.appendChild(el('h3','ds-kaart__titel','Uw weg naar deze ervaring'));row.steps.forEach(function(s){var p=el('p','ds-meta',s.text+' '),a=el('a','',s.label+' openen');a.href=s.url;p.appendChild(a);d.appendChild(p);});}}
   function memory(rows){
-    var box=el('section','lw-panel'),select=el('select'),label=el('label','','World Memory · tijdvenster'),grid=el('div','lw-grid');
+    var box=el('section','ds-collectie__kop'),select=el('select','ds-invoer'),label=el('label','ds-veldlabel','World Memory · tijdvenster'),grid=el('div','ds-collectie__raster');
     [['all','Alles'],['now','Nu · actuele waarnemingen'],['today','Vandaag'],['month','Deze maand'],['then','Eerder'],['knowledge','Kennis']].forEach(function(x){var op=el('option','',x[1]);op.value=x[0];select.appendChild(op);});
     label.appendChild(select);box.append(label,grid);host.appendChild(box);
     function paint(){var now=new Date(view.asOf),day=now.toISOString().slice(0,10),month=day.slice(0,7);
@@ -76,7 +77,7 @@ var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,
         select.value==='month'&&date.slice(0,7)===month||select.value==='then'&&date.slice(0,7)<month||
         select.value==='knowledge'&&c.current&&['knowledge','correction'].includes(c.kind);});
       grid.textContent='';found.forEach(function(c){grid.appendChild(card(c,'contribution'));});
-      if(!found.length)grid.appendChild(el('p','lw-empty','Nog geen bijdragen in dit tijdvenster.'));
+      if(!found.length)grid.appendChild(el('p','ds-meta','Nog geen bijdragen in dit tijdvenster.'));
     }
     select.onchange=paint;paint();
   }

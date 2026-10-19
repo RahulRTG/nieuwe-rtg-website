@@ -77,31 +77,23 @@ test('het reisscherm groepeert per reis, en de kop zegt hetzelfde als de regels 
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-domain > summary').click();
+    /* Op het RTG Design System staat het register in het blad "Reizen"; een
+       lid opent het met de tab, zoals hier. innerText van een verborgen blad
+       is leeg, dus de toets kijkt pas als het blad open staat. */
+    await page.locator('[data-tab="reizen"]').click();
     await page.waitForFunction(() => {
       const el = document.querySelector('#komend');
-      return el && !/Laden/.test(el.textContent) && el.querySelector('.regkop');
+      return el && !/Laden/.test(el.textContent) && el.querySelector('[data-reiskop]');
     }, null, { timeout: 20000 });
-    /* Sinds de warme desktopstandaard (#413) staat de eigen inhoud van het
-       wereldhuis -- ook #komend -- onder een INGEKLAPT <details class="wp-domain">
-       "Uw volledige overzicht". Dat is een bewuste keuze van dat ontwerp; innerText
-       van een ingeklapt blok is leeg, dus opent de toets het overzicht zoals een lid
-       dat doet (op de summary). Wat hij van de koppen eist, blijft gelijk. */
-    await page.waitForFunction(() => !!document.body.dataset.rtgDesktopState, null, { timeout: 20000 });
-    const dicht = page.locator('details.wp-domain:not([open]) > summary');
-    if (await dicht.count()) await dicht.click();
 
-    /* De koppen MET hun regels, uit de opmaak zelf: alles tussen deze kop en de
-       volgende. Zo wordt gemeten wat er werkelijk onder een kop hangt, in
-       plaats van dat twee losse tellingen naast elkaar worden gelegd. */
-    const blokken = await page.$$eval('#komend > *', (nodes) => {
-      const uit = [];
-      for (const n of nodes) {
-        if (n.classList.contains('regkop')) uit.push({ kop: n.innerText.replace(/\s+/g, ' ').trim(), regels: [] });
-        else if (uit.length && n.classList.contains('reis')) uit[uit.length - 1].regels.push(n.innerText.replace(/\s+/g, ' ').trim());
-      }
-      return uit;
-    });
+    /* De koppen MET hun regels, uit de opmaak zelf: elk reisblok draagt zijn
+       kop en de regels die eronder hangen. Zo wordt gemeten wat er werkelijk
+       onder een kop hangt, in plaats van dat twee losse tellingen naast elkaar
+       worden gelegd. */
+    const blokken = await page.$$eval('#komend > [data-reis]', (nodes) => nodes.map((n) => ({
+      kop: n.querySelector('[data-reiskop]').innerText.replace(/\s+/g, ' ').trim(),
+      regels: [...n.querySelectorAll('[data-sleep="reis"]')].map((r) => r.innerText.replace(/\s+/g, ' ').trim())
+    })));
 
     await t.test('twee reizen, twee koppen, elk met hun eigen bestemming', () => {
       assert.equal(blokken.length, 2, 'twee koppen: ' + JSON.stringify(blokken.map(b => b.kop)));

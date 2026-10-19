@@ -1,0 +1,46 @@
+/* RTG Design System: het enige blad dat een scherm laadt.
+
+   Elk bestand hieronder zet zichzelf in zijn eigen laag (contractregel 1),
+   dus ook los geladen kan het niet buiten de volgorde vallen. De eerste regel
+   hieronder legt die volgorde van de cascadelagen vast. Dat is de
+   structurele oplossing voor wat rtg-heritage-order.js met een
+   MutationObserver probeerde: welke laag wint, hangt niet meer af van welk
+   <link> toevallig het laatst in <head> staat, maar van deze ene regel. Een
+   schermtype wint van een component, een component van een thema, een thema
+   van de tokens -- altijd, in elke laadvolgorde. */
+
+@layer rtg.reset, rtg.tokens, rtg.thema, rtg.component, rtg.scherm;
+
+@import url("reset.css");
+@import url("tokens.css");
+@import url("thema/living.css");
+@import url("thema/travel.css");
+@import url("thema/work.css");
+@import url("thema/foundation.css");
+@import url("componenten/kop.css");
+@import url("componenten/knop.css");
+@import url("componenten/kaart.css");
+@import url("componenten/veld.css");
+@import url("componenten/lijst.css");
+@import url("componenten/chip.css");
+@import url("componenten/dialoog.css");
+@import url("componenten/edge.css");
+@import url("componenten/melding.css");
+@import url("componenten/toestel.css");
+@import url("componenten/paneel.css");
+@import url("componenten/overgang.css");
+@import url("componenten/meter.css");
+@import url("componenten/lezer.css");
+@import url("componenten/canvaslaag.css");
+@import url("componenten/handelingen.css");
+@import url("componenten/rooster.css");
+@import url("componenten/sectie.css");
+@import url("componenten/vel.css");
+@import url("componenten/beeldsnede.css");
+@import url("schermen/cover.css");
+@import url("schermen/collectie.css");
+@import url("schermen/taak.css");
+@import url("schermen/detail.css");
+@import url("schermen/gesprek.css");
+@import url("schermen/canvas.css");
+@import url("schermen/status.css");

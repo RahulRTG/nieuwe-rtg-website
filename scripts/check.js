@@ -308,7 +308,11 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
        declaratieve schermvorm gebruikt daarom rechtstreeks de technische
        wauw-laag; alle gewone apps houden de volledige metgezel. */
     const projectie = /<body[^>]*\bdata-rtg-projectie\b/i.test(s) && s.includes('/shared/wauw.js');
-    if (!s.includes('/shared/metgezel.js') && !projectie) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
+    /* Een scherm op het RTG Design System draagt Rahul in zijn Edge
+       (/ds/edge-modi.js, dezelfde /api/fluister als de metgezel); de metgezel
+       zou er een tweede Rahul-balk met eigen stijl naast zetten. */
+    const dsEdge = s.includes('/ds/shell.js') && s.includes('/ds/rtg-ds.css');
+    if (!s.includes('/shared/metgezel.js') && !projectie && !dsEdge) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
     const gids = appgids.gidsVan('/' + rel);
     if (!gids || gids.algemeen) { np++; fout('9+: geen eigen app-gids voor /' + rel + ' (vul kern/appgids.js aan)'); }
   }
@@ -3023,7 +3027,9 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
       if (!s.includes('/shared/media.js')) {
         misDeur++;
         fout(web(p) + ' gebruikt RTGMedia maar laadt /shared/media.js niet');
-      } else if (!s.includes('/shared/media.css')) {
+      } else if (!s.includes('/shared/media.css') && !s.includes('/ds/shell.js')) {
+        /* Een ds-scherm laadt geen erfenisblad; daar geeft .ds-melding--blijft
+           (public/ds/componenten/melding.css) de melding haar vorm. */
         misDeur++;
         fout(web(p) + ' laadt de mediapoort maar niet /shared/media.css; de melding staat er dan zonder vorm');
       }
@@ -4721,6 +4727,10 @@ console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulev
   const mag = (v, rel) => {
     const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
     if (k === '0' || k === '0!important' || k === '50%' || k === '50%!important') return true;
+    /* public/ds/ heeft zijn eigen, strengere grens: alleen een --ds-radius-
+       token, nagelopen door scripts/ontwerpsysteem.js. Geen lijst per bestand
+       erbij, want juist die lijst hierboven groeide met elke nieuwe laag. */
+    if (rel.split(path.sep).join('/').startsWith('public/ds/')) return /^var\(--ds-radius-[a-z-]+\)$/.test(k);
     return HERITAGE.has(rel) && HERITAGE.get(rel).has(k);
   };
   const kapot = [];

@@ -900,7 +900,10 @@
       "sleutel": "move",
       "url": "/apps/move.html",
       "woorden": [
-        "move"
+        "move",
+        "reis",
+        "wordt",
+        "gewogen"
       ]
     },
     {
@@ -920,18 +923,18 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "navigatie",
-      "url": "/apps/navigatie.html",
-      "woorden": [
-        "navigation",
-        "intelligence"
-      ]
+      "url": "/apps/navigatie.html"
     },
     {
       "naam": "Openbaar vervoer",
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "ov",
-      "url": "/apps/ov.html"
+      "url": "/apps/ov.html",
+      "woorden": [
+        "volgende",
+        "reis"
+      ]
     },
     {
       "naam": "OV-routes",
@@ -963,10 +966,7 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "reizen",
-      "url": "/apps/reizen-veilig.html",
-      "woorden": [
-        "welkom"
-      ]
+      "url": "/apps/reizen-veilig.html"
     },
     {
       "naam": "Routedossier",

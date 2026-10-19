@@ -1,0 +1,20 @@
+/* Toestel: een telefoonkader rond een scherm, voor de voorbeeldpagina van
+   het systeem (/ds/voorbeeld.html) en voor de vergelijking met de mockups.
+   Binnen het kader gedraagt een scherm zich als op een telefoon van 390 px:
+   de Edge en de kop horen bij het kader en niet bij de pagina eromheen. */
+@layer rtg.component {
+  .ds-toestellen { display: flex; gap: var(--ds-ruimte-8); padding: var(--ds-ruimte-8) var(--ds-goot); overflow-x: auto; }
+  .ds-toestel { flex: none; display: grid; justify-items: center; gap: var(--ds-ruimte-4); }
+  .ds-toestel__kader {
+    position: relative;
+    inline-size: 390px;
+    block-size: 844px;
+    padding: 12px;
+    background: var(--ds-cover-grond);
+    border-radius: var(--ds-radius-toestel);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  .ds-toestel__scherm { position: relative; block-size: 100%; min-block-size: 0; overflow: hidden auto; scrollbar-width: none; border-radius: var(--ds-radius-systeem); background: var(--ds-grond); --ds-schermhoogte: 100%; }
+  .ds-toestel .ds-edge { position: absolute; inset-inline: var(--ds-ruimte-3); inset-block-end: var(--ds-ruimte-3); }
+  .ds-toestel__naam { margin: 0; font-family: var(--ds-letter-display); font-size: 1.5rem; }
+}

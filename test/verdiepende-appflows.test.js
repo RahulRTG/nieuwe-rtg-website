@@ -11,7 +11,6 @@ test('de vier werelden gebruiken dezelfde verdiepende stijl op hun echte routes'
     'public/apps/agenda.html': 'rtg-living-flow',
     'public/apps/attenties.html': 'rtg-living-flow',
     'public/apps/vluchten.html': 'rtg-travel-flow',
-    'public/apps/rit.html': 'rtg-travel-flow',
     'public/apps/rtgone.html': 'rtg-work-flow',
     'public/apps/foundation/agenda.html': 'rtg-school-flow',
     'public/apps/foundation/leren.html': 'rtg-school-flow',
@@ -19,6 +18,14 @@ test('de vier werelden gebruiken dezelfde verdiepende stijl op hun echte routes'
   };
   for (const [route, klasse] of Object.entries(routes)) {
     const html = lees(route);
+    /* Een scherm op het RTG Design System (TRAVELOS-MIGRATIE.md) draagt de
+       verdieping niet meer als eigen klasse en blad: zijn wereld komt uit het
+       wereldthema van /ds/rtg-ds.css, en dat is dan de gedeelde stijl. */
+    if (html.includes('/ds/shell.js')) {
+      assert.ok(html.includes('/ds/rtg-ds.css'), route + ' laadt het Design System');
+      assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + klasse.split('-')[1] + '"'), route + ' houdt zijn wereld');
+      continue;
+    }
     const stijl = route === 'public/apps/agenda.html' ? 'rtg-daily-rooms.css' : 'rtg-deep-flows-2026.css';
     assert.ok(html.includes('/shared/' + stijl), route + ' laadt zijn huidige gedeelde stijl');
     assert.match(html, new RegExp(`class="[^"]*${klasse}`));
@@ -38,7 +45,11 @@ test('LivingOS en TravelOS houden de vervolgstappen onder de duim', () => {
   assert.match(vlucht, /view=mijn/);
   assert.match(vlucht, /href="\/apps\/rit\.html"/);
 
+  /* rit.html staat sinds batch 4 van TRAVELOS-MIGRATIE.md op het Design
+     System en draagt de verdiepende stijl niet meer; de vervolgstappen naar
+     bericht en navigatie houdt hij wel. */
   const rit = lees('public/apps/rit.html');
+  assert.match(rit, /href="\/ds\/rtg-ds\.css"/);
   assert.match(rit, /href="\/apps\/comm\.html"/);
   assert.match(rit, /href="\/apps\/navigatie\.html"/);
 });

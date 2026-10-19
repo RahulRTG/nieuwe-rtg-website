@@ -1,0 +1,126 @@
+/* RTG Design System: tokens. Het ENIGE bestand in public/ds/ waar een
+   kleurwaarde mag staan (scripts/ontwerpsysteem.js, contractregel 3).
+
+   Twee niveaus. De primitieven (--ds-p-*) zijn de vaste merkkleuren uit
+   AGENTS.md plus de wereldaccenten uit HERITAGE.md; alleen een wereldthema
+   leest ze, een component of schermtype nooit (contractregel 7). De semantische tokens (--ds-grond, --ds-accent, ...)
+   zijn wat componenten lezen, en precies die lijst mag een wereldthema
+   verzetten (contract.json "themabaar"). Zo verandert TravelOS zijn accent
+   zonder dat het ooit een knop van WorkOS kan raken. */
+
+@layer rtg.tokens {
+  :root {
+    /* Merkkleuren, exact uit het logo (AGENTS.md). */
+    --ds-p-wit: #FFFFFF;
+    --ds-p-zwart: #0C0C0B;
+    --ds-p-bordeaux: #7F1634;
+    --ds-p-bordeaux-helder: #9E1C40;
+    --ds-p-bordeaux-op-donker: #C23A5E;
+    --ds-p-goud: #857007;
+    --ds-p-lijn: #DEDBD5;
+    --ds-p-grijs: #4D4A45;
+    --ds-p-grijs-zacht: #8A8680;
+
+    /* Huiswaarden die al bestonden (--gold-tekst, v4-paper); hier één keer. */
+    --ds-p-champagne: #C0A544;
+    --ds-p-ivoor: #F4EFE7;
+    --ds-p-ivoor-licht: #FAF7F2;
+    --ds-p-steen: #ECE6DD;
+    --ds-p-water: #A9BCC6;
+    /* De lippen van Rahul en het metaal op beeld: champagne naar brons. */
+    --ds-p-champagne-licht: #F1DFB4;
+    --ds-p-brons: #A9824B;
+
+    /* Wereldaccenten (HERITAGE.md par. 3, eigenaarsbesluit 19 oktober 2026). */
+    --ds-p-wijn: #4A0F1F;
+    --ds-p-wijn-hover: #5E1428;
+    --ds-p-zwartgroen: #16302A;
+    --ds-p-zwartgroen-hover: #1F4239;
+    --ds-p-nachtblauw: #14233A;
+    --ds-p-nachtblauw-hover: #1D3250;
+
+    --ds-p-sluier: linear-gradient(180deg, rgba(12, 12, 11, 0) 35%, rgba(12, 12, 11, .82) 100%);
+    --ds-p-schaduw-systeem: 0 18px 48px rgba(12, 12, 11, .22);
+    --ds-p-schaduw-inhoud: 0 1px 2px rgba(12, 12, 11, .06);
+    --ds-p-glas: rgba(12, 12, 11, .92);
+    --ds-p-glasrand: rgba(192, 165, 68, .35);
+
+    /* Semantisch, met de RTG Pass-standaard (bordeaux op ivoor). */
+    --ds-grond: var(--ds-p-ivoor);
+    --ds-oppervlak: var(--ds-p-ivoor-licht);
+    --ds-oppervlak-sterk: var(--ds-p-wit);
+    --ds-inkt: var(--ds-p-zwart);
+    --ds-inkt-zacht: var(--ds-p-grijs);
+    --ds-lijnkleur: var(--ds-p-lijn);
+    --ds-accent: var(--ds-p-bordeaux);
+    --ds-accent-hover: var(--ds-p-bordeaux-helder);
+    --ds-accent-inkt: var(--ds-p-wit);
+    --ds-metaal: var(--ds-p-goud);
+    --ds-cover-grond: var(--ds-p-zwart);
+    --ds-cover-inkt: var(--ds-p-wit);
+    --ds-cover-metaal: var(--ds-p-champagne);
+    --ds-cover-sluier: var(--ds-p-sluier);
+    --ds-focus: var(--ds-p-bordeaux-helder);
+    --ds-beeld-positie: center;
+    --ds-oppervlak-zacht: var(--ds-p-steen);
+    --ds-water: var(--ds-p-water);
+    --ds-lippen-licht: var(--ds-p-champagne-licht);
+    --ds-lippen-diep: var(--ds-p-brons);
+
+    --ds-schaduw-systeem: var(--ds-p-schaduw-systeem);
+    --ds-schaduw-inhoud: var(--ds-p-schaduw-inhoud);
+    --ds-glas: var(--ds-p-glas);
+    --ds-glasrand: var(--ds-p-glasrand);
+
+    /* Typografie: alleen de twee zelfgehoste huisletters. */
+    --ds-letter-display: 'Bodoni Moda', Georgia, serif;
+    --ds-letter-tekst: 'Inter', system-ui, sans-serif;
+    --ds-maat-meta: .75rem;
+    --ds-maat-klein: .875rem;
+    --ds-maat-tekst: 1rem;
+    --ds-maat-kop: clamp(1.5rem, 1.2rem + 1.2cqi, 2rem);
+    --ds-maat-titel: clamp(2rem, 1.4rem + 2.6cqi, 3.25rem);
+    --ds-maat-display: clamp(2.5rem, 1.6rem + 4cqi, 4.5rem);
+    --ds-spatie-label: .24em;
+
+    /* Ruimte: veel lucht (AGENTS.md design-principe 4). */
+    --ds-ruimte-1: 4px;
+    --ds-ruimte-2: 8px;
+    --ds-ruimte-3: 12px;
+    --ds-ruimte-4: 16px;
+    --ds-ruimte-6: 24px;
+    --ds-ruimte-8: 32px;
+    --ds-ruimte-12: 48px;
+    --ds-ruimte-16: 64px;
+    --ds-goot: clamp(16px, 4cqi, 48px);
+    --ds-breedte-lees: 42rem;
+    --ds-breedte-max: 80rem;
+
+    /* Geometrie (eigenaarsbesluit 19 oktober 2026): inhoud vrijwel recht,
+       systeemlagen herkenbaar rond, een knop mag een capsule zijn. */
+    --ds-radius-inhoud: 2px;
+    --ds-radius-beeld: 12px;
+    --ds-radius-knop: 6px;
+    --ds-radius-systeem: 24px;
+    --ds-radius-capsule: 999px;
+    --ds-radius-cirkel: 50%;
+    --ds-radius-toestel: 44px;
+
+    --ds-doel: 48px;
+    /* De hoogte van een scherm: het venster, of het kader eromheen (toestel). */
+    --ds-schermhoogte: 100dvh;
+    --ds-edge-hoogte: 68px;
+    --ds-duur-kort: 160ms;
+    --ds-duur: 280ms;
+    --ds-curve: cubic-bezier(.2, .7, .2, 1);
+  }
+
+  /* Het toegankelijkheidsprofiel van het lid (shared/basis.js zet de klassen
+     op <html>; de tekstmaat werkt al vanzelf, want alles meet in rem). */
+  html.rtg-contrast { --ds-inkt-zacht: var(--ds-p-zwart); --ds-lijnkleur: var(--ds-p-grijs); --ds-glas: var(--ds-p-zwart); }
+  html.rtg-rustig { --ds-metaal: var(--ds-inkt); --ds-cover-metaal: var(--ds-cover-inkt); }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root { --ds-duur-kort: 0ms; --ds-duur: 0ms; }
+  }
+}

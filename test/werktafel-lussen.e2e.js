@@ -80,11 +80,17 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
     const begin = Date.now();
     await page.locator('.cmd-leeg button[data-url="/apps/reizen.html"]').click();
     const blad = page.frameLocator('.cmd-pane.actief iframe');
-    await blad.locator('body[data-rtg-world-start="ready"]').waitFor({ state: 'attached', timeout: 20000 });
+    /* TravelOS staat op het RTG Design System en heeft geen laadlaag meer: het
+       blad is er zodra de Cover met de wereldnaam zichtbaar is. */
+    await blad.locator('.ds-cover__wereld').waitFor({ state: 'visible', timeout: 20000 });
     const duur = Date.now() - begin;
     assert.ok(duur < 8000, 'TravelOS hing ' + duur + ' ms op het laadscherm (de noodtimer staat op 12 s)');
 
-    // 4) De kop noemt de wereld waar je bent.
+    // 4) De kop noemt de wereld waar je bent. Het blad staat er nu sneller dan
+    //    de oude laadlaag; de schil zet zijn label op de wisseling van het
+    //    palet, dus de toets wacht op die toestand en niet op een vaste tik.
+    await page.waitForFunction(() => (document.querySelector('.wd-world-label') || {}).textContent === 'TravelOS',
+      null, { timeout: 10000 }).catch(() => {});
     assert.deepEqual(await label(), { wereld: 'travel', kop: 'TravelOS' });
 
     // 2) Terug binnen de wereld, en dan terug naar de lege tafel -- niet de app uit.

@@ -1,0 +1,33 @@
+/* Rooster: "Alles in deze wereld", de volledige index onder een wereldhuis
+   (TIKKEN.md). De inhoud komt uit scripts/wereldrooster.js en staat letterlijk
+   in de HTML; daarom vormt dit blad de kinderen van .ds-rooster (een link met
+   een naam en eventueel een label) en geen eigen klasse per link. Rustig: een
+   dunne lijn per regel, geen kaartjes. */
+@layer rtg.component {
+  .ds-rooster {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    column-gap: var(--ds-ruimte-6);
+    margin-block: var(--ds-ruimte-2) 0;
+  }
+  .ds-rooster > a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--ds-ruimte-3);
+    min-block-size: var(--ds-doel);
+    padding-block: var(--ds-ruimte-3);
+    border-block-end: 1px solid var(--ds-lijnkleur);
+    color: var(--ds-inkt);
+    font-size: var(--ds-maat-klein);
+    text-decoration: none;
+  }
+  .ds-rooster > a:hover { color: var(--ds-accent); }
+  .ds-rooster > a > span + span {
+    font-size: var(--ds-maat-meta);
+    font-weight: 500;
+    letter-spacing: var(--ds-spatie-label);
+    text-transform: uppercase;
+    color: var(--ds-inkt-zacht);
+  }
+}

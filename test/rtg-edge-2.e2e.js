@@ -35,7 +35,10 @@ const ROUTES = [
     ]
   },
   {
-    naam: 'TravelOS Vandaag', pad: '/apps/reizen.html', wereld: 'travel',
+    /* TravelOS staat op het RTG Design System (TRAVELOS-MIGRATIE.md): daar is
+       de ds-Edge de ene rand en bestaat Edge 2 niet. De rij blijft staan en
+       wordt met hetzelfde contract op de ds-vorm gekeurd (controleerDsRoute). */
+    naam: 'TravelOS Vandaag', pad: '/apps/reizen.html', wereld: 'travel', ds: true,
     context: ['travel-header', 'hoofdtabs'],
     oud: [
       '.reisapp > .prestatiekop', '.reisapp > .hoofdtabs', '.tos-topbar', '.tos-nav',
@@ -59,7 +62,9 @@ const ROUTES = [
     ]
   },
   {
-    naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel',
+    /* Reisboek staat op het RTG Design System (TRAVELOS-MIGRATIE.md): één
+       rand, maar die van /ds/ (ds: true), en ingebed bouwt hij er geen. */
+    naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel', ds: true,
     context: ['native-header'],
     oud: [
       'body > header:not(.rtg-edge-top)', '.tos-topbar', '.tos-nav',
@@ -353,7 +358,36 @@ async function controleerV4Route(page, route, scherm) {
     document.querySelector('.rtg-adaptive-sheet').hidden);
 }
 
+/* Een ds-route: precies een Edge (de ds-Edge), geen Edge-chrome van de oude
+   generaties, geen oude schermbalk zichtbaar, de eigen tabs in de inhoud, en
+   Escape brengt een andere Edge-modus terug naar de navigatie. */
+async function controleerDsRoute(page, route, scherm) {
+  await page.setViewportSize(scherm.maat);
+  await page.goto(route.basis + route.pad, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]', { timeout: 15000 });
+  const label = route.naam + ' · ' + scherm.naam;
+  const m = await page.evaluate((r) => {
+    const zichtbaar = (el) => { if (!el) return false; const st = getComputedStyle(el), b = el.getBoundingClientRect();
+      return st.display !== 'none' && st.visibility !== 'hidden' && b.width > 0 && b.height > 0 && b.top < innerHeight && b.bottom > 0; };
+    return { edges: [...document.querySelectorAll('.ds-edge')].filter(zichtbaar).length,
+      oudeChrome: document.querySelectorAll('.rtg-edge-chrome,.rtg-adaptive-bar,.rtg-edge-top,.rtg-edge-side').length,
+      oudZichtbaar: r.oud.filter((sel) => [...document.querySelectorAll(sel)].some(zichtbaar)),
+      wereld: document.body.getAttribute('data-rtg-world'), tabs: document.querySelectorAll('#inhoud [data-tab]').length };
+  }, route);
+  assert.equal(m.edges, 1, label + ': er hoort precies één zichtbare Edge te zijn');
+  assert.equal(m.oudeChrome, 0, label + ': een oude Edge-generatie staat naast de ds-Edge');
+  assert.deepEqual(m.oudZichtbaar, [], label + ': zichtbare oude chrome');
+  assert.equal(m.wereld, route.wereld, label + ': verkeerde wereld');
+  assert.equal(m.tabs, 5, label + ': de lokale bediening (vijf bladen) staat niet meer in de inhoud');
+  await page.locator('[data-ds-edge="rahul"]').click();
+  assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'rahul');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'navigatie', label + ': Escape herstelt de navigatie');
+  return { omgeleid: null };
+}
+
 async function controleerRoute(page, route, scherm) {
+  if (route.ds) return controleerDsRoute(page, route, scherm);
   await page.setViewportSize(scherm.maat);
   await page.goto(route.basis + route.pad, { waitUntil: 'domcontentloaded' });
   const geland = new URL(await page.url());
@@ -477,6 +511,21 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
         await t.test(route.naam + ' · ' + scherm.naam, async (st) => {
           const page = await context.newPage();
           try {
+            if (route.ds) {
+              await page.setViewportSize(scherm.maat);
+              await page.goto(base + route.pad, { waitUntil: 'domcontentloaded' });
+              await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+              const m = await page.evaluate((r) => ({
+                ds: document.querySelectorAll('.ds-edge').length, balken: document.querySelectorAll('.ds-edge__balk').length,
+                oud: document.querySelectorAll('.rtg-edge-chrome, .rtg-adaptive-bar, .rtg-edge-top, .rtg-edge-side').length,
+                oudZichtbaar: r.oud.filter((sel) => [...document.querySelectorAll(sel)].some((el) => !el.matches('.ds-kop') && el.getClientRects().length)), // de kop van het Design System is de nieuwe kop, geen oude chrome
+                wereld: document.body.getAttribute('data-rtg-world')
+              }), route);
+              assert.deepEqual([m.ds, m.balken, m.oud], [1, 1, 0], route.naam + ': precies één rand, die van het Design System');
+              assert.deepEqual(m.oudZichtbaar, [], route.naam + ': oude chrome zichtbaar');
+              assert.equal(m.wereld, route.wereld);
+              return;
+            }
             const uit = await controleerRoute(page, route, scherm);
             if (uit.omgeleid) st.skip('auth-afhankelijke route leidde naar ' + uit.omgeleid + '; geen contract omzeild');
           } finally { await page.close(); }
@@ -519,10 +568,32 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
                   frame.contentDocument.readyState === 'complete' && frame.contentDocument.body;
               } catch (e) { return false; }
             }, route.pad, { timeout: 15000 });
+            if (route.ds) {
+              /* Ook een ds-scherm brengt in een kader geen tweede Edge mee. */
+              const k = await page.evaluate(() => {
+                const f = document.getElementById('rtg-edge-2-proefframe'), d = f.contentDocument, w = f.contentWindow;
+                const zichtbaar = (el) => !!(el && w.getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+                return { edges: [...d.querySelectorAll('.ds-edge')].filter(zichtbaar).length, oud: d.querySelectorAll('.rtg-edge-chrome').length,
+                  buitensteRoots: document.querySelectorAll('.rtg-edge-chrome').length };
+              });
+              assert.deepEqual(k, { edges: 0, oud: 0, buitensteRoots: 1 }, route.naam + ': iframe bouwt een geneste Edge');
+              return;
+            }
             const m = await page.evaluate(ingebeddeToestand, route);
             const verwachtPad = new URL(base + route.pad).pathname;
             if (m.pad !== verwachtPad) {
               routeTest.skip('auth-afhankelijke iframe-route leidde naar ' + m.pad + '; geen contract omzeild');
+              return;
+            }
+            if (route.ds) {
+              const ds = await page.evaluate(() => {
+                const d = document.getElementById('rtg-edge-2-proefframe').contentDocument;
+                return { ingebed: d.documentElement.classList.contains('ds-ingebed'), randen: d.querySelectorAll('.ds-edge').length };
+              });
+              assert.deepEqual(ds, { ingebed: true, randen: 0 }, route.naam + ': ingebed bouwt de ds-schil geen tweede Edge (en de kop valt weg)');
+              assert.deepEqual([m.roots, m.top, m.side, m.bottom], [0, 0, 0, 0], route.naam + ': iframe bouwt geneste Edge-chrome');
+              assert.deepEqual(m.oudZichtbaar, [], route.naam + ': iframe toont nog oude vaste chrome:\n' + m.oudZichtbaar.join('\n'));
+              assert.equal(m.buitensteRoots, 1, route.naam + ': de buitenste Edge is tijdens embed vervangen of verdubbeld');
               return;
             }
             assert.equal(m.embed, true, route.naam + ': iframe is niet als embed gemarkeerd');

@@ -323,7 +323,8 @@
     "site.werelden.livingos": "site/werelden/livingos.html",
     "site.werelden.travelos": "site/werelden/travelos.html",
     "site.werelden.workos": "site/werelden/workos.html",
-    "library.werk": "apps/library.html"
+    "library.werk": "apps/library.html",
+    "ontwerp.voorbeeld": "ds/voorbeeld.html"
   },
   "oordelen": [
     {
@@ -2750,6 +2751,12 @@
       "rol": "eigenaar",
       "doelgroep": "lid",
       "doel": "Een maker werkt in Foundation LibraryOS aan een intellectueel werk: inhoud, bijdragen, afspraken, rechten en een vaste editie, en leest die editie."
+    },
+    "ds/voorbeeld.html": {
+      "capability": "ontwerp.voorbeeld",
+      "rol": "eigenaar",
+      "doelgroep": "ontwikkelaar",
+      "doel": "De zeven schermtypen van het RTG Design System in telefoonkaders naast elkaar zien, om het systeem naast de goedgekeurde mockups te leggen (ONTWERPSYSTEEM.md); voorbeeldinhoud, geen echte gegevens."
     }
   }
 }

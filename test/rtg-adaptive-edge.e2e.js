@@ -368,29 +368,51 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
       return page;
     };
 
-    await t.test('reisboek: scrollTo zonder gebaar geeft geen peek', async (st) => {
-      const page = await edge2Pagina(st, '/apps/reisboek.html');
-      if (!page) return;
+    /* Reisboek staat sinds de TravelOS-migratie op het RTG Design System
+       (TRAVELOS-MIGRATIE.md): daar is de Edge die van /ds/, en die reageert
+       op geen enkele scroll. Het gedrag dat hier bewaakt wordt blijft: een
+       scroll van de software laat de balk niet flikkeren. Een lager venster
+       maakt de pagina zonder inlog scrolbaar, anders meet de proef niets. */
+    await t.test('reisboek: scrollTo zonder gebaar laat de Edge ongemoeid', async () => {
+      const page = await context.newPage();
       try {
-        const m = await volgBalk(page, 'scrollTo', 900);
-        assert.equal(m.edge2, true, 'op reisboek hoort Edge 2 te draaien');
+        await page.setViewportSize({ width: 390, height: 480 });
+        await page.goto(base + '/apps/reisboek.html', { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+        await page.waitForSelector('#inhoud .ds-status__titel');
+        const m = await page.evaluate(async () => {
+          const edge = document.querySelector('.ds-edge'), voor = edge.getBoundingClientRect().bottom;
+          let mutaties = 0;
+          const w = new MutationObserver((r) => { mutaties += r.length; });
+          w.observe(edge, { attributes: true, subtree: true, childList: true });
+          window.scrollTo(0, 900);
+          await new Promise((r) => setTimeout(r, 900));
+          w.disconnect();
+          return { y: window.scrollY, mutaties, voor, na: edge.getBoundingClientRect().bottom };
+        });
         assert.ok(m.y > 50, 'de pagina scrolde niet (' + m.y + '); dan meet deze proef niets');
-        assert.deepEqual(m.standen, ['dock'], 'de balk flikkerde bij een scroll van de software: ' + m.standen.join(' > '));
+        assert.equal(m.mutaties, 0, 'de Edge veranderde bij een scroll van de software');
+        assert.equal(m.na, m.voor, 'de Edge bewoog bij een scroll van de software');
       } finally { await page.close(); }
     });
 
-    await t.test('reizen: een wiel omlaag geeft peek en daarna dock', async (st) => {
-      const page = await edge2Pagina(st, '/apps/reizen.html');
-      if (!page) return;
+    /* TravelOS staat op het RTG Design System: daar is de ds-Edge de ene rand,
+       zonder Edge 2 en zonder verkleinstanden. Wat deze proef op reizen bewaakte
+       (een echt wiel scrolt de pagina en de onderste bediening blijft er,
+       vast en bereikbaar), eist hij daarom van de ds-Edge. */
+    await t.test('reizen: een wiel omlaag scrolt, en de ds-Edge blijft vast staan', async () => {
+      const page = await context.newPage();
       try {
+        await page.goto(base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+        assert.equal(await page.locator('.rtg-adaptive-edge').count(), 0, 'op reizen draait geen tweede, oude Edge');
+        const voor = await page.locator('.ds-edge__balk').boundingBox();
         await page.mouse.move(195, 420);
-        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 1400);
-        assert.equal(m.edge2, true, 'op reizen hoort Edge 2 te draaien');
-        assert.ok(m.y > 50, 'het wiel scrolde de pagina niet (hoogste ' + m.y + '; ' + m.standen.join(' > ') + ')');
-        assert.ok(m.standen.includes('peek'), 'een wiel gaf geen peek: ' + m.standen.join(' > '));
-        assert.equal(m.edge2Stand, 'compact',
-          'Edge 2 staat niet meer op compact; dan kan de dock van Edge 2 komen en niet van de klok van de balk');
-        assert.equal(m.standen[m.standen.length - 1], 'dock', 'na het wiel kwam de balk niet op dock: ' + m.standen.join(' > '));
+        await page.mouse.wheel(0, 700);
+        await page.waitForFunction(() => scrollY > 50);
+        const na = await page.locator('.ds-edge__balk').boundingBox();
+        assert.ok(Math.abs(na.y - voor.y) < 1 && na.height >= 63.5, 'de Edge bewoog of kromp bij het wiel: ' + JSON.stringify([voor, na]));
+        assert.ok(na.y + na.height <= page.viewportSize().height, 'de Edge viel uit beeld');
       } finally { await page.close(); }
     });
 

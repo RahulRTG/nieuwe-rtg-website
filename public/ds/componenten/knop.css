@@ -1,0 +1,43 @@
+/* Knop: één primaire actie per scherm (HERITAGE.md par. 2.6). Een volle knop
+   is een rechthoek met een zachte hoek (mockup Taak, Detail, Status); de
+   capsule is voor een ingang op beeld ("Enter TravelOS") en voor filters. */
+@layer rtg.component {
+  .ds-knop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-ruimte-2);
+    min-block-size: 52px;
+    padding-inline: var(--ds-ruimte-6);
+    border: 1px solid transparent;
+    border-radius: var(--ds-radius-knop);
+    font-family: var(--ds-letter-tekst);
+    font-size: var(--ds-maat-klein);
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--ds-duur-kort) var(--ds-curve), border-color var(--ds-duur-kort) var(--ds-curve);
+  }
+  .ds-knop--primair { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-knop--primair:hover { background: var(--ds-accent-hover); }
+  .ds-knop--stil { background: transparent; color: var(--ds-inkt); border-color: var(--ds-lijnkleur); }
+  .ds-knop--stil:hover { border-color: var(--ds-inkt); }
+  .ds-knop--klein { min-block-size: 40px; padding-inline: var(--ds-ruimte-4); }
+  .ds-knop--capsule { border-radius: var(--ds-radius-capsule); }
+  .ds-knop--op-beeld {
+    min-block-size: 48px;
+    padding-inline: var(--ds-ruimte-8) var(--ds-ruimte-6);
+    background: var(--ds-glas);
+    color: var(--ds-cover-inkt);
+    border-color: var(--ds-cover-metaal);
+    border-radius: var(--ds-radius-capsule);
+    font-family: var(--ds-letter-display);
+    font-size: 1.0625rem;
+    letter-spacing: 0;
+  }
+  .ds-knop--breed { inline-size: 100%; }
+  .ds-knop[disabled], .ds-knop[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+  .ds-knop__pijl { inline-size: 16px; block-size: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  [dir="rtl"] .ds-knop__pijl { transform: scaleX(-1); }
+}

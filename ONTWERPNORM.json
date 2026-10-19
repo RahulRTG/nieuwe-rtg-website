@@ -1,0 +1,2571 @@
+{
+  "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
+  "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
+  "totaal": {
+    "bladen": 168,
+    "schermenMetStijlblok": 265,
+    "important": 7586
+  },
+  "uitzonderingen": [],
+  "bladen": {
+    "public/apps/access/portal.css": {
+      "bytes": 20538,
+      "important": 61,
+      "hex": 16
+    },
+    "public/apps/access/team.css": {
+      "bytes": 2836,
+      "important": 14,
+      "hex": 28
+    },
+    "public/apps/camera-heritage.css": {
+      "bytes": 8279,
+      "important": 88,
+      "hex": 6
+    },
+    "public/apps/comm-heritage.css": {
+      "bytes": 7517,
+      "important": 84,
+      "hex": 25
+    },
+    "public/apps/foundation/premium.css": {
+      "bytes": 19829,
+      "important": 212,
+      "hex": 52
+    },
+    "public/apps/foundation/stijl.css": {
+      "bytes": 9173,
+      "important": 0,
+      "hex": 53
+    },
+    "public/apps/foundation/werk-premium.css": {
+      "bytes": 19305,
+      "important": 7,
+      "hex": 26
+    },
+    "public/apps/klankwerk-pro.css": {
+      "bytes": 10792,
+      "important": 101,
+      "hex": 26
+    },
+    "public/apps/library/style.css": {
+      "bytes": 4396,
+      "important": 3,
+      "hex": 15
+    },
+    "public/apps/media/studio-pro.css": {
+      "bytes": 9410,
+      "important": 6,
+      "hex": 29
+    },
+    "public/apps/muziek-heritage-kop.css": {
+      "bytes": 3452,
+      "important": 67,
+      "hex": 4
+    },
+    "public/apps/muziek-heritage.css": {
+      "bytes": 9870,
+      "important": 145,
+      "hex": 21
+    },
+    "public/apps/office/collab.css": {
+      "bytes": 5186,
+      "important": 2,
+      "hex": 4
+    },
+    "public/apps/office/enterprise.css": {
+      "bytes": 11159,
+      "important": 8,
+      "hex": 8
+    },
+    "public/apps/office/presentation-enterprise.css": {
+      "bytes": 1670,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/reisprogramma.css": {
+      "bytes": 5190,
+      "important": 13,
+      "hex": 35
+    },
+    "public/apps/rtg-onthul.css": {
+      "bytes": 690,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/rtg-protect.css": {
+      "bytes": 4054,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/saloon/edge.css": {
+      "bytes": 729,
+      "important": 8,
+      "hex": 0
+    },
+    "public/apps/saloon/redactioneel.css": {
+      "bytes": 9601,
+      "important": 26,
+      "hex": 0
+    },
+    "public/apps/saloon/saloon.css": {
+      "bytes": 2920,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/sociaal-heritage.css": {
+      "bytes": 8652,
+      "important": 151,
+      "hex": 19
+    },
+    "public/apps/wereld-feed.css": {
+      "bytes": 15907,
+      "important": 25,
+      "hex": 17
+    },
+    "public/apps/werk/praktijk.css": {
+      "bytes": 1714,
+      "important": 4,
+      "hex": 0
+    },
+    "public/fonts/fonts.css": {
+      "bytes": 16026,
+      "important": 0,
+      "hex": 0
+    },
+    "public/shared/adaptief.css": {
+      "bytes": 12633,
+      "important": 3,
+      "hex": 23
+    },
+    "public/shared/canvas.css": {
+      "bytes": 13163,
+      "important": 0,
+      "hex": 32
+    },
+    "public/shared/command.css": {
+      "bytes": 40254,
+      "important": 41,
+      "hex": 20
+    },
+    "public/shared/connection-communication-final.css": {
+      "bytes": 2115,
+      "important": 0,
+      "hex": 0
+    },
+    "public/shared/connection-communication.css": {
+      "bytes": 2387,
+      "important": 2,
+      "hex": 3
+    },
+    "public/shared/connection-edge.css": {
+      "bytes": 9091,
+      "important": 10,
+      "hex": 9
+    },
+    "public/shared/dagkleur.css": {
+      "bytes": 3206,
+      "important": 0,
+      "hex": 32
+    },
+    "public/shared/dating-premium.css": {
+      "bytes": 17831,
+      "important": 12,
+      "hex": 64
+    },
+    "public/shared/experience-kernel.css": {
+      "bytes": 6938,
+      "important": 0,
+      "hex": 30
+    },
+    "public/shared/gebaar.css": {
+      "bytes": 17331,
+      "important": 0,
+      "hex": 22
+    },
+    "public/shared/geld-command.css": {
+      "bytes": 20459,
+      "important": 0,
+      "hex": 79
+    },
+    "public/shared/grammatica.css": {
+      "bytes": 10508,
+      "important": 2,
+      "hex": 25
+    },
+    "public/shared/hand.css": {
+      "bytes": 3458,
+      "important": 0,
+      "hex": 0
+    },
+    "public/shared/horeca-command.css": {
+      "bytes": 26309,
+      "important": 95,
+      "hex": 107
+    },
+    "public/shared/horeca-enterprise-modules.css": {
+      "bytes": 4316,
+      "important": 25,
+      "hex": 17
+    },
+    "public/shared/instant-reality.css": {
+      "bytes": 10992,
+      "important": 0,
+      "hex": 44
+    },
+    "public/shared/interface/second-screen-personal.css": {
+      "bytes": 10127,
+      "important": 9,
+      "hex": 18
+    },
+    "public/shared/interface/second-screen.css": {
+      "bytes": 9587,
+      "important": 5,
+      "hex": 7
+    },
+    "public/shared/interface/workspace-components.css": {
+      "bytes": 16200,
+      "important": 0,
+      "hex": 16
+    },
+    "public/shared/ios.css": {
+      "bytes": 18047,
+      "important": 20,
+      "hex": 9
+    },
+    "public/shared/kantoor-tools.css": {
+      "bytes": 7185,
+      "important": 2,
+      "hex": 13
+    },
+    "public/shared/leven-contract.css": {
+      "bytes": 1739,
+      "important": 0,
+      "hex": 8
+    },
+    "public/shared/leven.css": {
+      "bytes": 3649,
+      "important": 0,
+      "hex": 14
+    },
+    "public/shared/levenspas.css": {
+      "bytes": 2532,
+      "important": 0,
+      "hex": 9
+    },
+    "public/shared/living-os.css": {
+      "bytes": 22772,
+      "important": 0,
+      "hex": 95
+    },
+    "public/shared/magazine.css": {
+      "bytes": 13996,
+      "important": 0,
+      "hex": 20
+    },
+    "public/shared/media-command.css": {
+      "bytes": 7711,
+      "important": 14,
+      "hex": 14
+    },
+    "public/shared/media.css": {
+      "bytes": 1850,
+      "important": 0,
+      "hex": 8
+    },
+    "public/shared/partner-network.css": {
+      "bytes": 18027,
+      "important": 0,
+      "hex": 61
+    },
+    "public/shared/pass-recovery.css": {
+      "bytes": 574,
+      "important": 1,
+      "hex": 3
+    },
+    "public/shared/private-office.css": {
+      "bytes": 14622,
+      "important": 0,
+      "hex": 76
+    },
+    "public/shared/reizen-veilig.css": {
+      "bytes": 21395,
+      "important": 17,
+      "hex": 50
+    },
+    "public/shared/rendezvous-2.css": {
+      "bytes": 3623,
+      "important": 0,
+      "hex": 6
+    },
+    "public/shared/rosthema.css": {
+      "bytes": 2054,
+      "important": 0,
+      "hex": 19
+    },
+    "public/shared/rtg-adaptive-edge.css": {
+      "bytes": 39439,
+      "important": 229,
+      "hex": 10
+    },
+    "public/shared/rtg-anchor-experiences-2026.css": {
+      "bytes": 24983,
+      "important": 237,
+      "hex": 127
+    },
+    "public/shared/rtg-cinematic-system.css": {
+      "bytes": 56110,
+      "important": 478,
+      "hex": 142
+    },
+    "public/shared/rtg-communication-surface.css": {
+      "bytes": 10606,
+      "important": 96,
+      "hex": 33
+    },
+    "public/shared/rtg-continue-key.css": {
+      "bytes": 8345,
+      "important": 42,
+      "hex": 0
+    },
+    "public/shared/rtg-daily-rooms.css": {
+      "bytes": 5305,
+      "important": 0,
+      "hex": 6
+    },
+    "public/shared/rtg-daily.css": {
+      "bytes": 7155,
+      "important": 11,
+      "hex": 3
+    },
+    "public/shared/rtg-decision-room-2026.css": {
+      "bytes": 13781,
+      "important": 0,
+      "hex": 26
+    },
+    "public/shared/rtg-deep-flows-2026.css": {
+      "bytes": 14946,
+      "important": 167,
+      "hex": 83
+    },
+    "public/shared/rtg-desktop-components.css": {
+      "bytes": 9806,
+      "important": 73,
+      "hex": 1
+    },
+    "public/shared/rtg-docs-2026.css": {
+      "bytes": 12358,
+      "important": 18,
+      "hex": 72
+    },
+    "public/shared/rtg-edge-2.css": {
+      "bytes": 46228,
+      "important": 341,
+      "hex": 75
+    },
+    "public/shared/rtg-edge-system.css": {
+      "bytes": 36157,
+      "important": 115,
+      "hex": 60
+    },
+    "public/shared/rtg-editorial-system.css": {
+      "bytes": 13389,
+      "important": 74,
+      "hex": 18
+    },
+    "public/shared/rtg-editorial-v4.css": {
+      "bytes": 117576,
+      "important": 1076,
+      "hex": 213
+    },
+    "public/shared/rtg-eten-uitgaan-2026.css": {
+      "bytes": 10498,
+      "important": 8,
+      "hex": 26
+    },
+    "public/shared/rtg-experience-2026.css": {
+      "bytes": 17794,
+      "important": 34,
+      "hex": 101
+    },
+    "public/shared/rtg-first-steps.css": {
+      "bytes": 10357,
+      "important": 11,
+      "hex": 15
+    },
+    "public/shared/rtg-foundation-geld-later-2026.css": {
+      "bytes": 9537,
+      "important": 18,
+      "hex": 37
+    },
+    "public/shared/rtg-foundation-gezondheid-welzijn-2026.css": {
+      "bytes": 12138,
+      "important": 17,
+      "hex": 35
+    },
+    "public/shared/rtg-foundation-hulp-2026.css": {
+      "bytes": 14052,
+      "important": 12,
+      "hex": 42
+    },
+    "public/shared/rtg-foundation-leren-2026.css": {
+      "bytes": 13485,
+      "important": 26,
+      "hex": 46
+    },
+    "public/shared/rtg-foundation-meedoen-ontdekken-2026.css": {
+      "bytes": 16084,
+      "important": 33,
+      "hex": 36
+    },
+    "public/shared/rtg-foundation-samen-thuis-2026.css": {
+      "bytes": 12004,
+      "important": 21,
+      "hex": 45
+    },
+    "public/shared/rtg-foundation-thuis-2026.css": {
+      "bytes": 10112,
+      "important": 6,
+      "hex": 36
+    },
+    "public/shared/rtg-foundation-veilig-vertrouwd-2026.css": {
+      "bytes": 11744,
+      "important": 16,
+      "hex": 32
+    },
+    "public/shared/rtg-geld-2026.css": {
+      "bytes": 7778,
+      "important": 0,
+      "hex": 21
+    },
+    "public/shared/rtg-heritage-adapters.css": {
+      "bytes": 9073,
+      "important": 7,
+      "hex": 21
+    },
+    "public/shared/rtg-heritage-components.css": {
+      "bytes": 7906,
+      "important": 0,
+      "hex": 1
+    },
+    "public/shared/rtg-heritage-experiences.css": {
+      "bytes": 3254,
+      "important": 0,
+      "hex": 0
+    },
+    "public/shared/rtg-heritage-materials.css": {
+      "bytes": 6719,
+      "important": 5,
+      "hex": 3
+    },
+    "public/shared/rtg-heritage-motion.css": {
+      "bytes": 7476,
+      "important": 12,
+      "hex": 2
+    },
+    "public/shared/rtg-heritage.css": {
+      "bytes": 6067,
+      "important": 0,
+      "hex": 15
+    },
+    "public/shared/rtg-hulpklassen.css": {
+      "bytes": 8927,
+      "important": 93,
+      "hex": 3
+    },
+    "public/shared/rtg-intelligence-shell.css": {
+      "bytes": 7867,
+      "important": 31,
+      "hex": 0
+    },
+    "public/shared/rtg-intelligence.css": {
+      "bytes": 2390,
+      "important": 4,
+      "hex": 0
+    },
+    "public/shared/rtg-magnaat-2026.css": {
+      "bytes": 13435,
+      "important": 5,
+      "hex": 32
+    },
+    "public/shared/rtg-mail-2026.css": {
+      "bytes": 23267,
+      "important": 43,
+      "hex": 124
+    },
+    "public/shared/rtg-mall-living.css": {
+      "bytes": 34740,
+      "important": 85,
+      "hex": 41
+    },
+    "public/shared/rtg-materiaal.css": {
+      "bytes": 7200,
+      "important": 0,
+      "hex": 21
+    },
+    "public/shared/rtg-media-2026.css": {
+      "bytes": 10029,
+      "important": 15,
+      "hex": 21
+    },
+    "public/shared/rtg-one-2026.css": {
+      "bytes": 10189,
+      "important": 8,
+      "hex": 50
+    },
+    "public/shared/rtg-ontwerp.css": {
+      "bytes": 15425,
+      "important": 0,
+      "hex": 4
+    },
+    "public/shared/rtg-personal-images.css": {
+      "bytes": 4954,
+      "important": 25,
+      "hex": 33
+    },
+    "public/shared/rtg-project-room-2026.css": {
+      "bytes": 14396,
+      "important": 0,
+      "hex": 24
+    },
+    "public/shared/rtg-public-warm.css": {
+      "bytes": 4441,
+      "important": 18,
+      "hex": 0
+    },
+    "public/shared/rtg-schil.css": {
+      "bytes": 22558,
+      "important": 9,
+      "hex": 21
+    },
+    "public/shared/rtg-school-shell.css": {
+      "bytes": 11176,
+      "important": 24,
+      "hex": 14
+    },
+    "public/shared/rtg-simple.css": {
+      "bytes": 33451,
+      "important": 261,
+      "hex": 10
+    },
+    "public/shared/rtg-sport-2026.css": {
+      "bytes": 9749,
+      "important": 16,
+      "hex": 24
+    },
+    "public/shared/rtg-team-room-2026.css": {
+      "bytes": 8822,
+      "important": 4,
+      "hex": 30
+    },
+    "public/shared/rtg-team-room-profiel-2026.css": {
+      "bytes": 4098,
+      "important": 6,
+      "hex": 12
+    },
+    "public/shared/rtg-themas.css": {
+      "bytes": 19612,
+      "important": 0,
+      "hex": 47
+    },
+    "public/shared/rtg-ui.css": {
+      "bytes": 54258,
+      "important": 1,
+      "hex": 13
+    },
+    "public/shared/rtg-uniform.css": {
+      "bytes": 4216,
+      "important": 4,
+      "hex": 8
+    },
+    "public/shared/rtg-vandaag-luxe.css": {
+      "bytes": 48840,
+      "important": 353,
+      "hex": 70
+    },
+    "public/shared/rtg-veilig-2026.css": {
+      "bytes": 10226,
+      "important": 4,
+      "hex": 44
+    },
+    "public/shared/rtg-warm-details.css": {
+      "bytes": 9202,
+      "important": 78,
+      "hex": 0
+    },
+    "public/shared/rtg-wereld.css": {
+      "bytes": 10981,
+      "important": 0,
+      "hex": 0
+    },
+    "public/shared/rtg-winkel-2026.css": {
+      "bytes": 8851,
+      "important": 9,
+      "hex": 27
+    },
+    "public/shared/rtg-wonen-2026.css": {
+      "bytes": 7520,
+      "important": 4,
+      "hex": 21
+    },
+    "public/shared/rtg-world-desktop.css": {
+      "bytes": 12787,
+      "important": 58,
+      "hex": 0
+    },
+    "public/shared/rtg-world-home.css": {
+      "bytes": 31677,
+      "important": 68,
+      "hex": 33
+    },
+    "public/shared/rtg-world-palette.css": {
+      "bytes": 25832,
+      "important": 258,
+      "hex": 81
+    },
+    "public/shared/rtg-world-screen.css": {
+      "bytes": 7343,
+      "important": 43,
+      "hex": 0
+    },
+    "public/shared/rtg-world-start.css": {
+      "bytes": 2110,
+      "important": 3,
+      "hex": 7
+    },
+    "public/shared/rtg-world-widgets.css": {
+      "bytes": 5853,
+      "important": 2,
+      "hex": 11
+    },
+    "public/shared/rtg-worlds-2026.css": {
+      "bytes": 36404,
+      "important": 3,
+      "hex": 41
+    },
+    "public/shared/rust.css": {
+      "bytes": 3505,
+      "important": 0,
+      "hex": 1
+    },
+    "public/shared/salon-elite.css": {
+      "bytes": 43603,
+      "important": 152,
+      "hex": 219
+    },
+    "public/shared/seizoen-pas.css": {
+      "bytes": 3930,
+      "important": 0,
+      "hex": 31
+    },
+    "public/shared/seizoen.css": {
+      "bytes": 6510,
+      "important": 0,
+      "hex": 107
+    },
+    "public/shared/sociaal-command.css": {
+      "bytes": 6639,
+      "important": 0,
+      "hex": 9
+    },
+    "public/shared/sociaal-elite.css": {
+      "bytes": 42402,
+      "important": 50,
+      "hex": 187
+    },
+    "public/shared/social-elite.css": {
+      "bytes": 8719,
+      "important": 32,
+      "hex": 28
+    },
+    "public/shared/social-intelligence.css": {
+      "bytes": 30525,
+      "important": 55,
+      "hex": 56
+    },
+    "public/shared/social-suite.css": {
+      "bytes": 47153,
+      "important": 327,
+      "hex": 118
+    },
+    "public/shared/toegang.css": {
+      "bytes": 3519,
+      "important": 1,
+      "hex": 7
+    },
+    "public/shared/travel-os.css": {
+      "bytes": 37518,
+      "important": 281,
+      "hex": 61
+    },
+    "public/shared/uitleg.css": {
+      "bytes": 1469,
+      "important": 0,
+      "hex": 3
+    },
+    "public/shared/veiligheid.css": {
+      "bytes": 4944,
+      "important": 0,
+      "hex": 10
+    },
+    "public/shared/vonk-2.css": {
+      "bytes": 23160,
+      "important": 8,
+      "hex": 82
+    },
+    "public/shared/webblok.css": {
+      "bytes": 5306,
+      "important": 3,
+      "hex": 13
+    },
+    "public/shared/wereldrooster.css": {
+      "bytes": 2574,
+      "important": 0,
+      "hex": 0
+    },
+    "public/shared/wereldschil.css": {
+      "bytes": 9007,
+      "important": 0,
+      "hex": 9
+    },
+    "public/shared/werk-command.css": {
+      "bytes": 27832,
+      "important": 139,
+      "hex": 82
+    },
+    "public/shared/werkplek-enterprise.css": {
+      "bytes": 14436,
+      "important": 2,
+      "hex": 9
+    },
+    "public/shared/workos-premium.css": {
+      "bytes": 14080,
+      "important": 92,
+      "hex": 19
+    },
+    "public/shared/zaakscherm.css": {
+      "bytes": 7071,
+      "important": 2,
+      "hex": 8
+    },
+    "public/site/explore-theme.css": {
+      "bytes": 20,
+      "important": 0,
+      "hex": 1
+    },
+    "public/site/explore.css": {
+      "bytes": 5821,
+      "important": 0,
+      "hex": 43
+    },
+    "public/site/passen/pass.css": {
+      "bytes": 2613,
+      "important": 0,
+      "hex": 19
+    },
+    "public/site/platform-company.css": {
+      "bytes": 40694,
+      "important": 106,
+      "hex": 28
+    },
+    "public/site/platform-detail.css": {
+      "bytes": 1827,
+      "important": 3,
+      "hex": 0
+    },
+    "public/site/platform-shell.css": {
+      "bytes": 32094,
+      "important": 108,
+      "hex": 57
+    },
+    "public/site/start/experience-2.css": {
+      "bytes": 18405,
+      "important": 1,
+      "hex": 130
+    },
+    "public/site/start/experience-premium-responsive.css": {
+      "bytes": 5235,
+      "important": 1,
+      "hex": 1
+    },
+    "public/site/start/experience-premium.css": {
+      "bytes": 9226,
+      "important": 4,
+      "hex": 35
+    },
+    "public/site/start/experience-responsive.css": {
+      "bytes": 8907,
+      "important": 3,
+      "hex": 16
+    },
+    "public/site/start/experience-tech.css": {
+      "bytes": 1792,
+      "important": 0,
+      "hex": 8
+    },
+    "public/site/start/experience.css": {
+      "bytes": 25887,
+      "important": 8,
+      "hex": 180
+    },
+    "public/site/start/start-base.css": {
+      "bytes": 6946,
+      "important": 2,
+      "hex": 14
+    },
+    "public/site/start/start-layout.css": {
+      "bytes": 11593,
+      "important": 0,
+      "hex": 29
+    },
+    "public/site/start/start-responsive.css": {
+      "bytes": 6074,
+      "important": 4,
+      "hex": 0
+    },
+    "public/site/storyline-stage.css": {
+      "bytes": 7666,
+      "important": 0,
+      "hex": 18
+    },
+    "public/site/storyline.css": {
+      "bytes": 7637,
+      "important": 2,
+      "hex": 27
+    },
+    "public/site/techniek/techniek.css": {
+      "bytes": 540,
+      "important": 0,
+      "hex": 6
+    },
+    "public/site/website-truth.css": {
+      "bytes": 4046,
+      "important": 0,
+      "hex": 16
+    },
+    "public/site/werelden/world.css": {
+      "bytes": 9086,
+      "important": 6,
+      "hex": 23
+    }
+  },
+  "blokken": {
+    "public/apps/agenda.html": {
+      "blokken": 2,
+      "bytes": 7960,
+      "important": 1,
+      "hex": 4
+    },
+    "public/apps/app.html": {
+      "blokken": 2,
+      "bytes": 129154,
+      "important": 5,
+      "hex": 200
+    },
+    "public/apps/appcel.html": {
+      "blokken": 1,
+      "bytes": 8635,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/appstore-dossier.html": {
+      "blokken": 1,
+      "bytes": 2839,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/appstore-kantoor.html": {
+      "blokken": 1,
+      "bytes": 3279,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/appstore-uitgever.html": {
+      "blokken": 1,
+      "bytes": 5596,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/architect-pda.html": {
+      "blokken": 2,
+      "bytes": 3170,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/attenties.html": {
+      "blokken": 2,
+      "bytes": 4301,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/avond.html": {
+      "blokken": 1,
+      "bytes": 5560,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/backoffice.html": {
+      "blokken": 2,
+      "bytes": 16786,
+      "important": 0,
+      "hex": 19
+    },
+    "public/apps/balans.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/bank.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/belastingkantoor.html": {
+      "blokken": 2,
+      "bytes": 6405,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/berichten.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/bestanden.html": {
+      "blokken": 2,
+      "bytes": 6815,
+      "important": 1,
+      "hex": 3
+    },
+    "public/apps/bestellen.html": {
+      "blokken": 1,
+      "bytes": 34290,
+      "important": 3,
+      "hex": 190
+    },
+    "public/apps/bewijsmap.html": {
+      "blokken": 1,
+      "bytes": 1877,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/boardroom.html": {
+      "blokken": 1,
+      "bytes": 542,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/browser.html": {
+      "blokken": 2,
+      "bytes": 7864,
+      "important": 1,
+      "hex": 7
+    },
+    "public/apps/camera.html": {
+      "blokken": 1,
+      "bytes": 6912,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/cellier.html": {
+      "blokken": 2,
+      "bytes": 3870,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/cercle.html": {
+      "blokken": 2,
+      "bytes": 3923,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/clips.html": {
+      "blokken": 2,
+      "bytes": 5821,
+      "important": 2,
+      "hex": 7
+    },
+    "public/apps/codewoord.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/comm.html": {
+      "blokken": 2,
+      "bytes": 13243,
+      "important": 0,
+      "hex": 9
+    },
+    "public/apps/command.html": {
+      "blokken": 1,
+      "bytes": 10006,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/commerce.html": {
+      "blokken": 1,
+      "bytes": 7121,
+      "important": 15,
+      "hex": 2
+    },
+    "public/apps/concern.html": {
+      "blokken": 1,
+      "bytes": 4997,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/concierge.html": {
+      "blokken": 1,
+      "bytes": 3268,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/connect.html": {
+      "blokken": 1,
+      "bytes": 2188,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/defensie.html": {
+      "blokken": 2,
+      "bytes": 3777,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/doelen.html": {
+      "blokken": 1,
+      "bytes": 1102,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/doos.html": {
+      "blokken": 1,
+      "bytes": 2749,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/entourage.html": {
+      "blokken": 2,
+      "bytes": 4061,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/festival-gast.html": {
+      "blokken": 1,
+      "bytes": 3176,
+      "important": 1,
+      "hex": 0
+    },
+    "public/apps/festival.html": {
+      "blokken": 1,
+      "bytes": 6226,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foodcourt.html": {
+      "blokken": 2,
+      "bytes": 6699,
+      "important": 1,
+      "hex": 5
+    },
+    "public/apps/foundation/agenda.html": {
+      "blokken": 2,
+      "bytes": 4910,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/arena.html": {
+      "blokken": 2,
+      "bytes": 6451,
+      "important": 0,
+      "hex": 14
+    },
+    "public/apps/foundation/babyboek.html": {
+      "blokken": 2,
+      "bytes": 5774,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/beheer.html": {
+      "blokken": 2,
+      "bytes": 3923,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/beroepen.html": {
+      "blokken": 1,
+      "bytes": 2335,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/bieb.html": {
+      "blokken": 2,
+      "bytes": 2373,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/bord.html": {
+      "blokken": 2,
+      "bytes": 5757,
+      "important": 0,
+      "hex": 12
+    },
+    "public/apps/foundation/budget.html": {
+      "blokken": 2,
+      "bytes": 2916,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/buurtruil.html": {
+      "blokken": 1,
+      "bytes": 4419,
+      "important": 4,
+      "hex": 18
+    },
+    "public/apps/foundation/campus.html": {
+      "blokken": 2,
+      "bytes": 10872,
+      "important": 2,
+      "hex": 7
+    },
+    "public/apps/foundation/club.html": {
+      "blokken": 2,
+      "bytes": 2600,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/foundation/clubswerk.html": {
+      "blokken": 2,
+      "bytes": 3312,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/foundation/contact.html": {
+      "blokken": 2,
+      "bytes": 2874,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/foundation/cv.html": {
+      "blokken": 2,
+      "bytes": 3501,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/foundation/dromen.html": {
+      "blokken": 2,
+      "bytes": 2870,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/foundation/geld.html": {
+      "blokken": 2,
+      "bytes": 2527,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/foundation/geloofbieb.html": {
+      "blokken": 2,
+      "bytes": 3172,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/foundation/geven.html": {
+      "blokken": 1,
+      "bytes": 3954,
+      "important": 4,
+      "hex": 15
+    },
+    "public/apps/foundation/gevoel.html": {
+      "blokken": 2,
+      "bytes": 3378,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/gezondheid.html": {
+      "blokken": 2,
+      "bytes": 3366,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/hulpwijzer.html": {
+      "blokken": 2,
+      "bytes": 2679,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/index.html": {
+      "blokken": 2,
+      "bytes": 13137,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/foundation/kantoor.html": {
+      "blokken": 2,
+      "bytes": 4265,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/foundation/keuken.html": {
+      "blokken": 2,
+      "bytes": 3166,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/klas.html": {
+      "blokken": 2,
+      "bytes": 3433,
+      "important": 0,
+      "hex": 10
+    },
+    "public/apps/foundation/kleuren.html": {
+      "blokken": 2,
+      "bytes": 2115,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/klimaatfonds.html": {
+      "blokken": 1,
+      "bytes": 4844,
+      "important": 4,
+      "hex": 14
+    },
+    "public/apps/foundation/klusjes.html": {
+      "blokken": 2,
+      "bytes": 2501,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/kompas.html": {
+      "blokken": 1,
+      "bytes": 1154,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/foundation/kwestiekantoor.html": {
+      "blokken": 1,
+      "bytes": 3063,
+      "important": 1,
+      "hex": 10
+    },
+    "public/apps/foundation/kwesties.html": {
+      "blokken": 1,
+      "bytes": 3838,
+      "important": 4,
+      "hex": 17
+    },
+    "public/apps/foundation/leerpaspoort.html": {
+      "blokken": 1,
+      "bytes": 2231,
+      "important": 1,
+      "hex": 3
+    },
+    "public/apps/foundation/liedjes.html": {
+      "blokken": 2,
+      "bytes": 2857,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/magazine.html": {
+      "blokken": 2,
+      "bytes": 7224,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/foundation/mail.html": {
+      "blokken": 1,
+      "bytes": 1377,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/markt.html": {
+      "blokken": 2,
+      "bytes": 9009,
+      "important": 0,
+      "hex": 26
+    },
+    "public/apps/foundation/mediawijs.html": {
+      "blokken": 2,
+      "bytes": 2465,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/memorie.html": {
+      "blokken": 2,
+      "bytes": 2117,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/mijnbanden.html": {
+      "blokken": 1,
+      "bytes": 473,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/ochtend.html": {
+      "blokken": 2,
+      "bytes": 3145,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/onveilig.html": {
+      "blokken": 1,
+      "bytes": 2372,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/oppasinfo.html": {
+      "blokken": 2,
+      "bytes": 2515,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/foundation/opvoeden.html": {
+      "blokken": 2,
+      "bytes": 1744,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/os-bestuur.html": {
+      "blokken": 1,
+      "bytes": 3300,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/foundation/os-deelnemer.html": {
+      "blokken": 1,
+      "bytes": 2347,
+      "important": 0,
+      "hex": 9
+    },
+    "public/apps/foundation/os-donateur.html": {
+      "blokken": 1,
+      "bytes": 2699,
+      "important": 0,
+      "hex": 10
+    },
+    "public/apps/foundation/os-portaal.html": {
+      "blokken": 1,
+      "bytes": 2296,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/foundation/os-publiek.html": {
+      "blokken": 2,
+      "bytes": 12630,
+      "important": 13,
+      "hex": 28
+    },
+    "public/apps/foundation/os-veld.html": {
+      "blokken": 1,
+      "bytes": 2822,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/foundation/os-vrijwilliger.html": {
+      "blokken": 1,
+      "bytes": 2970,
+      "important": 0,
+      "hex": 12
+    },
+    "public/apps/foundation/os.html": {
+      "blokken": 1,
+      "bytes": 3887,
+      "important": 0,
+      "hex": 12
+    },
+    "public/apps/foundation/overhoren.html": {
+      "blokken": 2,
+      "bytes": 3135,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/partner.html": {
+      "blokken": 2,
+      "bytes": 2317,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/foundation/pesten.html": {
+      "blokken": 2,
+      "bytes": 2139,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/foundation/presenteren.html": {
+      "blokken": 2,
+      "bytes": 2589,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/privacy.html": {
+      "blokken": 1,
+      "bytes": 2032,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/foundation/projecten.html": {
+      "blokken": 2,
+      "bytes": 3208,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/rechten.html": {
+      "blokken": 1,
+      "bytes": 2244,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/registreren.html": {
+      "blokken": 1,
+      "bytes": 3057,
+      "important": 0,
+      "hex": 8
+    },
+    "public/apps/foundation/reis.html": {
+      "blokken": 2,
+      "bytes": 2494,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/foundation/rust.html": {
+      "blokken": 2,
+      "bytes": 4147,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/foundation/school.html": {
+      "blokken": 1,
+      "bytes": 3770,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/foundation/schoolbieb.html": {
+      "blokken": 1,
+      "bytes": 1261,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/schrift.html": {
+      "blokken": 2,
+      "bytes": 5363,
+      "important": 0,
+      "hex": 22
+    },
+    "public/apps/foundation/schrijven.html": {
+      "blokken": 1,
+      "bytes": 1437,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/societeit.html": {
+      "blokken": 2,
+      "bytes": 6592,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/foundation/speelhal.html": {
+      "blokken": 1,
+      "bytes": 2292,
+      "important": 0,
+      "hex": 23
+    },
+    "public/apps/foundation/speeltuin.html": {
+      "blokken": 1,
+      "bytes": 3077,
+      "important": 0,
+      "hex": 22
+    },
+    "public/apps/foundation/steun.html": {
+      "blokken": 1,
+      "bytes": 1557,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/foundation/studie.html": {
+      "blokken": 2,
+      "bytes": 1407,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/tellen.html": {
+      "blokken": 2,
+      "bytes": 2824,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/toetsen.html": {
+      "blokken": 2,
+      "bytes": 2410,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/veilig.html": {
+      "blokken": 2,
+      "bytes": 3257,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/foundation/verhaaltje.html": {
+      "blokken": 2,
+      "bytes": 2262,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/verjaardagen.html": {
+      "blokken": 2,
+      "bytes": 3360,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/foundation/vrienden.html": {
+      "blokken": 1,
+      "bytes": 9447,
+      "important": 0,
+      "hex": 30
+    },
+    "public/apps/foundation/wegwijzer.html": {
+      "blokken": 1,
+      "bytes": 2353,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/foundation/werk.html": {
+      "blokken": 2,
+      "bytes": 4298,
+      "important": 0,
+      "hex": 14
+    },
+    "public/apps/foundation/winkel.html": {
+      "blokken": 1,
+      "bytes": 3954,
+      "important": 4,
+      "hex": 15
+    },
+    "public/apps/foundation/zakgeld.html": {
+      "blokken": 2,
+      "bytes": 3043,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/galerij.html": {
+      "blokken": 1,
+      "bytes": 4820,
+      "important": 1,
+      "hex": 3
+    },
+    "public/apps/garderobe.html": {
+      "blokken": 2,
+      "bytes": 3764,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/gast.html": {
+      "blokken": 1,
+      "bytes": 6761,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/gedachten.html": {
+      "blokken": 1,
+      "bytes": 891,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/geld.html": {
+      "blokken": 2,
+      "bytes": 3832,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/gemeente.html": {
+      "blokken": 3,
+      "bytes": 8135,
+      "important": 0,
+      "hex": 15
+    },
+    "public/apps/gemeenteloket.html": {
+      "blokken": 3,
+      "bytes": 6802,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/gemeentepda.html": {
+      "blokken": 3,
+      "bytes": 6568,
+      "important": 0,
+      "hex": 8
+    },
+    "public/apps/genootschap.html": {
+      "blokken": 2,
+      "bytes": 5990,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/gereedschap.html": {
+      "blokken": 2,
+      "bytes": 7066,
+      "important": 1,
+      "hex": 4
+    },
+    "public/apps/handel.html": {
+      "blokken": 1,
+      "bytes": 696,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/hardware-pda.html": {
+      "blokken": 2,
+      "bytes": 3170,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/home.html": {
+      "blokken": 2,
+      "bytes": 4749,
+      "important": 0,
+      "hex": 9
+    },
+    "public/apps/horeca-bar.html": {
+      "blokken": 1,
+      "bytes": 2759,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/horeca-beheer.html": {
+      "blokken": 1,
+      "bytes": 572,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-bezorg.html": {
+      "blokken": 2,
+      "bytes": 1299,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-club.html": {
+      "blokken": 2,
+      "bytes": 1272,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-events.html": {
+      "blokken": 1,
+      "bytes": 650,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-expeditie.html": {
+      "blokken": 1,
+      "bytes": 609,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-haccp.html": {
+      "blokken": 1,
+      "bytes": 678,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-hotel.html": {
+      "blokken": 1,
+      "bytes": 706,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/horeca-pda.html": {
+      "blokken": 1,
+      "bytes": 4358,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/horeca-vloer.html": {
+      "blokken": 1,
+      "bytes": 4216,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/ik.html": {
+      "blokken": 2,
+      "bytes": 10200,
+      "important": 47,
+      "hex": 58
+    },
+    "public/apps/isolatie.html": {
+      "blokken": 1,
+      "bytes": 4339,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/juridisch.html": {
+      "blokken": 1,
+      "bytes": 1356,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/juridisch/partnervoorwaarden.html": {
+      "blokken": 1,
+      "bytes": 4240,
+      "important": 0,
+      "hex": 10
+    },
+    "public/apps/juridisch/privacy.html": {
+      "blokken": 1,
+      "bytes": 4240,
+      "important": 0,
+      "hex": 10
+    },
+    "public/apps/juridisch/voorwaarden.html": {
+      "blokken": 1,
+      "bytes": 4088,
+      "important": 0,
+      "hex": 9
+    },
+    "public/apps/kantoor.html": {
+      "blokken": 2,
+      "bytes": 3918,
+      "important": 3,
+      "hex": 0
+    },
+    "public/apps/kantoorpda.html": {
+      "blokken": 1,
+      "bytes": 219,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/kantoren.html": {
+      "blokken": 5,
+      "bytes": 44015,
+      "important": 0,
+      "hex": 56
+    },
+    "public/apps/kassa.html": {
+      "blokken": 2,
+      "bytes": 4730,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/klankwerk-kantoor.html": {
+      "blokken": 1,
+      "bytes": 2518,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/klankwerk.html": {
+      "blokken": 2,
+      "bytes": 7439,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/kosten.html": {
+      "blokken": 1,
+      "bytes": 6450,
+      "important": 1,
+      "hex": 1
+    },
+    "public/apps/krant.html": {
+      "blokken": 2,
+      "bytes": 4769,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/lab.html": {
+      "blokken": 2,
+      "bytes": 3939,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/labfonds.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/labpas.html": {
+      "blokken": 2,
+      "bytes": 4413,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/leerhuis-werk.html": {
+      "blokken": 1,
+      "bytes": 3158,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/leerhuis.html": {
+      "blokken": 1,
+      "bytes": 2257,
+      "important": 0,
+      "hex": 2
+    },
+    "public/apps/lesmaker.html": {
+      "blokken": 2,
+      "bytes": 3763,
+      "important": 0,
+      "hex": 10
+    },
+    "public/apps/leven.html": {
+      "blokken": 1,
+      "bytes": 1174,
+      "important": 0,
+      "hex": 10
+    },
+    "public/apps/leverancier-aanvragen.html": {
+      "blokken": 1,
+      "bytes": 3430,
+      "important": 1,
+      "hex": 5
+    },
+    "public/apps/leverancier-commerce.html": {
+      "blokken": 1,
+      "bytes": 4648,
+      "important": 5,
+      "hex": 4
+    },
+    "public/apps/leverancier-rtmail.html": {
+      "blokken": 2,
+      "bytes": 7989,
+      "important": 0,
+      "hex": 9
+    },
+    "public/apps/leverancier-service.html": {
+      "blokken": 1,
+      "bytes": 3439,
+      "important": 1,
+      "hex": 5
+    },
+    "public/apps/leverancier.html": {
+      "blokken": 2,
+      "bytes": 101760,
+      "important": 2,
+      "hex": 155
+    },
+    "public/apps/life.html": {
+      "blokken": 2,
+      "bytes": 4169,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/lifestyle.html": {
+      "blokken": 1,
+      "bytes": 7681,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/livinglab.html": {
+      "blokken": 2,
+      "bytes": 6595,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/logboek.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/loonstrook.html": {
+      "blokken": 1,
+      "bytes": 2640,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/loopbaan.html": {
+      "blokken": 1,
+      "bytes": 4383,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/loopbaanbewijs.html": {
+      "blokken": 1,
+      "bytes": 2783,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/magnaat-kantoor.html": {
+      "blokken": 1,
+      "bytes": 13447,
+      "important": 0,
+      "hex": 53
+    },
+    "public/apps/magnaat-partnerstudio.html": {
+      "blokken": 1,
+      "bytes": 14313,
+      "important": 0,
+      "hex": 29
+    },
+    "public/apps/magnaat.html": {
+      "blokken": 2,
+      "bytes": 44950,
+      "important": 3,
+      "hex": 173
+    },
+    "public/apps/maison.html": {
+      "blokken": 2,
+      "bytes": 3486,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/mall.html": {
+      "blokken": 3,
+      "bytes": 19269,
+      "important": 0,
+      "hex": 19
+    },
+    "public/apps/mecenaat.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/media.html": {
+      "blokken": 1,
+      "bytes": 6235,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/medicijnen.html": {
+      "blokken": 1,
+      "bytes": 1419,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/meet.html": {
+      "blokken": 2,
+      "bytes": 4465,
+      "important": 1,
+      "hex": 7
+    },
+    "public/apps/meldkamer.html": {
+      "blokken": 2,
+      "bytes": 5551,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/memo.html": {
+      "blokken": 2,
+      "bytes": 3600,
+      "important": 1,
+      "hex": 3
+    },
+    "public/apps/merken.html": {
+      "blokken": 2,
+      "bytes": 2788,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/metier.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/mijn-gegevens.html": {
+      "blokken": 1,
+      "bytes": 5616,
+      "important": 1,
+      "hex": 2
+    },
+    "public/apps/mijn-isolatie.html": {
+      "blokken": 1,
+      "bytes": 3333,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/mijn-neigingen.html": {
+      "blokken": 1,
+      "bytes": 4792,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/mijn-post.html": {
+      "blokken": 1,
+      "bytes": 4222,
+      "important": 1,
+      "hex": 2
+    },
+    "public/apps/mijn-relaties.html": {
+      "blokken": 1,
+      "bytes": 6288,
+      "important": 6,
+      "hex": 3
+    },
+    "public/apps/mijn-sessies.html": {
+      "blokken": 1,
+      "bytes": 5758,
+      "important": 6,
+      "hex": 3
+    },
+    "public/apps/mijnmall.html": {
+      "blokken": 1,
+      "bytes": 4655,
+      "important": 1,
+      "hex": 6
+    },
+    "public/apps/muziek.html": {
+      "blokken": 2,
+      "bytes": 10391,
+      "important": 3,
+      "hex": 27
+    },
+    "public/apps/nalatenschap.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/nieuws.html": {
+      "blokken": 2,
+      "bytes": 4154,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/notities.html": {
+      "blokken": 2,
+      "bytes": 5907,
+      "important": 1,
+      "hex": 5
+    },
+    "public/apps/office.html": {
+      "blokken": 2,
+      "bytes": 25086,
+      "important": 2,
+      "hex": 51
+    },
+    "public/apps/onderneming.html": {
+      "blokken": 1,
+      "bytes": 6039,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/oog.html": {
+      "blokken": 1,
+      "bytes": 4472,
+      "important": 2,
+      "hex": 5
+    },
+    "public/apps/overheid.html": {
+      "blokken": 3,
+      "bytes": 9066,
+      "important": 0,
+      "hex": 19
+    },
+    "public/apps/overheidspda.html": {
+      "blokken": 2,
+      "bytes": 5064,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/pakketten.html": {
+      "blokken": 1,
+      "bytes": 5096,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/partner-worden.html": {
+      "blokken": 2,
+      "bytes": 5239,
+      "important": 6,
+      "hex": 11
+    },
+    "public/apps/passkeys.html": {
+      "blokken": 2,
+      "bytes": 3289,
+      "important": 2,
+      "hex": 4
+    },
+    "public/apps/pay.html": {
+      "blokken": 2,
+      "bytes": 8511,
+      "important": 0,
+      "hex": 17
+    },
+    "public/apps/payroll.html": {
+      "blokken": 2,
+      "bytes": 4815,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/personeel.html": {
+      "blokken": 3,
+      "bytes": 32828,
+      "important": 0,
+      "hex": 63
+    },
+    "public/apps/platformregister.html": {
+      "blokken": 1,
+      "bytes": 4504,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/podium.html": {
+      "blokken": 2,
+      "bytes": 5670,
+      "important": 2,
+      "hex": 8
+    },
+    "public/apps/pulse.html": {
+      "blokken": 2,
+      "bytes": 6992,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/rechtbank.html": {
+      "blokken": 2,
+      "bytes": 6724,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/redactie-pda.html": {
+      "blokken": 2,
+      "bytes": 3885,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/redactie.html": {
+      "blokken": 2,
+      "bytes": 10356,
+      "important": 0,
+      "hex": 9
+    },
+    "public/apps/redactiekantoor.html": {
+      "blokken": 2,
+      "bytes": 5811,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/rijksloket.html": {
+      "blokken": 3,
+      "bytes": 7866,
+      "important": 0,
+      "hex": 8
+    },
+    "public/apps/rtg.html": {
+      "blokken": 2,
+      "bytes": 13109,
+      "important": 11,
+      "hex": 25
+    },
+    "public/apps/rtgcode.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/rtgid.html": {
+      "blokken": 2,
+      "bytes": 3862,
+      "important": 1,
+      "hex": 5
+    },
+    "public/apps/rtgkantoor.html": {
+      "blokken": 2,
+      "bytes": 4594,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/rtgone.html": {
+      "blokken": 2,
+      "bytes": 6647,
+      "important": 0,
+      "hex": 24
+    },
+    "public/apps/rtgschool.html": {
+      "blokken": 2,
+      "bytes": 5419,
+      "important": 1,
+      "hex": 6
+    },
+    "public/apps/rtmail.html": {
+      "blokken": 2,
+      "bytes": 9970,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/salon.html": {
+      "blokken": 2,
+      "bytes": 10235,
+      "important": 2,
+      "hex": 8
+    },
+    "public/apps/scanner.html": {
+      "blokken": 1,
+      "bytes": 3044,
+      "important": 1,
+      "hex": 3
+    },
+    "public/apps/scherm.html": {
+      "blokken": 2,
+      "bytes": 4496,
+      "important": 1,
+      "hex": 4
+    },
+    "public/apps/schoolpartner.html": {
+      "blokken": 2,
+      "bytes": 6009,
+      "important": 2,
+      "hex": 6
+    },
+    "public/apps/service-bel.html": {
+      "blokken": 1,
+      "bytes": 2274,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/service.html": {
+      "blokken": 1,
+      "bytes": 5247,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/sitemaker.html": {
+      "blokken": 2,
+      "bytes": 9160,
+      "important": 0,
+      "hex": 8
+    },
+    "public/apps/sociaal.html": {
+      "blokken": 1,
+      "bytes": 4435,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/spelen.html": {
+      "blokken": 2,
+      "bytes": 11774,
+      "important": 0,
+      "hex": 44
+    },
+    "public/apps/spelscherm.html": {
+      "blokken": 1,
+      "bytes": 1723,
+      "important": 0,
+      "hex": 12
+    },
+    "public/apps/sport.html": {
+      "blokken": 1,
+      "bytes": 5325,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/sportclub.html": {
+      "blokken": 2,
+      "bytes": 6274,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/stadsdoos.html": {
+      "blokken": 2,
+      "bytes": 4215,
+      "important": 0,
+      "hex": 6
+    },
+    "public/apps/studio-pda.html": {
+      "blokken": 2,
+      "bytes": 3170,
+      "important": 0,
+      "hex": 5
+    },
+    "public/apps/table.html": {
+      "blokken": 2,
+      "bytes": 3904,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/techniek.html": {
+      "blokken": 2,
+      "bytes": 12915,
+      "important": 0,
+      "hex": 29
+    },
+    "public/apps/theater.html": {
+      "blokken": 2,
+      "bytes": 5145,
+      "important": 2,
+      "hex": 6
+    },
+    "public/apps/thuis.html": {
+      "blokken": 2,
+      "bytes": 8847,
+      "important": 0,
+      "hex": 20
+    },
+    "public/apps/thuisrust.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/thuiswacht.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/tijdlijn.html": {
+      "blokken": 1,
+      "bytes": 827,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/training.html": {
+      "blokken": 1,
+      "bytes": 1318,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/uitgaan.html": {
+      "blokken": 3,
+      "bytes": 7346,
+      "important": 0,
+      "hex": 12
+    },
+    "public/apps/veilig.html": {
+      "blokken": 1,
+      "bytes": 1961,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/verificatie.html": {
+      "blokken": 1,
+      "bytes": 3355,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/vertaler.html": {
+      "blokken": 2,
+      "bytes": 4699,
+      "important": 1,
+      "hex": 3
+    },
+    "public/apps/vertegenwoordiging.html": {
+      "blokken": 1,
+      "bytes": 4561,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/vitaal.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/voeding.html": {
+      "blokken": 1,
+      "bytes": 1362,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/vonk.html": {
+      "blokken": 1,
+      "bytes": 2227,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/wallet.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/wbw.html": {
+      "blokken": 1,
+      "bytes": 680,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/websitestudio.html": {
+      "blokken": 3,
+      "bytes": 12022,
+      "important": 3,
+      "hex": 16
+    },
+    "public/apps/wereld.html": {
+      "blokken": 1,
+      "bytes": 13871,
+      "important": 0,
+      "hex": 4
+    },
+    "public/apps/werk.html": {
+      "blokken": 1,
+      "bytes": 877,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/werkplek.html": {
+      "blokken": 2,
+      "bytes": 6532,
+      "important": 0,
+      "hex": 1
+    },
+    "public/apps/werkruimte.html": {
+      "blokken": 1,
+      "bytes": 474,
+      "important": 0,
+      "hex": 0
+    },
+    "public/apps/zaakpay.html": {
+      "blokken": 1,
+      "bytes": 4133,
+      "important": 0,
+      "hex": 11
+    },
+    "public/apps/zaakweb.html": {
+      "blokken": 2,
+      "bytes": 2678,
+      "important": 0,
+      "hex": 7
+    },
+    "public/apps/zaal.html": {
+      "blokken": 2,
+      "bytes": 5148,
+      "important": 0,
+      "hex": 3
+    },
+    "public/apps/zorgbalie.html": {
+      "blokken": 1,
+      "bytes": 219,
+      "important": 0,
+      "hex": 3
+    },
+    "public/site/404.html": {
+      "blokken": 1,
+      "bytes": 897,
+      "important": 0,
+      "hex": 6
+    }
+  },
+  "injectie": {
+    "public/apps/app-main.js": 1,
+    "public/apps/app-main/app-main-55.js": 1,
+    "public/apps/boardroom-eigenaar.js": 1,
+    "public/apps/foundation/gezin-rt.js": 1,
+    "public/apps/foundation/gezin-rt/gezin-rt-03.js": 1,
+    "public/apps/foundation/palet.js": 1,
+    "public/apps/foundation/samen.js": 2,
+    "public/apps/foundation/samen/samen-01.js": 1,
+    "public/apps/foundation/samen/samen-02.js": 1,
+    "public/apps/foundation/schil-os.js": 2,
+    "public/apps/foundation/sessie.js": 4,
+    "public/apps/foundation/sessie/sessie-00.js": 1,
+    "public/apps/foundation/sessie/sessie-02.js": 1,
+    "public/apps/foundation/sessie/sessie-03.js": 2,
+    "public/apps/foundation/sw.js": 41,
+    "public/apps/geld/balans.js": 1,
+    "public/apps/geld/bank.js": 1,
+    "public/apps/geld/labfonds.js": 1,
+    "public/apps/geld/lidmaatschap.js": 1,
+    "public/apps/geld/logboek.js": 1,
+    "public/apps/geld/mecenaat.js": 1,
+    "public/apps/geld/metier.js": 1,
+    "public/apps/geld/nalatenschap.js": 1,
+    "public/apps/geld/overzicht.js": 1,
+    "public/apps/geld/overzichtb.js": 1,
+    "public/apps/geld/rtgcodeb.js": 1,
+    "public/apps/geld/waarde.js": 1,
+    "public/apps/geld/wallet.js": 1,
+    "public/apps/geld/wbw.js": 1,
+    "public/apps/lab-pro.js": 1,
+    "public/apps/leverancier.js": 3,
+    "public/apps/leverancier/leverancier-78.js": 2,
+    "public/apps/leverancier/leverancier-79.js": 1,
+    "public/apps/livinglab-observatorium.js": 1,
+    "public/apps/magnaat-sandbox.js": 1,
+    "public/shared/appmenu.js": 1,
+    "public/shared/appmenu/appmenu-02.js": 1,
+    "public/shared/basis.js": 7,
+    "public/shared/basis/basis-01.js": 4,
+    "public/shared/basis/basis-01b.js": 2,
+    "public/shared/basis/basis-02.js": 1,
+    "public/shared/bediening.js": 1,
+    "public/shared/bediening/bediening-01.js": 1,
+    "public/shared/borden.js": 1,
+    "public/shared/borden/borden-01.js": 1,
+    "public/shared/bureaupda.js": 1,
+    "public/shared/bureaupda/bureaupda-02.js": 1,
+    "public/shared/collegachat.js": 1,
+    "public/shared/command/bladhaak.js": 1,
+    "public/shared/cookie.js": 1,
+    "public/shared/cookie/cookie-01.js": 1,
+    "public/shared/deelmenu.js": 1,
+    "public/shared/deelmenu/deelmenu-02.js": 1,
+    "public/shared/deur.js": 1,
+    "public/shared/edge/conceptwerk.js": 1,
+    "public/shared/focus.js": 1,
+    "public/shared/gebaar.js": 2,
+    "public/shared/gebaar/gebaar-01.js": 2,
+    "public/shared/handenvrij-balk.js": 1,
+    "public/shared/handenvrij-balk/handenvrij-balk-01b.js": 1,
+    "public/shared/handenvrij-bureau.js": 1,
+    "public/shared/handenvrij-bureau/handenvrij-bureau-01.js": 1,
+    "public/shared/handenvrij-chat.js": 1,
+    "public/shared/handenvrij-geld.js": 1,
+    "public/shared/handenvrij-oog.js": 1,
+    "public/shared/handenvrij-scherm.js": 1,
+    "public/shared/handenvrij-scherm/handenvrij-scherm-01.js": 1,
+    "public/shared/i18n.js": 1,
+    "public/shared/i18n/i18n-03.js": 1,
+    "public/shared/inlogkleur.js": 1,
+    "public/shared/ios.js": 2,
+    "public/shared/ios/ios-02b.js": 2,
+    "public/shared/kaart.js": 1,
+    "public/shared/kantoorgesprek.js": 1,
+    "public/shared/klok.js": 1,
+    "public/shared/klok/klok-01.js": 1,
+    "public/shared/klok3d.js": 1,
+    "public/shared/klok3d/klok3d-01.js": 1,
+    "public/shared/kostenbeeld.js": 1,
+    "public/shared/levendekleur.js": 1,
+    "public/shared/levendekleur/levendekleur-02.js": 1,
+    "public/shared/metgezel.js": 2,
+    "public/shared/metgezel/metgezel-01b.js": 1,
+    "public/shared/metgezel/metgezel-01b2.js": 1,
+    "public/shared/ondernemerpoort.js": 1,
+    "public/shared/ondertitelband.js": 1,
+    "public/shared/overdracht.js": 1,
+    "public/shared/paspoortscan.js": 1,
+    "public/shared/plaatsdienst.js": 1,
+    "public/shared/plaatsnadering.js": 1,
+    "public/shared/plek.js": 1,
+    "public/shared/poortgesprek.js": 1,
+    "public/shared/rahul-mond.js": 2,
+    "public/shared/rahul-tab/style-base.js": 1,
+    "public/shared/rahul-tab/style-twin.js": 1,
+    "public/shared/rahulpoort.js": 1,
+    "public/shared/rahulpoort/rahulpoort-01.js": 1,
+    "public/shared/randen.js": 3,
+    "public/shared/rtg-adaptive-edge-loader.js": 3,
+    "public/shared/rtg-edge-2-loader.js": 1,
+    "public/shared/rtg-heritage-order.js": 2,
+    "public/shared/rtg-school-session.js": 1,
+    "public/shared/rtg-world-desktop.js": 1,
+    "public/shared/scanknop.js": 1,
+    "public/shared/sneltoets.js": 1,
+    "public/shared/social-intelligence.js": 2,
+    "public/shared/split.js": 1,
+    "public/shared/spraak.js": 1,
+    "public/shared/sprong.js": 1,
+    "public/shared/sprong/sprong-02.js": 1,
+    "public/shared/teamcall.js": 2,
+    "public/shared/teamcall/teamcall-01.js": 1,
+    "public/shared/teamcall/teamcall-01b.js": 1,
+    "public/shared/thema.js": 1,
+    "public/shared/toegang.js": 2,
+    "public/shared/uitvoer.js": 1,
+    "public/shared/uitvoer/uitvoer-02.js": 1,
+    "public/shared/uurwerk.js": 2,
+    "public/shared/volscherm.js": 1,
+    "public/shared/werkos.js": 2,
+    "public/shared/werkos/werkos-01c.js": 1,
+    "public/shared/werkos/werkos-03.js": 1,
+    "public/shared/zaakcommand.js": 1,
+    "public/shared/zaakcommand/zaakcommand-01.js": 1,
+    "public/sw.js": 30
+  }
+}

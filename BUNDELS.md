@@ -431,7 +431,7 @@ omlaag.
 
 ## `apps/residentie.js`
 
-`public/apps/residentie/` -- 16 delen, 2039 regels in de delen
+`public/apps/residentie/` -- 16 delen, 2053 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -568,7 +568,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 933 regels in de delen
+`public/shared/basis/` -- 10 delen, 939 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -769,7 +769,7 @@ omlaag.
 
 ## `shared/media.js`
 
-`public/shared/media/` -- 2 delen, 191 regels in de delen
+`public/shared/media/` -- 2 delen, 194 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -866,7 +866,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 332 regels in de delen
+`public/shared/sprong/` -- 3 delen, 336 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -896,7 +896,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 297 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 296 regels in de delen
 
 | deel | onderwerp |
 |---|---|

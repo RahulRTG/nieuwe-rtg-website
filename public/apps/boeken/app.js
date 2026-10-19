@@ -2,7 +2,10 @@
    tekstbestanden uit de Bestanden-kluis) en een rustige lezer met
    instelbare lettergrootte. De leesplek gaat als een getal tussen 0 en 1
    naar je account, zodat je op elk toestel verdergaat waar je was --
-   meer dan die plek bewaart de server niet. */
+   meer dan die plek bewaart de server niet.
+   Op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom G): de plank is een
+   Collectie van tekstkaarten, de lezer een Detail. De voortgang is een
+   native <progress> en de lettermaat een data-maat: dit script zet geen stijl. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
@@ -26,19 +29,19 @@
   function balk(id) {
     var v = voortgang[id];
     var pct = v ? Math.round(v.plek * 100) : 0;
-    return '<span class="vgang" aria-hidden="true"><span style="width:' + pct + '%"></span></span>' +
-      (v ? '<span class="stil">' + (pct >= 99 ? 'uitgelezen' : pct + '% gelezen') + '</span>' : '<span class="stil">nog niet begonnen</span>');
+    return '<progress class="ds-voortgang" max="100" value="' + pct + '" aria-hidden="true"></progress>' +
+      (v ? '<span class="ds-kaart__sub">' + (pct >= 99 ? 'uitgelezen' : pct + '% gelezen') + '</span>' : '<span class="ds-kaart__sub">nog niet begonnen</span>');
   }
   function kaart(b) {
-    return '<button class="boek" data-boek="' + esc(b.boek) + '" type="button">' +
-      '<b>' + esc(b.titel) + '</b><span class="stil">' + esc(b.sub) + '</span>' + balk(b.boek) + '</button>';
+    return '<button class="ds-kaart" data-boek="' + esc(b.boek) + '" type="button"><span class="ds-kaart__inhoud">' +
+      '<span class="ds-kaart__titel">' + esc(b.titel) + '</span><span class="ds-kaart__sub">' + esc(b.sub) + '</span>' + balk(b.boek) + '</span></button>';
   }
 
   function tekenPlank(bieb, kluis) {
     $('#plank').innerHTML = bieb.map(function (b) {
       return kaart({ boek: b.id, titel: b.titel, sub: b.auteur + ' · ' + b.over + ' · ' + b.woorden + ' woorden' });
     }).join('');
-    $('#eigenKop').style.display = kluis.length ? '' : 'none';
+    $('#eigenKop').hidden = !kluis.length;
     $('#eigen').innerHTML = kluis.map(function (f) {
       return kaart({ boek: 'kluis:' + f.id, titel: f.naam.replace(/\.txt$/, ''), sub: 'uit je Bestanden-kluis' });
     }).join('');
@@ -52,7 +55,7 @@
   var bewaarBezig = Promise.resolve(true);
   function melding(tekst) {
     $('#melding').textContent = tekst;
-    $('#melding').classList.add('zie');
+    $('#melding').classList.add('toon');
   }
   function plekVan(el) {
     var ruimte = Math.max(1, el.scrollHeight - el.clientHeight);
@@ -102,12 +105,13 @@
       $('#tekst').textContent = b.tekst;
       $('#plankBlok').hidden = true;
       $('#leesBlok').hidden = false;
+      document.body.dataset.dsSchermtype = 'detail';
       var v = voortgang[boek];
       requestAnimationFrame(function () {
         var el = $('#tekst');
         el.scrollTop = v ? v.plek * Math.max(0, el.scrollHeight - el.clientHeight) : 0;
       });
-    }).catch(function (e) { $('#melding').textContent = e.message; $('#melding').classList.add('zie'); });
+    }).catch(function (e) { melding(e.message); });
   }
   $('#tekst').addEventListener('scroll', function () {
     if (!huidig) return;
@@ -124,6 +128,7 @@
     huidig = null;
     $('#leesBlok').hidden = true;
     $('#plankBlok').hidden = false;
+    document.body.dataset.dsSchermtype = 'collectie';
     tekenPlank(bieb, eigen);
     /* Lees pas opnieuw van de server nadat de laatste plek bevestigd is. Een
        trage GET kan de zojuist opgeslagen plek daardoor niet meer inhalen. */
@@ -133,7 +138,8 @@
   var maat = 1;
   try { maat = Number(localStorage.getItem('rtg_boeken_maat')) || 1; } catch (e) {}
   function zetMaat() {
-    $('#tekst').style.fontSize = MATEN[maat] + 'rem';
+    /* de maat is een stap (MATEN), en de lezer kent die stappen als data-maat */
+    $('#tekst').dataset.maat = String(maat);
     try { localStorage.setItem('rtg_boeken_maat', String(maat)); } catch (e) {}
   }
   $('#kleiner').addEventListener('click', function () { maat = Math.max(0, maat - 1); zetMaat(); });
@@ -152,7 +158,7 @@
         eigen = kluis;
         tekenPlank(bieb, kluis);
       })
-      .catch(function (e) { $('#plank').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; });
+      .catch(function (e) { $('#plank').innerHTML = '<p class="ds-meta">' + esc(e.message) + '</p>'; });
   }
 
   /* Meenemen: de plank zoals hij hier staat -- welk boek, van wie, en hoe ver
@@ -177,7 +183,7 @@
   }
 
   if (!token) {
-    $('#plank').innerHTML = '<p class="stil">Log eerst in op de leden-app.</p>';
+    $('#plank').innerHTML = '<p class="ds-meta">Log eerst in op de leden-app.</p>';
     return;
   }
   zetMaat();

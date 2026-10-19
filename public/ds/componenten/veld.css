@@ -1,0 +1,59 @@
+/* Veld: rij met icoon, label en waarde (Taak-scherm), of een invoerveld. */
+@layer rtg.component {
+  .ds-veld {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    align-items: center;
+    gap: var(--ds-ruimte-3);
+    min-block-size: 68px;
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-knop);
+    color: inherit;
+    text-align: start;
+    font: inherit;
+    inline-size: 100%;
+  }
+  .ds-veld__icoon { inline-size: 20px; block-size: 20px; color: var(--ds-inkt-zacht); fill: none; stroke: currentColor; stroke-width: 1.4; }
+  .ds-veld__label { display: block; font-size: var(--ds-maat-klein); font-weight: 500; }
+  /* Een invoer IN een rij (mockup Taak: Datum 17 apr. 2025): de rij is de
+     vorm, het veld zelf heeft er geen. */
+  /* Het bedienbare deel zelf haalt 24px (WCAG 2.5.8), niet alleen de rij. */
+  .ds-veld__invoer { display: block; inline-size: 100%; min-block-size: 1.75rem; padding: 0; border: 0; background: transparent; color: var(--ds-inkt-zacht); font: inherit; font-size: var(--ds-maat-klein); }
+  .ds-veld__invoer:focus { outline: none; color: var(--ds-inkt); }
+  .ds-veld:focus-within { border-color: var(--ds-accent); }
+  .ds-velden { display: grid; gap: var(--ds-ruimte-2); }
+  .ds-veld__waarde { display: block; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-veld__pijl { inline-size: 16px; block-size: 16px; color: var(--ds-inkt-zacht); fill: none; stroke: currentColor; stroke-width: 1.4; }
+  [dir="rtl"] .ds-veld__pijl { transform: scaleX(-1); }
+  .ds-invoer {
+    inline-size: 100%;
+    min-block-size: var(--ds-doel);
+    padding-inline: var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-capsule);
+    color: var(--ds-inkt);
+    font: inherit;
+  }
+  .ds-invoer:focus { border-color: var(--ds-accent); outline: none; }
+  .ds-invoer--tekst { min-block-size: 6rem; padding-block: var(--ds-ruimte-3); border-radius: var(--ds-radius-inhoud); resize: vertical; }
+  /* Een label met zijn invoer eronder; de groep legt ze in een raster. */
+  .ds-veldlabel { display: grid; gap: var(--ds-ruimte-1); font-size: var(--ds-maat-meta); font-weight: 500; color: var(--ds-inkt-zacht); }
+  .ds-veldgroep { display: grid; gap: var(--ds-ruimte-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); }
+  .ds-keuze {
+    display: grid;
+    gap: var(--ds-ruimte-1);
+    inline-size: 100%;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    color: var(--ds-inkt);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .ds-keuze[aria-pressed="true"] { border-color: var(--ds-accent); box-shadow: inset 0 0 0 1px var(--ds-accent); }
+}

@@ -9,7 +9,16 @@
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
     body: JSON.stringify(body || {})
   }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
-  function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
+  function meld(t){ const m = $('#melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove('toon'), 2600); }
+  /* Op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom G) is elke laag
+     (gids, atelier, huistelefoon, spel) een <dialog>; dit script zet nergens
+     stijl. Openen en sluiten lopen via deze twee, zodat een laag die al open
+     staat gewoon zijn nieuwe inhoud krijgt. */
+  function laagOpen(id){ const d = $(id); if (!d.open) d.showModal(); }
+  function laagDicht(id){ const d = $(id); if (d.open) d.close(); }
+  // een rij in een laag: een rustige ds-veld-rij, met een lid of een zaal ervoor
+  const RIJICOON = '<svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>';
+  const DEURICOON = '<svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4h12v17M4 21h16"/><circle cx="15" cy="12.5" r=".8"/></svg>';
 
   /* ---------- de wereldstaat ---------- */
   const S = {
@@ -36,9 +45,10 @@
   let W = 0, H = 0, DPR = 1, TW = 64, TH = 32, OX = 0, OY = 0, MUUR = 84;
   function maat() {
     DPR = Math.min(2, window.devicePixelRatio || 1);
-    W = window.innerWidth; H = window.innerHeight;
+    /* het vlak meet zichzelf (.ds-canvas__vlak vult het scherm); de pixels
+       volgen die maat, zodat er geen stijl uit dit script hoeft te komen */
+    W = canvas.clientWidth || window.innerWidth; H = canvas.clientHeight || window.innerHeight;
     canvas.width = W * DPR; canvas.height = H * DPR;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (S.kamer) {
       const b = S.kamer.b, d = S.kamer.d;
@@ -67,6 +77,8 @@
   /* ---------- de zaal: sfeerlicht, muren, marmer ---------- */
   function tekenZaal() {
     ctx.clearRect(0, 0, W, H);
+    // de nacht van het huis onder alles: de gloed hieronder is half doorzichtig
+    ctx.fillStyle = '#0A0908'; ctx.fillRect(0, 0, W, H);
     const b = S.kamer.b, d = S.kamer.d;
     const sfeer = S.kamer.soort === 'suite' ? KLEUR.goud : (SFEER[S.kamer.id] || KLEUR.goud);
     // avondlicht van boven: een warme gloed in de zaalkleur, met meer contrast
@@ -723,12 +735,12 @@
     if (P) return meld('Er loopt al een potje.');
     const anderen = [...S.leden.values()].filter(l => l.codenaam !== S.ik);
     if (!anderen.length) return meld('U bent hier nog alleen; nodig iemand uit via de gids of uw telefoon.');
-    $('#spelKeuze').innerHTML = '<h2>Wie daagt u uit?</h2><div class="sub">' +
-      esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</div>' +
-      anderen.map(l => '<button class="rij-item" data-daag="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">daag uit</span></button>').join('') +
-      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
-    $('#spelLaag').classList.add('open');
-    $('#spelKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Wie daagt u uit?</h2><p class="ds-meta">' +
+      esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</p>' +
+      anderen.map(l => '<button class="ds-veld" data-daag="' + esc(l.codenaam) + '">' + RIJICOON + '<span><span class="ds-veld__label">' + esc(l.codenaam) + '</span></span><span class="ds-meta">daag uit</span></button>').join('') +
+      '<button class="ds-knop ds-knop--stil ds-knop--breed" id="spelKeuzeWeg" type="button">Toch niet</button>';
+    laagOpen('#spelLaag');
+    $('#spelKeuzeWeg').addEventListener('click', () => laagDicht('#spelLaag'));
     $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', () => kiesSpel(b.dataset.daag)));
   });
 
@@ -736,7 +748,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
-    $('#spelPin').parentElement.style.opacity = (TIK[P.spel] || VRIJ[P.spel]) ? '0.25' : '1';
+    $('#spelPin').toggleAttribute('data-rust', !!(TIK[P.spel] || VRIJ[P.spel]));
     tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
@@ -748,14 +760,14 @@
           P.spelers.filter(s2 => s2.team === t).reduce((a, s2) => a + s2.punten.reduce((x, y) => x + y, 0), 0)).join(' tegen ')
       : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(P.samen ? ' en ' : ' tegen ');
     $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
-      '<span style="color:var(--rtg-leesgoud,var(--gold));"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
+      '<span> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
     $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
   }
   function meterLus(t) {
     if (!P) { meterAan = false; return; }
     requestAnimationFrame(meterLus);
     meterWaarde = Math.round((Math.sin(t / 260) * 0.5 + 0.5) * 100);
-    $('#spelPin').style.left = meterWaarde + '%';
+    $('#spelPin').value = String(meterWaarde);
   }
   $('#spelDoe').addEventListener('click', async () => {
     if (!P) return;
@@ -808,16 +820,16 @@
     if (d.uitslag) {
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
       const w = d.uitslag.winnaar;
-      $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
-        '<div class="sub">' + (d.uitslag.samen
+      $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
+        '<p class="ds-meta">' + (d.uitslag.samen
           ? esc(namen[0]) + ' · samen ' + d.uitslag.stand[0] + ' ' + (P ? esc(P.eenheid) : '')
-          : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</div>' +
-        '<p style="margin:0.5rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
+          : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</p>' +
+        '<p class="ds-kaart__titel">' +
         (d.uitslag.samen ? 'Wat een paar. De vloer was van u.'
           : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
-        '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
-      $('#spelLaag').classList.add('open');
-      $('#spelUitslagWeg').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); sceneDicht(); });
+        '<button class="ds-knop ds-knop--primair ds-knop--breed" id="spelUitslagWeg" type="button">Verder</button>';
+      laagOpen('#spelLaag');
+      $('#spelUitslagWeg').addEventListener('click', () => { laagDicht('#spelLaag'); sceneDicht(); });
       P = null; $('#spelBalk').hidden = true;
       return;
     }
@@ -826,19 +838,19 @@
 
   function spelSein(d) {
     if (d.kind === 'spel-uitnodiging') {
-      $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
-        '<div class="sub">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-        '<button class="knop2 h-flex1" id="spelJa" type="button">Graag</button>' +
-        '<button class="knop2 stil2 h-flex1" id="spelNee" type="button">Nu even niet</button></div>';
-      $('#spelLaag').classList.add('open');
+      $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Een uitnodiging</h2>' +
+        '<p class="ds-meta">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</p>' +
+        '<div class="ds-dialoog__acties">' +
+        '<button class="ds-knop ds-knop--primair" id="spelJa" type="button">Graag</button>' +
+        '<button class="ds-knop ds-knop--stil" id="spelNee" type="button">Nu even niet</button></div>';
+      laagOpen('#spelLaag');
       $('#spelJa').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { const r = await api('/api/residentie/spel/antwoord', { ja: true }); if (r.potje) startPotje(r.potje); }
         catch (e) { meld(e.message); }
       });
       $('#spelNee').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { await api('/api/residentie/spel/antwoord', { ja: false }); } catch (e) {}
       });
     }
@@ -855,15 +867,14 @@
   function toonVraag(v) {
     if (typeof v === 'string') v = { tekst: v };
     const k = $('#vraagKaart'), rahul = v.van === 'rahul';
-    k.classList.toggle('rahul', rahul);
-    k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:' +
-      (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:0.25rem;">' +
+    k.dataset.van = rahul ? 'rahul' : 'huis';
+    k.innerHTML = '<p class="ds-label">' +
       (rahul ? 'Rahul · directeur van het huis' : 'Vraag van het huis') +
-      (v.niveau ? ' · ' + esc(v.niveau) : '') + '</div>' +
-      (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:0.25rem;">' + esc(v.intro) + '</div>' : '') +
-      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(v.tekst) + '</div>';
-    k.classList.add('open');
-    clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), rahul ? 16000 : 12000);
+      (v.niveau ? ' · ' + esc(v.niveau) : '') + '</p>' +
+      (rahul && v.intro ? '<p class="ds-meta">' + esc(v.intro) + '</p>' : '') +
+      '<p class="ds-kaart__titel">' + esc(v.tekst) + '</p>';
+    k.hidden = false;
+    clearTimeout(k._t); k._t = setTimeout(() => { k.hidden = true; }, rahul ? 16000 : 12000);
   }
   $('#knopVraag').addEventListener('click', async () => {
     try { toonVraag(await api('/api/residentie/vraag', {})); }
@@ -878,29 +889,29 @@
     try {
       const d = await api('/api/residentie/huis', {});
       $('#belLijst').innerHTML = d.leden.length ? d.leden.map(l =>
-        '<button class="rij-item" data-bel="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b><span class="m">nu in ' + esc(l.kamer) + '</span></span>' +
-        '<span class="tel">nodig uit</span></button>').join('')
-        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Er is nu verder niemand in het huis.</div>';
-      $('#belLaag').classList.add('open');
+        '<button class="ds-veld" data-bel="' + esc(l.codenaam) + '">' + RIJICOON + '<span><span class="ds-veld__label">' + esc(l.codenaam) + '</span><span class="ds-veld__waarde">nu in ' + esc(l.kamer) + '</span></span>' +
+        '<span class="ds-meta">nodig uit</span></button>').join('')
+        : '<p class="ds-meta">Er is nu verder niemand in het huis.</p>';
+      laagOpen('#belLaag');
       $('#belLijst').querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', async () => {
-        $('#belLaag').classList.remove('open');
+        laagDicht('#belLaag');
         try { await api('/api/residentie/bel', { codenaam: b.dataset.bel });
           meld('Uitnodiging verstuurd naar ' + b.dataset.bel + '.'); } catch (e) { meld(e.message); }
       }));
     } catch (e) { meld(e.message); }
   }
-  $('#belDicht').addEventListener('click', () => $('#belLaag').classList.remove('open'));
+  $('#belDicht').addEventListener('click', () => laagDicht('#belLaag'));
 
   /* er wordt gebeld: iemand nodigt u uit in zijn of haar suite */
   function toonBel(d) {
-    $('#spelKeuze').innerHTML = '<h2>De telefoon gaat</h2>' +
-      '<div class="sub">' + esc(d.van) + ' nodigt u uit in de suite</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-      '<button class="knop2 h-flex1" id="belGa" type="button">Ga erheen</button>' +
-      '<button class="knop2 stil2 h-flex1" id="belNiet" type="button">Niet nu</button></div>';
-    $('#spelLaag').classList.add('open');
-    $('#belGa').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); betreed(d.adres); });
-    $('#belNiet').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">De telefoon gaat</h2>' +
+      '<p class="ds-meta">' + esc(d.van) + ' nodigt u uit in de suite</p>' +
+      '<div class="ds-dialoog__acties">' +
+      '<button class="ds-knop ds-knop--primair" id="belGa" type="button">Ga erheen</button>' +
+      '<button class="ds-knop ds-knop--stil" id="belNiet" type="button">Niet nu</button></div>';
+    laagOpen('#spelLaag');
+    $('#belGa').addEventListener('click', () => { laagDicht('#spelLaag'); betreed(d.adres); });
+    $('#belNiet').addEventListener('click', () => laagDicht('#spelLaag'));
   }
 
   /* ---------- deel 3d: samen wandelen (het paar) ----------
@@ -936,13 +947,13 @@
     }
     const anderen = [...S.leden.values()].filter(l => l.codenaam !== S.ik);
     if (!anderen.length) return meld('U bent hier nog alleen.');
-    $('#spelKeuze').innerHTML = '<h2>Samen wandelen</h2><div class="sub">vast aan elkaar door het huis, zolang u allebei hier bent</div>' +
-      anderen.map(l => '<button class="rij-item" data-paar="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">vraag</span></button>').join('') +
-      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
-    $('#spelLaag').classList.add('open');
-    $('#paarKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Samen wandelen</h2><p class="ds-meta">vast aan elkaar door het huis, zolang u allebei hier bent</p>' +
+      anderen.map(l => '<button class="ds-veld" data-paar="' + esc(l.codenaam) + '">' + RIJICOON + '<span><span class="ds-veld__label">' + esc(l.codenaam) + '</span></span><span class="ds-meta">vraag</span></button>').join('') +
+      '<button class="ds-knop ds-knop--stil ds-knop--breed" id="paarKeuzeWeg" type="button">Toch niet</button>';
+    laagOpen('#spelLaag');
+    $('#paarKeuzeWeg').addEventListener('click', () => laagDicht('#spelLaag'));
     $('#spelKeuze').querySelectorAll('[data-paar]').forEach(b => b.addEventListener('click', async () => {
-      $('#spelLaag').classList.remove('open');
+      laagDicht('#spelLaag');
       try { await api('/api/residentie/paar/vraag', { codenaam: b.dataset.paar });
         meld('Gevraagd; even wachten op ' + b.dataset.paar + '.'); } catch (e) { meld(e.message); }
     }));
@@ -960,19 +971,19 @@
 
   function paarSein(d) {
     if (d.kind === 'paar-verzoek') {
-      $('#spelKeuze').innerHTML = '<h2>Samen wandelen?</h2>' +
-        '<div class="sub">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-        '<button class="knop2 h-flex1" id="paarJa" type="button">Graag</button>' +
-        '<button class="knop2 stil2 h-flex1" id="paarNee" type="button">Liever niet</button></div>';
-      $('#spelLaag').classList.add('open');
+      $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Samen wandelen?</h2>' +
+        '<p class="ds-meta">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</p>' +
+        '<div class="ds-dialoog__acties">' +
+        '<button class="ds-knop ds-knop--primair" id="paarJa" type="button">Graag</button>' +
+        '<button class="ds-knop ds-knop--stil" id="paarNee" type="button">Liever niet</button></div>';
+      laagOpen('#spelLaag');
       $('#paarJa').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { const r = await api('/api/residentie/paar/antwoord', { ja: true }); S.paar = r.paar || d.van; zetKnopPaar(); }
         catch (e) { meld(e.message); }
       });
       $('#paarNee').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { await api('/api/residentie/paar/antwoord', { ja: false }); } catch (e) {}
       });
     }
@@ -980,14 +991,14 @@
       if (S.kamer && S.kamer.paren && !S.kamer.paren.some(p2 => p2.includes(d.a))) S.kamer.paren.push([d.a, d.b]);
       if (d.a === S.ik || d.b === S.ik) {
         S.paar = d.a === S.ik ? d.b : d.a; zetKnopPaar();
-        $('#spelKeuze').innerHTML = '<h2>U wandelt samen</h2>' +
-          '<div class="sub">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</div>' +
-          '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-          '<button class="knop2 h-flex1" id="paarVriend" type="button">Word ook vrienden</button>' +
-          '<button class="knop2 stil2 h-flex1" id="paarKlaar" type="button">Verder</button></div>';
-        $('#spelLaag').classList.add('open');
-        $('#paarVriend').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); wordVrienden(S.paar); });
-        $('#paarKlaar').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+        $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">U wandelt samen</h2>' +
+          '<p class="ds-meta">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</p>' +
+          '<div class="ds-dialoog__acties">' +
+          '<button class="ds-knop ds-knop--primair" id="paarVriend" type="button">Word ook vrienden</button>' +
+          '<button class="ds-knop ds-knop--stil" id="paarKlaar" type="button">Verder</button></div>';
+        laagOpen('#spelLaag');
+        $('#paarVriend').addEventListener('click', () => { laagDicht('#spelLaag'); wordVrienden(S.paar); });
+        $('#paarKlaar').addEventListener('click', () => laagDicht('#spelLaag'));
       } else meld(d.a + ' en ' + d.b + ' wandelen nu samen.');
     }
     if (d.kind === 'paar-los') {
@@ -1114,9 +1125,8 @@
   function sceneMaat() {
     if (!SC.aan) return;
     SDPR = Math.min(2, window.devicePixelRatio || 1);
-    SW = window.innerWidth; SH = window.innerHeight;
+    SW = veld.clientWidth || window.innerWidth; SH = veld.clientHeight || window.innerHeight;
     veld.width = SW * SDPR; veld.height = SH * SDPR;
-    veld.style.width = SW + 'px'; veld.style.height = SH + 'px';
     sctx.setTransform(SDPR, 0, 0, SDPR, 0, 0);
   }
   window.addEventListener('resize', sceneMaat);
@@ -1125,11 +1135,12 @@
     if (!SCENES[spel]) return;
     SC.aan = true; SC.spel = spel; SC.anims = [];
     if (SCENES[spel].reset) SCENES[spel].reset();
-    veld.hidden = false; document.body.classList.add('scene-aan');
+    /* tijdens een potje wijkt de kop van de zaal: alle aandacht naar het speelveld */
+    veld.hidden = false; document.body.classList.add('scene-aan'); $('#zaalKop').hidden = true;
     sceneMaat();
     requestAnimationFrame(sceneLus);
   }
-  function sceneDicht() { SC.aan = false; veld.hidden = true; document.body.classList.remove('scene-aan'); }
+  function sceneDicht() { SC.aan = false; veld.hidden = true; document.body.classList.remove('scene-aan'); $('#zaalKop').hidden = false; }
 
   function sceneLus() {
     if (!SC.aan) return;
@@ -1853,23 +1864,23 @@
     const zaalSpel = S.kamer && SPELZAAL[S.kamer.id];
     // sommige zalen hebben een tweede tafel naast het zaalspel
     const tweede = S.kamer && S.kamer.id === 'biljart' ? [['pool', 'Pool', 'de tafel met de zes zakken']] : [];
-    $('#spelKeuze').innerHTML = '<h2>' + esc(codenaam) + ' uitdagen</h2>' +
-      '<div class="sub">kies waarmee u het ijs breekt</div>' +
-      (zaalSpel ? '<button class="rij-item" id="kiesZaal" type="button"><span><b>Het spel van de zaal</b></span><span class="tel">' + esc(zaalSpel) + '</span></button>' : '') +
-      tweede.map(([k, n, t2]) => '<button class="rij-item" data-zaal2="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">' + t2 + '</span></button>').join('') +
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">' + esc(codenaam) + ' uitdagen</h2>' +
+      '<p class="ds-meta">kies waarmee u het ijs breekt</p>' +
+      (zaalSpel ? '<button class="ds-veld" id="kiesZaal" type="button">' + RIJICOON + '<span><span class="ds-veld__label">Het spel van de zaal</span></span><span class="ds-meta">' + esc(zaalSpel) + '</span></button>' : '') +
+      tweede.map(([k, n, t2]) => '<button class="ds-veld" data-zaal2="' + k + '" type="button">' + RIJICOON + '<span><span class="ds-veld__label">' + n + '</span></span><span class="ds-meta">' + t2 + '</span></button>').join('') +
       Object.entries(KAST).map(([k, n]) =>
-        '<button class="rij-item" data-kast="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">aan de speeltafel</span></button>').join('') +
-      '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
-    $('#kiesWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+        '<button class="ds-veld" data-kast="' + k + '" type="button">' + RIJICOON + '<span><span class="ds-veld__label">' + n + '</span></span><span class="ds-meta">aan de speeltafel</span></button>').join('') +
+      '<button class="ds-knop ds-knop--stil ds-knop--breed" id="kiesWeg" type="button">Toch niet</button>';
+    $('#kiesWeg').addEventListener('click', () => laagDicht('#spelLaag'));
     if (zaalSpel) $('#kiesZaal').addEventListener('click', async () => {
-      $('#spelLaag').classList.remove('open');
+      laagDicht('#spelLaag');
       try {
         await api('/api/residentie/spel/daag', { codenaam, spel: zaalSpel });
         meld('Uitnodiging verstuurd; even wachten op ' + codenaam + '.');
       } catch (e) { meld(e.message); }
     });
     $('#spelKeuze').querySelectorAll('[data-zaal2]').forEach(b2 => b2.addEventListener('click', async () => {
-      $('#spelLaag').classList.remove('open');
+      laagDicht('#spelLaag');
       try {
         await api('/api/residentie/spel/daag', { codenaam, spel: b2.dataset.zaal2 });
         meld('Uitnodiging verstuurd; even wachten op ' + codenaam + '.');
@@ -1885,14 +1896,14 @@
 
   // de tafel is gedekt: het potje staat klaar op de speeltafel
   function naarTafel(id, naam, wie) {
-    $('#spelKeuze').innerHTML = '<h2>De tafel is gedekt</h2>' +
-      '<div class="sub">' + esc(naam) + ' met ' + esc(wie) + ' -- de uitnodiging is onderweg</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-      '<button class="knop2 h-flex1" id="tafelGa" type="button">Naar de speeltafel</button>' +
-      '<button class="knop2 stil2 h-flex1" id="tafelHier" type="button">Hier wachten</button></div>';
-    $('#spelLaag').classList.add('open');
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">De tafel is gedekt</h2>' +
+      '<p class="ds-meta">' + esc(naam) + ' met ' + esc(wie) + ' -- de uitnodiging is onderweg</p>' +
+      '<div class="ds-dialoog__acties">' +
+      '<button class="ds-knop ds-knop--primair" id="tafelGa" type="button">Naar de speeltafel</button>' +
+      '<button class="ds-knop ds-knop--stil" id="tafelHier" type="button">Hier wachten</button></div>';
+    laagOpen('#spelLaag');
     $('#tafelGa').addEventListener('click', () => { location.href = '/apps/spelen.html?potje=' + encodeURIComponent(id) + '&pas=rtg'; });
-    $('#tafelHier').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#tafelHier').addEventListener('click', () => laagDicht('#spelLaag'));
   }
 
   // een uitnodiging voor de speeltafel komt hier in het hotel binnen; de
@@ -1903,20 +1914,20 @@
     let mijn; try { mijn = await api('/api/member/spel/mijn', {}); } catch (e) { return; }
     const uit = (mijn.uitnodigingen || []).find(u => u.id === d.potje);
     if (!uit) return;
-    $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
-      '<div class="sub">' + esc(uit.van || 'een lid') + ' vraagt u aan de speeltafel voor een potje ' + esc(uit.naam || KASTNAAM[d.soort] || 'spel') + '</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-      '<button class="knop2 h-flex1" id="bordJa" type="button">Speel mee</button>' +
-      '<button class="knop2 stil2 h-flex1" id="bordNee" type="button">Nu even niet</button></div>';
-    $('#spelLaag').classList.add('open');
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Een uitnodiging</h2>' +
+      '<p class="ds-meta">' + esc(uit.van || 'een lid') + ' vraagt u aan de speeltafel voor een potje ' + esc(uit.naam || KASTNAAM[d.soort] || 'spel') + '</p>' +
+      '<div class="ds-dialoog__acties">' +
+      '<button class="ds-knop ds-knop--primair" id="bordJa" type="button">Speel mee</button>' +
+      '<button class="ds-knop ds-knop--stil" id="bordNee" type="button">Nu even niet</button></div>';
+    laagOpen('#spelLaag');
     $('#bordJa').addEventListener('click', async () => {
       try {
         await api('/api/member/spel/antwoord', { id: d.potje, akkoord: true });
         location.href = '/apps/spelen.html?potje=' + encodeURIComponent(d.potje) + '&pas=rtg';
-      } catch (e) { meld(e.message); $('#spelLaag').classList.remove('open'); }
+      } catch (e) { meld(e.message); laagDicht('#spelLaag'); }
     });
     $('#bordNee').addEventListener('click', async () => {
-      $('#spelLaag').classList.remove('open');
+      laagDicht('#spelLaag');
       try { await api('/api/member/spel/antwoord', { id: d.potje, akkoord: false }); } catch (e) {}
     });
   }
@@ -1928,34 +1939,36 @@
     try {
       const d = await api('/api/residentie/gids', {});
       $('#gidsZalen').innerHTML = d.zalen.map(z =>
-        '<button class="rij-item" data-kamer="' + esc(z.id) + '"><span><b>' + esc(z.naam) + '</b><span class="m">' + esc(z.sub) + '</span></span>' +
-        '<span class="tel">' + z.aanwezig + ' aanwezig</span></button>').join('');
+        '<button class="ds-veld" data-kamer="' + esc(z.id) + '">' + DEURICOON + '<span><span class="ds-veld__label">' + esc(z.naam) + '</span><span class="ds-veld__waarde">' + esc(z.sub) + '</span></span>' +
+        '<span class="ds-meta">' + z.aanwezig + ' aanwezig</span></button>').join('');
       $('#gidsSuites').innerHTML = d.suites.length ? d.suites.map(s2 =>
-        '<button class="rij-item" data-kamer="' + esc(s2.adres) + '"><span><b>' + esc(s2.naam) + '</b><span class="m">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
-        '<span class="tel">' + s2.aanwezig + ' aanwezig</span></button>').join('')
-        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Nog geen open suites; richt de uwe in en zet hem open.</div>';
-      $('#gidsLaag').classList.add('open');
+        '<button class="ds-veld" data-kamer="' + esc(s2.adres) + '">' + DEURICOON + '<span><span class="ds-veld__label">' + esc(s2.naam) + '</span><span class="ds-veld__waarde">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
+        '<span class="ds-meta">' + s2.aanwezig + ' aanwezig</span></button>').join('')
+        : '<p class="ds-meta">Nog geen open suites; richt de uwe in en zet hem open.</p>';
+      laagOpen('#gidsLaag');
       $('#gidsLaag').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => {
-        $('#gidsLaag').classList.remove('open');
+        laagDicht('#gidsLaag');
         S.editor = null; $('#knopAtelier').classList.remove('aan');
         betreed(b.dataset.kamer);
       }));
     } catch (e) { meld(e.message); }
   }
   $('#knopGids').addEventListener('click', toonGids);
-  $('#gidsDicht').addEventListener('click', () => $('#gidsLaag').classList.remove('open'));
+  $('#gidsDicht').addEventListener('click', () => laagDicht('#gidsLaag'));
   /* ESCAPE SLUIT DE BOVENSTE LAAG, via zijn eigen sluitknop, zodat sluiten doet
      wat het altijd deed. De gids, het atelier en de huistelefoon hadden alleen
      die knop; een toetsenbordgebruiker kwam er niet meer uit (gemeten 27
      september 2026). Een LOPEND spel sluit Escape met opzet niet: #spelWeg
      verlaat het potje, en dat hoort een bewuste tik te zijn en geen toets die je
-     per ongeluk raakt. De keuze- en uitslagschermen van het spel sluiten wel. */
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    const open = Array.from(document.querySelectorAll('section.laag.open')).pop();
-    const knop = open && open.querySelector('#gidsDicht,#atelierDicht,#belDicht,#spelKeuzeWeg,#paarKeuzeWeg,#kiesWeg,#spelUitslagWeg');
+     per ongeluk raakt. De keuze- en uitslagschermen van het spel sluiten wel.
+     Een laag is nu een <dialog>: Escape wordt daar een 'cancel' op de bovenste
+     laag. Die sluit niet vanzelf, maar drukt dezelfde sluitknop als altijd; een
+     uitnodiging (Graag / Nu even niet) blijft dus staan tot er gekozen is. */
+  document.querySelectorAll('dialog.laag').forEach(laag => laag.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    const knop = laag.querySelector('#gidsDicht,#atelierDicht,#belDicht,#spelKeuzeWeg,#paarKeuzeWeg,#kiesWeg,#spelUitslagWeg');
     if (knop && knop.offsetParent !== null) knop.click();
-  });
+  }));
 
   /* mijn suite: binnenlopen en het atelier openen */
   async function naarMijnSuite() {
@@ -1971,11 +1984,11 @@
     $('#suiteNaam').value = S.suite ? S.suite.naam : '';
     $('#suiteOpen').textContent = S.suite && S.suite.open ? 'Open voor bezoek: ja' : 'Open voor bezoek: nee';
     $('#catalogus').innerHTML = S.catalogus.map(c =>
-      '<button class="cat' + (S.editor && S.editor.soort === c.soort ? ' aan' : '') + '" data-soort="' + esc(c.soort) + '">' + esc(c.naam) +
-      '<span style="display:block;color:var(--soft);font-size:.66rem;">' + c.b + 'x' + c.d + (c.zit ? ' · zitplek' : '') + '</span></button>').join('');
+      '<button class="ds-keuze" type="button" aria-pressed="' + !!(S.editor && S.editor.soort === c.soort) + '" data-soort="' + esc(c.soort) + '">' + esc(c.naam) +
+      '\n<span class="ds-meta">' + c.b + 'x' + c.d + (c.zit ? ' · zitplek' : '') + '</span></button>').join('');
     $('#catalogus').querySelectorAll('[data-soort]').forEach(b => b.addEventListener('click', () => {
       S.editor = { soort: b.dataset.soort };
-      $('#atelierWeg').classList.remove('aan');
+      $('#atelierWeg').setAttribute('aria-pressed', 'false');
       tekenAtelier();
       meld('Tik op een tegel om "' + b.textContent.split('\n')[0].trim() + '" neer te zetten.');
     }));
@@ -1983,14 +1996,14 @@
   $('#knopAtelier').addEventListener('click', async () => {
     if (!S.suite) { try { const d = await api('/api/residentie/suite', {}); S.suite = d.suite; S.catalogus = d.catalogus; } catch (e) { return meld(e.message); } }
     tekenAtelier();
-    $('#atelierLaag').classList.add('open');
+    laagOpen('#atelierLaag');
   });
-  $('#atelierDicht').addEventListener('click', () => { $('#atelierLaag').classList.remove('open'); });
+  $('#atelierDicht').addEventListener('click', () => { laagDicht('#atelierLaag'); });
   $('#atelierWeg').addEventListener('click', () => {
     S.editor = S.editor && S.editor.weg ? null : { weg: true };
-    $('#atelierWeg').classList.toggle('aan', !!(S.editor && S.editor.weg));
+    $('#atelierWeg').setAttribute('aria-pressed', String(!!(S.editor && S.editor.weg)));
     tekenAtelier();
-    if (S.editor) { $('#atelierLaag').classList.remove('open'); meld('Weghaal-modus: tik op een meubel in de suite.'); }
+    if (S.editor) { laagDicht('#atelierLaag'); meld('Weghaal-modus: tik op een meubel in de suite.'); }
   });
   $('#suiteNaamZet').addEventListener('click', async () => {
     try { const r = await api('/api/residentie/suite/zet', { naam: $('#suiteNaam').value });
@@ -2025,10 +2038,11 @@
 
   /* ---------- de start: poort of naar binnen ---------- */
   if (!TOKEN) {
-    document.querySelector('.kop').style.display = 'none';
-    $('#poort').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.5rem;">De Résidence</h2>' +
-      '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
-      '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
+    $('#zaalKop').hidden = true;
+    $('#poort').innerHTML = '<div class="ds-canvaslaag__vlak"><h2 class="ds-titel ds-titel--scherm">De Résidence</h2>' +
+      '<p class="ds-meta">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
+      '<a class="ds-knop ds-knop--primair" href="/apps/app.html">Naar de app →</a></div>';
+    $('#poort').hidden = false;
   } else {
     const wens = new URLSearchParams(location.search).get('kamer') || 'lobby';
     betreed(wens);

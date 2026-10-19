@@ -681,6 +681,15 @@ jobs:
       # houdt het eigenaarsregister tegen diezelfde meting.
       - name: De schermfunctie (loopt het register achter op de schermen)
         run: npm run schermfunctie:controle
+      # HET ONTWERPSYSTEEM (ONTWERPSYSTEEM.md). Elke ontwerpronde legde een laag
+      # bovenop de vorige tot een scherm gemiddeld 49 stijlbladen laadde; deze
+      # stap maakt dat technisch onmogelijk. Per BESTAND, niet als som: geen
+      # nieuw stijlblad buiten public/ds/, geen nieuw <style>-blok, geen extra
+      # !important of hexkleur in de erfenis, en public/ds/ zelf houdt zich aan
+      # public/ds/contract.json (cascadelagen, tokens, logische eigenschappen,
+      # thema's die alleen tokens zetten). Kost twee seconden.
+      - name: Het ontwerpsysteem (geen nieuwe stijllaag, erfenis krimpt alleen)
+        run: npm run ontwerpsysteem:controle
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.

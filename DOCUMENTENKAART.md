@@ -1748,6 +1748,16 @@ overschaduwt `window.open` die de gedeelde schil gebruikt, en die schil laadt me
 TypeError je hele werkblad voordat het gevuld is, en dat ziet eruit als een
 willekeurige flake.
 
+**`ONTWERPSYSTEEM.md` is de afdwingbare visuele architectuur** — het
+eigenaarsbesluit van 19 oktober 2026 om de vormgeving niet nog een keer bij te
+werken maar te vervangen. De diagnose: elke ontwerpronde legde een laag bovenop
+de vorige, tot een scherm gemiddeld 49 stijlbladen laadde met 7.500 keer
+`!important`. Het antwoord: alles in `public/ds/`, één blad per scherm,
+CSS-cascadelagen in plaats van laadvolgorde, vier wereldthema's die alleen
+tokens mogen zetten, en zeven schermtypen (Cover, Collectie, Taak, Detail,
+Gesprek, Canvas, Status). `npm run ontwerpsysteem:controle` houdt in CI per
+bestand tegen dat er een laag bij komt; de erfenis mag alleen krimpen.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur
@@ -1864,7 +1874,7 @@ NORM.json en geen achteruitgang. Daarnaast vond ronde 0
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
 nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
-<!--getal:edgekaart.levendeKanalen-->18<!--/getal--> levende kanalen. Het **Edge
+<!--getal:edgekaart.levendeKanalen-->19<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op

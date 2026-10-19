@@ -368,7 +368,10 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
     const buiten = [];
     for (const pad of ['/apps/navigatie.html', '/apps/ov.html', '/apps/balans.html', '/apps/home.html']) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => !!window.RTGUitvoer && document.body.dataset.rtgDesktopState === 'ready', null, { timeout: 12000 });
+      /* Een scherm op het Design System (html[data-ds]) heeft geen
+         werelddesktop die 'ready' meldt; daar is de uitvoer zelf het teken. */
+      await page.waitForFunction(() => !!window.RTGUitvoer && (document.body.dataset.rtgDesktopState === 'ready' ||
+        document.documentElement.hasAttribute('data-ds')), null, { timeout: 12000 });
       // een bron aanmelden zoals een ingelogde app dat doet; zonder bron is er
       // geen knop, en dan meet deze toets niets
       await page.evaluate(() => RTGUitvoer.bron(function () { return { kolommen: ['a'], rijen: [['1']] }; }));

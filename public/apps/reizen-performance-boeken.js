@@ -9,7 +9,7 @@
       ['DUUR', opdracht.minuten ? opdracht.minuten + ' min' : $('#ritDuur').textContent.trim()],
       ['STATUS', opdracht.status || 'Aangevraagd']
     ];
-    feiten.forEach(function (f) { var s = maak('span'); s.appendChild(maak('small', '', f[0])); s.appendChild(maak('b', '', f[1])); doel.appendChild(s); });
+    feiten.forEach(function (f) { var s = maak('li', 'ds-detail__gegeven'); s.appendChild(maak('span', 'ds-label', f[0])); s.appendChild(maak('b', '', f[1])); doel.appendChild(s); });
   }
   function toonBevestiging(opdracht) {
     $('#bevestigingLabel').textContent = 'RIT AANGEVRAAGD';

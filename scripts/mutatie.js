@@ -623,6 +623,49 @@ const EIGEN_MODULE = new Map([
   /* Reizen & Veilig: het moment uit Move en het aanbod uit de catalogus wonen
      in reizen-veilig-reis.js (11 oktober 2026). */
   ['reizen-veilig.e2e.js', ['public/apps/reizen-veilig-reis.js']],
+  /* RTG Verblijven op het Design System (TRAVELOS-MIGRATIE.md, batch 3): de
+     toets beoordeelt de voorzijde (collectie, verblijfsblad, aanvraag). */
+  ['hotels-ds.e2e.js', ['public/apps/hotels-voorzijde.js']],
+  /* Stroom E (operatie, deel 2): dispatch, chauffeur, ghost en voertuig op
+     de werklaag; elke toets beoordeelt de bron die zijn scherm tekent. */
+  ['dispatch-ds.e2e.js', ['public/apps/dispatch-voorzijde.js']],
+  ['chauffeur-ds.e2e.js', ['public/apps/chauffeur.js']],
+  ['ghost-ds.e2e.js', ['public/apps/ghost-voorzijde.js']],
+  ['voertuig-ds.e2e.js', ['public/apps/voertuig.js']],
+  /* Stroom G (plaatsbepaling): De Résidence, Boeken en Mijn Stad op het
+     Design System; elke toets beoordeelt de bron die zijn scherm tekent. */
+  /* De residence laadt de bundel public/apps/residentie.js; de delen in
+     residentie/ zijn los geen programma (zelfde vorm als werkruimte.e2e.js). */
+  ['residentie-ds.e2e.js', ['public/apps/residentie.js']],
+  ['boeken-ds.e2e.js', ['public/apps/boeken/app.js']],
+  ['stad-ds.e2e.js', ['public/apps/stad.js']],
+  /* Stroom D van de TravelOS-migratie: Hangar, Zakelijk vervoer, de
+     reisuitnodiging en Living World op het Design System. */
+  ['hangar-ds.e2e.js', ['public/apps/hangar-voorzijde.js', 'public/apps/hangar-toestel.js']],
+  ['zakelijk-ds.e2e.js', ['public/apps/zakelijk-voorzijde.js']],
+  ['reisuitnodiging-ds.e2e.js', ['public/apps/reisuitnodiging-client.js']],
+  ['living-world-ds.e2e.js', ['public/apps/living-world/client.js', 'public/apps/living-world/render.js']],
+  ['rit-ds.e2e.js', ['public/apps/rit-momenten.js']],
+  ['ov-ds.e2e.js', ['public/apps/ov.html']],
+  ['move-ds.e2e.js', ['public/apps/move.html']],
+  ['reizen-veilig-ds.e2e.js', ['public/apps/reizen-veilig.js']],
+  ['reisbureau-ds.e2e.js', ['public/apps/reisbureau-voorzijde.js']],
+  ['vluchten-ds.e2e.js', ['public/apps/vluchten-voorzijde.js']],
+  ['reisboek-ds.e2e.js', ['public/apps/reisboek.js']],
+  /* Stroom F: de kantoorschermen routedossier en routedekking op de werklaag. */
+  ['routedossier-ds.e2e.js', ['public/apps/routedossier-voorzijde.js']],
+  ['routedekking-ds.e2e.js', ['public/apps/routedekking-voorzijde.js']],
+  /* Stroom E1 van de TravelOS-migratie: de operatieschermen op de werklaag. */
+  ['luchthaven-ds.e2e.js', ['public/apps/luchthaven-bord.js', 'public/apps/werkvloer.js']],
+  ['marechaussee-ds.e2e.js', ['public/apps/marechaussee.js']],
+  ['ovdienst-ds.e2e.js', ['public/apps/ovdienst.js']],
+  ['ovroutes-ds.e2e.js', ['public/apps/ovroutes.js']],
+  ['ovcontrol-ds.e2e.js', ['public/apps/ovcontrol.js']],
+  ['reizen-ds.e2e.js', ['public/apps/reizen-register.js', 'public/apps/reizen-beeld.js', 'public/apps/reizen-beeld-editor.js', 'public/apps/reizen-regel.js', 'public/ds/register.js']],
+  ['arrival-ds.e2e.js', ['public/apps/arrival-voorzijde.js']],
+  ['flits-ds.e2e.js', ['public/apps/flits-voorzijde.js']],
+  ['navigatie-ds.e2e.js', ['public/apps/navigatie-zoek.js', 'public/apps/navigatie-bediening.js']],
+  ['ontwerpvoorbeeld.e2e.js', ['public/ds/voorbeeld.html']],
   /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
   ['move-gevolg.e2e.js', ['public/apps/move.html']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
@@ -1304,7 +1347,7 @@ const EIGEN_MODULE = new Map([
   /* De appbalktoets leest browsercode via fs; dezelfde bron hoort ook bij
      de mutatieproef, anders blijft deze toets ongemeten. */
   ['beproeving-contract.test.js', ['scripts/verhalen.js']],
-  ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie.html']],
+  ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie-zoek.js', 'public/apps/navigatie-bediening.js', 'public/apps/navigatie-start.js']],
   /* De moveproef toetst twee dingen die geen require() zijn: het INSTRUMENT
      (scripts/moveproef.js) en het SCHERM. modulesVan() ziet daardoor niets en
      noteerde 'geen module gevonden' -- niet te meten, terwijl de beweringen

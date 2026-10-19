@@ -2,7 +2,8 @@
   'use strict';
   var $ = R.$, $$ = R.$$, maak = R.maak;
   function voegChat(tekst, soort) {
-    var p = maak('p', 'chatregel ' + soort, tekst); $('#rahulChat').appendChild(p); p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    var p = maak('p', 'ds-gesprek__bericht' + (soort === 'gebruiker' ? ' ds-gesprek__bericht--eigen' : ''), tekst);
+    $('#rahulChat').appendChild(p); p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   function vraagRahul(vraag) {
     var tekst = String(vraag || '').trim(); if (!tekst) return;

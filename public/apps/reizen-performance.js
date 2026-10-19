@@ -18,8 +18,8 @@
 
   var toastTimer;
   R.toast = function (tekst) {
-    var el = R.$('#toast'); el.textContent = tekst; el.classList.add('zichtbaar');
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('zichtbaar'); }, 3200);
+    var el = R.$('#toast'); el.textContent = tekst; el.classList.add('toon');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('toon'); }, 3200);
   };
   R.dialogOpen = function (el) {
     if (!el) return;
@@ -38,12 +38,14 @@
         return data;
       }); });
   };
+  /* Datum en bedrag volgen de taal van het lid (TRAVELOS-MIGRATIE.md par. 0). */
+  R.taal = function () { return d.documentElement.lang || 'nl'; };
   R.vandaagISO = function (sprong) { return new Date(Date.now() + (sprong || 0) * 86400000).toISOString().slice(0, 10); };
   R.maak = function (tag, klasse, tekst) {
     var el = d.createElement(tag); if (klasse) el.className = klasse; if (tekst != null) el.textContent = tekst; return el;
   };
   R.eur = function (centen) {
-    return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
+    return new Intl.NumberFormat(R.taal(), { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
   };
   R.wisselBlad = function (naam, schrijfHash, opties) {
     /* De lijst bladen staat hier EEN keer; wie er een toevoegt aan het scherm
@@ -52,7 +54,7 @@
     R.staat.blad = naam;
     R.$$('[data-blad]').forEach(function (blad) { var aan = blad.dataset.blad === naam; blad.hidden = !aan; blad.classList.toggle('actief', aan); });
     R.$$('[data-tab]').forEach(function (knop) { var aan = knop.dataset.tab === naam; knop.classList.toggle('actief', aan);
-      if (aan) knop.setAttribute('aria-current', 'page'); else knop.removeAttribute('aria-current'); });
+      knop.setAttribute('aria-selected', String(aan)); });
     if (schrijfHash !== false) history.replaceState(null, '', '#' + naam);
     var bladNaam = naam.charAt(0).toUpperCase() + naam.slice(1);
     d.title = 'RTG Reizen · ' + bladNaam;
@@ -61,9 +63,12 @@
        bleef er "VANDAAG" staan terwijl je op Samen keek. Een pad dat iets
        anders zegt dan het scherm is erger dan geen pad. */
     if (w.RTGEdge && w.RTGEdge.setContext) w.RTGEdge.setContext({ title: bladNaam });
+    /* Boven de bladen staat de Cover. Een gekozen blad schuift dus naar de
+       bladen toe, en niet naar de bovenkant van de pagina (dat is de foto). */
     if (!opties || !opties.restore) {
-      var rustig = w.RTGHeritageMotion && !w.RTGHeritageMotion.allowsMotion(w, d);
-      w.scrollTo({ top: 0, behavior: rustig ? 'auto' : 'smooth' });
+      var rustig = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var plek = R.$('#inhoud');
+      if (plek && plek.scrollIntoView) plek.scrollIntoView({ block: 'start', behavior: rustig ? 'auto' : 'smooth' });
     }
     if (naam === 'samen' && opties && opties.restore && R.laadSamen) R.laadSamen();
     if (naam === 'taxi' && R.laadMobiliteit) R.laadMobiliteit();
@@ -71,7 +76,8 @@
   };
 
   R.$$('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { R.wisselBlad(b.dataset.tab); }); });
-  R.$$('[data-naar-blad]').forEach(function (b) { b.addEventListener('click', function () { R.wisselBlad(b.dataset.naarBlad); }); });
+  R.$$('[data-naar-blad]').forEach(function (b) { b.addEventListener('click', function (e) {
+    if (b.tagName === 'A') e.preventDefault(); R.wisselBlad(b.dataset.naarBlad); }); });
   R.$('[data-open-veilig]').addEventListener('click', function () { R.dialogOpen(R.$('#veiligDialoog')); });
   R.$$('[data-statusactie]').forEach(function (b) { b.addEventListener('click', function () {
     R.toast(b.dataset.statusactie === 'betaling' ? 'De veilige betaalflow wordt geopend vanuit uw reis.' : b.querySelector('b').textContent);
@@ -83,7 +89,7 @@
      vier bladen hierboven precies één keer; deze adapter biedt die bestaande
      wissel aan de RTG Command-balk aan. shared/adaptief/brug.js brengt alleen
      ids over de framegrens en stuurt een tik weer hierheen terug. Rechtstreeks
-     geopend blijft .hoofdtabs dus gewoon de bediening, op desktop eveneens. */
+     geopend blijven de .ds-tabs gewoon de bediening, op desktop eveneens. */
   function startAdaptief() {
     var A = w.RTGAdaptief;
     if (!A || w.parent === w) return;
@@ -108,4 +114,25 @@
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', startAdaptief);
   else startAdaptief();
+
+  /* EEN WERKBLAD TEKENT GEEN TWEEDE EDGE. De werktafel (shared/command/
+     bladhaak.js) markeert een blad met html.rtg-command-blad en draagt zelf de
+     ene Edge; de oude rand week daar met een stijlregel op [data-rtg-edge-bar].
+     De ds-Edge kent die markering nog niet (TRAVELOS-MIGRATIE.md, open punt
+     voor /ds/shell.js), dus wijkt hij hier zolang dit scherm een blad is.
+     Ook in elk ander kader tekent het scherm geen eigen Edge: de oude rand
+     deed dat evenmin (body.rtg-edge-embed), want de buitenste pagina draagt
+     de ene rand. Ingebed (?embed=1, bijvoorbeeld in Reizen & Veilig) draagt
+     de ouder ook de bediening; dan wijken de eigen tabs. */
+  var inKader = false;
+  try { inKader = w.top !== w.self; } catch (e) { inKader = true; }
+  function blad() {
+    var html = d.documentElement, ingebed = html.classList.contains('tos-ingebed');
+    var edge = d.querySelector('.ds-edge'), tabs = d.querySelector('.hoofdtabs');
+    if (edge) edge.hidden = inKader || ingebed || html.classList.contains('rtg-command-blad');
+    if (tabs) tabs.hidden = ingebed;
+  }
+  new MutationObserver(blad).observe(d.documentElement, { attributes: true, attributeFilter: ['class'] });
+  if (d.body) new MutationObserver(blad).observe(d.body, { childList: true });
+  blad();
 })(window, document);

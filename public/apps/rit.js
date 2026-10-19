@@ -15,7 +15,7 @@ let TAB=['chauffeur','aankomst'].includes(PARAMS.get('view'))?PARAMS.get('view')
 let RITTEN=[],ACTIEF=null,VERBLIJVEN=[],AANBOD=[],ZOEKTIJD=null,POLL=null;
 const GEKOZEN={van:null,naar:null,categorie:'taxi'};
 const api=(pad,body,herkans)=>fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));const p=herkans?null:(window.RTGGegevensPoort&&window.RTGGegevensPoort.vang(d,r.status,()=>api(pad,body,true),api));if(p)return p;if(!r.ok)throw new Error(d.error||'Dit lukt nu niet.');return d});
-function meld(t){const m=$('#melding');m.textContent=t;m.classList.add('zien');clearTimeout(m._t);m._t=setTimeout(()=>m.classList.remove('zien'),3800)}
+function meld(t){const m=$('#melding');m.textContent=t;m.classList.add('toon');clearTimeout(m._t);m._t=setTimeout(()=>m.classList.remove('toon'),3800)}
 function plaats(o){return o&&typeof o==='object'?(o.label||'Onbekende plek'):(o||'Onbekende plek')}
 function actieveRit(){return ACTIEF||RITTEN.find(r=>!['afgerekend','geannuleerd','voltooid'].includes(r.status))||RITTEN[0]||null}
 function actiefVerblijf(){return VERBLIJVEN.find(v=>v.status==='ingecheckt')||VERBLIJVEN.find(v=>v.status==='bevestigd')||VERBLIJVEN.find(v=>v.status==='aangevraagd')||null}
@@ -25,13 +25,12 @@ function zetKop(){
   $('#ritEy').textContent=k[0];$('#ritTitel').innerHTML=esc(k[1]).replace('\n','<br>');$('#ritIntro').textContent=k[2];
 }
 function zetTab(tab,schrijf){
-  TAB=['aanvragen','chauffeur','aankomst'].includes(tab)?tab:'aanvragen';document.body.dataset.ritTab=TAB;zetKop();
-  document.querySelectorAll('[data-t]').forEach(b=>{if(b.dataset.t===TAB)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
-  document.querySelectorAll('[data-rit-nav]').forEach(b=>{if(b.dataset.ritNav===TAB)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  TAB=['aanvragen','chauffeur','aankomst'].includes(tab)?tab:'aanvragen';document.body.dataset.ritTab=TAB;document.body.dataset.dsSchermtype={aanvragen:'taak',chauffeur:'detail',aankomst:'status'}[TAB];zetKop();
+  document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.t===TAB)));
   if(schrijf){const u=new URL(location.href);if(TAB==='aanvragen')u.searchParams.delete('view');else u.searchParams.set('view',TAB);history.replaceState(null,'',u.pathname+u.search)}
   teken();
 }
-function inlog(){return '<div class="rit-leeg"><span>ALLEEN VOOR LEDEN</span><h2>Uw aankomst blijft persoonlijk.</h2><p>Log in via de RTG-app om een rit aan te vragen en alleen uw eigen chauffeur te zien.</p><a href="/apps/app.html">Naar de app</a></div>'}
+function inlog(){return '<div class="ds-status ds-status--binnen"><p class="ds-label">Alleen voor leden</p><h2 class="ds-status__titel">Uw aankomst blijft persoonlijk.</h2><p class="ds-status__tekst">Log in via de RTG-app om een rit aan te vragen en alleen uw eigen chauffeur te zien.</p><a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/app.html">Naar de app</a></div>'}
 function teken(){
   if(!TOKEN){$('#inhoud').innerHTML=inlog();return}
   const ctx={$,esc,meld,plaats,api,ritten:()=>RITTEN,rit:actieveRit,verblijf:actiefVerblijf,aanbod:()=>AANBOD,gekozen:GEKOZEN,zoekPlek,vraagRit,ververs:laad,zetTab,openRit};
@@ -40,7 +39,7 @@ function teken(){
 function plekSpec(p){if(!p)return null;if(p.soort==='zaak')return{zaak:p.code};if(p.soort==='halte')return{halte:p.code};if(p.soort==='favoriet')return{favoriet:p.code};if(Number.isFinite(p.lat)&&Number.isFinite(p.lng))return{lat:p.lat,lng:p.lng,label:p.naam||p.label};return null}
 function zoekPlek(soort,q,doel){
   clearTimeout(ZOEKTIJD);GEKOZEN[soort]=null;if(q.trim().length<2){doel.hidden=true;doel.textContent='';return}
-  ZOEKTIJD=setTimeout(async()=>{try{const d=await api('/api/mob/plekken',{zoek:q.trim(),limiet:10});const lijst=d.plekken||[];doel.innerHTML=lijst.length?lijst.map((p,i)=>'<button type="button" data-plek="'+i+'"><span>'+esc(p.naam)+'</span><small>'+esc([p.genre,p.stad,p.lijn].filter(Boolean).join(' · ')||'RTG-bestemming')+'</small></button>').join(''):'<button type="button" disabled>Geen bekende plek gevonden</button>';doel.hidden=false;doel.querySelectorAll('[data-plek]').forEach(b=>b.addEventListener('click',()=>{const p=lijst[Number(b.dataset.plek)];GEKOZEN[soort]=p;document.querySelector('#'+soort+'Veld').value=p.naam;doel.hidden=true}))}catch(e){doel.hidden=true;meld(e.message)}},180);
+  ZOEKTIJD=setTimeout(async()=>{try{const d=await api('/api/mob/plekken',{zoek:q.trim(),limiet:10});const lijst=d.plekken||[];doel.innerHTML='<div class="ds-velden">'+(lijst.length?lijst.map((p,i)=>'<button class="ds-keuze" type="button" data-plek="'+i+'"><b>'+esc(p.naam)+'</b><span class="ds-meta">'+esc([p.genre,p.stad,p.lijn].filter(Boolean).join(' · ')||'RTG-bestemming')+'</span></button>').join(''):'<button class="ds-keuze" type="button" disabled>Geen bekende plek gevonden</button>')+'</div>';doel.hidden=false;doel.querySelectorAll('[data-plek]').forEach(b=>b.addEventListener('click',()=>{const p=lijst[Number(b.dataset.plek)];GEKOZEN[soort]=p;document.querySelector('#'+soort+'Veld').value=p.naam;doel.hidden=true}))}catch(e){doel.hidden=true;meld(e.message)}},180);
 }
 async function vraagRit(form){
   if(!GEKOZEN.van){meld('Kies een vertrekpunt uit de voorstellen.');$('#vanVeld').focus();return}
@@ -58,10 +57,10 @@ async function laad(){
     const uit=await Promise.all([api('/api/mob/mijn',{}),api('/api/mob/aanbod',{}),api('/api/verblijf/mijn',{}).catch(()=>({verblijven:[]}))]);
     const m=uit[0];RITTEN=(m.ritten||[]).slice();if(m.lopend&&!RITTEN.some(r=>r.ref===m.lopend.ref))RITTEN.unshift(m.lopend);AANBOD=uit[1].direct||[];VERBLIJVEN=uit[2].verblijven||[];
     ACTIEF=GEVRAAGD?RITTEN.find(r=>r.ref===GEVRAAGD)||null:m.lopend||RITTEN[0]||null;
-    if(GEVRAAGD&&!ACTIEF){$('#inhoud').innerHTML='<div class="rit-leeg"><span>UW RIT</span><h2>Deze rit is niet zichtbaar.</h2><p>De referentie staat niet bij uw ritten. Of hij niet bestaat of niet van u is, welke van de twee zegt dit scherm bewust niet.</p><button type="button" data-terug-ritten>Naar mijn ritten</button></div>';document.querySelector('[data-terug-ritten]').addEventListener('click',()=>{GEVRAAGD='';ACTIEF=RITTEN[0]||null;const u=new URL(location.href);u.searchParams.delete('rit');history.replaceState(null,'',u.pathname+u.search);zetTab('chauffeur',true)});return}
+    if(GEVRAAGD&&!ACTIEF){$('#inhoud').innerHTML='<div class="ds-status ds-status--binnen"><p class="ds-label">Uw rit</p><h2 class="ds-status__titel">Deze rit is niet zichtbaar.</h2><p class="ds-status__tekst">De referentie staat niet bij uw ritten. Of hij niet bestaat of niet van u is, welke van de twee zegt dit scherm bewust niet.</p><button class="ds-knop ds-knop--primair ds-status__actie" type="button" data-terug-ritten>Naar mijn ritten</button></div>';document.querySelector('[data-terug-ritten]').addEventListener('click',()=>{GEVRAAGD='';ACTIEF=RITTEN[0]||null;const u=new URL(location.href);u.searchParams.delete('rit');history.replaceState(null,'',u.pathname+u.search);zetTab('chauffeur',true)});return}
     teken();zetKop();startPoll();
-  }catch(e){if(/niet ingelogd/i.test(e.message)){$('#inhoud').innerHTML=inlog();return}$('#inhoud').innerHTML='<div class="rit-leeg"><span>UW AANKOMST</span><h2>Dit lukt nu niet.</h2><p>'+esc(e.message)+'</p><button type="button" data-opnieuw>Probeer opnieuw</button></div>';document.querySelector('[data-opnieuw]').addEventListener('click',laad)}
+  }catch(e){if(/niet ingelogd/i.test(e.message)){$('#inhoud').innerHTML=inlog();return}$('#inhoud').innerHTML='<div class="ds-status ds-status--binnen"><p class="ds-label">Uw aankomst</p><h2 class="ds-status__titel">Dit lukt nu niet.</h2><p class="ds-status__tekst">'+esc(e.message)+'</p><button class="ds-knop ds-knop--primair ds-status__actie" type="button" data-opnieuw>Probeer opnieuw</button></div>';document.querySelector('[data-opnieuw]').addEventListener('click',laad)}
 }
 function startPoll(){clearInterval(POLL);const r=actieveRit();if(!r||['afgerekend','geannuleerd','voltooid'].includes(r.status))return;POLL=setInterval(async()=>{if(document.hidden)return;try{const d=await api('/api/mob/volg',{ref:r.ref});ACTIEF=d.opdracht;if(TAB!=='aanvragen')teken();zetKop()}catch(e){}},12000)}
-document.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>zetTab(b.dataset.t,true)));document.querySelectorAll('[data-rit-nav]').forEach(b=>b.addEventListener('click',()=>zetTab(b.dataset.ritNav,true)));window.addEventListener('beforeunload',()=>clearInterval(POLL));zetTab(TAB,false);laad();
+document.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>zetTab(b.dataset.t,true)));window.addEventListener('beforeunload',()=>clearInterval(POLL));zetTab(TAB,false);laad();
 })();

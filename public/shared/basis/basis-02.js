@@ -1,13 +1,17 @@
   /* ---- 5. het lopende werk: de gangreserve-laag van het huis ---- */
-  var uw = document.createElement('script');
-  uw.src = '/shared/uurwerk.js'; uw.async = true;
-  (document.head || document.documentElement).appendChild(uw);
+  if (!ds) {
+    var uw = document.createElement('script');
+    uw.src = '/shared/uurwerk.js'; uw.async = true;
+    (document.head || document.documentElement).appendChild(uw);
+  }
 
   /* ---- 6. de kaart-uitwijk: geo:-links op desktop/iOS opvangen met een eigen
      paneeltje (coördinaten tonen + kopiëren), zonder iets naar derden ---- */
-  var km = document.createElement('script');
-  km.src = '/shared/kaart.js'; km.async = true;
-  (document.head || document.documentElement).appendChild(km);
+  if (!ds) {
+    var km = document.createElement('script');
+    km.src = '/shared/kaart.js'; km.async = true;
+    (document.head || document.documentElement).appendChild(km);
+  }
 
   /* ---- 7. de OS-klok is nu zelf een rustige analoge wijzerplaat (shared/klok.js):
      gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een

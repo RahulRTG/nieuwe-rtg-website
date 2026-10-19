@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T14:15:53.750Z",
-    "commit": "5e756c4f6",
+    "op": "2026-10-19T15:38:39.447Z",
+    "commit": "dfd18882",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1038,6 +1038,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "arrival-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/arrival-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "arrival-security.test.js": {
       "soort": "puur",
@@ -2316,6 +2326,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "boeken-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/boeken/app.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "boeken.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2696,6 +2714,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "chauffeur-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/chauffeur.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "chauffeur-scherm.e2e.js": {
       "soort": "server",
@@ -3858,6 +3884,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "dispatch-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/dispatch-voorzijde.js",
+      "operator": "api-actie-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "divergentie.test.js": {
       "soort": "puur",
@@ -5086,6 +5120,16 @@
       "gezakt": 1,
       "geprobeerd": 7
     },
+    "flits-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/flits-voorzijde.js",
+      "operator": "api-actie-weg#0",
+      "geprobeerd": 3
+    },
     "flits.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6227,6 +6271,16 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "ghost-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/ghost-voorzijde.js",
+      "operator": "route-doel-weg#0",
+      "geprobeerd": 2
+    },
     "ghost.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6463,6 +6517,16 @@
       "module": "scripts/handlerwacht.js",
       "operator": "true->false#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "hangar-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 6,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/hangar-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
       "geprobeerd": 1
     },
     "hardware.test.js": {
@@ -6957,6 +7021,14 @@
       "module": "server/kern/hospitality-universe/world-model.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "hotels-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/hotels-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "housekeeping.test.js": {
@@ -9160,6 +9232,16 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "living-world-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/living-world/client.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
     "living-world-http.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9544,6 +9626,16 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 10
+    },
+    "luchthaven-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 6,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/luchthaven-bord.js",
+      "operator": "browser-export-weg#0",
+      "geprobeerd": 1
     },
     "luchthaven-vip.test.js": {
       "soort": "server",
@@ -10153,6 +10245,16 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 16
+    },
+    "marechaussee-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/marechaussee.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "marechaussee.test.js": {
       "soort": "server",
@@ -10860,6 +10962,16 @@
       "gezakt": 2,
       "geprobeerd": 2
     },
+    "move-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/move.html",
+      "operator": "html-bron-weg#0",
+      "geprobeerd": 1
+    },
     "move-gevolg-adressen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11182,6 +11294,16 @@
       "module": "scripts/lib/native-artifact.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "navigatie-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/navigatie-zoek.js",
+      "operator": "api-actie-weg#0",
       "geprobeerd": 2
     },
     "navigatie-index.test.js": {
@@ -12017,6 +12139,22 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "ontwerpsysteem.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ontwerpsysteem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "ontwerpvoorbeeld.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/ds/voorbeeld.html",
+      "operator": "html-bron-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
     "onvervreemdbaar.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -12209,6 +12347,14 @@
         "testSha256": "861fdcc25324c270f5f5200ace548b82ce36251c375fb48370905d8473afad55"
       }
     },
+    "ov-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/ov.html",
+      "operator": "html-bron-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ov-operatie-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12245,6 +12391,26 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "ovcontrol-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/ovcontrol.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
+    "ovdienst-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/ovdienst.js",
+      "operator": "route-doel-weg#0",
+      "geprobeerd": 4
     },
     "overdracht.test.js": {
       "soort": "server",
@@ -12320,6 +12486,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 12,
       "scherp": "gezakt"
+    },
+    "ovroutes-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/ovroutes.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "padgrens.test.js": {
       "soort": "puur",
@@ -13830,9 +14004,27 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reisboek-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisboek.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "reisboek-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "reisbureau-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 6,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/reisbureau-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "reisbureau-genre.test.js": {
       "soort": "puur",
@@ -13980,6 +14172,16 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "reisuitnodiging-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/reisuitnodiging-client.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
     "reisuitnodiging.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14022,6 +14224,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "reizen-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reizen-register.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "reizen-veilig-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reizen-veilig.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "reizen-veilig.e2e.js": {
       "soort": "puur",
@@ -14169,6 +14387,16 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "residentie-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/residentie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
     "residentie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14305,6 +14533,16 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "rit-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/rit-momenten.js",
+      "operator": "browser-export-weg#0",
+      "geprobeerd": 1
+    },
     "ritmigratie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -14398,6 +14636,16 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "routedekking-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/routedekking-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
     "routedekking.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14411,6 +14659,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "routedossier-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/routedossier-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "routedossier.test.js": {
       "soort": "server",
@@ -17136,6 +17394,14 @@
       "gezakt": 5,
       "geprobeerd": 2
     },
+    "stad-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/stad.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "stad.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -19240,6 +19506,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "vluchten-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/vluchten-voorzijde.js",
+      "operator": "api-actie-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "voeding-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -19253,6 +19527,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "voertuig-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/voertuig.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "voertuigscherm.e2e.js": {
       "soort": "puur",
@@ -20838,6 +21120,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "zakelijk-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/zakelijk-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zakelijk.test.js": {
       "soort": "server",

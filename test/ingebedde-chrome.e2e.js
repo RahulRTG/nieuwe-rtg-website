@@ -74,15 +74,21 @@ const SCHERMEN = [
   { pad: '/apps/attenties.html', weg: SUITE },
   { pad: '/apps/sociaal-prive.html', weg: SUITE },
   { pad: '/apps/rendezvous.html', weg: SUITE, blijft: ['#tabs.dating-tabs'] },
-  { pad: '/apps/luchthaven.html', weg: ['.tos-opsnav'] },
-  { pad: '/apps/ovcontrol.html', weg: ['.tos-opsnav'] },
-  { pad: '/apps/ovdienst.html', weg: ['.tos-opsnav'] },
-  { pad: '/apps/ovroutes.html', weg: ['.tos-opsnav'] },
+  /* luchthaven, ovcontrol, ovdienst en ovroutes stonden hier met
+     `.tos-opsnav`. Ze staan sinds TRAVELOS-MIGRATIE.md par. 1b op het Design
+     System, dat geen rtg-edge-embed meer zet; hun belofte (in een kader geen
+     tweede kop, Edge of operatienavigatie, zonder kader wel) staat in
+     DS_OPERATIE hieronder, met dezelfde besturingsproef. */
   /* RTMail draagt geen platformchrome meer en staat hier als TEGENPROEF: zijn
      eigen mappenbalk hoort in een kader gewoon te blijven staan. Zijn <main>
      is `aria-hidden` en dus geen inhoudsmaat; de zichtbare romp is .rtm-binnen. */
   { pad: '/apps/rtmail.html', weg: [], blijft: ['.rtm-nav'], inhoud: '.rtm-binnen' }
 ];
+
+/* De operatieschermen op het Design System: wat in een kader weg hoort, en
+   wat zonder kader zichtbaar hoort te staan (de besturingsproef). */
+const DS_OPERATIE = ['/apps/luchthaven.html', '/apps/ovcontrol.html', '/apps/ovdienst.html', '/apps/ovroutes.html'];
+const DS_CHROME = ['.ds-kop', '.ds-edge__balk', '[data-ds-opsnav]'];
 
 /* Een gastheer die zelf niets doet. app.html leek logisch en is het niet: die
    pagina leidt zelf door, en dan verdwijnt de uitvoeringscontext onder de
@@ -271,6 +277,35 @@ test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader we
             scherm.pad + ': ' + sel + ' is buiten een kader onzichtbaar en niet door de Edge geclaimd -- ' +
             'verborgen zonder eigenaar is een functie kwijt'));
         }
+      });
+    }
+
+    for (const pad of DS_OPERATIE) {
+      await t.test(pad + ' (Design System)', async () => {
+        await page.goto(base + GASTHEER, { waitUntil: 'domcontentloaded' });
+        await page.evaluate(zetKader, { id: KADER, url: base + pad });
+        await wachtTot(page, (g) => {
+          const f = document.getElementById(g.id);
+          let d; try { d = f && f.contentDocument; } catch (e) { return false; }
+          return !!(f && f.getAttribute('data-geladen') === '1' && d && d.readyState === 'complete' &&
+            d.documentElement.hasAttribute('data-ds-ingebed') && d.querySelector('[data-ds-opsnav]') && d.querySelector('main'));
+        }, { id: KADER }, { wat: 'het kader van ' + pad + ' in de ingebedde stand' });
+        const kader = await page.evaluate((g) => {
+          const f = document.getElementById(g.id), d = f.contentDocument, w = f.contentWindow;
+          const zichtbaar = el => { const s = w.getComputedStyle(el), r = el.getBoundingClientRect();
+            return s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0; };
+          const main = d.querySelector('main');
+          return { zichtbaar: g.chrome.filter(sel => [...d.querySelectorAll(sel)].some(zichtbaar)), hoofd: zichtbaar(main) };
+        }, { id: KADER, chrome: DS_CHROME });
+        assert.deepEqual(kader.zichtbaar, [], pad + ': tweede bediening zichtbaar in een kader: ' + kader.zichtbaar.join(', '));
+        assert.equal(kader.hoofd, true, pad + ': na het weghalen staat er geen inhoud meer');
+
+        /* DE BESTURINGSPROEF: zonder kader staan ze er wel. */
+        await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
+        await wachtTot(page, (chrome) => chrome.every(sel => {
+          const el = document.querySelector(sel);
+          return el && el.getClientRects().length > 0;
+        }), DS_CHROME, { wat: pad + ' zonder kader met kop, Edge en operatienavigatie in beeld' });
       });
     }
 

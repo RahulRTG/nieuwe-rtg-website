@@ -9,6 +9,10 @@ geen moodboard en geen optioneel thema. Nieuwe en gewijzigde schermen voldoen
 aan deze grammatica zonder hun domeingedrag, live brondata, rechten of
 foutsemantiek te vervangen.
 
+> **Uitvoering:** [ONTWERPSYSTEEM.md](ONTWERPSYSTEEM.md) is de afdwingbare
+> vorm van deze grammatica (`public/ds/`, eigenaarsbesluit 19 oktober 2026),
+> inclusief capsuleknoppen, wereldaccenten en mensen in beeld (par. 4 daar).
+
 ## 1. Karakter
 
 RTG combineert hospitality-rust, redactionele hiërarchie, de precisie van een

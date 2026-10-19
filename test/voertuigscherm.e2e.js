@@ -96,10 +96,10 @@ test('5. het ritscherm toont de ledendeur, verbergt vreemde refs en verzint geen
     });
     const page = await context.newPage();
     await page.goto(BASE + '/apps/rit.html?rit=BESTAAT-NIET');
-    await page.waitForSelector('#inhoud .rit-leeg a[href="/apps/app.html"]');
+    await page.waitForSelector('#inhoud .ds-status a[href="/apps/app.html"]');
     assert.match(await page.locator('#inhoud').innerText(), /log in via de RTG-app/i,
       'zonder sessie wordt de benodigde ledendeur zichtbaar uitgelegd');
-    assert.equal(await page.locator('#transferForm,.chauffeur-kaart').count(), 0);
+    assert.equal(await page.locator('#transferForm,[data-chauffeurkaart]').count(), 0);
     async function post(route, body, token) {
       const r = await fetch(BASE + route, { method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
@@ -125,13 +125,13 @@ test('5. het ritscherm toont de ledendeur, verbergt vreemde refs en verzint geen
       await page.waitForSelector('#inhoud [data-terug-ritten]');
       redenen.push(await page.locator('#inhoud').innerText());
       assert.match(redenen.at(-1), /welke van de twee zegt dit scherm bewust niet/i);
-      assert.equal(await page.locator('.chauffeur-kaart').count(), 0);
+      assert.equal(await page.locator('[data-chauffeurkaart]').count(), 0);
     }
     assert.equal(redenen[0], redenen[1], 'een vreemde en onbekende ref onthullen hetzelfde');
     await page.evaluate(t => localStorage.setItem('rtg_member_token', t), tokens[0]);
     await page.goto(BASE + '/apps/rit.html?rit=' + encodeURIComponent(rit.opdracht.ref));
-    await page.waitForSelector('.chauffeur-profiel h3');
-    assert.equal(await page.locator('.chauffeur-profiel h3').innerText(), 'Nog niet toegewezen',
+    await page.waitForSelector('[data-chauffeurnaam]');
+    assert.equal(await page.locator('[data-chauffeurnaam]').innerText(), 'Nog niet toegewezen',
       'de eigen aangevraagde rit toont de werkelijke stand, zonder verzonnen chauffeur');
   } finally { await browser.close(); }
 });

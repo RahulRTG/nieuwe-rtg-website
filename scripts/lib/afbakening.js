@@ -58,12 +58,24 @@ function merkbaar(s) {
   return !DATUM.test(s);
 }
 
-/* Alle merkbare scalars in een antwoord, tot zes lagen diep. */
+/* Alle merkbare scalars in een antwoord, tot zes lagen diep. En de JSON-vorm van
+   een onderscheidend GETALLENRIJTJE: een aggregaat als `perDag:[3,0,5,1,4,0,2]`
+   draagt geen enkele merkbare scalar (losse cijfers vallen af), maar het rijtje
+   als geheel -- "[3,0,5,1,4,0,2]" -- is wel merkbaar (lang genoeg, cijfers, geen
+   spatie) en is onderscheidend voor de agenda van A. Zo wordt een route die zijn
+   aggregaten op de sessie afbakent (balans) alsnog meetbaar, en een route die
+   voor iedereen dezelfde cijfers gaf juist betrapt. Bewust smal: minstens vier
+   getallen, en de JSON moet door hetzelfde merkbaar-filter -- geen versoepeling. */
 function waarden(data, uit = new Set()) {
   (function loop(v, d) {
     if (d > 6 || v === null || v === undefined) return;
     if (typeof v === 'string') { if (merkbaar(v)) uit.add(v); return; }
-    if (Array.isArray(v)) { for (const el of v.slice(0, 50)) loop(el, d + 1); return; }
+    if (Array.isArray(v)) {
+      if (v.length >= 4 && v.every((x) => typeof x === 'number' && Number.isFinite(x))) {
+        const j = JSON.stringify(v); if (merkbaar(j)) uit.add(j);
+      }
+      for (const el of v.slice(0, 50)) loop(el, d + 1); return;
+    }
     if (typeof v === 'object') for (const w of Object.values(v)) loop(w, d + 1);
   })(data, 0);
   return uit;

@@ -401,7 +401,14 @@ function stappen() {
     { pad: '/api/mall/aanvraag', lijf: (c) => ({ wat: 'Privechef gezocht ' + c.merk, verdieping: 'eten', plek: 'Ibiza' }) },
     /* Privé per sleutel: agenda, onderhoud, metingen, medicatie, noodkaart.
        De namen dragen A's merkwoord, zodat A's antwoord iets van A toont. */
-    { pad: '/api/agenda/toevoegen', lijf: (c) => ({ titel: 'Afspraak ' + c.merk, datum: morgen(), tijd: '10:00' }) },
+    /* Een ONDERSCHEIDEND agendapatroon over de komende week: twee afspraken op
+       dag 1, drie op dag 3, een op dag 4. /api/balans telt dat per dag op tot
+       perDag [0,2,0,3,1,0,0]; dat rijtje is het merkteken van A (./afbakening.js
+       merkbaar), en B (lege agenda) en C krijgen [0,0,0,0,0,0,0]. De balans-stap
+       hieronder oogst het, zodat het in vanA komt en stabiel is. */
+    ...[[1, 2], [3, 3], [4, 1]].flatMap(([dag, n]) => Array.from({ length: n }, (_, i) => ({
+      pad: '/api/agenda/toevoegen', lijf: (c) => ({ titel: 'Afspraak ' + c.merk + '-' + dag + '-' + i, datum: over(dag), tijd: (9 + i) + ':00' }) }))),
+    { pad: '/api/balans', lijf: {} },
     { pad: '/api/home/onderhoud/meld', lijf: (c) => ({ titel: 'Kraan ' + c.merk, plek: 'keuken', urgentie: 'normaal' }) },
     { pad: '/api/metingen/zet', lijf: { onderwerp: 'slaap', waarde: 7 } },
     { pad: '/api/medicatie/zet', lijf: (c) => ({ naam: 'Middel-' + c.merk, sterkte: '10mg' }) },

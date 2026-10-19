@@ -439,7 +439,7 @@ const CONTRACT = {
     via: '#tab=gezin',
     // app-main-43.js: kanaal en ontkoppelen; -44.js: overzicht, uitnodiging accepteren, bericht
     bestanden: ['public/apps/app-main/app-main-43.js', 'public/apps/app-main/app-main-44.js']
-  }, voltooi('gezin', 'het scenario loopt /api/rtf/uitnodiging/accepteer, /overzicht, /kanaal, /bericht en /ontkoppel, de routes die de stand Gezin in app-main-43 en -44 aanroept, met een echte ouder aan de andere kant')),
+  }, voltooi('gezin', 'het scenario loopt /api/rtf/uitnodiging/accepteer, /overzicht, /kanaal, /bericht en /ontkoppel en de gezinsroutes /api/foundation/gezin/uitnodiging/maak en /api/foundation/gezin/oppasinfo, de routes die de stand Gezin in app-main-43 en -44 aanroept (de gezinsfuncties zijn eigendom van de Gezin-app, capabilities gezin.beheer en gezin.oppasinfo in SCHERMEIGENAAR, ook al wonen ze onder /foundation), met een echte ouder aan de andere kant')),
   'tab:betalen': Object.assign({
     belofte: 'een lid rekent het betaalverzoek van een zaak een keer af, betaalt een zaak rechtstreeks en hoort het als de bank weigert',
     ingang: '/apps/app.html',

@@ -27,6 +27,10 @@ const geen5xx = (r) => r && r.status > 0 && r.status < 500;
 
 async function zaakSessie(w, code) {
   const rooster = await w.post('/api/supplier/roster', { code });
+  /* In modus LOS staat de partnerkant uit; dan geeft het rooster 503. Dat is een
+     nette AFGEBROKEN-reden -- het scherm leunt op de Partners-app voor de zaak --
+     en geen reden om verderop op een ontbrekend veld te crashen. */
+  if (rooster.status === 503) throw new Error('de partnerkant (leveranciers) staat uit: zaak ' + code + ' is in modus LOS niet bereikbaar');
   const man = ((rooster.data && rooster.data.staff) || []).find((x) => x.role === 'manager');
   if (!man) throw new Error('de zaak ' + code + ' heeft geen manager in het rooster');
   const z = await w.post('/api/supplier/login', { code, staffId: man.id, pin: '1234' });

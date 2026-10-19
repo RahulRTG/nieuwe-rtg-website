@@ -32,7 +32,11 @@ const ZAAK = 'BODE';
 const geen5xx = (r) => r && r.status > 0 && r.status < 500;
 
 async function zaakSessie(w, code) {
-  const roster = (await w.post('/api/supplier/roster', { code })).data || {};
+  const r0 = await w.post('/api/supplier/roster', { code });
+  /* Modus LOS: de partnerkant uit -> 503. Nette AFGEBROKEN-reden, geen crash op
+     een ontbrekend veld verderop. */
+  if (r0.status === 503) throw new Error('de partnerkant (leveranciers) staat uit: zaak ' + code + ' is in modus LOS niet bereikbaar');
+  const roster = r0.data || {};
   const wie = (roster.staff || []).find((x) => x.role === 'manager');
   if (!wie) throw new Error('de zaak ' + code + ' heeft geen manager');
   const r = await w.post('/api/supplier/login', { code, staffId: wie.id, pin: '1234' });

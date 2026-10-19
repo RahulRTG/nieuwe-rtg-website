@@ -1,8 +1,8 @@
 # Premiumdomeinkaarten — LivingOS-B
 
-**Stand:** 19 oktober 2026, gemeten op `appwerkt/living-b` (vanaf c038c1bd1).
+**Stand:** 19 oktober 2026, gemeten op `appwerkt/living-b` (vanaf c038c1bd1); versie 3 gemeten op f64048209 en b18a5031d.
 **Opdracht:** Beyond Premium, met de bijstelling, de aanscherping en de drie aanvullingen van de eigenaar van die dag.
-**Status:** dit is een kaart, geen bouwopdracht. Er is niets gebouwd. Een functie wordt pas werk als de eigenaar haar per familie toezegt.
+**Status:** dit is een kaart, geen bouwopdracht. Behalve de reparaties die bij de huisbrede bevindingen staan, is er niets gebouwd. Een functie wordt pas werk als de eigenaar haar per familie toezegt.
 
 ## Waarom dit stuk er is
 
@@ -41,6 +41,7 @@ Op verzoek van de integrator is elke app aangevuld met één blok **"v3 — afbo
 - **Volledige werkzaamheid.** Per app één regel: wie doet hier zijn hele werk, voor wie is het maar een deel, en welke externe software blijft nodig.
 - **(te controleren).** Een wets- of marktregel uit een zoekfragment, een secundaire bron of een bron van derden draagt dit label.
   - Zo'n regel stuurt geen weigerregel en geen 'bepaald'-uitkomst. Tot de controle waarschuwt de functie en weigert ze niet.
+  - **Uitzondering: een huisregel die beschermt.** Een regel die minderjarigen, rechthebbenden of een geldpad (vier ogen) beschermt, of die eerlijkheid vooraf eist, weigert wél. Strenger dan de wet mag, dus hij steunt niet op de bron die te controleren is. Het scherm noemt dan de huisregel als reden, niet de wet. Zonder deze uitzondering zou het label een bescherming verzwakken.
   - Een primaire bron (de wettekst, de eigen prijspagina van de aanbieder) draagt het label niet.
 
 ## Verdeling (afgestemd met LivingOS-A en Geld; Centraal besliste)
@@ -78,6 +79,16 @@ Camera, spelavond, krant en logboek horen bij LivingOS-A. De geldapps horen bij 
 6. **Herroepingsrecht.** De retourgrond "bedenktijd" bestaat, maar de wettelijke termijn van 14 dagen na levering wordt nergens gerekend.
 7. **Dynamische paden.** Attenties en Cercle bouwen hun API-paden nog dynamisch op. De meting ziet hun routes daardoor niet. Table (d806269d4) en Entourage (a5bc914f6) staan nu voluit.
 8. **Een fout op het scherm.** De liegronde zag op Rendez-vous de kale tekst "undefined" bij een leeg antwoord. **Gerepareerd op 19 oktober (c5d6e935e):** het scherm zegt nu dat het antwoord onvolledig was.
+
+9. **Nieuw uit de v3-meting (19 oktober), elk een HERSTEL.** Elk punt staat uitgeschreven in het v3-blok of de ONTBREKEND-regels van de app; dit zijn de zwaarste.
+   - **Mall: echte naam in de operationele data.** Bestellingen bij een eigen merk of een boerderij bewaren `contactName` en `email` naast de bestelling, zonder codenaam. Dat gaat om de kluis heen.
+   - **Sociaal: schakelaars die omgekeerd lezen.** "Weekend zonder voorstellen" en "Alleen verzoeken uit een gedeelde groep" staan op het scherm op "AAN", terwijl de beperking pas werkt op UIT. Het scherm toont zo een bescherming die niet aan staat.
+   - **Videobellen: de meeleesbaan komt nooit aan.** De client stuurt `kind: 'tekst'` naar `/api/member/call`. De server weigert dat met "Onbekend signaal.", en de client slikt de fout. Wat een dove deelnemer typt, bereikt de ander niet.
+   - **Videobellen: stille STUN-terugval naar Google.** Faalt `/api/ice`, dan gebruikt de client `stun.l.google.com` zonder het te zeggen. De server staat dat alleen toe met `STUN_FALLBACK_GOOGLE=1`.
+   - **Attenties: een naam naar het model.** `kern/rechterhand/ai.js` geeft de naam van de eerstvolgende relatie mee in de context, ook naar een extern model. Table en Entourage geven sinds 19 oktober alleen tellingen.
+   - **Privékantoor-adviseurs en Rendez-vous beloven een vervolg dat niet bestaat.** "wat een boeking vraagt, zet ik voor u klaar bij De Rechterhand" (`ai.js`, zonder model) en "regelt De Rechterhand de rest" (`rendezvous-date.js`): er is geen koppeling die dat doet.
+   - **Klankwerk: medemaker zonder akkoord.** Wie wordt uitgenodigd, staat direct in de aftiteling, zonder eigen akkoord en zonder pascontrole.
+   - **Saloon-lezer: een leeg artikel gaf de kale fout.** **Gerepareerd in b18a5031d** (bevinding van LivingOS-A).
 
 ## Bronnen
 
@@ -204,10 +215,10 @@ Vier apps volgens de aanscherping van 19 oktober (punt 4 a–h, plus LOS/SAMEN e
 
 **Domeinbronnen die voor alle vier gelden** (als bron, niet als partner)
 - De Auteurswet en de Wet op de naburige rechten.
-- Buma (openbaarmaking van muziekwerken) en Stemra (het mechanische recht: vastleggen en verveelvoudigen). Bron: [webwoordenboek, auteursrechten muziek](https://webwoordenboek.nl/kenniscentrum/wat-zijn-auteursrechten-muziek).
-- Sena (naburige rechten van uitvoerende artiesten en producenten). Bron: [IE-Forum, Angad-Gaur](https://www.ie-forum.nl/archief/ieforum_nl/uploads/file/IE-Forum%20Erwin%20Angad-Gaur,%20'Reflecties'%20in%20Sena%20Performers%20Magazine,%202012,%20p_16-17%20(met%20toestemming)_.pdf), een opiniestuk uit 2012. Wie muziek openbaar ten gehore brengt, draagt aan beide af.
-- Videma en FilmService voor zakelijk vertoonde tv- en filmbeelden. Bron: [business.gov.nl](https://business.gov.nl/regulation/applying-for-licence-use-television-images).
-- Pictoright voor beeldmakers en fotografen. Bron: [Emerce](https://www.emerce.nl/nieuws/670997).
+- Buma (openbaarmaking van muziekwerken) en Stemra (het mechanische recht: vastleggen en verveelvoudigen). Bron: [webwoordenboek, auteursrechten muziek](https://webwoordenboek.nl/kenniscentrum/wat-zijn-auteursrechten-muziek). (te controleren)
+- Sena (naburige rechten van uitvoerende artiesten en producenten). Bron: [IE-Forum, Angad-Gaur](https://www.ie-forum.nl/archief/ieforum_nl/uploads/file/IE-Forum%20Erwin%20Angad-Gaur,%20'Reflecties'%20in%20Sena%20Performers%20Magazine,%202012,%20p_16-17%20(met%20toestemming)_.pdf), een opiniestuk uit 2012. Wie muziek openbaar ten gehore brengt, draagt aan beide af. (te controleren)
+- Videma en FilmService voor zakelijk vertoonde tv- en filmbeelden. Bron: [business.gov.nl](https://business.gov.nl/regulation/applying-for-licence-use-television-images). (te controleren)
+- Pictoright voor beeldmakers en fotografen. Bron: [Emerce](https://www.emerce.nl/nieuws/670997). (te controleren)
 - Actuele tarieven heb ik niet gevonden. Die staan op de sites van deze organisaties zelf, en ik verzin ze niet.
 
 ---
@@ -239,7 +250,7 @@ Gebouwd en getoetst:
   - Kern `muziek-bestanden.js`: maximaal 60 MB per nummer en 200 nummers per lid; de luisterkaart is 15 minuten geldig; publiceren gaat met een herhaalsleutel. Daarnaast `samen.js`.
   - Generatieve stations klinken in de browser.
 - **Klankwerk:**
-  - Kern `muziek.js`, `muziek-instrumenten.js` met 19 klanken (kick … koor, fluister), `muziek-lied.js` (vorm en zanglijn; Rahul verzint geen tekst), `muziek-mix.js` (master-gain en drieband-EQ), `muziek-samen.js` (rollen productie, zang, tekst, instrument, mix), `muziek-uitgave.js` (uitgeven onder codenaam; onder de RTG-naam alleen na een besluit van een kantoormens; geen hitlijst) en `muziek-rahul.js` (voorstellen uit tabellen, lokaal-eerst).
+  - Kern `muziek.js`, `muziek-instrumenten.js` met 19 klanken (kick … koor, fluister), `muziek-lied.js` (vorm en zanglijn; Rahul verzint geen tekst), `muziek-mix.js` (master-gain en drieband-EQ), `muziek-samen.js` (rollen productie, zang, tekst, instrument, mix (gecorrigeerd: plus "overig"; `ROLLEN` in `server/kern/muziek-samen.js`)), `muziek-uitgave.js` (uitgeven onder codenaam; onder de RTG-naam alleen na een besluit van een kantoormens; geen hitlijst) en `muziek-rahul.js` (voorstellen uit tabellen, lokaal-eerst) (gecorrigeerd: de tabellen zijn de basis; voor een figuur vraagt `server/routes/muziek.js` r. 91–125 Claude zodra er een externe sleutel is, geen lokaal model; een lied komt altijd uit de tabellen).
   - Scherm `public/apps/klankwerk/*`: export als WAV en als stems.
 - **Toetsen:** `muziek*.test.js`, `muziek-bestanden.e2e.js`, `klankwerk.e2e.js`, `muziek-lied.test.js`, `muziek-uitgave.test.js`.
 
@@ -247,11 +258,11 @@ Gebouwd en getoetst:
 
 | Marktleider (duurste pakket) | Wat het pakket biedt | Bron, peildatum 2026-10-19 | Wij |
 |---|---|---|---|
-| Avid Pro Tools Ultimate | Professionele DAW: onbeperkt sporen, surround/immersive, video-sync, post-productie. $599 per jaar (persbericht Avid 2022) of $99,99 per maand | [Avid persbericht](https://www.avid.com/press-room/2022/11/avids-pro-tools-flex-subscription-offering-for-audio-post-and-music-facilities-renamed-as-pro-tools), [Sweetwater](https://www.sweetwater.com/c1108--Avid--Pro_Tools_Software) [derde bron] | half: meersporen-raster met 19 klanken, mix en master-EQ, WAV en stems. Geen audio-opname van externe instrumenten in meerdere sporen, geen video-sync |
-| Ableton Live 12 Suite | Volledige instrumenten- en effectenbibliotheek, Max for Live. $749 (huur-tot-koop 24 × $31,21) | [Sweetwater](https://www.sweetwater.com/store/detail/Live12Ste), [Sound On Sound](https://www.soundonsound.com/news/ableton-introduce-rent-own-plan) [derde bron] | half: lied-vorm en zanglijn, maar een beperkte klankbibliotheek |
-| BandLab Max | Samenwerken in de cloud, AI-mastering met mastering-EQ, Retune, distributie (90/10) | [BandLab Help](https://help.bandlab.com/hc/en-us/articles/19290698933145-What-is-BandLab-Membership); prijs [derde bron] wisselend ($12,99–$14,95) | half: samenwerken met rollen ja; mastering half (EQ zonder luidheidsdoel); distributie nee |
-| DistroKid Ultimate | Distributie voor 5+ artiesten, Content-ID als betaalde add-on. Circa $89,99 per jaar | [SoftwareSuggest](https://www.softwaresuggest.com/distrokid/pricing), [RouteNote](https://routenote.com/blog/distrokid-up-their-pricing/) [derde bron] | nee |
-| Spotify Premium Family | Luisteren zonder advertenties, offline, meerdere profielen. $19,99 per maand (juni 2024) | [Engadget](https://www.engadget.com/spotify-raises-iprice-of-premium-plans-115138529.html) | half: luisteren zonder advertenties ja; offline nee; gezinsprofielen nee |
+| Avid Pro Tools Ultimate | Professionele DAW: onbeperkt sporen, surround/immersive, video-sync, post-productie. $599 per jaar (persbericht Avid 2022) of $99,99 per maand | [Avid persbericht](https://www.avid.com/press-room/2022/11/avids-pro-tools-flex-subscription-offering-for-audio-post-and-music-facilities-renamed-as-pro-tools), [Sweetwater](https://www.sweetwater.com/c1108--Avid--Pro_Tools_Software) [derde bron] (te controleren) | half: meersporen-raster met 19 klanken, mix en master-EQ, WAV en stems. Geen audio-opname van externe instrumenten in meerdere sporen, geen video-sync |
+| Ableton Live 12 Suite | Volledige instrumenten- en effectenbibliotheek, Max for Live. $749 (huur-tot-koop 24 × $31,21) | [Sweetwater](https://www.sweetwater.com/store/detail/Live12Ste), [Sound On Sound](https://www.soundonsound.com/news/ableton-introduce-rent-own-plan) [derde bron] (te controleren) | half: lied-vorm en zanglijn, maar een beperkte klankbibliotheek |
+| BandLab Max | Samenwerken in de cloud, AI-mastering met mastering-EQ, Retune, distributie (90/10) | [BandLab Help](https://help.bandlab.com/hc/en-us/articles/19290698933145-What-is-BandLab-Membership); prijs [derde bron] wisselend ($12,99–$14,95) (te controleren) | half: samenwerken met rollen ja; mastering half (EQ zonder luidheidsdoel); distributie nee |
+| DistroKid Ultimate | Distributie voor 5+ artiesten, Content-ID als betaalde add-on. Circa $89,99 per jaar | [SoftwareSuggest](https://www.softwaresuggest.com/distrokid/pricing), [RouteNote](https://routenote.com/blog/distrokid-up-their-pricing/) [derde bron] (te controleren) | nee |
+| Spotify Premium Family | Luisteren zonder advertenties, offline, meerdere profielen. $19,99 per maand (juni 2024) | [Engadget](https://www.engadget.com/spotify-raises-iprice-of-premium-plans-115138529.html) (te controleren) | half: luisteren zonder advertenties ja; offline nee; gezinsprofielen nee |
 
 Wat we niet overnemen:
 - Betaald bereik of "promotie" (BandLab en vergelijkbare) en hitlijsten: huisregel, en `muziek-uitgave.js` weigert ze al in zijn kop.
@@ -263,7 +274,7 @@ Wat we niet overnemen:
 - **Professioneel**, voor muzikant, producer, songwriter, technicus en sessiemuzikant:
   - opname van meerdere bronnen, overdubs en comping;
   - mixen met inserts, sends en automation;
-  - mastering naar een luidheidsdoel (streamingdiensten normaliseren rond −14 LUFS; vakpraktijk, zonder bron met datum);
+  - mastering naar een luidheidsdoel (streamingdiensten normaliseren rond −14 LUFS; vakpraktijk, zonder bron met datum) (te controleren);
   - stems voor remixers en sync-licenties;
   - metadata: ISRC per opname, ISWC per werk, credits per rol;
   - splitsheets: wie schreef wat, in welk percentage, vastgelegd vóór de release;
@@ -303,7 +314,7 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
    - Wanneer iemand iets hoort: het label bij het nummer.
    - Rollen: iedereen die mag luisteren.
    - Acceptatie: bij een 24-bit WAV staat "verliesvrij, 24-bit" en de geleverde bytes zijn gelijk aan de geüploade.
-   - Stand: half (de levering is al verliesvrij, de weergave ontbreekt). Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (de levering is al verliesvrij, de weergave ontbreekt). Kosten: klein. Bak: nu · VERDIEPING.
 
 3. **Offline bewaren**
    - Gegevens: een kopie in de cache van het toestel.
@@ -324,7 +335,7 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
    - Acceptatie: de luisteraar hoort binnen een seconde hetzelfde station.
    - Stand: bestaat. Bak: –.
 
-**L2 Professioneel** (alleen via bestaande genres: `creator` bestaat, muzikant/label niet → vraagt besluit)
+**L2 Professioneel** (alleen via bestaande genres: `creator` bestaat, muzikant/label niet → vraagt besluit) (gecorrigeerd: de genres staan in `server/seed/genres-lijst-b.js`; daar bestaat ook `talentmens`, "Zelfstandig talent", waarvan de kop de muzikant met name noemt. Label en studio bestaan niet.)
 
 5. **Credits en splitsheet bij uitgave**
    - Gegevens: medemakers en rollen (`muziek-samen.js`), vastgelegd bij uitgave.
@@ -335,11 +346,11 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
    - Rollen: de maker stelt voor, elke medemaker tekent voor zichzelf.
    - Uitzonderingen: een medemaker die eruit gaat, blijft met zijn vastgelegde aandeel staan.
    - Acceptatie: een uitgave met twee makers en 60/40 toont beide met rol en percentage, ook nadat één van hen het project verliet.
-   - Stand: half (rollen en aftiteling bestaan, percentages en bevestiging niet). Kosten: middel. Bak: aanbevolen nu.
+   - Stand: half (rollen en aftiteling bestaan, percentages en bevestiging niet). Kosten: middel. Bak: nu · VERDIEPING.
 
 6. **Werk- en opname-metadata (ISWC/ISRC-velden)**
    - Gegevens: velden op de uitgave, ingevuld door de maker.
-   - Regels: het formaat wordt gecontroleerd (ISRC: 12 tekens); RTG geeft zelf geen codes uit.
+   - Regels: het formaat wordt gecontroleerd (ISRC: 12 tekens (te controleren)); RTG geeft zelf geen codes uit. Tot de controle: waarschuwen, niet weigeren.
    - Onzekerheid: RTG controleert niet of een code echt bij een register hoort, en zegt dat.
    - Wanneer iemand iets hoort: geen melding.
    - Rollen: maker.
@@ -375,14 +386,14 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
 
 10. **Mastering naar een luidheidsdoel**
     - Gegevens: de mix (`muziek-mix.js`).
-    - Regels: doel −14 LUFS geïntegreerd en ware piek ≤ −1 dBTP, gekozen door de maker.
+    - Regels: doel −14 LUFS geïntegreerd en ware piek ≤ −1 dBTP (te controleren), gekozen door de maker.
     - Rekenwijze: luidheid meten volgens ITU-R BS.1770 (K-gewogen); daarna gain en limiter.
     - Onzekerheid: de meting is exact; "klinkt goed" is geen meting en wordt niet beweerd.
     - Wanneer iemand iets hoort: vóór en na, A/B te vergelijken.
     - Rollen: rol mix.
     - Uitzonderingen: een stil stuk wordt niet opgepompt boven het doel.
     - Acceptatie: na "maak af" meet de export −14 LUFS (±0,5) en ≤ −1 dBTP.
-    - Stand: half (EQ en gain bestaan, de meting niet). Kosten: middel. Bak: aanbevolen nu.
+    - Stand: half (EQ en gain bestaan, de meting niet). Kosten: middel. Bak: nu · VERDIEPING.
 
 11. **Voorstel van Rahul voor een patroon of lied**
     - Gegevens: tabellen uit `muziek-rahul.js`.
@@ -401,20 +412,20 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
     - Gegevens: de uitgave.
     - Regels: intrekken haalt het nummer uit de zaal; de aftiteling blijft in het archief van de makers; clips die het als geluid dragen tonen "niet meer beschikbaar".
     - Acceptatie: na intrekken hoort niemand het nummer meer, en de clip zegt waarom.
-    - Stand: half (`muziekTrekIn` bestaat; het gedrag in Clips is niet gemeten). Kosten: klein. Bak: aanbevolen nu.
+    - Stand: half (`muziekTrekIn` bestaat; het gedrag in Clips is niet gemeten) (gecorrigeerd: in de code gemeten. Een clip draagt geen uitgave maar een kopie `{ id, naam, bpm }` van een eigen, klaar stuk (`server/kern/clips-studio.js`, `geluid`); intrekken raakt die clip dus niet. `trekIn` haalt de uitgave met makers en reacties uit de lijst (`server/kern/muziek-uitgave.js` r. 90–97); de makers blijven alleen bij het stuk in de studio). Kosten: klein. Bak: nu · VERDIEPING.
 
 **L6 RTG-samenhang**
 
-14. **Uitgegeven:** `RTGSpeler` (de mini-speler van de schil), uitgaven voor Media OS (stand MUZIEK), geluid voor Clips (`clips-lezers.js`), functiegids/Heel RTG ("open muziek").
+14. **Uitgegeven:** `RTGSpeler` (de mini-speler van de schil), uitgaven voor Media OS (stand MUZIEK), geluid voor Clips (`clips-lezers.js`), functiegids/Heel RTG ("open muziek"). (gecorrigeerd: Media OS leest alleen Klankwerk-uitgaven (`server/kern/mediaos/catalogus.js`, `vanTrack`), geen Sound-uploads. Het clipgeluid zet `clips-studio.js` via `muziekEigenTrack`, alleen met een eigen, klaar stuk; `clips-lezers.js` leest alleen welke clips een stuk dragen.)
 15. **Ontvangen:** Samen-kamers, `werkherkomst.js` (wie de maker is).
 16. **Buiten de eigen apps:**
     - FoundationOS "liedjes" (`rtf.liedjes` → apps/foundation/liedjes.html) en School (`leren.school`): een kind maakt een lied als leeropdracht.
-    - Horeca-events (`horeca.events`): een zaak die muziek laat horen, moet aan Buma en Sena afdragen; RTG kan dat melden, niet regelen.
+    - Horeca-events (`horeca.events`): een zaak die muziek laat horen, moet aan Buma en Sena afdragen (te controleren); RTG kan dat melden, niet regelen.
     - → *Voor de integrator:* koppelt horeca.events aan een "muziek in de zaak"-verklaring, en wie is daarvan eigenaar?
 
 #### e. RTG-exclusief
 
-- **Uitgeven onder codenaam:** de echte naam reist nooit mee, en de aftiteling is onwijzigbaar.
+- **Uitgeven onder codenaam:** de echte naam reist nooit mee, en de aftiteling is onwijzigbaar. (gecorrigeerd: onwijzigbaar zolang de uitgave staat, getoetst in `test/muziek-uitgave.test.js`, "de aftiteling ligt vast"; bij terugtrekken verdwijnt de hele uitgave.)
 - **Geen hitlijst en geen bereik te koop:** de zaal is chronologisch en eindig.
 - **Splitsheet en uitgave in één stap:** de credits staan vast vóór iemand het hoort. Elders is dat een los document.
 - **Van School tot uitgave in één keten:** een kind maakt een lied bij School en de ouder ziet het in het gezin. De 18+-grens geldt alleen voor een eventuele ranglijst, en die bestaat niet.
@@ -433,10 +444,10 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
 
 | # | Functie | Kosten | Complexiteit | Afhankelijk van |
 |---|---|---|---|---|
-| 1 | Verliesvrij tonen | klein | laag | – |
-| 2 | Intrekken zichtbaar in Clips | klein | laag | clips-lezers |
-| 3 | Splitsheet bij uitgave | middel | middel | muziek-samen, uitgave |
-| 4 | Mastering naar luidheidsdoel | middel | middel (DSP in de browser) | muziek-mix, wav-export |
+| 1 | Verliesvrij tonen (nu · VERDIEPING) | klein | laag | – |
+| 2 | Intrekken zichtbaar in Clips (nu · VERDIEPING) | klein | laag | clips-lezers |
+| 3 | Splitsheet bij uitgave (nu · VERDIEPING) | middel | middel | muziek-samen, uitgave |
+| 4 | Mastering naar luidheidsdoel (nu · VERDIEPING) | middel | middel (DSP in de browser) | muziek-mix, wav-export |
 | 5 | Offline bewaren | middel | middel | service worker, rechtenbesluit |
 | 6 | ISRC/ISWC-velden | klein | laag | pas zinvol met #8 |
 | 7 | Meersporen-opname | groot | hoog | latentiemeting, opslag |
@@ -457,7 +468,7 @@ Per functie: gegevens en bron · regels · rekenwijze · onzekerheid · wanneer 
 
 #### Twee uitkomsten
 
-**Deel A — bouwbaar binnen de huidige architectuur en scope.** Dit zijn de functies in d met bak "aanbevolen nu" en "later", in de volgorde van g:
+**Deel A — bouwbaar binnen de huidige architectuur en scope.** Dit zijn de functies in d met bak "nu · HERSTEL", "nu · VERDIEPING" en "later", in de volgorde van g:
 1. verliesvrij tonen;
 2. intrekken zichtbaar in Clips;
 3. splitsheet bij uitgave;
@@ -542,10 +553,10 @@ Alles op bestaande kern (`muziek-*`, Samen, mediastore). Geen nieuwe laag, geen 
   - de eigen bibliotheek werkt zonder Media OS of Clips;
   - zonder inlog zegt het scherm dat de feed een account vraagt;
   - Klankwerk exporteert zonder netwerk.
-- Niet gemeten: wat Sound zegt als `/api/samen` uitvalt. Eis: "Samen luisteren is nu niet beschikbaar; je eigen muziek speelt gewoon."
+- Niet gemeten: wat Sound zegt als `/api/samen` uitvalt. Eis: "Samen luisteren is nu niet beschikbaar; je eigen muziek speelt gewoon." (gecorrigeerd: in de code af te lezen. De Rahul-regel toont dan de foutmelding van de server, anders "Er ging iets mis."; bij netwerkverlies de melding van de browser — `sesApi` in `muziek.html`. De eis-zin staat er niet.)
 
 **Modus SAMEN**
-- Eén verwijzing (het id van de uitgave) reist van Klankwerk naar Sound, Media OS en Clips.
+- Eén verwijzing (het id van de uitgave) reist van Klankwerk naar Sound, Media OS en Clips. (gecorrigeerd: Sound toont geen Klankwerk-uitgaven; `muziek.html` roept alleen `/api/muziek/feed|bestand|bestand-ticket|mooi|bestand-weg`, `/api/samen/*` en `/api/fluister` aan. Media OS krijgt het id van de uitgave. Clips krijgt het id van het stuk, niet van de uitgave, met een kopie van naam en bpm.)
 - Volgen gaat via Media OS naar de volgerslijst van het domein zelf.
 - Rahul "open muziek" en Heel RTG vinden Sound; Klankwerk staat in de gids als `media.muziek-maken`.
 
@@ -555,11 +566,11 @@ Alles op bestaande kern (`muziek-*`, Samen, mediastore). Geen nieuwe laag, geen 
 3. B neemt de zang op (vandaag: de zanglijn van Klankwerk; straks een opname).
 4. Ze bevestigen een split van 60/40.
 5. A geeft uit onder codenaam.
-6. Vrienden horen het in Sound en zien het in Media OS.
-7. C zet het onder een clip.
+6. Vrienden horen het in Sound en zien het in Media OS. (gecorrigeerd: een uitgave staat in De Zaal, `/apps/zaal.html`, en in Media OS, niet in Sound.)
+7. C zet het onder een clip. (gecorrigeerd: kan vandaag niet. Clips neemt alleen een eigen, klaar stuk aan — "Kies een eigen stuk uit RTG Studio dat u klaar hebt gemeld." (`server/kern/clips-studio.js`) — en `clips.html` heeft geen muziekknop.)
 
 Storingen:
-- B heeft geen pas: uitnodigen weigert met de reden.
+- B heeft geen pas: uitnodigen weigert met de reden. (gecorrigeerd: vandaag niet. `nodig` in `server/kern/muziek-samen.js` toetst alleen of de codenaam bestaat, en zet B zonder zijn akkoord in de makerslijst.)
 - B bevestigt niet: de uitgave blijft concept.
 - Het netwerk valt weg tijdens de upload: dezelfde sleutel geeft één nummer (bewezen).
 - Een crash na het publiceren: één nummer (bewezen).
@@ -567,7 +578,7 @@ Storingen:
 - C is geen vriend en ziet het nummer niet als het besloten is (bestaat bij Salon-posts, nog niet bij uitgaven).
 
 **Vraagt besluit:**
-- een genre muzikant/label/studio in `server/seed/genres.js`;
+- een genre muzikant/label/studio in `server/seed/genres.js`; (gecorrigeerd: muzikant valt al onder `talentmens` in `server/seed/genres-lijst-b.js`)
 - de vorm van de band (organisatie of kring);
 - rechten voor offline bewaren;
 - distributie en uitbetaling van splits.
@@ -576,6 +587,68 @@ Storingen:
 - een distributeur (ISRC/UPC, levering aan streamingdiensten);
 - collectieve beheersorganisaties voor auteurs- en naburige rechten (aanmelding blijft *voorbehouden*: RTG meldt niet aan namens een maker zonder mandaat);
 - codecs voor verliesvrije compressie (FLAC wordt al herkend).
+
+#### v3 — afbouw (RTG Sound met Klankwerk)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Generatieve stations — schermtekst: "Begin met luisteren", "Kies een sfeer. De muziek ontstaat live in RTG Sound." (`public/apps/muziek.html`) — geen route, klank uit `/shared/geluid.js` — stand: bestaat
+- Eigen nummer delen — schermtekst: "Deel uw muziek", "Publiceer voor anderen", vinkje "Dit is mijn eigen muziek en ik mag haar met anderen delen." (`muziek.html`) — route `POST /api/muziek/bestand` met `Idempotency-Key` — stand: bestaat
+- Feed, afspelen, waarderen, weghalen — schermtekst: "Nieuw van makers", knop "♡ n", knop "×" met "… verwijderen uit de muziekfeed?" (`public/apps/muziek-feed.js`) — routes `POST /api/muziek/feed`, `/bestand-ticket`, `GET /api/muziek/luister/:ticket`, `POST /api/muziek/mooi`, `/bestand-weg` — stand: bestaat
+- Verliesvrij label — geen schermtekst — stand: ontbreekt (levering via `stuurBuffer` bestaat)
+- Samen luisteren — schermtekst: "Start samen", "Doe mee", "Nieuwe deelcode", "Stoppen" (`muziek.html`) — routes `POST /api/samen/maak|mee|code|muziek|staat|weg` — stand: bestaat
+- Spraaksturing — knop met label "Spraaksturing: zeg wat u wilt horen" (`muziek.html`) — route `POST /api/fluister` — stand: bestaat
+- Klankwerk, stuk maken en bewaren — schermtekst: "Bewaren", "Kanaal erbij", "Gekozen kanaal weg", "Deel erbij" (`public/apps/klankwerk.html`) — routes `POST /api/muziek/maak|open|bewaar|mijn|weg` — stand: bestaat
+- Master console — schermtekst: "Uw eindklank.", schuiven "Master", "Low", "Mid", "High", "Limiter" (`klankwerk.html`) — geen route — stand: half (geen luidheidsmeting)
+- Rahul-voorstel — schermtekst: "Een figuur om mee te beginnen", "Maak er een heel lied van" (`klankwerk.html`) — route `POST /api/muziek/rahul` — stand: bestaat
+- Samen produceren — schermtekst: "Erbij vragen", "eruit", "ik stap eruit" (`klankwerk.html`, `klankwerk/samen.js`) — routes `POST /api/muziek/samen`, `/samen/nodig`, `/samen/eruit`, `/samen/verlaat`, `/samen/rol` — stand: half (geen akkoord van de uitgenodigde, geen percentages)
+- Uitgeven en terugtrekken — schermtekst: "Uitgeven onder mijn codenaam", "Uitgeven en de RTG-naam aanvragen", "De RTG-naam aanvragen", "Terugtrekken" (`klankwerk/samen.js`) — routes `POST /api/muziek/uitgeven`, `/uitgave/rtg`, `/uitgave/in`, `/uitgave/van` — stand: bestaat
+- Export — schermtekst: "Exporteer WAV-master", "Exporteer gekozen stem", "Als stuk (leesbare getallen)" (`klankwerk.html`) — geen route, `klankwerk/wav.js` — stand: bestaat
+- Kantoorbesluit RTG-naam — scherm `public/apps/klankwerk-kantoor.html` — routes `POST /api/office/muziek`, `/api/office/muziek/beslis` — stand: bestaat
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log in om muziek van mensen te beluisteren en uw eigen werk te delen." en "De live stations kunt u wel meteen beluisteren." (`muziek-feed.js`); de stations blijven werken
+- Pas-poort (`geenGast`) — gratis account: 403 "RTG Studio is voor leden." (`server/routes/muziek.js`)
+- Mediaopslag — uitval: 503 "De muziekopslag is niet beschikbaar." (`server/kern/muziek-bestanden.js`)
+- Idempotentie — zonder sleutel: "De publicatiesleutel ontbreekt. Probeer het publiceren opnieuw." (`muziek-bestanden.js`)
+- Codenaamkluis (`keyVanCodenaam`) — onbekende codenaam: "Deze codenaam ken ik niet." (`server/kern/muziek-samen.js`); uitval van de kluis zelf: niet gemeten
+- Samen-dienst (`server/kern/samen.js`) — uitval: de Rahul-regel toont de fout van de server, anders "Er ging iets mis." (`sesApi` in `muziek.html`)
+- 18+-poort en bewaarveger: niet van toepassing (geen ranglijst; bewaartermijn niet gemeten)
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- RTG Media — toont Klankwerk-uitgaven in MUZIEK; Sound-uploads niet — Sound zegt niets als hij uit staat
+- RTG Video — een eigen, klaar stuk als clipgeluid, alleen via de API — Sound en Klankwerk zeggen niets
+- Externe AI-sleutel — Claude varieert een figuur; zonder sleutel komen figuur en lied uit de tabellen, zonder melding (`server/routes/muziek.js`)
+- De Zaal (`/apps/zaal.html`, eigenaar `media.zaal`) — de plek waar uitgaven te horen zijn; knop "Naar de zaal" (`klankwerk/samen.js`)
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:muziek': {
+  uitgeeft: [
+    { wat: 'uitgave (id, makers, kanalen als getallen)', aan: 'link:mediaos (stand MUZIEK)', vorm: 'projectie', bron: 'server/kern/mediaos/catalogus.js (vanTrack)' },
+    { wat: 'uitgave om af te spelen', aan: 'link:mediaos (speler)', vorm: 'verwijzing', bron: 'public/apps/media/speler.js → POST /api/muziek/uitgave' },
+    { wat: 'eigen, klaar stuk { id, naam, bpm }', aan: 'link:clips (geluid "muziek")', vorm: 'projectie', bron: 'server/kern/muziek.js (eigenTrack) → server/kern/clips-studio.js' },
+    { wat: 'aanvraag RTG-naam', aan: 'kantoor.uitgavenaam', vorm: 'gebeurtenis', bron: 'server/kern/muziek-uitgave.js (kantoorMelding)' }
+  ],
+  ontvangt: [
+    { wat: 'Samen-kamer', van: 'server/kern/samen.js', vorm: 'verwijzing', bron: 'server/routes/samen.js' },
+    { wat: 'codenaam → sleutel', van: 'codenaamkluis', vorm: 'verwijzing', bron: 'server/routes/muziek-samen.js (keyVanCodenaam)' },
+    { wat: 'besluit over de RTG-naam', van: 'kantoor.uitgavenaam', vorm: 'gebeurtenis', bron: 'POST /api/office/muziek/beslis' }
+  ],
+  ketens: [
+    { naam: 'eigen werk delen en horen', stappen: ['Sound: A publiceert met "eigen werk"', 'Sound: B hoort en waardeert', 'Sound: samen luisteren'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/muziek.js (lokaal; register GEEN_FIXTURE)' },
+    { naam: 'RTG-naam onder een uitgave', stappen: ['Klankwerk: aanvraag', 'kantoor: besluit door een mens op naam', 'Klankwerk: maker ziet het besluit'], stand: 'gesloten', bewijs: 'test/muziek-uitgave.test.js ("DE RTG-NAAM KOMT ER NOOIT VANZELF ONDER")' },
+    { naam: 'Sound-upload in Media OS', stappen: ['Sound: upload', 'Media OS: MUZIEK'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'uitgave van een ander als clipgeluid', stappen: ['Klankwerk: uitgave van B', 'Clips: A zet hem onder een clip'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'intrekken zichtbaar in Clips', stappen: ['Klankwerk: terugtrekken', 'Clips: "niet meer beschikbaar"'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'splitsheet met akkoord', stappen: ['Klankwerk: maker stelt aandelen voor', 'medemaker: akkoord', 'Klankwerk: uitgave'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een luisteraar doet hier zijn hele werk: stations, muziek van leden, waarderen en samen luisteren. Een hobbymaker ook: een lied maken, exporteren en onder codenaam uitgeven. Het kantoor doet het hele besluit over de RTG-naam. Voor een muzikant, producer, songwriter of band is het een deel van het werk: opname van echte instrumenten, een luidheidsmeting, een splitsheet met akkoord en distributie ontbreken. Extern blijft nodig: een DAW voor meersporen-opname (bv. Pro Tools of Ableton Live uit b), een distributeur (bv. DistroKid uit b) en de aanmelding bij de collectieve beheersorganisaties. Volledig voor: luisteraar, hobbymaker, kantoor (RTG-naam) · Deels voor: muzikant, producer, songwriter, band · Extern nodig: DAW, distributeur, aanmelding bij beheersorganisaties.
 
 ---
 
@@ -602,7 +675,7 @@ Gebouwd:
 - Routes `/api/clips/*` (feed, maak, weg, volg, reactie(s), meld, knip, ondertitels, geluid, aanwezig, signaal) en `/api/office/clips*`.
 - Kern `clips.js`: maximaal 60 s; een affiche van ≤ 80 kB; een eindige dagselectie van 25; aanwezigheid 90 s.
 - `clips-studio.js`: knippen zonder iets weg te gooien, ondertitels, geluid.
-- `clips-lezers.js` (uitgave als geluid) en `clips-kantoor.js` (melden en afhandelen).
+- `clips-lezers.js` (uitgave als geluid) en `clips-kantoor.js` (melden en afhandelen). (gecorrigeerd: `clips-lezers.js` leest welke clips een stuk dragen, van een maker zijn en wie die maker volgt; het geluid zet `clips-studio.js`, en alleen met een eigen, klaar stuk uit Klankwerk.)
 - Het origineel blijft in OPFS op het toestel van de maker.
 
 #### b. Marktvergelijking
@@ -610,8 +683,8 @@ Gebouwd:
 | Marktleider (duurste pakket) | Wat het pakket biedt | Bron, peildatum 2026-10-19 | Wij |
 |---|---|---|---|
 | CapCut Pro | Export in 4K/HDR, automatische ondertitels, 1 TB cloud, AI-effecten (achtergrond, ruis, tracking). $19,99/mnd of $179,99/jr | [Newsweek](https://newsweek.com/app-used-millions-nearly-doubles-subscription-price-overnight-11535999), [CapCut help](https://www.capcut.com/help/capcut-pro-price) | half: knippen, ondertitels en geluid zonder watermerk ja; 4K-export, ruisonderdrukking en tracking nee |
-| Frame.io Enterprise | Review met tijdcodecommentaar, versies, beveiligde deellinks, SSO. Team $25 per lid per maand; Enterprise op offerte | [Frame.io help](https://help.frame.io/en/articles/10150181-getting-started-what-are-the-pricing-plans-you-offer), [Capterra](https://www.capterra.com/p/148214/Frame-io/pricing/) [derde bron] | nee: geen review op tijdcode, geen versies |
-| Vimeo Enterprise / Advanced | Hosting, privacy per video, livestreaming, analyses, DRM | [Vimeo help](https://help.vimeo.com/hc/en-us/articles/12425432033937-About-Vimeo-plans), [Livid](https://livid.com/blog/vimeo-price-increase-2026-a-complete-breakdown-of-the-new-plans-and-forced-upgrades/) [derde bron] | half: privacy per clip nee (alles is feed); live zit in Podium (`media.podium`) |
+| Frame.io Enterprise | Review met tijdcodecommentaar, versies, beveiligde deellinks, SSO. Team $25 per lid per maand; Enterprise op offerte | [Frame.io help](https://help.frame.io/en/articles/10150181-getting-started-what-are-the-pricing-plans-you-offer), [Capterra](https://www.capterra.com/p/148214/Frame-io/pricing/) [derde bron] (te controleren) | nee: geen review op tijdcode, geen versies |
+| Vimeo Enterprise / Advanced | Hosting, privacy per video, livestreaming, analyses, DRM | [Vimeo help](https://help.vimeo.com/hc/en-us/articles/12425432033937-About-Vimeo-plans), [Livid](https://livid.com/blog/vimeo-price-increase-2026-a-complete-breakdown-of-the-new-plans-and-forced-upgrades/) [derde bron] (te controleren) | half: privacy per clip nee (alles is feed); live zit in Podium (`media.podium`) |
 
 Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en oneindige scroll. De feed is eindig: 25, met een einde.
 
@@ -621,7 +694,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
 - **Professioneel**, voor videomaker, editor, journalist en content-maker:
   - review met tijdcodecommentaar en versies;
   - exportprofielen (resolutie, codec, beeldverhouding);
-  - rechten op de muziek eronder (synchronisatierecht: muziek bij beeld vraagt toestemming van de rechthebbende, ook van uitgever en producent);
+  - rechten op de muziek eronder (synchronisatierecht: muziek bij beeld vraagt toestemming van de rechthebbende, ook van uitgever en producent) (te controleren);
   - portretrecht van wie in beeld is (Auteurswet art. 21);
   - ondertitels als toegankelijkheidseis.
 - **Organisatorisch**, voor redactie, merk en school:
@@ -653,7 +726,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
    - Rollen: maker.
    - Uitzonderingen: een gemelde clip wordt door het kantoor verborgen.
    - Acceptatie: een clip "vrienden" is voor een vreemde 404 en voor een vriend zichtbaar.
-   - Stand: ontbreekt. Kosten: klein. Bak: aanbevolen nu.
+   - Stand: ontbreekt. Kosten: klein. Bak: nu · VERDIEPING.
 
 3. **"De maker is nu niet online"**
    - Gegevens: de aanwezigheid (90 s).
@@ -661,7 +734,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
    - Onzekerheid: aanwezigheid is een momentopname.
    - Wanneer iemand iets hoort: de kijker ziet de affiche, de titel en de zin.
    - Acceptatie: met de maker offline geeft Speel binnen 3 s die zin en geen lege speler.
-   - Stand: half. Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (gecorrigeerd: de zin bestaat letterlijk: "De maker is nu niet online; deze clip staat alleen op diens eigen toestel." (`public/shared/clipdeler/clipdeler-01.js` r. 86, en als 409 uit `server/kern/clips.js` r. 88); de feed zegt vooraf "Maker offline: de clip staat alleen op diens toestel" (`clips.html`). Wat ontbreekt is de toets op 3 s). Kosten: klein. Bak: nu · HERSTEL (meetgat).
 
 4. **Export in de resolutie van opname**
    - Gegevens: het origineel in OPFS.
@@ -690,7 +763,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
    - Gegevens: reacties met tijdstip (uitbreiding van `clips` reacties).
    - Regels: alleen voor genodigden van de maker.
    - Acceptatie: een opmerking op 0:12 springt bij tikken naar 0:12.
-   - Stand: half (reacties bestaan zonder tijdcode). Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (reacties bestaan zonder tijdcode). Kosten: klein. Bak: nu · VERDIEPING.
 
 **L3 Organisatorisch**
 
@@ -706,7 +779,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
    - Gegevens: audio van de clip via `/api/ondertiteling` (lokaal-eerst).
    - Onzekerheid: de ondertitels zijn voorlopig tot de maker ze nakeek; dat staat erbij.
    - Acceptatie: na opname staan ze klaar, met "voorlopig, nog niet nagekeken".
-   - Stand: half. Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (gecorrigeerd: in Clips ontbreekt het. `clips.html` roept `/api/ondertiteling` niet aan en kent alleen handmatige regels ("Regel erbij", "Bewaar de ondertitels"). De dienst `POST /api/ondertiteling/fragment` bestaat en wordt gebruikt door Studio Pro in `media.html` ("Lokaal transcriberen"), zonder "voorlopig"). Kosten: klein. Bak: nu · VERDIEPING.
 
 **L5 Levenscyclus**
 
@@ -719,7 +792,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
 **L6 RTG-samenhang**
 
 - Uit: clips voor Media OS (FLOW); aanwezigheid via de gedeelde clipdeler (ook in media.html).
-- In: uitgaven als geluid (Klankwerk), volgen via Media OS.
+- In: uitgaven als geluid (Klankwerk), volgen via Media OS. (gecorrigeerd: geen uitgave maar een eigen, klaar stuk, en alleen via `POST /api/clips/geluid`; het scherm biedt alleen "Eigen geluid", "Zonder geluid te bekijken" en "Met gesproken toelichting", en zegt "We hebben geen rechten op muziek en doen dus niet alsof." (`clips.html`).)
 - Buiten de eigen apps:
   - Reizen: een clip van een moment op reis. Eigenaar van momenten in Reizen is `reizen.reisboek` (apps/reisboek.html) of de momenten van Reizen. → *Voor de integrator:* welke eigenaar, zodat Clips alleen een verwijzing geeft.
   - School: een spreekbeurt-video (`leren.school`).
@@ -728,7 +801,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
 
 - **Het origineel verlaat het toestel nooit**, maar kijken kan toch, rechtstreeks. Er is geen kopie op een server.
 - **Een eindige, eerlijke feed** met een einde.
-- **Muziek eronder met de rechten van de maker meegenomen:** de uitgave draagt credits, en intrekken stopt het geluid.
+- **Muziek eronder met de rechten van de maker meegenomen:** de uitgave draagt credits, en intrekken stopt het geluid. (gecorrigeerd: de clip draagt een kopie van een eigen stuk, geen uitgave; intrekken verandert er niets aan.)
 
 #### f. Bouwstenen en ontbrekende koppelingen
 
@@ -736,7 +809,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
 - **Ontbreekt:**
   - `publiek` op de clip via de Salon-poort;
   - tijdcode bij reacties;
-  - de melding bij een offline maker;
+  - de melding bij een offline maker (gecorrigeerd: bestaat, zie d.3; alleen de toets ontbreekt);
   - de melding "voorlopig" bij ondertitels;
   - export.
 
@@ -744,10 +817,10 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
 
 | # | Functie | Kosten | Complexiteit | Afhankelijk van |
 |---|---|---|---|---|
-| 1 | "Maker niet online" | klein | laag | aanwezigheid |
-| 2 | Ondertitels "voorlopig" | klein | laag | ondertiteling |
-| 3 | Zichtbaarheid per clip | klein | laag | Salon-poort |
-| 4 | Tijdcodecommentaar | klein | laag | reacties |
+| 1 | "Maker niet online" (nu · HERSTEL) | klein | laag | aanwezigheid |
+| 2 | Ondertitels "voorlopig" (nu · VERDIEPING) | klein | laag | ondertiteling |
+| 3 | Zichtbaarheid per clip (nu · VERDIEPING) | klein | laag | Salon-poort |
+| 4 | Tijdcodecommentaar (nu · VERDIEPING) | klein | laag | reacties |
 | 5 | Portretrechtvraag | middel | middel | tags, meldingen |
 | 6 | Export | middel | middel | codecs in de browser |
 | 7 | Ruisonderdrukking | middel | hoog | lokaal model |
@@ -798,7 +871,7 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
   - muziekrechten (de uitgave met credits, of een licentie-ID van derden);
   - portrettoestemmingen (getagde codenamen met akkoord);
   - locatierechten (een verklaring van de plek).
-- Regels: een publieke clip zonder volledig rechtenpakket blijft "alleen voor mij".
+- Regels: een publieke clip zonder volledig rechtenpakket blijft "alleen voor mij". (Het synchronisatierecht in c is te controleren.) Dit blijft een huisregel ter bescherming van rechthebbenden (de veilige stand is "alleen voor mij", geen weigering van het lid): alleen de wettelijke grondslag is te controleren, en het scherm noemt de huisregel als reden, niet de wet.
 - Onzekerheid: RTG controleert geen externe licentie inhoudelijk en zegt dat; een licentie-ID is een opgave.
 - Wanneer iemand iets hoort: de maker, bij een ontbrekend onderdeel.
 - Rollen: de maker vraagt, de rechthebbende stemt in.
@@ -825,14 +898,14 @@ Wat we niet overnemen: algoritmische bereiksvergroting, boost, "trending" en one
 **Gebruikersketen**
 1. A neemt 20 s op.
 2. A knipt.
-3. A zet er een uitgave van B onder.
+3. A zet er een uitgave van B onder. (gecorrigeerd: kan vandaag niet; alleen een eigen, klaar stuk van A.)
 4. A deelt met "vrienden".
 5. C (een vriend) kijkt rechtstreeks.
 6. D (een vreemde) ziet niets.
 
 Storingen:
 - A is offline: C hoort "de maker is nu niet online".
-- B trekt de uitgave in: de clip speelt zonder geluid en zegt waarom.
+- B trekt de uitgave in: de clip speelt zonder geluid en zegt waarom. (gecorrigeerd: niet van toepassing zolang een clip geen uitgave van een ander kan dragen; te bouwen.)
 - Een dubbeltik of crash bij delen: één kaart (bewezen).
 - Een streng netwerk zonder TURN: geen beeld, met de reden.
 - Het toestel van A is weg: besluit nodig.
@@ -843,6 +916,60 @@ Storingen:
 - het portretrechtbeleid.
 
 **Extern:** TURN voor strenge netwerken; codecs per platform.
+
+#### v3 — afbouw (RTG Video)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Feed met einde — schermtekst: "▶ Speel", "+ Volg" / "✓ Volgend", "Meld", filter "Alleen met ondertitel"; status "Rechtstreeks van <codenaam>" of "Maker offline: de clip staat alleen op diens toestel" (`public/apps/clips.html`) — routes `POST /api/clips/feed`, `/volg`, `/meld` — stand: bestaat
+- Opnemen en delen — schermtekst: "Maak een clip", "● Opnemen", "◼ Stop", "Deel de clip"; "Klaar om op te nemen (max 60 seconden)." (`clips.html`) — route `POST /api/clips/maak` met `idem` — stand: bestaat
+- Knippen — schermtekst: "Zet de knip", "Terugdraaien" — route `POST /api/clips/knip` — stand: bestaat
+- Geluid — schermtekst: "Eigen geluid", "Zonder geluid te bekijken", "Met gesproken toelichting" — route `POST /api/clips/geluid` — stand: bestaat; de vierde waarde "muziek" heeft geen knop
+- Ondertitels met de hand — schermtekst: "Regel erbij", "Bewaar de ondertitels" — route `POST /api/clips/ondertitels` — stand: bestaat
+- Reageren — schermtekst: "Plaats", placeholder "Schrijf een reactie…" — routes `POST /api/clips/reactie`, `/reacties` — stand: bestaat
+- Weghalen — schermtekst: "Weg", daarna "Clip weggehaald." — route `POST /api/clips/weg` — stand: bestaat
+- Zichtbaarheid per clip, tijdcode bij reacties, export, automatische ondertitels — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in op de leden-app." (`clips.html`); routes geven 401
+- Pas-poort (`geenGast`) — gratis account: 403 "RTG Clips is voor leden." (`server/routes/clips.js`)
+- Opslag op het toestel (OPFS) — mislukt: "Lokaal bewaren lukte niet: <reden>", en de kaart wordt weer weggehaald (`clips.html`)
+- WebRTC met aanwezigheid en ICE (`/api/clips/aanwezig`, `/api/clips/signaal`, `/api/ice`) — maker offline: "De maker is nu niet online; deze clip staat alleen op diens eigen toestel." (`public/shared/clipdeler/clipdeler-01.js`); geen TURN-verbinding: niet gemeten
+- Idempotentie (`idem` op maak) — dubbeltik geeft één kaart (`test/clips-deel.e2e.js`)
+- Kantoor (`/api/office/clips`, `/api/office/clips/verwijder`) — zonder kantoor blijft een melding liggen; wat het lid dan ziet: niet gemeten
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Klankwerk — een eigen, klaar stuk als geluid; zonder: "Kies een eigen stuk uit RTG Studio dat u klaar hebt gemeld." (`server/kern/clips-studio.js`), alleen via de API
+- RTG Media — FLOW, makerprofiel en volgen over de vormen; Clips zegt niets als hij uit staat
+- Spraakmodel (`/api/ondertiteling`) — niet gekoppeld in Clips
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:clips': {
+  uitgeeft: [
+    { wat: 'clips van een maker', aan: 'link:mediaos (FLOW, makerprofiel)', vorm: 'projectie', bron: 'server/kern/clips-lezers.js (clipsVan)' },
+    { wat: 'clips met dit stuk als geluid', aan: 'link:mediaos (hub)', vorm: 'projectie', bron: 'server/kern/clips-lezers.js (clipsMetTrack)' },
+    { wat: 'volgers van een maker (sleutels)', aan: 'link:mediaos (bord, meldingen)', vorm: 'projectie', bron: 'server/kern/clips-lezers.js (clipsVolgersVan)' },
+    { wat: 'melding van een clip', aan: 'kantoor', vorm: 'gebeurtenis', bron: 'server/kern/clips-kantoor.js' }
+  ],
+  ontvangt: [
+    { wat: 'eigen, klaar stuk { id, naam, bpm } (kopie)', van: 'link:muziek (Klankwerk)', vorm: 'projectie', bron: 'server/kern/clips-studio.js (geluid → eigenTrack)' },
+    { wat: 'volgrelatie', van: 'link:mediaos', vorm: 'gebeurtenis', bron: 'server/kern/mediaos/volgen.js' },
+    { wat: 'ICE-servers', van: '/api/ice', vorm: 'verwijzing', bron: 'public/shared/clipdeler/clipdeler-01.js' }
+  ],
+  ketens: [
+    { naam: 'delen, zien, reageren, melden', stappen: ['Clips: A deelt', 'Clips: B ziet, reageert en meldt', 'kantoor: ziet de melding'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/clips.js (lokaal; register GEEN_FIXTURE)' },
+    { naam: 'rechtstreeks kijken', stappen: ['Clips: A neemt op', 'clipdeler: B krijgt het beeld van het toestel van A'], stand: 'gesloten', bewijs: 'test/videobellen-echt.e2e.js ("clips: een kijker ziet de clip van de maker, rechtstreeks van diens toestel")' },
+    { naam: 'uitgave van een ander als geluid', stappen: ['Klankwerk: uitgave van B', 'Clips: A kiest hem als geluid'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'export uit Studio Pro', stappen: ['Clips: opname', 'Media Studio Pro: export in bronkwaliteit'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'clip als moment op reis', stappen: ['Clips: clip', 'Reizen: verwijzing in het reisboek'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een lid dat een moment wil delen, doet hier zijn hele werk: opnemen tot 60 s, knippen, ondertitelen, geluid kiezen, delen, reageren en melden. Een kijker ook. Het kantoor handelt meldingen volledig af. Voor een videomaker, editor, redactie of school is het een deel van het werk: export, review op tijdcode, versies, zichtbaarheid per clip en een kanaal met goedkeuring ontbreken. Extern blijft nodig: een montageprogramma met export (bv. CapCut uit b), een reviewdienst (bv. Frame.io uit b) en TURN voor strenge netwerken. Volledig voor: lid als maker, kijker, kantoor (meldingen) · Deels voor: videomaker, editor, redactie, school · Extern nodig: montage met export, review-software, TURN.
 
 ---
 
@@ -874,8 +1001,8 @@ Gebouwd:
 
 | Marktleider (duurste pakket) | Wat het pakket biedt | Bron, peildatum 2026-10-19 | Wij |
 |---|---|---|---|
-| Plex Pass Lifetime | Downloaden voor offline, op afstand kijken, transcoderen in HD/4K, gezinsprofielen, liedteksten. Lifetime $749,99, jaar $69,99 | [TechCrunch 2025](https://techcrunch.com/2025/03/19/streamer-plex-raises-subscription-price-for-the-first-time-in-a-decade), [AlternativeTo 2026](https://alternativeto.net/news/2026/7/plex-lifetime-pass-price-is-now-750-as-plex-adds-a-new-5-year-recurring-pass-at-250/) [derde bron] | half: één bibliotheek en samen kijken ja; offline, profielen en transcoderen nee |
-| Spotify Premium Family | Muziek zonder advertenties, offline, profielen | [Engadget](https://www.engadget.com/spotify-raises-iprice-of-premium-plans-115138529.html) | half |
+| Plex Pass Lifetime | Downloaden voor offline, op afstand kijken, transcoderen in HD/4K, gezinsprofielen, liedteksten. Lifetime $749,99, jaar $69,99 | [TechCrunch 2025](https://techcrunch.com/2025/03/19/streamer-plex-raises-subscription-price-for-the-first-time-in-a-decade), [AlternativeTo 2026](https://alternativeto.net/news/2026/7/plex-lifetime-pass-price-is-now-750-as-plex-adds-a-new-5-year-recurring-pass-at-250/) [derde bron] (te controleren) | half: één bibliotheek en samen kijken ja; offline, profielen en transcoderen nee |
+| Spotify Premium Family | Muziek zonder advertenties, offline, profielen | [Engadget](https://www.engadget.com/spotify-raises-iprice-of-premium-plans-115138529.html) (te controleren) | half |
 | Vimeo Enterprise | Privacy per video, analyses, DRM | [Vimeo help](https://help.vimeo.com/hc/en-us/articles/12425432033937-About-Vimeo-plans) | nee: geen DRM; maker-analyses beperkt (`mediaos/meldingen`) |
 
 Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een volgorde op populariteit.
@@ -887,13 +1014,13 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
 - **Organisatorisch** (zaak, zender, festival):
   - een zaakwereld (`zaakwereld.js`);
   - programmeren voor een zaal;
-  - wat een zaak publiek mag vertonen (Videma/FilmService voor tv- en filmbeeld, Buma/Sena voor muziek).
+  - wat een zaak publiek mag vertonen (Videma/FilmService voor tv- en filmbeeld, Buma/Sena voor muziek) (te controleren).
 - **Wat ontbreekt:**
   - offline;
   - profielen per gezinslid;
   - doorgaan waar ik was;
-  - uitleg bij een aanbeveling;
-  - een eerlijke melding per domein.
+  - uitleg bij een aanbeveling (gecorrigeerd: bestaat, zie d.6);
+  - een eerlijke melding per domein (gecorrigeerd: het mechanisme bestaat, de toets niet; zie d).
 
 #### d. Functiecatalogus
 
@@ -903,7 +1030,7 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
    - Gegevens: de volgerslijst van elk domein zelf (`volgen.js`).
    - Regels: Media OS schrijft in het domein, nooit in een eigen kopie.
    - Acceptatie: één keer volgen toont de maker in MUZIEK, KIJK en FLOW.
-   - Stand: bestaat.
+   - Stand: bestaat (gecorrigeerd: volgen schrijft in de volgerslijsten van Clips en Theater; Klankwerk heeft geen volgerslijst, en het betaalde Podium-abonnement wordt bewust niet aangeraakt — kop van `server/kern/mediaos/volgen.js`. Of MUZIEK een gevolgde maker eerst toont, is niet gemeten).
 
 2. **Gedeelde lijst met rechten**
    - Gegevens: `lijsten.js` en `lijstdelen.js`.
@@ -918,7 +1045,7 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
    - Rekenwijze: de laatste positie ≥ 10 s vóór het einde; daarna geldt het stuk als "af".
    - Wanneer iemand iets hoort: "verder op 12:40".
    - Acceptatie: op een tweede toestel start het stuk binnen 5 s van de laatste positie.
-   - Stand: half. Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (gecorrigeerd: ontbreekt. Er wordt nergens een positie per stuk bewaard; `tijdlijn.js` is een momentenfacade en `positieS` bestaat alleen in de samen-kamer (`server/kern/mediaos/samen.js`). Het scherm belooft wel "bewaren en verdergaan" bij Bibliotheek, `media.html`). Kosten: klein. Bak: nu · HERSTEL.
 
 4. **Profielen per gezinslid met leeftijdsfilter**
    - Gegevens: de gezinsrol van FoundationOS (de gezinsregel van 3d0e386f2), geen kopie.
@@ -941,13 +1068,13 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
    - Regels: elke aanbeveling zegt waarom ("u volgt X", "op uw lijst Y"); uit te zetten.
    - Onzekerheid: een aanbeveling is een voorstel en nooit een volgorde op populariteit.
    - Acceptatie: bij elke aanbeveling staat een reden; met smaak uit verdwijnen de aanbevelingen.
-   - Stand: half. Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (gecorrigeerd: de reden staat al bij elk stuk, bv. "U volgt X." en "Nieuw binnengekomen; verder weet ik niets van uw smaak hier." (`server/kern/mediaos/smaak.js` r. 113–118, getoond door `media/wereld.js`); "Verras me" en "Wis mijn hele smaakprofiel" bestaan. Een schakelaar "smaak uit" heb ik niet gevonden). Kosten: klein. Bak: nu · VERDIEPING.
 
 **L5:** ontdekken → bewaren → lijst → delen → samen → verwijderen uit de bibliotheek. Bestaat; herstel bewezen.
 
 **L6**
 - Ontvangen: uitgaven, video's, clips, livekanalen; `aanwezig` en `momenten` (de momentproef).
-- Uitgegeven: verwijzingen in lijsten en DM's, de stuurfunctie naar de schil.
+- Uitgegeven: verwijzingen in lijsten en DM's, de stuurfunctie naar de schil. (gecorrigeerd: `/api/mediaos/stuur` stuurt de eigen smaak — meer, minder, nooit — en niets naar de schil; `stuurSmaak` in `media/wereld.js`.)
 - Buiten de eigen apps:
   - Horeca-events/festival (`horeca.events`, `festival.crewdashboard`): een programma met media van makers. Verwijzing, geen kopie.
   - FoundationOS magazine (`media.magazine`).
@@ -956,7 +1083,7 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
 - Gegevens: `leeg.js`.
 - Regels: valt een domein weg, dan blijven de andere standen werken en zegt de stand "Theater is nu niet bereikbaar".
 - Acceptatie: met Theater uit werken MUZIEK en FLOW, en KIJK toont de melding.
-- Stand: half. Kosten: klein. Bak: aanbevolen nu.
+- Stand: half (gecorrigeerd: het mechanisme bestaat. Elke bron die weigert of faalt komt in `buiten` (`haal` in `server/kern/mediaos/catalogus.js`), en het scherm zegt "<vorm> staat nu buiten uw wereld" met de reden eronder (`media/wereld.js`). Wat ontbreekt is de toets met één domein uit). Kosten: klein. Bak: nu · HERSTEL (meetgat).
 
 #### e. RTG-exclusief
 
@@ -969,16 +1096,16 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
 - **Bestaat:** de hele `server/kern/mediaos/`, de clipdeler, Samen.
 - **Ontbreekt:**
   - de positie per stuk in de tijdlijn;
-  - de uitleg in smaak;
-  - de melding per domein;
+  - de uitleg in smaak (gecorrigeerd: bestaat, zie d.6);
+  - de melding per domein (gecorrigeerd: bestaat als `buiten`; de toets ontbreekt);
   - het leeftijdslabel en de koppeling met de gezinsregel;
   - de 5 onbedienbare knoppen (nulmeting).
 
 #### g. Prioritering
 
-1. Melding per domein: klein.
-2. Doorgaan waar ik was: klein.
-3. Uitleg bij aanbeveling: klein.
+1. Melding per domein (nu · HERSTEL): klein.
+2. Doorgaan waar ik was (nu · HERSTEL): klein.
+3. Uitleg bij aanbeveling (nu · VERDIEPING): klein.
 4. Onbedienbare knoppen: klein; nodig voor bewijs bedienbaar.
 5. Leeftijdsfilter: middel; hangt aan het besluit over het label.
 6. Offline: middel; hangt aan een rechtenbesluit.
@@ -1012,7 +1139,7 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
 - Gegevens: een programma (tijdvakken met stukken uit de vier domeinen, als verwijzingen), het publiek (iedereen, leden, een besloten kring) en de rechtenstatus per stuk.
 - Regels:
   - alleen stukken waarvan de maker "mag in een programma" aanzette;
-  - een stuk zonder rechtenstatus voor openbare vertoning kan niet in een publiek programma;
+  - een stuk zonder rechtenstatus voor openbare vertoning kan niet in een publiek programma (de regels voor openbare vertoning in c zijn te controleren; Dit blijft een huisregel ter bescherming van rechthebbenden (de veilige stand is "alleen voor mij", geen weigering van het lid): alleen de wettelijke grondslag is te controleren, en het scherm noemt de huisregel als reden, niet de wet.);
   - een programma is eindig en heeft een einde.
 - Rekenwijze: per tijdvak is de duur gelijk aan de som van de stukken; een overloop wordt gemeld.
 - Wanneer iemand iets hoort: de maker, als zijn stuk wordt geprogrammeerd; het publiek bij de start (alleen wie volgt of zich aanmeldde).
@@ -1030,7 +1157,7 @@ Niet over te nemen: autoplay naar het volgende stuk, eindeloze stromen en een vo
 - Acceptatie: een maker ziet zijn eigen tellingen met drempel, en geen enkele vergelijking met anderen.
 
 **B3. Leeftijdslabels en een keuringsproces.**
-- Gegevens: een label per stuk, door de maker opgegeven volgens een vaste schaal (bijvoorbeeld AL/6/9/12/14/16/18, de schaal van de Nederlandse classificatie als BRON, niet als partner).
+- Gegevens: een label per stuk, door de maker opgegeven volgens een vaste schaal (bijvoorbeeld AL/6/9/12/14/16/18, de schaal van de Nederlandse classificatie als BRON, niet als partner) (te controleren).
 - Regels:
   - zonder label niet zichtbaar voor kinderen;
   - een melding dat een label te laag is, gaat naar een mens van het kantoor;
@@ -1061,6 +1188,62 @@ Storingen:
 
 **Extern:** geen.
 
+#### v3 — afbouw (RTG Media)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Wereld met reden per stuk — schermtekst: "Vandaag" ("voor u gekozen"), per kaart de `waarom`-regel, onderaan het einde (`public/apps/media.html`, `media/wereld.js`) — route `POST /api/mediaos/wereld` — stand: bestaat
+- Bewaren en bibliotheek — schermtekst: "Bibliotheek" ("bewaren en verdergaan") — routes `POST /api/mediaos/bewaar`, `/bieb` — stand: half (bewaren ja, verdergaan nee)
+- Maker, volgen, meldingen, bord — schermtekst: "Mijn bord" (`media.html`, `media/blad.js`) — routes `POST /api/mediaos/maker`, `/volg`, `/meldingen`, `/bord`, `/stuk` — stand: bestaat
+- Lijsten — schermtekst: "Lijsten", "In lijst" — routes `POST /api/mediaos/lijsten`, `/lijst`, `/lijst/maak`, `/lijst/stuk`, `/lijst/zet`, `/lijst/deel` — stand: bestaat
+- Samen kijken — schermtekst: "Samen", "Samen kijken"; "Kamer gesloten." (`media/samen.js`) — routes `POST /api/mediaos/samen/start|in|uit|zet|nodig|mijn` — stand: bestaat
+- Smaak sturen — schermtekst: "Verras me", "Wis mijn hele smaakprofiel" (`media/wereld.js`) — routes `POST /api/mediaos/smaak`, `/stuur` — stand: bestaat
+- Studio Pro, lokaal bewerken — schermtekst: "Nieuwe productie", "Rahul afwerking", "Ondertitels toepassen", "Lokaal transcriberen", "Exporteer master", "Project lokaal bewaren"; "Geen RTG-watermerk, geen betaalmuur, …" (`media.html`, `media/studio-pro*.js`) — alleen transcriberen gebruikt een route: `POST /api/ondertiteling/fragment` — stand: bestaat (export als WebM via MediaRecorder; het project staat in `localStorage` onder `rtg_studio_pro_laatst`)
+- Releasecontrole — schermtekst: "Menselijke goedkeuring vereist", knop "Controle starten"; regels "Nog in te vullen", "Nog te controleren", "Niet gekozen", "Alleen u" (`media.html`) — geen route en geen klikhandler in de geladen scripts (`media/studio.js` opent en sluit alleen het paneel) — stand: ontbreekt
+- Live — knop "Live" leidt naar `/apps/podium.html` (`media/voorzijde.js`) — stand: bestaat
+- Doorgaan waar ik was, profielen per gezinslid, offline — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder: "Meld u aan om verder te gaan." (`media/wereld.js`)
+- Pas-poort (`geenGast`) — gratis account: 403 "De Media OS is voor leden." (`server/routes/mediaos.js`)
+- De vier domeinbronnen (Klankwerk, Theater, Clips, Podium) — een bron die weigert of faalt: "<Muziek|Video|Korte video|Live> staat nu buiten uw wereld" met de reden, bv. "Deze bron gaf een fout: …" (`server/kern/mediaos/catalogus.js`, `media/wereld.js`); alle vier leeg: de tekst uit `server/kern/mediaos/leeg.js`, bv. "Uw mediawereld is nog leeg"
+- Verbindingen en DM (`/api/member/connections`, `/api/member/dm/send`) — nodig om een lijst te delen; uitval: niet gemeten
+- Idempotentie (`idem` op `/lijst/maak`) — dubbeltik geeft één lijst (`scripts/lib/voltooi/mediaos.js`)
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Spraakmodel (`/api/ondertiteling/fragment`) — transcriptie in Studio Pro; uit: de fout van de server of "Geen spraak herkend." (`media/studio-pro.js`). Studio Pro vraagt `/api/ondertiteling/stand` niet, dus de knop staat er altijd
+- Klankmotor (`/apps/klankwerk/motor.js`) — speelt een uitgave af als getallen; zonder Klankwerk-uitgaven staat MUZIEK buiten of leeg
+- Clipdeler (`/shared/clipdeler.js`) — speelt een clip rechtstreeks af; maker offline: de zin uit Clips
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:mediaos': {
+  uitgeeft: [
+    { wat: 'volgrelatie op een maker', aan: 'link:clips en Theater', vorm: 'gebeurtenis', bron: 'server/kern/mediaos/volgen.js' },
+    { wat: 'gedeelde lijst (stuk-ids)', aan: 'verbonden lid via DM', vorm: 'verwijzing', bron: 'public/apps/media/lijst.js → POST /api/member/dm/send' },
+    { wat: 'samen-kamer met stuk en positie', aan: 'genodigd lid', vorm: 'verwijzing', bron: 'server/kern/mediaos/samen.js' }
+  ],
+  ontvangt: [
+    { wat: 'uitgaven', van: 'link:muziek (Klankwerk)', vorm: 'projectie', bron: 'server/kern/mediaos/catalogus.js (vanTrack)' },
+    { wat: 'video\'s', van: 'Theater (media.theater)', vorm: 'projectie', bron: 'server/kern/mediaos/catalogus.js (vanVideo)' },
+    { wat: 'clips, clips per stuk, volgers', van: 'link:clips', vorm: 'projectie', bron: 'server/kern/clips-lezers.js' },
+    { wat: 'livekanalen', van: 'Podium (media.podium)', vorm: 'projectie', bron: 'server/kern/mediaos/catalogus.js (bronnen.live)' },
+    { wat: 'aanwezigheid en momenten', van: 'clipdeler, momentproef', vorm: 'gebeurtenis', bron: 'server/routes/mediaos.js (/aanwezig, /momenten)' }
+  ],
+  ketens: [
+    { naam: 'ontdekken, bewaren, lijst, delen', stappen: ['Media: A ziet stukken met reden', 'Media: A bewaart en maakt een lijst', 'Media: B leest de gedeelde lijst', 'Media: een vreemde ziet niets'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/mediaos.js (lokaal; register GEEN_FIXTURE)' },
+    { naam: 'volgen en gewekt worden', stappen: ['Media: volgen', 'Clips: nieuwe clip', 'Media: melding'], stand: 'gesloten', bewijs: 'MOMENTPROEF.json (ZONDER_APP in appcontract)' },
+    { naam: 'doorgaan op een ander toestel', stappen: ['Media: positie bewaren', 'Media: tweede toestel'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'releasecontrole door een mens', stappen: ['Studio Pro: productie', 'Releasecontrole: "Controle starten"', 'kantoor: besluit'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'Sound-uploads in MUZIEK', stappen: ['Sound: upload', 'Media: MUZIEK'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een lid doet hier zijn hele werk als kijker en luisteraar: ontdekken met een reden, bewaren, lijsten maken en delen, samen kijken en smaak sturen. Een maker ziet zijn werk over de vormen op één profiel en één bord. Voor een maker die publiceert is het een deel van het werk: Studio Pro bewerkt en exporteert lokaal, maar de releasecontrole erachter doet niets. Voor een gezin is het een deel: profielen en een leeftijdsfilter ontbreken, net als verdergaan en offline. Extern blijft nodig: een mediaspeler met offline en profielen (bv. Plex uit b) voor wie dat wil, en hosting met DRM (bv. Vimeo uit b) voor wie dat vraagt. Volledig voor: lid als kijker en luisteraar, lijstmaker · Deels voor: maker die publiceert, gezin · Extern nodig: offline-speler met profielen, DRM-hosting.
+
 ---
 
 ### Tweede scherm (link:tweedescherm, /apps/scherm.html, werkrol zaak)
@@ -1083,21 +1266,21 @@ Storingen:
 Gebouwd:
 - Eén eigen route: `/api/supplier/state`.
 - Spiegelen via BroadcastChannel (alleen op hetzelfde toestel).
-- Standen keuken, bar, kassa en kamers, elk met eigen capabilities.
+- Standen keuken, bar, kassa en kamers, elk met eigen capabilities. (gecorrigeerd: zes standen: "Keuken", "Bar", "Uit te serveren", "Kassa vandaag", "Reserveringen" en "Kamers"; keuken, bar en serveren vragen `orders`, kamers vraagt `rooms` — `WERK` in `scherm.html`.)
 
 #### b. Marktvergelijking
 
 | Marktleider | Wat het pakket biedt | Bron, peildatum 2026-10-19 | Wij |
 |---|---|---|---|
-| Toast KDS | Bonnen per station, kleurcodes op wachttijd, bon klaar, doorsturen naar de pas | [Merchant Maverick](https://www.merchantmaverick.com/toast-pricing-guide), [UpMenu](https://www.upmenu.com/blog/toast-pricing) [derde bron]; software ca. $25–35/mnd, scherm $599–1.199 | half: tonen ja; bon klaar, wachttijd en doorsturen nee |
-| Fresh KDS (Advanced) | Meerdere schermen, routering per station, rapportage over bereidingstijd | [Square help](https://squareup.com/help/au/article/5392), [Fit Small Business](https://fitsmallbusiness.com/best-kitchen-display-systems/) [derde bron]; $15–89/mnd | nee: geen routering, geen rapportage |
+| Toast KDS | Bonnen per station, kleurcodes op wachttijd, bon klaar, doorsturen naar de pas | [Merchant Maverick](https://www.merchantmaverick.com/toast-pricing-guide), [UpMenu](https://www.upmenu.com/blog/toast-pricing) [derde bron] (te controleren); software ca. $25–35/mnd, scherm $599–1.199 | half: tonen ja; bon klaar, wachttijd en doorsturen nee |
+| Fresh KDS (Advanced) | Meerdere schermen, routering per station, rapportage over bereidingstijd | [Square help](https://squareup.com/help/au/article/5392), [Fit Small Business](https://fitsmallbusiness.com/best-kitchen-display-systems/) [derde bron] (te controleren); $15–89/mnd | nee: geen routering, geen rapportage |
 
 #### c. Het volledige domein
 
 - **Horeca-praktijk:**
   - de keuken werkt met een bon per gang en per station (koud, warm, pass);
   - "fire" per gang;
-  - allergenen op de bon (EU-verordening 1169/2011 over voedselinformatie; vakpraktijk);
+  - allergenen op de bon (EU-verordening 1169/2011 over voedselinformatie; vakpraktijk) (te controleren);
   - wachttijd zichtbaar voor de chef.
   - De bar ziet drank; de pass ziet wat compleet is; de bediening hoort "klaar".
   - Het hotel ziet de kamerstand (schoonmaak, vrij).
@@ -1113,15 +1296,15 @@ Gebouwd:
    - Regels: elk scherm toont alleen de regels van zijn station (koud, warm, bar).
    - Rollen: werkrol zaak, en straks per personeelsrol.
    - Acceptatie: het barscherm toont geen gerecht en het keukenscherm geen drank.
-   - Stand: half (keuken/bar-standen). Kosten: klein. Bak: aanbevolen nu.
+   - Stand: half (keuken/bar-standen) (gecorrigeerd: het filter keuken/bar bestaat al. `kdsFilter` in `scherm.html` toont per bon alleen de regels waarvan `menu[].station` bij dat scherm hoort; het barscherm toont dus geen gerecht en het keukenscherm geen drank. Koud, warm en pass bestaan niet). Kosten: klein. Bak: nu · VERDIEPING.
 
 2. **Allergenen op de bon**
    - Gegevens: allergenen per gerecht uit de kaart van de zaak.
    - Regels: altijd zichtbaar, nooit in te klappen.
    - Onzekerheid: de zaak voert ze in; RTG controleert de recepten niet en zegt dat.
    - Acceptatie: een bon met een notengerecht toont "noten" bovenaan, groot.
-   - Stand: niet gemeten. → *Voor de integrator:* staan allergenen al in de horecakaart?
-   - Kosten: klein. Bak: aanbevolen nu (zodra de bron bekend is).
+   - Stand: niet gemeten (gecorrigeerd: gemeten. De bron bestaat: `menu[].allergens` per gerecht (`server/seed/leveranciers.js`, `server/kern/horeca/kaart.js`) en het `zorg`-profiel dat met de bestelling meereist (`server/kern/lidacties/bestellen.js`). Het scherm toont alleen de vrije `allergyNote` van de bestelling, in de kleine meta-regel onder de bon). → *Voor de integrator:* staan allergenen al in de horecakaart?
+   - Kosten: klein. Bak: nu · HERSTEL (zodra de bron bekend is) (gecorrigeerd: de bron is bekend, zie hierboven).
 
 **L5 Levenscyclus**
 
@@ -1132,14 +1315,14 @@ Gebouwd:
    - Rollen: personeel met de keukenrol.
    - Uitzonderingen: een bon die al klaar is, kan niet nog eens.
    - Acceptatie: een dubbele tik zet de bon één keer op klaar; na een crash blijft hij klaar.
-   - Stand: ontbreekt. Kosten: middel. Bak: aanbevolen nu. → *Vraagt besluit:* mag het tweede scherm schrijven?
+   - Stand: ontbreekt. Kosten: middel. Bak: nu · VERDIEPING. → *Vraagt besluit:* mag het tweede scherm schrijven?
 
 4. **Stand bij netwerkverlies**
    - Regels: het scherm laat zien hoe oud zijn stand is.
    - Rekenwijze: nu min laatste antwoord.
    - Wanneer iemand iets hoort: na 30 s zonder antwoord "verbinding weg sinds …".
    - Acceptatie: zonder netwerk toont het scherm binnen 35 s de melding en de laatste stand.
-   - Stand: ontbreekt. Kosten: klein. Bak: aanbevolen nu.
+   - Stand: ontbreekt. Kosten: klein. Bak: nu · HERSTEL.
 
 **L4 Domeinintelligentie**
 
@@ -1148,32 +1331,32 @@ Gebouwd:
    - Rekenwijze: nu min besteltijd; oranje boven de streefwaarde van de zaak, rood boven twee keer die waarde.
    - Onzekerheid: geen voor wachttijd. Een voorspelde bereidingstijd heet "verwachting", nooit een feit.
    - Acceptatie: een bon boven de streefwaarde kleurt oranje.
-   - Stand: ontbreekt. Kosten: klein. Bak: aanbevolen nu (zonder voorspelling); voorspelling later via de stuurlaag.
+   - Stand: ontbreekt (gecorrigeerd: half. Elke bon toont de minuten sinds bestellen, en de kaart krijgt klasse `laat` vanaf 12 en `langlaat` vanaf 20 minuten — vaste drempels, geen streefwaarde van de zaak; `orderKaart` in `scherm.html`). Kosten: klein. Bak: nu · VERDIEPING (zonder voorspelling); voorspelling later via de stuurlaag.
 
 **L6:** leest de zaakstand; gevonden alleen door de werkrol zaak (Heel RTG en de gids, 4074a194d). Buiten de eigen apps: festival-crew (`festival.crewdashboard`) kan hetzelfde scherm gebruiken voor een bar op een event. → *Voor de integrator.*
 
 #### e. RTG-exclusief
 
-- **Bestelling en scherm in één keten:** de gast bestelt aan tafel (`horeca.tafelgast`), en de bon staat op het scherm zonder koppelsoftware.
+- **Bestelling en scherm in één keten:** de gast bestelt aan tafel (`horeca.tafelgast`), en de bon staat op het scherm zonder koppelsoftware. (gecorrigeerd: alleen een betaalde bestelling. `lopende()` in `scherm.html` eist `o.paid`, en een bestelling met betaalmoment achteraf start als `paid: false` (`server/kern/lidacties/bestellen.js`). Een open tafelrekening staat dus volgens de code niet op keuken of bar; niet in een proef gemeten.)
 - **Zaak-eigen data, nul toegang voor andere zaken** (bewezen).
 
 #### f. Bouwstenen en ontbrekende koppelingen
 
 - **Bestaat:** `scherm.html`, `/api/supplier/state`, de horeca-kern, de herhaalsleutelregel.
 - **Ontbreekt:**
-  - het filter per station;
+  - het filter per station (gecorrigeerd: bestaat voor keuken en bar);
   - de schrijfroute "klaar";
   - de ouderdom van de stand;
-  - de wachttijd;
-  - de bron van allergenen (niet gemeten).
+  - de wachttijd (gecorrigeerd: minuten en twee vaste drempels bestaan; de streefwaarde per zaak ontbreekt);
+  - de bron van allergenen (niet gemeten) (gecorrigeerd: de bron bestaat, `menu[].allergens`; de weergave ontbreekt).
 
 #### g. Prioritering
 
-1. Ouderdom van de stand: klein.
-2. Wachttijd: klein.
-3. Filter per station: klein.
-4. Allergenen: klein; hangt aan de bron.
-5. Bon klaar: middel; hangt aan het besluit over schrijven.
+1. Ouderdom van de stand (nu · HERSTEL): klein.
+2. Wachttijd (nu · VERDIEPING): klein.
+3. Filter per station (nu · VERDIEPING): klein.
+4. Allergenen (nu · HERSTEL): klein; hangt aan de bron.
+5. Bon klaar (nu · VERDIEPING): middel; hangt aan het besluit over schrijven.
 
 #### h. Eindcontract
 
@@ -1232,7 +1415,7 @@ Gebouwd:
 - Acceptatie: een gemiste koelcelmeting verschijnt binnen een minuut op het keukenscherm.
 - Eigenaar: `horeca.haccp`. Het tweede scherm geeft alleen weer.
 
-**Modus LOS:** het scherm werkt zonder de hoofd-app. Zonder zaaksessie zegt het "Log eerst in op de leverancier-app". Zonder netwerk zegt het nog niets: te bouwen.
+**Modus LOS:** het scherm werkt zonder de hoofd-app. Zonder zaaksessie zegt het "Log eerst in op de leverancier-app". Zonder netwerk zegt het nog niets: te bouwen. (gecorrigeerd: de volledige zin is "Log eerst in op de leverancier-app op dit toestel; open dit tweede scherm daarna vanuit "Meer → Tweede scherm"."; bij elke status anders dan 200, ook een serverfout, zegt het "De inlog is verlopen. Log opnieuw in op de leverancier-app.")
 
 **Modus SAMEN:** tafel → horeca-kern → keukenscherm → bediening. De kassa telt de dag. Gevonden via Heel RTG (werkrol zaak).
 
@@ -1253,23 +1436,122 @@ Storingen:
 
 **Extern:** hardware (scherm, montage) per zaak.
 
+#### v3 — afbouw (Tweede scherm)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Werkplek kiezen — schermtekst: "Keuken", "Bar", "Uit te serveren", "Kassa vandaag", "Reserveringen", "Kamers", naar de capabilities `orders` en `rooms` (`public/apps/scherm.html`) — route `POST /api/supplier/state`, elke 5 s — stand: bestaat
+- Bon per station, keuken en bar — schermtekst bij leeg: "Geen openstaande keukenbonnen." en "Geen openstaande barbonnen." (`scherm.html`) — zelfde route — stand: bestaat voor keuken/bar; koud, warm en pass ontbreken
+- Wachttijd per bon — minuten sinds bestellen, klasse `laat` vanaf 12 en `langlaat` vanaf 20 min (`orderKaart`) — stand: half (vaste drempels)
+- Allergie op de bon — alleen de vrije `allergyNote` van de bestelling — stand: half (`menu[].allergens` en `zorg` niet getoond)
+- Uit te serveren — schermtekst bij leeg: "Niets staat klaar om uit te serveren." — stand: bestaat
+- Kassa — schermtekst: "Omzet vandaag", "Verkopen", "Open bestellingen" — stand: bestaat
+- Reserveringen en kamers — schermtekst bij leeg: "Geen komende reserveringen.", "Geen kamers." — stand: bestaat
+- Spiegel — schermtekst: "Spiegel hoofdscherm"; "Spiegel aan: dit scherm volgt de werkplek van de hoofd-app." — BroadcastChannel `rtg-scherm`, alleen hetzelfde toestel — stand: bestaat
+- Bon klaar, ouderdom van de stand — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Zaaksessie (`rtg_sup_token`) — zonder: "Log eerst in op de leverancier-app op dit toestel; open dit tweede scherm daarna vanuit "Meer → Tweede scherm"." (`scherm.html`)
+- Zaakstand (`/api/supplier/state`) — elke status anders dan 200, ook een serverfout: "De inlog is verlopen. Log opnieuw in op de leverancier-app." Dat is bij een 5xx een onjuiste zin
+- Netwerk — een mislukte `fetch` wordt stil gevangen (`catch (e) {}`); het scherm houdt de oude stand vast zonder ouderdom of melding
+- Horeca-kern (orders, menu, kassa) — levert de inhoud via de zaakstand; een bestelling met `paid: false` valt buiten `lopende()` en komt niet op keuken of bar
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Leverancier-app op hetzelfde toestel — zendt de werkplek uit op `rtg-scherm` (`public/apps/leverancier.js`); zonder: de spiegel doet niets, zonder melding
+- Meenemen (`/shared/uitvoer.js`) — bestellingen, reserveringen en kamers als tabel; bij de kassa niets
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:tweedescherm': {
+  uitgeeft: [ /* niets: het scherm leest alleen */ ],
+  ontvangt: [
+    { wat: 'zaakstand: orders, menu met station, pos, reserveringen, rooms', van: 'leverancier-kern (horeca.keuken, horeca.dashboard)', vorm: 'projectie', bron: 'POST /api/supplier/state in public/apps/scherm.html' },
+    { wat: 'gekozen werkplek', van: 'leverancier-app', vorm: 'gebeurtenis', bron: 'BroadcastChannel rtg-scherm (public/apps/leverancier.js → scherm.html)' }
+  ],
+  ketens: [
+    { naam: 'kassaverkoop op het scherm', stappen: ['kassa: verkoop', 'Tweede scherm: omzet en een verkoop meer', 'andere zaak: ziet niets'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/tweedescherm.js (lokaal; register GEEN_FIXTURE)' },
+    { naam: 'tafelbestelling op het keukenscherm', stappen: ['horeca.tafelgast: bestelling', 'Tweede scherm: bon op keuken/bar'], stand: 'open', bewijs: 'geen; achteraf betaalde bestellingen vallen volgens de code weg' },
+    { naam: 'bon klaar naar de bediening', stappen: ['Tweede scherm: klaar', 'horeca-kern: status', 'bediening: hoort het'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'allergenen per gerecht op de bon', stappen: ['horeca-kaart: menu[].allergens', 'Tweede scherm: bon'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+De zaak doet hier haar hele werk voor het kassa-overzicht, de reserveringen en de kamerstand op een muurscherm. Voor keuken, bar, pass en chef is het een deel van het werk: bonnen per keuken of bar en de wachttijd zijn er, maar "bon klaar", de stations koud, warm en pass, allergenen per gerecht, een melding bij netwerkverlies en bereidingsanalyse ontbreken, en volgens de code staan achteraf te betalen bestellingen er niet op. Extern blijft nodig: een KDS met bon klaar en routering (bv. Toast KDS of Fresh KDS uit b) en de schermhardware. Volledig voor: zaakbeheer (kassa, reserveringen, kamers) · Deels voor: keuken, bar, pass, chef · Extern nodig: KDS met bon klaar en routering, schermhardware.
+
 ---
 
 ### Voor de integrator (alle vier)
 
 1. Moet Klankwerk (`media.muziek-maken`) een eigen APPWERKT-rij krijgen, of is het een stand van link:muziek?
-2. Een genre muzikant/label/studio in `server/seed/genres.js`: dat vraagt een besluit.
+2. Een genre muzikant/label/studio in `server/seed/genres.js`: dat vraagt een besluit. (gecorrigeerd: `talentmens` in `server/seed/genres-lijst-b.js` dekt de muzikant al; label en studio niet.)
 3. Is een band of collectief een organisatie (WorkOS/concern) of een kring (sociaal)?
 4. Wie is eigenaar van het leeftijdslabel per stuk: het domein of Media OS? Dit hangt aan de gezinsregel.
 5. Een videokanaal van een zaak hoort bij `zaak.redactie`, niet als tweede redactielogica in Clips.
 6. Wie is eigenaar van de momenten in Reizen, zodat Clips daar alleen een verwijzing geeft?
 7. Een "muziek in de zaak"-verklaring bij `horeca.events`, met Buma- en Sena-afdracht: melden, niet regelen.
-8. Staan allergenen al in de horecakaart, en mag het tweede scherm schrijven?
+8. Staan allergenen al in de horecakaart, en mag het tweede scherm schrijven? (gecorrigeerd: ja, `menu[].allergens` per gerecht; het tweede scherm toont ze niet. Het schrijfbesluit staat nog open.)
 9. De registers zijn de nulmeting. Pas een centrale meetronde maakt de lokaal gesloten scenario's tot bewijs.
 
 
 ---
 
+### Familie Media — samen (v3)
+
+**FAMILIES-entry** (voorstel voor het register, zelfde vorm als het appcontract)
+```js
+FAMILIES['livingos-b/media'] = {
+  naam: 'Media',
+  apps: ['link:muziek', 'link:clips', 'link:mediaos', 'link:tweedescherm'],
+  gedeeld: [
+    { wat: 'P2P-weergave en aanwezigheid van clips', bestand: 'public/shared/clipdeler.js (geladen door clips.html en media.html)' },
+    { wat: 'ondertitelband in de speler', bestand: 'public/shared/ondertitelband.js (clips.html, media.html)' },
+    { wat: 'validatie van ondertitelregels', bestand: 'server/kern/ondertitels.js (clips-studio.js en Theater)' },
+    { wat: 'klankmotor die een uitgave uit getallen afspeelt', bestand: 'public/apps/klankwerk/motor.js (klankwerk.html, media.html)' },
+    { wat: 'lezers van Clips voor de laag erboven', bestand: 'server/kern/clips-lezers.js' },
+    { wat: 'herkomst van werk', bestand: 'server/kern/mediaos/werkherkomst.js' },
+    { wat: 'lege stand met reden', bestand: 'server/kern/mediaos/leeg.js en public/shared/leeg.js' },
+    { wat: 'herhaalsleutel in de browser (RTGIdem)', bestand: 'public/shared/id.js' },
+    { wat: 'meenemen als tabel', bestand: 'public/shared/uitvoer.js (muziek.html, clips.html, scherm.html)' },
+    { wat: 'spraak naar tekst, lokaal model', bestand: 'server/routes/spraaktekst.js (/api/ondertiteling/*)' }
+  ],
+  eigenaar: [
+    'link:muziek → media.luisteren (apps/muziek.html); media.muziek-maken (apps/klankwerk.html); kantoor.uitgavenaam (apps/klankwerk-kantoor.html)',
+    'link:clips → media.clips (apps/clips.html)',
+    'link:mediaos → media.centrum (apps/media.html)',
+    'link:tweedescherm → horeca.tweedescherm (apps/scherm.html)'
+  ]
+};
+```
+Niet in de familie, wel in de keten: De Zaal (`apps/zaal.html`, eigenaar `media.zaal`), waar Klankwerk-uitgaven te horen zijn.
+
+**ONTBREKEND** (één regel per schakel die ontbreekt tussen apps van deze familie of naar andere families)
+```
+ONTBREKEND: link:muziek (Klankwerk) → ander lid: uitnodigen als medemaker zet iemand zonder akkoord en zonder pascontrole in de aftiteling (muziek-samen.js, nodig) · HERSTEL · klein
+ONTBREKEND: link:mediaos (Studio Pro) → spraakmodel: een transcriptie wordt meteen als ondertitel toegepast, zonder "voorlopig" · HERSTEL · klein
+ONTBREKEND: link:mediaos (Releasecontrole) → kantoor: "Controle starten" heeft geen handler en geen route, terwijl het paneel "Menselijke goedkeuring vereist" zegt · HERSTEL · klein
+ONTBREKEND: horeca (tafel, betaalmoment achteraf) → link:tweedescherm: bestellingen met paid:false vallen buiten lopende() en komen niet op keuken of bar · HERSTEL · klein
+ONTBREKEND: horeca (kaart, zorgprofiel) → link:tweedescherm: menu[].allergens en het meegestuurde zorg-profiel staan niet op de bon; alleen allergyNote · HERSTEL · klein
+ONTBREKEND: link:tweedescherm → zaaksessie/netwerk: geen ouderdom van de stand, en elke niet-200 heet "De inlog is verlopen" · HERSTEL · klein
+ONTBREKEND: link:muziek (Sound) → link:mediaos: Sound-uploads (muziekBestanden) staan niet in MUZIEK; Media OS leest alleen Klankwerk-uitgaven · VERDIEPING · middel
+ONTBREKEND: link:muziek (Klankwerk) → link:muziek (Sound): uitgaven staan in De Zaal en Media OS, niet in Sound · VERDIEPING · klein
+ONTBREKEND: link:muziek → link:clips: een uitgave van een ander lid kan geen clipgeluid zijn (eigenTrack eist een eigen, klaar stuk), en clips.html heeft geen muziekknop · VERDIEPING · middel
+ONTBREKEND: link:muziek → link:clips: terugtrekken of weghalen van een stuk zegt niets in de clip; die houdt een kopie { id, naam, bpm } · VERDIEPING · klein
+ONTBREKEND: link:muziek (Sound) ↔ link:mediaos: twee aparte kamerlogica's voor samen (server/kern/samen.js en server/kern/mediaos/samen.js) · VERDIEPING · middel
+ONTBREKEND: link:mediaos → link:muziek: volgen schrijft niet in Klankwerk, dat geen volgerslijst heeft · VERDIEPING · klein
+ONTBREKEND: link:mediaos (Studio Pro) → link:clips: export in bronkwaliteit en lokaal transcriberen bestaan in Media, niet in Clips · VERDIEPING · middel
+ONTBREKEND: link:mediaos → link:mediaos: geen positie per stuk, dus geen "verdergaan" op een ander toestel · VERDIEPING · klein
+ONTBREKEND: link:mediaos → FoundationOS (gezinsregel): geen profiel per gezinslid en geen leeftijdslabel per stuk · VERDIEPING · middel
+ONTBREKEND: link:clips → zaak.redactie: geen kanaal met goedkeuring vóór publicatie · VERDIEPING · middel
+ONTBREKEND: link:clips → reizen.reisboek: geen clip als verwijzing in een reismoment · VERDIEPING · klein
+ONTBREKEND: link:muziek → horeca.events: geen "muziek in de zaak"-melding met de beheersorganisaties erbij · VERDIEPING · middel
+ONTBREKEND: link:tweedescherm → horeca-kern: geen schrijfroute "bon klaar" met herhaalsleutel · VERDIEPING · middel
+ONTBREKEND: link:tweedescherm → horeca.haccp: een gemiste registratie verschijnt niet op het keukenscherm · VERDIEPING · klein
+```
+
+---
 ## Sociaal (LivingOS-B)
 
 Domeinkaarten volgens `premiumformat.md`, inclusief de aanscherping en de drie aanvullingen: vier
@@ -1290,21 +1572,21 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 
 | Code | Bron | Wat |
 |---|---|---|
-| M1 | https://techcrunch.com/2026/02/18/snapchat-tops-25m-subscribers-driving-companys-direct-revenue-arr-to-1b/ · https://unil.ink/blog/snapchat-plus-features | Snapchat+ ca. $3,99 per maand. Platinum (duurste) ca. $15,99 per maand: advertentievrij, 5 TB opslag. Functies: Story Timer (1 uur tot 1 week), aantal herbekijkingen, Pin a BFF, streak-emoji's, badge |
-| M2 | https://metricool.com/twitter-blue/ · https://www.igeeksblog.com/what-is-x-premium/ (officieel: https://help.x.com/en/using-x/x-premium, onbereikbaar) | X Basic ca. $3, Premium ca. $8, Premium+ (duurste) ca. $40 per maand. Functies: bewerken binnen 1 uur, berichten tot 25.000 tekens, bladwijzermappen, voorrang voor antwoorden, minder of geen advertenties, Articles |
+| M1 | https://techcrunch.com/2026/02/18/snapchat-tops-25m-subscribers-driving-companys-direct-revenue-arr-to-1b/ · https://unil.ink/blog/snapchat-plus-features | Snapchat+ ca. $3,99 per maand. Platinum (duurste) ca. $15,99 per maand: advertentievrij, 5 TB opslag. Functies: Story Timer (1 uur tot 1 week), aantal herbekijkingen, Pin a BFF, streak-emoji's, badge **(te controleren)** |
+| M2 | https://metricool.com/twitter-blue/ · https://www.igeeksblog.com/what-is-x-premium/ (officieel: https://help.x.com/en/using-x/x-premium, onbereikbaar) | X Basic ca. $3, Premium ca. $8, Premium+ (duurste) ca. $40 per maand. Functies: bewerken binnen 1 uur, berichten tot 25.000 tekens, bladwijzermappen, voorrang voor antwoorden, minder of geen advertenties, Articles **(te controleren)** |
 | M3 | https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/ (officieel persbericht) · https://metricool.com/meta-one-subscription/ | Meta One. **Advanced (duurste), $49,99 per maand per profiel:** stories 30 dagen vooruit inplannen, links in posts, analyses exporteren, teamtoegang zonder wachtwoord, melding als je werk wordt hergepost (bronvermelding vragen). Verder zichtbaarheid kopen in feed en zoeken |
-| M4 | https://www.unilink.us/blog/discord-nitro-features-2026 · https://toolradar.com/tools/discord/pricing | Discord Nitro Basic $2,99 en Nitro $9,99 per maand; server boosts ca. $4,99 per stuk. Functies: grotere uploads, profiel per server, hogere streamkwaliteit |
-| M5 | https://schoolmaker.com/blog/circle-so-pricing · https://cartmango.com/circle-so-pricing/ | Community-platform voor organisaties. Professional ca. $89, Business ca. $199, Enterprise ca. $419 tot $499 per maand. "Plus" met eigen apps op maat. Functies: rollen, moderatie, betaalde lidmaatschappen, analyses, e-mail |
-| M6 | https://www.commonsense.org/education/reviews/kialo-edu | Argumentkaart-platform, gratis. Stelling met pro en contra in een boom, besloten per groep |
+| M4 | https://www.unilink.us/blog/discord-nitro-features-2026 · https://toolradar.com/tools/discord/pricing | Discord Nitro Basic $2,99 en Nitro $9,99 per maand; server boosts ca. $4,99 per stuk. Functies: grotere uploads, profiel per server, hogere streamkwaliteit **(te controleren)** |
+| M5 | https://schoolmaker.com/blog/circle-so-pricing · https://cartmango.com/circle-so-pricing/ | Community-platform voor organisaties. Professional ca. $89, Business ca. $199, Enterprise ca. $419 tot $499 per maand. "Plus" met eigen apps op maat. Functies: rollen, moderatie, betaalde lidmaatschappen, analyses, e-mail **(te controleren)** |
+| M6 | https://www.commonsense.org/education/reviews/kialo-edu | Argumentkaart-platform, gratis. Stelling met pro en contra in een boom, besloten per groep **(te controleren)** |
 
 **Domeinbronnen (bron, nooit partner)**
 
 | Code | Bron | Wat |
 |---|---|---|
-| D1 | Digital Services Act (Verordening (EU) 2022/2065), samengevat via https://trust.doctena.com/dsa en https://www.taskus.com/insights/dsa-internal-complaint-handling-system/ | Art. 16 meldingsprocedure; art. 17 motivering van een beperking (feiten, of het geautomatiseerd ging, rechtsmiddel); art. 20 gratis intern klachtensysteem, niet volledig geautomatiseerd; art. 21 buitengerechtelijke geschilbeslechting. De Bundesnetzagentur noemt art. 16, 17 en 20 haar handhavingsfocus (https://bundesnetzagentur.de/SharedDocs/Pressemitteilungen/EN/2026/20260430_TB_DSC.html). Artikelnummers zijn niet tegen het Publicatieblad gecontroleerd |
+| D1 | Digital Services Act (Verordening (EU) 2022/2065), samengevat via https://trust.doctena.com/dsa en https://www.taskus.com/insights/dsa-internal-complaint-handling-system/ | Art. 16 meldingsprocedure; art. 17 motivering van een beperking (feiten, of het geautomatiseerd ging, rechtsmiddel); art. 20 gratis intern klachtensysteem, niet volledig geautomatiseerd; art. 21 buitengerechtelijke geschilbeslechting. De Bundesnetzagentur noemt art. 16, 17 en 20 haar handhavingsfocus (https://bundesnetzagentur.de/SharedDocs/Pressemitteilungen/EN/2026/20260430_TB_DSC.html). Artikelnummers zijn niet tegen het Publicatieblad gecontroleerd **(te controleren)** |
 | D2 | Code voor Kinderrechten (BZK, Leiden eLaw en Waag, 2021): https://www.universiteitleiden.nl/nieuws/2021/03/code-voor-kinderrechten-ontwerpen-in-het-belang-van-het-kind | Tien ontwerpprincipes, met het belang van het kind voorop. Niet afdwingbaar, wel onderschreven door de ACM |
-| D3 | AVG art. 8 en UAVG art. 5, via https://www.legiscope.com/blog/uavg-uitvoeringswet-avg.html | In Nederland 16 jaar voor toestemming voor een informatiedienst; daaronder ouderlijke toestemming. Secundaire bron |
-| D4 | Beroepspraktijk community-management en moderatie | Huisregels vooraf, escalatieladder (verbergen, waarschuwen, schorsen), vier ogen bij zware sancties, transparantierapport. Afgeleid uit D1 en M5. Er is geen enkele norm die ik hier kon verifiëren |
+| D3 | AVG art. 8 en UAVG art. 5, via https://www.legiscope.com/blog/uavg-uitvoeringswet-avg.html | In Nederland 16 jaar voor toestemming voor een informatiedienst; daaronder ouderlijke toestemming. Secundaire bron **(te controleren)** |
+| D4 | Beroepspraktijk community-management en moderatie | Huisregels vooraf, escalatieladder (verbergen, waarschuwen, schorsen), vier ogen bij zware sancties, transparantierapport. Afgeleid uit D1 en M5. Er is geen enkele norm die ik hier kon verifiëren **(te controleren)** |
 
 ---
 
@@ -1346,7 +1628,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 **d. Functiecatalogus: uitkomst A (binnen de huidige architectuur en scope)**
 
 **S1 · Wat wacht er op mij, over alle sociale apps** — L6 · bestaat · –
-- *Gegevens:* projecties uit Berichten (`comm.berichten`), Genootschap, Pulse, Salon en Vonk via `/api/sociaal/graaf`.
+- *Gegevens:* projecties uit Berichten (`comm.berichten`), Genootschap, Pulse, Salon en Vonk via `/api/sociaal/graaf`. (gecorrigeerd: de graaf leest acht bronnen. `server/kern/socialegraaf/bronnen.js` en `bronnen-poort.js` noemen Berichten, Genootschap, Pulse, De Salon, Meet, Vrienden (verzoeken), Vonk en Rendez-vous, plus de termijnen uit de vooruitblik.)
 - *Regels:* alleen lezen; elke rij draagt zijn bron-app.
 - *Melding:* geen eigen push, want die doet de bron-app.
 - *Rollen:* het lid zelf.
@@ -1354,11 +1636,11 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 
 **S2 · Rahul zet klaar, de mens bevestigt** — L4 · bestaat · –
 - *Gegevens:* het open object in de kring.
-- *Regels:* een voorstel is nooit een handeling. In het weekend zet Rahul met opzet niets klaar.
+- *Regels:* een voorstel is nooit een handeling. In het weekend zet Rahul met opzet niets klaar. (gecorrigeerd: alleen als het lid dat kiest. Standaard staat er geen schakelaar uit (`knopUit: []`), en dan zet Rahul ook in het weekend klaar. `inStilte()` in `server/kern/socialebeleid/index.js` geeft pas stilte als de schakelaar "Weekend zonder voorstellen" op UIT staat; `test/socialebeleid.test.js` bewaakt dat. Het scherm toont die schakelaar standaard als "AAN", en dat leest omgekeerd.)
 - *Onzekerheid:* het voorstel draagt "voorstel" en geen stand.
 - *Acceptatie:* zonder tik ziet de ander niets; na de tik ziet hij het antwoord. Bewezen.
 
-**S3 · Bevestiging terugdraaien** — L5 · ontbreekt · klein · **aanbevolen nu**
+**S3 · Bevestiging terugdraaien** — L5 · ontbreekt · klein · **nu · VERDIEPING**
 - *Gegevens:* het bevestigde voorstel en zijn actielogregel.
 - *Regels:* binnen 10 seconden na bevestigen terug te draaien, alleen door wie bevestigde. Daarna gaat het via de bron-app (afzeggen in Genootschap).
 - *Rekenwijze:* het tijdstip van de actielogregel plus 10 s.
@@ -1366,7 +1648,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 - *Uitzondering:* een betaalde of extern bevestigde handeling kan niet terug.
 - *Acceptatie:* een lid tikt "bevestig" en daarna "ongedaan maken" binnen 10 s. De gastheer ziet niets, en het actielog toont beide regels.
 
-**S4 · Eén overzicht van de kring in het menu** — L6 · half · klein · **aanbevolen nu (besluit)**
+**S4 · Eén overzicht van de kring in het menu** — L6 · half · klein · **nu · HERSTEL (besluit)**
 - *Regels:* er is één eigenaar, en de ander wordt een projectie of verdwijnt uit het menu. Dat volgt uit het open oordeel in SCHERMEIGENAAR.
 - *Acceptatie:* het menu toont één ingang "Sociaal". Een tweede ingang heet anders en zegt wat hij anders doet.
 
@@ -1380,7 +1662,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 - *Afhankelijk van:* Genootschap, de eigenaar. De bouw hoort daar.
 
 **S6 · Kringbeleid** — L1 · bestaat · –
-- *Acceptatie:* wie "geen voorstellen van onbekenden" kiest, krijgt die niet. Dat gaat via `/api/sociaal/beleid`.
+- *Acceptatie:* wie "geen voorstellen van onbekenden" kiest, krijgt die niet. Dat gaat via `/api/sociaal/beleid`. (gecorrigeerd: de schakelaar heet "Alleen verzoeken uit een gedeelde groep" en filtert verbindingsverzoeken, geen voorstellen. Het filter werkt pas als de schakelaar op UIT staat (`!B.knopAan(key, 'bereik')`, `server/kern/socialegraaf/bronnen-poort.js:42`), terwijl het scherm hem standaard als "AAN" toont.)
 
 **S7 · Advertentievrij** — L1 · bestaat · –
 - *Acceptatie:* geen enkel scherm toont gesponsorde inhoud.
@@ -1393,7 +1675,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 - Bestaat: de graaf, het actielog, het beleid, de klaarzetfunctie van Rahul en de schil-contextbus (`public/shared/rtg-schil.js`).
 - Ontbreekt:
   - een terugdraaiknop (S3);
-  - een storingsmelding per bron: faalt `/api/comm/inbox`, dan zegt het scherm dat in woorden. Niet gemeten.
+  - een storingsmelding per bron: faalt `/api/comm/inbox`, dan zegt het scherm dat in woorden. Niet gemeten. (gecorrigeerd: in de code nagelopen. `laadBerichtStand()` in `sociaal.html` slikt de fout met `catch (e) {}`, en de regel blijft "gesprekken en bellen". Hetzelfde geldt voor `/command` en `/lijn`. Een bron van de graaf die faalt, komt wel met naam in `stil[]`.)
 
 **g. Prioritering**
 
@@ -1429,7 +1711,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 
 ##### Variant 1: menselijke discussie
 
-**DK1 · Kamer openen met stelling en huisregels** — L1/L3 · ontbreekt · middel · aanbevolen nu
+**DK1 · Kamer openen met stelling en huisregels** — L1/L3 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:*
   - stelling (≤ 280 tekens);
   - toelichting;
@@ -1444,14 +1726,14 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 - *Rekenwijze:* een kamer is open tussen start en eind; daarna alleen-lezen.
 - *Melding:* genodigden krijgen één uitnodiging via Sociaal/Berichten, geen herhaling.
 - *Rollen en toestemming:* opener, moderator, deelnemer, lezer. Deelnemen vraagt toestemming in de kamer; meelezen vraagt alleen het publiek.
-- *Uitzondering:* onder 16 alleen in kamers van de eigen klas of het eigen gezin (D3); geen open kamers.
+- *Uitzondering:* onder 16 alleen in kamers van de eigen klas of het eigen gezin (D3) **(te controleren)**; geen open kamers. Dit blijft een huisregel ter bescherming van minderjarigen en weigert dus wél: strenger dan de wet mag. Alleen de wettelijke grondslag is te controleren, en het scherm noemt de huisregel als reden, niet de wet.
 - *Acceptatie:*
   - een lid opent een kamer voor zijn kring met stelling en eindtijd;
   - een kringlid ziet hem en doet mee;
   - een buitenstaander krijgt 404;
   - na de eindtijd is de kamer alleen-lezen.
 
-**DK2 · Argumentkaart** — L4 · ontbreekt · middel · aanbevolen nu
+**DK2 · Argumentkaart** — L4 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* elke bijdrage is een **knoop** met:
   - soort: voor, tegen, vraag of bron;
   - ouder (de knoop waarop hij reageert);
@@ -1474,7 +1756,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
   - een verplaatsing door de moderator staat in het verslag;
   - nergens staat een winnaar.
 
-**DK3 · Broncontrole** — L4 · ontbreekt · middel · aanbevolen nu
+**DK3 · Broncontrole** — L4 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* een bron is:
   - een URL, met titel en datum zoals de deelnemer die invult;
   - of een verwijzing naar een RTG-object: een Krant-artikel (`media.krant`), een kwestie (`democratie.kwestie`) of een document van het lid zelf.
@@ -1495,7 +1777,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
   - zonder netwerk staat er "niet gecontroleerd";
   - nergens staat "waar" of "onwaar".
 
-**DK4 · Moderatie in de kamer** — L3 · ontbreekt · middel · aanbevolen nu
+**DK4 · Moderatie in de kamer** — L3 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* de huisregels uit DK1, meldingen per knoop en moderatiebesluiten.
 - *Regels (escalatieladder, D4):*
   1. verbergen met motivering;
@@ -1504,8 +1786,8 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
   4. uit de kamer zetten. Dat vraagt een tweede moderator, of de opener.
 
   Verder:
-  - elke stap draagt een motivering die de deelnemer ziet (D1 art. 17);
-  - de deelnemer kan één keer bezwaar maken bij een andere moderator (D1 art. 20);
+  - elke stap draagt een motivering die de deelnemer ziet (D1 art. 17) **(te controleren)**;
+  - de deelnemer kan één keer bezwaar maken bij een andere moderator (D1 art. 20) **(te controleren)**;
   - gaat het over illegale inhoud of onveiligheid, dan gaat het door naar de wachtrij van het kantoor (SA1).
 - *Rekenwijze:* een melding van ≥ 3 verschillende deelnemers verbergt een knoop voorlopig. Hetzelfde patroon als `MELD_GRENS`.
 - *Melding:* de moderator krijgt een wachtrij met een termijn van 24 uur in een open kamer.
@@ -1517,7 +1799,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
   - het bezwaar komt bij een ander;
   - een moderator die zijn eigen knoop wil verbergen, krijgt "dit beslist een andere moderator".
 
-**DK5 · Verslag** — L5 · ontbreekt · middel · aanbevolen nu
+**DK5 · Verslag** — L5 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* de kaart, de moderatiebesluiten en de bronstanden bij het sluiten.
 - *Regels:*
   - het verslag bevat: de stelling, de argumenten per tak met auteur-codenaam, de bronnen met hun stand, en de moderatiebesluiten (zonder de verborgen tekst);
@@ -1538,7 +1820,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 
 ##### Variant 2: AI-rollendiscussie (simulatie)
 
-**DK7 · Simulatie openen** — L4 · ontbreekt · middel · aanbevolen nu
+**DK7 · Simulatie openen** — L4 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* stelling; 2 tot 5 rollen, elk met een **perspectief** (bv. "huurder", "verhuurder", "gemeente", "econoom", "jongere"); bronnenset (DK3-bronnen die het lid aanlevert, of RTG-objecten).
 - *Regels:*
   - elke rol is een **perspectief, nooit een echte persoon of partij**. Een rolnaam die op een bestaande persoon of politieke partij lijkt, wordt geweigerd: dezelfde keuring als `kern/veilig.js`, plus een lijst van eigennamen uit `server/kern/democratie/partijen.js`;
@@ -1604,7 +1886,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 - *Acceptatie:* een gastheer met mandaat stuurt een herinnering namens de kring. Na intrekking van het mandaat wordt dezelfde handeling geweigerd.
 
 **SB2 · Moderatiedienst als beroep (RTG-moderatoren)**
-- *Proces:* opgeleide moderatoren (werkrol `kantoor` of een nieuw genre "moderator") behandelen meldingen uit alle sociale apps met termijnen, vier ogen en een transparantierapport (D1).
+- *Proces:* opgeleide moderatoren (werkrol `kantoor` of een nieuw genre "moderator") behandelen meldingen uit alle sociale apps met termijnen, vier ogen en een transparantierapport (D1) **(te controleren)**.
 - *Gegevens:* meldingen, besluiten, bezwaren en doorlooptijden.
 - *Regels:*
   - een moderator behandelt geen zaak van iemand in zijn eigen kring;
@@ -1629,7 +1911,7 @@ onderzoeken per app, per app de onderdelen a tot en met h, en per app twee uitko
 - **Niet gemeten:** de uitval van één bron.
 
 **Modus SAMEN**
-- Ontvangt de vijf projecties.
+- Ontvangt de vijf projecties. (gecorrigeerd: acht bronnen, zie S1.)
 - Geeft verwijzingen naar de bron-app en de Rahul-context via de contextbus.
 - Bereikbaar via Heel RTG ("sociaal") en Rahul ("open sociaal").
 
@@ -1644,6 +1926,74 @@ Een lid opent Sociaal en ziet "diner vrijdag" (uit Genootschap). Het laat Rahul 
 - **Discussiekamer:** akkoord als verdieping binnen Sociaal en uitgewerkt hierboven. Open punten: het genre "moderator" (SB2) en de lijst van eigennamen voor de simulatiekeuring.
 
 **Extern:** geen.
+
+#### v3 — afbouw (Sociaal)
+
+Dit blok dekt ook de Discussiekamer (DK1 t/m DK9). Die heeft geen eigen v3-blok.
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Kring en signalen — schermtekst: "Uw kring", "Open uw kringen" (`public/apps/sociaal.html`) — route `POST /api/sociaal/wereld` — stand: bestaat
+- Filter op het overzicht — schermtekst: "Alles", "Vandaag", "Wacht op mij", "Gesprekken", "Bijeenkomsten" (`sociaal.html`) — geen eigen route, filtert de lijn in de browser — stand: bestaat
+- Momentlijn — schermtekst: "Tijdlijn" (`sociaal.html`) — route `POST /api/sociaal/lijn` — stand: bestaat
+- Klaarzetten en bevestigen — schermtekst: "Klaargezet · u beslist", de knoppen zijn de keuzes die de server stuurt (`sociaal.html`) — routes `POST /api/sociaal/command`, `POST /api/sociaal/voorstel/bevestig` — stand: bestaat
+  - Lukt het loggen niet, dan geeft de route `gelogd: false`. `bevestig()` in `sociaal.html` leest dat veld niet, dus het lid hoort het niet. Stand van dat deel: half.
+- Objectpaneel — schermtekst: "Sluiten"; bij een fout "Niet opgehaald: … Dit beeld is dus niet compleet." (`sociaal.html`) — routes `POST /api/sociaal/object`, `/object/pagina` (404 "Dit vinden we niet.") — stand: bestaat
+- Beleid — schermtekst: "02 / BELEID", "Bepaal wat in beeld mag komen.", "Automatische verzending bestaat niet" (`public/shared/social-intelligence-deck.js`, `social-intelligence-data.js`, geladen door `sociaal.html`) — routes `POST /api/sociaal/beleid`, `/beleid/zet` — stand: half
+  - Twee van de drie schakelaars lezen omgekeerd. "Weekend zonder voorstellen" en "Alleen verzoeken uit een gedeelde groep" staan standaard op "AAN". De beperking geldt pas als de schakelaar op UIT staat: `inStilte()` in `server/kern/socialebeleid/index.js`, en `!B.knopAan(key, 'bereik')` in `server/kern/socialegraaf/bronnen-poort.js:42`.
+  - De derde, "Vonk en Rendez-vous meetellen", leest wel goed.
+- Actielog — schermtekst: "Menselijk besluit, aantoonbare reden." (`social-intelligence-data.js`) — route `POST /api/sociaal/actielog` — stand: bestaat
+- Sociale graaf — paneel in `social-intelligence-data.js` — route `POST /api/sociaal/graaf` — stand: bestaat
+- Rahul vragen — schermtekst: "SOCIAL GRAPH WORDT GEANALYSEERD…", "Waarop dit antwoord rust" (`social-intelligence-data.js`) — route `POST /api/sociaal/rahul` — stand: bestaat
+- Terugdraaien (S3) — geen knop, geen route — stand: ontbreekt
+- Discussiekamer (DK1 t/m DK9) — geen collectie `discussiekamers`, geen route en geen paneel. Een grep op "discussiekamer" in `server/`, `public/` en `scripts/` vindt niets — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie (`auth`). Zonder sessie geeft de server 401 "Niet ingelogd." (`server/opzet/diensten2.js`). Het scherm zet daar "Log eerst in via de leden-app." achter (`sociaal.html`, `laad()`).
+- Gastpoort (`geenGast`, `server/server.js`). Op graaf, lijn, command, beleid, actielog, bevestig en object krijgt een gast 403 "Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.". `/wereld` laat een gast door en toont hem niets.
+- Actielog-opslag (`server/kern/socialecommand/actielog.js`). Valt die uit, dan gaat de handeling wel door maar staat ze niet in het log. Het scherm zegt dat niet (zie hierboven).
+- Agenda van Genootschap (`kern.bijeenkomst.mijnAgenda`). Zonder die agenda zijn er geen voorstellen. Wat er dan op het scherm staat: niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Berichten (`/api/comm/inbox`, `/api/stream`). Voegt de stand ongelezen en "typt…" toe. Bij een fout staat er gewoon "gesprekken en bellen", zonder melding: de fout wordt geslikt in `catch (e) {}` (`sociaal.html`).
+- Genootschap, Pulse, De Salon, Meet, Vonk, Rendez-vous en Vrienden. Elk levert rijen in de graaf (`server/kern/socialegraaf/bronnen.js`, `bronnen-poort.js`). Valt een bron uit, dan komt zijn naam in `stil[]`.
+  - Staat de stand op onbekend, dan zegt de rust-zin "Dit beeld is niet compleet: … is niet opgehaald." (`public/shared/canvas-taal.js`). Of dat bij elke uitval zo loopt: niet gemeten in een e2e.
+  - Faalt `/command` of `/lijn`, dan blijft het scherm stil: `catch (e) {}` in `laadKlaar()` en `laadLijn()`.
+- AI voor Rahul (`/api/sociaal/rahul`). Wat het scherm zonder model zegt: niet gemeten.
+- Voor de Discussiekamer: DemocratieOS (`democratie.kwestie`), de Krant (`media.krant`) en lokaal-eerst AI (`server/local-ai.js`). Geen van die koppelingen bestaat.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:sociaal': {
+  uitgeeft: [
+    { wat: 'antwoord op een bijeenkomst, na de tik van het lid', aan: 'sociaal.genootschap', vorm: 'gebeurtenis', bron: 'server/kern/socialecommand/voorstellen.js' },
+    { wat: 'per rij een link naar de bron-app', aan: 'comm, genootschap, pulse, salon, meet, vonk, rendezvous, app (vrienden)', vorm: 'verwijzing', bron: 'server/kern/socialegraaf/bronnen.js, bronnen-poort.js' },
+    { wat: "schermcontext 'sociaal.sociaal'", aan: 'Rahul en Edge (RTGAdaptief)', vorm: 'gebeurtenis', bron: 'public/apps/sociaal.html' }
+  ],
+  ontvangt: [
+    { wat: 'gesprekken en ongelezen', van: 'comm.berichten', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js; /api/comm/inbox in sociaal.html' },
+    { wat: 'uitnodigingen en bijeenkomsten', van: 'sociaal.genootschap', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js' },
+    { wat: 'berichten', van: 'link:pulse', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js' },
+    { wat: 'posts', van: 'tab:salon', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js' },
+    { wat: 'afspraken', van: 'Meet', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js' },
+    { wat: 'matches (uit te zetten met de schakelaar vonk)', van: 'Vonk, Rendez-vous', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen-poort.js' },
+    { wat: 'verbindingsverzoeken', van: 'vriendenlaag (server/kern/sociaal.js)', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen-poort.js' },
+    { wat: "sein 'comm'", van: 'SSE-stroom', vorm: 'gebeurtenis', bron: 'public/apps/sociaal.html (RTGStroom)' }
+  ],
+  ketens: [
+    { naam: 'antwoord op een bijeenkomst', stappen: ['Genootschap: A roept een bijeenkomst bijeen', 'Sociaal: Rahul zet klaar voor B', 'Sociaal: B bevestigt', 'Genootschap: A ziet het antwoord'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/sociaal.js' },
+    { naam: 'bevestiging terugdraaien (S3)', stappen: ['Sociaal: B bevestigt', 'Sociaal: B draait binnen 10 s terug', 'Genootschap: A ziet niets'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'Discussiekamer met een kring uit Genootschap (DK1)', stappen: ['Genootschap: beheerdersrol', 'Sociaal: kamer openen', 'Sociaal: kringleden doen mee'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'verslag als inbreng voor een kwestie (DK6)', stappen: ['Sociaal: verslag met hash', 'DemocratieOS: kwestie toont de verwijzing'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'bron uit de Krant in een argumentkaart (DK3)', stappen: ['Krant: artikel', 'Sociaal: knoop verwijst ernaar'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk voor één taak: het sociale leven overzien en een antwoord bevestigen. Voor de gastheer of beheerder van een kring is Sociaal maar een deel van het werk: uitnodigen, herinneren en het mandaat (S5, SB1) wonen in Genootschap of ontbreken. Een debatleider of moderator kan hier vandaag niets, want de Discussiekamer bestaat niet. Daarvoor blijft externe software nodig: een argumentkaart-platform (M6) en voor organisaties een community-platform met rollen en moderatie (M5). Voor de moderatie zelf: zie het voorstel MO1–MO7 bovenaan de kaart.
+Volledig voor: lid (kringoverzicht en bevestigen) · Deels voor: gastheer en beheerder van een kring · Extern nodig: argumentkaart- of debattool, community-platform voor organisaties
 
 ---
 
@@ -1692,11 +2042,11 @@ Niet overnemen:
   - Een redactie of community-manager werkt met een huisstijlgids, een moderatiewachtrij met termijnen, een escalatieladder en een transparantierapport (D1, D4).
 - **Organisatorisch:**
   - Een zaak of vereniging publiceert namens een merk met meerdere mensen. Wie mag publiceren en wie tekent af, vier ogen.
-  - Een platform met meldingen moet volgens D1:
+  - Een platform met meldingen moet volgens D1 **(te controleren)**:
     - een meldingsroute bieden (art. 16);
     - een beperking motiveren (art. 17);
     - een gratis bezwaarroute bieden die niet volledig automatisch is (art. 20).
-- **Minderjarigen:** D2 vraagt standaarden in het belang van het kind (geen druk, geen profilering). D3: onder 16 vraagt verwerking op toestemming ouderlijke toestemming.
+- **Minderjarigen:** D2 vraagt standaarden in het belang van het kind (geen druk, geen profilering). D3: onder 16 vraagt verwerking op toestemming ouderlijke toestemming **(te controleren)**.
 - **Wat RTG vandaag doet:**
   - Melden: drie verschillende melders verbergen een post (`MELD_GRENS`, `kern/salon/reacties.js`). "Daarna beslist het kantoor."
   - **Maar er is geen kantoorroute om die post te beoordelen of terug te zetten.** Gezocht in `server/routes/office/*`: er zijn alleen meldingenlijsten voor rendezvous en vonk.
@@ -1704,7 +2054,7 @@ Niet overnemen:
 
 **d. Functiecatalogus: uitkomst A (binnen de huidige architectuur en scope)**
 
-**SA1 · Moderatiewachtrij voor gemelde posts** — L3 · ontbreekt · middel · **aanbevolen nu**
+**SA1 · Moderatiewachtrij voor gemelde posts** — L3 · ontbreekt · middel · **nu · HERSTEL**
 - *Gegevens:* `post.meldingen` (key, reden, at) en `post.weg` in de bestaande opslag van De Salon. Geen nieuwe database.
 - *Regels:* een post met ≥3 melders of één melding van de categorie "onveilig" komt in de wachtrij van het kantoor. Een kantoormens op naam (werkrol kantoor) beslist: terugzetten, verborgen laten, of verwijderen met motivering. Bij verwijderen of schorsen tekent een tweede mens af.
 - *Rekenwijze:* de termijn is `at` van de eerste melding plus 72 uur. Daarna staat de post rood in de wachtrij.
@@ -1719,7 +2069,7 @@ Niet overnemen:
   - verwijderen kan pas na de tweede handtekening.
 - *Bron:* D1 art. 16 en 17, D4.
 
-**SA2 · Bezwaar tegen een moderatiebesluit** — L5 · ontbreekt · middel · **aanbevolen nu**
+**SA2 · Bezwaar tegen een moderatiebesluit** — L5 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* het besluit uit SA1.
 - *Regels:* de maker kan één keer gratis bezwaar maken. Een ánder kantoormens beslist dan, niet degene die besloot. Er gaat niets volledig automatisch.
 - *Rekenwijze:* binnen 14 dagen na het besluit.
@@ -1730,7 +2080,7 @@ Niet overnemen:
   - de maker hoort de uitkomst.
 - *Bron:* D1 art. 20.
 
-**SA3 · Bewerken met versies** — L5 · ontbreekt · middel · **aanbevolen nu**
+**SA3 · Bewerken met versies** — L5 · ontbreekt · middel · **nu · VERDIEPING**
 - *Gegevens:* het tekstveld van de post, met een versielijst. Hergebruikt het patroon van Pulse (`/api/member/pulse/bewerk` en `/versies`).
 - *Regels:* alleen de maker, binnen 60 minuten na plaatsen. Elke versie gaat opnieuw langs de 9+-keuring (`kern/veilig.js`).
 - *Melding:* lezers zien "bewerkt"; wie al reageerde krijgt geen push.
@@ -1835,7 +2185,7 @@ Niet overnemen:
   - uitlichten en hergebruik alleen binnen de licentie;
   - een herkenbaar persoon zonder toestemming gaat niet naar de site;
   - een intrekking geldt voor nieuw gebruik, en bestaande uitingen krijgen een vervaltermijn;
-  - het auteursrecht ligt bij de maker (Auteurswet; bron, geen partner).
+  - het auteursrecht ligt bij de maker (Auteurswet; bron, geen partner) **(te controleren)**.
 - *Melding:* de maker hoort elk gebruik, met plaats en datum.
 - *Rollen:* maker, kantoor (uitlichten), derde (licentie vragen).
 - *Uitzondering:* demo-beelden van RTG zelf (`public/campagne/`) vallen eronder als "RTG, eigen werk".
@@ -1844,7 +2194,7 @@ Niet overnemen:
   - na een intrekking verschijnt het beeld niet meer in een nieuwe uiting.
 
 **SAB3 · Gesponsorde samenwerking, transparant**
-- *Proces:* een zaak vraagt een maker om een post. Volgens de Reclamecode (bron) moet een betaalde samenwerking herkenbaar zijn.
+- *Proces:* een zaak vraagt een maker om een post. Volgens de Reclamecode (bron) moet een betaalde samenwerking herkenbaar zijn **(te controleren)**.
 - *Gegevens:* een samenwerkingsafspraak (zaak, maker, vergoeding als verwijzing naar Pay of Facturatie).
 - *Regels:*
   - een post binnen een afspraak draagt verplicht het label "samenwerking met <zaak>";
@@ -1892,7 +2242,78 @@ A plaatst een vriendenpost. B reageert. C (vreemde) meldt. Na drie melders is de
 - Een makersgenre voor leden (L2) via `server/kern/aanmeldingen`. Dat genre bestaat nu niet.
 - Het meldingsdrempelbeleid (3 melders) tegenover D1: blijft automatisch verbergen voorlopig toegestaan, met een menselijk besluit binnen een termijn?
 
-**Extern:** geschilbeslechting buiten de rechter (D1 art. 21) vraagt een erkende instantie. Dat is een besluit, geen bouw.
+**Extern:** geschilbeslechting buiten de rechter (D1 art. 21) **(te controleren)** vraagt een erkende instantie. Dat is een besluit, geen bouw.
+
+#### v3 — afbouw (De Salon)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Plaatsen met een publiek — schermtekst: "Iets delen", "Voor wie is dit bedoeld?", "Plaatsen" (`public/apps/salon.html`) — routes `POST /api/salon/plaats`, `/api/salon/media` — stand: bestaat
+  - Publieken in het scherm: "Mijn Saloon", "Vrienden en volgers", "Alleen vrienden", "Alleen volgers", "Alleen ik", "Openbaar als het voor ontdekking geschikt is".
+- Bijschrift door Rahul — schermtekst: "Rahul schrijft een bijschrift", daarna "Voorstel staat in het veld. Lees het na en plaats het zelf." (`salon.html`) — route `POST /api/salon/ai/bijschrift` — stand: bestaat
+- Ondertitels — schermtekst: "Maak automatisch" (`salon.html`) — route `POST /api/salon/ondertitels` — stand: bestaat
+- Feed met een eind — schermtekst: "Meer laden", "Je bent bij." (`salon.html`) — route `POST /api/salon/feed` — stand: bestaat
+- Waarderen — schermtekst: "Mooi (n)" (`salon.html`); in de tab de knop `.js-like` (`app-main-58.js`) — route `POST /api/like` — stand: half
+  - In de tab werkt het optimistisch: de telling gaat meteen omhoog, en een fout van de server wordt geslikt met `.catch(() => {})`. Het scherm kan dus een waardering tonen die niet is opgeslagen.
+- Reageren — schermtekst: "Reacties (n)" (`salon.html`); in de tab "Reactie geplaatst." en bij weigering "Reageren niet toegestaan." (`app-main-58.js`) — routes `POST /api/salon/reageer`, `/api/salon/reacties`, `/api/comment` (met herhaalsleutel) — stand: bestaat
+- Bewaren — schermtekst: "Bewaar", "Wat je bewaarde" (`salon.html`) — route `POST /api/salon/bewaar` — stand: bestaat (één lijst)
+- Archiveren — schermtekst: "Archiveer" / "Terugzetten", daarna "In je archief. Hij is uit de etalage, maar hij is nog van jou." (`salon.html`) — route `POST /api/salon/archiveer` — stand: bestaat
+- Verwijderen — schermtekst: "Verwijder", daarna "De post is verwijderd." (`salon.html`) — route `POST /api/salon/weg` — stand: bestaat
+- Verbergen voor mezelf — schermtekst: "Verberg", daarna "Verborgen. Alleen u ziet deze post niet meer." (`salon.html`) — route `POST /api/salon/verberg` — stand: bestaat
+- Melden — schermtekst: "Meld", daarna "Gemeld. De post is verborgen tot het kantoor ernaar kijkt." (`salon.html`) — route `POST /api/salon/meld` — stand: half
+  - Het scherm belooft dat het kantoor kijkt, maar er is geen kantoorroute die `post.meldingen` leest (SA1).
+- Zoeken en onderwerpen — schermtekst: "Zoek op woord, plaats of codenaam", "Zoeken", "Waar het over gaat" (`salon.html`) — routes `POST /api/salon/onderwerpen`, `/api/salon/ai/waarover`, `/api/salon/feed` — stand: bestaat
+- Profiel en volgen — schermtekst: "Bio aanpassen", "Volgen" / "Ontvolgen", "Naar de feed" (`salon.html`) — routes `POST /api/salon/lid`, `/bio`, `/volg-lid`; in de tab `/api/salon/volg` — stand: bestaat
+- Inzicht voor de maker — schermtekst: "Wat jouw posts deden", "Wat aansloeg", "Per post" (`salon.html`) — route `POST /api/salon/inzicht` — stand: bestaat, zonder export
+- Reacties samenvatten — schermtekst: "Reacties worden samengevat..." (`salon.html`) — route `POST /api/salon/ai/reacties` — stand: bestaat
+- Deal claimen — schermtekst: "Claim deze aanbieding", "Uw eenmalige claimcode", "Deze claimcode direct ongeldig maken?" (`app-main-56c.js`, `app-main-58.js`) — routes `/api/salon/deal/claim`, `/claim/roteer`, `/claim/intrek` (`salon-claims.js`) — stand: bestaat
+- Poll — schermtekst: "Poll", "stem(men)" (`app-main-56c.js`) — route `POST /api/salon/poll/stem` — stand: bestaat
+- Bewerken (SA3), inplannen (SA4), bronvermelding bij hergebruik (SA5) en mappen (SA6) — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie. Zonder sessie: 401 (in het voltooiscenario). Welke tekst het scherm dan toont: niet gemeten.
+- Pas-poort. Een gast ziet in de tab "Zonder pas bekijk je de Salon; liken en reageren bij leden is voor leden." (`app-main-58.js`). Een gratis account krijgt 403 (voltooiscenario).
+- Zichtbaarheidspoort (`server/kern/salon/zichtbaarheid.js`). Een vreemde krijgt 404 op een besloten post.
+- 9+-keuring (`server/kern/veilig.js`, gebruikt in `kern/salon/index.js`, `reacties.js`, `profiel.js`). Een weigering komt als reden in de melding van het scherm (`api()` in `salon.html` toont `d.error || d.reden`).
+- Mediaopslag (`/api/salon/media`). Wat het scherm toont als die uitvalt: niet gemeten.
+- Herhaalsleutel op reacties (`RTGIdem` in `app-main-58.js`). Dezelfde sleutel met een andere tekst geeft 409 (voltooiscenario). Plaatsen via `/api/salon/plaats` heeft geen herhaalsleutel.
+- Toestand van de app (`/api/state`). Valt die uit, dan slikt `refreshState()` de fout (`catch(e){}` in `app-main-02.js`) en blijft de tab de oude stand tonen, zonder melding. Wat er bij de eerste keer laden gebeurt: niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- AI-aanbieder (`server/kern/salon/ai.js`). Geeft bijschrift, samenvatting en "waarover". Staat hij uit, dan ziet het lid "De AI is nu niet bereikbaar. Probeer het zo nog eens.".
+- Rahul-balk — schermtekst: "Zeg wat er moet gebeuren", "Rahul" — route `/api/chat/send`. Wat het scherm toont als die uit staat: niet gemeten.
+- Zaakkanaal (`/api/supplier/salon/*`). Levert partnerposts en deals. Zonder zaakkanaal staat er "Nog geen folders of aanbiedingen." (`app-main-56c.js`, `sal.etaleeg`).
+- Berichten (`/api/dm`), voor een bericht vanuit een profiel. Bij uitval: niet gemeten.
+- Site en campagne (`/api/salon/promo`). Krijgen beeld dat een mens van RTG uitlicht (`/api/office/salon/uitlicht`, `server/routes/kantoren/salon.js`).
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'tab:salon': {
+  uitgeeft: [
+    { wat: 'posts, door de zichtbaarheidspoort', aan: 'link:wereldlaag', vorm: 'projectie', bron: 'server/opzet/kernlaag4.js (salonToegang), server/kern/wereld/feed.js' },
+    { wat: 'posts', aan: 'link:sociaal', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js' },
+    { wat: "uitgelicht beeld met 'Uit De Salon · naam'", aan: 'site en campagne', vorm: 'projectie', bron: 'server/routes/member/salon.js (/api/salon/promo)' },
+    { wat: 'eenmalige claimcode voor een deal', aan: 'de zaak die verzilvert', vorm: 'verwijzing', bron: 'server/routes/member/salon-claims.js' }
+  ],
+  ontvangt: [
+    { wat: 'partnerposts en deals', van: 'zaakkanaal', vorm: 'projectie', bron: 'server/routes/supplier (/api/supplier/salon/*)' },
+    { wat: 'vriendschap en blokkade', van: 'vriendenlaag', vorm: 'verwijzing', bron: 'server/kern/sociaal.js' },
+    { wat: 'reacties en posts vanuit Alles bij elkaar', van: 'link:wereldlaag', vorm: 'gebeurtenis', bron: 'public/apps/saloon/*.js (/api/salon/plaats, /reageer)' }
+  ],
+  ketens: [
+    { naam: 'vriendenpost alleen voor een vriend', stappen: ['Salon: A plaatst voor vrienden', 'Salon: vriend B reageert', 'Salon: vreemde C krijgt 404'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/salon.js' },
+    { naam: 'deal claimen en verzilveren', stappen: ['Salon: lid claimt', 'zaak: verzilvert de code een keer'], stand: 'gesloten', bewijs: 'test/salon-claimcode.test.js (toets, geen voltooiscenario)' },
+    { naam: 'melden tot besluit (SA1, SA2)', stappen: ['Salon: drie melders', 'kantoor: wachtrij', 'kantoor: besluit met motivering', 'maker: hoort het', 'kantoor: bezwaar bij een ander'], stand: 'open', bewijs: 'geen; alleen de eerste stap bestaat' },
+    { naam: 'herdeling met bron (SA5)', stappen: ['Salon: B deelt de post van A', 'Salon: A krijgt een seintje'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'post verwijst naar een reis, event of klas', stappen: ['Reizen, Uitgaan of School: object', 'Salon: post met verwijzing'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk als deler en lezer. Een particuliere maker doet het grootste deel, maar mist inplannen, bewerken en export. Een zaak publiceert via het zaakkanaal; daar regelt `req.actor.manager` wie mag. Een redactieproces met vier ogen (SAB1) bestaat niet. Het kantoor kan hier vandaag niet modereren: gemelde posts worden verborgen en door niemand gelezen. Voor de moderatie: zie het voorstel MO1–MO7 bovenaan de kaart. Een zaak met een team heeft daarom nog een inplan- en analysetool nodig (zoals M3 Advanced). Een organisatie die moderatie met rollen wil, heeft een community-platform nodig (M5).
+Volledig voor: lid (delen, lezen, reageren) · Deels voor: maker, zaak, kantoor (moderatie ontbreekt) · Extern nodig: inplan- en analysetool voor makers en zaken, community-platform met moderatie
 
 ---
 
@@ -1916,7 +2337,7 @@ A plaatst een vriendenpost. B reageert. C (vreemde) meldt. Na drie melders is de
 - **Eigenaar:** niet geregistreerd in SCHERMEIGENAAR.json.
 
 **b. Marktvergelijking**
-- **M1 Snapchat+** (ca. $3,99) en **Platinum** (duurste, ca. $15,99): Story Timer van 1 uur tot 1 week, aantal herbekijkingen, Pin a BFF, streak-emoji's, opslag tot 5 TB.
+- **M1 Snapchat+** (ca. $3,99) en **Platinum** (duurste, ca. $15,99): Story Timer van 1 uur tot 1 week, aantal herbekijkingen, Pin a BFF, streak-emoji's, opslag tot 5 TB **(te controleren)**.
 - **RTG heeft:** kijk-één-keer (gratis bij iedereen), advertentievrij.
 - **Niet:** de duur van een verhaal kiezen, een kijkertelling op het scherm, opslag.
 - **Niet overnemen:** BFF-rangorde en streaks.
@@ -1924,7 +2345,7 @@ A plaatst een vriendenpost. B reageert. C (vreemde) meldt. Na drie melders is de
 **c. Het volledige domein**
 - **Particulier:** spontaan, vluchtig, alleen voor wie het is bedoeld. Het gevaar zit in druk ("streak"), in doorsturen en in schermafdrukken.
 - **D2:** geen ontwerp dat dwingt om terug te komen.
-- **D3:** onder 16 ouderlijke toestemming. In RTG hangt een kind aan het gezin, via de gezinsvariant met voogdbeleid (`isBeschermdHandle`).
+- **D3:** onder 16 ouderlijke toestemming **(te controleren)**. In RTG hangt een kind aan het gezin, via de gezinsvariant met voogdbeleid (`isBeschermdHandle`).
 - **Professioneel:** n.v.t. Een makersverhaal hoort in De Salon.
 - **Organisatorisch:** n.v.t.
 
@@ -1933,7 +2354,7 @@ A plaatst een vriendenpost. B reageert. C (vreemde) meldt. Na drie melders is de
 **SN1 · Kijk-één-keer, daarna nergens** — L5 · bestaat · –
 - *Acceptatie:* een tweede keer openen geeft 404, en het merkteken van de foto staat niet meer in de opslag. Bewezen.
 
-**SN2 · Duur van een verhaal kiezen** — L1 · ontbreekt · klein · **aanbevolen nu**
+**SN2 · Duur van een verhaal kiezen** — L1 · ontbreekt · klein · **nu · VERDIEPING**
 - *Gegevens:* een verhaal met `tot` in plaats van de vaste `STORY_TTL`.
 - *Regels:* keuze uit 1 uur, 24 uur of 7 dagen; standaard 24 uur. Opruimen gebeurt in de bestaande `opschonenSnaps`.
 - *Rekenwijze:* `at + gekozen duur`.
@@ -1944,7 +2365,7 @@ A plaatst een vriendenpost. B reageert. C (vreemde) meldt. Na drie melders is de
   - een kind kan geen 7 dagen kiezen.
 - *Bron:* M1.
 
-**SN3 · Hoeveel vrienden mijn verhaal zagen** — L1 · half (`kijkers` bestaat, het scherm toont het niet) · klein · **aanbevolen nu**
+**SN3 · Hoeveel vrienden mijn verhaal zagen** — L1 · half (`kijkers` bestaat, het scherm toont het niet) · klein · **nu · VERDIEPING**
 - *Regels:* alleen de maker ziet een telling ("door 4 vrienden gezien"), zonder namen, volgorde of ranglijst.
 - *Acceptatie:* de maker ziet het aantal; een vriend ziet niets van andere kijkers.
 - *Bron:* M1.
@@ -1962,7 +2383,7 @@ A plaatst een vriendenpost. B reageert. C (vreemde) meldt. Na drie melders is de
 - *Acceptatie:* wie het aanzet, vindt zijn eigen verhaal van gisteren terug. Wie het uitzet, ziet ze allemaal verdwijnen.
 - *Bron:* M1 (opslag).
 
-**SN8 · Dag-opdracht zonder telling** — L4 · bestaat · –
+**SN8 · Dag-opdracht zonder telling** — L4 · bestaat · – (gecorrigeerd: bestaat op de server (`/api/member/snap/opdracht`) en in het gezinsscherm `public/apps/foundation/vrienden.html`. De os-ingang in `/apps/app.html` roept de route niet aan, en `story/post` krijgt daar geen `opdracht` mee. Voor os:snaps is de stand dus half.)
 - *Acceptatie:* een overgeslagen dag kost niets en toont nergens een teller.
 
 **e. RTG-exclusief**
@@ -2047,6 +2468,58 @@ A zegt "open snaps", kiest B en een foto. B opent de snap in de strip.
 
 **Extern:** geen.
 
+#### v3 — afbouw (Snaps)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Snap sturen — schermtekst: "Tekst erbij (mag leeg):", daarna "Snap verstuurd. Hij verdwijnt na bekijken." (`public/apps/app-main/app-main-07.js`) — route `POST /api/member/snap/send` (herhaalsleutel `RTGIdem('snap')`) — stand: bestaat
+- Snap openen, één keer — schermtekst: "Snap van <codenaam>", "Deze snap verdwijnt zodra je sluit." (`app-main-09.js`) — route `POST /api/member/snap/view`. Een tweede keer geeft 404 "Deze snap is er niet meer." — stand: bestaat
+- Strip met snaps en verhalen (`app-main-08b.js`) — routes `POST /api/member/snaps`, `/api/member/stories` — stand: half
+  - Faalt een van de twee, dan wordt de fout geslikt (`catch(e){}`) en is de strip leeg, zonder melding.
+- Verhaal plaatsen — schermtekst: "Je verhaal staat er 24 uur op." (`app-main-07.js`) — route `POST /api/member/story/post` — stand: bestaat
+- Verhaal bekijken — schermtekst: "Verhaal van <codenaam>" (`app-main-09.js`) — route `POST /api/member/story/view` — stand: bestaat
+- Dag-opdracht — route `POST /api/member/snap/opdracht` — stand: half
+  - De os-ingang in `app.html` roept die route niet aan, en `story/post` krijgt daar geen `opdracht` mee. Alleen het gezinsscherm toont hem: "Dag-opdracht" in `public/apps/foundation/vrienden.html`.
+- Duur van een verhaal kiezen (SN2) en een kijkertelling voor de maker (SN3) — stand: ontbreekt. `kijkers` wordt wel bijgehouden in `server/kern/sociaal/snaps.js`.
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie. Zonder sessie: 401 (voltooiscenario). Welke tekst het scherm dan toont: niet gemeten.
+- Vriendenlaag (`zijnVrienden`, `server/kern/sociaal.js`). Een niet-vriend krijgt 403 "Je kunt alleen snappen naar een vriend.".
+- Blokkade (`isGeblokkeerd`). Na een blokkade: 403 "Dit contact is niet beschikbaar.".
+- Mediaopslag, versleuteld (`media.bewaar`). Valt die uit: 400 "De foto kon niet worden opgeslagen.". Een te grote foto: 400 "Kies een foto (max ~900 kB).". Het scherm verkleint vooraf tot 1000 px (`snapVerklein`).
+- Herhaalsleutel. Dezelfde sleutel met een andere tekst geeft 409 "Deze snap is al met een andere tekst verstuurd.".
+- Rem op sturen (`sociaalRate`): 429 "Rustig aan met snaps sturen.".
+- Bewaarveger (`opschonenSnaps`, en de bovengrens in `kern/kappen.js`). Ruimt snaps en verhalen na 24 uur op. Als hij uitvalt, blijven ze staan; dat ziet het lid niet. Niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- De Salon, als plek waar contacten worden toegevoegd. Zonder contacten zegt de kiezer: "Nog geen contacten. Voeg iemand toe in De Salon; daarna belt, videobelt en snapt u met een tik, zonder telefoonnummer." (`app-main-26.js`).
+- Rahul en Edge ("open snaps", `app-main-26.js`: `RTGSocial.snap`). Snaps is ook bereikbaar vanuit het contactenblok (`data-snap`, `app-main-07.js`).
+- SSE-stroom. Geeft de ontvanger een sein `{ kind: 'snap' }` (`sseToCustomer`). Zonder stroom ziet hij de snap pas als de strip opnieuw laadt.
+- Gezinsvariant (`/api/rtf/social/snap/*`, `server/routes/social/gezinnen/vrienden.js`). Draait op dezelfde kern.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'os:snaps': {
+  uitgeeft: [
+    { wat: "sein 'social' met kind 'snap'", aan: 'het toestel van de ontvanger', vorm: 'gebeurtenis', bron: 'server/kern/sociaal/snaps.js (sseToCustomer)' }
+  ],
+  ontvangt: [
+    { wat: 'vriendschap en blokkade', van: 'vriendenlaag, toegevoegd via De Salon', vorm: 'verwijzing', bron: 'server/kern/sociaal.js (zijnVrienden, isGeblokkeerd)' },
+    { wat: 'contactkeuze', van: 'Rahul en Edge (kiezer)', vorm: 'gebeurtenis', bron: 'public/apps/app-main/app-main-26.js' }
+  ],
+  ketens: [
+    { naam: 'snap één keer zien, daarna weg', stappen: ['Snaps: A stuurt naar vriend B', 'Snaps: B opent één keer', 'opslag: foto weg'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/snaps.js' },
+    { naam: 'ouder keurt een nieuw contact (SNB1)', stappen: ['vriendenlaag: voogdWacht', 'Snaps: kind snapt alleen naar goedgekeurd contact'], stand: 'open', bewijs: 'geen in deze familie; voogdWacht staat in server/kern/sociaal/vrienden/*.js' },
+    { naam: 'gemelde snap met bewijs naar het kantoor (SNB2)', stappen: ['Snaps: ontvanger meldt', 'kantoor: beoordeelt', 'opslag: na afhandeling weg'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk: een vluchtige foto naar een vriend sturen of een verhaal plaatsen. Een professionele rol is er bewust niet. Een ouder in de gezinsvariant doet hier maar een deel van zijn werk, want het goedkeuren van contacten loopt via de vriendenlaag. Het kantoor kan een snap niet beoordelen (SNB2). Er is geen externe software nodig voor wat Snaps belooft; opslag van herinneringen (M1 Platinum) is bewust buiten scope (SN7).
+Volledig voor: lid · Deels voor: ouder (gezinsvariant), kantoor (melden ontbreekt) · Extern nodig: geen
+
 ---
 
 ### Pulse (link:pulse, /apps/pulse.html)
@@ -2074,10 +2547,10 @@ A zegt "open snaps", kiest B en een foto. B opent de snap in de strip.
 - **Eigenaar:** `sociaal.pulse`, met een open oordeel tegenover De Salon.
 
 **b. Marktvergelijking**
-- **M2:** Basic ca. $3, Premium ca. $8, Premium+ (duurste) ca. $40:
-  - bewerken binnen een uur: RTG **bestaat**;
+- **M2:** Basic ca. $3, Premium ca. $8, Premium+ (duurste) ca. $40 **(te controleren)**:
+  - bewerken binnen een uur: RTG **bestaat** (gecorrigeerd: Pulse kent geen termijn. `pulseBewerk` in `server/kern/pulse/vrij.js` staat bewerken altijd toe, tot tien keer, met versies die iedereen kan lezen);
   - tot 25.000 tekens: RTG **bewust niet**, want Pulse is kort;
-  - bladwijzermappen: RTG **half**;
+  - bladwijzermappen: RTG **half** (gecorrigeerd: bestaat. `pulseBewaar(key, id, map)` in `server/kern/pulse/vrij.js` bewaart in een benoemde map, en `pulse.html` vraagt "In welke map wilt u dit bericht bewaren?");
   - voorrang voor antwoorden: **niet doen** als betaald voorrecht;
   - advertentievrij: RTG **bestaat**;
   - Articles: lange vorm hoort in De Salon of de Krant (`media.krant`).
@@ -2092,18 +2565,18 @@ A zegt "open snaps", kiest B en een foto. B opent de snap in de strip.
 
 **d. Functiecatalogus: uitkomst A (binnen de huidige architectuur en scope)**
 
-**P1 · Bewerken met versies** — L5 · bestaat · klein (meten) · **aanbevolen nu**
+**P1 · Bewerken met versies** — L5 · bestaat · klein (meten) · **nu · HERSTEL**
 - *Acceptatie:* na bewerken ziet een lezer "bewerkt" en opent hij de vorige versie. Komt in de voltooiproef; die liep het nog niet.
 
-**P2 · Moderatiewachtrij en motivering** — L3 · ontbreekt · middel · **aanbevolen nu**
+**P2 · Moderatiewachtrij en motivering** — L3 · ontbreekt · middel · **nu · HERSTEL**
 - Zelfde ontwerp als SA1 en SA2, op `post.melders`.
 - **Voor de integrator:** één kantoorroute voor beide feeds is dubbele logica tenzij het open oordeel Pulse/Salon wordt beslist. Tot dan: twee dunne routes op dezelfde kantoorpoort, of het besluit eerst.
 - *Acceptatie:* drie melders → verborgen → de maker hoort waarom → een kantoormens zet terug of verwijdert met motivering.
 
-**P3 · Eindige feed** — L1 · half (cursor bestaat; niet gemeten of het scherm eindigt) · klein · **aanbevolen nu (meten)**
+**P3 · Eindige feed** — L1 · half (cursor bestaat; niet gemeten of het scherm eindigt) · klein · **nu · HERSTEL (meten)** (gecorrigeerd: in de code nagelopen. `pulse.html` stuurt geen `cursor` mee (`api('feed',{soort:SOORT})`). Het scherm toont dus de eerste 40 berichten en stopt daar, zonder "u bent bij" en zonder te zeggen dat er meer is.)
 - *Acceptatie:* na de laatste pagina toont het scherm "u bent bij" en laadt niets stil door.
 
-**P4 · Bladwijzermappen** — L1 · half · klein · later
+**P4 · Bladwijzermappen** — L1 · half · klein · later (gecorrigeerd: bestaat, met mappen; zie b.)
 
 **P5 · Onderwerp volgen (hashtag) in plaats van alleen mensen** — L1 · ontbreekt · klein · later
 - *Regels:* volgen op een tag; de feed `volgend` neemt die berichten mee.
@@ -2189,6 +2662,56 @@ A plaatst "#zeilen". B vindt het onder Ontdek, waardeert en bewaart het. A haalt
 
 **Extern:** geen.
 
+#### v3 — afbouw (Pulse)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Plaatsen — schermtekst: "Plaats een bericht", "Wat wilt u delen?", "Plaatsen" (`public/apps/pulse.html`) — route `POST /api/member/pulse/post` — stand: bestaat
+- Feed Volgend en Ontdek — schermtekst: "Volgend", "Ontdek mensen" (`pulse.html`) — route `POST /api/member/pulse/feed` — stand: half
+  - Het scherm stuurt geen `cursor` mee. Het toont dus hoogstens 40 berichten, zonder "meer" en zonder eindregel.
+  - Bij een onvolledig antwoord staat er "Het antwoord was onvolledig, dus dit kon niet worden geladen.".
+- Waarderen en reageren — schermtekst: "Schrijf een reactie" (`pulse.html`) — routes `POST /api/member/pulse/like`, `/reactie` — stand: bestaat
+- Volgen — schermtekst: "+ volgen", daarna "U volgt deze codenaam nu." (`pulse.html`) — route `POST /api/member/pulse/volg` — stand: bestaat
+- Melden — schermtekst: "melden", "Waarom meld je dit bericht?", daarna "Dank u. Uw melding is ontvangen." (`pulse.html`) — route `POST /api/member/pulse/meld` — stand: half
+  - Drie melders verbergen het bericht (`server/kern/pulse/index.js`). Er is geen kantoorroute, en de maker hoort niets.
+- Bewerken met versies — schermtekst: "bewerken", "Pas uw bericht aan. De vorige versie blijft leesbaar voor iedereen die het bericht kan bekijken.", "geschiedenis (n)" (`pulse.html`) — routes `POST /api/member/pulse/bewerk`, `/versies` — stand: bestaat
+  - Er is geen termijn. Wel geldt een maximum van tien bewerkingen (`server/kern/pulse/vrij.js`).
+- Bewaren in mappen — schermtekst: "bewaar", "In welke map wilt u dit bericht bewaren?", "Mijn plank", "U heeft nog geen berichten bewaard." (`pulse.html`) — routes `POST /api/member/pulse/bewaar`, `/bewaard` — stand: bestaat
+- Verwijderen — schermtekst: "verwijderen", "Dit bericht verwijderen?" (`pulse.html`) — route `POST /api/member/pulse/weg` — stand: bestaat
+- Profiel — schermtekst: "Mijn profiel", "Terug naar de feed" (`pulse.html`) — route `POST /api/member/pulse/profiel` — stand: bestaat
+- Stemming en week — schermtekst: "Stemming", "Uw stemming vandaag:", "Mijn week" (`pulse.html`) — routes `/api/member/wauw/stemming`, `/stemming/zet`, `/terugblik` — stand: bestaat
+- Een onderwerp volgen (P5) — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie. Bij een fout toont het scherm `meld(e.message)`, of "Er ging iets mis.". De tekst bij een ontbrekende sessie: niet gemeten.
+- 9+-keuring (`server/kern/veilig.js`, via `keur()` in `kern/pulse/index.js` en `vrij.js`). Een weigering geeft de reden in woorden.
+- Eigen opslag (`db.data.pulse`). Herstelbaar staat op BEWEZEN in APPWERKT. Welke laag dubbele tikken opvangt: niet nagelopen.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Alles bij elkaar. Neemt de volgend-feed over als projectie (`pulseLezen` in `server/opzet/kernlaag4.js`). Pulse merkt het niet als die uitvalt.
+- Sociaal. Neemt berichten op in de graaf (`server/kern/socialegraaf/bronnen.js`, bron "Pulse"). Pulse merkt het niet als die uitvalt.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:pulse': {
+  uitgeeft: [
+    { wat: 'berichten uit de volgend-feed', aan: 'link:wereldlaag', vorm: 'projectie', bron: 'server/opzet/kernlaag4.js (pulseLezen)' },
+    { wat: 'berichten', aan: 'link:sociaal', vorm: 'projectie', bron: 'server/kern/socialegraaf/bronnen.js' }
+  ],
+  ontvangt: [ /* niets, bewust (zie Modus SAMEN) */ ],
+  ketens: [
+    { naam: 'schrijven, vinden, bewaren, weghalen', stappen: ['Pulse: A plaatst', 'Pulse: B waardeert en bewaart', 'Pulse: A haalt weg', 'Pulse: ook weg van de plank van B'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/pulse.js' },
+    { naam: 'melden tot besluit (P2)', stappen: ['Pulse: drie melders', 'kantoor: wachtrij en besluit', 'maker: hoort het'], stand: 'open', bewijs: 'geen; alleen de eerste stap bestaat' },
+    { naam: 'projectie in Alles bij elkaar met bron', stappen: ['Pulse: bericht', 'Alles bij elkaar: item met bron pulse'], stand: 'gesloten', bewijs: 'niet als eigen proef; de wereldfeed leest pulseLezen (server/kern/wereld/feed.js)' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk: kort delen, volgen, bewaren en bewerken met zichtbare versies. Een woordvoerder of redactie heeft hier het grootste deel, maar mist officiële mededelingen (PB1) en rectificatie met reden (PB2). Het kantoor kan niets met gemelde berichten. Voor de moderatie: zie het voorstel MO1–MO7 bovenaan de kaart. Externe software is niet nodig voor wat Pulse belooft. Wie lange vorm wil (M2 Articles), heeft De Salon of de Krant nodig, niet een externe tool.
+Volledig voor: lid · Deels voor: woordvoerder of redactie, kantoor (moderatie ontbreekt) · Extern nodig: geen
+
 ---
 
 ### Alles bij elkaar (link:wereldlaag, /apps/wereld.html)
@@ -2222,30 +2745,30 @@ A plaatst "#zeilen". B vindt het onder Ontdek, waardeert en bewaart het. A haalt
 - **Particulier:** één tijdlijn in plaats van vier apps, met de zichtbaarheid in eigen hand.
 - **Professioneel:** zakelijk netwerken via `/api/wereld/bedrijf`. Introducties zijn wat een makelaar of concierge in het echt doet: twee kanten vragen, en pas dan verbinden.
 - **Organisatorisch:** niet hier. Verenigingen zitten in Genootschap.
-- **Privacy:** wie mijn profiel bekeek, is een persoonsgegeven van de bezoeker. Zichtbaar maken vraagt een grondslag en wederkerigheid (D3/AVG).
+- **Privacy:** wie mijn profiel bekeek, is een persoonsgegeven van de bezoeker. Zichtbaar maken vraagt een grondslag en wederkerigheid (D3/AVG) **(te controleren)**.
 
 **d. Functiecatalogus: uitkomst A (binnen de huidige architectuur en scope)**
 
-**W1 · Profielbezoekers, wederkerig** — L1 · half · klein · **aanbevolen nu**
+**W1 · Profielbezoekers, wederkerig** — L1 · half · klein · **nu · VERDIEPING** (gecorrigeerd: de functie bestaat volledig, maar met een ander ontwerp. `server/kern/wereld/bezoek.js` toont de bezochte altijd de codenaam van de kijker, 90 dagen lang en hoogstens 200 per lid. De kijker hoort dat zijn bezoek is genoteerd; het scherm zegt: "Kijk jij bij een ander, dan ziet die jou hier ook: er is geen onzichtbare stand." Een stand met alleen een telling bestaat niet. W1 is dus een ontwerpwijziging, geen afbouw.)
 - *Gegevens:* bezoeken uit `kern/wereld/bezoek.js`.
 - *Regels:*
   - standaard alleen een telling;
   - namen alleen als zowel bezoeker als bezochte "wederzijds zichtbaar" aanzetten;
-  - onder 16 nooit namen.
+  - onder 16 nooit namen (D3/AVG **(te controleren)**). Dit blijft een huisregel ter bescherming van minderjarigen en weigert dus wél: strenger dan de wet mag. Alleen de wettelijke grondslag is te controleren, en het scherm noemt de huisregel als reden, niet de wet.
 - *Rekenwijze:* unieke bezoekers per 7 dagen.
 - *Melding:* geen push. Het is een overzicht, geen trigger.
 - *Acceptatie:*
   - zonder wederzijdse keuze ziet A "3 bezoekers", zonder namen;
   - als beiden het aanzetten, ziet A de codenaam.
 
-**W2 · Storingsbestendige tijdlijn** — L6 · ontbreekt (niet gemeten) · klein · **aanbevolen nu**
-- *Regels:* valt één bron weg (Salon, Pulse of Zakelijk), dan blijven de andere staan, met een regel "Pulse is nu niet bereikbaar".
+**W2 · Storingsbestendige tijdlijn** — L6 · ontbreekt (niet gemeten) · klein · **nu · HERSTEL**
+- *Regels:* valt één bron weg (Salon, Pulse of Zakelijk), dan blijven de andere staan, met een regel "Pulse is nu niet bereikbaar". (gecorrigeerd: de modus 'alles' heeft vier bronnen: salon, pulse, zakelijk en genootschap (`BRONNEN` in `server/kern/wereld/feed.js`). Ze worden in het proces gelezen en niet over een route. Er is geen `try` per bron, dus één lezer die een fout gooit laat de hele feed vallen. De stand "ontbreekt" is daarmee gemeten.)
 - *Acceptatie:* een e2e met de Pulse-route op 503 toont Salon-posts en de melding.
 
-**W3 · Gevraagde introductie** — L4 · bestaat · –
+**W3 · Gevraagde introductie** — L4 · bestaat · – (gecorrigeerd: alleen de route `/api/wereld/introductie` bestaat. Geen bestand in `public/` roept haar aan, dus voor het lid is de stand half.)
 - *Acceptatie:* een introductie gaat pas door na ja van beide kanten. Bij nee hoort de vrager "geen introductie", zonder reden.
 
-**W4 · Lijsten en zoeken over drie bronnen** — L1 · bestaat · –
+**W4 · Lijsten en zoeken over drie bronnen** — L1 · bestaat · – (gecorrigeerd: zoeken heeft een scherm (`api('/zoek')` in `wereld.html`). Lijsten (`/api/wereld/lijst`, `/lijst/zet`) hebben alleen een route; geen bestand in `public/` roept ze aan.)
 - *Acceptatie:* zoeken op "#zeilen" toont posts uit De Salon en Pulse, elk met de bron erbij.
 
 **W5 · Zichtbaarheid per profieldeel** — L1 · bestaat · –
@@ -2327,6 +2850,57 @@ A zoekt "#zeilen", vindt een post van B, vraagt een introductie. B zegt ja, en z
 
 **Extern:** geen.
 
+#### v3 — afbouw (Alles bij elkaar)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Tijdlijn per modus en lens — schermtekst: "Het leven, met elkaar." (`public/apps/wereld.html`) — routes `POST /api/wereld/feed`, `/state`, `/modus` — stand: bestaat
+- Zoeken — schermtekst: "Zoeken" (`wereld.html`) — route `POST /api/wereld/zoek` — stand: bestaat
+- Profiel en zichtbaarheid per deel — schermtekst bij een leeg veld: "Nog niet ingevuld" (`wereld.html`) — routes `POST /api/wereld/profiel`, `/profiel/zicht`, `/profiel/van` — stand: bestaat
+- Profielbezoekers — schermtekst: "Wie bekeek jouw profiel", "Bezoeken blijven 90 dagen staan. Kijk jij bij een ander, dan ziet die jou hier ook: er is geen onzichtbare stand.", "Nog niemand." (`wereld.html`) — route `POST /api/wereld/bezoekers` — stand: bestaat
+- Gesprek beginnen — route `POST /api/wereld/gesprek` (`wereld.html`) — stand: bestaat
+- Plaatsen en reageren via De Saloon (`public/apps/saloon/*.js`) — routes `/api/salon/plaats`, `/reageer`, `/reacties` — stand: bestaat
+- Introductie, lijsten, zakelijk profiel, bereik en Rahul — routes `POST /api/wereld/introductie`, `/lijst`, `/lijst/zet`, `/bedrijf`, `/bereik`, `/rahul` — stand: half
+  - Geen bestand in `public/` roept deze routes aan. De route bestaat, het scherm niet.
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie. Fouten komen als `toon(e.message)`. Zonder items toont het scherm `RTGLivingFeed.welcome('error')` (`wereld.html`, `laad()`). De tekst bij een ontbrekende sessie: niet gemeten.
+- Pasrechten (`server/kern/wereld/rechten`). Een modus buiten de pas geeft "Deze wereld hoort bij een andere pas.". Een onbekende lens geeft "Deze lens kennen we niet." (`server/kern/wereld/feed.js`).
+- Zichtbaarheidspoort van De Salon (`salonToegang`, `server/opzet/kernlaag4.js`). Zonder poort mag de feed geen Salon-post tonen.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- De Salon, Pulse, Zakelijk en Genootschap: de bronnen van de modus 'alles' (`BRONNEN` in `server/kern/wereld/feed.js`).
+  - De feed leest ze één voor één (`lezers[n](key, tier)`), zonder `try` per bron. Gooit één lezer een fout, dan valt de hele feed. Het lid ziet dan de foutmelding, geen gedeeltelijke tijdlijn (W2).
+- De Krant (`/api/krant/artikel`) en RTG Media (`/api/mediaos/volg`), voor artikelen in de tijdlijn. Bij uitval: niet gemeten.
+- Berichten, voor het gesprek na een introductie. Bij uitval: niet gemeten.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:wereldlaag': {
+  uitgeeft: [
+    { wat: 'post of reactie, uitgevoerd door de bron-app', aan: 'tab:salon', vorm: 'gebeurtenis', bron: 'public/apps/saloon/*.js (/api/salon/plaats, /reageer)' },
+    { wat: 'volgen van een mediabron', aan: 'link:mediaos', vorm: 'gebeurtenis', bron: 'public/apps/wereld.html (/api/mediaos/volg)' }
+  ],
+  ontvangt: [
+    { wat: 'posts', van: 'tab:salon', vorm: 'projectie', bron: 'server/kern/wereld/feed.js, server/opzet/kernlaag4.js' },
+    { wat: 'berichten', van: 'link:pulse', vorm: 'projectie', bron: 'server/opzet/kernlaag4.js (pulseLezen)' },
+    { wat: 'zakelijke posts (vermogen zakelijk.feed)', van: 'Zakelijk', vorm: 'projectie', bron: 'server/kern/wereld/feed.js' },
+    { wat: 'genootschapsposts (vermogen genootschap)', van: 'sociaal.genootschap', vorm: 'projectie', bron: 'server/kern/wereld/feed.js' },
+    { wat: 'artikelen', van: 'media.krant', vorm: 'projectie', bron: 'public/apps/wereld.html (/api/krant/artikel)' }
+  ],
+  ketens: [
+    { naam: 'plaatsen, reageren, weghalen via de eigenaar', stappen: ['Alles bij elkaar: plaatst via De Salon', 'De Salon: verbonden lid reageert', 'De Salon: maker haalt weg, voor iedereen'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/wereldlaag.js' },
+    { naam: 'introductie met twee ja’s, daarna Berichten (W3)', stappen: ['Alles bij elkaar: A vraagt', 'Alles bij elkaar: B zegt ja', 'Berichten: gesprek'], stand: 'open', bewijs: 'geen; route bestaat, geen scherm' },
+    { naam: 'gedeeltelijke tijdlijn bij uitval van een bron (W2)', stappen: ['bron: valt uit', 'Alles bij elkaar: andere bronnen blijven, met een regel in woorden'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk als lezer van één tijdlijn over vier bronnen, en hij beheert de zichtbaarheid van zijn profiel. Een zakelijke netwerker of concierge doet hier maar een deel: introducties en het zakelijk profiel hebben een route maar geen scherm, en een introductiedienst (WB1) bestaat niet. Externe software is niet nodig voor wat het scherm belooft. In de marktvergelijking staat geen tool die een rol hier vervangt.
+Volledig voor: lid (lezen, zoeken, profiel) · Deels voor: zakelijke netwerker, concierge · Extern nodig: geen
+
 ---
 
 ### Voor de integrator (buiten mijn apps)
@@ -2342,6 +2916,56 @@ A zoekt "#zeilen", vindt een post van B, vraagt een introductie. B zegt ja, en z
 
 ---
 
+### Familie Sociaal — samen (v3)
+
+**FAMILIES-entry** (voorstel voor het register, zelfde vorm als het appcontract)
+```js
+FAMILIES['livingos-b/sociaal'] = {
+  naam: 'Sociaal',
+  apps: ['link:sociaal', 'tab:salon', 'os:snaps', 'link:pulse', 'link:wereldlaag'],
+  gedeeld: [
+    { wat: '9+-keuring', bestand: 'server/kern/veilig.js (gebruikt door kern/salon/*, kern/pulse/*, kern/sociaal/vrienden/contact.js)' },
+    { wat: 'vriendenlaag, blokkade en misbruikmelding (reports)', bestand: 'server/kern/sociaal.js' },
+    { wat: 'zichtbaarheidspoort van De Salon, ook gelezen door de wereldfeed', bestand: 'server/kern/salon/zichtbaarheid.js, server/opzet/kernlaag4.js' },
+    { wat: 'Pulse-lezer voor de wereldfeed', bestand: 'server/opzet/kernlaag4.js (pulseLezen)' },
+    { wat: 'meldgrens van drie melders, op twee plekken', bestand: 'server/kern/salon/reacties.js (MELD_GRENS) en server/kern/pulse/index.js (los getal 3)' },
+    { wat: 'sociale graaf over alle bronnen', bestand: 'server/kern/socialegraaf/bronnen.js, bronnen-poort.js' },
+    { wat: 'gastpoort', bestand: 'server/server.js (geenGast)' },
+    { wat: 'herhaalsleutel in de ledenapp', bestand: 'RTGIdem in public/apps/app-main/app-main-58.js en app-main-07.js' },
+    { wat: 'SSE-stroom', bestand: 'public/shared/stroom.js; sseToCustomer in server/kern/sociaal/snaps.js' }
+  ],
+  eigenaar: [
+    'link:sociaal → sociaal.leven (apps/sociaal.html)',
+    'tab:salon → kern.app (apps/app.html, de ingang); de inhoud is van sociaal.salon (apps/salon.html)',
+    'os:snaps → niet geregistreerd in SCHERMEIGENAAR.json',
+    'link:pulse → sociaal.pulse (apps/pulse.html)',
+    'link:wereldlaag → sociaal.alles (apps/wereld.html)'
+  ]
+};
+```
+
+**ONTBREKEND** (één regel per schakel die ontbreekt tussen apps van deze familie of naar andere families)
+```
+ONTBREKEND: tab:salon → kantoor: een route die post.meldingen leest en een besluit met motivering schrijft (SA1; zie MO1–MO7) · HERSTEL · middel
+ONTBREKEND: link:pulse → kantoor: dezelfde route voor post.melders (P2; zie MO1–MO7) · HERSTEL · middel
+ONTBREKEND: vriendenlaag (server/kern/sociaal.js) → kantoor: een lezer van reports; vandaag schrijft /api/member/report en leest niemand (zie MO1–MO7) · HERSTEL · middel
+ONTBREKEND: tab:salon en link:pulse → maker: een bericht via notify als zijn post na meldingen verdwijnt · HERSTEL · klein
+ONTBREKEND: tab:salon → kantoor: bezwaar bij een tweede medewerker (SA2) · VERDIEPING · middel
+ONTBREKEND: os:snaps → kantoor: melden met bewijs, versleuteld bewaard tot afhandeling (SNB2) · VERDIEPING · middel
+ONTBREKEND: link:wereldlaag → tab:salon, link:pulse, Zakelijk, Genootschap: per bron een vangnet, zodat één bron de feed niet laat vallen (W2) · HERSTEL · klein
+ONTBREKEND: link:sociaal → comm.berichten: een melding in woorden als /api/comm/inbox faalt; vandaag stil · HERSTEL · klein
+ONTBREKEND: link:sociaal ↔ link:wereldlaag: één eigenaar van het kringoverzicht (open oordeel in SCHERMEIGENAAR, S4) · HERSTEL · klein
+ONTBREKEND: tab:salon ↔ link:pulse: besluit over het open oordeel en daarna één gedeelde feed- of moderatiecomponent · VERDIEPING · middel
+ONTBREKEND: os:snaps → SCHERMEIGENAAR.json: een eigenaar voor de os-ingang · HERSTEL · klein
+ONTBREKEND: link:wereldlaag → comm.berichten: een scherm voor de introductie met twee ja's en het gesprek daarna (W3) · VERDIEPING · klein
+ONTBREKEND: tab:salon → herdeler en maker: bronvermelding en seintje bij hergebruik (SA5) · VERDIEPING · middel
+ONTBREKEND: tab:salon → wereld.travel, leven.uitgaan, festival.crewdashboard, leren.school: één verwijzingsvorm voor "post over een reis, event of klas" · VERDIEPING · middel
+ONTBREKEND: link:sociaal (Discussiekamer) → sociaal.genootschap: de kring als publiek van een kamer, met de genootschapsrol als bron (DK1) · VERDIEPING · middel
+ONTBREKEND: link:sociaal (Discussiekamer) → democratie.kwestie: het verslag als inbreng, als verwijzing (DK6) · VERDIEPING · klein
+ONTBREKEND: link:sociaal (Discussiekamer) → media.krant: een Krant-artikel als bron van een knoop (DK3) · VERDIEPING · klein
+ONTBREKEND: link:sociaal (Discussiekamer) → lokale AI (server/local-ai.js): de simulatie met rollen, lokaal-eerst (DK7) · VERDIEPING · middel
+ONTBREKEND: link:sociaal → sociaal.genootschap: een herinnering door de gastheer, hoogstens één per uitnodiging (S5) · VERDIEPING · middel
+```
 ## Spel, sport en bellen (LivingOS-B)
 
 Gemeten op `appwerkt/living-b` (HEAD c038c1bd1), 19 oktober 2026. Vorm volgens `premiumformat.md`, inclusief de aanscherping van de eigenaar: per app de punten a tot en met h, plus Modus LOS, Modus SAMEN en een gebruikersketen met storingen.
@@ -2375,7 +2999,7 @@ Doel: een lid speelt met wie het kent een echt spel, aan elk toestel, en ziet da
 | herstelbaar | GEEN_FIXTURE | sluit 5/5 (dubbeltik, crash na "Nodig uit en start", dubbele zet, afgebroken zet, crash na de matzet) |
 
 Wat er gebouwd is:
-- **Routes:** 37 letterlijke routes onder `/api/member/spel/*` en dezelfde acties onder `/api/rtf/spel/*` voor het gezinsprofiel (`server/routes/spellen.js`). `/api/rtf/spel/nieuw` staat letterlijk achter `rtfSpeler`.
+- **Routes:** 37 letterlijke routes onder `/api/member/spel/*` en dezelfde acties onder `/api/rtf/spel/*` voor het gezinsprofiel (`server/routes/spellen.js`) (gecorrigeerd: 43 routes onder `/api/member/spel/*` en 43 onder `/api/rtf/spel/*`; alleen `/nieuw` staat letterlijk in de bron, de andere 42 maakt een lus uit `ACTIES` in `server/routes/spellen.js` en `server/routes/spellen-rondom.js`; `public/apps/spelen.html` roept er 34 van aan). `/api/rtf/spel/nieuw` staat letterlijk achter `rtfSpeler`.
 - **Kern:** `server/kern/spellen/`, met 18 spellen in het register: Schaken, Dammen, Mens erger je niet, Rummi, Pesten, Sneek, Sudoku, Tetris, Quizduel, Woordduel, 30 Seconden, Doen of Waarheid, Proost (18+), en de duels Flits, Geheugen, Reactie, Schat en Rangschik.
 - **Kernmodules:** descriptor en variant, zicht per speler, klok en tempo, teams zonder ranglijst, toernooien (knockout 4/8 en roundrobin 3–8), replay en naspelen, nabespreking, Rahul als spelmaatje zonder het bord te zien, presence, dagpuzzel en arcade (beide achter de grens), dubbeltik-sleutel en projectie naar een tweede scherm.
 - **Toetsen:** onder meer `test/spel-dubbeltik.test.js`, `test/spel-nieuw-sleutel.test.js`, `test/arena.test.js`, `test/spelbeleid.test.js`, `test/spelsudoku.test.js` en de spel-e2e's.
@@ -2388,10 +3012,10 @@ Wat er gebouwd is:
 | Chess.com Gold | onbeperkt puzzels en lessen, alle bots, geen advertenties | [support.chess.com](https://support.chess.com/en/articles/8562418-what-does-each-level-of-membership-get-me) | geen advertenties: ja. Lessen en bots: nee. Puzzels: half (dagpuzzel) |
 | Chess.com Platinum | onbeperkte partijanalyse | idem | half: nabespreking en naspelen, geen zetbeoordeling |
 | Chess.com Diamond (duurste) | coachuitleg bij elke zet, Insights over al je partijen; gezinsplan tot 6 personen | idem; prijzen alleen via derden en tegenstrijdig, de officiële pagina chess.com/membership is niet opgehaald | nee; een gezinsplan is bij ons overbodig, want alles is inbegrepen |
-| Lichess (alles gratis) | geen advertenties, onbeperkt spelen en toernooien, lokale engine-analyse; diepe serveranalyse 40 per dag | [lichess.org/features](https://lichess.org/features) | toernooien: ja. Lokale engine-analyse: nee |
-| Board Game Arena Premium | premiumspellen, tafels openen voor elk spel, spraak en video aan tafel, spelen op één toestel, statistiek na afloop; $5 per maand of $42 per jaar | [forum.boardgamearena.com](https://forum.boardgamearena.com/viewtopic.php?p=215419) (BGA zelf) | tafels voor elk spel: ja. Spraak en video: half (los in Videobellen). Eén toestel: nee. Statistiek: half (alleen 18+) |
+| Lichess (alles gratis) | geen advertenties, onbeperkt spelen en toernooien, lokale engine-analyse; diepe serveranalyse 40 per dag | [lichess.org/features](https://lichess.org/features) | toernooien: ja (gecorrigeerd: half; de kern en de routes `/api/member/spel/toernooi-*` bestaan, maar geen scherm in `public/` roept ze aan). Lokale engine-analyse: nee |
+| Board Game Arena Premium | premiumspellen, tafels openen voor elk spel, spraak en video aan tafel, spelen op één toestel, statistiek na afloop; $5 per maand of $42 per jaar | [forum.boardgamearena.com](https://forum.boardgamearena.com/viewtopic.php?p=215419) (BGA zelf; een forumbericht, niet de prijspagina) (te controleren) | tafels voor elk spel: ja. Spraak en video: half (los in Videobellen). Eén toestel: nee. Statistiek: half (alleen 18+) |
 
-Wat we NIET overnemen: premiumspellen achter een muur, advertenties als verdienmodel, kunstmatige schaarste. Loot boxes ook niet: de Kansspelautoriteit ziet loot boxes als kansspel zodra de speler geen invloed heeft op de inhoud ([cms.law](https://cms.law/nl/nld/publication/kansspelautoriteit-loot-boxes-kunnen-onder-reikwijdte-wet-op-de-kansspelen-vallen), peildatum 2026-10-19).
+Wat we NIET overnemen: premiumspellen achter een muur, advertenties als verdienmodel, kunstmatige schaarste. Loot boxes ook niet: de Kansspelautoriteit ziet loot boxes als kansspel zodra de speler geen invloed heeft op de inhoud ([cms.law](https://cms.law/nl/nld/publication/kansspelautoriteit-loot-boxes-kunnen-onder-reikwijdte-wet-op-de-kansspelen-vallen), peildatum 2026-10-19) (te controleren).
 
 #### c. Analyse van het volledige domein
 
@@ -2399,26 +3023,26 @@ Wat we NIET overnemen: premiumspellen achter een muur, advertenties als verdienm
 
 **Professioneel.** Er zijn drie werelden: speltoezicht, rating en ontwikkeling.
 - **Rating:** een rating hoort bij een vastgelegde regeling. De FIDE-ratingregels (goedgekeurd 15/12/2023, van kracht sinds 1 maart 2024) stellen eisen aan bedenktijd en wie mee telt ([handbook.fide.com](https://handbook.fide.com/chapter/B022024), peildatum 2026-10-19). Een eigen ratingcijfer is dus geen officiële rating, en moet zo heten.
-- **Leeftijdsclassificatie:** spelontwikkelaars werken met PEGI. PEGI kent een aanduiding voor in-game aankopen en een aparte voor betaalde willekeurige voorwerpen ([wikipedia: PEGI](https://en.wikipedia.org/wiki/PEGI), peildatum 2026-10-19; pegi.info zelf niet opgehaald). Omdat RTG niets verkoopt in een spel, hoort geen van onze spellen die aanduidingen te dragen.
-- **Kansspel:** de Wet op de kansspelen verbiedt prijzen toe te kennen via een kansbepaling waarop deelnemers in het algemeen geen overwegende invloed hebben, zonder vergunning ([kansspelautoriteit.nl / Raad van State](https://www.raadvanstate.nl/@123942/202001415-1-a3/), peildatum 2026-10-19). Een toernooi met een prijs bij een kansspel (Mens erger je niet, Pesten) is dus juridisch iets anders dan een schaaktoernooi.
+- **Leeftijdsclassificatie:** spelontwikkelaars werken met PEGI. PEGI kent een aanduiding voor in-game aankopen en een aparte voor betaalde willekeurige voorwerpen ([wikipedia: PEGI](https://en.wikipedia.org/wiki/PEGI), peildatum 2026-10-19; pegi.info zelf niet opgehaald) (te controleren). Omdat RTG niets verkoopt in een spel, hoort geen van onze spellen die aanduidingen te dragen.
+- **Kansspel:** de Wet op de kansspelen verbiedt prijzen toe te kennen via een kansbepaling waarop deelnemers in het algemeen geen overwegende invloed hebben, zonder vergunning ([kansspelautoriteit.nl / Raad van State](https://www.raadvanstate.nl/@123942/202001415-1-a3/), peildatum 2026-10-19) (te controleren). Een toernooi met een prijs bij een kansspel (Mens erger je niet, Pesten) is dus juridisch iets anders dan een schaaktoernooi.
 
 **Organisatorisch.** Toernooiorganisatoren werken met indelingssystemen (knockout, roundrobin, Zwitsers, poules), tie-breaks, bedenktijd per ronde, arbiters, verzoeken om uitstel en een publiek reglement. Schaakclubs en scholen houden clubkampioenschappen. RTG heeft al de Arena voor tieners en klas en quiz voor scholen (`rtf.klas`).
 
-Wat dit volgens ons vraagt: 18+-poort voor elke blijvende stand, geen prijzen bij kansspelen zonder besluit, en bij minderjarigen de AVG-leeftijd van 16 voor toestemming in onlinediensten (art. 8 AVG, art. 5 UAVG, [gdpr-text.com](https://gdpr-text.com/nl/read/article-8/), peildatum 2026-10-19).
+Wat dit volgens ons vraagt: 18+-poort voor elke blijvende stand, geen prijzen bij kansspelen zonder besluit, en bij minderjarigen de AVG-leeftijd van 16 voor toestemming in onlinediensten (art. 8 AVG, art. 5 UAVG, [gdpr-text.com](https://gdpr-text.com/nl/read/article-8/), peildatum 2026-10-19) (te controleren).
 
 #### d. Concrete functiecatalogus
 
 | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Wanneer hoort iemand iets | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Spelen aan één toestel (hotseat) | L1 | het potje in `S`, geen tweede sessie | de beurt wisselt op één toestel; per beurt een scherm "geef door aan <naam>" zodat verborgen kaarten verborgen blijven (`zicht.js`) | geen | niemand; het blijft op het toestel | een lid is eigenaar; medespelers zonder account tellen als gast in het potje en laten geen spoor na | spellen met verborgen informatie alleen met het doorgeefscherm; geen uitslag in `spelUitslagen` als niet iedereen 18+ en geverifieerd is | twee mensen spelen Rummi op één telefoon; bij elke beurt ziet alleen wie aan de beurt is zijn kaarten | ontbreekt | klein | aanbevolen nu |
-| Zetbeoordeling na afloop | L4 | de zetten uit `naspelen.js`; een lokale evaluatie per spel (schaken, dammen) | per zet het verschil tussen de beste en de gespeelde zet, in drie klassen: goed / twijfelachtig / fout; geen extern model (AI lokaal-eerst) | een beoordeling is een inschatting van de rekendiepte, en heet zo ("volgens een rekendiepte van N zetten") | na afloop, op verzoek; nooit tijdens het potje | alleen de spelers van het potje; een kijker niet | niet bij kansspellen; niet bij een lopend potje | na een schaakpartij ziet het lid bij zet 12 "twijfelachtig, een betere zet was …" en kan het die stelling op het bord terugzien | half (nabespreking, geen evaluatie) | middel | aanbevolen nu |
+| Spelen aan één toestel (hotseat) | L1 | het potje in `S`, geen tweede sessie | de beurt wisselt op één toestel; per beurt een scherm "geef door aan <naam>" zodat verborgen kaarten verborgen blijven (`zicht.js`) | geen | niemand; het blijft op het toestel | een lid is eigenaar; medespelers zonder account tellen als gast in het potje en laten geen spoor na | spellen met verborgen informatie alleen met het doorgeefscherm; geen uitslag in `spelUitslagen` als niet iedereen 18+ en geverifieerd is | twee mensen spelen Rummi op één telefoon; bij elke beurt ziet alleen wie aan de beurt is zijn kaarten | ontbreekt | klein | nu · VERDIEPING |
+| Zetbeoordeling na afloop | L4 | de zetten uit `naspelen.js`; een lokale evaluatie per spel (schaken, dammen) | per zet het verschil tussen de beste en de gespeelde zet, in drie klassen: goed / twijfelachtig / fout; geen extern model (AI lokaal-eerst) | een beoordeling is een inschatting van de rekendiepte, en heet zo ("volgens een rekendiepte van N zetten") | na afloop, op verzoek; nooit tijdens het potje | alleen de spelers van het potje; een kijker niet | niet bij kansspellen; niet bij een lopend potje | na een schaakpartij ziet het lid bij zet 12 "twijfelachtig, een betere zet was …" en kan het die stelling op het bord terugzien | half (nabespreking, geen evaluatie) | middel | nu · VERDIEPING |
 | Eigen inzicht over partijen | L4 | `spelUitslagen` en de eigen replays | per opening of fase het aandeel winst en verlies van de eigen partijen; geen vergelijking met anderen | bij weinig partijen zegt het scherm "te weinig partijen om iets te zeggen" (drempel: 10) | maandelijks een samenvatting, alleen als het lid dat aanzet | alleen het lid zelf | onder de 18+-grens bestaat het niet (`progressieMag`) | een gekeurde volwassene ziet "met wit verloor je vaak na zet 20" uit zijn eigen 30 partijen | ontbreekt | middel | later |
 | Ranked met een verborgen matchmakingcijfer | L4 | uitslagen van ranked-potjes | een eigen cijfer (Elo-achtig), uitdrukkelijk geen FIDE-rating; tegenstanders binnen een band | het cijfer is een schatting en wordt nooit getoond als absolute sterkte | na elk ranked-potje alleen de uitslag, geen cijfer in beeld | alleen gekeurde volwassenen; casual blijft voor iedereen | niet bij kansspellen; geen seizoenen of verval die terugkomen dwingen | een gekeurde volwassene kiest "Ranked" en krijgt binnen 60 seconden een tegenstander van vergelijkbare sterkte, of de melding dat er nu niemand is | ontbreekt (GAMEHALL.md par. 15) | middel | later |
-| Toernooien: Zwitsers, poules, best-of, tie-breaks | L3 | `toernooi.js` en `toernooi-schema.js` | Zwitsers: per ronde koppelen op gelijke score, niet twee keer dezelfde; tie-break volgens het gekozen reglement | geen; de indeling is deterministisch en uitlegbaar | voor elke ronde aan alle spelers; bij uitstel aan de tegenstander | organisator (een lid) maakt; deelnemers op uitnodiging | onder de 18 geen blijvende stand na afloop (al zo); kansspellen zonder prijs | een organisator start een Zwitsers toernooi met 9 spelers; ronde 2 koppelt nooit twee spelers die al tegen elkaar speelden | half (knockout en roundrobin bestaan) | middel | aanbevolen nu: het schema heeft er de plek al voor |
+| Toernooien: Zwitsers, poules, best-of, tie-breaks | L3 | `toernooi.js` en `toernooi-schema.js` | Zwitsers: per ronde koppelen op gelijke score, niet twee keer dezelfde; tie-break volgens het gekozen reglement | geen; de indeling is deterministisch en uitlegbaar | voor elke ronde aan alle spelers; bij uitstel aan de tegenstander | organisator (een lid) maakt; deelnemers op uitnodiging | onder de 18 geen blijvende stand na afloop (al zo); kansspellen zonder prijs | een organisator start een Zwitsers toernooi met 9 spelers; ronde 2 koppelt nooit twee spelers die al tegen elkaar speelden | half (knockout en roundrobin bestaan) (gecorrigeerd: alleen in de kern en als route; geen scherm roept `/api/member/spel/toernooi-*` aan) | middel | nu · VERDIEPING: het schema heeft er de plek al voor |
 | Publiek toernooireglement en arbiter | L3 | een reglementtekst per toernooi; een aangewezen arbiter | de arbiter kan een uitslag corrigeren met een reden; de correctie staat in de geschiedenis | geen | bij een correctie aan beide spelers | arbiter is een lid dat de organisator aanwijst; de arbiter speelt zelf niet mee | geen arbiter, dan beslist de uitslag van de partij | een arbiter zet een uitslag om met een reden; beide spelers zien de reden en de oude uitslag | ontbreekt | middel | later |
-| Nieuwe varianten op een bestaand spel | L5 | de descriptor van een spel (`variant.js`) | een variant is een keuzelijst uit de descriptor, nooit vrije code uit het verzoek (al zo voor quiz) | geen | — | elk lid kiest; de keuzelijst bepaalt RTG | geen variant die een kansspel met prijs maakt | een lid kiest "Dammen, 8x8" of "Schaken 960" en het potje speelt volgens die regels | half (variant bestaat voor quiz) | klein tot middel per spel | aanbevolen nu |
+| Nieuwe varianten op een bestaand spel | L5 | de descriptor van een spel (`variant.js`) | een variant is een keuzelijst uit de descriptor, nooit vrije code uit het verzoek (al zo voor quiz) | geen | — | elk lid kiest; de keuzelijst bepaalt RTG | geen variant die een kansspel met prijs maakt | een lid kiest "Dammen, 8x8" of "Schaken 960" en het potje speelt volgens die regels | half (variant bestaat voor quiz) | klein tot middel per spel | nu · VERDIEPING |
 | Spelbouwstudio en eigen spelmotor | — | — | — | — | — | — | — | — | ontbreekt | groot | niet doen vóór V1: een nieuwe motor of laag is uitgesloten. De verdieping is de descriptor (varianten) en de bestaande motoren |
-| Spraak en video aan tafel | L6 | het potje en een verwijzing naar een gesprek (`/api/member/call`) | met één tik start een gesprek met de medespelers; het bord blijft staan | geen | de medespelers krijgen een oproep | alleen medespelers die verbonden zijn | geen gesprek met iemand die geblokkeerd is | in een lopend potje tikt een lid "Bel de tafel" en de ander krijgt een oproep met het bord eronder | half (bellen los) | middel | aanbevolen nu |
+| Spraak en video aan tafel | L6 | het potje en een verwijzing naar een gesprek (`/api/member/call`) | met één tik start een gesprek met de medespelers; het bord blijft staan | geen | de medespelers krijgen een oproep | alleen medespelers die verbonden zijn | geen gesprek met iemand die geblokkeerd is | in een lopend potje tikt een lid "Bel de tafel" en de ander krijgt een oproep met het bord eronder | half (bellen los) | middel | nu · VERDIEPING |
 
 #### e. RTG-exclusieve mogelijkheden
 
@@ -2463,21 +3087,21 @@ Dit eindcontract vervangt de acht APPWERKT-bewijzen niet.
 | Bewezen betrouwbaarheid | alle acht APPWERKT-bewijzen BEWEZEN, met IDOR-dekking voor alle 50 routes |
 
 #### Uitkomst A — bouwbaar binnen de huidige architectuur en scope
-De functiecatalogus (d) met de bak "aanbevolen nu" en "later", in de volgorde van g: hotseat, varianten via de descriptor, Zwitsers en poules, spraak en video aan tafel, zetbeoordeling met een lokale evaluator, ranked en eigen inzicht achter `progressieMag`. Geen nieuwe motor of laag; alles hangt aan de bestaande spelkern.
+De functiecatalogus (d) met de bakken "nu · VERDIEPING" en "later", in de volgorde van g: hotseat, varianten via de descriptor, Zwitsers en poules, spraak en video aan tafel, zetbeoordeling met een lokale evaluator, ranked en eigen inzicht achter `progressieMag`. Geen nieuwe motor of laag; alles hangt aan de bestaande spelkern.
 
 #### Uitkomst B — het domeinmaximum, ook buiten de huidige scope
 Compleet nieuwe professionele processen. Elk vraagt een besluit en valt buiten V1.
 
 | Proces | Gegevens en bron | Regels en rekenwijze | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium |
 |---|---|---|---|---|---|
-| **Toernooiorganisatie als vak** (clubs, scholen, zaken organiseren erkende toernooien met inschrijving, bedenktijd per ronde, arbiters en een publiek reglement) | inschrijvingen, het reglement als versie-tekst, rondes en uitslagen uit de spelkern | indeling volgens het gekozen systeem; tie-break volgens het reglement; een uitslag wordt definitief na een bezwaartermijn (bijvoorbeeld 24 uur) | organisator (zaak met een nieuw genre "spelorganisatie"), arbiter (aangewezen lid), deelnemer; minderjarigen alleen met toestemming van een ouder (AVG art. 8) | kansspellen alleen zonder prijs, of met een vergunning; geen blijvende stand onder de 18 | een organisator publiceert een reglement, 16 spelers schrijven in, de arbiter corrigeert één uitslag met een reden, en na de bezwaartermijn staat de eindstand vast en zichtbaar voor alle deelnemers |
+| **Toernooiorganisatie als vak** (clubs, scholen, zaken organiseren erkende toernooien met inschrijving, bedenktijd per ronde, arbiters en een publiek reglement) | inschrijvingen, het reglement als versie-tekst, rondes en uitslagen uit de spelkern | indeling volgens het gekozen systeem; tie-break volgens het reglement; een uitslag wordt definitief na een bezwaartermijn (bijvoorbeeld 24 uur) | organisator (zaak met een nieuw genre "spelorganisatie"), arbiter (aangewezen lid), deelnemer; minderjarigen alleen met toestemming van een ouder (AVG art. 8) (te controleren). Dit blijft een huisregel ter bescherming van minderjarigen en weigert dus wél: strenger dan de wet mag. Alleen de wettelijke grondslag is te controleren, en het scherm noemt de huisregel als reden, niet de wet. | kansspellen alleen zonder prijs, of met een vergunning; geen blijvende stand onder de 18 | een organisator publiceert een reglement, 16 spelers schrijven in, de arbiter corrigeert één uitslag met een reden, en na de bezwaartermijn staat de eindstand vast en zichtbaar voor alle deelnemers |
 | **Erkende rating via een bond** | partijen met bedenktijd die voldoet aan de ratingregeling van de bond ([handbook.fide.com](https://handbook.fide.com/chapter/B022024)) | RTG berekent niets officieels; RTG levert een partijbestand aan de bond (PGN) en toont de officiële rating die de bond teruggeeft | de speler geeft toestemming per toernooi; de arbiter tekent het rapport af | online partijen tellen alleen als de bond dat erkent | na een erkend toernooi staat het rapport bij de bond, en ziet de speler zijn officiële rating met de bron erbij |
 | **Spelontwikkeling door derden** (een uitgever brengt een bordspel naar RTG) | een descriptor-bestand van de uitgever, gekeurd door RTG; rechten en licentie van de uitgever | het spel draait alleen als declaratieve descriptor binnen de bestaande motoren, nooit als vrije code; PEGI-achtige leeftijdsaanduiding verplicht | uitgever (zaak, via het App Store-kanaal, APPSTORE.md), keurder van RTG op naam (vier ogen) | geen in-game aankopen, geen willekeurige betaalde voorwerpen | een uitgever dient een descriptor in, een keurder keurt goed, en het spel verschijnt in Spelen met de leeftijdsaanduiding en de naam van de uitgever |
 | **Spelhal en clubavond** (een zaak houdt een speelavond met tafels, inschrijving en een televisie per tafel) | tafels als zaakobject, potjes uit de spelkern, projectie per tafel | een tafel is een potje met een eigen schermcode; de zaak ziet alleen de bezetting, nooit de inhoud van verborgen kaarten | zaak (nieuw genre of horeca), gast als lid of als tafelgast zonder spoor | 18+-spellen (Proost) alleen aan tafels met gekeurde volwassenen | op een clubavond met 6 tafels toont elke televisie zijn eigen potje, en de zaak ziet welke tafel vrij is |
 
 **Modus LOS.**
 - **Al zo:** spelen op codenaam en solo (Sudoku, Tetris, de dagpuzzel) werkt zonder De Salon en School. Zonder Rahul-sleutel geeft dezelfde motor een vaste tip.
-- **Nog niet:** staat De Salon uit, dan is de vriendenlijst leeg zonder uitleg. Dat hoort een zin te worden: "Uw vrienden komen uit De Salon; nodig iemand uit op codenaam".
+- **Nog niet:** staat De Salon uit, dan is de vriendenlijst leeg zonder uitleg (gecorrigeerd: een lege lijst zegt "Nog geen vrienden; speel random of voeg eerst vrienden toe." (`public/apps/spelen.html`); De Salon als bron noemt die zin niet. Wat het scherm doet als `/api/member/connections` faalt: niet gemeten). Dat hoort een zin te worden: "Uw vrienden komen uit De Salon; nodig iemand uit op codenaam".
 
 **Modus SAMEN.**
 - **Uitgegeven:**
@@ -2502,7 +3126,7 @@ Storingen in die keten:
 - **Dubbele tik op "Nodig uit en start":** één potje (bewezen).
 - **Een crash vlak na de tik:** dezelfde tik geeft hetzelfde potje. Een ander spel onder dezelfde sleutel geeft 409 (bewezen).
 - **Het netwerk valt weg tijdens een zet:** de zet staat er één keer, en de stand na herladen klopt (bewezen).
-- **De vriend is niet gekeurd:** het potje wordt uitgespeeld, er wordt niets bewaard, en het scherm zegt dat met `GEEN_PROGRESSIE`.
+- **De vriend is niet gekeurd:** het potje wordt uitgespeeld, er wordt niets bewaard, en het scherm zegt dat met `GEEN_PROGRESSIE` (gecorrigeerd: bij een bordspel verbergt `public/apps/spelen.html` de blokken stand, recent en prestaties zonder reden (`laadStand`, `laadRecent`, `laadPrestaties`: `hidden = leeg`); de reden uit `spelUitslagen` en `spelStand` komt niet in beeld. Alleen arcade, dagpuzzel en Sudoku tonen `d.reden`).
 - **De televisie valt weg:** de schermcode is op, het scherm zegt dat, en een nieuwe code koppelt (bewezen in Game Night).
 - **De vriend is geblokkeerd:** geen uitnodiging mogelijk (bevoegd-stap op de tak).
 
@@ -2513,6 +3137,70 @@ Storingen in die keten:
 - De naam en de zichtbaarheid van een eigen matchmakingcijfer.
 
 **Extern.** Geen. Een officiële rating (FIDE of een nationale bond) is extern en valt buiten dit voorstel.
+
+#### v3 — afbouw (Spelen)
+
+Gemeten op HEAD `f64048209`, 19 oktober 2026.
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Potje starten met een vriend of op codenaam — schermtekst: "Nodig uit en start" en "Of nodig uit op codenaam (bijv. Gouden Ibis 1234)" (`public/apps/spelen.html`) — route `POST /api/member/spel/nieuw` — stand: bestaat (herhaalsleutel in `server/kern/spellen/dubbeltik.js`; ander spel onder dezelfde sleutel: "Deze uitnodiging is al met een ander spel of andere spelers verstuurd.")
+- Random tegenstander — schermtekst: "Random tegenstander" (`public/apps/spelen.html`) — route `POST /api/member/spel/random` — stand: bestaat
+- Uitnodiging aannemen of weigeren — schermtekst: "Speel mee" / "✕" (`public/apps/spelen.html`) — route `POST /api/member/spel/antwoord` — stand: bestaat
+- Zetten en de staat van het bord — schermtekst per spel, bijvoorbeeld "Pak een kaart", "Klaar met leggen", "Speel woord" (`public/apps/spelen.html`) — route `POST /api/member/spel/zet` en `/staat` — stand: bestaat
+- Opgeven en een partij opeisen bij een verlopen klok — schermtekst: "Opgeven" / "Partij toewijzen" (`public/apps/spelen.html`) — route `POST /api/member/spel/opgeven` en `/toewijzen` — stand: bestaat
+- Naspelen — schermtekst: "< vorige" / "volgende >" (`public/apps/spelen.html`) — route `POST /api/member/spel/naspelen` — stand: bestaat
+- Nabespreking door Rahul — schermtekst: "Rahul: bespreek na" (`public/apps/spelen.html`) — route `POST /api/member/spel/nabespreking` — stand: half (geen zetbeoordeling)
+- Rahul als spelmaatje tijdens het potje — schermtekst: "Geef een tip" / "Vraag" (`public/apps/spelen.html`) — route `POST /api/member/spel/rahul` — stand: bestaat (zonder model een vaste tip met `demo: true`, `server/kern/spellen/rahul.js`)
+- Praten in het potje — schermtekst: "Stuur" (`public/apps/spelen.html`) — route `POST /api/member/spel/praat` en `/praat-stuur` — stand: bestaat
+- Teams — schermtekst: "Maak team", "Doe mee", "Verlaat" (`public/apps/spelen.html`) — route `POST /api/member/spel/team-nieuw`, `/team-antwoord`, `/team-verlaat`, `/team-mijn` — stand: bestaat
+- Zichtbaarheid voor de kring — knop `#zichtbaarKnop` (tekst wordt gezet door het script; niet gemeten) — route `POST /api/member/spel/zichtbaar` en `/zichtbaar-zet` — stand: bestaat
+- Solo: Sudoku, dagpuzzel, Tetris en Sneek — schermtekst: "Start (of pijltjes)" / "Start (pijltjes of vegen)" (`public/apps/spelen.html`) — route `POST /api/member/spel/sudoku-nieuw`, `/dag-start`, `/arcade-score`, `/sneek-score` — stand: bestaat
+- Eigen stand, recente partijen en prestaties — kop: "Jouw partijen" (`public/apps/spelen.html`) — route `POST /api/member/spel/stand`, `/uitslagen`, `/prestaties` — stand: bestaat, alleen boven de 18+-grens
+- Toernooien — geen schermtekst — route `POST /api/member/spel/toernooi-nieuw` en drie andere — stand: half (route en kern bestaan; geen scherm in `public/` roept ze aan, alleen `test/spelpoort.test.js`)
+- Hotseat met doorgeefscherm — geen schermtekst — geen route — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie — zonder ledentoken en zonder gezinssessie stuurt het scherm zonder melding door naar `/apps/foundation/index.html` (`public/apps/spelen.html`).
+- Gastpoort `geenGast` — een anonieme demo-gast ziet "Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten." (`server/server.js`).
+- Gezinspoort `rtfSpeler` — "Log opnieuw in bij je gezin." of "Als oppas of familielid speel je hier niet mee." (`server/routes/spellen.js`).
+- 18+-poort `progressieMag` op `volwassen()` (`server/kern/spellen/grens.js`) — zonder keuring speelt het potje door en wordt niets bewaard; bij arcade, dagpuzzel en Sudoku staat `GEEN_PROGRESSIE` in beeld, bij bordspellen verdwijnt het blok zonder reden. Uitval van de poort zelf: niet gemeten.
+- Opslag van potjes en uitslagen — een onverwachte fout geeft "Er ging iets mis. Probeer het opnieuw." met een verzoek-id (`veilig()` in `server/routes/spellen.js`).
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- De Salon (`/api/member/connections`) — de vriendenlijst — leeg: "Nog geen vrienden; speel random of voeg eerst vrienden toe." (`public/apps/spelen.html`).
+- Klas van FoundationOS (`spelKlasgenoten`) — klasgenoten als kring voor tieners — zonder klas een lege lijst, zonder melding.
+- Game Night (`apps/spelscherm.html`) — het bord op een tweede scherm — schermtekst "Op het grote scherm" en "Sluit scherm"; een oude code geeft "Deze oude schermcode is gesloten. Vraag een speler om een nieuwe code." (`server/routes/spellen.js`).
+- Communicatiekern (`kern/comm`) — praten in het potje — zonder kern: "Praten in het potje bestaat hier niet." (`server/kern/spellen/praat.js`).
+- Extern of lokaal model — Rahul-antwoorden — zonder model een vaste tip.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:spelen': {
+  uitgeeft: [
+    { wat: 'potje-verwijzing met eenmalige schermcode', aan: 'link:spelavond (Game Night)', vorm: 'verwijzing', bron: 'server/routes/spellen-rondom.js (projectie-open); server/routes/spellen.js (/api/projectie/koppel, /api/projectie/kijk)' },
+    { wat: 'gesprek bij het potje (soort group)', aan: 'kern/comm', vorm: 'verwijzing', bron: 'server/kern/spellen/praat.js' },
+    { wat: 'ingang Spelen met ?pas=', aan: 'ledenapp (werktafel)', vorm: 'verwijzing', bron: 'public/apps/app-main/app-main-06.js, app-main-23a.js' }
+  ],
+  ontvangt: [
+    { wat: 'vriendenkring', van: 'De Salon', vorm: 'projectie', bron: 'public/apps/spelen.html (vriendenLijst); server/routes/spellen.js (socialConnecties)' },
+    { wat: 'klasgenoten', van: 'FoundationOS-klas', vorm: 'projectie', bron: 'server/routes/spellen.js (spelKlasgenoten)' },
+    { wat: 'keuring 18+', van: 'server/kern/volwassen.js', vorm: 'projectie', bron: 'server/kern/spellen/grens.js' },
+    { wat: 'gezinsidentiteit', van: 'FoundationOS (rtf.verifieerProfiel)', vorm: 'verwijzing', bron: 'server/routes/spellen.js (rtfSpeler)' }
+  ],
+  ketens: [
+    { naam: 'uitnodigen tot uitslag', stappen: ['spelen: nodig uit', 'vriend: neemt aan', 'beiden: zetten tot mat', 'spelen: uitslag alleen voor gekeurde volwassenen'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/spelen.js' },
+    { naam: 'potje op de televisie', stappen: ['spelen: "Op het grote scherm"', 'spelavond: koppelt met de eenmalige code'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/spelavond.js' },
+    { naam: 'toernooi voor leden', stappen: ['spelen: toernooi maken', 'deelnemers: aannemen', 'kern: ronde indelen'], stand: 'open', bewijs: 'test/spelpoort.test.js (alleen de route, geen scherm)' },
+    { naam: 'bel de tafel', stappen: ['spelen: "Bel de tafel"', 'os:videobellen of RTG Meet: oproep aan de medespelers'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'spelavond op een evenement', stappen: ['horeca.events of festival.gast: verwijzing naar een potje', 'spelen: speelt'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een lid dat met bekenden speelt, doet hier zijn hele werk: uitnodigen, spelen, praten, naspelen en het bord op de televisie. Een gekeurde volwassene heeft daarbij zijn stand en prestaties. Een gezinslid speelt via de gezinsingang mee, zonder stand. Voor een toernooiorganisator, een club, een school die een kampioenschap houdt en een arbiter is het nog maar een deel: toernooien hebben geen scherm, en een genre en arbiterrol ontbreken. Externe software blijft nodig voor engine-analyse (zoals de lokale analyse van Lichess in de marktvergelijking) en voor een officiële rating. Volledig voor: lid, gekeurde volwassene, gezinslid · Deels voor: toernooiorganisator, club, school, arbiter · Extern nodig: engine-analyse, officiële rating (bond).
 
 ---
 
@@ -2547,9 +3235,9 @@ Wat er gebouwd is:
 
 | Marktleider en pakket | Functies | Bron, peildatum 2026-10-19 | Hebben wij het? |
 |---|---|---|---|
-| FotMob, gratis basis | live stand, xG en schotkaarten, live tekst, tv-schema | [apps.apple.com](https://apps.apple.com/US/app/id488575683) | stand: half (één club). xG: nee |
-| FotMob, betaald (duurste in de lijst: familie jaarlijks $29.99) | geen advertenties; verder niet hard te verifiëren | [apppricinglab.com](https://apppricinglab.com/iap/apple/488575683) (april 2026; officiële pagina niet opgehaald) | geen advertenties: ja |
-| OneFootball, abonnement en per wedstrijd | wedstrijden per stuk kijken, clubkanalen (bijvoorbeeld €2.99 per maand voor een clubkanaal) | [apppricinglab.com](https://apppricinglab.com/iap/apple/382002079), [inter.it](https://www.inter.it/en/news/inter-tv-onefootball) | nee |
+| FotMob, gratis basis | live stand, xG en schotkaarten, live tekst, tv-schema | [apps.apple.com](https://apps.apple.com/US/app/id488575683) (te controleren) | stand: half (één club). xG: nee |
+| FotMob, betaald (duurste in de lijst: familie jaarlijks $29.99) | geen advertenties; verder niet hard te verifiëren | [apppricinglab.com](https://apppricinglab.com/iap/apple/488575683) (april 2026; officiële pagina niet opgehaald) (te controleren) | geen advertenties: ja |
+| OneFootball, abonnement en per wedstrijd | wedstrijden per stuk kijken, clubkanalen (bijvoorbeeld €2.99 per maand voor een clubkanaal) | [apppricinglab.com](https://apppricinglab.com/iap/apple/382002079), [inter.it](https://www.inter.it/en/news/inter-tv-onefootball) (te controleren) | nee |
 | Ledenadministratie van de bond | leden, wedstrijdzaken, teammanagers, digitaal wedstrijdformulier | [knvb.nl](https://www.knvb.nl/over-ons/knvb-account) (bron, geen partner) | teams en spelers: half. Wedstrijdformulier: nee. Koppeling met de bond: nee |
 
 #### c. Domein
@@ -2562,19 +3250,19 @@ Wat er gebouwd is:
 - een digitaal wedstrijdformulier dat alleen werkt als trainer en teammanager goed geregistreerd zijn;
 - scheidsrechters die worden aangewezen en een uitslag vastleggen.
 
-**Organisatorisch.** Daaronder vallen vrijwilligersroosters (bar, scheidsrechter, kantine), sponsorcontracten, kampen en toernooien, contributie en de AVG voor jeugdleden (toestemming van een ouder onder de 16, [gdpr-text.com](https://gdpr-text.com/nl/read/article-8/)). Bij tickets voor grote wedstrijden spelen veiligheid, persoonsgebonden kaarten en doorverkoop een rol.
+**Organisatorisch.** Daaronder vallen vrijwilligersroosters (bar, scheidsrechter, kantine), sponsorcontracten, kampen en toernooien, contributie en de AVG voor jeugdleden (toestemming van een ouder onder de 16, [gdpr-text.com](https://gdpr-text.com/nl/read/article-8/) (te controleren)). Bij tickets voor grote wedstrijden spelen veiligheid, persoonsgebonden kaarten en doorverkoop een rol.
 
 #### d. Functiecatalogus
 
 | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Wanneer hoort iemand iets | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Mijn clubs volgen | L1 | een lijst clubcodes per lid; programma en stand uit `sportief.js` | alleen clubs die op RTG staan | geen | — | het lid | een club die van RTG afgaat, verdwijnt met een melding | een lid volgt twee clubs en ziet hun programma samen, op datum | half (één club per verzoek, voorkeur `FCRTG`) | klein | aanbevolen nu |
-| Melding bij de aftrap en de uitslag | L1 | wedstrijdstart en uitslag uit `uitslagZet` | één melding bij de aftrap, één bij de uitslag; nooit een live stroom | geen | bij aftrap en uitslag, alleen als het lid dat aanzet | het lid | geen melding 's nachts (rust van de meldingslaag) | het lid zet de melding aan; bij de uitslag krijgt het precies één bericht | ontbreekt | klein | aanbevolen nu |
-| Ticket doorgeven aan een vriend | L5 | het ticket (`stadion.js`) en een Salon-verbinding | de oude code vervalt meteen; de nieuwe is eenmalig; een gescand ticket kan niet meer | geen | de ontvanger krijgt een bericht | de houder geeft door; de ontvanger accepteert | niet na een scan; niet aan iemand die geblokkeerd is | een lid geeft één van drie tickets door; de oude code weigert aan de poort, de nieuwe werkt | ontbreekt | middel | aanbevolen nu |
-| Annuleren voor de wedstrijd | L5 | het ticket | zolang het niet gescand is en de club annuleren toestaat | geen | de club ziet een plaats vrijkomen | de houder | na de aftrap niet | een lid annuleert een ticket; het vak heeft er één plek bij | ontbreekt | klein | aanbevolen nu |
-| Wedstrijd in de agenda | L6 | een verwijzing (club, wedstrijd-id, tijd) | de agenda neemt geen ticketgegevens over, alleen de verwijzing | geen | — | het lid | — | na reserveren staat de wedstrijd in de agenda en opent een tik het ticket in Sport | ontbreekt | klein | aanbevolen nu |
+| Mijn clubs volgen | L1 | een lijst clubcodes per lid; programma en stand uit `sportief.js` | alleen clubs die op RTG staan | geen | — | het lid | een club die van RTG afgaat, verdwijnt met een melding | een lid volgt twee clubs en ziet hun programma samen, op datum | half (één club per verzoek, voorkeur `FCRTG`) | klein | nu · VERDIEPING |
+| Melding bij de aftrap en de uitslag | L1 | wedstrijdstart en uitslag uit `uitslagZet` | één melding bij de aftrap, één bij de uitslag; nooit een live stroom | geen | bij aftrap en uitslag, alleen als het lid dat aanzet | het lid | geen melding 's nachts (rust van de meldingslaag) | het lid zet de melding aan; bij de uitslag krijgt het precies één bericht | ontbreekt | klein | nu · VERDIEPING |
+| Ticket doorgeven aan een vriend | L5 | het ticket (`stadion.js`) en een Salon-verbinding | de oude code vervalt meteen; de nieuwe is eenmalig; een gescand ticket kan niet meer | geen | de ontvanger krijgt een bericht | de houder geeft door; de ontvanger accepteert | niet na een scan; niet aan iemand die geblokkeerd is | een lid geeft één van drie tickets door; de oude code weigert aan de poort, de nieuwe werkt | ontbreekt | middel | nu · VERDIEPING |
+| Annuleren voor de wedstrijd | L5 | het ticket | zolang het niet gescand is en de club annuleren toestaat | geen | de club ziet een plaats vrijkomen | de houder | na de aftrap niet | een lid annuleert een ticket; het vak heeft er één plek bij | ontbreekt | klein | nu · VERDIEPING |
+| Wedstrijd in de agenda | L6 | een verwijzing (club, wedstrijd-id, tijd) | de agenda neemt geen ticketgegevens over, alleen de verwijzing | geen | — | het lid | — | na reserveren staat de wedstrijd in de agenda en opent een tik het ticket in Sport | ontbreekt | klein | nu · VERDIEPING |
 | Online afrekenen | L5 | betaalwaarheid (`kern/betaalwaarheid`, eigenaar Geld) | ticket pas na een bevestigde betaling; weigert de bank, dan geen ticket | een hangende betaling heet wachtend, nooit betaald | bij bevestiging | het lid en de club | gratis wedstrijden zonder betaling | weigert de bank, dan staat er geen ticket en zegt het scherm dat er niets is afgeschreven | ontbreekt (afrekenen aan de poort) | middel | later, met Geld |
-| Vrijwilligersrooster | L3 | rooster en taken in de clubkern | een lid schrijft zich in voor een dienst; de club bevestigt | geen | herinnering de dag ervoor | club (zaak) maakt, lid schrijft in | jeugdleden alleen met toestemming van een ouder | een lid schrijft zich in voor een bardienst en ziet hem in zijn agenda | ontbreekt | middel | later, met PLANNING.md |
+| Vrijwilligersrooster | L3 | rooster en taken in de clubkern | een lid schrijft zich in voor een dienst; de club bevestigt | geen | herinnering de dag ervoor | club (zaak) maakt, lid schrijft in | jeugdleden alleen met toestemming van een ouder (te controleren). Dit blijft een huisregel ter bescherming van minderjarigen en weigert dus wél: strenger dan de wet mag. Alleen de wettelijke grondslag is te controleren, en het scherm noemt de huisregel als reden, niet de wet. | een lid schrijft zich in voor een bardienst en ziet hem in zijn agenda | ontbreekt | middel | later, met PLANNING.md |
 | Scheidsrechter aanwijzen en uitslag laten vastleggen | L3 | wedstrijd, aangewezen lid | de scheidsrechter legt de uitslag vast; de club kan corrigeren met een reden | geen | beide teams bij de uitslag | club wijst aan; scheidsrechter is een lid met die rol in de club | geen scheidsrechter, dan de club zelf | een aangewezen scheidsrechter legt 2–1 vast; de stand werkt bij | ontbreekt (`uitslagZet` alleen door de club) | middel | later |
 | Bondskoppeling en digitaal wedstrijdformulier | L2 | — | — | — | — | — | — | — | ontbreekt | groot | niet doen vóór V1: extern pakket en besluit |
 | Live kijken en uitzendrechten | L1 | — | — | — | — | — | — | — | ontbreekt | groot | niet doen: rechten zijn extern |
@@ -2625,7 +3313,7 @@ De catalogus (d) in de volgorde van g: mijn clubs, melding bij aftrap en uitslag
 
 | Proces | Gegevens en bron | Regels en rekenwijze | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium |
 |---|---|---|---|---|---|
-| **Complete verenigingsadministratie** (leden, contributie, teams, wedstrijdzaken, bondsafdracht) | leden op codenaam met echte naam in de kluis; contributieschema; bondscontributie per seizoen (bijvoorbeeld €13,83 in 2025/'26 volgens [knvb.nl](https://www.knvb.nl/over-ons/knvb-account)) | contributie per categorie en leeftijd op peildatum; automatische incasso via Geld; bondsafdracht per seizoen | ledenadministrateur, penningmeester, bestuur (vier ogen op afschrijven); een ouder voor een jeugdlid onder 16 | opzegtermijn volgens de statuten; geen incasso zonder machtiging | een vereniging met 300 leden draait een seizoen: contributie geïnd, bondsafdracht berekend, en een opgezegd lid wordt na de termijn niet meer geïnd |
+| **Complete verenigingsadministratie** (leden, contributie, teams, wedstrijdzaken, bondsafdracht) | leden op codenaam met echte naam in de kluis; contributieschema; bondscontributie per seizoen (bijvoorbeeld €13,83 in 2025/'26 volgens [knvb.nl](https://www.knvb.nl/over-ons/knvb-account)) | contributie per categorie en leeftijd op peildatum; automatische incasso via Geld; bondsafdracht per seizoen | ledenadministrateur, penningmeester, bestuur (vier ogen op afschrijven); een ouder voor een jeugdlid onder 16 (te controleren) | opzegtermijn volgens de statuten; geen incasso zonder machtiging | een vereniging met 300 leden draait een seizoen: contributie geïnd, bondsafdracht berekend, en een opgezegd lid wordt na de termijn niet meer geïnd |
 | **Digitaal wedstrijdformulier en scheidsrechterszaken** | opstellingen, wissels, kaarten, uitslag; aanwijzing van scheidsrechters | het formulier wordt definitief na ondertekening door beide teammanagers en de scheidsrechter; een tuchtzaak opent bij een rode kaart | teammanager, scheidsrechter (met licentie, als vakbewijs in `kern/vakbewijs.js`), wedstrijdsecretaris | een gestaakte wedstrijd krijgt geen uitslag; een niet-geregistreerde speler blokkeert het formulier | na een wedstrijd ondertekenen drie mensen het formulier, en verschijnen uitslag, kaarten en spelersminuten bij beide clubs |
 | **Veilige kaartverkoop voor risicowedstrijden** | persoonsgebonden tickets op codenaam met identiteitscontrole (betrouwbaarheidsniveau A3) | per wedstrijd een risicoklasse; bij hoog alleen persoonsgebonden, niet doorverkoopbaar boven de nominale prijs | club, veiligheidsmedewerker, lid | uitverkochte wedstrijd: een eerlijke wachtlijst op volgorde, geen loting met betaling | bij een risicowedstrijd kan alleen een gekeurd lid een kaart kopen, en een doorverkoop boven de nominale prijs wordt geweigerd |
 | **Jeugdopleiding en talentvolg** (alleen als leerdossier, nooit als vergelijking) | trainingsaanwezigheid en doelen per speler, alleen voor de speler, de ouder en de trainer | geen ranglijst, geen niveau-label (de regel van het leerdossier in FOUNDATION.md par. 5.5) | trainer, speler, ouder | onder de 18 nooit een vergelijking tussen spelers | een trainer legt drie doelen vast, de speler en de ouder zien ze, en geen ander lid ziet iets |
@@ -2667,6 +3355,63 @@ Storingen in die keten:
 
 **Extern.** Bondsadministratie en wedstrijdformulier, live data en uitzendrechten, en poortapparatuur.
 
+#### v3 — afbouw (Sport)
+
+Gemeten op HEAD `f64048209`, 19 oktober 2026.
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Wedstrijdbord — schermtekst: "Vandaag" en "Bekijk wedstrijddag" (`public/apps/sport.html`) — route `POST /api/member/sport/bord` — stand: bestaat (wedstrijden van alle clubs, hoogstens 60, `server/kern/sportclub/zakelijk.js`; stand, tickets en club gaan over de eerste club in de lijst, `d.clubs[0]`)
+- Stand — schermtekst: "De stand", "Bekijk alles" en "Rechtstreeks berekend uit de uitslagen die de club invoert." (`public/apps/sport.html`) — route `POST /api/member/sport/stand` — stand: bestaat
+- Vak kiezen en reserveren — schermtekst: "Kies uw vak" / "Reserveer" (`public/apps/sport.html`) — route `POST /api/member/sport/plattegrond` en `/ticket/koop` — stand: bestaat (herhaalsleutel `RTGIdem('sport-ticket')`; vol vak: "… is (bijna) vol: nog N plaats(en).", `server/kern/sportclub/stadion.js`)
+- Mijn tickets met QR-code — schermtekst: "Mijn tickets", "Toon toegang" en "Gescand bij de entree; veel plezier." (`public/apps/sport.html`) — route `POST /api/member/sport/tickets` — stand: bestaat
+- Clubmomenten — schermtekst: "Clubmomenten" (`public/apps/sport.html`) — route `POST /api/member/sport/momenten` — stand: bestaat
+- Sponsorinteresse op codenaam — schermtekst: "Bekijk mogelijkheden" en "Interesse tonen kan op codenaam; de club beslist zelf en neemt contact op." (`public/apps/sport.html`) — route `POST /api/member/sport/sponsors` en `/sponsor` — stand: bestaat
+- Afrekenen — schermtekst: "Afrekenen aan de poort: contant of RTG Pay bij de kassa." (`public/apps/sport.html`) — geen route — stand: ontbreekt online
+- Volgen, melding, doorgeven en annuleren — geen schermtekst — geen route in `server/routes/sportclub.js` — stand: ontbreekt
+- Clubkant (`public/apps/sportclub.html`, `werk.sportclubbeheer`): "Scan" (`POST /api/sport/scan`), "Zet erin" (`/api/sport/wedstrijd/maak`), "Uitslag ✓" (`/api/sport/uitslag`), "Richt op" (`/api/sport/team/maak`), "Gun het pakket" (`/api/sport/sponsor/beslis`), "Vraag aan" (`/api/sport/kamp/vraag`) en "Vraag" (`/api/sport/ai`) — stand: bestaat
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie — zonder token: "Log eerst in via de RTG-app; daarna staan hier alle uitslagen, standen en uw tickets." (`public/apps/sport.html`).
+- Ledenpoort — een gast krijgt 403 "Alleen voor leden." bij reserveren en sponsorinteresse (`server/routes/sportclub.js`).
+- Gegevenspoort — reserveren vraagt een telefoonnummer (`reservering: ['telefoon']`); het lid ziet "Hiervoor heb ik nog … nodig; dat vraag ik even." (`server/kern/gegevenspoort.js`, met `public/shared/poortgesprek.js` op het scherm).
+- Clubgegevens in de opslag — een onvolledig antwoord geeft "Het antwoord was onvolledig, dus dit kon niet worden geladen." (`public/apps/sport.html`).
+- Leverancierssessie voor de club — een andere zaak krijgt "Alleen voor de sportclub." (`server/routes/sportclub.js`).
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Navigatie — "Open route" opent `/apps/navigatie.html`, zonder het adres van de club mee te geven (`public/apps/sport.html`).
+- RTG Pay — alleen als betaalwijze aan de poort genoemd; geen koppeling.
+- Kantoor (reisdesk) — beslist over trainingskampen (`POST /api/office/sport/kamp/beslis`); zonder besluit blijft een kamp open. Schermtekst niet gemeten.
+- Model voor de clubassistent — zonder model een vaste tekst die begint met "Het beeld van de club:" en eindigt met "Beslissen doet u zelf." (`server/kern/sportclub/cockpit.js`); `RTG_EXTERNE_AI_UIT` werkt via `server/ai.js`.
+- Agenda, meldingen en De Salon — nog geen koppeling.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:sport': {
+  uitgeeft: [
+    { wat: 'ticket (code, vak, aantal) voor de poortscan', aan: 'werk.sportclubbeheer', vorm: 'projectie', bron: 'server/kern/sportclub/stadion.js' },
+    { wat: 'sponsorinteresse op codenaam', aan: 'werk.sportclubbeheer', vorm: 'projectie', bron: 'server/kern/sportclub/zakelijk.js (sponsorInteresse)' },
+    { wat: 'link "Open route" zonder bestemming', aan: 'link:navigatie', vorm: 'verwijzing', bron: 'public/apps/sport.html' }
+  ],
+  ontvangt: [
+    { wat: 'plattegrond, wedstrijden, uitslagen, momenten en sponsorpakketten', van: 'werk.sportclubbeheer', vorm: 'projectie', bron: 'server/routes/sportclub.js' },
+    { wat: 'eis telefoonnummer bij reserveren', van: 'gegevenspoort', vorm: 'verwijzing', bron: 'server/kern/gegevenspoort.js' }
+  ],
+  ketens: [
+    { naam: 'reserveren tot poortscan', stappen: ['club: tekent het vak', 'sport: lid reserveert', 'sportclub: scant een keer'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/sport.js' },
+    { naam: 'sponsorinteresse', stappen: ['sport: lid toont interesse op codenaam', 'sportclub: ziet de codenaam en beslist'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/sport.js' },
+    { naam: 'ticket in de agenda', stappen: ['sport: reservering', 'agenda.afspraken: verwijzing naar de wedstrijd'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'online betalen', stappen: ['sport: reservering', 'Geld (kern/betaalwaarheid): bevestigt', 'sport: ticket'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'ticket doorgeven', stappen: ['sport: houder geeft door', 'De Salon: verbonden ontvanger', 'sport: nieuwe eenmalige code'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'route naar het stadion', stappen: ['sport: "Open route"', 'navigatie: bestemming uit server/kern/mall/plek.js'], stand: 'open', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een supporter die een thuiswedstrijd bezoekt, doet hier zijn hele werk: bord, stand, reserveren en binnenkomen. Voor wie meerdere clubs volgt, een ticket wil doorgeven of online wil betalen, is het een deel. De club doet hier teams, wedstrijden, uitslag, scan, velden, sponsors, kampen en financiën; dat is een deel van haar werk, want ledenadministratie, contributie en het wedstrijdformulier ontbreken. Het kantoor (reisdesk) doet het kampbesluit volledig. Externe software blijft nodig voor de bondsadministratie (het KNVB-pakket in de marktvergelijking), live data en uitzendrechten, en poortapparatuur. Volledig voor: supporter bij een thuiswedstrijd, kantoor (kampbesluit) · Deels voor: supporter met meer clubs, club (zaak), scheidsrechter, vrijwilliger · Extern nodig: bondsadministratie, live data en uitzendrechten, poortapparatuur.
+
 ---
 
 ### RTFoundation-kiezer (os:rtf) — staat in de kaart van FoundationOS
@@ -2679,7 +3424,7 @@ Deze familie houdt alleen bij wat in LivingOS ligt: de tegel en de leeftijdskiez
 
 ### Videobellen (os:videobellen, kiezer in de ledenapp)
 
-Doel: twee mensen die elkaar kennen, zien en horen elkaar, rechtstreeks tussen hun toestellen, zonder dat het beeld over een server gaat. Eigenaar: niet geregistreerd in `SCHERMEIGENAAR.json`. Verwant zijn `apps/comm.html` (`comm.berichten`, LivingOS-A) en de werkvloer (`zaak.teamroom` in `apps/personeel.html`, die `public/shared/teamcall.js` laadt).
+Doel: twee mensen die elkaar kennen, zien en horen elkaar, rechtstreeks tussen hun toestellen, zonder dat het beeld over een server gaat. Eigenaar: niet geregistreerd in `SCHERMEIGENAAR.json` (gecorrigeerd: de kiezer `os:videobellen` heeft geen eigen regel, maar de capability `comm.videobellen` staat er wel, op `apps/meet.html` (RTG Meet), rol eigenaar, doelgroep lid). Verwant zijn `apps/comm.html` (`comm.berichten`, LivingOS-A) en de werkvloer (`zaak.teamroom` in `apps/personeel.html`, die `public/shared/teamcall.js` laadt).
 
 #### a. Inventaris
 
@@ -2704,10 +3449,10 @@ Wat er gebouwd is:
 
 | Marktleider en pakket | Functies | Bron, peildatum 2026-10-19 | Hebben wij het? |
 |---|---|---|---|
-| Zoom gratis | 40 minuten per vergadering, tot 100 deelnemers | [tldv.io](https://tldv.io/blog/zoom-pricing/) (juni 2026; zoom.us/pricing niet opgehaald) | duur: wij zijn onbeperkt (één-op-één) |
-| Zoom Pro | tot 30 uur, opnemen in de cloud, peilingen | idem | duur: ja. Opnemen: nee, bewust. Peilingen: nee |
-| Zoom Business Plus en Enterprise (duurste) | 300 tot 1000 deelnemers, SSO, huisstijl, telefonie, onbeperkte cloudopslag; Enterprise op aanvraag | [eesel.ai](https://www.eesel.ai/en/blog/zoom-pricing), [trustradius.com](https://trustradius.com/products/zoom/pricing) (derden, onderling tegenstrijdig) | groep: alleen werkvloer (mesh tot 100, praktisch minder). Rest: nee |
-| Google Meet gratis | één-op-één tot 24 uur, groep van 3 of meer tot 60 minuten | [9to5google.com](https://9to5google.com/2021/07/12/google-meet-group-limit/) (uit 2021); [tldv.io](https://tldv.io/blog/google-meet-time-limit/) (augustus 2026) | één-op-één: ja. Groep voor leden: nee |
+| Zoom gratis | 40 minuten per vergadering, tot 100 deelnemers | [tldv.io](https://tldv.io/blog/zoom-pricing/) (juni 2026; zoom.us/pricing niet opgehaald) (te controleren) | duur: wij zijn onbeperkt (één-op-één) |
+| Zoom Pro | tot 30 uur, opnemen in de cloud, peilingen | idem (te controleren) | duur: ja. Opnemen: nee, bewust. Peilingen: nee |
+| Zoom Business Plus en Enterprise (duurste) | 300 tot 1000 deelnemers, SSO, huisstijl, telefonie, onbeperkte cloudopslag; Enterprise op aanvraag | [eesel.ai](https://www.eesel.ai/en/blog/zoom-pricing), [trustradius.com](https://trustradius.com/products/zoom/pricing) (derden, onderling tegenstrijdig) (te controleren) | groep: alleen werkvloer (mesh tot 100, praktisch minder) (gecorrigeerd: ook RTG Meet, kamers tot 12 aanwezigen, `MAX_AANWEZIG` in `server/kern/meet.js`). Rest: nee |
+| Google Meet gratis | één-op-één tot 24 uur, groep van 3 of meer tot 60 minuten | [9to5google.com](https://9to5google.com/2021/07/12/google-meet-group-limit/) (uit 2021); [tldv.io](https://tldv.io/blog/google-meet-time-limit/) (augustus 2026) (te controleren) | één-op-één: ja. Groep voor leden: nee (gecorrigeerd: in Videobellen nee; RTG Meet geeft leden een kamer tot 12, op kamercode) |
 
 Wat we NIET overnemen: een tijdslimiet als prikkel om te betalen, en opnemen of transcriberen in de cloud zonder toestemming.
 
@@ -2725,24 +3470,24 @@ Wat we NIET overnemen: een tijdslimiet als prikkel om te betalen, en opnemen of 
 
 | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Wanneer hoort iemand iets | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Kleine groep voor leden (tot 4 tot 6) | L1 | Salon-verbindingen; de mesh van `teamcall.js` | alleen leden die onderling allemaal verbonden zijn; maximaal 6 met beeld | het toestel bepaalt hoeveel video's het aankan; het scherm zegt dat | iedereen krijgt een oproep | de beller nodigt uit; elke deelnemer neemt zelf op | een geblokkeerde deelnemer kan niet in hetzelfde gesprek | drie vrienden zien elkaar tegelijk, en een vierde die met één van hen niet verbonden is, wordt niet toegelaten | half (werkvloer) | middel | aanbevolen nu: dezelfde mesh, geen nieuwe motor |
-| Werkt op 4G en achter een firewall | L5 | `/api/ice`, relaystand | TURN alleen voor een ingelogde actor; productie start niet zonder `TURN_URL` | of een netwerk TURN nodig heeft, is vooraf niet zeker; het scherm zegt "verbinden via een relais" | — | — | — | vanaf een mobiel netwerk met strenge NAT komt het gesprek tot stand via het relais | half (de uitgifte bestaat, een relais in productie is extern) | middel | aanbevolen nu |
-| Herverbinden na netwerkverlies | L5 | de RTCPeerConnection | ICE herstart bij `disconnected`; na 15 seconden het bericht "verbinding verloren" | geen | beide kanten zien "opnieuw verbinden" | — | — | valt het netwerk 3 seconden weg, dan loopt het gesprek door of zegt het scherm dat het opnieuw verbindt; na 15 seconden een duidelijke melding | ontbreekt in de toetsen | middel | aanbevolen nu |
-| Camera en microfoon aan en uit, wisselen | L1 | lokale tracks | aan en uit zonder het gesprek te verbreken; de ander ziet het | geen | de ander ziet het pictogram | — | — | een lid zet zijn camera uit, en de ander ziet een stilstaand pictogram in plaats van beeld | half (niet apart beproefd) | klein | aanbevolen nu: een toets erbij |
-| Scherm delen | L1 | `getDisplayMedia` | alleen tijdens een gesprek, met een duidelijke rand "u deelt uw scherm" | geen | de ander ziet het gedeelde scherm | de deler | niet op toestellen zonder ondersteuning; het scherm zegt dat | een lid deelt zijn scherm en de ander ziet het binnen 3 seconden | ontbreekt | klein | later |
-| Gepland gesprek | L3 | een agendaregel als verwijzing | de agenda bewaart alleen tijd en deelnemers; Videobellen belt op het moment | geen | een herinnering bij de start | de organisator | — | om 20:00 krijgen beide een herinnering met een knop "bel nu" | ontbreekt | klein | later |
+| Kleine groep voor leden (tot 4 tot 6) | L1 | Salon-verbindingen; de mesh van `teamcall.js` | alleen leden die onderling allemaal verbonden zijn; maximaal 6 met beeld | het toestel bepaalt hoeveel video's het aankan; het scherm zegt dat | iedereen krijgt een oproep | de beller nodigt uit; elke deelnemer neemt zelf op | een geblokkeerde deelnemer kan niet in hetzelfde gesprek | drie vrienden zien elkaar tegelijk, en een vierde die met één van hen niet verbonden is, wordt niet toegelaten | half (werkvloer) (gecorrigeerd: ook RTG Meet, tot 12 aanwezigen, toegang op kamercode of agenda-uitnodiging en niet op onderlinge verbinding; vanuit de kiezer van Videobellen ontbreekt hij) | middel | nu · VERDIEPING: dezelfde mesh, geen nieuwe motor |
+| Werkt op 4G en achter een firewall | L5 | `/api/ice`, relaystand | TURN alleen voor een ingelogde actor; productie start niet zonder `TURN_URL` | of een netwerk TURN nodig heeft, is vooraf niet zeker; het scherm zegt "verbinden via een relais" | — | — | — | vanaf een mobiel netwerk met strenge NAT komt het gesprek tot stand via het relais | half (de uitgifte bestaat, een relais in productie is extern) | middel | nu · VERDIEPING |
+| Herverbinden na netwerkverlies | L5 | de RTCPeerConnection | ICE herstart bij `disconnected`; na 15 seconden het bericht "verbinding verloren" | geen | beide kanten zien "opnieuw verbinden" | — | — | valt het netwerk 3 seconden weg, dan loopt het gesprek door of zegt het scherm dat het opnieuw verbindt; na 15 seconden een duidelijke melding | ontbreekt in de toetsen (gecorrigeerd: ontbreekt ook in de code; `public/apps/app-main/app-main-10.js` reageert alleen op `failed` en `closed`, niet op `disconnected`) | middel | nu · HERSTEL |
+| Camera en microfoon aan en uit, wisselen | L1 | lokale tracks | aan en uit zonder het gesprek te verbreken; de ander ziet het | geen | de ander ziet het pictogram | — | — | een lid zet zijn camera uit, en de ander ziet een stilstaand pictogram in plaats van beeld | half (niet apart beproefd) | klein | nu · HERSTEL: een toets erbij |
+| Scherm delen | L1 | `getDisplayMedia` | alleen tijdens een gesprek, met een duidelijke rand "u deelt uw scherm" | geen | de ander ziet het gedeelde scherm | de deler | niet op toestellen zonder ondersteuning; het scherm zegt dat | een lid deelt zijn scherm en de ander ziet het binnen 3 seconden | ontbreekt (gecorrigeerd: in Videobellen; RTG Meet heeft "Deel scherm", `public/apps/meet/kamer.js`) | klein | later |
+| Gepland gesprek | L3 | een agendaregel als verwijzing | de agenda bewaart alleen tijd en deelnemers; Videobellen belt op het moment | geen | een herinnering bij de start | de organisator | — | om 20:00 krijgen beide een herinnering met een knop "bel nu" | ontbreekt (gecorrigeerd: de agenda opent al een besloten Meet-kamer per afspraak, `public/apps/agenda/paneel.js` naar `POST /api/meet/maak`; een herinnering met "bel nu" is niet gemeten) | klein | later |
 | Opnemen of transcriberen in de cloud | — | — | — | — | — | — | — | — | ontbreekt | groot | niet doen: beeld loopt bewust nooit over de server, en dat is de belofte |
 | Grote groepen (meer dan 8 met beeld) | — | — | — | — | — | — | — | — | ontbreekt | groot | niet doen vóór V1: vraagt een SFU, een nieuwe motor |
 
 #### e. RTG-exclusief
 
 - **Bellen zonder telefoonnummer.** Alleen tussen mensen die elkaar langs De Salon kennen, op codenaam. De server ziet alleen signalen.
-- **Eén belweg in het hele huis.** Spelen, Samen en Berichten verwijzen naar hetzelfde gesprek, in plaats van elk een eigen bel te bouwen.
+- **Eén belweg in het hele huis.** Spelen, Samen en Berichten verwijzen naar hetzelfde gesprek, in plaats van elk een eigen bel te bouwen (gecorrigeerd: vandaag zijn er meer belwegen: `/api/member/call`, RTG Meet `/api/meet/*`, `public/shared/teamcall.js`, `servicebel.js` en `schoolbel.js`; Berichten stuurt een groepsgesprek naar RTG Meet (`public/apps/comm.html`: "Groepsgesprekken bellen loopt via RTG Meet."), en Spelen verwijst naar geen enkel gesprek).
 
 #### f. Bouwstenen en ontbrekende koppelingen
 
 - **Bestaat:** signalering, ICE en TURN-uitgifte, relaystand, de belschil met de rand, en de groepsmesh van de werkvloer.
-- **Ontbreekt:** de groepsmesh voor leden, een toets voor herverbinden, een verwijzing vanuit Spelen en Samen, en de koppeling met de agenda.
+- **Ontbreekt:** de groepsmesh voor leden (gecorrigeerd: RTG Meet heeft er een tot 12; wat ontbreekt is de weg ernaartoe vanuit Videobellen), een toets voor herverbinden, een verwijzing vanuit Spelen en Samen, en de koppeling met de agenda.
 
 #### g. Prioritering
 
@@ -2815,9 +3560,118 @@ Storingen in die keten:
 
 **Extern.** Een TURN-relais in productie (eigen beheer of een aanbieder; geen merk als partner). Een SFU voor grote groepen valt buiten V1.
 
+#### v3 — afbouw (Videobellen)
+
+Gemeten op HEAD `f64048209`, 19 oktober 2026.
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Kiezer met contacten — Rahul "open videobellen" (`public/apps/app-main/app-main-29.js`), lijst in `public/apps/app-main/app-main-26.js` — geen eigen route — stand: bestaat
+- Videobellen vanuit een gesprek — knop met titel "Videobellen" (`public/apps/app.html`, `#dmVideo`) — route `POST /api/member/call`, soort `ring` — stand: bestaat
+- Opnemen en weigeren — knoppen met aria-label "Opnemen" / "Weigeren" (`public/apps/app.html`) — `accept` / `decline` — stand: bestaat
+- Ophangen — knop met aria-label "Ophangen" (`public/apps/app.html`) — `hangup` — stand: bestaat; de ander ziet "Gesprek beëindigd.", "Oproep geweigerd." of "In gesprek." (`public/apps/app-main/app-main-11.js`)
+- Microfoon en camera aan en uit — knoppen met aria-label "Microfoon" / "Camera" (`public/apps/app.html`) — geen route, alleen de lokale track — stand: half (de ander krijgt geen signaal; geen toets)
+- Meeleesbaan in het gesprek — `public/shared/meelezen.js` in het belscherm — `POST /api/member/call`, soort `tekst` — stand: half. De server kent `tekst` niet en geeft 400 "Onbekend signaal." (`server/routes/social/leden.js`); de client slikt die fout (`.catch(()=>{})` in `app-main-10.js`). De ontvangstkant in `app-main-11.js` bestaat, maar krijgt nooit iets.
+- Melding bij een mislukte verbinding — "Verbinding mislukt. Op een streng netwerk lukt bellen soms niet." (`public/apps/app-main/app-main-10.js`) — stand: bestaat
+- Herverbinden bij `disconnected` — geen schermtekst — stand: ontbreekt
+- Een derde uitnodigen — geen schermtekst — stand: ontbreekt
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en gastpoort — een anonieme gast ziet "Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten." (`server/server.js`).
+- Verbinding en blokkade uit De Salon — "Je bent nog niet verbonden met deze codenaam." / "Dit contact is niet beschikbaar." (`server/routes/social/leden.js`).
+- Live-stroom naar de ander (`sseToCustomer`) — bij uitval komt er geen oproep aan; wat de beller dan ziet: niet gemeten.
+- ICE-uitgifte `/api/ice` (`server/kern/rtc/ijs.js`) — bij uitval valt de client zonder melding terug op `stun:stun.l.google.com:19302` (`app-main-10.js`, `haalIce`). De server geeft Google-STUN alleen met `STUN_FALLBACK_GOOGLE=1`; de client omzeilt die keuze.
+- Microfoon en camera via `RTGMedia` — zonder toegang: "Geen toegang tot microfoon of camera." (`app-main-10.js`).
+- TURN-relais in productie — zonder `TURN_URL` start productie niet: "TURN_URL ontbreekt: live voice/video is dan niet betrouwbaar via 4G, symmetrische NAT en bedrijfsfirewalls." (`server/config/productie-communicatie.js`).
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- De Salon — de contactenlijst — leeg: "Nog geen contacten. Voeg iemand toe in De Salon; daarna belt, videobelt en snapt u met een tik, zonder telefoonnummer." met de knop "Naar De Salon" (`app-main-26.js`).
+- De rand (`RTGAdaptiveEdgeVisual`) — draagt Opnemen en Ophangen; staat hij er nog niet, dan probeert de code het 40 keer, elke 250 ms (`toonRand` in `app-main-10.js`).
+- Automatische ondertiteling via een lokaal model (`public/shared/meeluister.js`, `LOCAL_AI_URL`) — geladen in `app.html`; of het in dit belscherm werkt: niet gemeten.
+- RTG Meet (`apps/meet.html`, `comm.videobellen`) — groep tot 12, "Deel scherm", "Hand" en een agenda-kamer — Videobellen verwijst er niet naar; Berichten wel bij een groep.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'os:videobellen': {
+  uitgeeft: [
+    { wat: 'lopend gesprek (active-call) met Opnemen en Ophangen', aan: 'de rand (RTGAdaptiveEdgeVisual)', vorm: 'gebeurtenis', bron: 'public/apps/app-main/app-main-10.js' }
+  ],
+  ontvangt: [
+    { wat: 'contacten', van: 'De Salon (RTGSocial.lijst)', vorm: 'projectie', bron: 'public/apps/app-main/app-main-26.js' },
+    { wat: 'verbinding en blokkade', van: 'De Salon', vorm: 'projectie', bron: 'server/routes/social/leden.js (connectieTussen, isGeblokkeerd)' },
+    { wat: 'STUN en kortlevend TURN-credential', van: '/api/ice', vorm: 'verwijzing', bron: 'server/kern/rtc/ijs.js' },
+    { wat: 'meeleesbaan', van: 'public/shared/meelezen.js', vorm: 'projectie', bron: 'public/apps/app-main/app-main-10.js (csBaan)' }
+  ],
+  ketens: [
+    { naam: 'een-op-een videobellen', stappen: ['A: "open videobellen" en kiest B', 'server: ring, offer, answer, ice', 'B: neemt op via de rand', 'beiden: zien elkaar en hangen op'], stand: 'gesloten', bewijs: 'test/videobellen-echt.e2e.js (browserproef, niet in de voltooiproef); de signalering ook in scripts/lib/voltooi/bellen.js (os:bellen)' },
+    { naam: 'meeleesbaan naar de ander', stappen: ['A: typt in de baan', 'server: /api/member/call soort tekst', 'B: app-main-11.js toont de regel'], stand: 'open', bewijs: 'geen' },
+    { naam: 'gesprek vanuit een potje', stappen: ['spelen: "Bel de tafel"', 'videobellen: oproep aan de medespelers'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'groep vanuit de kiezer', stappen: ['videobellen: derde uitnodigen', 'RTG Meet: kamer voor alle drie'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'gepland gesprek', stappen: ['agenda: afspraak', 'videobellen: herinnering met "bel nu"'], stand: 'ontbreekt', bewijs: 'geen (de agenda opent wel een Meet-kamer: public/apps/agenda/paneel.js)' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Twee verbonden leden die elkaar één-op-één willen zien, doen hier hun hele werk. Voor een groep is het een deel: die loopt via RTG Meet, en de kiezer wijst daar niet heen. Voor een dove deelnemer is het een deel, want de meeleesbaan komt bij de ander niet aan. Voor een professional die vergadert, is het een deel; dat werk ligt bij RTG Meet en de werkvloer (`teamcall.js`). Externe software blijft nodig voor een TURN-relais in productie, en voor grote vergaderingen met opname (zoals Zoom in de marktvergelijking). Volledig voor: twee verbonden leden, één-op-één · Deels voor: groep, dove deelnemer, vergaderaar · Extern nodig: TURN-relais, vergadersoftware voor grote groepen en opname.
 
 ---
 
+### Familie Spel, sport en bellen — samen (v3)
+
+Gemeten op HEAD `f64048209`, 19 oktober 2026.
+
+**FAMILIES-entry** (voorstel voor het register, zelfde vorm als het appcontract)
+```js
+FAMILIES['livingos-b/spel'] = {
+  naam: 'Spel, sport en bellen',
+  apps: [
+    'link:spelen',
+    'link:sport',
+    'os:videobellen',
+    'os:rtf' // alleen een verwijzing: de kaart van deze app is docs/domeinkaarten/foundationos.md (hoofdstuk 14 "RTF-tegel"); hier geen v3-blok
+  ],
+  gedeeld: [
+    { wat: '18+-poort voor elke blijvende stand (progressieMag op volwassen())', bestand: 'server/kern/spellen/grens.js, server/kern/volwassen.js' },
+    { wat: 'Salon-kring: verbindingen en blokkades', bestand: 'server/routes/social/leden.js (connectieTussen, isGeblokkeerd); /api/member/connections' },
+    { wat: 'gastpoort voor een anonieme demo-gast', bestand: 'server/server.js (geenGast)' },
+    { wat: 'herhaalsleutel per tik in de browser', bestand: 'public/shared/id.js (RTGIdem; Sport); server/kern/spellen/dubbeltik.js (Spelen)' },
+    { wat: 'live-stroom naar het toestel', bestand: 'public/shared/stroom.js (Spelen); sseToCustomer in server/routes/social/leden.js (Videobellen)' },
+    { wat: 'ICE- en TURN-uitgifte', bestand: 'server/kern/rtc/ijs.js (/api/ice; Videobellen en RTG Meet)' }
+  ],
+  eigenaar: [
+    'link:spelen → spelen.bordspel (apps/spelen.html, eigenaar, lid)',
+    'link:sport → sport.wedstrijd (apps/sport.html, eigenaar, lid); clubkant werk.sportclubbeheer (apps/sportclub.html, eigenaar, zaak)',
+    'os:videobellen → geen eigen regel; verwant comm.videobellen (apps/meet.html, eigenaar, lid)',
+    'os:rtf → rtf.start (apps/foundation/index.html); kaart in foundationos.md'
+  ]
+};
+```
+
+**ONTBREKEND**
+```
+ONTBREKEND: kern/spellen/grens.js → link:spelen: bij bordspellen komt de reden van de 18+-grens niet in beeld; het blok verdwijnt zonder zin · HERSTEL · klein
+ONTBREKEND: link:spelen → os:videobellen: knop "Bel de tafel" met een oproep aan de medespelers vanuit een lopend potje · VERDIEPING · middel
+ONTBREKEND: link:spelen → RTG Meet (comm.videobellen): een tafel van drie of meer spelers als Meet-kamer (tot 12) · VERDIEPING · middel
+ONTBREKEND: link:spelen (scherm) → kern/spellen toernooi: geen scherm roept /api/member/spel/toernooi-* aan · VERDIEPING · middel
+ONTBREKEND: De Salon → link:spelen: de lege vriendenlijst noemt De Salon niet als bron · VERDIEPING · klein
+ONTBREKEND: link:spelen → horeca.events en festival.gast: een spelavond als verwijzing naar een potje · VERDIEPING · middel
+ONTBREKEND: link:sport → werk.sportclubbeheer: zonder club valt het scherm terug op FCRTG en "De club", zonder te zeggen dat er geen club gekoppeld is · HERSTEL · klein
+ONTBREKEND: link:sport → agenda.afspraken: verwijzing naar de wedstrijd na reserveren · VERDIEPING · klein
+ONTBREKEND: link:sport → Geld (kern/betaalwaarheid): online afrekenen; vandaag "Afrekenen aan de poort" · VERDIEPING · middel
+ONTBREKEND: link:sport → De Salon: ticket doorgeven aan een verbonden lid · VERDIEPING · middel
+ONTBREKEND: link:sport → link:navigatie: "Open route" geeft het adres van de club niet mee (server/kern/mall/plek.js kent sportclub als adres) · VERDIEPING · klein
+ONTBREKEND: link:sport → meldingslaag: één melding bij de aftrap en één bij de uitslag · VERDIEPING · klein
+ONTBREKEND: public/shared/meelezen.js → os:videobellen: /api/member/call weigert het signaal tekst (400 "Onbekend signaal."), dus de meeleesbaan bereikt de ander niet · HERSTEL · klein
+ONTBREKEND: /api/ice → os:videobellen: bij uitval valt de client terug op Google-STUN, buiten STUN_FALLBACK_GOOGLE om · HERSTEL · klein
+ONTBREKEND: os:videobellen (scherm) → herstel: geen reactie op disconnected en geen ICE-herstart · HERSTEL · middel
+ONTBREKEND: os:videobellen → SCHERMEIGENAAR.json: geen eigen regel voor de kiezer · HERSTEL · klein
+ONTBREKEND: os:videobellen → RTG Meet: een derde uitnodigen opent geen Meet-kamer · VERDIEPING · klein
+ONTBREKEND: os:videobellen → agenda: een gepland één-op-één gesprek; de agenda kent alleen een Meet-kamer · VERDIEPING · klein
+```
+
+---
 ## Lezen, overzicht, ontmoeten en het Privékantoor (LivingOS-B)
 
 **Vorm.** Premiumdomeinkaart, met de aanscherping van de eigenaar van 19 oktober (punt 4 a–h). Gemeten op `appwerkt/living-b` (c038c1bd1 en later). Er is niets gebouwd.
@@ -2840,7 +3694,7 @@ Storingen in die keten:
 
 **Code:**
 - **Routes:** `/api/member/nieuws`, `/api/member/nieuws/artikel` en `/api/member/nieuws/ai` (`server/routes/member/nieuws.js`). De schrijfkant loopt via `/api/office/redactie/*`.
-- **Kern:** `server/kern/redactie/` (`index.js`, `pers.js`, `hoofdredacteur.js`), met zes rubrieken: nieuws, reizen, lifestyle, zaken, cultuur en sport. Een artikel heeft de standen concept, live en teruggetrokken.
+- **Kern:** `server/kern/redactie/` (`index.js`, `pers.js`, `hoofdredacteur.js`), met zes rubrieken: nieuws, reizen, lifestyle, zaken, cultuur en sport. Een artikel heeft de standen concept, live en teruggetrokken. (gecorrigeerd: de standen in de code zijn concept, eindredactie en gepubliceerd (`ARTIKEL_STATUS` in `server/kern/redactie/index.js`). "Live" heet daar "gepubliceerd". "Teruggetrokken" bestaat niet als stand: terugtrekken is de stand terugzetten naar concept via `/api/office/redactie/artikel/status`, zo loopt `scripts/lib/voltooi/nieuws.js` het, of het stuk verwijderen via `/artikel/verwijder`.)
 - **Toetsen:** `redactie.test.js`, `edgenieuwscherm.test.js`.
 - **Eigenaar:** `nieuws.lezen` → `apps/nieuws.html` (rol eigenaar, doelgroep lid).
 
@@ -2861,9 +3715,9 @@ Storingen in die keten:
 
 | Aanbieder | Pakket en prijs | Functies boven de ondergrens | Bron |
 |---|---|---|---|
-| Apple News+ | US$12,99 per maand, niet geverifieerd | ruim 350 titels, audioversies, offline, gezinsdeling (tot 5) | derde partijen, bv. [trustedreviews.com](https://www.trustedreviews.com/news/apple-news-plus-subscription-price-3683829) |
+| Apple News+ | US$12,99 per maand, niet geverifieerd (te controleren) | ruim 350 titels, audioversies, offline, gezinsdeling (tot 5) | derde partijen, bv. [trustedreviews.com](https://www.trustedreviews.com/news/apple-news-plus-subscription-price-3683829) |
 | Readly | EUR 14,99 per maand | ruim 8.000 titels, bladwijzers, offline, zoeken over de hele inventaris, delen met 5 huisgenoten | [corporate.readly.com/about-us](https://corporate.readly.com/about-us) |
-| New York Times All Access | prijs niet geverifieerd: US$19,99 tot 25 per maand volgens derden | puzzels, recepten, audio, productreviews | [subger.com](https://subger.com/en/service/new-york-times) |
+| New York Times All Access | prijs niet geverifieerd: US$19,99 tot 25 per maand volgens derden (te controleren) | puzzels, recepten, audio, productreviews | [subger.com](https://subger.com/en/service/new-york-times) |
 | Meltwater (duurste: monitoring voor organisaties) | Starter vanaf US$10.000, Pro vanaf 25.000, Enterprise vanaf 130.000 per jaar | waarschuwingen op onderwerpen, analyses, API, governance | [meltwater.com/en/blog/meltwater-pricing](https://www.meltwater.com/en/blog/meltwater-pricing) |
 
 **Over, als functie:** bladwijzers, offline lezen, voorlezen, zoeken, volgen en waarschuwingen per onderwerp.
@@ -2875,12 +3729,12 @@ Storingen in die keten:
 **Particulier.** Een lezer wil vertrouwen ("is dit gecorrigeerd?"), tijd (een kort samenvattend overzicht in plaats van een oneindige stroom), toegankelijkheid (voorlezen, grote letters) en een eigen bewaarplek.
 
 **Professioneel: redacties.** Een redactie werkt in de praktijk zo:
-- **Beroepsnormen:** de Leidraad van de Raad voor de Journalistiek en de Code van het Genootschap van Hoofdredacteuren ([presscouncils.eu](https://www.presscouncils.eu/database/the-netherlands/), [rvdj.nl](https://rvdj.nl/english)).
+- **Beroepsnormen:** de Leidraad van de Raad voor de Journalistiek en de Code van het Genootschap van Hoofdredacteuren (te controleren) ([presscouncils.eu](https://www.presscouncils.eu/database/the-netherlands/), [rvdj.nl](https://rvdj.nl/english)).
 - **Correcties:** gecorrigeerd wordt zichtbaar, met de datum.
 - **Hoor en wederhoor.**
 - **Anonieme bronnen** worden beschermd.
-- **Persvrijheid naast privacy:** de AVG kent een uitzondering voor journalistieke doeleinden, en de verwerking blijft verantwoord.
-- **Een klacht** gaat naar een onafhankelijke raad. Die legt geen boetes op; een eis tot rectificatie loopt via de rechter.
+- **Persvrijheid naast privacy:** de AVG kent een uitzondering voor journalistieke doeleinden, en de verwerking blijft verantwoord (te controleren).
+- **Een klacht** gaat naar een onafhankelijke raad. Die legt geen boetes op; een eis tot rectificatie loopt via de rechter (te controleren).
 - **Eindredactie:** kopij → eindredactie → hoofdredactie → publicatie, en in vier ogen bij gevoelige stukken.
 
 **Organisatorisch.**
@@ -2897,41 +3751,41 @@ Storingen in die keten:
 - **Melding:** geen.
 - **Rollen:** ieder lid.
 - **Uitzondering:** een lege rubriek.
-- **Acceptatie:** een lid opent "Reizen" en ziet alleen live reisstukken. Een lege rubriek zegt "nog niets gepubliceerd in Reizen" en is geen leeg scherm. Dat tweede is nog na te gaan, dus half.
+- **Acceptatie:** een lid opent "Reizen" en ziet alleen live reisstukken. Een lege rubriek zegt "nog niets gepubliceerd in Reizen" en is geen leeg scherm. Dat tweede is nog na te gaan, dus half. (gecorrigeerd: een lege rubriek is vandaag al geen leeg scherm. Er staat "Nog geen nieuws in deze rubriek. De redactie is aan het schrijven." (`public/apps/nieuws.html`). De rubrieknaam staat niet in die zin, en de tweede zin beweert iets wat het scherm niet weet.)
 
 **N2 Rahul over het artikel** (L4) — bestaat.
 - **Gegevens:** alleen de artikeltekst.
 - **Regel:**
   - zonder model werkt het lokaal, met een letterlijke bronzin;
   - met een model gaat alleen de tekst mee, nooit het profiel van het lid.
-- **Onzekerheid:** het antwoord heet een samenvatting en geen feit. Staat het antwoord niet in de tekst, dan zegt Rahul dat.
-- **Acceptatie:** bij de vraag "wanneer opent het museum?" en een artikel zonder datum zegt Rahul "dat staat niet in dit artikel".
+- **Onzekerheid:** het antwoord heet een samenvatting en geen feit. Staat het antwoord niet in de tekst, dan zegt Rahul dat. (gecorrigeerd: het scherm zet geen label bij het antwoord. De route geeft `ai: false` en `modus: 'handmatig'` mee, maar `nieuws.html` toont alleen `antwoord`.)
+- **Acceptatie:** bij de vraag "wanneer opent het museum?" en een artikel zonder datum zegt Rahul "dat staat niet in dit artikel". (gecorrigeerd: zonder model is de zin letterlijk "Ik vind hiervoor geen voldoende duidelijke bronzin in het artikel. Lees het artikel zelf of stel de vraag opnieuw zodra vrije taalhulp beschikbaar is." (`server/routes/member/nieuws.js`). Met een model bepaalt het model de zin.)
 
-**N3 Leeslijst** (L1) — ontbreekt, klein, aanbevolen nu.
+**N3 Leeslijst** (L1) — ontbreekt, klein, nu · VERDIEPING.
 - **Gegevens:** artikel-ids per lid, in de eigen collectie (eigencollectie), met als eigenaar de codenaam van het lid.
 - **Regel:** wordt een stuk teruggetrokken, dan blijft het op de lijst staan met "teruggetrokken op <datum>" en zonder tekst.
 - **Melding:** geen; het lid ziet het bij het openen.
 - **Rollen:** alleen het lid zelf.
 - **Acceptatie:** bewaren, herstarten en inloggen op een ander toestel geeft dezelfde lijst, en een ander lid ziet hem niet.
 
-**N4 Voorlezen** (L1) — ontbreekt, klein, aanbevolen nu.
+**N4 Voorlezen** (L1) — ontbreekt, klein, nu · VERDIEPING.
 - **Gegevens:** de artikeltekst, voorgelezen met de spraak van het toestel (`shared/spraak.js`).
 - **Regel:** er gaat geen tekst naar buiten.
 - **Uitzondering:** kan het toestel niet voorlezen, dan zegt het scherm dat.
 - **Acceptatie:** "Lees voor" start; pauzeren en verder gaan werkt; vergrendelen stopt netjes.
 
-**N5 Rubrieken volgen en ordenen** (L1) — ontbreekt, klein, aanbevolen nu.
+**N5 Rubrieken volgen en ordenen** (L1) — ontbreekt, klein, nu · VERDIEPING.
 - **Regel:** een gevolgde rubriek komt eerst. Er is geen oneindige stroom: een rubriek eindigt.
 - **Acceptatie:** wie "Cultuur" volgt, ziet die als eerste, ook na opnieuw inloggen.
 
-**N6 Correctie zichtbaar** (L5) — half (de Krant heeft correcties, Nieuws niet), klein, aanbevolen nu.
+**N6 Correctie zichtbaar** (L5) — half (de Krant heeft correcties, Nieuws niet), klein, nu · HERSTEL.
 - **Gegevens:** de correctieregel van de redactie, met datum en wat er veranderde.
 - **Regel:** een correctie is openbaar, oude tekst wordt nooit stil vervangen.
 - **Melding:** wie het stuk op zijn leeslijst heeft, ziet "gecorrigeerd" bij het openen. Er komt geen push: niet elke correctie verdient een onderbreking.
 - **Rollen:** de eindredactie schrijft, ieder lid leest.
 - **Acceptatie:** na een correctie staat bovenaan "Gecorrigeerd op 19 oktober: <wat>".
 
-**N7 Terugtrekking met reden** (L5) — ontbreekt, klein, aanbevolen nu.
+**N7 Terugtrekking met reden** (L5) — ontbreekt, klein, nu · VERDIEPING.
 - **Regel:** een teruggetrokken stuk geeft een korte pagina met de reden in één zin, door de redactie verplicht ingevuld. Bij een juridische terugtrekking kan de reden "op verzoek, om juridische redenen" zijn.
 - **Acceptatie:** een gedeelde link naar een teruggetrokken stuk toont de reden, geen fout.
 
@@ -2944,7 +3798,7 @@ Storingen in die keten:
 - **Regel:** alleen voor stukken op de leeslijst, via `sw.js`.
 - **Onzekerheid:** er staat "bewaarde versie van <tijd>", omdat er intussen een correctie kan zijn.
 
-**N10 Artikel delen als verwijzing** (L6) — ontbreekt, klein, aanbevolen nu.
+**N10 Artikel delen als verwijzing** (L6) — ontbreekt, klein, nu · VERDIEPING.
 - **Gegevens:** alleen het artikel-id en de kop, via `objectverwijzing.js`. De tekst wordt niet gekopieerd.
 - **Rollen:** de ontvanger moet een lid zijn.
 - **Uitzondering:** teruggetrokken (zie N7).
@@ -2974,15 +3828,15 @@ Storingen in die keten:
 
 #### g. Prioritering
 
-| Volgorde | Wat | Kosten | Afhankelijkheid |
-|---|---|---|---|
-| 1 | N6 correctie zichtbaar en N7 terugtrekking met reden | klein | vertrouwen gaat voor alles |
-| 2 | N3 leeslijst | klein | |
-| 3 | N10 delen als verwijzing | klein | hangt af van N7 |
-| 4 | N4 voorlezen | klein | |
-| 5 | N5 rubrieken volgen | klein | |
-| later | N8 zoeken en N9 offline | middel | N9 hangt af van N3 |
-| later | N11 onderwerp-waarschuwing | groot | |
+| Volgorde | Wat | Kosten | Afhankelijkheid | Bak |
+|---|---|---|---|---|
+| 1 | N6 correctie zichtbaar en N7 terugtrekking met reden | klein | vertrouwen gaat voor alles | N6 nu · HERSTEL; N7 nu · VERDIEPING |
+| 2 | N3 leeslijst | klein | | nu · VERDIEPING |
+| 3 | N10 delen als verwijzing | klein | hangt af van N7 | nu · VERDIEPING |
+| 4 | N4 voorlezen | klein | | nu · VERDIEPING |
+| 5 | N5 rubrieken volgen | klein | | nu · VERDIEPING |
+| later | N8 zoeken en N9 offline | middel | N9 hangt af van N3 | later |
+| later | N11 onderwerp-waarschuwing | groot | | later |
 
 #### Uitkomst A — bouwbaar binnen de huidige architectuur en scope
 
@@ -3054,6 +3908,50 @@ Storingen:
 **Extern:** het gebruik van externe inhoud of persbureaumateriaal vraagt licenties. Voor eigen werk is niets extern.
 **Voor de integrator:** mediamonitoring voor organisaties (N11, organisatorisch) hoort bij WorkOS. Die eigenaar staat niet in SCHERMEIGENAAR.json.
 
+#### v3 — afbouw (Nieuws)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Rubriek kiezen — schermtekst: "alles" en per rubriek een knop (`public/apps/nieuws.html`) — route `POST /api/member/nieuws` — stand: bestaat.
+- Lege rubriek — schermtekst: "Nog geen nieuws in deze rubriek. De redactie is aan het schrijven." (`nieuws.html`) — route `POST /api/member/nieuws` — stand: half. De tweede zin beweert iets wat het scherm niet weet.
+- Artikel lezen — schermtekst: "← alle artikelen" (`nieuws.html`) — route `POST /api/member/nieuws/artikel` — stand: bestaat. Een concept of een teruggezet stuk geeft "Dit artikel is er niet (meer)." (`server/kern/redactie/pers.js`). Het scherm toont dat als korte melding en gaat terug naar de lijst.
+- Rahul over het stuk — schermtekst: "Vraag Rahul iets over dit stuk, of laat het samenvatten", knop "Vraag", wachttekst "Rahul leest mee…" (`nieuws.html`) — route `POST /api/member/nieuws/ai` — stand: bestaat. Er staat geen label "samenvatting" of "zonder model" bij het antwoord.
+- Meenemen — de tabel `nieuws` met de kolommen datum, rubriek, kop en auteur via `RTGUitvoer.bron` (`nieuws.html`) — geen eigen route — stand: bestaat. De knoptekst komt uit `public/shared/uitvoer.js`: niet gemeten.
+- Correctie — geen schermtekst — stand: ontbreekt (N6). Een gepubliceerd stuk wijzigen weigert de kern met "Een gepubliceerd artikel wijzig je niet meer; maak een vervolgstuk." (`server/kern/redactie/index.js`). Terugzetten naar concept, wijzigen en opnieuw publiceren vervangt de tekst wel, onder hetzelfde id en zonder spoor. Daarom HERSTEL.
+- Leeslijst, voorlezen, rubrieken volgen, terugtrekking met reden en delen — stand: ontbreekt (N3, N4, N5, N7, N10). `nieuws.html` laadt `shared/spraak.js` en `shared/objectverwijzing.js` niet.
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie — zonder token staat er "Log eerst in via de RTG-app; daarna leest het nieuws hier." (`nieuws.html`). Zonder inlog geven alle drie de routes 401 (`scripts/lib/voltooi/nieuws.js`). Er is geen pas-eis: de route vraagt alleen `auth`.
+- Redactiekern en opslag (`eigencollectie`, bak `redactie`) — bij een onvolledig antwoord staat er "Het antwoord was onvolledig, dus dit kon niet worden geladen."; bij een fout de tekst van de server of "Er ging iets mis." (`nieuws.html`).
+- Idempotentie — niet nodig voor de lezer: hij muteert niets. Een dubbele tik op "Vraag" verandert niets (scenario, herstelbaar).
+- Publicatie door een mens — de redactie publiceert via `/api/office/redactie/artikel/status` achter `officeAuth`. Vier ogen dwingt `artikelStatus` niet af: die functie kijkt niet wie er publiceert.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Taalmodel — vrije antwoorden buiten een letterlijke bronzin. Zonder model: een lokale samenvatting of bronzin, en anders "Ik vind hiervoor geen voldoende duidelijke bronzin in het artikel. Lees het artikel zelf of stel de vraag opnieuw zodra vrije taalhulp beschikbaar is." (`server/routes/member/nieuws.js`). Het scherm zegt niet of er een model meedeed.
+- Berichten, De Salon en Reisboek — vandaag geen koppeling, dus ook geen schermtekst bij uitval.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:nieuws': {
+  uitgeeft: [
+    { wat: 'tabel nieuws (datum, rubriek, kop, auteur) om mee te nemen', aan: 'uitvoerlaag van het lid (RTGUitvoer)', vorm: 'projectie', bron: 'public/apps/nieuws.html' }
+  ],
+  ontvangt: [
+    { wat: 'gepubliceerde artikelen per rubriek, zonder concepten', van: 'RTG Redactie (kantoor, /api/office/redactie/*)', vorm: 'projectie', bron: 'server/kern/redactie/pers.js' }
+  ],
+  ketens: [
+    { naam: 'redactie publiceert, lid leest, redactie trekt terug', stappen: ['kantoor: artikel/maak en status gepubliceerd', 'Nieuws: lijst, artikel en Rahul', 'kantoor: status terug naar concept', 'Nieuws: 404 "Dit artikel is er niet (meer)."'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/nieuws.js (lokale run, nog niet in VOLTOOIPROEF.json)' },
+    { naam: 'artikel delen als verwijzing', stappen: ['Nieuws: verwijzing soort artikel', 'Berichten of De Salon: toont alleen de kop', 'ontvanger: opent het stuk in Nieuws'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'reisstuk bij een reis', stappen: ['Nieuws: projectie via de contextbus', 'Reisboek: "1 stuk uit Nieuws"'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'zichtbare correctie', stappen: ['kantoor: correctieregel met datum', 'Nieuws: "Gecorrigeerd op …" boven het stuk'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een lid dat alleen het werk van RTG Redactie leest, doet hier zijn hele werk: rubriek kiezen, lezen en Rahul laten samenvatten. Voor de redactie is dit scherm maar een deel: zij schrijft en publiceert in het kantoor, en correctie, klacht en wederhoor bestaan nog niet als proces. Wie titels van derden wil lezen, of als organisatie wil horen wat er over haar verschijnt, heeft externe software nodig. Volledig voor: het lid dat RTG Redactie leest · Deels voor: de redactie (schrijftafel in het kantoor, zonder correctie- en klachtproces) · Extern nodig: een leesdienst voor titels van derden (zoals Readly of Apple News+), mediamonitoring voor organisaties (zoals Meltwater).
+
 ---
 
 ### Overzicht (link:ontdek, /apps/rtg.html)
@@ -3086,7 +3984,7 @@ Storingen:
 
 #### b. Marktvergelijking
 
-- **Ondergrens:** Google Discover. Gratis en betaald met advertenties. Het lid kan onderwerpen volgen en "meer of minder" kiezen, en de stroom leert van zoek- en surfgedrag ([technipages.com](https://www.technipages.com/top-alternatives-to-google-discover-feed/), [ppc.land](https://ppc.land/googles-discover-vs-discovery-personalized-content-meets-targeted-advertising/)).
+- **Ondergrens:** Google Discover. Gratis en betaald met advertenties. Het lid kan onderwerpen volgen en "meer of minder" kiezen, en de stroom leert van zoek- en surfgedrag (te controleren) ([technipages.com](https://www.technipages.com/top-alternatives-to-google-discover-feed/), [ppc.land](https://ppc.land/googles-discover-vs-discovery-personalized-content-meets-targeted-advertising/)).
 - **Betaald maximum:** een betaalde marktleider voor een persoonlijk startscherm kon ik niet verifiëren. Ik noem er geen.
 
 **Over, als functie:** volgen, minder tonen, onderwerpen beheren.
@@ -3115,17 +4013,17 @@ Storingen:
 - **Uitzondering:** herstellen geeft het RTG-beeld terug.
 - **Acceptatie:** een ander lid krijgt 404 op mijn foto (voltooiproef, bevoegd).
 
-**O3 Eerlijk bij een onbereikbare bron** (L5/L6) — ontbreekt, klein, aanbevolen nu.
+**O3 Eerlijk bij een onbereikbare bron** (L5/L6) — ontbreekt, klein, nu · HERSTEL. (gecorrigeerd: half. Bij een netwerkfout of een antwoord dat geen JSON is, staat er al "Uw agenda is nu niet op te halen.", en voor de kring "Wat er op u wacht is nu niet op te halen." met de stille bronnen als "Zonder signaal: …" (`public/apps/rtg-vandaag.js`). Alleen een foutantwoord mét JSON-lichaam, zoals een 401 of 429, valt door naar "Vandaag staat er niets in uw agenda.", omdat `api()` daar `r.ok` niet leest.)
 - **Gegevens:** de antwoordstand per bron.
 - **Regel:** "niets" en "niet bereikbaar" zijn verschillende zinnen.
 - **Acceptatie:** valt de agenda weg, dan staat er "Agenda nu niet bereikbaar" en niet "niets vandaag". Dit kan in de liegronde getoetst worden met een gefaalde bron.
 
-**O4 Waarom zie ik dit** (L4) — ontbreekt, klein, aanbevolen nu.
+**O4 Waarom zie ik dit** (L4) — ontbreekt, klein, nu · VERDIEPING. (gecorrigeerd: de bron-app staat al op elke kaart van "Wat er op u wacht", als `dagbron` uit `r.app || r.soort` (`public/apps/rtg-vandaag.js`). De zin met de reden ontbreekt.)
 - **Regel:** elke kaart noemt in één zin de bron-app en de reden ("omdat u om 14:00 een afspraak heeft").
 - **Onzekerheid:** een verwachting heet "verwacht", nooit een feit.
 - **Acceptatie:** elke kaart heeft een uitleg die uit de bron-app komt.
 
-**O5 Minder hiervan** (L1) — ontbreekt, klein, aanbevolen nu.
+**O5 Minder hiervan** (L1) — ontbreekt, klein, nu · VERDIEPING.
 - **Gegevens:** een voorkeur per bron-app in de eigen collectie van het lid.
 - **Regel:** het verbergt alleen hier, en wist niets in de bron-app.
 - **Acceptatie:** na "minder sport" toont het Overzicht een week lang geen sportkaart, terwijl Sport zelf ongewijzigd is.
@@ -3159,14 +4057,14 @@ Het Overzicht is een eerlijk dashboard over het hele huis: elke kaart is een pro
 
 #### g. Prioritering
 
-| Volgorde | Wat | Kosten |
-|---|---|---|
-| 1 | O3 eerlijk bij uitval | klein |
-| 2 | O4 waarom zie ik dit | klein |
-| 3 | O5 minder hiervan | klein |
-| later | O6 widgets ordenen | middel |
-| later | O7 gezinsprojectie | middel |
-| later | O9 gedeeld toestel | middel |
+| Volgorde | Wat | Kosten | Bak |
+|---|---|---|---|
+| 1 | O3 eerlijk bij uitval | klein | nu · HERSTEL |
+| 2 | O4 waarom zie ik dit | klein | nu · VERDIEPING |
+| 3 | O5 minder hiervan | klein | nu · VERDIEPING |
+| later | O6 widgets ordenen | middel | later |
+| later | O7 gezinsprojectie | middel | later |
+| later | O9 gedeeld toestel | middel | later |
 
 **Afhankelijkheid:** O7 vraagt het besluit over wie "de dag" bezit (zie "Vraagt besluit").
 
@@ -3206,7 +4104,7 @@ O3, O4 en O5 (klein), daarna O6–O9. Ze gebruiken bestaande bouwstenen: het kom
 | RTG-ketens | tikken op een kaart opent de eigenaar-app op het juiste object |
 | Bewezen betrouwbaarheid | acht keer BEWEZEN, met bevoegd na het meetbaar maken van `/api/sociaal/*` in IDOR |
 
-**Modus LOS:** vandaag zegt het kompas "Vandaag staat er niets in uw agenda", ook als de agenda niet antwoordt. Dat haalt de harde eis niet (O3).
+**Modus LOS:** vandaag zegt het kompas "Vandaag staat er niets in uw agenda", ook als de agenda niet antwoordt. Dat haalt de harde eis niet (O3). (gecorrigeerd: dat gebeurt alleen bij een foutantwoord met JSON-lichaam. Antwoordt de agenda helemaal niet, dan staat er "Uw agenda is nu niet op te halen." (`public/apps/rtg-vandaag.js`).)
 **Modus SAMEN:** projecties via de contextbus; Heel RTG en Rahul openen alles vanuit hier; het Overzicht is nooit eigenaar.
 
 **Gebruikersketen:**
@@ -3225,6 +4123,56 @@ Storingen:
 **Vraagt besluit:** wie is eigenaar van "de dag": Vandaag (LivingOS-A, `dag.overzicht` is `apps/life.html`) of het Overzicht? Twee dagbeelden mogen niet uiteenlopen.
 **Extern:** niets.
 
+#### v3 — afbouw (Overzicht)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Standen wisselen — schermtekst: "Vandaag", "Alles", "Mensen" (`public/apps/rtg.html`) — geen route; de keuze bewaart `RTGRouteMemory` onder `living-home` (`public/apps/rtg-context.js`) — stand: bestaat.
+- Eigen beeld — schermtekst: "Foto wijzigen" (`public/shared/interface/personal-images.js`), "Upload foto", "Herstel RTG-beeld", "Alleen zichtbaar voor u" (`personal-image-editor.js`) — routes `POST /api/ik/beelden`, `/api/ik/beelden/zet`, `/api/bestanden/upload` (met `/upstart`, `/updeel`, `/upklaar`) en `/api/bestanden/haal` — stand: bestaat. Dit is het enige wat het Overzicht zelf bezit.
+- Reisdossier — schermtekst: "UW PRIVATE REISDOSSIER", knoppen "Neem het dossier mee" en "Vraag het Rahul" (`rtg.html`, `public/apps/rtg-dossier.js`) — routes `POST /api/member/huis/dossier`, `/map` en `/rahul` — stand: bestaat. De kern is Het Huis (`server/kern/huis.js`); de reis zelf komt uit Reizen (zie de koppelingen).
+- Waarom zie ik dit, minder hiervan, gezinsprojectie, gedeeld toestel — stand: ontbreekt (O4, O5, O7, O9). De bron-app staat al op de kaart (O4, gecorrigeerd).
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie — zonder token staat er "Meld u aan; daarna staan uw momenten van vandaag hier.", "Meld u aan om te zien wat er vandaag op u wacht." en "Meld u aan voor uw agenda." (`rtg-vandaag.js`). Voor het dossier: "Log in de RTG-app in; daarna staat uw reisdossier hier compleet: …" (`rtg-dossier.js`).
+- Eigen account en ledenstaat — zonder eigen account weigert `/api/ik/beelden` met "Log in met uw eigen RTG-account om persoonlijke beelden te bewaren." (`server/routes/presentatie-beelden.js`).
+- Bestandenkluis — de foto staat in de privékluis van het lid. Bij een te groot of verkeerd bestand: "Kies een JPG-, PNG- of WebP-foto van maximaal 15 MB." (`personal-image-editor.js`). Bij een mislukte opslag: "De wijziging kon niet worden opgeslagen." (`personal-images.js`).
+- Idempotentie — een dubbele en een afgebroken "Opslaan" geven één keuze voor de plek (scenario `scripts/lib/voltooi/ontdek.js`, herstelbaar).
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Agenda (`agenda.afspraken`) — de afspraken van vandaag op de lokale datum. Uit: "Uw agenda is nu niet op te halen." Bij een foutantwoord met JSON-lichaam staat er ten onrechte "Vandaag staat er niets in uw agenda." (O3, HERSTEL).
+- Sociaal (`/api/sociaal/wereld` en `/lijn`) — wat er wacht en de momentenrij. Uit: "Wat er op u wacht is nu niet op te halen." en "Uw momentenlijn is nu niet op te halen."; een stille bron staat er als "Zonder signaal: …" (`rtg-vandaag.js`).
+- Reizen en Entourage — leveren de reis voor het dossier (`reisVan`, `entourageVan` in `server/kern/huis.js`). Zonder reis: "Er staat nog geen reis in uw dossier. Zodra er iets geboekt is, komt het hier vanzelf bij elkaar." Onbereikbaar: "Het dossier is nu niet op te halen. Uw reis staat er nog; probeer het zo nog eens." (`rtg-dossier.js`). Die tweede zin beweert iets wat het scherm op dat moment niet weet.
+- Taalmodel voor "Vraag het Rahul" — zonder model is de vaste zin uit de telling het antwoord (`ai: false`, `server/routes/huis.js`).
+- Doorverwijzingen — "Maak moment" (Camera), "Bekijk alles ›" (Pulse), "Open Sociaal ›", "Volledige agenda", "Open Vandaag", "Het Vooruitzicht" (`rtg.html`). Dat zijn links naar het beginscherm van de eigenaar, niet naar een object.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:ontdek': {
+  uitgeeft: [
+    { wat: 'tabel reisdossier (wanneer, onderdeel, toelichting, stand, factuur) om mee te nemen', aan: 'uitvoerlaag van het lid (RTGUitvoer)', vorm: 'projectie', bron: 'public/apps/rtg-dossier.js' },
+    { wat: 'reisdossier als platte tekst (reisdossier.txt)', aan: 'het lid zelf (download)', vorm: 'projectie', bron: 'server/kern/huis.js' },
+    { wat: 'links naar Camera, Pulse, Sociaal, Agenda, Vandaag en Het Vooruitzicht', aan: 'die apps', vorm: 'verwijzing', bron: 'public/apps/rtg.html' }
+  ],
+  ontvangt: [
+    { wat: 'afspraken van het lid', van: 'Agenda (/api/agenda/mijn-lijst)', vorm: 'projectie', bron: 'public/apps/rtg-vandaag.js' },
+    { wat: 'regels die wachten en stille bronnen', van: 'Sociaal (/api/sociaal/wereld, kern/socialewereld.js)', vorm: 'projectie', bron: 'public/apps/rtg-vandaag.js' },
+    { wat: 'momentenlijn', van: 'Sociaal (/api/sociaal/lijn)', vorm: 'projectie', bron: 'public/apps/rtg-vandaag.js' },
+    { wat: 'reis met stand per onderdeel', van: 'Reizen en Entourage (reisVan, entourageVan)', vorm: 'projectie', bron: 'server/kern/huis.js' }
+  ],
+  ketens: [
+    { naam: 'afspraak van vandaag in het Overzicht', stappen: ['Agenda: afspraak op de lokale datum', 'Overzicht: kompas "Vandaag"'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/ontdek.js en test/rtg-vandaag-lokaal.test.js' },
+    { naam: 'eigen beeld kiezen, herstellen en opnieuw kiezen', stappen: ['Overzicht: upload in de kluis', 'Overzicht: beeldkeuze zetten', 'Overzicht: "Herstel RTG-beeld"'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/ontdek.js' },
+    { naam: 'kaart opent de eigenaar op het object en toont de nieuwe tijd', stappen: ['Overzicht: tik op de afspraak', 'Agenda: verzetten', 'Overzicht: nieuwe tijd'], stand: 'open', bewijs: 'geen' },
+    { naam: 'uitleg per kaart en "minder hiervan"', stappen: ['bron-app: reden in één zin', 'Overzicht: tonen of verbergen, bron ongewijzigd'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'gezinsprojectie', stappen: ['Gezin: gedeelde kaart per persoon en soort', 'Overzicht: tonen, intrekken direct'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Niemand doet hier zijn hele werk, en dat is de bedoeling: het Overzicht is een projectie, en het werk zelf gebeurt in Agenda, Sociaal en Reizen. Voor het lid is het een deel van zijn dag: zien wat telt, het dossier meenemen en het huis een eigen beeld geven. Er is geen externe software nodig. Volledig voor: niemand (projectie) · Deels voor: het lid (dag, wat er wacht, reisdossier, eigen beeld) · Extern nodig: niets.
+
 ---
 
 ### Rendez-vous (link:rendezvous, /apps/rendezvous.html)
@@ -3237,7 +4185,7 @@ Storingen:
 - 28 onder `/api/member/rendezvous/*`: profiel, kandidaten, like, pas, matches, blokkeer, tafels, introducties, circles, arrange, concierge, date, encounter, samen, aanwezig en foto's;
 - de chat, media en oproep via `/api/connection/rendezvous/*`.
 
-**Kern:** `server/kern/rendezvous*.js` (15 bestanden). De poort is `kern/ontmoetpoort.js` (18+ met een geverifieerd paspoort), gedeeld met Vonk.
+**Kern:** `server/kern/rendezvous*.js` (15 bestanden) (gecorrigeerd: dat patroon telt 14 bestanden; daarnaast horen `server/kern/connection-state-rendezvous.js` en de map `server/kern/ontmoeting/` erbij). De poort is `kern/ontmoetpoort.js` (18+ met een geverifieerd paspoort), gedeeld met Vonk.
 
 **Toets:** `rendezvous.test.js`.
 
@@ -3262,10 +4210,10 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
 
 | Aanbieder | Pakket en prijs | Wat de betaalde laag geeft | Bron |
 |---|---|---|---|
-| Hinge | Hinge+ ca. US$19,99–29,99 per maand, HingeX US$49,99 per maand | gratis 8 likes per dag; meer zichtbaarheid | [lowermysubs.com](https://www.lowermysubs.com/blog/hinge-retention-offer) |
-| Raya | lidmaatschap ca. US$24,99 en Raya+ US$49,99 per maand (augustus 2025) | op uitnodiging, met een commissie; Raya+ geeft "wie vond mij leuk", onbeperkt liken en reisplannen | [subger.com](https://subger.com/en/service/raya) |
-| The League | Owner ca. US$249 en Investor ca. US$999 per maand; tot ca. US$30.000 per jaar volgens Fortune (2024) | | [swipestats.io](https://www.swipestats.io/blog/the-league-review), [fortune.com](https://fortune.com/2024/01/07/wealthy-gen-z-millennial-singles-paying-thousands-the-league-dating-app) |
-| Tawkify (duurste: matchmaker die een mens is) | pakketten vanaf US$4.900, tot ca. US$70.000 | een matchmaker die zelf zoekt en introduceert | [tawkify.com/w/faq](https://Tawkify.com/w/faq), [photofeeler](https://blog.photofeeler.com/tawkify/) |
+| Hinge | Hinge+ ca. US$19,99–29,99 per maand, HingeX US$49,99 per maand (te controleren) | gratis 8 likes per dag; meer zichtbaarheid | [lowermysubs.com](https://www.lowermysubs.com/blog/hinge-retention-offer) |
+| Raya | lidmaatschap ca. US$24,99 en Raya+ US$49,99 per maand (augustus 2025) (te controleren) | op uitnodiging, met een commissie; Raya+ geeft "wie vond mij leuk", onbeperkt liken en reisplannen | [subger.com](https://subger.com/en/service/raya) |
+| The League | Owner ca. US$249 en Investor ca. US$999 per maand; tot ca. US$30.000 per jaar volgens Fortune (2024) (te controleren) | | [swipestats.io](https://www.swipestats.io/blog/the-league-review), [fortune.com](https://fortune.com/2024/01/07/wealthy-gen-z-millennial-singles-paying-thousands-the-league-dating-app) |
+| Tawkify (duurste: matchmaker die een mens is) | pakketten vanaf US$4.900, tot ca. US$70.000 (te controleren) | een matchmaker die zelf zoekt en introduceert | [tawkify.com/w/faq](https://Tawkify.com/w/faq), [photofeeler](https://blog.photofeeler.com/tawkify/) |
 
 **Over, als functie:**
 - zien wie je leuk vond (bij ons inbegrepen);
@@ -3286,7 +4234,7 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
 - **eerlijke afwijzing**, zonder zich te hoeven verantwoorden;
 - **tijd:** een eindige selectie, geen lijst die eindeloos doorgaat.
 
-**Professioneel: matchmakers en datingbureaus.** Zo werken ze in het vak:
+**Professioneel: matchmakers en datingbureaus.** Zo werken ze in het vak (te controleren):
 - een intakegesprek;
 - een vooraf afgesproken aantal introducties;
 - de identiteit wordt gecontroleerd;
@@ -3313,23 +4261,23 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
 - **Regel:** wie blokkeert, hoeft zich niet te verantwoorden (par. 4.6).
 - **Acceptatie:** de blokkade blijft na een crash, in een nieuwe sessie (bewezen).
 
-**R5 Reisplannen, opgegeven en niet afgeleid** (L1) — half (`arrange`, aanwezigheid), middel, aanbevolen nu.
+**R5 Reisplannen, opgegeven en niet afgeleid** (L1) — half (`arrange`, aanwezigheid), middel, nu · VERDIEPING.
 - **Gegevens:** stad en datumvenster, opgegeven door het lid.
 - **Regel:** het wordt nooit afgeleid uit GPS (par. 4.3) en vervalt na het venster.
 - **Melding:** geen push. Het lid ziet het bij het openen.
 - **Acceptatie:** wie "Lissabon 12–15 november" zet, verschijnt in die dagen voor leden in Lissabon, en daarna niet meer.
 
-**R6 Veilige date** (L1/L6) — half (Veilig bestaat, eigenaar `veilig.noodcontacten`, LivingOS-A), klein, aanbevolen nu.
+**R6 Veilige date** (L1/L6) — half (Veilig bestaat, eigenaar `veilig.noodcontacten`, LivingOS-A), klein, nu · VERDIEPING.
 - **Gegevens:** tijd en plaats van de date, gedeeld met één contact dat het lid in Veilig koos.
 - **Regel:** het delen sluit vanzelf na een afgesproken tijd.
 - **Melding:** het contact hoort het alleen als het lid de veiligheidsknop gebruikt.
 - **Acceptatie:** delen, de date en afloop leveren geen bericht meer op; een alarm bereikt alleen het gekozen contact.
 
-**R7 Date als verwijzing in Agenda** (L6) — ontbreekt, klein, aanbevolen nu.
+**R7 Date als verwijzing in Agenda** (L6) — ontbreekt, klein, nu · VERDIEPING.
 - **Regel:** een verwijzing bij beide leden. Bij afzeggen verdwijnt hij bij allebei, zonder reden.
 - **Acceptatie:** na afzeggen door A is hij weg bij B en staat er "afgezegd".
 
-**R8 Wissen bij opzeggen** (L5) — onbekend, aanbevolen nu, eerst meten.
+**R8 Wissen bij opzeggen** (L5) — onbekend, nu · HERSTEL, eerst meten.
 - **Gegevens:** profiel, foto's, chat en aanwezigheid.
 - **Regel:** wissen, behalve wat de wet vraagt; het meten vraagt de lezer van de opslag (`vindInOpslag`).
 - **Acceptatie:** na opzeggen is het merkteken nergens in de opslag te vinden.
@@ -3337,7 +4285,7 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
 **R9 Leeg antwoord, geen "undefined"** (L5) — **bestaat sinds c5d6e935e**: Today en Matches zeggen "Het antwoord was onvolledig, dus dit kon niet worden geladen." in plaats van de JS-fout. Toets: test/rendezvous-leeg.e2e.js.
 - **Acceptatie:** de liegronde met een leeg antwoord toont een eerlijke zin.
 
-**R10 Melden van lekken (screenshots, echte naam)** (L3) — half (melden bestaat), klein, aanbevolen nu.
+**R10 Melden van lekken (screenshots, echte naam)** (L3) — half (melden bestaat), klein, nu · VERDIEPING.
 - **Regel:** een mens van RTG beslist, nooit de AI.
 - **Acceptatie:** een melding komt bij het kantoor, en het lid hoort de uitkomst.
 
@@ -3348,7 +4296,7 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
   - het lid zegt per introductie ja of nee.
 
 **R12 Concierge regelt de ontmoeting** (L3) — bestaat (`rendezvous-concierge.js`).
-- **Regel:** het lid keurt goed, en er staat nooit "geboekt" voordat de zaak bevestigde.
+- **Regel:** het lid keurt goed, en er staat nooit "geboekt" voordat de zaak bevestigde. (gecorrigeerd: in de code bevestigt niet de zaak maar het kantoor. `officeStep` in `server/kern/rendezvous-concierge.js` zet CONFIRMED na het akkoord van het lid, met verplichte "fulfilmentinformatie" en een optionele partnercode; een zaakroute voor deze concierge bestaat niet. Het scherm noemt hem "De Rechterhand" (`public/apps/rendezvous.html`), maar het is een eigen werkqueue en niet de lus van het Privékantoor in `server/kern/bureau/lus*.js`.)
 
 **Niet doen:**
 - **boost en zichtbaarheid kopen:** verdienmodellen;
@@ -3360,7 +4308,7 @@ Prijzen variëren per land, leeftijd en looptijd. Alle bedragen hieronder zijn g
 
 De hele avond in één keten:
 1. de match;
-2. De Rechterhand regelt een tafel bij een echte zaak;
+2. De Rechterhand regelt een tafel bij een echte zaak (gecorrigeerd: vandaag is dat de eigen concierge-queue van Rendez-vous, behandeld door het kantoor via `/api/office/rendezvous/concierge*`, en niet de lus van het Privékantoor; zie R12);
 3. de date staat bij allebei in de agenda;
 4. Veilig houdt een vertrouwd contact op de hoogte;
 5. de afloop is elegant.
@@ -3369,24 +4317,24 @@ Er zijn vier eigenaars en geen gedeelde data. Daarbij geldt overal dezelfde poor
 
 #### f. Bouwstenen en ontbrekende koppelingen
 
-- **Bestaat:** de ontmoetpoort, de 15 kernbestanden, de connection-chat met herhaalsleutel, de concierge, Veilig en objectverwijzing.
+- **Bestaat:** de ontmoetpoort, de 15 kernbestanden (gecorrigeerd: 14, zie a), de connection-chat met herhaalsleutel, de concierge, Veilig en objectverwijzing.
 - **Ontbreekt:**
   - de verwijzing "date" naar Agenda;
   - de koppeling van een date aan Veilig;
   - een meting van het wissen bij opzeggen;
-  - de reparatie van het lege antwoord.
+  - de reparatie van het lege antwoord (gecorrigeerd: gedaan in c5d6e935e, zie R9).
 
 #### g. Prioritering
 
-| Volgorde | Wat | Kosten |
-|---|---|---|
-| gedaan | R9 leeg antwoord (c5d6e935e) | — |
-| 2 | R8 wissen meten | klein voor de meting |
-| 3 | R6 veilige date | klein |
-| 4 | R7 date in Agenda | klein |
-| 5 | R10 melden van lekken | klein |
-| later | R5 reisplannen | middel |
-| besluit | R11 menselijke matchmaker | |
+| Volgorde | Wat | Kosten | Bak |
+|---|---|---|---|
+| gedaan | R9 leeg antwoord (c5d6e935e) | — | gedaan |
+| 2 | R8 wissen meten | klein voor de meting | nu · HERSTEL |
+| 3 | R6 veilige date | klein | nu · VERDIEPING |
+| 4 | R7 date in Agenda | klein | nu · VERDIEPING |
+| 5 | R10 melden van lekken | klein | nu · VERDIEPING |
+| later | R5 reisplannen | middel | later |
+| besluit | R11 menselijke matchmaker | | besluit |
 
 **Afhankelijkheid:** R6 en R7 vragen afstemming met LivingOS-A (Veilig) en de eigenaar van Agenda.
 
@@ -3458,6 +4406,66 @@ Storingen:
 
 **Extern:** de identiteitskeuring blijft bij RTG, door een mens. Tafels lopen via echte zaken; hun bevestiging is extern.
 
+#### v3 — afbouw (Rendez-vous)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Profiel — schermtekst: "Een profiel met intentie", "Profiel bewaren", melding "Uw profiel is veilig bewaard." (`public/apps/rendezvous.html`) — routes `POST /api/member/rendezvous/profiel` en `/profiel/zet` — stand: bestaat.
+- Foto's — schermtekst: "Foto toevoegen" — routes `/profile-photo`, `/profile-photo/publish`, `/remove` en `/order` (`server/routes/member/rendezvous-connection.js`) — stand: bestaat.
+- Aanwezigheid — schermtekst: "Waar u bent", "Periode toevoegen", "Alles wissen", melding "Gewist." — routes `/profiel/zet` (aanwezig) en `/aanwezig/wis` — stand: bestaat. Vensters zijn een stad en dagen, alleen zelf ingetikt, en vallen weg na de einddatum (`server/kern/rendezvous-aanwezig.js`).
+- Beschikbaarheid — schermtekst: "Wanneer u kunt" — route `/profiel/zet` (beschikbaar) — stand: bestaat.
+- Kandidaten en match — schermtekst: "Today.", "Interesse", "Voorbij", meldingen "Uw interesse is discreet genoteerd." en "Het is wederzijds. Uw match staat klaar." — routes `/kandidaten`, `/like` en `/pas` — stand: bestaat.
+- Matches — schermtekst: "Uw matches", "Maak een voorstel", "Arrange it", "Wij zijn samen" — routes `/matches`, `/date`, `/arrange`, `/akkoord`, `/samen` en `/samen/zet` — stand: bestaat.
+- Blokkeren en melden — schermtekst: "Blokkeren of melden", "Alleen blokkeren", "Blokkeren en melden", melding "Geblokkeerd en veilig gemeld bij RTG." — route `/blokkeer` — stand: half. De melding komt in een lijst die het kantoor leest (`/api/office/rendezvous/meldingen`). Er is geen route die een uitkomst zet of het lid iets terugmeldt.
+- Introducties, tafels en circles — schermtekst: "Voorgesteld worden", "Uitnodigingen", "Ik kom" — routes `/introducties`, `/introductie/antwoord`, `/tafels`, `/tafel/antwoord`, `/circles` en `/circle/rsvp` — stand: bestaat. Tafels en circles maakt het kantoor.
+- Ontmoeting bevestigen — schermtekst: "Iemand ontmoet?", "Ik heb deze persoon ontmoet" — route `/encounter` — stand: bestaat.
+- Concierge — schermtekst: "Concierge.", "Uw verzoeken.", "Verzoek indienen", "Goedkeuren", melding "Uw verzoek is ontvangen." — routes `/concierge`, `/concierge/request` en `/concierge/approve` — stand: bestaat, als eigen werkqueue. De stand staat als ruwe code op het scherm (`esc(r.state)`, bijvoorbeeld REQUESTED).
+- Chat, media en bellen — routes `/api/connection/rendezvous/text`, `/message-media`, `/message/report` en `/call/*` — stand: bestaat. De schermtekst komt uit `public/shared/connection-communication*.js`: niet gemeten.
+- Rahul schetst een date — zonder model staat er een vaste tekst met `demo: true`, en het scherm toont dat label niet (`server/kern/rendezvous-date.js`). Zonder gedeelde locatie eindigt die tekst met "dan schets ik een date en regelt De Rechterhand de rest." Dat belooft een koppeling met het Privékantoor die in de code niet bestaat.
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie — titel "Open uw besloten ledenaccount", knop "Naar de leden-app" (`rendezvous.html`).
+- Ontmoetpoort: 18+ met een geverifieerd paspoort (`server/kern/ontmoetpoort.js`) — titel "Verifieer eerst uw identiteit", knop "Start identiteitscontrole"; bij leeftijd "Alleen voor geverifieerde leden van 18+" (`rendezvous.html`). De leeftijd komt uit `member_state.geboren`, en die staat er alleen na een gezien document.
+- Pas-poort (Lifestyle of Business) — titel "Signature-membership vereist" met de servertekst "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass." (`server/routes/connection-policy.js`), knop "Bekijk Signature". Die knop gaat naar `/apps/lifestyle.html`; daar zegt `public/shared/deur.js` "De Lifestyle Pass gaat uitsluitend op uitnodiging of na goedkeuring, en dat besluit nemen mensen bij RTG -- niet deze app en niet Rahul." Er wordt dus nergens toegang beloofd.
+- Codenaamkluis — vertrouwenspaneel "Codenaam, nooit echte naam" (`rendezvous.html`). Echte namen blijven in de kluis.
+- Idempotentie en staatsbewaking — een `Idempotency-Key`-kop op de foto-upload, een `idempotencyKey` in het concierge-verzoek, een sleutel per chatbericht, en `rvStateGuard` met `stateRevision` op like, pas, arrange en akkoord (`server/routes/member/rendezvous.js`).
+- Opslag en liegpoort — bij een leeg antwoord staat er "Het antwoord was onvolledig, dus dit kon niet worden geladen."; bij een serverfout "Er ging iets mis. Probeer het opnieuw."
+- Wissen bij opzeggen — niet gemeten. `server/kern/vergeten/` en de toetsen `test/vergeten*.test.js` noemen Rendez-vous nergens (R8).
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Kantoor — tafels, circles, introducties, de concierge en het lezen van meldingen (`server/routes/office/rendezvous.js`). Uit: de lijsten zijn leeg ("Geen uitnodigingen op dit moment.", "U heeft nog geen verzoek openstaan.").
+- Taalmodel — Rahuls schets van een date. Uit: de vaste tekst hierboven, zonder label.
+- Veilig, Agenda en het Privékantoor — vandaag geen koppeling, dus ook geen schermtekst bij uitval.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:rendezvous': {
+  uitgeeft: [
+    { wat: 'melding bij blokkeren (codenaam van, codenaam over, reden)', aan: 'kantoor (/api/office/rendezvous/meldingen)', vorm: 'gebeurtenis', bron: 'server/kern/rendezvous-acties.js' },
+    { wat: 'concierge-verzoek (onderwerp, stad, venster, verzoek)', aan: 'kantoor (/api/office/rendezvous/concierge)', vorm: 'gebeurtenis', bron: 'server/kern/rendezvous-concierge.js' },
+    { wat: 'arrangement van een match', aan: 'kantoor (/api/office/rendezvous/arrangements)', vorm: 'gebeurtenis', bron: 'server/routes/office/rendezvous.js' },
+    { wat: 'introductie of match als object', aan: 'de Edge (connection-edge, adaptief register)', vorm: 'verwijzing', bron: 'public/apps/rendezvous.html' }
+  ],
+  ontvangt: [
+    { wat: 'geverifieerd paspoort en geboortedatum', van: 'identiteitskluis (accounts, member_state)', vorm: 'projectie', bron: 'server/kern/ontmoetpoort.js' },
+    { wat: 'pas van de sessie', van: 'sessie (tier)', vorm: 'projectie', bron: 'server/routes/connection-policy.js' },
+    { wat: 'tafels, circles en introducties', van: 'kantoor', vorm: 'gebeurtenis', bron: 'server/routes/office/rendezvous.js' },
+    { wat: 'voorstel en bevestiging van een concierge-verzoek', van: 'kantoor (officeStep)', vorm: 'gebeurtenis', bron: 'server/kern/rendezvous-concierge.js' }
+  ],
+  ketens: [
+    { naam: 'wederzijdse match, chat en blokkade', stappen: ['A: like', 'B: like', 'beiden: match en chat', 'A: blokkeert, ook na een nieuwe sessie'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/rendezvous.js (lokale run, nog niet in VOLTOOIPROEF.json)' },
+    { naam: 'concierge regelt de ontmoeting', stappen: ['lid: verzoek', 'kantoor: voorstel', 'lid: goedkeuren', 'kantoor: CONFIRMED'], stand: 'open', bewijs: 'geen; de zaak bevestigt zelf niets' },
+    { naam: 'de avondketen', stappen: ['Rendez-vous: match', 'Privékantoor: tafel via de lus', 'Agenda: date bij allebei', 'Veilig: vertrouwd contact'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'melding met uitkomst', stappen: ['lid: blokkeren en melden', 'kantoor: besluit', 'lid: hoort de uitkomst'], stand: 'open', bewijs: 'geen' },
+    { naam: 'wissen bij opzeggen', stappen: ['lid: zegt op', 'vergeten: wist profiel, foto\'s, chat en aanwezigheid', 'opslaglezer: merkteken nergens'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een Signature-lid doet hier zijn hele werk zolang het zelf zoekt: profiel, aanwezigheid, matchen, chatten, blokkeren en een concierge-verzoek. Voor het kantoor is het een deel van zijn werk: het verifieert, maakt tafels en circles en behandelt de concierge, maar handelt een melding niet af, want daar is geen stap voor. Een menselijke matchmaker bestaat binnen RTG niet (R11), en de bevestiging van een zaak loopt buiten de app. Volledig voor: het Signature-lid dat zelf zoekt, matcht, chat en blokkeert · Deels voor: het kantoor (verificatie, tafels, circles en concierge wel; een melding afhandelen niet) · Extern nodig: de reservering en bevestiging bij de zaak; een menselijke matchmaker (zoals Tawkify) voor wie dat wil.
+
 ---
 
 ### Privékantoor / De Rechterhand (link:rechterhand, /apps/lifestyle.html)
@@ -3473,7 +4481,7 @@ Storingen:
 - de kantoorkant via `/api/office/bureau/lus/*` (`server/routes/office/concierge.js`);
 - de zaakkant via `/api/supplier/concierge/opdrachten`.
 
-**Kern:** `server/kern/bureau/` (27 bestanden: lus, cases, delegatie, twin, collectie, reisdek, relaties, reputatie, dieren, beveiliging en ai).
+**Kern:** `server/kern/bureau/` (27 bestanden (gecorrigeerd: 26): lus, cases, delegatie, twin, collectie, reisdek, relaties, reputatie, dieren, beveiliging en ai).
 
 **Toetsen:** `conciergelus.test.js`, `-kern`, `-regels`, `-dubbel`, `-naam` en `conciergelusscherm.e2e.js`.
 
@@ -3498,8 +4506,8 @@ Het scenario loopt met een echt lid, een pas uit een menselijk besluit en een ka
 
 | Aanbieder | Pakket en prijs | Bron |
 |---|---|---|
-| Quintessentially | ca. US$1.500, 5.000–7.000 en 20.000 per jaar (Elite, op uitnodiging); £24.000 per jaar voor een team (2008). Alles uit oudere artikelen, niet geverifieerd | [floridatrend.com](https://www.floridatrend.com/article/304/concierges), [dailynewsegypt.com](https://www.dailynewsegypt.com/2008/01/11/whatever-your-little-heart-desires) |
-| Ten Lifestyle | voor bedrijven of banken £7.000–36.000 (niet geverifieerd); 24/7, 26 talen, reizen, dining, entertainment, retail | [tenlifestylegroup.com](https://tenlifestylegroup.com/what-ten-does/how-we-do-it/) |
+| Quintessentially | ca. US$1.500, 5.000–7.000 en 20.000 per jaar (Elite, op uitnodiging); £24.000 per jaar voor een team (2008). Alles uit oudere artikelen, niet geverifieerd (te controleren) | [floridatrend.com](https://www.floridatrend.com/article/304/concierges), [dailynewsegypt.com](https://www.dailynewsegypt.com/2008/01/11/whatever-your-little-heart-desires) |
+| Ten Lifestyle | voor bedrijven of banken £7.000–36.000 (niet geverifieerd) (te controleren); 24/7, 26 talen, reizen, dining, entertainment, retail | [tenlifestylegroup.com](https://tenlifestylegroup.com/what-ten-does/how-we-do-it/) |
 
 **Duurste klasse:** het family office (huishouden, vermogen, personeel, veiligheid). Prijzen zijn daar niet openbaar.
 
@@ -3518,7 +4526,7 @@ Het scenario loopt met een echt lid, een pas uit een menselijk besluit en een ka
 
 **Particulier.** Een lid wil één aanspreekpunt, geheugen (wat wil mijn vrouw nooit), een eerlijk "dit lukt niet, wel dit", en geen rompslomp.
 
-**Professioneel: concierges.** Hoe het vak werkt, volgens Les Clefs d'Or:
+**Professioneel: concierges.** Hoe het vak werkt, volgens Les Clefs d'Or (te controleren):
 - geen commissies of incentives die een aanbeveling sturen;
 - vertrouwelijkheid;
 - nooit een uitkomst beloven die je niet zeker kunt leveren;
@@ -3526,7 +4534,7 @@ Het scenario loopt met een echt lid, een pas uit een menselijk besluit en een ka
 
 Bronnen: [ehotelier.com](https://insights.ehotelier.com/news/2014/05/20/les-clefs-dor-and-the-modern-concierge/), [mixtemagazine.ca](https://www.mixtemagazine.ca/en/?p=12509). De officiële codetekst heb ik niet gevonden.
 
-**Organisatorisch: family offices.** Hoe die in de praktijk werken:
+**Organisatorisch: family offices.** Hoe die in de praktijk werken (te controleren):
 - mandaten per domein (tot welk bedrag, welke zaken);
 - vier ogen bij geld;
 - personeelsbeheer;
@@ -3561,16 +4569,16 @@ RTG heeft daarvoor al `delegatie.js`, `collectie.js` (herkomst, taxatie, bruikle
 
 **P6 Omgevallen onderdeel → herstel in dezelfde case** (L5) — bestaat.
 
-**P7 Bevestigd door de zaak, zichtbaar per onderdeel** (L5) — half, klein, aanbevolen nu.
+**P7 Bevestigd door de zaak, zichtbaar per onderdeel** (L5) — half, klein, nu · HERSTEL. (gecorrigeerd: de zaak kan in de code niets bevestigen; `/api/supplier/concierge/opdrachten` leest alleen. "Bevestigd" zet het kantoor via `/api/office/bureau/lus/bevestig`, en een gekozen aanbod krijgt meteen de stand 'bevestigd' (`plaats()` in `server/kern/bureau/lus.js`). Het lid leest daarna "Vastgezet. Wij regelen de rest." (`public/apps/lifestyle-lus.js`).)
 - **Regel:** "bevestigd" staat er alleen als de zaak het zelf bevestigde.
 - **Acceptatie:** zonder bevestiging van de zaak staat er "wacht op de zaak", nooit "geregeld".
 
-**P8 Wens per spraak** (L1) — ontbreekt, klein, aanbevolen nu.
+**P8 Wens per spraak** (L1) — ontbreekt, klein, nu · VERDIEPING.
 - **Gegevens:** spraak, op het toestel omgezet (`shared/spraak.js`).
 - **Regel:** er gaat geen opname naar buiten; de tekst gaat de normale intake in.
 - **Acceptatie:** een ingesproken wens geeft dezelfde case als de getypte.
 
-**P9 Case als verwijzing in Agenda en Berichten** (L6) — ontbreekt, klein, aanbevolen nu.
+**P9 Case als verwijzing in Agenda en Berichten** (L6) — ontbreekt, klein, nu · VERDIEPING.
 - **Regel:** een verzette tijd verzet de verwijzing.
 - **Acceptatie:** na verzetten klopt de agenda.
 
@@ -3579,14 +4587,14 @@ RTG heeft daarvoor al `delegatie.js`, `collectie.js` (herkomst, taxatie, bruikle
 - **Onzekerheid:** een verwachte tijd heet "verwacht".
 - **Acceptatie:** een wens om 03:00 krijgt een mens of een eerlijke tijd.
 
-**P11 Geen commissie stuurt een advies** (L2/L3) — ontbreekt als regel, klein, aanbevolen nu.
+**P11 Geen commissie stuurt een advies** (L2/L3) — ontbreekt als regel, klein, nu · VERDIEPING.
 - **Gegevens:** per voorstel staat vermeld of er een commerciële relatie met de zaak is.
 - **Regel:** volgens de norm van het vak beïnvloedt een commissie het advies niet; RTG maakt de relatie zichtbaar.
 - **Acceptatie:** het lid ziet bij elk voorstel "RTG ontvangt hier niets" of wat RTG wel ontvangt.
 
-**P12 Kosten en voorwaarden vooraf** (L5) — half, klein, aanbevolen nu.
+**P12 Kosten en voorwaarden vooraf** (L5) — half, klein, nu · VERDIEPING.
 - **Regel:** een kledingvoorschrift, een annuleringsvoorwaarde en een verborgen kost horen bij het voorstel.
-- **Acceptatie:** een voorstel zonder die velden kan het kantoor niet versturen.
+- **Acceptatie:** een voorstel zonder die velden kan het kantoor niet versturen. Dit is een huisregel (eerlijkheid vooraf) en weigert dus wél; hij steunt niet op de bron die te controleren is.
 
 **P13 Kring, bezit, woning, dieren, reputatie** (L1) — bestaat (de tabbladen); de voltooiproef loopt alleen de lus.
 - **Later:** een eigen scenario per tabblad.
@@ -3611,15 +4619,15 @@ Het Privékantoor is een family office op codenaam. Mandaat, zaak, reis, kring e
 
 #### g. Prioritering
 
-| Volgorde | Wat | Kosten |
-|---|---|---|
-| 1 | P7 bevestigd door de zaak | klein |
-| 2 | P11 geen commissie stuurt het advies | klein |
-| 3 | P12 kosten en voorwaarden vooraf | klein |
-| 4 | P9 case in Agenda en Berichten | klein |
-| 5 | P8 wens per spraak | klein |
-| later | P13 scenario's per tabblad | middel |
-| besluit | P10 responstijd | groot (bezetting) |
+| Volgorde | Wat | Kosten | Bak |
+|---|---|---|---|
+| 1 | P7 bevestigd door de zaak | klein | nu · HERSTEL |
+| 2 | P11 geen commissie stuurt het advies | klein | nu · VERDIEPING |
+| 3 | P12 kosten en voorwaarden vooraf | klein | nu · VERDIEPING |
+| 4 | P9 case in Agenda en Berichten | klein | nu · VERDIEPING |
+| 5 | P8 wens per spraak | klein | nu · VERDIEPING |
+| later | P13 scenario's per tabblad | middel | later |
+| besluit | P10 responstijd | groot (bezetting) | besluit |
 
 #### Uitkomst A — bouwbaar binnen de scope
 
@@ -3645,6 +4653,7 @@ P7, P11, P12, P9 en P8 (klein), daarna P13. Ze gebruiken de bestaande lus, deleg
 - **Regels:**
   - boven de drempel tekenen twee mensen: het lid en een gemachtigde, of twee gemachtigden;
   - nooit dezelfde persoon twee keer (zoals `kern/appstore/vierogen.js`).
+  - Dit is een huisregel op een geldpad (vier ogen) en weigert dus wél; hij steunt niet op de bron die te controleren is.
 - **Rekenwijze:** de drempel geldt per domein en per periode, en het bedrag wordt opgeteld over de periode.
 - **Melding:** het lid hoort bij elke uitgave boven de drempel.
 - **Uitzondering:** een noodgeval. Dan mag één handtekening, met een verplichte reden en melding achteraf.
@@ -3672,7 +4681,7 @@ P7, P11, P12, P9 en P8 (klein), daarna P13. Ze gebruiken de bestaande lus, deleg
 | Dimensie | Meetbaar criterium |
 |---|---|
 | Breedte | elk tabblad heeft een scenario in de voltooiproef |
-| Professionele diepte | elk voorstel draagt voorwaarden en de commerciële relatie; de toets weigert een voorstel zonder |
+| Professionele diepte | elk voorstel draagt voorwaarden en de commerciële relatie; de toets weigert een voorstel zonder. Dit is een huisregel (eerlijkheid vooraf) en weigert dus wél; hij steunt niet op de bron die te controleren is. |
 | Levenscyclus | van intake tot uitkomst, inclusief herstel na een omgevallen onderdeel, bewezen na een crash |
 | Samenwerking en rollen | lid, kantoor op naam en zaak, elk met eigen zicht; een tweede zaak ziet niets |
 | Domeinintelligentie | de intake zonder model geeft dezelfde velden; voorstellen buiten het mandaat worden nooit vastgezet |
@@ -3681,7 +4690,7 @@ P7, P11, P12, P9 en P8 (klein), daarna P13. Ze gebruiken de bestaande lus, deleg
 | Bewezen betrouwbaarheid | acht keer BEWEZEN, met voltooibaar uit het nieuwe scenario |
 
 **Modus LOS:** intake, case, voorstel en besluit werken zonder andere apps. Bij een kantoor zonder bezetting blijft de case "in voorbereiding" staan, zonder verwachte tijd. Dat haalt de eis nog niet (P10).
-**Modus SAMEN:** Reizen (reisdek), zaken (opdrachten), Rendez-vous (concierge) en Agenda en Berichten (P9). Rahul "open privékantoor" opent het. Heel RTG toont het alleen met de pas.
+**Modus SAMEN:** Reizen (reisdek), zaken (opdrachten), Rendez-vous (concierge) en Agenda en Berichten (P9). (gecorrigeerd: de concierge van Rendez-vous raakt deze lus niet. Hij is een eigen werkqueue in `server/kern/rendezvous-concierge.js`, ook al noemt `rendezvous.html` hem "De Rechterhand".) Rahul "open privékantoor" opent het. Heel RTG toont het alleen met de pas.
 
 **Gebruikersketen:**
 1. De vlucht naar Lissabon gaat twee uur later (Reizen).
@@ -3704,16 +4713,116 @@ Storingen:
 
 **Voor de integrator:** de concierge-behoefte van Reizen (`reizen.reisbureau`) en Horeca-evenementen raakt deze lus. Dat is geen dubbele logica: zij leveren onderdelen aan de case, en de case blijft van De Rechterhand.
 
+#### v3 — afbouw (Privékantoor / De Rechterhand)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Tabbladen — schermtekst: "Nu", "Vooruit", "Zaken", "Kantoor", "Woning", "Kring", "Bezit", "Reis", "Veilig", "Mandaat", "Overzicht" (`TABS` in `public/apps/lifestyle.html`) — stand: bestaat.
+- Wens in één zin — schermtekst: "Vraag het De Rechterhand", "Uw wens", "Speelruimte in tijd", knop "Vraag het ons", melding "Ontvangen. Wij gaan ermee aan de slag." of "Dit hadden wij al van u ontvangen." (`public/apps/lifestyle-lus.js`) — route `POST /api/member/bureau/lus/intake` — stand: bestaat.
+- Voorstel beslissen — schermtekst: "Wij leggen u iets voor", "Waarom wij het u vragen: …", "Akkoord", "Liever niet", melding "Vastgezet. Wij regelen de rest." of "Genoteerd. Wij zoeken verder." (`lifestyle-lus.js`) — route `/lus/beslis` — stand: bestaat. De geldigheid staat als tijd met "UTC" erachter, niet in de tijd van het lid.
+- Toelichting en verrassing — schermtekst: "Laat ons iets weten", "Versturen", "Maak er een verrassing van" (`lifestyle-lus.js`) — routes `/lus/toelichting` en `/lus/verrassing` — stand: bestaat.
+- Zaak openen — schermtekst: "Bekijk het voorstel", "Bekijk de zaak", "Uw zaken", "Een zaak aanleggen" (`lifestyle-lus.js`, `lifestyle.html`) — routes `/lus/zaak`, `/api/member/bureau/zaken` en `/zaak/open` — stand: bestaat.
+- Mandaat — schermtekst: "Wat mogen wij zelf?" (`vMandaat`) — routes `/delegatie` en `/delegatie/zet` — stand: bestaat.
+- Woning, kring, bezit, reis, veilig — koppen "Uw woningen", "Uw kring", "Uw collectie", "Uw reizen" en "Verstoringen", "Beveiliging", "Dieren", "Reputatie" (`lifestyle.html`) — routes `/twin/*`, `/relaties/*`, `/collectie/*`, `/reisdek/*`, `/beveiliging/*`, `/dieren/*` en `/reputatie/*` — stand: bestaat; de voltooiproef loopt ze niet (P13).
+- Rahul en de briefing — schermtekst: "Rahul" met "Zeg wat u geregeld wilt hebben. Hij noteert en legt aan; bevestigen doet een mens.", en "Uw briefing" (`lifestyle.html`) — routes `/api/member/bureau/ai` en `/briefing` — stand: bestaat.
+- Bevestiging door de zaak, spraak, commissieregel, verplichte voorwaarden en verwijzing naar Agenda en Berichten — stand: ontbreekt (P7 gecorrigeerd, P8, P9, P11, P12).
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog en sessie — zonder token: "Log eerst in" met "Het Privékantoor is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account." (`lifestyle.html`).
+- Pas-poort (Lifestyle of Business) — de route weigert met "Het Privékantoor is onderdeel van de Lifestyle Pass." (`server/routes/member/bureau.js`). Het scherm toont dan `RTGDeur`: "De Lifestyle Pass gaat uitsluitend op uitnodiging of na goedkeuring, en dat besluit nemen mensen bij RTG -- niet deze app en niet Rahul." (`public/shared/deur.js`). Er wordt geen toegang beloofd.
+- Andere laadfout — "Kon het Privékantoor niet laden." (`lifestyle.html`).
+- Idempotentie — één sleutel per formulier (`RTGId('lus')`); een dubbele tik, een afgebroken intake en een crash geven één case (scenario `scripts/lib/voltooi/rechterhand.js`, herstelbaar).
+- Een mens op naam in het kantoor — de case loopt via `/api/office/bureau/lus/*`. Zonder bezetting blijft de case op "In voorbereiding" staan, zonder tijd (P10).
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Taalmodel — vrije taal bij Rahul en de intake. Uit: de intake leest met de regels in `server/kern/bureau/lus-regels.js`, en Rahul geeft vaste zinnen zoals "Er staat niets open." (`server/kern/bureau/ai.js`).
+- De zaak — ziet alleen haar eigen onderdelen via `/api/supplier/concierge/opdrachten` (positieve veldlijst `deelnemerBeeld`). Ze kan niets bevestigen of weigeren in de app.
+- Reisboek — het reisdek leest de reizen uit het levensdossier (`server/kern/bureau/reisdek.js`). Zonder reis: "Deze reis staat niet in uw reisboek."
+- Rendez-vous, Agenda en Berichten — vandaag geen koppeling, dus ook geen schermtekst bij uitval.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:rechterhand': {
+  uitgeeft: [
+    { wat: 'onderdeel van een case, alleen de velden van deelnemerBeeld', aan: 'zaak (/api/supplier/concierge/opdrachten)', vorm: 'projectie', bron: 'server/kern/bureau/lus-regels.js' },
+    { wat: 'lus-case met wens, mandaat en speelruimte', aan: 'kantoor (/api/office/bureau/lus/*)', vorm: 'projectie', bron: 'server/routes/office/concierge.js' },
+    { wat: 'klaargezette berichten na een vertraging, pas weg na "verstuur"', aan: 'deelnemers van de case', vorm: 'gebeurtenis', bron: 'server/kern/bureau/lus-uitvoering.js' },
+    { wat: 'tabel van het open tabblad om mee te nemen', aan: 'uitvoerlaag van het lid (RTGUitvoer)', vorm: 'projectie', bron: 'public/apps/lifestyle.html' }
+  ],
+  ontvangt: [
+    { wat: 'reizen uit het reisboek', van: 'levensdossier (kern/levensdossier.js)', vorm: 'projectie', bron: 'server/kern/bureau/reisdek.js' },
+    { wat: 'aanbod, keuze, vertraging, omgevallen onderdeel en bevestiging', van: 'kantoor (/api/office/bureau/lus/*)', vorm: 'gebeurtenis', bron: 'server/routes/office/concierge.js' },
+    { wat: 'pas van de sessie', van: 'sessie (tier)', vorm: 'projectie', bron: 'server/routes/member/bureau.js' }
+  ],
+  ketens: [
+    { naam: 'wens, mens op naam, voorstel buiten mandaat, akkoord', stappen: ['lid: intake', 'kantoor: neem en aanbod', 'lid: voorstel met reden', 'lid: akkoord, vastgezet'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/rechterhand.js (lokale run, nog niet in VOLTOOIPROEF.json)' },
+    { naam: 'zaakkant, vertraging en herstel', stappen: ['kantoor: onderdeel bij een zaak', 'zaak: ziet alleen haar onderdeel', 'kantoor: vertraging, berichten klaarzetten, verstuur', 'kantoor: kapot en vervanger'], stand: 'gesloten', bewijs: 'scripts/conciergeproef.js (CONCIERGEPROEF.json, ZONDER_APP in appcontract.js)' },
+    { naam: 'de zaak bevestigt zelf', stappen: ['zaak: bevestigt of weigert haar onderdeel', 'Privékantoor: "bevestigd" alleen daarna'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'vertraging uit Reizen opent of verzet een case', stappen: ['Reizen: vlucht later', 'Privékantoor: case verzet', 'zaak: nieuw voorstel'], stand: 'ontbreekt', bewijs: 'geen; de vertraging zet het kantoor nu met de hand' },
+    { naam: 'case in Agenda en Berichten', stappen: ['Privékantoor: verwijzing', 'Agenda: tijd verzet mee', 'Berichten: partner ziet de tijd'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'Rendez-vous vraagt De Rechterhand', stappen: ['Rendez-vous: match vraagt een tafel', 'Privékantoor: lus-case'], stand: 'ontbreekt', bewijs: 'geen; Rendez-vous heeft een eigen queue' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Een Lifestyle-lid doet hier zijn hele werk voor een wens die in één case past: vertellen, een voorstel krijgen en beslissen. De kantoormens doet zijn lus in het kantoor, maar een bevestiging van de zaak moet hij buiten de app halen en daarna zelf invoeren. Voor de zaak is het maar een klein deel: zij ziet haar onderdeel en kan in de app niets terugzeggen. Volledig voor: het Lifestyle-lid, voor een wens binnen één case · Deels voor: de kantoormens (bevestiging buiten de app), de zaak (alleen lezen) · Extern nodig: het reserverings- of kassasysteem van de zaak, en telefoon of mail voor haar bevestiging.
 
 ---
 
+### Familie Lezen, overzicht, ontmoeten en het Privékantoor — samen (v3)
+
+**FAMILIES-entry** (voorstel voor het register, zelfde vorm als het appcontract)
+```js
+FAMILIES['livingos-b/lezen'] = {
+  naam: 'Lezen, overzicht, ontmoeten en het Privékantoor',
+  apps: ['link:nieuws', 'link:ontdek', 'link:rendezvous', 'link:rechterhand'],
+  gedeeld: [
+    { wat: 'ledensessie: rtg_member_token uit localStorage als Bearer, auth op elke route (alle vier de schermen)', bestand: 'public/apps/nieuws.html, public/apps/rtg-vandaag.js, public/apps/rendezvous.html, public/apps/lifestyle.html' },
+    { wat: 'RTGId voor idempotentiesleutels (Rendez-vous, Privékantoor)', bestand: 'public/shared/id.js' },
+    { wat: 'meenemen: elk scherm meldt zijn eigen tabel aan met RTGUitvoer.bron', bestand: 'public/shared/uitvoer.js' },
+    { wat: 'pasdeur zonder toegangsbelofte (Privékantoor; Rendez-vous verwijst ernaar met "Bekijk Signature")', bestand: 'public/shared/deur.js' },
+    { wat: 'eigen collectie per module (redactie, rendezvous)', bestand: 'server/kern/eigencollectie.js' },
+    { wat: 'liegpoort: "Het antwoord was onvolledig, dus dit kon niet worden geladen." (Nieuws, Rendez-vous)', bestand: 'public/apps/nieuws.html, public/apps/rendezvous.html' }
+  ],
+  eigenaar: [
+    'link:nieuws → nieuws.lezen (apps/nieuws.html, doelgroep lid)',
+    'link:ontdek → wereld.living (apps/rtg.html, doelgroep lid)',
+    'link:rendezvous → sociaal.ontmoeten (apps/rendezvous.html, doelgroep lid)',
+    'link:rechterhand → concierge.privekantoor (apps/lifestyle.html, doelgroep lifestyle-lid)'
+  ]
+};
+```
+
+**ONTBREKEND** (één regel per schakel die ontbreekt tussen apps van deze familie of naar andere families)
+```
+ONTBREKEND: link:nieuws → media.krant: de correctie- en terugtrekvorm uit journalistiek, zodat een gepubliceerd stuk niet stil vervangen kan worden · HERSTEL · klein
+ONTBREKEND: link:nieuws → comm.berichten en sociaal.salon: verwijzingstype "artikel" (alleen id en kop) · VERDIEPING · klein
+ONTBREKEND: link:nieuws → reizen.reisboek: projectie van een reisstuk via de contextbus · VERDIEPING · middel
+ONTBREKEND: link:ontdek → agenda.afspraken: "niet op te halen" ook bij een foutantwoord met JSON-lichaam (r.ok lezen in rtg-vandaag.js) · HERSTEL · klein
+ONTBREKEND: link:ontdek → elke bron-app: een reden in één zin per kaart en een voorkeur "minder hiervan" · VERDIEPING · klein
+ONTBREKEND: link:ontdek → gezin.*: gezinsprojectie per persoon en per soort · VERDIEPING · middel
+ONTBREKEND: link:ontdek → dag.overzicht: besluit wie eigenaar is van "de dag" · VERDIEPING · klein
+ONTBREKEND: link:rendezvous → link:rechterhand: de vaste zin "regelt De Rechterhand de rest" (rendezvous-date.js) belooft een koppeling die niet bestaat · HERSTEL · klein
+ONTBREKEND: link:rendezvous → link:rechterhand: een concierge-verzoek als lus-case in plaats van een eigen queue · VERDIEPING · middel
+ONTBREKEND: link:rendezvous → agenda.afspraken: date als verwijzing bij beide leden · VERDIEPING · klein
+ONTBREKEND: link:rendezvous → veilig.noodcontacten: veilige date met één gekozen contact · VERDIEPING · klein
+ONTBREKEND: link:rendezvous → kantoor: een uitkomst op een melding, terug naar het lid · VERDIEPING · klein
+ONTBREKEND: link:rendezvous → kern/vergeten: wissen bij opzeggen, bewezen met vindInOpslag · HERSTEL · klein
+ONTBREKEND: link:rechterhand → zaak (supplier): de zaak bevestigt of weigert zelf; nu zet het kantoor "bevestigd" · HERSTEL · middel
+ONTBREKEND: link:rechterhand → agenda.afspraken en comm.berichten: case als verwijzing die meeverzet · VERDIEPING · klein
+ONTBREKEND: link:rechterhand → reizen: een vertraging uit Reizen opent of verzet een case · VERDIEPING · middel
+```
+
+---
 ## Handel (LivingOS-B)
 
 Vier apps rond kopen, vragen en reserveren: **Commerce, Mall, Mijn bestellingen en Food Court**. Geschreven volgens de aanscherping van de eigenaar (19 oktober, later): diep en volledig, vier onderzoeken per app, elke functie bouwbaar concreet, en een toetsbaar eindcontract dat de acht APPWERKT-bewijzen NIET vervangt.
 
 ### Gemeenschappelijke grond voor de vier
 
-**De grens die de code zelf trekt.** RTG stelt samen en zet klaar, de zaak bevestigt (`kern/commerce/overdracht.js`: "een overdracht draagt de keuze over, nooit de bevestiging"; `kern/mall/bestellingen.js`: "geen gezamenlijke afrekening"). Geen van de vier bestelt, boekt of betaalt namens het lid. Betalen is van Geld (`geld.overzicht` → apps/geld.html, RTG Pay, wallet, betaalnaad), bevestigen is van het domein van de verkoper. Deze apps geven alleen verwijzingen uit: een bestel-, aanvraag- of reservering-id plus de zaakcode.
+**De grens die de code zelf trekt.** RTG stelt samen en zet klaar, de zaak bevestigt (`kern/commerce/overdracht.js`: "een overdracht draagt de keuze over, nooit de bevestiging"; `kern/mall/bestellingen.js`: "geen gezamenlijke afrekening"). Geen van de vier bestelt, boekt of betaalt namens het lid. Betalen is van Geld (`geld.overzicht` → apps/geld.html, RTG Pay, wallet, betaalnaad), bevestigen is van het domein van de verkoper. Deze apps geven alleen verwijzingen uit: een bestel-, aanvraag- of reservering-id plus de zaakcode. (gecorrigeerd: de Mall plaatst wel zelf bestellingen. `POST /api/mall/bestel` (eigen merk) en `POST /api/mall/land-bestel` (boerderij; de voorraad daalt) schrijven een regel in `winkelBestellingen` (`server/kern/mall/catalogus.js`), met de melding "Bestelling geplaatst. We nemen contact op." (`public/apps/mall.html`). Betaalde apps koopt het lid in de Mall via `POST /api/appstore/koop` langs RTG Pay, na een bon vooraf (`server/routes/appstore/kopen.js`). Het lid doet dat zelf; RTG bevestigt niets namens een derde.)
 
 **Eigenaren volgens SCHERMEIGENAAR.json:**
 - `winkel.commerce` → apps/commerce.html
@@ -3732,25 +4841,25 @@ Vier apps rond kopen, vragen en reserveren: **Commerce, Mall, Mijn bestellingen 
 
 | Onderwerp | Bron | Wat het voor RTG betekent |
 |---|---|---|
-| Herroepingsrecht op afstand | Richtlijn 2011/83/EU (consumentenrechten), art. 9-16, https://eur-lex.europa.eu/eli/dir/2011/83/oj; in NL BW 7:46d | 14 dagen bedenktijd na ontvangst bij koop op afstand. Uitzonderingen: o.a. bederfelijk, op maat gemaakt, en diensten op een vaste datum zoals een restaurantreservering (art. 16 sub l). |
+| Herroepingsrecht op afstand | Richtlijn 2011/83/EU (consumentenrechten), art. 9-16, https://eur-lex.europa.eu/eli/dir/2011/83/oj; in NL BW 7:46d **(te controleren)** (dit artikel geldt volgens secundaire bronnen sinds de omzetting van de richtlijn niet meer; de Nederlandse plaats zou art. 6:230o BW zijn. wetten.overheid.nl was niet bereikbaar, dus de controle aan de wettekst staat nog open.) | 14 dagen bedenktijd na ontvangst bij koop op afstand. Uitzonderingen: o.a. bederfelijk, op maat gemaakt, en diensten op een vaste datum zoals een restaurantreservering (art. 16 sub l). |
 | Prijsverlaging tonen | Richtlijn 2019/2161 (Omnibus), via art. 6 bis Prijsaanduidingsrichtlijn, https://eur-lex.europa.eu/eli/dir/2019/2161/oj | "Van/voor" alleen met de laagste prijs van de afgelopen 30 dagen. |
 | Marktplaats-transparantie | Verordening 2019/1150 (P2B), https://eur-lex.europa.eu/eli/reg/2019/1150/oj | De rangorde van aanbod moet uitlegbaar zijn voor de zakelijke gebruiker. |
 | Traceerbaarheid van handelaren | Verordening 2022/2065 (DSA), art. 30-32, https://eur-lex.europa.eu/eli/reg/2022/2065/oj | Een marktplaats kent de handelaar, en de koper ziet wie de verkoper is. |
 | Allergenen | Verordening 1169/2011, bijlage II (14 allergenen), https://eur-lex.europa.eu/eli/reg/2011/1169/oj | Ook horeca moet de allergenen kunnen noemen. |
-| Btw | NL 9% en 21%, met de tarieven per categorie | In de code via `kern/fiscaal/tarief.js` (één bron). |
+| Btw | NL 9% en 21%, met de tarieven per categorie **(te controleren)** (geen bron genoemd; het tarief in de code komt uit de landentabel achter `kern/fiscaal/tarief.js`, die de Regelwacht bijhoudt, en niet uit deze regel) | In de code via `kern/fiscaal/tarief.js` (één bron). |
 
 **Marktvergelijking, ook de duurste pakketten** (peildatum 2026-10-19; functies over, verdienmodellen niet):
 
 | Aanbieder (marktreferentie) | Pakket en prijs | Bron | Betrouwbaarheid |
 |---|---|---|---|
-| Amazon Prime | $139/jaar of $14,99/maand (VS) | https://www.nerdwallet.com/finance/learn/amazon-prime-benefits-cost-worth | consistent over bronnen |
+| Amazon Prime | $139/jaar of $14,99/maand (VS) | https://www.nerdwallet.com/finance/learn/amazon-prime-benefits-cost-worth | consistent over bronnen **(te controleren)** |
 | bol.com Select | € 14,99/jaar (BE, klacht dec. 2025) | https://www.bol.com/be/nl/tc/select-voorwaarden/ | andere bronnen noemen € 11,99–12; niet eenduidig |
-| Zalando Plus | vroeger € 9,95–14,95/jaar; nu volgens meerdere bronnen een gratis puntensysteem | https://www.retaildetail.be/nl/news/mode/zalando-plus-ledenprogramma-nu-ook-in-belgie/ | bronnen 2020–2024; geen officiële pagina gevonden |
-| Shopify Plus (verkoperskant, duurste pakket) | vanaf $2.300/maand (3 jaar) of $2.500/maand (1 jaar), plus een variabel deel | https://useamp.com/blog/how-much-does-shopify-plus-cost/ | het variabele deel publiceert Shopify volgens één bron niet |
-| OpenTable voor restaurants (duurste pakket Pro) | Basic $39/maand + $1,50/cover, Core $249, Pro $449 + $1/cover | https://www.capterra.com.au/software/17313/opentable-for-restaurants | een concurrent noemt hogere bedragen; niet officieel geverifieerd |
-| TheFork Yums (diner) | punten per reservering, 1.000 Yums ≈ € 10 korting | https://loyaltyrewardco.com/thefork/ | bron 2022; actuele voorwaarden niet geverifieerd |
+| Zalando Plus | vroeger € 9,95–14,95/jaar; nu volgens meerdere bronnen een gratis puntensysteem | https://www.retaildetail.be/nl/news/mode/zalando-plus-ledenprogramma-nu-ook-in-belgie/ | bronnen 2020–2024; geen officiële pagina gevonden **(te controleren)** |
+| Shopify Plus (verkoperskant, duurste pakket) | vanaf $2.300/maand (3 jaar) of $2.500/maand (1 jaar), plus een variabel deel | https://useamp.com/blog/how-much-does-shopify-plus-cost/ | het variabele deel publiceert Shopify volgens één bron niet **(te controleren)** |
+| OpenTable voor restaurants (duurste pakket Pro) | Basic $39/maand + $1,50/cover, Core $249, Pro $449 + $1/cover | https://www.capterra.com.au/software/17313/opentable-for-restaurants | een concurrent noemt hogere bedragen; niet officieel geverifieerd **(te controleren)** |
+| TheFork Yums (diner) | punten per reservering, 1.000 Yums ≈ € 10 korting | https://loyaltyrewardco.com/thefork/ | bron 2022; actuele voorwaarden niet geverifieerd **(te controleren)** |
 
-Wat RTG overneemt zijn de **functies**: bezorging en retourophaling inbegrepen, ledenprijs, vroege toegang, wachtlijst, tafelvoorkeuren, en een verkoperskant met voorraad, omnichannel en rapportage. Wat RTG **niet** overneemt: spaarpunten, levels, aftellende deals, betaalde zichtbaarheid en "dubbele punten"-acties. Dat zijn lokmechanieken, verboden onder "geen verslavende patronen" en "progressie alleen 18+".
+Wat RTG overneemt zijn de **functies**: bezorging en retourophaling inbegrepen, ledenprijs, vroege toegang, wachtlijst, tafelvoorkeuren, en een verkoperskant met voorraad, omnichannel en rapportage. Wat RTG **niet** overneemt: spaarpunten, levels, aftellende deals, betaalde zichtbaarheid en "dubbele punten"-acties. Dat zijn lokmechanieken, verboden onder "geen verslavende patronen" en "progressie alleen 18+". (gecorrigeerd: spaarpunten bestaan al in de code. `server/kern/ervaring/leden/punten.js` geeft "1 punt per betaalde 10 euro" en verzilvert "100 punten = 10 euro tegoed", via `POST /api/punten` en `POST /api/punten/verzilver` in `server/routes/member/handel/uitjes.js`. Geen van de vier schermen toont ze; niet gemeten of een ander scherm dat doet.)
 
 ---
 
@@ -3830,17 +4939,18 @@ Niet gelopen: bevestigen en betalen in het domein, en de retour na een echte bes
 - **Rollen:** alleen het lid leest het briefje.
 - **Uitzonderingen:** verlopen of van een ander → 404 met uitleg.
 - **Acceptatie:** het domeinscherm opent met de keuze ingevuld; rekent het domein anders, dan toont het domein het verschil.
+- (gecorrigeerd: het briefje bestaat, maar het domeinscherm vult niets in. `public/shared/overdracht.js`, geladen door `shared/basis.js` bij `?overdracht=`, toont een balk met de keuze uit `POST /api/commerce/overdracht/lees`. Het formulier van het domein blijft leeg; het script bevat geen invulcode. Voor deze acceptatie is de stand dus half.)
 - — / —.
 
 **F3 · Herroepingstermijn van 14 dagen** (L5, **ontbreekt**)
 - **Gegevens:** leverdatum uit `lever` van het domein, soort goed uit koopbaar.
-- **Regels:** BW 7:46d. 14 dagen vanaf de dag na ontvangst. Uitgesloten zijn o.a. op maat gemaakt, bederfelijk, verzegeld en geopend, en diensten op een vaste datum (art. 16).
+- **Regels:** BW 7:46d **(te controleren)**. 14 dagen vanaf de dag na ontvangst. Primaire bron: Richtlijn 2011/83/EU art. 9, https://eur-lex.europa.eu/eli/dir/2011/83/oj. De Nederlandse wettekst is niet gecontroleerd. Tot de controle: waarschuwen, niet weigeren. Uitgesloten zijn o.a. op maat gemaakt, bederfelijk, verzegeld en geopend, en diensten op een vaste datum (art. 16).
 - **Rekenwijze:** einddatum = levering + 14 dagen, in de zone van de koper.
 - **Onzekerheid:** zonder gemeten leverdatum staat er "termijn loopt vanaf levering; levering nog niet vastgesteld", geen datum.
 - **Melding:** in de app 3 dagen voor het einde, één keer, zonder pushmelding om terug te lokken.
 - **Rollen:** de koper ziet het; de verkoper ziet dezelfde einddatum.
 - **Acceptatie:** bij een bedenktijd-retour toont het scherm de einddatum. Na de einddatum is `bedenktijd` niet meer kiesbaar, met de wet als reden; de andere gronden blijven.
-- **Kosten** middel / **bak** aanbevolen nu.
+- **Kosten** middel / **bak** nu · HERSTEL. De grond `bedenktijd` staat vandaag op het scherm ("Op andere gedachten", `public/apps/commerce.html`), en de kern omschrijft hem als "de koper heeft binnen de termijn spijt" (`server/kern/commerce/retourlijst.js`). Een termijn is er nergens.
 
 **F4 · Retour volgen tot de afronding** (L5, **half**)
 - **Gegevens:** de vijf standen van retourlijst.js, met wie elke stand zet.
@@ -3849,7 +4959,7 @@ Niet gelopen: bevestigen en betalen in het domein, en de retour na een echte bes
 - **Rollen:** koper, en de verkoper in leverancier-commerce.
 - **Uitzonderingen:** na 60 dagen zonder handeling: vervallen, met reden.
 - **Acceptatie:** het lid ziet elke stand met de naam van de rol die hem zette, en hoort het één keer bij aanvaarding en bij afronding.
-- **Kosten** klein / **bak** aanbevolen nu.
+- **Kosten** klein / **bak** nu · VERDIEPING.
 
 **F5 · Laagste prijs van 30 dagen bij een prijsverlaging** (L2, **ontbreekt**)
 - **Gegevens:** de prijshistorie van het koopbaar item bij de zaak.
@@ -3869,12 +4979,12 @@ Niet gelopen: bevestigen en betalen in het domein, en de retour na een echte bes
 **F7 · Eén winkelingang** (L6, **half**)
 - **Regels:** volgt het besluit over oordeel 29.
 - **Acceptatie:** een lid heeft één plek om te kopen; Commerce is daarvan een stand of de verkoperskant, en de mand is één mand.
-- **Kosten** middel / **bak** aanbevolen nu, na besluit.
+- **Kosten** middel / **bak** nu · VERDIEPING, na besluit.
 
 **F8 · Verkoper op naam van de handelaar** (L3, **half**)
 - **Regels:** DSA art. 30-32. De koper ziet de handelsnaam van de verkoper, nooit een codenaam van een lid.
 - **Acceptatie:** elke afrekeningsregel noemt de verkopende zaak en hoe die bereikbaar is.
-- **Kosten** klein / **bak** aanbevolen nu.
+- **Kosten** klein / **bak** nu · HERSTEL. De afrekening noemt `aanbiederNaam`, maar niet hoe de verkoper bereikbaar is (`public/apps/commerce.html`); DSA art. 30-32 vraagt dat.
 
 **Niet doen:**
 - betaalde zichtbaarheid of boost (lokmechaniek);
@@ -3907,7 +5017,7 @@ Niet gelopen: bevestigen en betalen in het domein, en de retour na een echte bes
 | Dimensie | Meetbaar criterium |
 |---|---|
 | Breedte | Elk werkwoord uit WERKWOORDEN heeft een koopbaar domein dat het levert, en elk NIET_GEBOUWD-werkwoord heeft zijn reden op het scherm. |
-| Professionele diepte | Een bedenktijd-retour toont de wettelijke einddatum en weigert na de termijn, met de wet als reden. |
+| Professionele diepte | Een bedenktijd-retour toont de wettelijke einddatum en weigert na de termijn, met de wet als reden. Tot de controle: waarschuwen, niet weigeren. |
 | Levenscyclus | Kiezen → afrekenen → overdragen → bevestigd (domein) → retour → afgerond, in één voltooiscenario. |
 | Samenwerking en rollen | Elke retourstand draagt de rol die hem zette; RTG staat er nergens bij. |
 | Domeinintelligentie | Geen voorspelling. Elk getoond bedrag is een rekenuitkomst van de server met een tarief, of "onbekend". |
@@ -3982,9 +5092,63 @@ Compleet nieuwe professionele processen. Elk vraagt een besluit van de eigenaar 
 - Food Court is uit: de afrekening zegt dat bevestigen daar nu niet kan, en de Cellier-regel blijft.
 - Het briefje is van een ander: 404.
 - De leverdatum is onbekend: geen einddatum, wel de tekst "loopt vanaf levering".
-- Dag 15: `bedenktijd` is niet meer kiesbaar, met de wet als reden; `defect` wel.
+- Dag 15: `bedenktijd` is niet meer kiesbaar, met de wet als reden; `defect` wel. Tot de controle: waarschuwen, niet weigeren.
 
 **Vraagt besluit.** Oordeel 29 (één winkelingang). Wie de bezorgkosten draagt. **Extern.** Vervoerders voor bezorging en retour (geen merk als partner).
+
+#### v3 — afbouw (Commerce)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Werkwoorden meten over al het aanbod — schermtekst: "De werkwoorden, nu gemeten" (`public/apps/commerce.html`) — route `POST /api/commerce/aanbod` — stand: bestaat
+- Etalage per verkoper, met wat er niet bij staat en waarom — schermtekst: "Etalage van een verkoper", "Staat er niet bij" (`public/apps/commerce.html`) — route `POST /api/commerce/etalage` — stand: bestaat
+- In de mand, ook met een prijsvraag (kamer, nachten) — schermtekst: "In de mand" (`public/apps/commerce.html`) — route `POST /api/commerce/mand/zet` — stand: bestaat
+- Mand met een afrekening per verkoper, btw en blokkades — schermtekst: "De mand", "een afrekening per verkoper", "Leegmaken" (`public/apps/commerce.html`) — routes `POST /api/commerce/mand`, `POST /api/commerce/mand/leeg` — stand: bestaat
+- Totaal dat geen bedrag is — schermtekst: "in totaal, maar dat is een optelsom om te tonen, geen bedrag dat je in één keer bevestigt." (`public/apps/commerce.html`) — stand: bestaat
+- Briefje naar de deur van het domein — schermtekst: "Bevestigen doe je bij de verkoper zelf. Je keuze gaat mee:" en "Naar …" (`public/apps/commerce.html`) — route `POST /api/commerce/overdracht/maak` — stand: bestaat (het invullen in het domein: ontbreekt, zie F2)
+- Retour aanvragen — schermtekst: "Terugsturen", "Bestelkenmerk van de verkoper", "Aanvragen" (`public/apps/commerce.html`) — route `POST /api/commerce/retour/vraag` — stand: bestaat, zonder termijn van 14 dagen (F3)
+- Retour volgen en "verstuurd" zetten — schermtekst: "Ik heb het verstuurd" (`public/apps/commerce.html`) — routes `POST /api/commerce/retour/mijn`, `POST /api/commerce/retour/verstuurd` — stand: half (de standen staan er, de rol die ze zette niet)
+- Mijn briefjes en losse doorrekening — routes `POST /api/commerce/overdracht/mijn`, `POST /api/commerce/reken` — stand: half (de route bestaat, geen scherm roept hem aan; `SCHERMROUTES.json`)
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie (`auth`; de mand staat op `req.session.key`) — zonder token: "Je aanbod en je mand staan achter je account." (`public/apps/commerce.html`, via `RTGLeeg.inlogStand`)
+- Aanbodlaag `kern/mall/aanbod.js` (via `kern/commerce/graaf.js`) — valt een bron uit: "Deze bronnen konden niet worden opgehaald: … De lijst hieronder is dus niet compleet." Valt de hele laag uit, dan zegt de graaf `stuk: aanbod`.
+- Btw-tarief `kern/fiscaal/tarief.js` — onbekend tarief: de afrekening toont `btwOnbekend` en nooit 0%; de letterlijke tekst is niet gemeten
+- Codenaam (`liveCodename`) voor de retour — ontbreekt hij, dan zegt `server/kern/commerce/retourstand.js`: "Bij deze aanvraag is niet vastgelegd naar wie het geld terug zou gaan; dat is met de hand te herstellen, maar niet hier."
+- Opslag (`db`/`save`) — uitval niet gemeten
+- Idempotentie — er is geen sleutel; "In mand" telt met opzet op (APPWERKT herstelbaar)
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Domeinschermen met `shared/overdracht.js` (Food Court, Mall, reisbureau, thuis) — nemen de keuze over — zonder bekende deur: "Voor deze verkoper is geen plek bekend waar dit wordt bevestigd. RTG stuurt je niet naar een deur die hij niet kent."
+- Verkoperskant `leverancier-commerce.html` (`handel.verkoopwegen`) — zet aanvaard, beoordeeld en afgehandeld — op het scherm van het lid staat dan: "Nog niet uitgevoerd: een mens bij de verkoper doet dat, RTG stuurt geen geld uit zichzelf."
+- Geld — de terugbetaling — Commerce betaalt zelf niet; er is geen route naar Geld vanuit dit scherm
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:commerce': {
+  uitgeeft: [
+    { wat: 'overdrachtsbriefje (id + verkoper + pagina, bevroren regels)', aan: 'domeinschermen via shared/overdracht.js', vorm: 'verwijzing', bron: 'server/kern/commerce/overdracht.js' },
+    { wat: 'retouraanvraag met grond en stand', aan: 'leverancier-commerce (handel.verkoopwegen)', vorm: 'projectie', bron: 'server/kern/commerce/retour.js' }
+  ],
+  ontvangt: [
+    { wat: 'koopbare rijen uit tien domeinen', van: 'link:mall (kern/mall/aanbod.js)', vorm: 'projectie', bron: 'server/kern/commerce/graaf.js' },
+    { wat: 'btw-tarief per zaak en categorie', van: 'kern/fiscaal', vorm: 'projectie', bron: 'server/kern/fiscaal/tarief.js' },
+    { wat: 'retourstanden van de verkoper', van: 'leverancier-commerce', vorm: 'gebeurtenis', bron: 'server/kern/commerce/retourstand.js' }
+  ],
+  ketens: [
+    { naam: 'mand → briefje → domein', stappen: ['commerce: mand/zet', 'commerce: overdracht/maak', 'domein: balk met de keuze'], stand: 'open', bewijs: 'test/commerce-overdracht.test.js; scripts/lib/voltooi/commerce.js' },
+    { naam: 'briefje → formulier ingevuld', stappen: ['commerce: overdracht', 'foodcourt: datum en gezelschap ingevuld'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'briefje → Mijn bestellingen', stappen: ['commerce: overdracht', 'domein: bevestigd', 'mijnmall: regel'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'retour koper ↔ verkoper', stappen: ['commerce: retour/vraag', 'leverancier-commerce: aanvaard', 'commerce: verstuurd', 'leverancier-commerce: afgehandeld'], stand: 'open', bewijs: 'test/commerce-retour.test.js' },
+    { naam: 'retour → terugbetaling in Geld', stappen: ['leverancier-commerce: afgehandeld', 'geld: klaarzetten', 'mens: akkoord'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk voor het samenstellen en het vragen van een retour. Kopen doet hij hier niet: bevestigen en betalen gebeuren in het domein en in Geld. Voor de winkelier is dit een deel van zijn werk: zijn retouren en verkoopwegen staan in leverancier-commerce. Voorraad, prijshistorie, verzending en een orderkenmerk dat RTG kan nakijken heeft hij hier niet. Externe software blijft nodig voor de verkoperskant (een winkelpakket zoals Shopify Plus uit de marktvergelijking) en voor vervoerders.
+Volledig voor: lid (samenstellen, retour vragen) · Deels voor: winkelier, kantoor · Extern nodig: winkel- en voorraadsoftware, vervoerder, betaalverwerking buiten RTG Pay.
 
 ---
 
@@ -3997,7 +5161,7 @@ Compleet nieuwe professionele processen. Elk vraagt een besluit van de eigenaar 
   - Mall: `/api/mall`, `/mall/home`, `/zoek`, `/plekken`, `/lijsten`, `/lijst`, `/lijst/nieuw`, `/lijst/zet`, `/lijst/weg`, `/lijst/voegtoe`, `/lijst/regel-weg`, `/bewaar`, `/bewaard`, `/wijzigingen`, `/collecties`, `/collectie`, `/concierge`, `/zakelijk`, `/living`, `/eigen`;
   - App-Bibliotheek: `/mall/apps`, `/apps/catalogus`, `/apps/installeer`, `/apps/weg`, `/apps/mijn`;
   - App Store: `/api/appstore/*`;
-  - routebestanden: mall-vindlaag.js en winkel-bieb.js.
+  - routebestanden: mall-vindlaag.js en winkel-bieb.js (gecorrigeerd: beide staan in `server/routes/member/`).
 - **Kern** (`server/kern/mall/`): aanbod, aanbodrtg, aanbodzaken, catalogus, zoek, zoekweging, zoekfilters, lijsten, lijstregel, bewaard, collecties, etalage, levende-etalage, kaart, extern, concierge, thuisplein.
 - **Voltooiscenario** `scripts/lib/voltooi/mall.js`.
 - **Toetsen:** mall-bewaard, -lijsten, -collecties, -concierge, -kaart, -extern, -context.
@@ -4038,7 +5202,7 @@ Niet gelopen: bestellen, boeken en betalen bij de verkopers; prijswijzigingen op
 - **Onzekerheid:** geen verborgen betaalde plaats.
 - **Rollen:** lid en zaak.
 - **Acceptatie:** bij elke treffer kan het lid "waarom staat dit hier" openen en ziet het de gronden (afstand, overeenkomst, beschikbaarheid). Een zaak ziet in haar app dezelfde gronden.
-- **Kosten** klein / **bak** aanbevolen nu. Het gat is de uitleg, niet de weging.
+- **Kosten** klein / **bak** nu · HERSTEL. Het gat is de uitleg, niet de weging. P2B art. 5 vraagt de hoofdparameters van de rangorde.
 
 **M2 · Bewaard en eigen lijsten** (L1, **bestaat**)
 - **Acceptatie:** Bewaard verschijnt bij het eerste hartje en kan niet weg; de lijsten staan op elk toestel van het lid.
@@ -4049,7 +5213,7 @@ Niet gelopen: bestellen, boeken en betalen bij de verkopers; prijswijzigingen op
 - **Onzekerheid:** valt het domein weg, dan staat er "prijs nu niet op te halen", en nooit de oude prijs als nieuwe.
 - **Melding:** alleen in de app, bij openen van de lijst. Geen pushmelding.
 - **Acceptatie:** het lid ziet oud en nieuw naast elkaar met de datum van de wijziging.
-- **Kosten** klein / **bak** aanbevolen nu, met een toets in de voltooiproef.
+- **Kosten** klein / **bak** nu · HERSTEL, met een toets in de voltooiproef. Het scherm belooft: "Verandert de prijs of beschikbaarheid, dan ziet u dat wanneer u zelf kijkt." (`public/apps/mijnmall.html`). Een prijswijziging is nooit gelopen, dus dit is een meetgat.
 
 **M4 · Een lijst delen met een verbonden lid** (L1/L3, **ontbreekt**)
 - **Gegevens:** de lijst van de eigenaar en de Salon-verbinding.
@@ -4070,7 +5234,7 @@ Niet gelopen: bestellen, boeken en betalen bij de verkopers; prijswijzigingen op
 - **Regels:** lokaal-eerst; zonder model werkt het gewone zoeken door.
 - **Onzekerheid:** een voorstel is geen feit en geen bevestiging.
 - **Acceptatie:** staat het model uit, dan zegt de concierge dat in één zin en blijft het zoekveld werken. Een voorstel wijst altijd naar de deur van de zaak.
-- **Kosten** klein / **bak** aanbevolen nu.
+- **Kosten** klein / **bak** nu · VERDIEPING. Gemeten: `POST /api/mall/concierge` bestaat (`server/routes/member/mall-vindlaag.js`), maar geen bestand in `public/` roept hem aan. Zonder model gaat de zin als gewone zoektekst door (`server/kern/mall/concierge.js`). Of de aanroep `LOCAL_AI_URL` en `RTG_EXTERNE_AI_UIT` volgt, is niet gemeten: de kern geeft een `anthropic`-client door aan `server/ai-kort.js`.
 
 **M7 · App-Bibliotheek in de pas** (L1, **bestaat**)
 - **Acceptatie:** installeren kost 0, en een tweede installatie geeft geen tweede exemplaar.
@@ -4078,13 +5242,13 @@ Niet gelopen: bestellen, boeken en betalen bij de verkopers; prijswijzigingen op
 **M8 · Collecties gescheiden van de rangorde** (L3, **half**)
 - **Regels:** een collectie is curatie door RTG of de zaak, zichtbaar als "samengesteld door …".
 - **Acceptatie:** elke collectie noemt wie haar samenstelde.
-- **Kosten** klein / **bak** aanbevolen nu.
+- **Kosten** klein / **bak** nu · VERDIEPING. De kern geeft `door` en `doorNaam` mee (`server/kern/mall/collecties.js`); `public/apps/mijnmall-mijn.js` toont ze niet.
 
 **Niet doen:** een oneindige feed of gepersonaliseerde lokdeals (verslavend), en een gekochte bovenaan-plaats (P2B en de huisregel).
 
 #### e. RTG-exclusief
 - **Aanbod uit tien domeinen in één zoek, waarvan de bron uitvalt zonder te verdwijnen:** de lijst zegt "kon niet ophalen" in plaats van stil minder te tonen.
-- **Apps zijn inbegrepen in de pas:** de App-Bibliotheek kost niets extra.
+- **Apps zijn inbegrepen in de pas:** de App-Bibliotheek kost niets extra. (gecorrigeerd: dat geldt alleen voor de App-Bibliotheek, en voor een gast niet: "Installeren uit de App-Bibliotheek is voor betalende leden." (`server/routes/member/winkel-bieb.js`). Apps van derden in de App Store kosten geld: "Kopen voor …" via `POST /api/appstore/koop` (`public/apps/mall.html`).)
 
 #### f. Bouwstenen en ontbrekende koppelingen
 - **Bestaand:** zoekweging, lijsten, bewaard, wijzigingen, collecties, concierge, appbieb.
@@ -4165,6 +5329,60 @@ Volgorde onder g.
 
 **Voor de integrator.** Uitgaan (`leven.avond` → avond.html) en Cellier (`leven.cellier`) leveren aanbod aan de Mall. Hun eigenaar blijft hun eigen app.
 
+#### v3 — afbouw (Mall)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Zoeken over alle domeinen — schermtekst: "Vinden wat bij u past. Zonder eindeloos zoeken.", "Zoeken", "Gevonden" (`public/apps/mall.html`) — route `POST /api/mall/zoek` — stand: bestaat (de uitleg per treffer ontbreekt, M1)
+- De levende Mall-voorpagina — schermtekst: "Niet alleen kopen." (`public/apps/mall.html`) — route `POST /api/mall/living` (`public/apps/mall-experience.js`) — stand: bestaat
+- Bewaren met het hartje — schermtekst: "Bewaar", en daarna "Bewaard in uw Mall." (`public/apps/mall-experience.js`) — route `POST /api/mall/bewaar` — stand: bestaat
+- Bewaren in een eigen lijst of reismand — schermtekst: "Bewaren", met de keuze "Bewaren in:" (`public/apps/mall.html`, via `prompt()`) — routes `POST /api/mall/lijsten`, `/lijst/nieuw`, `/lijst/voegtoe` — stand: bestaat
+- Vergelijken van twee mogelijkheden — schermtekst: "Vergelijk wat werkelijk verschilt." (`public/apps/mall.html`) — route geen (alleen in het scherm) — stand: bestaat
+- Eigen merk en boerderij bestellen — schermtekst: "Bestelling plaatsen", "Naam voor de levering", "E-mail", "Facturatie in euro, ex btw." (`public/apps/mall.html`) — routes `POST /api/mall/bestel`, `POST /api/mall/land-bestel` — stand: bestaat. Let op: de echte naam en het e-mailadres gaan als `contactName` en `email` de operationele data in (`server/kern/mall/catalogus.js`), zonder codenaam en buiten de kluis. Dat ontwerp omzeilt de codenaamregel. Ook "ex btw" in een consumentenprijs is een prijsaanduidingsvraag **(te controleren)**.
+- App-Bibliotheek, Reis-Bibliotheek en RTF-Bibliotheek — schermtekst: "App-Bibliotheek", "Installeer", "In mijn kast" (`public/apps/mall.html`) — routes `POST /api/mall/apps/*`, `/api/mall/reis/*`, `/api/mall/rtf/*` — stand: bestaat
+- App Store met een bon vooraf — schermtekst: "Kopen voor …", "Betalen" (`public/apps/mall.html`) — routes `POST /api/appstore/bon`, `POST /api/appstore/koop` (met `idem`) — stand: bestaat
+- Dienstenplein: een offerte en een wachtlijst bij een vakman — schermtekst: "Offerte aanvragen", "Vol? Zet mij op de wachtlijst voor deze dag" (`public/apps/mall.html`) — routes `POST /api/vak/offerte/vraag`, `POST /api/vak/wachtlijst/zet` — stand: bestaat (niet in deze kaart beschreven; een tweede vraagweg naast Mijn bestellingen)
+- Concierge — route `POST /api/mall/concierge` — stand: half (geen scherm roept hem aan)
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token toont het scherm de poort "Een wereld die op u wacht." (`public/apps/mall.html`)
+- Pas-poort — een gast die installeert: "Installeren uit de App-Bibliotheek is voor betalende leden. …"; de zakelijke Mall zonder Business Pass: "De zakelijke Mall hoort bij de Business Pass. Een pas krijgt u niet hier maar via een gesprek met RTG." (`server/routes/member/winkel-bieb.js`, `mall-vindlaag.js`)
+- Gegevenspoort (`gegevensStop`) bij bestellen — het lid krijgt de vraag om ontbrekende gegevens; de letterlijke tekst is niet gemeten
+- RTG Pay en de betaalpoort (`payGate`) voor de App Store — uit: "De betaallaag draait niet mee; betaalde apps zijn nu niet te kopen." (`server/routes/appstore/kopen.js`)
+- Opslag van lijsten (`kern/mall/lijsten.js`) — uitval niet gemeten
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Mijn bestellingen — bewaarde regels, lijsten en wijzigingen — staat de koppeling uit, dan blijft het hartje werken; het scherm zegt dan niets apart (niet gemeten)
+- Reviews van zaken (`POST /api/reviews`, `public/apps/mall-experience-view.js`) — ervaringen van leden — tekst bij uitval niet gemeten
+- Een taalmodel voor de concierge — vertaalt een zin naar filters — uit: de zin gaat als gewone zoektekst door, en bij een fout zegt de route "De concierge is even niet bereikbaar. Zoeken werkt gewoon."
+- Commerce — leest dezelfde aanbodlaag als koopbaar
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:mall': {
+  uitgeeft: [
+    { wat: 'aanbod-rijen uit tien domeinen', aan: 'link:commerce', vorm: 'projectie', bron: 'server/kern/mall/aanbod.js' },
+    { wat: 'lijstregels en Bewaard (aanbodId → pagina van het domein)', aan: 'link:mijnmall', vorm: 'verwijzing', bron: 'server/kern/mall/lijsten.js' },
+    { wat: 'eigen-merk- en boerderijbestelling', aan: 'kantoor (winkelBestellingen)', vorm: 'gebeurtenis', bron: 'server/kern/mall/catalogus.js' }
+  ],
+  ontvangt: [
+    { wat: 'aanbod van zaken, RTG-aanbod, verblijven, reizen', van: 'domeinen (aanbodzaken.js, aanbodrtg.js)', vorm: 'projectie', bron: 'server/kern/mall/aanbod.js' },
+    { wat: 'aankoop van een app', van: 'RTG Pay (Geld)', vorm: 'gebeurtenis', bron: 'server/routes/appstore/kopen.js' }
+  ],
+  ketens: [
+    { naam: 'vinden → bewaren → lijst', stappen: ['mall: zoek', 'mall: bewaar of lijst/voegtoe', 'mijnmall: Bewaard'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/mall.js; test/mall-bewaard.test.js' },
+    { naam: 'eigen merk bestellen → Mijn bestellingen', stappen: ['mall: bestel', 'mijnmall: regel'], stand: 'ontbreekt', bewijs: 'geen (winkelBestellingen staat niet in BRONNEN van kern/mall/bestellingen.js)' },
+    { naam: 'lijst delen', stappen: ['mall: lijst', 'salon: verbinding', 'tweede lid: lezen'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'lijstregel → domeinscherm met item geselecteerd', stappen: ['mall: lijstregel', 'domein: item open'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk voor zoeken, bewaren en apps beheren, en voor een eigen-merkbestelling en een app-aankoop. De zaak doet hier niets: vindbaarheid, etalage en collecties beheert zij elders, en ze kan haar rangorde niet inzien (B1). Het kantoor handelt de eigen-merkbestellingen af buiten dit scherm. Extern blijft voor de zaak een eigen webwinkel of marktplaatskanaal nodig; de marktvergelijking noemt geen voorbeeld voor de vindkant.
+Volledig voor: lid (vinden, bewaren, apps) · Deels voor: zaak, kantoor (eigen merk) · Extern nodig: eigen webwinkel of marktplaats voor de zaak, vervoerder voor het eigen merk.
+
 ---
 
 ### Mijn bestellingen (link:mijnmall, /apps/mijnmall.html)
@@ -4219,13 +5437,13 @@ Niet gelopen: de bestellingen, lijsten en bewaarde items op dit scherm, en het v
 - **Regels:** RTG rangschikt niet op "beste"; het lid kan sorteren op prijs of termijn.
 - **Rekenwijze:** geen score.
 - **Acceptatie:** het lid ziet de reacties in een tabel en kan sorteren; geen enkele reactie draagt een RTG-oordeel.
-- **Kosten** klein / **bak** aanbevolen nu.
+- **Kosten** klein / **bak** nu · VERDIEPING.
 
 **B4 · Verlopen en heropenen** (L5, **half**)
 - **Regels:** na 30 dagen sluit een vraag met een reden; heropenen kan.
 - **Melding:** in de app bij het sluiten.
 - **Acceptatie:** met een verzette klok sluit de vraag op dag 30 met de reden, en heropenen maakt hem weer zichtbaar voor dezelfde zaken.
-- **Kosten** klein / **bak** aanbevolen nu, met een proef met tijdmachine.
+- **Kosten** klein / **bak** nu · HERSTEL, met een proef met tijdmachine. De kern belooft het verlopen (`DAGEN_GELDIG = 30` in `server/kern/mall/aanvraag-acties.js`), maar het is nooit gelopen. Dat is een meetgat. Gemeten: het verlopen wordt bij het lezen afgeleid (`status open` en ouder dan 30 dagen), en niet als stand opgeslagen.
 
 **B5 · Stand van een bestelling van het domein** (L5, **half**)
 - **Onzekerheid:** RTG verzint geen bezorgmoment.
@@ -4295,6 +5513,55 @@ B4 met een proef (klein) → bevoegd meten (klein) → B3 (klein) → B5 (middel
 - Een ander raadt de id: 404.
 - Na 30 dagen: gesloten met reden.
 
+#### v3 — afbouw (Mijn bestellingen)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Alles wat loopt — schermtekst: "Wat u lopen heeft", "Alles wat loopt, zonder schijnzekerheid" (`public/apps/mijnmall.html`) — route `POST /api/mall/bestellingen` — stand: bestaat
+- Een vraag plaatsen — schermtekst: "Iets niet gevonden?", "Vraag plaatsen", en daarna "Uw vraag staat uit. Zaken in dit vak en deze plaats zien hem." (`public/apps/mijnmall.html`, `public/apps/mijnmall.js`) — route `POST /api/mall/aanvraag` — stand: bestaat
+- Een reactie kiezen — schermtekst: "Kiezen" (`public/apps/mijnmall-aanvragen.js`) — route `POST /api/mall/aanvraag/kies` (met `versie`) — stand: bestaat
+- Wijzigen, intrekken en heropenen — schermtekst: "Vraag wijzigen", "Aanvraag intrekken", "Opnieuw openen" (`server/kern/mall/aanvraag-acties.js`, getoond door `public/apps/mall-aanvraag-acties.js`) — routes `POST /api/mall/aanvraag/wijzig`, `/sluit`, `/heropen` — stand: bestaat
+- Verloop van een aanvraag — schermtekst: "Verloop van deze aanvraag" (`public/apps/mall-aanvraag-acties.js`) — stand: bestaat
+- Eigen lijsten en reismanden — schermtekst: "Nieuwe lijst", "Nieuwe reismand", "Openen", "Verwijder", "Weg" (`public/apps/mijnmall.html`, `public/apps/mijnmall.js`) — routes `POST /api/mall/lijsten`, `/lijst`, `/lijst/nieuw`, `/lijst/weg`, `/lijst/regel-weg` — stand: bestaat
+- Bewaard en wijzigingen — schermtekst: "Je hebt nog niets bewaard. In de Mall zet je met het hartje iets in deze lijst.", "Er is niets veranderd aan wat je bewaarde." (`public/apps/mijnmall-mijn.js`) — routes `POST /api/mall/bewaard`, `POST /api/mall/wijzigingen` — stand: half (een wijziging is nooit gelopen)
+- Samengesteld voor nu — schermtekst: "Samengesteld voor nu" (`public/apps/mijnmall.html`) — route `POST /api/mall/collecties` — stand: half (zonder samensteller, M8)
+- Verlopen na 30 dagen — stand: half (afgeleid bij het lezen; nooit gelopen)
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in" en "Mijn Mall is er voor leden. Open de app en log in met je RTG-account." (`public/apps/mijnmall.js`)
+- Versiecontrole op een aanvraag — bij een verouderde stand: "Deze aanvraag is gewijzigd. Vernieuw en bekijk de huidige stand." (`server/kern/mall/aanvraag-acties.js`)
+- Routebeleid (`req.routeBeleid`) — verbergt acties waar de rol niet bij mag; de tekst die het lid dan ziet is niet gemeten
+- Zaakkant achter `supplierAuth` (`server/routes/supplier.js`: `/api/supplier/mall/aanvraag/reageer`, `/behandel`) — zonder zaak blijft er "Nog geen reacties. Zaken in dit vak en deze plaats zien uw vraag." (`public/apps/mijnmall-aanvragen.js`)
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Vijf domeinen in `server/kern/mall/bestellingen.js` (horeca-winkel, diensten/tickets, foodcourt, reisbureau, thuis) — de regels van het overzicht — een bron die uitvalt: "Van … konden we op dit moment niets ophalen. De rest klopt wel." (`public/apps/mijnmall-mijn.js`)
+- Mall — waar het hartje wordt gezet — een regel die verdwenen is: "Staat niet meer in de Mall." (`public/apps/mijnmall-mijn.js`)
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:mijnmall': {
+  uitgeeft: [
+    { wat: 'aanvraag-id met vak en plaats', aan: 'zaakapp (supplier/mall/aanvraag)', vorm: 'verwijzing', bron: 'server/kern/mall/aanvragen.js' },
+    { wat: 'gekozen reactie (geen boeking, geen betaling)', aan: 'zaakapp', vorm: 'gebeurtenis', bron: 'server/kern/mall/aanvraag-acties.js' }
+  ],
+  ontvangt: [
+    { wat: 'orders, boekingen, tickets, reserveringen, reizen en verblijven', van: 'horeca-winkel, diensten, link:foodcourt, reisbureau, thuis', vorm: 'projectie', bron: 'server/kern/mall/bestellingen.js' },
+    { wat: 'lijsten, Bewaard en collecties', van: 'link:mall', vorm: 'projectie', bron: 'server/kern/mall/lijsten.js' },
+    { wat: 'reacties en behandeling van een zaak', van: 'zaakapp', vorm: 'gebeurtenis', bron: 'server/routes/supplier.js' }
+  ],
+  ketens: [
+    { naam: 'vraag → reactie → kiezen → afgerond', stappen: ['mijnmall: aanvraag', 'zaak: reageer', 'mijnmall: kies', 'zaak: behandel/afronden'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/mijnmall.js; test/mall-aanvraag-levensloop.test.js' },
+    { naam: 'verlopen na 30 dagen → heropenen', stappen: ['klok: dag 30', 'mijnmall: heropen'], stand: 'open', bewijs: 'geen (geen tijdmachineproef)' },
+    { naam: 'commerce-briefje en mall-bestelling → overzicht', stappen: ['commerce of mall', 'mijnmall: regel'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk voor een vraag die niemand aanbiedt en voor het overzicht van wat loopt. Wijzigen, annuleren en betalen doet hij bij de aanbieder ("Betalen, wijzigen en annuleren doet u bij de aanbieder.", `public/apps/mijnmall.html`). Voor de zaak is dit een deel van haar werk: ze reageert en rondt af, maar een offerte met voorwaarden en een opdrachtbevestiging bestaan niet (B1 onder Uitkomst B). Extern blijft voor vakmensen offerte- en factuursoftware nodig; de marktvergelijking noemt klusplatforms zonder merk.
+Volledig voor: lid (vraag en overzicht) · Deels voor: zaak · Extern nodig: offerte- en opdrachtsoftware voor de zaak.
+
 ---
 
 ### Food Court (link:foodcourt, /apps/foodcourt.html)
@@ -4302,7 +5569,7 @@ B4 met een proef (klein) → bevoegd meten (klein) → B3 (klein) → B5 (middel
 **Doel.** Alle restaurants op een rij, de vrije tijden voor een datum en een gezelschap, en een tafel aanvragen in één tik. De zaak beslist. Let op de naam: `kern/gast/foodcourt.js` is een ander product (het mandje bij meer loketten); ze delen geen code.
 
 #### a. Inventaris
-- **Routes:** `/api/foodcourt` en `/foodcourt/tijden` (winkel-bieb.js); `/api/reserveer`, `/reserveringen/mijn`, `/reservering/annuleer`, `/reservering/tegenvoorstel` en `/review` (handel/uitjes.js).
+- **Routes:** `/api/foodcourt` en `/foodcourt/tijden` (winkel-bieb.js); `/api/reserveer`, `/reserveringen/mijn`, `/reservering/annuleer`, `/reservering/tegenvoorstel` en `/review` (handel/uitjes.js). (gecorrigeerd: de paden zijn `server/routes/member/winkel-bieb.js` en `server/routes/member/handel/uitjes.js`. Gemeten: `public/apps/foodcourt.html` roept er vier aan: `/api/foodcourt`, `/api/foodcourt/tijden`, `/api/reserveer` en `/api/reserveringen/mijn`. Geen bestand in `public/` roept `/api/reservering/annuleer`, `/api/reservering/tegenvoorstel` of `/api/review` aan.)
 - **Kern:**
   - `kern/foodcourt.js`: vaste lunch- en dinerslots, de klok van de zaak via tijdzone.js, capaciteit via `kern/reservering/capaciteit`;
   - `kern/ervaring/tafels.js`: een dubbele aanvraag voor hetzelfde moment geeft 409;
@@ -4330,8 +5597,8 @@ Niet gelopen: het tegenvoorstel en het meereizende zorgprofiel.
 |---|---|---|---|
 | Vrije tijden en reserveren | OpenTable, TheFork (gratis voor de gast) | **ja** | foodcourt.js, tafels.js |
 | Voorkeuren en allergieën meegeven | OpenTable (gastprofiel) | half | zorgMee (met toestemming); niet in de proef |
-| Wachtlijst | OpenTable Core/Pro | nee | — |
-| Aanbetaling of no-show-garantie | OpenTable (2% transactiekosten, secundaire bron) | nee | — |
+| Wachtlijst | OpenTable Core/Pro **(te controleren)** | nee (gecorrigeerd: een wachtlijst bestaat voor volle events en activiteit-tijdsloten, `server/kern/ervaring/leden/wachtlijst.js` en `POST /api/wachtlijst`; voor een restauranttafel niet) | — |
+| Aanbetaling of no-show-garantie | OpenTable (2% transactiekosten, secundaire bron) **(te controleren)** | nee | — |
 | Spaarpunten (Yums) | TheFork | **niet doen** | lokmechaniek |
 | Echte openingstijden en tafelplan per zaak | restaurantpakketten (Pro) | half | vaste LUNCH/DINER-slots in foodcourt.js; het tafelplan staat in horeca |
 
@@ -4341,7 +5608,7 @@ Niet gelopen: het tegenvoorstel en het meereizende zorgprofiel.
   - werkt met eigen diensten en tijden, tafelcombinaties en een maximum aantal couverts per kwartier;
   - heeft te maken met no-shows;
   - moet de allergenen kunnen benoemen (Verordening 1169/2011, bijlage II);
-  - werkt volgens de hygiënecode (HACCP; in huis: `horeca.haccp` → horeca-haccp.html).
+  - werkt volgens de hygiënecode (HACCP **(te controleren)**, geen bron genoemd; in huis: `horeca.haccp` → horeca-haccp.html).
 - **Organisatorisch (foodcourt-exploitant of horecaketen):** meer vestigingen, groepsreserveringen, aanbetalingen en een eerlijke weergave van ledenvoordelen.
 - **Recht:** een restaurantreservering valt buiten het herroepingsrecht (Richtlijn 2011/83/EU, art. 16 sub l: diensten op een bepaalde datum).
 
@@ -4353,22 +5620,22 @@ Niet gelopen: het tegenvoorstel en het meereizende zorgprofiel.
 - **Rekenwijze:** `capaciteit.past`.
 - **Onzekerheid:** als de zaak geen reserveringen aanneemt: "vol", met reden.
 - **Acceptatie:** een slot is vrij als de capaciteit past, in de tijdzone van de zaak. Een zaak met eigen diensten toont die en niet de vaste lijst.
-- **Kosten** middel / **bak** aanbevolen nu. Vandaag zijn de slots een vaste lijst; de diensten van de zaak bestaan in horeca.
-- **Na te gaan:** tafels.js gebruikt `vandaag()`; of dat ook de klok van de zaak is, is niet geverifieerd.
+- **Kosten** middel / **bak** nu · HERSTEL. Vandaag zijn de slots een vaste lijst; de diensten van de zaak bestaan in horeca. Het scherm belooft: "U ziet de echte vrije tijden en de aanbieder bevestigt zelf." (`public/apps/foodcourt.html`).
+- **Na te gaan:** tafels.js gebruikt `vandaag()`; of dat ook de klok van de zaak is, is niet geverifieerd. (gecorrigeerd, nu gemeten: het is niet de klok van de zaak. `vandaag` staat in `server/kern/ervaring.js` r. 24 als `new Date().toISOString().slice(0, 10)`, dus de UTC-datum. `server/kern/foodcourt.js` toont de tijden wel op `nuBijZaak`. Rond middernacht kunnen het tonen en het aanvragen dus een andere dag als "vandaag" nemen.)
 
 **R2 · Aanvragen, bevestigen, annuleren** (L5, **bestaat**)
 - **Uitzondering:** een tweede aanvraag voor hetzelfde moment geeft 409.
-- **Acceptatie:** "bevestigd" verschijnt alleen als de zaak dat zei; annuleren door het lid maakt de plek vrij.
+- **Acceptatie:** "bevestigd" verschijnt alleen als de zaak dat zei; annuleren door het lid maakt de plek vrij. (gecorrigeerd: annuleren bestaat als route, `POST /api/reservering/annuleer`, maar geen scherm in `public/` roept hem aan. Op het scherm is dat deel van R2 ontbrekend.)
 
 **R3 · Tegenvoorstel** (L5, **half**)
 - **Acceptatie:** het lid ziet het nieuwe tijdstip en kiest ja of nee; bij nee blijft er niets op zijn naam.
-- **Kosten** klein / **bak** aanbevolen nu, met een stap in de voltooiproef.
+- **Kosten** klein / **bak** nu · HERSTEL, met een stap in de voltooiproef. De zaak kan een tegenvoorstel doen (`server/kern/ervaring/tafeluitzondering.js`), maar geen scherm roept `POST /api/reservering/tegenvoorstel` aan. Het lid kan dus niet antwoorden.
 
 **R4 · Allergieën meegeven** (L1/L2, **half**)
 - **Gegevens:** het zorgprofiel van het lid.
-- **Regels:** alleen met toestemming. De zaak ziet het op codenaam. De 14 allergenen van bijlage II zijn de keuzelijst.
+- **Regels:** alleen met toestemming. De zaak ziet het op codenaam. De 14 allergenen van bijlage II zijn de keuzelijst. Die lijst bestaat sinds commit d806269d4 als één bron in `server/kern/allergenen.js` (`ALLERGENEN`, `kiesAllergenen`), en wordt al gebruikt door `kern/tafelwensen.js`, `kern/rechterhand/table.js` en `kern/rechterhand/entourage.js`. Gemeten: het zorgprofiel gebruikt hem nog niet. `zorgZet` in `server/kern/gastzorg.js` neemt tot 12 vrije woorden aan.
 - **Acceptatie:** bij de aanvraag ziet de zaak "pinda, schaaldieren", en zonder toestemming ziet de zaak niets.
-- **Kosten** klein / **bak** aanbevolen nu.
+- **Kosten** klein / **bak** nu · VERDIEPING. De bouwsteen is er; het werk is `zorgZet` op `kiesAllergenen` zetten.
 
 **R5 · Wachtlijst** (L5, **ontbreekt**)
 - **Regels:** het lid hoort het één keer als er plek vrijkomt, met een vervaltijd die de zaak zet. Geen aftelklok in beeld.
@@ -4382,7 +5649,7 @@ Niet gelopen: het tegenvoorstel en het meereizende zorgprofiel.
 
 **R7 · Review na het bezoek** (L1, **bestaat**)
 - **Regels:** 1 tot 5 sterren na een afgeronde dienst; geen gast-review.
-- **Acceptatie:** een review kan pas na een bevestigde en voorbije reservering.
+- **Acceptatie:** een review kan pas na een bevestigde en voorbije reservering. (gecorrigeerd: `POST /api/review` bestaat, maar geen scherm in `public/` roept hem aan. `public/apps/mall-experience-view.js` leest alleen `/api/reviews`.)
 
 **Niet doen:** spaarpunten of "dubbele punten" (lokmechaniek), en een no-show-score op gasten (ranglijst).
 
@@ -4473,9 +5740,110 @@ R6 aanbetaling na besluit.
 - Groepsdiners bij events horen bij `horeca.events`.
 - De Food Court leest alleen; geen dubbele logica.
 
+#### v3 — afbouw (Food Court)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Restaurants op een rij, met zoeken en keukens — schermtekst: "Voor u gevonden", "Alle keukens", "Zoek op restaurant, keuken of plaats", "Nu gesloten voor reserveringen" (`public/apps/foodcourt.html`) — route `POST /api/foodcourt` — stand: bestaat
+- Vrije tijden voor datum en gezelschap — schermtekst: "Vrije tijden", "Lunch", "Diner", "Dit restaurant neemt nu geen reserveringen aan. Kies een andere zaak." (`public/apps/foodcourt.html`) — route `POST /api/foodcourt/tijden` — stand: half (vaste slots; zie R1)
+- Een tafel aanvragen — schermtekst: "Vraag deze tafel aan", "Het restaurant ontvangt uw aanvraag en bevestigt zelf. U heeft nu nog niets aangevraagd.", en daarna "Aanvraag ontvangen. Het restaurant heeft nog niet bevestigd." of "Uw tafel is bevestigd door het restaurant." (`public/apps/foodcourt.html`) — route `POST /api/reserveer` — stand: bestaat
+- Een onbekende uitkomst nakijken — schermtekst: "Controleer mijn aanvraag", "De uitkomst is onbekend. Controleer eerst uw aanvraag; uw invoer blijft staan." (`public/apps/foodcourt.html`) — route `POST /api/reserveringen/mijn` — stand: bestaat
+- Een dubbele aanvraag weigeren — tekst: "U heeft hier al een reservering voor dit moment." (`server/kern/ervaring/tafels.js`) — stand: bestaat
+- Keuzes voor de avond bewaren — schermtekst: "Bewaar mijn keuzes voor deze avond", "Nieuwe avond" (`public/apps/foodcourt.html`; in `sessionStorage` via `public/shared/experience-intent.js`) — stand: bestaat
+- Annuleren, op een tegenvoorstel antwoorden en een review schrijven — routes `POST /api/reservering/annuleer`, `/reservering/tegenvoorstel`, `/api/review` — stand: half (de route bestaat, geen scherm)
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in" en "De Food Court is er voor leden. Open de app en log in met je RTG-account." (`public/apps/foodcourt.html`)
+- Identiteitspoort voor een gratis account — "Reserveren kan zodra uw identiteit geverifieerd is. Eten bestellen en meebestellen kan wel gewoon." (`server/routes/member/handel/uitjes.js`)
+- Gegevenspoort (`gegevensStop`, 428) — `RTGGegevensPoort.vang` vraagt wat er mist en zet de aanvraag daarna door; de letterlijke vraag is niet gemeten
+- Klok van de zaak (`kern/tijdzone.js`, `nuBijZaak`) en capaciteit (`kern/reservering/capaciteit.js`) — uitval niet gemeten. Let op: de aanvraag zelf toetst op de UTC-datum (zie R1).
+- Codenaam (`liveCodename`) — de zaak kent het lid op codenaam; uitval niet gemeten
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Zorgprofiel (`zorgMee`, `server/kern/gastzorg-profiel.js`) — allergieën naar de zaak, met een regel in het inzagejournaal — zonder toestemming geeft `zorgMee` null, en het scherm zegt daar niets over (niet gemeten)
+- Agenda — schermtekst: "Bekijk in mijn agenda" → `/apps/agenda.html?datum=` (`public/apps/foodcourt.html`)
+- Uitgaan — schermtekst: "Bekijk uitgaan", "Bars en avonden" (`public/apps/foodcourt.html`)
+- Commerce-briefje — de balk van `shared/overdracht.js` bij `?overdracht=`, via `shared/basis.js` — zonder briefje laadt de balk niet
+- Lijst meenemen — `RTGUitvoer.bron` met de kolommen "naam, keuken, prijs, stad, aanbod, reserveren mogelijk" (`public/apps/foodcourt.html`)
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:foodcourt': {
+  uitgeeft: [
+    { wat: 'reservering-id + supplierCode + datum/tijd/personen', aan: 'link:mijnmall (bron foodcourt)', vorm: 'projectie', bron: 'server/kern/mall/bestellingen.js' },
+    { wat: 'aanvraag op codenaam', aan: 'zaak (horeca)', vorm: 'gebeurtenis', bron: 'server/kern/ervaring/tafels.js' },
+    { wat: 'datum voor de agenda', aan: 'agenda', vorm: 'verwijzing', bron: 'public/apps/foodcourt.html' }
+  ],
+  ontvangt: [
+    { wat: 'zorgprofiel met toestemming (kopie met op/bron/voor)', van: 'zorgprofiel', vorm: 'projectie', bron: 'server/kern/gastzorg-profiel.js' },
+    { wat: 'overdrachtsbriefje (alleen een balk)', van: 'link:commerce', vorm: 'verwijzing', bron: 'public/shared/overdracht.js' },
+    { wat: 'tegenvoorstel van de zaak', van: 'zaak', vorm: 'gebeurtenis', bron: 'server/kern/ervaring/tafeluitzondering.js' }
+  ],
+  ketens: [
+    { naam: 'aanvragen → zaak bevestigt → lid ziet het', stappen: ['foodcourt: reserveer', 'zaak: bevestig', 'foodcourt: reserveringen/mijn'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/foodcourt.js; test/foodcourt.test.js' },
+    { naam: 'tegenvoorstel → antwoord', stappen: ['zaak: tegenvoorstel', 'foodcourt: ja of nee'], stand: 'open', bewijs: 'geen (geen scherm, niet in de voltooiproef)' },
+    { naam: 'reservering → Mijn bestellingen', stappen: ['foodcourt: reserveer', 'mijnmall: regel'], stand: 'open', bewijs: 'test/mall-bestellingen.test.js (bron foodcourt); niet in een voltooiscenario' },
+    { naam: 'allergenen uit de EU-lijst', stappen: ['zorgprofiel: kiesAllergenen', 'foodcourt: zorgMee', 'zaak: ziet codes'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'briefje → formulier ingevuld', stappen: ['commerce: overdracht', 'foodcourt: datum en gezelschap ingevuld'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'wachtlijst voor een tafel', stappen: ['foodcourt: vol', 'wachtlijst: zet', 'annulering: eerste hoort het'], stand: 'ontbreekt', bewijs: 'geen (wachtlijst.js dekt alleen events en activiteiten)' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk voor vinden en aanvragen. Annuleren, op een tegenvoorstel antwoorden en een review schrijven kan het nog niet op een scherm. Voor het restaurant is dit een deel van zijn werk: het bevestigt en doet tegenvoorstellen in de horecakant (`horeca.beheer`, `horeca.vloer`). Diensten, het tafelplan, de wachtlijst, de aanbetaling en de allergenen per gerecht staan hier niet. Extern blijft een reserveringspakket met wachtlijst en no-show-garantie nodig, zoals OpenTable Pro uit de marktvergelijking.
+Volledig voor: lid (vinden, aanvragen) · Deels voor: restaurant, kantoor · Extern nodig: reserveringssoftware met diensten, wachtlijst en aanbetaling; betaalverwerking voor een garantie.
+
 
 ---
 
+### Familie Handel — samen (v3)
+
+**FAMILIES-entry** (voorstel voor het register, zelfde vorm als het appcontract)
+```js
+FAMILIES['livingos-b/handel'] = {
+  naam: 'Handel',
+  apps: ['link:commerce', 'link:mall', 'link:mijnmall', 'link:foodcourt'],
+  gedeeld: [
+    { wat: 'aanbodlaag over tien domeinen (Mall levert, Commerce leest)', bestand: 'server/kern/mall/aanbod.js' },
+    { wat: 'btw-tarief op één plek', bestand: 'server/kern/fiscaal/tarief.js' },
+    { wat: 'overdrachtsbriefje (kern) en de balk op het domeinscherm', bestand: 'server/kern/commerce/overdracht.js + public/shared/overdracht.js' },
+    { wat: 'overzicht over vijf domeinen, schrijft niets', bestand: 'server/kern/mall/bestellingen.js' },
+    { wat: 'lijsten en Bewaard (Mall en Mijn bestellingen)', bestand: 'server/kern/mall/lijsten.js' },
+    { wat: 'klok van de zaak', bestand: 'server/kern/tijdzone.js' },
+    { wat: 'zorgprofiel dat meereist, met inzagejournaal', bestand: 'server/kern/gastzorg-profiel.js' },
+    { wat: 'de 14 EU-allergenen (nog niet in deze familie gebruikt)', bestand: 'server/kern/allergenen.js' },
+    { wat: 'lege en inlogstand', bestand: 'public/shared/leeg.js' },
+    { wat: 'lijst meenemen', bestand: 'public/shared/uitvoer.js' }
+  ],
+  eigenaar: [
+    'link:commerce → winkel.commerce (apps/commerce.html)',
+    'link:mall → winkel.mall (apps/mall.html)',
+    'link:mijnmall → winkel.bestellingen (apps/mijnmall.html)',
+    'link:foodcourt → horeca.reserveren (apps/foodcourt.html)'
+  ]
+};
+```
+De verkoperskant van Commerce is een eigen scherm met een eigen eigenaar: `handel.verkoopwegen` → apps/leverancier-commerce.html. Hij hoort niet in `apps`, omdat de doelgroep de zaak is en niet het lid.
+
+**ONTBREKEND** (één regel per schakel die ontbreekt tussen apps van deze familie of naar andere families)
+```
+ONTBREKEND: commerce → foodcourt: het briefje vult datum en gezelschap niet in; overdracht.js toont alleen een balk · HERSTEL · middel
+ONTBREKEND: commerce → mijnmall: een doorgegeven en bevestigde keuze verschijnt niet in het overzicht · VERDIEPING · middel
+ONTBREKEND: mall → mijnmall: eigen-merk- en boerderijbestellingen (winkelBestellingen) staan niet in BRONNEN van bestellingen.js, terwijl het scherm "Bestelling geplaatst" zegt · HERSTEL · klein
+ONTBREKEND: mall → identiteitskluis: /api/mall/bestel en /land-bestel bewaren echte naam en e-mail in de operationele data, zonder codenaam · HERSTEL · middel
+ONTBREKEND: mall → mijnmall: twee vraagwegen (Dienstenplein /api/vak/offerte/* in de Mall en /api/mall/aanvraag in Mijn bestellingen) zonder gedeeld overzicht · VERDIEPING · middel
+ONTBREKEND: mall ↔ commerce: twee winkelingangen met elk een eigen mand of aanvraagweg (oordeel 29) · VERDIEPING · middel
+ONTBREKEND: foodcourt → zorgprofiel: zorgZet gebruikt kiesAllergenen uit kern/allergenen.js niet; vrije tekst gaat naar de zaak · VERDIEPING · klein
+ONTBREKEND: foodcourt → scherm: geen ingang voor annuleren, tegenvoorstel en review, terwijl de routes bestaan · HERSTEL · klein
+ONTBREKEND: foodcourt → horeca: de diensten van de zaak sturen de slots niet; de aanvraag toetst op UTC en het tonen op de klok van de zaak · HERSTEL · middel
+ONTBREKEND: foodcourt → wachtlijst: wachtlijst.js dekt events en activiteiten, geen tafel · VERDIEPING · middel
+ONTBREKEND: commerce → domein (lever): geen leverdatum voor de termijn van 14 dagen bij bedenktijd · HERSTEL · middel
+ONTBREKEND: commerce → geld: een afgehandelde retour zet geen terugbetaling klaar in Geld · VERDIEPING · middel
+ONTBREKEND: alle vier → IDOR.json: bevoegd is NIET_GETEST; /api/supplier/mall/aanvraag/behandel staat er niet in · HERSTEL · klein
+ONTBREKEND: mall → scherm: /api/mall/concierge heeft geen scherm · VERDIEPING · klein
+```
 ## Uitgaan en kring (LivingOS-B)
 
 Premiumdomeinkaarten voor Table, Uitgaan, Attenties en Cercle. Volgens de bijstelling en de aanscherping van de eigenaar van 19 oktober 2026: geen nieuwe domeinen, lagen of motoren vóór V1. Elke functie hieronder is een verdieping binnen de bestaande app en de bestaande kernen.
@@ -4498,7 +5866,7 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 **Eigenaar** (SCHERMEIGENAAR.json): `leven.tafel-gelegenheid`.
 
 #### a. Inventaris van het bewezen bestaande
-- **Kern:** `server/kern/rechterhand/table.js` (3,9 KB).
+- **Kern:** `server/kern/rechterhand/table.js` (3,9 KB) (gecorrigeerd: 7,3 KB sinds d806269d4, 7349 bytes).
   - Een gelegenheid zetten, wijzigen of weghalen; maximaal 100.
   - Een gast toevoegen, wijzigen of weghalen, met naam, dieet (80 tekens), tafel en notitie; maximaal 400 per gelegenheid.
   - Een gerecht per gang toevoegen of weghalen; maximaal 30.
@@ -4520,10 +5888,10 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 
 | Aanbieder (referentie) | Pakket, ook het duurste | Relevante functies | Bron |
 |---|---|---|---|
-| Paperless Post | per gast in munten; Basic, Premium en All Access. Een abonnement op jaarbasis ligt rond $250 per jaar voor 250 gasten (derde partij). | Uitnodiging, RSVP-registratie, gastvragen, gastenlijst importeren | usecarly.com/blog/paperless-post-pricing; paperlesspost.com/features |
-| Partiful | gratis voor de gast. Verdienmodel niet geverifieerd. | RSVP, maximum met automatische wachtlijst, bericht aan alle bevestigde gasten, privacy van de gastenlijst | sacra.com/research/partiful (derde partij) |
-| Tripleseat (de professionele kant: zalen en restaurants) | Standard en Premium, alleen op aanvraag. Een "$200–500 per maand"-bereik bij derden is ongesourcet. | Banquet Event Order (opstelling, tijden, menu, dieetwensen, audio en video), contract met e-handtekening, aanbetaling | tripleseat.com/blog/banquet-event-order-samples; saasrat.com/products/tripleseat (derde partij) |
-| SevenRooms (restaurant-CRM) | Starter, plus add-ons Event Management en e-mailmarketing. Enterprise op maat; "$499 per maand per functie" bij derden, ongeverifieerd. | Gastprofiel met allergieën, tafelbeheer, wachtlijst, aanbetaling of kaart vooraf tegen no-shows | sevenrooms.com/pricing; getapp.com/…/sevenrooms/pricing (derde partij) |
+| Paperless Post | per gast in munten; Basic, Premium en All Access. Een abonnement op jaarbasis ligt rond $250 per jaar voor 250 gasten (derde partij) (te controleren). | Uitnodiging, RSVP-registratie, gastvragen, gastenlijst importeren | usecarly.com/blog/paperless-post-pricing; paperlesspost.com/features |
+| Partiful | gratis voor de gast. Verdienmodel niet geverifieerd. | RSVP, maximum met automatische wachtlijst, bericht aan alle bevestigde gasten, privacy van de gastenlijst (te controleren) | sacra.com/research/partiful (derde partij) |
+| Tripleseat (de professionele kant: zalen en restaurants) | Standard en Premium, alleen op aanvraag. Een "$200–500 per maand"-bereik bij derden is ongesourcet (te controleren). | Banquet Event Order (opstelling, tijden, menu, dieetwensen, audio en video), contract met e-handtekening, aanbetaling | tripleseat.com/blog/banquet-event-order-samples; saasrat.com/products/tripleseat (derde partij) |
+| SevenRooms (restaurant-CRM) | Starter, plus add-ons Event Management en e-mailmarketing. Enterprise op maat; "$499 per maand per functie" bij derden, ongeverifieerd (te controleren). | Gastprofiel met allergieën, tafelbeheer, wachtlijst, aanbetaling of kaart vooraf tegen no-shows | sevenrooms.com/pricing; getapp.com/…/sevenrooms/pricing (derde partij) |
 
 **Overgenomen functies:** uitnodiging met RSVP, gastvragen, wachtlijst, draaiboek en BEO-document, en allergenen per gerecht.
 **Niet overgenomen:** munten per gast, boost of promotie, en no-show-geld als lokmiddel. Een aanbetaling is van Geld en de zaak, niet van Table.
@@ -4537,14 +5905,14 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 - **Professioneel (de chef, cateraar of zaal):**
   - werkt met een BEO: datum, tijden, aantal, opstelling, menu per gang, dieet en allergie per gast of per couvert, audio en video, bloemen, aanbetaling en eindafrekening;
   - de 14 allergenen van Verordening (EU) 1169/2011 moeten per gerecht bekend en schriftelijk beschikbaar zijn (NVWA-factsheet, nvwa.nl/…/onderzoeksresultaten-allergenen.pdf);
-  - no-shows worden bestreden met bevestigingen, herinneringen en soms een aanbetaling (KHN, khn.nl/kennis/minder-no-shows-khn-geeft-tips);
-  - een no-show-vergoeding mag alleen als die vooraf is afgesproken. Die juridische kant is niet geverifieerd bij ACM of ConsuWijzer.
+  - no-shows worden bestreden met bevestigingen, herinneringen en soms een aanbetaling (KHN, khn.nl/kennis/minder-no-shows-khn-geeft-tips) (te controleren);
+  - een no-show-vergoeding mag alleen als die vooraf is afgesproken. Die juridische kant is niet geverifieerd bij ACM of ConsuWijzer (te controleren).
 - **Organisatorisch:**
   - de assistent of de Rechterhand die het diner voorbereidt (mandaat);
   - het kantoor dat een privéchef zoekt (concierge-lus);
   - de zaak die alleen het deel ziet dat hij levert.
 - **Privacy (hard):**
-  - een allergie of dieet om medische redenen is een gezondheidsgegeven, art. 9 AVG (legiscope.com/blog/avg-horeca-hotels.html, secundair, nog te toetsen aan de AP);
+  - een allergie of dieet om medische redenen is een gezondheidsgegeven, art. 9 AVG (legiscope.com/blog/avg-horeca-hotels.html, secundair, nog te toetsen aan de AP) (te controleren);
   - een gezondheidsgegeven vraagt een expliciete grondslag en beperking tot het doel.
   - Table bewaart `dieet` nu onbeperkt in vrije tekst bij een gast, en de gast is geen account. Dat is een gegeven over een derde die niet zelf heeft ingestemd.
   - **Dit is het belangrijkste open punt van deze app.**
@@ -4556,10 +5924,10 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 | T1 | Gelegenheid, gasten, tafels, menu | L1 | eigen invoer, `table.js` | grenzen 100/400/30 | geen | geen | alleen het lid | vol geeft een weigering met de reden | 12 gasten met tafel staan er na een herstart nog, en een dubbeltik geeft 1 gast | bestaat | — | (gedekt) |
 | T2 | Dieet als vaste keuzelijst plus vrije notitie | L1 | de 14 allergenen van 1169/2011 bijlage II (`server/kern/allergenen.js`, gedeeld met de tafellijst van de zaak); vegetarisch, halal en dergelijke als vrije aanvulling van 80 tekens | per gast een set codes in de volgorde van de lijst; een code buiten de lijst geeft 400 "Kies de allergenen uit de lijst; iets anders kan als korte aanvulling." | geen | geen | lid | "onbekend" als eigen waarde: nog niet gebouwd | Het lid vinkt "noten" en "melk" aan; die staan als codes bij de gast | **bestaat** (d806269d4; test/table-dieet.test.js). De BEO-weergave (T8) en "onbekend" ontbreken nog | — | gedaan |
 | T3 | Bewaartermijn van dieetgegevens | L5 | T2 | allergie en dieet worden **in de opslag** gewist de dag na de gelegenheid; zonder datum 30 dagen na invoer. De gast blijft staan. Elke lezing veegt het eigen dossier, de bewaarveger alle (`tableVergeetDieet`). De maître krijgt alleen een telling per allergeen, zonder namen | geen | het scherm toont per gast "bewaard t/m …" en een uitleg; een melding vooraf is niet gebouwd | lid | "bewaren voor volgende keer" is niet gebouwd (bewust: de integrator koos een vaste termijn) | Een gelegenheid van eergisteren toont het dieet niet meer, en in de opslag staat het er niet meer (ook na een herstart met RTG_KLOK) | **bestaat** (d806269d4; test/table-dieet.test.js) | — | gedaan |
-| T4 | Allergenen per gerecht en conflictcheck | L4 | menu × T2 | per gang: gasten met een allergeen ∩ allergenen van het gerecht | gerechten zonder allergeneninvoer heten "niet ingevuld", nooit "veilig" | bij het opslaan van een gerecht | lid | gerecht zonder allergenen: waarschuwing "niet gecontroleerd" | Gast met noten plus gerecht met noten geeft "Gang 2: noten — 1 gast (A)". Een gerecht zonder invoer zegt "niet gecontroleerd" | ontbreekt | klein | aanbevolen nu |
-| T5 | Draaiboek (tijden van de avond) | L1 | eigen invoer | gesorteerd op tijd; overlap gemarkeerd | geen | geen | lid | — | Ontvangst 19:00, gang 1 19:45 en toespraak 19:30 staan in tijdvolgorde | ontbreekt | klein | aanbevolen nu |
-| T6 | Kopiëren "zoals vorige keer" | L5 | T1 | kopie zonder datum en zonder dieet (vanwege T3), wel gasten, tafels en menu | geen | geen | lid | — | De kopie heeft dezelfde 12 gasten en 0 dieetregels; het origineel is ongewijzigd | ontbreekt | klein | aanbevolen nu |
-| T7 | Gast als verwijzing naar een Attenties-relatie | L6 | relatie-id uit Attenties | Table bewaart alleen de id plus het tafelnummer; de naam komt live uit Attenties | relatie weg: gast toont "relatie verwijderd" | geen | lid (beide apps van hetzelfde lid) | Attenties uit: de gast is een vrije naam | Een naamwijziging in Attenties is in Table te zien zonder kopie | ontbreekt | middel | aanbevolen nu |
+| T4 | Allergenen per gerecht en conflictcheck | L4 | menu × T2 | per gang: gasten met een allergeen ∩ allergenen van het gerecht | gerechten zonder allergeneninvoer heten "niet ingevuld", nooit "veilig" | bij het opslaan van een gerecht | lid | gerecht zonder allergenen: waarschuwing "niet gecontroleerd" | Gast met noten plus gerecht met noten geeft "Gang 2: noten — 1 gast (A)". Een gerecht zonder invoer zegt "niet gecontroleerd" | ontbreekt | klein | **nu · VERDIEPING** |
+| T5 | Draaiboek (tijden van de avond) | L1 | eigen invoer | gesorteerd op tijd; overlap gemarkeerd | geen | geen | lid | — | Ontvangst 19:00, gang 1 19:45 en toespraak 19:30 staan in tijdvolgorde | ontbreekt | klein | **nu · VERDIEPING** |
+| T6 | Kopiëren "zoals vorige keer" | L5 | T1 | kopie zonder datum en zonder dieet (vanwege T3), wel gasten, tafels en menu | geen | geen | lid | — | De kopie heeft dezelfde 12 gasten en 0 dieetregels; het origineel is ongewijzigd | ontbreekt | klein | **nu · VERDIEPING** |
+| T7 | Gast als verwijzing naar een Attenties-relatie | L6 | relatie-id uit Attenties | Table bewaart alleen de id plus het tafelnummer; de naam komt live uit Attenties | relatie weg: gast toont "relatie verwijderd" | geen | lid (beide apps van hetzelfde lid) | Attenties uit: de gast is een vrije naam | Een naamwijziging in Attenties is in Table te zien zonder kopie | ontbreekt | middel | **nu · VERDIEPING** |
 | T8 | BEO-weergave (afdrukbaar) | L2 | T1, T2, T4, T5 | één document per gelegenheid; zonder gastnamen naar buiten, met couverts per dieetcode | geen | geen | lid | — | De afdruk toont het aantal per dieetcode en het menu per gang, en geen gastnamen | ontbreekt | middel | later |
 | T9 | Verzoek aan de concierge-lus (privéchef of zaal) | L3/L6 | gelegenheid-id, aantal, datum, dieetcodes | via `/api/member/bureau/lus/intake`; de zaak krijgt via de bestaande positieve veldenlijst alleen datum, aantal en codes | het blijft een voorstel; niets is geboekt tot het akkoord | lus-bericht | lid geeft akkoord; kantoormens op naam | buiten mandaat: het lid beslist | Het lid vraagt "privéchef 12 nov"; in de lus staat een case met aantal en dieetcodes, en de zaak ziet geen namen | ontbreekt (de lus bestaat) | middel | later |
 | T10 | Uitnodiging en RSVP aan gasten | L1 | e-mail/telefoon van de gast | vraagt een account van de gast (accountregel) of een eenmalige link | — | uitnodiging, herinnering | gast geeft zelf toestemming | gast zonder account | De gast zegt ja; het lid ziet de stand per gast | ontbreekt | groot | later (vraagt besluit) |
@@ -4587,9 +5955,9 @@ Peildatum van alle marktbronnen: **2026-10-19**. De officiële prijspagina's war
 
 #### g. Prioritering
 1. T3 en T2, privacy eerst: **gedaan** (d806269d4).
-2. T4: klein, hangt aan T2.
-3. T5 en T6: klein.
-4. T7: middel, objectverwijzing in Table.
+2. T4: klein, hangt aan T2. **nu · VERDIEPING**
+3. T5 en T6: klein. **nu · VERDIEPING**
+4. T7: middel, objectverwijzing in Table. **nu · VERDIEPING**
 5. T8 en T9: middel, later.
 6. T10: groot, vraagt een besluit.
 
@@ -4612,7 +5980,7 @@ Compleet nieuwe professionele processen rond een gelegenheid. Elk is bouwbaar co
 
 | # | Proces | Gegevens en bron | Regels en rekenwijze | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium |
 |---|---|---|---|---|---|---|
-| TB1 | **Offerte–contract–BEO-keten met een privéchef of cateraar** | gelegenheid (aantal, datum, dieetcodes), offerteregels van de chef (gang × prijs × couvert), voorwaarden | De offerte is Σ(couverts × prijs per gang) plus vaste kosten. Het contract bevriest de offerte met een versienummer. De BEO wordt uit het contract gegenereerd. Wijziging na het contract maakt een nieuwe versie, en de chef moet opnieuw akkoord geven. | chef (nieuw genre "privéchef"), lid; elke versie met akkoord van beide | Annuleren volgens de vooraf afgesproken voorwaarde; zonder afspraak geen kosten (consumentenrecht, te toetsen) | Het lid ziet offerte v1 → akkoord → BEO. Een wijziging van het aantal maakt v2, die pas geldt na het akkoord van de chef. De aanbetaling loopt via Geld met dezelfde versie-id. |
+| TB1 | **Offerte–contract–BEO-keten met een privéchef of cateraar** | gelegenheid (aantal, datum, dieetcodes), offerteregels van de chef (gang × prijs × couvert), voorwaarden | De offerte is Σ(couverts × prijs per gang) plus vaste kosten. Het contract bevriest de offerte met een versienummer. De BEO wordt uit het contract gegenereerd. Wijziging na het contract maakt een nieuwe versie, en de chef moet opnieuw akkoord geven. | chef (nieuw genre "privéchef"), lid; elke versie met akkoord van beide | Annuleren volgens de vooraf afgesproken voorwaarde; zonder afspraak geen kosten (consumentenrecht, te toetsen) (te controleren) | Het lid ziet offerte v1 → akkoord → BEO. Een wijziging van het aantal maakt v2, die pas geldt na het akkoord van de chef. De aanbetaling loopt via Geld met dezelfde versie-id. |
 | TB2 | **Couvertplanning voor de keuken** | BEO, dieetcodes per couvert, tafelplan | Per tafel per gang een lijst "couvert n: code X". Wisselgerechten worden automatisch per code toegewezen, uit de alternatieven van de chef. | chef en keukenstaf (werkrol); ziet geen gastnamen, alleen tafel en couvertnummer | Een code zonder alternatief blokkeert het afronden van de BEO | De keuken ziet "tafel 2, couvert 4: notenvrij → alternatief B" en nergens een naam. |
 | TB3 | **Zaalboeking met opstelling** | zaal (capaciteit per opstelling: diner, cocktail, theater), datum en tijdslot | De capaciteit per opstelling is een harde grens. Een dubbele boeking op hetzelfde slot wordt geweigerd. | zaal (genre horeca, uit te breiden), lid | brandveilige capaciteit volgens vergunning gaat boven de wens van het lid | 40 gasten in een zaal met 32 dinerplaatsen wordt geweigerd met de reden en het alternatief "cocktail: 60". |
 | TB4 | **Nazorg en bedankronde** | gasten (Attenties-verwijzing), gelegenheid | Na de datum een bedanklijst. Wat gegeven is, gaat de giftgeschiedenis van Attenties in, als verwijzing. | lid | — | Na het diner toont Attenties "aanwezig bij Diner 12 nov" bij elke gast, als verwijzing. |
@@ -4648,6 +6016,60 @@ Storingen:
 
 **Extern.** Bezorging van uitnodigingen in productie (mail en sms via de bestaande postvangerketen).
 
+#### v3 — afbouw (Table)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Gelegenheid aanmaken — schermtekst: "Nieuwe gelegenheid", knop "Aanmaken" (`public/apps/table.html`) — route `POST /api/member/rechterhand/table/zet` — stand: bestaat
+- Gelegenheid wijzigen — de kern neemt een `id` aan in `/table/zet`; het scherm heeft geen wijzigknop — route `POST /api/member/rechterhand/table/zet` — stand: half
+- Gelegenheid verwijderen — schermtekst: "Verwijderen", bevestiging "Deze gelegenheid verwijderen?" (`table.html`) — route `POST /api/member/rechterhand/table/weg` — stand: bestaat
+- Overzicht — schermtekst: "Gelegenheden", leeg "Nog geen gelegenheden." (`table.html`) — route `POST /api/member/rechterhand/table` — stand: bestaat
+- Gast met tafel, allergenen (T2) en aanvulling — schermtekst: "Allergenen (EU-lijst)", placeholder "aanvulling, bijv. vegetarisch", knop "+ gast" (`table.html`) — route `POST /api/member/rechterhand/table/gast` — stand: bestaat (d806269d4). Een code buiten de lijst geeft "Kies de allergenen uit de lijst; iets anders kan als korte aanvulling." (`server/kern/allergenen.js`)
+- Gast wijzigen — route `POST /api/member/rechterhand/table/gast/zet` bestaat en het voltooiscenario loopt hem; het scherm roept hem niet aan (wijzigen = weghalen en opnieuw toevoegen) — stand: half
+- Gast weghalen — knop "×" (`table.html`) — route `POST /api/member/rechterhand/table/gast/weg` — stand: bestaat
+- Wistermijn van dieet (T3) — schermtekst: "Wij wissen het de dag na de gelegenheid" en per gast "bewaard t/m …" (`table.html`); de opslag wordt geveegd bij elke lezing (`veeg` in `server/kern/rechterhand/table.js`) en door `tableVergeetDieet` — route `POST /api/member/rechterhand/table` — stand: bestaat (d806269d4; `test/table-dieet.test.js`)
+- Menu per gang met wijn — knop "+ gerecht", placeholders "gang", "gerecht", "wijn" (`table.html`) — routes `POST /api/member/rechterhand/table/menu` en `/table/menu/weg` — stand: bestaat
+- De maître — schermtekst: "Vraag de maître", knop "Vraag" (`table.html`) — route `POST /api/member/rechterhand/ai` (app `table`) — stand: bestaat. Hij krijgt per allergeen een aantal en geen namen (`server/kern/rechterhand/ai.js`)
+- Meenemen — de gastenlijst van de open gelegenheid of het overzicht (`RTGUitvoer.bron` in `table.html`) — stand: bestaat
+- **Meetgat · nu · HERSTEL:** de APPWERKT-stempel (`af81b538`, 19 oktober 05:16) en de voltooimeting (`f85c044e`) liggen vóór d806269d4 (16:26), dat `table.js` en `scripts/lib/voltooi/table.js` veranderde. De acht bewijzen in tabel a gaan dus over de code van vóór T2 en T3. Opnieuw meten.
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in" (`table.html`).
+- Pas-poort (`eis` in `server/routes/member/rechterhand.js`) — de API geeft 403 "Deze app is onderdeel van de Lifestyle Pass."; het scherm toont dan de deur uit `public/shared/deur.js`: "De Lifestyle Pass gaat uitsluitend op uitnodiging of na goedkeuring, en dat besluit nemen mensen bij RTG -- niet deze app en niet Rahul."
+- Levensbak (`L(key)` in `server/kern/rechterhand/index.js`, op `server/kern/levensdossier/`) — bij een fout of een onvolledig antwoord: "Kon Table niet laden."; een uitzondering in de route geeft "Er ging iets mis. Probeer het opnieuw."
+- Bewaarveger (`server/opzet/bewaarveger.js`, `tableVergeetDieet` aangesloten in `server/opzet/start.js`) — valt hij uit, dan veegt elke lezing en schrijving van het eigen dossier nog steeds; wat er in een dossier zonder lezing blijft staan: niet gemeten.
+- Dubbeltik — het scherm stuurt geen `idem`; de voltooiproef bewijst toch één gast bij een dubbeltik (`scripts/lib/voltooiboek.js`). Welk mechanisme dat doet: niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Taalmodel voor de maître — vrij antwoord. Zonder model: "Tot uw dienst. … Stel mij gerust een vraag; wat een boeking vraagt, zet ik voor u klaar bij De Rechterhand." (`ai.js`). **nu · HERSTEL:** die zin belooft een handeling die niet gebeurt; `rechterhandAI` geeft alleen tekst terug en opent geen lus-case. Hetzelfde geldt voor Attenties en Cercle.
+- Desktopwidget — `public/shared/interface/world-widget-data.js` leest `/api/member/rechterhand/table` (`events`). Wat de widget zegt als Table faalt: niet gemeten.
+- Attenties en de concierge-lus — niet gekoppeld, en het scherm zegt er niets over. `SCHERMEIGENAAR.json` noemt in `doel` wel "via De Rechterhand (concierge)".
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:table': {
+  uitgeeft: [
+    { wat: 'aantal gasten per allergeen van de eerstvolgende gelegenheid, zonder namen', aan: 'de maître (rechterhandAI)', vorm: 'projectie', bron: 'server/kern/rechterhand/ai.js' },
+    { wat: 'de lijst gelegenheden (events)', aan: 'desktopwidget', vorm: 'projectie', bron: 'public/shared/interface/world-widget-data.js' }
+  ],
+  ontvangt: [
+    { wat: 'de 14 allergeencodes van bijlage II', van: 'server/kern/allergenen.js (ook gelezen door kern/tafelwensen.js)', vorm: 'verwijzing', bron: 'server/kern/rechterhand/table.js' },
+    { wat: 'de veegronde', van: 'bewaarveger', vorm: 'gebeurtenis', bron: 'server/opzet/start.js' }
+  ],
+  ketens: [
+    { naam: 'diner met dieet en wistermijn', stappen: ['Table: gelegenheid, gasten met codes, menu', 'bewaarveger: wist allergenen en aanvulling de dag na de datum'], stand: 'gesloten', bewijs: 'test/table-dieet.test.js; scripts/lib/voltooi/table.js' },
+    { naam: 'allergenen per gerecht (T4)', stappen: ['Table: gerecht met codes', 'Table: botsing per gang'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'gast als relatie (T7)', stappen: ['Attenties: relatie-id', 'Table: gast verwijst ernaar'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'privéchef via de lus (T9)', stappen: ['Table: gelegenheid', 'Rechterhand: POST /api/member/bureau/lus/intake', 'zaak: datum, aantal, codes'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid dat zelf een privédiner organiseert, doet hier zijn hele werk: gasten, tafels, allergenen met wistermijn en het menu. Voor de chef, cateraar of zaal is het hooguit een deel: er is geen rol, geen BEO en geen aanbetaling. De assistent met mandaat en het kantoor hebben geen eigen ingang en geen lus vanuit een gelegenheid. Uitnodigen en RSVP doet Table niet.
+Volledig voor: het lid als gastheer · Deels voor: chef, cateraar of zaal; assistent; kantoor · Extern nodig: uitnodiging en RSVP (zoals Paperless Post of Partiful), BEO- en zaalsoftware (zoals Tripleseat).
+
 ---
 
 ### Uitgaan (link:uitgaan, /apps/uitgaan.html)
@@ -4679,8 +6101,8 @@ Storingen:
 
 | Referentie | Pakket, ook het duurste | Functies | Bron |
 |---|---|---|---|
-| Eventbrite | Flex (per ticket) en Pro (abonnement). Servicekosten circa 3,7% + $1,79 per betaald ticket plus 2,9% verwerking (derde partij); een organisatorfee boven 25 tickets. | Mobiele check-in met QR, wachtlijst, capaciteit | checkoutpage.com/blog/eventbrite-pricing-change-august-2023; softwareadvice.com/event-management/eventbrite-profile (derde partij) |
-| Partiful | gratis voor de gast | RSVP, maximum met wachtlijst, bericht aan bevestigde gasten, verborgen gastenlijst | sacra.com/research/partiful (derde partij) |
+| Eventbrite | Flex (per ticket) en Pro (abonnement). Servicekosten circa 3,7% + $1,79 per betaald ticket plus 2,9% verwerking (derde partij); een organisatorfee boven 25 tickets (te controleren). | Mobiele check-in met QR, wachtlijst, capaciteit | checkoutpage.com/blog/eventbrite-pricing-change-august-2023; softwareadvice.com/event-management/eventbrite-profile (derde partij) |
+| Partiful | gratis voor de gast | RSVP, maximum met wachtlijst, bericht aan bevestigde gasten, verborgen gastenlijst (te controleren) | sacra.com/research/partiful (derde partij) |
 | SevenRooms (horeca-CRM met event-add-on) | Starter plus add-ons; Enterprise op maat | Wachtlijst, gastprofiel, aanbetaling tegen no-show | sevenrooms.com/pricing |
 
 **Overgenomen:** wachtlijst, check-in, één bericht aan alle gasten, verborgen gastenlijst, herinnering.
@@ -4693,7 +6115,7 @@ Storingen:
   - een gastenlijst met plus-één;
   - check-in aan de deur en een deurteller;
   - leeftijdsgrens voor alcohol;
-  - selectiebeleid dat niet mag discrimineren: het College voor de Rechten van de Mens oordeelde in 2014 dat een Amsterdamse club aan de deur discrimineerde (nltimes.nl/node/17011, secundair). Een gastenlijst op codenaam helpt, want de deur ziet geen naam of afkomst, maar een weigering aan de deur blijft een menselijk besluit dat uitlegbaar moet zijn;
+  - selectiebeleid dat niet mag discrimineren: het College voor de Rechten van de Mens oordeelde in 2014 dat een Amsterdamse club aan de deur discrimineerde (nltimes.nl/node/17011, secundair) (te controleren). Een gastenlijst op codenaam helpt, want de deur ziet geen naam of afkomst, maar een weigering aan de deur blijft een menselijk besluit dat uitlegbaar moet zijn;
   - no-shows en wachtlijsten.
 - **Organisatorisch:** de zaak met meerdere medewerkers (manager, deur), het festival met crew (`festival.crewdashboard`), en events van de Foundation of School (`rtf.club`).
 
@@ -4702,12 +6124,12 @@ Storingen:
 | # | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Moment | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | U1 | Aanmelden met capaciteit | L1/L2 | `e.capacity`, `e.guests` | bezet = Σ qty; weigeren als bezet + qty > capaciteit | geen | melding aan lid en zaak | lid; geen gast | events-optie uit: 409 met de naam van de zaak | Vol geeft "Dit event is vol"; dubbel geeft "U staat al op de gastenlijst" | bestaat | — | (gedekt) |
-| U2 | Wachtlijst zichtbaar en doorschuiven | L5 | `wachtlijst.js` | FIFO; bij een afmelding krijgt de eerste met passend qty de plek, en de rest blijft staan | geen | melding "u bent erbij" | lid | qty past niet: de volgende | Bij vol staat het lid op de wachtlijst; na een afmelding staat de eerste op de gastenlijst en krijgt één melding (in de proef) | half | klein | aanbevolen nu |
-| U3 | Check-in in de proef en in "mijn avonden" | L5 | `planning.js` `checkedIn` | een schakelaar; de log meldt wie het deed | geen | geen | zaakmedewerker | per ongeluk ingecheckt: terugzetten | Na de check-in toont het lid "Ingecheckt"; terugzetten toont weer "Op de gastenlijst" | half | klein | aanbevolen nu |
-| U4 | Gezelschap als leden | L3 | Salon-connecties | het lid kiest vrienden; ieder heeft een eigen regel met de verwijzing "met <codenaam>"; capaciteit telt per persoon | geen | melding aan de vriend | de vriend moet zelf accepteren | de vriend weigert: de plek komt vrij | Twee vrienden zien de avond in hun eigen lijst en kunnen zelf afmelden | ontbreekt | middel | aanbevolen nu |
+| U2 | Wachtlijst zichtbaar en doorschuiven | L5 | `wachtlijst.js` | FIFO; bij een afmelding krijgt de eerste met passend qty de plek, en de rest blijft staan | geen | melding "u bent erbij" | lid | qty past niet: de volgende | Bij vol staat het lid op de wachtlijst; na een afmelding staat de eerste op de gastenlijst en krijgt één melding (in de proef) | half | klein | **nu · VERDIEPING** |
+| U3 | Check-in in de proef en in "mijn avonden" | L5 | `planning.js` `checkedIn` | een schakelaar; de log meldt wie het deed | geen | geen | zaakmedewerker | per ongeluk ingecheckt: terugzetten | Na de check-in toont het lid "Ingecheckt"; terugzetten toont weer "Op de gastenlijst" | half (gecorrigeerd: het scherm toont al "Ingecheckt" uit `ingecheckt` van `/api/uitgaan/mijn` en verbergt dan "Afmelden"; wat ontbreekt is de check-in in `scripts/lib/voltooi/uitgaan.js`) | klein | **nu · HERSTEL** |
+| U4 | Gezelschap als leden | L3 | Salon-connecties | het lid kiest vrienden; ieder heeft een eigen regel met de verwijzing "met <codenaam>"; capaciteit telt per persoon | geen | melding aan de vriend | de vriend moet zelf accepteren | de vriend weigert: de plek komt vrij | Twee vrienden zien de avond in hun eigen lijst en kunnen zelf afmelden | ontbreekt | middel | **nu · VERDIEPING** |
 | U5 | Herinnering op de dag | L1 | datum en tijd van het event | 1 melding op de dag (bijv. 4 uur vooraf), nooit herhaald | geen | 1× | lid kan het uitzetten | event zonder tijd: geen melding | Er komt precies één melding op de dag, en geen na afmelden | ontbreekt | klein | later |
 | U6 | Bericht van de zaak aan alle gasten | L2 | gastenlijst | één bericht per wijziging; geen marketing | geen | 1× per bericht | zaakmanager | — | Een tijdswijziging bereikt elke gast één keer, en een afgemelde gast niet | ontbreekt | middel | later |
-| U7 | Leeftijdsgrens per avond | L2 | `volwassen()` (`kern/volwassen.js`) | een avond met "18+" weigert een lid zonder bevestigde leeftijd, met de reden | leeftijd zoals opgegeven telt niet als bevestigd (`leeftijdBron`) | — | zaak zet de grens | — | Een lid zonder A3 krijgt bij een 18+-avond een weigering in woorden | ontbreekt | klein | aanbevolen nu |
+| U7 | Leeftijdsgrens per avond | L2 | `volwassen()` (`kern/volwassen.js`) | een avond met "18+" weigert een lid zonder bevestigde leeftijd, met de reden | leeftijd zoals opgegeven telt niet als bevestigd (`leeftijdBron`) | — | zaak zet de grens | — | Een lid zonder A3 krijgt bij een 18+-avond een weigering in woorden | ontbreekt | klein | **nu · VERDIEPING** |
 | U8 | Voorstel "past bij u" | L4 | eigen geschiedenis | voorstel met reden; aanmelden doet het lid zelf | het is een voorstel | geen | lid | — | Rahul noemt drie avonden met de reden en meldt niets aan | ontbreekt | middel | later |
 | U9 | Ticket en betaling | L6 | mall-bestelling | Uitgaan toont alleen de verwijzing naar het ticket (`pagina`) | — | — | Geld | — | Een gekocht ticket staat in "mijn avonden" met een link naar de mall | half | — | (keten bestaat) |
 | U10 | "Bijna vol", populariteitsranglijst | — | — | — | — | — | — | — | — | — | — | **niet doen**: kunstmatige urgentie en vergelijking |
@@ -4734,9 +6156,9 @@ Storingen:
 - IDOR-dekking van `/api/event/rsvp*`.
 
 #### g. Prioritering
-1. U2 en U3: proef en scherm, klein.
-2. U7: klein; hangt aan `volwassen()`.
-3. U4: middel; Salon-connecties.
+1. U2 en U3: proef en scherm, klein. U2 **nu · VERDIEPING**; U3 **nu · HERSTEL** (meetgat).
+2. U7: klein; hangt aan `volwassen()`. **nu · VERDIEPING**
+3. U4: middel; Salon-connecties. **nu · VERDIEPING**
 4. U5 en U6: later.
 5. U8: later.
 
@@ -4764,7 +6186,7 @@ Storingen:
 
 **Modus LOS.**
 - **Werkt:** aanmelden en afmelden werken zonder de mall.
-- **Na te gaan:** of het scherm eerlijk zegt dat de bestellingen niet laden als `/api/mall/bestellingen` faalt. De code vangt het op; of dat ook zichtbaar is, niet geverifieerd.
+- **Na te gaan:** of het scherm eerlijk zegt dat de bestellingen niet laden als `/api/mall/bestellingen` faalt. De code vangt het op; of dat ook zichtbaar is, niet geverifieerd. (gecorrigeerd: het zegt het niet. `laadMijn` in `uitgaan.html` maakt van een mislukte `/api/mall/bestellingen` stil een lege lijst, en van een mislukte `/api/uitgaan/mijn` ook; falen beide, dan staat er "Nog niets gepland. Kies hieronder een tafel of avond; alleen bevestigde gegevens verschijnen hier." **nu · HERSTEL**.)
 
 **Modus SAMEN.**
 - **Ontvangen:** mall-tickets en reserveringen (verwijzing).
@@ -4790,6 +6212,61 @@ Storingen:
 
 **Vraagt besluit.** Gezelschap met niet-leden (accountregel). **Extern.** Geen.
 
+#### v3 — afbouw (Uitgaan)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Adressen per soort — schermtekst: chips "Alles", "Bars", "Clubs", "Beachclubs"; leeg "Geen adressen in deze categorie." (`public/apps/uitgaan.html`) — route `POST /api/uitgaan` (`server/kern/uitgaan.js`) — stand: bestaat
+- Avonden van een zaak — schermtekst: "Nog N plekken vrij" of "Vol"; leeg "Geen avonden gepland." (`uitgaan.html`) — route `POST /api/uitgaan` — stand: bestaat
+- Aanmelden met 1–8 personen — knoppen "−", "+", "Aanmelden"; daarna "Je staat op de gastenlijst. Nog … plekken vrij." (`uitgaan.html`) — route `POST /api/event/rsvp` — stand: bestaat. Weigeringen in woorden: "U staat al op de gastenlijst.", "Dit event is vol.", "<zaak> neemt op dit moment geen event-aanmeldingen aan.", "Alleen voor leden." (`server/routes/member/terplaatse.js`)
+- Mijn avond — kop "Mijn avond", stand "Op de gastenlijst" of "Ingecheckt"; leeg "Nog niets gepland. Kies hieronder een tafel of avond; alleen bevestigde gegevens verschijnen hier." (`uitgaan.html`) — route `POST /api/uitgaan/mijn` — stand: bestaat
+- Afmelden — knop "Afmelden", daarna "Afgemeld." (`uitgaan.html`) — route `POST /api/event/rsvp/annuleer` — stand: bestaat. Na de check-in verbergt het scherm de knop; de API weigert een afmelding na de check-in niet (`server/kern/ervaring/leden/wachtlijst.js`).
+- Wachtlijst — bij vol toont het scherm "Vol" en een uitgeschakelde knop "Aanmelden". `POST /api/wachtlijst` bestaat (`server/routes/member/handel/uitjes.js`), het scherm roept hem niet aan — stand: ontbreekt op het scherm. Bij een afmelding krijgt de eerste alleen een melding: "Er kwam een plek vrij voor … Wees er snel bij: de plek is niet gereserveerd." Een aantal personen kent de wachtlijst niet.
+- Meenemen — de avonden van de open zaak of de adressenlijst (`RTGUitvoer.bron` in `uitgaan.html`) — stand: bestaat
+- **Toon · nu · HERSTEL:** het scherm wisselt "u" en "je" door elkaar: "Uw avond" en "U staat al op de gastenlijst." naast "Je staat op de gastenlijst." en "Uitgaan regel je als lid." De merkregels vragen één vorm per pas.
+- **Meetgat · nu · HERSTEL:** `bevoegd` is NIET_GETEST omdat `/api/event/rsvp`, `/api/event/rsvp/annuleer` en `/api/fluister` in IDOR.json onbereikbaar zijn (APPWERKT.json).
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in" en "Uitgaan regel je als lid. Open de app en log in met je RTG-account." (`uitgaan.html`). Een gastsessie krijgt bij aanmelden 403 "Alleen voor leden."
+- Codenaam (`req.session.account.codename`) — de gastenlijst draagt alleen de codenaam; de melding aan het lid eindigt met "Uw codenaam is uw toegang." (`terplaatse.js`). Uitval: niet gemeten.
+- Zaakregister (`db.data.suppliers` met hun events) — faalt `/api/uitgaan`, dan staat de foutmelding van de API in de lijst, of "Er ging iets mis." (`uitgaan.html`).
+- Meldingslaag (`notify`, `notifySupplier`) — uitval: niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Mall — tickets en reserveringen in "Mijn avond", met de link "Bekijken" (`/api/mall/bestellingen`). Uit: het scherm zegt niets (zie de correctie onder Modus LOS).
+- Rahul — knop "Vraag Rahul", met "Zeg wat je wilt. Ik reserveer, boek, meld je aan en bestel, alles met jouw eigen inlog." (`POST /api/fluister`). Wat die route werkelijk uitvoert: niet gemeten. Fout: "Er ging iets mis. Probeer het opnieuw."
+- Navigatie — "Open route" linkt naar `/apps/navigatie.html` zonder de zaak of het adres mee te geven.
+- Leven — `public/apps/leven-panelen.js` leest `/api/uitgaan` voor het ontdekpaneel.
+- Zaakkant — check-in via `POST /api/supplier/event/checkin` (`server/routes/supplier/events/planning.js`), met de logregel "checkte … in bij"; daarna toont "Mijn avond" "Ingecheckt".
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:uitgaan': {
+  uitgeeft: [
+    { wat: 'gastregel: codenaam, aantal, tijdstip', aan: 'zaak (horeca.club, horeca.events)', vorm: 'projectie', bron: 'server/routes/member/terplaatse.js' },
+    { wat: 'melding "Aanmelding voor …" en "Afmelding voor …"', aan: 'zaak', vorm: 'gebeurtenis', bron: 'terplaatse.js; server/kern/ervaring/leden/wachtlijst.js' },
+    { wat: 'vrijgekomen plek', aan: 'de eerste op de wachtlijst', vorm: 'gebeurtenis', bron: 'wachtlijst.js (meldWachtlijst)' }
+  ],
+  ontvangt: [
+    { wat: 'gepubliceerde avonden met capaciteit', van: 'zaakkant (POST /api/supplier/event)', vorm: 'projectie', bron: 'server/kern/uitgaan.js' },
+    { wat: 'de check-in-stand', van: 'zaakkant (POST /api/supplier/event/checkin)', vorm: 'projectie', bron: 'server/kern/uitgaan.js (mijnAvonden: ingecheckt)' },
+    { wat: 'tickets en reserveringen', van: 'Mall (POST /api/mall/bestellingen)', vorm: 'verwijzing', bron: 'public/apps/uitgaan.html (pagina)' }
+  ],
+  ketens: [
+    { naam: 'aanmelden tot de zaak ziet de codenaam', stappen: ['Uitgaan: POST /api/event/rsvp', 'zaak: gastenlijst via /api/supplier/state'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/uitgaan.js' },
+    { naam: 'afmelden geeft de plek aan de wachtlijst', stappen: ['Uitgaan: /api/event/rsvp/annuleer', 'wachtlijst: de eerste krijgt een melding'], stand: 'open', bewijs: 'geen (test/wachtlijst.test.js loopt de zorgtak, niet de event-tak)' },
+    { naam: 'check-in aan de deur tot "Ingecheckt"', stappen: ['zaak: /api/supplier/event/checkin', 'Uitgaan: "Ingecheckt" in Mijn avond'], stand: 'open', bewijs: 'geen' },
+    { naam: 'gezelschap als leden (U4)', stappen: ['Uitgaan: vrienden kiezen', 'Salon: /api/member/connections', 'vriend: accepteert zelf'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: '18+-avond (U7)', stappen: ['zaak: grens per event', 'Uitgaan: volwassen()'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk voor een avond met gastenlijst: kiezen, aanmelden, zien of hij erop staat en afmelden. De zaak doet hier niets; haar kant (events, check-in, clubdeur) woont in `horeca.club` en `horeca.events`. Voor een lid op de wachtlijst is het een deel: het scherm zet hem er niet op. Tickets en betaling blijven bij de Mall.
+Volledig voor: het lid met een gastenlijstavond · Deels voor: het lid bij een volle avond; het gezelschap (alleen een aantal, geen eigen regel) · Extern nodig: ticketverkoop met check-in voor betaalde avonden buiten RTG (zoals Eventbrite).
+
 ---
 
 ### Attenties (link:attenties, /apps/attenties.html)
@@ -4802,7 +6279,7 @@ Storingen:
   - Een relatie zetten of weghalen; weghalen neemt de giften mee. Maximaal 500.
   - Een gift zetten of weghalen; maximaal 5000.
   - De banden; `aankomend` voor 30 dagen, met `dagenTot` op MM-DD.
-- **Routes:** `/api/member/rechterhand/attenties`, `/relatie`, `/relatie/weg`, `/gift` en `/gift/weg`.
+- **Routes:** `/api/member/rechterhand/attenties`, `/relatie`, `/relatie/weg`, `/gift` en `/gift/weg`. (gecorrigeerd: voluit `/api/member/rechterhand/attenties/relatie`, `/attenties/relatie/weg`, `/attenties/gift` en `/attenties/gift/weg`; zo staan ze in `server/routes/member/rechterhand.js`.)
 - **Scherm:** laadt `objectverwijzing.js`.
 - **Voltooiscenario:** `scripts/lib/voltooi/attenties.js`.
 
@@ -4821,8 +6298,8 @@ Storingen:
 
 | Referentie | Pakket, ook het duurste | Functies | Bron |
 |---|---|---|---|
-| Dex (persoonlijke CRM) | Premium circa $12 per maand (jaarlijks); Professional $20 per maand; Enterprise met SSO en een SOC 2-rapport | Verjaardagen en belangrijke data, herinneringen, notities, sync met LinkedIn, mail en agenda, kaartweergave | getdex.com/blog/hubspot-vs-dex; capterra.com/p/275020/Dex (derde partij; de eigen prijspagina was niet bereikbaar) |
-| Sendoso (zakelijk geschenken versturen) | Essential, Plus, Pro en Enterprise, op aanvraag. Derden schatten $15–25K tot $75–100K+ per jaar, plus de giften. | Catalogus, verzending, internationaal (Pro en Enterprise), rapportage | sendoso.com/pricing; docket.io/resources/research/sendoso-pricing (derde partij) |
+| Dex (persoonlijke CRM) | Premium circa $12 per maand (jaarlijks); Professional $20 per maand; Enterprise met SSO en een SOC 2-rapport | Verjaardagen en belangrijke data, herinneringen, notities, sync met LinkedIn, mail en agenda, kaartweergave | getdex.com/blog/hubspot-vs-dex; capterra.com/p/275020/Dex (derde partij; de eigen prijspagina was niet bereikbaar) (te controleren) |
+| Sendoso (zakelijk geschenken versturen) | Essential, Plus, Pro en Enterprise, op aanvraag. Derden schatten $15–25K tot $75–100K+ per jaar, plus de giften (te controleren). | Catalogus, verzending, internationaal (Pro en Enterprise), rapportage | sendoso.com/pricing; docket.io/resources/research/sendoso-pricing (derde partij) |
 
 **Overgenomen:** herinneringen, dubbelgift-waarschuwing, vooruitblik.
 **Niet overgenomen:** sync van contacten uit externe diensten. Die zet echte namen in de operationele data en botst met privacy by design. Een verzendcatalogus met marge evenmin: dat is een verdienmodel en hoort bij handel en Geld.
@@ -4841,14 +6318,14 @@ Storingen:
 
 | # | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Moment | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A1 | Vooruitblik 30 dagen | L1 | relaties.datum (MM-DD) | dagenTot ≤ 30, gesorteerd | 29 februari: in een niet-schrikkeljaar op 28 februari (te toetsen) | geen | lid | — | Een verjaardag over 10 dagen staat erin, een over 40 niet | bestaat | — | (gedekt) |
-| A2 | "Dit gaf u al" | L4 | giften per relatie | normaliseer de tekst (kleine letters, zonder lidwoord); gelijk of zeer gelijkend geeft een waarschuwing met de datum | gelijkenis is een hint, geen feit | bij het opslaan | lid | — | "Een fles wijn" bij iemand die "fles wijn" al kreeg, geeft "u gaf dit op 12-03-2025" | half | klein | aanbevolen nu |
-| A3 | Herinnering een week vooraf en op de dag | L1 | A1 | 2 meldingen per datum per jaar; per relatie uit te zetten | geen | −7 dagen en op de dag | lid | relatie zonder datum | Er komen precies twee meldingen per jaar per datum, en geen na uitzetten | ontbreekt | klein | aanbevolen nu |
+| A1 | Vooruitblik 30 dagen | L1 | relaties.datum (MM-DD) | dagenTot ≤ 30, gesorteerd | 29 februari: in een niet-schrikkeljaar op 28 februari (te toetsen) (gecorrigeerd: `dagenTot` rekent met `Date.UTC(jaar, 1, 29)`, en dat valt in een niet-schrikkeljaar op 1 maart) | geen | lid | — | Een verjaardag over 10 dagen staat erin, een over 40 niet | bestaat | — | (gedekt) |
+| A2 | "Dit gaf u al" | L4 | giften per relatie | normaliseer de tekst (kleine letters, zonder lidwoord); gelijk of zeer gelijkend geeft een waarschuwing met de datum | gelijkenis is een hint, geen feit | bij het opslaan | lid | — | "Een fles wijn" bij iemand die "fles wijn" al kreeg, geeft "u gaf dit op 12-03-2025" | half | klein | **nu · VERDIEPING** |
+| A3 | Herinnering een week vooraf en op de dag | L1 | A1 | 2 meldingen per datum per jaar; per relatie uit te zetten | geen | −7 dagen en op de dag | lid | relatie zonder datum | Er komen precies twee meldingen per jaar per datum, en geen na uitzetten | ontbreekt | klein | **nu · VERDIEPING** |
 | A4 | Budget per relatie of jaar | L1 | giften.waarde | som per jaar; waarschuwing boven het eigen budget | geen | bij overschrijding | lid | — | Na 3 giften van €40 bij een budget van €100 waarschuwt het scherm | ontbreekt | klein | later |
-| A5 | Relatie als verwijzing naar een Salon-contact | L6 | codenaam | alleen een verwijzing; de ander ziet niets en krijgt niets | — | geen | lid | contact weg: de koppeling vervalt | Het scherm toont de codenaam; het andere lid ziet in geen enkele route dat het gekoppeld is (IDOR-toets) | ontbreekt | middel | aanbevolen nu |
+| A5 | Relatie als verwijzing naar een Salon-contact | L6 | codenaam | alleen een verwijzing; de ander ziet niets en krijgt niets | — | geen | lid | contact weg: de koppeling vervalt | Het scherm toont de codenaam; het andere lid ziet in geen enkele route dat het gekoppeld is (IDOR-toets) | ontbreekt | middel | **nu · VERDIEPING** |
 | A6 | "Laat regelen" via de concierge-lus | L3/L6 | relatie, budget, voorkeur | lus-intake met een verwijzing; niets besteld zonder akkoord | het is een voorstel | lus-bericht | lid; kantoormens | buiten mandaat: het lid beslist | Er ontstaat een case met de relatie als verwijzing; er is niets besteld | ontbreekt (de lus bestaat) | middel | later |
 | A7 | Giftbeleid zakelijk | L2 | giften.waarde, relatie.band = zakelijk | grens per jaar per relatie; uitkomst in een fiscale klasse indien relevant | — | bij overschrijding | lid | — | Een zakelijke relatie boven de grens geeft een waarschuwing met de klasse "advies" | ontbreekt | middel | later |
-| A8 | Gevoelige voorkeur markeren en wissen | L5 | voorkeuren | markering "gevoelig"; niet in een uitvoer of naar de lus zonder expliciete keuze | — | — | lid | — | Een als gevoelig gemarkeerde voorkeur zit niet in een lus-case, tenzij het lid haar aanvinkt | ontbreekt | klein | aanbevolen nu |
+| A8 | Gevoelige voorkeur markeren en wissen | L5 | voorkeuren | markering "gevoelig"; niet in een uitvoer of naar de lus zonder expliciete keuze | — | — | lid | — | Een als gevoelig gemarkeerde voorkeur zit niet in een lus-case, tenzij het lid haar aanvinkt | ontbreekt | klein | **nu · VERDIEPING** |
 | A9 | Contactsync en verzendcatalogus | — | — | — | — | — | — | — | — | — | — | **niet doen**: privacy en verdienmodel |
 
 #### e. RTG-exclusief
@@ -4871,8 +6348,8 @@ Storingen:
 - letterlijke API-paden.
 
 #### g. Prioritering
-1. A2, A3 en A8: klein.
-2. A5: middel, met een IDOR-toets.
+1. A2, A3 en A8: klein. **nu · VERDIEPING**
+2. A5: middel, met een IDOR-toets. **nu · VERDIEPING**
 3. A6 en A7: later.
 4. A4: later.
 
@@ -4916,10 +6393,60 @@ Storingen:
 - **Geen pas:** 403.
 - **Lus buiten mandaat:** voorstel, niets besteld.
 - **Dubbeltik bij de gift:** één gift (bewezen).
-- **Relatie weggehaald:** de giften verdwijnen mee; het scherm moet dat vooraf zeggen (na te gaan).
+- **Relatie weggehaald:** de giften verdwijnen mee; het scherm moet dat vooraf zeggen (na te gaan). (gecorrigeerd: het zegt het al: "Deze relatie en de giftgeschiedenis verwijderen?", `attenties.html`.)
 - **Gevoelige voorkeur:** gaat niet mee naar de lus.
 
 **Vraagt besluit.** Of een relatie aan een echt account mag hangen; de standaardgrens voor zakelijke giften. **Extern.** Bezorging van een gift: via de zaak of concierge, niet via Attenties.
+
+#### v3 — afbouw (Attenties)
+
+Het scherm heet in de kop "Aandacht" (eyebrow "RTG · LivingOS", terug naar "← vandaag" op `/apps/life.html`); de tabtitel is "Attenties · Lifestyle Pass" (`public/apps/attenties.html`).
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Vooruitblik 30 dagen — schermtekst: kop "Binnenkort", per relatie "vandaag", "morgen" of "over N dagen" (`attenties.html`) — route `POST /api/member/rechterhand/attenties` — stand: bestaat
+- Relatie toevoegen — schermtekst: "Relatie toevoegen", knop "+ relatie", placeholders "naam", "voorkeuren (bijv. houdt van boeken)", "persoonlijke notitie"; band uit familie, vriend, zakelijk, mentor, buur, overig — route `POST /api/member/rechterhand/attenties/relatie` — stand: bestaat
+- Relatie wijzigen — schermtekst: "Relatie wijzigen", knop "Wijzigingen bewaren", melding "Relatie bijgewerkt." — route `POST /api/member/rechterhand/attenties/relatie` (met `id`) — stand: bestaat
+- Relatie verwijderen, met de giften — knop "Verwijderen", bevestiging "Deze relatie en de giftgeschiedenis verwijderen?" — route `POST /api/member/rechterhand/attenties/relatie/weg` — stand: bestaat
+- Gift noteren — schermtekst: "Gift noteren", knop "+ gift", placeholders "wat gaf/geeft u", "gelegenheid", "bedrag €" — route `POST /api/member/rechterhand/attenties/gift` — stand: bestaat
+- Giftgeschiedenis per relatie, weghalen met "×" — schermtekst: "Giftgeschiedenis", leeg "Nog geen giften genoteerd." — route `POST /api/member/rechterhand/attenties/gift/weg` — stand: bestaat
+- Dubbelgift-waarschuwing (A2) — geen regel in `server/kern/rechterhand/attenties.js`; het lid ziet alleen de geschiedenis — stand: half
+- De relatiesecretaris — schermtekst: "Vraag de relatiesecretaris", knop "Vraag" — route `POST /api/member/rechterhand/ai` (app `attenties`) — stand: bestaat
+- Meenemen — relaties met band, data, voorkeuren en de laatste gift (`RTGUitvoer.bron`) — stand: bestaat
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in" (`attenties.html`).
+- Pas-poort (`eis` in `server/routes/member/rechterhand.js`) — 403 "Deze app is onderdeel van de Lifestyle Pass."; het scherm toont de deur uit `public/shared/deur.js` ("De Lifestyle Pass gaat uitsluitend op uitnodiging of na goedkeuring, …").
+- Levensbak (`L(key)`, veld `attenties`) — bij een fout of een onvolledig antwoord: "Kon het relatiebeheer niet laden."
+- Huistijdzone (`server/kern/tijdzone.js`, `huis()`) — rekent `dagenTot`. Uitval: niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Taalmodel voor de relatiesecretaris — vrij antwoord; zonder model "Tot uw dienst. Relatiebeheer: …" met de zin over De Rechterhand (zie Table, **HERSTEL** daar). **nu · HERSTEL:** de context die `server/kern/rechterhand/ai.js` naar een extern model stuurt, bevat de naam van de eerstvolgende relatie (`e.naam`). Dat is een vrije, meestal echte naam van een derde zonder account; Table en Cercle sturen alleen aantallen.
+- Desktopwidget — `public/shared/interface/world-widget-data.js` leest `/api/member/rechterhand/attenties`; `world-widget-surfaces.js` toont het als personen. Wat de widget zegt als Attenties faalt: niet gemeten.
+- Adaptief register — het scherm declareert alleen de context `sociaal.attenties` met `sociaal.context`; het geeft via `objectverwijzing.js` geen object uit.
+- Concierge-lus, Table, Salon — niet gekoppeld. `SCHERMEIGENAAR.json` noemt in `doel` wel "via De Rechterhand attenties/geschenken voor ze laten regelen".
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:attenties': {
+  uitgeeft: [
+    { wat: 'aantal relaties en de eerstvolgende datum, met de naam', aan: 'de relatiesecretaris (rechterhandAI)', vorm: 'projectie', bron: 'server/kern/rechterhand/ai.js' },
+    { wat: 'relaties en aankomend', aan: 'desktopwidget', vorm: 'projectie', bron: 'public/shared/interface/world-widget-data.js' }
+  ],
+  ontvangt: [ /* niets uit een andere app */ ],
+  ketens: [
+    { naam: 'relatie als gast in Table (T7)', stappen: ['Attenties: relatie-id', 'Table: gast verwijst ernaar'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'relatie als Salon-contact (A5)', stappen: ['Salon: codenaam', 'Attenties: verwijzing, de ander ziet niets'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'laat regelen (A6)', stappen: ['Attenties: relatie, budget, voorkeur', 'Rechterhand: POST /api/member/bureau/lus/intake', 'lid: akkoord'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'herinnering vooraf (A3)', stappen: ['Attenties: datum', 'meldingslaag: -7 dagen en op de dag'], stand: 'ontbreekt', bewijs: 'geen' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk als hij zijn relaties, data en giften zelf bijhoudt. Voor de assistent met mandaat en de concierge is het geen werkplek: er is geen eigen ingang en geen lus. De zakelijke gever mist een giftbeleid en een register. Herinneringen buiten het scherm komen er niet.
+Volledig voor: het lid als eigen relatiebeheerder · Deels voor: assistent, concierge, zakelijke gever · Extern nodig: een persoonlijke CRM met herinneringen (zoals Dex) en geschenkverzending (zoals Sendoso).
 
 ---
 
@@ -4933,7 +6460,7 @@ Storingen:
   - Een club zetten of weghalen; maximaal 300.
   - Een gastpas gebruiken, met een logboek, en terugdraaien.
   - `waarheen` per stad: eigen clubs en clubs via reciprociteit. RTG houdt geen clubgids bij, en het antwoord zegt dat.
-- **Routes:** `/api/member/rechterhand/cercle`, `/club`, `/club/weg`, `/gast`, `/gast/terug` en `/waarheen`.
+- **Routes:** `/api/member/rechterhand/cercle`, `/club`, `/club/weg`, `/gast`, `/gast/terug` en `/waarheen`. (gecorrigeerd: voluit `/api/member/rechterhand/cercle/club`, `/cercle/club/weg`, `/cercle/gast`, `/cercle/gast/terug` en `/cercle/waarheen`; zo staan ze in `server/routes/member/rechterhand.js`.)
 - **Scherm:** laadt `objectverwijzing.js`.
 - **Voltooiscenario:** `scripts/lib/voltooi/cercle.js`.
 
@@ -4952,7 +6479,7 @@ Storingen:
 
 | Referentie | Pakket, ook het duurste | Functies | Bron |
 |---|---|---|---|
-| Clubessential (software voor clubs) | geen publieke prijs, contact met de verkoper; door derden aan de dure kant geplaatst | Leden-app, reserveringen, bestellen, account, pushberichten, CRM | capterra.com/p/151992/Clubessential; us.fitgap.com/products/clubessential (derde partij) |
+| Clubessential (software voor clubs) | geen publieke prijs, contact met de verkoper; door derden aan de dure kant geplaatst (te controleren) | Leden-app, reserveringen, bestellen, account, pushberichten, CRM | capterra.com/p/151992/Clubessential; us.fitgap.com/products/clubessential (derde partij) |
 | Digitale ledenkaarten (musea en tuinen, als patroon voor reciprociteit) | lidmaatschap | Kaart in de wallet, een pagina met het reciprocal netwerk, gastrechten per mail delen, eenmalige gastpassen | sjmusart.org/digital-membership-cards; wavehill.org/support/membership/digital-membership-cards; redbuttegarden.org/memberships/digital-faq |
 
 Voor de reciprociteitsfuncties van clubsoftware vond ik geen verifieerbare bron. Die vergelijking is daarom niet gemaakt.
@@ -4973,12 +6500,12 @@ Voor de reciprociteitsfuncties van clubsoftware vond ik geen verifieerbare bron.
 | # | Functie | Laag | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Moment | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium | Stand | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | C1 | Clubs met lidnummer en dresscode | L1 | eigen invoer | max 300 | geen | geen | lid | — | Na een herstart staat alles er nog | bestaat | — | (gedekt) |
-| C2 | Waarheen per stad | L4 | eigen clubs plus ingevulde reciprociteit | eigen ∪ via reciprociteit; zegt "RTG houdt geen gids bij" | alleen eigen invoer | geen | lid | geen club: zegt dat | "Milaan" toont eigen clubs en clubs via reciprociteit, en verzint niets | bestaat | — | (gedekt) |
+| C2 | Waarheen per stad | L4 | eigen clubs plus ingevulde reciprociteit | eigen ∪ via reciprociteit; zegt "RTG houdt geen gids bij" | alleen eigen invoer | geen | lid | geen club: zegt dat | "Milaan" toont eigen clubs en clubs via reciprociteit, en verzint niets | bestaat (gecorrigeerd: een reciprociteitsclub is een naam zonder stad, en `crWaarheen` toetst de zoekterm op die naam. "Milaan" toont dus de eigen clubs in Milaan, en een club via reciprociteit alleen als "Milaan" in de naam staat) | — | (gedekt) |
 | C3 | Gastpassen met terugdraaibaar logboek | L5 | `gastpassen`, `gastlog` | −1 per gebruik; terug +1; 0 geeft een weigering | geen | geen | lid | — | Gebruik en terugdraaien kloppen; een dubbeltik geeft één (bewezen) | bestaat | — | (gedekt) |
-| C4 | Vervaldatum en verlenging | L5 | `vervaltOp` (nieuw veld) | binnen 60 dagen: bovenaan, met de datum | geen | 1 melding 30 dagen vooraf | lid | — | Een lidmaatschap dat over 20 dagen verloopt, staat bovenaan; er komt één melding | ontbreekt | klein | aanbevolen nu |
-| C5 | Introducés-regels per club | L2 | `gastRegel` (max per jaar, begeleid) | het logboek telt per kalenderjaar; boven het maximum een waarschuwing | de clubregel is wat het lid invult | bij het gebruik | lid | — | De derde gast bij een maximum van 2 per jaar geeft een waarschuwing in woorden | ontbreekt | klein | aanbevolen nu |
-| C6 | Voor wie de gastpas was | L1 | logboek.notitie (codenaam of vrije naam) | alleen een notitie; de gast krijgt niets van RTG | — | — | lid | — | Het logboek toont "voor K." bij de pas | ontbreekt | klein | aanbevolen nu |
-| C7 | Waarheen vanuit Reisboek | L6 | reisboek.bestemming | Reisboek toont een verwijzing "u kunt hier terecht bij …", live uit Cercle | — | geen | lid | Cercle leeg: geen verwijzing | Bij een reis naar Milaan toont Reisboek de clubs zonder kopie | ontbreekt | middel | aanbevolen nu |
+| C4 | Vervaldatum en verlenging | L5 | `vervaltOp` (nieuw veld) | binnen 60 dagen: bovenaan, met de datum | geen | 1 melding 30 dagen vooraf | lid | — | Een lidmaatschap dat over 20 dagen verloopt, staat bovenaan; er komt één melding | ontbreekt | klein | **nu · VERDIEPING** |
+| C5 | Introducés-regels per club | L2 | `gastRegel` (max per jaar, begeleid) | het logboek telt per kalenderjaar; boven het maximum een waarschuwing | de clubregel is wat het lid invult | bij het gebruik | lid | — | De derde gast bij een maximum van 2 per jaar geeft een waarschuwing in woorden | ontbreekt | klein | **nu · VERDIEPING** |
+| C6 | Voor wie de gastpas was | L1 | logboek.notitie (codenaam of vrije naam) | alleen een notitie; de gast krijgt niets van RTG | — | — | lid | — | Het logboek toont "voor K." bij de pas | bestaat (gecorrigeerd: `crGast` bewaart `wie`, het scherm vraagt "Wie neemt u mee?" en toont de naam in het logboek) | — | (gedekt) (gecorrigeerd: stond op aanbevolen nu) |
+| C7 | Waarheen vanuit Reisboek | L6 | reisboek.bestemming | Reisboek toont een verwijzing "u kunt hier terecht bij …", live uit Cercle | — | geen | lid | Cercle leeg: geen verwijzing | Bij een reis naar Milaan toont Reisboek de clubs zonder kopie | ontbreekt | middel | **nu · VERDIEPING** |
 | C8 | Club als plaats voor een Table-gelegenheid | L6 | club-id | verwijzing | — | — | lid | — | Een gelegenheid toont "in <club>" via de verwijzing | ontbreekt | klein | later |
 | C9 | Kaart in de wallet van het toestel | L1 | C1 | passenlaag van Geld en wallet | — | — | lid | — | — | ontbreekt | groot | later (vraagt besluit) |
 | C10 | Club bevestigt een gast (genre) | L2 | — | vraagt een nieuw genre | — | — | — | — | — | ontbreekt | groot | later (vraagt besluit) |
@@ -4997,13 +6524,13 @@ Voor de reciprociteitsfuncties van clubsoftware vond ik geen verifieerbare bron.
 - `notify`.
 
 **Ontbreekt:**
-- de velden vervaldatum en gastregel;
+- de velden vervaldatum en gastregel (gecorrigeerd: het logboek bewaart al voor wie de pas was, veld `wie`);
 - de verwijzing vanuit Reisboek;
 - letterlijke API-paden.
 
 #### g. Prioritering
-1. C4, C5 en C6: klein.
-2. C7: middel.
+1. C4, C5 en C6: klein. C4 en C5 **nu · VERDIEPING**; C6 bestaat al (gecorrigeerd).
+2. C7: middel. **nu · VERDIEPING**
 3. C8: later.
 4. C9 en C10: besluit.
 
@@ -5049,14 +6576,110 @@ Storingen:
 
 **Vraagt besluit.** Een genre "besloten club"; de walletkaart. **Extern.** Geen, zolang RTG geen gids voert.
 
+#### v3 — afbouw (Cercle)
+
+**LOS — wat de app zelf doet, in drie groepen**
+
+*Eigen functies* (werken zonder andere app)
+- Telling — schermtekst: "Clubs", "Steden", "Gastpassen" (`public/apps/cercle.html`) — route `POST /api/member/rechterhand/cercle` — stand: bestaat
+- Club toevoegen en wijzigen — schermtekst: "Club toevoegen", knop "+ club", "wijzig" en dan "wijzigingen bewaren"; placeholders "clubnaam", "stad", "lidnummer", "lid sinds", "gastpassen", "dresscode", "reciprociteit: bij welke clubs bent u als gast welkom?" — route `POST /api/member/rechterhand/cercle/club` — stand: bestaat
+- Club verwijderen — knop "×", bevestiging "Deze club verwijderen?" — route `POST /api/member/rechterhand/cercle/club/weg` — stand: bestaat
+- Gastpas gebruiken, voor wie — knop "gastpas", vragen "Wie neemt u mee?", "In welke stad? (mag leeg)", "Notitie? (mag leeg)"; daarna "Genoteerd. Nog N gastpassen bij deze club."; bij nul "U heeft geen gastpassen meer bij deze club." — route `POST /api/member/rechterhand/cercle/gast` — stand: bestaat
+- Gastpas terugboeken — knop "↶", bevestiging "Deze gastpas terugboeken naar het saldo?", daarna "Teruggeboekt. Het saldo is N." — route `POST /api/member/rechterhand/cercle/gast/terug` — stand: bestaat
+- Waarheen — schermtekst: "Waar kan ik terecht?", knop "zoeken", placeholder "stad of clubnaam"; onder het antwoord "Alles hierin komt uit wat u zelf heeft ingevuld. RTG houdt geen clubgids bij en belooft niets namens een club; bel vooruit."; leeg "Niets gevonden in uw eigen gegevens." — route `POST /api/member/rechterhand/cercle/waarheen` — stand: half. **nu · HERSTEL:** een reciprociteitsclub is een naam zonder stad; `crWaarheen` vindt hem alleen als de zoekterm in de clubnaam staat. De vraag "waar kan ik in Milaan terecht" beantwoordt hij dus alleen voor de eigen clubs (zie de correctie bij C2).
+- Gasten dit jaar — `gastenDitJaar` in het antwoord van `/cercle`, over alle clubs samen; het scherm toont het niet — stand: half (basis voor C5)
+- De clubsecretaris — schermtekst: "Vraag de clubsecretaris", knop "Vraag" — route `POST /api/member/rechterhand/ai` (app `cercle`) — stand: bestaat; de context is alleen aantallen
+- Meenemen — clubs zonder het gastlogboek ("Wie er met een gastpas mee was, blijft hier: dat is een naam van iemand anders.", commentaar in `cercle.html`) — stand: bestaat
+
+*Noodzakelijke platformdiensten* (zonder deze werkt de kern niet)
+- Inlog/sessie — zonder token: "Log eerst in" (`cercle.html`).
+- Pas-poort (`eis` in `server/routes/member/rechterhand.js`) — 403 "Deze app is onderdeel van de Lifestyle Pass."; het scherm toont de deur uit `public/shared/deur.js`.
+- Levensbak (`L(key)`, veld `cercle`) — bij een fout of een onvolledig antwoord: "Kon uw Cercle niet laden."
+- Huistijdzone (`server/kern/tijdzone.js`, `jaarIn()`) — begrenst "lid sinds" en telt gasten per jaar. Uitval: niet gemeten.
+
+*Optionele koppelingen* (de app werkt zonder; met is beter)
+- Taalmodel voor de clubsecretaris — vrij antwoord; zonder model "Tot uw dienst. Cercle: …" met de zin over De Rechterhand (zie Table, **HERSTEL** daar).
+- Adaptief register — het scherm declareert alleen de context `sociaal.cercle`; geen object via `objectverwijzing.js`.
+- Reisboek, Table, Vandaag — niet gekoppeld; `world-widget-data.js` kent geen bron voor Cercle. `SCHERMEIGENAAR.json` noemt in `doel` "gastenpassen regelen via De Rechterhand"; dat loopt nergens via de lus.
+
+**SAMEN — in de velden van `scripts/lib/appcontract.js`**
+```js
+'link:cercle': {
+  uitgeeft: [
+    { wat: 'aantal clubs, steden en gastpassen', aan: 'de clubsecretaris (rechterhandAI)', vorm: 'projectie', bron: 'server/kern/rechterhand/ai.js' }
+  ],
+  ontvangt: [ /* niets uit een andere app */ ],
+  ketens: [
+    { naam: 'waarheen vanuit Reisboek (C7)', stappen: ['Reisboek: bestemming', 'Cercle: waarheen live'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'club als plaats van een gelegenheid (C8)', stappen: ['Cercle: club-id', 'Table: "in <club>"'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'vervaldatum in Vandaag (C4)', stappen: ['Cercle: vervaltOp', 'Vandaag: projectie'], stand: 'ontbreekt', bewijs: 'geen' },
+    { naam: 'gastpas met boekhouding', stappen: ['Cercle: gastpas -1 met logregel', 'Cercle: terugboeken +1'], stand: 'gesloten', bewijs: 'scripts/lib/voltooi/cercle.js' }
+  ]
+}
+```
+
+**Volledige werkzaamheid**
+Het lid doet hier zijn hele werk als eigen clubregister: lidmaatschappen, gastpassen met boekhouding en de vraag waar hij terecht kan, binnen wat hij zelf invult. Voor het secretariaat of de assistent is er geen eigen ingang. De club zelf heeft geen rol: zij verifieert niets via RTG en hoort het niet. De ledenkaart, de introductiebrief en de contributie blijven bij de club.
+Volledig voor: het lid als eigen clubadministrateur · Deels voor: secretariaat of assistent · Extern nodig: de ledenadministratie en leden-app van de club zelf (zoals Clubessential), en de digitale ledenkaart van de club.
+
 ---
 
 ### Voor de integrator (buiten mijn apps; eigenaar volgens SCHERMEIGENAAR.json)
-- **Allergenen per gerecht** (Table T4) is dezelfde behoefte als bij `horeca.bestellen` en `horeca.reserveren` (foodcourt). Eén bron voor de 14 allergenen hoort bij de horecakant; Table moet die codelijst ontvangen en niet kopiëren.
+- **Allergenen per gerecht** (Table T4) is dezelfde behoefte als bij `horeca.bestellen` en `horeca.reserveren` (foodcourt). Eén bron voor de 14 allergenen hoort bij de horecakant; Table moet die codelijst ontvangen en niet kopiëren. (gecorrigeerd: die ene bron bestaat sinds d806269d4 als `server/kern/allergenen.js`; `kern/tafelwensen.js` en `kern/rechterhand/table.js` lezen hem allebei. Wat ontbreekt is de lijst per gerecht, T4.)
 - **Gastenlijst, check-in en wachtlijst** (Uitgaan) bestaan ook bij `horeca.events`, `horeca.club` en `festival.gast`. De regels (capaciteit, 18+, check-in-log) horen bij de zaakkant. Uitgaan is alleen de ledenkant.
 - **Verjaardagen** bestaan ook in `gezin.verjaardagen` (FoundationOS) en `agenda.afspraken`. Attenties houdt de relaties van het lid; geen dubbele verjaardagslogica. De vooruitblik hoort in Vandaag en Leven als projectie.
 - **Gezondheidsgegevens van derden** (dieet bij Table, voorkeuren bij Attenties): een huisbrede bewaarregel zou in de bestaande privacylaag horen, niet per app.
 
-
 ---
 
+### Familie Uitgaan en kring — samen (v3)
+
+**FAMILIES-entry** (voorstel voor het register, zelfde vorm als het appcontract)
+```js
+FAMILIES['livingos-b/uitgaan'] = {
+  naam: 'Uitgaan en kring',
+  apps: ['link:table', 'link:uitgaan', 'link:attenties', 'link:cercle'],
+  gedeeld: [
+    { wat: 'pas-poort en vangnet (eis, doe) voor Table, Attenties en Cercle', bestand: 'server/routes/member/rechterhand.js' },
+    { wat: 'levensbak per lid, L(key)', bestand: 'server/kern/rechterhand/index.js (op server/kern/levensdossier/)' },
+    { wat: 'adviseur per app: maître, relatiesecretaris, clubsecretaris', bestand: 'server/kern/rechterhand/ai.js' },
+    { wat: 'pas-deur bij een 403', bestand: 'public/shared/deur.js' },
+    { wat: 'Meenemen uit het eigen model (alle vier)', bestand: 'public/shared/uitvoer.js' },
+    { wat: 'objectpoort en adaptief register (Attenties en Cercle; alleen een context gedeclareerd)', bestand: 'public/shared/objectverwijzing.js; public/shared/adaptief/register.js' },
+    { wat: 'huistijdzone (Attenties en Cercle)', bestand: 'server/kern/tijdzone.js' },
+    { wat: 'premiumset die Table, Attenties en Cercle verbergt zonder Lifestyle of Business', bestand: 'public/apps/app-main/app-main-24a3.js' },
+    { wat: 'desktopwidget-bronnen (Table en Attenties)', bestand: 'public/shared/interface/world-widget-data.js' },
+    { wat: 'allergeenlijst bijlage II (Table, gedeeld met de zaakkant)', bestand: 'server/kern/allergenen.js' }
+  ],
+  eigenaar: [
+    'link:table → leven.tafel-gelegenheid',
+    'link:uitgaan → leven.uitgaan',
+    'link:attenties → relaties.attenties',
+    'link:cercle → leven.cercle'
+  ]
+};
+```
+
+**ONTBREKEND** (één regel per schakel die ontbreekt tussen apps van deze familie of naar andere families)
+```
+ONTBREKEND: table/attenties/cercle → rechterhand (lus): de adviseur zegt "wat een boeking vraagt, zet ik voor u klaar bij De Rechterhand", maar zet niets klaar; zin aanpassen of een echte lus-intake · HERSTEL · klein
+ONTBREKEND: attenties → extern taalmodel: de naam van de eerstvolgende relatie gaat mee in de context; vervangen door een aantal of een codeletter · HERSTEL · klein
+ONTBREKEND: uitgaan → mall: geen eerlijke zin als /api/mall/bestellingen of /api/uitgaan/mijn faalt; nu staat er "Nog niets gepland." · HERSTEL · klein
+ONTBREKEND: horeca.events (zaak) → uitgaan: de check-in staat niet in scripts/lib/voltooi/uitgaan.js, terwijl "Mijn avond" "Ingecheckt" toont (U3) · HERSTEL · klein
+ONTBREKEND: table → attenties: gast als verwijzing naar een relatie-id, naam live uit Attenties (T7) · VERDIEPING · middel
+ONTBREKEND: table → rechterhand (lus): lus-intake vanuit een gelegenheid met aantal, datum en dieetcodes (T9) · VERDIEPING · middel
+ONTBREKEND: table → horeca (zaakkant): allergenen per gerecht uit dezelfde codelijst, met de botsing per gang (T4) · VERDIEPING · klein
+ONTBREKEND: attenties → salon: relatie als verwijzing naar een codenaam, onzichtbaar voor de ander (A5) · VERDIEPING · middel
+ONTBREKEND: attenties → rechterhand (lus): "laat regelen" met de relatie als verwijzing en akkoord van het lid (A6) · VERDIEPING · middel
+ONTBREKEND: attenties → meldingslaag: herinnering een week vooraf en op de dag (A3) · VERDIEPING · klein
+ONTBREKEND: cercle → reisboek: waarheen live bij een bestemming (C7) · VERDIEPING · middel
+ONTBREKEND: cercle → table: de club als plaats van een gelegenheid (C8) · VERDIEPING · klein
+ONTBREKEND: cercle → vandaag: vervaldatum als projectie, na het veld vervaltOp (C4) · VERDIEPING · klein
+ONTBREKEND: uitgaan → wachtlijst: een knop naar POST /api/wachtlijst bij een volle avond, en "Mijn avond" toont de positie (U2) · VERDIEPING · klein
+ONTBREKEND: uitgaan → salon: gezelschap als leden, elk met een eigen regel en eigen toestemming (U4) · VERDIEPING · middel
+ONTBREKEND: horeca.events → uitgaan: een leeftijdsgrens per avond, getoetst met volwassen() (U7) · VERDIEPING · klein
+ONTBREKEND: uitgaan → vandaag: de avond als projectie; nu leest alleen het Leven-paneel (leven-panelen.js) het overzicht /api/uitgaan, niet de eigen avonden · VERDIEPING · klein
+ONTBREKEND: uitgaan → navigatie: "Open route" geeft de zaak niet mee · VERDIEPING · klein
+```
+
+---

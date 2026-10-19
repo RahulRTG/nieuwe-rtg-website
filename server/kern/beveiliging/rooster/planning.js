@@ -15,7 +15,7 @@ module.exports = (ctx) => {
   function budget(s, opts) {
     opts = opts || {};
     const b = defaults(s);
-    const maand = opts.maand || vandaag().slice(0, 7);   // YYYY-MM
+    const maand = opts.maand || vandaag(s).slice(0, 7);   // YYYY-MM
     const tarief = b.budget.tariefUur || 0;
     const budgetUren = b.budget.periodeUren || 0;
     const budgetBedrag = Math.round(budgetUren * tarief);
@@ -69,7 +69,7 @@ module.exports = (ctx) => {
   }
   function rooster(s, van, dagen) {
     const b = defaults(s);
-    const start = /^\d{4}-\d{2}-\d{2}$/.test(String(van)) ? van : vandaag();
+    const start = /^\d{4}-\d{2}-\d{2}$/.test(String(van)) ? van : vandaag(s); // de dag van de zaak die het rooster maakt
     const n = getal(dagen, 1, 31, 7);
     // een prefilter over de dienstentabel in plaats van een volledige scan per
     // dag: bij 31 dagen scheelt dat dertig keer door alle diensten lopen

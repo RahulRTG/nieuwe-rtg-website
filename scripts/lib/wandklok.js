@@ -42,7 +42,7 @@ const UITZONDERING = /tijd-uitzondering:\s*\S.{8,}/;
 // de plek waar de wandklok WOONT
 const THUIS = 'server/kern/tijdzone.js';
 // het plafond van de tweede telling; alleen omlaag
-const UTC_VANDAAG_MAX = 105;
+const UTC_VANDAAG_MAX = 103;
 
 function bestanden(root) {
   const uit = [];

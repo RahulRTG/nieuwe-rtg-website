@@ -65,3 +65,33 @@ test('backoffice om 01:30 lokaal: de omzetdag is nog gisteren, en de week eindig
   assert.equal(week[6].date, '2026-01-15', 'de omzetdag loopt tot 05:00');
   assert.equal(week[0].date, '2026-01-09', 'en de week telt zeven omzetdagen terug');
 });
+
+/* De hotelreceptie (kern/verblijf/receptie.js) en het beveiligingsrooster
+   (kern/beveiliging/rooster/planning.js) bouwen een reeks dagen vanaf vandaag.
+   Om 00:30 lokale tijd is vandaag al de nieuwe dag, in de zone van de zaak. */
+function zaakDagen(klok) {
+  const uit = execFileSync(process.execPath, ['-e', `
+    const crypto = require('crypto');
+    const v = require('./server/kern/verblijf')({ db: { data: {} }, save() {}, crypto,
+      schoon: (x, n) => String(x || '').slice(0, n), findSupplier: () => null,
+      notify() {}, notifySupplier() {}, sseToSupplier() {}, sseToCustomer() {} });
+    const { maakBeveiliging } = require('./server/kern/beveiliging');
+    const b = maakBeveiliging({ db: { data: {} }, save() {}, crypto, accounts: { listStaff: () => [] },
+      findSupplier: () => null, notify() {}, notifySupplier() {}, sseToSupplier() {}, sseToOffice() {},
+      logActivity() {}, haversine: () => 0, afwezigOp: () => null });
+    console.log(JSON.stringify({
+      hotel: v.kamerplanning({ code: 'H', country: 'ES', rooms: [] }, 7).dagen[0],
+      tokio: v.kamerplanning({ code: 'T', tijdzone: 'Asia/Tokyo', rooms: [] }, 7).dagen[0],
+      rooster: b.bevRooster({ code: 'B', country: 'NL' }).dagen[0].datum }));`],
+  { encoding: 'utf8', cwd: WORTEL, env: { ...process.env, TZ: 'UTC', RTG_KLOK: klok, NODE_ENV: 'test' } });
+  return JSON.parse(uit.trim().split('\n').pop());
+}
+
+test('receptie en beveiligingsrooster om 00:30 lokale tijd beginnen op de nieuwe dag van de zaak', () => {
+  // 22:30 UTC = 00:30 in Madrid en Amsterdam (zomer), 07:30 in Tokio
+  assert.deepEqual(zaakDagen('2026-07-15T22:30:00Z'),
+    { hotel: '2026-07-16', tokio: '2026-07-16', rooster: '2026-07-16' });
+  // 14:30 UTC = 23:30 in Tokio: daar is het nog de 15e, in Europa ook
+  assert.deepEqual(zaakDagen('2026-07-15T14:30:00Z'),
+    { hotel: '2026-07-15', tokio: '2026-07-15', rooster: '2026-07-15' });
+});

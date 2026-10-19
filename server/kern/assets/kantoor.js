@@ -55,11 +55,16 @@ module.exports = (ctx) => {
     const v = db.data.assetTerugkoop.find(x => x.id === String(verzoekIdIn || '') && x.status === 'aangevraagd');
     if (!v) return { status: 404, error: 'Terugkoopverzoek niet gevonden (of al uitbetaald).' };
     const t = db.data.assetTickets.find(x => x.id === v.ticketId);
+    /* Eerst het geld, dan de stand: huisUit geeft een fout TERUG en die werd
+       genegeerd, zodat een terugkoop "uitbetaald" heette zonder dat er iets ging. */
+    let uit;
+    try { uit = (await pay.huisUit({ aanCodenaam: v.codenaam, centen: v.waarde * 100, oms: 'Terugkoop ' + v.assetNaam + ' (RTG Asset)', idem: 'terugkoop-' + v.id })) || {}; }
+    catch (e) { uit = { error: String(e && e.message || e) }; }
+    if (!uit.ok) return { status: 409, error: 'Uitbetalen lukt niet: ' + (uit.error || 'onbekende fout') + ' Het verzoek blijft open.' };
     v.status = 'uitbetaald'; v.uitbetaaldAt = nu(); v.door = schoon(wie, 40) || 'RTG-kantoor';
     if (t) { t.status = 'uitgestapt'; t.uitstap = { waarde: v.waarde, at: nu(), soort: 'terugkoop' }; }
     kasAdd(v.assetId, -v.waarde * 100);
     save();
-    try { await pay.huisUit({ aanCodenaam: v.codenaam, centen: v.waarde * 100, oms: 'Terugkoop ' + v.assetNaam + ' (RTG Asset)', idem: 'terugkoop-' + v.id }); } catch (e) {}
     notify(v.key, { icon: 'betalen', title: 'Terugkoop uitbetaald: ' + v.assetNaam, body: 'De Tik van € ' + v.waarde + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
     return { ok: true, waarde: v.waarde, verzoek: v };
   }

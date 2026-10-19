@@ -164,55 +164,41 @@ test('een object, een gezelschap per dag; en de piekregel houdt augustus eerlijk
   assert.ok(/Piekseizoen/.test(piek.body.error), 'de derde piekdag ketst af');
 });
 
-test('uitstappen zonder wachtlijst: terugkoop, kantoor betaalt binnen het venster', async () => {
+test('uitstappen: met een wachtlijstkoper die niet kan betalen volgt eerlijk de terugkoop, en die heet pas uitbetaald als het geld gaat', async () => {
+  /* Een Asset-ticket van de villa is € 20.000 waard; een Tik (pay.huisIn/huisUit)
+     gaat tot € 5.000 per boeking (kern/pay/stand.js MAX_CENTEN). Hier stond dat
+     de overdracht en de uitbetaling lukten: de fouten werden geslikt en het
+     ticket verhuisde zonder betaling. Nu zegt de app wat er werkelijk gebeurt;
+     de geslaagde overdracht en uitbetaling staan in de kerntoetsen onderaan. */
   const mijn = (await api('asset/mijn', {}, lid)).body.posities.find(p => p.assetId === villa.id);
   assert.equal(mijn.uitstapWaarde, mijn.ticketWaarde, 'een Asset-ticket = waarde / 300');
-  // trap 2: er staat niemand op de wachtlijst, dus het wordt een terugkoopverzoek
+  // het zakelijke lid meldt zich op de wachtlijst (de pool is vol; dubbel melden kan niet)
+  assert.equal((await api('asset/wachtlijst', { assetId: villa.id }, zakelijk)).status, 200);
+  assert.equal((await api('asset/wachtlijst', { assetId: villa.id }, zakelijk)).status, 409);
   const uit = await api('asset/uitstap', { ticketId: mijn.assetTicketIds[0] }, lid);
   assert.equal(uit.status, 200);
-  assert.equal(uit.body.soort, 'terugkoop-aangevraagd');
+  assert.equal(uit.body.soort, 'terugkoop-aangevraagd', 'geen overdracht zonder betaling van de koper');
+  assert.match(uit.body.wachtlijst, /kon niet betalen/, 'de reden staat erbij');
   assert.equal(uit.body.waarde, mijn.ticketWaarde);
   assert.ok(uit.body.uiterlijk > new Date().toISOString().slice(0, 10), 'met een harde uiterste betaaldatum');
-  // het ticket valt pas terug in de pool na de uitbetaling
-  assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).beschikbaar, 0);
-  const tussen = (await api('asset/mijn', {}, lid)).body.posities.find(p => p.assetId === villa.id);
-  assert.equal(tussen.terugkoopOnderweg.length, 1);
-  // het kantoor betaalt uit: de Tik gaat eruit en de pool krijgt het ticket terug
+  assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).wachtenden, 1, 'de koper blijft wachten');
+  const koperPos = (await api('asset/mijn', {}, zakelijk)).body.posities.find(p => p.assetId === villa.id);
+  assert.equal(koperPos.asset, 0, 'de koper kreeg geen ticket zonder te betalen');
+  // het kantoor wil uitbetalen; boven de grens van een Tik lukt dat niet, en dat zegt het
   const kantoor = (await api('office/login', { code: 'RTG-OFFICE' })).body.token;
   const bord = (await api('office/asset/overzicht', {}, kantoor)).body.objecten.find(o => o.id === villa.id);
   assert.equal(bord.terugkoopOpen.length, 1);
   assert.ok(bord.kas > 0, 'de premies staan in de poolkas');
   assert.ok(bord.restdagen < 365 && bord.restdagen > 300, 'de restdagen zijn zichtbaar om te verhuren');
   const betaald = await api('office/asset/terugkoop', { verzoekId: bord.terugkoopOpen[0].id }, kantoor);
-  assert.equal(betaald.status, 200);
-  assert.equal(betaald.body.waarde, mijn.ticketWaarde);
-  assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).beschikbaar, 1);
-  const na = (await api('asset/mijn', {}, lid)).body.posities.find(p => p.assetId === villa.id);
-  assert.equal(na.tickets, 2);
-  assert.equal(na.asset, 0);
+  assert.equal(betaald.status, 409);
+  assert.match(betaald.body.error, /Uitbetalen lukt niet/);
+  const tussen = (await api('asset/mijn', {}, lid)).body.posities.find(p => p.assetId === villa.id);
+  assert.equal(tussen.terugkoopOnderweg.length, 1, 'het verzoek staat nog open');
+  assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).beschikbaar, 0, 'het ticket valt pas terug na een echte uitbetaling');
   // Access heeft geen restwaarde en een vreemd ticket bestaat niet
   assert.equal((await api('asset/uitstap', { ticketId: accessTicketId }, lid)).status, 400);
   assert.equal((await api('asset/uitstap', { ticketId: 'bestaat-niet' }, lid)).status, 404);
-});
-
-test('uitstappen met wachtlijst: directe overdracht, koper betaalt de 5% naar de poolkas', async () => {
-  // het lid koopt het vrijgevallen ticket weer in (pool weer vol)
-  const vers = (await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id);
-  const k = await koop(lid, 'rtg', { assetId: villa.id, smaak: 'asset', aantal: 1, akkoord: true });
-  assert.equal(k.status, 200);
-  // het zakelijke lid meldt zich op de wachtlijst (dubbel melden kan niet)
-  assert.equal((await api('asset/wachtlijst', { assetId: villa.id }, zakelijk)).status, 200);
-  assert.equal((await api('asset/wachtlijst', { assetId: villa.id }, zakelijk)).status, 409);
-  assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).wachtenden, 1);
-  // trap 1: de uitstapper matcht direct met de wachtende koper
-  const uit = await api('asset/uitstap', { ticketId: k.body.ticketIds[0] }, lid);
-  assert.equal(uit.status, 200);
-  assert.equal(uit.body.soort, 'overdracht');
-  assert.equal(uit.body.waarde, vers.ticketWaarde);
-  // het ticket is nu van de koper, de wachtlijst is leeg
-  const koperPos = (await api('asset/mijn', {}, zakelijk)).body.posities.find(p => p.assetId === villa.id);
-  assert.ok(koperPos && koperPos.asset >= 1, 'de koper heeft het Asset-ticket');
-  assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).wachtenden, 0);
 });
 
 test('bedenktijd: herroepen na betaling heet pas terugbetaald als de bank het bevestigt', async () => {
@@ -394,4 +380,61 @@ test('kern: herroepen voor betaling sluit de aanvraag; vol is vol voordat er gel
   const h = await k.assetHerroep(LID, 'Lid', tickets(LID.key)[0].id);
   assert.match(h.let, /is terugbetaald/);
   assert.equal(h.terug, tickets(LID.key)[0].prijs);
+});
+
+/* ---------- Uitstappen: geen stil geslikte fout bij overdracht of terugkoop ----------
+   pay.huisIn/huisUit geven een fout TERUG (geen throw), en de oude code keek er
+   niet naar: een wachtlijstoverdracht verhuisde het ticket zonder dat de koper
+   betaalde, en een terugkoop heette "uitbetaald" zonder dat er iets ging. Met een
+   nep-pay kiest de toets zelf of het geld lukt. */
+function kernMetPay(pay) {
+  const db = { data: {} };
+  const k = require('../server/kern/assets')({ db, save: () => {}, crypto: require('crypto'), schoon: (s, n) => String(s || '').slice(0, n), notify: () => {}, pay, betaalWaarheid: null });
+  k.assetsOverzicht('x');
+  const ticket = (key) => { const t = { id: 'T-' + key, ref: 'R', assetId: 'sa-villa', assetNaam: 'Villa', key, codenaam: 'Verkoper', tier: 'rtg', smaak: 'asset', prijs: 23000, urenPerJaar: 24, at: new Date().toISOString(), vervaltOp: '2036-01-01', status: 'actief', feeJaar: 2026 }; db.data.assetTickets.push(t); return t; };
+  return { db, k, ticket };
+}
+const KOPER = { key: 'user-koper', tier: 'rtg' }, VERKOPER = { key: 'user-verkoper', tier: 'rtg' };
+
+test('kern: lukt de betaling van de wachtlijstkoper niet, dan verhuist het ticket niet en volgt de terugkoop', async () => {
+  const pay = { huisIn: async () => ({ status: 400, error: 'Dat bedrag kan niet.' }), huisUit: async () => ({ ok: true }) };
+  const { db, k, ticket } = kernMetPay(pay);
+  const t = ticket(VERKOPER.key);
+  db.data.assetWachtlijst.push({ id: 'w1', assetId: 'sa-villa', key: KOPER.key, codenaam: 'Koper', tier: 'rtg', at: new Date().toISOString() });
+  const r = await k.assetUitstap(VERKOPER, 'Verkoper', t.id);
+  assert.equal(r.soort, 'terugkoop-aangevraagd', 'geen overdracht zonder betaling');
+  assert.match(r.wachtlijst || '', /Dat bedrag kan niet/, 'de reden staat erbij');
+  assert.equal(t.key, VERKOPER.key, 'het ticket is niet van de koper geworden');
+  assert.equal(db.data.assetWachtlijst.length, 1, 'de koper blijft op de wachtlijst');
+});
+
+test('kern: lukt de betaling wel, dan verhuist het ticket en krijgt de verkoper zijn geld', async () => {
+  const geboekt = [];
+  const pay = { huisIn: async (x) => (geboekt.push(['in', x.centen]), { ok: true }), huisUit: async (x) => (geboekt.push(['uit', x.centen]), { ok: true }) };
+  const { db, k, ticket } = kernMetPay(pay);
+  const t = ticket(VERKOPER.key);
+  db.data.assetWachtlijst.push({ id: 'w1', assetId: 'sa-villa', key: KOPER.key, codenaam: 'Koper', tier: 'rtg', at: new Date().toISOString() });
+  const r = await k.assetUitstap(VERKOPER, 'Verkoper', t.id);
+  assert.equal(r.soort, 'overdracht');
+  assert.equal(t.key, KOPER.key);
+  assert.deepEqual(geboekt.map((x) => x[0]), ['in', 'uit'], 'eerst de koper, dan de verkoper');
+  assert.equal(db.data.assetWachtlijst.length, 0);
+});
+
+test('kern: een terugkoop heet pas uitbetaald als het geld echt ging', async () => {
+  let lukt = false;
+  const pay = { huisIn: async () => ({ ok: true }), huisUit: async () => (lukt ? { ok: true } : { status: 400, error: 'Dat bedrag kan niet.' }) };
+  const { db, k, ticket } = kernMetPay(pay);
+  const t = ticket(VERKOPER.key);
+  const r = await k.assetUitstap(VERKOPER, 'Verkoper', t.id);
+  assert.equal(r.soort, 'terugkoop-aangevraagd');
+  const nee = await k.assetTerugkoopUit(r.verzoek.id, 'Kantoor');
+  assert.equal(nee.status, 409);
+  assert.match(nee.error, /Dat bedrag kan niet/);
+  assert.equal(db.data.assetTerugkoop[0].status, 'aangevraagd', 'het verzoek blijft open');
+  assert.equal(t.status, 'uitstap-aangevraagd', 'het ticket is niet uitgestapt');
+  lukt = true;
+  const ja = await k.assetTerugkoopUit(r.verzoek.id, 'Kantoor');
+  assert.equal(ja.ok, true);
+  assert.equal(t.status, 'uitgestapt');
 });

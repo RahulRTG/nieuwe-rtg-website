@@ -84,7 +84,20 @@ module.exports = (ctx) => {
     const a = objectVan(t.assetId);
     const waarde = ticketWaarde(a);
     const wi = db.data.assetWachtlijst.findIndex(w => w.assetId === a.id && w.key !== sess.key);
+    /* GEEN STIL GESLIKTE FOUT. pay.huisIn/huisUit geven een fout TERUG; de oude
+       code keek er niet naar, en zo verhuisde een ticket zonder dat de koper
+       betaalde. Nu: eerst betaalt de koper, en alleen als dat lukt verhuist het
+       ticket. Lukt het niet, dan blijft de koper op de wachtlijst en volgt trap 2,
+       met de reden erbij. */
+    let wachtlijstReden = null;
+    const uitkomst = async (f) => { try { return (await f()) || {}; } catch (e) { return { error: String(e && e.message || e) }; } };
     if (wi >= 0) {
+      const koper = db.data.assetWachtlijst[wi];
+      const fee = netjes(waarde * OVERDRACHT_FEE_PCT);
+      const inn = await uitkomst(() => pay.huisIn({ vanCodenaam: koper.codenaam, centen: (waarde + fee) * 100, oms: 'Overname Asset-ticket ' + a.naam + ' (incl. ' + Math.round(OVERDRACHT_FEE_PCT * 100) + '% overdracht)', idem: 'overname-' + t.id + '-' + koper.id }));
+      if (!inn.ok) wachtlijstReden = 'De wachtlijstkoper kon niet betalen: ' + (inn.error || 'onbekende fout') + ' RTG koopt terug.';
+    }
+    if (wi >= 0 && !wachtlijstReden) {
       // trap 1: de wachtlijst neemt over; het ticket verhuist met restlooptijd en al
       const koper = db.data.assetWachtlijst.splice(wi, 1)[0];
       const fee = netjes(waarde * OVERDRACHT_FEE_PCT);
@@ -92,11 +105,11 @@ module.exports = (ctx) => {
       t.akkoord = nu(); t.at = nu(); // nieuwe eigenaar, nieuwe bedenktijd
       kasAdd(a.id, fee * 100);
       save();
-      try { await pay.huisIn({ vanCodenaam: koper.codenaam, centen: (waarde + fee) * 100, oms: 'Overname Asset-ticket ' + a.naam + ' (incl. ' + Math.round(OVERDRACHT_FEE_PCT * 100) + '% overdracht)', idem: 'overname-' + t.id + '-' + koper.id }); } catch (e) {}
-      try { await pay.huisUit({ aanCodenaam: codenaam, centen: waarde * 100, oms: 'Verkoop Asset-ticket ' + a.naam + ' via de wachtlijst', idem: 'uitstap-' + t.id + '-' + koper.id }); } catch (e) {}
-      notify(sess.key, { icon: 'betalen', title: 'Verkocht via de wachtlijst', body: a.naam + ': de Tik van € ' + waarde + ' staat in uw tegoed.', scope: 'assets' });
+      const uit = await uitkomst(() => pay.huisUit({ aanCodenaam: codenaam, centen: waarde * 100, oms: 'Verkoop Asset-ticket ' + a.naam + ' via de wachtlijst', idem: 'uitstap-' + t.id + '-' + koper.id }));
+      if (!uit.ok) { t.uitbetalingOpen = { aan: schoon(codenaam, 40), waarde, reden: uit.error || 'onbekende fout', at: nu() }; save(); }
+      notify(sess.key, { icon: 'betalen', title: 'Verkocht via de wachtlijst', body: uit.ok ? a.naam + ': de Tik van € ' + waarde + ' staat in uw tegoed.' : a.naam + ': verkocht, maar de uitbetaling van € ' + waarde + ' lukte nog niet (' + (uit.error || 'onbekende fout') + '). Het kantoor betaalt u uit.', scope: 'assets' });
       notify(koper.key, { icon: a.icon, title: 'U bent aan de beurt: ' + a.naam, body: 'Het Asset-ticket is van u (€ ' + waarde + ' + € ' + fee + ' overdracht). Restlooptijd tot ' + t.vervaltOp + '.', scope: 'assets' });
-      return { ok: true, soort: 'overdracht', waarde, naar: koper.codenaam };
+      return { ok: true, soort: 'overdracht', waarde, naar: koper.codenaam, ...(uit.ok ? {} : { uitbetaling: 'open', reden: uit.error || 'onbekende fout' }) };
     }
     // trap 2: terugkoop door RTG, uitbetaling binnen het venster door het kantoor
     const uiterlijk = new Date(Date.now() + TERUGKOOP_VENSTER_DAGEN * 86400000).toISOString().slice(0, 10);
@@ -106,7 +119,7 @@ module.exports = (ctx) => {
     db.data.assetTerugkoop = db.data.assetTerugkoop.slice(0, 50000);
     save();
     notify(sess.key, { icon: 'agenda', title: 'Terugkoop aangevraagd: ' + a.naam, body: 'Er staat nu geen koper op de wachtlijst; RTG koopt terug en betaalt uiterlijk ' + uiterlijk + ' € ' + waarde + ' uit via een Tik.', scope: 'assets' });
-    return { ok: true, soort: 'terugkoop-aangevraagd', waarde, uiterlijk, verzoek: v };
+    return { ok: true, soort: 'terugkoop-aangevraagd', waarde, uiterlijk, verzoek: v, ...(wachtlijstReden ? { wachtlijst: wachtlijstReden } : {}) };
   }
 
   /* Hertaxatie door RTG-kantoor: de objectwaarde beweegt, en daarmee schuiven

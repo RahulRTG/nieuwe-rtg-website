@@ -13,7 +13,15 @@
      4. zonder zaakinlog blijft het beeld dicht;
      5. op 390, 820 en 1440 px loopt niets horizontaal over, en in het
         Arabisch staat dir="rtl" zonder overloop.
-   De bredere mobiliteitsketen staat in test/mobiliteitscherm.e2e.js. */
+   De bredere mobiliteitsketen staat in test/mobiliteitscherm.e2e.js.
+
+   DE WERKGEVER IS HIER EEN VERVOERDER (MKKX, genre taxi), geen hotel. De
+   functie mobiliteit heeft alleenGenres (taxi, jet, ...); zodra er op de
+   server iets in techniek.functies staat, gaat de genrematrix werken en krijgt
+   een hotel als werkgever 503 op /api/supplier/mob/*. Dat gebeurt een paar
+   seconden na de start, dus met een hotel werd deze toets een loterij. Het
+   scherm doet voor elk genre hetzelfde; de keuze van het genre is een
+   serverbesluit en hoort niet in deze vormtoets. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -44,9 +52,9 @@ test.before(async () => {
   if (skip) return;
   srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
-  const roster = await post('/api/supplier/roster', { code: 'HOSHI' });
+  const roster = await post('/api/supplier/roster', { code: 'MKKX' });
   const m = (roster.staff || []).find(x => x.role === 'manager');
-  baas = (await post('/api/supplier/login', { code: 'HOSHI', staffId: m.id, pin: '1234' })).token;
+  baas = (await post('/api/supplier/login', { code: 'MKKX', staffId: m.id, pin: '1234' })).token;
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
 
@@ -62,7 +70,7 @@ test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge sta
 
 test('het reisbeleid bewaren en een rit akkoord geven lopen over de echte zaakkern', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);
-  assert.match(await page.textContent('#zaakNaam'), /Aguamarina/, 'de werkgever ziet zijn eigen naam, geen code');
+  assert.match(await page.textContent('#zaakNaam'), /Ibiza Executive Cars/, 'de werkgever ziet zijn eigen naam, geen code');
   await page.locator('#tabs [data-tab="beleid"]').click();
   await page.waitForFunction(() => !document.querySelector('#tBeleid').hidden);
   assert.equal(await page.locator('body').getAttribute('data-ds-schermtype'), 'taak');
@@ -84,10 +92,10 @@ test('het reisbeleid bewaren en een rit akkoord geven lopen over de echte zaakke
   const reg = await post('/api/auth/register', { name: 'Medewerker', email: mail, phone: '06' + u, password: 'geheim123',
     geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   const inv = await post('/api/supplier/staff/invite', { name: 'Nora Vermeer', role: 'staff' }, baas);
-  await post('/api/supplier/staff/join', { bedrijf: 'Aguamarina Ibiza', kassacode: inv.invite.kassacode, login: mail, password: 'geheim123' });
+  await post('/api/supplier/staff/join', { bedrijf: 'Ibiza Executive Cars', kassacode: inv.invite.kassacode, login: mail, password: 'geheim123' });
   const rit = await post('/api/mob/vraag', { ritsoort: 'direct', categorie: 'taxi',
     van: { lat: 38.908, lng: 1.432, label: 'Hotel' }, naar: { lat: 38.978, lng: 1.536, label: 'Luchthaven' },
-    stad: 'Ibiza', namensOrganisatie: 'HOSHI', betaler: 'organisatie' }, reg.token);
+    stad: 'Ibiza', namensOrganisatie: 'MKKX', betaler: 'organisatie' }, reg.token);
   assert.equal(rit.opdracht.goedkeuring.status, 'wacht', 'de rit wacht op akkoord');
 
   await page.locator('#tabs [data-tab="akkoord"]').click();

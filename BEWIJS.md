@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2896 bestanden en 19823 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2894 bestanden en 19816 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2896 |
-| losse beweringen (`test(...)`) | 19823 |
+| toetsbestanden | 2894 |
+| losse beweringen (`test(...)`) | 19816 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 76 |
+| niets van beide | 74 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2552 bestanden, 19243 beweringen.
+2549 bestanden, 19235 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -479,7 +479,6 @@ toets omvalt.
 | `contextpakket.test.js` | 12 | gezakt op `===->!==#0` | DE CONTEXTSAMENSTELLER -- nooit stil afkappen. Een eigen modelserver kapt stil af wat niet in zijn venster past, vanaf het begin, en daar staat de grondwet. |
 | `contextspoor.test.js` | 3 | geen module gevonden | HET CONTEXTSPOOR STAAT UIT, EN ZWIJGT ALS HET AAN STAAT. Deze meting hangt in een HEET PAD: de domeingrens-Proxy waar elke toegang tot het contextobject langskomt, dus tienduizenden keren per opstart en opnieuw bij... |
 | `contract.test.js` | 13 | gezakt op `liegpoort /api/` | HET CONTRACT: maand 13, en de prijs die vaststaat. kern/aanmeldingen/betaalschema.js zette twaalf termijnen klaar en hield op. |
-| `controleafronden.test.js` | 5 | -- | Een betaling op controle wordt afgerond door een mens op naam (kern/betaalwaarheid/controle.js, routes/kantoren/betaalproviders.js). Een geweigerde terugbetaling zet de HELE betaling op CONTROLE_NODIG, met opzet (kop... |
 | `controlekamer.test.js` | 4 | gezakt op `liegpoort /api/` | De controlekamer: de eigenaar zet functies aan/uit PER DOELGROEP op de beveiligde technische pagina. Bewijs dat een functie uit kan voor de ene doelgroep (bijv. |
 | `controls.test.js` | 28 | gezakt op `return-weg#0` | HET CONTROLREGISTER (scripts/controls.js) en het uitzendcontract uit TOEZICHT.md. WAAROM DEZE TOETS ER IS. |
 | `correlatie.test.js` | 4 | gezakt op `!==->===#0` | DE CORRELATIE MAAKT DE SERVER (Fase 2, besluit B1a; server/lib/correlatie.js). Een X-Request-Id van de client werd ongetoetst de correlatie van het verzoek, in elke lengte -- en die correlatie is een SLEUTEL: de... |
@@ -838,7 +837,7 @@ toets omvalt.
 | `hardware.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Hardwarelab: het eigen hardware-ontwerpbureau van de kantoren (apparaten, schermen, sensoren, edge & servers, accessoires). Een AI tekent het concept uit (behuizing, chip, materialen, gedempt palet, poorten,... |
 | `heapproef.test.js` | 11 | gezakt op `===->!==#0` | DE HEAPPROEF ALS INSTRUMENT -- en HEAPPROEF.json als ratel. scripts/heapproef.js meet of deze server geheugen vasthoudt. |
 | `heapstat.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE HEAPPROEF -- KAN HET ALLE DRIE ZEGGEN? De rekenkant van scripts/heapproef.js staat apart (scripts/lib/heapstat.js) zodat hij te beproeven is met reeksen waarvan we het antwoord al weten. |
-| `heelrtg-bron.test.js` | 4 | -- | DE BRON VAN HEEL RTG IS DE FUNCTIEGIDS (eigenaarsbesluit 19 oktober 2026). Het zoekmenu van de rand (apps/app-main/app-main-29d.js) en Rahuls "open <app>" (app-main-29.js, gidsCommando) lezen dezelfde gids:... |
+| `heelrtg-bron.test.js` | 5 | -- | DE BRON VAN HEEL RTG IS DE FUNCTIEGIDS (eigenaarsbesluit 19 oktober 2026). Het zoekmenu van de rand (apps/app-main/app-main-29d.js) en Rahuls "open <app>" (app-main-29.js, gidsCommando) lezen dezelfde gids:... |
 | `helikopter.test.js` | 4 | gezakt op `liegpoort /api/` | Helikopter transfers: het nieuwe vervoersgenre. Een lid vraagt een helikoptervlucht aan bij Ibiza Sky Charter, betaalt vooraf, en de zaak (Operations + piloot) wijst piloot en toestel toe en rijdt de ritketen af. |
 | `herbevestiging-p1.test.js` | 7 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `herbevestiging-takken.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | HERBEVESTIGING TAK VOOR TAK (server/kern/identiteit/herbevestiging.js). Toetst de beslissing zelf met nagemaakte accounts, zware poort en rem: zonder eigen account geen handeling; een meegestuurde passkeyceremonie... |
@@ -1557,7 +1556,6 @@ toets omvalt.
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |
 | `pasbronnen.test.js` | 6 | gezakt op `true->false#0` | DE TWEE BRONNEN ONDER RETENTIE, NIEUW LID, COHORT EN CHURN (kern/pasgeschiedenis.js en kern/aanwezigheid.js; besluiten van de eigenaar, 25 september 2026). Wat hier vastligt: 1. |
 | `pasladder.test.js` | 9 | gezakt op `===->!==#0` | DE LADDER: vijf treden, elk met een bodem. Het besluit van 20 augustus 2026 zet een MKB-laag tussen consument en enterprise (Business Lite, 150 euro) en maakt de twee bovenste treden contractueel met een "vanaf". |
-| `paspoort-gratisaccount.test.js` | 1 | -- | De paspoortpoort van RTG Pay geldt voor elk account (kern/onboarding/lid.js, payGate). payGate vroeg het paspoort alleen bij tier 'rtg': een gratis account (tier 'guest') viel onder `if (tier !== 'rtg') return { ok:... |
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
 | `paspoortdeur.test.js` | 5 | gezakt op `liegpoort /api/` | DE DEUR VAN DE UNIVERSELE BODEM (server/kern/onvervreemdbaar.js), tegen een echte server. Het besluit van 27 september 2026 (SAMENLEVING.md, besluit 4c): een afspraak bij de gemeente, aangifte bij de overheid en een... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
@@ -2029,7 +2027,6 @@ toets omvalt.
 | `snaps-herhaal.test.js` | 1 | -- | Een snap met een herhaalsleutel gaat een keer weg, ook bij twee gelijktijdige tikken en na een crash (19 oktober 2026). De voltooiproef van os:snaps zag dezelfde tik na een crash twee snaps bij de vriend leggen. |
 | `snaps-routes.test.js` | 2 | gezakt op `liegpoort /api/` | SNAPS EN VERHALEN AAN DE RTG-LEDENKANT: /api/member/snaps, /api/member/snap/view, /api/member/story/view en /api/member/snap/opdracht. test/foundation.test.js loopt dezelfde kern af via de gezinskant... |
 | `sni.test.js` | 5 | geen bruikbare mutatie | SNI ALLEEN BIJ EEN NAAM. WAAROM DEZE TOETS BESTAAT, en dat is de les. |
-| `sociaal-gratisaccount.test.js` | 3 | -- | De sociale kant van de wallet staat open voor elk account, ook een gratis account (server/routes/pay.js, server/routes/pay-tegoed.js). Eigenaarsbesluit van 19 oktober 2026 (derde reeks): geld sturen, betaalverzoeken... |
 | `sociaal-index.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `social-elite.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `socialebeleid-volgorde.test.js` | 3 | geen module gevonden | EERST KEUREN, DAN PAKKEN, DAN TOEPASSEN -- twee fouten in een functie. `zet()` in server/kern/socialebeleid/index.js had ze allebei, en de staatproef vond ze in EEN meting: "geweigerd (status 400) en de toestand... |
@@ -2592,7 +2589,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-344 bestanden, 580 beweringen.
+345 bestanden, 581 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2696,6 +2693,7 @@ toets omvalt.
 | `grammatica.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE GRAMMATICA IN EEN ECHTE BROWSER. De regels staan in GRAMMATICA.md, de statische kant in test/grammatica.test.js. |
 | `handelscherm.e2e.js` | 0 | gezakt op `liegpoort /api/` | Scherm-test: RTG Handel in een echte browser (Playwright). De endpoints van de handelsketen liggen vast in test/handelsketen.test.js. |
 | `handenvrij.e2e.js` | 1 | gezakt op `liegpoort /api/` | Muisvrij bedienen, in een echte browser. De zinsontleding is los getoetst (test/handenvrij.test.js). |
+| `heelrtg-catalogus-poort.e2e.js` | 1 | -- | HEEL RTG TOONT UIT DE CATALOGUS NIETS WAT DE GIDS VERBERGT (19 oktober 2026). Het zoekmenu "Heel RTG" in de rand bouwt zijn lijst uit de widgetcatalogus (shared/interface/world-widget-catalog.json). |
 | `heelrtg-osapps.e2e.js` | 1 | -- | HEEL RTG VINDT ELKE APP, OOK DE OS-APPS (eigenaarsbesluit 19 oktober 2026). Videobellen, Bellen, Snaps en Werk hebben geen eigen adres: ze wonen in de functiegids (MAPPEN, workspace-world-catalog.js), dezelfde bron... |
 | `helper-veegdoor.e2e.js` | 2 | gezakt op `true->false#0` | DE VEEGHELPER ZELF, en niet een scherm dat hem gebruikt. veegDoor (test/helper.js) heeft twee wegen: de protocolvlucht naar Chromium, en een terugval in de renderer voor als de timer van lang drukken de vlucht heeft... |
 | `heritage-context.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

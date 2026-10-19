@@ -51,3 +51,30 @@ test('het zoekmenu leest dezelfde gids en poort als gidsCommando, zonder tweede 
   assert.match(menu, /gidsOpen\(m\)/, 'een treffer opent langs dezelfde weg als Rahul');
   assert.doesNotMatch(menu, /\[\s*['"](?:os|tab|link):/, 'geen eigen lijst van onderdelen');
 });
+
+/* DE CATALOGUS VAN HEEL RTG LOOPT DOOR DEZELFDE POORT (19 oktober 2026). De
+   widgetcatalogus kent geen werkrol en geen pas. Elke catalogus-app wiens adres
+   een ingang met een werkrol of een pas in de gids heeft, moet die ingang ook
+   VINDEN -- anders laat de poort (RTGAppCatalogusPoort, null) hem stil door. */
+test('elke catalogus-app achter een werkrol of pas vindt zijn ingang in de gids, en het menu vraagt de poort', () => {
+  const reg = require('../scripts/lib/wereldregister');
+  const pas = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-24a3.js'), 'utf8')
+    .match(/const PREMIUM = new Set\(\[([\s\S]*?)\]\)/)[1].match(/'([a-z]+)'/g).map((s) => s.slice(1, -1));
+  const zonderQuery = (u) => { const s = String(u || ''), h = s.indexOf('#'); return (h < 0 ? s : s.slice(0, h)).split('?')[0] + (h < 0 ? '' : s.slice(h)); };
+  const gids = new Map();
+  for (const i of CATALOGUS.flatMap((w) => w.items || [])) if (i.url) gids.set(zonderQuery(i.url), (gids.get(zonderQuery(i.url)) || []).concat(i.id));
+  const beperkt = Object.entries(reg.LINKS).filter(([k, v]) => v.url && (v.werkrol || pas.includes(k) || k === 'wallet'));
+  const apps = require('../public/shared/interface/world-widget-catalog.json').apps;
+  let gedekt = 0;
+  for (const [k, v] of beperkt) {
+    for (const app of apps.filter((a) => zonderQuery(a.url) === zonderQuery(v.url))) {
+      assert.ok((gids.get(zonderQuery(app.url)) || []).includes('link:' + k), app.id + ' (' + app.url + ') vindt link:' + k + ' niet in de gids');
+      gedekt++;
+    }
+  }
+  assert.ok(gedekt >= 20, 'te weinig beperkte catalogus-apps gevonden (' + gedekt + '); is de lezer stuk?');
+  const menu = fs.readFileSync(path.join(WORTEL, 'public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js'), 'utf8');
+  assert.match(menu, /poort && poort\(app\.url\) === false/, 'het menu vraagt de poort niet');
+  const app29d = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-29d.js'), 'utf8');
+  assert.match(app29d, /window\.RTGAppCatalogusPoort = [\s\S]*?gidsToegang\(id\)/, 'de poort is niet die van de gids');
+});

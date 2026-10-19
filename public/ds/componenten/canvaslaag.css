@@ -1,0 +1,39 @@
+/* Canvaslaag: wat er OP een getekend vlak zweeft (De Résidence). Bovenin,
+   onder de kop, de naam van de plek met zijn handelingen; onderin, boven de
+   Edge, een stapel rustige vlakken (het gesprek, een lopend spel). De laag
+   zelf vangt geen tikken, alleen wat erin staat: het vlak eronder blijft
+   aanraakbaar. Het vlak is donker getekend, dus de tekst erop is coverinkt. */
+@layer rtg.component {
+  .ds-canvaslaag {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 56px;
+    z-index: 5;
+    display: grid;
+    gap: var(--ds-ruimte-2);
+    padding-inline: var(--ds-goot);
+    color: var(--ds-cover-inkt);
+    pointer-events: none;
+  }
+  .ds-canvaslaag > * { pointer-events: auto; min-inline-size: 0; }
+  .ds-canvaslaag .ds-label { color: var(--ds-cover-metaal); }
+  .ds-canvaslaag .ds-meta { color: var(--ds-cover-inkt); }
+  .ds-canvaslaag--onder {
+    inset-block: auto calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6));
+    max-inline-size: 36rem;
+    margin-inline: auto;
+  }
+  .ds-canvaslaag__vlak {
+    display: grid;
+    gap: var(--ds-ruimte-2);
+    padding: var(--ds-ruimte-3);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border-radius: var(--ds-radius-beeld);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  .ds-canvaslaag__vlak .ds-meta { color: var(--ds-inkt-zacht); }
+  .ds-canvaslaag__vlak .ds-label { color: var(--ds-metaal); }
+  /* Een melding op een canvas staat bovenin: onderin ligt het gesprek. */
+  .ds-melding--boven { inset-block: calc(56px + var(--ds-ruimte-2)) auto; }
+}

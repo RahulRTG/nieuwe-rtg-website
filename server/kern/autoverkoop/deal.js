@@ -2,27 +2,39 @@
    inruilaanvraag, het digitale koopcontract, het dealerbesluit, tekenen en
    de lijsten voor klant en dealer. vindAuto komt via de context binnen
    nadat kern/autoverkoop.js de showroomlaag heeft gemount. */
+const { herhaling } = require('./herhaal');
+const { koopContract } = require('./contract');
 module.exports = (ctx) => {
-  const { db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, media,
-    KETEN_PROEFRIT, KETEN_KOOP, KLAAR, BRANDSTOF,
-    deals, isVerkoopBedrijf, ver, magVerkopen, autoNaam, id, nu, schoon, getal } = ctx;
-  const { zetAan, zetAuto, verwijderAuto, publiekeAuto, bedrijven, showroom, aanbevolen, vindAuto } = ctx;
-  function proefritAanvraag(key, codenaam, supplierCode, autoId, wens) {
+  const { db, save, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
+    KLAAR, deals, ver, magVerkopen, autoNaam, id, nu, schoon, getal } = ctx;
+  const { publiekeAuto, showroom, vindAuto } = ctx;
+  // de herhaalsleutel van het scherm staat bij de deal (./herhaal.js)
+  function herhaal(key, idem, soort, code, autoId) {
+    const h = herhaling(deals(), key, schoon(idem, 80), soort, code, autoId);
+    return h && (h.deal ? { status: 200, ok: true, herhaald: true, deal: klantDeal(h.deal) } : h);
+  }
+  function proefritAanvraag(key, codenaam, supplierCode, autoId, wens, idem) {
+    const h = herhaal(key, idem, 'proefrit', supplierCode, autoId);
+    if (h) return h;
     const t = vindAuto(supplierCode, autoId);
     if (!t) return { status: 404, error: 'Deze auto staat niet te koop.' };
     const d = nieuweDeal('proefrit', key, codenaam, t.s, t.a);
     d.wens = schoon(wens, 200);
+    if (idem) d.idem = schoon(idem, 80);
     bewaar(d, t.s);
     return { status: 200, ok: true, deal: klantDeal(d) };
   }
 
   /* ---- kopen (met bod, inruil, concierge-aflevering) ---- */
   function koopAanvraag(key, codenaam, supplierCode, autoId, opts) {
+    opts = opts || {};
+    const h = herhaal(key, opts.idem, 'koop', supplierCode, autoId);
+    if (h) return h;
     const t = vindAuto(supplierCode, autoId);
     if (!t) return { status: 404, error: 'Deze auto staat niet te koop.' };
     if (t.a.status !== 'te koop') return { status: 409, error: 'Deze auto is niet meer beschikbaar.' };
-    opts = opts || {};
     const d = nieuweDeal('koop', key, codenaam, t.s, t.a);
+    if (opts.idem) d.idem = schoon(opts.idem, 80);
     d.vraagprijs = t.a.prijs;
     d.bod = opts.bod != null ? getal(opts.bod, 0, 1e7, t.a.prijs) : t.a.prijs;
     d.prijs = d.bod;
@@ -38,19 +50,6 @@ module.exports = (ctx) => {
     bewaar(d, t.s);
     return { status: 200, ok: true, deal: klantDeal(d) };
   }
-  function koopContract(d) {
-    return [
-      'RTG Autoverkoop, koopovereenkomst (concept)',
-      '',
-      'Voertuig: ' + d.autoNaam,
-      'Prijs: € ' + d.prijs + (d.vraagprijs && d.vraagprijs !== d.prijs ? ' (vraagprijs € ' + d.vraagprijs + ')' : ''),
-      d.inruil ? 'Inruil: ' + [d.inruil.merk, d.inruil.model, d.inruil.jaar].filter(Boolean).join(' ') + (d.inruil.taxatie != null ? ', getaxeerd op € ' + d.inruil.taxatie : ', taxatie volgt') : 'Inruil: geen',
-      d.concierge ? 'Aflevering: concierge, op ' + (d.adres || 'uw adres') : 'Aflevering: ophalen bij de zaak',
-      '',
-      'Door te tekenen bevestigt u de koop tegen bovenstaande voorwaarden. De zaak levert de auto met de opgegeven garantie en historie. Betaling en tenaamstelling worden bij aflevering afgerond.'
-    ].join('\n');
-  }
-
   /* ---- inruil-taxatie los aanvragen ---- */
   function inruilAanvraag(key, codenaam, supplierCode, autoId, inruil) {
     const t = vindAuto(supplierCode, autoId);
@@ -124,6 +123,8 @@ module.exports = (ctx) => {
     const d = deals().find(x => x.ref === ref && x.key === key);
     if (!d) return { status: 404, error: 'Aanvraag niet gevonden.' };
     if (d.soort !== 'koop') return { status: 409, error: 'Alleen een koop heeft een contract.' };
+    // een tweede tik op tekenen: dezelfde handtekening, geen nieuwe
+    if (d.status === 'getekend' && d.contract && d.contract.getekend) return { status: 200, ok: true, herhaald: true, status2: d.status };
     if (d.status !== 'aanvaard') return { status: 409, error: 'Er is nog geen aanvaard aanbod om te tekenen.' };
     const n = schoon(naam, 60);
     if (!n) return { status: 400, error: 'Typ uw naam om te tekenen.' };

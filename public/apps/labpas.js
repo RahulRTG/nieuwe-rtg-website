@@ -53,7 +53,7 @@
 
   /* ---------- mijn onderzoek ---------- */
   function openPas(pas) {
-    return api('mijn', { pas: pas }).then(function (d) {
+    return window.LabpasBuurt.deur().then(function () { return api('mijn', { pas: pas }); }).then(function (d) {
       PAS = pas;
       try { sessionStorage.setItem('rtg_labpas', pas); } catch (e) {}
       teken(d);
@@ -149,9 +149,9 @@
   }
 
   /* ---------- starten ---------- */
-  api('bewoner/kader').then(function (k) {
+  window.LabpasBuurt.deur().then(function () { return api('bewoner/kader'); }).then(function (k) {
     KADER = k;
-    return window.LabpasBuurt.deur().then(function () { return api('bewoner/labs'); });
+    return api('bewoner/labs');
   }).then(function (d) {
     LABS = d.labs || [];
     LAB = LABS.length ? LABS[0].id : null;

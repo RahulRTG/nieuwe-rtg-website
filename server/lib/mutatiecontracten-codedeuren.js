@@ -39,4 +39,6 @@ const CONTRACTEN = {
     'Zelfde als de ledenkant: opvragen is roteren, met dezelfde teller in de kern.',
     'test/servicezaak.test.js "een zaak bevestigt toegang net als een lid": de zaak vraagt zelf een zescijferige code op')
 };
+// de roteerroutes van de codeportalen (19 oktober 2026) staan apart, en komen hier mee (mutatiecontracten.js zit op de 10 kB-grens)
+Object.assign(CONTRACTEN, require('./mutatiecontracten-portaalrotatie').CONTRACTEN);
 module.exports = { CONTRACTEN };

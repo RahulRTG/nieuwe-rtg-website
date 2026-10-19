@@ -1,6 +1,9 @@
-/* Living Lab, deel "openbaar": de deuren die zonder inlog en zonder labpas
-   opengaan -- de onderzoekskaarten, de buurtvragen met hun stand, en de
-   apparatuur die te lenen is.
+/* Living Lab, deel "openbaar": de deuren die zonder labpas opengaan -- de
+   onderzoekskaarten, de buurtvragen met hun stand, en de apparatuur die te
+   lenen is. Sinds het eigenaarsbesluit van 19 oktober 2026 met een account (een
+   gratis account of een gezinsprofiel onder een ouderaccount is genoeg,
+   ./bewoneraccount.js): alles van het buurtlab gaat achter een account, en een
+   onderzoekskaart is geen wettelijk openbaar stuk zoals het ANBI-jaarverslag.
 
    Afgesplitst van ./bewoner.js toen die over de 10 KB-keuringsgrens ging, en
    langs een echte naad: dat bestand gaat over een bewoner die MEEDOET (labpas,
@@ -17,19 +20,18 @@
 
 module.exports = (kern, hulp) => {
   const { app, livinglab, labfonds } = kern;
-  const { veilig, lijf, remLezen, remSchrijf } = hulp;
+  const { veilig, lijf, remLezen, remSchrijf, bewoner, GEEN_ACCOUNT } = hulp;
 
-  /* Wat een school of buurtinitiatief kan lenen, en de aanvraag zelf. Geen
-     inlog: wie iets wil lenen van dit lab, heeft geen RTG-account -- en dat
-     hoort geen drempel te zijn. */
-  app.post('/api/lab2/publiek/apparatuur', remLezen, (req, res) => veilig(res, () => livinglab.uitleen.catalogus(lijf(req).labId)));
-  app.post('/api/lab2/publiek/uitleen-aanvraag', remSchrijf, (req, res) => veilig(res, () => livinglab.uitleen.aanvraag(lijf(req))));
+  /* Wat een school of buurtinitiatief kan lenen, en de aanvraag zelf. Hier stond
+     "geen inlog"; sinds 19 oktober 2026 een gratis account. */
+  app.post('/api/lab2/publiek/apparatuur', remLezen, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => livinglab.uitleen.catalogus(lijf(req).labId)));
+  app.post('/api/lab2/publiek/uitleen-aanvraag', remSchrijf, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => livinglab.uitleen.aanvraag(lijf(req))));
 
   /* De vragen van dit lab met hun stand -- ook de afgewezen, met de reden. Dit
      is de kant waarop een bewoner kan zien wat er met zijn vraag is gebeurd. */
-  app.post('/api/lab2/publiek/vragen', remLezen, (req, res) => veilig(res, () => livinglab.vraagbesluit.vragen(lijf(req).labId, lijf(req))));
+  app.post('/api/lab2/publiek/vragen', remLezen, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => livinglab.vraagbesluit.vragen(lijf(req).labId, lijf(req))));
 
-  app.post('/api/lab2/publiek/onderzoeken', remLezen, (req, res) => veilig(res, () => livinglab.publicatie.lijst(lijf(req).labId, lijf(req).n)));
+  app.post('/api/lab2/publiek/onderzoeken', remLezen, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => livinglab.publicatie.lijst(lijf(req).labId, lijf(req).n)));
   /* De onderzoekskaart, met het fondsgeld dat eraan is TOEGEZEGD erbij. Dit is
      de vraag van het lid dat inzamelde: wat is er met mijn bijdrage onderzocht?
 
@@ -37,7 +39,7 @@ module.exports = (kern, hulp) => {
      is van het lab, de toezegging van het fonds, en geen van beide hoort de
      ander na te bouwen. Ontbreekt het fonds, dan blijft de kaart gewoon staan --
      zonder financieringsblok en zonder verzonnen nul. */
-  app.post('/api/lab2/publiek/onderzoek', remLezen, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/publiek/onderzoek', remLezen, (req, res) => !bewoner(req) ? res.status(401).json(GEEN_ACCOUNT) : veilig(res, () => {
     const k = livinglab.publicatie.kaart(lijf(req).id);
     if (!k || k.error || !labfonds) return k;
     return Object.assign({}, k, { fonds: labfonds.financiering(lijf(req).id) });

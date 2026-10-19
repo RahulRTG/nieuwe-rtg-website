@@ -34,7 +34,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 // de buurtdeuren van het lab vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per alias
 require('./labaccount').zetLabAccount();
 
@@ -232,9 +233,21 @@ test('het labpaspoort draagt de punten die in een onderzoek zijn verdiend', asyn
   PUNTEN = kader.spel.punten.interview;
   assert.ok(PUNTEN > 0, 'een interview levert punten op');
 
-  PASPOORT = (await moetPub('bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' }, 'paspoort maken')).paspoort.code;
+  /* Het paspoort is progressie (niveaus en badges) en hangt sinds het
+     eigenaarsbesluit van 19 oktober 2026 aan een gekeurd, volwassen account
+     (routes/livinglab/bewonerpas.js): Sam is dat. */
+  const sam = await registreerGratis(base);
+  await keurLidGoed(base, sam.token, sam.codenaam, '1985-05-05');
+  const alsSam = async (pad, body, wat) => {
+    const r = await fetch(base + '/api/lab2/' + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sam.token }, body: JSON.stringify(body || {}) })
+      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
+    assert.equal(r.status, 200, wat + ' -- ' + (r.body.error || ''));
+    return r.body;
+  };
+  PASPOORT = (await alsSam('bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' }, 'paspoort maken')).paspoort.code;
 
-  const leeg = await moetPub('bewoner/paspoort', { pas: PASPOORT }, 'vers paspoort lezen');
+  const leeg = await alsSam('bewoner/paspoort', { pas: PASPOORT }, 'vers paspoort lezen');
   assert.equal(leeg.paspoort.naam, 'Sam', 'het paspoort draagt de roepnaam en geen echte naam');
   assert.equal(leeg.paspoort.punten, 0, 'een vers paspoort begint op nul');
   assert.equal(leeg.paspoort.niveau, 1);
@@ -256,13 +269,16 @@ test('het labpaspoort draagt de punten die in een onderzoek zijn verdiend', asyn
   assert.equal(obs.observatie.door, ALIAS,
     'de observatie staat op de alias van de pas en niet op de naam die de inzender zelf meestuurde');
 
-  const na = await moetPub('bewoner/paspoort', { pas: PASPOORT.toLowerCase() }, 'paspoort in kleine letters');
+  const na = await alsSam('bewoner/paspoort', { pas: PASPOORT.toLowerCase() }, 'paspoort in kleine letters');
   assert.equal(na.paspoort.punten, PUNTEN, 'de punten uit de studie staan op het paspoort');
   assert.equal(na.paspoort.volgende.teGaan, leeg.paspoort.volgende.teGaan - PUNTEN,
     'en het volgende niveau is precies die punten dichterbij');
 
-  const onbekend = await pub('/api/lab2/bewoner/paspoort', { pas: 'LABPAS-BESTAATNIET' });
+  const onbekend = await fetch(base + '/api/lab2/bewoner/paspoort', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sam.token }, body: JSON.stringify({ pas: 'LABPAS-BESTAATNIET' }) });
   assert.equal(onbekend.status, 404, 'een code die niemand heeft, geeft niets');
+  const kind = await pub('/api/lab2/bewoner/paspoort', { pas: PASPOORT });
+  assert.equal(kind.status, 403, 'een account dat de 18+-poort niet haalt, leest geen progressie');
 });
 
 /* De klachtenprocedure, van allebei de kanten. Het punt van deze laag is niet

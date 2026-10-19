@@ -146,6 +146,37 @@ vooraf vaststaat, een bewijsregel per betaling die naar het mandaat wijst, en
 een uitgang waarmee een mens het kan intrekken zonder de agent te stoppen.
 Zolang die vier er niet zijn, blijft `mandaat.js` staan zoals hij staat.
 
+## 7c. De wallet van elk account -- besluiten van 19 oktober 2026
+
+Dezelfde dag besloot de eigenaar eerst dat gebruiken minimaal een gratis
+account vraagt (`AGENTS.md`), dat de wallet daarbij hoort (opladen, het
+overzicht, betalen bij een zaak) en dat een terugbetaling die de veegronde
+escaleert, als "terugbetaling vastgelopen" op de lijst van de betaalkamer
+komt. Daarna volgden drie besluiten die de rest van dat beeld afmaken.
+
+1. **Het paspoort voor elk account, ook een gratis account.** De paspoortpoort
+   van RTG Pay (`payGate`, `server/kern/onboarding/lid.js`) gold alleen voor de
+   RTG Pass; een ongekeurd gratis account laadde zonder paspoort op tot het
+   walletplafond. Nu vraagt hij het paspoort van elk account op elk geldmoment.
+   Lifestyle en Business deden het al bij de onboarding. Bewijs:
+   `test/paspoort-gratisaccount.test.js`.
+2. **Een betaling op controle rondt een mens op naam af.** Een geweigerde
+   terugbetaling zet de hele betaling op `CONTROLE_NODIG`, met opzet: daarna
+   gaat er niets meer terug, ook geen tweede ticket, tot een mens keek. Uit die
+   stand bestond geen weg. Nu zet een kantoormens op naam, met een reden, de
+   betaling terug op haar laatste ruststand voor de controle (bevestigd,
+   gedeeltelijk of geheel terugbetaald); de geweigerde opdracht blijft staan.
+   Geen automatische weg: de statenmachine kent nog steeds geen uitgang, de
+   handeling staat apart in `server/kern/betaalwaarheid/controle.js`, en een
+   betaling die nooit bevestigd was, kan niet worden afgerond. Op dezelfde lijst
+   van de betaalkamer, zonder nieuw scherm. Bewijs: `test/controleafronden.test.js`.
+3. **Sturen, betaalverzoeken en tikken ook voor een gratis account.** De
+   sociale kant was voor leden. Door besluit 1 heeft een account met geld altijd
+   zijn paspoort laten zien, en valt die grond weg. Plafond, grens per boeking,
+   eigen limieten en blokkades blijven; de afzender komt uit de sessie, nooit uit
+   het verzoek. Het tegoed en de terugstorting naar het eigen IBAN vielen buiten
+   dit besluit en blijven voor leden. Bewijs: `test/sociaal-gratisaccount.test.js`.
+
 ## 8. De elf gezichtspunten
 
 | Stand | Rol in het systeem |

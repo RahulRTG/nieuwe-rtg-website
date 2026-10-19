@@ -14,9 +14,13 @@
       aan koppelen -- dat zou precies de link maken die het lab niet vastlegt --
       en de punten blijven daar dus binnen dat onderzoek. Dat staat er ook zo bij,
       want een spelelement dat stil minder oplevert voelt als een storing.
-   3. DE KLACHT. Zonder pas, met opzet: een klacht kan juist gaan over hoe een
-      onderzoek met je omging, en dan is "log eerst in" het verkeerde antwoord.
-      Zolang er één openstaat, komt die studie niet aan nieuwe deelnemers toe. */
+   3. DE KLACHT. Zonder pas, maar met een account: sinds het eigenaarsbesluit
+      van 19 oktober 2026 gaat alles van het buurtlab achter een account, ook de
+      klacht (een gratis account is genoeg; de deur staat in dit scherm,
+      ./labpas-buurt.js). Zolang er één openstaat, komt die studie niet aan
+      nieuwe deelnemers toe.
+   Het paspoort is progressie en hangt aan het account, alleen boven de
+   18+-grens (routes/livinglab/bewonerpas.js). */
 (function () {
   'use strict';
   var api, esc, meld, KADER, LAB = null;
@@ -77,7 +81,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-oklacht]'), function (b) {
       b.addEventListener('click', function () {
         var id = b.closest('[data-studie]').dataset.studie;
-        var tekst = prompt('Waar gaat uw klacht over? U hoeft niet in te loggen en u mag anoniem blijven.');
+        var tekst = prompt('Waar gaat uw klacht over?');
         if (!tekst) return;
         api('bewoner/klacht', { id: id, tekst: tekst })
           .then(function () {
@@ -133,7 +137,8 @@
             'gescheiden houdt kan dat niet -- daar blijven de punten binnen dat ene onderzoek.</div></div>';
           $('#paspVeld').value = r.paspoort.code;
         })
-        .catch(function (e) { meld(e.message); });
+        // de 18+-grens hoort naast de knop te staan en niet in een vluchtige melding
+        .catch(function (e) { $('#pasp').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
     });
     // wie zijn paspoort deze sessie al opende, hoeft het niet opnieuw te typen
     try {

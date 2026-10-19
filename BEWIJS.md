@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2912 bestanden en 19867 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2913 bestanden en 19869 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2912 |
-| losse beweringen (`test(...)`) | 19867 |
+| toetsbestanden | 2913 |
+| losse beweringen (`test(...)`) | 19869 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 92 |
+| niets van beide | 93 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2565 bestanden, 19282 beweringen.
+2566 bestanden, 19284 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -824,6 +824,7 @@ toets omvalt.
 | `groepvorm.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | De groepvorm (scripts/groepvorm.js, GROEPVORM.json) -- de meting waar de architectuurkeuze van FoundationOS op rust (GEMEENSCHAP.md par. 5, fase 0.1, besluit van de eigenaar van 11 oktober 2026). |
 | `grondwacht.test.js` | 56 | gezakt op `true->false#0` | DE WACHTERS -- en of ze echt kunnen zakken. LAT.md regel 10: een meter die je niet hebt zien uitslaan, meet niets. |
 | `groothandel.test.js` | 9 | gezakt op `liegpoort /api/` | Groothandel & markt: een brede B2B/B2C-marktplaats op het RTG-systeem. Een groothandel voert een assortiment, zet zijn eigen functies aan/uit, en levert aan horeca (inkoopprijs), leden (boodschappen) en... |
+| `haccp-grens.test.js` | 2 | -- | Horeca HACCP: EEN MEETGRENS ZET DE LEIDING, EN EEN OUDE GRENS BLIJFT STAAN. Een temperatuurlogboek is zo goed als zijn grens: koeling op hoogstens 7 °C (NVWA). |
 | `hack.test.js` | 9 | gezakt op `liegpoort /api/` | Hack-test: een adversariële penetratietest die bewijst dat het platform bekende aanvallen afslaat. Geen exploit die MOET slagen -- juist een regressie-hek dat de bestaande verdediging vastlegt: auth-dwang,... |
 | `hand.test.js` | 6 | geen module gevonden | LINKS- OF RECHTSHANDIG: DE HAND BEPAALT WAAR DE DINGEN LIGGEN. De duimboog van een linkshandige is het spiegelbeeld van die van een rechtshandige. |
 | `handelenspoor.test.js` | 6 | gezakt op `liegpoort /api/` | DE REFERENTIE ONDER EEN LIEGENDE OPSLAG -- geval 1 en 2 van de vijf. REPRESENTATIE.md par. |

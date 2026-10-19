@@ -23,14 +23,17 @@
       vraag krijgt een eigen antwoord; "alles akkoord" in een keer bestaat niet
       als knop, want dat is precies hoe die lijsten waardeloos worden. */
 module.exports = (kern) => {
-  const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
+  const { app, save, schoon, supplierAuth, logActivity, horeca, managerOnly } = kern;
   const { H, nu, id } = horeca;
 
   const HA = (code) => { const h = H(code); if (!h.haccp) h.haccp = { punten: {}, metingen: [], batches: {}, lijsten: {}, afgevinkt: [] }; return h.haccp; };
   const vandaag = () => nu().slice(0, 10);
 
   /* ---------- meetpunten (koeling, vriezer, warmhoud, afwas) ---------- */
+  /* Een grens zet de leiding, en een oude grens blijft staan (19 oktober 2026:
+     tot dan kon elke medewerker 7 graden 12 maken, zonder spoor). */
   app.post('/api/supplier/horeca/haccp/punt', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
     const ha = HA(req.supplier.code);
     const naam = schoon(req.body.naam, 60);
     if (!naam) return res.status(400).json({ error: 'Welk meetpunt? (koeling 1, vriezer, bain-marie)' });
@@ -38,8 +41,14 @@ module.exports = (kern) => {
     const max = req.body.max != null ? Number(req.body.max) : null;
     if (min == null && max == null) return res.status(400).json({ error: 'Geef een onder- of bovengrens; zonder grens is een meting geen controle.' });
     const key = schoon(req.body.id, 20) || id(3);
+    const oud = ha.punten[key];
+    const historie = (oud && oud.historie) || [];
+    if (oud && (oud.min !== min || oud.max !== max)) {
+      historie.unshift({ min: oud.min, max: oud.max, van: oud.at, tot: nu(),
+        door: (req.actor && req.actor.name) || 'manager' });
+    }
     ha.punten[key] = { id: key, naam, min, max, eenheid: schoon(req.body.eenheid, 5) || 'C',
-      frequentie: schoon(req.body.frequentie, 30) || 'dagelijks', at: nu() };
+      frequentie: schoon(req.body.frequentie, 30) || 'dagelijks', at: nu(), historie: historie.slice(0, 50) };
     save();
     res.json({ ok: true, punt: ha.punten[key], punten: Object.values(ha.punten) });
   });

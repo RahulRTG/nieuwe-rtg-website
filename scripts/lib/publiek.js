@@ -120,7 +120,6 @@ const PUBLIEK = new Map([
   ['/api/arrival/request', 'gast maakt zelf een aanvraag; de server geeft een 128-bit pass (kern/arrivalpas.js), idempotentie en rem per ip'],
   ['/api/arrival/pass/roteer', 'de houder roteert zijn eigen pass: de 128-bit pass uit het lijf is de deur (kern/arrivalpas.js), rem per ip'],
   ['/api/arrival/pass/intrek', 'de houder trekt zijn eigen pass in; beveiliging hoort geen drempel te hebben, rem per ip'],
-  ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
   ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
   ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],
   ['/api/rtgid/start', 'de identiteitsstroom begint voordat er een sessie is'],

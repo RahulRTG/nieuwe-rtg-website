@@ -535,11 +535,17 @@
     $('#spList').querySelectorAll('.sp-person[data-sid]').forEach(b => b.addEventListener('click', () => openPin(b.dataset.sid, b.dataset.name, b.dataset.role)));
     bindBack(mgmt ? renderRoles : renderFuncs);
   }
-  // Solliciteren: bij elk bedrijf hetzelfde formulier
+  // Solliciteren: bij elk bedrijf hetzelfde formulier. Het vraagt een account (eigenaarsbesluit
+  // 19 oktober 2026): eerst inloggen of gratis aanmelden, hier in het scherm (shared/accountdeur.js).
   function renderApply(){
-    const type = TYPEOF[pickCode] || 'restaurant';
     spH2().textContent = T('sp.applyh','Solliciteren');
     spDeck().textContent = T('sp.applydeck','Bij elke RTG-partner solliciteert u op dezelfde manier. Het bedrijf ziet uw sollicitatie direct in de app.');
+    $('#spList').innerHTML = '<div id="apDeur"></div>' + backBtn();
+    bindBack(renderRoles);
+    RTGAccountDeur.eis($('#apDeur'), { waarom: T('sp.a.account','Solliciteren doet u met een RTG-account; een gratis account is genoeg.') }).then(applyForm);
+  }
+  function applyForm(){
+    const type = TYPEOF[pickCode] || 'restaurant';
     $('#spList').innerHTML =
       '<div class="field h-mt40"><label>'+T('sp.a.name','Uw naam')+'</label><input id="apName"></div>'+
       '<div class="field"><label>'+T('sp.a.func','Functie')+'</label><select id="apFunc" class="s-1r27qfv">'+
@@ -552,7 +558,11 @@
       const name = $('#apName').value.trim(), contact = $('#apContact').value.trim();
       if (!name || !contact){ toast(T('sp.a.fill','Vul uw naam en telefoonnummer of e-mailadres in.')); return; }
       try {
-        await API.call('/supplier/apply', { code: pickCode, name, func: $('#apFunc').value, contact, note: $('#apNote').value.trim() });
+        const r = await fetch('/api/supplier/apply', { method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ code: pickCode, name, func: $('#apFunc').value, contact, note: $('#apNote').value.trim() }) });
+        const d = await r.json().catch(() => ({}));
+        if (r.status === 401) { RTGAccountDeur.vergeet(); renderApply(); return; }
+        if (!r.ok) throw new Error(d.error || T('sp.a.fout','Versturen lukte niet.'));
         toast(T('sp.a.sent','Verstuurd. ') + gateRoster.supplier.name + ' ' + T('sp.a.sent2','neemt contact met u op.'));
         renderRoles();
       } catch(e){ toast(e.message); }

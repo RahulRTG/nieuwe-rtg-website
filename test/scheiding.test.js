@@ -349,7 +349,6 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/bericht': 'clubportaal: de clubcode is de sleutel',
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/partner/raad': 'stadsraad-portaal: de partnercode is de sleutel',
     'server/routes/supplier/toegang.js POST /api/supplier/roster': 'openbaar rooster van een zaak op zaakcode',
-    'server/routes/supplier/werving/sollicitaties.js POST /api/supplier/apply': 'solliciteren kan zonder account: de vacaturecode is openbaar',
     // (b) openbare inhoud achter een inlog
     'server/routes/luchthaven.js POST /api/supplier/lucht/pass': 'boarding pass die de gast zelf toont aan de balie',
     'server/routes/member/winkel-bieb.js POST /api/foodcourt/tijden': 'vrije tijdsloten van een restaurant: openbare beschikbaarheid',

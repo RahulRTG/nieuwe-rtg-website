@@ -111,13 +111,17 @@ test('een ongekeurd lid betaalt geen boeking en krijgt de paspoortweg', async ()
    hij een huur heeft waarvan hij de afloop van tevoren weet -- nooit een
    afloop die per run verschilt (eis van de eigenaar, 19 oktober 2026). */
 async function huurMetAfloop(L, gewenst, start) {
-  for (let i = 0; i < 80; i++) {
-    const h = await api('/api/huur/boek', { supplierCode: 'ISLAREN', autoId: 'c' + (1 + i % 3), van: D(start + 2 * i), tot: D(start + 2 * i + 1),
+  /* Steeds HETZELFDE tijdvak: een annulering maakt de auto weer vrij, dus de
+     lus loopt niet weg in de kalender en kan lang genoeg zoeken. Een
+     terugboeking is 3 op de 100 sleutels; 600 pogingen missen hem met een kans
+     van ongeveer 1 op 100 miljoen. */
+  for (let i = 0; i < 600; i++) {
+    const h = await api('/api/huur/boek', { supplierCode: 'ISLAREN', autoId: 'c1', van: D(start), tot: D(start + 1),
       idem: 'afloop-' + gewenst + '-' + i + '-' + Date.now() }, L.token);
-    if (h.status !== 200) continue;
+    assert.equal(h.status, 200, 'het tijdvak is vrij: ' + JSON.stringify(h.body));
     const ref = h.body.huur.ref;
     if (afloop(L.codenaam, 'boeking:' + ref + ':autolaad') === gewenst) return ref;
-    await api('/api/annuleer', { soort: 'boeking', ref }, L.token);
+    assert.equal((await api('/api/annuleer', { soort: 'boeking', ref }, L.token)).status, 200);
   }
   throw new Error('geen huur gevonden waarvan de bijlading "' + gewenst + '" geeft');
 }

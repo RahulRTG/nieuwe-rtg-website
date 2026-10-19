@@ -27,7 +27,7 @@
     }
     function total() {
       var n = fields().participants;
-      q('rTotaal').textContent = trip ? 'Richtprijs: € ' + trip.prijs*n + ' voor ' + n + ' reiziger' + (n===1?'':'s') : '';
+      q('rTotaal').textContent = trip ? 'Richtprijs: ' + new Intl.NumberFormat(d.documentElement.lang || 'nl',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(trip.prijs*n) + ' voor ' + n + ' reiziger' + (n===1?'':'s') : '';
     }
     function apply(value) {
       q('rDatum').value = value.date || '';

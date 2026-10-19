@@ -146,6 +146,8 @@
     "public/apps/ov.html": "test/ov-ds.e2e.js",
     "public/apps/move.html": "test/move-ds.e2e.js",
     "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
+    "public/apps/routedossier.html": "test/routedossier-ds.e2e.js",
+    "public/apps/routedekking.html": "test/routedekking-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

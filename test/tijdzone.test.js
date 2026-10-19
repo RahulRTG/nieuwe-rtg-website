@@ -103,3 +103,11 @@ test('zaakZoneOfHuis: de zone van de zaak, en anders het huis in plaats van UTC'
   assert.equal(tz.zaakZoneOfHuis({}), 'Europe/Amsterdam');
   assert.equal(tz.zaakZoneOfHuis(null), 'Europe/Amsterdam');
 });
+
+test('datumVan: de dag van een opgeslagen tijdstip in het huis; leeg is null en nooit vandaag', () => {
+  assert.equal(tz.datumVan('2026-07-15T23:30:00Z'), '2026-07-16');
+  assert.equal(tz.datumVan(Date.parse('2026-07-15T21:00:00Z')), '2026-07-15');
+  assert.equal(tz.datumVan(undefined), null);
+  assert.equal(tz.datumVan(''), null);
+  assert.equal(tz.datumVan('rommel'), null);
+});

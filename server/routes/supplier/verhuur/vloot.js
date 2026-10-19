@@ -61,10 +61,10 @@ app.post('/api/supplier/auto', supplierAuth, (req, res) => {
 app.post('/api/supplier/huur/overzicht', supplierAuth, (req, res) => {
   const s = req.supplier;
   if (!isVerhuur(s, res)) return;
-  const vandaag = new Date().toISOString().slice(0, 10);
+  const vandaag = require('../../../kern/tijdzone').datumIn();
   const lijst = db.data.boekingen
     .filter(b => b.kind === 'huur' && b.supplierCode === s.code && b.paid &&
-      (!['afgerond', 'geweigerd'].includes(b.status) || String(b.finishedAt || b.at).slice(0, 10) === vandaag))
+      (!['afgerond', 'geweigerd'].includes(b.status) || require('../../../kern/tijdzone').datumVan(b.finishedAt || b.at) === vandaag))
     .slice(0, 40)
     .map(b => {
       const f = db.data.huurFotos[b.ref] || { voor: [], na: [] };

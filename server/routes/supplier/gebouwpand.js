@@ -34,8 +34,8 @@ module.exports = (kern) => {
   const lees = (code) => eigen.kijk('gebouwPand')[code]
     || { installaties: [], post: [], parkeer: [], bhv: [] };
   const cap = l => { if (l.length > MAX) l.length = MAX; };
-  const vandaag = () => new Date().toISOString().slice(0, 10);
-  const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
+  const vandaag = () => require('../../kern/tijdzone').datumIn();
+  const overDagen = d => require('../../kern/tijdzone').plusDagen(vandaag(), d);
 
   /* Signalen over het pand: keuringen die (bijna) verlopen zijn, pakketten
      die al dagen op de mailroom liggen en een BHV-oefening die te lang

@@ -107,7 +107,7 @@ module.exports = (ctx) => {
     if (!waar) return { status: 400, error: 'Waar is het verschenen?' };
     const r = R(key);
     if (r.vermeldingen.length >= 1000) r.vermeldingen.pop();
-    r.vermeldingen.unshift({ id: rid(), waar, op: isDatum(x.op) ? x.op : new Date().toISOString().slice(0, 10),
+    r.vermeldingen.unshift({ id: rid(), waar, op: isDatum(x.op) ? x.op : require('../tijdzone').datumIn(),
       teneur: TENEUR.includes(x.teneur) ? x.teneur : 'neutraal', notitie: schoon(x.notitie, 400) });
     save();
     return { status: 200, ok: true };
@@ -116,7 +116,7 @@ module.exports = (ctx) => {
 
   function reputatie(key) {
     const r = lees(key);
-    const t = new Date().toISOString().slice(0, 10);
+    const t = require('../tijdzone').datumIn();
     return { status: 200,
       optredens: r.optredens, lijnen: r.lijnen, woordvoerders: r.woordvoerders,
       vermeldingen: r.vermeldingen.slice(0, 100),

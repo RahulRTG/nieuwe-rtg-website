@@ -105,7 +105,7 @@ app.post('/api/office/export.csv', kluisAuth, async (req, res) => {
   if (!spoor.ok) return res.status(spoor.status || 503).json({ error: spoor.error, spoor: spoor.reden });
   const esc = require('../../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');
+  res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + require('../../kern/tijdzone').datumIn() + '.csv"');
   res.write('\uFEFF' + ['datum', 'soort', 'partner', 'gast', 'omschrijving', 'status', 'betaald', 'bedrag'].join(';') + '\n');
   // de boekhouding blijft compleet: gearchiveerde tickets (oudste eerst) tellen mee
   for (const o of archief.leesAlles()) {

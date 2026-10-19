@@ -54,7 +54,7 @@ require('./tickets-dicht')(kern, { heeftTickets });
 app.post('/api/supplier/programma', supplierAuth, (req, res) => {
   const s = req.supplier;
   if (!heeftTickets(s)) return res.status(409).json({ error: 'Deze sector verkoopt geen tickets.' });
-  const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.datum || '')) ? req.body.datum : new Date().toISOString().slice(0, 10);
+  const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.datum || '')) ? req.body.datum : require('../../kern/tijdzone').datumIn();
   const slots = [];
   for (const a of (s.activiteiten || [])) {
     for (const tijd of (a.tijden || [])) {

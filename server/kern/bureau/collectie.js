@@ -80,7 +80,7 @@ module.exports = (ctx) => {
     const door = schoon(x.door, 100);
     if (!door) return { status: 400, error: 'Wie heeft getaxeerd? Een bedrag zonder taxateur leggen wij niet vast.' };
     if (d.taxaties.length >= 100) return { status: 400, error: 'Er staan al veel taxaties.' };
-    d.taxaties.unshift({ id: rid(), door, op: isDatum(x.op) ? x.op : new Date().toISOString().slice(0, 10),
+    d.taxaties.unshift({ id: rid(), door, op: isDatum(x.op) ? x.op : require('../tijdzone').datumIn(),
       bedrag: getal(x.bedrag, 1e11), volgende: isDatum(x.volgende) ? x.volgende : '',
       notitie: schoon(x.notitie, 300) });
     save();
@@ -95,7 +95,7 @@ module.exports = (ctx) => {
     const d = C(key, String(x.bezitId || ''), true);
     if (!d) return geenStuk;
     d.conditie = { staat: STATEN.includes(x.staat) ? x.staat : 'goed',
-      gezienOp: isDatum(x.gezienOp) ? x.gezienOp : new Date().toISOString().slice(0, 10),
+      gezienOp: isDatum(x.gezienOp) ? x.gezienOp : require('../tijdzone').datumIn(),
       volgende: isDatum(x.volgende) ? x.volgende : '', notitie: schoon(x.notitie, 300) };
     if (x.waar !== undefined) d.standplaats = { waar: schoon(x.waar, 100), sinds: nu() };
     save();
@@ -111,7 +111,7 @@ module.exports = (ctx) => {
     if (!aan) return { status: 400, error: 'Aan wie leent u het uit?' };
     if (!isDatum(x.tot)) return { status: 400, error: 'Tot wanneer? Zonder einddatum leggen wij een bruikleen niet vast.' };
     if (d.bruikleen.length >= 100) return { status: 400, error: 'De lijst is vol.' };
-    d.bruikleen.unshift({ id: rid(), aan, van: isDatum(x.van) ? x.van : new Date().toISOString().slice(0, 10),
+    d.bruikleen.unshift({ id: rid(), aan, van: isDatum(x.van) ? x.van : require('../tijdzone').datumIn(),
       tot: x.tot, terug: '', notitie: schoon(x.notitie, 300) });
     save();
     return { status: 200, ok: true };
@@ -120,7 +120,7 @@ module.exports = (ctx) => {
     const d = C(key, String(x.bezitId || ''), false); if (!d) return geenStuk;
     const b = d.bruikleen.find(y => y.id === x.id);
     if (!b) return { status: 404, error: 'Deze bruikleen staat er niet.' };
-    b.terug = isDatum(x.op) ? x.op : new Date().toISOString().slice(0, 10);
+    b.terug = isDatum(x.op) ? x.op : require('../tijdzone').datumIn();
     save();
     return { status: 200, ok: true, bruikleen: b };
   }

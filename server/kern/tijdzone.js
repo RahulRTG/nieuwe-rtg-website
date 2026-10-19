@@ -129,6 +129,11 @@ const datumIn = (wanneer, zone) => huis(wanneer, zone).datum;
 const jaarIn = (wanneer, zone) => huis(wanneer, zone).jaar;
 const maandIn = (wanneer, zone) => huis(wanneer, zone).maand;
 const hhmmIn = (wanneer, zone) => huis(wanneer, zone).hhmm;
+// de kalenderdag van een OPGESLAGEN tijdstip; leeg of onleesbaar is null, nooit vandaag
+const datumVan = (t, zone) => {
+  const d = t == null || t === '' ? null : new Date(t);
+  return d && Number.isFinite(d.getTime()) ? huis(d, zone).datum : null;
+};
 
 /* De zone van een zaak, en zonder eigen zone of bekend land het huis: voor
    een rooster of kassa in Nederland is UTC een uur ernaast. */
@@ -193,4 +198,4 @@ const nuBijZaak = (s, wanneer) => lokaal(zaakZone(s).zone, wanneer);
 const instantIn = (...a) => require('./tijdzone-instant')(...a);
 
 module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak, instantIn,
-  HUIS_ZONE, huis, uurIn, weekdagIn, datumIn, jaarIn, maandIn, hhmmIn, plusDagen, weekdagVan, middernacht, moment, zaakZoneOfHuis };
+  HUIS_ZONE, huis, uurIn, weekdagIn, datumIn, datumVan, jaarIn, maandIn, hhmmIn, plusDagen, weekdagVan, middernacht, moment, zaakZoneOfHuis };

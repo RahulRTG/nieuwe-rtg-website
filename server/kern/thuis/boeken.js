@@ -81,7 +81,7 @@ module.exports = (ctx) => {
     if (h.host === codenaam || (h.coHosts || []).includes(codenaam)) return { status: 400, error: 'Je eigen huis boeken hoeft niet -- je hebt de sleutel al.' };
     const van = data.van, tot = data.tot;
     if (!geldigeDatum(van) || !geldigeDatum(tot) || van >= tot) return { status: 400, error: 'Kies een geldige periode.' };
-    if (van < new Date().toISOString().slice(0, 10)) return { status: 400, error: 'De aankomstdatum ligt in het verleden.' };
+    if (van < require('../tijdzone').datumIn()) return { status: 400, error: 'De aankomstdatum ligt in het verleden.' };
     const n = nachten(van, tot);
     if (n < h.minNachten) return { status: 400, error: 'Dit huis vraagt minimaal ' + h.minNachten + ' nacht(en).' };
     const gasten = Math.round(Number(data.gasten) || 1);

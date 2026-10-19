@@ -32,7 +32,7 @@ function apkVan(plate) {
   if (kt.length < 4) return null;
   const v = (db.data.rijkVoertuigen || []).find(x => x.kenteken === kt);
   if (!v) return null;
-  return { bekend: true, apkTot: v.apkTot, geldig: !v.geschorst && v.apkTot >= new Date().toISOString().slice(0, 10) };
+  return { bekend: true, apkTot: v.apkTot, geldig: !v.geschorst && v.apkTot >= require('../../../kern/tijdzone').datumIn() };
 }
 app.post('/api/verhuur/aanbod', auth, (req, res) => {
   if (overheid && overheid.registreerVloot) overheid.registreerVloot(); // idempotent: vloot in het RDW-register
@@ -50,7 +50,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
   const auto = (s.autos || []).find(a => a.id === req.body.autoId && a.actief !== false);
   if (!auto) return res.status(404).json({ error: 'Deze auto is niet (meer) beschikbaar.' });
   const van = String(req.body.van || ''), tot = String(req.body.tot || '');
-  const vandaag = new Date().toISOString().slice(0, 10);
+  const vandaag = require('../../../kern/tijdzone').datumIn();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot) || van < vandaag || tot <= van)
     return res.status(400).json({ error: 'Kies een periode vanaf vandaag; inleveren na de ophaaldag.' });
   const dagen = Math.round((new Date(tot) - new Date(van)) / 86400000);

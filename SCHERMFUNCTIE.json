@@ -3,7 +3,7 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-19",
-    "commit": "22cd8af4"
+    "commit": "04c82e52"
   },
   "bronnen": {
     "schermroutes": {
@@ -2057,6 +2057,10 @@
       "schermen": 6
     },
     {
+      "script": "public/ds/shell.js",
+      "schermen": 5
+    },
+    {
       "script": "public/shared/adaptief/grammatica.js",
       "schermen": 10
     },
@@ -2534,7 +2538,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 208,
+      "inkomend": 209,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -7718,7 +7722,9 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/member/rechterhand/"
       ],
@@ -7727,7 +7733,7 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 13,
+      "inkomend": 14,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -7735,13 +7741,13 @@
         "public/apps/reizen-veilig.html",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
+        "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/travel-os-config.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel2b.js",
         "server/kern/bureau/plattegrond.js",
-        "server/kern/mall/aanbodzaken.js",
-        "server/kern/mall/index.js"
+        "server/kern/mall/aanbodzaken.js"
       ]
     },
     {
@@ -8167,7 +8173,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/hotels",
         "/api/partner/chat/send",
@@ -8227,11 +8235,13 @@
         "/api/rahul"
       ],
       "zonderServer": false,
-      "inkomend": 11,
+      "inkomend": 13,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
+        "public/apps/hangar.html",
         "public/apps/hotels.html",
+        "public/apps/living-world.html",
         "public/ds/edge-modi.js",
         "public/shared/command/catalog.js",
         "public/shared/interface/second-screen-personal.js",
@@ -8239,8 +8249,7 @@
         "public/shared/workos-premium.js",
         "server/kern/appcatalogus-rijen/deel2.js",
         "server/kern/appgids-data/deel7.js",
-        "server/kern/wereldroutes.js",
-        "server/kern/wereldroutes/instellingen.js"
+        "server/kern/wereldroutes.js"
       ]
     },
     {
@@ -9282,7 +9291,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/experience/bootstrap",
         "/api/experience/intent/execute",
@@ -9295,11 +9306,12 @@
         "/api/living-world"
       ],
       "zonderServer": false,
-      "inkomend": 5,
+      "inkomend": 6,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/reizen.html",
         "public/apps/saloon/opbouw.js",
+        "public/ds/contract.json",
         "public/shared/rtg-edge-2-loader.js",
         "server/kern/appgids-data/deel12b.js",
         "server/kern/living-world/model.js"
@@ -11580,13 +11592,15 @@
       "bestand": "public/apps/reisuitnodiging.html",
       "url": "/apps/reisuitnodiging.html",
       "titel": "Uw reis staat klaar · RTG",
-      "h1": "RTG",
+      "h1": "",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/"
       ],
@@ -11595,10 +11609,11 @@
         "/api/"
       ],
       "zonderServer": false,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/reizen.html",
+        "public/ds/contract.json",
         "server/kern/appgids-data/deel1.js",
         "server/kern/reisuitnodiging-gebruik.js",
         "server/kern/reisuitnodiging.js",
@@ -12054,7 +12069,7 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 55,
+      "inkomend": 56,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -14068,7 +14083,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/supplier/mob/"
       ],
@@ -14077,11 +14094,12 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 8,
+      "inkomend": 9,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/personeel.js",
         "public/apps/personeel/personeel-25.js",
+        "public/ds/contract.json",
         "server/kern/appgids-data/deel10.js",
         "server/kern/bureau/plattegrond.js",
         "server/kern/lidmaatschap.js",

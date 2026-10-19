@@ -377,12 +377,11 @@ const PUBLIEK = new Map([
      keuzes op foundation/registreren.html niets, en de aanvrager heeft vóór
      toelating nog geen account. Met reden ook in scripts/lib/publiek.js. */
   ['POST /api/foundation/registratie/catalogus', 'de eisen per registratiesoort en de actieve steden: geen geheim, en een aanvrager leest ze voordat hij een account heeft; met rem per ip'],
-  ['POST /api/rtfos/publiek/steden', 'de buurt zonder code; getemperd'],
-  ['POST /api/rtfos/publiek/campagnes', 'idem'],
+  /* rtfos/publiek/steden en campagnes, lab2/bewoner/labs en onderneming/
+     rechtsvormen vragen sinds het eigenaarsbesluit van 19 oktober 2026 een
+     account en horen hier dus niet meer. */
   ['POST /api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatie -- openbaar, want anders is het geen publicatie'],
-  ['POST /api/lab2/bewoner/labs', 'het publieke labbeeld: alleen actieve labs, zonder budget, tekenaars en partners'],
   ['POST /api/lab2/bewoner/kader', 'de spelregels van de cyclus; dezelfde tabel als het kantoorscherm, een waarheid'],
-  ['GET /api/onderneming/rechtsvormen', 'wat een B.V. van een stichting onderscheidt, te lezen voor je een account hebt'],
   ['POST /api/fout/client', 'de foutmelder van een kapot scherm; met opzet zonder inlog, met 4 kB-grens en rem'],
   ['POST /api/arrival/interpret', 'leest vrije tekst en geeft een plan terug -- vraagt niets aan, bewaart niets, getemperd'],
   // alleen in de testomgeving; de trede bewijst hieronder dat ze in productie weg zijn

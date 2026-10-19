@@ -145,6 +145,7 @@
 
 </main>
 
+<script src="/shared/accountdeur.js"></script>
 <script>
 /* Het Klimaatfonds: een VENSTER op het Living Lab, geen tweede lab.
 
@@ -203,10 +204,15 @@ async function werkTeken() {
   }
 }
 
+/* De buurtdeuren van het lab vragen een account of het gezinsprofiel onder het account van een ouder (eigenaarsbesluit 19 oktober 2026). */
+const lidToken = () => RTGAccountDeur.token();
+const gezin = () => { try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {}; } catch (e) { return {}; } };
 const api = (pad, body) => fetch(pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+  method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }),
+  body: JSON.stringify(Object.assign({ gezinCode: gezin().code, gezinToken: gezin().token }, body || {}))
 }).then(async r => {
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && lidToken()) RTGAccountDeur.vergeet();
   if (!r.ok || d.error) throw new Error(d.error || 'Er ging iets mis.');
   return d;
 });
@@ -223,6 +229,8 @@ const STAPPEN = ['vraagstuk', 'hypothese', 'plan', 'deelnemers', 'experiment', '
 
 async function start() {
   try {
+    if (!lidToken() && !gezin().token)
+      await RTGAccountDeur.eis($('#labs'), { waarom: 'Het lab doe je met een RTG-account. Een gratis account is genoeg.' });
     const r = await api('/api/lab2/bewoner/labs');
     /* Zonder lijst geen "Er is nog geen lab open" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
     if (!(r && Array.isArray(r.labs))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');

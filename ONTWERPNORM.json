@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 177,
-    "schermenMetStijlblok": 289,
-    "important": 7703
+    "bladen": 176,
+    "schermenMetStijlblok": 288,
+    "important": 7691
   },
   "uitzonderingen": [],
   "bladen": {
@@ -102,11 +102,6 @@
       "bytes": 5190,
       "important": 13,
       "hex": 35
-    },
-    "public/apps/reizen-performance.css": {
-      "bytes": 41881,
-      "important": 10,
-      "hex": 111
     },
     "public/apps/rtg-onthul.css": {
       "bytes": 690,
@@ -2279,12 +2274,6 @@
       "blokken": 1,
       "bytes": 593,
       "important": 0,
-      "hex": 0
-    },
-    "public/apps/reizen.html": {
-      "blokken": 2,
-      "bytes": 1550,
-      "important": 2,
       "hex": 0
     },
     "public/apps/residentie.html": {

@@ -64,6 +64,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
+const { echtLid } = require('./lib/proeftoestel');
 
 const WORTEL = path.join(__dirname, '..');
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
@@ -121,12 +122,12 @@ async function meet(tredeId) {
   db.save();
 
   const B = 'http://127.0.0.1:' + poort;
-  const post = async (p, lijf, token) => {
+  const post = async (p, lijf, token, koppen) => {
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), 8000);
     try {
       const r = await fetch(B + p, { method: 'POST', signal: ac.signal,
-        headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) },
+        headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}), ...(koppen || {}) },
         body: JSON.stringify(lijf || {}) });
       let d = null; try { d = await r.json(); } catch (e) { /* geen json */ }
       return { s: r.status, d };
@@ -140,7 +141,12 @@ async function meet(tredeId) {
     invarianten.push({ wat, uitleg, ...oordeelInvariant({ gedraaid, geslaagd }) });
 
   /* ---- de keten ---- */
-  const inlog = await post('/api/login', { tier: 'rtg' });
+  /* Een ECHT lid met een gebonden toestel: afrekenen is sinds 19 oktober 2026
+     zwaar (kern/identiteit/bezitspaden.js), en een demo-pas kan niet binden. */
+  const alsStatus = async (b, p, l, t, k) => { const x = await post(p, l, t, k); return { status: x.s, data: x.d }; };
+  const proeflid = await echtLid({ basis: B, post: alsStatus, naam: 'Zaakwig' }).catch(e => ({ fout: e.message }));
+  const lidPost = async (p, l, t) => { const x = await proeflid.P(p, l, t); return { s: x.status, d: x.data }; };
+  const inlog = proeflid.lid ? { s: 200, d: { token: proeflid.lid.token } } : { s: null, d: null, fout: proeflid.fout };
   const lid = inlog.d && inlog.d.token;
   stap('lid logt in', inlog, !!lid);
 
@@ -179,7 +185,7 @@ async function meet(tredeId) {
     'de zaak zag hem al voor de betaling -- dan krijgt een zaak werk van wie niet betaald heeft');
 
   /* Betalen volgt de trede. */
-  const pay = ref ? await post('/api/order/pay', { ref }, lid) : null;
+  const pay = ref ? await lidPost('/api/order/pay', { ref }, lid) : null;
   if (geldAan) {
     stap('het lid betaalt', pay, pay && pay.s === 200);
     inv('de betaling hoort bij DEZELFDE bon', !!(pay && pay.s === 200),

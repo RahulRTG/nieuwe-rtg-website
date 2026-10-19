@@ -62,6 +62,8 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+const { bindToestel, KOP } = require('./lib/proeftoestel');
+const { zwaarPad } = require('../server/kern/identiteit/bezitsbewijs');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'OMZETPROEF.json');
@@ -86,10 +88,17 @@ const KAART = [
 const BESTELLING = [{ id: 'dagschotel', qty: 2 }, { id: 'flatwhite', qty: 1 }];
 const BRUTO = 20 * 2 + 5 * 1;        // 45,00 -- het bedrag dat de hele keten door moet
 
+/* De koper en de buitenstaander zijn ECHTE clients met een gebonden toestel:
+   het telefoongesprek (/api/gegevens/start en /zeg) en afrekenen zijn zware
+   paden (kern/identiteit/bezitspaden.js), en dan tekent het toestel -- zoals de
+   browser, alleen op een zwaar pad. De poort zelf blijft zoals in productie. */
+const TOESTELLEN = [];
 async function post(basis, pad, lijf, tok) {
+  const t = tok && TOESTELLEN.find(x => x.token === tok);
+  const bewijs = t && zwaarPad(pad) ? { [KOP]: await t.teken('POST', pad) } : {};
   const r = await fetch(basis + pad, {
     method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, bewijs),
     body: JSON.stringify(lijf || {})
   }).catch(() => null);
   if (!r) return { status: 0, data: null };
@@ -163,6 +172,9 @@ async function wereld(basis, merk) {
      bewijst de opvolgende schakels tegen een toestand die in productie niet
      bestaat. Elk lid dat koopt, krijgt dit gesprek. */
   for (const tok of [L, X]) {
+    const b = await bindToestel({ post: P, token: tok, naam: 'Toestel omzetproef' });
+    if (!b.klaar) throw new Error('het toestel van de koper bond niet: ' + b.reden);
+    TOESTELLEN.push(b.klaar);
     const g = await P('/api/gegevens/start', { soort: 'bestelling' }, tok);
     const id = g.data && g.data.id;
     if (id) await P('/api/gegevens/zeg', { id, tekst: '+31 6 12345678' }, tok);

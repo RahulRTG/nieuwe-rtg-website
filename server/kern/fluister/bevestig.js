@@ -4,13 +4,15 @@
    hier verlaat geld; de voorstellen met de drempel wonen in ./boeken en
    ./betalen. Elke handler krijgt {q,p,klaar,key,codenaam,sess} en geeft een
    klaar(...)-antwoord of null (dan probeert de orkestrator de volgende). */
+// het woord dat een openstaand voorstel uitvoert; ook de bezitspoort van de route leest het
+const JA = /^(ja|yes|ok[eé]?|doe maar|graag|bevestig|akkoord|prima)[.!]?$/i;
 module.exports = (ctx) => {
   const { db, save, reserveerTafel, annuleerReservering, zorgVoor, zorgMee, pay, nu, eur, datumInZin, voerUit } = ctx;
   const poort = require('./gegevens')(ctx);
 
   // "ja": het openstaande voorstel uitvoeren
   async function ja({ q, p, klaar, key, codenaam, sess }) {
-    if (!/^(ja|yes|ok[eé]?|doe maar|graag|bevestig|akkoord|prima)[.!]?$/i.test(q)) return null;
+    if (!JA.test(q)) return null;
     const wachtVers = p.wacht && Date.now() - Date.parse(p.wacht.at) < 10 * 60000;
     if (!wachtVers) return klaar('Er staat niets open om te bevestigen. Zeg gerust wat ik moet regelen.');
     const w = p.wacht;
@@ -143,3 +145,4 @@ module.exports = (ctx) => {
 
   return { ja, nee, planDag, saldo, annuleerRes, reserveer, zoek };
 };
+module.exports.JA = JA;

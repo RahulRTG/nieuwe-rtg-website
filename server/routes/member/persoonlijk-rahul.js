@@ -16,6 +16,7 @@ const { maakLiveTwin } = require('../../ai-live-twin');
 const plafond = require('../../kern/stuur/plafond');
 const { taakBeeld } = require('../../kern/stuur/taakbeeld');
 // het volle plan zit al in `taak`; in `stuur` reist hij niet nog eens mee
+const GELDJA = require('../../kern/identiteit/bezitspaden').VOORWAARDELIJK.find(v => v.pad === '/api/fluister');
 const zonderPlan = (a) => Object.fromEntries(Object.entries(a).filter(([k]) => k !== 'plan'));
 
 module.exports = (kern) => {
@@ -50,6 +51,12 @@ module.exports = (kern) => {
     const grendel = plafond.grendelVoor(plafondTrede, 'member');
     const grens = pestgrens.poort(req.session.key, req.body.q);
     if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
+    // een ja op een geldvoorstel vraagt een bezitsbewijs (bezitspaden.js VOORWAARDELIJK); het voorstel blijft staan
+    if (kern.fluister.fluisterJaOpGeld(req.session.key, req.body.q)) {
+      const uit = await kern.bezitsbewijs.controleer({ sess: req.session, methode: req.method, pad: req.path,
+        kop: req.get('rtg-bezitsbewijs') || null, als: GELDJA });
+      if (uit.stand === 'geweigerd') return res.status(uit.code || 401).json({ error: uit.reden, bezitsbewijs: 'vereist' });
+    }
     // het scherm, aan DEZE sessie gebonden (EDGE.md par. 14.4)
     const sch = kern.contextDomeinen.scherm(req.session, req.body.context, req.body.q);
     // sessie mee voor doen (reserveren, 24 uur plannen)

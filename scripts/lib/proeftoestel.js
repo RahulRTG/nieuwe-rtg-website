@@ -92,10 +92,10 @@ async function bindToestel({ post, token, naam }) {
 
    Mislukt de keuring, dan blijft het proeflid bruikbaar voor wat geen paspoort
    vraagt, en zegt `gekeurd: false` met de reden waarom de rest ongemeten blijft. */
-async function maakProeflid({ post, naam, basis }) {
+async function maakProeflid({ post, naam, basis, telefoon }) {
   const email = 'proeflid-toestel-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
   const reg = await post('/api/auth/register', { name: naam || 'Proeflid Toestel', email,
-    password: 'geheim12345', geboortedatum: '1988-04-04', tier: 'rtg', pasApp: 'rtg' });
+    password: 'geheim12345', geboortedatum: '1988-04-04', tier: 'rtg', pasApp: 'rtg', ...(telefoon ? { phone: telefoon } : {}) });
   const token = tok(reg);
   if (!token) return { klaar: null, reden: 'registreren lukte niet (' + (reg && reg.status) + ': ' + ((reg && reg.data && reg.data.error) || '') + ')' };
   const t = await bindToestel({ post, token, naam: 'Toestel ' + (naam || 'proeflid') });
@@ -155,4 +155,27 @@ function metToestellen(post, { toestellen, voorLid } = {}) {
   };
 }
 
-module.exports = { bindToestel, maakProeflid, metToestellen, bewijsVoor, KOP };
+/* EEN ECHT LID IN PLAATS VAN DE DEMO-PAS, voor een proef die het lid de hele
+   keten laat lopen (bestellen, betalen, volgen). `voorLid` hierboven ruilt
+   alleen op het zware pad, en dan betaalt het proeflid de bestelling van de
+   demo-pas: een 404 die de proef als iets anders leest. Sinds 19 oktober 2026
+   zijn afrekenen en kopen zwaar (kern/identiteit/bezitspaden.js), dus een proef
+   die het lid laat betalen, laat het VANAF HET BEGIN het proeflid zijn.
+   `post(basis, pad, lijf, token, koppen)` is de post van de proef zelf. */
+async function echteLeden({ basis, post, namen }) {
+  const leden = [];
+  for (const naam of namen) {
+    // met een telefoonnummer, zoals de demo-pas: anders vraagt de gegevenspoort het eerst (428)
+    const telefoon = '06' + String(Math.floor(Math.random() * 1e8)).padStart(8, '0');
+    const lid = await maakProeflid({ post: (p, l, t) => post(basis, p, l, t), naam, basis, telefoon });
+    if (!lid.klaar) throw new Error('geen echt proeflid (' + naam + '): ' + lid.reden);
+    leden.push(lid.klaar);
+  }
+  return { leden, P: metToestellen((p, l, t, k) => post(basis, p, l, t, k), { toestellen: leden }) };
+}
+const echtLid = async ({ basis, post, naam }) => {
+  const { leden, P } = await echteLeden({ basis, post, namen: [naam] });
+  return { lid: leden[0], P };
+};
+
+module.exports = { bindToestel, maakProeflid, metToestellen, bewijsVoor, echtLid, echteLeden, KOP };

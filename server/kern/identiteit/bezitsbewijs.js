@@ -41,9 +41,8 @@
                   het antwoord als `nietAfgedwongen`.
      verplicht    sluit dat gat: zonder gebonden toestel geen zware handeling.
 
-   De stand komt uit RTG_BEZITSBEWIJS en valt (sinds A-P1-04) terug op `aanbevolen`. Een onbekende
-   waarde valt OOK terug op schaduw en zegt dat: een typefout in een
-   omgevingsvariabele hoort geen beveiliging aan of uit te zetten.
+   De stand komt uit RTG_BEZITSBEWIJS (./bezitsstand.js): leeg of onbekend is
+   `verplicht`, en zegt dat; een typefout zet geen beveiliging uit.
    ========================================================================== */
 'use strict';
 
@@ -87,8 +86,9 @@ function maakBezitsbewijs({ db, save, toestellen }) {
      acht uitkomsten van CONTROLPLANE.md. `onbekend` en `geweigerd` zijn niet
      hetzelfde: een ontbrekend bewijs op een onbeschermde sessie is geen
      overtreding, en hoort niet als overtreding te klinken. */
-  async function controleer({ sess, methode, pad, kop, stand }) {
-    const zwaar = zwaarPad(pad);
+  // `als`: een voorwaardelijk zwaar pad (bezitspaden.js VOORWAARDELIJK) dat de route zwaar verklaart
+  async function controleer({ sess, methode, pad, kop, stand, als }) {
+    const zwaar = zwaarPad(pad) || als || null;
     if (!zwaar) return { stand: 'nvt' };
     const werkelijk = stand || standNu().stand;
     let uit;

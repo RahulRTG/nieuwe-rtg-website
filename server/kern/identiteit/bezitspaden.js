@@ -33,6 +33,27 @@ const PADEN = [
      19 oktober 2026: elk gekeurd account mag een reis betalen; de keuring is
      de payGate in routes/member/winkel.js, het bezit staat hier). */
   { pad: '/api/reisbureau/betaal', reden: 'geld verplaatsen: de reissom uit de wallet naar het reisbureau' },
+  /* DE LEDENROUTES DIE HET EIGEN GELD BELASTEN (audit van 19 oktober 2026,
+     keuze (a) van de integrator; test/geldroutes-bezit.test.js houdt hem vast).
+     Telkens alleen het pad dat afrekent; lezen en klaarzetten blijven licht. */
+  { pad: '/api/order/pay', reden: 'geld verplaatsen: een bestelling afrekenen uit de wallet' },
+  { pad: '/api/rekening/betaal', reden: 'geld verplaatsen: een rekening afrekenen uit de wallet' },
+  { pad: '/api/ride/pay', reden: 'geld verplaatsen: een rit afrekenen uit de wallet' },
+  { pad: '/api/booking/pay', reden: 'zet een boeking op betaald en verbruikt het punten-tegoed' },
+  { pad: '/api/ov/uit', reden: 'geld verplaatsen: uitchecken int de ritprijs' },
+  { pad: '/api/mob/kaart/koop', reden: 'geld verplaatsen: een vervoerbewijs kopen' },
+  { pad: '/api/mob/abo/koop', reden: 'geld verplaatsen: een abonnement kopen' },
+  { pad: '/api/pakket/koop', reden: 'geld verplaatsen: een pakket kopen' },
+  { pad: '/api/vonk/betaal', reden: 'geld verplaatsen: betalen binnen een Vonk-afspraak' },
+  { pad: '/api/appstore/koop', reden: 'geld verplaatsen: een aankoop in de App Store' },
+  { pad: '/api/rtfos/winkel/koop', reden: 'geld verplaatsen: een aankoop in de RTFoundation-winkel' },
+  { pad: '/api/rtfos/gift/bevestig', reden: 'geld verplaatsen: een gift aan de RTFoundation bevestigen' },
+  { pad: '/api/giftcard/buy', reden: 'geld verplaatsen: een cadeaukaart kopen' },
+  { pad: '/api/wbw/verreken', reden: 'geld verplaatsen: samen betalen verrekenen' },
+  { pad: '/api/podium/cadeau', reden: 'geld verplaatsen: een cadeau aan een maker' },
+  { pad: '/api/podium/abonneer', reden: 'geld verplaatsen: een maandabonnement op een kanaal' },
+  { pad: '/api/podium/kaartje', reden: 'geld verplaatsen: een kaartje voor een evenement' },
+  { pad: '/api/podium/koop', reden: 'geld verplaatsen: een product kopen tijdens een uitzending' },
   { pad: '/api/auth/password', reden: 'het wachtwoord wijzigen zet alle andere sessies eruit' },
   { pad: '/api/webauthn/registreer', reden: 'een nieuwe passkey is een nieuwe sleutel tot het account' },
   { pad: '/api/webauthn/weg', reden: 'een passkey verwijderen haalt een herstelroute weg' },
@@ -68,4 +89,16 @@ const PADEN = [
   { pad: '/api/onboarding/inricht', reden: 'zet het telefoonnummer, en dat is het herstelkanaal' }
 ];
 
-module.exports = { PADEN };
+/* VOORWAARDELIJK ZWAAR: het pad zelf is licht, een bepaalde handeling erop niet.
+   De ROUTE beslist wanneer (en roept het bezitsbewijs aan met `als`), want
+   alleen zij weet wat het verzoek doet. /api/fluister is het gewone gesprek met
+   Rahul en draagt het stille codewoord: dat mag nooit op een toestelbewijs
+   stranden. Alleen een ja op een openstaand voorstel dat geld verplaatst (een
+   Tik, betaalverzoeken betalen) vraagt het bewijs. De browser tekent deze paden
+   altijd (public/shared/toestelsleutel.js), de server eist het alleen dan. */
+const VOORWAARDELIJK = [
+  { pad: '/api/fluister', wanneer: 'een ja op een openstaand geldvoorstel (tik, klompjes)',
+    reden: 'geld verplaatsen: Rahul voert een betaling uit op uw ja' }
+];
+
+module.exports = { PADEN, VOORWAARDELIJK };

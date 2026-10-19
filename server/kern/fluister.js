@@ -53,6 +53,16 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     return p;
   };
 
+  /* Staat er een vers voorstel open dat geld verplaatst, en zegt dit bericht ja?
+     Dan is deze beurt zwaar (identiteit/bezitspaden.js VOORWAARDELIJK). Leest
+     alleen: maakt geen profiel aan en raakt het voorstel niet. */
+  const GELD = ['tik', 'klompjes'];
+  function fluisterJaOpGeld(key, q) {
+    const w = ((eigen.bak('fluister')[key] || {}).wacht) || null;
+    return !!(w && GELD.includes(w.soort) && Date.now() - Date.parse(w.at) < 10 * 60000 &&
+      require('./fluister/bevestig').JA.test(String(q || '').trim()));
+  }
+
   function fluisterOnthoud(key, tekstIn) {
     // alleen een echte tekst kan een weetje worden; een array/object laat
     // schoon() zelf vallen (dus geen "1,2,3" uit een gecoerced array)
@@ -149,7 +159,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     rahulExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer,
     gegevensStart, gegevensZeg });
 
-  return { fluisterZeg, conceptWijzig: concepten.conceptAanpassen, conceptDomein: concepten.contextDomein, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
+  return { fluisterZeg, fluisterJaOpGeld, conceptWijzig: concepten.conceptAanpassen, conceptDomein: concepten.contextDomein, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
     sparParkeer: sparren.parkeer, sparLijst: sparren.lijst, sparStatus: sparren.status,
     sparHouding: sparren.sparHouding, sparRustMoment: sparren.rustMoment, sparSweepVoor: sparren.sweepVoor, sparSweepAlle: sparren.sweepAlle };
 };

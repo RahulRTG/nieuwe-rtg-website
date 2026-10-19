@@ -113,9 +113,16 @@
     '/api/webauthn/registreer', '/api/webauthn/weg', '/api/mijn/toestel/introk',
     '/api/privacy/delete', '/api/rtgid/machtig', '/api/mijn/sessies/sluit',
     '/api/privacy/export', '/api/privacy/inzage', '/api/gegevens/start', '/api/gegevens/zeg',
-    '/api/onboarding/inricht'];
+    '/api/onboarding/inricht', '/api/order/pay', '/api/rekening/betaal', '/api/ride/pay', '/api/booking/pay',
+    '/api/ov/uit', '/api/mob/kaart/koop', '/api/mob/abo/koop', '/api/pakket/koop', '/api/vonk/betaal',
+    '/api/appstore/koop', '/api/rtfos/winkel/koop', '/api/rtfos/gift/bevestig', '/api/giftcard/buy',
+    '/api/wbw/verreken', '/api/podium/cadeau', '/api/podium/abonneer', '/api/podium/kaartje', '/api/podium/koop'];
+  // licht pad, maar een handeling erop is zwaar; de server beslist wanneer (bezitspaden.js)
+  var VOORWAARDELIJK = ['/api/fluister'];
   function zwaar(pad) {
-    for (var i = 0; i < ZWAAR.length; i++) if (String(pad).indexOf(ZWAAR[i]) === 0) return true;
+    var p = String(pad);
+    for (var i = 0; i < ZWAAR.length; i++) if (p.indexOf(ZWAAR[i]) === 0) return true;
+    for (var j = 0; j < VOORWAARDELIJK.length; j++) if (p === VOORWAARDELIJK[j]) return true;
     return false;
   }
 

@@ -25,6 +25,7 @@ const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
 const { startChromium, herkomst } = require('./lib/scherm');
+const { bindToestel, KOP } = require('./lib/proeftoestel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'MOVEPROEF.json');
@@ -33,9 +34,9 @@ const vastleggen = process.argv.includes('--vastleggen');
 
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
-async function post(basis, pad, lijf, tok) {
+async function post(basis, pad, lijf, tok, koppen) {
   const r = await fetch(basis + pad, { method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, koppen || {}),
     body: JSON.stringify(lijf || {}) }).catch(() => null);
   if (!r) return { status: 0, data: null };
   return { status: r.status, data: await r.json().catch(() => null) };
@@ -114,7 +115,14 @@ if (require.main === module) (async () => {
     const d = morgen();
     const bk = await post(s.basis, '/api/booking/request',
       { supplierCode: 'KAITO', serviceId: 's1', date: d, time: '08:00' }, token);
-    if (bk.status === 200) await post(s.basis, '/api/booking/pay', { ref: bk.data.boeking.ref }, token);
+    /* Afrekenen is sinds 19 oktober 2026 zwaar (kern/identiteit/bezitspaden.js):
+       het lid bindt een toestel en tekent, zoals de browser. Het Move-scherm
+       zelf leest alleen en raakt geen zwaar pad. */
+    if (bk.status === 200) {
+      const t = await bindToestel({ post: (p, l, k) => post(s.basis, p, l, k), token, naam: 'Toestel moveproef' });
+      if (!t.klaar) throw new Error('het toestel van het proeflid bond niet: ' + t.reden);
+      await post(s.basis, '/api/booking/pay', { ref: bk.data.boeking.ref }, token, { [KOP]: await t.klaar.teken('POST', '/api/booking/pay') });
+    }
     const ch = await post(s.basis, '/api/member/vluchten/charter',
       { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, token);
     S(2, 'lid', 'domein', 'boekt een afspraak van 08:00 en vraagt een charter van 09:30 aan',

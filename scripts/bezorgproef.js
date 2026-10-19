@@ -30,12 +30,13 @@
              node scripts/bezorgproef.js --json
    ============================================================================ */
 const { start } = require('./lib/wegwerpserver');
+const { echteLeden } = require('./lib/proeftoestel');
 const { stempel: huisStempel } = require('./lib/stempel');
 
-async function post(basis, pad, lijf, tok) {
+async function post(basis, pad, lijf, tok, koppen) {
   const r = await fetch(basis + pad, {
     method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, koppen || {}),
     body: JSON.stringify(lijf || {})
   }).catch(() => null);
   if (!r) return { status: 0, data: null };
@@ -50,7 +51,12 @@ function schakel(nr, van, naar, wat, opts) {
    inlog: de manager pakt in en zet het assortiment, de bediening rijdt. Een
    rit staat op NAAM (staffId), dus de bezorger moet een eigen inlog hebben --
    met het zaakaccount is er niemand om de rit op te zetten. */
-async function actoren(P) {
+/* Het lid en de vreemde zijn ECHTE leden met een gebonden toestel: afrekenen is
+   sinds 19 oktober 2026 zwaar (kern/identiteit/bezitspaden.js), en een demo-pas
+   kan niet binden. Met een demo-pas zou de vreemde op de bezitspoort stranden
+   en niet op de vraag of hij andermans bestelling mag volgen. */
+const ledenEnPost = (basis) => echteLeden({ basis, post, namen: ['Bezorgproef lid', 'Bezorgproef vreemde'] });
+async function actoren(P, leden) {
   const sup = await P('/api/supplier/login', { username: 'rahul', password: 'Imran' });
   const code = sup.data && sup.data.state && sup.data.state.supplier && sup.data.state.supplier.code;
   if (!code) throw new Error('geen zaaksessie (status ' + sup.status + ') -- dan meet deze proef zichzelf');
@@ -60,8 +66,7 @@ async function actoren(P) {
   if (!mgr || !vloer) throw new Error('de demozaak heeft geen twee mensen om in te pakken en te rijden');
   const inpakker = (await P('/api/supplier/login', { code, staffId: mgr.id, pin: '1234' })).data;
   const bezorger = (await P('/api/supplier/login', { code, staffId: vloer.id, pin: '5678' })).data;
-  const lid = (await P('/api/login', { tier: 'rtg' })).data;
-  const ander = (await P('/api/login', { tier: 'lifestyle' })).data;
+  const [lid, ander] = leden;
   if (!inpakker || !inpakker.token || !bezorger || !bezorger.token) throw new Error('geen persoonlijke inlog voor inpakker en bezorger');
   if (!lid || !lid.token || !ander || !ander.token) throw new Error('geen lidsessies -- draait de server in de testomgeving?');
   /* Een DERDE collega, geen manager en niet de bezorger: alleen met hem is
@@ -93,7 +98,7 @@ const lopendBij = async (P, tok, ref) => {
 };
 
 async function loop(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const { leden, P } = await ledenEnPost(basis);
   const stap = async (s, doe, zien) => {
     const t0 = Date.now();
     let r, gezien = null, fout = null;
@@ -112,7 +117,7 @@ async function loop(basis, uit) {
     return r;
   };
 
-  const wie = await actoren(P);
+  const wie = await actoren(P, leden);
   uit.zaak = wie.code;
 
   /* 1 -- de zaak zet een bezorgassortiment en de dienst aan. Ontvanger: het
@@ -239,8 +244,8 @@ async function loop(basis, uit) {
 
 /* ---- DE STORINGEN. ---- */
 async function storingen(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
-  const wie = await actoren(P);
+  const { leden, P } = await ledenEnPost(basis);
+  const wie = await actoren(P, leden);
   const noteer = (naam, belofte, gehouden, wat) =>
     uit.storingen.push({ naam, belofte, stand: gehouden ? 'gehouden' : 'gebroken', wat });
 

@@ -37,6 +37,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+const { echtLid } = require('./lib/proeftoestel');
 /* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
    APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
    gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
@@ -50,10 +51,10 @@ const VERVOERDER = 'ISLATR';                  // de vervoerszaak uit de seed
    dat geval apart; hier hoort de keten wel door te lopen. */
 const BESTEMMING = 'KIKUNOI';
 
-async function post(basis, pad, lijf, tok) {
+async function post(basis, pad, lijf, tok, koppen) {
   const r = await fetch(basis + pad, {
     method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, koppen || {}),
     body: JSON.stringify(lijf || {})
   }).catch(() => null);
   if (!r) return { status: 0, data: null };
@@ -85,7 +86,8 @@ async function ritVanLid(basis, tok, ref) {
 }
 
 async function loop(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  // het lid betaalt de rit, en afrekenen is zwaar: een echt lid met een gebonden toestel
+  const { lid: echt, P } = await echtLid({ basis, post, naam: 'Ritproef' });
   const stap = async (s, doe, zien) => {
     const t0 = Date.now();
     let r, gezien = null, fout = null;
@@ -105,9 +107,8 @@ async function loop(basis, uit) {
     return r;
   };
 
-  const lid = await P('/api/login', { tier: 'rtg' });
+  const lid = { data: { token: echt.token } };
   const zaak = await P('/api/supplier/login', { username: 'rahul', password: 'Imran' });
-  if (!lid.data || !lid.data.token) throw new Error('geen lidsessie (status ' + lid.status + ')');
   if (!zaak.data || !zaak.data.token) throw new Error('geen vervoerderssessie (status ' + zaak.status + ') -- draait de server met DEMO_SUPPLIER=' + VERVOERDER + '?');
   const M = lid.data.token, S = zaak.data.token;
 
@@ -229,8 +230,8 @@ async function loop(basis, uit) {
 }
 
 async function storingen(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
-  const M = (await P('/api/login', { tier: 'rtg' })).data.token;
+  const { lid: echt, P } = await echtLid({ basis, post, naam: 'Ritproef storing' });
+  const M = echt.token;
   const S = (await P('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
   const staf = await P('/api/supplier/staff/add', { name: 'Chauffeur Twee', func: 'chauffeur' }, S);
   const staffId = staf.data && staf.data.staff && staf.data.staff.id;

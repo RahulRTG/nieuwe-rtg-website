@@ -36,6 +36,8 @@ const { plausibelLijf } = require('./lib/rolproef');
 const { maakPool } = require('./lib/objectpool');
 const { maakSessiewacht } = require('./lib/sessiewacht');
 const { oordeelIdor } = require('./lib/idor');
+const { waarden, merktekens, oordeelAfbakening } = require('./lib/afbakening');
+const opbouwLib = require('./lib/idoropbouw');
 const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
@@ -123,6 +125,59 @@ const NAGEKEKEN = {
      nieuwe kandidaten, met de hand nagelezen, alle drie B die iets van B doet. */
   'POST /api/auth/aanmeldkanaal': 'leest alleen req.session.account (de eigen ledenstand) en het gekozen kanaal; een `id` in het lijf wordt nergens gelezen',
   'POST /api/member/magnaat/stad/maak': 'stad.maak(req.session.key, b) leest uit het lijf alleen moeilijkheid en begin en maakt een NIEUWE stad met een verse code; een meegestuurde code wijst niets aan',
+  /* De eerste afbakeningsronde (gang 4, 19 oktober 2026): B kreeg met
+     hetzelfde verzoek een merkteken van A terug, met de hand nagelezen. */
+  'POST /api/browser/gids': 'webmaker-blader gids() geeft alleen sites die hun maker zelf online zette (d.online && d.adres): een openbare gids, en het adres is de codenaam die de maker publiceerde',
+  /* De opbouwronde (19 oktober 2026, ./lib/idoropbouw.js): A had voor het eerst
+     potten, een kring en een loopbaanprofiel, en vier nieuwe kandidaten kwamen
+     boven. Met de hand nagelezen, alle vier B die iets van B doet. Twee ervan
+     tonen een zwakte van de ijking zelf: de tweede poging van B (met een
+     verzonnen id) faalde op de TOESTAND die B's eerste poging had gezet (409),
+     niet op het id. */
+  'POST /api/metier/naam-vrij': 'metierBewijs.geefVrij(req.session.key, code, waarvoor): B geeft zijn EIGEN naam vrij aan een zaak; de code is de openbare zaakcode, een verzonnen code geeft "Deze zaak kennen we niet"',
+  'POST /api/neiging/antwoord': 'kern.neiging.antwoord(req.session.key, vraag, onderwerpen): de vraag is een id uit de vaste vragenlijst (kern/neiging/vraag-lijst.js), geen object van A; het antwoord landt op B\'s eigen sleutel',
+  'POST /api/veiligheid/kring/mail': 'kringMailToevoegen(req.session.key, adres) leest geen id; de controle gaf 409 omdat B\'s eerste poging het adres al in B\'s EIGEN kring zette',
+  'POST /api/veiligheid/wacht/start': 'wachtStart(req.session.key, codenaam, body) leest body.id niet en maakt een nieuwe wacht voor B; de controle gaf 409 "Er loopt al een wacht" door B\'s eerste poging',
+  /* De tweede opbouwronde (19 oktober 2026). De tegenpoging staat nu in het
+     register (`tegenpoging`); vier van de vijf vielen op 409, de TOESTAND die
+     B's eigen eerste poging zette. */
+  'POST /api/home/onderhoud/meld': 'woningOnderhoud.meld(req.session.key, body) leest geen id en maakt een nieuwe melding voor B; de tegenpoging gaf 409 door B\'s eerste melding',
+  'POST /api/mall/aanvraag': 'mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id\'s in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt',
+  'POST /api/reserveer': 'reserveerTafel(req.session, ...) zet customerKey uit de SESSIE; een customerKey in het lijf wordt niet gelezen. De tegenpoging gaf 409 "al een reservering voor dit moment" door B\'s eerste reservering',
+  'POST /api/vak/wachtlijst/zet': 'wachtZet({ key: req.session.key, ... }) zet B op de wachtlijst; de supplierCode is een openbare zaakcode, en de tegenpoging gaf 409 "al op de wachtlijst" door B\'s eerste poging',
+  'POST /api/code/scan': 'een dynamische code is een getoonde code die een ANDER hoort te scannen; dyncode.lees controleert alleen handtekening en geldigheid, en een verzonnen token geeft 422. Op de integratietak draagt een pas een ondoorzichtige verwijzing (betaalcode.js, besluit eigenaar): een KASSA die scant krijgt de codenaam en verbruikt de code, een LID dat scant krijgt niets persoonlijks -- de gang-2-controle op wie A is ziet dan dat B als lid geen codenaam van A terugkrijgt',
+  /* DE ZAKEN (gang 5, 19 oktober 2026): KIKUNOI tegen PONTO. Dertien
+     kandidaten, alle dertien met de hand nagelezen: elke route haalt de zaak uit
+     req.supplier (of de medewerker uit staffKey), en het id uit het lijf is
+     een catalogus-id of wordt genegeerd. De tegenpoging faalde telkens op de
+     TOESTAND die B's eerste poging zette of op validatie -- niet op A's id. De
+     verdachtste (band/betaal, tegenpoging 404) is los gereproduceerd: KIKUNOI
+     maakt band BAND-77, PONTO betaalt erop -> 404 "Deze band kennen we niet",
+     KIKUNOI zelf -> 200. B betaalde in de gang op een EIGEN band die hij een
+     route eerder (club/band) met hetzelfde verrijkte nummer had gemaakt. */
+  'POST /api/staff/gemoed/zet': 'gemoedZet(staffKey(req), body): de stemming van de medewerker zelf; een stemming-id is een categorie',
+  'POST /api/supplier/horeca/club/band/betaal': 'bandVan(req.supplier.code, nummer) zoekt alleen banden van de EIGEN zaak; los gereproduceerd: PONTO op een band van KIKUNOI -> 404. In de gang betaalde B op een band die B zelf een route eerder had gemaakt',
+  'POST /api/supplier/horeca/venue/publiceer': 'leest alleen req.supplier.code en geen lijf; B publiceerde zijn EIGEN venue-concept, waarna de tegenpoging niets meer vond (404)',
+  'POST /api/supplier/magnaat/studio/importeer': 'importeer(supplier, ...) zet het menu en de kamers van de EIGEN zaak in haar eigen tweeling; de tegenpoging gaf 409 door B\'s eerste import',
+  'POST /api/supplier/net/verzoek': 'een netwerkverzoek gaat naar een andere zaak op haar OPENBARE code (findSupplier); dat is de bedoelde handeling, de verzoeker is req.supplier',
+  'POST /api/supplier/overheid/kvk/inschrijven': 'kvkInschrijven({ supplierCode: req.supplier.code }): de eigen zaak; het kvknummer uit het lijf maakt niets van A open, de tegenpoging gaf 409 door B\'s eerste inschrijving',
+  'POST /api/supplier/poort/rondleiding': 'rondleidingZet(req.supplier, id): de id is een vaste rondleiding uit de catalogus; een verzonnen id geeft 400',
+  'POST /api/supplier/pr/nieuwsbrief': 'nieuwsbrief van req.supplier.code; de tegenpoging gaf 429 (hoogstens een per 7 dagen) door B\'s eerste brief',
+  'POST /api/supplier/staff/invite': 'maakInvite(req.supplier, ...) met een idem-sleutel "inv:" + req.supplier.code: een nieuwe uitnodiging voor de EIGEN zaak; de tegenpoging gaf 409',
+  'POST /api/supplier/training/add': 'een trainingstip in db.data.training[req.supplier.code]; de tegenpoging gaf 409 "al een tip met deze titel" door B\'s eerste poging',
+  'POST /api/supplier/training/remove': 'zoekt de tip op titel in de lijst van req.supplier.code; B verwijderde zijn EIGEN tip uit de vorige route, daarna vond de tegenpoging niets (404)',
+  'POST /api/supplier/verkoopweg/zet': 'commerce.wegZet(req.supplier.code, ...): de eigen verkoopwegen; soort en toegang zijn catalogus-waarden, verzonnen waarden geven 400',
+  'POST /api/supplier/zaak/functie': 'zaakZet(req.supplier, id, aan): de functie-id is een catalogus-id; verzonnen geeft 400',
+  /* WIE A IS, IN B'S ANTWOORD (19 oktober 2026): de 2xx-routes die eerst
+     ongezien `publiek` heetten, worden nu gelezen op A's codenaam, e-mail en
+     merkwoord. Vier treffers, met de hand nagelezen; alle vier een openbare
+     etalage op codenaam, en nergens een sleutel of persoonsgegeven. */
+  'POST /api/member/pulse/bewaard': 'pulseBewaard(req.session.key): B\'s EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin',
+  'POST /api/metier/lid': 'Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C\'s profiel schreef, met A\'s codenaam als schrijver',
+  'POST /api/metier/zoek': 'kern/metier/zoek.js: "wie niets invulde, staat niet in de etalage" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw',
+  'POST /api/residentie/gids': 'de gids toont suites met s.open op codenaam; let wel: een suite ONTSTAAT open (kern/residentie/index.js suiteVan, open: true), dus wie zijn suite opent staat in de gids zonder zelf voor open te kiezen -- een productvraag over de standaard, geen IDOR',
+  'POST /api/carriere/ledger/zet': 'carriereledger.zet(key, data) leest geen id en schrijft een NIEUW feit in reeks(key) van B; de tegenpoging gaf 409 "staat er al, woord voor woord" door B\'s eigen eerste regel',
+  'POST /api/member/rtmail/team/maak': 'rtmailTeam.maak(sess, invoer) leest geen id en maakt een NIEUW team voor B op de naam uit het lijf; de tegenpoging met dezelfde naam gaf 400 "Dit adres bestaat al" door B\'s eigen eerste team',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
@@ -132,8 +187,14 @@ const VASTLEGGEN = argv.includes('--vastleggen');
 if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
-  const server = await start({ naam: 'idor', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
-  const { basis, klaar } = server;
+  /* Het kaatsmodel (./lib/kaatsmodel.js) is de lokale modelserver van deze
+     wereld: een AI-route geeft dan terug wat de server in de prompt zette, en een
+     merkwoord van A in B's prompt valt op. Zonder model antwoordden die routes
+     503 en bleef de vraag ongesteld. */
+  const kaats = await require('./lib/kaatsmodel').start();
+  const server = await start({ naam: 'idor', env: Object.assign({ RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }, kaats.omgeving) });
+  const { basis } = server;
+  const klaar = () => { kaats.stop(); server.klaar(); };
 
   const kaal = async (pad, lijf, tok, koppen) => {
     try {
@@ -189,6 +250,8 @@ if (require.main !== module) { module.exports = {}; return; }
      dan bestaat er eigenaarschap om te schenden. Beiden meerderjarig zodat de
      jeugdpoort niets afsluit dat de proef aanziet voor een IDOR-weigering. */
   const geheugen = {};
+  const identiteit = {};
+  const leden = {};
   let teller = 0;
   const maakLid = async (n) => {
     const email = 'idor' + n + '-' + Date.now() + '-' + (++teller) + '@voorbeeld.test';
@@ -203,13 +266,26 @@ if (require.main !== module) { module.exports = {}; return; }
        paspoort, en zonder keuring zou A op de betaalpaden niets oogsten. De
        keuring loopt langs de echte weg (test/helper.js keurLidGoed). */
     const user = r.data.state && r.data.state.user;
+    /* Wie dit lid IS, als merkteken voor de afbakening (gang 4): een codenaam of
+       e-mail van A in B's antwoord is A's gegeven, wat de route ook is. */
+    (identiteit[n] = identiteit[n] || new Set());
+    leden[n] = { email, codenaam: user && user.codename };
+    for (const w of [email, user && user.codename, user && user.email]) if (typeof w === 'string' && w.length >= 6) identiteit[n].add(w);
     try { await require('../test/helper').keurLidGoed(basis, tok, user && user.codename); toestelStand.gekeurd++; }
     catch (e) { toestelStand.mislukt.push('lid ' + n + ' niet gekeurd: ' + e.message); }
     return bind(n, tok);
   };
   let A = await maakLid(1);
   let B = await maakLid(2);
-  if (!A || !B) { console.error('kon geen twee leden registreren; A=' + !!A + ' B=' + !!B); klaar(); process.exit(2); }
+  /* C, DE CONTROLE voor de afbakening (gang 4). C loopt de routes VOOR A, en
+     alles wat C te zien kreeg -- seed-inrichting, publieke catalogus,
+     server-brede waarden -- telt daarna niet als merkteken van A. C probeert
+     zelf niets bij A of B. */
+  let C = await maakLid(3);
+  if (!A || !B || !C) { console.error('kon geen drie leden registreren; A=' + !!A + ' B=' + !!B + ' C=' + !!C); klaar(); process.exit(2); }
+  /* De context van de opbouw (./lib/idoropbouw.js): de tegenpartij is C. */
+  const ctx = { get tegen() { return leden[3]; }, get ik() { return leden[1]; }, merk: opbouwLib.merkwoord() };
+  const basisLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), ctx);
 
   /* ---- DE SESSIE OVERLEEFT DE PROEF, want anders bewijst hij het tegendeel ----
 
@@ -264,7 +340,8 @@ if (require.main !== module) { module.exports = {}; return; }
      natrekken, en een lid heeft zo'n route. */
   const wacht = maakSessiewacht({ post, rollen: {
     1: { vers: () => versLid(1), leeft: levend, zet: (t) => { A = t; } },
-    2: { vers: () => versLid(2), leeft: levend, zet: (t) => { B = t; } }
+    2: { vers: () => versLid(2), leeft: levend, zet: (t) => { B = t; } },
+    3: { vers: () => versLid(3), leeft: levend, zet: (t) => { C = t; } }
   } });
   const roep = (pad, lijf, n, tok) => wacht.roep(pad, lijf, n, tok);
 
@@ -275,17 +352,75 @@ if (require.main !== module) { module.exports = {}; return; }
     .filter(r => !r.pad.includes(':'));
   const verdeling = verdeelOpRol(kandidaten, ['member']);
   let routes = verdeling.metRol.filter(r => r.rol === 'member');
+  /* DE HANDLERPOORT. Een route zonder bewakerslaag controleert de sessie in de
+     handler (een stroomticket, een dynamische code, een gezins- of werkruimte-
+     token). Ledenschermen roepen er tientallen aan met een ledentoken, en
+     /api/stroom/ticket geeft een lid gewoon 200. Ze horen dus dezelfde vraag te
+     krijgen. Of een lid er binnenkomt, beslist de gang zelf: komt A er niet in,
+     dan blijft de route eerlijk onbereikbaar. */
+  const handlerRoutes = verdeling.zonderRol.filter(z => /^geen bewakerslaag/.test(z.reden))
+    .map(z => ({ methode: z.methode, pad: z.pad, rol: 'handler' }));
+  routes = routes.concat(handlerRoutes);
   if (MAX) routes = routes.slice(0, MAX);
 
   console.log('\n=== DE IDOR-PROEF ===\n');
   console.log('  twee echte leden, ' + routes.length + ' member-schrijfroutes\n');
 
-  /* GANG 1: A oogst. Elk geslaagd antwoord draagt id's van objecten die A mag
-     bedienen; de pool onthoudt ze per domein. */
-  const pool = maakPool();
+  /* GANG 0: de controle. C raakt dezelfde routes aan VOOR A er is; wat C ziet
+     kan dus nooit een object van A zijn. */
+  const controle = new Set();
   for (const r of routes) {
-    const u = await roep(r.pad, plausibelLijf(r.pad), 1, A);
-    if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') pool.leer(u.data, r.pad);
+    const u = await roep(r.pad, basisLijf(r.pad), 3, C);
+    if (u.data && typeof u.data === 'object') waarden(u.data, controle);
+  }
+  for (const w of identiteit[3] || []) controle.add(w);
+
+  /* GANG 1: A oogst. Elk geslaagd antwoord draagt id's van objecten die A mag
+     bedienen; de pool onthoudt ze per domein. En elke merkbare waarde die A
+     terugkreeg gaat in vanA: de kandidaat-merktekens voor gang 4. */
+  const pool = maakPool();
+  const vanA = new Set();
+  for (const r of routes) {
+    const u = await roep(r.pad, basisLijf(r.pad), 1, A);
+    if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { pool.leer(u.data, r.pad); waarden(u.data, vanA); }
+  }
+
+  /* GANG 1b: DE OPBOUW. A maakt langs de echte routes de objecten die de
+     oogstgang niet kon maken (een pot, een gesprek met C, een team). Wat
+     terugkomt leert de pool en de merktekens, net als elk ander antwoord. */
+  const opbouw = { stappen: 0, geslaagd: 0, mislukt: [] };
+  let kantoor = null;
+  const hulp = { post, kaal, A: () => A, C: () => C,
+    tweedeSessieA: async () => ((await post('/api/auth/login', { login: geheugen[1].email, password: geheugen[1].wachtwoord })).data || {}).token || null };
+  for (const st of opbouwLib.stappen(ctx)) {
+    opbouw.stappen++;
+    if (typeof st.doe === 'function') {
+      try { await st.doe(hulp, ctx); opbouw.geslaagd++; }
+      catch (e) { opbouw.mislukt.push(st.naam + ': ' + e.message); }
+      continue;
+    }
+    const lijf = typeof st.lijf === 'function' ? st.lijf(ctx) : (st.lijf || {});
+    if (st.als === 'kantoor' && !kantoor) {
+      kantoor = ((await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data || {}).token || null;
+    }
+    const u = st.als === 'kantoor' ? await post(st.pad, lijf, kantoor)
+      : st.als === 'tegen' ? await roep(st.pad, lijf, 3, C) : await roep(st.pad, lijf, 1, A);
+    /* Wat C in de opbouw maakt (een clip, een aanbeveling voor A) is van C en
+       hoort bij de controle: anders lijkt C's nieuwe object straks een
+       merkteken van A, alleen omdat C het na zijn controlegang maakte. */
+    if (st.als === 'tegen' && u.data && typeof u.data === 'object') waarden(u.data, controle);
+    if (st.als) {
+      if (u.status >= 200 && u.status < 300) { opbouw.geslaagd++; if (typeof st.bewaar === 'function') { try { st.bewaar(u.data, ctx); } catch (e) {} } }
+      else opbouw.mislukt.push((st.als + ' ') + st.pad + ' ' + u.status + ' ' + String(u.tekst || '').slice(0, 80));
+      continue;
+    }
+    if (u.status >= 200 && u.status < 300) {
+      opbouw.geslaagd++;
+      if (u.data && typeof u.data === 'object') {
+        pool.leer(u.data, st.pad); waarden(u.data, vanA);
+        if (typeof st.bewaar === 'function') { try { st.bewaar(u.data, ctx); } catch (e) {} }
+      }
+    } else opbouw.mislukt.push(st.pad + ' ' + u.status + ' ' + String(u.tekst || '').slice(0, 80));
   }
   const poolStand = pool.grootte();
   /* DE PROEF CONTROLEERT ZICHZELF, want dit is precies de fout die hij een
@@ -320,42 +455,170 @@ if (require.main !== module) { module.exports = {}; return; }
      doorbraak. Blijft hij 2xx, dan is de route gewoon publiek en telt hij als
      publiek, niet als bevinding. Dezelfde gedachte als de vingerafdruk-ijking
      van de rolproef: eerst bewijzen dat je meetinstrument iets KAN zien. */
-  const perRoute = {};
-  const telling = { gescheiden: 0, doorbraak: 0, nagekeken: 0, publiek: 0, onbereikbaar: 0, lek: 0 };
+  /* EEN KRUISFUNCTIE VOOR TWEE GANGEN, en voor twee soorten tegenpartij: twee
+     leden (hieronder) en twee zaken (gang 5). Wie A en B zijn, staat in de
+     aanroep; het oordeel staat hier een keer, zodat het niet uiteenloopt
+     (LAT.md regel 4). */
   const verzonnen = () => 'ZZ-' + Math.random().toString(36).slice(2, 10);
-  for (const r of routes) {
-    const sleutel = r.methode + ' ' + r.pad;
-    const { lijf, velden } = pool.verrijk(plausibelLijf(r.pad), r.pad);
-    if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
-    const u = await roep(r.pad, lijf, 2, B);
-    const o = oordeelIdor(u.status, u.tekst);
-    if (o.staat === 'doorbraak') {
-      const nep = { ...lijf };
-      for (const v of velden) nep[v] = verzonnen();
-      const controle = await post(r.pad, nep, B);
-      if (controle.status >= 200 && controle.status < 300) {
-        telling.publiek++;
-        perRoute[sleutel] = { status: u.status, staat: 'publiek', velden,
-          reden: 'ook met een VERZONNEN id een ' + controle.status + ': de route is publiek/rol-open, ' +
-            'A\'s id maakt geen verschil -- geen objectreferentie om te schenden' };
+  const spoor = (pad) => process.env.IDOR_SPOOR && new RegExp(process.env.IDOR_SPOOR).test(pad);
+  async function kruis({ routes, pool, basis, eigenVan, vanA, controle, wie, roepA, roepB, tegenB, ijkAltijd }) {
+    const perRoute = {};
+    const telling = { gescheiden: 0, doorbraak: 0, nagekeken: 0, publiek: 0, onbereikbaar: 0, lek: 0, afgebakend: 0 };
+    for (const r of routes) {
+      const sleutel = r.methode + ' ' + r.pad;
+      const verrijkt = pool.verrijk(basis(r.pad), r.pad);
+      /* A's eigen verwijzingen uit de opbouw (./lib/idoropbouw.js VAN_A) gaan er
+         NA het verrijken op: de pool kent een IBAN niet en deelt een `id` per
+         domein, en B hoort precies A's object te noemen. */
+      const eigen = eigenVan(r.pad);
+      const lijf = Object.assign(verrijkt.lijf, eigen);
+      const velden = [...new Set([...verrijkt.velden, ...Object.keys(eigen)])];
+      if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
+      const u = await roepB(r.pad, lijf);
+      if (spoor(r.pad)) console.error('SPOOR2B', r.pad, u.status, String(u.tekst).slice(0, 200));
+      const o = oordeelIdor(u.status, u.tekst);
+      /* WIE A IS, IN B'S ANTWOORD. Een 2xx voor B die ook met een verzonnen id
+         2xx blijft, heette publiek -- zonder dat iemand in het antwoord keek.
+         Draagt B's antwoord A's codenaam, e-mail of merkwoord, dan kreeg B iets
+         van A, welke statuscode de tegenpoging ook geeft. (Gemeten toen het
+         kaatsmodel meedraaide: een AI-route die A's profiel in B's prompt zet,
+         zou anders als "publiek" door de meting gaan.) */
+      const zagA = (wie() || []).filter((w) => typeof w === 'string' && w.length >= 6 && !controle.has(w) &&
+        !String(JSON.stringify(lijf)).includes(w) && String(u.tekst || '').includes(JSON.stringify(w).slice(1, -1)));
+      if (o.staat === 'doorbraak' && zagA.length) {
+        if (NAGEKEKEN[sleutel]) {
+          telling.nagekeken++;
+          perRoute[sleutel] = { status: u.status, staat: 'nagekeken', velden, gezien: zagA.slice(0, 3),
+            reden: 'B zag wie A is; met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
+          continue;
+        }
+        perRoute[sleutel] = { status: u.status, staat: 'doorbraak', velden, gezien: zagA.slice(0, 3),
+          reden: 'B kreeg ' + u.status + ' en zijn antwoord draagt wie A is (' + zagA.length + ' merkteken(s)): NAKIJKEN' };
+        telling.doorbraak++;
         continue;
       }
-      if (NAGEKEKEN[sleutel]) {
-        telling.nagekeken++;
-        perRoute[sleutel] = { status: u.status, staat: 'nagekeken', velden,
-          reden: 'doorbraak-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
+      if (o.staat === 'doorbraak') {
+        const nep = { ...lijf };
+        for (const v of velden) nep[v] = verzonnen();
+        const tegenpoging = await tegenB(r.pad, nep);
+        if (tegenpoging.status >= 200 && tegenpoging.status < 300) {
+          telling.publiek++;
+          perRoute[sleutel] = { status: u.status, staat: 'publiek', velden,
+            reden: 'ook met een VERZONNEN id een ' + tegenpoging.status + ': de route is publiek/rol-open, ' +
+              'A\'s id maakt geen verschil -- geen objectreferentie om te schenden' };
+          continue;
+        }
+        if (NAGEKEKEN[sleutel]) {
+          telling.nagekeken++;
+          perRoute[sleutel] = { status: u.status, staat: 'nagekeken', velden,
+            reden: 'doorbraak-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
+          continue;
+        }
+        perRoute[sleutel] = { status: u.status, tegenpoging: tegenpoging.status, staat: 'doorbraak', velden,
+          reden: 'B kreeg ' + u.status + ' met A\'s id maar ' + tegenpoging.status + ' met een verzonnen id: ' +
+            'A\'s ECHTE object opende de deur voor B -- dit is een objectreferentie die B niet hoort te hebben' };
+        telling.doorbraak++;
         continue;
       }
-      perRoute[sleutel] = { status: u.status, staat: 'doorbraak', velden,
-        reden: 'B kreeg ' + u.status + ' met A\'s id maar ' + controle.status + ' met een verzonnen id: ' +
-          'A\'s ECHTE object opende de deur voor B -- dit is een objectreferentie die B niet hoort te hebben' };
-      telling.doorbraak++;
-      continue;
+      /* DE GEIJKTE 400. Een 400 voor B zegt op zichzelf niets: de validatie kan
+         eerder gestrand zijn. Maar stuurt A LETTERLIJK HETZELFDE lijf -- met zijn
+         eigen id's -- en komt A wel binnen, dan was het lijf geldig en is het
+         enige verschil wie het stuurt. Dan is B's weigering een scheiding. Een
+         antwoord voor B dat een merkteken van A draagt telt nooit als scheiding. */
+      if (o.staat === 'onbereikbaar' && (u.status === 400 || u.status === 422)) {
+        const ijk = await roepA(r.pad, lijf);
+        if (spoor(r.pad)) console.error('SPOOR2', r.pad, 'B', u.status, String(u.tekst).slice(0, 100), 'A', ijk.status, String(ijk.tekst).slice(0, 200));
+        if (ijk.status >= 200 && ijk.status < 300) {
+          const merken = merktekens({ antwoordA: ijk.data, vanA, controle, lijf, wie: wie() });
+          const gezien = merken.filter((m) => String(u.tekst || '').includes(JSON.stringify(m).slice(1, -1)));
+          if (!gezien.length) {
+            telling.gescheiden++;
+            perRoute[sleutel] = { status: u.status, statusA: ijk.status, staat: 'gescheiden', velden,
+              reden: 'geijkt: A kwam met letterlijk hetzelfde lijf binnen (' + ijk.status + '), B kreeg ' + u.status +
+                ' -- het lijf was geldig, het enige verschil is wie het stuurt' };
+            continue;
+          }
+        }
+      }
+      /* IJKEN OOK BIJ EEN WEIGERING (ijkAltijd), ALLEEN waar de deur een token in
+         het lijf is (de werkruimtes). Daar komt A's standing uit zijn eigen token,
+         niet uit een object-id, dus A's ijk met hetzelfde lijf is eerlijk: komt A
+         er met zijn token wel in en B niet, dan is dat scheiding; komt A er ook
+         niet in, dan is het een muur. Bij de leden NIET: daar draagt het lijf A's
+         geoogste id, de pool kan dat door een ander id overschrijven, en dan zou
+         A's ijk vals falen -- een 404 voor B op A's object is dan al scheiding
+         (A's sessie opent zijn eigen id, B's niet). Een 401/403/404 voor B bewijst
+         pas scheiding als de deur voor A WEL opengaat -- anders is het een muur
+         (gang 3 zegt hetzelfde). Waar de deur een token in het lijf is, zoals bij
+         de werkruimtes, is dat geen formaliteit: een lid zonder recht krijgt
+         dezelfde 403 als een vreemde. */
+      if (ijkAltijd && o.staat === 'gescheiden') {
+        const ijk = await roepA(r.pad, lijf);
+        if (spoor(r.pad)) console.error('SPOORIJK', r.pad, 'B', u.status, String(u.tekst).slice(0, 120), 'A', ijk.status, String(ijk.tekst).slice(0, 160));
+        if (!(ijk.status >= 200 && ijk.status < 300)) {
+          telling.onbereikbaar++;
+          perRoute[sleutel] = { status: u.status, statusA: ijk.status, staat: 'onbereikbaar', velden,
+            reden: 'B kreeg ' + u.status + ', maar ook A kwam er met zijn eigen sleutel niet in (' + ijk.status + '): een muur, geen scheiding' };
+          continue;
+        }
+        o.reden += ' (geijkt: A kwam erin, ' + ijk.status + ')';
+      }
+      perRoute[sleutel] = { status: u.status, ...o, velden };
+      telling[o.staat]++;
+      if (o.lek) telling.lek++;
     }
-    perRoute[sleutel] = { status: u.status, ...o, velden };
-    telling[o.staat]++;
-    if (o.lek) telling.lek++;
+
+    /* ---- DE AFBAKENING (scripts/lib/afbakening.js) ----
+
+       De routes waar het kruisen niets kon, omdat ze geen id dragen: ze bakenen
+       af op de sessie. Hier is de vraag of B met HETZELFDE verzoek iets van A
+       terugkrijgt. A gaat eerst: alleen als A's antwoord een merkteken van A
+       draagt (iets wat A zag, de controle niet, en dat niet in het verzoek
+       stond), zegt B's antwoord iets. Anders blijft de route onbereikbaar. */
+    const afbakening = { routes: 0, afgebakend: 0, gescheiden: 0, doorbraak: 0, nagekeken: 0, onbereikbaar: 0 };
+    for (const r of routes) {
+      const sleutel = r.methode + ' ' + r.pad;
+      const v = perRoute[sleutel];
+      if (!v || v.staat !== 'onbereikbaar' || (v.velden && v.velden.length)) continue;
+      afbakening.routes++;
+      const lijf = basis(r.pad);
+      const a = await roepA(r.pad, lijf);
+      /* EEN MERKTEKEN IS IETS WAT A AL HAD, en niet wat deze ene aanroep net
+         verzon. Hier stond eerst waarden(a.data, vanA) VOOR de merktekens, en
+         dan was het verse ticket van /api/stroom/ticket een "merkteken van A":
+         een waarde die per aanroep nieuw is, die B dus nooit kan zien, wat de
+         route ook doet. Een experiment dat niet kan zakken (BEWIJSMACHINE.md par.
+         6a). Nu telt alleen wat A in een EERDERE aanroep (oogst, opbouw) al kreeg:
+         een blijvend object van A. */
+      const merken = merktekens({ antwoordA: a.data, vanA, controle, lijf, wie: wie() });
+      if (a.status >= 200 && a.status < 300 && a.data && typeof a.data === 'object') waarden(a.data, vanA);
+      /* IDOR_SPOOR=<patroon> toont voor die routes wat A kreeg: om een open route te
+         begrijpen zonder het register te lezen. Verandert niets aan de meting. */
+      if (spoor(r.pad)) console.error('SPOOR4', r.pad, a.status, JSON.stringify(merken), String(a.tekst).slice(0, 400));
+      const b = merken.length && a.status >= 200 && a.status < 300 ? await roepB(r.pad, lijf) : { status: 0, tekst: '' };
+      let o = oordeelAfbakening({ a, b, merken });
+      if (o.staat === 'doorbraak' && NAGEKEKEN[sleutel]) {
+        o = { staat: 'nagekeken', reden: 'afbakening-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
+      }
+      afbakening[o.staat]++;
+      if (o.staat === 'onbereikbaar') { v.afbakening = o.reden; continue; }   // het kruisen blijft staan, met de reden van de afbakening erbij
+      telling.onbereikbaar--;
+      telling[o.staat]++;
+      if (o.lek) telling.lek++;
+      perRoute[sleutel] = { status: b.status, statusA: a.status, gang: 'afbakening', ...o, velden: [] };
+    }
+    return { perRoute, telling, afbakening };
   }
+
+  /* GANG 2 EN 4: de leden. */
+  const { perRoute, telling, afbakening } = await kruis({ routes, pool, basis: basisLijf,
+    /* Wie A IS: codenaam, e-mail, en A's merkwoord. Dat laatste staat alleen in
+       wat A zelf maakte; een antwoord voor B dat het draagt, ergens in een lange
+       tekst (een AI-prompt, een chatgeschiedenis), toont iets van A. */
+    eigenVan: (pad) => opbouwLib.vanA(pad, ctx), vanA, controle, wie: () => [...(identiteit[1] || []), ctx.merk],
+    roepA: (pad, lijf) => roep(pad, lijf, 1, A), roepB: (pad, lijf) => roep(pad, lijf, 2, B),
+    tegenB: (pad, lijf) => post(pad, lijf, B) });
+
   if (!(await levend(B))) {
     const vers = await versLid(2);
     if (!vers) {
@@ -490,9 +753,243 @@ if (require.main !== module) { module.exports = {}; return; }
     }
   }
 
+  /* ---- GANG 5: DE ZAKEN (organisatie A tegen organisatie B) ----
+
+     Ledenschermen als Horeca, Tweede scherm en OV-routes roepen leveranciers-
+     routes aan. Daar is "een ander lid" geen vraag; de vraag is of een ANDERE
+     ZAAK bij het object van deze zaak kan. Dezelfde kruisfunctie, met zaken:
+     de manager van KIKUNOI is A, die van PONTO is B, en SAKURA is de controle
+     die de routes eerst loopt. De zaak komt bij elke leveranciersroute uit het
+     token, dus B probeert met zijn eigen sessie de objecten die A terugkreeg.
+
+     Een zaaksessie kan eindigen (een uitlogroute, een personeelswissel): de
+     sessiewacht haalt dan een verse via het rooster, zoals bij de leden. */
+  const zaakLogin = async (code) => {
+    const ro = await post('/api/supplier/roster', { code });
+    const man = (((ro.data || {}).staff) || []).find((x) => x.role === 'manager');
+    if (!man) return null;
+    return ((await post('/api/supplier/login', { code, staffId: man.id, pin: '1234' })).data || {}).token || null;
+  };
+  const ZAKEN = { 11: 'KIKUNOI', 12: 'PONTO', 13: 'SAKURA' };
+  const zaakTok = {};
+  for (const [n, code] of Object.entries(ZAKEN)) zaakTok[n] = await zaakLogin(code);
+  const zaakLeeft = async (tok) => (await post('/api/supplier/state', {}, tok)).status === 200;
+  const zaakWacht = maakSessiewacht({ post, rollen: Object.fromEntries(Object.entries(ZAKEN).map(([n, code]) =>
+    [n, { vers: () => zaakLogin(code), leeft: zaakLeeft, zet: (t) => { zaakTok[n] = t; } }])) });
+  const zroep = (pad, lijf, n) => zaakWacht.roep(pad, lijf, n, zaakTok[n]);
+  const zaakRoutes = verdeelOpRol(kandidaten, ['supplier']).metRol.filter((r) => r.rol === 'supplier');
+  const zLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), {});
+  let zaak = { routes: zaakRoutes.length, reden: null };
+  let zaakPerRoute = {};
+  if (!zaakTok[11] || !zaakTok[12] || !zaakTok[13]) {
+    zaak.reden = 'geen drie zaaksessies (' + Object.entries(ZAKEN).filter(([n]) => !zaakTok[n]).map(([, c]) => c).join(', ') + ')';
+  } else {
+    const zControle = new Set();
+    for (const r of zaakRoutes) {
+      const u = await zroep(r.pad, zLijf(r.pad), 13);
+      if (u.data && typeof u.data === 'object') waarden(u.data, zControle);
+    }
+    const zPool = maakPool();
+    const vanZaakA = new Set();
+    for (const r of zaakRoutes) {
+      const u = await zroep(r.pad, zLijf(r.pad), 11);
+      if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { zPool.leer(u.data, r.pad); waarden(u.data, vanZaakA); }
+    }
+    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: () => ({}),
+      vanA: vanZaakA, controle: zControle, wie: () => [],
+      roepA: (pad, lijf) => zroep(pad, lijf, 11), roepB: (pad, lijf) => zroep(pad, lijf, 12),
+      tegenB: (pad, lijf) => post(pad, lijf, zaakTok[12]) });
+    zaakPerRoute = z.perRoute;
+    zaak = { routes: zaakRoutes.length, ...z.telling, afbakening: z.afbakening, pool: zPool.grootte(),
+      sessieHernieuwd: zaakWacht.hernieuwd(), zaken: ZAKEN };
+  }
+
+  /* ---- GANG 6: DE STROOM (/api/stroom/ticket en GET /api/stream) ----
+
+     De live stroom van een lid draait op een ticket: de sessie gaat in de kop
+     naar /api/stroom/ticket, het ticket gaat in het adres naar /api/stream.
+     Achttien ledenschermen openen hem. De vraag is of de stroom van B iets van
+     A laat zien, en daar is geen id voor: een ticket is van wie hem haalde.
+
+     Het experiment: A en B openen elk hun EIGEN stroom. Dan stuurt C in het
+     gesprek met A een bericht met een vers merkwoord. A's stroom moet het
+     dragen -- dat is de ijking, want zonder die gebeurtenis bij A bewijst een
+     lege stroom bij B niets -- en B's stroom niet. Daarna probeert B A's al
+     GEBRUIKTE ticket: een ticket is eenmalig, en een tweede opening hoort
+     geweigerd te worden, ook voor een ander. */
+  const leesStroom = async (ticket, ms) => {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), ms);
+    let status = 0, tekst = '';
+    try {
+      const r = await fetch(basis + '/api/stream?ticket=' + encodeURIComponent(ticket || ''), { signal: ac.signal });
+      status = r.status;
+      if (r.body) {
+        const rd = r.body.getReader();
+        for (;;) { const { value, done } = await rd.read(); if (done) break; tekst += Buffer.from(value).toString('utf8'); }
+      }
+    } catch (e) { /* afgebroken na ms: zo eindigt een stroom */ }
+    clearTimeout(t);
+    return { status, tekst };
+  };
+  const stroom = { staat: 'onbereikbaar', reden: null };
+  {
+    const merk = 'stroom-' + opbouwLib.merkwoord();
+    const tA = ((await post('/api/stroom/ticket', { stroom: 'lid' }, A)).data || {}).ticket;
+    const tB = ((await post('/api/stroom/ticket', { stroom: 'lid' }, B)).data || {}).ticket;
+    if (!tA || !tB || !ctx.gesprek) {
+      stroom.reden = 'geen ticket voor A en B, of geen gesprek van A met C om een gebeurtenis bij A te laten landen';
+    } else {
+      const lezen = Promise.all([leesStroom(tA, 3500), leesStroom(tB, 3500)]);
+      await new Promise((r) => setTimeout(r, 800));
+      const stuur = await roep('/api/comm/stuur', { id: ctx.gesprek, tekst: merk }, 3, C);
+      const [sA, sB] = await lezen;
+      const herhaal = await leesStroom(tA, 800);
+      Object.assign(stroom, { statusA: sA.status, statusB: sB.status, stuur: stuur.status, herhaal: herhaal.status });
+      if (!(sA.status === 200 && sA.tekst.includes(merk))) {
+        stroom.reden = 'A\'s stroom droeg het bericht van C niet (status ' + sA.status + ', bericht ' + stuur.status +
+          '): zonder gebeurtenis bij A zegt een lege stroom bij B niets';
+      } else if (sB.tekst.includes(merk)) {
+        stroom.staat = 'doorbraak';
+        stroom.reden = 'B\'s EIGEN stroom droeg het bericht dat C aan A stuurde';
+      } else if (herhaal.status >= 200 && herhaal.status < 300) {
+        stroom.staat = 'doorbraak';
+        stroom.reden = 'A\'s gebruikte ticket opende de stroom een tweede keer (' + herhaal.status + '): een ticket in een adres hoort eenmalig te zijn';
+      } else {
+        stroom.staat = 'afgebakend';
+        stroom.reden = 'A\'s stroom droeg het bericht van C, B\'s eigen stroom (' + sB.status + ') niet, en A\'s gebruikte ticket werd een tweede keer geweigerd (' +
+          herhaal.status + ')';
+      }
+    }
+    /* Het experiment beproeft beide routes: het ticket bepaalt wiens stroom opengaat. */
+    perRoute['GET /api/stream'] = { gang: 'stroom', ...stroom };
+    if (stroom.staat !== 'onbereikbaar') perRoute['POST /api/stroom/ticket'] = { gang: 'stroom', ...stroom };
+  }
+
+  /* ---- GANG 8: DE WERKRUIMTES (bedrijf A tegen bedrijf B) ----
+
+     RTG Werk OS draait op een werkruimte met een lid-token en een
+     beheer-token in het lijf (server/bedrijf/deuren.js): die tokens zijn hier
+     de identiteit, zoals de sessie in de kop bij een lid. Drie werkruimtes
+     langs de echte routes -- A, B en de controle C -- elk met een toegelaten lid
+     met alle rollen. Dan dezelfde kruisfunctie: B noemt A's werkruimte met B's
+     EIGEN tokens. De vraag is precies "kan een ander bedrijf hier iets".
+
+     De uitslag vervangt die van gang 2 alleen waar gang 2 onbereikbaar bleef: daar
+     stuurde het lid geen werkruimte-tokens mee, dus stond elke deur dicht. */
+  const werkruimte = { routes: 0, reden: null };
+  {
+    const ROLLEN = ['directie', 'bestuur', 'hr', 'financieel', 'verkoop', 'service', 'engineering', 'projectleider',
+      'jurist', 'it', 'marketing', 'medewerker'];
+    const maakRuimte = async (wie, tok, merk) => {
+      const w = await post('/api/bedrijf/werkruimte/maak', { naam: 'Bedrijf ' + merk, land: 'NL', valuta: 'EUR', taal: 'nl' }, tok);
+      const code = w.data && w.data.werkruimte, beheer = w.data && w.data.beheerToken;
+      if (!code || !beheer) return { fout: wie + ': werkruimte/maak gaf ' + w.status };
+      const l = await post('/api/bedrijf/lid/aanmeld', { werkruimte: code, naam: 'Lid ' + merk, functie: 'directie' }, tok);
+      const lidId = l.data && l.data.lidId, lidToken = l.data && l.data.lidToken;
+      if (!lidId || !lidToken) return { fout: wie + ': lid/aanmeld gaf ' + l.status };
+      const bes = await post('/api/bedrijf/lid/besluit', { werkruimte: code, beheerToken: beheer, lidId, akkoord: true }, tok);
+      const rol = await post('/api/bedrijf/lid/rollen', { werkruimte: code, beheerToken: beheer, lidId, rollen: ROLLEN }, tok);
+      if (bes.status !== 200) return { fout: wie + ': lid/besluit gaf ' + bes.status };
+      return { code, beheer, lidToken, rollen: rol.status };
+    };
+    const WA = await maakRuimte('A', A, ctx.merk), WB = await maakRuimte('B', B, 'B' + Date.now()), WC = await maakRuimte('C', C, 'C' + Date.now());
+    const fout = [WA, WB, WC].map((x) => x.fout).filter(Boolean);
+    const wRoutes = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler');
+    werkruimte.routes = wRoutes.length;
+    if (fout.length) werkruimte.reden = fout.join('; ');
+    else {
+      const met = (W, w) => (lijf) => Object.assign({}, lijf, { werkruimte: W.code, lidToken: w.lidToken, beheerToken: w.beheer });
+      const wControle = new Set();
+      for (const r of wRoutes) {
+        const u = await roep(r.pad, met(WC, WC)(basisLijf(r.pad)), 3, C);
+        if (u.data && typeof u.data === 'object') waarden(u.data, wControle);
+      }
+      const wPool = maakPool();
+      const vanWA = new Set();
+      for (const r of wRoutes) {
+        const u = await roep(r.pad, met(WA, WA)(basisLijf(r.pad)), 1, A);
+        if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { wPool.leer(u.data, r.pad); waarden(u.data, vanWA); }
+      }
+      /* B noemt A's werkruimte met B's EIGEN tokens; A ijkt met zijn eigen. De
+         pool zet A's id's; de werkruimtecode en tokens gaan er daarna op, want
+         de pool zou anders een `code` uit A's antwoorden over A's werkruimte
+         heen kunnen leggen. */
+      const z = await kruis({ routes: wRoutes, pool: wPool, basis: basisLijf, eigenVan: () => ({ werkruimte: WA.code }),
+        vanA: vanWA, controle: wControle, wie: () => [ctx.merk],
+        roepA: (pad, lijf) => roep(pad, met(WA, WA)(lijf), 1, A),
+        roepB: (pad, lijf) => roep(pad, met(WA, WB)(lijf), 2, B),
+        tegenB: (pad, lijf) => post(pad, met(WA, WB)(lijf), B), ijkAltijd: true });
+      Object.assign(werkruimte, z.telling, { afbakening: z.afbakening, pool: wPool.grootte() });
+      for (const [k, v] of Object.entries(z.perRoute)) {
+        const eerder = perRoute[k];
+        if (!eerder || eerder.staat === 'onbereikbaar') perRoute[k] = { gang: 'werkruimte', ...v, eerder: eerder && eerder.reden };
+      }
+    }
+  }
+
+  /* ---- GANG 7: DE PASSKEY (/api/webauthn/registreer, /weg, /bevestig/opties) ----
+
+     Een passkey-ceremonie is niet na te doen met een verzonnen lijf, en dus
+     stonden deze drie routes open op elk identiteitsscherm. De authenticator
+     van test/webauthn-authenticator.js tekent met een echte P-256-sleutel; met
+     hem registreert A een passkey langs de echte ceremonie. Daarna:
+       registreer   B speelt A's ondertekende registratie na onder zijn eigen
+                    sessie -- dat hoort te stranden (de challenge is van A);
+       bevestig     A's ceremonie noemt A's credential; die van B hoort dat niet
+                    te doen (anders weet B welke sleutels A heeft);
+       weg          B probeert A's passkey weg te halen; daarna moet hij bij A
+                    nog staan, en de ijking is dat A hem ZELF wel weg kan halen.
+     Deze gang loopt als laatste: een passkey maakt A's herbevestiging zwaar, en
+     dat zou de gangen hierboven anders raken. */
+  const passkey = {};
+  {
+    const { maakAuthenticator } = require('../test/webauthn-authenticator');
+    const url = new URL(basis);
+    const sleutel = maakAuthenticator(url.hostname);
+    const credVan = async (tok) => ((((await post('/api/webauthn/lijst', {}, tok)).data) || {}).sleutels || []).map((x) => x.id);
+    const oA = await post('/api/webauthn/registreer/opties', { huidig: geheugen[1].wachtwoord }, A);
+    const ch = oA.data && oA.data.opties && oA.data.opties.challenge;
+    const antwoordA = ch ? sleutel.registratieAntwoord(ch, url.origin) : null;
+    const regA = antwoordA ? await post('/api/webauthn/registreer', { antwoord: antwoordA, naam: 'IDOR passkey A' }, A) : { status: 0 };
+    const credA = regA.status === 200 ? (await credVan(A))[0] : null;
+    if (!credA) {
+      passkey.reden = 'A kon geen passkey registreren (opties ' + oA.status + ', registreer ' + regA.status + '); zonder passkey van A is er niets te kruisen';
+    } else {
+      const oB = await post('/api/webauthn/registreer/opties', { huidig: geheugen[2].wachtwoord }, B);
+      const naspel = await post('/api/webauthn/registreer', { antwoord: antwoordA, naam: 'nagespeeld' }, B);
+      const bHeeft = (await credVan(B)).includes(credA);
+      passkey.registreer = (naspel.status >= 400 && naspel.status < 500 && !bHeeft)
+        ? { staat: 'gescheiden', status: naspel.status, reden: 'A registreerde een passkey (200); B speelde A\'s ondertekende registratie na onder zijn eigen sessie en kreeg ' +
+            naspel.status + ', en A\'s credential staat niet in B\'s lijst' }
+        : { staat: 'doorbraak', status: naspel.status, opties: oB.status, reden: 'B\'s nagespeelde registratie van A gaf ' + naspel.status + (bHeeft ? ' en A\'s credential staat in B\'s lijst' : '') + ': NAKIJKEN' };
+      const bevA = await post('/api/webauthn/bevestig/opties', { actie: 'passkey-weg' }, A);
+      const bevB = await post('/api/webauthn/bevestig/opties', { actie: 'passkey-weg' }, B);
+      const zieA = String(bevA.tekst || '').includes(credA), zieB = String(bevB.tekst || '').includes(credA);
+      passkey.bevestig = !zieA ? { staat: 'onbereikbaar', reden: 'A\'s eigen ceremonie noemde A\'s credential niet (' + bevA.status + '): niets om in B\'s ceremonie te zoeken' }
+        : zieB ? { staat: 'doorbraak', reden: 'B\'s ceremonie noemde A\'s credential: NAKIJKEN' }
+          : { staat: 'afgebakend', status: bevB.status, reden: 'A\'s ceremonie noemde A\'s credential, die van B (' + bevB.status + ') niet' };
+      const wegB = await post('/api/webauthn/weg', { id: credA }, B);
+      const nogBijA = (await credVan(A)).includes(credA);
+      let wegA = { status: 0 };
+      if (bevA.data && bevA.data.ceremonie && bevA.data.opties) {
+        wegA = await post('/api/webauthn/weg', { id: credA, ceremonie: bevA.data.ceremonie,
+          antwoord: sleutel.loginAntwoord(bevA.data.opties.challenge, url.origin, 1) }, A);
+      }
+      const ob = oordeelIdor(wegB.status, wegB.tekst);
+      passkey.weg = !(wegA.status >= 200 && wegA.status < 300) ? { staat: 'onbereikbaar', reden: 'A kon zijn eigen passkey niet weghalen (' + wegA.status + '): de deur is voor niemand open, een weigering voor B bewijst niets' }
+        : !nogBijA ? { staat: 'doorbraak', status: wegB.status, reden: 'na B\'s poging (' + wegB.status + ') stond A\'s passkey niet meer bij A: NAKIJKEN' }
+          : ob.staat === 'gescheiden' ? { staat: 'gescheiden', status: wegB.status, reden: 'B kreeg ' + wegB.status + ' op A\'s passkey, die stond daarna nog bij A, en A haalde hem zelf weg (' + wegA.status + ')' }
+            : { staat: ob.staat === 'doorbraak' ? 'doorbraak' : 'onbereikbaar', status: wegB.status, reden: 'B kreeg ' + wegB.status + ' op A\'s passkey: ' + ob.reden };
+      perRoute['POST /api/webauthn/registreer'] = { gang: 'passkey', ...passkey.registreer };
+      perRoute['POST /api/webauthn/bevestig/opties'] = { gang: 'passkey', ...passkey.bevestig };
+      perRoute['POST /api/webauthn/weg'] = { gang: 'passkey', ...passkey.weg };
+    }
+  }
+
   klaar();
 
-  const doorbraken = Object.entries(perRoute).filter(([, v]) => v.staat === 'doorbraak');
+  const doorbraken = Object.entries(perRoute).concat(Object.entries(zaakPerRoute)).filter(([, v]) => v.staat === 'doorbraak');
   /* DE ZWARE PADEN APART GETELD: dat is waar het toestel voor is, en een totaal
      over 2000 routes laat niet zien of juist die nu gekruist zijn. `aanDeDeur`
      telt wat nog steeds aan de toesteldeur strandde -- blijft dat hoog terwijl
@@ -515,10 +1012,11 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar },
+      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, passkey, werkruimte, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
-    werkplekPerRoute
+    werkplekPerRoute,
+    zaakPerRoute
   };
 
   if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
@@ -528,6 +1026,13 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  publiek (id maakt geen verschil): ' + telling.publiek);
   console.log('  onbereikbaar (geen id/validatie): ' + telling.onbereikbaar);
   console.log('  weigering die een persoonsveld lekt: ' + telling.lek);
+  console.log('  afbakening (gang 4, routes zonder id): ' + JSON.stringify(afbakening));
+  console.log('  zaken (gang 5, KIKUNOI tegen PONTO): ' + JSON.stringify(zaak));
+  console.log('  stroom (gang 6): ' + JSON.stringify(stroom));
+  console.log('  passkey (gang 7): ' + JSON.stringify(passkey));
+  console.log('  werkruimtes (gang 8): ' + JSON.stringify(werkruimte));
+  console.log('  opbouw (gang 1b): ' + opbouw.geslaagd + ' van ' + opbouw.stappen + ' stappen geslaagd' +
+    (opbouw.mislukt.length ? '; mislukt: ' + opbouw.mislukt.join(' | ') : ''));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');
   console.log('  toestel: ' + toestelStand.gebonden + ' bindingen, ' + toestelStand.gekeurd + ' gekeurd' +
     (toestelStand.mislukt.length ? ', MISLUKT: ' + toestelStand.mislukt.join('; ') : ''));

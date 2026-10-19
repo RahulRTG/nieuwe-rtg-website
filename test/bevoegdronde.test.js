@@ -49,6 +49,21 @@ test('1. een ledenscherm is alleen BEWEZEN als elke route gemeten is', () => {
     'een voorvoegsel zonder bekende routes eronder is open, en niet gemeten');
   assert.equal(R.ledenOordeel(rij, reg({ '/api/a/ding/x': [{ staat: 'gescheiden' }] }, {}), { schermroutes: SRv, lees }).status, 'BEWEZEN');
   assert.equal(R.ledenOordeel({ functie: 'x', ingang: 'stand:x' }, beide, { schermroutes: SR, lees }).status, 'NIET_GETEST');
+
+  /* De afbakening (gang 4 van de IDOR-proef) telt als gemeten; haar
+     onbereikbaar (A zag niets van zichzelf) blijft open. */
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ staat: 'afgebakend' }], '/api/a/zet': [{ staat: 'gescheiden' }] }, {})).status, 'BEWEZEN');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ staat: 'afgebakend' }], '/api/a/zet': [{ staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
+});
+
+test('1b. de zaak-gang van IDOR.json telt mee, en een doorbraak daar is een defect', () => {
+  const lees = (perRoute, zaakPerRoute) => (f) => (f === 'IDOR.json' ? JSON.stringify({ stempel: {}, perRoute, zaakPerRoute })
+    : f === 'ROLPROEF.json' ? JSON.stringify({ stempel: {}, perRoute: [] }) : null);
+  const vers = () => ({ vers: true });
+  const r1 = R.laadRegisters({ lees: lees({}, { 'POST /api/supplier/x': { staat: 'gescheiden' } }), vers });
+  assert.deepEqual(r1.idor.get('/api/supplier/x'), [{ methode: 'POST', staat: 'gescheiden' }]);
+  const r2 = R.laadRegisters({ lees: lees({}, { 'POST /api/supplier/x': { staat: 'doorbraak' } }), vers });
+  assert.equal(R.padOordeel('/api/supplier/x', r2).stand, 'gebroken');
 });
 
 test('2. een breuk is een defect, en vervallen bewijs is geen bewijs', () => {

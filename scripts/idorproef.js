@@ -522,8 +522,15 @@ if (require.main !== module) { module.exports = {}; return; }
       afbakening.routes++;
       const lijf = basis(r.pad);
       const a = await roepA(r.pad, lijf);
-      if (a.status >= 200 && a.status < 300 && a.data && typeof a.data === 'object') waarden(a.data, vanA);
+      /* EEN MERKTEKEN IS IETS WAT A AL HAD, en niet wat deze ene aanroep net
+         verzon. Hier stond eerst waarden(a.data, vanA) VOOR de merktekens, en
+         dan was het verse ticket van /api/stroom/ticket een "merkteken van A":
+         een waarde die per aanroep nieuw is, die B dus nooit kan zien, wat de
+         route ook doet. Een experiment dat niet kan zakken (BEWIJSMACHINE.md par.
+         6a). Nu telt alleen wat A in een EERDERE aanroep (oogst, opbouw) al kreeg:
+         een blijvend object van A. */
       const merken = merktekens({ antwoordA: a.data, vanA, controle, lijf, wie: wie() });
+      if (a.status >= 200 && a.status < 300 && a.data && typeof a.data === 'object') waarden(a.data, vanA);
       /* IDOR_SPOOR=<patroon> toont voor die routes wat A kreeg: om een open route te
          begrijpen zonder het register te lezen. Verandert niets aan de meting. */
       if (spoor(r.pad)) console.error('SPOOR4', r.pad, a.status, JSON.stringify(merken), String(a.tekst).slice(0, 400));
@@ -732,6 +739,68 @@ if (require.main !== module) { module.exports = {}; return; }
       sessieHernieuwd: zaakWacht.hernieuwd(), zaken: ZAKEN };
   }
 
+  /* ---- GANG 6: DE STROOM (/api/stroom/ticket en GET /api/stream) ----
+
+     De live stroom van een lid draait op een ticket: de sessie gaat in de kop
+     naar /api/stroom/ticket, het ticket gaat in het adres naar /api/stream.
+     Achttien ledenschermen openen hem. De vraag is of de stroom van B iets van
+     A laat zien, en daar is geen id voor: een ticket is van wie hem haalde.
+
+     Het experiment: A en B openen elk hun EIGEN stroom. Dan stuurt C in het
+     gesprek met A een bericht met een vers merkwoord. A's stroom moet het
+     dragen -- dat is de ijking, want zonder die gebeurtenis bij A bewijst een
+     lege stroom bij B niets -- en B's stroom niet. Daarna probeert B A's al
+     GEBRUIKTE ticket: een ticket is eenmalig, en een tweede opening hoort
+     geweigerd te worden, ook voor een ander. */
+  const leesStroom = async (ticket, ms) => {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), ms);
+    let status = 0, tekst = '';
+    try {
+      const r = await fetch(basis + '/api/stream?ticket=' + encodeURIComponent(ticket || ''), { signal: ac.signal });
+      status = r.status;
+      if (r.body) {
+        const rd = r.body.getReader();
+        for (;;) { const { value, done } = await rd.read(); if (done) break; tekst += Buffer.from(value).toString('utf8'); }
+      }
+    } catch (e) { /* afgebroken na ms: zo eindigt een stroom */ }
+    clearTimeout(t);
+    return { status, tekst };
+  };
+  const stroom = { staat: 'onbereikbaar', reden: null };
+  {
+    const merk = 'stroom-' + opbouwLib.merkwoord();
+    const tA = ((await post('/api/stroom/ticket', { stroom: 'lid' }, A)).data || {}).ticket;
+    const tB = ((await post('/api/stroom/ticket', { stroom: 'lid' }, B)).data || {}).ticket;
+    if (!tA || !tB || !ctx.gesprek) {
+      stroom.reden = 'geen ticket voor A en B, of geen gesprek van A met C om een gebeurtenis bij A te laten landen';
+    } else {
+      const lezen = Promise.all([leesStroom(tA, 3500), leesStroom(tB, 3500)]);
+      await new Promise((r) => setTimeout(r, 800));
+      const stuur = await roep('/api/comm/stuur', { id: ctx.gesprek, tekst: merk }, 3, C);
+      const [sA, sB] = await lezen;
+      const herhaal = await leesStroom(tA, 800);
+      Object.assign(stroom, { statusA: sA.status, statusB: sB.status, stuur: stuur.status, herhaal: herhaal.status });
+      if (!(sA.status === 200 && sA.tekst.includes(merk))) {
+        stroom.reden = 'A\'s stroom droeg het bericht van C niet (status ' + sA.status + ', bericht ' + stuur.status +
+          '): zonder gebeurtenis bij A zegt een lege stroom bij B niets';
+      } else if (sB.tekst.includes(merk)) {
+        stroom.staat = 'doorbraak';
+        stroom.reden = 'B\'s EIGEN stroom droeg het bericht dat C aan A stuurde';
+      } else if (herhaal.status >= 200 && herhaal.status < 300) {
+        stroom.staat = 'doorbraak';
+        stroom.reden = 'A\'s gebruikte ticket opende de stroom een tweede keer (' + herhaal.status + '): een ticket in een adres hoort eenmalig te zijn';
+      } else {
+        stroom.staat = 'afgebakend';
+        stroom.reden = 'A\'s stroom droeg het bericht van C, B\'s eigen stroom (' + sB.status + ') niet, en A\'s gebruikte ticket werd een tweede keer geweigerd (' +
+          herhaal.status + ')';
+      }
+    }
+    /* Het experiment beproeft beide routes: het ticket bepaalt wiens stroom opengaat. */
+    perRoute['GET /api/stream'] = { gang: 'stroom', ...stroom };
+    if (stroom.staat !== 'onbereikbaar') perRoute['POST /api/stroom/ticket'] = { gang: 'stroom', ...stroom };
+  }
+
   klaar();
 
   const doorbraken = Object.entries(perRoute).concat(Object.entries(zaakPerRoute)).filter(([, v]) => v.staat === 'doorbraak');
@@ -757,7 +826,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar, zaak, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
+      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute,
@@ -773,6 +842,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  weigering die een persoonsveld lekt: ' + telling.lek);
   console.log('  afbakening (gang 4, routes zonder id): ' + JSON.stringify(afbakening));
   console.log('  zaken (gang 5, KIKUNOI tegen PONTO): ' + JSON.stringify(zaak));
+  console.log('  stroom (gang 6): ' + JSON.stringify(stroom));
   console.log('  opbouw (gang 1b): ' + opbouw.geslaagd + ' van ' + opbouw.stappen + ' stappen geslaagd' +
     (opbouw.mislukt.length ? '; mislukt: ' + opbouw.mislukt.join(' | ') : ''));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');

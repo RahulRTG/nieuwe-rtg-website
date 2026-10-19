@@ -18,7 +18,10 @@
      2  HET MERKTEKEN IS ECHT VAN A. Een controlelid C liep dezelfde routes VOOR
         A. Wat C ook zag (seed-inrichting, publieke catalogus, server-brede
         waarden), is geen merkteken. Een waarde die in het VERZOEK zelf staat
-        ook niet: die echoot de route voor iedereen terug.
+        ook niet: die echoot de route voor iedereen terug. En `vanA` bevat wat
+        A in EERDERE aanroepen kreeg: een waarde die deze aanroep net verzon (een
+        vers ticket) is niet van A maar van het moment, en B kan hem nooit zien
+        -- een experiment dat niet kan zakken.
      3  B STUURT LETTERLIJK HETZELFDE VERZOEK.
 
    DE UITKOMSTEN:

@@ -285,3 +285,24 @@ test('een tab zonder eigen adres koppelt alleen via ingang, via en zijn eigen de
   }
   assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', null, { schermroutes }), null);
 });
+
+test('een stand op een scherm koppelt op zijn eigen delen, en alleen als het scherm die laadt', () => {
+  /* /apps/geld.html laadt de delen van elke stand; zonder versmalling telt
+     Balans alle routes van het geldscherm en kan hij met zijn ene route nooit
+     koppelen. Een deel dat het scherm niet laadt, mag het contract niet noemen. */
+  const lees = (f) => f === 'public/apps/geld.html'
+    ? '<script src="/apps/geld/balans.js"></script><script src="/apps/geld/bank.js"></script>' : null;
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/geld/balans.js', exact: ['/api/balans'] },
+    { bestand: 'public/apps/geld/bank.js', exact: ['/api/bank/overzicht', '/api/bank/storten'] },
+    { bestand: 'public/apps/ander.js', exact: ['/api/ander'] }] };
+  const opt = { lees, schermroutes, bundels: new Map() };
+  const heel = B.ingangVan('/apps/geld.html#balans', null, opt);
+  assert.equal(heel.exact.size, 3, 'zonder contract telt het hele scherm');
+  const stand = B.ingangVan('/apps/geld.html#balans', { bestanden: ['public/apps/geld/balans.js'] }, opt);
+  assert.deepEqual([...stand.exact], ['/api/balans']);
+  assert.equal(B.ingangVan('/apps/geld.html#balans', { bestanden: ['public/apps/ander.js'] }, opt), null,
+    'een deel dat het scherm niet laadt geeft geen ingang');
+  const zonderHash = B.ingangVan('/apps/geld.html', { bestanden: ['public/apps/geld/balans.js'] }, opt);
+  assert.equal(zonderHash.exact.size, 3, 'zonder stand in de ingang wordt er niet versmald');
+});

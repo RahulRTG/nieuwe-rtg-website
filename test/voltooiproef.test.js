@@ -88,7 +88,7 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
       /* Minstens twee routes van de ingang, of ALLE als het scherm er minder
          heeft: een scherm met één route (het routedossier) kan geen tweede
          leveren, en dan moet het scenario juist die ene raken. */
-      const ingang = sc.functie.startsWith('link:') ? B.ingangRoutes(sc.ingang) : B.ingangVan(null, c);
+      const ingang = B.ingangVan(sc.functie.startsWith('link:') ? sc.ingang : null, c);
       const raak = B.gedeeld(B.proefRoutes(sc.bestand), ingang);
       const aantal = ingang.exact.size + ingang.voor.size;
       assert.ok(aantal >= 1, sc.functie + ': de ingang ' + sc.ingang + ' roept geen bekende route aan');

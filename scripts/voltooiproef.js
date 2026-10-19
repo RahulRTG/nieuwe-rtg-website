@@ -181,9 +181,7 @@ const SCENARIOS = {
   'werk.js': require('./lib/voltooi/werk'),
   'werkos.js': require('./lib/voltooi/werkos'),
   'vluchten.js': require('./lib/voltooi/vluchten'),
-  'vonk.js': require('./lib/voltooi/vonk'),
-  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht'),
-  'werkos.js': require('./lib/voltooi/werkos')
+  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht')
 };
 
 function scenarios(alleen) {

@@ -54,6 +54,7 @@ const BUITEN = {
      werkelijk in de tabel staat. */
   'TAALOORDEEL.json': 'het oordeel van een mens die de taal spreekt; met de hand bijgehouden, geen meetronde -- de dekking ervan bewaakt test/taaloordeel.test.js',
   'NORM.json': 'de normtanden zelf -- hij IS de ratel en wordt door de ratels geschreven, niet door een meetronde',
+  'ONTWERPNORM.json': 'de per-bestand-ratel op de CSS-erfenis (ONTWERPSYSTEEM.md) -- net als NORM.json IS hij de lat; scripts/ontwerpsysteem.js --controle meet er bij elke CI-ronde vers tegen, en --vastleggen zet hem alleen strakker',
   /* De nulstand van de Magnaat-grondwet is met opzet OUD. Hij is de lat waar
      test/magnaatgrondwet.test.js vers tegen meet; hem "verversen" is achteruit
      mogen gaan zonder dat iemand het ziet (MAGNAAT.md par. 5). Veroudering is

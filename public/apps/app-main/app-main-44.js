@@ -56,10 +56,10 @@
   function infoRij(titel, tekst){ return tekst ? '<div class="h-mt50"><div class="meta s-aekzga">'+esc(titel)+'</div><div class="s-yztz7f">'+esc(tekst)+'</div></div>' : ''; }
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
-    const g=(rtf.gekoppeld||[]); if(!g.length) return;
+    const a=actiefGezin(); if(!a) return;
     // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
     if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
-    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    try{ await API.call('/api/rtf/bericht',{ code:a.code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+a.gezinNaam+'.'); }
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){

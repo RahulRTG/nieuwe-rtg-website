@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1b45b94d';
+var RTG_BOUW = 'fe498370';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7746,22 +7746,28 @@ var RTG_BOUW = '1b45b94d';
       '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.75rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go s-2k7uh7" id="rtfPushBtn">Meldingen op mijn telefoon</button></div>';
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
+      // wie meer gezinnen volgt, kiest naar welk gezin chat en antwoord gaan (nooit stil het eerste)
+      (g.length>1 ? '<select id="rtfGezinKeus" aria-label="Naar welk gezin" style="margin-top:.8rem;width:100%;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.5rem .7rem;color:var(--txt);">'+g.map(x=>'<option value="'+esc(x.code)+'"'+(actiefGezin()&&actiefGezin().code===x.code?' selected':'')+'>'+esc(x.gezinNaam)+'</option>').join('')+'</select>' : '')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
     fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', async ()=>{ const [code,pid]=b.dataset.los.split('|'); if(!confirm('Dit gezin niet meer volgen?')) return; try{ await API.call('/api/rtf/ontkoppel',{code,profielId:pid}); toast('Ontkoppeld.'); await refreshState(); renderFoundation(); if(!(rtf.gekoppeld||[]).length) openTab('home'); }catch(e){ toast(e.message); } }));
     const kb=$('#rtfKoppelBtn2'); if(kb) kb.addEventListener('click', rtfKoppelStart);
     const pb=$('#rtfPushBtn'); if(pb) pb.addEventListener('click', ()=> ensurePush(true));
     const rb=$('#rtfReplyBtn'); if(rb) rb.addEventListener('click', rtfReply);
     const ri=$('#rtfReplyIn'); if(ri) ri.addEventListener('keydown', e=>{ if(e.key==='Enter') rtfReply(); });
+    const gk=$('#rtfGezinKeus'); if(gk) gk.addEventListener('change', ()=>{ gezinKeus=gk.value; laadGezinChat(); });
     if (m.filter(x=>!x.gelezen).length) API.call('/api/rtf/meldingen/gelezen').catch(()=>{});
     if (g.length){ laadGezinInfo(); laadGezinChat(); } else { const gc=$('#gezinChat'); if(gc) gc.style.display='none'; }
   }
-  let grtInit=false, grtActief=null;
+  let grtInit=false, grtActief=null, grtCode=null, gezinKeus=null;
+  // het gezin waar chat en antwoord heen gaan: de keuze van het lid, anders het eerste
+  function actiefGezin(){ const g=(rtf.gekoppeld||[]); return g.find(x=>x.code===gezinKeus)||g[0]||null; }
   async function laadGezinChat(){
     const box=$('#gezinChat'); if(!box) return;
     const g=(rtf.gekoppeld||[]); if(!g.length){ box.style.display='none'; return; }
     box.style.display='';
-    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
-    if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; }
+    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:actiefGezin().code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
+    // een ander gezin gekozen: GezinRT opnieuw op dat gezin (injectUI is eenmalig, verbind sluit de oude stroom)
+    if ((!grtInit || grtCode!==kan.code) && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; grtCode=kan.code; }
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); if (GezinRT.setToken) GezinRT.setToken(kan.token); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
     const byId={}; chats.forEach(c=> byId[c.id]=c);
@@ -7823,10 +7829,10 @@ var RTG_BOUW = '1b45b94d';
   function infoRij(titel, tekst){ return tekst ? '<div class="h-mt50"><div class="meta s-aekzga">'+esc(titel)+'</div><div class="s-yztz7f">'+esc(tekst)+'</div></div>' : ''; }
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
-    const g=(rtf.gekoppeld||[]); if(!g.length) return;
+    const a=actiefGezin(); if(!a) return;
     // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
     if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
-    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    try{ await API.call('/api/rtf/bericht',{ code:a.code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+a.gezinNaam+'.'); }
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){

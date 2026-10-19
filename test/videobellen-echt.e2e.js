@@ -21,10 +21,14 @@
    - menselijk: de weigering draagt een melding in woorden.
    Niet: persistent en herstelbaar (een gesprek wordt nergens bewaard; een
    crash van de server midden in een gesprek is een andere proef), TURN over
-   een streng netwerk, en echte camera's. De oproep start met RTGSocial.bel --
-   precies de aanroep die de kiezer van de os-tegel doet bij een tik op een
-   contact (apps/app-main/app-main-26.js) --, want op de werktafel van een vers
-   lid staat het beginschermrooster met die tegel niet in beeld.
+   een streng netwerk, en echte camera's.
+
+   DE OPROEP LOOPT DE ECHTE ROUTE, met zichtbare klikken en typen. Videobellen
+   heeft geen tegel: de werktafel is het beginscherm (WERELD.md) en een wereld
+   opent zonder tussenscherm met tegels (PLATFORM.md par. 0). Een lid vraagt het
+   aan Rahul: "Praat met Rahul" in de rand, "open videobellen" in het veld dat
+   verschijnt; de functiegids opent de kiezer met Salon-contacten
+   (apps/app-main/app-main-26.js), en een tik op B belt.
 
    Draait alleen waar Playwright met een passende browser staat. */
 'use strict';
@@ -121,7 +125,13 @@ test('videobellen: twee vrienden zien elkaar echt, in beide richtingen, en ophan
        oproep naar een gesloten app werkt, en niet wat hier gemeten wordt. */
     await b.p.waitForFunction(() => window.RTGRealtime && window.RTGRealtime.source && window.RTGRealtime.source.readyState === 1, null, { timeout: 20000 });
 
-    await a.p.evaluate(([k, n]) => window.RTGSocial.bel(k, n, true), [B.key, B.codenaam]);
+    await a.p.click('.rtg-adaptive-item[aria-label="Praat met Rahul"]');
+    const vraag = a.p.locator('input[placeholder^="Vraag Rahul"]:visible').first();
+    await vraag.fill('open videobellen');
+    await vraag.press('Enter');
+    await a.p.waitForSelector('#osBelScrim.open', { timeout: 10000 });
+    assert.match(await a.p.textContent('#osBelTitel'), /Videobellen/);
+    await a.p.click('#osBelLijst button:has-text("' + B.codenaam + '")');
     await b.p.waitForSelector('#callIncoming.open', { state: 'attached', timeout: 20000 });
     await b.p.waitForSelector('.rtg-edge-live__accept', { state: 'visible', timeout: 10000 });
     const soort = await b.p.textContent('#ciSoort');

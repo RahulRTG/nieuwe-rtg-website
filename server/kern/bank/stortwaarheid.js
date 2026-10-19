@@ -19,7 +19,7 @@
 const { randomUUID } = require('crypto');
 const { maakSleutel } = require('../../db/economische-identiteit');
 const { boekOpSleutel } = require('../betaalopdracht/terugboeking');
-const { LOPEND } = require('../pay/oplaadstand');
+const stand = require('../pay/oplaadstand');
 
 module.exports = (ctx) => {
   const { betaalWaarheid, grootboek, boek, boekAsync, economischeBoekingEenmaal, geldModus, rekMeta, saldoVan, seintje } = ctx;
@@ -51,27 +51,13 @@ module.exports = (ctx) => {
         idem: 'bank-stort:' + iban + ':' + (idem ? String(idem) : 'los:' + randomUUID()),
         centen, valuta: 'eur', context: { iban, oms: oms || 'Storting' } });
     } catch (e) { return { status: 409, error: e.message }; }
-    /* Een storting die al liep, is bij een herhaling niet onbekend: dezelfde
-       regel als bij opladen (../pay/oplaadstand.js). */
+    /* stand en zin: dezelfde regel als opladen, op een plek (../pay/oplaadstand.js) */
     const alGestart = !!w.providerId;
     try { await betaalWaarheid.begin(w.id, { omschrijving: oms || 'RTG Bank storten' }); }
-    catch (e) {
-      const nu = betaalWaarheid.van(w.id);
-      if (alGestart && nu && LOPEND.includes(nu.status) && !(e && e.code === 'BETAAL_AFHANDELING_MISLUKT'))
-        return { status: 402, betalingId: w.id, lopend: true, error: 'De betaling wacht op bevestiging.', betaalStatus: nu.providerStatus || null };
-      if (e && e.code === 'BETAAL_AFHANDELING_MISLUKT')
-        return { status: 502, betalingId: w.id, error: 'De storting is bevestigd maar nog niet bijgeschreven; dat gebeurt vanzelf.' };
-      return { status: 502, betalingId: w.id, onbekend: true,
-        error: 'De storting gaf geen uitsluitsel. Stort niet opnieuw: RTG zoekt het na met dezelfde sleutel.' };
-    }
+    catch (e) { return stand.naFout(betaalWaarheid.van(w.id), e, alGestart, w.id, 'storting'); }
     const r = betaalWaarheid.van(w.id);
     if (r && r.afgehandeldAt) return { ok: true, iban, via: 'kaart', saldoCenten: saldoVan(iban), gestort: centen, betalingId: w.id };
-    const stand = r && r.status;
-    const zin = stand === 'GEWEIGERD' || stand === 'GEANNULEERD'
-      ? 'De storting is niet gelukt. Er is niets afgeschreven en niets bijgeschreven.'
-      : stand === 'CONTROLE_NODIG' ? 'De storting ligt bij RTG ter controle. Stort niet opnieuw.'
-        : 'De betaling wacht op bevestiging.';
-    return { status: 402, error: zin, betalingId: w.id, betaalStatus: (r && r.providerStatus) || null };
+    return { status: 402, error: stand.zinNa(r && r.status, 'storting'), betalingId: w.id, betaalStatus: (r && r.providerStatus) || null };
   }
 
   return { viaKaart };

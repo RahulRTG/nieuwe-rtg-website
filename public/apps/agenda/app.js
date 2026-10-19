@@ -189,5 +189,9 @@
     });
   });
 
+  /* De contextbus volgt in ./volgt.js; die krijgt hier precies wat hij nodig
+     heeft om met DEZE sessie op te lossen en de weergave te verzetten. */
+  window.RTGAgendaBus = { stand: stand, laad: laad, api: api, sessie: !!token };
+
   if (!token) window.RTGDaily.render('agenda', 'guest'); else laad();
 })();

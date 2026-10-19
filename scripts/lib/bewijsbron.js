@@ -343,9 +343,15 @@ const SOORT_OK = (soort) => {
 function noemtSoort(tekst, soort, protocol) {
   if (!tekst.includes(protocol)) return false;
   const s = soort.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (protocol === "rtg: 'context'") return new RegExp('soort\\s*:\\s*["\']' + s + '["\']').test(tekst);
   if (protocol === 'sleep-start') return new RegExp('data-sleep=\\\\?["\']' + s + '["\'\\\\]|soort\\s*:\\s*["\']' + s + '["\']').test(tekst);
-  return new RegExp('(^|[\\s{,])["\']?' + s + '["\']?\\s*:\\s*\\{').test(tekst);
+  return new RegExp('(^|[\\s{,])["\']?' + s + '["\']?\\s*:\\s*(\\{|function\\b)').test(tekst);
 }
+/* Het protocol per schakel: `sleep` (slepen, 06b-objecten) of `context` (de
+   contextbus, 05-context). Een ontvanger op de contextbus luistert naar
+   rtg === 'context' en kent de soort als sleutel. */
+const PROTOCOL = { sleep: { uit: 'sleep-start', in: 'sleep-kan' }, context: { uit: "rtg: 'context'", in: "'context'" } };
+function protocolVan(sch, uit) { const p = PROTOCOL[sch.protocol || 'sleep']; return p ? p[uit ? 'uit' : 'in'] : null; }
 function schermSpreekt(ingang, soort, protocol, opties) {
   const bestanden = opties.bestandenVan ? opties.bestandenVan(ingang) : standaardBestanden(ingang);
   const lees = opties.lees || leesStandaard;
@@ -407,7 +413,9 @@ function controleerSamen(opties = {}) {
     for (const sch of k.schakels || []) {
       const soort = sch.uitgeeft || sch.ontvangt;
       if (!SOORT_OK(soort)) { bezwaren.push(wie + ': "' + soort + '" is geen soort die de objectpoort doorlaat'); continue; }
-      if (!schermSpreekt(sch.scherm, soort, sch.uitgeeft ? 'sleep-start' : 'sleep-kan', opties)) bezwaren.push(wie + ': ' + sch.scherm + ' ' + (sch.uitgeeft ? 'geeft ' : 'ontvangt ') + soort + ' niet in zijn code');
+      const protocol = protocolVan(sch, !!sch.uitgeeft);
+      if (!protocol) { bezwaren.push(wie + ': onbekend protocol ' + sch.protocol); continue; }
+      if (!schermSpreekt(sch.scherm, soort, protocol, opties)) bezwaren.push(wie + ': ' + sch.scherm + ' ' + (sch.uitgeeft ? 'geeft ' : 'ontvangt ') + soort + ' niet in zijn code (' + (sch.protocol || 'sleep') + ')');
       if (sch.ontvangt && !uitgegeven.has(sch.ontvangt)) bezwaren.push(wie + ': ontvangt ' + sch.ontvangt + ', maar niemand geeft die uit');
     }
     for (const [f, c] of [...functies].map(([x]) => [x, samen[x]]).filter(([, c]) => c)) if ((c.ketens || []).some((x) => x.naam === k.naam)) bezwaren.push(wie + ' staat ook onder ' + f + ' in SAMEN; een keten staat op een plek');
@@ -435,4 +443,4 @@ function samenKetens(opties = {}) {
   return uit;
 }
 
-module.exports = { controleerSamen, samenKetens, noemtSoort, proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };
+module.exports = { controleerSamen, samenKetens, noemtSoort, PROTOCOL, proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

@@ -67,6 +67,38 @@ async function inKalender(frame, label) {
   return false;
 }
 
+/* Een werkruimte voor een lid, met Reizen, Agenda en een derde surface die de
+   soort niet kent (zonder die derde is "zwijgen is nee" niet te meten). */
+async function werkruimte(browser, base, tok) {
+  const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const page = await ctx.newPage();
+  const fouten = [];
+  page.on('pageerror', (e) => fouten.push(String(e.message || e).slice(0, 160)));
+  await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate((tk) => {
+    localStorage.setItem('rtg_member_token', tk);
+    localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+  }, tok);
+  await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.rtg-surface[data-id="agenda"]', { state: 'attached', timeout: 20000 });
+  /* Een derde surface die de soort niet kent: zonder hem is "zwijgen is nee"
+     niet te meten. */
+  await page.evaluate(() => RTGSchil.open('office', { naam: 'Documenten', url: '/apps/office.html', kort: 'Documenten' }));
+  await page.waitForSelector('body[data-rtg-desktop-state="ready"]', { timeout: 20000 }).catch(() => {});
+  for (let i = 0; i < 60; i++) {
+    const klaar = page.frames().some((f) => f.url().includes('/apps/reizen.html')) &&
+      page.frames().some((f) => f.url().includes('/apps/agenda.html'));
+    if (klaar) break;
+    await wacht(250);
+  }
+  await wacht(1500);
+  const frame = (pad) => page.frames().find((f) => f.url().includes(pad));
+  /* Wat de agenda ONTVANGT, onderschept in haar eigen venster. */
+  const agenda = frame('/apps/agenda.html');
+  if (agenda) await agenda.evaluate(() => { window.__samen = []; window.addEventListener('message', (e) => window.__samen.push(e.data)); });
+  return { ctx, page, fouten, frame };
+}
+
 /* ---- KETEN 1: een reis uit Reizen wordt een afspraak in de Agenda ------- */
 async function reisNaarAgenda({ pw, browserOpties, base, api }) {
   const t = teller();
@@ -94,35 +126,7 @@ async function reisNaarAgenda({ pw, browserOpties, base, api }) {
 
   const browser = await pw.chromium.launch(browserOpties(pw));
   try {
-    const open = async (tok) => {
-      const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
-      const page = await ctx.newPage();
-      const fouten = [];
-      page.on('pageerror', (e) => fouten.push(String(e.message || e).slice(0, 160)));
-      await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
-      await page.evaluate((tk) => {
-        localStorage.setItem('rtg_member_token', tk);
-        localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-      }, tok);
-      await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('.rtg-surface[data-id="agenda"]', { state: 'attached', timeout: 20000 });
-      /* Een derde surface die de soort niet kent: zonder hem is "zwijgen is nee"
-         niet te meten. */
-      await page.evaluate(() => RTGSchil.open('office', { naam: 'Documenten', url: '/apps/office.html', kort: 'Documenten' }));
-      await page.waitForSelector('body[data-rtg-desktop-state="ready"]', { timeout: 20000 }).catch(() => {});
-      for (let i = 0; i < 60; i++) {
-        const klaar = page.frames().some((f) => f.url().includes('/apps/reizen.html')) &&
-          page.frames().some((f) => f.url().includes('/apps/agenda.html'));
-        if (klaar) break;
-        await wacht(250);
-      }
-      await wacht(1500);
-      const frame = (pad) => page.frames().find((f) => f.url().includes(pad));
-      /* Wat de agenda ONTVANGT, onderschept in haar eigen venster. */
-      const agenda = frame('/apps/agenda.html');
-      if (agenda) await agenda.evaluate(() => { window.__samen = []; window.addEventListener('message', (e) => window.__samen.push(e.data)); });
-      return { ctx, page, fouten, frame };
-    };
+    const open = (tok) => werkruimte(browser, base, tok);
     const lichtOp = (page, ms) => page.waitForSelector('.rtg-surface[data-id="agenda"][data-kan-vangen]', { timeout: ms || 8000 }).then(() => true, () => false);
     const loslatenOpAgenda = async (page) => {
       const doos = await page.evaluate(() => {
@@ -299,7 +303,105 @@ async function reisNaarAgenda({ pw, browserOpties, base, api }) {
   return afsluiten(t);
 }
 
-const KETENS = { 'reis-naar-agenda': reisNaarAgenda };
+/* ---- KETEN 2: de contextbus naar de Agenda --------------------------------
+   Kiest iemand een reis, dan stuurt de schil de verwijzing rond
+   (rtg-schil/05-context.js) en volgt de Agenda: ze zoekt in de EIGEN afspraken
+   en springt naar de dag. Geen enkele app stuurt vandaag context; de proef zet
+   hem met RTGSchil.context, de API van de console. Schakel 1 staat daarom open
+   met de reden: zonder afzender is de keten niet af. */
+async function contextNaarAgenda({ pw, browserOpties, base, api }) {
+  const t = teller();
+  const nieuwLid = async (naam) => {
+    const u = naam.toLowerCase() + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const r = await api('/api/auth/register', { name: naam, email: u + '@samen.test',
+      phone: '06' + String(Date.now()).slice(-8), password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg' });
+    if (!r.body || !r.body.token) throw new Error('registreren mislukte voor ' + naam);
+    return r.body.token;
+  };
+  const A = await nieuwLid('Carla'), B = await nieuwLid('Daan');
+  const d = new Date(); d.setDate(d.getDate() + 21);
+  const datum = d.toISOString().slice(0, 10);
+  const LABEL = 'Hotel Aurora naar Lissabon';
+  await api('/api/agenda/toevoegen', { titel: LABEL, datum }, A);
+  const REF = { soort: 'reis', id: 'SAMEN1', label: LABEL };
+
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  try {
+    const volg = async (w) => w.page.evaluate(() => { window.__volgt = []; window.addEventListener('message', (e) => { if (e.data && e.data.rtg === 'context-volgt') window.__volgt.push(e.data); }); });
+    const stand = async (w) => w.frame('/apps/agenda.html').evaluate(() => ({ context: document.body.dataset.context || null,
+      regel: (document.querySelector('#agendaContext') || {}).textContent || '', kal: (document.querySelector('#kal') || {}).innerText || '' }));
+    const volgden = (w) => w.page.evaluate(() => window.__volgt || []);
+    const zet = (w, ref) => w.page.evaluate((r) => RTGSchil.context(r), ref);
+    const wachtOp = async (fn, ms) => { for (let i = 0; i < (ms || 6000) / 250; i++) { if (await fn()) return true; await wacht(250); } return false; };
+
+    t.schakel(1, 'een app in de werkruimte stuurt de gekozen reis als context', 'open',
+      'geen enkele app stuurt vandaag {rtg: \'context\'}; de proef zet de context met RTGSchil.context (de console-API)');
+
+    const a = await werkruimte(browser, base, A);
+    await volg(a);
+    await zet(a, REF);
+    const gevolgd = await wachtOp(async () => (await stand(a)).context === REF.id);
+    const sa = await stand(a);
+    t.schakel(2, 'de Agenda lost de verwijzing op met haar eigen afspraken en springt naar de dag van de reis',
+      gevolgd && sa.kal.includes(LABEL) && /Context: 1 afspraak/.test(sa.regel), (sa.regel || 'geen contextregel') + (sa.kal.includes(LABEL) ? '; de afspraak staat in beeld' : '; de afspraak staat NIET in beeld'));
+    const v = await volgden(a);
+    t.schakel(3, 'de Agenda meldt de schil dat ze volgt, met wat ze doet en zonder gegevens',
+      v.length === 1 && v[0].id === REF.id && Object.keys(v[0]).sort().join() === 'id,rtg,soort,wat', JSON.stringify(v).slice(0, 200));
+    await zet(a, null);
+    const weg = await wachtOp(async () => (await stand(a)).context === null);
+    const na = await stand(a);
+    t.schakel(4, 'context weg (null) zet de Agenda terug zoals ze was', weg && !na.regel, weg ? 'contextregel weg' : 'context bleef staan');
+
+    /* ===== storingen ===== */
+    /* Elke storing begint zonder context. Een soort die de Agenda niet kent zet
+       haar volgens het contract terug -- ook als `null` (schakel 4) niet
+       aankomt -- zodat de ene storing de volgende niet kleurt. */
+    const reset = async (w) => { await zet(w, { soort: 'leeg', id: 'reset', label: '' }); await wachtOp(async () => (await stand(w)).context === null, 3000); };
+    await reset(a);
+    const volgdenVoor = (await volgden(a)).length;
+    await zet(a, { soort: 'factuur', id: 'F1', label: LABEL });
+    const onbekend = await wachtOp(async () => (await stand(a)).context !== null, 2500);
+    t.storing(1, 'een soort die de Agenda niet kent: ze zwijgt en toont niets', !onbekend && (await volgden(a)).length === volgdenVoor,
+      onbekend ? 'de Agenda volgde toch' : 'gezwegen');
+
+    await reset(a);
+    /* Een context die niet van de schil komt maar uit een ander frame. */
+    const reis = a.frame('/apps/reizen.html');
+    if (reis) await reis.evaluate((r) => {
+      const f = [...window.parent.document.querySelectorAll('iframe')].find((x) => x.src.includes('/apps/agenda.html'));
+      if (f) f.contentWindow.postMessage({ rtg: 'context', ref: r }, location.origin);
+    }, REF);
+    const vreemd = await wachtOp(async () => (await stand(a)).context !== null, 2500);
+    t.storing(2, 'een context uit een ander venster dan de schil wordt niet gehoord', !!reis && !vreemd, vreemd ? 'de Agenda volgde een buurframe' : 'genegeerd');
+
+    await reset(a);
+    /* De Agenda kan haar eigen lijst niet lezen: zwijgen, geen kale fout. */
+    await a.ctx.route('**/api/agenda/mijn-lijst', (r) => r.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'even niet' }) }));
+    await zet(a, REF);
+    const zonderLijst = await wachtOp(async () => (await stand(a)).context !== null, 2500);
+    await a.ctx.unroute('**/api/agenda/mijn-lijst');
+    t.storing(3, 'kan de Agenda haar eigen afspraken niet lezen, dan volgt ze niet en gooit ze niets', !zonderLijst && a.fouten.length === 0,
+      (zonderLijst ? 'volgde toch' : 'gezwegen') + '; ' + a.fouten.length + ' kale fout(en)');
+    await zet(a, null);
+
+    /* Bevoegd: dezelfde verwijzing in de werkruimte van B opent niets. */
+    const b = await werkruimte(browser, base, B);
+    await volg(b);
+    await zet(b, REF);
+    const bVolgt = await wachtOp(async () => (await stand(b)).context !== null, 3000);
+    const sb = await stand(b);
+    t.storing(4, 'de verwijzing van lid A opent niets voor lid B: B\'s Agenda zwijgt en toont niets van A',
+      !bVolgt && !sb.kal.includes(LABEL) && (await volgden(b)).length === 0, bVolgt ? 'B volgde' : 'B zweeg' + (sb.kal.includes(LABEL) ? ', maar A\'s afspraak STAAT in beeld' : ''));
+    t.storing(5, 'geen kale JS-fout in de werkruimte', a.fouten.length === 0 && b.fouten.length === 0,
+      (a.fouten[0] || b.fouten[0] || 'geen'));
+    await a.ctx.close(); await b.ctx.close();
+  } finally {
+    await browser.close().catch(() => {});
+  }
+  return afsluiten(t);
+}
+
+const KETENS = { 'reis-naar-agenda': reisNaarAgenda, 'context-naar-agenda': contextNaarAgenda };
 
 if (require.main === module) (async () => {
   const vastleggen = process.argv.includes('--vastleggen');

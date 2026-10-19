@@ -299,3 +299,13 @@ test('SAMEN: een keten zonder app draagt zijn reden en wat er nodig is, en wordt
     schakels: [{ scherm: '/apps/stil.html', uitgeeft: 'reis' }], proef: { register: 'X.json', instrument: 'scripts/proef.js' } }] }));
   assert.ok(b.some((x) => /stil\.html geeft reis niet in zijn code/.test(x)), b.join('\n'));
 });
+
+test('SAMEN: een ontvanger op de contextbus wordt aan zijn eigen protocol gemeten', () => {
+  const ontvanger = "window.addEventListener('message', function (e) { if (e.data.rtg !== 'context') return; }); var VOLGT = { reis: function (ref, items) {} };";
+  assert.equal(B.noemtSoort(ontvanger, 'reis', B.PROTOCOL.context.in), true);
+  assert.equal(B.noemtSoort(ontvanger, 'reis', B.PROTOCOL.sleep.in), false, 'een contextontvanger is geen sleepontvanger');
+  const opt = samenOpties({}, { zonderApp: [{ naam: 'c', reden: 'r', nodig: 'n', proef: { register: 'X.json', instrument: 'scripts/proef.js' },
+    schakels: [{ scherm: '/apps/neem.html', ontvangt: 'reis', protocol: 'context' }] }], extern: { reis: 'proef' } });
+  assert.ok(B.controleerSamen(opt).some((x) => /neem\.html ontvangt reis niet in zijn code \(context\)/.test(x)),
+    'neem.html spreekt alleen sleep-kan; als contextontvanger telt hij niet');
+});

@@ -652,7 +652,9 @@ const TESTWERELD_ONTBREEKT = {
    Vandaag (gemeten op 19 oktober 2026) is er precies EEN keten in de code: een
    reis uit /apps/reizen.html die als afspraak in /apps/agenda.html komt. Geen
    van beide schermen is een ingang in MAPPEN, dus hij staat bij
-   KETENS_ZONDER_APP met de reden -- weglaten leest als "niet bestaand". */
+   KETENS_ZONDER_APP met de reden -- weglaten leest als "niet bestaand". De
+   tweede, de contextbus naar de Agenda, heeft een ontvanger en nog geen
+   afzender. Een schakel noemt zijn protocol: `sleep` (standaard) of `context`. */
 const SAMEN = {};
 
 /* Soorten die van BUITEN het huis komen (een agenda-uitnodiging uit een andere
@@ -669,7 +671,17 @@ const KETENS_ZONDER_APP = [
     schakels: [{ scherm: '/apps/reizen.html', uitgeeft: 'reis' }, { scherm: '/apps/agenda.html', ontvangt: 'reis' }],
     proef: { register: 'SAMENPROEF.json', instrument: 'scripts/samenproef.js' },
     reden: 'Reizen (/apps/reizen.html) en Agenda (/apps/agenda.html) zijn geen ingang in MAPPEN: TravelOS kent tab:reizen zonder eigen adres, en Agenda staat in geen enkele wereld',
-    nodig: 'beide schermen als ingang in MAPPEN (wereldregister); dan verhuist deze keten naar SAMEN onder hun functies' }
+    nodig: 'beide schermen als ingang in MAPPEN (wereldregister); dan verhuist deze keten naar SAMEN onder hun functies' },
+  /* De contextbus (rtg-schil/05-context.js): kiest iemand in een app een
+     object, dan volgen de andere surfaces. Agenda is sinds 19 oktober 2026 de
+     eerste ontvanger. Een AFZENDER is er nog niet: geen enkele app stuurt
+     vandaag context, en de proef zet hem met RTGSchil.context. Die schakel
+     staat in de proef open, met de reden. */
+  { naam: 'context-naar-agenda',
+    schakels: [{ scherm: '/apps/agenda.html', ontvangt: 'reis', protocol: 'context' }],
+    proef: { register: 'SAMENPROEF.json', instrument: 'scripts/samenproef.js' },
+    reden: 'Agenda (/apps/agenda.html) is geen ingang in MAPPEN, en geen enkele app stuurt vandaag context: de bus heeft een ontvanger en nog geen afzender',
+    nodig: 'een afzender (Reizen stuurt de gekozen reis als context, af te stemmen met wie de schil bezit) en Agenda als ingang in MAPPEN' }
 ];
 
 module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT,

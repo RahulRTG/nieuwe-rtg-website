@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 177,
-    "schermenMetStijlblok": 289,
-    "important": 7703
+    "bladen": 176,
+    "schermenMetStijlblok": 286,
+    "important": 7694
   },
   "uitzonderingen": [],
   "bladen": {
@@ -57,11 +57,6 @@
       "bytes": 4396,
       "important": 3,
       "hex": 15
-    },
-    "public/apps/living-world/world.css": {
-      "bytes": 4929,
-      "important": 6,
-      "hex": 0
     },
     "public/apps/media/studio-pro.css": {
       "bytes": 9410,
@@ -1693,12 +1688,6 @@
       "important": 0,
       "hex": 0
     },
-    "public/apps/hangar.html": {
-      "blokken": 2,
-      "bytes": 4446,
-      "important": 0,
-      "hex": 6
-    },
     "public/apps/hardware-pda.html": {
       "blokken": 2,
       "bytes": 3170,
@@ -2275,12 +2264,6 @@
       "important": 1,
       "hex": 14
     },
-    "public/apps/reisuitnodiging.html": {
-      "blokken": 1,
-      "bytes": 593,
-      "important": 0,
-      "hex": 0
-    },
     "public/apps/reizen.html": {
       "blokken": 2,
       "bytes": 1550,
@@ -2610,12 +2593,6 @@
       "bytes": 5148,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/zakelijk.html": {
-      "blokken": 2,
-      "bytes": 4399,
-      "important": 3,
-      "hex": 5
     },
     "public/apps/zorgbalie.html": {
       "blokken": 1,

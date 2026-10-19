@@ -11,6 +11,14 @@
     body: JSON.stringify(body || {})
   }).then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
+  /* Status (fout, verlopen link): een rustige regel, geen alarm. */
+  const status = (t) => '<p class="ds-detail__status">' + esc(t) + '</p>';
+  const VOL = 'class="ds-knop ds-knop--primair ds-knop--breed"', STIL = 'class="ds-knop ds-knop--stil ds-knop--klein"';
+  /* Klaar: het scherm wordt Status. */
+  const klaar = (zin) => { document.body.dataset.dsSchermtype = 'status';
+    $('#doe').innerHTML = status(zin) + '<a ' + VOL + ' href="/apps/reizen.html">Naar mijn reizen</a>'; };
+  const rijVeld = (label, invoer) => '<label class="ds-veld"><span></span><span><span class="ds-veld__label">' + esc(label) +
+    '</span>' + invoer + '</span><span></span></label>';
   const dagen = (v) => v.van === v.tot ? v.van : v.van + ' t/m ' + v.tot;
   const soortenZin = (s) => Object.entries(s || {}).map(([k, n]) => n + ' ' + k + (n === 1 ? '' : 'en')).join(', ');
 
@@ -18,31 +26,31 @@
      verstuurde uitnodigingen en kan ze intrekken. Zonder sessie én zonder code
      valt er niets te tonen -- dan is de link gewoon niet compleet. */
   if (!code) { token() ? mijnUitnodigingen() : ($('#vak').innerHTML =
-    '<p class="rtg-sub">Deze link is niet compleet. Vraag om een nieuwe.</p>'); return; }
+    '<p class="ds-meta">Deze link is niet compleet. Vraag om een nieuwe.</p>'); return; }
 
   api('reis/uitnodiging/open', { code }).then((d) => teken(d.uitnodiging)).catch((e) => {
-    $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>';
+    $('#vak').innerHTML = status(e.message);
   });
 
   async function mijnUitnodigingen(verseLink) {
     let d;
     try { d = await api('reis/uitnodiging/mijn', {}, token()); }
-    catch (e) { $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>'; return; }
+    catch (e) { $('#vak').innerHTML = status(e.message); return; }
     const rij = d.uitnodigingen || [];
-    $('#vak').innerHTML = '<h2 class="rp-invite-9">Uw uitnodigingen</h2>' +
-      '<p class="rtg-sub rp-invite-1">Een uitnodigingslink wordt alleen bij uitgifte getoond. ' +
+    $('#vak').innerHTML = '<h1 class="ds-titel ds-titel--scherm">Uw uitnodigingen</h1>' +
+      '<p class="ds-meta">Een uitnodigingslink wordt alleen bij uitgifte getoond. ' +
         'Niet ontvangen? Roteer haar; de oude link wordt dan direct onbruikbaar.</p>' +
       '<div id="eenmaligeLink" aria-live="polite"></div>' +
-      (rij.length ? rij.map((u) =>
-        '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(u.bestemming || 'reis') +
+      (rij.length ? '<ul class="ds-lijst">' + rij.map((u) =>
+        '<li class="ds-lijst__rij"><span></span><span><span class="ds-lijst__titel">' + esc(u.bestemming || 'reis') +
           ' &middot; ' + esc(dagen(u.venster)) + '</span>' +
-          '<span class="rtg-sub">' + (u.opgeeist ? 'overgenomen' : u.ingetrokken ? 'ingetrokken' :
+          '<span class="ds-lijst__tekst">' + (u.opgeeist ? 'overgenomen' : u.ingetrokken ? 'ingetrokken' :
             'geldig tot ' + esc(u.toegang && u.toegang.expires_at)) + '</span></span>' +
-          (u.opgeeist || u.ingetrokken ? '' :
-            '<button class="rtg-knop" type="button" data-roteer="' + esc(u.id) + '">Roteer link</button>' +
-            '<button class="rtg-knop" type="button" data-weg="' + esc(u.id) + '">Trek in</button>') +
-        '</div>').join('')
-      : '<p class="rtg-sub">U heeft nog geen uitnodigingen verstuurd. Dat doet u bij een reis in <a href="/apps/reizen.html">RTG Reizen</a>.</p>');
+          (u.opgeeist || u.ingetrokken ? '<span></span>' :
+            '<span class="ds-veldgroep"><button ' + STIL + ' type="button" data-roteer="' + esc(u.id) + '">Roteer link</button>' +
+            '<button ' + STIL + ' type="button" data-weg="' + esc(u.id) + '">Trek in</button></span>') +
+        '</li>').join('') + '</ul>'
+      : '<p class="ds-meta">U heeft nog geen uitnodigingen verstuurd. Dat doet u bij een reis in <a href="/apps/reizen.html">RTG Reizen</a>.</p>');
     if (verseLink) toonEenmaligeLink(verseLink);
     $('#vak').querySelectorAll('[data-roteer]').forEach((b) => b.addEventListener('click', async () => {
       b.disabled = true;
@@ -63,10 +71,9 @@
   function toonEenmaligeLink(link) {
     const vak = $('#eenmaligeLink');
     if (!vak || !link) return;
-    vak.innerHTML = '<div class="rtg-groep rp-invite-2">' +
-      '<strong>Nieuwe link: nu eenmalig kopiëren</strong>' +
-      '<input class="rtg-veld rp-invite-3" id="verseLink" readonly autocomplete="off" spellcheck="false">' +
-      '<button class="rtg-knop" id="kopieerVerseLink" type="button">Kopieer link</button></div>';
+    vak.innerHTML = '<div class="ds-velden">' +
+      rijVeld('Nieuwe link: nu eenmalig kopiëren', '<input class="ds-veld__invoer" id="verseLink" readonly autocomplete="off" spellcheck="false">') +
+      '<button class="ds-knop ds-knop--primair" id="kopieerVerseLink" type="button" data-ds-actie="Kopieer link">Kopieer link</button></div>';
     const invoer = $('#verseLink');
     invoer.value = new URL(link, location.origin).href;
     $('#kopieerVerseLink').addEventListener('click', async (e) => {
@@ -78,25 +85,25 @@
   let gastTimer=null;
   async function verversGast(){
     try{const d=await api("reis/uitnodiging/open",{code});teken(d.uitnodiging);}
-    catch(e){$("#vak").replaceChildren();const p=document.createElement("p");p.textContent=e.message+" Open de originele gastlink opnieuw om het nogmaals te proberen.";$("#vak").append(p);}
+    catch(e){$("#vak").innerHTML=status(e.message+" Open de originele gastlink opnieuw om het nogmaals te proberen.");}
   }
   document.addEventListener("visibilitychange",()=>{if(gastTimer&&!document.hidden)verversGast();});
   function teken(u) {
     if(u.programma){
-      document.body.classList.add("rtg-programma-gast");
       RTGReisProgramma.teken($("#vak"),u,false);
-      const b=document.createElement("button");b.id="gast-ververs";b.textContent="Controleer op wijzigingen";b.type="button";
+      const b=document.createElement("button");b.id="gast-ververs";b.className="ds-knop ds-knop--stil";b.textContent="Controleer op wijzigingen";b.type="button";
       b.onclick=verversGast;$("#vak").append(b);
       if(!gastTimer)gastTimer=setInterval(()=>{if(!document.hidden)verversGast();},60000);
       return;
     }
-    const kop = '<h2 class="rp-invite-10">' +
-      (u.bestemming ? esc(u.bestemming) : 'Uw reis') + '</h2>' +
-      '<p class="rtg-sub">' + esc(dagen(u.venster)) + ' &middot; ' + esc(soortenZin(u.soorten)) + '</p>' +
-      '<p class="rtg-sub rp-invite-4">Klaargezet door ' + esc(u.van) + '.</p>';
+    const kop = '<p class="ds-label">Uw reis staat klaar</p><h1 class="ds-titel ds-titel--scherm">' +
+      (u.bestemming ? esc(u.bestemming) : 'Uw reis') + '</h1>' +
+      '<p class="ds-meta">' + esc(dagen(u.venster)) + ' &middot; ' + esc(soortenZin(u.soorten)) + '</p>' +
+      '<p class="ds-meta">Klaargezet door ' + esc(u.van) + '.</p>';
 
     if (!u.open) {
-      $('#vak').innerHTML = kop + '<p class="rtg-sub rp-invite-5">' + esc(u.reden || 'Deze uitnodiging kan niet meer gebruikt worden.') + '</p>';
+      document.body.dataset.dsSchermtype = 'status';
+      $('#vak').innerHTML = kop + status(u.reden || 'Deze uitnodiging kan niet meer gebruikt worden.');
       return;
     }
     /* WAT ER TE ZIEN IS VOORDAT IEMAND HEM OVERNEEMT, staat hierboven: waar,
@@ -105,22 +112,19 @@
       ? 'U reist met iemand mee. Omdat u daarmee in de reisgegevens van een ander komt, controleren wij eerst uw identiteit -- dat gebeurt in uw account.'
       : 'Neem hem over en hij staat in uw eigen RTG-reisoverzicht: alle onderdelen op een tijdlijn, met wat er nog niet rond is.';
     $('#vak').innerHTML = kop +
-      '<p class="rtg-intro rp-invite-5">' + esc(uitleg) + '</p>' +
-      '<div id="doe"></div>';
+      '<p class="ds-meta">' + esc(uitleg) + '</p>' +
+      '<div class="ds-taak__kop" id="doe"></div>';
     token() ? tekenOvernemen() : tekenAanmelden();
   }
 
   function tekenOvernemen() {
-    $('#doe').innerHTML = '<div class="rtg-acties rp-invite-5">' +
-      '<button class="rtg-knop vol" id="neem" type="button">Neem deze reis over</button></div>' +
-      '<p class="rtg-sub" id="uit" aria-live="polite"></p>';
+    $('#doe').innerHTML = '<button ' + VOL + ' id="neem" type="button" data-ds-actie="Neem deze reis over">Neem deze reis over</button>' +
+      '<p class="ds-meta" id="uit" aria-live="polite"></p>';
     $('#neem').addEventListener('click', async () => {
       $('#neem').disabled = true;
       try {
         const d = await api('reis/uitnodiging/eisop', { code }, token());
-        $('#doe').innerHTML = '<p class="rtg-intro">Overgenomen: ' + d.overgenomen +
-          ' onderdeel' + (d.overgenomen === 1 ? '' : 'en') + ' staan nu in uw reisoverzicht.</p>' +
-          '<div class="rtg-acties"><a class="rtg-knop vol" href="/apps/reizen.html">Naar mijn reizen</a></div>';
+        klaar('Overgenomen: ' + d.overgenomen + ' onderdeel' + (d.overgenomen === 1 ? '' : 'en') + ' staan nu in uw reisoverzicht.');
       } catch (e) { $('#uit').textContent = e.message; $('#neem').disabled = false; }
     });
   }
@@ -130,26 +134,23 @@
      mens -- een link kan dat niet regelen (CLAUDE.md). */
   function tekenAanmelden() {
     $('#doe').innerHTML =
-      '<div class="rtg-groep rp-invite-5">' +
-        '<h2>Word lid van RTG</h2>' +
-        '<p class="rtg-uitleg">Uw reis komt daarna in uw eigen overzicht te staan. U kiest zelf wat u verder met RTG doet.</p>' +
-        veld('rNaam', 'Uw naam', 'text', 'Voor- en achternaam') +
+      '<section class="ds-taak__kop" aria-labelledby="rKop">' +
+        '<h2 class="ds-kaart__titel" id="rKop">Word lid van RTG</h2>' +
+        '<p class="ds-meta">Uw reis komt daarna in uw eigen overzicht te staan. U kiest zelf wat u verder met RTG doet.</p>' +
+        '<div class="ds-velden">' + veld('rNaam', 'Uw naam', 'text', 'Voor- en achternaam') +
         veld('rMail', 'E-mailadres', 'email', 'u@voorbeeld.nl') +
         veld('rTel', 'Telefoon', 'tel', '06 12 34 56 78') +
         veld('rGeb', 'Geboortedatum', 'date', '') +
-        veld('rWw', 'Wachtwoord', 'password', 'minstens 6 tekens') +
-        '<div class="rtg-acties rp-invite-6">' +
-          '<button class="rtg-knop vol" id="rGo" type="button">Word lid en neem de reis over</button>' +
-        '</div>' +
-        '<p class="rtg-sub" id="rUit" aria-live="polite"></p>' +
-        '<p class="rtg-sub rp-invite-7">Heeft u al een RTG-account? ' +
+        veld('rWw', 'Wachtwoord', 'password', 'minstens 6 tekens') + '</div>' +
+        '<button ' + VOL + ' id="rGo" type="button" data-ds-actie="Word lid en neem de reis over">Word lid en neem de reis over</button>' +
+        '<p class="ds-meta" id="rUit" aria-live="polite"></p>' +
+        '<p class="ds-meta">Heeft u al een RTG-account? ' +
           '<a href="/apps/app.html">Log eerst in</a> en open deze link daarna opnieuw.</p>' +
-      '</div>';
+      '</section>';
     $('#rGo').addEventListener('click', aanmelden);
   }
   function veld(id, label, soort, plaats) {
-    return '<label class="rtg-label" for="' + id + '">' + esc(label) + '</label>' +
-      '<input class="rtg-veld rp-invite-8" id="' + id + '" type="' + soort + '" placeholder="' + esc(plaats) + '">';
+    return rijVeld(label, '<input class="ds-veld__invoer" id="' + id + '" type="' + soort + '" placeholder="' + esc(plaats) + '">');
   }
 
   async function aanmelden() {
@@ -164,9 +165,7 @@
       if (!d.token) throw new Error('Aanmelden lukte, maar er kwam geen sessie terug. Log in via de app.');
       try { localStorage.setItem('rtg_member_token', d.token); } catch (e) {}
       const over = await api('reis/uitnodiging/eisop', { code }, d.token);
-      $('#doe').innerHTML = '<p class="rtg-intro">Welkom bij RTG. Uw reis staat klaar: ' + over.overgenomen +
-        ' onderdeel' + (over.overgenomen === 1 ? '' : 'en') + '.</p>' +
-        '<div class="rtg-acties"><a class="rtg-knop vol" href="/apps/reizen.html">Naar mijn reizen</a></div>';
+      klaar('Welkom bij RTG. Uw reis staat klaar: ' + over.overgenomen + ' onderdeel' + (over.overgenomen === 1 ? '' : 'en') + '.');
     } catch (e) { $('#rUit').textContent = e.message; knop.disabled = false; }
   }
 })();

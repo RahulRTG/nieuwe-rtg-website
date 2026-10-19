@@ -132,6 +132,10 @@
   "bewijs": {
     "uitleg": "Per scherm op het Design System de browsertoets die in een echte browser bewijst dat er geen erfenisblad actief is, dat de ds-poort van de basis klopt en dat de kernhandeling slaagt.",
     "public/apps/hotels.html": "test/hotels-ds.e2e.js",
+    "public/apps/hangar.html": "test/hangar-ds.e2e.js",
+    "public/apps/zakelijk.html": "test/zakelijk-ds.e2e.js",
+    "public/apps/reisuitnodiging.html": "test/reisuitnodiging-ds.e2e.js",
+    "public/apps/living-world.html": "test/living-world-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

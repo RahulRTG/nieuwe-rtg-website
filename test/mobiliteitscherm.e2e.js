@@ -431,7 +431,8 @@ test('de werkgever zet zijn beleid, ziet de aanvraag en geeft akkoord',
 
     // het beleid op het scherm zetten: een drempel van vijf euro
     await page.evaluate(() => { document.querySelector('#tabs button[data-tab="beleid"]').click(); });
-    await page.waitForFunction(() => !document.querySelector('#tBeleid').classList.contains('weg'),
+    // sinds de Design System-migratie verbergt het scherm een tab met [hidden]
+    await page.waitForFunction(() => !document.querySelector('#tBeleid').hidden,
       null, { timeout: 20000 });
     await page.fill('#bDrempel', '5');
     await page.evaluate(() => { document.querySelector('#bBewaar').click(); });

@@ -27,7 +27,8 @@ function setTab(value){
 }
 function render(){
   if(!view)return;
-  d.querySelector('.lw-hero').hidden=!!selection||tab!=='world';
+  d.getElementById('lwHero').hidden=!!selection||tab!=='world';
+  d.body.dataset.dsSchermtype=selection?'detail':'collectie';
   d.querySelectorAll('[data-lw-tab]').forEach(function(b){if(b.dataset.lwTab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   w.LivingWorldRender.render(d.getElementById('lwContent'),view,selection,tab,startAction,open);
   syncEdge();
@@ -39,7 +40,7 @@ async function load(){
   try{
     var q={};var media=new URLSearchParams(location.search).get('mediaRef');if(media)q.mediaRef=media;
     view=await api('/api/living-world/view',q);render();
-    status.textContent='Bijgewerkt '+new Date(view.asOf).toLocaleTimeString()+'. U bepaalt welke ervaringen u opent.';
+    status.textContent='Bijgewerkt '+new Date(view.asOf).toLocaleTimeString(d.documentElement.lang||undefined)+'. U bepaalt welke ervaringen u opent.';
   }catch(e){status.textContent=e.message+' Opnieuw proberen: Vernieuwen. Getoonde gegevens zijn niet opnieuw gecontroleerd.';}
 }
 function drawFields(fields){
@@ -47,14 +48,14 @@ function drawFields(fields){
   fields.forEach(function(f){
     if(f.type==='checks'){
       if(!f.options.length)return;
-      var group=el('fieldset'),legend=el('legend','',f.label);group.appendChild(legend);
-      f.options.forEach(function(o){var label=el('label'),input=el('input');input.type='checkbox';input.name=f.name;input.value=o[0];input.checked=(f.value||[]).includes(o[0]);
+      var group=el('fieldset','ds-velden'),legend=el('legend','ds-veldlabel',f.label);group.appendChild(legend);
+      f.options.forEach(function(o){var label=el('label','ds-keuze'),input=el('input');input.type='checkbox';input.name=f.name;input.value=o[0];input.checked=(f.value||[]).includes(o[0]);
         label.append(input,d.createTextNode(o[1]));group.appendChild(label);});target.appendChild(group);return;
     }
-    var label=el('label','',f.label),input;
-    if(f.type==='textarea'||f.type==='lines'){input=el('textarea');input.value=f.type==='lines'?(f.value||[]).join('\n'):(f.value||'');input.maxLength=2400;}
-    else if(f.type==='select'){input=el('select');f.options.forEach(function(o){var option=el('option','',o[1]);option.value=o[0];input.appendChild(option);});input.value=f.value||'';}
-    else{input=el('input');input.type=f.type==='checkbox'?'checkbox':f.type;if(f.type==='datetime-local')input.step='1';input.value=f.type==='checkbox'?'on':(f.value||'');if(f.type==='checkbox')input.checked=!!f.value;else input.maxLength=1600;}
+    var label=el('label',f.type==='checkbox'?'ds-keuze':'ds-veldlabel',f.label),input;
+    if(f.type==='textarea'||f.type==='lines'){input=el('textarea','ds-invoer ds-invoer--tekst');input.value=f.type==='lines'?(f.value||[]).join('\n'):(f.value||'');input.maxLength=2400;}
+    else if(f.type==='select'){input=el('select','ds-invoer');f.options.forEach(function(o){var option=el('option','',o[1]);option.value=o[0];input.appendChild(option);});input.value=f.value||'';}
+    else{input=el('input',f.type==='checkbox'?'':'ds-invoer');input.type=f.type==='checkbox'?'checkbox':f.type;if(f.type==='datetime-local')input.step='1';input.value=f.type==='checkbox'?'on':(f.value||'');if(f.type==='checkbox')input.checked=!!f.value;else input.maxLength=1600;}
     input.name=f.name;input.id='lwField-'+f.name;label.htmlFor=input.id;
     if(f.type==='checkbox')label.prepend(input);else label.appendChild(input);target.appendChild(label);
   });
@@ -98,22 +99,15 @@ w.addEventListener('popstate',function(){readLocation();render();});
 w.addEventListener('online',load);
 d.addEventListener('visibilitychange',function(){if(!d.hidden)load();});
 setInterval(function(){if(!d.hidden&&!busy)load();},60000);
+/* De Edge van het Design System toont de handelingen van dit scherm
+   (elk element met data-ds-actie, /ds/edge-modi.js). Precies een: de
+   hoofdactie van wat nu open staat, en anders de tab Wereld. */
 function syncEdge(){
-  if(w.RTGAdaptief)w.RTGAdaptief.context({bron:'living-world',titel:selection?'Living World · '+selection.type:tab==='plans'?'Mijn ervaringen':tab==='studio'?'Werkplaats':'Living World'});
-  var primary=d.querySelector('[data-lw-primary]')||d.querySelector('[data-lw-tab="world"]');
-  d.querySelectorAll('#lwMain [data-hoofdactie]').forEach(function(b){b.removeAttribute('data-hoofdactie');});
-  if(primary)primary.setAttribute('data-hoofdactie','');
-  var edge=w.RTGEdge&&w.RTGEdge.active;if(!edge)return;
-  var b=edge.root.querySelector('[data-rtg-edge-primary]');
-  if(!b)return;
-  edge.onAction=function(){if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.setState('dock');var current=d.querySelector('[data-lw-primary]');if(current)current.click();else setTab('world');};
-  var label=primary?primary.textContent:'Ontdek uw wereld';edge.ctx.actie=label;b.textContent=label;b.hidden=false;
-  if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.continueWith({title:'Living World',copy:label,presence:label,action:'primary'});
-  if(w.RTGContinueKey&&w.RTGContinueKey.sync)w.RTGContinueKey.sync(d,w);
+  var primary=d.querySelector('#lwContent [data-lw-primary]')||d.querySelector('[data-lw-tab="world"]');
+  d.querySelectorAll('#lwMain [data-ds-actie]').forEach(function(b){b.removeAttribute('data-ds-actie');});
+  if(primary)primary.setAttribute('data-ds-actie',primary.textContent.trim()||'Ontdek uw wereld');
 }
-var observer=new MutationObserver(function(){if(w.RTGEdge&&w.RTGEdge.active){syncEdge();observer.disconnect();}});
-observer.observe(d.body,{childList:true,subtree:true});setTimeout(function(){observer.disconnect();syncEdge();},15000);
 readLocation();
-if(!token){status.textContent='Log in om uw wereld te openen.';var a=el('a','','Naar inloggen');a.href='/apps/app.html';d.getElementById('lwContent').appendChild(a);}
+if(!token){status.textContent='Log in om uw wereld te openen.';var a=el('a','ds-knop ds-knop--primair','Naar inloggen');a.href='/apps/app.html';d.getElementById('lwContent').appendChild(a);}
 else load();
 })(window,document);

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T14:15:53.750Z",
-    "commit": "5e756c4f6",
+    "op": "2026-10-19T08:42:50.622Z",
+    "commit": "2404c5fb",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -12016,6 +12016,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "ontwerpsysteem.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ontwerpsysteem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "onvervreemdbaar.test.js": {
       "soort": "puur",

@@ -207,6 +207,8 @@ const LIJVEN = {
   '/api/fluister': { q: 'Hallo Rahul' },
   '/api/mediaos/volg': (c) => ({ codenaam: c.tegen && c.tegen.codenaam, aan: true }),
   '/api/push/subscribe': { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/proef123', keys: { p256dh: 'x', auth: 'y' } } },
+  '/api/rtgid/machtig': (c) => ({ dienst: 'gemeente', dagen: 7, codenaam: c.tegen && c.tegen.codenaam }),
+  '/api/supplier/ai': { vraag: 'Hoe druk wordt het vanavond?' },
   '/api/verify/selfie': { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' }
 };
 
@@ -232,6 +234,8 @@ const VAN_A = {
   '/api/gegevens/zeg': (c) => ({ id: c.gegevensgesprek }),
   '/api/neiging/antwoord': (c) => (c.vraag ? { vraag: c.vraag, onderwerpen: c.onderwerpen } : {}),
   '/api/metier/naam-intrekken': () => ({ code: 'KIKUNOI' }),
+  '/api/mijn/toestel/introk': (c) => ({ toestelId: c.tweedeToestel }),
+  '/api/mijn/toestel/noem': (c) => ({ toestelId: c.tweedeToestel, naam: 'Hernoemd' }),
   /* RTMail: A's eigen bericht, A's eigen postvak, A's team */
   '/api/member/rtmail/antwoord': (c) => ({ id: c.bericht }),
   '/api/member/rtmail/etiket': (c) => ({ id: c.bericht }),
@@ -261,6 +265,18 @@ function stappen() {
       const { verbind } = require('./voltooiwereld');
       const v = await verbind({ post: h.post }, { token: h.A() }, { token: h.C() });
       c.ik.key = v.a.key; c.tegen.key = v.b.key;
+    } },
+    /* Een TWEEDE toestel van A, in een eigen sessie. Een toestel intrekken sluit
+       ook de sessies eraan; met A's hoofdtoestel zou de ijking van
+       /api/mijn/toestel/introk A's eigen tekenaar uitzetten en de rest van de
+       proef aan de toesteldeur laten stranden. */
+    { naam: 'tweede toestel van A', doe: async (h, c) => {
+      const t = await h.tweedeSessieA();
+      if (!t) throw new Error('A kon geen tweede sessie openen');
+      const { bindToestel } = require('./proeftoestel');
+      const b = await bindToestel({ post: h.kaal, token: t, naam: 'IDOR tweede toestel' });
+      if (!b.klaar) throw new Error(b.reden);
+      c.tweedeToestel = b.klaar.toestelId;
     } },
     /* RTG Bank: akkoord opent de eerste rekening, daarna een spaarrekening,
        geld erop en een pas. */

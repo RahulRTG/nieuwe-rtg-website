@@ -388,7 +388,8 @@ if (require.main !== module) { module.exports = {}; return; }
      terugkomt leert de pool en de merktekens, net als elk ander antwoord. */
   const opbouw = { stappen: 0, geslaagd: 0, mislukt: [] };
   let kantoor = null;
-  const hulp = { post, A: () => A, C: () => C };
+  const hulp = { post, kaal, A: () => A, C: () => C,
+    tweedeSessieA: async () => ((await post('/api/auth/login', { login: geheugen[1].email, password: geheugen[1].wachtwoord })).data || {}).token || null };
   for (const st of opbouwLib.stappen(ctx)) {
     opbouw.stappen++;
     if (typeof st.doe === 'function') {
@@ -752,6 +753,7 @@ if (require.main !== module) { module.exports = {}; return; }
     [n, { vers: () => zaakLogin(code), leeft: zaakLeeft, zet: (t) => { zaakTok[n] = t; } }])) });
   const zroep = (pad, lijf, n) => zaakWacht.roep(pad, lijf, n, zaakTok[n]);
   const zaakRoutes = verdeelOpRol(kandidaten, ['supplier']).metRol.filter((r) => r.rol === 'supplier');
+  const zLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), {});
   let zaak = { routes: zaakRoutes.length, reden: null };
   let zaakPerRoute = {};
   if (!zaakTok[11] || !zaakTok[12] || !zaakTok[13]) {
@@ -759,16 +761,16 @@ if (require.main !== module) { module.exports = {}; return; }
   } else {
     const zControle = new Set();
     for (const r of zaakRoutes) {
-      const u = await zroep(r.pad, plausibelLijf(r.pad), 13);
+      const u = await zroep(r.pad, zLijf(r.pad), 13);
       if (u.data && typeof u.data === 'object') waarden(u.data, zControle);
     }
     const zPool = maakPool();
     const vanZaakA = new Set();
     for (const r of zaakRoutes) {
-      const u = await zroep(r.pad, plausibelLijf(r.pad), 11);
+      const u = await zroep(r.pad, zLijf(r.pad), 11);
       if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { zPool.leer(u.data, r.pad); waarden(u.data, vanZaakA); }
     }
-    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: plausibelLijf, eigenVan: () => ({}),
+    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: () => ({}),
       vanA: vanZaakA, controle: zControle, wie: () => [],
       roepA: (pad, lijf) => zroep(pad, lijf, 11), roepB: (pad, lijf) => zroep(pad, lijf, 12),
       tegenB: (pad, lijf) => post(pad, lijf, zaakTok[12]) });

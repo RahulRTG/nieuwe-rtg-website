@@ -1,10 +1,7 @@
 /* RTG Stadsweefsel, deel "zaken": EEN zaak- en incidentmotor voor de hele stad.
 
-   Dit lost het gat op dat in de inventarisatie het duidelijkst was: een bewoner
-   die een kapotte lantaarn meldde in Mijn Stad kwam bij de veldploeg terecht,
-   dezelfde lantaarn gemeld via de gemeente kwam bij een ambtenaar terecht, en
-   die twee wisten niets van elkaar. Tien meldingen over dezelfde paal werden
-   tien klussen.
+   Een lantaarn gemeld via Mijn Stad en via de gemeente werd vroeger twee
+   klussen die niets van elkaar wisten; tien meldingen, tien klussen.
 
    Een WAARNEMING is wat er binnenkomt, uit welk kanaal dan ook: bewonersapp,
    gemeenteloket, telefoon, een ambtenaar, een Stadsdoos, een vervoerder. Een

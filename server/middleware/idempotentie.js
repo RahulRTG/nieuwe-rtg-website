@@ -100,6 +100,14 @@ function metHerhaald(lijf) {
   } catch (e) { return lijf; }
 }
 
+function vingerafdruk(b) {
+  const rest = Object.assign({}, b); delete rest.idem; delete rest.idempotentieSleutel;
+  const vast = (v) => Array.isArray(v) ? '[' + v.map(vast).join(',') + ']'
+    : v && typeof v === 'object' ? '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + vast(v[k])).join(',') + '}'
+      : JSON.stringify(v === undefined ? null : v);
+  return crypto.createHash('sha256').update(vast(rest)).digest('hex');
+}
+
 module.exports = () => {
   const kas = new Map(); // hash -> { status, lijf, op }
 
@@ -129,7 +137,17 @@ module.exports = () => {
     const id = crypto.createHash('sha256')
       .update(req.method + ' ' + req.path + '|' + wie + '|' + sleutel).digest('hex');
 
+    /* DEZELFDE SLEUTEL, EEN ANDER VERZOEK: 409 en niet het oude antwoord. Een
+       herhaling met een ander lijf is geen herhaling; het eerste antwoord
+       teruggeven zou "gelukt" zeggen over iets wat nooit is gedaan (een ander
+       kaartje, een ander bedrag). Zo doet de geldlaag het al (pay/stuur). De
+       vingerafdruk is het lijf zonder de sleutelvelden. Besluit 19 oktober 2026. */
+    const vinger = vingerafdruk(b);
     const oud = kas.get(id);
+    if (oud && Date.now() - oud.op < TTL_MS && oud.vinger && oud.vinger !== vinger) {
+      return res.status(409).json({ error: 'Deze herhaalsleutel hoort bij een ander verzoek. Er is niets uitgevoerd.',
+        code: 'IDEM_ANDER_VERZOEK' });
+    }
     if (oud && Date.now() - oud.op < TTL_MS) {
       res.set('X-Idempotentie', 'herhaald');
       return res.status(oud.status).type('application/json').send(metHerhaald(oud.lijf));
@@ -144,7 +162,7 @@ module.exports = () => {
             !(data && typeof data === 'object' && data.ok === false);
           if (geslaagd && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
             ruim();
-            kas.set(id, { status: res.statusCode, lijf, op: Date.now() });
+            kas.set(id, { status: res.statusCode, lijf, op: Date.now(), vinger });
           }
         } catch (e) { /* een antwoord dat niet te serialiseren is, is niet te herhalen */ }
       };

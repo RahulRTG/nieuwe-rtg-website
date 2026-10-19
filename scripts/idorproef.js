@@ -804,15 +804,19 @@ if (require.main !== module) { module.exports = {}; return; }
        bonCode + nummer gaan via ZAAK_VAN_A in B's lijf, zodat B een object van A
        opzoekt (bon, club/band/terug). */
     /* B en C klokken hun manager ook in: dan maakt elke zaak zijn EIGEN
-       servicemissie (publiek), zonder een missie van A te raken. */
-    await zroep('/api/staff/clock', {}, 12);
-    await zroep('/api/staff/clock', {}, 13);
+       servicemissie (publiek), zonder een missie van A te raken. En elke zaak
+       krijgt een bezorgzone, zodat /api/supplier/horeca/bezorg/check niet op
+       "geen zones" strandt maar de eigen zone van de zaak leest. */
+    const zone = { zones: [{ id: 'kring', naam: 'Centrum', postcodes: ['1012'], kosten: 3, minimum: 10, minuten: 20 }] };
+    for (const n of [11, 12, 13]) { await zroep('/api/staff/clock', {}, n); await zroep('/api/supplier/horeca/bezorg/zone', zone, n); }
     const zctx = {};
     for (const st of opbouwLib.zaakStappen()) {
       const lijf = typeof st.lijf === 'function' ? st.lijf(zctx) : (st.lijf || {});
       const u = await zroep(st.pad, lijf, 11);
       if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object' && typeof st.bewaar === 'function') { try { st.bewaar(u.data, zctx); } catch (e) {} }
+      if (process.env.IDOR_SPOOR === 'ZCTX') console.error('ZAAKSTAP', st.pad, u.status, 'band=' + JSON.stringify(u.data && u.data.band));
     }
+    if (process.env.IDOR_SPOOR === 'ZCTX') console.error('ZCTX', JSON.stringify(zctx));
     const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: (pad) => opbouwLib.zaakVanA(pad, zctx),
       vanA: vanZaakA, controle: zControle, wie: () => [],
       roepA: (pad, lijf) => zroep(pad, lijf, 11), roepB: (pad, lijf) => zroep(pad, lijf, 12),
@@ -820,6 +824,52 @@ if (require.main !== module) { module.exports = {}; return; }
     zaakPerRoute = z.perRoute;
     zaak = { routes: zaakRoutes.length, ...z.telling, afbakening: z.afbakening, pool: zPool.grootte(),
       sessieHernieuwd: zaakWacht.hernieuwd(), zaken: ZAKEN };
+
+    /* wave/activeer kan geen statisch lijf dragen: de servicegolf vraagt een
+       voorstel met de EIGEN ingeklokte medewerker van de zaak (wave/voorstel).
+       Daarom bespoke: A haalt zijn eigen voorstel en activeert het (zijn golf);
+       B probeert A's voorstel te activeren -- B's team kent A's medewerker niet,
+       dus dat hoort te weigeren. A ijkt de deur. */
+    const vA = await zroep('/api/supplier/horeca/wave/voorstel', {}, 11);
+    const voorstelA = vA.data && vA.data.voorstel;
+    const golfA = voorstelA ? await zroep('/api/supplier/horeca/wave/activeer', { voorstel: voorstelA, allergieAkkoord: true }, 11) : { status: 0 };
+    const golfB = voorstelA ? await post('/api/supplier/horeca/wave/activeer', { voorstel: voorstelA, allergieAkkoord: true }, zaakTok[12]) : { status: 0 };
+    const sleutelW = 'POST /api/supplier/horeca/wave/activeer';
+    if (!(golfA.status >= 200 && golfA.status < 300)) {
+      zaakPerRoute[sleutelW] = { gang: 'wave', staat: 'onbereikbaar', status: golfA.status,
+        reden: 'A kon zijn eigen servicegolf niet activeren (' + golfA.status + '): zonder open deur bewijst B\'s weigering niets' };
+    } else if (golfB.status >= 200 && golfB.status < 300) {
+      zaakPerRoute[sleutelW] = { gang: 'wave', staat: 'doorbraak', status: golfB.status,
+        reden: 'zaak B activeerde een servicegolf op A\'s voorstel (' + golfB.status + '): NAKIJKEN' };
+    } else {
+      zaakPerRoute[sleutelW] = { gang: 'wave', statusA: golfA.status, status: golfB.status, staat: 'gescheiden',
+        reden: 'zaak A activeerde zijn eigen golf (' + golfA.status + '); zaak B kon dat niet op A\'s voorstel (' + golfB.status +
+          '): de golf vraagt de eigen ingeklokte medewerker van de zaak' };
+    }
+
+    /* GET /api/supplier/stream: de live stroom van de zaak op een ticket (zoals
+       gang 6 voor het lid). Zaak A opent zijn stroom; A's ticket is eenmalig, dus
+       een tweede opening -- door A of een ander -- hoort geweigerd. */
+    const leesSSE = async (ticket, ms) => {
+      const ac = new AbortController(); const t = setTimeout(() => ac.abort(), ms);
+      let status = 0, tekst = '';
+      try { const r = await fetch(basis + '/api/supplier/stream?ticket=' + encodeURIComponent(ticket || ''), { signal: ac.signal });
+        status = r.status; if (r.body) { const rd = r.body.getReader(); for (;;) { const { value, done } = await rd.read(); if (done) break; tekst += Buffer.from(value).toString('utf8'); if (tekst.length > 200) break; } }
+      } catch (e) {} clearTimeout(t); return { status, tekst };
+    };
+    const tZA = ((await post('/api/stroom/ticket', { stroom: 'zaak' }, zaakTok[11])).data || {}).ticket;
+    const sleutelS = 'GET /api/supplier/stream';
+    if (!tZA) {
+      zaakPerRoute[sleutelS] = { gang: 'stroom', staat: 'onbereikbaar', reden: 'zaak A kreeg geen stroomticket; niets te openen' };
+    } else {
+      const open1 = await leesSSE(tZA, 2500);
+      const herhaal = await leesSSE(tZA, 800);
+      zaakPerRoute[sleutelS] = (open1.status === 200 && !(herhaal.status >= 200 && herhaal.status < 300))
+        ? { gang: 'stroom', statusA: open1.status, status: herhaal.status, staat: 'gescheiden',
+            reden: 'zaak A opende zijn stroom (' + open1.status + '); A\'s gebruikte ticket werd een tweede keer geweigerd (' + herhaal.status + '): een ticket in een adres is eenmalig en zaakgebonden' }
+        : { gang: 'stroom', statusA: open1.status, status: herhaal.status, staat: herhaal.status >= 200 && herhaal.status < 300 ? 'doorbraak' : 'onbereikbaar',
+            reden: herhaal.status >= 200 && herhaal.status < 300 ? 'A\'s ticket opende de stroom een tweede keer: NAKIJKEN' : 'zaak A kon zijn eigen stroom niet openen (' + open1.status + ')' };
+    }
   }
 
   /* ---- GANG 6: DE STROOM (/api/stroom/ticket en GET /api/stream) ----

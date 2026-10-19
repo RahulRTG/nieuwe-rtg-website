@@ -5,6 +5,7 @@
    Opslag in db.data.gebouwPlus[code] = { contracten, leads, energie }. */
 module.exports = (kern) => {
   const { app, db, save, supplierAuth, managerOnly, logActivity, sseToSupplier, crypto } = kern;
+  const eisGebouw = require('../../kern/gebouw-poort')(db);
 
   const rid = () => crypto.randomBytes(4).toString('hex');
   const txt = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
@@ -66,6 +67,7 @@ module.exports = (kern) => {
   }
 
   app.post('/api/supplier/gebouwplus/overzicht', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const b = kijk(req.supplier.code);
     res.json({ ok: true, contracten: b.contracten.slice(0, 60), leads: b.leads.slice(0, 60),
@@ -74,6 +76,7 @@ module.exports = (kern) => {
 
   /* ---- huurcontracten: vastleggen, verlengen, beeindigen ---- */
   app.post('/api/supplier/gebouwplus/contract', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const huurder = txt(req.body.huurder, 60);
     const verdiepingen = txt(req.body.verdiepingen, 30);
@@ -92,6 +95,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/gebouwplus/contract/zet', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const b = kijk(req.supplier.code);
     const c = b.contracten.find(x => x.id === req.body.id);
@@ -111,6 +115,7 @@ module.exports = (kern) => {
 
   /* ---- leads voor lege verdiepingen: van kennismaking tot handtekening ---- */
   app.post('/api/supplier/gebouwplus/lead', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const naam = txt(req.body.naam, 60), wens = txt(req.body.wens, 160);
     if (!naam) return res.status(400).json({ error: 'Wie is de kandidaat-huurder?' });
@@ -122,6 +127,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/gebouwplus/lead/fase', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const b = kijk(req.supplier.code);
     const l = b.leads.find(x => x.id === req.body.id);
@@ -135,6 +141,7 @@ module.exports = (kern) => {
 
   /* ---- energie: een weekstand per week, de trend leest zichzelf ---- */
   app.post('/api/supplier/gebouwplus/energie', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const week = txt(req.body.week, 8);
     if (!/^\d{4}-W\d{2}$/.test(week)) return res.status(400).json({ error: 'Geef de week als 2026-W31.' });

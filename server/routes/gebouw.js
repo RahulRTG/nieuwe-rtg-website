@@ -5,11 +5,7 @@
 module.exports = (kern) => {
   const { app, db, supplierAuth, gebouw } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
-  function eisGebouw(req, res) {
-    const caps = db.capsVan(req.supplier);
-    if (!caps.includes('gebouw')) { res.status(403).json({ error: 'Dit is geen kantoorgebouw-partner.' }); return false; }
-    return true;
-  }
+  const eisGebouw = require('../kern/gebouw-poort')(db);
   /* De paden staan voluit en niet als '/api/supplier/gebouw' + pad. Een opgebouwd pad
      ziet scripts/schakelbaar.js niet, en wat die census niet ziet is vanuit
      de boardroom niet uit te zetten en niet per stad te sluiten

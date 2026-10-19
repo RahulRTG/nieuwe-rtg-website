@@ -6,6 +6,7 @@
    Opslag in db.data.gebouwPand[code]; signalen sluiten aan op gebouwplus. */
 module.exports = (kern) => {
   const { app, db, save, supplierAuth, managerOnly, logActivity, sseToSupplier, crypto } = kern;
+  const eisGebouw = require('../../kern/gebouw-poort')(db);
 
   const rid = () => crypto.randomBytes(4).toString('hex');
   const txt = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
@@ -55,6 +56,7 @@ module.exports = (kern) => {
   }
 
   app.post('/api/supplier/gebouwpand/overzicht', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const b = bak(req.supplier.code);
     res.json({ ok: true, installaties: b.installaties.slice(0, 40), post: b.post.slice(0, 80),
@@ -63,6 +65,7 @@ module.exports = (kern) => {
 
   /* ---- installaties: het pand keurt zichzelf niet ---- */
   app.post('/api/supplier/gebouwpand/installatie', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const soort = INSTALLATIES.includes(req.body.soort) ? req.body.soort : null;
     const naam = txt(req.body.naam, 60);
@@ -76,6 +79,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/gebouwpand/installatie/keuring', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const i = lees(req.supplier.code).installaties.find(x => x.id === req.body.id);
     if (!i) return res.status(404).json({ error: 'Installatie niet gevonden.' });
@@ -89,6 +93,7 @@ module.exports = (kern) => {
 
   /* ---- de mailroom: aannemen, melden, ophalen ---- */
   app.post('/api/supplier/gebouwpand/post', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     const voorWie = txt(req.body.voorWie, 60), omschrijving = txt(req.body.omschrijving, 80);
     if (!voorWie) return res.status(400).json({ error: 'Voor welke huurder is dit?' });
     const p = { id: rid(), voorWie, omschrijving: omschrijving || 'pakket', dag: vandaag(), status: 'aangekomen' };
@@ -99,6 +104,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/gebouwpand/post/opgehaald', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     const p = lees(req.supplier.code).post.find(x => x.id === req.body.id);
     if (!p) return res.status(404).json({ error: 'Zending niet gevonden.' });
     p.status = 'opgehaald'; save();
@@ -108,6 +114,7 @@ module.exports = (kern) => {
 
   /* ---- parkeren: vaste plekken per huurder ---- */
   app.post('/api/supplier/gebouwpand/parkeer', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const plek = txt(req.body.plek, 12), huurder = txt(req.body.huurder, 60);
     if (!plek) return res.status(400).json({ error: 'Welke plek (bijv. P1-04)?' });
@@ -122,6 +129,7 @@ module.exports = (kern) => {
 
   /* ---- BHV en ontruiming: oefenen, opkomst en verbeterpunten ---- */
   app.post('/api/supplier/gebouwpand/bhv', supplierAuth, (req, res) => {
+    if (!eisGebouw(req, res)) return;
     if (!managerOnly(req, res)) return;
     const b = bak(req.supplier.code);
     const dag = DATUM.test(req.body.dag) ? req.body.dag : vandaag();

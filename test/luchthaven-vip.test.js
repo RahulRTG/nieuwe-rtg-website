@@ -153,3 +153,15 @@ test('6. een dubbeltik op het charterloket is een aanvraag, geen twee', async ()
   const mijn = await api(base, '/api/member/vluchten/mijn', {}, lid);
   assert.equal(mijn.body.charters.filter(c => c.bestemming === 'Genève dubbel').length, 1);
 });
+
+test('7. de herhaalsleutel staat bij de charteraanvraag: dezelfde tik is dezelfde aanvraag, een andere een 409', async () => {
+  const lijf = { soort: 'helikopter', bestemming: 'Formentera sleutel', tijd: '10:15', idem: 'charter-sleutel-1' };
+  const een = await api(base, '/api/member/vluchten/charter', lijf, lid);
+  await new Promise(r => setTimeout(r, 5200)); // voorbij het dubbeltikvenster van de idem-poort
+  const twee = await api(base, '/api/member/vluchten/charter', lijf, lid);
+  assert.equal(twee.status, 200);
+  assert.equal(twee.body.charter.code, een.body.charter.code);
+  assert.equal((await api(base, '/api/member/vluchten/charter', Object.assign({}, lijf, { bestemming: 'Mallorca' }), lid)).status, 409);
+  const mijn = await api(base, '/api/member/vluchten/mijn', {}, lid);
+  assert.equal(mijn.body.charters.filter(c => /Formentera sleutel|Mallorca/.test(c.bestemming)).length, 1);
+});

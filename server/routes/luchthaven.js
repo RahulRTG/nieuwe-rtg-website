@@ -98,5 +98,5 @@ module.exports = (kern) => {
   app.post('/api/member/vluchten/mijn', auth, (req, res) =>
     veilig(res, () => lucht.mijnVeilig(req.session.key)));
   // een charter aanvragen (privejet of helikopter); operations bevestigt of wijst af
-  app.post('/api/member/vluchten/charter', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; stuur(res, lucht.charterVraag(req.session, liveCodename(req.session), req.body || {})); });
+  app.post('/api/member/vluchten/charter', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; const b = req.body || {}; /* de herhaalsleutel: EIGEN in middleware/idempotentie-eigen.js */ stuur(res, lucht.charterVraag(req.session, liveCodename(req.session), Object.assign({}, b, { idem: b.idem }))); });
 };

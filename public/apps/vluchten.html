@@ -252,7 +252,7 @@ async function laadCharter(){
   $('#chDatum').value=new Date().toISOString().slice(0,10);
   $('#chVraag').onclick=async()=>{
     const soort=document.querySelector('[name="chSoort"]:checked').value;
-    try{ const r=await api('/api/member/vluchten/charter',{soort,bestemming:$('#chBest').value,datum:$('#chDatum').value,tijd:$('#chTijd').value});
+    try{ const r=await api('/api/member/vluchten/charter',{soort,bestemming:$('#chBest').value,datum:$('#chDatum').value,tijd:$('#chTijd').value,idem:RTGIdem('charter')});
       meld('Aangevraagd ('+r.charter.code+'); Operations bevestigt persoonlijk.'); laadCharter(); }catch(e){ meld(e.message); }
   };
 }

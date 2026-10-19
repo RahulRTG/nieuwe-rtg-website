@@ -84,12 +84,17 @@ function maakOnderwijs({ db, save, schoon }) {
   }
 
   /* Een leerjaar erbij binnen dezelfde fase (havo 2 naar havo 3). */
-  function jaarOver(key) {
+  /* Met herhaalsleutel (19 oktober 2026): een dubbele tik telde twee
+     leerjaren. De sleutel woont op het paspoort, dus ook na een crash. */
+  function jaarOver(key, idemRuw) {
     const p = paspoort(key);
+    const idem = scho(idemRuw, 64);
+    if (idem && (p.jaarIdem || []).includes(idem)) return Object.assign(mijn(key), { herhaald: true });
     const f = p.fase ? faseVan(p.fase) : null;
     if (!f) return { status: 400, error: 'Schrijf eerst in op een fase.' };
     if (!f.jaren || p.jaar >= f.jaren) return { status: 400, error: 'Dit is al het laatste leerjaar van deze fase; kies de volgende stap op de ladder.' };
     p.jaar += 1; p.historie.push({ van: f.id, naar: f.id, jaar: p.jaar, reden: 'over naar leerjaar ' + p.jaar, op: nu() });
+    if (idem) p.jaarIdem = [idem].concat(p.jaarIdem || []).slice(0, 20);
     p.at = nu(); save();
     return mijn(key);
   }

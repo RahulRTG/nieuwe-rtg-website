@@ -12,7 +12,7 @@ module.exports = (kern) => {
   app.post('/api/onderwijs/ladder', auth, (req, res) => stuur(res, onderwijs.ladder()));
   app.post('/api/onderwijs/mijn', auth, (req, res) => stuur(res, onderwijs.mijn(req.session.key)));
   app.post('/api/onderwijs/inschrijf', auth, (req, res) => stuur(res, onderwijs.inschrijf(req.session.key, req.body || {})));
-  app.post('/api/onderwijs/jaar-over', auth, (req, res) => stuur(res, onderwijs.jaarOver(req.session.key)));
+  app.post('/api/onderwijs/jaar-over', auth, (req, res) => stuur(res, onderwijs.jaarOver(req.session.key, req.body.idem)));
   app.post('/api/onderwijs/doel', auth, (req, res) => stuur(res, onderwijs.doelBehaald(req.session.key, req.body || {})));
   /* "Waarom denkt RTG dat ik dit kan?" Het bewijs onder een beheersing, van de
      leerling zelf. Zonder doel: de lijst met per doel hoe stevig het staat. */

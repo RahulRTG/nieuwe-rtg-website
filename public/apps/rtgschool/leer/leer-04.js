@@ -49,7 +49,7 @@
       catch (e) { meld(e.message); }
     });
     document.getElementById('jaarKnop').addEventListener('click', async function () {
-      try { await api('/api/onderwijs/jaar-over', {}); meld('Een leerjaar erbij.'); laadPaspoort(); }
+      try { await api('/api/onderwijs/jaar-over', { idem: RTGId('jo') }); meld('Een leerjaar erbij.'); laadPaspoort(); }
       catch (e) { meld(e.message); }
     });
     document.getElementById('leerKies').addEventListener('change', function () {

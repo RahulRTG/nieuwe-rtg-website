@@ -31,12 +31,25 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lagen-'));
 const CODE = 'KANTOOR-LAGEN-1';
 let srv, base, office;
 
-const api = (pad, body, tok) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
+/* De gast aan tafel heeft een gratis account (eigenaarsbesluit 19 oktober 2026):
+   de QR is een extra sleutel bij de sessie, nooit een vervanging. Een /api/gast-
+   aanroep zonder eigen token reist met dat account mee; een expliciete null is
+   een aanroep zonder account. */
+const gastLeden = new Map();
+async function api(pad, body, token) {
+  if (token === undefined && String(pad).startsWith('/api/gast/')) {
+    if (!gastLeden.has(base)) gastLeden.set(base, await registreerGratis(base));
+    token = (gastLeden.get(base) || {}).token;
+  }
+  return apiKaal(pad, body, token);
+}
+const apiKaal = (pad, body, tok) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));

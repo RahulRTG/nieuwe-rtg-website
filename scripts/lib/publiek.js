@@ -116,8 +116,6 @@ const PUBLIEK = new Map([
      QR op die tafel. Het token is dus de credential en geen gemakje -- het is
      negen bytes willekeur, het staat gehasht in de opslag, en beide routes
      hebben een rem per ip die bij een misser oploopt. */
-  ['/api/gast/tafel', 'de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)'],
-  ['/api/gast/aanschuiven', 'aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)'],
   ['/api/arrival/interpret', 'publieke wensontleding zonder opslag of uitvoering (met rem per ip)'],
   ['/api/arrival/request', 'gast maakt zelf een aanvraag; de server geeft een 128-bit pass (kern/arrivalpas.js), idempotentie en rem per ip'],
   ['/api/arrival/pass/roteer', 'de houder roteert zijn eigen pass: de 128-bit pass uit het lijf is de deur (kern/arrivalpas.js), rem per ip'],

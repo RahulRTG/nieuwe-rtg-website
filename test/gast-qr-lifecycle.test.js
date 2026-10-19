@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startServer } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const maakKern = (begin = {}) => {
   const db = { data: { horeca: begin } };
@@ -74,6 +75,9 @@ test('de leveranciersdeur trekt in en roteert zonder de oude code te laten herle
     method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
     body: JSON.stringify(body || {})
   }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  // de gast scant met een gratis account (eigenaarsbesluit 19 oktober 2026): de QR is een extra sleutel
+  const klant = await registreerGratis(base);
+  assert.ok(klant, 'een gratis account voor de gast');
   const roster = (await post('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const manager = roster.staff.find((x) => x.role === 'manager') || roster.staff[0];
   const medewerker = roster.staff.find((x) => x.role !== 'manager');
@@ -90,7 +94,7 @@ test('de leveranciersdeur trekt in en roteert zonder de oude code te laten herle
   const een = await post('/api/supplier/horeca/gast/qr', { tafel: 'L88' }, auth);
   assert.equal(een.status, 200);
   assert.ok(een.body.token && een.body.lifecycle.expiresAt);
-  assert.equal((await post('/api/gast/tafel', { token: een.body.token })).status, 200);
+  assert.equal((await post('/api/gast/tafel', { token: een.body.token }, klant.token)).status, 200);
 
   const zelfde = await post('/api/supplier/horeca/gast/qr', { tafel: 'L88' }, auth);
   assert.equal(zelfde.status, 200);
@@ -100,10 +104,10 @@ test('de leveranciersdeur trekt in en roteert zonder de oude code te laten herle
   const intrek = await post('/api/supplier/horeca/gast/qr', { tafel: 'L88', intrek: true, reden: 'verloren' }, auth);
   assert.equal(intrek.status, 200);
   assert.ok(intrek.body.revokedAt);
-  assert.equal((await post('/api/gast/tafel', { token: een.body.token })).status, 404);
+  assert.equal((await post('/api/gast/tafel', { token: een.body.token }, klant.token)).status, 404);
 
   const twee = await post('/api/supplier/horeca/gast/qr', { tafel: 'L88', vernieuw: true }, auth);
   assert.equal(twee.status, 200);
   assert.notEqual(twee.body.token, een.body.token);
-  assert.equal((await post('/api/gast/tafel', { token: twee.body.token })).status, 200);
+  assert.equal((await post('/api/gast/tafel', { token: twee.body.token }, klant.token)).status, 200);
 });

@@ -120,6 +120,7 @@ const SCENARIOS = {
   'ovroutes.js': require('./lib/voltooi/ovroutes'),
   'onderneming.js': require('./lib/voltooi/onderneming'),
   'office.js': require('./lib/voltooi/office'),
+  'partnernetwerk.js': require('./lib/voltooi/partnernetwerk'),
   'pay.js': require('./lib/voltooi/pay'),
   'post.js': require('./lib/voltooi/post'),
   'projectroom.js': require('./lib/voltooi/projectroom'),

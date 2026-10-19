@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-10-18T19:50:29.476Z",
-  "commit": "8f7e59c7c",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-10-19T07:15:53.015Z",
+  "commit": "e47081ed4",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5398,
-  "geclassificeerd": 5373,
+  "totaal": 5399,
+  "geclassificeerd": 5374,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
-   "NOT_APPLICABLE": 1298,
+   "NOT_APPLICABLE": 1299,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 705,
    "INTENTIONALLY_NON_IDEMPOTENT": 206
   },
-  "vastgesteldDoorMens": 2261,
+  "vastgesteldDoorMens": 2262,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4438,
+   "AUTHENTICATED": 4439,
    "PUBLIC": 142,
    "OBJECT_SCOPED": 785,
    "(niet af te leiden -- vraagt een verklaring)": 17,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 251
+   "niet gemeten": 252
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -86230,7 +86230,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86257,7 +86257,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -105411,7 +105411,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
@@ -105438,7 +105438,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
@@ -122512,6 +122512,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "partnernetwerk.overzicht",
+   "route": "POST /api/supplier/netwerk/overzicht",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

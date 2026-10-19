@@ -80,15 +80,21 @@ function maakReisdossier({ accounts }) {
   }
 
   /* De reisadviseur bevestigt: dezelfde regel, andere stand. Geen nieuwe regel
-     en geen tweede waarheid -- het dossier vertelt de geschiedenis van EEN reis. */
-  function bevestig(key, ref) {
+     en geen tweede waarheid -- het dossier vertelt de geschiedenis van EEN reis.
+     Bevestigd is NIET betaald: hier stond 'paid', zodat een reis zonder betaling
+     in de reistab als betaald stond. 'open' is de stand "wacht op betaling" die
+     kern/huis.js en de reistab al kennen; pas betaald() zet 'paid'. */
+  function stand(key, ref, status, label) {
     return metDossier(key, (md) => {
       const it = md.trip && (md.trip.items || []).find(i => i.reisRef === ref);
       if (!it) return false;
-      it.status = 'paid';
-      it.label = 'Bevestigd';
+      it.status = status;
+      it.label = label;
     });
   }
+  const bevestig = (key, ref) => stand(key, ref, 'open', 'Bevestigd, nog niet betaald');
+  // alleen na een geslaagde betaling (reisbureau.markeerBetaald)
+  const betaald = (key, ref) => stand(key, ref, 'paid', 'Betaald');
 
   /* Ingetrokken of afgewezen: de regel gaat eruit. Blijft er niets over, dan
      gaat de hele reis weg -- een dossier met een lege tijdlijn is geen dossier,
@@ -102,7 +108,7 @@ function maakReisdossier({ accounts }) {
     });
   }
 
-  return { reisdossier: { zetAanvraag, bevestig, weghalen } };
+  return { reisdossier: { zetAanvraag, bevestig, betaald, weghalen } };
 }
 
 module.exports = { maakReisdossier, datumZin };

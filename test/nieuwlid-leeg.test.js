@@ -183,7 +183,9 @@ test('een aangevraagde reis vult het dossier, en pas een mens maakt hem bevestig
 
     const na = await staat();
     const naRegel = (na.trip.items || []).find(i => i.reisRef === ref);
-    assert.equal(naRegel.status, 'paid', 'nu pas staat de reis op bevestigd');
+    // bevestigd is niet betaald (K1, docs/domeinkaarten/travelos.md): 'open' is
+    // "wacht op betaling"; pas reisbureau.markeerBetaald zet 'paid'
+    assert.equal(naRegel.status, 'open', 'nu pas staat de reis op bevestigd, en nog niet op betaald');
     assert.match(naRegel.label, /bevestigd/i, 'en zegt dat ook: ' + naRegel.label);
 
     // tweemaal bevestigen is geen tweede reis

@@ -161,6 +161,7 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
     if (a.betaald) return { status: 409, error: 'Deze reis is al betaald.', betaald: a.betaald };
     a.betaald = betaling;
     save();
+    if (dossier) dossier.betaald(a.customerKey, a.ref); // pas nu heet de reis betaald
     return { ok: true, betaald: a.betaald };
   }
 

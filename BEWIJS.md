@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2889 bestanden en 19797 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2890 bestanden en 19799 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2889 |
-| losse beweringen (`test(...)`) | 19797 |
+| toetsbestanden | 2890 |
+| losse beweringen (`test(...)`) | 19799 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 69 |
+| niets van beide | 70 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2545 bestanden, 19217 beweringen.
+2546 bestanden, 19219 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1723,6 +1723,7 @@ toets omvalt.
 | `reisbureau-nazorg.test.js` | 8 | gezakt op `liegpoort /api/` | DE NAZORG VAN EEN REISAANVRAAG: wijzigen en afzeggen nadat een mens de reis heeft bevestigd -- kern/reisbureau-nazorg.js. WAAROM DIT BESTAND ER IS. |
 | `reisbureau-thuis.test.js` | 4 | gezakt op `liegpoort /api/` | THUIS: de reis is voorbij en de reiziger is terug -- kern/reisbureau-thuis.js (besluit C3, AUTONOMIE.md par. 2.5). |
 | `reisbureau.test.js` | 9 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |
+| `reisdossier-betaald.test.js` | 2 | -- | K1 uit docs/domeinkaarten/travelos.md: een bevestigde reis heet in het reisdossier "bevestigd, nog niet betaald", en pas een geslaagde betaling (reisbureau.markeerBetaald) maakt er "betaald" van. Bevestigen zette de... |
 | `reisgezelschap-instemming.test.js` | 8 | gezakt op `liegpoort /api/` | INSTEMMEN OP EEN VASTE VERSIE, over de draad (kern/reisgezelschap-instemming.js). Stap 4 van "Five People. |
 | `reisgezelschap-opgave.test.js` | 8 | gezakt op `liegpoort /api/` | DE PRIVE-INVOER VAN EEN REISGENOOT, over de draad (kern/reisgezelschap-opgave.js). Stap 1 van "Five People. |
 | `reisgezelschap-opties.test.js` | 6 | gezakt op `liegpoort /api/` | DE GROEPSBEREKENING, over de draad (kern/reisgezelschap-opties.js). Stap 2 van "Five People. |

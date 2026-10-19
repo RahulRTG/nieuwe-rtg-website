@@ -34,9 +34,11 @@
        is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {
       if (e.origin !== location.origin || !e.data) return;
-      if (e.data.rtg === 'context') { context(e.data.ref); return; }
       var s = surfaceVanVenster(e.source);
       if (!s) return;                       // een venster dat geen surface is, telt niet mee
+      /* Ook een context komt alleen van een open surface: een ander venster op
+         dezelfde herkomst (een pop-up, een tweede tab) zet hem niet. */
+      if (e.data.rtg === 'context') { context(e.data.ref); return; }
       if (e.data.rtg === 'sleep-start') {
         var v = schoneVerwijzing(e.data.object);
         if (v) sleepStart(s, v);

@@ -47,3 +47,11 @@ test('context weg (null) bereikt ook de luisteraars en de frames', () => {
   assert.equal(t.gehoord.at(-1), null, 'een luisteraar hoort dat de context weg is');
   assert.deepEqual(t.gepost.at(-1), { rtg: 'context', ref: null }, 'een surface hoort dat de context weg is');
 });
+
+test('de schil neemt een context alleen aan van een open surface, net als de andere berichten', () => {
+  const start = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'rtg-schil', '07-start.js'), 'utf8');
+  const bewaker = start.indexOf('surfaceVanVenster(e.source)');
+  const ctx = start.indexOf("e.data.rtg === 'context'");
+  assert.ok(bewaker > 0 && ctx > 0, 'de berichtafhandeling is niet te vinden');
+  assert.ok(ctx > bewaker, 'een context van een venster dat geen surface is, mag niet meetellen');
+});

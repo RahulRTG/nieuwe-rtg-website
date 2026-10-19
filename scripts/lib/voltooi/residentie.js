@@ -49,6 +49,15 @@ async function loop(w, stap) {
       ziet: r.status + ', ' + (s && s.naam) + ', ' + startAantal + ' meubels, catalogus ' + cat.length + ' stuks' };
   });
 
+  await stap('voltooibaar', 'een net ingerichte suite begint dicht: niet in de gids van een ander lid, en die komt er niet in', async () => {
+    const s = await suite();
+    const g = await w.post(GIDS, {}, B.token);
+    const inGids = ((g.data && g.data.suites) || []).some((x) => x.adres === adres);
+    const b = await w.post(BETREED, { kamer: adres }, B.token);
+    return { klopt: !!s && s.open === false && g.status === 200 && !inGids && b.status === 403,
+      ziet: 'open ' + (s && s.open) + ', in de gids ' + (inGids ? 'WEL' : 'niet') + ', B ' + b.status };
+  });
+
   await stap('voltooibaar', 'een meubel buiten de suite wordt geweigerd met de reden', async () => {
     const r = await w.post(MEUBEL_ZET, { soort: 'tafel', x: 11, y: 8 }, T);
     return { klopt: r.status === 400 && /past daar niet/.test(r.data.error), ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
@@ -56,10 +65,16 @@ async function loop(w, stap) {
 
   await stap('voltooibaar', 'het lid zet een fauteuil neer en geeft zijn suite een naam; beide staan er', async () => {
     const m = await w.post(MEUBEL_ZET, { soort: 'fauteuil', x: 10, y: 7 }, T);
-    const z = await w.post(SUITE_ZET, { naam: 'Suite ' + merk, open: true }, T);
+    const z = await w.post(SUITE_ZET, { naam: 'Suite ' + merk }, T);
     const s = await suite();
-    return { klopt: m.status === 200 && z.status === 200 && s.naam === 'Suite ' + merk && s.open === true && opPlek(s, 'fauteuil', 10, 7).length === 1,
+    return { klopt: m.status === 200 && z.status === 200 && s.naam === 'Suite ' + merk && s.open === false && opPlek(s, 'fauteuil', 10, 7).length === 1,
       ziet: 'meubel ' + m.status + ', naam ' + z.status + ', ' + s.naam + ', ' + s.meubels.length + ' meubels' };
+  });
+
+  await stap('voltooibaar', 'het lid zet zijn suite zelf open voor bezoek', async () => {
+    const z = await w.post(SUITE_ZET, { open: true }, T);
+    const s = await suite();
+    return { klopt: z.status === 200 && s.open === true, ziet: 'open ' + z.status + ', nu open ' + s.open };
   });
 
   await stap('voltooibaar', 'de gids toont de open suite onder zijn naam, en een ander lid loopt hem binnen', async () => {
@@ -159,7 +174,7 @@ module.exports = {
   functie: 'link:residentie',
   ingang: '/apps/residentie.html',
   persona: 'lid',
-  belofte: 'een lid richt zijn eigen suite in met de Maison-catalogus, geeft hem een naam en zet hem open of dicht; de gids toont een open suite en een ander lid kan hem binnenlopen, een gesloten niet -- en de inrichting overleeft een herstart, een dubbele tik, een afgebroken verzoek en een crash',
+  belofte: 'een lid richt zijn eigen suite in met de Maison-catalogus, geeft hem een naam en zet hem zelf open (hij begint dicht) of weer dicht; de gids toont een open suite en een ander lid kan hem binnenlopen, een gesloten niet -- en de inrichting overleeft een herstart, een dubbele tik, een afgebroken verzoek en een crash',
   grens: 'De proef loopt de routes van het scherm, niet het canvas. Lopen, praten, emotes, spellen en de paarvorming zijn niet gelopen; wie er in een zaal staat is een momentopname en wordt niet als persistent gemeten. Het live seintje over /api/stream is niet gelopen. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

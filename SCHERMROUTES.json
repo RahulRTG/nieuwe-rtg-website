@@ -3,11 +3,11 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "1fa753de",
+  "commit": "14ac8b6c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
+   "boomVuil": false,
    "ongecommitteInvoer": [],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7821,7 +7821,7 @@
   "schermenMetPad": 451,
   "nietGelezen": 0,
   "exactePaden": 1195,
-  "verwijzingen": 1437,
+  "verwijzingen": 1438,
   "voorvoegsels": 131,
   "basisPaden": 2,
   "doodPad": 0,
@@ -8595,6 +8595,14 @@
    "schermen": [
     "public/apps/geld/voorzijde.js",
     "public/apps/geld/wbwb.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/wbw/verreken",
+   "schermen": [
+    "public/apps/geld/wbwb.js",
+    "public/shared/toestelsleutel.js"
    ],
    "aantal": 2
   },
@@ -11403,13 +11411,6 @@
   },
   {
    "pad": "/api/wbw/uitgave",
-   "schermen": [
-    "public/apps/geld/wbwb.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/wbw/verreken",
    "schermen": [
     "public/apps/geld/wbwb.js"
    ],
@@ -20792,6 +20793,7 @@
     "/api/privacy/export",
     "/api/privacy/inzage",
     "/api/rtgid/machtig",
+    "/api/wbw/verreken",
     "/api/webauthn/registreer",
     "/api/webauthn/weg"
    ],

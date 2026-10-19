@@ -6,6 +6,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, klasgenotenVan } = ctx;
+  const { dubbeltik } = require('./dubbeltik');
   const uitnodigen = require('./uitnodigen')({ zijnVrienden, socialZoek, isGeblokkeerd, klasgenotenVan });
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
@@ -63,6 +64,8 @@ module.exports = (ctx) => {
     // zodat er hier geen tweede lus staat die de vraag net anders stelt
     const neeGasten = beleid.mag(uitgenodigd, soort, { wereld });
     if (neeGasten) return neeGasten;
+    const al = dubbeltik(S().potjes, mij, { soort, grootte: max, uitgenodigd }, Date.parse(nu()));
+    if (al) return { status: 200, ok: true, id: al.id, herhaald: true };
     const potje = Object.assign({ id: rid(5), soort, grootte: max, modus: teamModus(soort, max, modus),
       taal: taal === 'en' ? 'en' : 'nl',
       teams: TEAMS, spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) },

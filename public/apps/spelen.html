@@ -447,8 +447,10 @@ function meld(t){ const el=$('#melding'); el.textContent=t; el.style.opacity='1'
 const memberTok = localStorage.getItem('rtg_member_token');
 let rtfSess = null; try { rtfSess = JSON.parse(localStorage.getItem('rtf_sessie')||'null'); } catch(e){}
 if (!memberTok && !(rtfSess && rtfSess.token)) location.href = '/apps/foundation/index.html';
-async function api(actie, body){
-  const pad = memberTok ? '/api/member/spel/' + actie : '/api/rtf/spel/' + actie;
+/* Het pad staat letterlijk bij elke aanroep (de lid-route); een gezinslid gaat
+   naar dezelfde handeling onder /api/rtf/spel/. */
+async function api(lidPad, body){
+  const pad = memberTok ? lidPad : lidPad.replace('/api/member/spel/', '/api/rtf/spel/');
   const opts = { method:'POST', headers:{'Content-Type':'application/json'} };
   if (memberTok) opts.headers.Authorization = 'Bearer ' + memberTok;
   else body = Object.assign({ code: rtfSess.code, token: rtfSess.token }, body||{});
@@ -523,7 +525,7 @@ function klokTekst(k){
    plaats van dat er valselijk "niemand" komt te staan. */
 let ONLINE = new Set();
 async function laadOnline(){
-  let d; try{ d = await api('online'); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/online'); }catch(e){ return; }
   ONLINE = new Set((d.online||[]).map(o => o.key));
   const n = d.aantal || 0;
   const lijn = $('#onlineLijn');
@@ -537,7 +539,7 @@ async function laadOnline(){
    op -- onzichtbaar zijn maakt je niet blind -- en de knop staat er altijd,
    want een keuze die je moet zoeken is geen keuze. */
 async function laadZichtbaar(){
-  let d; try{ d = await api('zichtbaar'); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/zichtbaar'); }catch(e){ return; }
   zetZichtbaarKnop(d.zichtbaar !== false);
 }
 function zetZichtbaarKnop(zichtbaar){
@@ -548,7 +550,7 @@ function zetZichtbaarKnop(zichtbaar){
 $('#zichtbaarKnop').addEventListener('click', async ()=>{
   const nuUit = $('#zichtbaarKnop').dataset.uit === '1';
   try{
-    const d = await api('zichtbaar-zet', { aan: nuUit });   // uit -> weer aan, en andersom
+    const d = await api('/api/member/spel/zichtbaar-zet', { aan: nuUit });   // uit -> weer aan, en andersom
     zetZichtbaarKnop(d.zichtbaar !== false);
   }catch(e){ meld(e.message); }
 });
@@ -558,7 +560,7 @@ $('#zichtbaarKnop').addEventListener('click', async ()=>{
    zonder tijdsaanduiding leest als een totaal-voor-altijd. Onder de
    progressiegrens bestaat er geen stand en blijft het blok gewoon weg. */
 async function laadStand(){
-  let d; try{ d = await api('stand'); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/stand'); }catch(e){ return; }
   const rijen = d.stand || [];
   const leeg = !d.progressie || !rijen.length;
   $('#standKop').hidden = leeg; $('#stand').hidden = leeg;
@@ -581,7 +583,7 @@ function tegenTekst(tegen){
   return namen.length ? namen.join(' & ') : '';
 }
 async function laadRecent(){
-  let d; try{ d = await api('uitslagen', { hoeveel: 5 }); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/uitslagen', { hoeveel: 5 }); }catch(e){ return; }
   const rijen = d.uitslagen || [];
   const leeg = !d.progressie || !rijen.length;
   $('#recent').hidden = leeg;
@@ -597,7 +599,7 @@ async function laadRecent(){
    kunt halen, en deze pagina verzint dat er ook niet bij. Geen teller, geen
    balk, geen "nog twee te gaan". */
 async function laadPrestaties(){
-  let d; try{ d = await api('prestaties'); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/prestaties'); }catch(e){ return; }
   const lijst = d.prestaties || [];
   const leeg = !d.progressie || !lijst.length;
   $('#prestaties').hidden = leeg;
@@ -615,14 +617,14 @@ function klokBij(x){
   return t ? ' · ' + t : '';
 }
 async function laadLobby(){
-  let d; try{ d = await api('mijn'); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/mijn'); }catch(e){ return; }
   laadOnline(); laadZichtbaar(); laadStand(); laadRecent(); laadPrestaties(); laadTeams(); tekenTeamVrienden();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+
     '<button class="knop mini" data-ja="'+esc(x.id)+'">Speel mee</button><button class="knop grijs mini" data-nee="'+esc(x.id)+'">✕</button></div>').join('') : '';
-  document.querySelectorAll('[data-ja]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('antwoord',{id:b.dataset.ja, akkoord:true}); laadLobby(); }catch(e){ meld(e.message); } }));
-  document.querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('antwoord',{id:b.dataset.nee, akkoord:false}); laadLobby(); }catch(e){ meld(e.message); } }));
+  document.querySelectorAll('[data-ja]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('/api/member/spel/antwoord',{id:b.dataset.ja, akkoord:true}); laadLobby(); }catch(e){ meld(e.message); } }));
+  document.querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('/api/member/spel/antwoord',{id:b.dataset.nee, akkoord:false}); laadLobby(); }catch(e){ meld(e.message); } }));
   const p = d.potjes||[];
   $('#potjes').innerHTML = p.length ? p.map(x =>
     '<div class="rij s-3vd53t" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
@@ -640,14 +642,14 @@ async function laadLobby(){
    schoolteam er niet op. */
 let MIJN_TEAMS = [];
 async function laadTeams(){
-  let d; try{ d = await api('team-mijn'); }catch(e){ return; }
+  let d; try{ d = await api('/api/member/spel/team-mijn'); }catch(e){ return; }
   MIJN_TEAMS = d.teams || [];
   const u = d.uitnodigingen || [];
   $('#teamUitnodigingen').innerHTML = u.map(t =>
     '<div class="rij"><div class="nm">'+esc(t.naam)+'<small>uitnodiging · met '+t.leden.map(l=>esc(l.codenaam)).join(', ')+'</small></div>'+
     '<button class="knop mini" data-tja="'+esc(t.id)+'">Doe mee</button><button class="knop grijs mini" data-tnee="'+esc(t.id)+'">✕</button></div>').join('');
-  document.querySelectorAll('[data-tja]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('team-antwoord',{id:b.dataset.tja, akkoord:true}); laadTeams(); }catch(e){ meld(e.message); } }));
-  document.querySelectorAll('[data-tnee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('team-antwoord',{id:b.dataset.tnee, akkoord:false}); laadTeams(); }catch(e){ meld(e.message); } }));
+  document.querySelectorAll('[data-tja]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('/api/member/spel/team-antwoord',{id:b.dataset.tja, akkoord:true}); laadTeams(); }catch(e){ meld(e.message); } }));
+  document.querySelectorAll('[data-tnee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('/api/member/spel/team-antwoord',{id:b.dataset.tnee, akkoord:false}); laadTeams(); }catch(e){ meld(e.message); } }));
 
   $('#teams').innerHTML = MIJN_TEAMS.length ? MIJN_TEAMS.map(t =>
     '<div class="rij"><div class="nm">'+esc(t.naam)+'<small>'+t.leden.map(l=>esc(l.codenaam)).join(' · ')+
@@ -656,7 +658,7 @@ async function laadTeams(){
     : '<div class="leeg">Nog geen team. Maak er een en vraag je vrienden erbij.</div>';
   document.querySelectorAll('[data-tweg]').forEach(b => b.addEventListener('click', async()=>{
     if (!confirm('Dit team verlaten?')) return;
-    try{ await api('team-verlaat',{id:b.dataset.tweg}); laadTeams(); }catch(e){ meld(e.message); }
+    try{ await api('/api/member/spel/team-verlaat',{id:b.dataset.tweg}); laadTeams(); }catch(e){ meld(e.message); }
   }));
 }
 /* De kieslijst bij het oprichten. Alleen vrienden: de server laat toch niets
@@ -678,7 +680,7 @@ $('#teamMaak').addEventListener('click', async ()=>{
   const naam = $('#teamNaam').value.trim();
   if (!naam) { meld('Geef je team eerst een naam.'); $('#teamNaam').focus(); return; }
   try{
-    await api('team-nieuw',{ naam, leden: teamGekozen });
+    await api('/api/member/spel/team-nieuw',{ naam, leden: teamGekozen });
     $('#teamNaam').value=''; teamGekozen = [];
     tekenTeamVrienden(); laadTeams();
     meld('Team gemaakt. Wie je vroeg krijgt een uitnodiging.');
@@ -719,7 +721,7 @@ function tekenGroottes(){
 let VARIANTEN = null, nVariant = {};
 async function laadVarianten(){
   if (VARIANTEN) return VARIANTEN;
-  try{ VARIANTEN = (await api('varianten', {})).varianten || {}; }catch(e){ VARIANTEN = {}; }
+  try{ VARIANTEN = (await api('/api/member/spel/varianten', {})).varianten || {}; }catch(e){ VARIANTEN = {}; }
   return VARIANTEN;
 }
 const VARIANT_LABEL = { vorm:'Welke vorm?', stad:'In welke stad?', duur:'Hoe lang?', bron:'Waar komen de vragen vandaan?', stof:'Welke leerstof?' };
@@ -799,7 +801,7 @@ $('#nStart').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
     const cn = $('#nCodenaam').value.trim();
-    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
+    const d = await api('/api/member/spel/nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
     meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
     toon('vLobby'); laadLobby();
   }catch(e){ $('#nFout').textContent = e.message; }
@@ -807,7 +809,7 @@ $('#nStart').addEventListener('click', async ()=>{
 $('#nRandom').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
-    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
+    const d = await api('/api/member/spel/random', { soort:nSpel, grootte:nGrootte, taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
     if (d.gestart){ openPotje(d.id); } else { meld('Je staat in de rij ('+d.plek+' van '+d.nodig+'). Zodra het vol is, start het potje.'); toon('vLobby'); laadLobby(); }
   }catch(e){ $('#nFout').textContent = e.message; }
 });
@@ -819,13 +821,13 @@ $('#nRandom').addEventListener('click', async ()=>{
 let huidig = null, pollT = null, mgVelden = null;
 async function ververs(){
   if (!huidig) return;
-  try{ const d = await api('staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
+  try{ const d = await api('/api/member/spel/staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
   laadPraat();
 }
 async function openPotje(id){
   // bij het openen reist het statische Magnaat-bord eenmalig mee; de polls
   // daarna dragen alleen de dynamische staat
-  try{ const d = await api('staat', { id, velden: true }); huidig = d.potje; }catch(e){ meld(e.message); return; }
+  try{ const d = await api('/api/member/spel/staat', { id, velden: true }); huidig = d.potje; }catch(e){ meld(e.message); return; }
   // de Arena- en Societeit-duels hebben hun eigen speelscherm
   if (huidig.soort === 'flits' || huidig.soort === 'reactie' || huidig.soort === 'geheugen'){ location.href = '/apps/foundation/arena.html?potje=' + encodeURIComponent(id); return; }
   if (huidig.soort === 'quiz' || huidig.soort === 'schat' || huidig.soort === 'orde'){ location.href = '/apps/foundation/societeit.html?potje=' + encodeURIComponent(id); return; }
@@ -865,9 +867,9 @@ document.addEventListener('visibilitychange', ()=>{
 /* een zet spelen en meteen verversen: de server stuurt de nieuwe staat in
    het zet-antwoord mee, dus een tweede staat-verzoek is niet nodig */
 async function speelZet(zet){
-  const d = await api('zet', { id: huidig.id, zet });
+  const d = await api('/api/member/spel/zet', { id: huidig.id, zet });
   if (d.potje) huidig = d.potje;
-  else { const s = await api('staat', { id: huidig.id }); huidig = s.potje; }
+  else { const s = await api('/api/member/spel/staat', { id: huidig.id }); huidig = s.potje; }
   tekenPotje();
   return d;
 }
@@ -915,7 +917,7 @@ function tekenPotje(){
 }
 $('#sToewijzen').addEventListener('click', async ()=>{
   if (!huidig || !confirm('De tijd van je tegenstander is om. Deze partij aan jou toewijzen?')) return;
-  try{ await api('toewijzen', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }
+  try{ await api('/api/member/spel/toewijzen', { id: huidig.id }); const d = await api('/api/member/spel/staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }
   catch(e){ meld(e.message); }
 });
 /* ---------- de partij terugkijken ----------
@@ -927,7 +929,7 @@ async function npToon(stap){
   if (!huidig || npBezig) return;
   npBezig = true;
   try{
-    const d = await api('naspelen', { id: huidig.id, stap });
+    const d = await api('/api/member/spel/naspelen', { id: huidig.id, stap });
     npStap = d.stap; npTotaal = d.totaal;
     $('#npSchuif').max = String(d.totaal);
     $('#npSchuif').value = String(d.stap);
@@ -953,7 +955,7 @@ $('#sScherm').addEventListener('click', async ()=>{
   if (!$('#sSchermCode').hidden &&
       !confirm('Een nieuwe schermcode trekt de vorige code en het gekoppelde scherm meteen in. Doorgaan?')) return;
   try{
-    const d = await api('projectie-open', { id: huidig.id, idem: window.RTGIdem('spelprojectie') });
+    const d = await api('/api/member/spel/projectie-open', { id: huidig.id, idem: window.RTGIdem('spelprojectie') });
     const link = location.origin + '/apps/spelscherm.html#' + encodeURIComponent(d.code);
     $('#sSchermCode').hidden = false;
     $('#sSchermCode').innerHTML = '<span>Deze code wordt eenmalig getoond en is 15 minuten te koppelen: ' +
@@ -963,7 +965,7 @@ $('#sScherm').addEventListener('click', async ()=>{
     $('#sScherm').textContent = 'Nieuwe schermcode';
     $('#sSchermDicht').addEventListener('click', async ()=>{
       try{
-        await api('projectie-sluit', { id: huidig.id });
+        await api('/api/member/spel/projectie-sluit', { id: huidig.id });
         $('#sSchermCode').hidden = true; $('#sSchermCode').textContent = '';
         $('#sScherm').textContent = 'Op het grote scherm';
       }catch(e){ meld(e.message); }
@@ -973,13 +975,13 @@ $('#sScherm').addEventListener('click', async ()=>{
 $('#sNabespreken').addEventListener('click', async ()=>{
   if (!huidig) return;
   $('#sNabespreking').hidden = false; $('#sNabespreking').textContent = 'Rahul kijkt de partij terug…';
-  try{ const d = await api('nabespreking', { id: huidig.id });
+  try{ const d = await api('/api/member/spel/nabespreking', { id: huidig.id });
     $('#sNabespreking').textContent = d.antwoord || d.samenvatting || '';
   }catch(e){ $('#sNabespreking').textContent = e.message; }
 });
 $('#sOpgeven').addEventListener('click', async ()=>{
   if (!huidig || !confirm('Dit potje opgeven?')) return;
-  try{ await api('opgeven', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }catch(e){ meld(e.message); }
+  try{ await api('/api/member/spel/opgeven', { id: huidig.id }); const d = await api('/api/member/spel/staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }catch(e){ meld(e.message); }
 });
 
 /* ---------- Rahul als spelmaatje: in elk potje op te roepen ---------- */
@@ -988,7 +990,7 @@ async function vraagRahul(vraag){
   const box = $('#rmAntwoord');
   box.hidden = false; box.textContent = 'Rahul denkt mee…';
   try{
-    const d = await api('rahul', { id: huidig.id, vraag: vraag || '' });
+    const d = await api('/api/member/spel/rahul', { id: huidig.id, vraag: vraag || '' });
     box.textContent = d.antwoord || 'Ik heb even niets bruikbaars, speel op je gevoel.';
   }catch(e){ box.textContent = e.message; }
 }
@@ -1010,7 +1012,7 @@ let prtLaatst = '';
 async function laadPraat(){
   if (!huidig) return;
   let d;
-  try{ d = await api('praat', { id: huidig.id }); }
+  try{ d = await api('/api/member/spel/praat', { id: huidig.id }); }
   catch(e){ $('#sPraat').hidden = true; return; }   // 403/404: dit potje praat niet
   $('#sPraat').hidden = false;
   const lijst = $('#prtLijst');
@@ -1027,7 +1029,7 @@ async function stuurPraat(){
   const veld = $('#prtVeld'), t = veld.value.trim();
   if (!huidig || !t) return;
   veld.value = '';
-  try{ await api('praat-stuur', { id: huidig.id, tekst: t }); prtLaatst = ''; await laadPraat(); }
+  try{ await api('/api/member/spel/praat-stuur', { id: huidig.id, tekst: t }); prtLaatst = ''; await laadPraat(); }
   catch(e){ meld(e.message); veld.value = t; }
 }
 $('#prtKnop').addEventListener('click', stuurPraat);
@@ -1241,7 +1243,7 @@ function ttTeken(){
   c.fillStyle='#EAE4D8'; c.font='13px sans-serif'; c.fillText('Score: '+TT.score+' · lijnen: '+TT.lijnen, 8, 16);
 }
 async function ttDood(){ clearInterval(TT.timer); TT.dood=true; meld('Game over! Score: '+TT.score);
-  try{ await api('arcade-score',{spel:'tetris',punten:TT.score}); laadTetrisBord(); }catch(e){} }
+  try{ await api('/api/member/spel/arcade-score',{spel:'tetris',punten:TT.score}); laadTetrisBord(); }catch(e){} }
 function ttZet(dx,dr){
   if (TT.dood) return;
   if (dr){ const nr=(TT.rot+1)%4; for (const k of [0,-1,1]) if (ttPast(ttDraai(TT.stuk[0],nr),TT.x+k,TT.y)){ TT.rot=nr; TT.x+=k; break; } }
@@ -1268,7 +1270,7 @@ document.addEventListener('keydown', e=>{
    suggereren dat je er wel een kunt halen. */
 async function laadRanglijst(spel, sel){
   try{
-    const d = await api('arcade-bord', { spel });
+    const d = await api('/api/member/spel/arcade-bord', { spel });
     const lijst = $(sel), kop = lijst && lijst.previousElementSibling;
     if (d.ranglijst === false){
       lijst.hidden = true;
@@ -1304,7 +1306,7 @@ function snStap(){
 async function snDood(){
   clearInterval(SN.timer); SN.dood=true;
   meld('Af! Score: '+SN.score);
-  try{ await api('sneek-score', { punten: SN.score }); laadSneekBord(); }catch(e){}
+  try{ await api('/api/member/spel/sneek-score', { punten: SN.score }); laadSneekBord(); }catch(e){}
 }
 $('#snStart').addEventListener('click', ()=>{
   SN.slang=[[8,8],[7,8],[6,8]]; SN.richting=[1,0]; SN.score=0; SN.dood=false; snEten(); snTeken();
@@ -1770,7 +1772,7 @@ async function suNieuw(){
   SU.bezig = true; SU.klaar = true; SU.sel = null; SU.dag = false;
   $('#suInfo').textContent = 'Een nieuwe puzzel…';
   try{
-    const d = await api('sudoku-nieuw', { niveau: SU.niveau });
+    const d = await api('/api/member/spel/sudoku-nieuw', { niveau: SU.niveau });
     SU.niveau = d.niveau || SU.niveau;
     suLeg(d.puzzel);
     $('#suInfo').textContent = '0:00 · sneller is meer punten';
@@ -1789,7 +1791,7 @@ async function suNieuw(){
 const suTijd = (s) => Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 async function suDagLaad(){
   let d;
-  try{ d = await api('dag', { spel:'sudoku' }); }
+  try{ d = await api('/api/member/spel/dag', { spel:'sudoku' }); }
   catch(e){ $('#suDag').innerHTML = '<div class="leeg">De dagopgave kwam niet binnen.</div>'; return; }
   const veld = d.mee === 1 ? '1 speler loste hem vandaag op' : d.mee + ' spelers losten hem vandaag op';
   let kop, knop = '';
@@ -1824,7 +1826,7 @@ async function suDagStart(){
   if (SU.bezig) return;
   SU.bezig = true;
   try{
-    const d = await api('dag-start', { spel:'sudoku' });
+    const d = await api('/api/member/spel/dag-start', { spel:'sudoku' });
     SU.dag = true;
     suLeg(d.opgave.puzzel, d.gestart);
     $('#suInfo').textContent = 'Dagopgave · sneller is meer punten';
@@ -1860,8 +1862,8 @@ async function suVul(v){
        eigen klok die bij de server begon, en die zou een verkeerde waarde hier
        stilletjes aan de verkeerde puzzel hangen. */
     const d = SU.dag
-      ? await api('dag-klaar', { spel:'sudoku', inzending: SU.grid })
-      : await api('sudoku-klaar', { rooster: SU.grid });
+      ? await api('/api/member/spel/dag-klaar', { spel:'sudoku', inzending: SU.grid })
+      : await api('/api/member/spel/sudoku-klaar', { rooster: SU.grid });
     if (!d.goed){
       SU.klaar = false;   // gewoon doorpuzzelen; de klok loopt door
       $('#suInfo').textContent = 'Er zit nog een foutje in. Zoek het en vul het opnieuw in.';

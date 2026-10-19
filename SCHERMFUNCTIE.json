@@ -3,7 +3,7 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-19",
-    "commit": "53b41bd4"
+    "commit": "92dab4a3"
   },
   "bronnen": {
     "schermroutes": {
@@ -2062,7 +2062,7 @@
     },
     {
       "script": "public/ds/shell.js",
-      "schermen": 26
+      "schermen": 30
     },
     {
       "script": "public/shared/adaptief/grammatica.js",
@@ -3402,7 +3402,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/",
         "/api/staff/mob/mijn",
@@ -3417,11 +3419,12 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/reizen-wereld.js",
         "public/apps/werkvloer.js",
+        "public/ds/contract.json",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel12.js"
       ]
@@ -3808,7 +3811,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/supplier/mob/"
       ],
@@ -3817,11 +3822,12 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 3,
+      "inkomend": 4,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/personeel.js",
         "public/apps/personeel/personeel-25.js",
+        "public/ds/contract.json",
         "server/kern/appgids-data/deel6b.js"
       ]
     },
@@ -7675,7 +7681,9 @@
         "supplier"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/supplier/ghost"
       ],
@@ -7684,11 +7692,12 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 3,
+      "inkomend": 4,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/leverancier.js",
         "public/apps/leverancier/leverancier-57.js",
+        "public/ds/contract.json",
         "server/kern/appgids-data/deel6b.js"
       ]
     },
@@ -9080,7 +9089,7 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 29,
+      "inkomend": 30,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -13644,7 +13653,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/supplier/mob/"
       ],
@@ -13653,10 +13664,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 3,
+      "inkomend": 4,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/kantoor.html",
+        "public/ds/contract.json",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/wereld/koppel.js"
       ]

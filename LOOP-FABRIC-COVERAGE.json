@@ -17542,7 +17542,7 @@
         "declaredMutationSemantics": 23,
         "sourceFileCount": 8,
         "kernelDependencyCount": 41,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/opzet/connectwebhook.js",
           "server/opzet/kaartwebhooks.js",
@@ -17583,7 +17583,8 @@
         "kernelDependenciesOmitted": 17,
         "screens": [
           "public/apps/geld.html",
-          "public/apps/isolatie.html"
+          "public/apps/isolatie.html",
+          "public/apps/pay.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -25612,7 +25613,7 @@
         "declaredMutationSemantics": 12,
         "sourceFileCount": 2,
         "kernelDependencyCount": 1,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/pay-tegoed.js",
           "server/routes/pay.js"
@@ -25623,7 +25624,8 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/isolatie.html"
+          "public/apps/isolatie.html",
+          "public/apps/pay.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -25712,14 +25714,16 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/pay-tegoed.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/pay.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "failure",
@@ -26783,7 +26787,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/link.js"
         ],
@@ -26792,7 +26796,9 @@
           "server/kern/link/wie.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/pay.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",

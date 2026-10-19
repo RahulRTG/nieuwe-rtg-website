@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-10-18",
-  "commit": "8df75d5a2",
+  "op": "2026-10-19",
+  "commit": "f6b7d1bc",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7820,8 +7820,8 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1028,
-  "verwijzingen": 1250,
+  "exactePaden": 1041,
+  "verwijzingen": 1266,
   "voorvoegsels": 142,
   "basisPaden": 2,
   "doodPad": 0,
@@ -7967,6 +7967,17 @@
    "aantal": 5
   },
   {
+   "pad": "/api/member/connections",
+   "schermen": [
+    "public/apps/comm.html",
+    "public/apps/geld/wbwb.js",
+    "public/apps/media/lijst.js",
+    "public/apps/pay.html",
+    "public/apps/spelen.html"
+   ],
+   "aantal": 5
+  },
+  {
    "pad": "/api/account/start",
    "schermen": [
     "public/apps/decision-room.js",
@@ -7994,16 +8005,6 @@
     "public/apps/memo/app.js",
     "public/apps/reizen-samen-delen.js",
     "public/shared/interface/personal-images.js"
-   ],
-   "aantal": 4
-  },
-  {
-   "pad": "/api/member/connections",
-   "schermen": [
-    "public/apps/comm.html",
-    "public/apps/geld/wbwb.js",
-    "public/apps/media/lijst.js",
-    "public/apps/spelen.html"
    ],
    "aantal": 4
   },
@@ -8125,6 +8126,15 @@
     "public/apps/horeca/kern.js",
     "public/apps/leverancier/leverancier-84a.js",
     "public/apps/personeel/personeel-25.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/pay/overzicht",
+   "schermen": [
+    "public/apps/isolatie.js",
+    "public/apps/pay.html",
+    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 3
   },
@@ -8552,10 +8562,10 @@
    "aantal": 2
   },
   {
-   "pad": "/api/pay/overzicht",
+   "pad": "/api/pay/stuur",
    "schermen": [
     "public/apps/isolatie.js",
-    "public/shared/interface/world-widget-data.js"
+    "public/apps/pay.html"
    ],
    "aantal": 2
   },
@@ -11494,13 +11504,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/pay/stuur",
-   "schermen": [
-    "public/apps/isolatie.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/techniek/isolatie",
    "schermen": [
     "public/apps/isolatie.js"
@@ -13223,7 +13226,98 @@
    "aantal": 1
   },
   {
+   "pad": "/api/link/cap/maak",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/login",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/oplaad",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tegoed",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tegoed/koop",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tegoed/roteer",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tegoed/terug",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tegoed/verzilver",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tik",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tikcode",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/tiks",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/verzoek",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/verzoek/betaal",
+   "schermen": [
+    "public/apps/pay.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/verzoek/intrek",
    "schermen": [
     "public/apps/pay.html"
    ],
@@ -17780,11 +17874,25 @@
   {
    "bestand": "public/apps/pay.html",
    "exact": [
-    "/api/login"
+    "/api/link/cap/maak",
+    "/api/login",
+    "/api/member/connections",
+    "/api/pay/oplaad",
+    "/api/pay/overzicht",
+    "/api/pay/stuur",
+    "/api/pay/tegoed",
+    "/api/pay/tegoed/koop",
+    "/api/pay/tegoed/roteer",
+    "/api/pay/tegoed/terug",
+    "/api/pay/tegoed/verzilver",
+    "/api/pay/tik",
+    "/api/pay/tikcode",
+    "/api/pay/tiks",
+    "/api/pay/verzoek",
+    "/api/pay/verzoek/betaal",
+    "/api/pay/verzoek/intrek"
    ],
-   "voorvoegsels": [
-    "/api/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/payroll.html",

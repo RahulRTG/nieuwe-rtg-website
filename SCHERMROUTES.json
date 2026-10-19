@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "d267186e",
+  "commit": "f9f9d229",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/foundation/os-portaal.html"
+    "public/apps/foundation/vrienden.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,16 +7822,15 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1107,
-  "verwijzingen": 1334,
-  "voorvoegsels": 141,
-  "basisPaden": 2,
+  "exactePaden": 1134,
+  "verwijzingen": 1362,
+  "voorvoegsels": 140,
+  "basisPaden": 1,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
  },
  "basisPadLijst": [
-  "/api/foundation",
-  "/api/rtf/social"
+  "/api/foundation"
  ],
  "doodPad": [],
  "nietGelezen": [],
@@ -7907,6 +7906,20 @@
    "aantal": 9
   },
   {
+   "pad": "/api/rtf/social/connections",
+   "schermen": [
+    "public/apps/foundation/arena.html",
+    "public/apps/foundation/overhoren.html",
+    "public/apps/foundation/projecten.html",
+    "public/apps/foundation/societeit.html",
+    "public/apps/foundation/vrienden.html",
+    "public/apps/spelen.html",
+    "public/shared/interface/world-desktop-home.js",
+    "public/shared/interface/world-desktop-people.js"
+   ],
+   "aantal": 8
+  },
+  {
    "pad": "/api/bestanden/mijn",
    "schermen": [
     "public/apps/boeken/app.js",
@@ -7916,19 +7929,6 @@
     "public/shared/interface/personal-image-editor.js",
     "public/shared/interface/world-widget-data.js",
     "public/shared/kluismap.js"
-   ],
-   "aantal": 7
-  },
-  {
-   "pad": "/api/rtf/social/connections",
-   "schermen": [
-    "public/apps/foundation/arena.html",
-    "public/apps/foundation/overhoren.html",
-    "public/apps/foundation/projecten.html",
-    "public/apps/foundation/societeit.html",
-    "public/apps/spelen.html",
-    "public/shared/interface/world-desktop-home.js",
-    "public/shared/interface/world-desktop-people.js"
    ],
    "aantal": 7
   },
@@ -10808,7 +10808,105 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtf/social",
+   "pad": "/api/rtf/social/block",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/call",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/connect",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/dm",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/dm/send",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/find",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/goedkeuren",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/kind/boardroom",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/kind/boardroom/zet",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/kind/contacten",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/kind/verwijder",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/opdracht",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/oudervoeg",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin/connect",
    "schermen": [
     "public/apps/foundation/vrienden.html"
    ],
@@ -10816,6 +10914,97 @@
   },
   {
    "pad": "/api/rtf/social/pin/live",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin/live/kijk",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin/live/verbind",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin/nieuw",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin/uit",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/pin/zoek",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/report",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/respond",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/snap/send",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/snap/view",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/snaps",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/stories",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/story/post",
+   "schermen": [
+    "public/apps/foundation/vrienden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/social/story/view",
    "schermen": [
     "public/apps/foundation/vrienden.html"
    ],
@@ -17005,12 +17194,39 @@
     "/api/rtf/ice",
     "/api/rtf/link/koppelingen",
     "/api/rtf/link/los",
-    "/api/rtf/social",
-    "/api/rtf/social/pin/live"
+    "/api/rtf/social/block",
+    "/api/rtf/social/call",
+    "/api/rtf/social/connect",
+    "/api/rtf/social/connections",
+    "/api/rtf/social/dm",
+    "/api/rtf/social/dm/send",
+    "/api/rtf/social/find",
+    "/api/rtf/social/goedkeuren",
+    "/api/rtf/social/kind/boardroom",
+    "/api/rtf/social/kind/boardroom/zet",
+    "/api/rtf/social/kind/contacten",
+    "/api/rtf/social/kind/verwijder",
+    "/api/rtf/social/opdracht",
+    "/api/rtf/social/oudervoeg",
+    "/api/rtf/social/pin",
+    "/api/rtf/social/pin/connect",
+    "/api/rtf/social/pin/live",
+    "/api/rtf/social/pin/live/kijk",
+    "/api/rtf/social/pin/live/verbind",
+    "/api/rtf/social/pin/nieuw",
+    "/api/rtf/social/pin/uit",
+    "/api/rtf/social/pin/zoek",
+    "/api/rtf/social/report",
+    "/api/rtf/social/respond",
+    "/api/rtf/social/snap/send",
+    "/api/rtf/social/snap/view",
+    "/api/rtf/social/snaps",
+    "/api/rtf/social/stories",
+    "/api/rtf/social/story/post",
+    "/api/rtf/social/story/view"
    ],
    "voorvoegsels": [
     "/api/rtf/",
-    "/api/rtf/social",
     "/api/rtf/social/stream?code="
    ]
   },

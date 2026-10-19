@@ -29,6 +29,9 @@
 @import url("componenten/toestel.css");
 @import url("componenten/paneel.css");
 @import url("componenten/overgang.css");
+@import url("componenten/meter.css");
+@import url("componenten/lezer.css");
+@import url("componenten/canvaslaag.css");
 @import url("schermen/cover.css");
 @import url("schermen/collectie.css");
 @import url("schermen/taak.css");

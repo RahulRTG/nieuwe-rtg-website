@@ -41,11 +41,11 @@ test('Boeken: de plank groeit met je kluis en de leesplek reist mee',
     await page.goto(base + '/apps/boeken.html', { waitUntil: 'domcontentloaded' });
 
     /* de plank: huisbibliotheek + het kluisboek */
-    await page.waitForFunction(() => document.querySelectorAll('#plank .boek').length >= 5, null, { timeout: 8000 });
+    await page.waitForFunction(() => document.querySelectorAll('#plank [data-boek]').length >= 5, null, { timeout: 8000 });
     await page.waitForFunction(() => /mijn-verhaal/.test(document.querySelector('#eigen').textContent), null, { timeout: 8000 });
 
     /* het kluisboek lezen en scrollen -> de plek wordt bewaard */
-    await page.evaluate(() => { document.querySelector('#eigen .boek').click(); });
+    await page.evaluate(() => { document.querySelector('#eigen [data-boek]').click(); });
     await page.waitForFunction(() => !document.querySelector('#leesBlok').hidden &&
       /eigen boek uit de kluis/.test(document.querySelector('#tekst').textContent), null, { timeout: 8000 });
     /* Wacht op de echte opslagbevestiging. De vaste 900 ms die hier stond kon
@@ -70,7 +70,7 @@ test('Boeken: de plank groeit met je kluis en de leesplek reist mee',
 
     /* op de plank staat de voortgang erbij, en heropenen springt terug */
     await page.waitForFunction(() => /% gelezen/.test(document.querySelector('#eigen').textContent), null, { timeout: 8000 });
-    await page.evaluate(() => { document.querySelector('#eigen .boek').click(); });
+    await page.evaluate(() => { document.querySelector('#eigen [data-boek]').click(); });
     await page.waitForFunction(() => !document.querySelector('#leesBlok').hidden &&
       document.querySelector('#tekst').scrollTop > 50, null, { timeout: 8000 });
 

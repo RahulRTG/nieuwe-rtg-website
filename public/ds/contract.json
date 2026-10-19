@@ -36,7 +36,10 @@
     "melding",
     "toestel",
     "paneel",
-    "overgang"
+    "overgang",
+    "meter",
+    "lezer",
+    "canvaslaag"
   ],
   "themabaar": [
     "--ds-grond",
@@ -150,6 +153,9 @@
     "public/apps/reisbureau.html": "test/reisbureau-ds.e2e.js",
     "public/apps/vluchten.html": "test/vluchten-ds.e2e.js",
     "public/apps/reisboek.html": "test/reisboek-ds.e2e.js",
+    "public/apps/residentie.html": "test/residentie-ds.e2e.js",
+    "public/apps/boeken.html": "test/boeken-ds.e2e.js",
+    "public/apps/stad.html": "test/stad-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

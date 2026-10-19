@@ -3,8 +3,8 @@
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
     "bladen": 172,
-    "schermenMetStijlblok": 282,
-    "important": 7618
+    "schermenMetStijlblok": 279,
+    "important": 7615
   },
   "uitzonderingen": [],
   "bladen": {
@@ -983,12 +983,6 @@
       "bytes": 542,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/boeken.html": {
-      "blokken": 1,
-      "bytes": 3009,
-      "important": 1,
-      "hex": 4
     },
     "public/apps/browser.html": {
       "blokken": 2,
@@ -2232,12 +2226,6 @@
       "important": 2,
       "hex": 0
     },
-    "public/apps/residentie.html": {
-      "blokken": 2,
-      "bytes": 8333,
-      "important": 2,
-      "hex": 18
-    },
     "public/apps/rijksloket.html": {
       "blokken": 3,
       "bytes": 7866,
@@ -2369,12 +2357,6 @@
       "bytes": 6274,
       "important": 0,
       "hex": 5
-    },
-    "public/apps/stad.html": {
-      "blokken": 2,
-      "bytes": 4088,
-      "important": 0,
-      "hex": 6
     },
     "public/apps/stadsdoos.html": {
       "blokken": 2,

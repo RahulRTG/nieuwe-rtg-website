@@ -28,12 +28,12 @@
     if (P) return meld('Er loopt al een potje.');
     const anderen = [...S.leden.values()].filter(l => l.codenaam !== S.ik);
     if (!anderen.length) return meld('U bent hier nog alleen; nodig iemand uit via de gids of uw telefoon.');
-    $('#spelKeuze').innerHTML = '<h2>Wie daagt u uit?</h2><div class="sub">' +
-      esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</div>' +
-      anderen.map(l => '<button class="rij-item" data-daag="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">daag uit</span></button>').join('') +
-      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
-    $('#spelLaag').classList.add('open');
-    $('#spelKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Wie daagt u uit?</h2><p class="ds-meta">' +
+      esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</p>' +
+      anderen.map(l => '<button class="ds-veld" data-daag="' + esc(l.codenaam) + '">' + RIJICOON + '<span><span class="ds-veld__label">' + esc(l.codenaam) + '</span></span><span class="ds-meta">daag uit</span></button>').join('') +
+      '<button class="ds-knop ds-knop--stil ds-knop--breed" id="spelKeuzeWeg" type="button">Toch niet</button>';
+    laagOpen('#spelLaag');
+    $('#spelKeuzeWeg').addEventListener('click', () => laagDicht('#spelLaag'));
     $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', () => kiesSpel(b.dataset.daag)));
   });
 
@@ -41,7 +41,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
-    $('#spelPin').parentElement.style.opacity = (TIK[P.spel] || VRIJ[P.spel]) ? '0.25' : '1';
+    $('#spelPin').toggleAttribute('data-rust', !!(TIK[P.spel] || VRIJ[P.spel]));
     tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
@@ -53,14 +53,14 @@
           P.spelers.filter(s2 => s2.team === t).reduce((a, s2) => a + s2.punten.reduce((x, y) => x + y, 0), 0)).join(' tegen ')
       : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(P.samen ? ' en ' : ' tegen ');
     $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
-      '<span style="color:var(--rtg-leesgoud,var(--gold));"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
+      '<span> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
     $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
   }
   function meterLus(t) {
     if (!P) { meterAan = false; return; }
     requestAnimationFrame(meterLus);
     meterWaarde = Math.round((Math.sin(t / 260) * 0.5 + 0.5) * 100);
-    $('#spelPin').style.left = meterWaarde + '%';
+    $('#spelPin').value = String(meterWaarde);
   }
   $('#spelDoe').addEventListener('click', async () => {
     if (!P) return;
@@ -113,16 +113,16 @@
     if (d.uitslag) {
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
       const w = d.uitslag.winnaar;
-      $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
-        '<div class="sub">' + (d.uitslag.samen
+      $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
+        '<p class="ds-meta">' + (d.uitslag.samen
           ? esc(namen[0]) + ' · samen ' + d.uitslag.stand[0] + ' ' + (P ? esc(P.eenheid) : '')
-          : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</div>' +
-        '<p style="margin:0.5rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
+          : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</p>' +
+        '<p class="ds-kaart__titel">' +
         (d.uitslag.samen ? 'Wat een paar. De vloer was van u.'
           : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
-        '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
-      $('#spelLaag').classList.add('open');
-      $('#spelUitslagWeg').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); sceneDicht(); });
+        '<button class="ds-knop ds-knop--primair ds-knop--breed" id="spelUitslagWeg" type="button">Verder</button>';
+      laagOpen('#spelLaag');
+      $('#spelUitslagWeg').addEventListener('click', () => { laagDicht('#spelLaag'); sceneDicht(); });
       P = null; $('#spelBalk').hidden = true;
       return;
     }
@@ -131,19 +131,19 @@
 
   function spelSein(d) {
     if (d.kind === 'spel-uitnodiging') {
-      $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
-        '<div class="sub">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
-        '<button class="knop2 h-flex1" id="spelJa" type="button">Graag</button>' +
-        '<button class="knop2 stil2 h-flex1" id="spelNee" type="button">Nu even niet</button></div>';
-      $('#spelLaag').classList.add('open');
+      $('#spelKeuze').innerHTML = '<h2 class="ds-titel ds-titel--scherm">Een uitnodiging</h2>' +
+        '<p class="ds-meta">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</p>' +
+        '<div class="ds-dialoog__acties">' +
+        '<button class="ds-knop ds-knop--primair" id="spelJa" type="button">Graag</button>' +
+        '<button class="ds-knop ds-knop--stil" id="spelNee" type="button">Nu even niet</button></div>';
+      laagOpen('#spelLaag');
       $('#spelJa').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { const r = await api('/api/residentie/spel/antwoord', { ja: true }); if (r.potje) startPotje(r.potje); }
         catch (e) { meld(e.message); }
       });
       $('#spelNee').addEventListener('click', async () => {
-        $('#spelLaag').classList.remove('open');
+        laagDicht('#spelLaag');
         try { await api('/api/residentie/spel/antwoord', { ja: false }); } catch (e) {}
       });
     }

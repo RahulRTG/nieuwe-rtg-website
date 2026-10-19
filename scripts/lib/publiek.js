@@ -231,7 +231,7 @@ const PUBLIEK = new Map([
   ['/api/rtfos/portaal/deelnemer/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
   ['/api/rtfos/portaal/donateur', 'de gever op zijn eigen code (RTFS-): alleen zijn eigen giften en waar ze heen gingen, nooit wie er nog meer gaf. Twee remmen, per bron en per code'],
   ['/api/rtfos/portaal/donateur/bewijs', 'idem: het giftbewijs voor een van zijn eigen giften'],
-  ['/api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatieplicht: een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers'],
+  ['/api/rtfos/publiek/jaarverslagen', 'eigenaarsbesluit 19 oktober 2026, uitzondering 7: de wettelijke ANBI-publicatieplicht; een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers, en niets ernaast'],
 
   // ---- publieke informatie: staat ook gewoon op de site ----
   ['/api/pasprijzen', 'de prijslijst is publieke informatie'],

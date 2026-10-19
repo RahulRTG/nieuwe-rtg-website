@@ -18,6 +18,13 @@
   'use strict';
   if (w.RTGDs) return;
   d.documentElement.setAttribute('data-ds', '1');
+  /* Ingebed (een blad van de werktafel, een iframe, ?embed=1): de buitenste
+     schil heeft al een Edge en een kop; dit scherm tekent er dan geen tweede
+     (EDGE.md, zelfde regel als rtg-edge-system.js). Vroeg gezet, zodat de kop
+     niet eerst verschijnt en dan wegvalt. */
+  var ingebed = false;
+  try { ingebed = w.self !== w.top; } catch (e) { ingebed = true; }
+  if (ingebed || /(?:^|[?&])embed=1(?:&|$)/.test(w.location.search || '')) d.documentElement.classList.add('ds-ingebed');
 
   var ICONEN = {
     home: '<path d="M3 11.5 12 4l9 7.5M5.5 10v10h13V10M9 20v-6h6v6"/>',

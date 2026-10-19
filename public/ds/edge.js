@@ -80,6 +80,7 @@
 
   function maak() {
     if (edge || d.body.hasAttribute('data-ds-geen-edge')) return;
+    if (d.documentElement.classList.contains('ds-ingebed')) return; // shell.js: ingebed, de buitenste schil heeft de Edge
     edge = el('div', 'ds-edge');
     blad = el('section', 'ds-edge__blad', { id: 'dsEdgeBlad', role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'dsEdgeBladTitel' });
     blad.hidden = true;

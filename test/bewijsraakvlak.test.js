@@ -264,3 +264,17 @@ test('de echte boom: de kern is vast te stellen, en elke regel in DYNAMISCH is n
   for (const p of ['server/server.js', 'server/opzet/routes.js']) assert.ok(g.bestanden.has(p), p);
   assert.ok([...g.bestanden].some((p) => p.startsWith('server/middleware/')));
 });
+
+test('het register van de hashes hoort aantoonbaar bij APPWERKT.json, anders tellen ze niet', () => {
+  const st = { op: '2026-10-19T00:00:00Z', commit: 'abc1234' };
+  const hashes = { 'server/a.js': 'a'.repeat(64), 'public/b.js': 'b'.repeat(64) };
+  const appwerkt = { stempel: st, raakvlak: R.verwijzing(st, hashes) };
+  assert.equal(appwerkt.raakvlak.hashes, undefined, 'de hashes staan niet in APPWERKT.json zelf');
+  assert.deepEqual(R.hashesVoor(appwerkt, R.register(st, hashes)).hashes, hashes);
+  /* Een register van een andere meting, of met een hash erbij of eraf. */
+  assert.equal(R.hashesVoor(appwerkt, R.register(Object.assign({}, st, { commit: 'fff0000' }), hashes)).hashes, null);
+  const geknoeid = R.register(st, hashes);
+  geknoeid.hashes['server/a.js'] = 'c'.repeat(64);
+  assert.equal(R.hashesVoor(appwerkt, geknoeid).hashes, null);
+  assert.equal(R.hashesVoor(appwerkt, null).hashes, null);
+});

@@ -760,5 +760,38 @@ function controleer(w, rec, opgeslagen, ingang, grof) {
   return { stand: 'VERS', vers: true, oorzaak: [], reden: 'geen van de ' + r.alle.size + ' bestanden in het raakvlak gewijzigd sinds ' + rec.commit };
 }
 
-module.exports = { maakWereld, raakvlak, versheidVoor, controleer, hashes, verschil, gedeeld, schermDeel, apiPaden,
+/* ---- HET REGISTER VAN DE HASHES ---------------------------------------------
+   De hashes per bestand staan in een eigen register naast APPWERKT.json, met
+   hetzelfde stempel; APPWERKT.json draagt alleen de verwijzing met de
+   samengestelde hash over het hele register. Zo blijft APPWERKT.json leesbaar
+   en klein in een diff, en kan het ene niet stil met het andere uiteenlopen:
+   een ander stempel of een andere samengestelde hash, en de hashes tellen als
+   ontbrekend -- elk bewijs is dan ONGELDIG, nooit vers. */
+const REGISTER = 'APPWERKT-RAAKVLAK.json';
+const REGISTER_PAD = path.join(WORTEL, REGISTER);
+const overAlles = (hashes) => samen(Object.keys(hashes), (p) => hashes[p]);
+function register(st, hashes) {
+  return { soort: 'meting',
+    uitleg: 'Per bestand dat in het raakvlak van een bewijs in APPWERKT.json zit, de sha256 van zijn inhoud op het moment van de meting (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i). Wordt alleen samen met APPWERKT.json geschreven, door scripts/appwerkt.js.',
+    stempel: st, bestanden: Object.keys(hashes).length, samen: overAlles(hashes), hashes };
+}
+function verwijzing(st, hashes) {
+  return { uitleg: 'Een bewijs is vers zolang geen bestand in zijn raakvlak veranderde sinds de commit waarop het gemeten is. Is het raakvlak niet vast te stellen, dan beslist de grove regel van versheid().',
+    hoe: 'npm run appwerkt:vers  (--controle zakt als een rij die als 8/8 geldt een bewijs heeft dat niet vers is)',
+    register: REGISTER, bestanden: Object.keys(hashes).length, samen: overAlles(hashes) };
+}
+/* De hashes die bij dit APPWERKT.json horen, of null met de reden. */
+function hashesVoor(appwerkt, raakvlakRegister) {
+  const v = appwerkt && appwerkt.raakvlak;
+  if (!v) return { hashes: null, reden: 'APPWERKT.json draagt nog geen raakvlak' };
+  if (v.hashes) return { hashes: v.hashes, reden: null };   // een register waarin ze nog meestonden
+  const r = raakvlakRegister;
+  if (!r || !r.hashes) return { hashes: null, reden: REGISTER + ' ontbreekt' };
+  const a = appwerkt.stempel || {}, b = r.stempel || {};
+  if (a.op !== b.op || a.commit !== b.commit) return { hashes: null, reden: REGISTER + ' hoort bij een andere meting (' + b.commit + ' ' + b.op + ')' };
+  if (overAlles(r.hashes) !== v.samen || r.samen !== v.samen) return { hashes: null, reden: 'de samengestelde hash van ' + REGISTER + ' klopt niet met APPWERKT.json' };
+  return { hashes: r.hashes, reden: null };
+}
+
+module.exports = { register, verwijzing, hashesVoor, REGISTER, REGISTER_PAD, maakWereld, raakvlak, versheidVoor, controleer, hashes, verschil, gedeeld, schermDeel, apiPaden,
   handlers, instrumentDeel, kanten, samen, DYNAMISCH, SCENARIOMAP };

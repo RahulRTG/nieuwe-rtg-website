@@ -648,11 +648,14 @@ uit een blob. `test/bewijsraakvlak.test.js` legt elke tak vast, en is met vier
 mutaties nagetrokken: geen wijziging zien, geen gedeelde kern, onbepaald als
 vers, en geen controle per bestand. Alle vier gaan rood.
 
-**Knoeien.** `APPWERKT.json` bewaart per bestand een sha256 (`raakvlak.hashes`),
-en elk bewijs zijn samengestelde hash (`raakvlak` in het bewijs). Bij de controle
-moet de huidige inhoud gelijk zijn aan de bewaarde hash én aan de inhoud op de
-meetcommit (de blob-id van git). Er zijn drie manieren om te knoeien, en geen
-ervan maakt iets vers:
+**Knoeien.** De sha256 per bestand staat in een eigen register,
+`APPWERKT-RAAKVLAK.json`, met hetzelfde stempel als `APPWERKT.json`; dat draagt
+alleen de verwijzing met een samengestelde hash over dat register, en elk bewijs
+zijn eigen samengestelde hash (`raakvlak` in het bewijs). Hoort het register niet
+aantoonbaar bij deze meting (ander stempel, andere samengestelde hash), dan tellen
+de hashes als ontbrekend. Bij de controle moet de huidige inhoud gelijk zijn aan
+de bewaarde hash én aan de inhoud op de meetcommit (de blob-id van git). Er zijn
+drie manieren om te knoeien, en geen ervan maakt iets vers:
 
 - een hash bijwerken naar nieuwe code: dan is het bewijs `VERVALLEN`;
 - een hash veranderen terwijl de code gelijk bleef: dan is het `ONGELDIG`;
@@ -662,9 +665,14 @@ Wat dit niet afvangt, en ook niet kan: wie de commit in het stempel vervalst,
 vervalst de meting zelf.
 
 **Voortdurend.** `npm run appwerkt:vers` meldt zonder browser per app en per
-bewijs wat vervallen is en door welk bestand, in ongeveer tien seconden. `npm run
-appwerkt:vers:controle` zakt zodra een rij die als 8/8 geldt een bewijs heeft dat
-niet vers is.
+bewijs wat vervallen is en door welk bestand, in ongeveer twintig seconden. `npm
+run appwerkt:vers:controle` zakt zodra een rij die als 8/8 geldt een bewijs heeft
+dat niet vers is, en die controle is een stap van de **releasepoort**
+(`scripts/release-gate.js`, stap `APPWERKT-versheid`;
+`test/appwerkt-vers-releasepoort.test.js` laat hem zakken). Niet van `npm run
+check`: die draait bij elke commit en zou na elke wijziging in de gedeelde kern
+rood staan tot de volgende meetronde. Check meldt het getal wel (regel 77), en
+velt niet.
 
 **Gemeten op de geschiedenis** (19 oktober 2026). Van de laatste 88 commits die
 `server/` of `public/` raakten, maakte de grove regel er 88 alles oud. Op het

@@ -50,7 +50,8 @@ function grofStempel(register, b) {
 function beoordeel(register, opties = {}) {
   const w = opties.wereld || R.maakWereld({ wortel: opties.wortel });
   const grof = opties.grof || versheid;
-  const H = (register.raakvlak && register.raakvlak.hashes) || null;
+  const gekoppeld = R.hashesVoor(register, opties.raakvlakRegister);
+  const H = gekoppeld.hashes;
   const rijen = [];
   for (const r of register.regels || []) {
     const per = {};
@@ -83,18 +84,26 @@ function beoordeel(register, opties = {}) {
     const k = b.stand === 'GROF' ? (b.vers ? 'GROF_VERS' : 'GROF_OUD') : b.stand;
     telling[k] = (telling[k] || 0) + 1;
   }
-  return { rijen, telling, achtOpAcht: achtOpAcht.length, gezakt };
+  return { rijen, telling, achtOpAcht: achtOpAcht.length, gezakt, hashesReden: gekoppeld.reden };
 }
 
 if (require.main === module) {
   const arg = new Set(process.argv.slice(2));
-  const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'APPWERKT.json'), 'utf8'));
-  const u = beoordeel(reg);
+  /* --register PAD (en --raakvlak PAD): een ander register beoordelen, voor de
+     toets van de poort. Standaard het register in de wortel. */
+  const waarde = (naam) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : null; };
+  const pad = waarde('--register') || path.join(WORTEL, 'APPWERKT.json');
+  const rvPad = waarde('--raakvlak') || (waarde('--register') ? null : R.REGISTER_PAD);
+  const reg = JSON.parse(fs.readFileSync(pad, 'utf8'));
+  let rv = null;
+  try { rv = rvPad ? JSON.parse(fs.readFileSync(rvPad, 'utf8')) : null; } catch (e) { rv = null; }
+  const u = beoordeel(reg, { raakvlakRegister: rv });
   if (arg.has('--json')) {
     process.stdout.write(JSON.stringify({ telling: u.telling, achtOpAcht: u.achtOpAcht, gezakt: u.gezakt.map((r) => r.app), rijen: u.rijen }, null, 1) + '\n');
   } else {
     console.log('APPWERKT:VERS -- register gemeten op ' + (reg.stempel && reg.stempel.commit) + ' (' + (reg.stempel && reg.stempel.op) + ')');
     if (!reg.raakvlak) console.log('  het register draagt nog geen raakvlak; elk bewijs valt terug op de grove regel tot de volgende meting');
+    else if (u.hashesReden) console.log('  LET OP: ' + u.hashesReden + '; elk bewijs met een raakvlak telt daardoor als ONGELDIG');
     for (const r of u.rijen) {
       const regels = Object.entries(r.bewijzen).filter(([, b]) => arg.has('--alle') || !b.vers);
       if (!regels.length) continue;

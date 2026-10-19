@@ -837,9 +837,10 @@ function legRaakvlakken(regels, st) {
   return raakvlakken.hashes(w);
 }
 
+let laatsteHashes = null;
 function bouw(meting) {
   const st = stempel();
-  const hashes = legRaakvlakken(meting.regels, st);
+  const hashes = laatsteHashes = legRaakvlakken(meting.regels, st);
   const telling = {};
   for (const r of meting.regels) telling[r.status] = (telling[r.status] || 0) + 1;
   const perBewijs = {};
@@ -863,13 +864,12 @@ function bouw(meting) {
       NIET_GETEST: 'deze ronde niet aangeraakt, met de reden erbij'
     },
     stempel: st,
-    /* Het raakvlak (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i): per
-       bestand dat in een raakvlak van een bewijs hieronder zit, de sha256 van
-       zijn inhoud. Elk bewijs draagt zijn eigen samengestelde hash in
-       `raakvlak`; npm run appwerkt:vers legt beide naast de boom van nu. */
-    raakvlak: { uitleg: 'Een bewijs is vers zolang geen bestand in zijn raakvlak veranderde sinds de commit waarop het gemeten is. Is het raakvlak niet vast te stellen, dan beslist de grove regel van versheid().',
-      hoe: 'npm run appwerkt:vers  (--controle zakt als een rij die als 8/8 geldt een vervallen bewijs heeft)',
-      bestanden: Object.keys(hashes).length, hashes },
+    /* Het raakvlak (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i):
+       de sha256 per bestand staat in APPWERKT-RAAKVLAK.json, met hetzelfde
+       stempel, zodat dit register leesbaar blijft. Hier staat de verwijzing met
+       de samengestelde hash over die hashes; elk bewijs draagt zijn eigen
+       samengestelde hash in `raakvlak`. */
+    raakvlak: raakvlakken.verwijzing(st, hashes),
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
     /* DE MACHINE STAAT ERBIJ. Deze proef tikt met een tijdslimiet, en op een
        machine die drie keer meer werk heeft dan kernen loopt een gezonde tik
@@ -1019,7 +1019,10 @@ if (require.main === module) (async () => {
     process.exit(0);
   }
   const uit = bouw(await meet());
-  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) {
+    fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+    fs.writeFileSync(raakvlakken.REGISTER_PAD, JSON.stringify(raakvlakken.register(uit.stempel, laatsteHashes), null, 1) + '\n');
+  }
   log('\nAPPWERKT: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);
   process.exit(0);

@@ -92,30 +92,38 @@ function vastleggen({ fs, WORTEL }, uit) {
   console.log('\nvastgelegd in VOLTOOIPROEF.json (losModus per app, losStempel)');
 }
 
+const label = (v) => v === 'LOS-KERN' ? 'LOS-KERN (kern LOS; isolatiebewijs vraagt SAMEN)' : v;
+function toonApp(r) {
+  console.log('\n### ' + r.app + '  ->  ' + label(r.verdict) + (r.primair ? '  (eigen categorie: ' + r.primair + ')' : '  (volledig op de bodem)'));
+  if (r.fout) { console.log('   ' + r.fout); return; }
+  if (r.andereCats && r.andereCats.length) console.log('   raakt ook (nu uit): ' + r.andereCats.join(', '));
+  if (r.afgebroken) console.log('   AFGEBROKEN bij de opbouw: ' + r.afgebroken);
+  for (const s of (r.open || [])) {
+    console.log('   ' + s.stand + ': [' + s.bewijs + '] ' + s.wat);
+    if (s.leunt) console.log('      leunt op: ' + s.leunt.join('; '));
+    if (s.fout) console.log('      fout: ' + s.fout);
+    else if (s.ziet) console.log('      zag: ' + s.ziet);
+  }
+  console.log('   (' + r.stappen + ' stappen, ' + (r.open ? r.open.length : 0) + ' open/stuk)');
+}
+
 async function main({ fs, WORTEL }) {
   const argv = process.argv.slice(2);
   const alleen = (argv.find((a) => a.startsWith('--app=')) || '').slice(6);
   const apps = alleen ? alleen.split(',') : P.KERN;
   const uit = [];
+  /* Per app meteen tonen (en flushen): een brede sweep die halverwege wordt
+     afgekapt, laat zo alles achter wat al gemeten is in plaats van niets. */
   for (const app of apps) {
+    let r;
     let sc; try { sc = require(path.join(WORTEL, 'scripts', 'lib', 'voltooi', app)); }
-    catch (e) { uit.push({ app, verdict: 'GEEN_SCENARIO', fout: String((e && e.message) || e) }); continue; }
-    try { uit.push(await meetApp(app, sc, { fs, WORTEL })); }
-    catch (e) { uit.push({ app, verdict: 'OMGEVALLEN', fout: String((e && e.stack) || e).slice(0, 500) }); }
-  }
-  const label = (v) => v === 'LOS-KERN' ? 'LOS-KERN (kern LOS; isolatiebewijs vraagt SAMEN)' : v;
-  for (const r of uit) {
-    console.log('\n### ' + r.app + '  ->  ' + label(r.verdict) + (r.primair ? '  (eigen categorie: ' + r.primair + ')' : '  (volledig op de bodem)'));
-    if (r.fout) { console.log('   ' + r.fout); continue; }
-    if (r.andereCats && r.andereCats.length) console.log('   raakt ook (nu uit): ' + r.andereCats.join(', '));
-    if (r.afgebroken) console.log('   AFGEBROKEN bij de opbouw: ' + r.afgebroken);
-    for (const s of (r.open || [])) {
-      console.log('   ' + s.stand + ': [' + s.bewijs + '] ' + s.wat);
-      if (s.leunt) console.log('      leunt op: ' + s.leunt.join('; '));
-      if (s.fout) console.log('      fout: ' + s.fout);
-      else if (s.ziet) console.log('      zag: ' + s.ziet);
+    catch (e) { r = { app, verdict: 'GEEN_SCENARIO', fout: String((e && e.message) || e) }; }
+    if (!r) {
+      try { r = await meetApp(app, sc, { fs, WORTEL }); }
+      catch (e) { r = { app, verdict: 'OMGEVALLEN', fout: String((e && e.stack) || e).slice(0, 500) }; }
     }
-    console.log('   (' + r.stappen + ' stappen, ' + (r.open ? r.open.length : 0) + ' open/stuk)');
+    uit.push(r);
+    toonApp(r);
   }
   console.log('\nsamenvatting: ' + uit.map((r) => r.app + '=' + r.verdict).join('  '));
   if (argv.includes('--vastleggen')) vastleggen({ fs, WORTEL }, uit);

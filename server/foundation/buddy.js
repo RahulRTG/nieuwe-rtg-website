@@ -9,6 +9,9 @@ module.exports = (ctx) => {
 /* De coachdata (prompts, persona's, leeftijdslaag, tips en kaarten) staat
    als pure data in een deelmodule. */
 const { HULP_SYS, HULP_DEMO, AI_KINDS, BUDDY, LEEFTIJD, BESPAARTIPS, GESPREKSKAARTEN } = require('./buddy/coachdata');
+const { niveauVan } = require('../kern/zorgniveau');
+// de soorten waarin ook een vraag over medicatie of diagnose naar een behandelaar gaat
+const ZORGSOORTEN = ['hulp', 'gezondheid', 'baby', 'steun', 'gevoel'];
 
 function kiesBuddy(g) { return BUDDY[g] || BUDDY.vrouw; }
 function buddySys(kind, g) {
@@ -32,6 +35,15 @@ router.post('/hulp/ai', async (req, res) => {
     .map(m => ({ role: m.role, content: m.content.slice(0, 1500) })).slice(-10);
   while (clean.length && clean[0].role !== 'user') clean.shift();
   if (!clean.length) return res.json({ text: HULP_DEMO[kind] });
+  /* DE GRENS IS CODE EN GEEN PROMPT (kern/zorgniveau.js). Een crisiszin krijgt
+     in elke soort de weg naar hulp en gaat niet naar het model; bij de
+     zorgsoorten ook een vraag over medicatie of diagnose (test/hulpwijzer-grens.test.js). */
+  const grens = niveauVan(clean.filter(m => m.role === 'user').map(m => m.content).join('\n'));
+  if (!grens.mag && (grens.reden === 'crisis' || ZORGSOORTEN.includes(kind))) {
+    const e = grens.escalatie;
+    return res.json({ text: [e.kop + '.', e.tekst].concat(e.wegen.map(w => w.naam + ': ' + w.hoe)).join('\n'),
+      grens: { niveau: grens.niveau, reden: grens.reden, wegen: e.wegen } });
+  }
   if (!anthropic) return res.json({ text: HULP_DEMO[kind], demo: true });
   try {
     const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 420, system: buddySys(kind, req.body.buddy) + leeftijdInstr(req.body.groep), messages: clean });

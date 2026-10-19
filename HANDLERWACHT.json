@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-19T12:05:23.491Z",
-  "commit": "e04b77ec",
-  "boomVuil": false,
-  "boomAnders": 3,
+  "op": "2026-10-19T15:28:55.697Z",
+  "commit": "2d9876e4",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -1658,7 +1658,7 @@
   },
   {
    "sleutel": "POST /api/foundation/hulp/ai",
-   "bestand": "server/foundation/buddy.js:27",
+   "bestand": "server/foundation/buddy.js:30",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },

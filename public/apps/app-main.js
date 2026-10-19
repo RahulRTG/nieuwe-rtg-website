@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '330b2d45';
+var RTG_BOUW = '10fced1a';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -6283,6 +6283,7 @@ var RTG_BOUW = '330b2d45';
             '<b>' + T('as.mijn','Mijn positie') + ':</b> ' + p.tickets + ' ' + T('as.tickets','tickets') + ' (' + p.access + ' Access · ' + p.asset + ' Asset)' + (p.tickets ? ' · ' +
             '<b style="color:var(--gold-bright,#C99A2E);">' + p.dagenTegoed + '</b> ' + T('as.dagen','x 24 uur over dit jaar') + ' · ' + T('as.geldig','geldig tot') + ' ' + p.vervaltOp : '') +
             (p.asset ? '<br>' + T('as.uitstapw','Uitstapwaarde vandaag') + ': <b>' + eur(p.uitstapWaarde) + '</b>' : '') +
+            (p.herroepLoopt ? '<br>' + T('as.herloopt','Terugbetaling loopt voor') + ' ' + p.herroepLoopt + ' ' + T('as.herloopt2','ticket(s); u hoort het zodra de bank haar bevestigt.') : '') +
             ((p.terugkoopOnderweg||[]).length ? '<br>' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
             (p.gepland.length ? '<br>' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
             '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
@@ -6319,9 +6320,15 @@ var RTG_BOUW = '330b2d45';
           T('as.akk4','Gaat u akkoord?'))) return;
         body.akkoord = true;
       }
+      // een herhaalsleutel per aanvraag: een dubbeltik of een herhaling na een
+      // afgebroken verbinding wordt geen tweede aanvraag
+      const vorm = body.assetId + '|' + body.smaak + '|' + aantal;
+      if (b.dataset.idemVorm !== vorm){ b.dataset.idem = RTGId('assetkoop'); b.dataset.idemVorm = vorm; }
+      body.idem = b.dataset.idem;
       try {
         const r = await API.call('/asset/koop', body);
-        toast('' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
+        delete b.dataset.idemVorm;
+        toast(T('as.aanvraag','Uw aanvraag staat. Een mens van RTG beoordeelt hem; er is nog niets afgeschreven en er is nog geen ticket.') + ' ' + eur(r.aanvraag.totaal));
         renderAssets();
       } catch(e){ toast(e.message); }
     }));
@@ -6329,10 +6336,34 @@ var RTG_BOUW = '330b2d45';
       try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
+/* RTG Shared Assets: een koop is een aanvraag (kern/assets/aanvraag.js). Het lid
+   ziet hier wat er met zijn aanvraag gebeurt, betaalt pas na goedkeuring, en
+   hoort pas van tickets als de betaling bevestigd is. */
+    let aanvragen = [];
+    try { aanvragen = (await API.call('/asset/aanvragen')).aanvragen || []; } catch(e){}
+    const open = aanvragen.filter(x => ['aangevraagd', 'goedgekeurd', 'betaling-loopt'].includes(x.status));
+    const STAND = { aangevraagd: T('as.st.aan','wacht op de beoordeling door een mens van RTG; er is niets afgeschreven'),
+      goedgekeurd: T('as.st.goed','goedgekeurd; betaal om uw tickets te krijgen'),
+      'betaling-loopt': T('as.st.loopt','de betaling wacht op bevestiging; uw tickets komen pas daarna') };
+    if (open.length) el.insertAdjacentHTML('afterbegin', '<div class="live-start h-mt80"><div class="lh">' + T('as.aanvragen','Mijn aanvragen') + '</div>' +
+      open.map(x => '<div class="ld" style="margin-top:0.5rem;">' + esc(x.assetNaam) + ' · ' + x.aantal + ' ' + esc(x.smaak) + ' · ' + eur(x.totaal) + '<br>' + esc(STAND[x.status] || x.status) +
+        '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.4rem;">' +
+        (x.status !== 'aangevraagd' ? '<button class="live-go js-asbetaal" data-id="' + esc(x.id) + '" style="margin-top:0;">' + T('as.betaal','Betaal') + ' ' + eur(x.totaal) + '</button>' : '') +
+        (x.status !== 'betaling-loopt' ? '<button class="mo-code js-asintrek" data-id="' + esc(x.id) + '">' + T('as.intrek','Trek in') + '</button>' : '') +
+        '</div></div>').join('') + '</div>');
+    el.querySelectorAll('.js-asbetaal').forEach(b => b.addEventListener('click', async () => {
+      if (!b.dataset.idem) b.dataset.idem = RTGId('assetbetaal');
+      try { await API.call('/asset/aanvraag/betaal', { id: b.dataset.id, idem: b.dataset.idem }); toast(T('as.betaald','Betaald en bevestigd. Uw tickets staan klaar; u heeft 14 dagen bedenktijd.')); renderAssets(); }
+      catch(e){ delete b.dataset.idem; toast(e.message); renderAssets(); }
+    }));
+    el.querySelectorAll('.js-asintrek').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/asset/herroep', { id: b.dataset.id }); toast(r.let); renderAssets(); }
+      catch(e){ toast(e.message); }
+    }));
 /* een asset herroepen binnen de bedenktijd */
     el.querySelectorAll('.js-asherroep').forEach(b => b.addEventListener('click', async () => {
-      if (!window.confirm(T('as.herroepvraag','Herroepen binnen de bedenktijd? U krijgt de volledige koopsom') + ' (' + eur(Number(b.dataset.p)) + ') ' + T('as.herroepvraag2','terug via een Tik.'))) return;
-      try { const r = await API.call('/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + T('as.herroepok','Herroepen. De Tik van') + ' ' + eur(r.terug) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      if (!window.confirm(T('as.herroepvraag','Herroepen binnen de bedenktijd? De volledige koopsom') + ' (' + eur(Number(b.dataset.p)) + ') ' + T('as.herroepvraag2','gaat terug naar de rekening waarmee u betaalde.'))) return;
+      try { const r = await API.call('/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + r.let); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asdoc').forEach(b => b.addEventListener('click', async () => {

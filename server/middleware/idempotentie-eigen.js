@@ -47,7 +47,9 @@ const EIGEN = [
   '/api/theater/reactie',
   '/api/thuis/huis',
   '/api/rtf/bericht',
-  '/api/groothandel/bestel'
+  '/api/groothandel/bestel',
+  '/api/asset/koop',
+  '/api/asset/aanvraag/betaal'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

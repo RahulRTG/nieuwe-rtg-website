@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-10-18T19:50:29.476Z",
-  "commit": "8f7e59c7c",
-  "boomVuil": false,
+  "op": "2026-10-19T08:09:57.016Z",
+  "commit": "7ac399929",
+  "boomVuil": true,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5398,
+  "totaal": 5402,
   "geclassificeerd": 5373,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1298,
-   "LEGACY_PENDING_CLASSIFICATION": 25,
+   "LEGACY_PENDING_CLASSIFICATION": 29,
    "PROTECTED": 705,
    "INTENTIONALLY_NON_IDEMPOTENT": 206
   },
   "vastgesteldDoorMens": 2261,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4438,
+   "AUTHENTICATED": 4442,
    "PUBLIC": 142,
    "OBJECT_SCOPED": 785,
    "(niet af te leiden -- vraagt een verklaring)": 17,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 251
+   "niet gemeten": 255
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -3143,6 +3143,44 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "asset.aanvraag.betaal",
+   "route": "POST /api/asset/aanvraag/betaal",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "asset.aanvragen",
+   "route": "POST /api/asset/aanvragen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "asset.document",
@@ -60294,6 +60332,44 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.asset.aanvraag.beslis",
+   "route": "POST /api/office/asset/aanvraag/beslis",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "office.asset.aanvragen",
+   "route": "POST /api/office/asset/aanvragen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "office.asset.fees",

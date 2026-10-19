@@ -30,14 +30,15 @@
    wordt beproefd. Een backend die iets VERKEERDS antwoordt in plaats van niets,
    wordt hier niet betrapt (de grens van scripts/lib/schermleugen.js).
 
-   DE TWEEDE RONDE: EEN VOORSPELLING ALS FEIT (19 oktober 2026). Elke rij gaat
+   DE TWEEDE RONDE: MEER BEWEREN DAN DE BRON (19 oktober 2026). Elke rij gaat
    daarna nog een keer open, met dezelfde persona, tegen een server die de
-   waarheid zegt. Krijgt het scherm een onzekere uitkomst -- een vooruitblik,
-   een doorrekening, een schatting; zie scripts/lib/voorspelling.js -- dan
-   moet er een voorbehoud op het scherm staan. De uitslag staat per rij in
-   `voorspelling`, in dezelfde standen, en raakt `status` (het lege antwoord)
-   NIET: of een voorspelling-als-feit bewijs 4 van een rij blokkeert, is een
-   besluit en geen bijvangst van deze meting.
+   waarheid zegt. Uit de antwoorden leidt scripts/lib/bewering.js de werkelijke
+   stand af -- een voorspelling, een aanvraag, een betaling die de provider nog
+   niet bevestigde, een simulatie, een voorstel, een verouderde stand -- en
+   vergelijkt die met wat het scherm zegt. De uitslag staat per rij in
+   `bewering`, in dezelfde standen, en raakt `status` (het lege antwoord)
+   NIET: of zo'n bevinding bewijs 4 van een rij blokkeert, is een besluit en
+   geen bijvangst van deze meting.
 
    Draai: node scripts/liegronde.js               (meet, schrijft niets)
           node scripts/liegronde.js --naar=pad    (meet, schrijft de uitslag naar pad)
@@ -54,7 +55,7 @@ const { rijen, maakContext, POORTEN } = require('./appwerkt');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
-const { oordeelVoorspelling } = require('./lib/voorspelling');
+const { oordeelBewering, GRENS: BEWERING_GRENS } = require('./lib/bewering');
 const { stempel } = require('./lib/stempel');
 
 const LIEG = '/api/';
@@ -95,8 +96,8 @@ function oordeel(m) {
 }
 
 /* De tweede ronde voor een rij: het scherm tegen de echte backend, en de vraag
-   of een onzekere uitkomst met een voorbehoud op het scherm staat. */
-async function meetVoorspelling(rij, base, contexten) {
+   of het meer beweert dan de antwoorden kunnen bewijzen. */
+async function meetBewering(rij, base, contexten) {
   if (!rij.pad) return { status: 'NIET_GETEST', reden: 'geen eigen adres' };
   const ctx = contexten[rij.persona];
   if (!ctx) return { status: 'NIET_GETEST', reden: 'geen sessie voor de persona ' + rij.persona };
@@ -114,7 +115,7 @@ async function meetVoorspelling(rij, base, contexten) {
     const deur = await page.evaluate((sel) => sel.find((s) => document.querySelector(s)) || null, POORTEN);
     const tekst = await zichtbareTekst(page);
     const antwoorden = (await Promise.all(wachten)).filter(Boolean);
-    return oordeelVoorspelling({ antwoorden, tekst, deur, landing, pad: rij.pad });
+    return oordeelBewering({ antwoorden, tekst, deur, landing, pad: rij.pad });
   } catch (e) {
     return { status: 'NIET_GETEST', reden: 'scherm viel om: ' + String((e && e.message) || e).split('\n')[0].slice(0, 120) };
   } finally {
@@ -163,7 +164,7 @@ async function meet() {
   const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_LIEG: LIEG, RTG_LIEG_NIET: SPAAR } });
-  // de tweede server zegt de waarheid: daar wordt de voorspelling-als-feit gemeten
+  // de tweede server zegt de waarheid: daar wordt gemeten of een scherm meer beweert dan de bron
   const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-waar-'));
   const waar = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP2 } });
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
@@ -180,7 +181,7 @@ async function meet() {
       while (true) {
         const i = n++; if (i >= lijst.length) break;
         const r = await meetRij(lijst[i], base, contexten);
-        r.voorspelling = await meetVoorspelling(lijst[i], waar.base, waarContexten);
+        r.bewering = await meetBewering(lijst[i], waar.base, waarContexten);
         uit.push(r);
       }
       for (const c of Object.values(contexten).concat(Object.values(waarContexten))) await c.close();
@@ -188,16 +189,16 @@ async function meet() {
     uit.sort((a, b) => a.functie.localeCompare(b.functie));
     const telling = {};
     for (const r of uit) telling[r.status] = (telling[r.status] || 0) + 1;
-    const voorspellingTelling = {};
-    for (const r of uit) voorspellingTelling[r.voorspelling.status] = (voorspellingTelling[r.voorspelling.status] || 0) + 1;
+    const beweringTelling = {};
+    for (const r of uit) beweringTelling[r.bewering.status] = (beweringTelling[r.bewering.status] || 0) + 1;
     return {
       stempel: stempel(),
       uitleg: 'Bewijs 4 (waarheidsgetrouw) per onderdeel uit MAPPEN: het scherm met de persona van de rij, terwijl de backend buiten de deuren leeg antwoordt (RTG_LIEG). Zie de kop van scripts/liegronde.js.',
       grens: GRENS + '. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.',
       sessiesOvergeslagen: overgeslagen,
       telling,
-      voorspellingTelling,
-      voorspellingGrens: require('./lib/voorspelling').GRENS,
+      beweringTelling,
+      beweringGrens: BEWERING_GRENS,
       regels: uit
     };
   } finally {
@@ -215,8 +216,8 @@ if (require.main === module) {
   meet().then((u) => {
     console.log('liegronde: ' + u.regels.length + ' onderdelen -- ' + JSON.stringify(u.telling));
     for (const r of u.regels) if (r.status === 'GEBLOKKEERD_DOOR_DEFECT') console.log('  DEFECT  ' + r.app + ' (' + r.ingang + '): ' + r.reden);
-    console.log('voorspelling als feit: ' + JSON.stringify(u.voorspellingTelling));
-    for (const r of u.regels) if (r.voorspelling.status === 'GEBLOKKEERD_DOOR_DEFECT') console.log('  VOORSPELLING ALS FEIT  ' + r.app + ' (' + r.ingang + ', ' + r.persona + '): ' + r.voorspelling.reden);
+    console.log('meer beweren dan de bron: ' + JSON.stringify(u.beweringTelling));
+    for (const r of u.regels) if (r.bewering.status === 'GEBLOKKEERD_DOOR_DEFECT') console.log('  MEER DAN DE BRON  ' + r.app + ' (' + r.ingang + ', ' + r.persona + '): ' + (r.bewering.klachten || [r.bewering.reden]).join(' | '));
     const naar = (process.argv.find((x) => x.startsWith('--naar=')) || '').slice(7);
     if (naar) { fs.writeFileSync(naar, JSON.stringify(u, null, 2) + '\n'); console.log('geschreven: ' + naar); }
     if (process.argv.includes('--vastleggen')) {

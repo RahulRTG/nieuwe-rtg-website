@@ -21,14 +21,19 @@ module.exports = ({ resolveSession, rtf }) => {
     const kop = (req.get && req.get('authorization')) || '';
     const token = kop.startsWith('Bearer ') ? kop.slice(7) : null;
     const s = token && typeof resolveSession === 'function' ? resolveSession(token) : null;
-    let wie = null;
-    if (s && (s.account || testomgeving.actief(process.env)) && s.key) wie = 'lid:' + s.key;
+    let wie = null, key = null;
+    if (s && (s.account || testomgeving.actief(process.env)) && s.key) { wie = 'lid:' + s.key; key = String(s.key); }
     else {
       const b = req.body || {};
       const p = b.gezinCode && b.gezinToken && rtf && rtf.verifieerProfiel(b.gezinCode, b.gezinToken);
       if (p) wie = 'gezin:' + p.handle;
     }
-    return wie ? { stemmer: 'st:' + crypto.createHash('sha256').update('lab2-stem|' + wie).digest('hex').slice(0, 32) } : null;
+    if (!wie) return null;
+    const hash = (doel) => crypto.createHash('sha256').update(doel + '|' + wie).digest('hex').slice(0, 32);
+    /* `key` alleen voor een eigen account (de 18+-poort leest hem); een
+       gezinsprofiel heeft er geen en haalt die poort dus nooit. `eigenaar` is
+       de sleutel waaraan een labpaspoort hangt, met een eigen doel in de hash. */
+    return { stemmer: 'st:' + hash('lab2-stem'), eigenaar: key ? 'pp:' + hash('lab2-paspoort') : null, key };
   }
   const GEEN_ACCOUNT = Object.freeze({ error: 'Log in met je RTG-account; een gratis account is genoeg.', accountNodig: true });
   return { bewoner, GEEN_ACCOUNT };

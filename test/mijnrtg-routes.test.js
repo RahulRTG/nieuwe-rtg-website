@@ -157,7 +157,12 @@ test('1. de deur: alle elf routes weigeren zonder sessie, een gast en een pas zo
 
     const alsGast = await api(pad, {}, gast.body.token);
     assert.equal(alsGast.status, 403, pad + ' liet een gast binnen');
-    assert.match(alsGast.body.error, /Alleen voor leden/, pad + ': de weigering noemt geen reden');
+    /* De toestelroutes vragen sinds 19 oktober 2026 alleen een eigen account,
+       ook een gratis account (een passkey hoort bij elk account): hun weigering
+       noemt dus het account, niet het lidmaatschap. Een gast komt er net zo
+       min binnen. */
+    assert.match(alsGast.body.error, pad.startsWith('/api/mijn/toestel/') ? /eigen RTG-account/ : /Alleen voor leden/,
+      pad + ': de weigering noemt geen reden');
 
     const alsPas = await api(pad, {}, pas.body.token);
     assert.equal(alsPas.status, 403, pad + ' liet een pas-sessie zonder eigen account binnen');

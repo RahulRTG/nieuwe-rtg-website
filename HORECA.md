@@ -777,7 +777,9 @@ middernacht. Daarvoor rekende De Kassa met de UTC-datum van de bon. Daardoor
 brak een winteravond om 01:00 lokale tijd in tweeën, en in de zomer om 02:00.
 
 De regel woont op één plek: `omzetdag()` in `server/kern/tijdzone.js`. Het dagrapport (X)
-en de kasopmaak in `routes/supplier/kassa/premium.js` lezen hem daar. De toets
+en de kasopmaak in `routes/supplier/kassa/premium.js` lezen hem daar, en de
+weektrend en "omzet vandaag" van de backoffice (`routes/supplier/backoffice.js`)
+ook, zodat het dashboard om 00:30 dezelfde dag toont als de kasopmaak. De toets
 is `test/omzetdag.test.js`: een verkoop om 23:30 en een om 00:30, met een
 kasopmaak om 01:00, vallen op dezelfde dag.
 

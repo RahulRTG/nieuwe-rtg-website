@@ -1,6 +1,7 @@
-/* RTF-kantoor, deel "codedeuren": de zes routes die binnenlaten op alleen een
-   CODE in het lijf -- het clubportaal, de clubberichten en de vier
-   stadsraad-routes van de partner.
+/* RTF-kantoor, deel "codedeuren": de zes routes die binnenlaten op een CODE in
+   het lijf -- het clubportaal, de clubberichten en de vier stadsraad-routes van
+   de partner -- en sinds 19 oktober 2026 ook een account vragen, plus de twee
+   kantoorroutes die die codes roteren.
 
    Waarom apart: dit zijn de enige publieke deuren van dit domein, en de rem
    eromheen heeft meer uitleg nodig dan de routes zelf. Afgesplitst toen
@@ -47,7 +48,7 @@
 const rem = require('../../rem');
 
 module.exports = (ctx) => {
-  const { app, auth, db, save, veilig, rtfclubs, stadsraad } = ctx;
+  const { app, auth, officeAuth, boardroomWie, db, save, veilig, rtfclubs, stadsraad } = ctx;
   /* EEN ACCOUNT EN EEN CODE (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt
      een account). De club en de stadsraadpartner maken een gratis account; de
      code koppelt dat account de eerste keer aan het dossier en is daarna een
@@ -75,4 +76,21 @@ module.exports = (ctx) => {
   app.post('/api/rtf/partner/besluit-start', auth, ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, p.naam + ' (' + p.stad + ')', 'partner')));
   app.post('/api/rtf/partner/stem', auth, ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.stem(String(req.body.besluitId || ''), 'partner', p.naam + ' (' + p.stad + ')', req.body.voor === true)));
   app.post('/api/rtf/partner/besluit-sluit', auth, ipRem, codeRem, (req, res) => metPartner(req, res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
+
+  /* ROTEREN (eigenaarsbesluit 19 oktober 2026): een kantoormens OP NAAM geeft een
+     nieuwe club- of raadcode; de gedeelde kantoorcode niet, net als bij een stem
+     in de stadsraad. De oude code gaat dicht voor iedereen, en de koppeling die
+     eraan hing vervalt. */
+  const opNaam = (req, res, werk) => {
+    if (!boardroomWie(req)) return res.status(403).json({ error: 'Een code roteren doet een mens op naam, niet de gedeelde kantoorcode. Log in met uw eigen RTG-account.' });
+    veilig(res, werk);
+  };
+  app.post('/api/rtfkantoor/club/code/roteren', officeAuth, (req, res) => opNaam(req, res, () => {
+    const id = String((req.body || {}).id || ''); const oud = rtfclubs.codeVan(id);
+    const r = rtfclubs.codeRoteer(id); if (r && r.ok) koppel.vervalt('club', oud); return r;
+  }));
+  app.post('/api/rtfkantoor/stadsraad/partner-code/roteren', officeAuth, (req, res) => opNaam(req, res, () => {
+    const id = String((req.body || {}).id || ''); const oud = stadsraad.partnerCodeVan(id);
+    const r = stadsraad.partnerCodeRoteer(id); if (r && r.ok) koppel.vervalt('raad', oud); return r;
+  }));
 };

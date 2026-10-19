@@ -86,5 +86,5 @@ module.exports = (kern) => {
   });
 
   // de publieke code-deuren, met hun eigen twee remmen
-  require('./codedeuren')({ app, auth: kern.auth, db: kern.db, save: kern.save, veilig, rtfclubs, stadsraad });
+  require('./codedeuren')({ app, auth: kern.auth, officeAuth, boardroomWie, db: kern.db, save: kern.save, veilig, rtfclubs, stadsraad });
 };

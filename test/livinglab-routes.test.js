@@ -31,7 +31,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 // de buurtdeuren van het lab vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per alias
 require('./labaccount').zetLabAccount();
 
@@ -285,13 +286,20 @@ test('10. het vraagstuk en "wat nu" horen bij de studie zelf', async () => {
 });
 
 test('11. een labpaspoort leest, en een reflectie vraagt een pas die we kennen', async () => {
-  const maak = await pub('/api/lab2/bewoner/paspoort-maak', { labId: LAB, naam: 'Sam Routetoets' });
+  /* Het paspoort hangt aan een gekeurd, volwassen account (eigenaarsbesluit 19
+     oktober 2026, routes/livinglab/bewonerpas.js: niveaus en badges zijn progressie). */
+  const sam = await registreerGratis(base);
+  await keurLidGoed(base, sam.token, sam.codenaam, '1985-05-05');
+  const alsSam = (pad, body) => fetch(base + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sam.token }, body: JSON.stringify(body || {}) })
+    .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const maak = await alsSam('/api/lab2/bewoner/paspoort-maak', { labId: LAB, naam: 'Sam Routetoets' });
   assert.equal(maak.status, 200, 'een labpaspoort maken: ' + (maak.body.error || ''));
   const code = maak.body.paspoort.code;
 
-  const lezen = await pub('/api/lab2/bewoner/paspoort', { code });
+  const lezen = await alsSam('/api/lab2/bewoner/paspoort', { code });
   assert.equal(lezen.status, 200, 'het paspoort is met die code te lezen');
-  assert.equal((await pub('/api/lab2/bewoner/paspoort', { code: 'LABPASBESTAATNIET' })).status, 404,
+  assert.equal((await alsSam('/api/lab2/bewoner/paspoort', { code: 'LABPASBESTAATNIET' })).status, 404,
     'een code die niet bestaat, is 404');
 
   /* Een LABPASPOORT is geen deelnemerspas: reflecteren doe je vanuit een

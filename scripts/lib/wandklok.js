@@ -29,7 +29,7 @@
       sociale graaf met de levenslijn zijn als een stelsel omgezet: hun
       `vandaag` en `dagVan` wonen in levensgraaf/hulp.js en lezen het huis.
       De kassadag rekent met de omzetdag tot 05:00 (tijdzone.omzetdag,
-      eigenaarsbesluit, HORECA.md). Nog niet: de backoffice-dashboards.
+      eigenaarsbesluit, HORECA.md), en de backoffice van een zaak ook.
       Daarom een ratel en geen grens: alleen omlaag.
    ========================================================================== */
 'use strict';
@@ -42,7 +42,7 @@ const UITZONDERING = /tijd-uitzondering:\s*\S.{8,}/;
 // de plek waar de wandklok WOONT
 const THUIS = 'server/kern/tijdzone.js';
 // het plafond van de tweede telling; alleen omlaag
-const UTC_VANDAAG_MAX = 106;
+const UTC_VANDAAG_MAX = 105;
 
 function bestanden(root) {
   const uit = [];

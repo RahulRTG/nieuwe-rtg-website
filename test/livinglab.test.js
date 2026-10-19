@@ -12,7 +12,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
+// de buurtdeuren van het lab vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per alias
+require('./labaccount').zetLabAccount();
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livinglab-'));
@@ -300,7 +303,12 @@ test('een gescheiden studie legt geen enkele koppeling vast en toont niets publi
 
   // een labpaspoort zou juist die koppeling maken, en wordt dus geweigerd --
   // met uitleg, niet stil genegeerd
-  const pasp = await pub('/api/lab2/bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' });
+  // het paspoort hangt aan een gekeurd, volwassen account (routes/livinglab/bewonerpas.js)
+  const sam = await registreerGratis(base);
+  await keurLidGoed(base, sam.token, sam.codenaam, '1985-05-05');
+  const pasp = await fetch(base + '/api/lab2/bewoner/paspoort-maak', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sam.token }, body: JSON.stringify({ labId: LAB, naam: 'Sam' }) })
+    .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   assert.equal(pasp.status, 200);
   const weiger = await api('/api/lab2/mens/bij', { id: g.id, rol: 'buurtonderzoeker', toestemming: true, paspoort: pasp.body.paspoort.code });
   assert.equal(weiger.status, 409, 'een paspoort koppelen kan niet bij een gescheiden studie');

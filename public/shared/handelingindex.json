@@ -1502,6 +1502,12 @@
       "url": "/apps/ov.html"
     },
     {
+      "label": "Naar de app",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
       "label": "Openbaar vervoer",
       "app": "Openbaar vervoer",
       "wereld": "TravelOS",
@@ -1928,6 +1934,18 @@
       "url": "/apps/pulse.html"
     },
     {
+      "label": "Documenten",
+      "app": "Reisboek",
+      "wereld": "TravelOS",
+      "url": "/apps/reisboek.html"
+    },
+    {
+      "label": "Wijzigingen",
+      "app": "Reisboek",
+      "wereld": "TravelOS",
+      "url": "/apps/reisboek.html"
+    },
+    {
       "label": "Adviseer",
       "app": "Reizen & Veilig",
       "wereld": "TravelOS",
@@ -1935,6 +1953,18 @@
     },
     {
       "label": "Deel mijn aankomst",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Gaan",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Instellingen",
       "app": "Reizen & Veilig",
       "wereld": "TravelOS",
       "url": "/apps/reizen-veilig.html"
@@ -1952,6 +1982,12 @@
       "url": "/apps/reizen-veilig.html"
     },
     {
+      "label": "Navigatie",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
       "label": "Nieuw Moment",
       "app": "Reizen & Veilig",
       "wereld": "TravelOS",
@@ -1959,6 +1995,30 @@
     },
     {
       "label": "Open",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Open mijn reizen",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Plan met Rahul",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Reizen",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "RTG Veilig",
       "app": "Reizen & Veilig",
       "wereld": "TravelOS",
       "url": "/apps/reizen-veilig.html"
@@ -3068,12 +3128,6 @@
       "url": "/apps/sport.html"
     },
     {
-      "label": "Meld",
-      "app": "Stad",
-      "wereld": "TravelOS",
-      "url": "/apps/stad.html"
-    },
-    {
       "label": "Aanmaken",
       "app": "Table",
       "wereld": "LivingOS",
@@ -3266,31 +3320,7 @@
       "url": "/apps/clips.html"
     },
     {
-      "label": "Code intrekken",
-      "app": "Vluchten",
-      "wereld": "TravelOS",
-      "url": "/apps/vluchten.html"
-    },
-    {
-      "label": "Inchecken",
-      "app": "Vluchten",
-      "wereld": "TravelOS",
-      "url": "/apps/vluchten.html"
-    },
-    {
-      "label": "Kies deze vlucht",
-      "app": "Vluchten",
-      "wereld": "TravelOS",
-      "url": "/apps/vluchten.html"
-    },
-    {
       "label": "Mijn reizen",
-      "app": "Vluchten",
-      "wereld": "TravelOS",
-      "url": "/apps/vluchten.html"
-    },
-    {
-      "label": "Nieuwe instapcode",
       "app": "Vluchten",
       "wereld": "TravelOS",
       "url": "/apps/vluchten.html"
@@ -3303,12 +3333,6 @@
     },
     {
       "label": "Vluchten",
-      "app": "Vluchten",
-      "wereld": "TravelOS",
-      "url": "/apps/vluchten.html"
-    },
-    {
-      "label": "Vraag persoonlijk aan",
       "app": "Vluchten",
       "wereld": "TravelOS",
       "url": "/apps/vluchten.html"

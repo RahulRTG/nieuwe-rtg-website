@@ -115,13 +115,11 @@ function alsDatum(wanneer) {
   return d && Number.isFinite(d.getTime()) ? d : klok.datum();
 }
 
-/* DE ZONE VAN HET HUIS. In de UTC-container lezen `getHours()` en zijn broers
-   UTC. Een lid heeft geen eigen tijdzone in zijn profiel; zonder zaak met een
-   eigen zone is dat Amsterdam. Wie een andere zone kent, geeft hem mee. */
+/* DE ZONE VAN HET HUIS: een lid heeft geen eigen zone in zijn profiel, dus
+   Amsterdam. Wie een andere zone kent, geeft hem mee. */
 const HUIS_ZONE = 'Europe/Amsterdam';
 const zoneOf = zone => (zone || HUIS_ZONE);
 
-// het hele lokaal()-antwoord in het huis (of `zone`), en de losse delen
 const huis = (wanneer, zone) => lokaal(zoneOf(zone), wanneer);
 const uurIn = (wanneer, zone) => huis(wanneer, zone).uur;
 const weekdagIn = (wanneer, zone) => huis(wanneer, zone).dag;
@@ -129,21 +127,19 @@ const datumIn = (wanneer, zone) => huis(wanneer, zone).datum;
 const jaarIn = (wanneer, zone) => huis(wanneer, zone).jaar;
 const maandIn = (wanneer, zone) => huis(wanneer, zone).maand;
 const hhmmIn = (wanneer, zone) => huis(wanneer, zone).hhmm;
-// de kalenderdag van een OPGESLAGEN tijdstip; leeg of onleesbaar is null, nooit vandaag
+// de dag van een OPGESLAGEN tijdstip; leeg of rommel is null, nooit vandaag
 const datumVan = (t, zone) => {
   const d = t == null || t === '' ? null : new Date(t);
   return d && Number.isFinite(d.getTime()) ? huis(d, zone).datum : null;
 };
 
-/* De zone van een zaak, en zonder eigen zone of bekend land het huis: voor
-   een rooster of kassa in Nederland is UTC een uur ernaast. */
+// de zone van een zaak, en zonder eigen zone of bekend land het huis (niet UTC)
 function zaakZoneOfHuis(s) {
   const z = zaakZone(s);
   return z.bron === 'terugval' ? HUIS_ZONE : z.zone;
 }
 
-/* Kalenderrekenen op 'YYYY-MM-DD', in UTC op de kalender zelf: een dag is
-   door de zomertijd niet altijd 24 uur. */
+// rekenen op de kalender zelf ('YYYY-MM-DD'): een dag is niet altijd 24 uur
 const kalender = (datum, plus) => {
   const [j, m, d] = String(datum).slice(0, 10).split('-').map(Number);
   return Date.UTC(j, m - 1, d + (plus || 0));
@@ -151,9 +147,8 @@ const kalender = (datum, plus) => {
 const plusDagen = (datum, n) => new Date(kalender(datum, n)).toISOString().slice(0, 10);
 const weekdagVan = datum => new Date(kalender(datum)).getUTCDay();
 
-/* Het moment waarop het in `zone` `datum` is, `minuten` na middernacht: wat
-   `new Date(j, m, d, u, mi)` deed, maar in de zone van het lid. Twee rondes
-   voor de zomertijd; 02:30 op de voorjaarsdag wordt 03:30, zoals de wandklok. */
+/* Het moment van `datum` + `minuten` in `zone` (wat new Date(j, m, d, u, mi)
+   deed). Twee rondes voor de zomertijd; 02:30 in maart wordt 03:30. */
 function moment(datum, minuten, zone) {
   const z = zoneOf(zone);
   const wens = kalender(datum) + (Number(minuten) || 0) * 60000;
@@ -165,6 +160,15 @@ function moment(datum, minuten, zone) {
   return new Date(t);
 }
 const middernacht = (datum, zone) => moment(datum, 0, zone);
+
+/* DE OMZETDAG van een zaak loopt tot 05:00 lokaal (eigenaarsbesluit 19 oktober
+   2026, HORECA.md): een kasopmaak om 00:30 telt de hele avond. */
+const OMZETDAG_GRENS = 5 * 60;
+function omzetdag(s, wanneer) { // zonder moment: nu
+  const h = huis(wanneer, zaakZoneOfHuis(s));
+  return h.minuten < OMZETDAG_GRENS ? plusDagen(h.datum, -1) : h.datum;
+}
+const omzetdagVan = (s, t) => (datumVan(t) ? omzetdag(s, t) : null); // leeg: null
 
 /* EEN antwoord op "in welke zone staat deze zaak", voor het hele huis.
 
@@ -198,4 +202,4 @@ const nuBijZaak = (s, wanneer) => lokaal(zaakZone(s).zone, wanneer);
 const instantIn = (...a) => require('./tijdzone-instant')(...a);
 
 module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak, instantIn,
-  HUIS_ZONE, huis, uurIn, weekdagIn, datumIn, datumVan, jaarIn, maandIn, hhmmIn, plusDagen, weekdagVan, middernacht, moment, zaakZoneOfHuis };
+  HUIS_ZONE, huis, uurIn, weekdagIn, datumIn, datumVan, jaarIn, maandIn, hhmmIn, plusDagen, weekdagVan, middernacht, moment, zaakZoneOfHuis, OMZETDAG_GRENS, omzetdag, omzetdagVan };

@@ -329,21 +329,24 @@ const CONTRACT = {
       waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
     }
   },
+  /* LivingOS-B: media, sociaal en spel (19 oktober 2026). */
+  'link:muziek': Object.assign({
+    belofte: 'een lid deelt zijn eigen muziek, een ander lid vindt, hoort en waardeert haar, alleen de maker haalt haar weg, en samen luisteren brengt de luisteraar in de kamer van de gastheer'
+  }, voltooi('muziek', 'het scenario loopt /api/muziek/bestand, /feed, /bestand-ticket, /luister, /mooi en /bestand-weg, en /api/samen/maak, /mee, /muziek en /staat, de routes die /apps/muziek.html (muziek-feed.js, muziek-bestanden.js) zelf aanroept, met twee leden en een gratis account')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies
      de lid-routes die de conciergeproef loopt. De proef dekt de lus en niet het
      hele Privékantoor (woning, kring, bezit, mandaat lopen hier niet mee); dat
      staat in `waarom` in plaats van weggelaten. */
-  'link:rechterhand': {
-    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'CONCIERGEPROEF.json',
-      instrument: 'scripts/conciergeproef.js',
-      waarom: 'de conciergeproef loopt de lus van CONCIERGE.md over /api/member/bureau/lus/*, de routes die het tabblad Zaken van /apps/lifestyle.html aanroept, met het kantoor en twee zaken ernaast; de andere tabbladen van het Privékantoor loopt hij niet'
-    }
-  }
+  /* Sinds 19 oktober 2026 levert de voltooiproef alle vier: hij loopt dezelfde
+     lus over een ECHT Lifestyle-lid (aangevraagd en door een mens geaccepteerd)
+     met een herstart, een crash en een afgebroken verzoek, en een scenario
+     levert zijn bewijzen samen (test/voltooiproef.test.js). De conciergeproef
+     blijft de keten met de zaakkant; zie ZONDER_APP. */
+  'link:rechterhand': Object.assign({
+    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat'
+  }, voltooi('rechterhand', 'het scenario loopt /api/member/bureau/lus/intake, /zaak, /beslis en /toelichting en /api/member/bureau/zaken, de routes die het tabblad Zaken van /apps/lifestyle.html (apps/lifestyle-lus.js) aanroept, met een kantoormens op naam langs /api/office/bureau/lus/*; de andere tabbladen van het Privékantoor loopt hij niet'))
 };
 
 /* Gesloten ketens die (nog) geen bewijs voor een app in MAPPEN leveren, met de
@@ -359,6 +362,9 @@ const ZONDER_APP = [
   { register: 'MOMENTPROEF.json', instrument: 'scripts/momentproef.js',
     reden: 'raakt RTG Media (/api/mediaos/aanwezig/*), maar alleen de deelbelofte volgen en gewekt worden -- niet wat RTG Media als geheel belooft',
     nodig: 'een tweede bron voor de kernbelofte van RTG Media, of een splitsing van die app in MAPPEN' },
+  { register: 'CONCIERGEPROEF.json', instrument: 'scripts/conciergeproef.js',
+    reden: 'leverde tot 19 oktober 2026 voltooibaar voor het Privekantoor (link:rechterhand); dat komt nu met persistent en herstelbaar uit de voltooiproef (scripts/lib/voltooi/rechterhand.js), over een echt Lifestyle-lid in plaats van de demo-inlog. De keten blijft wat het scenario niet loopt: de zaakkant, vertragingen en herstel na een omgevallen onderdeel',
+    nodig: 'een zaakregister naast APPWERKT, zoals bij de toelatingsproef; of de zaakkant in het scenario van link:rechterhand' },
   { register: 'TOELATINGSPROEF.json', instrument: 'scripts/toelatingsproef.js',
     reden: 'de klant is geen lid en de keten loopt over kantoor en aanmeldbalie; MAPPEN kent alleen lid- en gezinswerelden',
     nodig: 'niets aan de keten -- dit bewijs hoort bij een zaak- of kantoorregister, niet bij APPWERKT' },

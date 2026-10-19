@@ -148,19 +148,10 @@ const PUBLIEK = new Map([
   ['/api/mijn/herstelkanaal/email/bevestig', 'de bevestigingslink IS de geloofsbrief (verifyActionToken, doel mailwissel); komt uit de mailbox van het nieuwe adres en heeft dus geen sessie'],
 
   // ---- publiek, maar met een code in het lijf als geloofsbrief ----
-  /* Dezelfde familie als metPartner hiernaast: clubs en stadspartners hebben
-     geen RTG-account, hun code is de sleutel en het portaal toont uitsluitend
-     het dossier dat bij die ene code hoort.
-
-     Hier stond eerst de kanttekening dat er GEEN rem op zat en dat de sterkte
-     dus volledig aan de lengte van de code hing. Die staat er nu wel: twee
-     remmen in server/routes/rtfkantoor/codedeuren.js (20/min per bron tegen het afgrazen,
-     60/min per code tegen veel bronnen op een code), vastgelegd in
-     test/rtfcoderem.test.js. Wat blijft staan voor de externe toets (taak 22):
-     codes zonder vervaldatum en zonder intrekknop. */
-  ['/api/rtf/club/portaal', 'de clubcode is de geloofsbrief (vindCode); alleen het eigen clubdossier'],
-  ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
-  ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
+  /* De club- en stadsraadcodes (routes/rtfkantoor/codedeuren.js) stonden hier.
+     Sinds het eigenaarsbesluit van 19 oktober 2026 vragen ze een account: de
+     code koppelt dat account aan het dossier en is daarna een extra sleutel
+     naast de sessie (kern/codekoppel.js). Ze staan dus achter `auth`. */
 
   /* HET RTF LIVING LAB (routes/livinglab/bewoner.js). Dezelfde familie, en om
      een reden die in het ontwerp zelf zit: een Living Lab waarin een bewoner
@@ -202,30 +193,12 @@ const PUBLIEK = new Map([
   ['/api/lab2/bewoner/paspoort-maak', 'een labpaspoort aanmaken op een zelfgekozen roepnaam (rem 10/min per bron)'],
   ['/api/lab2/bewoner/kader', 'de spelregels van het lab: cyclus, methoden en bewijsgraden horen juist openbaar te zijn'],
 
-  /* Dezelfde familie, in het Foundation OS (routes/rtfos/portalen.js). Een
-     lokale stichting, een gemeente en een lokale ondernemer hebben geen
-     RTG-account: hun code bepaalt het dossier, niet de vraagsteller. Ze
-     dragen dezelfde twee remmen (20/min per bron, 60/min per code) en de
-     gemeentekant geeft per constructie alleen getelde cijfers terug, nooit
-     een casus of een naam (kern/rtfos/gemeente.js). */
-  ['/api/rtfos/portaal/partner', 'de partnercode is de geloofsbrief (vindCode); alleen het eigen partnerdossier'],
-  ['/api/rtfos/portaal/partner/genootschap', 'idem, plus partners.erkend(): alleen genootschappen die DEZE stichting vroegen, met naam en stand -- geen leden en geen aantal (B1 drager)'],
-  ['/api/rtfos/portaal/partner/genootschap/erken', 'idem: erkent alleen een dragervraag die op deze stichting staat; voor elke andere partner bestaat de vraag niet (404)'],
-  ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
-  ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
-
-  /* Twee doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js), met
-     dezelfde twee remmen als de codes hierboven. De derde, de buurt-app
-     (/api/rtfos/publiek/steden, stad en campagnes), staat hier niet meer: sinds
-     het eigenaarsbesluit van 19 oktober 2026 vraagt hij een account of een
-     gezinsprofiel aan het account van een ouder. */
-  ['/api/rtfos/portaal/vrijwilliger', 'de vrijwilligerscode is de geloofsbrief; alleen zijn eigen planning en uren, geen contactgegevens en geen evaluaties'],
-  ['/api/rtfos/portaal/vrijwilliger/zet', 'idem: hij werkt zijn eigen beschikbaarheid bij; zijn VOG en status zet de afdeling'],
-  ['/api/rtfos/portaal/vrijwilliger/uren', 'idem: uren die hij opgeeft komen binnen als MELDING en tellen pas na bevestiging'],
-  ['/api/rtfos/portaal/deelnemer', 'de deelnemerscode is de geloofsbrief; uitsluitend de stand van die ene hulpvraag'],
-  ['/api/rtfos/portaal/deelnemer/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
-  ['/api/rtfos/portaal/donateur', 'de gever op zijn eigen code (RTFS-): alleen zijn eigen giften en waar ze heen gingen, nooit wie er nog meer gaf. Twee remmen, per bron en per code'],
-  ['/api/rtfos/portaal/donateur/bewijs', 'idem: het giftbewijs voor een van zijn eigen giften'],
+  /* De codeportalen van het Foundation OS (routes/rtfos/portalen.js,
+     doelgroepen.js en afmaak.js: partner, gemeente, ondernemer, vrijwilliger,
+     hulpvrager en donateur) stonden hier met "de code is de geloofsbrief".
+     Sinds het eigenaarsbesluit van 19 oktober 2026 vragen ze een account en
+     koppelt de code dat account aan het dossier (kern/codekoppel.js). De
+     hulpvrager in acute nood gaat via de beschermingsdeur, die blijft open. */
   ['/api/rtfos/publiek/jaarverslagen', 'eigenaarsbesluit 19 oktober 2026, uitzondering 7: de wettelijke ANBI-publicatieplicht; een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers, en niets ernaast'],
 
   // ---- publieke informatie: staat ook gewoon op de site ----

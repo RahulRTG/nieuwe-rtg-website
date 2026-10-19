@@ -101,6 +101,9 @@ async function wereld(basis) {
   for (const s of ['in_toetsing', 'goedgekeurd']) await os('partner/status', { id: partner.id, status: s });
 
   const w = { stichting: { id: partner.id, code: partner.code }, lid };
+  /* de medewerker van de stichting opent haar partnerdeur met een eigen account
+     en de code (eigenaarsbesluit 19 oktober 2026, kern/codekoppel.js) */
+  w.stichting.token = (await lid(null, false)).token;
   w.beheerder = await lid();
   w.leden = [];
   for (let i = 0; i < 5; i++) w.leden.push(await lid());
@@ -176,7 +179,7 @@ async function loop(basis, uit, w) {
   await stap(schakel(3, 'beheerder', 'stichting', 'een erkende stichting als drager vragen, en de stichting ziet de vraag zonder ledencodenamen'),
     () => P('/api/genootschap/drager/vraag', { groep: A.id, ref: w.stichting.id }, w.beheerder.token),
     async () => {
-      const z = await P('/api/rtfos/portaal/partner/genootschap', { code: w.stichting.code });
+      const z = await P('/api/rtfos/portaal/partner/genootschap', { code: w.stichting.code }, w.stichting.token);
       const rij = ((z.data && z.data.groepen) || []).find(g => g.groep === A.id);
       const lek = [w.beheerder].concat(w.leden).some(l => z.tekst.includes(l.codenaam));
       return { klopt: !!rij && rij.stand === 'gevraagd' && !lek,
@@ -185,7 +188,7 @@ async function loop(basis, uit, w) {
 
   /* 4 -- de stichting erkent; een gewoon lid ziet de drager als verwijzing. */
   await stap(schakel(4, 'stichting', 'lid', 'de stichting erkent het genootschap, en een lid ziet de drager als verwijzing'),
-    () => P('/api/rtfos/portaal/partner/genootschap/erken', { code: w.stichting.code, groep: A.id }),
+    () => P('/api/rtfos/portaal/partner/genootschap/erken', { code: w.stichting.code, groep: A.id }, w.stichting.token),
     async () => {
       const m = await P('/api/genootschap/mijn', {}, l1.token);
       const g = ((m.data && m.data.groepen) || []).find(x => x.id === A.id) || {};

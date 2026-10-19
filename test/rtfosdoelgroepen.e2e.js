@@ -87,9 +87,14 @@ async function decor(base) {
   /* Vier uur die de vrijwilliger zelf doorgeeft. Ze staan hier in het decor
      omdat het bestuursscherm ze moet TONEN met een bevestigknop: een melding
      die de coordinator nergens ziet, is hetzelfde als geen melding. */
-  await post('/api/rtfos/portaal/vrijwilliger/uren', { code: vcode, uren: 4, datum: '2026-11-03' });
+  /* De vrijwilliger en de hulpvrager dragen elk hun eigen (gratis) account:
+     hun code koppelt dat account de eerste keer aan hun dossier
+     (eigenaarsbesluit 19 oktober 2026, kern/codekoppel.js). */
+  const vrij = await registreerGratis(base);
+  const hulp = await registreerGratis(base);
+  await post('/api/rtfos/portaal/vrijwilliger/uren', { code: vcode, uren: 4, datum: '2026-11-03' }, vrij.token);
 
-  return { vcode, dcode, stadNaam: stad.naam, token, memberToken: reg.token };
+  return { vcode, dcode, stadNaam: stad.naam, token, memberToken: reg.token, vrijToken: vrij.token, hulpToken: hulp.token };
 }
 
 // de vijf dingen die op geen van de drie schermen mogen staan
@@ -123,7 +128,7 @@ test('het vrijwilligersscherm toont zijn planning en nergens zijn nummer of een 
   let s;
   try {
     const d = await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-vrijwilliger.html');
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-vrijwilliger.html', d.vrijToken);
 
     // eerst een code die niet klopt: het scherm hoort te zeggen wat er mis is
     await s.page.fill('#code', 'RTFX-FOUTCODE');
@@ -161,7 +166,21 @@ test('het deelnemersscherm toont de stand in gewone taal en de knop om in te tre
   let s;
   try {
     const d = await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-deelnemer.html');
+    /* Zonder account: de code opent niets, de accountdeur staat in het scherm,
+       en de zin naar de beschermingsdeur staat er voor wie nu in nood is. */
+    const zonder = await schermMet(srv.base, pw, '/apps/foundation/os-deelnemer.html');
+    try {
+      assert.match(await zonder.page.evaluate(() => document.body.innerText), /beschermingsdeur/,
+        'zonder account verwijst het hulpvragerscherm niet naar de beschermingsdeur');
+      assert.equal(await zonder.page.getAttribute('a[href="onveilig.html"]', 'href'), 'onveilig.html');
+      await zonder.page.fill('#code', d.dcode);
+      await zonder.page.click('#open');
+      await zonder.page.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor({ timeout: 15000 });
+      assert.equal(zonder.verzoeken.filter(u => u.includes('/api/rtfos/portaal/deelnemer')).length, 0,
+        'zonder account ging de code toch naar de server');
+    } finally { await zonder.browser.close(); }
+
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-deelnemer.html', d.hulpToken);
 
     await s.page.fill('#code', d.dcode);
     await s.page.click('#open');

@@ -77,6 +77,50 @@ async function zoekInHeelRtg(browser, base, tok, termen) {
   return { uit, fouten };
 }
 
+/* De eigenaar van de testomgeving draagt de kantoorrol in zijn sleutelbos
+   (kantoorAlsPersoon in ./helper.js start daar zijn kantoorsessie mee). */
+async function kantoorLid(post) {
+  const r = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran' });
+  const tok = r.data && r.data.token;
+  assert.ok(tok, 'geen eigenaar in de testomgeving');
+  const rollen = ((await post('/api/account/rollen', {}, tok)).data || {}).rollen || [];
+  assert.ok(rollen.some((x) => x.rol === 'kantoor'), 'de eigenaar draagt geen kantoorrol: ' + JSON.stringify(rollen).slice(0, 160));
+  return tok;
+}
+
+/* DE SCHERMEN VAN EEN WERKROL DIE GEEN WERELDTEGEL ZIJN (19 oktober 2026). De
+   kassa, de backoffice en de werkplek stonden in de catalogus zonder ingang in de
+   gids; de server eist een zaak-, kantoor- of werkruimtesessie. Met hun ingang
+   (app-main-23c.js) filtert dezelfde poort ze. */
+test('Heel RTG: een lid vindt de kassa, de backoffice en de werkplek niet; een zaakmanager vindt de kassa, een kantoormens de backoffice',
+  { skip: geenBrowser(pw), timeout: 240000 }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-heelrtg-werkrol-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const post = maakPost(base);
+    const A = await lid(post, 'hrw');
+    const Z = await zaakLid(post, 'KIKUNOI');
+    const K = await kantoorLid(post);
+    browser = await pw.chromium.launch(browserOpties(pw, {}));
+    const a = await zoekInHeelRtg(browser, base, A, ['kassa', 'backoffice', 'campus', 'horeca']);
+    assert.ok(!a.uit.kassa.includes('kassa'), 'een lid ziet de kassa: ' + a.uit.kassa.join(','));
+    assert.ok(!a.uit.backoffice.includes('backoffice'), 'een lid ziet de backoffice: ' + a.uit.backoffice.join(','));
+    assert.ok(!a.uit.campus.includes('werkplek'), 'een lid ziet de werkplek: ' + a.uit.campus.join(','));
+    assert.ok(!a.uit.horeca.some((x) => /^horeca-/.test(x)), 'een lid ziet de horecaschermen van een zaak: ' + a.uit.horeca.join(','));
+    assert.deepEqual(a.fouten, [], 'paginafouten bij het lid');
+    const z = await zoekInHeelRtg(browser, base, Z, ['kassa', 'backoffice']);
+    assert.ok(z.uit.kassa.includes('kassa'), 'een zaakmanager vindt de kassa niet: ' + z.uit.kassa.join(','));
+    assert.ok(!z.uit.backoffice.includes('backoffice'), 'een zaakmanager ziet de backoffice: ' + z.uit.backoffice.join(','));
+    const k = await zoekInHeelRtg(browser, base, K, ['backoffice']);
+    assert.ok(k.uit.backoffice.includes('backoffice'), 'een kantoormens vindt de backoffice niet: ' + k.uit.backoffice.join(','));
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('Heel RTG: een lid vindt het tweede scherm niet, een zaakmanager wel; kantoor- en Lifestyle-apps blijven buiten beeld van een RTG-lid',
   { skip: geenBrowser(pw), timeout: 240000 }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-heelrtg-poort-'));

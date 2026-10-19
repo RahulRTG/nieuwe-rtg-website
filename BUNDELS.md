@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 496 delen, 0 zonder onderwerp.**
+**62 bundels, 497 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 103 delen, 10112 regels in de delen
+`public/apps/app-main/` -- 104 delen, 10181 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -61,6 +61,7 @@ omlaag.
 | `app-main-23.js` | de lopende rekening bij een partner opvragen |
 | `app-main-23a.js` | RTG OS-schil |
 | `app-main-23b.js` | Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging (keuringsregel 13) |
+| `app-main-23c.js` | SCHERMEN VAN EEN WERKROL (19 oktober 2026) |
 | `app-main-24.js` | Veiligheid en verbinding |
 | `app-main-24a1.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging toen er een tegel bijkwam |
 | `app-main-24a2.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging |

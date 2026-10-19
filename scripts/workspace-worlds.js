@@ -30,6 +30,14 @@ function gegevens() {
   const instellingen = reg.MAPPEN.find(m => m.sleutel === 'map-instellingen');
   contexts.push({ id: 'core', name: 'RTG Core', home: '/apps/app.html', kind: 'core',
     items: (instellingen ? instellingen.items : []).concat(['tab:home', 'tab:ai']).map(regel) });
+  /* WERKROLLEN: de schermen van een zaak, personeel, kantoor of werkruimte die
+     in LINKS een werkrol dragen maar in geen wereld van MAPPEN staan. Ze zijn geen
+     tegel van een lid, maar de gids moet ze kennen, anders kan de poort van Heel
+     RTG (app-main-29d.js, gidsToegang) ze niet filteren. Een eigen context, zodat
+     het aantal werelden niet verandert; de wereldnaam zelf geeft geen toegang. */
+  const inWereld = new Set(reg.MAPPEN.flatMap(m => m.items));
+  const rollen = Object.keys(reg.LINKS).filter(k => reg.LINKS[k].werkrol && !inWereld.has('link:' + k)).map(k => 'link:' + k);
+  if (rollen.length) contexts.push({ id: 'werkrollen', name: 'Werkrollen', home: '/apps/app.html', kind: 'werkrol', items: rollen.map(regel) });
   return contexts;
 }
 function bouw() {

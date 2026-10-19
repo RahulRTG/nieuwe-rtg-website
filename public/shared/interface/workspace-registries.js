@@ -30,7 +30,7 @@
     function registerWorldCatalog(catalog) {
       (Array.isArray(catalog) ? catalog : []).forEach(function (world) {
         var wid = String(world.id || ''); if (!/^[a-z][a-z0-9-]*$/.test(wid) || worlds[wid]) throw new Error('Ongeldige of dubbele wereld: ' + wid);
-        var copy = { id: wid, name: String(world.name || wid), home: String(world.home || ''), kind: world.kind === 'core' ? 'core' : 'world', items: [] };
+        var copy = { id: wid, name: String(world.name || wid), home: String(world.home || ''), kind: world.kind === 'core' || world.kind === 'werkrol' ? world.kind : 'world', items: [] };
         (Array.isArray(world.items) ? world.items : []).forEach(function (item) {
           var iid = String(item.id || ''), match = /^(link|tab|os):([a-z][a-z0-9-]*)$/.exec(iid);
           if (!match || !/^L[0-4]$/.test(String(item.maturity || ''))) throw new Error('Ongeldige wereldfunctie: ' + iid);

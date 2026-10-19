@@ -78,3 +78,37 @@ test('elke catalogus-app achter een werkrol of pas vindt zijn ingang in de gids,
   const app29d = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-29d.js'), 'utf8');
   assert.match(app29d, /window\.RTGAppCatalogusPoort = [\s\S]*?gidsToegang\(id\)/, 'de poort is niet die van de gids');
 });
+
+/* De schermen van een werkrol die de catalogus aan iedereen toonde, terwijl de
+   server een zaak-, personeels-, kantoor- of werkruimtesessie eist (gemeten op
+   19 oktober 2026 met scripts/lib/bewakers.js en SCHERMROUTES.json). Elk heeft
+   een ingang met die werkrol, en de gids kent hem -- anders filtert de poort niet. */
+test('de gemeten werkrol-schermen hebben een ingang met hun werkrol in de gids, en geen tegel in een wereld', () => {
+  const reg = require('../scripts/lib/wereldregister');
+  const GEMETEN = {
+    zaak: ['appstore-uitgever', 'belastingkantoor', 'dispatch', 'festival', 'gemeenteloket', 'ghost', 'handel', 'horeca-bar',
+      'horeca-beheer', 'horeca-bezorg', 'horeca-club', 'horeca-events', 'horeca-expeditie', 'horeca-haccp', 'horeca-hotel',
+      'horeca-vloer', 'kassa', 'leverancier-aanvragen', 'leverancier-commerce', 'leverancier-rtmail', 'leverancier-service',
+      'luchthaven', 'magnaat-partnerstudio', 'marechaussee', 'oog', 'ovcontrol', 'rechtbank', 'redactie', 'rijksloket',
+      'sportclub', 'voertuig', 'zaakkosten', 'zaakweb', 'zakelijk'],
+    personeel: ['chauffeur', 'gemeentepda', 'horeca-pda', 'ovdienst', 'overheidspda', 'redactie-pda'],
+    kantoor: ['appstore-kantoor', 'backoffice', 'boardroom', 'foundation/kwestiekantoor', 'isolatie', 'kantoren', 'kosten',
+      'magnaat-kantoor', 'payroll', 'platformregister', 'routedekking', 'service', 'techniek', 'websitestudio'],
+    werkruimte: ['werkplek']
+  };
+  const inGids = new Set(CATALOGUS.flatMap((w) => w.items || []).map((i) => i.id));
+  const inWereld = new Set(reg.MAPPEN.flatMap((m) => m.items));
+  let n = 0;
+  for (const [rol, schermen] of Object.entries(GEMETEN)) {
+    for (const s of schermen) {
+      const url = '/apps/' + s + '.html';
+      const k = Object.keys(reg.LINKS).find((x) => reg.LINKS[x].url === url);
+      assert.ok(k, url + ' heeft geen ingang in LINKS');
+      assert.equal(reg.LINKS[k].werkrol, rol, url + ' hoort werkrol ' + rol + ' te dragen');
+      assert.ok(inGids.has('link:' + k), 'link:' + k + ' staat niet in de gids');
+      assert.ok(!inWereld.has('link:' + k), 'link:' + k + ' staat als tegel in een wereld; het is een scherm van een werkrol');
+      n++;
+    }
+  }
+  assert.equal(n, 55);
+});

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2904 bestanden en 19838 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2905 bestanden en 19839 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2904 |
-| losse beweringen (`test(...)`) | 19838 |
+| toetsbestanden | 2905 |
+| losse beweringen (`test(...)`) | 19839 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 84 |
+| niets van beide | 85 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2559 bestanden, 19257 beweringen.
+2560 bestanden, 19258 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2454,6 +2454,7 @@ toets omvalt.
 | `wachtwijze.test.js` | 9 | gezakt op `>=->>#0` | DE WACHTWIJZE VAN DE SCHERMTOETSEN (scripts/wachtwijze.js + WACHTWIJZE.json). WAAROM DEZE TOETS ER IS. |
 | `wachtwoordkosten.test.js` | 4 | gezakt op `return-weg#0` | De scrypt-kosten en het migratiepad. Waar dit over gaat: de opgeslagen wachtwoordhash droeg vroeger geen enkele parameter (`salt:hash`), en daardoor was de scrypt-kostenfactor niet te verhogen zonder elk bestaand... |
 | `wachtwoordrem-weerbaar.test.js` | 8 | gezakt op `true->false#0` | DE WACHTWOORDREM TEGEN EEN GOKKER (server/kern/identiteit/wachtwoordrem.js, met ./lopend.js voor de pogingen die nog lopen). Wat deze module beschermt: elke deur die een RTG-wachtwoord toetst, deelt dezelfde drie... |
+| `wallet-gratisaccount-verplicht.test.js` | 1 | -- | De wallet van een gratis account in de productiestand van de bezitspoort (RTG_BEZITSBEWIJS=verplicht), met een gebonden toestel. test/wallet-gratisaccount.test.js draait, zoals de meeste toetsen, met de bezitspoort... |
 | `wallet-gratisaccount.test.js` | 4 | -- | De wallet staat open voor elk account, ook een gratis account (server/routes/pay.js, server/routes/zorgwallet.js). Eigenaarsbesluit van 19 oktober 2026: gebruiken vraagt minimaal een gratis account, en de wallet... |
 | `walletmunt-herhaal.test.js` | 3 | -- | Een betaling geeft een keer feestmunten (server/kern/wallet.js, muntKoop). Gevonden door de voltooiproef van de wallet (scripts/lib/voltooi/wallet.js): een koop, een SIGKILL, en dezelfde tik opnieuw. |
 | `wandklok.test.js` | 4 | -- | DE RATEL OP DE WANDKLOK (scripts/lib/wandklok.js, keuringsregel 77). Een regel die niets kan vinden is erger dan geen regel (LAT.md regel 9). |

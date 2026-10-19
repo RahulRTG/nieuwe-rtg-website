@@ -185,6 +185,9 @@ const CONTRACT = {
   'link:library': Object.assign({
     belofte: 'een maker begint een werk, legt het vast in onderdelen met revisies, geeft met afspraak en rechten een editie vrij die niet meer verandert, leest hem en verwerkt feedback'
   }, voltooi('library', 'het scenario loopt /api/library/work/*, /studio/workspace, /revision/add, /agreement/*, /rights/grant, /edition/*, /publication/*, /reader/* en /feedback/*, de routes die /apps/library.html via apps/library/app.js aanroept')),
+  'link:rtfbuurt': Object.assign({
+    belofte: 'wie in een stad woont ziet welke RTF-afdeling open is, wat er loopt, waar hij binnen kan lopen en welke campagne er is -- en niets wat niet op een poster in het buurthuis zou hangen'
+  }, voltooi('rtfbuurt', 'het scenario loopt /api/rtfos/publiek/steden, /stad en /campagnes, de routes die /apps/foundation/os-publiek.html zelf aanroept, met wat het kantoor opent en stopt')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

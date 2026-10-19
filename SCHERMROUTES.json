@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "bd41a86a",
+  "commit": "e1eed930",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/connect.html"
+    "public/apps/foundation/os-publiek.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,8 +7822,8 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1102,
-  "verwijzingen": 1328,
+  "exactePaden": 1104,
+  "verwijzingen": 1331,
   "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
@@ -8304,6 +8304,14 @@
    "schermen": [
     "public/apps/festival/podium.js",
     "public/apps/festival/programma.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtfos/publiek/steden",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html",
+    "public/apps/foundation/os-publiek.html"
    ],
    "aantal": 2
   },
@@ -10401,13 +10409,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtfos/publiek/steden",
-   "schermen": [
-    "public/apps/foundation/buurtruil.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/rtfos/ruil/interesse",
    "schermen": [
     "public/apps/foundation/buurtruil.html"
@@ -10677,6 +10678,20 @@
    "pad": "/api/rtf/leven/deel/zet",
    "schermen": [
     "public/apps/foundation/mijnbanden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/publiek/campagnes",
+   "schermen": [
+    "public/apps/foundation/os-publiek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/publiek/stad",
+   "schermen": [
+    "public/apps/foundation/os-publiek.html"
    ],
    "aantal": 1
   },
@@ -16737,10 +16752,12 @@
   },
   {
    "bestand": "public/apps/foundation/os-publiek.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/publiek/"
-   ]
+   "exact": [
+    "/api/rtfos/publiek/campagnes",
+    "/api/rtfos/publiek/stad",
+    "/api/rtfos/publiek/steden"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foundation/os-veld.html",

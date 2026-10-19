@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T12:36:53.652Z",
-    "commit": "d1a33766",
+    "op": "2026-10-19T12:49:41.352Z",
+    "commit": "30dc2ac1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10888,6 +10888,16 @@
       "gezakt": 2,
       "geprobeerd": 2
     },
+    "move-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/move.html",
+      "operator": "html-bron-weg#0",
+      "geprobeerd": 1
+    },
     "move-gevolg-adressen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -12252,6 +12262,14 @@
         "sourceSha256": "64aa05f06ecaff915cd18039ced4dd709e139dc09b2c09a4be53095e786b2b9d",
         "testSha256": "861fdcc25324c270f5f5200ace548b82ce36251c375fb48370905d8473afad55"
       }
+    },
+    "ov-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/ov.html",
+      "operator": "html-bron-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "ov-operatie-routes.test.js": {
       "soort": "server",
@@ -14077,6 +14095,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "reizen-veilig-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reizen-veilig.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "reizen-veilig.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -14357,6 +14383,16 @@
       "module": "scripts/lib/risico.js",
       "operator": "===->!==#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "rit-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/rit-momenten.js",
+      "operator": "browser-export-weg#0",
       "geprobeerd": 1
     },
     "ritmigratie.test.js": {

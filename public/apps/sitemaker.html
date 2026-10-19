@@ -215,6 +215,8 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+/* een herhaalsleutel per upload; een herhaling na een afgebroken verbinding is dezelfde foto */
+let FOTO_IDEM='',FOTO_VOOR='';
 const api=(pad,body)=>fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
 
@@ -643,7 +645,7 @@ else {
     const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f)return;
     if(f.size>2.2*1024*1024){ $('#uploadStatus').textContent='Te groot (max ~2 MB).'; return; }
     $('#uploadStatus').textContent='Scannen en opslaan…';
-    try{ const dataUrl=await leesBestand(f); const r=await api('/api/site/foto',{dataUrl}); MIJNFOTOS=r.fotos||MIJNFOTOS; bouwBeeldgrid(); $('#uploadStatus').textContent='Toegevoegd. Klik de foto om hem te plaatsen.'; }
+    try{ const dataUrl=await leesBestand(f); if(FOTO_VOOR!==f.name+'|'+f.size){FOTO_IDEM=RTGId('foto');FOTO_VOOR=f.name+'|'+f.size;} const r=await api('/api/site/foto',{dataUrl,idem:FOTO_IDEM}); FOTO_IDEM='';FOTO_VOOR=''; MIJNFOTOS=r.fotos||MIJNFOTOS; bouwBeeldgrid(); $('#uploadStatus').textContent='Toegevoegd. Klik de foto om hem te plaatsen.'; }
     catch(err){ $('#uploadStatus').textContent=err.message||'Uploaden mislukt.'; }
   });
   $('#blokKnop').addEventListener('click',()=>$('#blokSheet').classList.add('open'));

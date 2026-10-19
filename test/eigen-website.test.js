@@ -219,3 +219,20 @@ test('7. een herhaalde eerste bewaring maakt geen tweede site', async () => {
   const c = await api('/api/site/bewaar', ontwerp('van de buur'), buur);
   assert.notEqual(c.body.design.id, a.body.design.id, 'dezelfde sleutel van een ander lid is een eigen site');
 });
+
+/* Een herhaalde upload (de knop na een afgebroken verbinding) is dezelfde
+   foto: geen tweede bestand en geen tweede plek in de bibliotheek. Dezelfde
+   sleutel bij een andere afbeelding is 409. */
+test('8. een herhaalde foto-upload met dezelfde sleutel is dezelfde foto', async () => {
+  const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  const voor = (await api('/api/site/fotos', {}, buur)).body.fotos.length;
+  const a = await api('/api/site/foto', { dataUrl: png, idem: 'foto-1' }, buur);
+  const b = await api('/api/site/foto', { dataUrl: png, idem: 'foto-1' }, buur);
+  assert.equal(a.status, 200);
+  assert.equal(b.status, 200);
+  assert.equal(b.body.herhaald, true);
+  assert.equal(b.body.url, a.body.url, 'dezelfde verwijzing, geen tweede bestand');
+  assert.equal((await api('/api/site/fotos', {}, buur)).body.fotos.length, voor + 1);
+  const ander = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  assert.equal((await api('/api/site/foto', { dataUrl: ander, idem: 'foto-1' }, buur)).status, 409);
+});

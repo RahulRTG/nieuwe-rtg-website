@@ -62,7 +62,9 @@ const EIGEN = [
   '/api/supplier/horeca/rekening/regel',
   '/api/browser/bericht',
   // een teamkamer: de sleutel op de kamer, de toegangscode maar een keer (kern/magnaat-trainingslobby-regie.js)
-  '/api/member/magnaat/teamkamer/maak'
+  '/api/member/magnaat/teamkamer/maak',
+  // een foto in de eigen bibliotheek (kern/webmaker-fotos.js, fotoHerhaling)
+  '/api/site/foto'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

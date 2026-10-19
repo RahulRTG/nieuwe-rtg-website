@@ -160,7 +160,7 @@ module.exports = function simulatiebank({ crypto, env, echteRail, nu }) {
   }
 
   return { aan, belet, maak, uitbetaal, scenarioVan, SCENARIOS,
-    haal: naslag.haal, terugbetaal: naslag.terugbetaal, terugScenarioVan: naslag.terugScenarioVan };
+    haal: naslag.haal, terugbetaal: naslag.terugbetaal, haalTerugbetaling: naslag.haalTerugbetaling, terugScenarioVan: naslag.terugScenarioVan };
 };
 
 module.exports.SCENARIOS = SCENARIOS;

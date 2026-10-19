@@ -178,6 +178,11 @@ const NAGEKEKEN = {
   'POST /api/residentie/gids': 'de gids toont suites met s.open op codenaam; let wel: een suite ONTSTAAT open (kern/residentie/index.js suiteVan, open: true), dus wie zijn suite opent staat in de gids zonder zelf voor open te kiezen -- een productvraag over de standaard, geen IDOR',
   'POST /api/carriere/ledger/zet': 'carriereledger.zet(key, data) leest geen id en schrijft een NIEUW feit in reeks(key) van B; de tegenpoging gaf 409 "staat er al, woord voor woord" door B\'s eigen eerste regel',
   'POST /api/member/rtmail/team/maak': 'rtmailTeam.maak(sess, invoer) leest geen id en maakt een NIEUW team voor B op de naam uit het lijf; de tegenpoging met dezelfde naam gaf 400 "Dit adres bestaat al" door B\'s eigen eerste team',
+  /* Horeca-createroutes (gang 5): folio/open maakt een gastrekening per kamer in
+     de EIGEN zaak (F(req.supplier.code)); folioVan filtert op de zaak. B's 200 is
+     B's eigen folio, en de tegenpoging gaf 409 omdat B met hetzelfde kamernummer
+     een tweede keer opende -- geen object van A. Met de hand nagelezen. */
+  'POST /api/supplier/horeca/folio/open': 'folio/open schrijft in F(req.supplier.code): B opent zijn EIGEN gastrekening, en de 409 van de tegenpoging is B\'s eigen dubbele kamer',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);

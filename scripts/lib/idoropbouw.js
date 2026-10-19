@@ -218,6 +218,16 @@ const LIJVEN = {
   '/api/push/subscribe': { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/proef123', keys: { p256dh: 'x', auth: 'y' } } },
   '/api/rtgid/machtig': (c) => ({ dienst: 'gemeente', dagen: 7, codenaam: c.tegen && c.tegen.codenaam }),
   '/api/supplier/ai': { vraag: 'Hoe druk wordt het vanavond?' },
+  /* Horeca-createroutes (gang 5, de zaken): met een geldig lijf maakt elke zaak
+     zijn EIGEN object. Een uniek kenmerk per aanroep voorkomt dat de tweede
+     poging op een 409 van zijn eigen eerste strandt; zo komen A, B en de
+     tegenpoging alledrie binnen en heet de route publiek -- er is geen object
+     van A om te schenden, elke zaak schrijft in zijn eigen doos. */
+  '/api/supplier/horeca/folio/open': () => ({ kamer: 'K' + randomUUID().slice(0, 6), gastnaam: 'Proefgast', gasten: 2 }),
+  '/api/supplier/horeca/haccp/punt': () => ({ naam: 'Koeling ' + randomUUID().slice(0, 5), min: 2, max: 7 }),
+  '/api/supplier/horeca/recovery/open': () => ({ tafel: 'T' + randomUUID().slice(0, 4), wat: 'Soep was koud, opnieuw gebracht' }),
+  '/api/supplier/horeca/fooienpot': () => ({ datum: over(-Math.floor(Math.random() * 300) - 1), deelnemers: [{ naam: 'Proef', uren: 8, weging: 1 }] }),
+  '/api/supplier/horeca/event/offerte': () => ({ naam: 'Feest ' + randomUUID().slice(0, 5), datum: over(30), posten: [{ naam: 'Zaalhuur', centen: 50000 }] }),
   '/api/verify/selfie': { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' }
 };
 

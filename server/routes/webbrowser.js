@@ -85,7 +85,11 @@ module.exports = (kern) => {
       return res.status(403).json({ error: 'Jullie zijn nog niet verbonden. Verbind eerst via de leden-app; daarna landt je bericht hier als gesprek.' });
     }
     if (!kern.commDm) return res.status(503).json({ error: 'De berichten draaien hier even niet.' });
-    const msg = kern.commDm.stuur(req.session.key, eigenaar, { tekst: 'Via jouw site (' + label.toLowerCase() + '): ' + tekst, lang: null });
+    /* De herhaalsleutel van het formulier: een herhaling na een afgebroken
+       verbinding of een herstart is hetzelfde bericht (kern/comm/bericht.js). */
+    const idem = b.idem ? 'web:' + String(b.idem).slice(0, 80) : null;
+    const msg = kern.commDm.stuur(req.session.key, eigenaar, { tekst: 'Via jouw site (' + label.toLowerCase() + '): ' + tekst, lang: null, idem });
+    if (msg.herhaald) return res.json({ ok: true, via: 'chat', soort, herhaald: true });
     if (sseToCustomer) sseToCustomer(eigenaar, 'social', { kind: 'dm', from: req.session.key, codename: liveCodename(req.session), text: msg.text, at: msg.at });
     webmaker.telFormulier(webmaker.idVanAdres(b.adres));
     save();

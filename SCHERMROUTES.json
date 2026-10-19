@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "10397ba5",
+  "commit": "e91f2bc3",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/sitemaker.html"
+    "public/apps/browser.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1092,
-  "verwijzingen": 1320,
-  "voorvoegsels": 138,
+  "exactePaden": 1096,
+  "verwijzingen": 1324,
+  "voorvoegsels": 137,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -9692,6 +9692,34 @@
    "pad": "/api/boeken/voortgang",
    "schermen": [
     "public/apps/boeken/app.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/bericht",
+   "schermen": [
+    "public/apps/browser.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/gids",
+   "schermen": [
+    "public/apps/browser.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/open",
+   "schermen": [
+    "public/apps/browser.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/browser/zoek",
+   "schermen": [
+    "public/apps/browser.html"
    ],
    "aantal": 1
   },
@@ -15994,10 +16022,13 @@
   },
   {
    "bestand": "public/apps/browser.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/browser/"
-   ]
+   "exact": [
+    "/api/browser/bericht",
+    "/api/browser/gids",
+    "/api/browser/open",
+    "/api/browser/zoek"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/camera.html",

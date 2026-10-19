@@ -95,8 +95,10 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
     const bijlage = o.post ? { soort: 'post', id: o.post.id }
       : o.stuk ? Object.assign({ soort: 'stuk' }, o.stuk) : null;
     const m = comm.bericht({ gesprekId: g.id, van, tekst: o.tekst || '',
-      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null });
-    return oudeVorm(m);
+      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null, idem: o.idem || null });
+    const uit = oudeVorm(m);
+    if (m.herhaald) uit.herhaald = true;
+    return uit;
   }
 
   /* De oude berichtvorm ({ from, text, post, stuk, at, lang }). Schermen en

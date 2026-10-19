@@ -248,6 +248,9 @@ const CONTRACT = {
   'link:sitemaker': Object.assign({
     belofte: 'een lid bouwt een eigen website, zet hem online en bepaalt zelf wanneer een wijziging naar buiten gaat, en een ander lid komt er niet aan'
   }, voltooi('sitemaker', 'het scenario loopt /api/site/sjablonen, /mijn, /haal, /bewaar, /publiceer, /live, /versies, /herstel en /offline, de routes die /apps/sitemaker.html zelf aanroept, met een bezoeker via /api/browser/open en een ander lid dat er niet bij komt')),
+  'link:browser': Object.assign({
+    belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden'
+  }, voltooi('browser', 'het scenario loopt /api/browser/gids, /zoek, /open en /bericht, de routes die /apps/browser.html zelf aanroept, met de maker die het gesprek leest en een vreemde die er niet door komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

@@ -28,6 +28,13 @@ function maakBericht({ B, eis, nu, id, save, standZet, standVan, seinNaarDeRest,
       const bron = (B()[g.id] || []).find((m) => m.id === o.antwoordOp);
       if (!bron) throw new Error('Dat bericht staat niet in dit gesprek.');
     }
+    /* Een herhaalsleutel (opt-in) per afzender: komt hetzelfde verzoek terug
+       nadat het eerste al was weggeschreven (een herstart, een afgebroken
+       verbinding), dan is het hetzelfde bericht en geen tweede. De sleutel
+       staat op het bericht zelf, dus hij overleeft een crash. */
+    const idem = o.idem ? String(o.idem).slice(0, 100) : null;
+    const eerder = idem && (B()[g.id] || []).find((x) => x.van === o.van && x.idem === idem);
+    if (eerder) return Object.assign({}, eerder, { herhaald: true });
     const m = {
       id: id('brc'), van: o.van, at: nu(),
       /* Namens wie er geschreven wordt (`van`) en WIE het typte (`door`) zijn
@@ -46,6 +53,7 @@ function maakBericht({ B, eis, nu, id, save, standZet, standVan, seinNaarDeRest,
       lang: o.lang || null,
       reacties: {}
     };
+    if (idem) m.idem = idem;
     const lijst = B()[g.id] = B()[g.id] || [];
     lijst.push(m);
     if (lijst.length > MAX_PER_GESPREK) lijst.splice(0, lijst.length - MAX_PER_GESPREK);

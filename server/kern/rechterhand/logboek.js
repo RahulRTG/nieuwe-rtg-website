@@ -8,7 +8,7 @@ module.exports = (ctx) => {
   const { save, rid, nu, schoon, isDatum, getal, L } = ctx;
   const SOORTEN = ['jacht', 'vliegtuig', 'helikopter', 'oldtimer', 'auto', 'motor', 'overig'];
   const REGELSOORTEN = ['keuring', 'service', 'reparatie', 'verzekering', 'stalling', 'overig'];
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../tijdzone').datumIn();
 
   function O(key) { const l = L(key); if (!l.onderhoud || typeof l.onderhoud !== 'object') l.onderhoud = { objecten: [], regels: [] }; if (!Array.isArray(l.onderhoud.objecten)) l.onderhoud.objecten = []; if (!Array.isArray(l.onderhoud.regels)) l.onderhoud.regels = []; return l.onderhoud; }
 
@@ -40,7 +40,7 @@ module.exports = (ctx) => {
   function lbRegelWeg(key, id) { const o = O(key); o.regels = o.regels.filter(x => x.id !== id); save(); return { status: 200, ok: true }; }
 
   function logboek(key) {
-    const o = O(key), t = vandaag(), grens = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+    const o = O(key), t = vandaag(), grens = require('../tijdzone').plusDagen(t, 60);
     const naam = id => { const x = o.objecten.find(y => y.id === id); return x ? x.naam : ''; };
     const objecten = o.objecten.map(x => {
       const regels = o.regels.filter(r => r.objectId === x.id);

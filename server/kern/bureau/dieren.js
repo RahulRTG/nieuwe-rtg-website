@@ -96,7 +96,7 @@ module.exports = (ctx) => {
     if (!wat) return { status: 400, error: 'Wat is er gedaan of gepland?' };
     if (!Array.isArray(d.zorg)) d.zorg = [];
     if (d.zorg.length >= 200) d.zorg.pop();
-    d.zorg.unshift({ id: rid(), wat, op: isDatum(x.op) ? x.op : new Date().toISOString().slice(0, 10),
+    d.zorg.unshift({ id: rid(), wat, op: isDatum(x.op) ? x.op : require('../tijdzone').datumIn(),
       door: schoon(x.door, 80), volgende: isDatum(x.volgende) ? x.volgende : '' });
     save();
     return { status: 200, ok: true };

@@ -8,8 +8,8 @@
 module.exports = (kern) => {
   const { app, db, supplierAuth } = kern;
 
-  const vandaag = () => new Date().toISOString().slice(0, 10);
-  const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
+  const vandaag = () => require('../../kern/tijdzone').datumIn();
+  const overDagen = d => require('../../kern/tijdzone').plusDagen(vandaag(), d);
   const bak = (naam, code) => (db.data[naam] || {})[code] || null;
   /* De pols staat er vanaf dag een: als de genre-motor nog nooit is
      geopend, wekken we hem hier met dezelfde accessor als het eigen

@@ -48,7 +48,7 @@ const { KETEN, NOOIT } = require('./keten');
 module.exports = (ctx) => {
   const { graaf, cases, beoordeel, rid, inAanbouw } = ctx;
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../tijdzone').datumIn();
 
   /* Wat raakt een periode? Puur uit de graaf: elke knoop met een datum die in
      het venster valt. Geen tabel, geen aanname -- als het lid het nergens heeft

@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-19T10:03:21.649Z",
-  "commit": "eb6dde1a"
+  "op": "2026-10-19T10:09:32.498Z",
+  "commit": "09897840"
  },
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
@@ -14049,31 +14049,31 @@
   {
    "route": "POST /api/huur/boek",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 46,
+   "regel": 44,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/foto",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 115,
+   "regel": 117,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/locatie",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 153,
+   "regel": 155,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/mijn",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 91,
+   "regel": 93,
    "samengesteld": false
   },
   {
    "route": "POST /api/huur/sos",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 136,
+   "regel": 138,
    "samengesteld": false
   },
   {
@@ -38181,7 +38181,7 @@
   {
    "route": "POST /api/verhuur/aanbod",
    "bestand": "server/routes/member/voertuigen/huur.js",
-   "regel": 37,
+   "regel": 35,
    "samengesteld": false
   },
   {

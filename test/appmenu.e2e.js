@@ -932,9 +932,11 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       return {
         acties: window.RTGAdaptief.context().acties,
         schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')) && document.querySelectorAll('.rtg-adaptive-edge').length === 1,
-        bank: zichtbaar(doc.querySelector('#rvApp > .rv-bank')),
-        rahul: zichtbaar(doc.querySelector('#rvApp > .rv-rahul')),
-        rasterrijen: getComputedStyle(doc.querySelector('#rvApp')).gridTemplateRows.trim().split(/\s+/).length
+        bank: zichtbaar(doc.querySelector('#rvBank')),
+        rahul: zichtbaar(doc.querySelector('#rvRahul')),
+        /* Reizen & Veilig staat op het Design System: in een blad tekent het
+           geen tweede Edge en geen eigen kop (public/ds/edge.js, ingebed). */
+        kindchrome: doc.querySelectorAll('.ds-edge, .ds-kop').length
       };
     });
     assert.deepEqual(begin.acties, [
@@ -944,14 +946,14 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     assert.equal(begin.schil, true, 'de Command-balk met menu en sluiten hoort te blijven');
     assert.equal(begin.bank, false, 'de lokale Reizen & Veilig-bank staat dubbel in beeld');
     assert.equal(begin.rahul, false, 'de lokale Rahul-balk staat naast de Rahul van Command');
-    assert.equal(begin.rasterrijen, 1, 'de verborgen bank laat nog een lege rasterrij achter');
+    assert.equal(begin.kindchrome, 0, 'het blad tekent een tweede Edge of kop naast die van Command');
 
     /* Ook een gewone specialist-link blijft hetzelfde directe werkblad. Zo'n
        route heeft geen embed-query, dus bewaakt de hostmarker zelf dat de
        TravelOS-balk en haar gereserveerde ruimte niet terugkomen. */
     const rvFrame = page.frameLocator('#rtgCommand .cmd-pane.actief iframe');
-    await rvFrame.locator('.rv-specialisten summary').click();
-    await rvFrame.locator('.rv-specialisten a[href="/apps/vluchten.html"]').click();
+    await rvFrame.locator('[data-specialisten] summary').click();
+    await rvFrame.locator('[data-specialisten] a[href="/apps/vluchten.html"]').click();
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f && f.contentDocument;
       return !!(f && doc && doc.documentElement && f.contentWindow.location.pathname === '/apps/vluchten.html' &&
@@ -982,8 +984,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       return !!(f && f.contentDocument && f.contentDocument.body &&
         f.contentWindow.location.pathname === '/apps/ov.html' &&
-        f.contentDocument.body.classList.contains('travel-os') &&
-        f.contentDocument.documentElement.classList.contains('tos-ingebed') &&
+        f.contentDocument.documentElement.getAttribute('data-ds-ingebed') === '1' &&
         document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane').length === 2);
     }, null, { timeout: 20000 });
     const vervoer = await page.evaluate(() => {
@@ -993,16 +994,16 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/ov.html');
-      const bank = rv.contentDocument.querySelector('#rvApp > .rv-bank');
-      const lokaal = leaf.contentDocument.querySelector('.tos-nav');
-      const stijl = getComputedStyle(leaf.contentDocument.documentElement);
+      const bank = rv.contentDocument.querySelector('#rvBank');
+      /* OV staat op het Design System: zijn lokale chrome is de ds-Edge en de
+         ds-kop, en in een blad bestaan die allebei niet. */
+      const lokaal = leaf.contentDocument.querySelector('.ds-edge');
       return {
         eigenaren: [...buiten, bank, lokaal].filter(zichtbaar).length,
         schil: buiten.filter(zichtbaar).length === 1, bank: zichtbaar(bank), travel: zichtbaar(lokaal),
-        marker: leaf.contentDocument.documentElement.classList.contains('tos-ingebed'),
+        marker: leaf.contentDocument.documentElement.getAttribute('data-ds-ingebed') === '1',
         embed: leaf.contentWindow.location.search,
-        rail: stijl.getPropertyValue('--tos-rail').trim(),
-        onderruimte: stijl.getPropertyValue('--tos-bottom').trim(),
+        kop: leaf.contentDocument.querySelectorAll('.ds-kop').length,
         diepte: frames.reduce((n, f) => n + f.contentDocument.querySelectorAll('iframe').length, 0),
         paden: frames.map(f => f.contentWindow.location.pathname)
       };
@@ -1013,8 +1014,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     assert.equal(vervoer.marker, true, 'OV herkent niet dat Command zijn navigatie al draagt (' +
       vervoer.embed + ')');
     assert.match(vervoer.embed, /(?:^|[?&])embed=1(?:&|$)/, 'het child-werkblad mist zijn expliciete embed-signaal');
-    assert.equal(vervoer.rail, '0px', 'de verborgen TravelOS-rail laat links lege ruimte achter');
-    assert.equal(vervoer.onderruimte, '0px', 'de verborgen TravelOS-balk laat onderaan lege ruimte achter');
+    assert.equal(vervoer.kop, 0, 'OV tekent in het blad een eigen kop naast die van Command');
     assert.equal(vervoer.diepte, 0, 'een direct Command-blad hoort zelf geen nieuw app-frame te maken: ' + vervoer.paden);
 
     /* Keer naar het bronblad terug. Zijn zes handelingen moeten opnieuw aan de
@@ -1033,7 +1033,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     await kies('reisveilig.reisblad', 'Reizen');
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
-      const p = f && f.contentDocument && f.contentDocument.querySelector('.rv-pane.actief');
+      const p = f && f.contentDocument && f.contentDocument.querySelector('[data-actief]');
       return !!(p && p.dataset.id === 'reisblad' && !p.querySelector('iframe'));
     }, null, { timeout: 10000 });
     await kies('reisveilig.navigatie', 'Navigatie');
@@ -1084,7 +1084,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
-      return { bank: zichtbaar(rv.contentDocument.querySelector('#rvApp > .rv-bank')),
+      return { bank: zichtbaar(rv.contentDocument.querySelector('#rvBank')),
         schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')) && document.querySelectorAll('.rtg-adaptive-edge').length === 1,
         kindnav: zichtbaar(leaf && leaf.contentDocument.querySelector('.tos-nav')),
         directeBladen: frames.length };
@@ -1102,43 +1102,45 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
-      return [document.querySelector('.rtg-adaptive-bar'), rv.contentDocument.querySelector('#rvApp > .rv-bank'),
+      return [document.querySelector('.rtg-adaptive-bar'), rv.contentDocument.querySelector('#rvBank'),
         leaf.contentDocument.querySelector('.tos-nav')].filter(zichtbaar).length;
     }), 1, 'na terugdraaien naar telefoon verschijnen de drie balken opnieuw');
 
-    /* Ook standalone bedient de gedeelde Edge Reizen & Veilig. Merk- en
-       teruglinks houden het child in embedmodus, zonder tweede appbalk. */
+    /* Ook standalone bedient de Edge Reizen & Veilig; sinds batch 4 van
+       TRAVELOS-MIGRATIE.md is dat de ds-Edge, met de bank onder Acties. Het
+       OV-blad in het paneel draagt geen tweede Edge en geen eigen kop
+       (public/ds/edge.js, ingebed): er is dus geen tweede terug- of merklink
+       meer om weg te stoppen. Een teruggang naar TravelOS houdt embed=1 vast. */
     const los = await ctx.newPage();
     await los.setViewportSize({ width: 393, height: 852 });
     await los.goto(base + '/apps/reizen-veilig.html', { waitUntil: 'domcontentloaded' });
-    await edgeActies(los);
-    await los.locator('.rtg-adaptive-controls [data-cap="reisveilig.vervoer"]').click();
-    await los.keyboard.press('Escape');
-    await los.waitForSelector('#rvPanes .rv-pane.actief iframe[src*="/apps/ov.html"][src*="embed=1"]', { timeout: 20000 });
-    const losKind = los.frameLocator('#rvPanes .rv-pane.actief iframe');
-    const lokaleTerug = losKind.locator('a[href="/apps/reizen.html?embed=1#reizen"]:not(.tos-mark)').first();
-    assert.equal(await lokaleTerug.evaluate(el => getComputedStyle(el).clipPath), 'inset(50%)',
-      'het child toont naast de Reizen & Veilig-bank een tweede terugbediening');
-    await lokaleTerug.evaluate(el => el.click());
+    await los.locator('[data-ds-edge="acties"]').click();
+    await los.locator('#dsEdgeBlad').getByRole('button', { name: 'Gaan', exact: true }).click();
+    await los.waitForSelector('#rvPanes [data-actief] iframe[src*="/apps/ov.html"][src*="embed=1"]', { timeout: 20000 });
     await los.waitForFunction(() => {
-      const f = document.querySelector('#rvPanes .rv-pane.actief iframe');
+      const f = document.querySelector('#rvPanes [data-actief] iframe'), doc = f && f.contentDocument;
+      return !!(doc && doc.documentElement && doc.documentElement.getAttribute('data-ds-ingebed') === '1');
+    }, null, { timeout: 20000 });
+    assert.deepEqual(await los.evaluate(() => {
+      const doc = document.querySelector('#rvPanes [data-actief] iframe').contentDocument;
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+      return { kop: doc.querySelectorAll('.ds-kop').length, edge: doc.querySelectorAll('.ds-edge').length,
+        app: [...doc.querySelectorAll('a[href="/apps/app.html"]')].filter(zichtbaar).length };
+    }), { kop: 0, edge: 0, app: 0 }, 'het child toont naast de Reizen & Veilig-bank een tweede terugbediening');
+    await los.evaluate(() => { document.querySelector('#rvPanes [data-actief] iframe').contentWindow.location.href = '/apps/reizen.html?embed=1#reizen'; });
+    await los.waitForFunction(() => {
+      const f = document.querySelector('#rvPanes [data-actief] iframe');
       const tabs = f && f.contentDocument && f.contentDocument.querySelector('.hoofdtabs');
       return !!(f && f.contentWindow.location.pathname === '/apps/reizen.html' &&
-        f.contentWindow.location.search.includes('embed=1') && tabs && getComputedStyle(tabs).display === 'none');
+        f.contentWindow.location.search.includes('embed=1') && !f.contentDocument.querySelector('#rtgCommand') &&
+        (!tabs || getComputedStyle(tabs).display === 'none'));
     }, null, { timeout: 20000 });
-    await los.evaluate(() => document.querySelector('#rvPanes .rv-pane.actief iframe').contentWindow.history.back());
-    await los.waitForFunction(() => document.querySelector('#rvPanes .rv-pane.actief iframe').contentWindow.location.pathname === '/apps/ov.html');
-    const ingebedMerk = losKind.locator('.tos-mark');
-    assert.equal(await ingebedMerk.evaluate(el => getComputedStyle(el.closest('.tos-topbar')).display), 'none',
-      'een childmodule tekent naast Reizen & Veilig opnieuw globale topchrome');
-    await ingebedMerk.evaluate(el => el.click());
-    await los.waitForFunction(() => {
-      const f = document.querySelector('#rvPanes .rv-pane.actief iframe');
+    assert.equal(await los.evaluate(() => {
+      const f = document.querySelector('#rvPanes [data-actief] iframe');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
-      return f.contentWindow.location.pathname === '/apps/reizen.html' && !f.contentDocument.querySelector('#rtgCommand') &&
-        [document.querySelector('.rtg-adaptive-bar'), document.querySelector('#rvApp > .rv-bank'),
-          f.contentDocument.querySelector('.hoofdtabs')].filter(zichtbaar).length === 1;
-    }, null, { timeout: 20000 });
+      return [document.querySelector('.ds-edge'), document.querySelector('#rvBank'),
+        f.contentDocument.querySelector('.hoofdtabs, .ds-edge')].filter(zichtbaar).length;
+    }), 2, 'standalone hoort precies de Edge en de eigen bank te tonen, en het kind geen derde balk');
     await los.close();
 
     const deep = await page.evaluate(() => ({

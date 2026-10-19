@@ -21,9 +21,10 @@
       versie zette die op nul, en toen liep de titel van Berichten onder de
       bovenbalk door. Nul was het verkeerde getal; de inzet van de Edge is het
       goede.
-   3. DE GRENDEL: EEN NAAM IS GEEN BALK. `ios.js` plakt `ios-nav` ook op
-      `header.ritkop` van rit.html, en rtg-aankomst-2026.css maakt daar een hero
-      van 430px met een foto van. Wie op de klassenaam claimt, haalt daar de
+   3. DE GRENDEL: EEN NAAM IS GEEN BALK. `ios.js` plakte `ios-nav` ook op
+      `header.ritkop` van rit.html, en rtg-aankomst-2026.css maakte daar een hero
+      van 430px met een foto van (rit.html staat inmiddels op /ds/; de proef
+      bouwt die hero nu zelf na). Wie op de klassenaam claimt, haalt daar de
       INHOUD weg. De claim meet daarom of het ding op dat moment ook werkelijk
       een balk is. Zonder deze derde proef zou de toets groen staan terwijl de
       regel te grof is -- en dat is precies het geval dat je niet ziet aankomen.
@@ -219,23 +220,32 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       assert.equal(balk.veldZichtbaar, true, 'het adresveld zelf is niet meer te zien');
     });
 
-    /* DE GRENDEL. De hero van rit.html is een inhoudelijke sectie van ruim
-       200px en geen systeembalk. Zonder deze proef zou een grovere claimregel
-       onopgemerkt de inhoud van dat scherm weghalen. */
+    /* DE GRENDEL. De hero van rit.html was een inhoudelijke sectie van ruim
+       200px en geen systeembalk. rit.html staat sinds batch 4 van
+       TRAVELOS-MIGRATIE.md op het Design System en draagt die oude laag niet
+       meer; de regel die hij bewaakte geldt nog wel. Daarom staat de hero hier
+       zelf, met een naam uit de claimlijst, op een scherm dat de claim nog
+       draait. Zonder deze proef zou een grovere claimregel onopgemerkt inhoud
+       wegnemen. */
     await t.test('een hero die alleen de naam draagt, blijft staan', async () => {
-      await page.goto(base + '/apps/rit.html', { waitUntil: 'domcontentloaded' });
+      await page.goto(base + '/apps/browser.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
-        document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('.ritkop'), null,
-        { wat: 'de inhoudelijke hero van rit.html' });
+        document.body.getAttribute('data-rtg-adaptive-ready') === 'true' && !!window.RTGAdaptiveEdgeClaim, null,
+        { wat: 'een scherm waarop de claim draait' });
       const hero = await page.evaluate(() => {
-        const el = document.querySelector('.ritkop');
+        const el = document.createElement('section');
+        el.className = 'rtg-deep-nav';
+        el.setAttribute('data-proefhero', '');
+        el.textContent = 'Van aankomst naar bestemming.';
+        el.style.cssText = 'position:relative;display:block;height:430px';
+        document.body.prepend(el);
+        window.RTGAdaptiveEdgeClaim.claim(document, window);
         const s = getComputedStyle(el), r = el.getBoundingClientRect();
-        return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), positie: s.position,
-          hoogte: Math.round(r.height), zichtbaar: s.display !== 'none' && r.height > 0 };
+        return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), hoogte: Math.round(r.height),
+          zichtbaar: s.display !== 'none' && r.height > 0 };
       });
       assert.equal(hero.geclaimd, false, 'de Edge claimde een hero alsof het een balk was');
-      assert.equal(hero.zichtbaar, true, 'de hero van rit.html is van het scherm verdwenen');
+      assert.equal(hero.zichtbaar, true, 'de hero is van het scherm verdwenen');
       assert.ok(hero.hoogte > 200, 'de hero is geen hero meer (' + hero.hoogte + 'px); de grendel toetst niets meer');
     });
   } finally {

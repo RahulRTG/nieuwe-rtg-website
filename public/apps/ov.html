@@ -6,361 +6,217 @@
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Vervoer</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
-  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
-  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
-  .kop .rek{flex:1;}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:640px;margin:0 auto;}
-  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
-  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
-  button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font-size:0.85rem;padding:0.6rem 0.95rem;}
-  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
-  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .knop[disabled]{opacity:0.45;cursor:default;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
-  select,input{font:inherit;background:var(--card2);border:1px solid var(--line);border-radius:0;
-    color:var(--txt);padding:0.55rem 0.7rem;width:100%;}
-  select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
-  label{display:block;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.3rem;}
-  .duo{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
-  /* de tabbladen: rit, ov, pendel */
-  /* GEEN eigen tabvormgeving hier. De UI-kit (shared/rtg-ui.css) maakt van een
-     `.tabs`-rij met kale knoppen een pilrij, en van `.aan` de actieve pil --
-     dat is de vormtaal van het huis en die wint ook op specificiteit
-     (`body.rtg-stijl .tabs > button`). Er een tweede tabstijl naast zetten
-     levert alleen een rij op die er net anders uitziet dan elke andere rij in
-     het OS. Wat hier overblijft is de plaatsing. */
-  .tabs{padding:0 1.1rem;max-width:640px;margin:0 auto 0.3rem;}
-  .tabs > button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  /* de twee snelle check-ins: twee grote rustige vlakken */
-  .snel{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;}
-  .snel button{display:flex;flex-direction:column;align-items:center;gap:0.4rem;background:var(--card);
-    border:1px solid var(--line);border-radius:0;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
-  .snel button .i{display:block;width:1.9rem;height:1.9rem;}
-  .snel button .sub{font-size:0.68rem;color:var(--soft);}
-  .snel button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  /* lijnen dichtbij */
-  .lijn{display:flex;align-items:baseline;gap:0.7rem;border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.88rem;}
-  .lijn:first-child{border-top:none;}
-  .lijn .icoon{width:1.2rem;height:1.2rem;flex:none;}
-  .lijn .sub{display:block;font-size:0.7rem;color:var(--soft);margin-top:0.15rem;}
-  .lijn .rek{flex:1;}
-  .lijn .over{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;}
-  .lijn .over .puls{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--groen);
-    margin-right:0.35rem;animation:puls 1.6s ease-in-out infinite;}
-  @keyframes puls{0%,100%{opacity:0.35;}50%{opacity:1;}}
-  /* de actieve rit en de oplichtende code */
-  .rit{border-left:3px solid var(--groen);}
-  /* de statusketen van een lopende rit */
-  .keten{display:flex;gap:0.3rem;margin:0.7rem 0 0.2rem;}
-  .keten span{flex:1;height:3px;border-radius:0;background:var(--line);}
-  .keten span.af{background:var(--gold);}
-  .prijs{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
-  .rijtje{display:flex;justify-content:space-between;gap:0.7rem;border-top:1px solid var(--line);
-    padding:0.5rem 0;font-size:0.85rem;}
-  .rijtje:first-child{border-top:none;}
-  .codeScherm{position:fixed;inset:0;background:#0C0C0B;display:none;flex-direction:column;align-items:center;
-    justify-content:center;gap:1.2rem;z-index:50;}
-  .codeScherm.zien{display:flex;}
-  .codeScherm .codeQr{width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;}
-  .codeScherm .codeTekst{font-family:'Bodoni Moda',serif;letter-spacing:0.1em;word-break:break-all;max-width:90vw;text-align:center;}
-  .codeScherm .code{font-family:'Bodoni Moda',serif;font-size:3.4rem;letter-spacing:0.35em;padding-left:0.35em;
-    color:#0C0C0B;background:var(--gold);border-radius:0;padding:1rem 1.4rem;
-    box-shadow:0 0 60px rgba(201,162,75,0.65), 0 0 140px rgba(201,162,75,0.35);}
-  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
-    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
-  .melding.zien{opacity:1;}
-  .weg{display:none !important;}
-  /* DE ACCENTTOON MOET OOK OP EEN LICHT VLAK LEZEN. #5EE7F7 is een heldere
-     cyaan: prachtig op pianolak (13,3:1) en onleesbaar op parelmoer (1,4). En de
-     tint is niet van dit blad: de server stuurt hem mee met het lidmaatschap
-     (private goud, lifestyle amber) en laadMoveWereld() zet hem INLINE. Een
-     inline stijl wint van elke regel hier, dus een vaste vervanging op champagne
-     haalde niets uit -- dat was mijn eerste poging en de poort zag hem gewoon
-     staan.
-
-     Wat hier staat vervangt de kleur dus niet maar VERDIEPT hem: dezelfde tint,
-     in de schaduw, zodat het onderscheid tussen de passen blijft. 40% van de
-     tint, nagerekend op de drie accenten die de server stuurt en op de twee
-     gronden waar ze staan: 5,8 tot 7,4 -- alle drie ruim boven de 4,5.
-
-     Champagne is het enige LICHTE thema van het huis (rtg-themas.css), dus dat
-     is hier de schakelaar. Komt er ooit een tweede lichte grond bij, dan hoort
-     deze regel mee te groeien -- de a11y-poort zegt het dan meteen. */
-  /* EN DE SCHAKELAAR IS HET VLAK, NIET HET THEMA -- dat is met schade geleerd.
-     Deze pagina verklaart haar eigen grond als onyx (data-rtg-eigenvlak op de
-     body hieronder), dus zij is DONKER ook als het thema champagne is. De regel
-     keek naar het thema en verdonkerde de inkt dus juist op een donkere grond:
-     de orb haalde 2,42:1. `:not(:has(...))` laat hem alleen gelden waar de grond
-     werkelijk het thema volgt -- dezelfde vorm die rtg-themas.css gebruikt om
-     een eigen vlak te herkennen. */
-  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .eyebrow,
-  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .moveStop,
-  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .moveOrb b{
-    color:color-mix(in srgb,var(--accent) 40%,#000);}
-  .moveHero{--accent:var(--ov-accent,#5EE7F7);position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:0;
-    border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--card)),var(--card) 70%);box-shadow:0 24px 70px rgba(0,0,0,.25)}
-  .moveHero.private{--accent:#D8C8A0;background:linear-gradient(145deg,#24231e,#0c1015 72%)}.moveHero.lifestyle{--accent:#E8C98B;background:linear-gradient(145deg,#34251f,#17110f 72%)}
-  .moveHero .eyebrow{font-size:.59rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}.moveHero h2{font:500 clamp(2rem,7vw,3.1rem)/1.02 'Bodoni Moda',serif;letter-spacing:0;text-transform:none;color:var(--txt);margin:.55rem 0;max-width:58%}.moveHero>p{max-width:48%}
-  .moveOrb{position:absolute;right:9%;top:33px;width:158px;height:158px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);box-shadow:inset 0 0 38px color-mix(in srgb,var(--accent) 13%,transparent),0 0 75px color-mix(in srgb,var(--accent) 14%,transparent);display:grid;place-items:center;animation:moveAdem 5s ease-in-out infinite}
-  .moveOrb:before,.moveOrb:after{content:'';position:absolute;inset:13px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-left-color:transparent;animation:moveDraai 13s linear infinite}.moveOrb:after{inset:29px;animation-direction:reverse;animation-duration:9s}.moveOrb b{font:500 .95rem 'Bodoni Moda',serif;text-align:center;max-width:9ch;z-index:1}.moveOrb i{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:moveBaan 7s linear infinite}
-  .moveRail{position:absolute;left:1.5rem;right:1.5rem;bottom:2.9rem;display:flex;align-items:center}.moveStop{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--accent) 44%,var(--line));background:var(--card2);font-size:.7rem;color:var(--accent)}.moveLine{height:1px;flex:1;position:relative}
-  /* DE STREEP IS EEN EIGEN ELEMENT GEWORDEN, en dat is geen opsmuk. Het label
-     ("Vertrek") staat absoluut ONDER de streep, buiten de doos van zijn ouder.
-     Zolang die ouder zelf het cyaanverloop droeg, was dat de enige grond die
-     eronder te vinden was: ivoor op helder cyaan, 1,30:1. In het echt ligt er
-     de donkere hero onder. De streep zit nu in een eigen <i>, zodat het label
-     de grond heeft waar het ook echt op ligt. */
-  .moveLine i{position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 17%,var(--line)))}.moveLine span{position:absolute;top:.45rem;left:.25rem;color:var(--soft);font-size:.57rem;white-space:nowrap}.moveStatus{position:absolute;bottom:1rem;left:1.5rem;font-size:.62rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase}.moveStatus:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--groen);box-shadow:0 0 12px var(--groen);margin-right:.45rem}
-  .privateForm{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}.privateModes{display:flex;gap:.4rem;flex-wrap:wrap;margin:.7rem 0}.privateModes button{border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--soft);padding:.42rem .62rem;font-size:.68rem}.privateModes button[aria-pressed=true]{border-color:var(--gold);color:var(--txt)}
-  @keyframes moveAdem{50%{transform:scale(1.035);filter:brightness(1.14)}}@keyframes moveDraai{to{transform:rotate(360deg)}}@keyframes moveBaan{from{transform:rotate(0) translateX(79px)}to{transform:rotate(360deg) translateX(79px)}}
-  @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
-  @media(max-width:560px){.moveHero{margin:.3rem 1.1rem 1rem;min-height:430px;padding:1.2rem}.moveHero h2,.moveHero>p{max-width:100%}.moveOrb{right:50%;top:150px;transform:translateX(50%);width:135px;height:135px}.moveRail{left:1.2rem;right:1.2rem}.privateForm{grid-template-columns:1fr}}
-
-  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
-     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
-     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
-  .i-1hjmzy{margin-top:0.5rem}
-  .i-q78lq2{margin-top:0.75rem}
-  .i-2uh62t{font-size:0.95rem}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/glyf.js" defer></script>
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/travel-os.css" rel="stylesheet">
-<link href="/shared/rtg-edge-system.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-1cuiwfl:not(#_#_#_){margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap}
-.s-1hjpjwj:not(#_#_#_){margin-top:0.9rem}
-.s-1x93s7l:not(#_#_#_){display:flex;gap:0.5rem}
-.s-5iufzb:not(#_#_#_){width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem}
-</style>
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/shared/poortgesprek.js"></script>
+<script src="/ds/shell.js"></script>
 </head>
-<body data-rtg-context-bron="ov" class="rtg-stijl travel-os" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>RTG Vervoer</h1>
-  <span class="rek"></span>
-  <span class="badge">Alles in &eacute;&eacute;n &middot; live gps</span>
+<!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4): Taak
+     (een reis plannen, inchecken, een kaartje kopen) en Detail (de lopende
+     rit, de code). Dezelfde vervoers- en OV-kern als ervoor; geen eigen stijl.
+     Een demovervoerder bestaat alleen met RTG_DEMO en draagt dan zijn eigen
+     markering uit de server; dit scherm verzint er niets bij. -->
+<body data-rtg-context-bron="ov" class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="taak">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/reizen.html" aria-label="RTG TravelOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
-<section class="moveHero" id="moveHero" aria-labelledby="moveTitel">
-  <div class="eyebrow" id="moveBelofte">Slim, eerlijk en zonder gedoe</div><h2 id="moveTitel">Alles voor uw volgende reis</h2><p class="stil" id="moveBrief">Live vervoer, de beste route en alleen bevestigen wanneer dat echt nodig is.</p>
-  <div class="moveOrb"><b id="moveOrbTekst">Alles onder controle</b><i></i></div>
-  <div class="moveRail" aria-label="Reisstatus"><span class="moveStop">&#9670;</span><span class="moveLine"><i></i><span>Vertrek</span></span><span class="moveStop">&#9678;</span><span class="moveLine"><i></i><span>Vervoer gereed</span></span><span class="moveStop">&#10003;</span></div>
-  <div class="moveStatus" id="moveStatus">Regie actief, u houdt de beslissing</div>
+<main class="ds-taak" id="main">
+<section class="ds-kaart ds-kaart--beeld" id="moveHero" aria-labelledby="moveTitel">
+  <img class="ds-kaart__beeld" src="/images/worlds/heritage/travel-heritage-v2.jpg" alt="">
+  <div class="ds-kaart__inhoud">
+    <p class="ds-kaart__sub" id="moveBelofte">Slim, eerlijk en zonder gedoe</p>
+    <h1 class="ds-kaart__titel" id="moveTitel">Alles voor uw volgende reis</h1>
+    <p class="ds-kaart__sub" id="moveBrief">Live vervoer, de beste route en alleen bevestigen wanneer dat echt nodig is.</p>
+  </div>
 </section>
-<nav class="tabs" role="tablist" aria-label="Soort vervoer">
-  <button id="tabRit" class="aan" type="button" role="tab" aria-selected="true" aria-controls="vRit">Reizen</button>
-  <button id="tabOv" type="button" role="tab" aria-selected="false" aria-controls="vOv">Openbaar vervoer</button>
-  <button id="tabPendel" type="button" role="tab" aria-selected="false" aria-controls="vPendel">Bedrijfspendel</button>
-  <button id="tabPrivate" class="weg" type="button" role="tab" aria-selected="false" aria-controls="vPrivate">Private</button>
-</nav>
-<main>
-  <section id="vPoort" class="weg">
-    <div class="kaart"><p class="stil">RTG Vervoer hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
+<div class="ds-taak__kop">
+  <p class="ds-label">RTG Vervoer · alles in &eacute;&eacute;n · live gps</p>
+  <p class="ds-detail__status" id="moveOrbTekst">Alles onder controle</p>
+  <p class="ds-meta" id="moveStatus">Regie actief, u houdt de beslissing</p>
+</div>
+<div class="ds-tabs" role="tablist" aria-label="Soort vervoer">
+  <button class="ds-tab" id="tabRit" type="button" role="tab" aria-selected="true" aria-controls="vRit">Reizen</button>
+  <button class="ds-tab" id="tabOv" type="button" role="tab" aria-selected="false" aria-controls="vOv">Openbaar vervoer</button>
+  <button class="ds-tab" id="tabPendel" type="button" role="tab" aria-selected="false" aria-controls="vPendel">Bedrijfspendel</button>
+  <button class="ds-tab" id="tabPrivate" type="button" role="tab" aria-selected="false" aria-controls="vPrivate" hidden>Private</button>
+</div>
+  <section id="vPoort" hidden>
+    <div class="ds-status ds-status--binnen"><p class="ds-label">Alleen voor leden</p><p class="ds-status__tekst">RTG Vervoer hoort bij uw lidmaatschap; log eerst in via de app.</p><a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/app.html">Naar de app</a></div>
   </section>
 
   <!-- ================= een rit ================= -->
-  <section id="vRit" role="tabpanel" aria-labelledby="tabRit">
+  <section id="vRit" role="tabpanel" aria-labelledby="tabRit"><div class="ds-taak__kop">
     <!-- de lopende rit; vervangt het boekformulier zolang hij loopt -->
-    <div class="kaart rit weg" id="lopendKaart">
-      <p class="i-2uh62t"><strong id="lopendStatus">Uw rit</strong></p>
-      <p class="stil" id="lopendSub"></p>
-      <div class="keten" id="lopendKeten" aria-hidden="true"></div>
-      <div id="lopendEtappes"></div>
-      <p class="stil" id="lopendVoertuig"></p>
-      <div class="s-1cuiwfl">
-        <button class="knop" id="lopendAnnuleer" type="button">Annuleren</button>
-        <button class="knop" id="lopendDeel" type="button">Deel deze rit</button>
-      </div>
-    </div>
+    <section id="lopendKaart" hidden>
+      <article class="ds-kaart"><div class="ds-kaart__inhoud">
+        <p class="ds-label">Onderweg</p>
+        <h2 class="ds-kaart__titel" id="lopendStatus">Uw rit</h2>
+        <p class="ds-meta" id="lopendSub"></p>
+        <p class="ds-meta" id="lopendKeten" hidden></p>
+        <div class="ds-velden" id="lopendEtappes"></div>
+        <p class="ds-meta" id="lopendVoertuig"></p>
+        <div class="ds-chips">
+          <button class="ds-knop ds-knop--stil ds-knop--klein" id="lopendAnnuleer" type="button">Annuleren</button>
+          <button class="ds-knop ds-knop--stil ds-knop--klein" id="lopendDeel" type="button" data-ds-actie="Deel deze rit">Deel deze rit</button>
+        </div>
+      </div></article>
+    </section>
 
-    <div id="boekBlok">
-      <h2>Waar gaat het heen?</h2>
-      <div class="kaart">
-        <label for="velVan">Vertrek</label>
-        <select id="velVan"><option value="hier">Huidige locatie</option></select>
-        <label for="velZoek">Bestemming</label>
-        <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
+    <div id="boekBlok"><div class="ds-taak__kop">
+      <h2 class="ds-titel">Waar gaat het heen?</h2>
+      <div class="ds-velden">
+        <label class="ds-veld" for="velVan"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg><span><span class="ds-veld__label">Vertrek</span><select class="ds-veld__invoer" id="velVan"><option value="hier">Huidige locatie</option></select></span><span></span></label>
+        <label class="ds-veld" for="velZoek"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span><span class="ds-veld__label">Bestemming</span><input class="ds-veld__invoer" id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off"></span><span></span></label>
         <!-- De keuzelijst die de zoekresultaten van hierboven toont. Hij hoort
              bij hetzelfde label "Bestemming", maar een select kan geen tweede
              `for` delen en heeft geen placeholder om op terug te vallen; zonder
              eigen naam is hij voor een schermlezer een naamloos veld. -->
-        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" class="i-1hjmzy"><option value="">Kies een plek</option></select>
-        <p class="stil" id="velMeer"></p>
-        <div class="duo">
-          <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
-          <div><label for="velBagage">Koffers</label><input id="velBagage" type="number" min="0" max="99" value="0"></div>
-        </div>
+        <div class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg><span><span class="ds-veld__label">Kies de plek</span><select class="ds-veld__invoer" id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten"><option value="">Kies een plek</option></select></span><span></span></div>
+        <p class="ds-meta" id="velMeer"></p>
+        <label class="ds-veld" for="velReizigers"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5M3 20c0-4 2-6 5-6s5 2 5 6m1-6c4 0 6 2 6 6"/></svg><span><span class="ds-veld__label">Reizigers</span><input class="ds-veld__invoer" id="velReizigers" type="number" min="1" max="60" value="1"></span><span></span></label>
+        <label class="ds-veld" for="velBagage"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="13" rx="1"/><path d="M9 7V4h6v3"/></svg><span><span class="ds-veld__label">Koffers</span><input class="ds-veld__invoer" id="velBagage" type="number" min="0" max="99" value="0"></span><span></span></label>
         <!-- Zakelijk. Bewust in het boekformulier en niet in een aparte app:
              wie voor zijn werk reist, reist met dezelfde knop als thuis. Wat
              erbij komt is een rekening en een reisbeleid, geen tweede product. -->
-        <label for="velZakOrg">Op rekening van (code van uw werkgever)</label>
-        <div class="duo">
-          <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off">
-          <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off">
-        </div>
-        <div id="beleidKaart" class="weg" style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">
-          <p class="stil" id="beleidUit"></p>
-        </div>
-        <div class="s-1hjpjwj">
-          <button class="knop vol hoofd" id="velPlan" type="button" data-hoofdactie>Plan mijn reis</button>
-        </div>
-        <p class="i-1hjmzy stil">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
-          vervoer, of een combinatie. Met de tijd, de prijs, wat u loopt en wat het uitstoot.</p>
+        <label class="ds-veld" for="velZakOrg"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="1"/><path d="M9 7V4h6v3M4 12h16"/></svg><span><span class="ds-veld__label">Op rekening van (code van uw werkgever)</span><input class="ds-veld__invoer" id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off"></span><span></span></label>
+        <label class="ds-veld" for="velKostenplaats"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5zM9 9h6M9 13h6"/></svg><span><span class="ds-veld__label">Kostenplaats</span><input class="ds-veld__invoer" id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off"></span><span></span></label>
       </div>
+      <div id="beleidKaart" hidden><p class="ds-meta" id="beleidUit"></p></div>
+      <button class="ds-knop ds-knop--primair ds-knop--breed ds-taak__actie" id="velPlan" type="button" data-hoofdactie data-ds-actie="Plan mijn reis">Plan mijn reis</button>
+      <p class="ds-meta">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
+        vervoer, of een combinatie. Met de tijd, de prijs, wat u loopt en wat het uitstoot.</p>
 
-      <div id="optieBlok" class="weg">
-        <h2>Hoe wilt u reizen?</h2>
-        <div id="opties"></div>
-        <div class="kaart weg" id="afvalKaart">
-          <p class="stil" style="margin-bottom:0.5rem;">Wat er niet bij staat, en waarom:</p>
+      <div id="optieBlok" hidden><div class="ds-taak__kop">
+        <h2 class="ds-titel">Hoe wilt u reizen?</h2>
+        <div id="opties" class="ds-collectie__raster"></div>
+        <div id="afvalKaart" hidden>
+          <p class="ds-meta">Wat er niet bij staat, en waarom:</p>
           <div id="afgevallen"></div>
         </div>
-      </div>
+      </div></div>
 
-      <h2>Op aanvraag</h2>
-      <div class="kaart">
-        <p class="stil" id="aanvraagUitleg">Helikopter, vliegtuig, boot: die boekt u niet met een tik. Daar komt altijd een mens
-          tussen, met een exploitant die de vergunning heeft en een weerscontrole. Staat er hieronder niets, dan is dat
-          vervoer hier (nog) niet beschikbaar.</p>
-        <div id="aanvraagLijst"></div>
-      </div>
-    </div>
+      <h2 class="ds-titel">Op aanvraag</h2>
+      <p class="ds-meta" id="aanvraagUitleg">Helikopter, vliegtuig, boot: die boekt u niet met een tik. Daar komt altijd een mens
+        tussen, met een exploitant die de vergunning heeft en een weerscontrole. Staat er hieronder niets, dan is dat
+        vervoer hier (nog) niet beschikbaar.</p>
+      <div class="ds-velden" id="aanvraagLijst"></div>
+    </div></div>
 
     <!-- De geschiedenis staat BUITEN het boekblok, want die verdwijnt niet als
          er een rit loopt. Anders staart iemand tijdens het wachten naar een
          leeg scherm met een kaartje bovenin. -->
-    <h2>Uw ritten</h2>
-    <div class="kaart"><div id="ritHistorie"><p class="stil">Nog geen ritten.</p></div></div>
-  </section>
+    <h2 class="ds-titel">Uw ritten</h2>
+    <div class="ds-velden" id="ritHistorie"><p class="ds-meta">Nog geen ritten.</p></div>
+  </div></section>
 
   <!-- ================= openbaar vervoer ================= -->
-  <section id="vOv" role="tabpanel" aria-labelledby="tabOv" class="weg">
+  <section id="vOv" role="tabpanel" aria-labelledby="tabOv" hidden><div class="ds-taak__kop">
     <!-- de actieve OV-rit -->
-    <div class="kaart rit weg" id="ritKaart">
-      <p class="i-2uh62t"><span id="ritIcoon"></span> <strong>U bent ingecheckt</strong></p>
-      <p class="stil" id="ritSub"></p>
-      <div class="i-q78lq2"><button class="knop vol" id="uitKnop" type="button">Check uit</button></div>
-    </div>
+    <section id="ritKaart" hidden>
+      <article class="ds-kaart"><div class="ds-kaart__inhoud">
+        <p class="ds-detail__status"><span id="ritIcoon"></span><strong>U bent ingecheckt</strong></p>
+        <p class="ds-meta" id="ritSub"></p>
+        <button class="ds-knop ds-knop--primair ds-knop--breed" id="uitKnop" type="button" data-ds-actie="Check uit">Check uit</button>
+      </div></article>
+    </section>
 
     <!-- twee snelle opties -->
-    <div id="inBlok">
-      <h2>Inchecken, twee snelle opties</h2>
-      <div class="snel">
-        <button id="knopCode" type="button">
-          <span class="i" id="icoonCode" aria-hidden="true"></span>Oplichtende code
-          <span class="sub">Tonen; het personeel scant hem</span>
-        </button>
-        <button id="knopGps" type="button">
-          <span class="i" id="icoonGps" aria-hidden="true"></span>E&eacute;n tik
-          <span class="sub">U staat bij het voertuig, klaar</span>
-        </button>
+    <div id="inBlok"><div class="ds-taak__kop">
+      <h2 class="ds-titel">Inchecken, twee snelle opties</h2>
+      <div class="ds-veldgroep">
+        <button class="ds-keuze" id="knopCode" type="button" data-ds-actie="Oplichtende code"><b>Oplichtende code</b><span class="ds-meta">Tonen; het personeel scant hem</span></button>
+        <button class="ds-keuze" id="knopGps" type="button" data-ds-actie="Inchecken met een tik"><b>E&eacute;n tik</b><span class="ds-meta">U staat bij het voertuig, klaar</span></button>
       </div>
-    </div>
+    </div></div>
 
-    <h2>In de buurt</h2>
-    <div class="kaart"><div id="lijnen"><p class="stil">Even kijken wat er rijdt&hellip;</p></div></div>
-    <p class="stil" id="uitleg">Uitchecken rekent eerlijk af: basistarief plus de gereden kilometers, direct uit uw
+    <h2 class="ds-titel">In de buurt</h2>
+    <div class="ds-velden" id="lijnen"><p class="ds-meta">Even kijken wat er rijdt&hellip;</p></div>
+    <p class="ds-meta" id="uitleg">Uitchecken rekent eerlijk af: basistarief plus de gereden kilometers, direct uit uw
       RTG Pay-wallet (die zichzelf bijlaadt als dat nodig is).</p>
 
-    <h2>Een kaartje kopen</h2>
-    <div class="kaart">
-      <div id="kaartVorm" class="weg">
-        <label for="kaartAanbod">Wat wilt u kopen?</label>
-        <select id="kaartAanbod"></select>
-        <div class="duo" id="kaartHaltes">
-          <div><label for="kaartVan">Instappen</label><select id="kaartVan"></select></div>
-          <div><label for="kaartNaar">Uitstappen</label><select id="kaartNaar"></select></div>
+    <h2 class="ds-titel">Een kaartje kopen</h2>
+    <div id="kaartVorm" hidden>
+      <div class="ds-velden">
+        <label class="ds-veld" for="kaartAanbod"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4z"/></svg><span><span class="ds-veld__label">Wat wilt u kopen?</span><select class="ds-veld__invoer" id="kaartAanbod"></select></span><span></span></label>
+        <div id="kaartHaltes">
+          <div class="ds-velden">
+            <label class="ds-veld" for="kaartVan"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/></svg><span><span class="ds-veld__label">Instappen</span><select class="ds-veld__invoer" id="kaartVan"></select></span><span></span></label>
+            <label class="ds-veld" for="kaartNaar"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg><span><span class="ds-veld__label">Uitstappen</span><select class="ds-veld__invoer" id="kaartNaar"></select></span><span></span></label>
+          </div>
         </div>
-        <div class="i-q78lq2"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
       </div>
-      <p class="stil" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
+      <button class="ds-knop ds-knop--primair ds-knop--breed ds-taak__actie" id="kaartKoop" type="button" data-ds-actie="Kaartje kopen">Kopen</button>
     </div>
+    <p class="ds-meta" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
 
-    <h2>Abonnement</h2>
-    <div class="kaart">
-      <div id="aboVorm" class="weg">
-        <p class="stil" id="aboUitleg"></p>
-        <div class="i-q78lq2"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
-      </div>
-      <p class="stil" id="aboReden">Even kijken of er een abonnement is&hellip;</p>
-      <div id="aboLijst"></div>
+    <h2 class="ds-titel">Abonnement</h2>
+    <div id="aboVorm" hidden>
+      <p class="ds-meta" id="aboUitleg"></p>
+      <button class="ds-knop ds-knop--stil ds-knop--breed ds-taak__actie" id="aboKoop" type="button">Abonnement nemen</button>
     </div>
+    <p class="ds-meta" id="aboReden">Even kijken of er een abonnement is&hellip;</p>
+    <div class="ds-velden" id="aboLijst"></div>
 
-    <h2>Uw vervoerbewijzen</h2>
-    <div class="kaart"><div id="kaartLijst"><p class="stil">U heeft nog geen kaartjes.</p></div></div>
-  </section>
+    <h2 class="ds-titel">Uw vervoerbewijzen</h2>
+    <div class="ds-velden" id="kaartLijst"><p class="ds-meta">U heeft nog geen kaartjes.</p></div>
+  </div></section>
 
   <!-- ================= bedrijfspendel ================= -->
-  <section id="vPendel" role="tabpanel" aria-labelledby="tabPendel" class="weg">
-    <h2>De pendel van uw werkgever</h2>
-    <div class="kaart">
-      <label for="velWerkgever">Bedrijfscode</label>
-      <div class="s-1x93s7l">
-        <input id="velWerkgever" type="text" placeholder="Bijv. MKKX" autocomplete="off">
-        <button class="knop" id="pendelHaal" type="button">Toon</button>
-      </div>
-      <p class="i-1hjmzy stil">U ziet alleen de pendels van een bedrijf waar u ook echt staat ingeschreven
-        als medewerker.</p>
+  <section id="vPendel" role="tabpanel" aria-labelledby="tabPendel" hidden><div class="ds-taak__kop">
+    <h2 class="ds-titel">De pendel van uw werkgever</h2>
+    <label class="ds-veldlabel" for="velWerkgever">Bedrijfscode</label>
+    <div class="ds-vraagrij">
+      <input class="ds-invoer" id="velWerkgever" type="text" placeholder="Bijv. MKKX" autocomplete="off">
+      <button class="ds-knop ds-knop--primair" id="pendelHaal" type="button">Toon</button>
     </div>
-    <div id="pendelLijst"></div>
-  </section>
-  <section id="vPrivate" role="tabpanel" aria-labelledby="tabPrivate" class="weg">
-    <h2>Private Journey Studio</h2><div class="kaart"><p class="stil">Bouw een afgeschermd draaiboek voor hoofdgast, entourage, beveiliging en bagage. Eerst concept, dan uw eenmalige code; niets wordt vanzelf geboekt of betaald.</p>
-      <div class="privateForm"><div><label for="privVan">Van</label><input id="privVan" placeholder="Woning of terminal"></div><div><label for="privNaar">Naar</label><input id="privNaar" placeholder="Stadion, jacht of bestemming"></div><div><label for="privPersonen">Personen</label><input id="privPersonen" type="number" min="1" max="120" value="1"></div></div>
-      <div class="privateModes" id="privateModes"></div><button class="knop vol" id="privMaak" type="button">Maak veilig concept</button><div id="privUit"></div>
-    </div><h2>Uw operaties</h2><div id="privLijst"></div>
-  </section>
+    <p class="ds-meta">U ziet alleen de pendels van een bedrijf waar u ook echt staat ingeschreven
+      als medewerker.</p>
+    <div class="ds-collectie__raster" id="pendelLijst"></div>
+  </div></section>
+  <section id="vPrivate" role="tabpanel" aria-labelledby="tabPrivate" hidden><div class="ds-taak__kop">
+    <h2 class="ds-titel">Private Journey Studio</h2>
+    <p class="ds-meta">Bouw een afgeschermd draaiboek voor hoofdgast, entourage, beveiliging en bagage. Eerst concept, dan uw eenmalige code; niets wordt vanzelf geboekt of betaald.</p>
+    <div class="ds-velden">
+      <label class="ds-veld" for="privVan"><span></span><span><span class="ds-veld__label">Van</span><input class="ds-veld__invoer" id="privVan" placeholder="Woning of terminal"></span><span></span></label>
+      <label class="ds-veld" for="privNaar"><span></span><span><span class="ds-veld__label">Naar</span><input class="ds-veld__invoer" id="privNaar" placeholder="Stadion, jacht of bestemming"></span><span></span></label>
+      <label class="ds-veld" for="privPersonen"><span></span><span><span class="ds-veld__label">Personen</span><input class="ds-veld__invoer" id="privPersonen" type="number" min="1" max="120" value="1"></span><span></span></label>
+    </div>
+    <div class="ds-chips" id="privateModes"></div>
+    <button class="ds-knop ds-knop--primair ds-knop--breed" id="privMaak" type="button">Maak veilig concept</button>
+    <div class="ds-taak__kop" id="privUit"></div>
+    <h2 class="ds-titel">Uw operaties</h2>
+    <div class="ds-collectie__raster" id="privLijst"></div>
+  </div></section>
 </main>
 
-<div class="codeScherm" id="codeScherm" role="dialog" aria-label="Uw incheckcode">
-  <p class="stil" id="codeZaak">Toon dit scherm; het personeel scant de code.</p>
-  <img id="codeQr" alt="QR-code om in te checken" class="codeQr" hidden>
-  <p class="stil codeTekst" id="codeTekst" aria-live="polite"></p>
-  <p class="stil" id="codeTijd"></p>
-  <button class="knop" id="codeDicht" type="button">Sluiten</button>
-</div>
-<div class="codeScherm" id="qrScherm" role="dialog" aria-label="Uw vervoerbewijs">
-  <p class="stil" id="qrTitel"></p>
-  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" class="s-5iufzb">
-  <p class="stil" id="qrCode" style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;"></p>
-  <button class="knop" id="qrDicht" type="button">Sluiten</button>
-</div>
-<div class="melding" id="melding" role="status"></div>
+<dialog class="ds-dialoog" id="codeScherm" aria-label="Uw incheckcode">
+  <div class="ds-taak__kop">
+    <p class="ds-meta" id="codeZaak">Toon dit scherm; het personeel scant de code.</p>
+    <img id="codeQr" alt="QR-code om in te checken" hidden>
+    <p class="ds-titel" id="codeTekst" aria-live="polite"></p>
+    <p class="ds-meta" id="codeTijd"></p>
+    <button class="ds-knop ds-knop--stil ds-knop--breed" id="codeDicht" type="button">Sluiten</button>
+  </div>
+</dialog>
+<dialog class="ds-dialoog" id="qrScherm" aria-label="Uw vervoerbewijs">
+  <div class="ds-taak__kop">
+    <p class="ds-meta" id="qrTitel"></p>
+    <img id="qrBeeld" alt="QR-code van uw vervoerbewijs">
+    <p class="ds-titel" id="qrCode"></p>
+    <button class="ds-knop ds-knop--stil ds-knop--breed" id="qrDicht" type="button">Sluiten</button>
+  </div>
+</dialog>
+<p class="ds-melding" id="melding" role="status" aria-live="polite"></p>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
-     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
-<!-- plek.js VOOR de inline code hieronder: die vraagt via RTGPlek om je
-     positie, maar het script werd nergens geladen. window.RTGPlek was dus
-     altijd undefined en de vraag verscheen nooit -- de app bleef op het
-     demo-startpunt staan en toonde haltes die niets met jou te maken
-     hebben. -->
+     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn.
+     plek.js VOOR de inline code hieronder: die vraagt via RTGPlek om je
+     positie. Zonder plek zegt het scherm dat het je plek niet weet; er is
+     geen verzonnen startpunt. -->
 <script src="/shared/plek.js" defer></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
@@ -373,10 +229,18 @@
   const api = (pad, body) => post('/api/ov/' + pad, body);
   const mob = (pad, body) => post('/api/mob/' + pad, body);
   let meldT;
-  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
-    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3600); };
-  const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
-  const glyf = n => (window.RTGGlyf && RTGGlyf.heeft(n)) ? RTGGlyf.svgHTML(n, { klasse: 'gl-inline' }) : '';
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('toon');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('toon'), 3600); };
+  const taal = () => document.documentElement.lang || 'nl';
+  const eur = c => new Intl.NumberFormat(taal(), { style: 'currency', currency: 'EUR' }).format(c / 100);
+  /* De iconen zijn de lijnen van het Design System; glyf.js hoort bij de oude laag. */
+  const ICOON = { ov: '<rect x="5" y="3" width="14" height="14" rx="2"/><path d="M5 11h14M8 17l-2 4m10-4 2 4M9 14h.01M15 14h.01"/>',
+    weg: '<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h6"/>' };
+  const glyf = n => '<svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true">' + (ICOON[n] || ICOON.weg) + '</svg>';
+  /* Een rustige rij (icoon, tekst, en rechts een stand of knop): de vorm van een Taak. */
+  const rij = (icoon) => { const d = document.createElement('div'); d.className = 'ds-veld'; d.insertAdjacentHTML('afterbegin', icoon ? glyf(icoon) : '<span></span>'); return d; };
+  const knopje = (tekst) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'ds-knop ds-knop--stil ds-knop--klein'; b.textContent = tekst; return b; };
+  const kaartMet = () => { const k = document.createElement('div'); k.className = 'ds-kaart'; const i = document.createElement('div'); i.className = 'ds-kaart__inhoud'; k.appendChild(i); return [k, i]; };
 
   /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
      de gps spreekt". Deze app toont haltes en ritten BIJ JOU; met dat punt keek
@@ -416,8 +280,7 @@
     for (const [t, v] of TABS) {
       const aan = t === welke;
       $(t).setAttribute('aria-selected', aan ? 'true' : 'false');
-      $(t).classList.toggle('aan', aan);   // de UI-kit tekent de actieve pil op .aan
-      $(v).classList.toggle('weg', !aan);
+      $(v).hidden = !aan;
     }
     if (welke === '#tabOv') { verversOv(); verversKaart(); }
   }
@@ -431,16 +294,15 @@
     /* Zonder ervaring of briefing blijft de kop zoals hij in de HTML staat, in plaats van om te vallen (LIEGRONDE.json). */
     if (!(r.body && r.body.ervaring && r.body.briefing)) return;
     const e = r.body.ervaring, hero = $('#moveHero');
-    hero.classList.toggle('private', e.modus === 'private'); hero.classList.toggle('lifestyle', e.modus === 'lifestyle');
-    hero.style.setProperty('--accent', e.accent); $('#moveBelofte').textContent = e.belofte;
+    hero.dataset.modus = e.modus || ''; $('#moveBelofte').textContent = e.belofte;
     $('#moveTitel').textContent = r.body.briefing.titel; $('#moveBrief').textContent = r.body.briefing.tekst;
     $('#moveOrbTekst').textContent = e.modus === 'private' ? 'Alles onder controle' : e.modus === 'lifestyle' ? 'Uw reis wordt verzorgd' : 'De slimste route';
-    $('#tabPrivate').classList.toggle('weg', r.body.tier !== 'business');
+    $('#tabPrivate').hidden = r.body.tier !== 'business';
     if (r.body.tier === 'business') laadPrivate();
   }
   function privateKnoppen() {
     const bak = $('#privateModes'); bak.innerHTML = '';
-    Object.entries(privateMeta.modi || {}).forEach(([id, m]) => { const b = document.createElement('button'); b.type = 'button';
+    Object.entries(privateMeta.modi || {}).forEach(([id, m]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'ds-chip';
       b.textContent = m.icoon + ' ' + m.naam; b.setAttribute('aria-pressed', String(privateModi.has(id)));
       b.addEventListener('click', () => { privateModi.has(id) ? privateModi.delete(id) : privateModi.add(id); b.setAttribute('aria-pressed', String(privateModi.has(id))); }); bak.appendChild(b); });
   }
@@ -451,29 +313,29 @@
     if (actief) { $('#moveTitel').textContent = actief.naam; $('#moveBrief').textContent = actief.van + ' → ' + actief.naar + ' · ' + actief.personen + ' personen';
       $('#moveOrbTekst').textContent = actief.status === 'concept' ? 'Concept gereed' : actief.status === 'onderweg' ? 'Operatie onderweg' : 'Regie actief';
       $('#moveStatus').textContent = actief.segmenten.filter(s => s.status === 'afgerond').length + ' van ' + actief.segmenten.length + ' segmenten afgerond'; }
-    (r.body.operaties || []).forEach(o => { const k = document.createElement('div'); k.className = 'kaart';
-      const s = document.createElement('p'); s.className = 'stil'; s.textContent = o.status.toUpperCase();
-      const t = document.createElement('strong'); t.textContent = o.naam;
-      const d = document.createElement('p'); d.className = 'stil'; d.textContent = o.segmenten.length + ' segmenten · ' + o.personen + ' personen · ' + o.van + ' → ' + o.naar;
+    (r.body.operaties || []).forEach(o => { const [kaart, k] = kaartMet();
+      const s = document.createElement('p'); s.className = 'ds-label'; s.textContent = o.status.toUpperCase();
+      const t = document.createElement('strong'); t.className = 'ds-kaart__titel'; t.textContent = o.naam;
+      const d = document.createElement('p'); d.className = 'ds-meta'; d.textContent = o.segmenten.length + ' segmenten · ' + o.personen + ' personen · ' + o.van + ' → ' + o.naar;
       k.append(s, t, d);
-      o.segmenten.forEach(seg => { const rij = document.createElement('div'); rij.className = 'rijtje';
+      o.segmenten.forEach(seg => { const regel = rij('weg');
         const tekst = document.createElement('span'); tekst.textContent = seg.naam + ' · ' + seg.status;
         const acties = document.createElement('span');
-        if (o.status !== 'concept' && seg.status === 'voorbereid') { const b = document.createElement('button'); b.className = 'knop'; b.textContent = 'Vraag aan';
+        if (o.status !== 'concept' && seg.status === 'voorbereid') { const b = knopje('Vraag aan');
           b.addEventListener('click', async () => { const z = await api('operatie/segment', { id: o.id, segmentId: seg.id, actie: 'vraag-aan', akkoord: true }); zeg(z.body.error || z.body.melding); if (!z.body.error) laadPrivate(); }); acties.appendChild(b); }
-        if (['aangevraagd', 'offerte', 'bevestigd'].includes(seg.status)) { const b = document.createElement('button'); b.className = 'knop'; b.textContent = 'Annuleer';
+        if (['aangevraagd', 'offerte', 'bevestigd'].includes(seg.status)) { const b = knopje('Annuleer');
           b.addEventListener('click', async () => { const z = await api('operatie/segment', { id: o.id, segmentId: seg.id, actie: 'annuleer' }); zeg(z.body.error || z.body.melding); if (!z.body.error) laadPrivate(); }); acties.appendChild(b); }
-        rij.append(tekst, acties); k.appendChild(rij); });
-      lijst.appendChild(k); });
+        regel.append(tekst, acties); k.appendChild(regel); });
+      lijst.appendChild(kaart); });
   }
   $('#privMaak').addEventListener('click', async () => {
     const r = await api('operatie/concept', { van: $('#privVan').value, naar: $('#privNaar').value,
       personen: Number($('#privPersonen').value) || 1, modi: [...privateModi], rollen: ['hoofdgast'], reserveplan: true });
     if (r.body.error) return zeg(r.body.error); const u = $('#privUit'); u.innerHTML = '';
-    const p = document.createElement('p'); p.className = 'stil'; p.style.marginTop = '.8rem';
+    const p = document.createElement('p'); p.className = 'ds-meta';
     p.textContent = r.body.operatie.segmenten.map(x => x.naam).join(' → ') + '. Code ' + r.body.bevestigCode + ' is 10 minuten geldig; nog niets geboekt of betaald.';
-    const inp = document.createElement('input'); inp.maxLength = 6; inp.placeholder = 'Bevestigingscode'; inp.setAttribute('aria-label', 'Bevestigingscode'); inp.style.marginTop = '.5rem';
-    const b = document.createElement('button'); b.className = 'knop vol'; b.style.marginTop = '.5rem'; b.textContent = 'Activeer regie';
+    const inp = document.createElement('input'); inp.maxLength = 6; inp.placeholder = 'Bevestigingscode'; inp.setAttribute('aria-label', 'Bevestigingscode'); inp.className = 'ds-invoer';
+    const b = document.createElement('button'); b.className = 'ds-knop ds-knop--primair ds-knop--breed'; b.textContent = 'Activeer regie';
     b.addEventListener('click', async () => { const z = await api('operatie/bevestig', { id: r.body.operatie.id, code: inp.value }); if (z.body.error) return zeg(z.body.error); zeg(z.body.melding); u.innerHTML = ''; laadPrivate(); });
     u.append(p, inp, b);
   });
@@ -522,11 +384,11 @@
     // wat je niet met een tik boekt, staat apart en met de reden erbij
     const lijst = $('#aanvraagLijst'); lijst.innerHTML = '';
     const opAanvraag = (aanbod.opAanvraag || []).concat(aanbod.ervaringen || []);
-    if (!opAanvraag.length) lijst.innerHTML = '<p class="stil">Op dit moment niets op aanvraag beschikbaar.</p>';
+    if (!opAanvraag.length) lijst.innerHTML = '<p class="ds-meta">Op dit moment niets op aanvraag beschikbaar.</p>';
     for (const c of opAanvraag) {
-      const d = document.createElement('div'); d.className = 'rijtje';
+      const d = rij('weg');
       const naam = document.createElement('span'); naam.textContent = c.naam;
-      const merk = document.createElement('span'); merk.className = 'stil';
+      const merk = document.createElement('span'); merk.className = 'ds-meta';
       merk.textContent = c.boeking === 'ervaring' ? 'ervaring' : 'op aanvraag';
       d.appendChild(naam); d.appendChild(merk); lijst.appendChild(d);
     }
@@ -583,13 +445,12 @@
   async function toonBeleid() {
     const code = $('#velZakOrg').value.trim().toUpperCase();
     const kaart = $('#beleidKaart'), uit = $('#beleidUit');
-    if (!code) { kaart.classList.add('weg'); return; }
+    if (!code) { kaart.hidden = true; return; }
     const r = await mob('beleid', { werkgever: code });
-    kaart.classList.remove('weg');
+    kaart.hidden = false;
     if (r.status !== 200) { uit.textContent = r.body.error || 'Dit bedrijf kennen we niet als uw werkgever.'; return; }
     const b = r.body.beleid;
     if (!b) { uit.textContent = r.body.reden || 'Er is geen reisbeleid ingesteld.'; return; }
-    const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
     const d = [];
     if (b.maxPrijs) d.push('maximaal ' + eur(b.maxPrijs) + ' per rit');
     if (b.budgetPerMaand) d.push('deze maand nog ' + eur(Math.max(0, b.budgetPerMaand - (r.body.besteed || 0))) +
@@ -608,27 +469,27 @@
 
   function toonOpties(p) {
     const bak = $('#opties'); bak.innerHTML = '';
-    $('#optieBlok').classList.remove('weg');
+    $('#optieBlok').hidden = false;
     if (!p.opties.length) {
-      const k = document.createElement('div'); k.className = 'kaart';
-      const t = document.createElement('p'); t.className = 'stil';
+      const [kaart, k] = kaartMet();
+      const t = document.createElement('p'); t.className = 'ds-meta';
       t.textContent = p.reden || 'Geen reis gevonden.';
-      k.appendChild(t); bak.appendChild(k);
+      k.appendChild(t); bak.appendChild(kaart);
     }
     for (const o of p.opties) {
-      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      const [optieKaart, kaart] = kaartMet();
       // de kop: naam en de merken (snelst / goedkoopst / schoonst)
-      const kop = document.createElement('p'); kop.style.fontSize = '0.95rem';
-      const nm = document.createElement('strong'); nm.textContent = o.naam;
-      kop.appendChild(nm);
+      const nm = document.createElement('strong'); nm.className = 'ds-kaart__titel'; nm.textContent = o.naam;
+      kaart.appendChild(nm);
+      const kop = document.createElement('div'); kop.className = 'ds-chips';
       for (const [vlag, woord] of [['snelst', 'snelst'], ['goedkoopst', 'goedkoopst'], ['schoonst', 'schoonst']]) {
         if (!o[vlag]) continue;
-        const b = document.createElement('span'); b.className = 'badge';
-        b.style.marginLeft = '0.4rem'; b.textContent = woord; kop.appendChild(b);
+        const b = document.createElement('span'); b.className = 'ds-chip';
+        b.textContent = woord; kop.appendChild(b);
       }
-      kaart.appendChild(kop);
+      if (kop.children.length) kaart.appendChild(kop);
 
-      const cijfers = document.createElement('p'); cijfers.className = 'stil';
+      const cijfers = document.createElement('p'); cijfers.className = 'ds-meta';
       cijfers.textContent = min(o.totaal.minuten) + ' · ' + eur(o.totaal.prijs) +
         ' · ' + Math.round(o.totaal.co2Gram) + ' g CO₂ (schatting)' +
         (o.totaal.loopM ? ' · ' + o.totaal.loopM + ' m lopen' : '');
@@ -636,38 +497,37 @@
 
       // de etappes onder elkaar: dit is wat iemand straks echt doet
       for (const e of o.etappes) {
-        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const regel = rij(e.wijze === 'ov' ? 'ov' : 'weg');
         const l = document.createElement('span');
         l.textContent = e.wijze === 'ov' ? e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam
           : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + e.km + ' km');
-        const p2 = document.createElement('span'); p2.className = 'stil';
+        const p2 = document.createElement('span'); p2.className = 'ds-meta';
         p2.textContent = min(e.minuten) + (e.prijs ? ' · ' + eur(e.prijs) : '');
-        rij.appendChild(l); rij.appendChild(p2); kaart.appendChild(rij);
+        regel.appendChild(l); regel.appendChild(p2); kaart.appendChild(regel);
         if (e.wijze === 'ov') {
-          const sub = document.createElement('p'); sub.className = 'stil';
-          sub.style.fontSize = '0.72rem';
+          const sub = document.createElement('p'); sub.className = 'ds-meta';
           sub.textContent = 'Wachttijd ' + e.wachtMin + ' min (' + e.wachtUitleg + ')' +
             (e.kaartTeKoop ? ' · kaartje inbegrepen' : ' · inchecken in het voertuig');
           kaart.appendChild(sub);
         }
       }
-      const comf = document.createElement('p'); comf.className = 'stil';
-      comf.style.fontSize = '0.72rem'; comf.textContent = o.comfort.punten.join(' · ');
+      const comf = document.createElement('p'); comf.className = 'ds-meta';
+      comf.textContent = o.comfort.punten.join(' · ');
       kaart.appendChild(comf);
 
       const knop = document.createElement('button');
-      knop.className = 'knop vol'; knop.style.marginTop = '0.7rem';
+      knop.className = 'ds-knop ds-knop--primair ds-knop--breed'; knop.dataset.boek = o.id;
       knop.textContent = 'Deze reis boeken';
       knop.addEventListener('click', () => boekReis(o.id, knop));
       kaart.appendChild(knop);
-      bak.appendChild(kaart);
+      bak.appendChild(optieKaart);
     }
     // wat er afviel en waarom; een lege lijst mag nooit als storing lezen
     const af = $('#afgevallen'); af.innerHTML = '';
-    $('#afvalKaart').classList.toggle('weg', !(p.afgevallen || []).length);
+    $('#afvalKaart').hidden = !(p.afgevallen || []).length;
     for (const a of (p.afgevallen || [])) {
-      const r = document.createElement('p'); r.className = 'stil';
-      r.style.fontSize = '0.72rem'; r.textContent = a.naam + ': ' + a.reden;
+      const r = document.createElement('p'); r.className = 'ds-meta';
+      r.textContent = a.naam + ': ' + a.reden;
       af.appendChild(r);
     }
   }
@@ -684,7 +544,7 @@
     knop.disabled = false;
     if (r.body.error) return zeg(r.body.error);
     zeg(r.body.reis.uitleg);
-    $('#optieBlok').classList.add('weg');
+    $('#optieBlok').hidden = true;
     verversRit();
   }
 
@@ -693,14 +553,14 @@
 
   async function verversRit() {
     const [m, reizen] = await Promise.all([mob('mijn'), mob('reis/mijn')]);
-    if (m.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
+    if (m.status !== 200) { $('#vPoort').hidden = false; return; }
     const lopend = m.body.lopend;
     const reis = (reizen.body.reizen || []).find(x => x.status === 'geboekt');
     lopendRef = lopend ? lopend.ref : null;
 
     const iets = !!(lopend || reis);
-    $('#lopendKaart').classList.toggle('weg', !iets);
-    $('#boekBlok').classList.toggle('weg', !!iets);
+    $('#lopendKaart').hidden = !iets;
+    $('#boekBlok').hidden = !!iets;
     const et = $('#lopendEtappes'); et.innerHTML = '';
 
     if (reis) {
@@ -708,18 +568,18 @@
          onderweg wil zien -- niet een statusbalk van een van de ritten. */
       $('#lopendStatus').textContent = 'Uw reis: ' + reis.optieNaam;
       $('#lopendSub').textContent = (reis.van.label || 'vertrek') + ' → ' + (reis.naar.label || 'bestemming');
-      $('#lopendKeten').classList.add('weg');
+      $('#lopendKeten').hidden = true;
       for (const e of reis.etappes) {
-        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const regel = rij(e.wijze === 'ov' ? 'ov' : 'weg');
         const l = document.createElement('span');
         l.textContent = e.wijze === 'ov' ? (e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam)
           : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + (e.km || 0) + ' km');
-        const st = document.createElement('span'); st.className = 'stil';
+        const st = document.createElement('span'); st.className = 'ds-meta';
         /* Een rit die op akkoord wacht staat op 'aangevraagd', en dat leest als
            "er wordt aan gewerkt". Er wordt niet aan gewerkt: er wordt gewacht. */
         st.textContent = (e.goedkeuring && e.goedkeuring.status === 'wacht') ? 'wacht op akkoord'
           : (e.ritStatus || e.kaartStand || (e.instructie ? 'inchecken' : ''));
-        rij.appendChild(l); rij.appendChild(st); et.appendChild(rij);
+        regel.appendChild(l); regel.appendChild(st); et.appendChild(regel);
       }
       $('#lopendVoertuig').textContent = reis.uitleg;
       $('#lopendAnnuleer').dataset.reis = reis.id;
@@ -727,13 +587,10 @@
       $('#lopendStatus').textContent = 'Uw rit: ' + lopend.status;
       $('#lopendSub').textContent = lopend.van.label + ' → ' + lopend.naar.label +
         ' · ' + lopend.km + ' km · ' + eur(lopend.prijs);
-      const k = $('#lopendKeten'); k.classList.remove('weg'); k.innerHTML = '';
+      /* De keten als zin: hoeveel van de stappen van een rit er achter de rug zijn. */
+      const k = $('#lopendKeten'); k.hidden = false;
       const tot = KETEN.indexOf(lopend.status);
-      for (let i = 0; i < KETEN.length; i++) {
-        const sp = document.createElement('span');
-        if (tot >= 0 && i <= tot) sp.className = 'af';
-        k.appendChild(sp);
-      }
+      k.textContent = 'Stap ' + (tot + 1) + ' van ' + KETEN.length;
       $('#lopendVoertuig').textContent = (lopend.goedkeuring && lopend.goedkeuring.status === 'wacht')
         ? 'Deze rit staat op rekening van ' + lopend.organisatie + ' en wacht op akkoord van uw werkgever; ' +
           'tot dan wordt er geen wagen gezocht.'
@@ -746,11 +603,11 @@
     // de geschiedenis
     const h = $('#ritHistorie'); h.innerHTML = '';
     const klaar = (m.body.ritten || []).filter(o => ['afgerekend', 'voltooid', 'geannuleerd'].includes(o.status));
-    if (!klaar.length) h.innerHTML = '<p class="stil">Nog geen ritten.</p>';
+    if (!klaar.length) h.innerHTML = '<p class="ds-meta">Nog geen ritten.</p>';
     for (const o of klaar.slice(0, 10)) {
-      const d = document.createElement('div'); d.className = 'rijtje';
+      const d = rij('weg');
       const l = document.createElement('span'); l.textContent = o.naar.label + ' · ' + o.status;
-      const p = document.createElement('span'); p.className = 'stil'; p.textContent = eur(o.prijs);
+      const p = document.createElement('span'); p.className = 'ds-meta'; p.textContent = eur(o.prijs);
       d.appendChild(l); d.appendChild(p); h.appendChild(d);
     }
   }
@@ -791,28 +648,27 @@
 
   async function verversOv() {
     const r = await api('kaart', hier || {});
-    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
+    if (r.status !== 200) { $('#vPoort').hidden = false; return; }
     // de actieve rit
     const rit = r.body.rit;
-    $('#ritKaart').classList.toggle('weg', !rit);
-    $('#inBlok').classList.toggle('weg', !!rit);
+    $('#ritKaart').hidden = !rit;
+    $('#inBlok').hidden = !!rit;
     if (rit) {
       $('#ritIcoon').innerHTML = glyf('ov');
       $('#ritSub').textContent = 'Sinds ' + String(rit.inAt).slice(11, 16) + ' · uitchecken rekent eerlijk af per kilometer.';
     }
     // de lijnen dichtbij
     const el = $('#lijnen'); el.innerHTML = '';
-    if (!(r.body.lijnen || []).length) el.innerHTML = '<p class="stil">Geen lijnen in de buurt.</p>';
+    if (!(r.body.lijnen || []).length) el.innerHTML = '<p class="ds-meta">Geen lijnen in de buurt.</p>';
     nabij = (r.body.lijnen || []).slice(0, 8);
     for (const l of nabij) {
-      const d = document.createElement('div'); d.className = 'lijn';
+      const d = rij('ov');
       const afst = l.halte && l.halte.afstandM != null
         ? (l.halte.afstandM < 1000 ? Math.round(l.halte.afstandM) + ' m' : (Math.round(l.halte.afstandM / 100) / 10) + ' km') : '';
-      d.innerHTML = '<span class="icoon" aria-hidden="true">' + glyf('ov') + '</span>' +
-        '<span><strong></strong><span class="sub"></span></span><span class="rek"></span>' +
-        '<span class="over">' + (l.live ? '<span class="puls" aria-hidden="true"></span>' : '') + 'over ~' + l.overMin + ' min</span>';
-      d.querySelector('strong').textContent = l.naam;
-      d.querySelector('.sub').textContent = (l.halte ? l.halte.naam + ' · ' + afst : '') +
+      d.insertAdjacentHTML('beforeend', '<span><span class="ds-veld__label"></span><span class="ds-veld__waarde"></span></span>' +
+        '<span class="ds-meta">over ~' + l.overMin + ' min</span>');
+      d.querySelector('.ds-veld__label').textContent = l.naam;
+      d.querySelector('.ds-veld__waarde').textContent = (l.halte ? l.halte.naam + ' · ' + afst : '') +
         (l.live ? ' · live' : ' · elke ' + l.frequentieMin + ' min');
       el.appendChild(d);
     }
@@ -832,19 +688,19 @@
     const qr = $('#codeQr');
     qr.hidden = true;
     try { if (window.RTGQRteken) { qr.src = RTGQRteken.dataURL(r.body.code, { schaal: 6, quiet: 3 }); qr.hidden = false; } } catch (e) {}
-    $('#codeScherm').classList.add('zien');
+    if (!$('#codeScherm').open) $('#codeScherm').showModal();
     let over = r.body.geldigS;
     clearInterval(codeTimer);
     codeTimer = setInterval(() => {
       over -= 1;
       $('#codeTijd').textContent = 'Nog ' + Math.floor(over / 60) + ':' + String(over % 60).padStart(2, '0') + ' geldig';
-      if (over <= 0) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); }
+      if (over <= 0) { clearInterval(codeTimer); $('#codeScherm').close(); }
       // ingecheckt door het personeel? Dan sluit het scherm vanzelf
-      if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); zeg('Ingecheckt. Goede reis.'); verversOv(); } });
+      if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').close(); zeg('Ingecheckt. Goede reis.'); verversOv(); } });
     }, 1000);
   });
   // sluiten trekt de code op de server in: een foto van het scherm opent daarna niets
-  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); api('code/intrek'); });
+  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').close(); api('code/intrek'); });
 
   /* ---- snelle optie 2: een tik op GPS ---- */
   $('#knopGps').addEventListener('click', async () => {
@@ -872,7 +728,7 @@
     // die overeenkomst is er niets te koop, en dan staat de reden er
     const a = await mob('kaart/aanbod', { vervoerder: 'TRANSIT' });
     aanbodLijst = (a.body && a.body.aanbod) || [];
-    $('#kaartVorm').classList.toggle('weg', !aanbodLijst.length);
+    $('#kaartVorm').hidden = !aanbodLijst.length;
     $('#kaartReden').textContent = aanbodLijst.length
       ? 'De vervoerder verkoopt deze bewijzen via RTG.'
       : ((a.body && a.body.reden) || 'Er is hier niets te koop.');
@@ -888,24 +744,23 @@
     const mijn = await mob('kaart/mijn');
     const lijst = $('#kaartLijst'); lijst.innerHTML = '';
     const kaartjes = (mijn.body && mijn.body.kaartjes) || [];
-    if (!kaartjes.length) lijst.innerHTML = '<p class="stil">U heeft nog geen kaartjes.</p>';
+    if (!kaartjes.length) lijst.innerHTML = '<p class="ds-meta">U heeft nog geen kaartjes.</p>';
     for (const k of kaartjes.slice(0, 8)) {
-      const d = document.createElement('div'); d.className = 'rijtje';
+      const d = rij('ov');
       const l = document.createElement('span');
-      l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
+      l.innerHTML = '<strong class="ds-veld__label"></strong><span class="ds-veld__waarde"></span>';
       l.querySelector('strong').textContent = k.productNaam + ' · ' + k.lijnNaam;
-      l.querySelector('.sub').textContent = k.reden;
+      l.querySelector('.ds-veld__waarde').textContent = k.reden;
       d.appendChild(l);
       /* Een geldig kaartje kun je TONEN: dat vraagt een nieuwe code (tonen is
          roteren) en trekt de vorige in. De QR is de code; zonder de
          tekenmodule blijft hij als tekst staan. */
       if (k.stand === 'geldig') {
-        const b = document.createElement('button'); b.className = 'knop';
-        b.textContent = 'Toon';
+        const b = knopje('Toon');
         b.addEventListener('click', () => toonCode(k.productNaam + ' · ' + k.lijnNaam, k.id));
         d.appendChild(b);
       } else {
-        const st = document.createElement('span'); st.className = 'stil'; st.textContent = k.stand;
+        const st = document.createElement('span'); st.className = 'ds-meta'; st.textContent = k.stand;
         d.appendChild(st);
       }
       lijst.appendChild(d);
@@ -927,15 +782,15 @@
       if (window.RTGQRteken) { img.src = RTGQRteken.dataURL(code, { schaal: 6, quiet: 3 }); img.hidden = false; }
       else img.hidden = true;
     } catch (e) { img.hidden = true; }
-    $('#qrScherm').classList.add('zien');
+    if (!$('#qrScherm').open) $('#qrScherm').showModal();
   }
-  $('#qrDicht').addEventListener('click', () => $('#qrScherm').classList.remove('zien'));
+  $('#qrDicht').addEventListener('click', () => $('#qrScherm').close());
 
   /* ---- het abonnement ---- */
   async function verversAbo() {
     const a = await mob('abo/aanbod', { vervoerder: 'TRANSIT' });
     const aanbod = a.body && a.body.aanbod;
-    $('#aboVorm').classList.toggle('weg', !aanbod);
+    $('#aboVorm').hidden = !aanbod;
     $('#aboReden').textContent = aanbod ? '' : ((a.body && a.body.reden) || 'Er is hier geen abonnement.');
     if (aanbod) $('#aboUitleg').textContent = 'Onbeperkt reizen op ' + aanbod.lijnen.length +
       ' lijn(en) van ' + aanbod.vervoerderNaam + ' voor ' + eur(aanbod.prijs) + ' per ' + aanbod.dagen + ' dagen.';
@@ -943,18 +798,18 @@
     const mijn = await mob('abo/mijn');
     const lijst = $('#aboLijst'); lijst.innerHTML = '';
     for (const ab of ((mijn.body && mijn.body.abonnementen) || []).slice(0, 4)) {
-      const d = document.createElement('div'); d.className = 'rijtje';
+      const d = rij('ov');
       const l = document.createElement('span');
-      l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
+      l.innerHTML = '<strong class="ds-veld__label"></strong><span class="ds-veld__waarde"></span>';
       l.querySelector('strong').textContent = 'Abonnement ' + ab.vervoerderNaam;
-      l.querySelector('.sub').textContent = ab.reden + ' · ' + ab.ritten + ' ritten (' + ab.rittenUitleg + ')';
+      l.querySelector('.ds-veld__waarde').textContent = ab.reden + ' · ' + ab.ritten + ' ritten (' + ab.rittenUitleg + ')';
       d.appendChild(l);
       if (ab.stand === 'geldig') {
-        const b = document.createElement('button'); b.className = 'knop'; b.textContent = 'Toon';
+        const b = knopje('Toon');
         b.addEventListener('click', () => toonCode('Abonnement ' + ab.vervoerderNaam, ab.id));
         d.appendChild(b);
       } else {
-        const st = document.createElement('span'); st.className = 'stil'; st.textContent = ab.stand;
+        const st = document.createElement('span'); st.className = 'ds-meta'; st.textContent = ab.stand;
         d.appendChild(st);
       }
       lijst.appendChild(d);
@@ -965,7 +820,7 @@
     const r = await mob('abo/koop', { vervoerder: 'TRANSIT', idem: RTGIdem('abo') });
     $('#aboKoop').disabled = false;
     if (r.body.error) return zeg(r.body.error);
-    zeg('Abonnement genomen tot ' + r.body.abonnement.geldigTot.slice(0, 10) + '.');
+    zeg('Abonnement genomen tot ' + new Intl.DateTimeFormat(taal(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(r.body.abonnement.geldigTot)) + '.');
     verversKaart();
   });
 
@@ -973,7 +828,7 @@
     const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
     // een dagkaart geldt op de hele lijn en heeft dus geen traject
     const traject = x && x.product !== 'dagkaart';
-    $('#kaartHaltes').classList.toggle('weg', !traject);
+    $('#kaartHaltes').hidden = !traject;
     if (!traject || !x) return;
     for (const [sel, kies] of [['#kaartVan', 0], ['#kaartNaar', 1]]) {
       const el = $(sel); el.innerHTML = '';
@@ -1004,41 +859,36 @@
     if (!code) return zeg('Vul de code van uw werkgever in.');
     const r = await mob('pendel', { werkgever: code });
     const uit = $('#pendelLijst'); uit.innerHTML = '';
-    if (r.body.error) { uit.innerHTML = '<div class="kaart"><p class="stil"></p></div>'; uit.querySelector('p').textContent = r.body.error; return; }
-    if (!(r.body.pendels || []).length) { uit.innerHTML = '<div class="kaart"><p class="stil">Dit bedrijf heeft geen pendeldienst.</p></div>'; return; }
+    if (r.body.error) { uit.innerHTML = '<div class="ds-kaart"><div class="ds-kaart__inhoud"><p class="ds-meta"></p></div></div>'; uit.querySelector('p').textContent = r.body.error; return; }
+    if (!(r.body.pendels || []).length) { uit.innerHTML = '<div class="ds-kaart"><div class="ds-kaart__inhoud"><p class="ds-meta">Dit bedrijf heeft geen pendeldienst.</p></div></div>'; return; }
     for (const p of r.body.pendels) {
-      const kaart = document.createElement('div'); kaart.className = 'kaart';
-      const t = document.createElement('p'); t.style.fontSize = '0.95rem';
+      const [pendelKaart, kaart] = kaartMet();
+      const t = document.createElement('p'); t.className = 'ds-kaart__titel';
       t.textContent = p.pendel.naam + ': ' + p.pendel.van.label + ' → ' + p.pendel.naar.label;
       kaart.appendChild(t);
-      if (p.reden) { const s = document.createElement('p'); s.className = 'stil'; s.textContent = p.reden; kaart.appendChild(s); }
+      if (p.reden) { const s = document.createElement('p'); s.className = 'ds-meta'; s.textContent = p.reden; kaart.appendChild(s); }
       for (const v of p.vertrekken) {
-        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const regel = rij('weg');
         const l = document.createElement('span');
         l.textContent = v.tijd + ' · ' + (v.vrij ? v.vrij + ' plaatsen vrij' : 'vol, wachtlijst ' + v.wachtlijst);
-        const b = document.createElement('button'); b.className = 'knop';
-        b.textContent = v.mijn ? 'Afzeggen' : 'Reserveer';
+        const b = knopje(v.mijn ? 'Afzeggen' : 'Reserveer');
         b.addEventListener('click', async () => {
           const rr = await mob('pendel/reserveer', { werkgever: code, id: p.pendel.id, vertrek: v.vertrek, weg: v.mijn });
           zeg(rr.body.error || rr.body.uitleg || 'Afgezegd.');
           $('#pendelHaal').click();
         });
-        rij.appendChild(l); rij.appendChild(b); kaart.appendChild(rij);
+        regel.appendChild(l); regel.appendChild(b); kaart.appendChild(regel);
       }
-      uit.appendChild(kaart);
+      uit.appendChild(pendelKaart);
     }
   });
 
   /* ---- start ---- */
-  if (!token) { $('#vPoort').classList.remove('weg'); return; }
+  if (!token) { $('#vPoort').hidden = false; return; }
   laadMoveWereld();
-  document.addEventListener('DOMContentLoaded', () => {
-    $('#icoonCode').innerHTML = glyf('pas');
-    $('#icoonGps').innerHTML = glyf('gps');
-  });
   (async () => {
     const [a, p] = await Promise.all([mob('aanbod'), mob('plekken', { bij: hier })]);
-    if (a.body.error || p.body.error) { $('#vPoort').classList.remove('weg'); return; }
+    if (a.body.error || p.body.error) { $('#vPoort').hidden = false; return; }
     aanbod = a.body; plekken = p.body.plekken || [];
     plekTotaal = p.body.totaal || 0; plekAfgekapt = p.body.afgekapt || 0;
     vulKiezers();
@@ -1049,17 +899,8 @@
 </script>
 <script src="/shared/qr.js" defer></script>
 <script src="/shared/qrteken.js" defer></script>
-<script src="/shared/poortgesprek.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
-<script src="/shared/travel-os.js" defer></script>
 <!-- Waar je bent, gezegd door dit scherm zelf (EDGE.md besluit 11): het register en
      apps/schermcontext.js, dat de bron van <body data-rtg-context-bron> publiceert. -->
 <script src="/shared/adaptief.js" defer></script>

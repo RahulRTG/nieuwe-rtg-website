@@ -78,8 +78,23 @@
     return ul;
   }
 
+  /* Ingebed (een kader, ?embed=1 of een Command-blad) heeft het scherm de
+     bediening van zijn ouder: "geen tweede Edge, en de lokale vaste chrome
+     van het kind wordt onderdrukt" (ONTWERP.md). Dus ook geen tweede kop met
+     zoeken, merk en account; die draagt de ouder al. De handelingen van het
+     scherm zelf blijven gewoon op het scherm staan. */
+  function ingebed() {
+    try { if (w.self !== w.top) return true; } catch (e) { return true; }
+    return /(?:^|[?&])embed=1(?:&|$)/.test(w.location.search || '');
+  }
   function maak() {
-    if (edge || d.body.hasAttribute('data-ds-geen-edge')) return;
+    if (edge) return;
+    if (ingebed()) {
+      d.documentElement.setAttribute('data-ds-ingebed', '1');
+      Array.prototype.forEach.call(d.querySelectorAll('.ds-kop'), function (k) { k.remove(); });
+      return;
+    }
+    if (d.body.hasAttribute('data-ds-geen-edge')) return;
     edge = el('div', 'ds-edge');
     blad = el('section', 'ds-edge__blad', { id: 'dsEdgeBlad', role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'dsEdgeBladTitel' });
     blad.hidden = true;

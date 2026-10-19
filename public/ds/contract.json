@@ -34,7 +34,8 @@
     "dialoog",
     "edge",
     "melding",
-    "toestel"
+    "toestel",
+    "paneel"
   ],
   "themabaar": [
     "--ds-grond",
@@ -105,6 +106,11 @@
       "vervalt": "2027-01-31"
     },
     {
+      "pad": "public/shared/plek.js",
+      "reden": "De locatievraag (rtg_os_gps, TIKKEN en de gps-schakelaar) is een rechtenpad: zonder haar vraagt OV nooit om je plek en valt inchecken met een tik stil. Haar kaart (.rtgplek) zet een eigen <style>. Gaat naar het dialoog-component.",
+      "vervalt": "2027-01-31"
+    },
+    {
       "pad": "public/shared/basis.js",
       "reden": "De basis houdt op een ds-scherm zijn gedrag en zet daarvoor nog een <style>: het toegankelijkheidsprofiel (rtg-tekst-*, rtg-contrast, rtg-stil, rtg-rustig, rtg-linkstreep), de hulpkaart (.bss-*) en de springlink (.rtg-spring). Gaat naar tokens en .ds-componenten.",
       "vervalt": "2027-01-31"
@@ -136,6 +142,10 @@
     "public/apps/zakelijk.html": "test/zakelijk-ds.e2e.js",
     "public/apps/reisuitnodiging.html": "test/reisuitnodiging-ds.e2e.js",
     "public/apps/living-world.html": "test/living-world-ds.e2e.js",
+    "public/apps/rit.html": "test/rit-ds.e2e.js",
+    "public/apps/ov.html": "test/ov-ds.e2e.js",
+    "public/apps/move.html": "test/move-ds.e2e.js",
+    "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

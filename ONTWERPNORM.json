@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 176,
-    "schermenMetStijlblok": 286,
-    "important": 7694
+    "bladen": 174,
+    "schermenMetStijlblok": 284,
+    "important": 7646
   },
   "uitzonderingen": [],
   "bladen": {
@@ -317,16 +317,6 @@
       "bytes": 2054,
       "important": 0,
       "hex": 19
-    },
-    "public/shared/rtg-aankomst-2026.css": {
-      "bytes": 8168,
-      "important": 46,
-      "hex": 20
-    },
-    "public/shared/rtg-aankomst-momenten-2026.css": {
-      "bytes": 8724,
-      "important": 0,
-      "hex": 8
     },
     "public/shared/rtg-adaptive-edge.css": {
       "bytes": 39439,
@@ -2090,12 +2080,6 @@
       "important": 1,
       "hex": 6
     },
-    "public/apps/move.html": {
-      "blokken": 1,
-      "bytes": 8602,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/muziek.html": {
       "blokken": 2,
       "bytes": 10391,
@@ -2143,12 +2127,6 @@
       "bytes": 4472,
       "important": 2,
       "hex": 5
-    },
-    "public/apps/ov.html": {
-      "blokken": 2,
-      "bytes": 12718,
-      "important": 3,
-      "hex": 16
     },
     "public/apps/ovcontrol.html": {
       "blokken": 1,

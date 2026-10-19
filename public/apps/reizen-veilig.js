@@ -23,38 +23,34 @@
     }
     if(!naast||innerWidth<761){panes.forEach(function(p){p.el.remove()});panes=[]}
     if(panes.length>=2){panes.shift().el.remove()}
-    var el=document.createElement('section');el.className='rv-pane';el.dataset.id=id;
-    if(a[1]){var f=document.createElement('iframe');f.src=ingebed(a[1]);f.title=a[0];RTGMedia.kader(f);el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
-    $('#rvPanes').appendChild(el);panes.push({id:id,titel:a[0],el:el});kies(panes.length-1);haak(el);if(id==='overzicht'){laadMomenten(el);reis().volgende(el);reis().groet(el)}if(id==='reisblad')reis().aanbod(el)
+    var el=document.createElement('section');el.className='ds-paneel';el.dataset.id=id;
+    if(a[1]){var f=document.createElement('iframe');f.className='ds-kader';f.src=ingebed(a[1]);f.title=a[0];RTGMedia.kader(f);el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
+    $('#rvPanes').appendChild(el);panes.push({id:id,titel:a[0],el:el});$('#rvPanes').classList.toggle('ds-panelen--twee',panes.length>1);kies(panes.length-1);haak(el);if(id==='overzicht'){laadMomenten(el);reis().volgende(el);reis().groet(el)}if(id==='reisblad')reis().aanbod(el)
   }
-  function kies(i){actief=i;panes.forEach(function(p,n){p.el.classList.toggle('actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.classList.toggle('actief',b.dataset.open===panes[i].id);b.setAttribute('aria-current',b.dataset.open===panes[i].id?'page':'false')});context();meldAdaptief()}
-  function teken(){var t=$('#rvTabs');t.innerHTML='';panes.forEach(function(p,i){var b=document.createElement('button');b.className='rv-tab'+(i===actief?' actief':'');b.textContent=p.titel;b.dataset.rtgActionKey='reisveilig.'+p.id;b.onclick=function(){kies(i)};t.appendChild(b)})}
+  function kies(i){actief=i;panes.forEach(function(p,n){p.el.toggleAttribute('data-actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.open===panes[i].id))});context();meldAdaptief()}
+  function teken(){var t=$('#rvTabs');t.innerHTML='';panes.forEach(function(p,i){var b=document.createElement('button');b.type='button';b.className='ds-chip';b.setAttribute('aria-pressed',String(i===actief));b.textContent=p.titel;b.dataset.rtgActionKey='reisveilig.'+p.id;b.onclick=function(){kies(i)};t.appendChild(b)})}
   function haak(el){el.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){open(b.dataset.action,innerWidth>760)}});el.querySelectorAll('[data-circle=maak]').forEach(function(b){b.onclick=function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}});gebaren(el)}
-  /* De regels van 'Uw eerstvolgende moment' dragen hun acties (shared/gebaar.js):
-     veeg naar links om te doen wat de regel voorstelt, naar rechts om hem over
-     te nemen. De veeg drukt de knop die de regel AL heeft -- geen tweede kopie
-     van wat die knop doet, want dan lopen ze uit elkaar (LAT.md regel 4). Heeft
-     de regel geen knop, dan is de handeling het Moment zelf. */
+  /* Veeg over een regel van 'Uw eerstvolgende moment' (shared/gebaar.js): de
+     veeg drukt de knop die de regel al heeft (LAT.md regel 4). */
   function gebaren(el){
     if(!window.RTGGebaar){document.addEventListener('rtg-gebaar',function(){gebaren(el)},{once:true});return}
     var K=window.RTGGebaar.klaar;
-    window.RTGGebaar.lijst(el,'.rv-lijn',function(rij){
+    window.RTGGebaar.lijst(el,'[data-lijn]',function(rij){
       var b=rij.querySelector('button'),kop=rij.querySelector('b');
       var doen=b?K.eigenKnop(b.textContent.replace(/[^\wÀ-ÿ ]/g,'').trim()||'Openen','openen','button')
                :{naam:'Moment starten',teken:'rahul',doe:function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}};
       return {titel:kop?kop.textContent.trim():'',rechts:[doen],links:[K.overnemen()]};
     });
   }
-  async function laadMomenten(el){var vak=el.querySelector('[data-momenten]');if(!vak)return;try{var d=await api('/api/veiligheid/moment'),m=d.momenten||[],voor=d.voorMij||[],regels=m.map(function(x){return '<div class="rv-momentchip"><i></i><span>'+esc(x.titel)+' · '+esc(x.status)+(x.eta?' · '+esc(x.eta):'')+(x.gepauzeerd?' · gepauzeerd':'')+'</span><button data-status="'+esc(x.id)+'">Aangekomen</button><button data-pauze="'+esc(x.id)+'" data-aan="'+(!x.gepauzeerd)+'">'+(x.gepauzeerd?'Hervat':'Pauze')+'</button><button data-stop="'+esc(x.id)+'">Stop</button></div>'});voor.forEach(function(x){regels.push('<div class="rv-momentchip ontvangen"><i></i><span>'+esc(x.eigenaar)+' deelt: '+esc(x.titel)+(x.status?' · '+esc(x.status):'')+(x.eta?' · '+esc(x.eta):'')+'</span></div>')});vak.innerHTML=regels.length?regels.join(''):'<div class="rv-momentchip"><i></i><span>Nog niets live gedeeld</span></div>';vak.querySelectorAll('[data-status]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/status',{id:b.dataset.status,status:'aangekomen'});laadMomenten(el)}});vak.querySelectorAll('[data-pauze]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/pauze',{id:b.dataset.pauze,aan:b.dataset.aan==='true'});laadMomenten(el)}});vak.querySelectorAll('[data-stop]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/stop',{id:b.dataset.stop});laadMomenten(el)}})}catch(e){vak.innerHTML='<div class="rv-momentchip"><span>Log in om uw Live Circle te beheren.</span></div>'}}
+  async function laadMomenten(el){var vak=el.querySelector('[data-momenten]');if(!vak)return;try{var d=await api('/api/veiligheid/moment'),m=d.momenten||[],voor=d.voorMij||[],regels=m.map(function(x){return '<div class="ds-veld" data-moment><span></span><span><span class="ds-veld__label">'+esc(x.titel)+'</span><span class="ds-veld__waarde">'+esc(x.status)+(x.eta?' · '+esc(x.eta):'')+(x.gepauzeerd?' · gepauzeerd':'')+'</span><span class="ds-chips"><button class="ds-chip" type="button" data-status="'+esc(x.id)+'">Aangekomen</button><button class="ds-chip" type="button" data-pauze="'+esc(x.id)+'" data-aan="'+(!x.gepauzeerd)+'">'+(x.gepauzeerd?'Hervat':'Pauze')+'</button><button class="ds-chip" type="button" data-stop="'+esc(x.id)+'">Stop</button></span></span><span></span></div>'});voor.forEach(function(x){regels.push('<div class="ds-veld" data-moment="ontvangen"><span></span><span><span class="ds-veld__label">'+esc(x.eigenaar)+' deelt: '+esc(x.titel)+'</span><span class="ds-veld__waarde">'+(x.status?esc(x.status):'')+(x.eta?' · '+esc(x.eta):'')+'</span></span><span></span></div>')});vak.innerHTML=regels.length?regels.join(''):'<p class="ds-meta">Nog niets live gedeeld</p>';vak.querySelectorAll('[data-status]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/status',{id:b.dataset.status,status:'aangekomen'});laadMomenten(el)}});vak.querySelectorAll('[data-pauze]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/pauze',{id:b.dataset.pauze,aan:b.dataset.aan==='true'});laadMomenten(el)}});vak.querySelectorAll('[data-stop]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/stop',{id:b.dataset.stop});laadMomenten(el)}})}catch(e){vak.innerHTML='<p class="ds-meta">Log in om uw Live Circle te beheren.</p>'}}
   /* Het eerstvolgende moment (RTG Move) en het aanbod (het Reisbureau) wonen in
      reizen-veilig-reis.js; dit bestand geeft ze alleen zijn api, esc en open. */
   function reis(){return window.RTGReisVeiligReis.maak({api:api,esc:esc,open:open,token:token})}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function context(){var id=panes[actief]&&panes[actief].id,z={overzicht:'Vervoer, aankomst en veiligheid op één plek.',vervoer:'Waar wilt u heen? Ik vergelijk de hele reis voor u.',reizen:'Ik zie uw reiswereld. Zal ik controleren wat nog aandacht vraagt?',veilig:'U bepaalt wie wat ziet en tot wanneer.',navigatie:'Ik blijf bij u tot u veilig bent aangekomen.'};$('#rvContext').textContent=z[id]||z.overzicht}
-  /* IN RTG COMMAND HEEFT DE ONDERBALK EEN EIGENAAR. De zes handelingen van
-     deze werkruimte blijven dezelfde open()-aanroepen; de adaptieve brug geeft
-     ze alleen door aan de buitenste Command-balk. Daardoor kan de lokale bank
-     in een mobiel werkblad verdwijnen zonder functies weg te nemen. */
+  /* IN RTG COMMAND HEEFT DE ONDERBALK EEN EIGENAAR. De handelingen blijven
+     dezelfde open()-aanroepen; de adaptieve brug geeft ze door aan de buitenste
+     Command-balk, dus de lokale bank kan daar weg zonder verlies. */
   function startAdaptief(){
     var A=window.RTGAdaptief;if(!A)return;
     bank.forEach(function(item){A.declareer({id:'reisveilig.'+item[0],naam:item[1],label:item[1],groep:'Reizen & Veilig',telefoon:['balk','lade'],tablet:['balk','lade'],bureau:['werkbalk'],doe:function(){open(item[0],false)}})});
@@ -66,7 +62,11 @@
     meldAdaptief();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startAdaptief);else startAdaptief();
+  /* In een Command-blad (rtg-command-blad) draagt de buitenste balk de bank
+     en Rahul al; dan staan ze hier niet nog een keer. */
+  function commandMobiel(){var m=document.documentElement.classList.contains('rtg-command-blad');$('#rvBank').hidden=m;$('#rvRahul').hidden=m}
+  commandMobiel();new MutationObserver(commandMobiel).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   function vraag(){var q=$('#rvIn').value.trim(),l=q.toLowerCase();if(!q)return;$('#rvIn').value='';if(/veilig|thuis|waak|kring|deel/.test(l))open('veilig',innerWidth>760);else if(/ov|taxi|route|gaan|breng|vervoer/.test(l))open('vervoer',innerWidth>760);else if(/navig/.test(l))open('navigatie',innerWidth>760);else if(/reis|vlucht|hotel/.test(l))open('reizen',innerWidth>760);else $('#rvContext').textContent='Ik begrijp de wens. Kies Gaan, Reizen of RTG Veilig om dit direct te regelen.'}
-  document.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){open(b.dataset.open,false)}});$('#rvPlus').onclick=function(){open(panes[0]&&panes[0].id==='veilig'?'vervoer':'veilig',true)};$('#rvStuur').onclick=vraag;$('#rvIn').onkeydown=function(e){if(e.key==='Enter')vraag()};$('#rvMond').onclick=function(){$('#rvIn').focus()};$('#rvMomentForm').onsubmit=async function(e){e.preventDefault();var f=new FormData(e.currentTarget),soort=f.get('soort'),niveau=f.get('niveau');if(soort==='bedrijf'&&niveau==='locatie')niveau='voortgang';try{await api('/api/veiligheid/moment/maak',{titel:f.get('titel'),doel:f.get('doel'),minuten:Number(f.get('minuten')),ontvangers:[{soort:soort,id:f.get('ontvanger'),niveau:niveau}]});$('#rvDialoog').close();e.currentTarget.reset();var p=panes.find(function(x){return x.id==='overzicht'});if(p)laadMomenten(p.el);$('#rvContext').textContent='Uw Live Circle is actief en stopt vanzelf op het gekozen moment.'}catch(x){$('#rvMomentFout').textContent=x.message}};if(window.RTGMond)window.RTGMond.fab($('#rvMond'),20);open('overzicht',false);if(innerWidth>980)open('veilig',true)
+  document.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){open(b.dataset.open,false)}});$('#rvPlus').onclick=function(){open(panes[0]&&panes[0].id==='veilig'?'vervoer':'veilig',true)};$('#rvStuur').onclick=vraag;$('#rvIn').onkeydown=function(e){if(e.key==='Enter')vraag()};$('#rvMomentForm').onsubmit=async function(e){e.preventDefault();var f=new FormData(e.currentTarget),soort=f.get('soort'),niveau=f.get('niveau');if(soort==='bedrijf'&&niveau==='locatie')niveau='voortgang';try{await api('/api/veiligheid/moment/maak',{titel:f.get('titel'),doel:f.get('doel'),minuten:Number(f.get('minuten')),ontvangers:[{soort:soort,id:f.get('ontvanger'),niveau:niveau}]});$('#rvDialoog').close();$('#rvMomentForm').reset();var p=panes.find(function(x){return x.id==='overzicht'});if(p)laadMomenten(p.el);$('#rvContext').textContent='Uw Live Circle is actief en stopt vanzelf op het gekozen moment.'}catch(x){$('#rvMomentFout').textContent=x.message}};open('overzicht',false);if(innerWidth>980)open('veilig',true)
   if(innerWidth>980){open('reisblad',false);open('overzicht',true)}
 })();

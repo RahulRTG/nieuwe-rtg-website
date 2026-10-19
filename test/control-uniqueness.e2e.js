@@ -19,15 +19,21 @@ test('de Edge biedt elke backoffice- en reisactie eenmaal en voert de juiste han
   }
   await actions.getByRole('button',{name:'Partnerprestaties',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('.wos-rail button.actief')?.getAttribute('aria-label')==='Partnerprestaties');
+  /* Reizen & Veilig staat op het Design System (TRAVELOS-MIGRATIE.md batch 4):
+     zijn handelingen staan onder Acties van de ds-Edge (data-ds-actie), en ook
+     daar elk precies een keer, ook na een wissel van werkblad. */
   await page.goto(srv.base+'/apps/reizen-veilig.html');await wachtOpNetstilte(page);
-  await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
-  assert.equal(await actions.getByRole('button',{name:'Vandaag',exact:true}).count(),1,width+': Vandaag eenmaal');
-  await actions.getByRole('button',{name:'Reizen',exact:true}).click();
-  await page.waitForFunction(()=>!!document.querySelector('.rv-pane.actief[data-id="reisblad"]'));
-  assert.equal(await actions.getByRole('button',{name:'Reizen',exact:true}).count(),1,'een nieuw actief werkblad maakt geen dubbele actie');
-  await actions.getByRole('button',{name:'Vandaag',exact:true}).click();
-  await page.waitForFunction(()=>!!document.querySelector('.rv-pane.actief[data-id="overzicht"]'));
-  assert.equal(await actions.getByRole('button',{name:'Vandaag',exact:true}).count(),1,'teruggaan blijft dezelfde handeling');
+  const rvActies=page.locator('#dsEdgeBlad');
+  await page.locator('[data-ds-edge="acties"]').click();
+  assert.equal(await rvActies.getByRole('button',{name:'Vandaag',exact:true}).count(),1,width+': Vandaag eenmaal');
+  await rvActies.getByRole('button',{name:'Reizen',exact:true}).click();
+  await page.waitForFunction(()=>!!document.querySelector('[data-actief][data-id="reisblad"]'));
+  await page.locator('[data-ds-edge="acties"]').click();
+  assert.equal(await rvActies.getByRole('button',{name:'Reizen',exact:true}).count(),1,'een nieuw actief werkblad maakt geen dubbele actie');
+  await rvActies.getByRole('button',{name:'Vandaag',exact:true}).click();
+  await page.waitForFunction(()=>!!document.querySelector('[data-actief][data-id="overzicht"]'));
+  await page.locator('[data-ds-edge="acties"]').click();
+  assert.equal(await rvActies.getByRole('button',{name:'Vandaag',exact:true}).count(),1,'teruggaan blijft dezelfde handeling');
   await ctx.close();
  }
  }finally{if(browser)await browser.close();await stopHard(srv.child)}

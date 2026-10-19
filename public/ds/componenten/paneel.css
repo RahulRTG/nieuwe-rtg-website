@@ -1,0 +1,23 @@
+/* Paneel: een werkruimte met een of twee panelen naast elkaar (Reizen &
+   Veilig), waarin een paneel ook een ander scherm in een kader kan dragen.
+   Op de telefoon staat er een paneel; vanaf tabletbreedte twee naast elkaar.
+   Het kader is rustig en recht: het is inhoud, geen systeemlaag. De vraagrij
+   is een veld met zijn knop op een regel (een vraag aan Rahul, een wens). */
+@layer rtg.component {
+  .ds-panelen { display: grid; gap: var(--ds-ruimte-4); grid-template-columns: minmax(0, 1fr); margin-block-start: var(--ds-ruimte-3); }
+  .ds-paneel { display: grid; gap: var(--ds-ruimte-4); align-content: start; min-inline-size: 0; }
+  .ds-kader {
+    display: block;
+    inline-size: 100%;
+    block-size: max(32rem, calc(var(--ds-schermhoogte) - var(--ds-edge-hoogte) - 14rem));
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-grond);
+  }
+  .ds-vraagrij { display: flex; gap: var(--ds-ruimte-2); align-items: center; }
+  .ds-vraagrij > .ds-invoer { flex: 1 1 auto; min-inline-size: 0; }
+  .ds-vraagrij > .ds-knop { flex: none; }
+  @container ds (min-width: 48rem) {
+    .ds-panelen--twee { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+}

@@ -632,6 +632,10 @@ const EIGEN_MODULE = new Map([
   ['zakelijk-ds.e2e.js', ['public/apps/zakelijk-voorzijde.js']],
   ['reisuitnodiging-ds.e2e.js', ['public/apps/reisuitnodiging-client.js']],
   ['living-world-ds.e2e.js', ['public/apps/living-world/client.js', 'public/apps/living-world/render.js']],
+  ['rit-ds.e2e.js', ['public/apps/rit-momenten.js']],
+  ['ov-ds.e2e.js', ['public/apps/ov.html']],
+  ['move-ds.e2e.js', ['public/apps/move.html']],
+  ['reizen-veilig-ds.e2e.js', ['public/apps/reizen-veilig.js']],
   ['ontwerpvoorbeeld.e2e.js', ['public/ds/voorbeeld.html']],
   /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
   ['move-gevolg.e2e.js', ['public/apps/move.html']],

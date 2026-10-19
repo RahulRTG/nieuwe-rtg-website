@@ -227,6 +227,9 @@ const CONTRACT = {
   'link:decisionroom': Object.assign({
     belofte: 'een medewerker legt een voorstel neer en mensen met de juiste rol beslissen het, nooit de aanvrager zelf en boven de drempel met twee stemmen'
   }, voltooi('decisionroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /goedkeuring en /goedkeuring/beslis, de routes die /apps/decision-room.html zelf aanroept, met drie mensen: aanvrager, beoordelaar met rol en de eigenaar')),
+  'link:projectroom': Object.assign({
+    belofte: 'een medewerker voert een project dat uit een RTMAIL ontstond aantoonbaar uit, met taken, bewijs en een menselijke oplevering, en een collega wijzigt er niets aan'
+  }, voltooi('projectroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /project/taak, /project/bewijs en /project/oplever, de routes die /apps/project-room.html zelf aanroept, met een collega en een lid die er niet bij komen')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

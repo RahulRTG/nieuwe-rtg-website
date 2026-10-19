@@ -129,9 +129,8 @@ Exploitatievergunning: https://ondernemersplein.kvk.nl/exploitatievergunning-hor
 Cao Horeca: rooster minstens 3 weken vooraf bekend; later ingeroosterde uren mag
 de medewerker weigeren; de cao loopt tot 31-12-2026; toeslagen te controleren in
 de cao-tekst. Bron: https://khn.nl/kennis/roosterprogramma-en-handleiding-2026.
-Fiscale bewaarplicht 7 jaar (art. 52 AWR). Contant: verbod op contante betalingen
-van 3.000 euro of meer sinds 1-1-2026.
-Bron: https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/aangifte_betalen_en_toezicht/wwft-voorkomen-van-witwassen-en-terrorismefinanciering/verplichtingen/verbod-cash-3000.
+Fiscale bewaarplicht 7 jaar (art. 52 AWR). De regel over contante betalingen staat op
+de lijst "te controleren" (workos.md par. 11).
 Inkoop: betaaltermijn B2B maximaal 60 dagen, 30 als niets is afgesproken (art. 6:119a BW).
 Leveranciersbeoordeling heeft geen wettelijke basis; normatief ISO 9001 8.4.
 

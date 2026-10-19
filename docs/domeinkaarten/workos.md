@@ -300,6 +300,24 @@ appwerkt/workos:
 | projectroom | het scherm belooft "op volgorde van afhankelijkheid", maar een taak heeft geen afhankelijkheidsveld |
 | partnernetwerk | `kern/partnernetwerk.js` bepaalt "vandaag" in UTC. Het SCHERMEIGENAAR-doel wijkt af van de code |
 
+## 11. Te controleren
+
+Een regel die alleen uit een zoeksamenvatting komt, is geen feit. Hij draagt in
+elke kaart het label **te controleren** tot een mens de primaire bron heeft
+nagelezen: de wettekst, de officiële pagina of de cao-tekst. Een regel van die
+soort wordt nooit als code afgedwongen.
+
+| Regel | Waar hij vandaan kwam | Wat ermee gebeurd is |
+|---|---|---|
+| Verbod op contante betalingen vanaf € 3.000 (sinds 1-1-2026) | een zoeksamenvatting van een Belastingdienst-pagina | Op verzoek van de integrator uit de kaarten van Decision Room, Onderneming, Magnaat en Horeca gehaald. Hij was nergens in code afgedwongen; `grep` op server/, public/apps en scripts/ vond niets. Hij komt pas terug na nalezing van de primaire bron. |
+| Eerstejaarsevaluatie Poortwachter (week 46–52) | bronnen spreken elkaar tegen | geldt in loonstrook.md en werkos.md als signaal, niet als harde datum |
+| Grenzen van de jaarrekeningklassen (€ 50 of € 51 mln) | KvK-pagina's spreken elkaar tegen | onderneming.md: klasse `uitlegbaar` |
+| Loontransparantie (EU 2023/970), invoering NL | wetsvoorstel, nog geen recht | overal "voorbereiden, geen recht" |
+| ISO 9001:2026, clausulenummers | revisie 16-9-2026; nummers niet geverifieerd | werkos.md noemt de nummers van de versie 2015 |
+| Herroepingsknop webwinkel (19-6 of 25-6-2026) | ACM en KvK noemen verschillende data | sitemaker.md |
+| Toeslagen in de cao Horeca | niet teruggevonden | horeca.md |
+| Alle marktprijzen in b. | zoeksamenvattingen, geen pagina zelf geopend | "(via zoektool, live te controleren)" |
+
 ## 10. Wat deze kaart niet doet
 
 - Hij bouwt niets.

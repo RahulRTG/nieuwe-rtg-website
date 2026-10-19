@@ -109,7 +109,6 @@ dat de aanvrager nooit zelf beslist.
 | Besluit buiten vergadering: alle vergadergerechtigden stemmen in, elektronisch mag, bestuurders hebben raadgevende stem (art. 2:238 BW) | https://www.dirkzwager.nl/kennis/artikelen/raadgevende-stem-van-de-bestuurder-ook-buiten-vergadering | Een AVA-besluit kan pas "aangenomen" zijn als iedere stemgerechtigde heeft ingestemd, en de raadgevende stem moet aantoonbaar zijn gevraagd. Decision Room telt nu 1 of 2 stemmen en kent geen kring. Een notulenplicht is te controleren. |
 | Fiscale bewaarplicht 7 jaar (art. 52 AWR) | https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/ondernemen/administratie/hoelang-moet-u-gegevens-bewaren | Een financieel besluit dat een boeking onderbouwt, moet 7 jaar leesbaar blijven. De auditregels kappen nu af op 500. |
 | Aanbestedingsdrempels 2026-2027 (€ 140.000, € 216.000, € 5.404.000) | https://www.pianoo.nl/nl/regelgeving/drempelbedragen-europees-aanbesteden | Geldt voor aanbestedende diensten. Of RTF of RTG dat zijn: niet vastgesteld (te controleren). Alleen relevant als signaal bij het bedrag. |
-| Contant verbod vanaf € 3.000 (sinds 1-1-2026) | https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/aangifte_betalen_en_toezicht/wwft-voorkomen-van-witwassen-en-terrorismefinanciering/verplichtingen/verbod-cash-3000 | Een besluit dat contante betaling vanaf € 3.000 voorstelt, mag niet worden goedgekeurd. |
 | ISO 9001 9.3 directiebeoordeling; 10.2 corrigerende maatregelen | https://www.lrqa.com/en/latest-news/iso-9001-publication-date-confirmed/ | Normatief: een besluit met een evaluatiedatum is de directiebeoordeling in klein. Versie 2026 te controleren. |
 | AVG art. 30 en art. 12 | https://autoriteitpersoonsgegevens.nl/nl/zelf-doen/gebruik-uw-privacyrechten/recht-op-inzage | Een stem met naam en reden is een persoonsgegeven; een betrokkene mag haar inzien. |
 
@@ -156,7 +155,7 @@ er niet.
 |---|---|---|---|---|---|---|---|---|---|---|
 | Compleetheid van het dossier | bestaat, `compleet()` in de agenda | 5 velden | aantal ingevulde velden | geen | beoordelaar | | | | | bestaat |
 | Gevolg van een financieel besluit | ontbreekt | bedrag, termijn | `kern/fiscaal/scenario.js` of `kern/kosten/vooruitblik.js`, klasse `advies` met `aannames` en `onbekend` | alles wat geen boeking is | beoordelaar vóór stemmen | finance | zonder bron: "niet gerekend" | Het scherm toont het verwachte effect met aannames en de zin van klasse `advies`, nooit als vaststaand bedrag | middel | later |
-| Signaal bij een wettelijke grens | ontbreekt | bedrag, betaalwijze | bedrag ≥ € 3.000 contant: weigeren; aanbestedingsdrempel: signaal | of de aanbestedingsplicht geldt | aanvrager bij indienen | | | Een voorstel met contant vanaf € 3.000 wordt niet ter stemming gebracht, met de bron | klein | later |
+| Signaal bij een wettelijke grens | ontbreekt | bedrag, betaalwijze | aanbestedingsdrempel: signaal (de contantregel staat op "te controleren", workos.md par. 11) | of de aanbestedingsplicht geldt | aanvrager bij indienen | | | Een voorstel boven een aanbestedingsdrempel draagt een signaal met de bron; het blokkeert niet | klein | later |
 | AI vat het dossier samen | ontbreekt | velden, document, mail | lokaal-eerst; "Rahul ordent, niet beslist" staat al op het scherm | wat het document bedoelt | beoordelaar | AI kan niet stemmen | `RTG_EXTERNE_AI_UIT=1` | De samenvatting noemt haar bronnen; er is geen knop waarmee AI stemt | middel | later |
 
 ### L5 Volledige levenscyclus
@@ -267,7 +266,7 @@ Dit contract vervangt de acht bewijzen van APPWERKT nooit.
 | Dimensie | Eis in gewone taal | Toets | Stand nu |
 |---|---|---|---|
 | 1. Breedte | Indienen, herindienen, intrekken, stemmen en evalueren hebben elk een knop en een route | `scripts/schermen.js` | half: herindienen en intrekken ontbreken |
-| 2. Professionele diepte | Contant vanaf € 3.000 wordt geweigerd; een belanghebbende stem telt niet; een finance-besluit blijft 7 jaar | `node --test` per regel | ontbreekt |
+| 2. Professionele diepte | Een belanghebbende stem telt niet; een finance-besluit blijft 7 jaar | `node --test` per regel | ontbreekt |
 | 3. Levenscyclus | Een besluit doorloopt indienen → stemmen → besluit → evaluatie, en "terug" leidt tot een nieuwe versie | voltooiproef `decisionroom`, uitgebreid | half |
 | 4. Samenwerking en rollen | Aanvrager, rolloze collega, lid zonder kantoorrol en uitgelogd worden geweigerd | voltooiproef stap 2 en 6; BEVOEGD | voltooiproef lokaal ja; BEVOEGD NIET_GETEST |
 | 5. Domeinintelligentie | Elk verwacht gevolg draagt klasse `advies` met `onbekend`; AI stemt nooit | test op zekerheid; geen stemroute voor AI | geen gevolg op het scherm |

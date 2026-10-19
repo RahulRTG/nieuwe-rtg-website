@@ -126,8 +126,6 @@ aansprakelijk; maar wat het **leert**, moet kloppen met de wet. Relevant uit
   (https://www.kvk.nl/starten/op-welke-datum-moet-ik-mijn-bedrijf-inschrijven-bij-kvk/).
 - Btw-aangifte uiterlijk de laatste dag van de maand na het tijdvak
   (https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/btw_aangifte_doen_en_betalen/btw-aangifte-waar-moet-u-aan-denken/btw-aangifte-waar-moet-u-aan-denken).
-- Contant verbod vanaf €3.000 sinds 1-1-2026
-  (https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/aangifte_betalen_en_toezicht/wwft-voorkomen-van-witwassen-en-terrorismefinanciering/verplichtingen/verbod-cash-3000).
 - Betaaltermijn B2B maximaal 60 dagen, 30 als niets is afgesproken
   (https://ondernemersplein.kvk.nl/betalingstermijn-incassokosten-en-wettelijke-rente/).
 

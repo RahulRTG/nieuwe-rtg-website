@@ -142,6 +142,54 @@ test('Adyen: HMAC-gecontroleerde CAPTURE-retry boekt maar eenmaal', async () => 
   assert.equal(domein, 1);
 });
 
+test('Adyen: een verwisseld paymentLinkId in een geldig ondertekend bericht raakt geen andere betaling', async () => {
+  const data = { kaartWachtend: {} };
+  let domein = 0, links = 0, legacy = 0;
+  const betaal = {
+    adyenMerchantAccount: 'RTG_EU', adyenHandmatigeCapture: false,
+    async maakBetaling(o) { links += 1; return { id: 'PL_' + links, status: 'active',
+      aanbieder: 'adyen', bedrag: o.bedrag, valuta: o.valuta }; },
+    /* De HMAC dekt paymentLinkId niet: de double laat dus ook het verwisselde
+       bericht door, precies zoals de echte controle zou doen. */
+    verifieerAdyenMelding() { return true; },
+    async maakTerugbetaling() { throw new Error('niet gebruikt'); }
+  };
+  const waarheid = maakBetaalWaarheid({ d: () => data, save() {}, crypto, betaal, nu: klok(), log: stil });
+  waarheid.registreerAfhandeling('bestelling', async () => { domein += 1; });
+  const betaald = waarheid.maak({ actor: 'Reiger', idem: 'adyen-echt', soort: 'bestelling',
+    bronRef: 'ORDER-ECHT', centen: 3000, valuta: 'eur' });
+  const ander = waarheid.maak({ actor: 'Valk', idem: 'adyen-ander', soort: 'bestelling',
+    bronRef: 'ORDER-ANDER', centen: 3000, valuta: 'eur' });
+  await waarheid.begin(betaald.id, { aanbieder: 'adyen' });
+  await waarheid.begin(ander.id, { aanbieder: 'adyen' });
+  assert.equal(ander.providerId, 'PL_2');
+  data.kaartWachtend.PL_2 = { soort: 'factuur', invoiceId: 'INV-ANDER' };
+  const post = routeTuig({ betaal, betaalWaarheid: waarheid, db: { data },
+    settleFactuur: async () => { legacy += 1; return { ok: true }; } });
+
+  const verwisseld = { notificationItems: [{ NotificationRequestItem: {
+    pspReference: 'PSP_ECHT', merchantAccountCode: 'RTG_EU', merchantReference: betaald.id,
+    eventCode: 'AUTHORISATION', success: 'true', amount: { value: 3000, currency: 'EUR' },
+    additionalData: { paymentLinkId: 'PL_2', hmacSignature: 'geldig' }
+  } }] };
+  assert.equal((await post('/api/betaal/webhook/adyen', verwisseld)).status, 200);
+  assert.equal((await post('/api/betaal/webhook/adyen', verwisseld)).status, 200, 'retry blijft even onschadelijk');
+  assert.notEqual(ander.status, 'BEVESTIGD', 'het link-id buiten de HMAC zet geen andere betaling op betaald');
+  assert.notEqual(betaald.status, 'BEVESTIGD', 'een tegenstrijdig bericht bevestigt ook de referentie niet');
+  assert.equal(domein, 0);
+  assert.equal(legacy, 0, 'een oude wachtende rij rekent niet af op een ongetekend link-id');
+  assert.ok(data.kaartWachtend.PL_2);
+  const melding = data.betaalWaarheidMeldingen['adyen:PSP_ECHT:AUTHORISATION:true'];
+  assert.deepEqual(melding.conflict, { referentie: betaald.id, providerId: ander.id });
+
+  const echt = { notificationItems: [{ NotificationRequestItem: Object.assign(
+    {}, verwisseld.notificationItems[0].NotificationRequestItem,
+    { pspReference: 'PSP_ECHT_2', additionalData: { paymentLinkId: 'PL_1', hmacSignature: 'geldig' } }) }] };
+  assert.equal((await post('/api/betaal/webhook/adyen', echt)).status, 200);
+  assert.equal(betaald.status, 'BEVESTIGD', 'het kloppende bericht wordt gewoon geboekt');
+  assert.equal(domein, 1);
+});
+
 test('domeinfout geeft 500; dezelfde Stripe-event herstelt zonder dubbel effect', async () => {
   const data = {};
   let pogingen = 0, effect = 0;

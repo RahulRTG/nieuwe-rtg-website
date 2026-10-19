@@ -9,7 +9,10 @@ const standaardHttp = require('./lib/http');
 function Mollie(apiKey, opties) {
   opties = opties || {};
   const http = opties.http || standaardHttp;
-  const basis = String(opties.baseUrl || process.env.MOLLIE_BASE_URL || 'https://api.mollie.com')
+  /* Net als bij Stripe: een ander adres alleen voor lokale protocoltests, anders
+     stuurt een verkeerd gezette variabele de geheime sleutel naar een vreemde. */
+  const omleiding = process.env.NODE_ENV === 'test' && process.env.MOLLIE_BASE_URL;
+  const basis = String(opties.baseUrl || omleiding || 'https://api.mollie.com')
     .replace(/\/+$/, '');
   const timeout = opties.timeout || 80000;
 

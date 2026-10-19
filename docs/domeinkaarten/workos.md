@@ -395,10 +395,22 @@ appwerkt/workos:
 | loonstrook | een strook (`kern/payroll/motor.js`) draagt het minimumloon en de vakantiegeldopbouw niet (art. 7:626 BW); payroll en HACCP staan niet in `bewaarbeleid.js` |
 | vertegenwoordiging | `vertegenwoordiging.html` belooft "Voorstellen doet u" maar roept `/voorstel`, `/handel` en `/voogd/*` niet aan; het jeugdbestuur heeft geen scherm |
 | magnaat | MAGNAATLAB.md en MAGNAATLAB.json noemen verschillende dekkingscijfers |
-| rtgone | `rtgone.js` `overdrachtMaak` zoekt op een deel van de naam ("Jan" vindt ook "Janneke") en verplaatst het eigendom niet. De audit wordt afgekapt op 500, terwijl het scherm "onveranderlijk" belooft |
+| rtgone | `rtgone.js` `overdrachtMaak` zoekt op een deel van de naam ("Jan" vindt ook "Janneke") en verplaatst het eigendom niet. De audit kapt af op 500 regels, terwijl `public/apps/decision-room-besluit.js` r. 8 het spoor "onveranderlijk" noemt (de stem zelf blijft bewaard). `rolGeef` controleert niet of de sleutel bij een medewerker hoort, en `rolTrek` laat geen historie. `state` toont maximaal 60 intenties, 80 beloften en 30 overdrachten |
 | decisionroom | "terug" sluit het besluit zonder herindienroute, waardoor het gekoppelde project blijft hangen. Een voorwaarde bij akkoord wordt opgeslagen maar nergens bewaakt |
 | projectroom | het scherm belooft "op volgorde van afhankelijkheid", maar een taak heeft geen afhankelijkheidsveld |
 | partnernetwerk | `kern/partnernetwerk.js` bepaalt "vandaag" in UTC. Het SCHERMEIGENAAR-doel wijkt af van de code |
+| office | `public/apps/office/app/app-01c.js` r. 19 zegt "voorgoed verwijderen … niet ongedaan maken", terwijl de server het document bewaart tot `bewaarTot`. Niets maakt `officeBewaard` leeg na de termijn. `/api/office/kantoorpakket/weg` en `/api/werkplek/kantoorpakket/weg` (gedeelde drives) hebben geen rolgrens: wie mag daar wissen is een besluit |
+| rtmail (team) | `kern/rtmail-team.js`: `verlaat` en `lidZet(erin=false)` laten `team.toegewezen` staan; een bericht blijft "opgepakt" door iemand die weg is, en `pak` weigert de rest |
+| browser | `webmaker-blader.js` r. 57 telt elk verversen als bezoek; `routes/webbrowser.js` wisselt je en u; een zaak kan op een websiteklus niet terugantwoorden (de klus kent het lid niet) |
+| sitemaker | `kern/webmaker.js` `verwijder` wist ook het spoor en antwoordt ok als er niets was; `kern/appgids-data/deel10b.js` r. 71 zegt dat een eigen domein bewust niet bestaat, tegen de schakelaar `dom-eigendomein` in |
+| werk | `starten.js` geeft de hele lijst `persoonseis.missend`, maar `app-main-25.js` toont alleen het eerste ontbrekende stuk. De koppelregel in `securityLog` draagt geen lidsleutel, dus een lid kan zijn eigen koppelingen niet inzien |
+| onderneming | `kern/onderneming/contracten.js` bepaalt `vandaag` in UTC; de route geeft geen datum mee |
+| horeca | `public/apps/horeca/kern.js` vangt een mislukte `fetch` niet: een HACCP-meting zonder netwerk gaat stil verloren. Er zijn twee lijsten van de 14 allergenen (`kern/tafelwensen.js`, `kern/horeca/allergenen.js`), en een lege lijst is niet te onderscheiden van "vrij van allergenen" |
+| loopbaan | een zaak heeft nog geen verzoek of dienstverband nodig om te bevestigen. Begrensd per feit (73ae8c6), maar over veel feiten kan zij tot 450 van de 500 regels vullen |
+| school | `kern/onderwijs.js` r. 82 `inschrijf` zet altijd `jaar = 1`, ook bij dezelfde fase, en heeft geen herhaalsleutel: een dubbele tik zet havo 3 terug naar havo 1 |
+| magnaat | `routes/magnaatwereld.js` r. 30–33: elk lid kan in de gedeelde Oefenkantoor-economie een schok plannen en de dag doordraaien voor iedereen. `magnaat-economenlab-training.js` bewaart tot 60 gescoorde analyses per lid zonder `progressieMag` en zonder toets op de leerdossiervoorwaarden |
+| projectroom | na een afgewezen besluit blijft een project op `besluit` staan, zonder manier om het af te breken |
+| partnernetwerk | `onderdelenOpen` telt ook bevestigde en geleverde onderdelen; "vandaag" vergelijkt met de begindatum van de case; `responstijdMin` meet de laatste bewerking; de aandachtslijst neemt de vijf nieuwste vragen, niet de vijf die het eerst verlopen. `kern/samenwerking.js` heeft geen eigen eigenaar in SCHERMEIGENAAR |
 
 ## 10. Te controleren
 

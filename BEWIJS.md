@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2906 bestanden en 19845 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2903 bestanden en 19838 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2906 |
-| losse beweringen (`test(...)`) | 19845 |
+| toetsbestanden | 2903 |
+| losse beweringen (`test(...)`) | 19838 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 86 |
+| niets van beide | 83 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2560 bestanden, 19263 beweringen.
+2557 bestanden, 19256 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -174,7 +174,6 @@ toets omvalt.
 | `artefact-image.test.js` | 3 | gezakt op `voorwaarde-omkeren#3` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `artefactketen-takken.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `artefactketen.test.js` | 16 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `assets-controleafronden.test.js` | 1 | -- | Een tweede ticket onder dezelfde betaling, door de assetlaag heen (server/kern/assets/aanvraag-betaal.js, kern/betaalwaarheid/controle.js). Vraag van LivingOS-A: een aanvraag met meer tickets is EEN betaling. |
 | `assets.test.js` | 16 | gezakt op `liegpoort /api/` | Toren 3, RTG Shared Assets: altijd 300 tickets per object, een ticket is 24 uur per jaar, tien jaar lang. Access loopt af; Asset heeft een aandeel in de restwaarde (waarde / 300) en stapt uit via een Tik. |
 | `ast-grens.test.js` | 2 | gezakt op `===->!==` | DE SNELLE EN DE UITPUTTENDE VARIANT MOETEN HETZELFDE ZEGGEN. WAAROM DEZE TOETS ER IS scripts/ast-scan.js kwam lokaal in negen minuten niet rond, terwijl hij in CI een blokkerende stap is (TAKEN 4.6). |
 | `ast-scan.test.js` | 13 | gezakt op `===->!==` | Test voor de zelfgebouwde AST-scanner (scripts/ast/* + scripts/ast-scan.js). Drie soorten borging: 1. |
@@ -492,7 +491,7 @@ toets omvalt.
 | `credential-log-hygiene.test.js` | 7 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dagcoach.test.js` | 11 | gezakt op `liegpoort /api/` | De dagcoach (kern/dagcoach.js). Wat hier wordt vastgezet is vooral wat hij NIET doet, want dat is de hele keuze: 1. |
 | `dagplan.test.js` | 6 | gezakt op `liegpoort /api/` | De Daily Learning Guarantee: elke schooldag weet een leerling wat er te doen is, en die lijst is nooit leeg zolang er iets te leren valt. De beloftes die hier hard worden gemaakt: - een ingeschreven leerling met open... |
-| `dashboard-dagen.test.js` | 2 | -- | DE DAGBAKKEN VAN DE DASHBOARDS, rond middernacht. Twee dashboards telden omzet per dag op de UTC-datum van de container: - de backoffice van een zaak (routes/supplier/backoffice.js): sinds het eigenaarsbesluit van 19... |
+| `dashboard-dagen.test.js` | 4 | -- | DE DAGBAKKEN VAN DE DASHBOARDS, rond middernacht. Twee dashboards telden omzet per dag op de UTC-datum van de container: - de backoffice van een zaak (routes/supplier/backoffice.js): sinds het eigenaarsbesluit van 19... |
 | `db-redis-mirror.test.js` | 1 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dealkans.test.js` | 2 | gezakt op `liegpoort /api/` | De dealvinder: de voorspeller herkent combinatiegedrag (twee zaken binnen een dagdeel door dezelfde leden) en zet er een kant-en-klaar Synergie-voorstel van klaar; de aandelen tellen exact op tot de prijs. |
 | `deavond.test.js` | 5 | gezakt op `liegpoort /api/` | EEN AVOND IN HET HUIS -- de keuken, een event, het hotel en de gasten. WAAROM DIT ER IS De vorige toetsen volgen een mens (levensloop) of een bestelling (bezorging). |
@@ -1940,7 +1939,6 @@ toets omvalt.
 | `schermmutatie.test.js` | 8 | gezakt op `+->-#0` | DE SCHERMMUTATIEMOTOR ZELF -- want een meter die je niet kunt narekenen is een belofte. WAAROM DIT BESTAAT. |
 | `schermronde.test.js` | 5 | gezakt op `===->!==#0` | EEN MISLUKTE RONDE MAG ZICH NIET VOORDOEN ALS EEN GEMETEN RONDE. HET GEVAL, EN HET IS ECHT GEBEURD (18 augustus 2026). |
 | `schermsuite-bewijs.test.js` | 4 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `schil-taal.test.js` | 5 | -- | DE SCHIL SPREEKT DE TAAL VAN DE PAGINA. Gevonden door TravelOS op /apps/arrival.html (19 oktober 2026): op een toestel in het Engels stond in het personenpaneel van de werktafel "View your conversations" boven een... |
 | `schild-weerbaar.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | HET SCHILD, WEERBAAR (server/kern/schild.js). Het schild is de voordeur: een applicatie-WAF op pad, query en user-agent, een DDoS-rem per IP, de banlijst, en de poort waar De Wacht zijn quarantaine afdwingt. |
 | `schild.test.js` | 4 | gezakt op `liegpoort /api/` | Het schild: de applicatie-WAF, de DDoS-banlijst en de kortlevende TURN-inloggegevens. Extern verkeer wordt gesimuleerd met een X-Forwarded-For-header (trust proxy staat aan); localhost zelf is uitgezonderd zodat... |
 | `schoneboom.test.js` | 8 | al rood | EEN MEETRONDE DIE TOCH NIET MEETELT, HOORT NIET TE BEGINNEN. HET PROBLEEM. |
@@ -2218,7 +2216,6 @@ toets omvalt.
 | `tegoedbon-credential.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor de tegoedbon (CODECREDENTIALS.json, deur `pay.tegoedbon`, control `atomic_claim`). Twee onafhankelijke app-instances delen alleen de database: de bon leeft in de collectietransactie van... |
 | `tegoedbon-credential.test.js` | 13 | gezakt op `===->!==#0` | DE TEGOEDBON ALS CREDENTIAL (CODECREDENTIALS.json, deur `pay.tegoedbon`). Elke control van de deur heeft hier een eigen toets, en elke toets is tegen een kapotgemaakte kern gezien zakken (LAT.md regel 2); de mutatie... |
 | `tegoedbon-routes.test.js` | 3 | gezakt op `liegpoort /api/` | DE TEGOEDBON OP EEN ECHTE SERVER: dezelfde controls als in tegoedbon-credential.test.js, nu over HTTP, door de echte montage, de echte deuren (auth, supplierAuth, managerOnly) en de echte opslag met zijn... |
-| `tegoedterug-gratisaccount.test.js` | 3 | -- | Het tegoed en de terugstorting staan open voor elk account, ook een gratis account (server/routes/pay-tegoed.js, server/routes/pay-terug.js). Eigenaarsbesluit van 19 oktober 2026 (vierde reeks): wie geld kan... |
 | `tekstbinding.test.js` | 3 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `tenant-ondertekenaar.test.js` | 1 | gezakt op `voorwaarde-omkeren#0` | WIE TEKENT BIJ EEN TENANT, komt uit de SESSIE (11 oktober 2026; B7 van de tweede tegenlezing). Contract, levensloop, bewaringsplicht en vernietigen lazen `b.door \|\| wie(req)`: een getypte naam ging voor de ingelogde... |
 | `tenant.test.js` | 8 | gezakt op `===->!==#0` | DE TENANT CONTROL PLANE OVER DE LIJN -- de routes, het merk en de bootstrap. De regels van de spine en de brug staan in test/tenantspine.test.js; hier gaat het om wat er door de deur komt. |

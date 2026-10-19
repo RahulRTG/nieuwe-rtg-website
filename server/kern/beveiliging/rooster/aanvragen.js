@@ -20,7 +20,7 @@ module.exports = (ctx) => {
      deze maand, dus op wat iemand TOEKOMT en niet op wat hij waard is. */
   function planAuto(s, datum) {
     if (!functieAan(s, 'autoplan')) return { status: 409, error: 'AI-planning staat uit in uw boardroom.' };
-    const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum)) ? datum : vandaag();
+    const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum)) ? datum : vandaag(s);
     const team = guards(s);
     if (!team.length) return { status: 409, error: 'Nog geen beveiligers in het team om in te plannen.' };
     const rst = rooster(s, dag, 1).dagen[0];

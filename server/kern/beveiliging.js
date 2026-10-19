@@ -48,7 +48,8 @@ const AANVR_KLAAR = { gepland: true, afgewezen: true, geannuleerd: true };
 function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp }) {
   const id = (p) => (p || 'b') + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  // de kalenderdag van de zaak (zonder zaak: het huis), niet die van de UTC-container
+  const vandaag = (s) => require('./tijdzone').datumIn(null, require('./tijdzone').zaakZoneOfHuis(s));
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const getal = (v, min, max, st) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : st; };
   const shiftVan = (sid) => BEV_SHIFTS.find(x => x.id === sid) || null;

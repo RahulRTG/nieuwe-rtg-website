@@ -11,7 +11,7 @@ module.exports = (kern) => {
   const { app, crypto, db, logActivity, pickupCode, save, schoon, sseToSupplier, supplierAuth } = kern;
 
   const DERVING = { verspil: 'verspilling', breuk: 'breuk', eigen: 'eigen gebruik', repro: 'repro/herdruk' };
-  const { omzetdag: od, omzetdagVan: odv } = require('../../../kern/tijdzone');
+  const { omzetdag: od, omzetdagVan: odv } = require('../../../kern/tijdzone'), nuIso = () => require('../../../lib/klok').datum().toISOString();
   const lijst = (bak, code) => (db.data[bak] = db.data[bak] || {}, db.data[bak][code] = db.data[bak][code] || []);
   const leesItems = (body) => (Array.isArray(body.items) ? body.items : []).slice(0, 40)
     .map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
@@ -33,7 +33,7 @@ module.exports = (kern) => {
     const reg = { id: crypto.randomBytes(4).toString('hex'), soort, label: DERVING[soort],
       items, waarde: Math.round(items.reduce((s, i) => s + i.price * i.qty, 0) * 100) / 100,
       kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null,
-      notitie: schoon(req.body.notitie, 120), actor: req.actor.name, at: new Date().toISOString() };
+      notitie: schoon(req.body.notitie, 120), actor: req.actor.name, at: nuIso() };
     const l = lijst('kassaDerving', req.supplier.code);
     l.unshift(reg); if (l.length > 300) l.length = 300;
     save();
@@ -73,7 +73,7 @@ module.exports = (kern) => {
     const sale = { id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
       kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null,
       desc: 'Retour' + (req.body.reden ? ': ' + schoon(req.body.reden, 120) : ''),
-      room: null, items, total: -bedrag, method: 'contant', retour: true, at: new Date().toISOString() };
+      room: null, items, total: -bedrag, method: 'contant', retour: true, at: nuIso() };
     const l = (db.data.posSales[req.supplier.code] = db.data.posSales[req.supplier.code] || []);
     l.unshift(sale); db.data.posSales[req.supplier.code] = l.slice(0, 300);
     save();
@@ -90,7 +90,7 @@ module.exports = (kern) => {
     const l = lijst('kassaWachtbonnen', req.supplier.code);
     if (l.length >= 30) return res.status(400).json({ error: 'Er staan al 30 wachtbonnen; haal er eerst een terug.' });
     const bon = { id: crypto.randomBytes(3).toString('hex'), naam: schoon(req.body.naam, 40) || 'Wachtbon',
-      items, actor: req.actor.name, kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null, at: new Date().toISOString() };
+      items, actor: req.actor.name, kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null, at: nuIso() };
     l.unshift(bon); save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
     res.json({ ok: true, bon, wachtbonnen: l });
@@ -149,7 +149,7 @@ module.exports = (kern) => {
       .reduce((s, x) => s + x.total, 0) * 100) / 100;
     const verschil = Math.round((geteld - verwacht) * 100) / 100;
     const reg = { dag, geteld, verwacht, verschil, kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null,
-      actor: req.actor.name, at: new Date().toISOString() };
+      actor: req.actor.name, at: nuIso() };
     const l = lijst('kassaOpmaak', req.supplier.code);
     l.unshift(reg); if (l.length > 60) l.length = 60;
     save();

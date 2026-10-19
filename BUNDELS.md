@@ -769,7 +769,7 @@ omlaag.
 
 ## `shared/media.js`
 
-`public/shared/media/` -- 2 delen, 191 regels in de delen
+`public/shared/media/` -- 2 delen, 194 regels in de delen
 
 | deel | onderwerp |
 |---|---|

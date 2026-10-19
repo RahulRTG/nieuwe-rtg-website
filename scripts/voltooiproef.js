@@ -94,6 +94,7 @@ const SCENARIOS = {
   'ik.js': require('./lib/voltooi/ik'),
   'klimaat.js': require('./lib/voltooi/klimaat'),
   'kwesties.js': require('./lib/voltooi/kwesties'),
+  'library.js': require('./lib/voltooi/library'),
   'logboek.js': require('./lib/voltooi/logboek'),
   'loopbaan.js': require('./lib/voltooi/loopbaan'),
   'maison.js': require('./lib/voltooi/maison'),

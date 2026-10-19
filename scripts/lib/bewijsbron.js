@@ -91,6 +91,15 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
       bestanden.push('public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src)));
     }
   }
+  /* EEN BUNDEL IS ZIJN DELEN. SCHERMROUTES.json meet bouwuitvoer niet maar de
+     delen ernaast (scripts/bundel.js): apps/library/app.js staat er dus als
+     apps/library/app/app-01.js en -02.js in. Zonder deze stap raakt een proef
+     nooit een scherm dat zijn aanroepen in een bundel draagt. */
+  let delen = [];
+  try { delen = Object.entries(require('../bundel').bundels).map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']); } catch (e) { /* geen bundelregister */ }
+  for (const [uit, map] of delen) {
+    if (bestanden.includes(uit)) for (const b of perBestand.keys()) if (b.startsWith(map)) bestanden.push(b);
+  }
   const exact = new Set(), voor = new Set();
   for (const b of bestanden) {
     const rij = perBestand.get(b);

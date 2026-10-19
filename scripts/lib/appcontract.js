@@ -182,6 +182,9 @@ const CONTRACT = {
   'link:klimaat': Object.assign({
     belofte: 'wie in de buurt woont ziet de lopende duurzaamheidsprojecten en geeft erheen, stelt in het Living Lab een vraag over duurzaamheid, steunt die van een ander en ziet welk onderzoek er loopt'
   }, voltooi('klimaat', 'het scenario loopt /api/rtfos/gift/projecten en /api/lab2/bewoner/labs, /themas, /thema, /stem en /overzicht, de routes die /apps/foundation/klimaatfonds.html zelf aanroept, met een buur die steunt')),
+  'link:library': Object.assign({
+    belofte: 'een maker begint een werk, legt het vast in onderdelen met revisies, geeft met afspraak en rechten een editie vrij die niet meer verandert, leest hem en verwerkt feedback'
+  }, voltooi('library', 'het scenario loopt /api/library/work/*, /studio/workspace, /revision/add, /agreement/*, /rights/grant, /edition/*, /publication/*, /reader/* en /feedback/*, de routes die /apps/library.html via apps/library/app.js aanroept')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

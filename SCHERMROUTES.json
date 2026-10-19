@@ -3,13 +3,15 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "e2a1043e",
+  "commit": "3f05a06d",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/foundation/klimaatfonds.html"
+    "public/apps/library/api.js",
+    "public/apps/library/app/app-01.js",
+    "public/apps/library/app/app-02.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7820,11 +7822,11 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 449,
+  "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1070,
-  "verwijzingen": 1296,
-  "voorvoegsels": 144,
+  "exactePaden": 1094,
+  "verwijzingen": 1320,
+  "voorvoegsels": 143,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -12000,6 +12002,174 @@
    "pad": "/api/supplier/verkoopweg/zet",
    "schermen": [
     "public/apps/leverancier-commerce.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/agreement/accept",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/agreement/propose",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/edition/create",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/edition/freeze",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/feedback/decide",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/feedback/list",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/feedback/resolve",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/publication/confirm",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/publication/consent",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/publication/preview",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/rights/grant",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/structure/reorder",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/studio/workspace",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/work/list",
+   "schermen": [
+    "public/apps/library/app/app-01.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/context",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/feedback/create",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/reader/bookmark",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/reader/note",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/reader/open",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/reader/progress",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/reader/search",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/reader/state",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/revision/add",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/library/work/create",
+   "schermen": [
+    "public/apps/library/app/app-02.js"
    ],
    "aantal": 1
   },
@@ -17441,11 +17611,40 @@
    ]
   },
   {
-   "bestand": "public/apps/library/api.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/library/"
-   ]
+   "bestand": "public/apps/library/app/app-01.js",
+   "exact": [
+    "/api/library/agreement/accept",
+    "/api/library/agreement/propose",
+    "/api/library/edition/create",
+    "/api/library/edition/freeze",
+    "/api/library/feedback/decide",
+    "/api/library/feedback/list",
+    "/api/library/feedback/resolve",
+    "/api/library/publication/confirm",
+    "/api/library/publication/consent",
+    "/api/library/publication/preview",
+    "/api/library/rights/grant",
+    "/api/library/structure/reorder",
+    "/api/library/studio/workspace",
+    "/api/library/work/list"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/library/app/app-02.js",
+   "exact": [
+    "/api/library/context",
+    "/api/library/feedback/create",
+    "/api/library/reader/bookmark",
+    "/api/library/reader/note",
+    "/api/library/reader/open",
+    "/api/library/reader/progress",
+    "/api/library/reader/search",
+    "/api/library/reader/state",
+    "/api/library/revision/add",
+    "/api/library/work/create"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/life-lagen.js",

@@ -46,10 +46,11 @@ async function loop(w, stap) {
       ziet: r.status + ', ' + r.data.meldingen.length + ' meldingen, bron: ' + r.data.bron.slice(0, 60) };
   });
 
-  await stap('voltooibaar', 'een flitser melden in Frankrijk wordt geweigerd met de reden; een file daar mag wel', async () => {
-    const f = await w.post(MELD, { soort: 'flitser', lat: 48.85, lng: 2.35, land: 'FR' }, C.token);
-    const ok = await w.post(MELD, { soort: 'file', lat: 48.85, lng: 2.35, land: 'FR' }, C.token);
-    return { klopt: f.status === 403 && /wettelijk niet toegestaan/.test(f.data.error) && ok.status === 200,
+  // de plek beslist, niet het land dat de client stuurt (kern/flits-landregel.js)
+  await stap('voltooibaar', 'een flitser melden in Frankrijk wordt geweigerd met de reden, ook als de client "ES" zegt; een file daar mag wel', async () => {
+    const f = await w.post(MELD, { soort: 'flitser', lat: 48.85, lng: 2.35, land: 'ES' }, C.token);
+    const ok = await w.post(MELD, { soort: 'file', lat: 48.85, lng: 2.35, land: 'ES' }, C.token);
+    return { klopt: f.status === 403 && /wettelijk niet zijn toegestaan/.test(f.data.error) && /benadering/.test(f.data.error) && ok.status === 200,
       ziet: 'flitser ' + f.status + ' (' + (f.data && f.data.error || '').slice(0, 60) + '), file ' + ok.status };
   });
 

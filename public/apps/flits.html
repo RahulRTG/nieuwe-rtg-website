@@ -133,7 +133,7 @@
   // rustige spraak, alleen als het ertoe doet (nadering); geen gebabbel
   const spreek = t => { try { const u = new SpeechSynthesisUtterance(t); u.lang = 'nl-NL'; u.rate = 1.02; speechSynthesis.speak(u); } catch (e) {} };
 
-  const LAND = 'ES';
+  // geen land meer van de client: de server bepaalt de landregel uit de plek (kern/flits-landregel.js)
   /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
      de gps spreekt". Dat is geen startpunt maar een bewering: dit scherm meldt
      flitsers en files ROND JOU, en met dat punt keek je naar een eiland waar je
@@ -202,12 +202,12 @@
   }
   async function ververs() {
     if (!hier) return;                       // zonder plek is "rond mij" een lege vraag
-    const r = await api('/api/flits/rond', { lat: hier.lat, lng: hier.lng, land: LAND });
+    const r = await api('/api/flits/rond', { lat: hier.lat, lng: hier.lng });
     if (r.status !== 200) return;
     rond = r.body;
     $('#bron').textContent = rond.bron + '.';
-    $('#landRegel').textContent = rond.flitsToegestaan ? '' :
-      'In dit land zijn flitsermeldingen wettelijk niet toegestaan; file- en gevaarmeldingen werken gewoon.';
+    // de server bepaalt de landregel uit de plek en geeft de reden mee
+    $('#landRegel').textContent = rond.flitsToegestaan ? '' : (rond.landRegel || '');
     // meldknoppen (flitser valt weg waar het niet mag)
     const rij = $('#meldrij'); rij.innerHTML = '';
     for (const s of rond.soorten) {
@@ -217,7 +217,7 @@
       b.innerHTML = '<span class="i" aria-hidden="true">' + s.icoon + '</span>' + s.naam;
       b.addEventListener('click', async () => {
         if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om te kunnen melden.');
-        const m = await api('/api/flits/meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND, idem: RTGIdem('flits') });
+        const m = await api('/api/flits/meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, idem: RTGIdem('flits') });
         if (m.body.error) return zeg(m.body.error);
         zeg(m.body.herhaald ? (m.body.let_op || 'Deze melding stond er al.') : m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
         ververs();
@@ -279,7 +279,7 @@
         return;
       }
     }
-    const eerste = await api('/api/flits/rond', { lat: hier.lat, lng: hier.lng, land: LAND });
+    const eerste = await api('/api/flits/rond', { lat: hier.lat, lng: hier.lng });
     if (eerste.status !== 200) { $('#poortReden').textContent = eerste.body.error || 'Log eerst in via de app.'; $('#vPoort').classList.remove('weg'); return; }
     $('#vRit').classList.remove('weg');
     rond = eerste.body;

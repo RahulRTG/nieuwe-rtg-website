@@ -28,7 +28,7 @@ const SOORTEN = {
   object:  { naam: 'Object op de weg', icoon: '\u{1FAA8}', ttlMin: 120 },
   wegwerk: { naam: 'Wegwerkzaamheden', icoon: '\u{1F6A7}', ttlMin: 1440 }
 };
-const GEEN_FLITS_LANDEN = ['FR', 'DE', 'CH', 'TR', 'MK'];
+const { verbodenVak, LANDREGEL } = require('./flits-landregel'); // de landregel, uit de plek
 const DEDUPE_M = 300;         // zelfde soort binnen deze straal = bevestiging
 const RADIUS_KM = 15;         // het rondom-beeld
 const WEG_STEMMEN = 3;        // zoveel keer "weg" haalt een melding eraf
@@ -55,7 +55,6 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
     eigen.zetBak('flitsMeldingen', rij);
     return rij;
   }
-  const flitsVerbodenIn = land => GEEN_FLITS_LANDEN.includes(String(land || '').toUpperCase());
 
   /* ---- melden: een tik, met dedupe en rust ---- */
   function meld(key, codenaam, data) {
@@ -64,8 +63,7 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
     const lat = coord(data.lat, 90), lng = coord(data.lng, 180);
     if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)
       return { status: 400, error: 'Geen geldige plek.' };
-    if (soort === 'flitser' && flitsVerbodenIn(data.land))
-      return { status: 403, error: 'In dit land zijn flitsermeldingen wettelijk niet toegestaan; file- en gevaarmeldingen werken gewoon.' };
+    if (soort === 'flitser' && verbodenVak({ lat, lng })) return { status: 403, error: LANDREGEL };
     /* DE HERHAALSLEUTEL hoort bij de melding en overleeft dus een herstart:
        dezelfde tik nog eens (een afgebroken verzoek, een dubbeltik) geeft de
        eerste uitkomst terug, en dezelfde sleutel voor iets anders is een 409. */
@@ -135,16 +133,18 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
       afstandKm: hier ? Math.round(haversine(hier, m) / 100) / 10 : null,   // haversine rekent in meters
       bevestigingen: m.bevestigingen || 0, at: m.at };
   }
-  function rond(hier, land) {
+  // het tweede argument (een land van de client) telt niet meer mee
+  function rond(hier) {
     const lat = Number(hier.lat), lng = Number(hier.lng);
     const geldig = Number.isFinite(lat) && Number.isFinite(lng);
+    const hierVerboden = geldig && !!verbodenVak({ lat, lng });
     const rij = opschonen()
-      .filter(m => !(m.soort === 'flitser' && flitsVerbodenIn(land)))
+      .filter(m => !(m.soort === 'flitser' && (hierVerboden || verbodenVak(m))))
       .map(m => beeld(m, geldig ? { lat, lng } : null))
       .filter(m => !geldig || m.afstandKm <= RADIUS_KM)
       .sort((a, b) => (a.afstandKm ?? 999) - (b.afstandKm ?? 999));
     return { status: 200, meldingen: rij.slice(0, 60), radiusKm: RADIUS_KM,
-      flitsToegestaan: !flitsVerbodenIn(land),
+      flitsToegestaan: !hierVerboden, landRegel: hierVerboden ? LANDREGEL : null,
       soorten: Object.entries(SOORTEN).map(([k, v]) => ({ soort: k, naam: v.naam, icoon: v.icoon, ttlMin: v.ttlMin })),
       bron: 'meldingen van het eigen netwerk (op codenaam); officiele flitserdata schuift in productie hier in' };
   }
@@ -172,7 +172,7 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
     return { weg: rij.length - houd.length };
   }
 
-  return { flitsMeld: meld, flitsStem: stem, flitsRond: rond, flitsVooruit: vooruit, flitsVerbodenIn, flitsVergeet: vergeet };
+  return { flitsMeld: meld, flitsStem: stem, flitsRond: rond, flitsVooruit: vooruit, flitsVergeet: vergeet };
 }
 
 module.exports = { maakFlits };

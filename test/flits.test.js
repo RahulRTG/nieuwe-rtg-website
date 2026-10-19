@@ -96,11 +96,17 @@ test('4. drie keer "weg" haalt een melding eraf; elke stem telt een keer', async
 });
 
 test('5. landregels: waar flitsermeldingen verboden zijn, doen we ze niet', async () => {
+  /* De plek beslist, niet het land dat de client stuurt (besluit 19 oktober
+     2026): Parijs ligt in het vak van Frankrijk, ook als de client 'ES' zegt.
+     Hier stond Ibiza met land 'FR' -- dat was de regel die de client liet
+     beslissen. */
   const e = await lid('rtg');
-  const meld = await api('/api/flits/meld', { soort: 'flitser', ...IBIZA, land: 'FR' }, e);
+  const PARIJS = { lat: 48.85, lng: 2.35 };
+  assert.equal((await api('/api/flits/meld', { soort: 'file', ...PARIJS, land: 'ES' }, await lid('rtg'))).status, 200);
+  const meld = await api('/api/flits/meld', { soort: 'flitser', ...PARIJS, land: 'ES' }, e);
   assert.equal(meld.status, 403, 'melden geweigerd met uitleg');
   assert.ok(/wettelijk/.test(meld.body.error));
-  const rond = await api('/api/flits/rond', { ...IBIZA, land: 'FR' }, e);
+  const rond = await api('/api/flits/rond', { ...PARIJS, land: 'ES' }, e);
   assert.equal(rond.body.flitsToegestaan, false);
   assert.ok(!(rond.body.meldingen || []).some(x => x.soort === 'flitser'), 'bestaande flitsers verschijnen daar niet');
   assert.ok((rond.body.meldingen || []).some(x => x.soort === 'file'), 'file- en gevaarmeldingen blijven aan');
@@ -215,4 +221,30 @@ test('10. dezelfde melder vlakbij opnieuw is een herhaling, geen bevestiging -- 
   assert.notEqual(nog.body.bevestigd, true, 'een melder bevestigt zichzelf niet');
   const rond = await api('/api/flits/rond', plek, melder);
   assert.equal(rond.body.meldingen.find(x => x.id === eerst.body.melding.id).bevestigingen, 0);
+});
+
+test('11. de landregel bepaalt de server uit de plek; het land van de client verandert niets', async () => {
+  /* Besluit van 19 oktober 2026 (optie C, stap A): het land kwam van de client
+     en flits.html stuurde hard 'ES', dus de regel greep nooit in. Nu rekent de
+     server met de plek van de melding, op vakken die een eigen benadering zijn
+     (geen grenzen): wie in het vak van een land met een verbod staat, krijgt
+     een weigering die zegt dat het een benadering is. */
+  const a = await lid('rtg');
+  const BERLIJN = { lat: 52.52, lng: 13.40 }, UTRECHT = { lat: 52.09, lng: 5.12 }, ARNHEM = { lat: 51.98, lng: 5.92 };
+  for (const land of ['ES', 'NL', undefined]) {
+    const r = await api('/api/flits/meld', { soort: 'flitser', ...BERLIJN, land }, await lid('rtg'));
+    assert.equal(r.status, 403, 'een flitser in het DE-vak wordt geweigerd, ook met land ' + land);
+    assert.match(r.body.error, /benadering/, 'de reden zegt dat het om een benadering gaat');
+  }
+  // een file mag overal, ook in het vak
+  assert.equal((await api('/api/flits/meld', { soort: 'file', ...BERLIJN, land: 'NL' }, await lid('rtg'))).status, 200);
+  // fail-closed in het grensvak: Arnhem ligt in het DE-vak (benadering, geen grens)
+  assert.equal((await api('/api/flits/meld', { soort: 'flitser', ...ARNHEM, land: 'NL' }, await lid('rtg'))).status, 403);
+  // buiten elk vak telt een opgegeven 'DE' niet: de client bepaalt de uitkomst nooit
+  assert.equal((await api('/api/flits/meld', { soort: 'flitser', ...UTRECHT, land: 'DE' }, a)).status, 200);
+  // het beeld rond Berlijn toont geen flitsers en zegt waarom, wat de client ook stuurt
+  const rond = await api('/api/flits/rond', { ...BERLIJN, land: 'NL' }, a);
+  assert.equal(rond.body.flitsToegestaan, false);
+  assert.ok(!(rond.body.meldingen || []).some((m) => m.soort === 'flitser'));
+  assert.match(rond.body.landRegel || '', /benadering/);
 });

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2831 bestanden en 19570 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2832 bestanden en 19574 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2831 |
-| losse beweringen (`test(...)`) | 19570 |
+| toetsbestanden | 2832 |
+| losse beweringen (`test(...)`) | 19574 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 15 |
+| niets van beide | 16 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2492 bestanden, 18997 beweringen.
+2493 bestanden, 19001 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -210,7 +210,7 @@ toets omvalt.
 | `bankhart.test.js` | 8 | gezakt op `liegpoort /api/` | Het financiele hart: de Regelwacht (belastingen en regels automatisch bij, streng gevalideerd, in place op de gedeelde landtabel), het verenigde hart-afschrift (RTG Bank + RTG Pay + de derde-partij-kaartnaad met een... |
 | `banknood-idem.test.js` | 4 | gezakt op `!==->===#0` | DEZELFDE MISLUKTE CLEARING TWEE KEER MELDEN MAG DE BANK NIET IN NOOD ZETTEN. `bankClearingMislukt()` is een teller, en bij NOOD_DREMPEL trekt hij automatisch de noodstop: de clearing valt dan terug op de kaart-rails. |
 | `bankpositie.test.js` | 5 | gezakt op `liegpoort /api/` | HET BANKSALDO VAN RTG -- server/kern/bankpositie.js (besluit C4), tegen een echte server, want dit zijn twee nieuwe routes. VIJF BEWERINGEN, en ze kunnen alle vijf zakken: 1. |
-| `bankstort-weigering.test.js` | 4 | -- | Storten via de kaart loopt via de betaalwaarheid (server/kern/bank/stortwaarheid.js). Twee fouten, allebei gevonden bij de voltooiproef van de bank (scripts/lib/voltooi/bank.js): 1. |
+| `bankstort-weigering.test.js` | 5 | -- | Storten via de kaart loopt via de betaalwaarheid (server/kern/bank/stortwaarheid.js). Twee fouten, allebei gevonden bij de voltooiproef van de bank (scripts/lib/voltooi/bank.js): 1. |
 | `bearercode-hmac.test.js` | 6 | gezakt op `===->!==#0` | HET HMAC-ZEGEL OP BEARERCODE V2 (server/kern/bearercode-zegel.js, de ring in bearercode-sleutelring.js, de migratie in bearercode-migratie.js). Besluit van de eigenaar, 14 oktober 2026: een kale hash beschermt niet... |
 | `bearercode-migratie-weerbaar.test.js` | 6 | gezakt op `===->!==#0` | DE MIGRATIE NAAR HET BEARERCODE-ZEGEL, WEERBAAR GEMAAKT VOOR DE UITROL (server/kern/bearercode-migratie.js en scripts/bearercode-herseal.js). Drie voorwaarden van de eigenaar voor productie: (1+3) geen onbedoelde... |
 | `bearercode-takken.test.js` | 21 | gezakt op `voorwaarde-omkeren#0` | TAKKEN VAN kern/bearercode.js DIE GEEN TOETS RAAKTE. test/bearercode.test.js legt v1 vast, test/bearercode-v2.test.js en test/bearercode-vernieuw.test.js de v2-werkwoorden. |
@@ -483,6 +483,7 @@ toets omvalt.
 | `decision-room.test.js` | 3 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `deelindex.test.js` | 5 | gezakt op `+->-#0` | DE INDEX VAN DE BUNDELDELEN LOOPT NIET ACHTER. BUNDELS.md wordt voortgebracht door scripts/deelindex.js. |
 | `defensie.test.js` | 7 | gezakt op `liegpoort /api/` | De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI weigert alles wat richting wapeninzet of doelbestrijding gaat. |
+| `dekking-hangend.test.js` | 3 | -- | Een hangende automatische bijlading wordt bij een herhaling herkend, niet opnieuw gestart en niet als storing gemeld (server/kern/pay/opladen.js). Gemeld door FoundationOS bij link:geven en gereproduceerd in de... |
 | `dekking-takidentiteit.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE IDENTITEIT VAN EEN TAK, BEWEZEN OP EEN REFERENTIEDATASET. Eigenaarsbesluit (14 oktober 2026): de takken van verschillende toetsprocessen mogen pas anders worden samengevoegd als op een kleine, vaste dataset is... |
 | `dekking.test.js` | 2 | gezakt op `===->!==#0` | DE DEKKINGSMETER LEEST ALLE JOURNALEN, NIET EEN (scripts/dekking.js). WAAROM DEZE TOETS ER IS. |
 | `dekkingsgat.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | HET DEKKINGSGAT, GEIJKT OP EEN KLEIN FIXTURE (besluit eigenaar 14 oktober 2026: "eerst meten, dan beslissen"). De dekkingsvloer telt alleen wat een Node-toetsproces laadt. |

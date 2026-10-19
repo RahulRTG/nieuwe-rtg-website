@@ -9,6 +9,7 @@ function maakOpladen(basis) {
     motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid, reserveerSleutel,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
   const { randomUUID } = require('crypto');
+  const stand = require('./oplaadstand');
   const { maakSleutel } = require('../../db/economische-identiteit');
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
@@ -37,24 +38,14 @@ function maakOpladen(basis) {
           idem: 'pay-oplaad:' + codenaam + ':' + (idem ? String(idem) : 'los:' + randomUUID()),
           centen: c, valuta: 'eur', context: { codenaam, userId: userId || null, oms: oms || 'Opladen' } });
       } catch (e) { return { status: 409, error: e.message }; }
+      /* een lopende oplading is niet onbekend, en geweigerd is AF: ./oplaadstand.js */
+      const alGestart = !!w.providerId;
       let uit;
       try { uit = await betaalWaarheid.begin(w.id, { omschrijving: oms || 'RTG Pay opladen' }); }
-      catch (e) {
-        if (e && e.code === 'BETAAL_AFHANDELING_MISLUKT')
-          return { status: 502, betalingId: w.id, error: 'De betaling is bevestigd maar nog niet bijgeschreven; dat gebeurt vanzelf.' };
-        return { status: 502, betalingId: w.id, onbekend: true,
-          error: 'De betaling gaf geen uitsluitsel. Betaal niet opnieuw: RTG zoekt het na met dezelfde sleutel.' };
-      }
+      catch (e) { return stand.naFout(betaalWaarheid.van(w.id), e, alGestart, w.id); }
       const r = betaalWaarheid.van(w.id);
       if (r && r.afgehandeldAt) return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c, betalingId: w.id };
-      /* Geweigerd is AF, niet onderweg; "wacht op bevestiging" liet het lid
-         wachten op niets (scripts/lib/voltooi/pay.js). */
-      const stand = r && r.status;
-      const zin = stand === 'GEWEIGERD' || stand === 'GEANNULEERD'
-        ? 'De betaling is niet gelukt. Er is niets afgeschreven en niets bijgeschreven.'
-        : stand === 'CONTROLE_NODIG' ? 'De betaling ligt bij RTG ter controle. Betaal niet opnieuw.'
-          : 'De betaling wacht op bevestiging.';
-      return { status: 402, error: zin, betalingId: w.id,
+      return { status: 402, error: stand.zinNa(r && r.status), betalingId: w.id,
         betaalStatus: (r && r.providerStatus) || (uit && uit.betaling && uit.betaling.status) || null };
     /* `poort`: opladen is een eigen capability (geld.opwaarderen) naast het
        interne saldo dat de idem-laag al vraagt -- ook als STAP binnen een andere

@@ -122,6 +122,12 @@ test('contract: een @import van buiten public/ds/ haalt erfenis binnen', () => {
   assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'rtg-ds.css'), '\n@import url("../shared/rtg-heritage.css");\n')), /van buiten public\/ds/);
 });
 
+test('contract: een script van het systeem spuit geen stijl en haalt geen erfenis binnen', () => {
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'shell.js'), "\nvar s=document.createElement('style');\n")), /zet zelf stijl/);
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'shell.js'), "\nel.style.color='red';\n")), /zet zelf stijl/);
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'shell.js'), "\nl.href='/shared/rtg-heritage.css';\n")), /buiten public\/ds/);
+});
+
 test('contract: elk schermtype, component en wereld uit het contract bestaat', () => {
   assert.match(kopieMet(d => fs.rmSync(path.join(d, 'schermen/canvas.css'))), /schermtype canvas/);
   const contract = JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8'));

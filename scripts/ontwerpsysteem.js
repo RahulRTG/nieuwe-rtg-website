@@ -252,6 +252,14 @@ function contractFouten(meting, DS = module.exports.DS) {
       }
     }
   }
+  /* 8. Een script van het systeem spuit geen stijl en haalt geen erfenis
+        binnen: dat is precies de weg waarlangs basis.js en randen.js de oude
+        lagen op elk scherm zetten. */
+  for (const f of bestanden(DS, /\.js$/)) {
+    const r = rel(f), s = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    if (/createElement\(\s*['"`]style['"`]\s*\)|\.insertRule\(|adoptedStyleSheets|\.style\.[a-zA-Z]+\s*=|\.style\.cssText|setAttribute\(\s*['"`]style['"`]/.test(s)) fouten.push(r + ': script zet zelf stijl; vorm komt uit de bladen van public/ds/');
+    for (const m of s.matchAll(/['"`]([^'"`\s]*\.css)(?:\?[^'"`]*)?['"`]/g)) if (!m[1].startsWith('/ds/')) fouten.push(r + ': noemt een stijlblad buiten public/ds/ (' + m[1] + ')');
+  }
   /* Elk schermtype en elk component uit het contract bestaat ook. */
   for (const t of contract.schermtypen) if (!fs.existsSync(path.join(DS, 'schermen', t + '.css'))) fouten.push('schermtype ' + t + ' staat in het contract maar public/ds/schermen/' + t + '.css ontbreekt');
   for (const c of contract.componenten) if (!fs.existsSync(path.join(DS, 'componenten', c + '.css'))) fouten.push('component ' + c + ' staat in het contract maar public/ds/componenten/' + c + '.css ontbreekt');

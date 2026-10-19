@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-19T06:59:15.704Z",
-  "commit": "66f413ff",
+  "op": "2026-10-19T07:15:50.846Z",
+  "commit": "0f982687",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -19,13 +19,14 @@
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 19
+  "publiekeLijstenVerschillen": 20
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
    "/api/foundation/health",
    "/api/metrics",
    "/api/metrics/kort",
+   "/api/loop/operations",
    "/api/doos/rapport",
    "/api/foundation/impact",
    "/api/foundation/tip",

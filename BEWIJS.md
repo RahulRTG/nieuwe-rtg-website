@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2887 bestanden en 19789 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2889 bestanden en 19797 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2887 |
-| losse beweringen (`test(...)`) | 19789 |
+| toetsbestanden | 2889 |
+| losse beweringen (`test(...)`) | 19797 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 67 |
+| niets van beide | 69 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2544 bestanden, 19210 beweringen.
+2546 bestanden, 19218 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2218,6 +2218,7 @@ toets omvalt.
 | `tenantuitgang.test.js` | 8 | gezakt op `===->!==#0` | DE UITGANG EN DE LEVENSLOOP -- weggaan zonder je geschiedenis te verliezen. Exit-recht is niet af met een knop die JSON teruggeeft. |
 | `terrein-en-panden.test.js` | 5 | gezakt op `liegpoort /api/` | TERREIN, PANDEN EN DIEREN -- 6 endpoints uit de supplier-groep. gebouw/zaal/weg, golf/tee/weg, pand/foto, charter/fotos, boerderij/dier en boerderij/water stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `terugstortstand.test.js` | 6 | gezakt op `liegpoort /api/` | DE TERUGSTORTSTAND -- de knop die niet regelt wat RTG doet maar wat RTG IS. WAAROM DEZE TOETS ER IS RTG wil twee juridische posities kunnen innemen, en dat is een legitieme bedrijfskeuze: gesloten saldo blijft binnen... |
+| `terugvastgelopen.test.js` | 4 | -- | Een vastgelopen terugbetaling staat op de kantoorlijst, en een mens op naam handelt hem af (kern/betaalwaarheid/terugveeg.js, kern/betaalregie.js, routes/kantoren/betaalproviders.js, apps/kantoren-terugbetaling.js).... |
 | `terugveeg.test.js` | 3 | -- | De veegronde voor terugbetalingen (server/kern/betaalwaarheid/terugveeg.js). Een terugbetaling die de provider aannam maar nog niet bevestigde, staat op BIJ_PROVIDER en wacht op een melding. |
 | `testwereld-adapters.test.js` | 5 | gezakt op `===->!==#0` | DE ADAPTERS VAN DE TESTWERELD -- postvanger (mail) en sms-sandbox. BETROUWBAARHEID.md par. |
 | `theater-herhaalsleutel.test.js` | 2 | -- | EEN HERHAALSLEUTEL IN HET THEATER OVERLEEFT EEN HERSTART (19 oktober 2026). De voltooiproef van Theater (scripts/lib/voltooi/theater.js) liet de maker na een crash zijn publicatie opnieuw versturen, met dezelfde... |
@@ -2440,6 +2441,7 @@ toets omvalt.
 | `wachtwijze.test.js` | 9 | gezakt op `>=->>#0` | DE WACHTWIJZE VAN DE SCHERMTOETSEN (scripts/wachtwijze.js + WACHTWIJZE.json). WAAROM DEZE TOETS ER IS. |
 | `wachtwoordkosten.test.js` | 4 | gezakt op `return-weg#0` | De scrypt-kosten en het migratiepad. Waar dit over gaat: de opgeslagen wachtwoordhash droeg vroeger geen enkele parameter (`salt:hash`), en daardoor was de scrypt-kostenfactor niet te verhogen zonder elk bestaand... |
 | `wachtwoordrem-weerbaar.test.js` | 8 | gezakt op `true->false#0` | DE WACHTWOORDREM TEGEN EEN GOKKER (server/kern/identiteit/wachtwoordrem.js, met ./lopend.js voor de pogingen die nog lopen). Wat deze module beschermt: elke deur die een RTG-wachtwoord toetst, deelt dezelfde drie... |
+| `wallet-gratisaccount.test.js` | 4 | -- | De wallet staat open voor elk account, ook een gratis account (server/routes/pay.js, server/routes/zorgwallet.js). Eigenaarsbesluit van 19 oktober 2026: gebruiken vraagt minimaal een gratis account, en de wallet... |
 | `walletmunt-herhaal.test.js` | 3 | -- | Een betaling geeft een keer feestmunten (server/kern/wallet.js, muntKoop). Gevonden door de voltooiproef van de wallet (scripts/lib/voltooi/wallet.js): een koop, een SIGKILL, en dezelfde tik opnieuw. |
 | `wandklok.test.js` | 4 | -- | DE RATEL OP DE WANDKLOK (scripts/lib/wandklok.js, keuringsregel 77). Een regel die niets kan vinden is erger dan geen regel (LAT.md regel 9). |
 | `wauw.test.js` | 4 | gezakt op `liegpoort /api/` | De wauw-laag (kern/wauw.js): de dag-stemming (vaste 9+-lijst) en de verjaardagsglans die overal naast de codenaam meereizen (Pulse, Berichten), het Moment van de week in de Pulse-feed en De Terugblik op je sociale week. |

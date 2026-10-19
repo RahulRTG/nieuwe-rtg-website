@@ -5,6 +5,7 @@ module.exports = function betalingCijfers(data) {
   const perStatus = {}, perProvider = {};
   let bevestigdCenten = 0, terugbetaaldCenten = 0, afhandelingWacht = 0,
     terugbetalingWacht = 0, terugbetalingControle = 0;
+  const vastgelopen = [];
   for (const b of alle) {
     perStatus[b.status] = (perStatus[b.status] || 0) + 1;
     const p = b.provider || 'nog-geen';
@@ -15,6 +16,11 @@ module.exports = function betalingCijfers(data) {
     if (b.status === 'BEVESTIGD' && !b.afgehandeldAt) afhandelingWacht += 1;
     for (const op of (b.terugbetaalOpdrachten || [])) {
       if (['VASTGELEGD', 'BIJ_PROVIDER'].includes(op.status)) terugbetalingWacht += 1;
+      // geescaleerd door de veegronde (betaalwaarheid/terugveeg.js) en nog niet door een mens afgehandeld
+      if (op.escalatie && op.status === 'BIJ_PROVIDER' && !op.mens)
+        vastgelopen.push({ betalingId: b.id, opdrachtId: op.id, centen: Number(op.centen) || 0,
+          bedrag: 'EUR ' + ((Number(op.centen) || 0) / 100).toFixed(2).replace('.', ','),
+          provider: b.provider || null, sinds: op.escalatie.at || null, reden: op.escalatie.reden || '' });
       if (op.status === 'CONTROLE_NODIG') terugbetalingControle += 1;
     }
   }
@@ -25,7 +31,7 @@ module.exports = function betalingCijfers(data) {
       bijgewerktAt: b.bijgewerktAt || b.aangemaaktAt || null }));
   return { totaal: alle.length, perStatus, perProvider, bevestigdCenten, terugbetaaldCenten,
     controleNodig: perStatus.CONTROLE_NODIG || 0,
-    afhandelingWacht, terugbetalingWacht, terugbetalingControle,
+    afhandelingWacht, terugbetalingWacht, terugbetalingControle, vastgelopen,
     onderweg: (perStatus.AANGEMAAKT || 0) + (perStatus.WACHT_OP_KLANT || 0) +
       (perStatus.IN_BEHANDELING || 0), recent };
 };

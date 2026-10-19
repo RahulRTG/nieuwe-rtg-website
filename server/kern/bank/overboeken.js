@@ -8,7 +8,6 @@
    twee grootboeken tegelijk raakt, en die regel hoort niet tussen deze.
    Krijgt de gedeelde ctx van kern/bank/index.js. */
 const { magBij } = require('./eigendom');
-const { providerStatus } = require('../betaalwaarheid/staten');
 
 module.exports = (ctx) => {
   const { db, save, bijeen, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje, metIdem } = ctx;
@@ -18,6 +17,7 @@ module.exports = (ctx) => {
      andere naam -- `!codenaam ||` -- en dekt uitgerekend het UITGAANDE
      geldpad: storten, overboeken, SEPA en naar-wallet. */
   const eigenaar = (iban, aanvrager) => magBij(rekMeta(iban), aanvrager);
+  const stort = require('./stortwaarheid')(ctx);
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
      hetzelfde antwoord terug en clearet nooit twee keer. Hij werd hier gemaakt
@@ -38,25 +38,13 @@ module.exports = (ctx) => {
     if (via === 'eigen' && !cl.eigen) return { status: 409, error: 'De eigen bank clearet nu niet; zet de knop verder.' };
     if (via === 'kaart' && !cl.kaart) return { status: 409, error: 'De kaart-rails staan uit; de eigen bank clearet.' };
     return metIdem(idem ? 'stort:' + iban + ':' + idem : null, 'stort|' + iban + '|' + c + '|' + via, async () => {
-      let ref = 'eigen';
-      if (via === 'kaart') {
-        let betaling;
-        try { betaling = await betaal.maakBetaling({ bedrag: c, referentie: 'bank-stort-' + iban + '-' + nu(), idempotentieSleutel: idem ? 'bank-stort:' + iban + ':' + idem : undefined, omschrijving: oms || 'RTG Bank storten' }); }
-        catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
-        if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') {
-          /* Geweigerd is AF, niet onderweg: "wacht op bevestiging" liet het lid
-             wachten op een storting die nooit kwam (scripts/lib/voltooi/bank.js).
-             Dezelfde vertaling van de providerstand als de betaalwaarheid. */
-          const af = ['GEWEIGERD', 'GEANNULEERD'].includes(providerStatus(betaling.aanbieder, betaling.status));
-          return { status: 402, betaalStatus: betaling.status, error: af
-            ? 'De storting is niet gelukt. Er is niets afgeschreven en niets bijgeschreven.' : 'De betaling wacht op bevestiging.' };
-        }
-        ref = betaling.id;
-      }
-      const van = via === 'eigen' ? 'extern:emissie' : 'extern:kaart';
-      const b = await boekAsync({ van, naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
-      if (b.error) { if (via === 'eigen') bankregie.bankClearingMislukt('emissie-boek'); return b; }
-      if (via === 'eigen') bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
+      /* De kaart loopt via de betaalwaarheid, en daar schrijft de afhandelaar
+         bij (./stortwaarheid.js); hier blijft alleen de eigen emissie. */
+      if (via === 'kaart') return stort.viaKaart({ iban, centen: c, idem, oms });
+      const ref = 'eigen';
+      const b = await boekAsync({ van: 'extern:emissie', naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
+      if (b.error) { bankregie.bankClearingMislukt('emissie-boek'); return b; }
+      bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
       seintje(rekMeta(iban).codenaam);
       return { ok: true, iban, via, saldoCenten: saldoVan(iban), gestort: c };
     }, { geld: 'stort geld op een rekening' });

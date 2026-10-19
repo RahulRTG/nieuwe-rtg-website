@@ -65,7 +65,7 @@ if (kern.rugdekking && kern.rugdekking.koppelBevoegd) kern.rugdekking.koppelBevo
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
+Object.assign(kern, require('../kern/bank')({ db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten, betaalWaarheid: kern.betaalWaarheid }));
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */

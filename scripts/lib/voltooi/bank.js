@@ -7,9 +7,9 @@
    en leest het afschrift. Routes letterlijk uit apps/geld/bankb.js en bankc.js.
 
    DE RAIL IS DE SIMULATIEBANK. Storten in de stand partner/hybride loopt via de
-   kaart-naad (kern/bank/overboeken.js); de simulatiebank kiest zijn afloop uit
-   de sleutel `bank-stort:<iban>:<idem>`, en de proef kiest die sleutel vooraf
-   (zelfde recept als ./pay.js). Geen vlag in een poort: de leden-bank gaat
+   betaalwaarheid naar de kaart-naad (kern/bank/stortwaarheid.js); de
+   simulatiebank kiest zijn afloop uit het betaling-id, en de proef kiest de
+   herhaalsleutel vooraf (zelfde recept als ./pay.js). Geen vlag in een poort: de leden-bank gaat
    open langs de echte kantoorroute (/api/office/bank/leden) door een
    herleidbaar mens, en /api/bank/* draagt het bezitsbewijs van een gebonden
    toestel (kern/identiteit/bezitspaden.js), zoals de browser dat meestuurt.
@@ -28,10 +28,16 @@ const AFSCHRIFT = '/api/bank/afschrift';
 const LEDEN_LIVE = '/api/office/bank/leden';
 
 const bank = simulatiebank({ crypto, env: {}, echteRail: null });
+const sha = (v) => crypto.createHash('sha256').update(String(v)).digest('hex');
+/* Storten loopt via de betaalwaarheid (kern/bank/stortwaarheid.js): actor
+   `bank:<codenaam>`, idem `bank-stort:<iban>:<idem>`, en de rail krijgt
+   `waarheid:<betaling-id>` -- dezelfde afleiding als ./pay.js. */
+let codenaam = null;
 function stortSleutel(iban, afloop, merk) {
   for (let i = 0; i < 10000; i++) {
     const idem = merk + '-' + i;
-    if (bank.scenarioVan({ idempotentieSleutel: 'bank-stort:' + iban + ':' + idem }) === afloop) return idem;
+    const id = 'BW-' + sha('bank:' + codenaam + '|bank-stort:' + iban + ':' + idem).slice(0, 20).toUpperCase();
+    if (bank.scenarioVan({ idempotentieSleutel: 'waarheid:' + id }) === afloop) return idem;
   }
   throw new Error('geen herhaalsleutel gevonden die "' + afloop + '" geeft');
 }
@@ -41,6 +47,7 @@ async function loop(w, stap) {
   const lid = await geverifieerdLid(w, 'bank');
   const T = lid.token;
   const toestel = await gebondenToestel(w, T);
+  codenaam = ((await w.post('/api/member/connections', {}, T)).data || {}).codename;
   const post = async (pad, lijf, tok, t) => w.post(pad, lijf, tok || T, await (t || toestel).bewijs('POST', pad));
   const ov = async (tok, t) => (await post(OVERZICHT, {}, tok, t)).data || {};
   const saldo = (o, iban) => ((o.rekeningen || []).find((r) => r.iban === iban) || {}).saldoCenten;
@@ -188,6 +195,6 @@ module.exports = {
   persona: 'lid',
   omgeving: Object.assign({ RTG_SIMULATIEBANK: '1' }, KANTOORWERELD),
   belofte: 'zodra het kantoor de leden-bank live zet, geeft een lid akkoord, krijgt een rekening, stort geld van buiten, boekt over tussen eigen rekeningen en leest het afschrift; weigert of hangt de bank, dan hoort het lid wat er werkelijk gebeurde -- een ander lid kan er niet bij, en een dubbele tik, een afgebroken verzoek of een crash boekt nooit dubbel',
-  grens: 'De rail is de simulatiebank, geen echte provider; de bankregie staat in zijn standaardstand (partner, clearing via de kaart-naad). Passen, spaardoel, de AI-bankier, de CSV-export en de eventstream zijn hier niet beproefd. De proef loopt de routes van de stand, niet de stand zelf, en kent geen Redis, PostgreSQL of geldmotor.',
+  grens: 'De rail is de simulatiebank, achter de betaalwaarheid; de bankregie staat in zijn standaardstand (partner, clearing via de kaart-naad). Passen, spaardoel, de AI-bankier, de CSV-export en de eventstream zijn hier niet beproefd. De proef loopt de routes van de stand, niet de stand zelf, en kent geen Redis, PostgreSQL of geldmotor.',
   loop
 };

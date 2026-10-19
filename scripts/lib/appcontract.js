@@ -230,15 +230,14 @@ const CONTRACT = {
   'link:projectroom': Object.assign({
     belofte: 'een medewerker voert een project dat uit een RTMAIL ontstond aantoonbaar uit, met taken, bewijs en een menselijke oplevering, en een collega wijzigt er niets aan'
   }, voltooi('projectroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /project/taak, /project/bewijs en /project/oplever, de routes die /apps/project-room.html zelf aanroept, met een collega en een lid die er niet bij komen')),
-  'link:horeca': {
-    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'TAFELPROEF.json',
-      instrument: 'scripts/tafelproef.js',
-      waarom: 'de tafelproef loopt exact die stroom over /api/supplier/horeca/*, de routes die /apps/horeca.html zelf aanroept'
-    }
-  },
+  /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
+     voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
+     afrekenen en meet daarnaast de herstart, de crash en de offline sync; een
+     scenario levert alle vier of geen (test/voltooiproef.test.js). De
+     tafelproef blijft zijn eigen register, voor de overdracht naar de gast. */
+  'link:horeca': Object.assign({
+    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en een offline opgenomen bestelling komt precies een keer binnen'
+  }, voltooi('horeca', 'het scenario loopt /api/supplier/horeca/rekening/*, /keuken/*, /betaal en /offline/sync onder het voorvoegsel dat /apps/horeca.html via RTGHoreca.api aanroept, met een tweede zaak die de rekening niet ziet')),
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
      link:connect is /apps/connect.html, dat acht /api/connect-routes met de proef

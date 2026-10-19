@@ -448,6 +448,7 @@ const REGISTERS = [
   ['ADAMPROEF.json', 'npm run adamproef:vast', 'of een jongere van 17 zonder account een mogelijkheid bereikt, en het zelf ziet'],
   ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
   ['GEMEENSCHAPSPROEF.json', 'npm run gemeenschapsproef:vast', 'of de samenwerkingsketen van FoundationOS sluit, van drager en verbond tot de terugkoppeling van een besluit'],
+  ['SAMENPROEF.json', 'npm run samenproef:vast', 'of een app een keten afmaakt met een andere app via een verwijzing (modus SAMEN), tot het resultaat bij de ontvanger'],
   ['LUSPROEF.json', 'npm run lusproef:vast', 'of de ontdeklus van Foundation Connect sluit, tot een ander die bevestigt dat het hem hielp'],
   ['VOLTOOIPROEF.json', 'npm run voltooiproef:vast', 'of een onderdeel met een scenario zijn bedoeling afmaakt, een herstart overleeft en na een crash en een afgebroken verzoek klopt (bewijs 3, 5 en 7)'],
   ['CONCIERGEPROEF.json', 'npm run conciergeproef:vast', 'of de concierge-lus sluit, van een wens in een zin tot een gesloten case met een uitkomst'],

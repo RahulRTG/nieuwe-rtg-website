@@ -627,4 +627,50 @@ const TESTWERELD_ONTBREEKT = {
   'os:videobellen': 'videobellen vraagt test-identiteiten voor WebRTC in een headless browser, en dat vraagt een besluit (BETROUWBAARHEID.md par. 4)'
 };
 
-module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT };
+/* ============================================================================
+   MODUS SAMEN -- wat een app aan andere apps doorgeeft, en wat hij ontvangt.
+
+   Eigenaarsbesluit van 19 oktober 2026: elke app werkt in twee modi. LOS doet
+   hij zijn eigen belofte. SAMEN maakt hij een keten af met andere apps, en dat
+   altijd via een VERWIJZING en nooit via gedeelde data (public/shared/
+   objectverwijzing.js: soort, id, label en hooguit acht velden die de
+   verzender al op het scherm had). De ontvanger doet de handeling met zijn
+   eigen sessie en zijn eigen rechten.
+
+   Per functie uit MAPPEN drie velden, en alle drie mogen leeg zijn:
+     uitgeeft  de soorten verwijzing die de app aanbiedt (soort uit de objectpoort)
+     ontvangt  de soorten die hij begrijpt
+     ketens    de ketens die hij met andere apps afmaakt: { naam, schakels
+               (functies uit MAPPEN, in volgorde), proef: { register,
+               instrument } }
+   LEEG IS EERLIJK "NIET VERBONDEN", nooit "bewezen". Een veld is een
+   VERKLARING; scripts/lib/bewijsbron.js (controleerSamen) MEET of de code hem
+   waarmaakt: een uitgegeven soort moet in de schermcode als object vertrekken,
+   een ontvangen soort moet er een ontvanger hebben, elke ontvangst moet ergens
+   een uitgifte hebben (of extern zijn), en een keten zonder proef is geen keten.
+
+   Vandaag (gemeten op 19 oktober 2026) is er precies EEN keten in de code: een
+   reis uit /apps/reizen.html die als afspraak in /apps/agenda.html komt. Geen
+   van beide schermen is een ingang in MAPPEN, dus hij staat bij
+   KETENS_ZONDER_APP met de reden -- weglaten leest als "niet bestaand". */
+const SAMEN = {};
+
+/* Soorten die van BUITEN het huis komen (een agenda-uitnodiging uit een andere
+   kalender, een gedeelde link) en dus geen uitgever in MAPPEN hebben. Elk met
+   de reden. Leeg tot er een is. */
+const EXTERN = {};
+
+/* Ketens die vandaag in de code bestaan, maar waarvan de schakels geen
+   functie in MAPPEN zijn. Een schakel noemt dan zijn SCHERM. Ze worden net zo
+   gemeten (koppeling in de code, de proef), maar tellen pas voor APPWERKT als
+   beide schermen een ingang in MAPPEN zijn. */
+const KETENS_ZONDER_APP = [
+  { naam: 'reis-naar-agenda',
+    schakels: [{ scherm: '/apps/reizen.html', uitgeeft: 'reis' }, { scherm: '/apps/agenda.html', ontvangt: 'reis' }],
+    proef: { register: 'SAMENPROEF.json', instrument: 'scripts/samenproef.js' },
+    reden: 'Reizen (/apps/reizen.html) en Agenda (/apps/agenda.html) zijn geen ingang in MAPPEN: TravelOS kent tab:reizen zonder eigen adres, en Agenda staat in geen enkele wereld',
+    nodig: 'beide schermen als ingang in MAPPEN (wereldregister); dan verhuist deze keten naar SAMEN onder hun functies' }
+];
+
+module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT,
+  SAMEN, EXTERN, KETENS_ZONDER_APP };

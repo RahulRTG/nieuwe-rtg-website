@@ -476,11 +476,26 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   return r;
 }
 
+const { SAMEN, KETENS_ZONDER_APP } = require('./lib/appcontract');
+const { controleerSamen, samenKetens } = require('./lib/bewijsbron');
+let samenUitslag = null;
+function samenVoor(functie) {
+  const c = SAMEN[functie] || {};
+  samenUitslag = samenUitslag || samenKetens();
+  const ketens = samenUitslag.filter((k) => k.functie === functie).map((k) => ({ naam: k.naam, schakels: k.schakels, status: k.status, reden: k.reden }));
+  const uitgeeft = c.uitgeeft || [], ontvangt = c.ontvangt || [];
+  return { stand: uitgeeft.length || ontvangt.length || ketens.length ? 'verbonden' : 'niet verbonden', uitgeeft, ontvangt, ketens };
+}
+
 function vulOngemeten(r) {
   for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
   r.samengesteld = stelSamen(r, { wereld: RAAKVLAKWERELD() });
+  /* MODUS SAMEN (scripts/lib/appcontract.js): wat deze functie doorgeeft en
+     ontvangt, en de ketens die hij afmaakt met hun uitslag. Leeg is "niet
+     verbonden" en staat er zo; het telt nergens als bewijs. */
+  r.samen = samenVoor(r.functie);
   /* De vier randvoorwaarden uit de opdracht die hier niet gemeten worden, maar
      die wel een plek in de rij verdienen -- weglaten leest als "in orde". */
   r.mobiel = { status: 'NIET_GETEST', reden: 'deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md' };
@@ -912,7 +927,13 @@ function bouw(meting) {
           commit: r.bewijzen[n].bewijs ? r.bewijzen[n].bewijs.commit : null }]))
       })),
       contractZonderRij: Object.keys(CONTRACT).filter((f) => !meting.regels.some((r) => r.functie === f)),
-      ketensZonderApp: ZONDER_APP
+      ketensZonderApp: ZONDER_APP,
+      /* MODUS SAMEN: of de verklaringen in het contract door de code gedekt
+         worden (een bezwaar per zin), en elke keten met zijn uitslag -- ook die
+         waarvan de schermen (nog) geen ingang in MAPPEN zijn. */
+      samen: { bezwaren: controleerSamen(), ketens: samenUitslag || samenKetens(),
+        nietVerbonden: meting.regels.filter((r) => r.samen && r.samen.stand === 'niet verbonden').length,
+        ketensZonderApp: KETENS_ZONDER_APP.map((k) => ({ naam: k.naam, reden: k.reden, nodig: k.nodig })) }
     },
     defecten: defecten.map((d) => ({ app: d.app, wereld: d.wereld, ingang: d.ingang,
       reden: Object.values(d.bewijzen).find((b) => b.status === 'GEBLOKKEERD_DOOR_DEFECT').reden })),

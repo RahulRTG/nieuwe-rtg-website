@@ -322,4 +322,117 @@ function stelSamen(r, opties = {}) {
   return gedaan;
 }
 
-module.exports = { proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };
+/* ---- MODUS SAMEN: de verklaring tegen de code ---------------------------
+
+   SAMEN, EXTERN en KETENS_ZONDER_APP in ./appcontract.js zijn een verklaring.
+   Hier wordt gemeten of de code hem waarmaakt. Elk bezwaar is een zin met wat
+   er niet klopt; een lege lijst betekent dat elke verklaring gedekt is -- en
+   NIET dat de keten werkt, dat zegt de proef (samenKetens hieronder).
+
+   DE CODEMETING. Een soort VERTREKT uit een scherm als een bestand dat het
+   scherm laadt een `sleep-start` stuurt en die soort noemt (`data-sleep="reis"`
+   of `soort: 'reis'`). Een soort KOMT AAN als een geladen bestand op
+   `sleep-kan` antwoordt en die soort als sleutel kent (`reis: {`). Dat is het
+   protocol van public/shared/rtg-schil/06b-objecten.js; een app die het niet
+   spreekt, is niet verbonden, wat er ook verklaard staat. */
+const SOORT_OK = (soort) => {
+  const ov = require('../../public/shared/objectverwijzing.js');
+  const v = ov.verwijzing({ soort, id: 'x' });
+  return typeof soort === 'string' && soort.length > 0 && v && v.soort === soort;
+};
+function noemtSoort(tekst, soort, protocol) {
+  if (!tekst.includes(protocol)) return false;
+  const s = soort.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (protocol === 'sleep-start') return new RegExp('data-sleep=\\\\?["\']' + s + '["\'\\\\]|soort\\s*:\\s*["\']' + s + '["\']').test(tekst);
+  return new RegExp('(^|[\\s{,])["\']?' + s + '["\']?\\s*:\\s*\\{').test(tekst);
+}
+function schermSpreekt(ingang, soort, protocol, opties) {
+  const bestanden = opties.bestandenVan ? opties.bestandenVan(ingang) : standaardBestanden(ingang);
+  const lees = opties.lees || leesStandaard;
+  return bestanden.some((b) => { const t = lees(b); return t !== null && noemtSoort(t, soort, protocol); });
+}
+let samenWereld = null;
+function standaardBestanden(ingang) {
+  const R = require('./bewijsraakvlak');
+  samenWereld = samenWereld || R.maakWereld();
+  return [...R.schermDeel(samenWereld, ingang).geladen].filter((b) => /\.(m?js|html?)$/.test(b));
+}
+function standaardFuncties() {
+  const reg = require('./wereldregister');
+  const uit = new Map();
+  for (const map of reg.MAPPEN) for (const item of map.items) {
+    const i = item.indexOf(':'), soort = item.slice(0, i), sleutel = item.slice(i + 1);
+    const bron = soort === 'link' ? reg.LINKS[sleutel] : (soort === 'os' ? reg.OSAPPS[sleutel] : null);
+    uit.set(item, bron && bron.url ? bron.url.split('#')[0].split('?')[0] : null);
+  }
+  return uit;
+}
+
+function controleerSamen(opties = {}) {
+  const ac = require('./appcontract');
+  const samen = opties.samen || ac.SAMEN, extern = opties.extern || ac.EXTERN;
+  const zonder = opties.zonderApp || ac.KETENS_ZONDER_APP;
+  const functies = opties.functies || standaardFuncties();   // functie -> ingang (of null)
+  const lees = opties.lees || leesStandaard;
+  const bezwaren = [];
+  const uitgegeven = new Set(Object.keys(extern));
+  for (const [f, c] of Object.entries(samen)) for (const x of c.uitgeeft || []) uitgegeven.add(x);
+  for (const k of zonder) for (const sch of k.schakels || []) if (sch.uitgeeft) uitgegeven.add(sch.uitgeeft);
+
+  const proefNodig = (k, wie) => {
+    if (!k.proef || !k.proef.register || !k.proef.instrument) { bezwaren.push(wie + ': keten "' + k.naam + '" noemt geen proef; een keten zonder proef is een bewering'); return; }
+    if (lees(k.proef.instrument) === null) bezwaren.push(wie + ': de proef van "' + k.naam + '" (' + k.proef.instrument + ') bestaat niet');
+  };
+  for (const [f, c] of Object.entries(samen)) {
+    if (!functies.has(f)) { bezwaren.push(f + ' staat in SAMEN maar is geen functie in MAPPEN'); continue; }
+    const ingang = functies.get(f);
+    for (const veld of ['uitgeeft', 'ontvangt']) for (const soort of c[veld] || []) {
+      if (!SOORT_OK(soort)) { bezwaren.push(f + ': "' + soort + '" in ' + veld + ' is geen soort die de objectpoort doorlaat'); continue; }
+      if (!ingang) { bezwaren.push(f + ': ' + veld + ' ' + soort + ', maar de functie heeft geen eigen scherm om dat in te meten'); continue; }
+      const protocol = veld === 'uitgeeft' ? 'sleep-start' : 'sleep-kan';
+      if (!schermSpreekt(ingang, soort, protocol, opties)) bezwaren.push(f + ': verklaart ' + veld + ' ' + soort + ', maar geen bestand dat ' + ingang + ' laadt doet dat (' + protocol + ')');
+    }
+    for (const soort of c.ontvangt || []) if (!uitgegeven.has(soort)) bezwaren.push(f + ': ontvangt ' + soort + ', maar geen app geeft die uit en hij staat niet in EXTERN');
+    for (const k of c.ketens || []) {
+      if (!k.naam) bezwaren.push(f + ': een keten zonder naam');
+      if (!Array.isArray(k.schakels) || k.schakels.length < 2) bezwaren.push(f + ': keten "' + k.naam + '" heeft minder dan twee schakels; dat is LOS, geen SAMEN');
+      for (const sch of k.schakels || []) if (!functies.has(sch)) bezwaren.push(f + ': keten "' + k.naam + '" noemt schakel ' + sch + ', en die bestaat niet in MAPPEN');
+      if (!(k.schakels || []).includes(f)) bezwaren.push(f + ': keten "' + k.naam + '" noemt deze functie zelf niet als schakel');
+      proefNodig(k, f);
+    }
+  }
+  for (const k of zonder) {
+    const wie = 'keten zonder app "' + k.naam + '"';
+    if (!k.reden || !k.nodig) bezwaren.push(wie + ': zonder reden of zonder wat er nodig is om wel te tellen');
+    for (const sch of k.schakels || []) {
+      const soort = sch.uitgeeft || sch.ontvangt;
+      if (!SOORT_OK(soort)) { bezwaren.push(wie + ': "' + soort + '" is geen soort die de objectpoort doorlaat'); continue; }
+      if (!schermSpreekt(sch.scherm, soort, sch.uitgeeft ? 'sleep-start' : 'sleep-kan', opties)) bezwaren.push(wie + ': ' + sch.scherm + ' ' + (sch.uitgeeft ? 'geeft ' : 'ontvangt ') + soort + ' niet in zijn code');
+      if (sch.ontvangt && !uitgegeven.has(sch.ontvangt)) bezwaren.push(wie + ': ontvangt ' + sch.ontvangt + ', maar niemand geeft die uit');
+    }
+    for (const [f, c] of [...functies].map(([x]) => [x, samen[x]]).filter(([, c]) => c)) if ((c.ketens || []).some((x) => x.naam === k.naam)) bezwaren.push(wie + ' staat ook onder ' + f + ' in SAMEN; een keten staat op een plek');
+    proefNodig(k, wie);
+  }
+  return bezwaren;
+}
+
+/* De uitslag per keten, uit zijn proef. Het register draagt per keten een
+   eigen rij schakels en storingen onder `ketens.<naam>`; dezelfde grendels als
+   elke ketenproef (vers, sluit, storingen gehouden). */
+function samenKetens(opties = {}) {
+  const ac = require('./appcontract');
+  const uit = [];
+  const alle = [];
+  for (const [f, c] of Object.entries(opties.samen || ac.SAMEN)) for (const k of c.ketens || []) alle.push({ functie: f, k });
+  for (const k of opties.zonderApp || ac.KETENS_ZONDER_APP) alle.push({ functie: null, k });
+  for (const { functie, k } of alle) {
+    const u = k.proef ? ketenUitslag(k.proef.register, { lees: opties.lees || leesStandaard,
+      versheid: opties.versheid || require('./stempel').versheid, deel: ['ketens', k.naam] })
+      : { status: 'NIET_GETEST', reden: 'geen proef', bewijs: null };
+    uit.push({ naam: k.naam, functie, zonderApp: !functie, schakels: k.schakels, status: u.status, reden: u.reden,
+      bewijs: u.bewijs, raakvlak: u.raakvlak });
+  }
+  return uit;
+}
+
+module.exports = { controleerSamen, samenKetens, noemtSoort, proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

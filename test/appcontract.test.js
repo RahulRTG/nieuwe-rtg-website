@@ -212,3 +212,90 @@ test('9. een voltooiproef levert drie geschreven bewijzen plus het afgeleide men
   reg.apps['link:x'].persistent.schakels.push({ nr: 2, stand: 'open', wat: 'na de herstart weg' });
   assert.equal(B.ketenUitslag('X.json', { lees: registerMet(reg), versheid: VERS, deel: ['apps', 'link:x', 'persistent'] }).status, 'GEBLOKKEERD_DOOR_DEFECT');
 });
+
+/* ---- MODUS SAMEN (eigenaarsbesluit 19 oktober 2026) ------------------------
+   SAMEN, EXTERN en KETENS_ZONDER_APP zijn een verklaring; controleerSamen meet
+   of de code hem waarmaakt. Hieronder elke grendel op een nagemaakt contract,
+   met nagemaakte schermcode (bestandenVan + lees), zodat geen echt scherm
+   hoeft te veranderen. */
+const AC = require('../scripts/lib/appcontract');
+const SAMENSCHERM = {
+  'public/apps/geef.html': "<script>window.parent.postMessage({ rtg: 'sleep-start', object: { soort: 'reis', id: 'R1' } });</script>",
+  'public/apps/neem.html': "<script>var KAN = { reis: { wat: 'x' } }; if (e.data.rtg === 'sleep-kan') {}</script>",
+  'public/apps/stil.html': '<p>geen protocol</p>'
+};
+const samenOpties = (samen, extra = {}) => Object.assign({
+  samen, extern: {}, zonderApp: [],
+  functies: new Map([['link:geef', '/apps/geef.html'], ['link:neem', '/apps/neem.html'], ['link:stil', '/apps/stil.html']]),
+  bestandenVan: (ingang) => ['public' + ingang],
+  lees: (rel) => (rel in SAMENSCHERM ? SAMENSCHERM[rel] : (rel === 'scripts/proef.js' ? '// proef' : null))
+}, extra);
+const keten = (schakels, proef = { register: 'X.json', instrument: 'scripts/proef.js' }) => ({ naam: 'k', schakels, proef });
+
+test('SAMEN: het echte contract wordt door de code gedekt, en elke keten heeft een proef', () => {
+  assert.deepEqual(B.controleerSamen(), []);
+  for (const k of AC.KETENS_ZONDER_APP) assert.ok(k.proef && fs.existsSync(path.join(WORTEL, k.proef.instrument)), k.naam);
+});
+
+test('SAMEN: een goed verbonden paar geeft geen bezwaar', () => {
+  assert.deepEqual(B.controleerSamen(samenOpties({
+    'link:geef': { uitgeeft: ['reis'], ketens: [keten(['link:geef', 'link:neem'])] },
+    'link:neem': { ontvangt: ['reis'] }
+  })), []);
+});
+
+test('SAMEN: een keten noemt alleen schakels die in MAPPEN bestaan', () => {
+  const b = B.controleerSamen(samenOpties({ 'link:geef': { uitgeeft: ['reis'], ketens: [keten(['link:geef', 'link:bestaatniet'])] } }));
+  assert.ok(b.some((x) => /link:bestaatniet, en die bestaat niet in MAPPEN/.test(x)), b.join('\n'));
+  assert.ok(B.controleerSamen(samenOpties({ 'link:verzonnen': {} })).some((x) => /geen functie in MAPPEN/.test(x)));
+});
+
+test('SAMEN: elke ontvangst heeft ergens een uitgifte, of staat uitdrukkelijk in EXTERN', () => {
+  const zonder = B.controleerSamen(samenOpties({ 'link:neem': { ontvangt: ['reis'] } }));
+  assert.ok(zonder.some((x) => /ontvangt reis, maar geen app geeft die uit/.test(x)), zonder.join('\n'));
+  assert.deepEqual(B.controleerSamen(samenOpties({ 'link:neem': { ontvangt: ['reis'] } }, { extern: { reis: 'uit een andere kalender' } })), []);
+});
+
+test('SAMEN: een opgegeven keten zonder proef, of met een proef die niet bestaat, is een bezwaar', () => {
+  const zonderProef = B.controleerSamen(samenOpties({ 'link:geef': { uitgeeft: ['reis'], ketens: [{ naam: 'k', schakels: ['link:geef', 'link:neem'] }] }, 'link:neem': { ontvangt: ['reis'] } }));
+  assert.ok(zonderProef.some((x) => /noemt geen proef/.test(x)), zonderProef.join('\n'));
+  const weg = B.controleerSamen(samenOpties({ 'link:geef': { uitgeeft: ['reis'], ketens: [keten(['link:geef', 'link:neem'], { register: 'X.json', instrument: 'scripts/weg.js' })] }, 'link:neem': { ontvangt: ['reis'] } }));
+  assert.ok(weg.some((x) => /bestaat niet/.test(x)), weg.join('\n'));
+});
+
+test('SAMEN: een verklaring die de schermcode niet waarmaakt, telt niet', () => {
+  const b = B.controleerSamen(samenOpties({ 'link:stil': { uitgeeft: ['reis'], ontvangt: ['reis'] }, 'link:geef': { uitgeeft: ['reis'] } }));
+  assert.ok(b.some((x) => /link:stil: verklaart uitgeeft reis/.test(x)), b.join('\n'));
+  assert.ok(b.some((x) => /link:stil: verklaart ontvangt reis/.test(x)), b.join('\n'));
+  /* En een soort die de objectpoort niet doorlaat (te lang) is geen soort. */
+  assert.ok(B.controleerSamen(samenOpties({ 'link:geef': { uitgeeft: ['x'.repeat(40)] } })).some((x) => /geen soort die de objectpoort doorlaat/.test(x)));
+});
+
+test('SAMEN: de codemeting vergist zich niet in een soort die op een andere lijkt', () => {
+  assert.equal(B.noemtSoort("sleep-start ' data-sleep=\"reisje\"", 'reis', 'sleep-start'), false);
+  assert.equal(B.noemtSoort("sleep-start soort: 'reis'", 'reis', 'sleep-start'), true);
+  assert.equal(B.noemtSoort('sleep-kan var KAN = { reisje: {', 'reis', 'sleep-kan'), false);
+  assert.equal(B.noemtSoort('var KAN = { reis: {', 'reis', 'sleep-kan'), false, 'zonder het protocol is het geen ontvanger');
+});
+
+test('SAMEN: leeg is "niet verbonden", en een keten zonder vers register is NIET_GETEST, nooit bewezen', () => {
+  assert.deepEqual(B.controleerSamen(samenOpties({})), []);
+  const k = B.samenKetens({ samen: { 'link:geef': { ketens: [keten(['link:geef', 'link:neem'])] } }, zonderApp: [], lees: () => null });
+  assert.equal(k.length, 1);
+  assert.equal(k[0].status, 'NIET_GETEST');
+  /* Een register met de keten, vers en gesloten: dan pas BEWEZEN. */
+  const reg = JSON.stringify({ stempel: { op: 'nu', commit: 'abc' }, ketens: { k: { schakels: [{ nr: 1, stand: 'gesloten', wat: 'x' }], storingen: [{ nr: 1, stand: 'gehouden', wat: 'y' }] } } });
+  const vers = B.samenKetens({ samen: { 'link:geef': { ketens: [keten(['link:geef', 'link:neem'])] } }, zonderApp: [],
+    lees: (r) => (r === 'X.json' ? reg : null), versheid: () => ({ vers: true, reden: 'nu' }) });
+  assert.equal(vers[0].status, 'BEWEZEN');
+  const gebroken = reg.replace('"gehouden"', '"gebroken"');
+  assert.equal(B.samenKetens({ samen: { 'link:geef': { ketens: [keten(['link:geef', 'link:neem'])] } }, zonderApp: [],
+    lees: (r) => (r === 'X.json' ? gebroken : null), versheid: () => ({ vers: true, reden: 'nu' }) })[0].status, 'GEBLOKKEERD_DOOR_DEFECT');
+});
+
+test('SAMEN: een keten zonder app draagt zijn reden en wat er nodig is, en wordt in de code gemeten', () => {
+  for (const k of AC.KETENS_ZONDER_APP) assert.ok(k.reden && k.nodig, k.naam);
+  const b = B.controleerSamen(samenOpties({}, { zonderApp: [{ naam: 'z', reden: 'r', nodig: 'n',
+    schakels: [{ scherm: '/apps/stil.html', uitgeeft: 'reis' }], proef: { register: 'X.json', instrument: 'scripts/proef.js' } }] }));
+  assert.ok(b.some((x) => /stil\.html geeft reis niet in zijn code/.test(x)), b.join('\n'));
+});

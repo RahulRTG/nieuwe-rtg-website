@@ -60,6 +60,8 @@
     "appwerkt:inventaris": "node scripts/appwerkt.js --inventaris",
     "appwerkt:inventaris:controle": "node scripts/appwerkt.js --inventaris --controle",
     "appwerkt:vers": "node scripts/appwerkt-vers.js",
+    "samenproef": "node scripts/samenproef.js",
+    "samenproef:vast": "node scripts/samenproef.js --vastleggen",
     "appwerkt:vers:controle": "node scripts/appwerkt-vers.js --controle",
     "tikken:controle": "node scripts/tikken.js --controle",
     "tikken:naloop": "node scripts/tikken.js --naloop",

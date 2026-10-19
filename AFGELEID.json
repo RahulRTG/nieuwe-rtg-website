@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-19T09:01:18.821Z",
-  "commit": "39c8e2b9",
+  "op": "2026-10-19T16:03:35.193Z",
+  "commit": "1b44e57e",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 392,
+  "artefacten": 393,
   "bron": 55,
-  "afgeleid": 206,
+  "afgeleid": 207,
   "fragmenten": 28,
   "momentopname": 1,
   "onbeslist": 102,
   "afgeleidZonderEigenaar": 0,
-  "metEigenaar": 235,
-  "afgeleidEigenaarHard": 206,
-  "afgeleidGrendelt": 69,
-  "metStempel": 131,
+  "metEigenaar": 236,
+  "afgeleidEigenaarHard": 207,
+  "afgeleidGrendelt": 70,
+  "metStempel": 132,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -3993,6 +3993,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SAMENPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/samenproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/samenproef.js"
+   ],
+   "stempelInstrument": "scripts/samenproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run samenproef:vast",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

@@ -231,7 +231,8 @@ test('het routedossier opent een route en toont zijn assen',
 
     await t.test('de lijst draagt duizenden routes, en dat getal komt van de server', async () => {
       const tel = await page.$eval('#paginatel', el => el.textContent);
-      const n = Number((tel.match(/([\d.]+) routes/) || [0, '0'])[1].replace(/\./g, ''));
+      /* Het getal staat in de taal van de pagina (Intl): 5.516 of 5,516. */
+      const n = Number((tel.match(/([\d.,\u00a0\u202f]+) routes/) || [0, '0'])[1].replace(/\D/g, ''));
       assert.ok(n > 1000, 'er horen duizenden routes te staan, nu: ' + tel);
     });
 

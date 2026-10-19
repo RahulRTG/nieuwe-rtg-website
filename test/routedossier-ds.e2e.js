@@ -105,7 +105,8 @@ test('de schakels filteren de echte lijst en een route opent als Detail', { skip
   await beeld(page, 'routedossier-390-detail');
   await page.locator('#dSluit').click();
   assert.equal(await page.locator('#dossier').evaluate(d => d.open), false);
-  assert.equal(await page.locator('body').getAttribute('data-ds-schermtype'), 'collectie');
+  /* Het schermtype volgt op het close-event van de dialoog; wacht op die toestand. */
+  await page.waitForFunction(() => document.body.getAttribute('data-ds-schermtype') === 'collectie');
   assert.deepEqual(fouten, []);
   await ctx.close();
 });

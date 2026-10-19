@@ -47,24 +47,32 @@
 const rem = require('../../rem');
 
 module.exports = (ctx) => {
-  const { app, veilig, rtfclubs, stadsraad } = ctx;
+  const { app, auth, db, save, veilig, rtfclubs, stadsraad } = ctx;
+  /* EEN ACCOUNT EN EEN CODE (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt
+     een account). De club en de stadsraadpartner maken een gratis account; de
+     code koppelt dat account de eerste keer aan het dossier en is daarna een
+     extra sleutel naast de sessie, nooit in plaats ervan (kern/codekoppel.js). */
+  const koppel = require('../../kern/codekoppel')({ db, save });
 
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfcode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfcode|' + codeVan(req) });
 
   // het clubportaal: de club zelf, op de eigen clubcode (alleen het eigen dossier)
-  app.post('/api/rtf/club/portaal', ipRem, codeRem, (req, res) => veilig(res, () => rtfclubs.portaal(req.body.code)));
-  app.post('/api/rtf/club/bericht', ipRem, codeRem, (req, res) => veilig(res, () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst)));
+  app.post('/api/rtf/club/portaal', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'club', codeVan(req), () => rtfclubs.portaal(req.body.code))));
+  app.post('/api/rtf/club/bericht', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'club', codeVan(req), () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst))));
 
   // het partnerportaal: op raadcode; de partner stemt namens zijn stad
   const metPartner = (req, res, werk) => {
     const p = stadsraad.vindCode(req.body.code);
     if (!p) return res.status(404).json({ error: 'Deze raadcode kennen we niet. Vraag het RTF-kantoor om de code.' });
-    veilig(res, () => werk(p));
+    veilig(res, () => koppel.met(req, 'raad', codeVan(req), () => werk(p)));
   };
-  app.post('/api/rtf/partner/raad', ipRem, codeRem, (req, res) => veilig(res, () => stadsraad.portaal(req.body.code)));
-  app.post('/api/rtf/partner/besluit-start', ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, p.naam + ' (' + p.stad + ')', 'partner')));
-  app.post('/api/rtf/partner/stem', ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.stem(String(req.body.besluitId || ''), 'partner', p.naam + ' (' + p.stad + ')', req.body.voor === true)));
-  app.post('/api/rtf/partner/besluit-sluit', ipRem, codeRem, (req, res) => metPartner(req, res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
+  app.post('/api/rtf/partner/raad', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'raad', codeVan(req), () => stadsraad.portaal(req.body.code))));
+  app.post('/api/rtf/partner/besluit-start', auth, ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, p.naam + ' (' + p.stad + ')', 'partner')));
+  app.post('/api/rtf/partner/stem', auth, ipRem, codeRem, (req, res) => metPartner(req, res, p => stadsraad.stem(String(req.body.besluitId || ''), 'partner', p.naam + ' (' + p.stad + ')', req.body.voor === true)));
+  app.post('/api/rtf/partner/besluit-sluit', auth, ipRem, codeRem, (req, res) => metPartner(req, res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
 };

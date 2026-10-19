@@ -3,8 +3,11 @@
 
    Inschrijven gaat op naam en op de bron van een officiele registratie. Er is
    met opzet geen veld voor ideologie, grootte of betrouwbaarheid: het register
-   oordeelt niet. De sleutel die de partij nodig heeft, staat hier EEN keer; de
-   server bewaart alleen een hash. Leest window.KwestieKantoor (api, esc, zeg). */
+   oordeelt niet. De koppelcode van de partij staat hier EEN keer; de server
+   bewaart alleen een hash. Sinds het eigenaarsbesluit van 19 oktober 2026
+   handelt een partij via een RTG-account met de partijrol: een mens van de
+   partij koppelt er zijn account mee, en hier staan de codenamen die dat
+   deden, elk los te maken. Leest window.KwestieKantoor (api, esc, zeg). */
 (function () {
   'use strict';
   const K = window.KwestieKantoor;
@@ -19,7 +22,10 @@
       '<div class="meta">' + id + ' · ' + esc(p.niveau) + ' · ' + esc(CAT[p.categorie] || p.categorie) +
       ' · bron: ' + esc(p.bron.verwijzing) + ', nagekeken ' + esc(p.bron.gecontroleerd) + '</div></div>' +
       '<span class="stand">' + esc(p.stand) + '</span></div>' +
-      (p.stand === 'actief' ? '<div class="werk"><div class="rij"><button class="kknop" type="button" data-psleutel="' + id + '">Nieuwe sleutel</button>' +
+      ((p.gekoppeld || []).length ? '<div class="werk">' + p.gekoppeld.map(g => '<div class="rij"><span class="meta">namens de partij: ' +
+        esc(g.codenaam) + '</span><button class="kknop" type="button" data-plos="' + id + '" data-pcodenaam="' + esc(g.codenaam) +
+        '">Losmaken</button></div>').join('') + '</div>' : '<div class="meta">Er handelt nog geen account namens deze partij.</div>') +
+      (p.stand === 'actief' ? '<div class="werk"><div class="rij"><button class="kknop" type="button" data-psleutel="' + id + '">Nieuwe koppelcode</button>' +
         '<input class="kveld" data-preden="' + id + '" maxlength="300" placeholder="Waarom uitschrijven? Met de bron." aria-label="Reden om uit te schrijven">' +
         '<button class="kknop" type="button" data-puit="' + id + '">Uitschrijven</button></div></div>' : '') + '</div>';
   }
@@ -51,9 +57,11 @@
     if (t.id === 'pRegistreer') {
       doe(() => K.api('partij/registreer', { aanduiding: $('#pAanduiding').value.trim(), niveau: $('#pNiveau').value,
         categorie: $('#pCategorie').value, bron: $('#pBron').value.trim(), gecontroleerd: $('#pGecontroleerd').value }),
-      'Ingeschreven. Geef de sleutel hierboven aan de partij.');
+      'Ingeschreven. Geef de koppelcode hierboven aan de partij.');
     } else if (t.dataset.psleutel) {
-      doe(() => K.api('partij/sleutel', { id: t.dataset.psleutel }), 'Nieuwe sleutel uitgegeven. De vorige werkt niet meer.');
+      doe(() => K.api('partij/sleutel', { id: t.dataset.psleutel }), 'Nieuwe koppelcode uitgegeven. De vorige werkt niet meer.');
+    } else if (t.dataset.plos) {
+      doe(() => K.api('partij/ontkoppel', { id: t.dataset.plos, codenaam: t.dataset.pcodenaam }), 'Losgemaakt. Dit account handelt niet meer namens de partij.');
     } else if (t.dataset.puit) {
       const reden = (document.querySelector('[data-preden="' + t.dataset.puit + '"]') || {}).value || '';
       doe(() => K.api('partij/uitschrijf', { id: t.dataset.puit, reden: reden.trim() }), 'Uitgeschreven. Wat de partij plaatste, blijft staan.');

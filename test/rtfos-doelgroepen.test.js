@@ -41,6 +41,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfos5-'));

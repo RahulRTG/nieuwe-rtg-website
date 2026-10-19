@@ -15,10 +15,10 @@
 const { maakPartijen } = require('./partijen');
 const { maakVoorstellen } = require('./voorstellen');
 
-function maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zonderNaam, betrokken }) {
+function maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zonderNaam, betrokken, koppeling }) {
   const iso = () => new Date(nu()).toISOString();
   const partijen = maakPartijen({ kaart: () => eigen.bak('democratiePartijen'), kijk: () => eigen.kijk('democratiePartijen') || {},
-    vastleggen, crypto, nu: iso });
+    vastleggen, crypto, nu: iso, koppeling, wie });
   const openbaar = () => [...new Set(Object.values(eigen.kijk('democratieActies') || {}).map(a => a.kwestie))]
     .sort().map(zoek).filter(Boolean);
   const voorstellen = maakVoorstellen({ kaart: () => eigen.bak('democratieVoorstellen'), kijk: () => eigen.kijk('democratieVoorstellen') || {},
@@ -50,10 +50,14 @@ function maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zo
     lijst: () => partijen.lijst(),
     registreer: (door, b) => opNaam(door, (w) => partijen.registreer(w, b)),
     sleutel: (door, b) => opNaam(door, (w) => partijen.vervangSleutel(w, b.id)),
-    uitschrijf: (door, b) => opNaam(door, (w) => partijen.uitschrijf(w, b.id, b))
+    uitschrijf: (door, b) => opNaam(door, (w) => partijen.uitschrijf(w, b.id, b)),
+    ontkoppel: (door, b) => opNaam(door, (w) => partijen.ontkoppel(w, b.id, b))
   };
 
-  return { partij, register, voorstellenBij, bijKwestie: voorstellen.bijKwestie, partijVanSleutel: partijen.vanSleutel };
+  /* De partijrol (./partijrol.js, eigenaarsbesluit 19 oktober 2026): de deur
+     kent een account met die rol, en tijdens de migratie de oude sleutel. */
+  return { partij, register, voorstellenBij, bijKwestie: voorstellen.bijKwestie, partijVanSleutel: partijen.vanSleutel,
+    partijVanOudeSleutel: partijen.vanOudeSleutel, partijVanAccount: partijen.vanAccount, partijKoppel: partijen.koppel };
 }
 
 module.exports = { maakConnector };

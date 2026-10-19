@@ -50,4 +50,8 @@ module.exports = ({ app, officeAuth, boardroomWie, democratie, stuur }) => {
 
   app.post('/api/office/democratie/partij/uitschrijf', officeAuth, (req, res) =>
     opNaam(req, res, (wie, b) => democratie.register.uitschrijf(wie, b)));
+
+  // een account weer losmaken van een partij (kern/democratie/partijrol.js, eigenaarsbesluit 19 oktober 2026)
+  app.post('/api/office/democratie/partij/ontkoppel', officeAuth, (req, res) =>
+    opNaam(req, res, (wie, b) => democratie.register.ontkoppel(wie, b)));
 };

@@ -54,6 +54,10 @@ const WORTEL = path.join(__dirname, '..');
 
 const { FASES, FUNCTIES } = require(path.join(WORTEL, 'server', 'functies', 'register'));
 const { functieVoorPad } = require(path.join(WORTEL, 'server', 'functies'));
+/* Het appcontract noemt per app de routes die de INGANG zelf aanroept, los van
+   de gedeelde setup -- de bron waaruit de eigenaar EIGEN wil afleiden. */
+let CONTRACT = {};
+try { CONTRACT = require(path.join(WORTEL, 'scripts', 'lib', 'appcontract')).CONTRACT || {}; } catch (e) { /* zonder contract valt alles terug op de scenario-bron */ }
 
 /* De vijf apps van de lanceerbare kern waar de integrator mee wil beginnen,
    met hun voltooiscenario. Geen nieuwe lijst van functies -- alleen WELKE
@@ -85,15 +89,45 @@ function idsVanRoutes(routes) {
   return ids;
 }
 
-/* De primaire categorie van een app: de categorie van de functie die de eigen
-   routes van het scenario het vaakst raken. Geen enkele geschakelde route ->
-   null (de app draait volledig op de bodem). */
-function primaireCategorie(routes) {
+/* De primaire categorie van een verzameling routes: de categorie van de functie
+   die ze het vaakst raken. `negeer` is een set functie-ids die niet meetelt (de
+   platform-bodem); `negeerCats` idem voor categorieen (het platform). Zo kiest
+   de telling de EIGEN categorie van de app en niet de gedeelde setup (inloggen,
+   member-schil), die anders de weinige bepalende eigen routes overstemt. Geen
+   niet-platform-route -> null. */
+function primaireCategorie(routes, negeer, negeerCats) {
+  const skipId = negeer || new Set();
+  const skipCat = new Set(negeerCats || []);
   const tel = new Map();
-  for (const r of routes) { const id = idVanRoute(r); if (id) tel.set(id, (tel.get(id) || 0) + 1); }
+  for (const r of routes) {
+    const id = idVanRoute(r); if (!id || skipId.has(id)) continue;
+    const c = categorieVan(id); if (!c || skipCat.has(c)) continue;
+    tel.set(c, (tel.get(c) || 0) + 1);
+  }
   let beste = null, besteN = 0;
-  for (const [id, n] of tel) if (n > besteN) { beste = id; besteN = n; }
-  return beste ? categorieVan(beste) : null;
+  for (const [c, n] of tel) if (n > besteN) { beste = c; besteN = n; }
+  return beste;
+}
+
+/* DE EIGEN ROUTES van een app, zoals de eigenaar ze bedoelt: wat de INGANG zelf
+   aanroept, zonder de gedeelde setup. Eerst uit het appcontract (het noemt per
+   app "het scenario loopt <eigen routes>, de routes die <ingang> zelf aanroept,
+   met <setup>"): alles vOOr "de route(s) die" is eigen, de "met ..."-setup valt
+   weg. Dekt het contract de app niet (11 van de 110), dan de module-constanten
+   van het scenariobestand (`const NAAM = '/api/...'`), die per conventie de
+   eigen routes van het scherm zijn. Allebei leeg -> null (de aanroeper valt dan
+   terug op alle scenario-routes). */
+function eigenRoutes(functieLink, scenarioBron) {
+  const e = functieLink && CONTRACT[functieLink];
+  const waarom = e && e.voltooibaar && e.voltooibaar.waarom;
+  if (waarom) {
+    const eigenDeel = String(waarom).split(/de routes? die/)[0];
+    const uit = (eigenDeel.match(/\/api\/[a-zA-Z0-9/_.-]+/g) || []).map((r) => r.replace(/[.,]+$/, ''));
+    if (uit.length) return uit;
+  }
+  const consts = (String(scenarioBron || '').match(/^const\s+[A-Z0-9_]+\s*=\s*['"]\/api\/[^'"]+['"]/gm) || [])
+    .map((s) => (s.match(/['"](\/api\/[^'"]+)['"]/) || [])[1]).filter(Boolean);
+  return consts.length ? consts : null;
 }
 
 /* DE PLATFORMVOORZIENINGEN die AAN blijven, los van welke app getest wordt
@@ -139,11 +173,19 @@ const PLATFORM_BODEM = new Set([...BODEM].filter((id) => !LANCEERVLOER.includes(
    -- plus de leun-kandidaten (andere app-categorieen die het scenario nog
    raakt). Geen server, geen bestand -- test/losproef.test.js draait hier recht
    op. */
-function losAfleiding({ scenarioBron, ruggengraatBron }) {
+function losAfleiding({ scenarioBron, ruggengraatBron, functieLink }) {
   const scRoutes = routesUit(scenarioBron);
-  const primair = primaireCategorie(scRoutes);
   const ruggengraat = idsVanRoutes(routesUit(ruggengraatBron || ''));
   const aanIds = new Set([...PLATFORM_BODEM, ...ruggengraat]);
+  /* EIGEN leidt de proef af uit de routes die de ingang zelf aanroept (contract,
+     anders de scenario-constanten), niet uit alle scenario-routes: de gedeelde
+     setup (inloggen, member-connect, een andere app vullen) telt niet mee voor
+     WELKE categorie de app zelf is. De platform-bodem en het platform zelf tellen
+     evenmin mee als "eigen". Lukt dat niet, dan valt het terug op alle routes. */
+  const heeftContract = !!(functieLink && CONTRACT[functieLink] && CONTRACT[functieLink].voltooibaar && CONTRACT[functieLink].voltooibaar.waarom);
+  const eigen = eigenRoutes(functieLink, scenarioBron);
+  const eigenBron = heeftContract ? 'contract' : (eigen ? 'scenario-constanten' : 'alle-routes (onzeker)');
+  const primair = primaireCategorie(eigen || scRoutes, aanIds, PLATFORM_CATS);
   const aanCats = new Set(PLATFORM_CATS); if (primair) aanCats.add(primair);
   const uitCats = ALLE_CATS.filter((c) => !aanCats.has(c));
   /* De leun-kandidaten: categorieen die het scenario raakt maar die nu uit
@@ -155,7 +197,7 @@ function losAfleiding({ scenarioBron, ruggengraatBron }) {
       'ongated infra: betaalwaarheid + bewijs/log (buiten het register)'])],
     optioneelUit: uitCats
   };
-  return { primair, aanIds, aanCats: [...aanCats], uitCats, andereCats, groepen, scRoutes };
+  return { primair, eigenBron, aanIds, aanCats: [...aanCats], uitCats, andereCats, groepen, scRoutes };
 }
 
 /* Het oordeel over een gedraaid scenario, puur uit zijn boek.
@@ -177,7 +219,7 @@ function oordeel({ afgebroken, open }) {
 
 module.exports = {
   KERN, BODEM, ALLE_CATS, WORTEL, PLATFORM_CATS, LANCEERVLOER, PLATFORM_BODEM,
-  categorieVan, idVanRoute, catVanRoute, routesUit, idsVanRoutes, primaireCategorie,
+  categorieVan, idVanRoute, catVanRoute, routesUit, idsVanRoutes, primaireCategorie, eigenRoutes,
   losAfleiding, oordeel,
   /* De tredeproef en de oude losrunner lazen losSet([]) voor de kale bodem. */
   losSet: (routes) => {

@@ -33,7 +33,7 @@ async function meetApp(app, sc, ctx) {
   const { fs, WORTEL } = ctx;
   const scenarioBron = fs.readFileSync(path.join(WORTEL, 'scripts', 'lib', 'voltooi', app + '.js'), 'utf8');
   const ruggengraatBron = fs.readFileSync(path.join(WORTEL, 'scripts', 'lib', 'voltooiwereld.js'), 'utf8');
-  const { primair, aanIds, uitCats, andereCats, groepen } = P.losAfleiding({ scenarioBron, ruggengraatBron });
+  const { primair, eigenBron, aanIds, uitCats, andereCats, groepen } = P.losAfleiding({ scenarioBron, ruggengraatBron, functieLink: sc.functie });
 
   const w = await maakWereld('los-' + app, Object.assign({}, KANTOORWERELD, sc.omgeving));
   const boek = [];
@@ -62,7 +62,7 @@ async function meetApp(app, sc, ctx) {
   w.klaar();
 
   const open = boek.filter((s) => s.stand !== 'gesloten');
-  return { app, ingang: sc.ingang, primair, andereCats, groepen, verdict: P.oordeel({ afgebroken, open }),
+  return { app, ingang: sc.ingang, primair, eigenBron, andereCats, groepen, verdict: P.oordeel({ afgebroken, open }),
     afgebroken, open, stappen: boek.length, boek };
 }
 
@@ -80,7 +80,7 @@ function vastleggen({ fs, WORTEL }, uit) {
     const sleutel = (sc && sc.functie) || ('link:' + r.app);
     const rij = reg.apps[sleutel] || (reg.apps[sleutel] = { scenario: 'scripts/lib/voltooi/' + r.app + '.js' });
     rij.losModus = {
-      verdict: r.verdict, eigenCategorie: r.primair || null, raaktOokNuUit: r.andereCats || [],
+      verdict: r.verdict, eigenCategorie: r.primair || null, eigenBron: r.eigenBron || null, raaktOokNuUit: r.andereCats || [],
       afgebroken: r.afgebroken || null, stappen: r.stappen || 0,
       open: (r.open || []).map((s) => ({ bewijs: s.bewijs, wat: s.wat, leunt: s.leunt || null, fout: s.fout || null }))
     };
@@ -94,7 +94,7 @@ function vastleggen({ fs, WORTEL }, uit) {
 
 const label = (v) => v === 'LOS-KERN' ? 'LOS-KERN (kern LOS; isolatiebewijs vraagt SAMEN)' : v;
 function toonApp(r) {
-  console.log('\n### ' + r.app + '  ->  ' + label(r.verdict) + (r.primair ? '  (eigen categorie: ' + r.primair + ')' : '  (volledig op de bodem)'));
+  console.log('\n### ' + r.app + '  ->  ' + label(r.verdict) + (r.primair ? '  (eigen categorie: ' + r.primair + ')' : '  (volledig op de bodem)') + (r.eigenBron && r.eigenBron !== 'contract' ? '  [EIGEN: ' + r.eigenBron + ']' : ''));
   if (r.fout) { console.log('   ' + r.fout); return; }
   if (r.andereCats && r.andereCats.length) console.log('   raakt ook (nu uit): ' + r.andereCats.join(', '));
   if (r.afgebroken) console.log('   AFGEBROKEN bij de opbouw: ' + r.afgebroken);

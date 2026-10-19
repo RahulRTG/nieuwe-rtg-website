@@ -145,6 +145,31 @@ test('9. tegen de eigen app staat de eigen categorie aan, ook als die normaal ui
   assert.ok(!officeAfl.uitCats.includes('RTG-Backoffice'));
 });
 
+test('10. EIGEN komt uit de routes die de ingang zelf aanroept, niet uit de gedeelde setup', () => {
+  /* DE ARTEFACTEN DIE DIT VASTHOUDT (sweep 19 oktober 2026). De vorige afleiding
+     koos de VAAKST geraakte categorie van ALLE scenario-routes; de gedeelde
+     setup (inloggen, member-schil, een andere app vullen) overstemde dan de
+     weinige bepalende eigen routes. Balans telde zo als "Diensten" (de agenda-
+     vul-setup) in plaats van "Geld" (zijn eigen /api/balans), en meldde een
+     valse zelf-leun. EIGEN komt nu uit het appcontract: de routes die de ingang
+     zELf aanroept, zonder de "met ..."-setup. */
+  const balans = P.eigenRoutes('link:balans', '');
+  assert.ok(balans && balans.includes('/api/balans'), 'balans noemt zijn eigen route uit het contract');
+  assert.ok(!balans.some((r) => r.startsWith('/api/agenda')), 'de agenda-vul-setup ("met ...") hoort NIET bij eigen');
+
+  /* En de afleiding kiest dan Geld, niet Diensten -- met de echte balans-bron. */
+  const fs = require('fs'); const path = require('path');
+  const bron = fs.readFileSync(path.join(P.WORTEL, 'scripts', 'lib', 'voltooi', 'balans.js'), 'utf8');
+  const afl = P.losAfleiding({ scenarioBron: bron, ruggengraatBron: '', functieLink: 'link:balans' });
+  assert.equal(afl.primair, 'Geld', 'balans is een Geld-app; de agenda-setup bepaalt zijn categorie niet');
+  assert.ok(afl.uitCats.includes('Diensten (leden)'), 'de agenda (Diensten) staat uit -> de leun op de Agenda is nu een ECHTE bevinding');
+
+  /* Zonder contract valt EIGEN terug op de module-constanten van het scenario. */
+  const viaConst = P.eigenRoutes('link:bestaat-niet', "const A = '/api/wallet/munt/koop';\nconst B = \"/api/pay/overzicht\";");
+  assert.deepEqual(viaConst, ['/api/wallet/munt/koop', '/api/pay/overzicht']);
+  assert.equal(P.eigenRoutes('link:bestaat-niet', 'geen const hier'), null, 'niets te vinden -> null (aanroeper valt terug op alle routes)');
+});
+
 test('7. de kern noemt vijf bestaande scenario-bestanden, en trede 0 bestaat', () => {
   assert.equal(P.KERN.length, 5);
   const fs = require('fs'); const path = require('path');

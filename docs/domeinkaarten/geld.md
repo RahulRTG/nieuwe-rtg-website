@@ -542,7 +542,7 @@ Herstel en terugdraaien:
 |---|---|---|---|---|---|
 | Opladen, sturen, Klompje, tikken | L1 | bestaat | Een gekeurd account laadt op, stuurt en betaalt een Klompje; een dubbele tik of crash boekt één keer. | — | — |
 | Terugstorten naar het eigen IBAN | L5 | bestaat | Alleen naar de eigen gekeurde rekening en het beschikbare deel, één keer; weigert de rail, dan komt het geld terug. | — | — |
-| De kascode tonen in Pay | L1 | half | Het lid toont in Pay een kassacode die vijf minuten geldt; vandaag roept `pay.html` `/api/pay/kascode` niet aan. | klein | nu |
+| De kascode tonen in Pay | L1 | bestaat | Het lid toont in Pay een kassacode die vijf minuten geldt (`pay.html` via de capability `geld.kassa`, `kern/pay/kassacode.js`); sinds 19 oktober met de paspoortpoort (`test/kascode-gratisaccount.test.js`). | — | — |
 | Eigen categorieën en zoeken in de geschiedenis | L1 | ontbreekt | Het lid zoekt een betaling op tekst, bedrag of datum en geeft een betaling een eigen categorie. Bij Emma is dit Pro, bij Monzo Extra (fragment). | middel | nu |
 | Export van de geschiedenis (CSV/PDF) | L5 | half | Het lid downloadt zijn betalingen van een periode. De bank heeft al `afschrift.csv`; Pay nog niet. Bij Emma is dit Pro (fragment). | klein | nu |
 | Potjes met een eigen doel | L1 | bestaat (in Geld Command) | Het lid zet geld opzij in een pot; de pot gaat nooit onder nul. Bij bunq kost een extra rekening een betaald pakket (fragment). | — | — |
@@ -638,19 +638,13 @@ De markt vraagt geld voor drie soorten dingen, geen van alle betaalfuncties:
 
 **De nu-functies, bouwbaar.**
 
-**F-P1. De kascode in Pay (L1, klein).**
-- *Gegevens.* `/api/pay/kascode` bestaat al.
-- *Regels.* De code geldt vijf minuten en wordt één keer gebruikt. Er is een
-  paspoortpoort.
-- *Rekenwijze.* Geen.
-- *Onzekerheid.* Een verlopen code zegt "verlopen".
-- *Wanneer hoort iemand iets.* Het lid ziet de betaling direct na de scan.
-- *Rollen.* Het lid toont de code, de zaak scant.
-- *Uitzonderingen.* Is er geen netwerk, dan staat er geen code en de reden
-  waarom.
-- *Acceptatie.* Het lid opent Pay, tikt op "Kassacode" en ziet een code met
-  een aflopende tijd. Na een scan door de zaak staat de betaling in de
-  geschiedenis.
+**F-P1. De kascode in Pay: correctie op versie 1 (gedaan).** Versie 1 zei dat
+`pay.html` geen kascode had. Dat klopte niet: het scherm maakt hem via de
+capability `geld.kassa` (`/api/link/cap/maak`, `kern/pay/kassacode.js`), niet
+via `/api/pay/kascode`. Het echte gat was de paspoortpoort: een ongekeurd
+gratis account kon via de oude route een code maken waarmee een zaak uit zijn
+wallet int. Beide wegen hebben nu de poort (`test/kascode-gratisaccount.test.js`,
+eerst gezakt).
 
 **F-P2. Zoeken, eigen categorieën en export (L1/L5, middel).**
 - *Gegevens.* `payBoekingen` van het lid. De categorie is een veld dat het
@@ -687,15 +681,13 @@ Een bank kan dat alle drie alleen binnen zijn eigen rekening.
   (de vorm).
 - Er ontbreken:
   - het categorieveld;
-  - de kascode in het scherm.
+  - (de kascode in het scherm bestond al; F-P1.)
 
 **Prioriteit.**
-1. F-P1: klein en los.
-2. F-P2: middel en los.
-3. Een gezamenlijke pot: groot, en hangt af van de rollen in 3.
+1. F-P2: middel en los.
+2. Een gezamenlijke pot: groot, en hangt af van de rollen in 3.
 
 **Uitkomst A (binnen de architectuur):**
-- de kascode;
 - zoeken, categorieën en export;
 - afrondsparen naar een eigen pot (later, middel).
 
@@ -2190,8 +2182,8 @@ het nummer uit het v2-blok.
 6. **Vermogensoverzicht** (F-GC1, middel), met de kosten uit Logboek
    (F-LB1, klein).
 7. **Aflosplan als rekensom** (F-GC2, middel).
-8. **Pay: de kascode, zoeken, categorieën en export** (F-P1 klein, F-P2
-   middel).
+8. **Pay: zoeken, categorieën en export** (F-P2, middel). De kascode
+   bestond al; de poort erop is gedaan (F-P1).
 9. **WBW** (allemaal klein):
    - F-WB1, export;
    - F-WB2, een sleutel op het verzoek;

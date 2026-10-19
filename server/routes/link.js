@@ -75,7 +75,7 @@ module.exports = (kern) => {
   app.post('/api/link/cap/maak', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const r = await linkCapMaak(alsLid(req), req.body || {});
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    if (r.error) return res.status(r.status || 400).json({ error: r.error, kyc: r.kyc || undefined });
     /* `eigen` is wat alleen de MAKER terugkrijgt en nooit op de kaart van een
        scanner staat -- bij de kassacode is dat de code van zes tekens, om voor te
        lezen aan een kassa zonder camera. */

@@ -39,7 +39,7 @@
    grendel `link.capability_aanvaarden` is daarom weg, hier en in de HTTP-poort. */
 const euro = (centen) => '€ ' + (Math.round(Number(centen)) / 100).toFixed(2).replace('.', ',');
 
-module.exports = ({ pay, schoon }) => ({
+module.exports = ({ pay, schoon, payGate }) => ({
   id: 'geld.kassa',
   wat: 'Afrekenen aan de kassa',
   uitgever: ['lid'],
@@ -55,6 +55,10 @@ module.exports = ({ pay, schoon }) => ({
      token en niet bij het oude. */
   async lees(invoer, uitgever) {
     if (!uitgever.codenaam) return { status: 403, error: 'Deze sessie kan niet afrekenen.' };
+    /* De kassa int straks uit de wallet van dit lid: een geldmoment, dus de
+       paspoortpoort van elk account (besluit 19 oktober 2026). */
+    const poort = payGate ? payGate(uitgever.sessie) : { ok: true };
+    if (!poort.ok) return { status: poort.status || 403, error: poort.error, kyc: true };
     const r = await pay.kasCode({ codenaam: uitgever.codenaam, maxCenten: invoer && invoer.maxCenten });
     if (r.error) return r;
     return { code: r.code, maxCenten: r.maxCenten };

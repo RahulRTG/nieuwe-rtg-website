@@ -74,7 +74,7 @@ module.exports = (kern, { stuur, geenGast, kyc, geenEchtAccount }) => {
   /* de kassacode: vijf minuten geldig, tot een zelfgekozen maximum. Een nieuwe
      code trekt de vorige in; het geld beweegt pas bij /api/supplier/pay/in. */
   app.post('/api/pay/kascode', auth, async (req, res) => {
-    if (geenEchtAccount(req, res)) return;
+    if (geenEchtAccount(req, res) || kyc(req, res)) return;
     stuur(res, await pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten, idem: req.body.idem }));
   });
   app.post('/api/pay/kascode/intrek', auth, async (req, res) => {

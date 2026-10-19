@@ -923,11 +923,7 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "navigatie",
-      "url": "/apps/navigatie.html",
-      "woorden": [
-        "navigation",
-        "intelligence"
-      ]
+      "url": "/apps/navigatie.html"
     },
     {
       "naam": "Openbaar vervoer",

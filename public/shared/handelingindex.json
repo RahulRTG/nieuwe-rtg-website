@@ -1370,12 +1370,6 @@
       "url": "/apps/navigatie.html"
     },
     {
-      "label": "Kaarten",
-      "app": "Navigatie",
-      "wereld": "TravelOS",
-      "url": "/apps/navigatie.html"
-    },
-    {
       "label": "Kaarten kiezen",
       "app": "Navigatie",
       "wereld": "TravelOS",
@@ -1497,12 +1491,6 @@
     },
     {
       "label": "Maak veilig concept",
-      "app": "Openbaar vervoer",
-      "wereld": "TravelOS",
-      "url": "/apps/ov.html"
-    },
-    {
-      "label": "Naar de app",
       "app": "Openbaar vervoer",
       "wereld": "TravelOS",
       "url": "/apps/ov.html"
@@ -2595,12 +2583,6 @@
     },
     {
       "label": "Maak mijn betaalcode",
-      "app": "RTG Pay",
-      "wereld": "LivingOS",
-      "url": "/apps/pay.html"
-    },
-    {
-      "label": "Naar de app",
       "app": "RTG Pay",
       "wereld": "LivingOS",
       "url": "/apps/pay.html"

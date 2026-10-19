@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2829 bestanden en 19565 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2830 bestanden en 19566 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2829 |
-| losse beweringen (`test(...)`) | 19565 |
+| toetsbestanden | 2830 |
+| losse beweringen (`test(...)`) | 19566 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 13 |
+| niets van beide | 14 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2491 bestanden, 18993 beweringen.
+2492 bestanden, 18994 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2342,6 +2342,7 @@ toets omvalt.
 | `voltooiproef.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE VOLTOOIPROEF EN ZIJN REGISTER -- bewijs 3, 5 en 7 voor APPWERKT. scripts/voltooiproef.js loopt per onderdeel een scenario af in de gecontroleerde testwereld (wegwerpdata, postvanger, sms-sandbox, herstart en crash). |
 | `vonk-daglot.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `vonk-experience.test.js` | 7 | gezakt op `===->!==#0` | RONDE 5: de Vonk-productervaring mag de bewezen Connection-contracten alleen presenteren. Deze toetsen bewaken de eindige dag, disclosure-reden, states, scopeslot en de mobiele/a11y-basics van het echte scherm. |
+| `vonk-text-herhaal.test.js` | 1 | -- | DE VONK-BALK GEEFT ZIJN HERHAALSLEUTEL DOOR (19 oktober 2026). public/shared/connection-communication.js stuurt per opgesteld bericht een sleutel mee naar /api/connection/vonk/text, maar die route gaf hem niet door... |
 | `vonk.test.js` | 26 | gezakt op `liegpoort /api/` | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
 | `voordeur-nonce-weerbaar.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE NONCE-LAAG VAN DE VOORDEUR -- elk script een verse nonce, niets van buiten de webroot. server/middleware/voordeur.js (cspNonce) serveert elke .html zelf: hij zet een verse nonce op ieder <script> en <style>, legt... |
 | `voornemen.test.js` | 15 | gezakt op `&&->||#0` | HET VOORNEMEN -- van "boek vijf hotels in Parijs onder 180 euro" naar een gecontroleerd plan, met de blokkade VOOR de uitvoering. DE FOUT DIE DIT VOORKOMT. |

@@ -43,6 +43,7 @@ const EIGEN = [
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
   '/api/comm/stuur',
   '/api/vonk/bericht',
+  '/api/connection/vonk/text',
   '/api/theater/reactie',
   '/api/thuis/huis',
   '/api/rtf/bericht',

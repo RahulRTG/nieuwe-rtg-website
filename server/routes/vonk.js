@@ -54,7 +54,7 @@ module.exports = (kern) => {
     stuur(res, vonkCommConsent(req.session.key, req.body || {}, req.body && req.body.capability,
       !(req.body && req.body.active === false)))));
   app.post('/api/connection/vonk/text', auth, lid('connection.message', (req, res) =>
-    stuur(res, vonkCommText(req.session.key, req.body || {}, req.body && req.body.text))));
+    stuur(res, vonkCommText(req.session.key, req.body || {}, req.body && req.body.text, req.body && req.body.idem))));
   app.post('/api/connection/vonk/message/remove', auth, lid('connection.message', (req,res) =>
     stuur(res,vonkCommRemove(req.session.key,req.body||{},req.body&&req.body.messageId))));
   app.post('/api/connection/vonk/message/report', auth, lid('connection.safety.block', (req,res) =>

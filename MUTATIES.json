@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T14:23:09.061Z",
-    "commit": "cd8b32e2",
+    "op": "2026-10-19T14:41:21.646Z",
+    "commit": "0e33781e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2715,6 +2715,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "chauffeur-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/chauffeur.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "chauffeur-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3876,6 +3884,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "dispatch-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/dispatch-voorzijde.js",
+      "operator": "api-actie-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "divergentie.test.js": {
       "soort": "puur",
@@ -6254,6 +6270,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "ghost-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/ghost-voorzijde.js",
+      "operator": "route-doel-weg#0",
+      "geprobeerd": 2
     },
     "ghost.test.js": {
       "soort": "server",
@@ -14363,11 +14389,13 @@
     },
     "residentie-ds.e2e.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
-      "modules": [
-        "public/apps/residentie/residentie-04.js"
-      ],
-      "posities": 1
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/residentie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "residentie.test.js": {
       "soort": "server",
@@ -19499,6 +19527,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "voertuig-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/voertuig.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "voertuigscherm.e2e.js": {
       "soort": "puur",

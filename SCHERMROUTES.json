@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "8221f4652",
+  "commit": "2307a61bc",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/podium.html"
+    "public/apps/thuis.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1088,
-  "verwijzingen": 1314,
-  "voorvoegsels": 138,
+  "exactePaden": 1108,
+  "verwijzingen": 1334,
+  "voorvoegsels": 137,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -14790,6 +14790,146 @@
    "aantal": 1
   },
   {
+   "pad": "/api/thuis/annuleer",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/bericht",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/beslis",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/blokkeer",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/boek",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/bord",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/checkin",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/checkuit",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/cohost",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/detail",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/huis",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/huizen",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/mijn",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/prijsadvies",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/review",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/reviews",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/typen",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/wens",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/wenslijst",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/thuis/zoek",
+   "schermen": [
+    "public/apps/thuis.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/tijdlijn",
    "schermen": [
     "public/apps/tijdlijn.html"
@@ -19081,10 +19221,29 @@
   },
   {
    "bestand": "public/apps/thuis.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/thuis/"
-   ]
+   "exact": [
+    "/api/thuis/annuleer",
+    "/api/thuis/bericht",
+    "/api/thuis/beslis",
+    "/api/thuis/blokkeer",
+    "/api/thuis/boek",
+    "/api/thuis/bord",
+    "/api/thuis/checkin",
+    "/api/thuis/checkuit",
+    "/api/thuis/cohost",
+    "/api/thuis/detail",
+    "/api/thuis/huis",
+    "/api/thuis/huizen",
+    "/api/thuis/mijn",
+    "/api/thuis/prijsadvies",
+    "/api/thuis/review",
+    "/api/thuis/reviews",
+    "/api/thuis/typen",
+    "/api/thuis/wens",
+    "/api/thuis/wenslijst",
+    "/api/thuis/zoek"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/tijdlijn.html",

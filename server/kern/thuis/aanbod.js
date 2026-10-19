@@ -10,8 +10,14 @@ module.exports = (ctx) => {
 
   /* Een huis aanmaken of bijwerken. Alles gevalideerd; het land wordt uit de
      plaats/landtekst herkend zodat de Reiswijzer bij elke boeking meereist. */
-  function huisZet(codenaam, data, id) {
+  /* `idem` (19 oktober 2026): een dubbele tik op "opslaan" zette een nieuw huis
+     er twee keer neer (voltooiproef Logeren bij leden). Dezelfde sleutel van
+     dezelfde host is hetzelfde huis, ook na een herstart. */
+  function huisZet(codenaam, data, id, idem) {
     data = data || {};
+    const sleutel = !id && typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
+    const al = sleutel && Object.values(huizen()).find(h => h.host === codenaam && h.idem === sleutel);
+    if (al) return { ok: true, huis: metStats(al), herhaald: true };
     const bestaand = id ? huizen()[id] : null;
     if (id && !bestaand) return { status: 404, error: 'Dit huis bestaat niet.' };
     if (bestaand && !magBeheren(bestaand, codenaam)) return { status: 403, error: 'Alleen de host (of een co-host) beheert dit huis.' };
@@ -24,7 +30,7 @@ module.exports = (ctx) => {
     if (!titel || !plaats) return { status: 400, error: 'Geef je huis een titel en een plaats.' };
     const type = TYPES[data.type] ? data.type : 'huis';
     const land = landVind(schoon(data.land, 40) || plaats) || (bestaand && bestaand.land) || null;
-    const h = bestaand || { id: 'TH' + crypto.randomBytes(4).toString('hex').toUpperCase(), host: codenaam, coHosts: [], blokkades: [], gemaakt: nu() };
+    const h = bestaand || { id: 'TH' + crypto.randomBytes(4).toString('hex').toUpperCase(), host: codenaam, coHosts: [], blokkades: [], gemaakt: nu(), ...(sleutel ? { idem: sleutel } : {}) };
     Object.assign(h, {
       titel, plaats, land, type,
       beschrijving: schoon(data.beschrijving, 600),

@@ -244,6 +244,9 @@ const CONTRACT = {
   'link:podium': Object.assign({
     belofte: 'een lid met een door het kantoor goedgekeurd kanaal gaat live; een kijker vindt het, kijkt mee, chat, stuurt een cadeau via RTG Pay en meldt, en de maker blokkeert wie over de schreef gaat'
   }, voltooi('podium', 'het scenario loopt /api/podium/kanalen, /mijn, /kanaal/aanmeld, /live, /kijk, /chat, /cadeau, /blokkeer en /meld, de routes die /apps/podium.html zelf aanroept, met een gekeurde kijker die over de simulatiebank oplaadt')),
+  'link:huis': Object.assign({
+    belofte: 'een lid zet zijn huis open, een ander lid vindt en vraagt het aan zonder dat er iets wordt afgeschreven, de host beslist, en het verblijf loopt van inchecken tot review; een bezette periode blijft bezet'
+  }, voltooi('huis', 'het scenario loopt /api/thuis/huis, /huizen, /zoek, /detail, /boek, /bord, /beslis, /mijn, /checkin, /checkuit, /bericht, /review en /reviews, de routes die /apps/thuis.html zelf aanroept, met een host, een gast en een derde lid')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

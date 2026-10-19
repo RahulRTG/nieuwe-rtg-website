@@ -43,7 +43,8 @@ const EIGEN = [
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
   '/api/comm/stuur',
   '/api/vonk/bericht',
-  '/api/theater/reactie'
+  '/api/theater/reactie',
+  '/api/thuis/huis'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

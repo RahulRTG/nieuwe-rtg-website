@@ -126,9 +126,9 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
 
   /* Opzoeken en terugbetalen wonen in ./naslag.js -- dit bestand gaat over een
      betaling STARTEN. Zie de kop daar voor waarom die snede daar ligt. */
-  const { haalBetaling, maakTerugbetaling } = require('./naslag')({
+  const { haalBetaling, maakTerugbetaling, haalTerugbetaling } = require('./naslag')({
     crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag, markProviderEvidence, vrijgave,
     simulatie: simAan ? simulatie : null });
 
-  return { mogelijkheden, kiesAanbieder, maakBetaling, haalBetaling, maakTerugbetaling };
+  return { mogelijkheden, kiesAanbieder, maakBetaling, haalBetaling, maakTerugbetaling, haalTerugbetaling };
 };

@@ -100,7 +100,7 @@ const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
   markProviderEvidence: providerBewijs.mark });
 const {
   maakBetaling: maakProviderBetaling,
-  haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder
+  haalBetaling, maakTerugbetaling, haalTerugbetaling, mogelijkheden, kiesAanbieder
 } = ontvangst;
 
 const maakBetaling = require('./betaal-connect')({
@@ -139,7 +139,7 @@ function verifieerAdyenMelding(item) {
 }
 
 module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
-  maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
+  maakBetaling, haalBetaling, maakTerugbetaling, haalTerugbetaling, maakUitbetaling,
   verifieerWebhook, koppelStore, tekenDemo, mogelijkheden, kiesAanbieder,
   CONNECT_SANDBOX: sandbox.CONNECT, SEPA_SANDBOX: sandbox.SEPA,
   zetSandbox: (kanaal, aan) => regie.zet(kanaal, aan), sandboxStand: regie.stand,

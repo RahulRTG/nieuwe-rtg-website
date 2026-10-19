@@ -107,5 +107,27 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
   }
 
 
-  return { haalBetaling, maakTerugbetaling };
+  /* NAVRAAG NAAR EEN TERUGBETALING, voor de veegronde
+     (kern/betaalwaarheid/terugveeg.js): de webhook kan wegblijven. Adyen kent
+     geen opvraagbare refund; daar is de melding de enige weg, en een gooi hier
+     telt voor de veegronde als "geen uitsluitsel". */
+  async function haalTerugbetaling(aanbieder, { providerId, refundId } = {}) {
+    weigerUit();
+    if (!refundId) throw new Error('Navraag naar een terugbetaling heeft het refund-id van de provider nodig.');
+    if (aanbieder === 'stripe' && stripe) {
+      const r = await stripe.refunds.retrieve(refundId);
+      return { id: r.id, status: r.status, aanbieder: 'stripe', bedrag: Number.isFinite(r.amount) ? r.amount : undefined,
+        valuta: r.currency };
+    }
+    if (aanbieder === 'mollie' && mollie) {
+      const r = await mollie.refunds.retrieve(providerId, refundId);
+      return { id: r.id, status: r.status, aanbieder: 'mollie',
+        bedrag: r.amount ? Math.round(Number(r.amount.value) * 100) : undefined,
+        valuta: r.amount && String(r.amount.currency || '').toLowerCase() };
+    }
+    if (aanbieder === 'simulatie' && simulatie) return simulatie.haalTerugbetaling(refundId);
+    throw new Error('Deze betaalprovider meldt terugbetalingen alleen via de webhook; navragen kan niet.');
+  }
+
+  return { haalBetaling, maakTerugbetaling, haalTerugbetaling };
 };

@@ -15,12 +15,19 @@
    erger dan dubbel, want dat tweede meubel had niemand aangewezen
    (./voltooi/residentie.js). Een woordelijk gelijk verzoek binnen het venster
    is daarom een herhaling; wie bewust twee keer hetzelfde wil, doet dat na
-   het venster of op een andere plek. */
+   het venster of op een andere plek.
+
+   DE CHARTERAANVRAAG (routes/luchthaven.js, kern/luchthaven/royaal.js). Elke
+   aanvraag wordt een regel die operations beoordeelt en waarvoor een stand of
+   helipad wordt gezocht; een dubbeltik maakte er twee van dezelfde vlucht
+   (./voltooi/vluchten.js). Een tweede echte aanvraag verschilt in soort,
+   bestemming, datum of tijd. */
 'use strict';
 const SLEUTELS = {
   'POST /api/staff/ov/lijnen': { leest: true },
   'POST /api/staff/ov/lijn/zet': { zelfdeVerzoek: true },
   'POST /api/residentie/meubel/zet': { zelfdeVerzoek: true },
-  'POST /api/residentie/meubel/weg': { zelfdeVerzoek: true }
+  'POST /api/residentie/meubel/weg': { zelfdeVerzoek: true },
+  'POST /api/member/vluchten/charter': { zelfdeVerzoek: true }
 };
 module.exports = { SLEUTELS };

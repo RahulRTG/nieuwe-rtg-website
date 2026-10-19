@@ -143,3 +143,13 @@ test('5. de lounges: binnen op de boarding pass, de Vleugel alleen met vip-proto
   const c = await api(base, '/api/lucht/cockpit', {}, ops);
   assert.ok('chartersWachtend' in c.body && 'vipsActief' in c.body && 'loungeGasten' in c.body);
 });
+
+test('6. een dubbeltik op het charterloket is een aanvraag, geen twee', async () => {
+  /* De voltooiproef (scripts/lib/voltooi/vluchten.js) zag twee aanvragen voor
+     dezelfde vlucht na een dubbeltik; operations beoordeelt elke regel apart.
+     Verklaard in server/lib/idemsleutels-travelos.js. */
+  const lijf = { soort: 'privejet', bestemming: 'Genève dubbel', tijd: '09:15' };
+  await Promise.all([api(base, '/api/member/vluchten/charter', lijf, lid), api(base, '/api/member/vluchten/charter', lijf, lid)]);
+  const mijn = await api(base, '/api/member/vluchten/mijn', {}, lid);
+  assert.equal(mijn.body.charters.filter(c => c.bestemming === 'Genève dubbel').length, 1);
+});

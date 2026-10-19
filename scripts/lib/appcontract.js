@@ -219,6 +219,11 @@ const CONTRACT = {
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),
+  /* WorkOS, de kantoorkant van RTG One (19 oktober 2026): een medewerker op naam,
+     met de kantoorrol via een uitnodiging van de eigenaar. */
+  'link:rtgone': Object.assign({
+    belofte: 'een medewerker op naam legt beloften, bedoelingen en frictie vast in het werkgeheugen en rondt een belofte omkeerbaar af, en dat staat er na een herstart en een crash precies een keer'
+  }, voltooi('rtgone', 'het scenario loopt /api/account/start, /api/rtgone/state, /belofte, /intentie, /frictie, /overdracht en /automatisering/*, de routes die /apps/rtgone.html zelf aanroept, met een lid zonder kantoorrol dat er niet bij komt')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

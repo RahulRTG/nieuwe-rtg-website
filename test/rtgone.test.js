@@ -126,3 +126,22 @@ test('één persoonlijk RTMAIL-bericht wordt een volledige, traceerbare werkstro
   assert.equal(one.projectOplever({ projectId: r.project.id, uitkomst: 'De route werkt binnen de afgesproken kwaliteit.' }, context).status, 400, 'oplevering kan nooit dubbel schrijven');
   assert.equal(one.projectVanMail({ huis: 'rtg', mailId: 'mail-1' }, context).status, 409, 'één bronbericht wordt nooit dubbel project');
 });
+
+test('een herhaalsleutel overleeft een herstart: dezelfde belofte of hetzelfde voorstel komt er nooit twee keer', () => {
+  const crypto = require('node:crypto'), db = { data: {} };
+  const eerste = require('../server/kern/rtgone')({ db, save: () => {}, crypto }).rtgone;
+  const a = eerste.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-1' }, 'Noordster');
+  assert.equal(a.ok, true);
+  /* Een nieuw proces op dezelfde opslag: niets uit het geheugen van het eerste. */
+  const tweede = require('../server/kern/rtgone')({ db: { data: JSON.parse(JSON.stringify(db.data)) }, save: () => {}, crypto }).rtgone;
+  const herhaling = tweede.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-1' }, 'Noordster');
+  assert.equal(herhaling.herhaald, true);
+  assert.equal(herhaling.belofte.id, a.belofte.id);
+  assert.equal(tweede.state('rtg').beloften.length, 1, 'de herhaling na een herstart maakt geen tweede belofte');
+  assert.equal(tweede.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-1' }, 'Westwind').herhaald, undefined,
+    'dezelfde sleutel van een andere medewerker is een eigen verzoek');
+  const ctx = { key: 'user-8', label: 'Noordster' };
+  const g = tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren', idem: 'dr-1' }, ctx);
+  assert.equal(tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren', idem: 'dr-1' }, ctx).goedkeuring.id, g.goedkeuring.id);
+  assert.equal(tweede.state('rtg').goedkeuringen.length, 1);
+});

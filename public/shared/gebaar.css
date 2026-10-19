@@ -80,11 +80,15 @@
      1px, en met border-box zou die pixel van de INHOUD afgaan. De knoppenrij is
      precies --gb-vol breed, dus dan puilt hij er een pixel uit en ziet de laatste
      letter er geschaafd uit. Zo staat de lijn ernaast in plaats van erin. */
-  box-sizing:content-box;
   position:absolute;top:0;bottom:0;width:var(--gb-lade,0px);
   overflow:hidden;background:var(--onyx-glans,#0C0C0B);
   transition:width var(--gb-duur,0ms) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
 }
+/* Met twee klassen, want een kale .gb-lade verloor van de reset in
+   rtg-editorial-v4.css (`body[data-rtg-editorial-v4] *`, 0,1,1 tegen 0,1,0).
+   Dan gold toch border-box, ging de rand van de inhoud af en stak de
+   Prullenbak er in rust 1px uit (test/gebaar-bestanden.e2e.js). */
+.gb-rij > .gb-lade{box-sizing:content-box;}
 /* Alleen de BUITENhoeken: aan de snede sluit de lade recht op de plank aan,
    want daar raken ze elkaar. */
 .gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));

@@ -103,6 +103,7 @@ const SCENARIOS = {
   'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
   'neigingen.js': require('./lib/voltooi/neigingen'),
   'nieuws.js': require('./lib/voltooi/nieuws'),
+  'ontdek.js': require('./lib/voltooi/ontdek'),
   'pay.js': require('./lib/voltooi/pay'),
   'post.js': require('./lib/voltooi/post'),
   'pulse.js': require('./lib/voltooi/pulse'),

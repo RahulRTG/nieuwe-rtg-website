@@ -271,6 +271,9 @@ const CONTRACT = {
   'link:mediaos': Object.assign({
     belofte: 'een lid ziet de mediawereld met bij elk stuk waarom het er staat, bewaart wat het wil houden, maakt een eigen afspeellijst en deelt die om te lezen met wie het kent; de lezer verandert niets en een vreemde ziet niets'
   }, voltooi('mediaos', 'het scenario loopt /api/mediaos/wereld, /bewaar, /bieb, /lijsten, /lijst, /lijst/maak, /lijst/stuk, /lijst/zet en /lijst/deel, de routes die /apps/media.html (media/wereld.js, blad.js, lijst.js) zelf aanroept, met twee verbonden leden, een vreemde en een gratis account; de stukken zijn clips van het tweede lid')),
+  'link:ontdek': Object.assign({
+    belofte: 'een lid ziet in zijn Overzicht zijn dossier, wat er wacht en de afspraken van zijn eigen dag, en maakt het huis het zijne met een eigen foto die alleen hij ziet'
+  }, voltooi('ontdek', 'het scenario loopt /api/member/huis/dossier, /api/sociaal/lijn, /api/sociaal/wereld, /api/agenda/mijn-lijst, /api/bestanden/upload, /api/bestanden/haal, /api/ik/beelden en /api/ik/beelden/zet, de routes die /apps/rtg.html (rtg-dossier.js, rtg-vandaag.js, shared/interface/personal-images.js en personal-image-editor.js) zelf aanroept, met twee leden')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

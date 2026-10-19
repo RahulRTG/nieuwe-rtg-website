@@ -3,8 +3,8 @@
    Een Living Lab dat alleen achter een personeelsinlog bestaat, is geen Living
    Lab. Een bewoner draagt een vraag aan, stemt, opent zijn onderzoek met zijn
    labpas en dient een klacht in. Sinds het eigenaarsbesluit van 19 oktober
-   2026 vragen de buurtdeuren (labs, themas, thema, stem, overzicht) een
-   account of gezinsprofiel: ./bewoneraccount.js.
+   2026 vraagt elke buurtdeur een account of gezinsprofiel: ./bewoneraccount.js
+   (klacht, studie, paspoort en kader in ./bewonerpas.js).
 
    ---------- DE REM ----------
 
@@ -143,29 +143,15 @@ module.exports = (kern, hulp) => {
     if (!bewoner(req)) return res.status(401).json(GEEN_ACCOUNT);
     veilig(res, () => livinglab.studie.overzicht(lijf(req).labId, null));
   });
-  app.post('/api/lab2/bewoner/studie', remLezen, (req, res) => veilig(res, () => livinglab.studie.studie(lijf(req).id, null)));
   app.post('/api/lab2/bewoner/labs', remLezen, (req, res) => bewoner(req) ? veilig(res, () => {
     const r = livinglab.bestuur.labs();
     // alleen de actieve labs, zonder het bestuurlijke deel (budget, tekenaars, partners)
     return { ok: true, labs: r.labs.filter(l => l.actief).map(l => ({ id: l.id, stad: l.stad, naam: l.naam, land: l.land, toegang: l.toegang })) };
   }) : res.status(401).json(GEEN_ACCOUNT));
 
-  /* ---------- de klachtenprocedure ----------
-     Bewust zonder pas te gebruiken: een klacht kan juist gaan over hoe het
-     onderzoek met je omging, en dan is "log eerst in" het verkeerde antwoord.
-     De klacht blijft zichtbaar tot een tekenbevoegde hem afhandelt (de kern
-     laat hem niet wegklikken), en hij blokkeert intussen de deelnemersstap. */
-  app.post('/api/lab2/bewoner/klacht', remSchrijf, (req, res) => veilig(res, () => livinglab.ethiek.klacht(lijf(req).id, lijf(req))));
-
-  /* ---------- het labpaspoort ---------- */
-  app.post('/api/lab2/bewoner/paspoort', remBron, remCode, (req, res) => veilig(res, () => livinglab.spel.paspoort(codeUit(req))));
-  app.post('/api/lab2/bewoner/paspoort-maak', remSchrijf, (req, res) => veilig(res, () => livinglab.spel.paspoortMaak(lijf(req))));
-
-  /* Het kader ook publiek: het bewonersscherm bouwt zijn keuzelijsten uit
-     dezelfde tabel als het kantoorscherm, zodat er maar één waarheid is over wat
-     de cyclus en de methoden zijn (regel 4). Er staat niets vertrouwelijks in --
-     het zijn de spelregels, en die horen juist openbaar te zijn. */
-  app.post('/api/lab2/bewoner/kader', remLezen, (req, res) => veilig(res, () => livinglab.kaderVoorScherm()));
+  /* De klacht, het labpaspoort en het kader staan in ./bewonerpas.js, achter
+     hetzelfde account (eigenaarsbesluit 19 oktober 2026). */
+  require('./bewonerpas')(kern, { veilig, lijf, codeUit, bewoner, GEEN_ACCOUNT, remBron, remCode, remLezen, remSchrijf });
 
   /* De deuren voor wie alleen KIJKT -- de onderzoekskaarten, de buurtvragen met
      hun stand, de leenbare apparatuur -- staan in ./openbaar.js. Ze krijgen

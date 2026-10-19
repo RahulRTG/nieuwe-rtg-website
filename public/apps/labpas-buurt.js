@@ -24,7 +24,7 @@
   function gezin() { try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {}; } catch (e) { return {}; } }
   function deur() {
     if (RTGAccountDeur.token() || gezin().token) return Promise.resolve();
-    return RTGAccountDeur.eis($('#bDeur'), { waarom: 'Vragen aandragen, stemmen en zien wat het lab onderzoekt doe je met een RTG-account. Een gratis account is genoeg.' });
+    return RTGAccountDeur.eis($('#bDeur'), { waarom: 'Vragen aandragen, stemmen, een klacht indienen en zien wat het lab onderzoekt doe je met een RTG-account. Een gratis account is genoeg.' });
   }
 
   /* ---------- de buurt: vragen aandragen en stemmen ----------

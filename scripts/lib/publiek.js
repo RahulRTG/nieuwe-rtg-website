@@ -190,11 +190,6 @@ const PUBLIEK = new Map([
   ['/api/lab2/publiek/vragen', 'de buurtvragen met hun stand -- juist ook de afgewezen, met de reden; wie zijn vraag niet kan terugvinden, heeft geen antwoord gekregen'],
   ['/api/lab2/publiek/onderzoeken', 'de openbare onderzoekskaarten: alleen wat een mens van het lab heeft gepubliceerd, zonder aliassen en zonder waarnemingen'],
   ['/api/lab2/publiek/onderzoek', 'idem, een kaart -- openbaar zijn is hier het hele punt: onderzoek dat niemand kan nakijken, is geen onderzoek'],
-  ['/api/lab2/bewoner/studie', 'idem per onderzoek; bij een gescheiden studie niet meer dan titel en stap'],
-  ['/api/lab2/bewoner/klacht', 'de klachtenprocedure mag geen inlog vragen: de klacht kan over het onderzoek zelf gaan'],
-  ['/api/lab2/bewoner/paspoort', 'de paspoortcode is de geloofsbrief; toont alleen punten, niveau en badges'],
-  ['/api/lab2/bewoner/paspoort-maak', 'een labpaspoort aanmaken op een zelfgekozen roepnaam (rem 10/min per bron)'],
-  ['/api/lab2/bewoner/kader', 'de spelregels van het lab: cyclus, methoden en bewijsgraden horen juist openbaar te zijn'],
 
   /* De codeportalen van het Foundation OS (routes/rtfos/portalen.js,
      doelgroepen.js en afmaak.js: partner, gemeente, ondernemer, vrijwilliger,

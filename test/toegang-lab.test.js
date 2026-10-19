@@ -72,3 +72,4 @@ test('hetzelfde account in een tweede sessie stemt niet nog eens', async () => {
   const nogEens = await post('/api/lab2/bewoner/stem', { id: t.body.thema.id, alias: 'Andere Naam' }, tweede.body.token);
   assert.equal(nogEens.status, 409, 'dezelfde mens in een tweede sessie stemt niet nog eens: ' + JSON.stringify(nogEens.body));
 });
+

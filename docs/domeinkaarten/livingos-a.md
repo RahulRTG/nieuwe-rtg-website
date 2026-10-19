@@ -355,6 +355,10 @@ Deze bestaan alleen omdat apps, rollen en processen verbonden zijn:
 | later | W9, W7, W12, W14, W16, W19 | M-G | middel-hoog | Geld (W14), bronnen (W7) |
 | B | W8, W10, W17, W21, W22, W23 | M-G | hoog | besluiten en genres |
 
+**Aanbeveling voor nu, gesplitst.**
+- **HERSTEL:** geen open fout. Het gat in SCHERMEIGENAAR r.2146 (onderhoud beloofde "gepland" en "opgelost") is met e8e70ca70 rechtgezet in de doeltekst.
+- **VERDIEPING (wacht op het akkoord voor de familie `wonen`):** W1, W3, W15, W5, W2, W6, W18, W11, W20 en W4, in de volgorde van de tabel.
+
 **Uitkomst A (huidige architectuur en scope):** W1 t/m W6, W9, W11, W12, W14 t/m W16, W18 t/m W20. Alles op bestaande vermogens, met eigencollecties, verwijzingen en projecties.
 
 **Uitkomst B (domeinmaximum).** Dit zijn nieuwe professionele processen samen met de bewoner:
@@ -420,21 +424,89 @@ Dit contract vervangt de acht bewijzen nooit. Elke regel wordt een stap in een v
 - Kluis uit: het bewijs is niet bewaard, maar de melding is wel opgelost.
 - Vakwerk uit: de melding blijft "gemeld" met "status vakman niet te zien".
 
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** melden, annuleren en de meldingenlijst met geschiedenis (`/api/home/onderhoud`), apparaten en scenes (`/api/home`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - de kluis (`docs.bestanden`) voor het woningdossier. Uit: "Het woningdossier is nu niet te openen. Melden werkt gewoon."
+- **Optionele koppelingen:**
+  - vakwerk (W4). Uit: "Status bij de vakman nu niet te zien."
+  - Agenda (W6). Uit: "Niet in je agenda gezet."
+  - Geld (W14). Uit: "Woonlasten nu niet te zien."
+  - Veilig (W18), Logboek (W14, grens met Geld).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:wonen': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:wonen': { uitgeeft: ['woning.melding', 'woning.installatie'], ontvangt: ['vak.werkbon'],
+  ketens: [{ naam: 'melding-naar-vakman', laag: 'scherm', familie: 'wonen',
+    schakels: ['link:wonen', '<werkos-ingang van de vakman>'], proef: { register: 'VOLTOOIPROEF.json', instrument: 'scripts/voltooiproef.js' } }] }
+```
+
+FAMILIES:
+
+```js
+wonen: { wat: 'een woningprobleem is af als het gemeld, bij de juiste vakman of verhuurder, gepland, opgelost, betaald en bewezen is, los en samen',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'wonen', naam: 'melding-naar-vakman', laag: 'kern', ontbreekt: 'keten', k: 'W4', kaart: KAART_LIVA,
+  wat: 'een melding gaat als projectie naar een vakzaak (bronRef woning.melding) en de offerte verwijst terug',
+  zolang: { geenBestandIn: 'server/kern/vakwerk/', noemt: 'woning.melding' } },
+{ familie: 'wonen', naam: 'werkbon-naar-melding', laag: 'kern', ontbreekt: 'keten', k: 'W3', kaart: KAART_LIVA,
+  wat: 'de werkbon van de vakman zet de melding op opgelost met de verwijzing' },
+{ familie: 'wonen', naam: 'cyclus-naar-agenda', laag: 'kern', ontbreekt: 'keten', k: 'W6', kaart: KAART_LIVA,
+  wat: 'een onderhoudscyclus wordt een herhalende afspraak met bron woning.installatie' },
+{ familie: 'wonen', naam: 'werkbon-betalen', laag: 'kern', ontbreekt: 'keten', k: 'W4', kaart: KAART_LIVA,
+  wat: 'de werkbon wordt betaald via betaalWaarheid met bronRef = opdracht (Geld)' },
+{ familie: 'wonen', naam: 'garantie-naar-kluis', laag: 'kern', ontbreekt: 'keten', k: 'W5', kaart: KAART_LIVA,
+  wat: 'het garantiebewijs hangt als bestand-id aan de installatie' }
+```
+
+**Volledige werkzaamheid.** De bewoner meldt hier en bewaart zijn dossier. Plannen, betalen en bewijzen doet hij nog buiten RTG. Daarvoor blijft nodig: de telefoon of WhatsApp met de vakman, de agenda van het toestel en de bankapp. De installateur werkt in zijn eigen pakket (IAMD, Simple-Simon) tot W4 bestaat.
+
 ---
 
 ## Werkwijze voor de overige apps
 
-Elke app volgt de vorm van Wonen, compacter:
+Elke app volgt de vorm van Wonen:
 - a. inventaris (gebouwd en bewezen);
 - b. markt (ook het duurste pakket);
 - c. domein;
 - d. catalogus;
 - e. RTG-exclusief;
 - f. bouwstenen;
-- g. prioritering met uitkomst A en B;
-- h. eindcontract.
+- g. prioritering, met de aanbeveling voor nu gesplitst in **HERSTEL** en **VERDIEPING**;
+- h. eindcontract;
+- i. LOS, SAMEN en volledige werkzaamheid.
 
-Per app staat er ook een gebruikersketen met storingen. Elk acceptatiecriterium wordt een stap in de voltooiproef van die app. De bronnen zijn geraadpleegd op 19 oktober 2026; "na te gaan" betekent dat de bron secundair is.
+**Volledig formaat (herstel na het oordeel van Centraal, 19 oktober).** Veilig, Gezin, Assets en het Vooruitzicht hebben hun catalogus in het volledige formaat van Wonen 1d: acht velden per functie, en elke uitkomst B als proces met stappen en rollen. De andere apps houden de compacte tabel; hun B-functies zijn klein of vragen eerst een besluit.
+
+**HERSTEL en VERDIEPING.**
+- **HERSTEL** is een belofte die vandaag niet klopt: een tekst, een stille fout, een route die wel bestaat maar die het scherm niet aanroept, of een lezer zonder afzender. Herstel maakt het huis eerlijker en voegt geen functie toe.
+- **VERDIEPING** is een nieuwe functie. Die wacht op het akkoord van de eigenaar per familie.
+
+**LOS (sectie i).** Per app drie groepen: eigen functies, noodzakelijke platformdiensten en optionele koppelingen. Bij elke dienst die kan uitvallen staat de schermtekst. "(bestaat)" betekent dat het scherm die tekst vandaag al toont; anders is de tekst het doel.
+
+**SAMEN (sectie i).** In de velden van `scripts/lib/appcontract.js` zoals ze op de tak `appwerkt/versheid` staan: `uitgeeft`, `ontvangt` en `ketens` per functie, een FAMILIES-entry, en ONTBREKEND-regels met `laag` (scherm of kern), `ontbreekt` (keten of proef) en een K-nummer uit deze kaart. Vandaag is geen enkele app van LivingOS-A verbonden: het veld is leeg. Daaronder staat het doel als verklaring, nog geen uitslag. In de regels staat `kaart: KAART_LIVA`, en dat staat voor `'docs/domeinkaarten/livingos-a.md'`. Ik heb `appcontract.js` niet aangeraakt; die blokken zijn klaar om over te nemen door wie de tak `appwerkt/versheid` bezit.
+
+**Volledige werkzaamheid (sectie i).** Per app één regel: wie doet hier zijn hele werk, en welke externe software blijft nodig?
+
+**Wetten en marktregels.** Een regel die ik alleen uit een zoekfragment ken, krijgt het label "te controleren" en stuurt geen weigerregel en geen uitkomst `bepaald`. Zulke regels staan onderaan in één lijst, met waar ze in deze kaart gebruikt worden en wat ze daar wel en niet mogen doen.
+
+Per app staat er een gebruikersketen met storingen. Elk acceptatiecriterium wordt een stap in de voltooiproef van die app. De bronnen zijn geraadpleegd op 19 oktober 2026; "na te gaan" betekent dat de bron secundair is.
 
 **Eindcontract (h):** dezelfde acht dimensies als bij Wonen 1i. Het vervangt nooit de acht bewijzen van APPWERKT.json (bereikbaar, bedienbaar, menselijk, voltooibaar, waarheidsgetrouw, persistent, bevoegd, herstelbaar). Per app staan alleen de dimensies die iets eigens vragen.
 
@@ -473,18 +545,94 @@ Per app staat er ook een gebruikersketen met storingen. Elk acceptatiecriterium 
 - **112.** De plicht geldt voor telecomaanbieders, niet voor spraak in apps ([ACM](https://www.acm.nl/nl/publicaties/acm-stelt-beleidsregel-vast-voor-mobiel-bellen-naar-alarmnummer-112)). Veilig mag dus nooit lijken op een route naar 112.
 - **Locatie** is een persoonsgegeven (AVG art. 6). Toestemming per contact bestaat al.
 
-### d. Catalogus
-| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
-|---|---|---|---|---|---|---|
-| V1 | Alarmknop op het scherm | L1 | half (`soort:'knop'`) | De knop vraagt één bevestiging, slaat de por over en stuurt de kring een bericht met plek waar dat is toegestaan. Een dubbeltik geeft één alarm. Met een lege kring wordt hij geweigerd met de reden. | K | **A nu** |
-| V2 | Alarm afsluiten op het scherm | L5 | half (route bestaat) | Afsluiten meldt elke ontvanger dat het voorbij is. Een tweede keer afsluiten verandert niets. | K | **A nu** |
-| V3 | "Voor mij": alarmen die ik als kringlid ontvang | L2/L6 | ontbreekt | B ziet het alarm van A met de toegestane plek, en drukt "ik kom" of "ik bel". A ziet dat. Na afsluiten verdwijnt de plek bij B. | M | **A nu** |
-| V4 | 112-wegwijzer | L1 | ontbreekt | Een knop opent de telefoonkiezer met 112 (`tel:112`). RTG belt niet en zegt dat ook. Bij een alarm staat de 112-knop bovenaan. | K | **A nu** |
-| V5 | Incident uitgeven aan de werkruimte | L6 | half | Een alarm geeft `safety.incident.started` uit, zonder inhoud, alleen soort en id. Afsluiten geeft het einde. | K | **A nu** |
-| V6 | Incidentdossier na afloop | L5 | ontbreekt | Een tijdlijn van wie wat zag en wanneer, alleen voor het lid. Wordt gewist na 90 dagen, gelijk met de plekken. | M | A later |
-| V7 | Veiligheidskaart van het huis (Wonen W18) | L6 | ontbreekt | Vanuit Veilig is de kaart van Wonen te zien als verwijzing. Is Wonen uit, dan staat er "kaart nu niet te zien". | K | A later |
-| V8 | Vertrouwde contacten uit Instellingen | L6 | ontbreekt | De kring kiest uit de relatie-objecten van Instellingen (naad met Toegang). Er is geen tweede lijst. | M | A later |
-| V9 | Doorschakelen naar een gecertificeerde meldkamer (EN 50518) | L2 | ontbreekt | — | G | B, extern contract |
+### d. Catalogus, volledig formaat
+
+Elke functie heeft dezelfde acht velden als Wonen 1d: gegevens en bron, regel of norm, rekenwijze, onzekerheid, wanneer iemand iets hoort, rollen en toestemming, uitzonderingen, en acceptatie. De acceptatie wordt een stap in `scripts/lib/voltooi/veilig.js`. Een veld dat voor een functie niets zegt, staat er met "—".
+
+**V1 · Alarmknop op het scherm · L1 · half (`soort:'knop'` bestaat in de kern) · K · VERDIEPING**
+- **Gegevens en bron:** het lid zelf (de tik), de kring uit `kern/veiligheid/kring.js` en de laatste plek uit `plek.js` als het lid plek deelt.
+- **Regel:** de knop slaat de por over, net als het codewoord (`alarm.js`, kop: "het codewoord slaat trede 1 over"). Eén bevestiging ("Alarm sturen naar je kring?") voorkomt een zakalarm.
+- **Rekenwijze:** —
+- **Onzekerheid:** is de plek ouder dan het venster, dan krijgt de kring "laatst bekende plek, N minuten oud" (`ouderdomMin` bestaat al in de mail).
+- **Wanneer iemand iets hoort:** de kring direct (push en inbox, mail waar opgegeven); het lid krijgt "Alarm verstuurd: N contacten" (bestaat).
+- **Rollen en toestemming:** alleen het lid zelf slaat alarm. Per kringlid geldt de plekkeuze die het lid eerder zette.
+- **Uitzonderingen:** een lege kring geeft 400 met "Je kring is leeg" (bestaat). Een dubbeltik binnen 5 seconden is één alarm (bestaat).
+- **Acceptatie:** tik, bevestig, en kringlid B ontvangt een alarm met soort `knop`; een tweede kringlid zonder plekrecht ontvangt het zonder plek; een dubbeltik geeft één alarm.
+
+**V2 · Alarm afsluiten op het scherm · L5 · half (route bestaat, geen scherm) · K · HERSTEL**
+- **Gegevens en bron:** het open alarm van het lid (`alarmen` in de opslag van Veilig).
+- **Regel:** een alarm dat blijft hangen is bijna even erg als geen alarm (`alarm.js`, kop van `alarmAfsluiten`). Alleen de melder sluit af.
+- **Rekenwijze:** —
+- **Onzekerheid:** —
+- **Wanneer iemand iets hoort:** elke ontvanger krijgt "Alarm afgesloten" met de optionele toelichting (bestaat in de kern).
+- **Rollen en toestemming:** alleen het lid dat alarm sloeg.
+- **Uitzonderingen:** een proefalarm, of een alarm dat binnen een minuut wordt afgesloten, verliest zijn plek direct; een echt alarm houdt hem 90 dagen (`sosPositie`).
+- **Acceptatie:** na afsluiten op het scherm krijgt B "afgesloten"; een tweede keer afsluiten verandert niets; een ander lid krijgt 404.
+- **Waarom herstel:** de route bestaat en de grenszin belooft een einde, maar het lid kan het einde vandaag niet zelf geven. Dat is een belofte die niet klopt, geen nieuwe functie.
+
+**V3 · "Voor mij": alarmen die ik als kringlid ontvang · L2/L6 · half (`alarmenVoorMij` bestaat in de kern) · M · VERDIEPING**
+- **Gegevens en bron:** `alarmenVoorMij(handle)`: soort, tijd, codenaam, notitie en de plek alleen als het kringlid plekrecht heeft en het alarm open is.
+- **Regel:** de plek verdwijnt bij afsluiten (bestaat in de kern).
+- **Rekenwijze:** —
+- **Onzekerheid:** de ouderdom van de plek staat erbij.
+- **Wanneer iemand iets hoort:** het kringlid tikt "ik kom" of "ik bel"; de melder ziet wie wat koos.
+- **Rollen en toestemming:** het kringlid ziet nooit meer dan het lid voor hem toestond.
+- **Uitzonderingen:** is de verbinding tussen beiden verbroken, dan verdwijnt het alarm uit de lijst van B.
+- **Acceptatie:** B ziet het alarm van A met plek; C zonder plekrecht ziet het zonder plek; na afsluiten heeft B geen plek meer.
+
+**V4 · 112-wegwijzer · L1 · ontbreekt · K · VERDIEPING**
+- **Gegevens en bron:** —
+- **Regel:** RTG-bellen en Veilig zijn geen route naar 112 (`grens.js`, "Bij levensgevaar belt u het alarmnummer"). De knop opent `tel:112` in de kiezer van het toestel.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** iedereen.
+- **Uitzonderingen:** een toestel zonder telefonie (desktop) toont het nummer als tekst.
+- **Acceptatie:** de knop heeft `href="tel:112"`, staat bovenaan tijdens een open alarm, en het scherm zegt "RTG belt niet zelf".
+
+**V5 · Incident naar de werkruimte · L6 · half (gelezen, nooit uitgegeven) · K · HERSTEL**
+- **Gegevens en bron:** alleen soort en id van het alarm, geen inhoud.
+- **Regel:** `public/shared/interface/workspace-orchestrator.js:44` en `second-screen.js:25` lezen `safety.incident.started`, en `modules/safety.js:14` verklaart het als uitgifte, maar geen regel publiceert het. Een lezer zonder afzender is een dode draad.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** de werkruimte van het lid zelf, niet die van een ander.
+- **Rollen:** het lid.
+- **Uitzonderingen:** een proefalarm geeft geen incident.
+- **Acceptatie:** een alarm geeft het begin en afsluiten het einde, beide met alleen soort en id.
+
+**V6 · Incidentdossier na afloop · L5 · ontbreekt · M · later**
+- **Gegevens en bron:** het afgesloten alarm, de bezorgingen (`naar`, `mails`) en de reacties van V3.
+- **Regel:** wissen na 90 dagen, gelijk met de plekken (`vergeetAlarmPlekken`).
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** alleen het lid.
+- **Uitzonderingen:** —
+- **Acceptatie:** de tijdlijn toont wie wanneer bericht kreeg; na 90 dagen is hij weg.
+
+**V7 · Veiligheidskaart van het huis (Wonen W18) · L6 · ontbreekt · K · later**
+- Verwijzing naar Wonen; Veilig bezit niets. Wonen uit: "Kaart nu niet te zien." Acceptatie als bij W18.
+
+**V8 · Vertrouwde contacten uit Instellingen · L6 · ontbreekt · M · later**
+- Naad met Toegang (docs/domeinkaarten/instellingen.md). De kring kiest uit de relatie-objecten; er komt geen tweede lijst. Acceptatie: een contact dat in Instellingen vervalt, valt bij het volgende alarm uit de kring en het lid ziet wie.
+
+**V9 · Doorschakelen naar een gecertificeerde meldkamer (EN 50518) · L2 · ontbreekt · G · B, extern contract**
+Zie het B-proces hieronder.
+
+**V10 · Een mislukte e-mail is zichtbaar · L1 · fout (stil geslikt) · K · HERSTEL**
+- **Gegevens en bron:** het resultaat van `mail.send` per adres.
+- **Regel:** `alarm.js` vangt een mislukte mail op met `catch (e) {}`, terecht om de rest van het alarm niet tegen te houden. Maar de bevestiging aan het lid telt de adressen als gewaarschuwd, ook als de mail niet weg is.
+- **Rekenwijze:** gewaarschuwd = push verstuurd + mails die `send` zonder fout verliet.
+- **Onzekerheid:** een verstuurde mail is nog geen gelezen mail; het scherm zegt "verstuurd", nooit "ontvangen".
+- **Wanneer iemand iets hoort:** het lid: "E-mail niet verstuurd naar 1 adres; je kring kreeg wel een melding in de app."
+- **Rollen:** het lid.
+- **Uitzonderingen:** een stil alarm (codewoord) toont niets op het toestel; de mislukking staat dan alleen in het dossier (V6).
+- **Acceptatie:** met de mail uit telt de bevestiging 0 mails en noemt het scherm het mislukte adres.
+
+**B-proces V9: een alarm dat een meldkamer bereikt.** Alleen na een contract met een EN 50518-gecertificeerde meldkamer en een besluit van de eigenaar over "RTG is geen alarmcentrale".
+1. **Lid:** kiest per wacht "ook de meldkamer" (uitdrukkelijk, nooit standaard) en geeft toestemming voor plek en noodkaart (AVG art. 9 bij gezondheid).
+2. **Veilig (RTG):** stuurt bij een gemiste check-in eerst de por (trede 1), daarna tegelijk de kring en de meldkamer, met alleen soort, plek, codenaam en terugbelnummer.
+3. **Meldkamer (externe partij):** belt het lid terug volgens haar protocol en beslist zelf over 112. RTG beslist dat nooit.
+4. **Kring:** ziet "meldkamer ingeschakeld" en de status die de meldkamer terugmeldt.
+5. **Lid of meldkamer:** sluit af; iedereen hoort het einde (V2).
+6. **Kantoor (RTG):** ziet het aantal doorschakelingen en de afloop, nooit de inhoud; het contract en de SLA zijn van Geld en de eigenaar.
 
 ### e. RTG-exclusief
 - De kring bestaat uit echte Salon-verbindingen en wordt bij elk alarm opnieuw getoetst.
@@ -500,7 +648,8 @@ Per app staat er ook een gebruikersketen met storingen. Elk acceptatiecriterium 
 - Instellingen (relaties, Toegang).
 
 ### g. Prioritering
-- **A nu:** V1, V2, V4, V5 (K) en V3 (M).
+- **HERSTEL:** V2 (alarm afsluiten op het scherm), V5 (het incident wordt gelezen maar nooit uitgegeven), V10 (een mislukte e-mail telt als gewaarschuwd).
+- **VERDIEPING (wacht op het akkoord per familie):** V1, V3, V4.
 - **A later:** V6, V7, V8.
 - **B:** V9. Die vraagt een contract met een meldkamer en een besluit van de eigenaar over de verhouding tot "RTG is geen alarmcentrale".
 
@@ -522,6 +671,55 @@ Per app staat er ook een gebruikersketen met storingen. Elk acceptatiecriterium 
 - **Los functioneren:** zonder Salon-verbindingen weigert de kring met de reden.
 - **Samenwerking:** een kringlid ziet nooit meer dan per contact is toegestaan (plek aan of uit). Dat wordt getoetst met een tweede kringlid zonder plekrecht.
 - **Bewezen betrouwbaarheid:** dubbeltik, crash tijdens een lopende wacht (de wacht loopt door na een herstart), en het wissen na 90 dagen.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** kring, wacht, codewoord, rust, alarm en afsluiten (`/api/veiligheid/*`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - Salon-verbindingen: een kringlid moet een actieve verbinding zijn. Zonder: "Je kring is leeg; er is niemand om te waarschuwen." (bestaat);
+  - meldingen (push en inbox). Uit: "Je kring ziet het alarm pas als ze de app openen.";
+  - internet en de server. Zonder: de grenszin "niets zonder internet" met de 112-knop (bestaat als grenszin, de knop is V4).
+- **Optionele koppelingen:**
+  - e-mail. Uit: "E-mail niet verstuurd; je kring kreeg wel een melding in de app." (ontbreekt: V10);
+  - plek. Uit of geweigerd: "Zonder plek verstuurd.";
+  - Wonen (V7), Instellingen (V8), Vonk (Vo1), Vandaag (Va1), Reizen en Veilig (moment, TravelOS).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:veilig': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:veilig': { uitgeeft: ['veilig.alarm'], ontvangt: ['vonk.date', 'woning.veiligheidskaart'], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+veiligheid: { wat: 'als het misgaat hoort de eigen kring het, vanuit elke app waar het mis kan gaan, met alleen wat het lid per persoon toestond',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'veiligheid', naam: 'alarm-naar-werkruimte', laag: 'scherm', ontbreekt: 'keten', k: 'V5', kaart: KAART_LIVA,
+  wat: 'safety.incident.started wordt gelezen (workspace-orchestrator, second-screen) en verklaard (modules/safety.js), maar nergens gepubliceerd' },
+{ familie: 'veiligheid', naam: 'date-naar-wacht', laag: 'kern', ontbreekt: 'keten', k: 'Vo1', kaart: KAART_LIVA,
+  wat: 'een bevestigde date start op verzoek een wacht met de eindtijd van de date' },
+{ familie: 'veiligheid', naam: 'kringlid-naar-noodkaart', laag: 'kern', ontbreekt: 'keten', k: 'Va1', kaart: KAART_LIVA,
+  wat: 'de noodkaart van Vandaag kiest een kringlid als verwijzing in plaats van vrije tekst' },
+{ familie: 'veiligheid', naam: 'veiligheidskaart-naar-veilig', laag: 'scherm', ontbreekt: 'keten', k: 'V7', kaart: KAART_LIVA,
+  wat: 'de veiligheidskaart van Wonen (W18) is vanuit Veilig te openen' }
+```
+
+**Volledige werkzaamheid.** Het lid en zijn kring doen hier het hele werk van "laat iemand weten dat het misgaat". Buiten RTG blijft nodig: 112, een gecertificeerde meldkamer (RTG is er geen) en de telefoon om het lid te bellen.
 
 ---
 
@@ -572,7 +770,8 @@ Een afspraak uit een gesprek wordt een agendapunt, een gedeeld document blijft i
 - de bestaande meldroute van vonk (connection-communication) als vorm voor B2.
 
 ### g. Prioritering
-- **A nu:** B1, B3 (K) en B2 (M).
+- **HERSTEL:** B1 (ai.js belooft een agendaknop bij een herkende afspraak, het scherm heeft hem niet).
+- **VERDIEPING (wacht op het akkoord per familie):** B2, B3.
 - **A later:** B4, B5.
 - **B:** B6.
 
@@ -590,6 +789,52 @@ Een afspraak uit een gesprek wordt een agendapunt, een gedeeld document blijft i
 ### h. Eindcontract, eigen eisen
 - **Domeinintelligentie:** geen samenvattingszin zonder bronbericht (B3).
 - **Samenwerking:** een niet-deelnemer leest, wijzigt of meldt niets (bestaat; houden).
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** inbox, gesprek, reacties, wijzigen, wissen, vlaggen, zoeken, groepen en lokaal samenvatten (`/api/comm/*`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - een vriendschap met elke deelnemer (bestaat: `/begin` weigert anders met de reden);
+  - de live-stroom. Uit: "Nieuwe berichten verschijnen na verversen."
+- **Optionele koppelingen:**
+  - een model voor een concept. Uit: 503 met "schrijf zelf" (bestaat);
+  - Agenda (B1). Uit: "Niet in agenda gezet.";
+  - de kluis (B4), Bellen (Be2).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:berichten': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:berichten': { uitgeeft: ['afspraak'], ontvangt: ['bestand', 'oproep.gemist'], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+gesprek: { wat: 'mensen die elkaar kennen schrijven, bellen en spreken af zonder kopieen: een afspraak uit een gesprek komt in de agenda, een gemiste oproep in het gesprek',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'gesprek', naam: 'afspraak-naar-agenda', laag: 'scherm', ontbreekt: 'keten', k: 'B1', kaart: KAART_LIVA,
+  wat: 'een herkende afspraak wordt een agendapunt met een verwijzing naar het gesprek' },
+{ familie: 'gesprek', naam: 'bestand-als-bijlage', laag: 'scherm', ontbreekt: 'keten', k: 'B4', kaart: KAART_LIVA,
+  wat: 'een document uit de kluis gaat als verwijzing mee' },
+{ familie: 'gesprek', naam: 'bellen-uit-gesprek', laag: 'scherm', ontbreekt: 'proef', kaart: KAART_LIVA,
+  wat: 'de belknop in het gesprek start os:bellen; de voltooiproef van berichten loopt bellen niet' }
+```
+
+**Volledige werkzaamheid.** Leden voeren hier hun dagelijkse gesprekken. Buiten RTG blijft nodig: WhatsApp of Signal voor wie geen lid is, e-mail, en end-to-end-versleuteling (B6, vraagt besluit).
 
 ---
 
@@ -640,7 +885,8 @@ Bellen kan alleen tussen echte verbindingen, met de meeleesbaan en lokale ondert
 - kern/comm voor Be2.
 
 ### g. Prioritering
-- **A nu:** Be1, Be3 (K) en Be2 (M).
+- **HERSTEL:** Be1 is af (e65703f35).
+- **VERDIEPING (wacht op het akkoord per familie):** Be2, Be3.
 - **A later:** Be4, Be5.
 
 ### Keten "bellen vanuit een gesprek"
@@ -657,6 +903,40 @@ Bellen kan alleen tussen echte verbindingen, met de meeleesbaan en lokale ondert
 ### h. Eindcontract, eigen eisen
 - **Betrouwbaarheid:** er blijft niets van een gesprek in de opslag (bestaat, persistente stap 3).
 - **Toegankelijkheid:** Be1 is getoetst (een meeleesregel komt aan).
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** spraakgesprek tussen verbindingen, meeleesbaan en lokale ondertitels (`/api/member/call`).
+- **Noodzakelijke platformdiensten:**
+  - account en een verbinding met de ander;
+  - de live-stroom voor de signalering. B niet live: "Niet bereikbaar." (bestaat);
+  - WebRTC in de browser. Een streng netwerk zonder TURN: "De verbinding komt via dit netwerk niet tot stand." (ontbreekt, Be5).
+- **Optionele koppelingen:**
+  - het lokale spraakmodel (meeluister). Uit: "Ondertitels staan uit; de meeleesbaan werkt wel.";
+  - Berichten (Be2).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'os:bellen': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'os:bellen': { uitgeeft: ['oproep.gemist'], ontvangt: ['gesprek'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'gesprek', naam: 'gemiste-oproep-naar-gesprek', laag: 'kern', ontbreekt: 'keten', k: 'Be2', kaart: KAART_LIVA,
+  wat: 'een onbeantwoorde oproep wordt een regel in het gesprek in Berichten, zonder inhoud' }
+```
+
+**Volledige werkzaamheid.** Tussen leden kan hier het hele gesprek. Buiten RTG blijft nodig: gewone telefonie, 112 en bellen met wie geen lid is.
 
 ---
 
@@ -704,7 +984,8 @@ De dag ziet de agenda, de wacht van Veilig en het eigen gemoed bij elkaar. Gemoe
 - kern/veiligheid voor Va1.
 
 ### g. Prioritering
-- **A nu:** Va1, Va2.
+- **HERSTEL:** Va2 (de grenstekst van de proef noemt `/api/dag` een modelvraag; dagcoach is regelgestuurd).
+- **VERDIEPING (wacht op het akkoord per familie):** Va1.
 - **A later:** Va3, Va4.
 - **B:** Va6.
 
@@ -718,6 +999,37 @@ De dag ziet de agenda, de wacht van Veilig en het eigen gemoed bij elkaar. Gemoe
 
 ### h. Eindcontract, eigen eisen
 - **Domeinintelligentie:** er is geen tekst die een diagnose stelt. Een toets zoekt naar woorden als "u heeft" of "diagnose" in de antwoorden van de app.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** dag, gewoonten, metingen, gemoed, noodkaart, medicatie en toestellen (`/api/life`, `/api/dag`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie.
+- **Optionele koppelingen:**
+  - Veilig (Va1). Uit: "Je kring is nu niet te zien; je noodkaart werkt gewoon.";
+  - Agenda (de dag leest haar).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:vandaag': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:vandaag': { uitgeeft: [], ontvangt: ['veilig.kringlid'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+(zie 'kringlid-naar-noodkaart' bij Veilig)
+```
+
+**Volledige werkzaamheid.** Het lid houdt hier zijn eigen dag bij. Buiten RTG blijft nodig: de zorgverlener, het LSP via Mitz voor medicatie, en de app van een wearable (Oura, Withings) voor de meting zelf.
 
 ---
 
@@ -746,14 +1058,78 @@ De dag ziet de agenda, de wacht van Veilig en het eigen gemoed bij elkaar. Gemoe
 - **Particuliere oppas:** er is geen VOG-plicht gevonden. De ouder kan erom vragen (na te gaan).
 - **AVG art. 8:** onder 16 jaar is toestemming van de ouder nodig ([tekst](https://gdpr-text.com/nl/read/article-8/)).
 
-### d. Catalogus
-| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
-|---|---|---|---|---|---|---|
-| G1 | Het juiste gezin kiezen (reparatie) | L1 | fout | Wie twee gezinnen volgt, kiest het gezin, en het bericht komt bij dat gezin aan. Getoetst met twee gezinnen. | K | **A nu** |
-| G2 | Oppasbeurt in de gezinsagenda | L6 | half (gezinsagenda bestaat) | De ouder plant een oppasbeurt, en de oppas ziet hem in zijn eigen agenda als verwijzing. | M | A later |
-| G3 | Aankomst en vertrek van de oppas | L5 | ontbreekt | De oppas tikt "ik ben er" en "ik ga". De ouder krijgt een melding, zonder plek tenzij hij die vraagt. | M | A later |
-| G4 | VOG op verzoek van de ouder | L2 | ontbreekt | — | M | B, vraagt besluit: persoonseis "oppas" (kern/persoonseis.js); RTG valideert niets inhoudelijk |
-| G5 | Oppas betalen | L6 | ontbreekt | — | M | B, eigenaar Geld |
+### d. Catalogus, volledig formaat
+
+Dezelfde acht velden als Wonen 1d. De acceptatie wordt een stap in `scripts/lib/voltooi/gezin.js`, of een schermtoets waar het scherm het enige bewijs is. De gezinskant zelf (de RTFoundation-app) is van FoundationOS; Gezin is de kant van de gekoppelde oppas of het familielid in de ledenapp.
+
+**G1 · Het juiste gezin kiezen · L1 · gerepareerd (90c8166f5) · K · HERSTEL, af**
+- **Gegevens en bron:** `/api/rtf/overzicht` (`gastOverzicht`) geeft alle gekoppelde gezinnen; het gekozen gezin is een keuze op het scherm.
+- **Regel:** chat en antwoord gaan naar het gekozen gezin, nooit vanzelf naar het eerste.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** de leden van het gekozen gezin, en de andere gekoppelde gasten van dat gezin (`bezorgAanGasten`).
+- **Rollen en toestemming:** de server toetst per bericht de koppeling (`berichtVanGast`: 403 zonder koppeling).
+- **Uitzonderingen:** met één gezin verschijnt er geen keuze.
+- **Acceptatie:** `test/gezin-keuze.e2e.js`: een oppas met twee gezinnen kiest het tweede, en het bericht staat bij het tweede en niet bij het eerste.
+
+**G2 · Oppasbeurt in de gezinsagenda · L6 · half (gezinsagenda bestaat) · M · later**
+- **Gegevens en bron:** een agendapunt van het gezin (sleutel `gezin:<code>`, gezinskant) met soort `oppas`, begin, einde en het gastprofiel.
+- **Regel:** de beurt is van het gezin. De oppas krijgt een verwijzing in zijn eigen agenda (`agenda.afspraken`), geen kopie.
+- **Rekenwijze:** —
+- **Onzekerheid:** —
+- **Wanneer iemand iets hoort:** de oppas bij het plannen en bij een wijziging; een herinnering op de dag zelf.
+- **Rollen en toestemming:** een ouder of beheerder plant; de oppas bevestigt of weigert. Een weigering is geen fout en staat bij de ouder.
+- **Uitzonderingen:** ontkoppelt de oppas, dan vervalt de verwijzing in zijn agenda en ziet de ouder "oppas niet meer gekoppeld".
+- **Acceptatie:** de ouder plant, de oppas ziet de beurt in zijn agenda, de ouder ziet de bevestiging; na ontkoppelen is de verwijzing weg.
+
+**G3 · Aankomst en vertrek van de oppas · L5 · ontbreekt · M · later**
+- **Gegevens en bron:** twee tikken van de oppas ("ik ben er", "ik ga") aan een beurt uit G2.
+- **Regel:** zonder beurt geen aankomst. De plek gaat alleen mee als de ouder daar per beurt om vroeg.
+- **Rekenwijze:** de duur van de beurt = vertrek − aankomst; hij staat bij de beurt en is de basis voor G5.
+- **Onzekerheid:** een vergeten "ik ga" toont "vertrek niet gemeld", nooit een geschat tijdstip.
+- **Wanneer iemand iets hoort:** de ouders bij beide tikken.
+- **Rollen en toestemming:** alleen de gekoppelde oppas van die beurt.
+- **Uitzonderingen:** een dubbeltik is één aankomst.
+- **Acceptatie:** aankomst en vertrek staan bij de beurt; een ander gastprofiel van hetzelfde gezin kan deze beurt niet aftikken (403).
+
+**G4 · VOG op verzoek van de ouder · L2 · ontbreekt · M · B, vraagt besluit**
+Zie het B-proces hieronder.
+
+**G5 · De oppas betalen · L6 · ontbreekt · M · B, eigenaar Geld**
+Zie het B-proces hieronder.
+
+**G6 · Ontkoppelen, door de oppas of door het gezin · L5 · bestaat · — · houden**
+- **Gegevens en bron:** `unlinkGast` wist de koppeling en sluit het kanaaltoken (`gezinstoken.sluit`).
+- **Regel:** na ontkoppelen leest de oppas niets meer van het gezin.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** het gezin ziet dat het profiel niet meer gekoppeld is.
+- **Rollen:** de oppas zelf, of het gezin in de RTFoundation-app.
+- **Uitzonderingen:** een profiel dat al aan een ander lid hangt, wordt niet overgenomen (409, bestaat).
+- **Acceptatie (bestaat):** na ontkoppelen geeft `/api/rtf/kanaal` 403 en `/api/rtf/bericht` 403.
+
+**G7 · De plek van de gezinsleden, alleen tijdens een beurt · L3 · vraagt besluit · M · HERSTEL-vraag**
+- **Gegevens en bron:** `gastOverzicht` geeft elke gekoppelde gast de precieze plek van elk gezinslid dat zijn plek met het gezin deelt (`locatiePubliek`, ontsleuteld), zolang de koppeling bestaat.
+- **Regel (voorstel):** een gast ziet plekken alleen tijdens een lopende beurt (G2/G3). Buiten een beurt ziet hij "plek alleen tijdens een oppasbeurt".
+- **Rekenwijze / Onzekerheid:** de ouderdom van de plek staat erbij.
+- **Wanneer iemand iets hoort:** —
+- **Rollen en toestemming:** het gezin kiest; de gast kan het niet zelf ruimer maken.
+- **Uitzonderingen:** een familielid (geen oppas) kan van het gezin blijvend plekrecht krijgen, uitdrukkelijk.
+- **Acceptatie:** zonder lopende beurt bevat het overzicht van de oppas geen coördinaten.
+- **Waarom een vraag:** vandaag is het gedrag een keuze die niemand uitdrukkelijk maakte. Het gaat om de live plek van kinderen. Dat is aan het gezin en FoundationOS, niet aan mij. Ik heb niets veranderd.
+
+**B-proces G4: een VOG op verzoek van de ouder.**
+1. **Ouder (gezinskant):** zet bij het gastprofiel "VOG gevraagd". Dat is een wens, geen poort; de koppeling blijft bestaan.
+2. **Oppas:** vraagt zelf de VOG aan bij Justis (extern, buiten RTG) en levert het stuk in via de kluis (`docs.bestanden`) als vakbewijs (`kern/vakbewijs.js`).
+3. **Mens van RTG:** tekent af dat het stuk gezien is, met datum; nooit de ouder zelf (regel in AGENTS.md: "een ingediend stuk is geen bewijs").
+4. **Gezin:** ziet "VOG gezien op <datum>", niet het stuk zelf. Het documentnummer staat in de identiteitskluis.
+5. **Verloop:** het stuk heeft een datum; de ouder bepaalt hoe oud het mag zijn, en bij elke vraag wordt het opnieuw gerekend (`persoonseis`).
+- **Besluit nodig:** een persoonseis "oppas" in `kern/persoonseis.js`, met reikwijdte `handeling`, zodat alleen de beurt en niet de koppeling wacht. RTG valideert inhoudelijk niets.
+
+**B-proces G5: de oppas betalen.**
+1. **Oppas:** de beurt is af met aankomst en vertrek (G3).
+2. **Gezin:** ziet de duur en het afgesproken uurtarief (door het gezin ingevuld) en drukt "betalen".
+3. **Geld (eigenaar):** voert de betaling uit via betaalWaarheid met `bronRef` = de beurt. Betaald heet pas betaald na bevestiging.
+4. **Oppas:** ziet "betaald" pas na die bevestiging.
+5. **Grens:** RTG zegt niets over werkgeverschap of de Regeling dienstverlening aan huis behalve als uitleg met bron (zie Maison M1). Nooit een automatische betaling.
 
 ### e. RTG-exclusief
 - De oppas is een gekeurd RTG-lid, met een eenmalige uitnodiging en een verloop van 12 uur.
@@ -763,7 +1139,8 @@ De dag ziet de agenda, de wacht van Veilig en het eigen gemoed bij elkaar. Gemoe
 foundation/gasten (koppeling, gezinsuitnodiging, gezinsagenda), pushHook en persoonseis.
 
 ### g. Prioritering
-- **A nu:** G1.
+- **HERSTEL:** G1 is af (90c8166f5); G7 (de plek van gezinsleden voor elke gast, altijd) is een vraag aan het gezin en FoundationOS.
+- **VERDIEPING (wacht op het akkoord per familie):** geen voor nu; G2 en G3 later.
 - **A later:** G2, G3.
 - **B:** G4, G5.
 
@@ -777,6 +1154,50 @@ foundation/gasten (koppeling, gezinsuitnodiging, gezinsagenda), pushHook en pers
 **Storingen:**
 - Kanaaltoken verlopen: het scherm vraagt opnieuw te openen.
 - De ouder heeft ontkoppeld: 403 met de reden.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** gezinnen zien, oppasinfo lezen, agenda lezen, berichten sturen, ontkoppelen (`/api/rtf/overzicht`, `/kanaal`, `/bericht`, `/ontkoppel`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - een geldige uitnodiging (48 uur) om te koppelen. Verlopen: de reden (bestaat);
+  - het kanaaltoken (12 uur). Verlopen: "Open het gezin opnieuw."
+- **Optionele koppelingen:**
+  - meldingen van het gezin (push via `pushHook`). Uit: berichten staan in de inbox, zonder telefoonmelding;
+  - Agenda (G2), Geld (G5).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'tab:gezin': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'tab:gezin': { uitgeeft: [], ontvangt: ['gezin.oppasbeurt'], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+gezin: { wat: 'een oppas of familielid doet zijn deel voor het gezin met alleen wat het gezin toevertrouwt: plannen, aankomen, berichten, vertrekken',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'gezin', naam: 'oppasbeurt-naar-agenda', laag: 'kern', ontbreekt: 'keten', k: 'G2', kaart: KAART_LIVA,
+  wat: 'een oppasbeurt van het gezin staat als verwijzing in de agenda van de oppas' },
+{ familie: 'gezin', naam: 'gezinsagenda-naar-gast', laag: 'kern', ontbreekt: 'proef', kaart: KAART_LIVA,
+  wat: 'gastOverzicht geeft de gezinsagenda (agendaPubliek); geen proef loopt dat af',
+  bron: [{ bestand: 'server/foundation/gasten/koppeling.js', noemt: 'agendaPubliek' }] }
+```
+
+**Volledige werkzaamheid.** De oppas of het familielid doet hier zijn deel: lezen en berichten. Buiten RTG blijft nodig: de telefoon voor aankomst en vertrek (G3), Justis voor een VOG (G4) en een betaalapp om de oppas te betalen (G5).
 
 ---
 
@@ -825,7 +1246,8 @@ Een gezinsboodschappenlijst, rekeningen splitsen met verbindingen, en "betaald" 
 - de gezinsagendasleutel als vorm voor Bs4.
 
 ### g. Prioritering
-- **A nu:** Bs1 (K) en Bs2 (M).
+- **HERSTEL:** geen gemeten fout; Bs6 (wie is eigenaar van de eetbestelling) is een besluit.
+- **VERDIEPING (wacht op het akkoord per familie):** Bs1, Bs2.
 - **Mits alcohol:** Bs3.
 - **A later:** Bs4, Bs5.
 - **Besluit:** Bs6.
@@ -839,6 +1261,47 @@ Een gezinsboodschappenlijst, rekeningen splitsen met verbindingen, en "betaald" 
 **Storingen:**
 - Groothandel uit: de bestelling blijft "aangevraagd", en het scherm zegt dat er nog niets is bevestigd.
 - Dubbeltik: één bestelling (bestaat).
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** groothandelsbestelling, eetbestelling, volgen en annuleren (`/api/groothandel/*`, `/api/bezorg/*`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - de zaak of groothandel aan de andere kant. Reageert niet: "Nog niet bevestigd." (de status aangevraagd bestaat);
+  - de zaakbetaling voor eten (`/api/order/pay`). Geweigerd: "Niet betaald; de bestelling is niet geplaatst."
+- **Optionele koppelingen:**
+  - de live-stroom voor volgen. Uit: de status na verversen;
+  - Gezin (Bs4).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'tab:bestellen': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'tab:bestellen': { uitgeeft: ['bestelling'], ontvangt: ['boodschappenlijst'], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+huishouden: { wat: 'het huishouden draait: boodschappen, personeel en taken, met een lijst die het gezin deelt en een betaling die pas betaald heet na bevestiging',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'huishouden', naam: 'gezinslijst-naar-bestelling', laag: 'scherm', ontbreekt: 'keten', k: 'Bs4', kaart: KAART_LIVA,
+  wat: 'een gedeelde boodschappenlijst wordt een bestelling bij de groothandel' }
+```
+
+**Volledige werkzaamheid.** Het lid bestelt hier volledig bij zaken in RTG. Buiten RTG blijft nodig: de app van een supermarkt die geen zaak in RTG is (Picnic, AH).
 
 ---
 
@@ -869,22 +1332,96 @@ Een gezinsboodschappenlijst, rekeningen splitsen met verbindingen, en "betaald" 
   - aanbieden van een beleggingsobject kan een vergunning vragen (Wft; bron uit 2014, na te gaan).
   - Ook dit vraagt een besluit.
 
-### d. Catalogus
-| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
-|---|---|---|---|---|---|---|
-| A1 | Juridische toets timeshare en Wft | — | ontbreekt | — | — | **vraagt besluit** (eigenaar, Geld, juridisch) |
-| A2 | Betaling pas na de bedenktijd, of in bewaring | L5 | ontbreekt | Hangt af van A1. Binnen 14 dagen na akkoord kan er niet betaald worden, of het geld blijft in bewaring tot dag 15. Herroepen binnen de termijn kost niets. | M | A, na A1 |
-| A3 | Wachtlijstoverdracht niet stil laten falen (reparatie) | L5 | fout | Weigert `pay.huisIn` of `huisUit`, dan gaat de overdracht niet door en zegt het scherm waarom. Er wordt geen ticket overgezet zonder geld. | K | **A nu** |
-| A4 | Geboekte dag naar Agenda, met een taak voor het team | L6 | ontbreekt | De dag staat in de agenda van het lid (verwijzing), en het kantoor ziet een open taak. Is de Agenda uit, dan blijft de boeking staan met de melding. | M | **A nu** |
-| A5 | Servicefee in de verplichtingenkalender van Geld | L6 | half | Geld toont bedrag, vervaldag en ticket-id. Betalen gaat via betaalWaarheid. Er wordt nooit automatisch afgeschreven. | K | A later (Geld) |
-| A6 | Dagen ruilen tussen poolleden | L3 | ontbreekt | Twee leden ruilen een dag met allebei een akkoord. Een gemiste bevestiging betekent geen ruil. | M | B |
+### d. Catalogus, volledig formaat
+
+Dezelfde acht velden als Wonen 1d. De acceptatie wordt een stap in `scripts/lib/voltooi/assets.js` of een toets in `test/assets.test.js`. Vaste getallen komen uit `server/kern/assets.js`: 300 tickets per object, 24 uur per ticket per jaar, 10 jaar geldig, 14 dagen bedenktijd, terugkoop binnen 30 dagen, servicefee 2%, overdracht 5%, 15 onderhoudsdagen, piek juli en augustus.
+
+**A1 · Juridische toets: timeshare en Wft · — · ontbreekt · — · vraagt besluit**
+Zie het B-proces hieronder. Tot het besluit stuurt geen enkele wetsregel uit deze kaart een weigering of een uitkomst `bepaald` (zie "Te controleren" onderaan).
+
+**A2 · Betaling pas na de bedenktijd, of in bewaring · L5 · ontbreekt · M · na A1**
+- **Gegevens en bron:** de goedgekeurde aanvraag met datum van akkoord (`assetAanvragen`), en de bedenktijd van 14 dagen (`BEDENKTIJD_DAGEN`).
+- **Regel:** alleen als A1 besluit dat de Access-smaak onder de timesharerichtlijn valt: binnen de bedenktijd wordt niet betaald, of het geld blijft in bewaring tot dag 15. Zonder besluit verandert er niets.
+- **Rekenwijze:** betaalbaar vanaf = datum akkoord + 14 dagen.
+- **Onzekerheid:** —
+- **Wanneer iemand iets hoort:** het lid bij akkoord ("betalen kan vanaf <datum>") en op die dag.
+- **Rollen en toestemming:** het lid betaalt; Geld voert uit via betaalWaarheid.
+- **Uitzonderingen:** herroepen binnen de termijn kost niets en vraagt geen terugbetaling, want er is niets betaald.
+- **Acceptatie:** betalen op dag 3 geeft 409 met de datum; op dag 15 lukt het.
+
+**A3 · Wachtlijstoverdracht en terugkoop niet stil laten falen · L5 · gerepareerd (5e04dc5b6) · K · HERSTEL, af**
+- **Gegevens en bron:** de uitkomst van `pay.huisIn` en `pay.huisUit` (`{status, error}`, ze gooien niet).
+- **Regel:** de koper betaalt eerst. Mislukt dat, dan blijft hij op de wachtlijst en volgt de terugkoop. Een mislukte uitbetaling aan de verkoper zet `uitbetalingOpen` en het antwoord zegt `uitbetaling:'open'`. Een terugkoop die niet uitbetaald kan worden, geeft 409 en blijft open.
+- **Rekenwijze:** waarde = actuele ticketwaarde; de koper betaalt waarde + 5%.
+- **Onzekerheid:** —
+- **Wanneer iemand iets hoort:** verkoper en koper krijgen de echte uitkomst.
+- **Rollen:** het lid stapt uit; het kantoor betaalt de terugkoop.
+- **Uitzonderingen:** een bedrag boven €5000 per boeking lukt niet via het huisgeld (A7).
+- **Acceptatie:** `test/assets.test.js`, drie kerntoetsen met een nep-pay, 18 van 18.
+
+**A4 · Geboekte dag: agendapunt en een taak voor het team · L6 · ontbreekt · M · HERSTEL (tekst) en VERDIEPING (taak)**
+- **Gegevens en bron:** de geboekte dag (`assetGebruik`), het object en de codenaam.
+- **Regel:** de melding zegt vandaag "Het team neemt vooraf contact op" (`gebruik.js:70`), maar er bestaat geen taak, geen agendapunt en geen kantoorscherm dat dat contact draagt.
+  - HERSTEL: de tekst zegt wat er is: "uw dag is vastgelegd". Klein, kan nu.
+  - VERDIEPING: het kantoor krijgt een open taak met de dag, en het lid een verwijzing in zijn agenda (`agenda.afspraken`).
+- **Rekenwijze:** —
+- **Onzekerheid:** —
+- **Wanneer iemand iets hoort:** het lid bij het boeken; het kantoor via de taak; het lid opnieuw als de taak is opgepakt ("het team neemt contact op").
+- **Rollen en toestemming:** een kantoormens op naam pakt de taak op.
+- **Uitzonderingen:** is de agenda uit, dan blijft de boeking staan met "niet in agenda gezet".
+- **Acceptatie:** na het boeken staat er een verwijzing in de agenda en een open taak in het kantoor; de melding belooft geen contact zolang er geen taak is.
+
+**A5 · Servicefee in de verplichtingenkalender van Geld · L6 · half · K · later (Geld)**
+- **Gegevens en bron:** de fee per ticket per jaar (2% van de ticketwaarde), het ticket-id en de vervaldag.
+- **Regel:** Geld bezit de verplichting; Assets geeft alleen de verwijzing. Er wordt nooit automatisch afgeschreven.
+- **Rekenwijze:** fee = 2% × ticketwaarde (`serviceFeeVan`).
+- **Onzekerheid:** de ticketwaarde volgt de taxatie en kan dalen; de datum van de taxatie staat erbij.
+- **Wanneer iemand iets hoort:** 30 dagen voor de vervaldag, in Geld.
+- **Rollen:** het lid betaalt; het kantoor int (`/api/office/asset/fees`).
+- **Uitzonderingen:** Geld uit: "fee nu niet te zien".
+- **Acceptatie:** de fee staat in de verplichtingen van Geld met de verwijzing naar het ticket.
+
+**A6 · Dagen ruilen tussen poolleden · L3 · ontbreekt · M · B**
+Zie het B-proces hieronder.
+
+**A7 · Bedragen boven het plafond van het huisgeld · L6 · grens gemeten · — · Geld en eigenaar**
+- **Gegevens en bron:** `pay` heeft `MAX_CENTEN` = 500000, dus €5000 per boeking. Een ticketprijs, een overdracht of een terugkoop is vaak hoger.
+- **Regel:** boven het plafond lukt de boeking niet en zegt het antwoord dat (sinds A3). Voor deze bedragen is de bankrail (betaalWaarheid) nodig.
+- **Rest:** —
+- **Acceptatie:** een bedrag boven het plafond geeft een eerlijke weigering en zet geen ticket over (bestaat sinds A3).
+- **Besluit:** bij Geld en de eigenaar. Ik bouw hier niets.
+
+**A8 · Open uitbetalingen zichtbaar voor het kantoor · L3 · ontbreekt · K · HERSTEL-vervolg**
+- **Gegevens en bron:** `t.uitbetalingOpen` (aan wie, waarde, reden, tijd), gezet door A3.
+- **Regel:** een open uitbetaling mag niet alleen in de opslag staan; iemand moet haar zien en opnieuw kunnen starten.
+- **Rekenwijze:** —
+- **Onzekerheid:** —
+- **Wanneer iemand iets hoort:** het kantoor ziet de lijst; de verkoper ziet "uitbetaling open" bij zijn ticket.
+- **Rollen:** een kantoormens op naam start de uitbetaling opnieuw; nooit vanzelf.
+- **Uitzonderingen:** —
+- **Acceptatie:** na een mislukte uitbetaling staat ze in `/api/office/asset/overzicht`; opnieuw starten met succes wist de markering.
+
+**B-proces A1: de juridische toets.**
+1. **Eigenaar:** legt de vraag voor aan een jurist: valt de Access-smaak onder BW 7:50a e.v. (timeshare, gebruiksrecht op accommodatie langer dan een jaar)? Valt de Asset-smaak onder de prospectusplicht of de Wft?
+2. **Jurist (extern):** geeft een schriftelijk advies met de klasse uit `kern/fiscaal/zekerheid.js`-taal: bepaald, uitlegbaar of voorbehouden.
+3. **Geld:** zet de uitkomst om in betaalregels (A2: bewaring of uitstel).
+4. **LivingOS-A:** bouwt A2 en past het informatiedocument aan (`assetDocument`).
+5. **Kantoor:** keurt pas nieuwe aanvragen na dat besluit, als de eigenaar dat zo kiest.
+
+**B-proces A6: dagen ruilen.**
+1. **Lid A:** biedt een geboekte dag aan voor een andere dag.
+2. **Lid B (poollid van hetzelfde object):** ziet het aanbod en kiest een eigen dag ervoor terug.
+3. **Assets:** controleert dat beide dagen nog van hen zijn en dat de piekregel (hooguit de helft in juli en augustus) blijft kloppen.
+4. **Beide leden:** geven akkoord. Een gemist akkoord binnen 48 uur betekent geen ruil.
+5. **Kantoor:** ziet de ruil in het overzicht; er gaat geen geld om.
 
 ### e. RTG-exclusief
 Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde agenda als de reis van TravelOS. Zo zijn het een gebruiksrecht en een reis, niet twee losse dingen.
 
 ### g. Prioritering
 - **Eerst A1 (besluit).**
-- **A nu:** A3 (K, reparatie) en A4 (M).
+- **HERSTEL:** A3 is af (5e04dc5b6); A4 (de melding belooft contact van het team zonder taak); A8 (open uitbetalingen zichtbaar maken).
+- **VERDIEPING (wacht op het akkoord per familie):** A4 (taak en agendapunt).
 - **Na A1:** A2.
 - **A later:** A5.
 - **B:** A6.
@@ -906,6 +1443,43 @@ Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde ag
 ### h. Eindcontract, eigen eisen
 - **Levenscyclus:** van aanvraag tot uitstappen of herroepen, zonder stille fout (A3).
 - **Juridisch:** geen betaling binnen de bedenktijd, als A1 dat zo besluit.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** aanvragen, documentinformatie, tickets, dagen boeken, wachtlijst, uitstappen en herroepen (`/api/asset/*`, `/api/assets`).
+- **Noodzakelijke platformdiensten:**
+  - account met een betalende pas;
+  - een mens van het kantoor die keurt. Afwezig: de aanvraag blijft "aangevraagd" met "Een mens van RTG beoordeelt hem" (bestaat);
+  - Geld (betaalWaarheid, pay). Uit of geweigerd: geen ticket, met de reden (bestaat).
+- **Optionele koppelingen:**
+  - Agenda (A4). Uit: "Niet in agenda gezet.";
+  - de verplichtingen van Geld (A5).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'tab:assets': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'tab:assets': { uitgeeft: ['asset.dag'], ontvangt: [], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'geld', naam: 'asset-betalen', laag: 'kern', ontbreekt: 'proef', kaart: KAART_LIVA,
+  wat: 'een goedgekeurde aanvraag wordt betaald via betaalWaarheid en geeft dan de tickets; de voltooiproef loopt dat voor het lid, er is geen ketenregister',
+  bron: [{ bestand: 'server/kern/assets/aanvraag-betaal.js', noemt: 'betaal' }] },
+{ familie: 'geld', naam: 'assetdag-naar-agenda', laag: 'kern', ontbreekt: 'keten', k: 'A4', kaart: KAART_LIVA,
+  wat: 'een geboekte dag staat als verwijzing in de agenda en als taak bij het kantoor' }
+```
+
+**Volledige werkzaamheid.** Het lid doet hier zijn deel, van aanvraag tot uitstappen. Het kantoor keurt hier. Buiten RTG blijft nodig: de bank voor bedragen boven het plafond van het huisgeld (A7), en een jurist voor A1. De bemanning en het beheer van het object werken in hun eigen systemen.
 
 ---
 
@@ -949,7 +1523,8 @@ Een mens op naam keurt, betaald heet pas betaald, en de dag staat in dezelfde ag
 Een date die echt gereserveerd is bij een gekeurde zaak, een check-in via Veilig bij de eigen kring, en een bevestiging van €10 die terugkomt als de zaak weigert.
 
 ### g. Prioritering
-- **A nu:** Vo1, Vo2 en Vo3 (M). Vo4 vervalt: geen fout.
+- **HERSTEL:** geen: Vo4 bleek geen fout.
+- **VERDIEPING (wacht op het akkoord per familie):** Vo1, Vo2, Vo3.
 - **A later:** Vo5.
 - **B:** Vo6.
 
@@ -968,6 +1543,48 @@ Een date die echt gereserveerd is bij een gekeurde zaak, een check-in via Veilig
 ### h. Eindcontract, eigen eisen
 - **Bevoegd:** een lid zonder 18+-verificatie bereikt geen enkele route (bestaat).
 - **Samenwerking:** wensen blijven bij de eigenaar. Getoetst: een match ziet geen wensen.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** profiel, foto's, selectie, like, bericht, halfweg, kiezen, reserveren, blokkeren (`/api/vonk/*`, `/api/connection/vonk/*`).
+- **Noodzakelijke platformdiensten:**
+  - account met 18+-verificatie (`ontmoetpoort.js`). Zonder: de reden (bestaat);
+  - Geld voor de bevestiging van €10. Geweigerd: "Bevestigen lukte niet; er is niets afgeschreven.";
+  - een gekeurde zaak die de tafel bevestigt. Stil: "De zaak heeft nog niet gereageerd." (de status onbekend bestaat).
+- **Optionele koppelingen:**
+  - Veilig (Vo1). Uit: "Geen check-in mogelijk.";
+  - bellen en media (wederzijdse consent).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:vonk': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:vonk': { uitgeeft: ['vonk.date'], ontvangt: [], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+ontmoeten: { wat: 'twee leden leren elkaar veilig kennen en spreken af op een plek die de zaak echt bevestigt, met de eigen kring als vangnet',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'ontmoeten', naam: 'date-naar-zaak', laag: 'kern', ontbreekt: 'proef', kaart: KAART_LIVA,
+  wat: 'de reservering gaat naar de zaak en het domeinbewijs ontstaat bij haar besluit (opzet/trust-bewijs.js); geen ketenproef loopt de zaakkant',
+  bron: [{ bestand: 'server/opzet/trust-bewijs.js', noemt: 'bewijsHospitalityBesluit' }] }
+```
+
+**Volledige werkzaamheid.** Het lid doet hier het hele werk van kennismaken tot een gereserveerde date. Buiten RTG blijft nodig: het reserveringssysteem van een zaak die geen RTG-zaak is (daar kan Vonk niet reserveren).
 
 ---
 
@@ -1011,7 +1628,8 @@ Een date die echt gereserveerd is bij een gekeurde zaak, een check-in via Veilig
 Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtstreeks van maker naar kijker.
 
 ### g. Prioritering
-- **A nu:** T3 (K) en T1 (M).
+- **HERSTEL:** geen gemeten fout.
+- **VERDIEPING (wacht op het akkoord per familie):** T3, T1.
 - **A later:** T2.
 - **B:** T4.
 - **Besluit:** T5.
@@ -1024,6 +1642,48 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 5. Het lid reageert.
 
 **Storing:** de opslag is vol: de upload wordt geweigerd met de reden, en er blijft geen half bestand achter.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** kijken, kanalen volgen, een eigen kanaal, uploaden, ondertitels, reacties (`/api/theater/*`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - opslag (tot 420 MB per video). Vol: "Uploaden lukt niet: de opslag is vol.";
+  - het kantoor dat een kanaal keurt. Afwezig: "Je kanaal wacht op keuring." (de status wacht bestaat);
+  - het stroomticket om te kijken.
+- **Optionele koppelingen:**
+  - de zaakbibliotheek en kijkplicht (een zaak);
+  - het Thuisarchief (WebRTC, van maker naar kijker).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:theater': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:theater': { uitgeeft: ['media.video'], ontvangt: ['bestand'], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+media: { wat: 'maken, publiceren, kijken en reageren, met de keuring en de grenzen van het huis, zonder kopie tussen de media-apps',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'media', naam: 'abonnement-naar-geld', laag: 'kern', ontbreekt: 'keten', k: 'T4', kaart: KAART_LIVA,
+  wat: 'een betaald abonnement op een kanaal (vraagt Geld en het PSD2-besluit)' }
+```
+
+**Volledige werkzaamheid.** Kijkers en makers doen hier hun werk binnen RTG. Buiten RTG blijft nodig: montage (Premiere, DaVinci), het maken van ondertitels, en de registratie bij het Commissariaat voor de Media als die geldt (T5).
 
 ---
 
@@ -1065,7 +1725,8 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 | P5 | Betaalvergunning voor cadeaus | — | — | — | — | vraagt besluit (Geld en juridisch: PSD2) |
 
 ### g. Prioritering
-- **A nu:** P1 (K) en P2 (M).
+- **HERSTEL:** P1 is af (a53012167).
+- **VERDIEPING (wacht op het akkoord per familie):** P2.
 - **A later:** P3, P4.
 - **Besluit:** P5.
 
@@ -1078,6 +1739,41 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 **Storingen:**
 - Pay weigert: geen cadeau, met de melding.
 - Kantoor uit: kanaalaanvragen blijven "wacht".
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** live kijken, chatten, volgen, blokkeren en melden (`/api/podium/*`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - de live-signalering. Uit: "De uitzending is nu niet te bereiken.";
+  - het kantoor voor kanaalaanvragen. Afwezig: "wacht" (bestaat).
+- **Optionele koppelingen:**
+  - Geld (`pay.stuur`) voor cadeaus en de kraam. Geweigerd: "Geen cadeau verstuurd" met de reden (bestaat);
+  - kaartjes (P3).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:podium': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:podium': { uitgeeft: ['media.live'], ontvangt: [], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'media', naam: 'cadeau-naar-maker', laag: 'kern', ontbreekt: 'proef', kaart: KAART_LIVA,
+  wat: 'een cadeau gaat via pay.stuur naar de maker; geen ketenproef loopt betaling en ontvangst samen',
+  bron: [{ bestand: 'server/kern/podium/index.js', noemt: 'stuur' }] }
+```
+
+**Volledige werkzaamheid.** Kijkers en makers doen hier hun werk tijdens de uitzending. Buiten RTG blijft nodig: de software die uitzendt (OBS of een camera-app), en een betaalinstelling voor cadeaus zolang P5 niet besloten is.
 
 ---
 
@@ -1117,7 +1813,8 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 | K5 | Persoonlijke krant (rubrieken volgen) | L1 | ontbreekt | Het lid volgt rubrieken. De volgorde is uit te leggen: nooit een verborgen score. | M | A later |
 
 ### g. Prioritering
-- **A nu:** K1, K2, K3 (K).
+- **HERSTEL:** K2 en K3 zijn af (58b2f5cf3).
+- **VERDIEPING (wacht op het akkoord per familie):** K1.
 - **A later:** K4, K5.
 
 ### Keten "een fout in een artikel"
@@ -1127,6 +1824,39 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 4. De lezer hoort het.
 
 **Storing:** redactie uit: lezen werkt door; de melding blijft "ontvangen".
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** gids, lezen, en voor de redactie maken, corrigeren en publiceren (`/api/krant/*`, `/api/supplier/redactie/*`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie (lezen vraagt een sessie);
+  - de capability `redactie` voor de redactiekant.
+- **Optionele koppelingen:**
+  - een model voor assist. Zonder: de regel-terugval met het label "zonder model";
+  - meldingen voor de lezer bij een correctie (K4).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:krant': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:krant': { uitgeeft: ['krant.artikel'], ontvangt: [], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'media', naam: 'klacht-naar-redactie', laag: 'kern', ontbreekt: 'keten', k: 'K4', kaart: KAART_LIVA,
+  wat: 'een lezer meldt een fout en de redactie beslist met een reden' }
+```
+
+**Volledige werkzaamheid.** Lezers lezen hier volledig; de redactie publiceert en corrigeert hier. Buiten RTG blijft nodig: de schrijfomgeving van de redactie (vaak Word of Google Docs) en persbureaus voor bronnen.
 
 ---
 
@@ -1158,11 +1888,12 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 | # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
 |---|---|---|---|---|---|---|
 | S1 | Avond plannen met uitnodigingen in de Agenda | L6 | ontbreekt | De gastheer plant een avond. De genodigden krijgen een agendaverwijzing. De potjes van die avond hangen eraan. | M | A later |
-| S2 | Melden en blokkeren in de spelchat | L2 | onbekend | Spelchat heeft melden en blokkeren (de PEGI-grens). Ontbreekt dat, dan geen vrije chat. | K | **A nu** (eerst meten) |
+| S2 | Melden en blokkeren in de spelchat | L2 | onbekend | Spelchat heeft melden en blokkeren. Ontbreekt dat, dan gaat de meting als besluit naar de eigenaar (de PEGI-regel is te controleren en stuurt zelf niets). | K | **A nu** (eerst meten) |
 | S3 | Geen lootboxen of geldprijzen | — | bestaat (niet gebouwd) | Een toets die vastlegt dat geen spelroute geld uitkeert of een willekeurige betaalde beloning geeft. | K | **A nu** |
 
 ### g. Prioritering
-- **A nu:** S2, S3.
+- **HERSTEL:** geen gemeten fout.
+- **VERDIEPING (wacht op het akkoord per familie):** S2 (eerst meten), S3.
 - **A later:** S1.
 
 ### Keten "spelavond"
@@ -1173,6 +1904,39 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 5. Afsluiten.
 
 **Storing:** de tv valt weg: het potje gaat door op de telefoon, en opnieuw koppelen kan met een nieuwe code.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** koppelen met een tv-code en kijken (`/api/projectie/koppel`, `/kijk`).
+- **Noodzakelijke platformdiensten:**
+  - account van de speler;
+  - een lopend spel (Spelen, LivingOS-B). Geen spel: "Start eerst een spel op je telefoon."
+- **Optionele koppelingen:**
+  - Agenda (S1);
+  - Rahul via de lokaal-eerst-keten. Zonder model: vaste tips (bestaat).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:spelavond': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:spelavond': { uitgeeft: [], ontvangt: ['spel.potje'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'spel', naam: 'avond-naar-agenda', laag: 'scherm', ontbreekt: 'keten', k: 'S1', kaart: KAART_LIVA,
+  wat: 'een geplande spelavond staat als verwijzing in de agenda van de genodigden' }
+```
+
+**Volledige werkzaamheid.** Spelers doen hier alles wat een spelavond vraagt. Buiten RTG blijft nodig: een browser op de tv of een cast-toestel.
 
 ---
 
@@ -1213,7 +1977,8 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 | C5 | Spraak lokaal | L1 | fout tegen de huisregel, gemeld | Spraaksturing gaat via de lokale spraakroute (meeluister) of staat uit. De browser-cloud is niet de standaard. Besluit Centraal 19 oktober: aanbevolen nu, nog niet omgebouwd. Ook 'bewaren' is alleen een download. | M | aanbevolen nu |
 
 ### g. Prioritering
-- **A nu:** C2 (K), C1 en C5 (M).
+- **HERSTEL:** C5 (spraak via de browsercloud; besluit Centraal: melden, niet ombouwen) en de teksten "Opgeslagen op volle resolutie" en "Deze mag de Salon in" (`camera.html:417, :592`) terwijl opslaan een download is en er geen Salon-route is.
+- **VERDIEPING (wacht op het akkoord per familie):** C2, C1.
 - **A later:** C3, C4.
 
 ### Keten "foto voor de Salon"
@@ -1223,6 +1988,40 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 4. Plaatsen in de Salon (C3).
 
 **Storing:** kluis uit: een download met de melding; de Salon krijgt niets zonder bestand.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** zoeker, standen, Studio en downloaden (`camera.html`, route alleen `/api/fluister`).
+- **Noodzakelijke platformdiensten:**
+  - toestemming voor de camera in de browser. Geweigerd: de oorzaak (bestaat).
+- **Optionele koppelingen:**
+  - de kluis (C1). Uit: "Bewaren in de kluis kan nu niet; download de foto.";
+  - de Salon (C3), spraaksturing (C5).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:camera': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:camera': { uitgeeft: ['bestand'], ontvangt: [], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'media', naam: 'foto-naar-kluis', laag: 'scherm', ontbreekt: 'keten', k: 'C1', kaart: KAART_LIVA,
+  wat: 'bewaren zet de foto versleuteld in docs.bestanden' },
+{ familie: 'media', naam: 'foto-naar-salon', laag: 'scherm', ontbreekt: 'keten', k: 'C3', kaart: KAART_LIVA,
+  wat: 'de foto gaat als bestand-id naar het plaatsen van de Salon (LivingOS-B)' }
+```
+
+**Volledige werkzaamheid.** Het lid maakt en werkt hier foto's af. Buiten RTG blijft nodig: de camera-app van het toestel voor RAW, en Lightroom voor professioneel werk.
 
 ---
 
@@ -1262,7 +2061,8 @@ Een zaakbibliotheek met kijkplicht voor medewerkers, en het Thuisarchief rechtst
 Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens op naam, met een echte toegankelijkheidsmeting, en het lid kan zelf intrekken.
 
 ### g. Prioritering
-- **A nu:** D2 (K) en D1 (M).
+- **HERSTEL:** D1 (het doel belooft genomen apps en intrekken; de routes bestaan, het scherm gebruikt ze niet).
+- **VERDIEPING (wacht op het akkoord per familie):** D2.
 - **A later:** D3, D4, D5.
 
 ### Keten "ik stop met een app"
@@ -1274,70 +2074,54 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 
 **Storing:** de app-dienst is uit: intrekken werkt toch, want de machtiging staat bij RTG en niet bij de app.
 
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** het dossier van een app en het kanaal lezen (`/api/appstore/dossier`, `/kanaal`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - het register van de App Store.
+- **Optionele koppelingen:**
+  - de routes voor intrekken en vernietigen (`/api/appstore/mijn`, `/weg`, `/tijdlijn`, `/vernietig`), zodra het scherm ze aanroept (D1).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:appdossier': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:appdossier': { uitgeeft: [], ontvangt: ['app'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'appstore', naam: 'intrekken-op-dossier', laag: 'scherm', ontbreekt: 'keten', k: 'D1', kaart: KAART_LIVA,
+  wat: 'het dossierscherm trekt een machtiging in, en de app krijgt daarna 403' }
+```
+
+**Volledige werkzaamheid.** Het lid ziet hier wat een app van hem heeft. Buiten RTG blijft nodig: de instellingen van Apple of Google voor apps buiten RTG.
+
 ---
 
-## 16. Logeren bij leden (`link:huis` → thuis.html, eigenaar `verblijf.logeren-bij-leden`)
+## 16. Logeren bij leden (`link:huis` → thuis.html): verwijzing naar TravelOS
 
-**Productindeling.** Het eigenaarsbesluit van 19 oktober zet Logeren in de productindeling onder TravelOS. Het eigenaarschap blijft hier.
+**Waar de kaart staat.** Logeren valt in de productindeling onder TravelOS (eigenaarsbesluit van 19 oktober). De domeinkaart staat in `docs/domeinkaarten/travelos.md` par. 3.6, met de open vraag B5 (betalen via RTG en de uitbetaling aan de gastheer) in par. 5, de familie `reis` en de ONTBREKEND-regel `logeren-naar-agenda` in `scripts/lib/appcontract.js`. Hier staat geen tweede kaart, om te voorkomen dat er twee lezingen van hetzelfde product ontstaan.
 
-**Doel.** Een lid zet zijn huis open voor andere leden. Een ander lid vindt het, vraagt aan, logeert en geeft een review. De host beslist, en betaald heet pas betaald.
+**Wat LivingOS-A hier op 19 oktober deed, op verzoek van Centraal:**
+- **c597f7916:** de teksten van boeking, hostbord, hostformulier en annuleren beloven geen betaling meer. De uitbetaling heeft de status `buiten-rtg`. Toets: `test/thuis-betaaltekst.test.js`.
+- **e8e70ca70:** het doel in SCHERMEIGENAAR.json beschrijft logeren bij leden. Toets: `test/schermeigenaar-doelen-livinga.test.js`.
 
-### a. Inventaris
-- **Routes:** `/api/thuis/*` (zoek, detail, boek met idem, beslis, annuleer, checkin, checkuit, review, bericht, huis met idem, cohost, prijsadvies, zakelijk).
-- **Statussen:** aangevraagd of bevestigd (instant), afgewezen, geannuleerd, ingecheckt en uitgecheckt.
-- **Deurcode:** alleen voor de gast, vanaf 3 dagen vóór aankomst.
-- **Bewezen:** voltooiproef `huis.js` (herhaalsleutels op boek en huis gerepareerd).
-- **Gaten:**
-  - SCHERMEIGENAAR r.2510 beschrijft een ander product ("woning-gerelateerde diensten");
-  - de boeking zegt "betaling loopt via RTG Pay bij bevestiging", maar `beslis` zet alleen de status;
-  - `terugPct` wordt alleen vastgelegd, er gaat geen geld terug;
-  - de uitbetaling blijft "gepland";
-  - de host krijgt geen melding van een aanvraag.
+Daarmee zijn twee van de vier NU-regels uit travelos.md 3.6 af: de betaaltekst en het doel. De gekeurde identiteit en de projectie in agenda, reis en Move blijven bij TravelOS.
 
-### b. Markt
-| Aanbieder | Topfunctie | Prijs en bron |
-|---|---|---|
-| Airbnb Luxe | gekeurd huis, een vaste Trip Designer | host-fee 15,5% ([Airbnb](https://www.airbnb.ca/help/article/3301); het Luxe-tarief is na te gaan) |
-| Plum Guide | gecureerd | 16,5% host-only, of 3% plus 12% voor de gast, plus €300 onboarding ([Plum Guide](https://help.plumguide.com/en/articles/4684372-plum-guide-fees)) |
-| Booking.com / Vrbo | groot bereik | 15-18% / 5% plus 3% (na te gaan) |
-
-### c. Domein
-- **Wet toeristische verhuur van woonruimte:** de gemeente kan een registratienummer, een meldplicht en een nachtenplafond eisen. Boetes tot €8.700 en €21.750 ([Volkshuisvesting](https://www.volkshuisvestingnederland.nl/onderwerpen/toeristische-verhuur/veelgestelde-vragen-toeristische-verhuur)).
-- **EU-verordening 2024/1028 (sinds 20 mei 2026):** registratie en een plicht voor platforms om gegevens te delen ([kamerstuk 36904](https://zoek.officielebekendmakingen.nl/kst-36904-3.pdf)).
-- **Toeristenbelasting (Gemeentewet art. 224):** de verhuurder is plichtig en houdt een nachtregister bij.
-- **Nepreviews:** verboden sinds 28 mei 2022 ([ACM](https://www.acm.nl/nl/publicaties/acm-pakt-handel-nepreviews-en-neplikes-aan)).
-
-### d. Catalogus
-| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
-|---|---|---|---|---|---|---|
-| H1 | Betalen via betaalWaarheid na bevestiging | L6 | ontbreekt (alleen tekst) | Na de bevestiging van de host betaalt de gast via betaalWaarheid (soort `thuis-boeking`). Zonder bevestigde betaling geen deurcode en geen check-in. Bij een weigering volgt "niet betaald". | M | **A nu** (met Geld) |
-| H2 | Annuleren met echte terugbetaling | L5 | ontbreekt (`terugPct` registratief) | Annuleren volgens het beleid start `terugbetalen`. Het scherm zegt pas "terugbetaald" als dat bevestigd is. | M | A nu, na H1 |
-| H3 | Melding aan de host bij een aanvraag | L1 | ontbreekt | Elke aanvraag geeft de host een melding met de datums. Een tweede aanvraag met dezelfde sleutel geeft geen tweede melding. | K | **A nu** |
-| H4 | Registratienummer en nachtenteller | L2 | ontbreekt | De host vult het registratienummer van zijn gemeente in. Zonder nummer gaat het huis niet live, als de gemeente het eist (vastgelegd door de host, RTG valideert niet). De teller toont de nachten per jaar. Boven het plafond dat de host opgaf, sluit de kalender. | M | A later |
-| H5 | Nachtregister en toeristenbelasting | L2/L6 | ontbreekt | Per verblijf een registerregel (nachten, gasten). De belasting wordt berekend als het tarief bekend is, met bron. Zonder tarief staat er "tarief niet ingevuld". | M | A later |
-| H6 | Uitbetaling aan de host | L6 | ontbreekt (gepland) | Na het uitchecken loopt de uitbetaling via Geld, die eigenaar is. Het scherm zegt "uitbetaald" pas als dat bevestigd is. | M | A later (Geld) |
-| H7 | SCHERMEIGENAAR-doel rechtzetten | — | fout (tekst) | Het doel beschrijft logeren bij leden. | K | **A nu** |
-| H8 | Gegevens delen met de overheid (2024/1028) | — | — | — | — | vraagt besluit (juridisch) |
-
-### g. Prioritering
-- **A nu:** H3, H7 (K) en H1 (M).
-- **Daarna:** H2.
-- **A later:** H4, H5, H6.
-- **Besluit:** H8.
-
-### Keten "een weekend logeren"
-1. Zoeken.
-2. Aanvragen; de host krijgt een melding (H3).
-3. Bevestigen.
-4. Betalen (H1).
-5. De deurcode komt 3 dagen vóór aankomst.
-6. Inchecken en uitchecken.
-7. Reviews.
-8. Uitbetaling (H6).
-
-**Storingen:**
-- Betaling geweigerd: geen deurcode, met de melding.
-- Geld uit: de boeking blijft "bevestigd, niet betaald".
+**Wat ik aan TravelOS overdraag (uit mijn eerdere inventaris, niet in travelos.md 3.6 gezien):**
+- De host krijgt geen melding van een aanvraag.
+- `terugPct` wordt alleen vastgelegd; er gaat geen geld terug.
+- De juridische punten: de registratieplicht en de nachtenteller (Wet toeristische verhuur), het nachtregister en de toeristenbelasting (Gemeentewet art. 224), en de gegevensplicht uit verordening 2024/1028. Al deze regels zijn "te controleren" (zie onderaan) en sturen geen weigerregel.
 
 ---
 
@@ -1379,7 +2163,8 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 | L4 | Doel in SCHERMEIGENAAR rechtzetten | — | fout (tekst) | Het doel beschrijft de lijn als projectie. | K | **A nu** |
 
 ### g. Prioritering
-- **A nu:** L1, L4.
+- **HERSTEL:** L4 is af (e8e70ca70).
+- **VERDIEPING (wacht op het akkoord per familie):** L1.
 - **A later:** L2, L3.
 
 ### Keten "mijn week"
@@ -1387,6 +2172,49 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 2. Leven toont ze, met de bron per item.
 
 **Storing:** een bron is uit: dat deel staat er niet, en het scherm noemt welke bron.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** de lijn en de cockpit tonen, alleen lezend (`/api/leven/lijn`, `/cockpit`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie;
+  - de bronnen zelf. Zonder bronnen is de lijn leeg, met "nog niets uit je apps".
+- **Optionele koppelingen:**
+  - een bron die uitvalt: "<app> nu niet te zien" (L1);
+  - de levensband voor delen; de mentor (model, terugval `spiegel()`).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:leven': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:leven': { uitgeeft: [], ontvangt: ['afspraak', 'woning.geschiedenis', 'reis'], ketens: [] }
+```
+
+FAMILIES:
+
+```js
+leven: { wat: 'het lid ziet zijn lijn uit de eigen apps, met de bron per regel, zonder dat een overzicht iets bezit',
+  kaart: 'docs/domeinkaarten/livingos-a.md' }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'leven', naam: 'woninggeschiedenis-naar-lijn', laag: 'kern', ontbreekt: 'keten', k: 'W20', kaart: KAART_LIVA,
+  wat: 'de woninggeschiedenis van Wonen staat als projectie op de lijn' },
+{ familie: 'leven', naam: 'deling-naar-vooruitzicht', laag: 'kern', ontbreekt: 'proef', kaart: KAART_LIVA,
+  wat: 'een deling van afspraken in Leven opent de partnerweergave van het Vooruitzicht; getoetst in test/instant-reality-partner.test.js, maar niet in een ketenregister',
+  bron: [{ bestand: 'server/routes/instant-reality.js', noemt: 'inzageMag' }] }
+```
+
+**Volledige werkzaamheid.** Het lid ziet hier zijn lijn; het werk zelf doet hij in de eigen apps. Buiten RTG blijft nodig: een dagboek als Day One voor wat niet uit een app komt.
 
 ---
 
@@ -1421,7 +2249,8 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 | Ce4 | AI-tekst eerlijk maken | — | fout (belofte) | De adviseur zegt niet "ik zet klaar" zolang Ce3 niet bestaat. | K | **A nu** |
 
 ### g. Prioritering
-- **A nu:** Ce1, Ce4.
+- **HERSTEL:** Ce4 (de adviseur belooft een fles te regelen zonder route).
+- **VERDIEPING (wacht op het akkoord per familie):** Ce1.
 - **A later:** Ce2, Ce3.
 
 ### Keten "een fles voor zaterdag"
@@ -1430,6 +2259,38 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 3. Inschenken telt af.
 
 **Storing:** model uit: een vaste tekst met `demo:true`.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** kelder bijhouden, schenken en advies (`/api/member/rechterhand/cellier/*`).
+- **Noodzakelijke platformdiensten:**
+  - account met Lifestyle of Business Pass.
+- **Optionele koppelingen:**
+  - een model. Uit: een vaste tekst met `demo:true` (bestaat);
+  - een wijnzaak (Ce3).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:cellier': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:cellier': { uitgeeft: ['cellier.fles'], ontvangt: [], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'leven', naam: 'fles-naar-zaak', laag: 'kern', ontbreekt: 'keten', k: 'Ce3', kaart: KAART_LIVA,
+  wat: 'een fles bestellen bij een gekeurde wijnzaak met 18+-controle' }
+```
+
+**Volledige werkzaamheid.** Het lid beheert hier zijn kelder. Buiten RTG blijft nodig: een wijnhandel voor aankoop en CellarTracker voor scores van critici.
 
 ---
 
@@ -1463,7 +2324,8 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 | Ga4 | Een menselijke stylist (Lifestyle-concierge) | L2 | ontbreekt | — | M | B, besluit (rol of genre) |
 
 ### g. Prioritering
-- **A nu:** Ga1.
+- **HERSTEL:** geen gemeten fout.
+- **VERDIEPING (wacht op het akkoord per familie):** Ga1.
 - **A later:** Ga2, Ga3.
 - **B:** Ga4.
 
@@ -1474,6 +2336,38 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 4. Terug in de garderobe.
 
 **Storing:** vakwerk uit: het stuk krijgt het label "herstel aangevraagd, status niet te zien".
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** stukken, vaklui als contact, en de stylist (`/api/member/rechterhand/garderobe/*`).
+- **Noodzakelijke platformdiensten:**
+  - account met Lifestyle of Business Pass.
+- **Optionele koppelingen:**
+  - een model voor de stylist. Uit: een vaste tekst;
+  - vakwerk (Ga2). Uit: "herstel aangevraagd, status niet te zien".
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:garderobe': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:garderobe': { uitgeeft: ['garderobe.stuk'], ontvangt: ['vak.werkbon'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'leven', naam: 'stuk-naar-vakman', laag: 'kern', ontbreekt: 'keten', k: 'Ga2', kaart: KAART_LIVA,
+  wat: 'een offerte bij een kleermaker of schoenmaker met een verwijzing naar het stuk' }
+```
+
+**Volledige werkzaamheid.** Het lid beheert hier zijn garderobe. Buiten RTG blijft nodig: de telefoon met de kleermaker, zolang Ga2 niet bestaat.
 
 ---
 
@@ -1504,13 +2398,14 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 ### d. Catalogus
 | # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
 |---|---|---|---|---|---|---|
-| M1 | Dagen per medewerker met de grens van de regeling | L2 | ontbreekt | Per medewerker de dagen per week. Bij 4 of meer staat er "geen dienstverlening aan huis meer: gewoon werkgeverschap", met de bron, als uitleg en niet als oordeel. | K | **A nu** |
+| M1 | Dagen per medewerker met de grens van de regeling | L2 | ontbreekt | Per medewerker de dagen per week. Bij 4 of meer staat er "volgens de regeling (te controleren) is dit gewoon werkgeverschap", met de bron, als uitleg en niet als oordeel. | K | **A nu** |
 | M2 | Taak voor een medewerker die zelf RTG-lid is | L3/L6 | ontbreekt | Is de medewerker lid en gekoppeld met zijn toestemming, dan ziet hij zijn taken en vinkt hij ze af. Een niet-lid blijft een notitie. | M | A later |
 | M3 | Huishoudhandboek | L1 | ontbreekt | Vaste routines per ruimte (verwijzing naar Wonen W1). Een document te delen met nieuw personeel, met een einddatum. | M | A later |
 | M4 | Loon via Geld (wbw of Pay) | L6 | ontbreekt | — | M | B, eigenaar Geld; werkgeverschap vraagt een besluit |
 
 ### g. Prioritering
-- **A nu:** M1.
+- **HERSTEL:** geen gemeten fout; het label "Vraag de huismeester" (`maison.html:86`) is een AI-adviseur, en de kaart noemt dat zo.
+- **VERDIEPING (wacht op het akkoord per familie):** M1.
 - **A later:** M2, M3.
 - **B:** M4.
 
@@ -1521,6 +2416,41 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 4. Het onderhoud van een installatie gaat als verwijzing naar Wonen.
 
 **Storing:** Wonen uit: de taak blijft staan zonder de installatiekoppeling.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** staf, taken, taak klaar, log en advies (`/api/member/rechterhand/maison/*`).
+- **Noodzakelijke platformdiensten:**
+  - account met Lifestyle of Business Pass.
+- **Optionele koppelingen:**
+  - een model. Uit: een vaste tekst;
+  - Wonen (installaties, M3). Uit: de taak blijft zonder installatiekoppeling;
+  - Geld (M4).
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:maison': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:maison': { uitgeeft: ['maison.taak'], ontvangt: ['woning.installatie'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'huishouden', naam: 'taak-naar-medewerker', laag: 'kern', ontbreekt: 'keten', k: 'M2', kaart: KAART_LIVA,
+  wat: 'een medewerker die lid is ziet zijn taken en vinkt ze af' },
+{ familie: 'wonen', naam: 'taak-naar-installatie', laag: 'kern', ontbreekt: 'keten', k: 'M3', kaart: KAART_LIVA,
+  wat: 'een onderhoudstaak verwijst naar een installatie in Wonen' }
+```
+
+**Volledige werkzaamheid.** Het lid plant hier het huishouden. Het personeel ontvangt hier niets. Daarvoor blijft nodig: WhatsApp met het personeel en een loonadministratie (wbw) zolang M2 en M4 niet bestaan.
 
 ---
 
@@ -1561,7 +2491,8 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 | E5 | Band "dienstverlener" | L1 | ontbreekt | De band bestaat, zonder documenten. | K | A later |
 
 ### g. Prioritering
-- **A nu:** E2, E3 (K) en E1 (M).
+- **HERSTEL:** het doel in SCHERMEIGENAAR.json:1062 noemt "dienstverleners" terwijl die band niet bestaat (E5 of de doeltekst).
+- **VERDIEPING (wacht op het akkoord per familie):** E1, E2, E3.
 - **A later:** E4, E5.
 
 ### Keten "met z'n vieren naar New York"
@@ -1572,6 +2503,38 @@ Apple en Google laten de maker het label zelf invullen. Bij RTG keurt een mens o
 5. Gereed.
 
 **Storing:** TravelOS uit: de toets gebruikt de datum die het lid zelf invult, en zegt dat.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** personen, documenten en een gezelschap (`/api/member/rechterhand/entourage/*`).
+- **Noodzakelijke platformdiensten:**
+  - account met Lifestyle of Business Pass.
+- **Optionele koppelingen:**
+  - een reis uit TravelOS (E1). Uit: de toets gebruikt de datum die het lid invult, en zegt dat;
+  - een model.
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:entourage': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:entourage': { uitgeeft: [], ontvangt: ['reis'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'reis', naam: 'reis-naar-gezelschap', laag: 'scherm', ontbreekt: 'keten', k: 'E1', kaart: KAART_LIVA,
+  wat: 'een reis uit /apps/reizen.html (die de soort reis al uitgeeft) is de datum waartegen het gezelschap de documenten toetst' }
+```
+
+**Volledige werkzaamheid.** Het lid houdt hier zijn gezelschap reisklaar. Buiten RTG blijft nodig: de gemeente voor een paspoort, visumportalen en straks ETIAS.
 
 ---
 
@@ -1606,20 +2569,83 @@ Een consumentenproduct met scenario's (ideaal, waarschijnlijk, verstoring) is **
 - **Richtlijn consumentenrechten art. 22:** geen afgeleide extra betalingen en geen vooraf aangevinkte vakjes.
 - **Pakketreisrichtlijn:** een gekoppeld reisarrangement vraagt informatie vooraf.
 
-### d. Catalogus
-| # | Functie | Laag | Status | Acceptatiecriterium | K | Bak |
-|---|---|---|---|---|---|---|
-| Vz1 | Klaarzetten is een voorstel in de eigenaar-app | L6 | ontbreekt | "Klaarzetten" maakt in Agenda, Geld en reis alleen een concept of voorstel, met een verwijzing naar de intentie. Niets is bindend of betaald tot het lid het in die app bevestigt. Er zijn geen vooraf aangevinkte keuzes. | M | **A nu** |
-| Vz2 | Drie werelden zonder kansen | L4 | half | De werelden tonen gevolgen, geen percentages. Elk gevolg noemt zijn bron (een app) of "aanname van het lid". | K | **A nu** |
-| Vz3 | Vrienden-toestemming afdwingen | L3 | fout (niet afgedwongen) | `permissions.friends` bepaalt wie de intentie ziet. Een niet-genoemde vriend krijgt 403. | K | **A nu** |
-| Vz4 | `/partner` laat de echte partner zien | L3 | fout | Met een levensband-akkoord ziet de partner de gedeelde intentie, en zonder akkoord niets. | M | A later |
-| Vz5 | Verstoring van een provider (vlucht vertraagd) | L6 | ontbreekt (geen providerroute) | — | G | B: providerroute met handtekening (TravelOS) |
+### d. Catalogus, volledig formaat
+
+Dezelfde acht velden als Wonen 1d. De acceptatie wordt een stap in `scripts/lib/voltooi/vooruitzicht.js` of een toets naast `test/instant-reality-partner.test.js`. Het Vooruitzicht bezit alleen de intentie en haar gebeurtenissen (`kern/instant-reality.js`, eigencollectie `instantReality`). Alles wat het toont van agenda, geld, reis, bureau en veiligheid leest het scherm bij de eigenaar (`living-os-data.js`: `/api/agenda/bereik`, `/api/geld/cockpit`, `/api/reis/wereld`, `/api/member/bureau/*`, `/api/veiligheid/moment`).
+
+**Vz1 · Vrijgeven wordt een voorstel in de eigenaar-app · L6 · ontbreekt · M · VERDIEPING**
+- **Gegevens en bron:** de intentie (`intent`, hooguit 300 tekens) en de gebeurtenis `preparation.authorized`, die alleen `state:'prepared'` zet.
+- **Regel:** "Voorbereiding vrijgeven" maakt vandaag in geen enkele andere app iets, en het scherm zegt dat ook eerlijk ("VOORBEREIDING VRIJGEGEVEN", providers "lokaal concept"; `living-os-view.js:30, :98`). Nagemeten: geen herstel nodig. De verdieping: vrijgeven maakt in Agenda, Geld en reis een concept met een verwijzing naar de intentie (`soort:'vooruitzicht.intentie'`). Niets is bindend of betaald tot het lid het in die app bevestigt.
+- **Rekenwijze:** —
+- **Onzekerheid:** een concept heet in elke app "voorstel uit het Vooruitzicht", nooit "gepland" of "gereserveerd".
+- **Wanneer iemand iets hoort:** het lid ziet per app "voorstel klaar" of "niet klaargezet: <app> nu niet bereikbaar".
+- **Rollen en toestemming:** alleen het lid. Geen vooraf aangevinkte keuzes (Richtlijn consumentenrechten art. 22; te controleren, zie onderaan).
+- **Uitzonderingen:** valt een app uit, dan gaat de rest door en noemt het scherm wat ontbreekt.
+- **Acceptatie:** na vrijgeven staat er in de agenda een concept met de verwijzing; zonder bevestiging in de agenda blijft het concept; Geld uit geeft "niet klaargezet" voor geld.
+
+**Vz2 · Drie werelden zonder kansen · L4 · half · K · VERDIEPING**
+- **Gegevens en bron:** de gekozen wereld (`ideal`, `likely`, `disruption`) en de bronnen van het scherm.
+- **Regel:** scenario's tonen gevolgen, geen percentages (scenariopraktijk; te controleren). Elk gevolg noemt zijn bron (een app) of "aanname van het lid".
+- **Rekenwijze:** geen kansberekening; een gevolg is een regel uit een bron of een invoer van het lid.
+- **Onzekerheid:** het scherm toont "GEEN AANNAMES" alleen als er geen aanname in staat; anders "1 aanname van u".
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** het lid.
+- **Uitzonderingen:** zonder bronnen toont elke wereld "nog geen route" (bestaat).
+- **Acceptatie:** geen tekst op het scherm bevat een percentage of het woord "kans"; elk gevolg heeft een bronlabel.
+
+**Vz3 · Vrienden-toestemming afdwingen · L3 · gerepareerd (2f7a65c58) · K · HERSTEL, af**
+- **Gegevens en bron:** `permissions.friends` met de bekende waarden `own_share` en `itinerary`, gezet met de gebeurtenis `permissions.friends`.
+- **Regel:** `itinerary` geeft de partner aankomstvenster en providers, `own_share` de betaalgarantie. Onbekende waarden vallen weg.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** de eigenaar zet; de partner kan het niet ruimer maken.
+- **Uitzonderingen:** —
+- **Acceptatie:** `test/instant-reality-partner.test.js`, toets 3.
+
+**Vz4 · `/partner` laat de echte partner zien · L3 · gerepareerd (2f7a65c58) · M · HERSTEL, af**
+- **Gegevens en bron:** de wereld van de eigenaar, in partnervorm (`instantPartnerVan`), zonder de intentie zelf.
+- **Regel:** met `van` alleen bij een bevestigde levensband en een deling van "afspraken" (`levensband.inzageMag`). Anders 403, ook voor een onbekende codenaam. Een lezing maakt geen wereld aan voor de eigenaar.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** de eigenaar deelt via Leven (`/api/leven/deel/zet`) en trekt in met `/deel/in`.
+- **Uitzonderingen:** zonder `van` is het de eigen voorvertoning.
+- **Acceptatie:** `test/instant-reality-partner.test.js`, vier toetsen.
+
+**Vz5 · Verstoring van een provider (vlucht vertraagd) · L6 · ontbreekt (geen providerroute) · G · B**
+Zie het B-proces hieronder.
+
+**Vz6 · Toestemming en partnerweergave op het scherm · L3 · ontbreekt · K · VERDIEPING**
+- **Gegevens en bron:** dezelfde als Vz3 en Vz4. `living-os.js` roept `/partner` en de gebeurtenis `permissions.friends` niet aan; de rij "Gegevensdeling" zegt altijd "Nog geen toestemming toegepast".
+- **Regel:** het lid kiest per stuk (reisplan, betaalgarantie) en ziet "zo ziet uw partner het".
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** het lid.
+- **Uitzonderingen:** zonder bevestigde levensband zegt het scherm "u deelt met niemand" en verwijst naar Leven.
+- **Acceptatie:** uitzetten van "reisplan" laat de providers verdwijnen uit de voorvertoning op het scherm.
+
+**Vz7 · Vragen en beslissen via het vraagveld · L4 · half (regex) · M · later**
+- **Gegevens en bron:** het vraagveld (`loInput`) en `/api/member/bureau/zaak/beslis`.
+- **Regel:** het vraagveld herkent nu met patronen; een vraag die het niet herkent, krijgt al "Deze vraag is niet uitgevoerd" (`living-os.js:137`), nooit een verzonnen antwoord. De verdieping: beslissen over een concreet voorstel van het bureau vanuit het vraagveld.
+- **Rekenwijze / Onzekerheid:** —
+- **Wanneer iemand iets hoort:** —
+- **Rollen:** het lid; een besluit buiten mandaat gaat naar een mens (Privékantoor).
+- **Uitzonderingen:** zonder model blijft de patroonherkenning.
+- **Acceptatie:** een onbekende vraag blijft "niet uitgevoerd"; een besluit verschijnt in het bureau van het lid.
+
+**B-proces Vz5: een echte verstoring van een provider.**
+1. **Provider (hotel, vervoerder; via TravelOS):** meldt een vertraging via een providerroute met handtekening. Die route bestaat niet; een gebeurtenis van het lid zelf krijgt 403 (bestaat).
+2. **TravelOS (eigenaar van de reis):** zet de vertraging in de reiswereld en geeft een verwijzing uit.
+3. **Vooruitzicht:** ontvangt de verwijzing, zet de wereld op "verstoring" en toont het nieuwe aankomstvenster met de bron.
+4. **Lid:** kiest een herstelvoorstel; het wordt een concept in de eigenaar-app (Vz1).
+5. **Partner (met deling):** ziet het nieuwe venster als `itinerary` gedeeld is.
+- **Nodig:** de providerroute en het handtekeningmodel (TravelOS en Geld), en een besluit welke provider mag melden.
 
 ### e. RTG-exclusief
 Eén intentie die zichtbaar wordt in de agenda, het geld, de reis en de veiligheid van dezelfde persoon, als voorstel in elke eigenaar-app. Er is geen centrale planner die iets bezit.
 
 ### g. Prioritering
-- **A nu:** Vz2, Vz3 (K) en Vz1 (M).
+- **HERSTEL:** Vz3 en Vz4 zijn af (2f7a65c58); nagemeten: het scherm zegt al eerlijk "voorbereiding vrijgegeven".
+- **VERDIEPING (wacht op het akkoord per familie):** Vz2, Vz6, Vz1.
 - **A later:** Vz4.
 - **B:** Vz5.
 
@@ -1631,6 +2657,40 @@ Eén intentie die zichtbaar wordt in de agenda, het geld, de reis en de veilighe
 5. Het lid bevestigt elk voorstel in de eigen app.
 
 **Storing:** Geld uit: dat deel staat er als "niet klaargezet". De rest gaat door.
+
+### i. LOS, SAMEN en volledige werkzaamheid
+
+**LOS.** Wat de app alleen doet, wat hij van het platform nodig heeft, en wat hij optioneel koppelt. Bij een dienst die uitvalt staat de schermtekst erbij; "(bestaat)" betekent dat het scherm hem vandaag al zo zegt.
+
+- **Eigen functies:** intentie, werelden, vrijgeven (`/api/instant-reality`, `/event`, `/partner`).
+- **Noodzakelijke platformdiensten:**
+  - account en sessie.
+- **Optionele koppelingen:**
+  - de acht bronnen van het scherm: bureau, Geld, reis, Agenda en Veiligheid. Een bron uit: "<bron> nu niet te zien";
+  - Leven (levensband) voor de partnerweergave.
+
+**SAMEN** in de velden van `scripts/lib/appcontract.js` (modus SAMEN, families en ONTBREKEND, op de tak `appwerkt/versheid`). Leeg is eerlijk "niet verbonden", nooit "bewezen".
+
+```js
+'link:vooruitzicht': { uitgeeft: [], ontvangt: [], ketens: [] }
+```
+
+Het doel, zodra de ketens met proef bestaan (een verklaring, nog geen uitslag):
+
+```js
+'link:vooruitzicht': { uitgeeft: ['vooruitzicht.intentie'], ontvangt: ['reis', 'afspraak'], ketens: [] }
+```
+
+ONTBREKEND:
+
+```js
+{ familie: 'leven', naam: 'intentie-naar-concept', laag: 'kern', ontbreekt: 'keten', k: 'Vz1', kaart: KAART_LIVA,
+  wat: 'vrijgeven maakt een concept in Agenda, Geld en reis met een verwijzing naar de intentie' },
+{ familie: 'reis', naam: 'verstoring-naar-vooruitzicht', laag: 'kern', ontbreekt: 'keten', k: 'Vz5', kaart: KAART_LIVA,
+  wat: 'een providerverstoring uit TravelOS zet de wereld op verstoring' }
+```
+
+**Volledige werkzaamheid.** Het lid denkt hier vooruit en geeft vrij. Uitvoeren gebeurt in de eigen apps, en buiten RTG bij hotel en vervoerder zolang er geen providerroute is (Vz5).
 
 ---
 
@@ -1648,6 +2708,25 @@ Eén intentie die zichtbaar wordt in de agenda, het geld, de reis en de veilighe
 - **Vonk:** geen fout, zie Vo4.
 - **Camera:** gemeld, niet omgebouwd (C5).
 
+**Herstel van de kaart na het oordeel "DEELS" (19 oktober, avond).**
+- Veilig, Gezin, Assets en het Vooruitzicht staan in het volledige formaat van Wonen 1d, met elke B als proces met stappen en rollen.
+- Logeren is een verwijzing naar travelos.md 3.6 geworden.
+- Elke app heeft een sectie i: LOS in drie groepen met schermtekst, SAMEN in de velden van appcontract.js met FAMILIES en ONTBREKEND, en een regel volledige werkzaamheid. Ik stel acht families voor: `wonen`, `veiligheid`, `gesprek`, `gezin`, `huishouden`, `ontmoeten`, `media` en `leven`; Assets valt onder `geld`, Entourage onder `reis`. Vandaag is geen enkele app van LivingOS-A verbonden.
+- "Aanbevolen nu" is overal gesplitst in HERSTEL en VERDIEPING.
+- Wets- en marktregels uit zoekfragmenten staan onderaan in "Te controleren". Ze sturen geen weigerregel en geen uitkomst `bepaald`. Twee criteria zijn daarop aangepast: Spelavond S2 en Maison M1.
+
+**Nieuw HERSTEL, gevonden bij het nameten (niets gebouwd):**
+- **Veilig V2:** het lid kan een alarm niet zelf afsluiten op het scherm (de route bestaat).
+- **Veilig V5:** `safety.incident.started` wordt gelezen en verklaard, maar nergens gepubliceerd.
+- **Veilig V10:** een mislukte e-mail telt in de bevestiging toch als gewaarschuwd.
+- **Assets A4:** de melding na het boeken belooft "het team neemt vooraf contact op" zonder taak.
+- **Assets A8:** een open uitbetaling (sinds 5e04dc5b6 vastgelegd) heeft nog geen kantoorscherm.
+- **Camera:** "Opgeslagen op volle resolutie" en "Deze mag de Salon in" bij een download zonder Salon-route.
+- **App-dossier D1:** de routes voor intrekken bestaan, het scherm roept ze niet aan.
+- **Entourage:** het doel noemt "dienstverleners", de band bestaat niet.
+- **Gezin G7 (vraag, geen herstel):** elke gekoppelde gast ziet de precieze plek van elk gezinslid dat zijn plek deelt, ook buiten een oppasbeurt. Dat is aan het gezin en FoundationOS.
+- **Nagemeten, geen fout:** het Vooruitzicht zegt al eerlijk "voorbereiding vrijgegeven".
+
 **Fouten in de code, gevonden met de inventaris** (de oorspronkelijke lijst):
 - **Bellen:** het signaal `tekst` geeft 400 en de fout wordt geslikt.
 - **Gezin:** alleen het eerste gezin, `g[0]`.
@@ -1662,8 +2741,60 @@ Eén intentie die zichtbaar wordt in de agenda, het geld, de reis en de veilighe
 - **Vooruitzicht:** de vriendentoestemming en `/partner` werken niet zoals beloofd.
 - **SCHERMEIGENAAR-doelen kloppen niet:** Logeren r.2510, Leven r.1884, en onderhoud r.2146 (Wonen W3).
 
-**Juridisch, vraagt besluit:**
+**Juridisch, vraagt besluit** (alle regels hieronder zijn "te controleren"):
 - **Assets:** een verbod op vooruitbetaling binnen de bedenktijd, als de timesharerichtlijn van toepassing is. Daarnaast de prospectusvrijstelling en het beleggingsobject.
 - **Podium en Theater:** PSD2 voor cadeaus en betaalde abonnementen; de CvdM-registratie.
 - **Logeren:** de gegevensplicht uit verordening 2024/1028.
 - **Bestellen:** alcohol, als dat verkocht wordt.
+
+---
+
+## Te controleren: wets- en marktregels uit zoekfragmenten
+
+Elke regel hieronder heb ik gevonden met een zoekopdracht op 19 oktober 2026. Ik heb de wettekst of de officiële bron niet zelf volledig gelezen, of de bron is secundair. Daarom geldt voor elke regel:
+- hij krijgt het label **te controleren**;
+- hij stuurt **geen weigerregel**: een scherm weigert niets omdat deze regel het zou eisen;
+- hij levert **nooit de klasse `bepaald`** (`kern/fiscaal/zekerheid.js`). Hooguit `uitlegbaar`, en dan als uitleg met de bron erbij.
+
+Waar een scherm wél iets weigert, is dat een **huisregel van RTG** die zelf in de code staat (`volwassen()`, `progressieMag`, de bevoegdheidspoorten). Het scherm noemt dan de huisregel en geen wetsartikel.
+
+| Regel | Bron (soort) | Gebruikt in | Mag | Mag niet |
+|---|---|---|---|---|
+| Rookmelder op elke verdieping in de vluchtroute (Bouwbesluit 2012 art. 6.21 lid 6) | makelaar (secundair) | Wonen W18 | uitleg "volgens de regel hoort hier een rookmelder" | een woning afkeuren |
+| Gasinstallatie eens per 2 jaar laten controleren | Rijksoverheid, advies | Wonen W2 | een adviesdatum met bron | een datum als "verplicht" tonen |
+| Energielabel 10 jaar geldig | Rijksoverheid | Wonen W11 | "geldig tot" als uitleg | een verkoopketen tegenhouden |
+| Alleen CO-vrij gecertificeerde bedrijven aan cv-ketels (sinds april 2023) | consumentenbron | Wonen 1e.2 | een vakbewijs als keuze van het lid | een zaak weigeren zonder besluit over de persoonseis |
+| Besluit kleine herstellingen (BW 7:240), herstelplicht verhuurder (BW 7:206) | juridische blog, Staatsblad | Wonen W4 | uitleg wie wat herstelt; het contract gaat voor | een oordeel over wie betaalt |
+| Waarborgsom hooguit 2x de kale huur, terug binnen 14 dagen (Wet goed verhuurderschap) | Aedes, Omgevingsweb | Wonen W22 | markering | een contract weigeren |
+| VvE-reserve 0,5% van de herbouwwaarde of een MJOP | Eerste Kamer | Wonen W23 | markering | een VvE afkeuren |
+| Consumentendossier bij oplevering (BW 7:757a, Wkb) | Kiwa | Wonen W12 | "opgeleverd zonder dossier" vraagt een uitdrukkelijke keuze van het lid | opleveren blokkeren |
+| Zonnepanelen bouwtechnisch vergunningvrij (Bbl art. 2.27) | IPLO | Wonen W10 | verwijzen naar de Vergunningcheck | een vergunning beloven of uitsluiten |
+| Alarmcentrales gecertificeerd volgens EN 50518 | Kiwa | Veilig V9 | uitleggen dat RTG geen alarmcentrale is | — |
+| 112-plicht geldt voor telecomaanbieders, niet voor app-spraak | ACM | Veilig V4, Bellen Be3 | de 112-wegwijzer met `tel:112` | — |
+| Toestemming van de ouder onder 16 (AVG art. 8) | tekstsite | Gezin | uitleg | een koppeling weigeren |
+| VOG en Personenregister voor gastouders (Wet kinderopvang); geen VOG-plicht gevonden voor een particuliere oppas | kamerstuk; zoekresultaat | Gezin G4 | een wens van de ouder | een oppas weigeren zonder de persoonseis uit G4 |
+| Timeshare: 14 dagen bedenktijd en een verbod op vooruitbetaling (BW 7:50a e.v., 7:50i) | kamerstuk | Assets A1, A2 | de vraag aan de jurist | betalen blokkeren vóór het besluit A1 |
+| Prospectusvrijstelling tot €12M, Wft-vergunning voor een beleggingsobject | AFM-rapport; bron uit 2014 | Assets A1 | de vraag aan de jurist | een uitkomst `bepaald` |
+| DSA art. 16, 17, 22 en 28 | wetteksten op een tekstsite, advocatenkantoor | Berichten B2, Vonk Vo3 | een meldproces met motivering | een automatische straf |
+| Opslaan op het toestel alleen met toestemming (Telecommunicatiewet art. 11.7a) | — | Berichten | uitleg | — |
+| MDR regel 11 en MDCG 2019-11: informatie voor diagnose is minstens klasse IIa | samenvattingssite | Vandaag Va3, Va6 | de grens "opslaan en tonen, nooit beoordelen" | — |
+| Alcohol op afstand: leeftijd vóór aankoop en bij aflevering (Alcoholwet art. 20 en 20a) | Ondernemersplein, CBL | Bestellen Bs3, Cellier Ce3 | `volwassen()` als **huisregel** van RTG, met de tekst "RTG verkoopt alcohol alleen aan leden van 18 jaar en ouder" | "wettelijk verplicht" op het scherm |
+| 14 allergenen vóór de aankoop (EU 1169/2011) | — | Bestellen Bs2 | "niet opgegeven door de zaak" | "geen allergenen" |
+| Geen herroeping bij snel bederfelijke waar (BW 6:230p) | secundair | Bestellen | uitleg | annuleren weigeren op grond van deze regel |
+| Registratie bij het CvdM, Kijkwijzer (NICAM) | na te gaan | Theater T1, T5 | de leeftijd die de **maker** kiest, als huisregel | een registratieplicht vaststellen |
+| Ondertitels doorgeven (European Accessibility Act) | advocatenkantoor | Theater T3 | doel | — |
+| Vloggers: registratie bij 500.000 volgers en 24 video's per jaar | advocatenkantoor (2022) | Podium | uitleg | een kanaal weigeren |
+| PSD2: een platform dat gelden doorbetaalt heeft een vergunning nodig | DNB | Podium P5, Theater T4 | de vraag aan Geld en de jurist | een uitkomst `bepaald` |
+| Rectificatie (BW 6:167), Leidraad van de Raad voor de Journalistiek | advocatenkantoor; Leidraad 2019 | Krant K1 | uitleg | — |
+| Betaalde lootboxen PEGI 16, vrije chat zonder melden of blokkeren PEGI 18 (vanaf juni 2026) | advocatenkantoor | Spelavond S2, S3 | meten; de uitkomst gaat als besluit naar de eigenaar | vrije chat uitzetten op grond van deze regel |
+| Portretrecht (Auteurswet art. 21) | advocatenkantoor | Camera C4 | een vraag "heeft de persoon toestemming?" | iets blokkeren |
+| DMA art. 6(4), AVG art. 28, ISO 27001 A.5.19-5.23, toegankelijkheidsverklaring (EAA) | diverse | App-dossier D3, D4 | wat het kantoor vastlegde tonen | een app weigeren |
+| Wet toeristische verhuur, verordening 2024/1028, toeristenbelasting (Gemeentewet art. 224), nepreviews | Volkshuisvesting, kamerstuk, ACM | Logeren (nu TravelOS 3.6) | uitleg | een huis offline halen |
+| Dataportabiliteit (AVG art. 20), geautomatiseerd besluit (AVG art. 22, UAVG art. 40), EMCC-code | Eerste Kamer, EMCC | Leven L2, L3 | de mentor beslist nooit | — |
+| Bewaren van wijn (12-14°C), accijnsvrij meebrengen (richtwaarde 90 liter) | secundair | Cellier | uitleg | — |
+| Onderhoudssymbolen (ISO 3758:2023), UPV textiel | ISO, consultatie | Garderobe Ga1, Ga3 | uitleg | — |
+| Regeling dienstverlening aan huis: minder dan 4 dagen per week | Rijksoverheid | Maison M1 | uitleg "volgens de regeling (te controleren) is dit bij 4 dagen of meer gewoon werkgeverschap" | een uitkomst `bepaald` over werkgeverschap |
+| Paspoort 3 maanden na vertrek (Schengengrenscode art. 6), vaak 6 maanden; ETIAS; toestemmingsformulier voor een minderjarige; informatieplicht derden (AVG art. 14) | Rijksoverheid, Commissie | Entourage E1, E2, E3 | uitleg met "check de eisen van het land" | een reis "niet gereed" noemen op grond van een landregel |
+| Geen vooraf aangevinkte vakjes (Richtlijn consumentenrechten art. 22); menselijke tussenkomst (AVG art. 22); informatie vooraf bij een gekoppeld reisarrangement | — | Vooruitzicht Vz1 | ontwerpregel: niets vooraf aangevinkt | — |
+| Scenario's zonder kansen (scenariopraktijk Oxford en Shell) | MIT Sloan | Vooruitzicht Vz2 | ontwerpregel | — |
+| Alle prijzen in de markttabellen (b) | aanbieders, pers, verkopers | elke app | vergelijking | een eigen prijs of belofte afleiden |

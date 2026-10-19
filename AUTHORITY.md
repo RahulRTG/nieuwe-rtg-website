@@ -984,6 +984,42 @@ niet gebouwd -- de stand per onderdeel blijft in par. 4 en 5.
 
 ---
 
+## 7a. Gebruiken vraagt een account (eigenaarsbesluit 19 oktober 2026)
+
+**Iedereen moet ingelogd zijn om iets te gebruiken, met minimaal een gratis
+account.** "Minimaal": een functie mag meer vragen (een pas, een gekeurde
+identiteit, een rol), nooit minder. Een gastsessie zonder account bestaat buiten
+de demo niet. Uitgevoerd door de APPWERKT-agent Toegang; de doorlopende toets is
+de bezoekersvorm in `scripts/lib/doelgroepsessies.js`: een uitgelogde bezoeker
+bereikt buiten de uitzonderingen niets.
+
+Zeven uitzonderingen, elk met de reden in `scripts/lib/publiek.js`:
+
+1. inlog, registratie en wachtwoordherstel;
+2. de ballotage-intake vóór het account;
+3. de ondertekende webhooks van providers;
+4. de openbare landing met de paspagina's;
+5. de beschermingsdeur voor mensen in nood (`HDI.md` par. 7);
+6. machine-tot-machineverkeer met een eigen handtekening, en een tv of tweede
+   scherm dat koppelt met een eenmalige code van een ingelogd lid;
+7. wat de wet openbaar wil: de jaarverslagen van de RTFoundation (ANBI), en niets
+   daarnaast.
+
+Uitgewerkt op dezelfde dag:
+
+- Een kind of gastprofiel hangt aan het account van een ouder of eigenaar.
+- Een klant aan tafel, op een gastlink of bij een vacature maakt in het scherm
+  zelf snel een gratis account (`public/shared/accountdeur.js`) en gaat daarna
+  verder waar hij was.
+- Aannemen koppelt de nieuwe medewerker direct aan zijn account, zonder kassacode.
+- De codeportalen van de RTFoundation (partner, gemeente, ondernemer,
+  vrijwilliger, donateur, club, hulpvrager) vragen een account; de code koppelt
+  dat account aan het dossier. Een hulpvrager in acute nood gaat via de
+  beschermingsdeur.
+- Een politieke partij handelt via een account met een partijrol die het kantoor
+  koppelt; de partijsleutel is geen geloofsbrief meer. Dit vervangt het besluit
+  van 29 september 2026 dat de partij niet aan een RTG-account hangt.
+
 ## 8. Grenzen
 
 1. **De actor komt uit de sessie, nooit uit het verzoek.** Par. 0 vond zeven

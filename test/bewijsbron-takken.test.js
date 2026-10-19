@@ -303,6 +303,8 @@ test('een stand op een scherm koppelt op zijn eigen delen, en alleen als het sch
   assert.deepEqual([...stand.exact], ['/api/balans']);
   assert.equal(B.ingangVan('/apps/geld.html#balans', { bestanden: ['public/apps/ander.js'] }, opt), null,
     'een deel dat het scherm niet laadt geeft geen ingang');
-  const zonderHash = B.ingangVan('/apps/geld.html', { bestanden: ['public/apps/geld/balans.js'] }, opt);
-  assert.equal(zonderHash.exact.size, 3, 'zonder stand in de ingang wordt er niet versmald');
+  const zonderContract = B.ingangVan('/apps/geld.html', {}, opt);
+  assert.equal(zonderContract.exact.size, 3, 'zonder aangewezen delen wordt er niet versmald');
+  const eigenScherm = B.ingangVan('/apps/geld.html', { bestanden: ['public/apps/geld/bank.js'] }, opt);
+  assert.equal(eigenScherm.exact.size, 2, 'ook zonder stand mag een scherm zijn eigen delen aanwijzen (niet de schil)');
 });

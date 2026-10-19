@@ -138,12 +138,13 @@ function routesVanBestanden(bestanden, perBestand) {
 function ingangVan(ingang, c, opties = {}) {
   if (ingang && String(ingang).startsWith('/')) {
     const heel = ingangRoutes(ingang, opties);
-    /* EEN STAND OP EEN SCHERM (`/apps/geld.html#balans`): het scherm laadt de
-       delen van alle standen, dus zonder versmalling telt Balans de 113 routes
-       van het hele geldscherm. Het contract mag dan de delen van die stand
-       noemen -- maar alleen delen die het scherm echt laadt; anders is er geen
-       ingang en blijft het bewijs NIET_GETEST. */
-    if (!heel || !String(ingang).includes('#') || !c || !Array.isArray(c.bestanden) || !c.bestanden.length) return heel;
+    /* EEN SCHERM IS NIET ZIJN SCHIL, EN EEN STAND NIET ZIJN SCHERM. Het geldscherm
+       laadt de delen van alle standen (Balans telde zo 113 routes), en elk scherm
+       laadt de gedeelde schil (Rahul, de stroom, de gids). Het contract mag
+       daarom de delen noemen die DEZE ingang zelf tekenen -- maar alleen delen
+       die het scherm echt laadt; anders is er geen ingang en blijft het bewijs
+       NIET_GETEST. Bevoegd (scripts/bevoegdronde.js) blijft alle routes eisen. */
+    if (!heel || !c || !Array.isArray(c.bestanden) || !c.bestanden.length) return heel;
     if (!c.bestanden.every((b) => heel.bestanden.includes(b))) return null;
     const lees = opties.lees || leesStandaard;
     const sr = opties.schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');

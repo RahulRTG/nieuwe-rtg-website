@@ -28,7 +28,11 @@
    koppelcode met "Nieuwe koppelcode" op het kwestiekantoor, en laat een mens
    van de partij er zijn account mee koppelen. Zodra de laatste oude partij
    gekoppeld is, gaan de zes partijpaden uit scripts/lib/publiek.js en komen ze
-   achter `auth`; vanOudeSleutel kan dan weg. */
+   achter `auth`; vanOudeSleutel kan dan weg. De kantoorlijst telt hoeveel er
+   nog over zijn (`oudePartijen`). EINDDATUM 19 JANUARI 2027: daarna zakt
+   test/partijmigratie.test.js zolang de paden nog in publiek.js staan, zodat het
+   opruimen niet vergeten wordt (keuze van de integrator, 19 oktober 2026: een
+   teller op het kantoor plus een datum als vangnet). */
 'use strict';
 
 const { schoon } = require('../util');

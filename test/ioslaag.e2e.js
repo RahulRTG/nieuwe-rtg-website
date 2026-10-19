@@ -143,6 +143,19 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
 
     for (const pad of steek) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
+      /* Een scherm op het RTG Design System (TRAVELOS-MIGRATIE.md) heeft geen
+         iOS-laag en geen home-indicator: daar staat de ds-Edge. Het woordmerk
+         en de eyebrow blijven uit de chrome, net als op de andere schermen. */
+      if (await page.locator('html[data-ds]').count()) {
+        await page.waitForSelector('.ds-edge__balk');
+        const ds = await page.evaluate(() => ({
+          merk: document.querySelectorAll('.os-merk, .os-merk-logo, .osbar, .os-kick, img[alt="RTG"]').length,
+          eyInKop: document.querySelectorAll('body > header .ey, body > header .ds-label').length,
+          edge: document.querySelectorAll('.ds-edge').length
+        }));
+        assert.deepEqual(ds, { merk: 0, eyInKop: 0, edge: 1 }, pad + ': chrome van het Design System');
+        continue;
+      }
       await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         ios: document.body.hasAttribute('data-ios'),

@@ -42,13 +42,44 @@ test('Four editorial first visits: responsive, language, shared Edge and real fi
     }, reg.token);
     const page = await context.newPage(), errors = [];
     letOpFouten(page, errors);
+    /* Reisbureau staat op het RTG Design System (TRAVELOS-MIGRATIE.md): zijn
+       eerste bezoek is [data-rtg-first-steps] en de Edge is die van /ds/. */
+    const DS = new Set(['reisbureau']);
     async function open(app, first = true, suffix = '') {
       await page.goto(srv.base + '/apps/' + app + '.html' + suffix, { waitUntil: 'domcontentloaded' });
-      if (first) await page.waitForSelector('.rtg-first-steps');
-      if (!suffix) await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      if (first) await page.waitForSelector(DS.has(app) ? '[data-rtg-first-steps]' : '.rtg-first-steps');
+      if (DS.has(app)) await page.waitForSelector('.ds-edge__balk');
+      else if (!suffix) await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
       await page.evaluate(() => document.fonts.ready);
     }
-    for (const app of ['salon', 'genootschap', 'reisbureau', 'galerij']) {
+    /* Het eerste bezoek aan het reisbureau, op het Design System: dezelfde
+       eisen (echt beeld, een kop, één Edge, geen overloop, taal wisselt de
+       vorm en niet de handeling, rtl), met de ds-schil in plaats van de oude. */
+    {
+      await open('reisbureau');
+      await page.waitForFunction(() => [...document.querySelectorAll('[data-rtg-first-steps] img')].every(i => i.complete && i.naturalWidth > 0));
+      assert.equal(await page.locator('.ds-edge__balk').count(), 1);
+      assert.equal(await page.locator('[data-rtg-first-steps] .ds-status__titel').count(), 1);
+      assert.equal(await page.locator('.rtg-adaptive-bar,.rtg-reality-graph,.tos-module-hero,.rtg-suite-hero').count(), 0);
+      for (const width of [320, 390, 1440]) {
+        await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'reisbureau: no overflow at ' + width);
+      }
+      await page.setViewportSize({ width: 390, height: 844 });
+      const controls = await page.locator('[data-rtg-first-steps] [data-first-action]').evaluateAll(elements => elements.map(e => e.dataset.firstAction));
+      await page.evaluate(() => RTGi18n.set('en'));
+      await page.waitForFunction(() => /Where/.test(document.querySelector('[data-rtg-first-steps] .ds-status__titel').innerText));
+      assert.deepEqual(await page.locator('[data-rtg-first-steps] [data-first-action]').evaluateAll(elements => elements.map(e => e.dataset.firstAction)), controls, 'language changes presentation, not the action');
+      await page.evaluate(() => RTGi18n.set('nl'));
+      await page.evaluate(() => document.documentElement.dir = 'rtl');
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'reisbureau: RTL layout');
+      await page.evaluate(() => document.documentElement.dir = 'ltr');
+      if (process.env.RTG_FIRST_SCREENSHOTS) {
+        fs.mkdirSync(process.env.RTG_FIRST_SCREENSHOTS, { recursive: true });
+        await page.screenshot({ path: path.join(process.env.RTG_FIRST_SCREENSHOTS, 'reisbureau.png'), fullPage: true });
+      }
+    }
+    for (const app of ['salon', 'genootschap', 'galerij']) {
       await open(app);
       await page.waitForFunction(() => [...document.querySelectorAll('.rtg-first-steps img')].every(i => i.complete && i.naturalWidth > 0));
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);

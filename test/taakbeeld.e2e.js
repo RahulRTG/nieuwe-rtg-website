@@ -70,11 +70,17 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
     const ref = (await post(srv.base, '/api/reisbureau/boek', { tripId: reizen[0].id, personen: 6, vertrek: '2026-11-03' }, token)).body.aanvraag.ref;
 
     await page.addInitScript((t) => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
-    await page.goto(srv.base + '/apps/reisbureau.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
-    const rij = page.locator('.aanvraag[data-ref="' + ref + '"]');
-    await rij.waitFor({ timeout: 20000 });
+    /* Het reisbureau staat op het RTG Design System (TRAVELOS-MIGRATIE.md),
+       en de Rahul-tab met zijn werkstukken hoort bij de oude schil. Deze proef
+       gaat over die tab; hij draait daarom op een scherm dat hem nog heeft, en
+       het aanwijzen gebeurt met precies de aanroep die het reisbureau doet
+       (reisbureau-aanvragen.js, spreek()). Het aanwijzen op het reisbureau
+       zelf bewijzen test/contextbrug.e2e.js en test/reisbureau-ds.e2e.js. */
+    await page.goto(srv.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForFunction(() => !!window.RTGEdgeBlikveld && !!window.RTGRahulTabHelpers, null, { timeout: 20000 });
-    await rij.locator('h3').click();
+    await page.evaluate((r) => RTGAdaptief.context({ bron: 'reisbureau', titel: 'Mijn aanvragen',
+      object: { soort: 'reisaanvraag', id: r, label: r } }), ref);
+    assert.deepEqual((await page.evaluate(() => RTGEdgeBlikveld.voorRahul())).verwijzingen, [{ soort: 'reisaanvraag', id: ref }]);
 
     const tab = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
     await tab.waitFor({ timeout: 20000 });

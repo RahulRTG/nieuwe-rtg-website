@@ -32,7 +32,7 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
    await page.locator('.rtg-edge-group a[href="/apps/reisbureau.html"]:visible').click();
    await page.waitForURL('**/apps/werkruimte.html?gebied=reizen&open=reisbureau');
    app=await (await page.waitForSelector('iframe[src*="/apps/reisbureau.html"]:visible')).contentFrame();
-   await app.waitForSelector('body.rtg-edge-embed');
+   await app.waitForSelector('html[data-ds] #lijst [data-id]'); // reisbureau staat op het Design System (TRAVELOS-MIGRATIE.md)
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1,'één Edge rondom de geopende reisapp');
   }else{
    /* Desktop gebruikt dezelfde zichtbare Edge-route als telefoon. De oude
@@ -45,15 +45,15 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
    await page.locator('.rtg-edge-group a[href="/apps/reisbureau.html"]:visible').click();
    await page.waitForURL('**/apps/werkruimte.html?gebied=reizen&open=reisbureau');
    app=await (await page.waitForSelector('iframe[src*="/apps/reisbureau.html"]:visible')).contentFrame();
-   await app.waitForSelector('body.rtg-edge-embed');
+   await app.waitForSelector('html[data-ds] #lijst [data-id]'); // reisbureau staat op het Design System (TRAVELOS-MIGRATIE.md)
   }
-  await app.locator('.reis[data-id="ibiza-jetset"]').click();
+  await app.locator('#lijst [data-id="ibiza-jetset"]').click();
   const date=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   await app.locator('#rDatum').fill(date);await app.locator('#rPlus').click();
   await app.locator('#travelRemember').check();await app.locator('#rNotitie').fill('Wens blijft alleen in dit formulier');
-  await app.locator('#bladTerug').click();await app.locator('.reis[data-id="ibiza-jetset"]').click();
+  await app.locator('#bladTerug').click();await app.locator('#lijst [data-id="ibiza-jetset"]').click();
   assert.equal(await app.locator('#rDatum').inputValue(),date);assert.equal(await app.locator('#rAantal').textContent(),'3');
-  await app.goto(srv.base+'/apps/reisbureau.html');await app.locator('.reis[data-id="ibiza-jetset"]').click();
+  await app.goto(srv.base+'/apps/reisbureau.html');await app.locator('#lijst [data-id="ibiza-jetset"]').click();
   assert.equal(await app.locator('#rDatum').inputValue(),date);assert.equal(await app.locator('#rAantal').textContent(),'3');
   assert.equal(await app.locator('#rNotitie').inputValue(),'','vrije tekst wordt niet opgeslagen');
   let sends=0;
@@ -73,7 +73,7 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
   assert.match(await app.locator('#rStatus').textContent(),/nog niet bevestigd/);
   const rows=(await api('/api/reisbureau/mijn',{},token)).aanvragen;assert.equal(rows.length,1);const ref=rows[0].ref;
   assert.equal(rows[0].personen,3);assert.equal(rows[0].vertrek,date);
-  await app.waitForSelector('.aanvraag[data-ref="'+ref+'"]',{state:'attached'});
+  await app.waitForSelector('[data-aanvraag="'+ref+'"]',{state:'attached'});
   assert.equal(await app.evaluate(()=>JSON.parse(sessionStorage.getItem('rtg.intent.v1')).rows.filter(r=>r.purpose==='travel'&&r.status==='ACTIVE').length),0);
   await api('/api/office/reisbureau/besluit',{ref,besluit:'bevestigd',bericht:'Uw vertrek is bevestigd.'},office);
   await app.locator('#rTrips').click();

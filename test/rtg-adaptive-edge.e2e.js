@@ -368,14 +368,31 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
       return page;
     };
 
-    await t.test('reisboek: scrollTo zonder gebaar geeft geen peek', async (st) => {
-      const page = await edge2Pagina(st, '/apps/reisboek.html');
-      if (!page) return;
+    /* Reisboek staat sinds de TravelOS-migratie op het RTG Design System
+       (TRAVELOS-MIGRATIE.md): daar is de Edge die van /ds/, en die reageert
+       op geen enkele scroll. Het gedrag dat hier bewaakt wordt blijft: een
+       scroll van de software laat de balk niet flikkeren. Een lager venster
+       maakt de pagina zonder inlog scrolbaar, anders meet de proef niets. */
+    await t.test('reisboek: scrollTo zonder gebaar laat de Edge ongemoeid', async () => {
+      const page = await context.newPage();
       try {
-        const m = await volgBalk(page, 'scrollTo', 900);
-        assert.equal(m.edge2, true, 'op reisboek hoort Edge 2 te draaien');
+        await page.setViewportSize({ width: 390, height: 480 });
+        await page.goto(base + '/apps/reisboek.html', { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+        await page.waitForSelector('#inhoud .ds-status__titel');
+        const m = await page.evaluate(async () => {
+          const edge = document.querySelector('.ds-edge'), voor = edge.getBoundingClientRect().bottom;
+          let mutaties = 0;
+          const w = new MutationObserver((r) => { mutaties += r.length; });
+          w.observe(edge, { attributes: true, subtree: true, childList: true });
+          window.scrollTo(0, 900);
+          await new Promise((r) => setTimeout(r, 900));
+          w.disconnect();
+          return { y: window.scrollY, mutaties, voor, na: edge.getBoundingClientRect().bottom };
+        });
         assert.ok(m.y > 50, 'de pagina scrolde niet (' + m.y + '); dan meet deze proef niets');
-        assert.deepEqual(m.standen, ['dock'], 'de balk flikkerde bij een scroll van de software: ' + m.standen.join(' > '));
+        assert.equal(m.mutaties, 0, 'de Edge veranderde bij een scroll van de software');
+        assert.equal(m.na, m.voor, 'de Edge bewoog bij een scroll van de software');
       } finally { await page.close(); }
     });
 

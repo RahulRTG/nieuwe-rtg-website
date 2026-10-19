@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-10-19T10:03:33.455Z",
-  "commit": "eb6dde1a",
+  "op": "2026-10-19T10:49:28.610Z",
+  "commit": "dc5dae5b",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 8,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5405,
-  "geclassificeerd": 5376,
+  "totaal": 5406,
+  "geclassificeerd": 5377,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1299,
    "LEGACY_PENDING_CLASSIFICATION": 29,
    "PROTECTED": 707,
-   "INTENTIONALLY_NON_IDEMPOTENT": 206
+   "INTENTIONALLY_NON_IDEMPOTENT": 207
   },
-  "vastgesteldDoorMens": 2264,
+  "vastgesteldDoorMens": 2265,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4479,
+   "AUTHENTICATED": 4480,
    "PUBLIC": 101,
    "OBJECT_SCOPED": 783,
    "(niet af te leiden -- vraagt een verklaring)": 26,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 258
+   "niet gemeten": 259
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -62953,6 +62953,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "betaalwaarheid.terugbetaling.afhandelen",
+   "route": "POST /api/office/betalingen/terug/afhandel",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "naamAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.bewaarverzoek",
    "route": "POST /api/office/bewaarverzoek",
    "semantiek": {
@@ -83418,7 +83439,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -139878,7 +139899,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139906,7 +139927,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139934,7 +139955,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139962,7 +139983,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139990,7 +140011,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {

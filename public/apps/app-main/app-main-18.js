@@ -3,18 +3,18 @@
       const [code, pid] = b.dataset.vgint.split(':');
       const wens = prompt(T('vg.m.wensvraag','Wanneer zou u willen bezichtigen? (bijv. zaterdagochtend)'));
       if (wens === null) return;
-      try { await API.call('/vastgoed/interesse', { supplierCode: code, pandId: pid, wens }); toast(T('vg.m.intok','De makelaar krijgt uw aanvraag en bevestigt een moment.')); laadVastgoed(); }
+      try { await API.call('/api/vastgoed/interesse', { supplierCode: code, pandId: pid, wens }); toast(T('vg.m.intok','De makelaar krijgt uw aanvraag en bevestigt een moment.')); laadVastgoed(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-vgbod]').forEach(b => b.addEventListener('click', async () => {
       const [code, pid] = b.dataset.vgbod.split(':');
       const bod = prompt(T('vg.m.bodvraag','Uw bod in euro:'));
       if (!bod) return;
-      try { await API.call('/vastgoed/bod', { supplierCode: code, pandId: pid, bedrag: Number(bod) }); toast(T('vg.m.bodok','Uw bod is verstuurd naar de makelaar.')); laadVastgoed(); }
+      try { await API.call('/api/vastgoed/bod', { supplierCode: code, pandId: pid, bedrag: Number(bod) }); toast(T('vg.m.bodok','Uw bod is verstuurd naar de makelaar.')); laadVastgoed(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-vgkey]').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/vastgoed/keyless', { ref: b.dataset.vgkey }); toast('\uD83D\uDD13 '+T('vg.m.geopend','De deur is open. Code: ')+r.code); }
+      try { const r = await API.call('/api/vastgoed/keyless', { ref: b.dataset.vgkey }); toast('\uD83D\uDD13 '+T('vg.m.geopend','De deur is open. Code: ')+r.code); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -23,7 +23,7 @@
   async function laadContracten(){
     if (!API.live) return;
     let lijst = [];
-    try { lijst = (await API.call('/contracten/mijn')).contracten || []; } catch(e){}
+    try { lijst = (await API.call('/api/contracten/mijn')).contracten || []; } catch(e){}
     const el = $('#conMijn'); if (!el) return;
     const open = lijst.filter(c => c.status !== 'geweigerd');
     if (!open.length){ el.innerHTML = ''; return; }
@@ -40,12 +40,12 @@
     document.querySelectorAll('[data-conteken]').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('con.tekenvraag','Typ uw naam om digitaal te ondertekenen. Zo gaat u akkoord met de voorwaarden.'));
       if (!naam) return;
-      try { await API.call('/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
+      try { await API.call('/api/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-conweiger]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm(T('con.weigervraag','Dit contract weigeren?'))) return;
-      try { await API.call('/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
+      try { await API.call('/api/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -54,7 +54,7 @@
   let bzPartners = [], bzZaak = null, bzMand = {}, bzLevering = 'bezorgen', bzGeo = null, bzAdresW = '';
   async function laadBestellen(){
     if (!API.live) return;
-    try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
+    try { bzPartners = (await API.call('/api/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
     renderBestellen();
     laadBzMijn();
   }
@@ -64,7 +64,7 @@
     const el = $('#showroom'); if (!el || !API.live) return;
     if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
     let d, mijn;
-    try { d = await API.call('/verkoop/showroom'); mijn = await API.call('/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    try { d = await API.call('/api/verkoop/showroom'); mijn = await API.call('/api/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
@@ -85,9 +85,9 @@
     el.innerHTML = h;
     el.querySelectorAll('.js-vkteken').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('vk.tekennaam','Typ uw naam om het koopcontract te tekenen:')); if (!naam) return;
-      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkproef').forEach(b => b.addEventListener('click', async () => {
       const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
-      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens, idem: b.dataset.idem || (b.dataset.idem = RTGIdem('vkproef')) }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));

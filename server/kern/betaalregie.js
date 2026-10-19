@@ -120,6 +120,11 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
       tekst: cijfers.afhandelingWacht + ' bevestigde betaling(en) wachten nog op veilige domeinafhandeling.' });
     if (cijfers.terugbetalingControle) problemen.push({ ernst: 'kritiek', code: 'TERUGBETALING-CONTROLE',
       tekst: cijfers.terugbetalingControle + ' terugbetaling(en) wachten op menselijke controle.' });
+    /* per vastgelopen terugbetaling een eigen regel, met wat de knop nodig heeft
+       (eigenaarsbesluit 19 oktober 2026; apps/kantoren-terugbetaling.js) */
+    for (const v of cijfers.vastgelopen) problemen.push({ ernst: 'kritiek', code: 'TERUGBETALING-VASTGELOPEN',
+      tekst: 'Terugbetaling vastgelopen: ' + v.bedrag + ' van betaling ' + v.betalingId + ' via ' + (v.provider || 'onbekend') +
+        '; ' + v.reden + '.', betalingId: v.betalingId, opdrachtId: v.opdrachtId, sinds: v.sinds });
     if (cijfers.terugbetalingWacht) problemen.push({ ernst: 'waarschuwing', code: 'TERUGBETALING-WACHT',
       tekst: cijfers.terugbetalingWacht + ' terugbetaling(en) wachten op providerbevestiging.' });
     const inbox = Object.values(d().betaalWaarheidMeldingen || {});

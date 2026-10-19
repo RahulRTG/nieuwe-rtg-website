@@ -1,7 +1,7 @@
 /* Domein "zorgwallet": de zorgtak van de verzekeraar (achter de
    polis-cap; de werkplek en de PDA gebruiken dezelfde endpoints) en de
-   RTG Wallet van het lid (achter de leden-inlog; gasten hebben geen
-   wallet). */
+   RTG Wallet (achter de inlog; elk account heeft er een, een bezoeker
+   zonder account niet). */
 module.exports = (kern) => {
   const { app, db, auth, supplierAuth, zorgpolis, wallet, onboarding } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; r.error ? res.status(status || 400).json({ error: r.error }) : res.status(200).json(rest); };
@@ -24,12 +24,14 @@ module.exports = (kern) => {
   app.post('/api/supplier/zorgpolis/declaratie/beslis', supplierAuth, doe((code, b) => zorgpolis.declaratieBeslis(code, b, b.door)));
   app.post('/api/supplier/zorgpolis/pas', supplierAuth, doe((code, b) => zorgpolis.pasCheck(code, b.pas)));
 
-  // de RTG Wallet van het lid
-  const geenGast = (req, res, next) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'De RTG Wallet is voor leden.' });
+  /* de RTG Wallet: van elk account, ook een gratis account (eigenaarsbesluit
+     19 oktober 2026); een bezoeker zonder account heeft er geen */
+  const eenAccount = (req, res, next) => {
+    if (req.session.tier === 'guest' && !req.session.account)
+      return res.status(403).json({ error: 'Maak een gratis account om de RTG Wallet te gebruiken.' });
     next();
   };
-  const lid = [auth, geenGast];
+  const lid = [auth, eenAccount];
   app.post('/api/wallet', ...lid, (req, res) => stuur(res, wallet.lijst(req.session.key)));
   app.post('/api/wallet/voeg', ...lid, (req, res) => stuur(res, wallet.voegZelf(req.session.key, req.body || {})));
   app.post('/api/wallet/weg', ...lid, (req, res) => stuur(res, wallet.weg(req.session.key, req.body.id)));

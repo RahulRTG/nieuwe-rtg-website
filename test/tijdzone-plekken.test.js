@@ -131,3 +131,17 @@ test('balans: om 00:30 in Amsterdam (22:30 UTC) begint het weekbeeld op de nieuw
     console.log(JSON.stringify([w.dagen[0], w.dagen[6], w.perDag[0], w.perDag[6]]));`);
   assert.deepEqual(r, ['2026-07-16', '2026-07-22', 0, 1]);
 });
+
+test('levens-, geld-, sociale graaf en levenslijn delen een dag: die van het lid', () => {
+  const r = inUtc('2026-07-15T22:30:00Z', `
+    const L = require('./server/kern/levensgraaf/hulp');
+    const G = require('./server/kern/geldgraaf/hulp');
+    const S = require('./server/kern/socialegraaf/hulp');
+    const LL = require('./server/kern/levenslijn/hulp');
+    console.log(JSON.stringify([L.vandaag(), G.vandaag(),
+      L.dagVan('2026-07-15T22:45:00Z'), G.dagVan('2026-07-15T21:30:00Z'),
+      L.straks('2026-07-15'), L.straks('2026-07-16'),
+      S.vandaag(), LL.dagVan('2026-07-15T22:45:00Z')]));`);
+  assert.deepEqual(r, ['2026-07-16', '2026-07-16', '2026-07-16', '2026-07-15', '', '2026-07-16',
+    '2026-07-16', '2026-07-16']);
+});

@@ -7,7 +7,7 @@
       if (wilInruil){ const merk = prompt(T('vk.inmerk','Merk + model van uw inruilauto:')); if (merk){ const jaar = prompt(T('vk.injaar','Bouwjaar?'),''); const km = prompt(T('vk.inkm','Kilometerstand?'),''); inruil = { merk, model: '', jaar, km }; } }
       const concierge = confirm(T('vk.concvraag','Concierge-aflevering op uw adres?'));
       const adres = concierge ? (prompt(T('vk.adres','Afleveradres:')) || '') : '';
-      try { await API.call('/api/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres, idem: b.dataset.idem || (b.dataset.idem = RTGIdem('vkkoop')) }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
   }
 

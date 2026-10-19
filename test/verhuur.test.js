@@ -134,3 +134,24 @@ test('annuleren is een management-handeling, en een lopende huur annuleer je nie
   assert.equal((await api('/api/supplier/huur/status', { ref: b.huur.ref, status: 'geweigerd' }, balieToken)).status, 403);
   assert.equal((await api('/api/supplier/huur/status', { ref: b.huur.ref, status: 'geweigerd' }, managerToken)).status, 200);
 });
+
+test('herhaalsleutel: dezelfde tik op boeken is dezelfde huur, ook na een herstart; een andere periode onder die sleutel een 409', async () => {
+  /* De voltooiproef van de tab Ter plaatse (scripts/lib/voltooi/terplaatse.js):
+     een afgebroken boeking en opnieuw gaf "al verhuurd" -- door de eigen,
+     nog onbetaalde boeking. De sleutel staat bij de huur. */
+  const lijf = { supplierCode: 'ISLAREN', autoId: 'c2', van: D(20), tot: D(22), idem: 'huur-' + Date.now() };
+  const a = await api('/api/huur/boek', lijf, lidToken);
+  assert.equal(a.status, 200);
+  const ref = (await json(a)).huur.ref;
+  const b = await api('/api/huur/boek', lijf, lidToken);
+  assert.equal(b.status, 200, 'dezelfde tik is geen "al verhuurd"');
+  assert.equal((await json(b)).huur.ref, ref);
+  const ander = await api('/api/huur/boek', Object.assign({}, lijf, { van: D(24), tot: D(25) }), lidToken);
+  assert.equal(ander.status, 409);
+  assert.ok((await json(ander)).error);
+  try { child.kill('SIGKILL'); } catch (e) {}
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  const c = await api('/api/huur/boek', lijf, lidToken);
+  assert.equal(c.status, 200);
+  assert.equal((await json(c)).huur.ref, ref, 'na de herstart dezelfde huur');
+});

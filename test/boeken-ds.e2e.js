@@ -85,7 +85,12 @@ test('lezen: de plank, de lezer, de lettermaat en de leesplek over de echte boek
 
   await page.locator('#eigen [data-boek]').first().click();
   await page.waitForFunction(() => !document.querySelector('#leesBlok').hidden && /eigen verhaal/.test(document.querySelector('#tekst').textContent));
+  /* De bewaringen lopen achter elkaar; wacht op het antwoord van de server
+     op DEZE plek, niet op een eerdere van het openen. */
+  const bewaard = page.waitForResponse(async r => new URL(r.url()).pathname === '/api/boeken/lees' &&
+    ((await r.json().catch(() => ({}))).plek || 0) > 0.4);
   await page.evaluate(() => { const el = document.querySelector('#tekst'); el.scrollTop = (el.scrollHeight - el.clientHeight) / 2; el.dispatchEvent(new Event('scroll')); });
+  await bewaard;
   await page.locator('#terug').click();
   await page.waitForFunction(() => /% gelezen/.test(document.querySelector('#eigen').textContent));
   const plek = ((await post('/api/boeken/voortgang', {})).voortgang['kluis:' + kluisId] || {}).plek || 0;

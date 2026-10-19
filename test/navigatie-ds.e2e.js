@@ -20,7 +20,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpRust } = require('./helper');
 const { alleenDs, edgeLabels, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
@@ -72,7 +72,7 @@ test('rond Ibiza: "Demonstratienet" in beeld, en een bestemming wordt een route'
   await page.waitForFunction(() => /Demonstratienet/.test(document.querySelector('#liveBadge').textContent), null, { timeout: 20000 });
   assert.equal(await page.locator('#poort').evaluate(e => e.hidden), true, 'met een plek blijft de poort dicht');
   assert.ok(await page.locator('#liveBadge').isVisible(), 'de markering van het demonstratienet staat in beeld');
-  await page.waitForTimeout(400);
+  await wachtOpRust(page); // de kaart is uitgetekend voor het beeld
   await beeld(page, 'navigatie-390');
   await page.fill('#zoek', 'laad');
   await page.waitForSelector('#res [role="option"]');

@@ -241,7 +241,7 @@ Eigenaren van schermen staan tussen `backticks` en komen uit SCHERMEIGENAAR.json
 **W14 · Woonlasten (financieel beheer) · L6 · ontbreekt · M · A, wacht op Geld**
 - Geld is eigenaar van de verplichting: huur, hypotheek, VvE-bijdrage, energie en verzekering. Wonen toont per woning een projectie (bedrag, vervaldag, verwijzing) en bezit niets.
 - Een onderhoudsreserve is een **reservering in Geld** die het lid zelf zet. Wonen levert de prognose (W7) als onderbouwing, nooit als afschrijving.
-- Het **Logboek** (Geld) registreert de financiële kant van onderhoud. Het onderhoud van woning en installaties blijft van Wonen; Logboek verwijst ernaar en bezit het niet.
+- **Grens met Logboek.** Logboek (`geld.html#logboek`, eigenaar `geld.overzicht`, Geld) gaat over kostbaar bezit buiten de woning: jacht, vliegtuig, helikopter, oldtimer, auto en motor (kern/rechterhand/logboek.js). Per regel staan keuring, service of reparatie, de kosten en een volgende datum. De woning en haar installaties zijn van Wonen (W1-W5). Logboek neemt ze niet op. Wil het lid de kosten van woningonderhoud in Geld zien, dan gaat dat via een verwijzing van Wonen naar Geld (W4, W12), niet via een tweede onderhoudsregel in Logboek.
 - **Acceptatie:** valt Geld uit, dan staat er "woonlasten nu niet te zien", zonder bedrag. Er gebeurt nooit een automatische reservering.
 
 **W15 · Documenten aan woning, ruimte, installatie of project (documentbeheer) · L1/L6 · ontbreekt · K · A, nu**

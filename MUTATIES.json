@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T09:45:54.136Z",
-    "commit": "edf04c76",
+    "op": "2026-10-19T10:03:01.291Z",
+    "commit": "1ef0918f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -12032,6 +12032,14 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 9,
       "geprobeerd": 1
+    },
+    "ontwerpvoorbeeld.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/ds/voorbeeld.html",
+      "operator": "html-bron-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "onvervreemdbaar.test.js": {
       "soort": "puur",

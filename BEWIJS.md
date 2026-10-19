@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2827 |
 | losse beweringen (`test(...)`) | 19574 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2636 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2637 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 9 |
+| niets van beide | 8 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2723,7 +2723,7 @@ toets omvalt.
 | `office-formschets.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de twee nieuwe officesoorten: het formulier en de schets. Wat hier bewezen wordt, door de echte schermen heen: - A bouwt een formulier (open vraag + schaal) en deelt het met B als meelezer, op... |
 | `office-suite.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de tekstverwerker en de presentatie van RTG Office. Wat hier bewezen wordt: - zoeken en vervangen raakt alleen TEKST, nooit de opmaak: na "haven" naar "kade" staat de kop er nog als kop; - de... |
 | `onderneming-scherm.e2e.js` | 5 | gezakt op `liegpoort /api/` | Schermtoets voor /apps/onderneming.html: de schil van het Ondernemers-OS. Waarom dit er als BROWSERtoets naast de API-toetsen staat: een scherm dat 200 geeft en netjes rendert kan nog steeds dood zijn (zie de kop van... |
-| `ontwerpvoorbeeld.e2e.js` | 1 | -- | De voorbeeldpagina van het RTG Design System (/ds/voorbeeld.html): elk schermtype in een telefoonkader, om naast de goedgekeurde mockups te leggen. Wat deze toets eist: alleen /ds/ en /fonts/ actief (de... |
+| `ontwerpvoorbeeld.e2e.js` | 1 | gezakt op `html-bron-weg#1` | De voorbeeldpagina van het RTG Design System (/ds/voorbeeld.html): elk schermtype in een telefoonkader, om naast de goedgekeurde mockups te leggen. Wat deze toets eist: alleen /ds/ en /fonts/ actief (de... |
 | `operationeel-aanvraag.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `overheidschermen.e2e.js` | 2 | gezakt op `liegpoort /api/` | DE OVERHEIDSSCHERMEN: DE BURGER EN DE AMBTENAAR. Acht schermen uit de lijst van TAKEN 4.9, en ze vallen in twee soorten die precies tegenover elkaar staan: DE BURGERKANT (gemeente, overheid) is voor het lid zelf. |
 | `paginas.e2e.js` | 1 | geen bronmutatie mogelijk | DE PAGINASCAN -- elke pagina in public/ wordt echt geopend in een browser. WAAROM DIT ER IS De schermtests hiernaast (test/*.e2e.js) beproeven allemaal EEN scherm dat iemand belangrijk vond. |

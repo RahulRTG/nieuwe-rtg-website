@@ -669,7 +669,9 @@ bewijs wat vervallen is en door welk bestand, in ongeveer twintig seconden. `npm
 run appwerkt:vers:controle` zakt zodra een rij die als 8/8 geldt een bewijs heeft
 dat niet vers is, en die controle is een stap van de **releasepoort**
 (`scripts/release-gate.js`, stap `APPWERKT-versheid`;
-`test/appwerkt-vers-releasepoort.test.js` laat hem zakken). Niet van `npm run
+`test/appwerkt-vers-releasepoort.test.js` laat hem zakken), en het
+productieoordeel (`scripts/lib/productie-oordeel.js`) zegt nooit "klaar" zonder
+die groene stap (`test/productie-status.test.js`). Niet van `npm run
 check`: die draait bij elke commit en zou na elke wijziging in de gedeelde kern
 rood staan tot de volgende meetronde. Check meldt het getal wel (regel 77), en
 velt niet.
@@ -682,9 +684,47 @@ enkele app oud. Die 60 zijn geen fout in de meting maar de bouw van het huis:
 - 26 raakten de geïnjecteerde serverkern;
 - 34 raakten de schil die vrijwel elk scherm laadt.
 
-De volgende verfijning ligt bij de kern. `GRENZEN.json` zegt per domein welke
-kernnamen een router mag zien, en een vertaling van naam naar bestand kan de
-gedeelde serverkern per domein versmallen.
+**Bewust niet gedaan: de serverkern per domein versmallen** (19 oktober 2026,
+met akkoord van de integrator). `GRENZEN.json` zegt per domein welke kernnamen
+een router mag zien, en `KERNHERKOMST.json` uit welk bestand een naam komt. Met
+die twee samen leek de gedeelde kern per domein te versmallen. Gemeten op de 45
+gewijzigde gedeelde serverbestanden uit dezelfde 88 commits: ongeveer 17 voeden
+maar een paar kernnamen (1 tot 11 domeinen, bijvoorbeeld `kern/pay/opladen.js` en
+`kern/keuken/voorraad.js`). De rest voedt het basisobject van `server.js` (468
+namen, meer dan 100 domeinen) of de interface (`db`, `save`, `auth`,
+`accounts`), en is terecht overal. Waarom ook die 17 gedeeld blijven:
+
+1. **Fabrieken draaien bij het opstarten** met `db` en `save` in handen. Ze kunnen
+   migreren, seeden, een timer zetten of middleware hangen, en dat raakt elk
+   domein. Dat een fabriek dat niet doet, is statisch niet te bewijzen.
+2. **Namen zonder domein worden doorgegeven** aan andere fabrieken. Dat waren er
+   4 tot 98 per bestand in de meting. Wie ze uiteindelijk gebruikt, vraagt een
+   stroomanalyse over alle kernlagen.
+3. **`KERNHERKOMST.json` kent 30 onopgeloste herkomsten** (spreads, een fabriek
+   die geen letterlijk object teruggeeft). Wat daar vandaan komt, is onbekend,
+   en onbekend is hier gedeeld.
+4. **Voor de browserbewijzen levert het bijna niets op**: de schil roept op elk
+   scherm rond de 300 routes uit veel domeinen aan.
+
+Wat het zou vragen, als iemand het toch wil:
+
+- **Runtime-bewijs.** Laat tijdens de meting de Proxy van de domeingrens
+  vastleggen welke kernnamen elk domein werkelijk leest, en V8-coverage welke
+  functies na de opstart draaien. Een kernbestand telt dan niet voor een bewijs
+  als er tijdens die meting geen functie van draaide én zijn opstartdeel zuiver
+  is. Dat tweede blijft een verklaring per bestand, en een verklaring kan
+  verouderen. Het helpt alleen de API-bewijzen (de voltooiproef), op grofweg een
+  derde van de kernwijzigingen. Het vraagt een haak in voltooiproef,
+  liegronde en bevoegdronde.
+- **Een lijst van "zuivere" kernmodules.** Een mens verklaart per module dat de
+  fabriek bij het opstarten niets schrijft, en een statische toets zakt bij
+  `setInterval`, een toewijzing aan `db.data` of `app.use` in het
+  fabriekslichaam. Dat is goedkoper, maar het rust op een verklaring en niet op
+  een meting.
+
+Een versmalling die op een verklaring rust in plaats van op een bewijs, is wat
+deze regel moet voorkomen. Daarom blijft de kern gedeeld. Al op deze
+geschiedenis raken 26 van de 88 commits geen enkele app meer.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

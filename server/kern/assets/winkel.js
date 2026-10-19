@@ -1,13 +1,12 @@
-/* Shared-assets (deelmodule): overzicht, ticketdocument, kopen, herroepen en de wachtlijst.
+/* Shared-assets (deelmodule): overzicht, ticketdocument en de wachtlijst.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
-const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, notify, pay,
+  const { db, save, crypto, schoon,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
     TERUGKOOP_VENSTER_DAGEN, SERVICE_FEE_PCT, OVERDRACHT_FEE_PCT, ONDERHOUD_DAGEN, PIEK_MAANDEN,
     ACCESS_FACTOR, ASSET_FACTOR, netjes,
     nu, vandaag, lijsten, objectVan, ticketWaarde, prijsAccessVan, prijsAssetVan, serviceFeeVan,
-    actieveVan, bezetVan, magKopen, kasAdd, binnenBedenktijd } = ctx;
+    actieveVan, bezetVan, magKopen } = ctx;
   function assetsOverzicht(key) {
     lijsten();
     return {
@@ -63,67 +62,9 @@ module.exports = (ctx) => {
     };
   }
 
-  function assetKoop(sess, codenaam, assetIdIn, smaakIn, aantalIn, akkoord) {
-    lijsten();
-    if (!magKopen(sess)) return { status: 403, error: 'RTG Shared Assets is er voor betalende leden (RTG, Lifestyle en Business Pass).' };
-    const a = objectVan(assetIdIn);
-    if (!a) return { status: 404, error: 'Object niet gevonden.' };
-    const smaak = smaakIn === 'asset' ? 'asset' : 'access';
-    // de Asset-smaak is een deelneming: kopen kan alleen na een uitdrukkelijk akkoord
-    if (smaak === 'asset' && akkoord !== true) {
-      return { status: 400, error: 'De Asset-smaak is een deelnemingsbewijs in ' + a.entiteit + '. Lees het informatiedocument (waarde kan dalen, jaarlijkse servicefee, uitstappen via wachtlijst of terugkoop binnen ' + TERUGKOOP_VENSTER_DAGEN + ' dagen) en bevestig uw akkoord.' };
-    }
-    const aantal = Math.max(1, Math.min(TICKETS_PER_OBJECT, parseInt(aantalIn, 10) || 1));
-    const beschikbaar = TICKETS_PER_OBJECT - bezetVan(a.id).length;
-    if (aantal > beschikbaar) return { status: 409, error: 'Uitverkocht: er zijn nog ' + beschikbaar + ' van de ' + TICKETS_PER_OBJECT + ' tickets beschikbaar. Zet u op de wachtlijst.' };
-    const prijs = smaak === 'asset' ? prijsAssetVan(a) : prijsAccessVan(a);
-    const vervalt = new Date();
-    vervalt.setUTCFullYear(vervalt.getUTCFullYear() + JAREN_GELDIG);
-    const tickets = [];
-    for (let i = 0; i < aantal; i++) {
-      tickets.push({
-        id: crypto.randomBytes(4).toString('hex'),
-        ref: 'RTG-SA-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-        assetId: a.id, assetNaam: a.naam,
-        key: sess.key, codenaam: schoon(codenaam, 40), tier: sess.tier,
-        smaak, prijs, urenPerJaar: UREN_PER_TICKET,
-        at: nu(), vervaltOp: vervalt.toISOString().slice(0, 10),
-        akkoord: smaak === 'asset' ? nu() : null,
-        status: 'actief', uitstap: null, feeJaar: tijdzone.jaarIn()
-      });
-    }
-    db.data.assetTickets.unshift(...tickets);
-    db.data.assetTickets = db.data.assetTickets.slice(0, 200000);
-    // de 15%-premie van elke Asset-koop valt in de poolkas van het object
-    if (smaak === 'asset') kasAdd(a.id, (prijs - ticketWaarde(a)) * 100 * aantal);
-    save();
-    notify(sess.key, {
-      icon: a.icon, title: 'Welkom in de pool van ' + a.naam,
-      body: aantal + ' ' + (smaak === 'asset' ? 'Asset' : 'Access') + '-ticket(s), elk 24 uur per jaar, tien jaar lang. U heeft ' + BEDENKTIJD_DAGEN + ' dagen bedenktijd.' +
-        (smaak === 'asset' ? ' Uw aandeel in de restwaarde: € ' + (ticketWaarde(a) * aantal) + '.' : ''), scope: 'assets'
-    });
-    return { ok: true, tickets, totaalPrijs: prijs * aantal, beschikbaar: beschikbaar - aantal };
-  }
-
-  /* De wettelijke bedenktijd: binnen veertien dagen herroepen betekent
-     volledige terugbetaling, voor beide smaken. Het ticket valt terug in de
-     pool en een eventueel gestorte premie gaat terug uit de poolkas. */
-  async function assetHerroep(sess, codenaam, ticketIdIn) {
-    lijsten();
-    const t = db.data.assetTickets.find(x => x.id === String(ticketIdIn || '') && x.key === sess.key && x.status === 'actief');
-    if (!t) return { status: 404, error: 'Ticket niet gevonden.' };
-    if (!binnenBedenktijd(t)) return { status: 409, error: 'De bedenktijd van ' + BEDENKTIJD_DAGEN + ' dagen is voorbij. Uitstappen kan (voor de Asset-smaak) via de wachtlijst of de terugkoop.' };
-    const a = objectVan(t.assetId);
-    t.status = 'herroepen';
-    t.uitstap = { waarde: t.prijs, at: nu(), soort: 'herroeping' };
-    if (t.smaak === 'asset') kasAdd(a.id, -(t.prijs - ticketWaarde(a)) * 100);
-    save();
-    try {
-      await pay.huisUit({ aanCodenaam: codenaam, centen: t.prijs * 100, oms: 'Herroeping ' + a.naam + ' (volledige terugbetaling)', idem: 'herroep-' + t.id });
-    } catch (e) { /* de terugbetaling staat vast op het ticket; de tik volgt */ }
-    notify(sess.key, { icon: 'betalen', title: 'Herroepen: ' + a.naam, body: 'De volledige koopsom van € ' + t.prijs + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
-    return { ok: true, terug: t.prijs, ticket: t };
-  }
+  /* Kopen en herroepen staan sinds 19 oktober 2026 in ./aanvraag.js: een koop
+     is een aanvraag die een mens van RTG beoordeelt, en een ticket ontstaat
+     pas na een bevestigde betaling. */
 
   // de wachtlijst: wie een Asset-ticket wil terwijl de pool vol is (of een
   // uitstapper zoekt), meldt zich hier; uitstappers matchen hier eerst op
@@ -141,5 +82,5 @@ module.exports = (ctx) => {
 
   /* Het eigen overzicht: per object de positie, het dagen-tegoed van dit jaar,
      wat uitstappen vandaag oplevert en welke tickets nog in de bedenktijd zitten. */
-  return { assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet };
+  return { assetsOverzicht, assetDocument, assetWachtlijstZet };
 };

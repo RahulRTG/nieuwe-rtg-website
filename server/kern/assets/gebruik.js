@@ -14,7 +14,9 @@ module.exports = (ctx) => {
     const posities = db.data.sharedAssets.map(a => {
       const mijn = actieveVan(a.id).filter(t => t.key === key);
       const wachtend = db.data.assetTerugkoop.filter(v => v.assetId === a.id && v.key === key && v.status === 'aangevraagd');
-      if (!mijn.length && !wachtend.length) return null;
+      // een herroeping die op de bank wacht: het ticket is nog niet terugbetaald
+      const herroepLoopt = db.data.assetTickets.filter(t => t.assetId === a.id && t.key === key && t.status === 'herroep-loopt').length;
+      if (!mijn.length && !wachtend.length && !herroepLoopt) return null;
       const gebruikt = db.data.assetGebruik.filter(g => g.assetId === a.id && g.key === key && g.datum.slice(0, 4) === String(jaar)).length;
       return {
         assetId: a.id, naam: a.naam, icon: a.icon, soort: a.soort, entiteit: a.entiteit,
@@ -29,6 +31,7 @@ module.exports = (ctx) => {
         uitstapWaarde: mijn.filter(t => t.smaak === 'asset').length * ticketWaarde(a),
         assetTicketIds: mijn.filter(t => t.smaak === 'asset').map(t => t.id),
         herroepbaar: mijn.filter(binnenBedenktijd).map(t => ({ id: t.id, smaak: t.smaak, prijs: t.prijs })),
+        herroepLoopt,
         terugkoopOnderweg: wachtend.map(v => ({ waarde: v.waarde, uiterlijk: v.uiterlijk })),
         gepland: db.data.assetGebruik.filter(g => g.assetId === a.id && g.key === key && g.datum >= vandaag()).map(g => g.datum).sort().slice(0, 6)
       };

@@ -111,7 +111,9 @@ const EIGEN = [
   // een chatbericht van Rendezvous draagt dezelfde sleutel (kern/connection-communication.js)
   '/api/connection/rendezvous/text',
   // "Nodig uit en start" onthoudt zijn sleutel op het potje (kern/spellen/dubbeltik.js)
-  '/api/member/spel/nieuw'
+  '/api/member/spel/nieuw',
+  '/api/asset/koop',
+  '/api/asset/aanvraag/betaal'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

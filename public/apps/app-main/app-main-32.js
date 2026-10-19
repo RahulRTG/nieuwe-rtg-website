@@ -41,6 +41,7 @@
             '<b>' + T('as.mijn','Mijn positie') + ':</b> ' + p.tickets + ' ' + T('as.tickets','tickets') + ' (' + p.access + ' Access · ' + p.asset + ' Asset)' + (p.tickets ? ' · ' +
             '<b style="color:var(--gold-bright,#C99A2E);">' + p.dagenTegoed + '</b> ' + T('as.dagen','x 24 uur over dit jaar') + ' · ' + T('as.geldig','geldig tot') + ' ' + p.vervaltOp : '') +
             (p.asset ? '<br>' + T('as.uitstapw','Uitstapwaarde vandaag') + ': <b>' + eur(p.uitstapWaarde) + '</b>' : '') +
+            (p.herroepLoopt ? '<br>' + T('as.herloopt','Terugbetaling loopt voor') + ' ' + p.herroepLoopt + ' ' + T('as.herloopt2','ticket(s); u hoort het zodra de bank haar bevestigt.') : '') +
             ((p.terugkoopOnderweg||[]).length ? '<br>' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
             (p.gepland.length ? '<br>' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
             '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
@@ -77,9 +78,15 @@
           T('as.akk4','Gaat u akkoord?'))) return;
         body.akkoord = true;
       }
+      // een herhaalsleutel per aanvraag: een dubbeltik of een herhaling na een
+      // afgebroken verbinding wordt geen tweede aanvraag
+      const vorm = body.assetId + '|' + body.smaak + '|' + aantal;
+      if (b.dataset.idemVorm !== vorm){ b.dataset.idem = RTGId('assetkoop'); b.dataset.idemVorm = vorm; }
+      body.idem = b.dataset.idem;
       try {
         const r = await API.call('/asset/koop', body);
-        toast('' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
+        delete b.dataset.idemVorm;
+        toast(T('as.aanvraag','Uw aanvraag staat. Een mens van RTG beoordeelt hem; er is nog niets afgeschreven en er is nog geen ticket.') + ' ' + eur(r.aanvraag.totaal));
         renderAssets();
       } catch(e){ toast(e.message); }
     }));

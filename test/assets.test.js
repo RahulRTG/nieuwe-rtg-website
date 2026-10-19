@@ -1,17 +1,24 @@
 /* Toren 3, RTG Shared Assets: altijd 300 tickets per object, een ticket is
    24 uur per jaar, tien jaar lang. Access loopt af; Asset heeft een aandeel
    in de restwaarde (waarde / 300) en stapt uit via een Tik. Alleen voor
-   betalende leden. Draai los:
+   betalende leden.
+
+   EEN KOOP IS EEN AANVRAAG (eigenaarsbesluit 19 oktober 2026). Hier stond dat
+   een lid 296 tickets kocht zonder te betalen, en dat was de fout: kopen gaf
+   tickets en een totaalprijs, en er werd niets afgeschreven. Nu: aanvraag, een
+   mens van RTG op naam keurt, betalen via de betaalwaarheid (de simulatiebank
+   hier), en pas na een BEVESTIGDE betaling de tickets. Draai los:
    node --test test/assets.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const assetkoop = require('./lib/assetkoop');
 
 let srv, base;
-let lid, zakelijk, gast;
+let lid, zakelijk, gast, opNaam;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-assets-'));
 
 const api = (pad, body, t) => fetch(base + '/api/' + pad, {
@@ -21,13 +28,18 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
 const login = tier => fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier }) }).then(r => r.json()).then(d => d.token);
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_SIMULATIEBANK: '1' } });
   base = srv.base;
   lid = await login('rtg');
   zakelijk = await login('business');
   gast = await login('guest');
-  assert.ok(lid && zakelijk && gast);
+  opNaam = await kantoorAlsPersoon(base);
+  assert.ok(lid && zakelijk && gast && opNaam);
 });
+
+// de hele weg (aanvraag, een mens op naam keurt, bevestigd betalen): test/lib/assetkoop.js
+const koop = (t, pas, body) => assetkoop.gekocht(api, { token: t, pas, opNaam, body });
+const poging = assetkoop.poging;
 test.after(() => {
   stop(srv && srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
@@ -55,24 +67,58 @@ test('de pool: drie objecten, altijd 300 tickets, alleen betalende leden kopen',
   assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 1 }, gast)).status, 403);
 });
 
+test('een koop is een aanvraag: geen ticket, geen afschrijving, en alleen een mens op naam keurt', async () => {
+  const a = await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 1, idem: 'eerst' }, lid);
+  assert.equal(a.status, 200);
+  assert.equal(a.body.aanvraag.status, 'aangevraagd');
+  assert.match(a.body.let, /nog niets afgeschreven/);
+  assert.equal(a.body.tickets, undefined, 'geen ticket in het antwoord');
+  assert.equal(((await api('asset/mijn', {}, lid)).body.posities || []).length, 0, 'en geen positie');
+  assert.equal((await api('assets', {}, lid)).body.assets.find(x => x.id === villa.id).beschikbaar, 300, 'een aanvraag houdt geen ticket bezet');
+  const id = a.body.aanvraag.id;
+  // bevoegdheid: zonder sessie niets, een ander lid ziet, betaalt en sluit niets
+  assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 1 })).status, 401);
+  assert.equal((await api('asset/aanvragen', {})).status, 401);
+  assert.equal((await api('asset/aanvraag/betaal', { id })).status, 401);
+  assert.equal((await api('asset/aanvragen', {}, zakelijk)).body.aanvragen.length, 0);
+  assert.equal((await api('asset/aanvraag/betaal', { id }, zakelijk)).status, 404);
+  assert.equal((await api('asset/herroep', { id }, zakelijk)).status, 404);
+  // voor de goedkeuring kan er niet betaald worden
+  assert.equal((await api('asset/aanvraag/betaal', { id, idem: 'x' }, lid)).status, 409);
+  // niet het lid, niet de gedeelde kantoorcode: alleen een mens op naam
+  assert.equal((await api('office/asset/aanvraag/beslis', { id, besluit: 'goedgekeurd' }, lid)).status, 401);
+  const code = (await api('office/login', { code: 'RTG-OFFICE' })).body.token;
+  assert.equal((await api('office/asset/aanvraag/beslis', { id, besluit: 'goedgekeurd' }, code)).status, 403);
+  assert.ok((await api('office/asset/aanvragen', {}, opNaam)).body.aanvragen.some(x => x.id === id));
+  assert.equal((await api('office/asset/aanvraag/beslis', { id, besluit: 'goedgekeurd' }, opNaam)).status, 200);
+  // een geweigerde betaling: geen ticket, en het lid mag het opnieuw proberen
+  const nee = await api('asset/aanvraag/betaal', { id, idem: poging('rtg', id, 'geweigerd') }, lid);
+  assert.equal(nee.status, 402);
+  assert.match(nee.body.error, /niet gelukt/);
+  assert.equal(((await api('asset/mijn', {}, lid)).body.posities || []).length, 0, 'geweigerd is geen ticket');
+  // voor betaling sluiten: de aanvraag gaat dicht, er was niets afgeschreven
+  const dicht = await api('asset/herroep', { id }, lid);
+  assert.equal(dicht.body.aanvraag.status, 'ingetrokken');
+});
+
 test('kopen: Access en Asset, tien jaar geldig, en vol is echt vol (300)', async () => {
-  const k1 = await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 2 }, lid);
-  assert.equal(k1.status, 200);
-  assert.equal(k1.body.totaalPrijs, villa.prijsAccess * 2);
-  accessTicketId = k1.body.tickets[0].id;
+  const k1 = await koop(lid, 'rtg', { assetId: villa.id, smaak: 'access', aantal: 2 });
+  assert.equal(k1.body.totaal, villa.prijsAccess * 2);
+  assert.equal(k1.body.ticketIds.length, 2, 'een bevestigde betaling geeft precies de gevraagde tickets');
+  accessTicketId = k1.body.ticketIds[0];
   // de Asset-smaak is een deelneming: zonder uitdrukkelijk akkoord geen koop
   assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'asset', aantal: 1 }, lid)).status, 400);
-  const k2 = await api('asset/koop', { assetId: villa.id, smaak: 'asset', aantal: 1, akkoord: true }, lid);
-  assert.equal(k2.body.totaalPrijs, villa.prijsAsset);
+  const k2 = await koop(lid, 'rtg', { assetId: villa.id, smaak: 'asset', aantal: 1, akkoord: true });
+  assert.equal(k2.body.totaal, villa.prijsAsset);
   // tien jaar geldig
   const jaarNu = new Date().getFullYear();
-  assert.ok(k2.body.tickets[0].vervaltOp.startsWith(String(jaarNu + 10)));
+  assert.ok((await api('asset/mijn', {}, lid)).body.posities[0].vervaltOp.startsWith(String(jaarNu + 10)));
   // een zakelijk lid koopt mee in dezelfde pool
-  assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 1 }, zakelijk)).status, 200);
+  assert.equal((await koop(zakelijk, 'business', { assetId: villa.id, smaak: 'access', aantal: 1 })).status, 200);
   // 296 over; meer dan beschikbaar ketst af, precies de rest mag
   assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).beschikbaar, 296);
   assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 297 }, zakelijk)).status, 409);
-  assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 296 }, zakelijk)).status, 200);
+  assert.equal((await koop(zakelijk, 'business', { assetId: villa.id, smaak: 'access', aantal: 296 })).status, 200);
   assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).beschikbaar, 0);
   assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 1 }, lid)).status, 409, 'vol is vol');
 });
@@ -152,14 +198,14 @@ test('uitstappen zonder wachtlijst: terugkoop, kantoor betaalt binnen het venste
 test('uitstappen met wachtlijst: directe overdracht, koper betaalt de 5% naar de poolkas', async () => {
   // het lid koopt het vrijgevallen ticket weer in (pool weer vol)
   const vers = (await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id);
-  const k = await api('asset/koop', { assetId: villa.id, smaak: 'asset', aantal: 1, akkoord: true }, lid);
+  const k = await koop(lid, 'rtg', { assetId: villa.id, smaak: 'asset', aantal: 1, akkoord: true });
   assert.equal(k.status, 200);
   // het zakelijke lid meldt zich op de wachtlijst (dubbel melden kan niet)
   assert.equal((await api('asset/wachtlijst', { assetId: villa.id }, zakelijk)).status, 200);
   assert.equal((await api('asset/wachtlijst', { assetId: villa.id }, zakelijk)).status, 409);
   assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).wachtenden, 1);
   // trap 1: de uitstapper matcht direct met de wachtende koper
-  const uit = await api('asset/uitstap', { ticketId: k.body.tickets[0].id }, lid);
+  const uit = await api('asset/uitstap', { ticketId: k.body.ticketIds[0] }, lid);
   assert.equal(uit.status, 200);
   assert.equal(uit.body.soort, 'overdracht');
   assert.equal(uit.body.waarde, vers.ticketWaarde);
@@ -169,17 +215,20 @@ test('uitstappen met wachtlijst: directe overdracht, koper betaalt de 5% naar de
   assert.equal((await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id).wachtenden, 0);
 });
 
-test('bedenktijd: binnen veertien dagen herroepen is volledige terugbetaling', async () => {
-  // het zakelijke lid herroept een van zijn verse tickets (het overgenomen Asset-ticket telt ook)
+test('bedenktijd: herroepen na betaling heet pas terugbetaald als de bank het bevestigt', async () => {
+  /* De simulatiebank bevestigt geen terugbetaling (server/betaal/naslag.js
+     kent haar niet als rail); de bevestigde afloop staat in de kerntoetsen
+     onderaan. Hier: wat het lid hoort zolang er niets bevestigd is. */
   const pos = (await api('asset/mijn', {}, zakelijk)).body.posities.find(p => p.assetId === villa.id);
   assert.ok(pos.herroepbaar.length >= 1, 'verse tickets zitten in de bedenktijd');
   const h = pos.herroepbaar[0];
   const r = await api('asset/herroep', { ticketId: h.id }, zakelijk);
-  assert.equal(r.status, 200);
-  assert.equal(r.body.terug, h.prijs, 'de volledige koopsom komt terug');
-  assert.equal(r.body.ticket.status, 'herroepen');
-  // twee keer herroepen kan niet
-  assert.equal((await api('asset/herroep', { ticketId: h.id }, zakelijk)).status, 404);
+  const eerlijk = r.status === 409 || (r.status === 200 && r.body.pending === true);
+  assert.ok(eerlijk, 'onbevestigd: loopt of niet gestart (' + r.status + ' ' + JSON.stringify(r.body) + ')');
+  assert.equal(r.body.terug, undefined, 'er is geen bedrag terug gemeld');
+  assert.doesNotMatch(String(r.body.let || r.body.error), /is terugbetaald|in uw tegoed/);
+  const na = (await api('asset/mijn', {}, zakelijk)).body.posities.find(p => p.assetId === villa.id);
+  assert.ok(na.tickets + (na.herroepLoopt || 0) === pos.tickets, 'het ticket is niet stil verdwenen');
 });
 
 test('het informatiedocument: eigen entiteit, kosten, risico en de uitstaptrap', async () => {
@@ -216,4 +265,129 @@ test('hertaxatie: de waarde beweegt, en beide prijzen en de uitstapwaarde schuiv
   // grenzen: een rare taxatie ketst af, en alleen het kantoor mag taxeren
   assert.equal((await api('office/asset/waarde', { assetId: villa.id, waarde: 5 }, kantoor)).status, 400);
   assert.equal((await api('office/asset/waarde', { assetId: villa.id, waarde: nieuw }, lid)).status, 401);
+});
+
+/* ---------- De kern, met een nep-bank waarvan WIJ de afloop kiezen ----------
+   Een koop is een aanvraag (eigenaarsbesluit 19 oktober 2026,
+   kern/assets/aanvraag.js). Deze toetsen bouwen de assets-kern los op met de
+   echte betaalwaarheid eronder; alleen de bank is nagemaakt, zodat elke afloop
+   (betaald, geweigerd, traag, terugbetaling bevestigd of niet) zeker optreedt. */
+function kernMet(bank) {
+  const db = { data: {} };
+  const save = () => {};
+  const crypto = require('crypto');
+  const nep = {
+    maakBetaling: async (o) => ({ id: 'p_' + o.referentie, status: bank.betaling, aanbieder: 'simulatie', bedrag: o.bedrag, valuta: o.valuta }),
+    haalBetaling: async (_, id) => ({ id, status: bank.betaling, aanbieder: 'simulatie' }),
+    maakTerugbetaling: async (o) => {
+      if (bank.terug === 'stuk') throw new Error('de bank antwoordde niet');
+      return { id: 'r_' + o.idempotentieSleutel.slice(-8), status: bank.terug, bedrag: o.bedrag, valuta: o.valuta };
+    }
+  };
+  const betaalWaarheid = require('../server/kern/betaalwaarheid')({ d: () => db.data, save, crypto, betaal: nep, nu: () => new Date().toISOString(), log: () => {} });
+  const k = require('../server/kern/assets')({ db, save, crypto, schoon: (s, n) => String(s || '').slice(0, n), notify: () => {}, pay: null, betaalWaarheid });
+  return { db, k, betaalWaarheid, tickets: (key) => db.data.assetTickets.filter(t => t.key === key) };
+}
+const LID = { key: 'user-41', tier: 'rtg' };
+const MENS = 'user-7'; // een mens van RTG op naam, uit de kantoorsessie
+
+test('kern: een aanvraag geeft geen ticket en geen afschrijving', () => {
+  const { db, k, tickets } = kernMet({ betaling: 'betaald', terug: 'refunded' });
+  const r = k.assetKoop(LID, 'Lid', 'sa-villa', 'access', 2, false, 'k1');
+  assert.equal(r.aanvraag.status, 'aangevraagd');
+  assert.match(r.let, /nog niets afgeschreven/);
+  assert.equal(r.tickets, undefined, 'het antwoord belooft geen tickets');
+  assert.equal(tickets(LID.key).length, 0, 'er is geen ticket');
+  assert.equal(Object.keys(db.data.betaalWaarheid || {}).length, 0, 'er is geen betaling begonnen');
+  // dezelfde sleutel is dezelfde aanvraag; een andere vraag onder die sleutel is 409
+  assert.equal(k.assetKoop(LID, 'Lid', 'sa-villa', 'access', 2, false, 'k1').herhaald, true);
+  assert.equal(k.assetKoop(LID, 'Lid', 'sa-villa', 'access', 3, false, 'k1').status, 409);
+  assert.equal(k.assetAanvragenMijn(LID.key).aanvragen.length, 1);
+});
+
+test('kern: alleen een mens op naam keurt, nooit de gedeelde code en nooit de aanvrager', async () => {
+  const { k } = kernMet({ betaling: 'betaald' });
+  const id = k.assetKoop(LID, 'Lid', 'sa-villa', 'access', 1, false, 'k2').aanvraag.id;
+  assert.equal((await k.assetAanvraagBetaal(LID, id, 'b')).status, 409, 'betalen kan pas na goedkeuring');
+  assert.equal(k.assetAanvraagBeslis({ id, besluit: 'goedgekeurd', doorKey: null }).status, 403, 'de gedeelde kantoorcode heeft geen naam');
+  assert.equal(k.assetAanvraagBeslis({ id, besluit: 'goedgekeurd', doorKey: LID.key }).status, 403, 'de aanvrager keurt zichzelf niet');
+  assert.equal(k.assetAanvraagBeslis({ id, besluit: 'goedgekeurd', doorKey: MENS }).aanvraag.status, 'goedgekeurd');
+  assert.equal(k.assetAanvraagBeslis({ id, besluit: 'afgewezen', doorKey: MENS }).status, 409, 'een besluit staat');
+});
+
+async function goedgekeurd(k, aantal, idem) {
+  const id = k.assetKoop(LID, 'Lid', 'sa-villa', 'access', aantal, false, idem).aanvraag.id;
+  k.assetAanvraagBeslis({ id, besluit: 'goedgekeurd', doorKey: MENS });
+  return id;
+}
+
+test('kern: goedkeuring plus een bevestigde betaling geeft precies een keer tickets', async () => {
+  const { db, k, betaalWaarheid, tickets } = kernMet({ betaling: 'betaald' });
+  const id = await goedgekeurd(k, 2, 'k3');
+  const r = await k.assetAanvraagBetaal(LID, id, 'b1');
+  assert.equal(r.aanvraag.status, 'betaald');
+  assert.equal(tickets(LID.key).length, 2);
+  const w = Object.values(db.data.betaalWaarheid)[0];
+  assert.equal(w.status, 'BEVESTIGD');
+  assert.equal(w.soort, 'asset-koop');
+  assert.equal(w.centen, r.aanvraag.totaal * 100, 'het bedrag van de aanvraag is het bedrag van de betaling');
+  assert.ok(tickets(LID.key).every(t => t.betalingId === w.id), 'elk ticket wijst naar zijn betaling');
+  // dubbeltik, nog een poging en een tweede bevestiging maken er geen tickets bij
+  assert.equal((await k.assetAanvraagBetaal(LID, id, 'b1')).herhaald, true);
+  assert.equal((await k.assetAanvraagBetaal(LID, id, 'b2')).herhaald, true);
+  await betaalWaarheid.begin(w.id, {});
+  assert.equal(tickets(LID.key).length, 2, 'nog steeds twee');
+});
+
+test('kern: een geweigerde betaling geeft geen ticket, een trage ook niet', async () => {
+  const bank = { betaling: 'geweigerd' };
+  const { k, tickets } = kernMet(bank);
+  const id = await goedgekeurd(k, 1, 'k4');
+  const r = await k.assetAanvraagBetaal(LID, id, 'b1');
+  assert.equal(r.status, 402);
+  assert.match(r.error, /niet gelukt/);
+  assert.equal(tickets(LID.key).length, 0);
+  bank.betaling = 'open';
+  const t = await k.assetAanvraagBetaal(LID, id, 'b2');
+  assert.equal(t.status, 402);
+  assert.equal(t.pending, true);
+  assert.equal(tickets(LID.key).length, 0, 'wachten is geen betalen');
+});
+
+test('kern: herroepen na betaling meldt pas terugbetaald als de bank het bevestigt', async () => {
+  const bank = { betaling: 'betaald', terug: 'pending' };
+  const { k, betaalWaarheid, tickets } = kernMet(bank);
+  await k.assetAanvraagBetaal(LID, await goedgekeurd(k, 2, 'k5'), 'b1');
+  const [t1, t2] = tickets(LID.key);
+  const h = await k.assetHerroep(LID, 'Lid', t1.id);
+  assert.equal(h.pending, true);
+  assert.equal(h.terug, undefined, 'geen bedrag terug gemeld');
+  assert.doesNotMatch(h.let, /is terugbetaald/);
+  assert.equal(t1.status, 'herroep-loopt');
+  // de bank bevestigt later (webhook); bij de volgende blik is het rond
+  const w = betaalWaarheid.van(t1.betalingId);
+  await betaalWaarheid.providerTerugbetaling({ eventId: 'e1', aanbieder: 'simulatie', referentie: w.id, providerRefundId: 'r1', centen: t1.prijs * 100, valuta: 'eur' });
+  k.assetMijn(LID.key);
+  assert.equal(t1.status, 'herroepen');
+  // het tweede ticket onder dezelfde betaling is NIET mee terugbetaald
+  bank.terug = 'stuk';
+  const h2 = await k.assetHerroep(LID, 'Lid', t2.id);
+  assert.equal(h2.pending, true, 'de opdracht staat vast, de bank antwoordde niet: dat loopt');
+  k.assetMijn(LID.key);
+  assert.equal(t2.status, 'herroep-loopt', 'gedeeltelijk terugbetaald is niet dit ticket terugbetaald');
+});
+
+test('kern: herroepen voor betaling sluit de aanvraag; vol is vol voordat er geld gaat', async () => {
+  const { k, tickets } = kernMet({ betaling: 'betaald', terug: 'refunded' });
+  const id = await goedgekeurd(k, 1, 'k6');
+  assert.equal((await k.assetHerroep(LID, 'Lid', id)).aanvraag.status, 'ingetrokken');
+  assert.equal((await k.assetAanvraagBetaal(LID, id, 'b')).status, 409);
+  const a = await goedgekeurd(k, 200, 'k7'), b = await goedgekeurd(k, 200, 'k8');
+  assert.equal((await k.assetAanvraagBetaal(LID, a, 'b')).aanvraag.status, 'betaald');
+  assert.equal((await k.assetAanvraagBetaal(LID, b, 'b')).status, 409, 'samen meer dan 300 kan niet');
+  assert.equal(tickets(LID.key).length, 200);
+  // direct terugbetaald: dan pas en meteen het bedrag
+  const h = await k.assetHerroep(LID, 'Lid', tickets(LID.key)[0].id);
+  assert.match(h.let, /is terugbetaald/);
+  assert.equal(h.terug, tickets(LID.key)[0].prijs);
 });

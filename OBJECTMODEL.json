@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-19",
   "gemeten": {
-    "bestanden": 2988,
-    "vormen": 1620,
-    "velden": 2316,
-    "modules": 909,
-    "domeinen": 325,
+    "bestanden": 2974,
+    "vormen": 1615,
+    "velden": 2317,
+    "modules": 906,
+    "domeinen": 323,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1621,
+    "veldenDomeineigen": 1622,
     "veldenGedeeldVanafVier": 237,
     "gelijkendeVormparen": 64
   },
@@ -154,18 +154,6 @@
       ]
     },
     {
-      "veld": "versie",
-      "domeinen": 15,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/fluister"
-      ]
-    },
-    {
       "veld": "onderwerp",
       "domeinen": 15,
       "waar": [
@@ -187,6 +175,18 @@
         "kern/commerce",
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport"
+      ]
+    },
+    {
+      "veld": "versie",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/fluister"
       ]
     },
     {
@@ -322,18 +322,6 @@
       ]
     },
     {
-      "veld": "plek",
-      "domeinen": 12,
-      "waar": [
-        "kern/afdelingen",
-        "kern/agenda-pro",
-        "kern/commerce",
-        "kern/festival",
-        "kern/hulpdienst",
-        "kern/mall"
-      ]
-    },
-    {
       "veld": "zaak",
       "domeinen": 12,
       "waar": [
@@ -463,6 +451,18 @@
         "kern/festival",
         "kern/leerhuis",
         "kern/mobiliteit"
+      ]
+    },
+    {
+      "veld": "plek",
+      "domeinen": 11,
+      "waar": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/commerce",
+        "kern/festival",
+        "kern/hulpdienst",
+        "kern/mall"
       ]
     },
     {

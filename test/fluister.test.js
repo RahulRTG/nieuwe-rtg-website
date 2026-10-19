@@ -8,7 +8,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const assetkoop = require('./lib/assetkoop');
 
 let srv, base;
 let lid, pda;
@@ -20,7 +21,7 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_SIMULATIEBANK: '1' } });
   base = srv.base;
   lid = (await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json()).token;
   const roster = await api('supplier/roster', { code: 'HOSHI' });
@@ -102,7 +103,8 @@ test('Fluister doet het ook echt: reserveren en het 24-uursblok plannen, in gewo
   await api('reservering/annuleer', { id: res.id }, lid);
   // het 24-uursblok claimt een dag van het gedeelde object: eerst een voorstel
   const ov = (await api('assets', {}, lid)).body;
-  await api('asset/koop', { assetId: ov.assets[0].id, smaak: 'access', aantal: 1 }, lid);
+  // een ticket langs de echte weg: aanvraag, een mens op naam keurt, bevestigd betalen
+  await assetkoop.gekocht(api, { token: lid, pas: 'rtg', opNaam: await kantoorAlsPersoon(base), body: { assetId: ov.assets[0].id, smaak: 'access', aantal: 1 } });
   const j = new Date().getUTCFullYear() + 1;
   const blok = await api('fluister', { q: 'zet mijn 24 uur op ' + j + '-01-20' }, lid);
   assert.ok(blok.body.voorstel && !blok.body.gedaan, 'boven de drempel: eerst een voorstel');

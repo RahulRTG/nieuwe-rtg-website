@@ -13,7 +13,7 @@
      een weigering van de server, en dit scherm toont die gewoon;
    - een reden van ten minste tien tekens is verplicht en blijft bij de opdracht.
 
-   Gebruik: RTGTerugVastgelopen({ api, meld, esc }) geeft { regel, bedraad }. */
+   Gebruik: RTGTerugVastgelopen({ api, meld, esc }) geeft { kent, regel, bedraad }. */
 window.RTGTerugVastgelopen = function (o) {
   'use strict';
   const { api, meld, esc } = o;
@@ -46,5 +46,35 @@ window.RTGTerugVastgelopen = function (o) {
     }));
   }
 
-  return { regel, bedraad };
+  /* EEN BETALING OP CONTROLE (derde reeks, 19 oktober 2026): na een weigering staat
+     de hele betaling stil tot een mens keek. Afronden zet haar terug op haar laatste
+     ruststand; de geweigerde opdracht blijft staan, en er wordt niets geboekt. */
+  function controleRegel(p) {
+    const k = esc(p.betalingId);
+    return '<div class="betaal-waarschuwing"><strong>Betaling op controle</strong> · ' +
+      esc(String(p.tekst || '').replace(/^Betaling op controle:\s*/, '')) +
+      '<div class="taakrij">' +
+        '<input class="veld h-flex1" maxlength="300" data-crreden="' + k + '" ' +
+          'placeholder="Wat heeft u nagekeken? (verplicht, ten minste tien tekens)">' +
+        '<button class="knop" type="button" data-cr="' + k + '">Controle afronden</button>' +
+      '</div></div>';
+  }
+  function bedraadControle(wortel, herlaad) {
+    wortel.querySelectorAll('button[data-cr]').forEach(b => b.addEventListener('click', async () => {
+      const veld = wortel.querySelector('input[data-crreden="' + b.dataset.cr + '"]');
+      b.disabled = true;
+      try {
+        const r = await api('betalingen/controle/afrond', { betalingId: b.dataset.cr, reden: veld ? veld.value : '' });
+        meld('Afgerond op uw naam. De betaling staat weer op ' + r.stand + '.');
+        if (herlaad) herlaad();
+      } catch (e) { b.disabled = false; meld(e.message); }
+    }));
+  }
+
+  const kent = code => code === 'TERUGBETALING-VASTGELOPEN' || code === 'BETALING-OP-CONTROLE';
+  return {
+    kent,
+    regel: p => (p.code === 'BETALING-OP-CONTROLE' ? controleRegel(p) : regel(p)),
+    bedraad: (wortel, herlaad) => { bedraad(wortel, herlaad); bedraadControle(wortel, herlaad); }
+  };
 };

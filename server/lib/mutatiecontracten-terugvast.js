@@ -2,7 +2,8 @@
    MUTATIECONTRACTEN -- EEN VASTGELOPEN TERUGBETALING AFHANDELEN.
 
    Deel van server/lib/mutatiecontracten.js (via ./mutatiecontracten-teruggave.js);
-   zie de kop daar voor de vorm. Een route (routes/kantoren/betaalproviders.js):
+   zie de kop daar voor de vorm. Twee routes (routes/kantoren/betaalproviders.js),
+   de tweede (controle afronden) uit de derde reeks van dezelfde dag. De eerste:
    een mens op naam legt vast wat hij bij de provider zag over een terugbetaling
    die de veegronde (kern/betaalwaarheid/terugveeg.js) na zes navragen zonder
    uitsluitsel escaleerde. Eigenaarsbesluit van 19 oktober 2026. De deur is
@@ -30,6 +31,24 @@ const CONTRACTEN = {
     },
     afgetekend: { door: 'Claude, op grond van kern/betaalwaarheid/terugveeg.js, routes/kantoren/betaalproviders.js ' +
       'en test/terugvastgelopen.test.js; niet door een mens nagelezen', op: '2026-10-19' }
+  },
+  'POST /api/office/betalingen/controle/afrond': {
+    mutatieId: 'betaalwaarheid.controle.afronden',
+    herkomst: 'mens',
+    semantiek: { klasse: 'hooguitEens' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'Een betaling op controle wordt een keer afgerond: de mens zet haar met naam en reden terug op de ' +
+      'laatste definitieve ruststand voor de controle, en een tweede afronding geeft 409 omdat de betaling dan ' +
+      'niet meer op controle staat -- een TOESTANDSCONTROLE en geen idempotentie. Er wordt niets geboekt.',
+    bewijs: {
+      gemeten: 'test/controleafronden.test.js: zonder afronden gaat het tweede ticket niet terug, na afronden wel ' +
+        'en een keer; zonder naam 403, een te korte reden 400, een tweede afronding 409, een nooit bevestigde betaling ' +
+        '409; geen andere weg haalt een betaling van controle; via de echte route krijgt de gedeelde kantoorcode 403.',
+      op: '2026-10-19'
+    },
+    afgetekend: { door: 'Claude, op grond van kern/betaalwaarheid/controle.js, routes/kantoren/betaalproviders.js ' +
+      'en test/controleafronden.test.js; niet door een mens nagelezen', op: '2026-10-19' }
   }
 };
 

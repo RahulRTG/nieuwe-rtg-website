@@ -26,7 +26,13 @@
    Alle acht staan met een reden op de publieke lijst van check.js regel 28. */
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, officeAuth, rtfos, veilig, H }) => {
+module.exports = ({ app, auth, officeAuth, rtfos, veilig, H, rtf, resolveSession }) => {
+  /* DE BUURT VRAAGT EEN SESSIE (eigenaarsbesluit 19 oktober 2026: gebruiken
+     vraagt een account). Een lid, een zaak of het kantoor met zijn sessie; een
+     gezinsprofiel met code en token in het lijf, en dan alleen uit een gezin
+     dat aan het account van een ouder hangt (foundation/accountplicht.js). De
+     vraag staat in kern/elkesessie.js; zonder sessie 401. */
+  const { magSessie, NIET_INGELOGD } = require('../../kern/elkesessie');
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });
@@ -56,10 +62,19 @@ module.exports = ({ app, auth, officeAuth, rtfos, veilig, H }) => {
   app.post('/api/rtfos/portaal/deelnemer/intrekken', ipRem, codeRem, (req, res) =>
     veilig(res, () => rtfos.deelnemerportaal.trekIn(codeVan(req), (req.body || {}).reden)));
 
-  // ---------- de buurt, zonder code ----------
-  app.post('/api/rtfos/publiek/steden', leesRem, (req, res) => veilig(res, () => rtfos.publiek.steden()));
-  app.post('/api/rtfos/publiek/stad', leesRem, (req, res) => veilig(res, () => rtfos.publiek.stad((req.body || {}).id)));
-  app.post('/api/rtfos/publiek/campagnes', leesRem, (req, res) => veilig(res, () => rtfos.publiek.campagnes()));
+  // ---------- de buurt, zonder code maar met een account of een gezinsprofiel ----------
+  app.post('/api/rtfos/publiek/steden', leesRem, (req, res) => {
+    if (!magSessie(req, { resolveSession, rtf })) return res.status(401).json(NIET_INGELOGD);
+    veilig(res, () => rtfos.publiek.steden());
+  });
+  app.post('/api/rtfos/publiek/stad', leesRem, (req, res) => {
+    if (!magSessie(req, { resolveSession, rtf })) return res.status(401).json(NIET_INGELOGD);
+    veilig(res, () => rtfos.publiek.stad((req.body || {}).id));
+  });
+  app.post('/api/rtfos/publiek/campagnes', leesRem, (req, res) => {
+    if (!magSessie(req, { resolveSession, rtf })) return res.status(401).json(NIET_INGELOGD);
+    veilig(res, () => rtfos.publiek.campagnes());
+  });
 
   /* ---------- de kantoorkant ----------
      Een code uitgeven is een besluit en geen bijvangst: er kijkt daarna iemand

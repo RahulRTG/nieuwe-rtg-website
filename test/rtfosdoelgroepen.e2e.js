@@ -24,6 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, kantoorKoppelBody } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosdoel-'));
@@ -97,7 +98,7 @@ const GEHEIM = ['0644433322', 'saskia@example.org', 'te streng tegen', 'Peter de
 
 function lekken(tekst) { return GEHEIM.filter(g => tekst.includes(g)); }
 
-async function schermMet(base, pw, pad) {
+async function schermMet(base, pw, pad, lidToken) {
   const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
@@ -111,7 +112,7 @@ async function schermMet(base, pw, pad) {
     try { antwoorden.push(await res.text()); } catch (e) { /* afgebroken antwoord */ }
   });
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
+  await page.evaluate((t) => { localStorage.setItem('rtg_cookieinfo_v1', '1'); if (t) localStorage.setItem('rtg_member_token', t); }, lidToken || '');
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   return { browser, page, fouten, antwoorden, verzoeken };
 }
@@ -200,7 +201,8 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
   let s;
   try {
     const d = await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere');
+    // de buurt-app vraagt een account (eigenaarsbesluit 19 oktober 2026): een gratis account is genoeg
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere', (await registreerGratis(srv.base)).token);
     await s.page.locator('.wp-domain summary').click();
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     await s.page.waitForSelector('body[data-rtg-world-dashboard-ready="true"]',

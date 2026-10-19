@@ -336,7 +336,6 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
        Een 128-bits eenmalige koppeling in het POST-lijf wordt atomair verbruikt
        voor een aparte, intrekbare schermsessie. Beide geven uitsluitend
        zicht.publiek van één potje; de rem staat ervoor. */
-    'server/routes/spellen.js POST /api/projectie/koppel': 'spelscherm op tv: eenmalige gehashte koppeling is de deur tot alleen publiek zicht',
     'server/routes/lesmaker.js POST /api/les/leraar': 'klaslokaal: leraarToken is de sleutel, geen account',
     'server/routes/lesmaker.js POST /api/les/volgende': 'klaslokaal: leraarToken is de sleutel',
     'server/routes/lesmaker.js POST /api/les/sluit': 'klaslokaal: leraarToken is de sleutel',

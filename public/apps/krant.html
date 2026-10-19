@@ -94,11 +94,15 @@
 </header>
 <main id="hoofd"></main>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/accountdeur.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const api=(pad,body)=>fetch('/api/krant/'+pad,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+/* De krant lees je met een account (eigenaarsbesluit 19 oktober 2026): zonder account eerst de deur, hier op de pagina. */
+const api=async(pad,body)=>{ if(!RTGAccountDeur.token()) await RTGAccountDeur.eis($('#hoofd'),{waarom:'De krant lees je met een RTG-account. Een gratis account is genoeg.'});
+  const r=await fetch('/api/krant/'+pad,{method:'POST',headers:RTGAccountDeur.kop({'Content-Type':'application/json'}),body:JSON.stringify(body||{})});
+  const d=await r.json().catch(()=>({})); if(r.status===401) RTGAccountDeur.vergeet(); if(!r.ok)throw new Error(d.error||'Er ging iets mis.'); return d; };
 let ZAAK=(new URLSearchParams(location.search).get('zaak')||'').toUpperCase();
 let KRANT=null, RUBRIEK='alle', GIDS=[];
 /* Meenemen: wat er open ligt. Staat er een krant open, dan de artikelen van

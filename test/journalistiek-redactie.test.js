@@ -29,11 +29,19 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let srv, base, bode, ander;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-journ-'));
 
-function api(pad, body, token) {
+/* De krant lezen vraagt een account (eigenaarsbesluit 19 oktober 2026): een
+   /api/krant-aanroep zonder eigen token reist met een gratis lezersaccount mee. */
+let lezer = null;
+async function api(pad, body, token) {
+  if (token === undefined && pad.startsWith('/api/krant/')) {
+    lezer = lezer || await registreerGratis(base);
+    token = lezer.token;
+  }
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })

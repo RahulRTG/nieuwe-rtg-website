@@ -83,8 +83,12 @@ function rtfSociaal(req, res) {
   require('./social/klets')(sctx);
 
 
-// web-push: publieke sleutel + subscription opslaan
+// web-push: publieke sleutel + subscription opslaan. De sleutel is de publieke
+// helft, maar hij hoort bij een ingelogd scherm (eigenaarsbesluit 19 oktober 2026):
+// elke sessie die het huis kent (kern/elkesessie.js), want ook de zaak en het kantoor zetten push aan.
 app.get('/api/push/key', (req, res) => {
+  const elke = require('../kern/elkesessie');
+  if (!elke.magSessie(req, { resolveSession: kern.resolveSession })) return res.status(401).json(elke.NIET_INGELOGD);
   res.json({ key: webpush && db.data.vapid ? db.data.vapid.publicKey : null });
 });
 

@@ -219,19 +219,16 @@ const PUBLIEK = new Map([
   ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
   ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
 
-  /* De drie doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js).
-     De eerste twee dragen dezelfde twee remmen als de codes hierboven; de
-     derde heeft geen code omdat er niets achter zit wat een code verdient --
-     zie kern/rtfos/publiek.js, waar de maat letterlijk is: wat zou je op een
-     poster in het buurthuis hangen? */
+  /* Twee doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js), met
+     dezelfde twee remmen als de codes hierboven. De derde, de buurt-app
+     (/api/rtfos/publiek/steden, stad en campagnes), staat hier niet meer: sinds
+     het eigenaarsbesluit van 19 oktober 2026 vraagt hij een account of een
+     gezinsprofiel aan het account van een ouder. */
   ['/api/rtfos/portaal/vrijwilliger', 'de vrijwilligerscode is de geloofsbrief; alleen zijn eigen planning en uren, geen contactgegevens en geen evaluaties'],
   ['/api/rtfos/portaal/vrijwilliger/zet', 'idem: hij werkt zijn eigen beschikbaarheid bij; zijn VOG en status zet de afdeling'],
   ['/api/rtfos/portaal/vrijwilliger/uren', 'idem: uren die hij opgeeft komen binnen als MELDING en tellen pas na bevestiging'],
   ['/api/rtfos/portaal/deelnemer', 'de deelnemerscode is de geloofsbrief; uitsluitend de stand van die ene hulpvraag'],
   ['/api/rtfos/portaal/deelnemer/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
-  ['/api/rtfos/publiek/steden', 'de buurt-app: alleen wat op een poster in het buurthuis zou hangen, geen enkel getal over hulpvragen'],
-  ['/api/rtfos/publiek/stad', 'idem, per stad: lopende projecten en open activiteiten'],
-  ['/api/rtfos/publiek/campagnes', 'idem: welke landelijke campagnes lopen, zonder opgehaalde bedragen'],
   ['/api/rtfos/portaal/donateur', 'de gever op zijn eigen code (RTFS-): alleen zijn eigen giften en waar ze heen gingen, nooit wie er nog meer gaf. Twee remmen, per bron en per code'],
   ['/api/rtfos/portaal/donateur/bewijs', 'idem: het giftbewijs voor een van zijn eigen giften'],
   ['/api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatieplicht: een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers'],
@@ -262,10 +259,6 @@ const PUBLIEK = new Map([
   ['/api/bescherming/deur/stand', 'de eigen code is de geloofsbrief, en hij is met opzet GEEN wachtwoord: dit antwoordt alleen de stand en of er iets is klaargezet, nooit wat'],
   ['/api/bescherming/deur/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
   ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
-  ['/api/gids/app', 'de app-gids is openbaar'],
-  ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],
-  ['/api/krant/open', 'idem'],
-  ['/api/krant/artikel', 'idem'],
   ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
   ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
   /* Een klaargezette reis wordt geopend door iemand die nog GEEN lid is --
@@ -278,7 +271,6 @@ const PUBLIEK = new Map([
   ['/api/talen', 'de talenlijst voedt de kiezer op het inlogscherm'],
   ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
   ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
-  ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
   /* Het gedeelde scherm. Een televisie in een vakantiehuis heeft geen
      RTG-account, en er een op zetten zou betekenen dat er een ingelogde
      sessie op een gedeeld apparaat blijft staan. Koppelen gebruikt daarom
@@ -288,8 +280,6 @@ const PUBLIEK = new Map([
      `zicht.publiek` van dat ene potje. Er kan niets terug: geen zet en geen
      chat. Beide deuren hebben een rem en antwoorden nooit cachebaar. Zie
      server/kern/spellen/projectie.js. */
-  ['/api/projectie/koppel', 'een gedeeld scherm heeft nog geen sessie; een eenmalige 128-bits koppelcredential opent alleen de publieke laag van een potje'],
-  ['/api/projectie/kijk', 'de intrekbare schermsessie leest alleen de publieke laag van het gekoppelde potje'],
   ['/api/projectie/:code', 'oude projectie-URL is uitsluitend een cacheloze 410-eindstatus en opent nooit meer een potje'],
   /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
      een stichting onderscheidt, en waar je met elk van de twee aan vastzit,
@@ -297,7 +287,6 @@ const PUBLIEK = new Map([
      geen enkele onderneming in -- alleen de vaste tabel uit
      kern/onderneming/rechtsvorm.js. Alles wat wel over een echt bedrijf
      gaat, zit in dezelfde router achter auth. */
-  ['/api/onderneming/rechtsvormen', 'de rechtsvormtabel is voorlichting; er staat geen enkele onderneming in'],
   /* Het algoritmeregister van de stad. Een register dat alleen achter een
      kantoorinlog te lezen is, geeft een inwoner precies niets -- en dat is
      de enige groep voor wie het bedoeld is. Er staan regels in, geen mensen:

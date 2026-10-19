@@ -25,6 +25,7 @@ const { KAART, TERREINEN, WOORDEN } = require('../server/kern/knelpunt/openingen
 const { terreinenVan } = require('../server/kern/knelpunt/openingen');
 const { zonderCommentaar } = require('../scripts/lib/bron');
 const { startServer, stop } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const WORTEL = path.join(__dirname, '..');
 const RV = { id: 'rv', wat: 'een rechtsvorm kiezen voor mijn eigen bedrijf', stand: 'ontbreekt' };
@@ -134,8 +135,12 @@ test('7. tegen een echte server: een kaal ondernemersdoel en een ondernemersknel
     assert.deepEqual(knel.d.vondstenGeweigerd, []);
     assert.ok(!(knel.d.vondstenZonderBron || []).some(z => z.terrein === 'ondernemen'));
 
-    /* De ingang van de kaart gaat open ZONDER account -- daarom is hij gekozen. */
-    const open = await fetch(base + '/api/onderneming/rechtsvormen');
-    assert.equal(open.status, 200, 'de voorlichting zit achter een deur; dan is hij geen ingang voor een gezin');
+    /* De ingang van de kaart is gekozen omdat hij zonder BETAALDE pas opengaat.
+       Sinds het eigenaarsbesluit van 19 oktober 2026 vraagt hij wel een account,
+       en een gratis account is genoeg. */
+    assert.equal((await fetch(base + '/api/onderneming/rechtsvormen')).status, 401, 'zonder account geen voorlichting meer');
+    const gratis = await registreerGratis(base);
+    const open = await fetch(base + '/api/onderneming/rechtsvormen', { headers: { Authorization: 'Bearer ' + gratis.token } });
+    assert.equal(open.status, 200, 'met een gratis account opent de ingang');
   } finally { await stop(child); }
 });

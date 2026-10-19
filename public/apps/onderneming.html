@@ -862,7 +862,7 @@ async function herlaad(){
     api('intake',{id:HUIDIG}),api('aanvraag/stand',{id:HUIDIG})]);
   DAG=dag;VERK=verk;INTAKE=intake.intake;AANVRAAG=stand;
   if(!RECHTSVORMEN){
-    try{ RECHTSVORMEN=(await (await fetch('/api/onderneming/rechtsvormen')).json()).rechtsvormen; }
+    try{ RECHTSVORMEN=(await (await fetch('/api/onderneming/rechtsvormen',{headers:{Authorization:'Bearer '+(localStorage.getItem('rtg_member_token')||'')}})).json()).rechtsvormen; }
     catch(e){ RECHTSVORMEN=[]; }
   }
   // de lijst met ondernemingen draagt de naam in de kiezer; die kan net gewijzigd zijn

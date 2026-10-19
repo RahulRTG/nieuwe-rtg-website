@@ -29,6 +29,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scherm-e2e-'));
@@ -61,7 +62,7 @@ async function bevriend(base, a, b) {
 }
 const api = (base, token, actie, body) => json(base, '/member/spel/' + actie, body, token);
 
-test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de kaart',
+test('een potje 30 Seconden op het gedeelde scherm, met een account op het scherm en zonder de kaart',
   { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -93,7 +94,7 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
     });
     assert.ok(kamer.code, 'de gastheer krijgt een code: ' + JSON.stringify(kamer).slice(0, 160));
 
-    /* Het scherm heeft geen LEDENtoken. De eenmalige code uit het fragment
+    /* Het scherm heeft een EIGEN account, niet dat van een speler. De eenmalige code uit het fragment
        wordt voor de eerste request uit de adresbalk gehaald en atomair
        ingewisseld voor een aparte schermsessie. */
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -111,6 +112,16 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
       projectieUrls.push(r.url());
       try { overDeLijn.push(await r.text()); } catch (e) { /* afgebroken antwoord */ }
     });
+
+    /* Het scherm vraagt eerst een account (eigenaarsbesluit 19 oktober 2026),
+       en verbruikt de koppelcode pas daarna: zonder account gaat er geen enkel
+       verzoek naar de projectie-ingang. */
+    await page.goto(base + '/apps/spelscherm.html#' + kamer.code, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor();
+    assert.equal(projectieUrls.length, 0, 'zonder account wordt de koppelcode niet gebruikt');
+    const schermAccount = await registreerGratis(base);
+    await ctx.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* about:blank */ } }, schermAccount.token);
+    await page.goto('about:blank');
 
     const paginaAntwoord = await page.goto(base + '/apps/spelscherm.html#' + kamer.code,
       { waitUntil: 'domcontentloaded' });

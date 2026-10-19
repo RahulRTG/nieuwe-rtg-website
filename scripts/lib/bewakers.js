@@ -105,6 +105,11 @@ const KAART = new Map([
   // Geen herbruikbare bearerrol: het bewijs zit in de HMAC-kop en is gebonden
   // aan de onbewerkte body, event-id en tijd. De eigen HTTP-proef tekent dit.
   ['storingenAuth', ['verzoeksignatuur', null, 'HMAC-kop over raw body, event-id en tijd; een bearer is hier geen geloofsbrief']],
+  /* De buitenpoort voor machinepost (server/kern/mailpoort.js, eigenaarsbesluit
+     19 oktober 2026, uitzondering 6): het gedeelde geheim van de eigen
+     mailserver in de kop x-rtg-mailpoort. Geen lid en geen bearerrol, dus niet
+     te kruisen; zonder ingericht geheim is hij voor iedereen dicht. */
+  ['mailpoort', ['verzoeksignatuur', null, 'gedeeld geheim van de eigen mailserver in de kop x-rtg-mailpoort; een bearer is hier geen geloofsbrief']],
   ['boardroomAuth', ['eigenrol', 'boardroom',
     'draait eerst officeAuth en eist daarna boardroomtoegang; member en supplier stranden op de eerste, office op de tweede']],
   /* DE KLUISPOORT (server/kern/kantoor/kluispoort.js). Hij draait eerst

@@ -1,5 +1,19 @@
 # School (link:school)
 
+**Volledige werkzaamheid:** School doet volledig waarvoor ze er is als een
+leerling (kind of volwassene) op zijn eigen fase een dagplan krijgt dat alleen
+doelen bevat waarvan de voorkennis af is, oefent, bij een fout de denkfout en een
+andere uitleg krijgt, na een mislukte sessie te horen krijgt welke bouwsteen
+eronder ontbreekt, een aanbeveling kan betwisten, een examen kan oefenen met een
+oefenindicatie die geen cijfer is, en het bewijs van school (toets, observatie)
+met de naam van wie het zag in zijn paspoort terugvindt; zonder dat iemand
+buiten de leerling en wie een rechtmatige verhouding met hem heeft het paspoort
+leest, en zonder dat er een vergelijking of niveau-label wordt bewaard. Toets:
+`scripts/lib/voltooi/school.js` (examen en advies) plus `test/leerfabric.test.js`,
+`test/denkfout.test.js`, `test/dagplan.test.js`; het betwisten, de ontbrekende
+bouwsteen en de lezersgrens zijn vandaag niet gebouwd (zie HERSTEL en
+VERDIEPING).
+
 Eigenaar: `leren.school` → `apps/rtgschool.html` (SCHERMEIGENAAR.json, doelgroep
 rtf-kind; de app wordt ook door volwassen leden gebruikt). Ingang: de app School
 in de ledenapp, en als schil het Leerpaspoort in de Foundation
@@ -81,23 +95,33 @@ vraagt, en wat er nog onder moet.
   advies) komt in `server/school/` en `kern/` **niet voor** (niet gevonden).
 - Fase en leerjaar in het paspoort zet het lid zelf (`inschrijf`, `jaarOver` in
   `kern/onderwijs.js`); een overgang door school bevestigd is er niet in het
-  ledenpaspoort.
+  ledenpaspoort. Een historieregel zegt niet wie de overgang zette.
+- **Gerepareerd** (commit dc14a03): een dubbele tik op "Een leerjaar erbij"
+  telde twee leerjaren. `jaarOver` bewaart nu de herhaalsleutel op het
+  paspoort (`jaarIdem`, laatste 20); beide routes staan in
+  `server/middleware/idempotentie-eigen.js`; toets
+  `test/onderwijs-jaarover.test.js`.
+- **Nog open, nieuw gezien**: `inschrijf` zet bij elke aanroep `p.jaar = 1`, ook
+  als de fase dezelfde is (`kern/onderwijs.js` r. 82). Een herhaalde of dubbele
+  inschrijving op de eigen fase zet een leerling in havo 3 stil terug naar havo
+  1, zonder historieregel; `inschrijf` heeft geen herhaalsleutel.
 
 ---
 
 ## b. Marktvergelijking
 
 Geraadpleegd 19 oktober 2026 via WebSearch op het officiële domein (via
-zoektool, live te controleren). Merken alleen ter vergelijking.
+zoektool, live te controleren). Elke marktregel hieronder is daarom **(te
+controleren)**. Merken alleen ter vergelijking.
 
 | Leider | Achter de betaalmuur | Wij | Bron |
 |---|---|---|---|
-| Snappet Compleet | €74 per leerling per jaar; adaptief oefenen in de klas | adaptief oefenen: **ja** (Fabric, voorkennis, denkfout); klasbeeld voor de docent: **ja** bij `werk.schoolbeheer`; volledig methode-aanbod po: **ja** (111 doelen), vo **half** | https://snappet.nl/tarieven/ |
-| ALEKS | $48,22; kennisruimte-adaptief | voorkennisgraaf: **ja**; beheersingscheck op verzoek (appeal): **nee** | https://www.mheducation.com/prek-12/program/microsites/MKTSP-GAB02M0/order-online.html |
-| Khanmigo | gratis voor leraren; leerling en ouder $4 per maand, alleen VS | AI-tutor: **half** (`/api/bijles*`, Explain Differently uit vaste uitlegvarianten); gratis voor docent: n.v.t. | https://www.khanmigo.ai/pricing |
-| Duolingo Max | roleplay, videogesprek, Explain My Answer | Explain My Answer: **ja** (denkfout-duiding uit het feit, geen model) | https://www.duolingo.com/help/what-is-duolingo-max |
-| Google Education Plus (enterprise) | $6 per gebruiker per jaar | schoolbrede suite: **nee** hier; documenten bij `docs.office` | https://knowledge.workspace.google.com/admin/getting-started/editions/google-workspace-for-education-pricing-and-licensing |
-| Cornerstone Galaxy / Docebo (duurste, zakelijk leren, offerte) | Skills Architect, People Graph | vaardighedengraaf voor werk: **nee** (zie Loopbaan en ARBEID besluit over een gedeelde vaardighedenlijst) | https://www.cornerstoneondemand.com/platform/portfolio-packages/ , https://www.docebo.com/pricing/ |
+| Snappet Compleet | €74 per leerling per jaar; adaptief oefenen in de klas (te controleren) | adaptief oefenen: **ja** (Fabric, voorkennis, denkfout); klasbeeld voor de docent: **ja** bij `werk.schoolbeheer`; volledig methode-aanbod po: **ja** (111 doelen), vo **half** | https://snappet.nl/tarieven/ |
+| ALEKS | $48,22; kennisruimte-adaptief (te controleren) | voorkennisgraaf: **ja**; beheersingscheck op verzoek (appeal): **nee** | https://www.mheducation.com/prek-12/program/microsites/MKTSP-GAB02M0/order-online.html |
+| Khanmigo | gratis voor leraren; leerling en ouder $4 per maand, alleen VS (te controleren) | AI-tutor: **half** (`/api/bijles*`, Explain Differently uit vaste uitlegvarianten); gratis voor docent: n.v.t. | https://www.khanmigo.ai/pricing |
+| Duolingo Max | roleplay, videogesprek, Explain My Answer (te controleren) | Explain My Answer: **ja** (denkfout-duiding uit het feit, geen model) | https://www.duolingo.com/help/what-is-duolingo-max |
+| Google Education Plus (enterprise) | $6 per gebruiker per jaar (te controleren) | schoolbrede suite: **nee** hier; documenten bij `docs.office` | https://knowledge.workspace.google.com/admin/getting-started/editions/google-workspace-for-education-pricing-and-licensing |
+| Cornerstone Galaxy / Docebo (duurste, zakelijk leren, offerte) | Skills Architect, People Graph (te controleren) | vaardighedengraaf voor werk: **nee** (zie Loopbaan en ARBEID besluit over een gedeelde vaardighedenlijst) | https://www.cornerstoneondemand.com/platform/portfolio-packages/ , https://www.docebo.com/pricing/ |
 
 Wat de markt niet heeft en wij wel: beheersing als woord met het bewijs eronder
 (geen percentage, geen ranglijst), een dagplan dat niets telt, herhalen zonder
@@ -120,23 +144,28 @@ en ontvangt bewijs (toets, observatie).
 **Organisatie.** Een school of bestuur: leerlingvolgsysteem, zorg, verzuim,
 inspectie, overstap. Dat is School Core in `server/school/` en niet deze app.
 
-**Wet en norm** (domein-max.txt, par. 8):
+**Wet en norm** (domein-max.txt, par. 8). Elke regel hieronder komt uit een
+zoeksamenvatting en is dus **(te controleren)**; geen ervan wordt in deze kaart
+een harde weigerregel, hooguit een signaal:
 - Leerlingvolgsysteem: art. 8 WPO. Onderwijskundig rapport bij vertrek:
-  art. 42 WPO. Voor software: een leerdossier per doel is bruikbaar, maar het
+  art. 42 WPO (te controleren). Voor software: een leerdossier per doel is bruikbaar, maar het
   officiële rapport stelt de school vast, niet RTG.
-- Tijdlijn schooladvies 2027: voorlopig advies 10-31 januari; doorstroomtoets
+- Tijdlijn schooladvies 2027 (te controleren): voorlopig advies 10-31 januari; doorstroomtoets
   25 januari tot 12 februari; definitief advies uiterlijk 24 maart; bijstellen
   alleen naar boven
   (https://www.rijksoverheid.nl/themas/onderwijs/schooladvies-en-doorstroomtoets-basisschool/tijdlijn-schooladvies-2027).
-  Voor software: een termijnklok bij de school, en in School alleen een
+  Voor software: een termijnsignaal bij de school, en in School alleen een
   zichtbare tijdlijn; het advies blijft van de school (`kern/schooladvies.js`).
-- Onderzoekskaders 2026 van de inspectie (vanaf 1 augustus 2026): OP0
+  Zolang de datums niet zijn nagelezen, waarschuwt de klok en weigert hij
+  niets.
+- Onderzoekskaders 2026 van de inspectie (vanaf 1 augustus 2026; te
+  controleren): OP0
   basisvaardigheden, OP1 aanbod, veiligheid en schoolklimaat,
   onderwijsresultaten, sturen en kwaliteitszorg
   (https://www.onderwijsinspectie.nl/actueel/nieuws/2026/07/03/onderzoekskaders-2026-vastgesteld).
   Voor software: aanbod en basisvaardigheden zijn per leerdoel aantoonbaar te
   maken, zonder kindranglijst.
-- AVG op school: leerlingdossier 2 jaar na vertrek; in- en uitschrijving en
+- AVG op school (te controleren): leerlingdossier 2 jaar na vertrek; in- en uitschrijving en
   verzuim 5 jaar; onderwijskundig rapport 5 jaar
   (https://autoriteitpersoonsgegevens.nl/nl/onderwerpen/onderwijs/leerlingdossiers ,
   https://normenkaderibp.kennisnet.nl/app/uploads/Handleiding-Bewaartermijnenoverzicht.pdf).
@@ -144,13 +173,13 @@ inspectie, overstap. Dat is School Core in `server/school/` en niet deze app.
   van een lid is van het lid zelf en valt niet onder de termijn van de school.
   Hoe die twee zich verhouden bij een kind dat via een school oefent: te
   controleren.
-- Formatief evalueren (SLO), vijf fasen: leerdoelen en succescriteria, reacties
+- Formatief evalueren (SLO), vijf fasen (te controleren): leerdoelen en succescriteria, reacties
   ontlokken, analyseren, feedback, vervolgstappen
   (https://www.slo.nl/thema/meer/10-14-onderwijs/werken-leerdoelen/slag-formatief-evalueren/).
   Voor software: de Fabric dekt fase 1 (`meting`), 2 (oefenen), 3 (denkfout),
   4 (uitleg anders) en 5 (dagplan). Ontbrekend: succescriteria in woorden van
   de leerling.
-- AVG art. 12 (inzage binnen 1 maand) en art. 35 (DPIA bij hoog risico;
+- AVG art. 12 (inzage binnen 1 maand) en art. 35 (beide te controleren) (DPIA bij hoog risico;
   kinderen en profilering zijn daarvoor een aanwijzing, te controleren tegen de
   AP-lijst).
 
@@ -170,10 +199,12 @@ rechtmatige verhouding, op codenaam. Een leerdossier valt **niet** onder
 |---|---|---|---|---|---|---|---|---|---|---|
 | Oefenen met voorkennis | bestaat, `leerstof-fabric.js` | Fabric, sessie | doel pas aangeboden als `vereist` af is | geen | leerling | eigen sessie | leeftijdspas in Foundation | een doel met open voorkennis staat nooit in het dagplan | – | bestaat |
 | Beheersing met bewijs ("Waarom?") | bestaat, `onderwijs-bewijs.js` | bewijsregels | woord uit onafhankelijkheid, nooit opgeslagen | geen | leerling | eigen | zelfgemeld telt minder | de leerling ziet waarom RTG denkt dat hij het kan | – | bestaat |
-| Algorithmic Appeal ("Ik kan dit al") | ontbreekt (SCHOOL.md par. 6) | doel + 5 verse vragen uit de generator | 5 vragen; 5 van 5 of 4 van 5 zonder hint → bewijssoort `herhaling` en de leerlijn schuift; minder → niets gewist | geen: regel | leerling direct | eigen | niet bij examentraining | een leerling kan een aanbeveling betwisten en schuift op bij goed resultaat, zonder dat een mislukte check ergens blijft staan | klein | aanbevolen nu |
-| Learning Recovery na een onvoldoende | ontbreekt (SCHOOL.md par. 6) | toetsuitslag per leerdoel (school) + `vereist` | lijst ontbrekende bouwstenen, maximaal 3, in het dagplan; geen "hoofdstuk opnieuw" | geen | leerling na de toets | school levert de uitslag | uitslag zonder leerdoel: niets | na een onvoldoende staan de drie ontbrekende bouwstenen in het dagplan van morgen | klein | aanbevolen nu |
+| Algorithmic Appeal ("Ik kan dit al") | ontbreekt (SCHOOL.md par. 6) | doel + 5 verse vragen uit de generator | 5 vragen; 5 van 5 of 4 van 5 zonder hint → bewijssoort `herhaling` en de leerlijn schuift; minder → niets gewist | geen: regel | leerling direct | eigen | niet bij examentraining | een leerling kan een aanbeveling betwisten en schuift op bij goed resultaat, zonder dat een mislukte check ergens blijft staan | klein | VERDIEPING V1, aanbevolen nu |
+| Learning Recovery na een onvoldoende | ontbreekt (SCHOOL.md par. 6) | toetsuitslag per leerdoel (school) + `vereist` | lijst ontbrekende bouwstenen, maximaal 3, in het dagplan; geen "hoofdstuk opnieuw" | geen | leerling na de toets | school levert de uitslag | uitslag zonder leerdoel: niets | na een onvoldoende staan de drie ontbrekende bouwstenen in het dagplan van morgen | klein | VERDIEPING V2, aanbevolen nu |
 | Succescriteria in leerlingtaal | ontbreekt | `meting` per doel | een zin per doel "je kunt dit als ..."; vast in `leerstof-data/` | geen | leerling | – | – | elk doel zegt in gewone taal wanneer het beheerst is (SLO fase 1) | middel (166 zinnen) | later |
-| Dubbele tik op "een leerjaar erbij" | half: `jaarOver` zonder herhaalsleutel | paspoort | herhaalsleutel zoals `server/kern/office/herhaling.js` | geen | – | eigen | – | twee tikken geven één leerjaar | klein | aanbevolen nu |
+| Dubbele tik op "een leerjaar erbij" | bestaat sinds dc14a03: `jaarIdem` op het paspoort | paspoort | dezelfde sleutel geeft het paspoort terug met `herhaald: true` | geen | – | eigen | – | twee tikken geven één leerjaar | – | HERSTEL: gerepareerd (commit dc14a03, `test/onderwijs-jaarover.test.js`) |
+| Herhaalde inschrijving op dezelfde fase | half: `inschrijf` zet altijd `jaar = 1` en heeft geen herhaalsleutel | paspoort | dezelfde fase opnieuw kiezen verandert niets; een herhaalsleutel zoals `jaarIdem` | geen | – | eigen | een bewuste stap terug blijft mogelijk, met historieregel | wie in havo 3 nogmaals op havo tikt, staat daarna nog in havo 3 | klein | HERSTEL, aanbevolen nu |
+| Voorkennisdiagnose na een mislukte sessie | ontbreekt | zie VERDIEPING V3 | zie V3 | middel: twee vragen per bouwsteen zijn een aanwijzing, geen meting; klasse `advies` | leerling direct na de sessie | eigen | niet bij examentraining | zie V3 | klein | VERDIEPING V3, aanbevolen nu |
 
 ### L2 Professioneel (de docent, eigenaar `werk.schoolbeheer`)
 
@@ -182,16 +213,16 @@ rechtmatige verhouding, op codenaam. Een leerdossier valt **niet** onder
 | Observatie en toets als bewijs | bestaat, `school/bewijs.js` → paspoort | docent op naam | alleen school mag `toets` en `observatie` | geen | leerling ziet het bewijs | rol in `school/rollen.js` | – | een observatie landt met de naam van wie het zag | – | bestaat |
 | Denkfouten in de klas zonder wie | bestaat, `school/denkfout.js` | telling + datum | geen leerlingsleutel in de opslag | geen | docent | rol | – | de docent ziet "11 keer" en nooit welk kind | – | bestaat |
 | Huiswerk met leerdoel in het dagplan | bestaat (SCHOOL.md par. 5b) | huiswerk van school | weegt zwaarder dan wat de motor voorstelt | geen | leerling | docent | – | wat de school vroeg staat vooraan | – | bestaat |
-| Schooladvies-tijdlijn als klok | ontbreekt | datums 2027 (bron boven) | termijnen per schooljaar als data met bron; waarschuwing aan de school, nooit een advies | laag: datums wijzigen per jaar, te controleren | directie en groep-8-leerkracht | `werk.schoolbeheer` | bijstellen alleen naar boven | de school ziet op 1 januari welke adviezen vóór 31 januari klaar moeten | klein | later (eigenaar `werk.schoolbeheer`) |
+| Schooladvies-tijdlijn als klok | ontbreekt | datums 2027 (bron boven) | termijnen per schooljaar als data met bron; waarschuwing aan de school, nooit een advies | laag: datums wijzigen per jaar, te controleren | directie en groep-8-leerkracht | `werk.schoolbeheer` | bijstellen alleen naar boven | de school ziet op 1 januari een signaal welke adviezen volgens de (te controleren) tijdlijn vóór 31 januari klaar moeten; de klok weigert niets | klein | later (eigenaar `werk.schoolbeheer`) |
 | Bijlesgever met eigen leerlingen | ontbreekt | koppeling leerling ↔ bijlesgever | een machtiging van leerling of voogd (Vertegenwoordiging kent hoedanigheid `coach`), alleen-lezen beheersing | geen | leerling ziet wie meekijkt | leerling of voogd | geen zorgdossier | een bijlesgever ziet alleen wat de leerling deelt, en het stopt bij intrekken | middel | later (besluit 3) |
 
 ### L3 Organisatorisch
 
 | Functie | Stand | Gegevens en bron | Regels en rekenwijze | Onzekerheid | Wie hoort wanneer | Rollen en toestemming | Uitzonderingen | Acceptatiecriterium (gewone taal) | Kosten | Bak |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Handhaver voorwaarde 3 (wie leest het dossier) | ontbreekt; `GELDING.json` `GEDRAGEN_NIET_GEZIEN` | lezersoort per route | een toets per route die het paspoort toont: leerling, ouder met rechtmatige verhouding, docent van de klas; partner en externe lezer 403 | geen | – | – | zelf-inzage vrij | een partner- of externe sessie krijgt het paspoort van een kind nooit, en een toets zakt als dat verandert | klein | aanbevolen nu |
-| Eén toets voor alle vier voorwaarden | ontbreekt | `kern/onderwijs.js` + routes | 1 geen vergelijkend veld; 2 geen opgeslagen niveau-woord; 3 lezers; 4 sleutel `lid:<codenaam-key>` | geen | – | – | – | één toetsbestand zakt zodra een van de vier voorwaarden breekt, met mutaties gezien | klein | aanbevolen nu |
-| Bewaarklassen voor het schooldossier | half: `server/school/dossier.js` noemt bewaartermijnen "elders" | AP-termijnen (2 en 5 jaar) | klasse per gegeven; wissen na termijn door een mens, niet met een knop (SCHOOL.md grens 10) | laag; verhouding tot leerpaspoort te controleren | directie | `werk.schoolbeheer` | wettelijke bewaarplicht gaat voor | elk schoolgegeven draagt een bewaarklasse uit de bron | middel | later (eigenaar `werk.schoolbeheer`) |
+| Handhaver voorwaarde 3 (wie leest het dossier) | ontbreekt; `GELDING.json` `GEDRAGEN_NIET_GEZIEN` | lezersoort per route | een toets per route die het paspoort toont: leerling, ouder met rechtmatige verhouding, docent van de klas; partner en externe lezer 403 | geen | – | – | zelf-inzage vrij | een partner- of externe sessie krijgt het paspoort van een kind nooit, en een toets zakt als dat verandert | klein | HERSTEL (rolgrens), aanbevolen nu |
+| Eén toets voor alle vier voorwaarden | ontbreekt | `kern/onderwijs.js` + routes | 1 geen vergelijkend veld; 2 geen opgeslagen niveau-woord; 3 lezers; 4 sleutel `lid:<codenaam-key>` | geen | – | – | – | één toetsbestand zakt zodra een van de vier voorwaarden breekt, met mutaties gezien | klein | HERSTEL, aanbevolen nu |
+| Bewaarklassen voor het schooldossier | half: `server/school/dossier.js` noemt bewaartermijnen "elders" | AP-termijnen (2 en 5 jaar) | klasse per gegeven; wissen na termijn door een mens, niet met een knop (SCHOOL.md grens 10) | laag; verhouding tot leerpaspoort te controleren | directie | `werk.schoolbeheer` | wettelijke bewaarplicht gaat voor | elk schoolgegeven draagt een bewaarklasse met bron; zolang de termijnen (te controleren) zijn, wist niets automatisch | middel | later (eigenaar `werk.schoolbeheer`) |
 | Inspectie-aanbodbeeld | ontbreekt | leerdoelen per fase, `ref` 1F-4F | per vak en fase welke doelen zijn aangeboden en geoefend, zonder kind | middel: kader is nieuw | directie | `werk.schoolbeheer` | – | de school toont per vak het aanbod (OP1) zonder een leerlingnaam | middel | later |
 
 ### L4 Domeinintelligentie
@@ -232,10 +263,82 @@ Foundation (`rtf.leerlingPassen`); bijles van de bijlesmodule.
 ### Modus LOS
 
 Met School Core, Foundation en Loopbaan uit blijft de kern: een lid oefent,
-herhaalt, krijgt zijn dagplan en een examentraining. Het scherm zegt dan
-eerlijk: **"Je bewijs is van jezelf. Bevestiging door een school is er niet,
-dus 'sterk' kun je hier niet halen."** Dat is wat `beheersingVan` al doet: zonder
-bewijs van buiten blijft het `stevig`.
+herhaalt, krijgt zijn dagplan en een examentraining. Dat is wat `beheersingVan`
+al doet: zonder bewijs van buiten blijft het `stevig`. Per groep, met de
+letterlijke tekst die de leerling ziet als iets ontbreekt (je-vorm, ook voor een
+kind). "Bestaat" betekent: de zin staat zo in de code; "voorstel" betekent: deze
+kaart stelt hem voor.
+
+**Eigen (School bezit het en kan het altijd).** De Fabric (166 doelen, 56
+generatoren), oefenen, denkfout en andere uitleg, Memory Engine, dagplan,
+examentraining, het eigen paspoort.
+- Geen bewijs van buiten: "Je bewijs is van jezelf. Bevestiging door een school
+  is er niet, dus 'sterk' kun je hier niet halen." (voorstel; de regel zelf
+  bestaat in `beheersingVan`)
+- Een fout die op geen denkpatroon past: er komt geen duiding, alleen het
+  juiste antwoord. (bestaat, `leerstof-denkfout.js` grens 1: "liever niets dan
+  een gok")
+
+**Noodzakelijke platformdiensten.** Account en sessie, opslag
+(`eigencollectie`: `onderwijs`, `leerstofSessies`), identiteit en leeftijd (de
+leeftijdspas van de Foundation voor de schil), de herhaalsleutel
+(`idempotentie-eigen.js`).
+- Geen fase gekozen: "Schrijf eerst in op een fase." (bestaat, `jaarOver`)
+- Al in het laatste leerjaar: "Dit is al het laatste leerjaar van deze fase;
+  kies de volgende stap op de ladder." (bestaat)
+- Opslag faalt midden in een sessie: "Je antwoord is niet bewaard. Probeer het
+  nog een keer; je verliest niets van wat je al deed." (voorstel)
+
+**Optionele koppelingen (andere apps).** School Core (`werk.schoolbeheer`:
+toets, observatie, huiswerk), Foundation (`rtf.school`, gezin), Loopbaan
+(`loopbaan.ledger`), Vertegenwoordiging (`mandaat.beheer`, coach), de bijles.
+- Geen school gekoppeld: "Je oefent op eigen houtje. Huiswerk en toetsen van
+  school zie je hier zodra je school is aangesloten." (voorstel)
+- Toetsuitslag zonder leerdoel (Learning Recovery): "Bij deze toets staat niet
+  welk leerdoel hij meet, dus we zetten niets klaar." (voorstel)
+- Loopbaan uit: "Delen naar je loopbaan kan nu niet; er is niets gedeeld."
+  (voorstel)
+
+### Modus SAMEN als contractblok (voorstel)
+
+Dit is een VOORSTEL; `scripts/lib/appcontract.js` blijft zoals het is. De
+huidige regel daar draagt alleen `belofte` en de voltooiproef.
+
+```js
+samen: {
+  functie: 'link:school', familie: 'WorkOS',
+  belofte: 'een leerling oefent op zijn eigen fase met een dagplan zonder tellers, krijgt bij een fout de denkfout en een andere uitleg, en vindt het bewijs van school met de naam van wie het zag in zijn paspoort terug; alleen hij en wie een rechtmatige verhouding met hem heeft, lezen dat paspoort',
+  ingang: '/apps/rtgschool.html',
+  via: '/apps/foundation/leerpaspoort.html' /* schil, zelfde component via /api/rtf/leerling/* */,
+  bestanden: ['server/routes/onderwijs.js', 'server/routes/leerstof.js', 'server/routes/rtfleerling.js',
+    'server/kern/onderwijs.js', 'server/kern/onderwijs-bewijs.js', 'server/kern/leerstof.js',
+    'server/kern/leerstof-fabric.js', 'server/kern/leerstof-dag.js', 'server/kern/leerstof-vervolg.js',
+    'server/kern/schooladvies.js'],
+  scenario: 'scripts/lib/voltooi/school.js',
+  ketens: [
+    { naam: 'toets en observatie van school in het paspoort', uitgeeft: 'niets terug naar school', ontvangt: 'bewijs met soort toets of observatie en de naam van de docent',
+      vorm: 'gebeurtenis', eigenaar: 'werk.schoolbeheer', toestemming: 'rol in server/school/rollen.js; alleen school mag toets en observatie',
+      storingen: ['waarnemer na einddatum: klaspoort weigert', 'bewijs zonder leerdoel: niets geschreven', 'dubbele aflevering: een bewijsregel'],
+      proef: 'test/teacherflow.test.js' },
+    { naam: 'huiswerk vooraan in het dagplan', uitgeeft: 'niets; het dagplan wordt niet bewaard', ontvangt: 'huiswerk met leerdoel',
+      vorm: 'projectie', eigenaar: 'werk.schoolbeheer', toestemming: 'docent van de klas',
+      storingen: ['voorkennis open: het huiswerkdoel wacht, de voorkennis komt in het plan met reden'],
+      proef: 'test/dagplan.test.js' },
+    { naam: 'leeftijdspas voor de Foundation-schil', uitgeeft: 'niets', ontvangt: 'pas en leeftijdsgroep',
+      vorm: 'verwijzing', eigenaar: 'rtf.school', toestemming: 'gezin in de Foundation',
+      storingen: ['geen pas: de schil opent niet, de ledenapp wel'],
+      proef: 'ontbreekt als keten' },
+    { naam: 'gekozen leerfeit naar Loopbaan', uitgeeft: 'een behaald doel met sterk bewijs, door het lid gekozen', ontvangt: 'niets terug',
+      vorm: 'verwijzing', eigenaar: 'loopbaan.ledger', toestemming: 'het lid, per feit; nooit automatisch; onder 18 geen progressie',
+      storingen: ['Loopbaan uit: niets gedeeld, melding aan het lid'],
+      proef: 'ontbreekt' },
+    { naam: 'coach leest beheersing mee', uitgeeft: 'een leesregel die de leerling ziet', ontvangt: 'machtiging met hoedanigheid coach',
+      vorm: 'projectie', eigenaar: 'mandaat.beheer', toestemming: 'leerling of voogd; per vraag opnieuw gelezen; besluit 3',
+      storingen: ['machtiging ingetrokken: volgende vraag 403'],
+      proef: 'ontbreekt' }
+  ]
+}
+```
 
 ### Modus SAMEN: een volledige keten
 
@@ -251,12 +354,17 @@ Groep 7, rekenen, breuken.
    uitleg; de klas krijgt +1 zonder wie.
    - Storing: netwerk weg midden in de sessie. De sessie staat op de server en
      loopt door op een ander toestel (voltooiproef: persistent).
-4. Een SO de week erna: 5 van 10. (Aanbevolen nu) Learning Recovery zet drie
-   bouwstenen in het dagplan.
+4. Een SO de week erna: 5 van 10. (Aanbevolen nu, V2) Learning Recovery zet
+   drie bouwstenen in het dagplan.
+   - Variant zonder school: zijn eigen oefensessie eindigt onder de drempel.
+     (Aanbevolen nu, V3) De voorkennisdiagnose stelt twee vragen over
+     "gelijknamig maken", hij heeft er één goed, en het dagplan van morgen
+     begint daar, met de reden.
    - Storing: de uitslag heeft geen leerdoel. Er komt niets; geen gok.
 5. De leerling zegt "ik kan dit al" (aanbevolen nu): vijf vragen, 5 goed. De
    leerlijn schuift; het bewijs krijgt een regel.
-   - Storing: dubbele tik op de check. Eén check (herhaalsleutel vereist).
+   - Storing: dubbele tik op de check. Eén check (herhaalsleutel vereist, zoals
+     `jaarIdem` sinds dc14a03).
 6. Twee weken later: herhaling uit de Memory Engine, zonder datum of
    achterstand.
 7. De ouder kijkt mee via het ouderportaal (rechtmatige verhouding).
@@ -299,13 +407,23 @@ herhaalsleutel).
 
 ## g. Prioritering
 
+### HERSTEL
+
 | Functie | Bouwkosten | Complexiteit | Afhankelijkheden | Bak |
 |---|---|---|---|---|
-| Toets op de vier leerdossiervoorwaarden, met handhaver voor 3 | klein | laag | `GELDING.json` | aanbevolen nu |
-| Herhaalsleutel op `jaar-over` en `inschrijf` | klein | laag | – | aanbevolen nu |
-| Algorithmic Appeal | klein | laag | generatoren | aanbevolen nu |
-| Learning Recovery | klein | laag | toetsuitslag per leerdoel | aanbevolen nu |
+| Herhaalsleutel op `jaar-over` | – | – | – | gerepareerd (commit dc14a03, `test/onderwijs-jaarover.test.js`) |
+| `inschrijf` op dezelfde fase laat het leerjaar staan; herhaalsleutel op `inschrijf` | klein | laag | – | aanbevolen nu |
+| Toets op de vier leerdossiervoorwaarden, met handhaver voor 3 (rolgrens) | klein | laag | `GELDING.json` | aanbevolen nu |
 | Bron (`zelf`/`school`) op elke historieregel | klein | laag | – | aanbevolen nu |
+| BEVOEGD tellen voor alle paspoortroutes (nu 5 geteld) | klein | laag | – | aanbevolen nu |
+
+### VERDIEPING
+
+| Functie | Bouwkosten | Complexiteit | Afhankelijkheden | Bak |
+|---|---|---|---|---|
+| V1 Algorithmic Appeal | klein | laag | generatoren | aanbevolen nu |
+| V2 Learning Recovery | klein | laag | toetsuitslag per leerdoel | aanbevolen nu |
+| V3 Voorkennisdiagnose na een mislukte sessie | klein | laag | `pad()`, generatoren | aanbevolen nu |
 | Succescriteria in leerlingtaal | middel | laag | 166 doelen | later |
 | Student Twin als projectie | middel | middel | taalvorm, geheugen | later |
 | Schooladvies-tijdlijn, bewaarklassen, aanbodbeeld | klein tot middel | middel | eigenaar `werk.schoolbeheer` | later |
@@ -323,9 +441,9 @@ Dit contract vervangt nooit de acht bewijzen van APPWERKT.
 |---|---|---|---|
 | Breedte | elk actief vak heeft per fase minstens één oefenbaar doel | dekkingsmeter (SCHOOL.md par. 7) | ja po en vo; mbo t/m wo dun |
 | Professionele diepte | een docent ziet patronen en geeft bewijs zonder een kind te rangschikken | `test/denkfout.test.js`, `test/teacherflow.test.js` | ja |
-| Levenscyclus | inschrijven, overgaan, herhalen, overstappen, volwassen worden zonder datagat | voltooiproef + `test/overdracht.test.js` + toets op historiebron | bron-veld ontbreekt |
+| Levenscyclus | inschrijven, overgaan, herhalen, overstappen, volwassen worden zonder datagat of stille terugval | voltooiproef + `test/overdracht.test.js` + `test/onderwijs-jaarover.test.js` + toets op historiebron en op herhaalde inschrijving | jaar-over gerepareerd; bron-veld ontbreekt; herhaalde inschrijving zet jaar op 1 |
 | Samenwerking en rollen | alleen leerling en rechtmatige verhouding lezen het dossier | nieuwe toets voorwaarde 3 | geen handhaver |
-| Domeinintelligentie | elke aanbeveling is te betwisten en draagt haar reden | appeal-toets, `test/dagplan.test.js` | reden ja, betwisten nee |
+| Domeinintelligentie | elke aanbeveling is te betwisten en draagt haar reden; na een mislukte sessie is de ontbrekende bouwsteen aangewezen | appeal-toets, diagnosetoets, `test/dagplan.test.js` | reden ja, betwisten nee, diagnose nee |
 | Los functioneren | zonder school werkt oefenen en zegt het scherm wat er ontbreekt | voltooiproef met School Core uit | niet beproefd |
 | RTG-ketens | een schooltoets landt in het paspoort, een gekozen feit in Loopbaan | ketentoets school → paspoort → Loopbaan | eerste helft ja |
 | Bewezen betrouwbaarheid | APPWERKT acht bewijzen; BEVOEGD geteld | APPWERKT, BEVOEGD.json | 7 van 8 centraal bewezen; bevoegd NT; BEVOEGD 5/4 |
@@ -336,14 +454,72 @@ Dit contract vervangt nooit de acht bewijzen van APPWERKT.
 
 ### (A) Binnen de huidige architectuur en scope
 
+#### HERSTEL
+
+| Functie | Kosten | Bouwt op | Stand |
+|---|---|---|---|
+| Herhaalsleutel `jaar-over` | – | `kern/onderwijs.js` `jaarIdem` | gerepareerd (commit dc14a03) |
+| `inschrijf`: zelfde fase laat jaar staan, plus herhaalsleutel | klein | `kern/onderwijs.js`, `idempotentie-eigen.js`, vorm van `jaarIdem` | open |
+| Toets vier voorwaarden + handhaver voorwaarde 3 | klein | `kern/onderwijs.js`, routes, `GELDING.json` | open |
+| Bron op historieregel | klein | `kern/onderwijs.js` | open |
+
+#### VERDIEPING
+
+Drie functies voor nu. Alle drie blijven bij `leren.school`, bouwen op de
+Fabric en bewaren niets wat vergelijkt of een label draagt.
+
+**V1. Algorithmic Appeal: "Ik kan dit al".**
+- Gegevens en bron: het leerdoel met zijn generator (`leerstof-gen.js`
+  `opgave`), het bewijs in het paspoort (`onderwijs-bewijs.js`).
+- Rekenwijze: vijf verse opgaven uit de generator van het doel, zonder hint.
+  5 van 5, of 4 van 5 zonder hint: een bewijsregel van soort `herhaling` met
+  "5 van 5 goed" en het doel telt als behaald voor `vereist`; de leerlijn
+  schuift. Minder: niets geschreven, niets gewist, geen spoor van de poging.
+  Eén check per doel per dag.
+- Rollen: alleen de leerling zelf, in zijn eigen sessie. Niet bij
+  examentraining.
+- Acceptatiecriterium: een leerling die "Ik kan dit al" kiest en 5 goed heeft,
+  ziet het volgende doel in zijn dagplan; een leerling met 2 goed ziet daarna
+  exact hetzelfde paspoort als ervoor. Een dubbele tik geeft één check.
+- Kosten: klein.
+
+**V2. Learning Recovery na een onvoldoende van school.**
+- Gegevens en bron: een toetsuitslag met leerdoel uit `server/school/bewijs.js`
+  (soort `toets`), de voorkennis via `pad()` in `leerstof-fabric.js`.
+- Rekenwijze: bij een uitslag onder de drempel van dat doel: de doelen uit
+  `pad()` die niet behaald zijn, van dichtbij naar ver, maximaal 3, in het
+  dagplan van de volgende dag met de reden "na je toets van <datum>". Geen
+  "hoofdstuk opnieuw".
+- Rollen: school levert de uitslag (docent op naam); de leerling ziet het plan.
+- Acceptatiecriterium: na een SO van 5 van 10 op "breuken optellen" staan de
+  drie ontbrekende bouwstenen in het dagplan van morgen; een uitslag zonder
+  leerdoel zet niets klaar.
+- Kosten: klein.
+
+**V3. Voorkennisdiagnose na een mislukte oefensessie.**
+- Gegevens en bron: de afgeronde sessie in `leerstofSessies` (`goed`, `drempel`,
+  `doel`), de voorkennis via `pad(doelId, behaald, doelen)`, de generatoren.
+- Rekenwijze: alleen als de sessie onder de drempel eindigde en de leerling
+  "zoek waar het zit" kiest. Langs `vereist` van dichtbij naar ver, per bouwsteen
+  twee verse opgaven; de eerste bouwsteen met minder dan 2 goed is het
+  aangewezen gat. Maximaal 4 bouwstenen (8 opgaven); alle goed: "het zit niet in
+  de voorkennis" en het doel komt terug met een andere uitleg
+  (`andersUitgelegd`). Uitkomst klasse `advies`: "waarschijnlijk".
+- Rollen: alleen de leerling. Niets in het paspoort; de uitkomst is alleen de
+  reden bij het eerste stuk van het dagplan van morgen.
+- Acceptatiecriterium: een leerling die "breuken optellen" niet haalt en bij
+  "gelijknamig maken" 1 van 2 goed heeft, leest "het zit waarschijnlijk in
+  gelijknamig maken", en morgen begint zijn dagplan daar. Er is geen nieuwe
+  regel in `onderwijs` en geen teller zichtbaar voor een ander.
+- Kosten: klein.
+
+**Later**
+
 | Functie | Kosten | Bouwt op |
 |---|---|---|
-| Toets vier voorwaarden + handhaver voorwaarde 3 | klein | `kern/onderwijs.js`, routes, `GELDING.json` |
-| Herhaalsleutel `jaar-over`/`inschrijf` | klein | `server/kern/office/herhaling.js`-vorm |
-| Algorithmic Appeal | klein | generatoren, `onderwijs-bewijs.js` |
-| Learning Recovery | klein | `school/bewijs.js`, `leerstof-dag.js` |
-| Bron op historieregel | klein | `kern/onderwijs.js` |
-| Succescriteria, Student Twin (projectie), bijles via machtiging | middel | Fabric, taalvorm, Vertegenwoordiging |
+| Succescriteria in leerlingtaal | middel | Fabric `meting`, 166 zinnen |
+| Student Twin (projectie, klasse `advies`) | middel | taalvorm, geheugen |
+| Bijles via machtiging | middel | Vertegenwoordiging (besluit 3) |
 
 ### (B) Het domeinmaximum, ook buiten de huidige scope
 

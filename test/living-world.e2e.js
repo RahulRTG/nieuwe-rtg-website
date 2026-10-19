@@ -17,7 +17,8 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  const member=(await post('/api/auth/register',{name:'Reiziger',email:'world-member-'+width+'@example.test',phone:'0612345678',
   password:'VeiligWachtwoord123!',geboortedatum:'1990-01-01',tier:'rtg'})).token;
  const context=await browser.newContext({viewport:{width,height:900},timezoneId:'UTC'});
- await context.addInitScript(t=>localStorage.setItem('rtg_member_token',t),owner);
+ // De opslagmelding (shared/cookie.js) ligt over de Edge tot ze is gezien; hier is ze gezien, zoals in hotels-ds.e2e.js.
+ await context.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_cookieinfo_v1','1');},owner);
  const page=await context.newPage(),errors=[];page.setDefaultTimeout(15000);h.letOpFouten(page,errors);
  await page.goto(srv.base+'/apps/living-world.html?tab=studio');await page.waitForSelector('[data-lw-primary]');
  await page.locator('#lwContent [data-lw-primary]').click();await page.locator('#lwField-title').fill('Haven '+width);
@@ -34,13 +35,14 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  const bp=(await post('/api/living-world/view',{},owner)).blueprints.find(b=>b.title==='Mijn kustervaring '+width);
  assert.ok(bp);
  const travelerContext=await browser.newContext({viewport:{width,height:900},timezoneId:'UTC'});
- await travelerContext.addInitScript(t=>localStorage.setItem('rtg_member_token',t),member);
+ await travelerContext.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_cookieinfo_v1','1');},member);
  const traveler=await travelerContext.newPage();traveler.setDefaultTimeout(15000);h.letOpFouten(traveler,errors);
  await traveler.goto(srv.base+bp.url);await traveler.waitForSelector('[data-lw-action="plan.create"]');
- await traveler.locator('[data-rtg-adaptive-action="context"]').click();
- await traveler.waitForSelector('.rtg-edge-action [data-rtg-edge-primary]');
- assert.equal((await traveler.locator('.rtg-edge-action [data-rtg-edge-primary]').innerText()).trim().toLowerCase(),'take me there');
- await traveler.locator('.rtg-edge-action [data-rtg-edge-primary]').click();await confirm(traveler);
+ // De hoofdactie staat in de Edge van het Design System, onder Acties (data-ds-actie).
+ await traveler.locator('[data-ds-edge="acties"]').click();
+ const edgeActie=traveler.locator('#dsEdgeBlad .ds-edge__regel');await edgeActie.first().waitFor();
+ assert.deepEqual((await edgeActie.allInnerTexts()).map(t=>t.trim().toLowerCase()),['take me there']);
+ await edgeActie.first().click();await confirm(traveler);
  await traveler.waitForSelector('[data-lw-action="plan.update"]');
  const plan=(await post('/api/living-world/view',{},member)).plans[0];assert.equal(plan.status,'planning');
  assert.equal((await post('/api/living-world/view',{},owner)).plans.some(p=>p.id===plan.id),false);
@@ -52,15 +54,16 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  await traveler.locator('#lwField-notes').fill('Graag een rustige route.');await confirm(traveler);
  await traveler.waitForSelector('[data-lw-action="plan.request"]');await traveler.locator('[data-lw-action="plan.request"]').click();await confirm(traveler);
  await page.goto(srv.base+'/apps/living-world.html?plan='+plan.id);await page.waitForSelector('[data-lw-action="plan.decide"]');
- assert.match(await page.locator('.lw-detail').textContent(),/Graag een rustige route/);
+ assert.match(await page.locator('[data-lw-detail]').textContent(),/Graag een rustige route/);
  await page.locator('[data-lw-action="plan.decide"]').click();await page.locator('#lwField-decision').selectOption('accepted');
  await page.locator('#lwField-reason').fill('Rustige route afgesproken.');await confirm(page);
- await traveler.reload();await traveler.waitForSelector('.lw-stages [aria-current="step"]');
- assert.equal(await traveler.locator('.lw-stages [aria-current="step"]').textContent(),'Geaccepteerd');
- await traveler.waitForSelector('.rtg-edge-chrome');
- assert.equal(await traveler.locator('.rtg-edge-chrome').count(),1);
- assert.equal(await traveler.evaluate(()=>window.RTGAdaptief.context().bron),'living-world');
- assert.equal(await traveler.locator('#lwMain [data-hoofdactie]').count(),1);
+ await traveler.reload();await traveler.waitForSelector('[data-lw-stages] [aria-current="step"]');
+ assert.equal(await traveler.locator('[data-lw-stages] [aria-current="step"]').textContent(),'Geaccepteerd');
+ await traveler.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+ assert.equal(await traveler.locator('.ds-edge').count(),1);
+ // Precies een hoofdactie van dit scherm in de Edge: die van het open plan.
+ assert.equal(await traveler.locator('#lwMain [data-ds-actie]').count(),1);
+ assert.equal(await traveler.locator('#lwMain [data-ds-actie]').getAttribute('data-lw-primary'),'');
  assert.equal(await traveler.locator('body').getAttribute('data-rtg-world'),'travel');
  assert.equal(await traveler.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false);
  const out=path.join(__dirname,'../artifacts/living-world');fs.mkdirSync(out,{recursive:true});
@@ -83,13 +86,13 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  await page.locator('[data-lw-action="contribution.review"]').click();await page.locator('#lwField-decision').selectOption('accepted');
  await page.locator('#lwField-reason').fill('Samen gecontroleerd tijdens de wandeling.');await confirm(page);
  await page.waitForSelector('[data-lw-action="contribution.adopt"]');await page.locator('[data-lw-action="contribution.adopt"]').click();await confirm(page);
- await traveler.goto(srv.base+bp.url);await traveler.waitForSelector('.lw-detail');
- assert.match(await traveler.locator('.lw-detail').textContent(),/Blueprintversie 2/);
- assert.match(await traveler.locator('.lw-detail').textContent(),/Spreek vooraf een precieze ontmoetingsplek af/);
+ await traveler.goto(srv.base+bp.url);await traveler.waitForSelector('[data-lw-detail]');
+ assert.match(await traveler.locator('[data-lw-detail]').textContent(),/Blueprintversie 2/);
+ assert.match(await traveler.locator('[data-lw-detail]').textContent(),/Spreek vooraf een precieze ontmoetingsplek af/);
  assert.ok((await post('/api/connect/portfolio',{},member)).worldContributions.some(c=>c.id===contribution.id));
  await traveler.goto(srv.base+'/apps/connect.html#deel-jij');
  await traveler.getByRole('link',{name:'Verzamelen bij de haven '+width,exact:true}).waitFor();
- await page.goto(srv.base+'/apps/living-world.html?tab=studio');await page.waitForSelector('#lwContent .lw-grid');
+ await page.goto(srv.base+'/apps/living-world.html?tab=studio');await page.waitForSelector('#lwContent [data-lw-grid]');
  await screenshot(page,path.join(out,'studio-'+width+'.png'));
  assert.deepEqual(errors,[]);await travelerContext.close();await context.close();
 });
@@ -98,10 +101,10 @@ async function confirm(page){
  await page.waitForFunction(()=>!document.getElementById('lwPreview').hidden||document.getElementById('lwFormError').textContent);
  assert.equal(await page.locator('#lwFormError').textContent(),'');
  await page.locator('#lwSubmit').click();await page.waitForSelector('#lwDialog',{state:'hidden'});
- assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(),false,'an executed action must not leave its old Edge sheet over the next step');
+ assert.equal(await page.locator('#dsEdgeBlad').isVisible(),false,'an executed action must not leave its old Edge sheet over the next step');
 }
 async function screenshot(page,file){
- await page.waitForFunction(()=>document.body.dataset.rtgDesktopState==='ready');
+ await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
  await page.keyboard.press('Escape');await page.mouse.move(-10,-10);await page.evaluate(()=>window.scrollTo(0,0));
  await page.screenshot({path:file});
 }

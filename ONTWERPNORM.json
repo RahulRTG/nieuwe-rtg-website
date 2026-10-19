@@ -2,7 +2,7 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 169,
+    "bladen": 168,
     "schermenMetStijlblok": 265,
     "important": 7586
   },
@@ -697,11 +697,6 @@
       "bytes": 37518,
       "important": 281,
       "hex": 61
-    },
-    "public/shared/travelos-materiaal.css": {
-      "bytes": 2553,
-      "important": 0,
-      "hex": 12
     },
     "public/shared/uitleg.css": {
       "bytes": 1469,

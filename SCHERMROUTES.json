@@ -3,12 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "34e0b230",
+  "commit": "1669ea5a",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [],
+   "boomVuil": true,
+   "ongecommitteInvoer": [
+    "public/apps/foundation/buurtruil.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,8 +7822,8 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1041,
-  "verwijzingen": 1266,
+  "exactePaden": 1047,
+  "verwijzingen": 1272,
   "voorvoegsels": 142,
   "basisPaden": 2,
   "doodPad": 0,
@@ -10287,6 +10289,48 @@
   },
   {
    "pad": "/api/rtfos/publiek/steden",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/interesse",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/lijst",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/meld",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/mijn",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/plaats",
+   "schermen": [
+    "public/apps/foundation/buurtruil.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/ruil/sluit",
    "schermen": [
     "public/apps/foundation/buurtruil.html"
    ],
@@ -15996,11 +16040,15 @@
   {
    "bestand": "public/apps/foundation/buurtruil.html",
    "exact": [
-    "/api/rtfos/publiek/steden"
+    "/api/rtfos/publiek/steden",
+    "/api/rtfos/ruil/interesse",
+    "/api/rtfos/ruil/lijst",
+    "/api/rtfos/ruil/meld",
+    "/api/rtfos/ruil/mijn",
+    "/api/rtfos/ruil/plaats",
+    "/api/rtfos/ruil/sluit"
    ],
-   "voorvoegsels": [
-    "/api/rtfos/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foundation/campus.html",

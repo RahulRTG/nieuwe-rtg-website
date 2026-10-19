@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19547 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19548 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2824 |
-| losse beweringen (`test(...)`) | 19547 |
+| losse beweringen (`test(...)`) | 19548 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2486 bestanden, 18975 beweringen.
+2486 bestanden, 18976 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1793,7 +1793,7 @@ toets omvalt.
 | `rtfos-netwerk.test.js` | 7 | gezakt op `liegpoort /api/` | HET FOUNDATION OS, FASE VIER: HET NETWERKEFFECT Delen, samen kopen, mensen uitwisselen, landelijk werven. Dit is de laag waar een federatie iets waard wordt -- en tegelijk de laag waar een federatie zijn eigen... |
 | `rtfos-portalen.test.js` | 8 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE PORTALEN EN DE DOSSIERS Dit derde toetsbestand dekt wat de eerste twee lieten liggen: de code-deuren naar buiten (partnerstichting en lokale ondernemer), en de dossierkant van projecten,... |
 | `rtfos-routes.test.js` | 3 | gezakt op `liegpoort /api/` | DE NIEUWE FOUNDATIONOS-ROUTES, OVER HTTP. test/routedekking.test.js is duidelijk: wie een route toevoegt zonder toets, ziet die poort zakken -- en er is geen norm om de eis mee te verlagen. |
-| `rtfos-ruil.test.js` | 8 | gezakt op `liegpoort /api/` | DE BUURTRUIL -- de vijf grendels uit kern/rtfos/ruil.js, elk apart. Waarom deze toets bestaat: dit is de ENIGE rtfos-deur die op een gewone ledensessie opengaat. |
+| `rtfos-ruil.test.js` | 9 | gezakt op `liegpoort /api/` | DE BUURTRUIL -- de vijf grendels uit kern/rtfos/ruil.js, elk apart. Waarom deze toets bestaat: dit is de ENIGE rtfos-deur die op een gewone ledensessie opengaat. |
 | `rtfos-uitvoering.test.js` | 8 | gezakt op `liegpoort /api/` | HET FOUNDATION OS, FASE TWEE: SUBSIDIES, VOORRAAD, ACTIVITEITEN, BERICHTEN test/rtfos.test.js toetst de governance-grendels (oormerk, vier ogen, limiet, VOG, toestemming, scheiding tussen steden). Dit bestand gaat... |
 | `rtfos-winkel.test.js` | 5 | gezakt op `===->!==#0` | DE WINKEL VAN DE RTFOUNDATION -- en waarom een aankoop geen gift is. Dit is de scherpste grens van deze laag, en hij stond al in dit huis: kern/rtfos/herkomst.js weigert een donatie waar iets tegenover staat, en de... |
 | `rtfos.test.js` | 12 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE GRENDELS DIE DE GOVERNANCE DRAGEN Dit toetsbestand gaat NIET over of de schermen vullen. Het gaat over de acht dingen die een federatieve stichting stukmaken zodra ze niet in code staan, en die... |

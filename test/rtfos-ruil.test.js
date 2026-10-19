@@ -144,6 +144,22 @@ test('sluiten kan alleen de eigenaar, en het haalt het aanbod uit de lijst', asy
   assert.ok(!lijst.some(x => x.id === id), 'een gesloten aanbod stond nog in de lijst');
 });
 
+/* Gevonden door de voltooiproef (scripts/lib/voltooi/buurtruil.js): een
+   dubbele tik op "Zet erbij" -- twee gelijke verzoeken tegelijk, of opnieuw na
+   een afgebroken verzoek of een crash -- zette het aanbod twee keer in de buurt. */
+test('een dubbele tik zet een aanbod een keer neer, en een ander aanbod gewoon ernaast', async () => {
+  const lijf = { stad: STAD, soort: 'geef', titel: 'Dubbele wieg', wat: 'blank hout' };
+  const [a, b] = await Promise.all([ruil('plaats', lijf, A), ruil('plaats', lijf, A)]);
+  assert.equal(a.status, 200); assert.equal(b.status, 200);
+  assert.equal(a.body.ruil.id, b.body.ruil.id, 'een dubbele tik gaf twee aanbiedingen');
+  const mijn = (await ruil('mijn', {}, A)).body.ruil.filter(x => x.titel === 'Dubbele wieg');
+  assert.equal(mijn.length, 1, 'een dubbele tik zette het aanbod twee keer neer');
+  const ander = await ruil('plaats', Object.assign({}, lijf, { wat: 'wit gelakt' }), A);
+  assert.notEqual(ander.body.ruil.id, a.body.ruil.id, 'een ander aanbod met dezelfde titel werd opgeslokt');
+  await ruil('sluit', { id: a.body.ruil.id, status: 'weg' }, A);
+  await ruil('sluit', { id: ander.body.ruil.id, status: 'weg' }, A);
+});
+
 test('een stad die niet open is, draagt geen buurtruil', async () => {
   const geplaatst = await ruil('plaats', { stad: DICHT, soort: 'geef', titel: 'Wasmachine' }, A);
   assert.equal(geplaatst.status, 409, 'er kon geruild worden in een stad die nog niet open is');

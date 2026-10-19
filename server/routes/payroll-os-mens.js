@@ -15,20 +15,29 @@ module.exports = (kern) => {
   const { app, auth, payrollOS, accounts, findSupplier } = kern;
   if (!payrollOS) return;
 
+  /* Zijn plekken, ook de oude: na uit dienst blijven zijn stroken van hem,
+     zeven jaar lang (art. 52 AWR). Een oude plek geeft alleen stroken binnen
+     die termijn; inloggen bij die zaak blijft dicht (staffPositions). */
+  const BEWAARJAREN = 7;
+  const plekken = (lid) => (accounts.staffHistorie ? accounts.staffHistorie(lid.id)
+    : accounts.staffPositions ? accounts.staffPositions(lid.id) : []);
+  const binnenTermijn = (s, st) => s.active !== 0 ||
+    Number(String(st.periode || '').slice(0, 4)) + BEWAARJAREN >= new Date().getUTCFullYear();
+
   /* Zijn eigen stroken, en de uitleg erbij. Het personeelsnummer komt uit de
      koppeling met het RTG-account, niet uit het verzoek. */
   app.post('/api/member/loonstroken', auth, (req, res) => {
     const lid = req.session && req.session.account ? req.session.account : null;
     if (!lid) return res.status(403).json({ error: 'Meld u aan met uw eigen RTG-account.' });
     const uit = [];
-    for (const s of (accounts.staffPositions ? accounts.staffPositions(lid.id) : [])) {
+    for (const s of plekken(lid)) {
       /* De naam van de zaak komt uit findSupplier en niet uit de personeelsrij:
          die draagt alleen supplier_code. Er stond `s.supplier_naam`, en dat veld
          bestaat niet -- dus viel het altijd terug op de code en las de
          medewerker "MERIDIAAN" boven zijn loonstrook in plaats van
          "Meridiaan Toren". Stil fout, want een code IS een string. */
       const zaak = findSupplier ? findSupplier(s.supplier_code) : null;
-      for (const st of payrollOS.run.strokenVan(s.supplier_code, s.id)) {
+      for (const st of payrollOS.run.strokenVan(s.supplier_code, s.id).filter((x) => binnenTermijn(s, x))) {
         uit.push(Object.assign({ zaak: (zaak && zaak.name) || s.supplier_code }, st,
           { uitleg: legUit(st.strook) }));
       }
@@ -44,8 +53,8 @@ module.exports = (kern) => {
     const lid = req.session && req.session.account ? req.session.account : null;
     if (!lid) return res.status(403).json({ error: 'Meld u aan met uw eigen RTG-account.' });
     const runId = String((req.body || {}).runId || '');
-    const mijn = (accounts.staffPositions ? accounts.staffPositions(lid.id) : []);
-    for (const s of mijn) {
+    for (const s of plekken(lid)) {
+      if (s.active === 0 && !payrollOS.run.strokenVan(s.supplier_code, s.id).some((x) => x.runId === runId && binnenTermijn(s, x))) continue;
       const d = payrollOS.dossier.vanMedewerker(runId, s.id);
       if (d && d.ok) return res.json(d);
     }

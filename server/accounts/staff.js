@@ -177,6 +177,6 @@ module.exports = {
   createStaff, createStaffSync, createStaffZaai, createAccountStaff,
   legacyStaffPinToegestaan, ACCOUNT_ONLY_HASH, getStaffById, getStaffByIdAny,
   listStaff, countStaff, verifyStaffPin, setStaffPin, activateStaff, deactivateStaff,
-  deactivateStaffVanZaak, staffByMember, staffPositions,
+  deactivateStaffVanZaak, staffByMember, staffPositions, staffHistorie: require('./staff-historie'),
   setStaffMember, claimStaffMember, releaseStaffMember, publicStaff, makePin
 };

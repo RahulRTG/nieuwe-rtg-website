@@ -6,7 +6,7 @@
    Salon-data (geen nieuwe tracking, geen surveillance). */
 module.exports = (kern) => {
   const { app, db, save, supplierAuth, managerOnly, findSupplier, schoon, logActivity,
-    sseToSupplier, broadcastSync, salonNaarVolgers, salon, crypto, rtmail } = kern;
+    sseToSupplier, broadcastSync, salonNaarVolgers, salon, crypto, rtmail, commercieel } = kern;
 
   const bak = code => {
     if (!db.data.campagnes) db.data.campagnes = {};
@@ -132,15 +132,20 @@ module.exports = (kern) => {
     if (!onderwerp || !tekst) return res.status(400).json({ error: 'Geef de brief een onderwerp en een tekst.' });
     const van = rtmail.adresVoor('zaak', code);
     const volgers = (req.supplier.salon && req.supplier.salon.volgers) || [];
-    let verstuurd = 0;
+    /* Volgen is geen toestemming voor post: alleen wie "Post namens partners"
+       via e-mail aanzette (kern/identiteit/commercieel.js mag()), en bij een
+       storing niemand (X3, 19 oktober 2026). De zaak ziet een getal, geen namen. */
+    const mag = (key) => { try { return commercieel.mag(key, 'partners', 'email'); } catch (e) { return false; } };
+    let verstuurd = 0, zonderToestemming = 0;
     for (const key of volgers.slice(0, 5000)) {
+      if (!mag(key)) { zonderToestemming++; continue; }
       const naar = volgerAdres(key);
       if (naar && !rtmail.stuur({ van, naar, onderwerp, tekst, soort: 'nieuwsbrief', bron: 'zaak' }).error) verstuurd++;
     }
     db.data.nieuwsbrieven[code] = { onderwerp, at: new Date().toISOString(), verstuurd, door: req.actor.name };
     save();
     logActivity(code, req.actor, 'verstuurde een nieuwsbrief aan ' + verstuurd + ' volger(s)');
-    res.json({ ok: true, verstuurd, volgers: volgers.length });
+    res.json({ ok: true, verstuurd, zonderToestemming, volgers: volgers.length });
   });
 
 };

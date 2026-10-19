@@ -44,11 +44,15 @@ module.exports = (ctx) => {
     return { ok: true, thema: pub(t) };
   }
 
-  function themaStem(b) {
+  /* De stem hangt aan de STEMMER (een hash uit de sessie, routes/livinglab/
+     bewoneraccount.js; eigenaarsbesluit 19 oktober 2026) en niet aan de alias:
+     een andere alias is geen tweede mens. Zonder stemmer valt hij terug op de
+     alias, zoals de stemmen van voor het besluit nog in de lijst staan. */
+  function themaStem(b, stemmer) {
     b = b || {};
     const t = S().themas.find(x => x.id === String(b.id || ''));
     if (!t) return { status: 404, error: 'Dit thema bestaat niet.' };
-    const wie = schoon(b.alias, 40) || '';
+    const wie = stemmer || schoon(b.alias, 40) || '';
     if (wie.length < 2) return { status: 400, error: 'Een stem draagt een naam of alias.' };
     if (t.stemmen.includes(wie)) return { status: 409, error: 'U heeft al op dit thema gestemd.' };
     if (t.stemmen.length >= 100000) return { status: 400, error: 'Dit thema heeft genoeg stemmen.' };

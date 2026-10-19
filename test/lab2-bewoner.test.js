@@ -35,6 +35,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+// de buurtdeuren van het lab vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per alias
+require('./labaccount').zetLabAccount();
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lab2-bewoner-'));
@@ -176,17 +178,20 @@ test('een vraag uit de buurt: de stem hangt aan het thema, niet aan de stemmer',
   assert.equal(eerst.themas[0].stemmen, 0, 'een vers thema heeft nul stemmen');
   assert.equal(eerst.themas[0].studieId, null, 'en hangt nog aan geen enkel onderzoek');
 
-  const naamloos = await pub('/api/lab2/bewoner/stem', { id: THEMA });
-  assert.equal(naamloos.status, 400, 'een stem draagt een naam of alias');
+  /* De stem hangt sinds het eigenaarsbesluit van 19 oktober 2026 aan het
+     ACCOUNT (routes/livinglab/bewoneraccount.js); de alias is alleen nog een
+     weergavenaam. Een stem zonder alias telt dus gewoon. */
+  const naamloos = await moetPub('bewoner/stem', { id: THEMA }, 'stemmen zonder alias');
+  assert.equal(naamloos.thema.stemmen, 1, 'het account is de stemmer, ook zonder alias');
 
   const stem = await moetPub('bewoner/stem', { id: THEMA, alias: 'BW-STEMMER' }, 'stemmen');
-  assert.equal(stem.thema.stemmen, 1, 'de stem telt');
+  assert.equal(stem.thema.stemmen, 2, 'een tweede account telt');
 
   const weer = await pub('/api/lab2/bewoner/stem', { id: THEMA, alias: 'BW-STEMMER' });
   assert.equal(weer.status, 409, 'twee keer stemmen kan niet');
 
   const na = await moetPub('bewoner/themas', { labId: LAB }, 'themalijst opnieuw');
-  assert.equal(na.themas[0].stemmen, 1, 'en de teller staat daarna nog steeds op een');
+  assert.equal(na.themas[0].stemmen, 2, 'en de teller staat daarna nog steeds op twee');
 
   const geenLijst = await pub('/api/lab2/bewoner/themas', { labId: 'bestaatniet' });
   assert.equal(geenLijst.status, 404, 'themas van een lab dat niet bestaat');

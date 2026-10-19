@@ -1,9 +1,10 @@
 /* Living Lab, deel "bewoner": de deuren die zonder kantoorinlog opengaan.
 
    Een Living Lab dat alleen achter een personeelsinlog bestaat, is geen Living
-   Lab. Een bewoner moet een vraag kunnen aandragen, erop kunnen stemmen, zijn
-   eigen onderzoek kunnen openen met zijn labpas, een observatie kunnen insturen
-   en een klacht kunnen indienen -- zonder account.
+   Lab. Een bewoner draagt een vraag aan, stemt, opent zijn onderzoek met zijn
+   labpas en dient een klacht in. Sinds het eigenaarsbesluit van 19 oktober
+   2026 vragen de buurtdeuren (labs, themas, thema, stem, overzicht) een
+   account of gezinsprofiel: ./bewoneraccount.js.
 
    ---------- DE REM ----------
 
@@ -22,10 +23,8 @@
       één code. Dat mag hier op de code alleen staan, want wie de labpas kent is
       al binnen -- er valt niemand buiten te sluiten die er wel bij hoort.
 
-   De SCHRIJFdeuren (een thema aandragen, stemmen, een observatie insturen, een
-   klacht indienen) hebben geen code maar wel een rem, en die staat strakker:
-   dat zijn de deuren waarmee je de INHOUD van het lab kunt vervuilen, en daar
-   is een mens met een toetsenbord genoeg voor.
+   De SCHRIJFdeuren (aandragen, stemmen, observatie, klacht) hebben een
+   strakkere rem: daarmee vervuil je de INHOUD van het lab.
 
    ---------- WAT ER NIET UIT DE BODY KOMT ----------
 
@@ -43,6 +42,8 @@ module.exports = (kern, hulp) => {
   const { veilig } = hulp;
 
   const lijf = req => (req.body || {});
+  // een account (of gezinsprofiel onder een ouderaccount) voor de buurtdeuren: ./bewoneraccount.js
+  const { bewoner, GEEN_ACCOUNT } = require('./bewoneraccount')({ resolveSession: kern.resolveSession, rtf: kern.rtf });
   const codeUit = req => String(lijf(req).pas || lijf(req).code || '').trim().toUpperCase();
 
   // de twee remmen van de code-deuren, met dezelfde maten als de andere
@@ -118,28 +119,36 @@ module.exports = (kern, hulp) => {
   }));
 
   /* ---------- vragen uit de buurt ----------
-     Open, want dit is de trechter vóór het onderzoek. Wel met een rem, en de
-     stem telt op het THEMA (regel 7: de teller hangt aan het doel). */
-  /* ---------- de openbare onderzoekskaarten ----------
-     Zonder inlog en zonder labpas: dit is de kant die een gemeente, een
-     subsidiegever of een buurtbewoner leest. Er staat alleen wat het lab zelf
-     heeft geschreven en wat te tellen is -- geen aliassen, geen waarnemingen. */
-  app.post('/api/lab2/bewoner/themas', remLezen, (req, res) => veilig(res, () => livinglab.themas.themas(lijf(req).labId)));
-  app.post('/api/lab2/bewoner/thema', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaBij(lijf(req))));
-  app.post('/api/lab2/bewoner/stem', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaStem(lijf(req))));
+     De trechter vóór het onderzoek. Met een account (eigenaarsbesluit 19
+     oktober 2026, ./bewoneraccount.js) en een rem; de stem telt op het THEMA
+     (regel 7: de teller hangt aan het doel) en is een per stemmer. */
+  app.post('/api/lab2/bewoner/themas', remLezen, (req, res) => {
+    if (!bewoner(req)) return res.status(401).json(GEEN_ACCOUNT);
+    veilig(res, () => livinglab.themas.themas(lijf(req).labId));
+  });
+  app.post('/api/lab2/bewoner/thema', remSchrijf, (req, res) => {
+    if (!bewoner(req)) return res.status(401).json(GEEN_ACCOUNT);
+    veilig(res, () => livinglab.themas.themaBij(lijf(req)));
+  });
+  app.post('/api/lab2/bewoner/stem', remSchrijf, (req, res) => {
+    const wie = bewoner(req);
+    if (!wie) return res.status(401).json(GEEN_ACCOUNT);
+    veilig(res, () => livinglab.themas.themaStem(lijf(req), wie.stemmer));
+  });
 
-  /* ---------- het publieke beeld van een lab ----------
+  /* ---------- het beeld van een lab ----------
      De buitenste ring: waar wordt aan gewerkt, en wat is eruit gekomen. Zonder
-     kijker meegegeven ziet deze route dus precies wat een voorbijganger mag zien,
-     en bij een gescheiden studie is dat niet meer dan de titel en de stap. */
-  app.post('/api/lab2/bewoner/overzicht', remLezen, (req, res) => veilig(res, () => livinglab.studie.overzicht(lijf(req).labId, null)));
+     kijker meegegeven; bij een gescheiden studie alleen de titel en de stap. */
+  app.post('/api/lab2/bewoner/overzicht', remLezen, (req, res) => {
+    if (!bewoner(req)) return res.status(401).json(GEEN_ACCOUNT);
+    veilig(res, () => livinglab.studie.overzicht(lijf(req).labId, null));
+  });
   app.post('/api/lab2/bewoner/studie', remLezen, (req, res) => veilig(res, () => livinglab.studie.studie(lijf(req).id, null)));
-  app.post('/api/lab2/bewoner/labs', remLezen, (req, res) => veilig(res, () => {
+  app.post('/api/lab2/bewoner/labs', remLezen, (req, res) => bewoner(req) ? veilig(res, () => {
     const r = livinglab.bestuur.labs();
-    // alleen de actieve labs, en zonder het bestuurlijke deel (budget, tekenaars,
-    // partners): dat gaat een voorbijganger niet aan
+    // alleen de actieve labs, zonder het bestuurlijke deel (budget, tekenaars, partners)
     return { ok: true, labs: r.labs.filter(l => l.actief).map(l => ({ id: l.id, stad: l.stad, naam: l.naam, land: l.land, toegang: l.toegang })) };
-  }));
+  }) : res.status(401).json(GEEN_ACCOUNT));
 
   /* ---------- de klachtenprocedure ----------
      Bewust zonder pas te gebruiken: een klacht kan juist gaan over hoe het

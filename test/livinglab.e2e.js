@@ -33,7 +33,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
-test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder account',
+test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner met een gratis account uit het scherm zelf',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livinglab-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'LIVINGLAB-E2E-1' } });
@@ -148,13 +148,25 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
       await wachtOpRust(bew, '#main', { rondes: 3 });
     };
 
+    /* Zonder account staat de accountdeur in het scherm (eigenaarsbesluit 19
+       oktober 2026: de buurtdeuren vragen een account, een gratis account is
+       genoeg). De bewoner maakt er een, hier en nu, en gaat verder waar hij was. */
     await bewDeel('vragen-uit-de-buurt');
+    await bew.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor();
+    assert.equal(await bew.locator('#bLab option').count(), 0, 'zonder account stond er toch een lab in de keuzelijst');
+    const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    await bew.getByLabel('Naam', { exact: true }).fill('Bewoner Toets');
+    await bew.getByLabel('E-mailadres', { exact: true }).fill('bewoner' + u + '@voorbeeld.nl');
+    await bew.getByLabel('Geboortedatum', { exact: true }).fill('1985-05-05');
+    await bew.getByLabel('Wachtwoord (minstens zes tekens)', { exact: true }).fill('geheim12345');
+    await bew.getByRole('button', { name: 'Account maken en doorgaan', exact: true }).click();
+    await wachtTot(bew, () => document.querySelectorAll('#bLab option').length > 0, null, { wat: 'de labs na het gratis account' });
     assert.ok((await bew.locator('#bLab option').count()) > 0, 'de bewoner ziet welke labs er zijn');
     await bew.fill('#bVraag', 'Kan de speeltuin veiliger tijdens het spitsuur?');
     await klikEnWacht(bew, '#bStuur', '/api/lab2/');
     await wachtOpTekst(bew, /speeltuin/i, { in: '#bLijst' });
     assert.match(await bew.textContent('#bLijst'), /speeltuin/i,
-      'een bewoner draagt een onderzoeksvraag aan zonder account');
+      'een bewoner draagt een onderzoeksvraag aan met een gratis account');
 
     /* Het publieke onderzoeksoverzicht: de BUITENSTE ring. De studie die deze
        toets hierboven aanmaakte staat erin, met haar vraag -- want die is niet

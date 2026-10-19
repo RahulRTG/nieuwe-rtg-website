@@ -10,7 +10,8 @@
 'use strict';
 
 const testomgeving = require('../../testomgeving');
-const { losSessie } = require('../../kern/isolatie/sessiedragers');
+// losSessie IS de centrale resolveSession (gemonteerd in kern/isolatie/sessiedragers.js)
+const { losSessie: resolveSession } = require('../../kern/isolatie/sessiedragers');
 
 module.exports = (gezinsCtx) => {
   const GEEN_ACCOUNT = { error: 'Log in met je RTG-account; een gratis account is genoeg.', accountNodig: true };
@@ -18,7 +19,7 @@ module.exports = (gezinsCtx) => {
     const h = (req.get && req.get('authorization')) || '';
     const t = h.startsWith('Bearer ') ? h.slice(7) : '';
     let s = null;
-    try { s = t ? losSessie(t) : null; } catch (e) { s = null; }
+    try { s = t ? resolveSession(t) : null; } catch (e) { s = null; }
     return !!(s && (s.account || testomgeving.actief(process.env)));
   }
   function alsGezinslid(req) {

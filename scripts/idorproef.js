@@ -800,7 +800,16 @@ if (require.main !== module) { module.exports = {}; return; }
       const u = await zroep(r.pad, zLijf(r.pad), 11);
       if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { zPool.leer(u.data, r.pad); waarden(u.data, vanZaakA); }
     }
-    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: () => ({}),
+    /* De zaak-opbouw (./lib/idoropbouw.js zaakStappen): zaak A maakt een band, en
+       bonCode + nummer gaan via ZAAK_VAN_A in B's lijf, zodat B een object van A
+       opzoekt (bon, club/band/terug). */
+    const zctx = {};
+    for (const st of opbouwLib.zaakStappen()) {
+      const lijf = typeof st.lijf === 'function' ? st.lijf(zctx) : (st.lijf || {});
+      const u = await zroep(st.pad, lijf, 11);
+      if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object' && typeof st.bewaar === 'function') { try { st.bewaar(u.data, zctx); } catch (e) {} }
+    }
+    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: (pad) => opbouwLib.zaakVanA(pad, zctx),
       vanA: vanZaakA, controle: zControle, wie: () => [],
       roepA: (pad, lijf) => zroep(pad, lijf, 11), roepB: (pad, lijf) => zroep(pad, lijf, 12),
       tegenB: (pad, lijf) => post(pad, lijf, zaakTok[12]) });

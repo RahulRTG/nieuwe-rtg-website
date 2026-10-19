@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 495 delen, 0 zonder onderwerp.**
+**62 bundels, 496 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 102 delen, 10055 regels in de delen
+`public/apps/app-main/` -- 103 delen, 10097 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -78,6 +78,7 @@ omlaag.
 | `app-main-29.js` | de realtime-verbinding starten en herstellen |
 | `app-main-29b.js` | het gesprek met Rahul op het beginscherm |
 | `app-main-29c.js` | de werelden aanreiken aan de bank van RTG Command |
+| `app-main-29d.js` | Heel RTG leest de functiegids (eigenaarsbesluit 19 oktober 2026) |
 | `app-main-30.js` | de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard |
 | `app-main-31.js` | Achtergrond (wallpaper) in het bedieningspaneel |
 | `app-main-31c.js` | Onderweg: de live reis |

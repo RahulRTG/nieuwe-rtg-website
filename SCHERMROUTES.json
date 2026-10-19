@@ -3,14 +3,12 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "09897840",
+  "commit": "b1497bc9c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [
-    "ROUTEBRON.json"
-   ],
+   "boomVuil": true,
+   "ongecommitteInvoer": [],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -81,6 +79,7 @@
     "public/apps/app-main/app-main-29.js",
     "public/apps/app-main/app-main-29b.js",
     "public/apps/app-main/app-main-29c.js",
+    "public/apps/app-main/app-main-29d.js",
     "public/apps/app-main/app-main-30.js",
     "public/apps/app-main/app-main-31.js",
     "public/apps/app-main/app-main-31c.js",
@@ -1993,16 +1992,16 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-19T10:09:32.498Z",
-   "commit": "09897840"
+   "op": "2026-10-19T10:03:21.649Z",
+   "commit": "eb6dde1a"
   },
   "bekendePaden": 5516
  },
  "gemeten": {
-  "schermenMetPad": 480,
+  "schermenMetPad": 475,
   "nietGelezen": 0,
-  "exactePaden": 1566,
-  "verwijzingen": 1849,
+  "exactePaden": 1533,
+  "verwijzingen": 1811,
   "voorvoegsels": 115,
   "basisPaden": 1,
   "doodPad": 0,
@@ -2278,15 +2277,6 @@
    "aantal": 3
   },
   {
-   "pad": "/api/orders/mine",
-   "schermen": [
-    "public/apps/app-main/app-main-19.js",
-    "public/apps/app-main/app-main-20.js",
-    "public/apps/app-main/app-main-43.js"
-   ],
-   "aantal": 3
-  },
-  {
    "pad": "/api/account/rollen",
    "schermen": [
     "public/apps/app-main/app-main-24a3.js",
@@ -2509,17 +2499,9 @@
    "aantal": 2
   },
   {
-   "pad": "/api/booking/pay",
+   "pad": "/api/orders/mine",
    "schermen": [
-    "public/apps/app-main/app-main-16.js",
-    "public/apps/app-main/app-main-17.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/order/pay",
-   "schermen": [
-    "public/apps/app-main/app-main-20.js",
+    "public/apps/app-main/app-main-19.js",
     "public/apps/app-main/app-main-43.js"
    ],
    "aantal": 2
@@ -2557,23 +2539,7 @@
    "aantal": 2
   },
   {
-   "pad": "/api/agenda/mijn",
-   "schermen": [
-    "public/apps/app-main/app-main-45.js",
-    "public/apps/isolatie.js"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/push/key",
-   "schermen": [
-    "public/apps/app-main/app-main-45.js",
-    "public/shared/realtime.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/push/subscribe",
    "schermen": [
     "public/apps/app-main/app-main-45.js",
     "public/shared/realtime.js"
@@ -3600,41 +3566,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/ride/pay",
-   "schermen": [
-    "public/apps/app-main/app-main-12b.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/ticket/toon",
-   "schermen": [
-    "public/apps/app-main/app-main-12b.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/tickets/aanbod",
-   "schermen": [
-    "public/apps/app-main/app-main-12b.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/tickets/mijn",
-   "schermen": [
-    "public/apps/app-main/app-main-12b.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/transfer/aanvraag",
-   "schermen": [
-    "public/apps/app-main/app-main-12b.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/care/intake/stop",
    "schermen": [
     "public/apps/app-main/app-main-13.js"
@@ -3684,174 +3615,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/huur/foto",
-   "schermen": [
-    "public/apps/app-main/app-main-15.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/huur/locatie",
-   "schermen": [
-    "public/apps/app-main/app-main-15.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/huur/mijn",
-   "schermen": [
-    "public/apps/app-main/app-main-15.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/huur/sos",
-   "schermen": [
-    "public/apps/app-main/app-main-15.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/verhuur/aanbod",
-   "schermen": [
-    "public/apps/app-main/app-main-15.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/charter/aanbod",
-   "schermen": [
-    "public/apps/app-main/app-main-16.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/charter/foto",
-   "schermen": [
-    "public/apps/app-main/app-main-16.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/charter/locatie",
-   "schermen": [
-    "public/apps/app-main/app-main-16.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/charter/mijn",
-   "schermen": [
-    "public/apps/app-main/app-main-16.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/charter/sos",
-   "schermen": [
-    "public/apps/app-main/app-main-16.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/huur/boek",
-   "schermen": [
-    "public/apps/app-main/app-main-16.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/charter/boek",
-   "schermen": [
-    "public/apps/app-main/app-main-17.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vastgoed/aanbod",
-   "schermen": [
-    "public/apps/app-main/app-main-17.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/bezorg/partners",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/contract/teken",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/contract/weiger",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/contracten/mijn",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vastgoed/bod",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vastgoed/interesse",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vastgoed/keyless",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/verkoop/mijn",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/verkoop/proefrit",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/verkoop/showroom",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/verkoop/teken",
-   "schermen": [
-    "public/apps/app-main/app-main-18.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/groothandel/annuleer",
    "schermen": [
     "public/apps/app-main/app-main-19.js"
@@ -3883,20 +3646,6 @@
    "pad": "/api/verkoop/koop",
    "schermen": [
     "public/apps/app-main/app-main-19.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/bezorg/bestel",
-   "schermen": [
-    "public/apps/app-main/app-main-20.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/suppliers",
-   "schermen": [
-    "public/apps/app-main/app-main-20.js"
    ],
    "aantal": 1
   },
@@ -4034,6 +3783,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/order/pay",
+   "schermen": [
+    "public/apps/app-main/app-main-43.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/rtf/kanaal",
    "schermen": [
     "public/apps/app-main/app-main-43.js"
@@ -4072,13 +3828,6 @@
    "pad": "/api/rtf/uitnodiging/accepteer",
    "schermen": [
     "public/apps/app-main/app-main-44.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/pay",
-   "schermen": [
-    "public/apps/app-main/app-main-45.js"
    ],
    "aantal": 1
   },
@@ -7208,6 +6957,13 @@
    "pad": "/api/techniek/isolatie/ontsluiting/stap/opties",
    "schermen": [
     "public/apps/isolatie-ontsluiting.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/agenda/mijn",
+   "schermen": [
+    "public/apps/isolatie.js"
    ],
    "aantal": 1
   },
@@ -13050,6 +12806,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/push/subscribe",
+   "schermen": [
+    "public/shared/realtime.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/ready",
    "schermen": [
     "public/shared/rtg-edge-library.js"
@@ -13344,17 +13107,6 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/app-main/app-main-12b.js",
-   "exact": [
-    "/api/ride/pay",
-    "/api/ticket/toon",
-    "/api/tickets/aanbod",
-    "/api/tickets/mijn",
-    "/api/transfer/aanvraag"
-   ],
-   "voorvoegsels": []
-  },
-  {
    "bestand": "public/apps/app-main/app-main-13.js",
    "exact": [
     "/api/care",
@@ -13380,51 +13132,7 @@
    "bestand": "public/apps/app-main/app-main-15.js",
    "exact": [
     "/api/care/pakket/betaal",
-    "/api/care/pakket/boek",
-    "/api/huur/foto",
-    "/api/huur/locatie",
-    "/api/huur/mijn",
-    "/api/huur/sos",
-    "/api/verhuur/aanbod"
-   ],
-   "voorvoegsels": []
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-16.js",
-   "exact": [
-    "/api/booking/pay",
-    "/api/charter/aanbod",
-    "/api/charter/foto",
-    "/api/charter/locatie",
-    "/api/charter/mijn",
-    "/api/charter/sos",
-    "/api/huur/boek"
-   ],
-   "voorvoegsels": []
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-17.js",
-   "exact": [
-    "/api/booking/pay",
-    "/api/charter/boek",
-    "/api/vastgoed/aanbod"
-   ],
-   "voorvoegsels": []
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-18.js",
-   "exact": [
-    "/api/bezorg/partners",
-    "/api/contract/teken",
-    "/api/contract/weiger",
-    "/api/contracten/mijn",
-    "/api/vastgoed/bod",
-    "/api/vastgoed/interesse",
-    "/api/vastgoed/keyless",
-    "/api/verkoop/mijn",
-    "/api/verkoop/proefrit",
-    "/api/verkoop/showroom",
-    "/api/verkoop/teken"
+    "/api/care/pakket/boek"
    ],
    "voorvoegsels": []
   },
@@ -13437,16 +13145,6 @@
     "/api/groothandel/mijn",
     "/api/orders/mine",
     "/api/verkoop/koop"
-   ],
-   "voorvoegsels": []
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-20.js",
-   "exact": [
-    "/api/bezorg/bestel",
-    "/api/order/pay",
-    "/api/orders/mine",
-    "/api/suppliers"
    ],
    "voorvoegsels": []
   },
@@ -13537,10 +13235,7 @@
   {
    "bestand": "public/apps/app-main/app-main-45.js",
    "exact": [
-    "/api/agenda/mijn",
-    "/api/pay",
-    "/api/push/key",
-    "/api/push/subscribe"
+    "/api/push/key"
    ],
    "voorvoegsels": []
   },

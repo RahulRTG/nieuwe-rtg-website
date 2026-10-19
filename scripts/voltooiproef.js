@@ -79,6 +79,7 @@ const AFGELEID = 'menselijk';
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'appdossier.js': require('./lib/voltooi/appdossier'),
   'attenties.js': require('./lib/voltooi/attenties'),
   'bescherming.js': require('./lib/voltooi/bescherming'),
   'cellier.js': require('./lib/voltooi/cellier'),

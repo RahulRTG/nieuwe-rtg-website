@@ -219,6 +219,10 @@ const CONTRACT = {
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),
+  /* LivingOS-A (APPWERKT, 19 oktober 2026). */
+  'link:appdossier': Object.assign({
+    belofte: 'een lid leest over een app van een derde wie de leverancier is en wie hem toeliet, wat er draait, wat hij nooit krijgt en wat het dossier niet kan zeggen -- pas nadat een mens van RTG publiceerde'
+  }, voltooi('appdossier', 'het scenario loopt /api/appstore/kanaal en /api/appstore/dossier, de routes die /apps/appstore-dossier.html zelf aanroept, met een uitgever die inzendt en een kantoormens op naam die publiceert')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

@@ -175,6 +175,8 @@ const contractStandVoor = require('./contractstand')({ kernVoorAuth, lidpoort })
 function resolveSession(token) {
   if (!token) return null;
   const demo = sessionFor(token);
+  // buiten de demo is een persona zonder account en zonder rol geen sessie (eigenaarsbesluit 19-10-2026)
+  if (demo && !DEMO && !demo.account && !demo.role && PERSONAS[demo.tier]) return null;
   if (demo) return demo.sid ? metContext(demo, demo.sid) : demo;
   const user = accounts.verifyToken(token);
   if (user) {

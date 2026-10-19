@@ -64,6 +64,11 @@ test('buiten de demo: geen gastsessie zonder account, wel een gratis account', a
     assert.equal((await P('/api/state', {})).status, 401, 'zonder token: 401');
     assert.equal((await P('/api/state', {}, oudeGast)).status, 401,
       'een persona-sessie zonder account komt buiten de demo niet door de ledenpoort');
+    /* En ook niet langs een deur die resolveSession zelf leest: de belgegevens
+       (/api/ice, kern/rtc/ijs.js bearerActor) geven een sessie zonder account
+       geen TURN-uitgifte. Zonder sessie is het 401. */
+    assert.equal((await P('/api/ice', {}, oudeGast)).status, 401,
+      'een persona-sessie zonder account krijgt buiten de demo geen belgegevens');
 
     // 3. een gratis account werkt
     const tok = await gratisAccount(P);

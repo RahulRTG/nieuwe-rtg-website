@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-19T21:14:59.758Z",
-    "commit": "09f77602c2",
+    "op": "2026-10-19T21:23:25.579Z",
+    "commit": "f1f8da6ee0",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -3034,14 +3034,19 @@
       "geprobeerd": 2
     },
     "comm-herhaalsleutel.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/comm/index.js"
-      ],
-      "geprobeerd": 6,
-      "posities": 1000,
-      "dekking": "dun"
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/comm/bericht.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-gerichte-integratiebewijs/comm-herhaalsleutel.test.js.evidence.json",
+        "sha256": "a21ca9e0fe6b14159a215bd5d9340b23b86c93532fa7771589333bf5d3604530",
+        "commit": "f1f8da6ee0a7d059c4624436a552b8fbd2a565ff",
+        "sourceSha256": "cabc40d968cf03f346a1d26dfb8406409f029d6060f6226f5d3770bd3872f46c",
+        "testSha256": "8f2ede7ad027220f0b8adbc3af25639bff0876776de16e1806c1eac529ab9a75"
+      }
     },
     "comm-stand-routes.test.js": {
       "soort": "server",
@@ -21346,20 +21351,19 @@
       "scherp": "gezakt"
     },
     "workspace-travel-budget.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/travel-request-controller.js",
-        "public/shared/interface/modules/travel-actions.js",
-        "public/shared/interface/modules/travel-continuity.js",
-        "public/shared/interface/modules/travel-dossier-view.js",
-        "public/shared/interface/modules/travel-edge.js",
-        "public/shared/interface/modules/travel-view.js",
-        "public/shared/interface/modules/travel.js"
-      ],
-      "geprobeerd": 296,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/shared/interface/modules/travel.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-gerichte-integratiebewijs/workspace-travel-budget.test.js.evidence.json",
+        "sha256": "f95bf5f148b759ca2d32beba81ae7c845d49b811c9b8d79f4d24e24bc6378ffd",
+        "commit": "f1f8da6ee0a7d059c4624436a552b8fbd2a565ff",
+        "sourceSha256": "ba40584b3a464d17babf3d9408567bb20c17c3facfdc41c50a791bdcf6931093",
+        "testSha256": "158d2c64156f4806bfa6b4bec8471ca3013a64b9422c566c090f915c8a64c957"
+      }
     },
     "workspace-travel-confirmation.e2e.js": {
       "soort": "server",

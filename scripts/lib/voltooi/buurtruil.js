@@ -127,9 +127,9 @@ async function loop(w, stap) {
   });
 
   /* ---------------- herstelbaar ---------------- */
-  await stap('herstelbaar', 'een dubbele tik op Zet erbij plaatst het aanbod een keer', async () => {
+  await stap('herstelbaar', 'een dubbele tik op Zet erbij (dezelfde herhaalsleutel) plaatst het aanbod een keer', async () => {
     const T = 'Wieg ' + merk;
-    const [a, b] = await w.dubbel(PLAATS, { stad: stad.id, soort: 'geef', titel: T }, ouder.token);
+    const [a, b] = await w.dubbel(PLAATS, { stad: stad.id, soort: 'geef', titel: T, idem: 'ruil-' + merk + '-wieg' }, ouder.token);
     const n = metTitel(await mijn(), T).length;
     return { klopt: a.status === 200 && b.status === 200 && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + n + ' wieg in Mijn aanbod' };
   });
@@ -143,8 +143,8 @@ async function loop(w, stap) {
 
   await stap('herstelbaar', 'een afgebroken plaatsing en daarna opnieuw: het aanbod staat er een keer', async () => {
     const T = 'Box ' + merk;
-    const half = await w.afgebroken(PLAATS, { stad: stad.id, soort: 'geef', titel: T }, ouder.token);
-    const opnieuw = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: T }, ouder.token);
+    const half = await w.afgebroken(PLAATS, { stad: stad.id, soort: 'geef', titel: T, idem: 'ruil-' + merk + '-box' }, ouder.token);
+    const opnieuw = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: T, idem: 'ruil-' + merk + '-box' }, ouder.token);
     const n = metTitel(await mijn(), T).length;
     return { klopt: opnieuw.status === 200 && n === 1,
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', ' + n + ' box' };
@@ -152,9 +152,9 @@ async function loop(w, stap) {
 
   await stap('herstelbaar', 'een crash direct na een plaatsing verliest hem niet, en opnieuw plaatsen verdubbelt hem niet', async () => {
     const T = 'Speelkleed ' + merk;
-    const r = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: T }, ouder.token);
+    const r = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: T, idem: 'ruil-' + merk + '-kleed' }, ouder.token);
     await w.crash();
-    const opnieuw = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: T }, ouder.token);
+    const opnieuw = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: T, idem: 'ruil-' + merk + '-kleed' }, ouder.token);
     const n = metTitel(await mijn(), T).length;
     return { klopt: r.status === 200 && opnieuw.status === 200 && n === 1,
       ziet: 'geplaatst ' + r.status + ', na SIGKILL opnieuw ' + opnieuw.status + ', ' + n + ' speelkleed' };

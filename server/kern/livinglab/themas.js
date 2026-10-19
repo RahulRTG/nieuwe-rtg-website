@@ -35,9 +35,17 @@ module.exports = (ctx) => {
     const lab = vindLab(b.labId); if (!lab) return { status: 404, error: 'Dit lab bestaat niet.' };
     const vraag = schoon(b.vraag, 300);
     if (vraag.length < 10) return { status: 400, error: 'Welke vraag leeft er in de buurt? Schrijf hem als vraag op.' };
+    /* EEN HERHAALSLEUTEL PER OPGESTELDE VRAAG, en geen vergelijking op de tekst:
+       twee bewoners met dezelfde vraag zijn twee vragers. Dezelfde sleutel is
+       dezelfde vraag (ook na een herstart, de sleutel staat erop); dezelfde
+       sleutel met een andere vraag is een fout. */
+    const idem = typeof b.idem === 'string' && b.idem ? b.idem.slice(0, 80) : null;
+    const al = idem && S().themas.find(t => t.labId === lab.id && t.idem === idem);
+    if (al) return al.vraag === vraag ? { ok: true, herhaald: true, thema: pub(al) }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere vraag.' };
     if (S().themas.filter(t => t.labId === lab.id).length >= 5000) return { status: 400, error: 'Het themaregister van dit lab zit vol.' };
     const t = { id: rid(), labId: lab.id, vraag, soort: (kader.soort(b.soort) || {}).soort || null,
-      door: schoon(b.alias, 40) || 'bewoner', stemmen: [], studieId: null, at: nu() };
+      door: schoon(b.alias, 40) || 'bewoner', stemmen: [], studieId: null, idem, at: nu() };
     S().themas.unshift(t);
     audit(lab.id, 'thema.bij', t.door, t.id, vraag.slice(0, 60));
     save();

@@ -75,14 +75,15 @@ function socialDm(mij, ander) {
   b.markeerGelezen(mij, ander);
   return { status: 200, messages: b.berichten(mij, ander, 80), codename: codenaamVan(ander) };
 }
-function socialDmSend(mij, ander, text) {
+function socialDmSend(mij, ander, text, idem) {
   if (isGeblokkeerd(mij, ander)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
   if (!verbActief(connectieTussen(mij, ander))) return { status: 403, error: 'Je bent nog niet verbonden met deze codenaam.' };
   if (!sociaalRate(mij, 'dm', 60, 60 * 1000)) return { status: 429, error: 'Rustig aan met berichten sturen.' };
   text = String(text || '').replace(/[<>]/g, '').slice(0, 500).trim();
   if (!text) return { status: 400, error: 'Leeg bericht.' };
   const b = DM();
-  b.stuur(mij, ander, { tekst: text });
+  // een herhaalsleutel per opgesteld bericht: dezelfde sleutel is hetzelfde bericht (kern/comm/bericht.js)
+  b.stuur(mij, ander, { tekst: text, idem: typeof idem === 'string' ? idem : null });
   sseToCustomer(ander, 'social', { kind: 'dm', from: mij, codename: codenaamVan(mij), text });
   return { status: 200, ok: true, messages: b.berichten(mij, ander, 80) };
 }

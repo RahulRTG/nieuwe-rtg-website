@@ -493,14 +493,16 @@ test('een voorstel is nog geen overeenkomst, en zegt dat ook', () => {
 
 /* Ook gevonden door de voltooiproef: een dubbele tik op Voorstellen zette twee
    gelijke plannen neer, elk met eigen termijnen en een eigen machtiging. */
-test('een dubbele tik op voorstellen zet een plan neer en geen twee', () => {
+test('een herhaalsleutel per voorstel: dezelfde sleutel is een plan, een ander voorstel met dezelfde sleutel 409', () => {
   const { gift } = bouwPlan();
-  const a = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 });
-  const b = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 });
+  const a = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5, idem: 'plan-1' });
+  const b = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5, idem: 'plan-1' });
   assert.equal(a.plan.id, b.plan.id, 'een dubbele tik gaf twee plannen');
   assert.equal(gift.plan.mijn('Poolvos 1BE9').plannen.length, 1);
-  assert.ok(gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 200, jaren: 5 }).plan.id !== a.plan.id,
-    'een ander plan werd opgeslokt');
+  assert.equal(gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 200, jaren: 5, idem: 'plan-1' }).status, 409,
+    'dezelfde sleutel met een ander bedrag is een fout');
+  assert.ok(gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5, idem: 'plan-2' }).plan.id !== a.plan.id,
+    'een bewust tweede gelijk plan met een eigen sleutel werd opgeslokt');
 });
 
 test('vastleggen vraagt een vindbaar stuk, en doet de stichting', () => {

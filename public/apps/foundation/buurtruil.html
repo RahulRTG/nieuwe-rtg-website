@@ -156,6 +156,7 @@ const api = (pad, body) => fetch(pad, {
 });
 
 let STAD = null;
+let AANBODSLEUTEL = null;
 let TAB = '';
 
 function zeg(tekst, goed) {
@@ -245,9 +246,14 @@ $('#tabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click
 $('#plaats').addEventListener('click', async () => {
   const titel = $('#nTitel').value.trim();
   if (!STAD || titel.length < 3) { zeg('Wat is het? Een paar woorden is genoeg.'); return; }
+  /* Een herhaalsleutel per opgesteld aanbod: een dubbele tik of een nieuwe
+     poging na een fout is hetzelfde aanbod, een aangepast aanbod een nieuw. */
+  const inhoud = [STAD, $('#nSoort').value, titel, $('#nWat').value.trim(), $('#nStaat').value.trim()].join('|');
+  if (!AANBODSLEUTEL || AANBODSLEUTEL.inhoud !== inhoud) AANBODSLEUTEL = { inhoud, idem: RTGId('ruil') };
   try {
     await api('/api/rtfos/ruil/plaats', { stad: STAD, soort: $('#nSoort').value, titel,
-      wat: $('#nWat').value.trim(), staat: $('#nStaat').value.trim() });
+      wat: $('#nWat').value.trim(), staat: $('#nStaat').value.trim(), idem: AANBODSLEUTEL.idem });
+    AANBODSLEUTEL = null;
     $('#nTitel').value = ''; $('#nWat').value = ''; $('#nStaat').value = '';
     zeg('Staat erbij.', true);
     teken();

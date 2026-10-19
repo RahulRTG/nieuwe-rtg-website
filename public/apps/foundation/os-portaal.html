@@ -126,7 +126,8 @@ async function open() {
   }
   let r;
   try {
-    const res = await fetch('/api/rtfos/portaal/' + soort, {
+    const PAD = { partner: '/api/rtfos/portaal/partner', gemeente: '/api/rtfos/portaal/gemeente', ondernemer: '/api/rtfos/portaal/ondernemer' };
+    const res = await fetch(PAD[soort], {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code })
     });
     r = await res.json().catch(() => ({}));

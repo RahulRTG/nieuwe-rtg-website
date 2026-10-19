@@ -151,3 +151,18 @@ test('dezelfde herhaalsleutel geeft geen tweede bericht, ook niet na een herstar
   assert.equal(dm2.stuur('a', 'b', { tekst: 'Zonder sleutel' }).herhaald, undefined);
   assert.equal(dm2.stuur('a', 'b', { tekst: 'Zonder sleutel' }).herhaald, undefined, 'zonder sleutel blijft elk bericht een eigen bericht');
 });
+
+/* Een herhaalsleutel per opgesteld bericht (voltooiproef van Vrienden, 19 oktober
+   2026). De centrale antwoordkas vangt een dubbele tik alleen zolang hij in het
+   geheugen staat; na een herstart is de sleutel op het bericht de enige grens.
+   Dit draait daarom op de kern zelf, zonder die kas ervoor. */
+test('dezelfde herhaalsleutel is hetzelfde bericht, een nieuwe sleutel een nieuw bericht', () => {
+  const { dm } = opzet();
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-1' });
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-1' });
+  assert.equal(dm.berichten('a', 'b', 80).filter((m) => m.text === 'Kom je spelen?').length, 1,
+    'dezelfde sleutel zette het bericht twee keer neer');
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-2' });
+  assert.equal(dm.berichten('a', 'b', 80).filter((m) => m.text === 'Kom je spelen?').length, 2,
+    'een bewust tweede bericht met een eigen sleutel hoort er wel bij');
+});

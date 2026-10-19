@@ -192,6 +192,33 @@ const CONTRACT = {
   'link:geven': Object.assign({
     belofte: 'wie geeft ziet eerst wat er zou gebeuren en bevestigt een keer; een oormerk landt op een echt project, en een meerjarig plan en zijn machtiging beheert de gever zelf'
   }, voltooi('geven', 'het scenario loopt /api/rtfos/gift/stand, /voorbereid, /bevestig, /projecten, /plan/* en /machtiging/*, de routes die /apps/foundation/geven.html zelf aanroept, met het kantoor dat het plan vastlegt')),
+  'link:rtfbord': Object.assign({
+    belofte: 'een begeleider start een les, tekent op het bord, zet opgaven en de agenda klaar, ziet de inzendingen en leest een schrift -- de klas en een andere les beschrijven zijn bord niet'
+  }, voltooi('rtfbord', 'het scenario loopt /api/foundation/bord/*, /opgave, /opgaven, /agenda, /schrift en /les/code/roteer, de routes die /apps/foundation/bord.html zelf aanroept, met de les zoals Leren & Groei hem start en het kind van het gezin als leerling')),
+  'link:rtfschrift': Object.assign({
+    belofte: 'een leerling doet mee met een les, schrijft in zijn eigen schrift, levert in en vraagt de bijleshulp -- een klasgenoot of een andere les leest zijn schrift niet'
+  }, voltooi('rtfschrift', 'het scenario loopt /api/foundation/schrift/opslaan, /schrift, /opgave/inleveren, /ai, /tip, /les en /bord, de routes die /apps/foundation/schrift.html zelf aanroept, met het kind van het gezin als leerling en een klasgenoot')),
+  'link:klimaat': Object.assign({
+    belofte: 'wie in de buurt woont ziet de lopende duurzaamheidsprojecten en geeft erheen, stelt in het Living Lab een vraag over duurzaamheid, steunt die van een ander en ziet welk onderzoek er loopt'
+  }, voltooi('klimaat', 'het scenario loopt /api/rtfos/gift/projecten en /api/lab2/bewoner/labs, /themas, /thema, /stem en /overzicht, de routes die /apps/foundation/klimaatfonds.html zelf aanroept, met een buur die steunt')),
+  'link:library': Object.assign({
+    belofte: 'een maker begint een werk, legt het vast in onderdelen met revisies, geeft met afspraak en rechten een editie vrij die niet meer verandert, leest hem en verwerkt feedback'
+  }, voltooi('library', 'het scenario loopt /api/library/work/*, /studio/workspace, /revision/add, /agreement/*, /rights/grant, /edition/*, /publication/*, /reader/* en /feedback/*, de routes die /apps/library.html via apps/library/app.js aanroept')),
+  'link:rtfbuurt': Object.assign({
+    belofte: 'wie in een stad woont ziet welke RTF-afdeling open is, wat er loopt, waar hij binnen kan lopen en welke campagne er is -- en niets wat niet op een poster in het buurthuis zou hangen'
+  }, voltooi('rtfbuurt', 'het scenario loopt /api/rtfos/publiek/steden, /stad en /campagnes, de routes die /apps/foundation/os-publiek.html zelf aanroept, met wat het kantoor opent en stopt')),
+  'link:rtfportaal': Object.assign({
+    belofte: 'een partnerstichting, gemeente of ondernemer opent met de code van het kantoor zijn eigen dossier -- de gemeente alleen getelde cijfers -- en elke code opent precies een dossier'
+  }, voltooi('rtfportaal', 'het scenario loopt /api/rtfos/portaal/partner, /gemeente en /ondernemer, de routes die /apps/foundation/os-portaal.html zelf aanroept, met codes die het kantoor uitgaf en een tweede stichting')),
+  'link:vrienden': Object.assign({
+    belofte: 'een kind zoekt niet zelf: zijn ouder voegt een vriendje toe, de ouder van dat vriendje keurt goed, en pas dan sturen de kinderen elkaar berichten'
+  }, voltooi('vrienden', 'het scenario loopt /api/rtf/social/connections, /find, /connect, /oudervoeg, /goedkeuren, /dm, /dm/send en /kind/contacten, de routes die /apps/foundation/vrienden.html zelf aanroept, met drie gezinnen')),
+  'link:foundationzorg': Object.assign({
+    belofte: 'het gezin ziet zijn zorgafspraken (betalen, annuleren) en de gezondheidskaart van het gezin bij elkaar, en een hulpwijzer denkt mee zonder de tekst te bewaren'
+  }, voltooi('foundationzorg', 'het scenario loopt /api/care, /api/care/mijn, /betaal, /annuleer, /api/foundation/gezin/:code/gezondheid en /api/foundation/hulp/ai, de routes die /apps/foundation/zorg.html via zorg-hulp.js aanroept')),
+  'link:passkeys': Object.assign({
+    belofte: 'een lid zet na zijn wachtwoord een passkey op zijn account, logt daarna in zonder wachtwoord, ziet zijn sleutels en haalt er een weg met zijn vinger'
+  }, voltooi('passkeys', 'het scenario loopt /api/webauthn/registreer/opties, /registreer, /lijst, /opties, /login, /bevestig/opties en /weg, de routes die /apps/passkeys.html zelf aanroept, met een software-authenticator')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),
@@ -369,15 +396,14 @@ const CONTRACT = {
      loopt als LID over /api/connect, de deur die connect.html zelf aanroept; de
      gezinsdeur /api/rtf/connect is dezelfde motor maar wordt niet gelopen, en dat
      staat in `waarom` in plaats van weggelaten. */
-  'link:connect': {
-    belofte: 'je ontdekt iets, begrijpt het, doet er iets mee, en een ander bevestigt dat het hem hielp -- zonder score, rangorde of niveau',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'LUSPROEF.json',
-      instrument: 'scripts/lusproef.js',
-      waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
-    }
-  },
+  /* Sinds 19 oktober 2026 komen alle vier de bewijzen uit de voltooiproef, die
+     de GEZINSDEUR loopt -- de persona van deze rij, en de deur die connect.html
+     bij een gezinssessie kiest. De lusproef (LUSPROEF.json, scripts/lusproef.js)
+     blijft bestaan en loopt de ledendeur met een tweede mens die bevestigt; dat
+     deel van de belofte draagt de voltooiproef niet, en dat staat in zijn grens. */
+  'link:connect': Object.assign({
+    belofte: 'je ontdekt iets, begrijpt het, doet er iets mee, en een ander bevestigt dat het hem hielp -- zonder score, rangorde of niveau'
+  }, voltooi('connect', 'het scenario loopt /api/rtf/connect/ontdek, /open, /signaal, /schuif, /horizon, /dossier, /portfolio, /noteer en /werk, de gezinsdeur die /apps/connect.html bij een gezinssessie aanroept; de bevestiging door een tweede mens loopt de lusproef')),
   /* LivingOS-B: media, sociaal en spel (19 oktober 2026). */
   'link:muziek': Object.assign({
     belofte: 'een lid deelt zijn eigen muziek, een ander lid vindt, hoort en waardeert haar, alleen de maker haalt haar weg, en samen luisteren brengt de luisteraar in de kamer van de gastheer'

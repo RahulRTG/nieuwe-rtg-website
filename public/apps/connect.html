@@ -171,10 +171,11 @@
       return s && s.code && s.token ? { code: s.code, token: s.token } : null;
     } catch (e) { return null; }
   };
-  const roep = (pad, body) => {
+  /* Beide deuren staan letterlijk bij de aanroep (de ledendeur en de
+     gezinsdeur), zodat de routekaart en de proeven ze allebei kunnen lezen. */
+  const roep = (pad, gezinsPad, body) => {
     const g = gezinsSessie();
-    return g ? Veilig.api(pad.replace('/api/connect/', '/api/rtf/connect/'), Object.assign({}, body || {}, g))
-      : Veilig.api(pad, body);
+    return g ? Veilig.api(gezinsPad, Object.assign({}, body || {}, g)) : Veilig.api(pad, body);
   };
   let staat = { schuif: 40, verras: false };
 
@@ -210,7 +211,7 @@
        met alles wat langskwam, meet aandacht en geen leren. */
     el.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', async () => {
       try {
-        await roep('/api/connect/open', { id: b.dataset.id,
+        await roep('/api/connect/open', '/api/rtf/connect/open', { id: b.dataset.id,
           onderwerp: b.dataset.onderwerp, herkomst: b.dataset.herkomst });
       } catch (e) { /* de ingang gaat voor: een spoor dat niet lukt, houdt de mens niet tegen */ }
       window.location.href = b.dataset.open;
@@ -219,7 +220,10 @@
       el.querySelectorAll('[' + attr + ']').forEach(b => b.addEventListener('click', async () => {
         const onderwerp = b.getAttribute(attr);
         try {
-          await roep('/api/connect/signaal', { onderwerp, signaal: welk });
+          /* Een sleutel per knop zolang hij er staat: een dubbele tik is een
+             bedoeling. Na het opnieuw tekenen is een tik een nieuwe keuze. */
+          b.dataset.idem = b.dataset.idem || RTGId('signaal');
+          await roep('/api/connect/signaal', '/api/rtf/connect/signaal', { onderwerp, signaal: welk, idem: b.dataset.idem });
           Veilig.melding('Genoteerd. Dit stuurt wat u ziet en niets anders.');
           laad();
         } catch (e) { Veilig.melding(e.message); }
@@ -240,7 +244,8 @@
     $('#onderwerpen').innerHTML = (kandidaten || []).map(o =>
       '<button class="merk" data-kies="' + esc(o) + '">' + esc(o) + '</button>').join('');
     $('#onderwerpen').querySelectorAll('[data-kies]').forEach(b => b.addEventListener('click', async () => {
-      try { await roep('/api/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer' }); laad(); }
+      b.dataset.idem = b.dataset.idem || RTGId('signaal');
+      try { await roep('/api/connect/signaal', '/api/rtf/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer', idem: b.dataset.idem }); laad(); }
       catch (e) { Veilig.melding(e.message); }
     }));
     $('#mijnOnderwerpen').innerHTML = h.onderwerpen && h.onderwerpen.length
@@ -289,7 +294,7 @@
   async function laad() {
     const plaats = ($('#plaats').value || '').trim();
     try {
-      const d = await roep('/api/connect/ontdek', { plaats, verras: staat.verras });
+      const d = await roep('/api/connect/ontdek', '/api/rtf/connect/ontdek', { plaats, verras: staat.verras });
       /* Zonder plekken geen "Er is nu niets voor u" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
       if (!(d && Array.isArray(d.plekken))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
       staat.verras = false;
@@ -302,9 +307,9 @@
          de volledige stand komt van /horizon -- en dan is de eerste tekening
          werk dat niemand ziet, met een zichtbare sprong in de schuifbalk als
          het tweede antwoord traag is. */
-      tekenHorizon(await roep('/api/connect/horizon'), d.onderwerpenDieBruggenKennen);
-      tekenDossier(await roep('/api/connect/dossier'));
-      tekenPortfolio(await roep('/api/connect/portfolio'));
+      tekenHorizon(await roep('/api/connect/horizon', '/api/rtf/connect/horizon'), d.onderwerpenDieBruggenKennen);
+      tekenDossier(await roep('/api/connect/dossier', '/api/rtf/connect/dossier'));
+      tekenPortfolio(await roep('/api/connect/portfolio', '/api/rtf/connect/portfolio'));
     } catch (e) {
       $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
     }
@@ -312,7 +317,7 @@
 
   function start() {
     $('#schuif').addEventListener('change', async () => {
-      try { await roep('/api/connect/schuif', { schuif: Number($('#schuif').value) }); laad(); }
+      try { await roep('/api/connect/schuif', '/api/rtf/connect/schuif', { schuif: Number($('#schuif').value) }); laad(); }
       catch (e) { Veilig.melding(e.message); }
     });
     /* "Verras me" verzet de instelling NIET -- hij geldt voor dit ene verzoek.
@@ -323,7 +328,7 @@
        bij het openen van het scherm. Zie de kop van kern/connect/werkbij.js. */
     $('#werkBij').addEventListener('click', async () => {
       try {
-        const r = await roep('/api/connect/werk');
+        const r = await roep('/api/connect/werk', '/api/rtf/connect/werk');
         Veilig.melding(r.nieuw && r.nieuw.length
           ? r.nieuw.length + ' bewijsstuk(ken) erbij uit uw eigen werk.'
           : (r.geenBron ? r.reden : 'Er kwam niets nieuws bij; wat er is, stond er al.'));

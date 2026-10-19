@@ -21,7 +21,14 @@
    sleutel die tot nu toe de deur opende. Die blijft werken tot er een account
    aan de partij hangt (vanOudeSleutel); koppelen trekt hem in. Een nieuwe
    partij, of een partij waarvan het kantoor de sleutel verving, staat op
-   model 'account' en komt met een code alleen nooit binnen. */
+   model 'account' en komt met een code alleen nooit binnen.
+
+   WERKOPDRACHT VOOR HET KANTOOR: DE MIGRATIE AFRONDEN. Geef elke partij van voor
+   het besluit (in het partijenregister: geen gekoppeld account) een nieuwe
+   koppelcode met "Nieuwe koppelcode" op het kwestiekantoor, en laat een mens
+   van de partij er zijn account mee koppelen. Zodra de laatste oude partij
+   gekoppeld is, gaan de zes partijpaden uit scripts/lib/publiek.js en komen ze
+   achter `auth`; vanOudeSleutel kan dan weg. */
 'use strict';
 
 const { schoon } = require('../util');

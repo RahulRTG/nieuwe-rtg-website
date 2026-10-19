@@ -40,8 +40,10 @@ const EIGEN = [
   /* de kantooruitnodiging bindt haar sleutel aan de uitgifte (kern/kantoor/uitnodiging.js)
      en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
   '/api/office/kantoor/uitnodiging',
-  /* de Flits-melding bewaart haar sleutel bij het object; dezelfde sleutel met
-     een ander verzoek is daar een 409 */
+  /* het OV-kaartje, het abonnement en de Flits-melding bewaren hun sleutel bij
+     het object; dezelfde sleutel met een ander verzoek is daar een 409 */
+  '/api/mob/kaart/koop',
+  '/api/mob/abo/koop',
   '/api/flits/meld'
 ];
 

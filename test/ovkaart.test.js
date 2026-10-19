@@ -447,3 +447,29 @@ test('13. dezelfde herhaalsleutel na een crash geeft hetzelfde kaartje, geen twe
   const mijn = (await api('/api/mob/kaart/mijn', {}, lidF)).body.kaartjes;
   assert.equal(mijn.length, 1, 'en er is er een, niet twee');
 });
+
+test('14. dezelfde herhaalsleutel voor een ander traject is een 409, en er wordt niets betaald', async () => {
+  /* De centrale antwoordkas gaf hier stil het EERSTE kaartje terug. De koop
+     staat nu in EIGEN (middleware/idempotentie-eigen.js) en de kern beslist:
+     het id volgt uit de sleutel, en een ander product onder die sleutel is een
+     andere aankoop. */
+  const lidG = await lid();
+  const lijf = { vervoerder: 'TRANSIT', lijnId: 'L1', van: 'h-stad', naar: 'h-tal', product: 'enkel', idem: 'zelfde-1' };
+  const eerst = await api('/api/mob/kaart/koop', lijf, lidG);
+  assert.equal(eerst.status, 200, eerst.body.error || '');
+  const boekingen = () => {
+    const { DatabaseSync } = require('node:sqlite');
+    const db = new DatabaseSync(path.join(TMP, 'store.db'), { readOnly: true });
+    try {
+      const rij = db.prepare("SELECT val FROM kv WHERE key = 'payBoekingen' AND deleted = 0").get();
+      const v = rij ? JSON.parse(require('../server/kluis').ontsleutel(rij.val)) : [];
+      return JSON.stringify(v).split('ovkaart').length - 1;
+    } finally { db.close(); }
+  };
+  const voor = boekingen();
+  const ander = await api('/api/mob/kaart/koop', Object.assign({}, lijf, { naar: 'h-mar' }), lidG);
+  assert.equal(ander.status, 409, JSON.stringify(ander.body).slice(0, 200));
+  assert.match(ander.body.error, /andere aankoop/);
+  assert.equal(boekingen(), voor, 'er is niets bij geboekt');
+  assert.equal((await api('/api/mob/kaart/mijn', {}, lidG)).body.kaartjes.length, 1);
+});

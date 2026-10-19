@@ -11,6 +11,20 @@
    Gemount vanuit ./productie.js; dezelfde (env, fouten, waarschuwingen). */
 'use strict';
 
+/* Een testsleutel in productie is geen kapotte rail maar een stille: de
+   provider aanvaardt de betaling, er beweegt geen geld, en RTG noemt het
+   betaald. Stripe en Mollie dragen de modus in het voorvoegsel; Adyen niet,
+   daar bewaakt het live Checkout-adres hieronder hetzelfde. */
+const LIVE_VORM = Object.freeze({
+  STRIPE_SECRET_KEY: /^(sk|rk)_live_[A-Za-z0-9]+$/,
+  STRIPE_WEBHOOK_SECRET: /^whsec_[A-Za-z0-9]+$/,
+  MOLLIE_API_KEY: /^(live|access)_[A-Za-z0-9]+$/
+});
+function liveSleutel(naam, waarde) {
+  const vorm = LIVE_VORM[naam];
+  return !vorm || vorm.test(String(waarde || '').trim());
+}
+
 function keurGeld(env, fouten, waarschuwingen) {
     const betalingenUit = env.RTG_BETALEN_UIT === '1';
     const oudeDemoVlag = env.STRIPE_DEMO_BEWUST === '1';
@@ -33,6 +47,9 @@ function keurGeld(env, fouten, waarschuwingen) {
       fouten.push('STRIPE_DEMO_BEWUST wordt niet meer ondersteund. Gebruik Magnaat Test voor tests; productie heeft een echte provider of RTG_BETALEN_UIT=1 nodig.');
     if (!echteProvider)
       fouten.push('STRIPE_SECRET_KEY, MOLLIE_API_KEY en ADYEN_API_KEY ontbreken in productie. Zet minstens één echte provider -- of RTG_BETALEN_UIT=1 om alle betaalfuncties fail-closed uit te schakelen.');
+    for (const naam of Object.keys(LIVE_VORM))
+      if (env[naam] && !liveSleutel(naam, env[naam]))
+        fouten.push(naam + ' is geen live sleutel. Productie aanvaardt geen test- of sandboxsleutel: de provider zou betalingen goedkeuren zonder dat er geld beweegt. Proeven horen in de sandboxproef, niet in productie.');
     /* Een betaalsleutel zonder webhook-secret is gevaarlijker dan geen van
        beide: er gaat echt geld om, en de webhook die vertelt of er betaald is
        zou dan onondertekend binnenkomen. Wie het adres kent roept "betaald". */

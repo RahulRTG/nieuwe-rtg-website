@@ -27,3 +27,21 @@ test('de eigen Mollie-client zet auth, bedragen en idempotentie exact op de rail
 function antwoord(data) {
   return { status: 200, json() { return data; } };
 }
+
+test('MOLLIE_BASE_URL leidt de sleutel alleen in de testomgeving om', async () => {
+  const oud = { env: process.env.NODE_ENV, url: process.env.MOLLIE_BASE_URL };
+  const gezien = [];
+  const http = { async vraag(o) { gezien.push(o.url); return antwoord({ id: 'tr_1', status: 'open' }); } };
+  try {
+    process.env.MOLLIE_BASE_URL = 'https://vreemd.example';
+    process.env.NODE_ENV = 'production';
+    await Mollie('live_geheim', { http }).payments.retrieve('tr_1');
+    process.env.NODE_ENV = 'test';
+    await Mollie('test_geheim', { http }).payments.retrieve('tr_1');
+  } finally {
+    if (oud.env === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = oud.env;
+    if (oud.url === undefined) delete process.env.MOLLIE_BASE_URL; else process.env.MOLLIE_BASE_URL = oud.url;
+  }
+  assert.match(gezien[0], /^https:\/\/api\.mollie\.com\/v2\/payments\/tr_1$/, 'productie negeert de omleiding');
+  assert.match(gezien[1], /^https:\/\/vreemd\.example\//);
+});

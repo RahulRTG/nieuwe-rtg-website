@@ -143,11 +143,15 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
           if (soort === 'AUTHORISATION' || soort === 'CAPTURE') {
             const status = !gelukt ? 'refused'
               : soort === 'CAPTURE' || !betaal.adyenHandmatigeCapture ? 'captured' : 'authorised';
-            await betaalWaarheid.providerMelding({ eventId, gebeurtenis: soort,
+            const gekoppeld = await betaalWaarheid.providerMelding({ eventId, gebeurtenis: soort,
               aanbieder: 'adyen', providerId: linkId, betaalId: item.pspReference,
               status, referentie: item.merchantReference, bedrag, valuta,
               providerSource: item });
-            if (status === 'captured') await settleWachtend({ id: linkId || item.pspReference, bedrag }, 'Betaald via Adyen');
+            /* Een oude kaartWachtend-rij hangt aan het link-id, en dat valt
+               buiten de HMAC. Alleen als geen betaalwaarheid de melding heeft
+               opgepakt én er geen conflict was, mag die rij nog afrekenen. */
+            if (status === 'captured' && gekoppeld === null)
+              await settleWachtend({ id: linkId || item.pspReference, bedrag }, 'Betaald via Adyen');
           } else if (['REFUND', 'REFUND_FAILED'].includes(soort)) {
             await betaalWaarheid.providerTerugbetaling({ eventId, aanbieder: 'adyen',
               providerPaymentId: item.originalReference, providerRefundId: item.pspReference,

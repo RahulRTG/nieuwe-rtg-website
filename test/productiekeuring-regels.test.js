@@ -51,14 +51,14 @@ test('2. geld: zonder echte provider en zonder uit-vlag start productie niet', (
 });
 
 test('3. geld: elke provider eist zijn eigen tweede helft', () => {
-  const stripe = draai(keurGeld, { STRIPE_SECRET_KEY: 'sk', RTF_IBAN: 'x' });
+  const stripe = draai(keurGeld, { STRIPE_SECRET_KEY: 'sk_live_x', RTF_IBAN: 'x' });
   assert.ok(heeft(stripe.fouten, /STRIPE_WEBHOOK_SECRET/));
   assert.ok(!heeft(stripe.fouten, /ontbreken in productie/));
   assert.ok(!heeft(stripe.waarschuwingen, /RTF_IBAN/));
-  assert.ok(!heeft(draai(keurGeld, { STRIPE_SECRET_KEY: 'sk', STRIPE_WEBHOOK_SECRET: 'wh' }).fouten, /STRIPE_WEBHOOK_SECRET/));
+  assert.ok(!heeft(draai(keurGeld, { STRIPE_SECRET_KEY: 'sk_live_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }).fouten, /STRIPE_WEBHOOK_SECRET/));
 
-  assert.ok(heeft(draai(keurGeld, { MOLLIE_API_KEY: 'm' }).fouten, /MOLLIE_API_KEY gezet zonder APP_URL/));
-  assert.deepEqual(draai(keurGeld, { MOLLIE_API_KEY: 'm', APP_URL: 'https://a.example', RTF_IBAN: 'x' }).fouten, []);
+  assert.ok(heeft(draai(keurGeld, { MOLLIE_API_KEY: 'live_m' }).fouten, /MOLLIE_API_KEY gezet zonder APP_URL/));
+  assert.deepEqual(draai(keurGeld, { MOLLIE_API_KEY: 'live_m', APP_URL: 'https://a.example', RTF_IBAN: 'x' }).fouten, []);
 
   const adyenLeeg = draai(keurGeld, { ADYEN_API_KEY: 'a' }).fouten;
   for (const p of [/ADYEN_MERCHANT_ACCOUNT/, /geldige ADYEN_HMAC_KEY/, /ADYEN_API_KEY gezet zonder APP_URL/, /live ADYEN_CHECKOUT_BASE_URL/])
@@ -298,4 +298,19 @@ test('18. communicatie: publieke productie eist een eigen TURN-keten en geen Goo
   assert.ok(heeft(kaal, /TURN-authenticatie ontbreekt/));
   assert.ok(heeft(draai(keurCommunicatie, { STUN_FALLBACK_GOOGLE: '1' }, false).fouten, /STUN_FALLBACK_GOOGLE=1/));
   assert.ok(!heeft(draai(keurCommunicatie, { STUN_FALLBACK_GOOGLE: '1' }, true).fouten, /STUN_FALLBACK_GOOGLE/));
+});
+
+test('3b. geld: een test- of sandboxsleutel start geen productie', () => {
+  const live = { STRIPE_SECRET_KEY: 'sk_live_x', STRIPE_WEBHOOK_SECRET: 'whsec_x',
+    MOLLIE_API_KEY: 'live_m', APP_URL: 'https://a.example', RTF_IBAN: 'x' };
+  assert.deepEqual(draai(keurGeld, live).fouten, []);
+  assert.deepEqual(draai(keurGeld, Object.assign({}, live, { STRIPE_SECRET_KEY: 'rk_live_x' })).fouten, [],
+    'een beperkte live-sleutel is ook live');
+  assert.deepEqual(draai(keurGeld, Object.assign({}, live, { MOLLIE_API_KEY: 'access_m' })).fouten, [],
+    'een Mollie-organisatietoken is live');
+  for (const [naam, waarde] of [['STRIPE_SECRET_KEY', 'sk_test_x'], ['STRIPE_SECRET_KEY', 'rk_test_x'],
+    ['MOLLIE_API_KEY', 'test_m'], ['STRIPE_WEBHOOK_SECRET', 'geheim']]) {
+    const fouten = draai(keurGeld, Object.assign({}, live, { [naam]: waarde })).fouten;
+    assert.ok(heeft(fouten, new RegExp(naam + ' is geen live sleutel')), naam + '=' + waarde);
+  }
 });

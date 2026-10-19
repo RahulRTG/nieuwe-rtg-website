@@ -35,7 +35,8 @@
     "edge",
     "melding",
     "toestel",
-    "paneel"
+    "paneel",
+    "vel"
   ],
   "themabaar": [
     "--ds-grond",
@@ -146,6 +147,9 @@
     "public/apps/ov.html": "test/ov-ds.e2e.js",
     "public/apps/move.html": "test/move-ds.e2e.js",
     "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
+    "public/apps/arrival.html": "test/arrival-ds.e2e.js",
+    "public/apps/flits.html": "test/flits-ds.e2e.js",
+    "public/apps/navigatie.html": "test/navigatie-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

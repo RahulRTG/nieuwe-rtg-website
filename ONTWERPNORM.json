@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 174,
-    "schermenMetStijlblok": 284,
-    "important": 7646
+    "bladen": 173,
+    "schermenMetStijlblok": 281,
+    "important": 7642
   },
   "uitzonderingen": [],
   "bladen": {
@@ -72,11 +72,6 @@
       "bytes": 9870,
       "important": 145,
       "hex": 21
-    },
-    "public/apps/navigatie-premium.css": {
-      "bytes": 15416,
-      "important": 2,
-      "hex": 33
     },
     "public/apps/office/collab.css": {
       "bytes": 5186,
@@ -922,12 +917,6 @@
       "important": 0,
       "hex": 5
     },
-    "public/apps/arrival.html": {
-      "blokken": 1,
-      "bytes": 1896,
-      "important": 0,
-      "hex": 15
-    },
     "public/apps/attenties.html": {
       "blokken": 2,
       "bytes": 4301,
@@ -1113,12 +1102,6 @@
       "bytes": 6226,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/flits.html": {
-      "blokken": 1,
-      "bytes": 4232,
-      "important": 2,
-      "hex": 4
     },
     "public/apps/foodcourt.html": {
       "blokken": 2,
@@ -2091,12 +2074,6 @@
       "bytes": 680,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/navigatie.html": {
-      "blokken": 1,
-      "bytes": 13025,
-      "important": 0,
-      "hex": 15
     },
     "public/apps/nieuws.html": {
       "blokken": 2,

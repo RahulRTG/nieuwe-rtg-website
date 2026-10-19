@@ -124,6 +124,12 @@ test('melden verbergt pas bij twee verschillende melders, en liegt daar niet ove
 
   const twee = await ruil('meld', { id, reden: 'ook mee eens' }, C);
   assert.equal(twee.body.verborgen, true, 'twee verschillende melders verborgen het aanbod niet');
+  /* Geen belofte zonder deur: er is (nog) geen scherm waarin de stichting een
+     verborgen aanbod bekijkt (ruil.gemeld heeft geen route), dus het bericht
+     belooft dat ook niet (domeinkaart FoundationOS, 19 oktober 2026). */
+  assert.doesNotMatch(twee.body.bericht, /kijkt ernaar|bekijkt het|beoordeelt/i,
+    'het bericht belooft een beoordeling die nergens gebeurt');
+  assert.match(twee.body.bericht, /verborgen/i);
 
   const lijst = (await ruil('lijst', { stad: STAD }, C)).body.ruil;
   assert.ok(!lijst.some(x => x.id === id), 'een verborgen aanbod stond nog in de lijst');

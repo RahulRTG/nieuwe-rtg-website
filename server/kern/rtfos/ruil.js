@@ -178,7 +178,7 @@ module.exports = (ctx) => {
       /* Wat ER GEBEURDE en geen dankwoord: onder de grens gebeurt er nog niets,
          en dat hoort de melder te weten. */
       bericht: verborgen
-        ? 'Dit aanbod staat niet meer in de lijst. Iemand van de stichting kijkt ernaar.'
+        ? 'Dit aanbod staat niet meer in de lijst: het is verborgen na meldingen van meer dan een buur.'
         : 'Genoteerd. Er is nog niets verborgen: daar is meer dan een melding voor nodig.' };
   }
 

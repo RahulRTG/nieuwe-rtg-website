@@ -17,7 +17,10 @@ module.exports = (kern) => {
   // melden: een tik; dichtbij dezelfde soort telt als bevestiging
   app.post('/api/flits/meld', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, flitsMeld(req.session.key, liveCodename(req.session), req.body || {}));
+    /* De herhaalsleutel hoort bij de melding en de kern beslist over een
+       herhaling (EIGEN in middleware/idempotentie-eigen.js). */
+    const b = req.body || {};
+    stuur(res, flitsMeld(req.session.key, liveCodename(req.session), Object.assign({}, b, { idem: b.idem })));
   });
   // klopt nog / weg
   app.post('/api/flits/stem', auth, (req, res) => {

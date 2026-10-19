@@ -188,3 +188,28 @@ test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en da
   const ai = (await oapi('/api/office/aidata')).body;
   assert.ok(ai.bronnen.stad >= 1, 'de bron "stad" telt mee in de dataset');
 });
+
+test('de herhaalsleutel van een melding staat bij de melding: dezelfde tik geeft dezelfde melding, ook na een herstart', async () => {
+  /* Vaste regel (19 oktober 2026): een aanmakende route bewaart zijn sleutel
+     bij het object. Een ander verzoek onder dezelfde sleutel is een 409. */
+  const u = Date.now().toString().slice(-8);
+  const tok = (await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Herhaler', email: 'sh' + u + '@voorbeeld.nl', phone: '06' + u, password: 'geheim12345',
+      geboortedatum: '1985-05-05', tier: 'rtg' }) })).json()).token;
+  const lijf = { zone: 'Marina', soort: 'water', tekst: 'water op straat bij de kade', idem: 'stad-herhaal-1' };
+  const eerst = await api('stad/melding', lijf, tok);
+  assert.equal(eerst.status, 200);
+  const weer = await api('stad/melding', lijf, tok);
+  assert.equal(weer.status, 200);
+  assert.equal(weer.body.herhaald, true);
+  assert.equal(weer.body.melding.id, eerst.body.melding.id);
+  assert.equal((await api('stad/melding', Object.assign({}, lijf, { soort: 'geluid' }), tok)).status, 409, 'een andere melding onder dezelfde sleutel');
+  stop(srv && srv.child);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-STAD-1' } });
+  base = srv.base;
+  const na = await api('stad/melding', lijf, tok);
+  assert.equal(na.status, 200);
+  assert.equal(na.body.melding.id, eerst.body.melding.id, 'na de herstart dezelfde melding, geen tweede');
+  const mijn = (await api('stad/bewoner', {}, tok)).body.mijnMeldingen.filter(m => m.tekst === lijf.tekst);
+  assert.equal(mijn.length, 1);
+});

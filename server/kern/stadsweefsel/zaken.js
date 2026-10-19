@@ -30,6 +30,7 @@
    ./zaakbeeld.js. Krijgt de gedeelde ctx van kern/stadsweefsel/index.js. */
 const { schoon, coordPaar } = require('../util');
 const { CATS, PLOEG, OBJECTSOORT, PRIO, UIT_STAD } = require('./categorien');
+const { herhaling } = require('./herhaal');
 
 const STATUS = ['open', 'in-behandeling', 'klaar', 'afgewezen'];
 const PRIOS = ['laag', 'normaal', 'hoog', 'urgent'];
@@ -113,6 +114,8 @@ module.exports = (ctx) => {
     const plek = plaatsBepaal({ ...inv, tekst });
     if (!plek) return { status: 400, error: 'Waar is het? Geef een gebied of een positie binnen de stad.' };
     const melder = schoon(inv.melder, 60) || null;
+    const ih = herhaling(zaken(), melder, inv.idem, categorie, plek.gebied, publiek); // ./herhaal.js
+    if (ih.uit) return ih.uit;
     if (melder && zaken().filter(z => open(z) && z.waarnemingen.some(w => w.melder === melder)).length >= MAX_OPEN_PER_MELDER)
       return { status: 429, error: 'Je hebt al ' + MAX_OPEN_PER_MELDER + ' open meldingen; de veldploeg is ermee bezig.' };
 
@@ -124,7 +127,7 @@ module.exports = (ctx) => {
       if (dichtbij) objectId = dichtbij.object.id;
     }
     const w = { id: 'W-' + crypto.randomBytes(3).toString('hex').toUpperCase(), kanaal, melder,
-      tekst, bronRef: schoon(inv.bronRef, 40) || null, at: nu() };
+      tekst, bronRef: schoon(inv.bronRef, 40) || null, at: nu(), idem: ih.idem };
 
     const bestaand = zelfdeZaak({ categorie, objectId, lat: plek.lat, lng: plek.lng });
     if (bestaand) {

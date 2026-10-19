@@ -48,7 +48,10 @@ module.exports = (kern, hulp) => {
   app.post('/api/mob/kaart/koop', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     if (gegevensStop(req, res, 'reservering')) return;
-    stuur(res, await kaartKoop(req.session, req.body || {}));
+    /* De herhaalsleutel hoort bij het kaartje en de kern beslist over een
+       herhaling (EIGEN in middleware/idempotentie-eigen.js). */
+    const b = req.body || {};
+    stuur(res, await kaartKoop(req.session, Object.assign({}, b, { idem: b.idem })));
   });
   app.post('/api/mob/kaart/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;
@@ -73,7 +76,8 @@ module.exports = (kern, hulp) => {
   app.post('/api/mob/abo/koop', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     if (gegevensStop(req, res, 'reservering')) return;
-    stuur(res, await aboKoop(req.session, req.body || {}));
+    const b = req.body || {};   // de herhaalsleutel: zie kaart/koop hierboven
+    stuur(res, await aboKoop(req.session, Object.assign({}, b, { idem: b.idem })));
   });
   app.post('/api/mob/abo/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;

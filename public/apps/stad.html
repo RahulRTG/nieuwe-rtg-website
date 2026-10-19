@@ -147,7 +147,7 @@ function render(){
       : '<div class="leeg">Nog geen meldingen. Zie je iets, dan hoort de stad het graag.</div>') + '</div>';
   $('#mDoe').addEventListener('click', async () => {
     try {
-      await api('/api/stad/melding', { zone: $('#mZone').value, soort: $('#mSoort').value, tekst: $('#mTekst').value });
+      await api('/api/stad/melding', { zone: $('#mZone').value, soort: $('#mSoort').value, tekst: $('#mTekst').value, idem: RTGIdem('stad') });
       toast('Dank je. De veldploeg heeft je melding.');
       laad();
     } catch (e) { toast(e.message); }

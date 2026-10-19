@@ -168,3 +168,14 @@ test('een geweigerde spelvraag legt de residentie-collectie niet aan', () => {
   }
   assert.equal(bewaard, 1, 'alleen het binnenkomen bewaarde; de weigeringen niet');
 });
+
+test('de herhaalsleutel staat bij het meubel: dezelfde tik is hetzelfde meubel, een ander meubel onder die sleutel een 409', async () => {
+  const voor = (await api(base, '/api/residentie/suite', {}, a.token)).body.suite.meubels.length;
+  const lijf = { soort: 'kruk', x: 8, y: 6, idem: 'meubel-sleutel-1' };
+  await api(base, '/api/residentie/meubel/zet', lijf, a.token);
+  await new Promise(r => setTimeout(r, 5200)); // voorbij het dubbeltikvenster van de idem-poort
+  const weer = await api(base, '/api/residentie/meubel/zet', lijf, a.token);
+  assert.equal(weer.status, 200);
+  assert.equal((await api(base, '/api/residentie/suite', {}, a.token)).body.suite.meubels.length, voor + 1, 'een kruk, niet twee');
+  assert.equal((await api(base, '/api/residentie/meubel/zet', Object.assign({}, lijf, { x: 9 }), a.token)).status, 409);
+});

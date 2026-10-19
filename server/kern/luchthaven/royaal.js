@@ -19,10 +19,18 @@ module.exports = (ctx) => {
     if (!soort) return { status: 400, error: 'Kies een privejet of een helikopter.' };
     const bestemming = schoon(data.bestemming, 60);
     if (bestemming.length < 2) return { status: 400, error: 'Waar wilt u heen?' };
+    /* De herhaalsleutel staat bij de aanvraag: dezelfde tik geeft dezelfde
+       aanvraag, dezelfde sleutel voor een andere vlucht een 409. */
+    const idem = data.idem ? String(data.idem).slice(0, 80) : null;
+    const al = idem ? L().charters.find(c => c.key === sess.key && c.idem === idem) : null;
+    if (al) return al.soort === soort && al.bestemming === bestemming
+      ? { ok: true, herhaald: true, charter: { code: al.code, soort: al.soort, bestemming: al.bestemming, datum: al.datum, tijd: al.tijd, status: al.status } }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere aanvraag.' };
     const ch = { id: id('ch'), code: 'CH-' + crypto.randomBytes(3).toString('hex').toUpperCase(), soort, bestemming,
       datum: /^\d{4}-\d{2}-\d{2}$/.test(String(data.datum || '')) ? data.datum : vandaag(),
       tijd: /^\d{2}:\d{2}$/.test(String(data.tijd || '')) ? data.tijd : '12:00',
       key: sess.key, codenaam: schoon(codenaam, 60) || 'Reiziger', status: 'aangevraagd', vluchtId: null, at: nu() };
+    if (idem) ch.idem = idem;
     L().charters.unshift(ch);
     L().charters = L().charters.slice(0, 20000);
     save();

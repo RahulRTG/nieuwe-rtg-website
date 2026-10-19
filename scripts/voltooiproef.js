@@ -129,6 +129,7 @@ const SCENARIOS = {
   'relaties.js': require('./lib/voltooi/relaties'),
   'rtgone.js': require('./lib/voltooi/rtgone'),
   'residentie.js': require('./lib/voltooi/residentie'),
+  'routedossier.js': require('./lib/voltooi/routedossier'),
   'rtmail.js': require('./lib/voltooi/rtmail'),
   'school.js': require('./lib/voltooi/school'),
   'rtgcode.js': require('./lib/voltooi/rtgcode'),
@@ -144,7 +145,8 @@ const SCENARIOS = {
   'wereldlaag.js': require('./lib/voltooi/wereldlaag'),
   'wonen.js': require('./lib/voltooi/wonen'),
   'wbw.js': require('./lib/voltooi/wbw'),
-  'werkos.js': require('./lib/voltooi/werkos')
+  'werkos.js': require('./lib/voltooi/werkos'),
+  'vluchten.js': require('./lib/voltooi/vluchten')
 };
 
 function scenarios(alleen) {

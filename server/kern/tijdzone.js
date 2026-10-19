@@ -133,4 +133,24 @@ function zaakZone(s) {
 // hoe laat het is BIJ DE ZAAK; de vorm die de bellers werkelijk gebruiken
 const nuBijZaak = (s, wanneer) => lokaal(zaakZone(s).zone, wanneer);
 
-module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak };
+/* DE OMGEKEERDE VRAAG: welk tijdstip is "om 10:00 op deze dag" in deze zone?
+   Een afspraak bij een zaak staat in de tijd van de zaak, niet in UTC
+   (kern/move/naad.js las hem als UTC en zat in de zomer twee uur mis). Twee
+   keer bijstellen met lokaal(): de eerste ronde vindt de offset, de tweede
+   vangt een zomertijdwissel tussen gok en antwoord. Geen dag of uur: null. */
+function instantIn(zone, datum, tijd) {
+  const d = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(datum || ''));
+  const u = /^(\d{2}):(\d{2})/.exec(String(tijd || ''));
+  if (!d || !u) return null;
+  const doel = Date.UTC(+d[1], +d[2] - 1, +d[3], +u[1], +u[2]);
+  if (!Number.isFinite(doel)) return null;
+  const z = geldigeZone(zone) ? zone : TERUGVAL;
+  let t = doel;
+  for (let i = 0; i < 2; i++) {
+    const l = lokaal(z, new Date(t));
+    t += doel - (Date.parse(l.datum + 'T00:00:00Z') + l.minuten * 60000);
+  }
+  return t;
+}
+
+module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak, instantIn };

@@ -3,12 +3,17 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "1fa753de",
+  "commit": "d912838c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
-   "ongecommitteInvoer": [],
+   "ongecommitteInvoer": [
+    "public/apps/ovroutes.html",
+    "public/apps/residentie/residentie-04.js",
+    "public/apps/stad.html",
+    "public/apps/vluchten.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,9 +7825,9 @@
  "gemeten": {
   "schermenMetPad": 451,
   "nietGelezen": 0,
-  "exactePaden": 1195,
-  "verwijzingen": 1437,
-  "voorvoegsels": 131,
+  "exactePaden": 1202,
+  "verwijzingen": 1444,
+  "voorvoegsels": 130,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -15826,6 +15831,55 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/vluchten/boek",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/bord",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/charter",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/incheck",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/mijn",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/pass/intrek",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/pass/roteer",
+   "schermen": [
+    "public/apps/vluchten.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/voeding",
    "schermen": [
     "public/apps/voeding.html"
@@ -20089,10 +20143,16 @@
   },
   {
    "bestand": "public/apps/vluchten.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/vluchten"
-   ]
+   "exact": [
+    "/api/member/vluchten/boek",
+    "/api/member/vluchten/bord",
+    "/api/member/vluchten/charter",
+    "/api/member/vluchten/incheck",
+    "/api/member/vluchten/mijn",
+    "/api/member/vluchten/pass/intrek",
+    "/api/member/vluchten/pass/roteer"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/voeding.html",

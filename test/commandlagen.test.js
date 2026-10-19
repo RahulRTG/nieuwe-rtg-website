@@ -300,20 +300,26 @@ test('de resterende enterprise-ingangen zijn anoniem fail-closed', async () => {
   }
 });
 
-test('open bewijs-, arrival-, webhook- en projectie-ingangen weigeren onbetrouwbare invoer veilig', async () => {
+test('open bewijs-, webhook- en projectie-ingangen en de arrivalingangen (achter de inlog) weigeren onbetrouwbare invoer veilig', async () => {
   const bewijs = await fetch(base + '/api/aanmelding/bewijs', { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.ok([400, 404].includes(bewijs.status), 'een bewijs zonder aanvraag-id wordt geweigerd');
 
-  const interpret = await fetch(base + '/api/arrival/interpret', { method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, body: '{}' });
-  const plan = await interpret.json();
+  /* Een account voor alles (besluit van 19 oktober 2026): de arrivalingangen
+     zijn niet meer open. Zonder sessie een 401; met een sessie gelden de
+     inhoudelijke grenzen van eerst. */
+  assert.equal(await zonder('/api/arrival/interpret'), 401, 'zonder sessie geen wensontleding');
+  assert.equal(await zonder('/api/arrival/request'), 401, 'zonder sessie geen aanvraag');
+  const u = Date.now().toString().slice(-8);
+  const lid = (await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Arrival Lid', email: 'cl' + u + '@voorbeeld.nl', phone: '06' + u, password: 'geheim12345',
+      geboortedatum: '1985-05-05', tier: 'rtg' }) })).json()).token;
+  const interpret = await api('/api/arrival/interpret', {}, lid);
   assert.equal(interpret.status, 200);
-  assert.match(plan.let || '', /nog niets aangevraagd/i,
+  assert.match(interpret.body.let || '', /nog niets aangevraagd/i,
     'taal interpreteren voert zonder menselijke controle nog niets uit');
 
-  const aanvraag = await fetch(base + '/api/arrival/request', { method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const aanvraag = await api('/api/arrival/request', {}, lid);
   assert.equal(aanvraag.status, 400, 'een arrival-aanvraag zonder tijdelijke request-token blijft dicht');
 
   for (const pad of ['/api/betaal/webhook/adyen', '/api/betaal/webhook/mollie']) {

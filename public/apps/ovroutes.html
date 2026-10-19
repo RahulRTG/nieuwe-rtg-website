@@ -264,7 +264,7 @@
     const r = await api('/api/staff/ov/lijn/zet', { id: huidig.id, naam: $('#fNaam').value, soort: $('#fSoort').value,
       frequentieMin: Number($('#fFreq').value),
       tarief: { basis: Math.round(Number($('#fBasis').value) * 100), perKm: Math.round(Number($('#fKm').value) * 100) },
-      haltes: huidig.haltes });
+      haltes: huidig.haltes, idem: RTGIdem('lijn') });
     if (r.body.error) return zeg(r.body.error);
     zeg('Lijn bewaard; leden zien hem meteen in de OV-app.');
     $('#editor').classList.add('weg'); huidig = null;

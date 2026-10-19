@@ -252,7 +252,7 @@ const CONTRACT = {
   }, voltooi('move', 'het scenario loopt /api/move/reis, /gevolg en /volgende, de drie routes die /apps/move.html zelf aanroept, over betaalde afspraken bij twee zaken en met een tweede lid dat niets van de reis ziet')),
   'link:navigatie': Object.assign({
     belofte: 'een lid zoekt een bestemming uit de eigen bronnen, krijgt een route van het eigen wegennet of een eerlijke weigering waar dat net er niet is, en meldt onderweg wat hij ziet op codenaam'
-  }, voltooi('navigatie', 'het scenario loopt /api/nav/status, /bestemmingen, /route, /kaart, /gebieden, /meld en /poi, de routes die /apps/navigatie.html zelf aanroept, met een tweede lid dat de melding alleen op codenaam ziet')),
+  }, voltooi('navigatie', 'het scenario loopt /api/nav/status, /bestemmingen, /route, /kaart, /gebieden, /gebied/kies, /gebied/weg, /gebied/pakket, /meld en /poi, de routes die /apps/navigatie.html zelf aanroept, eerst zonder en daarna met een NWB-raster en gebiedsindex langs de eigen importscripts, met een tweede lid dat melding en kaartkeuze niet ziet')),
   'link:ov': Object.assign({
     belofte: 'een lid koopt bij een vervoerder waarmee RTG een overeenkomst heeft een kaartje uit zijn wallet, toont het, en de controleur ziet het een keer als geldig; weigert de bank, dan is er geen kaartje'
   }, voltooi('ov', 'het scenario loopt /api/mob/kaart/aanbod, /koop, /mijn en /toon, de routes die /apps/ov.html zelf aanroept, met de overeenkomst langs het kantoor, de controleur van de vervoerder en de simulatiebank als rail')),
@@ -268,6 +268,12 @@ const CONTRACT = {
   'link:flits': Object.assign({
     belofte: 'een lid meldt met een tik wat hij onderweg ziet en wie in de buurt is ziet het op codenaam; vlakbij dezelfde soort is een bevestiging, drie verschillende leden halen hem weg, en waar het verboden is wordt een flitser geweigerd'
   }, voltooi('flits', 'het scenario loopt /api/flits/rond, /meld, /stem en /vooruit, de routes die /apps/flits.html zelf aanroept, met drie andere leden die bevestigen en wegstemmen')),
+  'link:vluchten': Object.assign({
+    belofte: 'een lid boekt een vlucht na het opgeven van zijn paspoortgegevens, checkt in met koffers en krijgt een boarding pass met een eenmalige code die hij kan roteren of intrekken, en vraagt een charter aan'
+  }, voltooi('vluchten', 'het scenario loopt /api/member/vluchten/bord, /boek, /mijn, /incheck, /pass/roteer, /pass/intrek en /charter, de routes die /apps/vluchten.html zelf aanroept, met een tweede lid dat niets van de boeking ziet')),
+  'link:routedossier': Object.assign({
+    belofte: 'een medewerker van het kantoor ziet per schakel hoeveel routes bewezen, gezakt of ongemeten zijn, filtert en bladert, en opent een route met al zijn cellen en hun bron'
+  }, voltooi('routedossier', 'het scenario loopt /api/office/routedossier, de enige route die /apps/routedossier.html aanroept, met een lid, een zaak en een vreemde die de kantoordeur dicht vinden')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

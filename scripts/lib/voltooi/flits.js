@@ -31,6 +31,7 @@ async function loop(w, stap) {
   const B = await nieuwLid(w, 'flb');
   const C = await nieuwLid(w, 'flc');
   const D = await nieuwLid(w, 'fld');
+  const E = await nieuwLid(w, 'fle');
   let T = A.token;
   const rond = async (p, tok) => ((((await w.post(ROND, p, tok || T)).data) || {}).meldingen || []);
   const metId = async (id, p, tok) => (await rond(p, tok)).find((m) => m.id === id) || null;
@@ -76,6 +77,17 @@ async function loop(w, stap) {
       ziet: 'stemmen ' + a.status + '/' + b.status + (b.data && b.data.al ? ' (al gestemd)' : '') + ', ' + (m && m.bevestigingen) + ' bevestigingen' };
   });
 
+  await stap('voltooibaar', 'een melder bevestigt zijn eigen melding niet: "klopt" geeft een 403 met een zin, en opnieuw melden vlakbij is een herhaling', async () => {
+    const s0 = (await metId(flitser.id, plek(0))).bevestigingen;
+    const k = await w.post(STEM, { id: flitser.id, klopt: true }, T);
+    await pauze();
+    const p = plek(0);
+    const m = await w.post(MELD, { soort: 'flitser', lat: p.lat + 0.0005, lng: p.lng, land: 'ES', idem: 'vp-flits-zelf' }, T);
+    const s1 = (await metId(flitser.id, plek(0))).bevestigingen;
+    return { klopt: k.status === 403 && /eigen melding/.test(k.data.error) && m.status === 200 && m.data.herhaald === true && m.data.melding.id === flitser.id && s1 === s0,
+      ziet: 'zelf stemmen ' + k.status + ' (' + (k.data && k.data.error) + '), opnieuw melden ' + m.status + (m.data && m.data.herhaald ? ' als herhaling' : m.data && m.data.bevestigd ? ' ALS BEVESTIGING' : '') + ', bevestigingen ' + s0 + ' -> ' + s1 };
+  });
+
   await stap('voltooibaar', 'een file melden en drie verschillende leden zeggen "weg": dan pas is hij van de kaart, niet na een of twee', async () => {
     const m = await w.post(MELD, Object.assign({ soort: 'file' }, plek(2)), B.token);
     file = m.data && m.data.melding;
@@ -114,11 +126,11 @@ async function loop(w, stap) {
     return { klopt: na === voor && !f, ziet: (na === voor ? 'flitser gelijk' : 'ANDERS') + ', file ' + (f ? 'TERUG' : 'weg') };
   });
 
-  await stap('persistent', 'de melding staat in de opslag, met de stemmers als sleutel en niet als naam of e-mailadres', async () => {
+  await stap('persistent', 'de melding staat in de opslag, met melder en bevestigers (de stem van B, de melding van D) als sleutel en niet als naam of e-mailadres', async () => {
     const rij = (w.collectie('flitsMeldingen') || []).find((m) => m.id === flitser.id);
     const tekst = JSON.stringify(rij || {});
-    return { klopt: !!rij && rij.bevestigingen === 2 && (rij.stemmers || []).length === 1 && !tekst.includes(B.email) && !tekst.includes('Voltooilid'),
-      ziet: rij ? 'gevonden, ' + rij.bevestigingen + ' bevestigingen, ' + (rij.stemmers || []).length + ' stemmer' : 'NIET GEVONDEN' };
+    return { klopt: !!rij && rij.bevestigingen === 2 && (rij.stemmers || []).length === 2 && !!rij.melder && !tekst.includes(A.email) && !tekst.includes(B.email) && !tekst.includes('Voltooilid'),
+      ziet: rij ? 'gevonden, ' + rij.bevestigingen + ' bevestigingen, ' + (rij.stemmers || []).length + ' bevestigers, melder als sleutel ' + !!rij.melder : 'NIET GEVONDEN' };
   });
 
   /* ---------------- herstelbaar ---------------- */
@@ -138,20 +150,20 @@ async function loop(w, stap) {
 
   await stap('herstelbaar', 'een afgebroken melding en opnieuw: precies een melding', async () => {
     await pauze();
-    const half = await w.afgebroken(MELD, Object.assign({ soort: 'object' }, plek(4)), D.token);
-    await pauze();
-    const opnieuw = await w.post(MELD, Object.assign({ soort: 'object' }, plek(4)), D.token);
+    const lijf = Object.assign({ soort: 'object', idem: 'vp-flits-half' }, plek(4));
+    const half = await w.afgebroken(MELD, lijf, D.token);
+    const opnieuw = await w.post(MELD, lijf, D.token);
     const n = (await rond(plek(4))).filter((m) => m.soort === 'object' && m.afstandKm < 0.3).length;
     return { klopt: opnieuw.status === 200 && n === 1,
-      ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + (opnieuw.data && opnieuw.data.bevestigd ? ' (bevestiging)' : '') + ', ' + n + ' melding' };
+      ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + (opnieuw.data && opnieuw.data.herhaald ? ' (herhaling van dezelfde tik)' : '') + ', ' + n + ' melding' };
   });
 
   await stap('herstelbaar', 'een crash direct na een stem: de bevestiging staat er na de herstart, en die stemmer telt niet nog een keer', async () => {
     const voorB = (await metId(flitser.id, plek(0))).bevestigingen;
-    const s = await w.post(STEM, { id: flitser.id, klopt: true }, D.token);
+    const s = await w.post(STEM, { id: flitser.id, klopt: true }, E.token);
     await w.crash();
     const na = (await metId(flitser.id, plek(0))).bevestigingen;
-    const weer = await w.post(STEM, { id: flitser.id, klopt: true }, D.token);
+    const weer = await w.post(STEM, { id: flitser.id, klopt: true }, E.token);
     const daarna = (await metId(flitser.id, plek(0))).bevestigingen;
     return { klopt: s.status === 200 && na === voorB + 1 && weer.data.al === true && daarna === na,
       ziet: 'stem ' + s.status + ', na SIGKILL ' + na + ' (was ' + voorB + '), opnieuw stemmen ' + (weer.data && weer.data.al ? 'telt niet' : 'TELT') + ', nu ' + daarna };
@@ -163,7 +175,7 @@ module.exports = {
   ingang: '/apps/flits.html',
   persona: 'lid',
   omgeving: KANTOORWERELD,
-  belofte: 'een lid meldt met een tik wat hij onderweg ziet en wie in de buurt is ziet het op codenaam; een melding vlakbij van dezelfde soort is een bevestiging, "klopt nog" verlengt, drie verschillende leden halen hem weg, en in landen waar het verboden is wordt een flitser geweigerd -- ook na een herstart, een dubbele tik, een afgebroken verzoek en een crash',
+  belofte: 'een lid meldt met een tik wat hij onderweg ziet en wie in de buurt is ziet het op codenaam; een melding vlakbij van dezelfde soort door een ander is een bevestiging, een melder bevestigt zichzelf nooit, "klopt nog" verlengt, drie verschillende leden halen hem weg, en in landen waar het verboden is wordt een flitser geweigerd -- ook na een herstart, een dubbele tik, een afgebroken verzoek en een crash',
   grens: 'De proef loopt de routes van het scherm, niet het scherm zelf. De chauffeurskant (/api/staff/flits/*) en het verlopen van een melding op zijn houdbaarheid (dat vraagt een klok die vooruit kan) zijn niet gelopen. Officiele flitserdata is er niet; het beeld komt van het eigen netwerk. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

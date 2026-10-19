@@ -43,7 +43,18 @@ const EIGEN = [
   // een bericht draagt zijn herhaalsleutel zelf, ook na een herstart (kern/comm/bericht.js)
   '/api/comm/stuur',
   // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
-  '/api/geld/pot/reserveer'
+  '/api/geld/pot/reserveer',
+  /* het OV-kaartje, het abonnement en de Flits-melding bewaren hun sleutel bij
+     het object; dezelfde sleutel met een ander verzoek is daar een 409 */
+  '/api/mob/kaart/koop',
+  '/api/mob/abo/koop',
+  '/api/flits/meld',
+  // de stadsmelding bewaart haar sleutel op de waarneming (kern/stadsweefsel/herhaal.js)
+  '/api/stad/melding',
+  // de OV-lijn, het meubel en de charteraanvraag bewaren hun sleutel bij het object
+  '/api/staff/ov/lijn/zet',
+  '/api/residentie/meubel/zet',
+  '/api/member/vluchten/charter'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

@@ -309,7 +309,9 @@ test('en de verdeling bereikt die tak ook werkelijk', () => {
    ========================================================================== */
 test('een openbare route met alleen een rem ervoor is beproefbaar', () => {
   const { PUBLIEK } = require('../scripts/lib/publiek');
-  const pad = '/api/arrival/interpret';
+  /* /api/arrival/interpret stond hier; sinds 19 oktober 2026 staat die achter de
+     ledeninlog (een account voor alles). De lab2-bewonerkant is openbaar met een rem. */
+  const pad = '/api/lab2/bewoner/thema';
   assert.ok(PUBLIEK.has(pad), 'deze route hoort met een reden op de openbaar-lijst te staan');
   const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['mw'], pad, methode: 'POST' });
   assert.equal(u.rol, 'openbaar', 'een rem is geen identiteitslaag, maar ook geen reden om niet te meten');

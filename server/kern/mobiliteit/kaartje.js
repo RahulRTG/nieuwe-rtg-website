@@ -123,7 +123,9 @@ module.exports = (ctx) => {
     const aankoopId = body.idem ? 'kt' + crypto.createHash('sha256')
       .update(codenaam + '\u0000' + schoon(body.idem, 60)).digest('hex').slice(0, 16) : id('kt');
     const al = body.idem ? kaartMet(aankoopId) : null;
-    if (al) return al.key === session.key && al.lijnId === lijn.id && al.product === product
+    const traject = (h) => (h ? h.id : null);
+    if (al) return al.key === session.key && al.lijnId === lijn.id && al.product === product &&
+      traject(al.van) === traject(van) && traject(al.naar) === traject(naar)
       ? { ok: true, herhaald: true, kaartje: ctx.kaartBeeld(al, true) }
       : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere aankoop.' };
     const rek = 'lid:' + codenaam;
@@ -139,6 +141,9 @@ module.exports = (ctx) => {
       economischeSleutel: maakSleutel('pay-handeling', body.idem
         ? ['ovkaart', codenaam, schoon(body.idem, 60)] : ['ovkaart', aankoopId]) });
     if (b.error) return { status: b.status || 400, error: b.error };
+    // een gelijktijdige herhaling kan tijdens het boeken al zijn afgerond
+    const intussen = body.idem ? kaartMet(aankoopId) : null;
+    if (intussen) return { ok: true, herhaald: true, kaartje: ctx.kaartBeeld(intussen, true) };
 
     const start = new Date();
     const k = {

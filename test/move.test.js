@@ -356,3 +356,23 @@ test('15. de volgende beweging is de eerste in de TIJD, niet de eerste in de rij
   /* En wat al voorbij is, slaat hij over: om 11:00 is de late de volgende. */
   assert.equal(move.volgende('lid', Date.parse('2099-01-02T11:00:00Z')).volgende.kenmerk, 'B');
 });
+
+test('16. een afspraak om 11:00 bij een zaak op Ibiza is 11:00 op de klok daar, ook in de zomertijd', () => {
+  /* tijdstip() las dag en uur als UTC. Om 11:30 Ibizaanse tijd (09:30 UTC) is
+     de afspraak van 11:00 voorbij, maar als UTC gelezen lag hij nog anderhalf
+     uur in de toekomst -- de knop bood hem aan. */
+  const { maakMove } = require('../server/kern/move');
+  const zaken = { A: { code: 'A', city: 'Ibiza', country: 'ES' }, B: { code: 'B', city: 'Ibiza', country: 'ES' } };
+  const kern = {
+    reiswereld: { komend: () => ({ komend: [
+      { titel: 'Elf uur', soort: 'afspraak', kenmerk: 'A', van: '2026-07-15', tijd: '11:00', plek: { zaak: 'A' } },
+      { titel: 'Een uur', soort: 'afspraak', kenmerk: 'B', van: '2026-07-15', tijd: '13:00', plek: { zaak: 'B' } }
+    ] }) },
+    plekBepaal: (p) => p.zaak === 'A' ? P(38.91, 1.43, 'A') : P(38.97, 1.41, 'B'),
+    findSupplier: (c) => zaken[c] || null
+  };
+  const { move } = maakMove({ kern });
+  const v = move.volgende('lid', Date.parse('2026-07-15T09:30:00Z'));
+  assert.equal(v.volgende.kenmerk, 'B', 'de afspraak van 11:00 is om 11:30 voorbij');
+  assert.equal(v.volgende.nodigAt, '2026-07-15T11:00:00.000Z', '13:00 op Ibiza is 11:00 UTC in de zomer');
+});

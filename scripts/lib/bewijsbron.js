@@ -84,7 +84,13 @@ function smalVoorvoegsel(v) {
 function bundelRegister() {
   try {
     const b = require('../bundel');
-    return new Map(Object.entries(b.bundels).map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']));
+    /* ALLEEN APP-BUNDELS. De schilbundels onder public/shared/ (metgezel,
+       basis, ...) laadt bijna elk scherm; hun routes zijn van de schil en niet
+       van de belofte van het scherm. Telden ze mee, dan koppelde elk scenario
+       dat /api/service raakt aan elk scherm -- en kreeg het routedossier er
+       vijftien routes bij die het zelf nooit aanroept. */
+    return new Map(Object.entries(b.bundels).filter(([uit]) => uit.startsWith('apps/'))
+      .map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']));
   } catch (e) { return new Map(); }
 }
 

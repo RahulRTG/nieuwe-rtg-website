@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-18T18:29:08.489Z",
-  "commit": "d0920c727",
+  "op": "2026-10-19T05:05:27.005Z",
+  "commit": "34b3fc25",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/idorproef.js",
@@ -10,12 +10,12 @@
  "uitleg": "Twee echte leden met dezelfde rol: A oogst objecten (objectpool), B probeert ze te bedienen. gescheiden = B geweigerd (bewijs); doorbraak = B kreeg 2xx op een object uit A's antwoord (BEVINDING, met de hand nakijken -- kan publiek zijn); onbereikbaar = geen id of validatie strandde eerder. Zie scripts/lib/idor.js voor het oordeel.",
  "grens": "een doorbraak is een VRAAG en geen vonnis: het object kan publiek zijn. En de proef ziet alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.",
  "gemeten": {
-  "routes": 1998,
+  "routes": 1999,
   "gescheiden": 715,
   "doorbraak": 0,
   "nagekeken": 43,
   "publiek": 445,
-  "onbereikbaar": 795,
+  "onbereikbaar": 796,
   "lek": 0,
   "poolDomeinen": 119,
   "poolVelden": 749,
@@ -1098,6 +1098,10 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/bedrijf/post/omzetten": {
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein"
+  },
+  "POST /api/bedrijf/zaakregie": {
    "staat": "onbereikbaar",
    "reden": "geen id van A in dit domein"
   },

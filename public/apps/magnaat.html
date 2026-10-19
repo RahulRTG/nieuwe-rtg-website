@@ -550,7 +550,7 @@ function renderTask(){
   document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>answer(Number(b.dataset.answer)));
 }
 async function submitAction(){const invoer={};document.querySelectorAll('[data-field]').forEach(e=>invoer[e.dataset.field]=e.type==='checkbox'?e.checked:e.value.trim());const b=$('#saveAction');b.disabled=true;try{const d=await api('taak/actie',{taakId:TASK.id,invoer});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.feedback)}catch(e){toast(e.message);b.disabled=false}}
-async function answer(keuze){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);try{const d=await api('taak/antwoord',{taakId:TASK.id,keuze});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.goed?'Sterke keuze.':'Je krijgt de juiste werkwijze mee.')}catch(e){toast(e.message);renderTask()}}
+async function answer(keuze){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);try{const d=await api('taak/antwoord',{taakId:TASK.id,keuze,stap:TASK.stap});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.goed?'Sterke keuze.':'Je krijgt de juiste werkwijze mee.')}catch(e){toast(e.message);renderTask()}}
 function openWorkflowScreen(){
   const stap=TASK&&TASK.huidig,frame=$(DEVICE==='pda'?'#rtgPda':'#rtgComputer');
   if(!stap||stap.soort!=='software'||!/^\/apps\/[^?#]+\.html$/.test(stap.schermPad||'')){toast('Dit werkprocesscherm kan niet veilig worden geopend.');return}

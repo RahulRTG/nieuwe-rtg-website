@@ -576,8 +576,16 @@
        nog EEN verstuurweg, en dat is precies wat "communicatie is
        infrastructuur" hoort te betekenen. Een tak laten staan die niets meer
        kan bereiken is een tak die niemand meer nakijkt. */
-    api('/api/comm/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp })
+    /* Een sleutel per opgesteld bericht, en dezelfde bij een nieuwe poging:
+       een tweede tik of een herhaling na een weggevallen verbinding is
+       hetzelfde bericht en geen tweede (kern/comm/bericht.js). */
+    if (!staat.idem || staat.idemTekst !== tekst) {
+      staat.idem = RTGId('bericht');
+      staat.idemTekst = tekst;
+    }
+    api('/api/comm/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp, idem: staat.idem })
       .then(function () {
+        staat.idem = null; staat.idemTekst = null;
         veld.value = ''; veld.style.height = 'auto';
         staat.antwoordOp = null; $('#antwoordop').hidden = true;
         return laadGesprek();

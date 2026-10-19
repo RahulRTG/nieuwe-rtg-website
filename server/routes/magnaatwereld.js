@@ -22,7 +22,7 @@ module.exports = (kern) => {
   require('./magnaatstad')({ app, auth, geenGast, magnaatWereld }); // samen in een Oudwijk
   app.post('/api/member/magnaat/overzicht', auth, (req, res) => alsLid(req, res, key => magnaatWereld.overzicht(key)));
   app.post('/api/member/magnaat/taak/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakStart(key, b.functieId, b.apparaat)));
-  app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze)));
+  app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze, b.stap)));
   app.post('/api/member/magnaat/taak/handeling', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakHandeling(key, b.taakId, b.handeling)));
   app.post('/api/member/magnaat/taak/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakActie(key, b.taakId, b.invoer)));
   app.post('/api/member/magnaat/kantoor/kies', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.kiesKantoor(key, b.kantoorId, b.rol)));

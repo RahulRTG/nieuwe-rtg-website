@@ -122,6 +122,25 @@ const CONTRACT = {
   'link:pay': Object.assign({
     belofte: 'een geverifieerd lid laadt zijn wallet op en ziet het nieuwe saldo; weigert of hangt de bank, dan hoort het lid wat er werkelijk gebeurde en wordt er niets bijgeschreven -- ook na een herstart, een dubbele tik, een afgebroken verzoek en een crash'
   }, voltooi('pay', 'het scenario loopt /api/pay/oplaad en /api/pay/overzicht, de routes die /apps/pay.html zelf aanroept, met een goedgekeurde identiteit, een gebonden toestel en de simulatiebank als rail')),
+  /* De standen van RTG Geld, familie Geld (19 oktober 2026). */
+  'link:wallet': Object.assign({
+    belofte: 'een lid legt zijn kaarten in de wallet, koopt feestmunten die echt betaald worden en wisselt ze in, nooit onder nul -- een ander lid ziet of raakt er niets van, en een dubbele tik, een afgebroken verzoek of een crash laat hem nooit twee keer betalen'
+  }, voltooi('wallet', 'het scenario loopt /api/wallet, /voeg, /weg, /munt/koop en /munt/wissel, de routes die /apps/geld.html#wallet (apps/geld/walletb.js) zelf aanroept, met een goedgekeurde identiteit, een gebonden toestel en de simulatiebank onder het bijladen')),
+  'link:bank': Object.assign({
+    belofte: 'zodra het kantoor de leden-bank live zet, geeft een lid akkoord, krijgt een rekening, stort geld van buiten, boekt over tussen eigen rekeningen en leest het afschrift; weigert of hangt de bank, dan hoort het lid wat er werkelijk gebeurde -- een ander lid kan er niet bij, en een dubbele tik, een afgebroken verzoek of een crash boekt nooit dubbel'
+  }, voltooi('bank', 'het scenario loopt /api/bank/overzicht, /akkoord, /rekening/open, /storten, /overboek en /afschrift, de routes die /apps/geld.html#bank (apps/geld/bankb.js en bankc.js) zelf aanroept, met de leden-bank live gezet langs /api/office/bank/leden, een gebonden toestel en de simulatiebank als rail')),
+  'link:wbw': Object.assign({
+    belofte: 'twee Salon-vrienden houden een gedeeld lijstje bij: wie betaalde wat en wie staat er hoe voor, tot op de cent; wie rood staat verrekent in een tik via RTG Pay -- wie buiten het lijstje staat leest of raakt niets, en een dubbele tik, een afgebroken verzoek of een crash betaalt nooit twee keer'
+  }, voltooi('wbw', 'het scenario loopt /api/wbw/mijn, /maak, /groep, /uitgave en /verreken, de routes die /apps/geld.html#wbw (apps/geld/wbwb.js) zelf aanroept, met twee leden die langs de Salon verbonden zijn, een derde erbuiten en de simulatiebank onder het bijladen')),
+  'link:labfonds': Object.assign({
+    belofte: 'leden zeggen samen geld toe aan de pot van een plek, dienen een voorstel in en beslissen gezamenlijk met de scheidsrechter; alleen de indiener sluit de stemming, en een dubbele tik, een afgebroken verzoek of een crash legt een toezegging nooit twee keer in de pot'
+  }, voltooi('labfonds', 'het scenario loopt /api/labfonds/overzicht, /doneer, /voorstel/maak, /stem en /beslis, de routes die /apps/geld.html#labfonds (apps/geld/labfondsb.js) zelf aanroept, met een tweede lid dat stemt en de stemming niet mag sluiten')),
+  'link:rtgcode': Object.assign({
+    belofte: 'een lid toont een levende, ondertekende code die alleen de RTG-app maakt en leest en die na een halve minuut vervalt; een valse, gewone of verlopen code wordt geweigerd, een ander lid leest er niets van het lid uit, en de code overleeft een herstart en een crash -- en hij is persoonlijk, zoals het scherm belooft'
+  }, voltooi('rtgcode', 'het scenario loopt /api/code/dyn en /api/code/scan, de routes die /apps/geld.html#rtgcode (apps/geld/rtgcode.js en rtgcodeb.js) zelf aanroept, met een tweede lid dat de code scant')),
+  'link:geldcommand': Object.assign({
+    belofte: 'een lid ziet hoe het er financieel voor staat, zet potten en regels binnen de harde grens van GELD.md en leest elke handeling terug in het actielog -- een ander lid ziet of raakt er niets van, en een dubbele tik, een afgebroken verzoek of een crash zet een bedrag nooit twee keer opzij'
+  }, voltooi('geldcommand', 'het scenario loopt /api/geld/cockpit, /beleid, /beleid/zet, /api/geld/pot/zet, /reserveer, /weg en /api/geld/actielog, de routes die de eerste stand van /apps/geld.html (apps/geld/overzichtb.js en overzichtc.js) zelf aanroept, met een tweede lid dat er niet bij mag')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'
@@ -165,6 +184,14 @@ const CONTRACT = {
   'link:kwesties': Object.assign({
     belofte: 'een mens brengt in wat er speelt, ziet de kwestie op zijn naam, opent de uitkomst en trekt hem in -- een ander kan er niets mee'
   }, voltooi('kwesties', 'het scenario loopt /api/member/democratie/kwestie/*, de routes die /apps/foundation/kwesties.html zelf aanroept, als lid en met een tweede lid')),
+  /* FoundationOS (19 oktober 2026): de gezinswereld met een eigenaar-account
+     (scripts/lib/voltooigezin.js). */
+  'link:buurtruil': Object.assign({
+    belofte: 'een buurtbewoner zet iets weg te geven of gezocht in zijn RTF-stad, een buur toont belangstelling en de eigenaar sluit het als het weg is'
+  }, voltooi('buurtruil', 'het scenario loopt /api/rtfos/publiek/steden en /api/rtfos/ruil/lijst, /mijn, /plaats, /interesse en /sluit, de routes die /apps/foundation/buurtruil.html zelf aanroept, met een buur en het kind van het gezin')),
+  'link:geven': Object.assign({
+    belofte: 'wie geeft ziet eerst wat er zou gebeuren en bevestigt een keer; een oormerk landt op een echt project, en een meerjarig plan en zijn machtiging beheert de gever zelf'
+  }, voltooi('geven', 'het scenario loopt /api/rtfos/gift/stand, /voorbereid, /bevestig, /projecten, /plan/* en /machtiging/*, de routes die /apps/foundation/geven.html zelf aanroept, met het kantoor dat het plan vastlegt')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),
@@ -247,15 +274,47 @@ const CONTRACT = {
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),
-  'link:horeca': {
-    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'TAFELPROEF.json',
-      instrument: 'scripts/tafelproef.js',
-      waarom: 'de tafelproef loopt exact die stroom over /api/supplier/horeca/*, de routes die /apps/horeca.html zelf aanroept'
-    }
-  },
+  /* WorkOS, de kantoorkant van RTG One (19 oktober 2026): een medewerker op naam,
+     met de kantoorrol via een uitnodiging van de eigenaar. */
+  'link:rtgone': Object.assign({
+    belofte: 'een medewerker op naam legt beloften, bedoelingen en frictie vast in het werkgeheugen en rondt een belofte omkeerbaar af, en dat staat er na een herstart en een crash precies een keer'
+  }, voltooi('rtgone', 'het scenario loopt /api/account/start, /api/rtgone/state, /belofte, /intentie, /frictie, /overdracht en /automatisering/*, de routes die /apps/rtgone.html zelf aanroept, met een lid zonder kantoorrol dat er niet bij komt')),
+  'link:decisionroom': Object.assign({
+    belofte: 'een medewerker legt een voorstel neer en mensen met de juiste rol beslissen het, nooit de aanvrager zelf en boven de drempel met twee stemmen'
+  }, voltooi('decisionroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /goedkeuring en /goedkeuring/beslis, de routes die /apps/decision-room.html zelf aanroept, met drie mensen: aanvrager, beoordelaar met rol en de eigenaar')),
+  'link:projectroom': Object.assign({
+    belofte: 'een medewerker voert een project dat uit een RTMAIL ontstond aantoonbaar uit, met taken, bewijs en een menselijke oplevering, en een collega wijzigt er niets aan'
+  }, voltooi('projectroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /project/taak, /project/bewijs en /project/oplever, de routes die /apps/project-room.html zelf aanroept, met een collega en een lid die er niet bij komen')),
+  'link:loonstrook': Object.assign({
+    belofte: 'een medewerker ziet zijn eigen loonstrook met uitleg en dossier, en een ander lid ziet hem niet'
+  }, voltooi('loonstrook', 'het scenario loopt /api/member/loonstroken, /api/member/dossier en /api/member/identiteit/verzoeken, de routes die /apps/loonstrook.html zelf aanroept, met de strook langs zaak en kantoor op naam en een ander lid dat er niet bij komt')),
+  'link:vertegenwoordiging': Object.assign({
+    belofte: 'een lid bepaalt zelf wie namens hem mag handelen, met een eigen grens, simulatie vooraf, spoor en intrekken per direct'
+  }, voltooi('vertegenwoordiging', 'het scenario loopt /api/vertegenwoordiging/bevoegdheden, /mijn, /grens, /simulatie, /aanvaard en /intrek, de routes die /apps/vertegenwoordiging.html zelf aanroept, met de vertegenwoordiger via /voorstel en /handel en een derde lid dat er niet bij komt')),
+  'link:onderneming': Object.assign({
+    belofte: 'een ondernemer begint met een werktitel, kiest een rechtsvorm, werkt de oprichting af en schrijft zich in, en dat staat precies een keer op zijn naam'
+  }, voltooi('onderneming', 'het scenario loopt /api/onderneming/nieuw, /mijn, /rechtsvorm, /oprichting/zet, /intake, /verkenning, /plan/vastleggen, /ingeschreven, /kas/saldo en /dagbeeld, de routes die /apps/onderneming.html zelf aanroept, met een ander lid dat er niet bij komt')),
+  'link:magnaat': Object.assign({
+    belofte: 'een lid pakt een dossier uit zijn dagdienst op, opent het juiste RTG-scherm en beantwoordt de keuzes; wat hij verdient blijft van hem en telt een keer'
+  }, voltooi('magnaat', 'het scenario loopt /api/member/magnaat/overzicht, /taak/start, /taak/handeling en /taak/antwoord, onder het voorvoegsel dat /apps/magnaat.html via api() aanroept, met een tweede speler die er niet bij komt')),
+  'link:office': Object.assign({
+    belofte: 'een medewerker maakt een document in de kantoordrive, bewaart met versies en zet een versie terug; een oud venster schrijft er niet overheen en een zaak of lid komt er niet bij'
+  }, voltooi('office', 'het scenario loopt /api/office/kantoorpakket/mijn, /maak, /open, /bewaar, /versies en /terug, het voorvoegsel dat /apps/office.html in de kantoorstand aanroept, met een zaak en een lid die er niet bij komen')),
+  /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
+     voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
+     afrekenen en meet daarnaast de herstart, de crash en de offline sync; een
+     scenario levert alle vier of geen (test/voltooiproef.test.js). De
+     tafelproef blijft zijn eigen register, voor de overdracht naar de gast. */
+  'link:horeca': Object.assign({
+    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en een offline opgenomen bestelling komt precies een keer binnen'
+  }, voltooi('horeca', 'het scenario loopt /api/supplier/horeca/rekening/*, /keuken/*, /betaal en /offline/sync onder het voorvoegsel dat /apps/horeca.html via RTGHoreca.api aanroept, met een tweede zaak die de rekening niet ziet')),
+  /* LivingOS-A (APPWERKT, 19 oktober 2026). */
+  'link:appdossier': Object.assign({
+    belofte: 'een lid leest over een app van een derde wie de leverancier is en wie hem toeliet, wat er draait, wat hij nooit krijgt en wat het dossier niet kan zeggen -- pas nadat een mens van RTG publiceerde'
+  }, voltooi('appdossier', 'het scenario loopt /api/appstore/kanaal en /api/appstore/dossier, de routes die /apps/appstore-dossier.html zelf aanroept, met een uitgever die inzendt en een kantoormens op naam die publiceert')),
+  'link:berichten': Object.assign({
+    belofte: 'een lid begint een gesprek met iemand die het kent, stuurt, antwoordt, wijzigt en trekt in, en de ander ziet precies dat; wie niet in het gesprek zit leest en schrijft niets'
+  }, voltooi('berichten', 'het scenario loopt /api/comm/begin, /stuur, /inbox, /gesprek, /lees, /reactie, /wijzig en /wis, de routes die /apps/comm.html zelf aanroept, met een verbonden tweede lid en een derde dat buiten blijft')),
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
      link:connect is /apps/connect.html, dat acht /api/connect-routes met de proef
@@ -272,21 +331,24 @@ const CONTRACT = {
       waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
     }
   },
+  /* LivingOS-B: media, sociaal en spel (19 oktober 2026). */
+  'link:muziek': Object.assign({
+    belofte: 'een lid deelt zijn eigen muziek, een ander lid vindt, hoort en waardeert haar, alleen de maker haalt haar weg, en samen luisteren brengt de luisteraar in de kamer van de gastheer'
+  }, voltooi('muziek', 'het scenario loopt /api/muziek/bestand, /feed, /bestand-ticket, /luister, /mooi en /bestand-weg, en /api/samen/maak, /mee, /muziek en /staat, de routes die /apps/muziek.html (muziek-feed.js, muziek-bestanden.js) zelf aanroept, met twee leden en een gratis account')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies
      de lid-routes die de conciergeproef loopt. De proef dekt de lus en niet het
      hele Privékantoor (woning, kring, bezit, mandaat lopen hier niet mee); dat
      staat in `waarom` in plaats van weggelaten. */
-  'link:rechterhand': {
-    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'CONCIERGEPROEF.json',
-      instrument: 'scripts/conciergeproef.js',
-      waarom: 'de conciergeproef loopt de lus van CONCIERGE.md over /api/member/bureau/lus/*, de routes die het tabblad Zaken van /apps/lifestyle.html aanroept, met het kantoor en twee zaken ernaast; de andere tabbladen van het Privékantoor loopt hij niet'
-    }
-  }
+  /* Sinds 19 oktober 2026 levert de voltooiproef alle vier: hij loopt dezelfde
+     lus over een ECHT Lifestyle-lid (aangevraagd en door een mens geaccepteerd)
+     met een herstart, een crash en een afgebroken verzoek, en een scenario
+     levert zijn bewijzen samen (test/voltooiproef.test.js). De conciergeproef
+     blijft de keten met de zaakkant; zie ZONDER_APP. */
+  'link:rechterhand': Object.assign({
+    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat'
+  }, voltooi('rechterhand', 'het scenario loopt /api/member/bureau/lus/intake, /zaak, /beslis en /toelichting en /api/member/bureau/zaken, de routes die het tabblad Zaken van /apps/lifestyle.html (apps/lifestyle-lus.js) aanroept, met een kantoormens op naam langs /api/office/bureau/lus/*; de andere tabbladen van het Privékantoor loopt hij niet'))
 };
 
 /* Gesloten ketens die (nog) geen bewijs voor een app in MAPPEN leveren, met de
@@ -302,6 +364,9 @@ const ZONDER_APP = [
   { register: 'MOMENTPROEF.json', instrument: 'scripts/momentproef.js',
     reden: 'raakt RTG Media (/api/mediaos/aanwezig/*), maar alleen de deelbelofte volgen en gewekt worden -- niet wat RTG Media als geheel belooft',
     nodig: 'een tweede bron voor de kernbelofte van RTG Media, of een splitsing van die app in MAPPEN' },
+  { register: 'CONCIERGEPROEF.json', instrument: 'scripts/conciergeproef.js',
+    reden: 'leverde tot 19 oktober 2026 voltooibaar voor het Privekantoor (link:rechterhand); dat komt nu met persistent en herstelbaar uit de voltooiproef (scripts/lib/voltooi/rechterhand.js), over een echt Lifestyle-lid in plaats van de demo-inlog. De keten blijft wat het scenario niet loopt: de zaakkant, vertragingen en herstel na een omgevallen onderdeel',
+    nodig: 'een zaakregister naast APPWERKT, zoals bij de toelatingsproef; of de zaakkant in het scenario van link:rechterhand' },
   { register: 'TOELATINGSPROEF.json', instrument: 'scripts/toelatingsproef.js',
     reden: 'de klant is geen lid en de keten loopt over kantoor en aanmeldbalie; MAPPEN kent alleen lid- en gezinswerelden',
     nodig: 'niets aan de keten -- dit bewijs hoort bij een zaak- of kantoorregister, niet bij APPWERKT' },

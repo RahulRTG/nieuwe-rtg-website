@@ -22,6 +22,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 let srv, base, kantoor, klant, genoot;
@@ -177,7 +178,7 @@ test('4. een reisgenoot wordt met zijn identiteit gecontroleerd', async () => {
 
   /* Een gratis account is nog geen geverifieerde identiteit. Hij mag dus wel
      lid zijn, maar niet zomaar in de reis van een ander. */
-  const gast = (await post('/api/login', { tier: 'guest' })).body.token;
+  const gast = (await registreerGratis(base)).token;
   const geweigerd = await post('/api/reis/uitnodiging/eisop', { code: code2 }, gast);
   assert.equal(geweigerd.status, 403);
   assert.match(geweigerd.body.error, /identiteitscontrole/i);

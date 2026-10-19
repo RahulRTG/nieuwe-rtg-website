@@ -118,7 +118,7 @@ const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',3200); }
-const api=(pad,body)=>fetch('/api/vertegenwoordiging'+pad,{method:'POST',
+const api=(pad,body)=>fetch(pad,{method:'POST',
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
   body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;});
@@ -196,8 +196,8 @@ function toonSimulatie(s){
 
 async function laad(){
   try{
-    LIJST = await api('/bevoegdheden');
-    MIJN = await api('/mijn');
+    LIJST = await api('/api/vertegenwoordiging/bevoegdheden');
+    MIJN = await api('/api/vertegenwoordiging/mijn');
     /* Zonder lijsten geen "Er staat niemand naast u" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
     if(!(LIJST && Array.isArray(LIJST.bevoegdheden) && MIJN && Array.isArray(MIJN.team) && Array.isArray(MIJN.ikSta) && Array.isArray(MIJN.log))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     teken();
@@ -206,16 +206,16 @@ async function laad(){
 
 document.addEventListener('click', async ev=>{
   const sim=ev.target.closest('[data-sim]'); const weg=ev.target.closest('[data-intrek]');
-  if(sim){ try{ toonSimulatie(await api('/simulatie',{id:sim.dataset.sim})); }catch(e){ meld(e.message); } return; }
-  if(weg){ try{ const r=await api('/intrek',{id:weg.dataset.intrek}); meld(r.let||'Ingetrokken.'); await laad(); }catch(e){ meld(e.message); } return; }
+  if(sim){ try{ toonSimulatie(await api('/api/vertegenwoordiging/simulatie',{id:sim.dataset.sim})); }catch(e){ meld(e.message); } return; }
+  if(weg){ try{ const r=await api('/api/vertegenwoordiging/intrek',{id:weg.dataset.intrek}); meld(r.let||'Ingetrokken.'); await laad(); }catch(e){ meld(e.message); } return; }
   if(ev.target.id==='grensOp'){
     const gekozen=[...document.querySelectorAll('[data-grens]')].filter(i=>i.checked).map(i=>i.dataset.grens);
-    try{ const r=await api('/grens',{bevoegdheden:gekozen}); meld(r.let||'Bewaard.'); await laad(); }catch(e){ meld(e.message); }
+    try{ const r=await api('/api/vertegenwoordiging/grens',{bevoegdheden:gekozen}); meld(r.let||'Bewaard.'); await laad(); }catch(e){ meld(e.message); }
   }
 });
 $('#simNee').addEventListener('click',()=>$('#sim').close());
 $('#simJa').addEventListener('click', async ()=>{
-  try{ const r=await api('/aanvaard',{id:SIM_ID}); $('#sim').close();
+  try{ const r=await api('/api/vertegenwoordiging/aanvaard',{id:SIM_ID}); $('#sim').close();
     meld(r.versmalling||'Aanvaard.'); await laad(); }catch(e){ meld(e.message); }
 });
 laad();

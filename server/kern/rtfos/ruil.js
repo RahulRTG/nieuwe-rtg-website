@@ -107,10 +107,13 @@ module.exports = (ctx) => {
     const titel = schoon(b.titel, 80);
     if (titel.length < 3) return { status: 400, error: 'Wat is het? Een paar woorden is genoeg.' };
     const wat = schoon(b.wat, 600);
+    // een dubbele tik is geen tweede aanbod (grendel 5)
+    const al = S().ruil.find(r => r.codenaam === ik && r.status === 'open' && r.stad === stad.id &&
+      r.soort === b.soort && r.titel === titel && r.wat === wat);
+    if (al) return { ok: true, bestond: true, ruil: pub(al, true) };
 
     /* EEN LID HOUDT ER TWINTIG TEGELIJK OPEN. Geen wet, wel een rem: wie er
-       honderd plaatst, gebruikt de buurtruil als etalage en dan staat er voor
-       de buurt niets meer tussen. */
+       honderd plaatst, gebruikt de buurtruil als etalage. */
     const open = S().ruil.filter(r => r.codenaam === ik && r.status === 'open').length;
     if (open >= 20) {
       return { status: 429, error: 'Je hebt er twintig openstaan. Sluit er eerst een voordat je een nieuwe plaatst.' };

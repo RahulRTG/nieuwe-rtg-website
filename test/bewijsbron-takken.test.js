@@ -264,3 +264,21 @@ test('zonder opgegeven lezer en versheid gebruikt bewijsVoor de echte, en dat bl
   assert.ok(['BEWEZEN', 'GEBLOKKEERD_DOOR_DEFECT', 'GEBLOKKEERD_DOOR_CONFIG', 'NIET_GETEST'].includes(r.status), r.status);
   assert.equal(r.bron.soort, 'liegronde');
 });
+
+test('een tab zonder eigen adres koppelt alleen via ingang, via en zijn eigen delen', () => {
+  /* Een tab koppelt op de routes van ZIJN delen, niet op die van de hele schil:
+     anders "bewijst" elk scenario dat iets in /apps/app.html aanroept alle tabs.
+     Ontbreekt de navigatiestap of de delen, dan is er geen ingang. */
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/app.html', exact: ['/api/schil/a', '/api/schil/b'] },
+    { bestand: 'public/apps/app-main/tab-x.js', exact: ['/api/tabx/lees', '/api/tabx/zet'] }] };
+  const vol = { ingang: '/apps/app.html', via: '#tab=x', bestanden: ['public/apps/app-main/tab-x.js'] };
+  const ing = B.ingangVan('(tab in de app, geen eigen adres)', vol, { schermroutes });
+  assert.deepEqual([...ing.exact].sort(), ['/api/tabx/lees', '/api/tabx/zet']);
+  assert.ok(!ing.exact.has('/api/schil/a'), 'de schil telt niet mee voor een tab');
+  for (const zonder of ['via', 'ingang', 'bestanden']) {
+    const c = Object.assign({}, vol); delete c[zonder];
+    assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', c, { schermroutes }), null, 'zonder ' + zonder + ' geen ingang');
+  }
+  assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', null, { schermroutes }), null);
+});

@@ -104,9 +104,12 @@
     };
   });
 
-  function api(pad) {
-    return fetch('/api' + pad, { method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+  /* Het lijf gaat mee. Tot 19 oktober 2026 stuurde dit altijd '{}', en dan kwam
+     de runId van het dossier nooit aan: elk dossier antwoordde "Deze loonstrook
+     staat niet op uw naam" (gevonden door scripts/lib/voltooi/loonstrook.js). */
+  function api(pad, lijf) {
+    return fetch(pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(lijf || {}) })
       .then(async (r) => { const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
   }
 
@@ -184,7 +187,7 @@
         this.dataset.geladen = '1';
         const vak = this.querySelector('.stap');
         try {
-          const d = await api('/member/dossier', { runId: this.dataset.dossier });
+          const d = await api('/api/member/dossier', { runId: this.dataset.dossier });
           const a = d.antwoorden, w = a.waarheen;
           vak.innerHTML =
             '<b>Goedgekeurd door</b><br>' +
@@ -228,12 +231,12 @@
       return;
     }
     try {
-      const d = await api('/member/loonstroken');
+      const d = await api('/api/member/loonstroken');
       STROKEN = d.stroken || [];
       tekenStroken(STROKEN);
     } catch (e) { $('#stroken').innerHTML = '<div class="kaart"><p class="stil">' + esc(e.message) + '</p></div>'; }
     try {
-      const d = await api('/member/identiteit/verzoeken');
+      const d = await api('/api/member/identiteit/verzoeken');
       tekenInzage(d.verzoeken || []);
     } catch (e) { $('#inzage').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
   }

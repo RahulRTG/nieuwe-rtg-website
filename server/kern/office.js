@@ -33,6 +33,7 @@ function platteNamen(state, basis) {
     ...docs,
     officeExporteer: (key, did, data, kring) => formaten.exporteer(key, did, data, kring),
     officeImporteer: (key, data, kring) => formaten.importeer(key, data, kring, docs.officeMaak),
+    ...require('./office/ster')(state, basis),
     ...require('./office/delen')(state, basis),
     ...require('./office/formulier')(state, basis),
     ...require('./office/workflow')(state, basis),

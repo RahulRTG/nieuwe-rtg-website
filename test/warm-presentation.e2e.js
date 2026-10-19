@@ -35,7 +35,7 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
   await ctx.addInitScript(token=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');localStorage.setItem('rtg_member_token',token);},first);
   const page=await ctx.newPage(), errors=[];letOpFouten(page,errors);
   try {
-    for (const [world,route] of [['living','rtg'],['work','kantoor'],['travel','reizen'],['foundation','foundation/os-publiek']]) {
+    for (const [world,route] of [['living','rtg'],['work','kantoor'],['foundation','foundation/os-publiek']]) {
       await page.setViewportSize({width:1440,height:1040});await page.goto(srv.base+'/apps/'+route+'.html',{waitUntil:'domcontentloaded'});
       await page.waitForSelector('body[data-rtg-desktop-state="ready"]');await page.waitForSelector('.rtg-adaptive-bar');await page.evaluate(()=>document.fonts.ready);
       assert.equal(await page.locator('.wp-photo').count(),1,world);
@@ -54,6 +54,26 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,world+' '+width+' overflow');
         if(width===430)await page.screenshot({path:path.join(out,world+'-mobile.png')});
       }
+    }
+    /* TravelOS staat op het RTG Design System (TRAVELOS-MIGRATIE.md): geen
+       oude schil maar een ds-Cover. Wat deze toets daar bewaakte, blijft:
+       precies een Edge, een zichtbaar fotografisch hoofdbeeld op desktop en op
+       320/390/430, en geen overloop. Het eigen hoofdbeeld (travel/hoofd) en
+       zijn editor bewijst test/reizen-ds.e2e.js. */
+    await page.setViewportSize({width:1440,height:1040});await page.goto(srv.base+'/apps/reizen.html',{waitUntil:'domcontentloaded'});
+    await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');await page.evaluate(()=>document.fonts.ready);
+    const travelLead=()=>page.evaluate(()=>[...document.querySelectorAll('.ds-cover .ds-cover__beeld')].some(el=>{
+      const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+      return r.width>120&&r.height>120&&s.display!=='none'&&s.visibility!=='hidden'&&(el.tagName==='IMG'?!!el.currentSrc&&el.complete&&el.naturalWidth>0:!!el.querySelector('image'));
+    }));
+    for(const width of [1440,320,390,430]) {
+      await page.setViewportSize({width,height:width===1440?1040:932});
+      await page.waitForFunction(()=>{const i=document.querySelector('img.ds-cover__beeld');return i.complete&&i.naturalWidth>0;});
+      assert.equal(await travelLead(),true,'travel '+width+' keeps a visible photographic lead');
+      assert.equal(await page.locator('.ds-edge').count(),1,'travel '+width+' has one Edge');
+      assert.equal(await page.locator('.rtg-adaptive-bar,.wd-shell,.rtg-edge-chrome').count(),0,'travel '+width+' has no legacy shell');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'travel '+width+' overflow');
+      if(width===1440||width===430)await page.screenshot({path:path.join(out,'travel-'+(width===1440?'desktop':'mobile')+'.png')});
     }
     await page.goto(srv.base+'/apps/rtg.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
     await page.waitForFunction(()=>document.querySelector('.wp-photo img').src.startsWith('data:'));

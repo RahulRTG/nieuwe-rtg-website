@@ -12,6 +12,11 @@
         register toont het gegroepeerd onder zijn eigen kop;
      4. op 390, 820 en 1440 px loopt niets horizontaal over, en in het
         Arabisch staat dir="rtl" zonder overloop.
+     5. het hoofdbeeld is van het lid (beeldplek travel/hoofd): een eigen foto
+        met een uitsnede voor desktop en een voor mobiel, bewaard via de
+        ds-editor, staat na herladen op de Cover op 1440 en op 390 px; herstel
+        brengt het RTG-beeld terug, en een gast krijgt de inlogzin. De
+        uitsnede staat in SVG-attributen, nooit in een style-attribuut.
    Zet RTG_DS_BEELDEN=<map> om de schermafbeeldingen te bewaren. */
 'use strict';
 const test = require('node:test');
@@ -182,3 +187,143 @@ for (const [naam, w, h, taal] of [['320', 320, 700, 'nl'], ['820', 820, 1180, 'n
     await ctx.close();
   });
 }
+
+/* 5. Het eigen hoofdbeeld. Een eigen lid, zodat de andere toetsen het
+   RTG-beeld blijven zien. */
+async function coverStand(page) {
+  return page.evaluate(() => {
+    const c = document.querySelector('.ds-cover'), svg = c.querySelector('svg.ds-cover__beeld'), img = c.querySelector('img.ds-cover__beeld');
+    const beeld = svg && svg.querySelector('image'), r = (svg || img).getBoundingClientRect();
+    return { eigen: c.getAttribute('data-eigen-beeld'), imgZichtbaar: !img.hidden && img.checkVisibility(),
+      href: beeld ? beeld.getAttribute('href').slice(0, 15) : '', breed: beeld ? Number(beeld.getAttribute('width')) : 0,
+      x: beeld ? Number(beeld.getAttribute('x')) : 0, vlak: r.width, hoog: r.height,
+      stijl: [...document.querySelectorAll('[style]')].map(e => e.tagName + '#' + e.id) };
+  });
+}
+test('het eigen hoofdbeeld: bewaren met twee uitsneden, na herladen op 1440 en 390, herstel en de gast', { skip }, async () => {
+  const now = Date.now();
+  const lid = (await post('/api/auth/register', { name: 'Beeld Lid', email: 'reizen-beeld-' + now + '@e.test',
+    phone: '06' + String(now + 7).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  const foto = fs.readFileSync(path.join(__dirname, '..', 'public', 'images', 'daily', 'agenda.webp'));
+  let { ctx, page, fouten } = await open(1440, 900, 'nl', '/apps/reizen.html', lid);
+  assert.equal((await coverStand(page)).imgZichtbaar, true, 'zonder keuze staat het RTG-beeld');
+  await page.locator('[data-ds-edge="acties"]').click();
+  assert.match(await page.locator('#dsEdgeBlad').textContent(), /Foto wijzigen/, 'Foto wijzigen staat ook onder Acties');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Foto wijzigen', exact: true }).click();
+  await page.waitForSelector('#beeldDialoog[open]');
+  await page.locator('#beeldUpload').setInputFiles({ name: 'Mijn reisfoto.webp', mimeType: 'image/webp', buffer: foto });
+  await page.waitForSelector('#beeldX:not(:disabled)');
+  await page.getByLabel('Horizontaal', { exact: true }).fill('20'); await page.getByLabel('Vergroten', { exact: true }).fill('1.4');
+  await page.getByRole('button', { name: 'Mobiel', exact: true }).click();
+  assert.equal(await page.locator('#beeldSnede').getAttribute('data-ds-snede'), 'mobiel');
+  await page.getByLabel('Horizontaal', { exact: true }).fill('80'); await page.getByLabel('Verticaal', { exact: true }).fill('30');
+  await beeld(page, '1440-beeldeditor');
+  await page.getByRole('button', { name: 'Opslaan', exact: true }).click();
+  await page.waitForSelector('#beeldDialoog:not([open])', { state: 'attached' });
+  const bewaard = (await post('/api/ik/beelden', {}, lid)).images['travel/hoofd'];
+  assert.ok(bewaard && bewaard.file, 'de keuze staat op de server');
+  assert.deepEqual([bewaard.desktop, bewaard.mobile], [{ x: 20, y: 50, zoom: 1.4 }, { x: 80, y: 30, zoom: 1 }]);
+  /* Uw eigen bestanden: de upload staat in de galerij van de editor. */
+  await page.getByRole('button', { name: 'Foto wijzigen', exact: true }).click();
+  await page.getByRole('button', { name: 'Mijn foto’s', exact: true }).click();
+  await page.locator('#beeldGalerij .ds-keuze', { hasText: 'Mijn reisfoto.webp' }).waitFor();
+  await page.getByRole('button', { name: 'Annuleren', exact: true }).click();
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.ds-cover[data-eigen-beeld="desktop"]');
+  let stand = await coverStand(page);
+  assert.equal(stand.imgZichtbaar, false); assert.equal(stand.href, 'data:image/webp');
+  verwacht(stand, { x: 20, zoom: 1.4 }, 'desktop');
+  assert.deepEqual(stand.stijl, [], 'geen style-attribuut op de pagina');
+  await beeld(page, '1440-eigen-beeld');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForSelector('.ds-cover[data-eigen-beeld="mobile"]');
+  stand = await coverStand(page);
+  verwacht(stand, { x: 80, zoom: 1 }, 'mobiel');
+  await geenOverloopHier(page);
+  await beeld(page, '390-eigen-beeld');
+  await ctx.close();
+  ({ ctx, page, fouten } = await open(390, 844, 'nl', '/apps/reizen.html', lid));
+  await page.waitForSelector('.ds-cover[data-eigen-beeld="mobile"]');
+  await page.getByRole('button', { name: 'Foto wijzigen', exact: true }).click();
+  assert.equal(await page.locator('#beeldMobiel').getAttribute('aria-pressed'), 'true', 'op de telefoon opent de mobiele uitsnede');
+  assert.equal(await page.locator('#beeldX').inputValue(), '80');
+  await beeld(page, '390-beeldeditor');
+  await page.getByRole('button', { name: 'Herstel RTG-beeld', exact: true }).click();
+  await page.getByRole('button', { name: 'Opslaan', exact: true }).click();
+  await page.waitForSelector('#beeldDialoog:not([open])', { state: 'attached' });
+  assert.equal((await post('/api/ik/beelden', {}, lid)).images['travel/hoofd'], undefined, 'herstel haalt de keuze weg');
+  stand = await coverStand(page);
+  assert.equal(stand.imgZichtbaar, true); assert.equal(stand.eigen, null);
+  assert.deepEqual(fouten, []);
+  await ctx.close();
+
+  ({ ctx, page, fouten } = await open(390, 844, 'nl', '/apps/reizen.html', ''));
+  await page.getByRole('button', { name: 'Foto wijzigen', exact: true }).click();
+  await page.waitForSelector('#beeldDialoog[open]');
+  assert.equal(await page.locator('#beeldStatus').textContent(), 'Log in met uw RTG-account om persoonlijke beelden te bewaren.');
+  assert.equal(await page.locator('#beeldBewaar').isDisabled(), true);
+  assert.equal(await page.locator('#beeldUploadKnop').isDisabled(), true);
+  await page.getByRole('button', { name: 'Mijn foto’s', exact: true }).click();
+  assert.equal(await page.locator('#beeldStatus').textContent(), 'Log in met uw RTG-account om uw foto’s te gebruiken.');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#beeldDialoog[open]').count(), 0, 'Escape sluit de editor');
+  assert.deepEqual(fouten, []);
+  await ctx.close();
+});
+/* object-fit: cover met object-position x% en een vergroting rond dat punt,
+   nagerekend uit de attributen van het SVG-beeld. */
+function verwacht(stand, snede, naam) {
+  const bw = stand.breed / snede.zoom, px = stand.vlak * snede.x / 100;
+  const x = px + ((stand.vlak - bw) * snede.x / 100 - px) * snede.zoom;
+  assert.ok(bw >= stand.vlak - 1, naam + ': het beeld dekt de breedte: ' + JSON.stringify(stand));
+  assert.ok(Math.abs(stand.x - x) < 1, naam + ': x ' + stand.x + ' verwacht ' + x.toFixed(2));
+}
+async function geenOverloopHier(page) {
+  const maat = await page.evaluate(() => ({ breed: document.documentElement.scrollWidth, venster: innerWidth }));
+  assert.ok(maat.breed <= maat.venster, 'scrollWidth ' + maat.breed + ' > ' + maat.venster);
+}
+
+/* 6. De vier handelingen van een reisregel (Openen, Delen, Kenmerk,
+   Overnemen): op de oude Reizen gaf RTGGebaar.wereldregister ze; op de ds-vorm
+   geeft de gedeelde bouwer /ds/register.js ze, met dezelfde teksten. Het
+   klembord wordt hier waargenomen; zonder navigator.share valt Delen terug op
+   het klembord, net als in gebaar.js. */
+test('de vier handelingen van een reisregel: openen, delen, kenmerk en overnemen', { skip }, async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
+  await ctx.addInitScript((t) => {
+    localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_member_token', t);
+    window.__klembord = [];
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: (x) => { window.__klembord.push(x); return Promise.resolve(); } }, configurable: true });
+  }, token);
+  const page = await ctx.newPage(), fouten = letOpFouten(page, []);
+  await page.goto(srv.base + '/apps/reizen.html#reizen', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#komend .reis[href] + [data-ds-register]');
+  const rij = page.locator('#komend .reis[href]').first(), acties = page.locator('#komend [data-ds-register]').first();
+  const ref = await rij.locator('[data-ref]').getAttribute('data-ref');
+  assert.ok(ref, 'de regel draagt een kenmerk');
+  assert.deepEqual(await acties.locator('button').allInnerTexts(), ['Openen', 'Delen', 'Kenmerk', 'Overnemen']);
+  assert.equal(await page.locator('#komend .reis[href]').count(), await page.locator('#komend [data-ds-register]').count(), 'elke regel krijgt zijn handelingen');
+  const titel = await rij.locator('[data-reg-titel]').innerText(), href = await rij.getAttribute('href');
+  await acties.getByRole('button', { name: 'Delen', exact: true }).click();
+  await page.waitForFunction(() => /gekopieerd; klaar om te plakken/i.test(document.querySelector('#toast').textContent));
+  await acties.getByRole('button', { name: 'Kenmerk', exact: true }).click();
+  await page.waitForFunction((r) => document.querySelector('#toast').textContent === r + ' - gekopieerd', ref);
+  await acties.getByRole('button', { name: 'Overnemen', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('#toast').textContent === 'De regel staat op uw klembord.');
+  const klembord = await page.evaluate(() => window.__klembord);
+  assert.equal(klembord[0], titel + ' - ' + new URL(href, srv.base).href, 'delen zonder deelvenster: titel - adres');
+  assert.equal(klembord[1], ref);
+  assert.ok(klembord[2].startsWith(titel + ' · ') && klembord[2].includes(' · ' + ref), 'overnemen: titel · plaats · dag · kenmerk · bron: ' + klembord[2]);
+  /* Na een nieuwe tekening van het register staan de handelingen er weer, een keer. */
+  await page.evaluate(() => window.RTGReizen.register.laad());
+  await page.waitForSelector('#komend .reis[href] + [data-ds-register]');
+  assert.equal(await page.locator('#komend .reis[href]').count(), await page.locator('#komend [data-ds-register]').count());
+  await beeld(page, '390-handelingen', { fullPage: true });
+  await page.locator('#komend [data-ds-register]').first().getByRole('button', { name: 'Openen', exact: true }).click();
+  await page.waitForURL((u) => u.href === new URL(href, srv.base).href);
+  assert.deepEqual(fouten, []);
+  await ctx.close();
+});

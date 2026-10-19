@@ -65,8 +65,12 @@ const minuten = (ms) => Math.round(ms / 60000);
    een kent). Zonder uur is er geen tijdstip -- hier 00:00 aannemen zou een
    hotelovernachting om middernacht laten beginnen en elke naad eromheen
    verzinnen. Dus: geen uur, geen tijdstip. */
-function tijdstip(dag, uur) {
+/* MET EEN ZONE is het uur dat van die zone (kern/tijdzone.js): een afspraak
+   om 10:00 bij een zaak is 10:00 op de klok van de zaak. Zonder zone blijft het
+   UTC, voor de pure rekentoetsen die alleen verschillen meten. */
+function tijdstip(dag, uur, zone) {
   if (!dag || !uur || !/^\d{2}:\d{2}/.test(String(uur))) return null;
+  if (zone) return require('../tijdzone').instantIn(zone, String(dag).slice(0, 10), String(uur).slice(0, 5));
   const t = Date.parse(String(dag).slice(0, 10) + 'T' + String(uur).slice(0, 5) + ':00Z');
   return Number.isFinite(t) ? t : null;
 }

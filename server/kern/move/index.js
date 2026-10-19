@@ -61,8 +61,19 @@ module.exports.maakMove = ({ kern }) => {
      met opzet alleen waar het domein er een heeft), en een onderdeel zonder
      bekende duur levert geen klaarAt. Een duur van nul aannemen zou betekenen
      dat je een restaurant op hetzelfde moment binnenkomt en verlaat. */
+  /* IN WELKE ZONE STAAT HET UUR? Dat van de zaak waar het onderdeel plaatsvindt
+     (kern/tijdzone.js zaakZone: haar eigen instelling, anders haar land).
+     Zonder zaak -- een vrij voornemen, een reispakket -- de zone van het huis,
+     Europe/Amsterdam; Ibiza heeft dezelfde offset. Dat is een aanname en geen
+     meting: voor een onderdeel zonder zaak buiten deze zone klopt hij niet. */
+  function zoneVan(rij) {
+    const code = rij && rij.plek && rij.plek.zaak;
+    const s = code && kern.findSupplier ? kern.findSupplier(code) : null;
+    return s ? require('../tijdzone').zaakZone(s).zone : 'Europe/Amsterdam';
+  }
+
   function tijdenVan(rij) {
-    const start = tijdstip(rij.van, rij.tijd);
+    const start = tijdstip(rij.van, rij.tijd, zoneVan(rij));
     /* EEN ONBEKENDE DUUR IS GEEN DUUR VAN NUL. `Number(null)` is 0 en `0 >= 0`
        is waar, dus kreeg elk onderdeel zonder duur `klaarAt === nodigAt` -- "u
        kunt weg op het moment dat u er moet zijn". Dat gold voor de meerderheid
@@ -151,7 +162,7 @@ module.exports.maakMove = ({ kern }) => {
         titel: String(b.titel || 'Dit voornemen').slice(0, 80),
         soort: String(b.soort || 'voornemen').slice(0, 40),
         plek: plekVan({ plek: b.plek })
-      }, tijdenVan({ van: b.dag, tijd: b.uur, duurMin: b.duurMin })),
+      }, tijdenVan({ van: b.dag, tijd: b.uur, duurMin: b.duurMin, plek: b.plek })),
       reisTijd, afstandM
     });
   }

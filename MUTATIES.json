@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T22:44:18.988Z",
-    "commit": "c1b1d0908b",
+    "op": "2026-10-19T22:54:00.015Z",
+    "commit": "bc015b5b6a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -18800,12 +18800,19 @@
       "scherp": "gezakt"
     },
     "tijdzone-instant.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/tijdzone.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1
+      "module": "server/kern/tijdzone-instant.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-time-mutation-proof/tijdzone-instant.test.js.evidence.json",
+        "sha256": "54d1771139e49e1dccef89d26d816ca9cbc78eeac3fb44e5473f6b6fcb66891d",
+        "commit": "bc015b5b6aa1180024defd6e92e8de6213596956",
+        "sourceSha256": "d7d45e2389ba7f8acf9c02e43dc3a118870a6dad011748726b5e94ee1349ec4d",
+        "testSha256": "64c8176424d5674c4f38463f710fe6c36719366c681d7cd2f81b7ea47f49d993"
+      }
     },
     "tijdzone-plekken.test.js": {
       "soort": "gericht",

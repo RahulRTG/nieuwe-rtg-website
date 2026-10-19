@@ -39,7 +39,9 @@
       w.scrollTo(0, 0); vlak.querySelector('[data-terug]').focus({ preventScroll: true });
       w.RTGSaloonActies.verzoek('/api/krant/artikel', i.artikel).then(function (r) {
         if (vraag !== nummer) return;
-        var a = r.artikel, inhoud = vlak.querySelector('.saloon-leesinhoud');
+        var a = r && r.artikel, inhoud = vlak.querySelector('.saloon-leesinhoud');
+        // Geen of een leeg artikel: de eerlijke lege toestand hieronder, nooit een kale fout of een kop zonder tekst.
+        if (!a || typeof a !== 'object' || !(a.titel || a.inhoud)) throw new Error('Dit artikel kon niet worden geladen; het antwoord was onvolledig.');
         // Gebruik het beeld van deze gepubliceerde editie, nooit een oud feedbeeld.
         var url = typeof a.beeld === 'string' ? a.beeld : '';
         var beeld = url && /^(https:\/\/|\/(?!\/))/.test(url)

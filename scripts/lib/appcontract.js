@@ -230,6 +230,9 @@ const CONTRACT = {
   'link:projectroom': Object.assign({
     belofte: 'een medewerker voert een project dat uit een RTMAIL ontstond aantoonbaar uit, met taken, bewijs en een menselijke oplevering, en een collega wijzigt er niets aan'
   }, voltooi('projectroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /project/taak, /project/bewijs en /project/oplever, de routes die /apps/project-room.html zelf aanroept, met een collega en een lid die er niet bij komen')),
+  'link:loonstrook': Object.assign({
+    belofte: 'een medewerker ziet zijn eigen loonstrook met uitleg en dossier, en een ander lid ziet hem niet'
+  }, voltooi('loonstrook', 'het scenario loopt /api/member/loonstroken, /api/member/dossier en /api/member/identiteit/verzoeken, de routes die /apps/loonstrook.html zelf aanroept, met de strook langs zaak en kantoor op naam en een ander lid dat er niet bij komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

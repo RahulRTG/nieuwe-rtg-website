@@ -61,6 +61,17 @@ test('2. een voornemen is geen prestatie', async () => {
     /NOOIT\.toekomst/);
 });
 
+test('2b. vandaag is vandaag, ook voor 14:00 en vlak voor middernacht', async () => {
+  /* De dag werd als 12:00 UTC gelezen: tot 14:00 Nederlandse tijd gold vandaag
+     als toekomst, en de voltooiproef van Loopbaan zakte na middernacht. */
+  const vroeg = Date.parse('2026-10-19T00:30:00Z'); // 02:30 in Amsterdam
+  assert.equal(R.dagGeldig('2026-10-19', vroeg), null, 'vroeg in de ochtend telt vandaag');
+  assert.match(R.dagGeldig('2026-10-20', vroeg), /NOOIT\.toekomst/, 'morgen blijft toekomst');
+  const laat = Date.parse('2026-10-18T22:30:00Z'); // 00:30 op de 19e in Amsterdam
+  assert.equal(R.dagGeldig('2026-10-19', laat), null, 'na middernacht in Nederland is het al de 19e');
+  assert.match(R.dagGeldig('2026-10-20', laat), /NOOIT\.toekomst/);
+});
+
 test('3. een bedrag en een cijfer zijn geen carrierefeit', async () => {
   const b = { kapitaal: 'financieel', herkomst: 'zelf', wat: 'contract getekend', op: GISTEREN };
   assert.match(R.toets(Object.assign({ bedragCenten: 100 }, b), NU), /NOOIT\.bedrag/);

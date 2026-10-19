@@ -42,7 +42,7 @@
     margin: 0;
     font-family: var(--ds-letter-display);
     font-weight: 400;
-    font-size: var(--ds-maat-titel);
+    font-size: var(--ds-nadruk-titel);
     line-height: 1.05;
     letter-spacing: -.01em;
   }

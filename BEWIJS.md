@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2856 bestanden en 19688 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2856 bestanden en 19694 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2856 |
-| losse beweringen (`test(...)`) | 19688 |
+| losse beweringen (`test(...)`) | 19694 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2666 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2487 bestanden, 18999 beweringen.
+2487 bestanden, 19004 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1474,7 +1474,7 @@ toets omvalt.
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
 | `ontwerpbureaus-verwijder.test.js` | 1 | gezakt op `liegpoort /api/` | EEN ONTWERP WEGHALEN UIT DE VIER ONTWERPBUREAUS VAN HET KANTOOR. RTG Atelier, de Ontwerpstudio, het Hardwarelab en het Architectenbureau (server/routes/kantoren/bureaus.js) hebben elk een /verwijder-deur die door... |
-| `ontwerpsysteem.test.js` | 24 | gezakt op `voorwaarde-omkeren#0` | De tand van ONTWERPSYSTEEM.md: gaat hij echt dicht? Een grendel die nooit zakt is niet te onderscheiden van een grendel die niets meet. |
+| `ontwerpsysteem.test.js` | 29 | gezakt op `voorwaarde-omkeren#0` | De tand van ONTWERPSYSTEEM.md: gaat hij echt dicht? Een grendel die nooit zakt is niet te onderscheiden van een grendel die niets meet. |
 | `onvervreemdbaar.test.js` | 7 | gezakt op `===->!==#0` | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 15 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
@@ -2527,7 +2527,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-369 bestanden, 689 beweringen.
+369 bestanden, 690 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2735,7 +2735,7 @@ toets omvalt.
 | `office-formschets.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de twee nieuwe officesoorten: het formulier en de schets. Wat hier bewezen wordt, door de echte schermen heen: - A bouwt een formulier (open vraag + schaal) en deelt het met B als meelezer, op... |
 | `office-suite.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de tekstverwerker en de presentatie van RTG Office. Wat hier bewezen wordt: - zoeken en vervangen raakt alleen TEKST, nooit de opmaak: na "haven" naar "kade" staat de kop er nog als kop; - de... |
 | `onderneming-scherm.e2e.js` | 5 | gezakt op `liegpoort /api/` | Schermtoets voor /apps/onderneming.html: de schil van het Ondernemers-OS. Waarom dit er als BROWSERtoets naast de API-toetsen staat: een scherm dat 200 geeft en netjes rendert kan nog steeds dood zijn (zie de kop van... |
-| `ontwerpvoorbeeld.e2e.js` | 1 | gezakt op `html-bron-weg#1` | De voorbeeldpagina van het RTG Design System (/ds/voorbeeld.html): elk schermtype in een telefoonkader, om naast de goedgekeurde mockups te leggen. Wat deze toets eist: alleen /ds/ en /fonts/ actief (de... |
+| `ontwerpvoorbeeld.e2e.js` | 2 | gezakt op `html-bron-weg#1` | De voorbeeldpagina van het RTG Design System (/ds/voorbeeld.html): elk schermtype in een telefoonkader, om naast de goedgekeurde mockups te leggen. Wat deze toets eist: alleen /ds/ en /fonts/ actief (de... |
 | `operationeel-aanvraag.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov-ds.e2e.js` | 3 | gezakt op `html-bron-weg#0` | RTG Vervoer op het RTG Design System: het bewijs van batch 4 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `ovcontrol-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | De Mobility Control Tower op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de werklaag uit par. |

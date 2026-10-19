@@ -24,6 +24,28 @@
     "canvas",
     "status"
   ],
+  "nadrukken": {
+    "beleving": "Experience: covers, ontdekken, inspireren en merkbeleving. Het merk ademt: meer lucht, staand beeld.",
+    "balans": "Balanced: collecties, vergelijken, orienteren en details bekijken. Beeld en gegevens wegen even zwaar.",
+    "gereedschap": "Utility: formulieren, dagelijks werk, communicatie, betalen en complexe handelingen. De handeling eerst: compacte koppen, minder lucht, korte beweging, liggend beeld.",
+    "bevestiging": "Confirmation: bevestigingen, resultaten, herstel en belangrijke statusmeldingen. De uitkomst groot en helder."
+  },
+  "nadrukStandaard": {
+    "cover": "beleving",
+    "collectie": "balans",
+    "detail": "balans",
+    "taak": "gereedschap",
+    "gesprek": "gereedschap",
+    "canvas": "gereedschap",
+    "status": "bevestiging"
+  },
+  "nadrukTokens": [
+    "--ds-nadruk-titel",
+    "--ds-nadruk-lucht",
+    "--ds-nadruk-beeld",
+    "--ds-nadruk-uitkomst",
+    "--ds-duur"
+  ],
   "componenten": [
     "kop",
     "knop",
@@ -91,47 +113,65 @@
   "overgangsscripts": [
     {
       "pad": "public/shared/i18n.js",
-      "reden": "De automatische DOM-vertaling is de enige vertaalweg van de TravelOS-schermen; hij zet een <style> voor zijn eigen taalkiezer (.rtg-lang-*) plus een regel voor verminderde beweging. Gaat naar een .ds-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De automatische DOM-vertaling is de enige vertaalweg van de TravelOS-schermen; hij zet een <style> voor zijn eigen taalkiezer (.rtg-lang-*) plus een regel voor verminderde beweging.",
+      "plan": "Gaat naar een .ds-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/poortgesprek.js",
-      "reden": "Het gegevensgesprek (428 van de gegevenspoort) is een rechtenpad en geen versiering; zijn dialoog (.rp-*) heeft een eigen <style>. Gaat naar het dialoog-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "Het gegevensgesprek (428 van de gegevenspoort) is een rechtenpad en geen versiering; zijn dialoog (.rp-*) heeft een eigen <style>.",
+      "plan": "Gaat naar het dialoog-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/cookie.js",
-      "reden": "De wettelijke opslagmelding (#rtg-cookie) heeft een eigen <style>. Gaat naar een .ds-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De wettelijke opslagmelding (#rtg-cookie) heeft een eigen <style>.",
+      "plan": "Gaat naar een .ds-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/uitvoer.js",
-      "reden": "Meenemen (gegevensportabiliteit) zet een eigen <style> voor .rtguitvoer. Gaat naar een .ds-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "Meenemen (gegevensportabiliteit) zet een eigen <style> voor .rtguitvoer.",
+      "plan": "Gaat naar een .ds-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/sprong.js",
-      "reden": "De sprong (twee tikken naar elke functie, TIKKEN.md) zet de server op elke pagina; op een ds-scherm tekent hij geen eigen greep meer, maar zijn luik heeft nog een eigen <style> (.rtgsprong-*). Gaat naar een .ds-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De sprong (twee tikken naar elke functie, TIKKEN.md) zet de server op elke pagina; op een ds-scherm tekent hij geen eigen greep meer, maar zijn luik heeft nog een eigen <style> (.rtgsprong-*).",
+      "plan": "Gaat naar een .ds-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/plek.js",
-      "reden": "De locatievraag (rtg_os_gps, TIKKEN en de gps-schakelaar) is een rechtenpad: zonder haar vraagt OV nooit om je plek en valt inchecken met een tik stil. Haar kaart (.rtgplek) zet een eigen <style>. Gaat naar het dialoog-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De locatievraag (rtg_os_gps, TIKKEN en de gps-schakelaar) is een rechtenpad: zonder haar vraagt OV nooit om je plek en valt inchecken met een tik stil. Haar kaart (.rtgplek) zet een eigen <style>.",
+      "plan": "Gaat naar het dialoog-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/basis.js",
-      "reden": "De basis houdt op een ds-scherm zijn gedrag en zet daarvoor nog een <style>: het toegankelijkheidsprofiel (rtg-tekst-*, rtg-contrast, rtg-stil, rtg-rustig, rtg-linkstreep), de hulpkaart (.bss-*) en de springlink (.rtg-spring). Gaat naar tokens en .ds-componenten.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De basis houdt op een ds-scherm zijn gedrag en zet daarvoor nog een <style>: het toegankelijkheidsprofiel (rtg-tekst-*, rtg-contrast, rtg-stil, rtg-rustig, rtg-linkstreep), de hulpkaart (.bss-*) en de springlink (.rtg-spring).",
+      "plan": "Gaat naar tokens en .ds-componenten; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/apps/magnaat-sandbox.js",
-      "reden": "De Magnaat-proef van de chauffeurs-PDA (TRAVELOS-MIGRATIE.md par. 1d) is een rechtenpad: de sandbox vangt API-, opslag- en apparaatverkeer af voordat chauffeur.js draait, en zet het zichtbare keurmerk Magnaat Test (#rtgMagnaatTestMark) met een eigen <style>. Zonder haar zou een trainingskopie de echte API raken. Gaat naar een .ds-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De Magnaat-proef van de chauffeurs-PDA (TRAVELOS-MIGRATIE.md par. 1d) is een rechtenpad: de sandbox vangt API-, opslag- en apparaatverkeer af voordat chauffeur.js draait, en zet het zichtbare keurmerk Magnaat Test (#rtgMagnaatTestMark) met een eigen <style>. Zonder haar zou een trainingskopie de echte API raken.",
+      "plan": "Gaat naar een .ds-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     },
     {
       "pad": "public/shared/plaatsnadering.js",
-      "reden": "De aankomstpuls (zelf melden dat je in de buurt bent, test/plaatsnadering.e2e.js) is gedrag en geen versiering; zijn aanbod (.rtgnader) heeft een eigen <style>. Gaat naar het dialoog-component.",
+      "eigenaar": "@RahulRTG",
+      "reden": "De aankomstpuls (zelf melden dat je in de buurt bent, test/plaatsnadering.e2e.js) is gedrag en geen versiering; zijn aanbod (.rtgnader) heeft een eigen <style>.",
+      "plan": "Gaat naar het dialoog-component; daarna valt dit pad uit overgangsscripts en zakt de controle als het script weer stijl zet.",
       "vervalt": "2027-01-31"
     }
   ],

@@ -111,8 +111,81 @@
     --ds-schermhoogte: 100dvh;
     --ds-edge-hoogte: 68px;
     --ds-duur-kort: 160ms;
-    --ds-duur: 280ms;
+    --ds-duur-vol: 280ms;
+    --ds-duur: var(--ds-duur-vol);
     --ds-curve: cubic-bezier(.2, .7, .2, 1);
+  }
+
+  /* Nadruk (ONTWERPSYSTEEM.md par. 7, Luxury Without Complexity): wat een
+     deel van een scherm vooropzet. Beleving laat het merk ademen, balans
+     weegt beeld en gegevens, gereedschap zet de handeling voorop en
+     bevestiging maakt een uitkomst helder. Zonder attribuut volgt de nadruk
+     het schermtype (contract.json "nadrukStandaard"); data-ds-nadruk op het
+     scherm of op een deel ervan verlegt hem voor precies dat deel. Een thema
+     kan hem niet zetten: deze tokens staan niet in "themabaar". Eerst de
+     standaard per schermtype, daarna het attribuut, zodat het attribuut wint. */
+  :root {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-12);
+    --ds-nadruk-beeld: 4 / 3;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-vol);
+  }
+  :where(.ds-scherm[data-ds-schermtype="cover"]) {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-16);
+    --ds-nadruk-beeld: 4 / 5;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-vol);
+  }
+  :where(.ds-scherm[data-ds-schermtype="collectie"], .ds-scherm[data-ds-schermtype="detail"]) {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-12);
+    --ds-nadruk-beeld: 4 / 3;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-vol);
+  }
+  :where(.ds-scherm[data-ds-schermtype="taak"], .ds-scherm[data-ds-schermtype="gesprek"], .ds-scherm[data-ds-schermtype="canvas"]) {
+    --ds-nadruk-titel: var(--ds-maat-kop);
+    --ds-nadruk-lucht: var(--ds-ruimte-8);
+    --ds-nadruk-beeld: 16 / 9;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-kort);
+  }
+  :where(.ds-scherm[data-ds-schermtype="status"]) {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-12);
+    --ds-nadruk-beeld: 4 / 3;
+    --ds-nadruk-uitkomst: var(--ds-maat-titel);
+    --ds-duur: var(--ds-duur-vol);
+  }
+  [data-ds-nadruk="beleving"] {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-16);
+    --ds-nadruk-beeld: 4 / 5;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-vol);
+  }
+  [data-ds-nadruk="balans"] {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-12);
+    --ds-nadruk-beeld: 4 / 3;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-vol);
+  }
+  [data-ds-nadruk="gereedschap"] {
+    --ds-nadruk-titel: var(--ds-maat-kop);
+    --ds-nadruk-lucht: var(--ds-ruimte-8);
+    --ds-nadruk-beeld: 16 / 9;
+    --ds-nadruk-uitkomst: var(--ds-maat-kop);
+    --ds-duur: var(--ds-duur-kort);
+  }
+  [data-ds-nadruk="bevestiging"] {
+    --ds-nadruk-titel: var(--ds-maat-titel);
+    --ds-nadruk-lucht: var(--ds-ruimte-12);
+    --ds-nadruk-beeld: 4 / 3;
+    --ds-nadruk-uitkomst: var(--ds-maat-titel);
+    --ds-duur: var(--ds-duur-vol);
   }
 
   /* Het toegankelijkheidsprofiel van het lid (shared/basis.js zet de klassen
@@ -121,6 +194,6 @@
   html.rtg-rustig { --ds-metaal: var(--ds-inkt); --ds-cover-metaal: var(--ds-cover-inkt); }
 
   @media (prefers-reduced-motion: reduce) {
-    :root { --ds-duur-kort: 0ms; --ds-duur: 0ms; }
+    :root { --ds-duur-kort: 0ms; --ds-duur-vol: 0ms; --ds-duur: 0ms; }
   }
 }

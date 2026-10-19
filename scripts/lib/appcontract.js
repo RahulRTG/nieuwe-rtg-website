@@ -252,7 +252,7 @@ const CONTRACT = {
   }, voltooi('move', 'het scenario loopt /api/move/reis, /gevolg en /volgende, de drie routes die /apps/move.html zelf aanroept, over betaalde afspraken bij twee zaken en met een tweede lid dat niets van de reis ziet')),
   'link:navigatie': Object.assign({
     belofte: 'een lid zoekt een bestemming uit de eigen bronnen, krijgt een route van het eigen wegennet of een eerlijke weigering waar dat net er niet is, en meldt onderweg wat hij ziet op codenaam'
-  }, voltooi('navigatie', 'het scenario loopt /api/nav/status, /bestemmingen, /route, /kaart, /gebieden, /meld en /poi, de routes die /apps/navigatie.html zelf aanroept, met een tweede lid dat de melding alleen op codenaam ziet')),
+  }, voltooi('navigatie', 'het scenario loopt /api/nav/status, /bestemmingen, /route, /kaart, /gebieden, /gebied/kies, /gebied/weg, /gebied/pakket, /meld en /poi, de routes die /apps/navigatie.html zelf aanroept, eerst zonder en daarna met een NWB-raster en gebiedsindex langs de eigen importscripts, met een tweede lid dat melding en kaartkeuze niet ziet')),
   'link:ov': Object.assign({
     belofte: 'een lid koopt bij een vervoerder waarmee RTG een overeenkomst heeft een kaartje uit zijn wallet, toont het, en de controleur ziet het een keer als geldig; weigert de bank, dan is er geen kaartje'
   }, voltooi('ov', 'het scenario loopt /api/mob/kaart/aanbod, /koop, /mijn en /toon, de routes die /apps/ov.html zelf aanroept, met de overeenkomst langs het kantoor, de controleur van de vervoerder en de simulatiebank als rail')),

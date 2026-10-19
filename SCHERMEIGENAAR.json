@@ -1881,7 +1881,7 @@
       "capability": "leven.werkblad",
       "rol": "eigenaar",
       "doelgroep": "lid",
-      "doel": "Een lid stelt één samengestelde avond (eten, uitgaan, verblijf, vervoer) samen of laat Rahul die voor hem combineren."
+      "doel": "Een lid ziet zijn eigen lijn (fasen, rollen, afspraken en wat deze week speelt) uit zijn eigen apps; Leven leest alleen en bezit niets."
     },
     "apps/leverancier-aanvragen.html": {
       "capability": "handel.aanvragen",
@@ -2143,7 +2143,7 @@
       "capability": "woning.onderhoud",
       "rol": "eigenaar",
       "doelgroep": "lid",
-      "doel": "Een onderhoudsprobleem in huis melden en de status van eigen meldingen volgen tot een vakman is gepland en het is opgelost."
+      "doel": "Een onderhoudsprobleem in huis melden, de eigen meldingen volgen en een melding annuleren; een vakman zoeken loopt via de Mall."
     },
     "apps/onderneming.html": {
       "capability": "werk.onderneming",
@@ -2507,7 +2507,7 @@
       "capability": "verblijf.logeren-bij-leden",
       "rol": "eigenaar",
       "doelgroep": "lid",
-      "doel": "Zijn woning-gerelateerde diensten en producten bekijken en bestellen (huisregels, prijs, reviews van diensten aan huis)."
+      "doel": "Logeren bij leden: een huis van een ander lid vinden, aanvragen, in- en uitchecken en een review geven, of het eigen huis openzetten en aanvragen beoordelen."
     },
     "apps/thuisrust.html": {
       "rol": "alias",

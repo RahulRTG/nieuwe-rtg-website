@@ -219,7 +219,13 @@ function stempel(extra, opties) {
     /* De gemeten invoer (ARCHITECTOPDRACHT.md fase 2), alleen als de generator
        met scripts/lib/invoerspoor-preload.js draait; anders undefined, en dan
        valt het veld uit de JSON en is dit stempel ongewijzigd. */
-    invoer: global.__rtgInvoerspoor ? require('./invoerspoor').blok((opties && opties.uitvoer) || []) : undefined
+    invoer: global.__rtgInvoerspoor ? require('./invoerspoor').blok((opties && opties.uitvoer) || []) : undefined,
+    /* Draaide de simulatiebank mee, dan zegt het stempel dat, en welke afloop
+       de proef vroeg (scripts/lib/simulatieafloop.js). Zonder bank undefined:
+       het veld valt uit de JSON en het stempel is ongewijzigd. Een meting met
+       de bank aan en zonder gevraagde afloop is een muntworp, en dat staat er
+       dan ook (BEWIJSMACHINE.md par. 6a). */
+    simulatiebank: require('./simulatieafloop').stempelDeel()
   }, extra || {});
 }
 

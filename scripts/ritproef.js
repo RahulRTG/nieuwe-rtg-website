@@ -62,6 +62,23 @@ async function post(basis, pad, lijf, tok) {
 
 function schakel(nr, van, naar, wat, bekend) { return { nr, van, naar, wat, bekend: bekend || null }; }
 
+/* DE AFLOOP VAN DE BANK LIGT VAST (BEWIJSMACHINE.md par. 6a). Deze proef draait
+   met de simulatiebank aan (zie start hieronder), en die kiest de afloop van de
+   bijlading uit de sleutel 'rit:<ref>:autolaad' -- en de ref is per run anders.
+   Zonder dit was de uitslag een muntworp: op 19 oktober 2026 gaf de meetronde
+   zes schakels stuk op een 402 van de bank. Elke rit die deze proef betaalt,
+   vraagt daarom een ref waarvan de bank vooraf `wil` zegt
+   (scripts/lib/simulatieafloop.js). De weigering zelf is een eigen storing. */
+const simulatieafloop = require('./lib/simulatieafloop');
+async function ritVoor(P, M, lijf, wil) {
+  const k = await simulatieafloop.kiesRef(async () => {
+    const r = await P('/api/ride/request', lijf, M);
+    const ride = r.data && r.data.ride;
+    return { antwoord: r, codenaam: ride && ride.customerCodename, idem: ride ? 'rit:' + ride.ref + ':autolaad' : null };
+  }, wil || 'betaald');
+  return k.antwoord;
+}
+
 /* EEN OPEN SCHAKEL MET EEN UITGESCHREVEN REDEN IS EEN BEVINDING, GEEN DEFECT.
 
    Dezelfde vorm als MET_REDEN in scripts/tikken.js: een scherm dat buiten
@@ -142,7 +159,7 @@ async function loop(basis, uit) {
      hieronder meet juist het geval waarin dat NIET lukt. */
   const gevraagd = await stap(
     schakel(1, 'lid', 'vervoerder', 'vraagt een rit aan; hij verschijnt op het dispatchbord'),
-    () => P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING, passengers: 2 }, M),
+    () => ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING, passengers: 2 }, 'betaald'),
     async (r) => {
       const ride = r.data && r.data.ride;
       const oref = r.data && r.data.opdrachtRef;
@@ -240,12 +257,31 @@ async function storingen(basis, uit) {
 
   /* 1. LEVEREN VOOR ER BETAALD IS. De omgekeerde volgorde van de tafel, en
      daarom de eerste storing: hij hoort een grens te zijn en geen gewoonte. */
-  const r1 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data.ride;
+  const r1 = (await ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING }, 'betaald')).data.ride;
   const vroeg = await P('/api/supplier/ride/assign', { ref: r1.ref, staffId }, S);
   noteer('een rit toewijzen die nog niet betaald is',
     'weigert, en zegt dat er nog niet betaald is',
     vroeg.status === 409 && /betaald/i.test(String(vroeg.data && vroeg.data.error)),
     'status ' + vroeg.status + ': ' + (vroeg.data && vroeg.data.error));
+
+  /* 1b. DE BANK WEIGERT. Een rit waarvan de bank de bijlading weigert (een
+     vastgelegde afloop, geen toeval): het lid hoort in woorden waarom, er gaat
+     niets af, de rit blijft onbetaald en is dus niet toe te wijzen. Dit was op
+     19 oktober het toeval dat zes schakels liet vallen; hier is het een
+     belofte. */
+  const rw = await ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING }, 'geweigerd');
+  const rwRit = rw && rw.data && rw.data.ride;
+  const saldo = async () => { const s0 = await P('/api/pay/saldo', {}, M); return s0.status === 200 ? JSON.stringify(s0.data) : 'niet leesbaar (' + s0.status + ')'; };
+  const saldoVoor = rwRit ? await saldo() : null;
+  const weiger = rwRit ? await P('/api/ride/pay', { ref: rwRit.ref }, M) : { status: 0, data: {} };
+  const saldoNa = rwRit ? await saldo() : null;
+  const naWeiger = rwRit ? await P('/api/supplier/ride/assign', { ref: rwRit.ref, staffId }, S) : { status: 0, data: {} };
+  const woorden = String(weiger.data && weiger.data.error || '');
+  noteer('de bank weigert de bijlading van een ritbetaling',
+    'weigert in woorden, schrijft niets af, de rit blijft onbetaald en is niet toe te wijzen',
+    !!rwRit && weiger.status >= 400 && weiger.status < 500 && woorden.trim().length >= 8 && saldoVoor === saldoNa && naWeiger.status === 409,
+    rwRit ? 'betalen ' + weiger.status + ': ' + woorden + '; saldo ' + (saldoVoor === saldoNa ? 'ongewijzigd' : 'VERANDERD (' + saldoVoor + ' -> ' + saldoNa + ')') +
+      '; toewijzen daarna ' + naWeiger.status : 'geen rit gevonden waarvan de bank weigert');
 
   /* 2. DE KETEN TERUG. kern/vervoer.js laat RIT_KETEN alleen vooruit lopen. */
   await P('/api/ride/pay', { ref: r1.ref }, M);
@@ -272,7 +308,7 @@ async function storingen(basis, uit) {
 
   /* 5. TWEE KEER BETALEN. De tafel kent de dubbele tik bij het bestellen; hier
      is de dubbeltik bij het BETALEN het geval dat geld kost. */
-  const r2 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data.ride;
+  const r2 = (await ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING }, 'betaald')).data.ride;
   const eerste = await P('/api/ride/pay', { ref: r2.ref }, M);
   const tweede = await P('/api/ride/pay', { ref: r2.ref }, M);
   noteer('twee keer betalen voor dezelfde rit',
@@ -314,7 +350,7 @@ async function storingen(basis, uit) {
   /* 8. DE VERTALING VAN DE STANDEN. `aan-boord` heet in de opdrachtketen
      `ingestapt`, en `rijdt` betekent in de twee werelden iets anders. Deze
      storing bewaakt dat de brug vertaalt in plaats van overtypt. */
-  const r8 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data;
+  const r8 = (await ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING }, 'betaald')).data;
   await P('/api/ride/pay', { ref: r8.ride.ref }, M);
   await P('/api/supplier/ride/assign', { ref: r8.ride.ref, staffId }, S);
   for (const stand of ['onderweg', 'aangekomen', 'aan-boord']) await P('/api/supplier/ride/status', { ref: r8.ride.ref, status: stand }, S);
@@ -355,7 +391,7 @@ async function storingen(basis, uit) {
   const pers = await P('/api/supplier/login',
     { code: VERVOERDER, staffId: eigen.data && eigen.data.staff && eigen.data.staff.id, pin: eigen.data && eigen.data.pin });
   const C = pers.data && pers.data.token;
-  const eigenRit = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data;
+  const eigenRit = (await ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING }, 'betaald')).data;
   await P('/api/ride/pay', { ref: eigenRit.ride.ref }, M);
   const zelf = C ? await P('/api/supplier/ride/assign', { ref: eigenRit.ride.ref, self: true }, C) : { status: 0 };
   const eigenBord = C ? await P('/api/supplier/mob/dispatch', {}, C) : { data: {} };
@@ -375,15 +411,22 @@ async function meet() {
   const uit = {
     stempel: huisStempel(),
     uitleg: 'Een ritketen van aanvraag tot afronding, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Tweede keten naast scripts/tafelproef.js, in een ander domein -- zie MAATSTAF.md par. 7.',
-    grens: 'Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de demo-rail: dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.',
+    grens: 'Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de simulatiebank met een vastgelegde afloop per rit (betaald op het gelukspad, geweigerd in een eigen storing): dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.',
     schakels: [], storingen: [], rit: null, wereld: null
   };
+  /* De simulatiebank staat met opzet AAN, en de afloop ligt per rit vast
+     (ritVoor hierboven): dan is de proef in elke omgeving hetzelfde experiment,
+     ook binnen een meetronde die de bank aanzet, en is de weigering te meten. */
+  simulatieafloop.bankAan();
   const srv = await start({ naam: 'ritproef', gereed: 'ready',
-    env: { NODE_ENV: 'test', RTG_DEMO: '1', DEMO_SUPPLIER: VERVOERDER, OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+    env: { NODE_ENV: 'test', RTG_DEMO: '1', DEMO_SUPPLIER: VERVOERDER, OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_SIMULATIEBANK: '1' } });
   try {
     await loop(srv.basis, uit);
     await storingen(srv.basis, uit);
   } finally { srv.klaar(); }
+  /* Het stempel is aan het begin genomen; wat de proef bij de bank vroeg, weet
+     hij pas nu. */
+  uit.stempel.simulatiebank = simulatieafloop.stempelDeel();
 
   const t = { schakels: uit.schakels.length, gesloten: 0, open: 0, openBekend: 0, stuk: 0,
     storingen: uit.storingen.length, gehouden: 0, gebroken: 0 };

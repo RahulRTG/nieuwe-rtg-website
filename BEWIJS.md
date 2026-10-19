@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2910 bestanden en 19874 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2911 bestanden en 19879 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2910 |
-| losse beweringen (`test(...)`) | 19874 |
+| toetsbestanden | 2911 |
+| losse beweringen (`test(...)`) | 19879 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 90 |
+| niets van beide | 91 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2563 bestanden, 19289 beweringen.
+2564 bestanden, 19294 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2022,6 +2022,7 @@ toets omvalt.
 | `signing-repetitie.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `simulatie-terugbetaling.test.js` | 6 | -- | De simulatiebank kan terugbetalen en opzoeken (server/betaal/naslag.js, server/betaal/synthetisch.js). Gevonden door LivingOS-A bij de asset-koop: naslag.js kende de aanbieder 'simulatie' niet. |
 | `simulatie-uitbetaling.test.js` | 7 | -- | De simulatieve uitbetaalrail: terugstorten naar het eigen IBAN, beproefbaar zonder echt geld (server/betaal/synthetisch.js `uitbetaal`, server/betaal/uitbetaling.js, kern/betaalopdracht/inzending.js). Gevraagd door... |
+| `simulatieafloop.test.js` | 5 | -- | EEN PROEF DIE ONDER DE SIMULATIEBANK BETAALT, LEGT ZIJN AFLOOP VAST. BEWIJSMACHINE.md par. |
 | `simulatiebank.test.js` | 7 | gezakt op `liegpoort /api/` | DE SIMULATIEBANK, EN DE POORT DIE HIJ NIET AANRAAKT. MAGNAATLAB.md par. |
 | `simulatiebrug-productiepoort.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `skipwacht.test.js` | 2 | geen module gevonden | EEN OVERGESLAGEN SCHERMTOETS IS ROOD. Afspraak van Rahul, 11 augustus 2026. |

@@ -104,6 +104,7 @@ const SCENARIOS = {
   'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
   'neigingen.js': require('./lib/voltooi/neigingen'),
   'onderneming.js': require('./lib/voltooi/onderneming'),
+  'office.js': require('./lib/voltooi/office'),
   'pay.js': require('./lib/voltooi/pay'),
   'post.js': require('./lib/voltooi/post'),
   'projectroom.js': require('./lib/voltooi/projectroom'),

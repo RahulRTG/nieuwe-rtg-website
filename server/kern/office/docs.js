@@ -3,6 +3,7 @@
    verwijderen door de eigenaar. */
 
 const { poort } = require('./uitgangspoort');
+const herhaling = require('./herhaling');
 const { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, SJABLONEN } = require('./basis');
 
 module.exports = ({ save, schoon, sseToCustomer }, basis) => {
@@ -58,19 +59,11 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     } catch (e) { return ''; }
   }
 
-  /* ---- een document markeren: het staat dan bovenaan in de drive ---- */
-  function ster(key, did, aan) {
-    const d = docMet(did);
-    if (!d) return { status: 404, error: 'Document niet gevonden.' };
-    if (d.key !== key) return { status: 403, error: 'Alleen de eigenaar markeert een document.' };
-    d.ster = aan !== false;
-    save();
-    return { status: 200, ok: true, ster: d.ster };
-  }
-
   /* ---- een nieuw document (leeg of vanuit een sjabloon) ---- */
   function maak(key, data, kring) {
     const alle = lijsten();
+    const idem = schoon(data.idem, 80) || null, eerder = herhaling.gemaakt(alle, key, idem); // ./herhaling.js
+    if (eerder) return eerder;
     const sjab = SJABLONEN[data.sjabloon] || null;
     const soort = sjab ? sjab.soort : (SOORTEN.includes(data.soort) ? data.soort : 'tekst');
     if (Object.values(alle).filter(d => d.key === key).length >= MAX_DOCS)
@@ -91,6 +84,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
       beheer: { classificatie: 'intern', bewaartermijn: '7jaar', herzienOp: '', tags: [] },
       gemaakt: nu(), gewijzigd: nu(), laatstDoor: naamVan(key) };
     if (kring) { d.kring = kring; d.kringDeel = null; }
+    if (idem) d.idem = idem;
     schrijfAudit(d, key, 'aangemaakt', { naar: 'concept' });
     alle[d.id] = d;
     save();
@@ -126,6 +120,8 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
        nieuwere versie heen schrijven. Oude clients zonder dit veld blijven
        werken; de nieuwe Office-client stuurt de laatst geopende tijd mee. */
     if (data.verwachtGewijzigd && String(data.verwachtGewijzigd) !== String(d.gewijzigd)) {
+      if (herhaling.staatEr(d, data, schoonInhoud, t => schoon(t, MAX_TITEL))) // ./herhaling.js
+        return { status: 200, ok: true, gewijzigd: d.gewijzigd, fase: faseVan(d), herhaald: true };
       return { status: 409, error: 'Dit document is intussen door iemand anders gewijzigd.',
         code: 'VERSIECONFLICT', huidig: d.gewijzigd, laatstDoor: d.laatstDoor || naamVan(d.key) };
     }
@@ -181,6 +177,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     return { status: 200, ok: true };
   }
 
+  // markeren (officeSter) staat in ./ster.js
   return { officeMijn: mijn, officeMaak: maak, officeOpen: open, officeBewaar: bewaar,
-    officeWeg: weg, officeSter: ster };
+    officeWeg: weg };
 };

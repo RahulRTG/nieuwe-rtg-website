@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5555<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27990<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->7958<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5555<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->27991<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->7959<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -159,7 +159,7 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
 per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->449<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->1028<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1250<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->142<!--/getal--> voorvoegsels.
+<!--getal:schermroutes.paden-->1041<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1266<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->142<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -200,7 +200,7 @@ geldt:
    `alleRoutes` (<!--getal:routebron.routerRoutes-->5531<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
-Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->1028<!--/getal--> exacte paden zijn tegen
+Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->1041<!--/getal--> exacte paden zijn tegen
 <!--getal:routebron.routerRoutes-->5531<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)

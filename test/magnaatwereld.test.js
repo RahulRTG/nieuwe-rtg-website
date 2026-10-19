@@ -104,6 +104,13 @@ test('onder de 18+-grens is elke dienst speelbaar maar worden xp, niveau en repu
   assert.equal(sJong.xp, 0, 'er wordt geen xp bewaard');
   assert.equal(sJong.niveau, 1);
   assert.equal(sJong.reputatie, 50, 'en geen reputatie');
+  /* 19 oktober 2026: ook het virtuele budget groeide onder de 18 door. Het
+     wordt nergens uitgegeven; het is een opgebouwde stand, dus progressie. */
+  assert.equal(sJong.virtueelBudget, 250000, 'het budget groeit niet onder de grens');
+  for (const d of w.overzicht('user-jong').speler.dienst.dossiers) voltooi(w, 'user-jong', d.functieId);
+  const naDienst = w.overzicht('user-jong').speler;
+  assert.equal(naDienst.dienstenVoltooid, 0, 'een volle dienst telt niet als bewaarde prestatie');
+  assert.equal(naDienst.virtueelBudget, 250000, 'ook de dienstbonus bouwt geen budget op');
   const oud = voltooi(w, 'user-volwassen', c.id);
   assert.ok(w.overzicht('user-volwassen').speler.xp >= oud.taak.punten, 'een gekeurde volwassene bouwt wel op');
   /* Zonder bedrading geen progressie: de grens faalt dicht. */

@@ -15,7 +15,7 @@ const VERSIE = 5;
 const DAG = 24 * 60 * 60 * 1000;
 const DIENST_BONUS = { xp: 300, virtueelBudget: 25000, reputatie: 3 };
 /* De melding van de 18+-grens, in de woorden van Magnaat: wat er niet gebeurt en wat eraan te doen is. */
-const GEEN_OPBOUW = 'Xp, niveau en reputatie bouw je pas op als RTG je identiteitsbewijs heeft gezien en je 18 of ouder bent; het dossier zelf telt gewoon.';
+const GEEN_OPBOUW = 'Xp, niveau, reputatie en virtueel budget bouw je pas op als RTG je identiteitsbewijs heeft gezien en je 18 of ouder bent; het dossier zelf telt gewoon.';
 const { nu: klokNu } = require('../lib/klok');
 
 /* De eerste volledige verticale werkroute. Dit is bewust geen quiz: de speler
@@ -577,9 +577,12 @@ module.exports = ({
     if (!klaar || dienst.bonusOntvangen) return false;
     dienst.bonusOntvangen = true;
     dienst.afgerond = nu();
-    bouwOp(key, p, DIENST_BONUS.xp, DIENST_BONUS.reputatie);
-    p.virtueelBudget += DIENST_BONUS.virtueelBudget;
-    p.dienstenVoltooid = (p.dienstenVoltooid || 0) + 1;
+    /* Budget en het aantal diensten zijn ook een bewaarde stand: alleen voor
+       wie progressieMag haalt (19 oktober 2026; het budget groeide eerder door). */
+    if (bouwOp(key, p, DIENST_BONUS.xp, DIENST_BONUS.reputatie)) {
+      p.virtueelBudget += DIENST_BONUS.virtueelBudget;
+      p.dienstenVoltooid = (p.dienstenVoltooid || 0) + 1;
+    }
     log('dienst-voltooid', key, dienst.datum + ' · bonus ' + DIENST_BONUS.xp + ' XP');
     return true;
   }
@@ -703,15 +706,17 @@ module.exports = ({
   function rondTaakAf(key, p, taak) {
     taak.status = 'klaar';
     taak.voltooid = nu();
-    if (!bouwOp(key, p, taak.punten, taak.punten >= 250 ? 2 : 1)) taak.feedback += ' ' + GEEN_OPBOUW;
-    p.virtueelBudget += taak.punten * 25;
+    if (bouwOp(key, p, taak.punten, taak.punten >= 250 ? 2 : 1)) p.virtueelBudget += taak.punten * 25;
+    else taak.feedback += ' ' + GEEN_OPBOUW;
     taak.economischEffect = economie.registreerWerk(key, taak);
     taak.feedback += ' ' + taak.economischEffect.uitleg;
     log('taak-voltooid', key, taak.functieId + ' · ' + taak.punten + ' XP');
     registreerUitkomst(key, taak);
     if (taak.dagdienst) {
       const dienstBonus = werkDienstBij(key, p, taak);
-      if (dienstBonus) taak.feedback += ' Dagdienst voltooid: ' + DIENST_BONUS.xp + ' bonus-XP en € ' + (DIENST_BONUS.virtueelBudget / 100) + ' virtueel kapitaal.';
+      if (dienstBonus) taak.feedback += magOpbouwen(key)
+        ? ' Dagdienst voltooid: ' + DIENST_BONUS.xp + ' bonus-XP en € ' + (DIENST_BONUS.virtueelBudget / 100) + ' virtueel kapitaal.'
+        : ' Dagdienst voltooid.';
     }
   }
 
@@ -987,8 +992,8 @@ module.exports = ({
     if (!claim.nieuw) return r;
     const p = speler(key), xp = claim.score * 3, virtueelBudget = claim.score * 250;
     const opgebouwd = bouwOp(key, p, xp, claim.score >= 75 ? 2 : 0);
-    p.virtueelBudget += virtueelBudget;
-    r.beloning = opgebouwd ? { xp, virtueelBudget, reputatie: claim.score >= 75 ? 2 : 0 } : { xp: 0, virtueelBudget, reputatie: 0, reden: GEEN_OPBOUW };
+    if (opgebouwd) p.virtueelBudget += virtueelBudget;
+    r.beloning = opgebouwd ? { xp, virtueelBudget, reputatie: claim.score >= 75 ? 2 : 0 } : { xp: 0, virtueelBudget: 0, reputatie: 0, reden: GEEN_OPBOUW };
     r.speler = publiekeSpeler(p);
     log('partnertraining-voltooid', key, claim.bedrijf.naam + ' · ' + claim.score + '%');
     save();

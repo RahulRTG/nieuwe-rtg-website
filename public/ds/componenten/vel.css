@@ -1,0 +1,57 @@
+/* Vel: een blad dat OP een canvas ligt (mockup Parijs, maar dan met meer
+   dan een objectkaart): het zoekvak bovenaan, het routepaneel onderaan, een
+   poort in het midden. Het canvas blijft eronder zichtbaar en bedienbaar;
+   een vel is een systeemlaag, dus herkenbaar rond, en scrolt zelf als het
+   lang wordt.
+   Een rij in een vel is een rustige knop (een zoektreffer, een vertrekpunt,
+   een kaartgebied). Een gebarenvlak handelt knijpen en slepen zelf af, dus
+   de browser zoomt of scrolt daar niet mee. */
+@layer rtg.component {
+  .ds-vel {
+    position: absolute;
+    z-index: 2;
+    inset-inline: var(--ds-ruimte-3);
+    inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6));
+    display: grid;
+    gap: var(--ds-ruimte-3);
+    max-block-size: min(45%, 30rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  /* Midden: een vel dat vraagt (een poort) en de onderrand vrijlaat voor
+     een systeemvraag van het toestel, zoals de locatievraag. */
+  .ds-vel--midden { inset-block: 0; margin-block: auto; block-size: fit-content; }
+  .ds-vel--boven { inset-block: 64px auto; gap: var(--ds-ruimte-2); max-block-size: calc(100% - 64px - var(--ds-edge-hoogte) - var(--ds-ruimte-8)); }
+  .ds-vel__kop { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); }
+  .ds-vel__lijst { display: grid; margin: 0; padding: 0; list-style: none; }
+  .ds-vel__rij {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ds-ruimte-2) var(--ds-ruimte-3);
+    inline-size: 100%;
+    min-block-size: var(--ds-doel);
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-1);
+    border: 0;
+    border-block-end: 1px solid var(--ds-lijnkleur);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--ds-maat-klein);
+    text-align: start;
+  }
+  .ds-vel__rij:is(button) { cursor: pointer; }
+  .ds-vel__rij[aria-selected="true"] { background: var(--ds-oppervlak); border-inline-start: 2px solid var(--ds-accent); }
+  .ds-vel__naam { flex: 1 1 10rem; min-inline-size: 0; display: grid; }
+  .ds-vel__naam small { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); }
+  .ds-vel__stip { flex: none; inline-size: 12px; block-size: 12px; margin-inline-end: var(--ds-ruimte-1); }
+  .ds-gebaren { touch-action: none; }
+  @container ds (min-width: 48rem) {
+    .ds-vel { inset-inline: var(--ds-ruimte-4) auto; inline-size: 26rem; max-block-size: min(55%, 36rem); }
+  }
+}

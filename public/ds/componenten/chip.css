@@ -15,7 +15,7 @@
     font: 500 var(--ds-maat-meta) / 1 var(--ds-letter-tekst);
     cursor: pointer;
   }
-  .ds-chip[aria-pressed="true"], .ds-chip[aria-selected="true"], .ds-chip[aria-current="page"] { background: var(--ds-inkt); border-color: var(--ds-inkt); color: var(--ds-grond); }
+  .ds-chip[aria-pressed="true"], .ds-chip[aria-selected="true"], .ds-chip[aria-current="page"], .ds-chip[aria-current="step"] { background: var(--ds-inkt); border-color: var(--ds-inkt); color: var(--ds-grond); }
   .ds-tabs { display: flex; gap: var(--ds-ruimte-6); border-block-end: 1px solid var(--ds-lijnkleur); }
   .ds-tab {
     padding-block: var(--ds-ruimte-3);

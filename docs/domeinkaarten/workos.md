@@ -23,6 +23,30 @@ De kaart per app staat in `docs/domeinkaarten/workos/<app>.md` en volgt
 
 De professionals rond wonen staan in `docs/domeinkaarten/professionals-wonen.md`.
 
+**Volledige werkzaamheid (familie):** een ondernemer, een medewerker en een
+lerende kunnen elk hun werk van begin tot eind in RTG doen:
+- de ondernemer van idee tot exploitatie;
+- de medewerker van aanname tot loonstrook en loopbaanregel;
+- de lerende van les tot bewezen doel.
+
+Elke stap heeft één eigenaar. De keten in par. 5a loopt rond in een proef, en
+bij elke app staan alle acht bewijzen centraal op BEWEZEN.
+
+```js
+// FAMILIES-entry, voorstel (scripts/lib/appcontract.js kent nog geen FAMILIES; daar is niets veranderd)
+familie: {
+  naam: 'WorkOS',
+  apps: ['link:werkos', 'os:werk', 'link:office', 'link:rtmail', 'link:browser', 'link:sitemaker',
+    'link:onderneming', 'link:horeca', 'link:loonstrook', 'link:loopbaan', 'link:vertegenwoordiging',
+    'link:school', 'link:magnaat', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:partnernetwerk'],
+  belofte: 'werk is een projectie over bestaande domeinobjecten; elke stap één eigenaar, geen overname van gegevens',
+  ketens: ['aanname-tot-loopbaanregel (par. 5a)', 'post-tot-taak (RT Mail -> Werk OS postbrug)',
+    'mail-tot-project (RT Mail -> RTG One -> Project Room -> Decision Room)', 'site-tot-klus (Sitemaker -> Browser -> werklijst zaak)',
+    'idee-tot-vestiging (Onderneming -> Concern -> Horeca)'],
+  eersteWerk: 'BEVOEGD-ronde, par. 3a'
+}
+```
+
 ## 1. De zeventien apps
 
 | App | Functie | Kaart | Ingang | Doelgroep | Eigenaar (SCHERMEIGENAAR) |
@@ -120,6 +144,36 @@ Wat dit zegt:
 Dat zijn de twee grootste gaten in bewezen betrouwbaarheid, en ze staan in elk
 eindcontract (dimensie 8).
 
+## 3a. Eerste werk: de BEVOEGD-ronde voor zestien apps
+
+Dit is het eerste werk van de familie, vóór elke verdieping. Bevoegd staat bij
+16 van de 17 apps op NIET_GETEST. De reden verschilt per app. BEVOEGD.json zegt
+het zelf: scripts/bevoegdronde.js stelt het oordeel samen uit IDOR.json (zelfde
+rol, ander lid) en ROLPROEF.json (verkeerde rol op een schrijfroute). Er zijn
+vier oorzaken, en elke oorzaak vraagt ander werk. Dit is de volgorde: de grootste
+risico's en het goedkoopste werk eerst.
+
+| Volgorde | App | Waarom NIET_GETEST (BEVOEGD.json) | Wat er moet gebeuren | Instrument | Kosten |
+|---|---|---|---|---|---|
+| 1 | loonstrook | "het scherm roept zelf geen route aan" | de schermroutes (`/api/member/loonstroken`, `/dossier`, `/identiteit/verzoeken`) letterlijk registreren (`npm run schermroutes`); daarna ze in IDOR meten met twee medewerkers | schermroutes, idorronde, bevoegdronde | klein |
+| 2 | onderneming | `/api/onderneming/rechtsvormen` staat niet in IDOR | IDOR-fixture voor ondernemingen, contracten en werkruimte. Het contractenlek van 19 oktober zat precies hier | idorronde, rolproef | middel |
+| 3 | office | `/api/supplier/ai` staat niet in IDOR; teamdrive zonder rolproef | IDOR voor de vijf kantoorpakket-ingangen; ROLPROEF personeel tegenover manager op `weg` (gerepareerd 697f1b5, nog niet gemeten) | idorronde, rolproef | middel |
+| 4 | horeca | 7 van 7 niet gemeten; "de registers kennen geen rol" voor /api/supplier/horeca* | rollen per horecaroute in het register zetten (manager of personeel), daarna ROLPROEF. De HACCP-grens en de inkoop zijn gerepareerd (4002318, 605ab79) | rolproef, bevoegdronde | middel |
+| 5 | werkos | 8 van 8: /api/bedrijf/* onbereikbaar of niet in IDOR | IDOR met twee werkruimtes en twee leden; ROLPROEF met de 14 rollen uit bedrijf/rollen.js | idorronde, rolproef | groot |
+| 6 | rtmail | 35 van 63 onbereikbaar | IDOR-fixture voor alias, team en afwezigheid | idorronde | middel |
+| 7 | loopbaan | 7 van 8 onbereikbaar | IDOR met een tweede lid en een tweede zaak, ook op bevestigen (gerepareerd 73ae8c6) | idorronde, rolproef | klein |
+| 8 | school | 4 van 5 onbereikbaar | IDOR op leerstof, examen en bijles; let op de gezinsprofielen (kruisproef gezin A/B) | idorronde, bevoegdronde (gezin) | middel |
+| 9 | vertegenwoordiging | "het scherm roept zelf geen route aan" | schermroutes letterlijk registreren; dan IDOR op machtiging (cliënt, vertegenwoordiger, derde) | schermroutes, idorronde | klein |
+| 10 | rtgone, decisionroom, projectroom | "geen kruisproef voor de persona kantoor" | de bevoegdronde een kantoorpersona geven (twee personeelsaccounts, een zonder rol). Dat is werk aan het INSTRUMENT, niet aan de apps | scripts/bevoegdronde.js | middel |
+| 11 | magnaat | 20 van 90 onbereikbaar | IDOR op economie en teamkamer | idorronde | middel |
+| 12 | partnernetwerk, browser | "het scherm roept zelf geen route aan" | schermroutes registreren; partnernetwerk is alleen-lezen, browser schrijft alleen `/bericht` | schermroutes, idorronde | klein |
+| 13 | os:werk | "geen eigen adres" | meten via de ledenapp met de via uit CONTRACT (Rahul, "open werk"); rollen personeel, zaak, kantoor en werkruimte tegenover een lid zonder rol | bevoegdronde met via | middel |
+
+Sitemaker is als enige BEWEZEN en blijft de maat.
+
+Wat dit werk NIET is: een vlag in een poort, of een bewijs op GEEN_FIXTURE
+zetten om groen te krijgen. Een app wordt pas BEWEZEN als de ronde hem meet.
+
 ## 4. Dwarsthema's van de bijstelling
 
 De eigenaar vroeg WorkOS uit te breiden met de thema's hieronder. Werk blijft
@@ -166,6 +220,52 @@ geleverd kan worden. Dat voorkomt dubbele logica. WorkOS bouwt hier niets; WorkO
 | Verbouwing (voorbeeld van de eigenaar) | Wonen (woningdossier), genre bouw (uitvoering), Project Room (samenwerking), Geld (financiële gevolgen), RTDocs (documenten), stuurlaag (toestemming en uitvoering) | Project Room is de samenwerkingsruimte en bezit geen gegevens van de anderen | per stuk, door het lid |
 
 Twijfel over het eigenaarschap staat bij de eigenaar onder par. 6.
+
+## 5a. De familiebrede keten: van aanname tot loopbaanregel
+
+Dit is één keten door zes apps, van de eerste dag tot het bewijs op iemands
+naam. Elke stap heeft een eigenaar, en geen stap neemt gegevens van een andere
+over. Werk is ook hier een projectie (ARBEID.md par. 2). De waarheid over de
+werkrelatie is het dienstverband bij de entiteit (employment, ARBEID.md
+par. 7a).
+
+| Stap | Wat er gebeurt | Eigenaar (app / capability) | Route of kern | Vorm naar de volgende stap | Nu gemeten door |
+|---|---|---|---|---|---|
+| 1. Aanname | de zaak neemt een sollicitant aan; die neemt met een eigen account zijn plek in | werving (Team Room, zaak.teamroom) | kern/werk.js, routes/werving.js | gebeurtenis "aangenomen" | scripts/adamproef.js schakel 10, 13 en 14 (gesloten) |
+| 2. Dienstverband | de aanname wordt een dienstverband bij de entiteit, met contract | Concern (werk.concern) | kern/concern/aanname.js, employment.js | verwijzing employment-id | adamproef schakel 15 en 16 (gesloten) |
+| 3. Rooster | de zaak plant diensten; het voorstel toetst rust en de publicatietermijn | Team Room / Vrijheid | /api/supplier/rooster/voorstel en /beslis (kern/agent.js), kern/vrijheid/ | projectie "ingeroosterd" | **niet in een keten gemeten**; roosterVoorstel toetst geen rust (par. 9) |
+| 4. Dienst | de medewerker klokt in en uit | Team Room (personeel) | /api/staff/clock (routes/staff/dienst-klok.js) | de klok als bron voor de uren | test/loonstrook-portaal.test.js zet diensten zoals de klok ze schrijft, maar via db.json en niet via de route |
+| 5. Loon | de loonrun leest contract, dienstverband en klokuren; vier ogen; definitief | Payroll OS (zaak/kantoor) | kern/payroll/run.js, motor.js | definitieve run | adamproef schakel 17; test/loonstrook-portaal.test.js |
+| 6. Strook | de medewerker leest zijn strook met uitleg en dossier, ook na uit dienst (7 jaar) | Loonstrook (loon.strook) | /api/member/loonstroken, /dossier | projectie op het eigen account | voltooiproef loonstrook (lokaal gesloten); test/loonstrook-oudmedewerker.test.js |
+| 7. Loopbaanregel | het lid zet "werkte bij X, functie Y, van … tot …" in zijn ledger; de zaak bevestigt op verzoek | Loopbaan (loopbaan.ledger) | /api/carriere/ledger/zet, /api/supplier/carriere/bevestig; leest /api/concern/mijnwerk | verwijzing naar het dienstverband (geen kopie) | **niet in een keten gemeten**; de zaak kan zelf geen feit voorstellen (CARRIERE.md par. 6d) |
+
+**Het proefinstrument (voorstel).** Verleng scripts/adamproef.js met de
+ontbrekende schakels: rooster, dienst via de echte klokroute, strook en
+loopbaanregel. Of maak een eigen `scripts/werkketenproef.js` naar het model van
+scripts/ritproef.js en hang die aan de ketenlijst van scripts/ondernemerbewijs.js
+(CIVILIS par. 5F). Elke schakel krijgt een uitslag `gesloten` of `open`, net als
+de Adamproef.
+
+**De storingen die de proef moet doorstaan:**
+
+| # | Storing | Wat de mens moet zien | Wat er bewaard blijft |
+|---|---|---|---|
+| 1 | Een dienst geklokt zonder rooster | de dienst telt voor het loon; het rooster toont "niet ingeroosterd" | de klokregel |
+| 2 | Een rooster dat de rust breekt (11 uur na een dienst) | waarschuwing met de regel, en een mens beslist (te weinig rust blijft met opzet een waarschuwing, ARBEID.md par. 4) | het voorstel en het besluit |
+| 3 | Loon zonder dienstverband | bevinding `loon_zonder_dienstverband` (zichtbaar, niet blokkerend) | de run en de bevinding |
+| 4 | Medewerker gaat uit dienst tijdens de periode | de strook komt toch bij hem, en blijft 7 jaar leesbaar | de strook |
+| 5 | Crash tussen run definitief en de melding aan de medewerker | na herstart ziet hij de strook precies één keer | de run |
+| 6 | Een andere zaak probeert de loopbaanregel te bevestigen | 403 of 404; het ledger blijft gelijk | het ledger |
+| 7 | Een derde bevestigt herhaald met andere tekst | na één actieve bevestiging 409 (gerepareerd 73ae8c6) | het ledger, ongeknipt |
+| 8 | Tenant-storing: zaak B leest rooster, klok of strook van zaak A | 404 | — |
+
+**Wat er nu ontbreekt om de keten rond te meten:**
+1. Rooster → dienst: geen schakel en geen rusttoets in het voorstel.
+2. Dienst → loon via de echte klokroute en niet via db.json.
+3. Strook → loopbaanregel: geen voorstel vanuit het dienstverband.
+
+Punt 3 is een eigenaarsbesluit (CARRIERE.md par. 6d). Het lid zet zelf; RTG
+stelt hooguit voor, en een voorstel is geen regel.
 
 ## 6. Vraagt besluit (familiebreed)
 
@@ -300,7 +400,7 @@ appwerkt/workos:
 | projectroom | het scherm belooft "op volgorde van afhankelijkheid", maar een taak heeft geen afhankelijkheidsveld |
 | partnernetwerk | `kern/partnernetwerk.js` bepaalt "vandaag" in UTC. Het SCHERMEIGENAAR-doel wijkt af van de code |
 
-## 11. Te controleren
+## 10. Te controleren
 
 Een regel die alleen uit een zoeksamenvatting komt, is geen feit. Hij draagt in
 elke kaart het label **te controleren** tot een mens de primaire bron heeft
@@ -318,7 +418,7 @@ soort wordt nooit als code afgedwongen.
 | Toeslagen in de cao Horeca | niet teruggevonden | horeca.md |
 | Alle marktprijzen in b. | zoeksamenvattingen, geen pagina zelf geopend | "(via zoektool, live te controleren)" |
 
-## 10. Wat deze kaart niet doet
+## 11. Wat deze kaart niet doet
 
 - Hij bouwt niets.
 - Hij voegt geen regels toe aan registers en zet niets in NORM.json.

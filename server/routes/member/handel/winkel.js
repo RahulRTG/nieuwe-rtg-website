@@ -37,7 +37,7 @@ app.post('/api/groothandel/markt', auth, (req, res) => {
 app.post('/api/groothandel/bestel', auth, (req, res) => {
   if (gegevensStop(req, res, 'bestelling')) return;
   const koper = { soort: 'lid', id: req.session.key, naam: liveCodename(req.session) };
-  const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koper, req.body.regels, { bezorgen: req.body.bezorgen !== false });
+  const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koper, req.body.regels, { bezorgen: req.body.bezorgen !== false, idem: req.body.idem });
   if (r.error) return res.status(r.status).json({ error: r.error });
   openLijn(findSupplier(req.body.groothandelCode), req);
   res.json({ ok: true, order: r.order });

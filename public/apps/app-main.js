@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'ab257b91';
+var RTG_BOUW = '330b2d45';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3502,7 +3502,9 @@ var RTG_BOUW = 'ab257b91';
       const regels = [];
       el.querySelectorAll('.js-boq[data-code="' + b.dataset.code + '"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
       if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
-      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+      // een sleutel per samengestelde bestelling: een tweede tik of een herhaling is dezelfde bestelling
+      const vorm = JSON.stringify(regels); if (b.dataset.idemVorm !== vorm) { b.dataset.idem = RTGId('boodschappen'); b.dataset.idemVorm = vorm; }
+      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels, idem: b.dataset.idem }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
     }));
   }
   async function laadBzMijn(){

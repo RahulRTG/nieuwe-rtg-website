@@ -20,5 +20,7 @@
   }
   .ds-scherm img { display: block; max-inline-size: 100%; }
   .ds-scherm :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
-  .ds-scherm [hidden] { display: none; }
+  /* De enige !important van het systeem: in de vroegste laag wint hij van elk
+     component, zodat hidden altijd verbergt (scripts/ontwerpsysteem.js regel 2). */
+  .ds-scherm [hidden] { display: none !important; }
 }

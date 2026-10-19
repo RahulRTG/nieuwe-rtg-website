@@ -44,6 +44,13 @@ test('de voorbeeldpagina toont elk schermtype uit het contract, alleen met het D
     assert.ok(k.breed <= k.venster, contract.schermtypen[i] + ' loopt horizontaal over in zijn kader');
     assert.ok(k.edgeOnder !== null && k.edgeOnder >= 0 && k.edgeOnder < 40, contract.schermtypen[i] + ': de Edge staat niet onderaan het kader');
   });
+  /* hidden verbergt ook een component met een eigen display (reset.css). */
+  const verborgen = await page.evaluate(() => ['ds-kaart', 'ds-knop', 'ds-lijst', 'ds-chips', 'ds-status'].map(k => {
+    const el = document.createElement('div'); el.className = k; el.hidden = true;
+    document.querySelector('.ds-scherm').appendChild(el);
+    const d = getComputedStyle(el).display; el.remove(); return k + ':' + d;
+  }));
+  assert.deepEqual(verborgen.filter(v => !v.endsWith(':none')), [], 'hidden verliest van een component');
   if (process.env.RTG_DS_BEELDEN) {
     fs.mkdirSync(process.env.RTG_DS_BEELDEN, { recursive: true });
     await page.screenshot({ path: path.join(process.env.RTG_DS_BEELDEN, 'voorbeeld.png'), fullPage: true });

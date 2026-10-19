@@ -95,6 +95,12 @@ test('contract: !important', () => {
   assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-knop{color:var(--ds-inkt)!important}}\n')), /!important/);
 });
 
+test('contract: de ene !important van reset.css is de enige', () => {
+  assert.match(fs.readFileSync(path.join(DS, 'reset.css'), 'utf8'), /\[hidden\] \{ display: none !important; \}/, 'hidden wint van elk component');
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'reset.css'), '\n@layer rtg.reset{.ds-scherm a{color:inherit!important}}\n')), /reset\.css: bevat !important/);
+  assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-scherm [hidden] { display: none !important; }}\n')), /knop\.css: bevat !important/);
+});
+
 test('contract: een kleurwaarde buiten tokens.css', () => {
   assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-knop{color:#123456}}\n')), /kleurwaarde buiten tokens/);
   assert.match(kopieMet(d => fs.appendFileSync(path.join(d, 'componenten/knop.css'), '\n@layer rtg.component{.ds-knop{color:rgb(1,2,3)}}\n')), /kleurwaarde buiten tokens/);

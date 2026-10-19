@@ -76,6 +76,7 @@ function telHex(css) {
   return n;
 }
 const telImportant = css => (css.match(/!\s*important/gi) || []).length;
+const VERBORGEN = /\.ds-scherm \[hidden\] \{ display: none !important; \}/;
 const telKleurfunctie = css => {
   let n = 0;
   for (const m of css.matchAll(/:([^;{}]+)(?=[;}])/g)) n += (m[1].match(/\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/gi) || []).length;
@@ -251,8 +252,12 @@ function contractFouten(meting, DS = module.exports.DS) {
       }
       fouten.push(r + ': losse opdracht buiten een laag ("' + stmt.slice(0, 60) + '")');
     }
-    /* 2. Geen !important: in een gelaagd systeem bestaat er geen reden voor. */
-    if (telImportant(s)) fouten.push(r + ': bevat !important (' + telImportant(s) + 'x)');
+    /* 2. Geen !important: in een gelaagd systeem is er precies een reden, en
+       die staat hier met naam. Een belangrijke declaratie in de VROEGSTE laag
+       wint van elke latere laag; zonder dat zet een component met een eigen
+       display het attribuut hidden opzij. Alleen die ene regel in reset.css. */
+    const zonderVerborgen = deel === 'reset.css' ? s.replace(VERBORGEN, '') : s;
+    if (telImportant(zonderVerborgen)) fouten.push(r + ': bevat !important (' + telImportant(zonderVerborgen) + 'x)');
     /* 3. Kleurwaarden alleen in tokens.css. */
     if (deel !== 'tokens.css' && (telHex(s) || telKleurfunctie(s))) fouten.push(r + ': kleurwaarde buiten tokens.css (' + (telHex(s) + telKleurfunctie(s)) + 'x); gebruik een token');
     /* 4. Rechts-naar-links: alleen logische eigenschappen. */

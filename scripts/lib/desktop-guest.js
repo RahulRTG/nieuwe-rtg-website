@@ -6,16 +6,21 @@ module.exports = async function guest(page, row, errors) {
   await page.evaluate(() => document.fonts.ready);
   row.state = await page.evaluate(() => {
     const main = document.querySelector('main'), rect = main?.getBoundingClientRect();
-    return {public:document.body.dataset.publicPlatform, world:document.body.dataset.rtgWorld,
+    /* Op het Design System is de gastgrond het grondtoken van het thema en
+       niet het oude bordeauxzwart; een proef leest wat dat token oplevert. */
+    const ds = document.documentElement.hasAttribute('data-ds'), proef = document.createElement('i');
+    proef.style.backgroundColor = 'var(--ds-grond)'; document.body.appendChild(proef);
+    const dsGrond = getComputedStyle(proef).backgroundColor; proef.remove();
+    return {public:document.body.dataset.publicPlatform, world:document.body.dataset.rtgWorld, ds, dsGrond,
       message:document.querySelector('#vak')?.textContent.trim(), background:getComputedStyle(document.body).backgroundColor,
-      shells:document.querySelectorAll('.wd-shell').length, edges:document.querySelectorAll('.rtg-adaptive-bar').length,
+      shells:document.querySelectorAll('.wd-shell').length, edges:document.querySelectorAll('.rtg-adaptive-bar,.ds-edge').length,
       overflow:document.documentElement.scrollWidth>innerWidth+1,
       content:rect&&{x:rect.x,right:rect.right,width:rect.width,height:rect.height}};
   });
   const s=row.state;row.failures=[];
   if(row.http!==200)row.failures.push('http-'+row.http);
   if(s.public!=='travel-guest'||s.world!=='travel')row.failures.push('missing-guest-identity');
-  if(s.background!=='rgb(25, 13, 18)')row.failures.push('nonstandard-guest-palette');
+  if(s.background!==(s.ds?s.dsGrond:'rgb(25, 13, 18)'))row.failures.push('nonstandard-guest-palette');
   if(s.shells||s.edges)row.failures.push('unexpected-member-navigation');
   if(s.overflow)row.failures.push('horizontal-overflow');
   if(!s.content||s.content.width<250||s.content.height<60||s.content.x<0)row.failures.push('missing-guest-content');

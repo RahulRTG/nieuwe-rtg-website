@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 493 delen, 0 zonder onderwerp.**
+**62 bundels, 492 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 10007 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9995 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -214,7 +214,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9910 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9899 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -568,7 +568,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 11 delen, 947 regels in de delen
+`public/shared/basis/` -- 10 delen, 933 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -578,7 +578,6 @@ omlaag.
 | `basis-01ab-heritage-order.js` | Routes mogen functionele CSS bijladen, maar Heritage blijft het laatste materiaalblad |
 | `basis-01ac-edge.js` | Iedere echte wereldkamer gebruikt dezelfde Edge |
 | `basis-01ad-intelligence.js` | De centrale controllers laden één keer, ook als een route een adapter vóór basis nodig heeft |
-| `basis-01ae-sessie.js` | De sessie van dit scherm, voor de app-gids (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt een account; server/ke... |
 | `basis-01b.js` | Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van de consolidatieronde; de bundelvolgorde is... |
 | `basis-01c.js` | de toegankelijkheidshelpers van de gedeelde laag |
 | `basis-02.js` | 5. het lopende werk: de gangreserve-laag van het huis |

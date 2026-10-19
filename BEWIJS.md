@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2911 bestanden en 19863 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2912 bestanden en 19867 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2911 |
-| losse beweringen (`test(...)`) | 19863 |
+| toetsbestanden | 2912 |
+| losse beweringen (`test(...)`) | 19867 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 91 |
+| niets van beide | 92 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2564 bestanden, 19278 beweringen.
+2565 bestanden, 19282 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1325,6 +1325,7 @@ toets omvalt.
 | `mensgrond.test.js` | 10 | gezakt op `===->!==#0` | DE MENSGRONDEN (scripts/lib/mensgrond.js) en hun meter (scripts/mensgrond.js). De lijst beweert iets dat in twee richtingen kan breken, en elke richting is een andere schade: - een grond die STIL wegvalt, laat de... |
 | `mensmutatie.test.js` | 6 | gezakt op `!==->===#1` | DE TIEN MUTATIES DRIJVEN NIET AF VAN DE BRON (scripts/mensmutatie.js). WAAROM DIT BESTAAT. |
 | `menstaal.test.js` | 13 | gezakt op `&&->||#0` | HET MENSENTAAL-CONTRACT -- klopt het corpus, en dekt de rail het? server/kern/stuur/menstaal.json zegt per menselijke zin wat er MAG gebeuren. |
+| `menukaart-allergenen.test.js` | 4 | -- | Horeca: DE MENUKAART KENT ALLE VEERTIEN WETTELIJKE ALLERGENEN. EU-verordening 1169/2011 kent veertien allergenen, en de NVWA vraagt dat de informatie ook schriftelijk of elektronisch beschikbaar is. |
 | `merge3.property.test.js` | 5 | gezakt op `===->!==#0` | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
 | `merkkern.test.js` | 7 | gezakt op `===->!==#0` | DE MERKKERN IS DE ENIGE BRON -- en dat is een structuurbewering, geen wens. Dit huis had het merk-idee vier keer: kern/tenant/merkkern.js (de definitie), kern/theater/huisstijl.js, kern/webmerk.js en... |
 | `meterijk.test.js` | 9 | muteert zelf | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |

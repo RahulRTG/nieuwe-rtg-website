@@ -7,6 +7,7 @@ module.exports = (kern) => {
           leeftijdVan, logActivity, managerOnly, media, publicSupplier, save, schoon, sseToOffice, supplierAuth } = kern;
   const bewaar = sleutels => typeof save.sleutels === 'function' ? save.sleutels(sleutels) : save();
   const noteer = logActivity.alleenActiviteit || logActivity;
+  const ALG = require('../../kern/horeca/allergenen');
 
 
 
@@ -38,7 +39,11 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
      (server/media/toegang.js): een willekeurige /media-naam die hier binnenkwam,
      zou daarmee openbaar worden -- ook het privébeeld van een ander. */
   const eigenFotos = new Set((req.supplier.menu || []).map(m => m && m.foto).filter(Boolean));
-  req.supplier.menu = req.body.menu.slice(0, 100).map(m => {
+  /* Allergenen: alle veertien wettelijke, naar hun wettelijke naam; een
+     onbekende term weigert de hele kaart (kern/horeca/allergenen.js). */
+  const onbekend = new Set();
+  const alg = (ruw) => { const n = ALG.normaliseer(ruw); n.onbekend.forEach(x => onbekend.add(x)); return n.lijst; };
+  const menu = req.body.menu.slice(0, 100).map(m => {
     // ledenprijsgarantie: de publieke prijs is het plafond; als er geen aparte
     // publieke prijs is meegegeven, is de opgegeven prijs meteen de publieke.
     const publiek = Math.max(0, Number(m.publiekePrijs != null ? m.publiekePrijs : m.price) || 0);
@@ -52,7 +57,7 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     foto: typeof m.foto === 'string' && /^\/media\/[a-zA-Z0-9._-]+$/.test(m.foto) && eigenFotos.has(m.foto) ? m.foto : undefined,
     publiekePrijs: publiek,
     price: ledenPrijs(publiek, m.price),
-    allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
+    allergens: alg(m.allergens),
     ingredienten: Array.isArray(m.ingredienten) ? m.ingredienten.slice(0, 40).map(a => schoon(a, 40)).filter(Boolean) : [],
     dieet: Array.isArray(m.dieet) ? m.dieet.slice(0, 12).map(a => schoon(a, 24).toLowerCase()).filter(Boolean) : [],
     opties: Array.isArray(m.opties) ? m.opties.slice(0, 12).map((g, gi) => ({
@@ -64,7 +69,7 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
         id:schoon(k && k.id, 30) || 'keuze-' + gi + '-' + ki,
         naam:schoon(k && k.naam, 50) || 'Optie',
         prijsCenten:Math.max(0, Math.min(100000, parseInt(k && k.prijsCenten, 10) || 0)),
-        allergenen:Array.isArray(k && k.allergenen) ? k.allergenen.slice(0, 12).map(a => schoon(a, 20)).filter(Boolean) : []
+        allergenen:alg(k && k.allergenen)
       })) : []
     })).filter(g => g.keuzes.length) : [],
     station: m.station === 'bar' ? 'bar' : 'keuken',
@@ -79,6 +84,11 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     recept: String(m.recept || '').slice(0, 1500)
     };
   });
+  if (onbekend.size) {
+    return res.status(400).json({ error: 'Onbekend allergeen: ' + [...onbekend].slice(0, 5).join(', ') +
+      '. Kies uit de veertien wettelijke: ' + ALG.ALLERGENEN.join(', ') + '.' });
+  }
+  req.supplier.menu = menu;
   bewaar(['suppliers']);
   noteer(req.supplier.code, req.actor, 'werkte de menukaart bij');
   res.json({ ok: true, menu: req.supplier.menu });

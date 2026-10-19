@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T23:00:49.063Z",
-    "commit": "fde5d623a7",
+    "op": "2026-10-19T23:05:10.782Z",
+    "commit": "636fec3b6d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -9235,12 +9235,19 @@
       "scherp": "gezakt"
     },
     "lidsleutel.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/lib/lidsleutel.js",
-      "operator": "return-weg#0",
-      "gezakt": 3,
-      "geprobeerd": 1
+      "module": "server/lib/account-op-sleutel.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-shared-mutation-proof/lidsleutel.test.js.evidence.json",
+        "sha256": "cd6ffecc2372066d7924c3db1771dbe842c6e7e7831d75e74d269858716cc50f",
+        "commit": "636fec3b6d5052bc641714270f5c9e2261e4a8c6",
+        "sourceSha256": "64cad369dc95c6ed8fc562b3ce815620289f556f91ab1ccaf9912eece6e726f1",
+        "testSha256": "49ea9859dc0f87f2d6d065b72d260f2932aa3311634d2a4fb767aaf177a1d611"
+      }
     },
     "liegend-scherm.e2e.js": {
       "soort": "puur",
@@ -12374,12 +12381,19 @@
       "staat": "geen module gevonden"
     },
     "ontwerpbank.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/ontwerpbank.js",
-      "operator": "+->-#0",
-      "gezakt": 2,
-      "geprobeerd": 1
+      "module": "server/kern/ontwerpbeheer.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-shared-mutation-proof/ontwerpbank.test.js.evidence.json",
+        "sha256": "2c7a8153ed8e6d6bb52f2ee9e379be248c57ec1029395dbd9fd7c2367bdda270",
+        "commit": "636fec3b6d5052bc641714270f5c9e2261e4a8c6",
+        "sourceSha256": "b9911decbe9ee56306d84f5672dd9dc26bacf77d58fb72150e55a77a56c25323",
+        "testSha256": "c889b83d12c5d1fe30e017eeb364ccf38a675c22e507b5ee4d57056913b2fc9d"
+      }
     },
     "ontwerpbureaus-verwijder.test.js": {
       "soort": "server",

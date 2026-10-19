@@ -20,10 +20,11 @@
    Dat derde was tot nu toe een zin op een scherm. Hier wordt het een meting op
    de netwerklaag: elk verzoek dat de pagina doet, wordt meegelezen.
 
-   EN DE TWEE WERELDEN BLIJVEN GESCHEIDEN. Een Arrival Pass is anoniem (een
-   accessToken, geen account); de plaatslaag werkt op codenamen. Op de server
-   worden die twee nergens aan elkaar geknoopt -- de enige plek waar ze
-   samenkomen is de browser van de mens over wie het gaat.
+   EN PLEK EN PASS BLIJVEN GESCHEIDEN. De pass hangt sinds 19 oktober 2026 aan
+   een account (een hash van de sleutel van het lid), maar de plaatslaag kent de
+   pass niet en de pass kent geen coordinaat. Op de server worden die twee
+   nergens aan elkaar geknoopt -- de enige plek waar ze samenkomen is de browser
+   van de mens over wie het gaat.
 
    Draai: npm run e2e */
 const test = require('node:test');

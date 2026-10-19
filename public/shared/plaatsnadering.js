@@ -16,13 +16,14 @@
    niet waar je bent, alleen dat je eraan komt -- dat is wat ze nodig heeft om
    een tafel gereed te maken, en niets meer.
 
-   DE TWEE WERELDEN RAKEN ELKAAR ALLEEN HIER, OP HET TOESTEL. Een Arrival Pass is
-   anoniem (een accessToken, geen account); de plaatslaag werkt op codenamen. Op
-   de SERVER worden die twee nooit aan elkaar geknoopt, en dat is met opzet: het
-   arrival-domein leert geen codenaam en de plaatslaag leert geen pass. De enige
-   plek waar ze samenkomen is dit bestand, in de browser van de mens over wie het
-   gaat. Wie dit ooit naar de server wil verplaatsen "omdat het makkelijker is",
-   koppelt daarmee een anonieme pass aan een identiteit.
+   PLEK EN PASS RAKEN ELKAAR ALLEEN HIER, OP HET TOESTEL. Sinds 19 oktober 2026
+   hangt een Arrival Pass aan een account (kern/arrivalpas.js bewaart een hash
+   van de sleutel van het lid, zodat een ander account 404 krijgt), en draagt de
+   reservering de codenaam van het lid. Wat op de SERVER nooit aan elkaar wordt
+   geknoopt, is de PLEK: de plaatslaag leert geen pass en de pass leert geen
+   coordinaat. De enige plek waar ze samenkomen is dit bestand, in de browser van
+   de mens over wie het gaat. Wie dit ooit naar de server wil verplaatsen "omdat
+   het makkelijker is", geeft de zaak daarmee een spoor van waar zijn gast is.
 
    HET WERKWOORD BLIJFT KLAARZETTEN. De puls gaat pas als jij een keer ja hebt
    gezegd, en de handknoppen blijven gewoon werken. Zeg je nee, dan verandert er

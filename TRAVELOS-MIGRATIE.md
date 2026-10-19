@@ -10,6 +10,93 @@ uit.*
 > **De mockups bepalen de visuele ambitie, het Design System de technische
 > uitvoering, en de bestaande motor blijft.**
 
+## 0. Eigenaarsbesluit van 19 oktober 2026: optie 4
+
+Alle 30 TravelOS-schermen worden volledig vervangen, in één doorlopend
+programma met parallelle werkstromen en één integrator. Er komt geen
+tussentijdse beperking tot voorbeeldschermen. Wat het besluit vastlegt:
+
+- `hotels` wordt opnieuw gecontroleerd.
+- `residentie`, `boeken` en `stad` gaan mee. Hun functie blijft behouden en
+  hun definitieve plaats wordt vastgelegd op basis van de routes; een
+  productbesluit dat niet uit de code blijkt, gaat apart naar de eigenaar.
+- `reizen` (de Cover) gaat vroeg, met behoud van zijn 25 browsertoetsen.
+- De zes aangeleverde mockups zijn het visuele ontwerpcontract.
+- Nieuwe fotografie alleen als deel van de migratie, nooit als losse
+  demonstratie.
+- Er komen geen tijdelijke CSS-lagen, demonstratiefuncties of ongecontroleerde
+  uitzonderingen bij.
+- Een batch wordt pas geïntegreerd als de verplichte CI groen is.
+
+Het eindrapport noemt drie getallen naast elkaar: gemigreerde schermen,
+werkelijk verwijderde oude stijl (bladen, bytes, `!important`), en
+aantoonbaar werkende gebruikersstromen (browsertoetsen per scherm).
+
+### Werkstromen
+
+| Stroom | Schermen |
+|---|---|
+| A. Ingang | `reizen` (Cover) |
+| B. Plannen en boeken | `reisbureau`, `vluchten`, `reisboek`, `hotels` (hercontrole) |
+| C. Onderweg | `rit`, `ov`, `move`, `reizen-veilig`, `arrival`, `flits`, `navigatie` |
+| D. Rechterhand en zakelijk | `hangar`, `zakelijk`, `reisuitnodiging`, `living-world` |
+| E. Operatie | `luchthaven`, `marechaussee`, `ovdienst`, `ovroutes`, `dispatch`, `chauffeur`, `ghost`, `ovcontrol`, `voertuig` |
+| F. Kantoor | `routedossier`, `routedekking` |
+| G. Plaatsbepaling | `residentie`, `boeken`, `stad` |
+
+### Werkwijze per scherm (het recept, bewezen op `hotels`)
+
+1. **HTML.** Het scherm laadt nog maar drie dingen:
+   - `/fonts/fonts.css` en `/ds/rtg-ds.css`;
+   - in de `<head>` `/shared/id.js`, en waar het scherm hem gebruikt
+     `poortgesprek.js`, met `/ds/shell.js` als laatste;
+   - onderaan zijn eigen scripts, `/shared/basis.js` (defer) en de
+     overgangsscripts die het nodig heeft.
+
+   Verder:
+   - Geen enkel oud stijlblad, geen `<style>`-blok, geen `style=`-attribuut.
+   - Geen `randen.js`, `metgezel.js`, `ios.js`, `travel-os.js` of
+     `rtg-world-desktop.js`.
+   - `<body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="...">`.
+   - De kop is `.ds-kop` met `[data-ds-zoek]` (opent de sprong), RTG en het
+     account.
+2. **Vorm.** Alleen de componenten en schermtypen uit `public/ds/`:
+   - Collectie: beeldkaarten met de naam op de foto.
+   - Taak: `.ds-veld`-rijen.
+   - Detail: groot beeld, status en icoonrijen.
+   - Gesprek: berichten, met de Edge in de modus `bericht`.
+   - Canvas en Status zoals op `/ds/voorbeeld.html`.
+
+   Mist er een component, dan komt hij als nieuw bestand in
+   `public/ds/componenten/` (contract en `rtg-ds.css` bijwerken). Een eigen
+   blad per scherm bestaat niet.
+3. **Gedrag blijft.** Dezelfde API-aanroepen, dezelfde teksten, dezelfde
+   menselijke grenzen ("het huis bevestigt", "aangevraagd" en nooit
+   "geboekt"), dezelfde rechten. Simulaties houden hun zichtbare markering
+   (par. 1d).
+   - Datum en bedrag volgen `document.documentElement.lang`, via `Intl`.
+   - De primaire handelingen dragen `data-ds-actie`, zodat de Edge ze toont.
+4. **Beeld.** Alleen in-huis beeld met herkomst (`public/campagne/`,
+   `public/images/worlds/`). Ontbreekt er passend beeld, dan noemt het
+   rapport dat. Er komt geen extern beeld.
+5. **Toetsen.**
+   - Een browsertoets `test/<scherm>-ds.e2e.js` naar het model van
+     `test/hotels-ds.e2e.js`:
+     - geen erfenisblad, ook niet in de stijlbundel;
+     - de ds-poort klopt;
+     - de Edge staat;
+     - de kernhandeling slaagt tegen de echte backend;
+     - geen overloop op 390, 820 en 1440;
+     - `dir="rtl"` in het Arabisch.
+   - Registreer de toets in `public/ds/contract.json` → `bewijs` en in de
+     toets-naar-bronkaart van `scripts/mutatie.js`.
+   - Een bestaande toets die de oude vorm eiste, wordt herschreven naar het
+     gedrag dat hij bewaakte en nooit verwijderd.
+6. **Opruimen.** Een oud blad dat na de migratie door niets meer wordt
+   geladen, gaat weg, en `ONTWERPNORM.json` wordt strakker gezet. Een blad
+   dat nog door andere schermen wordt geladen, blijft staan tot het laatste
+   scherm over is.
+
 ## 1. Nulmeting (batch 1, 19 oktober 2026)
 
 `rtg-world-identity.js` deelt 30 schermen in bij TravelOS. Geen van die

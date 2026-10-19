@@ -14,13 +14,16 @@
    kind langs de route van de gezondheidskaart. Een ander lid en een ander gezin
    zijn de kruisproef.
 
-   LET OP, EN DAT STAAT OOK IN DE GRENS: /api/care/betaal zet een boeking op
-   betaald zonder dat er geld beweegt (kern/care/leden.js careBetaal). De proef
-   meet dat "betaald" een keer gebeurt en blijft staan, niet dat er werd
-   afgeschreven.
+   ECHT GELD. /api/care/betaal betaalt via RTG Pay aan de zaak van de
+   aanbieder (kern/care/leden.js careBetaal); de proef leest op /api/pay/overzicht
+   dat er precies een zorgregel van prijs x 100 centen afging, en dat een
+   geweigerde bijlading de boeking op wacht-op-betaling laat zonder dat er iets
+   afgaat (../voltooizorggeld.js). De ouder heeft een RTG Pass: Care boekt niet
+   met een gratis account, en RTG Pay vraagt een gebonden toestel.
    ========================================================================== */
 'use strict';
-const { nieuwLid, inloggen } = require('../voltooiwereld');
+const { nieuwLid, inloggen, gebondenToestel } = require('../voltooiwereld');
+const { autolaadAfloop, geldVan, vulWallet } = require('../voltooizorggeld');
 const { GEZINSWERELD, accountGezin, haal } = require('../voltooigezin');
 
 const CARE = '/api/care';
@@ -35,10 +38,14 @@ const TOESTEMMING = '/api/foundation/gezin/toestemming/gezondheid';
 
 async function loop(w, stap) {
   const merk = Date.now().toString(36);
-  const ouder = await accountGezin(w, 'zorg', { kind: true });
+  const ouder = await accountGezin(w, 'zorg', { kind: true, tier: 'rtg' }); // Care boekt alleen met een pas (kern/care/leden.js)
   const ander = await accountGezin(w, 'zorgander');
   const vreemd = await nieuwLid(w, 'zorgvreemd');
   let tok = ouder.token;
+  let toestel = await gebondenToestel(w, tok);
+  const geld = geldVan(w, () => toestel, () => tok);
+  const codenaam = (await geld.overzicht()).codenaam;
+  await vulWallet(w, tok, toestel, codenaam, 60000);
   const mijn = async (t) => (((await w.post(CARE_MIJN, {}, t || tok)).data) || {}).boekingen || [];
   const aanbod = ((await w.post(CARE, {}, tok)).data || {}).aanbieders || [];
   const a = aanbod.find((x) => (x.behandelingen || []).some((b) => (b.tijden || []).length >= 3)) || {};
@@ -60,10 +67,38 @@ async function loop(w, stap) {
     const b = await w.post(CARE_BOEK, slot(0), tok);
     boeking = b.data && b.data.boeking;
     const voor = (await mijn()).find((x) => boeking && x.ref === boeking.ref) || {};
+    const saldoVoor = (await geld.overzicht()).saldo;
     const p = await w.post(CARE_BETAAL, { ref: boeking && boeking.ref }, tok);
     const na = (await mijn()).find((x) => boeking && x.ref === boeking.ref) || {};
-    return { klopt: b.status === 200 && voor.status === 'wacht-op-betaling' && p.status === 200 && na.paid === true && na.status === 'geboekt',
-      ziet: 'boeken ' + b.status + ' (' + voor.status + '), betalen ' + p.status + ', daarna ' + na.status };
+    const o = await geld.overzicht();
+    const z = (o.geschiedenis || []).filter((g) => g.soort === 'zorg');
+    const centen = Math.round(Number(boeking && boeking.prijs) * 100);
+    return { klopt: b.status === 200 && voor.status === 'wacht-op-betaling' && p.status === 200 && na.paid === true && na.status === 'geboekt' &&
+      z.length === 1 && z[0].centen === -centen && saldoVoor - o.saldo === centen,
+      ziet: 'boeken ' + b.status + ' (' + voor.status + '), betalen ' + p.status + ', daarna ' + na.status + '; RTG Pay: ' + z.length + ' zorgregel van ' + (z[0] && z[0].centen) + ' centen aan ' + (z[0] && z[0].tegen) + ', saldo ' + saldoVoor + ' -> ' + o.saldo };
+  });
+
+  await stap('voltooibaar', 'een lid met een lege wallet wiens bijlading de bank weigert: de afspraak blijft wacht-op-betaling en er gaat niets af', async () => {
+    /* De bank kiest de afloop uit de sleutel ('care:<ref>:autolaad'); de proef
+       boekt tot de bijlading van een boeking volgens de bank NIET doorgaat, en
+       annuleert de rest. Zo is de weigering reproduceerbaar en geen geluk. */
+    const leeg = await nieuwLid(w, 'zorgleeg');
+    const lt = await gebondenToestel(w, leeg.token);
+    const lg = geldVan(w, () => lt, () => leeg.token);
+    const cn = (await lg.overzicht()).codenaam;
+    let bk = null, soort = null;
+    for (let i = 0; i < 60 && !bk; i++) {
+      const b = ((await w.post(CARE_BOEK, Object.assign(slot(2), { datum: new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10) }), leeg.token)).data || {}).boeking;
+      if (!b) break;
+      const a = autolaadAfloop(cn, b.ref);
+      if (a === 'geweigerd' || a === 'traag') { bk = b; soort = a; } else await w.post(CARE_ANNULEER, { ref: b.ref }, leeg.token);
+    }
+    const p = await w.post(CARE_BETAAL, { ref: bk && bk.ref }, leeg.token);
+    const na = (((await w.post(CARE_MIJN, {}, leeg.token)).data || {}).boekingen || []).find((x) => bk && x.ref === bk.ref) || {};
+    const o = await lg.overzicht();
+    const z = (o.geschiedenis || []).filter((g) => g.soort === 'zorg');
+    return { klopt: !!bk && p.status === 402 && na.paid === false && na.status === 'wacht-op-betaling' && z.length === 0 && o.saldo === 0,
+      ziet: 'bijlading ' + soort + ': betalen ' + p.status + ' (' + (p.data && p.data.error) + '), afspraak ' + na.status + ', ' + z.length + ' zorgregels, saldo ' + o.saldo };
   });
 
   await stap('voltooibaar', 'de ouder annuleert een tweede afspraak: hij verdwijnt en het tijdslot komt vrij voor een ander', async () => {
@@ -144,17 +179,21 @@ async function loop(w, stap) {
 
   await stap('persistent', 'na de herstart logt de ouder opnieuw in en ziet in een nieuwe sessie dezelfde afspraak', async () => {
     tok = await inloggen(w, ouder);
+    toestel = await gebondenToestel(w, tok);
     const b = (await mijn()).find((x) => boeking && x.ref === boeking.ref) || {};
-    return { klopt: b.paid === true, ziet: 'nieuwe sessie: afspraak ' + b.status };
+    const z = await geld.regels();
+    return { klopt: b.paid === true && z.length === 1, ziet: 'nieuwe sessie: afspraak ' + b.status + ', RTG Pay ' + z.length + ' zorgregel' };
   });
 
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik op Betalen betaalt een keer, en de tweede tik zegt dat het al betaald is', async () => {
     const b = ((await w.post(CARE_BOEK, slot(2), tok)).data || {}).boeking || {};
+    const voor = (await geld.regels()).length;
     const [x, y] = await w.dubbel(CARE_BETAAL, { ref: b.ref }, tok);
     const st = [x.status, y.status].sort().join();
     const na = (await mijn()).find((z) => z.ref === b.ref) || {};
-    return { klopt: st === '200,409' && na.paid === true, ziet: 'tikken ' + x.status + '/' + y.status + ', ' + na.status };
+    const erbij = (await geld.regels()).length - voor;
+    return { klopt: st === '200,409' && na.paid === true && erbij === 1, ziet: 'tikken ' + x.status + '/' + y.status + ', ' + na.status + ', RTG Pay +' + erbij + ' zorgregel' };
   });
 
   await stap('herstelbaar', 'een dubbele tik op Annuleren annuleert een keer', async () => {
@@ -166,19 +205,25 @@ async function loop(w, stap) {
 
   await stap('herstelbaar', 'een afgebroken betaling en daarna opnieuw: betaald, en een keer', async () => {
     const b = ((await w.post(CARE_BOEK, Object.assign(slot(1), { datum: new Date(Date.now() + 12 * 864e5).toISOString().slice(0, 10) }), tok)).data || {}).boeking || {};
+    const voor = (await geld.regels()).length;
     const half = await w.afgebroken(CARE_BETAAL, { ref: b.ref }, tok);
     const opnieuw = await w.post(CARE_BETAAL, { ref: b.ref }, tok);
     const na = (await mijn()).find((z) => z.ref === b.ref) || {};
-    return { klopt: (opnieuw.status === 200 || opnieuw.status === 409) && na.paid === true,
-      ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + (opnieuw.status === 409 ? ' (' + (opnieuw.data && opnieuw.data.error) + ')' : '') + ', ' + na.status };
+    const erbij = (await geld.regels()).length - voor;
+    return { klopt: (opnieuw.status === 200 || opnieuw.status === 409) && na.paid === true && erbij === 1,
+      ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + (opnieuw.status === 409 ? ' (' + (opnieuw.data && opnieuw.data.error) + ')' : '') + ', ' + na.status + ', RTG Pay +' + erbij + ' zorgregel' };
   });
 
   await stap('herstelbaar', 'een crash direct na een betaling verliest hem niet', async () => {
     const b = ((await w.post(CARE_BOEK, Object.assign(slot(2), { datum: new Date(Date.now() + 13 * 864e5).toISOString().slice(0, 10) }), tok)).data || {}).boeking || {};
+    const voor = (await geld.regels()).length;
     const p = await w.post(CARE_BETAAL, { ref: b.ref }, tok);
     await w.crash();
     const na = (await mijn()).find((z) => z.ref === b.ref) || {};
-    return { klopt: p.status === 200 && na.paid === true, ziet: 'betalen ' + p.status + ', na SIGKILL ' + na.status };
+    const nog = await w.post(CARE_BETAAL, { ref: b.ref }, tok);
+    const erbij = (await geld.regels()).length - voor;
+    return { klopt: p.status === 200 && na.paid === true && nog.status === 409 && erbij === 1,
+      ziet: 'betalen ' + p.status + ', na SIGKILL ' + na.status + ', nog eens betalen ' + nog.status + ', RTG Pay +' + erbij + ' zorgregel' };
   });
 }
 
@@ -186,8 +231,8 @@ module.exports = {
   functie: 'link:foundationzorg',
   ingang: '/apps/foundation/zorg.html',
   persona: 'gezin',
-  omgeving: GEZINSWERELD,
+  omgeving: Object.assign({ RTG_SIMULATIEBANK: '1' }, GEZINSWERELD),
   belofte: 'het gezin ziet zijn zorgafspraken (betalen, annuleren) en de gezondheidskaart van het gezin bij elkaar, en een hulpwijzer denkt mee zonder de tekst te bewaren -- een ander lid, een ander gezin of het kind kan er niets mee',
-  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf; boeken (/api/care/boek) en de doktersafspraak zetten lopen langs de routes van de Care-app en de gezondheidskaart. Betalen bij Care zet een boeking op betaald zonder dat er geld beweegt (kern/care/leden.js); dat is hier niet beproefd en gemeld. De hulpwijzer antwoordt zonder model met de vaste terugval. Intakes delen loopt hier niet mee. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf; boeken (/api/care/boek) en de doktersafspraak zetten lopen langs de routes van de Care-app en de gezondheidskaart. Betalen loopt via RTG Pay tegen de simulatiebank (geen echte bank); de wallet wordt vooraf gevuld, en een geweigerde bijlading is reproduceerbaar uit de sleutel gekozen. De ouder heeft een RTG Pass: Care boekt niet met een gratis account. De hulpwijzer antwoordt zonder model met de vaste terugval. Intakes delen loopt hier niet mee. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

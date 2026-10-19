@@ -17,10 +17,10 @@
    dubbele tik, een afgebroken verzoek en een crash moeten hier hetzelfde beeld
    opleveren en de opslag niet raken.
 
-   EEN OPEN SCHAKEL MET OPZET. De buurtroutes zijn ontworpen voor "mensen zonder
-   RTG-account" (routes/rtfos/doelgroepen.js). Onder het besluit van 19 oktober
-   2026 hoort ook lezen een account te vragen; de openbare landing met de
-   paspagina's is de enige leesuitzondering. Die deur sluit de agent Toegang.
+   EEN ACCOUNT OOK OM TE LEZEN (besluit 19 oktober 2026, Toegang 66f413ff).
+   De buurtroutes vragen een sessie die het huis kent: de ouder leest met zijn
+   gratis account; zonder sessie is het 401. De openbare landing met de
+   paspagina's is de enige leesuitzondering.
    ========================================================================== */
 'use strict';
 const { GEZINSWERELD, accountGezin, openStad, actiefProject } = require('../voltooigezin');
@@ -87,7 +87,7 @@ async function loop(w, stap) {
   await stap('voltooibaar', 'bevoegdheid: zonder account geeft de buurtpagina niets (401)', async () => {
     const s = await w.post(STEDEN, {}), z = await w.post(STAD, { id: zwolle.id }), c = await w.post(CAMPAGNES, {});
     return { klopt: [s.status, z.status, c.status].every((x) => x === 401),
-      ziet: 'steden ' + s.status + ', stad ' + z.status + ', campagnes ' + c.status + (s.status === 200 ? ' (de deur staat open: gemeld aan Toegang)' : '') };
+      ziet: 'steden ' + s.status + ', stad ' + z.status + ', campagnes ' + c.status };
   });
 
   await stap('voltooibaar', 'bevoegdheid: de buurt ziet geen budget, geen projectleider, geen begeleiders en geen inschrijvingen', async () => {
@@ -153,6 +153,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'wie in een stad woont ziet welke RTF-afdeling open is, wat er loopt, waar hij binnen kan lopen met de vrije plekken en welke campagne er is -- en niets wat niet op een poster in het buurthuis zou hangen',
-  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Het scherm leest alleen; herstelbaar is hier dat een dubbele tik, een afgebroken verzoek en een crash hetzelfde beeld geven en niets schrijven. De stad, het project, de maaltijd en de campagne maakt het landelijke bestuur langs het kantoor. De buurtroutes vragen geen account; dat staat als open bevoegdheidsstap en is gemeld. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Het scherm leest alleen; herstelbaar is hier dat een dubbele tik, een afgebroken verzoek en een crash hetzelfde beeld geven en niets schrijven. De stad, het project, de maaltijd en de campagne maakt het landelijke bestuur langs het kantoor. De buurtroutes vragen een (gratis) account of een gezinsprofiel. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

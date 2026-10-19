@@ -4,7 +4,7 @@ const nietVerstuurd = error => { error.nietVerstuurd = true; return error; };
 
 module.exports = function maakUitbetaalrail(deps) {
   const { betalenUit, haalOp, bewaar, regie, sandbox, stripe, demoBetalen,
-    aanbieder, eisBetaalrail, crypto, uitgaandBewustDicht, vrijgave } = deps;
+    aanbieder, eisBetaalrail, crypto, uitgaandBewustDicht, vrijgave, simulatie } = deps;
   const poort = () => vrijgave || require('../kern/vrijgave').standaard();
   return async function startUitbetaling(opdracht) {
     if (betalenUit)
@@ -45,6 +45,16 @@ module.exports = function maakUitbetaalrail(deps) {
       const error = new Error('Uitbetaling veilig geblokkeerd: een IBAN in Stripe-metadata is geen echte betaalbestemming. Koppel eerst een gecontroleerde uitbetaalrail.' + uitleg);
       error.code = 'UITBETAALRAIL_NIET_ACTIEF';
       throw nietVerstuurd(error);
+    } else if (simulatie && simulatie.aan()) {
+      /* DE SIMULATIEVE UITBETAALRAIL (./synthetisch.js): alleen met
+         RTG_SIMULATIEBANK=1, nooit naast een echte provider, nooit in productie.
+         Achter dezelfde vrijgavepoort als een echte rail, op de neprail
+         `simulatie` -- die kent de poort alleen in de stand `sandbox`. */
+      try {
+        poort().eis(String((opdracht && opdracht.vrijgave) || 'geld.uitbetaling_zonder_capability'),
+          { actor: { soort: 'systeem' }, provider: 'simulatie', rail: 'simulatie' });
+        resultaat = simulatie.uitbetaal({ bedrag, valuta, referentie, iban, idempotentieSleutel: sleutel });
+      } catch (e) { throw nietVerstuurd(e); }
     } else if (demoBetalen) {
       resultaat = { id: 'magnaat_uit_' + crypto.randomBytes(8).toString('hex'), status: 'ingepland',
         aanbieder: 'magnaat-test', bedrag: Math.round(bedrag), valuta, referentie, iban };

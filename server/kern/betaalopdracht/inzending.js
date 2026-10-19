@@ -5,7 +5,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { save, nu, klacht, publiek, zet, wacht, maxPogingen, STATUS, AF, DEFINITIEF,
+  const { save, nu, klacht, publiek, zet, wacht, maxPogingen, STATUS, AF, DEFINITIEF, MISLUKT_RAIL,
     railInzenden, terugboeken, verwerkAfwikkeling } = ctx;
 
   /* Eén poging bij de rail. Slaagt hij, dan is de opdracht ingediend (of meteen
@@ -63,6 +63,14 @@ module.exports = (ctx) => {
     }
 
     const railStatus = String((uit && uit.status) || '').toLowerCase();
+    /* De rail weigert uitdrukkelijk: niet herhalen, meteen terug (./status.js). */
+    if (MISLUKT_RAIL.has(railStatus)) {
+      zet(o, STATUS.MISLUKT, { settlementRef: (uit && uit.id) || null, railStatus, volgendeAt: null,
+        laatsteFout: 'de rail weigerde de uitbetaling (' + railStatus + ')' });
+      save();
+      await draaiTerug(o);
+      return publiek(o);
+    }
     zet(o, DEFINITIEF.has(railStatus) ? STATUS.AFGEWIKKELD : STATUS.INGEDIEND,
       { settlementRef: (uit && uit.id) || null, railStatus, laatsteFout: null, volgendeAt: null });
     save();

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T10:08:06.609Z",
-    "commit": "9eed8a0a7",
+    "op": "2026-10-19T11:09:38.871Z",
+    "commit": "35ed49c2",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -1092,7 +1092,7 @@
           "rol": "beslist",
           "etiket": null,
           "wat": "laadt de Continue Key",
-          "citaat": "if (!window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&"
+          "citaat": "if (!ds && !window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&"
         }
       ],
       "verantwoordelijkheden": [],
@@ -1139,7 +1139,7 @@
           "rol": "beslist",
           "etiket": null,
           "wat": "laadt controllers die ontbreken",
-          "citaat": "if (window[bron[1]] || document.querySelector("
+          "citaat": "if (ds || window[bron[1]] || document.querySelector("
         }
       ],
       "verantwoordelijkheden": [],

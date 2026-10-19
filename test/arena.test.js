@@ -232,3 +232,19 @@ test('online: onzichtbaar spelen haalt je uit de stand van je klasgenoot', async
     assert.equal((await json(await spel('online', {}, A))).aantal, 1, 'en hij is weer te zien');
   } finally { stroom.sluit(); }
 });
+
+/* De gezinsingang van "Nodig uit en start" draagt dezelfde herhaalsleutel als
+   die van een lid (kern/spellen/dubbeltik.js): twee tikken tegelijk zijn een
+   potje, en dezelfde sleutel met een ander spel is een conflict. */
+test('gezinsingang: dezelfde sleutel geeft hetzelfde potje, een ander spel onder die sleutel is 409', async () => {
+  // een eigen paar: de tieners hierboven hebben hun snelheidsgrens al gebruikt
+  const E = await tiener(ECHT + ' Fam E', 'Tiener Ee ' + ECHT), F = await tiener(ECHT + ' Fam F', 'Tiener Ff ' + ECHT);
+  await klasMet('Herhaal', [E, F]);
+  const kg = await json(await spel('klasgenoten', {}, E));
+  const lijf = { soort: 'flits', grootte: 2, klasgenoten: [kg.klasgenoten[0].key], idem: 'arena-gezin-sleutel-0001' };
+  const [x, y] = await Promise.all([spel('nieuw', lijf, E).then(json), spel('nieuw', lijf, E).then(json)]);
+  assert.ok(x.id && y.id, 'beide tikken krijgen een potje terug');
+  assert.equal(x.id, y.id, 'twee tikken met een sleutel zijn een potje');
+  const anders = await spel('nieuw', Object.assign({}, lijf, { soort: 'reactie' }), E);
+  assert.equal(anders.status, 409, 'dezelfde sleutel met een ander spel is een conflict');
+});

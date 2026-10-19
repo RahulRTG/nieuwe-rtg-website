@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2905 bestanden en 19839 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2908 bestanden en 19851 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2905 |
-| losse beweringen (`test(...)`) | 19839 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
+| toetsbestanden | 2908 |
+| losse beweringen (`test(...)`) | 19851 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 85 |
+| niets van beide | 88 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2560 bestanden, 19258 beweringen.
+2561 bestanden, 19266 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -492,7 +492,7 @@ toets omvalt.
 | `credential-log-hygiene.test.js` | 7 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dagcoach.test.js` | 11 | gezakt op `liegpoort /api/` | De dagcoach (kern/dagcoach.js). Wat hier wordt vastgezet is vooral wat hij NIET doet, want dat is de hele keuze: 1. |
 | `dagplan.test.js` | 6 | gezakt op `liegpoort /api/` | De Daily Learning Guarantee: elke schooldag weet een leerling wat er te doen is, en die lijst is nooit leeg zolang er iets te leren valt. De beloftes die hier hard worden gemaakt: - een ingeschreven leerling met open... |
-| `dashboard-dagen.test.js` | 2 | -- | DE DAGBAKKEN VAN DE DASHBOARDS, rond middernacht. Twee dashboards telden omzet per dag op de UTC-datum van de container: - de backoffice van een zaak (routes/supplier/backoffice.js): sinds het eigenaarsbesluit van 19... |
+| `dashboard-dagen.test.js` | 4 | -- | DE DAGBAKKEN VAN DE DASHBOARDS, rond middernacht. Twee dashboards telden omzet per dag op de UTC-datum van de container: - de backoffice van een zaak (routes/supplier/backoffice.js): sinds het eigenaarsbesluit van 19... |
 | `db-redis-mirror.test.js` | 1 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dealkans.test.js` | 2 | gezakt op `liegpoort /api/` | De dealvinder: de voorspeller herkent combinatiegedrag (twee zaken binnen een dagdeel door dezelfde leden) en zet er een kant-en-klaar Synergie-voorstel van klaar; de aandelen tellen exact op tot de prijs. |
 | `deavond.test.js` | 5 | gezakt op `liegpoort /api/` | EEN AVOND IN HET HUIS -- de keuken, een event, het hotel en de gasten. WAAROM DIT ER IS De vorige toetsen volgen een mens (levensloop) of een bestelling (bezorging). |
@@ -840,7 +840,7 @@ toets omvalt.
 | `hardware.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Hardwarelab: het eigen hardware-ontwerpbureau van de kantoren (apparaten, schermen, sensoren, edge & servers, accessoires). Een AI tekent het concept uit (behuizing, chip, materialen, gedempt palet, poorten,... |
 | `heapproef.test.js` | 11 | gezakt op `===->!==#0` | DE HEAPPROEF ALS INSTRUMENT -- en HEAPPROEF.json als ratel. scripts/heapproef.js meet of deze server geheugen vasthoudt. |
 | `heapstat.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE HEAPPROEF -- KAN HET ALLE DRIE ZEGGEN? De rekenkant van scripts/heapproef.js staat apart (scripts/lib/heapstat.js) zodat hij te beproeven is met reeksen waarvan we het antwoord al weten. |
-| `heelrtg-bron.test.js` | 4 | -- | DE BRON VAN HEEL RTG IS DE FUNCTIEGIDS (eigenaarsbesluit 19 oktober 2026). Het zoekmenu van de rand (apps/app-main/app-main-29d.js) en Rahuls "open <app>" (app-main-29.js, gidsCommando) lezen dezelfde gids:... |
+| `heelrtg-bron.test.js` | 5 | -- | DE BRON VAN HEEL RTG IS DE FUNCTIEGIDS (eigenaarsbesluit 19 oktober 2026). Het zoekmenu van de rand (apps/app-main/app-main-29d.js) en Rahuls "open <app>" (app-main-29.js, gidsCommando) lezen dezelfde gids:... |
 | `helikopter.test.js` | 4 | gezakt op `liegpoort /api/` | Helikopter transfers: het nieuwe vervoersgenre. Een lid vraagt een helikoptervlucht aan bij Ibiza Sky Charter, betaalt vooraf, en de zaak (Operations + piloot) wijst piloot en toestel toe en rijdt de ritketen af. |
 | `herbevestiging-p1.test.js` | 7 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `herbevestiging-takken.test.js` | 13 | gezakt op `voorwaarde-omkeren#0` | HERBEVESTIGING TAK VOOR TAK (server/kern/identiteit/herbevestiging.js). Toetst de beslissing zelf met nagemaakte accounts, zware poort en rem: zonder eigen account geen handeling; een meegestuurde passkeyceremonie... |
@@ -1940,6 +1940,7 @@ toets omvalt.
 | `schermmutatie.test.js` | 8 | gezakt op `+->-#0` | DE SCHERMMUTATIEMOTOR ZELF -- want een meter die je niet kunt narekenen is een belofte. WAAROM DIT BESTAAT. |
 | `schermronde.test.js` | 5 | gezakt op `===->!==#0` | EEN MISLUKTE RONDE MAG ZICH NIET VOORDOEN ALS EEN GEMETEN RONDE. HET GEVAL, EN HET IS ECHT GEBEURD (18 augustus 2026). |
 | `schermsuite-bewijs.test.js` | 4 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `schil-taal.test.js` | 5 | -- | DE SCHIL SPREEKT DE TAAL VAN DE PAGINA. Gevonden door TravelOS op /apps/arrival.html (19 oktober 2026): op een toestel in het Engels stond in het personenpaneel van de werktafel "View your conversations" boven een... |
 | `schild-weerbaar.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | HET SCHILD, WEERBAAR (server/kern/schild.js). Het schild is de voordeur: een applicatie-WAF op pad, query en user-agent, een DDoS-rem per IP, de banlijst, en de poort waar De Wacht zijn quarantaine afdwingt. |
 | `schild.test.js` | 4 | gezakt op `liegpoort /api/` | Het schild: de applicatie-WAF, de DDoS-banlijst en de kortlevende TURN-inloggegevens. Extern verkeer wordt gesimuleerd met een X-Forwarded-For-header (trust proxy staat aan); localhost zelf is uitgezonderd zodat... |
 | `schoneboom.test.js` | 8 | al rood | EEN MEETRONDE DIE TOCH NIET MEETELT, HOORT NIET TE BEGINNEN. HET PROBLEEM. |
@@ -2600,7 +2601,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-345 bestanden, 581 beweringen.
+347 bestanden, 585 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2705,6 +2706,7 @@ toets omvalt.
 | `grammatica.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE GRAMMATICA IN EEN ECHTE BROWSER. De regels staan in GRAMMATICA.md, de statische kant in test/grammatica.test.js. |
 | `handelscherm.e2e.js` | 0 | gezakt op `liegpoort /api/` | Scherm-test: RTG Handel in een echte browser (Playwright). De endpoints van de handelsketen liggen vast in test/handelsketen.test.js. |
 | `handenvrij.e2e.js` | 1 | gezakt op `liegpoort /api/` | Muisvrij bedienen, in een echte browser. De zinsontleding is los getoetst (test/handenvrij.test.js). |
+| `heelrtg-catalogus-poort.e2e.js` | 1 | -- | HEEL RTG TOONT UIT DE CATALOGUS NIETS WAT DE GIDS VERBERGT (19 oktober 2026). Het zoekmenu "Heel RTG" in de rand bouwt zijn lijst uit de widgetcatalogus (shared/interface/world-widget-catalog.json). |
 | `heelrtg-osapps.e2e.js` | 1 | -- | HEEL RTG VINDT ELKE APP, OOK DE OS-APPS (eigenaarsbesluit 19 oktober 2026). Videobellen, Bellen, Snaps en Werk hebben geen eigen adres: ze wonen in de functiegids (MAPPEN, workspace-world-catalog.js), dezelfde bron... |
 | `helper-veegdoor.e2e.js` | 2 | gezakt op `true->false#0` | DE VEEGHELPER ZELF, en niet een scherm dat hem gebruikt. veegDoor (test/helper.js) heeft twee wegen: de protocolvlucht naar Chromium, en een terugval in de renderer voor als de timer van lang drukken de vlucht heeft... |
 | `heritage-context.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -2869,6 +2871,7 @@ toets omvalt.
 | `scan-tafel.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `schermcontext.e2e.js` | 1 | gezakt op `liegpoort /api/` | AGENDA EN NOTITIES ZEGGEN ZELF WAAR JE BENT (EDGE.md besluit 11). Beide schermen wijzen een eigen hoofdactie aan en stonden daarom op CONTEXT_SCHULD in scripts/edgedekking.js. |
+| `schil-taal.e2e.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `schuif.e2e.js` | 1 | gezakt op `liegpoort /api/` | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |
 | `servicebel.e2e.js` | 3 | gezakt op `liegpoort /api/` | BELLEN MET RTG -- de twee schermen. De routes waren al beproefd; deze toetsen gaan over wat een mens ziet en kan. |
 | `servicecockpit.e2e.js` | 8 | gezakt op `liegpoort /api/` | DE SERVICE-COCKPIT. Wat deze toetsen vastleggen is niet dat het scherm laadt, maar wat het WEL en NIET doet: 1. |

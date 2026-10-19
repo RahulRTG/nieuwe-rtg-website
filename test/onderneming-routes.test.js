@@ -23,6 +23,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -148,19 +149,20 @@ test('de deuren van het Ondernemers-OS: dicht, van u alleen, en heel', async () 
       }
     }
 
-    /* En de publieke voorlichting: de rechtsvormen zijn zonder inlog te lezen,
-       want wat een B.V. van een stichting onderscheidt hoort iemand te kunnen
-       lezen vóórdat hij een account heeft. */
-    const rv = await fetch(base + '/api/onderneming/rechtsvormen');
+    /* En de voorlichting: de rechtsvormen vragen sinds het eigenaarsbesluit van
+       19 oktober 2026 een account, en een gratis account is genoeg. */
+    assert.equal((await fetch(base + '/api/onderneming/rechtsvormen')).status, 401, 'zonder account dicht');
+    const gk = { headers: { Authorization: 'Bearer ' + (await registreerGratis(base)).token } };
+    const rv = await fetch(base + '/api/onderneming/rechtsvormen', gk);
     assert.equal(rv.status, 200);
     const lijst = await rv.json();
     assert.ok(lijst.rechtsvormen.length > 5);
     assert.ok(lijst.landen.includes('NL'));
-    const de = await (await fetch(base + '/api/onderneming/rechtsvormen?land=DE')).json();
+    const de = await (await fetch(base + '/api/onderneming/rechtsvormen?land=DE', gk)).json();
     assert.equal(de.ok, true);
     assert.ok(de.rechtsvormen.every(r => r.land === 'DE'));
-    const it = await (await fetch(base + '/api/onderneming/rechtsvormen?land=IT')).json();
-    assert.equal(it.ok, false, 'een land dat wij niet kennen zegt dat, ook publiek');
+    const it = await (await fetch(base + '/api/onderneming/rechtsvormen?land=IT', gk)).json();
+    assert.equal(it.ok, false, 'een land dat wij niet kennen zegt dat');
   } finally {
     try { child.kill('SIGKILL'); } catch (e) { /* al weg */ }
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* niets */ }

@@ -460,6 +460,38 @@ async function meet() {
           'zou moeten openen is van buiten niet te zien';
       }
     }
+    /* ---------------------------------------------------------------------
+       DE UITGELOGDE BEZOEKER BEREIKT NIETS (eigenaarsbesluit 19 oktober 2026:
+       gebruiken vraagt een account). Per functie elke route die een anonieme
+       klop NIET met 401 of 403 weigert, terwijl hij niet op de lijst van
+       uitzonderingen staat (scripts/lib/publiek.js voor de openbare paden,
+       scripts/lib/eigenpoort.js voor de deuren waar de poort in de handler
+       zit, zoals de inlog).
+
+       TWEE BAKKEN, met de indeling van scripts/poortwacht.js:
+         bezoekerDefecten  2xx of 3xx -- hij kreeg een antwoord. Dat is een
+                           defect, en de meter klopt dan niet.
+         bezoekerStil      een andere niet-weigering (400, 404, 422, 5xx): de
+                           handler draaide voor er een poort was. Geen gegevens
+                           eruit, wel een rommelige volgorde; triage voor een
+                           mens, geen defect.
+       --------------------------------------------------------------------- */
+    const { POORTWACHT } = require('./lib/publiek');
+    const { EIGEN_POORT } = require('./lib/eigenpoort');
+    const uitzondering = (pad) => POORTWACHT.has(pad) || EIGEN_POORT.has(pad);
+    uit.bezoekerDefecten = []; uit.bezoekerStil = [];
+    const alGemeld = new Set();
+    for (const f of FUNCTIES) {
+      const paden = Array.isArray(f.paden) ? f.paden : [];
+      for (const r of routes.filter((x) => paden.some((p) => onderVoorvoegsel(x.pad, p))).slice(0, MAX_PER_CEL)) {
+        const sleutel = r.methode + ' ' + r.pad;
+        if (alGemeld.has(sleutel) || uitzondering(r.pad)) continue;
+        const an = await anoniemVoor(r);
+        if (!an || an.onbepaald || WEIGERSTATUS.has(an.status)) continue;
+        alGemeld.add(sleutel);
+        (an.status < 400 ? uit.bezoekerDefecten : uit.bezoekerStil).push({ functie: f.id, route: sleutel, status: an.status });
+      }
+    }
   } finally { srv.klaar(); }
 
   const t = { cellen: uit.cellen.length, waar: 0, 'correct-afgesloten': 0, registerleugen: 0,
@@ -471,7 +503,7 @@ async function meet() {
   /* Twee getallen en geen samengesteld cijfer. `klopt` gaat alleen over de harde
      fout; de andere richting is een triagelijst en geen defect, en die twee bij
      elkaar optellen zou van een vraag een uitslag maken. */
-  uit.klopt = t.registerleugen === 0 && uit.overgeslagen.length === 0;
+  uit.klopt = t.registerleugen === 0 && uit.overgeslagen.length === 0 && !(uit.bezoekerDefecten || []).length;
   return uit;
 }
 
@@ -501,6 +533,11 @@ function druk(u) {
     for (const c of u.zonderVerklaring.slice(0, 25))
       console.log('    ' + c.doelgroep.padEnd(12) + c.functie.padEnd(22) + (c.open || ''));
     if (u.zonderVerklaring.length > 25) console.log('    ... en nog ' + (u.zonderVerklaring.length - 25));
+  }
+  if ((u.bezoekerDefecten || []).length) {
+    console.log('\n  \x1b[31mDE UITGELOGDE BEZOEKER KOMT BINNEN (' + u.bezoekerDefecten.length + ', defect):\x1b[0m');
+    for (const d of u.bezoekerDefecten.slice(0, 40)) console.log('    ' + String(d.status).padEnd(5) + d.route + '  (' + d.functie + ')');
+    if (u.bezoekerDefecten.length > 40) console.log('    ... en nog ' + (u.bezoekerDefecten.length - 40));
   }
   console.log(u.klopt ? '\nGeen registerleugens.' : '\nHET REGISTER KLOPT NIET MET DE DEUREN.');
 }

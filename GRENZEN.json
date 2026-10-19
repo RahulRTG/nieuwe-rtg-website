@@ -512,7 +512,9 @@
       "ghostSimuleer"
     ],
     "gids": [
-      "appgids"
+      "appgids",
+      "resolveSession",
+      "rtf"
     ],
     "home": [
       "homeMerken",
@@ -1796,6 +1798,8 @@
     "rtfos": [
       "boardroomAuth",
       "genootschapDrager",
+      "resolveSession",
+      "rtf",
       "rtfos"
     ],
     "rtfschool": [

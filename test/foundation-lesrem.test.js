@@ -27,6 +27,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+// de les vraagt een account (eigenaarsbesluit 19 oktober 2026): les maken en meedoen met een gratis account
+require('./lesaccount').zetLesAccount();
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lesrem-'));
 let BASE, srv;

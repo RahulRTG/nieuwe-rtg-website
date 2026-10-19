@@ -13,7 +13,9 @@
      1. de zaak drukt een QR (POST /api/supplier/horeca/gast/qr)
      2. de gast opent het pad dat daar letterlijk uit komt (?t=<token>)
      3. het scherm noemt de zaak en de tafel -- dat kwam van de server
-     4. de gast schuift aan met alleen een naam, en ziet de rekening
+     4. de gast maakt in het scherm een gratis account (eigenaarsbesluit 19
+        oktober 2026: de QR is een extra sleutel bij een account), schuift aan
+        op zijn codenaam en ziet de rekening
      5. zonder token zegt het scherm wat je moet doen, en toont het GEEN zaak
 
    Die vijfde is de privacyhelft: een gast-URL zonder geldig token mag niets
@@ -67,8 +69,17 @@ test('de gast scant de QR, schuift aan en ziet zijn rekening; zonder token ziet 
     const fouten = [];
     letOpFouten(page, fouten);
 
-    await t.test('met de QR: de zaak en de tafel komen van de server', async () => {
+    await t.test('met de QR: eerst een gratis account in het scherm, dan de zaak en de tafel van de server', async () => {
       await page.goto(srv.base + qr.pad, { waitUntil: 'domcontentloaded' });
+      await page.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor();
+      assert.strictEqual((await page.locator('#zaakNaam').textContent()).trim(), 'Aan tafel',
+        'zonder account geeft de QR nog niets over de zaak prijs');
+      const u = Date.now().toString().slice(-8);
+      await page.getByLabel('Naam', { exact: true }).fill('Proefgast');
+      await page.getByLabel('E-mailadres', { exact: true }).fill('tafel' + u + '@voorbeeld.nl');
+      await page.getByLabel('Geboortedatum', { exact: true }).fill('1985-05-05');
+      await page.getByLabel('Wachtwoord (minstens zes tekens)', { exact: true }).fill('geheim12345');
+      await page.getByRole('button', { name: 'Account maken en doorgaan', exact: true }).click();
       /* NIET wachten op "er staat een naam": de kop draagt statisch al 'Aan
          tafel', dus die wacht slaagt voordat de server iets heeft gezegd. De
          wacht is dat de naam VERANDERT -- dat kan alleen de server doen. */
@@ -84,13 +95,13 @@ test('de gast scant de QR, schuift aan en ziet zijn rekening; zonder token ziet 
       assert.match(kop.sub, /Tafel 7/, 'de tafel van de sticker staat op het scherm: ' + kop.sub);
     });
 
-    await t.test('aanschuiven met alleen een naam, en de rekening verschijnt', async () => {
+    await t.test('aanschuiven op de codenaam van het account, en de rekening verschijnt', async () => {
       await page.waitForSelector('#vAanschuif:not([hidden])', { timeout: 10000 });
-      await page.fill('#naam', 'Proefgast');
+      assert.equal(await page.locator('#naam').count(), 0, 'de gast typt geen naam: op de rekening staat zijn codenaam');
       await page.click('#bAanschuif');
       /* Aangeschoven is: het aanschuifvenster is weg en er staat een rekening.
          De INHOUD van die rekening (leeg of niet) is hier niet de bewering;
-         dat een vreemde met alleen een naam een sessie krijgt, is het. */
+         dat een gast met een vers gratis account een sessie krijgt, is het. */
       /* GEEN waitForSelector: die wacht standaard op een ZICHTBAAR element, en
          een element met [hidden] is per definitie niet zichtbaar -- die wacht
          kan dus nooit slagen. Dat is hier gebeurd: de flow werkte, de toets

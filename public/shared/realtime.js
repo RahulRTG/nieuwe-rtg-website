@@ -104,7 +104,7 @@
       if (perm !== 'granted') return 'denied';
       try {
         const reg = await navigator.serviceWorker.ready;
-        const { key } = await (await fetch('/api/push/key')).json();
+        const { key } = await (await fetch('/api/push/key', { headers: { 'Authorization': 'Bearer ' + this.token } })).json();
         if (!key) return 'unsupported';
         let sub = await reg.pushManager.getSubscription();
         if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToUint8(key) });

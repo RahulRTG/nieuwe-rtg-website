@@ -7,10 +7,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const { MERK: IJKMERK } = require('../scripts/lib/schonebron');
 
+/* De app-gids hoort bij een ingelogd scherm (eigenaarsbesluit 19 oktober 2026):
+   de gidsvragen reizen met een gratis account (`lid`, zie test.before). */
+let lid = null;
 function api(base, pad, body) {
-  return fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
+  const kop = pad === '/api/gids/app' && lid ? { Authorization: 'Bearer ' + lid.token } : {};
+  return fetch(base + pad, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, kop), body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
@@ -19,6 +24,7 @@ test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-negenplus-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
+  lid = await registreerGratis(base);
   gezin = (await api(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Testgezin', naam: 'Ouder', pin: '1234' })).body;
   const kp = (await api(base, '/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Kim', rol: 'kind', groep: 'kind' })).body;
   kind = (await api(base, '/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kp.profiel.id })).body;
@@ -50,6 +56,8 @@ test('1. de app-gids dekt ELKE app-pagina met een eigen uitleg (wat, doe, tip)',
 });
 
 test('2. de gids kent de werelden: RTF kindvriendelijk, en buiten /apps/ geen gids', async () => {
+  const zonder = await fetch(base + '/api/gids/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pad: '/apps/mall.html' }) });
+  assert.equal(zonder.status, 401, 'zonder sessie geen gids');
   const rtf = (await api(base, '/api/gids/app', { pad: '/apps/foundation/bieb.html' })).body.gids;
   assert.equal(rtf.wereld, 'rtf');
   assert.match(rtf.wat + rtf.tip, /gratis/i, 'de RTF-uitleg benadrukt dat alles gratis is');

@@ -23,10 +23,23 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let BASE, child, ZAAK;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gast-'));
-const post = (pad, body, token) => fetch(BASE + pad, {
+/* De gast aan tafel heeft een gratis account (eigenaarsbesluit 19 oktober 2026):
+   de QR is een extra sleutel bij de sessie, nooit een vervanging. Een /api/gast-
+   aanroep zonder eigen token reist met dat account mee; een expliciete null is
+   een aanroep zonder account. */
+const gastLeden = new Map();
+async function post(pad, body, token) {
+  if (token === undefined && String(pad).startsWith('/api/gast/')) {
+    if (!gastLeden.has(BASE)) gastLeden.set(BASE, await registreerGratis(BASE));
+    token = (gastLeden.get(BASE) || {}).token;
+  }
+  return postKaal(pad, body, token);
+}
+const postKaal = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -76,7 +89,8 @@ test('een gastbestelling komt op dezelfde rekening die de zaak ziet, en de prijs
   assert.equal(aan.status, 200);
   const sleutel = aan.body.sleutel;
   assert.ok(sleutel && sleutel.length >= 24, 'aanschuiven levert een tafelsleutel');
-  assert.equal(aan.body.ik.handle, 'Sam');
+  // op de rekening staat de codenaam van het account, niet een zelfgekozen naam
+  assert.equal(aan.body.ik.handle, gastLeden.get(BASE).codenaam);
 
   /* De telefoon stuurt een eigen prijs mee. Die hoort genegeerd te worden:
        de kaart van de zaak bepaalt wat iets kost. */

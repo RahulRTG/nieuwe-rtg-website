@@ -99,7 +99,7 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
      Een deelnemer krijgt een nummer (dat is het `gastNr` dat de bestaande
      rekening al kent, dus de splitlaag per persoon werkt meteen) en een eigen
      sleutel. De sleutel gaat een keer over de lijn en wordt gehasht bewaard. */
-  function schuifAan(zaakcode, plek, { naam, codenaam, lid, leeftijd, leeftijdGeverifieerd, soort, folioVan }) {
+  function schuifAan(zaakcode, plek, { naam, codenaam, account, lid, leeftijd, leeftijdGeverifieerd, soort, folioVan }) {
     const r = rekeningVoorPlek(zaakcode, soort || 'tafel', plek, { folioVan });
     if (r.error) return r;   // een kamer zonder open gastrekening: geen sessie
     if (!Array.isArray(r.deelnemers)) r.deelnemers = [];
@@ -115,6 +115,8 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
       nr,
       handle: schoon(codenaam, 40) || schoon(naam, 40) || ('Gast ' + nr),
       lid: !!lid,
+      // het account dat aanschoof (zijn codenaam): de tafelsleutel werkt alleen voor die sessie
+      account: account || null,
       /* De leeftijd staat hier als FEIT en niet als bewering: alleen een
          geverifieerde leeftijd telt bij de alcoholregel in beleid.js. */
       leeftijd: leeftijd == null ? null : Math.max(0, Math.min(120, parseInt(leeftijd, 10) || 0)),

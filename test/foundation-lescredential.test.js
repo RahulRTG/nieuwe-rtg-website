@@ -155,8 +155,16 @@ test('een les van voor de migratie: de oude code en tokens openen niets, en ze g
   const oud = await roep('GET /bord/:code', { params: { code: 'OUDECODE' },
     get: k => (k === 'authorization' ? 'Bearer ' + 'a'.repeat(48) : '') });
   assert.equal(oud.statusCode, 404, 'het oude leraarstoken opent het bord niet meer: de les heeft geen credential');
-  assert.equal((await roep('POST /les/join', { body: { lescode: 'OUDECODE', naam: 'X' } })).statusCode, 404);
-  const nieuw = await roep('POST /les/maak', { body: { vak: 'Nieuw', naam: 'Juf' } });
+  /* Les maken en meedoen vragen een account (eigenaarsbesluit 19 oktober 2026,
+     onderwijs/lesaccount.js): zonder sessie 401, en met een lidsessie meet dit
+     wat het mat -- de oude code opent niets. De sessieoplosser is hier
+     nagebouwd zoals de router: een token, een account. */
+  require('../server/kern/isolatie/sessiedragers').zetSessieOplosser(t => (t === 'lid-proef' ? { key: 'user-1', account: { id: 1 } } : null));
+  const lid = { get: k => (k === 'authorization' ? 'Bearer lid-proef' : '') };
+  assert.equal((await roep('POST /les/join', { body: { lescode: 'OUDECODE', naam: 'X' } })).statusCode, 401);
+  assert.equal((await roep('POST /les/maak', { body: { vak: 'Nieuw', naam: 'Juf' } })).statusCode, 401);
+  assert.equal((await roep('POST /les/join', Object.assign({ body: { lescode: 'OUDECODE', naam: 'X' } }, lid))).statusCode, 404);
+  const nieuw = await roep('POST /les/maak', Object.assign({ body: { vak: 'Nieuw', naam: 'Juf' } }, lid));
   assert.equal(nieuw.statusCode, 200);
   const json = JSON.stringify(data.foundation);
   assert.equal(json.includes('a'.repeat(48)) || json.includes('b'.repeat(48)), false, 'kale oude tokens op schijf');

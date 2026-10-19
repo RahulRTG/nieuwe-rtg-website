@@ -168,7 +168,7 @@ async function start() {
   $('#app').classList.remove('verborgen');
   try {
     const r = await fetch('/api/rtfos/publiek/steden', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() }, body: '{}'
     }).then(x => x.json());
     $('#steden').innerHTML = (r.steden || []).length
       ? r.steden.map(s => '<button type="button" class="stadknop" data-stad="' + esc(s.id) + '" aria-pressed="false">' +

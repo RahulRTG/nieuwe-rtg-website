@@ -26,13 +26,25 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosaf-'));
 const OFFICE_CODE = 'RTFOSAF-KEURING';
 
 let srv, BASE, LAND, WERKER, STAD, PROJECT, CASUS, ANDERE, KEY_WERKER;
 
-const post = (pad, body, tok) => fetch(BASE + pad, {
+/* De buurt-app vraagt een account (eigenaarsbesluit 19 oktober 2026): een
+   aanroep van /api/rtfos/publiek/{steden,stad,campagnes} zonder eigen token
+   reist met een gratis account mee; een expliciete null is zonder account. */
+let buurtLid = null;
+async function post(pad, body, tok) {
+  if (tok === undefined && /^\/api\/rtfos\/publiek\/(steden|stad|campagnes)$/.test(pad)) {
+    buurtLid = buurtLid || await registreerGratis(BASE);
+    tok = buurtLid.token;
+  }
+  return postKaal(pad, body, tok);
+}
+const postKaal = (pad, body, tok) => fetch(BASE + pad, {
   method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(body || {})

@@ -125,9 +125,13 @@ test('2. de cluster-schakelaar bestaat niet voor wie de sleutel niet heeft', asy
 
 /* ================= 3. wat er open MAG staan ================= */
 
-test('3. de publieke sleutel voor pushmeldingen is publiek, en alleen de publieke', async () => {
-  const r = await get('/api/push/key');
-  assert.equal(r.status, 200, 'de sleutel is op te halen zonder inlog');
+test('3. de pushsleutel hoort bij een ingelogd scherm, en het is alleen de publieke helft', async () => {
+  /* Sinds het eigenaarsbesluit van 19 oktober 2026 vraagt hij een sessie: elk
+     lid, elke zaak en het kantoor zetten push aan (kern/elkesessie.js). */
+  assert.equal((await get('/api/push/key')).status, 401, 'zonder sessie geen sleutel');
+  assert.equal((await get('/api/push/key', zaak)).status, 200, 'een zaaksessie haalt hem op');
+  const r = await get('/api/push/key', lid.token);
+  assert.equal(r.status, 200, 'een lid haalt hem op');
   /* Een VAPID-paar heeft een publieke en een private helft. Alleen de publieke
      hoort de deur uit; de private is waarmee je meldingen ondertekent. */
   assert.equal(/privateKey|priv/i.test(r.tekst), false, 'de private helft komt er niet uit');
@@ -146,16 +150,20 @@ test('4. de zegelcontrole keurt een verzonnen zegel af zonder iets te verklappen
   }
 });
 
-test('5. de krant is openbaar, maar kent geen verzonnen editie', async () => {
-  const gids = await post('/api/krant/gids', {});
-  assert.equal(gids.status, 200, 'de gids is openbaar');
+test('5. de krant vraagt een account, en kent geen verzonnen editie', async () => {
+  /* Eigenaarsbesluit 19 oktober 2026: de krant staat niet op de landing, dus
+     lezen vraagt een account (een gratis account is genoeg). */
+  for (const pad of ['/api/krant/gids', '/api/krant/open', '/api/krant/artikel'])
+    assert.equal((await post(pad, { code: 'BESTAATNIET', id: 'x' })).status, 401, pad + ' zonder account');
+  const gids = await post('/api/krant/gids', {}, lid.token);
+  assert.equal(gids.status, 200, 'de gids is er voor elk account');
   assert.ok(Array.isArray(gids.body.lijst), 'een lijst, ook als hij leeg is');
 
-  const open = await post('/api/krant/open', { code: 'BESTAATNIET' });
+  const open = await post('/api/krant/open', { code: 'BESTAATNIET' }, lid.token);
   assert.notEqual(open.status, 500, 'een onbekende krantcode valt niet om');
   assert.notEqual(open.status, 200, 'en levert geen krant op');
 
-  const art = await post('/api/krant/artikel', { code: 'BESTAATNIET', id: 'x' });
+  const art = await post('/api/krant/artikel', { code: 'BESTAATNIET', id: 'x' }, lid.token);
   assert.notEqual(art.status, 500);
   assert.equal(art.tekst.includes(NAAM), false, 'en er komt geen ledennaam uit');
 });

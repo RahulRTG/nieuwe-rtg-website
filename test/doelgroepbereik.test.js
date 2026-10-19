@@ -281,3 +281,23 @@ test('15. `gast` is twee mensen, en de meter draagt ze allebei', () => {
      er gekozen is waar niets te kiezen viel. */
   assert.ok(j.cellen.filter((c) => c.doelgroep !== 'gast').every((c) => c.openVorm === undefined));
 });
+
+test('16. de uitgelogde bezoeker bereikt niets buiten de uitzonderingen', () => {
+  /* Eigenaarsbesluit 19 oktober 2026 (AGENTS.md: gebruiken vraagt een account).
+     De vorm `bezoeker` is de uitgelogde mens, zonder enig token
+     (lib/doelgroepsessies.js). Krijgt hij op een route van een functie een
+     2xx of 3xx terwijl die route niet op de lijst van uitzonderingen staat
+     (scripts/lib/publiek.js, scripts/lib/eigenpoort.js), dan is dat een
+     defect en klopt de meter niet.
+
+     DE MUTATIES: zet een route terug zonder poort, of laat de bezoeker weer
+     inloggen met de gastinlog -> deze toets zakt. */
+  const { DOELGROEPEN } = require('../scripts/lib/doelgroepsessies');
+  assert.deepEqual(DOELGROEPEN.gast.vormen.bezoeker.draag('uitgelogd'), { kop: {}, lijf: {} },
+    'de bezoeker draagt geen enkel token');
+  const j = lees('DOELGROEPBEREIK.json');
+  assert.ok(Array.isArray(j.bezoekerDefecten), 'de meting kent de bezoekersdefecten niet; draai npm run doelgroepbereik:vast');
+  assert.deepEqual(j.bezoekerDefecten.map(d => d.status + ' ' + d.route), [],
+    'de uitgelogde bezoeker krijgt een antwoord buiten de uitzonderingen');
+  assert.match(bron, /uit\.klopt = .*bezoekerDefecten/, 'een bezoekersdefect hoort de meter te laten zakken');
+});

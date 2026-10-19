@@ -18,12 +18,6 @@
 'use strict';
 
 const PUBLIEK = new Map([
-  ['/api/werk-leverancier/beeld', 'Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd.'],
-  ['/api/werk-leverancier/besluit', 'Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang.'],
-  ['/api/werk-gast/betaling/start', 'Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren.'],
-  ['/api/werk-gast/betaling/status', 'Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client.'],
-  ['/api/werk-gast/beeld', 'Een gast heeft geen RTG-account: een tijdelijk 256-bit geheim toont precies één afspraak; opslag bewaart alleen de hash en iedere lezing controleert intrekking en tenantstatus.'],
-  ['/api/werk-gast/besluit', 'Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten.'],
   // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
   ['/api/auth/register', 'registreren kan alleen zonder account'],
   ['/api/mail/ses', 'AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht'],
@@ -122,9 +116,6 @@ const PUBLIEK = new Map([
      QR op die tafel. Het token is dus de credential en geen gemakje -- het is
      negen bytes willekeur, het staat gehasht in de opslag, en beide routes
      hebben een rem per ip die bij een misser oploopt. */
-  ['/api/gast/tafel', 'de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)'],
-  ['/api/gast/aanschuiven', 'aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)'],
-  ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
   ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
   ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],
   ['/api/rtgid/start', 'de identiteitsstroom begint voordat er een sessie is'],
@@ -224,22 +215,19 @@ const PUBLIEK = new Map([
   ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
   ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
 
-  /* De drie doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js).
-     De eerste twee dragen dezelfde twee remmen als de codes hierboven; de
-     derde heeft geen code omdat er niets achter zit wat een code verdient --
-     zie kern/rtfos/publiek.js, waar de maat letterlijk is: wat zou je op een
-     poster in het buurthuis hangen? */
+  /* Twee doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js), met
+     dezelfde twee remmen als de codes hierboven. De derde, de buurt-app
+     (/api/rtfos/publiek/steden, stad en campagnes), staat hier niet meer: sinds
+     het eigenaarsbesluit van 19 oktober 2026 vraagt hij een account of een
+     gezinsprofiel aan het account van een ouder. */
   ['/api/rtfos/portaal/vrijwilliger', 'de vrijwilligerscode is de geloofsbrief; alleen zijn eigen planning en uren, geen contactgegevens en geen evaluaties'],
   ['/api/rtfos/portaal/vrijwilliger/zet', 'idem: hij werkt zijn eigen beschikbaarheid bij; zijn VOG en status zet de afdeling'],
   ['/api/rtfos/portaal/vrijwilliger/uren', 'idem: uren die hij opgeeft komen binnen als MELDING en tellen pas na bevestiging'],
   ['/api/rtfos/portaal/deelnemer', 'de deelnemerscode is de geloofsbrief; uitsluitend de stand van die ene hulpvraag'],
   ['/api/rtfos/portaal/deelnemer/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
-  ['/api/rtfos/publiek/steden', 'de buurt-app: alleen wat op een poster in het buurthuis zou hangen, geen enkel getal over hulpvragen'],
-  ['/api/rtfos/publiek/stad', 'idem, per stad: lopende projecten en open activiteiten'],
-  ['/api/rtfos/publiek/campagnes', 'idem: welke landelijke campagnes lopen, zonder opgehaalde bedragen'],
   ['/api/rtfos/portaal/donateur', 'de gever op zijn eigen code (RTFS-): alleen zijn eigen giften en waar ze heen gingen, nooit wie er nog meer gaf. Twee remmen, per bron en per code'],
   ['/api/rtfos/portaal/donateur/bewijs', 'idem: het giftbewijs voor een van zijn eigen giften'],
-  ['/api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatieplicht: een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers'],
+  ['/api/rtfos/publiek/jaarverslagen', 'eigenaarsbesluit 19 oktober 2026, uitzondering 7: de wettelijke ANBI-publicatieplicht; een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers, en niets ernaast'],
 
   // ---- publieke informatie: staat ook gewoon op de site ----
   ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
@@ -267,13 +255,8 @@ const PUBLIEK = new Map([
   ['/api/bescherming/deur/stand', 'de eigen code is de geloofsbrief, en hij is met opzet GEEN wachtwoord: dit antwoordt alleen de stand en of er iets is klaargezet, nooit wat'],
   ['/api/bescherming/deur/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
   ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
-  ['/api/gids/app', 'de app-gids is openbaar'],
-  ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],
-  ['/api/krant/open', 'idem'],
-  ['/api/krant/artikel', 'idem'],
   ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
   ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
-  ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
   /* Een klaargezette reis wordt geopend door iemand die nog GEEN lid is --
      dat is de hele opzet van de reisuitnodiging. Het slot is de code zelf
      (128 bits uit crypto.randomBytes); wat er zonder opeisen te zien is,
@@ -284,7 +267,6 @@ const PUBLIEK = new Map([
   ['/api/talen', 'de talenlijst voedt de kiezer op het inlogscherm'],
   ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
   ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
-  ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
   /* Het gedeelde scherm. Een televisie in een vakantiehuis heeft geen
      RTG-account, en er een op zetten zou betekenen dat er een ingelogde
      sessie op een gedeeld apparaat blijft staan. Koppelen gebruikt daarom
@@ -294,8 +276,8 @@ const PUBLIEK = new Map([
      `zicht.publiek` van dat ene potje. Er kan niets terug: geen zet en geen
      chat. Beide deuren hebben een rem en antwoorden nooit cachebaar. Zie
      server/kern/spellen/projectie.js. */
-  ['/api/projectie/koppel', 'een gedeeld scherm heeft nog geen sessie; een eenmalige 128-bits koppelcredential opent alleen de publieke laag van een potje'],
-  ['/api/projectie/kijk', 'de intrekbare schermsessie leest alleen de publieke laag van het gekoppelde potje'],
+  ['/api/projectie/koppel', 'eigenaarsbesluit 19 oktober 2026, uitzondering 6: het tv-scherm wisselt de eenmalige 128-bits code van een INGELOGD lid (projectie-open vraagt auth) in voor een gehashte schermsessie; zonder geldige code 404, rem per adres'],
+  ['/api/projectie/kijk', 'eigenaarsbesluit 19 oktober 2026, uitzondering 6: de intrekbare schermsessie uit die koppeling leest alleen de publieke laag van het gekoppelde potje'],
   ['/api/projectie/:code', 'oude projectie-URL is uitsluitend een cacheloze 410-eindstatus en opent nooit meer een potje'],
   /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
      een stichting onderscheidt, en waar je met elk van de twee aan vastzit,
@@ -303,7 +285,6 @@ const PUBLIEK = new Map([
      geen enkele onderneming in -- alleen de vaste tabel uit
      kern/onderneming/rechtsvorm.js. Alles wat wel over een echt bedrijf
      gaat, zit in dezelfde router achter auth. */
-  ['/api/onderneming/rechtsvormen', 'de rechtsvormtabel is voorlichting; er staat geen enkele onderneming in'],
   /* Het algoritmeregister van de stad. Een register dat alleen achter een
      kantoorinlog te lezen is, geeft een inwoner precies niets -- en dat is
      de enige groep voor wie het bedoeld is. Er staan regels in, geen mensen:
@@ -337,8 +318,8 @@ const PUBLIEK = new Map([
   ['/api/munt/webhook', 'idem, met een eigen webhook-secret'],
   ['/api/betaal/webhook/connect', 'Stripe Connect-meldingen over partnerafrekeningen, ondertekend met een EIGEN geheim (STRIPE_CONNECT_WEBHOOK_SECRET); zonder dat geheim weigert de route met 404 (niet ingericht)'],
   ['/api/cluster/:actie', 'de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet'],
-  ['/api/werkmail/bezorg', 'inkomende post van de mailserver, met een eigen venster-rem per minuut'],
-  ['/api/mail/binnen', 'de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)'],
+  ['/api/werkmail/bezorg', 'eigenaarsbesluit 19 oktober 2026, uitzondering 6: machinepost van de eigen mailserver, met het gedeelde geheim in de kop x-rtg-mailpoort (server/kern/mailpoort.js); zonder ingericht geheim dicht, en een rem per minuut'],
+  ['/api/mail/binnen', 'eigenaarsbesluit 19 oktober 2026, uitzondering 6: een mailserver is geen lid, maar alleen de eigen mailserver met het gedeelde geheim in de kop x-rtg-mailpoort komt binnen (server/kern/mailpoort.js); in de SES-stand dicht, rem per minuut'],
   ['/api/stad/doos/hartslag', 'de stadsdoos stuurt zijn apparaatsleutel mee'],
   ['/api/stad/doos/meting', 'idem'],
   ['/api/rtgid/status', 'RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie'],
@@ -403,6 +384,7 @@ const ALLEEN_ANONIEM = new Map([
   ['/api/foundation/health', 'leven-teken van de RTF (zonder cijfers, zie server/foundation.js)'],
   ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
   ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],
+  ['/api/loop/operations', 'dezelfde meetpoort (magMeten in server/routes/loop-fabric.js): van buiten 404, alleen intern of met RTG_METRICS_TOKEN; een anonieme klop van 127.0.0.1 is binnen'],
   ['/api/doos/rapport', 'de zaakdoos meldt zijn dagrapport op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
 
   // ---- publieke verantwoording en vaste teksten ----
@@ -431,9 +413,7 @@ const ALLEEN_ANONIEM = new Map([
 
      WAAROM HIER EN NIET BIJ PUBLIEK: keuringsregel 28 leest alleen
      `app.post('/api/...')`; deze route hangt aan de router onder /api/foundation. */
-  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
-  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js'],
-  ['/api/foundation/les/join', 'meedoen zonder account: de 128-bit lescode IS de geloofsbrief en wordt atomair geclaimd (B17); rem per ip, plafond 60 per les']
+  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend']
 ]);
 
 /* De som, voor de poortwacht. Een pad dat in beide lijsten zou staan is een

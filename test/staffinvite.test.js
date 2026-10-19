@@ -10,10 +10,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-inv-'));
-let child, managerToken, balieToken, lidToken;
+let child, managerToken, balieToken, lidToken, sollicitant; // sollicitant: een gratis account (eigenaarsbesluit 19 oktober 2026)
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -25,6 +26,7 @@ let BEDRIJF; // de echte demonaam van KIKUNOI, uit de roster
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  sollicitant = (await registreerGratis(BASE)).token;
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   BEDRIJF = roster.supplier.name;
   const man = roster.staff.find(x => x.role === 'manager');
@@ -182,30 +184,36 @@ test('ontslag: een verwijderd teamlid kan niet meer inloggen', async () => {
   assert.equal((await api('/api/supplier/login', { code: 'KIKUNOI', staffId: sara.id, pin: '9753' })).status, 401, 'na ontslag komt zij er niet meer in');
 });
 
-test('een sollicitant aannemen levert een kassacode op, geen kant-en-klaar account', async () => {
-  // solliciteer als ons lid
-  assert.equal((await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Nova de Wit', func: 'Bediening', contact: 'nova@x.nl' })).status, 200);
+test('een sollicitant aannemen verbindt zijn eigen account, en er gaat geen kassacode rond', async () => {
+  /* Solliciteren vraagt sinds het eigenaarsbesluit van 19 oktober 2026 een
+     account, dus hangt de sollicitatie aan een sleutel -- zoals /api/member/apply.
+     Aannemen verbindt dat account dan meteen (neemAan in
+     routes/supplier/werving/uitnodiging-afnemers.js). Er is geen anonieme
+     sollicitant meer die een kassacode nodig heeft om binnen te komen, en een
+     kassacode die niemand nodig heeft hoort niet in het antwoord te staan. */
+  assert.equal((await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Nova de Wit', func: 'Bediening', contact: 'nova@x.nl' })).status, 401, 'zonder account geen sollicitatie');
+  assert.equal((await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Nova de Wit', func: 'Bediening', contact: 'nova@x.nl' }, sollicitant)).status, 200);
   const lijst = await json(await api('/api/supplier/state', {}, managerToken));
   const open = (lijst.state.applications || []).find(x => x.status === 'nieuw');
   assert.ok(open, 'de sollicitatie staat open bij de werkgever');
   const d = await json(await api('/api/supplier/apply/decide', { id: open.id, action: 'aannemen' }, managerToken));
-  assert.ok(d.invite && /^[A-Z2-9]{6}\.[A-F0-9]{32}$/.test(d.invite.kassacode),
-    'aannemen geeft een 128-bit kassacode om eenmalig door te geven');
+  assert.ok(d.direct && d.direct.staffId, 'het account van de sollicitant is meteen verbonden: ' + JSON.stringify(d).slice(0, 160));
+  assert.equal(d.invite, undefined, 'er staat geen kassacode in het antwoord');
   assert.equal(d.bedrijf, BEDRIJF);
 });
 
-test('de anonieme sollicitatie heeft een eigen rem: een afzender duwt de lijst van een zaak niet vol', async () => {
+test('de sollicitatie heeft een eigen rem: een afzender duwt de lijst van een zaak niet vol', async () => {
   /* ARBEID.md par. 4 punt 8. De lijst van een zaak bewaart 100 sollicitaties
      en deze route heeft geen inlog; zonder rem drukte een afzender echte
      sollicitaties er stil uit. Een fout formulier telt niet mee. */
   const { SOLL_PER_UUR } = require('../server/routes/supplier/werving/sollrem');
   for (let i = 0; i < 3; i++)
-    assert.equal((await api('/api/supplier/apply', { code: 'ESVEDRA', name: '', func: 'x', contact: 'y' })).status, 400);
+    assert.equal((await api('/api/supplier/apply', { code: 'ESVEDRA', name: '', func: 'x', contact: 'y' }, sollicitant)).status, 400);
   const statussen = [];
   for (let i = 0; i < SOLL_PER_UUR + 1; i++)
-    statussen.push((await api('/api/supplier/apply', { code: 'ESVEDRA', name: 'Proef ' + i, func: 'Gids', contact: 'p' + i + '@x.nl' })).status);
+    statussen.push((await api('/api/supplier/apply', { code: 'ESVEDRA', name: 'Proef ' + i, func: 'Gids', contact: 'p' + i + '@x.nl' }, sollicitant)).status);
   assert.deepEqual(statussen.slice(0, SOLL_PER_UUR), Array(SOLL_PER_UUR).fill(200), 'de eerste ' + SOLL_PER_UUR + ' gaan door: ' + statussen);
   assert.equal(statussen[SOLL_PER_UUR], 429, 'daarna houdt de rem hem tegen');
-  assert.equal((await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Ander', func: 'Bediening', contact: 'a@x.nl' })).status, 200,
+  assert.equal((await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Ander', func: 'Bediening', contact: 'a@x.nl' }, sollicitant)).status, 200,
     'per zaak: bij een andere zaak kan dezelfde afzender gewoon solliciteren');
 });

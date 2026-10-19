@@ -7733,7 +7733,7 @@ var RTG_BOUW = '330b2d45';
   async function ensurePush(interactief){
     try{
       if (!('serviceWorker' in navigator) || !('PushManager' in window)){ if(interactief) toast('Push wordt op dit toestel niet ondersteund.'); return; }
-      const keyRes = await fetch('/api/push/key').then(r=>r.json()).catch(()=>({}));
+      const keyRes = await fetch('/api/push/key',{headers:{Authorization:'Bearer '+API.token}}).then(r=>r.json()).catch(()=>({}));
       if (!keyRes.key){ if(interactief) toast('Meldingen zijn nu niet beschikbaar.'); return; }
       if (interactief || Notification.permission==='default'){
         const perm = await Notification.requestPermission();

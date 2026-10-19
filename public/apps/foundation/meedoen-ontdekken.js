@@ -8,7 +8,7 @@
   function leesInteresses() { try { var x = JSON.parse(localStorage.getItem(sleutel) || '[]'); return Array.isArray(x) ? x : []; } catch (e) { return []; } }
   function bewaarInteresses() { try { localStorage.setItem(sleutel, JSON.stringify(staat.interesses.slice(-50))); } catch (e) {} }
   function api(pad, body) {
-    return fetch('/api/rtfos/publiek/' + pad, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(body || {}) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (x) { if (!r.ok || x.ok === false) throw new Error(x.error || 'Het buurtaanbod is nu niet bereikbaar.'); return x; }); });
+    var s = Sessie.huidig() || {}; return fetch('/api/rtfos/publiek/' + pad, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body || {})) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (x) { if (!r.ok || x.ok === false) throw new Error(x.error || 'Het buurtaanbod is nu niet bereikbaar.'); return x; }); });
   }
   function dag(v) { var x = new Date(v + 'T12:00:00'); return isNaN(x.getTime()) ? null : x; }
   function zelfdeDag(a, b) { return a && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }

@@ -14,6 +14,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const { maakLuister } = require('./stroombaken');
 
 let H, child, TMP, tokM, zora, abel;
@@ -107,7 +108,9 @@ test('B1. een ziekmelding: de manager DAT en sinds wanneer, de zieke zichzelf, e
 });
 
 test('sollicitaties: alleen de manager', async () => {
-  const r = await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Sanne Sollicitant', func: 'Kok', contact: 'sanne@x.nl', note: 'graag' });
+  // solliciteren vraagt een account (eigenaarsbesluit 19 oktober 2026): een gratis account
+  const sollicitant = await registreerGratis(H);
+  const r = await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Sanne Sollicitant', func: 'Kok', contact: 'sanne@x.nl', note: 'graag' }, sollicitant.token);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   const m = await state(tokM);
   assert.ok(m.applications.some(x => x.name === 'Sanne Sollicitant'), 'de manager ziet de sollicitatie');

@@ -6,7 +6,9 @@
   function el(id){return d.getElementById(id)}
   function antwoord(r){return r.json().catch(function(){return{}}).then(function(x){if(!r.ok)throw new Error(x.error||'Deze leeromgeving is nu niet bereikbaar.');return x})}
   function leer(url,body){return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:staat.sessie.code,token:staat.sessie.token},body||{}))}).then(antwoord)}
-  function basis(url,body){return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(antwoord)}
+  /* De les vraagt een account of het gezinsprofiel onder het account van een ouder (eigenaarsbesluit 19 oktober 2026). */
+  function basis(url,body){var t='';try{t=localStorage.getItem('rtg_member_token')||''}catch(e){}var g=staat.sessie||{};
+    return fetch(url,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},t?{Authorization:'Bearer '+t}:{}),body:JSON.stringify(Object.assign({gezinCode:g.code,gezinToken:g.token},body||{}))}).then(antwoord)}
   function open(naam){
     d.querySelectorAll('[data-lg-view]').forEach(function(x){var aan=x.dataset.lgView===naam;x.hidden=!aan;x.classList.toggle('is-actief',aan)});
     d.querySelectorAll('[data-lg-tab]').forEach(function(x){var aan=x.dataset.lgTab===naam;x.classList.toggle('is-actief',aan);x.setAttribute('aria-current',aan?'page':'false')});

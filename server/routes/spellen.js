@@ -117,7 +117,9 @@ module.exports = (kern) => {
     }
   }
   /* HET GEDEELDE SCHERM blijft zonder ledenaccount, maar niet zonder een
-     begrensde credential. De eenmalige koppeling en de blijvende schermsessie
+     begrensde credential (eigenaarsbesluit 19 oktober 2026, uitzondering 6):
+     de tv koppelt met de eenmalige code die een INGELOGD lid aanmaakte
+     (projectie-open vraagt auth), en hangt zo aan dat account. De eenmalige koppeling en de blijvende schermsessie
      reizen uitsluitend in POST-lijven. Zo belandt geen geheim in een URL,
      accesslog of Referer. Beide antwoorden zijn no-store. */
   app.post('/api/projectie/koppel', rem({ windowMs: 60000, limit: 20 }), (req, res) => {

@@ -24,6 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, elevateTier } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const RV = require('../server/kern/onderneming/rechtsvorm');
 const FASE = require('../server/kern/onderneming/fase');
@@ -314,11 +315,12 @@ test('een gewoon RTG-lid mag een onderneming beginnen -- geen paslaag voor naden
   assert.equal(mijn.ondernemingen.length, 1);
 });
 
-test('zonder inlog kom je er niet in, met de rechtsvormen als tegenproef', async () => {
+test('zonder inlog kom je er niet in, ook niet bij de rechtsvormen; een gratis account wel', async () => {
   const dicht = await post('/api/onderneming/mijn', {});
   assert.equal(dicht.status, 401, 'de eigen ondernemingen zitten achter de inlog');
-  // en de tegenproef: de voorlichting staat wél open, dus 401 is een besluit
-  const open = await fetch(BASE + '/api/onderneming/rechtsvormen');
+  // de voorlichting vraagt sinds het eigenaarsbesluit van 19 oktober 2026 ook een account
+  assert.equal((await fetch(BASE + '/api/onderneming/rechtsvormen')).status, 401);
+  const open = await fetch(BASE + '/api/onderneming/rechtsvormen', { headers: { Authorization: 'Bearer ' + (await registreerGratis(BASE)).token } });
   assert.equal(open.status, 200);
   const lijst = (await open.json()).rechtsvormen.map(r => r.id);
   for (const v of ['eenmanszaak', 'bv', 'stichting']) assert.ok(lijst.includes(v), v + ' hoort in de keuzelijst');

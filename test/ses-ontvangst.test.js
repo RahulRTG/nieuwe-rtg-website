@@ -9,6 +9,9 @@ const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
 const { startServer }=require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 const { teken }=require('../server/kern/ses-ontvangst');
 
 const SECRET='ses-testgeheim-van-meer-dan-32-tekens-123456';
@@ -47,7 +50,7 @@ const bericht=() => [
 ].join('\r\n');
 
 test.before(async () => {
-  ({ child, base }=await startServer({ env:{ RTG_DATA_DIR:TMP, SMTP_URL:'',
+  ({ child, base }=await startServer({ env:{ RTG_MAILPOORT_GEHEIM: GEHEIM, RTG_DATA_DIR:TMP, SMTP_URL:'',
     MAIL_INBOUND_PROVIDER:'aws-ses', SES_INBOUND_SECRET:SECRET,
     RTG_MAIL_PUBLIEK_BASIS:'rahultravelgroup.com' } }));
   const r=await json('/api/auth/register', { name:'Ada Lovelace', email:'ada-ses@example.test',

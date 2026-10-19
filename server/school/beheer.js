@@ -15,7 +15,7 @@ module.exports = (sctx) => {
     const sch = m ? eigenVeld(S(), m[1].toUpperCase()) : null;
     const reg = sch && sch.registratie;
     const hash = m ? crypto.createHash('sha256').update(m[2]).digest('hex') : '';
-    const verwacht = reg && String(reg.activatieHash || '');
+    const verwacht = String((reg && reg.activatieHash) || ''); // een onbekende code is een 403, geen 500
     const x = Buffer.from(hash), y = Buffer.from(verwacht);
     const geldig = reg && reg.activatieStatus === 'open' && Date.parse(reg.activatieVerlooptAt) > Date.parse(nu())
       && x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y);

@@ -348,8 +348,12 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+/* De buurt-app vraagt een account of een gezinsprofiel (eigenaarsbesluit 19 oktober 2026). */
+const lidToken = () => { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } };
+const gezin = () => { try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {}; } catch (e) { return {}; } };
 const api = (pad, body) => fetch(pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, lidToken() ? { Authorization: 'Bearer ' + lidToken() } : {}),
+  body: JSON.stringify(Object.assign(lidToken() ? {} : { code: gezin().code, token: gezin().token }, body || {}))
 }).then(async r => {
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');

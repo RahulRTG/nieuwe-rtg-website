@@ -5,11 +5,14 @@
   document.body.classList.add('pr-gast');
   const el = document.createElement('main'); el.id = 'praktijkGast'; el.className = 'praktijk'; document.body.append(el);
   const e = window.RTGWerk.esc;
+  // De link is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026): eerst inloggen of gratis aanmelden, hier in het scherm.
+  const deur = window.RTGAccountDeur;
   async function api(pad,b = {}) {
-    const r = await fetch('/api/werk-gast/' + pad,{ method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({ ...b,sleutel }) });
-    const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Dit is niet gelukt.'); return d;
+    const r = await fetch('/api/werk-gast/' + pad,{ method:'POST',cache:'no-store',headers:deur.kop({'Content-Type':'application/json'}),body:JSON.stringify({ ...b,sleutel }) });
+    const d = await r.json(); if (r.status === 401) deur.vergeet(); if (!r.ok) throw Object.assign(new Error(d.error || 'Dit is niet gelukt.'),{ status:r.status }); return d;
   }
   async function laad() {
+    await deur.eis(el,{ waarom:'Deze afspraak is met u gedeeld. Om hem te bekijken en te beantwoorden heeft u een RTG-account nodig; een gratis account is genoeg.' });
     el.textContent = 'Uw afspraak laden…';
     try {
       const d = await api('beeld');
@@ -26,7 +29,7 @@
         try { await api('besluit',{ keuze:k.dataset.keuze,versie:d.versie }); await laad(); }
         catch (err) { el.querySelector('[role=status]').textContent = err.message; knoppen.forEach(b => b.disabled = false); }
       }));
-    } catch (err) { el.textContent = err.message; }
+    } catch (err) { if (err.status === 401) return laad(); el.textContent = err.message; }
   }
   laad();
 })();

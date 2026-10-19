@@ -151,7 +151,8 @@
       sheet.querySelector('.bss-kop span').textContent = document.title || 'Deze app';
       document.body.appendChild(sheet);
       sheet.querySelector('.bss-x').addEventListener('click', sluit);
-      fetch('/api/gids/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pad: location.pathname }) })
+      var gs = gidsSessie(); // de sessie van dit scherm: ./basis-01ae-sessie.js
+      fetch('/api/gids/app', { method: 'POST', headers: gs.kop, body: JSON.stringify({ pad: location.pathname, code: gs.code, token: gs.token }) })
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (!sheet || !d || !d.gids) return;

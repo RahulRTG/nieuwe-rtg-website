@@ -14,6 +14,9 @@
       home.before(root); home.classList.add('wd-home'); root.appendChild(people); w.RTGDesktopSurface.move(root, home);
       root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
       w.RTGDesktopSurface.guard(root, home);
+      // De schilvlakken zeggen zelf welke taal zij tonen; de inhoud van de pagina staat in root en houdt <html lang>.
+      function talen() { [people, favorites, library, announcement].forEach(function (n) { n.lang = U.taal(); }); }
+      talen(); w.addEventListener('rtglang', talen);
       w.RTGWorldPresentation.start({root:root,home:home,people:people,favorites:favorites});
     var loadingHeader = U.el('header','wd-greeting'), loadingTitle=U.el('h1','',d.title);
     loadingHeader.appendChild(loadingTitle);root.prepend(loadingHeader);

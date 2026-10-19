@@ -169,10 +169,21 @@
       return fallback != null ? fallback : key;
     },
 
+    /* Toont deze pagina haar inhoud in this.lang? Na een keuze wel (het vangnet
+       vertaalt ook tekst zonder sleutel); zonder keuze alleen als de pagina
+       eigen sleutels draagt. De sleutels van de schil (desktop*, widget.)
+       tellen niet: die zijn niet de inhoud. */
+    inhoudVolgt() {
+      if (this.lang === 'nl') return true;
+      return this.chosen || !!document.querySelector('[data-i18n]:not([data-i18n^="desktop"]):not([data-i18n^="widget."])');
+    },
+
     apply(lang) {
       lang = /^[a-z]{2}$/.test(String(lang || '')) ? lang : 'nl';
       this.lang = lang;
-      document.documentElement.setAttribute('lang', lang);
+      // <html lang> zegt de taal van de inhoud, niet die van het toestel: een
+      // schermlezer leest anders Nederlandse tekst met een Engelse stem.
+      document.documentElement.setAttribute('lang', this.inhoudVolgt() ? lang : 'nl');
       if (lang !== 'nl' && lang !== 'en') this.laadWereldDict(lang, false);
       const d = this.dict(lang);
 
@@ -218,7 +229,9 @@
       // getekende interface gaat via de centrale, gebatchte vangnetlaag.
       // Activeer dat vangnet pas na een opgeslagen of expliciete taalkeuze:
       // de voorgeselecteerde toestel-taal mag een Nederlandstalig scherm niet
-      // al op de achtergrond half vertalen voordat de bezoeker kiest.
+      // al op de achtergrond half vertalen voordat de bezoeker kiest. Tot die
+      // keuze blijft <html lang> daarom nl waar de pagina geen eigen sleutels
+      // heeft (inhoudVolgt hierboven).
       if (window.RTGAutoVertaling) window.RTGAutoVertaling.apply(this.chosen ? lang : 'nl');
 
       this.updateSwitch();

@@ -44,6 +44,8 @@ function pagina({ lang, chosen, eigenSleutels }) {
   const window = { document };
   window.RTGi18n = lang == null ? undefined : {
     lang, chosen,
+    /* Hetzelfde antwoord als inhoudVolgt() in i18n.js; die regel zelf toetst schil-taal.e2e.js in de browser. */
+    inhoudVolgt() { return this.lang === 'nl' || !!this.chosen || !!eigenSleutels; },
     t(k, f) { if (this.lang === 'nl') return f; const v = window.I18N[this.lang] && window.I18N[this.lang][k]; return v != null ? v : f; }
   };
   window.window = window;

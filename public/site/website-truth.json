@@ -9,7 +9,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "ed683645cb3716d6b13f76eb1113e996d85c0c41ab28c32d9501f13b3ace3e38",
+  "sourceHash": "8a6878775a9c87e4a2939e747056e930175ecd174a75056760e90bdb338ab637",
   "platform": [
     {
       "id": "organisatie",
@@ -40,7 +40,7 @@
         "Stuur uw team aan met rooster en taken"
       ],
       "note": "Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.",
-      "sourceHash": "33a243b4c8479a5184860452fd27f2984428311326cb6b9fbeb0c0a09b7f6ddf"
+      "sourceHash": "4c56d83c44ea23e01601623c9086e0343541eb59495684ebe2c75152b9c48850"
     },
     {
       "id": "gebruiker",
@@ -56,7 +56,7 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "74ec70449d2ce7c9a9017d6c927097d1c32212a68cefca10a4ee332ae238f44b"
+      "sourceHash": "307ccd68f9fd7393315961b11ea5ea8ff39dc837b180455fe965a5a4efa4357a"
     }
   ],
   "worlds": {

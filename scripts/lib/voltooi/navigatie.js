@@ -142,18 +142,18 @@ async function loop(w, stap) {
     const n = opPlek(await meldingenRond(plek(4)), plek(4));
     return { klopt: opnieuw.status === 200 && n.length === 1,
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status +
-        (opnieuw.data && opnieuw.data.bevestigd ? ' (als bevestiging)' : '') + ', ' + n.length + ' melding' };
+        (opnieuw.data && opnieuw.data.herhaald ? ' (als herhaling)' : '') + ', ' + n.length + ' melding' };
   });
 
-  await stap('herstelbaar', 'een crash direct na een melding: hij staat er na de herstart, en opnieuw melden maakt er geen tweede van', async () => {
+  await stap('herstelbaar', 'een crash direct na een melding: hij staat er na de herstart, en opnieuw melden is een herhaling en geen tweede of een zelfbevestiging', async () => {
     await pauze();
     const m = await w.post(MELD, plek(5), T);
     await w.crash();
     const na = opPlek(await meldingenRond(plek(5)), plek(5));
     const opnieuw = await w.post(MELD, plek(5), T);
     const daarna = opPlek(await meldingenRond(plek(5)), plek(5));
-    return { klopt: m.status === 200 && na.length === 1 && opnieuw.status === 200 && opnieuw.data.bevestigd === true && daarna.length === 1,
-      ziet: 'melden ' + m.status + ', na SIGKILL ' + na.length + ' melding; opnieuw ' + opnieuw.status + (opnieuw.data && opnieuw.data.bevestigd ? ' als bevestiging' : '') + ', nu ' + daarna.length };
+    return { klopt: m.status === 200 && na.length === 1 && opnieuw.status === 200 && opnieuw.data.herhaald === true && daarna.length === 1,
+      ziet: 'melden ' + m.status + ', na SIGKILL ' + na.length + ' melding; opnieuw ' + opnieuw.status + (opnieuw.data && opnieuw.data.herhaald ? ' als herhaling' : '') + ', nu ' + daarna.length };
   });
 }
 

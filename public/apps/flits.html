@@ -217,9 +217,9 @@
       b.innerHTML = '<span class="i" aria-hidden="true">' + s.icoon + '</span>' + s.naam;
       b.addEventListener('click', async () => {
         if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om te kunnen melden.');
-        const m = await api('/api/flits/meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND });
+        const m = await api('/api/flits/meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND, idem: RTGIdem('flits') });
         if (m.body.error) return zeg(m.body.error);
-        zeg(m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
+        zeg(m.body.herhaald ? (m.body.let_op || 'Deze melding stond er al.') : m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
         ververs();
       });
       rij.appendChild(b);
@@ -237,7 +237,7 @@
     toonAlarm(rond.meldingen.find(m => m.afstandKm != null && m.afstandKm <= 1.2) || null);
   }
   $('#stemKlopt').addEventListener('click', async () => { if (!alarmMelding) return;
-    await api('/api/flits/stem', { id: alarmMelding.id, klopt: true }); zeg('Dank u.'); ververs(); });
+    const r = await api('/api/flits/stem', { id: alarmMelding.id, klopt: true }); zeg(r.body.error || 'Dank u.'); ververs(); });
   $('#stemWeg').addEventListener('click', async () => { if (!alarmMelding) return;
     const r = await api('/api/flits/stem', { id: alarmMelding.id, klopt: false });
     zeg(r.body.weg ? 'De melding is weggehaald.' : 'Genoteerd.'); ververs(); });

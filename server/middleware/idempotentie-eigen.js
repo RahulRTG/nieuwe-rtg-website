@@ -39,7 +39,10 @@ const EIGEN = [
   '/api/supplier/horeca/teruggave',
   /* de kantooruitnodiging bindt haar sleutel aan de uitgifte (kern/kantoor/uitnodiging.js)
      en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
-  '/api/office/kantoor/uitnodiging'
+  '/api/office/kantoor/uitnodiging',
+  /* de Flits-melding bewaart haar sleutel bij het object; dezelfde sleutel met
+     een ander verzoek is daar een 409 */
+  '/api/flits/meld'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

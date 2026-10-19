@@ -133,3 +133,18 @@ test('de gezinsrol: de catalogus draagt de vlag uit het scherm, de poort volgt h
   assert.match(app29d, /const GEZINSDEUR = '\/apps\/foundation\/index\.html'/);
   assert.match(app29d, /gezinsPoort,\s+rtfPoort, rtfSpeler/, 'de regel noemt de serverpoorten niet die hij volgt');
 });
+
+/* "Mijn RTG" (/apps/app.html) staat in de catalogus, maar het is geen functie:
+   het is de schil, en de gids kent het als de home van RTG Core. De poort leest
+   het daarom als die context (de wereldpoort van de gids), niet als een los
+   scherm zonder ingang. Werkrollen heeft geen home: dat is geen plek. */
+test('de schil is de home van RTG Core in de gids, en de poort leest hem zo', () => {
+  const apps = require('../public/shared/interface/world-widget-catalog.json').apps;
+  const schil = apps.find((a) => a.id === 'app');
+  assert.ok(schil && schil.url === '/apps/app.html');
+  const homes = CATALOGUS.filter((w) => w.home === schil.url).map((w) => w.id);
+  assert.deepEqual(homes, ['core'], 'de schil is in de gids de home van RTG Core en van niets anders');
+  assert.ok(!CATALOGUS.find((w) => w.id === 'werkrollen').home, 'de context Werkrollen heeft geen home');
+  const app29d = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-29d.js'), 'utf8');
+  assert.match(app29d, /w\.home && zonderQuery\(w\.home\) === doel[\s\S]*?gidsToegang\('world:' \+ w\.id, 'world'\)/, 'de poort leest een home niet als zijn context');
+});

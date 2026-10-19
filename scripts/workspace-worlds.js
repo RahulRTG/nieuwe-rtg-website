@@ -37,7 +37,7 @@ function gegevens() {
      het aantal werelden niet verandert; de wereldnaam zelf geeft geen toegang. */
   const inWereld = new Set(reg.MAPPEN.flatMap(m => m.items));
   const rollen = Object.keys(reg.LINKS).filter(k => reg.LINKS[k].werkrol && !inWereld.has('link:' + k)).map(k => 'link:' + k);
-  if (rollen.length) contexts.push({ id: 'werkrollen', name: 'Werkrollen', home: '/apps/app.html', kind: 'werkrol', items: rollen.map(regel) });
+  if (rollen.length) contexts.push({ id: 'werkrollen', name: 'Werkrollen', home: null, kind: 'werkrol', items: rollen.map(regel) });
   return contexts;
 }
 function bouw() {

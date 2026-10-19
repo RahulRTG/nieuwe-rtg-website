@@ -63,6 +63,10 @@
     const doel = zonderQuery(url), ids = [];
     for (const w of window.RTGWorkspaceWorldCatalog || []) for (const i of w.items || []) if (i.url && zonderQuery(i.url) === doel) ids.push(i.id);
     if (ids.length) return ids.some(id => gidsToegang(id));
+    /* Een schil is geen functie maar het THUIS van een context: /apps/app.html is
+       in de gids de home van RTG Core. Dan beslist de wereldpoort van de gids. */
+    const thuis = (window.RTGWorkspaceWorldCatalog || []).filter(w => w.home && zonderQuery(w.home) === doel);
+    if (thuis.length) return thuis.some(w => gidsToegang('world:' + w.id, 'world'));
     return app && app.gezinssessie && doel.split('#')[0] !== GEZINSDEUR ? gezinssessie() : null;
   };
   document.addEventListener('input', e => {

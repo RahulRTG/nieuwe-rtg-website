@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2856 |
 | losse beweringen (`test(...)`) | 19686 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2661 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2666 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
-| niet te meten (al rood, geen module gevonden, ...) | 181 |
+| niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 12 |
+| niets van beide | 8 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2563,7 +2563,7 @@ toets omvalt.
 | `buurtruil-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE BUURTRUIL (/apps/foundation/buurtruil.html) IN EEN ECHTE BROWSER. test/rtfos-gift-ruil-routes.test.js bewijst dat de zes ruilroutes hun grenzen hebben: alleen in een stad die open is, een aanbod aan een codenaam,... |
 | `camerascherm.e2e.js` | 1 | gezakt op `&&->||#7` | SCHERM-TOETS VOOR /apps/camera.html -- de app uit de oorspronkelijke klacht. WAAROM DEZE ER NOG NIET WAS, EN WAAROM DAT ERG IS. |
 | `campus-scherm.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE RTF CAMPUS IN EEN ECHTE BROWSER: de werkplek van een leerlingprofiel. test/rtfleerlingtoegang.test.js bewijst dat /api/rtf/toegang de Campus fail-closed houdt. |
-| `chauffeur-ds.e2e.js` | 4 | -- | De chauffeurs-PDA op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
+| `chauffeur-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | De chauffeurs-PDA op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
 | `chauffeur-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE CHAUFFEURS-PDA IN EEN ECHTE BROWSER: van ritaanvraag tot afgeronde dienst. WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst de keten aan de API, en test/mobiliteitscherm.e2e.js legt de reiziger en de... |
 | `clipdeler.e2e.js` | 1 | gezakt op `liegpoort /api/` | GAAT ER OOK ECHT BEELD OVER? -- de clipdeler tussen twee browsers. |
 | `clips-studio.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
@@ -2591,7 +2591,7 @@ toets omvalt.
 | `deelmenuronde.e2e.js` | 5 | geen bronmutatie mogelijk | DE TWEEDE RONDE VAN HET DEELMENU: WAT ER GEBEURT ALS DE APP HERTEKENT. test/deelmenuwacht.e2e.js bewaakt de EERSTE ronde: komt er een menu zodra de app zijn schermen neerzet. |
 | `deelmenuwacht.e2e.js` | 2 | geen bronmutatie mogelijk | DE WACHT VAN HET DEELMENU, OP EEN PAGINA DIE VERDER NIETS DOET. WAAROM DEZE TOETS ER IS -- eerlijkheidspunt 6.2 `shared/deelmenu.js` kijkt met een MutationObserver of een app zijn schermen alsnog neerzet. |
 | `deur.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor de gedeelde poort (shared/deur.js). Veertien apps toonden aan wie er niet in mag precies een zin -- "Alleen met de Lifestyle Pass" -- zonder knop, zonder uitleg, zonder weg vooruit. |
-| `dispatch-ds.e2e.js` | 5 | -- | RTG Dispatch op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
+| `dispatch-ds.e2e.js` | 5 | gezakt op `api-actie-weg#0` | RTG Dispatch op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
 | `document-capability.e2e.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `document-equivalence.e2e.js` | 1 | gezakt op `===->!==#0` | Four real interfaces execute against independent copies of the SAME SQLite fixture. Negative UI cases deliberately forge the client projection/transport credential: hidden buttons are not policy. |
 | `document-persistence.e2e.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -2630,7 +2630,7 @@ toets omvalt.
 | `gereedschap.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Gereedschap: rekenen met de toetsen (btw erbij), een wekker en een timer zetten (de server telt), en het alarmscherm dat op het SSE-seintje opent. Draait alleen waar een browser is. |
 | `geven-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | GEVEN AAN DE RTFOUNDATION (/apps/foundation/geven.html) IN EEN ECHTE BROWSER. GIFT.md zegt het met zoveel woorden: er is met opzet GEEN doneerknop. |
 | `gezondheidstoestemming.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de aparte toestemming voor gezondheidsgegevens (public/apps/foundation/gezondheidstoestemming.js op gezondheid.html; server: foundation/gezondheidstoestemming.js). Een ouder legt voor het eerst een... |
-| `ghost-ds.e2e.js` | 4 | -- | De Ghost Driver op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
+| `ghost-ds.e2e.js` | 4 | gezakt op `route-doel-weg#0` | De Ghost Driver op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
 | `gpsschakelaar.e2e.js` | 4 | gezakt op `liegpoort /api/` | Scherm-test voor de GPS-schakelaar van het OS-menu (rtg_os_gps). De schakelaar bestond, maar geen enkele locatie-aanroep las hem: wie hem op "uit" zette werd alsnog om de twintig seconden om een positie gevraagd (de... |
 | `grammatica.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE GRAMMATICA IN EEN ECHTE BROWSER. De regels staan in GRAMMATICA.md, de statische kant in test/grammatica.test.js. |
 | `handelscherm.e2e.js` | 0 | gezakt op `liegpoort /api/` | Scherm-test: RTG Handel in een echte browser (Playwright). De endpoints van de handelsketen liggen vast in test/handelsketen.test.js. |
@@ -2778,7 +2778,7 @@ toets omvalt.
 | `reizen-veilig-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | Reizen & Veilig op het RTG Design System: het bewijs van batch 4 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `reizen-veilig.e2e.js` | 2 | gezakt op `browser-export-weg#0` | REIZEN & VEILIG ZONDER SCHIJNINHOUD -- in een echte browser, op een echte server. De werkruimte toonde drie dingen die niet uit de data kwamen: - "Uw eerstvolgende moment · LIVE" was een vaste regel "Nu: Vertrek... |
 | `reizenscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op DE REIS in /apps/reizen.html (REIZEN.md fase 1). WAAROM DIT BESTAND ER IS. |
-| `residentie-ds.e2e.js` | 3 | geen bruikbare mutatie | De Résidence op het RTG Design System: het bewijs van stroom G uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
+| `residentie-ds.e2e.js` | 3 | gezakt op `voorwaarde-omkeren#0` | De Résidence op het RTG Design System: het bewijs van stroom G uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `rit-ds.e2e.js` | 3 | gezakt op `browser-export-weg#0` | RTG Aankomst & Chauffeur op het RTG Design System: het bewijs van batch 4 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `routedekking-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | De routedekking op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom F, kantoorschermen op de werklaag). |
 | `routedekking.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de routedekking in het RTG Kantoor. De server-kant staat in test/routedekking.test.js; dit gaat over wat een personeelslid ziet. |
@@ -2855,7 +2855,7 @@ toets omvalt.
 | `verzorging-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor de verzorgingskant van de Zorg-tab: de kapper, de barbier en de nagelstudio staan nu in de leden-app. Wat hier bewezen wordt is precies wat een servertoets NIET kan zien: dat het blok echt op het... |
 | `vluchten-ds.e2e.js` | 4 | gezakt op `api-actie-weg#0` | RTG Vluchten op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `voeding-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor apps/voeding.html. Dit scherm belooft vooral iets NIET, en dat is precies wat op het scherm zelf nagekeken hoort te worden: een motor die niets telt naast een scherm dat er alsnog een cijfer of een... |
-| `voertuig-ds.e2e.js` | 4 | -- | Het voertuigscherm op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
+| `voertuig-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | Het voertuigscherm op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |
 | `vooruitscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERM-TOETS voor de twee kaarten in Mijn backoffice: "Vooruit" en "Uit uw post". WAAROM DEZE ER MOET ZIJN. |
 | `vrienden-blok.e2e.js` | 1 | gezakt op `liegpoort /api/` | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |

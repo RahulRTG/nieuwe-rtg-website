@@ -152,7 +152,7 @@ Dezelfde dag besloot de eigenaar eerst dat gebruiken minimaal een gratis
 account vraagt (`AGENTS.md`), dat de wallet daarbij hoort (opladen, het
 overzicht, betalen bij een zaak) en dat een terugbetaling die de veegronde
 escaleert, als "terugbetaling vastgelopen" op de lijst van de betaalkamer
-komt. Daarna volgden drie besluiten die de rest van dat beeld afmaken.
+komt. Daarna volgden vier besluiten die de rest van dat beeld afmaken.
 
 1. **Het paspoort voor elk account, ook een gratis account.** De paspoortpoort
    van RTG Pay (`payGate`, `server/kern/onboarding/lid.js`) gold alleen voor de
@@ -174,8 +174,13 @@ komt. Daarna volgden drie besluiten die de rest van dat beeld afmaken.
    sociale kant was voor leden. Door besluit 1 heeft een account met geld altijd
    zijn paspoort laten zien, en valt die grond weg. Plafond, grens per boeking,
    eigen limieten en blokkades blijven; de afzender komt uit de sessie, nooit uit
-   het verzoek. Het tegoed en de terugstorting naar het eigen IBAN vielen buiten
-   dit besluit en blijven voor leden. Bewijs: `test/sociaal-gratisaccount.test.js`.
+   het verzoek. Bewijs: `test/sociaal-gratisaccount.test.js`.
+4. **Het tegoed en de terugstorting ook voor een gratis account** (vierde reeks,
+   dezelfde dag). Wie geld kan inleggen, moet het ook terug kunnen halen. Met
+   dezelfde paspoortpoort, en terugstorten gaat alleen naar de eigen, gekeurde
+   rekening: die hangt aan de sessie, een wijziging wacht, alleen het
+   beschikbare deel gaat mee, en de vrijgavepoort (B3) bepaalt nog altijd of
+   het open staat. Bewijs: `test/tegoedterug-gratisaccount.test.js`.
 
 ## 8. De elf gezichtspunten
 

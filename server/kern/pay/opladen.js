@@ -47,7 +47,14 @@ function maakOpladen(basis) {
       }
       const r = betaalWaarheid.van(w.id);
       if (r && r.afgehandeldAt) return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c, betalingId: w.id };
-      return { status: 402, error: 'De betaling wacht op bevestiging.', betalingId: w.id,
+      /* Geweigerd is AF, niet onderweg; "wacht op bevestiging" liet het lid
+         wachten op niets (scripts/lib/voltooi/pay.js). */
+      const stand = r && r.status;
+      const zin = stand === 'GEWEIGERD' || stand === 'GEANNULEERD'
+        ? 'De betaling is niet gelukt. Er is niets afgeschreven en niets bijgeschreven.'
+        : stand === 'CONTROLE_NODIG' ? 'De betaling ligt bij RTG ter controle. Betaal niet opnieuw.'
+          : 'De betaling wacht op bevestiging.';
+      return { status: 402, error: zin, betalingId: w.id,
         betaalStatus: (r && r.providerStatus) || (uit && uit.betaling && uit.betaling.status) || null };
     /* `poort`: opladen is een eigen capability (geld.opwaarderen) naast het
        interne saldo dat de idem-laag al vraagt -- ook als STAP binnen een andere

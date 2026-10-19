@@ -2,13 +2,13 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-18",
-    "commit": "2918d3def"
+    "op": "2026-10-19",
+    "commit": "f6b7d1bc"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-10-18",
-      "commit": "8df75d5a2",
+      "op": "2026-10-19",
+      "commit": "f6b7d1bc",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -11104,11 +11104,26 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/"
+        "/api/link/cap/maak",
+        "/api/pay/oplaad",
+        "/api/pay/overzicht",
+        "/api/pay/stuur",
+        "/api/pay/tegoed",
+        "/api/pay/tegoed/koop",
+        "/api/pay/tegoed/roteer",
+        "/api/pay/tegoed/terug",
+        "/api/pay/tegoed/verzilver",
+        "/api/pay/tik",
+        "/api/pay/tikcode",
+        "/api/pay/tiks",
+        "/api/pay/verzoek",
+        "/api/pay/verzoek/betaal",
+        "/api/pay/verzoek/intrek"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/"
+        "/api/link",
+        "/api/pay"
       ],
       "zonderServer": false,
       "inkomend": 7,

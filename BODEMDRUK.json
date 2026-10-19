@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-18T21:33:31.699Z",
-    "commit": "d1a9a85f9",
+    "op": "2026-10-18T23:18:03.013Z",
+    "commit": "336c3a93",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bodemdruk.js",
@@ -11,7 +11,7 @@
   "uitleg": "Per scherm dat een pad van de universele bodem aanroept (afgeleid uit de verklaring, het functieregister en SCHERMROUTES.json): staat er een uitnodiging om te betalen op? SAMENLEVING.md par. 6, eis 5.",
   "grens": "Lexicaal en zonder commentaar gelezen, dus een ONDERGRENS: druk zonder deze woorden (een slotje, een kleur, een badge) ziet deze meter niet. Een deur die zegt dat iets bij een pas hoort is een weigering en geen druk; of die weigering op de bodem mag, meet npm run onvervreemdbaar. Gebruikstijd wordt niet gemeten (SAM-05).",
   "gemeten": {
-    "schermen": 50,
+    "schermen": 51,
     "metDruk": 0,
     "treffers": 0
   },
@@ -248,6 +248,15 @@
       ],
       "functies": [
         "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/pay.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
       ]
     },
     {

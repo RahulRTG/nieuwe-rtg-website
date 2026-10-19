@@ -659,7 +659,7 @@ const EIGEN_MODULE = new Map([
   ['ovdienst-ds.e2e.js', ['public/apps/ovdienst.js']],
   ['ovroutes-ds.e2e.js', ['public/apps/ovroutes.js']],
   ['ovcontrol-ds.e2e.js', ['public/apps/ovcontrol.js']],
-  ['reizen-ds.e2e.js', ['public/apps/reizen-register.js', 'public/apps/reizen-beeld.js', 'public/apps/reizen-beeld-editor.js']],
+  ['reizen-ds.e2e.js', ['public/apps/reizen-register.js', 'public/apps/reizen-beeld.js', 'public/apps/reizen-beeld-editor.js', 'public/apps/reizen-regel.js', 'public/ds/register.js']],
   ['arrival-ds.e2e.js', ['public/apps/arrival-voorzijde.js']],
   ['flits-ds.e2e.js', ['public/apps/flits-voorzijde.js']],
   ['navigatie-ds.e2e.js', ['public/apps/navigatie-zoek.js', 'public/apps/navigatie-bediening.js']],

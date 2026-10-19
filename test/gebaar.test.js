@@ -276,7 +276,7 @@ test('de drie wereldregisters delen EEN bouwer', () => {
      DE MUTATIE: schrijf in sociaal.html weer een eigen RTGGebaar.lijst met een
      eigen actielijst. Beide schermen blijven werken -- tot iemand er in EEN van
      de twee een actie bij zet (LAT.md regel 4). */
-  for (const scherm of ['kantoor', 'sociaal', 'reizen']) {
+  for (const scherm of ['kantoor', 'sociaal']) {
     const bron = lees('public/apps/' + scherm + '.html');
     assert.match(bron, /RTGGebaar\.wereldregister\(/,
       scherm + '.html hangt zijn register niet meer aan de gedeelde bouwer');
@@ -285,6 +285,26 @@ test('de drie wereldregisters delen EEN bouwer', () => {
   }
   assert.match(JSKAAL, /function wereldregister\(wortel\)/,
     'de gedeelde bouwer is uit de laag verdwenen');
+  /* Reizen staat op het RTG Design System, en gebaar.js (dat zijn eigen stijl
+     zet) laadt daar niet. Zijn register hangt aan de ds-vorm van DEZELFDE
+     bouwer, /ds/register.js, met dezelfde vier handelingen; ook daar schrijft
+     het scherm geen eigen actielijst. De browsertoets test/reizen-ds.e2e.js
+     bewijst dat de vier werken. */
+  const reizen = lees('public/apps/reizen.html');
+  const reizenJs = ['reizen-register.js', 'reizen-regel.js'].map((f) => lees('public/apps/' + f)).join('\n');
+  assert.match(reizen, /<script src="\/ds\/register\.js"><\/script>/, 'reizen.html laadt de gedeelde ds-bouwer niet');
+  assert.match(reizenJs, /RTGDsRegister\.wereldregister\(\$\('#komend'\)/,
+    'reizen hangt zijn register niet meer aan de gedeelde ds-bouwer');
+  for (const bron of [reizen, reizenJs]) {
+    assert.ok(!/RTGGebaar\.lijst\(|gebaar\.(delen|kenmerk|overnemen)|KLAAR\./.test(bron),
+      'reizen bouwt zijn .reis-acties weer zelf; dat hoort in de gedeelde bouwer te staan');
+  }
+  const DS = lees('public/ds/register.js');
+  assert.match(DS, /function wereldregister\(wortel, opties\)/, 'de gedeelde ds-bouwer is verdwenen');
+  for (const actie of ['openen', 'delen', 'kenmerk', 'overnemen']) {
+    assert.match(DS, new RegExp('KLAAR\\.' + actie + '\\('), 'de ds-bouwer mist ' + actie);
+    assert.match(JSKAAL, new RegExp(actie + ': function'), 'gebaar.js mist ' + actie);
+  }
 });
 
 test('de klik na een veeg wordt eenmalig geslikt, niet op een klok', () => {

@@ -284,3 +284,46 @@ async function geenOverloopHier(page) {
   const maat = await page.evaluate(() => ({ breed: document.documentElement.scrollWidth, venster: innerWidth }));
   assert.ok(maat.breed <= maat.venster, 'scrollWidth ' + maat.breed + ' > ' + maat.venster);
 }
+
+/* 6. De vier handelingen van een reisregel (Openen, Delen, Kenmerk,
+   Overnemen): op de oude Reizen gaf RTGGebaar.wereldregister ze; op de ds-vorm
+   geeft de gedeelde bouwer /ds/register.js ze, met dezelfde teksten. Het
+   klembord wordt hier waargenomen; zonder navigator.share valt Delen terug op
+   het klembord, net als in gebaar.js. */
+test('de vier handelingen van een reisregel: openen, delen, kenmerk en overnemen', { skip }, async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
+  await ctx.addInitScript((t) => {
+    localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_member_token', t);
+    window.__klembord = [];
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: (x) => { window.__klembord.push(x); return Promise.resolve(); } }, configurable: true });
+  }, token);
+  const page = await ctx.newPage(), fouten = letOpFouten(page, []);
+  await page.goto(srv.base + '/apps/reizen.html#reizen', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#komend .reis[href] + [data-ds-register]');
+  const rij = page.locator('#komend .reis[href]').first(), acties = page.locator('#komend [data-ds-register]').first();
+  const ref = await rij.locator('[data-ref]').getAttribute('data-ref');
+  assert.ok(ref, 'de regel draagt een kenmerk');
+  assert.deepEqual(await acties.locator('button').allInnerTexts(), ['Openen', 'Delen', 'Kenmerk', 'Overnemen']);
+  assert.equal(await page.locator('#komend .reis[href]').count(), await page.locator('#komend [data-ds-register]').count(), 'elke regel krijgt zijn handelingen');
+  const titel = await rij.locator('[data-reg-titel]').innerText(), href = await rij.getAttribute('href');
+  await acties.getByRole('button', { name: 'Delen', exact: true }).click();
+  await page.waitForFunction(() => /gekopieerd; klaar om te plakken/i.test(document.querySelector('#toast').textContent));
+  await acties.getByRole('button', { name: 'Kenmerk', exact: true }).click();
+  await page.waitForFunction((r) => document.querySelector('#toast').textContent === r + ' - gekopieerd', ref);
+  await acties.getByRole('button', { name: 'Overnemen', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('#toast').textContent === 'De regel staat op uw klembord.');
+  const klembord = await page.evaluate(() => window.__klembord);
+  assert.equal(klembord[0], titel + ' - ' + new URL(href, srv.base).href, 'delen zonder deelvenster: titel - adres');
+  assert.equal(klembord[1], ref);
+  assert.ok(klembord[2].startsWith(titel + ' · ') && klembord[2].includes(' · ' + ref), 'overnemen: titel · plaats · dag · kenmerk · bron: ' + klembord[2]);
+  /* Na een nieuwe tekening van het register staan de handelingen er weer, een keer. */
+  await page.evaluate(() => window.RTGReizen.register.laad());
+  await page.waitForSelector('#komend .reis[href] + [data-ds-register]');
+  assert.equal(await page.locator('#komend .reis[href]').count(), await page.locator('#komend [data-ds-register]').count());
+  await beeld(page, '390-handelingen', { fullPage: true });
+  await page.locator('#komend [data-ds-register]').first().getByRole('button', { name: 'Openen', exact: true }).click();
+  await page.waitForURL((u) => u.href === new URL(href, srv.base).href);
+  assert.deepEqual(fouten, []);
+  await ctx.close();
+});

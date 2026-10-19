@@ -35,7 +35,8 @@
     "edge",
     "melding",
     "toestel",
-    "paneel"
+    "paneel",
+    "overgang"
   ],
   "themabaar": [
     "--ds-grond",
@@ -146,6 +147,9 @@
     "public/apps/ov.html": "test/ov-ds.e2e.js",
     "public/apps/move.html": "test/move-ds.e2e.js",
     "public/apps/reizen-veilig.html": "test/reizen-veilig-ds.e2e.js",
+    "public/apps/reisbureau.html": "test/reisbureau-ds.e2e.js",
+    "public/apps/vluchten.html": "test/vluchten-ds.e2e.js",
+    "public/apps/reisboek.html": "test/reisboek-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

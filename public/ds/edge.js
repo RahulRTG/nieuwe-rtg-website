@@ -89,7 +89,9 @@
   }
   function maak() {
     if (edge) return;
-    if (ingebed()) {
+    /* shell.js zet .ds-ingebed al in <head> (de kop verdwijnt dan zonder flits,
+       kop.css); hier volgt het attribuut waar de werkruimte op wacht. */
+    if (d.documentElement.classList.contains('ds-ingebed') || ingebed()) {
       d.documentElement.setAttribute('data-ds-ingebed', '1');
       Array.prototype.forEach.call(d.querySelectorAll('.ds-kop'), function (k) { k.remove(); });
       return;

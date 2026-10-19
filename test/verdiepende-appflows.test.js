@@ -18,6 +18,14 @@ test('de vier werelden gebruiken dezelfde verdiepende stijl op hun echte routes'
   };
   for (const [route, klasse] of Object.entries(routes)) {
     const html = lees(route);
+    /* Een scherm op het RTG Design System (TRAVELOS-MIGRATIE.md) draagt de
+       verdieping niet meer als eigen klasse en blad: zijn wereld komt uit het
+       wereldthema van /ds/rtg-ds.css, en dat is dan de gedeelde stijl. */
+    if (html.includes('/ds/shell.js')) {
+      assert.ok(html.includes('/ds/rtg-ds.css'), route + ' laadt het Design System');
+      assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + klasse.split('-')[1] + '"'), route + ' houdt zijn wereld');
+      continue;
+    }
     const stijl = route === 'public/apps/agenda.html' ? 'rtg-daily-rooms.css' : 'rtg-deep-flows-2026.css';
     assert.ok(html.includes('/shared/' + stijl), route + ' laadt zijn huidige gedeelde stijl');
     assert.match(html, new RegExp(`class="[^"]*${klasse}`));

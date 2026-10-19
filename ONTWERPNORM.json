@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 174,
-    "schermenMetStijlblok": 284,
-    "important": 7646
+    "bladen": 172,
+    "schermenMetStijlblok": 282,
+    "important": 7618
   },
   "uitzonderingen": [],
   "bladen": {
@@ -548,11 +548,6 @@
       "important": 18,
       "hex": 0
     },
-    "public/shared/rtg-reisboek-2026.css": {
-      "bytes": 15624,
-      "important": 2,
-      "hex": 34
-    },
     "public/shared/rtg-schil.css": {
       "bytes": 22558,
       "important": 9,
@@ -607,11 +602,6 @@
       "bytes": 10226,
       "important": 4,
       "hex": 44
-    },
-    "public/shared/rtg-vlucht-2026.css": {
-      "bytes": 10236,
-      "important": 25,
-      "hex": 29
     },
     "public/shared/rtg-warm-details.css": {
       "bytes": 9202,
@@ -2236,12 +2226,6 @@
       "important": 0,
       "hex": 5
     },
-    "public/apps/reisbureau.html": {
-      "blokken": 2,
-      "bytes": 7363,
-      "important": 1,
-      "hex": 14
-    },
     "public/apps/reizen.html": {
       "blokken": 2,
       "bytes": 1550,
@@ -2487,12 +2471,6 @@
       "bytes": 680,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/vluchten.html": {
-      "blokken": 2,
-      "bytes": 5224,
-      "important": 0,
-      "hex": 8
     },
     "public/apps/voeding.html": {
       "blokken": 1,

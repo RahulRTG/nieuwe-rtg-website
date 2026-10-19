@@ -97,8 +97,15 @@ test('de volledige Edge blijft in rust bedienbaar, focusveilig en vastgezet',
     assert.equal(await host.getAttribute('data-rtg-adaptive-state'), 'dock', 'actieve invoer blijft vrij van automatische verkleining');
 
     await page.evaluate(() => document.getElementById('quietPresenceInput').remove());
+    /* Reisboek staat op het RTG Design System (TRAVELOS-MIGRATIE.md): daar
+       staat precies één Edge, die van /ds/, en geen tweede oude ernaast. */
+    const eenDsEdge = async () => {
+      await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+      assert.deepEqual(await page.evaluate(() => [document.querySelectorAll('.ds-edge').length,
+        document.querySelectorAll('.rtg-adaptive-edge').length]), [1, 0], 'het reisboek tekent precies één Edge');
+    };
     await page.goto(srv.base + '/apps/reisboek.html', { waitUntil: 'domcontentloaded' });
-    await gereed(page);
+    await eenDsEdge();
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await gereed(page);
     assert.equal(await page.locator('.rtg-adaptive-edge').count(), 1, 'routeherstel tekent precies één Edge');
@@ -106,9 +113,8 @@ test('de volledige Edge blijft in rust bedienbaar, focusveilig en vastgezet',
       await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').count(), 1,
     'de bestaande navigatie blijft bereikbaar');
     await page.goForward({ waitUntil: 'domcontentloaded' });
-    await gereed(page);
     assert.equal(new URL(page.url()).pathname, '/apps/reisboek.html');
-    assert.equal(await page.locator('.rtg-adaptive-edge').count(), 1, 'vooruit-herstel tekent precies één Edge');
+    await eenDsEdge(); // vooruit-herstel tekent precies één Edge
   } finally {
     if (browser) await browser.close();
     await stop(srv.child);

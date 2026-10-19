@@ -105,8 +105,8 @@ async function proef(reducedMotion) {
        `ready` later dan 800 ms, en dan las de eerste versie een lege lijst en
        zakte een op de acht keer zonder dat er iets mis was. */
     await doel.waitForFunction(() => window.__gedeeld && window.__gedeeld.klaar, null, { timeout: 15000 });
-    const uit = await doel.evaluate(() => ({ g: window.__gedeeld, naam: getComputedStyle(document.querySelector('.reisboek-kop')).viewTransitionName }));
-    assert.equal(uit.naam, 'rtg-gedeeld-reisboek', 'het doel draagt zijn naam bij binnenkomst (rtg-uniform.css)');
+    const uit = await doel.evaluate(() => ({ g: window.__gedeeld, naam: getComputedStyle(document.querySelector('[data-rtg-gedeeld-doel="reisboek"]')).viewTransitionName }));
+    assert.equal(uit.naam, 'rtg-gedeeld-reisboek', 'het doel draagt zijn naam bij binnenkomst (/ds/componenten/overgang.css)');
     return { uit, fouten };
   } finally {
     if (browser) await browser.close().catch(() => {});

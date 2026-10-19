@@ -59,7 +59,9 @@ const ROUTES = [
     ]
   },
   {
-    naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel',
+    /* Reisboek staat op het RTG Design System (TRAVELOS-MIGRATIE.md): één
+       rand, maar die van /ds/ (ds: true), en ingebed bouwt hij er geen. */
+    naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel', ds: true,
     context: ['native-header'],
     oud: [
       'body > header:not(.rtg-edge-top)', '.tos-topbar', '.tos-nav',
@@ -477,6 +479,21 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
         await t.test(route.naam + ' · ' + scherm.naam, async (st) => {
           const page = await context.newPage();
           try {
+            if (route.ds) {
+              await page.setViewportSize(scherm.maat);
+              await page.goto(base + route.pad, { waitUntil: 'domcontentloaded' });
+              await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+              const m = await page.evaluate((r) => ({
+                ds: document.querySelectorAll('.ds-edge').length, balken: document.querySelectorAll('.ds-edge__balk').length,
+                oud: document.querySelectorAll('.rtg-edge-chrome, .rtg-adaptive-bar, .rtg-edge-top, .rtg-edge-side').length,
+                oudZichtbaar: r.oud.filter((sel) => [...document.querySelectorAll(sel)].some((el) => !el.matches('.ds-kop') && el.getClientRects().length)), // de kop van het Design System is de nieuwe kop, geen oude chrome
+                wereld: document.body.getAttribute('data-rtg-world')
+              }), route);
+              assert.deepEqual([m.ds, m.balken, m.oud], [1, 1, 0], route.naam + ': precies één rand, die van het Design System');
+              assert.deepEqual(m.oudZichtbaar, [], route.naam + ': oude chrome zichtbaar');
+              assert.equal(m.wereld, route.wereld);
+              return;
+            }
             const uit = await controleerRoute(page, route, scherm);
             if (uit.omgeleid) st.skip('auth-afhankelijke route leidde naar ' + uit.omgeleid + '; geen contract omzeild');
           } finally { await page.close(); }
@@ -523,6 +540,17 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
             const verwachtPad = new URL(base + route.pad).pathname;
             if (m.pad !== verwachtPad) {
               routeTest.skip('auth-afhankelijke iframe-route leidde naar ' + m.pad + '; geen contract omzeild');
+              return;
+            }
+            if (route.ds) {
+              const ds = await page.evaluate(() => {
+                const d = document.getElementById('rtg-edge-2-proefframe').contentDocument;
+                return { ingebed: d.documentElement.classList.contains('ds-ingebed'), randen: d.querySelectorAll('.ds-edge').length };
+              });
+              assert.deepEqual(ds, { ingebed: true, randen: 0 }, route.naam + ': ingebed bouwt de ds-schil geen tweede Edge (en de kop valt weg)');
+              assert.deepEqual([m.roots, m.top, m.side, m.bottom], [0, 0, 0, 0], route.naam + ': iframe bouwt geneste Edge-chrome');
+              assert.deepEqual(m.oudZichtbaar, [], route.naam + ': iframe toont nog oude vaste chrome:\n' + m.oudZichtbaar.join('\n'));
+              assert.equal(m.buitensteRoots, 1, route.naam + ': de buitenste Edge is tijdens embed vervangen of verdubbeld');
               return;
             }
             assert.equal(m.embed, true, route.naam + ': iframe is niet als embed gemarkeerd');

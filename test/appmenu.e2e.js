@@ -957,16 +957,18 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f && f.contentDocument;
       return !!(f && doc && doc.documentElement && f.contentWindow.location.pathname === '/apps/vluchten.html' &&
-        doc.documentElement.classList.contains('rtg-command-mobiel') && doc.body.classList.contains('travel-os'));
+        doc.documentElement.classList.contains('rtg-command-mobiel') && doc.querySelector('html.ds-ingebed #inhoud'));
     }, null, { timeout: 20000 });
+    /* Vluchten staat op het RTG Design System (TRAVELOS-MIGRATIE.md): ingebed
+       bouwt de ds-schil geen eigen Edge, dus er is één eigenaar van de balk. */
     assert.deepEqual(await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f.contentDocument;
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
-      return { eigenaren: [...document.querySelectorAll('.rtg-adaptive-bar'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
-        travel: zichtbaar(doc.querySelector('.tos-nav')),
-        onderruimte: getComputedStyle(doc.documentElement).getPropertyValue('--tos-bottom').trim() };
-    }), { eigenaren: 1, travel: false, onderruimte: '0px' },
-    'een gewone specialist-link brengt de tweede TravelOS-balk terug');
+      return { eigenaren: [...document.querySelectorAll('.rtg-adaptive-bar'), doc.querySelector('.tos-nav'), doc.querySelector('.ds-edge__balk')].filter(zichtbaar).length,
+        travel: zichtbaar(doc.querySelector('.tos-nav')), ingebed: doc.documentElement.classList.contains('ds-ingebed'),
+        kop: zichtbaar(doc.querySelector('.ds-kop')) };
+    }), { eigenaren: 1, travel: false, ingebed: true, kop: false },
+    'een gewone specialist-link brengt een tweede balk terug');
     await page.evaluate(() => document.querySelector('#rtgCommand .cmd-pane.actief iframe').contentWindow.history.back());
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');

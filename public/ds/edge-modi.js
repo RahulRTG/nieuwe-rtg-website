@@ -63,7 +63,9 @@
     fetch('/api/fluister', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
-      body: JSON.stringify({ q: q })
+      /* Wat het scherm aanwijst (EDGE.md par. 14.4): alleen als het scherm het
+         blikveld laadt, en dan alleen soort en id; de server zoekt zelf op. */
+      body: JSON.stringify(w.RTGEdgeBlikveld ? { q: q, context: w.RTGEdgeBlikveld.voorRahul() } : { q: q })
     }).then(function (r) { return r.json().catch(function () { return {}; }); })
       .then(function (data) { uit.textContent = (data && (data.antwoord || data.reply || data.error)) || 'Ik kwam er niet uit.'; })
       .catch(function () { uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });

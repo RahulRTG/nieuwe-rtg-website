@@ -13,6 +13,8 @@
     background: var(--ds-grond);
     color: var(--ds-inkt);
   }
+  /* Ingebed (shell.js zet .ds-ingebed): de buitenste schil draagt de kop. */
+  :where(.ds-ingebed) .ds-kop { display: none; }
   .ds-kop--op-beeld { position: absolute; inset-inline: 0; background: transparent; color: var(--ds-cover-inkt); }
   .ds-kop--op-beeld .ds-kop__merk { color: var(--ds-cover-metaal); }
   .ds-kop__merk {

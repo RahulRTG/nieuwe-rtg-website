@@ -50,6 +50,15 @@ test('acht pilots gebruiken zeven route-entrypagina\'s met de gesloten contextma
   for (const pagina of PAGINAS) {
     const html = lees(pagina.bestand);
     const body = bodyVan(html);
+    /* Een route op het RTG Design System (TRAVELOS-MIGRATIE.md) heeft ook
+       precies één Edge, maar dan die van /ds/shell.js: geen randen.js en
+       geen Edge 2 ernaast, want twee randen is wat deze toets tegenhoudt. */
+    if (html.includes('/ds/shell.js')) {
+      assert.equal((html.match(/\/ds\/shell\.js/g) || []).length, 1, pagina.bestand + ' houdt één Edge-ingang (ds)');
+      assert.doesNotMatch(html, /shared\/randen\.js|rtg-edge-2-(?:loader|context)\.js|rtg-edge-2\.js|rtg-edge-2\.css/,
+        pagina.bestand + ' laadt naast de ds-Edge geen tweede rand');
+      continue;
+    }
     assert.ok(body.includes('data-rtg-edge-2-context="' + pagina.context + '"'), pagina.bestand);
     assert.ok(body.includes('data-rtg-edge-2-state="' + pagina.stand + '"'), pagina.bestand);
     assert.ok(body.includes('data-rtg-edge-2-auto="' + pagina.auto + '"'), pagina.bestand);
@@ -70,8 +79,9 @@ test('vier homes zijn native dashboards; drie subroutes houden alleen hun wereld
   }
   assert.match(bodyVan(lees('public/apps/agenda.html')),
     /data-rtg-world="living"[^>]*data-rtg-daily="agenda"[^>]*data-rtg-editorial-room="agenda"/);
-  assert.match(bodyVan(lees('public/apps/reisboek.html')),
-    /data-rtg-vandaag-luxe="surface"[^>]*data-rtg-vandaag-surface="reisboek"/);
+  /* Reisboek staat op het Design System: zijn palet is het TravelOS-thema. */
+  assert.match(bodyVan(lees('public/apps/reisboek.html')), /data-rtg-world="travel"/);
+  assert.ok(lees('public/apps/reisboek.html').includes('/ds/rtg-ds.css'));
   assert.match(bodyVan(lees('public/apps/werk.html')), /data-rtg-vandaag-surface="projecten"/);
 });
 

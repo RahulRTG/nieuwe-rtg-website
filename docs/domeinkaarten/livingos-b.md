@@ -48,12 +48,13 @@ Camera, spelavond, krant en logboek horen bij LivingOS-A. De geldapps horen bij 
    - De Salon en Pulse verbergen een post na drie meldingen. Er is geen kantoorroute die die meldingen leest, terugzet of motiveert.
    - `/api/member/report` slaat meldingen op, en niets leest ze.
    - Dat botst met de meld-, motiverings- en bezwaarplicht voor platforms. Zie de kaart van Sociaal.
-4. **Gezondheidsgegevens van derden.** Table bewaart het dieet van een gast onbeperkt in vrije tekst. Een allergie is een bijzonder persoonsgegeven, van iemand die zelf niet instemde. Dit is het zwaarste privacypunt in deze familie.
+   - Het concrete voorstel aan de eigenaar staat hieronder, in "Voorstel aan de eigenaar: één moderatiedienst met een kantoorkant".
+4. **Gezondheidsgegevens van derden.** Table bewaarde het dieet van een gast onbeperkt in vrije tekst. Een allergie is een bijzonder persoonsgegeven, van iemand die zelf niet instemde. **Gerepareerd op 19 oktober (d806269d4):** de veertien allergenen van bijlage II als keuzelijst, wissen in de opslag de dag na de gelegenheid (zonder datum na 30 dagen), en de maître krijgt alleen aantallen zonder namen. Entourage bewaart het dieet van reisgenoten op dezelfde manier en is nog niet gerepareerd.
 5. **Snaps voor kinderen.** Dit ligt als besluit bij de eigenaar (opties A/B/C in het bericht van 19 oktober).
    - Op de gezinsroute hebben snaps en verhalen geen leeftijdsgrens. Ze gaan alleen naar door een ouder goedgekeurde vrienden, en na bekijken is de foto weg.
 6. **Herroepingsrecht.** De retourgrond "bedenktijd" bestaat, maar de wettelijke termijn van 14 dagen na levering wordt nergens gerekend.
 7. **Dynamische paden.** Table, Attenties en Cercle bouwen hun API-paden nog dynamisch op. De meting ziet hun routes daardoor niet.
-8. **Een fout op het scherm.** De liegronde zag op Rendez-vous de kale tekst "undefined" bij een leeg antwoord.
+8. **Een fout op het scherm.** De liegronde zag op Rendez-vous de kale tekst "undefined" bij een leeg antwoord. **Gerepareerd op 19 oktober (c5d6e935e):** het scherm zegt nu dat het antwoord onvolledig was.
 
 ## Bronnen
 
@@ -71,6 +72,94 @@ Camera, spelavond, krant en logboek horen bij LivingOS-A. De geldapps horen bij 
 - De bewaartermijn na opzeggen bij Rendez-vous.
 - Responstijd en 24/7-bezetting voor het kantoor.
 - Snaps voor kinderen.
+- Eén moderatiedienst met een kantoorkant (voorstel A, B of C hieronder).
+
+## Voorstel aan de eigenaar: één moderatiedienst met een kantoorkant
+
+*Gevraagd door de integrator op 19 oktober 2026 (bevinding 3). Dit is een nieuwe kantoorfunctie, dus een besluit van de eigenaar. Er is nog niets van gebouwd.*
+
+### Wat er nu is (gemeten op d806269d4)
+
+| Bron | Wat een melding doet | Waar het staat | Wie het leest |
+|---|---|---|---|
+| De Salon (`kern/salon/reacties.js`) | drie verschillende melders zetten `p.weg = true` | `post.meldingen` (key, reden, at) | niemand; de commentaarregel zegt "tot het kantoor kijkt" |
+| Pulse (`kern/pulse/index.js`) | drie unieke melders zetten `post.verborgen = true` | `post.melders` (per key: reden, at) | niemand |
+| Markt (`kern/markt/toezicht.js`) | drie melders: `verborgen` | `ad.melders`, `ad.meldRedenen` | niemand |
+| Een persoon melden (`/api/member/report`, `kern/sociaal.js` `meldMisbruik`) | niets zichtbaars | `sociaal.reports` (laatste 5000; bewaartermijn 2 jaar in `bewaarbeleid-operationeel.js`) | niemand |
+| Rendez-vous en Vonk | veiligheidsmeldingen | eigen opslag | het kantoor, als **leeslijst** (`/api/office/rendezvous/meldingen`, `/api/office/vonk/meldingen`); er hoort geen besluit bij |
+
+Drie dingen ontbreken overal:
+- iemand die beslist;
+- een motivering aan de maker;
+- een weg om bezwaar te maken.
+
+Daarnaast blijft een post die drie mensen samen wegmelden voor altijd weg. Dat is meteen een middel om iemand het zwijgen op te leggen.
+
+### Wat de wet vraagt (te toetsen door een jurist; menselijke beoordeling)
+
+- **DSA art. 16:** een meldmechanisme met een bevestiging aan de melder. Het mechanisme bestaat; de bevestiging ontbreekt.
+- **DSA art. 17:** een motivering aan de maker bij elke beperking. Dat geldt ook voor verbergen.
+- **DSA art. 20:** een intern klachtensysteem van ten minste zes maanden na het besluit, besloten door mensen.
+  - Art. 19 zondert micro- en kleine ondernemingen uit van art. 20 en verder, maar niet van art. 16 en 17.
+  - Of RTG onder die uitzondering valt, is niet vastgesteld. Het voorstel bouwt art. 20 toch, omdat hij weinig kost en de huisregel "een mens beslist" er al om vraagt.
+
+### Het voorstel
+
+**Eén kern, `server/kern/moderatie/`, met een adapter per bron.** Elke bron houdt zijn eigen opslag en zijn eigen drempel. De adapter geeft vijf dingen:
+- `gemeld()`: wat er in de wachtrij hoort;
+- `herstel(id)`;
+- `houdVerborgen(id)`;
+- `verwijder(id)`;
+- `maker(id)`: de codenaam van de maker, nooit een echte naam.
+
+Er komt dus geen tweede kopie van de posts. Het oordeel Pulse naast De Salon (zie de besluitenlijst) hoeft hiervoor niet eerst genomen te worden: één wachtrij, twee adapters.
+
+**Besluiten** komen in één eigen collectie `moderatiebesluiten`, met:
+- bron, id, maker-codenaam;
+- het besluit en de motivering;
+- de huisregel waarop het besluit steunt;
+- wie besloot (naam via `naamAuth`), wanneer;
+- de tweede handtekening;
+- het bezwaar.
+
+| # | Functie | Regel | Acceptatie |
+|---|---|---|---|
+| MO1 | Wachtrij voor het kantoor | Erin komt: een post die verborgen raakte, of één melding met de reden "onveilig" (kind, geweld, dreiging). Zo'n melding gaat bovenaan en verbergt meteen. Termijn: 72 uur na de eerste melding, daarna rood. Op codenaam. | Drie leden melden een Salon-post; hij staat in `/api/office/moderatie/wachtrij` met de redenen en de termijn. |
+| MO2 | Besluit met motivering | Een kantoormens op naam (werkrol kantoor, capability `moderatie.besluit`) kiest **terugzetten**, **verborgen houden** of **verwijderen**, met een verplichte motivering en een huisregel uit een vaste lijst. **Verwijderen** en **schorsen** vragen een tweede kantoormens; de eerste kan niet zelf tekenen (403). | Terugzetten zet de post terug in de feed. Verwijderen zonder tweede handtekening blijft "wacht op tweede". Dezelfde persoon tweemaal geeft 403. |
+| MO3 | Bericht aan de maker | Bij verbergen meteen: "Uw bericht is verborgen na meldingen; een medewerker beslist binnen 3 dagen." Na het besluit: de uitkomst, de motivering en de huisregel, plus hoe bezwaar werkt. Melders worden nooit genoemd. | De maker leest in `/api/member/moderatie/mijn` de motivering, zonder codenamen van melders. |
+| MO4 | Bevestiging aan de melder | Bij melden: "ontvangen". Na het besluit: "afgehandeld". Het besluit over een ander krijgt de melder niet te zien. | De melder ziet twee regels en geen besluit. |
+| MO5 | Bezwaar | De maker maakt binnen 6 maanden één keer bezwaar, zonder kosten. Een **ander** kantoormens beslist; wie het eerste besluit nam, krijgt 403. Elk bezwaarbesluit draagt een nieuwe motivering. | Het bezwaar staat bij een tweede medewerker; de eerste wordt geweigerd; de maker leest de uitkomst. |
+| MO6 | Personen melden leesbaar maken | `sociaal.reports` komt als bron "persoon" in dezelfde wachtrij, en wordt pas een besluit als het kantoor er een neemt. Een automatische sanctie op een persoon is er niet. | Een melding via `/api/member/report` staat in de wachtrij en verdwijnt alleen door een besluit. |
+| MO7 | Geen stil wegmelden | Een post die na 72 uur niemand heeft beoordeeld, blijft verborgen en rood. Hij komt niet vanzelf terug en wordt niet vanzelf verwijderd. De maker ziet "nog in behandeling". | Na de termijn: rood in de wachtrij, en geen automatisch besluit. |
+
+**Niet in dit voorstel:**
+- een transparantierapport (art. 15/24; later, uit dezelfde collectie te tellen);
+- het buitengerechtelijk geschil (art. 21; verwijzen volstaat);
+- AI die beslist. AI mag hooguit de wachtrij sorteren, en beslist nooit.
+
+**Rollen:**
+- de werkrol **kantoor** (bestaat), met twee nieuwe capabilities `moderatie.besluit` en `moderatie.bezwaar`;
+- geen nieuwe rol.
+
+**Kosten en bouwvolgorde (schatting):**
+- MO1, MO2 en MO3 op De Salon en Pulse: middel, ongeveer een werkronde;
+- MO4 en MO5: klein;
+- MO6 voor personen en de Markt-adapter: klein per adapter.
+
+Elke stap krijgt een toets die eerst faalt, en een stap in de voltooiproeven van Salon en Pulse.
+
+### Wat de eigenaar kiest
+
+1. **Aanbevolen: A. Bouwen zoals hierboven, met De Salon en Pulse eerst, daarna personen en Markt.**
+   - Wat het betekent: de wettelijke kern (art. 16 en 17) is er na één ronde, en bezwaar komt direct mee.
+   - Wat het kost: het kantoor krijgt een wachtrij die bemand moet worden. Met 72 uur termijn is dat werkdagbezetting, geen 24/7. De responstijd staat al in de besluitenlijst.
+2. **B. Alleen motiveren en terugzetten, zonder tweede handtekening en zonder bezwaar.**
+   - Kleiner, maar art. 20 en de vier-ogenregel ontbreken.
+   - Elk verwijderbesluit is dan het oordeel van één mens.
+3. **C. Voorlopig geen automatisch verbergen meer: een melding gaat alleen naar de wachtrij, en verbergt pas na een besluit.**
+   - Er is dan geen stil wegmelden, maar ook geen snelle bescherming bij echte overlast tot er iemand kijkt.
+   - Te combineren met A: "onveilig" verbergt wel meteen.
+
 
 ---
 

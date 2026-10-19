@@ -99,6 +99,8 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-isolatie').SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
+  /* De routetekenaar van een OV-zaak; zie de kop daar. */
+  require('./idemsleutels-ov').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
   /* De zware poort en het eigenaarsherstel: negen van de tien nietIdempotent,
      elk met een eigen reden. Zie de kop van ./idemsleutels-eigenaar.js. */

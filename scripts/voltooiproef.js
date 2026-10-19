@@ -103,6 +103,7 @@ const SCENARIOS = {
   'navigatie.js': require('./lib/voltooi/navigatie'),
   'neigingen.js': require('./lib/voltooi/neigingen'),
   'ov.js': require('./lib/voltooi/ov'),
+  'ovroutes.js': require('./lib/voltooi/ovroutes'),
   'pay.js': require('./lib/voltooi/pay'),
   'post.js': require('./lib/voltooi/post'),
   'pulse.js': require('./lib/voltooi/pulse'),

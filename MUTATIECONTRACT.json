@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-19T09:47:42.118Z",
-  "commit": "aff4985f",
+  "op": "2026-10-19T13:40:11.455Z",
+  "commit": "bf4b7fae",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -57352,7 +57352,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57379,7 +57379,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57406,7 +57406,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57433,7 +57433,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

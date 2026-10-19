@@ -39,6 +39,9 @@ module.exports = (octx) => {
     const les = lesVan(req, res); if (!les) return; if (!docentCheck(les, req, res)) return;
     const tekst = schoon(req.body.tekst, 600);
     if (!tekst) return res.status(400).json({ error: 'Schrijf de opgave.' });
+    // een dubbele tik is geen tweede opgave
+    const al = les.opgaven.find(x => x.tekst === tekst);
+    if (al) return res.json({ ok: true, bestond: true, opgave: { id: al.id, tekst: al.tekst, at: al.at } });
     const o = { id: rid(3), tekst, at: nu(), inzendingen: {} };
     les.opgaven.push(o); save();
     stuur(les.id, 'opgave', { id: o.id, tekst: o.tekst, at: o.at }, c => c.role === 'leerling');
@@ -64,6 +67,7 @@ module.exports = (octx) => {
     const les = lesVan(req, res); if (!les) return; if (!docentCheck(les, req, res)) return;
     const item = { id: rid(3), tekst: schoon(req.body.tekst, 200), datum: schoon(req.body.datum, 20), at: nu() };
     if (!item.tekst) return res.status(400).json({ error: 'Vul het agendapunt in.' });
+    if (les.agenda.some(a => a.tekst === item.tekst && a.datum === item.datum)) return res.json({ ok: true, bestond: true, agenda: les.agenda });
     les.agenda.unshift(item); les.agenda = les.agenda.slice(0, 60); save();
     stuur(les.id, 'agenda', { agenda: les.agenda }, c => c.role === 'leerling');
     res.json({ ok: true, agenda: les.agenda });

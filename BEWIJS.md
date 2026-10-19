@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19550 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19551 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2824 |
-| losse beweringen (`test(...)`) | 19550 |
+| losse beweringen (`test(...)`) | 19551 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2486 bestanden, 18978 beweringen.
+2486 bestanden, 18979 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -658,7 +658,7 @@ toets omvalt.
 | `foundation-gezondheid-welzijn.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-hulp-zorg.test.js` | 4 | geen module gevonden | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
 | `foundation-leren-groei.test.js` | 5 | geen module gevonden | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
-| `foundation-lescredential-server.test.js` | 3 | gezakt op `liegpoort /api/` | De lescredentials van RTFoundation-onderwijs tegen een ECHTE server (B17): elke nieuwe route krijgt hier een treffer, met de montage, de deur en de generieke antwoordcaches ervoor. Zie... |
+| `foundation-lescredential-server.test.js` | 4 | gezakt op `liegpoort /api/` | De lescredentials van RTFoundation-onderwijs tegen een ECHTE server (B17): elke nieuwe route krijgt hier een treffer, met de montage, de deur en de generieke antwoordcaches ervoor. Zie... |
 | `foundation-lescredential.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor de lescredentials van RTFoundation- onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
 | `foundation-lescredential.test.js` | 10 | gezakt op `!==->===#0` | De lescredentials van RTFoundation-onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens) op moduleniveau: vorm, hash-only, verval, de claim met zijn plafond, intrekken en roteren, en dat een kind geen... |
 | `foundation-lesrem.test.js` | 3 | gezakt op `liegpoort /api/` | DE LES-MAAKROUTE HEEFT DE REM DIE HAAR REDEN BELOOFDE. WAT ER MIS WAS. |

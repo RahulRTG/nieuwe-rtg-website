@@ -3,13 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "e95bc85b",
+  "commit": "1623ec9c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/foundation/geven.html"
+    "public/apps/foundation/bord.html",
+    "public/apps/foundation/schrift.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7823,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1056,
-  "verwijzingen": 1282,
-  "voorvoegsels": 142,
+  "exactePaden": 1065,
+  "verwijzingen": 1291,
+  "voorvoegsels": 145,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -10296,6 +10297,55 @@
    "aantal": 1
   },
   {
+   "pad": "/api/foundation/agenda",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/agenda/verwijder",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/bord/stroke",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/bord/undo",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/bord/wis",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/les/code/roteer",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/opgave",
+   "schermen": [
+    "public/apps/foundation/bord.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/rtfos/publiek/steden",
    "schermen": [
     "public/apps/foundation/buurtruil.html"
@@ -10565,6 +10615,20 @@
    "pad": "/api/member/democratie/kwestie/voorstellen",
    "schermen": [
     "public/apps/foundation/samendoen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/ai",
+   "schermen": [
+    "public/apps/foundation/schrift.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/opgave/inleveren",
+   "schermen": [
+    "public/apps/foundation/schrift.html"
    ],
    "aantal": 1
   },
@@ -16096,9 +16160,20 @@
   },
   {
    "bestand": "public/apps/foundation/bord.html",
-   "exact": [],
+   "exact": [
+    "/api/foundation/agenda",
+    "/api/foundation/agenda/verwijder",
+    "/api/foundation/bord/stroke",
+    "/api/foundation/bord/undo",
+    "/api/foundation/bord/wis",
+    "/api/foundation/les/code/roteer",
+    "/api/foundation/opgave"
+   ],
    "voorvoegsels": [
-    "/api/foundation"
+    "/api/foundation/bord/",
+    "/api/foundation/les/",
+    "/api/foundation/opgaven/",
+    "/api/foundation/schrift/"
    ]
   },
   {
@@ -16521,11 +16596,15 @@
   {
    "bestand": "public/apps/foundation/schrift.html",
    "exact": [
+    "/api/foundation/ai",
+    "/api/foundation/opgave/inleveren",
     "/api/foundation/schrift/opslaan",
     "/api/foundation/tip"
    ],
    "voorvoegsels": [
-    "/api/foundation"
+    "/api/foundation/bord/",
+    "/api/foundation/les/",
+    "/api/foundation/schrift/"
    ]
   },
   {

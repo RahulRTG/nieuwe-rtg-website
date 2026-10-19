@@ -105,3 +105,19 @@ test('het les-id is geen geloofsbrief, en de AI-bijles vraagt een geldige sleute
   const ander = (await post('/api/foundation/les/maak', { vak: 'Ander', naam: 'Juf' })).data;
   assert.equal(await lees('/bord/' + ander.lesId, k.token), 403, 'een sleutel van een andere les opent niets');
 });
+
+/* Gevonden door de voltooiproef (scripts/lib/voltooi/rtfbord.js): een dubbele
+   tik op "+" of "Zet" op het bord -- twee gelijke verzoeken tegelijk, of opnieuw
+   na een afgebroken verzoek -- zette het agendapunt of de opgave twee keer voor
+   de klas. */
+test('een dubbele tik zet een opgave en een agendapunt een keer neer', async () => {
+  const d = (await post('/api/foundation/les/maak', { vak: 'Dubbel', naam: 'Juf' })).data;
+  const D = (b) => Object.assign({ code: d.lesId, token: d.token }, b);
+  const [o1, o2] = await Promise.all([post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8' })), post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8' }))]);
+  assert.equal(o1.status, 200); assert.equal(o2.status, 200);
+  assert.equal(o1.data.opgave.id, o2.data.opgave.id, 'een dubbele tik gaf twee opgaven');
+  const [, a2] = await Promise.all([post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-02' })), post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-02' }))]);
+  assert.equal(a2.data.agenda.filter(x => x.tekst === 'Toets').length, 1, 'een dubbele tik zette het agendapunt twee keer neer');
+  const ander = await post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-09' }));
+  assert.equal(ander.data.agenda.filter(x => x.tekst === 'Toets').length, 2, 'een ander agendapunt met dezelfde tekst werd opgeslokt');
+});

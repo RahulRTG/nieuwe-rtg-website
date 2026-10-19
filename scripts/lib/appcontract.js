@@ -173,6 +173,12 @@ const CONTRACT = {
   'link:geven': Object.assign({
     belofte: 'wie geeft ziet eerst wat er zou gebeuren en bevestigt een keer; een oormerk landt op een echt project, en een meerjarig plan en zijn machtiging beheert de gever zelf'
   }, voltooi('geven', 'het scenario loopt /api/rtfos/gift/stand, /voorbereid, /bevestig, /projecten, /plan/* en /machtiging/*, de routes die /apps/foundation/geven.html zelf aanroept, met het kantoor dat het plan vastlegt')),
+  'link:rtfbord': Object.assign({
+    belofte: 'een begeleider start een les, tekent op het bord, zet opgaven en de agenda klaar, ziet de inzendingen en leest een schrift -- de klas en een andere les beschrijven zijn bord niet'
+  }, voltooi('rtfbord', 'het scenario loopt /api/foundation/bord/*, /opgave, /opgaven, /agenda, /schrift en /les/code/roteer, de routes die /apps/foundation/bord.html zelf aanroept, met de les zoals Leren & Groei hem start en het kind van het gezin als leerling')),
+  'link:rtfschrift': Object.assign({
+    belofte: 'een leerling doet mee met een les, schrijft in zijn eigen schrift, levert in en vraagt de bijleshulp -- een klasgenoot of een andere les leest zijn schrift niet'
+  }, voltooi('rtfschrift', 'het scenario loopt /api/foundation/schrift/opslaan, /schrift, /opgave/inleveren, /ai, /tip, /les en /bord, de routes die /apps/foundation/schrift.html zelf aanroept, met het kind van het gezin als leerling en een klasgenoot')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

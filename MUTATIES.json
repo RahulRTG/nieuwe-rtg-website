@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T10:03:01.291Z",
-    "commit": "1ef0918f",
+    "op": "2026-10-19T12:36:53.652Z",
+    "commit": "d1a33766",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6465,6 +6465,16 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "hangar-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 6,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/hangar-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
     "hardware.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9166,6 +9176,16 @@
       "module": "server/kern/living-world/actions.js",
       "operator": "true->false#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "living-world-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/living-world/client.js",
+      "operator": "voorwaarde-omkeren#0",
       "geprobeerd": 1
     },
     "living-world-http.test.js": {
@@ -14003,6 +14023,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "reisuitnodiging-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/reisuitnodiging-client.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "reisuitnodiging.e2e.js": {
       "soort": "server",
@@ -20862,6 +20892,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "zakelijk-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/zakelijk-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zakelijk.test.js": {
       "soort": "server",

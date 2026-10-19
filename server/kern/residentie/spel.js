@@ -10,7 +10,7 @@ const rahul = require('./rahul');
 const vragen = require('./vragen');
 
 module.exports = (ctx) => {
-  const { R, kamer, kamerVanLees, potjesLees, sein, sseToCustomer, save, partnerVan } = ctx;
+  const { R, kamer, kamerVanLees, potjesLees, sein, sseToCustomer, save, partnerVan, volwassen } = ctx;
   const potjes = () => (R().potjes = R().potjes || {});
   const spelerIn = (id, key) => kamer(id).leden[key];
   const keyOpNaam = (id, codenaam) =>
@@ -126,9 +126,12 @@ module.exports = (ctx) => {
     if (prive) {
       // de directeur als gastheer: gewaagd (eigen dek) afgewisseld met de
       // diepere genres uit de motor
+      // het gewaagde dek is seksueel getint: alleen als BEIDE de 18+-poort halen
+      // (kern/volwassen.js); zonder poort blijft de directeur bij het eerlijke dek
+      const volw = typeof volwassen === 'function' && volwassen(key) === true && volwassen(maat) === true;
       if (k.vraagTeller % 2 === 0) {
-        const r = rahul.kies('gewaagd');
-        uit = { tekst: r.tekst, intro: r.intro, van: 'rahul', niveau: 'gewaagd' };
+        const r = rahul.kies(volw ? 'gewaagd' : 'eerlijk');
+        uit = { tekst: r.tekst, intro: r.intro, van: 'rahul', niveau: volw ? 'gewaagd' : 'eerlijk' };
       } else {
         const v = vragen.genereer(pak(['intiem', 'ongemakkelijk', 'traan']));
         uit = { tekst: v.tekst, intro: rahul.kies('eerlijk').intro, van: 'rahul', niveau: v.genre };

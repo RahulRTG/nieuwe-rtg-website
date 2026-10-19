@@ -50,7 +50,7 @@ module.exports = function bouwKernAan(kern, grens) {
   /* De Residence (kern/residentie): het virtuele grandhotel -- zalen en eigen
      suites waar leden als pionnen op codenaam rondlopen en praten, live over
      het bestaande SSE-kanaal. */
-  Object.assign(kern, require('../kern/residentie').maakResidentie({ db, save, schoon, sseToCustomer }));
+  Object.assign(kern, require('../kern/residentie').maakResidentie({ db, save, schoon, sseToCustomer, volwassen: kern.volwassen }));
   require('../routes/samen')(grens('samen'));
   require('../routes/baby')(grens('baby'));
   require('../routes/tiener')(grens('tiener'));

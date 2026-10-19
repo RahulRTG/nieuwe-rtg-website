@@ -9,7 +9,7 @@
 const { MEUBELS, ZALEN, SUITE, DELUXE } = require('./zalen');
 const TTL = 90000; // wie 90s niets laat horen, is de kamer uit
 
-function maakResidentie({ db, save, schoon, sseToCustomer }) {
+function maakResidentie({ db, save, schoon, sseToCustomer, volwassen }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/residentie/index', bezit: { residentie: 'kaart' } });
   const R = () => {
     const r = eigen.bak('residentie', (b) => Object.assign(b, { kamers: {}, suites: {}, wie: {} }));
@@ -178,7 +178,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
   Object.assign(kop, require('./koppel')({ R, kamer, kamerVan, sein, sseToCustomer, save, zetNeer, zitplek, plattegrond }));
   Object.assign(api, { paarVraag: kop.paarVraag, paarAntwoord: kop.paarAntwoord, paarLos: k => kop.paarLos(k) });
   Object.assign(api, require('./spel')({ R, kamer, kamerVan, kamerVanLees, potjesLees,
-    sein, sseToCustomer, save, partnerVan: kop.partnerVan }));
+    sein, sseToCustomer, save, partnerVan: kop.partnerVan, volwassen }));
   return { residentie: api };
 }
 

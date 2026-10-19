@@ -571,7 +571,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 939 regels in de delen
+`public/shared/basis/` -- 11 delen, 953 regels in de delen
 
 | deel | onderwerp |
 |---|---|

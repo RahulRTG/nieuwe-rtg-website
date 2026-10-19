@@ -36,11 +36,19 @@ const MIN_NIVEAU = 'A3';
 
 function maakVolwassen({ accounts, lidstandVan }) {
   const stand = lidstandVan || maakLidstand({ accounts });
-  return function volwassen(handle) {
+  /* WAAROM NIET (X2, 19 oktober 2026). volwassen() blijft ja of nee; reden()
+     zegt erbij of het een echte nee is of een kluis die niet te lezen was. */
+  function reden(handle) {
     const st = stand(String(handle || ''));
-    return !!(st && st.account && voldoet(st.niveau, MIN_NIVEAU) &&
-      st.leeftijd != null && st.leeftijd >= MIN_LEEFTIJD);
-  };
+    if (!st || st.storing) return 'storing';
+    if (!st.account) return 'geen-account';
+    if (!voldoet(st.niveau, MIN_NIVEAU)) return 'niveau';
+    if (st.leeftijd == null) return 'leeftijd-onbekend';
+    return st.leeftijd >= MIN_LEEFTIJD ? 'ja' : 'te-jong';
+  }
+  const volwassen = (handle) => reden(handle) === 'ja';
+  volwassen.reden = reden;
+  return volwassen;
 }
 
 module.exports = { maakVolwassen, MIN_LEEFTIJD, MIN_NIVEAU };

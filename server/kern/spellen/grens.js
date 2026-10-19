@@ -26,11 +26,16 @@
    stand na), een replay (je eigen partij terugkijken telt niets op) en de
    dagtelling (daar staat geen persoon in). Die drie staan met hun reden in hun
    eigen module. */
+const GEEN_PROGRESSIE = 'Scores en ranglijsten bestaan alleen voor leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn. Laat je identiteit verifieren in de app; het spel zelf speel je gewoon door.';
+/* Was de kluis niet te lezen (volwassen.reden 'storing'), dan is er niets aan
+   het lid te verbeteren: dan zegt de grens dat, en niet "laat je verifieren". */
+const STORING = 'Of je scores bewaard mogen worden, kunnen we even niet controleren. Het spel speel je gewoon door; probeer het straks opnieuw.';
 module.exports = ({ volwassen }) => ({
   progressieMag: (handle) => volwassen(handle),
+  waaromNiet: (handle) => (volwassen.reden && volwassen.reden(handle) === 'storing' ? STORING : GEEN_PROGRESSIE),
   /* De melding zegt sinds deze ronde ook WAT eraan te doen is. De poort kijkt
      nu echt naar de keuring (kern/volwassen.js), en daarmee kan iemand er ook
      echt buiten vallen die dat gisteren nog niet deed. Een grens zonder deur
      ernaast leest als een storing. */
-  GEEN_PROGRESSIE: 'Scores en ranglijsten bestaan alleen voor leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn. Laat je identiteit verifieren in de app; het spel zelf speel je gewoon door.'
+  GEEN_PROGRESSIE
 });

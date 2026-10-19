@@ -42,7 +42,9 @@
 const { lokaal } = require('../tijdzone');
 
 module.exports = (ctx) => {
-  const { S, save, nu, codenaamVan, ARCADE, DAG, progressieMag, GEEN_PROGRESSIE } = ctx;
+  const { S, save, nu, codenaamVan, ARCADE, DAG, progressieMag, GEEN_PROGRESSIE, waaromNiet } = ctx;
+  // een storing in de kluis krijgt een eigen zin (kern/spellen/grens.js, X2)
+  const geen = (mij) => (waaromNiet ? waaromNiet(mij) : GEEN_PROGRESSIE);
   const ZONE = 'Europe/Amsterdam';
   // als parameter zodat een toets een dag verder kan zetten zonder de klok van
   // de machine te verzetten; in productie staat hier niets
@@ -91,7 +93,7 @@ module.exports = (ctx) => {
        de progressiegrens mee: dat is dezelfde redenering waarmee de dagtelling
        buiten de grens valt (zie ./grens.js). */
     const mee = rij.length;
-    if (!progressieMag(mij)) return { mee, bord: [], ranglijst: false, reden: GEEN_PROGRESSIE };
+    if (!progressieMag(mij)) return { mee, bord: [], ranglijst: false, reden: geen(mij) };
     const plaats = new Map(rij.map(([h], i) => [h, i + 1]));
     const kring = new Set([mij, ...(vrienden || [])]);
     return {
@@ -161,7 +163,7 @@ module.exports = (ctx) => {
     const uit = { status: 200, ok: true, goed: true, datum, seconden: mijn.seconden, punten: p };
     if (!progressieMag(mij)) {
       save();
-      return Object.assign(uit, { bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE });
+      return Object.assign(uit, { bewaard: false, ranglijst: false, reden: geen(mij) });
     }
     mijn.punten = p;
     mijn.at = nu();

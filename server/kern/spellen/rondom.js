@@ -26,7 +26,7 @@
 module.exports = (ctx) => {
   const { anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, bewerkCollectie, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
-    comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx } = ctx;
+    comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, waaromNiet, opruimHaken, spelCtx } = ctx;
 
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een
   // peptalk. Krijgt het bord NIET te zien; zie spellen/rahul.js.
@@ -67,7 +67,7 @@ module.exports = (ctx) => {
      Zie spellen/arcade.js voor waarom de twee soorten score niet naast elkaar
      mogen bestaan zonder dat de ene de andere dichtzet. */
   const { arcadeScore, arcadeBord, sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, arcadeVergeet, sudokuOpschonen } =
-    require('./arcade')({ S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE });
+    require('./arcade')({ S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE, waaromNiet });
   opruimHaken.deel.push(arcadeVergeet);
   opruimHaken.tijd.push(sudokuOpschonen);
 
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
      's nachts leeg is. Krijgt `nudge` NIET binnen, en dat is de maatregel zelf:
      er komt geen melding dat de opgave verloopt. Zie spellen/dag.js. */
   const { dagStand, dagStart, dagKlaar, dagVergeet, dagOpschonen } =
-    require('./dag')({ S, save, nu, codenaamVan, ARCADE, DAG, progressieMag, GEEN_PROGRESSIE });
+    require('./dag')({ S, save, nu, codenaamVan, ARCADE, DAG, progressieMag, GEEN_PROGRESSIE, waaromNiet });
   opruimHaken.deel.push(dagVergeet);
   opruimHaken.tijd.push(dagOpschonen);
 

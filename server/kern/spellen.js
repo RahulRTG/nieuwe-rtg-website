@@ -76,8 +76,8 @@ module.exports = ({ db, save, bewerkCollectie, crypto, zijnVrienden, codenaamVan
   });
 
   /* DE PROGRESSIEGRENS staat in spellen/grens.js: de enige regel waar deze hele
-     laag aan hangt, en daarom een eigen bestand met een eigen naam. */
-  const { progressieMag, GEEN_PROGRESSIE } = require('./spellen/grens')({ volwassen });
+     laag aan hangt, dus een eigen bestand. */
+  const { progressieMag, GEEN_PROGRESSIE, waaromNiet } = require('./spellen/grens')({ volwassen });
 
   /* HET BELEID (spellen/beleid.js): alle toetredingsvragen op een plek, in
      volgorde. Neemt geen regel over -- hij roept gedeeld.js, grens.js en
@@ -141,7 +141,7 @@ module.exports = ({ db, save, bewerkCollectie, crypto, zijnVrienden, codenaamVan
   const rondom = require('./spellen/rondom')({
     anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, bewerkCollectie, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
-    comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx: ctx
+    comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, waaromNiet, opruimHaken, spelCtx: ctx
   });
   const { spelRahul, spelNabespreking, spelNaspelen, projectieOpen, projectieKoppel, projectieStand,
     projectieSluit, projectieSpellen, teamNieuw, teamNodig, teamAntwoord,

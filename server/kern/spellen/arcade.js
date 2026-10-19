@@ -26,7 +26,9 @@
    gewoon, er wordt alleen niets bewaard. Geen 403 -- een fout aan het eind van
    een potje zou zeggen dat je iets niet mocht, en dat is niet waar. */
 module.exports = (ctx) => {
-  const { S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE } = ctx;
+  const { S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE, waaromNiet } = ctx;
+  // een storing in de kluis krijgt een eigen zin (kern/spellen/grens.js, X2)
+  const geen = (mij) => (waaromNiet ? waaromNiet(mij) : GEEN_PROGRESSIE);
 
   /* De borden. De oude losse `sneek`-tak verhuist bij de eerste aanraking naar
      `arcade.sneek`: een bron, anders lopen de oude en de nieuwe sleutel uiteen. */
@@ -49,7 +51,7 @@ module.exports = (ctx) => {
       return { status: 400, error: 'De score van dit spel wordt door de server bepaald.' };
     /* `bewaard: false` zegt precies wat er gebeurt, zodat de client zijn
        scorebord kan verbergen in plaats van een leeg bord te tonen. */
-    if (!progressieMag(mij)) return { status: 200, ok: true, bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE };
+    if (!progressieMag(mij)) return { status: 200, ok: true, bewaard: false, ranglijst: false, reden: geen(mij) };
     const n = Math.max(0, Math.min(ARCADE[spel].maxPunten, Math.floor(Number(punten) || 0)));
     const s = A(spel);
     if (!s[mij] || n > s[mij].punten) { s[mij] = { punten: n, at: nu() }; save(); }
@@ -58,7 +60,7 @@ module.exports = (ctx) => {
 
   function arcadeBord(mij, spel, vrienden) {
     if (!ARCADE[spel]) return { status: 400, error: 'Onbekend arcadespel.' };
-    if (!progressieMag(mij)) return { bord: [], ranglijst: false, reden: GEEN_PROGRESSIE };
+    if (!progressieMag(mij)) return { bord: [], ranglijst: false, reden: geen(mij) };
     const s = A(spel);
     const rij = [mij, ...vrienden].filter(h => s[h]).map(h => ({ codenaam: codenaamVan(h), ik: h === mij, punten: s[h].punten }));
     return { bord: rij.sort((a, b) => b.punten - a.punten).slice(0, 20), ranglijst: true };
@@ -107,7 +109,7 @@ module.exports = (ctx) => {
        record, precies zoals `arcadeScore` het voor Sneek en Tetris doet.
        Anders zou de server-berekening een tweede weg naar het scorebord zijn. */
     const uit = { status: 200, ok: true, goed: true, seconden: Math.round(seconden), punten: p };
-    if (!progressieMag(mij)) return Object.assign(uit, { bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE });
+    if (!progressieMag(mij)) return Object.assign(uit, { bewaard: false, ranglijst: false, reden: geen(mij) });
     const bord = A('sudoku');
     if (!bord[mij] || p > bord[mij].punten) { bord[mij] = { punten: p, at: nu() }; save(); }
     return Object.assign(uit, { bewaard: true, ranglijst: true, beste: bord[mij].punten });

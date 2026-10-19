@@ -97,11 +97,13 @@ const { idVanKey: STD_SLEUTEL } = require('../lib/lidsleutel');
 function maakLidstand({ accounts, leeftijdVan = STD_LEEFTIJD, idVanKey = STD_SLEUTEL }) {
   return function lidstandVan(key) {
     const id = idVanKey(key);
-    let u = null;
-    try { u = id == null ? null : accounts.getUserById(id); } catch (e) { u = null; }
+    // een leesfout blijft fail-closed, maar zegt het (storing): onleesbaar is geen nee (X2)
+    let u = null, storing = false;
+    try { u = id == null ? null : accounts.getUserById(id); } catch (e) { u = null; storing = true; }
     let md = {};
-    try { md = u ? (accounts.getMemberState(u.id) || {}) : {}; } catch (e) { md = {}; }
+    try { md = u ? (accounts.getMemberState(u.id) || {}) : {}; } catch (e) { md = {}; storing = true; }
     return {
+      storing,
       account: !!u,
       niveau: niveauVan({ account: u, verified: u && u.verified, faceMatch: md.faceMatch }),
       leeftijd: md.geboren ? leeftijdVan(md.geboren) : null,

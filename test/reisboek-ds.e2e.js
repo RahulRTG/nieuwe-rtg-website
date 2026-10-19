@@ -11,7 +11,7 @@
         een reis vast en voegt een document toe; Vandaag toont de reis als
         Detail met groot beeld, Documenten toont het document zonder nummer;
      4. het doel van het gedeelde element draagt zijn naam (de overgang van
-        de reiskaart, test/gedeeld-element.e2e.js);
+        de reiskaart; de overgang zelf bewijst test/gedeeld-element.e2e.js);
      5. op 390, 820 en 1440 px loopt niets horizontaal over, en in het
         Arabisch staat dir="rtl" zonder overloop.
    Zet RTG_DS_BEELDEN=<map> om de schermafbeeldingen te bewaren. */
@@ -90,7 +90,7 @@ test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge sta
   const edge = await page.locator('.ds-edge__balk > *').evaluateAll(x => x.map(e => e.textContent.trim() || e.getAttribute('aria-label')));
   assert.deepEqual(edge, ['Home', 'Werelden', 'Vraag Rahul', 'Acties', 'Menu']);
   const naam = await page.locator('[data-rtg-gedeeld-doel="reisboek"]').evaluate(e => getComputedStyle(e).viewTransitionName);
-  assert.equal(naam, 'none', 'met minder beweging draagt het doel geen overgangsnaam');
+  assert.equal(naam, 'rtg-gedeeld-reisboek', 'het doel draagt zijn naam vast; minder beweging zet alleen de overgang zelf uit');
   assert.deepEqual(fouten, []);
   await ctx.close();
 });
@@ -140,15 +140,6 @@ test('een reis vastleggen en een document toevoegen loopt over de echte kern', {
   await page.locator('[data-rb-tabknop="wijzigingen"]').click();
   await page.waitForFunction(() => /Niets wordt aangepast zonder uw akkoord/.test(document.querySelector('#inhoud').textContent));
   assert.deepEqual(fouten, []);
-  await ctx.close();
-});
-
-test('met beweging draagt het doel van het gedeelde element zijn naam', { skip }, async () => {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-  const page = await ctx.newPage();
-  await page.goto(srv.base + '/apps/reisboek.html', { waitUntil: 'domcontentloaded' });
-  const naam = await page.locator('[data-rtg-gedeeld-doel="reisboek"]').evaluate(e => getComputedStyle(e).viewTransitionName);
-  assert.equal(naam, 'rtg-gedeeld-reisboek');
   await ctx.close();
 });
 

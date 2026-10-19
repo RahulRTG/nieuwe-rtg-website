@@ -23,18 +23,18 @@ const api = (pad, body, herkans) => fetch(pad, {
   if (p) return p;
   if (!r.ok) { const fout = new Error(d.error || 'Er ging iets mis.'); fout.status = r.status; throw fout; } return d;
 });
-const T = k => window.RTGFirstSteps ? RTGFirstSteps.text(k) : '';
+const eerste = k => window.RTGFirstSteps ? RTGFirstSteps.text(k) : '';
 
 /* De eerste keer: geen boekbaar aanbod, of nog niet ingelogd. Het beeld is
    inspiratie en staat er met die naam bij; de knoppen vullen alleen een wens. */
 function welkom(gast) {
   return '<section class="ds-status ds-status--binnen" data-rtg-first-steps><img class="ds-status__beeld" src="' + BEELD[0] + '" alt="">' +
-    '<p class="ds-meta">' + T('travelAtmosphere') + '</p><p class="ds-label">' + T('agency') + '</p><h2 class="ds-status__titel">' + T('travelTitle') + '</h2>' +
-    '<p class="ds-status__tekst">' + T(gast ? 'guest' : 'travelIntro') + '</p>' +
-    (gast ? '<a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/app.html">' + T('login') + '</a>'
-      : '<div class="ds-chips" role="group">' + ['rest', 'company', 'explore'].map(k => '<button class="ds-chip" type="button" aria-pressed="false" data-first-preference="' + k + '">' + T(k) + '</button>').join('') + '</div>' +
-        '<button class="ds-knop ds-knop--primair ds-status__actie" type="button" data-first-action="wish" data-ds-actie="Bespreek uw reiswens">' + T('wish') + '</button>' +
-        '<p class="ds-status__tekst">' + T('unavailable') + '</p><p class="ds-status__tekst">' + T('start') + '</p>') + '</section>';
+    '<p class="ds-meta">' + eerste('travelAtmosphere') + '</p><p class="ds-label">' + eerste('agency') + '</p><h2 class="ds-status__titel">' + eerste('travelTitle') + '</h2>' +
+    '<p class="ds-status__tekst">' + eerste(gast ? 'guest' : 'travelIntro') + '</p>' +
+    (gast ? '<a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/app.html">' + eerste('login') + '</a>'
+      : '<div class="ds-chips" role="group">' + ['rest', 'company', 'explore'].map(k => '<button class="ds-chip" type="button" aria-pressed="false" data-first-preference="' + k + '">' + eerste(k) + '</button>').join('') + '</div>' +
+        '<button class="ds-knop ds-knop--primair ds-status__actie" type="button" data-first-action="wish" data-ds-actie="Bespreek uw reiswens">' + eerste('wish') + '</button>' +
+        '<p class="ds-status__tekst">' + eerste('unavailable') + '</p><p class="ds-status__tekst">' + eerste('start') + '</p>') + '</section>';
 }
 
 let ALLE = [], HUIDIG = null, travelFlow = null;

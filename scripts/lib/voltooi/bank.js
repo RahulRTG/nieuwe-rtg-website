@@ -127,6 +127,14 @@ async function loop(w, stap) {
       ziet: 'ander ziet ' + (zijn.rekeningen || []).length + ' eigen rekening, afschrift ' + af.status + ', afboeken ' + weg.status + '; eigen saldo ' + saldo(o, betaal.iban) };
   });
 
+  await stap('voltooibaar', 'uitgelogd ziet niemand een rekening en boekt niemand iets: 401, met een zin', async () => {
+    const o = await w.post(OVERZICHT, {}, null);
+    const a = await w.post(AFSCHRIFT, { iban: betaal.iban }, null);
+    const b = await w.post(OVERBOEK, { vanIban: betaal.iban, naarIban: spaar.iban, centen: 100, idem: merk + '-uit' }, null);
+    return { klopt: [o, a, b].every((r) => r.status === 401 && r.data && r.data.error) && saldo(await ov(), betaal.iban) === 3000,
+      ziet: 'overzicht ' + o.status + ', afschrift ' + a.status + ', overboeken ' + b.status + ' (' + (o.data && o.data.error) + ')' };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staan het akkoord, beide rekeningen en de saldi er nog', async () => {

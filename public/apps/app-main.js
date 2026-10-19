@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '67db66ba';
+var RTG_BOUW = '64f74029';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -191,7 +191,7 @@ var RTG_BOUW = '67db66ba';
 
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
   async function refreshState(){
-    try { applyState((await API.call('/state')).state); } catch(e){}
+    try { applyState((await API.call('/api/state')).state); } catch(e){}
   }
 
   let toastTimer;
@@ -1030,7 +1030,7 @@ var RTG_BOUW = '67db66ba';
     const tekst = prompt(T('snap.tekst','Tekst erbij (mag leeg):'),'') || '';
     try {
       if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast(''+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
-      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
+      else { await API.call('/api/member/snap/send', { toKey: snapNaar, foto, tekst, idem: RTGIdem('snap') }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
     } catch(err){ toast(err.message); }
   }
   function snapVerklein(file){
@@ -1456,7 +1456,7 @@ var RTG_BOUW = '67db66ba';
     // verhalen-strip + inkomende snaps bovenaan de contactenkaart
     let stories = [], snaps = [];
     try { stories = (await API.call('/member/stories')).stories || []; } catch(e){}
-    try { snaps = (await API.call('/member/snaps')).snaps || []; } catch(e){}
+    try { snaps = (await API.call('/api/member/snaps')).snaps || []; } catch(e){}
     let box = el.querySelector('#snapStrip');
     if (!box){ box = document.createElement('div'); box.id='snapStrip'; el.insertBefore(box, el.firstChild.nextSibling); }
 /* de storyrij bovenaan De Salon */
@@ -1475,7 +1475,7 @@ var RTG_BOUW = '67db66ba';
     box.querySelectorAll('.js-opensnap').forEach(b => b.addEventListener('click', () => openSnap(b.dataset.id)));
   }
   async function openSnap(id){
-    let d; try { d = await API.call('/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
+    let d; try { d = await API.call('/api/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
     const ov = snapOverlay();
     ov.querySelector('#snapOvVan').textContent = 'Snap van ' + d.van;
     ov.querySelector('#snapOvImg').src = d.foto;
@@ -3502,7 +3502,9 @@ var RTG_BOUW = '67db66ba';
       const regels = [];
       el.querySelectorAll('.js-boq[data-code="' + b.dataset.code + '"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
       if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
-      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+      // een sleutel per samengestelde bestelling: een tweede tik of een herhaling is dezelfde bestelling
+      const vorm = JSON.stringify(regels); if (b.dataset.idemVorm !== vorm) { b.dataset.idem = RTGId('boodschappen'); b.dataset.idemVorm = vorm; }
+      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels, idem: b.dataset.idem }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
     }));
   }
   async function laadBzMijn(){
@@ -4001,7 +4003,8 @@ var RTG_BOUW = '67db66ba';
        niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
-    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
+    // de netwerkkant van een partnerzaak: alleen voor wie een zaak opent (werkrol, app-main-24a3.js)
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html', werkrol: 'zaak' },
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
@@ -4526,7 +4529,12 @@ var RTG_BOUW = '67db66ba';
     fetch('/api/account/rollen', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { werkrollen = new Set(((d && d.rollen) || []).map((r) => r.rol)); if (werkrollen.size) bouw(); })
+      /* Een manager die via zijn dienstverband aan een zaak hangt (rol
+         personeel, manager) opent de zaak-app net als wie de zaak koppelde
+         (app-main-25.js); voor een ingang met werkrol 'zaak' telt hij dus ook. */
+      .then((d) => { const rollen = (d && d.rollen) || [];
+        werkrollen = new Set(rollen.map((r) => r.rol).concat(rollen.some((r) => r.rol === 'personeel' && r.manager) ? ['zaak'] : []));
+        if (werkrollen.size) bouw(); })
       .catch(() => {});
   })();
 
@@ -4633,9 +4641,13 @@ var RTG_BOUW = '67db66ba';
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
+    /* De paden van de werkkiezer staan voluit, zodat de routemeting
+       (SCHERMROUTES.json) ziet welke deuren hij aanroept; API.call zet zelf
+       /api ervoor, dus dat gaat er hier weer af. */
+    const werkApi = (pad, body) => API.call(pad.replace(/^\/api(?=\/)/, ''), body);
     belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
-    API.call('/account/rollen', {}).then(d => {
+    werkApi('/api/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
       if (!rollen.length) {
         const leeg = document.createElement('div');
@@ -4668,12 +4680,12 @@ var RTG_BOUW = '67db66ba';
               if (u.geenPasskey) { location.href = deur.PASSKEYS; return; }
               if (!u.token) throw new Error(u.error || T('werk.mis', 'Openen lukte niet.'));
               s = u;
-            } else try { s = await API.call('/account/start', body); }
+            } else try { s = await werkApi('/api/account/start', body); }
             catch (e1) {
               if (!(e1.data && e1.data.locatieNodig)) throw e1;
               const pos = await vraagPositie();
               if (!pos) throw e1;
-              s = await API.call('/account/start', Object.assign({ positie: pos }, body));
+              s = await werkApi('/api/account/start', Object.assign({ positie: pos }, body));
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
@@ -7709,7 +7721,9 @@ var RTG_BOUW = '67db66ba';
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
     const g=(rtf.gekoppeld||[]); if(!g.length) return;
-    try{ await API.call('/rtf/bericht',{ code:g[0].code, tekst:t }); inp.value=''; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
+    if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
+    try{ await API.call('/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
@@ -7731,7 +7745,7 @@ var RTG_BOUW = '67db66ba';
   async function ensurePush(interactief){
     try{
       if (!('serviceWorker' in navigator) || !('PushManager' in window)){ if(interactief) toast('Push wordt op dit toestel niet ondersteund.'); return; }
-      const keyRes = await fetch('/api/push/key').then(r=>r.json()).catch(()=>({}));
+      const keyRes = await fetch('/api/push/key',{headers:{Authorization:'Bearer '+API.token}}).then(r=>r.json()).catch(()=>({}));
       if (!keyRes.key){ if(interactief) toast('Meldingen zijn nu niet beschikbaar.'); return; }
       if (interactief || Notification.permission==='default'){
         const perm = await Notification.requestPermission();
@@ -9526,7 +9540,7 @@ var RTG_BOUW = '67db66ba';
         post.likes += post.liked ? 1 : -1;
         ev.currentTarget.classList.toggle('liked', post.liked);
         el.querySelector('.lc').textContent = post.likes;
-        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
+        if (API.live) API.call('/api/like', {postId: post.id, liked: post.liked}).catch(() => {});
       });
       const shareBtn = el.querySelector('.js-share');
       if (shareBtn) shareBtn.addEventListener('click', () => openShare(post.id));
@@ -9597,8 +9611,11 @@ var RTG_BOUW = '67db66ba';
         const inp = el.querySelector('.cform input');
         if (!inp.value.trim()) return;
         if (API.live){
-          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          // een sleutel per reactie: een tweede tik of een nieuwe poging is dezelfde
+          if (!inp.dataset.idem) inp.dataset.idem = RTGIdem('salon-reactie');
+          try { await API.call('/api/comment', {postId: post.id, text: inp.value.trim(), idem: inp.dataset.idem}); }
           catch (e) { toast(e.message || T('app.salon.notallowed','Reageren niet toegestaan.')); return; }
+          delete inp.dataset.idem;
         }
         post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
         const d = document.createElement('div');

@@ -101,13 +101,8 @@ module.exports = (ctx) => {
     return { ok: true, boeking: Object.assign({}, boeking, { intake: tekst || null }) };
   }
 
-  /* BETAALD IS: ER BEWOOG GELD. Hier stond `bk.paid = true` zonder dat er een
-     cent bewoog -- geen RTG Pay, geen betaalnaad -- terwijl het scherm
-     "Betalen" zegt (gevonden door FoundationOS bij link:foundationzorg). Nu
-     betaalt het lid de zorgaanbieder via RTG Pay (pay.betaalZaak, de vaste weg
-     voor een lid dat een zaak betaalt); een tekort laadt bij via de
-     betaalwaarheid. De sleutel hangt aan de boeking: een herhaling voor
-     dezelfde boeking is dezelfde betaling (test/carebetaal.test.js). */
+  /* Betaald is: er bewoog geld. Het lid betaalt de zorgaanbieder via RTG Pay
+     (pay.betaalZaak); de sleutel hangt aan de boeking (test/carebetaal.test.js). */
   async function careBetaal(sess, refIn, verdien) {
     lijsten();
     const bk = C.bak('careBoekingen').find(x => x.ref === String(refIn || '') && x.key === sess.key);
@@ -162,12 +157,9 @@ module.exports = (ctx) => {
   }
 
   /* ---- de aanbieder-kant: de agenda van de behandelaar ----
-     Een zorgaanbieder (spa/kliniek) is gekoppeld aan een leveranciersaccount
-     via supplierCode. De behandelaar ziet zijn dag: wie komt, wanneer, welke
-     behandeling, en de zorgcontext die met toestemming meereist (allergenen
-     en, alleen voor een kliniek met een gedeelde intake, de medische notitie).
-     Zo staat een notenallergie of bloedverdunner vóór de behandeling op het
-     scherm. Afronden zet de afspraak op 'afgerond'. */
+     Gekoppeld via supplierCode: wie komt, welke behandeling, en de zorgcontext
+     die met toestemming meereist, zodat een allergie vóór de behandeling op het
+     scherm staat. Afronden zet de afspraak op 'afgerond'. */
   const aanbiedersVanSupplier = code => C.kijk('careAanbieders')
     .filter(a => String(a.supplierCode || '').toUpperCase() === String(code || '').toUpperCase());
 

@@ -1,159 +1,461 @@
-# Premiumdomeinkaart Geld
+# Premiumdomeinkaart Geld, versie 2
 
-Status: **werkdocument, voorstel aan de eigenaar**. Niets hierin is toegezegd
-werk: een functie wordt pas werk als de eigenaar haar per familie toezegt
-(besluit van 19 oktober 2026). Opgesteld door de Geld-sessie op de tak
+Status: **werkdocument, voorstel aan de eigenaar.** Niets hierin is
+toegezegd werk; een functie wordt pas werk als de eigenaar haar per familie
+toezegt (besluit van 19 oktober 2026). Opgesteld door de Geld-sessie op de tak
 `appwerkt/geld`.
 
-**Wat deze kaart beslaat.** Dit zijn de Geld-apps volgens de verdeling van de
-integrator: Wallet, Pay, Bank, Balans, RTG Code, Geld Command, WBW, Labfonds,
-Mecenaat, Nalatenschap en de tab Betalen. Logboek staat in de kaart van
-LivingOS-A, en `tab:assets` blijft daar ook. Volgens `SCHERMEIGENAAR.json`
-zijn ze allemaal een stand of alias van `/apps/geld.html`, met eigenaar
-`geld.overzicht`. Pay (`/apps/pay.html`, `betalen.rtgpay`) heeft een eigen
-scherm.
+Versie 2 volgt de aanscherping van dezelfde dag:
+- per app vier onderzoeken: bestaande werkelijkheid, marktmaximum,
+  domeinmaximum en RTG Beyond;
+- elke functie bouwbaar concreet;
+- ook kijken buiten de eigen apps;
+- per app een uitkomst A, binnen de huidige architectuur en scope, en een
+  uitkomst B, het domeinmaximum;
+- een toetsbaar eindcontract over acht dimensies.
 
-**Hoe te lezen.** Per functie staat er:
-- de laag (L1 persoonlijk, L2 professioneel, L3 organisatorisch, L4
-  domeinintelligentie, L5 levenscyclus, L6 RTG-samenhang);
-- of hij **bestaat**, **half** is of **ontbreekt**;
-- een acceptatiecriterium in gewone taal (dat wordt later een stap in het
-  voltooiscenario);
-- de kosten (klein, middel of groot);
-- de bak: **nu**, **later** of **niet**.
+**Wat deze kaart beslaat.**
+- **De apps.** Wallet, Pay, Bank, Balans, RTG Code, Geld Command, WBW,
+  Labfonds, Mecenaat, Nalatenschap en de tab Betalen, volgens de verdeling van
+  de integrator.
+- **Logboek**, maar alleen de financiële registratie (zie de grens in 4.3).
+- **Eén scherm.** Ze zijn allemaal een stand of alias van `/apps/geld.html`,
+  met eigenaar `geld.overzicht` in `SCHERMEIGENAAR.json`. Alleen Pay heeft een
+  eigen scherm (`/apps/pay.html`, `betalen.rtgpay`).
+- **Vijf families.** 0 reis, 1 betalen, 2 rekening en overzicht, 3 samen geld,
+  4 bewaren en geven.
 
-"Bestaat" betekent: in de code én met een toets of voltooiscenario. Wat
-alleen in een document staat, heet "ontbreekt".
+**Hoe te lezen.**
+- **Hoofdstukken.** Per app staan eerst de bestaande inventaris, de catalogus
+  en LOS en SAMEN uit versie 1. Daarna volgt het blok **"v2"** met:
+  - de vier onderzoeken;
+  - de nu-functies bouwbaar uitgeschreven;
+  - wat alleen RTG kan;
+  - de bouwstenen en ontbrekende schakels;
+  - de prioriteit;
+  - de uitkomsten A en B;
+  - het eindcontract.
+- **Acht velden per nu-functie.** Een nu-functie staat uitgeschreven met:
+  - de gegevens en hun bron;
+  - de regels en grenzen;
+  - de rekenwijze;
+  - de onzekerheid en hoe die zichtbaar is;
+  - wanneer iemand iets hoort;
+  - de rollen en de toestemming;
+  - de uitzonderingen;
+  - het acceptatiecriterium.
+
+  Bij **later** en **niet** staan één regel en de reden.
+- **"Bestaat" en "bewezen".** "Bestaat" betekent: in de code, met een toets of
+  voltooiscenario. "Bewezen" betekent: gesloten in de registers (`APPWERKT.json`,
+  `VOLTOOIPROEF.json`, `IDOR.json`, `BEVOEGD.json`).
+- **De registerstand.** Op deze tak zijn de registers gemeten op 19 oktober
+  tussen 04:47 en 05:16 UTC. Dat gebeurde **vóór** de samenvoeging van de
+  voltooiscenario's van Geld (wallet, bank, wbw, labfonds, rtgcode, geldcommand
+  en balans). Die sluiten lokaal (`node scripts/voltooiproef.js --alleen=<app>`),
+  maar de centrale meetronde moet ze nog vastleggen. Waar hieronder "3/8"
+  staat, is dat dus de registerstand, geen oordeel over de code.
+- **Het eindcontract** vervangt de acht bewijzen niet (bereikbaar, bedienbaar,
+  voltooibaar, waarheidsgetrouw, persistent, bevoegd, herstelbaar, menselijk).
+  Het komt erbovenop.
 
 **Grenzen die overal gelden.**
 - Geld verlaat het huis nooit vanzelf (`AFBOUWPROGRAMMA.md` par. 1.3).
-- Samenwerking loopt via verwijzingen en projecties, nooit via een gedeeld
-  datamodel (`AFBOUWPROGRAMMA.md` par. 1.2, `WERKRUIMTE.md` par. 5).
-- Geen nieuwe motor of laag (bijstelling van de eigenaar, 19 oktober):
-  geldgraaf, geldbeleid, actielog, de scenario-engine en de stuurlaag
-  bestaan al, en daarop bouwen we voort.
-- Geen beleggings-, krediet- of verzekeringsadvies (`GELD.md` par. 7).
+- Samenwerking loopt via verwijzingen en projecties, nooit via een gedeelde
+  database (par. 1.2). Geld toont de gevolgen; het domein blijft eigenaar.
+- Er komt geen nieuwe motor of laag. Wat er al is, staat in G.1.
+- Geen beleggings-, krediet- of verzekeringsadvies (`GELD.md` par. 7). Waar die
+  Wft-grens precies loopt, staat in G.2.
 - Een voorspelling is nooit een feit.
-- Geen echte merken als partner, en geen verzonnen gegevens.
+- Geen echte merken als partner, geen verzonnen gegevens.
 
-**Over de betaalmuurlijsten.** Elke regel met een marktleider draagt een
-bron-URL en de datum 19 oktober 2026. In deze sessie was het web niet
-rechtstreeks te openen: WebFetch gaf `ENOTFOUND` en de proxy gaf 403. Alle
-marktgegevens komen daarom uit **zoekresultaat-fragmenten**, en zijn zo
-gemarkeerd ("fragment"). Ze zijn een ondergrens om na te lezen, geen geciteerde
-pagina.
+**Over de bronnen.** In deze sessie was het web niet rechtstreeks te openen:
+WebFetch gaf `ENOTFOUND` en de proxy gaf 403. Daarom staat bij elke bron wat
+voor soort bron het is:
+- **fragment**: uit een zoekresultaat, met de URL en de datum 19 oktober 2026;
+- **kennis**: uit kennis, niet nagelezen.
+
+Beide zijn een ondergrens om na te lezen, geen geciteerde pagina. Bij de
+prijsniveaus van marktpartijen geldt dat in het bijzonder.
 
 ---
 
-## 0. Eerst: de reisfamilie, het Geld-deel
+## 0. De reisfamilie, het Geld-deel (gaat voor)
 
 Prioriteit van de eigenaar: boeken, betalen, agenda en reisdossier worden als
-eerste familie compleet, los en samen getest. Dit hoofdstuk is het Geld-deel:
-het betaalbewijs van een reis, en wat Geld ervan maakt (verplichting, kasstroom
-en herkomst). Het is afgestemd met TravelOS (`session_01RSoau3Wc3Ze7MXzDAfGtpK`);
-de open vragen aan hen staan in 0.5.
+eerste compleet, los en samen getest. Afgestemd met TravelOS (hun kaart
+`docs/domeinkaarten/travelos.md` par. 1.5) en met Toegang.
 
-### 0.1 Wat er al is (gemeten in de code)
+### 0.1 Bestaande werkelijkheid
 
-- `POST /api/reisbureau/betaal` (`server/routes/member/winkel.js:62`) roept
-  `betaal()` aan in `server/kern/reisbureau-betaling.js`. Daar staan drie regels:
-  - alleen een **bevestigde** reis wordt betaald; anders volgt 409;
-  - een reis zonder samenstelling wordt **geweigerd** met de reden, en niet
-    geboekt met een onbekende herkomst;
-  - het lid betaalt **één** bedrag, dus is er één boeking (`pay.boekAsync`, van
-    `lid:<codenaam>` naar `rtg:reisbureau`), met de economische sleutel
-    `pay-handeling:[reis, ref]`. Een herhaling na een crash geeft dezelfde
-    boeking terug.
-- Pas ná die boeking:
-  - de herkomstrijen (`reisGeldrijen`: wie wat ontvangt en waarom);
-  - de uitkeringen aan derden, **klaargezet** met `uitgevoerd: false`, want een
-    mens voert ze uit;
-  - "betaald" op de aanvraag (`reisbureau.markeerBetaald`, eigenaar TravelOS).
-- Faalt de boeking (402 te weinig saldo, 503 "De betaallaag is niet
-  beschikbaar."), dan wordt de reis niet betaald gemarkeerd.
-- Teruggave na afzeggen (`server/kern/reisbureau-teruggave.js`):
-  - een teruggaverecht, uitgevoerd door een mens op naam met passkey;
-  - vanaf € 1.000 met een tweede mens.
-- Bewijs: `test/reisherkomst.test.js` (toets 12 en 13, op een echte server) en
-  `test/reisteruggave.test.js`.
+**Betalen.**
+- `POST /api/reisbureau/betaal` roept `betaal()` aan in
+  `kern/reisbureau-betaling.js`.
+- Alleen een bevestigde reis met samenstelling wordt betaald.
+- Er komt één boeking (`pay.boekAsync`, economische sleutel
+  `pay-handeling:[reis, ref]`).
+- Daarna volgen:
+  1. de herkomstrijen;
+  2. de uitkeringen aan derden, klaargezet maar niet uitgevoerd;
+  3. `markeerBetaald`.
+- Bewijs: `test/reisherkomst.test.js`, toetsen 12 en 13.
 
-### 0.2 Gaten (gemeten)
+**Teruggave.**
+- Na afzeggen bestaat er een teruggaverecht. Een mens op naam voert het uit,
+  met passkey.
+- Vanaf € 1.000 kijkt er een tweede mens mee (`kern/reisbureau-teruggave.js`).
 
-1. **Geen scherm roept `/api/reisbureau/betaal` aan.** In `public/` staat geen
-   aanroep, dus het lid kan een bevestigde reis niet zelf betalen. Wie dat
-   scherm bezit, is een vraag aan TravelOS (0.5).
-2. **Alleen walletsaldo.** Er is geen betaalwaarheid en geen bijladen per kaart.
-   Een lid zonder saldo krijgt 402. Elke andere zaakbetaling van het huis heeft
-   die dekking wel (`pay.betaalZaak`, `kern/pay/dekking.js`), net als de
-   bankstorting en de markt-deal (`kern/bank/stortwaarheid.js`,
-   `kern/markt/handel/dealbetaal.js`).
-3. **Geen bezitspoort.** `/api/reisbureau/` staat niet in
-   `server/kern/identiteit/bezitspaden.js`, terwijl de route geld verplaatst.
-4. **Geen paspoortpoort.** `payGate` wordt niet aangeroepen. De route weigert
-   tier `guest` met "Alleen voor leden". Of een reis een pasfunctie is of
-   "minimaal een account" volgt, is een besluit (0.5).
-5. **Geen verplichting in Geld.** Een bevestigde, onbetaalde reis is in de
-   Geld-app nergens zichtbaar. Er bestaat geen eigen verplichtingenobject; de
-   geldgraaf kent terugkerende posten alleen als patroon.
+**Sinds versie 1 gerepareerd of toegevoegd.**
+- **De paspoortpoort (`960cc45a`).**
+  - Een reis boeken mag elk account.
+  - Een reis betalen mag elk account dat gekeurd is met de paspoortpoort
+    (besluit van 19 oktober). Dat vervangt "Alleen voor leden".
+  - Een bezoeker zonder account krijgt 403.
+  - Bewijs: `test/reisbetaal-poorten.test.js`.
+- **De bezitspoort** (Toegang, `54f4b42c` op `appwerkt/toegang`).
+  `/api/reisbureau/betaal` staat in de bezitspaden.
+- **Een dubbele herkomst na een crash (`6016db28`).**
+  - Wat er misging: een herhaling na een crash tussen de boeking en "betaald"
+    schreef de rijen en uitkeringen opnieuw weg. Ibiza kreeg 12 rijen waar
+    het er 6 horen te zijn.
+  - Gevonden door TravelOS. Ik heb het eerst nagemeten met een toets die
+    zakte, en daarna gerepareerd.
+  - Bewijs: `test/reisbetaling-herhaal.test.js`.
 
-### 0.3 Functiecatalogus van het Geld-deel
+**Nog open.**
+- **K2.** Geen scherm betaalt. Afgesproken is dat de knop in `reisbureau.html`
+  komt, bij de reis.
+- Er wordt alleen uit het walletsaldo betaald, zonder de betaalwaarheid.
+- **K3.** Er is geen betaalbewijs.
+- Er staat geen verplichting in Geld.
+- Defecten van TravelOS, die zij oplossen:
+  - **K1.** Het reisdossier zet 'paid' al bij het bevestigen.
+  - **K4.** Het reisoverzicht staat hard op `betaald:false`.
 
-| Functie | Laag | Stand | Acceptatiecriterium | Kosten | Bak |
-|---|---|---|---|---|---|
-| Een bevestigde reis precies één keer betalen | L1 | bestaat | Het lid betaalt een bevestigde reis; een tweede tik of een herhaling na een crash boekt niets extra. | — | — |
-| Een reis zonder samenstelling weigeren | L1 | bestaat | Een reis die niet is uitgesplitst wordt geweigerd met de reden; er komt geen geldrij met een onbekende herkomst. | — | — |
-| De herkomst per cent | L6 | bestaat | Na het betalen staat per rij wie het geld ontvangt en waarom, en de rijen tellen op tot de reissom. | — | — |
-| Betalen vanaf het scherm | L1 | ontbreekt | Op een bevestigde reis ziet het lid "Betalen", met het bedrag; na de bevestiging ziet hij het betaalbewijs. | klein | nu |
-| Betalen met bijladen via de betaalwaarheid | L1 | ontbreekt | Een lid met te weinig saldo betaalt toch, met de kaart. Weigert de bank, dan heet de reis niet betaald. Blijft de bank hangen, dan staat er "wacht op bevestiging" en niet "betaald"; komt de bevestiging later, dan wordt de reis één keer betaald. | middel | nu |
-| Bezitspoort op reisbetalingen | L1 | ontbreekt | Met een gestolen sessie zonder het toestel kan niemand een reis betalen. | klein | nu |
-| Paspoort- en accountregel voor een reis | L1 | half | Een ongekeurd account kan niet betalen en krijgt de paspoortweg. Of een gratis account een reis kan boeken, volgt het besluit van de eigenaar. | klein | nu (na besluit) |
-| Het betaalbewijs | L5 | half | Na het betalen kan het lid het bewijs openen, met bedrag, datum, boekingsnummer en reis. Het bewijs blijft bestaan als de agenda of het reisdossier uit staat. | klein | nu |
-| De reis als verplichting in Geld | L6 | ontbreekt | Een bevestigde, onbetaalde reis staat in de Geld-app als open bedrag met de verwijzing naar de reis. Na het betalen verdwijnt ze daar, en na een afzegging ook. | middel | nu |
-| De kasstroom van een reis | L4 | half | De geldgraaf toont de betaling als uitgaand op de betaaldag, en een teruggave als inkomend, nooit dubbel. Een verwachte betaling heet "verwacht" en niet "geboekt". | klein | nu |
-| De herkomst laten zien in Geld | L6 | ontbreekt | Bij de betaling ziet het lid waar het geld heen ging (hotel, vervoer, RTG), uit de rijen van TravelOS, zonder eigen kopie. | klein | later |
-| Teruggave na afzeggen | L5 | bestaat | Een afzegging na betalen zet een recht klaar. Een mens op naam voert het uit, met een tweede mens vanaf € 1.000, en het geld komt één keer terug. | — | — |
-| Reisbudget of pot vooraf | L1 | half | Het lid zet geld opzij voor een reis (`geldbeleid/potten.js`), en bij het betalen ziet hij of de pot het dekt. Dat gebeurt nooit automatisch. | klein | later |
+### 0.2 Markt en domein, kort
 
-### 0.4 De gebruikersketen, met storingen
+**Markt.**
+- Een reisorganisatie vraagt doorgaans een aanbetaling en het restant een
+  aantal weken voor vertrek (kennis).
+- Een betaalbewijs per boeking is standaard (kennis).
 
-Keten: **een reis boeken → betaalbewijs → agendapunt → reisdossier → Geld
-toont het**.
+**Domein.**
+- Wie in Nederland een pakketreis verkoopt, valt onder de garantie van de
+  SGR/het Garantiefonds (kennis). RTG claimt dat niet.
+- De factuurvereisten gelden ook voor reizen (G.2).
 
-1. Het lid vraagt aan en de reisadviseur bevestigt (TravelOS). Geld toont
-   "open: € x voor reis RTG-R-…".
-2. Het lid betaalt, met bijladen als het saldo tekortschiet. Geld boekt één
-   keer, TravelOS markeert "betaald", en Geld zet de verplichting dicht en de
-   uitgaande stroom erin.
-3. De agenda krijgt het reispunt en het reisdossier het betaalbewijs (TravelOS
-   en de agenda geven het uit; Geld levert alleen het boekingsnummer).
+**Besluit B2 (TravelOS).** Er is geen betaaltermijn. Daarom staat een reis in
+Geld als "open, geen vervaldag".
 
-Storingen:
-- **Agenda valt uit.** De bevestigde reis en de betaling blijven staan. Geld
-  raakt de agenda niet.
-- **Geld of RTG Pay valt uit.** Betalen geeft "De betaallaag is niet
-  beschikbaar." (503). De reis blijft bevestigd en onbetaald, en het scherm
-  zegt dat.
-- **De bank weigert.** De reis heet nergens betaald; het lid kan opnieuw
-  proberen.
-- **De bank blijft hangen.** "Wacht op bevestiging", nooit "betaald". De
-  veegronde rondt de betaling later één keer af.
-- **Crash na de boeking, vóór "betaald".** Een herhaling geeft dezelfde boeking
-  terug en markeert dan; er wordt niet dubbel geboekt.
-- **Reisdossier valt uit.** Het betaalbewijs staat in Geld (boekingsnummer en
-  bedrag), zodat het lid het bewijs houdt.
+### 0.3 Functies, bouwbaar concreet (bak **nu**)
 
-### 0.5 Open vragen
+**R1. Een reis betalen via de betaalwaarheid, met bijladen (L1/L5, middel).**
+- *Gegevens.*
+  - De bevestigde aanvraag, van TravelOS: `ref`, `prijs.totaal` en `status`.
+  - Het walletsaldo, van Pay.
+  - De kaart, via de betaalprovider.
+- *Regels.*
+  - Alleen bij `status = bevestigd`, en met samenstelling.
+  - Elk account, gekeurd met de paspoortpoort, met het bezitsbewijs.
+  - `betaalWaarheid.maak({ soort: 'reis', bronRef: ref, idem: 'reis:' + ref })`.
+  - De afhandelaar boekt van de wallet naar `rtg:reisbureau`, met de bestaande
+    sleutel, en roept dan `markeerBetaald`.
+  - Dezelfde vorm als `kern/bank/stortwaarheid.js` en
+    `kern/markt/handel/dealbetaal.js`.
+- *Rekenwijze.* Het tekort is de reissom min het beschikbare saldo. Alleen dat
+  tekort wordt bijgeladen.
+- *Onzekerheid.*
+  - De afloop is betaald, geweigerd of traag.
+  - "Wacht op bevestiging" heet nooit "betaald".
+- *Wanneer hoort iemand iets.*
+  - Het lid ziet de uitkomst meteen op het scherm. Komt de bevestiging later,
+    dan volgt een melding van Pay.
+  - De reisadviseur ziet het in het kantooroverzicht.
+- *Rollen.*
+  - Het lid betaalt zelf: één tik en een bevestiging.
+  - Het kantoor bevestigt de reis vooraf.
+- *Uitzonderingen.*
+  - **Afzegging tijdens een hangende betaling.** De teruggave volgt het
+    bestaande recht.
+  - **De betaalwaarheid valt uit.** 503, met "er is niets afgeschreven".
+  - **Bedrag of valuta wijkt af.** De betaling gaat naar `CONTROLE_NODIG`, en
+    een mens op naam rondt af (`kern/betaalwaarheid/controle.js`).
+- *Acceptatie.*
+  - Een gekeurd account met te weinig saldo betaalt een bevestigde reis met de
+    kaart.
+  - De reis heet pas betaald na de bevestiging, en dan één keer, ook na een
+    dubbele tik of een crash.
+  - Bij een weigering heet ze nergens betaald.
 
-Aan TravelOS:
-1. Wie bezit het betaalscherm van een bevestigde reis: het reisscherm of
-   `tab:betalen`?
-2. Kent een bevestigde reis een betaaltermijn of vervaldag? Zo niet, dan toont
-   Geld "open, geen vervaldag" en verzint geen datum.
-3. Gaat TravelOS akkoord dat "betaald" alleen nog door de afhandelaar van de
-   betaalwaarheid wordt gezet, zoals bij de bankstorting en de markt-deal?
+**R2. Het betaalbewijs (L5, klein, na R1).**
+- *Gegevens.*
+  - De pay-boeking: id, centen en datum.
+  - De reis: ref en titel.
+- *Regels.* De afhandelaar van R1 roept `factuurVoorLid` aan. Zo is er één
+  plek die een lidtransactie tot factuur maakt; dat is het voorstel van
+  TravelOS.
+- *Rekenwijze.* Het bedrag van de boeking.
+- *Onzekerheid.* Geen: een bewijs bestaat pas na de bevestiging.
+- *Wanneer hoort iemand iets.* Het lid ziet het bewijs bij de reis en in
+  Facturen.
+- *Rollen.* Alleen het lid en het kantoor.
+- *Uitzonderingen.* Na een teruggave volgt een creditnota
+  (`kern/factuurcorrectie.js`).
+- *Acceptatie.*
+  - Na het betalen opent het lid het bewijs, met bedrag, datum,
+    boekingsnummer en reis.
+  - Het bewijs blijft bestaan als de agenda of het reisdossier uit staat.
 
-Aan de eigenaar:
-4. Is een reis een pasfunctie, of "minimaal een account"?
+**R3. De reis als verplichting en kasstroom in Geld (L4/L6, middel).**
+- *Gegevens.* Een projectie van TravelOS, zonder kopie: `ref`, `prijs.totaal`,
+  `vertrek` en `betaald`.
+- *Regels.* Er is geen vervaldag (besluit B2).
+- *Rekenwijze.*
+  - **Kasstroom** (`geldgraaf/vooruitblik.js`): de reis telt als "verwacht" op
+    de vertrekdatum, maar alleen als het lid dat aanzet.
+  - **Na het betalen**: uitgaand op de betaaldag.
+  - **Een teruggave**: inkomend.
+- *Onzekerheid.* "Verwacht" en "geboekt" zien er zichtbaar verschillend uit.
+- *Wanneer hoort iemand iets.* Geen eigen melding. De verplichting staat in de
+  kalender van Geld Command.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.*
+  - Na een afzegging verdwijnt de verplichting.
+  - Valt TravelOS uit, dan zegt de kalender "niet opgehaald".
+- *Acceptatie.*
+  - Een bevestigde, onbetaalde reis staat in Geld als open bedrag, met een
+    link naar de reis.
+  - Na het betalen verdwijnt ze uit "open" en staat ze één keer als uitgave.
+
+### 0.4 Keten en storingen
+
+**De keten.**
+1. Boeken.
+2. Bevestigen.
+3. Betalen (R1).
+4. Het bewijs (R2).
+5. De agenda en het reisdossier (TravelOS).
+6. Geld toont het (R3).
+
+**Storingen.**
+- **De agenda valt uit.** De betaling en het bewijs blijven staan.
+- **Pay of de betaalwaarheid valt uit.** 503. De reis blijft bevestigd en
+  onbetaald, en het scherm zegt dat.
+- **De bank weigert.** De reis heet nergens betaald.
+- **De bank blijft hangen.** Er staat "wacht op bevestiging", en de veegronde
+  rondt het één keer af.
+- **Een crash na de boeking.** Er blijft één boeking en één set rijen
+  (`6016db28`).
+- **Het reisdossier valt uit.** Het bewijs staat nog in Facturen.
+
+### 0.5 Afspraken en open punten
+
+**Afgesproken met TravelOS.**
+- Het betaalscherm komt in `reisbureau.html`.
+- Er is geen vervaldag.
+- "Betaald" ontstaat alleen via de afhandelaar van de betaalwaarheid.
+- Het bewijs komt van `factuurVoorLid`.
+- K1 en K4 zijn van TravelOS; K3 en K7 van Geld.
+- K7 is af (`6016db28`).
+
+**Vraag van TravelOS aan de eigenaar.** Bevestig de lezing van het besluit:
+- de paspoortpoort geldt alleen bij **betalen**, niet bij boeken;
+- een boeking kost niets, dus er is geen geldmoment.
+
+Zo is het nu gebouwd (`960cc45a`).
+
+**Wanneer ik R1 bouw.** Pas nadat de eigenaar deze familie toezegt.
+
+---
+
+## G. Gemeenschappelijk voor alle Geld-apps
+
+### G.1 Bouwstenen die er al zijn (hergebruik eerst)
+
+| Bouwsteen | Pad | Wat hij doet | Eigen of projectie |
+|---|---|---|---|
+| Betaalwaarheid | `server/kern/betaalwaarheid/` | Een betaling bestaat vóór de provider wordt gebeld. Afloop: betaald, geweigerd of traag. Veegronden voor betalingen en terugbetalingen. Een controle wordt door een mens op naam afgerond. | eigen |
+| RTG Pay | `server/kern/pay/` | Saldo, boekingen, `metIdem`, walletplafond, eigen geldgrens, opdrachtenrij voor terugstorten | eigen |
+| Geldgraaf | `server/kern/geldgraaf/` | Projectie over wallet, wbw, mecenaat, labfonds en payroll. Herkent terugkerende posten (`patronen.js`). Vooruitblik over 7, 30 en 90 dagen. | projectie |
+| Geldbeleid | `server/kern/geldbeleid/` | Regels met vier niveaus, potten, een harde geldgrens die weigert, een actielog waaraan alleen toegevoegd wordt | eigen |
+| Scenario-engine | `server/kern/fiscaal/scenario.js` | "Wat als" (personeel, omzet). Schrijft niets. | projectie |
+| Stuurlaag | `server/kern/stuur/` | Welke route de AI mag aansturen. Een mandaat versmalt alleen. | beleid |
+| Fiscale klassen | `server/kern/fiscaal/zekerheid.js` | Bepaald, uitlegbaar, advies of voorbehouden | regel |
+| Facturatie | `server/kern/facturatie/motor.js`, `factuurVoorLid` | Facturen met betaaltermijn en vervaldatum | eigen |
+| Contractklok | `server/bedrijf/contract.js` | Einde, opzegtermijn en `laatsteOpzegdag` (bedrijven) | eigen |
+| Simulatiebank | `server/betaal/synthetisch*.js` | Betalen, terugbetalen en uitbetalen met alle afloopvormen, zonder echte sleutels | toetsbank |
+
+### G.2 Het domeinmaximum: hoe het financiële domein werkt
+
+Per beroepsgroep: het werk, de normen en de grens. Elke bron staat erbij.
+
+**Huishoudens.**
+- Het Nibud deelt de uitgaven in drie groepen: vaste lasten,
+  reserveringsuitgaven en huishoudelijke uitgaven (fragment,
+  zoek.officielebekendmakingen.nl/kst-32777-11.html).
+- Het Budgethandboek verschijnt elk jaar, met referentiebudgetten. Die zijn
+  een voorbeeld, geen norm voor één persoon (fragment,
+  nibud.nl/samenwerken/cijfers-en-rekentools/referentiebegrotingen/).
+- Ook de buffer hangt af van het huishouden (fragment,
+  radar.avrotros.nl/artikelen/18100).
+
+**Budgetcoaches en schuldhulp.**
+- Sinds 2021 is vroegsignalering een wettelijke taak van de gemeente (Wgs).
+  Vier partijen melden een achterstand: woningcorporatie, zorgverzekeraar,
+  energiebedrijf en waterbedrijf (fragment, binnenlandsbestuur.nl).
+- De gedragscode van de NVVK bouwt op NEN 8048 (fragment, nvvk.nl).
+- De beslagvrije voet is 95% van de bijstandsnorm, inclusief vakantiegeld. De
+  officiële rekentool is uwbeslagvrijevoet.nl (fragment, rvr.org).
+- De Wsnp duurt 18 maanden, voor wie vanaf 1 juli 2023 is toegelaten
+  (fragment, rechtspraak.nl).
+- **Grens.** Een schuldregeling is aan de gemeente en de NVVK-leden; de Wsnp
+  aan de rechter.
+
+**Zzp, mkb en boekhouders.**
+- De administratie- en bewaarplicht is 7 jaar, en 10 jaar voor onroerende
+  zaken (art. 52 AWR, fragment, wetten.overheid.nl/BWBR0002320).
+- De btw-aangifte per kwartaal moet uiterlijk de laatste dag van de maand na
+  het kwartaal binnen zijn (fragment, belastingdienst.nl).
+- Er gelden factuurvereisten (fragment, mkbservicedesk.nl).
+- De KOR geldt tot € 20.000 omzet (fragment, onderneming.nl).
+
+**Stichtingen (ANBI) en verenigingen.**
+- Een ANBI publiceert haar beleidsplan, haar bestuur en haar financiële
+  verantwoording (fragment, taxence.nl).
+- Een losse gift is aftrekbaar boven een drempel van 1% (minimaal € 60) tot
+  10% van het inkomen. Een periodieke gift (5 jaar) heeft geen drempel
+  (fragment, consumentenbond.nl).
+- Een vereniging heeft een kascommissie en legt verantwoording af aan de ALV
+  (art. 2:48 BW, kennis).
+
+**Financieel planners.**
+- Advies is een persoonlijke aanbeveling over een specifiek nieuw product, en
+  vraagt een Wft-vergunning. Informeren vraagt dat niet (fragment,
+  afm.nl/…/interpretatie-informeren-en-adviseren.pdf).
+- Een FFP werkt met levensloopscenario's (fragment, ffp.nl).
+- **Grens voor RTG.**
+  - Scenario's met de eigen getallen van het lid en zonder productkeuze zijn
+    informeren. Die mogen.
+  - Een productaanbeveling doen wij nooit.
+
+**Nalatenschap.**
+- De aangifte erfbelasting moet binnen 8 maanden bij een overlijden tot en met
+  2025, en binnen 20 maanden bij een overlijden vanaf 1 januari 2026
+  (fragment, belastingdienst.nl, rendement.nl).
+- Er zijn de executeur, het Centraal Testamentenregister en de
+  boedelbeschrijving.
+- De digitale nalatenschap is wettelijk niet geregeld (fragment,
+  consumentenbond.nl).
+- **Grens.** Het testament, de verklaring van erfrecht en het register zijn
+  aan de notaris.
+
+**Gedeeld geld.**
+- Het Nibud noemt vier verdeelmethoden (fragment, rabobank.nl):
+  - naar inkomen;
+  - gelijk overhouden;
+  - helft-helft;
+  - een vaste bijdrage.
+- Zakgeld is een vast bedrag op een vast moment (fragment,
+  wijzeringeldzaken.nl).
+- Een verenigingskas heeft een penningmeester en een ALV.
+
+**Betaalregulering.**
+- Rekeninginformatie (AISP, PSD2) vraagt een DNB-vergunning, of een partner
+  die zelf contractpartij is (fragment, dnb.nl).
+- Elektronisch geld vraagt een vergunning, behalve binnen een beperkt netwerk
+  (art. 1:5a Wft). Boven € 1 miljoen moet dat gemeld worden (fragment,
+  dnb.nl).
+- De Wwft-poortwachters zijn de bank, de betaalinstelling en de notaris
+  (fragment, dnb.nl).
+
+### G.3 Financiële behoeften buiten de eigen apps
+
+Geld toont de gevolgen; het domein blijft eigenaar. Gemeten in de code; de
+eigenaar staat volgens `SCHERMEIGENAAR.json`.
+
+| Domein (eigenaar) | Geldobject vandaag | Via RTG Pay? | Wat Geld als projectie zou tonen |
+|---|---|---|---|
+| Reizen (`reisbureau.html`, `reizen.reisbureau`) | aanvraag `RTG-R-…`, `prijs.totaal`, `vertrek`, `betaald`; teruggave | ja (`boekAsync`, `terugGave`), nog zonder betaalwaarheid | verplichting, uitgave en teruggave (R3) |
+| Logeren (`thuis.html`, `verblijf.logeren-bij-leden`, TravelOS) | boeking `RTG-T-…` met `prijsopbouw.totaal`, `borg`, `van` en `terugPct` | **nee**: er staat alleen de tekst "De betaling loopt via RTG Pay bij bevestiging" | verplichting en borg, zodra er een geldpad is |
+| Horeca (`gast.html`, `bestellen.html` …) | rekening en bestelling (`pay.betaalZaak`); aanbetaling en annuleringsboete bij een reservering | de rekening wel; **de aanbetaling en de boete niet** (bewaard, nooit geïnd) | uitgave per zaak; een aanbetaling als verplichting, zodra die geïnd wordt |
+| School (`foundation/school.html`, `rtf.school`) | facturen voor schoolgeld, ouderbijdrage en excursie met `vervalt`; machtiging | **nee**: met de hand als betaald gemarkeerd; de betaallink `#factuur=` wordt nergens verwerkt | open bedrag met vervaldag in de kalender; een betaling als het lid betaalt |
+| Onderneming (`onderneming.html`, `werk.onderneming`) | facturen met `vervaldatum`, btw-saldo per periode, contracten met `laatsteOpzegdag` | de facturen niet (de verkoper markeert betaald); de werkopdracht wel | voor het eigen bedrijf: btw-reservering, debiteuren en crediteuren, alleen als het lid de zaak koppelt |
+| Gezin (`foundation/zakgeld.html`, `geld.zakgeld`) | zakgeldpotje, weekgeld en spaardoelen: leerboeken, "geen echt geld" | nee, met opzet | niets, want het is leergeld en geen geld; hooguit een verwijzing |
+| Wonen (`wonen.html`, `woning.overzicht`) | meldingen zonder bedrag; geen woonlasten | nee | niets, tot er woonlasten zijn (besluit G.5-4) |
+| Assets (`tab:assets`, LivingOS-A) | koop en herroeping via de betaalwaarheid; servicefee | ja | de servicefee als verplichting; Assets blijft eigenaar |
+| Hangar (`hangar.html`, `reizen.vliegtuig`) | toestellen en vluchten, zonder kosten | nee | — (onderhoud: zie Logboek, 4.3) |
+
+**Wat hieruit volgt voor Geld (één bouwsteen, geen laag).** Elk domein met een
+open bedrag (Reizen, Logeren, School, Assets, later Wonen) levert dezelfde
+kleine projectie aan Geld:
+
+| Veld | Wat erin staat |
+|---|---|
+| `bron` | de capability van de eigenaar |
+| `ref` | de verwijzing naar het object bij de eigenaar |
+| `centen` | het open bedrag |
+| `vervalt` | de vervaldag, of leeg |
+| `status` | `open`, `betaald` of `vervallen` |
+| `link` | het adres van het scherm van de eigenaar |
+
+Geld leest dat met de bestaande `bronnen`-vorm van de geldgraaf en bewaart
+niets. Dat is de verplichtingenkalender (2.2, F-GC4).
+
+### G.4 Veiligheid, gemeten door Toegang (ligt bij de integrator)
+
+Ongeveer twintig ledenroutes belasten de eigen wallet buiten de bezitspaden.
+Op de app store na hebben ze ook geen paspoortpoort. Het gaat om:
+
+- order, rekening en ride;
+- ov/uit, mob kaart en abo;
+- pakket en vonk;
+- rtfos winkel en gift;
+- giftcard, wbw, podium en fluister.
+
+De geldroutes van de bank (`/api/bank/*`) hebben geen paspoortpoort. Geld voegt
+die poorten toe zodra de integrator kiest. Voor de tab Betalen
+(`/api/betaal/direct`) en de bank staat het in de catalogi hieronder.
+
+### G.5 Besluiten gevraagd (alle apps)
+
+1. **Geld Command en WBW.** Ze weigeren elk gratis account (`geenGast`). Vallen
+   ze onder "minimaal een account"?
+2. **Krediet en de AI-bankier.** Ze staan allebei achter de leden-bank, die uit
+   staat, terwijl `GELD.md` par. 7 ze uitsluit. Blijven ze?
+   - Krediet staat in `kern/bank/krediet.js`: leningen tot € 50 miljoen tegen
+     7%; het kantoor beslist.
+   - De AI-bankier staat in `kern/bank/advies.js` en adviseert.
+3. **De paspoortpoort op de routes uit G.4.** Welke wel en welke niet?
+4. **Woonlasten.** Komt er een verplichtingenobject van Geld waar Wonen naar
+   verwijst, of levert Wonen de projectie uit G.3?
+5. **Mecenaat en Labfonds.** Een gift of toezegging echt betalen of innen?
+6. **Nalatenschap.** Een genre "notaris" in de leveranciersapp (CIVILIS)?
+7. **Logboek.** De onderhoudsregels van een vliegtuig naar Hangar (4.3)?
+8. **De reis.** De paspoortpoort alleen bij betalen (vraag van TravelOS, 0.5)?
+
+### G.6 Het eindcontract, de vorm
+
+Per app staat aan het einde van het v2-blok een eindcontract over acht
+dimensies:
+
+1. functionele breedte;
+2. professionele diepte;
+3. levenscyclus;
+4. samenwerking en rollen;
+5. domeinintelligentie;
+6. los functioneren;
+7. RTG-ketens;
+8. bewezen betrouwbaarheid.
+
+**Hoe een dimensie getoetst wordt.** Elke dimensie is één toetsbare zin die
+een toets of voltooiscenario kan worden. Een dimensie die bij een app niet van
+toepassing is, zegt dat met de reden. De achtste dimensie is altijd dezelfde:
+
+> "alle acht bewijzen gesloten in de centrale meetronde, IDOR zonder
+> doorbraak, BEVOEGD zonder DEFECT"
+
+**Wat het contract niet vervangt.** Het eindcontract vervangt de acht bewijzen
+niet.
 
 ---
 
@@ -290,6 +592,141 @@ Wij hebben:
 (B3) zolang er een terugstorting naar een IBAN bestaat; de vrijgavepoort beslist.
 Een kaart uitgeven vraagt een bankpartner.
 
+#### v2 — Pay
+
+**Bestaande werkelijkheid.**
+- Registers: 7/8; alleen *bevoegd* staat op NIET_GETEST (5 van de 17 routes
+  open). IDOR: geen doorbraak.
+- Sinds versie 1 bewezen voor een gratis account:
+  - sturen, verzoeken en tikken (`test/sociaal-gratisaccount.test.js`);
+  - tegoed en terugstorten (`test/tegoedterug-gratisaccount.test.js`);
+  - de verplichte bezitspoort met een gebonden toestel
+    (`test/wallet-gratisaccount-verplicht.test.js`);
+  - de uitbetaalrail in de simulatiebank (`test/simulatie-uitbetaling.test.js`).
+- Een vastgelopen terugbetaling staat als regel op de kantoorlijst
+  (`test/terugvastgelopen.test.js`).
+
+**Marktmaximum, met de duurste niveaus** (fragment, 19 oktober 2026):
+
+| Aanbieder | Duurste niveau | Wat alleen daar zit | Bron |
+|---|---|---|---|
+| Revolut | Ultra | lounges, partnerabonnementen, annuleringsdekking, lagere handelskosten | revolut.com/ultra-plan/ |
+| bunq | Elite | reisverzekering, ZeroFX, eSIM, 25 IBAN's | bunq.com/personal-account/banking-plans/bunq-elite |
+| Monzo | Max | verzekeringen en een gezinsaanvulling | monzo.com/current-account/plans |
+
+Wat de middenniveaus vragen:
+- **Monzo Extra:** eigen categorieën, export naar een spreadsheet, andere
+  banken koppelen.
+
+Wat gratis is:
+- Wise (betalen per gebruik, wise.com/eu/pricing);
+- Tikkie;
+- de betaalfuncties van Apple en Google.
+
+De markt vraagt geld voor drie soorten dingen, geen van alle betaalfuncties:
+- verzekering;
+- valuta;
+- status.
+
+**Domeinmaximum.**
+- Een betaalrekening van een huishouden heeft drie dingen nodig:
+  - een afschrift dat sluit;
+  - een categorie per post (de Nibud-indeling, G.2);
+  - een export voor de belastingaangifte of de schuldhulp.
+- De bewaarplicht van 7 jaar geldt voor ondernemers (art. 52 AWR). Voor
+  particulieren is er geen plicht, wel een gewoonte (kennis).
+
+**De nu-functies, bouwbaar.**
+
+**F-P1. De kascode in Pay (L1, klein).**
+- *Gegevens.* `/api/pay/kascode` bestaat al.
+- *Regels.* De code geldt vijf minuten en wordt één keer gebruikt. Er is een
+  paspoortpoort.
+- *Rekenwijze.* Geen.
+- *Onzekerheid.* Een verlopen code zegt "verlopen".
+- *Wanneer hoort iemand iets.* Het lid ziet de betaling direct na de scan.
+- *Rollen.* Het lid toont de code, de zaak scant.
+- *Uitzonderingen.* Is er geen netwerk, dan staat er geen code en de reden
+  waarom.
+- *Acceptatie.* Het lid opent Pay, tikt op "Kassacode" en ziet een code met
+  een aflopende tijd. Na een scan door de zaak staat de betaling in de
+  geschiedenis.
+
+**F-P2. Zoeken, eigen categorieën en export (L1/L5, middel).**
+- *Gegevens.* `payBoekingen` van het lid. De categorie is een veld dat het
+  lid zelf zet en dat bij Pay hoort.
+- *Regels.*
+  - De categorieën volgen de drie Nibud-groepen, met eigen subcategorieën.
+  - Een categorie verandert het bedrag nooit.
+  - De export omvat alleen de eigen boekingen, als CSV in dezelfde vorm als
+    `afschrift.csv`.
+- *Rekenwijze.* Het totaal per categorie per maand.
+- *Onzekerheid.* "Zonder categorie" is een eigen groep en wordt nooit
+  stilzwijgend ingedeeld.
+- *Wanneer hoort iemand iets.* Geen melding.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een export van meer dan 10.000 regels gaat per jaar.
+- *Acceptatie.*
+  - Het lid vindt een betaling op bedrag of tekst.
+  - Het lid geeft een betaling een categorie en ziet het maandtotaal.
+  - Het lid downloadt een periode. Het CSV telt op tot het saldoverschil van
+    die periode.
+
+**Wat alleen RTG kan.**
+- **Herkomst per cent.** Elke betaling in het huis weet waar het geld heen
+  ging: de waardegraaf.
+- **De betaalwaarheid.** Iets heet pas betaald na de bevestiging, ook bij
+  een zorg-, reis- of horecabetaling.
+- **De eigen geldgrens.** Het lid zet zelf een grens, en die weigert ook
+  namens hem.
+
+Een bank kan dat alle drie alleen binnen zijn eigen rekening.
+
+**Bouwstenen en ontbrekende schakels.**
+- Er zijn al: `metIdem`, de opdrachtenrij, de veegronden en `afschrift.csv`
+  (de vorm).
+- Er ontbreken:
+  - het categorieveld;
+  - de kascode in het scherm.
+
+**Prioriteit.**
+1. F-P1: klein en los.
+2. F-P2: middel en los.
+3. Een gezamenlijke pot: groot, en hangt af van de rollen in 3.
+
+**Uitkomst A (binnen de architectuur):**
+- de kascode;
+- zoeken, categorieën en export;
+- afrondsparen naar een eigen pot (later, middel).
+
+**Uitkomst B (domeinmaximum):**
+- een echte betaalrekening met IBAN, kaartuitgifte en valuta;
+- wat daarvoor nodig is:
+  - een gereguleerde bankpartner;
+  - een vergunning voor elektronisch geld, of een beperkt netwerk
+    (art. 1:5a Wft);
+  - een Wwft-proces.
+
+RTG levert dat niet zelf.
+
+**Eindcontract Pay.**
+1. **Breedte.** Het lid kan opladen, sturen, verzoeken, tikken, een tegoed
+   en de kascode gebruiken, terugstorten, zoeken, categoriseren en
+   exporteren, elk op één scherm.
+2. **Diepte.** De categorieën volgen de Nibud-indeling, en de export sluit op
+   het saldo.
+3. **Levenscyclus.** Elke geldhandeling heeft een weg terug (terugstorten,
+   terugboeken, controle afronden) die bewezen is in de simulatiebank.
+4. **Rollen.** Het lid, de zaak en het kantoor zien elk alleen het hunne;
+   een kantoorhandeling gebeurt op naam.
+5. **Intelligentie.** Het maandtotaal per categorie wordt alleen getoond, en
+   er wordt niets voorspeld zonder het label "verwacht".
+6. **Los.** Als de provider uitvalt, werkt sturen uit het saldo door, en
+   opladen zegt "er is niets afgeschreven".
+7. **Ketens.** Zorg, assets, markt, wbw, de kassa en reis betalen via Pay en
+   heten pas betaald na de bevestiging.
+8. **Betrouwbaarheid.** Zie G.6.
+
 ### 1.2 Wallet (`/apps/geld.html#wallet`)
 
 **a. Doel.** Alles wat je bij je wilt hebben (passen, kaarten, munten) op één
@@ -341,6 +778,83 @@ plek, en weten wanneer iets verloopt.
 betaalmuur bij de marktleiders (fragment, payconiq.be/en/faq/…). De ondergrens
 is dus: alles gratis, en dat zijn wij.
 
+#### v2 — Wallet
+
+**Bestaande werkelijkheid.**
+- Registers: 3/8 en GEEN_FIXTURE (vóór de samenvoeging van het
+  voltooiscenario).
+- IDOR: de vermeende doorbraak op `/api/wallet/munt/koop` is nagemeten en is
+  geen doorbraak. De 409 kwam van de idem-laag. Zie `b2698f2b` en
+  `test/wallet-muntkoop-idor.test.js`.
+- Sinds 19 oktober is de wallet er voor elk account (`eenAccount`), ook met
+  de verplichte bezitspoort.
+
+**Marktmaximum.**
+- Apple Wallet en Google Wallet zijn gratis en bewaren daarbij:
+  - passen;
+  - kaartjes;
+  - sleutels;
+  - identiteitsbewijzen, waar dat wettelijk mag (kennis).
+- Geen enkel fragment noemt een betaald niveau.
+
+**Domeinmaximum.**
+- Er gelden geen normen.
+- Wel geldt de regel: een pas blijft van de uitgever. Dat is hier al zo voor
+  de zorgpas.
+
+**De nu-functie, bouwbaar.**
+
+**F-W1. Het verloopsignaal (L4, klein).**
+
+- *Gegevens.* Een optioneel veld `geldigTot` per item. Dat veld zet het lid,
+  of de uitgever bij een verwijzing.
+- *Regels.*
+  - 30 dagen vooraf verschijnt een signaal.
+  - Een item zonder datum geeft nooit een signaal.
+- *Rekenwijze.* Vandaag tegen `geldigTot`, in de tijdzone van het huis
+  (`kern/tijdzone`).
+- *Onzekerheid.* Geen. De datum is een opgave, en dat staat erbij.
+- *Wanneer hoort iemand iets.* Het lid ziet het signaal in de wallet en in de
+  kalender van Geld Command. Er gaat geen push uit (geen kunstmatige urgentie).
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een pas van een uitgever volgt de datum van die uitgever.
+- *Acceptatie.*
+  - Een pas met een datum over 20 dagen toont het signaal.
+  - Een pas zonder datum toont het niet.
+  - Een ander lid ziet het niet.
+
+**Wat alleen RTG kan.** Passen uit het huis zelf, als verwijzing die vanzelf
+vervalt wanneer de uitgever haar intrekt:
+
+- zorgpolis;
+- schoolpas;
+- festivalmunten;
+- RTG-pas.
+
+**Uitkomst A.**
+- Het verloopsignaal.
+- Passen uit andere RTG-apps, zoals de schoolpas en het festivalbandje.
+
+**Uitkomst B.**
+- Een pas in Apple Wallet of Google Wallet.
+- Wat daarvoor nodig is: een developeraccount en ondertekening, buiten RTG.
+
+**Eindcontract Wallet.**
+
+1. **Breedte.** Het lid kan bewaren, tonen, laten verlopen en verwijderen, en
+   munten kopen en wisselen.
+2. **Diepte.** Niet van toepassing (geen beroepsgroep).
+3. **Levenscyclus.** Een pas wordt toegevoegd, verloopt met een signaal en
+   wordt ingetrokken door de uitgever.
+4. **Rollen.** De uitgever blijft eigenaar van een verwijzing. Het lid kan
+   die verwijzing niet wijzigen.
+5. **Intelligentie.** Alleen het verloopsignaal.
+6. **Los.** Valt Pay uit, dan blijven de passen zichtbaar, maar kan het lid
+   geen munten kopen.
+7. **Ketens.** De zorgpas, en later de school- en festivalpas, verschijnen en
+   verdwijnen met hun bron.
+8. **Betrouwbaarheid.** Zie G.6.
+
 ### 1.3 De tab Betalen (`/apps/app.html#tab=betalen`)
 
 **a. Doel.** In twee tikken een zaak of een verzoek betalen vanuit de hoofdapp.
@@ -390,6 +904,55 @@ niet.
   betaalt in de tab, en de zaak ziet de ontvangst. Weigert de bank, dan blijft
   het verzoek open; valt de zaakapp uit, dan staat de betaling bij het lid.
 
+#### v2 — tab Betalen
+
+**Bestaande werkelijkheid.**
+- Registers: 0/8, omdat de tab geen eigen adres heeft in het register. De
+  meting hangt aan `app.html`.
+- Het voltooiscenario `voltooi/betalen.js` bestaat.
+- Toegang meet: geen paspoortpoort.
+
+**Marktmaximum.** Payconiq en iDEAL QR zijn gratis voor consumenten
+(fragment).
+
+**De nu-functie, bouwbaar.**
+
+**F-T1. De paspoortpoort op direct betalen (L1, klein).**
+- *Gegevens.* De sessie.
+- *Regels.* `kern.onboarding.payGate(s)` op `/api/betaal/direct` en op
+  `/verzoek/pay`, in dezelfde vorm als `reisPoort` in `routes/member/winkel.js`.
+- *Rekenwijze.* Geen.
+- *Onzekerheid.* Geen.
+- *Wanneer hoort iemand iets.* Een ongekeurd account krijgt meteen de
+  paspoortweg (`kyc: true`).
+- *Rollen.* Het lid.
+- *Uitzonderingen.* De Lifestyle- en de Business-pas zijn vrijgesteld, zoals
+  overal.
+- *Acceptatie.*
+  - Een ongekeurd gratis account betaalt geen zaakverzoek en ziet de
+    paspoortstap.
+  - Een gekeurd account betaalt wel, één keer.
+  - Dit is een toets die eerst zakt.
+
+**Uitkomst A.**
+- De paspoortpoort.
+- Een eigen adres in het register, zodat de acht bewijzen meetbaar worden.
+- Een reis betalen vanuit de tab, na R1.
+
+**Uitkomst B.** Gelijk aan A. De markt heeft hier geen maximum boven gratis.
+
+**Eindcontract tab Betalen.**
+1. **Breedte.** Een zaakverzoek en een reis betalen in twee tikken.
+2. **Diepte.** Niet van toepassing.
+3. **Levenscyclus.** Het verzoek is open, wordt betaald, geweigerd of blijft
+   traag, en wordt daarna afgerond.
+4. **Rollen.** Alleen de zaak maakt een verzoek. Alleen het lid betaalt.
+5. **Intelligentie.** Niet van toepassing.
+6. **Los.** Valt de betaalwaarheid uit, dan geeft de tab 503 met "er is
+   niets afgeschreven".
+7. **Ketens.** De zaak ziet de ontvangst pas na de bevestiging.
+8. **Betrouwbaarheid.** Zie G.6, met een eigen registeradres.
+
 ### 1.4 RTG Code (`/apps/geld.html#rtgcode`)
 
 **a. Doel.** Laten zien wie je bent of betalen aan de balie, zonder iets
@@ -436,6 +999,39 @@ persoonlijks prijs te geven.
 consumenten; geen enkel fragment noemt een betaalde functie (fragment,
 payconiq.be/en/faq/is-the-payconiq-by-bancontact-app-free-of-charge). De
 ondergrens is dus gratis, en dat zijn wij.
+
+#### v2 — RTG Code
+
+**Bestaande werkelijkheid.**
+- Registers: 3/8 en GEEN_FIXTURE, gemeten vóór het voltooiscenario.
+- Een code is een verwijzing van 128 bit en wordt één keer gebruikt.
+
+**Markt- en domeinmaximum.**
+- iDEAL QR en Payconiq zijn gratis.
+- EMVCo-QR is de internationale norm (kennis).
+
+**Wat alleen RTG kan.** De kassa krijgt een codenaam en geen naam: privacy by
+design aan de balie.
+
+**Uitkomst A.** Gelijk aan wat er nu is. Daarna later, in de bak middel, een
+code die offline te controleren is: een ondertekend token met een korte
+geldigheid.
+
+**Uitkomst B.** Een EMVCo-QR die ook buiten het huis werkt. Daarvoor is een
+acquirer nodig.
+
+**Eindcontract RTG Code.**
+1. **Breedte.** De code wordt getoond en gescand. Een tweede scan krijgt "al
+   gebruikt".
+2. **Diepte.** Niet van toepassing.
+3. **Levenscyclus.** De code wordt uitgegeven, gebruikt en verloopt.
+4. **Rollen.** Alleen een kassa verbruikt de code. Een lid dat scant, krijgt
+   niets persoonlijks.
+5. **Intelligentie.** Niet van toepassing.
+6. **Los.** Zonder camera of netwerk wordt dat eerlijk gezegd.
+7. **Ketens.** De afrekening loopt via Pay. Valt Pay uit, dan komt er geen
+   "betaald".
+8. **Betrouwbaarheid.** Zie G.6.
 
 ---
 
@@ -537,6 +1133,82 @@ Wij hebben:
   leden-bank uit.
 - SEPA via een partner.
 - Krediet: een vergunning plus een eigen besluit.
+
+#### v2 — Bank
+
+**Bestaande werkelijkheid.**
+- Registers: 3/8 en GEEN_FIXTURE.
+- IDOR: `/api/bank` is onbereikbaar, omdat de leden-bank uit staat.
+- Toegang meet: geen paspoortpoort.
+- Krediet en de AI-bankier staan in de code (G.5-2).
+
+**Marktmaximum** (fragment):
+- **bunq Elite.** 25 IBAN's, ZeroFX en reisverzekering.
+- **Revolut Ultra.** Lounges en lagere handelskosten.
+- **Gezamenlijke rekening.** Bij bunq is die betaald.
+
+**Domeinmaximum.**
+- **Wat een rekening is.** Een rekening met IBAN is een bankproduct
+  (vergunning) of een betaalinstellingsproduct.
+- **Beslag.** Bij beslag geldt de beslagvrije voet (95%, G.2). Die moet een
+  bank respecteren.
+- **Schuldhulp.** Bij schuldhulp is een budgetbeheerrekening gebruikelijk
+  (kennis).
+
+**De nu-functie, bouwbaar.**
+
+**F-B1. De paspoortpoort op de bank, vóór de bank live gaat (L1, klein).**
+- *Gegevens.* De sessie.
+- *Regels.* `payGate` op `rekening/open`, `storten`, `overboeken`, `sepa`,
+  `naar-wallet` en `van-wallet`.
+- *Rekenwijze.* Geen.
+- *Onzekerheid.* Geen.
+- *Wanneer hoort iemand iets.* Het lid krijgt meteen de paspoortweg.
+- *Rollen.* Het lid.
+- *Uitzonderingen.* Lifestyle en Business, en de zakelijke rekening
+  (`supplierAuth`, met een eigen keuring).
+- *Acceptatie.* Met de leden-bank live (toets-env) opent een ongekeurd account
+  geen rekening, en een gekeurd account wel.
+
+**Wat alleen RTG kan.**
+- **`walletbrug`.** De bank dekt de wallet binnen één huis.
+- **Salaris.** Het salaris van de payroll komt op de eigen rekening en staat
+  als "verwacht" in Geld Command.
+
+**Uitkomst A.**
+- de paspoortpoort;
+- meerdere eigen rekeningen (na live);
+- een gezamenlijke rekening met tweemansbevestiging boven een grens (groot,
+  later).
+
+**Uitkomst B.**
+- echte IBAN's en SEPA;
+- beslagvrije-voetbewaking;
+- een budgetbeheerrekening samen met schuldhulp.
+
+Wat daarvoor nodig is:
+- een bankvergunning of een gereguleerde bankpartner;
+- Wwft;
+- DNB-toezicht.
+
+Krediet hoort hier niet bij (GELD.md par. 7).
+
+**Eindcontract Bank.**
+1. **Breedte.** Openen, storten, overboeken, afschrift, vaste lasten en
+   meerdere rekeningen.
+2. **Diepte.** Het afschrift sluit tot op de cent. De vaste lasten volgen de
+   Nibud-groep "vaste lasten".
+3. **Levenscyclus.** Akkoord, openen, gebruiken, sluiten. De opdrachtenrij
+   draait terug bij `MISLUKT_RAIL`.
+4. **Rollen.** Het lid, de zaak en het kantoor zetten elk hun eigen deel. Een
+   kantoorhandeling gebeurt op naam.
+5. **Intelligentie.** De inzichten zijn uitleg, met een fiscale klasse.
+   Advies geven ze niet.
+6. **Los.** Zolang de bank niet live is, werkt de wallet door. Valt de bank
+   uit, dan heet salaris "verwacht".
+7. **Ketens.** De payroll schrijft naar de bank, de bank naar de wallet en de
+   wallet naar Geld Command, elk één keer.
+8. **Betrouwbaarheid.** Zie G.6, en IDOR met de leden-bank live.
 
 ### 2.2 Geld Command (`/apps/geld.html`, eerste stand)
 
@@ -648,6 +1320,207 @@ Wij hebben:
 **j. Extern.** Een bankkoppeling met andere banken (PSD2) vraagt een
 AISP-vergunning of -partner; tot dan alleen RTG-bronnen en de eigen opgave.
 
+#### v2 — Geld Command
+
+**Bestaande werkelijkheid.**
+- Registers: 3/8 en GEEN_FIXTURE.
+- `geenGast` weigert een gratis account (G.5-1).
+- `GELD.md` fase 1 staat "in aanbouw".
+
+**Marktmaximum** (fragment):
+
+| Aanbieder | Duurste niveau | Wat het niveau geeft | Bron |
+|---|---|---|---|
+| Monarch | Plus | forecasting, levensgebeurtenissen | help.monarch.com/hc/en-us/articles/48349699981972 |
+| Emma | Ultimate | Spaces, een gedeeld budget | help.emma-app.com/en/article/what-are-the-features-of-emma-plus-pro-and-ultimate-678fjp/ |
+| YNAB | volledig betaald | — | ynab.com/pricing |
+| Boldin | betaald niveau | Monte Carlo | — |
+| Rocket Money | betaald niveau | opzegdienst | — |
+
+Het maximum van de markt is dus:
+- vermogen;
+- forecast;
+- levensgebeurtenissen;
+- een gedeeld budget;
+- een opzegdienst.
+
+**Domeinmaximum.**
+- **Nibud.** Drie groepen uitgaven, een referentiebudget en een buffer.
+- **Budgetcoach.** Werkt met een maandbegroting, een kasboek en een
+  betalingsachterstandenlijst.
+- **Vroegsignalering.** Huur, zorgverzekering, energie en water zijn de vier
+  signaalposten (Wgs).
+- **FFP-planner.** Levensloopscenario's, maar zonder productadvies (G.2).
+
+**De nu-functies, bouwbaar.** Elk gebouwd op de geldgraaf en het geldbeleid,
+zonder nieuwe motor.
+
+**F-GC1. Vermogensoverzicht (L1, middel).**
+- *Gegevens.*
+  - De posities bij RTG: `/api/pay/portefeuille`, `bank/overzicht`,
+    assets als projectie.
+  - De eigen opgave: een lijst `{soort: bezit | schuld, naam, centen, peildatum}`
+    in `geldbeleid.perLid`.
+- *Regels.*
+  - De opgave is nooit een RTG-bron. Er wordt nooit een koers opgehaald of
+    een waarde geschat.
+- *Rekenwijze.*
+  - Het totaal is de RTG-posten plus de opgave.
+  - Beide staan apart getoond, met de peildatum.
+- *Onzekerheid.*
+  - Een opgave ouder dan 12 maanden heet "verouderd".
+  - Valt een bron uit, dan staat er "niet opgehaald" en is er geen totaal.
+- *Wanneer hoort iemand iets.* Geen melding.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een schuld zonder bedrag wordt geweigerd.
+- *Acceptatie.*
+  - Het lid ziet zijn RTG-saldo en zijn eigen opgave apart, met een totaal.
+  - Valt Pay uit, dan verdwijnt het totaal en staat er "niet opgehaald".
+
+**F-GC2. Aflosplan als rekensom (L4, middel).**
+- *Gegevens.* De schulden uit de opgave, met rente (zoals de lener die
+  opgeeft) en een bedrag per maand.
+- *Regels.*
+  - Het is een rekensom en geen advies.
+  - Er staat geen product bij, geen oversluiten en geen volgorde-aanbeveling.
+- *Rekenwijze.* Annuïtair:
+  `n = -ln(1 - r·S/B) / ln(1 + r)`, met `r` de maandrente, `S` de schuld en
+  `B` het maandbedrag.
+- *Onzekerheid.*
+  - De uitkomst heeft de klasse **uitlegbaar**.
+  - Is `B ≤ r·S`, dan staat er "met dit bedrag wordt de schuld niet kleiner".
+- *Wanneer hoort iemand iets.* Geen melding.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Bij een betalingsachterstand verwijst het scherm naar
+  gemeentelijke schuldhulp, met het nummer en zonder doorverkoop.
+- *Acceptatie.*
+  - € 5.000 tegen 6% met € 200 per maand geeft 27 maanden.
+  - € 5.000 tegen 6% met € 25 per maand geeft "wordt niet kleiner".
+
+**F-GC3. Contracten en abonnementen (L1/L4, middel).**
+- *Gegevens.*
+  - Herkenning: `geldgraaf/patronen.js` en `bank/vastelasten`.
+  - Opgave per contract: `{naam, centen, ritme, einde, opzegtermijn}`.
+- *Regels.*
+  - De vorm komt uit `server/bedrijf/contract.js` (`laatsteOpzegdag`).
+  - Opzeggen doet het lid zelf. RTG zegt nooit iets op namens het lid.
+- *Rekenwijze.*
+  - `laatsteOpzegdag = einde − opzegtermijn`.
+  - Een prijsstijging is het laatste bedrag min het vorige bedrag van hetzelfde
+    patroon.
+- *Onzekerheid.*
+  - Een herkend patroon heet "herkend, niet bevestigd" tot het lid het
+    bevestigt.
+  - "Ongebruikt" staat er alleen als het lid dat zelf aangeeft.
+- *Wanneer hoort iemand iets.* 30 dagen en 7 dagen vóór de `laatsteOpzegdag`,
+  in de kalender.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een contract zonder einddatum geeft geen opzegsignaal.
+- *Acceptatie.*
+  - Een herkende maandpost van € 12,99 wordt bevestigd als contract met een
+    einde en een maand opzegtermijn.
+  - Het signaal verschijnt op de juiste dag.
+  - Een stijging naar € 14,99 toont + € 2,00 en de datum.
+
+**F-GC4. Verplichtingenkalender (L4/L6, middel).**
+- *Gegevens.*
+  - De projecties uit G.3: reis, school, assets en later wonen.
+  - De contracten uit F-GC3.
+  - De verwachte posten uit `vooruitblik.js`.
+- *Regels.*
+  - Elke regel draagt de `link` naar de eigenaar.
+  - Geld bewaart niets.
+  - Een bron die uitvalt, krijgt "niet opgehaald".
+- *Rekenwijze.* Gesorteerd per maand. Een regel zonder datum staat apart.
+- *Onzekerheid.*
+  - "Verwacht" en "geboekt" zijn zichtbaar verschillend.
+  - De vier signaalposten van de Wgs (huur, zorg, energie, water) worden niet
+    automatisch herkend. Het lid markeert ze, en dan krijgen ze voorrang in de
+    weergave.
+- *Wanneer hoort iemand iets.* Een vervaldag van een eigenaar (school) die
+  binnen 7 dagen valt, verschijnt bovenaan. Er gaat geen push uit.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een bron die het lid niet koppelt, verschijnt niet.
+- *Acceptatie.*
+  - Een bevestigde reis, een schoolfactuur met vervaldag en een contract
+    staan in dezelfde maand, elk met een link.
+  - Valt School uit, dan staat er "niet opgehaald: School".
+
+**F-GC5. Huishoudscenario's en kasstroomprognose (L4, middel).**
+- *Gegevens.* `vooruitblik.js` (7, 30 en 90 dagen), uitgebreid naar 12
+  maanden, plus de vorm van `fiscaal/scenario.js`.
+- *Regels.*
+  - Een scenario schrijft niets.
+  - Er is geen rendement en geen inflatie, tenzij het lid die zelf invult, en
+    dan staat het erbij.
+- *Rekenwijze.* Het verwachte saldo per maand is het saldo, plus de
+  verwachte instroom, min de verwachte uitstroom, plus of min de wijziging
+  van het scenario.
+- *Onzekerheid.*
+  - Alles na vandaag heet "verwacht".
+  - Na 3 maanden staat er een band: de laagste en de hoogste maand van het
+    patroon in het afgelopen jaar.
+  - De uitkomst heeft de klasse **uitlegbaar**.
+- *Wanneer hoort iemand iets.* Zakt de prognose onder de eigen buffer uit het
+  geldbeleid, dan verschijnt dat in het overzicht. Geld verplaatst niets.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Met minder dan 2 maanden geschiedenis is er geen band.
+- *Acceptatie.*
+  - "Reis van € 2.200 in juni" verlaagt de verwachte stand in juni en later
+    met precies € 2.200.
+  - Er wordt niets opgeslagen.
+
+**Later.** Elk met de reden:
+- **Een gezamenlijk budget.** Groot, en vraagt de rollen uit hoofdstuk 3.
+- **Besluitvergelijking en lange termijn.** Middel, met een doelbedrag en
+  datum zonder rendement.
+- **De fiscale klasse "advies"** zodra er een keuze tussen producten in zit.
+
+**Wat alleen RTG kan.**
+- Geld Command ziet de verplichtingen van het hele huis (reis, school,
+  assets) als verwijzing, zonder bankkoppeling.
+- De harde geldgrens weigert ook in die andere domeinen.
+- Het actielog laat zien wie wat besloot.
+
+**Bouwstenen en ontbrekende schakels.**
+- De projectievorm uit G.3 ontbreekt bij de eigenaren.
+- Volgorde: eerst reis (R3), dan school en assets.
+
+**Prioriteit.**
+1. F-GC4, de kalender. Die bundelt ketens.
+2. F-GC3.
+3. F-GC5.
+4. F-GC1.
+5. F-GC2.
+
+**Uitkomst A.** F-GC1 tot en met F-GC5, en de zes Beyond-systemen als
+bestaande bouwstenen (tabel in versie 1).
+
+**Uitkomst B.**
+- Een koppeling met andere banken, die alle rekeningen automatisch in het
+  vermogen en de kasstroom zet. Nodig: een AISP-vergunning of -partner (PSD2).
+- Samenwerken met een schuldhulporganisatie (Wgs en NVVK), waarbij het lid zelf
+  toestemming geeft om te delen. Nodig: afspraken met de gemeente of NVVK-leden.
+- Bij een productkeuze een gelicentieerd adviseur. Nodig: een
+  Wft-vergunning, buiten RTG.
+
+**Eindcontract Geld Command.**
+1. **Breedte.** Vermogen, schulden, contracten, kalender, scenario's,
+   kasstroom, beleid, potten en grens.
+2. **Diepte.** De Nibud-groepen, de Wgs-signaalposten als markering en een
+   aflosrekensom die klopt op het voorbeeld.
+3. **Levenscyclus.** Een contract van herkend tot bevestigd tot opgezegd. Een
+   scenario wordt gemaakt en weggegooid zonder spoor.
+4. **Rollen.** Alleen het lid. Een gezamenlijk budget pas met toestemming van
+   beide.
+5. **Intelligentie.** "Verwacht" is nergens "geboekt". Elke uitkomst draagt
+   een klasse. Er is geen productadvies.
+6. **Los.** Valt een bron uit, dan staat er "niet opgehaald" en is er geen
+   totaal.
+7. **Ketens.** Reis, school en assets verschijnen als verwijzing en
+   verdwijnen bij betaling of afzegging.
+8. **Betrouwbaarheid.** Zie G.6.
+
 ### 2.3 Balans (`/apps/geld.html#balans`)
 
 **a. Doel.** Rust: zien of je week ademt, zonder dat iemand je bijhoudt.
@@ -688,6 +1561,38 @@ de boekingen.
 Teams (team analytics) zijn betaald (reclaim.ai/pricing,
 support.getclockwise.com/article/75-clockwise-plan-offerings). Wij hebben het
 weekbeeld gratis; een trend niet.
+
+#### v2 — Balans
+
+**Bestaande werkelijkheid.** Registers: 3/8 en GEEN_FIXTURE. Het scenario is
+geregistreerd (`87039a31`).
+
+**Marktmaximum.** Reclaim en Clockwise geven analyse in een betaald niveau
+(fragment).
+
+**Domeinmaximum.** Over werkdruk zijn er de arbo-normen, maar die zijn voor de
+werkgever. Balans is voor het lid zelf en meet geen werk voor een baas.
+
+**Wat alleen RTG kan.** De tijd en het geld van hetzelfde lid naast elkaar,
+zonder dat iemand anders meekijkt.
+
+**Uitkomst A.**
+- Een trend over vier weken, berekend en niet opgeslagen.
+- De vrije ruimte deze maand uit F-GC5, als verwijzing.
+
+**Uitkomst B.** Gelijk aan A. Er is geen extern maximum dat RTG nodig heeft.
+
+**Eindcontract Balans.**
+1. **Breedte.** Weekbeeld, trend en vrije ruimte.
+2. **Diepte.** Niet van toepassing.
+3. **Levenscyclus.** Alles berekend, niets bewaard.
+4. **Rollen.** Alleen het lid. Het weekbeeld van het personeel ziet geen
+   leden.
+5. **Intelligentie.** Een advies is een regel en geen voorspelling.
+6. **Los.** Zonder agenda zegt Balans dat.
+7. **Ketens.** De agenda en Pay worden gelezen, en er wordt niets
+   geschreven.
+8. **Betrouwbaarheid.** Zie G.6.
 
 ---
 
@@ -769,6 +1674,91 @@ Wij hebben:
 - onbeperkt, en direct verrekenen;
 - niet: per regel splitsen, omrekenen en export.
 
+#### v2 — WBW
+
+**Bestaande werkelijkheid.**
+- Registers: 3/8 en GEEN_FIXTURE.
+- IDOR: onbereikbaar.
+- Toegang meet: geen bezitspoort op de walletbelastende route.
+- `geenGast` (G.5-1).
+
+**Marktmaximum** (fragment):
+- **Splitwise Pro:** bonscan, splitsen per regel, valuta, grafieken.
+- **Tricount:** de premiumversie is weggehaald.
+- **Tikkie:** gratis.
+
+**Domeinmaximum.** De vier Nibud-verdeelmethoden (G.2):
+- naar inkomen;
+- gelijk overhouden;
+- helft-helft;
+- een vaste bijdrage.
+
+Een verenigingskas legt verantwoording af.
+
+**De nu-functies, bouwbaar.**
+
+**F-WB1. Export en afrekenoverzicht (L5, klein).**
+- *Gegevens.* De regels en de stand van de groep.
+- *Regels.* Elk lid van de groep mag exporteren, alleen deze groep, als CSV
+  en als printbare pagina.
+- *Rekenwijze.* De bestaande exacte verdeling.
+- *Onzekerheid.* Geen.
+- *Wanneer hoort iemand iets.* Geen melding.
+- *Rollen.* Elk lid van de groep.
+- *Uitzonderingen.* Een lid dat uit de groep is, kan niet meer exporteren.
+- *Acceptatie.* De export van een groep met drie leden telt per lid op tot de
+  stand op het scherm, tot op de cent.
+
+**F-WB2. Een sleutel op het verzoek (L5, klein).**
+- *Gegevens.* Het verzoek.
+- *Regels.* `metIdem` met de sleutel `wbw-verzoek:groep:van:aan:stand`.
+- *Rekenwijze.* Geen.
+- *Onzekerheid.* Geen.
+- *Wanneer hoort iemand iets.* De ontvanger krijgt één verzoek.
+- *Rollen.* Het lid dat rood staat, krijgt het verzoek.
+- *Uitzonderingen.* Verandert de stand, dan mag er een nieuw verzoek komen.
+- *Acceptatie.*
+  - Twee tikken maken één Klompje.
+  - Dit is een toets die eerst zakt.
+
+**F-WB3. De verdeelmethode kiezen (L4, klein).**
+- *Gegevens.* Per uitgave een methode: gelijk, vaste bedragen of naar
+  verhouding.
+- *Regels.* Naar inkomen alleen als elk lid zijn eigen verhouding opgeeft.
+  RTG leest geen inkomen.
+- *Rekenwijze.* De exacte verdeling, met resten volgens de bestaande regel.
+- *Onzekerheid.* Geen.
+- *Wanneer hoort iemand iets.* Geen melding.
+- *Rollen.* De groep.
+- *Uitzonderingen.* Een verhouding die niet optelt tot 100, wordt geweigerd.
+- *Acceptatie.* Een verhouding van 60/40 op € 100,01 geeft € 60,01 en
+  € 40,00.
+
+**Wat alleen RTG kan.**
+- Verrekenen in één tik binnen het huis, met de betaalwaarheid.
+- Een groep alleen van Salon-vrienden.
+- Na een reis (TravelOS) een groep met de reisgenoten. Dat kan pas na
+  toestemming van elke genoot (later).
+
+**Uitkomst A.** F-WB1 tot en met F-WB3, en later valuta met de koers en de
+datum erbij.
+
+**Uitkomst B.**
+- Een bonscan met OCR. Kan lokaal-eerst zonder extern model.
+- Verrekenen met mensen buiten RTG. Nodig: een betaalverzoek via iDEAL, en dus
+  een acquirer.
+
+**Eindcontract WBW.**
+1. **Breedte.** Groep, uitgave, methode, verrekenen, verzoek en export.
+2. **Diepte.** De vier Nibud-methoden.
+3. **Levenscyclus.** Een groep wordt geopend, gebruikt, verrekend en
+   gesloten. De export blijft.
+4. **Rollen.** Alleen Salon-vrienden. Een buitenstaander ziet niets.
+5. **Intelligentie.** Niet van toepassing.
+6. **Los.** Valt Pay uit, dan houdt het lijstje de stand.
+7. **Ketens.** Verrekenen loopt via Pay en verschijnt in Geld Command.
+8. **Betrouwbaarheid.** Zie G.6, met de bezitspoort (G.4).
+
 ### 3.2 Labfonds (`/apps/geld.html#labfonds`)
 
 **a. Doel.** Samen geld toezeggen aan een plek of onderzoek dat je raakt, en er
@@ -822,9 +1812,63 @@ fondsen (opencollective.com/ofico/updates/…); Snapshot-stemmen is gratis
 (help.snapshot.box/…). Wij hebben toezeggen en stemmen gratis; de verantwoording
 half.
 
+#### v2 — Labfonds
+
+**Bestaande werkelijkheid.**
+- Registers: 3/8 en GEEN_FIXTURE.
+- Labfonds is een grootboek van toezeggingen, geen kas.
+
+**Marktmaximum.**
+- Open Collective Pro: banksync en beheerde fondsen (fragment).
+- Snapshot: stemmen, gratis.
+
+**Domeinmaximum.**
+- **Verenigingen.** De kascommissie en de ALV (art. 2:48 BW).
+- **ANBI.** Publicatieplicht (G.2).
+
+**De nu-functie, bouwbaar.**
+
+**F-L1. Verantwoording per pot (L5, klein).**
+- *Gegevens.* `labFonds`: de toezeggingen, de voorstellen, de besluiten en de
+  financiering.
+- *Regels.* Alleen de deelnemers van de pot zien de verantwoording. Van een
+  bijdrager zien ze de codenaam, nooit de naam.
+- *Rekenwijze.* De stand van de pot is toegezegd min besteed.
+- *Onzekerheid.* "Toegezegd" is nooit "ontvangen".
+- *Wanneer hoort iemand iets.* Na een besluit krijgen de deelnemers een
+  melding.
+- *Rollen.* De indiener sluit. Een scheidsrechter beslist bij twijfel.
+- *Uitzonderingen.* Een ingetrokken toezegging blijft zichtbaar als
+  ingetrokken.
+- *Acceptatie.* Na drie toezeggingen en één besluit tonen de stand en de
+  regels de juiste optelling.
+
+**Wat alleen RTG kan.** Het onderzoekslab en de Foundation zijn eigen
+ontvangers, met een studie-id.
+
+**Uitkomst A.**
+- F-L1.
+- Een toezegging omzetten in een betaling, na besluit G.5-5, via de
+  betaalwaarheid.
+
+**Uitkomst B.**
+- Een echte kas, met de bewijzen voor ANBI-giftenaftrek.
+- Nodig: de ANBI-status van de ontvanger en een boekhouding met kascommissie.
+
+**Eindcontract Labfonds.**
+1. **Breedte.** Toezeggen, voorstellen, stemmen, beslissen en verantwoorden.
+2. **Diepte.** De verantwoording volgt de vorm van een kascommissie.
+3. **Levenscyclus.** Toegezegd, besteed, verantwoord.
+4. **Rollen.** De indiener, de scheidsrechter, het gezin en de deelnemers.
+5. **Intelligentie.** Niet van toepassing.
+6. **Los.** Zonder onderzoeksplatform werkt toezeggen gewoon.
+7. **Ketens.** Het onderzoekslab ontvangt de financiering. Geld Command toont
+   "toegezegd, niet betaald".
+8. **Betrouwbaarheid.** Zie G.6.
+
 ---
 
-## Familie 4 — Lifestyle (Mecenaat, Nalatenschap)
+## Familie 4 — bewaren en geven (Mecenaat, Nalatenschap, Logboek)
 
 Beide zijn vandaag alleen voor de Lifestyle- en Business Pass ("Deze app is
 onderdeel van de Lifestyle Pass.", `server/routes/member/rechterhand.js:20`).
@@ -876,6 +1920,73 @@ gevonden. Wij hebben het bijhouden; het jaaroverzicht niet.
 **j. Extern.** ANBI-gegevens zijn openbaar; RTG controleert ze niet
 inhoudelijk en zegt dat.
 
+#### v2 — Mecenaat
+
+**Bestaande werkelijkheid.**
+- Registers: 7/8, alleen *bevoegd* is NIET_GETEST.
+- Er beweegt geen geld.
+
+**Marktmaximum.** Every.org en GoFundMe Giving Fund maken gratis een
+jaaroverzicht (fragment).
+
+**Domeinmaximum.**
+- **Losse gift.** Aftrekbaar boven 1%, met een minimum van € 60, tot 10%.
+- **Periodieke gift.** Vijf jaar lang, zonder drempel, via een akte of
+  overeenkomst.
+- **Ontvanger.** Moet een ANBI zijn.
+
+Bronnen: G.2.
+
+**De nu-functie, bouwbaar.**
+
+**F-M1. Jaaroverzicht van giften (L5, klein).**
+- *Gegevens.* De giften van het lid: doel, bedrag, datum, of er betaald is,
+  en of het een periodieke gift is.
+- *Regels.*
+  - Het overzicht heeft de klasse **uitlegbaar**.
+  - Het lid controleert zelf de ANBI-status. RTG valideert die niet en zegt
+    dat ook.
+  - Aftrek berekent RTG niet; dat is "advies".
+- *Rekenwijze.* Per jaar telt het overzicht apart op:
+  - wat betaald is;
+  - wat alleen is toegezegd;
+  - en daaronder apart de periodieke giften.
+- *Onzekerheid.* "Toegezegd" telt niet als betaald.
+- *Wanneer hoort iemand iets.* Geen melding.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een gift zonder datum valt in het jaar waarin hij is
+  ingevoerd. Dat staat er dan bij.
+- *Acceptatie.*
+  - Twee betaalde giften en één toezegging in 2026 geven een overzicht met
+    twee bedragen en één aparte regel.
+  - De klassezin staat onderaan.
+
+**Wat alleen RTG kan.** Een gift via de RTFoundation staat apart, met de
+doorgifte van 30%.
+
+**Uitkomst A.**
+- F-M1.
+- Een gift echt betalen, na besluit G.5-5 en `GIFT.md`.
+
+**Uitkomst B.**
+- Een periodieke gift vastleggen, en de ANBI-status controleren tegen het
+  openbare register.
+- Nodig: een overeenkomst die geldig is voor de Belastingdienst, en een
+  bronkoppeling.
+
+**Eindcontract Mecenaat.**
+1. **Breedte.** Bijhouden, betaald markeren en een jaaroverzicht maken.
+2. **Diepte.** Losse en periodieke giften staan apart. De ANBI-zin staat
+   erbij.
+3. **Levenscyclus.** Toegezegd, betaald, in het jaaroverzicht.
+4. **Rollen.** Alleen het lid.
+5. **Intelligentie.** De klasse "uitlegbaar". Een aftrekbedrag wordt nergens
+   berekend.
+6. **Los.** Mecenaat werkt volledig los.
+7. **Ketens.** Geld Command toont de giften. De Foundation ontvangt pas na het
+   besluit.
+8. **Betrouwbaarheid.** Zie G.6.
+
 ### 4.2 Nalatenschap (`/apps/geld.html#nalatenschap`)
 
 **a. Doel.** Rust voor later: weten dat je naasten vinden wat ze nodig hebben,
@@ -926,82 +2037,218 @@ contacten en wensen) is van de rechterhand.
 - Mijndigisafe (NL): een notariële kluis tegen betaling (id.nl/…).
 
 Wij hebben de versleutelde kluis; de vrijgave aan nabestaanden niet.
+#### v2 — Nalatenschap
+
+**Bestaande werkelijkheid.**
+- Registers: 7/8.
+- De gevoelige velden staan versleuteld (AES-256-GCM).
+
+**Marktmaximum.**
+- Trust & Will: een kluis met membership.
+- Mijndigisafe: een notariële kluis, betaald.
+- Google Inactive Account Manager en Apple Legacy Contact: gratis.
+
+Bron: fragment.
+
+**Domeinmaximum.**
+- Aangifte erfbelasting binnen 8 of 20 maanden (G.2).
+- De rollen van de executeur, het CTR en de notaris.
+- Voor de digitale nalatenschap is geen wet.
+
+**Wat alleen RTG kan.**
+- Een geldbeeld van het huis voor de executeur, na een vrijgave: welke
+  posities, welke contracten en welke verplichtingen. Dat komt uit Geld
+  Command, als verwijzing.
+
+**Uitkomst A.**
+- Een vertrouwenspersoon met een vrijgavevoorwaarde. Die voorwaarde is altijd
+  een menselijke bevestiging.
+- Versies en een audit.
+- Daarna het geldbeeld voor de executeur.
+
+Groot, en later.
+
+**Uitkomst B.**
+- Een koppeling met het CTR en een notarisgenre.
+- Wat daarvoor nodig is:
+  - besluit G.5-6;
+  - de notaris als Wwft-poortwachter;
+  - voor het testament: "voorbehouden".
+
+**Eindcontract Nalatenschap.**
+1. **Breedte.** Documenten, contacten, wensen, een vertrouwenspersoon en een
+   geldbeeld.
+2. **Diepte.** De termijnen van de erfbelasting worden getoond als
+   voorlichting, met een klasse.
+3. **Levenscyclus.** Bewaren, wijzigen (met versie), vrijgeven en inzien
+   (met audit).
+4. **Rollen.** Het lid en de aangewezen mens, en niemand anders.
+5. **Intelligentie.** Niet van toepassing.
+6. **Los.** Nalatenschap werkt volledig los.
+7. **Ketens.** Alleen na een vrijgave, en alleen naar de aangewezen mens.
+8. **Betrouwbaarheid.** Zie G.6, en de versleuteling overleeft een crash.
+
+
+### 4.3 Logboek (`/apps/geld.html#logboek`), alleen de financiële registratie
+
+**Waar de grens ligt.** Afgesproken met LivingOS-A en bevestigd door de
+integrator.
+
+- **Geld** bezit de financiële registratie van een kostbaar bezit:
+  - de aanschaf;
+  - de waarde, als eigen opgave met peildatum;
+  - de kosten per regel.
+- **Het onderhoud** is van het objectdomein:
+  - het huis bij **Wonen** (`wonen.html`, `woning.overzicht`);
+  - een vliegtuig bij **Hangar** (`hangar.html`, `reizen.vliegtuig`);
+  - een jacht of oldtimer bij geen eigen domein. Dan blijft het onderhoud in
+    Logboek, tot er een domein komt.
+- **Logboek** verwijst naar het onderhoud en bezit het niet.
+- **Een gemeten spanning.** `server/kern/rechterhand/logboek.js` bewaart nu
+  zelf de keuring-, service- en reparatieregels met `volgende` (de
+  attenties). Voor een vliegtuig hoort dat bij Hangar. Dat is besluit
+  G.5-7: verhuizen of laten staan. Ik raak het niet aan zonder dat besluit.
+
+**Bestaande werkelijkheid.**
+- Registers: 7/8, met alleen *bevoegd* op NIET_GETEST.
+- Objecten: maximaal 200. Regels: maximaal 5.000.
+- Het veld `kosten` is een getal (`getal(b.kosten, 1e9)`) zonder eenheid. Het
+  scherm vraagt om hele euro's, en `totaalKosten` telt ze op.
+- Er is geen koppeling met Pay of Geld Command.
+
+**Markt.**
+- Er zijn onderhoudsapps voor auto's, boten en vliegtuigen, met kosten per
+  object (kennis).
+- Bij een vliegtuig is het officiële logboek wettelijk voorgeschreven en van
+  de eigenaar of operator. Dat is aan de luchtvaartautoriteit, niet aan RTG
+  (kennis).
+
+**De nu-functie, bouwbaar.**
+
+**F-LB1. Kosten per object in Geld Command (L6, klein).**
+- *Gegevens.* `logboek(key).objecten[].kosten` en `regels[].kosten`, met de
+  `datum` erbij.
+- *Regels.*
+  - Geld leest alleen; het schrijft niets terug.
+  - De bedragen zijn hele euro's, en dat staat erbij.
+- *Rekenwijze.* Per object de kosten per jaar, met de datum van de regel.
+- *Onzekerheid.* Een kostenregel zonder datum staat apart en telt niet mee
+  in een jaar.
+- *Wanneer hoort iemand iets.* Geen melding. De attenties blijven van het
+  objectdomein.
+- *Rollen.* Alleen het lid.
+- *Uitzonderingen.* Een object dat is verwijderd, verdwijnt ook uit Geld.
+- *Acceptatie.*
+  - Een jacht met twee kostenregels in 2026 toont het jaartotaal in Geld
+    Command, met een link naar Logboek.
+  - Valt Logboek uit, dan staat er "niet opgehaald: Logboek".
+
+**Uitkomst A.**
+- F-LB1.
+- De aanschaf en de waarde als eigen opgave in het vermogensoverzicht
+  (F-GC1).
+
+**Uitkomst B.** Hetzelfde, plus een waardebron per object. Die levert RTG
+niet; het blijft een eigen opgave.
+
+**Eindcontract Logboek, het Geld-deel.**
+1. **Breedte.** Aanschaf, waarde en kosten per object.
+2. **Diepte.** Bedragen met eenheid en datum.
+3. **Levenscyclus.** Van aanschaf tot verkoop of verwijdering.
+4. **Rollen.** Alleen het lid.
+5. **Intelligentie.** Niet van toepassing.
+6. **Los.** Logboek werkt zonder Geld.
+7. **Ketens.** Geld leest; het objectdomein bezit het onderhoud.
+8. **Betrouwbaarheid.** Zie G.6.
 
 ---
 
-## Voorstel aan de eigenaar, in drie bakken
+## Voorstel aan de eigenaar, in drie bakken (versie 2)
 
-Per functie één zin, de kosten en wat er al voor bestaat. Een functie wordt pas
-werk na toezegging per familie.
+Elke functie wordt pas werk na een toezegging per familie. Per functie staat
+het nummer uit het v2-blok.
 
-### Aanbevolen nu
+### Aanbevolen nu, in deze volgorde
 
-1. **Reis betalen vanaf het scherm, via de betaalwaarheid, met bijladen**
-   (middel). Er is al `reisbureau-betaling.js`, en ook `stortwaarheid` en
-   `dealbetaal` als voorbeeld. Daarbij horen de bezits- en paspoortpoort op
-   `/api/reisbureau/betaal` (klein).
-2. **De reis als verplichting en kasstroom in Geld** (middel). Bouwt op
-   `geldgraaf/vooruitblik.js`.
-3. **Paspoortpoort op direct betalen (tab Betalen) en op de bank, vóór live**
-   (klein). Voorbeeld: `payGate`.
-4. **De kascode tonen in Pay** (klein). `/api/pay/kascode` bestaat al.
-5. **Zoeken, eigen categorieën en export van de geschiedenis** (middel). De
-   bank heeft al `afschrift.csv`.
-6. **Vermogensoverzicht** (middel): de posities bij RTG en de eigen opgave
-   apart. Er is al `/api/pay/portefeuille`.
-7. **Contracten en abonnementen**: koppelen en een signaal vóór de
-   opzegdatum, plus prijsstijging (middel). Er zijn al `patronen.js` en
-   `vastelasten`.
-8. **Huishoudscenario's en kasstroomprognose** (middel). Er zijn al
-   `vooruitblik.js` en `fiscaal/scenario.js`.
-9. **Verplichtingenkalender**, met verwijzingen naar de app-eigenaar (middel).
-   Ontvangt van reis, assets en wonen.
-10. **Aflosplan als rekensom** (middel). Bestaat nog nergens.
-11. **Verloopsignaal in Wallet** (klein).
-12. **WBW-export en een sleutel op het verzoek** (klein).
-13. **Labfonds-verantwoording per pot** (klein).
-14. **Jaaroverzicht van giften in Mecenaat**, als "uitlegbaar" (klein).
+1. **De reis.**
+   - R1, betalen via de betaalwaarheid met bijladen (middel);
+   - R2, het betaalbewijs (klein);
+   - R3, de verplichting en kasstroom in Geld (middel).
+
+   Dat zijn gaten 1, 2 en 5 uit versie 1, nu K2, K3 en R3. De poorten (gaten 3
+   en 4) en de dubbele herkomst zijn al gedicht.
+2. **Paspoortpoorten.**
+   - F-T1, de tab Betalen;
+   - F-B1, de bank;
+   - de routes uit G.4, na de keuze van de integrator.
+
+   Allemaal klein.
+3. **De verplichtingenkalender** (F-GC4, middel), met de projectievorm uit
+   G.3, als eerste bij reis.
+4. **Contracten en abonnementen** (F-GC3, middel).
+5. **Huishoudscenario's en kasstroom** (F-GC5, middel).
+6. **Vermogensoverzicht** (F-GC1, middel), met de kosten uit Logboek
+   (F-LB1, klein).
+7. **Aflosplan als rekensom** (F-GC2, middel).
+8. **Pay: de kascode, zoeken, categorieën en export** (F-P1 klein, F-P2
+   middel).
+9. **WBW** (allemaal klein):
+   - F-WB1, export;
+   - F-WB2, een sleutel op het verzoek;
+   - F-WB3, de verdeelmethode.
+10. **Klein werk in de overige apps.**
+    - F-W1, het verloopsignaal in Wallet;
+    - F-L1, de verantwoording in Labfonds;
+    - F-M1, het jaaroverzicht in Mecenaat.
 
 ### Later
 
-- Een gezamenlijke pot, rekening of budget voor een huishouden (groot).
-- Afrondsparen (middel).
-- Bonregels splitsen en valuta in WBW (middel).
-- Besluitvergelijking en langetermijnplanning zonder rendement (middel).
-- Meerdere rekeningen bij de bank (klein, na live).
-- Passen uit andere apps in Wallet (middel).
-- Een offline RTG Code (middel).
-- Een trend in Balans en financieel welzijn (klein en middel).
-- In Nalatenschap: een vertrouwenspersoon met vrijgavevoorwaarde, versies en
-  audit (groot).
-- Automatisch de groep herkennen in WBW (later, eerst toestemming).
+Groot werk:
+- een gezamenlijke pot, rekening of budget;
+- de vertrouwenspersoon en het geldbeeld voor de executeur in Nalatenschap.
+
+Middel werk:
+- besluitvergelijking en lange termijn;
+- afrondsparen;
+- valuta in WBW;
+- de offline RTG Code;
+- passen uit andere apps in Wallet.
+
+Klein werk:
+- een trend in Balans;
+- meerdere rekeningen bij de bank (na live).
 
 ### Niet doen, en waarom
 
-- **Krediet en lening in de bank.** GELD.md par. 7, en een vergunning is
-  nodig. Het bestaat al in `kern/bank/krediet.js`: **besluit gevraagd** of dat
-  blijft.
-- **AI-"advies" in de bank als advies.** Herschrijven naar uitleg met de
-  fiscale klasse.
-- **Verzekering en dekking** (aankoop, annulering, reis).
-- **Lounges en partnerabonnementen.** Verdienmodellen, geen functies.
-- **Rendement, Monte Carlo of beleggingsanalyse in de planning.** Dat is
-  beleggingsadvies.
-- **Een testament opstellen of fiscale aftrek vaststellen.** Juridisch of
-  fiscaal "voorbehouden" of "advies".
-- **Eigen kaarten uitgeven.** Dat vraagt een bankpartner.
-- **Een bankkoppeling met andere banken.** Pas met een AISP-partner (extern);
-  tot dan alleen RTG-bronnen en de eigen opgave.
+Dit is ongewijzigd ten opzichte van versie 1.
 
-### Besluiten gevraagd
+- **Krediet en AI-advies als advies.** Die vallen onder G.5-2.
+- **Verzekering en dekking.** Uitgesloten.
+- **Lounges en partnerabonnementen.** Uitgesloten.
+- **Rendement en Monte Carlo.** Uitgesloten.
+- **Een testament opstellen of fiscale aftrek vaststellen.** Uitgesloten.
+- **Eigen kaarten uitgeven.** Uitgesloten.
+- **Namens het lid opzeggen of betalen.** Geld verlaat het huis nooit vanzelf.
+- **Een bankkoppeling zonder AISP-partner.** Uitgesloten.
 
-1. Een reis: een pasfunctie of "minimaal een account"? (0.5)
-2. Geld Command en WBW weigeren elk gratis account (`geenGast`). Vallen ze
-   onder "minimaal een account"?
-3. Krediet en AI-advies in `kern/bank`: blijven ze, en zo ja onder welke
-   vergunning?
-4. Woonlasten: komt er een verplichtingenobject van Geld waar Wonen naar
-   verwijst?
-5. Mecenaat: een gift echt betalen (`GIFT.md`)? Labfonds: een toezegging echt
-   innen?
-6. Nalatenschap: een genre "notaris" onder CIVILIS?
+### Uitkomst B per app (wat er buiten RTG nodig is)
+
+| App | Wat er nodig is |
+|---|---|
+| Pay en Bank | een gereguleerde bankpartner, regels voor elektronisch geld (art. 1:5a Wft), Wwft |
+| Geld Command | een AISP-partner (PSD2); afspraken met schuldhulp (Wgs, NVVK); een Wft-adviseur buiten RTG |
+| WBW en tab Betalen | een acquirer, voor iDEAL naar buiten |
+| Mecenaat en Labfonds | de ANBI-status van de ontvanger; een kas met een kascommissie |
+| Nalatenschap | een notarisgenre (CIVILIS); CTR |
+| Wallet | ondertekening voor Apple en Google Wallet |
+
+### Menselijke beoordeling
+
+Deze punten vragen een mens met vakkennis:
+
+- **De klassezinnen** onder F-GC2, F-GC5 en F-M1.
+- **De tekst bij schuldhulp** in F-GC2.
+- **De Wft-grens** tussen informeren en adviseren.
+- **De termijnen van de erfbelasting** in Nalatenschap.
+
+Ze staan hier als voorstel en zijn juridisch en fiscaal niet nagelezen.

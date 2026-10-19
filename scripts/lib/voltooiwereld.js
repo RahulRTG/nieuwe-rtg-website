@@ -42,13 +42,16 @@ function wachtOpEinde(kind, ms) {
   });
 }
 
-async function maakWereld(naam, eigenEnv) {
+/* `opties.nodeArgs`: node-vlaggen voor de server, bij elke (her)start dezelfde
+   -- scripts/lib/betaalpaden-rit.js laadt er de bankhaak mee voor. */
+async function maakWereld(naam, eigenEnv, opties) {
+  const nodeArgs = (opties && opties.nodeArgs) || [];
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-voltooi-' + naam + '-'));
   const env = Object.assign({ NODE_ENV: 'test' }, eigenEnv || {}, postvanger.omgeving());
   /* Dezelfde omgeving die het kind krijgt, en dezelfde waaromNiet() die de
      server leest: de vraag "kan hier post naar buiten" heeft een antwoord. */
   postvanger.eis(gereedschapsomgeving({ poort: 0, datamap }, env));
-  let srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
+  let srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready', nodeArgs });
   const herstarts = { netjes: 0, crash: 0 };
 
   /* ELK ANTWOORD DAT HET LID KREEG, voor bewijs 8 (menselijk). De scenario's
@@ -101,7 +104,7 @@ async function maakWereld(naam, eigenEnv) {
   }
 
   async function opnieuw() {
-    srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
+    srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready', nodeArgs });
   }
 
   async function herstart() {

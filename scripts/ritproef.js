@@ -70,6 +70,7 @@ function schakel(nr, van, naar, wat, bekend) { return { nr, van, naar, wat, beke
    vraagt daarom een ref waarvan de bank vooraf `wil` zegt
    (scripts/lib/simulatieafloop.js). De weigering zelf is een eigen storing. */
 const simulatieafloop = require('./lib/simulatieafloop');
+const { ritBetaalpaden } = require('./lib/betaalpaden-rit');
 async function ritVoor(P, M, lijf, wil) {
   const k = await simulatieafloop.kiesRef(async () => {
     const r = await P('/api/ride/request', lijf, M);
@@ -264,24 +265,11 @@ async function storingen(basis, uit) {
     vroeg.status === 409 && /betaald/i.test(String(vroeg.data && vroeg.data.error)),
     'status ' + vroeg.status + ': ' + (vroeg.data && vroeg.data.error));
 
-  /* 1b. DE BANK WEIGERT. Een rit waarvan de bank de bijlading weigert (een
-     vastgelegde afloop, geen toeval): het lid hoort in woorden waarom, er gaat
-     niets af, de rit blijft onbetaald en is dus niet toe te wijzen. Dit was op
-     19 oktober het toeval dat zes schakels liet vallen; hier is het een
-     belofte. */
-  const rw = await ritVoor(P, M, { supplierCode: VERVOERDER, toCode: BESTEMMING }, 'geweigerd');
-  const rwRit = rw && rw.data && rw.data.ride;
-  const saldo = async () => { const s0 = await P('/api/pay/saldo', {}, M); return s0.status === 200 ? JSON.stringify(s0.data) : 'niet leesbaar (' + s0.status + ')'; };
-  const saldoVoor = rwRit ? await saldo() : null;
-  const weiger = rwRit ? await P('/api/ride/pay', { ref: rwRit.ref }, M) : { status: 0, data: {} };
-  const saldoNa = rwRit ? await saldo() : null;
-  const naWeiger = rwRit ? await P('/api/supplier/ride/assign', { ref: rwRit.ref, staffId }, S) : { status: 0, data: {} };
-  const woorden = String(weiger.data && weiger.data.error || '');
-  noteer('de bank weigert de bijlading van een ritbetaling',
-    'weigert in woorden, schrijft niets af, de rit blijft onbetaald en is niet toe te wijzen',
-    !!rwRit && weiger.status >= 400 && weiger.status < 500 && woorden.trim().length >= 8 && saldoVoor === saldoNa && naWeiger.status === 409,
-    rwRit ? 'betalen ' + weiger.status + ': ' + woorden + '; saldo ' + (saldoVoor === saldoNa ? 'ongewijzigd' : 'VERANDERD (' + saldoVoor + ' -> ' + saldoNa + ')') +
-      '; toewijzen daarna ' + naWeiger.status : 'geen rit gevonden waarvan de bank weigert');
+  /* DE BANK WEIGERT, VERTRAAGT OF DE SERVER STERFT: geen storing hier maar de
+     vier betaalpaden in een eigen wereld (scripts/lib/betaalpaden-rit.js,
+     zie meet() hieronder). Daar telt het afschrift van de bank of er iets is
+     afgeschreven -- het saldo van het demolid is voor een proef niet leesbaar,
+     en "niet leesbaar" voor en na is geen "ongewijzigd". */
 
   /* 2. DE KETEN TERUG. kern/vervoer.js laat RIT_KETEN alleen vooruit lopen. */
   await P('/api/ride/pay', { ref: r1.ref }, M);
@@ -411,7 +399,7 @@ async function meet() {
   const uit = {
     stempel: huisStempel(),
     uitleg: 'Een ritketen van aanvraag tot afronding, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Tweede keten naast scripts/tafelproef.js, in een ander domein -- zie MAATSTAF.md par. 7.',
-    grens: 'Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de simulatiebank met een vastgelegde afloop per rit (betaald op het gelukspad, geweigerd in een eigen storing): dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.',
+    grens: 'Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de simulatiebank met een vastgelegde afloop per rit (betaald op het gelukspad; weigering, vertraging en crash in de vier betaalpaden): dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.',
     schakels: [], storingen: [], rit: null, wereld: null
   };
   /* De simulatiebank staat met opzet AAN, en de afloop ligt per rit vast
@@ -424,6 +412,10 @@ async function meet() {
     await loop(srv.basis, uit);
     await storingen(srv.basis, uit);
   } finally { srv.klaar(); }
+  /* DE VIER BETAALPADEN (eigenaarsbesluit 19 oktober 2026): succes, weigering
+     met herstel, vertraging met latere bevestiging, en een crash tussen het
+     bankverzoek en de bevestiging. Elk met een gevraagde afloop. */
+  uit.betaalpaden = await ritBetaalpaden({ vervoerder: VERVOERDER, bestemming: BESTEMMING });
   /* Het stempel is aan het begin genomen; wat de proef bij de bank vroeg, weet
      hij pas nu. */
   uit.stempel.simulatiebank = simulatieafloop.stempelDeel();
@@ -437,8 +429,12 @@ async function meet() {
      gesloten: hij is `sluitMetBevinding`. Twee velden en geen samengesteld
      cijfer, want een proef die "sluit: true" meldt terwijl er een gat in staat,
      is precies de scorecard die LAT.md regel 11 verbiedt. */
-  uit.sluit = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.openBekend === 0 && t.schakels >= 7;
-  uit.sluitMetBevinding = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.schakels >= 7;
+  /* Een betaalpad dat stuk is, laat de keten niet sluiten; een pad dat open
+     staat (de wereld kon het niet meten), is een bevinding en geen bewijs. */
+  const bp = uit.betaalpaden;
+  t.betaalpaden = { gesloten: bp.gesloten, open: bp.open, stuk: bp.stuk };
+  uit.sluit = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.openBekend === 0 && t.schakels >= 7 && bp.stuk === 0 && bp.open === 0;
+  uit.sluitMetBevinding = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.schakels >= 7 && bp.stuk === 0;
   uit.bevindingen = uit.schakels.filter(s2 => s2.stand === 'openBekend')
     .map(s2 => ({ schakel: s2.nr, van: s2.van, naar: s2.naar, wat: s2.wat, gemeten: s2.ziet, reden: s2.bekend }));
   return uit;
@@ -455,6 +451,8 @@ function druk(u) {
       (s.antwoord ? '\n      antwoord: ' + s.antwoord : '') + (s.fout ? '\n      FOUT: ' + s.fout : ''));
   for (const s of u.storingen)
     console.log('  -- ' + s.stand.padEnd(9) + s.naam + '\n      belooft: ' + s.belofte + '\n      gaf: ' + s.wat);
+  for (const [pad, p] of Object.entries(u.betaalpaden.paden))
+    for (const s of p.stappen) console.log('  $ ' + (pad + ' ' + s.nr).padEnd(13) + s.stand.padEnd(9) + s.wat + '\n      ' + s.reden);
   console.log(u.sluit ? '\nDe keten sluit.'
     : u.sluitMetBevinding ? '\nDe keten loopt door, met ' + u.telling.openBekend + ' bevinding(en) die een besluit vragen.'
       : '\nDE KETEN SLUIT NIET.');

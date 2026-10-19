@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T23:15:16.364Z",
-    "commit": "f06ff2f3d7",
+    "op": "2026-10-19T23:25:05.656Z",
+    "commit": "638e5a995d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -1364,11 +1364,19 @@
       "geprobeerd": 1
     },
     "bank.test.js": {
-      "soort": "server",
+      "soort": "gericht",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 21,
-      "scherp": "gezakt"
+      "module": "server/kern/bank/rondes.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-round-order-final-proof/bank.test.js.evidence.json",
+        "sha256": "b46a44392c831b9e293f4011d6d568afde4d4b2b19cffcec39a391498985daa3",
+        "commit": "638e5a995db3335b938585e227961795ebb1e273",
+        "sourceSha256": "e49a83f2d5115aed069f4a6aa42f83a74069084bc60c0ef4071ebaeb7c5ea74e",
+        "testSha256": "2571ee0dae424bb91b659486d9752ce67daeb1c1f933d625e52e90abd8bb86f7"
+      }
     },
     "bankbeveiliging.test.js": {
       "soort": "server",
@@ -6592,11 +6600,19 @@
       "geprobeerd": 1
     },
     "groothandel.test.js": {
-      "soort": "server",
+      "soort": "gericht",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 7,
-      "scherp": "gezakt"
+      "module": "server/kern/groothandel/orderbeeld.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-round-order-final-proof/groothandel.test.js.evidence.json",
+        "sha256": "9aca8dae4f96620cf45ffaed46980d41e315552b7b13a349d38c370e6798b935",
+        "commit": "638e5a995db3335b938585e227961795ebb1e273",
+        "sourceSha256": "ad99d2c2fea7ed4b43eec5d8ba913436cc9035f4d16f8f9dc25037dc08c4aebf",
+        "testSha256": "3aea2cd8c97f8a2b2e75d5324d9cafc585b13318209516cca0822fffbfd3d853"
+      }
     },
     "hack.test.js": {
       "soort": "server",

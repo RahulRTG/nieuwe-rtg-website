@@ -85,6 +85,10 @@
   overflow:hidden;background:var(--onyx-glans,#0C0C0B);
   transition:width var(--gb-duur,0ms) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
 }
+/* En dat moet ook WINNEN: de universele V4-regel `body[data-rtg-editorial-v4] *`
+   zet border-box en is specifieker dan `.gb-lade` alleen. Dan ging de rand
+   alsnog van de inhoud af en stak de laatste knop 1px uit (18 oktober 2026). */
+.gb-rij > .gb-lade{box-sizing:content-box;}
 /* Alleen de BUITENhoeken: aan de snede sluit de lade recht op de plank aan,
    want daar raken ze elkaar. */
 .gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));

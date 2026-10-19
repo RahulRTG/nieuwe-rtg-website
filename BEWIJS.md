@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2895 bestanden en 19822 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2905 bestanden en 19839 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2895 |
-| losse beweringen (`test(...)`) | 19822 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 363 |
+| toetsbestanden | 2905 |
+| losse beweringen (`test(...)`) | 19839 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 75 |
+| niets van beide | 85 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2550 bestanden, 19239 beweringen.
+2560 bestanden, 19258 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -174,6 +174,7 @@ toets omvalt.
 | `artefact-image.test.js` | 3 | gezakt op `voorwaarde-omkeren#3` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `artefactketen-takken.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `artefactketen.test.js` | 16 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `assets-controleafronden.test.js` | 1 | -- | Een tweede ticket onder dezelfde betaling, door de assetlaag heen (server/kern/assets/aanvraag-betaal.js, kern/betaalwaarheid/controle.js). Vraag van LivingOS-A: een aanvraag met meer tickets is EEN betaling. |
 | `assets.test.js` | 16 | gezakt op `liegpoort /api/` | Toren 3, RTG Shared Assets: altijd 300 tickets per object, een ticket is 24 uur per jaar, tien jaar lang. Access loopt af; Asset heeft een aandeel in de restwaarde (waarde / 300) en stapt uit via een Tik. |
 | `ast-grens.test.js` | 2 | gezakt op `===->!==` | DE SNELLE EN DE UITPUTTENDE VARIANT MOETEN HETZELFDE ZEGGEN. WAAROM DEZE TOETS ER IS scripts/ast-scan.js kwam lokaal in negen minuten niet rond, terwijl hij in CI een blokkerende stap is (TAKEN 4.6). |
 | `ast-scan.test.js` | 13 | gezakt op `===->!==` | Test voor de zelfgebouwde AST-scanner (scripts/ast/* + scripts/ast-scan.js). Drie soorten borging: 1. |
@@ -479,6 +480,7 @@ toets omvalt.
 | `contextpakket.test.js` | 12 | gezakt op `===->!==#0` | DE CONTEXTSAMENSTELLER -- nooit stil afkappen. Een eigen modelserver kapt stil af wat niet in zijn venster past, vanaf het begin, en daar staat de grondwet. |
 | `contextspoor.test.js` | 3 | geen module gevonden | HET CONTEXTSPOOR STAAT UIT, EN ZWIJGT ALS HET AAN STAAT. Deze meting hangt in een HEET PAD: de domeingrens-Proxy waar elke toegang tot het contextobject langskomt, dus tienduizenden keren per opstart en opnieuw bij... |
 | `contract.test.js` | 13 | gezakt op `liegpoort /api/` | HET CONTRACT: maand 13, en de prijs die vaststaat. kern/aanmeldingen/betaalschema.js zette twaalf termijnen klaar en hield op. |
+| `controleafronden.test.js` | 5 | -- | Een betaling op controle wordt afgerond door een mens op naam (kern/betaalwaarheid/controle.js, routes/kantoren/betaalproviders.js). Een geweigerde terugbetaling zet de HELE betaling op CONTROLE_NODIG, met opzet (kop... |
 | `controlekamer.test.js` | 4 | gezakt op `liegpoort /api/` | De controlekamer: de eigenaar zet functies aan/uit PER DOELGROEP op de beveiligde technische pagina. Bewijs dat een functie uit kan voor de ene doelgroep (bijv. |
 | `controls.test.js` | 28 | gezakt op `return-weg#0` | HET CONTROLREGISTER (scripts/controls.js) en het uitzendcontract uit TOEZICHT.md. WAAROM DEZE TOETS ER IS. |
 | `correlatie.test.js` | 4 | gezakt op `!==->===#0` | DE CORRELATIE MAAKT DE SERVER (Fase 2, besluit B1a; server/lib/correlatie.js). Een X-Request-Id van de client werd ongetoetst de correlatie van het verzoek, in elke lengte -- en die correlatie is een SLEUTEL: de... |
@@ -490,6 +492,7 @@ toets omvalt.
 | `credential-log-hygiene.test.js` | 7 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dagcoach.test.js` | 11 | gezakt op `liegpoort /api/` | De dagcoach (kern/dagcoach.js). Wat hier wordt vastgezet is vooral wat hij NIET doet, want dat is de hele keuze: 1. |
 | `dagplan.test.js` | 6 | gezakt op `liegpoort /api/` | De Daily Learning Guarantee: elke schooldag weet een leerling wat er te doen is, en die lijst is nooit leeg zolang er iets te leren valt. De beloftes die hier hard worden gemaakt: - een ingeschreven leerling met open... |
+| `dashboard-dagen.test.js` | 2 | -- | DE DAGBAKKEN VAN DE DASHBOARDS, rond middernacht. Twee dashboards telden omzet per dag op de UTC-datum van de container: - de backoffice van een zaak (routes/supplier/backoffice.js): sinds het eigenaarsbesluit van 19... |
 | `db-redis-mirror.test.js` | 1 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dealkans.test.js` | 2 | gezakt op `liegpoort /api/` | De dealvinder: de voorspeller herkent combinatiegedrag (twee zaken binnen een dagdeel door dezelfde leden) en zet er een kant-en-klaar Synergie-voorstel van klaar; de aandelen tellen exact op tot de prijs. |
 | `deavond.test.js` | 5 | gezakt op `liegpoort /api/` | EEN AVOND IN HET HUIS -- de keuken, een event, het hotel en de gasten. WAAROM DIT ER IS De vorige toetsen volgen een mens (levensloop) of een bestelling (bezorging). |
@@ -1543,6 +1546,7 @@ toets omvalt.
 | `paktebetekenis.test.js` | 8 | gezakt op `===->!==#0` | DE PAKTE-METING (scripts/paktebetekenis.js). Deze toets bewaakt niet de UITSLAG -- die hoort te veranderen zodra `pakte` wordt gesplitst. |
 | `papieren-boardroom.test.js` | 9 | gezakt op `liegpoort /api/` | HET PAPIERWERK IN DE BOARDROOM. De 18 vragen die alleen een mens kan beantwoorden -- de juridische naam en het KvK-nummer, het privacy-aanspreekpunt, of er een FG is, hoe lang een paspoortscan bewaard wordt, welke... |
 | `papieren.test.js` | 11 | gezakt op `liegpoort /api/` | DE PAPIEREN: Rahul vraagt het AVG-papierwerk uit in plaats van een [VUL IN]-lijst achter te laten die niemand invult. Waar deze tests op letten, in volgorde van belang: 1. |
+| `partijmigratie.test.js` | 2 | -- | HET EINDE VAN DE PARTIJMIGRATIE (eigenaarsbesluit 19 oktober 2026, keuze van de integrator dezelfde dag: een teller op het kantoor plus een datum als vangnet). Partijen van voor het besluit komen met hun oude sleutel... |
 | `partner.test.js` | 8 | gezakt op `liegpoort /api/` | Integratietests voor de PARTNER-app-flows (de leverancier-kant): - personeelslogin met PIN + rate-limiting (bescherming tegen raden) - restaurant/keuken (KDS): een order van nieuw naar klaar zetten - taxi: een rit... |
 | `partnernetwerk-route.test.js` | 1 | genoemd | PARTNER NETWORK OVER HTTP: /api/supplier/netwerk/overzicht. De zaak krijgt tellingen met een bron (kern/partnernetwerk.js); een lid zonder zaak en een aanvraag zonder sessie komen er niet in, en de route schrijft... |
 | `partnernetwerk-scherm.test.js` | 3 | -- | PARTNER NETWORK: GEEN GETAL ZONDER BRON. Tot 19 oktober 2026 toonde /apps/partner-network.html vaste cijfers als live waarheid: "97 network fit", "96% mutual fit", partnerscores 98/94/91/100, "marge 18,4%", "€... |
@@ -1556,6 +1560,7 @@ toets omvalt.
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |
 | `pasbronnen.test.js` | 6 | gezakt op `true->false#0` | DE TWEE BRONNEN ONDER RETENTIE, NIEUW LID, COHORT EN CHURN (kern/pasgeschiedenis.js en kern/aanwezigheid.js; besluiten van de eigenaar, 25 september 2026). Wat hier vastligt: 1. |
 | `pasladder.test.js` | 9 | gezakt op `===->!==#0` | DE LADDER: vijf treden, elk met een bodem. Het besluit van 20 augustus 2026 zet een MKB-laag tussen consument en enterprise (Business Lite, 150 euro) en maakt de twee bovenste treden contractueel met een "vanaf". |
+| `paspoort-gratisaccount.test.js` | 1 | -- | De paspoortpoort van RTG Pay geldt voor elk account (kern/onboarding/lid.js, payGate). payGate vroeg het paspoort alleen bij tier 'rtg': een gratis account (tier 'guest') viel onder `if (tier !== 'rtg') return { ok:... |
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
 | `paspoortdeur.test.js` | 5 | gezakt op `liegpoort /api/` | DE DEUR VAN DE UNIVERSELE BODEM (server/kern/onvervreemdbaar.js), tegen een echte server. Het besluit van 27 september 2026 (SAMENLEVING.md, besluit 4c): een afspraak bij de gemeente, aangifte bij de overheid en een... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
@@ -1935,7 +1940,6 @@ toets omvalt.
 | `schermmutatie.test.js` | 8 | gezakt op `+->-#0` | DE SCHERMMUTATIEMOTOR ZELF -- want een meter die je niet kunt narekenen is een belofte. WAAROM DIT BESTAAT. |
 | `schermronde.test.js` | 5 | gezakt op `===->!==#0` | EEN MISLUKTE RONDE MAG ZICH NIET VOORDOEN ALS EEN GEMETEN RONDE. HET GEVAL, EN HET IS ECHT GEBEURD (18 augustus 2026). |
 | `schermsuite-bewijs.test.js` | 4 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `schil-taal.test.js` | 5 | -- | DE SCHIL SPREEKT DE TAAL VAN DE PAGINA. Gevonden door TravelOS op /apps/arrival.html (19 oktober 2026): op een toestel in het Engels stond in het personenpaneel van de werktafel "View your conversations" boven een... |
 | `schild-weerbaar.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | HET SCHILD, WEERBAAR (server/kern/schild.js). Het schild is de voordeur: een applicatie-WAF op pad, query en user-agent, een DDoS-rem per IP, de banlijst, en de poort waar De Wacht zijn quarantaine afdwingt. |
 | `schild.test.js` | 4 | gezakt op `liegpoort /api/` | Het schild: de applicatie-WAF, de DDoS-banlijst en de kortlevende TURN-inloggegevens. Extern verkeer wordt gesimuleerd met een X-Forwarded-For-header (trust proxy staat aan); localhost zelf is uitgezonderd zodat... |
 | `schoneboom.test.js` | 8 | al rood | EEN MEETRONDE DIE TOCH NIET MEETELT, HOORT NIET TE BEGINNEN. HET PROBLEEM. |
@@ -2028,6 +2032,7 @@ toets omvalt.
 | `snaps-herhaal.test.js` | 1 | -- | Een snap met een herhaalsleutel gaat een keer weg, ook bij twee gelijktijdige tikken en na een crash (19 oktober 2026). De voltooiproef van os:snaps zag dezelfde tik na een crash twee snaps bij de vriend leggen. |
 | `snaps-routes.test.js` | 2 | gezakt op `liegpoort /api/` | SNAPS EN VERHALEN AAN DE RTG-LEDENKANT: /api/member/snaps, /api/member/snap/view, /api/member/story/view en /api/member/snap/opdracht. test/foundation.test.js loopt dezelfde kern af via de gezinskant... |
 | `sni.test.js` | 5 | geen bruikbare mutatie | SNI ALLEEN BIJ EEN NAAM. WAAROM DEZE TOETS BESTAAT, en dat is de les. |
+| `sociaal-gratisaccount.test.js` | 3 | -- | De sociale kant van de wallet staat open voor elk account, ook een gratis account (server/routes/pay.js, server/routes/pay-tegoed.js). Eigenaarsbesluit van 19 oktober 2026 (derde reeks): geld sturen, betaalverzoeken... |
 | `sociaal-index.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `social-elite.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `socialebeleid-volgorde.test.js` | 3 | geen module gevonden | EERST KEUREN, DAN PAKKEN, DAN TOEPASSEN -- twee fouten in een functie. `zet()` in server/kern/socialebeleid/index.js had ze allebei, en de staatproef vond ze in EEN meting: "geweigerd (status 400) en de toestand... |
@@ -2212,6 +2217,7 @@ toets omvalt.
 | `tegoedbon-credential.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor de tegoedbon (CODECREDENTIALS.json, deur `pay.tegoedbon`, control `atomic_claim`). Twee onafhankelijke app-instances delen alleen de database: de bon leeft in de collectietransactie van... |
 | `tegoedbon-credential.test.js` | 13 | gezakt op `===->!==#0` | DE TEGOEDBON ALS CREDENTIAL (CODECREDENTIALS.json, deur `pay.tegoedbon`). Elke control van de deur heeft hier een eigen toets, en elke toets is tegen een kapotgemaakte kern gezien zakken (LAT.md regel 2); de mutatie... |
 | `tegoedbon-routes.test.js` | 3 | gezakt op `liegpoort /api/` | DE TEGOEDBON OP EEN ECHTE SERVER: dezelfde controls als in tegoedbon-credential.test.js, nu over HTTP, door de echte montage, de echte deuren (auth, supplierAuth, managerOnly) en de echte opslag met zijn... |
+| `tegoedterug-gratisaccount.test.js` | 3 | -- | Het tegoed en de terugstorting staan open voor elk account, ook een gratis account (server/routes/pay-tegoed.js, server/routes/pay-terug.js). Eigenaarsbesluit van 19 oktober 2026 (vierde reeks): wie geld kan... |
 | `tekstbinding.test.js` | 3 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `tenant-ondertekenaar.test.js` | 1 | gezakt op `voorwaarde-omkeren#0` | WIE TEKENT BIJ EEN TENANT, komt uit de SESSIE (11 oktober 2026; B7 van de tweede tegenlezing). Contract, levensloop, bewaringsplicht en vernietigen lazen `b.door \|\| wie(req)`: een getypte naam ging voor de ingelogde... |
 | `tenant.test.js` | 8 | gezakt op `===->!==#0` | DE TENANT CONTROL PLANE OVER DE LIJN -- de routes, het merk en de bootstrap. De regels van de spine en de brug staan in test/tenantspine.test.js; hier gaat het om wat er door de deur komt. |
@@ -2249,16 +2255,19 @@ toets omvalt.
 | `toegang-contract.test.js` | 2 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `toegang-gastlinks.test.js` | 1 | -- | EEN GASTLINK IS EEN EXTRA SLEUTEL BIJ EEN ACCOUNT, GEEN VERVANGING ERVAN (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). De klantlink (#gast=) en de leverancierslink (#leverancier=) uit... |
 | `toegang-gezin.test.js` | 1 | -- | EEN GEZINSPROFIEL HANGT AAN HET ACCOUNT VAN EEN OUDER (eigenaarsbesluit 19 oktober 2026, AGENTS.md; foundation/accountplicht.js). Buiten de demo opent een gezinstoken alleen nog iets in een gezin met een EIGENAAR. |
-| `toegang-lab.test.js` | 1 | -- | DE BEWONERSKANT VAN HET LIVING LAB VRAAGT EEN ACCOUNT, EN EEN STEM IS EEN PER ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account; gemeld door FoundationOS bij link:klimaat).... |
+| `toegang-lab.test.js` | 2 | -- | DE BEWONERSKANT VAN HET LIVING LAB VRAAGT EEN ACCOUNT, EN EEN STEM IS EEN PER ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account; gemeld door FoundationOS bij link:klimaat).... |
+| `toegang-labpas.test.js` | 2 | -- | ALLES VAN HET BUURTLAB ACHTER EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, tweede ronde): ook een onderzoek bekijken, een klacht indienen, het kader en het labpaspoort. Het paspoort is progressie (niveaus en... |
 | `toegang-ledenroutes.test.js` | 3 | -- | ROUTES DIE "OPENBAAR" HETEN TERWIJL ALLEEN EEN INGELOGD SCHERM ZE AANROEPT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). Gevonden door de bevoegdheidsmeting: de app-gids, de krant, de... |
 | `toegang-les.test.js` | 1 | -- | DE LES VAN DE RTFOUNDATION VRAAGT EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). /api/foundation/les/maak en /les/join werkten zonder account; alleen de lessleutel telde. |
 | `toegang-mailpoort.test.js` | 2 | -- | DE BUITENPOORTEN VOOR POST VRAGEN EEN GEDEELD GEHEIM (eigenaarsbesluit 19 oktober 2026, AGENTS.md: uitzondering 6, machine-tot- machineverkeer met een eigen handtekening). /api/werkmail/bezorg en /api/mail/binnen... |
 | `toegang-partij.test.js` | 2 | -- | WIE NAMENS EEN PARTIJ HANDELT, HEEFT EEN ACCOUNT MET DIE ROL (eigenaarsbesluit 19 oktober 2026; vervangt het besluit van 29 september 2026 "de partij hangt niet aan een RTG-account", en daarmee vervalt proef P3). De... |
 | `toegang-partnerkanaal.test.js` | 1 | -- | BOEKEN EN DE PERSONEELSDEUR VAN HET PARTNERKANAAL VRAGEN EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). POST /api/book boekte zonder sessie, en POST /api/staff opende het... |
 | `toegang-poortwacht.test.js` | 1 | -- | GEEN NIEUWE ANONIEME DEUR (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). Buiten de demo bestaat er geen gastsessie meer, en een uitgelogde bezoeker bereikt alleen de uitzonderingen:... |
+| `toegang-portaalrotatie.test.js` | 1 | -- | ROTEREN VOOR ELK CODEPORTAAL (eigenaarsbesluit 19 oktober 2026: een code per medewerker, en roteren voor elk portaal). De vrijwilliger, de hulpvrager en de donateur konden al roteren; nu ook de partnerstichting, de... |
 | `toegang-portalen.test.js` | 2 | -- | DE CODEPORTALEN VAN DE RTFOUNDATION VRAGEN EEN ACCOUNT, EN DE CODE KOPPELT DAT ACCOUNT AAN HET DOSSIER (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). De partnerstichting, de gemeente, de... |
 | `toegang-sollicitatie.test.js` | 1 | -- | SOLLICITEREN BIJ EEN ZAAK VRAAGT EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). POST /api/supplier/apply nam een sollicitatie aan van iedereen zonder sessie. |
 | `toegang-tafel.test.js` | 1 | -- | DE TAFEL-QR IS EEN EXTRA SLEUTEL BIJ EEN ACCOUNT, GEEN VERVANGING ERVAN (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). Wie de QR scant, maakt in het scherm een gratis account en schuift... |
+| `toegang-toestel.test.js` | 2 | -- | EEN PASSKEY HOORT BIJ ELK ACCOUNT, OOK EEN GRATIS ACCOUNT (eigenaarsbesluit 19 oktober 2026; uitwerking bij AUTHORITY.md par. 7a). |
 | `toegangprefix.test.js` | 4 | gezakt op `!==->===#0` | DE PREFIXKAART VAN DE TOEGANGSMOTOR (server/functies/toegang.js). functieVoorPad() zegt WELKE functieschakelaar dit pad bewaakt. |
 | `toegankelijk.test.js` | 6 | gezakt op `liegpoort /api/` | Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich hoort te gedragen. Wat hier bewezen wordt: de stand blijft staan, een onbekende waarde valt terug op normaal in plaats van stil te blijven... |
 | `toelatingsproef.test.js` | 10 | gezakt op `===->!==#0` | DE TOELATINGSPROEF -- de derde keten, en wat drie ketens werkelijk delen. scripts/toelatingsproef.js legt de toelatingsketen af (aanvraag, bewijs, aftekenen, besluit, zaak, herkeuring); scripts/ketenvorm.js telt... |
@@ -2445,6 +2454,7 @@ toets omvalt.
 | `wachtwijze.test.js` | 9 | gezakt op `>=->>#0` | DE WACHTWIJZE VAN DE SCHERMTOETSEN (scripts/wachtwijze.js + WACHTWIJZE.json). WAAROM DEZE TOETS ER IS. |
 | `wachtwoordkosten.test.js` | 4 | gezakt op `return-weg#0` | De scrypt-kosten en het migratiepad. Waar dit over gaat: de opgeslagen wachtwoordhash droeg vroeger geen enkele parameter (`salt:hash`), en daardoor was de scrypt-kostenfactor niet te verhogen zonder elk bestaand... |
 | `wachtwoordrem-weerbaar.test.js` | 8 | gezakt op `true->false#0` | DE WACHTWOORDREM TEGEN EEN GOKKER (server/kern/identiteit/wachtwoordrem.js, met ./lopend.js voor de pogingen die nog lopen). Wat deze module beschermt: elke deur die een RTG-wachtwoord toetst, deelt dezelfde drie... |
+| `wallet-gratisaccount-verplicht.test.js` | 1 | -- | De wallet van een gratis account in de productiestand van de bezitspoort (RTG_BEZITSBEWIJS=verplicht), met een gebonden toestel. test/wallet-gratisaccount.test.js draait, zoals de meeste toetsen, met de bezitspoort... |
 | `wallet-gratisaccount.test.js` | 4 | -- | De wallet staat open voor elk account, ook een gratis account (server/routes/pay.js, server/routes/zorgwallet.js). Eigenaarsbesluit van 19 oktober 2026: gebruiken vraagt minimaal een gratis account, en de wallet... |
 | `walletmunt-herhaal.test.js` | 3 | -- | Een betaling geeft een keer feestmunten (server/kern/wallet.js, muntKoop). Gevonden door de voltooiproef van de wallet (scripts/lib/voltooi/wallet.js): een koop, een SIGKILL, en dezelfde tik opnieuw. |
 | `wandklok.test.js` | 4 | -- | DE RATEL OP DE WANDKLOK (scripts/lib/wandklok.js, keuringsregel 77). Een regel die niets kan vinden is erger dan geen regel (LAT.md regel 9). |
@@ -2590,7 +2600,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-345 bestanden, 583 beweringen.
+345 bestanden, 581 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2605,6 +2615,7 @@ toets omvalt.
 | `appwerkt-bestemming.e2e.js` | 1 | gezakt op `===->!==#0` | BEREIKBAAR IN EEN ECHTE BROWSER -- doorverwijzingen die pas na het laden gebeuren. Een synthetisch huis met vier schermen en een eigen register. |
 | `appwerkt-glad.e2e.js` | 1 | gezakt op `!==->===#4` | DE BEDEKT-METING MAG NIET OP EEN ANIMATIE WACHTEN (scripts/appwerkt.js bedektDoorSchil, 6 oktober 2026). Een scherm met `scroll-behavior: smooth` laat scrollIntoView animeren. |
 | `appwerkt-schil.e2e.js` | 1 | gezakt op `-->+#0` | BEDIENBAAR MEET HET SCHERM, NIET DE SCHIL -- in een echte browser. Een synthetisch scherm met de gedeelde schil erop (30 knoppen onder .rtg-edge-chrome, plus de toetsknop van het veeggebaar die met opzet buiten beeld... |
+| `arrival-accountdeur.e2e.js` | 1 | -- | INVISIBLE ARRIVAL ZONDER SESSIE: DE ACCOUNTDEUR IN HET SCHERM. Eigenaarsbesluit 19 oktober 2026 (AGENTS.md: gebruiken vraagt een account). |
 | `avond-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET AVONDSCHERM (/apps/avond.html) IN EEN ECHTE BROWSER. test/avond.test.js bewijst dat de avondroutes de klok en het budget als GRENS behandelen en dat een tafel nooit verder komt dan `aangevraagd`. |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
 | `bankoverboek-dubbelklik.e2e.js` | 1 | -- | Een dubbelklik op Overboeken boekt een keer (public/apps/geld/bankb.js). De knop maakte zijn herhaalsleutel PER KLIK. |
@@ -2858,7 +2869,6 @@ toets omvalt.
 | `scan-tafel.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `schermcontext.e2e.js` | 1 | gezakt op `liegpoort /api/` | AGENDA EN NOTITIES ZEGGEN ZELF WAAR JE BENT (EDGE.md besluit 11). Beide schermen wijzen een eigen hoofdactie aan en stonden daarom op CONTEXT_SCHULD in scripts/edgedekking.js. |
-| `schil-taal.e2e.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `schuif.e2e.js` | 1 | gezakt op `liegpoort /api/` | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |
 | `servicebel.e2e.js` | 3 | gezakt op `liegpoort /api/` | BELLEN MET RTG -- de twee schermen. De routes waren al beproefd; deze toetsen gaan over wat een mens ziet en kan. |
 | `servicecockpit.e2e.js` | 8 | gezakt op `liegpoort /api/` | DE SERVICE-COCKPIT. Wat deze toetsen vastleggen is niet dat het scherm laadt, maar wat het WEL en NIET doet: 1. |

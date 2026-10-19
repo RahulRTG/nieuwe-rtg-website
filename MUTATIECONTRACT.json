@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-19T11:41:46.736Z",
-  "commit": "b19b2d25",
-  "boomVuil": false,
-  "boomAnders": 7,
+  "op": "2026-10-19T11:39:02.828Z",
+  "commit": "d7ce2870",
+  "boomVuil": true,
+  "boomAnders": 23,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
@@ -11,15 +11,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5412,
-  "geclassificeerd": 5387,
+  "geclassificeerd": 5383,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
-   "NOT_APPLICABLE": 1300,
-   "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 710,
+   "NOT_APPLICABLE": 1299,
+   "LEGACY_PENDING_CLASSIFICATION": 29,
+   "PROTECTED": 707,
    "INTENTIONALLY_NON_IDEMPOTENT": 213
   },
-  "vastgesteldDoorMens": 2275,
+  "vastgesteldDoorMens": 2271,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4486,
@@ -74,12 +74,6 @@
   {
    "route": "POST /api/arrival/request",
    "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/asset/aanvraag/betaal",
-   "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -260,12 +254,6 @@
   {
    "route": "POST /api/mob/kaart/toon",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/office/asset/aanvraag/beslis",
-   "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -3337,46 +3325,42 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "asset.aanvraag.betalen",
+   "mutatieId": "asset.aanvraag.betaal",
    "route": "POST /api/asset/aanvraag/betaal",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
    },
    "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "niet gemeten"
   },
   {
-   "mutatieId": "asset.aanvragen.mijn",
+   "mutatieId": "asset.aanvragen",
    "route": "POST /api/asset/aanvragen",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
    },
    "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "asset.document",
@@ -60566,46 +60550,42 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "asset.aanvraag.beslissen",
+   "mutatieId": "office.asset.aanvraag.beslis",
    "route": "POST /api/office/asset/aanvraag/beslis",
-   "semantiek": {
-    "klasse": "hooguitEens"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "CAPABILITY_GATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "niet gemeten"
   },
   {
-   "mutatieId": "asset.aanvragen.kantoor",
+   "mutatieId": "office.asset.aanvragen",
    "route": "POST /api/office/asset/aanvragen",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "office.asset.fees",

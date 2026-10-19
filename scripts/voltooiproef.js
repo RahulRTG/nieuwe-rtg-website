@@ -153,6 +153,7 @@ const SCENARIOS = {
   'wallet.js': require('./lib/voltooi/wallet'),
   'wereldlaag.js': require('./lib/voltooi/wereldlaag'),
   'wonen.js': require('./lib/voltooi/wonen'),
+  'vonk.js': require('./lib/voltooi/vonk'),
   'wbw.js': require('./lib/voltooi/wbw'),
   'werkos.js': require('./lib/voltooi/werkos')
 };

@@ -173,8 +173,13 @@ test('4. GEMETEN DUBBELZINNIGHEID: `gelukt` volgt het oordeel en niet de uitvoer
 
   const r = await api(eerlijk.base, '/api/vertegenwoordiging/handel',
     { id: mid, bevoegdheid: 'contract.lezen' }, agentToken);
-  assert.match(String(r.body.let), /Uitgevoerd/,
-    'de zin claimt uitvoering; wordt dit gesplitst, dan hoort DEZE regel mee te veranderen');
+  /* 19 oktober 2026: de zin claimde "Uitgevoerd binnen de machtiging" terwijl
+     er niets werd uitgevoerd. Nu zegt het antwoord eerlijk dat het oordeel het
+     toestaat en dat RTG zelf niets heeft uitgevoerd; `gelukt` in het spoor
+     blijft het oordeel (hierboven), en `uitgevoerd: false` zegt de rest. */
+  assert.doesNotMatch(String(r.body.let), /Uitgevoerd/, 'het antwoord claimt geen uitvoering');
+  assert.match(String(r.body.let), /niets uitgevoerd/);
+  assert.equal(r.body.uitgevoerd, false, 'en zegt het ook als veld');
 
   const na = await mijn(eerlijk.base, clientToken);
   regelsVoor = (na.body.log || []).length;

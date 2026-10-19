@@ -63,10 +63,12 @@ module.exports = (h) => {
     const mis = await vastleggen(() => spoor(clientKey, regel));
     if (mis) return mis;
     if (!oordeel.mag) return { status: 403, error: oordeel.reden, gelogd: true };
-    return { status: 200, ok: true, klaarzetten: oordeel.klaarzetten, reden: oordeel.reden,
+    /* handel() voert niets uit: hij oordeelt en legt vast (test/handelenspoor.test.js).
+       Tot 19 oktober 2026 zei het antwoord toch "Uitgevoerd binnen de machtiging". */
+    return { status: 200, ok: true, klaarzetten: oordeel.klaarzetten, reden: oordeel.reden, uitgevoerd: false,
       let: oordeel.klaarzetten
         ? 'Klaargezet. De cliënt bevestigt; er is niets verstuurd of vastgelegd.'
-        : 'Uitgevoerd binnen de machtiging, en het staat in het spoor van de cliënt.' };
+        : 'Toegestaan binnen de machtiging en genoteerd in het spoor van de cliënt. RTG heeft hier zelf niets uitgevoerd; de handeling doet u in de app waar ze hoort.' };
   }
 
   return { grensZet, handel };

@@ -323,7 +323,7 @@
        linksboven in de kop de greep: dezelfde plek op elk scherm, een tik
        (/ds/shell.js koppelt [data-ds-zoek] aan open()). Een tweede zwevende
        greep zou daar een losse laag naast de Edge zijn. */
-    stijl(); if (!d.documentElement.hasAttribute('data-ds')) greepje();
+    stijl(); if (!(d.documentElement && d.documentElement.hasAttribute('data-ds'))) greepje();
     if (w.requestIdleCallback) w.requestIdleCallback(vooraf, { timeout: 1500 }); else setTimeout(vooraf, 300);
     d.addEventListener('keydown', function (e) {
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); open(); return; }

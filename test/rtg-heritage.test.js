@@ -236,6 +236,15 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
     const body = (html.match(/<body\b[^>]*>/i) || [''])[0];
     const material = (body.match(/data-rtg-eigenvlak="([^"]+)"/) || [])[1];
     assert.equal(material, undefined, file + ' gebruikt nog een oude materiaalvariant');
+    /* Een scherm op het RTG Design System heeft zijn eigen schil: de layout en
+       de desktoploader van Heritage horen daar juist NIET (ONTWERPSYSTEEM.md
+       par. 5); zijn schil bewijst test/ontwerpsysteem.test.js en zijn eigen
+       browsertoets uit public/ds/contract.json "bewijs". */
+    if (/class="[^"]*\bds-scherm\b/.test(body)) {
+      assert.match(html, /href="\/ds\/rtg-ds\.css"/, file + ' draagt ds-scherm zonder het Design System');
+      assert.doesNotMatch(html, /rtg-world-desktop\.js|data-rtg-layout=/, file + ' mengt de oude schil met het Design System');
+      continue;
+    }
     if (identity.classify('/apps/'+file) !== 'redirect') {
       assert.match(body, /data-rtg-layout="standard"/, file+' mist de standaard');
       assert.equal((html.match(/src="\/shared\/rtg-world-desktop\.js"/g)||[]).length,1,file+' mist de desktoploader');

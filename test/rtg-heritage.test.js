@@ -253,6 +253,14 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
   }
   for (const route of Object.keys(registry.canvas)) {
     const body = lees('public' + route).match(/<body\b[^>]*>/i)[0];
+    /* Een canvasroute op het Design System (navigatie.html sinds batch 4 van
+       TRAVELOS-MIGRATIE.md) heeft geen Edge 2 die compact of automatisch kan
+       staan: de ds-Edge is een vaste, compacte balk onder het canvas. Daar
+       eist de toets dat het scherm zich als Canvas aandient. */
+    if (/class="[^"]*\bds-scherm\b/.test(body)) {
+      assert.match(body, /data-ds-schermtype="canvas"/, route + ': canvas op het Design System is geen Canvas-schermtype');
+      continue;
+    }
     assert.match(body, /data-rtg-edge-2-state="compact"/, route + ': canvas opent compact');
     assert.match(body, /data-rtg-edge-2-auto="false"/, route + ': bediening wacht op de gebruiker');
   }

@@ -3,23 +3,23 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-18T22:52:17.355Z",
-  "commit": "813118cc7",
-  "boomVuil": false,
+  "op": "2026-10-19T09:52:24.841Z",
+  "commit": "2c39db7a",
+  "boomVuil": true,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 392,
+  "artefacten": 394,
   "bron": 55,
-  "afgeleid": 206,
+  "afgeleid": 207,
   "fragmenten": 28,
   "momentopname": 1,
-  "onbeslist": 102,
+  "onbeslist": 103,
   "afgeleidZonderEigenaar": 0,
-  "metEigenaar": 235,
-  "afgeleidEigenaarHard": 206,
+  "metEigenaar": 236,
+  "afgeleidEigenaarHard": 207,
   "afgeleidGrendelt": 69,
   "metStempel": 131,
   "stempelAnders": 0
@@ -3269,8 +3269,34 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ONTWERPNORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ontwerpsysteem.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/ontwerpsysteem.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "ONTWERPSTANDAARD-METING.md",
    "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONTWERPSYSTEEM.md",
+   "soort": "ONBESLIST",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],

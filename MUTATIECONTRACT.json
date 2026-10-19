@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-19T09:01:58.367Z",
-  "commit": "cea06cb5",
+  "op": "2026-10-19T09:47:42.118Z",
+  "commit": "aff4985f",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -23,9 +23,9 @@
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4473,
-   "PUBLIC": 105,
+   "PUBLIC": 88,
    "OBJECT_SCOPED": 785,
-   "(niet af te leiden -- vraagt een verklaring)": 26,
+   "(niet af te leiden -- vraagt een verklaring)": 43,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -189,12 +189,6 @@
    "route": "POST /api/krant/open",
    "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/lab2/bewoner/studie",
-   "bedoeld": "AUTHENTICATED",
-   "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -35927,7 +35921,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -35954,7 +35948,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36035,7 +36029,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36063,7 +36057,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36117,7 +36111,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
@@ -36900,7 +36894,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36928,7 +36922,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36956,7 +36950,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36984,7 +36978,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37012,7 +37006,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37040,7 +37034,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37068,7 +37062,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37393,7 +37387,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37420,7 +37414,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37447,7 +37441,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37474,7 +37468,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37501,7 +37495,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [

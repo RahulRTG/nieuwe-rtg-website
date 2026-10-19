@@ -225,7 +225,7 @@ const SAMENSCHERM = {
   'public/apps/stil.html': '<p>geen protocol</p>'
 };
 const samenOpties = (samen, extra = {}) => Object.assign({
-  samen, extern: {}, zonderApp: [],
+  samen, extern: {}, zonderApp: [], ontbrekend: [],
   functies: new Map([['link:geef', '/apps/geef.html'], ['link:neem', '/apps/neem.html'], ['link:stil', '/apps/stil.html']]),
   bestandenVan: (ingang) => ['public' + ingang],
   lees: (rel) => (rel in SAMENSCHERM ? SAMENSCHERM[rel] : (rel === 'scripts/proef.js' ? '// proef' : null))
@@ -308,4 +308,60 @@ test('SAMEN: een ontvanger op de contextbus wordt aan zijn eigen protocol gemete
     schakels: [{ scherm: '/apps/neem.html', ontvangt: 'reis', protocol: 'context' }] }], extern: { reis: 'proef' } });
   assert.ok(B.controleerSamen(opt).some((x) => /neem\.html ontvangt reis niet in zijn code \(context\)/.test(x)),
     'neem.html spreekt alleen sleep-kan; als contextontvanger telt hij niet');
+});
+
+/* ---- FAMILIES, LAAG EN ONTBREKEND (keuze A, 19 oktober 2026) ---------------- */
+const FAM = { reis: { wat: 'w', kaart: 'k' } };
+const famOpties = (extra) => samenOpties({}, Object.assign({ families: FAM, ontbrekend: [], zoekIn: () => [] }, extra));
+
+test('FAMILIE: compleet alleen als alle ketens BEWEZEN zijn en er niets ontbreekt', () => {
+  const k = (status) => ({ naam: 'k' + status, familie: 'reis', laag: 'scherm', status });
+  assert.equal(B.familieStand({ families: FAM, ketens: [k('BEWEZEN')], ontbrekend: [] }).reis.compleet, true);
+  assert.equal(B.familieStand({ families: FAM, ketens: [k('BEWEZEN'), k('NIET_GETEST')], ontbrekend: [] }).reis.compleet, false);
+  assert.equal(B.familieStand({ families: FAM, ketens: [k('BEWEZEN')],
+    ontbrekend: [{ familie: 'reis', naam: 'gat', ontbreekt: 'keten', wat: 'x', kaart: 'k', k: 'K1' }] }).reis.compleet, false,
+    'een gemeld gat houdt de familie open, ook als elke keten groen is');
+  assert.equal(B.familieStand({ families: FAM, ketens: [], ontbrekend: [] }).reis.compleet, false, 'zonder een enkele keten is er niets compleet');
+});
+
+test('FAMILIE: de echte reisfamilie is (nog) niet compleet, en elk gat noemt zijn kaart', () => {
+  const f = B.familieStand().reis;
+  assert.equal(f.compleet, false);
+  assert.ok(f.ontbrekend.some((o) => o.k === 'K2'), 'de ontbrekende betaalknop (K2) staat erin');
+  for (const o of AC.ONTBREKEND) assert.ok(o.kaart && o.wat, o.naam);
+});
+
+test('ONTBREKEND: laag, familie en soort worden gecontroleerd', () => {
+  const b = B.controleerSamen(famOpties({ ontbrekend: [
+    { familie: 'nergens', naam: 'a', laag: 'scherm', ontbreekt: 'keten', wat: 'x', kaart: 'k' },
+    { familie: 'reis', naam: 'b', laag: 'wolk', ontbreekt: 'keten', wat: 'x', kaart: 'k' },
+    { familie: 'reis', naam: 'c', laag: 'kern', ontbreekt: 'misschien', wat: 'x', kaart: 'k' },
+    { familie: 'reis', naam: 'd', laag: 'kern', ontbreekt: 'keten' }
+  ] }));
+  assert.ok(b.some((x) => /"a": familie "nergens"/.test(x)), b.join('\n'));
+  assert.ok(b.some((x) => /"b": laag "wolk"/.test(x)), b.join('\n'));
+  assert.ok(b.some((x) => /"c": ontbreekt is "misschien"/.test(x)), b.join('\n'));
+  assert.ok(b.some((x) => /"d": zonder wat of zonder kaart/.test(x)), b.join('\n'));
+});
+
+test('ONTBREKEND: een bestaande keten zonder proef moet in de code staan', () => {
+  const lees = (rel) => (rel === 'server/kern/x.js' ? 'roept bijBoeking aan' : null);
+  const ok = { familie: 'reis', naam: 'p', laag: 'kern', ontbreekt: 'proef', wat: 'x', kaart: 'k', bron: [{ bestand: 'server/kern/x.js', noemt: 'bijBoeking' }] };
+  assert.deepEqual(B.controleerSamen(famOpties({ lees, ontbrekend: [ok] })), []);
+  const weg = B.controleerSamen(famOpties({ lees, ontbrekend: [Object.assign({}, ok, { bron: [{ bestand: 'server/kern/x.js', noemt: 'verdwenen' }] })] }));
+  assert.ok(weg.some((x) => /noemt "verdwenen" niet meer/.test(x)), weg.join('\n'));
+  const zonder = B.controleerSamen(famOpties({ lees, ontbrekend: [Object.assign({}, ok, { bron: [] })] }));
+  assert.ok(zonder.some((x) => /noemt waar hij in de code staat/.test(x)), zonder.join('\n'));
+});
+
+test('ONTBREKEND: een gat dat in de code gedicht is maar blijft staan, wordt rood', () => {
+  const gat = { familie: 'reis', naam: 'knop', laag: 'scherm', ontbreekt: 'keten', wat: 'x', kaart: 'k', k: 'K2',
+    zolang: { geenBestandIn: 'public/', noemt: '/api/reisbureau/betaal' } };
+  assert.deepEqual(B.controleerSamen(famOpties({ ontbrekend: [gat] })), []);
+  const dicht = B.controleerSamen(famOpties({ ontbrekend: [gat], zoekIn: () => ['public/apps/reisbureau.html'] }));
+  assert.ok(dicht.some((x) => /het gat lijkt gedicht/.test(x)), dicht.join('\n'));
+  /* En een keten die al als keten staat, hoort er niet meer in. */
+  const dubbel = B.controleerSamen(famOpties({ ontbrekend: [Object.assign({}, gat, { naam: 'z', zolang: undefined })],
+    zonderApp: [{ naam: 'z', laag: 'kern', familie: 'reis', reden: 'r', nodig: 'n', schakels: [], proef: { register: 'X.json', instrument: 'scripts/proef.js' } }] }));
+  assert.ok(dubbel.some((x) => /staat ook als keten/.test(x)), dubbel.join('\n'));
 });

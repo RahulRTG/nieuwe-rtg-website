@@ -667,7 +667,7 @@ const EXTERN = {};
    gemeten (koppeling in de code, de proef), maar tellen pas voor APPWERKT als
    beide schermen een ingang in MAPPEN zijn. */
 const KETENS_ZONDER_APP = [
-  { naam: 'reis-naar-agenda',
+  { naam: 'reis-naar-agenda', laag: 'scherm', familie: 'reis',
     schakels: [{ scherm: '/apps/reizen.html', uitgeeft: 'reis' }, { scherm: '/apps/agenda.html', ontvangt: 'reis' }],
     proef: { register: 'SAMENPROEF.json', instrument: 'scripts/samenproef.js' },
     reden: 'Reizen (/apps/reizen.html) en Agenda (/apps/agenda.html) zijn geen ingang in MAPPEN: TravelOS kent tab:reizen zonder eigen adres, en Agenda staat in geen enkele wereld',
@@ -677,12 +677,70 @@ const KETENS_ZONDER_APP = [
      eerste ontvanger. Een AFZENDER is er nog niet: geen enkele app stuurt
      vandaag context, en de proef zet hem met RTGSchil.context. Die schakel
      staat in de proef open, met de reden. */
-  { naam: 'context-naar-agenda',
+  { naam: 'context-naar-agenda', laag: 'scherm', familie: 'reis',
     schakels: [{ scherm: '/apps/agenda.html', ontvangt: 'reis', protocol: 'context' }],
     proef: { register: 'SAMENPROEF.json', instrument: 'scripts/samenproef.js' },
     reden: 'Agenda (/apps/agenda.html) is geen ingang in MAPPEN, en geen enkele app stuurt vandaag context: de bus heeft een ontvanger en nog geen afzender',
     nodig: 'een afzender (Reizen stuurt de gekozen reis als context, af te stemmen met wie de schil bezit) en Agenda als ingang in MAPPEN' }
 ];
 
+/* ---- FAMILIES EN WAT ER ONTBREEKT (integrator, keuze A, 19 oktober 2026) ----
+
+   Een keten heeft een LAAG: `scherm` (een verwijzing tussen twee schermen, het
+   SAMEN-model hierboven) of `kern` (een schrijvende koppeling van kernmodule
+   naar kernmodule; een schakel noemt dan zijn `bestand` en wat het van de
+   volgende `noemt`). En een FAMILIE: de apps die samen een belofte maken.
+
+   Een familie is pas COMPLEET als al haar ketens BEWEZEN zijn en ONBREKEND voor
+   haar leeg is. ONTBREKEND is de eerlijke lijst van gaten, gemeten door de
+   wereldagent (docs/domeinkaarten/<wereld>.md, met K-nummer):
+     ontbreekt: 'keten'  er is geen koppeling in de code
+     ontbreekt: 'proef'  de koppeling bestaat, maar geen proef loopt haar af --
+                         en een keten zonder proef is een bewering, dus telt
+                         hij nog niet als keten
+   Een regel in ONTBREKEND is geen bezwaar: hij is gemeld. Hij gaat er pas af
+   als de keten (met proef) hierboven staat. Waar een gat in de code te meten
+   is, draagt hij `zolang` -- en lost iemand het op zonder de regel weg te
+   halen, dan wordt de controle rood: een opgelost gat dat blijft staan, liegt
+   de andere kant op. */
+const FAMILIES = {
+  reis: { wat: 'boeken, betalen, agenda en reisdossier: een reis is compleet als hij geboekt, betaald, in de agenda en in het dossier staat, los en samen (eigenaarsbesluit 19 oktober 2026: de eerste familie)',
+    kaart: 'docs/domeinkaarten/travelos.md' }
+};
+
+const KAART_REIS = 'docs/domeinkaarten/travelos.md';
+const ONTBREKEND = [
+  /* Bestaat in de code, nog zonder proef (TravelOS, 307a16d12). */
+  { familie: 'reis', naam: 'boeking-naar-visumtaak', laag: 'kern', ontbreekt: 'proef', kaart: KAART_REIS,
+    wat: 'een reisboeking zet een visumtaak in de agenda (bron = reisref)',
+    bron: [{ bestand: 'server/kern/reisbureau.js', noemt: 'bijBoeking' }, { bestand: 'server/kern/visumtaak.js', noemt: 'bijBoeking' }] },
+  { familie: 'reis', naam: 'vlucht-naar-visumtaak', laag: 'kern', ontbreekt: 'proef', kaart: KAART_REIS,
+    wat: 'een geboekte vlucht zet een visumtaak in de agenda',
+    bron: [{ bestand: 'server/kern/luchthaven/vluchten.js', noemt: 'bijBoeking' }] },
+  { familie: 'reis', naam: 'reisfix-naar-agenda', laag: 'kern', ontbreekt: 'proef', kaart: KAART_REIS,
+    wat: 'een opgeloste reis (/api/reis/los/doe) zet een agendaregel met bron reisfix:',
+    bron: [{ bestand: 'server/kern/reisoplosser.js', noemt: 'reisfix:' }] },
+  { familie: 'reis', naam: 'reisbureau-naar-dossier', laag: 'kern', ontbreekt: 'proef', kaart: KAART_REIS,
+    wat: 'boeken, bevestigen, annuleren en afzeggen schrijven in het reisdossier (md.trip)',
+    bron: [{ bestand: 'server/kern/reisbureau.js', noemt: 'reisdossier' }, { bestand: 'server/kern/lid/reisdossier.js', noemt: 'zetAanvraag' }] },
+  { familie: 'reis', naam: 'reis-betalen', laag: 'kern', ontbreekt: 'proef', kaart: KAART_REIS,
+    wat: 'een reis betalen boekt in de wallet (pay.boekAsync) en markeert de aanvraag betaald -- nog zonder betaalwaarheid; de schakel "betaald" telt pas als /api/reisbureau/mijn een betaald-object heeft EN de wallet een reisboeking toont (Geld)',
+    bron: [{ bestand: 'server/kern/reisbureau-betaling.js', noemt: 'boekAsync' }] },
+  /* Ontbreekt in de code. */
+  { familie: 'reis', naam: 'betaling-naar-dossier', laag: 'kern', ontbreekt: 'keten', k: 'K1', kaart: KAART_REIS,
+    wat: 'markeerBetaald raakt md.trip niet, terwijl bevestigen al paid zet: het dossier noemt een onbetaalde reis betaald' },
+  { familie: 'reis', naam: 'betaling-naar-betaalbewijs', laag: 'kern', ontbreekt: 'keten', k: 'K3', kaart: KAART_REIS,
+    wat: 'reisbureau-betaling roept factuurVoorLid niet aan: er is geen betaalbewijs' },
+  { familie: 'reis', naam: 'betaling-naar-bestellingen', laag: 'kern', ontbreekt: 'keten', k: 'K4', kaart: KAART_REIS,
+    wat: 'het bestellingenoverzicht zet hard betaald: false, ook voor een betaalde reis' },
+  { familie: 'reis', naam: 'logeren-naar-agenda', laag: 'kern', ontbreekt: 'keten', kaart: KAART_REIS,
+    wat: 'logeren bij leden (thuisBoekingen) komt niet in de agenda, de reiswereld of Move' },
+  { familie: 'reis', naam: 'reisboek-naar-reiswereld', laag: 'kern', ontbreekt: 'keten', kaart: KAART_REIS,
+    wat: 'een handmatige reis uit het Reisboek (levensdossier rechterhand) is geen bron van de reiswereld' },
+  { familie: 'reis', naam: 'reisbureau-betaalknop', laag: 'scherm', ontbreekt: 'keten', k: 'K2', kaart: KAART_REIS,
+    wat: 'geen scherm roept /api/reisbureau/betaal aan: een lid kan een bevestigde reis niet zelf betalen',
+    zolang: { geenBestandIn: 'public/', noemt: '/api/reisbureau/betaal' } }
+];
+
 module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT,
-  SAMEN, EXTERN, KETENS_ZONDER_APP };
+  SAMEN, EXTERN, KETENS_ZONDER_APP, FAMILIES, ONTBREKEND };

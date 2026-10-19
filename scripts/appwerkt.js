@@ -477,7 +477,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 }
 
 const { SAMEN, KETENS_ZONDER_APP } = require('./lib/appcontract');
-const { controleerSamen, samenKetens } = require('./lib/bewijsbron');
+const { controleerSamen, samenKetens, familieStand } = require('./lib/bewijsbron');
 let samenUitslag = null;
 function samenVoor(functie) {
   const c = SAMEN[functie] || {};
@@ -933,7 +933,10 @@ function bouw(meting) {
          waarvan de schermen (nog) geen ingang in MAPPEN zijn. */
       samen: { bezwaren: controleerSamen(), ketens: samenUitslag || samenKetens(),
         nietVerbonden: meting.regels.filter((r) => r.samen && r.samen.stand === 'niet verbonden').length,
-        ketensZonderApp: KETENS_ZONDER_APP.map((k) => ({ naam: k.naam, reden: k.reden, nodig: k.nodig })) }
+        ketensZonderApp: KETENS_ZONDER_APP.map((k) => ({ naam: k.naam, reden: k.reden, nodig: k.nodig })),
+        /* Een familie is compleet als al haar ketens BEWEZEN zijn en ONTBREKEND
+           voor haar leeg is (scripts/lib/appcontract.js). */
+        families: familieStand({ ketens: samenUitslag || samenKetens() }) }
     },
     defecten: defecten.map((d) => ({ app: d.app, wereld: d.wereld, ingang: d.ingang,
       reden: Object.values(d.bewijzen).find((b) => b.status === 'GEBLOKKEERD_DOOR_DEFECT').reden })),

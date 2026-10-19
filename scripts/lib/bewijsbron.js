@@ -389,6 +389,21 @@ function controleerSamen(opties = {}) {
     if (!k.proef || !k.proef.register || !k.proef.instrument) { bezwaren.push(wie + ': keten "' + k.naam + '" noemt geen proef; een keten zonder proef is een bewering'); return; }
     if (lees(k.proef.instrument) === null) bezwaren.push(wie + ': de proef van "' + k.naam + '" (' + k.proef.instrument + ') bestaat niet');
   };
+  const families = opties.families || ac.FAMILIES;
+  const laagOk = (k, wie) => {
+    const laag = k.laag || 'scherm';
+    if (laag !== 'scherm' && laag !== 'kern') { bezwaren.push(wie + ': laag "' + laag + '" is geen scherm of kern'); return null; }
+    if (k.familie && !families[k.familie]) bezwaren.push(wie + ': familie "' + k.familie + '" bestaat niet in FAMILIES');
+    return laag;
+  };
+  /* Een kernschakel: het bestand bestaat en noemt wat de volgende schakel is. */
+  const kernSchakels = (wie, schakels) => {
+    for (const sch of schakels || []) {
+      const t = sch.bestand ? lees(sch.bestand) : null;
+      if (t === null) { bezwaren.push(wie + ': kernschakel ' + (sch.bestand || '(geen bestand)') + ' bestaat niet'); continue; }
+      if (sch.noemt && !t.includes(sch.noemt)) bezwaren.push(wie + ': ' + sch.bestand + ' noemt "' + sch.noemt + '" niet meer');
+    }
+  };
   for (const [f, c] of Object.entries(samen)) {
     if (!functies.has(f)) { bezwaren.push(f + ' staat in SAMEN maar is geen functie in MAPPEN'); continue; }
     const ingang = functies.get(f);
@@ -401,6 +416,7 @@ function controleerSamen(opties = {}) {
     for (const soort of c.ontvangt || []) if (!uitgegeven.has(soort)) bezwaren.push(f + ': ontvangt ' + soort + ', maar geen app geeft die uit en hij staat niet in EXTERN');
     for (const k of c.ketens || []) {
       if (!k.naam) bezwaren.push(f + ': een keten zonder naam');
+      if (laagOk(k, f + ': keten "' + k.naam + '"') === 'kern' && k.kern) kernSchakels(f + ': keten "' + k.naam + '"', k.kern);
       if (!Array.isArray(k.schakels) || k.schakels.length < 2) bezwaren.push(f + ': keten "' + k.naam + '" heeft minder dan twee schakels; dat is LOS, geen SAMEN');
       for (const sch of k.schakels || []) if (!functies.has(sch)) bezwaren.push(f + ': keten "' + k.naam + '" noemt schakel ' + sch + ', en die bestaat niet in MAPPEN');
       if (!(k.schakels || []).includes(f)) bezwaren.push(f + ': keten "' + k.naam + '" noemt deze functie zelf niet als schakel');
@@ -410,6 +426,7 @@ function controleerSamen(opties = {}) {
   for (const k of zonder) {
     const wie = 'keten zonder app "' + k.naam + '"';
     if (!k.reden || !k.nodig) bezwaren.push(wie + ': zonder reden of zonder wat er nodig is om wel te tellen');
+    if (laagOk(k, wie) === 'kern') { kernSchakels(wie, k.schakels); proefNodig(k, wie); continue; }
     for (const sch of k.schakels || []) {
       const soort = sch.uitgeeft || sch.ontvangt;
       if (!SOORT_OK(soort)) { bezwaren.push(wie + ': "' + soort + '" is geen soort die de objectpoort doorlaat'); continue; }
@@ -421,7 +438,62 @@ function controleerSamen(opties = {}) {
     for (const [f, c] of [...functies].map(([x]) => [x, samen[x]]).filter(([, c]) => c)) if ((c.ketens || []).some((x) => x.naam === k.naam)) bezwaren.push(wie + ' staat ook onder ' + f + ' in SAMEN; een keten staat op een plek');
     proefNodig(k, wie);
   }
+
+  /* ONTBREKEND: elk gat is gemeld met familie, laag, wat en kaart; een gat dat
+     in de code te meten is (`zolang`) mag niet stilletjes opgelost zijn; en een
+     keten die al als keten met proef staat, hoort er niet meer in. */
+  const ontbrekend = opties.ontbrekend || ac.ONTBREKEND;
+  const ketenNamen = new Set(zonder.map((k) => k.naam));
+  for (const c of Object.values(samen)) for (const k of c.ketens || []) ketenNamen.add(k.naam);
+  for (const o of ontbrekend) {
+    const wie = 'ontbrekend "' + o.naam + '"';
+    if (!o.familie || !families[o.familie]) bezwaren.push(wie + ': familie "' + o.familie + '" bestaat niet in FAMILIES');
+    if (o.ontbreekt !== 'keten' && o.ontbreekt !== 'proef') bezwaren.push(wie + ': ontbreekt is "' + o.ontbreekt + '", geen keten of proef');
+    if (!o.wat || !o.kaart) bezwaren.push(wie + ': zonder wat of zonder kaart');
+    laagOk(o, wie);
+    if (ketenNamen.has(o.naam)) bezwaren.push(wie + ' staat ook als keten; haal hem uit ONTBREKEND');
+    if (o.ontbreekt === 'proef') {
+      if (!Array.isArray(o.bron) || !o.bron.length) bezwaren.push(wie + ': een bestaande keten zonder proef noemt waar hij in de code staat (bron)');
+      else kernSchakels(wie, o.bron);
+    }
+    if (o.zolang) {
+      const map = o.zolang.geenBestandIn;
+      const noemen = (opties.zoekIn || standaardZoekIn)(map, o.zolang.noemt);
+      if (noemen.length) bezwaren.push(wie + ': ' + noemen[0] + ' noemt nu ' + o.zolang.noemt + ' -- het gat lijkt gedicht; meet de keten en haal hem uit ONTBREKEND');
+    }
+  }
   return bezwaren;
+}
+function standaardZoekIn(map, tekst) {
+  const R = require('./bewijsraakvlak');
+  samenWereld = samenWereld || R.maakWereld();
+  const uit = [];
+  for (const p of samenWereld.lijst() || []) {
+    if (!p.startsWith(map) || !/\.(m?js|html?)$/.test(p)) continue;
+    const t = samenWereld.inhoud(p);
+    if (t && t.toString('utf8').includes(tekst)) uit.push(p);
+  }
+  return uit;
+}
+
+/* DE STAND VAN EEN FAMILIE. Compleet als al haar ketens BEWEZEN zijn en er voor
+   haar niets in ONTBREKEND staat. Een getal per soort, geen graad. */
+function familieStand(opties = {}) {
+  const ac = require('./appcontract');
+  const families = opties.families || ac.FAMILIES;
+  const ketens = opties.ketens || samenKetens(opties);
+  const ontbrekend = opties.ontbrekend || ac.ONTBREKEND;
+  const uit = {};
+  for (const [naam, f] of Object.entries(families)) {
+    const eigen = ketens.filter((k) => k.familie === naam);
+    const gaten = ontbrekend.filter((o) => o.familie === naam);
+    uit[naam] = { wat: f.wat, kaart: f.kaart,
+      ketens: eigen.map((k) => ({ naam: k.naam, laag: k.laag, status: k.status })),
+      bewezen: eigen.filter((k) => k.status === 'BEWEZEN').length,
+      ontbrekend: gaten.map((o) => ({ naam: o.naam, laag: o.laag || 'scherm', ontbreekt: o.ontbreekt, k: o.k || null, wat: o.wat })),
+      compleet: eigen.length > 0 && gaten.length === 0 && eigen.every((k) => k.status === 'BEWEZEN') };
+  }
+  return uit;
 }
 
 /* De uitslag per keten, uit zijn proef. Het register draagt per keten een
@@ -437,10 +509,10 @@ function samenKetens(opties = {}) {
     const u = k.proef ? ketenUitslag(k.proef.register, { lees: opties.lees || leesStandaard,
       versheid: opties.versheid || require('./stempel').versheid, deel: ['ketens', k.naam] })
       : { status: 'NIET_GETEST', reden: 'geen proef', bewijs: null };
-    uit.push({ naam: k.naam, functie, zonderApp: !functie, schakels: k.schakels, status: u.status, reden: u.reden,
+    uit.push({ naam: k.naam, functie, zonderApp: !functie, laag: k.laag || 'scherm', familie: k.familie || null, schakels: k.schakels, status: u.status, reden: u.reden,
       bewijs: u.bewijs, raakvlak: u.raakvlak });
   }
   return uit;
 }
 
-module.exports = { controleerSamen, samenKetens, noemtSoort, PROTOCOL, proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };
+module.exports = { controleerSamen, samenKetens, familieStand, noemtSoort, PROTOCOL, proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

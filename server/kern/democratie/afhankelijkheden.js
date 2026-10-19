@@ -30,7 +30,10 @@ const MODULES = {
   '../bearercode': { wat: 'de partijsleutel: 128 bits, alleen de hash op schijf, zoeken in constante tijd, vervaltijd en intrekken',
     vervangbaar: 'ja: een zelfstandige module zonder opslag, alleen node:crypto' },
   '../../rem': { wat: 'een rem per bron voor de deur van een partij, tegen wie sleutels probeert',
-    vervangbaar: 'ja: elke teller per bron en tijdvenster' }
+    vervangbaar: 'ja: elke teller per bron en tijdvenster' },
+  '../../kern/isolatie/sessiedragers': { wat: 'welk RTG-account er achter de Bearer van de partijdeur zit: wie namens ' +
+    'een partij handelt, heeft sinds het eigenaarsbesluit van 19 oktober 2026 een account met die rol (./partijrol.js)',
+    vervangbaar: 'deels: een eigen inlog nodig, net als auth' }
 };
 
 /* Namen die de fabriek van buitenaf krijgt (kern/democratie/index.js). */

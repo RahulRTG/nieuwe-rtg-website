@@ -73,7 +73,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   const doe = maakDoe({ kaart: () => eigen.bak('democratieActies'), kijk: () => eigen.kijk('democratieActies') || {},
     zoek, schrijver, koppeling, vastleggen, ontvangersVan, crypto, nu: () => new Date(nu()).toISOString() });
-  const { bijKwestie, ...connector } = maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zonderNaam, betrokken });
+  const { bijKwestie, ...connector } = maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zonderNaam, betrokken, koppeling });
   const metActies = (v) => Object.assign(v, { acties: doe.opKwestie(v.id), voorstellen: bijKwestie(v.id) });
 
   function lijst() {
